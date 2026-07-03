@@ -84,7 +84,8 @@ async function main() {
     for (const row of rows) {
       const {
         story_id, task_id, worker_id, trace_id, query_hash,
-        packet_key, source_ref, feature_id, feature_label,
+        packet_key, packet_id, packet_ulid, source_ref, canonical_source_ref,
+        source_ref_key, feature_id, title_id, feature_label,
         cache_namespace, cache_key, cache_hit_source,
         graph_stage_status, traversal_path, fusion_score, verdict
       } = row;
@@ -117,8 +118,13 @@ async function main() {
 
       qGroup.packets.push({
         packet_key,
+        packet_id,
+        packet_ulid,
         source_ref,
+        canonical_source_ref,
+        source_ref_key,
         feature_id,
+        title_id,
         feature_label,
         cache_namespace,
         cache_key,
@@ -159,7 +165,7 @@ Generated at: ${new Date().toISOString()}
 | Metric | Value |
 |---|---|
 | Total Packet Matches | ${summaryReport.statistics.total_packet_matches} |
-| Valid Joins (\`story/task/worker → packet_key → source_ref → feature_id\`) | ${summaryReport.statistics.valid_joins} |
+| Valid Joins (\`story/task/worker → packet_key → packet_id/title_id → source_ref → feature_id\`) | ${summaryReport.statistics.valid_joins} |
 | Broken / Ambiguous Joins | ${summaryReport.statistics.missing_joins} |
 | **Join Stability Score** | **${summaryReport.statistics.join_stability_pct}%** |
 
@@ -180,7 +186,13 @@ Generated at: ${new Date().toISOString()}
                 md += `        * 📭 *No packet matches retrieved for this query*\n`;
               } else {
                 md += `        * 📦 Packet: \`${p.packet_key}\`\n`;
+                if (p.packet_id) md += `          * 🆔 Packet ID: \`${p.packet_id}\`\n`;
+                if (p.packet_ulid) md += `          * 🕒 Packet ULID: \`${p.packet_ulid}\`\n`;
+                if (p.title_id) md += `          * 🏷️ Title ID: \`${p.title_id}\`\n`;
                 md += `          * 📁 Source: \`${p.source_ref}\`\n`;
+                if (p.canonical_source_ref && p.canonical_source_ref !== p.source_ref) {
+                  md += `          * 📌 Canonical Source: \`${p.canonical_source_ref}\`\n`;
+                }
                 md += `          * 🏷️ Feature ID: \`${p.feature_id}\` (${p.feature_label || 'no label'})\n`;
                 md += `          * ⚡ Cache Hit: ${p.cache_hit_source !== 'miss' ? `🟢 ${p.cache_hit_source} (${p.cache_namespace})` : '🔴 MISS'}\n`;
                 md += `          * 🔗 Join Spine Status: ${p.has_valid_join ? '🟢 STABLE' : '🔴 BROKEN (null feature or source)'}\n`;

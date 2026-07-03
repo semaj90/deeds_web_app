@@ -25,6 +25,19 @@ interface SummarizeResponse {
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+const SUMMARY_PROMPT_TEMPLATE_VERSION = 'phase7-v2';
+
+function buildStableSummaryPrompt(prompt: string): string {
+  return [
+    'You are a legal AI assistant.',
+    'Provide a concise summary in 1-2 sentences.',
+    'Return only the summary text.',
+    'Do not include chain-of-thought, headings, or bullet lists.',
+    `Prompt template version: ${SUMMARY_PROMPT_TEMPLATE_VERSION}.`,
+    '',
+    prompt,
+  ].join('\n');
+}
 
 /**
  * Strip <|channel>thought blocks from model output
@@ -66,9 +79,9 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
         messages: [
           {
             role: 'system',
-            content: 'You are a legal AI assistant. Provide clear, concise summaries.'
+            content: 'You are a legal AI assistant. Provide concise summaries in 1-2 sentences. Return only the summary text.'
           },
-          { role: 'user', content: prompt }
+          { role: 'user', content: buildStableSummaryPrompt(prompt) }
         ],
         stream: false,
         max_tokens: maxTokens,
@@ -158,7 +171,7 @@ export async function summarizeBatchPackets(
   for (let i = 0; i < packets.length; i++) {
     const packet = packets[i];
     try {
-      const response = await summarizeWithGemma4({
+    const response = await summarizeWithGemma4({
         prompt: `Summarize this code/feature in 50-100 words:\n\n${packet.content}`
       });
       results.push({

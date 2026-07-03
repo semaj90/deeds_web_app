@@ -15,6 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import readline from 'node:readline';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,9 +24,11 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run') || !args.includes('--apply');
 const verbose = args.includes('--verbose');
+const completeGraph = args.includes('--complete-graph');
+const repoEnv = loadRepoEnv(process.env);
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+  connectionString: resolveDatabaseUrl(repoEnv),
   max: 5,
 });
 
@@ -68,14 +71,44 @@ async function readNDJSON(filePath) {
   return items;
 }
 
+async function insertEdge(client, fromFeatureId, toFeatureId, relation, weight) {
+  try {
+    if (!dryRun) {
+      await client.query(`
+        INSERT INTO code_feature_edges (from_feature_id, to_feature_id, relation, confidence)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT DO NOTHING
+      `, [fromFeatureId, toFeatureId, relation, weight]);
+    }
+
+    proof.stats.feature_edges_created++;
+  } catch (err) {
+    proof.errors.push({
+      edge: `${fromFeatureId} → ${toFeatureId}`,
+      relation,
+      error: err.message
+    });
+    proof.stats.errors++;
+  }
+}
+
 /**
- * Populate code_feature_edges with complete graph from all features
- * This ensures PageRank can compute meaningful scores from the graph structure.
+ * Populate code_feature_edges with scoped structural graph edges.
+ * Complete graph mode remains available behind --complete-graph, but the
+ * default is file-local so PageRank/GDS receives useful signal instead of
+ * millions of uniform all-to-all edges.
  */
 async function populateEdges(client) {
   // Get all code features
-  const featuresResult = await client.query('SELECT feature_id FROM code_features');
-  const features = featuresResult.rows.map(r => r.feature_id);
+  const featuresResult = await client.query(`
+    SELECT feature_id, source_ref, symbol, kind, line_start
+    FROM code_features
+    WHERE feature_id IS NOT NULL
+      AND source_ref IS NOT NULL
+    ORDER BY source_ref, COALESCE(line_start, 999999), kind, symbol
+  `);
+  const featureRows = featuresResult.rows;
+  const features = featureRows.map(r => r.feature_id);
   proof.stats.features_total = features.length;
   console.log(`✓ Loaded ${features.length} code features`);
 
@@ -85,51 +118,70 @@ async function populateEdges(client) {
   proof.stats.edges_read = topoEdges.length;
   console.log(`✓ Loaded ${topoEdges.length} topology edges`);
 
-  // Create a complete graph between all features with weights from topology
-  for (let i = 0; i < features.length; i++) {
-    for (let j = i + 1; j < features.length; j++) {
-      const fromFeatureId = features[i];
-      const toFeatureId = features[j];
+  if (completeGraph) {
+    console.warn('⚠ --complete-graph enabled: this can create many low-signal edges.');
+    for (let i = 0; i < features.length; i++) {
+      for (let j = i + 1; j < features.length; j++) {
+        const weight = 1.0 / Math.max(1, features.length - 1);
+        await insertEdge(client, features[i], features[j], 'DEPENDS_ON', weight);
+        await insertEdge(client, features[j], features[i], 'DEPENDS_ON', weight);
+      }
+    }
+  } else {
+    const bySource = new Map();
+    for (const row of featureRows) {
+      const list = bySource.get(row.source_ref) ?? [];
+      list.push(row);
+      bySource.set(row.source_ref, list);
+    }
 
-      // Use a base weight from topology edges (if available), else uniform
-      const weight = 1.0 / Math.max(1, features.length - 1);
+    for (const rows of bySource.values()) {
+      const sorted = rows.sort((a, b) => Number(a.line_start ?? 999999) - Number(b.line_start ?? 999999));
 
-      try {
-        if (!dryRun) {
-          // Create bidirectional edges
-          await client.query(`
-            INSERT INTO code_feature_edges (from_feature_id, to_feature_id, relation, confidence)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT DO NOTHING
-          `, [fromFeatureId, toFeatureId, 'DEPENDS_ON', weight]);
+      for (let i = 0; i < sorted.length - 1; i++) {
+        await insertEdge(client, sorted[i].feature_id, sorted[i + 1].feature_id, 'NEXT_IN_FILE', 0.8);
+      }
 
-          await client.query(`
-            INSERT INTO code_feature_edges (from_feature_id, to_feature_id, relation, confidence)
-            VALUES ($1, $2, $3, $4)
-            ON CONFLICT DO NOTHING
-          `, [toFeatureId, fromFeatureId, 'DEPENDS_ON', weight]);
+      const imports = sorted.filter((row) => String(row.kind ?? '').includes('import'));
+      const codeNodes = sorted.filter((row) => /function|method|exported|class|type|route|mcp_tool|drizzle_table/.test(String(row.kind ?? '')));
+      for (const imp of imports.slice(0, 25)) {
+        for (const target of codeNodes.slice(0, 50)) {
+          if (imp.feature_id !== target.feature_id) {
+            await insertEdge(client, imp.feature_id, target.feature_id, 'SUPPORTS_IN_FILE', 0.6);
+          }
         }
+      }
+    }
 
-        proof.stats.feature_edges_created += 2; // bidirectional
-      } catch (err) {
-        proof.errors.push({
-          edge: `${fromFeatureId} → ${toFeatureId}`,
-          error: err.message
-        });
-        proof.stats.errors++;
+    const bySymbol = new Map();
+    for (const row of featureRows) {
+      const symbol = String(row.symbol ?? '').trim().toLowerCase();
+      if (!symbol || symbol.length < 4) continue;
+      const list = bySymbol.get(symbol) ?? [];
+      list.push(row);
+      bySymbol.set(symbol, list);
+    }
+
+    for (const rows of bySymbol.values()) {
+      if (rows.length < 2 || rows.length > 25) continue;
+      for (let i = 0; i < rows.length; i++) {
+        for (let j = i + 1; j < rows.length; j++) {
+          await insertEdge(client, rows[i].feature_id, rows[j].feature_id, 'SAME_SYMBOL', 0.7);
+          await insertEdge(client, rows[j].feature_id, rows[i].feature_id, 'SAME_SYMBOL', 0.7);
+        }
       }
     }
   }
 
   if (verbose) {
-    console.log(`  Created ${proof.stats.feature_edges_created} feature edges (bidirectional)`);
+    console.log(`  Created ${proof.stats.feature_edges_created} feature edges`);
   }
 }
 
 async function main() {
   console.log(`📊 Code Feature Edges Population\n`);
   console.log(`Mode: ${dryRun ? 'DRY-RUN (no writes)' : 'APPLY (writes enabled)'}`);
-  console.log(`Strategy: Complete graph between all code features\n`);
+  console.log(`Strategy: ${completeGraph ? 'complete graph between all code features' : 'file-scoped structural graph'}\n`);
 
   try {
     console.log(`Connecting to database...`);

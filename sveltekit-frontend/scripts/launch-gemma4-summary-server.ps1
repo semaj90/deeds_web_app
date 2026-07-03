@@ -151,7 +151,9 @@ $args = @(
     '-fa', $FlashAttention,
     '-ngl', $GpuLayers.ToString(),
     '--cache-prompt',
-    '--cache-reuse', $CacheReuse.ToString()
+    '--cache-reuse', $CacheReuse.ToString(),
+    '--jinja',
+    '--chat-template-file', "$(Get-Location)\configs\templates\gemma4-summary-clean.jinja"
 )
 
 if ($Verbose) {

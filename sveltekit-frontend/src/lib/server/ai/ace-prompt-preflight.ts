@@ -38,6 +38,10 @@ export type AcePromptPreflightInput = {
 
 export type KnowledgeCardForPrompt = {
   cardId: string;
+  packetId?: string;
+  packetUlid?: string;
+  titleId?: string;
+  featureId?: string;
   kind: string;
   title: string;
   summary: string;
@@ -88,6 +92,10 @@ export type AcePromptPreflightResult = {
   queryHash: string;
   contextPackKey: string;
   selectedCards: KnowledgeCardForPrompt[];
+  packetIds: string[];
+  packetUlids: string[];
+  titleIds: string[];
+  featureIds: string[];
   sourceRefs: string[];
   chunkIds: string[];
   featureLabels: string[];
@@ -172,6 +180,10 @@ function extractQueryEntities(query: string): QueryEntities {
 function buildCompactCard(card: KnowledgeCardForPrompt): string {
   const lines = [
     `[${card.cardId}] ${card.title}`,
+    `packetId: ${card.packetId ?? '(none)'}`,
+    `packetUlid: ${card.packetUlid ?? '(none)'}`,
+    `titleId: ${card.titleId ?? '(none)'}`,
+    `featureId: ${card.featureId ?? '(none)'}`,
     `summary: ${card.summary}`,
     `sourceRefs: ${card.sourceRefs.join(', ') || '(none)'}`,
     `chunkIds: ${card.chunkIds.join(', ') || '(none)'}`,
@@ -326,6 +338,10 @@ function normalizeCardFromPayload(payload: Record<string, unknown>, overrides: P
 
   return {
     cardId: String(payload.cardId ?? overrides.cardId ?? sha1(JSON.stringify(payload)).slice(0, 40)),
+    packetId: String(payload.packet_id ?? payload.packetId ?? overrides.packetId ?? '').trim() || undefined,
+    packetUlid: String(payload.packet_ulid ?? payload.packetUlid ?? overrides.packetUlid ?? '').trim() || undefined,
+    titleId: String(payload.title_id ?? payload.titleId ?? overrides.titleId ?? '').trim() || undefined,
+    featureId: String(payload.feature_id ?? payload.featureId ?? overrides.featureId ?? '').trim() || undefined,
     kind: String(payload.kind ?? overrides.kind ?? 'json-card'),
     title: String(payload.title ?? overrides.title ?? 'untitled'),
     summary: String(payload.summary ?? overrides.summary ?? ''),
@@ -415,6 +431,10 @@ export async function buildAcePromptPreflight(
         timing?: Record<string, number>;
         prompt?: { system: string; context: string; user: string; estimatedTokens: number };
         routing?: { selectedLane: string; reason: string };
+        packetIds?: string[];
+        packetUlids?: string[];
+        titleIds?: string[];
+        featureIds?: string[];
         sourceRefs?: string[];
         chunkIds?: string[];
         featureLabels?: string[];
@@ -430,6 +450,10 @@ export async function buildAcePromptPreflight(
           queryHash,
           contextPackKey,
           selectedCards: cached.selectedCards,
+          packetIds: cached.packetIds ?? [],
+          packetUlids: cached.packetUlids ?? [],
+          titleIds: cached.titleIds ?? [],
+          featureIds: cached.featureIds ?? [],
           sourceRefs: cached.sourceRefs ?? [],
           chunkIds: cached.chunkIds ?? [],
           featureLabels: cached.featureLabels ?? [],
@@ -458,6 +482,10 @@ export async function buildAcePromptPreflight(
 
   const queryEntities = extractQueryEntities(input.query);
   const selectedCards: KnowledgeCardForPrompt[] = [];
+  const packetIds = new Set<string>();
+  const packetUlids = new Set<string>();
+  const titleIds = new Set<string>();
+  const featureIds = new Set<string>();
   const sourceRefs = new Set<string>();
   const chunkIds = new Set<string>();
   const featureLabels = new Set<string>();
@@ -504,6 +532,10 @@ export async function buildAcePromptPreflight(
             card.nextAction = String(packet.nextAction ?? card.nextAction);
           }
           selectedCards.push(card);
+          if (card.packetId) packetIds.add(card.packetId);
+          if (card.packetUlid) packetUlids.add(card.packetUlid);
+          if (card.titleId) titleIds.add(card.titleId);
+          if (card.featureId) featureIds.add(card.featureId);
           for (const value of card.sourceRefs) sourceRefs.add(value);
           card.chunkIds.forEach((value) => chunkIds.add(value));
           card.featureLabels.forEach((value) => featureLabels.add(value));
@@ -599,6 +631,10 @@ export async function buildAcePromptPreflight(
     if (!selectedCards.some((existing) => existing.cardId === card.cardId)) {
       selectedCards.push(card);
     }
+    if (card.packetId) packetIds.add(card.packetId);
+    if (card.packetUlid) packetUlids.add(card.packetUlid);
+    if (card.titleId) titleIds.add(card.titleId);
+    if (card.featureId) featureIds.add(card.featureId);
   }
 
   // 5. Postgres JSONB/sourceRef filter
@@ -714,11 +750,19 @@ export async function buildAcePromptPreflight(
     version: ACE_NES_PACKET_VERSION,
     cartridgeId: contextPackKey,
     intent: input.intent ?? 'explain',
+    packetIds: uniq([...packetIds]),
+    packetUlids: uniq([...packetUlids]),
+    titleIds: uniq([...titleIds]),
+    featureIds: uniq([...featureIds]),
     sourceRefs: uniq([...sourceRefs]),
     chunkIds: uniq([...chunkIds, ...packedCards.flatMap((card) => card.chunkIds)]),
     featureLabels: uniq([...featureLabels, ...packedCards.flatMap((card) => card.featureLabels)]),
     selectedCards: packedCards.map((card) => ({
       cardId: card.cardId,
+      packetId: card.packetId,
+      packetUlid: card.packetUlid,
+      titleId: card.titleId,
+      featureId: card.featureId,
       kind: card.kind,
       title: card.title,
       summary: card.summary,
@@ -743,7 +787,7 @@ export async function buildAcePromptPreflight(
     'ACE Prompt Preflight Router.',
     'Use the compact ACE/NES packet and sourceRefs only.',
     'Do not expand raw files, full JSON, or markdown dumps into the generation prompt.',
-    'Preserve sourceRefs, chunkIds, contextPackKey, retrievalTrace, and backend identity.',
+    'Preserve packetIds, packetUlids, titleIds, featureIds, sourceRefs, chunkIds, contextPackKey, retrievalTrace, and backend identity.',
     `Model: ${input.modelName}`,
     `Backend: ${input.backend}`,
     input.basePrompt ? `Base prompt hash: ${sha1(input.basePrompt).slice(0, 16)}` : '',
@@ -769,6 +813,10 @@ export async function buildAcePromptPreflight(
           backend: input.backend,
           packet: contextPacket,
           selectedCards: cacheableCards,
+          packetIds: uniq([...packetIds]),
+          packetUlids: uniq([...packetUlids]),
+          titleIds: uniq([...titleIds]),
+          featureIds: uniq([...featureIds]),
           sourceRefs: uniq([...sourceRefs]),
           chunkIds: uniq([...chunkIds, ...cacheableCards.flatMap((c) => c.chunkIds)]),
           featureLabels: uniq([...featureLabels, ...cacheableCards.flatMap((c) => c.featureLabels)]),
@@ -815,6 +863,9 @@ export async function buildAcePromptPreflight(
     packet: packedCards[0]
       ? {
           source_ref: packedCards[0].sourceRefs?.[0],
+          packet_id: packedCards[0].packetId,
+          packet_ulid: packedCards[0].packetUlid,
+          title_id: packedCards[0].titleId,
           feature_id: packedCards[0].featureLabels?.[0],
           packet_key: packedCards[0].cardId,
         }
@@ -833,6 +884,10 @@ export async function buildAcePromptPreflight(
     queryHash,
     contextPackKey,
     selectedCards: packedCards,
+    packetIds: uniq([...packetIds]),
+    packetUlids: uniq([...packetUlids]),
+    titleIds: uniq([...titleIds]),
+    featureIds: uniq([...featureIds]),
     sourceRefs: uniq([...sourceRefs]),
     chunkIds: uniq([...chunkIds, ...packedCards.flatMap((card) => card.chunkIds)]),
     featureLabels: uniq([...featureLabels, ...packedCards.flatMap((card) => card.featureLabels)]),

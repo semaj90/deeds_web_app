@@ -23,6 +23,10 @@ import amqp from 'amqplib';
 import pg from 'pg';
 import fetch from 'node-fetch';
 import process from 'process';
+import {
+  isUsableGemma4Summary,
+  sanitizeGemma4Summary
+} from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
 
@@ -32,9 +36,13 @@ const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 
-const EXCHANGE = 'summaries.fanout';
-const QUEUE_PREFIX = 'summaries.worker';
+const QUEUE_NAME = process.env.PHASE7_SUMMARY_QUEUE || 'phase7.summarization';
+const DLQ_NAME = `${QUEUE_NAME}.dlq`;
+const MAX_RETRIES = parseInt(process.env.PHASE7_MAX_RETRIES || '3');
 const PREFETCH = 1; // Fair dispatch: process one at a time
+const HOT_BATCH_FEATURE_LIMIT = 1000;
+const SUMMARY_PROMPT_TEMPLATE_VERSION = 'phase7-v2';
+const GEMMA4_TIMEOUT_MS = parseInt(process.env.GEMMA4_TIMEOUT_MS || '120000');
 
 // Postgres pool
 const pool = new Pool({
@@ -50,6 +58,48 @@ const mode = process.argv[2];
 const workerId = process.argv.find(a => a.startsWith('--id='))?.split('=')[1] || '1';
 const batchSize = parseInt(process.argv.find(a => a.startsWith('--batch='))?.split('=')[1] || '100');
 
+function normalizeKeyPart(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._/-]+/g, '-')
+    .replace(/[-/]+/g, '.')
+    .replace(/^\.+|\.+$/g, '');
+}
+
+function sourceRefPrefix(relativePath) {
+  const cleaned = String(relativePath ?? '').replace(/\\/g, '/').trim();
+  if (!cleaned) return 'unclassified';
+  const parts = cleaned.split('/').filter(Boolean);
+  if (parts.length <= 1) return parts[0] || 'unclassified';
+  parts.pop();
+  return parts.join('/') || 'unclassified';
+}
+
+function deriveReuseFeatureId(chunk) {
+  const symbol = normalizeKeyPart(chunk.symbol);
+  const kind = normalizeKeyPart(chunk.kind);
+  const domain = normalizeKeyPart(chunk.domain);
+  const language = normalizeKeyPart(chunk.language);
+  const extension = normalizeKeyPart(chunk.extension);
+
+  const primary = [domain, kind, symbol].filter(Boolean).join('.');
+  if (primary) return primary;
+
+  const fallback = [language, extension, sourceRefPrefix(chunk.relative_path)].filter(Boolean).join('.');
+  return fallback || 'unclassified';
+}
+
+function derivePromptReuseBucket(chunk) {
+  return [
+    normalizeKeyPart(chunk.domain),
+    normalizeKeyPart(chunk.language),
+    normalizeKeyPart(chunk.kind),
+    normalizeKeyPart(chunk.extension),
+    sourceRefPrefix(chunk.relative_path)
+  ].filter(Boolean).join('|') || 'unclassified';
+}
+
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PRODUCER: Enqueue all chunks
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -63,14 +113,37 @@ async function produceQueue() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    // Declare exchange (fanout — all workers get all messages)
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
+    await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     // Fetch all chunks from Postgres
     const result = await pool.query(`
-      SELECT id, relative_path, content, COALESCE(summary, '') as existing_summary
+      SELECT
+        id,
+        relative_path,
+        content,
+        COALESCE(summary, '') as existing_summary,
+        symbol,
+        kind,
+        domain,
+        language,
+        extension,
+        som_cluster,
+        gpu_cluster,
+        page_rank_score,
+        community_id
       FROM codebase_chunk_index
-      ORDER BY id
+      ORDER BY
+        COALESCE(NULLIF(domain, ''), 'zzzz'),
+        COALESCE(NULLIF(language, ''), 'zzzz'),
+        COALESCE(NULLIF(kind, ''), 'zzzz'),
+        COALESCE(NULLIF(extension, ''), 'zzzz'),
+        COALESCE(NULLIF(symbol, ''), 'zzzz'),
+        COALESCE(som_cluster, 999999),
+        COALESCE(gpu_cluster, 999999),
+        COALESCE(page_rank_score, 0) DESC,
+        relative_path,
+        id
     `);
 
     const chunks = result.rows;
@@ -85,15 +158,27 @@ async function produceQueue() {
       }
 
       const message = {
+        id: chunk.id,
         chunk_id: chunk.id,
         source_ref: chunk.relative_path,
+        reuse_feature_id: deriveReuseFeatureId(chunk),
+        prompt_reuse_bucket: derivePromptReuseBucket(chunk),
+        prompt_template_version: SUMMARY_PROMPT_TEMPLATE_VERSION,
+        prompt_reuse_hint: {
+          template_version: SUMMARY_PROMPT_TEMPLATE_VERSION,
+          feature_id: deriveReuseFeatureId(chunk),
+          source_prefix: sourceRefPrefix(chunk.relative_path),
+          language: chunk.language ?? null,
+          kind: chunk.kind ?? null,
+          som_cluster: chunk.som_cluster ?? null,
+          gpu_cluster: chunk.gpu_cluster ?? null,
+        },
         content: chunk.content,
         timestamp: Date.now()
       };
 
-      channel.publish(
-        EXCHANGE,
-        '', // routing key (ignored for fanout)
+      channel.sendToQueue(
+        QUEUE_NAME,
         Buffer.from(JSON.stringify(message)),
         { persistent: true, contentType: 'application/json' }
       );
@@ -105,7 +190,7 @@ async function produceQueue() {
       }
     }
 
-    console.log(`\n  ✅ Enqueued ${enqueued} packets to ${EXCHANGE}`);
+    console.log(`\n  ✅ Enqueued ${enqueued} packets to ${QUEUE_NAME}`);
     console.log(`  📋 Start 4 workers: node phase7-rabbitmq-summary-queue.mjs --worker --id=N\n`);
 
   } catch (err) {
@@ -121,6 +206,10 @@ async function produceQueue() {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // WORKER: Consume queue + summarize
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function sanitizeSummary(raw) {
+  return sanitizeGemma4Summary(raw).summary;
+}
 
 async function generateSummary(content) {
   try {
@@ -140,7 +229,7 @@ async function generateSummary(content) {
         max_tokens: 150,
         stream: false
       }),
-      timeout: 30000
+      signal: AbortSignal.timeout(GEMMA4_TIMEOUT_MS)
     });
 
     if (!res.ok) {
@@ -148,7 +237,9 @@ async function generateSummary(content) {
     }
 
     const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim() || '';
+    const raw = data.choices?.[0]?.message?.content?.trim() || '';
+    const summary = sanitizeSummary(raw);
+    return isUsableGemma4Summary(summary, { minLength: 30, minUniqueWords: 6 }) ? summary : '';
   } catch (err) {
     console.warn(`  ⚠️  Summary generation failed: ${err.message}`);
     return '';
@@ -157,18 +248,41 @@ async function generateSummary(content) {
 
 async function updatePgAndQdrant(chunkId, sourceRef, summary) {
   try {
-    // Update Postgres
-    await pool.query(
-      `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id = $2`,
+    const result = await pool.query(
+      `UPDATE codebase_chunk_index
+       SET summary = $1, updated_at = NOW()
+       WHERE id = $2
+         AND (summary IS NULL OR btrim(summary) = '')`,
       [summary, chunkId]
     );
+    return result.rowCount === 1;
 
     // Update Qdrant payload (if needed — can skip for speed)
     // For now, just write to Postgres
 
   } catch (err) {
     console.error(`  ❌ DB update failed for ${chunkId}: ${err.message}`);
+    throw err;
   }
+}
+
+function retryCountFor(msg) {
+  return Number(msg.properties.headers?.['x-retry-count'] ?? 0);
+}
+
+function republishOrDlq(channel, msg, err) {
+  const nextRetry = retryCountFor(msg) + 1;
+  const targetQueue = nextRetry > MAX_RETRIES ? DLQ_NAME : QUEUE_NAME;
+  channel.sendToQueue(targetQueue, msg.content, {
+    persistent: true,
+    contentType: msg.properties.contentType || 'application/json',
+    headers: {
+      ...(msg.properties.headers || {}),
+      'x-retry-count': nextRetry,
+      'x-last-error': String(err?.message || err).slice(0, 300)
+    }
+  });
+  channel.ack(msg);
 }
 
 async function startWorker() {
@@ -182,17 +296,13 @@ async function startWorker() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    // Declare exchange + queue
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
-
-    const queueName = `${QUEUE_PREFIX}.${workerId}`;
-    const queue = await channel.assertQueue(queueName, { durable: true, exclusive: false });
-    await channel.bindQueue(queue.queue, EXCHANGE, '');
+    const queue = await channel.assertQueue(QUEUE_NAME, { durable: true, exclusive: false });
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     // Fair dispatch
     await channel.prefetch(PREFETCH);
 
-    console.log(`  ✓ Listening on ${queueName}`);
+    console.log(`  ✓ Listening on ${QUEUE_NAME} as worker ${workerId}`);
     console.log(`  Type Ctrl+C to stop\n`);
 
     // Consume
@@ -201,16 +311,17 @@ async function startWorker() {
 
       try {
         const payload = JSON.parse(msg.content.toString());
-        const { chunk_id, source_ref, content } = payload;
+        const chunk_id = payload.id ?? payload.chunk_id;
+        const { source_ref, content } = payload;
 
         process.stdout.write(`  [${new Date().toISOString().slice(11, 19)}] Summarizing ${chunk_id}...`);
 
         const summary = await generateSummary(content);
 
         if (summary) {
-          await updatePgAndQdrant(chunk_id, source_ref, summary);
-          console.log(` ✓`);
-          processed++;
+          const wrote = await updatePgAndQdrant(chunk_id, source_ref, summary);
+          console.log(wrote ? ` ✓` : ` (already summarized)`);
+          if (wrote) processed++;
         } else {
           console.log(` (skipped)`);
           failed++;
@@ -221,7 +332,7 @@ async function startWorker() {
       } catch (err) {
         console.error(`\n  ❌ Error: ${err.message}`);
         failed++;
-        channel.nack(msg, false, true); // Requeue
+        republishOrDlq(channel, msg, err);
       }
 
       if ((processed + failed) % 100 === 0) {
@@ -256,18 +367,10 @@ async function monitorQueue() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
-
-    // Check all worker queues
-    for (let i = 1; i <= 4; i++) {
-      const queueName = `${QUEUE_PREFIX}.${i}`;
-      try {
-        const queue = await channel.checkQueue(queueName);
-        console.log(`  Worker ${i}: ${queue.messageCount} messages, ${queue.consumerCount} consumers`);
-      } catch (err) {
-        console.log(`  Worker ${i}: queue not found`);
-      }
-    }
+    const queue = await channel.assertQueue(QUEUE_NAME, { durable: true });
+    const dlq = await channel.assertQueue(DLQ_NAME, { durable: true });
+    console.log(`  Work queue ${QUEUE_NAME}: ${queue.messageCount} messages, ${queue.consumerCount} consumers`);
+    console.log(`  DLQ ${DLQ_NAME}: ${dlq.messageCount} messages, ${dlq.consumerCount} consumers`);
 
     // Check Postgres progress
     const result = await pool.query(

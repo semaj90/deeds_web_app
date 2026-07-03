@@ -12,10 +12,13 @@ export const AtlasSearchRequestSchema = z.object({
 });
 
 export const PacketContextSchema = z.object({
+  packet_id: z.string().optional(),
   packet_key: z.string(),
+  packet_ulid: z.string().optional(),
   source_ref: z.string(),
   source_ref_key: z.string().optional(),
   canonical_source_ref: z.string().optional(),
+  title_id: z.string().optional(),
   feature_id: z.string(),
   feature_label: z.string().optional(),
   story_id: z.string().optional(),
@@ -34,9 +37,12 @@ export const PacketContextSchema = z.object({
 });
 
 export const ProvenanceRecordSchema = z.object({
+  packet_id: z.string().optional(),
   packet_key: z.string(),
+  packet_ulid: z.string().optional(),
   source_ref: z.string(),
   source_ref_key: z.string().optional(),
+  title_id: z.string().optional(),
   feature_id: z.string(),
   story_id: z.string().optional(),
   task_id: z.string().optional(),
@@ -85,9 +91,12 @@ export const JsonRpcRequestSchema = z.object({
 // Mapping from known aliases to the canonical spine fields
 const FIELD_ALIASES: Record<string, string> = {
   packetKey: 'packet_key',
+  packetId: 'packet_id',
+  packetUlid: 'packet_ulid',
   sourceRef: 'source_ref',
   sourceRefKey: 'source_ref_key',
   canonicalSourceRef: 'canonical_source_ref',
+  titleId: 'title_id',
   featureId: 'feature_id',
   featureLabel: 'feature_label',
   storyId: 'story_id',

@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-02T03:54:00.905Z",
+  "generated_at": "2026-07-02T23:31:09.664Z",
   "status": "PASS_WITH_WARNINGS",
   "summary": {
-    "livePass": 10,
-    "fallbackPass": 0,
+    "livePass": 9,
+    "fallbackPass": 1,
     "fail": 0,
     "criticalFailures": 0,
     "legacyWarnings": 1
@@ -16,7 +16,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 95,
+      "duration_ms": 55,
       "details": {
         "http_status": 200,
         "body": {
@@ -33,8 +33,7 @@
                 ""
               ],
               "capabilities": [
-                "completion",
-                "multimodal"
+                "completion"
               ],
               "parameters": "",
               "details": {
@@ -56,7 +55,7 @@
               "aliases": [],
               "tags": [],
               "object": "model",
-              "created": 1782964439,
+              "created": 1783035068,
               "owned_by": "llamacpp",
               "meta": {
                 "vocab_type": 2,
@@ -76,20 +75,12 @@
       "url": "http://127.0.0.1:8095",
       "port": 8095,
       "transport": "http",
-      "status": "LIVE_PASS",
-      "fallback_used": false,
-      "duration_ms": 711,
+      "status": "FALLBACK_PASS",
+      "fallback_used": true,
+      "duration_ms": 6,
+      "error": "LangExtract unavailable; inline Gemma4 fallback available (fetch failed)",
       "details": {
-        "http_status": 200,
-        "body": {
-          "status": "healthy",
-          "services": {
-            "spacy_loaded": false,
-            "spacy_enabled": false,
-            "llama_server_available": true
-          },
-          "memory_mb": 6.9
-        }
+        "fallback_url": "http://127.0.0.1:8090"
       }
     },
     {
@@ -99,7 +90,7 @@
       "transport": "grpc",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 2
+      "duration_ms": 1
     },
     {
       "service_name": "go-retrieval",
@@ -108,7 +99,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 19,
+      "duration_ms": 14,
       "details": {
         "http_status": 200,
         "body": {
@@ -117,7 +108,7 @@
           "qdrantConnected": true,
           "redisConnected": true,
           "status": "healthy",
-          "timestamp": 1782964439754
+          "timestamp": 1783035068919
         }
       }
     },
@@ -128,7 +119,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 9,
+      "duration_ms": 7,
       "details": {
         "http_status": 200,
         "body": {
@@ -163,7 +154,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 43,
+      "duration_ms": 24,
       "details": {
         "http_status": 200,
         "body": {
@@ -274,7 +265,7 @@
             ]
           },
           "status": "ok",
-          "time": 0.001957686
+          "time": 0.000764348
         }
       }
     },
@@ -285,7 +276,7 @@
       "transport": "postgres",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 30
+      "duration_ms": 43
     },
     {
       "service_name": "seaweedfs",
@@ -294,10 +285,10 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 8,
+      "duration_ms": 5,
       "details": {
         "http_status": 403,
-        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BE5CB624D69405D6FEF3B0</RequestId></Error>"
+        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BE9CF2C6579B567B003187</RequestId></Error>"
       }
     },
     {
@@ -307,7 +298,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 682,
+      "duration_ms": 476,
       "details": {
         "http_status": 200,
         "body": {
@@ -327,7 +318,7 @@
       "transport": "redis",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 340
+      "duration_ms": 164
     }
   ],
   "legacy_warnings": [
@@ -342,7 +333,7 @@
         "transport": "http",
         "status": "FAIL",
         "fallback_used": false,
-        "duration_ms": 5,
+        "duration_ms": 2,
         "error": "fetch failed"
       }
     }

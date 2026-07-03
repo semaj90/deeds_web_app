@@ -15,6 +15,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,9 +24,10 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run') || !args.includes('--apply');
 const verbose = args.includes('--verbose');
+const repoEnv = loadRepoEnv(process.env);
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
+  connectionString: resolveDatabaseUrl(repoEnv),
   max: 5,
 });
 

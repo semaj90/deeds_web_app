@@ -22,6 +22,7 @@ import pg from 'pg';
 import { createHash } from 'crypto';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dirname } from 'path';
+import { hasGemma4ReasoningLeak, isUsableGemma4Summary, sanitizeGemma4Summary } from './lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
 
@@ -59,7 +60,9 @@ const PATTERNS = {
   meta_preambles: [
     { pattern: /^(here'?s|here'?is)\s+a\s+(thinking|summary|breakdown)/im, name: "Here's a thinking..." },
     { pattern: /^(the\s+)?(user\s+)?(wants|is\s+asking|is\s+looking|wants\s+a)/im, name: 'The user wants...' },
-    { pattern: /^(the|this)\s+(user|code|snippet|object|component)\s+/im, name: 'The code...' },
+    { pattern: /^(the\s+)?provided\s+(code\s+)?snippet\b/im, name: 'Provided code snippet...' },
+    { pattern: /^analy[sz]e\s+(the\s+)?code\b/im, name: 'Analyze the code...' },
+    { pattern: /^(the\s+)?code\s+is\s*:/im, name: 'The code is:' },
   ],
 
   self_correction: [
@@ -102,6 +105,13 @@ function detectContaminations(summary) {
     }
   }
 
+  if (hasGemma4ReasoningLeak(summary)) {
+    detected.has_thinking_markers = true;
+    if (!detected.markers_found.includes('shared-gemma4-sanitizer')) {
+      detected.markers_found.push('shared-gemma4-sanitizer');
+    }
+  }
+
   // Check meta preambles
   for (const { pattern, name } of PATTERNS.meta_preambles) {
     if (pattern.test(summary)) {
@@ -128,22 +138,18 @@ function detectContaminations(summary) {
 }
 
 function sanitizeSummary(summary) {
-  let cleaned = summary;
+  const shared = sanitizeGemma4Summary(summary);
+  let cleaned = shared.summary;
   const steps = [];
-  let before;
+  let before = summary;
 
-  // 1. Strip thinking block markers
-  for (const { pattern, name } of PATTERNS.thinking_markers) {
-    before = cleaned;
-    cleaned = cleaned.replace(pattern, '');
-    if (cleaned !== before) {
-      steps.push({
-        step: 'strip_thinking_markers',
-        pattern_matched: name,
-        length_before: before.length,
-        length_after: cleaned.length,
-      });
-    }
+  if (cleaned !== before) {
+    steps.push({
+      step: 'shared_gemma4_sanitizer',
+      pattern_matched: 'transport/thought/meta markers',
+      length_before: before.length,
+      length_after: cleaned.length,
+    });
   }
 
   // 2. Remove full lines that are preambles
@@ -223,10 +229,10 @@ function scoreQuality(original, cleaned, contaminations) {
     reason = 'Content appears truncated or structurally incomplete.';
   }
 
-  // Ensure minimum length for valid summary
-  if (!cleaned || cleaned.length < 20) {
+  // Ensure minimum length and no remaining leak markers for valid summary
+  if (!isUsableGemma4Summary(cleaned, { minLength: 30, minUniqueWords: 6 })) {
     status = 'FAIL';
-    reason = 'Cleaned summary too short or empty.';
+    reason = 'Cleaned summary too short, too generic, or still contaminated.';
     score = 0;
   } else if (score < 0.6) {
     status = 'FAIL';

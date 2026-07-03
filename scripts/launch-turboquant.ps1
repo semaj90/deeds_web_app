@@ -487,7 +487,7 @@ $baseArgs = @(
 )
 
 # -- Parallel slots check (Multi-core / Concurrent processing) -------------
-$slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '1' }
+$slots = if ($env:TURBO_PARALLEL) { $env:TURBO_PARALLEL } else { '4' }
 if (Test-LlamaFlag $llama '--parallel') {
     $baseArgs = $baseArgs + @('--parallel', $slots)
     Write-Host "Parallel slots: --parallel $slots enabled" -ForegroundColor Cyan
@@ -598,22 +598,27 @@ if (Test-LlamaFlag $llama '--reasoning-budget') {
     Write-Host "Reasoning budget: --reasoning-budget 0 (suppress <|channel>thought leak)" -ForegroundColor Cyan
 }
 
-# -- Chat template: opt-in only via TURBO_CHAT_TEMPLATE_FILE env var ------
-# DEFAULT: no --chat-template flag at all. On gemma4-legal-iq4xs-direct.gguf
-# (build b8757+), omitting --chat-template gives supports_system_role:true
-# and correct SYSTEM_OK obedience. Passing --chat-template gemma or gemma3
-# drops prompt_tokens to 3-4 and discards the system message entirely.
-# HARD RULE: never inject --chat-template <name>. Only --chat-template-file
-# when explicitly requested via env var.
-if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
-    if (Test-Path $env:TURBO_CHAT_TEMPLATE_FILE) {
-        $baseArgs = $baseArgs + @('--chat-template-file', $env:TURBO_CHAT_TEMPLATE_FILE)
-        Write-Host "Chat template: --chat-template-file $($env:TURBO_CHAT_TEMPLATE_FILE)" -ForegroundColor Cyan
-    } else {
-        Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but file not found at $($env:TURBO_CHAT_TEMPLATE_FILE) - skipping" -ForegroundColor Yellow
-    }
+# -- Chat template: suppress thinking block markers via gemma4-summary-clean.jinja ------
+# DEFAULT: use gemma4-summary-clean.jinja to strip <|channel>thought markers from output.
+# The GGUF-embedded template wraps reasoning in <|channel>thought...<|channel|> delimiters.
+# --chat-template-file override suppresses these at the template level (not regex).
+# HARD RULE: always pass --chat-template-file for Phase 7. Never use --chat-template <name>.
+$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\gemma4-summary-clean.jinja"
+$chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
+    $env:TURBO_CHAT_TEMPLATE_FILE
+} elseif (Test-Path $defaultTemplate) {
+    $defaultTemplate
 } else {
-    Write-Host "Chat template: none (GGUF built-in, supports_system_role via --jinja)" -ForegroundColor DarkGray
+    $null
+}
+
+if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
+    $baseArgs = $baseArgs + @('--chat-template-file', $chatTemplateFile)
+    Write-Host "Chat template: --chat-template-file (clean, no thinking blocks)" -ForegroundColor Cyan
+} elseif ($env:TURBO_CHAT_TEMPLATE_FILE) {
+    Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in (may output thinking blocks)" -ForegroundColor Yellow
+} else {
+    Write-Host "Chat template: $defaultTemplate not found - will use GGUF built-in (may output <|channel>thought markers)" -ForegroundColor Yellow
 }
 
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------

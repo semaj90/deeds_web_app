@@ -6,6 +6,12 @@ type ToolJson = Record<string, unknown>;
 type ProvenanceLike = {
   featureId?: string | null;
   feature_id?: string | null;
+  titleId?: string | null;
+  title_id?: string | null;
+  packetKey?: string | null;
+  packet_key?: string | null;
+  packetUlid?: string | null;
+  packet_ulid?: string | null;
   sourceRef?: string | null;
   source_ref?: string | null;
   sourceRefs?: string[] | null;
@@ -24,6 +30,12 @@ export interface AgenticFixProposalInput {
   clusterId?: number | null;
   featureId?: string | null;
   feature_id?: string | null;
+  titleId?: string | null;
+  title_id?: string | null;
+  packetKey?: string | null;
+  packet_key?: string | null;
+  packetUlid?: string | null;
+  packet_ulid?: string | null;
   sourceRef?: string | null;
   source_ref?: string | null;
   sourceRefs?: string[] | null;
@@ -71,6 +83,7 @@ export interface AgenticFixProposalResult {
     rerank: ToolJson | null;
     wiki: ToolJson | null;
   };
+  canonicalEnvelope: ToolJson | null;
   suggestions: Array<{
     suggestion: string;
     successRate: number;
@@ -315,13 +328,36 @@ function buildGraphFacts(query: string, filePath?: string): string[][] {
   return facts;
 }
 
-function buildRerankCandidates(query: string, filePath?: string): Array<Record<string, unknown>> {
+function buildRerankCandidates(
+  query: string,
+  filePath?: string,
+  envelope?: {
+    featureId?: string | null;
+    titleId?: string | null;
+    packetKey?: string | null;
+    packetUlid?: string | null;
+    sourceRef?: string | null;
+    canonicalSourceRef?: string | null;
+  }
+): Array<Record<string, unknown>> {
   const lines = String(query ?? '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean).slice(0, 20);
   return lines.map((text, index) => ({
     chunkId: `${filePath ?? 'query'}:${index + 1}`,
+    packet_id: null,
+    packet_ulid: envelope?.packetUlid ?? null,
+    packet_key: envelope?.packetKey ?? `${filePath ?? 'query'}:${index + 1}`,
+    title_id: envelope?.titleId ?? null,
+    feature_id: envelope?.featureId ?? null,
+    source_ref: envelope?.sourceRef ?? filePath ?? null,
+    canonical_source_ref: envelope?.canonicalSourceRef ?? envelope?.sourceRef ?? filePath ?? null,
     text,
     filePath: filePath ?? null,
     qdrantScore: Math.max(0, 1 - index * 0.04),
+    concepts: [],
+    entities: [],
+    nouns: [],
+    verbs: [],
+    ast_tags: [],
   }));
 }
 
@@ -379,7 +415,14 @@ export async function buildAgenticFixProposal(
 
   const observedStates = buildObservedStates(query, filePath ?? undefined);
   const graphFacts = buildGraphFacts(query, filePath ?? undefined);
-  const rerankCandidates = buildRerankCandidates(query, filePath ?? undefined);
+  const rerankCandidates = buildRerankCandidates(query, filePath ?? undefined, {
+    featureId,
+    titleId: featureId ?? filePath ?? null,
+    packetKey: tupleHash ?? semanticHash ?? null,
+    packetUlid: null,
+    sourceRef,
+    canonicalSourceRef: sourceRef,
+  });
 
   const [langextract, hmm, graphrag, rerank, wiki] = await Promise.all([
     callTool('langextract_extract_error_facts', { text: query, mode: 'error' }),
@@ -401,6 +444,12 @@ export async function buildAgenticFixProposal(
       query: filePath ? `${filePath} ${query}` : query,
     }),
   ]);
+
+  const rerankPayload = asJsonPayload(rerank);
+  const canonicalEnvelope =
+    (rerankPayload?.canonical_envelope as ToolJson | undefined) ??
+    (Array.isArray(rerankPayload?.reranked) ? (rerankPayload.reranked[0] as { canonical_envelope?: ToolJson })?.canonical_envelope ?? null : null) ??
+    null;
 
   const hmmStates = asJsonPayload(hmm)?.states;
   const missingStates = Array.isArray(hmmStates)
@@ -461,6 +510,9 @@ export async function buildAgenticFixProposal(
     `### Rerank`,
     JSON.stringify(rerank ?? {}, null, 2),
     ``,
+    `### Canonical envelope`,
+    JSON.stringify(canonicalEnvelope ?? {}, null, 2),
+    ``,
     `### Wiki`,
     JSON.stringify(wiki ?? {}, null, 2),
     ``,
@@ -500,6 +552,7 @@ export async function buildAgenticFixProposal(
     laneOrder,
     suggestionCount: suggestionRows.length,
     proposalSummary: proposalMarkdown,
+    canonicalEnvelope,
   });
 
   return {
@@ -530,6 +583,7 @@ export async function buildAgenticFixProposal(
       rerank,
       wiki,
     },
+    canonicalEnvelope,
     suggestions: suggestionRows,
     proposalMarkdown,
   };

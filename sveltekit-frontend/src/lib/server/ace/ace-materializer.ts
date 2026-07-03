@@ -19,6 +19,7 @@ import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { bifrostKey } from '$lib/server/cache-keys.js';
 import { eq } from 'drizzle-orm';
+import { buildCanonicalAcePacketEnvelope } from './canonical-packet-envelope.js';
 
 export interface MaterializeOptions {
   packetKey: string;
@@ -74,18 +75,39 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
       throw new Error(`Packet incomplete: missing key/feature_id/summary`);
     }
 
+    const canonicalEnvelope = buildCanonicalAcePacketEnvelope(
+      {
+        packet_id: pkt.packetId,
+        packet_ulid: pkt.packetUlid ?? null,
+        packet_key: pkt.packetKey,
+        title_id: pkt.titleId
+          ?? (pkt.metadata as { title_id?: string | null; titleId?: string | null } | null | undefined)?.title_id
+          ?? (pkt.metadata as { title_id?: string | null; titleId?: string | null } | null | undefined)?.titleId
+          ?? pkt.featureId,
+        source_ref: pkt.sourceRef,
+        canonical_source_ref: pkt.canonicalSourceRef
+          ?? (pkt.metadata as { canonical_source_ref?: string | null; canonicalSourceRef?: string | null } | null | undefined)?.canonical_source_ref
+          ?? (pkt.metadata as { canonical_source_ref?: string | null; canonicalSourceRef?: string | null } | null | undefined)?.canonicalSourceRef
+          ?? pkt.sourceRef,
+        feature_id: pkt.featureId,
+        feature_label: pkt.featureLabel,
+        summary: pkt.summary,
+      },
+      {
+        feature_id: pkt.featureId,
+        som_cell: pkt.somRow !== null && pkt.somCol !== null ? `${pkt.somRow}:${pkt.somCol}` : null,
+        language: null,
+        kind: null,
+        page_rank_score: 0,
+      }
+    );
+
     // 3. Prepare payload for Qdrant
     const payload = {
-      packet_key: pkt.packetKey,
-      source_ref: pkt.sourceRef,
+      ...canonicalEnvelope,
       file_path: pkt.filePath,
-      feature_id: pkt.featureId,
-      feature_label: pkt.featureLabel,
-      summary: pkt.summary,
-      som_row: pkt.somRow,
-      som_col: pkt.somCol,
-      community_id: pkt.communityId,
-      metadata: pkt.metadata || {}
+      metadata: pkt.metadata || {},
+      canonical_envelope: canonicalEnvelope,
     };
 
     // 4. Generate embedding vector from packet summary + title

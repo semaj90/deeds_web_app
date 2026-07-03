@@ -6,7 +6,7 @@
  *   Packet envelope (identity + metadata)
  *     ↓ Postgres
  *   512-packet batches
- *     ↓ RabbitMQ fanout
+ *     ↓ RabbitMQ durable work queue
  *   Batch worker
  *     ↓
  *   Extract content (LangExtract + ast-grep)
@@ -45,7 +45,9 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
 import process from 'process';
+import { createHash } from 'crypto';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { isUsableGemma4Summary, sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
 
@@ -86,15 +88,13 @@ const allowGemma4Fallback = process.argv.includes('--allow-gemma4-fallback');
 const MAX_GEMMA4_FALLBACK_BATCH = parseInt(env.PHASE7_MAX_GEMMA4_FALLBACK_BATCH || '32');
 const allowLargeLlamaBatch = process.argv.includes('--allow-large-llama-batch');
 
-const QUEUE_NAME = 'summaries.batch.work';
+const QUEUE_NAME = process.env.PHASE7_TRITON_SUMMARY_QUEUE || `summaries.batch.work.${batchSize}`;
+const DLQ_NAME = `${QUEUE_NAME}.dlq`;
 const PREFETCH = 1; // Process one batch at a time
+const MAX_RETRIES = parseInt(env.PHASE7_MAX_RETRIES || '3');
 
 function stripGemmaChannelBlocks(text) {
-  return String(text || '')
-    .replace(/<\|channel\>thought[\s\S]*?(?:<\|channel\>|<channel\|>|<\|message\|>|$)/gi, '')
-    .replace(/<\|start_header_id\>analysis<\|end_header_id\>[\s\S]*?(?:<\|start_header_id\>final<\|end_header_id\>|$)/gi, '')
-    .replace(/<\|[^>]+?\|>/g, '')
-    .trim();
+  return sanitizeGemma4Summary(text).summary;
 }
 
 async function probeLlamaServer() {
@@ -127,6 +127,7 @@ async function produceQueue() {
 
     // Assert durable work queue (no exchange needed for direct queue)
     await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     // Fetch all unsummarized chunks
     const result = await pool.query(`
@@ -336,9 +337,9 @@ async function updateBatchResults(chunks, summaries) {
     let written = 0;
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
-      const summary = summaries[i] || '';
+      const summary = stripGemmaChannelBlocks(summaries[i] || '');
 
-      if (!summary) {
+      if (!isUsableGemma4Summary(summary, { minLength: 30, minUniqueWords: 6 })) {
         console.log(`    ⊘ Chunk ${i}: empty summary, skipping`);
         continue;
       }
@@ -347,7 +348,10 @@ async function updateBatchResults(chunks, summaries) {
       // 1. Postgres update (with type safety for UUID/text mismatch)
       try {
         const result = await pool.query(
-          `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id::text = $2::text`,
+          `UPDATE codebase_chunk_index
+           SET summary = $1, updated_at = NOW()
+           WHERE id::text = $2::text
+             AND (summary IS NULL OR btrim(summary) = '')`,
           [summary, String(chunk.chunk_id)]
         );
         console.log(`    chunk=${chunk.chunk_id.substring(0, 8)}... len=${summary.length} rows=${result.rowCount}`);
@@ -359,9 +363,21 @@ async function updateBatchResults(chunks, summaries) {
         throw pgErr;
       }
 
-      // 2. Redis cache (TTL 24h)
+      // 2. Redis cache (TTL 24h) — Layer 3: BitFrost semantic packet cache
       const cacheKey = `bitfrost:summary:${chunk.chunk_id}`;
       await redis.setex(cacheKey, 86400, summary);
+
+      // 2b. Cache by source_ref hash for topology-based lookups
+      if (chunk.source_ref) {
+        const sourceHash = createHash('sha256').update(chunk.source_ref).digest('hex');
+        const sourceKey = `bitfrost:source:${sourceHash}`;
+        await redis.setex(sourceKey, 86400, JSON.stringify({
+          source_ref: chunk.source_ref,
+          chunk_id: chunk.chunk_id,
+          summary_len: summary.length,
+          cached_at: new Date().toISOString()
+        }));
+      }
 
       // 3. Qdrant payload update (optional, can skip for speed)
       if (chunk.qdrant_id) {
@@ -411,6 +427,7 @@ async function startWorker() {
 
     // Assert durable work queue (direct, no exchange)
     await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     await channel.prefetch(PREFETCH);
 
@@ -456,7 +473,36 @@ async function startWorker() {
 
       } catch (err) {
         console.error(`\n  ❌ Error: ${err.message}`);
-        channel.nack(msg, false, !once); // Requeue unless this was a smoke probe
+        if (once) {
+          channel.nack(msg, false, false);
+        } else {
+          const headers = msg.properties.headers || {};
+          const retryCount = Number(headers['x-retry-count'] || 0);
+          if (retryCount >= MAX_RETRIES) {
+            channel.sendToQueue(DLQ_NAME, msg.content, {
+              persistent: true,
+              contentType: msg.properties.contentType || 'application/json',
+              headers: {
+                ...headers,
+                'x-retry-count': retryCount,
+                'x-dead-letter-reason': err.message,
+                'x-dead-lettered-at': new Date().toISOString(),
+              },
+            });
+            channel.ack(msg);
+          } else {
+            channel.sendToQueue(QUEUE_NAME, msg.content, {
+              persistent: true,
+              contentType: msg.properties.contentType || 'application/json',
+              headers: {
+                ...headers,
+                'x-retry-count': retryCount + 1,
+                'x-last-error': err.message,
+              },
+            });
+            channel.ack(msg);
+          }
+        }
         if (once) {
           setImmediate(async () => {
             await channel.close().catch(() => {});

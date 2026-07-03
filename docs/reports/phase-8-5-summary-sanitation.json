@@ -1,0 +1,288 @@
+{
+  "phase": "8.5",
+  "mode": "dry-run",
+  "timestamp": "2026-07-03T05:31:17.008Z",
+  "total_scanned": 500,
+  "total_contaminated": 8,
+  "total_cleaned": 3,
+  "total_skipped": 5,
+  "total_failed": 0,
+  "pass_count": 2,
+  "warn_count": 1,
+  "fail_count": 5,
+  "contamination_patterns": {
+    "shared-gemma4-sanitizer": 3
+  },
+  "results": [
+    {
+      "chunk_id": "455af5d1-4ff0-4f97-b741-31125b6f9bb2",
+      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+      "original_length": 93,
+      "original_hash": "ecd5cf131ad96789fcddade019ff9184ca6faf468345582b9319c90d98dda378",
+      "cleaned_summary": "**Final Output",
+      "cleaned_length": 14,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 93,
+          "length_after": 14
+        }
+      ]
+    },
+    {
+      "chunk_id": "55fb6907-d5c9-447a-a7af-29e69aaeaca2",
+      "relative_path": "src/lib/data/report-templates.ts",
+      "original_length": 163,
+      "original_hash": "1b7f52f0688d351e9fdc63eda392f17969ff5631784d2ca6387af110a409b21f",
+      "cleaned_summary": "The object defines a template for a \"Charging Memorandum,\" which is a comprehensive legal document.",
+      "cleaned_length": 99,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 163,
+          "length_after": 99
+        }
+      ]
+    },
+    {
+      "chunk_id": "515afb62-2b31-4ec7-b6d4-3c3663d7d433",
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "original_length": 387,
+      "original_hash": "3859f50997ad0d7f3920b89fd3f18438025fe1bd302bfd583718dfc88d6d3b50",
+      "cleaned_summary": "The snippet shows how the code handles two main categories of queries:",
+      "cleaned_length": 70,
+      "quality_score": 0.6,
+      "quality_status": "WARN",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 387,
+          "length_after": 336
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 336,
+          "length_after": 70
+        }
+      ]
+    },
+    {
+      "chunk_id": "2438b1c0-0885-4cb1-b8cb-b697c3460fe6",
+      "relative_path": "src/lib/services/error-analysis/ExperienceRecorder.ts",
+      "original_length": 70,
+      "original_hash": "7158068f34ffa64e96cdf937c1e905d3b242db7d23fb2154b5d3e76f04d62e9f",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": false,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 70,
+          "length_after": 0
+        }
+      ]
+    },
+    {
+      "chunk_id": "5a074997-9bb9-44b3-8d7d-9234ccd726a9",
+      "relative_path": "src/lib/server/db/schema-gpu-cache.ts",
+      "original_length": 501,
+      "original_hash": "5cf49d4018884d0860b170323978d98f93882248c1beee3b531ca006b46d6175",
+      "cleaned_summary": "This is a database schema definition for a `shader_dependencies` table. I need to summarize its purpose and key fields concisely.\n**Drafting the summary:**\nThis table tracks dependencies between shaders, linking a parent shader",
+      "cleaned_length": 227,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": true,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [
+          "shared-gemma4-sanitizer"
+        ],
+        "preamble_patterns": []
+      },
+      "contamination_count": 2,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 501,
+          "length_after": 496
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 496,
+          "length_after": 227
+        }
+      ]
+    },
+    {
+      "chunk_id": "3301d520-210b-4ead-9a2f-a2d7e123899e",
+      "relative_path": "src/lib/components/EvidenceConnections.svelte",
+      "original_length": 105,
+      "original_hash": "a1ba370bf2f901f441062cb6dcafbab32f5172a6bc3b0b161672167e136227f0",
+      "cleaned_summary": "The code does the following:\n4",
+      "cleaned_length": 30,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 105,
+          "length_after": 30
+        }
+      ]
+    },
+    {
+      "chunk_id": "3a2b1ac1-fd3f-4316-b599-6eec218e760b",
+      "relative_path": "src/lib/webgpu/compute-shader-engine.ts",
+      "original_length": 417,
+      "original_hash": "4f753ee7b88a0ef9d177f9dcb451492f6fba9f81125e7428f4e26dfe2d81c46c",
+      "cleaned_summary": "The snippet is setting up various GPU resources (buffers and bind group layouts) for a compute shader operation.",
+      "cleaned_length": 112,
+      "quality_score": 0.85,
+      "quality_status": "PASS",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": false,
+        "has_planning_steps": true,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "shared_gemma4_sanitizer",
+          "pattern_matched": "transport/thought/meta markers",
+          "length_before": 417,
+          "length_after": 413
+        },
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 413,
+          "length_after": 112
+        }
+      ]
+    },
+    {
+      "chunk_id": "f5add746-1e57-4855-8920-b430b872710f",
+      "relative_path": "src/lib/server/adapters/service-integrations.ts",
+      "original_length": 198,
+      "original_hash": "01d4769362c64aa43caa0c4605cd176de4a67a7ceb27417ff8a7a2e73641ad12",
+      "cleaned_summary": "",
+      "cleaned_length": 0,
+      "quality_score": 0,
+      "quality_status": "FAIL",
+      "contaminations_detected": {
+        "has_thinking_markers": false,
+        "has_meta_preamble": false,
+        "has_self_correction": true,
+        "has_planning_steps": false,
+        "markers_found": [],
+        "preamble_patterns": []
+      },
+      "contamination_count": 1,
+      "removal_steps": [
+        {
+          "step": "remove_meta_lines",
+          "pattern_matched": "various preamble/planning lines",
+          "length_before": 198,
+          "length_after": 0
+        }
+      ]
+    }
+  ],
+  "contamination_rate_before": "1.6",
+  "contamination_rate_after": "1.0",
+  "avg_length_before": "242",
+  "avg_length_after": "69",
+  "gates": {
+    "contamination_rate_acceptable": true,
+    "avg_quality_score_acceptable": false,
+    "all_pass_or_warn": false,
+    "ready_for_phase_9": false
+  },
+  "examples": [
+    {
+      "relative_path": "src/routes/(app)/demos/celestial-icons/+page.svelte",
+      "before_len": 93,
+      "after_len": 14,
+      "quality_status": "FAIL"
+    },
+    {
+      "relative_path": "src/lib/data/report-templates.ts",
+      "before_len": 163,
+      "after_len": 99,
+      "quality_status": "PASS"
+    },
+    {
+      "relative_path": "src/lib/server/agent/tools/web-search-searxng.ts",
+      "before_len": 387,
+      "after_len": 70,
+      "quality_status": "WARN"
+    }
+  ]
+}

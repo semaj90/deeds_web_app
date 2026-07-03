@@ -344,6 +344,7 @@ export async function recordAgenticProposalEngram(input: {
   semanticHash?: string | null;
   missingFeatureId?: boolean;
   warning?: string | null;
+  canonicalEnvelope?: Record<string, unknown> | null;
   observedStates: Record<string, boolean>;
   laneOrder: string[];
   suggestionCount: number;
@@ -393,6 +394,7 @@ export async function recordAgenticProposalEngram(input: {
         laneOrder: input.laneOrder,
         suggestionCount: input.suggestionCount,
         proposalSummary: input.proposalSummary,
+        canonicalEnvelope: input.canonicalEnvelope ?? null,
         missingFeatureId: Boolean(input.missingFeatureId),
         warning: input.warning ?? null,
         timestamp: new Date().toISOString(),
@@ -440,6 +442,7 @@ export async function recordAgenticProposalEngram(input: {
           observedStates: input.observedStates,
           laneOrder: input.laneOrder,
           suggestionCount: input.suggestionCount,
+          canonicalEnvelope: input.canonicalEnvelope ?? null,
           missingFeatureId: Boolean(input.missingFeatureId),
           warning: input.warning ?? null,
         },
@@ -478,6 +481,7 @@ export async function recordAgenticProposalEngram(input: {
         observedStates: input.observedStates,
         laneOrder: input.laneOrder,
         suggestionCount: input.suggestionCount,
+        canonicalEnvelope: input.canonicalEnvelope ?? null,
         missingFeatureId: Boolean(input.missingFeatureId),
         warning: input.warning ?? null,
       },

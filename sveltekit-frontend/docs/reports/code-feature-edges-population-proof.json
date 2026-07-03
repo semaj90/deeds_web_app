@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-07-02T03:13:32.066Z",
+  "timestamp": "2026-07-03T03:50:55.101Z",
   "mode": "apply",
   "stats": {
-    "features_total": 11,
+    "features_total": 1477,
     "edges_read": 101,
-    "feature_edges_created": 110,
+    "feature_edges_created": 6448,
     "errors": 0
   },
   "errors": []

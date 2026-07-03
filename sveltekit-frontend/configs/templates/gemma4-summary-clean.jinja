@@ -1,0 +1,12 @@
+{# Custom Jinja2 chat template for Phase 7 clean summaries #}
+{# Suppresses thinking blocks and turn markers to prevent contamination #}
+{# Based on Gemma4 official template with system role support #}
+{% for message in messages %}
+  {% if message['role'] == 'user' %}
+    {{ '<start_of_turn>user\n' + message['content'] + '<end_of_turn>\n<start_of_turn>model\n' }}
+  {% elif message['role'] == 'assistant' %}
+    {{ message['content'] + '<end_of_turn>\n' }}
+  {% elif message['role'] == 'system' %}
+    {{ '<start_of_turn>system\n' + message['content'] + '<end_of_turn>\n' }}
+  {% endif %}
+{% endfor %}

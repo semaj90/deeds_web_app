@@ -23,8 +23,15 @@ const env = loadRepoEnv();
 const QDRANT_URL = String(args.get('qdrant-url') ?? env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/+$/, '');
 const COLLECTION = String(args.get('collection') ?? env.QDRANT_CODE_COLLECTION ?? 'codebase_chunks_768');
 const VECTOR_NAME = String(args.get('vector-name') ?? env.QDRANT_CODE_VECTOR_NAME ?? 'content');
-const EMBED_URL = String(args.get('embed-url') ?? env.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081').replace(/\/+$/, '');
-const OLLAMA_URL = String(args.get('ollama-url') ?? env.OLLAMA_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
+const EMBED_URL = String(
+  args.get('embed-url')
+  ?? env.EMBED_SERVER_URL
+  ?? env.EMBEDDING_URL
+  ?? env.OLLAMA_EMBED_BASE_URL
+  ?? env.OLLAMA_URL
+  ?? 'http://127.0.0.1:11434'
+).replace(/\/+$/, '');
+const OLLAMA_URL = String(args.get('ollama-url') ?? env.OLLAMA_URL ?? env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
 const EMBED_MODEL = String(args.get('model') ?? env.EMBEDDINGGEMMA_MODEL ?? env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest');
 const TURBOVEC_HTTP = String(args.get('turbovec-http') ?? env.TURBOVEC_PYTHON_URL ?? 'http://127.0.0.1:8791').replace(/\/+$/, '');
 const GRPC_URL = String(args.get('grpc-url') ?? env.TURBOVEC_SIDECAR_GRPC_URL ?? '127.0.0.1:50062');

@@ -314,8 +314,47 @@ async function runIncrementalLane(redis) {
     // Non-blocking — failures are recorded in log.services but don't abort the lane.
     log.services = await probeServices();
 
+    // ── TurboVec canonical gRPC bridge (fire-and-forget, :50062) ─────────────
+    // Spawn the gRPC bridge if it is not already healthy.
+    // This is the canonical accelerator lane used by proof scripts and
+    // retrieval/gating code paths. Keep the legacy :8792 ANN wrapper separate.
+    const tvGrpcCooldownKey = 'startup:turbovec-grpc:last_spawn';
+    const tvGrpcStampRaw = await redis.get(tvGrpcCooldownKey).catch(() => null);
+    const tvGrpcAge = tvGrpcStampRaw
+      ? (Date.now() - new Date(tvGrpcStampRaw).getTime()) / 60_000
+      : Infinity;
+    let tvGrpcHealthy = false;
+    try {
+      const tvGrpcProbe = await fetch('http://127.0.0.1:50062/health', {
+        signal: AbortSignal.timeout(1500),
+      });
+      tvGrpcHealthy = tvGrpcProbe.ok;
+    } catch {}
+
+    if (!tvGrpcHealthy && tvGrpcAge > 30) {
+      const sidecarScript = resolve(ROOT, 'scripts/sidecars/turbovec-grpc-bridge.mjs');
+      const tvGrpcOut = openSync(resolve(LOG_DIR, 'turbovec-grpc.out.log'), 'a');
+      const tvGrpcErr = openSync(resolve(LOG_DIR, 'turbovec-grpc.err.log'), 'a');
+      const tvGrpcChild = spawn('node', [sidecarScript], {
+        cwd: ROOT,
+        detached: true,
+        stdio: ['ignore', tvGrpcOut, tvGrpcErr],
+      });
+      tvGrpcChild.unref();
+      log.turbovecGrpc = { status: 'spawned', pid: tvGrpcChild.pid };
+      console.log(
+        `[startup] TurboVec gRPC bridge spawned pid=${tvGrpcChild.pid} → logs/task-output/pipeline-test/turbovec-grpc.{out,err}.log`
+      );
+      await redis.set(tvGrpcCooldownKey, new Date().toISOString(), 'EX', 3600).catch(() => {});
+    } else if (tvGrpcHealthy) {
+      log.turbovecGrpc = { status: 'already-up' };
+      console.log('[startup] TurboVec gRPC bridge already healthy on :50062');
+    } else {
+      log.turbovecGrpc = { status: 'cooldown', ageMin: tvGrpcAge.toFixed(1) };
+    }
+
     // ── TurboVec ANN sidecar (fire-and-forget, :8792) ────────────────────────
-    // Spawn the TurboVec ANN wrapper if it's not already alive.
+    // Spawn the legacy TurboVec ANN wrapper if it's not already alive.
     // Uses a 30-min Redis cooldown so it doesn't respawn on every folder-open.
     // Feeds hyperrag:multiquery prefilter — optional, degrades gracefully if down.
     const tvCooldownKey = 'startup:turbovec-sidecar:last_spawn';

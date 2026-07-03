@@ -10,6 +10,8 @@ import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { eq, inArray } from 'drizzle-orm';
 import type { HyperRAGPacketState, HyperRAGPacketPipeline } from './hyperrag-rpc-client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
+import { makePacketUlid } from '$lib/server/identity/ulid.js';
+import { buildCanonicalAcePacketEnvelope } from '$lib/server/ace/canonical-packet-envelope.js';
 
 interface ChunkResult {
   content: string;
@@ -53,7 +55,9 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
       }
 
       const data = (await response.json()) as { features: string[] };
-      return data.features;
+      return Array.isArray(data.features)
+        ? data.features.filter((feature): feature is string => typeof feature === 'string')
+        : [];
     } catch (err) {
       // Fallback: regex extraction
       return this.extractFeaturesFallback(text);
@@ -87,9 +91,9 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
         !results.some((r: any) => r.featureId === c)
       );
 
-      return Array.from(new Set([
-        ...normalizedIds,
-        ...missingCandidates.map(c => c.toLowerCase()),
+      return Array.from(new Set<string>([
+        ...Array.from(normalizedIds).map((id) => String(id)),
+        ...missingCandidates.map((c) => c.toLowerCase()),
       ]));
     } catch (err) {
       // Fallback: normalize to lowercase (assumes candidates are already feature labels)
@@ -152,20 +156,47 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
     try {
       for (const packet of packets) {
         // Prepare insert statement
+        const canonicalSourceRef = packet.canonicalSourceRef || packet.sourceRef;
+        const titleId = packet.titleId || packet.featureId;
+        const packetUlid = packet.packetUlid ?? makePacketUlid();
+        const canonicalEnvelope = buildCanonicalAcePacketEnvelope(
+          {
+            packet_id: packet.packetId ?? null,
+            packet_ulid: packetUlid,
+            packet_key: packet.packetKey,
+            title_id: titleId,
+            source_ref: packet.sourceRef,
+            canonical_source_ref: canonicalSourceRef,
+            feature_id: packet.featureId,
+            domain: packet.domain ?? null,
+            summary: packet.summary,
+          },
+          {
+            feature_id: packet.featureId,
+            kind: 'packet',
+            language: null,
+            page_rank_score: 0,
+          }
+        );
         const metadata = {
           chunkCount: packet.chunkCount,
           tokenEstimate: packet.tokenEstimate,
           embeddingModel: packet.embeddingModel,
           source: 'hyperrag-pipeline',
           traceId: packet.traceId,
+          canonical_envelope: canonicalEnvelope,
         };
 
         // Insert into atlas_packets table
         await (this.db as any).insert(atlasPackets).values({
+          packetId: packet.packetId ?? undefined,
+          packetUlid,
           packetKey: packet.packetKey,
           featureId: packet.featureId,
           sourceRef: packet.sourceRef,
-          featureLabel: packet.featureId, // Use featureId as label for now
+          canonicalSourceRef: canonicalSourceRef,
+          titleId: titleId,
+          featureLabel: titleId || packet.featureId,
           directoryPath: '', // TODO: Extract from sourceRef
           summary: packet.summary,
           metadata,
@@ -173,11 +204,17 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
           embeddingModel: packet.embeddingModel,
           createdAt: new Date(),
           updatedAt: new Date(),
+          sourcePath: canonicalSourceRef,
         }).onConflictDoUpdate({
           target: atlasPackets.packetKey,
           set: {
             summary: packet.summary,
             metadata,
+            packetUlid,
+            canonicalSourceRef: canonicalSourceRef,
+            titleId: titleId,
+            featureLabel: titleId || packet.featureId,
+            sourcePath: canonicalSourceRef,
             updatedAt: new Date(),
           },
         });

@@ -23,6 +23,8 @@ import crypto from 'crypto';
 
 export interface AceFullPacket {
   packet_id: string;
+  packet_ulid: string | null;
+  title_id: string | null;
   query: string;
   query_hash: string;
   // Parent Atlas identity
@@ -88,6 +90,8 @@ export async function writeAcePacket(
   const full: AceFullPacket = {
     ...packet,
     packet_id: makePacketId(packet.query),
+    packet_ulid: packet.packet_ulid ?? null,
+    title_id: packet.title_id ?? null,
     created_at: new Date().toISOString(),
     ttl_seconds: ttl,
   };
@@ -217,6 +221,8 @@ export interface AcePacketValidation {
 export function validateAcePacket(p: Partial<AceFullPacket>): AcePacketValidation {
   const errors: string[] = [];
   if (!p.query?.trim()) errors.push('query is required');
+  if (p.packet_ulid !== undefined && p.packet_ulid !== null && !String(p.packet_ulid).trim()) errors.push('packet_ulid cannot be blank');
+  if (p.title_id !== undefined && p.title_id !== null && !String(p.title_id).trim()) errors.push('title_id cannot be blank');
   if (!Array.isArray(p.source_refs) || p.source_refs.length === 0) errors.push('source_refs must be non-empty array');
   if (!Array.isArray(p.feature_ids)) errors.push('feature_ids must be array');
   if (!Array.isArray(p.lane_ids)) errors.push('lane_ids must be array');

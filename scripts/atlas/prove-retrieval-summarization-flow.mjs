@@ -29,8 +29,15 @@ const TOP_K = Number(args.get('top-k') ?? 8);
 const OUT_JSON = path.resolve(REPO_ROOT, String(args.get('out-json') ?? 'docs/reports/retrieval-summarization-flow-proof.json'));
 const OUT_MD = path.resolve(REPO_ROOT, String(args.get('out-md') ?? 'docs/reports/retrieval-summarization-flow-proof.md'));
 
-const EMBED_URL = String(args.get('embed-url') ?? env.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081').replace(/\/+$/, '');
-const OLLAMA_URL = String(args.get('ollama-url') ?? env.OLLAMA_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
+const EMBED_URL = String(
+  args.get('embed-url')
+  ?? env.EMBED_SERVER_URL
+  ?? env.EMBEDDING_URL
+  ?? env.OLLAMA_EMBED_BASE_URL
+  ?? env.OLLAMA_URL
+  ?? 'http://127.0.0.1:11434'
+).replace(/\/+$/, '');
+const OLLAMA_URL = String(args.get('ollama-url') ?? env.OLLAMA_URL ?? env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434').replace(/\/+$/, '');
 const EMBED_MODEL = String(args.get('embed-model') ?? env.EMBEDDINGGEMMA_MODEL ?? env.EMBEDDING_GEMMA_MODEL ?? 'embeddinggemma:latest');
 const QDRANT_URL = String(args.get('qdrant-url') ?? env.QDRANT_URL ?? 'http://127.0.0.1:6333').replace(/\/+$/, '');
 const QDRANT_COLLECTION = String(args.get('collection') ?? env.QDRANT_CODE_COLLECTION ?? 'codebase_chunks_768');

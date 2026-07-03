@@ -6,7 +6,7 @@
  *   Packet envelope (identity + metadata)
  *     ↓ Postgres
  *   512-packet batches
- *     ↓ RabbitMQ fanout
+ *     ↓ RabbitMQ durable work queue
  *   Batch worker
  *     ↓
  *   Extract content (LangExtract + ast-grep)
@@ -45,7 +45,8 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
 import process from 'process';
-import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../scripts/atlas/connection-config.mjs';
+import { isUsableGemma4Summary, sanitizeGemma4Summary } from '../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
 
@@ -85,16 +86,13 @@ const allowGemma4Fallback = process.argv.includes('--allow-gemma4-fallback');
 const MAX_GEMMA4_FALLBACK_BATCH = parseInt(env.PHASE7_MAX_GEMMA4_FALLBACK_BATCH || '32');
 const allowLargeLlamaBatch = process.argv.includes('--allow-large-llama-batch');
 
-const EXCHANGE = 'summaries.batch.fanout';
-const QUEUE_PREFIX = 'summaries.batch.worker';
+const QUEUE_NAME = process.env.PHASE7_TRITON_SUMMARY_QUEUE || `summaries.batch.work.${batchSize}`;
+const DLQ_NAME = `${QUEUE_NAME}.dlq`;
 const PREFETCH = 1; // Process one batch at a time
+const MAX_RETRIES = parseInt(env.PHASE7_MAX_RETRIES || '3');
 
 function stripGemmaChannelBlocks(text) {
-  return String(text || '')
-    .replace(/<\|channel\>thought[\s\S]*?(?:<\|channel\>|<channel\|>|<\|message\|>|$)/gi, '')
-    .replace(/<\|start_header_id\>analysis<\|end_header_id\>[\s\S]*?(?:<\|start_header_id\>final<\|end_header_id\>|$)/gi, '')
-    .replace(/<\|[^>]+?\|>/g, '')
-    .trim();
+  return sanitizeGemma4Summary(text).summary;
 }
 
 async function probeLlamaServer() {
@@ -120,7 +118,8 @@ async function produceQueue() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
+    await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     // Fetch all unsummarized chunks
     const result = await pool.query(`
@@ -153,9 +152,8 @@ async function produceQueue() {
         timestamp: Date.now()
       };
 
-      channel.publish(
-        EXCHANGE,
-        '',
+      channel.sendToQueue(
+        QUEUE_NAME,
         Buffer.from(JSON.stringify(message)),
         { persistent: true, contentType: 'application/json' }
       );
@@ -168,7 +166,7 @@ async function produceQueue() {
       }
     }
 
-    console.log(`\n  ✅ Enqueued ${enqueued} batches of ${batchSize} packets to ${EXCHANGE}`);
+    console.log(`\n  ✅ Enqueued ${enqueued} batches of ${batchSize} packets to ${QUEUE_NAME}`);
     console.log(`  📋 Start worker: node phase7-triton-batch-summaries.mjs --worker --batch-size=${batchSize}\n`);
 
   } catch (err) {
@@ -301,13 +299,16 @@ async function updateBatchResults(chunks, summaries) {
   try {
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
-      const summary = summaries[i] || '';
+      const summary = stripGemmaChannelBlocks(summaries[i] || '');
 
-      if (!summary) continue;
+      if (!isUsableGemma4Summary(summary, { minLength: 30, minUniqueWords: 6 })) continue;
 
       // 1. Postgres update
       await pool.query(
-        `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id = $2`,
+        `UPDATE codebase_chunk_index
+         SET summary = $1, updated_at = NOW()
+         WHERE id = $2
+           AND (summary IS NULL OR btrim(summary) = '')`,
         [summary, chunk.chunk_id]
       );
 
@@ -355,15 +356,12 @@ async function startWorker() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
-
-    const queueName = `${QUEUE_PREFIX}.${workerId}`;
-    const queue = await channel.assertQueue(queueName, { durable: true });
-    await channel.bindQueue(queue.queue, EXCHANGE, '');
+    const queue = await channel.assertQueue(QUEUE_NAME, { durable: true });
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     await channel.prefetch(PREFETCH);
 
-    console.log(`  ✓ Listening on ${queueName}`);
+    console.log(`  ✓ Listening on ${QUEUE_NAME}`);
     console.log(`  Type Ctrl+C to stop\n`);
 
     await channel.consume(queue.queue, async (msg) => {
@@ -405,7 +403,36 @@ async function startWorker() {
 
       } catch (err) {
         console.error(`\n  ❌ Error: ${err.message}`);
-        channel.nack(msg, false, !once); // Requeue unless this was a smoke probe
+        if (once) {
+          channel.nack(msg, false, false);
+        } else {
+          const headers = msg.properties.headers || {};
+          const retryCount = Number(headers['x-retry-count'] || 0);
+          if (retryCount >= MAX_RETRIES) {
+            channel.sendToQueue(DLQ_NAME, msg.content, {
+              persistent: true,
+              contentType: msg.properties.contentType || 'application/json',
+              headers: {
+                ...headers,
+                'x-retry-count': retryCount,
+                'x-dead-letter-reason': err.message,
+                'x-dead-lettered-at': new Date().toISOString(),
+              },
+            });
+            channel.ack(msg);
+          } else {
+            channel.sendToQueue(QUEUE_NAME, msg.content, {
+              persistent: true,
+              contentType: msg.properties.contentType || 'application/json',
+              headers: {
+                ...headers,
+                'x-retry-count': retryCount + 1,
+                'x-last-error': err.message,
+              },
+            });
+            channel.ack(msg);
+          }
+        }
         if (once) {
           setImmediate(async () => {
             await channel.close().catch(() => {});

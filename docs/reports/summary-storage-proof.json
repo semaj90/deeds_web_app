@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T21:56:06.637Z",
+  "generated_at": "2026-07-02T23:22:48.384Z",
   "status": "PASS",
   "tables": {
     "atlas_packets": {
@@ -8,13 +8,13 @@
     },
     "atlas_summary_layers": {
       "exists": true,
-      "rows": 11994
+      "rows": 12004
     }
   },
   "coverage": {
     "atlas_packets_metadata_pct": 100,
     "atlas_packets_topology_pct": 0,
-    "atlas_packets_vectors_pct": 4.99,
+    "atlas_packets_vectors_pct": 5.3,
     "atlas_summary_layers_metadata_pct": 99.72
   },
   "proof": {
@@ -24,21 +24,21 @@
   },
   "sample": {
     "atlas_packets": {
-      "packet_key": "packet:5118cc67e6df",
-      "source_ref": "scripts/atlas/audit-recommendation-sourceref.mjs",
-      "feature_id": "scripts.audit-recommendation-sourceref",
+      "packet_key": "packet:5a6bc565606c",
+      "source_ref": "logs/turboquant/launch-2026-05-28T16-59-48.out",
+      "feature_id": "logs.launch-2026-05-28T16-59-48",
       "metadata": {
         "identity": {
           "source": "filesystem",
           "version": 1,
-          "created_at": "2026-06-28T08:36:34.587Z",
+          "created_at": "2026-06-28T08:36:31.584Z",
           "created_by": "phase-d:whole-codebase-scan"
         },
         "workspace": {
           "domain": "codebase",
           "universe": "atlas",
           "text_safe": true,
-          "size_bytes": 6951
+          "size_bytes": 0
         }
       },
       "topology": {},

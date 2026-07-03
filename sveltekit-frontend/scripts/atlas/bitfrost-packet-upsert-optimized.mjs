@@ -31,6 +31,47 @@ const RESUME_FROM = process.argv.find(a => a.startsWith('--resume='))?.split('='
 
 let redis;
 
+function normalizeKeyPart(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9._/-]+/g, '-')
+    .replace(/[-/]+/g, '.')
+    .replace(/^\.+|\.+$/g, '');
+}
+
+function sourcePrefixFrom(ref, fallbackDir) {
+  const raw = String(ref ?? fallbackDir ?? '').replace(/\\/g, '/').trim();
+  if (!raw) return 'unclassified';
+  const parts = raw.split('/').filter(Boolean);
+  if (parts.length <= 1) return parts[0] || 'unclassified';
+  parts.pop();
+  return parts.join('/') || 'unclassified';
+}
+
+function summaryTemplateFrom(summary) {
+  const text = String(summary ?? '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+  if (!text) return 'unclassified';
+  const words = text.split(' ').slice(0, 8).join(' ');
+  return normalizeKeyPart(words).slice(0, 120) || 'unclassified';
+}
+
+function hotKey(featureId, sourcePrefix, somRow, somCol, language, kind, summary) {
+  const parts = {
+    feature: featureId ? `bitfrost:hot:feature:${normalizeKeyPart(featureId)}` : null,
+    source: sourcePrefix ? `bitfrost:hot:source:${normalizeKeyPart(sourcePrefix)}` : null,
+    som: somRow !== undefined && somCol !== undefined ? `bitfrost:hot:som:${somRow}:${somCol}` : null,
+    language: language ? `bitfrost:hot:language:${normalizeKeyPart(language)}` : null,
+    kind: kind ? `bitfrost:hot:kind:${normalizeKeyPart(kind)}` : null,
+    summary: summary ? `bitfrost:hot:summary-template:${summaryTemplateFrom(summary)}` : null,
+  };
+
+  return Object.values(parts).filter(Boolean);
+}
+
 async function initRedis() {
   redis = new Redis({
     host: REDIS_HOST,
@@ -78,6 +119,7 @@ function getDirectoryHash(dirPath) {
 function createUpsertPipeline(packets, pipeline) {
   const featureGroups = {};
   const dirGroups = {};
+  const hotGroups = new Map();
 
   for (const packet of packets) {
     const {
@@ -86,6 +128,10 @@ function createUpsertPipeline(packets, pipeline) {
       feature_id,
       directory_path,
       summary,
+      language,
+      kind,
+      som_row,
+      som_col,
       confidence,
       updated_at,
       provenance
@@ -119,6 +165,13 @@ function createUpsertPipeline(packets, pipeline) {
     if (!dirGroups[dirHash]) dirGroups[dirHash] = [];
     dirGroups[dirHash].push(packet_key);
 
+    // Hot reuse buckets (prompt locality rather than raw KV token tracking)
+    const sourcePrefix = sourcePrefixFrom(source_ref, directory_path);
+    for (const key of hotKey(feature_id, sourcePrefix, som_row, som_col, language, kind, summary)) {
+      if (!hotGroups.has(key)) hotGroups.set(key, []);
+      hotGroups.get(key).push([updated_at ? new Date(updated_at).getTime() : Date.now(), packet_key]);
+    }
+
     // L4: Global sorted index (by authority / updated_at)
     const score = new Date(updated_at).getTime();
     pipeline.zadd(`bifrost:index:all`, score, packet_key);
@@ -134,6 +187,16 @@ function createUpsertPipeline(packets, pipeline) {
   for (const [dirHash, keys] of Object.entries(dirGroups)) {
     pipeline.sadd(`bifrost:${dirHash}`, ...keys);
     pipeline.expire(`bifrost:${dirHash}`, TTL_SECONDS);
+  }
+
+  for (const [key, entries] of hotGroups.entries()) {
+    const flattened = entries
+      .sort((a, b) => b[0] - a[0])
+      .flatMap(([score, packetKey]) => [score, packetKey]);
+    if (flattened.length > 0) {
+      pipeline.zadd(key, ...flattened);
+      pipeline.expire(key, TTL_SECONDS);
+    }
   }
 
   // Update global counters

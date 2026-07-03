@@ -188,8 +188,12 @@ async function main() {
       console.log(`      -> Latency: ${latency}ms, Packets: ${packets.length}, Cache: ${cacheHit}`);
 
       let packetKeyCount = 0;
+      let packetIdCount = 0;
+      let packetUlidCount = 0;
       let featureIdCount = 0;
+      let titleIdCount = 0;
       let sourceRefCount = 0;
+      let canonicalSourceRefCount = 0;
 
       if (packets.length === 0) {
         // Log a query miss with no packet matches
@@ -215,21 +219,29 @@ async function main() {
         const norm = normalize(rawPacket);
 
         const packetKey = norm.packet_key || rawPacket.packetKey || rawPacket.id || `pkt:${qHash}`;
+        const packetId = norm.packet_id || rawPacket.packetId || null;
+        const packetUlid = norm.packet_ulid || rawPacket.packetUlid || null;
         const sourceRef = norm.source_ref || rawPacket.sourceRef || rawPacket.source_path || '';
+        const canonicalSourceRef = norm.canonical_source_ref || rawPacket.canonicalSourceRef || sourceRef || '';
         const featureId = norm.feature_id || rawPacket.featureId || '';
+        const titleId = norm.title_id || rawPacket.titleId || '';
         const featureLabel = norm.feature_label || rawPacket.featureLabel || '';
 
         if (packetKey && packetKey !== `pkt:${qHash}`) packetKeyCount++;
+        if (packetId) packetIdCount++;
+        if (packetUlid) packetUlidCount++;
         if (featureId) featureIdCount++;
+        if (titleId) titleIdCount++;
         if (sourceRef) sourceRefCount++;
+        if (canonicalSourceRef) canonicalSourceRefCount++;
 
         // Log provenance trace to Postgres
         await pool.query(
           `INSERT INTO retrieval_provenance
-             (story_id, task_id, worker_id, trace_id, query_hash, packet_key, source_ref,
-              source_ref_key, feature_id, feature_label, cache_namespace, cache_key,
+             (story_id, task_id, worker_id, trace_id, query_hash, packet_key, packet_id, packet_ulid, source_ref,
+              canonical_source_ref, source_ref_key, feature_id, title_id, feature_label, cache_namespace, cache_key,
               cache_hit_source, graph_stage_status, traversal_path, fusion_score, verdict)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15::jsonb, $16, 'PASS')`,
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19::jsonb, $20, 'PASS')`,
           [
             'proof-quality-lane',
             'atlas:replay:breadth:50',
@@ -237,9 +249,13 @@ async function main() {
             traceId,
             qHash,
             packetKey,
+            packetId,
+            packetUlid,
             sourceRef,
+            canonicalSourceRef,
             rawPacket.sourceRefKey || null,
             featureId,
+            titleId,
             featureLabel,
             data.trace?.cache_namespace || null,
             data.trace?.cache_key || null,
@@ -258,8 +274,12 @@ async function main() {
         cacheHit,
         packetsReturned: packets.length,
         packetKeyCount,
+        packetIdCount,
+        packetUlidCount,
         featureIdCount,
+        titleIdCount,
         sourceRefCount,
+        canonicalSourceRefCount,
         strategy: data.strategy || 'fusion',
         traceId,
         latencyMs: latency
@@ -290,8 +310,12 @@ async function main() {
         cacheHit: false,
         packetsReturned: 0,
         packetKeyCount: 0,
+        packetIdCount: 0,
+        packetUlidCount: 0,
         featureIdCount: 0,
+        titleIdCount: 0,
         sourceRefCount: 0,
+        canonicalSourceRefCount: 0,
         strategy: 'failed',
         latencyMs: 0
       });
@@ -308,16 +332,24 @@ async function main() {
 
   const totalReturnedPackets = results.reduce((sum, r) => sum + r.packetsReturned, 0);
   const packetKeyMatches = results.reduce((sum, r) => sum + r.packetKeyCount, 0);
+  const packetIdMatches = results.reduce((sum, r) => sum + r.packetIdCount, 0);
+  const packetUlidMatches = results.reduce((sum, r) => sum + r.packetUlidCount, 0);
   const featureIdMatches = results.reduce((sum, r) => sum + r.featureIdCount, 0);
+  const titleIdMatches = results.reduce((sum, r) => sum + r.titleIdCount, 0);
   const sourceRefMatches = results.reduce((sum, r) => sum + r.sourceRefCount, 0);
+  const canonicalSourceRefMatches = results.reduce((sum, r) => sum + r.canonicalSourceRefCount, 0);
 
   const summary = {
     status: successCount >= 45 ? "PASS" : "FAIL",
     queryCount: results.length,
     qdrantHitPct: totalReturnedPackets > 0 ? Number((successCount / results.length * 100).toFixed(2)) : 0,
     packetKeyPct: totalReturnedPackets > 0 ? Number((packetKeyMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
+    packetIdPct: totalReturnedPackets > 0 ? Number((packetIdMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
+    packetUlidPct: totalReturnedPackets > 0 ? Number((packetUlidMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
     featureIdPct: totalReturnedPackets > 0 ? Number((featureIdMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
+    titleIdPct: totalReturnedPackets > 0 ? Number((titleIdMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
     sourceRefPct: totalReturnedPackets > 0 ? Number((sourceRefMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
+    canonicalSourceRefPct: totalReturnedPackets > 0 ? Number((canonicalSourceRefMatches / totalReturnedPackets * 100).toFixed(2)) : 0,
     cacheHitPct: Number((cacheHitCount / results.length * 100).toFixed(2)),
     timeoutCount: results.filter(r => r.error && r.error.includes('timeout')).length,
     failedQueries: results.filter(r => r.strategy === 'failed').map(r => r.query),

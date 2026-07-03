@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-07-02T03:13:42.145Z",
+  "timestamp": "2026-07-03T03:51:48.127Z",
   "mode": "apply",
   "stats": {
-    "features_total": 11,
-    "edges_total": 110,
-    "pagerank_computed": 11,
-    "pagerank_updated": 11,
+    "features_total": 1477,
+    "edges_total": 6558,
+    "pagerank_computed": 1477,
+    "pagerank_updated": 1477,
     "errors": 0,
     "iterations": 20,
     "damping_factor": 0.85

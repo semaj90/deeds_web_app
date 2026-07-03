@@ -7,6 +7,12 @@ import { recordRetrievalTelemetry, type RetrievalHit } from '../telemetry/retrie
 import { multiLaneRetrievalWithRRF } from './rrf-integration.js';
 import { toStableFileKey } from './subgraph-seed-neighborhood.js';
 import { getRedis } from '../redis.js';
+import { getAceContextPackPointer } from '../cache/ace-context-pack-cache.js';
+import { QueryProfileRouter } from './query-profile-router.js';
+import {
+  buildCanonicalAcePacketEnvelope,
+  type CanonicalAcePacketEnvelope,
+} from '../ace/canonical-packet-envelope.js';
 
 export type HyperRagPacketRpcInput = {
   query: string;
@@ -25,10 +31,13 @@ export type HyperRagPacketRpcInput = {
 };
 
 export type HyperRagPacketRpcPacket = {
+  packet_id: string | null;
   packet_key: string;
+  packet_ulid: string | null;
   packet_type: 'chrom97' | 'neschrom97';
   source_ref: string;
   canonical_source_ref: string;
+  title_id: string | null;
   feature_id: string | null;
   feature_label: string | null;
   topology_label: string | null;
@@ -61,6 +70,7 @@ export type HyperRagPacketRpcResult = {
   packets: HyperRagPacketRpcPacket[];
   trace: {
     retrieval_strategy: 'fusion' | 'fts-only';
+    cache_hit_source: 'redis' | 'bitfrost' | 'ace' | null;
     qdrant_hits: number;
     postgres_hits: number;
     rrf_hits: number;
@@ -78,6 +88,7 @@ export type HyperRagPacketRpcResult = {
 type ParentAtlasRow = {
   source_ref: string | null;
   rel_path: string | null;
+  title_id: string | null;
   feature_id: string | null;
   summary_lod0: string | null;
   summary_lod1: string | null;
@@ -87,11 +98,14 @@ type ParentAtlasRow = {
 };
 
 type AtlasPacketRow = {
+  packet_id: string | null;
   packet_key: string | null;
+  packet_ulid: string | null;
   source_ref: string | null;
   source_ref_key: string | null;
   file_path: string | null;
   source_path: string | null;
+  title_id: string | null;
   feature_id: string | null;
   feature_label: string | null;
   summary: string | null;
@@ -116,8 +130,11 @@ type QueryEvalTelemetryPayload = {
   cache_hit_source: string | null;
   error: string | null;
   packet_summaries: Array<{
+    packet_id: string | null;
     packet_key: string;
+    packet_ulid: string | null;
     source_ref: string;
+    title_id: string | null;
     feature_id: string | null;
     fusion_score: number;
     rank: number;
@@ -125,8 +142,11 @@ type QueryEvalTelemetryPayload = {
 };
 
 type NesPacketRow = {
+  packet_id: string | null;
   packet_key: string;
+  packet_ulid: string | null;
   source_ref: string | null;
+  title_id: string | null;
   feature_id: string | null;
   summary: string | null;
   qdrant_point_id: string | null;
@@ -330,6 +350,22 @@ function packetSeedCandidatesFromRrf(
   });
 }
 
+function envelopeAsContextFields(envelope: CanonicalAcePacketEnvelope): {
+  feature_id?: string | null;
+  som_cell?: string | null;
+  language?: string | null;
+  kind?: string | null;
+  page_rank_score?: number;
+} {
+  return {
+    feature_id: envelope.feature_id,
+    som_cell: envelope.som_cell,
+    language: envelope.language,
+    kind: envelope.kind,
+    page_rank_score: envelope.page_rank_score,
+  };
+}
+
 function packetSeedCandidatesFromFts(hits: FTSResult[]): Array<{
   stable_key: string;
   file_path: string | null;
@@ -483,11 +519,14 @@ async function loadAtlasPacketsByIdentity(keys: string[]): Promise<Map<string, A
     const { rows } = await getPacketRpcPool().query<AtlasPacketRow>(
       `
         select
+          packet_id,
           packet_key,
+          packet_ulid,
           source_ref,
           source_ref_key,
           file_path,
           source_path,
+          title_id,
           feature_id,
           feature_label,
           summary,
@@ -518,13 +557,20 @@ async function loadAtlasPacketsByIdentity(keys: string[]): Promise<Map<string, A
     for (const row of rows) {
       for (const value of [
         row.packet_key,
+        row.packet_id,
+        row.packet_ulid,
         row.source_ref,
         row.source_ref_key,
         row.file_path,
         row.source_path,
+        row.title_id,
         row.qdrant_point_id,
         row.payload?.packet_key,
         row.payload?.packetKey,
+        row.payload?.packet_id,
+        row.payload?.packetId,
+        row.payload?.packet_ulid,
+        row.payload?.packetUlid,
         row.payload?.source_ref,
         row.payload?.sourceRef,
         row.payload?.canonical_source_ref,
@@ -536,6 +582,10 @@ async function loadAtlasPacketsByIdentity(keys: string[]): Promise<Map<string, A
         row.payload?.qdrantPointId,
         row.metadata?.packet_key,
         row.metadata?.packetKey,
+        row.metadata?.packet_id,
+        row.metadata?.packetId,
+        row.metadata?.packet_ulid,
+        row.metadata?.packetUlid,
         row.metadata?.source_ref,
         row.metadata?.sourceRef,
         row.metadata?.canonical_source_ref,
@@ -783,6 +833,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
                 trace: {
                   ...parsed.trace,
                   latency_ms: totalMs,
+                  cache_hit_source: 'redis' as const,
                 }
               };
 
@@ -812,8 +863,11 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
                   cache_hit_source: 'redis',
                   error: null,
                   packet_summaries: cachedResult.packets.map((packet) => ({
+                    packet_id: packet.packet_id,
                     packet_key: packet.packet_key,
+                    packet_ulid: packet.packet_ulid,
                     source_ref: packet.source_ref,
+                    title_id: packet.title_id,
                     feature_id: packet.feature_id,
                     fusion_score: packet.fusion_score,
                     rank: packet.rank,
@@ -830,8 +884,96 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       }
     }
 
+    // ┌─────────────────────────────────────────────────────────────────────────────
+    // │ STAGE A0: BitFrost Hot-Bucket Cache Check (Pre-Qdrant)
+    // │ Checks Phase 7 warm-up buckets for exact feature/language/kind matches
+    // └─────────────────────────────────────────────────────────────────────────────
+
+    let hotBucketHits: string[] = [];
+    let stageA0IdentityRefs: string[] = [];
+    let stageA0CacheHitSource: 'bitfrost' | 'ace' | null = null;
+    let bitfrostMs = 0;
+    let potentialLanguage: string | undefined;
+    let potentialKind: string | undefined;
+
+    try {
+      const redis = getRedis();
+      const tBitfrostStart = performance.now();
+
+      // Extract query intent signals
+      const queryLower = query.toLowerCase();
+      const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2);
+      const queryProfile = QueryProfileRouter.route(query);
+      const profileAliases = QueryProfileRouter.getAliases(queryProfile);
+
+      // Stage A0 exact ACE pack cache: ace:ctx:{queryHash}
+      const aceContextPack = await getAceContextPackPointer(qHash).catch(() => null);
+      if (aceContextPack) {
+        const exactRefs = [
+          ...(aceContextPack.sourceRefs ?? []),
+          ...(aceContextPack.chunkIds ?? []),
+          ...(aceContextPack.graphPaths ?? []),
+        ]
+          .map((value) => cleanText(value))
+          .filter(Boolean);
+        stageA0IdentityRefs = [...new Set(exactRefs)];
+        hotBucketHits = [...stageA0IdentityRefs].slice(0, limit);
+        stageA0CacheHitSource = 'ace';
+      }
+
+      // Try to infer feature/language/kind from query and profile aliases
+      const potentialFeatures = queryWords.slice(0, 2).join('.');
+      potentialLanguage = queryWords.find(w => ['typescript', 'javascript', 'python', 'rust', 'go'].includes(w));
+      potentialKind = queryWords.find(w => ['function', 'class', 'interface', 'type', 'enum', 'module'].includes(w));
+
+      // Check hot buckets in priority order
+      const hotKeys = [
+        ...profileAliases.map((alias) => `bitfrost:hot:feature:${alias}`),
+        potentialFeatures ? `bitfrost:hot:feature:${potentialFeatures}` : null,
+        potentialLanguage ? `bitfrost:hot:language:${potentialLanguage}` : null,
+        potentialKind ? `bitfrost:hot:kind:${potentialKind}` : null,
+      ].filter((k): k is string => Boolean(k));
+
+      if (hotKeys.length > 0 && hotBucketHits.length < limit) {
+        const pipeline = redis.pipeline();
+        for (const key of hotKeys) {
+          pipeline.smembers(key);
+        }
+        const results = await pipeline.exec().catch(() => null);
+
+        if (results) {
+          // Collect all packet_keys from hot buckets (order by recency is built-in)
+          const allHits = new Set<string>();
+          for (const [err, members] of results as Array<[Error | null, string[]]>) {
+            if (!err && Array.isArray(members)) {
+              members.forEach(m => allHits.add(m));
+            }
+          }
+          hotBucketHits = [...new Set([...hotBucketHits, ...Array.from(allHits)])].slice(0, limit);
+          if (!stageA0CacheHitSource && hotBucketHits.length > 0) {
+            stageA0CacheHitSource = 'bitfrost';
+          }
+        }
+      }
+
+      bitfrostMs = performance.now() - tBitfrostStart;
+
+      if (hotBucketHits.length > 0) {
+        console.log(`[hyperrag-packet-rpc] Stage A0 cache hit: ${hotBucketHits.length} packets in ${bitfrostMs.toFixed(1)}ms (source: ${stageA0CacheHitSource})`);
+      }
+    } catch (err) {
+      console.warn('[hyperrag-packet-rpc] Stage A0 hot-bucket check failed:', err);
+      bitfrostMs = 0;
+    }
+
+    // Placeholder for Stage A0 cache envelopes (will be populated after Postgres rows load)
+    const stageA0CacheEnvelopes: Map<string, CanonicalAcePacketEnvelope> = new Map();
+
+    // Skip RRF if we have hot-bucket hits (instant cache)
+    const skipRrf = hotBucketHits.length >= limit;
+
     const [rrfResult, initialFtsHits] = await Promise.all([
-      includeGraph ? multiLaneRetrievalWithRRF(query, getPacketRpcPool(), { topK: limit, minScore: 0.001 }).catch(() => null) : Promise.resolve(null),
+      skipRrf ? Promise.resolve(null) : (includeGraph ? multiLaneRetrievalWithRRF(query, getPacketRpcPool(), { topK: limit, minScore: 0.001 }).catch(() => null) : Promise.resolve(null)),
       useFts ? searchCodeLexicalBounded(query, limit) : Promise.resolve([]),
     ]);
 
@@ -872,12 +1014,39 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   }
   const dedupedSeeds = Array.from(dedupeMap.values());
 
-  const candidateRefs = [...new Set(dedupedSeeds.flatMap((seed) => seed.source_refs))];
+    const candidateRefs = [...new Set([
+      ...dedupedSeeds.flatMap((seed) => seed.source_refs),
+      ...stageA0IdentityRefs,
+      ...hotBucketHits,
+    ].map((value) => cleanText(value)).filter(Boolean))];
   const [canonicalPackets, parentAtlas, nesPackets] = await Promise.all([
     loadAtlasPacketsByIdentity(candidateRefs),
     loadParentAtlas(candidateRefs),
     loadNesPackets(candidateRefs),
   ]);
+
+  // Build canonical envelopes for Stage A0 cache hits
+  // These preserve packet_id/title_id lineage through all downstream stages
+  if (hotBucketHits.length > 0 && stageA0CacheHitSource) {
+    const context = {
+      feature_id: null as string | null,
+      som_cell: null as string | null,
+      language: potentialLanguage ?? null,
+      kind: potentialKind ?? null,
+      page_rank_score: 0,
+    };
+
+    for (const key of hotBucketHits.slice(0, limit)) {
+      const row = canonicalPackets.get(key) ?? canonicalPackets.get(key.toLowerCase());
+      if (row) {
+        const envelope = buildCanonicalAcePacketEnvelope(row, context);
+        stageA0CacheEnvelopes.set(key, envelope);
+      }
+    }
+    if (stageA0CacheEnvelopes.size > 0) {
+      console.log(`[hyperrag-packet-rpc] Built ${stageA0CacheEnvelopes.size} canonical envelopes for Stage A0 cache hits (source: ${stageA0CacheHitSource})`);
+    }
+  }
 
   let neo4jExpansions = 0;
   const fusionLookup = new Map<string, { score: number; sources: string[] }>();
@@ -902,7 +1071,52 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
     }
   }
   const packets: HyperRagPacketRpcPacket[] = [];
-  const seedsToEmit = dedupedSeeds.slice(0, limit);
+
+  // Emit Stage A0 cache envelopes first (high priority, instant retrieval)
+  for (const [key, envelope] of stageA0CacheEnvelopes) {
+    if (packets.length >= limit) break;
+    // Convert canonical envelope to RPC packet shape
+    const packet: HyperRagPacketRpcPacket = {
+      packet_id: envelope.packet_id,
+      packet_ulid: envelope.packet_ulid,
+      packet_key: envelope.packet_key,
+      title_id: envelope.title_id,
+      source_ref: envelope.source_ref,
+      canonical_source_ref: envelope.source_ref,
+      feature_id: envelope.feature_id,
+      feature_label: null,
+      kind: envelope.kind,
+      language: envelope.language,
+      som_cell: envelope.som_cell,
+      headline: cleanText(envelope.packet_key),
+      content: null,
+      tags: [],
+      fusion_score: 1.0, // Cache hits are perfect matches
+      rank: packets.length + 1,
+      lexical_score: 1.0,
+      dense_score: 1.0,
+      qdrant_score: null,
+      ner_features: [],
+      traces: [
+        {
+          stage: 'A0',
+          source: stageA0CacheHitSource || 'unknown',
+          timing: `${bitfrostMs.toFixed(1)}ms`,
+          confidence: 0.99,
+        },
+      ],
+      metadata: {
+        packet_key: envelope.packet_key,
+        source_ref: envelope.source_ref,
+        feature_id: envelope.feature_id,
+        cached: true,
+        cache_source: stageA0CacheHitSource,
+      },
+    };
+    packets.push(packet);
+  }
+
+  const seedsToEmit = dedupedSeeds.slice(0, limit - packets.length);
   const neighborsBySeed = includeGraph
     ? await Promise.all(
         seedsToEmit.map(async (seed) => {
@@ -956,6 +1170,26 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       cleanText(seedMetadata.packet_key ?? seedMetadata.packetKey) ??
       `hyperrag:${sourceRef || seed.stable_key}`
     );
+    const packetId = cleanText(
+      canonicalPacket?.packet_id ??
+      canonicalPacket?.payload?.packet_id ??
+      canonicalPacket?.payload?.packetId ??
+      canonicalPacket?.metadata?.packet_id ??
+      canonicalPacket?.metadata?.packetId ??
+      seedMetadata.packet_id ??
+      seedMetadata.packetId ??
+      ''
+    ) || null;
+    const packetUlid = cleanText(
+      canonicalPacket?.packet_ulid ??
+      canonicalPacket?.payload?.packet_ulid ??
+      canonicalPacket?.payload?.packetUlid ??
+      canonicalPacket?.metadata?.packet_ulid ??
+      canonicalPacket?.metadata?.packetUlid ??
+      seedMetadata.packet_ulid ??
+      seedMetadata.packetUlid ??
+      ''
+    ) || null;
     const canonicalSourceRef = canonicalPacket?.source_ref ?? atlasRow?.source_ref ?? nesRow?.source_ref ?? sourceRef;
     const packetType: HyperRagPacketRpcPacket['packet_type'] = nesRow ? 'neschrom97' : 'chrom97';
     const atlasMetadata = getMetadata(atlasRow);
@@ -983,6 +1217,18 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       ?? seedMetadata.pathLabel
       ?? inferredDomainClass
       ?? null,
+    ) || null;
+    const titleId = cleanText(
+      canonicalPacket?.title_id ??
+      canonicalPacket?.payload?.title_id ??
+      canonicalPacket?.payload?.titleId ??
+      canonicalPacket?.metadata?.title_id ??
+      canonicalPacket?.metadata?.titleId ??
+      atlasRow?.title_id ??
+      nesRow?.title_id ??
+      seedMetadata.title_id ??
+      seedMetadata.titleId ??
+      null,
     ) || null;
     const ontologyLabel = cleanText(
       nesRow?.payload?.ontology_label
@@ -1034,10 +1280,13 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
         : 'Use this packet as evidence, then verify the nearest source_ref and graph neighbors.';
 
     packets.push({
+      packet_id: packetId,
       packet_key: packetKey,
+      packet_ulid: packetUlid,
       packet_type: packetType,
       source_ref: sourceRef,
       canonical_source_ref: canonicalSourceRef,
+      title_id: titleId,
       feature_id: featureId,
       feature_label: featureLabelFrom(nesRow ?? atlasRow, featureId),
       topology_label: topologyLabel,
@@ -1108,6 +1357,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
       duckdb_join_used: false,
       latency_ms: latencyMs,
       fusion_used: Boolean(rrfResult?.results?.length),
+      cache_hit_source: stageA0CacheHitSource,
       collection_split: {
         runtime_legal: 'legal_documents',
         codebase_topology: 'codebase_chunks_768',
@@ -1128,7 +1378,10 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
         cachedAt: new Date().toISOString(),
       };
       const provenance = {
+        packet_id: packets[0].packet_id,
         packet_key: packets[0].packet_key,
+        packet_ulid: packets[0].packet_ulid,
+        title_id: packets[0].title_id,
         feature_id: packets[0].feature_id ?? 'unknown',
         source_ref: packets[0].source_ref,
         retrieved_at: new Date().toISOString(),
@@ -1211,7 +1464,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
         embeddingMs: input.embeddingMs ?? null,
         verdict: result.trace.neo4j_expansions > 0 ? 'PASS' : 'WARN',
         totalMs: latencyMs,
-        cacheHitSource: null,
+        cacheHitSource: stageA0CacheHitSource,
         ttlRemaining: null,
         error: null,
         payload: {
@@ -1220,11 +1473,14 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
           packet_keys: packets.map((packet) => packet.packet_key),
           feature_ids: [...new Set(packets.map((packet) => packet.feature_id).filter((value): value is string => Boolean(value)))],
           source_refs: [...new Set(packets.map((packet) => packet.source_ref))],
-          cache_hit_source: null,
+          cache_hit_source: stageA0CacheHitSource,
           error: null,
           packet_summaries: packets.map((packet) => ({
+            packet_id: packet.packet_id,
             packet_key: packet.packet_key,
+            packet_ulid: packet.packet_ulid,
             source_ref: packet.source_ref,
+            title_id: packet.title_id,
             feature_id: packet.feature_id,
             fusion_score: packet.fusion_score,
             rank: packet.rank,

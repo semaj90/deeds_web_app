@@ -19,19 +19,155 @@
 
 import { Pool } from 'pg';
 import process from 'process';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+
+const ENV = loadRepoEnv(process.env);
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const LIMIT = process.argv.includes('--limit')
   ? parseInt(process.argv[process.argv.indexOf('--limit') + 1], 10)
   : undefined;
 
+const STOP_WORDS = new Set([
+  'about', 'after', 'again', 'against', 'also', 'because', 'before', 'being',
+  'between', 'chunk', 'chunks', 'class', 'code', 'codebase', 'data', 'file',
+  'files', 'from', 'function', 'into', 'module', 'packet', 'packets', 'summary',
+  'that', 'their', 'there', 'these', 'this', 'through', 'using', 'where', 'which',
+  'with', 'within',
+]);
+
+const VERB_HINTS = new Set([
+  'add', 'adds', 'align', 'analyze', 'apply', 'backfill', 'build', 'cache',
+  'call', 'check', 'classify', 'compute', 'connect', 'create', 'decode',
+  'derive', 'embed', 'extract', 'fetch', 'filter', 'generate', 'hydrate',
+  'index', 'join', 'load', 'materialize', 'merge', 'normalize', 'parse',
+  'populate', 'query', 'rank', 'rerank', 'resolve', 'route', 'score', 'search',
+  'store', 'summarize', 'sync', 'tag', 'train', 'update', 'upsert', 'validate',
+  'verify', 'warm', 'write',
+]);
+
+const ACTION_NOUN_TO_VERB = new Map([
+  ['builder', 'build'],
+  ['collector', 'collect'],
+  ['compiler', 'compile'],
+  ['connector', 'connect'],
+  ['analysis', 'analyze'],
+  ['audit', 'audit'],
+  ['auditing', 'audit'],
+  ['backfill', 'backfill'],
+  ['cache', 'cache'],
+  ['classification', 'classify'],
+  ['clustering', 'cluster'],
+  ['collection', 'collect'],
+  ['compilation', 'compile'],
+  ['compression', 'compress'],
+  ['configuration', 'configure'],
+  ['diagnostic', 'diagnose'],
+  ['diagnostics', 'diagnose'],
+  ['creation', 'create'],
+  ['decode', 'decode'],
+  ['deployment', 'deploy'],
+  ['encoding', 'encode'],
+  ['embedding', 'embed'],
+  ['execution', 'execute'],
+  ['extraction', 'extract'],
+  ['filtering', 'filter'],
+  ['generation', 'generate'],
+  ['hydration', 'hydrate'],
+  ['indexing', 'index'],
+  ['ingestion', 'ingest'],
+  ['interaction', 'interact'],
+  ['loading', 'load'],
+  ['management', 'manage'],
+  ['materialization', 'materialize'],
+  ['migration', 'migrate'],
+  ['normalization', 'normalize'],
+  ['parsing', 'parse'],
+  ['projection', 'project'],
+  ['ranking', 'rank'],
+  ['reconciliation', 'reconcile'],
+  ['reranking', 'rerank'],
+  ['retrieval', 'retrieve'],
+  ['routing', 'route'],
+  ['runner', 'run'],
+  ['scoring', 'score'],
+  ['search', 'search'],
+  ['storage', 'store'],
+  ['summarization', 'summarize'],
+  ['synchronization', 'sync'],
+  ['validation', 'validate'],
+  ['verification', 'verify'],
+  ['warming', 'warm'],
+  ['writeback', 'write'],
+  ['reader', 'read'],
+  ['writer', 'write'],
+]);
+
+function words(text) {
+  return String(text ?? '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+    .match(/[a-z][a-z0-9_'-]{2,}/g) ?? [];
+}
+
+function unique(items, limit = 24) {
+  return [...new Set(items.filter(Boolean))].slice(0, limit);
+}
+
+function extractLexicalTerms(text) {
+  const tokens = words(text).filter((token) => !STOP_WORDS.has(token));
+  const mappedVerbs = tokens
+    .flatMap((token) => {
+      const singular = token.endsWith('s') ? token.slice(0, -1) : token;
+      return [ACTION_NOUN_TO_VERB.get(token), ACTION_NOUN_TO_VERB.get(singular)];
+    })
+    .filter(Boolean);
+  const nouns = unique(tokens.filter((token) =>
+    token.length >= 4 &&
+    !token.endsWith('ly') &&
+    !VERB_HINTS.has(token) &&
+    !/(ing|ed|ize|izes|ise|ises|ate|ates)$/.test(token)
+  ));
+  const verbs = unique(tokens.filter((token) =>
+    VERB_HINTS.has(token) || /(ing|ed|ize|izes|ise|ises|ate|ates|ify|ifies)$/.test(token)
+  ).concat(mappedVerbs), 20);
+  const adverbs_ly = unique(tokens.filter((token) => token.endsWith('ly')), 16);
+  return { nouns, verbs, adverbs_ly };
+}
+
+function slugifyTitleId(value) {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/['"`]/g, '')
+    .replace(/[^a-z0-9]+/g, '.')
+    .replace(/\.{2,}/g, '.')
+    .replace(/^\.|\.$/g, '');
+}
+
+function deriveTitleId(row, lexical) {
+  const direct = row.title_id || row.feature_id || row.feature_label;
+  const directSlug = slugifyTitleId(direct);
+  if (directSlug) return directSlug;
+  return slugifyTitleId([...lexical.nouns, ...lexical.verbs].slice(0, 4).join(' ')) || 'packet';
+}
+
+function scoreEnvelope(row, lexical) {
+  let score = 0;
+  if (row.packet_key) score += 15;
+  if (row.source_ref) score += 15;
+  if (row.feature_id) score += 15;
+  if (row.summary_text && String(row.summary_text).trim().length >= 40) score += 15;
+  score += Math.min(15, lexical.nouns.length * 3);
+  score += Math.min(15, lexical.verbs.length * 5);
+  if (row.pagerank !== null && row.pagerank !== undefined) score += 5;
+  if (row.som_cluster !== null && row.som_cluster !== undefined) score += 5;
+  return Math.max(0, Math.min(100, score));
+}
+
 async function main() {
   const pool = new Pool({
-    user: process.env.POSTGRES_USER || 'legal_admin',
-    password: process.env.POSTGRES_PASSWORD || 'password',
-    host: process.env.POSTGRES_HOST || '127.0.0.1',
-    port: parseInt(process.env.POSTGRES_PORT || '5434', 10),
-    database: process.env.POSTGRES_DB || 'legal_ai_db',
+    connectionString: resolveDatabaseUrl(ENV),
   });
 
   try {
@@ -55,16 +191,36 @@ async function main() {
           pagerank REAL,
           keywords TEXT[] DEFAULT '{}',
           entities TEXT[] DEFAULT '{}',
+          summary_text TEXT,
+          title_id TEXT,
+          lexical_nouns JSONB DEFAULT '[]'::jsonb,
+          lexical_verbs JSONB DEFAULT '[]'::jsonb,
+          lexical_adverbs_ly JSONB DEFAULT '[]'::jsonb,
+          lexical_terms JSONB DEFAULT '{}'::jsonb,
+          summary_rank_score REAL,
+          summary_rank_status TEXT,
           summary_packet_key TEXT,
           provenance JSONB DEFAULT '{}',
           materialized_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
 
+        ALTER TABLE atlas_feature_envelopes
+          ADD COLUMN IF NOT EXISTS summary_text TEXT,
+          ADD COLUMN IF NOT EXISTS title_id TEXT,
+          ADD COLUMN IF NOT EXISTS lexical_nouns JSONB DEFAULT '[]'::jsonb,
+          ADD COLUMN IF NOT EXISTS lexical_verbs JSONB DEFAULT '[]'::jsonb,
+          ADD COLUMN IF NOT EXISTS lexical_adverbs_ly JSONB DEFAULT '[]'::jsonb,
+          ADD COLUMN IF NOT EXISTS lexical_terms JSONB DEFAULT '{}'::jsonb,
+          ADD COLUMN IF NOT EXISTS summary_rank_score REAL,
+          ADD COLUMN IF NOT EXISTS summary_rank_status TEXT;
+
         CREATE INDEX IF NOT EXISTS idx_feature_envelopes_source_ref ON atlas_feature_envelopes(source_ref);
         CREATE INDEX IF NOT EXISTS idx_feature_envelopes_feature_id ON atlas_feature_envelopes(feature_id);
+        CREATE INDEX IF NOT EXISTS idx_feature_envelopes_title_id ON atlas_feature_envelopes(title_id);
         CREATE INDEX IF NOT EXISTS idx_feature_envelopes_community_id ON atlas_feature_envelopes(community_id);
         CREATE INDEX IF NOT EXISTS idx_feature_envelopes_som_cluster ON atlas_feature_envelopes(som_cluster);
+        CREATE INDEX IF NOT EXISTS idx_feature_envelopes_lexical_terms ON atlas_feature_envelopes USING GIN(lexical_terms);
       `);
       console.log('[MATERIALIZE] Output table created');
     }
@@ -79,6 +235,7 @@ async function main() {
         ontology_label, topology_label,
         community_id, cluster_key, som_cluster, pagerank,
         keywords, entities,
+        summary_text, title_id,
         summary_packet_key, provenance
       )
       SELECT
@@ -92,10 +249,15 @@ async function main() {
         COALESCE(asl.entities, ARRAY[]::text[]) as topology_label,
         ap.community_id,
         'cluster:' || ap.community_id as cluster_key,
-        ap.som_cluster,
-        ap.pagerank,
+        CASE
+          WHEN ap.som_cluster::text ~ '^[0-9]+$' THEN ap.som_cluster::int
+          ELSE NULL
+        END as som_cluster,
+        COALESCE(ap.pagerank, cf_authority.pagerank) as pagerank,
         COALESCE(ap.keywords, ARRAY[]::text[]) as keywords,
         COALESCE(asl.entities, ARRAY[]::text[]) as entities,
+        COALESCE(NULLIF(asl.summary_text, ''), NULLIF(asl.summary, ''), ap.summary) as summary_text,
+        COALESCE(ap.title_id, ap.feature_id) as title_id,
         asl.packet_key as summary_packet_key,
         JSONB_BUILD_OBJECT(
           'layer_type', asl.layer_type,
@@ -104,7 +266,19 @@ async function main() {
           'generated_at', asl.generated_at
         ) as provenance
       FROM atlas_packets ap
-      LEFT JOIN atlas_summary_layers asl ON ap.packet_key = asl.packet_key
+      LEFT JOIN LATERAL (
+        SELECT *
+        FROM atlas_summary_layers layer
+        WHERE layer.packet_key = ap.packet_key
+        ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
+        LIMIT 1
+      ) asl ON TRUE
+      LEFT JOIN LATERAL (
+        SELECT MAX(cf.page_rank_score) as pagerank
+        FROM code_features cf
+        WHERE cf.source_ref IN (ap.source_ref, regexp_replace(ap.source_ref, '^sveltekit-frontend/', ''))
+           OR cf.feature_id = ap.feature_id
+      ) cf_authority ON TRUE
       WHERE ap.packet_key IS NOT NULL
         AND ap.source_ref IS NOT NULL
       ${LIMIT ? `LIMIT ${LIMIT}` : ''}
@@ -114,6 +288,9 @@ async function main() {
         topology_label = EXCLUDED.topology_label,
         keywords = EXCLUDED.keywords,
         entities = EXCLUDED.entities,
+        pagerank = EXCLUDED.pagerank,
+        summary_text = EXCLUDED.summary_text,
+        title_id = EXCLUDED.title_id,
         provenance = EXCLUDED.provenance;
     `;
 
@@ -132,7 +309,13 @@ async function main() {
           asl.entities,
           asl.layer_type
         FROM atlas_packets ap
-        LEFT JOIN atlas_summary_layers asl ON ap.packet_key = asl.packet_key
+        LEFT JOIN LATERAL (
+          SELECT *
+          FROM atlas_summary_layers layer
+          WHERE layer.packet_key = ap.packet_key
+          ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
+          LIMIT 1
+        ) asl ON TRUE
         LIMIT 1;
       `);
 
@@ -144,6 +327,87 @@ async function main() {
     const result = await pool.query(materializeQuery);
     console.log(`[MATERIALIZE] Materialization complete: ${result.rowCount} rows upserted`);
 
+    const lexicalInput = await pool.query(`
+      SELECT
+        packet_key,
+        source_ref,
+        feature_id,
+        feature_label,
+        title_id,
+        domain_class,
+        summary_text,
+        keywords,
+        entities,
+        ast_symbols,
+        ast_kinds,
+        ast_tags,
+        pagerank,
+        som_cluster
+      FROM atlas_feature_envelopes
+      LEFT JOIN LATERAL (
+        SELECT
+          array_agg(DISTINCT cf.symbol) FILTER (WHERE cf.symbol IS NOT NULL AND cf.symbol <> '') as ast_symbols,
+          array_agg(DISTINCT cf.kind) FILTER (WHERE cf.kind IS NOT NULL AND cf.kind <> '') as ast_kinds,
+          array_agg(DISTINCT tag) FILTER (WHERE tag IS NOT NULL AND tag <> '') as ast_tags
+        FROM code_features cf
+        LEFT JOIN LATERAL unnest(COALESCE(cf.static_tags, ARRAY[]::text[])) tag ON TRUE
+        WHERE cf.source_ref IN (
+             atlas_feature_envelopes.source_ref,
+             regexp_replace(atlas_feature_envelopes.source_ref, '^sveltekit-frontend/', '')
+           )
+           OR cf.feature_id = atlas_feature_envelopes.feature_id
+      ) ast ON TRUE
+      WHERE packet_key IS NOT NULL
+      ${LIMIT ? `LIMIT ${LIMIT}` : ''}
+    `);
+
+    let lexicalUpdated = 0;
+    for (const row of lexicalInput.rows) {
+      const text = [
+        row.title_id,
+        row.feature_id,
+        row.feature_label,
+        row.domain_class,
+        row.source_ref,
+        row.summary_text,
+        ...(Array.isArray(row.keywords) ? row.keywords : []),
+        ...(Array.isArray(row.entities) ? row.entities : []),
+        ...(Array.isArray(row.ast_symbols) ? row.ast_symbols : []),
+        ...(Array.isArray(row.ast_kinds) ? row.ast_kinds : []),
+        ...(Array.isArray(row.ast_tags) ? row.ast_tags : []),
+      ].filter(Boolean).join(' ');
+      const lexical = extractLexicalTerms(text);
+      const titleId = deriveTitleId(row, lexical);
+      const score = scoreEnvelope(row, lexical);
+      const status = score >= 80 ? 'READY' : score >= 60 ? 'NEAR_READY' : score >= 35 ? 'PARTIAL' : 'BLOCKED';
+
+      await pool.query(
+        `UPDATE atlas_feature_envelopes
+         SET
+           title_id = $2,
+           lexical_nouns = $3::jsonb,
+           lexical_verbs = $4::jsonb,
+           lexical_adverbs_ly = $5::jsonb,
+           lexical_terms = $6::jsonb,
+           summary_rank_score = $7,
+           summary_rank_status = $8,
+           updated_at = NOW()
+         WHERE packet_key = $1`,
+        [
+          row.packet_key,
+          titleId,
+          JSON.stringify(lexical.nouns),
+          JSON.stringify(lexical.verbs),
+          JSON.stringify(lexical.adverbs_ly),
+          JSON.stringify(lexical),
+          score,
+          status,
+        ],
+      );
+      lexicalUpdated++;
+    }
+    console.log(`[MATERIALIZE] Lexical enrichment complete: ${lexicalUpdated} rows updated`);
+
     // Verify
     const countResult = await pool.query('SELECT COUNT(*) as count FROM atlas_feature_envelopes');
     const verifyResult = await pool.query(`
@@ -151,7 +415,12 @@ async function main() {
         COUNT(*) as total,
         COUNT(CASE WHEN keywords IS NOT NULL AND array_length(keywords, 1) > 0 THEN 1 END) as with_keywords,
         COUNT(CASE WHEN entities IS NOT NULL AND array_length(entities, 1) > 0 THEN 1 END) as with_entities,
-        COUNT(CASE WHEN pagerank IS NOT NULL THEN 1 END) as with_pagerank
+        COUNT(CASE WHEN pagerank IS NOT NULL THEN 1 END) as with_pagerank,
+        COUNT(CASE WHEN title_id IS NOT NULL AND title_id <> '' THEN 1 END) as with_title_id,
+        COUNT(CASE WHEN jsonb_array_length(lexical_nouns) > 0 THEN 1 END) as with_lexical_nouns,
+        COUNT(CASE WHEN jsonb_array_length(lexical_verbs) > 0 THEN 1 END) as with_lexical_verbs,
+        COUNT(CASE WHEN jsonb_array_length(lexical_adverbs_ly) > 0 THEN 1 END) as with_lexical_adverbs,
+        COUNT(CASE WHEN summary_rank_status IN ('READY', 'NEAR_READY') THEN 1 END) as rank_ready
       FROM atlas_feature_envelopes;
     `);
 
@@ -161,6 +430,11 @@ async function main() {
     console.log(`  With keywords: ${stats.with_keywords}`);
     console.log(`  With entities: ${stats.with_entities}`);
     console.log(`  With pagerank: ${stats.with_pagerank}`);
+    console.log(`  With title_id: ${stats.with_title_id}`);
+    console.log(`  With lexical nouns: ${stats.with_lexical_nouns}`);
+    console.log(`  With lexical verbs: ${stats.with_lexical_verbs}`);
+    console.log(`  With -ly adverbs: ${stats.with_lexical_adverbs}`);
+    console.log(`  Rank ready: ${stats.rank_ready}`);
 
     console.log(`\n✅ Feature envelope materialization complete!`);
     console.log(`  Ready for: k-means clustering, SOM training, AE compression`);

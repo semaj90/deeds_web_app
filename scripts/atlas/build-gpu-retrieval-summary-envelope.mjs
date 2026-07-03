@@ -233,8 +233,8 @@ async function postgresJoin(fused) {
     const packetKeys = fused.map((row) => row.packet_key).filter(Boolean);
     const sourceRefs = fused.map((row) => row.source_ref).filter(Boolean);
     const result = await pool.query(`
-      SELECT packet_key, source_ref, source_ref_key, file_path, directory_path,
-             feature_id, feature_label, domain_class,
+      SELECT packet_id, packet_ulid, packet_key, source_ref, canonical_source_ref, source_ref_key, file_path, directory_path,
+             feature_id, title_id, feature_label, domain_class,
              COALESCE(metadata->>'ontology_label', topology->>'ontology_label', payload->>'ontology_label') AS ontology_label,
              COALESCE(metadata->>'topology_label', topology->>'topology_label', payload->>'topology_label') AS topology_label,
              community_id, cluster_id, som_cluster, kmeans_cluster, pagerank,
@@ -314,10 +314,15 @@ function buildEnvelope({ proof, fusionRows }) {
   const joined = fusionRows.filter((row) => row.packet).slice(0, TOP_K);
   const first = joined[0]?.packet ?? {};
   const sourceRefs = joined.map((row) => ({
+    packet_id: row.packet?.packet_id ?? null,
+    packet_ulid: row.packet?.packet_ulid ?? null,
     packet_key: row.packet?.packet_key ?? row.packet_key ?? null,
     source_ref: row.packet?.source_ref ?? row.source_ref ?? null,
+    canonical_source_ref:
+      row.packet?.canonical_source_ref ?? row.packet?.source_ref ?? row.canonical_source_ref ?? row.source_ref ?? null,
     source_ref_key: row.packet?.source_ref_key ?? null,
     feature_id: row.packet?.feature_id ?? row.feature_id ?? null,
+    title_id: row.packet?.title_id ?? row.title_id ?? null,
     feature_label: row.packet?.feature_label ?? row.feature_label ?? null,
     rrf_score: Number(row.rrf_score.toFixed(6)),
     retrieval_sources: Object.keys(row.sources),
@@ -333,18 +338,23 @@ function buildEnvelope({ proof, fusionRows }) {
 
   return {
     envelope_id: stableId('gpu_retrieval_summary_envelope', `${GROUP_KEY}:${QUERY}:${sourceRefs.map((ref) => ref.packet_key || ref.source_ref).join('|')}`),
+    packet_id: first.packet_id ?? null,
+    packet_ulid: first.packet_ulid ?? null,
+    packet_key: first.packet_key ?? null,
     task_id: `task:${GROUP_KEY}`,
     story_id: `story:${GROUP_KEY}`,
     worker_id: 'build-gpu-retrieval-summary-envelope',
     group_key: GROUP_KEY,
     feature_id: first.feature_id ?? `retrieval.${GROUP_KEY.replace(/[^a-z0-9]+/gi, '_').toLowerCase()}`,
     feature_label: FEATURE_LABEL,
+    title_id: first.title_id ?? first.feature_id ?? null,
     domain_class: domain,
     ontology_label: ontology,
     topology_label: topology,
     cluster_key: clusterKey,
     query: QUERY,
     source_refs: sourceRefs,
+    packets: sourceRefs,
     tuples: joined.flatMap((row) => Object.keys(row.sources).map((source) => ({
       relation: source === 'rg' ? 'LEXICAL_MATCH' : source === 'qdrant' ? 'SEMANTIC_MATCH' : source === 'go_retrieval' ? 'SEARCH_RESULT' : 'RANK_SIGNAL',
       extractor: source,
@@ -461,6 +471,7 @@ async function main() {
       report_json: path.relative(REPO_ROOT, OUT_JSON).replace(/\\/g, '/'),
       report_md: path.relative(REPO_ROOT, OUT_MD).replace(/\\/g, '/'),
     },
+    canonical_envelope: envelope,
     envelopes: [envelope],
   };
 

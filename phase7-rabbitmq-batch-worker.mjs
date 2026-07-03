@@ -6,7 +6,7 @@
  *   - RabbitMQ queues 32-item micro-batches (fits Gemma4 limits)
  *   - N parallel workers consume and summarize (1 worker per CPU core)
  *   - Each worker calls Gemma4 sequentially within its batch
- *   - Write-back: Postgres + Redis + Qdrant (idempotent)
+ *   - Write-back: Postgres + Redis/BitFrost (idempotent)
  *   - Progress tracking: RabbitMQ queue depth, per-worker metrics
  *
  * Expected throughput:
@@ -26,6 +26,7 @@ import amqp from 'amqplib';
 import pg from 'pg';
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
+import { isUsableGemma4Summary, sanitizeGemma4Summary } from './scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const { Pool } = pg;
 
@@ -50,9 +51,9 @@ const workerId = process.argv.find(a => a.startsWith('--id='))?.split('=')[1] ||
 const chunkBatchSize = parseInt(process.argv.find(a => a.startsWith('--chunk-batch-size='))?.split('=')[1] || '1000');
 const queueBatchSize = parseInt(process.argv.find(a => a.startsWith('--queue-batch-size='))?.split('=')[1] || '32');
 
-const EXCHANGE = 'phase7.summaries';
-const QUEUE_NAME = `phase7.batch.${queueBatchSize}`;
-const WORKER_QUEUE = `${QUEUE_NAME}.worker.${workerId}`;
+const QUEUE_NAME = process.env.PHASE7_SUMMARY_QUEUE || `phase7.summarization.batch${queueBatchSize}`;
+const DLQ_NAME = `${QUEUE_NAME}.dlq`;
+const MAX_RETRIES = parseInt(process.env.PHASE7_MAX_RETRIES || '3');
 
 const pool = new Pool({ host: DB_HOST, port: DB_PORT, user: DB_USER, password: DB_PASSWORD, database: DB_NAME });
 const redis = new Redis({
@@ -68,7 +69,16 @@ async function summarizeOne(chunkId, content, cacheKey) {
   const redisKey = `bitfrost:summary:${cacheKey}`;
   try {
     const cached = await redis.get(redisKey);
-    if (cached) return cached;
+    if (cached) {
+      const sanitized = sanitizeGemma4Summary(cached);
+      if (isUsableGemma4Summary(sanitized.summary, { minLength: 30, minUniqueWords: 6 })) {
+        if (sanitized.changed) {
+          await redis.setex(redisKey, 86400, sanitized.summary);
+        }
+        return sanitized.summary;
+      }
+      await redis.del(redisKey);
+    }
   } catch (err) {
     // Cache miss, proceed to Gemma4
   }
@@ -90,37 +100,17 @@ async function summarizeOne(chunkId, content, cacheKey) {
         reasoning: false,
         cache_prompt: true  // Enable KV cache for system prompt reuse
       }),
-      timeout: 45000
+      signal: AbortSignal.timeout(45000)
     });
 
     if (!res.ok) return null;
 
     const data = await res.json();
-    let summary = data.choices?.[0]?.message?.content?.trim() || '';
-
-    // Strip Gemma4 thinking block markers (can appear mid-summary or wrapped)
-    summary = summary.replace(/<\|channel\>thought<channel\|>/g, '')
-                     .replace(/<\|endthinking\>/g, '')
-                     .replace(/<\|thinking\>/g, '')
-                     .replace(/<thinking>[\s\S]*?<\/thinking>/g, '');
-
-    // Filter out meta-commentary lines (Gemma4 preambles)
-    const lines = summary.split('\n').map(l => l.trim()).filter(line => {
-      if (!line) return false;
-
-      // Meta-commentary patterns (case-insensitive)
-      if (line.match(/^(here'?s|here'?is)\s+a\s+(thinking|summary|breakdown)/i)) return false;
-      if (line.match(/^(the\s+)?(user\s+)?(wants|is\s+asking|is\s+looking|wants\s+a)/i)) return false;
-      if (line.match(/^(the|this)\s+(user|code|snippet|object|component)\s+/i)) return false;
-      if (line.match(/^(plan|summary|note|important|note:|key:|what|when|where|why|how|output):/i)) return false;
-      if (line.match(/^(1|2|3)\.\s+(identify|analyze|break|define|note|step)/i)) return false;
-      if (line.match(/^(1|2|3)\.\s+\*\*/)) return false;
-      if (line.match(/^(defines|exports|imports|contains|implements|describes):/i)) return false;
-
-      return true;
-    });
-
-    summary = lines.join('\n').trim();
+    const sanitized = sanitizeGemma4Summary(data.choices?.[0]?.message?.content ?? '');
+    const summary = sanitized.summary;
+    if (!isUsableGemma4Summary(summary, { minLength: 30, minUniqueWords: 6 })) {
+      return null;
+    }
 
     // Cache summary using the same key that was checked in L1 (lines 68-71)
     if (summary && cacheKey) {
@@ -146,9 +136,8 @@ async function produceQueue() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
     await channel.assertQueue(QUEUE_NAME, { durable: true });
-    await channel.bindQueue(QUEUE_NAME, EXCHANGE, '');
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     // Fetch unsummarized chunks with relative_path as stable cache key
     const result = await pool.query(`
@@ -172,9 +161,8 @@ async function produceQueue() {
         chunks: batch.map(c => ({ id: c.id, path: c.relative_path, content: c.content, cacheKey: c.relative_path }))
       };
 
-      channel.publish(
-        EXCHANGE,
-        '',
+      channel.sendToQueue(
+        QUEUE_NAME,
         Buffer.from(JSON.stringify(message)),
         { persistent: true, contentType: 'application/json' }
       );
@@ -210,9 +198,8 @@ async function startWorker() {
     connection = await amqp.connect(RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    await channel.assertExchange(EXCHANGE, 'fanout', { durable: true });
     await channel.assertQueue(QUEUE_NAME, { durable: true });
-    await channel.bindQueue(QUEUE_NAME, EXCHANGE, '');
+    await channel.assertQueue(DLQ_NAME, { durable: true });
 
     await channel.prefetch(1);
 
@@ -236,7 +223,10 @@ async function startWorker() {
           if (summary) {
             // Write to Postgres (canonical)
             await pool.query(
-              `UPDATE codebase_chunk_index SET summary = $1, updated_at = NOW() WHERE id = $2`,
+              `UPDATE codebase_chunk_index
+               SET summary = $1, updated_at = NOW()
+               WHERE id = $2
+                 AND (summary IS NULL OR btrim(summary) = '')`,
               [summary, chunk.id]
             );
 
@@ -257,7 +247,32 @@ async function startWorker() {
 
       } catch (err) {
         console.error(`  ❌ Error: ${err.message}`);
-        channel.nack(msg, false, true); // Requeue
+        const headers = msg.properties.headers || {};
+        const retryCount = Number(headers['x-retry-count'] || 0);
+        if (retryCount >= MAX_RETRIES) {
+          channel.sendToQueue(DLQ_NAME, msg.content, {
+            persistent: true,
+            contentType: msg.properties.contentType || 'application/json',
+            headers: {
+              ...headers,
+              'x-retry-count': retryCount,
+              'x-dead-letter-reason': err.message,
+              'x-dead-lettered-at': new Date().toISOString(),
+            },
+          });
+          channel.ack(msg);
+        } else {
+          channel.sendToQueue(QUEUE_NAME, msg.content, {
+            persistent: true,
+            contentType: msg.properties.contentType || 'application/json',
+            headers: {
+              ...headers,
+              'x-retry-count': retryCount + 1,
+              'x-last-error': err.message,
+            },
+          });
+          channel.ack(msg);
+        }
       }
     }, { noAck: false });
 

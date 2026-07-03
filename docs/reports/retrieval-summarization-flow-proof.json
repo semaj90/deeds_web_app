@@ -1,17 +1,15 @@
 {
-  "generated_at": "2026-07-02T03:38:40.126Z",
+  "generated_at": "2026-07-02T23:32:47.267Z",
   "status": "WARN",
-  "query": "GPU Qdrant TurboVec Go Retrieval HyperRAG dense search summaries",
+  "query": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow",
   "rule": "LIVE_PASS means real service, real port, real data. Fallbacks and warnings are visible, not green.",
   "lanes": {
     "embeddinggemma": {
-      "status": "FALLBACK_PASS",
-      "url": "http://10.0.0.243:11434",
+      "status": "LIVE_PASS",
+      "url": "http://localhost:11434",
       "model": "embeddinggemma:latest",
       "dimension": 768,
-      "fallback_used": true,
-      "reason": "OpenAI-compatible EmbeddingGemma unavailable; used Ollama EmbeddingGemma only. Primary error: fetch failed",
-      "duration_ms": 504
+      "duration_ms": 373
     },
     "qdrant": {
       "status": "LIVE_PASS",
@@ -19,8 +17,8 @@
       "collection": "codebase_chunks_768",
       "vector_name": "content",
       "hits": 16,
-      "identity_hits": 12,
-      "duration_ms": 963
+      "identity_hits": 8,
+      "duration_ms": 59
     },
     "turbovec_grpc": {
       "status": "LIVE_PASS",
@@ -29,32 +27,35 @@
       "backend": "bridge:py(python)+addon(cuda)",
       "in_dim": 768,
       "out_dim": 64,
-      "duration_ms": 767
+      "duration_ms": 352
     },
     "go_retrieval": {
       "status": "LIVE_PASS",
       "url": "http://127.0.0.1:8100",
       "endpoint": "/search/codebase",
-      "query_used": "GPU Qdrant TurboVec Go Retrieval HyperRAG dense search summaries",
+      "query_used": "Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow",
       "results": 8,
-      "total_ms": 259,
-      "duration_ms": 273
+      "total_ms": 6,
+      "duration_ms": 16
     },
     "postgres_truth_join": {
       "status": "LIVE_PASS",
       "table": "atlas_packets",
-      "packet_keys_in": 20,
-      "source_refs_in": 19,
-      "rows": 8,
-      "identity_rows": 8,
-      "duration_ms": 86
+      "packet_keys_in": 16,
+      "source_refs_in": 12,
+      "rows": 7,
+      "identity_rows": 7,
+      "duration_ms": 35
     },
     "langextract": {
-      "status": "LIVE_PASS",
+      "status": "FALLBACK_PASS",
       "url": "http://127.0.0.1:8095",
+      "fallback_url": "http://127.0.0.1:8090/v1",
+      "fallback_used": true,
+      "reason": "LangExtract unavailable: fetch failed",
       "entities": 0,
-      "structure_keys": 5,
-      "duration_ms": 18950
+      "structure_keys": 2,
+      "duration_ms": 15220
     },
     "gemma4_summary": {
       "status": "LIVE_PASS",
@@ -62,98 +63,95 @@
       "model": "gemma4-legal-iq4xs-direct.gguf",
       "reasoning_leak_stripped": false,
       "json_parsed": true,
-      "output_chars": 1129,
-      "duration_ms": 14601
+      "output_chars": 1691,
+      "duration_ms": 20029
     }
   },
   "candidates": {
     "qdrant": [
       {
-        "id": "6cb3482f-01e3-46c5-82a9-ae28d390dad4",
-        "score": 0.5584717,
-        "packet_key": "packet:5dfd2d2a9aa2",
-        "source_ref": "sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts",
-        "feature_id": "sveltekit-frontend.hypergraph-4d",
-        "feature_label": "hypergraph-4d.ts"
-      },
-      {
-        "id": "2ae155a8-889c-4c1d-9577-9a56c19ebc2e",
-        "score": 0.5552616,
-        "packet_key": "packet:4725cc6f30ff",
-        "source_ref": "sveltekit-frontend/src/lib/server/analytics/minified-research-cache.ts",
-        "feature_id": "sveltekit-frontend.minified-research-cache",
-        "feature_label": "minified-research-cache.ts"
-      },
-      {
-        "id": "fe78285b-9b7b-446a-9641-f64f47fb3af3",
-        "score": 0.55179024,
-        "packet_key": null,
-        "source_ref": null,
-        "feature_id": null,
-        "feature_label": null
-      },
-      {
-        "id": "6f2db5cd-f4b3-4f8d-9239-339d54e037fd",
-        "score": 0.54969215,
-        "packet_key": "packet:9ab3a62cbb2b",
-        "source_ref": "sveltekit-frontend/src/lib/server/inference/turbo-prefix-cache.ts",
-        "feature_id": "sveltekit-frontend.turbo-prefix-cache",
-        "feature_label": "turbo-prefix-cache.ts"
-      },
-      {
-        "id": "2d255130-fd6e-4691-b997-bfbec228d8ad",
-        "score": 0.5493851,
-        "packet_key": "packet:5dfd2d2a9aa2",
-        "source_ref": "sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts",
-        "feature_id": "sveltekit-frontend.hypergraph-4d",
-        "feature_label": "hypergraph-4d.ts"
-      },
-      {
-        "id": "fd231938-1e55-4c62-99b0-ce9454ed18ab",
-        "score": 0.54842377,
-        "packet_key": "packet:2ed2ae895ab5",
-        "source_ref": "sveltekit-frontend/src/lib/server/analytics/research-graph-rl.ts",
-        "feature_id": "sveltekit-frontend.research-graph-rl",
-        "feature_label": "research-graph-rl.ts"
-      },
-      {
         "id": "a6005fa3-e7c7-4d84-bd3a-938079c6ed94",
-        "score": 0.54748726,
+        "score": 0.51727104,
         "packet_key": "packet:dbe1acef161d",
         "source_ref": "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts",
         "feature_id": "sveltekit-frontend.cluster-summary",
         "feature_label": "cluster-summary.ts"
       },
       {
-        "id": "eadf7bcd-0c0f-45f1-8526-5c5ea180b87c",
-        "score": 0.5474415,
-        "packet_key": "packet:3a23c856fa18",
-        "source_ref": "sveltekit-frontend/src/lib/server/retrieval/gpu-reranker.ts",
-        "feature_id": "sveltekit-frontend.gpu-reranker",
-        "feature_label": "gpu-reranker.ts"
+        "id": "6cb3482f-01e3-46c5-82a9-ae28d390dad4",
+        "score": 0.49843216,
+        "packet_key": "packet:5dfd2d2a9aa2",
+        "source_ref": "sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts",
+        "feature_id": "sveltekit-frontend.hypergraph-4d",
+        "feature_label": "hypergraph-4d.ts"
+      },
+      {
+        "id": "8d650e3a-4852-4658-95c4-b9f2ba28303f",
+        "score": 0.49822235,
+        "packet_key": "packet:293eda957471",
+        "source_ref": "sveltekit-frontend/src/lib/server/services/langextract-service.ts",
+        "feature_id": "sveltekit-frontend.langextract-service",
+        "feature_label": "langextract-service.ts"
+      },
+      {
+        "id": "c6d0cbdd-b5db-456d-940c-bd2a33d2ed3f",
+        "score": 0.4978485,
+        "packet_key": null,
+        "source_ref": null,
+        "feature_id": null,
+        "feature_label": null
+      },
+      {
+        "id": "0b07799b-af4f-4ad7-b68f-2b5f87c8504a",
+        "score": 0.49357224,
+        "packet_key": null,
+        "source_ref": null,
+        "feature_id": null,
+        "feature_label": null
+      },
+      {
+        "id": "4756a744-a9cd-4693-b55e-c5e18d251e43",
+        "score": 0.49295425,
+        "packet_key": "packet:70be15a70940",
+        "source_ref": "sveltekit-frontend/src/lib/server/analytics/research-summaries-db.ts",
+        "feature_id": "sveltekit-frontend.research-summaries-db",
+        "feature_label": "research-summaries-db.ts"
+      },
+      {
+        "id": "d4d37d62-dccc-4794-8f42-9b1a1b013f70",
+        "score": 0.4880867,
+        "packet_key": "packet:c39e00032c1c",
+        "source_ref": "sveltekit-frontend/src/lib/server/llm/gemmaIntake.ts",
+        "feature_id": "sveltekit-frontend.gemmaIntake",
+        "feature_label": "gemmaIntake.ts"
+      },
+      {
+        "id": "3c4fc90e-46f1-4386-93d7-aebeabf2e47f",
+        "score": 0.48680305,
+        "packet_key": null,
+        "source_ref": null,
+        "feature_id": null,
+        "feature_label": null
       }
     ],
     "go_retrieval_count": 8
   },
   "summary": {
-    "summary": "The provided context details various components related to advanced retrieval and inference mechanisms within a codebase, including GPU-accelerated reranking, TurboVec caching, and specific modules for LLM interaction (Gemma4 tool loop), graph analysis (HyperRAG, research graph), and general knowledge base retrieval.",
-    "domain_class": "RetrievalAugmentedGeneration (RAG) / AI Infrastructure",
-    "ontology_label": "Advanced Knowledge Retrieval and Inference Pipeline",
-    "topology_label": "Modular Service Layer",
+    "summary": "The provided context outlines several components related to advanced data processing, retrieval, and summarization within a SvelteKit frontend structure. Key features include: `gemmaIntake.ts` for Gemma integration, `web-research-crawler.ts` for web data acquisition, `hypergraph-4d.ts` for graph representation, `gemma4-agent.ts` for AI agent logic, `research-summaries-db.ts` for storing summaries, `langextract-service.ts` for language extraction, and `cluster-summary.ts` for indexing/clustering. The overall flow suggests a system that crawls web data, processes it using language extraction and AI agents (like Gemma/Gemma4), builds a knowledge graph, and stores/summarizes the results.",
+    "domain_class": "Data Processing & Knowledge Graph Management",
+    "ontology_label": "Retrieval-Augmented Generation (RAG) Pipeline",
+    "topology_label": "Web Crawling -> Language Extraction -> AI Processing/Graph Building -> Summarization/Indexing",
     "source_refs": [
-      "sveltekit-frontend.kb-retrieval-server",
-      "sveltekit-frontend.turbo-prefix-cache",
-      "sveltekit-frontend.gemma4-tool-loop",
-      "sveltekit-frontend.research-graph-rl",
-      "sveltekit-frontend.cluster-summary",
-      "sveltekit-frontend.gpu-reranker",
-      "sveltekit-frontend.minified-research-cache",
-      "sveltekit-frontend.hypergraph-4d"
+      "sveltekit-frontend/src/lib/server/llm/gemmaIntake.ts",
+      "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts",
+      "sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts",
+      "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
+      "sveltekit-frontend/src/lib/server/analytics/research-summaries-db.ts",
+      "sveltekit-frontend/src/lib/server/services/langextract-service.ts",
+      "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts"
     ],
-    "missing_evidence": [
-      "Specific implementation details or usage examples for 'GPU Qdrant TurboVec Go Retrieval' are not explicitly detailed, only the presence of related modules."
-    ],
-    "confidence": 0.9
+    "missing_evidence": "Specific details on the 'Qdrant TurboVec' integration or the exact 'LangExtract' usage within the flow are not explicitly detailed in the provided file names/snippets.",
+    "confidence": "High"
   },
-  "elapsed_ms": 36147
+  "elapsed_ms": 36088
 }

@@ -29,13 +29,16 @@ export type AtlasIdentityLane =
 export const atlasPackets = pgTable('atlas_packets', {
   // Primary identity spine (canonical — Postgres is truth)
   packetId: uuid('packet_id').primaryKey().defaultRandom(),
+  packetUlid: text('packet_ulid'),
   packetKey: text('packet_key').notNull(),
   sourceRef: text('source_ref').notNull(),
+  canonicalSourceRef: text('canonical_source_ref'),
   directoryPath: text('directory_path').notNull(),
   filePath: text('file_path'),
   functionSymbol: text('function_symbol'),
   featureId: text('feature_id').notNull(),
   featureLabel: text('feature_label').notNull(),
+  titleId: text('title_id'),
 
   // Community / topology
   communityId: integer('community_id'),
@@ -99,6 +102,9 @@ export const atlasPackets = pgTable('atlas_packets', {
 }, (table) => ({
   identityIdx: index('idx_atlas_packets_identity').on(table.packetKey, table.sourceRef, table.featureId, table.directoryPath),
   sourceRefIdx: index('idx_atlas_packets_source_feature').on(table.sourceRef, table.featureId),
+  packetUlidIdx: index('idx_atlas_packets_packet_ulid').on(table.packetUlid),
+  titleIdIdx: index('idx_atlas_packets_title_id').on(table.titleId),
+  canonicalSourceRefIdx: index('idx_atlas_packets_canonical_source_ref').on(table.canonicalSourceRef),
   directoryIdx: index('idx_atlas_packets_directory_path').on(table.directoryPath),
   directoryFeatureIdx: index('idx_atlas_packets_directory_feature').on(table.directoryPath, table.featureId),
   clusterIdIdx: index('idx_atlas_packets_cluster_id').on(table.clusterId),

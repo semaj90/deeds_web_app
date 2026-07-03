@@ -67,9 +67,13 @@ export type HyperRAGResponse = z.infer<typeof HyperRAGResponseSchema>;
  * Tracks packets through map/reduce summarization and index materialization
  */
 export interface HyperRAGPacketState {
+  packetId?: string;
+  packetUlid?: string | null;
   packetKey: string;
+  titleId?: string | null;
   featureId: string;
   sourceRef: string;
+  canonicalSourceRef?: string | null;
   domain?: string;
   summary: string;
   chunkCount: number;

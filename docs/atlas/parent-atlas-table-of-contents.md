@@ -168,6 +168,14 @@ The next derived surfaces are compare-only until the live contract exists:
 - run live-service env audit before qdrant backfill applies
 - keep offline mirrors downstream-only
 
+### Lineage and Bitfrost findings
+- `packet_id` is still the canonical UUID identity, while `packet_ulid` is now the sortable lineage field.
+- `packet_key` remains the deterministic content guard and mirror lookup key.
+- `title_id` is now present as a derived grouping surface for summary materialization.
+- `canonical_source_ref` is backfilled to keep packet provenance aligned across the ledger.
+- The remaining malformed legacy packet row needs source-side repair rather than more generic lineage backfill.
+- For local Bitfrost checks, `0.0.0.0:8080` is invalid as a browser target; the live host URL is `http://127.0.0.1:3040` and the container listens on `8080`, so verify the host URL before treating it as a service outage.
+
 ## Retrieval abstraction and future cuVS swap
 
 The current retrieval boundary is:

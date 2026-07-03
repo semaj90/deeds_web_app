@@ -124,9 +124,13 @@ async function main() {
         trace_id TEXT,
         query_hash TEXT NOT NULL,
         packet_key TEXT NOT NULL,
+        packet_id TEXT,
+        packet_ulid TEXT,
         source_ref TEXT NOT NULL,
+        canonical_source_ref TEXT,
         source_ref_key TEXT,
         feature_id TEXT NOT NULL,
+        title_id TEXT,
         feature_label TEXT,
         cache_namespace TEXT,
         cache_key TEXT,
@@ -139,7 +143,10 @@ async function main() {
       );
       CREATE INDEX IF NOT EXISTS idx_rp_story_task ON retrieval_provenance(story_id, task_id);
       CREATE INDEX IF NOT EXISTS idx_rp_packet_key ON retrieval_provenance(packet_key);
+      CREATE INDEX IF NOT EXISTS idx_rp_packet_id ON retrieval_provenance(packet_id);
+      CREATE INDEX IF NOT EXISTS idx_rp_packet_ulid ON retrieval_provenance(packet_ulid);
       CREATE INDEX IF NOT EXISTS idx_rp_source_ref ON retrieval_provenance(source_ref);
+      CREATE INDEX IF NOT EXISTS idx_rp_title_id ON retrieval_provenance(title_id);
       CREATE INDEX IF NOT EXISTS idx_rp_feature_id ON retrieval_provenance(feature_id);
       CREATE INDEX IF NOT EXISTS idx_rp_query_hash ON retrieval_provenance(query_hash);
     `;
