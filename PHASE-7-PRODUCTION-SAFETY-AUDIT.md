@@ -123,9 +123,127 @@ npm run phase7:test:load -- --batch=1000
 
 ---
 
+---
+
+## Pipeline Scripts for Next Steps
+
+### Phase 7 Current Operations (Running Now)
+
+```bash
+# Monitor queue depth and worker progress
+npm run phase7:monitor
+
+# Producer: Enqueue remaining unsummarized chunks
+node sveltekit-frontend/scripts/atlas/phase7-rabbitmq-summary-queue.mjs --produce --batch=1000
+
+# Workers: Start 6 workers consuming from RabbitMQ
+for i in {1..6}; do
+  node sveltekit-frontend/scripts/atlas/phase7-rabbitmq-summary-queue.mjs --worker --id=$i &
+done
+```
+
+### Phase 7.1 (Pre-Production Hardening Scripts — TBD)
+
+```bash
+# Add structured logging to worker
+npm run phase7:patch:logging
+
+# Add Gemma4 → Ollama fallback
+npm run phase7:patch:fallback
+
+# Add connection pool validation
+npm run phase7:patch:db-validation
+
+# Add exponential backoff for retries
+npm run phase7:patch:retry-logic
+
+# Run pre-production tests
+npm run phase7:test:batch -- --limit=100 --expect-clean=0.95
+npm run phase7:test:gemma4-failure
+npm run phase7:test:idempotency
+npm run phase7:test:load -- --batch=1000
+```
+
+### Phase 8 (Summary Indexing — After Phase 7 completes)
+
+```bash
+# Index clean summaries to Qdrant
+npm run atlas:summaries:qdrant:index \
+  --collection=codebase_summaries_384 \
+  --batch=1000 \
+  --dry-run
+
+# Verify indexing
+npm run atlas:summaries:qdrant:verify
+
+# Warm BitFrost cache from indexed summaries
+npm run atlas:bitfrost:warm:summaries \
+  --limit=10000 \
+  --batch=100 \
+  --apply
+```
+
+### Phase 9 (ACE Packet Assembly — After indexing complete)
+
+```bash
+# Build ACE packet envelopes from summaries
+npm run atlas:ace:packets:build \
+  --source=summaries \
+  --limit=10000 \
+  --dry-run
+
+# Validate packet lineage and completeness
+npm run atlas:ace:packets:validate --verbose
+
+# Emit packets to Neo4j for topology enrichment
+npm run atlas:ace:packets:emit --targets=neo4j,qdrant
+```
+
+### Monitoring & Observability (Phase 7.1+)
+
+```bash
+# Tail worker logs with structured JSON output
+docker logs -f $(docker ps --filter "name=phase7-worker" -q) | jq '.level, .worker_id, .message'
+
+# Check summary quality over time (every 5 min)
+watch -n 300 'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
+  "SELECT COUNT(*) total, COUNT(CASE WHEN summary NOT LIKE '"'"'%<end_of_turn>%'"'"' THEN 1 END) clean FROM codebase_chunk_index WHERE summary IS NOT NULL AND LENGTH(summary) > 10;"'
+
+# Export metrics to CSV for trending
+npm run phase7:metrics:export --format=csv --output=phase7-metrics.csv
+```
+
+### Current Live Status Commands
+
+```bash
+# Check RabbitMQ queue depth
+curl -s -u guest:guest http://127.0.0.1:15672/api/overview | jq '.queue_totals'
+
+# Sample recent summaries
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
+  "SELECT SUBSTRING(summary FROM 1 FOR 80) FROM codebase_chunk_index WHERE summary IS NOT NULL ORDER BY updated_at DESC LIMIT 5;"
+
+# Count clean vs contaminated (audit)
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
+  "SELECT COUNT(*) total, COUNT(CASE WHEN summary NOT LIKE '%<end_of_turn>%' AND summary NOT LIKE '%<start_of_turn>%' THEN 1 END) clean, ROUND(100.0*COUNT(CASE WHEN summary NOT LIKE '%<end_of_turn>%' AND summary NOT LIKE '%<start_of_turn>%' THEN 1 END)/COUNT(*),1) clean_rate FROM codebase_chunk_index WHERE summary IS NOT NULL AND LENGTH(summary) > 10;"
+
+# View progress (% complete)
+docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
+  "SELECT COUNT(*) written, ROUND(100.0*COUNT(*)/40754,1) pct_complete FROM codebase_chunk_index WHERE summary IS NOT NULL AND LENGTH(summary) > 10;"
+```
+
+---
+
 ## Sign-off
 
 **Prototype Status**: ✅ Suitable for dev/test with the contamination sanitizer deployed.
+
+**Current Phase 7 Status (July 3, 2026):**
+- ✅ Sanitizer: 100% clean (0 contaminated summaries)
+- ✅ Pipeline: Live and processing (6 workers active)
+- ✅ Progress: 12,707 / 40,754 summaries (31.2%)
+- ✅ Throughput: ~40 summaries/min (ETA 12 hours to completion)
+- ⏳ Queue: 332,534 messages pending
 
 **Production Status**: ❌ NOT READY. Requires:
 - Error handling hardening (issues 1, 4, 6)
@@ -134,3 +252,9 @@ npm run phase7:test:load -- --batch=1000
 - Senior review of concurrency model
 
 **Estimated Effort**: 2-3 days of hardening work before production deployment.
+
+**Next Steps (Ordered):**
+1. ✅ **Phase 7 (Running):** Monitor overnight, verify sustained 100% clean rate
+2. ⏳ **Phase 7.1:** Implement error handling + observability hardening
+3. ⏳ **Phase 8:** Index summaries to Qdrant + warm BitFrost (after Phase 7 completes)
+4. ⏳ **Phase 9:** Build ACE packet envelopes (after indexing complete)
