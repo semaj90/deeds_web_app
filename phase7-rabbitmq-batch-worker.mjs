@@ -63,10 +63,11 @@ const redis = new Redis({
   retryStrategy: () => null
 });
 
-async function summarizeOne(chunkId, content) {
-  // L1: Check BitFrost cache first (5ms)
+async function summarizeOne(chunkId, content, cacheKey) {
+  // L1: Check BitFrost cache first (5ms) — use relative_path as stable cache key for source_ref linkage
+  const redisKey = `bitfrost:summary:${cacheKey}`;
   try {
-    const cached = await redis.get(`bitfrost:summary:${chunkId}`);
+    const cached = await redis.get(redisKey);
     if (cached) return cached;
   } catch (err) {
     // Cache miss, proceed to Gemma4
@@ -97,10 +98,37 @@ async function summarizeOne(chunkId, content) {
     const data = await res.json();
     let summary = data.choices?.[0]?.message?.content?.trim() || '';
 
-    // Strip thinking blocks
-    if (summary.includes('<|channel>')) {
-      const match = summary.match(/<\|channel\|>.*/s);
-      if (match) summary = summary.substring(match.index + 13).trim();
+    // Strip Gemma4 thinking block markers (can appear mid-summary or wrapped)
+    summary = summary.replace(/<\|channel\>thought<channel\|>/g, '')
+                     .replace(/<\|endthinking\>/g, '')
+                     .replace(/<\|thinking\>/g, '')
+                     .replace(/<thinking>[\s\S]*?<\/thinking>/g, '');
+
+    // Filter out meta-commentary lines (Gemma4 preambles)
+    const lines = summary.split('\n').map(l => l.trim()).filter(line => {
+      if (!line) return false;
+
+      // Meta-commentary patterns (case-insensitive)
+      if (line.match(/^(here'?s|here'?is)\s+a\s+(thinking|summary|breakdown)/i)) return false;
+      if (line.match(/^(the\s+)?(user\s+)?(wants|is\s+asking|is\s+looking|wants\s+a)/i)) return false;
+      if (line.match(/^(the|this)\s+(user|code|snippet|object|component)\s+/i)) return false;
+      if (line.match(/^(plan|summary|note|important|note:|key:|what|when|where|why|how|output):/i)) return false;
+      if (line.match(/^(1|2|3)\.\s+(identify|analyze|break|define|note|step)/i)) return false;
+      if (line.match(/^(1|2|3)\.\s+\*\*/)) return false;
+      if (line.match(/^(defines|exports|imports|contains|implements|describes):/i)) return false;
+
+      return true;
+    });
+
+    summary = lines.join('\n').trim();
+
+    // Cache summary using the same key that was checked in L1 (lines 68-71)
+    if (summary && cacheKey) {
+      try {
+        await redis.setex(`bitfrost:summary:${cacheKey}`, 86400, summary);
+      } catch (err) {
+        // Ignore cache write errors
+      }
     }
 
     return summary || null;
@@ -122,7 +150,7 @@ async function produceQueue() {
     await channel.assertQueue(QUEUE_NAME, { durable: true });
     await channel.bindQueue(QUEUE_NAME, EXCHANGE, '');
 
-    // Fetch unsummarized chunks
+    // Fetch unsummarized chunks with relative_path as stable cache key
     const result = await pool.query(`
       SELECT id, relative_path, content
       FROM codebase_chunk_index
@@ -141,7 +169,7 @@ async function produceQueue() {
       const batch = chunks.slice(i, i + queueBatchSize);
       const message = {
         batch_id: Math.floor(i / queueBatchSize),
-        chunks: batch.map(c => ({ id: c.id, path: c.relative_path, content: c.content }))
+        chunks: batch.map(c => ({ id: c.id, path: c.relative_path, content: c.content, cacheKey: c.relative_path }))
       };
 
       channel.publish(
@@ -203,7 +231,7 @@ async function startWorker() {
 
         // Process each chunk in the batch
         for (const chunk of chunks) {
-          const summary = await summarizeOne(chunk.id, chunk.content);
+          const summary = await summarizeOne(chunk.id, chunk.content, chunk.cacheKey);
 
           if (summary) {
             // Write to Postgres (canonical)
@@ -212,18 +240,7 @@ async function startWorker() {
               [summary, chunk.id]
             );
 
-            // Write to Redis cache (TTL 24h) - already done in summarizeOne if cache miss
-            // Only write if not already in cache (summarizeOne handles it)
-            try {
-              await redis.get(`bitfrost:summary:${chunk.id}`).then(cached => {
-                if (!cached) {
-                  return redis.setex(`bitfrost:summary:${chunk.id}`, 86400, summary);
-                }
-              });
-            } catch (err) {
-              // Ignore cache write errors
-            }
-
+            // Redis caching done in summarizeOne() using relative_path-based key
             summarized++;
           }
         }
