@@ -2,192 +2,366 @@
 /**
  * Agentic Error MapReduce
  *
- * Runs every 5 minutes (or on demand). Groups error signals from the last
- * window by (error_class, model_name, task_id), reduces to cluster rows,
- * and warms the BitFrost repair cache.
+ * Map:    error_signal_stream rows → fingerprint / route / state / feature_id
+ * Reduce: count, latest_seen, top_route, top_suggestion, confidence, cluster_group
+ * Write:  upsert error_cluster_groups
+ * Warm:   BitFrost repair cache (bifrost:repair:{error_class}:{model_name})
  *
  * Usage:
- *   node scripts/atlas/agentic-error-mapreduce.mjs [--dry-run] [--window-minutes 5]
- *
- * Hard rules:
- * - Groups by semantic keys (error_class, model_name, task_id) — never raw log text
- * - HMM classification is separate — this script only groups and counts
- * - BitFrost cache: bifrost:repair:{error_class}:{model_name} → cluster JSON
+ *   node scripts/atlas/agentic-error-mapreduce.mjs [--dry-run] [--window-minutes 15] [--verbose]
  */
 
 import pg from 'pg';
 import Redis from 'ioredis';
+import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 
 const { values: args } = parseArgs({
   options: {
     'dry-run':        { type: 'boolean', default: false },
-    'window-minutes': { type: 'string',  default: '5' },
+    'window-minutes': { type: 'string',  default: '15' },
     verbose:          { type: 'boolean', default: false },
   },
   strict: false,
 });
 
 const DRY_RUN        = args['dry-run'];
-const WINDOW_MINUTES = parseInt(args['window-minutes'] ?? '5', 10);
+const WINDOW_MINUTES = parseInt(args['window-minutes'] ?? '15', 10);
 const VERBOSE        = args['verbose'];
-const REPAIR_TTL     = 300; // seconds
+const REPAIR_TTL     = 300;
+
+// ── Observation normalization (mirrors hmm-error-classifier.ts) ───────────────
+
+const OBS_PATTERNS = [
+  { pattern: /relation.*does not exist|table.*not found/i,    obs: 'SQL_RELATION_MISSING' },
+  { pattern: /column.*does not exist/i,                        obs: 'COLUMN_MISSING' },
+  { pattern: /cannot find module|import.*fail|ERR_MODULE/i,    obs: 'IMPORT_FAIL' },
+  { pattern: /404|not found/i,                                 obs: 'HTTP_404' },
+  { pattern: /500|internal server error/i,                     obs: 'HTTP_500' },
+  { pattern: /timeout|timed out|ETIMEDOUT|AbortError/i,        obs: 'TIMEOUT' },
+  { pattern: /empty result|no rows|0 rows/i,                   obs: 'EMPTY_RESULT' },
+  { pattern: /decode.*fail|msgpack|BYTEA|binary.*invalid/i,    obs: 'DECODE_FAIL' },
+  { pattern: /TypeScript|TS\d{4}|type.*error|svelte-check/i,  obs: 'TYPECHECK_FAIL' },
+];
+
+function normalizeObs(raw) {
+  for (const { pattern, obs } of OBS_PATTERNS) {
+    if (pattern.test(raw)) return obs;
+  }
+  return null;
+}
+
+// ── HMM emission weights (mirrors hmm-error-classifier.ts) ───────────────────
+
+const EMISSION = {
+  schema_mismatch:    { SQL_RELATION_MISSING: 0.9, COLUMN_MISSING: 0.8, HTTP_500: 0.3, TYPECHECK_FAIL: 0.4 },
+  missing_dependency: { IMPORT_FAIL: 0.9, HTTP_404: 0.5, TYPECHECK_FAIL: 0.6 },
+  stale_cache:        { EMPTY_RESULT: 0.7, HTTP_404: 0.4 },
+  retrieval_miss:     { EMPTY_RESULT: 0.9, HTTP_404: 0.6, HTTP_500: 0.2 },
+  worker_timeout:     { TIMEOUT: 0.95, HTTP_500: 0.4, EMPTY_RESULT: 0.3 },
+  codec_failure:      { DECODE_FAIL: 0.95, HTTP_500: 0.3, TYPECHECK_FAIL: 0.5 },
+  unknown:            { HTTP_500: 0.3, EMPTY_RESULT: 0.2, TIMEOUT: 0.2 },
+};
+
+const PRIOR = {
+  schema_mismatch: 0.20, missing_dependency: 0.15, stale_cache: 0.15,
+  retrieval_miss: 0.20,  worker_timeout: 0.15,     codec_failure: 0.10, unknown: 0.05,
+};
+
+const SUGGESTED_ACTION = {
+  schema_mismatch:    'Run drizzle-kit introspect and verify migration was applied',
+  missing_dependency: 'Verify npm install ran; check $lib alias resolution',
+  stale_cache:        'Invalidate BitFrost keys; re-warm from Postgres',
+  retrieval_miss:     'Check Qdrant collection count and chunk_index population',
+  worker_timeout:     'Increase AbortSignal.timeout; reduce batch size; check Gemma4 :8090',
+  codec_failure:      'Verify @msgpack/msgpack round-trip; check BYTEA column integrity',
+  unknown:            'Inspect evidence for raw error text; escalate to operator',
+};
+
+function classifyObservations(observations) {
+  if (!observations.length) return { state: 'unknown', confidence: 0 };
+
+  const states = Object.keys(EMISSION);
+  let scores = {};
+  for (const s of states) {
+    scores[s] = (PRIOR[s] ?? 0.05) * ((EMISSION[s][observations[0]] ?? 0.01));
+  }
+  for (let t = 1; t < observations.length; t++) {
+    const next = {};
+    for (const s of states) {
+      next[s] = scores[s] * ((EMISSION[s][observations[t]] ?? 0.01));
+    }
+    scores = next;
+  }
+
+  let bestState = 'unknown', bestScore = -1;
+  for (const [s, v] of Object.entries(scores)) {
+    if (v > bestScore) { bestScore = v; bestState = s; }
+  }
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  return { state: bestState, confidence: total > 0 ? bestScore / total : 0 };
+}
+
+// ── Fingerprint helper ────────────────────────────────────────────────────────
+
+function fingerprint(errorClass, modelName, featureId) {
+  return createHash('sha256')
+    .update(`${errorClass}:${modelName}:${featureId ?? ''}`)
+    .digest('hex')
+    .slice(0, 16);
+}
+
+// ── Database / Redis setup ────────────────────────────────────────────────────
 
 const pool = new pg.Pool({
-  host:     process.env.PGHOST     || '127.0.0.1',
-  port:     parseInt(process.env.PGPORT || '5434', 10),
-  database: process.env.PGDATABASE || 'legal_ai_db',
-  user:     process.env.PGUSER     || 'legal_admin',
-  password: process.env.PGPASSWORD || process.env.DB_PASSWORD || '',
+  host:     process.env.PGHOST     ?? '127.0.0.1',
+  port:     parseInt(process.env.PGPORT     ?? '5434', 10),
+  database: process.env.PGDATABASE ?? 'legal_ai_db',
+  user:     process.env.PGUSER     ?? 'legal_admin',
+  password: process.env.PGPASSWORD ?? process.env.DB_PASSWORD ?? '',
 });
 
 const redis = new Redis({
-  host:              process.env.REDIS_HOST     || '127.0.0.1',
-  port:              parseInt(process.env.REDIS_PORT || '6379', 10),
-  password:          process.env.REDIS_PASSWORD || 'redis',
-  lazyConnect:       true,
+  host:               process.env.REDIS_HOST     ?? '127.0.0.1',
+  port:               parseInt(process.env.REDIS_PORT ?? '6379', 10),
+  password:           process.env.REDIS_PASSWORD ?? 'redis',
+  lazyConnect:        true,
   enableOfflineQueue: false,
-  retryStrategy:     () => null,
+  retryStrategy:      () => null,
 });
 
-async function mapPhase(windowMinutes) {
+// ── MAP phase ─────────────────────────────────────────────────────────────────
+
+async function mapPhase() {
   const result = await pool.query(`
     SELECT
+      id,
       packet_key,
       task_id,
       error_class,
       model_name,
-      COUNT(*) AS count
+      evidence,
+      ingested_at
     FROM error_signal_stream
-    WHERE ingested_at > NOW() - INTERVAL '${windowMinutes} minutes'
-    GROUP BY packet_key, task_id, error_class, model_name
-    ORDER BY count DESC
-  `);
-  return result.rows;
+    WHERE ingested_at > NOW() - ($1 || ' minutes')::interval
+    ORDER BY ingested_at ASC
+  `, [WINDOW_MINUTES]);
+
+  return result.rows.map(row => {
+    const raw =
+      (row.evidence?.message) ??
+      (row.evidence?.error)   ??
+      row.error_class         ??
+      '';
+    const obs       = normalizeObs(raw);
+    const featureId = row.evidence?.feature_id ?? null;
+    const route     = row.evidence?.route      ?? row.evidence?.endpoint ?? null;
+
+    return {
+      ...row,
+      observation: obs,
+      feature_id:  featureId,
+      route,
+      fp: fingerprint(row.error_class, row.model_name, featureId),
+    };
+  });
 }
 
-function reducePhase(signals) {
+// ── REDUCE phase ──────────────────────────────────────────────────────────────
+
+function reducePhase(mapped) {
+  // Group by (error_class, model_name, task_id)
   const clusters = new Map();
 
-  for (const sig of signals) {
-    const key = `${sig.error_class}:${sig.model_name}:${sig.task_id}`;
+  for (const row of mapped) {
+    const key = `${row.error_class}:${row.model_name}:${row.task_id}`;
     if (!clusters.has(key)) {
       clusters.set(key, {
-        error_class: sig.error_class,
-        model_name:  sig.model_name,
-        task_id:     sig.task_id,
-        packet_keys: [],
+        error_class: row.error_class,
+        model_name:  row.model_name,
+        task_id:     row.task_id,
+        packet_keys: new Set(),
+        observations: [],
+        routes:      new Map(),
+        feature_ids: new Set(),
+        fingerprints: new Set(),
+        latest_seen: row.ingested_at,
         count: 0,
       });
     }
-    const cluster = clusters.get(key);
-    if (!cluster.packet_keys.includes(sig.packet_key)) {
-      cluster.packet_keys.push(sig.packet_key);
+
+    const c = clusters.get(key);
+    c.count++;
+    c.packet_keys.add(row.packet_key);
+    c.fingerprints.add(row.fp);
+    if (row.observation) c.observations.push(row.observation);
+    if (row.feature_id)  c.feature_ids.add(row.feature_id);
+    if (row.route) {
+      c.routes.set(row.route, (c.routes.get(row.route) ?? 0) + 1);
     }
-    cluster.count += parseInt(sig.count, 10);
+    if (new Date(row.ingested_at) > new Date(c.latest_seen)) {
+      c.latest_seen = row.ingested_at;
+    }
   }
 
-  return clusters;
+  // Classify each cluster
+  const results = [];
+  for (const [key, c] of clusters) {
+    const classification = classifyObservations(c.observations);
+
+    // Top route by frequency
+    let topRoute = null, topCount = 0;
+    for (const [route, cnt] of c.routes) {
+      if (cnt > topCount) { topCount = cnt; topRoute = route; }
+    }
+
+    results.push({
+      key,
+      error_class:      c.error_class,
+      model_name:       c.model_name,
+      task_id:          c.task_id,
+      packet_keys:      [...c.packet_keys],
+      feature_ids:      [...c.feature_ids],
+      fingerprints:     [...c.fingerprints],
+      top_route:        topRoute,
+      state:            classification.state,
+      confidence:       classification.confidence,
+      suggested_action: SUGGESTED_ACTION[classification.state],
+      latest_seen:      c.latest_seen,
+      count:            c.count,
+    });
+  }
+
+  return results;
 }
+
+// ── WRITE phase ───────────────────────────────────────────────────────────────
 
 async function writePhase(clusters) {
   let written = 0;
-
-  for (const [, cluster] of clusters) {
+  for (const c of clusters) {
     if (DRY_RUN) {
       if (VERBOSE) {
-        console.log(`[dry-run] Would upsert cluster: ${cluster.error_class}:${cluster.model_name}:${cluster.task_id} (${cluster.count} signals, ${cluster.packet_keys.length} packets)`);
+        console.log(
+          `[dry-run] cluster ${c.key}` +
+          ` | count=${c.count}` +
+          ` | state=${c.state}` +
+          ` | confidence=${c.confidence.toFixed(3)}` +
+          ` | route=${c.top_route ?? 'n/a'}` +
+          ` | packets=${c.packet_keys.length}`
+        );
       }
       continue;
     }
 
     await pool.query(`
       INSERT INTO error_cluster_groups
-        (error_class, model_name, task_id, packet_keys, failure_count, last_seen)
-      VALUES ($1, $2, $3, $4, $5, NOW())
-      ON CONFLICT (error_class, model_name, task_id)
-      DO UPDATE SET
-        packet_keys   = $4,
-        failure_count = $5,
-        last_seen     = NOW()
+        (error_class, model_name, task_id, packet_keys, failure_count, last_seen,
+         recovery_packet_key, recovery_confidence)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ON CONFLICT (error_class, model_name, task_id) DO UPDATE SET
+        packet_keys         = $4,
+        failure_count       = error_cluster_groups.failure_count + $5,
+        last_seen           = $6,
+        recovery_packet_key = $7,
+        recovery_confidence = $8
     `, [
-      cluster.error_class,
-      cluster.model_name,
-      cluster.task_id,
-      cluster.packet_keys,
-      cluster.count,
+      c.error_class,
+      c.model_name,
+      c.task_id,
+      c.packet_keys,
+      c.count,
+      c.latest_seen,
+      c.suggested_action,
+      c.confidence,
     ]);
 
     written++;
   }
-
   return written;
 }
 
-async function warmBitFrost(clusters) {
+// ── WARM phase ────────────────────────────────────────────────────────────────
+
+async function warmPhase(clusters) {
   if (DRY_RUN) return 0;
 
-  let warmed = 0;
   const pipeline = redis.pipeline();
-
-  for (const [key, cluster] of clusters) {
-    const cacheKey = `bifrost:repair:${key}`;
+  for (const c of clusters) {
+    const cacheKey = `bifrost:repair:${c.error_class}:${c.model_name}`;
     pipeline.setex(cacheKey, REPAIR_TTL, JSON.stringify({
-      packet_keys:   cluster.packet_keys,
-      failure_count: cluster.count,
-      last_seen:     new Date().toISOString(),
+      state:            c.state,
+      confidence:       c.confidence,
+      suggested_action: c.suggested_action,
+      top_route:        c.top_route,
+      packet_keys:      c.packet_keys.slice(0, 10), // cap to 10
+      feature_ids:      c.feature_ids.slice(0, 10),
+      fingerprints:     c.fingerprints,
+      failure_count:    c.count,
+      last_seen:        c.latest_seen,
     }));
-    warmed++;
   }
-
   await pipeline.exec();
-  return warmed;
+  return clusters.length;
 }
 
-async function run() {
-  console.log(`[mapreduce] Starting error signal grouping (window: ${WINDOW_MINUTES}m, dry-run: ${DRY_RUN})`);
+// ── Runner ────────────────────────────────────────────────────────────────────
 
+async function run() {
+  console.log(
+    `[mapreduce] window=${WINDOW_MINUTES}m  dry-run=${DRY_RUN}  verbose=${VERBOSE}`
+  );
+
+  let redisOk = false;
   try {
     await redis.connect();
+    await redis.ping();
+    redisOk = true;
   } catch {
     console.warn('[mapreduce] Redis unavailable — BitFrost warming skipped');
   }
 
   try {
     // MAP
-    const signals = await mapPhase(WINDOW_MINUTES);
-    console.log(`[mapreduce] MAP: ${signals.length} signal rows from last ${WINDOW_MINUTES} minutes`);
-
-    if (!signals.length) {
-      console.log('[mapreduce] No signals in window — nothing to reduce');
-      return;
-    }
+    const mapped = await mapPhase();
+    console.log(`[mapreduce] MAP: ${mapped.length} signals`);
+    if (!mapped.length) { console.log('[mapreduce] nothing to reduce'); return; }
 
     // REDUCE
-    const clusters = reducePhase(signals);
-    console.log(`[mapreduce] REDUCE: ${clusters.size} clusters`);
+    const clusters = reducePhase(mapped);
+    console.log(`[mapreduce] REDUCE: ${clusters.length} clusters`);
 
     if (VERBOSE) {
-      for (const [key, cluster] of clusters) {
-        console.log(`  ${key}: ${cluster.count} signals, ${cluster.packet_keys.length} distinct packets`);
+      for (const c of clusters) {
+        console.log(
+          `  ${c.key} | count=${c.count} | state=${c.state}` +
+          ` | conf=${c.confidence.toFixed(3)} | route=${c.top_route ?? '-'}`
+        );
       }
     }
 
-    // WRITE clusters to Postgres
+    // WRITE
     const written = await writePhase(clusters);
-    console.log(`[mapreduce] WRITE: ${DRY_RUN ? '(dry-run)' : written} cluster rows upserted`);
+    console.log(`[mapreduce] WRITE: ${DRY_RUN ? '(dry-run)' : written} rows upserted`);
 
-    // WARM BitFrost repair cache
-    const warmed = await warmBitFrost(clusters);
-    console.log(`[mapreduce] WARM: ${DRY_RUN ? '(dry-run)' : warmed} repair cache keys set (TTL ${REPAIR_TTL}s)`);
+    // WARM
+    if (redisOk) {
+      const warmed = await warmPhase(clusters);
+      console.log(`[mapreduce] WARM: ${DRY_RUN ? '(dry-run)' : warmed} repair keys (TTL ${REPAIR_TTL}s)`);
+    }
+
+    // Summary
+    const byState = {};
+    for (const c of clusters) byState[c.state] = (byState[c.state] ?? 0) + 1;
+    console.log('[mapreduce] states:', JSON.stringify(byState));
 
   } finally {
     await pool.end().catch(() => {});
-    if (redis.status === 'ready') await redis.quit().catch(() => {});
+    if (redisOk) await redis.quit().catch(() => {});
   }
 }
 
-run().catch((err) => {
+run().catch(err => {
   console.error('[mapreduce] Fatal:', err.message);
   process.exit(1);
 });
