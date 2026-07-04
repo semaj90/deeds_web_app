@@ -1,6 +1,6 @@
 # Parent Atlas Service Probes
 
-Generated: 2026-07-02T23:31:09.664Z
+Generated: 2026-07-04T00:59:20.562Z
 Status: PASS_WITH_WARNINGS
 
 ## Summary
@@ -16,15 +16,15 @@ Status: PASS_WITH_WARNINGS
 | service | transport | url | status | fallback | ms | error |
 |---|---:|---|---:|---:|---:|---|
 | gemma4-llama-server | http | http://127.0.0.1:8090 | LIVE_PASS | false | 55 |  |
-| langextract | http | http://127.0.0.1:8095 | FALLBACK_PASS | true | 6 | LangExtract unavailable; inline Gemma4 fallback available (fetch failed) |
+| langextract | http | http://127.0.0.1:8095 | FALLBACK_PASS | true | 7 | LangExtract unavailable; inline Gemma4 fallback available (fetch failed) |
 | turbovec-grpc | grpc | 127.0.0.1:50062 | LIVE_PASS | false | 1 |  |
-| go-retrieval | http | http://127.0.0.1:8100 | LIVE_PASS | false | 14 |  |
-| embeddinggemma | http | http://127.0.0.1:11434 | LIVE_PASS | false | 7 |  |
-| qdrant | http | http://127.0.0.1:6333 | LIVE_PASS | false | 24 |  |
-| postgres | postgres | postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db | LIVE_PASS | false | 43 |  |
-| seaweedfs | http | http://127.0.0.1:8333 | LIVE_PASS | false | 5 |  |
-| neo4j | http | http://127.0.0.1:7474 | LIVE_PASS | false | 476 |  |
-| redis-valkey | redis | redis://127.0.0.1:6379 | LIVE_PASS | false | 164 |  |
+| go-retrieval | http | http://127.0.0.1:8100 | LIVE_PASS | false | 1904 |  |
+| embeddinggemma | http | http://127.0.0.1:11434 | LIVE_PASS | false | 5 |  |
+| qdrant | http | http://127.0.0.1:6333 | LIVE_PASS | false | 15 |  |
+| postgres | postgres | postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db | LIVE_PASS | false | 44 |  |
+| seaweedfs | http | http://127.0.0.1:8333 | LIVE_PASS | false | 7 |  |
+| neo4j | http | http://127.0.0.1:7474 | LIVE_PASS | false | 15 |  |
+| redis-valkey | redis | redis://127.0.0.1:6379 | LIVE_PASS | false | 151 |  |
 
 ## Legacy Warnings
 

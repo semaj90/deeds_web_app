@@ -1,8 +1,8 @@
 # ACP Packet Transport Audit
 
-Generated: 2026-07-01T04:45:52.667Z
+Generated: 2026-07-04T00:59:11.378Z
 
-Verdict: **PASS**
+Verdict: **PASS_WITH_WARNINGS**
 
 ## What This Proves
 
@@ -36,14 +36,14 @@ Verdict: **PASS**
 
 - RabbitMQ queues: 20
 - RabbitMQ status: READY_WITH_QUEUES
-- NATS status: PASS
+- NATS status: BROKER_ONLY_HANDLERS_MISSING
 
 ## Analytics
 
 - existing tables: ace_retrieval_hits, ace_retrieval_runs, agent_os_events, analytics_events, phase89_agentic_calls, task_registry, trace_events, trace_runs
-- apply mode: true
-- agent_os_events insert: PASS
+- apply mode: false
+- agent_os_events insert: SKIPPED
 
 ## Next Action
 
-ACP transport proof is ready; wire the same metadata fields into request handlers and Langfuse traces.
+Start NATS handlers with `cd sveltekit-frontend; npm run nats:handlers`, then rerun `npm run nats:proof-of-life:all`.

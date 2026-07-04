@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-07-04T00:35:02.177Z",
+  "overall": "WARN",
+  "checks": [
+    {
+      "name": "summary_surface_verify",
+      "command": "npm run atlas:summary-surface:verify",
+      "ok": true,
+      "duration_ms": 1465,
+      "status": "PASS",
+      "error": "",
+      "stdout": "> yorha-legal-ai-frontend@1.0.0 atlas:summary-surface:verify\n> node ../scripts/atlas/verify-summary-surface.mjs\n\nWrote docs/reports/summary-surface-proof.json\nWrote docs/reports/summary-surface-proof.md",
+      "stderr": ""
+    },
+    {
+      "name": "summary_sanitizer_hardened",
+      "command": "npm run atlas:summary-sanitizer:hardened:test",
+      "ok": false,
+      "duration_ms": 643,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Missing script: \"atlas:summary-sanitizer:hardened:test\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-04T00_34_38_529Z-debug-0.log"
+    },
+    {
+      "name": "summary_layer_clean_dry",
+      "command": "npm run atlas:summary-layer:clean:dry",
+      "ok": false,
+      "duration_ms": 689,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Missing script: \"atlas:summary-layer:clean:dry\"\nnpm error\nnpm error Did you mean one of these?\nnpm error   npm run atlas:summary:phase1:dry # run the \"atlas:summary:phase1:dry\" package script\nnpm error   npm run atlas:summarize:batch:dry # run the \"atlas:summarize:batch:dry\" package script\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-04T00_34_39_255Z-debug-0.log"
+    },
+    {
+      "name": "bitfrost_semantic_cache_audit",
+      "command": "npm run atlas:bitfrost-semantic-cache:audit",
+      "ok": false,
+      "duration_ms": 696,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "> yorha-legal-ai-frontend@1.0.0 atlas:bitfrost-semantic-cache:audit\n> node scripts/atlas/audit-bitfrost-semantic-cache.mjs",
+      "stderr": "node:internal/modules/cjs/loader:1404\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\scripts\\atlas\\audit-bitfrost-semantic-cache.mjs'\r\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\r\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\r\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\r\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\r\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\r\n    at node:internal/main/run_main_module:36:49 {\r\n  code: 'MODULE_NOT_FOUND',\r\n  requireStack: []\r\n}\r\n\r\nNode.js v22.17.1"
+    },
+    {
+      "name": "ontology_kag_readiness",
+      "command": "npm run atlas:ontology-kag:readiness",
+      "ok": false,
+      "duration_ms": 709,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "> yorha-legal-ai-frontend@1.0.0 atlas:ontology-kag:readiness\n> node ../scripts/atlas/ontology-kag-readiness.mjs",
+      "stderr": "node:internal/modules/cjs/loader:1404\r\n  throw err;\r\n  ^\r\n\r\nError: Cannot find module 'C:\\Users\\james\\Videos\\deeds-web-app\\scripts\\atlas\\ontology-kag-readiness.mjs'\r\n    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)\r\n    at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)\r\n    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)\r\n    at Function._load (node:internal/modules/cjs/loader:1211:37)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:322:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)\r\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\r\n    at node:internal/main/run_main_module:36:49 {\r\n  code: 'MODULE_NOT_FOUND',\r\n  requireStack: []\r\n}\r\n\r\nNode.js v22.17.1"
+    },
+    {
+      "name": "ranker_envelope_readiness",
+      "command": "npm run atlas:ranker-envelope:readiness",
+      "ok": false,
+      "duration_ms": 613,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Missing script: \"atlas:ranker-envelope:readiness\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-04T00_34_41_271Z-debug-0.log"
+    },
+    {
+      "name": "acp_transport",
+      "command": "npm run verify:acp-transport",
+      "ok": true,
+      "duration_ms": 6977,
+      "status": "PASS",
+      "error": "",
+      "stdout": "> yorha-legal-ai-frontend@1.0.0 verify:acp-transport\n> node ../scripts/atlas/audit-acp-packet-transport.mjs\n\n[acp-audit] verdict=PASS_WITH_WARNINGS\n[acp-audit] warnings=nats_handlers_broker_only_handlers_missing\n[acp-audit] critical=none\n[acp-audit] report=docs\\reports\\acp-packet-transport-audit.json",
+      "stderr": ""
+    },
+    {
+      "name": "services_probe",
+      "command": "npm run atlas:services:probe",
+      "ok": false,
+      "duration_ms": 701,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Missing script: \"atlas:services:probe\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-04T00_34_48_960Z-debug-0.log"
+    },
+    {
+      "name": "embedding_qdrant_turbovec",
+      "command": "npm run atlas:embedding-qdrant-turbovec:test",
+      "ok": true,
+      "duration_ms": 2844,
+      "status": "PASS",
+      "error": "",
+      "stdout": "> yorha-legal-ai-frontend@1.0.0 atlas:embedding-qdrant-turbovec:test\n> node ../scripts/atlas/test-embedding-qdrant-turbovec.mjs\n\n{\n  \"generated_at\": \"2026-07-04T00:34:50.246Z\",\n  \"overall\": \"WARN\",\n  \"lanes\": {\n    \"embeddinggemma\": {\n      \"status\": \"LIVE_PASS\",\n      \"url\": \"http://localhost:11434\",\n      \"port\": 11434,\n      \"model\": \"embeddinggemma:latest\",\n      \"dimension\": 768,\n      \"duration_ms\": 265\n    },\n    \"qdrant\": {\n      \"status\": \"LIVE_PASS\",\n      \"url\": \"http://127.0.0.1:6333\",\n      \"port\": 6333,\n      \"collection\": \"codebase_chunks_768\",\n      \"vector_name\": \"content\",\n      \"dimension\": 768,\n      \"points\": 40581,\n      \"proof_point_id\": \"3473e188-b0ec-43c7-8ad8-4411354a0e80\",\n      \"search_result_count\": 5,\n      \"duration_ms\": 199\n    },\n    \"turbovec_grpc\": {\n      \"status\": \"LIVE_PASS\",\n      \"port\": 50062,\n      \"transport\": \"grpc\",\n      \"grpc_url\": \"127.0.0.1:50062\",\n      \"http_url\": \"http://127.0.0.1:8791\",\n      \"backend\": \"bridge:py(python)+addon(cuda)\",\n      \"health\": {\n        \"ok\": true,\n        \"indexed\": 256,\n        \"dim\": 64,\n        \"bits\": 4,\n        \"backend\": \"bridge:py(python)+addon(cuda)\"\n      },\n      \"transform\": {\n        \"in_dim\": 768,\n        \"out_dim\": 64,\n        \"vector_length\": 64\n      },\n      \"qdrant_scanned\": 384,\n      \"http_indexed\": 256,\n      \"grpc_candidates\": 10,\n      \"duration_ms\": 1245\n    },\n    \"turbovec_jsonrpc_8792\": {\n      \"status\": \"FALLBACK_PASS\",\n      \"port\": 8792,\n      \"reason\": \"Legacy fallback only; canonical path is TurboVec gRPC 50062 and HTTP ANN sidecar 8791.\"\n    }\n  },\n  \"rule\": \"LIVE_PASS requires real service + real port + real data. FALLBACK_PASS is WARN, never green success.\",\n  \"elapsed_ms\": 1711\n}",
+      "stderr": ""
+    },
+    {
+      "name": "gpu_retrieval_summary_fanout",
+      "command": "npm run atlas:gpu-retrieval-summary-fanout:test",
+      "ok": true,
+      "duration_ms": 10189,
+      "status": "PASS",
+      "error": "",
+      "stdout": "> yorha-legal-ai-frontend@1.0.0 atlas:gpu-retrieval-summary-fanout:test\n> node ../scripts/atlas/test-gpu-retrieval-summary-fanout.mjs\n\n{\n  \"status\": \"LIVE_PASS\",\n  \"lanes\": {\n    \"envelope_read\": \"LIVE_PASS\",\n    \"source_file_read\": \"LIVE_PASS\",\n    \"ast_structural_pass\": \"LIVE_PASS\",\n    \"langextract\": \"FALLBACK_PASS\",\n    \"ace_envelope\": \"LIVE_PASS\",\n    \"gemma4_summary\": \"LIVE_PASS\",\n    \"kmeans_som_seeds\": \"LIVE_PASS\"\n  },\n  \"outputs\": {\n    \"ace_envelope_ndjson\": \".tmp/ace-envelope-from-gpu-retrieval.ndjson\",\n    \"kmeans_som_seed_ndjson\": \".tmp/kmeans-som-feature-seeds.ndjson\"\n  }\n}",
+      "stderr": ""
+    }
+  ]
+}

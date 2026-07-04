@@ -17,7 +17,7 @@ async function gemmaClient(prompt) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
         prompt: prompt,
         stream: false,
         format: 'json'

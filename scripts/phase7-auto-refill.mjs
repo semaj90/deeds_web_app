@@ -155,7 +155,6 @@ async function monitor() {
         // === REFILL TRIGGER ===
         if (
           status.messages < REFILL_THRESHOLD &&
-          status.messages > 0 &&
           status.healthy &&
           Date.now() - lastRefillTime > MIN_REFILL_INTERVAL_MS
         ) {

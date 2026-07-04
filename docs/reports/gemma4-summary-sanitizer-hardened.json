@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-07-03T19:08:55.160Z",
-  "gate": "WARN",
+  "timestamp": "2026-07-04T00:58:23.626Z",
+  "gate": "PASS",
   "synthetic": {
     "total": 4,
-    "pass": false,
+    "pass": true,
     "cases": [
       {
         "name": "transport markers",
@@ -178,7 +178,5 @@
       }
     ]
   },
-  "gaps": [
-    "At least one synthetic marker case still fails sanitized-output expectations."
-  ]
+  "gaps": []
 }

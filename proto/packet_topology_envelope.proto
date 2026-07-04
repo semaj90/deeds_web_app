@@ -1,0 +1,185 @@
+syntax = "proto3";
+
+package acp.packet;
+
+/**
+ * Canonical Packet Topology Envelope (gRPC transport)
+ *
+ * Mirrors the Zod schema in packet-topology-envelope.ts.
+ * Used for ACP/gRPC transport boundaries.
+ *
+ * Protocol buffer choice:
+ * - Compact binary format (smaller than msgpack)
+ * - Typed schema (stronger validation than msgpack)
+ * - Full duplex streaming support
+ * - Service definitions (searchable, discoverable)
+ */
+
+// Canonical identity (immutable)
+message PacketIdentity {
+  string packet_id = 1;        // UUID
+  optional string packet_ulid = 2;  // Sortable event ID
+  string packet_key = 3;       // SHA256 (cross-system join key)
+}
+
+// Semantic grouping (derived from summary, immutable after first set)
+message PacketSemantics {
+  string title_id = 1;
+  string feature_id = 2;
+  string source_ref = 3;
+  optional string directory_path = 4;
+}
+
+// Topology labels (routing hints, NOT identity)
+message PacketTopology {
+  optional int32 community_id = 1;        // Louvain community
+  optional int32 som_row = 2;             // SOM 20×20 row (0–19)
+  optional int32 som_col = 3;             // SOM 20×20 column (0–19)
+  optional string som_cluster = 4;        // Derived cluster ID
+  optional int32 kmeans_cluster_id = 5;   // K-Means assignment
+}
+
+// 4D manifold coordinates
+message Manifold4D {
+  double x = 1;                           // SOM column (X-axis)
+  double y = 2;                           // SOM row (Y-axis)
+  double z = 3;                           // K-Means cluster (Z-axis / depth)
+  oneof time_variant {
+    int64 timestamp_unix_ms = 4;
+    string timestamp_iso8601 = 5;
+  }
+}
+
+// Derived latent/manifold representations
+message PacketLatent {
+  repeated float latent_64 = 1 [packed = true];  // 64-dim autoencoder latent
+  optional Manifold4D manifold_4d = 2;           // 4D topology coordinates
+}
+
+// Retrieval mirrors (read-only)
+message PacketMirrors {
+  optional string qdrant_point_id = 1;     // Qdrant vector point ID
+  repeated string neo4j_neighbors = 2;     // Neo4j neighbor packet_keys
+  optional float page_rank_score = 3;      // PageRank authority
+}
+
+// Lexical enrichment (from feature materialization)
+message PacketLexical {
+  optional string summary = 1;             // Human-readable summary
+  repeated string lexical_nouns = 2;
+  repeated string lexical_verbs = 3;
+  repeated string lexical_adverbs_ly = 4;
+  repeated string routing_hints = 5;
+  repeated string used_concepts = 6;
+}
+
+// Lineage (immutable append-only)
+message PacketLineage {
+  repeated string supersedes = 1;          // packet_keys this replaces
+  optional string superseded_by = 2;       // packet_key of replacement
+  string created_at = 3;                   // ISO8601 timestamp
+  optional string updated_at = 4;          // ISO8601 timestamp
+}
+
+// Extraction/synthesis metadata (optional, diagnostic)
+message PacketMetadata {
+  optional float confidence = 1;           // Extraction confidence (0–1)
+  optional string extraction_method = 2;   // Extractor identifier
+  map<string, string> provenance = 3;      // Diagnostic context
+}
+
+// Canonical Packet Topology Envelope (composite)
+message PacketTopologyEnvelope {
+  PacketIdentity identity = 1;
+  PacketSemantics semantics = 2;
+  PacketTopology topology = 3;
+  PacketLatent latent = 4;
+  PacketMirrors mirrors = 5;
+  PacketLexical lexical = 6;
+  PacketLineage lineage = 7;
+  optional PacketMetadata metadata = 8;
+}
+
+// Batch operations
+message PacketBatch {
+  repeated PacketTopologyEnvelope packets = 1;
+  int32 batch_id = 2;
+  string timestamp = 3;
+}
+
+// ACP Worker request (resolve semantic key + lookup neighborhood)
+message AcpWorkerRequest {
+  PacketTopologyEnvelope packet = 1;
+  int32 neighborhood_radius = 2;           // SOM grid radius
+  int32 max_candidates = 3;                // Max neighbor expansion
+}
+
+// ACP Worker response (ranked candidates)
+message AcpWorkerResponse {
+  string packet_key = 1;
+  repeated string ranked_neighbor_keys = 2;  // Top-K by score
+  repeated float scores = 3;               // Confidence scores
+  int64 latency_ms = 4;
+}
+
+// OpenAI facade request (query + context constraints)
+message OpenAiFacadeRequest {
+  string query = 1;
+  int32 top_k = 2;
+  optional PacketTopologyEnvelope[] context_packets = 3;
+}
+
+// OpenAI facade response (packed into OpenAI messages format)
+message OpenAiFacadeResponse {
+  repeated PacketTopologyEnvelope retrieved_packets = 1;
+  string synthesized_answer = 2;
+  int32 latency_ms = 3;
+}
+
+// Service definitions (for gRPC stubs)
+service AcpPacketService {
+  // Fetch single packet by key
+  rpc GetPacket(GetPacketRequest) returns (PacketTopologyEnvelope);
+
+  // Batch fetch packets
+  rpc GetPacketBatch(GetPacketBatchRequest) returns (PacketBatch);
+
+  // ACP worker loop (validate + expand)
+  rpc ProcessPacket(AcpWorkerRequest) returns (AcpWorkerResponse);
+
+  // Search neighbors (SOM grid + graph)
+  rpc SearchNeighborhood(SearchNeighborhoodRequest) returns (PacketBatch);
+
+  // Validate envelope against canonical schema
+  rpc ValidateEnvelope(PacketTopologyEnvelope) returns (ValidationResult);
+
+  // Stream packets (for SSE + chunking)
+  rpc StreamPackets(StreamPacketsRequest) returns (stream PacketTopologyEnvelope);
+}
+
+// Supporting message types
+message GetPacketRequest {
+  string packet_key = 1;
+}
+
+message GetPacketBatchRequest {
+  repeated string packet_keys = 1;
+}
+
+message SearchNeighborhoodRequest {
+  int32 som_row = 1;
+  int32 som_col = 2;
+  int32 radius = 3;
+  int32 limit = 4;
+}
+
+message ValidationResult {
+  bool valid = 1;
+  repeated string errors = 2;
+}
+
+message StreamPacketsRequest {
+  string query = 1;
+  int32 chunk_size = 2;
+  bool include_mirrors = 3;
+}

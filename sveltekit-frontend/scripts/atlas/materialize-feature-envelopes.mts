@@ -114,6 +114,34 @@ function unique(items, limit = 24) {
   return [...new Set(items.filter(Boolean))].slice(0, limit);
 }
 
+function deriveUsedConcepts(row, lexical) {
+  const seed = [
+    row.title_id,
+    row.feature_id,
+    row.feature_label,
+    row.domain_class,
+    row.source_ref,
+    ...(Array.isArray(row.keywords) ? row.keywords : []),
+    ...(Array.isArray(row.entities) ? row.entities : []),
+    ...(Array.isArray(row.ast_symbols) ? row.ast_symbols : []),
+    ...(Array.isArray(row.ast_kinds) ? row.ast_kinds : []),
+    ...(Array.isArray(row.ast_tags) ? row.ast_tags : []),
+    ...lexical.nouns,
+    ...lexical.verbs,
+    ...lexical.adverbs_ly,
+  ]
+    .flatMap((value) => {
+      if (!value) return [];
+      return String(value)
+        .split(/[./:_\-\s]+/)
+        .map((part) => part.trim().toLowerCase())
+        .filter(Boolean);
+    })
+    .filter((value) => value.length >= 3);
+
+  return unique(seed, 40);
+}
+
 function extractLexicalTerms(text) {
   const tokens = words(text).filter((token) => !STOP_WORDS.has(token));
   const mappedVerbs = tokens
@@ -196,6 +224,7 @@ async function main() {
           lexical_nouns JSONB DEFAULT '[]'::jsonb,
           lexical_verbs JSONB DEFAULT '[]'::jsonb,
           lexical_adverbs_ly JSONB DEFAULT '[]'::jsonb,
+          used_concepts JSONB DEFAULT '[]'::jsonb,
           lexical_terms JSONB DEFAULT '{}'::jsonb,
           summary_rank_score REAL,
           summary_rank_status TEXT,
@@ -211,6 +240,7 @@ async function main() {
           ADD COLUMN IF NOT EXISTS lexical_nouns JSONB DEFAULT '[]'::jsonb,
           ADD COLUMN IF NOT EXISTS lexical_verbs JSONB DEFAULT '[]'::jsonb,
           ADD COLUMN IF NOT EXISTS lexical_adverbs_ly JSONB DEFAULT '[]'::jsonb,
+          ADD COLUMN IF NOT EXISTS used_concepts JSONB DEFAULT '[]'::jsonb,
           ADD COLUMN IF NOT EXISTS lexical_terms JSONB DEFAULT '{}'::jsonb,
           ADD COLUMN IF NOT EXISTS summary_rank_score REAL,
           ADD COLUMN IF NOT EXISTS summary_rank_status TEXT;
@@ -378,6 +408,7 @@ async function main() {
       ].filter(Boolean).join(' ');
       const lexical = extractLexicalTerms(text);
       const titleId = deriveTitleId(row, lexical);
+      const usedConcepts = deriveUsedConcepts(row, lexical);
       const score = scoreEnvelope(row, lexical);
       const status = score >= 80 ? 'READY' : score >= 60 ? 'NEAR_READY' : score >= 35 ? 'PARTIAL' : 'BLOCKED';
 
@@ -388,9 +419,10 @@ async function main() {
            lexical_nouns = $3::jsonb,
            lexical_verbs = $4::jsonb,
            lexical_adverbs_ly = $5::jsonb,
-           lexical_terms = $6::jsonb,
-           summary_rank_score = $7,
-           summary_rank_status = $8,
+           used_concepts = $6::jsonb,
+           lexical_terms = $7::jsonb,
+           summary_rank_score = $8,
+           summary_rank_status = $9,
            updated_at = NOW()
          WHERE packet_key = $1`,
         [
@@ -399,6 +431,7 @@ async function main() {
           JSON.stringify(lexical.nouns),
           JSON.stringify(lexical.verbs),
           JSON.stringify(lexical.adverbs_ly),
+          JSON.stringify(usedConcepts),
           JSON.stringify(lexical),
           score,
           status,
@@ -420,6 +453,7 @@ async function main() {
         COUNT(CASE WHEN jsonb_array_length(lexical_nouns) > 0 THEN 1 END) as with_lexical_nouns,
         COUNT(CASE WHEN jsonb_array_length(lexical_verbs) > 0 THEN 1 END) as with_lexical_verbs,
         COUNT(CASE WHEN jsonb_array_length(lexical_adverbs_ly) > 0 THEN 1 END) as with_lexical_adverbs,
+        COUNT(CASE WHEN jsonb_array_length(used_concepts) > 0 THEN 1 END) as with_used_concepts,
         COUNT(CASE WHEN summary_rank_status IN ('READY', 'NEAR_READY') THEN 1 END) as rank_ready
       FROM atlas_feature_envelopes;
     `);
@@ -434,6 +468,7 @@ async function main() {
     console.log(`  With lexical nouns: ${stats.with_lexical_nouns}`);
     console.log(`  With lexical verbs: ${stats.with_lexical_verbs}`);
     console.log(`  With -ly adverbs: ${stats.with_lexical_adverbs}`);
+    console.log(`  With used concepts: ${stats.with_used_concepts}`);
     console.log(`  Rank ready: ${stats.rank_ready}`);
 
     console.log(`\n✅ Feature envelope materialization complete!`);

@@ -47,7 +47,7 @@ async function checkGemma4Availability() {
       return true;
     }
     log('⚠️  Gemma4 not found in Ollama. Skipping LLM summaries.');
-    log('    Ensure: ollama pull gemma4-rotorquant:latest');
+    log('    Ensure the configured Gemma4 runtime is available');
     return false;
   } catch (e) {
     log('⚠️  Ollama not available at http://127.0.0.1:11434');
@@ -108,7 +108,7 @@ Format as JSON: { "reasoning": "...", "risks": [...], "approach": "...", "confid
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
         prompt,
         stream: false,
         options: { temperature: 0.3, num_predict: 200 }

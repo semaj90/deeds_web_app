@@ -27,6 +27,7 @@ import pg from 'pg';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { z } from 'zod';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -47,6 +48,47 @@ const RELATION_WEIGHTS = {
   BELONGS_TO_CLUSTER: 1.2,
   SHARES_TAGS: 0.8,
 };
+
+const SummaryEnvelopeSchema = z.object({
+  feature_id: z.string().min(1),
+  title_id: z.string().min(1),
+  source_ref: z.string().min(1),
+  domain_class: z.string().nullable().optional(),
+  feature_label: z.string().nullable().optional(),
+  rank: z.number().int().positive(),
+  score: z.number(),
+  tuple_count: z.number().int().nonnegative(),
+  symbol_count: z.number().int().nonnegative(),
+  top_symbols: z.array(z.string().min(1)).default([]),
+  candidate_refs: z.array(z.string().min(1)).default([]),
+  has_existing_summary: z.boolean(),
+  used_concepts: z.array(z.string().min(1)).default([]),
+  lexical_nouns: z.array(z.string().min(1)).default([]),
+  lexical_verbs: z.array(z.string().min(1)).default([]),
+  lexical_adverbs_ly: z.array(z.string().min(1)).default([]),
+  relationship_hints: z.array(z.string().min(1)).default([]),
+  routing_hints: z.array(z.string().min(1)).default([]),
+  adjacency_packet_keys: z.array(z.string().min(1)).default([]),
+  adjacency_feature_ids: z.array(z.string().min(1)).default([]),
+  adjacency_source_refs: z.array(z.string().min(1)).default([]),
+  packed_arrays: z.object({
+    packet_keys: z.array(z.string().min(1)).default([]),
+    feature_ids: z.array(z.string().min(1)).default([]),
+    source_refs: z.array(z.string().min(1)).default([]),
+    title_ids: z.array(z.string().min(1)).default([]),
+  }).default({
+    packet_keys: [],
+    feature_ids: [],
+    source_refs: [],
+    title_ids: [],
+  }),
+  columnar_tables: z.array(z.string().min(1)).default([]),
+  mmap_vector_refs: z.array(z.string().min(1)).default([]),
+  som_cluster: z.union([z.string(), z.number()]).nullable().optional(),
+  community_id: z.union([z.string(), z.number()]).nullable().optional(),
+  som_row: z.number().int().nonnegative().nullable().optional(),
+  som_col: z.number().int().nonnegative().nullable().optional(),
+}).strict();
 
 const pool = new Pool({
   host: process.env.POSTGRES_HOST ?? 'localhost',
@@ -119,6 +161,39 @@ function groupTuples(tuples) {
   return groups;
 }
 
+function humanizeTitleId(value) {
+  const text = String(value || '').trim();
+  if (!text) return 'summary.packet';
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '.')
+    .replace(/\.+/g, '.')
+    .replace(/^\./, '')
+    .replace(/\.$/, '') || 'summary.packet';
+}
+
+function deriveUsedConcepts(group) {
+  const values = [
+    group.feature_label,
+    group.feature_id,
+    group.domain_class,
+    ...Array.from(group.symbols),
+  ];
+  return [...new Set(values.map((value) => String(value ?? '').trim().toLowerCase()).filter((value) => value.length >= 3))].slice(0, 40);
+}
+
+function deriveTopologyFields(group) {
+  const somCluster = group.tuples.find((tuple) => tuple.som_cluster !== null && tuple.som_cluster !== undefined)?.som_cluster ?? null;
+  const somText = String(somCluster ?? '').trim();
+  const somMatch = somText.match(/^(\d+)\s*[:,-]\s*(\d+)$/);
+  return {
+    som_cluster: somCluster,
+    community_id: null,
+    som_row: somMatch ? Number(somMatch[1]) : null,
+    som_col: somMatch ? Number(somMatch[2]) : null,
+  };
+}
+
 function rankGroups(groups) {
   const ranked = [];
 
@@ -160,6 +235,9 @@ function buildEnvelopes(rankedGroups, topK) {
 
   for (let i = 0; i < Math.min(topK, rankedGroups.length); i++) {
     const group = rankedGroups[i];
+    const titleId = humanizeTitleId(group.feature_label || group.feature_id);
+    const usedConcepts = deriveUsedConcepts(group);
+    const topology = deriveTopologyFields(group);
 
     // Split large groups
     const subgroups = [];
@@ -172,8 +250,9 @@ function buildEnvelopes(rankedGroups, topK) {
     }
 
     for (const sub of subgroups) {
-      envelopes.push({
+      const envelope = {
         feature_id: group.feature_id,
+        title_id: titleId,
         batch_index: sub.batch_index,
         source_ref: group.source_ref,
         domain_class: group.domain_class,
@@ -181,11 +260,35 @@ function buildEnvelopes(rankedGroups, topK) {
         rank: i + 1,
         score: group.score,
         tuple_count: sub.tuples.length,
-        symbol_count: group.symbol_count,
+        symbol_count: group.symbols.size,
         top_symbols: group.top_symbols,
         candidate_refs: sub.tuples.map(t => t.packet_key),
         has_existing_summary: group.has_summary,
-      });
+        used_concepts: usedConcepts,
+        lexical_nouns: group.top_symbols,
+        lexical_verbs: [],
+        lexical_adverbs_ly: [],
+        relationship_hints: group.tuples.some((t) => t.summary) ? ['SUMMARY_EXISTS'] : [],
+        routing_hints: [
+          `feature:${group.feature_id}`,
+          `title:${titleId}`,
+          group.domain_class ? `domain:${group.domain_class}` : null,
+        ].filter(Boolean),
+        adjacency_packet_keys: sub.tuples.map(t => t.packet_key),
+        adjacency_feature_ids: [group.feature_id],
+        adjacency_source_refs: [group.source_ref],
+        packed_arrays: {
+          packet_keys: sub.tuples.map(t => t.packet_key),
+          feature_ids: [group.feature_id],
+          source_refs: [group.source_ref],
+          title_ids: [titleId],
+        },
+        columnar_tables: ['atlas_packets', 'atlas_feature_envelopes'],
+        mmap_vector_refs: [],
+        ...topology,
+      };
+      const validated = SummaryEnvelopeSchema.parse(envelope);
+      envelopes.push(validated);
     }
   }
 

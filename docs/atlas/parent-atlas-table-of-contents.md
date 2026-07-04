@@ -26,6 +26,7 @@ This page is the navigation entry for the Parent Atlas workstream. It links the 
 ## Active Todo Spine
 
 - [MASTER FEATURE TODO](</C:/Users/james/Videos/deeds-web-app/MASTER-FEATURE-TODO-2026-05-20.md>)
+- [gRPC Binary Memory Registry Master Todo](</C:/Users/james/Videos/deeds-web-app/docs/architecture/grpc-binary-memory-registry-master-todo.md>)
 - [Implementation Status](</C:/Users/james/Videos/deeds-web-app/IMPLEMENTATION_STATUS.md>)
 - [Master todo kanban board](</C:/Users/james/Videos/deeds-web-app/docs/graph/kanban-board.json>)
 - [Master todo consolidation report](</C:/Users/james/Videos/deeds-web-app/memory/exports/master-todo-consolidation-report.json>)

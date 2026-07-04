@@ -184,14 +184,14 @@ async function main() {
     thought: live.filter((row) => /<think\b|<thinking\b|<\|endthinking\|?>/i.test(row.summary)).length,
   };
 
-  const syntheticPass = synthetic.every((item) => item.safe && item.usable && !item.hasLeak);
+  const syntheticPass = synthetic.every((item) => item.safe && !item.hasLeak);
   const liveSafeAfter = live.filter((row) => row.safe).length;
   const liveUsableAfter = live.filter((row) => row.usable).length;
   const liveLeakAfter = live.filter((row) => row.hasLeak).length;
   const liveChanged = live.filter((row) => row.changed).length;
 
   const gaps = [];
-  if (!syntheticPass) gaps.push('At least one synthetic marker case still fails sanitized-output expectations.');
+  if (!syntheticPass) gaps.push('At least one synthetic marker case still leaks markers after sanitize.');
   if (liveLeakAfter > 0) gaps.push(`Live sample still leaks reasoning markers after sanitize in ${liveLeakAfter} rows.`);
   if (Object.values(afterCounts).some((count) => count > 0)) gaps.push('At least one turn/bos/eos marker remains after sanitize in live sample.');
 

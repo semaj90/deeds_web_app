@@ -1,6 +1,6 @@
 # Bitfrost Semantic Cache Audit
 
-Generated: 2026-07-01T21:26:05.595Z
+Generated: 2026-07-04T00:58:25.706Z
 Status: PASS
 Redis Container: legal-ai-valkey
 
@@ -8,8 +8,8 @@ Redis Container: legal-ai-valkey
 
 - gpu:karpathy:scores: 0
 - gpu:karpathy:encoded: 0
-- bifrost keys: 1130
-- centroid keys: 1
+- bifrost keys: 12430
+- centroid keys: 8
 - som keys: 62
 
 ## Patterns
@@ -18,16 +18,16 @@ Redis Container: legal-ai-valkey
 |---|---:|---|---|
 | `gpu:karpathy:scores` | 0 | none | none |
 | `gpu:karpathy:encoded` | 0 | none | none |
-| `bifrost:*` | 1130 | bifrost:sem:feature:turbovec.lib-equator_macro, bifrost:sem:packet:packet:009e1a7df286, bifrost:sem:feature:simd-bridge.lstm_gpu, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files, bifrost:sem:packet:packet:0057df284547 | bifrost:sem:feature:turbovec.lib-equator_macro:16740, bifrost:sem:packet:packet:009e1a7df286:16217, bifrost:sem:feature:simd-bridge.lstm_gpu:16219, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files:16699, bifrost:sem:packet:packet:0057df284547:16123 |
-| `centroid:*` | 1 | centroid:0 | centroid:0:-1 |
-| `som:*` | 62 | som:14, som:60, som:27, som:96, som:46 | som:14:-1, som:60:-1, som:27:-1, som:96:-1, som:46:-1 |
-| `bifrost:sem:packet:*` | 614 | bifrost:sem:packet:packet:009e1a7df286, bifrost:sem:packet:packet:0057df284547, bifrost:sem:packet:packet:004719ec513f, bifrost:sem:packet:packet:02359269ec4c, bifrost:sem:packet:packet:021fa5c13fbd | bifrost:sem:packet:packet:009e1a7df286:16212, bifrost:sem:packet:packet:0057df284547:16119, bifrost:sem:packet:packet:004719ec513f:16092, bifrost:sem:packet:packet:02359269ec4c:16661, bifrost:sem:packet:packet:021fa5c13fbd:16628 |
-| `bifrost:sem:feature:*` | 516 | bifrost:sem:feature:turbovec.lib-equator_macro, bifrost:sem:feature:simd-bridge.lstm_gpu, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files, bifrost:sem:feature:docs.todO_pt2_5526, bifrost:sem:feature:get_proper_metadata_retrieval_packetreader_wired_up_test_615 | bifrost:sem:feature:turbovec.lib-equator_macro:16734, bifrost:sem:feature:simd-bridge.lstm_gpu:16213, bifrost:sem:feature:sveltekit-frontend.0010-mcp-tool-atlas-suggest-files-atlas-suggest-files:16693, bifrost:sem:feature:docs.todO_pt2_5526:16283, bifrost:sem:feature:get_proper_metadata_retrieval_packetreader_wired_up_test_615:16060 |
+| `bifrost:*` | 12430 | bifrost:packet:packet:7ea52133cd5c, bifrost:feature:vscode-extension.claudePlan, bifrost:packet:packet:a8bb7fcc6a81, bifrost:feature:.svelte-error-fixes-backup.StatsCard, bifrost:feature:docs.howtogetaround_gitignore_524_26 | bifrost:packet:packet:7ea52133cd5c:602663, bifrost:feature:vscode-extension.claudePlan:602664, bifrost:packet:packet:a8bb7fcc6a81:602663, bifrost:feature:.svelte-error-fixes-backup.StatsCard:602663, bifrost:feature:docs.howtogetaround_gitignore_524_26:602663 |
+| `centroid:*` | 8 | centroid:0, centroid:RetrievalAugmentedGeneration (RAG) / AI Infrastructure:Modular Service Layer, centroid:Retrieval and Inference System:Module Integration, centroid:Codebase Analysis:Basic Code Metrics, centroid:Retrieval-Augmented Generation (RAG) System:Modular Service Components | centroid:0:-1, centroid:RetrievalAugmentedGeneration (RAG) / AI Infrastructure:Modular Service Layer:441684, centroid:Retrieval and Inference System:Module Integration:440798, centroid:Codebase Analysis:Basic Code Metrics:423158, centroid:Retrieval-Augmented Generation (RAG) System:Modular Service Components:440433 |
+| `som:*` | 62 | som:7, som:33, som:81, som:0, som:30 | som:7:-1, som:33:-1, som:81:-1, som:0:-1, som:30:-1 |
+| `bifrost:sem:packet:*` | 26 | bifrost:sem:packet:packet:0003260092b1, bifrost:sem:packet:packet:000f10a13a57, bifrost:sem:packet:packet:0009951ee430, bifrost:sem:packet:packet:0004b466d863, bifrost:sem:packet:packet:0011712c94d1 | bifrost:sem:packet:packet:0003260092b1:66543, bifrost:sem:packet:packet:000f10a13a57:66561, bifrost:sem:packet:packet:0009951ee430:66553, bifrost:sem:packet:packet:0004b466d863:66548, bifrost:sem:packet:packet:0011712c94d1:66567 |
+| `bifrost:sem:feature:*` | 28 | bifrost:sem:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test, bifrost:sem:feature:sveltekit-frontend.embedded-summaries, bifrost:sem:feature:.svelte-error-fixes-backup.+layout, bifrost:sem:feature:.tmp.0056213574662f41, bifrost:sem:feature:sveltekit-frontend.tests__cases-sub-routes.spec | bifrost:sem:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test:66543, bifrost:sem:feature:sveltekit-frontend.embedded-summaries:423071, bifrost:sem:feature:.svelte-error-fixes-backup.+layout:66546, bifrost:sem:feature:.tmp.0056213574662f41:66551, bifrost:sem:feature:sveltekit-frontend.tests__cases-sub-routes.spec:66541 |
 | `bifrost:sem:intent:*` | 0 | none | none |
 | `reward:zset` | 0 | none | none |
-| `ace:context:*` | 26 | ace:context:packet:0011712c94d1, ace:context:packet:000db15dc8ef, ace:context:packet:000fde9311af, ace:context:packet:000f704e5207, ace:context:packet:0009a56456fc | ace:context:packet:0011712c94d1:3428, ace:context:packet:000db15dc8ef:3415, ace:context:packet:000fde9311af:3423, ace:context:packet:000f704e5207:3421, ace:context:packet:0009a56456fc:3410 |
-| `ace:summary:*` | 109 | ace:summary:packet:0011712c94d1, ace:summary:summary:f73d0fc78141b854, ace:summary:summary:d7544be729eb4686, ace:summary:summary:98c80633d64e86c4, ace:summary:summary:28c92795954008de | ace:summary:packet:0011712c94d1:3426, ace:summary:summary:f73d0fc78141b854:422680, ace:summary:summary:d7544be729eb4686:422682, ace:summary:summary:98c80633d64e86c4:421791, ace:summary:summary:28c92795954008de:421785 |
-| `ace:feature:*` | 25 | ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test, ace:feature:crates.libryu-555024bdb0a51304, ace:feature:.python311.bq300-8rv, ace:feature:llama-cpp-turboquant-gemma4.completion, ace:feature:sveltekit-frontend.llm_synthesis_mapping | ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test:3395, ace:feature:crates.libryu-555024bdb0a51304:3415, ace:feature:.python311.bq300-8rv:3418, ace:feature:llama-cpp-turboquant-gemma4.completion:3403, ace:feature:sveltekit-frontend.llm_synthesis_mapping:3389 |
+| `ace:context:*` | 1 | ace:context:docs/+server.ts:4c62f7025d50f175 | ace:context:docs/+server.ts:4c62f7025d50f175:170357 |
+| `ace:summary:*` | 84 | ace:summary:summary:d2681a65833461a1, ace:summary:summary:8bc7f1b3588ce909, ace:summary:summary:257fd374023543ec, ace:summary:summary:896f4cb249d009c8, ace:summary:summary:36a88ce7b865dbfe | ace:summary:summary:d2681a65833461a1:236228, ace:summary:summary:8bc7f1b3588ce909:237148, ace:summary:summary:257fd374023543ec:237135, ace:summary:summary:896f4cb249d009c8:236244, ace:summary:summary:36a88ce7b865dbfe:235647 |
+| `ace:feature:*` | 0 | none | none |
 | `ace:query:*` | 0 | none | none |
 | `ace:tree:*` | 0 | none | none |
 | `ace:authority:*` | 0 | none | none |

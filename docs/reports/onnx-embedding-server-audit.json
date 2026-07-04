@@ -1,37 +1,9 @@
 {
-  "generated_at": "2026-07-01T15:53:40.973Z",
+  "generated_at": "2026-07-04T00:38:30.735Z",
   "url": "http://127.0.0.1:8081",
-  "status": "PASS",
-  "health": {
-    "status": "ok",
-    "model": "embeddinggemma",
-    "dim": 768,
-    "backend": "onnx",
-    "providers_available": [
-      "AzureExecutionProvider",
-      "CPUExecutionProvider"
-    ],
-    "providers_active": [
-      "CPUExecutionProvider"
-    ],
-    "requests": 0
-  },
+  "status": "FAIL",
+  "health": null,
   "batch_size": 8,
-  "embedding_probe": {
-    "elapsed_ms": 57,
-    "vectors": 8,
-    "dimensions": [
-      768,
-      768,
-      768,
-      768,
-      768,
-      768,
-      768,
-      768
-    ],
-    "dimension_ok": true,
-    "ms_per_text": 7.1
-  },
-  "error": null
+  "embedding_probe": null,
+  "error": "fetch failed"
 }

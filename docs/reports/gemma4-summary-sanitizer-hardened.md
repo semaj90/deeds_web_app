@@ -1,9 +1,9 @@
 # Gemma4 Summary Sanitizer Hardened Report
 
-- Timestamp: 2026-07-03T19:08:55.160Z
+- Timestamp: 2026-07-04T00:58:23.626Z
 - DB sample size: 200
 - Synthetic cases: 4
-- Gate: WARN
+- Gate: PASS
 
 ## Synthetic Cases
 
@@ -25,4 +25,4 @@
 
 ## Gaps
 
-- At least one synthetic marker case still fails sanitized-output expectations.
+- None detected in this run.

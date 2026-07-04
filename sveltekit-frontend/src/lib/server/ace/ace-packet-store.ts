@@ -20,6 +20,7 @@
 
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import crypto from 'crypto';
+import { z } from 'zod';
 
 export interface AceFullPacket {
   packet_id: string;
@@ -33,6 +34,21 @@ export interface AceFullPacket {
   lane_ids: string[];
   cluster_id: string | null;       // SOM cluster "row:col"
   workspace_task_id: string | null;
+  used_concepts?: string[];
+  lexical_nouns?: string[];
+  lexical_verbs?: string[];
+  lexical_adverbs_ly?: string[];
+  adjacency_packet_keys?: string[];
+  adjacency_feature_ids?: string[];
+  adjacency_source_refs?: string[];
+  packed_arrays?: {
+    packet_keys: string[];
+    feature_ids: string[];
+    source_refs: string[];
+    title_ids: string[];
+  };
+  columnar_tables?: string[];
+  mmap_vector_refs?: string[];
   // Retrieval evidence
   qdrant_point_ids: (string | number)[];
   neo4j_neighbor_ids: string[];
@@ -58,6 +74,59 @@ export interface AceFullPacket {
   created_at: string;
   ttl_seconds: number;
 }
+
+const AceFullPacketSchema = z.object({
+  packet_id: z.string().min(1),
+  packet_ulid: z.string().min(1).nullable(),
+  title_id: z.string().min(1).nullable(),
+  query: z.string().min(1),
+  query_hash: z.string().min(1),
+  source_refs: z.array(z.string().min(1)).min(1),
+  feature_ids: z.array(z.string().min(1)),
+  lane_ids: z.array(z.string().min(1)),
+  cluster_id: z.string().regex(/^\d+:\d+$/).nullable(),
+  workspace_task_id: z.string().min(1).nullable(),
+  used_concepts: z.array(z.string().min(1)).default([]),
+  lexical_nouns: z.array(z.string().min(1)).default([]),
+  lexical_verbs: z.array(z.string().min(1)).default([]),
+  lexical_adverbs_ly: z.array(z.string().min(1)).default([]),
+  adjacency_packet_keys: z.array(z.string().min(1)).default([]),
+  adjacency_feature_ids: z.array(z.string().min(1)).default([]),
+  adjacency_source_refs: z.array(z.string().min(1)).default([]),
+  packed_arrays: z.object({
+    packet_keys: z.array(z.string().min(1)).default([]),
+    feature_ids: z.array(z.string().min(1)).default([]),
+    source_refs: z.array(z.string().min(1)).default([]),
+    title_ids: z.array(z.string().min(1)).default([]),
+  }).default({
+    packet_keys: [],
+    feature_ids: [],
+    source_refs: [],
+    title_ids: [],
+  }),
+  columnar_tables: z.array(z.string().min(1)).default([]),
+  mmap_vector_refs: z.array(z.string().min(1)).default([]),
+  qdrant_point_ids: z.array(z.union([z.string(), z.number()])),
+  neo4j_neighbor_ids: z.array(z.string().min(1)),
+  redis_hot_keys: z.array(z.string().min(1)),
+  som_cluster: z.string().nullable(),
+  engram_ids: z.array(z.string().min(1)),
+  kag_hits: z.number().int().nonnegative(),
+  dag_hits: z.number().int().nonnegative(),
+  nes_chrom_packet_keys: z.array(z.string().min(1)),
+  prompt_context: z.string(),
+  ranked_cards: z.array(z.object({
+    source_ref: z.string().min(1),
+    score: z.number(),
+    feature_id: z.string().nullable(),
+    snippet: z.string(),
+  })),
+  cache_hit: z.enum(['redis', 'bifrost', 'qdrant', 'none']),
+  latency_ms: z.number().nonnegative(),
+  degraded: z.boolean(),
+  created_at: z.string().datetime(),
+  ttl_seconds: z.number().int().positive(),
+});
 
 const DEFAULT_TTL = 604_800;   // 7d
 const CLUSTER_TTL = 604_800;   // 7d for cluster-scoped packets
@@ -95,6 +164,7 @@ export async function writeAcePacket(
     created_at: new Date().toISOString(),
     ttl_seconds: ttl,
   };
+  AceFullPacketSchema.parse(full);
 
   const pipeline = redis.pipeline();
 
@@ -219,15 +289,15 @@ export interface AcePacketValidation {
 }
 
 export function validateAcePacket(p: Partial<AceFullPacket>): AcePacketValidation {
-  const errors: string[] = [];
-  if (!p.query?.trim()) errors.push('query is required');
-  if (p.packet_ulid !== undefined && p.packet_ulid !== null && !String(p.packet_ulid).trim()) errors.push('packet_ulid cannot be blank');
-  if (p.title_id !== undefined && p.title_id !== null && !String(p.title_id).trim()) errors.push('title_id cannot be blank');
-  if (!Array.isArray(p.source_refs) || p.source_refs.length === 0) errors.push('source_refs must be non-empty array');
-  if (!Array.isArray(p.feature_ids)) errors.push('feature_ids must be array');
-  if (!Array.isArray(p.lane_ids)) errors.push('lane_ids must be array');
-  if (!Array.isArray(p.qdrant_point_ids)) errors.push('qdrant_point_ids must be array');
-  if (p.cluster_id && !/^\d+:\d+$/.test(p.cluster_id)) errors.push('cluster_id must be "row:col" format');
-  if (typeof p.prompt_context !== 'string') errors.push('prompt_context must be string');
-  return { valid: errors.length === 0, errors };
+  const result = AceFullPacketSchema.safeParse(p);
+  if (result.success) {
+    return { valid: true, errors: [] };
+  }
+  return {
+    valid: false,
+    errors: result.error.issues.map((issue) => {
+      const path = issue.path.length ? `${issue.path.join('.')}: ` : '';
+      return `${path}${issue.message}`;
+    }),
+  };
 }

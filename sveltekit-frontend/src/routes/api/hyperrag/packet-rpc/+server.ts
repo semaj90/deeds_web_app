@@ -77,6 +77,10 @@ import { HyperRagReplayTrace } from '$lib/server/hyperrag/replay-trace.js';
 import { getRedis } from '$lib/server/redis.js';
 import { startRun, recordEvent, finishRun } from '$lib/server/trace/trace-collector.js';
 import { recordRetrievalTelemetry } from '$lib/server/telemetry/retrieval-recorder.js';
+import {
+	validatePacketBatch,
+	type PacketTopologyEnvelope,
+} from '$lib/server/hyperrag/packet-topology-envelope.js';
 import crypto from 'crypto';
 
 function hashQuery(query: string): string {
@@ -397,6 +401,26 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		).length;
 		const rrfFinalHits = operatorPackets.length;
 
+		// Validate all packets against canonical envelope schema
+		const packetValidation = validatePacketBatch(operatorPackets as unknown[]);
+		if (packetValidation.invalid.length > 0) {
+			console.warn(
+				`[hyperrag-packet-rpc] ${packetValidation.invalid.length} packets failed canonical validation`,
+				packetValidation.invalid.slice(0, 3), // Log first 3 failures
+			);
+			// Log validation errors to trace for debugging
+			trace.recordEvent('validation_warning', {
+				component: 'packet_envelope',
+				invalid_count: packetValidation.invalid.length,
+				first_errors: packetValidation.invalid.slice(0, 3).map(x => x.error),
+			});
+		}
+
+		// Use validated packets (or fallback to original if all failed to validate)
+		const validatedPackets = packetValidation.valid.length > 0
+			? packetValidation.valid
+			: operatorPackets;
+
 		const responsePayload = {
 			ok: true,
 			query: result.query,
@@ -415,8 +439,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			},
 			degraded: {
 				turbovec: turbovecHits === 0,
+				packet_validation: packetValidation.invalid.length > 0,
 			},
-			packets: operatorPackets,
+			packets: validatedPackets,
 			provenance: provenances,
 			trace: {
 				query_hash: hashQuery(query),

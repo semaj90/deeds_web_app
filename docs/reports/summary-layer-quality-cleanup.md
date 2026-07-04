@@ -1,40 +1,40 @@
 # Summary Layer Quality Cleanup
 
-- generated_at: 2026-06-30T19:30:57.196Z
-- mode: apply
+- generated_at: 2026-07-04T00:58:24.915Z
+- mode: dry-run
 - status: PASS
-- selected_rows: 11
+- selected_rows: 0
 - packet_summaries_invalidated: 0
 - cleaned_reasoning_leaks: 0
-- marked_duplicate_superseded: 7
-- marked_requires_regeneration: 4
+- marked_duplicate_superseded: 0
+- marked_requires_regeneration: 0
 
 ## Before
 
 - atlas_summary_layers:
-  - total_rows: 9823
-  - summary_text_rows: 1141
-  - embedded_rows: 1138
-  - leaked_rows: 11
-  - distinct_packet_keys: 5780
-  - duplicate_rows: 4043
+  - total_rows: 12004
+  - summary_text_rows: 1221
+  - embedded_rows: 1193
+  - leaked_rows: 0
+  - distinct_packet_keys: 7919
+  - duplicate_rows: 4085
 - atlas_packets:
   - total_rows: 58304
-  - summary_text_rows: 357
+  - summary_text_rows: 422
   - leaked_rows: 0
 
 ## After
 
 - atlas_summary_layers:
-  - total_rows: 9823
-  - summary_text_rows: 1130
-  - embedded_rows: 1130
+  - total_rows: 12004
+  - summary_text_rows: 1221
+  - embedded_rows: 1193
   - leaked_rows: 0
-  - distinct_packet_keys: 5780
-  - duplicate_rows: 4043
+  - distinct_packet_keys: 7919
+  - duplicate_rows: 4085
 - atlas_packets:
   - total_rows: 58304
-  - summary_text_rows: 357
+  - summary_text_rows: 422
   - leaked_rows: 0
 
 ## Notes

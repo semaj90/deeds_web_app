@@ -332,11 +332,11 @@ function buildSummaryPrompt(
 // ============================================================================
 
 async function writeSummaryToPostgres(
-  chunkId: string,
-  summary: string,
-  packetId?: string | null,
-  packetKey?: string | null,
-): Promise<boolean> {
+    chunkId: string,
+    summary: string,
+    packetId?: string | null,
+    packetKey?: string | null,
+  ): Promise<boolean> {
   if (DRY_RUN) {
     return true;
   }
@@ -344,23 +344,32 @@ async function writeSummaryToPostgres(
   try {
     // **CRITICAL**: Write summary to canonical truth (Postgres)
     const packetIdText = String(packetId ?? '').trim();
+    const packetKeyText = String(packetKey ?? '').trim();
     const result = await pgPool.query(
       `UPDATE codebase_chunk_index
-       SET summary = $1,
-           packet_key = COALESCE($4::text, packet_key),
-           metadata = CASE
-             WHEN $3::text IS NULL OR btrim($3::text) = '' THEN metadata
-             ELSE jsonb_set(
-               COALESCE(metadata, '{}'::jsonb),
-               '{packet_id}',
-               to_jsonb($3::text),
-               true
-             )
-           END,
-           updated_at = NOW()
-       WHERE id = $2
-         AND (summary IS NULL OR btrim(summary) = '')`,
-      [summary, chunkId, packetIdText || null, String(packetKey ?? '').trim() || null]
+         SET summary = $1,
+            metadata = CASE
+              WHEN ($3::text IS NULL OR btrim($3::text) = '')
+                AND ($4::text IS NULL OR btrim($4::text) = '') THEN metadata
+              ELSE jsonb_set(
+                CASE
+                  WHEN $3::text IS NULL OR btrim($3::text) = '' THEN COALESCE(metadata, '{}'::jsonb)
+                  ELSE jsonb_set(
+                    COALESCE(metadata, '{}'::jsonb),
+                    '{packet_id}',
+                    to_jsonb($3::text),
+                    true
+                  )
+                END,
+                '{packet_key}',
+                to_jsonb($4::text),
+                true
+              )
+            END,
+            updated_at = NOW()
+         WHERE id = $2
+           AND (summary IS NULL OR btrim(summary) = '')`,
+      [summary, chunkId, packetIdText || null, packetKeyText || null]
     );
 
     if (result.rowCount !== 1) {

@@ -52,7 +52,7 @@ const workerId = process.argv.find(a => a.startsWith('--id='))?.split('=')[1] ||
 const chunkBatchSize = parseInt(process.argv.find(a => a.startsWith('--chunk-batch-size='))?.split('=')[1] || '1000');
 const queueBatchSize = parseInt(process.argv.find(a => a.startsWith('--queue-batch-size='))?.split('=')[1] || '32');
 
-const QUEUE_NAME = process.env.PHASE7_SUMMARY_QUEUE || `phase7.summarization.batch${queueBatchSize}`;
+const QUEUE_NAME = process.env.PHASE7_SUMMARY_QUEUE || 'phase7.summarization';
 const DLQ_NAME = `${QUEUE_NAME}.dlq`;
 const MAX_RETRIES = parseInt(process.env.PHASE7_MAX_RETRIES || '3');
 

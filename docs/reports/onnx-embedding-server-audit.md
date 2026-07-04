@@ -1,16 +1,16 @@
 # ONNX Embedding Server Audit
 
-- generated_at: 2026-07-01T15:53:40.973Z
+- generated_at: 2026-07-04T00:38:30.735Z
 - url: http://127.0.0.1:8081
-- status: PASS
-- backend: onnx
-- dim: 768
-- providers_available: AzureExecutionProvider, CPUExecutionProvider
-- providers_active: CPUExecutionProvider
+- status: FAIL
+- backend: unknown
+- dim: unknown
+- providers_available: unknown
+- providers_active: unknown
 - batch_size: 8
-- elapsed_ms: 57
-- vectors: 8
-- dimension_ok: true
+- elapsed_ms: n/a
+- vectors: 0
+- dimension_ok: false
 
 ## Routing
 

@@ -277,6 +277,7 @@ function rankRows(rows) {
         summary: cleanText(row.summary ?? row.summary_text),
         keywords: Array.isArray(row.keywords) ? row.keywords.filter(Boolean) : [],
         entities: Array.isArray(row.entities) ? row.entities.filter(Boolean) : [],
+        used_concepts: Array.isArray(row.used_concepts) ? row.used_concepts.filter(Boolean) : [],
         pagerank: row.pagerank === null || row.pagerank === undefined ? null : Number(row.pagerank),
         som_cluster: row.som_cluster === null || row.som_cluster === undefined ? null : row.som_cluster,
         community_id: row.community_id === null || row.community_id === undefined ? null : row.community_id,
@@ -300,6 +301,24 @@ function rankRows(rows) {
 }
 
 async function loadSummaries(pool, limit) {
+  const hasUsedConcepts = await pool.query(`
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_name = 'atlas_feature_envelopes'
+        AND column_name = 'used_concepts'
+    ) AS exists
+  `);
+
+  const includeUsedConcepts = Boolean(hasUsedConcepts.rows[0]?.exists);
+  const usedConceptsSelect = includeUsedConcepts
+    ? `COALESCE(fe.used_concepts, '[]'::jsonb) AS used_concepts,`
+    : `'[]'::jsonb AS used_concepts,`;
+  const usedConceptsJoin = includeUsedConcepts
+    ? `LEFT JOIN atlas_feature_envelopes fe
+        ON fe.packet_key = ap.packet_key`
+    : '';
+
   const { rows } = await pool.query(
     `
       SELECT
@@ -320,6 +339,7 @@ async function loadSummaries(pool, limit) {
         asl.summary_text,
         COALESCE(asl.keywords, ARRAY[]::text[]) AS keywords,
         COALESCE(asl.entities, ARRAY[]::text[]) AS entities,
+        ${usedConceptsSelect}
         asl.model_name,
         asl.generated_at,
         asl.updated_at,
@@ -327,6 +347,7 @@ async function loadSummaries(pool, limit) {
       FROM atlas_summary_layers asl
       LEFT JOIN atlas_packets ap
         ON ap.packet_key = asl.packet_key
+      ${usedConceptsJoin}
       WHERE COALESCE(NULLIF(asl.summary_text, ''), NULLIF(asl.summary, '')) IS NOT NULL
       ORDER BY COALESCE(ap.pagerank, 0) DESC, asl.updated_at DESC NULLS LAST, ap.packet_key
       LIMIT $1
@@ -362,6 +383,7 @@ function buildReport(ranked, redisResult) {
     acc.with_feature_id += Boolean(row.feature_id) ? 1 : 0;
     acc.with_packet_key += Boolean(row.packet_key) ? 1 : 0;
     acc.with_source_ref += Boolean(row.source_ref) ? 1 : 0;
+    acc.with_used_concepts += Array.isArray(row.used_concepts) && row.used_concepts.length > 0 ? 1 : 0;
     return acc;
   }, {
     ready: 0,
@@ -373,6 +395,7 @@ function buildReport(ranked, redisResult) {
     with_feature_id: 0,
     with_packet_key: 0,
     with_source_ref: 0,
+    with_used_concepts: 0,
   });
 
   return {
@@ -391,6 +414,7 @@ function buildReport(ranked, redisResult) {
       with_feature_id: stats.with_feature_id,
       with_packet_key: stats.with_packet_key,
       with_source_ref: stats.with_source_ref,
+      with_used_concepts: stats.with_used_concepts,
     },
     top: ranked.slice(0, Math.min(TOP_K, ranked.length)),
     bottom: ranked.slice(Math.max(0, ranked.length - 20)),
@@ -446,7 +470,7 @@ async function main() {
         mode: APPLY ? 'apply' : 'dry-run',
         source_of_truth: 'postgres.atlas_summary_layers + atlas_packets',
         redis_index: { applied: false, key: REDIS_INDEX_KEY, count: 0 },
-        stats: { total: 0, ready: 0, near_ready: 0, partial: 0, blocked: 0, avg_score: 0 },
+        stats: { total: 0, ready: 0, near_ready: 0, partial: 0, blocked: 0, avg_score: 0, with_used_concepts: 0 },
         top: [],
         bottom: [],
       };
@@ -507,6 +531,7 @@ async function main() {
           community_id: row.community_id,
           keywords: row.keywords,
           entities: row.entities,
+          used_concepts: row.used_concepts,
           reasons: row.reasons,
         }))
         .join('\n') + '\n',

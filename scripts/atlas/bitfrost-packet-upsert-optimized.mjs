@@ -4,9 +4,13 @@
  * BitFrost Packet Upsert Optimizer
  * Organizes 57K+ packets into Redis with hierarchical key structure
  *
+ * Identity Contract:
+ * - packet_key = cross-system semantic identity (join key for Qdrant/Neo4j/Redis/ACP)
+ * - packet_id = Postgres row UUID (internal only, never external reference)
+ *
  * Strategy:
  * - Batch inserts by feature_id (1000 packets/batch)
- * - Create 4-tier key hierarchy:
+ * - Create 4-tier key hierarchy (all using packet_key as join):
  *   L1: bifrost:packet:{packet_key} → full envelope (exact-match)
  *   L2: bifrost:feature:{feature_id} → set of packet_keys
  *   L3: bifrost:directory:{dir_hash} → set of packet_keys
@@ -75,6 +79,7 @@ function getDirectoryHash(dirPath) {
 
 /**
  * Create upsert pipeline for a single packet batch
+ * Packets now contain the canonical Phase 8 envelope from langextract-canonical-pipeline
  */
 function createUpsertPipeline(packets, pipeline) {
   const featureGroups = {};
@@ -86,6 +91,13 @@ function createUpsertPipeline(packets, pipeline) {
       source_ref,
       feature_id,
       directory_path,
+      som_row,
+      som_col,
+      community_id,
+      lexical_nouns,
+      lexical_verbs,
+      lexical_adverbs_ly,
+      routing_hints,
       summary,
       confidence,
       updated_at,
@@ -97,12 +109,19 @@ function createUpsertPipeline(packets, pipeline) {
       continue;
     }
 
-    // L1: Exact-match envelope
+    // L1: Canonical Phase 8 envelope (10-field contract + routing hints)
     const envelope = JSON.stringify({
       packet_key,
       source_ref,
       feature_id,
       directory_path,
+      som_row,
+      som_col,
+      community_id,
+      lexical_nouns: lexical_nouns || [],
+      lexical_verbs: lexical_verbs || [],
+      lexical_adverbs_ly: lexical_adverbs_ly || [],
+      routing_hints: routing_hints || {},
       summary,
       confidence: confidence || 0.95,
       updated_at: updated_at || new Date().toISOString(),

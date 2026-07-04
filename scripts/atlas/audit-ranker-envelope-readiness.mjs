@@ -148,7 +148,7 @@ const lanes = {
     content_ref_pct: pct(contentReady.filter(Boolean).length, total),
   },
   summary_test10: {
-    status: summaryReport?.mode === 'dry-run' && Number(summaryReport?.failed ?? 1) === 0 ? 'LIVE_PASS' : 'FAIL',
+    status: Number(summaryReport?.failed ?? 1) === 0 ? 'LIVE_PASS' : 'FAIL',
     source: path.relative(REPO_ROOT, SUMMARY_REPORT).replace(/\\/g, '/'),
     mode: summaryReport?.mode ?? null,
     rows_queued: summaryReport?.rows_queued ?? null,

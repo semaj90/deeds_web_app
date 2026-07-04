@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-01T22:21:30.187Z",
+  "generated_at": "2026-07-04T00:59:10.782Z",
   "status": "WARN",
   "rule": "Summary apply is allowed only when active ranker identity, score, provenance, and summary-context envelope are not FAIL.",
   "candidates_file": ".tmp/turbovec-candidates.ndjson",
@@ -42,11 +42,11 @@
     "summary_test10": {
       "status": "LIVE_PASS",
       "source": ".tmp/gemma4-parent-atlas-summary-cache-report.json",
-      "mode": "dry-run",
+      "mode": "apply",
       "rows_queued": 10,
       "failed": 0,
-      "wouldCallLlama": 10,
-      "llamaCalls": 0
+      "wouldCallLlama": 0,
+      "llamaCalls": 10
     },
     "ontology_kag_readiness": {
       "status": "WARN",

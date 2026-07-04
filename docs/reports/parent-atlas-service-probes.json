@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T23:31:09.664Z",
+  "generated_at": "2026-07-04T00:59:20.562Z",
   "status": "PASS_WITH_WARNINGS",
   "summary": {
     "livePass": 9,
@@ -33,7 +33,8 @@
                 ""
               ],
               "capabilities": [
-                "completion"
+                "completion",
+                "multimodal"
               ],
               "parameters": "",
               "details": {
@@ -55,7 +56,7 @@
               "aliases": [],
               "tags": [],
               "object": "model",
-              "created": 1783035068,
+              "created": 1783126758,
               "owned_by": "llamacpp",
               "meta": {
                 "vocab_type": 2,
@@ -77,7 +78,7 @@
       "transport": "http",
       "status": "FALLBACK_PASS",
       "fallback_used": true,
-      "duration_ms": 6,
+      "duration_ms": 7,
       "error": "LangExtract unavailable; inline Gemma4 fallback available (fetch failed)",
       "details": {
         "fallback_url": "http://127.0.0.1:8090"
@@ -99,16 +100,16 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 14,
+      "duration_ms": 1904,
       "details": {
         "http_status": 200,
         "body": {
-          "embeddingServiceUp": true,
+          "embeddingServiceUp": false,
           "pgvectorConnected": true,
           "qdrantConnected": true,
           "redisConnected": true,
           "status": "healthy",
-          "timestamp": 1783035068919
+          "timestamp": 1783126758409
         }
       }
     },
@@ -119,7 +120,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 7,
+      "duration_ms": 5,
       "details": {
         "http_status": 200,
         "body": {
@@ -154,7 +155,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 24,
+      "duration_ms": 15,
       "details": {
         "http_status": 200,
         "body": {
@@ -265,7 +266,7 @@
             ]
           },
           "status": "ok",
-          "time": 0.000764348
+          "time": 0.000528224
         }
       }
     },
@@ -276,7 +277,7 @@
       "transport": "postgres",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 43
+      "duration_ms": 44
     },
     {
       "service_name": "seaweedfs",
@@ -285,10 +286,10 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 5,
+      "duration_ms": 7,
       "details": {
         "http_status": 403,
-        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BE9CF2C6579B567B003187</RequestId></Error>"
+        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BEF0575607CC7BD8CCACA1</RequestId></Error>"
       }
     },
     {
@@ -298,7 +299,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 476,
+      "duration_ms": 15,
       "details": {
         "http_status": 200,
         "body": {
@@ -318,7 +319,7 @@
       "transport": "redis",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 164
+      "duration_ms": 151
     }
   ],
   "legacy_warnings": [

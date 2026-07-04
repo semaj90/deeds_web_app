@@ -24,8 +24,10 @@ const pool = new Pool({ connectionString: DATABASE_URL });
 const SQL = [
   `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS page_rank_score real DEFAULT NULL;`,
   `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS kmeans_cluster_id integer DEFAULT NULL;`,
+  `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS community_id integer DEFAULT NULL;`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_page_rank_score ON atlas_packets(page_rank_score DESC NULLS LAST);`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_kmeans_cluster_id ON atlas_packets(kmeans_cluster_id);`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_community_id ON atlas_packets(community_id);`,
 ];
 
 console.log('╔════════════════════════════════════════════════════════════════╗');

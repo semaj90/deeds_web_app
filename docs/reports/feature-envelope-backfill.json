@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-29T05:04:48.278Z",
+  "generated_at": "2026-07-04T01:40:10.729Z",
   "apply": true,
-  "limit": 500,
-  "rows_read": 336,
-  "rows_with_core_identity": 336,
-  "updated_packets": 336,
-  "updated_summary_layers": 336,
+  "limit": 40000,
+  "rows_read": 12004,
+  "rows_with_core_identity": 12004,
+  "updated_packets": 12004,
+  "updated_summary_layers": 31140,
   "ndjson": ".tmp/feature-envelopes.ndjson",
   "status": "PASS",
   "notes": [

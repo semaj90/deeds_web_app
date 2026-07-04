@@ -16,11 +16,13 @@ import { z } from 'zod';
 // ── Core Identity (immutable) ────────────────────────────────────────────
 
 export const PacketIdentitySchema = z.object({
+  packet_id: z.string().uuid().optional().describe('Canonical packet UUID when present'),
   packet_key: z.string().min(1).describe('Stable deterministic key (e.g., "ace:chunk:auth:001")'),
   source_ref: z.string().min(1).describe('Canonical source path (e.g., "src/lib/server/auth.ts")'),
   source_id: z.string().uuid().describe('UUID, unique within source_ref'),
   feature_id: z.string().min(1).describe('Feature category (e.g., "auth.sessions")'),
   feature_label: z.string().min(1).describe('Human-readable feature label'),
+  title_id: z.string().min(1).optional().describe('Derived semantic grouping key from summary meaning'),
 });
 
 // ── Source Location (deterministic) ──────────────────────────────────────
@@ -71,7 +73,47 @@ export const TopologySchema = z.object({
   som_bmu_row: z.number().int().min(0).max(19).describe('SOM row coordinate'),
   som_bmu_col: z.number().int().min(0).max(19).describe('SOM column coordinate'),
   kmeans_cluster: z.number().int().min(0).describe('K-means cluster assignment'),
+  community_id: z.union([z.string(), z.number()]).optional().describe('Community detection label for graph fan-out'),
+  som_row: z.number().int().min(0).max(19).optional().describe('SOM row alias for runtime fan-out'),
+  som_col: z.number().int().min(0).max(19).optional().describe('SOM column alias for runtime fan-out'),
+  latent_64: z.array(z.number()).length(64).optional().describe('64-d latent vector for topology projection'),
+  manifold_4d: z.object({
+    x: z.number(),
+    y: z.number(),
+    z: z.number(),
+    w: z.number(),
+  }).optional().describe('4D manifold coordinates for routing and ranking'),
   ontology_tags: z.array(z.string()).default([]).describe('Domain/semantic tags'),
+});
+
+// ── Semantic Labels & Fan-out ────────────────────────────────────────────
+
+export const SemanticLabelSchema = z.object({
+  used_concepts: z.array(z.string().min(1)).default([]).describe('Canonical semantic concepts derived from summary, AST, and lexical labels'),
+  lexical_nouns: z.array(z.string().min(1)).default([]).describe('Lexical noun phrases'),
+  lexical_verbs: z.array(z.string().min(1)).default([]).describe('Lexical verbs'),
+  lexical_adverbs_ly: z.array(z.string().min(1)).default([]).describe('Lexical adverbs ending in -ly'),
+  relationship_hints: z.array(z.string().min(1)).default([]).describe('Graph relation hints for Neo4j / ACL fan-out'),
+  routing_hints: z.array(z.string().min(1)).default([]).describe('Cache and retrieval routing hints'),
+});
+
+export const FanoutLayoutSchema = z.object({
+  adjacency_packet_keys: z.array(z.string().min(1)).default([]).describe('Neighbor packet keys for graph expansion'),
+  adjacency_feature_ids: z.array(z.string().min(1)).default([]).describe('Neighbor feature IDs for grouped fan-out'),
+  adjacency_source_refs: z.array(z.string().min(1)).default([]).describe('Neighbor source refs for locality-aware expansion'),
+  packed_arrays: z.object({
+    packet_keys: z.array(z.string().min(1)).default([]),
+    feature_ids: z.array(z.string().min(1)).default([]),
+    source_refs: z.array(z.string().min(1)).default([]),
+    title_ids: z.array(z.string().min(1)).default([]),
+  }).default({
+    packet_keys: [],
+    feature_ids: [],
+    source_refs: [],
+    title_ids: [],
+  }).describe('Columnar packed arrays for batch joins and mmap-style fan-out'),
+  columnar_tables: z.array(z.string().min(1)).default([]).describe('Columnar table names participating in fan-out'),
+  mmap_vector_refs: z.array(z.string().min(1)).default([]).describe('Read-only vector references suitable for mmap-backed loading'),
 });
 
 // ── Validation & Metadata (bookkeeping) ──────────────────────────────────
@@ -113,6 +155,10 @@ export const CanonicalPacketSchema = z.object({
   // Topology
   ...TopologySchema.shape,
 
+  // Phase 8 semantic labels & fan-out
+  ...SemanticLabelSchema.shape,
+  ...FanoutLayoutSchema.shape,
+
   // Validation
   ...ValidationSchema.shape,
 
@@ -140,7 +186,10 @@ export type CanonicalPacket = z.infer<typeof CanonicalPacketSchema>;
 
 export const PacketAfterLayer1Schema = PacketIdentitySchema.merge(SourceLocationSchema).merge(ExtractionPayloadSchema).merge(ValidationSchema);
 export const PacketAfterLayer2Schema = PacketAfterLayer1Schema.merge(EmbeddingSchema).merge(TopologySchema);
-export const PacketAfterLayer3Schema = PacketAfterLayer2Schema.merge(SummarySchema);
+export const PacketAfterLayer3Schema = PacketAfterLayer2Schema
+  .merge(SummarySchema)
+  .merge(SemanticLabelSchema)
+  .merge(FanoutLayoutSchema);
 
 export type PacketAfterLayer1 = z.infer<typeof PacketAfterLayer1Schema>;
 export type PacketAfterLayer2 = z.infer<typeof PacketAfterLayer2Schema>;
@@ -206,6 +255,10 @@ export const PACKET_EXAMPLE_LAYER_2: PacketAfterLayer2 = {
   som_bmu_row: 2,
   som_bmu_col: 1,
   kmeans_cluster: 7,
+  community_id: 4,
+  som_row: 2,
+  som_col: 1,
+  latent_64: new Array(64).fill(0),
   ontology_tags: ['auth', 'session', 'validation'],
   indexed_at: new Date().toISOString(),
 };
@@ -213,6 +266,23 @@ export const PACKET_EXAMPLE_LAYER_2: PacketAfterLayer2 = {
 export const PACKET_EXAMPLE_LAYER_3: PacketAfterLayer3 = {
   ...PACKET_EXAMPLE_LAYER_2,
   summary_text: 'Authentication session validation follows Lucia convention: session created via createSession(user), validated server-side in middleware, stored in Postgres via sql client. Depends on db/client for connection pool.',
-  summary_model: 'gemma4-rotorquant:latest',
+  summary_model: 'gemma4-legal-iq4xs-direct.gguf',
   summary_generated_at: new Date().toISOString(),
+  used_concepts: ['authentication', 'session', 'validation', 'lucia', 'postgres'],
+  lexical_nouns: ['session', 'middleware', 'client', 'connection', 'pool'],
+  lexical_verbs: ['create', 'validate', 'store'],
+  lexical_adverbs_ly: ['server-side'],
+  relationship_hints: ['CALLS', 'DEPENDS_ON', 'VALIDATES'],
+  routing_hints: ['retrieval', 'fanout', 'neo4j', 'bitfrost'],
+  adjacency_packet_keys: ['ace:chunk:auth:001'],
+  adjacency_feature_ids: ['auth.sessions'],
+  adjacency_source_refs: ['src/lib/server/auth.ts'],
+  packed_arrays: {
+    packet_keys: ['ace:chunk:auth:001'],
+    feature_ids: ['auth.sessions'],
+    source_refs: ['src/lib/server/auth.ts'],
+    title_ids: ['auth.session.validation'],
+  },
+  columnar_tables: ['atlas_packets', 'atlas_feature_envelopes'],
+  mmap_vector_refs: ['codebase_chunks_768:auth.sessions:001'],
 };

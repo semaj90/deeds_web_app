@@ -195,6 +195,7 @@ export * from './schema/retrieval-eval-times.js';
 export * from './schema/kanban-tasks.js';
 export * from './schema/agent-traces.js';
 export * from './schema/atlas-packets.js';
+export * from './schema/packet-binary-registry.js';
 export * from './schema/repo-function-registry.js';
 export * from './schema/atlas-contract-fields.js';
 export * from './schema/retrieval-provenance.js';

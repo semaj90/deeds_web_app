@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-01T04:45:52.667Z",
-  "verdict": "PASS",
-  "apply": true,
+  "generated_at": "2026-07-04T00:59:11.378Z",
+  "verdict": "PASS_WITH_WARNINGS",
+  "apply": false,
   "sample": {
     "jsonrpc": "2.0",
     "id": "acp-audit-request",
@@ -283,13 +283,13 @@
       {
         "name": "cache.invalidate",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "document.embed",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
@@ -301,55 +301,55 @@
       {
         "name": "evidence.process",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "vector.index",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "chat.context",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "analytics.track",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "codebase.index",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "ace.evaluate",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "error.embed",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "synthesis.generate",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "knowledge.backfill",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
@@ -361,55 +361,55 @@
       {
         "name": "glyph.tile.rebuild",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "qlora.distill",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "media.download",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "media.transcribe",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "cards.refresh",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "repair.workflow.run",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "inference.log.flush",
         "messages": 0,
-        "consumers": 3,
+        "consumers": 0,
         "status": "READY"
       }
     ],
-    "output": "[{\"name\":\"cache.invalidate\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"document.embed\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"chat.document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"evidence.process\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"vector.index\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"chat.context\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"analytics.track\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"codebase.index\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"ace.evaluate\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"error.embed\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"synthesis.generate\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"knowledge.backfill\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"audio.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"glyph.tile.rebuild\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"qlora.distill\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"media.download\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"media.transcribe\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"cards.refresh\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"repair.workflow.run\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"},{\"name\":\"inference.log.flush\",\"messages\":0,\"consumers\":3,\"status\":\"READY\"}]",
+    "output": "[{\"name\":\"cache.invalidate\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"chat.document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"evidence.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"vector.index\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"chat.context\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"analytics.track\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"codebase.index\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"ace.evaluate\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"error.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"synthesis.generate\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"knowledge.backfill\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"audio.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"glyph.tile.rebuild\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"qlora.distill\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"media.download\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"media.transcribe\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"cards.refresh\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"repair.workflow.run\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"inference.log.flush\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"}]",
     "status": "READY_WITH_QUEUES"
   },
   "nats": {
     "command": "cd C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend && npm run nats:proof-of-life:all --silent",
-    "ok": true,
+    "ok": false,
     "connected": true,
-    "status": "PASS",
-    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ✅ PASS (5ms)\n   Message: Task executed: agent.task.execute\n\n📤 Testing retrieval.turbovec.rerank...\n   ✅ PASS (3ms)\n   Message: TurboVec: 3 candidates reordered via turbovec-gpu\n\n📤 Testing gpu.cuvs.search...\n   ✅ PASS (2ms)\n   Message: cuVS: 5 results via cuvs-gpu\n\n📤 Testing gpu.cuda.rank...\n   ✅ PASS (3ms)\n   Message: CUDA: 2 items ranked via cuda-gpu\n\n📤 Testing engram.feedback.async...\n   ✅ PASS (2ms)\n   Message: Engram: persisted=true, outcome=fixed\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n✅ agent.task.execute\n   Duration: 5ms\n   Message: Task executed: agent.task.execute\n\n✅ retrieval.turbovec.rerank\n   Duration: 3ms\n   Message: TurboVec: 3 candidates reordered via turbovec-gpu\n\n✅ gpu.cuvs.search\n   Duration: 2ms\n   Message: cuVS: 5 results via cuvs-gpu\n\n✅ gpu.cuda.rank\n   Duration: 3ms\n   Message: CUDA: 2 items ranked via cuda-gpu\n\n✅ engram.feedback.async\n   Duration: 2ms\n   Message: Engram: persisted=true, outcome=fixed\n\n======================================================================\n🎯 Result: 5/5 subjects passed\n======================================================================\n\n🎉 ALL SUBJECTS PROVEN!\n   NATS worker: WIRED ✓\n   Distributed task bus: WIRED ✓\n   Subject proof: ALL PROVEN ✓\n   Overall: PRODUCTION READY ✓"
+    "status": "BROKER_ONLY_HANDLERS_MISSING",
+    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ❌ ERROR (5ms)\n   Error: 503\n\n📤 Testing retrieval.turbovec.rerank...\n   ❌ ERROR (1ms)\n   Error: 503\n\n📤 Testing gpu.cuvs.search...\n   ❌ ERROR (1ms)\n   Error: 503\n\n📤 Testing gpu.cuda.rank...\n   ❌ ERROR (1ms)\n   Error: 503\n\n📤 Testing engram.feedback.async...\n   ❌ ERROR (2ms)\n   Error: 503\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n❌ agent.task.execute\n   Duration: 5ms\n   Error: 503\n\n❌ retrieval.turbovec.rerank\n   Duration: 1ms\n   Error: 503\n\n❌ gpu.cuvs.search\n   Duration: 1ms\n   Error: 503\n\n❌ gpu.cuda.rank\n   Duration: 1ms\n   Error: 503\n\n❌ engram.feedback.async\n   Duration: 2ms\n   Error: 503\n\n======================================================================\n🎯 Result: 0/5 subjects passed\n======================================================================\n\n⚠️  5 subjects still failing\n   Start handlers: npm run nats:handlers\n   Then re-run: npm run nats:proof-of-life:all"
   },
   "postgres": {
     "command": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c \nselect table_name\nfrom information_schema.tables\nwhere table_schema='public'\n  and table_name in ('agent_os_events','analytics_events','phase89_agentic_calls','trace_events','trace_runs','ace_retrieval_runs','ace_retrieval_hits','task_registry')\norder by table_name;\n",
@@ -427,12 +427,9 @@
     "output": "ace_retrieval_hits\nace_retrieval_runs\nagent_os_events\nanalytics_events\nphase89_agentic_calls\ntask_registry\ntrace_events\ntrace_runs"
   },
   "critical_failures": [],
-  "warnings": [],
-  "next_action": "ACP transport proof is ready; wire the same metadata fields into request handlers and Langfuse traces.",
-  "run_id": "acp-audit-1782881152666",
-  "agent_os_event": {
-    "command": "docker exec -i legal-ai-postgres psql ...",
-    "ok": true,
-    "output": "INSERT 0 1"
-  }
+  "warnings": [
+    "nats_handlers_broker_only_handlers_missing"
+  ],
+  "next_action": "Start NATS handlers with `cd sveltekit-frontend; npm run nats:handlers`, then rerun `npm run nats:proof-of-life:all`.",
+  "run_id": "acp-audit-1783126751378"
 }
