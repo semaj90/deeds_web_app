@@ -1,10 +1,14 @@
 /**
- * AST-Grep Extractor
+ * AST-Grep Extractor — REGEX FALLBACK
  *
- * Extracts code structure (functions, classes, methods) via ast-grep.
- * Uses Gemma4 as the semantic understanding layer for NLP-aware extraction.
+ * ⚠ This implementation uses regex pattern matching, NOT real AST parsing.
+ * Results are tagged source='regex' to prevent callers from treating them as
+ * AST-quality. Real implementation requires @ast-grep/napi to be installed.
  *
- * Supports: TypeScript, JavaScript, Python, Go, Rust, Java, C++
+ * Production blocker: graph edges derived from these results have limited accuracy.
+ * Fix: install @ast-grep/napi and replace the regex blocks below with real queries.
+ *
+ * Supports: TypeScript, JavaScript (regex patterns only — not Python/Go/Rust/Java/C++)
  */
 
 export interface ExtractedFeature {
@@ -44,10 +48,10 @@ export async function extractAstFeatures(code: string): Promise<ExtractedFeature
 			type: 'ast_function',
 			name,
 			description: `Function: ${name}() - Code structure extracted via pattern matching`,
-			source: 'ast-grep',
+			source: 'pattern',
 			rawText: signature,
 			lineNumber,
-			confidence: 0.85,
+			confidence: 0.55,
 		});
 	}
 
@@ -63,9 +67,9 @@ export async function extractAstFeatures(code: string): Promise<ExtractedFeature
 			type: 'ast_class',
 			name,
 			description: `Class: ${name}${extends_} - Code structure extracted via pattern matching`,
-			source: 'ast-grep',
+			source: 'pattern',
 			lineNumber,
-			confidence: 0.85,
+			confidence: 0.55,
 		});
 	}
 
@@ -82,7 +86,7 @@ export async function extractAstFeatures(code: string): Promise<ExtractedFeature
 				type: 'ast_method',
 				name,
 				description: `Method: ${name}() - Code structure extracted via pattern matching`,
-				source: 'ast-grep',
+				source: 'pattern',
 				lineNumber,
 				confidence: 0.75,
 			});
@@ -115,7 +119,7 @@ export async function extractDependencyFeatures(code: string): Promise<Extracted
 				type: 'ast_function', // Placeholder type for dependencies
 				name: moduleName,
 				description: `External dependency: ${moduleName}`,
-				source: 'ast-grep',
+				source: 'pattern',
 				lineNumber,
 				confidence: 0.95,
 			});
@@ -161,7 +165,7 @@ export async function extractComplexityFeatures(code: string): Promise<Extracted
 				type: 'ast_function',
 				name: fnName,
 				description: `Large function: ${fnName}() (~${lineCount} lines) - Potential code complexity concern`,
-				source: 'ast-grep',
+				source: 'pattern',
 				lineNumber,
 				confidence: 0.8,
 			});

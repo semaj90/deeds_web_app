@@ -72,16 +72,23 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 	}
 
 	// Path 2: AST-Grep features (code only)
+	// NOTE: ast-grep-extractor.ts is currently regex-based fallback, not real AST.
+	// Results are tagged source='ast-grep' for traceability but accuracy is limited.
 	if (isCode) {
+		let astExtractor: { extractAstFeatures: (t: string) => Promise<ExtractedFeature[]> } | null = null;
 		try {
-			const { extractAstFeatures } = await import('./ast-grep-extractor.js').catch(() => ({
-				extractAstFeatures: async () => [] as ExtractedFeature[],
-			}));
+			astExtractor = await import('./ast-grep-extractor.js');
+		} catch (importErr) {
+			console.warn('[AstLangextractBridge] AST extractor unavailable (regex fallback skipped):', importErr);
+		}
 
-			const astFeatures = await extractAstFeatures(text);
-			features.push(...astFeatures);
-		} catch (err) {
-			console.warn('[AstLangextractBridge] AST extraction failed:', err);
+		if (astExtractor) {
+			try {
+				const astFeatures = await astExtractor.extractAstFeatures(text);
+				features.push(...astFeatures);
+			} catch (err) {
+				console.warn('[AstLangextractBridge] AST extraction failed:', err);
+			}
 		}
 	}
 
