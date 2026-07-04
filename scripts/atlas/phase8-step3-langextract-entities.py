@@ -78,13 +78,9 @@ PG_DB       = os.getenv('PGDATABASE', 'legal_ai_db')
 PG_USER     = os.getenv('PGUSER',     'legal_admin')
 PG_PASS     = os.getenv('PGPASSWORD', os.getenv('DB_PASSWORD', '123456'))
 
-OLLAMA_URL  = os.getenv('OLLAMA_HOST', 'http://127.0.0.1:11434').rstrip('/')
-if OLLAMA_URL.startswith('0.0.0.0'):
-    OLLAMA_URL = OLLAMA_URL.replace('0.0.0.0', '127.0.0.1')
-if not OLLAMA_URL.startswith('http'):
-    OLLAMA_URL = f'http://{OLLAMA_URL}'
-
-DEFAULT_MODEL = os.getenv('LANGEXTRACT_MODEL', 'gemma4-rotorquant:latest')
+# llama-server OpenAI-compatible endpoint (port 8091 = gemma4-legal-iq4xs-direct.gguf)
+LLAMA_URL   = os.getenv('GEMMA4_URL', os.getenv('OPENCODE_GEMMA4_URL', 'http://127.0.0.1:8091')).rstrip('/')
+DEFAULT_MODEL = os.getenv('LANGEXTRACT_MODEL', 'gemma4-legal-iq4xs-direct.gguf')
 
 # ── Legal extraction prompt ────────────────────────────────────────────────────
 LEGAL_PROMPT = textwrap.dedent("""\
@@ -130,40 +126,100 @@ def connect_pg():
     )
 
 
+def _parse_json_permissive(text: str) -> list:
+    """Parse JSON that may be an array, a single object, or concatenated objects/arrays."""
+    import re
+    text = text.strip()
+    # Try straight parse first
+    try:
+        result = json.loads(text)
+        if isinstance(result, list):
+            return result
+        if isinstance(result, dict):
+            return result.get('entities', result.get('extractions', result.get('items', [result])))
+        return []
+    except json.JSONDecodeError:
+        pass
+
+    # Try extracting all JSON objects/arrays via regex
+    items = []
+    for match in re.finditer(r'\{[^{}]*\}|\[[^\[\]]*\]', text):
+        try:
+            obj = json.loads(match.group())
+            if isinstance(obj, dict):
+                items.append(obj)
+            elif isinstance(obj, list):
+                items.extend(obj)
+        except Exception:
+            pass
+    return items
+
+
 def run_langextract(text: str, model: str, passes: int, verbose: bool) -> list[dict]:
     """
-    Run langextract on a single text block.
-    Returns list of {class, text, attributes} dicts.
+    Extract entities via llama-server OpenAI-compatible endpoint.
+    Sends a structured JSON extraction prompt and parses the response.
+    Returns list of {extraction_class, extraction_text, attributes} dicts.
     """
+    import re
+    import urllib.request
+
+    system_prompt = (
+        "You are a precise legal entity extractor. "
+        "Extract entities from the text and return ONLY a JSON array. "
+        "No explanation, no markdown fences, just the raw JSON array.\n\n"
+        "Each item: {\"class\": \"TYPE\", \"text\": \"exact text\", \"attr\": {}}\n\n"
+        "Types: PARTY, DATE, CITATION, MONEY, STATUTE, CONCEPT, LOCATION, FUNCTION\n\n"
+        "Example input: 'On Jan 5 2024 ACME Corp filed under Cal. Civ. Code §3294'\n"
+        "Example output: [{\"class\":\"DATE\",\"text\":\"Jan 5 2024\",\"attr\":{}},{\"class\":\"PARTY\",\"text\":\"ACME Corp\",\"attr\":{}},{\"class\":\"STATUTE\",\"text\":\"Cal. Civ. Code §3294\",\"attr\":{}}]"
+    )
+
+    user_prompt = f"Extract entities from this text:\n\n{text[:2000]}"
+
+    payload = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user",   "content": user_prompt},
+        ],
+        "temperature": 0.1,
+        "max_tokens":  512,
+        "stream":      False,
+    }).encode('utf-8')
+
     try:
-        result = lx_extract(
-            text_or_documents=text,
-            prompt_description=LEGAL_PROMPT,
-            examples=LEGAL_EXAMPLES,
-            model_id=model,
-            model_url=OLLAMA_URL,
-            fence_output=False,
-            use_schema_constraints=False,
-            extraction_passes=passes,
-            temperature=0.3,
-            max_workers=1,           # sequential — Gemma4 is batch=1
-            max_char_buffer=2000,
+        req = urllib.request.Request(
+            f'{LLAMA_URL}/v1/chat/completions',
+            data=payload,
+            headers={'Content-Type': 'application/json'},
+            method='POST',
         )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read())
+
+        content = data['choices'][0]['message']['content'].strip()
+
+        # Strip markdown fences if present
+        content = re.sub(r'^```(?:json)?\s*', '', content)
+        content = re.sub(r'\s*```$', '', content)
+        content = content.strip()
+
+        # Handle concatenated JSON objects or arrays from the model
+        raw = _parse_json_permissive(content)
 
         entities = []
-        if hasattr(result, 'extractions'):
-            for ext in result.extractions:
-                entities.append({
-                    'extraction_class': ext.extraction_class,
-                    'extraction_text':  ext.extraction_text,
-                    'attributes':       ext.attributes if hasattr(ext, 'attributes') else {},
-                })
+        for item in raw:
+            cls  = item.get('class') or item.get('extraction_class', '')
+            text_val = item.get('text') or item.get('extraction_text', '')
+            attr = item.get('attr') or item.get('attributes', {})
+            if cls and text_val:
+                entities.append({'extraction_class': cls, 'extraction_text': text_val, 'attributes': attr})
                 if verbose:
-                    print(f'    [{ext.extraction_class}] {ext.extraction_text!r}')
+                    print(f'    [{cls}] {text_val!r}')
         return entities
 
     except Exception as e:
-        print(f'  [step3] langextract error: {e}')
+        print(f'  [step3] extraction error: {e}')
         return []
 
 
@@ -184,8 +240,8 @@ def main():
 
     print(f'[step3] Phase 8 Step 3 — LangExtract Entity Enrichment')
     print(f'[step3] dry_run={dry_run}  limit={args.limit}  passes={args.passes}  model={args.model}')
-    print(f'[step3] Postgres: {PG_USER}@{PG_HOST}:{PG_PORT}/{PG_DB}')
-    print(f'[step3] Ollama:   {OLLAMA_URL}')
+    print(f'[step3] Postgres:     {PG_USER}@{PG_HOST}:{PG_PORT}/{PG_DB}')
+    print(f'[step3] llama-server: {LLAMA_URL}')
 
     # ── Connect ────────────────────────────────────────────────────────────────
     try:
@@ -197,24 +253,30 @@ def main():
         sys.exit(1)
 
     # ── Load packets that have summaries but no langextract entities yet ───────
+    # atlas_summary_layers has no is_canonical column — use DISTINCT ON + latest
     cur.execute("""
         SELECT
-            id,
-            packet_key,
-            source_ref,
-            feature_id,
-            COALESCE(asl.summary, ap.summary) AS summary,
+            ap.packet_id,
+            ap.packet_key,
+            ap.source_ref,
+            ap.feature_id,
+            COALESCE(asl.summary, asl.summary_text, ap.summary) AS summary,
             ap.metadata
         FROM atlas_packets ap
-        LEFT JOIN atlas_summary_layers asl
-            ON asl.packet_key = ap.packet_key
-           AND asl.layer_type = 'gemma4_summary'
-           AND asl.is_canonical = true
+        LEFT JOIN LATERAL (
+            SELECT summary, summary_text
+            FROM atlas_summary_layers
+            WHERE packet_key = ap.packet_key
+              AND layer_type = 'gemma4_summary'
+              AND (summary IS NOT NULL OR summary_text IS NOT NULL)
+            ORDER BY created_at DESC NULLS LAST
+            LIMIT 1
+        ) asl ON true
         WHERE ap.packet_key IS NOT NULL
           AND ap.feature_id  IS NOT NULL
           AND (
-              COALESCE(asl.summary, ap.summary) IS NOT NULL
-              AND LENGTH(COALESCE(asl.summary, ap.summary)) > 30
+              COALESCE(asl.summary, asl.summary_text, ap.summary) IS NOT NULL
+              AND LENGTH(COALESCE(asl.summary, asl.summary_text, ap.summary)) > 30
           )
           AND (
               ap.metadata IS NULL
@@ -222,7 +284,7 @@ def main():
           )
         ORDER BY
             CASE WHEN ap.page_rank_score IS NOT NULL THEN 0 ELSE 1 END,
-            ap.id
+            ap.packet_id
         LIMIT %s
     """, (args.limit,))
 
