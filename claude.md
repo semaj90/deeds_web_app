@@ -57,6 +57,8 @@
 | [SESSION-102-STAGE-A0-ENVELOPE-ASSEMBLY-COMPLETE.md](memory/SESSION-102-STAGE-A0-ENVELOPE-ASSEMBLY-COMPLETE.md) | Envelope assembly, direct emission, deterministic shape | ✅ COMPLETE |
 | [PHASE-7-ARCHITECTURE-FINAL.md](docs/PHASE-7-ARCHITECTURE-FINAL.md) | Layer 3b cache check, RPC alignment, 7 production gates | ✅ LOCKED |
 | [unified-retrieval-algorithm-execution-plan.md](memory/unified-retrieval-algorithm-execution-plan.md) | 12-step retrieval pipeline, 6 signals, ranking formula | ✅ REFERENCE |
+| **PostgreSQL 18 Query Optimization** (Section below) | Materialized stats pattern, fast exports, partial indexes | ✅ NEW |
+| [CANONICAL-PACKET-WIRING-BLUEPRINT.md](docs/architecture/CANONICAL-PACKET-WIRING-BLUEPRINT.md) | Lane separation, packet envelope, Protobuf/msgpack | ✅ SPEC |
 
 ---
 
