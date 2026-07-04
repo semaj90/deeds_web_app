@@ -1,6 +1,6 @@
 # EmbeddingGemma Qdrant TurboVec Proof
 
-Generated: 2026-07-04T00:59:21.275Z
+Generated: 2026-07-04T09:48:56.636Z
 Overall: WARN
 
 | lane | status | detail |

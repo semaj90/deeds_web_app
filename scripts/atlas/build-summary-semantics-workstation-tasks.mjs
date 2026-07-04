@@ -18,6 +18,7 @@ import crypto from 'node:crypto';
 import pg from 'pg';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { normalizePageRank } from './lib/normalize-pagerank.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dir, '../..');
@@ -120,7 +121,7 @@ function priorityScore(row, kind) {
     graph_authority_gap: 12,
     ready_for_fanout: 4,
   };
-  const pagerank = numberOrNull(row.pagerank) ?? 0;
+  const pagerank = normalizePageRank(row.pagerank, row.max_page_rank);
   return Math.max(1, Math.min(100, Math.round(rankPenalty * 0.65 + (bonuses[kind] ?? 10) + Math.min(10, pagerank * 10))));
 }
 
@@ -256,7 +257,8 @@ async function readRows() {
       COALESCE(afe.keywords, ap.keywords, ARRAY[]::text[]) AS keywords,
       COALESCE(afe.entities, ARRAY[]::text[]) AS entities,
       COALESCE(afe.som_cluster::text, ap.som_cluster::text) AS som_cluster,
-      COALESCE(afe.pagerank, ap.pagerank) AS pagerank
+      COALESCE(afe.pagerank, ap.pagerank) AS pagerank,
+      MAX(COALESCE(afe.pagerank, ap.pagerank)) OVER () AS max_page_rank
     FROM atlas_packets ap
     LEFT JOIN atlas_feature_envelopes afe ON afe.packet_key = ap.packet_key
     WHERE ap.packet_key IS NOT NULL

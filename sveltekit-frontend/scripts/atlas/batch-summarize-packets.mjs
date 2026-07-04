@@ -40,18 +40,25 @@ const args = process.argv.slice(2);
 const dryRun = args.includes('--dry-run');
 const apply = !dryRun && args.includes('--apply');
 const verbose = args.includes('--verbose');
+function cliValue(name) {
+  const direct = args.find((a) => a.startsWith(`--${name}=`));
+  if (direct) return direct.split('=')[1];
+  const envKey = `npm_config_${name.replace(/-/g, '_')}`;
+  const envValue = process.env[envKey];
+  return envValue !== undefined && String(envValue).length > 0 ? String(envValue) : null;
+}
 // Cap concurrency to 2 for RTX 3060 Ti 8GB safety (default: 2, max: 2)
 const concurrency = Math.min(
-  parseInt(args.find(a => a.startsWith('--concurrency='))?.split('=')[1] ?? '2'),
+  parseInt(cliValue('concurrency') ?? '2', 10),
   2
 );
-const batchSize = parseInt(args.find(a => a.startsWith('--batch='))?.split('=')[1] ?? '100');
+const batchSize = parseInt(cliValue('batch') ?? '100', 10);
 const maxTokens = 80; // Shorter than cluster summaries
 const temperature = 0.1; // Low variance
 
 // Database connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgres://legal_admin:legal_ai@127.0.0.1:5434/legal_ai_db',
+  connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
   max: 10,
 });
 
@@ -112,15 +119,14 @@ async function invalidateRedisCache(packetKeys, sourceRefs) {
 async function getPacketsNeedingSummaries(limit) {
   const query = `
     SELECT
-      id,
+      packet_id as "packetId",
       packet_key as "packetKey",
       source_ref as "sourceRef",
       file_path as "filePath",
       function_symbol as "functionSymbol",
       feature_id as "featureId",
       feature_label as "featureLabel",
-      summary,
-      embedding_vector as "embeddingVector"
+      summary
     FROM atlas_packets
     WHERE summary IS NULL OR summary = ''
     ORDER BY feature_id ASC, packet_key ASC
@@ -233,13 +239,12 @@ async function upsertPacketSummary(pool, packetId, summary, confidence) {
     UPDATE atlas_packets
     SET
       summary = $1,
-      summary_confidence = $2,
       updated_at = NOW()
-    WHERE id = $3
+    WHERE packet_key = $2
   `;
 
   try {
-    await pool.query(query, [summary, confidence, packetId]);
+    await pool.query(query, [summary, packetId]);
     return true;
   } catch (err) {
     console.error(`Failed to upsert packet ${packetId}:`, err.message);
@@ -305,7 +310,7 @@ async function processBatch(packets, pool) {
 
         // Write to DB if not dry-run
         if (apply) {
-          const success = await upsertPacketSummary(pool, packet.id, summary, confidence);
+          const success = await upsertPacketSummary(pool, packet.packetKey, summary, confidence);
           if (success) {
             results.success++;
             results.packetKeysUpdated.push(packet.packetKey);

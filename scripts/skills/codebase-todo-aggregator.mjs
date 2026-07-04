@@ -36,14 +36,23 @@
 
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
+const DB_URL = process.env.DATABASE_URL || process.env.DB_URL || null;
 
 // Parse arguments
 const args = process.argv.slice(2);
 const isDry = args.includes('--dry-run') || args.includes('--dry');
 const toStdout = args.includes('--stdout');
+const limitIdx = args.findIndex((a) => a === '--limit');
+const LIMIT = Number(
+  args.find((a) => a.startsWith('--limit='))?.split('=')[1] ??
+  (limitIdx >= 0 ? args[limitIdx + 1] : '25')
+) || 25;
 const queryIdx = args.findIndex((a) => a === '--query');
 const query = queryIdx >= 0 ? args[queryIdx + 1] : null;
 
@@ -69,10 +78,15 @@ async function fetchRedisSignals() {
     const redis = new Redis({
       host: process.env.REDIS_HOST || '127.0.0.1',
       port: process.env.REDIS_PORT || 6379,
-      password: process.env.REDIS_PASSWORD,
+      password: process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || 'redis',
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null
+    });
+    redis.on('error', (err) => {
+      if (process.env.DEBUG_TODO_SKILL) {
+        console.warn(`[codebase-todo] Redis error: ${err.message}`);
+      }
     });
 
     try {
@@ -161,11 +175,122 @@ async function fetchAgentsMdRuleDensity() {
   return density;
 }
 
+async function fetchFeatureEnvelopeRecommendations(limit = 30) {
+  if (!DB_URL) return [];
+
+  try {
+    const { default: pg } = await import('pg');
+    const pool = new pg.Pool({
+      connectionString: DB_URL,
+      connectionTimeoutMillis: 3000,
+      max: 1,
+    });
+
+    const res = await pool.query(
+      `
+      SELECT
+        packet_key,
+        source_ref,
+        feature_id,
+        COALESCE(title_id, feature_id) AS title_id,
+        COALESCE(summary_text, '') AS summary_text,
+        COALESCE(summary_rank_score, 0) AS summary_rank_score,
+        COALESCE(summary_rank_status, 'BLOCKED') AS summary_rank_status,
+        COALESCE(used_concepts, '[]'::jsonb) AS used_concepts,
+        COALESCE(keywords, ARRAY[]::text[]) AS keywords,
+        COALESCE(entities, ARRAY[]::text[]) AS entities,
+        COALESCE(lexical_nouns, '[]'::jsonb) AS lexical_nouns,
+        COALESCE(lexical_verbs, '[]'::jsonb) AS lexical_verbs,
+        COALESCE(lexical_adverbs_ly, '[]'::jsonb) AS lexical_adverbs_ly,
+        COALESCE(pagerank, 0) AS pagerank,
+        COALESCE(community_id, 0) AS community_id,
+        COALESCE(som_cluster::text, '') AS som_cluster,
+        COALESCE(tree_node_id::text, '') AS tree_node_id,
+        feature_label,
+        domain_class,
+        ontology_label,
+        topology_label
+      FROM atlas_feature_envelopes
+      WHERE packet_key IS NOT NULL
+      ORDER BY COALESCE(summary_rank_score, 0) DESC, COALESCE(pagerank, 0) DESC NULLS LAST
+      LIMIT $1
+      `,
+      [limit],
+    );
+
+    await pool.end();
+
+    return res.rows.map((row) => {
+      const usedConcepts = Array.isArray(row.used_concepts)
+        ? row.used_concepts.filter(Boolean).map(String)
+        : [];
+      const keywords = Array.isArray(row.keywords)
+        ? row.keywords.filter(Boolean).map(String)
+        : [];
+      const entities = Array.isArray(row.entities)
+        ? row.entities.filter(Boolean).map(String)
+        : [];
+      const nouns = Array.isArray(row.lexical_nouns)
+        ? row.lexical_nouns.filter(Boolean).map(String)
+        : [];
+      const verbs = Array.isArray(row.lexical_verbs)
+        ? row.lexical_verbs.filter(Boolean).map(String)
+        : [];
+      const adverbs = Array.isArray(row.lexical_adverbs_ly)
+        ? row.lexical_adverbs_ly.filter(Boolean).map(String)
+        : [];
+      const summaryRankScore = Number(row.summary_rank_score) || 0;
+      const pagerank = Number(row.pagerank) || 0;
+      const attention = Math.min(
+        1,
+        (usedConcepts.length + keywords.length + entities.length + nouns.length + verbs.length + adverbs.length) / 24,
+      );
+
+      return {
+        file: row.source_ref || row.packet_key,
+        title: `${row.title_id || row.feature_id || 'feature-envelope'} · canonical envelope`,
+        authority: pagerank || Math.max(0, Math.min(1, summaryRankScore / 100)),
+        karpathy: Math.max(0, Math.min(4, summaryRankScore / 25)),
+        attention,
+        isDirty: false,
+        blend: 0,
+        reason: [
+          'canonical feature envelope',
+          row.summary_rank_status ? `rank=${row.summary_rank_status}` : null,
+          row.feature_id ? `feature_id=${row.feature_id}` : null,
+          usedConcepts.length ? `used_concepts=${usedConcepts.slice(0, 4).join(',')}` : null,
+        ].filter(Boolean).join('; '),
+        packet_key: row.packet_key,
+        source_ref: row.source_ref,
+        feature_id: row.feature_id,
+        title_id: row.title_id,
+        summary_rank_score: summaryRankScore,
+        summary_rank_status: row.summary_rank_status,
+        used_concepts: usedConcepts,
+        keywords,
+        entities,
+        lexical_nouns: nouns,
+        lexical_verbs: verbs,
+        lexical_adverbs_ly: adverbs,
+        community_id: row.community_id,
+        som_cluster: row.som_cluster,
+        tree_node_id: row.tree_node_id,
+        pagerank,
+      };
+    });
+  } catch (err) {
+    if (process.env.DEBUG_TODO_SKILL) {
+      console.warn(`[codebase-todo] Canonical feature envelope query failed: ${err.message}`);
+    }
+    return [];
+  }
+}
+
 // Fetch Redis signals (or use mock)
 const redisSignals = await fetchRedisSignals();
 const agentsMdDensity = await fetchAgentsMdRuleDensity();
 
-const mockRecommendations = [
+const legacyMockRecommendations = [
   {
     file: 'scripts/skills/codebase-todo-aggregator.mjs',
     title: 'Wire codebase-todo skill to idle-review agent',
@@ -218,8 +343,13 @@ const mockRecommendations = [
   }
 ];
 
+const featureEnvelopeRecommendations = await fetchFeatureEnvelopeRecommendations(LIMIT);
+const recommendationSeed = featureEnvelopeRecommendations.length > 0
+  ? featureEnvelopeRecommendations
+  : legacyMockRecommendations;
+
 // Blend recommendations with Redis signals + Postgres rule density
-const recommendations = mockRecommendations.map((rec) => {
+const recommendations = recommendationSeed.map((rec) => {
   // Use Redis signals if available, fall back to mock values
   const authority = redisSignals.authority[rec.file] !== undefined
     ? redisSignals.authority[rec.file]
@@ -350,7 +480,7 @@ const markdown = `# Codebase TODO Recommendations
 
 **Generated**: ${new Date().toISOString()}
 **Method**: Redis authority (0.40) + Karpathy GPU (0.35) + attention (0.15) + dirty (0.10) + Postgres rules density
-**Data Source**: ${redisSignals.source === 'redis' ? '✅ Redis signals' : '⏳ Mock data (Redis unavailable)'}
+**Data Source**: ${featureEnvelopeRecommendations.length > 0 ? '✅ Canonical feature-envelope rows' : '⏳ Mock data (feature envelopes unavailable)'}${redisSignals.source === 'redis' ? ' | ✅ Redis/Valkey mirrors reachable' : ' | ⏳ Redis/Valkey mirrors unavailable'}
 **Gemma4 rerank**: temperature=0.3, deterministic ${process.env.SKIP_GEMMA4_RERANK === 'true' ? '(disabled)' : ''}
 
 ## Top Priorities (${process.env.SKIP_GEMMA4_RERANK === 'true' ? 'Blend-Sorted' : 'Gemma4-Ranked'})
@@ -385,13 +515,13 @@ When working in these areas, pay extra attention to the AGENTS.md files.
 
 ## Provenance & Signal Health
 
-- **Redis ace:authority:top**: ${Object.keys(redisSignals.authority).length > 0 ? `✅ ${Object.keys(redisSignals.authority).length} entries` : '⏳ Empty'} (6h TTL) — run \`npm run graphify:gds\`
-- **Redis gpu:karpathy:scores**: ${Object.keys(redisSignals.karpathy).length > 0 ? `✅ ${Object.keys(redisSignals.karpathy).length} entries` : '⏳ Empty'} (24h TTL) — run \`npm run karpathy:gpu\`
-- **Redis ace:rank:dirty_files**: ${redisSignals.dirty.size > 0 ? `✅ ${redisSignals.dirty.size} files` : '⏳ Empty'} (live set) — updated during startup
+- **Redis ace:authority:top**: ${Object.keys(redisSignals.authority).length > 0 ? `✅ ${Object.keys(redisSignals.authority).length} entries` : '⏳ Empty (optional mirror)'} (6h TTL) — run \`npm run graphify:gds\`
+- **Redis gpu:karpathy:scores**: ${Object.keys(redisSignals.karpathy).length > 0 ? `✅ ${Object.keys(redisSignals.karpathy).length} entries` : '⏳ Empty (optional mirror)'} (24h TTL) — run \`npm run karpathy:gpu\`
+- **Redis ace:rank:dirty_files**: ${redisSignals.dirty.size > 0 ? `✅ ${redisSignals.dirty.size} files` : '⏳ Empty (startup mirror)'} (live set) — updated during startup
 - **Postgres agent_context_files**: ${Object.keys(agentsMdDensity).length > 0 ? `✅ ${Object.keys(agentsMdDensity).length} directories` : '⏳ Empty'} (rule density indexed) — run \`npm run agents:pipeline:safe\`
 - **Engram bigram cache**: ⏳ TODO (1h TTL) — live during retrieval
 
-Status: ${redisSignals.source === 'redis' ? '✅ Redis signals live' : '⏳ Mock data (Redis unavailable)'} | ${Object.keys(agentsMdDensity).length > 0 ? '✅ AGENTS.md rules indexed' : '⏳ AGENTS.md rules empty'}
+Status: ${featureEnvelopeRecommendations.length > 0 ? '✅ Canonical feature-envelope ranking live' : '⏳ Feature-envelope ranking unavailable'} | ${redisSignals.source === 'redis' ? '✅ Redis/Valkey mirrors reachable' : '⏳ Redis/Valkey mirrors unavailable'} | ${Object.keys(agentsMdDensity).length > 0 ? '✅ AGENTS.md rules indexed' : '⏳ AGENTS.md rules empty'}
 
 ## Integration Points
 

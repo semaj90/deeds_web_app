@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-06-18T22:39:35.791Z",
-  "mode": "apply",
+  "generated_at": "2026-07-04T06:25:39.519Z",
+  "mode": "dry-run",
   "stats": {
-    "total_scanned": 17485,
-    "success_count": 17485,
+    "total_scanned": 58304,
+    "success_count": 58304,
     "error_count": 0,
-    "gds_enriched": 8744,
-    "som_enriched": 3150
+    "gds_enriched": 0,
+    "som_enriched": 0,
+    "tree_node_enriched": 47100
   }
 }

@@ -39,7 +39,7 @@ Features (16 scalars):
   reward_prior          — reward_prior / 10, clamped [0,1]
   domain_class_match    — binary: domain aligns
   freshness_score       — age-decay [0.1, 1.0]
-  pagerank_score        — Karpathy blend / 10, clamped [0,1]
+  pagerank_score        — PageRank blend [0,1]
   som_cache_hit         — binary: SOM cell was a Redis cache hit
   packet_hit_count_norm — hit_count / n_retrieved [0,1]
   n_retrieved_norm      — log1p(n_retrieved) / log1p(200), clamped [0,1]
@@ -164,7 +164,7 @@ def parse_row(row):
         min(1.0, f('reward_prior')),
         f('domain_class_match'),
         f('freshness_score'),
-        min(1.0, f('pagerank_score') / 10.0),
+        min(1.0, max(0.0, f('pagerank_score'))),
         f('som_cache_hit'),                            # 0 if not in CSV
         min(1.0, hit_count / n_retrieved),
         min(1.0, math.log1p(n_retrieved) / math.log1p(200)),

@@ -119,7 +119,7 @@ def score_rows(rows):
             min(1.0, f(row, 'reward_prior')),
             f(row, 'domain_class_match'),
             f(row, 'freshness_score'),
-            min(1.0, f(row, 'pagerank_score') / 10.0),
+            min(1.0, max(0.0, f(row, 'pagerank_score'))),
             f(row, 'som_cache_hit'),
             min(1.0, hit_count / n_retrieved) if hit_count <= 1.0 else min(1.0, hit_count / n_retrieved),
             min(1.0, math.log1p(n_retrieved) / math.log1p(200)),

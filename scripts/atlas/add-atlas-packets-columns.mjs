@@ -47,6 +47,11 @@ const MIGRATIONS = [
     sql: `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now()`,
     note: 'Last backfill/update timestamp',
   },
+  {
+    column: 'tree_node_id',
+    sql: `ALTER TABLE atlas_packets ADD COLUMN IF NOT EXISTS tree_node_id UUID`,
+    note: 'Tree topology bridge to atlas_tree_nodes',
+  },
 ];
 
 const EXTRA_INDEXES = [
@@ -55,6 +60,7 @@ const EXTRA_INDEXES = [
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_source_feature ON atlas_packets(source_ref, feature_id)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_qdrant_point_id ON atlas_packets(qdrant_point_id)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_community_id ON atlas_packets(community_id)`,
+  `CREATE INDEX IF NOT EXISTS idx_atlas_packets_tree_node_id ON atlas_packets(tree_node_id)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_source_kind ON atlas_packets(source_kind)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_concept_ids ON atlas_packets USING GIN(concept_ids)`,
   `CREATE INDEX IF NOT EXISTS idx_atlas_packets_metadata_gin_pathops ON atlas_packets USING GIN(metadata jsonb_path_ops)`,

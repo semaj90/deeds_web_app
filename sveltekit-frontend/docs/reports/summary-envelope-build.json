@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-07-04T00:21:03.659Z",
+  "timestamp": "2026-07-04T09:51:55.058Z",
   "dry_run": false,
   "total_envelopes": 501,
   "total_jobs": 501,
-  "tuples_to_summarize": 16573,
+  "tuples_to_summarize": 16459,
   "avg_tuples_per_envelope": 33,
   "top_k_groups": 500,
   "tuple_limit_per_group": 2000,

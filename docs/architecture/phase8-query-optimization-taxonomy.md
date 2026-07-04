@@ -239,6 +239,53 @@ Reduce by:
 - `som_cell`
 - `source_ref`
 
+## Canonical Summary Export Order
+
+After summary generation, promote results in this order:
+
+```text
+summary-index-ranker
+  -> materialize-feature-envelopes
+  -> Neo4j GDS / community / tree_node_id pass
+  -> BitFrost warm
+  -> Qdrant / TurboVec fan-out
+```
+
+Rules:
+
+- Summary ranking produces the canonical export surface.
+- `materialize-feature-envelopes` adds lexical and semantic enrichment.
+- `tree_node_id` is a graph/topology label and should come from the topology lane, not from raw summary text.
+- Fan-out consumers should read the canonical envelope instead of recomputing nouns, verbs, concepts, or title grouping.
+- LangExtract and ast-grep are enrichment layers; they should not become identity sources.
+
+## Summary To Topology Flow
+
+Use this exact progression for codebase packets:
+
+```text
+source_ref / file_path / summary
+  -> summary-index-ranker
+  -> canonical packet envelope
+  -> title_id / feature_id / used_concepts
+  -> lexical tags / tree_node_id / community_id
+  -> latent_64
+  -> KMeans
+  -> SOM 20x20
+  -> Neo4j GDS / PageRank / Louvain
+  -> BitFrost warm
+  -> Qdrant / TurboVec fan-out
+```
+
+Rules:
+
+- `source_ref` and `file_path` establish lineage.
+- `summary` produces the semantic label layer, not identity.
+- `title_id` is derived from summary meaning and source lineage.
+- `feature_id` remains the canonical feature grouping key.
+- `kmeans_cluster` and `som_row/som_col` are derived topology labels.
+- `tree_node_id` belongs to the topology lane and should not be sourced from raw summary text.
+
 ## Rerank Guidance
 
 For `marco_rerank_chunks` and related packet scoring, use the following weighting contract as a default reference:

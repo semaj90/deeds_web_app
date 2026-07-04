@@ -123,11 +123,28 @@ async function loadRecoveryPacket(
 
   // L2: Postgres canonical truth
   const rows = await db.execute(sql`
-    SELECT packet_key, source_ref, feature_id, title_id, summary,
-           page_rank_score, som_row, som_col, som_cluster,
-           community_id, kmeans_cluster_id, directory_path
-    FROM atlas_packets
-    WHERE packet_key = ${recoveryPacketKey}
+    SELECT
+      ap.packet_key,
+      ap.source_ref,
+      ap.feature_id,
+      ap.title_id,
+      COALESCE(NULLIF(ap.summary, ''), NULLIF(asl.summary_text, ''), NULLIF(asl.summary, '')) AS summary,
+      ap.page_rank_score,
+      ap.som_row,
+      ap.som_col,
+      ap.som_cluster,
+      ap.community_id,
+      ap.kmeans_cluster_id,
+      ap.directory_path
+    FROM atlas_packets ap
+    LEFT JOIN LATERAL (
+      SELECT summary_text, summary
+      FROM atlas_summary_layers layer
+      WHERE layer.packet_key = ap.packet_key
+      ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
+      LIMIT 1
+    ) asl ON TRUE
+    WHERE ap.packet_key = ${recoveryPacketKey}
     LIMIT 1
   `);
 

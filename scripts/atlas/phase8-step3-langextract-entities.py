@@ -78,8 +78,11 @@ PG_DB       = os.getenv('PGDATABASE', 'legal_ai_db')
 PG_USER     = os.getenv('PGUSER',     'legal_admin')
 PG_PASS     = os.getenv('PGPASSWORD', os.getenv('DB_PASSWORD', '123456'))
 
-# llama-server OpenAI-compatible endpoint (port 8091 = gemma4-legal-iq4xs-direct.gguf)
-LLAMA_URL   = os.getenv('GEMMA4_URL', os.getenv('OPENCODE_GEMMA4_URL', 'http://127.0.0.1:8091')).rstrip('/')
+# llama-server OpenAI-compatible endpoint.
+# Default to the canonical 8090 summary lane.
+# Override only with LANGEXTRACT_GEMMA4_URL so shared GEMMA4_URL envs do not
+# accidentally redirect this step to the benchmark lane.
+LLAMA_URL   = os.getenv('LANGEXTRACT_GEMMA4_URL', 'http://127.0.0.1:8090').rstrip('/')
 DEFAULT_MODEL = os.getenv('LANGEXTRACT_MODEL', 'gemma4-legal-iq4xs-direct.gguf')
 
 # ── Legal extraction prompt ────────────────────────────────────────────────────

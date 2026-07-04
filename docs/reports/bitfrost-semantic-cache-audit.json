@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-04T00:58:25.706Z",
+  "generatedAt": "2026-07-04T09:48:04.668Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -9,7 +9,7 @@
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
     "bifrostKeys": 12430,
-    "centroidKeys": 8,
+    "centroidKeys": 807,
     "somKeys": 62
   },
   "patterns": [
@@ -36,36 +36,36 @@
       "pattern": "bifrost:*",
       "count": 12430,
       "sample": [
-        "bifrost:packet:packet:7ea52133cd5c",
-        "bifrost:feature:vscode-extension.claudePlan",
-        "bifrost:packet:packet:a8bb7fcc6a81",
-        "bifrost:feature:.svelte-error-fixes-backup.StatsCard",
-        "bifrost:feature:docs.howtogetaround_gitignore_524_26"
+        "bifrost:packet:packet:159e0f59c788",
+        "bifrost:feature:.tmp.build_config_int4.json.report.json.items.jsonl",
+        "bifrost:feature:crates.librustc_hash-b5f66e3f21703a29",
+        "bifrost:feature:llm.llm_dependencies",
+        "bifrost:packet:packet:fd23e3478cc2"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:packet:packet:7ea52133cd5c",
-          "ttl": 602663,
+          "key": "bifrost:packet:packet:159e0f59c788",
+          "ttl": 570885,
           "ok": true
         },
         {
-          "key": "bifrost:feature:vscode-extension.claudePlan",
-          "ttl": 602664,
+          "key": "bifrost:feature:.tmp.build_config_int4.json.report.json.items.jsonl",
+          "ttl": 570885,
           "ok": true
         },
         {
-          "key": "bifrost:packet:packet:a8bb7fcc6a81",
-          "ttl": 602663,
+          "key": "bifrost:feature:crates.librustc_hash-b5f66e3f21703a29",
+          "ttl": 570885,
           "ok": true
         },
         {
-          "key": "bifrost:feature:.svelte-error-fixes-backup.StatsCard",
-          "ttl": 602663,
+          "key": "bifrost:feature:llm.llm_dependencies",
+          "ttl": 570885,
           "ok": true
         },
         {
-          "key": "bifrost:feature:docs.howtogetaround_gitignore_524_26",
-          "ttl": 602663,
+          "key": "bifrost:packet:packet:fd23e3478cc2",
+          "ttl": 570885,
           "ok": true
         }
       ],
@@ -75,38 +75,38 @@
     {
       "key": "centroid:*",
       "pattern": "centroid:*",
-      "count": 8,
+      "count": 807,
       "sample": [
-        "centroid:0",
+        "centroid:som:-338",
+        "centroid:som:-141",
         "centroid:RetrievalAugmentedGeneration (RAG) / AI Infrastructure:Modular Service Layer",
-        "centroid:Retrieval and Inference System:Module Integration",
-        "centroid:Codebase Analysis:Basic Code Metrics",
-        "centroid:Retrieval-Augmented Generation (RAG) System:Modular Service Components"
+        "centroid:som:-212",
+        "centroid:som:-230"
       ],
       "ttlSamples": [
         {
-          "key": "centroid:0",
-          "ttl": -1,
+          "key": "centroid:som:-338",
+          "ttl": 86101,
+          "ok": true
+        },
+        {
+          "key": "centroid:som:-141",
+          "ttl": 86096,
           "ok": true
         },
         {
           "key": "centroid:RetrievalAugmentedGeneration (RAG) / AI Infrastructure:Modular Service Layer",
-          "ttl": 441684,
+          "ttl": 409906,
           "ok": true
         },
         {
-          "key": "centroid:Retrieval and Inference System:Module Integration",
-          "ttl": 440798,
+          "key": "centroid:som:-212",
+          "ttl": 86098,
           "ok": true
         },
         {
-          "key": "centroid:Codebase Analysis:Basic Code Metrics",
-          "ttl": 423158,
-          "ok": true
-        },
-        {
-          "key": "centroid:Retrieval-Augmented Generation (RAG) System:Modular Service Components",
-          "ttl": 440433,
+          "key": "centroid:som:-230",
+          "ttl": 86098,
           "ok": true
         }
       ],
@@ -118,35 +118,35 @@
       "pattern": "som:*",
       "count": 62,
       "sample": [
-        "som:7",
-        "som:33",
-        "som:81",
-        "som:0",
-        "som:30"
+        "som:98",
+        "som:3",
+        "som:87",
+        "som:69",
+        "som:37"
       ],
       "ttlSamples": [
         {
-          "key": "som:7",
+          "key": "som:98",
           "ttl": -1,
           "ok": true
         },
         {
-          "key": "som:33",
+          "key": "som:3",
           "ttl": -1,
           "ok": true
         },
         {
-          "key": "som:81",
+          "key": "som:87",
           "ttl": -1,
           "ok": true
         },
         {
-          "key": "som:0",
+          "key": "som:69",
           "ttl": -1,
           "ok": true
         },
         {
-          "key": "som:30",
+          "key": "som:37",
           "ttl": -1,
           "ok": true
         }
@@ -159,36 +159,36 @@
       "pattern": "bifrost:sem:packet:*",
       "count": 26,
       "sample": [
-        "bifrost:sem:packet:packet:0003260092b1",
-        "bifrost:sem:packet:packet:000f10a13a57",
-        "bifrost:sem:packet:packet:0009951ee430",
-        "bifrost:sem:packet:packet:0004b466d863",
-        "bifrost:sem:packet:packet:0011712c94d1"
+        "bifrost:sem:packet:packet:0014edb0c6e4",
+        "bifrost:sem:packet:packet:0003ab694534",
+        "bifrost:sem:packet:packet:000db15dc8ef",
+        "bifrost:sem:packet:packet:001007058f4a",
+        "bifrost:sem:packet:packet:0003260092b1"
       ],
       "ttlSamples": [
         {
+          "key": "bifrost:sem:packet:packet:0014edb0c6e4",
+          "ttl": 85378,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:0003ab694534",
+          "ttl": 85345,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:000db15dc8ef",
+          "ttl": 85360,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:packet:packet:001007058f4a",
+          "ttl": 85370,
+          "ok": true
+        },
+        {
           "key": "bifrost:sem:packet:packet:0003260092b1",
-          "ttl": 66543,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:000f10a13a57",
-          "ttl": 66561,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0009951ee430",
-          "ttl": 66553,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0004b466d863",
-          "ttl": 66548,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0011712c94d1",
-          "ttl": 66567,
+          "ttl": 85341,
           "ok": true
         }
       ],
@@ -200,36 +200,36 @@
       "pattern": "bifrost:sem:feature:*",
       "count": 28,
       "sample": [
-        "bifrost:sem:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
-        "bifrost:sem:feature:sveltekit-frontend.embedded-summaries",
-        "bifrost:sem:feature:.svelte-error-fixes-backup.+layout",
+        "bifrost:sem:feature:sveltekit-frontend.hypergraph-4d",
         "bifrost:sem:feature:.tmp.0056213574662f41",
-        "bifrost:sem:feature:sveltekit-frontend.tests__cases-sub-routes.spec"
+        "bifrost:sem:feature:sveltekit-frontend.llm_synthesis_mapping",
+        "bifrost:sem:feature:.svelte-error-fixes-backup.+layout",
+        "bifrost:sem:feature:sveltekit-frontend.+server"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:sem:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
-          "ttl": 66543,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:sveltekit-frontend.embedded-summaries",
-          "ttl": 423071,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:feature:.svelte-error-fixes-backup.+layout",
-          "ttl": 66546,
+          "key": "bifrost:sem:feature:sveltekit-frontend.hypergraph-4d",
+          "ttl": 409900,
           "ok": true
         },
         {
           "key": "bifrost:sem:feature:.tmp.0056213574662f41",
-          "ttl": 66551,
+          "ttl": 85352,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:sveltekit-frontend.tests__cases-sub-routes.spec",
-          "ttl": 66541,
+          "key": "bifrost:sem:feature:sveltekit-frontend.llm_synthesis_mapping",
+          "ttl": 85339,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:.svelte-error-fixes-backup.+layout",
+          "ttl": 85346,
+          "ok": true
+        },
+        {
+          "key": "bifrost:sem:feature:sveltekit-frontend.+server",
+          "ttl": 85366,
           "ok": true
         }
       ],
@@ -257,14 +257,38 @@
     {
       "key": "ace:context:*",
       "pattern": "ace:context:*",
-      "count": 1,
+      "count": 26,
       "sample": [
-        "ace:context:docs/+server.ts:4c62f7025d50f175"
+        "ace:context:packet:000db15dc8ef",
+        "ace:context:packet:001007058f4a",
+        "ace:context:packet:000f10a13a57",
+        "ace:context:packet:0011a232d0b8",
+        "ace:context:packet:0014edb0c6e4"
       ],
       "ttlSamples": [
         {
-          "key": "ace:context:docs/+server.ts:4c62f7025d50f175",
-          "ttl": 170357,
+          "key": "ace:context:packet:000db15dc8ef",
+          "ttl": 2552,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:001007058f4a",
+          "ttl": 2562,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:000f10a13a57",
+          "ttl": 2555,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:0011a232d0b8",
+          "ttl": 2564,
+          "ok": true
+        },
+        {
+          "key": "ace:context:packet:0014edb0c6e4",
+          "ttl": 2569,
           "ok": true
         }
       ],
@@ -274,38 +298,38 @@
     {
       "key": "ace:summary:*",
       "pattern": "ace:summary:*",
-      "count": 84,
+      "count": 109,
       "sample": [
-        "ace:summary:summary:d2681a65833461a1",
-        "ace:summary:summary:8bc7f1b3588ce909",
-        "ace:summary:summary:257fd374023543ec",
-        "ace:summary:summary:896f4cb249d009c8",
-        "ace:summary:summary:36a88ce7b865dbfe"
+        "ace:summary:summary:89dd151d353e7c51",
+        "ace:summary:summary:04a7f3765ee73323",
+        "ace:summary:summary:db0ba7e8f7959ca4",
+        "ace:summary:summary:003914849fd74a2e",
+        "ace:summary:summary:1b50d504e06e9956"
       ],
       "ttlSamples": [
         {
-          "key": "ace:summary:summary:d2681a65833461a1",
-          "ttl": 236228,
+          "key": "ace:summary:summary:89dd151d353e7c51",
+          "ttl": 205366,
           "ok": true
         },
         {
-          "key": "ace:summary:summary:8bc7f1b3588ce909",
-          "ttl": 237148,
+          "key": "ace:summary:summary:04a7f3765ee73323",
+          "ttl": 204456,
           "ok": true
         },
         {
-          "key": "ace:summary:summary:257fd374023543ec",
-          "ttl": 237135,
+          "key": "ace:summary:summary:db0ba7e8f7959ca4",
+          "ttl": 204447,
           "ok": true
         },
         {
-          "key": "ace:summary:summary:896f4cb249d009c8",
-          "ttl": 236244,
+          "key": "ace:summary:summary:003914849fd74a2e",
+          "ttl": 205355,
           "ok": true
         },
         {
-          "key": "ace:summary:summary:36a88ce7b865dbfe",
-          "ttl": 235647,
+          "key": "ace:summary:summary:1b50d504e06e9956",
+          "ttl": 205362,
           "ok": true
         }
       ],
@@ -315,9 +339,41 @@
     {
       "key": "ace:feature:*",
       "pattern": "ace:feature:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 25,
+      "sample": [
+        "ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+        "ace:feature:neschrom97.a45aa64da8f0240c",
+        "ace:feature:sveltekit-frontend.keyboard-shortcuts.svelte",
+        "ace:feature:neschrom97.93f973562fff24ed",
+        "ace:feature:.svelte-error-fixes-backup.+layout"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+          "ttl": 2532,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:neschrom97.a45aa64da8f0240c",
+          "ttl": 2564,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:sveltekit-frontend.keyboard-shortcuts.svelte",
+          "ttl": 2546,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:neschrom97.93f973562fff24ed",
+          "ttl": 2533,
+          "ok": true
+        },
+        {
+          "key": "ace:feature:.svelte-error-fixes-backup.+layout",
+          "ttl": 2534,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },

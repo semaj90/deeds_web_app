@@ -109,6 +109,7 @@ function buildBitFrostEnvelope(packet, topology, retrieval) {
     source_ref: packet.source_ref,
     feature_id: packet.feature_id,
     title_id: packet.title_id || packet.feature_id || packet.packet_key,
+    summary: packet.summary || null,
     tree_id: `contextual-tree:${packet.feature_id}`,
 
     topology: {
@@ -162,17 +163,25 @@ async function enqueuePackets() {
     const result = await pool.query(`
       SELECT
         p.packet_id,
-        p.packet_key,
-        p.source_ref,
-        p.feature_id,
-        COALESCE(p.title, p.feature_id) as title_id,
-        c.som_cluster,
-        c.qdrant_id as qdrant_point_id,
-        (p.metadata->>'rrf')::float as rrf_score,
-        (p.metadata->'topology'->>'pagerank')::float as pagerank,
-        (p.metadata->'topology'->>'community_id')::int as community_id
+      p.packet_key,
+      p.source_ref,
+      p.feature_id,
+      COALESCE(p.title, p.feature_id) as title_id,
+      COALESCE(NULLIF(p.summary, ''), NULLIF(asl.summary_text, ''), NULLIF(asl.summary, '')) as summary,
+      c.som_cluster,
+      c.qdrant_id as qdrant_point_id,
+      (p.metadata->>'rrf')::float as rrf_score,
+      (p.metadata->'topology'->>'pagerank')::float as pagerank,
+      (p.metadata->'topology'->>'community_id')::int as community_id
       FROM atlas_packets p
       LEFT JOIN codebase_chunk_index c ON p.source_ref = c.relative_path
+      LEFT JOIN LATERAL (
+        SELECT summary_text, summary
+        FROM atlas_summary_layers layer
+        WHERE layer.packet_key = p.packet_key
+        ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
+        LIMIT 1
+      ) asl ON TRUE
       WHERE p.packet_key IS NOT NULL
       ORDER BY p.packet_id
       LIMIT $1
@@ -190,6 +199,7 @@ async function enqueuePackets() {
         source_ref: packet.source_ref,
         feature_id: packet.feature_id,
         title_id: packet.title_id,
+        summary: packet.summary || null,
         topology: {
           som_cluster: packet.som_cluster,
           pagerank: packet.pagerank || 0,
@@ -340,6 +350,16 @@ async function startWorker() {
 
         // Optional: Update Postgres metadata with BitFrost trace
         try {
+          if (packet.summary) {
+            await pool.query(
+              `UPDATE atlas_packets
+               SET summary = COALESCE(NULLIF(summary, ''), $1),
+                   updated_at = NOW()
+               WHERE packet_key = $2`,
+              [packet.summary, packet.packet_key]
+            );
+          }
+
           await pool.query(
             `UPDATE atlas_packets SET metadata = jsonb_set(metadata, '{bitfrost_trace}', $1) WHERE packet_key = $2`,
             [JSON.stringify({

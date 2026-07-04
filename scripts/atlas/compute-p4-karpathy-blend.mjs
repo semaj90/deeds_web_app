@@ -110,9 +110,9 @@ async function computeKarpathyBlend() {
       maxFeat = Math.max(maxFeat, row.unique_features);
     }
 
-    // Normalize provenance to [0,1]
+    // Normalize provenance to [0,1] against actual maximum (not hardcoded 10)
     Object.entries(provScores).forEach(([clusterId, feat]) => {
-      provScores[parseInt(clusterId)] = maxFeat > 0 ? Math.min(1, feat / 10) : 0;
+      provScores[parseInt(clusterId)] = maxFeat > 0 ? Math.min(1, feat / maxFeat) : 0;
     });
     log(`✅ Computed provenance scores for ${Object.keys(provScores).length} clusters`);
 

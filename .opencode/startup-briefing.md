@@ -55,7 +55,7 @@ Hello James.
 2. With the Qdrant tag mirror applied, move to the Neo4j / GDS topology pass until graph scores, community labels, and sourceRef projection are fully applied.
 3. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
 4. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
-5. Use dev:gpu as the capture harness, but keep llama-server.exe on :8090 for chat/synthesis and Ollama/EmbeddingGemma embeddings-only; route RTX into batching, compression, and rerank, not canonical truth.
+5. Use dev:gpu as the capture harness. Keep llama-server.exe on :8090 for canonical chat/synthesis and Ollama/EmbeddingGemma embeddings-only; use :8091 via `OPENCODE_GEMMA4_URL` for the MTP benchmark lane. Route RTX into batching, compression, and rerank, not canonical truth.
 
 ## Notes
 
@@ -128,4 +128,3 @@ I will structure the summary by file/module, detailing the functions and their p
 - tool routing health execution pool size: 4-6 required tools
 - recommendation workflow status: READY
 - turbovec plan status: READY
-

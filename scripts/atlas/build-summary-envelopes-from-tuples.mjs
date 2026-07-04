@@ -55,6 +55,7 @@ const SummaryEnvelopeSchema = z.object({
   source_ref: z.string().min(1),
   domain_class: z.string().nullable().optional(),
   feature_label: z.string().nullable().optional(),
+  batch_index: z.number().int().nonnegative(),
   rank: z.number().int().positive(),
   score: z.number(),
   tuple_count: z.number().int().nonnegative(),
@@ -177,7 +178,13 @@ function deriveUsedConcepts(group) {
     group.feature_label,
     group.feature_id,
     group.domain_class,
-    ...Array.from(group.symbols),
+    ...(Array.isArray(group.symbols)
+      ? group.symbols
+      : group.symbols instanceof Set
+        ? Array.from(group.symbols)
+        : Array.isArray(group.top_symbols)
+          ? group.top_symbols
+          : []),
   ];
   return [...new Set(values.map((value) => String(value ?? '').trim().toLowerCase()).filter((value) => value.length >= 3))].slice(0, 40);
 }
@@ -216,6 +223,7 @@ function rankGroups(groups) {
       score,
       tuple_count: group.tuples.length,
       symbol_count: group.symbols.size,
+      symbols: Array.from(group.symbols),
       has_summary: group.tuples.some(t => t.summary),
       source_ref: group.source_ref,
       domain_class: group.domain_class,
@@ -260,7 +268,7 @@ function buildEnvelopes(rankedGroups, topK) {
         rank: i + 1,
         score: group.score,
         tuple_count: sub.tuples.length,
-        symbol_count: group.symbols.size,
+        symbol_count: group.symbol_count ?? (Array.isArray(group.symbols) ? group.symbols.length : 0),
         top_symbols: group.top_symbols,
         candidate_refs: sub.tuples.map(t => t.packet_key),
         has_existing_summary: group.has_summary,
@@ -312,7 +320,7 @@ function buildSummaryJobs(envelopes) {
       top_symbols: envelope.top_symbols,
       candidate_refs: envelope.candidate_refs,
       max_tokens: 512,
-      model: 'gemma4-rotorquant:latest',
+        model: 'gemma4-legal-iq4xs-direct.gguf',
       created_at: new Date().toISOString(),
     });
   }

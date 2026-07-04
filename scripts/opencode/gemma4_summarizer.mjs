@@ -1,13 +1,36 @@
 #!/usr/bin/env node
-import fs from 'fs/promises';
+import fs from 'fs';
+import fsp from 'fs/promises';
 import { basename, join } from 'path';
 import { createHash } from 'crypto';
+
+const ROOT = process.cwd();
+
+function loadWorkspaceEnv() {
+  for (const envPath of [join(ROOT, '.env'), join(ROOT, '.env.local')]) {
+    if (!fs.existsSync(envPath)) continue;
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+      const idx = trimmed.indexOf('=');
+      const key = trimmed.slice(0, idx).trim();
+      const value = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, '');
+      if (key && value && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
+loadWorkspaceEnv();
 
 const CARDS_INDEX = '.opencode/cards/index.json';
 const CARDS_DIR = '.opencode/cards';
 const CACHE_DIR = '.opencode/cache';
 
 const GEMMA4_URL =
+  process.env.OPENCODE_GEMMA4_URL ||
   process.env.GEMMA4_URL ||
   process.env.TURBOQUANT_BASE_URL ||
   process.env.LLAMA_SERVER_URL ||
@@ -110,7 +133,7 @@ async function main(){
   const topN = topNIndex >= 0 ? Number(argv[topNIndex+1] || 20) : 20;
 
   try{
-    const idxRaw = await fs.readFile(CARDS_INDEX, 'utf8');
+    const idxRaw = await fsp.readFile(CARDS_INDEX, 'utf8');
     const index = JSON.parse(idxRaw);
     // score by occurrences of query in title+excerpt
     const scored = index.map(i=>{
@@ -129,7 +152,7 @@ async function main(){
 
     for(const cardMeta of scored){
       const cardPath = join(CARDS_DIR, cardMeta.file);
-      const raw = await fs.readFile(cardPath, 'utf8');
+      const raw = await fsp.readFile(cardPath, 'utf8');
       const card = JSON.parse(raw);
       const prompt = buildPrompt(card);
       console.log('Summarizing', cardMeta.id, '...');
@@ -139,7 +162,7 @@ async function main(){
       }catch(e){}
       // skip if exists and not forced
       if(!force){
-        try{ await fs.access(outPath); console.log('Skipping existing summary for', cardMeta.id); continue; }catch(e){}
+        try{ await fsp.access(outPath); console.log('Skipping existing summary for', cardMeta.id); continue; }catch(e){}
       }
         try{
                 const resp = await callLLM(prompt, { dryRun });

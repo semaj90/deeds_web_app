@@ -10,8 +10,27 @@ const execFileP = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 
+function loadWorkspaceEnv() {
+  for (const envPath of [path.join(ROOT, '.env'), path.join(ROOT, '.env.local')]) {
+    if (!fs.existsSync(envPath)) continue;
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
+      const idx = trimmed.indexOf('=');
+      const key = trimmed.slice(0, idx).trim();
+      const value = trimmed.slice(idx + 1).trim().replace(/^["']|["']$/g, '');
+      if (key && value && !process.env[key]) {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
+loadWorkspaceEnv();
 
 const DEFAULT_BASE_URL =
+  process.env.OPENCODE_GEMMA4_URL ??
   process.env.GEMMA4_URL ??
   process.env.TURBO_BASE ??
   process.env.LLAMA_SERVER_URL ??

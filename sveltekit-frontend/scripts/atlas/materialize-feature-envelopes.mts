@@ -10,7 +10,7 @@
  * - packet_key, source_ref, source_ref_key
  * - feature_id, feature_label, domain_class
  * - ontology_label, topology_label, community_id, cluster_key
- * - som_cluster, pagerank, keywords, entities
+ * - som_cluster, pagerank, keywords, entities, tree_node_id
  * - summary_packet_key, provenance
  *
  * Output: atlas_feature_envelopes table (58,304 rows)
@@ -221,6 +221,7 @@ async function main() {
           entities TEXT[] DEFAULT '{}',
           summary_text TEXT,
           title_id TEXT,
+          tree_node_id TEXT,
           lexical_nouns JSONB DEFAULT '[]'::jsonb,
           lexical_verbs JSONB DEFAULT '[]'::jsonb,
           lexical_adverbs_ly JSONB DEFAULT '[]'::jsonb,
@@ -237,6 +238,7 @@ async function main() {
         ALTER TABLE atlas_feature_envelopes
           ADD COLUMN IF NOT EXISTS summary_text TEXT,
           ADD COLUMN IF NOT EXISTS title_id TEXT,
+          ADD COLUMN IF NOT EXISTS tree_node_id TEXT,
           ADD COLUMN IF NOT EXISTS lexical_nouns JSONB DEFAULT '[]'::jsonb,
           ADD COLUMN IF NOT EXISTS lexical_verbs JSONB DEFAULT '[]'::jsonb,
           ADD COLUMN IF NOT EXISTS lexical_adverbs_ly JSONB DEFAULT '[]'::jsonb,
@@ -265,7 +267,7 @@ async function main() {
         ontology_label, topology_label,
         community_id, cluster_key, som_cluster, pagerank,
         keywords, entities,
-        summary_text, title_id,
+        summary_text, title_id, tree_node_id,
         summary_packet_key, provenance
       )
       SELECT
@@ -288,6 +290,7 @@ async function main() {
         COALESCE(asl.entities, ARRAY[]::text[]) as entities,
         COALESCE(NULLIF(asl.summary_text, ''), NULLIF(asl.summary, ''), ap.summary) as summary_text,
         COALESCE(ap.title_id, ap.feature_id) as title_id,
+        COALESCE(ap.tree_node_id, tn.node_id) as tree_node_id,
         asl.packet_key as summary_packet_key,
         JSONB_BUILD_OBJECT(
           'layer_type', asl.layer_type,
@@ -303,6 +306,13 @@ async function main() {
         ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
         LIMIT 1
       ) asl ON TRUE
+      LEFT JOIN LATERAL (
+        SELECT node_id
+        FROM atlas_tree_nodes tn
+        WHERE tn.packet_key = ap.packet_key
+        ORDER BY tn.created_at ASC NULLS LAST, tn.updated_at ASC NULLS LAST
+        LIMIT 1
+      ) tn ON TRUE
       LEFT JOIN LATERAL (
         SELECT MAX(cf.page_rank_score) as pagerank
         FROM code_features cf
@@ -321,6 +331,7 @@ async function main() {
         pagerank = EXCLUDED.pagerank,
         summary_text = EXCLUDED.summary_text,
         title_id = EXCLUDED.title_id,
+        tree_node_id = EXCLUDED.tree_node_id,
         provenance = EXCLUDED.provenance;
     `;
 
@@ -364,6 +375,7 @@ async function main() {
         feature_id,
         feature_label,
         title_id,
+        tree_node_id,
         domain_class,
         summary_text,
         keywords,
@@ -450,6 +462,7 @@ async function main() {
         COUNT(CASE WHEN entities IS NOT NULL AND array_length(entities, 1) > 0 THEN 1 END) as with_entities,
         COUNT(CASE WHEN pagerank IS NOT NULL THEN 1 END) as with_pagerank,
         COUNT(CASE WHEN title_id IS NOT NULL AND title_id <> '' THEN 1 END) as with_title_id,
+        COUNT(CASE WHEN tree_node_id IS NOT NULL AND tree_node_id <> '' THEN 1 END) as with_tree_node_id,
         COUNT(CASE WHEN jsonb_array_length(lexical_nouns) > 0 THEN 1 END) as with_lexical_nouns,
         COUNT(CASE WHEN jsonb_array_length(lexical_verbs) > 0 THEN 1 END) as with_lexical_verbs,
         COUNT(CASE WHEN jsonb_array_length(lexical_adverbs_ly) > 0 THEN 1 END) as with_lexical_adverbs,
@@ -465,6 +478,7 @@ async function main() {
     console.log(`  With entities: ${stats.with_entities}`);
     console.log(`  With pagerank: ${stats.with_pagerank}`);
     console.log(`  With title_id: ${stats.with_title_id}`);
+    console.log(`  With tree_node_id: ${stats.with_tree_node_id}`);
     console.log(`  With lexical nouns: ${stats.with_lexical_nouns}`);
     console.log(`  With lexical verbs: ${stats.with_lexical_verbs}`);
     console.log(`  With -ly adverbs: ${stats.with_lexical_adverbs}`);

@@ -11,10 +11,11 @@
  */
 
 import neo4j from 'neo4j-driver';
-import { createClient } from 'redis';
 import pg from 'pg';
 import { config } from 'dotenv';
 import { resolve } from 'path';
+import crypto from 'node:crypto';
+import { resolveAtlasRedisContext, runRedisCli } from './lib/redis-valkey.mjs';
 
 config({ path: resolve('.', '.env') });
 
@@ -22,14 +23,6 @@ const driver = neo4j.default.driver(
   process.env.NEO4J_URI || 'bolt://localhost:7687',
   neo4j.default.auth.basic('neo4j', process.env.NEO4J_PASSWORD || 'password')
 );
-
-const redis = createClient({
-  socket: {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-  },
-  password: process.env.REDIS_PASSWORD || 'redis',
-});
 
 const pgPool = new pg.Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
@@ -45,6 +38,8 @@ console.log('╚═════════════════════�
 
 async function computeLouvain() {
   const session = driver.session();
+  const redisCtx = await resolveAtlasRedisContext(resolve('.'), process.env);
+  const redisKey = 'bitfrost:louvain:community-stats:v1';
 
   try {
     console.log('📊 Step 1: Drop existing projection (if any) and create GDS projection\n');
@@ -58,15 +53,13 @@ async function computeLouvain() {
       console.log(`   ℹ️  No existing projection to drop\n`);
     }
 
-    // Create graph projection with multiple relationship types
+    // Create graph projection — only SIMILAR_TOPOLOGY exists at volume (51K edges)
     const projRes = await session.run(`
       CALL gds.graph.project(
         'packetGraph',
         'Packet',
         {
-          SIMILAR_TOPOLOGY: { orientation: 'UNDIRECTED' },
-          DEPENDS_ON: { orientation: 'NATURAL' },
-          SAME_FEATURE: { orientation: 'UNDIRECTED' }
+          SIMILAR_TOPOLOGY: { orientation: 'UNDIRECTED' }
         }
       )
       YIELD nodeCount, relationshipCount
@@ -140,11 +133,12 @@ async function computeLouvain() {
       process.exit(1);
     }
 
-    // Fetch ALL community assignments from Neo4j
+    // Fetch ALL community assignments from Neo4j — join via path (= source_ref without prefix)
+    // Neo4j nodes use n.path = 'src/...' which maps to Postgres source_ref = 'sveltekit-frontend/src/...'
     const allRes = await session.run(`
       MATCH (n:Packet)
-      WHERE n.community_id IS NOT NULL AND n.packet_key IS NOT NULL
-      RETURN n.packet_key as packet_key, n.community_id as community_id
+      WHERE n.community_id IS NOT NULL AND n.path IS NOT NULL
+      RETURN n.path as path, n.community_id as community_id
     `);
 
     const recordCount = allRes.records.length;
@@ -155,45 +149,46 @@ async function computeLouvain() {
       if (recordCount > 0) {
         const samples = allRes.records.slice(0, 3).map(r => {
           const obj = r.toObject();
-          return `${obj.packet_key}: community ${obj.community_id}`;
+          const commId = obj.community_id.toNumber ? obj.community_id.toNumber() : parseInt(obj.community_id);
+          return `sveltekit-frontend/${obj.path}: community ${commId}`;
         });
         console.log(`   Sample mappings:\n      ${samples.join('\n      ')}\n`);
       }
       console.log(`   DRY-RUN: Skipping Postgres writes\n`);
     } else {
-      // APPLY: Batch Postgres updates
+      // APPLY: Batch Postgres updates — join by prefixed source_ref
       const BATCH_SIZE = 500;
       let synced = 0;
 
       for (let i = 0; i < recordCount; i += BATCH_SIZE) {
         const batch = allRes.records.slice(i, i + BATCH_SIZE);
 
-        // Build VALUES clause for batch update
         const values = [];
         const placeholders = [];
         let paramIndex = 1;
 
         for (const record of batch) {
-          const { packet_key, community_id } = record.toObject();
+          const { path, community_id } = record.toObject();
           const communityIdNum = community_id.toNumber ? community_id.toNumber() : parseInt(community_id);
-          values.push(packet_key, communityIdNum);
-          placeholders.push(`($${paramIndex}, $${paramIndex + 1})`);
+          // Postgres stores 'sveltekit-frontend/src/...' while Neo4j has 'src/...'
+          const sourceRef = 'sveltekit-frontend/' + path;
+          values.push(sourceRef, communityIdNum);
+          placeholders.push(`($${paramIndex}, $${paramIndex + 1}::integer)`);
           paramIndex += 2;
         }
 
-        // Batch update with VALUES
-        await pgPool.query(
+        const res = await pgPool.query(
           `UPDATE atlas_packets AS p
            SET community_id = v.community_id,
                updated_at = NOW()
            FROM (VALUES ${placeholders.join(', ')})
-           AS v(packet_key, community_id)
-           WHERE p.packet_key = v.packet_key`,
+           AS v(source_ref, community_id)
+           WHERE p.source_ref = v.source_ref`,
           values
         );
 
-        synced += batch.length;
-        if (synced % 1000 === 0) {
+        synced += res.rowCount;
+        if (i % 5000 === 0 && i > 0) {
           console.log(`   ✓ Synced ${synced}/${recordCount} assignments...`);
         }
       }
@@ -204,7 +199,7 @@ async function computeLouvain() {
     console.log('💾 Step 4: Cache community statistics in Redis\n');
 
     if (!DRY_RUN && allRes.records.length > 0) {
-      // Compute community statistics and cache
+      // Compute community statistics and cache as a canonical envelope-shaped JSON blob
       const communityStats = {};
       for (const record of allRes.records) {
         const { community_id } = record.toObject();
@@ -212,17 +207,66 @@ async function computeLouvain() {
         communityStats[idNum] = (communityStats[idNum] || 0) + 1;
       }
 
-      const statMap = {};
-      for (const [communityId, count] of Object.entries(communityStats)) {
-        statMap[`community:${communityId}:count`] = count.toString();
-      }
+      const commIds = Object.keys(communityStats);
+      if (commIds.length > 0 && redisCtx.container) {
+        const totalCommunities = commIds.length;
+        const totalAssignments = Object.values(communityStats).reduce((sum, count) => sum + count, 0);
+        const packetKey = `sha256:${crypto.createHash('sha256').update(`louvain:${totalCommunities}:${totalAssignments}`, 'utf8').digest('hex')}`;
+        const packetId = crypto.randomUUID();
+        const envelope = {
+          packet_id: packetId,
+          packet_ulid: null,
+          packet_key: packetKey,
+          title_id: 'graph.community.stats',
+          feature_id: 'graph.community.clustering',
+          source_ref: 'neo4j://packetGraph',
+          directory_path: 'neo4j',
+          community_id: null,
+          som_row: null,
+          som_col: null,
+          som_cluster: null,
+          kmeans_cluster_id: null,
+          latent_64: null,
+          manifold_4d: null,
+          qdrant_point_id: null,
+          neo4j_neighbors: [],
+          page_rank_score: null,
+          summary: `Louvain detected ${totalCommunities} communities across ${totalAssignments} packet assignments.`,
+          lexical_nouns: ['louvain', 'community', 'packet', 'graph'],
+          lexical_verbs: ['detect', 'cluster', 'sync'],
+          lexical_adverbs_ly: ['topologically'],
+          routing_hints: ['neo4j', 'bitfrost', 'community', 'graph'],
+          used_concepts: ['louvain', 'community detection', 'graph topology'],
+          supersedes: [],
+          superseded_by: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          confidence: 1,
+          extraction_method: 'neo4j-gds-louvain',
+          provenance: {
+            node_count: recordCount,
+            community_count: totalCommunities,
+            assignment_count: totalAssignments,
+            source: 'neo4j-gds',
+          },
+        };
 
-      if (Object.keys(statMap).length > 0) {
-        await redis.connect();
-        await redis.hSet('louvain:community_stats', statMap);
-        await redis.expire('louvain:community_stats', 24 * 3600); // 24 hour TTL
-        console.log(`   ✅ Cached statistics for ${Object.keys(statMap).length} communities`);
-        console.log(`   Expiry: 24 hours\n`);
+        const payload = JSON.stringify({
+          envelope,
+          community_stats: communityStats,
+        });
+        const cacheResult = runRedisCli(
+          redisCtx.container,
+          ['SETEX', redisKey, String(24 * 3600)],
+          redisCtx.password,
+          payload,
+        );
+        if (!cacheResult.ok) {
+          console.warn(`   ⚠️  Failed to cache Louvain envelope: ${cacheResult.stderr || cacheResult.error || 'unknown error'}`);
+        } else {
+          console.log(`   ✅ Cached canonical Louvain envelope at ${redisKey}`);
+          console.log(`   Expiry: 24 hours\n`);
+        }
       }
     } else if (DRY_RUN) {
       console.log(`   DRY-RUN: Would cache community statistics\n`);
@@ -243,14 +287,6 @@ async function computeLouvain() {
       await session.close();
     } catch (e) {
       // Session already closed
-    }
-
-    if (redis.isOpen) {
-      try {
-        await redis.quit();
-      } catch (e) {
-        // Redis already closed
-      }
     }
 
     try {

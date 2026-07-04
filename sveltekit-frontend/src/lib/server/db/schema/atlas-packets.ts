@@ -4,6 +4,7 @@ import {
   timestamp, index, uuid, boolean, real, customType,
 } from 'drizzle-orm/pg-core';
 import { vector } from 'drizzle-orm/pg-core';
+import { atlasTreeNodes } from './atlas-tree-nodes.js';
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
@@ -72,6 +73,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   betweenness: real('betweenness'),
   eigenvector: real('eigenvector'),
   neo4jNodeId: text('neo4j_node_id'),
+  treeNodeId: uuid('tree_node_id').references(() => atlasTreeNodes.nodeId, { onDelete: 'set null' }),
   redisCentroidKey: text('redis_centroid_key'),
   domainClass: text('domain_class'),
   tags: text('tags').array().notNull().default(sql`'{}'::text[]`),
@@ -119,6 +121,7 @@ export const atlasPackets = pgTable('atlas_packets', {
   betweennessIdx: index('idx_atlas_packets_betweenness').on(table.betweenness),
   eigenvectorIdx: index('idx_atlas_packets_eigenvector').on(table.eigenvector),
   neo4jNodeIdIdx: index('idx_atlas_packets_neo4j_node_id').on(table.neo4jNodeId),
+  treeNodeIdIdx: index('idx_atlas_packets_tree_node_id').on(table.treeNodeId),
   redisCentroidKeyIdx: index('idx_atlas_packets_redis_centroid_key').on(table.redisCentroidKey),
   rewardPriorIdx: index('idx_atlas_packets_reward_prior').on(sql`${table.rewardPrior} DESC`),
   communityConfIdx: index('idx_atlas_packets_community_confidence').on(sql`${table.communityConfidence} DESC`),

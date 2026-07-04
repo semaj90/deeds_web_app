@@ -16,6 +16,7 @@ const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
 
 const quiet = process.env.GRAPHIFY_QUIET === '1';
+const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
 
 try {
   if (!quiet) console.log('[graphify:daily] Starting...');
@@ -28,6 +29,17 @@ try {
   });
 
   console.log('graphify:daily complete');
+
+  if (refreshFeatures) {
+    if (!quiet) console.log('[graphify:daily] Refreshing feature recommendation index...');
+    execSync('npm run atlas:feature-recommendations:refresh', {
+      cwd: ROOT,
+      stdio: 'inherit',
+      shell: true
+    });
+    console.log('[graphify:daily] feature recommendations complete');
+  }
+
   process.exit(0);
 } catch (err) {
   console.error(`ERROR: graphify:daily failed: ${err.message}`);

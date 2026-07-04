@@ -1,28 +1,20 @@
-# GDS/SOM Topology Backfill Report
+# Packet Topology & Vectors Backfill Report
 
-Generated: 2026-06-23T18:50:12.068Z
+Generated: 2026-07-04T06:25:39.519Z
 Mode: **DRY-RUN**
-Input File: `.tmp/addressable-packets.enriched.ndjson`
-
-## Executive Summary
-
-This report captures the results of the Graph Data Science (GDS) and Self-Organizing Map (SOM) topology enrichment pass. Packet structures now carry community partitioning, graph centrality ranks, and SOM BMU grid projections directly inside the validated `topology` envelope.
 
 ## Statistics
 
-| Metric | Count | Percentage |
-|:---|:---|:---|
-| **Total Processed** | 10 | 100% |
-| **Success Updates** | 10 | 100.0% |
-| **Neo4j GDS Enriched** | 9 | 90.0% |
-| **SOM BMU Coords Enriched** | 0 | 0.0% |
-| **Errors** | 0 | 0.0% |
+| Metric | Value |
+|:---|:---|
+| **Total Scanned** | 58304 |
+| **Successfully Backfilled** | 58304 |
+| **Errors** | 0 |
+| **GDS Enriched (PageRank/Louvain)** | 0 |
+| **SOM Enriched (BMU Grid)** | 0 |
+| **Tree Node Enriched** | 47100 |
 
-## Component Status
-
-- **Neo4j GDS**: ✅ REACHABLE (Scored nodes: 8804, Resolved matches: 9)
-- **SOM BMU Coordinates**: ✅ LOADED (Assigned cells: 9372)
-
-## Errors List
-
-*No errors encountered.*
+## Component Validation
+- **Centroid Lookup Storage**: Populated dynamically from Valkey/Redis cache keys.
+- **Vector Lookup Storage**: Cast and synchronized UUID mappings from `atlas_packets` to `atlas_vector_lookup`.
+- **Packet Envelopes**: `topology` JSONB and `vectors` JSONB envelopes correctly mapped and populated.

@@ -35,11 +35,14 @@ Already wired:
 - BitFrost hot cache lanes already exist
 - packet-key dedup audit already exists
 - HyperRAG materialization now best-effort warms the binary registry lane for DAG-hit reuse
+- summary ranking, feature envelope materialization, and lexical enrichment already feed the canonical Phase 8 envelope surface
+- `tree_node_id` is now carried in the feature envelope as derived topology context, not as summary identity
 
 Still missing:
 
 - ingress route that writes binary payloads after validation
 - read route that hydrates binary packets before fan-out
+- explicit promotion of the ranked summary export into the fan-out path that Neo4j / BitFrost consume
 
 Live wiring gap:
 
@@ -114,14 +117,28 @@ Official helpers to prefer:
 - materialize packet rows from canonical envelope + topology fields
 - preserve `title_id`, `feature_id`, `community_id`, `som_row`, `som_col`
 - attach `latent_64` only as derived state
+- carry `tree_node_id` from the graph/topology lane, not from raw summary text
 
-### 5. Add open-lane routing facade
+### 5. Export the ranked summary surface
+
+- export ranked summaries as JSON / NDJSON after `summary-index-ranker`
+- feed that export into `materialize-feature-envelopes.mts`
+- keep the export canonical, not model-specific
+- do not let LangExtract or ast-grep become identity sources
+- use LangExtract / ast-grep for enrichment fields only:
+  - `used_concepts`
+  - `lexical_nouns`
+  - `lexical_verbs`
+  - `lexical_adverbs_ly`
+  - `tree_node_id` when present from topology
+
+### 6. Add open-lane routing facade
 
 - route by `packet_key`, `title_id`, `feature_id`, `community_id`
 - resolve the next hop into Postgres, BitFrost, Qdrant, Neo4j, or TurboVec
 - keep raw generated text out of routing identity
 
-### 6. Keep DAG-assisted Gemma4 downstream
+### 7. Keep DAG-assisted Gemma4 downstream
 
 - Gemma4 receives assembled packets, not identity state
 - summaries stay as derived semantic labels
@@ -181,7 +198,9 @@ Official helpers to prefer:
 2. Replace the codec scaffold with a real binary encoder/decoder.
 3. Wire queue/dequeue containers around the canonical envelope.
 4. Hydrate the open-lane routing facade from the binary registry.
-5. Prove DAG-hit reuse and BitFrost warmup on canonical keys.
+5. Export the ranked summary surface into the canonical envelope flow.
+6. Prove DAG-hit reuse and BitFrost warmup on canonical keys.
+7. Run the Neo4j GDS / tree_node_id pass after ranking, not before it.
 
 ## Non-Goals
 

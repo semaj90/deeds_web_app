@@ -8,6 +8,7 @@ const INDEX = '.opencode/cards/index.json';
 const CARDS_DIR = '.opencode/cards';
 const SUMMARIES_JSONL = '.opencode/cards/summaries.jsonl';
 const GEMMA4_URL =
+  process.env.OPENCODE_GEMMA4_URL ||
   process.env.GEMMA4_URL ||
   process.env.OLLAMA_URL ||
   process.env.TURBOQUANT_URL ||

@@ -20,7 +20,17 @@ import { reankPatternsViaGemma4 } from './gemma4-nlp-reranker.js';
 import { extractEntities } from './entity-extraction.js';
 
 export interface ExtractedFeature {
-	type: 'ast_function' | 'ast_class' | 'ast_method' | 'entity_person' | 'entity_org' | 'entity_location' | 'entity_statute' | 'entity_case';
+	type:
+		| 'ast_function'
+		| 'ast_class'
+		| 'ast_method'
+		| 'ast_arrow'
+		| 'ast_import'
+		| 'entity_person'
+		| 'entity_org'
+		| 'entity_location'
+		| 'entity_statute'
+		| 'entity_case';
 	name: string;
 	description: string;
 	source: 'ast-grep' | 'langextract' | 'pattern';
@@ -72,8 +82,7 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 	}
 
 	// Path 2: AST-Grep features (code only)
-	// NOTE: ast-grep-extractor.ts is currently regex-based fallback, not real AST.
-	// Results are tagged source='ast-grep' for traceability but accuracy is limited.
+	// Uses @ast-grep/napi real AST parsing (confidence 0.92–0.95).
 	if (isCode) {
 		let astExtractor: { extractAstFeatures: (t: string) => Promise<ExtractedFeature[]> } | null = null;
 		try {

@@ -39,6 +39,16 @@ async function main() {
   const pool = new Pool({ connectionString: DATABASE_URL });
   const pgClient = await pool.connect();
 
+  const treeNodeColumnRes = await pgClient.query(`
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'atlas_packets'
+      AND column_name = 'tree_node_id'
+    LIMIT 1
+  `);
+  const hasTreeNodeColumn = treeNodeColumnRes.rows.length > 0;
+  console.log(`✅ atlas_packets.tree_node_id ${hasTreeNodeColumn ? 'available' : 'not available'}.`);
+
   const redis = new Redis(REDIS_URL, {
     lazyConnect: true,
     connectTimeout: 4000,
@@ -210,6 +220,26 @@ async function main() {
     console.warn('   ⚠️  Failed to load GDS scores (table might be empty or missing):', err.message);
   }
 
+  // 4b. Load tree node ids from atlas_tree_nodes
+  console.log('📥 Loading tree_node_id mappings from atlas_tree_nodes...');
+  const treeNodeMap = new Map();
+  try {
+    const treeNodesRes = await pgClient.query(`
+      SELECT packet_key, node_id, source_ref
+      FROM atlas_tree_nodes
+      WHERE packet_key IS NOT NULL
+    `);
+    for (const row of treeNodesRes.rows) {
+      treeNodeMap.set(row.packet_key, {
+        tree_node_id: row.node_id,
+        source_ref: row.source_ref,
+      });
+    }
+    console.log(`   ✅ Loaded ${treeNodeMap.size} tree node mappings.`);
+  } catch (err) {
+    console.warn('   ⚠️  Failed to load tree node mappings:', err.message);
+  }
+
   // 5. Load Centroids from atlas_centroid_lookup
   console.log('📥 Loading centroids from atlas_centroid_lookup...');
   const centroidsMap = new Map();
@@ -241,12 +271,15 @@ async function main() {
   let errorCount = 0;
   let gdsEnriched = 0;
   let somEnriched = 0;
+  let treeNodeEnriched = 0;
 
   while (offset < totalPackets) {
     try {
+      const selectTreeNode = hasTreeNodeColumn ? 'tree_node_id' : 'NULL::uuid AS tree_node_id';
       const packetsRes = await pgClient.query(`
         SELECT packet_id, packet_key, source_ref, directory_path, qdrant_collection, qdrant_vector_dim,
-               topology, vectors, pagerank, community_id, som_row, som_col, som_index, kmeans_cluster, neo4j_node_id, metadata
+               topology, vectors, pagerank, community_id, som_row, som_col, som_index, kmeans_cluster,
+               neo4j_node_id, ${selectTreeNode}, metadata
         FROM atlas_packets
         WHERE packet_key IS NOT NULL AND source_ref IS NOT NULL AND source_ref != ''
         ORDER BY packet_id
@@ -276,14 +309,18 @@ async function main() {
         const newSomCol = somInfo?.som_col !== undefined ? somInfo.som_col : (packet.som_col ?? null);
         const newSomIndex = somInfo?.som_index !== undefined ? somInfo.som_index : (packet.som_index ?? null);
         const newKmeansCluster = centroidId !== null ? centroidId : (packet.kmeans_cluster ?? null);
+        const treeNode = treeNodeMap.get(packet.packet_key) || null;
+        const newTreeNodeId = treeNode?.tree_node_id || packet.tree_node_id || null;
 
         if (gdsScore) gdsEnriched++;
         if (somInfo || centroidId !== null) somEnriched++;
+        if (newTreeNodeId) treeNodeEnriched++;
 
         // Build topology envelope
         const existingTopology = (packet.topology && typeof packet.topology === 'object') ? packet.topology : {};
         const topology = {
           ...existingTopology,
+          tree_node_id: newTreeNodeId || existingTopology.tree_node_id || null,
           community_id: newCommunityId !== null ? String(newCommunityId) : (existingTopology.community_id ?? null),
           neo4j_node_id: packet.neo4j_node_id || existingTopology.neo4j_node_id || null,
           pagerank: newPagerank,
@@ -312,30 +349,59 @@ async function main() {
         };
 
         if (APPLY) {
-          await pgClient.query(`
-            UPDATE atlas_packets
-            SET
-              pagerank = $1,
-              community_id = $2,
-              som_row = $3,
-              som_col = $4,
-              som_index = $5,
-              kmeans_cluster = $6,
-              topology = $7,
-              vectors = $8,
-              updated_at = NOW()
-            WHERE packet_id = $9
-          `, [
-            newPagerank,
-            newCommunityId,
-            newSomRow,
-            newSomCol,
-            newSomIndex,
-            newKmeansCluster,
-            JSON.stringify(topology),
-            JSON.stringify(vectors),
-            packet.packet_id
-          ]);
+          if (hasTreeNodeColumn) {
+            await pgClient.query(`
+              UPDATE atlas_packets
+              SET
+                pagerank = $1,
+                community_id = $2,
+                tree_node_id = $3,
+                som_row = $4,
+                som_col = $5,
+                som_index = $6,
+                kmeans_cluster = $7,
+                topology = $8,
+                vectors = $9,
+                updated_at = NOW()
+              WHERE packet_id = $10
+            `, [
+              newPagerank,
+              newCommunityId,
+              newTreeNodeId,
+              newSomRow,
+              newSomCol,
+              newSomIndex,
+              newKmeansCluster,
+              JSON.stringify(topology),
+              JSON.stringify(vectors),
+              packet.packet_id
+            ]);
+          } else {
+            await pgClient.query(`
+              UPDATE atlas_packets
+              SET
+                pagerank = $1,
+                community_id = $2,
+                som_row = $3,
+                som_col = $4,
+                som_index = $5,
+                kmeans_cluster = $6,
+                topology = $7,
+                vectors = $8,
+                updated_at = NOW()
+              WHERE packet_id = $9
+            `, [
+              newPagerank,
+              newCommunityId,
+              newSomRow,
+              newSomCol,
+              newSomIndex,
+              newKmeansCluster,
+              JSON.stringify(topology),
+              JSON.stringify(vectors),
+              packet.packet_id
+            ]);
+          }
         }
         successCount++;
       }
@@ -376,7 +442,8 @@ async function main() {
       success_count: successCount,
       error_count: errorCount,
       gds_enriched: gdsEnriched,
-      som_enriched: somEnriched
+      som_enriched: somEnriched,
+      tree_node_enriched: treeNodeEnriched
     }
   };
 
@@ -398,6 +465,7 @@ Mode: **${report.mode.toUpperCase()}**
 | **Errors** | ${report.stats.error_count} |
 | **GDS Enriched (PageRank/Louvain)** | ${report.stats.gds_enriched} |
 | **SOM Enriched (BMU Grid)** | ${report.stats.som_enriched} |
+| **Tree Node Enriched** | ${report.stats.tree_node_enriched} |
 
 ## Component Validation
 - **Centroid Lookup Storage**: Populated dynamically from Valkey/Redis cache keys.
@@ -411,6 +479,7 @@ Mode: **${report.mode.toUpperCase()}**
   console.log(`Processed:              ${successCount}`);
   console.log(`GDS Enriched:           ${gdsEnriched}`);
   console.log(`SOM Enriched:           ${somEnriched}`);
+  console.log(`Tree Node Enriched:     ${treeNodeEnriched}`);
   console.log(`Errors:                 ${errorCount}`);
   console.log('═══════════════════════════════════════════════════════════════\n');
 }

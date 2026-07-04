@@ -27,6 +27,7 @@ export type ErrorState =
   | 'retrieval_miss'
   | 'worker_timeout'
   | 'codec_failure'
+  | 'audit_recommendation'   // Gemma4 architectural rec — not a runtime error
   | 'unknown';
 
 export type ErrorObservation =
@@ -38,7 +39,9 @@ export type ErrorObservation =
   | 'TIMEOUT'
   | 'EMPTY_RESULT'
   | 'DECODE_FAIL'
-  | 'TYPECHECK_FAIL';
+  | 'TYPECHECK_FAIL'
+  | 'ARCH_SIGNAL'            // Gemma4 architectural keyword detected
+  | 'REFACTOR_SIGNAL';       // Gemma4 recommendation phrasing detected
 
 export interface ClassificationResult {
   state: ErrorState;
@@ -68,6 +71,7 @@ const STATES: ErrorState[] = [
   'retrieval_miss',
   'worker_timeout',
   'codec_failure',
+  'audit_recommendation',
   'unknown',
 ];
 
@@ -81,53 +85,62 @@ const OBSERVATIONS: ErrorObservation[] = [
   'EMPTY_RESULT',
   'DECODE_FAIL',
   'TYPECHECK_FAIL',
+  'ARCH_SIGNAL',
+  'REFACTOR_SIGNAL',
 ];
 
 // emission[state][observation] = weight
 const EMISSION: Record<ErrorState, Partial<Record<ErrorObservation, number>>> = {
-  schema_mismatch:    { SQL_RELATION_MISSING: 0.9, COLUMN_MISSING: 0.8, HTTP_500: 0.3, TYPECHECK_FAIL: 0.4 },
-  missing_dependency: { IMPORT_FAIL: 0.9, HTTP_404: 0.5, TYPECHECK_FAIL: 0.6 },
-  stale_cache:        { EMPTY_RESULT: 0.7, HTTP_404: 0.4, STALE_CACHE: 0.9 } as never,
-  retrieval_miss:     { EMPTY_RESULT: 0.9, HTTP_404: 0.6, HTTP_500: 0.2 },
-  worker_timeout:     { TIMEOUT: 0.95, HTTP_500: 0.4, EMPTY_RESULT: 0.3 },
-  codec_failure:      { DECODE_FAIL: 0.95, HTTP_500: 0.3, TYPECHECK_FAIL: 0.5 },
-  unknown:            { HTTP_500: 0.3, EMPTY_RESULT: 0.2, TIMEOUT: 0.2 },
+  schema_mismatch:      { SQL_RELATION_MISSING: 0.9, COLUMN_MISSING: 0.8, HTTP_500: 0.3, TYPECHECK_FAIL: 0.4 },
+  missing_dependency:   { IMPORT_FAIL: 0.9, HTTP_404: 0.5, TYPECHECK_FAIL: 0.6 },
+  stale_cache:          { EMPTY_RESULT: 0.7, HTTP_404: 0.4 },
+  retrieval_miss:       { EMPTY_RESULT: 0.9, HTTP_404: 0.6, HTTP_500: 0.2 },
+  worker_timeout:       { TIMEOUT: 0.95, HTTP_500: 0.4, EMPTY_RESULT: 0.3 },
+  codec_failure:        { DECODE_FAIL: 0.95, HTTP_500: 0.3, TYPECHECK_FAIL: 0.5 },
+  // Architectural recommendation state — triggered by Gemma4 suggestion text, not runtime errors
+  audit_recommendation: { ARCH_SIGNAL: 0.90, REFACTOR_SIGNAL: 0.85, TYPECHECK_FAIL: 0.10 },
+  unknown:              { HTTP_500: 0.3, EMPTY_RESULT: 0.2, TIMEOUT: 0.2 },
 };
 
-// Prior weights (initial state distribution)
+// Prior weights (initial state distribution) — must sum to 1.0
 const PRIOR: Record<ErrorState, number> = {
-  schema_mismatch:    0.20,
-  missing_dependency: 0.15,
-  stale_cache:        0.15,
-  retrieval_miss:     0.20,
-  worker_timeout:     0.15,
-  codec_failure:      0.10,
-  unknown:            0.05,
+  schema_mismatch:      0.18,
+  missing_dependency:   0.14,
+  stale_cache:          0.14,
+  retrieval_miss:       0.18,
+  worker_timeout:       0.14,
+  codec_failure:        0.09,
+  audit_recommendation: 0.08,
+  unknown:              0.05,
 };
 
 // Suggested actions per hidden state
 const SUGGESTED_ACTION: Record<ErrorState, string> = {
-  schema_mismatch:    'Run drizzle-kit introspect and verify table exists; check CREATE TABLE migration was applied',
-  missing_dependency: 'Verify npm install ran in sveltekit-frontend; check $lib alias resolution',
-  stale_cache:        'Invalidate BitFrost keys for this packet_key; run cache warm after Postgres read',
-  retrieval_miss:     'Check Qdrant collection count and Postgres codebase_chunk_index population',
-  worker_timeout:     'Increase AbortSignal.timeout; check Gemma4 :8090 health; reduce batch size',
-  codec_failure:      'Verify @msgpack/msgpack encode/decode round-trip; check BYTEA column integrity',
-  unknown:            'Inspect error_signal_stream.evidence for raw error text; escalate to operator',
+  schema_mismatch:      'Run drizzle-kit introspect and verify table exists; check CREATE TABLE migration was applied',
+  missing_dependency:   'Verify npm install ran in sveltekit-frontend; check $lib alias resolution',
+  stale_cache:          'Invalidate BitFrost keys for this packet_key; run cache warm after Postgres read',
+  retrieval_miss:       'Check Qdrant collection count and Postgres codebase_chunk_index population',
+  worker_timeout:       'Increase AbortSignal.timeout; check Gemma4 :8090 health; reduce batch size',
+  codec_failure:        'Verify @msgpack/msgpack encode/decode round-trip; check BYTEA column integrity',
+  audit_recommendation: 'Create review/refactor task in LangGraph Kanban; queue for operator review',
+  unknown:              'Inspect error_signal_stream.evidence for raw error text; escalate to operator',
 };
 
 // ── Observation normalization ─────────────────────────────────────────────────
 
 const OBS_PATTERNS: Array<{ pattern: RegExp | string; obs: ErrorObservation }> = [
-  { pattern: /relation.*does not exist|table.*not found/i,      obs: 'SQL_RELATION_MISSING' },
-  { pattern: /column.*does not exist/i,                          obs: 'COLUMN_MISSING' },
-  { pattern: /cannot find module|import.*fail|ERR_MODULE/i,      obs: 'IMPORT_FAIL' },
-  { pattern: /404|not found/i,                                   obs: 'HTTP_404' },
-  { pattern: /500|internal server error/i,                       obs: 'HTTP_500' },
-  { pattern: /timeout|timed out|ETIMEDOUT|AbortError/i,          obs: 'TIMEOUT' },
-  { pattern: /empty result|no rows|0 rows|zero results/i,        obs: 'EMPTY_RESULT' },
-  { pattern: /decode.*fail|msgpack|BYTEA|binary.*invalid/i,      obs: 'DECODE_FAIL' },
-  { pattern: /TypeScript|TS\d{4}|type.*error|svelte-check/i,     obs: 'TYPECHECK_FAIL' },
+  { pattern: /relation.*does not exist|table.*not found/i,                                       obs: 'SQL_RELATION_MISSING' },
+  { pattern: /column.*does not exist/i,                                                           obs: 'COLUMN_MISSING' },
+  { pattern: /cannot find module|import.*fail|ERR_MODULE/i,                                       obs: 'IMPORT_FAIL' },
+  { pattern: /404|not found/i,                                                                    obs: 'HTTP_404' },
+  { pattern: /500|internal server error/i,                                                        obs: 'HTTP_500' },
+  { pattern: /timeout|timed out|ETIMEDOUT|AbortError/i,                                           obs: 'TIMEOUT' },
+  { pattern: /empty result|no rows|0 rows|zero results/i,                                         obs: 'EMPTY_RESULT' },
+  { pattern: /decode.*fail|msgpack|BYTEA|binary.*invalid/i,                                       obs: 'DECODE_FAIL' },
+  { pattern: /TypeScript|TS\d{4}|type.*error|svelte-check/i,                                      obs: 'TYPECHECK_FAIL' },
+  // Gemma4 architectural recommendation signals — present in suggestion text, not error logs
+  { pattern: /refactor|consolidat|extract.*service|separate.*concern|dedup|dead.?code|remove.*unused|migrate.*to|replace.*with|abstract|modularize/i, obs: 'ARCH_SIGNAL' },
+  { pattern: /should be|consider|recommend|suggest|would benefit|ought to|ideally|better approach/i, obs: 'REFACTOR_SIGNAL' },
 ];
 
 export function normalizeObservation(rawError: string): ErrorObservation | null {
@@ -233,7 +246,7 @@ export async function classifyErrorCluster(
     LIMIT 100
   `);
 
-  const signals = (rows.rows ?? []) as ErrorSignalRow[];
+  const signals = (rows.rows ?? []) as unknown as ErrorSignalRow[];
   const observations = normalizeSignals(signals);
   return classifyObservations(observations);
 }

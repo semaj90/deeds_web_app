@@ -235,6 +235,7 @@ async function main() {
 
   const dbRows = await fetchPacketRows(ranked.map((row) => row.packet_key));
   const maxPre = Math.max(...ranked.map((row) => row.score_pre), 1);
+  const maxPagerank = Math.max(1, ...[...dbRows.values()].map((r) => Number(r.pagerank ?? 0)).filter(Number.isFinite));
   const now = new Date().toISOString();
   const candidates = [];
   fs.mkdirSync(CONTEXT_DIR, { recursive: true });
@@ -262,7 +263,7 @@ async function main() {
         (relationObject.USES_REDIS_CACHE ?? 0) + (relationObject.USES_VECTOR_SEARCH ?? 0) + (relationObject.USES_QDRANT ?? 0),
       Math.max(row.tuple_count, 1)
     );
-    const graphAuthorityScore = normalizeScore(Number(db.pagerank ?? 0), 1);
+    const graphAuthorityScore = normalizeScore(Number(db.pagerank ?? 0), maxPagerank);
     const testCoverageScore = /(?:test|spec)\./i.test(sourceRef) ? 1 : 0;
     const finalScore =
       0.34 * semanticScore +

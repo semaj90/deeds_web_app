@@ -8,10 +8,12 @@
 
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { eq, inArray } from 'drizzle-orm';
+import { ENV } from '$lib/server/env.server.js';
 import type { HyperRAGPacketState, HyperRAGPacketPipeline } from './hyperrag-rpc-client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { makePacketUlid } from '$lib/server/identity/ulid.js';
 import { buildCanonicalAcePacketEnvelope } from '$lib/server/ace/canonical-packet-envelope.js';
+import { persistDagHitEnvelope } from '$lib/server/serialization/dag-hit-envelope-persist.js';
 
 interface ChunkResult {
   content: string;
@@ -218,6 +220,16 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
             updatedAt: new Date(),
           },
         });
+
+        // Best-effort transient binary registry write for DAG-hit reuse.
+        // This does not replace Postgres truth; it promotes the canonical
+        // envelope into the binary handoff lane used by ACE / open-memory.
+        await persistDagHitEnvelope(canonicalEnvelope, 'dag_hit').catch((err) => {
+          console.warn(
+            `[HyperRAGPacketPipeline] binary registry warm failed for ${packet.packetKey}:`,
+            err instanceof Error ? err.message : String(err),
+          );
+        });
       }
     } catch (err) {
       console.error('Materialization failed:', err);
@@ -242,11 +254,12 @@ export class HyperRAGPacketPipelineImpl implements HyperRAGPacketPipeline {
 
   private async summarizeChunk(chunk: string): Promise<string> {
     try {
+      const model = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
       const response = await fetch('http://127.0.0.1:8090/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
+          model,
           messages: [
             {
               role: 'system',

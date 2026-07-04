@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-07-01T01:20:44.928Z",
+  "generated_at": "2026-07-04T09:31:45.299Z",
   "status": "PASS",
   "neo4j": {
     "uri": "bolt://127.0.0.1:7687"
   },
   "counts": {
-    "nodes": 40765,
-    "relationships": 51338,
+    "nodes": 40840,
+    "relationships": 51448,
     "packets": 40754,
-    "features": 0,
+    "features": 11,
     "chrom97_contexts": 1
   },
   "density": {
-    "directed_density": 0.00003089,
-    "avg_relationships_per_node": 1.2594
+    "directed_density": 0.00003085,
+    "avg_relationships_per_node": 1.2597
   },
   "error": null
 }

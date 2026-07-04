@@ -7,7 +7,7 @@
  * into Qdrant payload field for every point in codebase_chunks_768 collection.
  *
  * Canonical metadata fields (15-field envelope):
- *   - source_ref, file_path, feature_id, feature_label
+ *   - packet_key, source_ref, file_path, feature_id, feature_label
  *   - group_id, cluster_id, community_id, som_cluster, centroid_id
  *   - domain, ontology, karpathy_score, redis_hot_key, qdrant_point_id, neo4j_node_id
  *   - feature_id_inferred, feature_id_source, updated_at
@@ -60,6 +60,7 @@ async function closeServices() {
 function buildCanonicalMetadata(pgRow) {
   const metadata = (pgRow.metadata && typeof pgRow.metadata === 'object') ? pgRow.metadata : {};
   return {
+    packet_key: pgRow.packet_key || null,
     source_ref: pgRow.source_ref || null,
     file_path: pgRow.file_path || null,
     feature_id: pgRow.feature_id,
@@ -77,6 +78,7 @@ async function fetchPacketBatch(offset, batchSize) {
     `
     SELECT
       packet_id,
+      packet_key,
       source_ref,
       source_path as file_path,
       feature_id,

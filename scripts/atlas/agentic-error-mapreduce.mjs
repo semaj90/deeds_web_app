@@ -15,6 +15,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
+import { selectRecoveryPacketsBatch } from './lib/topology-recovery-selector.mjs';
 
 const { values: args } = parseArgs({
   options: {
@@ -42,6 +43,9 @@ const OBS_PATTERNS = [
   { pattern: /empty result|no rows|0 rows/i,                   obs: 'EMPTY_RESULT' },
   { pattern: /decode.*fail|msgpack|BYTEA|binary.*invalid/i,    obs: 'DECODE_FAIL' },
   { pattern: /TypeScript|TS\d{4}|type.*error|svelte-check/i,  obs: 'TYPECHECK_FAIL' },
+  // Gemma4 architectural recommendation signals — same as hmm-error-classifier.ts
+  { pattern: /refactor|consolidat|extract.*service|separate.*concern|dedup|dead.?code|remove.*unused|migrate.*to|replace.*with|abstract|modularize/i, obs: 'ARCH_SIGNAL' },
+  { pattern: /should be|consider|recommend|suggest|would benefit|ought to|ideally|better approach/i, obs: 'REFACTOR_SIGNAL' },
 ];
 
 function normalizeObs(raw) {
@@ -53,29 +57,33 @@ function normalizeObs(raw) {
 
 // ── HMM emission weights (mirrors hmm-error-classifier.ts) ───────────────────
 
+// Emission + Prior mirrors hmm-error-classifier.ts exactly (including audit_recommendation)
 const EMISSION = {
-  schema_mismatch:    { SQL_RELATION_MISSING: 0.9, COLUMN_MISSING: 0.8, HTTP_500: 0.3, TYPECHECK_FAIL: 0.4 },
-  missing_dependency: { IMPORT_FAIL: 0.9, HTTP_404: 0.5, TYPECHECK_FAIL: 0.6 },
-  stale_cache:        { EMPTY_RESULT: 0.7, HTTP_404: 0.4 },
-  retrieval_miss:     { EMPTY_RESULT: 0.9, HTTP_404: 0.6, HTTP_500: 0.2 },
-  worker_timeout:     { TIMEOUT: 0.95, HTTP_500: 0.4, EMPTY_RESULT: 0.3 },
-  codec_failure:      { DECODE_FAIL: 0.95, HTTP_500: 0.3, TYPECHECK_FAIL: 0.5 },
-  unknown:            { HTTP_500: 0.3, EMPTY_RESULT: 0.2, TIMEOUT: 0.2 },
+  schema_mismatch:      { SQL_RELATION_MISSING: 0.9, COLUMN_MISSING: 0.8, HTTP_500: 0.3, TYPECHECK_FAIL: 0.4 },
+  missing_dependency:   { IMPORT_FAIL: 0.9, HTTP_404: 0.5, TYPECHECK_FAIL: 0.6 },
+  stale_cache:          { EMPTY_RESULT: 0.7, HTTP_404: 0.4 },
+  retrieval_miss:       { EMPTY_RESULT: 0.9, HTTP_404: 0.6, HTTP_500: 0.2 },
+  worker_timeout:       { TIMEOUT: 0.95, HTTP_500: 0.4, EMPTY_RESULT: 0.3 },
+  codec_failure:        { DECODE_FAIL: 0.95, HTTP_500: 0.3, TYPECHECK_FAIL: 0.5 },
+  audit_recommendation: { ARCH_SIGNAL: 0.90, REFACTOR_SIGNAL: 0.85, TYPECHECK_FAIL: 0.10 },
+  unknown:              { HTTP_500: 0.3, EMPTY_RESULT: 0.2, TIMEOUT: 0.2 },
 };
 
 const PRIOR = {
-  schema_mismatch: 0.20, missing_dependency: 0.15, stale_cache: 0.15,
-  retrieval_miss: 0.20,  worker_timeout: 0.15,     codec_failure: 0.10, unknown: 0.05,
+  schema_mismatch: 0.18, missing_dependency: 0.14, stale_cache: 0.14,
+  retrieval_miss:  0.18, worker_timeout:     0.14, codec_failure: 0.09,
+  audit_recommendation: 0.08, unknown: 0.05,
 };
 
 const SUGGESTED_ACTION = {
-  schema_mismatch:    'Run drizzle-kit introspect and verify migration was applied',
-  missing_dependency: 'Verify npm install ran; check $lib alias resolution',
-  stale_cache:        'Invalidate BitFrost keys; re-warm from Postgres',
-  retrieval_miss:     'Check Qdrant collection count and chunk_index population',
-  worker_timeout:     'Increase AbortSignal.timeout; reduce batch size; check Gemma4 :8090',
-  codec_failure:      'Verify @msgpack/msgpack round-trip; check BYTEA column integrity',
-  unknown:            'Inspect evidence for raw error text; escalate to operator',
+  schema_mismatch:      'Run drizzle-kit introspect and verify migration was applied',
+  missing_dependency:   'Verify npm install ran; check $lib alias resolution',
+  stale_cache:          'Invalidate BitFrost keys; re-warm from Postgres',
+  retrieval_miss:       'Check Qdrant collection count and chunk_index population',
+  worker_timeout:       'Increase AbortSignal.timeout; reduce batch size; check Gemma4 :8090',
+  codec_failure:        'Verify @msgpack/msgpack round-trip; check BYTEA column integrity',
+  audit_recommendation: 'Create review/refactor task in LangGraph Kanban; queue for operator review',
+  unknown:              'Inspect evidence for raw error text; escalate to operator',
 };
 
 function classifyObservations(observations) {
@@ -238,8 +246,23 @@ function reducePhase(mapped) {
 // ── WRITE phase ───────────────────────────────────────────────────────────────
 
 async function writePhase(clusters) {
+  // Topology-aware recovery selection: same community → highest PageRank → summary match
+  // Deterministic: same (error_class, model_name, community_id) → same packet_key
+  let recoveryMap = new Map();
+  if (!DRY_RUN) {
+    try {
+      recoveryMap = await selectRecoveryPacketsBatch(pool, clusters);
+    } catch (err) {
+      console.warn('[mapreduce] topology recovery selection failed, falling back to null:', err.message);
+    }
+  }
+
   let written = 0;
   for (const c of clusters) {
+    const recovery = recoveryMap.get(c.key);
+    const recoveryKey  = recovery?.packet_key ?? null;
+    const recoveryConf = recovery?.confidence ?? c.confidence;
+
     if (DRY_RUN) {
       if (VERBOSE) {
         console.log(
@@ -248,7 +271,8 @@ async function writePhase(clusters) {
           ` | state=${c.state}` +
           ` | confidence=${c.confidence.toFixed(3)}` +
           ` | route=${c.top_route ?? 'n/a'}` +
-          ` | packets=${c.packet_keys.length}`
+          ` | packets=${c.packet_keys.length}` +
+          ` | recovery=${recoveryKey ?? '(not selected in dry-run)'}`
         );
       }
       continue;
@@ -263,7 +287,7 @@ async function writePhase(clusters) {
         packet_keys         = $4,
         failure_count       = error_cluster_groups.failure_count + $5,
         last_seen           = $6,
-        recovery_packet_key = $7,
+        recovery_packet_key = COALESCE($7, error_cluster_groups.recovery_packet_key),
         recovery_confidence = $8
     `, [
       c.error_class,
@@ -272,8 +296,8 @@ async function writePhase(clusters) {
       c.packet_keys,
       c.count,
       c.latest_seen,
-      c.suggested_action,
-      c.confidence,
+      recoveryKey,
+      recoveryConf,
     ]);
 
     written++;
@@ -286,19 +310,29 @@ async function writePhase(clusters) {
 async function warmPhase(clusters) {
   if (DRY_RUN) return 0;
 
+  // Re-run topology recovery for warm phase (clusters already classified)
+  let recoveryMap = new Map();
+  try {
+    recoveryMap = await selectRecoveryPacketsBatch(pool, clusters);
+  } catch { /* non-blocking */ }
+
   const pipeline = redis.pipeline();
   for (const c of clusters) {
+    const recovery = recoveryMap.get(c.key);
     const cacheKey = `bifrost:repair:${c.error_class}:${c.model_name}`;
     pipeline.setex(cacheKey, REPAIR_TTL, JSON.stringify({
-      state:            c.state,
-      confidence:       c.confidence,
-      suggested_action: c.suggested_action,
-      top_route:        c.top_route,
-      packet_keys:      c.packet_keys.slice(0, 10), // cap to 10
-      feature_ids:      c.feature_ids.slice(0, 10),
-      fingerprints:     c.fingerprints,
-      failure_count:    c.count,
-      last_seen:        c.latest_seen,
+      state:                c.state,
+      confidence:           c.confidence,
+      suggested_action:     c.suggested_action,
+      top_route:            c.top_route,
+      recovery_packet_key:  recovery?.packet_key ?? null,
+      recovery_confidence:  recovery?.confidence ?? null,
+      recovery_reason:      recovery?.reason ?? null,
+      packet_keys:          c.packet_keys.slice(0, 10),
+      feature_ids:          c.feature_ids.slice(0, 10),
+      fingerprints:         c.fingerprints,
+      failure_count:        c.count,
+      last_seen:            c.latest_seen,
     }));
   }
   await pipeline.exec();
