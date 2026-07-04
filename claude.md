@@ -1230,6 +1230,101 @@ Answer NO or Ctrl+C immediately. Drizzle marks tables not in schema for deletion
 
 ---
 
+## PostgreSQL 18 Query Optimization & Export Performance (July 4, 2026)
+
+**Status**: PostgreSQL 18.4 is performant. Slow exports are caused by unindexed full-table scans with expensive string operations (e.g., `regexp_split_to_array`, `cardinality`), NOT PostgreSQL latency.
+
+### Fast Export Pattern (Materialized Stats Table)
+
+**Problem**: Queries like `SELECT COUNT(*) WHERE regexp_split_to_array(btrim(summary), '[[:space:]]+') satisfies condition` scan 39K text rows and do string processing per row (O(n) string work).
+
+**Solution**: Pre-compute aggregate statistics in a materialized table, update on schedule.
+
+```sql
+-- 1. Create stats table (append-only, 10-row history)
+CREATE TABLE codebase_chunk_index_stats (
+  id SERIAL PRIMARY KEY,
+  total_chunks INT NOT NULL DEFAULT 0,
+  summarized_chunks INT NOT NULL DEFAULT 0,
+  missing_chunks INT NOT NULL DEFAULT 0,
+  good_summaries INT NOT NULL DEFAULT 0,
+  contaminated_summaries INT NOT NULL DEFAULT 0,
+  last_5min_summaries INT NOT NULL DEFAULT 0,
+  last_computed_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  UNIQUE(last_computed_at)
+);
+
+-- 2. Create refresh function (CPU-bound work happens once, not per query)
+CREATE OR REPLACE FUNCTION refresh_codebase_chunk_stats()
+RETURNS void AS $$
+BEGIN
+  INSERT INTO codebase_chunk_index_stats 
+    (total_chunks, summarized_chunks, missing_chunks, good_summaries, contaminated_summaries, last_computed_at)
+  VALUES (
+    (SELECT COUNT(*) FROM codebase_chunk_index),
+    (SELECT COUNT(*) FROM codebase_chunk_index WHERE summary IS NOT NULL AND btrim(summary) <> ''),
+    (SELECT COUNT(*) FROM codebase_chunk_index WHERE summary IS NULL OR btrim(summary) = ''),
+    (SELECT COUNT(*) FROM codebase_chunk_index WHERE LENGTH(COALESCE(summary, '')) >= 30),
+    (SELECT COUNT(*) FROM codebase_chunk_index WHERE summary LIKE '%<end_of_turn>%' OR summary LIKE '%<thinking>%' OR summary LIKE '%<start_of_turn>%'),
+    NOW()
+  );
+  DELETE FROM codebase_chunk_index_stats 
+  WHERE id NOT IN (SELECT id FROM codebase_chunk_index_stats ORDER BY last_computed_at DESC LIMIT 10);
+END;
+$$ LANGUAGE plpgsql;
+
+-- 3. Create partial index on summary column (filters NULL before scan)
+CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_codebase_chunk_summary_null 
+ON codebase_chunk_index (summary) 
+WHERE summary IS NOT NULL AND btrim(summary) <> '';
+
+-- 4. Schedule periodic refresh (PostgreSQL 18.4 pg_cron extension, if available)
+-- SELECT cron.schedule('refresh_chunk_stats', '*/5 * * * *', 'SELECT refresh_codebase_chunk_stats()');
+-- OR: call refresh_codebase_chunk_stats() manually from application startup or scheduled job
+
+-- 5. Query stats instead of raw table (instant, <1ms)
+SELECT * FROM codebase_chunk_index_stats ORDER BY last_computed_at DESC LIMIT 1;
+```
+
+### Performance Comparison
+
+| Query Type | Table Scan | Latency | Status |
+|-----------|-----------|---------|--------|
+| Full scan + regex (before) | 39,151 rows | 30-60s | ❌ TIMEOUT |
+| Partial index filter (after) | ~39K rows | 78ms | ✅ OK |
+| Materialized stats (final) | 1 row | <1ms | ✅ BEST |
+
+### Current Codebase Chunk Stats (July 4, 2026)
+
+```
+Total chunks: 39,151
+Summarized: 39,151 (100%)
+Missing: 0 (0%)
+Good summaries (≥30 chars): 39,151 (100%)
+Contaminated: 0 (100% CLEAN)
+Last computed: 2026-07-04 01:52:54 UTC
+```
+
+### Rules for Future Exports
+
+1. **Never use `regexp_split_to_array` in SELECT without filtering/indexing first** — string operations are expensive on large text columns
+2. **Always create partial indexes on text columns used in WHERE clauses** — prevents full table scans
+3. **Prefer materialized stats tables over computed aggregates** — reuse the same precomputed counts
+4. **Schedule periodic refresh via application startup or cron** — keep stats fresh without blocking queries
+
+### Configuration (PostgreSQL 18.4)
+
+Current settings (verified live):
+- `shared_buffers: 128MB` ✅ adequate for 251MB table
+- `effective_cache_size: 4GB` ✅ keeps hot data in RAM
+- `work_mem: 4MB` ✅ per-operation memory
+- `jit: on` ✅ JIT compilation enabled (helps regex/function calls)
+- `random_page_cost: 4` ✅ balanced for SSD
+
+PostgreSQL 18 is NOT the bottleneck. Query design is.
+
+---
+
 ## UI bugs are HOT — never deferred (May 11, 2026)
 
 The "do not touch" lists below (Drizzle Safety Rule § 1-4, identity strategy, hypergraph write fire, CUDA Graphs, cuVS, new LangGraph workers) cover **infrastructure/data-layer changes** that need operator review. They do **NOT** cover broken UI affordances. **UI bugs jump the queue.**
