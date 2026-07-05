@@ -17,6 +17,7 @@
 import { Client } from 'pg';
 import * as Redis from 'ioredis';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
 
 const env = loadRepoEnv(process.env);
 const POSTGRES_URL = resolveDatabaseUrl(env);
@@ -161,10 +162,21 @@ async function extractEntities() {
 
     // APPLY: Extract and materialize
     let extracted = 0;
+    let skipped = 0;
     let langExtractFails = 0;
 
     for (let i = 0; i < packets.length; i++) {
       const p = packets[i];
+
+      // Build and validate canonical envelope
+      const { envelope, validation } = buildCanonicalFeatureEnvelope(p);
+
+      // Skip on hard failures
+      if (validation.hardFailures.length > 0) {
+        console.warn(`  ⚠️  Hard validation failure for ${p.packet_key}: ${validation.hardFailures.join(', ')}`);
+        skipped++;
+        continue;
+      }
 
       // Try LangExtract first
       let entities = await extractViaLangExtract(p.summary);
@@ -177,13 +189,17 @@ async function extractEntities() {
       const uniqueEntities = [...new Map(entities.map((e) => [e.text, e])).values()];
       const conceptTexts = uniqueEntities.map((e) => e.text);
 
+      // Enrich canonical envelope with extracted concepts
+      envelope.used_concepts = conceptTexts;
+
       // Update Postgres metadata
       await pgClient.query(
         `UPDATE atlas_packets
          SET metadata = COALESCE(metadata, '{}'::jsonb) || $1,
+             used_concepts = $2,
              updated_at = NOW()
-         WHERE id = $2`,
-        [JSON.stringify({ used_concepts: conceptTexts }), p.packet_id]
+         WHERE id = $3`,
+        [JSON.stringify({ used_concepts: conceptTexts }), JSON.stringify(conceptTexts), p.packet_id]
       );
 
       // Update Valkey cache if it exists
@@ -203,6 +219,9 @@ async function extractEntities() {
 
     console.log(`\n✅ Extraction complete:`);
     console.log(`  Entities materialized: ${extracted}`);
+    if (skipped > 0) {
+      console.log(`  Skipped (validation failures): ${skipped}`);
+    }
     console.log(`  LangExtract failures (using regex): ${langExtractFails}`);
   } finally {
     await pgClient.end();

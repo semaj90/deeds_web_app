@@ -14,6 +14,7 @@
 import { Client } from 'pg';
 import * as Redis from 'ioredis';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
 
 const env = loadRepoEnv(process.env);
 const POSTGRES_URL = resolveDatabaseUrl(env);
@@ -130,24 +131,36 @@ async function materializeFeatureEnvelopes() {
 
     // APPLY: Materialize envelopes
     let updated = 0;
+    let skipped = 0;
     for (let i = 0; i < packets.length; i++) {
       const p = packets[i];
-      const featureLabel = deriveFeatureLabelFromSummary(p.summary);
-      const titleId = deriveTitleId(featureLabel, p.source_ref);
 
-      const envelope = {
-        feature_envelope: {
-          feature_label: featureLabel,
-          title_id: titleId,
-          source_ref: p.source_ref,
-          directory_path: p.directory_path,
-          feature_id: p.feature_id,
-          materialized_at: new Date().toISOString(),
-        },
-      };
+      // Build and validate canonical envelope
+      const { envelope, validation } = buildCanonicalFeatureEnvelope(p);
+
+      // Skip on hard failures
+      if (validation.hardFailures.length > 0) {
+        console.warn(`  ⚠️  Hard validation failure for ${p.packet_key}: ${validation.hardFailures.join(', ')}`);
+        skipped++;
+        continue;
+      }
+
+      // Log soft warnings
+      if (validation.softWarnings.length > 0) {
+        console.warn(`  ⚠️  Soft warnings for ${p.packet_key}: ${validation.softWarnings.join(', ')}`);
+      }
+
+      // Derive additional fields
+      const featureLabel = deriveFeatureLabelFromSummary(p.summary) || envelope.feature_label || 'unknown';
+      const titleId = deriveTitleId(featureLabel, p.source_ref) || envelope.title_id;
+
+      // Enrich envelope with derived fields
+      envelope.feature_label = featureLabel;
+      envelope.title_id = titleId;
+      envelope.materialized_at = new Date().toISOString();
 
       // Merge with existing metadata
-      const newMetadata = { ...p.metadata, ...envelope };
+      const newMetadata = { ...p.metadata, feature_envelope: envelope };
 
       // Update Postgres
       await pgClient.query(
@@ -171,7 +184,7 @@ async function materializeFeatureEnvelopes() {
       }
     }
 
-    console.log(`\n✅ Materialization complete: ${updated} packets updated`);
+    console.log(`\n✅ Materialization complete: ${updated} packets updated, ${skipped} skipped (validation failures)`);
   } finally {
     await pgClient.end();
     await redis.quit();

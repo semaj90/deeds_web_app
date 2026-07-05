@@ -69,8 +69,6 @@ async function extractEntitiesViaPython(content) {
     const pythonScript = `
 import sys
 import json
-import os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, r'c:\\Users\\james\\Videos\\deeds-web-app')
 try:
   from langextract import extract_entities
@@ -82,10 +80,10 @@ except Exception as e:
   sys.exit(1)
 `;
 
-    // Use actual Python path on Windows
+    // Use venv Python on Windows, fallback to python3 on Unix
     const pythonPath = process.platform === 'win32'
-      ? 'c:\\Python313\\python.exe'
-      : 'python3';
+      ? '.venv\\Scripts\\python.exe'
+      : '.venv/bin/python3';
 
     const proc = spawn(pythonPath, ['-c', pythonScript], {
       timeout: 5000, // 5s timeout per packet
@@ -137,8 +135,8 @@ async function langextractBridge() {
     let pythonAvailable = false;
     try {
       const pythonPath = process.platform === 'win32'
-        ? 'c:\\Python313\\python.exe'
-        : 'python3';
+        ? '.venv\\Scripts\\python.exe'
+        : '.venv/bin/python3';
       const pythonProc = spawn(pythonPath, ['--version'], { timeout: 2000 });
       let pythonVersion = '';
       pythonProc.stdout.on('data', data => {

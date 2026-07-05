@@ -273,10 +273,10 @@ async function lexicalFeatureExtraction() {
           `
           UPDATE atlas_packets ap
           SET
-            keywords = v.keywords,
-            ngrams = v.ngrams,
-            trigrams = v.trigrams,
-            engrams = v.engrams,
+            keywords = v.keywords::TEXT[],
+            ngrams = v.ngrams::TEXT[],
+            trigrams = v.trigrams::TEXT[],
+            engrams = v.engrams::TEXT[],
             updated_at = NOW()
           FROM (VALUES ${VALUES})
           AS v(packet_key, keywords, ngrams, trigrams, engrams)

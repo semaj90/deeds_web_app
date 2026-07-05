@@ -25,6 +25,7 @@ import pg from 'pg';
 import fetch from 'node-fetch';
 import crypto from 'crypto';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { buildCanonicalFeatureEnvelope, reportValidation } from '../../../scripts/atlas/lib/envelope-builder.mjs';
 
 const { Pool } = pg;
 
@@ -94,46 +95,31 @@ async function warmPacketEnvelopeCache() {
 
     for (const packet of packets.rows) {
       try {
-        const {
-          packet_key,
-          packet_id,
-          source_ref,
-          feature_id,
-          feature_label,
-          summary,
-          chunk_id,
-          pagerank,
-          som_cluster,
-          som_row,
-          som_col,
-          som_index,
-          qdrant_point_id,
-          qdrant_collection
-        } = packet;
+        const { packet_key } = packet;
 
-        // Skip if missing key or summary
-        if (!packet_key || !chunk_id || !summary) {
+        // Build and validate canonical envelope
+        const { envelope, validation } = buildCanonicalFeatureEnvelope(packet);
+
+        // Check hard failures (skip on error, don't fail the batch)
+        if (validation.hardFailures.length > 0) {
+          console.warn(`  ⚠️  Hard validation failure for ${packet_key}: ${validation.hardFailures.join(', ')}`);
           skipped++;
           continue;
         }
 
-        // Build envelope
-        const envelope = {
-          packet_key,
-          packet_id,
-          source_ref,
-          feature_id,
-          feature_label,
-          summary,
-          chunk_id,
-          rrf_score: pagerank || 0,
-          som_cluster,
-          som_coords: som_row !== null && som_col !== null ? { row: som_row, col: som_col, index: som_index } : null,
-          qdrant_point_id,
-          qdrant_collection,
-          cached_at: new Date().toISOString(),
-          version: 1
-        };
+        // Log soft warnings
+        if (validation.softWarnings.length > 0) {
+          console.warn(`  ⚠️  Soft warnings for ${packet_key}: ${validation.softWarnings.join(', ')}`);
+        }
+
+        // Enrich with cache-specific fields
+        envelope.page_rank_score = packet.pagerank || 0;
+        envelope.som_coords = (packet.som_row !== null && packet.som_col !== null)
+          ? { row: packet.som_row, col: packet.som_col, index: packet.som_index }
+          : null;
+        envelope.qdrant_point_id = packet.qdrant_point_id || null;
+        envelope.cached_at = new Date().toISOString();
+        envelope.version = 1;
 
         if (MODE === 'APPLY') {
           // Cache 1: Individual packet envelope (24h TTL)
