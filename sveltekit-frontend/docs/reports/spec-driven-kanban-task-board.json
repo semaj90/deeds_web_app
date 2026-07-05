@@ -1,0 +1,263 @@
+{
+  "title": "Spec-Driven Kanban Task Board",
+  "version": "1.0",
+  "generated": "2026-07-04T00:00:00Z",
+  "description": "Machine-readable execution manifest for Phase 8-9 completion. Bounded slices, dry-run first, Postgres canonical.",
+  "execution_model": {
+    "strategy": "bounded_batches",
+    "validation": "dry_run_first",
+    "canonical_store": "postgres",
+    "derived_layers": ["arrow_transport", "mmap_registry", "acp_routing", "qdrant_mirror"]
+  },
+  "current_slice": {
+    "name": "Phase 8.5 — Materialization & Transport",
+    "status": "ready",
+    "priority_order": [
+      "qdrant_point_id_bridge",
+      "tree_node_id_propagation",
+      "title_id_propagation",
+      "arrow_batch_transport",
+      "mmap_registry_payloads",
+      "acp_routing_fanout",
+      "stub_mock_cleanup"
+    ],
+    "tasks": [
+      {
+        "id": "qdrant-point-id-bridge",
+        "title": "Qdrant Point ID Bridge Materialization",
+        "description": "Materialize deterministic qdrant_point_id mapping for all 54,650 points. Bridge from Qdrant scroll (verified with next_page_offset) to Postgres atlas_packets.qdrant_point_id column.",
+        "status": "ready",
+        "priority": 1,
+        "depends_on": ["phase8-qdrant-scroll-fix"],
+        "deliverables": [
+          "atlas_packets.qdrant_point_id populated (100%)",
+          "Qdrant payload packet_key sync verified",
+          "Redis cache invalidation post-sync"
+        ],
+        "acceptance_criteria": [
+          "54,650 / 54,650 points have qdrant_point_id",
+          "SELECT COUNT(DISTINCT qdrant_point_id) FROM atlas_packets returns 54,650",
+          "No null qdrant_point_id values for canonical packets"
+        ],
+        "estimated_duration_minutes": 15,
+        "command_dry_run": "npm run atlas:qdrant-point-id:bridge --dry-run",
+        "command_apply": "npm run atlas:qdrant-point-id:bridge --apply"
+      },
+      {
+        "id": "tree-node-id-propagation",
+        "title": "Tree Node ID Propagation Through Envelopes",
+        "description": "Propagate tree_node_id from atlas_packets to feature envelopes and recommendation cards. Ensures Neo4j topology identity chain is preserved end-to-end.",
+        "status": "ready",
+        "priority": 2,
+        "depends_on": ["qdrant-point-id-bridge"],
+        "deliverables": [
+          "atlas_feature_envelopes.tree_node_id populated",
+          "recommendation_cards.tree_node_id populated",
+          "Neo4j nodes updated with source_tree_node reference"
+        ],
+        "acceptance_criteria": [
+          "SELECT COUNT(*) FROM atlas_feature_envelopes WHERE tree_node_id IS NOT NULL = 58,365",
+          "No divergence between atlas_packets and envelopes on tree_node_id"
+        ],
+        "estimated_duration_minutes": 20,
+        "command_dry_run": "npm run atlas:envelope:propagate-tree-node --dry-run",
+        "command_apply": "npm run atlas:envelope:propagate-tree-node --apply"
+      },
+      {
+        "id": "title-id-propagation",
+        "title": "Title ID Propagation Through Envelopes and Recommendation Cards",
+        "description": "Propagate title_id from atlas_packets through feature envelopes, recommendation cards, and ACE context. Ensures consistent feature grouping across all downstream consumers.",
+        "status": "ready",
+        "priority": 3,
+        "depends_on": ["qdrant-point-id-bridge", "tree-node-id-propagation"],
+        "deliverables": [
+          "atlas_feature_envelopes.title_id populated",
+          "recommendation_cards.title_id populated",
+          "ACE context payloads carry title_id",
+          "Redis cache keys use title_id for feature grouping"
+        ],
+        "acceptance_criteria": [
+          "SELECT COUNT(*) FROM atlas_feature_envelopes WHERE title_id IS NOT NULL = 58,365",
+          "SELECT COUNT(DISTINCT title_id) matches identity layer count"
+        ],
+        "estimated_duration_minutes": 20,
+        "command_dry_run": "npm run atlas:envelope:propagate-title-id --dry-run",
+        "command_apply": "npm run atlas:envelope:propagate-title-id --apply"
+      },
+      {
+        "id": "arrow-batch-transport",
+        "title": "Arrow Batch Export/Import as Batch-Only Transport",
+        "description": "Wire Arrow columnar serialization for batch packet transport. Enables zero-copy mmap, GPU tensor hand-off, and deterministic shape across processes. Batch-only: no streaming single packets.",
+        "status": "ready",
+        "priority": 4,
+        "depends_on": ["qdrant-point-id-bridge", "tree-node-id-propagation", "title-id-propagation"],
+        "deliverables": [
+          "Arrow schema for CanonicalAcePacketEnvelope",
+          "Batch export: Postgres → Arrow IPC file",
+          "Batch import: Arrow IPC file → shared memory (mmap)",
+          "GPU tensor bridge accepts Arrow batch input"
+        ],
+        "acceptance_criteria": [
+          "100 packets round-trip Postgres → Arrow → Postgres with zero divergence",
+          "Arrow batch size configurable (default 5000)",
+          "Serialized batch is deterministic (sha256 stable)"
+        ],
+        "estimated_duration_minutes": 45,
+        "command_dry_run": "npm run atlas:arrow:batch:export --batch-size 5000 --dry-run",
+        "command_apply": "npm run atlas:arrow:batch:export --batch-size 5000 --apply"
+      },
+      {
+        "id": "mmap-registry-payloads",
+        "title": "Memory-Mapped Packet Registry Payloads (Parent Atlas 0-Latency)",
+        "description": "Wire mmap-backed registry for Parent Atlas feature packets. Enables 0-latency L1 exact-match lookups and payload re-materialization without Redis round-trip.",
+        "status": "ready",
+        "priority": 5,
+        "depends_on": ["arrow-batch-transport"],
+        "deliverables": [
+          "mmap registry file for 58,365 packet payloads",
+          "Feature registry offset index (binary search)",
+          "Lazy-load payload on query (0-latency after first page fault)",
+          "Parent Atlas uses mmap as L0 cache tier (before Redis L1)"
+        ],
+        "acceptance_criteria": [
+          "L0 mmap lookup latency < 1ms (after JIT warm-up)",
+          "Feature query: mmap payload hit rate > 95%",
+          "Registry file size optimized (JSONB sparse, no null padding)"
+        ],
+        "estimated_duration_minutes": 60,
+        "command_dry_run": "npm run atlas:mmap-registry:build --output /tmp/test-registry.mmap --dry-run",
+        "command_apply": "npm run atlas:mmap-registry:build --output sveltekit-frontend/.cache/packet-registry.mmap --apply"
+      },
+      {
+        "id": "acp-routing-fanout",
+        "title": "ACP Routing for Keyword/Query/Error Fan-Out",
+        "description": "Wire ACP (Agent Control Plane) routing logic for packet fan-out based on keyword match, query semantics, and error signals. Enables agentic error-fixing MapReduce clustering.",
+        "status": "ready",
+        "priority": 6,
+        "depends_on": ["mmap-registry-payloads"],
+        "deliverables": [
+          "ACP router: keyword fan-out (regex, trie, bloom filter)",
+          "ACP router: query semantic fan-out (Qdrant nearest neighbors)",
+          "ACP router: error signal fan-out (HMM classifier groups)",
+          "Agentic error fixing: error_signal_stream → packet_key mapping"
+        ],
+        "acceptance_criteria": [
+          "Keyword query routes to correct packet class in < 5ms",
+          "Error signal fan-out produces repeatable cluster assignments",
+          "No packet loss in any routing path (audit trail in Postgres)"
+        ],
+        "estimated_duration_minutes": 90,
+        "command_dry_run": "npm run acp:routing:validate --verbose --dry-run",
+        "command_apply": "npm run acp:routing:wire --apply"
+      },
+      {
+        "id": "stub-mock-cleanup",
+        "title": "Stub/Mock Cleanup in Live Lanes",
+        "description": "Remove mock/stub implementations from live execution paths (Phase 8 Steps 2-7). Ensure all code paths use real Postgres/Qdrant/Redis, not in-memory mocks.",
+        "status": "ready",
+        "priority": 7,
+        "depends_on": ["acp-routing-fanout"],
+        "deliverables": [
+          "All mock Redis clients replaced with real getRedis()",
+          "All stubbed Qdrant searches replaced with real collections",
+          "All mock Postgres inserts replaced with real transactions",
+          "Zero dangling @todo or @mock comments in critical paths"
+        ],
+        "acceptance_criteria": [
+          "grep -r '@mock\\|@todo\\|stubbed\\|fake' sveltekit-frontend/src/lib/server/acp/ sveltekit-frontend/scripts/atlas/phase8* returns 0 hits in live paths",
+          "All getters use real service clients with error handling",
+          "Integration test: mock-free Phase 8 pipeline execution"
+        ],
+        "estimated_duration_minutes": 30,
+        "command_audit": "npm run audit:stubs:find -- sveltekit-frontend/src/lib/server/acp",
+        "command_cleanup": "npm run audit:stubs:cleanup -- --apply"
+      }
+    ]
+  },
+  "validation_gates": [
+    {
+      "gate": "G1",
+      "name": "Qdrant Point ID Determinism",
+      "check": "SELECT COUNT(DISTINCT qdrant_point_id) FROM atlas_packets WHERE qdrant_point_id IS NOT NULL",
+      "expected": "54650",
+      "rationale": "Ensures all points have stable, unique identifiers"
+    },
+    {
+      "gate": "G2",
+      "name": "Feature Envelope Identity Chain",
+      "check": "SELECT packet_id, qdrant_point_id, tree_node_id, title_id FROM atlas_feature_envelopes LIMIT 1",
+      "expected": "All four columns populated, no NULLs",
+      "rationale": "End-to-end identity preservation"
+    },
+    {
+      "gate": "G3",
+      "name": "Arrow Batch Round-Trip",
+      "check": "npm run atlas:arrow:batch:validate",
+      "expected": "100 packets round-trip with zero divergence (sha256 match)",
+      "rationale": "Transport layer fidelity"
+    },
+    {
+      "gate": "G4",
+      "name": "mmap Registry L0 Latency",
+      "check": "npm run benchmark:l0-latency -- --iterations 1000",
+      "expected": "p99 latency < 2ms after warm-up",
+      "rationale": "0-latency requirement for Parent Atlas"
+    },
+    {
+      "gate": "G5",
+      "name": "ACP Routing Repeatable Clustering",
+      "check": "npm run acp:routing:stability-test -- --runs 3",
+      "expected": "3 runs produce identical cluster assignments (sha256 match)",
+      "rationale": "Deterministic error fixing"
+    },
+    {
+      "gate": "G6",
+      "name": "Mock-Free Live Paths",
+      "check": "grep -r '@mock\\|stubbed\\|fake' sveltekit-frontend/src/lib/server/acp/ sveltekit-frontend/scripts/atlas/phase8*",
+      "expected": "0 hits in critical paths",
+      "rationale": "No accidental stubs in production"
+    }
+  ],
+  "risk_assessment": {
+    "high_risk": [
+      {
+        "task": "Arrow Batch Transport",
+        "risk": "Serialization format divergence across processes",
+        "mitigation": "Deterministic schema validation, sha256 round-trip tests"
+      },
+      {
+        "task": "mmap Registry Payloads",
+        "risk": "mmap file corruption or out-of-sync with Postgres",
+        "mitigation": "Version stamp in header, rebuild on startup, fallback to Redis"
+      }
+    ],
+    "medium_risk": [
+      {
+        "task": "ACP Routing Fanout",
+        "risk": "Routing logic divergence between keyword/query/error paths",
+        "mitigation": "Unified router contract, audit trail in Postgres"
+      }
+    ],
+    "low_risk": [
+      {
+        "task": "Tree Node / Title ID Propagation",
+        "risk": "NULL propagation in envelopes",
+        "mitigation": "Constraint checks, backfill script"
+      },
+      {
+        "task": "Stub/Mock Cleanup",
+        "risk": "Accidental removal of legitimate test code",
+        "mitigation": "Grep audit, manual review before cleanup"
+      }
+    ]
+  },
+  "success_criteria": {
+    "phase_8_5_complete": {
+      "condition": "All 7 tasks PASS + All 6 validation gates GREEN",
+      "unblocks": "Phase 8.6 (Neo4j GDS suite) + Phase 9 (Benchmark)",
+      "estimated_total_duration_minutes": 280,
+      "estimated_total_duration_hours": 4.67
+    }
+  },
+  "notes": "This manifest is read-only and evidence-backed. Execute one slice at a time. Dry-run first for all tasks. Postgres stays canonical; Arrow/mmap/ACP/Qdrant are derived layers only."
+}

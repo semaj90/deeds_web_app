@@ -1,11 +1,58 @@
-version: '3.8' services: # Redis for caching (lightweight) redis: image: redis:7-alpine container_name:
-legal-ai-redis-light ports: - "6379:6379" command: redis-server --requirepass redis networks: - legal-ai-network
-restart: unless-stopped # SvelteKit development server vite-dev: build: context: . dockerfile: Dockerfile.light
-container_name: legal-ai-vite-light ports: - "5174:5174" - "24678:24678" # HMR WebSocket volumes: - ./src:/app/src -
-./static:/app/static - ./package.json:/app/package.json - ./vite.config.js:/app/vite.config.js -
-./svelte.config.js:/app/svelte.config.js environment: - NODE_ENV=development - REDIS_PASSWORD=redis -
-REDIS_URL=redis://redis:6379 networks: - legal-ai-network depends_on: - redis restart: unless-stopped command: npm run
-dev:docker:light # Caddy reverse proxy with QUIC (lightweight) caddy: image: caddy:2.8-alpine container_name:
-legal-ai-caddy-light ports: - "5178:5178" # Main QUIC port - "8082:8082" # Health check volumes: -
-./Caddyfile.light:/etc/caddy/Caddyfile networks: - legal-ai-network depends_on: - vite-dev restart: unless-stopped
-networks: legal-ai-network: driver: bridge
+version: '3.8'
+
+services:
+  # Valkey for caching (lightweight)
+  valkey:
+    image: valkey/valkey-bundle:8.1.1
+    container_name: legal-ai-valkey-light
+    command: valkey-server --requirepass redis --port 6379
+    ports:
+      - "6379:6379"
+    networks:
+      - legal-ai-network
+    restart: unless-stopped
+
+  # SvelteKit development server
+  vite-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.light
+    container_name: legal-ai-vite-light
+    ports:
+      - "5174:5174"
+      - "24678:24678"  # HMR WebSocket
+    volumes:
+      - ./src:/app/src
+      - ./static:/app/static
+      - ./package.json:/app/package.json
+      - ./vite.config.js:/app/vite.config.js
+      - ./svelte.config.js:/app/svelte.config.js
+    environment:
+      - NODE_ENV=development
+      - REDIS_PASSWORD=redis
+      - REDIS_URL=valkey://valkey:6379
+    networks:
+      - legal-ai-network
+    depends_on:
+      - valkey
+    restart: unless-stopped
+    command: npm run dev:docker:light
+
+  # Caddy reverse proxy with QUIC (lightweight)
+  caddy:
+    image: caddy:2.8-alpine
+    container_name: legal-ai-caddy-light
+    ports:
+      - "5178:5178"  # Main QUIC port
+      - "8082:8082"  # Health check
+    volumes:
+      - ./Caddyfile.light:/etc/caddy/Caddyfile
+    networks:
+      - legal-ai-network
+    depends_on:
+      - vite-dev
+    restart: unless-stopped
+
+networks:
+  legal-ai-network:
+    driver: bridge
