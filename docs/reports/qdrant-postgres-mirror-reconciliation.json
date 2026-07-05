@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-02T03:46:01.937Z",
-  "status": "RECONCILED",
+  "generatedAt": "2026-07-04T18:29:13.121Z",
+  "status": "IN_SYNC",
   "collection": "codebase_chunks_768",
   "qdrantUrl": "http://127.0.0.1:6333",
   "postgresContainer": "legal-ai-postgres",
-  "applyRequested": true,
+  "applyRequested": false,
   "qdrant": {
     "reachable": true,
     "error": null,
@@ -12,8 +12,8 @@
       "result": {
         "status": "green",
         "optimizer_status": "ok",
-        "indexed_vectors_count": 121704,
-        "points_count": 40572,
+        "indexed_vectors_count": 123551,
+        "points_count": 40997,
         "segments_count": 4,
         "config": {
           "params": {
@@ -68,31 +68,31 @@
           }
         },
         "payload_schema": {
-          "workspace_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "kind": {
+          "summary_hash": {
             "data_type": "keyword",
             "points": 0
           },
           "som_cluster": {
             "data_type": "integer",
-            "points": 8310
-          },
-          "tags": {
-            "data_type": "keyword",
-            "points": 32944
+            "points": 14701
           },
           "centroid_id": {
             "data_type": "keyword",
             "points": 0
           },
+          "file_path": {
+            "data_type": "keyword",
+            "points": 38888
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 32963
+          },
           "sourceRefs": {
             "data_type": "keyword",
-            "points": 32258
+            "points": 38888
           },
-          "summary_hash": {
+          "status": {
             "data_type": "keyword",
             "points": 0
           },
@@ -100,69 +100,13 @@
             "data_type": "keyword",
             "points": 0
           },
-          "status": {
-            "data_type": "keyword",
-            "points": 0
-          },
           "updated_at": {
             "data_type": "integer",
-            "points": 0
-          },
-          "point_kind": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "source_ref": {
-            "data_type": "keyword",
-            "points": 32299
-          },
-          "workspace_task_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "agent_pickup_ready": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "parent_centroid_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "cluster_id": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "repo": {
-            "data_type": "keyword",
             "points": 0
           },
           "error_id": {
             "data_type": "keyword",
             "points": 0
-          },
-          "symbol_name": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "path": {
-            "data_type": "keyword",
-            "points": 32258
-          },
-          "topo_class": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "file_path": {
-            "data_type": "keyword",
-            "points": 32258
-          },
-          "language": {
-            "data_type": "keyword",
-            "points": 0
-          },
-          "feature_id": {
-            "data_type": "keyword",
-            "points": 32299
           },
           "cluster_key": {
             "data_type": "keyword",
@@ -175,6 +119,62 @@
           "observed_at": {
             "data_type": "keyword",
             "points": 0
+          },
+          "workspace_task_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 38925
+          },
+          "repo": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "workspace_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "agent_pickup_ready": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "topo_class": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "feature_id": {
+            "data_type": "keyword",
+            "points": 38925
+          },
+          "parent_centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "kind": {
+            "data_type": "keyword",
+            "points": 404
+          },
+          "point_kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 38888
+          },
+          "symbol_name": {
+            "data_type": "keyword",
+            "points": 0
           }
         },
         "update_queue": {
@@ -182,18 +182,18 @@
         }
       },
       "status": "ok",
-      "time": 0.004986912
+      "time": 0.026040507
     }
   },
   "summary": {
-    "canonicalRows": 58298,
-    "qdrantPointsScanned": 500,
-    "joinablePoints": 445,
-    "orphanPoints": 55,
-    "agreementBefore": 444,
-    "agreementAfter": 445,
-    "patchCandidates": 1,
-    "appliedPatches": 1,
+    "canonicalRows": 58144,
+    "qdrantPointsScanned": 250,
+    "joinablePoints": 0,
+    "orphanPoints": 250,
+    "agreementBefore": 0,
+    "agreementAfter": 0,
+    "patchCandidates": 0,
+    "appliedPatches": 0,
     "applyFailures": 0,
     "deferredFields": {
       "qdrant_tag_id": "DEFERRED",
@@ -204,31 +204,31 @@
   },
   "fieldCoverage": {
     "source_ref": {
-      "canonical": 445,
-      "present": 445,
-      "matched": 445,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
       "mismatched": 0,
       "deferred": 0
     },
     "feature_id": {
-      "canonical": 445,
-      "present": 445,
-      "matched": 444,
-      "mismatched": 1,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
+      "mismatched": 0,
       "deferred": 0
     },
     "packet_key": {
-      "canonical": 445,
-      "present": 445,
-      "matched": 444,
-      "mismatched": 1,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
+      "mismatched": 0,
       "deferred": 0
     },
     "metadata": {
-      "canonical": 445,
-      "present": 445,
-      "matched": 444,
-      "mismatched": 1,
+      "canonical": 0,
+      "present": 0,
+      "matched": 0,
+      "mismatched": 0,
       "deferred": 0
     },
     "cluster_id": {
@@ -282,7 +282,7 @@
     },
     "som_cluster": {
       "canonical": 0,
-      "present": 37,
+      "present": 0,
       "matched": 0,
       "mismatched": 0,
       "deferred": 0
@@ -290,262 +290,1007 @@
   },
   "orphanSamples": [
     {
-      "pointId": "00537352-b039-45bf-9009-b44d4ccf337d",
+      "pointId": "990761",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0062a661-a993-4cfc-9e86-0bc1785dd997",
+      "pointId": "1576768",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "006960bb-8d3a-49e1-8c9b-ee1a8138111f",
+      "pointId": "1636755",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00865f5e-a81d-454a-b60a-ad66b5781146",
+      "pointId": "2434769",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "008a52ea-f999-4d9e-8b3e-7acad60238d9",
+      "pointId": "4006069",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0096d303-1566-4c9b-9686-46fb24d70eba",
+      "pointId": "4180125",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00a5ac67-62a0-4539-b8dd-65d5f9714135",
+      "pointId": "4261983",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00abe2b4-f279-4aff-8b28-1c39e429a60d",
+      "pointId": "5166037",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00aee0f9-ac9d-4f90-9fb9-600fc04ccd8f",
+      "pointId": "5366116",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00b6cd93-7b91-4283-a7b3-0a09d19acb0e",
+      "pointId": "5576550",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00bac87c-24c9-4873-97ad-8bf0a921f32c",
+      "pointId": "7009857",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "00f23cbd-3f36-428c-8579-c29f0b632ea1",
+      "pointId": "7043140",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "011e26f2-64f6-456d-b776-b51366ddc19b",
+      "pointId": "7957767",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "013b47c1-31b5-4438-b043-555a28c76d58",
+      "pointId": "8244089",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "014a97cb-9a99-4258-bc3d-624194fdba42",
+      "pointId": "9114187",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0157bd1a-4ae3-4c59-859a-a18569f89c4a",
+      "pointId": "10224847",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "015863c2-e2b1-4296-94be-2e7be29a098f",
+      "pointId": "13655509",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01792e27-0930-46b6-ab26-896d11eae31e",
+      "pointId": "14135343",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "017e96d6-ed80-4710-a657-d27da715e9f5",
+      "pointId": "14678501",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "017f7d5c-40ec-4ef1-bb2c-cfbe2119a339",
+      "pointId": "14821906",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01830c2b-80be-4f3a-bad2-e3c809ef5c1c",
+      "pointId": "14973700",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0194cf36-53c5-4187-8a02-acf1ddaf4a5b",
+      "pointId": "15581773",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0199c1d6-3236-4a16-a632-ecd12db77945",
+      "pointId": "15824686",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "019eba1d-ce59-410f-94c9-240717a5bcd8",
+      "pointId": "17403585",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01acf772-e27e-4555-b3b5-ddb467718a7e",
+      "pointId": "19051608",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01bd327f-24ba-4a52-b110-eeeceafa2c1d",
+      "pointId": "19386140",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01d18795-fb63-4c04-a9fc-696d8b6307ae",
+      "pointId": "19822861",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01e326cf-400c-4d45-8b09-083142b85bfb",
+      "pointId": "20069943",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "01e66c37-c3b1-435f-9e9e-b975a3b08560",
+      "pointId": "20852398",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "021954ea-c8cd-4ca0-971d-0a512f445bc5",
+      "pointId": "22404118",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "022e0506-351f-4321-8ab1-8ead96f2346e",
+      "pointId": "23730479",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "022eb3fb-b546-46b2-b42f-24102ff767b4",
+      "pointId": "23772899",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "022fad88-25e9-446f-8a38-f9c4bbec970d",
+      "pointId": "23843263",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "024123f1-1c97-437e-9c01-fe47be383e6e",
+      "pointId": "24043375",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02527db0-c735-42c5-9a09-aaac41e450b4",
+      "pointId": "24407847",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02571631-3f7b-41fd-a6e7-65e73dc78bec",
+      "pointId": "24515072",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02710ad5-cbab-408e-8f6e-482a623b04d1",
+      "pointId": "24520429",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "028acf78-cd2d-4211-ba94-c15c43fa9216",
+      "pointId": "24637667",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "028ce2eb-10be-4e1d-9158-0c4debb7728d",
+      "pointId": "25007526",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02900bd8-52ff-44de-a3ca-2a19a83165b5",
+      "pointId": "25181404",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "029f03d2-eaa5-4193-9ae9-e734c643e1e2",
+      "pointId": "26663885",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02a1d423-face-43ba-b851-7c0fd94424a3",
+      "pointId": "28425697",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02a456f1-b2bb-4889-8568-0e04227d9a0b",
+      "pointId": "28571146",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02c32db5-4ce4-47bc-af25-2defdf1d41b1",
+      "pointId": "30105275",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02e919ae-9bdc-42d4-bc5f-dd6bc521c470",
+      "pointId": "30244106",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02e919e6-96ab-4660-9004-050b1f8d5c7c",
+      "pointId": "30704622",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "02f10f38-4f90-4001-af58-041d7c89a4ec",
+      "pointId": "30796953",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0301f221-be66-423f-961b-9e02c5192363",
+      "pointId": "31012436",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "030d9858-1d76-4dd8-9a46-a9283806a53c",
+      "pointId": "31313709",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "03118e79-dee4-41b6-840a-4ecaf0b75142",
+      "pointId": "31371210",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "0315066a-e9fa-4eff-bf4a-e6f2563210ad",
+      "pointId": "32398769",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "03159f7d-e6b6-48d4-a26c-ed88dcb7efd9",
+      "pointId": "34006293",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "031cf4bf-4e4a-4c51-8a5e-d67b8c0270a4",
+      "pointId": "34262270",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "032d1a20-b1e9-4d70-8824-910726301b7c",
+      "pointId": "35101757",
       "reason": "not joinable to canonical Postgres spine"
     },
     {
-      "pointId": "032f0488-f502-451c-829e-9e48771a83f4",
+      "pointId": "35458497",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "36233080",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "36534214",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "37020808",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "39532862",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "40575534",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "40768543",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "41114456",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "41885483",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "43176892",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "43188883",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "43344167",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "43899312",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "44023279",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "44336728",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "45264396",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "45317315",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "45785169",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "46332461",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "46928663",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "47638062",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "48544382",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "49491517",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "51148973",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "52068435",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "53250011",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "55557498",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "55891422",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "56262564",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "56384861",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "56436087",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "57869266",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "58666999",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "59030149",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "59141618",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "59430653",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "59491724",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "61082582",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "61578841",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "62533817",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "62717359",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "63112696",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "63255291",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "63406776",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "63817049",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "63954572",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "64427082",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "64627448",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "65255644",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "68902116",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "69729119",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "70258551",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "71053735",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "71342211",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "71826943",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "71843377",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "73149840",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "74041249",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "74796136",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "75947899",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "75950192",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "77398049",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "77652099",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "77996605",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "78827252",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "79301423",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "79992663",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "81035855",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "81919119",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "82767540",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "85019391",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "85850136",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "86263439",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "86952803",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "87322224",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "87940535",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "89297745",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "89410678",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "90175026",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "91420677",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "91800382",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "92247667",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "92381981",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "92844119",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "93846724",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "94822799",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "97172889",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "99022922",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "99578214",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "99870160",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "100770304",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "101729688",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "103089436",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "103123477",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "103327184",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "104082970",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "104118807",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "104976933",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "105898285",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "105973480",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "106780662",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "106833096",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "106909386",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "107036908",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "108637068",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "108644254",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "110117807",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "110868628",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "111552806",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "111625650",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "111680538",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "111990913",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "113536803",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "114480798",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "114588173",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "115669123",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "116366996",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "116408700",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "116520117",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "117439994",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "118166160",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "118313793",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "118366796",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "118459880",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "118474230",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "119614484",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "120753067",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "121477153",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "121650105",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "122142441",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "123369482",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "123939080",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "123965860",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "124656296",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "125076442",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "126192326",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "126635878",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "128017689",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "128698218",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "129175443",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "129577344",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "129809936",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "130502661",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "130531987",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "131715948",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "132490460",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "132523249",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "132682027",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "132923605",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "133595556",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "133764390",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "134808260",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "134839272",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "134953284",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "135314287",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "135388372",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "135742054",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "136208401",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "136903870",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "137015271",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "137116435",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "137558354",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "137651998",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "138077347",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "138297262",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "139849035",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "139903997",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "140690350",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "142049529",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "142234457",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "142249268",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "142620229",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "143282361",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "144187491",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "144266279",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "146376673",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "146474551",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "146612820",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "146627614",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "146718713",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "147424301",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "150282579",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "151410685",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "151734250",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "152631415",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "152676525",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "153228700",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "153306950",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "153365946",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "155596472",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "155597166",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "156003878",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "158277899",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "158388973",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "158492305",
+      "reason": "not joinable to canonical Postgres spine"
+    },
+    {
+      "pointId": "159109430",
       "reason": "not joinable to canonical Postgres spine"
     }
   ],
-  "patchCandidates": [
-    {
-      "pointId": "01c6caaa-1cbd-4b92-a488-e6b6c17385de",
-      "canonical": {
-        "sourceTable": "atlas_packets",
-        "qdrantPointId": "01c6caaa-1cbd-4b92-a488-e6b6c17385de",
-        "packetKey": "packet:3b4260e18be3",
-        "sourceRef": "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
-        "featureId": "sveltekit-frontend.context-assembler"
-      },
-      "mismatchedFields": [
-        "feature_id",
-        "packet_key",
-        "metadata"
-      ],
-      "patch": {
-        "feature_id": "sveltekit-frontend.context-assembler",
-        "packet_key": "packet:3b4260e18be3",
-        "metadata": {
-          "identity": {
-            "source": "filesystem",
-            "version": 1,
-            "created_at": "2026-06-28T08:36:38.074Z",
-            "created_by": "phase-d:whole-codebase-scan"
-          },
-          "workspace": {
-            "domain": "codebase",
-            "universe": "atlas",
-            "text_safe": true,
-            "size_bytes": 57
-          },
-          "qdrant_coarse_feature": "sveltekit-frontend.context-assembler"
-        }
-      }
-    }
-  ],
+  "patchCandidates": [],
   "applyFailures": [],
   "deferredFields": {
     "qdrant_tag_id": {
@@ -572,21 +1317,22 @@
   "canonicalSources": {
     "taskSemanticPackets": 0,
     "parentAtlasDocuments": 0,
-    "atlasPackets": 58298
+    "atlasPackets": 58144
   },
   "gemma4Context": {
     "fields": {
       "feature_id": {
-        "status": "VISIBLE",
+        "status": "MISSING",
         "value": "sveltekit-frontend.EvidencePrimaryUpload"
       },
       "source_ref": {
-        "status": "VISIBLE",
+        "status": "MISSING",
         "value": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte"
       },
       "metadata": {
         "status": "VISIBLE",
         "value": {
+          "ae_epoch": 60,
           "identity": {
             "source": "filesystem",
             "version": 1,
@@ -599,6 +1345,9 @@
             "text_safe": true,
             "size_bytes": 13590
           },
+          "ae_val_loss": 0.0007358284494839609,
+          "ae_timestamp": "2026-06-19T16:13:04Z",
+          "som_updated_at": "2026-07-04T08:30:59.288Z",
           "qdrant_coarse_feature": "sveltekit-frontend.EvidencePrimaryUpload"
         }
       },
@@ -611,8 +1360,8 @@
         "value": null
       },
       "community_id": {
-        "status": "MISSING",
-        "value": null
+        "status": "VISIBLE",
+        "value": "38514"
       },
       "topology_label": {
         "status": "MISSING",
@@ -661,8 +1410,8 @@
     },
     "briefingCompatibility": {
       "greeting": "Hello James.",
-      "nextLane": "Qdrant payload agreement"
+      "nextLane": "Maintain current packet contract alignment"
     }
   },
-  "nextSafeAction": "Backfill the Qdrant payload fields from the canonical Postgres spine using the apply alias, then rerun the audit."
+  "nextSafeAction": "Keep the payload lane read-only; the current canonical rows are already aligned with Qdrant for the checked fields."
 }

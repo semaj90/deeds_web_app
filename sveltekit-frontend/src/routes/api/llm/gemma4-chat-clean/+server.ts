@@ -9,16 +9,9 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { sanitizeGemma4Summary } from '../../../../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
 
 const LLAMA_SERVER = 'http://127.0.0.1:8090';
-
-function sanitizeGemma4Output(text: string): string {
-  if (!text) return text;
-  let cleaned = text.replace(/<\|channel>thought[\s\S]*?<channel\|>/g, '');
-  cleaned = cleaned.replace(/<\|?channel\|?>/g, '');
-  cleaned = cleaned.trim();
-  return cleaned;
-}
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -44,7 +37,7 @@ export const POST: RequestHandler = async ({ request }) => {
           ? {
               ...choice.message,
               content: choice.message.content
-                ? sanitizeGemma4Output(choice.message.content)
+                ? sanitizeGemma4Summary(choice.message.content).summary
                 : undefined,
             }
           : undefined,

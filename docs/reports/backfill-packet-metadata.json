@@ -1,22 +1,6 @@
 {
-  "generated_at": "2026-06-26T16:50:08.889Z",
-  "mode": "apply",
-  "rows_updated": 10192,
-  "resolved_on_disk": 716,
-  "not_on_disk": 9476,
-  "with_hash": 714,
-  "with_mtime": 716,
-  "errors": 0,
-  "coverage": {
-    "total": 18046,
-    "payload_path": 17807,
-    "payload_hash": 8329,
-    "payload_path_pct": 98.7,
-    "src_hash_pct": 46.8
-  },
-  "gate": {
-    "path": true,
-    "hash": false,
-    "pass": false
-  }
+  "generated_at": "2026-07-04T18:24:41.071Z",
+  "mode": "dry-run",
+  "rows_to_update": 0,
+  "estimated_hash_coverage_pct": 0
 }

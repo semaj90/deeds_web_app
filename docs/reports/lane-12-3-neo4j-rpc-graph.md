@@ -1,23 +1,23 @@
 # Lane 12.3: Neo4j RPC Graph — Verification Report
 
-**Generated**: 2026-06-13T22:41:48.936Z
-**Mode**: dry-run
+**Generated**: 2026-07-04T20:59:54.016Z
+**Mode**: apply
 **Input File**: C:\Users\james\Videos\deeds-web-app\docs\reports\grpc-service-packets.jsonl
-**Input Packets**: 50
+**Input Packets**: 12
 
 ## Statistics
 
-- **RpcService nodes**: 50
-- **RpcMethod nodes**: 100
-- **HAS_METHOD edges**: 100
+- **RpcService nodes**: 12
+- **RpcMethod nodes**: 61
+- **HAS_METHOD edges**: 61
 
 ## Verification Gates
 
 | Gate | Threshold | Actual | Status |
 |------|-----------|--------|--------|
-| GATE_SERVICE_COUNT | 49 | 50 | ✅ |
-| GATE_METHOD_COUNT | 49 | 100 | ✅ |
-| GATE_EDGE_COUNT | 49 | 100 | ✅ |
+| GATE_SERVICE_COUNT | 5 | 12 | ✅ |
+| GATE_METHOD_COUNT | 5 | 61 | ✅ |
+| GATE_EDGE_COUNT | 5 | 61 | ✅ |
 
 ## Gates Summary
 

@@ -28,10 +28,9 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { globSync } from 'glob';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.join(__dirname, '../../sveltekit-frontend');
+const { frontendRoot: ROOT } = resolveAtlasPaths(import.meta.url);
 
 // Threshold patterns
 const ACTIVE_PATTERNS = [
@@ -219,7 +218,7 @@ function writeOutput(active, suppressed) {
   console.log(`✓ Wrote ${tmpDir}/hidden_directory_tasks.jsonl (${activeTasks.length} lines)`);
 
   // Suppressed evidence JSONL
-  const svelteDir = path.join(__dirname, '../../sveltekit-frontend/.tmp');
+  const svelteDir = path.join(ROOT, '.tmp');
   if (!fs.existsSync(svelteDir)) {
     fs.mkdirSync(svelteDir, { recursive: true });
   }

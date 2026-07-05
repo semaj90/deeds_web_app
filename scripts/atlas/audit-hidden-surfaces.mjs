@@ -24,12 +24,13 @@ import { execSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT, repoRoot: REPO_ROOT } = resolveAtlasPaths(import.meta.url);
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
 
-const REPORT_DIR = resolve(__dirname, '../../sveltekit-frontend/docs/reports');
+const REPORT_DIR = resolve(FRONTEND_ROOT, 'docs/reports');
 const REPORT_FILE = resolve(REPORT_DIR, 'hidden-surface-audit.json');
 
 function log(msg) {
@@ -50,7 +51,7 @@ function findGitignoredFiles() {
     // Use git check-ignore to find all ignored files
     const output = execSync(
       'git status --porcelain=v1 --untracked-files=all 2>/dev/null | grep "^?" | awk "{print $2}" | while read f; do git check-ignore "$f" >/dev/null 2>&1 && echo "$f"; done',
-      { cwd: resolve(__dirname, '../../'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
+      { cwd: REPO_ROOT, encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
     );
 
     const files = output.trim().split('\n').filter(f => f.length > 0);

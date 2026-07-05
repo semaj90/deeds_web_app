@@ -13,16 +13,17 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const VERBOSE = process.argv.includes('--verbose');
 const DRY_RUN = process.argv.includes('--dry-run');
 const QUERY = process.argv.find((arg) => arg.startsWith('--query='))?.split('=')[1] || 'authentication';
 
-const REPO_ROOT = resolve(__dirname, '../../');
-const REPORT_DIR = resolve(REPO_ROOT, 'sveltekit-frontend/docs/reports');
+const REPO_ROOT = resolve(FRONTEND_ROOT, '..');
+const REPORT_DIR = resolve(FRONTEND_ROOT, 'docs/reports');
 const REPORT_FILE = resolve(REPORT_DIR, 'atlas-cache-cascade-test.json');
 
 function log(msg) {

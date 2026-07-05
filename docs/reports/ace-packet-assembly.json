@@ -1,0 +1,15 @@
+{
+  "run_at": "2026-07-05T01:17:44.502Z",
+  "dry_run": false,
+  "limit": 500,
+  "total": 500,
+  "pg_updated": 500,
+  "redis_cached": 500,
+  "coverage": {
+    "hasSummary": 500,
+    "hasSom": 19,
+    "hasCommunity": 22
+  },
+  "errors": [],
+  "ndjson_path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\ace-packet-assembly.ndjson"
+}

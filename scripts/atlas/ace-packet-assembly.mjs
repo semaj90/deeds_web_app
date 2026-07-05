@@ -201,19 +201,16 @@ async function main() {
     // Load enriched packets — join atlas_packets with atlas_summary_layers for summaries
     const result = await client.query(`
       SELECT
-        ap.id,
+        ap.packet_id,
         ap.packet_key,
         ap.source_ref,
         ap.feature_id,
         ap.directory_path,
         ap.metadata,
-        ap.page_rank_score,
         ap.community_id,
         ap.som_row,
         ap.som_col,
         ap.som_cluster,
-        ap.kmeans_cluster_id,
-        ap.confidence,
         ap.created_at,
         ap.updated_at,
         ap.payload,
@@ -222,14 +219,12 @@ async function main() {
       LEFT JOIN atlas_summary_layers asl
         ON asl.packet_key = ap.packet_key
        AND asl.layer_type = 'gemma4_summary'
-       AND asl.is_canonical = true
       WHERE ap.packet_key IS NOT NULL
         AND ap.feature_id IS NOT NULL
         AND ap.source_ref  IS NOT NULL
       ORDER BY
         CASE WHEN ap.summary IS NOT NULL THEN 0 ELSE 1 END,
-        CASE WHEN ap.page_rank_score IS NOT NULL THEN 0 ELSE 1 END,
-        ap.id
+        ap.packet_id
       LIMIT $1
     `, [LIMIT]);
 
@@ -240,11 +235,9 @@ async function main() {
     // Counts
     const hasSom        = envelopes.filter(e => e.som_row != null).length;
     const hasCommunity  = envelopes.filter(e => e.community_id != null).length;
-    const hasPageRank   = envelopes.filter(e => e.page_rank_score != null).length;
     const hasSummary    = envelopes.filter(e => e.summary).length;
-    const hasKmeans     = envelopes.filter(e => e.kmeans_cluster_id != null).length;
 
-    console.log(`[ace-assembly] Coverage: summary=${hasSummary} som=${hasSom} community=${hasCommunity} pagerank=${hasPageRank} kmeans=${hasKmeans} / ${envelopes.length}`);
+    console.log(`[ace-assembly] Coverage: summary=${hasSummary} som=${hasSom} community=${hasCommunity} / ${envelopes.length}`);
 
     if (DRY_RUN) {
       // Dry-run: write NDJSON and report only
@@ -305,7 +298,7 @@ async function main() {
         total:           envelopes.length,
         pg_updated:      pgUpdated,
         redis_cached:    redisCached,
-        coverage: { hasSummary, hasSom, hasCommunity, hasPageRank, hasKmeans },
+        coverage: { hasSummary, hasSom, hasCommunity },
         errors:          errors.slice(0, 20),
         ndjson_path:     OUT_NDJSON,
       };
@@ -324,8 +317,8 @@ async function main() {
 | summary | ${hasSummary} | ${((hasSummary/envelopes.length)*100).toFixed(1)}% |
 | som_row/col | ${hasSom} | ${((hasSom/envelopes.length)*100).toFixed(1)}% |
 | community_id | ${hasCommunity} | ${((hasCommunity/envelopes.length)*100).toFixed(1)}% |
-| page_rank_score | ${hasPageRank} | ${((hasPageRank/envelopes.length)*100).toFixed(1)}% |
-| kmeans_cluster_id | ${hasKmeans} | ${((hasKmeans/envelopes.length)*100).toFixed(1)}% |
+| page_rank_score | ${0} | ${((0/envelopes.length)*100).toFixed(1)}% |
+| kmeans_cluster_id | ${0} | ${((0/envelopes.length)*100).toFixed(1)}% |
 
 ${errors.length > 0 ? `## Errors (${errors.length})\n\n${errors.slice(0,5).map(e => `- \`${e.packet_key}\`: ${e.error}`).join('\n')}` : '## Errors\n\nNone.'}
 `;
@@ -340,7 +333,7 @@ ${errors.length > 0 ? `## Errors (${errors.length})\n\n${errors.slice(0,5).map(e
         dry_run:  true,
         limit:    LIMIT,
         total:    envelopes.length,
-        coverage: { hasSummary, hasSom, hasCommunity, hasPageRank, hasKmeans },
+        coverage: { hasSummary, hasSom, hasCommunity },
         ndjson_path: OUT_NDJSON,
       };
       await fs.writeFile(REPORT_JSON, JSON.stringify(report, null, 2), 'utf8');

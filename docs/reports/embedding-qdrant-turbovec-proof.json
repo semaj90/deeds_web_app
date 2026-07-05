@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-04T09:48:56.636Z",
+  "generated_at": "2026-07-05T00:04:58.826Z",
   "overall": "WARN",
   "lanes": {
     "embeddinggemma": {
@@ -8,7 +8,7 @@
       "port": 11434,
       "model": "embeddinggemma:latest",
       "dimension": 768,
-      "duration_ms": 1111
+      "duration_ms": 2638
     },
     "qdrant": {
       "status": "LIVE_PASS",
@@ -17,10 +17,10 @@
       "collection": "codebase_chunks_768",
       "vector_name": "content",
       "dimension": 768,
-      "points": 40592,
-      "proof_point_id": "389a2cba-b554-452a-84b8-b7df4de548b6",
+      "points": 54649,
+      "proof_point_id": "42078073-30bd-4bde-ac99-881ecc07183a",
       "search_result_count": 5,
-      "duration_ms": 150
+      "duration_ms": 7857
     },
     "turbovec_grpc": {
       "status": "LIVE_PASS",
@@ -31,7 +31,7 @@
       "backend": "bridge:py(python)+addon(cuda)",
       "health": {
         "ok": true,
-        "indexed": 256,
+        "indexed": 0,
         "dim": 64,
         "bits": 4,
         "backend": "bridge:py(python)+addon(cuda)"
@@ -41,10 +41,10 @@
         "out_dim": 64,
         "vector_length": 64
       },
-      "qdrant_scanned": 256,
+      "qdrant_scanned": 1024,
       "http_indexed": 256,
       "grpc_candidates": 10,
-      "duration_ms": 1172
+      "duration_ms": 6859
     },
     "turbovec_jsonrpc_8792": {
       "status": "FALLBACK_PASS",
@@ -53,5 +53,5 @@
     }
   },
   "rule": "LIVE_PASS requires real service + real port + real data. FALLBACK_PASS is WARN, never green success.",
-  "elapsed_ms": 2434
+  "elapsed_ms": 17357
 }

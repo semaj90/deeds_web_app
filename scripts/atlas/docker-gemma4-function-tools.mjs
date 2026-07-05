@@ -16,11 +16,8 @@
  */
 
 import { execSync } from 'child_process';
-import fetch from 'node-fetch';
 import fs from 'fs';
-
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const GEMMA4_MODEL = 'gemma4-rotorquant:latest';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 // Tool definitions for Gemma4
 const TOOLS = [
@@ -55,7 +52,7 @@ const TOOLS = [
     parameters: {
       type: 'object',
       properties: {
-        container: { type: string', description: 'Container to check' },
+        container: { type: 'string', description: 'Container to check' },
         metrics: {
           type: 'array',
           items: { type: 'string' },
@@ -93,18 +90,7 @@ ${TOOLS.map(t => `- ${t.name}: ${t.description}`).join('\n')}
 Respond with a JSON plan array of function calls.`;
 
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: GEMMA4_MODEL,
-        prompt,
-        stream: false,
-        temperature: 0.3,
-      }),
-    });
-
-    const { response } = await res.json();
+    const response = await llamaChat(prompt, { maxTokens: 512, temperature: 0.3 });
 
     // Extract JSON from response
     const jsonMatch = response.match(/\[[\s\S]*\]/);

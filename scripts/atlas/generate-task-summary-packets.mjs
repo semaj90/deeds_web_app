@@ -18,13 +18,16 @@
 
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { llamaChat } from './lib/llama-inference.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 
 // ── env injection ──────────────────────────────────────────────────────────────
 try {
   const dotenv = await import('dotenv');
-  dotenv.config({ path: resolve(__dirname, '../../sveltekit-frontend/.env'), override: false });
+  dotenv.config({ path: resolve(FRONTEND_ROOT, '.env'), override: false });
+  dotenv.config({ path: resolve(FRONTEND_ROOT, '.env.local'), override: true });
   dotenv.config({ path: resolve(__dirname, '../../.env'), override: false });
 } catch { /* optional */ }
 
@@ -37,77 +40,14 @@ const DRY_RUN  = process.argv.includes('--dry-run');
 const LIMIT    = (() => { const a = process.argv.find(x => x.startsWith('--limit=')); return a ? parseInt(a.split('=')[1], 10) : 50; })();
 const BATCH    = (() => { const a = process.argv.find(x => x.startsWith('--batch=')); return a ? parseInt(a.split('=')[1], 10) : 5; })();
 
-const LLAMA_URL  = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
-// Normalize OLLAMA_HOST — it may be bare IP/hostname (e.g. "0.0.0.0") from the Ollama daemon env
-// 0.0.0.0 is a bind address, not a connect address; remap to 127.0.0.1
-const _ollamaRaw = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
-const OLLAMA_URL = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;
-const DB_URL     = process.env.DATABASE_URL     ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const REDIS_URL  = process.env.REDIS_URL        ?? 'redis://127.0.0.1:6379';
-const REDIS_TTL  = 86400; // 24h
-const MODEL      = 'gemma4-rotorquant:latest';
+const DB_URL    = process.env.DATABASE_URL ?? 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const REDIS_URL = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
+const REDIS_TTL = 86400; // 24h
 
-// ── LLM call — llama-server (streaming) → Ollama fallback ────────────────────
+// ── LLM call — llama-server :8090 ────────────────────────────────────────────
 async function callLlm(prompt) {
-  // Try llama-server first — stream:true lets us accumulate content tokens after
-  // the Gemma4 thinking block without needing to budget max_tokens for CoT.
-  // Also enables cache_prompt KV reuse across calls with the same prompt prefix.
-  try {
-    const res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1024,
-        temperature: 0.3,
-        stream: true,
-      }),
-      signal: AbortSignal.timeout(90_000),
-    });
-    if (res.ok) {
-      // Assemble content delta tokens from SSE stream
-      let assembled = '';
-      const decoder = new TextDecoder();
-      let buf = '';
-      for await (const chunk of res.body) {
-        buf += decoder.decode(chunk, { stream: true });
-        const lines = buf.split('\n');
-        buf = lines.pop() ?? '';
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith('data:')) continue;
-          const payload = trimmed.slice(5).trim();
-          if (payload === '[DONE]') break;
-          try {
-            const parsed = JSON.parse(payload);
-            assembled += parsed.choices?.[0]?.delta?.content ?? '';
-          } catch { /* skip malformed SSE line */ }
-        }
-      }
-      const text = assembled.trim();
-      if (text) return { text, backend: 'llama-server' };
-    }
-  } catch { /* fall through */ }
-
-  // Ollama fallback — use /api/chat with think:false so reasoning tokens don't consume num_predict
-  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      stream: false,
-      think: false,
-      options: { temperature: 0.3, num_predict: 200 },
-    }),
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) throw new Error(`Ollama HTTP ${res.status}`);
-  const data = await res.json();
-  const text = data.message?.content?.trim();
-  if (!text) throw new Error('Empty Ollama response');
-  return { text, backend: 'ollama' };
+  const text = await llamaChat(prompt, { maxTokens: 1024, temperature: 0.3 });
+  return { text, backend: 'llama-server' };
 }
 
 function buildPrompt(row) {
@@ -149,7 +89,7 @@ async function connectRedis() {
 async function main() {
   console.log(`[T3+T4] Task Summary Packet Generator — Phase 102`);
   console.log(`[T3+T4] DRY_RUN=${DRY_RUN}  LIMIT=${LIMIT}  BATCH=${BATCH}`);
-  console.log(`[T3+T4] LLM=${LLAMA_URL} → ${OLLAMA_URL} fallback`);
+  console.log(`[T3+T4] LLM=llama-server :8090`);
 
   // Postgres
   const pool = new Pool({ connectionString: DB_URL });

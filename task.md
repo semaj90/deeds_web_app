@@ -15,7 +15,7 @@
 ## ⚡ READY
 
 - **XGBoost supervised reranker** — train (npm run atlas:xgboost:train) + smoke (atlas:xgboost:serve + atlas:cascade:smoke)
-- **Proto/RPC tool registry packetization** — audit-proto-registry.mjs → packetize gRPC services + RPC methods → embed tool manifests → Qdrant rpc retrieval → Neo4j rpc graph → MCP runtime selection
+
 - **Reward prior backfill** — populate reward_prior on packets without traces; gates XGBoost label quality
 - **PyTorch policy sidecar scaffold** — Stage 5 agent action selector (after XGBoost sidecar is proven); SOM Embedding(400,64) for topology context
 - **Graph / KAG / DAG refresh invalidation binding** — complete: refresh-manifest invalidation now binds through atlas truth promotion
@@ -24,6 +24,19 @@
 
 ## ✅ DONE
 
+- **Proto/RPC tool registry packetization** — audit-proto-registry.mjs → packetize gRPC services + RPC methods → embed tool manifests → Qdrant rpc retrieval → Neo4j rpc graph → MCP runtime selection
+  - **Status**: COMPLETE
+  - **Evidence**:
+    - Discovered 12 services and 61 methods in active protos.
+    - Inserted 61 packets into Postgres `atlas_packets`, Qdrant `codebase_chunks_768`, and Redis cache.
+    - Seeded Neo4j with 12 `RpcService` nodes, 61 `RpcMethod` nodes, and 61 `HAS_METHOD` edges.
+  - **OpenCode Skill Contract**:
+    - `likely_cause`: "The system needed tool capabilities registered in the atlas index and Neo4j graph for MCP routing."
+    - `evidence`: "[intent:mcp_runtime_selection, file:scripts/atlas/audit-proto-registry.mjs, file:scripts/atlas/seed-neo4j-rpc-graph.mjs]"
+    - `patch_targets`: ["scripts/atlas/audit-proto-registry.mjs", "scripts/atlas/bridge-rpc-packets.mjs", "scripts/atlas/seed-neo4j-rpc-graph.mjs"]
+    - `safe_next_command`: "npm run neo4j:query -- \"MATCH (s:RpcService)-[r:HAS_METHOD]->(m:RpcMethod) RETURN count(r)\""
+    - `smoke_command`: "node scripts/atlas/audit-proto-registry.mjs"
+    - `report_path`: "docs/reports/lane-12-3-neo4j-rpc-graph.json"
 - **Runtime Queue Layer — NATS / LangGraph**
   - **Status**: READY
   - **Evidence**:

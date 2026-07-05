@@ -1,7 +1,7 @@
 # Qdrant Tag Mirror Audit
 
-Generated: 2026-07-01T21:22:49.948Z
-Status: APPLIED
+Generated: 2026-07-05T00:20:09.494Z
+Status: DRY_RUN_READY
 
 ## Summary
 
@@ -20,4 +20,4 @@ Status: APPLIED
 
 ## Next Safe Action
 
-Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections.
+Review the dry-run patch list, then re-run with --apply once the addressable packet materializer has produced rows.

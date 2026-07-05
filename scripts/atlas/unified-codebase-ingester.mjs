@@ -30,6 +30,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -48,49 +49,15 @@ const REPORT_PATH = path.join(ROOT, '.tmp', 'ingester-validation-report.json');
 const RETRIEVAL_LOOP_PATH = path.join(ROOT, '.tmp', 'atlas-retrieval-loop.jsonl');
 
 // ─── LLM Configuration ───────────────────────────────────────────────────────
-const TURBO_BASE = process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090';
-const OLLAMA_BASE = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const TIMEOUT_MS = 30_000;
 
 async function callGemma4(prompt) {
-  const endpoints = [
-    {
-      url: `${TURBO_BASE}/v1/chat/completions`,
-      body: {
-        model: 'gemma4-rotorquant:latest',
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-        max_tokens: 256,
-      },
-    },
-    {
-      url: `${OLLAMA_BASE}/api/generate`,
-      body: {
-        model: 'gemma3-legal:latest',
-        prompt,
-        stream: false,
-        options: { temperature: 0.2, num_predict: 256 },
-      },
-    },
-  ];
-
-  for (const { url, body } of endpoints) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      });
-      if (!res.ok) continue;
-      const data = await res.json();
-      const text = data.response ?? data.choices?.[0]?.message?.content ?? '';
-      if (text.trim()) return text.trim();
-    } catch (e) {
-      if (VERBOSE) console.log(`  [LLM fallback] ${url}: ${e.message}`);
-    }
+  try {
+    return await llamaChat(prompt, { maxTokens: 256, temperature: 0.2, timeoutMs: TIMEOUT_MS });
+  } catch (e) {
+    if (VERBOSE) console.log(`  [LLM] llamaChat: ${e.message}`);
+    return null;
   }
-  return null;
 }
 
 // ─── Task Card Builder ───────────────────────────────────────────────────────

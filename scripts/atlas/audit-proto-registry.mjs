@@ -465,9 +465,9 @@ async function main() {
       await pool.query(
         `
         INSERT INTO atlas_packets
-          (packet_key, source_ref, directory_path, file_path, function_symbol, feature_id, feature_label,
+          (packet_id, packet_key, source_ref, directory_path, file_path, function_symbol, feature_id, feature_label,
            community_id, summary, payload, source_kind, domain_class, concept_ids, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13, NOW(), NOW())
+        VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13, NOW(), NOW())
         ON CONFLICT (packet_key) DO UPDATE SET
           source_ref     = EXCLUDED.source_ref,
           directory_path = EXCLUDED.directory_path,

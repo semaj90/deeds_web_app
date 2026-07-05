@@ -28,6 +28,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
+import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,6 +54,7 @@ const SummaryEnvelopeSchema = z.object({
   feature_id: z.string().min(1),
   title_id: z.string().min(1),
   source_ref: z.string().min(1),
+  file_path: z.string().nullable().optional(),
   domain_class: z.string().nullable().optional(),
   feature_label: z.string().nullable().optional(),
   batch_index: z.number().int().nonnegative(),
@@ -107,12 +109,21 @@ async function readTuples() {
   const query = `
     SELECT
       p.packet_key,
-      p.feature_id,
-      p.domain_class,
       p.source_ref,
+      p.source_ref_key,
+      p.feature_id,
+      p.title_id,
+      p.tree_node_id,
       p.feature_label,
-      p.summary,
+      p.domain_class,
+      p.concept_ids AS used_concepts,
+      p.community_id,
       p.som_cluster,
+      p.som_row,
+      p.som_col,
+      p.qdrant_point_id,
+      p.file_path,
+      p.summary,
       COUNT(*) OVER (PARTITION BY p.feature_id) as tuple_count,
       ROW_NUMBER() OVER (PARTITION BY p.feature_id ORDER BY p.packet_key) as tuple_rank
     FROM atlas_packets p
@@ -122,7 +133,27 @@ async function readTuples() {
   `;
 
   const result = await pool.query(query);
-  return result.rows;
+
+  // Validate each packet against canonical envelope contract
+  const validated = [];
+  for (const row of result.rows) {
+    // Ensure used_concepts is an array
+    const packet = {
+      ...row,
+      used_concepts: Array.isArray(row.used_concepts) ? row.used_concepts : [],
+    };
+    const { envelope, validation } = buildCanonicalFeatureEnvelope(packet);
+    if (validation.softWarnings.length > 0 && VERBOSE) {
+      console.warn(`[${row.packet_key}] soft warnings:`, validation.softWarnings);
+    }
+    if (!validation.isValid) {
+      reportValidation(validation, row.packet_key);
+      continue;
+    }
+    validated.push({ ...row, ...envelope });
+  }
+
+  return validated;
 }
 
 function groupTuples(tuples) {
@@ -134,6 +165,7 @@ function groupTuples(tuples) {
       groups.set(key, {
         feature_id: key,
         source_ref: tuple.source_ref,
+        file_path: tuple.file_path ?? null,
         domain_class: tuple.domain_class,
         feature_label: tuple.feature_label,
         tuples: [],
@@ -263,6 +295,7 @@ function buildEnvelopes(rankedGroups, topK) {
         title_id: titleId,
         batch_index: sub.batch_index,
         source_ref: group.source_ref,
+        file_path: group.file_path ?? null,
         domain_class: group.domain_class,
         feature_label: group.feature_label,
         rank: i + 1,
@@ -318,9 +351,9 @@ function buildSummaryJobs(envelopes) {
       batch_index: envelope.batch_index,
       tuple_count: envelope.tuple_count,
       top_symbols: envelope.top_symbols,
-      candidate_refs: envelope.candidate_refs,
-      max_tokens: 512,
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        candidate_refs: envelope.candidate_refs,
+        max_tokens: 512,
+      model: 'gemma4-legal-iq4xs-direct.gguf',
       created_at: new Date().toISOString(),
     });
   }

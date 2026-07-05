@@ -16,6 +16,7 @@ import pg from 'pg';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,98 +47,16 @@ function loadEnv() {
 }
 
 const ENV = loadEnv();
-const LLAMA_URL = (ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
-const OLLAMA_URL = (ENV.OLLAMA_HOST ?? 'http://127.0.0.1:11434')
-                     .replace(/^0\.0\.0\.0/, '127.0.0.1')
-                     .replace(/^(?!http)/, 'http://');
-const OLLAMA_MODEL = ENV.GEMMA4_OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 const DATABASE_URL = ENV.DATABASE_URL ||
   `postgresql://${ENV.DB_USER ?? 'legal_admin'}:${ENV.DB_PASSWORD ?? '123456'}@${ENV.DB_HOST ?? '127.0.0.1'}:${ENV.DB_PORT ?? '5434'}/${ENV.DB_NAME ?? 'legal_ai_db'}`;
 
-function resolveLlamaServerModelId() {
-  const explicit = String(ENV.LLAMA_MODEL ?? ENV.TURBOQUANT_MODEL ?? '').trim();
-  if (explicit) return explicit;
-  return 'gemma4-legal-iq4xs-direct.gguf';
-}
-const MODEL = resolveLlamaServerModelId();
-
-async function summarizeViaLlamaServer(factsText, sourceRef) {
-  const prompt =
-    `You are a SvelteKit/Drizzle codebase analyst. Write a concise 2-sentence summary ` +
-    `of what this source file does, based ONLY on the following facts:\n\n` +
-    `File: ${sourceRef}\n\n` +
-    `Facts:\n${factsText}\n\n` +
-    `Summary:`;
-
-  const res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 600,
-      temperature: 0.1,
-      stream: true,
-    }),
-    signal: AbortSignal.timeout(90_000),
-  });
-  if (!res.ok) throw new Error(`llama-server ${res.status}`);
-
-  let assembled = '';
-  const decoder = new TextDecoder();
-  let buf = '';
-  for await (const chunk of res.body) {
-    buf += decoder.decode(chunk, { stream: true });
-    const lines = buf.split('\n');
-    buf = lines.pop() ?? '';
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data:')) continue;
-      const payload = trimmed.slice(5).trim();
-      if (payload === '[DONE]') break;
-      try {
-        const parsed = JSON.parse(payload);
-        assembled += parsed.choices?.[0]?.delta?.content ?? '';
-      } catch {}
-    }
-  }
-  return assembled.trim();
-}
-
-async function summarizeViaOllama(factsText, sourceRef) {
-  const prompt =
-    `You are a SvelteKit/Drizzle codebase analyst. Write a concise 2-sentence summary ` +
-    `of what this source file does, based ONLY on the following facts:\n\n` +
-    `File: ${sourceRef}\n\n` +
-    `Facts:\n${factsText}\n\n` +
-    `Summary:`;
-
-  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: OLLAMA_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      stream: false,
-      think: false,
-      options: { temperature: 0.1, num_predict: 600 },
-    }),
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) throw new Error(`Ollama ${res.status}`);
-  const data = await res.json();
-  return (data.message?.content ?? '').trim();
-}
-
 async function callGemma4(factsText, sourceRef) {
-  try {
-    const summary = await summarizeViaLlamaServer(factsText, sourceRef);
-    if (summary) return { summary, backend: 'llama-server' };
-  } catch (e) {
-    if (VERBOSE) console.warn(`  [llama-server fallback] ${e.message}`);
-  }
-  const summary = await summarizeViaOllama(factsText, sourceRef);
-  return { summary, backend: 'ollama' };
+  const prompt =
+    `You are a SvelteKit/Drizzle codebase analyst. Write a concise 2-sentence summary ` +
+    `of what this source file does, based ONLY on the following facts:\n\n` +
+    `File: ${sourceRef}\n\nFacts:\n${factsText}\n\nSummary:`;
+  const summary = await llamaChat(prompt, { maxTokens: 600, temperature: 0.1 });
+  return { summary, backend: 'llama-server' };
 }
 
 function sanitizeZeroHiddenThoughts(text) {

@@ -2294,7 +2294,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                       try {
                         const parsed = JSON.parse(payload);
                         const delta = parsed.choices?.[0]?.delta;
-                        const chunk = delta?.content ?? delta?.reasoning_content ?? '';
+                        const chunk = delta?.content ?? '';
                         if (chunk) {
                           fullResponse += chunk;
                           send({ id, role: 'assistant', content: fullResponse, status: 'streaming' });
@@ -2543,7 +2543,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                           try {
                             const retryParsed = JSON.parse(payload);
                             const retryDelta = retryParsed.choices?.[0]?.delta;
-                            const retryChunk = retryDelta?.content ?? retryDelta?.reasoning_content ?? '';
+                            const retryChunk = retryDelta?.content ?? '';
                             if (retryChunk) {
                               improvedResponse += retryChunk;
                               send({

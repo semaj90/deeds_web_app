@@ -13,10 +13,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const ROOT = resolve(__dirname, '..', '..');
+const { repoRoot: ROOT, frontendRoot: FRONTEND_ROOT, frontendTmpRoot: FRONTEND_TMP_ROOT } = resolveAtlasPaths(import.meta.url);
 const REPORTS = resolve(ROOT, 'docs', 'reports');
 
 const OUTPUT_JSON = resolve(REPORTS, 'doc-feature-crosswalk-2026-06-01.json');
@@ -27,10 +26,10 @@ const PARENT_ATLAS = resolve(ROOT, 'memory', 'exports', 'parent-atlas', 'parent_
 
 const DOC_ROOTS = [
   'docs',
-  'sveltekit-frontend/docs',
+  relative(ROOT, resolve(FRONTEND_ROOT, 'docs')).replace(/\\/g, '/'),
   'memory/exports',
   '.tmp',
-  'sveltekit-frontend/.tmp',
+  relative(ROOT, FRONTEND_TMP_ROOT).replace(/\\/g, '/'),
 ];
 
 const FAMILIES = [

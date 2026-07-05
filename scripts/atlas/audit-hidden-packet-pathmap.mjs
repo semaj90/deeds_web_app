@@ -10,9 +10,9 @@ import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../..');
+const { repoRoot: ROOT, frontendTmpRoot: FRONTEND_TMP_ROOT } = resolveAtlasPaths(import.meta.url);
 const REPORT_JSON = path.join(ROOT, 'docs', 'reports', 'hidden-packet-pathmap-report.json');
 const REPORT_MD = path.join(ROOT, 'docs', 'reports', 'hidden-packet-pathmap-report.md');
 const PATHMAP = path.join(ROOT, 'docs', 'graph', 'missing-features-path-map.json');
@@ -21,17 +21,17 @@ const INPUTS = [
   {
     key: 'feature_labels',
     requestedPath: '.tmp/feature_labels.jsonl',
-    fallbacks: ['sveltekit-frontend/.tmp/feature_labels.jsonl'],
+    fallbacks: [path.relative(ROOT, path.join(FRONTEND_TMP_ROOT, 'feature_labels.jsonl')).replace(/\\/g, '/')],
   },
   {
     key: 'kanban_tasks',
     requestedPath: '.tmp/kanban_tasks.jsonl',
-    fallbacks: ['sveltekit-frontend/.tmp/kanban_tasks.jsonl'],
+    fallbacks: [path.relative(ROOT, path.join(FRONTEND_TMP_ROOT, 'kanban_tasks.jsonl')).replace(/\\/g, '/')],
   },
   {
     key: 'missing_feature_todos',
     requestedPath: '.tmp/missing_feature_todos.jsonl',
-    fallbacks: ['sveltekit-frontend/.tmp/missing_feature_todos.jsonl'],
+    fallbacks: [path.relative(ROOT, path.join(FRONTEND_TMP_ROOT, 'missing_feature_todos.jsonl')).replace(/\\/g, '/')],
   },
 ];
 

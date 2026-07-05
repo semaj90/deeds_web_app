@@ -25,10 +25,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Project } from 'ts-morph';
 import pg from 'pg';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.join(__dirname, '../../sveltekit-frontend');
+const { frontendRoot: ROOT } = resolveAtlasPaths(import.meta.url);
 
 // Environment
 const DATABASE_URL = process.env.DATABASE_URL || 'postgres://legal_admin:legal@127.0.0.1:5432/legal_ai_db';

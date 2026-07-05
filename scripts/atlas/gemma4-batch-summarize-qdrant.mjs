@@ -30,6 +30,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { buildPacketKey, sha8, slug } from './packet-materializer-lib.mjs';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -65,11 +66,6 @@ const ENV = loadEnv();
 
 const QDRANT_URL    = ENV.QDRANT_URL    ?? 'http://127.0.0.1:6333';
 const COLLECTION    = 'codebase_chunks_768';
-const LLAMA_URL     = (ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
-const OLLAMA_URL    = (ENV.OLLAMA_HOST ?? 'http://127.0.0.1:11434')
-                        .replace(/^0\.0\.0\.0/, '127.0.0.1')
-                        .replace(/^(?!http)/, 'http://');
-const OLLAMA_MODEL  = ENV.GEMMA4_OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
 const DB_URL        = ENV.DATABASE_URL
   ?? `postgresql://${ENV.DB_USER ?? 'legal_admin'}:${ENV.DB_PASSWORD ?? '123456'}@${ENV.DB_HOST ?? '127.0.0.1'}:${ENV.DB_PORT ?? '5434'}/${ENV.DB_NAME ?? 'legal_ai_db'}`;
 
@@ -84,106 +80,14 @@ function normalizeRef(raw) {
     .replace(/^sveltekit-frontend\//, '');
 }
 
-function resolveLlamaServerModelId() {
-  const explicit = String(ENV.LLAMA_MODEL ?? ENV.TURBOQUANT_MODEL ?? '').trim();
-  if (explicit) return explicit;
-
-  const modelPath = String(
-    ENV.ROTORQUANT_MODEL_PATH ??
-    ENV.TURBO_MODEL_PATH ??
-    ENV.TURBOQUANT_MODEL_PATH ??
-    '',
-  ).trim();
-  if (modelPath) {
-    const base = path.basename(modelPath).trim();
-    if (base) return base;
-  }
-
-  const gemma4 = String(ENV.GEMMA4_MODEL ?? '').trim();
-  if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
-
-  return 'gemma4-legal-iq4xs-direct.gguf';
-}
-
-const MODEL = resolveLlamaServerModelId();
-
-// ── Gemma4 summary via llama-server (stream:true per hard rules) ──────────────
-async function summarizeViaLlamaServer(text, sourceRef) {
+async function callGemma4(text, sourceRef) {
   const prompt =
     `You are a TypeScript/SvelteKit code analyst. In 2-3 sentences, describe what ` +
     `this file does, its primary exports, and any key error patterns it handles.\n\n` +
     `File: ${sourceRef}\n\n` +
     `---\n${text.slice(0, 3000)}\n---\n\nSummary:`;
-
-  const res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model:      MODEL,
-      messages:   [{ role: 'user', content: prompt }],
-      max_tokens: 200,
-      temperature: 0.2,
-      stream:     true,
-    }),
-    signal: AbortSignal.timeout(90_000),
-  });
-  if (!res.ok) throw new Error(`llama-server ${res.status}`);
-
-  let assembled = '';
-  const decoder = new TextDecoder();
-  let buf = '';
-  for await (const chunk of res.body) {
-    buf += decoder.decode(chunk, { stream: true });
-    const lines = buf.split('\n');
-    buf = lines.pop() ?? '';
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed.startsWith('data:')) continue;
-      const payload = trimmed.slice(5).trim();
-      if (payload === '[DONE]') break;
-      try {
-        const parsed = JSON.parse(payload);
-        assembled += parsed.choices?.[0]?.delta?.content ?? '';
-      } catch { /* skip malformed */ }
-    }
-  }
-  return assembled.trim();
-}
-
-async function summarizeViaOllama(text, sourceRef) {
-  const prompt =
-    `You are a TypeScript/SvelteKit code analyst. In 2-3 sentences, describe what ` +
-    `this file does, its primary exports, and any key error patterns it handles.\n\n` +
-    `File: ${sourceRef}\n\n---\n${text.slice(0, 3000)}\n---\n\nSummary:`;
-
-  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model:   OLLAMA_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      stream:  false,
-      think:   false,
-      options: { temperature: 0.2, num_predict: 200 },
-    }),
-    signal: AbortSignal.timeout(60_000),
-  });
-  if (!res.ok) throw new Error(`Ollama ${res.status}`);
-  const data = await res.json();
-  return (data.message?.content ?? '').trim();
-}
-
-async function callGemma4(text, sourceRef) {
-  // Try llama-server first (preferred — stream:true avoids thinking-block token starvation)
-  try {
-    const summary = await summarizeViaLlamaServer(text, sourceRef);
-    if (summary) return { summary, backend: 'llama-server' };
-  } catch (e) {
-    if (VERBOSE) console.warn(`  [llama-server fallback] ${e.message}`);
-  }
-  // Fallback: Ollama think:false
-  const summary = await summarizeViaOllama(text, sourceRef);
-  return { summary, backend: 'ollama' };
+  const summary = await llamaChat(prompt, { maxTokens: 200, temperature: 0.2 });
+  return { summary, backend: 'llama-server' };
 }
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────

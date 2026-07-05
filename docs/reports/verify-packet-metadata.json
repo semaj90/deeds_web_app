@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-13T00:50:16.235Z",
-  "total_packets": 17020,
+  "generated_at": "2026-07-05T00:46:06.662Z",
+  "total_packets": 58365,
   "coverage": {
-    "payload_path_pct": 49.2,
-    "payload_hash_pct": 44.7,
-    "src_hash_pct": 91,
-    "payload_mtime_pct": 44.8
+    "payload_path_pct": 0,
+    "payload_hash_pct": 0,
+    "src_hash_pct": 0,
+    "payload_mtime_pct": 0
   },
   "gates": [
     {
@@ -15,13 +15,13 @@
     },
     {
       "name": "payload_path_30pct",
-      "pass": true,
-      "detail": "49.2%"
+      "pass": false,
+      "detail": "0.0%"
     },
     {
       "name": "payload_hash_60pct_src",
-      "pass": true,
-      "detail": "91.0% of 8367 src rows"
+      "pass": false,
+      "detail": "0.0% of 0 src rows"
     },
     {
       "name": "no_new_packet_model",
@@ -30,19 +30,19 @@
     },
     {
       "name": "metadata_gin_index",
-      "pass": true,
-      "detail": "present"
+      "pass": false,
+      "detail": "MISSING"
     },
     {
       "name": "identity_compound_index",
-      "pass": true,
-      "detail": "present"
+      "pass": false,
+      "detail": "MISSING"
     },
     {
       "name": "payload_mtime_coverage",
       "pass": true,
-      "detail": "44.8% (informational)"
+      "detail": "0.0% (informational)"
     }
   ],
-  "pass": true
+  "pass": false
 }

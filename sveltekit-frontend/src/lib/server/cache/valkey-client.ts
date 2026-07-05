@@ -8,7 +8,7 @@
  * getValkeyClient() from this file rather than constructing
  * their own `new Redis(...)` instances.
  *
- * Container: valkey/valkey-bundle:8.1.1, name legal-ai-redis
+ * Container: valkey/valkey-bundle:8.1.1, name legal-ai-valkey
  * Bind: 127.0.0.1:6379, auth password = "redis"
  */
 

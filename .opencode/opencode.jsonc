@@ -1,0 +1,14 @@
+/**
+ * OpenCode Workspace Configuration (July 4, 2026)
+ *
+ * Minimal valid config — OpenCode CLI infers LLM from environment
+ * Canonical llama-server with Gemma4 RotorQuant runs at :8090
+ * Benchmark-only MTP/test1111 lane runs at :8091
+ *
+ * To activate: set environment variables before launching opencode:
+ *   $env:OPENAI_API_BASE = "http://127.0.0.1:8090/v1"
+ *   $env:OPENAI_API_KEY = "sk-not-needed"
+ *   $env:OPENAI_MODEL_ID = "gemma4-legal-iq4xs-direct.gguf"
+ *   $env:OPENAI_CONTEXT_LENGTH = "65536"
+ */
+{}

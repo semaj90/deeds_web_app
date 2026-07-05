@@ -14,14 +14,16 @@
 import { createRequire } from 'module';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const require = createRequire(import.meta.url);
 
 // ── env injection ─────────────────────────────────────────────────────────────
 try {
   const dotenv = await import('dotenv');
-  dotenv.config({ path: resolve(__dirname, '../../sveltekit-frontend/.env') });
+  dotenv.config({ path: resolve(FRONTEND_ROOT, '.env') });
+  dotenv.config({ path: resolve(FRONTEND_ROOT, '.env.local'), override: true });
   dotenv.config({ path: resolve(__dirname, '../../.env') });
 } catch { /* dotenv optional */ }
 

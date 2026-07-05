@@ -13,9 +13,11 @@ import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../../sveltekit-frontend/.env') });
+const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
+dotenv.config({ path: path.resolve(FRONTEND_ROOT, '.env') });
+dotenv.config({ path: path.resolve(FRONTEND_ROOT, '.env.local'), override: true });
 
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const REDIS_URL  = process.env.REDIS_URL  ?? 'redis://127.0.0.1:6379';

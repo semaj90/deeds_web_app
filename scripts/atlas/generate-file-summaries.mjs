@@ -37,12 +37,13 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import dotenv from 'dotenv';
 import { Progress } from './lib/progress.mjs';
+import { llamaChat } from './lib/llama-inference.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 dotenv.config();
 
-const __dir    = dirname(fileURLToPath(import.meta.url));
-const SRC_ROOT = resolve(__dir, '../../sveltekit-frontend/src');
-const FRONTEND_ROOT = resolve(__dir, '../../sveltekit-frontend');
+const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
+const SRC_ROOT = resolve(FRONTEND_ROOT, 'src');
 
 // ── Args ─────────────────────────────────────────────────────────────────────
 
@@ -67,8 +68,7 @@ const DO_T3 = !TIER_ARG || TIER_ARG === '3';
 
 const DATABASE_URL   = process.env.DATABASE_URL;
 const QDRANT_URL     = process.env.QDRANT_URL     ?? 'http://127.0.0.1:6333';
-const OLLAMA_BASE    = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const TURBO_BASE     = process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090';
+// inference: llamaChat() → llama-server :8090/v1/chat/completions
 const REDIS_URL      = process.env.REDIS_URL      ?? 'redis://127.0.0.1:6379';
 const COLLECTION     = 'codebase_chunks_768';
 const TIMEOUT_MS     = 60_000;
@@ -188,33 +188,10 @@ ${snippet}${src.length > 8000 ? '\n... (truncated)' : ''}
 
 Summary (2-3 sentences, no bullet points, focus on the "why"):`;
 
-  // Try TurboQuant first (faster), fallback to Ollama
-  for (const [url, model] of [[TURBO_BASE, null], [OLLAMA_BASE, 'gemma3-legal:latest']]) {
-    try {
-      const endpoint = model ? `${url}/api/generate` : `${url}/v1/chat/completions`;
-      const body = model
-        ? { model, prompt, stream: false, options: { temperature: 0.2, num_predict: 256 } }
-        : { model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: prompt }], stream: false, max_tokens: 256 };
-
-      const res = await fetch(endpoint, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(body),
-        signal:  AbortSignal.timeout(TIMEOUT_MS),
-      });
-
-      if (!res.ok) continue;
-      const data = await res.json();
-      const text = data.response ?? data.choices?.[0]?.message?.content ?? '';
-      if (!text.trim()) continue;
-
-      return {
-        ...t0,
-        summary_md: text.trim(),
-        trust_tier: 2, // T2 = Gemma4 enriched ×1.00
-      };
-    } catch { /* try next */ }
-  }
+  try {
+    const text = await llamaChat(prompt, { maxTokens: 256, temperature: 0.2, timeoutMs: TIMEOUT_MS });
+    if (text.trim()) return { ...t0, summary_md: text.trim(), trust_tier: 2 };
+  } catch { /* fall through */ }
 
   return t0; // fallback to T0
 }

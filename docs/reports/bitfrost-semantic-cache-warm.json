@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-04T09:30:38.195Z",
+  "generatedAt": "2026-07-04T23:41:42.405Z",
   "mode": "apply",
   "limit": 25,
   "source": {
@@ -11,7 +11,7 @@
     "packetKeysPlanned": 25,
     "featureKeysPlanned": 25,
     "aceKeysPlanned": 75,
-    "appliedWrites": 125,
+    "appliedWrites": 225,
     "failures": 0
   },
   "plans": [
@@ -48,6 +48,42 @@
       "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
       "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.llm_synthesis_mapping",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -97,6 +133,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:documentation",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "feature_id": "sveltekit-frontend.tests__cases-sub-routes.spec",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.tests__cases-sub-routes.spec",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "feature_id": "sveltekit-frontend.tests__cases-sub-routes.spec",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0003850e84ca",
       "ttl": 3600,
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
@@ -138,6 +210,42 @@
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
       "feature_id": "sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:cache",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -187,6 +295,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+      "feature_id": "neschrom97.93f973562fff24ed",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:neschrom97.93f973562fff24ed",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+      "feature_id": "neschrom97.93f973562fff24ed",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0003dda5e534",
       "ttl": 3600,
       "source_ref": "neschrom97/cards/93f973562fff24ed.json",
@@ -228,6 +372,42 @@
       "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
       "feature_id": ".svelte-error-fixes-backup.+layout",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:frontend",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+      "feature_id": ".svelte-error-fixes-backup.+layout",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:svelte-error-fixes-backup.-layout",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+      "feature_id": ".svelte-error-fixes-backup.+layout",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -277,6 +457,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "feature_id": "sveltekit-frontend.sprint5-6-monitoring.spec",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.sprint5-6-monitoring.spec",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "feature_id": "sveltekit-frontend.sprint5-6-monitoring.spec",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0004f849be72",
       "ttl": 3600,
       "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
@@ -318,6 +534,42 @@
       "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
       "feature_id": "sveltekit-frontend.launch-2026-06-25T22-12-53-881Z",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+      "feature_id": "sveltekit-frontend.launch-2026-06-25T22-12-53-881Z",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.launch-2026-06-25t22-12-53-881z",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+      "feature_id": "sveltekit-frontend.launch-2026-06-25T22-12-53-881Z",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -367,6 +619,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "feature_id": "llama-cpp-turboquant-gemma4.completion",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:llama-cpp-turboquant-gemma4.completion",
+      "ttl": 7200,
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "feature_id": "llama-cpp-turboquant-gemma4.completion",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0008d535a1f6",
       "ttl": 3600,
       "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
@@ -408,6 +696,42 @@
       "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
       "feature_id": ".tmp.0056213574662f41",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+      "feature_id": ".tmp.0056213574662f41",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:tmp.0056213574662f41",
+      "ttl": 7200,
+      "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+      "feature_id": ".tmp.0056213574662f41",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -457,6 +781,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+      "feature_id": "sveltekit-frontend.terminal_theme",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.terminal_theme",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+      "feature_id": "sveltekit-frontend.terminal_theme",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0009a56456fc",
       "ttl": 3600,
       "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
@@ -498,6 +858,42 @@
       "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-13T00-19-01-475Z.json",
       "feature_id": "sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-13T00-19-01-475Z.json",
+      "feature_id": "sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.startup-2026-05-13t00-19-01-475z",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-13T00-19-01-475Z.json",
+      "feature_id": "sveltekit-frontend.startup-2026-05-13T00-19-01-475Z",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-13T00-19-01-475Z.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-13T00-19-01-475Z.json",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -547,6 +943,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:agent",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
+      "feature_id": "sveltekit-frontend.phase76-acp-tools.property.test",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.phase76-acp-tools.property.test",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
+      "feature_id": "sveltekit-frontend.phase76-acp-tools.property.test",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:000b2df0cfdf",
       "ttl": 3600,
       "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
@@ -588,6 +1020,42 @@
       "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
       "feature_id": "sveltekit-frontend.keyboard-shortcuts.svelte",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:frontend",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "feature_id": "sveltekit-frontend.keyboard-shortcuts.svelte",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.keyboard-shortcuts.svelte",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "feature_id": "sveltekit-frontend.keyboard-shortcuts.svelte",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -637,6 +1105,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/914feea85742abf0.json",
+      "feature_id": "neschrom97.914feea85742abf0",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:neschrom97.914feea85742abf0",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/914feea85742abf0.json",
+      "feature_id": "neschrom97.914feea85742abf0",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/914feea85742abf0.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/914feea85742abf0.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:000e4d5a58e7",
       "ttl": 3600,
       "source_ref": "neschrom97/cards/914feea85742abf0.json",
@@ -678,6 +1182,42 @@
       "source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
       "feature_id": "crates.libryu-555024bdb0a51304",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
+      "feature_id": "crates.libryu-555024bdb0a51304",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:crates.libryu-555024bdb0a51304",
+      "ttl": 7200,
+      "source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
+      "feature_id": "crates.libryu-555024bdb0a51304",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -727,6 +1267,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:agent",
+      "ttl": 7200,
+      "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
+      "feature_id": "simd-bridge.LLMS",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:simd-bridge.llms",
+      "ttl": 7200,
+      "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
+      "feature_id": "simd-bridge.LLMS",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:000f50f509c8",
       "ttl": 3600,
       "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
@@ -768,6 +1344,42 @@
       "source_ref": ".python311/share/terminfo/b/bq300-8rv",
       "feature_id": ".python311.bq300-8rv",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": ".python311/share/terminfo/b/bq300-8rv",
+      "feature_id": ".python311.bq300-8rv",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:python311.bq300-8rv",
+      "ttl": 7200,
+      "source_ref": ".python311/share/terminfo/b/bq300-8rv",
+      "feature_id": ".python311.bq300-8rv",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": ".python311/share/terminfo/b/bq300-8rv",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": ".python311/share/terminfo/b/bq300-8rv",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -817,6 +1429,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:frontend",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.-server",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:000fde9311af",
       "ttl": 3600,
       "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
@@ -858,6 +1506,42 @@
       "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
       "feature_id": "scripts.generate-concept-temperature-report",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "feature_id": "scripts.generate-concept-temperature-report",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:scripts.generate-concept-temperature-report",
+      "ttl": 7200,
+      "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "feature_id": "scripts.generate-concept-temperature-report",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -907,6 +1591,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
+      "feature_id": "scripts.LLMS",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:scripts.llms",
+      "ttl": 7200,
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
+      "feature_id": "scripts.LLMS",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0011712c94d1",
       "ttl": 3600,
       "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
@@ -948,6 +1668,42 @@
       "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
       "feature_id": "sveltekit-frontend.npy_os",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
+      "feature_id": "sveltekit-frontend.npy_os",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.npy_os",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
+      "feature_id": "sveltekit-frontend.npy_os",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -997,6 +1753,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:documentation",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
+      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
+      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:001375b841d0",
       "ttl": 3600,
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
@@ -1038,6 +1830,42 @@
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
       "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:documentation",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
+      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
+      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },
@@ -1087,6 +1915,42 @@
       "som_cluster": null
     },
     {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
+      "feature_id": "neschrom97.a45aa64da8f0240c",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:neschrom97.a45aa64da8f0240c",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
+      "feature_id": "neschrom97.a45aa64da8f0240c",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
       "key": "ace:summary:packet:0014edb0c6e4",
       "ttl": 3600,
       "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
@@ -1128,6 +1992,42 @@
       "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
       "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
       "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
+      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
+      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:",
+      "ttl": 7200,
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
+      "feature_id": null,
+      "feature_label": null,
       "community_id": null,
       "som_cluster": null
     },

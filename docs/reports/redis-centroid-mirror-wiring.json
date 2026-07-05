@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T21:22:51.298Z",
+  "generatedAt": "2026-07-04T18:31:33.479Z",
   "mode": "apply",
   "nextSafeAction": "Re-run the mirror in dry-run mode if you want to inspect the generated keys, then proceed to Bifrost mirror wiring.",
   "plannedKeys": [
@@ -18,7 +18,7 @@
     {
       "key": "atlas:centroid:index",
       "kind": "index",
-      "preview": "{\n  \"centroid_keys\": [],\n  \"community_count\": 0,\n  \"generated_at\": \"2026-07-01T21:22:51.297Z\",\n  \"qdrant_backed_rows\": 0,\n  \"som_count\": 0,\n  \"som_keys\": [],\n  …"
+      "preview": "{\n  \"centroid_keys\": [],\n  \"community_count\": 0,\n  \"generated_at\": \"2026-07-04T18:31:33.478Z\",\n  \"qdrant_backed_rows\": 0,\n  \"som_count\": 0,\n  \"som_keys\": [],\n  …"
     }
   ],
   "source": {

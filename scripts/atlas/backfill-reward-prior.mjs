@@ -171,7 +171,7 @@ async function main() {
       SELECT
         packet_id,
         feature_id,
-        community_confidence,
+        (payload->>'community_confidence')::double precision AS community_confidence,
         summary,
         concept_ids,
         (payload->>'domain_confidence')::double precision AS domain_confidence
@@ -291,7 +291,7 @@ async function main() {
     for (let i = 0; i < updates.length; i += BATCH_SIZE) {
       const batch       = updates.slice(i, i + BATCH_SIZE);
       const placeholders = batch
-        .map((_, j) => `($${j * 2 + 1}::uuid, $${j * 2 + 2}::double precision)`)
+        .map((_, j) => `($${j * 2 + 1}::text, $${j * 2 + 2}::double precision)`)
         .join(', ');
       const values = batch.flatMap(u => [u.packet_id, u.reward_prior]);
 

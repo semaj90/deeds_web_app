@@ -17,16 +17,17 @@
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
 
 const REPO_ROOT = resolve(__dirname, '../../');
-const REPORT_DIR = resolve(REPO_ROOT, 'sveltekit-frontend/docs/reports');
+const REPORT_DIR = resolve(FRONTEND_ROOT, 'docs/reports');
 const REPORT_FILE = resolve(REPORT_DIR, 'qdrant-payload-sync.json');
 
 function log(msg) {

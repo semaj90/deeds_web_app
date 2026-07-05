@@ -21,17 +21,16 @@
  *   --from-hot-set  Prefer ace:cluster:hot over the static cluster manifest
  */
 
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import {
   buildClusterWarmupPrompt,
   readHotClusters,
 } from '../../sveltekit-frontend/src/lib/server/ace/hot-cluster-reader.ts';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const FE_ROOT = resolve(__dirname, '../../sveltekit-frontend');
+const { frontendRoot: FE_ROOT } = resolveAtlasPaths(import.meta.url);
 
 dotenv.config({ path: resolve(FE_ROOT, '.env') });
 

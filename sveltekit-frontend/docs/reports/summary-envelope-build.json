@@ -1,16 +1,18 @@
 {
-  "timestamp": "2026-07-04T09:51:55.058Z",
-  "dry_run": false,
+  "timestamp": "2026-07-05T01:06:40.115Z",
+  "dry_run": true,
   "total_envelopes": 501,
   "total_jobs": 501,
-  "tuples_to_summarize": 16459,
+  "tuples_to_summarize": 16514,
   "avg_tuples_per_envelope": 33,
   "top_k_groups": 500,
   "tuple_limit_per_group": 2000,
   "distribution": {
     "by_domain_class": {
-      "unknown": 498,
-      "Classification failed": 3
+      "unknown": 496,
+      "mcp_agents": 1,
+      "Classification failed": 3,
+      "compiler": 1
     },
     "by_rank": {
       "top_10": 11,

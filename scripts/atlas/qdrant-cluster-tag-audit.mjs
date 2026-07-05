@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 import dotenv from 'dotenv';
 
@@ -11,10 +10,9 @@ import {
   writeJson,
   writeMarkdown,
 } from './_atlas-utils.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
-const REPO_ROOT = resolve(__dirname, '../..');
+const { frontendRoot: ROOT, repoRoot: REPO_ROOT } = resolveAtlasPaths(import.meta.url);
 
 dotenv.config({ path: resolve(REPO_ROOT, '.env') });
 dotenv.config({ path: resolve(ROOT, '.env'), override: false });

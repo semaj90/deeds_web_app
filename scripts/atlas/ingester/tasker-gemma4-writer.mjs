@@ -2,14 +2,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { llamaChat } from '../lib/llama-inference.mjs';
 
 // Resolve repository root robustly on Windows and POSIX
 const ROOT = path.resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const argv = process.argv.slice(2);
 const APPLY = argv.includes('--apply');
 const FORCE = argv.includes('--force');
-const OLLAMA_URL = process.env.OLLAMA_URL || (argv.includes('--ollama-url') ? argv[argv.indexOf('--ollama-url') + 1] : null);
-const MODEL = process.env.OLLAMA_MODEL || (argv.includes('--ollama-model') ? argv[argv.indexOf('--ollama-model') + 1] : 'gemma4-rotorquant:latest');
 
 // Allow overriding paths via CLI or environment for Windows path normalization issues
 const TASKS_IN = (argv.includes('--tasks-in') ? argv[argv.indexOf('--tasks-in') + 1] : process.env.TASKS_IN) || path.join(ROOT, '.tmp', 'ingest', 'tasks.ndjson');
@@ -25,110 +24,11 @@ function writeND(file, arr){
 }
 
 async function callLLM(prompt){
-  if(!OLLAMA_URL) throw new Error('No OLLAMA_URL');
-  try{
-    // Use chat-style payload with a system instruction to avoid chain-of-thought
-    let res = await fetch(OLLAMA_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: MODEL, messages: [
-        { role: 'system', content: 'You are a concise assistant. Output ONLY a single short task title on one line. Do NOT include reasoning, analysis, or any extra text. Do NOT reveal internal chain-of-thought.' },
-        { role: 'user', content: prompt }
-      ], temperature: 0, max_tokens: 128, stream: false })
-    });
-
-    // If the server rejects that (400), fall back to the older prompt-style payload
-    if (!res.ok && res.status === 400) {
-      try {
-        res = await fetch(OLLAMA_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: MODEL, prompt, max_tokens: 64 })
-        });
-      } catch (e) {
-        // fall through to error handling below
-      }
-    }
-
-    if(!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-
-    // Try to parse common JSON response shapes (chat completions, "output", "result")
-    const contentType = res.headers.get && res.headers.get('content-type') || '';
-    const text = await res.text();
-
-    // Handle NDJSON streaming responses (Ollama /api/generate) by concatenating "response" fields
-    if (contentType.includes('application/x-ndjson') || /"response"\s*:\s*"/.test(text)){
-      const lines = text.split('\n').filter(Boolean);
-      let assembled = '';
-      for(const line of lines){
-        try{
-          const obj = JSON.parse(line);
-          if(obj?.response) assembled += String(obj.response);
-          if(obj?.done) break;
-        }catch(e){ /* ignore parse errors per-line */ }
-      }
-      if(assembled) return assembled.trim();
-      // fallback to raw text
-      return text.trim();
-    }
-
-    try{
-      const j = JSON.parse(text);
-
-      // Helper: recursively extract the first non-empty string from likely fields
-      function extractText(obj){
-        if(!obj && obj !== 0) return null;
-        if(typeof obj === 'string'){
-          const s = obj.trim();
-          return s ? s : null;
-        }
-        if(Array.isArray(obj)){
-          for(const item of obj){
-            const t = extractText(item);
-            if(t) return t;
-          }
-          return null;
-        }
-        if(typeof obj === 'object'){
-          // prefer plain `content`/`text`/`output` before any `reasoning_content`
-          const keysPriority = ['content','text','output','result','response','reasoning_content'];
-          for(const k of keysPriority){
-            if(k in obj){
-              const t = extractText(obj[k]);
-              if(t) return t;
-            }
-          }
-          for(const k of Object.keys(obj)){
-            const t = extractText(obj[k]);
-            if(t) return t;
-          }
-        }
-        return null;
-      }
-
-      // Chat-completions shape
-      if (j?.choices && j.choices[0]){
-        const c = j.choices[0];
-        // prefer message.content, then other fields, avoid reasoning_content unless nothing else
-        const fromChoice = extractText(c.message?.content) || extractText(c.message) || extractText(c) || extractText(c.message?.reasoning_content);
-        if(fromChoice) return fromChoice;
-      }
-
-      // Other shapes: Ollama-style, output/result etc.
-      const byScan = extractText(j);
-      if(byScan) return byScan;
-
-      if (j?.output) return (typeof j.output === 'string' ? j.output : JSON.stringify(j.output));
-      if (j?.result && typeof j.result === 'string') return j.result;
-      if (typeof j === 'string') return j;
-      return JSON.stringify(j);
-    } catch(e) {
-      return text.trim();
-    }
-  }catch(e){
-    console.error('LLM call failed:', e.message);
-    throw e;
-  }
+  const messages = [
+    { role: 'system', content: 'You are a concise assistant. Output ONLY a single short task title on one line. Do NOT include reasoning, analysis, or any extra text.' },
+    { role: 'user', content: prompt },
+  ];
+  return llamaChat(messages, { maxTokens: 128, temperature: 0 });
 }
 
 function heuristicTitle(task){
@@ -151,7 +51,7 @@ async function main(){
     if(!title || FORCE){
       const prompt = `Create a short (6-12 words) human-friendly task title for a review task.\nTask reason: ${t.reason || 'unspecified'}\nTarget id: ${t.target || t.featureId || t.taskId}\nKeep it concise.\nIMPORTANT: Output only the final title on a single line. Do NOT include any reasoning, analysis, or extra text.`;
       try{
-        if(OLLAMA_URL && (APPLY || FORCE)){
+        if(APPLY || FORCE){
           let out = await callLLM(prompt);
           // If LLM returned a JSON string, try to parse and extract nested fields like reasoning_content
           try{
@@ -205,7 +105,7 @@ async function main(){
             return firstWords || null;
           }
           title = pickTitle(out) || heuristicTitle(t);
-        } else if(OLLAMA_URL && !APPLY){
+        } else if(!APPLY){
           let out = await callLLM(prompt).catch(()=>null);
           try{
             if(typeof out === 'string'){
@@ -285,7 +185,7 @@ async function main(){
     fs.renameSync(TASKS_OUT, TASKS_IN);
     console.log('applied titles to', TASKS_IN);
   } else {
-    console.log('dry-run; to apply: rerun with --apply and optionally set OLLAMA_URL and OLLAMA_MODEL');
+    console.log('dry-run; to apply: rerun with --apply');
   }
 }
 

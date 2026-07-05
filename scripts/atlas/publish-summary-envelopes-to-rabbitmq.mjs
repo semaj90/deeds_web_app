@@ -16,6 +16,7 @@
 import amqp from 'amqplib';
 import fs from 'fs';
 import path from 'path';
+import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,9 +41,27 @@ const LIMIT = LIMIT_ARG ? Math.max(0, Number.parseInt(LIMIT_ARG, 10) || 0) : 0;
 const DRY_RUN = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
 
-function readNdjson(filePath) {
+let nativeJsonlLoader = null;
+try {
+  const require = createRequire(import.meta.url);
+  const wrapperPath = path.resolve(ROOT, 'crates/turbovec-napi/wrapper.js');
+  nativeJsonlLoader = require(wrapperPath);
+} catch {
+  nativeJsonlLoader = null;
+}
+
+async function readNdjson(filePath) {
   if (!fs.existsSync(filePath)) {
     throw new Error(`Input file not found: ${filePath}`);
+  }
+
+  if (nativeJsonlLoader?.loadJsonlPackets) {
+    try {
+      const parsed = nativeJsonlLoader.loadJsonlPackets(filePath);
+      return JSON.parse(parsed);
+    } catch (err) {
+      console.warn(`[summary-envelope-queue] Native JSONL parse failed, falling back to JS: ${err.message}`);
+    }
   }
 
   return fs.readFileSync(filePath, 'utf8')
@@ -98,7 +117,7 @@ async function publishJobs(jobs) {
 }
 
 async function main() {
-  const jobs = readNdjson(INPUT);
+  const jobs = await readNdjson(INPUT);
   const selected = LIMIT > 0 ? jobs.slice(0, LIMIT) : jobs;
 
   console.log(`[summary-envelope-queue] Input: ${INPUT}`);

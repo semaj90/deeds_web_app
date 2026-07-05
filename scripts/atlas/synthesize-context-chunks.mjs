@@ -38,6 +38,7 @@ import fs      from 'node:fs';
 import path    from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Redis   from 'ioredis';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -53,49 +54,16 @@ const VERBOSE    = argv.includes('--verbose');
 
 const INPUT_PATH = inputI >= 0 ? argv[inputI + 1] : null;
 const OUT_PATH   = outI   >= 0 ? argv[outI + 1]   : null;
-const MODEL      = modelI >= 0 ? argv[modelI + 1] : 'gemma4-rotorquant:latest';
 
-const TURBO_URL  = process.env.TURBO_URL  ?? 'http://localhost:8090';
-const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const REDIS_URL  = process.env.REDIS_URL  ?? 'redis://localhost:6379';
 const REDIS_TTL  = Number(process.env.REDIS_TTL ?? '86400');
-
-// ── LLM probe ─────────────────────────────────────────────────────────────────
-let turboquantAvailable = false;
-
-async function checkTurboQuant() {
-  try {
-    const r = await fetch(`${TURBO_URL}/health`, { signal: AbortSignal.timeout(2000) });
-    turboquantAvailable = r.ok;
-  } catch {
-    turboquantAvailable = false;
-  }
-}
 
 async function chatCompletion(systemPrompt, userPrompt) {
   const messages = [
     { role: 'system', content: systemPrompt },
     { role: 'user',   content: userPrompt },
   ];
-
-  const url   = turboquantAvailable ? `${TURBO_URL}/v1/chat/completions` : `${OLLAMA_URL}/v1/chat/completions`;
-  const model = turboquantAvailable ? MODEL : 'gemma3-legal:latest';
-
-  const r = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model,
-      messages,
-      max_tokens: 400,
-      temperature: 0.2,
-      stream: false,
-    }),
-    signal: AbortSignal.timeout(60000),
-  });
-  if (!r.ok) throw new Error(`LLM ${r.status}`);
-  const data = await r.json();
-  return data.choices?.[0]?.message?.content?.trim() ?? '';
+  return llamaChat(messages, { maxTokens: 400, temperature: 0.2 });
 }
 
 // ── Feature grouping ──────────────────────────────────────────────────────────
@@ -179,8 +147,7 @@ async function main() {
     return;
   }
 
-  await checkTurboQuant();
-  console.log(`[synthesize] LLM: ${turboquantAvailable ? `TurboQuant ${TURBO_URL}` : `Ollama ${OLLAMA_URL}`}`);
+  console.log('[synthesize] LLM: llama-server :8090/v1/chat/completions');
 
   // Redis (optional)
   let redis = null;

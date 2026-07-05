@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
-const REPO_ROOT = resolve(__dirname, '../..');
+const { frontendRoot: ROOT, repoRoot: REPO_ROOT } = resolveAtlasPaths(import.meta.url);
 
 // Load root .env first (has REDIS_URL), then sveltekit-frontend/.env (may override)
 dotenv.config({ path: resolve(REPO_ROOT, '.env') });

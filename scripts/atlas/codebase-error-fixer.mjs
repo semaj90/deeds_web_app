@@ -32,6 +32,7 @@ import { spawnSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { loadConfig, resolveRepoPath, readJson, readText, writeJson, writeMarkdown, REPO_ROOT } from './_atlas-utils.mjs';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const argv  = process.argv.slice(2);
@@ -46,9 +47,7 @@ const SOURCE   = SOURCE_I >= 0 ? argv[SOURCE_I + 1] : 'auto';
 
 // ── LLM ───────────────────────────────────────────────────────────────────────
 
-const TURBO_BASE  = process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090';
-const OLLAMA_BASE = process.env.OLLAMA_BASE_URL     ?? 'http://127.0.0.1:11434';
-const TIMEOUT_MS  = 60_000;
+const TIMEOUT_MS = 60_000;
 
 async function callGemma4Fix(errorCluster, featureContext) {
   const prompt = `You are an expert TypeScript/SvelteKit developer.
@@ -67,21 +66,11 @@ Provide:
 3. Files to check (comma-separated)
 Keep response under 200 words. Be specific and actionable.`;
 
-  const endpoints = [
-    { url: `${TURBO_BASE}/v1/chat/completions`,  body: { model: 'gemma4-rotorquant:latest', messages: [{ role: 'user', content: prompt }], stream: false, max_tokens: 512 } },
-    { url: `${OLLAMA_BASE}/api/generate`,         body: { model: 'gemma3-legal:latest', prompt, stream: false, options: { temperature: 0.1, num_predict: 512 } } },
-  ];
-
-  for (const { url, body } of endpoints) {
-    try {
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(TIMEOUT_MS) });
-      if (!res.ok) continue;
-      const data = await res.json();
-      const text = data.response ?? data.choices?.[0]?.message?.content ?? '';
-      if (text.trim()) return text.trim();
-    } catch { /* try next */ }
+  try {
+    return await llamaChat(prompt, { maxTokens: 512, temperature: 0.1, timeoutMs: TIMEOUT_MS });
+  } catch {
+    return null;
   }
-  return null;
 }
 
 // ── Error parsers ──────────────────────────────────────────────────────────────

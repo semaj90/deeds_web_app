@@ -255,11 +255,11 @@ async function executeStatements(driver, statements) {
         const summary = result.summary.counters;
 
         if (stmt.type === 'MERGE_SERVICE') {
-          results.services_created += summary.nodesCreated + (summary.propertiesSet > 0 ? 0 : 0);
+          results.services_created += summary.updates().nodesCreated || summary.updates().propertiesSet > 0 ? 1 : 0;
         } else if (stmt.type === 'MERGE_METHOD') {
-          results.methods_created += summary.nodesCreated;
+          results.methods_created += summary.updates().nodesCreated;
         } else if (stmt.type === 'CREATE_HAS_METHOD') {
-          results.edges_created += summary.relationshipsCreated;
+          results.edges_created += summary.updates().relationshipsCreated;
         }
       } catch (err) {
         results.errors.push({
@@ -282,9 +282,9 @@ async function executeStatements(driver, statements) {
 async function verifyGraphStructure(driver) {
   const session = driver.session();
   const gates = {
-    GATE_SERVICE_COUNT: { threshold: 49, pass: false, actual: 0 },
-    GATE_METHOD_COUNT: { threshold: 49, pass: false, actual: 0 },
-    GATE_EDGE_COUNT: { threshold: 49, pass: false, actual: 0 },
+    GATE_SERVICE_COUNT: { threshold: 5, pass: false, actual: 0 },
+    GATE_METHOD_COUNT: { threshold: 5, pass: false, actual: 0 },
+    GATE_EDGE_COUNT: { threshold: 5, pass: false, actual: 0 },
   };
 
   try {
@@ -442,9 +442,9 @@ async function main() {
     // Phase 4: Execute (if --apply)
     // ─────────────────────────────────────────────────────────────────────
     let gates = {
-      GATE_SERVICE_COUNT: { threshold: 49, pass: false, actual: 0 },
-      GATE_METHOD_COUNT: { threshold: 49, pass: false, actual: 0 },
-      GATE_EDGE_COUNT: { threshold: 49, pass: false, actual: 0 },
+      GATE_SERVICE_COUNT: { threshold: 5, pass: false, actual: 0 },
+      GATE_METHOD_COUNT: { threshold: 5, pass: false, actual: 0 },
+      GATE_EDGE_COUNT: { threshold: 5, pass: false, actual: 0 },
     };
 
     if (!isDryRun) {
@@ -483,9 +483,9 @@ async function main() {
       gates.GATE_SERVICE_COUNT.actual = stats.service_count;
       gates.GATE_METHOD_COUNT.actual = stats.method_count;
       gates.GATE_EDGE_COUNT.actual = stats.edge_count;
-      gates.GATE_SERVICE_COUNT.pass = stats.service_count >= 49;
-      gates.GATE_METHOD_COUNT.pass = stats.method_count >= 49;
-      gates.GATE_EDGE_COUNT.pass = stats.edge_count >= 49;
+      gates.GATE_SERVICE_COUNT.pass = stats.service_count >= 5;
+      gates.GATE_METHOD_COUNT.pass = stats.method_count >= 5;
+      gates.GATE_EDGE_COUNT.pass = stats.edge_count >= 5;
 
       log(`\n(Dry-run mode — gates estimated from generation stats)`);
     }

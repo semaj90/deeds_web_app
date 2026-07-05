@@ -18,6 +18,7 @@ import readline from 'node:readline';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, normalizeConnectionHost, REPO_ROOT } from './connection-config.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = REPO_ROOT || path.resolve(__dirname, '../..');
@@ -52,8 +53,8 @@ const SCAN_PATHS = [
   'neschrom97',
   'scripts',
   'src',
-  'sveltekit-frontend/.tmp',
-  'sveltekit-frontend/docs',
+  path.relative(ROOT, resolveAtlasPaths(import.meta.url).frontendTmpRoot).replace(/\\/g, '/'),
+  path.relative(ROOT, resolveAtlasPaths(import.meta.url).frontendReportsRoot).replace(/\\/g, '/'),
   'sveltekit-frontend/reports',
   'sveltekit-frontend/src',
 ];

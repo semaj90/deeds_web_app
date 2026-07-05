@@ -35,14 +35,14 @@ export async function loadAtlasEnvFiles(repoRoot, fileNames = ['.env', '.env.loc
 
 export function getRedisContainerCandidates(env = process.env) {
   return [
-    env.PARENT_ATLAS_REDIS_CONTAINER,
     env.PARENT_ATLAS_VALKEY_CONTAINER,
-    env.REDIS_CONTAINER,
+    env.PARENT_ATLAS_REDIS_CONTAINER,
     env.VALKEY_CONTAINER,
+    env.REDIS_CONTAINER,
     'legal-ai-valkey',
     'legal-ai-redis',
-    'redis',
     'valkey',
+    'redis',
   ].filter(Boolean);
 }
 
@@ -74,7 +74,8 @@ export function findRedisContainer(env = process.env, runDockerFn = runDocker) {
 }
 
 export function redisCliArgs(container, commandArgs, password = '') {
-  const args = ['exec', '-i', container, 'redis-cli'];
+  const cli = container.includes('valkey') ? 'valkey-cli' : 'redis-cli';
+  const args = ['exec', '-i', container, cli];
   if (password) args.push('-a', password);
   args.push(...commandArgs);
   return args;

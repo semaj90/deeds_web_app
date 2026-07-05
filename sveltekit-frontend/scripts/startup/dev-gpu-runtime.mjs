@@ -36,9 +36,9 @@ function mergedEnv(extra = {}) {
     LOCAL_OPENAI_API_KEY: envFromFiles.LOCAL_OPENAI_API_KEY ?? 'local',
     LOCAL_GEMMA_MODEL: envFromFiles.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
     TURBO_PORT: envFromFiles.TURBO_PORT ?? '8090',
-    TURBO_CTX: envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '16384',
-    LLM_CONTEXT_SIZE: envFromFiles.LLM_CONTEXT_SIZE ?? envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '16384',
-    TURBO_CTX_ALLOW_SHORT_CONTEXT: envFromFiles.TURBO_CTX_ALLOW_SHORT_CONTEXT ?? 'true',
+    TURBO_CTX: envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
+    LLM_CONTEXT_SIZE: envFromFiles.LLM_CONTEXT_SIZE ?? envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
+    TURBO_CTX_ALLOW_SHORT_CONTEXT: envFromFiles.TURBO_CTX_ALLOW_SHORT_CONTEXT ?? 'false',
     TURBO_PARALLEL: envFromFiles.TURBO_PARALLEL ?? '1',
     TURBO_BATCH_SIZE: envFromFiles.TURBO_BATCH_SIZE ?? '512',
     TURBO_UBATCH_SIZE: envFromFiles.TURBO_UBATCH_SIZE ?? '128',
@@ -53,7 +53,7 @@ function runChecked(command, args, options = {}) {
       cwd: options.cwd ?? REPO_ROOT,
       env: options.env ?? mergedEnv(),
       stdio: options.stdio ?? 'inherit',
-      shell: false,
+      shell: process.platform === 'win32',  // Use shell on Windows for .cmd resolution
       windowsHide: true,
     });
     child.on('error', reject);
@@ -70,7 +70,7 @@ function spawnForeground(command, args, options = {}) {
     cwd: options.cwd ?? FRONTEND_ROOT,
     env: options.env ?? mergedEnv(),
     stdio: 'inherit',
-    shell: false,
+    shell: process.platform === 'win32',  // Use shell on Windows for .cmd resolution
     windowsHide: false,
   });
   child.on('exit', (code, signal) => {
@@ -84,8 +84,7 @@ function spawnForeground(command, args, options = {}) {
 }
 
 async function main() {
-  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-
+  // Launch TurboQuant llama-server (Gemma4 at :8090)
   await runChecked('pwsh', [
     '-NoProfile',
     '-ExecutionPolicy',
@@ -96,15 +95,28 @@ async function main() {
     '-TextOnly',
   ], { cwd: REPO_ROOT, env: mergedEnv() });
 
-  await runChecked(npm, ['run', 'embed:onnx:start:detached'], {
-    cwd: REPO_ROOT,
-    env: mergedEnv(),
-  });
+  console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active');
 
-  console.log('[dev:gpu] Gemma4 llama-server and ONNX EmbeddingGemma startup checks completed.');
-  console.log('[dev:gpu] Summary text: http://127.0.0.1:8090/v1/chat/completions');
-  console.log('[dev:gpu] Embeddings:   http://127.0.0.1:8081/v1/embeddings');
+  // Try to start ONNX embedding server if available
+  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+  try {
+    await runChecked(npm, ['run', 'embed:onnx:start:detached'], {
+      cwd: FRONTEND_ROOT,
+      env: mergedEnv(),
+    });
+    console.log('[dev:gpu] ✅ ONNX Embedding server started on :8081');
+  } catch (err) {
+    console.log('[dev:gpu] ⚠️  ONNX Embedding server unavailable, using Ollama fallback');
+    console.log('[dev:gpu] Will use Ollama embeddinggemma:latest at :11434/api');
+  }
 
+  console.log('[dev:gpu] --- GPU Runtime Ready ---');
+  console.log('[dev:gpu] LLM (synthesis):  http://127.0.0.1:8090/v1');
+  console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX)');
+  console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
+  console.log('[dev:gpu] Starting Vite dev server (:5173)...\n');
+
+  // Launch Vite dev server in foreground
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
   spawnForeground(npx, ['vite', 'dev'], {
     cwd: FRONTEND_ROOT,

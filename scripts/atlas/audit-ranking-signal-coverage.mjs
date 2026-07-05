@@ -46,9 +46,9 @@ async function main() {
         COUNT(*) FILTER (WHERE source_ref IS NOT NULL AND source_ref != '')            AS with_source_ref,
         COUNT(*) FILTER (WHERE length(summary) > 20)                                  AS bm25_summary,
         COUNT(*) FILTER (WHERE length(payload->>'bm25_text') > 20)                    AS bm25_payload,
-        COUNT(*) FILTER (WHERE community_source IS NOT NULL)                           AS community_source,
-        COUNT(*) FILTER (WHERE community_confidence > 0)                               AS community_conf_any,
-        COUNT(*) FILTER (WHERE community_confidence >= 0.65)                           AS community_conf_high,
+        COUNT(*) FILTER (WHERE community_id IS NOT NULL)                           AS community_source,
+        COUNT(*) FILTER (WHERE (payload->>'community_confidence')::float > 0)                               AS community_conf_any,
+        COUNT(*) FILTER (WHERE (payload->>'community_confidence')::float >= 0.65)                           AS community_conf_high,
         -- concept_ids gate: scoped to packets with a non-empty source_ref (addressable packets)
         COUNT(*) FILTER (WHERE concept_ids IS NOT NULL AND cardinality(concept_ids)>0 AND source_ref IS NOT NULL AND source_ref != '') AS concept_ids_sourced,
         COUNT(*) FILTER (WHERE concept_ids IS NOT NULL AND cardinality(concept_ids)>0) AS concept_ids,

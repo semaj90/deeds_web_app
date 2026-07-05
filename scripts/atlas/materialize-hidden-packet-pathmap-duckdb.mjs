@@ -19,9 +19,11 @@ import readline from 'node:readline';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, REPO_ROOT } from './connection-config.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = REPO_ROOT || path.resolve(__dirname, '../..');
+const { frontendTmpRoot: FRONTEND_TMP_ROOT } = resolveAtlasPaths(import.meta.url);
 const DUCKDB = process.env.DUCKDB_BIN || 'C:\\Users\\james\\AppData\\Local\\Programs\\DuckDB\\duckdb.exe';
 const args = new Set(process.argv.slice(2));
 const DRY_RUN = args.has('--dry-run') || !args.has('--write');
@@ -35,17 +37,17 @@ const INPUTS = [
   {
     key: 'feature_labels',
     requestedPath: '.tmp/feature_labels.jsonl',
-    fallbackPaths: ['sveltekit-frontend/.tmp/feature_labels.jsonl'],
+    fallbackPaths: [path.relative(ROOT, path.join(FRONTEND_TMP_ROOT, 'feature_labels.jsonl')).replace(/\\/g, '/')],
   },
   {
     key: 'kanban_tasks',
     requestedPath: '.tmp/kanban_tasks.jsonl',
-    fallbackPaths: ['sveltekit-frontend/.tmp/kanban_tasks.jsonl'],
+    fallbackPaths: [path.relative(ROOT, path.join(FRONTEND_TMP_ROOT, 'kanban_tasks.jsonl')).replace(/\\/g, '/')],
   },
   {
     key: 'missing_feature_todos',
     requestedPath: '.tmp/missing_feature_todos.jsonl',
-    fallbackPaths: ['sveltekit-frontend/.tmp/missing_feature_todos.jsonl'],
+    fallbackPaths: [path.relative(ROOT, path.join(FRONTEND_TMP_ROOT, 'missing_feature_todos.jsonl')).replace(/\\/g, '/')],
   },
 ];
 

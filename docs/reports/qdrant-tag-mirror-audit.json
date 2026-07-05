@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-01T21:22:49.948Z",
-  "mode": "apply",
+  "generatedAt": "2026-07-05T00:20:09.494Z",
+  "mode": "dry-run",
   "inputPath": ".tmp/addressable-packets.ndjson",
   "summary": {
     "inputRows": 58304,
@@ -15,6 +15,6 @@
     "patchRatePct": 0
   },
   "samples": [],
-  "status": "APPLIED",
-  "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
+  "status": "DRY_RUN_READY",
+  "nextSafeAction": "Review the dry-run patch list, then re-run with --apply once the addressable packet materializer has produced rows."
 }

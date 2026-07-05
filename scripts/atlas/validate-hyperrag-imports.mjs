@@ -25,12 +25,13 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const VERBOSE = process.argv.includes('--verbose');
 
-const REPO_ROOT = resolve(__dirname, '../../');
-const REPORT_FILE = resolve(REPO_ROOT, 'sveltekit-frontend/docs/reports/hyperrag-import-validation.json');
+const REPO_ROOT = resolve(FRONTEND_ROOT, '..');
+const REPORT_FILE = resolve(FRONTEND_ROOT, 'docs/reports/hyperrag-import-validation.json');
 
 function log(msg) {
   console.log(`[${new Date().toISOString()}] ${msg}`);

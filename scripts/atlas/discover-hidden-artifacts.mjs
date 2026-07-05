@@ -31,13 +31,11 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { globSync } from 'glob';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const ROOT = path.join(__dirname, '../../sveltekit-frontend');
+const { frontendRoot: ROOT } = resolveAtlasPaths(import.meta.url);
 
 // Environment
 const DATABASE_URL = process.env.DATABASE_URL || 'postgres://legal_admin:123456@127.0.0.1:5434/legal_ai_db';

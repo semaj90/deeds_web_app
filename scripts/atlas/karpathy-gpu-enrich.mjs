@@ -16,6 +16,7 @@ import { createHash } from 'node:crypto';
 import Redis from 'ioredis';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 dotenv.config();
 
 // ── Canonical source-ref helper ──────────────────────────────────────────────
@@ -23,9 +24,7 @@ const _canonicalHelperPath = resolve(dirname(fileURLToPath(import.meta.url)), '.
 const { normalizeSourceRef: _canonNorm, sourceRefVariants: _canonVariants } =
   await import(pathToFileURL(_canonicalHelperPath).href);
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
-const REPO = resolve(ROOT, '..');
+const { frontendRoot: ROOT, repoRoot: REPO } = resolveAtlasPaths(import.meta.url);
 const esmRequire = createRequire(import.meta.url);
 
 function computeKarpathyBlend(pr, authority, attention) {

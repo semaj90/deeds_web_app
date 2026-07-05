@@ -44,7 +44,38 @@ function topoLabel(rel) {
 }
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
+const REPO_ROOT = resolve(__dirname, '../..');
+
+// Configuration-driven index roots.
+// Each entry is relative to REPO_ROOT.
+// --roots=fast  → only sveltekit-frontend (startup/delta pass, <2 min)
+// --roots=cold  → all roots (full-repo topology pass, 15–60 min)
+// default       → sveltekit-frontend only (preserves existing behaviour)
+const INDEX_ROOTS_FAST = ['sveltekit-frontend'];
+const INDEX_ROOTS_COLD = [
+  'sveltekit-frontend',
+  'scripts',
+  'crates',
+  'packages',
+  'simd-bridge',
+  'docs',
+  'services',
+];
+const EXCLUDE_ROOTS = new Set([
+  'node_modules', '.git', '.svelte-kit', 'dist', 'build',
+  'coverage', '.cache', '.tmp', 'logs', 'archives', 'backups',
+  '.venv', '.venv-py313-backup', '__pycache__', 'deeds_labs',
+  'granite-docling-258M', '.opencode', '.claude',
+]);
+
+const rootsArg = process.argv.find(a => a.startsWith('--roots='));
+const ACTIVE_ROOTS = (rootsArg?.split('=')?.[1] === 'cold')
+  ? INDEX_ROOTS_COLD
+  : INDEX_ROOTS_FAST;
+
+// Backward-compatible ROOT: primary index root (sveltekit-frontend) —
+// keeps all graph JSON path references consistent.
+const ROOT = resolve(REPO_ROOT, 'sveltekit-frontend');
 
 // ── CLI args ──────────────────────────────────────────────────────────────────
 
@@ -207,6 +238,36 @@ function syntheticManifold4(rel, clusterId, indexInCluster, clusterSize) {
   ];
 }
 
+// ── Domain class taxonomy ─────────────────────────────────────────────────────
+// Maps a relative path to one of the canonical domain_class values.
+// These values should be stored in atlas_packets, atlas_feature_envelopes,
+// and Qdrant payloads for multi-hop filtering.
+/** @param {string} rel @returns {string} */
+function domainClass(rel) {
+  const p = rel.toLowerCase();
+  if (p.startsWith('scripts/')) return 'infrastructure';
+  if (p.startsWith('crates/') || p.startsWith('simd-bridge/')) return 'gpu';
+  if (p.startsWith('packages/')) {
+    if (/retrieval|turbovec|bifrost/.test(p)) return 'retrieval';
+    if (/atlas-core|parent-atlas/.test(p))   return 'agent';
+    return 'backend';
+  }
+  if (p.startsWith('services/') || p.startsWith('go/')) return 'backend';
+  if (p.startsWith('docs/'))      return 'documentation';
+  // sveltekit-frontend paths
+  if (/\/(gpu|cuda|libtorch|tensorrt|simd)/.test(p))  return 'gpu';
+  if (/\/(neo4j|graph|topology|gds|pagerank)/.test(p)) return 'graph';
+  if (/\/(qdrant|vector|retrieval|turbovec|embedding)/.test(p)) return 'retrieval';
+  if (/\/(cache|redis|bifrost|bitfrost)/.test(p))     return 'cache';
+  if (/\/(langgraph|acp|agent|workflow|ace\/)/.test(p)) return 'agent';
+  if (/\/(ast|langextract|compiler|parser)/.test(p)) return 'compiler';
+  if (/\/(routes\/api\/|server\/)/.test(p))          return 'backend';
+  if (/\/(components\/|routes\/\(app\)|svelte)/.test(p)) return 'frontend';
+  if (/\/(auth|session|lucia)/.test(p))              return 'backend';
+  if (/\/(db|schema|drizzle|migration)/.test(p))     return 'backend';
+  return 'unclassified';
+}
+
 // ── Build nodes ───────────────────────────────────────────────────────────────
 
 log(`Building file nodes (limit=${LIMIT === Infinity ? 'none' : LIMIT}) …`);
@@ -250,6 +311,7 @@ for (const f of dedupedFiles) {
     clusterConfidence:  clusterKey ? 0.90 : null,
     summaryLens,
     topoLabel:          topoLabel(f.rel),
+    domain_class:       domainClass(f.rel),
     glyph: {
       sprite:  glyphSprite(f),
       palette: glyphPalette(f.rel),

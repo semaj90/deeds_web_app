@@ -17,19 +17,17 @@
  *  --skip-backfill  skip chunk_hit_log NULL backfill step
  *  --top N          emit only top-N clusters (default: all)
  */
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import pkg from 'pg';
 import { fileLanguage } from './_atlas-utils.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 const { Pool } = pkg;
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
-const REPO_ROOT = resolve(__dirname, '../..');
+const { frontendRoot: ROOT, repoRoot: REPO_ROOT } = resolveAtlasPaths(import.meta.url);
 
 // Load root .env first, then sveltekit-frontend/.env (no override)
 dotenv.config({ path: resolve(REPO_ROOT, '.env') });

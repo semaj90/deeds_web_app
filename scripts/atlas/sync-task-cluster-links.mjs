@@ -19,9 +19,13 @@ import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
 import pg from 'pg';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), '../../sveltekit-frontend/.env') });
-dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), '../../.env') });
+const { frontendRoot: FRONTEND_ROOT, repoRoot: REPO_ROOT } = resolveAtlasPaths(import.meta.url);
+dotenv.config({ path: resolve(FRONTEND_ROOT, '.env') });
+dotenv.config({ path: resolve(FRONTEND_ROOT, '.env.local'), override: true });
+dotenv.config({ path: resolve(REPO_ROOT, '.env') });
+dotenv.config({ path: resolve(REPO_ROOT, '.env.local'), override: true });
 
 // ── Args ──────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);

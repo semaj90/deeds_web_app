@@ -29,11 +29,15 @@ CREATE TABLE IF NOT EXISTS error_cluster_groups (
   last_seen TIMESTAMP NOT NULL DEFAULT NOW(),
   recovery_packet_key TEXT,
   recovery_confidence REAL,
+  recovery_reason TEXT,
   UNIQUE (error_class, model_name, task_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_error_cluster_class_model_seen
   ON error_cluster_groups (error_class, model_name, last_seen DESC);
+
+CREATE INDEX IF NOT EXISTS idx_error_cluster_recovery_packet
+  ON error_cluster_groups (recovery_packet_key);
 
 -- 3. Binary DAG-hit landing zone (temporary, TTL-based)
 CREATE TABLE IF NOT EXISTS dag_hit_envelope_cache (

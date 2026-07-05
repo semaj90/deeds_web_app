@@ -24,14 +24,12 @@
  *   graphify:tag-backfill:dry
  *   graphify:tag-backfill:force
  */
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
+const { frontendRoot: ROOT } = resolveAtlasPaths(import.meta.url);
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';

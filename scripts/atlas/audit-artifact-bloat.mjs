@@ -12,8 +12,10 @@ import { mkdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectFiles, REPO_ROOT, toPosixPath } from './_atlas-utils.mjs';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const { frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const REPORTS_DIR = path.join(REPO_ROOT, 'docs', 'reports');
 const OUT_JSON = path.join(REPORTS_DIR, 'artifact-bloat-report.json');
 const OUT_MD = path.join(REPORTS_DIR, 'artifact-bloat-report.md');
@@ -99,9 +101,9 @@ async function main() {
     'models',
     'turbovec',
     'granite-docling-258M',
-    'sveltekit-frontend/docs',
-    'sveltekit-frontend/.tmp',
-    'sveltekit-frontend/tmp',
+    path.relative(REPO_ROOT, path.join(FRONTEND_ROOT, 'docs')).replace(/\\/g, '/'),
+    path.relative(REPO_ROOT, path.join(FRONTEND_ROOT, '.tmp')).replace(/\\/g, '/'),
+    path.relative(REPO_ROOT, path.join(FRONTEND_ROOT, 'tmp')).replace(/\\/g, '/'),
   ];
 
   const files = [];

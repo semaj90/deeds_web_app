@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Validate 295/5000 partial batch from Phase 3
+ * Import 5K batch from Phase 3
  *
- * 1. Import summaries from .tmp/gemma4-summaries-5k.ndjson (295 packets)
- * 2. Log analysis pass (gemma4_summary_v1) independently
- * 3. Validate source_ref + feature_id lineage
- * 4. Report coverage progress
+ * 1. Import summaries from .tmp/gemma4-summaries-5k.ndjson
+ * 2. Validate source_ref + feature_id lineage (orphan detection)
+ * 3. Insert into atlas_summary_layers with schema
+ * 4. Report coverage progress (X/58304)
  *
  * Usage:
  *   node scripts/atlas/validate-5k-batch-partial.mjs --apply

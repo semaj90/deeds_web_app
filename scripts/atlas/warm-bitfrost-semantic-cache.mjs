@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { packetFieldValue, safeJsonObject } from './lib/adaptive-schema.mjs';
 import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
 import { resolveAtlasRedisContext, runRedisCli } from './lib/redis-valkey.mjs';
+import { buildTopologyEnvelope, deriveCentroidKeys } from './lib/topology-ontology.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -301,6 +302,14 @@ async function main() {
       metadata.text ??
       '',
     ).trim();
+    const topology = buildTopologyEnvelope({
+      ...row,
+      som_cell: packetFieldValue(row, 'som_cluster') ?? row.som_cluster ?? null,
+    });
+    const centroidKeys = deriveCentroidKeys({
+      ...row,
+      som_cell: packetFieldValue(row, 'som_cluster') ?? row.som_cluster ?? null,
+    });
 
     const base = {
       packet_key: packetKey,
@@ -332,6 +341,8 @@ async function main() {
       summary: summary || null,
       metadata,
       tags: Array.isArray(tags) ? tags : [],
+      topology,
+      centroid_keys: centroidKeys,
     };
     plans.push(
       {
@@ -410,6 +421,58 @@ async function main() {
           lineage_version: lineageVersion || null,
         },
       },
+      {
+        key: centroidKeys.domain_centroid_key,
+        ttl: 7200,
+        value: {
+          packet_key: packetKey,
+          domain_class: centroidKeys.domain_class,
+          feature_id: featureId,
+          source_ref: sourceRef,
+          centroid_keys: centroidKeys,
+        },
+      },
+      ...(centroidKeys.feature_centroid_key ? [{
+        key: centroidKeys.feature_centroid_key,
+        ttl: 7200,
+        value: {
+          packet_key: packetKey,
+          feature_id: featureId,
+          feature_label: featureLabel,
+          source_ref: sourceRef,
+          centroid_keys: centroidKeys,
+        },
+      }] : []),
+      ...(centroidKeys.kmeans_centroid_key ? [{
+        key: centroidKeys.kmeans_centroid_key,
+        ttl: 7200,
+        value: {
+          packet_key: packetKey,
+          kmeans_cluster: clusterId || somCluster || null,
+          source_ref: sourceRef,
+          centroid_keys: centroidKeys,
+        },
+      }] : []),
+      ...(centroidKeys.som_centroid_key ? [{
+        key: centroidKeys.som_centroid_key,
+        ttl: 7200,
+        value: {
+          packet_key: packetKey,
+          som_cluster: somCluster || null,
+          source_ref: sourceRef,
+          centroid_keys: centroidKeys,
+        },
+      }] : []),
+      ...(centroidKeys.community_centroid_key ? [{
+        key: centroidKeys.community_centroid_key,
+        ttl: 7200,
+        value: {
+          packet_key: packetKey,
+          community_id: communityId || null,
+          source_ref: sourceRef,
+          centroid_keys: centroidKeys,
+        },
+      }] : []),
       {
         key: `ace:summary:${packetKey}`,
         ttl: 3600,

@@ -260,8 +260,9 @@ async function writePhase(clusters) {
   let written = 0;
   for (const c of clusters) {
     const recovery = recoveryMap.get(c.key);
-    const recoveryKey  = recovery?.packet_key ?? null;
-    const recoveryConf = recovery?.confidence ?? c.confidence;
+    const recoveryKey    = recovery?.packet_key ?? null;
+    const recoveryConf   = recovery?.confidence ?? c.confidence;
+    const recoveryReason = recovery?.reason ?? null;
 
     if (DRY_RUN) {
       if (VERBOSE) {
@@ -281,14 +282,15 @@ async function writePhase(clusters) {
     await pool.query(`
       INSERT INTO error_cluster_groups
         (error_class, model_name, task_id, packet_keys, failure_count, last_seen,
-         recovery_packet_key, recovery_confidence)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         recovery_packet_key, recovery_confidence, recovery_reason)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       ON CONFLICT (error_class, model_name, task_id) DO UPDATE SET
         packet_keys         = $4,
         failure_count       = error_cluster_groups.failure_count + $5,
         last_seen           = $6,
         recovery_packet_key = COALESCE($7, error_cluster_groups.recovery_packet_key),
-        recovery_confidence = $8
+        recovery_confidence = $8,
+        recovery_reason     = COALESCE($9, error_cluster_groups.recovery_reason)
     `, [
       c.error_class,
       c.model_name,
@@ -298,6 +300,7 @@ async function writePhase(clusters) {
       c.latest_seen,
       recoveryKey,
       recoveryConf,
+      recoveryReason,
     ]);
 
     written++;

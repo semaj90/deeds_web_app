@@ -32,6 +32,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Redis from 'ioredis';
 import pg from 'pg';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -72,8 +73,7 @@ const REDIS_CONFIG = {
   retryStrategy: () => null,
 };
 
-const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+// inference: llamaChat() → llama-server :8090/v1/chat/completions
 
 function log(...args) { console.log(...args); }
 function vlog(...args) { if (VERBOSE) console.log(...args); }
@@ -247,43 +247,7 @@ ${chunk.content?.substring(0, 3000) || '(empty)'}
 Summary:`;
 
   try {
-    // Try TurboQuant first (faster, cached)
-    const response = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.3,
-        max_tokens: 100,
-        stream: false,
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return (data.choices?.[0]?.message?.content || '').trim();
-    }
-
-    // Fallback to Ollama
-    const ollRes = await fetch(`${OLLAMA_URL}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma3-legal:latest',
-        messages: [{ role: 'user', content: prompt }],
-        stream: false,
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-
-    if (ollRes.ok) {
-      const data = await ollRes.json();
-      return (data.message?.content || '').trim();
-    }
-
-    return '(summary generation failed)';
+    return await llamaChat(prompt, { maxTokens: 100, temperature: 0.3, timeoutMs: 30_000 });
   } catch (e) {
     throw new Error(`Gemma4 summary failed: ${e.message}`);
   }

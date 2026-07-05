@@ -15,15 +15,13 @@
  */
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../../sveltekit-frontend');
+const { frontendRoot: ROOT } = resolveAtlasPaths(import.meta.url);
 const REDIS_URL = process.env.REDIS_URL;
 const TTL = 604800; // 7 days — matches gpu:karpathy:scores
 

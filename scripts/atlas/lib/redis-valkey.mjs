@@ -74,7 +74,8 @@ export function findRedisContainer(env = process.env, runDockerFn = runDocker) {
 }
 
 export function redisCliArgs(container, commandArgs, password = '') {
-  const args = ['exec', '-i', container, 'redis-cli'];
+  const cli = container.includes('valkey') ? 'valkey-cli' : 'redis-cli';
+  const args = ['exec', '-i', container, cli];
   if (password) args.push('-a', password);
   args.push(...commandArgs);
   return args;

@@ -27,18 +27,18 @@ services:
       - legal-ai-network
 
   # ============================================================================
-  # Redis Cache
+  # Valkey Cache (Redis-compatible, AGPL-free)
   # ============================================================================
-  redis:
-    image: redis:7-alpine
-    container_name: legal-ai-redis
-    command: redis-server --requirepass redis --maxmemory 2gb --maxmemory-policy allkeys-lru
+  valkey:
+    image: valkey/valkey-bundle:8.1.1
+    container_name: legal-ai-valkey
+    command: valkey-server --requirepass redis --maxmemory 2gb --maxmemory-policy allkeys-lru --io-threads 4
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - valkey_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      test: ["CMD", "valkey-cli", "-a", "redis", "ping"]
       interval: 30s
       timeout: 10s
       retries: 3

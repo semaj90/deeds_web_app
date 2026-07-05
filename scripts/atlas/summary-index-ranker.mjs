@@ -268,6 +268,7 @@ function rankRows(rows) {
         packet_key: row.packet_key ?? row.summary_packet_key ?? null,
         summary_packet_key: row.summary_packet_key ?? row.packet_key ?? null,
         source_ref: cleanText(row.source_ref),
+        file_path: cleanText(row.file_path),
         canonical_source_ref: cleanText(row.canonical_source_ref ?? row.source_ref),
         feature_id: cleanText(row.feature_id ?? row.packet_feature_id),
         feature_label: cleanText(row.feature_label ?? row.packet_feature_id ?? row.feature_id),
@@ -327,6 +328,7 @@ async function loadSummaries(pool, limit) {
         ap.packet_key,
         ap.title_id,
         ap.source_ref,
+        ap.file_path,
         ap.canonical_source_ref,
         ap.feature_id,
         ap.feature_label,
@@ -445,10 +447,10 @@ function renderMarkdown(report) {
     '',
     '## Top packets',
     '',
-    '| rank | score | status | title_id | feature_id | source_ref | reasons |',
-    '|---:|---:|---|---|---|---|---|',
+    '| rank | score | status | title_id | feature_id | source_ref | file_path | reasons |',
+    '|---:|---:|---|---|---|---|---|---|',
     ...report.top.slice(0, 20).map((row) =>
-      `| ${row.rank} | ${row.score} | ${row.status} | ${row.title_id || ''} | ${row.feature_id || ''} | ${row.source_ref || ''} | ${row.reasons.slice(0, 3).join('; ') || ''} |`
+      `| ${row.rank} | ${row.score} | ${row.status} | ${row.title_id || ''} | ${row.feature_id || ''} | ${row.source_ref || ''} | ${row.file_path || ''} | ${row.reasons.slice(0, 3).join('; ') || ''} |`
     ),
     '',
   ].join('\n');
@@ -520,6 +522,7 @@ async function main() {
           packet_key: row.packet_key,
           summary_packet_key: row.summary_packet_key,
           source_ref: row.source_ref,
+          file_path: row.file_path,
           canonical_source_ref: row.canonical_source_ref,
           title_id: row.title_id,
           title_id_source: row.title_id_source,

@@ -35,13 +35,14 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const VERBOSE = process.argv.includes('--verbose');
 
-const REPORT_DIR = resolve(__dirname, '../../sveltekit-frontend/docs/reports');
+const REPORT_DIR = resolve(FRONTEND_ROOT, 'docs/reports');
 const REPORT_FILE = resolve(REPORT_DIR, 'opencode-placeholder-prevention.json');
 const POLICY_FILE = resolve(REPORT_DIR, 'opencode-placeholder-policy.txt');
 

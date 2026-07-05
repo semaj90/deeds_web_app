@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-04T09:47:49.278Z",
+  "timestamp": "2026-07-05T00:01:08.518Z",
   "gate": "PASS",
   "synthetic": {
     "total": 4,
@@ -57,12 +57,12 @@
   },
   "live_sample": {
     "total": 200,
-    "changed": 103,
+    "changed": 59,
     "safe_after": 200,
-    "usable_after": 200,
+    "usable_after": 184,
     "leaky_after": 0,
     "before_counts": {
-      "channel": 0,
+      "channel": 3,
       "turns": 0,
       "bos": 0,
       "eos": 0,
@@ -77,9 +77,29 @@
     },
     "samples": [
       {
-        "packet_key": "packet:0003260092b1",
-        "raw": "llm_synthesis_mapping.json packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json. Derived LangExtract labels: llm synthesis mapping.json, summary backlog packet.",
-        "summary": "llm_synthesis_mapping.json packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json. Derived LangExtract labels: llm synthesis mapping.json, summary backlog packet.",
+        "packet_key": "packet:022d19be3ccd",
+        "raw": "source_ref: 620_26.txt | feature_id: 620_26 | tags:  | imports:  | exports:  | route_handlers:  | snippet: yes continue I would add Provenance Trees\r New table:\r atlas_provenance_tree\r provenance_id",
+        "summary": "source_ref: 620_26.txt | feature_id: 620_26 | tags: | imports: | exports: | route_handlers: | snippet: yes continue I would add Provenance Trees New table: atlas_provenance_tree provenance_id",
+        "changed": true,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:07db78a3e18e",
+        "raw": "source_ref: 6_14_26__to_do_parent_atlas_registery.txt | feature_id: 6_14_26__to_do_parent_atlas_registery | tags:  | imports:  | exports:  | route_handlers:  | snippet: yes continue find all files even rg gitignored files yes continue  the repo is deeds-web-app? sveltekit-frontend will be opencode integration in the app. i want to make parent atlas into a library plugin to ingest repos reasuring before I touch the next backfill. Ran Get-Content C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\scripts\\atlas\\audit-higher-hop-schema-repair.mjs -TotalCount 260 The repair and audit both passed. I’m pulling the generated backfill report once so I can summarize the exact counts back to you cleanly. Ran Get-Content C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\tree-nodes-backfill.json -TotalCount 220 I’ve fixed the underlying audit path, so I’m re-running the package alias once to confirm the repo entrypoint is green too, not just the direct script.for yo",
+        "summary": "source_ref: 6_14_26__to_do_parent_atlas_registery.txt | feature_id: 6_14_26__to_do_parent_atlas_registery | tags: | imports: | exports: | route_handlers: | snippet: yes continue find all files even rg gitignored files yes continue the repo is deeds-web-app? sveltekit-frontend will be opencode integration in the app. i want to make parent atlas into a library plugin to ingest repos reasuring before I touch the next backfill. Ran Get-Content C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\scripts\\atlas\\audit-higher-hop-schema-repair.mjs -TotalCount 260 The repair and audit both passed. I’m pulling the generated backfill report once so I can summarize the exact counts back to you cleanly. Ran Get-Content C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\tree-nodes-backfill.json -TotalCount 220 I’ve fixed the underlying audit path, so I’m re-running the package alias once to confirm the repo entrypoint is green too, not just the direct script.for yo",
+        "changed": true,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:0e90ff37c40f",
+        "raw": "Debugging a 'Permission denied' error during hook execution within a WSL/bash environment.",
+        "summary": "Debugging a 'Permission denied' error during hook execution within a WSL/bash environment.",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -87,9 +107,19 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0003850e84ca",
-        "raw": "tests__cases-sub-routes.spec.md packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md. Derived LangExtract labels: summary backlog packet, tests cases sub routes.spec.md.",
-        "summary": "tests__cases-sub-routes.spec.md packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md. Derived LangExtract labels: summary backlog packet, tests cases sub routes.spec.md.",
+        "packet_key": "packet:1bda0f118249",
+        "raw": "source_ref: 6_24_26__test.txt | feature_id: 6_24_26__test | tags:  | imports:  | exports:  | route_handlers:  | snippet: Yes File: scripts/launch-llama-server-parallel.ps1\r Status: Ready to deploy\r Configuration:\r --parallel 4 --slots 4 (4 concurrent workers, 4 KV cache slots)",
+        "summary": "source_ref: 6_24_26__test.txt | feature_id: 6_24_26__test | tags: | imports: | exports: | route_handlers: | snippet: Yes File: scripts/launch-llama-server-parallel.ps1 Status: Ready to deploy Configuration: --parallel 4 --slots 4 (4 concurrent workers, 4 KV cache slots)",
+        "changed": true,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:24abbee99423",
+        "raw": "Advancement in AI development moving beyond traditional RAG systems.",
+        "summary": "Advancement in AI development moving beyond traditional RAG systems.",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -97,9 +127,9 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0003ab694534",
-        "raw": "tests__routes__auto__api__cache__metrics.test.md packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md. Derived LangExtract labels: summary backlog packet, tests routes auto api cache.",
-        "summary": "tests__routes__auto__api__cache__metrics.test.md packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md. Derived LangExtract labels: summary backlog packet, tests routes auto api cache.",
+        "packet_key": "packet:2c29665425b7",
+        "raw": "Completion and readiness of the `6_26_26_todo_re` feature.",
+        "summary": "Completion and readiness of the `6_26_26_todo_re` feature.",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -107,70 +137,40 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0003dda5e534",
-        "raw": "93f973562fff24ed.json packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: neschrom97/cards/93f973562fff24ed.json. Derived LangExtract labels: 93f973562fff24ed.json, summary backlog packet.",
-        "summary": "93f973562fff24ed.json packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: neschrom97/cards/93f973562fff24ed.json. Derived LangExtract labels: 93f973562fff24ed.json, summary backlog packet.",
-        "changed": false,
+        "packet_key": "packet:351b10e524dc",
+        "raw": "source_ref: 6_25_26_manifold_truth.txt | feature_id: 6_25_26_manifold_truth | tags:  | imports:  | exports:  | route_handlers:  | snippet: ying the payload contract is stable for checked fields, but the topology/domain layer is under-modeled. The safest fix is not “patch Qdrant harder”; it is to add a canonical topology projection table and validate it daily.\r Next Steps\r From the user's follow-up message: \"Do not block on Valkey OpenCode rule seeding. That is optional developer memory cache.\"",
+        "summary": "source_ref: 6_25_26_manifold_truth.txt | feature_id: 6_25_26_manifold_truth | tags: | imports: | exports: | route_handlers: | snippet: ying the payload contract is stable for checked fields, but the topology/domain layer is under-modeled. The safest fix is not “patch Qdrant harder”; it is to add a canonical topology projection table and validate it daily. Next Steps From the user's follow-up message: \"Do not block on Valkey OpenCode rule seeding. That is optional developer memory cache.\"",
+        "changed": true,
         "safe": true,
         "leaky": false,
         "usable": true,
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0004b466d863",
-        "raw": "+layout.svelte packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: .svelte-error-fixes-backup/sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte. Derived LangExtract labels: +layout.svelte, summary backlog packet.",
-        "summary": "+layout.svelte packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: .svelte-error-fixes-backup/sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte. Derived LangExtract labels: +layout.svelte, summary backlog packet.",
-        "changed": false,
+        "packet_key": "packet:3f83579bfc52",
+        "raw": "source_ref: 6_27_26_todo_pt2.txt | feature_id: 6_27_26_todo_pt2 | tags:  | imports:  | exports:  | route_handlers:  | snippet: we need to move scripts atlas that work in packages/atlas? then review using supersede checks? use the parent-atlas / packages/atlas-core adapters for shared infrastructure, but do not force the SvelteKit app to stop using Drizzle.\r Use this split:\r sveltekit-frontend/src/lib/server/db/schema-postgres.ts\r = app-local typed Drizzle schema for SvelteKit routes/actions",
+        "summary": "source_ref: 6_27_26_todo_pt2.txt | feature_id: 6_27_26_todo_pt2 | tags: | imports: | exports: | route_handlers: | snippet: then review using supersede checks? use the parent-atlas / packages/atlas-core adapters for shared infrastructure, but do not force the SvelteKit app to stop using Drizzle. Use this split: sveltekit-frontend/src/lib/server/db/schema-postgres.ts = app-local typed Drizzle schema for SvelteKit routes/actions",
+        "changed": true,
+        "safe": true,
+        "leaky": true,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:4db0031b7a9b",
+        "raw": "source_ref: 61026__.txt | feature_id: 61026__ | tags:  | imports:  | exports:  | route_handlers:  | snippet: run a pass again reviewing supeseded older files into next_steps compltely for temporal kanban task completion under parent atlas codebase indexing moving to seaweedfs for coldstorage once indexed embedded summarized qdrant tags multi vector search gds neighbouring for 4d manifold dense search using nes chrom packet engram \r use rg search git ignored for atlas nes chro97 directories not files we need directory mapping from path mapping sourceref feature_id to feature_labeling from functions in the repo tied to node modules files our hypergraphrag dense seach multi vector search qdrant tags gemma4 sumamrized and move extracted files to cold storage seaweedfs with summaries with path mapping sourceref file path summaries postgresql 18 pgvector mirrored qdrant collections redis centroids for json packets after we finish lanes yes continue the review the .md update to do list use ru",
+        "summary": "source_ref: 61026__.txt | feature_id: 61026__ | tags: | imports: | exports: | route_handlers: | snippet: run a pass again reviewing supeseded older files into next_steps compltely for temporal kanban task completion under parent atlas codebase indexing moving to seaweedfs for coldstorage once indexed embedded summarized qdrant tags multi vector search gds neighbouring for 4d manifold dense search using nes chrom packet engram use rg search git ignored for atlas nes chro97 directories not files we need directory mapping from path mapping sourceref feature_id to feature_labeling from functions in the repo tied to node modules files our hypergraphrag dense seach multi vector search qdrant tags gemma4 sumamrized and move extracted files to cold storage seaweedfs with summaries with path mapping sourceref file path summaries postgresql 18 pgvector mirrored qdrant collections redis centroids for json packets after we finish lanes yes continue the review the .md update to do list use ru",
+        "changed": true,
         "safe": true,
         "leaky": false,
         "usable": true,
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0004f849be72",
-        "raw": "sprint5-6-monitoring.spec.ts packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts. Derived LangExtract labels: sprint5 6 monitoring.spec.ts, summary backlog packet.",
-        "summary": "sprint5-6-monitoring.spec.ts packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts. Derived LangExtract labels: sprint5 6 monitoring.spec.ts, summary backlog packet.",
-        "changed": false,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:0006ca4a45e3",
-        "raw": "launch-2026-06-25T22-12-53-881Z.out packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out. Derived LangExtract labels: launch 2026 06 25T22 12, summary backlog packet.",
-        "summary": "launch-2026-06-25T22-12-53-881Z.out packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out. Derived LangExtract labels: launch 2026 06 25T22 12, summary backlog packet.",
-        "changed": false,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:0008d535a1f6",
-        "raw": "completion.cpp packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: llama-cpp-turboquant-gemma4/tools/completion/completion.cpp. Derived LangExtract labels: completion.cpp, summary backlog packet.",
-        "summary": "completion.cpp packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: llama-cpp-turboquant-gemma4/tools/completion/completion.cpp. Derived LangExtract labels: completion.cpp, summary backlog packet.",
-        "changed": false,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:0009951ee430",
-        "raw": "0056213574662f41.json packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: .tmp/parent_atlas_packets/0056213574662f41.json. Derived LangExtract labels: 0056213574662f41.json, summary backlog packet.",
-        "summary": "0056213574662f41.json packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: .tmp/parent_atlas_packets/0056213574662f41.json. Derived LangExtract labels: 0056213574662f41.json, summary backlog packet.",
-        "changed": false,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:0009a56456fc",
-        "raw": "terminal_theme.py packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py. Derived LangExtract labels: summary backlog packet, terminal theme.py.",
-        "summary": "terminal_theme.py packets are grouped for bounded synthesis. The lane covers 1 addressable packets across 1 source anchors. Primary evidence anchors: sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py. Derived LangExtract labels: summary backlog packet, terminal theme.py.",
-        "changed": false,
+        "packet_key": "packet:4ee7308faeac",
+        "raw": "source_ref: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt | feature_id: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard | tags:  | imports:  | exports:  | route_handlers:  | snippet: review this file  carrying load typescript utilities web workers, go routines? typescript global utility types service_workers loops rabbitmq, exporting json loops, registry gate checks, que deque loops? search our cannonical sources client vs server cpu vs gpu http http/2 http3 faster if we can organize the udp packets back into our pipeline how? langextract is python? we need something more primitive? msgpack ? go-routine how do we packet assembler? materializer? packer validator(need to make) tied to our registry? eval times? packages/parent-atlas telemetry library. tree_node star, pentagram. \r Every packet should be the central entity\r One canonical atlas_packet_registry that every se",
+        "summary": "source_ref: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt | feature_id: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard | tags: | imports: | exports: | route_handlers: | snippet: review this file carrying load typescript utilities web workers, go routines? typescript global utility types service_workers loops rabbitmq, exporting json loops, registry gate checks, que deque loops? search our cannonical sources client vs server cpu vs gpu http http/2 http3 faster if we can organize the udp packets back into our pipeline how? langextract is python? we need something more primitive? msgpack ? go-routine how do we packet assembler? materializer? packer validator(need to make) tied to our registry? eval times? packages/parent-atlas telemetry library. tree_node star, pentagram. Every packet should be the central entity One canonical atlas_packet_registry that every se",
+        "changed": true,
         "safe": true,
         "leaky": false,
         "usable": true,

@@ -31,6 +31,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { loadConfig, resolveRepoPath, readJson, writeJson, writeMarkdown, REPO_ROOT } from './_atlas-utils.mjs';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir  = path.dirname(fileURLToPath(import.meta.url));
 const argv   = process.argv.slice(2);
@@ -45,41 +46,15 @@ const FEATURE   = FEATURE_I >= 0 ? argv[FEATURE_I + 1] : null;
 const config = loadConfig();
 
 // ── LLM config ────────────────────────────────────────────────────────────────
-const TURBO_BASE  = process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090';
-const OLLAMA_BASE = process.env.OLLAMA_BASE_URL     ?? 'http://127.0.0.1:11434';
-// Resolved at runtime via /v1/models — falls back to the first listed model
-const TURBO_MODEL  = process.env.TURBO_MODEL  ?? 'gemma4-legal.gguf';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
-const TIMEOUT_MS  = 45_000;
+const TIMEOUT_MS = 45_000;
 
 async function callGemma4(prompt) {
-  const endpoints = [
-    {
-      url:  `${TURBO_BASE}/v1/chat/completions`,
-      body: { model: TURBO_MODEL, messages: [{ role: 'user', content: prompt }], stream: false, max_tokens: 512 },
-      extract: (d) => d.choices?.[0]?.message?.content ?? '',
-    },
-    {
-      url:  `${OLLAMA_BASE}/api/generate`,
-      body: { model: OLLAMA_MODEL, prompt, stream: false, options: { temperature: 0.2, num_predict: 512 } },
-      extract: (d) => d.response ?? '',
-    },
-  ];
-  for (const { url, body, extract } of endpoints) {
-    try {
-      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(TIMEOUT_MS) });
-      if (!res.ok) {
-        if (VERBOSE) console.warn(`  [llm] ${url} → HTTP ${res.status}`);
-        continue;
-      }
-      const data = await res.json();
-      // Guard: server may return {error:...} with HTTP 200
-      if (data.error) { if (VERBOSE) console.warn(`  [llm] ${url} error:`, data.error); continue; }
-      const text = extract(data);
-      if (text.trim()) return text.trim();
-    } catch (e) { if (VERBOSE) console.warn(`  [llm] ${url} threw:`, e.message); }
+  try {
+    return await llamaChat(prompt, { maxTokens: 512, temperature: 0.2, timeoutMs: TIMEOUT_MS });
+  } catch (e) {
+    if (VERBOSE) console.warn(`  [llm] llamaChat threw:`, e.message);
+    return null;
   }
-  return null;
 }
 
 // ── Kanban status mapping ──────────────────────────────────────────────────────

@@ -7,7 +7,7 @@
  * to produce the derived feature surface for clustering input.
  *
  * Input fields (from summary + packets):
- * - packet_key, source_ref, source_ref_key
+ * - packet_key, source_ref, file_path, source_ref_key
  * - feature_id, feature_label, domain_class
  * - ontology_label, topology_label, community_id, cluster_key
  * - som_cluster, pagerank, keywords, entities, tree_node_id
@@ -20,6 +20,7 @@
 import { Pool } from 'pg';
 import process from 'process';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { buildTopologyEnvelope, deriveCentroidKeys, deriveDomainClass } from '../../../scripts/atlas/lib/topology-ontology.mjs';
 
 const ENV = loadRepoEnv(process.env);
 
@@ -207,6 +208,7 @@ async function main() {
         CREATE TABLE IF NOT EXISTS atlas_feature_envelopes (
           packet_key TEXT PRIMARY KEY REFERENCES atlas_packets(packet_key),
           source_ref TEXT NOT NULL,
+          file_path TEXT,
           source_ref_key TEXT,
           feature_id TEXT NOT NULL,
           feature_label TEXT NOT NULL,
@@ -217,6 +219,14 @@ async function main() {
           cluster_key TEXT,
           som_cluster INTEGER,
           pagerank REAL,
+          topology JSONB DEFAULT '{}'::jsonb,
+          domain_centroid_key TEXT,
+          feature_centroid_key TEXT,
+          kmeans_centroid_key TEXT,
+          som_centroid_key TEXT,
+          community_centroid_key TEXT,
+          redis_centroid_key TEXT,
+          som_cell TEXT,
           keywords TEXT[] DEFAULT '{}',
           entities TEXT[] DEFAULT '{}',
           summary_text TEXT,
@@ -237,6 +247,7 @@ async function main() {
 
         ALTER TABLE atlas_feature_envelopes
           ADD COLUMN IF NOT EXISTS summary_text TEXT,
+          ADD COLUMN IF NOT EXISTS file_path TEXT,
           ADD COLUMN IF NOT EXISTS title_id TEXT,
           ADD COLUMN IF NOT EXISTS tree_node_id TEXT,
           ADD COLUMN IF NOT EXISTS lexical_nouns JSONB DEFAULT '[]'::jsonb,
@@ -245,7 +256,15 @@ async function main() {
           ADD COLUMN IF NOT EXISTS used_concepts JSONB DEFAULT '[]'::jsonb,
           ADD COLUMN IF NOT EXISTS lexical_terms JSONB DEFAULT '{}'::jsonb,
           ADD COLUMN IF NOT EXISTS summary_rank_score REAL,
-          ADD COLUMN IF NOT EXISTS summary_rank_status TEXT;
+          ADD COLUMN IF NOT EXISTS summary_rank_status TEXT,
+          ADD COLUMN IF NOT EXISTS topology JSONB DEFAULT '{}'::jsonb,
+          ADD COLUMN IF NOT EXISTS domain_centroid_key TEXT,
+          ADD COLUMN IF NOT EXISTS feature_centroid_key TEXT,
+          ADD COLUMN IF NOT EXISTS kmeans_centroid_key TEXT,
+          ADD COLUMN IF NOT EXISTS som_centroid_key TEXT,
+          ADD COLUMN IF NOT EXISTS community_centroid_key TEXT,
+          ADD COLUMN IF NOT EXISTS redis_centroid_key TEXT,
+          ADD COLUMN IF NOT EXISTS som_cell TEXT;
 
         CREATE INDEX IF NOT EXISTS idx_feature_envelopes_source_ref ON atlas_feature_envelopes(source_ref);
         CREATE INDEX IF NOT EXISTS idx_feature_envelopes_feature_id ON atlas_feature_envelopes(feature_id);
@@ -262,10 +281,12 @@ async function main() {
 
     const materializeQuery = `
       INSERT INTO atlas_feature_envelopes (
-        packet_key, source_ref, source_ref_key,
+        packet_key, source_ref, file_path, source_ref_key,
         feature_id, feature_label, domain_class,
         ontology_label, topology_label,
-        community_id, cluster_key, som_cluster, pagerank,
+        community_id, cluster_key, som_cluster, pagerank, topology,
+        domain_centroid_key, feature_centroid_key, kmeans_centroid_key,
+        som_centroid_key, community_centroid_key, redis_centroid_key, som_cell,
         keywords, entities,
         summary_text, title_id, tree_node_id,
         summary_packet_key, provenance
@@ -273,6 +294,7 @@ async function main() {
       SELECT
         ap.packet_key,
         ap.source_ref,
+        ap.file_path,
         ap.source_ref || ':' || ap.packet_key as source_ref_key,
         ap.feature_id,
         ap.feature_label,
@@ -286,6 +308,40 @@ async function main() {
           ELSE NULL
         END as som_cluster,
         COALESCE(ap.pagerank, cf_authority.pagerank) as pagerank,
+        JSONB_BUILD_OBJECT(
+          'domain_class', COALESCE(ap.domain_class, 'infrastructure'),
+          'centroid_keys', JSONB_BUILD_OBJECT(
+            'domain', 'atlas:centroid:domain:' || COALESCE(ap.domain_class, 'infrastructure'),
+            'feature', 'atlas:centroid:feature:' || COALESCE(ap.feature_id, ap.title_id, ap.feature_label),
+            'kmeans', CASE
+              WHEN ap.kmeans_cluster IS NOT NULL THEN 'atlas:centroid:kmeans:' || ap.kmeans_cluster::text
+              WHEN ap.kmeans_cluster_id IS NOT NULL THEN 'atlas:centroid:kmeans:' || ap.kmeans_cluster_id::text
+              ELSE NULL
+            END,
+            'som', CASE WHEN ap.som_cluster IS NOT NULL THEN 'atlas:centroid:som:' || ap.som_cluster::text ELSE NULL END,
+            'community', CASE WHEN ap.community_id IS NOT NULL THEN 'atlas:centroid:community:' || ap.community_id::text ELSE NULL END
+          ),
+          'som_cell', CASE WHEN ap.som_cluster IS NOT NULL THEN ap.som_cluster::text ELSE NULL END
+        ) as topology,
+        'atlas:centroid:domain:' || COALESCE(ap.domain_class, 'infrastructure') as domain_centroid_key,
+        'atlas:centroid:feature:' || COALESCE(ap.feature_id, ap.title_id, ap.feature_label) as feature_centroid_key,
+        CASE
+          WHEN ap.kmeans_cluster IS NOT NULL THEN 'atlas:centroid:kmeans:' || ap.kmeans_cluster::text
+          WHEN ap.kmeans_cluster_id IS NOT NULL THEN 'atlas:centroid:kmeans:' || ap.kmeans_cluster_id::text
+          ELSE NULL
+        END as kmeans_centroid_key,
+        CASE
+          WHEN ap.som_row IS NOT NULL AND ap.som_col IS NOT NULL THEN 'atlas:centroid:som:' || ap.som_row::text || ':' || ap.som_col::text
+          WHEN ap.som_cluster IS NOT NULL THEN 'atlas:centroid:som:' || ap.som_cluster::text
+          ELSE NULL
+        END as som_centroid_key,
+        CASE WHEN ap.community_id IS NOT NULL THEN 'atlas:centroid:community:' || ap.community_id::text ELSE NULL END as community_centroid_key,
+        'atlas:centroid:domain:' || COALESCE(ap.domain_class, 'infrastructure') as redis_centroid_key,
+        CASE
+          WHEN ap.som_row IS NOT NULL AND ap.som_col IS NOT NULL THEN ap.som_row::text || ':' || ap.som_col::text
+          WHEN ap.som_cluster IS NOT NULL THEN ap.som_cluster::text
+          ELSE NULL
+        END as som_cell,
         COALESCE(ap.keywords, ARRAY[]::text[]) as keywords,
         COALESCE(asl.entities, ARRAY[]::text[]) as entities,
         COALESCE(NULLIF(asl.summary_text, ''), NULLIF(asl.summary, ''), ap.summary) as summary_text,
@@ -324,8 +380,17 @@ async function main() {
       ${LIMIT ? `LIMIT ${LIMIT}` : ''}
       ON CONFLICT (packet_key) DO UPDATE SET
         updated_at = NOW(),
+        file_path = EXCLUDED.file_path,
         ontology_label = EXCLUDED.ontology_label,
         topology_label = EXCLUDED.topology_label,
+        topology = EXCLUDED.topology,
+        domain_centroid_key = EXCLUDED.domain_centroid_key,
+        feature_centroid_key = EXCLUDED.feature_centroid_key,
+        kmeans_centroid_key = EXCLUDED.kmeans_centroid_key,
+        som_centroid_key = EXCLUDED.som_centroid_key,
+        community_centroid_key = EXCLUDED.community_centroid_key,
+        redis_centroid_key = EXCLUDED.redis_centroid_key,
+        som_cell = EXCLUDED.som_cell,
         keywords = EXCLUDED.keywords,
         entities = EXCLUDED.entities,
         pagerank = EXCLUDED.pagerank,
@@ -343,6 +408,7 @@ async function main() {
         SELECT
           ap.packet_key,
           ap.source_ref,
+          ap.file_path,
           ap.feature_id,
           ap.feature_label,
           ap.pagerank,
@@ -370,22 +436,29 @@ async function main() {
 
     const lexicalInput = await pool.query(`
       SELECT
-        packet_key,
-        source_ref,
-        feature_id,
-        feature_label,
-        title_id,
-        tree_node_id,
-        domain_class,
-        summary_text,
-        keywords,
-        entities,
-        ast_symbols,
-        ast_kinds,
-        ast_tags,
-        pagerank,
-        som_cluster
-      FROM atlas_feature_envelopes
+        afe.packet_key,
+        afe.source_ref,
+        afe.file_path,
+        afe.feature_id,
+        afe.feature_label,
+        afe.title_id,
+        afe.tree_node_id,
+        afe.domain_class,
+        afe.summary_text,
+        afe.keywords,
+        afe.entities,
+        ast.ast_symbols,
+        ast.ast_kinds,
+        ast.ast_tags,
+        afe.pagerank,
+        ap.som_cluster,
+        ap.community_id,
+        ap.som_row,
+        ap.som_col,
+        ap.kmeans_cluster,
+        ap.kmeans_cluster_id
+      FROM atlas_feature_envelopes afe
+      JOIN atlas_packets ap ON ap.packet_key = afe.packet_key
       LEFT JOIN LATERAL (
         SELECT
           array_agg(DISTINCT cf.symbol) FILTER (WHERE cf.symbol IS NOT NULL AND cf.symbol <> '') as ast_symbols,
@@ -394,12 +467,12 @@ async function main() {
         FROM code_features cf
         LEFT JOIN LATERAL unnest(COALESCE(cf.static_tags, ARRAY[]::text[])) tag ON TRUE
         WHERE cf.source_ref IN (
-             atlas_feature_envelopes.source_ref,
-             regexp_replace(atlas_feature_envelopes.source_ref, '^sveltekit-frontend/', '')
+             afe.source_ref,
+             regexp_replace(afe.source_ref, '^sveltekit-frontend/', '')
            )
-           OR cf.feature_id = atlas_feature_envelopes.feature_id
+           OR cf.feature_id = afe.feature_id
       ) ast ON TRUE
-      WHERE packet_key IS NOT NULL
+      WHERE afe.packet_key IS NOT NULL
       ${LIMIT ? `LIMIT ${LIMIT}` : ''}
     `);
 
@@ -411,6 +484,7 @@ async function main() {
         row.feature_label,
         row.domain_class,
         row.source_ref,
+        row.file_path,
         row.summary_text,
         ...(Array.isArray(row.keywords) ? row.keywords : []),
         ...(Array.isArray(row.entities) ? row.entities : []),
@@ -423,28 +497,61 @@ async function main() {
       const usedConcepts = deriveUsedConcepts(row, lexical);
       const score = scoreEnvelope(row, lexical);
       const status = score >= 80 ? 'READY' : score >= 60 ? 'NEAR_READY' : score >= 35 ? 'PARTIAL' : 'BLOCKED';
+      const domainClass = deriveDomainClass(row);
+      const centroidKeys = deriveCentroidKeys({
+        ...row,
+        domain_class: domainClass,
+        som_row: row.som_row,
+        som_col: row.som_col,
+        som_cell: row.som_cluster,
+      });
+      const topology = buildTopologyEnvelope({
+        ...row,
+        domain_class: domainClass,
+        som_row: row.som_row,
+        som_col: row.som_col,
+        som_cell: row.som_cluster,
+      });
 
       await pool.query(
         `UPDATE atlas_feature_envelopes
          SET
            title_id = $2,
-           lexical_nouns = $3::jsonb,
-           lexical_verbs = $4::jsonb,
-           lexical_adverbs_ly = $5::jsonb,
-           used_concepts = $6::jsonb,
-           lexical_terms = $7::jsonb,
-           summary_rank_score = $8,
-           summary_rank_status = $9,
+           domain_class = $3,
+           topology = $4::jsonb,
+           domain_centroid_key = $5,
+           feature_centroid_key = $6,
+           kmeans_centroid_key = $7,
+           som_centroid_key = $8,
+           community_centroid_key = $9,
+           redis_centroid_key = $10,
+           som_cell = $11,
+           lexical_nouns = $12::jsonb,
+           lexical_verbs = $13::jsonb,
+           lexical_adverbs_ly = $14::jsonb,
+           used_concepts = $15::jsonb,
+           lexical_terms = $16::jsonb,
+           summary_rank_score = $17,
+           summary_rank_status = $18,
            updated_at = NOW()
          WHERE packet_key = $1`,
         [
           row.packet_key,
           titleId,
+          domainClass,
+          JSON.stringify(topology),
+          centroidKeys.domain_centroid_key,
+          centroidKeys.feature_centroid_key,
+          centroidKeys.kmeans_centroid_key,
+          centroidKeys.som_centroid_key,
+          centroidKeys.community_centroid_key,
+          centroidKeys.domain_centroid_key,
+          centroidKeys.som_cell,
           JSON.stringify(lexical.nouns),
           JSON.stringify(lexical.verbs),
           JSON.stringify(lexical.adverbs_ly),
           JSON.stringify(usedConcepts),
-          JSON.stringify(lexical),
+          JSON.stringify({ ...lexical, used_concepts: usedConcepts }),
           score,
           status,
         ],
@@ -463,6 +570,11 @@ async function main() {
         COUNT(CASE WHEN pagerank IS NOT NULL THEN 1 END) as with_pagerank,
         COUNT(CASE WHEN title_id IS NOT NULL AND title_id <> '' THEN 1 END) as with_title_id,
         COUNT(CASE WHEN tree_node_id IS NOT NULL AND tree_node_id <> '' THEN 1 END) as with_tree_node_id,
+        COUNT(CASE WHEN domain_class IS NOT NULL AND domain_class <> '' THEN 1 END) as with_domain_class,
+        COUNT(CASE WHEN topology IS NOT NULL AND topology <> '{}'::jsonb THEN 1 END) as with_topology,
+        COUNT(CASE WHEN domain_centroid_key IS NOT NULL AND domain_centroid_key <> '' THEN 1 END) as with_domain_centroid_key,
+        COUNT(CASE WHEN feature_centroid_key IS NOT NULL AND feature_centroid_key <> '' THEN 1 END) as with_feature_centroid_key,
+        COUNT(CASE WHEN som_centroid_key IS NOT NULL AND som_centroid_key <> '' THEN 1 END) as with_som_centroid_key,
         COUNT(CASE WHEN jsonb_array_length(lexical_nouns) > 0 THEN 1 END) as with_lexical_nouns,
         COUNT(CASE WHEN jsonb_array_length(lexical_verbs) > 0 THEN 1 END) as with_lexical_verbs,
         COUNT(CASE WHEN jsonb_array_length(lexical_adverbs_ly) > 0 THEN 1 END) as with_lexical_adverbs,
@@ -479,6 +591,11 @@ async function main() {
     console.log(`  With pagerank: ${stats.with_pagerank}`);
     console.log(`  With title_id: ${stats.with_title_id}`);
     console.log(`  With tree_node_id: ${stats.with_tree_node_id}`);
+    console.log(`  With domain_class: ${stats.with_domain_class}`);
+    console.log(`  With topology: ${stats.with_topology}`);
+    console.log(`  With domain centroid key: ${stats.with_domain_centroid_key}`);
+    console.log(`  With feature centroid key: ${stats.with_feature_centroid_key}`);
+    console.log(`  With SOM centroid key: ${stats.with_som_centroid_key}`);
     console.log(`  With lexical nouns: ${stats.with_lexical_nouns}`);
     console.log(`  With lexical verbs: ${stats.with_lexical_verbs}`);
     console.log(`  With -ly adverbs: ${stats.with_lexical_adverbs}`);

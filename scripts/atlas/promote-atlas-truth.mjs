@@ -34,11 +34,12 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import pkg from 'pg';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 const { Pool } = pkg;
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
 
@@ -48,7 +49,7 @@ const NEO4J_URL = process.env.NEO4J_URI ?? process.env.NEO4J_URL ?? 'bolt://loca
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? 'neo4j123';
 
-const REPORT_DIR = resolve(__dirname, '../../sveltekit-frontend/docs/reports');
+const REPORT_DIR = resolve(FRONTEND_ROOT, 'docs/reports');
 const REPORT_FILE = resolve(REPORT_DIR, 'graph-refresh.json');
 const REFRESH_MANIFEST_SCRIPT = resolve(__dirname, 'write-graph-refresh-manifest.mjs');
 const CACHE_EPOCH_SCRIPT = resolve(__dirname, 'invalidate-atlas-cache-epoch.mjs');

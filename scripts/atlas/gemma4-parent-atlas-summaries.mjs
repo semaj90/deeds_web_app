@@ -34,6 +34,7 @@ import {
   resolveRedisConfig as resolveSharedRedisConfig,
 } from './connection-config.mjs';
 import { buildSummaryContext, formatSummaryContext } from './lib/summary-context-map.mjs';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -850,27 +851,7 @@ async function detectLLM() {
 }
 
 async function callLLM(prompt) {
-  if (llmMode === 'turboquant') {
-    const r = await fetch(TURBO_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: process.env.LOCAL_GEMMA_MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 150,
-        temperature: 0.1,
-        stream: false,
-        stop: ['<|channel>thought', '<think>', '</think>', 'Thinking:', 'Self-Correction'],
-        chat_template_kwargs: { enable_thinking: false },
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-    if (!r.ok) throw new Error(`TurboQuant HTTP ${r.status}`);
-    const data = await r.json();
-    return cleanModelText(data.choices?.[0]?.message?.content);
-  }
-
-  throw new Error('No llama-server chat backend available on port 8090');
+  return cleanModelText(await llamaChat(prompt, { maxTokens: 150, temperature: 0.1, timeoutMs: 30000 }));
 }
 
 // ── Read a bounded whole-file source body for tuple extraction ───────────────

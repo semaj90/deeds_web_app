@@ -30,15 +30,17 @@
 
 import { createRequire } from 'module'
 import path from 'path'
+import { fileURLToPath } from 'url'
+import { readFileSync } from 'fs'
 
 // ── N-API binding (lazy, graceful fallback) ────────────────────────────────
 
 type NativeBinding = {
-  hashSourceRefs(refs: string[]): Buffer
+  hashSourceRefs(refs: string[]): BigUint64Array
   dedupeEdgesJson(edgesJson: string): string
   scoreSom20X20(queryCell: number, candidateCells: number[]): Float32Array
   loadJsonlPackets(path: string): string
-  packQdrantPayloads(payloadsJson: string): Buffer
+  packQdrantPayloads(nodesPath: string, edgesPath: string): Buffer
   turbovecSmoke(dim: number, bits: number): string
 }
 
@@ -50,10 +52,12 @@ function getNative(): NativeBinding | null {
   _loadAttempted = true
   try {
     const require = createRequire(import.meta.url)
-    // wrapper.js is the stable public entry that survives napi-rs index.js regeneration
+    // wrapper.js is the stable public entry that survives napi-rs index.js regeneration.
+    // Resolve from this file rather than process.cwd() so the bridge works from both
+    // the repo root and the sveltekit-frontend package root.
     const wrapperPath = path.resolve(
-      process.cwd(),
-      '../crates/turbovec-napi/wrapper.js'
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../../../../crates/turbovec-napi/wrapper.js'
     )
     _native = require(wrapperPath) as NativeBinding
   } catch {
@@ -73,8 +77,7 @@ function getNative(): NativeBinding | null {
 export function hashSourceRefs(refs: string[]): BigUint64Array {
   const native = getNative()
   if (native) {
-    const buf = native.hashSourceRefs(refs)
-    return new BigUint64Array(buf.buffer, buf.byteOffset, buf.length / 8)
+    return native.hashSourceRefs(refs)
   }
   // JS fallback: FNV-1a 64-bit (two 32-bit halves)
   const out = new BigUint64Array(refs.length)
@@ -156,7 +159,6 @@ export async function loadJsonlPackets(filePath: string): Promise<unknown[]> {
   if (native) {
     return JSON.parse(native.loadJsonlPackets(filePath)) as unknown[]
   }
-  const { readFileSync } = await import('fs')
   return readFileSync(filePath, 'utf8')
     .split('\n')
     .filter((l) => l.trim())
@@ -169,12 +171,87 @@ export async function loadJsonlPackets(filePath: string): Promise<unknown[]> {
  * Serialize an array of Qdrant payload objects to MessagePack (Buffer).
  * Falls back to JSON encoding if N-API unavailable (Qdrant HTTP API accepts both).
  */
-export function packQdrantPayloads(payloads: unknown[]): Buffer {
+function parseJsonlFile(filePath: string): unknown[] {
+  return readFileSync(filePath, 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      try {
+        return JSON.parse(line)
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to parse JSONL line ${index + 1} in ${filePath}: ${message}`)
+      }
+    })
+}
+
+function packQdrantPayloadsFallback(nodesPath: string, edgesPath: string): Buffer {
+  const nodes = parseJsonlFile(nodesPath) as Array<Record<string, unknown>>
+  const edges = parseJsonlFile(edgesPath) as Array<Record<string, unknown>>
+
+  const laneMap = new Map<string, string[]>()
+  for (const edge of edges) {
+    const src = String(edge.src ?? '')
+    const dst = String(edge.dst ?? '')
+    const lanes = Array.isArray(edge.lane_ids) ? edge.lane_ids.map(String) : []
+    if (!src || lanes.length === 0) continue
+    const srcList = laneMap.get(src) ?? []
+    srcList.push(...lanes)
+    laneMap.set(src, srcList)
+    if (dst) {
+      const dstList = laneMap.get(dst) ?? []
+      dstList.push(...lanes)
+      laneMap.set(dst, dstList)
+    }
+  }
+
+  const seen = new Set<string>()
+  const payloads = nodes.map((node) => {
+    const sourceRef = String(node.source_ref ?? node.card_id ?? '').replace(/^file:/, '')
+    const somRow = node.som_row === undefined || node.som_row === null ? null : Number(node.som_row)
+    const somCol = node.som_col === undefined || node.som_col === null ? null : Number(node.som_col)
+    const featureIds = Array.isArray(node.feature_ids) ? node.feature_ids.map(String) : []
+    const laneIds = [
+      ...(laneMap.get(sourceRef) ?? []),
+      ...(Array.isArray(node.lane_ids) ? node.lane_ids.map(String) : []),
+    ].filter((lane) => {
+      if (seen.has(`${sourceRef}|${lane}`)) return false
+      seen.add(`${sourceRef}|${lane}`)
+      return true
+    })
+
+    return {
+      source_ref: sourceRef,
+      som_cell: somRow !== null && somCol !== null ? `${somRow}:${somCol}` : null,
+      som_row: somRow,
+      som_col: somCol,
+      feature_id: typeof node.feature_id === 'string' ? node.feature_id : featureIds[0] ?? null,
+      feature_ids: featureIds,
+      lane_ids: laneIds,
+      tags: Array.isArray(node.tags) ? node.tags.map(String) : [],
+      keywords: Array.isArray(node.keywords) ? node.keywords.map(String) : [],
+      kind: typeof node.kind === 'string' ? node.kind : null,
+      area: typeof node.area === 'string' ? node.area : null,
+      summary: typeof node.summary === 'string' ? node.summary : null,
+    }
+  })
+
+  return Buffer.from(JSON.stringify(payloads), 'utf8')
+}
+
+export function packQdrantPayloads(payloadsOrNodesPath: unknown, edgesPath?: string): Buffer {
   const native = getNative()
   if (native) {
-    return native.packQdrantPayloads(JSON.stringify(payloads))
+    if (typeof payloadsOrNodesPath === 'string' && typeof edgesPath === 'string') {
+      return native.packQdrantPayloads(payloadsOrNodesPath, edgesPath)
+    }
+    return Buffer.from(JSON.stringify(payloadsOrNodesPath), 'utf8')
   }
-  return Buffer.from(JSON.stringify(payloads), 'utf8')
+  if (typeof payloadsOrNodesPath === 'string' && typeof edgesPath === 'string') {
+    return packQdrantPayloadsFallback(payloadsOrNodesPath, edgesPath)
+  }
+  return Buffer.from(JSON.stringify(payloadsOrNodesPath), 'utf8')
 }
 
 // ── Diagnostic ────────────────────────────────────────────────────────────

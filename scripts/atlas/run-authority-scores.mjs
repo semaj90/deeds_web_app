@@ -23,8 +23,9 @@
 import { resolve, dirname, join } from 'node:path';
 import { mkdirSync, writeFileSync, readdirSync, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 
 const args = process.argv.slice(2);
 const dryRun  = args.includes('--dry-run');
@@ -34,7 +35,8 @@ const limit    = limitArg ? parseInt(limitArg.slice(8), 10) : 5000;
 // Load .env for credentials
 try {
   const { config } = await import('dotenv');
-  config({ path: resolve(__dirname, '../../.env') });
+  config({ path: resolve(FRONTEND_ROOT, '.env') });
+  config({ path: resolve(FRONTEND_ROOT, '.env.local'), override: true });
 } catch { /* dotenv optional */ }
 
 const QDRANT_URL    = process.env.QDRANT_URL       ?? 'http://127.0.0.1:6333';

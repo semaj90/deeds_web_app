@@ -35,17 +35,18 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import pkg from 'pg';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 const { Pool } = pkg;
 
 dotenv.config();
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const { __dirname, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
 const VERBOSE = process.argv.includes('--verbose');
 const SAMPLE_QUERIES = process.argv.includes('--sample') ? 5 : 1;
 
 const DB_URL = process.env.DATABASE_URL ?? 'postgres://legal_admin:legal_admin@127.0.0.1:5434/legal_ai_db';
 
-const REPORT_DIR = resolve(__dirname, '../../sveltekit-frontend/docs/reports');
+const REPORT_DIR = resolve(FRONTEND_ROOT, 'docs/reports');
 const REPORT_JSON = resolve(REPORT_DIR, 'recommendation-collapse.json');
 const REPORT_MD = resolve(REPORT_DIR, 'recommendation-collapse.md');
 

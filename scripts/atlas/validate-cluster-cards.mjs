@@ -10,11 +10,11 @@
 import fs from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveAtlasPaths } from './lib/repo-paths.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = resolve(__dirname, '../..');
-const SCHEMA_PATH = resolve(ROOT, 'sveltekit-frontend/docs/cluster-cards.schema.json');
-const DATA_PATH = resolve(ROOT, 'sveltekit-frontend/memory/cluster-cards/cluster-cards.jsonl');
+const { repoRoot: ROOT, frontendRoot: FRONTEND_ROOT } = resolveAtlasPaths(import.meta.url);
+const SCHEMA_PATH = resolve(FRONTEND_ROOT, 'docs/cluster-cards.schema.json');
+const DATA_PATH = resolve(FRONTEND_ROOT, 'memory/cluster-cards/cluster-cards.jsonl');
 
 const log = (...a) => console.log(...a);
 const warn = (...a) => console.warn(...a);

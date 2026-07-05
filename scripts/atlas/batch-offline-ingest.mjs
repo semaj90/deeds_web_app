@@ -33,6 +33,7 @@ import {
   extractImportsFromText,
   createProgressLogger
 } from './_atlas-utils.mjs';
+import { llamaChat } from './lib/llama-inference.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const LIMIT_ARG_INDEX = process.argv.indexOf('--limit');
@@ -287,10 +288,9 @@ function scanASTCode(file) {
   };
 }
 
-// 5. Ollama generator for summaries (fail-safe)
+// 5. Generator for summaries via llama-server :8090 (fail-safe)
 async function getGemmaSummary(sourceRef, features, structure) {
-  return new Promise((resolve) => {
-    const prompt = `Perform a concise structural metadata analysis for a codebase entity.
+  const prompt = `Perform a concise structural metadata analysis for a codebase entity.
 Entity File Path: ${sourceRef}
 Identified Features: ${features.join(', ')}
 Entity Structure: ${JSON.stringify(structure)}
@@ -303,53 +303,12 @@ Return JSON object containing:
 
 JSON Response:`;
 
-    const payload = JSON.stringify({
-      model: 'gemma4:latest',
-      prompt,
-      stream: false,
-      format: 'json',
-      options: { temperature: 0.1 },
-    });
-
-    const url = new URL(OLLAMA_BASE_URL + '/api/generate');
-    const req = http.request(
-      {
-        hostname: url.hostname,
-        port: url.port || 80,
-        path: url.pathname + url.search,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(payload),
-        },
-        timeout: 5000,
-      },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => (data += chunk));
-        res.on('end', () => {
-          try {
-            if (res.statusCode === 200) {
-              const result = JSON.parse(data);
-              resolve(JSON.parse(result.response));
-            } else {
-              resolve(null);
-            }
-          } catch {
-            resolve(null);
-          }
-        });
-      }
-    );
-
-    req.on('error', () => resolve(null));
-    req.on('timeout', () => {
-      req.destroy();
-      resolve(null);
-    });
-    req.write(payload);
-    req.end();
-  });
+  try {
+    const text = await llamaChat(prompt, { maxTokens: 300, temperature: 0.1, timeoutMs: 15_000 });
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
 
 // 6. Generate embedding via Ollama (with mock fallback)
