@@ -131,21 +131,34 @@ async function backfillIDHierarchy() {
       console.log(`[DRY-RUN] Would update ${hierarchyData.length} rows in atlas_packets`);
       console.log(`✅ Dry-run complete. Run with --apply to backfill.\n`);
     } else {
-      // Batch insert into metadata
+      // Batch insert into metadata using parameterized queries
       for (let i = 0; i < hierarchyData.length; i += BATCH_SIZE) {
         const batch = hierarchyData.slice(i, i + BATCH_SIZE);
 
-        const values = batch
-          .map(
-            (row, idx) =>
-              `('${row.packet_key}', '${row.repository_id}', '${row.directory_id}', '${row.file_id}', '${row.module_id}', '${row.symbol_id}', '${row.feature_id}', '${row.chunk_id}', '${row.source_ref}')`
-          )
+        // Build parameterized query
+        const placeholders = batch
+          .map((_, idx) => {
+            const base = idx * 9;
+            return `($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4}, $${base + 5}, $${base + 6}, $${base + 7}, $${base + 8}, $${base + 9})`;
+          })
           .join(',');
+
+        const params = batch.flatMap(row => [
+          row.packet_key,
+          row.repository_id,
+          row.directory_id,
+          row.file_id,
+          row.module_id,
+          row.symbol_id,
+          row.feature_id,
+          row.chunk_id,
+          row.source_ref
+        ]);
 
         const insertQuery = `
           INSERT INTO atlas_id_hierarchy_metadata (
             packet_key, repository_id, directory_id, file_id, module_id, symbol_id, feature_id, chunk_id, source_ref
-          ) VALUES ${values}
+          ) VALUES ${placeholders}
           ON CONFLICT (packet_key) DO UPDATE SET
             repository_id = EXCLUDED.repository_id,
             directory_id = EXCLUDED.directory_id,
@@ -156,7 +169,7 @@ async function backfillIDHierarchy() {
             chunk_id = EXCLUDED.chunk_id
         `;
 
-        await pool.query(insertQuery);
+        await pool.query(insertQuery, params);
         console.log(`✅ Inserted batch ${Math.floor(i / BATCH_SIZE) + 1} (${batch.length} rows)`);
       }
 
@@ -173,10 +186,9 @@ async function backfillIDHierarchy() {
               file_id = $3,
               module_id = $4,
               symbol_id = $5,
-              feature_id_new = $6,
-              chunk_id = $7,
+              chunk_id = $6,
               updated_at = NOW()
-            WHERE packet_key = $8
+            WHERE packet_key = $7
           `;
 
           await pool.query(updateQuery, [
@@ -185,7 +197,6 @@ async function backfillIDHierarchy() {
             row.file_id,
             row.module_id,
             row.symbol_id,
-            row.feature_id,
             row.chunk_id,
             row.packet_key
           ]);

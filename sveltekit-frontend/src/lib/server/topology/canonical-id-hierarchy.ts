@@ -27,6 +27,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { z } from 'zod';
 
 /**
  * Role-based access levels for identity hierarchy
@@ -51,9 +52,15 @@ export interface AccessPolicy {
 }
 
 /**
- * Canonical ID set — every packet carries all parent IDs
- * Enables efficient filtering, grouping, and traversal at any level
+ * Canonical Envelope — Complete identity + mirror mapping + provenance
+ *
+ * Separates concerns:
+ * - hierarchy: top-down immutable structure (repository → chunk)
+ * - mirrors: store-specific handles (Qdrant, Neo4j, Redis IDs)
+ * - topology: derived clustering (SOM, community, centroid)
+ * - provenance: truth tracking + parity status
  */
+
 export interface CanonicalIDHierarchy {
   repository_id: string; // UUID: code repository
   directory_id: string; // UUID: src/lib/server/
@@ -63,44 +70,80 @@ export interface CanonicalIDHierarchy {
   feature_id: string; // STRING: auth:session-validation
   packet_key: string; // STRING: ace:packet:auth:001
   chunk_id: string; // UUID/SERIAL: codebase_chunk_index row
-  // Permissions metadata
-  owner_id?: string; // User who owns this packet
+}
+
+export interface MirrorHandles {
+  qdrant_point_id?: string; // Qdrant point ID (optional, backfillable)
+  neo4j_node_id?: string; // Neo4j node ID (optional, syncable)
+  redis_key?: string; // Redis cache key pattern
+}
+
+export interface TopologyCoordinates {
+  som_cluster?: string; // SOM grid position
+  centroid_id?: string; // K-means centroid ID
+  community_id?: string; // Louvain community ID
+}
+
+export interface Provenance {
+  truth: 'postgres'; // Canonical source
+  revision: number; // Update counter
+  parity_status: 'matched' | 'diverged' | 'unknown'; // vs mirrors
+  last_verified_at?: Date;
+  verified_by_lane?: string; // Which retrieval lane verified this
+}
+
+export interface CanonicalEnvelope extends CanonicalIDHierarchy {
+  // Source reference (derived from hierarchy)
+  source_ref: string; // src/lib/server/auth.ts
+  packet_type: string; // 'file' | 'module' | 'function' | 'class' | 'route'
+
+  // Mirror store IDs (separate from hierarchy)
+  mirrors: MirrorHandles;
+
+  // Topology (derived, not canonical)
+  topology: TopologyCoordinates;
+
+  // Provenance (for error detection)
+  provenance: Provenance;
+
+  // Permissions (optional, for guarding mutations)
+  owner_id?: string;
   access_policy?: AccessPolicy;
 }
 
 /**
  * Store-specific envelope — same IDs, wrapped per store
  */
-export interface PostgresEnvelope extends CanonicalIDHierarchy {
-  // Postgres extends with columns
+export interface PostgresEnvelope extends CanonicalEnvelope {
+  // Postgres-specific columns
   created_at: Date;
   updated_at: Date;
-  deleted_at?: Date; // NULL until deleted; null deletion is reversible (marked_for_deletion=false)
-  source_ref: string; // src/lib/server/auth.ts (derived from file_id)
-  packet_type: 'file' | 'module' | 'function' | 'class' | 'route';
+  deleted_at?: Date; // NULL until deleted; soft delete is reversible
+
   // Permission enforcement
   access_control_list: Permission[]; // All grants for this packet
-  marked_for_deletion: boolean; // Soft delete flag (can be reversed if user has write access)
-  delete_approved_by?: string[]; // user_ids of approvers (if require_approval_for_delete=true)
+  marked_for_deletion: boolean; // Soft delete flag (reversible if user has write access)
+  delete_approved_by?: string[]; // user_ids of approvers (if approval required)
 }
 
-export interface QdrantPayload extends CanonicalIDHierarchy {
-  // Qdrant payload mirrors IDs
-  source_ref: string;
-  packet_type: string;
+export interface QdrantPayload extends CanonicalEnvelope {
+  // Qdrant payload carries full canonical envelope + embeddings
   // Multi-vector metadata
-  content_embedding: number[]; // 384-dim (primary)
-  summary_embedding: number[]; // 384-dim (concept-level)
+  content_embedding: number[]; // 384-dim (primary, semantic search)
+  summary_embedding: number[]; // 384-dim (concept-level retrieval)
   title_embedding: number[]; // 384-dim (feature lookup)
-  signature_embedding: number[]; // 384-dim (function similarity)
-  feature_embedding?: number[]; // 384-dim (recommendation, optional)
-  latent64?: number[]; // 64-dim (clustering only, not retrieval)
+  signature_embedding: number[]; // 384-dim (function/API similarity)
+  feature_embedding?: number[]; // 384-dim (cross-cutting concerns, optional)
+  latent64?: number[]; // 64-dim (clustering only, NOT for retrieval)
 }
 
-export interface Neo4jNode extends CanonicalIDHierarchy {
-  // Neo4j mirrors IDs + adds relationships
-  labels: string[];
-  properties: Record<string, unknown>;
+export interface Neo4jNode extends CanonicalEnvelope {
+  // Neo4j node mirrors canonical envelope + topology edges
+  labels: string[]; // e.g., ['Packet', 'Feature', 'Module']
+  relationships?: Array<{
+    type: string; // IMPORTS, USES, SIMILAR_TOPOLOGY, etc.
+    target_node_id: string;
+  }>;
 }
 
 export interface RedisKey {
@@ -155,7 +198,57 @@ function derivePacketKey(sourceRef: string): string {
 }
 
 /**
- * Validate that all 8 IDs are present before writing to any store
+ * Validate canonical envelope — hierarchy is required, mirrors/topology optional
+ */
+export function validateCanonicalEnvelope(
+  envelope: CanonicalEnvelope
+): { valid: boolean; errors: string[]; recovery_lane?: 'canonical' | 'recoverable' | 'quarantine' } {
+  const errors: string[] = [];
+
+  // Hard-fail conditions (hierarchy must be complete)
+  const required = [
+    'repository_id',
+    'directory_id',
+    'file_id',
+    'module_id',
+    'symbol_id',
+    'feature_id',
+    'packet_key',
+    'chunk_id'
+  ] as const;
+
+  for (const field of required) {
+    if (!envelope[field]) {
+      errors.push(`[HIERARCHY] Missing required field: ${field}`);
+    }
+  }
+
+  // Soft warnings (mirrors optional but valuable for parity)
+  if (!envelope.mirrors?.qdrant_point_id) {
+    // Not an error, but marks this packet as requiring backfill
+  }
+  if (!envelope.mirrors?.neo4j_node_id) {
+    // Not an error, but marks this packet as requiring sync
+  }
+
+  // Determine recovery lane
+  let recovery_lane: 'canonical' | 'recoverable' | 'quarantine' = 'canonical';
+
+  if (!envelope.packet_key) {
+    recovery_lane = 'quarantine'; // Lost core identity, cannot recover
+  } else if (!envelope.source_ref || !envelope.feature_id) {
+    recovery_lane = 'recoverable'; // Partial identity, can be reconstructed
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    recovery_lane
+  };
+}
+
+/**
+ * Legacy: validate just the hierarchy (for backward compat)
  */
 export function validateIDHierarchy(ids: CanonicalIDHierarchy): boolean {
   const required = [
@@ -483,3 +576,50 @@ export async function undeletePacket(
   await pool.query(query, [packetKey]);
   console.log(`[AUDIT] User ${userId} restored packet ${packetKey} at ${new Date().toISOString()}`);
 }
+
+/**
+ * Zod schemas for API boundary validation
+ */
+
+export const CanonicalIDHierarchySchema = z.object({
+  repository_id: z.string().uuid(),
+  directory_id: z.string().uuid(),
+  file_id: z.string().uuid(),
+  module_id: z.string().uuid(),
+  symbol_id: z.string().uuid(),
+  feature_id: z.string(),
+  packet_key: z.string(),
+  chunk_id: z.string()
+});
+
+export const MirrorHandlesSchema = z.object({
+  qdrant_point_id: z.string().optional(),
+  neo4j_node_id: z.string().optional(),
+  redis_key: z.string().optional()
+});
+
+export const TopologyCoordinatesSchema = z.object({
+  som_cluster: z.string().optional(),
+  centroid_id: z.string().optional(),
+  community_id: z.string().optional()
+});
+
+export const ProvenanceSchema = z.object({
+  truth: z.literal('postgres'),
+  revision: z.number().int().nonnegative(),
+  parity_status: z.enum(['matched', 'diverged', 'unknown']),
+  last_verified_at: z.date().optional(),
+  verified_by_lane: z.string().optional()
+});
+
+export const CanonicalEnvelopeSchema = CanonicalIDHierarchySchema.extend({
+  source_ref: z.string(),
+  packet_type: z.string(),
+  mirrors: MirrorHandlesSchema,
+  topology: TopologyCoordinatesSchema,
+  provenance: ProvenanceSchema,
+  owner_id: z.string().optional(),
+  access_policy: z.object({}).optional()
+});
+
+export type CanonicalEnvelopeType = z.infer<typeof CanonicalEnvelopeSchema>;

@@ -21,6 +21,9 @@ import {
   type RetrievalRequest,
   type RetrievalResult
 } from './unified-orchestrator.js';
+import { validateCanonicalEnvelope, type CanonicalEnvelope } from '$lib/server/topology/canonical-id-hierarchy.js';
+import { createPermissionManager, type PermissionManager } from '$lib/server/topology/permission-manager.js';
+import { integrateDispatcher } from '$lib/server/dispatch/dispatcher-integration.js';
 
 export interface GoRetrievalFacadeRequest {
   query: string;
@@ -51,6 +54,8 @@ export interface GoRetrievalFacadeResponse {
     symbol: string;
     kind: string;
     ranks: Record<string, number>;
+    identity_lane?: 'canonical' | 'recoverable' | 'quarantine';
+    canonical_envelope?: CanonicalEnvelope;
   }>;
   summary?: {
     text: string;
@@ -67,6 +72,19 @@ export interface GoRetrievalFacadeResponse {
   };
   stages_completed: string[];
   fallback_used: boolean;
+  identity_validation?: {
+    candidates_before: number;
+    candidates_after: number;
+    quarantined: number;
+    recovery_lane_count: number;
+  };
+  dispatch?: {
+    decision: string;
+    node_id: string;
+    mcp_tool: string | null;
+    should_proceed_to_synthesis: boolean;
+    latency_ms: number;
+  };
   metadata: {
     query: string;
     query_embedding_dim: number;
@@ -136,14 +154,26 @@ function normalizeResponse(
 }
 
 /**
- * Execute unified retrieval via Go Retrieval facade
+ * Execute unified retrieval via Go Retrieval facade with identity validation
  * Main entry point for Go Retrieval HTTP API
+ *
+ * Steps:
+ * 1. Execute unified retrieval (standard 6-signal RRF)
+ * 2. Validate each candidate has canonical envelope
+ * 3. Filter by recovery lanes (canonical + recoverable only)
+ * 4. Classify into identity lanes for ACE error recovery routing
  */
 export async function executeGoRetrievalSearch(
   request: GoRetrievalFacadeRequest,
   includeSummary?: boolean
 ): Promise<GoRetrievalFacadeResponse> {
   let fallback = false;
+  const identityValidation = {
+    candidates_before: 0,
+    candidates_after: 0,
+    quarantined: 0,
+    recovery_lane_count: 0
+  };
 
   try {
     const unified = normalizeRequest(request);
@@ -156,13 +186,99 @@ export async function executeGoRetrievalSearch(
         }
       : undefined;
 
-    if (shouldSummarize) {
-      const result = await executeUnifiedRetrievalWithSummarization(unified, undefined, summaryOptions);
-      return normalizeResponse(result, request.query, fallback);
-    } else {
-      const result = await executeUnifiedRetrieval(unified);
-      return normalizeResponse(result, request.query, fallback);
+    const result = shouldSummarize
+      ? await executeUnifiedRetrievalWithSummarization(unified, undefined, summaryOptions)
+      : await executeUnifiedRetrieval(unified);
+
+    // ── Identity Validation Gate ──────────────────────────────────────────────
+    identityValidation.candidates_before = result.candidates.length;
+
+    // Validate each candidate and classify into recovery lanes
+    const validated = result.candidates
+      .map((c: any) => {
+        // Build minimal CanonicalEnvelope from candidate
+        const envelope: Partial<CanonicalEnvelope> = {
+          repository_id: c.id || '',
+          directory_id: c.path || '',
+          file_id: c.path || '',
+          module_id: c.symbol || '',
+          symbol_id: c.symbol || '',
+          feature_id: c.id || '',
+          packet_key: c.id || '',
+          chunk_id: c.id || '',
+          source_ref: c.path || ''
+        };
+
+        const validation = validateCanonicalEnvelope(envelope as CanonicalEnvelope);
+        return {
+          ...c,
+          identity_lane: validation.recovery_lane,
+          validation_errors: validation.errors,
+          is_valid: validation.valid
+        };
+      })
+      .filter((c: any) => {
+        // Only return canonical or recoverable lanes (no quarantine)
+        if (c.identity_lane === 'canonical' || c.identity_lane === 'recoverable') {
+          return true;
+        }
+        identityValidation.quarantined++;
+        return false;
+      });
+
+    identityValidation.candidates_after = validated.length;
+    identityValidation.recovery_lane_count = validated.filter((c: any) => c.identity_lane === 'recoverable').length;
+
+    console.log(
+      `[identity-validation] ${identityValidation.candidates_before} → ${identityValidation.candidates_after} ` +
+        `(quarantined: ${identityValidation.quarantined}, recovery: ${identityValidation.recovery_lane_count})`
+    );
+
+    // ── Dispatcher Routing Gate ───────────────────────────────────────────────
+    // Compute dispatch decision based on identity lanes + parity status
+    let dispatchResult;
+    try {
+      dispatchResult = await integrateDispatcher(validated, {
+        caseId: request.case_id ?? request.caseId,
+        userId: undefined // Extract from context in future sessions
+      });
+
+      console.log(
+        `[dispatcher] decision=${dispatchResult.decision} ` +
+          `node=${dispatchResult.nodeId} ` +
+          `proceed=${dispatchResult.shouldProceedToSynthesis} ` +
+          `latency=${dispatchResult.telemetry.latency_ms}ms`
+      );
+    } catch (err) {
+      console.warn('[dispatcher] integration failed (non-blocking):', err);
+      dispatchResult = undefined;
     }
+
+    // ── Reconstruct response with validated candidates ────────────────────────
+    const response = normalizeResponse(result, request.query, fallback);
+    response.results = validated.map((c: any) => ({
+      id: c.id,
+      score: c.score,
+      file_path: c.path,
+      relative_path: c.path,
+      symbol: c.symbol,
+      kind: c.kind,
+      ranks: c.ranks,
+      identity_lane: c.identity_lane
+    }));
+    response.identity_validation = identityValidation;
+
+    if (dispatchResult) {
+      response.dispatch = {
+        decision: dispatchResult.decision,
+        node_id: dispatchResult.nodeId,
+        mcp_tool: dispatchResult.mcpTool,
+        should_proceed_to_synthesis: dispatchResult.shouldProceedToSynthesis,
+        latency_ms: dispatchResult.telemetry.latency_ms
+      };
+    }
+
+    return response;
   } catch (err) {
     console.error('[go-retrieval-facade] execution failed:', err);
     fallback = true;
@@ -180,6 +296,7 @@ export async function executeGoRetrievalSearch(
       },
       stages_completed: [],
       fallback_used: true,
+      identity_validation: identityValidation,
       metadata: {
         query: request.query,
         query_embedding_dim: 0,

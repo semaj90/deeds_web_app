@@ -15,7 +15,8 @@ export type RetrievalLaneName =
   | 'ast_symbol'
   | 'som_topology'
   | 'neo4j_community'
-  | 'web_research';
+  | 'web_research'
+  | 'dispatcher_signal'; // Session 117: Dispatcher topology signals
 
 export interface ContextHit {
   id: string;

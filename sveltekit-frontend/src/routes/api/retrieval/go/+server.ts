@@ -14,11 +14,24 @@
  */
 
 import type { RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import {
   executeGoRetrievalSearch,
   checkGoRetrievalHealth,
   type GoRetrievalFacadeRequest
 } from '$lib/server/retrieval/go-retrieval-facade.js';
+import { CanonicalEnvelopeSchema } from '$lib/server/topology/canonical-id-hierarchy.js';
+
+const RetrievalResponseSchema = z.object({
+  candidates: z.array(
+    CanonicalEnvelopeSchema.extend({
+      packet_key: z.string(),
+      source_ref: z.string(),
+      rrf_score: z.number(),
+      identity_lane: z.enum(['canonical', 'recoverable', 'quarantine']).optional()
+    })
+  ).optional()
+});
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -33,6 +46,16 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const includeSummary = body.includeSummary ?? body.include_summary ?? false;
     const result = await executeGoRetrievalSearch(body, includeSummary);
+
+    // Validate response envelope
+    try {
+      RetrievalResponseSchema.parseAsync(result).catch((validationErr) => {
+        console.warn('[go-retrieval-api] response validation warning:', validationErr.message);
+        // Non-blocking — log but continue
+      });
+    } catch (_) {
+      // Validation errors are informational only
+    }
 
     return new Response(JSON.stringify(result), {
       status: 200,

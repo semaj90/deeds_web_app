@@ -232,6 +232,12 @@ export default defineConfig({
       'tests/gpu/som-topology-prefilter.spec.ts',
       // TensorRT N-API worker pool integration (Session 88 Continuation)
       'tests/gpu/tensorrt-integration.spec.ts',
+      // Session 117 — Dispatcher topology signal integration (RRF blend lane 8)
+      'tests/unit/dispatcher-signal-extractor.spec.ts',
+      'tests/unit/dispatcher-topology-service.spec.ts',
+      // Session 115-116 — Priority 1 & 2 validation tests (schema + MCP tools)
+      'tests/dispatcher-mcp-tools-validation.spec.ts',
+      'tests/session-115-116-integration.spec.ts',
     ],
     exclude: [
       'node_modules/**',

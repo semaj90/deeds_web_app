@@ -29,6 +29,25 @@ import {
   mergeTopologyWeights,
   TOPOLOGY_RRF_WEIGHTS,
 } from './signal-normalizer.js';
+import type { DispatcherOrchestrationResult } from '../dispatcher/dispatcher-orchestrator.js';
+import { generateDispatcherTopologyHits, getDispatcherSignalLaneWeight } from '../dispatcher/dispatcher-topology-service.js';
+import { DISPATCHER_RRF_WEIGHTS } from '../dispatcher/dispatcher-signal-extractor.js';
+
+/**
+ * Canonical default RRF lane weights across all retrieval modes
+ * Must be consistent across all integration points for stable ranking
+ * 7 primary lanes + 1 dispatcher topology signal (Session 117)
+ */
+export const RRF_DEFAULT_WEIGHTS = {
+  postgres_trigram: 1.0,
+  concept_overlap: 1.2,
+  qdrant_vector: 1.0,
+  turbovec_ann: 0.9,
+  neo4j_graph: 0.8,
+  som_topology: 0.5,
+  neo4j_community: 0.3,
+  dispatcher_signal: 0.6, // Session 117: Dispatcher topology signal weight
+} as const;
 
 export interface RRFIntegrationOptions {
   k?: number; // RRF constant (default 60)
@@ -36,6 +55,7 @@ export interface RRFIntegrationOptions {
   topK?: number; // results to return (default 20)
   minScore?: number; // filter results below this RRF score (default 0.001)
   deduplicateBy?: 'id' | 'text'; // default 'id'
+  dispatcherResult?: DispatcherOrchestrationResult; // Optional dispatcher result for topology signal integration (Session 117)
 }
 
 export interface RRFIntegrationOutput {
@@ -48,6 +68,7 @@ export interface RRFIntegrationOutput {
     neoCount: number;
     topologyClusterCount: number;
     communityAuthorityCount: number;
+    dispatcherSignalCount?: number; // Session 117: Dispatcher signal hits
   };
   durationMs: number;
   timings?: {
@@ -61,6 +82,7 @@ export interface RRFIntegrationOutput {
     pgvector_ms?: number;
     concept_overlap_ms?: number;
     topology_ms?: number;
+    dispatcher_signal_ms?: number; // Session 117: Dispatcher signal extraction time
   };
 }
 
@@ -434,19 +456,10 @@ export async function multiLaneRetrievalWithRRF(
     minScore = 0.001,
     deduplicateBy = 'id',
     weights = {},
+    dispatcherResult,
   } = opts;
 
-  const defaultWeights = {
-    postgres_trigram: 1.0,
-    concept_overlap: 1.2,
-    qdrant_vector: 1.0,
-    turbovec_ann: 0.9,
-    neo4j_graph: 0.8,
-    som_topology: 0.5,    // New: SOM cluster match signal
-    neo4j_community: 0.3, // New: Community authority signal
-  };
-
-  const finalWeights = { ...defaultWeights, ...weights };
+  const finalWeights = { ...RRF_DEFAULT_WEIGHTS, ...weights };
 
   try {
     let pgvectorMs = 0;
@@ -456,6 +469,7 @@ export async function multiLaneRetrievalWithRRF(
     let qdrantMs = 0;
     let turbovecMs = 0;
     let neo4jMs = 0;
+    let dispatcherSignalMs = 0; // Session 117
 
     // Generate embedding once for all vector lanes
     const tEmbedStart = performance.now();
@@ -707,16 +721,37 @@ export async function multiLaneRetrievalWithRRF(
             .filter((hit) => hit.score > 0.5) // Only include authority hits with meaningful scores
         : [];
 
+    // Session 117: Extract dispatcher topology signals
+    let dispatcherSignalHits: ContextHit[] = [];
+    if (dispatcherResult) {
+      const tDispatcherStart = performance.now();
+      try {
+        // Generate dispatcher signal hits using all qdrant results as candidate pool
+        const candidateCount = qdrantResults.status === 'fulfilled' ? qdrantResults.value.length : 0;
+        if (candidateCount > 0) {
+          dispatcherSignalHits = generateDispatcherTopologyHits({
+            dispatcherResult,
+            candidateCount,
+            queryPacketKey: bm25Results.status === 'fulfilled' ? bm25Results.value[0]?.stable_key : undefined,
+          });
+        }
+      } catch (err) {
+        console.warn('[RRF] Dispatcher signal extraction failed:', err);
+      }
+      dispatcherSignalMs = performance.now() - tDispatcherStart;
+    }
+
     const tRerankStart = performance.now();
-    // Combine via RRF with topology signals
+    // Combine via RRF with topology signals (including dispatcher signals from Session 117)
     const lanes = [
       bm25Hits,
       conceptHits,
       qdrantHits,
       turbovecHits,
       neoHits,
-      topologyClusterHits,     // NEW: SOM topology signal lane
-      communityAuthorityHits,  // NEW: Community authority signal lane
+      topologyClusterHits,     // SOM topology signal lane
+      communityAuthorityHits,  // Community authority signal lane
+      dispatcherSignalHits,    // Session 117: Dispatcher topology signal lane
     ];
     const laneNames: RetrievalLaneName[] = [
       'postgres_trigram',
@@ -724,8 +759,9 @@ export async function multiLaneRetrievalWithRRF(
       'qdrant_vector',
       'turbovec_ann',
       'neo4j_graph',
-      'som_topology',          // NEW
-      'neo4j_community',       // NEW
+      'som_topology',
+      'neo4j_community',
+      'dispatcher_signal',     // Session 117
     ];
 
     const rrfResults = combineViaRRF(lanes, laneNames, {
@@ -748,6 +784,7 @@ export async function multiLaneRetrievalWithRRF(
         neoCount: neoHits.length,
         topologyClusterCount: topologyClusterHits.length,
         communityAuthorityCount: communityAuthorityHits.length,
+        dispatcherSignalCount: dispatcherSignalHits.length, // Session 117
       },
       durationMs: Date.now() - t0,
       timings: {
@@ -760,7 +797,8 @@ export async function multiLaneRetrievalWithRRF(
         rrf_ms: rerankMs,
         pgvector_ms: pgvectorMs,
         concept_overlap_ms: conceptOverlapMs,
-        topology_ms: topologyClusterHits.length > 0 ? rerankMs * 0.1 : 0, // Estimate 10% of rerank time
+        topology_ms: topologyClusterHits.length > 0 ? rerankMs * 0.1 : 0,
+        dispatcher_signal_ms: dispatcherSignalMs, // Session 117
       },
     };
   } catch (error) {
@@ -775,6 +813,7 @@ export async function multiLaneRetrievalWithRRF(
         neoCount: 0,
         topologyClusterCount: 0,
         communityAuthorityCount: 0,
+        dispatcherSignalCount: 0,
       },
       durationMs: Date.now() - t0,
       timings: {
@@ -788,6 +827,7 @@ export async function multiLaneRetrievalWithRRF(
         pgvector_ms: 0,
         concept_overlap_ms: 0,
         topology_ms: 0,
+        dispatcher_signal_ms: 0,
       },
     };
   }

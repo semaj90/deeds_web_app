@@ -18,6 +18,7 @@ Decision docs:
 
 ```mermaid
 flowchart LR
+  Z["Identity Lane Classification"] --> A
   A["Codebase semantic indexing"] --> B["Parent atlas / document atlas"]
   B --> C["ACE packet build"]
   C --> D["Gemma4 assistant / tool loop"]
@@ -26,7 +27,21 @@ flowchart LR
   F --> G["Qdrant / Neo4j / Postgres"]
   G --> H["Offline batch promotion"]
   H --> B
+  
+  Z_text["<br/>Identity Lane Gate:<br/>canonical ✅<br/>recoverable ⚠️<br/>quarantine ❌"]
+  
+  style Z fill:#f99,stroke:#333
+  style A fill:#9f9,stroke:#333
+  style C fill:#99f,stroke:#333
+  style D fill:#ff9,stroke:#333
 ```
+
+**Identity Lane Gate** (upstream of all lanes):
+- Routes packets to 5 lanes (canonical + recovery + quarantine)
+- Only **canonical lane** packets feed ACE/Engram/Gemma4 pipeline
+- **Recoverable lane** packets flag for offline promotion
+- **Quarantine lane** packets blocked from all downstream use
+- See `docs/architecture/identity-lane-architecture.md` for full taxonomy
 
 ## Live components
 
@@ -142,3 +157,28 @@ If a lane does not affect:
 - Gemma4 tool routing,
 
 then it should stay outside the canonical assistant path until promoted.
+
+---
+
+## Identity Lane Architecture Reference
+
+**Why**: The ACE/Engram pipeline depends on packet identity being recoverable across all stores (Postgres, Qdrant, Neo4j, Redis). Lost identity (missing `packet_key`, `source_ref`, or `feature_id`) breaks the entire upstream flow.
+
+**What**: Five-lane classification system that routes packets based on identity completeness:
+- **Lane 1 (Canonical)**: packet_key + source_ref + feature_id present → feeds ACE pipeline ✅
+- **Lane 2-3 (Recoverable)**: reconstructible from byte span or content hash → flagged for offline promotion
+- **Lane 4 (Mirror Orphan)**: qdrant/neo4j/redis reference but no canonical key → quarantine
+- **Lane 5 (Quarantine)**: no identity fields → blocked from all downstream use
+
+**How**: Run before codebase indexing:
+```bash
+npm run atlas:assign:identity-lanes:dry        # Preview
+npm run atlas:assign:identity-lanes:apply      # Classify all packets
+```
+
+**Where**: See `docs/architecture/identity-lane-architecture.md` for full architecture, recovery algorithms, and agentic error fixing integration points.
+
+**Key files**:
+- `src/lib/server/topology/identity-lane-router.ts` — Lane assignment logic
+- `drizzle/0100_identity_lane_recovery.sql` — Schema + audit tables
+- `scripts/atlas/assign-identity-lanes.mjs` — Batch classification script
