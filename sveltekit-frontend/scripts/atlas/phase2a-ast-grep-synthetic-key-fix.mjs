@@ -1,18 +1,23 @@
 #!/usr/bin/env node
 /**
- * Phase 1: AST-Grep Structural Extraction (Critical Path)
+ * Phase 2A: AST-Grep Synthetic Key Fix (CRITICAL PATH)
  *
- * Extract ast_symbols[] from TypeScript/JavaScript code using ast-grep
- * Symbols: functions, classes, imports, exports, identifiers
+ * PROBLEM: phase1-ast-grep-extraction.mjs created synthetic packet_keys like 'codebase:src/...'
+ * which don't exist in atlas_packets, causing orphaned rows in atlas_packet_features.
  *
- * Input: atlas_packets.source_ref (file path)
- * Output: atlas_packet_features.ast_symbols[]
+ * SOLUTION: Map source_ref from atlas_packets to real packet_key values.
+ * For each packet in atlas_packets that has ast_symbols extracted,
+ * verify the packet_key exists and write the symbols to atlas_packet_features.
  *
- * Stage 1 output feeds Stage 2 (Lexical), Stage 3 (LangExtract), Stage 4 (Naive Bayes)
+ * INPUT:  atlas_packets (canonical identity)
+ * OUTPUT: atlas_packet_features.ast_symbols (with real packet_key references)
+ *
+ * This unblocks LAYER 2 feature extraction (lexical, entities, etc.)
+ * and enables downstream phases (LangExtract, Naive Bayes, etc.)
  *
  * Usage:
- *   npm run atlas:phase1:ast-grep:dry --limit=100
- *   npm run atlas:phase1:ast-grep:apply --limit=10000
+ *   npm run atlas:phase2a:ast-grep-fix:dry --limit=100
+ *   npm run atlas:phase2a:ast-grep-fix:apply --limit=10000
  */
 
 import pg from 'pg';
@@ -23,12 +28,19 @@ import { fileURLToPath } from 'url';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '../..');
+// Resolve repo root: scripts/atlas/phase2a-... → repo root (3 levels up: atlas → scripts → sveltekit-frontend → repo)
+// BUT: We're running from sveltekit-frontend, so __dirname is sveltekit-frontend/scripts/atlas
+let repoRoot = path.resolve(__dirname, '../../..');
+// Verify and fallback
+if (!fs.existsSync(path.join(repoRoot, 'sveltekit-frontend')) && !fs.existsSync(path.join(repoRoot, 'claude-mem'))) {
+  // Last resort: manually construct from known location
+  repoRoot = 'C:\\Users\\james\\Videos\\deeds-web-app';
+}
 
 const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('--dry');
 const isVerbose = process.argv.includes('--verbose') || process.argv.includes('-v');
 const limit = parseInt(
-  process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] ?? '100'
+  process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] ?? '10000'
 );
 
 const pool = new Pool({
@@ -153,64 +165,38 @@ async function extractAstSymbols(filePath) {
 }
 
 async function main() {
-  console.log(`\n🔍 Phase 1: AST-Grep Structural Extraction [${isDryRun ? 'DRY-RUN' : 'APPLY'}]\n`);
+  console.log(`\n🔧 Phase 2A: AST-Grep Synthetic Key Fix [${isDryRun ? 'DRY-RUN' : 'APPLY'}]\n`);
 
   const client = await pool.connect();
 
   try {
-    // Step 1: Extract from actual codebase files (alternative to atlas_packets.source_ref)
-    console.log('📦 Step 1: Scan codebase for TypeScript files...');
+    // Step 1: Query code file packets from atlas_packets (canonical identity)
+    console.log('📦 Step 1: Query code file packets from atlas_packets...');
 
-    // For this first run, we'll extract from real TS/TSX files in src/
-    const tsFiles = [];
-    const findTsFiles = (dir) => {
-      try {
-        const files = fs.readdirSync(dir);
-        files.forEach(file => {
-          const fullPath = path.join(dir, file);
-          const stat = fs.statSync(fullPath);
-          if (stat.isDirectory() && !file.startsWith('.')) {
-            findTsFiles(fullPath);
-          } else if ((file.endsWith('.ts') || file.endsWith('.tsx')) && !file.endsWith('.d.ts')) {
-            let relPath = path.relative(repoRoot, fullPath);
-            // PHASE 2A: Normalize path separators to forward slashes (match DB format)
-            relPath = relPath.replace(/\\/g, '/');
-            tsFiles.push({
-              source_ref: relPath,
-              filePath: fullPath,
-            });
-          }
-        });
-      } catch (e) {
-        // skip
-      }
-    };
+    const queryResult = await client.query(`
+      SELECT packet_key, source_ref
+      FROM atlas_packets
+      WHERE source_ref LIKE '%.ts'
+         OR source_ref LIKE '%.tsx'
+         OR source_ref LIKE '%.js'
+         OR source_ref LIKE '%.jsx'
+      ORDER BY packet_key
+      LIMIT $1
+    `, [limit]);
 
-    findTsFiles(path.join(repoRoot, 'src'));
+    const packets = queryResult.rows;
 
-    console.log(`  ✓ Found ${tsFiles.length} TypeScript files in codebase\n`);
-
-    if (tsFiles.length === 0) {
-      console.log('  ℹ️  No TypeScript files to process.\n');
-      await client.release();
-      await pool.end();
-      process.exit(0);
-    }
-
-    // Limit to requested count
-    const packets = tsFiles.slice(0, limit);
-
-    console.log(`  ✓ Found ${packets.length} TypeScript files to extract\n`);
+    console.log(`  ✓ Found ${packets.length} code file packets\n`);
 
     if (packets.length === 0) {
-      console.log('  ℹ️  No TypeScript files to process.\n');
+      console.log('  ℹ️  No code file packets to process.\n');
       await client.release();
       await pool.end();
       process.exit(0);
     }
 
-    // Step 2: Extract symbols for each packet
-    console.log(`🔨 Step 2: Extract AST symbols from ${packets.length} source files...\n`);
+    // Step 2: For each packet, try to extract symbols from its source_ref file
+    console.log(`🔨 Step 2: Extract AST symbols from ${packets.length} files...\n`);
 
     let extracted = 0;
     let failed = 0;
@@ -219,10 +205,32 @@ async function main() {
 
     for (let i = 0; i < packets.length; i++) {
       const packet = packets[i];
-      const filePath = packet.filePath; // Use the real file path
 
       if ((i + 1) % 100 === 0) {
-        console.log(`  [${i + 1}/${packets.length}] Processed ${i + 1} files...`);
+        console.log(`  [${i + 1}/${packets.length}] Processed ${i + 1} packets...`);
+      }
+
+      // Try to find the file on disk
+      // source_ref uses forward slashes from DB, but path.join needs platform-specific separators
+      // Convert source_ref forward slashes to platform separators
+      let filePath = null;
+      const sourceRefPath = packet.source_ref.replace(/\//g, path.sep);
+
+      const candidates = [
+        path.join(repoRoot, sourceRefPath),
+      ];
+
+      for (const candidate of candidates) {
+        if (fs.existsSync(candidate)) {
+          filePath = candidate;
+          break;
+        }
+      }
+
+      if (!filePath) {
+        skipped++;
+        if (isVerbose) console.log(`    [SKIP] File not found: ${packet.source_ref}`);
+        continue;
       }
 
       const symbols = await extractAstSymbols(filePath);
@@ -233,9 +241,9 @@ async function main() {
         continue;
       }
 
-      // PHASE 2A FIX: Map source_ref to real atlas_packets.packet_key via database lookup
-      // Do NOT use synthetic packet_key like 'codebase:...' — those don't exist in the DB
+      // PHASE 2A FIX: Use the real packet_key from atlas_packets
       updates.push({
+        packet_key: packet.packet_key,
         source_ref: packet.source_ref,
         symbols: symbols,
       });
@@ -263,33 +271,15 @@ async function main() {
         console.log(`      Symbols: ${u.symbols.slice(0, 5).join(', ')}${u.symbols.length > 5 ? '...' : ''}`);
       });
     } else {
-      // PHASE 2A FIX: Batch insert/update with source_ref join
-      // For each update, JOIN to atlas_packets on source_ref to get the real packet_key
+      // Batch insert/update
       const batchSize = 50;
       let totalInserted = 0;
-      let totalMatched = 0;
-      let totalMissed = 0;
 
       for (let i = 0; i < updates.length; i += batchSize) {
         const batch = updates.slice(i, i + batchSize);
 
         for (const update of batch) {
           try {
-            // PHASE 2A: JOIN source_ref to atlas_packets to get real packet_key
-            const packetResult = await client.query(`
-              SELECT packet_key FROM atlas_packets WHERE source_ref = $1 LIMIT 1
-            `, [update.source_ref]);
-
-            if (packetResult.rows.length === 0) {
-              if (isVerbose) console.log(`    [WARN] No packet found for source_ref: ${update.source_ref}`);
-              totalMissed++;
-              continue;
-            }
-
-            const { packet_key } = packetResult.rows[0];
-            totalMatched++;
-
-            // Now update atlas_packet_features with the real packet_key
             const result = await client.query(`
               INSERT INTO atlas_packet_features (packet_key, ast_symbols)
               VALUES ($1, $2)
@@ -297,22 +287,20 @@ async function main() {
                 ast_symbols = $2,
                 updated_at = NOW()
               RETURNING packet_key
-            `, [packet_key, update.symbols]);
+            `, [update.packet_key, update.symbols]);
             totalInserted += result.rowCount;
           } catch (e) {
-            console.error(`    ⚠️  Failed to insert ${update.source_ref}:`, e.message);
+            console.error(`    ⚠️  Failed to insert ${update.packet_key}:`, e.message);
           }
         }
 
         console.log(`  ✓ Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(updates.length / batchSize)} processed`);
       }
 
-      console.log(`\n✅ Successfully wrote ${totalInserted} rows to atlas_packet_features`);
-      console.log(`   Matched source_ref → packet_key: ${totalMatched}`);
-      console.log(`   Missing (no packet found): ${totalMissed}\n`);
+      console.log(`\n✅ Successfully wrote ${totalInserted} rows to atlas_packet_features\n`);
     }
 
-    // Step 4: Verify (count all ast_symbols in the feature table)
+    // Step 4: Verify coverage
     const verifyResult = await client.query(`
       SELECT
         COUNT(*) as total,
@@ -328,7 +316,14 @@ async function main() {
     console.log(`  With ast_symbols: ${populated}`);
     console.log(`  Coverage: ${coverage}%\n`);
 
-    console.log(`✨ Phase 1 complete!\n`);
+    // Show progress toward 80% target
+    if (populated / total >= 0.80) {
+      console.log(`✨ PHASE 2A COMPLETE! Coverage ≥ 80% achieved (${coverage}%)\n`);
+      console.log(`   Ready for Phase 2B (lexical extraction) and Phase 2C (entity extraction)\n`);
+    } else {
+      const needed = Math.ceil(total * 0.80) - populated;
+      console.log(`   ⏳ Progress toward 80%: need ${needed} more rows with ast_symbols\n`);
+    }
 
   } catch (error) {
     console.error('❌ Error:', error.message);
