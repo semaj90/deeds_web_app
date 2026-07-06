@@ -1,14 +1,37 @@
 /**
- * OpenCode Workspace Configuration (July 4, 2026)
+ * OpenCode Workspace Configuration (July 6, 2026)
  *
- * Minimal valid config — OpenCode CLI infers LLM from environment
  * Canonical llama-server with Gemma4 RotorQuant runs at :8090
- * Benchmark-only MTP/test1111 lane runs at :8091
+ * Context window: 65536 (verify via GET http://127.0.0.1:8090/slots)
+ * KV cache: q8_0 (stock stable baseline)
  *
- * To activate: set environment variables before launching opencode:
- *   $env:OPENAI_API_BASE = "http://127.0.0.1:8090/v1"
- *   $env:OPENAI_API_KEY = "sk-not-needed"
- *   $env:OPENAI_MODEL_ID = "gemma4-legal-iq4xs-direct.gguf"
- *   $env:OPENAI_CONTEXT_LENGTH = "65536"
+ * Before launching OpenCode, ensure:
+ *   1. llama-server running: .\scripts\launch-turboquant.ps1
+ *   2. Qdrant running: docker-compose up legal-ai-qdrant
+ *   3. .env has correct model paths (see docs/ai-os/opencode-context-window.md)
  */
-{}
+{
+  "models": {
+    "gemma4-legal-iq4xs-direct.gguf": {
+      "name": "Gemma4 Legal IQ4_XS (canonical, stock q8_0)",
+      "tools": true,
+      "reasoning": false,
+      "limit": {
+        "context": 65536,
+        "output": 4096
+      }
+    }
+  },
+  "model": "gemma4-legal-iq4xs-direct.gguf",
+  "instructions": [
+    ".opencode/system.md",
+    "AGENTS.md"
+  ],
+  "trace": {
+    "type": "remote",
+    "url": "http://127.0.0.1:8788/mcp",
+    "headers": {
+      "Accept": "application/json, text/event-stream"
+    }
+  }
+}

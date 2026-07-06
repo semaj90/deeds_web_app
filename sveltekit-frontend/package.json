@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite dev",
     "dev:gpu": "node scripts/startup/dev-gpu-runtime.mjs",
-    "build": "vite build",
+    "compile:protos": "node ../scripts/compile-protos.mjs",
+    "build": "npm run compile:protos && vite build",
     "test": "vitest",
     "lint": "eslint .",
     "turbo:start": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1",
@@ -895,7 +896,12 @@
     "pagerank:mapreduce:gpu": "node ../scripts/phase85/pagerank-mapreduce.mjs --mapreduce",
     "pagerank:gpu:cache-warm": "node ../scripts/phase85/pagerank-mapreduce.mjs --cache-warm",
     "cache:warm:all": "node ../scripts/phase85/cache-warm.mjs",
-    "phase85:full-pipeline": "npm run manifold:hilbert:sort:57k && npm run cuda:graph:capture:representative && npm run pagerank:neo4j:apply && npm run pagerank:mapreduce:gpu && npm run cache:warm:all"
+    "phase85:full-pipeline": "npm run manifold:hilbert:sort:57k && npm run cuda:graph:capture:representative && npm run pagerank:neo4j:apply && npm run pagerank:mapreduce:gpu && npm run cache:warm:all",
+    "atlas:mirror:flow:test": "node scripts/atlas/test-mirror-worker-flow.mjs",
+    "atlas:mirror:flow:test:dry": "node scripts/atlas/test-mirror-worker-flow.mjs --dry-run",
+    "atlas:mirror:qdrant:worker": "tsx src/lib/server/workers/qdrant-sync-worker.ts",
+    "atlas:mirror:neo4j:worker": "tsx src/lib/server/workers/neo4j-sync-worker.ts",
+    "atlas:mirror:redis:worker": "tsx src/lib/server/workers/redis-invalidate-worker.ts"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

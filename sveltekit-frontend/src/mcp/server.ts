@@ -12,10 +12,12 @@ import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
 import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
 import { DISPATCHER_TOOLS_SCHEMAS } from './dispatcher-tools-schemas.js';
-import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j } from '$lib/server/dispatch/mcp-tool-implementations.js';
+import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j, toolGraphExpand, toolRetrievalRerank, toolAnswerSynthesize, toolEscalationRoute, toolIdentityQuarantine } from '$lib/server/dispatch/mcp-tool-implementations.js';
 import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
 import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-lifecycle.js';
 import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
+import { registerDispatcherToolsAsACP, executeACPTool } from '$lib/server/acp/acp-mcp-integration.js';
+import { bootstrapACPRegistry } from '$lib/server/acp/acp-grpc-quic-bridge.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -87,6 +89,10 @@ async function executeTool(
  * Setup tool handlers for MCP server
  */
 export function setupToolHandlers() {
+  // Initialize ACP registry with dispatcher tools on first tool list request
+  bootstrapACPRegistry();
+  registerDispatcherToolsAsACP();
+
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       {

@@ -238,6 +238,8 @@ export default defineConfig({
       // Session 115-116 — Priority 1 & 2 validation tests (schema + MCP tools)
       'tests/dispatcher-mcp-tools-validation.spec.ts',
       'tests/session-115-116-integration.spec.ts',
+      // Session 117+ — ACP/gRPC/QUIC integration (proto wiring, A2A discovery, QUIC transport)
+      'tests/acp-grpc-quic-integration.spec.ts',
     ],
     exclude: [
       'node_modules/**',

@@ -1,166 +1,197 @@
 /**
- * Mirror Sync Publisher — Async Event Emission
+ * Mirror Sync Publisher
  *
- * Architecture:
- * Postgres commit
- *   ↓ (Identity Worker)
- * Publish identity.updated → RabbitMQ
- *   ↓ (Non-blocking)
- * Mirror workers subscribe and listen:
- *   - Qdrant worker: sync payload
- *   - Neo4j worker: sync topology node
- *   - Redis worker: cache invalidation
- *
- * This ensures:
- * - Postgres is always updated FIRST (truth)
- * - Mirrors are updated AFTER (async, non-blocking)
- * - If mirror update fails, doesn't break identity worker
- * - Audit trail in RabbitMQ for debugging
+ * Publishes identity update events to RabbitMQ for mirror workers to consume.
  */
 
-import type { IdentityWorkerResult } from './identity-worker.js';
+import * as amqp from 'amqplib';
 
-/**
- * Event payload published to RabbitMQ after identity update
- */
 export interface IdentityUpdatedEvent {
-  packetKey: string;
-  sourceRef: string;
-  identityLane: 'canonical' | 'recoverable' | 'quarantine' | 'mirror_orphan';
-  canonicalEnvelope: any; // CanonicalEnvelope
-  action: 'created' | 'updated' | 'skipped' | 'quarantined';
-  timestamp: string;
-  workerId: string;
+  packet_key: string;
+  source_ref: string;
+  feature_id: string;
+  identity_lane: 'canonical' | 'recoverable_1' | 'recoverable_2' | 'mirror_orphan' | 'quarantine';
+  mirror_parity: {
+    qdrant_synced_at?: string;
+    neo4j_synced_at?: string;
+    redis_invalidated_at?: string;
+  };
+  updated_at: string;
+  envelope?: Record<string, unknown>;
 }
 
-/**
- * Publish identity.updated event to RabbitMQ
- *
- * Subscribers:
- * - qdrant-sync-worker: listens and syncs payload to Qdrant
- * - neo4j-sync-worker: listens and syncs node to Neo4j
- * - redis-invalidate-worker: listens and invalidates cache
- */
+const EXCHANGE_NAME = 'identity.updated';
+const QUEUES = {
+  qdrant: 'qdrant-sync-workers',
+  neo4j: 'neo4j-sync-workers',
+  redis: 'redis-invalidate-workers',
+  dlq: 'mirror-worker-dlq'
+};
+
+const ROUTING_KEYS = {
+  canonical: 'identity.canonical',
+  recoverable: 'identity.recoverable',
+  quarantine: 'identity.quarantine',
+  all: 'identity.*'
+};
+
+let connection: any = null;
+let channel: any = null;
+let isReady = false;
+
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+
+export async function initializeMirrorSyncPublisher(): Promise<void> {
+  if (isReady && channel) return;
+
+  try {
+    connection = await (amqp as any).connect(RABBITMQ_URL);
+    channel = await connection.createChannel();
+
+    await channel.assertExchange(EXCHANGE_NAME, 'topic', {
+      durable: true,
+      autoDelete: false
+    });
+
+    for (const queueName of Object.values(QUEUES)) {
+      await channel.assertQueue(queueName, {
+        durable: true,
+        arguments: {
+          'x-dead-letter-exchange': EXCHANGE_NAME,
+          'x-dead-letter-routing-key': 'mirror.dlq'
+        }
+      });
+    }
+
+    await channel.bindQueue(QUEUES.qdrant, EXCHANGE_NAME, ROUTING_KEYS.canonical);
+    await channel.bindQueue(QUEUES.qdrant, EXCHANGE_NAME, ROUTING_KEYS.recoverable);
+    await channel.bindQueue(QUEUES.neo4j, EXCHANGE_NAME, ROUTING_KEYS.all);
+    await channel.bindQueue(QUEUES.redis, EXCHANGE_NAME, ROUTING_KEYS.canonical);
+    await channel.bindQueue(QUEUES.redis, EXCHANGE_NAME, ROUTING_KEYS.recoverable);
+    await channel.bindQueue(QUEUES.dlq, EXCHANGE_NAME, 'mirror.dlq');
+
+    isReady = true;
+    console.log('Mirror sync publisher initialized');
+  } catch (err) {
+    console.error('Failed to initialize mirror sync publisher:', err);
+    throw err;
+  }
+}
+
 export async function publishIdentityUpdatedEvent(
-  result: IdentityWorkerResult,
-  workerId: string = 'identity-worker'
+  event: IdentityUpdatedEvent,
+  options?: { dryRun?: boolean }
 ): Promise<void> {
-  if (!result.was_updated) {
-    // Don't publish events for skipped packets
+  if (!channel) {
+    await initializeMirrorSyncPublisher();
+  }
+
+  if (!channel) {
+    throw new Error('RabbitMQ channel not initialized');
+  }
+
+  const routingKey =
+    event.identity_lane === 'canonical' ? ROUTING_KEYS.canonical :
+    event.identity_lane === 'quarantine' ? ROUTING_KEYS.quarantine :
+    ROUTING_KEYS.recoverable;
+
+  const message = Buffer.from(JSON.stringify(event));
+
+  if (options?.dryRun) {
+    console.log('Dry-run: would publish identity event', { packet_key: event.packet_key, routing_key: routingKey });
     return;
   }
 
-  try {
-    // This would normally publish to RabbitMQ
-    // For now, just log (v1 non-blocking stub)
-    const event: IdentityUpdatedEvent = {
-      packetKey: result.packet_key,
-      sourceRef: result.source_ref,
-      identityLane: result.identity_lane,
-      canonicalEnvelope: result.canonical_envelope,
-      action: result.action,
-      timestamp: new Date().toISOString(),
-      workerId
-    };
+  const published = channel.publish(
+    EXCHANGE_NAME,
+    routingKey,
+    message,
+    {
+      persistent: true,
+      contentType: 'application/json',
+      timestamp: Date.now(),
+      headers: {
+        'x-packet-key': event.packet_key,
+        'x-identity-lane': event.identity_lane,
+        'x-event-version': '1'
+      }
+    }
+  );
 
-    console.log(
-      `[mirror-sync-publisher] Published: identity.updated → ${result.packet_key} (action: ${result.action})`
-    );
-
-    // TODO: Wire RabbitMQ publisher
-    // const channel = await getRabbitMQChannel();
-    // await channel.publish('legal.updates', 'identity.updated', Buffer.from(JSON.stringify(event)), {
-    //   persistent: true,
-    //   contentType: 'application/json'
-    // });
-  } catch (err) {
-    // Non-blocking: if publishing fails, just log
-    // Mirrors can be synced via manual backfill if needed
-    console.warn(`[mirror-sync-publisher] Failed to publish event for ${result.packet_key}:`, err);
+  if (!published) {
+    await new Promise(resolve => channel.once('drain', resolve));
   }
+
+  console.log('Published identity update event:', { packet_key: event.packet_key, routing_key: routingKey });
 }
 
-/**
- * Publish batch of identity.updated events
- */
 export async function publishBatchIdentityUpdatedEvents(
-  results: IdentityWorkerResult[],
-  workerId: string = 'identity-worker'
+  events: IdentityUpdatedEvent[],
+  options?: { dryRun?: boolean }
 ): Promise<void> {
-  const events = results
-    .filter((r) => r.was_updated)
-    .map((r) => ({
-      packetKey: r.packet_key,
-      sourceRef: r.source_ref,
-      identityLane: r.identity_lane,
-      canonicalEnvelope: r.canonical_envelope,
-      action: r.action,
-      timestamp: new Date().toISOString(),
-      workerId
-    }));
-
-  if (events.length === 0) {
-    return; // Nothing to publish
+  if (!channel) {
+    await initializeMirrorSyncPublisher();
   }
 
-  console.log(`[mirror-sync-publisher] Publishing ${events.length} identity.updated events`);
+  for (const event of events) {
+    await publishIdentityUpdatedEvent(event, options);
+  }
 
+  console.log('Batch published:', { count: events.length });
+}
+
+export async function getMirrorQueueStats(): Promise<Record<string, { messageCount: number; consumerCount: number }>> {
+  if (!channel) {
+    await initializeMirrorSyncPublisher();
+  }
+
+  const stats: Record<string, { messageCount: number; consumerCount: number }> = {};
+  for (const queueName of Object.values(QUEUES)) {
+    const ok = await channel.checkQueue(queueName);
+    stats[queueName] = { messageCount: ok.messageCount, consumerCount: ok.consumerCount };
+  }
+  return stats;
+}
+
+export async function closeMirrorSyncPublisher(): Promise<void> {
+  if (channel) {
+    try {
+      await channel.close();
+      channel = null;
+    } catch (err) {
+      console.warn('Error closing channel:', err);
+    }
+  }
+  if (connection) {
+    try {
+      await connection.close();
+      connection = null;
+    } catch (err) {
+      console.warn('Error closing connection:', err);
+    }
+  }
+  isReady = false;
+}
+
+export async function healthCheckMirrorSync(): Promise<boolean> {
   try {
-    // TODO: Batch publish to RabbitMQ
-    // for (const event of events) {
-    //   const channel = await getRabbitMQChannel();
-    //   await channel.publish('legal.updates', 'identity.updated', Buffer.from(JSON.stringify(event)), {
-    //     persistent: true,
-    //     contentType: 'application/json'
-    //   });
-    // }
-
-    console.log(`[mirror-sync-publisher] Published ${events.length} events`);
+    if (!channel) {
+      await initializeMirrorSyncPublisher();
+    }
+    if (!channel) return false;
+    await channel.checkExchange(EXCHANGE_NAME);
+    for (const queueName of Object.values(QUEUES)) {
+      await channel.checkQueue(queueName);
+    }
+    return true;
   } catch (err) {
-    console.warn(`[mirror-sync-publisher] Batch publish failed:`, err);
+    console.error('Mirror sync health check failed:', err);
+    return false;
   }
 }
 
-/**
- * Future mirror workers (stubs for Session 114+)
- */
-
-/**
- * Qdrant Sync Worker
- * Listens to identity.updated events
- * Syncs canonical envelope payload to Qdrant
- */
-export async function handleQdrantSyncEvent(event: IdentityUpdatedEvent): Promise<void> {
-  console.log(`[qdrant-sync-worker] Syncing ${event.packetKey} to Qdrant`);
-  // TODO: Implement
-  // 1. Fetch Qdrant point by packet_key
-  // 2. Update payload with canonical_envelope fields
-  // 3. Publish qdrant.synced event
-}
-
-/**
- * Neo4j Sync Worker
- * Listens to identity.updated events
- * Syncs topology node to Neo4j
- */
-export async function handleNeo4jSyncEvent(event: IdentityUpdatedEvent): Promise<void> {
-  console.log(`[neo4j-sync-worker] Syncing ${event.packetKey} to Neo4j`);
-  // TODO: Implement
-  // 1. Create or update Neo4j node for packet
-  // 2. Add edges: BELONGS_TO_DIRECTORY, BELONGS_TO_FEATURE, etc.
-  // 3. Publish neo4j.synced event
-}
-
-/**
- * Redis Cache Invalidation Worker
- * Listens to identity.updated events
- * Invalidates related cache keys
- */
-export async function handleRedisCacheInvalidationEvent(event: IdentityUpdatedEvent): Promise<void> {
-  console.log(`[redis-invalidate-worker] Invalidating cache for ${event.packetKey}`);
-  // TODO: Implement
-  // 1. Delete bifrost:packet:{packetKey}
-  // 2. Delete bifrost:feature:{featureId}:packets
-  // 3. Delete bifrost:directory:{directoryPath}:packets
-  // 4. Publish redis.invalidated event
-}
+export const MirrorSyncConfig = {
+  EXCHANGE_NAME,
+  QUEUES,
+  ROUTING_KEYS
+};
