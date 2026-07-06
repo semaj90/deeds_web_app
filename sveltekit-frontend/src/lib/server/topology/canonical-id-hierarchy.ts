@@ -29,6 +29,28 @@
 import { randomUUID } from 'node:crypto';
 
 /**
+ * Role-based access levels for identity hierarchy
+ */
+export type AccessLevel = 'owner' | 'write' | 'read' | 'none';
+
+export interface Permission {
+  user_id: string;
+  resource_id: string; // Any level: repository_id, directory_id, file_id, etc.
+  resource_type: 'repository' | 'directory' | 'file' | 'module' | 'symbol' | 'feature' | 'packet' | 'chunk';
+  access_level: AccessLevel;
+  granted_at: Date;
+  granted_by: string; // user_id of grantor
+}
+
+export interface AccessPolicy {
+  // Inheritance rule: access to parent implies access to children
+  inherit_from_parent: boolean; // True = read parent → read all children
+  require_explicit: boolean; // True = must explicitly grant child access
+  audit_deletions: boolean; // True = log all delete attempts
+  require_approval_for_delete: boolean; // True = deletion needs second approval
+}
+
+/**
  * Canonical ID set — every packet carries all parent IDs
  * Enables efficient filtering, grouping, and traversal at any level
  */
@@ -41,6 +63,9 @@ export interface CanonicalIDHierarchy {
   feature_id: string; // STRING: auth:session-validation
   packet_key: string; // STRING: ace:packet:auth:001
   chunk_id: string; // UUID/SERIAL: codebase_chunk_index row
+  // Permissions metadata
+  owner_id?: string; // User who owns this packet
+  access_policy?: AccessPolicy;
 }
 
 /**
@@ -50,8 +75,13 @@ export interface PostgresEnvelope extends CanonicalIDHierarchy {
   // Postgres extends with columns
   created_at: Date;
   updated_at: Date;
+  deleted_at?: Date; // NULL until deleted; null deletion is reversible (marked_for_deletion=false)
   source_ref: string; // src/lib/server/auth.ts (derived from file_id)
   packet_type: 'file' | 'module' | 'function' | 'class' | 'route';
+  // Permission enforcement
+  access_control_list: Permission[]; // All grants for this packet
+  marked_for_deletion: boolean; // Soft delete flag (can be reversed if user has write access)
+  delete_approved_by?: string[]; // user_ids of approvers (if require_approval_for_delete=true)
 }
 
 export interface QdrantPayload extends CanonicalIDHierarchy {
@@ -288,4 +318,168 @@ export async function warmRedisFromPostgres(
   for (const { pattern, ttl } of keys) {
     await redisClient.setex(pattern, ttl, JSON.stringify(data));
   }
+}
+
+/**
+ * PERMISSION CHECKING LAYER
+ * Guards all read/write/delete operations on identity hierarchy
+ */
+
+export async function checkPermission(
+  userId: string,
+  resourceId: string,
+  resourceType: string,
+  action: 'read' | 'write' | 'delete',
+  permissions: Permission[]
+): Promise<{ allowed: boolean; reason?: string }> {
+  // Find matching permission
+  const perm = permissions.find(
+    p => p.user_id === userId && p.resource_id === resourceId
+  );
+
+  if (!perm) {
+    return { allowed: false, reason: 'No permission granted for this resource' };
+  }
+
+  // Map actions to required access levels
+  const accessRequired: Record<string, AccessLevel[]> = {
+    read: ['read', 'write', 'owner'],
+    write: ['write', 'owner'],
+    delete: ['owner']
+  };
+
+  const required = accessRequired[action] || [];
+  const hasAccess = required.includes(perm.access_level);
+
+  if (!hasAccess) {
+    return {
+      allowed: false,
+      reason: `User access level '${perm.access_level}' insufficient for '${action}' (requires: ${required.join(' or ')})`
+    };
+  }
+
+  return { allowed: true };
+}
+
+export async function checkHierarchicalPermission(
+  userId: string,
+  packetIds: CanonicalIDHierarchy,
+  action: 'read' | 'write' | 'delete',
+  permissions: Permission[],
+  policy: AccessPolicy
+): Promise<{ allowed: boolean; reason?: string; blockedAt?: string }> {
+  // Check all levels: packet → chunk → feature → symbol → module → file → directory → repository
+  const levels = [
+    { id: packetIds.packet_key, type: 'packet' },
+    { id: packetIds.chunk_id, type: 'chunk' },
+    { id: packetIds.feature_id, type: 'feature' },
+    { id: packetIds.symbol_id, type: 'symbol' },
+    { id: packetIds.module_id, type: 'module' },
+    { id: packetIds.file_id, type: 'file' },
+    { id: packetIds.directory_id, type: 'directory' },
+    { id: packetIds.repository_id, type: 'repository' }
+  ];
+
+  // Walk down hierarchy
+  for (const { id, type } of levels) {
+    const check = await checkPermission(userId, id, type, action, permissions);
+    if (!check.allowed) {
+      if (policy.inherit_from_parent) {
+        // Try parent level
+        continue;
+      } else if (policy.require_explicit) {
+        return { allowed: false, reason: check.reason, blockedAt: type };
+      }
+    }
+    if (check.allowed) {
+      return { allowed: true };
+    }
+  }
+
+  return { allowed: false, reason: 'No sufficient permissions at any hierarchy level' };
+}
+
+export async function auditDeleteOperation(
+  userId: string,
+  packetKey: string,
+  resourceId: string,
+  policy: AccessPolicy
+): Promise<{ allowed: boolean; requiresApproval: boolean; reason?: string }> {
+  if (!policy.audit_deletions) {
+    return { allowed: true, requiresApproval: false };
+  }
+
+  if (policy.require_approval_for_delete) {
+    return {
+      allowed: false,
+      requiresApproval: true,
+      reason: 'Deletion requires secondary approval. Record deletion intent in audit trail.'
+    };
+  }
+
+  return { allowed: true, requiresApproval: false };
+}
+
+export async function softDeletePacket(
+  pool: any,
+  packetKey: string,
+  userId: string
+): Promise<void> {
+  // Mark for deletion instead of hard delete
+  const query = `
+    UPDATE atlas_packets
+    SET marked_for_deletion = true,
+        updated_at = NOW()
+    WHERE packet_key = $1
+  `;
+  await pool.query(query, [packetKey]);
+
+  // Log in audit trail
+  console.log(`[AUDIT] User ${userId} marked packet ${packetKey} for deletion at ${new Date().toISOString()}`);
+}
+
+export async function approveAndPermanentlyDelete(
+  pool: any,
+  packetKey: string,
+  approvedBy: string[],
+  minApprovalsRequired: number = 2
+): Promise<{ deleted: boolean; reason?: string }> {
+  if (approvedBy.length < minApprovalsRequired) {
+    return {
+      deleted: false,
+      reason: `Only ${approvedBy.length}/${minApprovalsRequired} approvals. Cannot permanently delete.`
+    };
+  }
+
+  // Hard delete only after threshold of approvals
+  const query = `
+    DELETE FROM atlas_packets
+    WHERE packet_key = $1 AND marked_for_deletion = true
+  `;
+  const result = await pool.query(query, [packetKey]);
+
+  if (result.rowCount === 0) {
+    return { deleted: false, reason: 'Packet not found or not marked for deletion' };
+  }
+
+  console.log(
+    `[AUDIT] Packet ${packetKey} permanently deleted after approval from: ${approvedBy.join(', ')}`
+  );
+  return { deleted: true };
+}
+
+export async function undeletePacket(
+  pool: any,
+  packetKey: string,
+  userId: string
+): Promise<void> {
+  // Soft-deleted packets can be restored if user has write access
+  const query = `
+    UPDATE atlas_packets
+    SET marked_for_deletion = false,
+        updated_at = NOW()
+    WHERE packet_key = $1 AND marked_for_deletion = true
+  `;
+  await pool.query(query, [packetKey]);
+  console.log(`[AUDIT] User ${userId} restored packet ${packetKey} at ${new Date().toISOString()}`);
 }

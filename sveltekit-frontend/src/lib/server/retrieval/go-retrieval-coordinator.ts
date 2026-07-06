@@ -1,14 +1,19 @@
 /**
- * Go Retrieval Coordinator — Low-latency parallel retrieval
+ * Go Retrieval Coordinator — Identity-preserving low-latency parallel retrieval
  *
  * Responsible for:
  * 1. Parallel queries to Qdrant/Postgres/Neo4j/Redis
  * 2. RRF fusion with 7 lanes
  * 3. Top-100 candidates → GPU reranker
  * 4. Top-20 → Gemma4 answer synthesis
+ * 5. Preserve all 8 canonical IDs through full pipeline
+ * 6. Track retrieval confidence for agentic error recovery
  *
  * Go service is the orchestrator, SvelteKit coordinates the overall flow
  */
+
+import type { CanonicalIDHierarchy } from '../topology/canonical-id-hierarchy.js';
+import type { PermissionManager } from '../topology/permission-manager.js';
 
 interface RetrievalRequest {
   query: string;
@@ -16,6 +21,7 @@ interface RetrievalRequest {
   top_k: number; // Default: 100 for RRF, 20 for Gemma4
   file_id?: string; // Optional filtering
   feature_id?: string; // Optional filtering
+  user_id?: string; // For permission checking
 }
 
 interface RetrievalCandidate {
@@ -50,9 +56,35 @@ interface RetrievalCandidate {
   feature_embedding?: number[]; // Optional
 }
 
+interface RetrievalCandidate extends CanonicalIDHierarchy {
+  // All 8 canonical IDs preserved
+  source_ref: string;
+  packet_type: string;
+
+  // RRF scores from 7 lanes
+  postgres_trigram_score: number; // BM25
+  concept_overlap_score: number; // Concept matching
+  qdrant_vector_score: number; // Dense vector (content_embedding)
+  turbovec_score: number; // 4-bit quantized prefilter
+  neo4j_graph_score: number; // Graph traversal
+  som_topology_score: number; // SOM cluster matching
+  community_authority_score: number; // Neo4j Louvain community
+
+  combined_rrf_score: number; // Final RRF blend
+  retrieval_confidence: number; // For error detection
+
+  // For GPU reranking (stay at 384-dim)
+  content_embedding: number[];
+  summary_embedding: number[];
+  title_embedding: number[];
+  signature_embedding: number[];
+  feature_embedding?: number[];
+}
+
 interface GemmaAnswer {
   answer: string;
-  sources: string[]; // packet_keys of top-20 candidates
+  sources: Array<{ packet_key: string; confidence: number }>; // Top-20 with confidence
+  identity_lane?: string; // Which lane provided these results
   confidence: number;
   execution_time_ms: number;
 }
