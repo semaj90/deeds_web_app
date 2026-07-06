@@ -159,6 +159,7 @@ export class HyperRagFusionService {
       useTaskDistillates = true,
       tokenBudget,
       userId,
+      compareScoring = false,
     } = params;
 
     const effectiveTopK = tokenBudget
@@ -398,6 +399,9 @@ export class HyperRagFusionService {
     const turbovecSet = new Set(turbovecIds.map(String));
     const authorityMap = new Map(graphAuthority.map((n) => [n.stableKey, n]));
 
+    // Build map of all hits grouped by lane (for RRF signal partitioning)
+    const allHitsInLanes = new Map<string, Array<{ id: string; signals: any }>>();
+
     const scoreMap = new Map<string, HyperRagHit>();
 
     for (const pt of allResults) {
@@ -438,9 +442,34 @@ export class HyperRagFusionService {
       const lexicalScore =
         lexicalHits.find((h) => h.clusterId === (payload[clusterField] as number))?.score ?? 0;
 
+      // Phase 1 Scorer Integration
+      // Vector score: normalize Qdrant distance to [0, 1] (if available from semantic lane)
+      const qdrantDistance = (payload.qdrantDistance as number) ?? (1 - pt.score); // fallback: invert pt.score
+      const vectorScore = pt.lane === 'semantic' ? computeVectorScore(qdrantDistance) : pt.score;
+
+      // Graph score: combine PageRank, community proximity, and degree signals
+      const graphScore =
+        pt.lane === 'kag'
+          ? computeGraphScore(pageRank, 0.15, 1.0)
+          : pageRank > 0
+            ? blendGraphSignals(pageRank, authorityScore, hitRate * 100, {
+                pageRank: 0.5,
+                community: 0.3,
+                degree: 0.2,
+              })
+            : 0;
+
+      // Telemetry score: blend recency, confidence, and hit rate
+      const telemetryScore = blendTelemetrySignals(
+        lastUsedAt,
+        (payload.confidence as number) ?? 0.5, // confidence score from payload
+        hitRate * 100, // hit count (scaled)
+        { recency: 0.4, confidence: 0.4, hitRate: 0.2 }
+      );
+
       const signals = {
-        dense: pt.score,
-        graphAuthority: authorityScore,
+        dense: vectorScore,
+        graphAuthority: graphScore,
         clusterMatch: hasClusterMatch ? 0.1 : 0,
         pagerank: pageRank,
         aceBoost: aceCacheHit ? 0.1 : 0,
@@ -453,7 +482,7 @@ export class HyperRagFusionService {
         taskBoost: taskDistillate?.clusters?.includes(String(payload[clusterField])) ? 0.1 : 0,
         activity_w: (payload.activity_w ?? payload.pagerank ?? 0) as number,
         cluster_alias: clusterAlias ?? undefined,
-        recencyOrHitRate: Math.max(hitRate, recencyBoost),
+        recencyOrHitRate: telemetryScore, // Phase 1: Telemetry signal (recency + confidence + hit rate)
         engramBoost: 0,
         trustTier: (payload.trustTier ??
           (pt.lane === 'external_docs' ? 'official_docs' : 'canonical')) as string,
@@ -479,17 +508,30 @@ export class HyperRagFusionService {
         }
       }
 
-      let finalScore =
-        signals.dense * 0.35 +
-        signals.topologyRouted * 0.15 +
-        signals.graphAuthority * 0.15 +
-        signals.lexicalBoost * 0.1 +
-        signals.taskBoost * 0.1 +
-        signals.aceBoost * 0.1 +
-        (pt.lane === 'kag' ? 0.05 : 0);
+      // Populate lane map for RRF signal partitioning
+      const lane = pt.lane ?? 'semantic';
+      if (!allHitsInLanes.has(lane)) {
+        allHitsInLanes.set(lane, []);
+      }
+      allHitsInLanes.get(lane)!.push({ id, signals });
 
-      // Engram Boost (v1.1)
-      finalScore += signals.engramBoost;
+      // RRF Scoring: compute consensus-amplified score via reciprocal rank fusion
+      const rrfResult = computeRRFScore(id, signals, allHitsInLanes);
+      let finalScore = rrfResult.score;
+
+      // A/B comparison mode (optional)
+      if (compareScoring) {
+        const baselineScore =
+          signals.dense * 0.35 +
+          signals.topologyRouted * 0.15 +
+          signals.graphAuthority * 0.15 +
+          signals.lexicalBoost * 0.1 +
+          signals.taskBoost * 0.1 +
+          signals.aceBoost * 0.1 +
+          (pt.lane === 'kag' ? 0.05 : 0);
+        // Store baseline score for comparison
+        // (will be attached to hit object below)
+      }
 
       // Topological Class Consistency Boost (0.08)
       if (clusterMatch?.topoClass && signals.topoClass === clusterMatch.topoClass) {
@@ -546,6 +588,16 @@ export class HyperRagFusionService {
         title: (payload.title ?? payload.path ?? '') as string,
         text: (payload.content ?? payload.summary ?? '') as string,
         score: finalScore,
+        scoreWeightedSum: compareScoring ? (
+          signals.dense * 0.35 +
+          signals.topologyRouted * 0.15 +
+          signals.graphAuthority * 0.15 +
+          signals.lexicalBoost * 0.1 +
+          signals.taskBoost * 0.1 +
+          signals.aceBoost * 0.1 +
+          (pt.lane === 'kag' ? 0.05 : 0)
+        ) : undefined,
+        rrfBreakdown: rrfResult.rrfBreakdown,
         signals,
         manifold4,
         manifold4Meta,
