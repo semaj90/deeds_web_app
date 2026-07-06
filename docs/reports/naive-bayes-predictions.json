@@ -1,0 +1,78 @@
+{
+  "generatedAt": "2026-07-05T21:50:12.006Z",
+  "mode": "dry-run",
+  "inputs": {
+    "model": ".tmp/semantic-naive-bayes-model.json"
+  },
+  "outputs": {
+    "jsonl": ".tmp/naive-bayes-predictions.ndjson"
+  },
+  "summary": {
+    "rowsProcessed": 20,
+    "rowsWritten": 0,
+    "distinctPredictions": 1
+  },
+  "sample": [
+    {
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "prediction": {
+        "model_version": "nb-packet-features-v1",
+        "predicted_label": "SemanticError",
+        "confidence": 1,
+        "distribution": {
+          "SemanticError": 1
+        }
+      }
+    },
+    {
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "prediction": {
+        "model_version": "nb-packet-features-v1",
+        "predicted_label": "SemanticError",
+        "confidence": 1,
+        "distribution": {
+          "SemanticError": 1
+        }
+      }
+    },
+    {
+      "packet_key": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "prediction": {
+        "model_version": "nb-packet-features-v1",
+        "predicted_label": "SemanticError",
+        "confidence": 1,
+        "distribution": {
+          "SemanticError": 1
+        }
+      }
+    },
+    {
+      "packet_key": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "prediction": {
+        "model_version": "nb-packet-features-v1",
+        "predicted_label": "SemanticError",
+        "confidence": 1,
+        "distribution": {
+          "SemanticError": 1
+        }
+      }
+    },
+    {
+      "packet_key": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "prediction": {
+        "model_version": "nb-packet-features-v1",
+        "predicted_label": "SemanticError",
+        "confidence": 1,
+        "distribution": {
+          "SemanticError": 1
+        }
+      }
+    }
+  ],
+  "nextSafeAction": "Use the predictions as soft evidence only; hard missing-field gaps still override routing."
+}

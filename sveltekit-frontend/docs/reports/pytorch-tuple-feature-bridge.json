@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-07-05T22:50:04.975Z",
+  "summary": {
+    "packets_processed": 1000,
+    "total_tuples": 16003,
+    "vocabulary_size": 6647,
+    "avg_features_per_packet": "16.00",
+    "similar_pairs_found": 902
+  },
+  "outputs": {
+    "vocabulary": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\tuple-vocabulary.ndjson",
+    "feature_vectors": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\tuple-feature-vectors.ndjson",
+    "similarities": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\tuple-similarities.json"
+  },
+  "next_steps": [
+    "Use tuple-vocabulary.ndjson + tuple-feature-vectors.ndjson for PyTorch tensor construction",
+    "Run KMeans on feature vectors for cluster assignment (--num-clusters=20)",
+    "Train XGBoost on feature vectors for reranking scores",
+    "Apply Gradient Descent optimization for HMM/RL routing"
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "total_packets": 1000,
+  "pairwise_comparisons": 4950,
+  "similar_pairs": 902,
+  "similarities": [
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1eaa3b6197ba",
+      "jaccard": 0.21428571428571427,
+      "cosine": 0.31211445921885267
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1eacbcd2f508",
+      "jaccard": 0.20689655172413793,
+      "cosine": 0.30576790087066735
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1eb439a0a641",
+      "jaccard": 0.17142857142857143,
+      "cosine": 0.2624483840797119
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1eba0d7cbb55",
+      "jaccard": 0.2,
+      "cosine": 0.29437984931091243
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:dde92c2a47c9",
+      "jaccard": 0.21739130434782608,
+      "cosine": 0.3902723081987104
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:f212a2c4de8b",
+      "jaccard": 0.25,
+      "cosine": 0.3599753015251747
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1ec35439d616",
+      "jaccard": 0.21428571428571427,
+      "cosine": 0.31211445921885267
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1ecf7c23db3f",
+      "jaccard": 0.23076923076923078,
+      "cosine": 0.33349621304666494
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1ee1b4204f33",
+      "jaccard": 0.25,
+      "cosine": 0.3599753015251747
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1ee2eb33a94c",
+      "jaccard": 0.23076923076923078,
+      "cosine": 0.33349621304666494
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:5d6baebcd00f",
+      "jaccard": 0.20689655172413793,
+      "cosine": 0.30576790087066735
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:942dc33f495b",
+      "jaccard": 0.14705882352941177,
+      "cosine": 0.26485803677997705
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1ee5051b4c42",
+      "jaccard": 0.23076923076923078,
+      "cosine": 0.33349621304666494
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1eecdb490c10",
+      "jaccard": 0.17647058823529413,
+      "cosine": 0.2664287940984641
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1eefb6eae02f",
+      "jaccard": 0.17647058823529413,
+      "cosine": 0.2664287940984641
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:ddea52b0a536",
+      "jaccard": 0.20833333333333334,
+      "cosine": 0.35806079241809485
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f1a70b808fa",
+      "jaccard": 0.23076923076923078,
+      "cosine": 0.33349621304666494
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:942de2213842",
+      "jaccard": 0.20833333333333334,
+      "cosine": 0.35806079241809485
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f217cfbc043",
+      "jaccard": 0.24,
+      "cosine": 0.3503348668862991
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f28e1adda87",
+      "jaccard": 0.2,
+      "cosine": 0.29437984931091243
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:ddeaf435b26d",
+      "jaccard": 0.25,
+      "cosine": 0.3599753015251747
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:a4227e6f5ad6",
+      "jaccard": 0.25,
+      "cosine": 0.3599753015251747
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f4e9f9d415d",
+      "jaccard": 0.17142857142857143,
+      "cosine": 0.2624483840797119
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:942f4d7af33d",
+      "jaccard": 0.2727272727272727,
+      "cosine": 0.39396328271089276
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f53ad6d535e",
+      "jaccard": 0.21428571428571427,
+      "cosine": 0.31211445921885267
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f5e47a9fe06",
+      "jaccard": 0.2222222222222222,
+      "cosine": 0.3257870040739471
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f5e843ffe6a",
+      "jaccard": 0.20689655172413793,
+      "cosine": 0.30576790087066735
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:6185414d948b",
+      "jaccard": 0.16666666666666666,
+      "cosine": 0.2926897243897602
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f853c0f4a95",
+      "jaccard": 0.17647058823529413,
+      "cosine": 0.2664287940984641
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1f95cf800a29",
+      "jaccard": 0.1875,
+      "cosine": 0.2793610091414764
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1fa89bc25ebb",
+      "jaccard": 0.1875,
+      "cosine": 0.2793610091414764
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:1fc1f1e79144",
+      "jaccard": 0.21428571428571427,
+      "cosine": 0.31211445921885267
+    },
+    {
+      "packet_i": "packet:57410633722e",
+      "packet_j": "packet:302e2996cae8",
+      "jaccard": 0.25,
+      "cosine": 0.3599753015251747
+    },
+    {
+      "packet_i": "packet:1ea0ec911d5e",
+      "packet_j": "packet:1eadf9dc8fd2",
+      "jaccard": 0.23809523809523808,
+      "cosine": 0.3056144615277579
+    },
+    {
+      "packet_i": "packet:1ea0ec911d5e",
+      "packet_j": "packet:1f42d2e22517",
+      "jaccard": 0.23809523809523808,
+      "cosine": 0.3056144615277579
+    },
+    {
+      "packet_i": "packet:1ea0ec911d5e",
+      "packet_j": "packet:1f6e49474031",
+      "jaccard": 0.23809523809523808,
+      "cosine": 0.3056144615277579
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:56920c1984af",
+      "jaccard": 0.29411764705882354,
+      "cosine": 0.3994528043775648
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:d71a5bb6b2aa",
+      "jaccard": 0.2222222222222222,
+      "cosine": 0.33242134062927486
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1ea656ded939",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:616fa217cb79",
+      "jaccard": 0.2222222222222222,
+      "cosine": 0.33242134062927486
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1eb489195c7d",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1ed89641d2d1",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1f0bb2728981",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1f1cafcdab57",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1f4849e84e6c",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:9421cbc04051",
+      "packet_j": "packet:1f97fd454aa1",
+      "jaccard": 0.15,
+      "cosine": 0.2649823855731643
+    },
+    {
+      "packet_i": "packet:94239e8310e1",
+      "packet_j": "packet:1ed4a1aa2d8d",
+      "jaccard": 0.14814814814814814,
+      "cosine": 0.2402073685887053
+    },
+    {
+      "packet_i": "packet:94239e8310e1",
+      "packet_j": "packet:6184924e0b8a",
+      "jaccard": 0.21739130434782608,
+      "cosine": 0.3087577925647777
+    },
+    {
+      "packet_i": "packet:94239e8310e1",
+      "packet_j": "packet:1f667e61deaf",
+      "jaccard": 0.16,
+      "cosine": 0.2566630458926167
+    },
+    {
+      "packet_i": "packet:94239e8310e1",
+      "packet_j": "packet:1f7454987f6f",
+      "jaccard": 0.16,
+      "cosine": 0.2566630458926167
+    }
+  ]
+}

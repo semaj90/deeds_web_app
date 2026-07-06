@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-07-05T22:18:45.732Z",
+  "summary": {
+    "acceptedHotWrites": 0,
+    "rejectedSemanticRows": 1000,
+    "coldArchivePath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\rejected-semantic-envelopes.ndjson",
+    "mmapRegistryWrites": 0,
+    "mmapRejectedWrites": 0
+  },
+  "validation": {
+    "totalProcessed": 1000,
+    "acceptedCount": 0,
+    "rejectedCount": 1000,
+    "hardFailReasons": {
+      "missing_embedding": 1000,
+      "missing_qdrant_point_id": 934
+    }
+  },
+  "details": {
+    "acceptedPackets": [],
+    "rejectedPackets": [
+      {
+        "packet_key": "packet:5b5c7977495b",
+        "source_ref": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormTextarea.svelte",
+        "feature_id": "llama-cpp-turboquant-gemma4.ChatFormTextarea",
+        "hard_failures": [
+          "missing_embedding",
+          "missing_qdrant_point_id"
+        ]
+      },
+      {
+        "packet_key": "packet:dff2c8fbe3b7",
+        "source_ref": "neschrom97/cards/0a26c19ce98d05bf.json",
+        "feature_id": "neschrom97.0a26c19ce98d05bf",
+        "hard_failures": [
+          "missing_embedding",
+          "missing_qdrant_point_id"
+        ]
+      },
+      {
+        "packet_key": "packet:e015fc24b445",
+        "source_ref": "neschrom97/cards/837ffbe0bf811473.json",
+        "feature_id": "neschrom97.837ffbe0bf811473",
+        "hard_failures": [
+          "missing_embedding",
+          "missing_qdrant_point_id"
+        ]
+      },
+      {
+        "packet_key": "packet:e13b06c520e1",
+        "source_ref": "scripts/atlas/sync-qdrant-payload-tags.mjs",
+        "feature_id": "scripts.sync-qdrant-payload-tags",
+        "hard_failures": [
+          "missing_embedding",
+          "missing_qdrant_point_id"
+        ]
+      },
+      {
+        "packet_key": "packet:5b6954a15819",
+        "source_ref": "sveltekit-frontend/src/lib/server/cache/invalidation.ts",
+        "feature_id": "sveltekit-frontend.invalidation",
+        "hard_failures": [
+          "missing_embedding"
+        ]
+      }
+    ]
+  }
+}

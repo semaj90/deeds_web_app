@@ -1,0 +1,523 @@
+{
+  "generated_at": "2026-07-06T00:58:52.218Z",
+  "mode": "dry-run",
+  "limit": 20,
+  "batch_size": 10,
+  "totals": {
+    "rows_read": 20,
+    "validated": 0,
+    "rejected": 20,
+    "registry_writes": 0,
+    "msgpack_bytes": 0
+  },
+  "accepted": [],
+  "rejected": [
+    {
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "4654d8b5-8d75-5e9b-8bba-7299b3dbed2b",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50954"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.215Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "803dfc05-d34c-5844-ab10-d894ff79237a",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50955"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.216Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "7a020a3f-41f4-5008-a893-b43bb6b50f98",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50956"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.216Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "4e968e1f-fd2a-58c6-a192-ce445690fbca",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50957"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.216Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "ccd78aea-9e25-5df9-92a3-2b58abb4f17e",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50958"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.216Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "2902e7eb-0337-5103-b981-3e2d6cba3074",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50959"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.217Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "1d5eba7211dea6f9",
+      "source_ref": "proto:ChatAssistantService.SendMessage",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "d43472ae-c5b4-56b9-9e18-43afb9ec5ab3",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50960"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.217Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "1f4b4c90-1ea8-5163-9aca-887709c57933",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50961"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.217Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "25c824811a2efd81",
+      "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "dc192b9a-fbf0-5cc4-a65a-380529ea0997",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50962"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.217Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "271b5446f6a86a48",
+      "source_ref": "proto:CyberElephantService.GetClusters",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "2f0aa8dd-37ee-5f01-a8f4-9b2e09d9d84c",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50963"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "28e942decdcdb342",
+      "source_ref": "proto:CodeIntelService.LookupChunk",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "79d17518-0a3b-5580-a1b9-f0a4bebb06bb",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50964"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "313d57f685058b60",
+      "source_ref": "proto:CodeIntelService.SummarizeCluster",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "63241d19-97a5-5d70-9a62-db881dd379d1",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50965"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "322b9cf893125f07",
+      "source_ref": "proto:RetrievalService.GetTopologyContext",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "ea745474-c593-5c3c-b2cd-9c97fe8fc981",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50966"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "32c7446a769f9c86",
+      "source_ref": "proto:RetrievalService.SearchCodebase",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "f6a99906-ccb1-532e-ba7b-d7ed8f66588b",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50967"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "35afe6ea3fdb17b8",
+      "source_ref": "proto:TurboVecCudaService.Search",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "10c4d8b4-bff6-5a61-a924-a7ada45f32f6",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50968"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "368c71501e9385c5",
+      "source_ref": "proto:RetrievalService.StreamCodebase",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "eee6159b-5405-580d-8082-6c9d67238487",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50969"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "38da098bc2c36c22",
+      "source_ref": "proto:RetrievalService.SearchEvidence",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "ca24eba9-9d19-5fd0-853d-de2061624d29",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50970"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "3bf3bc0c64d433c0",
+      "source_ref": "proto:LibrarySearchService.GetDocumentToc",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "2e6434ce-408c-57cc-b175-6af93aba3186",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50971"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "3d0da82598d9064a",
+      "source_ref": "proto:RetrievalService.SearchChunks",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "68bae275-c388-50f9-8035-eb2dc5033ad8",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50972"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    },
+    {
+      "packet_key": "3edd306a02055c3a",
+      "source_ref": "proto:ChatAssistantService.CreateSession",
+      "feature_id": "grpc_service",
+      "title_id": "grpc_service",
+      "tree_node_id": "2bb398fd-d62c-5874-9f84-9e81b63bd97c",
+      "qdrant_point_id": null,
+      "hmm_state": "QdrantBridgeError",
+      "repair_lane": "qdrant_bridge",
+      "routing_hints": [
+        "mcp_agents",
+        "grpc_service",
+        "community:50973"
+      ],
+      "validation": {
+        "isValid": true,
+        "hardFailures": [],
+        "softWarnings": [
+          "som_cluster: recommended but missing"
+        ]
+      },
+      "accepted": "",
+      "created_at": "2026-07-06T00:58:52.218Z",
+      "reason": "missing qdrant_point_id"
+    }
+  ],
+  "registry_writes": [],
+  "manifest_entries": [],
+  "outputs": {
+    "msgpack_file": "memory/packets/hyperrag-packets.msgpack",
+    "manifest": "memory/packets/hyperrag-packets.manifest.json",
+    "ndjson": ".tmp/hyperrag-packet-materializer.ndjson"
+  }
+}

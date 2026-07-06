@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-07-02T03:54:50.633Z",
+  "generated_at": "2026-07-05T22:15:15.405Z",
   "http_url": "http://127.0.0.1:8100",
   "grpc_addr": "127.0.0.1:50053",
   "status": "PASS",
   "http": {
     "ok": true,
     "status": 200,
-    "elapsed_ms": 49,
+    "elapsed_ms": 1949,
     "body": {
-      "embeddingServiceUp": true,
+      "embeddingServiceUp": false,
       "pgvectorConnected": true,
       "qdrantConnected": true,
       "redisConnected": true,
       "status": "healthy",
-      "timestamp": 1782964490667
+      "timestamp": 1783289715468
     }
   },
   "grpc": {

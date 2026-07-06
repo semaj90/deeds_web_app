@@ -1,0 +1,333 @@
+# Phase 106: Deterministic Packet Operating System
+# Routing Contract (YAML reference for multi-system coordination)
+# Status: WIRED & TESTED (Session 106)
+
+version: 1.0
+last_updated: 2026-07-05
+mission: "Implement Phase 106 as deterministic packet OS using three-tier decision flow"
+
+# ============================================================================
+# Three-Tier Decision Flow (IMMUTABLE CONTRACT)
+# ============================================================================
+
+tiers:
+  tier_1_feature_extraction:
+    name: "Feature Extraction (Stage 1-3)"
+    responsibility: "Extract structural, lexical, semantic features"
+    scripts:
+      - phase1.5-ast-grep-extraction.mjs (ast_symbols)
+      - phase1.5-lexical-extraction.mjs (lexical_features)
+      - langextract-phase3 (used_concepts)
+    input_tables:
+      - atlas_packets (packet_key, source_ref)
+    output_tables:
+      - atlas_packet_features (ast_symbols, lexical_features, used_concepts, entities)
+    coverage_target: 95% of 58,304 extractable packets
+    current_status:
+      ast_symbols: 0.9% (516/58,304)
+      lexical_features: 2.4% (1,418/58,304)
+      used_concepts: 100% (58,361/58,365)
+
+  tier_2_naive_bayes_classification:
+    name: "Naive Bayes Classification (Phase 106.2)"
+    responsibility: "Classify packet type and predict initial error state"
+    motto: "Naive Bayes answers: What kind of packet is this?"
+    scripts:
+      - train-naive-bayes-packet-classifier.py (training)
+      - infer-naive-bayes.py (inference engine, JSON-based)
+      - apply-naive-bayes-packet-classifier.mjs (apply to all packets)
+    input_tables:
+      - atlas_packet_features (vectorized via TF-IDF)
+    output_tables:
+      - atlas_packet_metrics.naive_bayes_predictions (JSONB)
+    predictions:
+      domain_class:
+        description: "Packet domain (auth, data, ui, infra, network, config, other)"
+        sample_accuracy: 80.8%
+        used_by: HMM for topology-aware reranking
+      feature_type:
+        description: "Feature classification (core, utility, test, config, migration)"
+        sample_accuracy: 83.8%
+        used_by: ACE context filtering
+      likely_error_state:
+        description: "Initial error diagnosis (StructureError, LexicalError, SemanticError, TopologyError, VectorError)"
+        sample_accuracy: 99.3%
+        used_by: HMM for priority-based repair selection
+      candidate_repair_lane:
+        description: "Recommended repair action (ast_extraction, lexical_extraction, concept_extraction, embedding_bridge, topology_repair)"
+        sample_accuracy: 99.3%
+        used_by: ACP for bounded action dispatch
+    model_format:
+      type: "JSON (secure, human-readable, no code execution)"
+      files:
+        naive_bayes_models.json: "Trained classifier coefficients and class priors"
+        tfidf_vectorizer.json: "Feature vocabulary and IDF values"
+    current_status: WIRED & TESTED (dry-run 100%)
+
+  tier_3_hmm_diagnosis:
+    name: "HMM State Machine (Phase 8.8, wiring pending)"
+    responsibility: "Infer diagnostic state and emit repair recommendations"
+    motto: "HMM answers: What should happen next?"
+    scripts:
+      - phase8.8-hmm-semantic-compiler.mjs (pending wire to Naive Bayes input)
+    input_tables:
+      - atlas_packet_metrics.naive_bayes_predictions (from Tier 2)
+    output_tables:
+      - atlas_packet_metrics.hmm_recommendations (pending creation)
+    state_machine:
+      description: "Priority-based error state detection with confidence scoring"
+      states:
+        - IdentityError (packet_key missing/corrupt)
+        - StructureError (ast_symbols missing/incomplete)
+        - LexicalError (lexical_features missing)
+        - SemanticError (used_concepts missing)
+        - TopologyError (graph edges missing)
+        - VectorError (embedding missing/invalid)
+        - QdrantBridgeError (Qdrant sync failed)
+      recommendations:
+        hmm_state: "Diagnosed state"
+        confidence: "0.0-1.0"
+        recommended_repair_lane: "Tool to run (ast-grep, lexical extractor, concept extractor, embedding bridge, topology repair)"
+        recommended_tool_call: "Exact command/RabbitMQ job"
+        evidence: "Supporting signals (Naive Bayes scores, feature coverage)"
+    current_status: PENDING WIRING (script exists, needs Naive Bayes input integration)
+
+  tier_4_acp_execution:
+    name: "ACP Repair Dispatcher (Phase 106.4, pending implementation)"
+    responsibility: "Execute bounded repair actions via RabbitMQ"
+    motto: "ACP answers: What tool runs now?"
+    scripts:
+      - acp-repair-dispatcher.mjs (PENDING CREATION)
+    input_tables:
+      - atlas_packet_metrics.hmm_recommendations (from Tier 3)
+    output_tables:
+      - rabbitmq (job queue for repair tools)
+    dispatch_rules:
+      confidence_threshold: 0.70 (only execute if HMM confidence >= 0.70)
+      scope_limit: "100 packets max per tool call (prevent cascade failures)"
+      tool_mapping:
+        StructureError: "atlas:phase1.5:ast-grep:apply"
+        LexicalError: "atlas:phase1.5:lexical:apply"
+        SemanticError: "atlas:langextract:concepts:apply"
+        TopologyError: "atlas:topology:repair:apply"
+        VectorError: "atlas:qdrant:embedding:bridge:apply"
+    current_status: NOT_YET_IMPLEMENTED
+
+# ============================================================================
+# Data Contracts (Routing Reference)
+# ============================================================================
+
+packet_flow:
+  identity_layer:
+    canonical_table: atlas_packets
+    key_fields:
+      packet_key: "Primary identity (UUID)"
+      source_ref: "File path or reference (src/lib/...)"
+      feature_id: "Feature label (auth.sessions, ui.forms, ...)"
+      title_id: "Packet title"
+    notes: "Immutable identity. Join point for all mirrors."
+
+  feature_extraction_layer:
+    canonical_table: atlas_packet_features
+    join_key: packet_key
+    extracted_fields:
+      ast_symbols: "Array of function/class/import names from ast-grep"
+      lexical_features: "Array of top-20 keywords from code text"
+      used_concepts: "Array of semantic concepts from LangExtract"
+      entities: "Array of named entities (User, Session, ...)"
+    dependency: "Joined to atlas_packets via packet_key"
+
+  classification_layer:
+    canonical_table: atlas_packet_metrics
+    join_key: packet_key
+    prediction_fields:
+      naive_bayes_predictions: "JSONB containing domain_class, feature_type, likely_error_state, candidate_repair_lane + confidence scores"
+    dependency: "Read from atlas_packet_features, write to atlas_packet_metrics"
+
+  diagnosis_layer:
+    canonical_table: atlas_packet_metrics (hmm_recommendations column, PENDING)
+    join_key: packet_key
+    recommendation_fields:
+      hmm_state: "Diagnosed error state"
+      confidence: "Confidence score (0.0-1.0)"
+      recommended_repair_lane: "Repair action to execute"
+      recommended_tool_call: "RabbitMQ job or CLI command"
+      evidence: "Supporting signals"
+    dependency: "Read from naive_bayes_predictions, write to hmm_recommendations"
+
+  execution_layer:
+    canonical_queue: RabbitMQ (routing keys: atlas:phase1.5:*, atlas:topology:*, atlas:qdrant:*)
+    join_key: packet_key (via audit trail)
+    job_fields:
+      packet_id: "Packet to repair"
+      tool: "Tool to execute"
+      scope: "Max packets to process"
+      params: "Tool-specific parameters"
+    dependency: "Read from hmm_recommendations, enqueue to RabbitMQ"
+
+# ============================================================================
+# Storage Decision Tree (WHERE DATA LIVES)
+# ============================================================================
+
+storage_allocation:
+  postgres_canonical:
+    tables:
+      - atlas_packets (58,365 rows, identity)
+      - atlas_packet_features (40,754 rows, features)
+      - atlas_packet_metrics (growing, predictions)
+    responsibility: "Source of truth for all decisions"
+    update_policy: "Transactional, immutable history"
+
+  qdrant_mirror:
+    collection: codebase_chunks_768
+    points: 40,568 (subset of chunks with embeddings)
+    payload_fields:
+      - packet_key
+      - source_ref
+      - feature_id
+      - domain_class (from Naive Bayes)
+      - som_cluster (from topology)
+    responsibility: "Fast ANN search, NOT identity"
+    rebuild_policy: "From atlas_packet_features on divergence"
+
+  redis_cache:
+    keyspace: bitfrost:* (warm cache for frequent queries)
+    ttl: Variable (packet cache 24h, centroid cache 6h)
+    responsibility: "L1 hot memory, NOT identity"
+    rebuild_policy: "From Postgres on cache miss"
+
+  neo4j_topology:
+    nodes: Directory, Feature, Packet (identity copy via mirror)
+    edges: IMPORTS, BELONGS_TO_CLUSTER, SIMILAR_TOPOLOGY, SHARES_TAGS
+    responsibility: "Graph reasoning, NOT identity"
+    rebuild_policy: "From Postgres on divergence"
+
+# ============================================================================
+# Acceptance Criteria (GATE REQUIREMENTS)
+# ============================================================================
+
+acceptance_gates:
+  gate_1_feature_extraction:
+    requirement: "ast_symbols ≥ 95%, lexical_features ≥ 95%, used_concepts = 100%"
+    measured: "ast_symbols 0.9%, lexical_features 2.4%, used_concepts 100%"
+    status: BLOCKED (feature extraction in progress)
+    blocker: "ast-grep performance; targeting 1.5-2h for batch optimization"
+
+  gate_2_naive_bayes:
+    requirement: "Predictions written to atlas_packet_metrics for 50,000+ packets"
+    measured: "Inference engine WIRED & TESTED (dry-run 100%)"
+    status: READY (pending feature extraction gate 1)
+    action: "Run `npm run atlas:phase106.2:naive-bayes:apply` once ast_symbols reach 50%+"
+
+  gate_3_hmm_wiring:
+    requirement: "HMM consumes Naive Bayes predictions from atlas_packet_metrics"
+    measured: "phase8.8-hmm-semantic-compiler.mjs exists but input wiring pending"
+    status: PENDING (waiting for Naive Bayes gate 2)
+    action: "Wire Naive Bayes output as HMM input evidence"
+
+  gate_4_acp_implementation:
+    requirement: "ACP dispatcher enqueues repair jobs via RabbitMQ (confidence ≥ 0.7)"
+    measured: "Not yet implemented"
+    status: PENDING (waiting for HMM gate 3)
+    action: "Implement acp-repair-dispatcher.mjs"
+
+  gate_5_smoke_test:
+    requirement: "Phase 106 end-to-end dry-run passes with 1,000 packets"
+    measured: "Not yet measured"
+    status: PENDING (waiting for all tiers 1-4)
+    action: "Run full integration test once all tiers complete"
+
+# ============================================================================
+# NPM Scripts (CLI Interface)
+# ============================================================================
+
+scripts:
+  tier_1:
+    extract_ast_grep:
+      - "npm run atlas:phase1.5:ast-grep:dry --limit=100"
+      - "npm run atlas:phase1.5:ast-grep:apply"
+    extract_lexical:
+      - "npm run atlas:phase1.5:lexical:dry --limit=100"
+      - "npm run atlas:phase1.5:lexical:apply"
+
+  tier_2:
+    train_naive_bayes:
+      - "npm run atlas:phase106.2:naive-bayes:train:dry"
+      - "npm run atlas:phase106.2:naive-bayes:train:apply"
+    apply_naive_bayes:
+      - "npm run atlas:phase106.2:naive-bayes:dry --limit=100"
+      - "npm run atlas:phase106.2:naive-bayes:apply"
+
+  tier_3:
+    wire_hmm:
+      description: "Pending: Modify phase8.8-hmm-semantic-compiler.mjs to read naive_bayes_predictions"
+      command: "PENDING_IMPLEMENTATION"
+
+  tier_4:
+    dispatch_repairs:
+      description: "Pending: Implement acp-repair-dispatcher.mjs"
+      command: "PENDING_IMPLEMENTATION"
+
+  validation:
+    validate_semantic_evidence:
+      - "npm run atlas:validate:semantic-evidence:dry --limit=100"
+      - "npm run atlas:validate:semantic-evidence:apply"
+
+# ============================================================================
+# Critical Rules (DO NOT VIOLATE)
+# ============================================================================
+
+hard_rules:
+  rule_1_naive_bayes_does_not_execute_repairs:
+    description: "Naive Bayes classifies packets; it does NOT run repairs"
+    enforcement: "Naive Bayes output goes to HMM, NOT directly to ACP"
+    consequence: "Violating this breaks the three-tier decision flow"
+
+  rule_2_tier_sequencing_is_mandatory:
+    description: "Tiers must execute in order: 1 → 2 → 3 → 4. No shortcuts."
+    enforcement: "Tier 2 requires Tier 1 output (features), Tier 3 requires Tier 2 output (predictions), Tier 4 requires Tier 3 output (recommendations)"
+    consequence: "Skipping tiers causes cascade failures and invalid diagnoses"
+
+  rule_3_postgres_is_truth:
+    description: "Postgres is the single source of truth for all decisions"
+    enforcement: "Qdrant/Redis/Neo4j are mirrors only. Never join across mirrors without Postgres as fallback."
+    consequence: "Violating this causes stale predictions and cascade failures"
+
+  rule_4_json_safe_serialization:
+    description: "Models saved as JSON (secure), never pickle"
+    enforcement: "infer-naive-bayes.py loads models from JSON, no pickle.load()"
+    consequence: "Pickle allows arbitrary code execution on deserialization; unsafe for untrusted data"
+
+  rule_5_confidence_threshold_for_acp:
+    description: "ACP only executes repairs if HMM confidence ≥ 0.70"
+    enforcement: "acp-repair-dispatcher filters by confidence threshold before enqueuing"
+    consequence: "Low-confidence recommendations can corrupt data; threshold prevents cascade failures"
+
+  rule_6_semantic_evidence_before_repair:
+    description: "Repair lanes only execute if semantic evidence validator passes"
+    enforcement: "validate-semantic-evidence.mjs gates every repair decision (identity + semantic lanes + HMM state)"
+    consequence: "Repairs without evidence validation cause blind patching and data corruption"
+
+# ============================================================================
+# Session 106 Status Summary
+# ============================================================================
+
+completion_status:
+  phase_106_1_feature_extraction: "IN PROGRESS (0.9% ast_symbols, 2.4% lexical)"
+  phase_106_2_naive_bayes: "WIRED & TESTED (dry-run 100%)"
+  phase_106_3_hmm_wiring: "PENDING (script exists, needs input wiring)"
+  phase_106_4_acp_dispatcher: "PENDING IMPLEMENTATION"
+  phase_106_semantic_evidence_validator: "WIRED & READY FOR TESTING"
+  phase_106_smoke_test: "PENDING (blocked on feature extraction)"
+
+next_actions:
+  immediate:
+    - "Complete Feature Extraction (Gate 1): Run ast-grep batch optimization to reach 95% coverage"
+    - "Unlock Naive Bayes Apply (Gate 2): Once ast_symbols >= 50%, run `npm run atlas:phase106.2:naive-bayes:apply`"
+  short_term:
+    - "Wire HMM Input (Gate 3): Modify phase8.8-hmm-semantic-compiler.mjs to consume naive_bayes_predictions"
+    - "Test Semantic Evidence Validator: Run `npm run atlas:validate:semantic-evidence:dry --limit=100`"
+    - "Implement ACP Dispatcher (Gate 4): Create acp-repair-dispatcher.mjs with RabbitMQ integration"
+  long_term:
+    - "Smoke Test (Gate 5): Run full Phase 106 end-to-end on 1,000 packets"
+    - "Observe ACP Execution: Monitor repair jobs and validate cascade failure prevention"

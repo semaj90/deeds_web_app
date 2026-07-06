@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -31,18 +32,29 @@ function argValue(name) {
 }
 
 function normalizeJoinKey(value) {
-  const raw = String(value ?? '').trim().replace(/\\/g, '/');
+  const raw = normalizeSourceRef(String(value ?? ''));
   if (!raw) return null;
   return raw
-    .replace(/^\.?\//, '')
     .replace(/^C:\/Users\/james\/Videos\/deeds-web-app\/sveltekit-frontend\//i, '')
     .replace(/^C:\/Users\/james\/Videos\/deeds-web-app\//i, '')
     .replace(/^sveltekit-frontend\//, '');
 }
 
+function isAbstractSourceRef(value) {
+  const s = String(value ?? '').trim().toLowerCase();
+  return s.startsWith('proto:')
+    || s.startsWith('task:')
+    || s.startsWith('feature:')
+    || s.startsWith('env-contract:')
+    || s.startsWith('audit report:')
+    || s.startsWith('packet:')
+    || s.startsWith('title:');
+}
+
 function joinKeyVariants(value) {
   const normalized = normalizeJoinKey(value);
   if (!normalized) return [];
+  if (isAbstractSourceRef(normalized)) return [];
 
   const variants = new Set([normalized]);
 
@@ -58,6 +70,7 @@ function joinKeyVariants(value) {
 }
 
 function addKey(map, key, packet) {
+  if (isAbstractSourceRef(key)) return;
   for (const normalized of joinKeyVariants(key)) {
     if (!map.has(normalized)) map.set(normalized, packet);
   }
@@ -107,9 +120,13 @@ async function loadPackets(pool) {
       payload,
       metadata,
       (
-        qdrant_point_id IS NULL
-        OR qdrant_collection IS NULL
-        OR qdrant_vector_dim IS NULL
+        (
+          qdrant_point_id IS NULL
+          OR qdrant_collection IS NULL
+          OR qdrant_vector_dim IS NULL
+        )
+        AND source_ref IS NOT NULL
+        AND source_ref !~* '^(proto|task|feature|env-contract|packet|title):'
       ) AS needs_qdrant_link
     FROM atlas_packets
     WHERE packet_key IS NOT NULL
@@ -125,6 +142,7 @@ async function loadPackets(pool) {
       addKey(map, packet.packet_key, packet);
       addKey(map, packet.source_ref, packet);
       addKey(map, packet.source_ref_key, packet);
+      addKey(map, packet.canonical_source_ref, packet);
       addKey(map, packet.file_path, packet);
       addKey(map, packet.source_path, packet);
       addKey(map, packet.qdrant_point_id, packet);

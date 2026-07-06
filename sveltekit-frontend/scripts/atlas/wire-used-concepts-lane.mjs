@@ -30,7 +30,12 @@ config({ path: resolve('.', '.env') });
 
 const { Pool } = pg;
 const POSTGRES_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:password@127.0.0.1:5434/legal_ai_db';
-const pgPool = new Pool({ connectionString: POSTGRES_URL });
+const pgPool = new Pool({
+  connectionString: POSTGRES_URL,
+  statement_timeout: 10000,
+  query_timeout: 10000,
+  idle_in_transaction_session_timeout: 10000
+});
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
@@ -42,19 +47,25 @@ console.log('║  Populate semantic concepts from lexical extraction           �
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
 async function getUsedConceptsCoverage() {
-  const result = await pgPool.query(`
-    SELECT COUNT(*) total,
-           COUNT(CASE WHEN used_concepts IS NOT NULL AND array_length(used_concepts, 1) > 0 THEN 1 END) populated,
-           COUNT(CASE WHEN used_concepts IS NULL OR array_length(used_concepts, 1) = 0 THEN 1 END) missing
-    FROM atlas_packets
-  `);
+  try {
+    const result = await pgPool.query(`
+      SELECT COUNT(*) total,
+             COUNT(CASE WHEN used_concepts IS NOT NULL AND array_length(used_concepts, 1) > 0 THEN 1 END) populated
+      FROM atlas_packets
+    `);
 
-  const { total, populated, missing } = result.rows[0];
-  return {
-    total: parseInt(total),
-    populated: parseInt(populated),
-    missing: parseInt(missing)
-  };
+    const { total, populated } = result.rows[0];
+    const totalCount = parseInt(total);
+    const populatedCount = parseInt(populated);
+    return {
+      total: totalCount,
+      populated: populatedCount,
+      missing: totalCount - populatedCount
+    };
+  } catch (err) {
+    console.error(`❌ Error querying coverage: ${err.message}`);
+    process.exit(1);
+  }
 }
 
 async function extractConceptsFromLexical(packetKey) {

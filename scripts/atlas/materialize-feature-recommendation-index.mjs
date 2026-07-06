@@ -31,7 +31,7 @@ function argValue(name) {
 }
 
 const hasLimitArg = process.argv.some((value) => value === '--limit' || value.startsWith('--limit='));
-const LIMIT = Number(argValue('limit') ?? 500);
+const LIMIT = Number(argValue('limit') ?? 1000);
 const OFFSET = Number(argValue('offset') ?? 0);
 
 if (APPLY && !hasLimitArg) {
@@ -107,6 +107,7 @@ function deriveFeatureRecommendation(row) {
     max_page_rank: toFloat(row.max_page_rank, null),
     community_id: row.community_id !== null && row.community_id !== undefined ? Number(row.community_id) : null,
     som_cluster: row.som_cluster !== null && row.som_cluster !== undefined ? Number(row.som_cluster) : null,
+    qdrant_keyed_count: toInt(row.qdrant_keyed_count, 0),
     entity_count: entityCount,
     bitfrost_keyed_count: bitfrostKeyedCount,
     tree_linked_count: treeLinkedCount,
@@ -159,6 +160,7 @@ async function ensureTable() {
       max_page_rank REAL,
       community_id INTEGER,
       som_cluster INTEGER,
+      qdrant_keyed_count INTEGER NOT NULL DEFAULT 0,
       entity_count INTEGER NOT NULL DEFAULT 0,
       bitfrost_keyed_count INTEGER NOT NULL DEFAULT 0,
       tree_linked_count INTEGER NOT NULL DEFAULT 0,
@@ -194,6 +196,7 @@ async function ensureTable() {
       ADD COLUMN IF NOT EXISTS max_page_rank REAL,
       ADD COLUMN IF NOT EXISTS community_id INTEGER,
       ADD COLUMN IF NOT EXISTS som_cluster INTEGER,
+      ADD COLUMN IF NOT EXISTS qdrant_keyed_count INTEGER NOT NULL DEFAULT 0,
       ADD COLUMN IF NOT EXISTS entity_count INTEGER NOT NULL DEFAULT 0,
       ADD COLUMN IF NOT EXISTS bitfrost_keyed_count INTEGER NOT NULL DEFAULT 0,
       ADD COLUMN IF NOT EXISTS tree_linked_count INTEGER NOT NULL DEFAULT 0,
@@ -241,6 +244,7 @@ async function readRows() {
         MAX(afe.pagerank) AS max_page_rank,
         MAX(afe.community_id) AS community_id,
         MAX(afe.som_cluster) AS som_cluster,
+        COUNT(*) FILTER (WHERE NULLIF(ap.qdrant_point_id::text, '') IS NOT NULL)::int AS qdrant_keyed_count,
         COUNT(*) FILTER (WHERE COALESCE(array_length(afe.entities, 1), 0) > 0)::int AS entity_count,
         COUNT(*) FILTER (WHERE afe.packet_key IS NOT NULL)::int AS bitfrost_keyed_count,
         COUNT(*) FILTER (WHERE NULLIF(afe.tree_node_id, '') IS NOT NULL)::int AS tree_linked_count,
@@ -275,6 +279,7 @@ async function readRows() {
         (ARRAY_AGG(NULLIF(afe.packet_key, '') ORDER BY COALESCE(afe.summary_rank_score, 0) DESC NULLS LAST, afe.packet_key ASC))[1] AS packet_key,
         (ARRAY_AGG(NULLIF(afe.source_ref, '') ORDER BY COALESCE(afe.summary_rank_score, 0) DESC NULLS LAST, afe.packet_key ASC))[1] AS source_ref
       FROM atlas_feature_envelopes afe
+      LEFT JOIN atlas_packets ap ON ap.packet_key = afe.packet_key
       WHERE afe.feature_id IS NOT NULL AND afe.feature_id <> ''
       GROUP BY afe.feature_id
     )
@@ -315,6 +320,7 @@ async function upsertRows(rows) {
       max_page_rank,
       community_id,
       som_cluster,
+      qdrant_keyed_count,
       entity_count,
       bitfrost_keyed_count,
       tree_linked_count,
@@ -340,8 +346,8 @@ async function upsertRows(rows) {
     VALUES (
       $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
       $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
-      $21, $22, $23, $24, $25, $26::jsonb, $27::jsonb, $28::jsonb, $29::jsonb,
-      $30, $31, $32, NOW()
+      $21, $22, $23, $24, $25, $26, $27::jsonb, $28::jsonb, $29::jsonb, $30::jsonb,
+      $31, $32, $33, NOW()
     )
     ON CONFLICT (feature_id) DO UPDATE SET
       feature_label = EXCLUDED.feature_label,
@@ -355,6 +361,7 @@ async function upsertRows(rows) {
       max_page_rank = EXCLUDED.max_page_rank,
       community_id = EXCLUDED.community_id,
       som_cluster = EXCLUDED.som_cluster,
+      qdrant_keyed_count = EXCLUDED.qdrant_keyed_count,
       entity_count = EXCLUDED.entity_count,
       bitfrost_keyed_count = EXCLUDED.bitfrost_keyed_count,
       tree_linked_count = EXCLUDED.tree_linked_count,
@@ -394,6 +401,7 @@ async function upsertRows(rows) {
       row.max_page_rank,
       row.community_id,
       row.som_cluster,
+      row.qdrant_keyed_count,
       row.entity_count,
       row.bitfrost_keyed_count,
       row.tree_linked_count,

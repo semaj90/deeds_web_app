@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-07-05T21:49:44.640Z",
+  "mode": "dry-run",
+  "inputs": {
+    "ndjson": ".tmp/semantic-training-rows.ndjson"
+  },
+  "outputs": {
+    "model": ".tmp/semantic-naive-bayes-model.json"
+  },
+  "summary": {
+    "trainingRows": 20,
+    "classes": [
+      "SemanticError"
+    ],
+    "vocabularySize": 63
+  },
+  "nextSafeAction": "Apply predictions to atlas_packet_metrics.naive_bayes_predictions, then route HMM states to kanban actions."
+}

@@ -123,6 +123,18 @@ function classifyGaps(row) {
     });
   }
 
+  if (row.qdrant_keyed_count !== undefined && +row.qdrant_keyed_count < +row.packet_count) {
+    const missing = +row.packet_count - +row.qdrant_keyed_count;
+    tasks.push({
+      gap:      'missing_qdrant_bridge',
+      priority: 20 + Math.min(missing, 25),
+      title:    `Qdrant bridge materialization for ${missing} packets`,
+      command:  'npm run atlas:packet-qdrant-links:apply',
+      detail:   `${row.qdrant_keyed_count}/${row.packet_count} packets have qdrant_point_id`,
+      packets:  missing,
+    });
+  }
+
   if (+row.lexically_rich_count < +row.packet_count / 2) {
     tasks.push({
       gap:      'low_lexical_coverage',
@@ -161,6 +173,7 @@ async function run() {
       max_page_rank,
       community_id,
       som_cluster,
+      qdrant_keyed_count,
       entity_count,
       bitfrost_keyed_count,
       tree_linked_count,
@@ -176,6 +189,7 @@ async function run() {
         + missing_som_count * 1
         + CASE WHEN entity_count = 0 AND summary_count > 0 THEN 15 ELSE 0 END
         + CASE WHEN tree_linked_count < packet_count THEN (packet_count - tree_linked_count) ELSE 0 END
+        + CASE WHEN qdrant_keyed_count < packet_count THEN (packet_count - qdrant_keyed_count) ELSE 0 END
         + COALESCE(ROUND(avg_page_rank::numeric * 10), 0)
       ) AS todo_score
     FROM atlas_feature_recommendation_index
@@ -184,6 +198,7 @@ async function run() {
        OR missing_community_count > 0
        OR entity_count = 0
        OR tree_linked_count < packet_count
+       OR qdrant_keyed_count < packet_count
     ORDER BY todo_score DESC
     LIMIT $1
   `, [LIMIT]);
@@ -198,6 +213,8 @@ async function run() {
         feature_label: row.feature_label ?? row.feature_id,
         domain_class:  row.domain_class,
         packet_count:  +row.packet_count,
+        qdrant_keyed_count: +row.qdrant_keyed_count || 0,
+        tree_linked_count: +row.tree_linked_count || 0,
         todo_score:    +row.todo_score,
         ...task,
       });
@@ -257,6 +274,7 @@ async function run() {
       SUM(missing_som_count)       AS total_missing_som,
       COUNT(*) FILTER (WHERE entity_count = 0 AND summary_count > 0) AS features_without_entities,
       COUNT(*) FILTER (WHERE tree_linked_count < packet_count)        AS features_with_tree_gaps,
+      COUNT(*) FILTER (WHERE qdrant_keyed_count < packet_count)       AS features_with_qdrant_gaps,
       SUM(packet_count)            AS total_packets,
       SUM(summary_count)           AS total_summarized
     FROM atlas_feature_recommendation_index
@@ -271,6 +289,7 @@ async function run() {
   console.log(`  Missing SOM cluster:        ${g.total_missing_som}`);
   console.log(`  Features without entities:  ${g.features_without_entities}`);
   console.log(`  Features with tree gaps:    ${g.features_with_tree_gaps}`);
+  console.log(`  Features with qdrant gaps:  ${g.features_with_qdrant_gaps}`);
 
   console.log('\n🎯 RECOMMENDED NEXT COMMANDS (in order)\n');
   for (const r of rollup.slice(0, 5)) {

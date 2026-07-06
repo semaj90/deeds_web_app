@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-07-05T22:49:52.647Z",
+  "summary": {
+    "packetsProcessed": 1000,
+    "tuplesExtracted": 16106,
+    "tuplesNormalized": 16003,
+    "avgTuplesPerPacket": "16.00"
+  },
+  "coverage": {
+    "schema_tuples": {
+      "count": 1000,
+      "pct": "100.0"
+    },
+    "ontology_tuples": {
+      "count": 1000,
+      "pct": "100.0"
+    },
+    "topology_tuples": {
+      "count": 1000,
+      "pct": "100.0"
+    },
+    "lexical_tuples": {
+      "count": 1000,
+      "pct": "100.0"
+    },
+    "concept_tuples": {
+      "count": 1000,
+      "pct": "100.0"
+    }
+  }
+}

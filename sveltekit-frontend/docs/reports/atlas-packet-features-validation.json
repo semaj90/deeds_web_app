@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-07-05T18:24:18.360Z",
+  "summary": {
+    "total_packets": "58365",
+    "features_populated": "58365",
+    "features_coverage_pct": 100,
+    "avg_concept_coverage": 25.66
+  },
+  "coverage": {
+    "used_concepts": {
+      "count": "58360",
+      "total": "58365",
+      "pct": 99.99
+    },
+    "lexical_features": {
+      "count": "1418",
+      "total": "58365",
+      "pct": 2.43
+    },
+    "ast_symbols": {
+      "count": "61",
+      "total": "58365",
+      "pct": 0.1
+    }
+  },
+  "gaps": {
+    "missing_all_features": "0",
+    "missing_used_concepts": "0",
+    "missing_lexical_features": "0",
+    "missing_ast_symbols": "0"
+  },
+  "acceptance_criteria": {
+    "features_coverage_gte_95_pct": true,
+    "used_concepts_coverage_gte_95_pct": true,
+    "lexical_features_coverage_gte_80_pct": false
+  }
+}

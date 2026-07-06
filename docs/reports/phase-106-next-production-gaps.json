@@ -1,0 +1,365 @@
+{
+  "generatedAt": "2026-07-05T21:50:11.815Z",
+  "mode": "dry-run",
+  "inputs": {
+    "packetSource": "atlas_packets + atlas_packet_features + atlas_packet_metrics",
+    "limit": 20,
+    "offset": 0
+  },
+  "summary": {
+    "rowsProcessed": 20,
+    "stateCounts": {
+      "QdrantBridgeError": 20
+    },
+    "topMissingFields": [
+      [
+        "qdrant_point_id",
+        20
+      ]
+    ]
+  },
+  "nextActions": [
+    {
+      "packet_key": "0ba2345cd9c542fa",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "0bffe0382a0d44bb",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "0ee918abc8c53e8d",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "1703d9c005252a62",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "175066b8a4ceee3c",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "17dc1fe9f5f8a021",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "1d5eba7211dea6f9",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "25c824811a2efd81",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "271b5446f6a86a48",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "28e942decdcdb342",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "313d57f685058b60",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "322b9cf893125f07",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "32c7446a769f9c86",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "35afe6ea3fdb17b8",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "368c71501e9385c5",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "38da098bc2c36c22",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "3bf3bc0c64d433c0",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "3d0da82598d9064a",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    },
+    {
+      "packet_key": "3edd306a02055c3a",
+      "state": "QdrantBridgeError",
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply",
+      "title_id": "grpc_service",
+      "feature_id": "grpc_service"
+    }
+  ],
+  "evidence": [
+    {
+      "packet_key": "0ba2345cd9c542fa",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "0bffe0382a0d44bb",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "0ee918abc8c53e8d",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "1703d9c005252a62",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "175066b8a4ceee3c",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "17dc1fe9f5f8a021",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "1d5eba7211dea6f9",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "25c824811a2efd81",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "271b5446f6a86a48",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "28e942decdcdb342",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "313d57f685058b60",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "322b9cf893125f07",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "32c7446a769f9c86",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "35afe6ea3fdb17b8",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "368c71501e9385c5",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "38da098bc2c36c22",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "3bf3bc0c64d433c0",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "3d0da82598d9064a",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    },
+    {
+      "packet_key": "3edd306a02055c3a",
+      "state": "QdrantBridgeError",
+      "missing_fields": [
+        "qdrant_point_id"
+      ],
+      "lane": "qdrant_bridge",
+      "command": "npm run atlas:qdrant-payload:sync:apply"
+    }
+  ]
+}

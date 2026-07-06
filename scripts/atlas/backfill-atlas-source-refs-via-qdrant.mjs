@@ -35,7 +35,7 @@ const LIMIT_ARG = process.argv.find((a) => a.startsWith('--limit='));
 const LIMIT = LIMIT_ARG ? parseInt(LIMIT_ARG.split('=')[1], 10) : 0;
 const MIN_SCORE_ARG = process.argv.find((a) => a.startsWith('--min-score='));
 const MIN_SCORE = MIN_SCORE_ARG ? parseFloat(MIN_SCORE_ARG.split('=')[1]) : 0.90;
-const BATCH_SIZE = 20;
+const BATCH_SIZE = parseInt(process.argv.find((a) => a.startsWith('--batch-size='))?.split('=')[1] ?? '200', 10);
 
 function buildPacketKey(sourceRef, packetId) {
   const ref = normalizeSourceRef(sourceRef) || sourceRef || '';
@@ -92,8 +92,9 @@ async function main() {
 
   console.log('\n🔍 Atlas Packets — Source Ref Backfill via Qdrant ANN (Phase 3I)');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-  console.log(`  Min score threshold: ${MIN_SCORE}`);
-  console.log(`  Qdrant collection:   ${COLLECTION}\n`);
+    console.log(`  Min score threshold: ${MIN_SCORE}`);
+    console.log(`  Qdrant collection:   ${COLLECTION}`);
+    console.log(`  Batch size:          ${BATCH_SIZE}\n`);
 
   try {
     // Check vector format
@@ -156,6 +157,9 @@ async function main() {
 
     for (let i = 0; i < res.rows.length; i += BATCH_SIZE) {
       const batch = res.rows.slice(i, i + BATCH_SIZE);
+      const updates = [];
+      const params = [];
+      let p = 1;
 
       for (const row of batch) {
         // Parse embedding from Postgres vector text format like '[0.1,0.2,...]'
@@ -220,18 +224,36 @@ async function main() {
           continue;
         }
 
+        updates.push(`($${p}, $${p + 1}, $${p + 2}, $${p + 3}, $${p + 4})`);
+        params.push(canonRef, rawPath, sourceKind, packetKey, row.packet_id);
+        p += 5;
+        fixed++;
+      }
+
+      if (!DRY_RUN && updates.length > 0) {
         try {
-          const sets = [`source_ref = $1`, `source_path = $2`, `source_kind = $3`, `packet_key = $4`];
-          const params = [canonRef, rawPath, sourceKind, packetKey];
-          if (cols.has('updated_at')) sets.push(`updated_at = now()`);
-          await pool.query(
-            `UPDATE atlas_packets SET ${sets.join(', ')} WHERE packet_id = $5`,
-            [...params, row.packet_id]
+          const updateRes = await pool.query(
+            `
+            UPDATE atlas_packets AS ap
+            SET
+              source_ref = COALESCE(NULLIF(ap.source_ref, ''), data.source_ref),
+              source_path = COALESCE(NULLIF(ap.source_path, ''), data.source_path),
+              source_kind = COALESCE(NULLIF(ap.source_kind, ''), data.source_kind),
+              packet_key = COALESCE(NULLIF(ap.packet_key, ''), data.packet_key)
+              ${cols.has('updated_at') ? ', updated_at = now()' : ''}
+            FROM (
+              VALUES ${updates.join(', ')}
+            ) AS data(source_ref, source_path, source_kind, packet_key, packet_id)
+            WHERE ap.packet_id = data.packet_id
+            `,
+            params
           );
-          fixed++;
+          if (updateRes.rowCount !== updates.length) {
+            console.warn(`  ⚠ Batch updated ${updateRes.rowCount}/${updates.length} rows`);
+          }
         } catch (e) {
-          console.error(`  ⚠ Update failed for ${row.packet_id}: ${e.message}`);
-          failed++;
+          console.error(`  ⚠ Batch update failed: ${e.message}`);
+          failed += updates.length;
         }
       }
 

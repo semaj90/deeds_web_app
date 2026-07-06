@@ -1,0 +1,503 @@
+{
+  "generated_at": "2026-07-05T23:52:46.003Z",
+  "mode": "apply",
+  "limit": 1000,
+  "offset": 0,
+  "page_size": 1000,
+  "top_k": 5,
+  "rows_exported": 1000,
+  "valid_rows": 1000,
+  "rejected_rows": 0,
+  "pages_exported": 1,
+  "top_clusters": [
+    {
+      "cluster_key": "retrieval::55::crates.invoked",
+      "domain_class": "retrieval",
+      "ontology_label": null,
+      "topology_label": "55",
+      "feature_id": "crates.invoked",
+      "title_id": "invoked.timestamp",
+      "count": 3,
+      "top_rows": [
+        {
+          "packet_key": "packet:114492a19ff1",
+          "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-fee07e3d99204579/invoked.timestamp",
+          "feature_id": "crates.invoked",
+          "title_id": "invoked.timestamp",
+          "domain_class": "retrieval",
+          "topology_label": "55",
+          "rank": 512,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This feature provides a timestamp representing when the `invoked` structure was last updated or created. --- **Example Usage:** If you need to check the freshness of the `invoked` data, you can compare the current time with `invoked.timestamp` to see if an update has occurred since a specific point in time. **Key Concept:** It allows for time-sensitive validation, ensuring that the data being used"
+        },
+        {
+          "packet_key": "packet:114492a19ff1",
+          "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-fee07e3d99204579/invoked.timestamp",
+          "feature_id": "crates.invoked",
+          "title_id": "invoked.timestamp",
+          "domain_class": "retrieval",
+          "topology_label": "55",
+          "rank": 513,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This feature provides a timestamp representing when the `invoked` structure was last updated or created. --- **Example Usage:** If you need to check the freshness of the `invoked` data, you can compare the current time with `invoked.timestamp` to see if an update has occurred since a specific point in time. **Key Concept:** It allows for time-sensitive validation, ensuring that the data being used"
+        },
+        {
+          "packet_key": "packet:031267dc19bc",
+          "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-cd5bd18126f0170d/invoked.timestamp",
+          "feature_id": "crates.invoked",
+          "title_id": "invoked.timestamp",
+          "domain_class": "retrieval",
+          "topology_label": "-55",
+          "rank": 853,
+          "rank_score": 27,
+          "rank_status": "BLOCKED",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This group represents invocation timestamps generated during the build process for the `napi` crate. The data is retrieved using the `crates.invoked` feature, specifically targeting the `invoked.timestamp` label. Operators should examine the associated summary packets to confirm the build timing and ensure consistency across build artifacts. Next, verify that the recorded timestamps align with exp"
+        }
+      ],
+      "dag_hits": 0,
+      "kag_hits": 0,
+      "rag_hits": 0
+    },
+    {
+      "cluster_key": "agent::116::simd.bridge.cargo",
+      "domain_class": "agent",
+      "ontology_label": null,
+      "topology_label": "-116",
+      "feature_id": "simd-bridge.Cargo",
+      "title_id": "cargo.lock",
+      "count": 2,
+      "top_rows": [
+        {
+          "packet_key": "packet:03d9c8b9c4a4",
+          "source_ref": "simd-bridge/rust/hmm-repair/Cargo.lock",
+          "feature_id": "simd-bridge.Cargo",
+          "title_id": "cargo.lock",
+          "domain_class": "agent",
+          "topology_label": "-116",
+          "rank": 128,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This file is a lock file that records the exact versions of all dependencies used in the project, ensuring reproducible builds across different environments. --- **Example 1: Feature: Build Script** **Summary:** This feature refers to code that runs during the build process, often used for setup or generating necessary files before"
+        },
+        {
+          "packet_key": "packet:03d9c8b9c4a4",
+          "source_ref": "simd-bridge/rust/hmm-repair/Cargo.lock",
+          "feature_id": "simd-bridge.Cargo",
+          "title_id": "cargo.lock",
+          "domain_class": "agent",
+          "topology_label": "-116",
+          "rank": 990,
+          "rank_score": 27,
+          "rank_status": "BLOCKED",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This group summarizes changes related to the Cargo.lock file within the `simd-bridge/rust/hmm-repair` context. The primary retrieval mechanism is via the `simd-bridge.Cargo` feature. Operators should review the summary to understand dependency resolution changes reflected in the lock file. Next steps involve validating the updated dependency constraints against the project's build requirements."
+        }
+      ],
+      "dag_hits": 0,
+      "kag_hits": 0,
+      "rag_hits": 0
+    },
+    {
+      "cluster_key": "agent::121::simd.bridge.cfg.if.b7ab4ef2a53904cf",
+      "domain_class": "agent",
+      "ontology_label": null,
+      "topology_label": "-121",
+      "feature_id": "simd-bridge.cfg_if-b7ab4ef2a53904cf",
+      "title_id": "cfg.if.b7ab4ef2a53904cf.d",
+      "count": 2,
+      "top_rows": [
+        {
+          "packet_key": "packet:112808d36371",
+          "source_ref": "simd-bridge/rust/hmm-repair/target/release/deps/cfg_if-b7ab4ef2a53904cf.d",
+          "feature_id": "simd-bridge.cfg_if-b7ab4ef2a53904cf",
+          "title_id": "cfg.if.b7ab4ef2a53904cf.d",
+          "domain_class": "agent",
+          "topology_label": "-121",
+          "rank": 464,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This file appears to be a configuration definition file used by the build system, likely handling conditional compilation based on specific build targets or environments. --- **Self-Correction/Refinement:** The provided summary is accurate, but I can make it more direct by focusing on its *function* rather than just its *nature*. **Revised Summary:** This file acts as a build configuration definit"
+        },
+        {
+          "packet_key": "packet:112808d36371",
+          "source_ref": "simd-bridge/rust/hmm-repair/target/release/deps/cfg_if-b7ab4ef2a53904cf.d",
+          "feature_id": "simd-bridge.cfg_if-b7ab4ef2a53904cf",
+          "title_id": "cfg.if.b7ab4ef2a53904cf.d",
+          "domain_class": "agent",
+          "topology_label": "-121",
+          "rank": 465,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This file appears to be a configuration definition file used by the build system, likely handling conditional compilation based on specific build targets or environments. --- **Self-Correction/Refinement:** The provided summary is accurate, but I can make it more direct by focusing on its *function* rather than just its *nature*. **Revised Summary:** This file acts as a build configuration definit"
+        }
+      ],
+      "dag_hits": 0,
+      "kag_hits": 0,
+      "rag_hits": 0
+    },
+    {
+      "cluster_key": "agent::149::scripts.prompt.generator",
+      "domain_class": "agent",
+      "ontology_label": null,
+      "topology_label": "149",
+      "feature_id": "scripts.prompt-generator",
+      "title_id": "prompt.generator.mjs",
+      "count": 2,
+      "top_rows": [
+        {
+          "packet_key": "packet:02859afee87d",
+          "source_ref": "scripts/agent/prompt-generator.mjs",
+          "feature_id": "scripts.prompt-generator",
+          "title_id": "prompt.generator.mjs",
+          "domain_class": "agent",
+          "topology_label": "149",
+          "rank": 5,
+          "rank_score": 40,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This module is responsible for generating structured prompts for the AI agent, allowing customization based on the specific task or context. --- **Example Usage:** If the user wants the agent to act as a \"Code Reviewer,\" this module can construct a prompt that includes instructions, context, and the specific code snippet"
+        },
+        {
+          "packet_key": "packet:02859afee87d",
+          "source_ref": "scripts/agent/prompt-generator.mjs",
+          "feature_id": "scripts.prompt-generator",
+          "title_id": "prompt.generator.mjs",
+          "domain_class": "agent",
+          "topology_label": "149",
+          "rank": 612,
+          "rank_score": 29,
+          "rank_status": "BLOCKED",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This packet group contains the core logic for generating structured prompts used by the agent. Retrieval should be performed using the feature ID, 'scripts.prompt-generator'. The operator should review the summary content to understand the current prompt generation mechanisms and test specific use cases."
+        }
+      ],
+      "dag_hits": 0,
+      "kag_hits": 0,
+      "rag_hits": 0
+    },
+    {
+      "cluster_key": "agent::188::simd.bridge.invoked",
+      "domain_class": "agent",
+      "ontology_label": null,
+      "topology_label": "-188",
+      "feature_id": "simd-bridge.invoked",
+      "title_id": "invoked.timestamp",
+      "count": 2,
+      "top_rows": [
+        {
+          "packet_key": "packet:0b13f0aaa9b6",
+          "source_ref": "simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-d9ef1d8a31833ee2/invoked.timestamp",
+          "feature_id": "simd-bridge.invoked",
+          "title_id": "invoked.timestamp",
+          "domain_class": "agent",
+          "topology_label": "-188",
+          "rank": 340,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This feature provides a timestamp indicating when the associated code was last invoked. --- *Self-Correction/Refinement:* The provided summary is accurate, but I can make it more concise by focusing on the *purpose* of the feature rather than just restating the definition. **Revised Summary:** This feature exposes a timestamp that records the last time the associated code was executed, useful for "
+        },
+        {
+          "packet_key": "packet:0b13f0aaa9b6",
+          "source_ref": "simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-d9ef1d8a31833ee2/invoked.timestamp",
+          "feature_id": "simd-bridge.invoked",
+          "title_id": "invoked.timestamp",
+          "domain_class": "agent",
+          "topology_label": "-188",
+          "rank": 341,
+          "rank_score": 38,
+          "rank_status": "PARTIAL",
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0,
+          "summary": "This feature provides a timestamp indicating when the associated code was last invoked. --- *Self-Correction/Refinement:* The provided summary is accurate, but I can make it more concise by focusing on the *purpose* of the feature rather than just restating the definition. **Revised Summary:** This feature exposes a timestamp that records the last time the associated code was executed, useful for "
+        }
+      ],
+      "dag_hits": 0,
+      "kag_hits": 0,
+      "rag_hits": 0
+    }
+  ],
+  "rejected": [],
+  "pages": [
+    {
+      "page": 1,
+      "offset": 0,
+      "row_count": 1000,
+      "valid_count": 1000,
+      "rejected_count": 0,
+      "clusters": [
+        {
+          "cluster_key": "retrieval::55::crates.invoked",
+          "domain_class": "retrieval",
+          "ontology_label": null,
+          "topology_label": "55",
+          "feature_id": "crates.invoked",
+          "title_id": "invoked.timestamp",
+          "count": 3,
+          "top_rows": [
+            {
+              "packet_key": "packet:114492a19ff1",
+              "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-fee07e3d99204579/invoked.timestamp",
+              "feature_id": "crates.invoked",
+              "title_id": "invoked.timestamp",
+              "domain_class": "retrieval",
+              "topology_label": "55",
+              "rank": 512,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This feature provides a timestamp representing when the `invoked` structure was last updated or created. --- **Example Usage:** If you need to check the freshness of the `invoked` data, you can compare the current time with `invoked.timestamp` to see if an update has occurred since a specific point in time. **Key Concept:** It allows for time-sensitive validation, ensuring that the data being used"
+            },
+            {
+              "packet_key": "packet:114492a19ff1",
+              "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/libm-fee07e3d99204579/invoked.timestamp",
+              "feature_id": "crates.invoked",
+              "title_id": "invoked.timestamp",
+              "domain_class": "retrieval",
+              "topology_label": "55",
+              "rank": 513,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This feature provides a timestamp representing when the `invoked` structure was last updated or created. --- **Example Usage:** If you need to check the freshness of the `invoked` data, you can compare the current time with `invoked.timestamp` to see if an update has occurred since a specific point in time. **Key Concept:** It allows for time-sensitive validation, ensuring that the data being used"
+            },
+            {
+              "packet_key": "packet:031267dc19bc",
+              "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/napi-cd5bd18126f0170d/invoked.timestamp",
+              "feature_id": "crates.invoked",
+              "title_id": "invoked.timestamp",
+              "domain_class": "retrieval",
+              "topology_label": "-55",
+              "rank": 853,
+              "rank_score": 27,
+              "rank_status": "BLOCKED",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This group represents invocation timestamps generated during the build process for the `napi` crate. The data is retrieved using the `crates.invoked` feature, specifically targeting the `invoked.timestamp` label. Operators should examine the associated summary packets to confirm the build timing and ensure consistency across build artifacts. Next, verify that the recorded timestamps align with exp"
+            }
+          ],
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0
+        },
+        {
+          "cluster_key": "agent::116::simd.bridge.cargo",
+          "domain_class": "agent",
+          "ontology_label": null,
+          "topology_label": "-116",
+          "feature_id": "simd-bridge.Cargo",
+          "title_id": "cargo.lock",
+          "count": 2,
+          "top_rows": [
+            {
+              "packet_key": "packet:03d9c8b9c4a4",
+              "source_ref": "simd-bridge/rust/hmm-repair/Cargo.lock",
+              "feature_id": "simd-bridge.Cargo",
+              "title_id": "cargo.lock",
+              "domain_class": "agent",
+              "topology_label": "-116",
+              "rank": 128,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This file is a lock file that records the exact versions of all dependencies used in the project, ensuring reproducible builds across different environments. --- **Example 1: Feature: Build Script** **Summary:** This feature refers to code that runs during the build process, often used for setup or generating necessary files before"
+            },
+            {
+              "packet_key": "packet:03d9c8b9c4a4",
+              "source_ref": "simd-bridge/rust/hmm-repair/Cargo.lock",
+              "feature_id": "simd-bridge.Cargo",
+              "title_id": "cargo.lock",
+              "domain_class": "agent",
+              "topology_label": "-116",
+              "rank": 990,
+              "rank_score": 27,
+              "rank_status": "BLOCKED",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This group summarizes changes related to the Cargo.lock file within the `simd-bridge/rust/hmm-repair` context. The primary retrieval mechanism is via the `simd-bridge.Cargo` feature. Operators should review the summary to understand dependency resolution changes reflected in the lock file. Next steps involve validating the updated dependency constraints against the project's build requirements."
+            }
+          ],
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0
+        },
+        {
+          "cluster_key": "agent::121::simd.bridge.cfg.if.b7ab4ef2a53904cf",
+          "domain_class": "agent",
+          "ontology_label": null,
+          "topology_label": "-121",
+          "feature_id": "simd-bridge.cfg_if-b7ab4ef2a53904cf",
+          "title_id": "cfg.if.b7ab4ef2a53904cf.d",
+          "count": 2,
+          "top_rows": [
+            {
+              "packet_key": "packet:112808d36371",
+              "source_ref": "simd-bridge/rust/hmm-repair/target/release/deps/cfg_if-b7ab4ef2a53904cf.d",
+              "feature_id": "simd-bridge.cfg_if-b7ab4ef2a53904cf",
+              "title_id": "cfg.if.b7ab4ef2a53904cf.d",
+              "domain_class": "agent",
+              "topology_label": "-121",
+              "rank": 464,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This file appears to be a configuration definition file used by the build system, likely handling conditional compilation based on specific build targets or environments. --- **Self-Correction/Refinement:** The provided summary is accurate, but I can make it more direct by focusing on its *function* rather than just its *nature*. **Revised Summary:** This file acts as a build configuration definit"
+            },
+            {
+              "packet_key": "packet:112808d36371",
+              "source_ref": "simd-bridge/rust/hmm-repair/target/release/deps/cfg_if-b7ab4ef2a53904cf.d",
+              "feature_id": "simd-bridge.cfg_if-b7ab4ef2a53904cf",
+              "title_id": "cfg.if.b7ab4ef2a53904cf.d",
+              "domain_class": "agent",
+              "topology_label": "-121",
+              "rank": 465,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This file appears to be a configuration definition file used by the build system, likely handling conditional compilation based on specific build targets or environments. --- **Self-Correction/Refinement:** The provided summary is accurate, but I can make it more direct by focusing on its *function* rather than just its *nature*. **Revised Summary:** This file acts as a build configuration definit"
+            }
+          ],
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0
+        },
+        {
+          "cluster_key": "agent::149::scripts.prompt.generator",
+          "domain_class": "agent",
+          "ontology_label": null,
+          "topology_label": "149",
+          "feature_id": "scripts.prompt-generator",
+          "title_id": "prompt.generator.mjs",
+          "count": 2,
+          "top_rows": [
+            {
+              "packet_key": "packet:02859afee87d",
+              "source_ref": "scripts/agent/prompt-generator.mjs",
+              "feature_id": "scripts.prompt-generator",
+              "title_id": "prompt.generator.mjs",
+              "domain_class": "agent",
+              "topology_label": "149",
+              "rank": 5,
+              "rank_score": 40,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This module is responsible for generating structured prompts for the AI agent, allowing customization based on the specific task or context. --- **Example Usage:** If the user wants the agent to act as a \"Code Reviewer,\" this module can construct a prompt that includes instructions, context, and the specific code snippet"
+            },
+            {
+              "packet_key": "packet:02859afee87d",
+              "source_ref": "scripts/agent/prompt-generator.mjs",
+              "feature_id": "scripts.prompt-generator",
+              "title_id": "prompt.generator.mjs",
+              "domain_class": "agent",
+              "topology_label": "149",
+              "rank": 612,
+              "rank_score": 29,
+              "rank_status": "BLOCKED",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This packet group contains the core logic for generating structured prompts used by the agent. Retrieval should be performed using the feature ID, 'scripts.prompt-generator'. The operator should review the summary content to understand the current prompt generation mechanisms and test specific use cases."
+            }
+          ],
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0
+        },
+        {
+          "cluster_key": "agent::188::simd.bridge.invoked",
+          "domain_class": "agent",
+          "ontology_label": null,
+          "topology_label": "-188",
+          "feature_id": "simd-bridge.invoked",
+          "title_id": "invoked.timestamp",
+          "count": 2,
+          "top_rows": [
+            {
+              "packet_key": "packet:0b13f0aaa9b6",
+              "source_ref": "simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-d9ef1d8a31833ee2/invoked.timestamp",
+              "feature_id": "simd-bridge.invoked",
+              "title_id": "invoked.timestamp",
+              "domain_class": "agent",
+              "topology_label": "-188",
+              "rank": 340,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This feature provides a timestamp indicating when the associated code was last invoked. --- *Self-Correction/Refinement:* The provided summary is accurate, but I can make it more concise by focusing on the *purpose* of the feature rather than just restating the definition. **Revised Summary:** This feature exposes a timestamp that records the last time the associated code was executed, useful for "
+            },
+            {
+              "packet_key": "packet:0b13f0aaa9b6",
+              "source_ref": "simd-bridge/rust/hmm-repair/target/release/.fingerprint/quote-d9ef1d8a31833ee2/invoked.timestamp",
+              "feature_id": "simd-bridge.invoked",
+              "title_id": "invoked.timestamp",
+              "domain_class": "agent",
+              "topology_label": "-188",
+              "rank": 341,
+              "rank_score": 38,
+              "rank_status": "PARTIAL",
+              "dag_hits": 0,
+              "kag_hits": 0,
+              "rag_hits": 0,
+              "summary": "This feature provides a timestamp indicating when the associated code was last invoked. --- *Self-Correction/Refinement:* The provided summary is accurate, but I can make it more concise by focusing on the *purpose* of the feature rather than just restating the definition. **Revised Summary:** This feature exposes a timestamp that records the last time the associated code was executed, useful for "
+            }
+          ],
+          "dag_hits": 0,
+          "kag_hits": 0,
+          "rag_hits": 0
+        }
+      ]
+    }
+  ],
+  "page_files": [
+    {
+      "page": 1,
+      "json": ".tmp\\summary-topology-pages\\page-0001.json",
+      "ndjson": ".tmp\\summary-topology-pages\\page-0001.ndjson"
+    }
+  ]
+}

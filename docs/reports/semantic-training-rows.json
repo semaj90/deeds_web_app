@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-07-05T21:49:28.110Z",
+  "mode": "dry-run",
+  "inputs": {
+    "rejectedArchive": ".tmp/rejected-semantic-envelopes.ndjson",
+    "fallbackRejectedArchive": ".tmp/feature-extract-summary-batch.rejected.ndjson"
+  },
+  "outputs": {
+    "ndjson": ".tmp/semantic-training-rows.ndjson"
+  },
+  "summary": {
+    "acceptedRows": 20,
+    "rejectedRows": 0,
+    "totalRows": 20,
+    "labelCounts": {
+      "SemanticError": 20
+    },
+    "coldArchivePath": ".tmp/rejected-semantic-envelopes.ndjson"
+  },
+  "nextSafeAction": "Train the Naive Bayes packet-features model from the balanced accepted/rejected training rows, then apply soft-evidence predictions."
+}

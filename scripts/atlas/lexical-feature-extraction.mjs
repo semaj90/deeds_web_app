@@ -27,6 +27,7 @@ import { config } from 'dotenv';
 import { resolve } from 'path';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
+import { extractLexicalTuples, extractOntologyTuple } from './lib/semantic-tuple-extractor.mjs';
 
 config({ path: resolve('.', '.env') });
 
@@ -44,84 +45,6 @@ console.log('║  Lexical Feature Extraction Lane                              �
 console.log('║  Keywords, ngrams, trigrams, engrams for recall indexing      ║');
 console.log(`║  Mode: ${APPLY ? 'APPLY' : 'DRY-RUN'.padEnd(54)}║`);
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
-
-/**
- * Extract lexical features from text
- */
-function extractLexicalFeatures(text) {
-  if (!text || text.length === 0) {
-    return { keywords: [], ngrams: [], trigrams: [], engrams: [] };
-  }
-
-  const results = {
-    keywords: [],
-    ngrams: [],
-    trigrams: [],
-    engrams: [],
-  };
-
-  // Normalize text
-  const normalized = text.toLowerCase().trim();
-
-  // ════════════════════════════════════════════════════════════════
-  // KEYWORDS: domain nouns/verbs (word-level, common English words excluded)
-  // ════════════════════════════════════════════════════════════════
-
-  const stopwords = new Set([
-    'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'is', 'are', 'was', 'were',
-    'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must',
-    'can', 'that', 'this', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'what', 'which', 'who',
-    'when', 'where', 'why', 'how', 'all', 'each', 'every', 'both', 'few', 'more', 'most', 'some', 'any',
-  ]);
-
-  const words = normalized
-    .replace(/[^\w\s_-]/g, ' ')
-    .split(/\s+/)
-    .filter(w => w.length > 2 && !stopwords.has(w));
-
-  results.keywords = [...new Set(words.slice(0, 20))]; // Unique, top 20
-
-  // ════════════════════════════════════════════════════════════════
-  // NGRAMS: 2-3 word sequences (for phrase-based recall)
-  // ════════════════════════════════════════════════════════════════
-
-  for (let n = 2; n <= 3; n++) {
-    const ngrams = [];
-    for (let i = 0; i <= words.length - n; i++) {
-      const gram = words.slice(i, i + n).join('_');
-      if (gram.length > 3) {
-        ngrams.push(gram);
-      }
-    }
-    results.ngrams.push(...ngrams.slice(0, 10)); // Top 10 per n
-  }
-  results.ngrams = [...new Set(results.ngrams)];
-
-  // ════════════════════════════════════════════════════════════════
-  // TRIGRAMS: char-level 3-grams (for fuzzy/typo matching)
-  // ════════════════════════════════════════════════════════════════
-
-  const trigrams = [];
-  const cleanText = normalized.replace(/\s+/g, '_');
-  for (let i = 0; i < cleanText.length - 2; i++) {
-    trigrams.push(cleanText.substring(i, i + 3));
-  }
-  results.trigrams = [...new Set(trigrams)].slice(0, 30); // Top 30
-
-  // ════════════════════════════════════════════════════════════════
-  // ENGRAMS: entity n-grams (camelCase, snake_case, paths)
-  // ════════════════════════════════════════════════════════════════
-
-  const entityMatches = [
-    ...normalized.match(/[a-z]+[A-Z][a-zA-Z]*/g) || [], // camelCase
-    ...normalized.match(/[a-z_]+\/[a-z_\/]+/g) || [], // paths
-    ...normalized.match(/[A-Z][a-z]+/g) || [], // PascalCase
-    ...normalized.match(/_[a-z_]+/g) || [], // _snake_case
-  ];
-  results.engrams = [...new Set(entityMatches.filter(e => e.length > 2))].slice(0, 15);
-
-  return results;
-}
 
 async function lexicalFeatureExtraction() {
   try {
@@ -158,7 +81,7 @@ async function lexicalFeatureExtraction() {
 
       console.log('Sample lexical extraction:');
       for (const row of sampleRes.rows) {
-        const features = extractLexicalFeatures(row.summary);
+        const features = extractLexicalTuples(row.summary);
         console.log(`\n  ${row.feature_id}`);
         console.log(`    Keywords (${features.keywords.length}): ${features.keywords.slice(0, 5).join(', ')}`);
         console.log(`    Ngrams (${features.ngrams.length}): ${features.ngrams.slice(0, 3).join(', ')}`);
@@ -227,19 +150,26 @@ async function lexicalFeatureExtraction() {
           continue;
         }
 
-        const features = extractLexicalFeatures(row.summary);
+        const lexical = extractLexicalTuples(row.summary);
+        const ontology = extractOntologyTuple(row);
 
         updates.push({
           packet_key: row.packet_key,
-          keywords: features.keywords,
-          ngrams: features.ngrams,
-          trigrams: features.trigrams,
-          engrams: features.engrams,
+          keywords: lexical.keywords,
+          ngrams: lexical.ngrams,
+          trigrams: lexical.trigrams,
+          engrams: lexical.engrams,
+          lexical_nouns: lexical.nouns,
+          lexical_verbs: lexical.verbs,
+          lexical_adjectives: lexical.adjectives,
+          title_id: ontology.title_id,
+          title_label: ontology.title_label,
+          domain_class: ontology.domain_class,
           all_lexical: [
-            ...features.keywords,
-            ...features.ngrams,
-            ...features.trigrams,
-            ...features.engrams,
+            ...lexical.keywords,
+            ...lexical.ngrams,
+            ...lexical.trigrams,
+            ...lexical.engrams,
           ],
         });
 
@@ -256,7 +186,7 @@ async function lexicalFeatureExtraction() {
       for (let i = 0; i < updates.length; i += BATCH_SIZE) {
         const batch = updates.slice(i, i + BATCH_SIZE);
 
-        const VALUES = batch.map((_, idx) => `($${idx * 5 + 1}, $${idx * 5 + 2}, $${idx * 5 + 3}, $${idx * 5 + 4}, $${idx * 5 + 5})`).join(',');
+        const VALUES = batch.map((_, idx) => `($${idx * 10 + 1}, $${idx * 10 + 2}, $${idx * 10 + 3}, $${idx * 10 + 4}, $${idx * 10 + 5}, $${idx * 10 + 6}, $${idx * 10 + 7}, $${idx * 10 + 8}, $${idx * 10 + 9}, $${idx * 10 + 10})`).join(',');
         const params = [];
 
         for (const update of batch) {
@@ -265,7 +195,12 @@ async function lexicalFeatureExtraction() {
             update.keywords,
             update.ngrams,
             update.trigrams,
-            update.engrams
+            update.engrams,
+            update.lexical_nouns,
+            update.lexical_verbs,
+            update.lexical_adjectives,
+            update.title_id,
+            update.domain_class
           );
         }
 
@@ -277,9 +212,18 @@ async function lexicalFeatureExtraction() {
             ngrams = v.ngrams::TEXT[],
             trigrams = v.trigrams::TEXT[],
             engrams = v.engrams::TEXT[],
+            metadata = COALESCE(ap.metadata, '{}'::jsonb) || jsonb_build_object(
+              'lexical_nouns', v.lexical_nouns::TEXT[],
+              'lexical_verbs', v.lexical_verbs::TEXT[],
+              'lexical_adjectives', v.lexical_adjectives::TEXT[],
+              'title_id', COALESCE(ap.title_id, v.title_id),
+              'domain_class', COALESCE(ap.domain_class, v.domain_class)
+            ),
+            title_id = COALESCE(ap.title_id, v.title_id),
+            domain_class = COALESCE(ap.domain_class, v.domain_class),
             updated_at = NOW()
           FROM (VALUES ${VALUES})
-          AS v(packet_key, keywords, ngrams, trigrams, engrams)
+          AS v(packet_key, keywords, ngrams, trigrams, engrams, lexical_nouns, lexical_verbs, lexical_adjectives, title_id, domain_class)
           WHERE ap.packet_key = v.packet_key
           `,
           params

@@ -28,12 +28,11 @@ const pgPool = new pg.Pool({ connectionString: POSTGRES_URL });
 const VERBOSE = process.argv.includes('--verbose');
 const GATES_ONLY = process.argv.includes('--gates-only');
 
-// NOTE: Currently som_cluster is deterministic hash (0-99, 10×10 grid)
-// True 20×20 training is deferred until autoencoder (768→64 latent) complete
+// NOTE: Validate the actual SOM contract through som_row + som_col.
+// som_cluster is a legacy label and may not encode the true 20×20 topology.
 const SOM_ROWS = 20;
 const SOM_COLS = 20;
 const SOM_CELLS = SOM_ROWS * SOM_COLS; // 400 (target)
-const CURRENT_SOM_CELLS = 100; // Actual: 10×10 deterministic hash
 const TOTAL_PACKETS = 58365; // Expected total
 const EXPECTED_PER_CELL = TOTAL_PACKETS / SOM_CELLS; // ~146 packets per cell
 
@@ -94,9 +93,9 @@ async function validateSOMTopology() {
     // Gate 1: SOM Cells Populated
     console.log('🔍 Gate 1: SOM Cells Populated');
     const cellRes = await pgPool.query(`
-      SELECT COUNT(DISTINCT som_cluster) AS populated_cells
+      SELECT COUNT(DISTINCT (som_row, som_col)) AS populated_cells
       FROM atlas_packets
-      WHERE som_cluster IS NOT NULL
+      WHERE som_row IS NOT NULL AND som_col IS NOT NULL
     `);
     const populatedCells = cellRes.rows[0]?.populated_cells ?? 0;
     const gate1Pass = populatedCells >= VALIDATION_GATES.som_cells_populated.min &&
@@ -106,11 +105,11 @@ async function validateSOMTopology() {
     console.log(`   Status: ${gate1Pass ? '✅ PASS' : '❌ FAIL'}\n`);
 
     // Gate 2: BMU Assignments
-    console.log('🔍 Gate 2: BMU Assignments (som_cluster not null)');
+    console.log('🔍 Gate 2: BMU Assignments (som_row + som_col not null)');
     const bmuRes = await pgPool.query(`
       SELECT COUNT(*) AS assigned_count
       FROM atlas_packets
-      WHERE som_cluster IS NOT NULL
+      WHERE som_row IS NOT NULL AND som_col IS NOT NULL
     `);
     const assignedCount = bmuRes.rows[0]?.assigned_count ?? 0;
     const gate2Pass = assignedCount >= VALIDATION_GATES.bmu_assignments.min;
@@ -123,11 +122,12 @@ async function validateSOMTopology() {
     console.log('🔍 Gate 3: Population Distribution (Shannon Entropy)');
     const distRes = await pgPool.query(`
       SELECT
-        som_cluster,
+        som_row,
+        som_col,
         COUNT(*) AS cell_count
       FROM atlas_packets
-      WHERE som_cluster IS NOT NULL
-      GROUP BY som_cluster
+      WHERE som_row IS NOT NULL AND som_col IS NOT NULL
+      GROUP BY som_row, som_col
       ORDER BY cell_count DESC
     `);
 
@@ -156,9 +156,7 @@ async function validateSOMTopology() {
     if (VERBOSE) {
       console.log('   Top 10 cells by population:');
       distRes.rows.slice(0, 10).forEach((row, idx) => {
-        const col = row.som_cluster % SOM_COLS;
-        const r = Math.floor(row.som_cluster / SOM_COLS);
-        console.log(`     ${idx + 1}. Cell [${r},${col}] (cluster ${row.som_cluster}): ${row.cell_count} packets`);
+        console.log(`     ${idx + 1}. Cell [${row.som_row},${row.som_col}]: ${row.cell_count} packets`);
       });
       console.log();
     }

@@ -1,0 +1,150 @@
+{
+  "generatedAt": "2026-07-05T21:50:11.834Z",
+  "mode": "dry-run",
+  "inputs": {
+    "packetSource": "atlas_packets + atlas_packet_features + atlas_packet_metrics"
+  },
+  "outputs": {
+    "ndjson": ".tmp/hmm-kanban-actions.ndjson"
+  },
+  "summary": {
+    "rowsProcessed": 20,
+    "actionsEmitted": 20,
+    "stateCounts": {
+      "VectorError": 20
+    }
+  },
+  "sample": [
+    {
+      "task_id": "hmm:0ba2345cd9c542fa",
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.830Z"
+    },
+    {
+      "task_id": "hmm:0bffe0382a0d44bb",
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:0ee918abc8c53e8d",
+      "packet_key": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:1703d9c005252a62",
+      "packet_key": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:175066b8a4ceee3c",
+      "packet_key": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:17dc1fe9f5f8a021",
+      "packet_key": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:1d5eba7211dea6f9",
+      "packet_key": "1d5eba7211dea6f9",
+      "source_ref": "proto:ChatAssistantService.SendMessage",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:1dc5ac2b3cd9bfe8",
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:25c824811a2efd81",
+      "packet_key": "25c824811a2efd81",
+      "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    },
+    {
+      "task_id": "hmm:271b5446f6a86a48",
+      "packet_key": "271b5446f6a86a48",
+      "source_ref": "proto:CyberElephantService.GetClusters",
+      "feature_id": "grpc_service",
+      "hmm_state": "VectorError",
+      "repair_lane": "embedding_backfill",
+      "confidence": 0,
+      "recommended_command": "npm run atlas:phase1:canonical:embeddings:apply",
+      "safe_scope": "bounded-repair",
+      "nb_hint": null,
+      "created_at": "2026-07-05T21:50:11.831Z"
+    }
+  ],
+  "nextSafeAction": "Use HMM states as deterministic repair routing, and keep Naive Bayes as soft evidence only."
+}

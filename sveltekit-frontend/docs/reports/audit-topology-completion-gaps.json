@@ -1,0 +1,51 @@
+{
+  "timestamp": "2026-07-05T22:20:02.420Z",
+  "summary": {
+    "total_packets": 58365,
+    "coverage": {
+      "som_cells": {
+        "present": 799,
+        "target": 400,
+        "coverage_pct": "199.75"
+      },
+      "tree_node_id": {
+        "present": 58365,
+        "total": 58365,
+        "coverage_pct": "100.00"
+      },
+      "qdrant_point_id": {
+        "present": 3092,
+        "total": 58365,
+        "coverage_pct": "5.30"
+      },
+      "pagerank": {
+        "present": 12616,
+        "total": 58365,
+        "coverage_pct": "21.62"
+      },
+      "community": {
+        "present": 12611,
+        "total": 58365,
+        "coverage_pct": "21.61"
+      },
+      "title_id": {
+        "present": 58365,
+        "total": 58365,
+        "coverage_pct": "100.00"
+      }
+    },
+    "gaps": {
+      "packets_missing_som": 61,
+      "packets_missing_tree_node_id": 0,
+      "packets_missing_qdrant_point_id": 55273,
+      "packets_missing_pagerank": 45749,
+      "packets_missing_title_id": 0
+    }
+  },
+  "topology_info": {
+    "som_grid_dims": "20×20",
+    "som_target_grid": "20×20 (400 cells)",
+    "som_cells_populated": 799,
+    "som_upgrade_gap": 0
+  }
+}

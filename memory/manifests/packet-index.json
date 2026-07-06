@@ -1,126 +1,131 @@
 {
   "artifact_path": "\\\\?\\C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\neschrom97-card-registry.json",
-  "total_rows": 30683,
+  "total_rows": 8200,
   "chunks": [
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0001.msgpack",
-      "row_count": 1270,
-      "byte_size": 43439
+      "row_count": 327,
+      "byte_size": 2800
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0002.msgpack",
-      "row_count": 1294,
-      "byte_size": 41954
+      "row_count": 331,
+      "byte_size": 2684
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0003.msgpack",
-      "row_count": 1295,
-      "byte_size": 44297
+      "row_count": 333,
+      "byte_size": 2725
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0004.msgpack",
-      "row_count": 1291,
-      "byte_size": 44333
+      "row_count": 335,
+      "byte_size": 2941
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0005.msgpack",
-      "row_count": 1304,
-      "byte_size": 43696
+      "row_count": 329,
+      "byte_size": 2716
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0006.msgpack",
-      "row_count": 1306,
-      "byte_size": 43469
+      "row_count": 333,
+      "byte_size": 2728
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0007.msgpack",
-      "row_count": 1284,
-      "byte_size": 43239
+      "row_count": 331,
+      "byte_size": 2694
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0008.msgpack",
-      "row_count": 1306,
-      "byte_size": 43564
+      "row_count": 332,
+      "byte_size": 2719
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0009.msgpack",
-      "row_count": 1284,
-      "byte_size": 43762
+      "row_count": 330,
+      "byte_size": 2541
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0010.msgpack",
-      "row_count": 1307,
-      "byte_size": 44655
+      "row_count": 327,
+      "byte_size": 2600
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0011.msgpack",
-      "row_count": 1287,
-      "byte_size": 43805
+      "row_count": 326,
+      "byte_size": 2572
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0012.msgpack",
-      "row_count": 1300,
-      "byte_size": 42215
+      "row_count": 338,
+      "byte_size": 2829
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0013.msgpack",
-      "row_count": 1301,
-      "byte_size": 45536
+      "row_count": 327,
+      "byte_size": 2520
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0014.msgpack",
-      "row_count": 1287,
-      "byte_size": 42530
+      "row_count": 326,
+      "byte_size": 2634
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0015.msgpack",
-      "row_count": 1295,
-      "byte_size": 42092
+      "row_count": 333,
+      "byte_size": 2577
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0016.msgpack",
-      "row_count": 1281,
-      "byte_size": 43297
+      "row_count": 331,
+      "byte_size": 2663
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0017.msgpack",
-      "row_count": 1295,
-      "byte_size": 44631
+      "row_count": 328,
+      "byte_size": 2612
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0018.msgpack",
-      "row_count": 1302,
-      "byte_size": 42645
+      "row_count": 332,
+      "byte_size": 2685
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0019.msgpack",
-      "row_count": 1289,
-      "byte_size": 43870
+      "row_count": 333,
+      "byte_size": 2726
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0020.msgpack",
-      "row_count": 1263,
-      "byte_size": 41544
+      "row_count": 325,
+      "byte_size": 2632
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0021.msgpack",
-      "row_count": 1306,
-      "byte_size": 41803
+      "row_count": 331,
+      "byte_size": 2513
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0022.msgpack",
-      "row_count": 1286,
-      "byte_size": 43537
+      "row_count": 336,
+      "byte_size": 2783
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0023.msgpack",
-      "row_count": 1292,
-      "byte_size": 42406
+      "row_count": 326,
+      "byte_size": 2709
     },
     {
       "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0024.msgpack",
-      "row_count": 958,
-      "byte_size": 31387
+      "row_count": 328,
+      "byte_size": 2730
+    },
+    {
+      "chunk_path": "C:\\Users\\james\\Videos\\deeds-web-app\\memory\\packets\\chunk-0025.msgpack",
+      "row_count": 272,
+      "byte_size": 2243
     }
   ]
 }

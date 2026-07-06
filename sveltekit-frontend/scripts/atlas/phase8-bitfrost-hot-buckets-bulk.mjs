@@ -14,6 +14,7 @@ import Redis from 'ioredis';
 import { sql } from 'drizzle-orm';
 import { db } from '../sveltekit-frontend/src/lib/server/db/client.js';
 import { buildCanonicalPacketKey } from '../../../scripts/atlas/lib/packet-identity.mjs';
+import { buildCanonicalFeatureEnvelope, reportValidation } from '../../../scripts/atlas/lib/envelope-builder.mjs';
 
 const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('--dry');
 const isApply = process.argv.includes('--apply');

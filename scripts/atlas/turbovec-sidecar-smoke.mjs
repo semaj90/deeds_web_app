@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../../');
-const TURBOVEC_HOST = process.env.TURBOVEC_HOST || 'http://127.0.0.1:8888';
+const TURBOVEC_HOST = process.env.TURBOVEC_HOST || 'http://127.0.0.1:8791';
 
 async function checkHealth() {
   const start = Date.now();

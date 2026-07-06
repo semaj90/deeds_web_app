@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-07-05T22:19:36.276Z",
+  "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\models\\naive-bayes-rejected-errors.json",
+  "summary": {
+    "total_training_samples": 350,
+    "total_validation_samples": 75,
+    "total_test_samples": 75,
+    "validation_accuracy": 100,
+    "vocabulary_size": 7,
+    "num_classes": 1
+  },
+  "class_distribution": {
+    "training": {
+      "VectorError": 350
+    },
+    "validation": {
+      "VectorError": 75
+    },
+    "test": {
+      "VectorError": 75
+    }
+  },
+  "class_accuracy": {
+    "VectorError": {
+      "correct": 75,
+      "total": 75
+    }
+  },
+  "top_features": [
+    {
+      "feature": "failure:missing_embedding",
+      "classes": {
+        "VectorError": 0.9831932773109243
+      }
+    },
+    {
+      "feature": "missing:missing_embedding",
+      "classes": {
+        "VectorError": 0.9831932773109243
+      }
+    },
+    {
+      "feature": "missing:missing_qdrant_point_id",
+      "classes": {
+        "VectorError": 0.9019607843137255
+      }
+    },
+    {
+      "feature": "lane:incomplete",
+      "classes": {
+        "VectorError": 0.9831932773109243
+      }
+    },
+    {
+      "feature": "qdrant_present:false",
+      "classes": {
+        "VectorError": 0.9831932773109243
+      }
+    },
+    {
+      "feature": "topology_present:false",
+      "classes": {
+        "VectorError": 0.9831932773109243
+      }
+    },
+    {
+      "feature": "tree_node_present:false",
+      "classes": {
+        "VectorError": 0.9831932773109243
+      }
+    }
+  ]
+}

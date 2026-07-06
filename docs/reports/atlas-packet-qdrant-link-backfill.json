@@ -1,233 +1,108 @@
 {
-  "status": "PASS",
-  "mode": "apply",
+  "status": "WARN",
+  "mode": "dry-run",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-07-02T04:04:09.204Z",
-  "packets_loaded": 55243,
-  "all_packets_loaded": 58304,
-  "already_linked_seen": 36793,
-  "no_postgres_join_seen": 3191,
-  "qdrant_points_scanned": 40573,
-  "matches": 31,
-  "updated": 31,
-  "skipped_duplicate_packet": 558,
-  "already_linked_samples": [
-    {
-      "pointId": "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
-      "packetKey": "packet:12dfac568730",
-      "sourceRef": "sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte"
-    },
-    {
-      "pointId": "0001981c-da69-4b0e-9acb-ad29544029c8",
-      "packetKey": "packet:1f18437ee58f",
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/+page.svelte"
-    },
-    {
-      "pointId": "0002c4d4-3f96-4a8f-934d-61d8c6985340",
-      "packetKey": "packet:39131da36eed",
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/notifications/+page.svelte"
-    },
-    {
-      "pointId": "0004791e-40fe-4736-be3b-d84796ac5476",
-      "packetKey": "packet:d8628b36a885",
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/admin/codebase-index/+page.svelte"
-    },
-    {
-      "pointId": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
-      "packetKey": "packet:2dd3a5e049f5",
-      "sourceRef": "sveltekit-frontend/src/lib/server/analytics/unified-research-query.ts"
-    },
-    {
-      "pointId": "000700dd-d698-4589-a3b3-62c404909095",
-      "packetKey": "packet:7f08f6b3ea65",
-      "sourceRef": "sveltekit-frontend/src/lib/server/db/schema-postgres.ts"
-    },
-    {
-      "pointId": "000b45f4-0368-4a92-bde7-5698e49d6f8c",
-      "packetKey": "packet:d6068edcf347",
-      "sourceRef": "sveltekit-frontend/src/routes/(app)/demos/bits-ui/+page.svelte"
-    },
-    {
-      "pointId": "000d381c-017b-4154-900c-f87e54e79539",
-      "packetKey": "packet:cbb4949dd176",
-      "sourceRef": "sveltekit-frontend/src/lib/server/helpers/docker-discovery.ts"
-    },
-    {
-      "pointId": "0010432e-9be2-4faf-9fc6-f6c26db3fe44",
-      "packetKey": "packet:931f622b69c0",
-      "sourceRef": "sveltekit-frontend/src/lib/server/embedding-cache.ts"
-    },
-    {
-      "pointId": "00113f4e-919d-4799-8eb1-b5e65f5a72fc",
-      "packetKey": "packet:b2b1b246e0fe",
-      "sourceRef": "sveltekit-frontend/src/lib/utils/webgpu-array-utils.ts"
-    }
-  ],
+  "started_at": "2026-07-05T23:00:46.729Z",
+  "packets_loaded": 55212,
+  "all_packets_loaded": 58365,
+  "already_linked_seen": 0,
+  "no_postgres_join_seen": 50,
+  "qdrant_points_scanned": 50,
+  "matches": 0,
+  "updated": 0,
+  "skipped_duplicate_packet": 0,
+  "already_linked_samples": [],
   "no_postgres_join_samples": [
     {
-      "pointId": "0062a661-a993-4cfc-9e86-0bc1785dd997",
+      "pointId": 990761,
       "qdrantPayloadKeys": [
-        "0062a661-a993-4cfc-9e86-0bc1785dd997",
-        "src/routes/(analysis)/video-analysis/[evidenceId]/AGENTS.md"
+        "990761",
+        "src/routes/(analysis)@"
       ],
-      "relativePath": "src/routes/(analysis)/video-analysis/[evidenceId]/AGENTS.md",
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@"
+    },
+    {
+      "pointId": 1167479,
+      "qdrantPayloadKeys": [
+        "1167479"
+      ],
+      "relativePath": null,
       "sourceRef": null
     },
     {
-      "pointId": "00865f5e-a81d-454a-b60a-ad66b5781146",
+      "pointId": 1181912,
       "qdrantPayloadKeys": [
-        "00865f5e-a81d-454a-b60a-ad66b5781146",
-        "src/lib/components/legal-corpus/AGENTS.md"
+        "1181912"
       ],
-      "relativePath": "src/lib/components/legal-corpus/AGENTS.md",
+      "relativePath": null,
       "sourceRef": null
     },
     {
-      "pointId": "0096d303-1566-4c9b-9686-46fb24d70eba",
+      "pointId": 1576768,
       "qdrantPayloadKeys": [
-        "0096d303-1566-4c9b-9686-46fb24d70eba",
-        "src/lib/server/evidence/services/drizzle-stub.ts"
+        "1576768",
+        "claude-mem/plugin/modes"
       ],
-      "relativePath": "src/lib/server/evidence/services/drizzle-stub.ts",
+      "relativePath": null,
+      "sourceRef": "claude-mem/plugin/modes"
+    },
+    {
+      "pointId": 1636755,
+      "qdrantPayloadKeys": [
+        "1636755"
+      ],
+      "relativePath": null,
       "sourceRef": null
     },
     {
-      "pointId": "00a5ac67-62a0-4539-b8dd-65d5f9714135",
+      "pointId": 2021966,
       "qdrantPayloadKeys": [
-        "00a5ac67-62a0-4539-b8dd-65d5f9714135",
-        "src/lib/components/legal/AGENTS.md"
+        "2021966"
       ],
-      "relativePath": "src/lib/components/legal/AGENTS.md",
+      "relativePath": null,
       "sourceRef": null
     },
     {
-      "pointId": "00abe2b4-f279-4aff-8b28-1c39e429a60d",
+      "pointId": 2434769,
       "qdrantPayloadKeys": [
-        "00abe2b4-f279-4aff-8b28-1c39e429a60d",
-        "src/lib/server/ff1/cli/AGENTS.md"
+        "2434769",
+        "scratch/index-checkpoints"
       ],
-      "relativePath": "src/lib/server/ff1/cli/AGENTS.md",
+      "relativePath": null,
+      "sourceRef": "scratch/index-checkpoints"
+    },
+    {
+      "pointId": 3085081,
+      "qdrantPayloadKeys": [
+        "3085081"
+      ],
+      "relativePath": null,
       "sourceRef": null
     },
     {
-      "pointId": "00aee0f9-ac9d-4f90-9fb9-600fc04ccd8f",
+      "pointId": 4006069,
       "qdrantPayloadKeys": [
-        "00aee0f9-ac9d-4f90-9fb9-600fc04ccd8f",
-        "src/lib/components/chat/AGENTS.md"
+        "4006069",
+        "memory/reconstruction"
       ],
-      "relativePath": "src/lib/components/chat/AGENTS.md",
-      "sourceRef": null
+      "relativePath": null,
+      "sourceRef": "sveltekit-frontend/memory/reconstruction"
     },
     {
-      "pointId": "00b6cd93-7b91-4283-a7b3-0a09d19acb0e",
+      "pointId": 4180125,
       "qdrantPayloadKeys": [
-        "00b6cd93-7b91-4283-a7b3-0a09d19acb0e",
-        "src/lib/components/ai/AGENTS.md"
+        "4180125",
+        "claude-mem/tests/services/sqlite"
       ],
-      "relativePath": "src/lib/components/ai/AGENTS.md",
-      "sourceRef": null
-    },
-    {
-      "pointId": "00bac87c-24c9-4873-97ad-8bf0a921f32c",
-      "qdrantPayloadKeys": [
-        "00bac87c-24c9-4873-97ad-8bf0a921f32c",
-        "src/routes/(app)/fictional-cases/[id]/AGENTS.md"
-      ],
-      "relativePath": "src/routes/(app)/fictional-cases/[id]/AGENTS.md",
-      "sourceRef": null
-    },
-    {
-      "pointId": "014a97cb-9a99-4258-bc3d-624194fdba42",
-      "qdrantPayloadKeys": [
-        "014a97cb-9a99-4258-bc3d-624194fdba42",
-        "src/lib/components/evidence/AGENTS.md"
-      ],
-      "relativePath": "src/lib/components/evidence/AGENTS.md",
-      "sourceRef": null
-    },
-    {
-      "pointId": "015863c2-e2b1-4296-94be-2e7be29a098f",
-      "qdrantPayloadKeys": [
-        "015863c2-e2b1-4296-94be-2e7be29a098f",
-        "src/routes/(app)/cases/[id]/notes/AGENTS.md"
-      ],
-      "relativePath": "src/routes/(app)/cases/[id]/notes/AGENTS.md",
-      "sourceRef": null
+      "relativePath": null,
+      "sourceRef": "claude-mem/tests/services/sqlite"
     }
   ],
   "unmatched_samples": [],
-  "matched_samples": [
-    {
-      "packetKey": "packet:1b7ba3c5d8aa",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/KAGTraverser.ts",
-      "pointId": "00537352-b039-45bf-9009-b44d4ccf337d",
-      "joinKey": "src/lib/services/error-analysis/KAGTraverser.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:10e1acda7d60",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/TagExtractor.ts",
-      "pointId": "006960bb-8d3a-49e1-8c9b-ee1a8138111f",
-      "joinKey": "src/lib/services/knowledge-search/TagExtractor.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:d5b399d99439",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/OllamaService.ts",
-      "pointId": "00f23cbd-3f36-428c-8579-c29f0b632ea1",
-      "joinKey": "src/lib/services/error-analysis/OllamaService.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:40a77f5816d3",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/FixSynthesizer.ts",
-      "pointId": "011e26f2-64f6-456d-b776-b51366ddc19b",
-      "joinKey": "src/lib/services/error-analysis/FixSynthesizer.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:088f7ea57bf8",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/KnowledgeSearcher.ts",
-      "pointId": "017f7d5c-40ec-4ef1-bb2c-cfbe2119a339",
-      "joinKey": "src/lib/services/knowledge-search/KnowledgeSearcher.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:6c0715e536cd",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/KnowledgeIndexer.ts",
-      "pointId": "019eba1d-ce59-410f-94c9-240717a5bcd8",
-      "joinKey": "src/lib/services/knowledge-search/KnowledgeIndexer.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:ad74ddf44938",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/RedisCacheService.ts",
-      "pointId": "02571631-3f7b-41fd-a6e7-65e73dc78bec",
-      "joinKey": "src/lib/services/knowledge-search/RedisCacheService.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:fae9f568ac3b",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
-      "pointId": "028ce2eb-10be-4e1d-9158-0c4debb7728d",
-      "joinKey": "src/lib/services/knowledge-search/PostgresKnowledgeStore.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:4c4c4977c0ce",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/knowledge-search/MinioKnowledgeStore.ts",
-      "pointId": "035be65f-000d-4eb2-a1f0-1046e63a72ce",
-      "joinKey": "src/lib/services/knowledge-search/MinioKnowledgeStore.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "packet:9d3837061e56",
-      "sourceRef": "sveltekit-frontend/src/lib/server/services/error-analysis/PatternStorage.ts",
-      "pointId": "040c1296-29d6-46b6-a807-7b56c2bee88b",
-      "joinKey": "src/lib/services/error-analysis/PatternStorage.ts",
-      "vectorDim": 768
-    }
+  "matched_samples": [],
+  "errors": [
+    "Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads."
   ],
-  "errors": [],
-  "finished_at": "2026-07-02T04:06:36.858Z"
+  "finished_at": "2026-07-05T23:00:52.532Z"
 }

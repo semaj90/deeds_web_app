@@ -1,0 +1,209 @@
+{
+  "timestamp": "2026-07-05T22:18:54.666Z",
+  "summary": {
+    "totalTrainingRows": 500,
+    "labelDistribution": {
+      "VectorError": 500
+    },
+    "trainingDatasetSplit": {
+      "train": {
+        "count": 350,
+        "pct": "70.0"
+      },
+      "val": {
+        "count": 75,
+        "pct": "15.0"
+      },
+      "test": {
+        "count": 75,
+        "pct": "15.0"
+      }
+    }
+  },
+  "files": {
+    "ndjson": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\rejected-semantic-training-rows.ndjson",
+    "json": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\rejected-semantic-training-rows.json",
+    "markdown": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\rejected-semantic-training-rows.md"
+  },
+  "samples": [
+    {
+      "packet_key": "packet:5b5c7977495b",
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/app/chat/ChatForm/ChatFormTextarea.svelte",
+      "feature_id": "llama-cpp-turboquant-gemma4.ChatFormTextarea",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.720Z"
+    },
+    {
+      "packet_key": "packet:dff2c8fbe3b7",
+      "source_ref": "neschrom97/cards/0a26c19ce98d05bf.json",
+      "feature_id": "neschrom97.0a26c19ce98d05bf",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:e015fc24b445",
+      "source_ref": "neschrom97/cards/837ffbe0bf811473.json",
+      "feature_id": "neschrom97.837ffbe0bf811473",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:e13b06c520e1",
+      "source_ref": "scripts/atlas/sync-qdrant-payload-tags.mjs",
+      "feature_id": "scripts.sync-qdrant-payload-tags",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:5b6954a15819",
+      "source_ref": "sveltekit-frontend/src/lib/server/cache/invalidation.ts",
+      "feature_id": "sveltekit-frontend.invalidation",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:e0266bddad68",
+      "source_ref": "neschrom97/cards/9786b9ab6291655f.json",
+      "feature_id": "neschrom97.9786b9ab6291655f",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:5b6d5269a75a",
+      "source_ref": "sveltekit-frontend/scripts/tests/probes/probe-case.spec.ts",
+      "feature_id": "sveltekit-frontend.probe-case.spec",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:e04dbdaa977b",
+      "source_ref": "claude-mem/plugin/scripts/worker-service.cjs",
+      "feature_id": "claude-mem.worker-service",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:e072a15b37e2",
+      "source_ref": "neschrom97/cards/83bb421f861b5513.json",
+      "feature_id": "neschrom97.83bb421f861b5513",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    },
+    {
+      "packet_key": "packet:5b70e4305738",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/enhanced-rag-vlm/+server.ts",
+      "feature_id": "scripts.+server",
+      "domain_class": "unknown",
+      "failure_reason": "missing_embedding",
+      "missing_fields": [
+        "missing_embedding",
+        "missing_qdrant_point_id"
+      ],
+      "semantic_lane_status": "incomplete",
+      "qdrant_point_id_present": false,
+      "topology_present": false,
+      "tree_node_id_present": false,
+      "suggested_label": "VectorError",
+      "training_split": "train",
+      "created_at": "2026-07-05T22:18:45.721Z"
+    }
+  ]
+}
