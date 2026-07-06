@@ -11,6 +11,31 @@ import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import type { SearchTiming } from '$lib/server/grpc/retrieval-client.js';
 
 /**
+ * Topology-aware signals for RRF fusion.
+ * Combines SOM cluster membership and community authority scoring.
+ */
+export interface TopologySignal {
+  /** SOM cluster match signal (1.0 for same cluster, 0.5 otherwise) */
+  clusterMatchScore: number;
+  /** Community authority signal from PageRank aggregation */
+  authorityScore: number;
+  /** Combined weighted blend of both signals */
+  blendScore: number;
+  /** Candidate's SOM cluster ID */
+  candidateCluster?: number | string | null;
+  /** Query's SOM cluster ID (for comparison) */
+  queryCluster?: number | string | null;
+  /** Candidate's community ID */
+  communityId?: number | null;
+  /** Metadata for debugging/tracing */
+  metadata?: {
+    clusterWeight?: number;
+    authorityWeight?: number;
+    confidenceScore?: number;
+  };
+}
+
+/**
  * Query execution on a single datastore.
  * Tracks timing, result count, and errors for performance analysis.
  */

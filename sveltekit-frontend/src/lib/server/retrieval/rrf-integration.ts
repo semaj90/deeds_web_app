@@ -20,6 +20,15 @@ import { turbovecSearch } from './turbovec-prefilter.js';
 import { searchCodebaseAnn } from '$lib/server/search/qdrant-search.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { toStableFileKey } from './subgraph-seed-neighborhood.js';
+import {
+  computeTopologClusterMatchSignal,
+  computeCommunityAuthoritySignal,
+  computeTopologyBlendSignal,
+  extractCanonicalPacketFromMetadata,
+  buildCommunityAuthorityMap,
+  mergeTopologyWeights,
+  TOPOLOGY_RRF_WEIGHTS,
+} from './signal-normalizer.js';
 
 export interface RRFIntegrationOptions {
   k?: number; // RRF constant (default 60)
@@ -37,6 +46,8 @@ export interface RRFIntegrationOutput {
     qdrantCount: number;
     turbovecCount: number;
     neoCount: number;
+    topologyClusterCount: number;
+    communityAuthorityCount: number;
   };
   durationMs: number;
   timings?: {
@@ -49,6 +60,7 @@ export interface RRFIntegrationOutput {
     rrf_ms: number;
     pgvector_ms?: number;
     concept_overlap_ms?: number;
+    topology_ms?: number;
   };
 }
 
@@ -430,6 +442,8 @@ export async function multiLaneRetrievalWithRRF(
     qdrant_vector: 1.0,
     turbovec_ann: 0.9,
     neo4j_graph: 0.8,
+    som_topology: 0.5,    // New: SOM cluster match signal
+    neo4j_community: 0.3, // New: Community authority signal
   };
 
   const finalWeights = { ...defaultWeights, ...weights };
@@ -549,6 +563,38 @@ export async function multiLaneRetrievalWithRRF(
       neoPromise,
     ]);
 
+    // Build community authority map from Neo4j PageRank data for topology signals
+    let communityAuthorityMap: Map<number, number> | null = null;
+    try {
+      const pageRankData = await fetchAuthorityScores(
+        neoResults.status === 'fulfilled'
+          ? neoResults.value.slice(0, 100).map((r) => r.id)
+          : []
+      ).catch(() => ({}));
+
+      const pageRankArray = Object.entries(pageRankData).map(([packet_id, data]) => ({
+        packet_id,
+        community_id: (data as { community_id?: number })?.community_id ?? 0,
+        pagerank: (data as { pagerank?: number })?.pagerank ?? 0,
+      }));
+
+      if (pageRankArray.length > 0) {
+        communityAuthorityMap = buildCommunityAuthorityMap(pageRankArray, 'max');
+      }
+    } catch (err) {
+      console.warn('[RRF] Community authority map build failed:', err);
+    }
+
+    // Extract candidate query packet for topology signal computation
+    let queryPacket: Partial<Record<string, unknown>> | null = null;
+    if (bm25Results.status === 'fulfilled' && bm25Results.value.length > 0) {
+      queryPacket = extractCanonicalPacketFromMetadata({
+        packet_key: bm25Results.value[0]?.stable_key,
+        source_ref: bm25Results.value[0]?.file_path,
+        som_cluster: bm25Results.value[0]?.som_cluster,
+      });
+    }
+
     // Convert results to ContextHit[] format for RRF
     const bm25Hits: ContextHit[] =
       bm25Results.status === 'fulfilled'
@@ -608,10 +654,79 @@ export async function multiLaneRetrievalWithRRF(
           }))
         : [];
 
+    // Topology signals: SOM cluster match and community authority
+    // These are computed for each candidate from qdrant results (which contain topolog_cluster and community_id)
+    const topologyClusterHits: ContextHit[] =
+      qdrantResults.status === 'fulfilled'
+        ? qdrantResults.value
+            .map((hit) => {
+              const candidatePacket = extractCanonicalPacketFromMetadata(hit.metadata ?? {});
+              const clusterScore = computeTopologClusterMatchSignal(
+                candidatePacket as Parameters<typeof computeTopologClusterMatchSignal>[0],
+                queryPacket as Parameters<typeof computeTopologClusterMatchSignal>[1],
+                0.5
+              );
+
+              return {
+                id: hit.id,
+                source: 'som_topology' as const,
+                score: clusterScore,
+                text: hit.text,
+                metadata: {
+                  topolog_cluster: candidatePacket.topolog_cluster,
+                  som_cluster: candidatePacket.som_cluster,
+                  query_cluster: queryPacket?.topolog_cluster,
+                },
+              };
+            })
+            .filter((hit) => hit.score > 0.5) // Only include cluster hits with meaningful scores
+        : [];
+
+    const communityAuthorityHits: ContextHit[] =
+      qdrantResults.status === 'fulfilled' && communityAuthorityMap
+        ? qdrantResults.value
+            .map((hit) => {
+              const candidatePacket = extractCanonicalPacketFromMetadata(hit.metadata ?? {});
+              const authorityScore = computeCommunityAuthoritySignal(
+                candidatePacket as Parameters<typeof computeCommunityAuthoritySignal>[0],
+                communityAuthorityMap,
+                0.5
+              );
+
+              return {
+                id: hit.id,
+                source: 'neo4j_community' as const,
+                score: authorityScore,
+                text: hit.text,
+                metadata: {
+                  community_id: candidatePacket.community_id,
+                  authority_score: authorityScore,
+                },
+              };
+            })
+            .filter((hit) => hit.score > 0.5) // Only include authority hits with meaningful scores
+        : [];
+
     const tRerankStart = performance.now();
-    // Combine via RRF
-    const lanes = [bm25Hits, conceptHits, qdrantHits, turbovecHits, neoHits];
-    const laneNames: RetrievalLaneName[] = ['postgres_trigram', 'concept_overlap', 'qdrant_vector', 'turbovec_ann', 'neo4j_graph'];
+    // Combine via RRF with topology signals
+    const lanes = [
+      bm25Hits,
+      conceptHits,
+      qdrantHits,
+      turbovecHits,
+      neoHits,
+      topologyClusterHits,     // NEW: SOM topology signal lane
+      communityAuthorityHits,  // NEW: Community authority signal lane
+    ];
+    const laneNames: RetrievalLaneName[] = [
+      'postgres_trigram',
+      'concept_overlap',
+      'qdrant_vector',
+      'turbovec_ann',
+      'neo4j_graph',
+      'som_topology',          // NEW
+      'neo4j_community',       // NEW
+    ];
 
     const rrfResults = combineViaRRF(lanes, laneNames, {
       k,
@@ -631,6 +746,8 @@ export async function multiLaneRetrievalWithRRF(
         qdrantCount: qdrantHits.length,
         turbovecCount: turbovecHits.length,
         neoCount: neoHits.length,
+        topologyClusterCount: topologyClusterHits.length,
+        communityAuthorityCount: communityAuthorityHits.length,
       },
       durationMs: Date.now() - t0,
       timings: {
@@ -643,13 +760,22 @@ export async function multiLaneRetrievalWithRRF(
         rrf_ms: rerankMs,
         pgvector_ms: pgvectorMs,
         concept_overlap_ms: conceptOverlapMs,
+        topology_ms: topologyClusterHits.length > 0 ? rerankMs * 0.1 : 0, // Estimate 10% of rerank time
       },
     };
   } catch (error) {
     console.error('RRF integration error:', error);
     return {
       results: [],
-      breakdown: { bm25Count: 0, conceptCount: 0, qdrantCount: 0, turbovecCount: 0, neoCount: 0 },
+      breakdown: {
+        bm25Count: 0,
+        conceptCount: 0,
+        qdrantCount: 0,
+        turbovecCount: 0,
+        neoCount: 0,
+        topologyClusterCount: 0,
+        communityAuthorityCount: 0,
+      },
       durationMs: Date.now() - t0,
       timings: {
         bm25_ms: 0,
@@ -661,6 +787,7 @@ export async function multiLaneRetrievalWithRRF(
         rrf_ms: 0,
         pgvector_ms: 0,
         concept_overlap_ms: 0,
+        topology_ms: 0,
       },
     };
   }

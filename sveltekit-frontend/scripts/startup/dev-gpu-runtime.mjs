@@ -3,7 +3,7 @@
  * Start the local GPU developer runtime, then run Vite in the foreground.
  *
  * Responsibilities:
- * - Gemma4 chat summaries: llama-server on :8090, 16k context, detached.
+ * - Gemma4 chat summaries: llama-server on :8090, 64K context, detached.
  * - EmbeddingGemma embeddings: ONNX/OpenAI-compatible server on :8081, detached.
  * - SvelteKit: Vite dev in the current terminal.
  *
@@ -85,15 +85,18 @@ function spawnForeground(command, args, options = {}) {
 
 async function main() {
   // Launch TurboQuant llama-server (Gemma4 at :8090)
+  // On Windows, PowerShell subprocess must receive env vars via explicit shell command
+  const launcherEnv = mergedEnv();
+  const psEnvAssign = `$env:TURBO_CTX='${launcherEnv.TURBO_CTX}'; $env:LLM_CONTEXT_SIZE='${launcherEnv.LLM_CONTEXT_SIZE}'; $env:TURBO_CTX_ALLOW_SHORT_CONTEXT='${launcherEnv.TURBO_CTX_ALLOW_SHORT_CONTEXT}';`;
+  const psCommand = `${psEnvAssign} & '${path.join(REPO_ROOT, 'scripts/launch-turboquant.ps1')}' -Detached -TextOnly`;
+
   await runChecked('pwsh', [
     '-NoProfile',
     '-ExecutionPolicy',
     'Bypass',
-    '-File',
-    path.join(REPO_ROOT, 'scripts/launch-turboquant.ps1'),
-    '-Detached',
-    '-TextOnly',
-  ], { cwd: REPO_ROOT, env: mergedEnv() });
+    '-Command',
+    psCommand,
+  ], { cwd: REPO_ROOT, env: launcherEnv });
 
   console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active');
 
@@ -114,6 +117,21 @@ async function main() {
   console.log('[dev:gpu] LLM (synthesis):  http://127.0.0.1:8090/v1');
   console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX)');
   console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
+
+  // Ensure TRACE MCP server is running before Vite starts
+  console.log('[dev:gpu] Starting TRACE MCP server (:8788)...');
+  try {
+    const { ensureTraceMcp } = await import('../ensure-mcp-server.mjs');
+    const mcpReady = await ensureTraceMcp();
+    if (mcpReady) {
+      console.log('[dev:gpu] ✅ TRACE MCP server (:8788) ready');
+    } else {
+      console.warn('[dev:gpu] ⚠️  TRACE MCP server startup failed; continuing without it');
+    }
+  } catch (err) {
+    console.warn('[dev:gpu] ⚠️  TRACE MCP server error:', err.message);
+  }
+
   console.log('[dev:gpu] Starting Vite dev server (:5173)...\n');
 
   // Launch Vite dev server in foreground

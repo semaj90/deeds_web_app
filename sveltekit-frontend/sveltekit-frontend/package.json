@@ -5,5 +5,8 @@
   "devDependencies": {
     "ignore": "^7.0.5",
     "tsx": "^4.22.4"
+  },
+  "optionalDependencies": {
+    "zod-to-json-schema-original": "npm:null@3"
   }
 }

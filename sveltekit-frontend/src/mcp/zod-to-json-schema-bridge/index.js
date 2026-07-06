@@ -51,12 +51,17 @@ function v3ToJsonSchema(schema, opts) {
   // throw a clear error so the operator knows what's missing.
   let original;
   try {
-    original = require('zod-to-json-schema-original');
+    // Try the original name first, then the actual package name
+    try {
+      original = require('zod-to-json-schema-original');
+    } catch (e1) {
+      original = require('zod-v3-to-json-schema');
+    }
   } catch (e) {
     throw new Error(
       `zod-to-json-schema-bridge: encountered a Zod v3 schema but the v3 ` +
-      `library 'zod-to-json-schema-original' is not installed. Either ` +
-      `migrate the schema to Zod v4 or add the v3 library back.`
+      `library 'zod-v3-to-json-schema' or 'zod-to-json-schema-original' is not installed. Either ` +
+      `migrate the schema to Zod v4 or add the v3 library.`
     );
   }
   return original.zodToJsonSchema(schema, opts);

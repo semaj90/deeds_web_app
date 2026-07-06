@@ -61,37 +61,60 @@ const pool = new Pool({
 });
 
 /**
- * Extract lexical features from ast_symbols
- * Returns array of: language-specific keywords, common patterns, identifier classes
+ * Extract lexical features from multiple sources:
+ * - ast_symbols (code identifiers)
+ * - feature_label (semantic label)
+ * - metadata_keywords (extracted by prior stages)
+ * - tags (user-provided tags)
  */
-function extractLexicalFeatures(astSymbols) {
+function extractLexicalFeatures(astSymbols, featureLabel, metadataKeywords, tags) {
   const features = new Set();
 
-  if (!astSymbols || astSymbols.length === 0) return [];
+  // 1. Extract from feature_label (always present, 58K packets)
+  if (featureLabel && featureLabel.length > 2) {
+    const labelWords = featureLabel.toLowerCase().split(/[\s_\-\.]+/).filter(w => w.length > 1);
+    labelWords.forEach(word => features.add(word));
+    features.add(featureLabel);
+  }
 
-  astSymbols.forEach(symbol => {
-    // 1. Add symbol itself as a feature
-    if (symbol.length > 2) features.add(symbol);
+  // 2. Extract from metadata keywords (already extracted in prior stages)
+  if (metadataKeywords && metadataKeywords.length > 2) {
+    const keywordParts = metadataKeywords.toLowerCase().split(/[,;\s]+/).filter(w => w.length > 1);
+    keywordParts.forEach(kw => features.add(kw));
+  }
 
-    // 2. Extract language patterns
-    // camelCase → extract parts
-    const camelParts = symbol.match(/[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)/g) || [];
-    camelParts.forEach(part => {
-      if (part.length > 1) features.add(part.toLowerCase());
+  // 3. Extract from tags (user-provided, domain-specific)
+  if (tags && Array.isArray(tags)) {
+    tags.forEach(tag => {
+      if (tag && tag.length > 1) features.add(tag.toLowerCase());
     });
+  }
 
-    // 3. Classify by pattern
-    if (/^[A-Z]/.test(symbol)) features.add('PascalCase'); // Classes, types
-    if (/^[a-z].*[A-Z]/.test(symbol)) features.add('camelCase'); // Functions, variables
-    if (/^[A-Z_]+$/.test(symbol)) features.add('CONSTANT'); // Constants
+  // 4. Extract from ast_symbols (code structure, 516 packets only)
+  if (astSymbols && astSymbols.length > 0) {
+    astSymbols.forEach(symbol => {
+      // Add symbol itself
+      if (symbol.length > 2) features.add(symbol);
 
-    // 4. Common TypeScript/JavaScript patterns
-    if (symbol.includes('Error')) features.add('error_handling');
-    if (symbol.match(/^(get|set|is|has|can)/)) features.add('accessor');
-    if (symbol.match(/^(use|create|make|build)/)) features.add('factory');
-    if (symbol.match(/(Handler|Listener|Callback)/)) features.add('event_driven');
-    if (symbol.match(/(Manager|Controller|Service|Factory)/)) features.add('architecture');
-  });
+      // Extract language patterns
+      const camelParts = symbol.match(/[A-Z]?[a-z]+|[A-Z]+(?=[A-Z][a-z]|\d|\W|$)/g) || [];
+      camelParts.forEach(part => {
+        if (part.length > 1) features.add(part.toLowerCase());
+      });
+
+      // Classify by pattern
+      if (/^[A-Z]/.test(symbol)) features.add('PascalCase');
+      if (/^[a-z].*[A-Z]/.test(symbol)) features.add('camelCase');
+      if (/^[A-Z_]+$/.test(symbol)) features.add('CONSTANT');
+
+      // Common patterns
+      if (symbol.includes('Error')) features.add('error_handling');
+      if (symbol.match(/^(get|set|is|has|can)/)) features.add('accessor');
+      if (symbol.match(/^(use|create|make|build)/)) features.add('factory');
+      if (symbol.match(/(Handler|Listener|Callback)/)) features.add('event_driven');
+      if (symbol.match(/(Manager|Controller|Service|Factory)/)) features.add('architecture');
+    });
+  }
 
   return Array.from(features)
     .filter(f => f.length > 1 && f.length < 128)
@@ -228,47 +251,57 @@ async function main() {
       }
     }
 
-    // Step 1: Query packets with ast_symbols
-    console.log('📦 Step 1: Query packets with ast_symbols...');
+    // Step 1: Query packets (both with and without ast_symbols)
+    console.log('📦 Step 1: Query packets for lexical extraction...');
 
     const queryResult = await client.query(`
       SELECT
         ap.packet_id,
         ap.packet_key,
         ap.source_ref,
-        apf.ast_symbols
+        ap.feature_label,
+        apf.ast_symbols,
+        COALESCE(ap.metadata->>'extracted_keywords', '') as metadata_keywords,
+        ap.tags
       FROM atlas_packets ap
-      JOIN atlas_packet_features apf ON ap.packet_key = apf.packet_key
-      WHERE apf.ast_symbols IS NOT NULL
-        AND array_length(apf.ast_symbols, 1) > 0
+      LEFT JOIN atlas_packet_features apf ON ap.packet_key = apf.packet_key
+      WHERE ap.packet_key IS NOT NULL
       ORDER BY ap.packet_key
       LIMIT $1
     `, [limit]);
 
     const packets = queryResult.rows;
-    console.log(`  ✓ Found ${packets.length} packets with ast_symbols\n`);
+    console.log(`  ✓ Found ${packets.length} packets for extraction\n`);
 
     if (packets.length === 0) {
-      console.log('  ℹ️  No packets with ast_symbols. Run Phase 2A first.\n');
+      console.log('  ℹ️  No packets to extract.\n');
       await client.release();
       await pool.end();
       process.exit(0);
     }
 
-    // Step 2: Extract lexical features
+    // Step 2: Extract lexical features from all sources
     console.log(`🔍 Step 2: Extract lexical features from ${packets.length} packets...\n`);
 
     const updates = [];
     let extracted = 0;
+    let withAstSymbols = 0;
+    let withoutAstSymbols = 0;
 
     for (let i = 0; i < packets.length; i++) {
       const packet = packets[i];
 
-      if ((i + 1) % 100 === 0) {
+      if ((i + 1) % 1000 === 0) {
         console.log(`  [${i + 1}/${packets.length}] Processed ${i + 1} packets...`);
       }
 
-      const lexicalFeatures = extractLexicalFeatures(packet.ast_symbols);
+      // Extract from all available sources
+      const lexicalFeatures = extractLexicalFeatures(
+        packet.ast_symbols,
+        packet.feature_label,
+        packet.metadata_keywords,
+        packet.tags
+      );
 
       if (lexicalFeatures.length === 0) {
         if (isVerbose) console.log(`    [SKIP] ${packet.source_ref} (no lexical features)`);
@@ -282,10 +315,18 @@ async function main() {
         lexical_features: lexicalFeatures,
       });
 
+      if (packet.ast_symbols && packet.ast_symbols.length > 0) {
+        withAstSymbols++;
+      } else {
+        withoutAstSymbols++;
+      }
+
       extracted++;
     }
 
-    console.log(`\n  ✓ Extracted: ${extracted} packets\n`);
+    console.log(`\n  ✓ Extracted: ${extracted} packets`);
+    console.log(`    - From ast_symbols: ${withAstSymbols} packets`);
+    console.log(`    - From feature_label/metadata: ${withoutAstSymbols} packets\n`);
 
     if (updates.length === 0) {
       console.log('ℹ️  No lexical features to write.\n');
@@ -307,27 +348,35 @@ async function main() {
     } else {
       const batchSize = 50;
       let totalUpdated = 0;
+      let totalInserted = 0;
 
       for (let i = 0; i < updates.length; i += batchSize) {
         const batch = updates.slice(i, i + batchSize);
 
         for (const update of batch) {
           try {
+            // Upsert: INSERT or UPDATE
             const result = await client.query(`
-              UPDATE atlas_packet_features
-              SET lexical_features = $1, updated_at = NOW()
-              WHERE packet_key = $2
-            `, [update.lexical_features, update.packet_key]);
-            totalUpdated += result.rowCount;
+              INSERT INTO atlas_packet_features (packet_key, lexical_features, updated_at)
+              VALUES ($1, $2, NOW())
+              ON CONFLICT (packet_key) DO UPDATE
+              SET lexical_features = EXCLUDED.lexical_features, updated_at = NOW()
+            `, [update.packet_key, update.lexical_features]);
+
+            if (result.command === 'INSERT') {
+              totalInserted += result.rowCount;
+            } else {
+              totalUpdated += result.rowCount;
+            }
           } catch (e) {
-            console.error(`    ⚠️  Failed to update ${update.packet_key}:`, e.message);
+            console.error(`    ⚠️  Failed to upsert ${update.packet_key}:`, e.message);
           }
         }
 
         console.log(`  ✓ Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(updates.length / batchSize)} done`);
       }
 
-      console.log(`\n✅ Updated ${totalUpdated} rows with lexical_features\n`);
+      console.log(`\n✅ Updated ${totalUpdated} rows, Inserted ${totalInserted} new rows\n`);
     }
 
     // Step 4: K-Means clustering (optional GPU acceleration)

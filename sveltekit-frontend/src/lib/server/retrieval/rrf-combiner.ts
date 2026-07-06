@@ -14,6 +14,7 @@ export type RetrievalLaneName =
   | 'redis_cache'
   | 'ast_symbol'
   | 'som_topology'
+  | 'neo4j_community'
   | 'web_research';
 
 export interface ContextHit {
