@@ -14,6 +14,7 @@ interface Neo4jSyncPacket {
   confidence?: number;
   identity_lane?: string;
   directory_path?: string;
+  som_cluster_id?: number;
 }
 
 interface Neo4jSyncResult {
@@ -60,12 +61,14 @@ export async function syncPacketsToNeo4j(
         p.confidence = pkt.confidence,
         p.identity_lane = pkt.identity_lane,
         p.directory_path = pkt.directory_path,
+        p.som_cluster_id = pkt.som_cluster_id,
         p.created_at = datetime(),
         p.updated_at = datetime()
       ON MATCH SET
         p.summary = pkt.summary,
         p.confidence = pkt.confidence,
         p.identity_lane = pkt.identity_lane,
+        p.som_cluster_id = pkt.som_cluster_id,
         p.updated_at = datetime()
       RETURN count(*) as total, sum(CASE WHEN p.created_at = datetime() THEN 1 ELSE 0 END) as created
       `,
@@ -78,6 +81,7 @@ export async function syncPacketsToNeo4j(
           confidence: p.confidence ?? 0.95,
           identity_lane: p.identity_lane || 'canonical',
           directory_path: p.directory_path || '',
+          som_cluster_id: p.som_cluster_id ?? null,
         })),
       }
     );
@@ -151,22 +155,27 @@ export async function syncPacketsToNeo4j(
 
     if (edgeTypes.includes('SIMILAR_TOPOLOGY')) {
       try {
-        // Connect packets with same feature_id (topology neighbors)
+        // Connect packets in same SOM cluster (spatial topology neighbors)
+        // Fallback to feature_id if SOM cluster not available
         const topoEdgeResult = await neo4jSession.run(
           `
           UNWIND $packets AS pkt1
           MATCH (p1:CanonicalPacket {packet_key: pkt1.packet_key})
           UNWIND $packets AS pkt2
           MATCH (p2:CanonicalPacket {packet_key: pkt2.packet_key})
-          WHERE p1.feature_id = p2.feature_id AND p1.packet_key < p2.packet_key
+          WHERE p1.packet_key < p2.packet_key AND (
+            (pkt1.som_cluster_id IS NOT NULL AND pkt1.som_cluster_id = pkt2.som_cluster_id) OR
+            (pkt1.som_cluster_id IS NULL AND p1.feature_id = p2.feature_id)
+          )
           MERGE (p1)-[r:SIMILAR_TOPOLOGY]->(p2)
-          ON CREATE SET r.created_at = datetime()
+          ON CREATE SET r.created_at = datetime(), r.topology_basis = CASE WHEN pkt1.som_cluster_id IS NOT NULL THEN 'som_cluster' ELSE 'feature_id' END
           RETURN count(r) as edge_count
           `,
           {
             packets: packets.map((p) => ({
               packet_key: p.packet_key,
               feature_id: p.feature_id,
+              som_cluster_id: p.som_cluster_id ?? null,
             })),
           }
         );

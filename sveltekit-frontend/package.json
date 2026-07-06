@@ -9,6 +9,7 @@
     "compile:protos": "node ../scripts/compile-protos.mjs",
     "build": "npm run compile:protos && vite build",
     "test": "vitest",
+    "test:telemetry:dispatcher": "vitest run tests/telemetry/dispatcher-telemetry-wrapper.spec.ts",
     "lint": "eslint .",
     "turbo:start": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1",
     "turbo:start:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1 -Detached",

@@ -79,7 +79,7 @@ async function backfillSomCluster() {
 
   const pgResult = await pgPool.query(`
     SELECT packet_key, som_cluster
-    FROM atlas_codebase_packets
+    FROM atlas_packets
     WHERE packet_key IS NOT NULL
     ORDER BY packet_key
   `);
@@ -185,20 +185,27 @@ async function backfillSomCluster() {
 
     try {
       await pgPool.query(
-        `UPDATE atlas_codebase_packets SET
-           som_cluster_bmu_row = $1,
-           som_cluster_bmu_col = $2,
-           enrichment_status = jsonb_set(enrichment_status, '{som_cluster}', 'true'),
-           enriched_at = now()
-         WHERE packet_key = ANY($3)`,
-        [
-          batch[0].som_cluster_bmu_row,
-          batch[0].som_cluster_bmu_col,
-          batch.map(u => u.packet_key)
-        ]
+        `UPDATE atlas_packets SET
+           som_cluster_id = $1
+         WHERE packet_key = $2`,
+        batch.map(u => [
+          (u.som_cluster_bmu_row * 20) + u.som_cluster_bmu_col,  // Convert (row, col) to cluster ID 0-399
+          u.packet_key
+        ])
       );
 
-      upsertedCount += batch.length;
+      // Execute each update individually (batch approach too complex for multi-row)
+      let count = 0;
+      for (const u of batch) {
+        const clusterId = (u.som_cluster_bmu_row * 20) + u.som_cluster_bmu_col;
+        await pgPool.query(
+          `UPDATE atlas_packets SET som_cluster_id = $1 WHERE packet_key = $2`,
+          [clusterId, u.packet_key]
+        );
+        count++;
+      }
+
+      upsertedCount += count;
     } catch (err) {
       console.error(`   ❌ Batch upsert failed:`, err.message);
     }

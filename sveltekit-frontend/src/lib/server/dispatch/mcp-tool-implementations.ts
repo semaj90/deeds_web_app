@@ -15,6 +15,8 @@ import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import Redis from 'ioredis';
 import { publishMirrorSyncEvent } from './mirror-sync-publisher.js';
+import { withMcpToolTelemetry } from '$lib/server/telemetry/mcp-tool-telemetry.js';
+import { getRedis } from '$lib/server/redis.js';
 
 // ──────────────────────────────────────────────────────────────────────
 // Zod Schemas (5-Step Gate 2: Validation)
@@ -118,7 +120,7 @@ async function invalidateBitfrostKeys(redis: Redis, packetKey: string): Promise<
 // Tool 1: identity:recover (5-Step: Read → Validate → Write → Invalidate → Emit)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolIdentityRecover(args: unknown): Promise<ToolResult> {
+async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
   let redis: Redis | null = null;
 
@@ -211,11 +213,18 @@ export async function toolIdentityRecover(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolIdentityRecover = withMcpToolTelemetry(
+  'identity:recover',
+  toolIdentityRecoverImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 2: envelope:validate (5-Step: Read → Validate → Write → Invalidate → Emit)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolEnvelopeValidate(args: unknown): Promise<ToolResult> {
+async function toolEnvelopeValidateImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
   let redis: Redis | null = null;
 
@@ -306,11 +315,18 @@ export async function toolEnvelopeValidate(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolEnvelopeValidate = withMcpToolTelemetry(
+  'envelope:validate',
+  toolEnvelopeValidateImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 3: mirror:sync_qdrant (5-Step: Read → Validate → Write → Invalidate → Emit)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolMirrorSyncQdrant(args: unknown): Promise<ToolResult> {
+async function toolMirrorSyncQdrantImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
   let redis: Redis | null = null;
 
@@ -399,11 +415,18 @@ export async function toolMirrorSyncQdrant(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolMirrorSyncQdrant = withMcpToolTelemetry(
+  'mirror:sync_qdrant',
+  toolMirrorSyncQdrantImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 4: mirror:sync_neo4j (5-Step: Read → Validate → Write → Invalidate → Emit)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolMirrorSyncNeo4j(args: unknown): Promise<ToolResult> {
+async function toolMirrorSyncNeo4jImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
   let redis: Redis | null = null;
 
@@ -491,11 +514,18 @@ export async function toolMirrorSyncNeo4j(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolMirrorSyncNeo4j = withMcpToolTelemetry(
+  'mirror:sync_neo4j',
+  toolMirrorSyncNeo4jImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 5: graph:expand (Read-only, no Postgres write)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolGraphExpand(args: unknown): Promise<ToolResult> {
+async function toolGraphExpandImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
 
   try {
@@ -533,11 +563,18 @@ export async function toolGraphExpand(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolGraphExpand = withMcpToolTelemetry(
+  'graph:expand',
+  toolGraphExpandImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 6: retrieval:rerank (Ranking-only, no writes)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolRetrievalRerank(args: unknown): Promise<ToolResult> {
+async function toolRetrievalRerankImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
 
   try {
@@ -571,11 +608,18 @@ export async function toolRetrievalRerank(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolRetrievalRerank = withMcpToolTelemetry(
+  'retrieval:rerank',
+  toolRetrievalRerankImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 7: answer:synthesize (5-Step: Read → Validate → Write → Invalidate → Emit)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolAnswerSynthesize(args: unknown): Promise<ToolResult> {
+async function toolAnswerSynthesizeImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
 
   try {
@@ -609,11 +653,18 @@ export async function toolAnswerSynthesize(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolAnswerSynthesize = withMcpToolTelemetry(
+  'answer:synthesize',
+  toolAnswerSynthesizeImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 8: escalation:route (Stateless, no Postgres access)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolEscalationRoute(args: unknown): Promise<ToolResult> {
+async function toolEscalationRouteImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
 
   try {
@@ -647,11 +698,18 @@ export async function toolEscalationRoute(args: unknown): Promise<ToolResult> {
   }
 }
 
+// Export wrapped with telemetry instrumentation
+export const toolEscalationRoute = withMcpToolTelemetry(
+  'escalation:route',
+  toolEscalationRouteImpl,
+  getRedis
+);
+
 // ──────────────────────────────────────────────────────────────────────
 // Tool 9: identity:quarantine (5-Step: Read → Validate → Write → Invalidate → Emit)
 // ──────────────────────────────────────────────────────────────────────
 
-export async function toolIdentityQuarantine(args: unknown): Promise<ToolResult> {
+async function toolIdentityQuarantineImpl(args: unknown): Promise<ToolResult> {
   const startTime = Date.now();
   let redis: Redis | null = null;
 
@@ -740,3 +798,10 @@ export async function toolIdentityQuarantine(args: unknown): Promise<ToolResult>
     if (redis?.isOpen) await redis.quit();
   }
 }
+
+// Export wrapped with telemetry instrumentation
+export const toolIdentityQuarantine = withMcpToolTelemetry(
+  'identity:quarantine',
+  toolIdentityQuarantineImpl,
+  getRedis
+);

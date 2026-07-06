@@ -240,6 +240,17 @@ export default defineConfig({
       'tests/session-115-116-integration.spec.ts',
       // Session 117+ — ACP/gRPC/QUIC integration (proto wiring, A2A discovery, QUIC transport)
       'tests/acp-grpc-quic-integration.spec.ts',
+      // Session 118 — Dispatcher signal integration (topology RRF blend, SOM fallback)
+      'tests/dispatcher-signal-integration.spec.ts',
+      // Phase 1 scorer integration tests (vector, graph, telemetry)
+      'tests/phase1-scorers-integration.spec.ts',
+      // Phase 2 infrastructure integration tests (autoencoder, SOM, K-means)
+      'tests/phase2-infrastructure-integration.spec.ts',
+      // Session 119a: Dispatcher telemetry wrapper tests
+      'tests/telemetry/dispatcher-telemetry-wrapper.spec.ts',
+      'tests/telemetry/dispatcher-e2e-integration.spec.ts',
+      'tests/telemetry/mcp-tool-telemetry.spec.ts',
+      'tests/telemetry/dispatcher-mcp-tool-integration.spec.ts',
     ],
     exclude: [
       'node_modules/**',

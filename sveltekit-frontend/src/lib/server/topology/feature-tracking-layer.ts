@@ -30,6 +30,7 @@ export interface CanonicalPacket {
   // Tier 3: Topology (immutable after Phase N completion)
   topolog_cluster: number | null; // Maps to som_cluster in Postgres
   som_cluster: string | null;
+  som_cluster_id: number | null; // Numeric SOM cluster ID (0-399) for dispatcher routing
   community_id: number | null;
 
   // Tier 4: Retrieval (per-query hints, computed by orchestrator)
@@ -80,6 +81,7 @@ export async function getCanonicalPacket(
         title_id,
         som_cluster as topolog_cluster,
         som_cluster,
+        som_cluster_id,
         community_id,
         qdrant_point_id,
         routing_hints as retrieval_strategy
@@ -139,6 +141,7 @@ export async function getCanonicalPacketsFromPostgres(
         title_id,
         som_cluster as topolog_cluster,
         som_cluster,
+        som_cluster_id,
         community_id,
         qdrant_point_id,
         routing_hints as retrieval_strategy

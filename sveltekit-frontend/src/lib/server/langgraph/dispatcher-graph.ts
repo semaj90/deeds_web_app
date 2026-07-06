@@ -18,6 +18,9 @@ import {
 } from './dispatcher-nodes/index.js';
 import { routeByDispatch, DISPATCHER_NODES } from './dispatcher-routes.js';
 import type { NodeContext } from './dispatcher-nodes/types.js';
+import { withDispatcherTelemetry } from '../telemetry/dispatcher-telemetry-wrapper.js';
+import Redis from 'ioredis';
+import { PgDatabase } from 'drizzle-orm/pg-core';
 
 /**
  * Define state schema for LangGraph
@@ -56,42 +59,96 @@ export function createDispatcherGraph(ctx: NodeContext) {
     };
   });
 
-  // Add all 9 dispatcher nodes
-  graph.addNode(DISPATCHER_NODES.node_escalate_quarantine, async (state: DispatcherState) => {
-    return nodeEscalateQuarantine(state, ctx);
-  });
+  // Add all 9 dispatcher nodes (wrapped with telemetry)
+  graph.addNode(
+    DISPATCHER_NODES.node_escalate_quarantine,
+    withDispatcherTelemetry(
+      'node_escalate_quarantine',
+      async (state: DispatcherState) => nodeEscalateQuarantine(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_recover_identity, async (state: DispatcherState) => {
-    return nodeRecoverIdentity(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_recover_identity,
+    withDispatcherTelemetry(
+      'node_recover_identity',
+      async (state: DispatcherState) => nodeRecoverIdentity(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_validate_envelope, async (state: DispatcherState) => {
-    return nodeValidateEnvelope(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_validate_envelope,
+    withDispatcherTelemetry(
+      'node_validate_envelope',
+      async (state: DispatcherState) => nodeValidateEnvelope(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_sync_qdrant_mirror, async (state: DispatcherState) => {
-    return nodeSyncQdrantMirror(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_sync_qdrant_mirror,
+    withDispatcherTelemetry(
+      'node_sync_qdrant_mirror',
+      async (state: DispatcherState) => nodeSyncQdrantMirror(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_sync_neo4j_mirror, async (state: DispatcherState) => {
-    return nodeSyncNeo4jMirror(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_sync_neo4j_mirror,
+    withDispatcherTelemetry(
+      'node_sync_neo4j_mirror',
+      async (state: DispatcherState) => nodeSyncNeo4jMirror(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_expand_topology, async (state: DispatcherState) => {
-    return nodeExpandTopology(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_expand_topology,
+    withDispatcherTelemetry(
+      'node_expand_topology',
+      async (state: DispatcherState) => nodeExpandTopology(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_rerank_candidates, async (state: DispatcherState) => {
-    return nodeRerankCandidates(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_rerank_candidates,
+    withDispatcherTelemetry(
+      'node_rerank_candidates',
+      async (state: DispatcherState) => nodeRerankCandidates(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_synthesize_answer, async (state: DispatcherState) => {
-    return nodeSynthesizeAnswer(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_synthesize_answer,
+    withDispatcherTelemetry(
+      'node_synthesize_answer',
+      async (state: DispatcherState) => nodeSynthesizeAnswer(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
-  graph.addNode(DISPATCHER_NODES.node_escalate_operator, async (state: DispatcherState) => {
-    return nodeEscalateOperator(state, ctx);
-  });
+  graph.addNode(
+    DISPATCHER_NODES.node_escalate_operator,
+    withDispatcherTelemetry(
+      'node_escalate_operator',
+      async (state: DispatcherState) => nodeEscalateOperator(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
 
   // Add end node
   graph.addNode('end', async (state: DispatcherState) => {
