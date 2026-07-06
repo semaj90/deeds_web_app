@@ -1,0 +1,4914 @@
+{
+  "timestamp": "2026-07-06T08:39:25.583Z",
+  "summary": {
+    "totalFiles": 298,
+    "byRole": {
+      "PRESERVES": 229,
+      "UNKNOWN": 40,
+      "RISKS": 14,
+      "ENRICHES": 7,
+      "CREATES": 2,
+      "MIRRORS": 6
+    },
+    "highRiskCount": 164,
+    "identityPreservationRate": 58
+  },
+  "files": [
+    {
+      "path": ".\\scripts\\atlas\\backfill-packets-to-qdrant.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\scripts\\atlas\\qdrant-payload-contract-repair.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\scripts\\atlas\\audit-som-identity-cross-store.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\packages\\atlas-core\\src\\langgraph\\worker.ts",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\packages\\atlas-core\\src\\packet\\identity.ts",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\ace-mcp-telemetry-join-test.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "INSERT",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\append_clusters_to_parent_atlas.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\atlas-cartridge-seed.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-acp-packet-transport.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-atlas-feature-parent-join.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-feature-lineage.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster",
+        "neo4j_node_id",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-feature-metadata-columns.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-feature-tracking-parity.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster",
+        "neo4j_node_id",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "DROP operation detected - verify identity fields are preserved"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-hidden-packet-pathmap.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-higher-hop-enrichment-live.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-higher-hop-enrichment.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-jsonl.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-metadata-contract-across-stores.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-runtime-coverage.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-runtime-packet-density.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-som-coordinate-coverage.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-topology-completion-gaps.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-tree-nodes.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-packets-embeddings-pool.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-qdrant-payload-complete.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-qdrant-point-id-bridge.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\batch-summaries-wrapped.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\batch-summarize-packets.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\benchmark-gpu-primitives.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\benchmark-retrieval-e2e.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\bitfrost-packet-upsert-optimized.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-atlas-feature-map.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "DROP operation detected - verify identity fields are preserved"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\capture-retrieval-telemetry.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\classify-qdrant-missing-packets.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\classify-qdrant-missing-packets.mjs.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\create-qdrant-indexes.mjs",
+      "role": "CREATES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\daily-startup-validation.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\debug-qdrant-postgres-mismatch.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\enrich-qdrant-neschrom97.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\error-cluster.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\export-cluster-summary-batches.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "feature_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\export-okf-bundle.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\export-rejected-semantic-training-rows.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\export-replay-traces.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\export-topology-report.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\extract-packet-titles.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\feature-extract-summary-batch.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\feature_labelling.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\gemma4-batch-summarize-packets.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\hyperrag-dense-multiquery.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\ingest-tree-nodes.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\logger-parent-atlas-health.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\mapreduce-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\materialize-addressable-packets.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\materialize-provenance-tree.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\materialize-route-runtime-packets.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\merge-atlas-ndjson-hypergraph.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\normalize-qdrant-payloads.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase-20-packet-helpers.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase-c-canonical-gate.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase-d-enrich-qdrant.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase-lane-completion.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase1.5-ast-grep-extraction.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase10-packet-cache-warmer.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase10-packet-serialization-rpc.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase2b-lexical-extraction-kmeans.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-build-hashmap.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-redis-cache-writer.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase7-rabbitmq-summary-queue.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8-9-orchestrator.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "centroid_id",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8-bitfrost-hot-buckets-bulk.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8-feature-envelope-materialization.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8.8-hmm-semantic-compiler.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8a-som-centroid-cache.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "centroid_id",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8b-bitfrost-packet-cache.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase9-bitfrost-semantic-cache.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster",
+        "neo4j_node_id",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\populate-code-feature-edges.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id"
+      ],
+      "operations": [
+        "INSERT",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\populate-feature-nouns.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\pytorch-tuple-feature-bridge.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\rank-supersedes-candidates.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\reconcile-qdrant-postgres-payloads.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\rotorquant-turbovec-sidecar.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run-replay-breadth-50.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\search-gemma4-context-test.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-completeness-validation.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-packet-registry.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\sync-qdrant-packet-payload.mjs",
+      "role": "MIRRORS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "centroid_id",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\topology-project-4d.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\unified-schema-tuple-extractor.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\upsert_parent_atlas_jsonb.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "som_cluster"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-addressable-packets.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-code-feature-registry-worker.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "DELETE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-envelope-extraction.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\valkey-create-semantic-index.mjs",
+      "role": "CREATES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-cold-storage-manifest.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-packet-metadata.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-qdrant-packet-payload.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id",
+        "som_cluster",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 100,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-store-parity.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 100,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\ace-context-fusion.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-dynamic-backend-contract.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-parent-atlas-overlay-crosswalk.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-qdrant-payload-contract.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-atlas-packets-feature-id.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-code-feature-registry.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-feature-metadata.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-missing-source-refs.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-som-coordinates-from-report.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-feature-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\current-corpus-promotion-preflight.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\derive-cluster-feature-ids.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\duckdb-import-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\expand-retrieval-topology.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\feature-prune-report.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\gate-phase-d-readiness.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\gemma4-batch-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\generate-production-readiness-report.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\hot-keyword-cluster-summary.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\hyperrag-cuda-stream.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\langgraph-gemma4-synthesis.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\materialize-retrieval-attempts.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\migrate-metadata-v1-to-v2.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\packet-rpc-4d-manifold.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\persist-ace-kag-dag-hit.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase6-som-clustering.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8-acceleration-cache-layer.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase85-orchestrator.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8e-tree-node-backfill.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\plan-runtime-packet-backfill.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\populate-atlas-packets-aggressive.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\propagate-tree-node-ids.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\route-hmm-output-to-kanban.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\seed-neo4j-bounded-used-packet-edges.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-neschrom97-registry.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "qdrant_point_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-rg-cluster-pivot.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\test-p4-summary-indexing.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 75,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-gan-tool-calls.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-feature-lineage.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-p4-end-to-end.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "REDIS_GET"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\warm-centroid-cache.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 75,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\sync-qdrant-metadata-by-source.mjs",
+      "role": "MIRRORS",
+      "identityFields": [
+        "source_ref",
+        "feature_id",
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 67,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\apply-naive-bayes-packet-classifier.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\apply_clusters_via_sql.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\apply_upsert_pg.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-concept-evidence-spine.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-turbovec-cuvs-readiness.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-packet-metadata-to-postgres.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "neo4j_node_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-source-ref-hashes.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-function-registry.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-manifold-autocoder.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-task-distillates.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\classify-qdrant-orphans.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\codebase-ingester-unified.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\concept-evidence-backfill.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "feature_id"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\daily-graphify-cold-processing.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\declare-rabbitmq-queues.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\enrich-qdrant-neschrom97-fast.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "source_ref",
+        "feature_id"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\generate-graph-exports.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\hyperrag-log-triage.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\infer-sveltekit-route-gaps.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\measure-bifrost-effectiveness.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\patch-qdrant-feature-ids.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase1-ast-grep-extraction.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase1-domain-class-backfill.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase1.5-lexical-extraction.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase19-retrieval-loop-seed.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase2-concepts-simple-backfill.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase2a-ast-grep-synthetic-key-fix.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-rrf-score.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-rrf-scorer.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-stability-test.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-topk-stability.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase5-tensor-loader.mjs",
+      "role": "RISKS",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase6-som-clustering-libtorch.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase7-indexed-validator.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "SELECT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase7-triton-batch-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8-step3-langextract-entities.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\populate-feature-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\project-clusters-neo4j.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\promote-retrieval-winner.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "redis_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\repair-qdrant-postgres-join.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\repair-qdrant-postgres-match.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-qdrant-neschrom97-enrichment.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\som-kmeans-neo4j-export.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\test-turbovec-sidecar-contract.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\topology-rerank.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\unified-atlas-trace.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\update-code-feature-pagerank.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "feature_id"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\update-manifold-activity.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-canonical-completeness.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-compression-quality.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-hmm-agentic-error.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-manifold4-payloads.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "centroid_id",
+        "som_cluster"
+      ],
+      "operations": [
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-master-feature-map.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-metadata-queries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-directory-source-map.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-p3-readiness.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\verify-phase-2-part-4.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET"
+      ],
+      "preservationScore": 50,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\warmup-bifrost-clusters.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\wire-used-concepts-lane.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\writeback-som-clusters.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE"
+      ],
+      "preservationScore": 50,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-parent-atlas-overlay-sync.mjs",
+      "role": "MIRRORS",
+      "identityFields": [
+        "feature_id",
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 33,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\p2-qdrant-payload-sync-topology.mjs",
+      "role": "MIRRORS",
+      "identityFields": [
+        "packet_key",
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 33,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase2-sync-qdrant-rff-payloads.mjs",
+      "role": "MIRRORS",
+      "identityFields": [
+        "source_ref",
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 33,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\packages\\parent-atlas-retrieval\\src\\turbovec\\turbovec-prefilter.ts",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\atlas-answer-trace.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-phase-2-part-4.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "redis_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-summary-quality.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-lineage-version.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\batch-summarize-chunks.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\batch-summarize-clusters.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-parent-atlas-cards.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-sveltekit-route-map.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-task-distillates-v2.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\cache-feature-cards.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\cache-hypergraph-cluster-cards.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\cache-task-distillates-redis.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\canonical-source-ref.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\concept-evidence-audit.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\detect-manifold-drift.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "NEO4J_QUERY",
+        "REDIS_GET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\distill-atlas-card-store.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\embedding-prep-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\extract-cluster-aliases.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\generate-parent-atlas-profile-cards.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\hyperrag-couchdb-enrich.mjs",
+      "role": "ENRICHES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\import-cluster-summaries.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\index-task-distillates.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\ingest-autoresearch-jsonl.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\ingest-directory-agents-signals.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase-1b-postgres-bm25-index.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase10-error-signal-classifier.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase17-pytorch-feature-extractor.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase18-xgboost-reranker.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase3d-retrieval-telemetry-summary.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "feature_id"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-postgres-writer.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase6-som-clustering-fast.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase6-unified-feature-graph.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase7-batch-worker-improved.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "redis_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase8f-langextract-concepts.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\populate-atlas-packet-features.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\project-feature-matrix-neo4j.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\qdrant-tag-backfill.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "qdrant_point_id"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\queue-kmeans-gpu-job.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\queue-som-gpu-job.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\record-git-diff-provenance.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "source_ref"
+      ],
+      "operations": [
+        "INSERT",
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\redis_inspect_wiki_note_dir.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\search-clusters-lexical.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-llm-synthesis-event.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\smoke-topology-ae2l-pca.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\stage-2c-500-phase-review.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\synthesize-context-chunks.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\train-naive-bayes-packet-features.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\update-task-performance.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "UPDATE",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-atlas-packet-features.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 25,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\validate-som-20x20-topology.mjs",
+      "role": "PRESERVES",
+      "identityFields": [
+        "som_cluster"
+      ],
+      "operations": [
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 25,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-postgres-contract-mirrors.mjs",
+      "role": "MIRRORS",
+      "identityFields": [
+        "packet_key"
+      ],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 17,
+      "risks": []
+    },
+    {
+      "path": ".\\scripts\\atlas\\ingest-topology-to-neo4j.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\src\\lib\\server\\ace\\context-assembler.ts",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\append-llm-synthesis-jsonl.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\append-temporal-agent-note.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\apply-hardened-sanitizer.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "UPDATE"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-cache-promotion-policy.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-engram-adapter-decision.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "REDIS_GET"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-error-fixes.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-node-postgres-context.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "SELECT",
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\audit-som-coverage-gaps.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-concept-evidence-spine.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-qdrant-source-refs.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\backfill-som-from-existing-topology.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-rg-search-matrix.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\build-route-feature-map.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\cache-task-distillates-redis-v2.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\check-live-service-env.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\chunk-text-notes.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\collect-runtime-evidence.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\compress-manifold-vectors.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\count_parent_atlas.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\duckdb-import-feature-cards.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\embed-chunks.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_UPSERT",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\error-ingest.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\generate-neo4j-graphrag-report.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\hyperrag-expand.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "QDRANT_SEARCH",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\index-task-distillates-qdrant.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "QDRANT_SEARCH"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\ingest-workspace-metadata.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\inventory-atlas-data-files.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\load-turbovec-index-from-qdrant.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "REDIS_GET",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\materialize-provenance-p2-fields.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "UPDATE",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase1-backfill-rff-embeddings.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "SELECT",
+        "UPDATE",
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\phase4-stability-report.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\prepare-knowledge-layer.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\prototype_feature_extract.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run-seed-nonfatal.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run_auth_probes.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run_auth_probes_with_env.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run_label_and_count.mjs",
+      "role": "UNKNOWN",
+      "identityFields": [],
+      "operations": [
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run_live_cache_checks.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "SELECT",
+        "JOIN",
+        "QDRANT_SEARCH",
+        "NEO4J_QUERY",
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Qdrant operation without qdrant_point_id tracking",
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\run_with_env.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "JOIN",
+        "NEO4J_QUERY"
+      ],
+      "preservationScore": 0,
+      "risks": [
+        "Neo4j operation without neo4j_node_id tracking"
+      ]
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\test-hardened-sanitizer.mjs",
+      "role": "RISKS",
+      "identityFields": [],
+      "operations": [
+        "UPDATE",
+        "JOIN"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    },
+    {
+      "path": ".\\sveltekit-frontend\\scripts\\atlas\\valkey-seed-opencode-rules.mjs",
+      "role": "PRESERVES",
+      "identityFields": [],
+      "operations": [
+        "REDIS_SET"
+      ],
+      "preservationScore": 0,
+      "risks": []
+    }
+  ]
+}
