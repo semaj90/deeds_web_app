@@ -15,7 +15,7 @@ Generated: 2026-07-05
 | Arrow batch transport | created | Board contract exists; not yet proven end-to-end in this checkout |
 | mmap registry payloads | created | Planned and contract-defined; not yet proven end-to-end |
 | ACP routing fan-out | wired | HMM router exists and emits bounded routing suggestions |
-| HyperRAG packet materializer | partial | Retrieval + HMM + recommendation scripts exist, but the single RPC/MsgPack/telemetry joiner still needs a bounded executor surface |
+| HyperRAG packet materializer | proven | `scripts/atlas/hyperrag-packet-materializer.mjs` now passes dry-run and apply on a bounded slice, writing MsgPack + hot registry rows |
 | Stub/mock cleanup | partial | New lanes are bounded and real, but older schema drift still needs cleanup |
 | Rust parser / N-API lane | proven | `verify-rust-napi-exports.mjs` and `test-rust-parser.mjs` pass on the live checkout |
 | TurboVec sidecar smoke | proven | Smoke now passes on 8791, matching the live pipeline validator |
@@ -63,15 +63,15 @@ Generated: 2026-07-05
 
 Scripts and board contracts exist.
 
-### Wired: 88%
+### Wired: 89%
 
-The live retrieval, semantic training, NB, HMM, and topology audit lanes are connected to the real schema.
+The live retrieval, semantic training, NB, HMM, topology audit, and bounded packet materializer lanes are connected to the real schema.
 
-### Proven: 76%
+### Proven: 79%
 
-Bounded slices and sidecar smoke tests pass, but the full-coverage bridges are still incomplete.
+Bounded slices and sidecar smoke tests pass, and the HyperRAG packet materializer now has a passing bounded apply slice.
 
-### Done: 60%
+### Done: 62%
 
 Core lanes are live, but the pipeline is not production-complete until the identity bridges and topology propagation are finished.
 

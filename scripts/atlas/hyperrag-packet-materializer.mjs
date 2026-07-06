@@ -97,6 +97,12 @@ function sha256(text) {
   return createHash('sha256').update(String(text)).digest('hex');
 }
 
+function numericOrNull(value) {
+  const text = normalizeText(value);
+  if (!text) return null;
+  return /^[0-9]+$/.test(text) ? Number(text) : null;
+}
+
 function base64Json(value) {
   return Buffer.from(stableStringify(value), 'utf8').toString('base64');
 }
@@ -399,9 +405,16 @@ async function ensureHotTable(client) {
       packet_key TEXT PRIMARY KEY,
       trace_id TEXT,
       source_ref TEXT,
+      source_ref_key TEXT,
+      canonical_source_ref TEXT,
       file_path TEXT,
+      directory_path TEXT,
       feature_id TEXT,
       title TEXT,
+      title_id TEXT,
+      tree_node_id TEXT,
+      parent_node_id TEXT,
+      root_node_id TEXT,
       summary TEXT,
       embedding_status TEXT,
       embedding_dim INTEGER,
@@ -440,6 +453,16 @@ async function ensureHotTable(client) {
       last_validated TIMESTAMP
     )
   `);
+  await client.query(`
+    ALTER TABLE atlas_packet_registry
+      ADD COLUMN IF NOT EXISTS source_ref_key TEXT,
+      ADD COLUMN IF NOT EXISTS canonical_source_ref TEXT,
+      ADD COLUMN IF NOT EXISTS directory_path TEXT,
+      ADD COLUMN IF NOT EXISTS title_id TEXT,
+      ADD COLUMN IF NOT EXISTS tree_node_id TEXT,
+      ADD COLUMN IF NOT EXISTS parent_node_id TEXT,
+      ADD COLUMN IF NOT EXISTS root_node_id TEXT
+  `);
 }
 
 async function upsertRegistry(client, packet) {
@@ -449,9 +472,12 @@ async function upsertRegistry(client, packet) {
     source_ref_key: packet.source_ref_key,
     canonical_source_ref: packet.canonical_source_ref,
     file_path: packet.file_path,
+    directory_path: packet.directory_path,
     feature_id: packet.feature_id,
     title_id: packet.title_id,
     tree_node_id: packet.tree_node_id,
+    parent_node_id: packet.parent_node_id || null,
+    root_node_id: packet.root_node_id || null,
     domain_class: packet.domain_class,
     ontology_label: packet.ontology_label,
     topology_label: packet.topology_label,
@@ -477,121 +503,97 @@ async function upsertRegistry(client, packet) {
   const checksum = sha256(Buffer.from(msgpackBytes));
 
   const traceId = payload.acp.trace_id;
-  const registryPath = path.join('memory', 'packets', 'hyperrag-packets.msgpack');
+  const registryPath = path.join('memory', 'packets', 'hyperrag', `${packet.packet_key}.msgpack`);
   const valkeyKey = `bitfrost:hyperrag:${packet.packet_key}`;
+  const qdrantRegistryId = numericOrNull(packet.qdrant_point_id);
 
   await client.query(`
     INSERT INTO atlas_packet_registry (
       packet_key,
       trace_id,
       source_ref,
+      source_ref_key,
+      canonical_source_ref,
       file_path,
+      directory_path,
       feature_id,
       title,
+      title_id,
+      tree_node_id,
+      parent_node_id,
+      root_node_id,
       summary,
       embedding_status,
       embedding_dim,
-      latent_64,
-      kmeans_cluster_id,
-      som_x,
-      som_y,
-      semantic_z,
-      activity_w,
-      manifold4,
       qdrant_point_id,
-      neo4j_node_id,
-      valkey_cache_key,
-      ace_cache_key,
-      seaweedfs_filer_path,
       pagerank_score,
-      authority_blend,
-      last_rerank_score,
-      retrieval_count,
-      cache_hits,
-      cache_misses,
       cache_state,
-      activity,
       status,
+      validation_status,
       created_at,
       updated_at,
-      dag_edges,
-      validation_status,
-      last_validated,
+      seaweedfs_filer_path,
+      valkey_cache_key,
+      ace_cache_key,
       total_size_bytes
     )
     VALUES (
-      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,now(),now(),$31,$32,now(),$33
+      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27
     )
     ON CONFLICT (packet_key) DO UPDATE SET
       trace_id = EXCLUDED.trace_id,
       source_ref = EXCLUDED.source_ref,
+      source_ref_key = EXCLUDED.source_ref_key,
+      canonical_source_ref = EXCLUDED.canonical_source_ref,
       file_path = EXCLUDED.file_path,
+      directory_path = EXCLUDED.directory_path,
       feature_id = EXCLUDED.feature_id,
       title = EXCLUDED.title,
+      title_id = EXCLUDED.title_id,
+      tree_node_id = EXCLUDED.tree_node_id,
+      parent_node_id = EXCLUDED.parent_node_id,
+      root_node_id = EXCLUDED.root_node_id,
       summary = EXCLUDED.summary,
       embedding_status = EXCLUDED.embedding_status,
       embedding_dim = EXCLUDED.embedding_dim,
-      latent_64 = EXCLUDED.latent_64,
-      kmeans_cluster_id = EXCLUDED.kmeans_cluster_id,
-      som_x = EXCLUDED.som_x,
-      som_y = EXCLUDED.som_y,
-      semantic_z = EXCLUDED.semantic_z,
-      activity_w = EXCLUDED.activity_w,
-      manifold4 = EXCLUDED.manifold4,
       qdrant_point_id = EXCLUDED.qdrant_point_id,
-      neo4j_node_id = EXCLUDED.neo4j_node_id,
+      pagerank_score = EXCLUDED.pagerank_score,
+      cache_state = EXCLUDED.cache_state,
+      status = EXCLUDED.status,
+      validation_status = EXCLUDED.validation_status,
+      created_at = EXCLUDED.created_at,
+      updated_at = EXCLUDED.updated_at,
+      seaweedfs_filer_path = EXCLUDED.seaweedfs_filer_path,
       valkey_cache_key = EXCLUDED.valkey_cache_key,
       ace_cache_key = EXCLUDED.ace_cache_key,
-      seaweedfs_filer_path = EXCLUDED.seaweedfs_filer_path,
-      pagerank_score = EXCLUDED.pagerank_score,
-      authority_blend = EXCLUDED.authority_blend,
-      last_rerank_score = EXCLUDED.last_rerank_score,
-      retrieval_count = EXCLUDED.retrieval_count,
-      cache_hits = EXCLUDED.cache_hits,
-      cache_misses = EXCLUDED.cache_misses,
-      cache_state = EXCLUDED.cache_state,
-      activity = EXCLUDED.activity,
-      status = EXCLUDED.status,
-      updated_at = now(),
-      dag_edges = EXCLUDED.dag_edges,
-      validation_status = EXCLUDED.validation_status,
-      last_validated = now(),
       total_size_bytes = EXCLUDED.total_size_bytes
   `, [
     packet.packet_key,
     traceId,
     packet.source_ref,
+    packet.source_ref_key || null,
+    packet.canonical_source_ref || null,
     packet.file_path,
+    packet.directory_path || null,
     packet.feature_id,
+    packet.feature_label || packet.title_id || null,
     packet.title_id,
+    packet.tree_node_id || null,
+    packet.parent_node_id || null,
+    packet.root_node_id || null,
     packet.summary || null,
-    packet.qdrant_point_id ? 'materialized' : 'pending',
+    packet.qdrant_point_id ? 'complete' : 'pending',
     packet.latent_64 ? 64 : null,
-    packet.latent_64 ? Buffer.from(packet.latent_64, 'base64') : null,
-    packet.kmeans_cluster != null ? String(packet.kmeans_cluster) : null,
-    packet.som_col ?? null,
-    packet.som_row ?? null,
-    packet.som_row != null && packet.som_col != null ? Number(`${packet.som_row}.${String(packet.som_col).padStart(2, '0')}`) : null,
+    qdrantRegistryId,
     packet.page_rank_score ?? null,
-    packet.community_id ?? null,
-    packet.topology || null,
-    packet.qdrant_point_id ? String(packet.qdrant_point_id) : null,
-    packet.tree_node_id ? String(packet.tree_node_id) : null,
+    packet.qdrant_point_id ? 'L3:qdrant' : 'cold',
+    'active',
+    'valid',
+    new Date().toISOString(),
+    new Date().toISOString(),
+    registryPath,
     valkeyKey,
     `ace:packet:${packet.packet_key}`,
-    registryPath,
-    packet.page_rank_score ?? null,
-    packet.community_id != null ? Number(packet.community_id) / 100000 : null,
-    packet.page_rank_score ?? null,
-    0,
-    0,
-    0,
-    packet.qdrant_point_id ? 'hot' : 'cold',
-    packet.acp,
-    packet.validation_status,
-    packet.dag_edges ? packet.dag_edges : [],
-    stableStringify(packet.provenance),
-    packet.qdrant_point_id ? 0 : null,
     Buffer.byteLength(JSON.stringify(packet), 'utf8'),
   ]);
 
