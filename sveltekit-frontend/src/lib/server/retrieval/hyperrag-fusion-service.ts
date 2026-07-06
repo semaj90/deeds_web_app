@@ -26,6 +26,11 @@ import { logAceRun } from '$lib/server/retrieval/ace-retrieval-logger.js';
 import { ColdStorageRetrievalService } from '$lib/server/retrieval/cold-storage-retrieval-service.js';
 import { execFileSync } from 'node:child_process';
 import { engramAdapter } from '$lib/server/memory/local-engram-memory-adapter.js';
+import { computeRRFScore, RRF_LANE_WEIGHTS, RRF_CONSTANT_K, type RRFScoreResult } from '$lib/server/retrieval/compute-rrf-score.js';
+import { partitionHitsByLane } from '$lib/server/retrieval/signal-grouping.js';
+import { computeVectorScore } from '$lib/server/retrieval/vector-scorer.js';
+import { computeGraphScore, blendGraphSignals } from '$lib/server/retrieval/graph-scorer.js';
+import { blendTelemetrySignals } from '$lib/server/retrieval/telemetry-scorer.js';
 
 export type LexicalClusterHit = {
   clusterId: number;
@@ -51,6 +56,7 @@ export type HyperRagQuery = {
   useAceCache?: boolean;
   tokenBudget?: number;
   userId?: string;
+  compareScoring?: boolean;
 };
 
 export type HyperRagHit = {
@@ -59,6 +65,7 @@ export type HyperRagHit = {
   title?: string;
   text?: string;
   score: number;
+  scoreWeightedSum?: number;
   signals: {
     dense?: number;
     graphAuthority?: number;
@@ -72,7 +79,12 @@ export type HyperRagHit = {
     activity_w?: number;
     cluster_alias?: string;
     recencyOrHitRate?: number;
+    engramBoost?: number;
   };
+  rrfBreakdown?: Array<{
+    lane: string;
+    contribution: number;
+  }>;
   manifold4?: [number, number, number, number];
   manifold4Meta?: {
     som_x: number;
