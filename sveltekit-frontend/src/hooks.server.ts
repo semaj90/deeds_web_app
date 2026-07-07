@@ -786,6 +786,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       '/api/docs',
       '/api/glossary',
       '/api/statutes',
+      '/api/opencode-dispatch',
     ];
 
     // Admin-only routes (require admin role)

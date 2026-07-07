@@ -13,6 +13,7 @@ export default defineConfig({
     include: [
       'src/**/*.{test,spec}.{js,ts}',
       // Vitest unit tests — explicitly listed to avoid picking up 66+ Playwright files in tests/
+      'tests/bitmap-optimization.spec.ts',
       'tests/ace-policy.spec.ts',
       'tests/code-llm-index.spec.ts',
       'tests/openai-facade.spec.ts',

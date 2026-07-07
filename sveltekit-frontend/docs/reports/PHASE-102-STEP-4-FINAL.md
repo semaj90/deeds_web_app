@@ -113,8 +113,8 @@ ls -lh docs/reports/phase4-*.md
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \
   "SELECT COUNT(*) FROM packet_graph_scores WHERE rrf_scores IS NOT NULL"
 
-# Check Redis (if gate passed)
-docker exec legal-ai-redis redis-cli DBSIZE
+# Check Valkey (if gate passed)
+docker exec legal-ai-valkey valkey-cli -a redis DBSIZE
 ```
 
 ---

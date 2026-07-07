@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data } = $props<{ data: PageData }>();
 
 	let status = $state('idle');
 	let progress = $state(0);

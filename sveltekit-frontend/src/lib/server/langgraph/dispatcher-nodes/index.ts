@@ -2,6 +2,7 @@
  * Dispatcher Nodes — Export All 9 Nodes
  */
 
+export { nodeBitmapGateScoring } from './node-bitmap-gate-scoring.js';
 export { nodeEscalateQuarantine } from './node-escalate-quarantine.js';
 export { nodeRecoverIdentity } from './node-recover-identity.js';
 export { nodeValidateEnvelope } from './node-validate-envelope.js';

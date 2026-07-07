@@ -36,12 +36,12 @@
     confidence: number;
   }
 
-  let toolMetrics: ToolMetrics[] = [];
-  let dispatcherMetrics: DispatcherMetrics[] = [];
-  let implementationClusters: ImplementationCluster[] = [];
-  let loading = true;
-  let selectedTool: string | null = null;
-  let error: string | null = null;
+  let toolMetrics = $state<ToolMetrics[]>([]);
+  let dispatcherMetrics = $state<DispatcherMetrics[]>([]);
+  let implementationClusters = $state<ImplementationCluster[]>([]);
+  let loading = $state(true);
+  let selectedTool = $state<string | null>(null);
+  let error = $state<string | null>(null);
 
   onMount(async () => {
     try {

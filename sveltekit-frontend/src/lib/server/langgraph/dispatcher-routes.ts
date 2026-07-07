@@ -6,6 +6,7 @@
 import type { DispatcherState } from './dispatcher-nodes/types.js';
 
 export const DISPATCHER_DECISION_TO_NODE: Record<string, string> = {
+  score_gates: 'node_bitmap_gate_scoring',
   quarantine: 'node_escalate_quarantine',
   recover: 'node_recover_identity',
   validate: 'node_validate_envelope',
@@ -37,9 +38,10 @@ export function routeByDispatch(state: DispatcherState): string {
 }
 
 /**
- * Node registry — all 9 nodes available for LangGraph execution
+ * Node registry — all 10 nodes available for LangGraph execution
  */
 export const DISPATCHER_NODES = {
+  node_bitmap_gate_scoring: 'node_bitmap_gate_scoring',
   node_escalate_quarantine: 'node_escalate_quarantine',
   node_recover_identity: 'node_recover_identity',
   node_validate_envelope: 'node_validate_envelope',

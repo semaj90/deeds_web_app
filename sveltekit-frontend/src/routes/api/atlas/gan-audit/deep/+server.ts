@@ -11,7 +11,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client.js';
 import { getRedis } from '$lib/server/redis.js';
-import { getNats } from '$lib/server/nats.js';
+// TODO: Import getNats from '$lib/server/nats.js' when module is created
 
 const ganDeepAuditRequestSchema = z.object({
   operation: z.enum(['gan-audit']).default('gan-audit'),
@@ -40,8 +40,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const body = await request.json().catch(() => ({}));
     const config = ganDeepAuditRequestSchema.parse(body);
 
-    // Dynamically import Phase 2.5 modules (lazy load to avoid circular deps)
-    const { executeGanDeepAudit } = await import('@deeds/atlas-core/validation/gan-deep-audit.js');
+    // Wire atlas-core GAN audit (relative import from compiled dist)
+    const { executeGanDeepAudit } = await import('../../../../../../../packages/atlas-core/dist/validation/gan-deep-audit.js');
     const { goSearchBridge } = await import('$lib/server/retrieval/go-search-bridge.js');
 
     // Get service clients with graceful fallback
@@ -54,7 +54,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
 
     try {
-      nats = getNats();
+      // TODO: Wire NATS when $lib/server/nats.ts is implemented
+      // For now, NATS is optional (non-blocking events deferred)
+      // const { getNats } = await import('$lib/server/nats.js');
+      // nats = getNats();
     } catch (err) {
       if (config.verbose) console.warn('[GAN Deep Audit] NATS unavailable, continuing without events');
     }
@@ -71,31 +74,50 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       console.log(`[GAN Deep Audit] Starting audit: operation=${config.operation}, batchSize=${config.batchSize}`);
     }
 
-    // Execute the deep audit pipeline
-    const result = await executeGanDeepAudit(config, deps);
+    // Execute comprehensive GAN deep audit
+    const auditConfig = {
+      operation: config.operation,
+      dryRun: config.dryRun,
+      batchSize: config.batchSize,
+      includeTokenAnalysis: config.includeTokenAnalysis,
+      includeFeatureRecommendations: config.includeFeatureRecommendations,
+      includeProductionHardening: config.includeProductionHardening,
+      includeRetrievalAnalysis: config.includeRetrievalAnalysis,
+    };
+
+    const auditDeps = {
+      db,
+      redis: redis || undefined,
+      nats: nats || undefined,
+      goSearchBridge: config.includeRetrievalAnalysis ? goSearchBridge : undefined,
+    };
+
+    const result = await executeGanDeepAudit(auditConfig, auditDeps);
 
     // Log to audit trail (non-blocking)
     try {
       if (redis) {
+        const trace_id = result.trace_id || `audit:gan-deep:${Date.now()}`;
         await redis.setex(
-          `audit:gan-deep:${result.trace_id}`,
+          trace_id,
           3600,
           JSON.stringify({
             timestamp: new Date().toISOString(),
             user_id: locals.user.id,
             operation: config.operation,
-            processed: result.processed,
-            passed: result.passed,
-            hardFailures: result.hardFailures,
-            softWarnings: result.softWarnings,
+            processed: result.processed || 0,
+            passed: result.passed || 0,
+            hardFailures: result.hardFailures || 0,
+            softWarnings: result.softWarnings || 0,
             total_potential_savings: result.total_potential_savings || 0,
             hardening_issues_count: result.production_hardening_issues?.length || 0,
             recommendations_count: result.agentic_recommendations?.length || 0,
           })
         );
+        if (config.verbose) console.log(`[GAN Deep Audit] Audit trail written: ${trace_id}`);
       }
     } catch (err) {
-      if (config.verbose) console.warn('[GAN Deep Audit] Audit trail write failed (non-blocking)');
+      if (config.verbose) console.warn('[GAN Deep Audit] Audit trail write failed (non-blocking):', err);
     }
 
     return json(result, { status: 200 });

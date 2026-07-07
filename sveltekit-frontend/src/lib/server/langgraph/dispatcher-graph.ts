@@ -6,6 +6,7 @@
 import { Annotation, StateGraph, END, START } from '@langchain/langgraph';
 import type { DispatcherState } from './dispatcher-nodes/types.js';
 import {
+  nodeBitmapGateScoring,
   nodeEscalateQuarantine,
   nodeRecoverIdentity,
   nodeValidateEnvelope,
@@ -59,7 +60,17 @@ export function createDispatcherGraph(ctx: NodeContext) {
     };
   });
 
-  // Add all 9 dispatcher nodes (wrapped with telemetry)
+  // Add all 10 dispatcher nodes (wrapped with telemetry)
+  graph.addNode(
+    DISPATCHER_NODES.node_bitmap_gate_scoring,
+    withDispatcherTelemetry(
+      'node_bitmap_gate_scoring',
+      async (state: DispatcherState) => nodeBitmapGateScoring(state, ctx),
+      ctx.redis,
+      ctx.postgres
+    )
+  );
+
   graph.addNode(
     DISPATCHER_NODES.node_escalate_quarantine,
     withDispatcherTelemetry(

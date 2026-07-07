@@ -236,7 +236,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "select now(
 ### Redis
 
 ```powershell
-docker exec legal-ai-redis redis-cli -a redis ping
+docker exec legal-ai-valkey valkey-cli -a redis ping
 ```
 
 ### Qdrant

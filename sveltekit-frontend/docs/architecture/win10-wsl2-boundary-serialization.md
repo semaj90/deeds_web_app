@@ -26,7 +26,7 @@
 │                                                                              │
 │  Docker containers (GPU-capable via /dev/dxgkrnl + libnvidia-container):    │
 │  ├── legal-ai-postgres   :5432   ← pg18, pgvector, JSONB + GIN indexes     │
-│  ├── legal-ai-redis      :6379   ← ioredis, RESP3, binary-safe strings      │
+│  ├── legal-ai-valkey     :6379   ← valkey-cli, RESP3, binary-safe strings   │
 │  ├── legal-ai-qdrant     :6333   ← gRPC :6334, FP16/BF16 HNSW               │
 │  ├── legal-ai-neo4j      :7687   ← Bolt protocol (binary framing)           │
 │  ├── legal-ai-rabbitmq   :5672   ← AMQP 0-9-1, persistent queues, DLX      │

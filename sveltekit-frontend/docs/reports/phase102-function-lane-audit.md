@@ -327,8 +327,8 @@ cat docs/reports/phase5-tensor-loader.json | jq '.embedding_count, .embedding_di
 cat docs/reports/phase6-som-clustering.json | jq '.stats'
 # Expected: 40568 embeddings, 400 clusters, convergence metrics
 
-# Redis cache
-docker exec legal-ai-redis redis-cli GET bitfrost:rrf:global:top-10 | wc -c
+# Valkey cache
+docker exec legal-ai-valkey valkey-cli -a redis GET bitfrost:rrf:global:top-10 | wc -c
 # Expected: >100 bytes (10 results cached)
 ```
 

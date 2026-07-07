@@ -1,27 +1,159 @@
-version: '3.8' services: # Redis with authentication redis: image: redis:7-alpine container_name: deeds-redis ports: -
-"6379:6379" command: redis-server --requirepass redis environment: - REDIS_PASSWORD=redis volumes: - redis_data:/data
-healthcheck: test: ["CMD", "redis-cli", "--raw", "incr", "ping"] interval: 30s timeout: 10s retries: 3 # PostgreSQL with
-pgvector extension postgres: image: pgvector/pgvector:pg16 container_name: deeds-postgres ports: - "5432:5432"
-environment: POSTGRES_DB: deeds POSTGRES_USER: postgres POSTGRES_PASSWORD: postgres volumes: -
-postgres_data:/var/lib/postgresql/data - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql healthcheck: test:
-["CMD-SHELL", "pg_isready -U postgres -d deeds"] interval: 30s timeout: 10s retries: 3 # Neo4j Graph Database neo4j: image:
-neo4j:5-community container_name: deeds-neo4j ports: - "7474:7474" - "7687:7687" environment: NEO4J_AUTH: neo4j/password
-NEO4J_PLUGINS: '["apoc"]' volumes: - neo4j_data:/data - neo4j_logs:/logs healthcheck: test: ["CMD", "cypher-shell",
-"-u", "neo4j", "-p", "password", "RETURN 1"] interval: 30s timeout: 10s retries: 3 # MinIO Object Storage minio: image:
-minio/minio:latest container_name: deeds-minio ports: - "9000:9000" - "9001:9001" environment: MINIO_ROOT_USER:
-minioadmin MINIO_ROOT_PASSWORD: minioadmin command: server /data --console-address ":9001" volumes: - minio_data:/data
-healthcheck: test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"] interval: 30s timeout: 10s retries:
-3 # Qdrant Vector Database qdrant: image: qdrant/qdrant:latest container_name: deeds-qdrant ports: - "6333:6333" -
-"6334:6334" volumes: - qdrant_data:/qdrant/storage healthcheck: test: ["CMD", "curl", "-f",
-"http://localhost:6333/health"] interval: 30s timeout: 10s retries: 3 # Ollama AI Service ollama: image:
-ollama/ollama:latest container_name: deeds-ollama ports: - "11434:11434" environment: - OLLAMA_HOST=0.0.0.0 volumes: -
-ollama_data:/root/.ollama deploy: resources: reservations: devices: - driver: nvidia count: 1 capabilities: [gpu]
-healthcheck: test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"] interval: 30s timeout: 10s retries: 3 #
-Enhanced RAG Service (Go) rag-service: build: context: ./go-enhanced-rag-service dockerfile: Dockerfile container_name:
-deeds-rag-service ports: - "8094:8094" environment: - REDIS_URL=redis://redis:6379 - REDIS_PASSWORD=redis -
-POSTGRES_URL=postgres://postgres:postgres@postgres:5432/deeds - NEO4J_URL=bolt://neo4j:7687 - NEO4J_USER=neo4j -
-NEO4J_PASSWORD=password - OLLAMA_URL=http://ollama:11434 - QDRANT_URL=http://qdrant:6333 - MINIO_URL=http://minio:9000 -
-ENABLE_CUDA=true - ENABLE_SIMD_JSON=true depends_on: - redis - postgres - neo4j - ollama - qdrant healthcheck: test:
-["CMD", "curl", "-f", "http://localhost:8094/health"] interval: 30s timeout: 10s retries: 3 volumes: redis_data:
-postgres_data: neo4j_data: neo4j_logs: minio_data: qdrant_data: ollama_data: networks: default: name: deeds-network
+version: '3.8'
 
+services:
+  # Valkey with authentication
+  valkey:
+    image: valkey/valkey-bundle:8.1.1
+    container_name: deeds-valkey
+    ports:
+      - "6379:6379"
+    command: valkey-server --requirepass redis --maxmemory 2gb --maxmemory-policy allkeys-lru --io-threads 4
+    environment:
+      - REDIS_PASSWORD=redis
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "-a", "redis", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # PostgreSQL with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: deeds-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: deeds
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d deeds"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Neo4j Graph Database
+  neo4j:
+    image: neo4j:5-community
+    container_name: deeds-neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_AUTH: neo4j/password
+      NEO4J_PLUGINS: '["apoc"]'
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "password", "RETURN 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: deeds-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: deeds-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Ollama AI Service (GPU-accelerated)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: deeds-ollama
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Enhanced RAG Service (Go)
+  rag-service:
+    build:
+      context: ./go-enhanced-rag-service
+      dockerfile: Dockerfile
+    container_name: deeds-rag-service
+    ports:
+      - "8094:8094"
+    environment:
+      - REDIS_URL=valkey://valkey:6379
+      - REDIS_PASSWORD=redis
+      - POSTGRES_URL=postgres://postgres:postgres@postgres:5432/deeds
+      - NEO4J_URL=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=password
+      - OLLAMA_URL=http://ollama:11434
+      - QDRANT_URL=http://qdrant:6333
+      - MINIO_URL=http://minio:9000
+      - ENABLE_CUDA=true
+      - ENABLE_SIMD_JSON=true
+    depends_on:
+      - valkey
+      - postgres
+      - neo4j
+      - ollama
+      - qdrant
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8094/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  valkey_data:
+  postgres_data:
+  neo4j_data:
+  neo4j_logs:
+  minio_data:
+  qdrant_data:
+  ollama_data:
+
+networks:
+  default:
+    name: deeds-network

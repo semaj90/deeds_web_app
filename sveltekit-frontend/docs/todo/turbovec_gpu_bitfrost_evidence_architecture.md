@@ -630,7 +630,7 @@ workflow.get_status
 It should not directly call:
 
 ```text
-redis-cli
+valkey-cli / redis-cli
 psql
 qdrant raw mutation
 neo4j write cypher

@@ -210,7 +210,7 @@ HASH gpu:autoencoder:centroids_64_meta
 TTL: 24h
 ```
 
-**Invalidation**: if `ace:autoencoder:weights` trainedAt changes → centroids stale; daily cron picks up the new weights and recomputes. Manual: `redis-cli DEL gpu:autoencoder:centroids_64`.
+**Invalidation**: if `ace:autoencoder:weights` trainedAt changes → centroids stale; daily cron picks up the new weights and recomputes. Manual: `valkey-cli -a redis DEL gpu:autoencoder:centroids_64`.
 
 ---
 

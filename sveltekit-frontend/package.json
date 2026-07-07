@@ -194,7 +194,7 @@
     "atlas:phase5:autoencoder:apply": "node scripts/atlas/phase5-autoencoder-bridge.mjs --apply",
     "atlas:phase13:acp:dry": "node scripts/atlas/phase13-acp-dispatcher.mjs --dry-run --limit=100",
     "atlas:phase13:acp:apply": "node scripts/atlas/phase13-acp-dispatcher.mjs --apply",
-    "atlas:phase8.8:hmm:dry": "node scripts/atlas/phase8.8-hmm-semantic-compiler.mjs --dry-run --limit=100",
+    "atlas:phase8.8:hmm:dry": "node scripts/atlas/phase8.8-hmm-semantic-compiler.mjs --dry-run",
     "atlas:phase8.8:hmm:apply": "node scripts/atlas/phase8.8-hmm-semantic-compiler.mjs --apply",
     "atlas:validate:features": "node scripts/atlas/validate-atlas-packet-features.mjs",
     "atlas:populate:features:dry": "node scripts/atlas/populate-atlas-packet-features.mjs --dry-run --limit=100",
@@ -565,8 +565,6 @@
     "atlas:phase8:step7:ace:full": "node ../scripts/atlas/ace-packet-assembly.mjs --apply",
     "atlas:phase8:step3:langextract:dry": "node ../scripts/atlas/run-venv-python.mjs scripts/atlas/phase8-step3-langextract-entities.py --limit=50",
     "atlas:phase8:step3:langextract:apply": "node ../scripts/atlas/run-venv-python.mjs scripts/atlas/phase8-step3-langextract-entities.py --apply --limit=200",
-    "atlas:phase8.8:hmm:dry": "node scripts/atlas/phase8.8-hmm-semantic-compiler.mjs --dry-run",
-    "atlas:phase8.8:hmm:apply": "node scripts/atlas/phase8.8-hmm-semantic-compiler.mjs --apply",
     "atlas:phase8.8:hmm:verify": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT hmm_state, COUNT(*) FROM atlas_packets WHERE hmm_state IS NOT NULL GROUP BY hmm_state ORDER BY hmm_state;\"",
     "atlas:phase8:step3:langextract:full": "node ../scripts/atlas/run-venv-python.mjs scripts/atlas/phase8-step3-langextract-entities.py --apply --limit=2000",
     "atlas:phase8:step3:langextract:verbose": "node ../scripts/atlas/run-venv-python.mjs scripts/atlas/phase8-step3-langextract-entities.py --limit=10 --verbose",
@@ -902,7 +900,9 @@
     "atlas:mirror:flow:test:dry": "node scripts/atlas/test-mirror-worker-flow.mjs --dry-run",
     "atlas:mirror:qdrant:worker": "tsx src/lib/server/workers/qdrant-sync-worker.ts",
     "atlas:mirror:neo4j:worker": "tsx src/lib/server/workers/neo4j-sync-worker.ts",
-    "atlas:mirror:redis:worker": "tsx src/lib/server/workers/redis-invalidate-worker.ts"
+    "atlas:mirror:redis:worker": "tsx src/lib/server/workers/redis-invalidate-worker.ts",
+    "atlas:enrich:packets:dry": "node ../scripts/atlas/enrich-packets-titles-summaries.mjs --dry-run --verbose",
+    "atlas:enrich:packets:apply": "node ../scripts/atlas/enrich-packets-titles-summaries.mjs --apply --verbose"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",
