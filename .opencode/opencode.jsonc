@@ -10,6 +10,7 @@
       "models": {
         "gemma4-legal-iq4xs-direct.gguf": {
           "name": "Gemma4 Legal IQ4_XS",
+          "supportsToolCall": false,
           "limit": {
             "context": 65536,
             "output": 4096
@@ -31,6 +32,4 @@
       "headers": {
         "Accept": "application/json, text/event-stream"
       }
-    }
-  }
-}
+    },
