@@ -1,0 +1,171 @@
+{
+  "$schema": "atlas.autoencoder.latent64.okf.v1",
+  "title": "Latent64 Autoencoder Routing Prefilter Contract",
+  "description": "Specifies schema, validation gates, and storage contracts for 64-dimensional latent vector space used for ANN prefiltering only (not semantic truth).",
+  "model": {
+    "name": "packet-autoencoder-768-64",
+    "architecture": "768 → 128 → 64 → 128 → 768",
+    "input_dim": 768,
+    "hidden_dim": 128,
+    "latent_dim": 64,
+    "trained_at": "2026-06-19T16:13:04Z",
+    "epochs": 60,
+    "train_vectors": 9000,
+    "val_vectors": 1000,
+    "val_loss": 0.0007358284494839609,
+    "device": "cuda",
+    "cuda_version": "12.1"
+  },
+  "redis": {
+    "weights_key": "ace:autoencoder:weights",
+    "weights_type": "hash",
+    "weights_ttl_hours": 24,
+    "meta_key": "ace:autoencoder:meta",
+    "meta_type": "hash",
+    "required_weight_fields": ["W1", "b1", "W2", "b2", "W3", "b3", "W4", "b4"],
+    "expected_weight_count": 8
+  },
+  "storage": {
+    "postgres": {
+      "table": "codebase_chunk_index",
+      "columns": {
+        "latent_64": {
+          "type": "vector(64)",
+          "purpose": "HNSW ANN search index",
+          "indexing": "gist",
+          "indexed": true,
+          "sparse": true
+        },
+        "latent64_model": {
+          "type": "text",
+          "purpose": "Model version tracking",
+          "default": "packet-autoencoder-768-64"
+        },
+        "latent64_meta": {
+          "type": "jsonb",
+          "purpose": "Gates validation envelope",
+          "schema": {
+            "gates": {
+              "g4_spearman": "number",
+              "g5_recall_at_100": "number",
+              "g6_ndcg20_regression": "number",
+              "g7_latency_improvement": "number"
+            },
+            "validated_at": "string (ISO8601)"
+          }
+        },
+        "latent64_validated_at": {
+          "type": "timestamptz",
+          "purpose": "Last validation timestamp"
+        },
+        "latent64_msgpack": {
+          "type": "bytea",
+          "purpose": "Compact msgpack encoding for Valkey cache only",
+          "encoding": "msgpack(dtype='float32', dims=64)"
+        }
+      }
+    },
+    "qdrant": {
+      "collection": "codebase_chunks_768",
+      "named_vector": "latent64",
+      "vector_size": 64,
+      "distance": "cosine",
+      "indexed": true,
+      "hnsw_params": {
+        "m": 16,
+        "ef_construction": 64
+      },
+      "payload_field": "latent64_model"
+    },
+    "valkey": {
+      "cache_key_pattern": "latent64:packet:{packet_id}",
+      "encoding": "msgpack",
+      "ttl_seconds": 300,
+      "use_case": "Ephemeral routing hints, not semantic truth"
+    }
+  },
+  "gates": {
+    "g4_spearman_correlation": {
+      "metric": "Spearman rank correlation",
+      "threshold_min": 0.85,
+      "description": "Latent64 reconstruction must preserve ranking order within 0.85 correlation of original",
+      "failure_mode": "Ranking is inverted or randomized; latent64 unsuitable for reranking",
+      "status": "FAIL (0.712 << 0.85)"
+    },
+    "g5_recall_at_100": {
+      "metric": "Recall@100",
+      "threshold_min": 0.98,
+      "description": "Top-100 candidates retrieved by latent64 ANN must include ≥98% of original top-100",
+      "failure_mode": "Missing candidates; ANN prefilter is too aggressive",
+      "status": "PASS (100%)"
+    },
+    "g6_ndcg20_regression": {
+      "metric": "NDCG@20 regression",
+      "threshold_min": -0.05,
+      "description": "Reranked top-20 after latent64 prefilter must not degrade ≥5% from baseline",
+      "failure_mode": "Relevance degradation; prefilter is removing high-quality candidates",
+      "status": "PASS (0.0000)"
+    },
+    "g7_latency_improvement": {
+      "metric": "Latency improvement %",
+      "threshold_min": 0.50,
+      "description": "End-to-end query latency with latent64 prefilter must improve ≥50% vs full 768-d ANN",
+      "failure_mode": "No speedup; latent64 encoding overhead dominates",
+      "status": "FAIL (6.7% << 50%)"
+    }
+  },
+  "deployment": {
+    "status": "GATED",
+    "blocker": "G4 Spearman gate failed (0.712 << 0.85)",
+    "decision": "Continue with latent64 as *routing research* (Valkey cache only), deploy content/summary/title named vectors as semantic truth. Do not use latent64 for HNSW prefilter until Spearman >0.85.",
+    "multi_vector_lanes": {
+      "content": {
+        "vector_type": "vector(768)",
+        "qdrant_named_vector": "content",
+        "purpose": "Full semantic search (truth)",
+        "indexed": true
+      },
+      "summary": {
+        "vector_type": "vector(768)",
+        "qdrant_named_vector": "summary",
+        "purpose": "Summary-based search",
+        "indexed": true
+      },
+      "title": {
+        "vector_type": "vector(768)",
+        "qdrant_named_vector": "title",
+        "purpose": "Title/name search",
+        "indexed": true
+      },
+      "latent64": {
+        "vector_type": "vector(64)",
+        "qdrant_named_vector": "latent64",
+        "purpose": "Routing research only, not semantic search",
+        "indexed": false,
+        "archived": true
+      }
+    }
+  },
+  "validation_parameters": {
+    "inputDim": 768,
+    "latentDim": 64,
+    "requiredRedisFields": 8,
+    "spearmanMin": 0.85,
+    "recallAt100Min": 0.98,
+    "ndcg20RegressionMin": -0.05,
+    "latencyImprovementMin": 0.50,
+    "maxReconstructionLoss": 0.01
+  },
+  "timeline": {
+    "trained": "2026-06-19",
+    "weights_loaded_to_redis": "2026-07-08",
+    "initial_benchmark": "2026-07-08 (FAIL: G4 Spearman 0.712)",
+    "decision": "Keep latent64 for research; ship content/summary/title vectors",
+    "next_steps": [
+      "Archive latent64 as research artifact (Valkey cache only)",
+      "Deploy multi-vector lanes (content, summary, title) as primary retrieval",
+      "RRF blend: 0.4·content + 0.3·summary + 0.2·title + 0.1·keywords",
+      "A/B test multi-vector vs baseline (target: same/better latency + recall)"
+    ]
+  }
+}

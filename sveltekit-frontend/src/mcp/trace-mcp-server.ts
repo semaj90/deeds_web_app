@@ -64,6 +64,8 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
+import { EngramMemoryBridge } from './memory-bridge.js';
+import { LangGraphBridge, extractKeywordsFromState } from './langgraph-bridge.js';
 
 process.on('uncaughtException', (err) => {
   console.error('[mcp] UNCAUGHT EXCEPTION:', err);
@@ -161,6 +163,18 @@ const pool = new Pool({
   connectionTimeoutMillis: 5_000,
 });
 pool.on('error', () => {});
+
+// Initialize Engram memory bridge (PostgreSQL agent memory)
+const engramBridge = new EngramMemoryBridge(PG_URL);
+await engramBridge.ensureSchema().catch((err) => {
+  console.warn('[mcp] Engram schema creation failed (non-fatal):', err);
+});
+
+// Initialize LangGraph bridge (Netflix Headroom dispatcher)
+const langgraphBridge = new LangGraphBridge({ maxStateSize: 32_000, maxToolResultChars: 12_000 }, pool);
+await langgraphBridge.ensureSchema().catch((err) => {
+  console.warn('[mcp] LangGraph schema creation failed (non-fatal):', err);
+});
 
 // Register topology management tools — needs `pool`, so must be after declaration.
 registerTopologyMgmtTools(server, pool);
@@ -549,15 +563,59 @@ type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 const toolRegistry = new Map<string, ToolHandler>();
 
 // Monkey-patch both registerTool and tool so they populate the batch_call registry
+// AND record tool invocations to Engram memory (PostgreSQL + BM25/HNSW)
 const _origRegister = server.registerTool.bind(server);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server as any).registerTool = (name: string, options: any, handler: any) => {
   const wrappedHandler = async (args: any, extra: any) => {
+    const startTime = Date.now();
     try {
       console.log(`[mcp] DISPATCH tool: ${name}`);
-      return await handler(args, extra);
+      const result = await handler(args, extra);
+
+      // Record successful tool invocation to Engram memory (fire-and-forget)
+      const inputHash = EngramMemoryBridge.hashInput(args);
+      const outputSummary =
+        typeof result === 'string'
+          ? result.slice(0, 500)
+          : typeof result === 'object'
+            ? JSON.stringify(result).slice(0, 500)
+            : String(result).slice(0, 500);
+
+      engramBridge
+        .recordObservation({
+          agent_name: 'gemma4-opencode',
+          tool_name: name,
+          input_hash: inputHash,
+          output_summary: outputSummary,
+          decision_context: { args_keys: Object.keys(args), result_type: typeof result },
+          confidence: 0.9,
+          bm25_tags: [name.split('.')[0], name.split('.')[1]].filter(Boolean),
+        })
+        .catch((err) => console.warn(`[mcp] Engram record failed for ${name}:`, err));
+
+      return result;
     } catch (err) {
       console.error(`[mcp] ERROR in tool ${name}:`, err);
+
+      // Record failed tool invocation to Engram memory (fire-and-forget)
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      engramBridge
+        .recordObservation({
+          agent_name: 'gemma4-opencode',
+          tool_name: name,
+          input_hash: EngramMemoryBridge.hashInput(args),
+          output_summary: `ERROR: ${errorMsg.slice(0, 200)}`,
+          decision_context: {
+            args_keys: Object.keys(args),
+            error: errorMsg.slice(0, 100),
+            elapsed_ms: Date.now() - startTime,
+          },
+          confidence: 0.3,
+          bm25_tags: [name.split('.')[0], name.split('.')[1], 'error'].filter(Boolean),
+        })
+        .catch((err2) => console.warn(`[mcp] Engram record failed for ${name} (error path):`, err2));
+
       throw err;
     }
   };
@@ -8228,6 +8286,54 @@ server.registerTool(
     }),
   },
   toolRegistry.get('atlas.coverage') as any
+);
+
+// ── Shell Tool Wrapper (Safe bash execution for Gemma4) ────────────────────────
+server.registerTool(
+  'shell.run',
+  {
+    description:
+      'Run a bash command and return output. Used by Gemma4 to safely invoke shell operations. ' +
+      'Output is truncated to 10KB to stay within context limits.',
+    inputSchema: z.object({
+      command: z.string().describe('Bash command to run'),
+      timeout_ms: z.number().int().positive().default(10000).describe('Timeout in milliseconds (max 30000)'),
+      cwd: z.string().optional().describe('Working directory for command'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    const { exec } = await import('child_process');
+    const { promisify } = await import('util');
+    const execAsync = promisify(exec);
+
+    const command = String(input.command ?? '').slice(0, 500);
+    const timeoutMs = Math.min(Number(input.timeout_ms ?? 10000), 30000);
+    const cwd = String(input.cwd ?? process.cwd()).slice(0, 255);
+
+    try {
+      const { stdout, stderr } = await execAsync(command, {
+        timeout: timeoutMs,
+        cwd,
+        maxBuffer: 1024 * 1024, // 1MB buffer
+      });
+
+      return {
+        status: 'success',
+        command,
+        stdout: String(stdout).slice(0, 10240),
+        stderr: String(stderr).slice(0, 5120),
+        truncated: stdout.length > 10240 || stderr.length > 5120,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return {
+        status: 'error',
+        command,
+        error: errorMsg.slice(0, 5120),
+        hint: errorMsg.includes('timeout') ? 'Command exceeded timeout limit' : undefined,
+      };
+    }
+  }
 );
 
 const isDirectRun =
