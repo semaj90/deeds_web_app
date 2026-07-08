@@ -616,6 +616,30 @@
       "detail": "Spawn gemma4-legal-iq4xs-direct.gguf + mmproj VLM on :8090. Pre-evicts Ollama VRAM, probes binary for --jinja/--cache-prompt/--cache-reuse/Flash-Attn, 64K ctx, q8_0/q8_0 KV, -np 1. Waits up to 120s for /health."
     },
     {
+      "label": "Gemma4 Tool-Call Sanitizer (:8091)",
+      "type": "shell",
+      "command": "node scripts/opencode/gemma4-tool-call-sanitizer.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "isBackground": true,
+      "dependsOn": ["TurboQuant llama-server (VLM)"],
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "silent",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": false
+      },
+      "detail": "HTTP proxy at :8091 that strips <start_of_turn>/<end_of_turn> contamination markers from Gemma4 responses before they reach OpenCode. OpenCode baseURL points to :8091/v1."
+    },
+    {
       "label": "MCP TRACE Server (detached)",
       "type": "shell",
       "command": "npm run mcp:ensure",

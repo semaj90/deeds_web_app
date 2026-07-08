@@ -113,7 +113,8 @@ async function computePageRank() {
 
         const res = await pgPool.query(
           `UPDATE atlas_packets AS p
-           SET page_rank_score = v.score,
+           SET pagerank = v.score,
+               page_rank_score = v.score,
                updated_at = NOW()
            FROM (VALUES ${placeholders.join(', ')})
            AS v(source_ref, score)

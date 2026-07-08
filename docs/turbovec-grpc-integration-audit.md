@@ -1,5 +1,5 @@
 # TurboVec gRPC Integration Audit — Session 74 (June 23, 2026)
-
+mmap[] apache arrow ipc
 ## Executive Summary
 
 TurboVec (Approximate Nearest Neighbor search + optional orthogonal transforms) is **fully wired** in the codebase with:
@@ -184,18 +184,18 @@ service TurboVecCudaService {
 GO_RETRIEVAL_GRPC_ADDR: privateEnv.GO_RETRIEVAL_GRPC_ADDR ?? ... ?? `${LOOPBACK_IP}:50053`,
 
 // Lines 219–220 — TurboVec gRPC sidecar
-TURBOVEC_SIDECAR_GRPC_URL: privateEnv.TURBOVEC_SIDECAR_GRPC_URL ?? 
-                           privateEnv.TURBOVEC_GRPC_URL ?? 
+TURBOVEC_SIDECAR_GRPC_URL: privateEnv.TURBOVEC_SIDECAR_GRPC_URL ??
+                           privateEnv.TURBOVEC_GRPC_URL ??
                            `${LOOPBACK_IP}:50062`,
-TURBOVEC_SIDECAR_GRPC_ENABLED: (privateEnv.TURBOVEC_SIDECAR_GRPC_ENABLED ?? 
+TURBOVEC_SIDECAR_GRPC_ENABLED: (privateEnv.TURBOVEC_SIDECAR_GRPC_ENABLED ??
                                 privateEnv.TURBOVEC_GRPC_ENABLED ?? 'false') === 'true',
 
 // Lines 293–294 — TurboVec HTTP JSON-RPC sidecar
-TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? 
-                               privateEnv.TURBOVEC_SIDECAR ?? 
+TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ??
+                               privateEnv.TURBOVEC_SIDECAR ??
                                `http://${LOOPBACK_IP}:8792`,
-TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ?? 
-                  privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? 
+TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR ??
+                  privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ??
                   `http://${LOOPBACK_IP}:8792`,
 ```
 
@@ -225,13 +225,13 @@ class TurboVecSidecar:
         self._index = None      # TurboQuantIndex (C++ binding)
         self._ids = []          # Parallel id list
         self._clusters = []     # Parallel cluster label per vector
-    
+
     def build(ids, vectors, clusters):
         """Construct index from scratch."""
-    
+
     def search(query_vec, top_k):
         """ANN search. Returns [{id, score, cluster, rank}]."""
-    
+
     def prefilter(query_vec, top_clusters):
         """Return top cluster IDs by centroid scoring."""
 ```
@@ -287,18 +287,18 @@ curl -X POST http://127.0.0.1:8791/search \
 
 **Current**: Retrieval pipeline directly queries Qdrant.
 
-**Needed**: 
+**Needed**:
 ```typescript
 // In src/lib/server/ace/context-assembler.ts or src/lib/server/retrieval/orchestrator.ts
 async function searchWithTurboVecPrefilter(query: Float32Array) {
   // Stage A0: Use TurboVec to get top clusters first
   const prefilterResult = await turbovecGrpcSearch(query, topK=5); // Return top cluster IDs
-  
+
   // Stage A1: Qdrant search with cluster filter
   const qdrantHits = await qdrantSearch(query, {
     filter: { must: [{ key: 'som_cluster', match: { value: prefilterResult.candidates[0].clusterId } }] }
   });
-  
+
   return qdrantHits;
 }
 ```
@@ -313,7 +313,7 @@ async function searchWithTurboVecPrefilter(query: Float32Array) {
 async function rerank(topCandidates: QdrantHit[], queryVector: Float32Array) {
   // Option A: Use TurboVec gRPC
   const result = await turbovecGrpcSearch(queryVector, topK=topCandidates.length);
-  
+
   // Option B: Use HTTP sidecar /rerank
   const result = await fetch('http://127.0.0.1:8792/api/rerank', {
     method: 'POST',
@@ -323,7 +323,7 @@ async function rerank(topCandidates: QdrantHit[], queryVector: Float32Array) {
       top_k: 50
     })
   });
-  
+
   return result.results;
 }
 ```
@@ -433,11 +433,11 @@ export async function searchPackets(query: Float32Array) {
   // Lane 1: TurboVec gRPC (fastest, prefiltered)
   const tv = await turbovecGrpcSearch(query, 200);
   if (tv?.candidates?.length) return tv;
-  
+
   // Lane 2: Qdrant direct (safe, no prefilter)
   const qd = await qdrantSearch(query, { limit: 200 });
   if (qd?.points?.length) return qd;
-  
+
   // Lane 3: Fallback to empty (no results)
   return { candidates: [], indexed: 0, backend: 'none' };
 }
@@ -597,6 +597,6 @@ Rerank (candidates) 18         55 ops/sec
 
 ---
 
-**Audit Date**: June 23, 2026  
-**Status**: ✅ WIRED, READY FOR INTEGRATION  
+**Audit Date**: June 23, 2026
+**Status**: ✅ WIRED, READY FOR INTEGRATION
 **Next Action**: Decide on prefilter vs reranker stage; wire Phase 1 health probe

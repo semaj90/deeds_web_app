@@ -18,8 +18,6 @@ Invoke skills only when they are relevant to the current task.
 
 ## Tool calling rule
 
-- Never emit XML tool tags such as `<execute_bash>`.
-- Never emit pseudo tool syntax such as `<|tool_call>`.
 - When a shell command is needed, call the runtime shell tool directly.
 - If shell tools are unavailable, output only a plain fenced PowerShell block and stop.
 - Do not narrate that you will run a command unless you actually called the tool.
@@ -40,8 +38,6 @@ Invoke skills only when they are relevant to the current task.
 ## Output rules
 ## Runtime
 
-- Prefer Ollama `:11434` for Gemma4 unless llama-server template tests pass.
-- Ollama `:11434` requires `think: false`.
 - Canonical llama-server `:8090` remains the production summary lane.
 - OpenCode MTP benchmark lane can use `OPENCODE_GEMMA4_URL` or `GEMMA4_URL` pointing at `:8091`.
 - llama-server `:8090` requires:
@@ -86,7 +82,6 @@ rg -n "rrf|bm25|turbovec|qdrant|batchCosine|attentionScore|gemma4|telemetry" `
 
 - canonical llama-server `:8090` requires `stream: true` for all completions
 - benchmark llama-server `:8091` may use the same streaming rule when testing MTP draft models
-- Ollama `:11434` requires `think: false`
 - Never call `generateText()` against reasoning models — use `streamText()`
 - Strip `<think>` / reasoning metadata before display
 

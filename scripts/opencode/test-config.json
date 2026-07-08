@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "turboquant": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Gemma4 via adapter :8091",
+      "options": {
+        "baseURL": "http://127.0.0.1:8091/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-legal.gguf": {
+          "name": "Gemma4 Legal GGUF",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        }
+      }
+    }
+  }
+}

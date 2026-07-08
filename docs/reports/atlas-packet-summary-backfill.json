@@ -1,27 +1,138 @@
 {
-  "generated_at": "2026-07-04T09:15:32.015Z",
-  "apply": false,
+  "generated_at": "2026-07-08T16:25:22.271Z",
+  "apply": true,
   "replace": false,
   "limit": 2000,
   "min_current_len": 30,
   "min_layer_len": 30,
-  "joined_rows": 0,
-  "updated": 0,
+  "joined_rows": 896,
+  "updated": 894,
   "skipped": {
-    "current_useful": 1221,
-    "no_layer_summary": 0,
+    "current_useful": 3221,
+    "no_layer_summary": 2,
     "same_summary": 0
   },
   "coverage": {
-    "total_rows": 58304,
-    "useful_summaries": 1224,
-    "missing_or_short": 57080,
-    "joinable_packets": 1221,
-    "candidate_packets": 0,
-    "already_useful_packets": 1221
+    "total_rows": 58365,
+    "useful_summaries": 4160,
+    "missing_or_short": 54205,
+    "joinable_packets": 4117,
+    "candidate_packets": 896,
+    "already_useful_packets": 3221
   },
-  "samples": [],
-  "status": "WARN",
+  "samples": [
+    {
+      "packet_key": "packet:0fd313b55614",
+      "title_id": "dockerfile.light",
+      "feature_id": "sveltekit-frontend.Dockerfile",
+      "source_ref": "sveltekit-frontend/Dockerfile.light",
+      "current_summary_len": 0,
+      "layer_summary_len": 311,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd330a8361c",
+      "title_id": "service.discovery.ts",
+      "feature_id": "sveltekit-frontend.service-discovery",
+      "source_ref": "sveltekit-frontend/src/lib/server/helpers/service-discovery.ts",
+      "current_summary_len": 0,
+      "layer_summary_len": 326,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd34e48ad84",
+      "title_id": "production.remediation.plan.md",
+      "feature_id": "next_steps.PRODUCTION_REMEDIATION_PLAN",
+      "source_ref": "next_steps/completed/production-history/PRODUCTION_REMEDIATION_PLAN.md",
+      "current_summary_len": 0,
+      "layer_summary_len": 344,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd4068304e5",
+      "title_id": "mach",
+      "feature_id": ".python311.mach",
+      "source_ref": ".python311/share/terminfo/M/mach",
+      "current_summary_len": 0,
+      "layer_summary_len": 326,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd44aadd293",
+      "title_id": "src.lib.gpu.gpu.search.reranker.md",
+      "feature_id": "sveltekit-frontend.src__lib__gpu__gpu-search-reranker",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__gpu__gpu-search-reranker.md",
+      "current_summary_len": 0,
+      "layer_summary_len": 296,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd54a927871",
+      "title_id": "real.gap.txt",
+      "feature_id": ".tmp.real-gap",
+      "source_ref": ".tmp/drizzle-introspect/real-gap.txt",
+      "current_summary_len": 0,
+      "layer_summary_len": 244,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd81a705d94",
+      "title_id": "smoke.atlas.2026.06.15t23.37.20.123z.json",
+      "feature_id": "sveltekit-frontend.smoke-atlas-2026-06-15T23-37-20-123Z",
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/smoke-atlas-2026-06-15T23-37-20-123Z.json",
+      "current_summary_len": 0,
+      "layer_summary_len": 253,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fd92e33c133",
+      "title_id": "mcp.tool.hypergraph.expand.members.md",
+      "feature_id": "sveltekit-frontend.mcp-tool-hypergraph-expand-members",
+      "source_ref": "sveltekit-frontend/.okf/features/mcp-tool-hypergraph-expand-members.md",
+      "current_summary_len": 0,
+      "layer_summary_len": 362,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fdb098e27b1",
+      "title_id": "lib.rawpointer.json",
+      "feature_id": "crates.lib-rawpointer",
+      "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/.fingerprint/rawpointer-236e99780fe32564/lib-rawpointer.json",
+      "current_summary_len": 0,
+      "layer_summary_len": 332,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    },
+    {
+      "packet_key": "packet:0fdbbb0ab010",
+      "title_id": "f1f0a245f69b3323.json",
+      "feature_id": "neschrom97.f1f0a245f69b3323",
+      "source_ref": "neschrom97/cards/f1f0a245f69b3323.json",
+      "current_summary_len": 0,
+      "layer_summary_len": 306,
+      "layer_type": "gemma4_offline",
+      "summary_level": "packet",
+      "model_name": "gemma4-legal-iq4xs-direct.gguf"
+    }
+  ],
+  "status": "PASS",
   "notes": [
     "Promotes summary-layer text back onto atlas_packets.summary by packet_key.",
     "Does not rewrite already-useful packet summaries unless --replace is set.",

@@ -1,8 +1,18 @@
 import type { RequestHandler } from './$types'
 import { json } from '@sveltejs/kit'
-import { streamText, generateText } from 'ai'
+import { streamText } from 'ai'
 import { bifrost } from '$lib/server/ai/bifrost-provider.js'
 import { z } from 'zod'
+
+/** Strip reasoning metadata from Gemma4 responses */
+function stripReasoningMetadata(text: string): string {
+  return text
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    .replace(/<start_of_turn>.*?<\/start_of_turn>/g, '')
+    .replace(/<end_of_turn>/g, '')
+    .replace(/<\|thinking\>[\s\S]*?<\/\|thinking\>/g, '')
+    .trim()
+}
 
 const requestSchema = z.object({
   messages: z
@@ -39,23 +49,33 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const { messages, model, stream, temperature, maxOutputTokens } = parsed.data
 
-  if (stream) {
-    const result = streamText({
-      model: bifrost(model),
-      messages,
-      temperature,
-      maxOutputTokens,
-    })
-    return result.toTextStreamResponse()
-  }
-
-  // Non-streaming fallback
-  const result = await generateText({
+  // Always use streamText for reasoning models like Gemma4
+  // (generateText silently truncates <think> blocks and breaks tool calling)
+  const result = streamText({
     model: bifrost(model),
     messages,
     temperature,
     maxOutputTokens,
   })
 
-  return json({ text: result.text, usage: result.usage })
+  if (stream) {
+    return result.toTextStreamResponse()
+  }
+
+  // Non-streaming: collect streamed chunks into full text
+  let fullText = ''
+  let usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 }
+
+  for await (const event of result.fullStream) {
+    if (event.type === 'text-delta') {
+      fullText += event.delta
+    } else if (event.type === 'finish') {
+      usage = event.usage
+    }
+  }
+
+  // Strip reasoning metadata before returning to client
+  const cleanText = stripReasoningMetadata(fullText)
+
+  return json({ text: cleanText, usage })
 }

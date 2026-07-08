@@ -36,10 +36,9 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
       // Record tool invocation as a routing decision
       collector.recordRoutingDecision({
         decision_type: 'tool_dispatch',
-        selected_tool: toolName,
+        selected_path: toolName,
         confidence: 1.0,
-        alternative_tools: [],
-        rationale: `Dispatching to ${toolName}`,
+        alternatives: [],
       });
 
       // Execute handler and record as async operation
@@ -49,16 +48,10 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
 
       // Record successful tool execution
       collector.recordAsyncOp({
-        op_type: 'mcp_tool_call',
-        service: 'mcp',
-        operation: toolName,
-        duration_ms: operationDuration,
+        op_type: 'mcp.invoke',
+        op_name: toolName,
+        execution_time_ms: operationDuration,
         status: 'success',
-        details: {
-          tool_name: toolName,
-          args_keys: Object.keys(args),
-          result_type: typeof result,
-        },
       });
 
       // Flush telemetry before returning
@@ -91,15 +84,11 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
 
       // Record failed tool execution
       collector.recordAsyncOp({
-        op_type: 'mcp_tool_call',
-        service: 'mcp',
-        operation: toolName,
-        duration_ms: durationMs,
-        status: 'error',
-        details: {
-          tool_name: toolName,
-          error: errorMsg,
-        },
+        op_type: 'mcp.invoke',
+        op_name: toolName,
+        execution_time_ms: durationMs,
+        status: 'failure',
+        error: errorMsg,
       });
 
       // Flush error telemetry
@@ -138,7 +127,26 @@ export function withMcpToolTelemetry<T extends Record<string, any>, R>(
  * @param redis - ioredis client
  * @returns Aggregated metrics per tool
  */
-export async function aggregateMcpToolTelemetry(redis: Redis) {
+interface McpToolMetrics {
+  call_count: number;
+  success_count: number;
+  error_count: number;
+  total_duration_ms: number;
+  avg_duration_ms: number;
+  p50_duration_ms: number;
+  p95_duration_ms: number;
+  success_rate: number;
+  last_error?: string;
+}
+
+interface McpTelemetryAggregation {
+  total_tools_invoked: number;
+  tools: Record<string, McpToolMetrics>;
+  aggregated_at: string;
+  error?: string;
+}
+
+export async function aggregateMcpToolTelemetry(redis: Redis): Promise<McpTelemetryAggregation> {
   try {
     const pattern = 'telemetry:mcp:*';
     const keys = await redis.keys(pattern);
@@ -151,20 +159,7 @@ export async function aggregateMcpToolTelemetry(redis: Redis) {
       };
     }
 
-    const toolMetrics: Record<
-      string,
-      {
-        call_count: number;
-        success_count: number;
-        error_count: number;
-        total_duration_ms: number;
-        avg_duration_ms: number;
-        p50_duration_ms: number;
-        p95_duration_ms: number;
-        success_rate: number;
-        last_error?: string;
-      }
-    > = {};
+    const toolMetrics: Record<string, McpToolMetrics> = {};
 
     // Fetch all telemetry events
     const events = await Promise.all(

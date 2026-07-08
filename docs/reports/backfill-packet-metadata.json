@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-04T18:24:41.071Z",
+  "generated_at": "2026-07-08T16:19:35.561Z",
   "mode": "dry-run",
-  "rows_to_update": 0,
-  "estimated_hash_coverage_pct": 0
+  "rows_to_update": 4273,
+  "estimated_hash_coverage_pct": 100
 }

@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-05-30T21:56:24.429Z",
-  "configPath": "c:\\Users\\james\\Videos\\deeds-web-app\\opencode.json",
-  "totalMcpEntries": 5,
+  "timestamp": "2026-07-08T16:52:11.602Z",
+  "configPath": "C:\\Users\\james\\Videos\\deeds-web-app\\opencode.json",
+  "totalMcpEntries": 6,
   "liveMcp": 1,
   "mcpUpButDisabled": 0,
   "customHttpOnly": 1,
   "broken": 0,
   "notListening": 0,
-  "localStdio": 3,
+  "localStdio": 4,
   "wsl2DockerNotes": {
     "rule": "Loopback 127.0.0.1 works when MCPs run on Windows host. Docker containers calling host services need host.docker.internal.",
     "detected": {
@@ -22,18 +22,18 @@
       "url": "http://127.0.0.1:8788/mcp",
       "enabledInConfig": true,
       "toolsListStatus": 200,
-      "toolsListMs": 64,
-      "toolCount": 127,
+      "toolsListMs": 262,
+      "toolCount": 129,
       "sampleTools": [
         "kb.organize_messy_text",
         "kb.extract_citations",
         "kb.trace_search",
         "atlas.query",
-        "trace_search"
+        "kb.wiki_note_lookup"
       ],
       "mcpHealthy": true,
       "healthEndpointStatus": 200,
-      "healthBody": "{\"ok\":true,\"version\":\"1.0.0\",\"uptime\":2774.687303}",
+      "healthBody": "{\"ok\":true,\"version\":\"1.0.0\",\"uptime\":6144.9699954}",
       "classification": "live_mcp"
     },
     {
@@ -42,17 +42,24 @@
       "url": "http://127.0.0.1:8791/mcp",
       "enabledInConfig": false,
       "toolsListStatus": 404,
-      "toolsListMs": 47,
+      "toolsListMs": 6,
       "mcpHealthy": false,
       "errorBody": "{\"error\": \"not found\"}",
       "healthEndpointStatus": 200,
-      "healthBody": "{\"status\": \"ok\", \"indexed\": 0, \"dim\": 768, \"bit_width\": 2}",
+      "healthBody": "{\"ok\": true, \"indexed\": 0, \"dim\": 64, \"bits\": 4, \"turbovec\": true, \"collection\": \"codebase_chunks_76",
       "classification": "custom_http_only"
     },
     {
       "name": "engram-embed",
       "type": "local",
-      "command": "node ./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
+      "command": "node ./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs --stdio",
+      "enabledInConfig": true,
+      "classification": "local_stdio_not_probed"
+    },
+    {
+      "name": "ldr-research",
+      "type": "local",
+      "command": "node ./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs",
       "enabledInConfig": true,
       "classification": "local_stdio_not_probed"
     },

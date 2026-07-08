@@ -1,46 +1,10 @@
 {
-  "generated_at": "2026-06-26T16:50:11.231Z",
-  "mode": "apply",
-  "packets_with_concepts": 17985,
-  "edges_planned": 42510,
-  "noisy_tokens_dropped": 299,
-  "unique_concept_labels": 10,
-  "canonical_taxonomy": [
-    "agent_intelligence",
-    "api_endpoints",
-    "database_orm",
-    "emergent_topology",
-    "general_abstractions",
-    "infrastructure_config",
-    "native_accelerators",
-    "observability_telemetry",
-    "test_harness",
-    "ui_components"
-  ],
-  "concept_labels": [
-    "agent_intelligence",
-    "api_endpoints",
-    "database_orm",
-    "emergent_topology",
-    "general_abstractions",
-    "infrastructure_config",
-    "native_accelerators",
-    "observability_telemetry",
-    "test_harness",
-    "ui_components"
-  ],
-  "applied_pairs": 42510,
-  "skipped_pairs": 0,
-  "error_pairs": 0,
-  "neo4j": {
-    "edge_count": 33293,
-    "packet_count": 8744,
-    "concept_count": 10
-  },
-  "gate": {
-    "edges": true,
-    "concepts": true,
-    "error_rate": true,
-    "pass": true
-  }
+  "generated_at": "2026-07-08T16:25:57.694Z",
+  "mode": "dry-run",
+  "packets_with_concepts": 58360,
+  "edges_planned": 0,
+  "noisy_tokens_dropped": 220010,
+  "unique_concept_labels": 0,
+  "canonical_taxonomy": [],
+  "concept_labels": []
 }

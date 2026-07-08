@@ -206,7 +206,7 @@ $ctxLenRequested = if ($env:LLM_CONTEXT_SIZE)  { $env:LLM_CONTEXT_SIZE }
                    elseif ($env:OLLAMA_CONTEXT_LENGTH) { $env:OLLAMA_CONTEXT_LENGTH }
                    else { '65536' }
 $ctxLen = [int]$ctxLenRequested
-$allowShortCtx = @('1','true','yes','on') -contains (($env:TURBO_CTX_ALLOW_SHORT_CONTEXT ?? '')).ToLower()
+$_allowShortCtxVal = if ($env:TURBO_CTX_ALLOW_SHORT_CONTEXT) { $env:TURBO_CTX_ALLOW_SHORT_CONTEXT } else { '' }; $allowShortCtx = @('1','true','yes','on') -contains $_allowShortCtxVal.ToLower()
 if ($ctxLen -lt 65536 -and -not $allowShortCtx) {
     Write-Warning "Requested TurboQuant context $ctxLen is below the repo default of 65536. Clamping to 65536. Set TURBO_CTX_ALLOW_SHORT_CONTEXT=true to opt in to a shorter context."
     $ctxLen = 65536
@@ -612,12 +612,13 @@ if (Test-LlamaFlag $llama '--reasoning-budget') {
     Write-Host "Reasoning budget: --reasoning-budget 0 (suppress <|channel>thought leak)" -ForegroundColor Cyan
 }
 
-# -- Chat template: suppress thinking block markers via gemma4-summary-clean.jinja ------
-# DEFAULT: use gemma4-summary-clean.jinja to strip <|channel>thought markers from output.
-# The GGUF-embedded template wraps reasoning in <|channel>thought...<|channel|> delimiters.
-# --chat-template-file override suppresses these at the template level (not regex).
-# HARD RULE: always pass --chat-template-file for Phase 7. Never use --chat-template <name>.
-$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\gemma4-summary-clean.jinja"
+# -- Chat template: use gemma4-tools.jinja to enable tool calling + suppress thinking markers --
+# DEFAULT: gemma4-tools.jinja — handles system role, tool injection, tool_call parsing,
+# and strips <|channel>thought markers. The GGUF has <|tool_response> baked in so the
+# embedded template supports tools; gemma4-summary-clean.jinja clobbered that support.
+# HARD RULE: always pass --chat-template-file. Never use --chat-template <name>.
+# To use summary-only mode (no tools): set TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
+$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\gemma4-tools.jinja"
 $chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
     $env:TURBO_CHAT_TEMPLATE_FILE
 } elseif (Test-Path $defaultTemplate) {
@@ -628,11 +629,11 @@ $chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPL
 
 if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
     $baseArgs = $baseArgs + @('--chat-template-file', $chatTemplateFile)
-    Write-Host "Chat template: --chat-template-file (clean, no thinking blocks)" -ForegroundColor Cyan
+    Write-Host "Chat template: --chat-template-file $chatTemplateFile" -ForegroundColor Cyan
 } elseif ($env:TURBO_CHAT_TEMPLATE_FILE) {
-    Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in (may output thinking blocks)" -ForegroundColor Yellow
+    Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in" -ForegroundColor Yellow
 } else {
-    Write-Host "Chat template: $defaultTemplate not found - will use GGUF built-in (may output <|channel>thought markers)" -ForegroundColor Yellow
+    Write-Host "Chat template: $defaultTemplate not found - will use GGUF built-in (supports_tools may be false)" -ForegroundColor Yellow
 }
 
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------
@@ -641,6 +642,18 @@ if (Test-LlamaFlag $llama '--jinja') {
     $baseArgs = $baseArgs + @('--jinja')
 } else {
     Write-Host "Tool calling: --jinja not in this binary - Gemma4 uses generic tool-call path" -ForegroundColor DarkYellow
+}
+
+# -- Skip chat template parsing to avoid Jinja2 filter compatibility issues --
+# --skip-chat-parsing bypasses common_chat_verify_template so custom jinja templates
+# (like gemma4-tools.jinja) don't need to survive the C++ Jinja2 output validator.
+# The model still receives the rendered template; it just won't be parsed for tool-call
+# extraction by llama-server's built-in parser (Gemma4 emits tool calls inline anyway).
+if (Test-LlamaFlag $llama '--skip-chat-parsing') {
+    Write-Host "Chat parsing: --skip-chat-parsing enabled (bypasses template validator)" -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--skip-chat-parsing')
+} else {
+    Write-Host "Chat parsing: --skip-chat-parsing not supported - using default template validator" -ForegroundColor DarkYellow
 }
 
 # -- KV prefix reuse: reduce prefill cost on repeated system prompts -------

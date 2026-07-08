@@ -18,6 +18,7 @@ import { getVlmState, switchVlmMode, VlmMode } from '$lib/server/inference/vlm-l
 import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
 import { registerDispatcherToolsAsACP, executeACPTool } from '$lib/server/acp/acp-mcp-integration.js';
 import { bootstrapACPRegistry } from '$lib/server/acp/acp-grpc-quic-bridge.js';
+import { withToolCallRecord } from '$lib/server/telemetry/tool-call-recorder.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -2023,7 +2024,10 @@ export function setupToolHandlers() {
 
   // Reusable tool handler for compose:pipeline reuse
   async function handleToolCall(name: string, args: Record<string, any>): Promise<any> {
-    return withMcpCache(name, args, () => _handleToolCallInner(name, args));
+    return withToolCallRecord(
+      { toolName: name, toolSource: 'mcp', arguments: args },
+      () => withMcpCache(name, args, () => _handleToolCallInner(name, args)),
+    );
   }
 
   async function _handleToolCallInner(name: string, args: Record<string, any>): Promise<any> {
