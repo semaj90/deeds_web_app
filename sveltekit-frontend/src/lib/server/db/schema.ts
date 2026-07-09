@@ -29,6 +29,12 @@ export {
 // export * from './schema-canvas-autosaves';
 // export * from './schema-canvas';
 
+// Phase 10: Packet Ontology Registry
+export {
+	packetTypeEnum, toolExecutionLog, toolExecutionStatsView,
+	type ToolExecutionLog, type NewToolExecutionLog, type ToolExecutionStats
+} from './schema/phase10-ontology';
+
 // Phase 89 Preserved Tables - DO NOT DELETE
 // Contains 1.2M+ records of error analysis data
 export * from './schema-phase89-preserved';

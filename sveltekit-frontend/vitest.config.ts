@@ -198,6 +198,8 @@ export default defineConfig({
       // MCP tool input hardening + rerank feedback aggregation
       'tests/mcp-trace-tools.spec.ts',
       'tests/qdrant-rerank-feedback.spec.ts',
+      // HMM-gated tool selection layer (Phase 9 — 2026-07-09)
+      'tests/retrieval/tool-selection.spec.ts',
       // operator-gated ops.* tools (propose_patch, run_targeted_test, record_fix_attempt, run_quality_gate)
       'tests/mcp-operator-tools.spec.ts',
       // OpenCode MCP config + docs regression guard

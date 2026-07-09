@@ -611,6 +611,7 @@
     "atlas:error:mapreduce:dry": "cross-env PGHOST=127.0.0.1 PGPORT=5434 PGDATABASE=legal_ai_db PGUSER=legal_admin PGPASSWORD=123456 REDIS_PASSWORD=redis node scripts/atlas/agentic-error-mapreduce.mjs --dry-run --verbose",
     "atlas:error:mapreduce:5m": "node scripts/atlas/agentic-error-mapreduce.mjs --window-minutes 5",
     "atlas:hmm:error:smoke": "node scripts/atlas/smoke-hmm-error.mjs",
+    "atlas:hmm:tool-router:smoke": "vitest run tests/hmm/tool-router-hmm.spec.ts",
     "atlas:ace:packet-swap:smoke": "node scripts/atlas/smoke-ace-packet-swap.mjs",
     "atlas:error:mapreduce:apply": "cross-env PGHOST=127.0.0.1 PGPORT=5434 PGDATABASE=legal_ai_db PGUSER=legal_admin PGPASSWORD=123456 REDIS_PASSWORD=redis node scripts/atlas/agentic-error-mapreduce.mjs"
   },

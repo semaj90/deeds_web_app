@@ -16,6 +16,7 @@ Generated: 2026-07-05
 | mmap registry payloads | created | Planned and contract-defined; not yet proven end-to-end |
 | ACP routing fan-out | wired | HMM router exists and emits bounded routing suggestions |
 | HyperRAG packet materializer | proven | `scripts/atlas/hyperrag-packet-materializer.mjs` now passes dry-run and apply on a bounded slice, writing MsgPack + hot registry rows |
+| Game-engine runtime cache | audited | `docs/reports/session-124-game-engine-runtime-cache-audit.md` maps Redis/Qdrant/Neo4j/packet materializer/WebGPU/IndexedDB to concrete promotion gates |
 | Stub/mock cleanup | partial | New lanes are bounded and real, but older schema drift still needs cleanup |
 | Rust parser / N-API lane | proven | `verify-rust-napi-exports.mjs` and `test-rust-parser.mjs` pass on the live checkout |
 | TurboVec sidecar smoke | proven | Smoke now passes on 8791, matching the live pipeline validator |
@@ -50,6 +51,7 @@ Generated: 2026-07-05
 - MapReduce consolidation is the wiki-style consolidation pass for file/import/topic aggregation before cluster fanout.
 - QLoRA adapter training should use canonical feature/metrics tuples plus topic labels; it does not need `qdrant_id` as a training feature.
 - HyperRAG RPC should assemble validated packets, write MsgPack/mmap-ready envelopes, and emit telemetry after ACP chooses the action lane.
+- Runtime cache promotion should follow the game-engine model: precompute packet assets, cache visibility/centroids, stream only needed packets, and record action-state telemetry.
 
 ## LOD / Streaming View
 
@@ -100,6 +102,7 @@ Core lanes are live, but the pipeline is not production-complete until the ident
 10. Use map-reduction to consolidate wiki-like file/topic evidence before clustering and rerank.
 11. Build the QLoRA dataset from feature/metrics evidence and canonical topic labels, not from vector IDs.
 12. Add a bounded HyperRAG packet materializer that joins RPC input, packet assembly, validator output, and telemetry before any cache promotion.
+13. Promote the service-worker cache lane by replacing dummy Redis/SOM clients, using stable request hashes, and adding packet LOD manifests.
 
 ## Missing Script Prompts
 
@@ -122,6 +125,7 @@ Core lanes are live, but the pipeline is not production-complete until the ident
 17. **QLoRA dataset export**: emit bounded training rows from `atlas_packet_features` + `atlas_packet_metrics` + labels for later adapter training.
 18. **Graph fanout lane**: add the 3D graph/A* traversal lane as a separate fanout experiment if topology routing needs more than SOM locality.
 19. **HyperRAG packet materializer**: implement a single bounded joiner for RPC input -> packet assembly -> validator -> MsgPack/mmap writer -> telemetry -> ACP handoff.
+20. **Game-engine runtime cache audit**: replace placeholder service-worker cache clients, hash POST bodies, add packet LOD manifests, and prove IndexedDB/WebGPU cache parity on a fixed fixture.
 
 ## Topology Recommendation Slice
 

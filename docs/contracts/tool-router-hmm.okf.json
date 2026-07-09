@@ -1,0 +1,34 @@
+{
+  "schema": "atlas.hmm_tool_router.v1",
+  "states": [
+    "UNKNOWN",
+    "SEARCH_CODE",
+    "SEARCH_GRAPH",
+    "SEARCH_SEMANTIC",
+    "VALIDATE_PACKET",
+    "SYNTHESIZE",
+    "QUARANTINE"
+  ],
+  "tools": [
+    "rg.search",
+    "ast_grep.search",
+    "qdrant.search",
+    "postgres.bm25",
+    "neo4j.expand",
+    "packet.validate",
+    "gemma4.synthesize"
+  ],
+  "rules": {
+    "gemma4_requires_packet_validation_min": 0.8,
+    "quarantine_blocks_synthesis": true,
+    "rg_first_for_code_location": true,
+    "rrf_final_ranking": true
+  },
+  "smoke_gates": {
+    "all_tools_indexed": true,
+    "schema_valid": true,
+    "ranked_top_tool_exists": true,
+    "quarantine_blocks_gemma": true
+  }
+}
+
