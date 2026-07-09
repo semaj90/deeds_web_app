@@ -107,11 +107,9 @@ async function main() {
       edgeChunks.push(edges.slice(i, i + 100));
     }
 
-    // Normalize paths (convert Windows backslashes to forward slashes, strip sveltekit-frontend prefix)
+    // Normalize paths to match CodebaseFile nodes (use absolute paths from Phase 2)
     const normalizedEdges = edges.map((e) => {
-      let filePath = e.source_file
-        .replace(/\\/g, '/') // Windows backslash → forward slash
-        .replace(/^sveltekit-frontend\//, ''); // Strip sveltekit-frontend/ prefix
+      let filePath = e.source_file.replace(/\\/g, '/'); // Windows backslash → forward slash
       return { ...e, filePath };
     });
 
@@ -119,9 +117,7 @@ async function main() {
     for (const chunk of edgeChunks) {
       const normalizedChunk = chunk.map((e, idx) => ({
         ...e,
-        filePath: e.source_file
-          .replace(/\\/g, '/')
-          .replace(/^sveltekit-frontend\//, '')
+        filePath: e.source_file.replace(/\\/g, '/')
       }));
 
       await session.run(
