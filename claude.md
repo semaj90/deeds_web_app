@@ -1,8 +1,136 @@
 # Legal AI Platform — Claude Project Instructions
 
-## Last Updated: July 3, 2026 (Session 102+ continuation VI — Phase 7 Clean Pipeline LIVE)
-## Status: All services UP ✅ | Gemma4 :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅
+## Last Updated: July 8, 2026 (Session 125+ — OpenCode Bash Tool Calling FIXED)
+## Status: All services UP ✅ | Gemma4 :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
 ## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
+
+---
+
+## OpenCode Bash Tool Calling — FIXED (July 8, 2026)
+
+**Root Cause**: `.opencode/opencode.jsonc` top-level `permission.bash` had `"*": "ask"` catch-all. Since `build`/`plan` are built-in agents (not defined in project config), their default `bash: allow` was being overridden by the project's top-level permission block (last rule wins). Result: any bash command not in the explicit allowlist → prompted user instead of executing.
+
+**The Fix** — in `.opencode/opencode.jsonc` lines 21-34, changed from explicit-allowlist + `"*": "ask"` to explicit-denylist + `"*": "allow"`:
+
+```jsonc
+"bash": {
+  "rm *": "deny",
+  "del *": "deny",
+  "Remove-Item *": "deny",
+  "rmdir *": "deny",
+  "cat *.md": "deny",
+  "cat *.txt": "deny",
+  "cat *.json": "deny",
+  "Get-Content docs/llms/generated/*": "deny",
+  "Get-Content *.json": "deny",
+  "*": "allow"       // ← CHANGED from "ask" to "allow"
+},
+"webfetch": "allow",
+"websearch": "allow"
+```
+
+**Impact**: 
+- ✅ `build` and `plan` agents now execute bash commands directly (grep, find, npm run, etc.) without prompting
+- ✅ Destructive commands (rm, del, rmdir) still blocked
+- ✅ `webfetch` and `websearch` also allowed for LDR research tool
+- ✅ MCP tools (atlas-tools, engram-embed, ldr-research, trace, gemma4-offload) all connected
+
+**Test**: `grep -r "graphify" . --include="*.md"` now executes immediately in `build`/`plan` agents.
+
+**Note**: Delete or ignore `C:\Users\james\.config\opencode\opencode.jsonc` (global config). It's minimal and unused — project `.opencode/opencode.jsonc` is the single source of truth for this workspace.
+
+### MCP Status (All Connected)
+
+| Server | Type | Status | Notes |
+|--------|------|--------|-------|
+| **atlas-tools** | local | ✅ Connected | Codebase traversal + topology queries |
+| **engram-embed** | local | ✅ Connected | Embeddings + semantic search |
+| **gemma4-offload** | local | ✅ Connected | Evidence-grounded summaries |
+| **ldr-research** | local | ✅ Connected | Local Deep Research (Gemma4 + SearXNG + Wikipedia) |
+| **trace** | remote | ✅ Connected | TRACE MCP at :8788 (KAG tools, graph queries) |
+| **turbovec** | remote | ⚠️ Disabled | No MCP endpoint (called directly from code via turbovec-prefilter.ts) |
+| **turbovec-sidecar** | — | ⚠️ Disabled | Not configured; turbovec health monitored via :8791/health |
+
+**Intentional disables**: `turbovec` has no MCP wrapper — it's a CUDA vector prefilter called directly from TypeScript, not an agent tool.
+
+### LSP Status — INSTALLED & WIRED
+
+**4 LSP servers installed and configured:**
+
+| Language | Server | Package | Status |
+|----------|--------|---------|--------|
+| **TypeScript/JavaScript** | typescript-language-server | `typescript-language-server` | ✅ Wired |
+| **Svelte** | svelte-language-server | `svelte-language-server` | ✅ Wired |
+| **JSON/JSONC** | vscode-json-language-server | `vscode-langservers-extracted` | ✅ Wired |
+| **CSS** | vscode-css-language-server | `vscode-langservers-extracted` | ✅ Wired |
+
+**Installation:**
+```bash
+cd sveltekit-frontend
+npm install -D typescript typescript-language-server vscode-langservers-extracted svelte-language-server @tailwindcss/language-server
+```
+
+**Configuration** (in `.opencode/opencode.jsonc`):
+- Each LSP server has explicit `command` + `args` pointing to local node_modules binaries
+- `filetypes` specify which file extensions trigger each server
+- All relative paths start from workspace root
+
+**When to add more LSPs:**
+- **Python**: `pip install pyright ruff-lsp` (for workers)
+- **Go**: `go install golang.org/x/tools/gopls@latest` (for sidecar)
+- **Rust**: `rustup component add rust-analyzer` (for TurboVec/SIMD)
+
+### `.mcp.json` History & Restoration (July 8, 2026)
+
+**Original Architecture** (commit c8f859828c):
+```json
+{
+  "playwright": { /* browser automation */ },
+  "trace-mcp": { /* local stdio process, ts-node/esm */ }
+}
+```
+- Playwright MCP: Browser testing, screenshots, regression detection
+- trace-mcp: Local TypeScript server, spawned by OpenCode
+- Problem: OpenCode responsible for process lifecycle; restart loses server
+
+**Intermediate State** (simplified):
+```json
+{ "trace": { "type": "remote", "url": "http://127.0.0.1:8788/mcp" } }
+```
+- **trace-mcp evolved** from local stdio → HTTP server (:8788)
+- Benefit: Shared process, survives editor restart, health endpoint, SSE support
+- Problem: Lost browser automation capability
+
+**Current (Restored)** — July 8, 2026:
+```json
+{
+  "playwright": { /* browser automation restored */ },
+  "trace": { /* remote HTTP server, `:8788` */ }
+}
+```
+
+**Why restore Playwright?**
+- Browser automation for UI regression testing, form filling, end-to-end flows
+- Agents can now screenshot and interact with the live app (:5173)
+- Orthogonal to retrieval/synthesis pipeline
+
+**Architecture Decision**:
+- **Keep TRACE as remote HTTP** (better than spawning from editor)
+- **Restore Playwright** (separate concern, orthogonal)
+- **`.opencode/opencode.jsonc` source of truth** for all 6 MCP servers (trace, atlas-tools, engram-embed, gemma4-offload, ldr-research, playwright)
+
+**Distributed MCP Pattern**:
+```
+OpenCode
+    ├── LSP (TypeScript, Svelte, JSON, CSS)
+    └── MCP
+         ├── trace (:8788 remote HTTP)
+         ├── atlas-tools (local)
+         ├── engram-embed (local)
+         ├── gemma4-offload (local)
+         ├── ldr-research (local)
+         └── playwright (browser automation)
+```
 
 ---
 

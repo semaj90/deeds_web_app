@@ -1,0 +1,37 @@
+{
+  "accuracy": 0.9989719866358263,
+  "num_classes": 4,
+  "test_samples": 11673,
+  "classes": [
+    "bm25-fallback",
+    "neo4j-authority",
+    "qdrant-dense",
+    "som-topology"
+  ],
+  "confusion_matrix": [
+    [
+      10832,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      809,
+      0
+    ],
+    [
+      11,
+      0,
+      0,
+      20
+    ]
+  ]
+}

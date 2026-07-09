@@ -1,54 +1,17 @@
 {
+  "extends": "./sveltekit-frontend/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "nodenext", // use NodeNext for modern Node ESM behavior
-    "module": "NodeNext", // match moduleResolution for proper ESM support
-    "allowImportingTsExtensions": true, // allow importing .ts extensions in ESM
-    "sourceMap": false, // disable source maps for smaller production builds
-    "inlineSources": false,
-    "target": "ES2022", // bump target for Node 22 features
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2022"
-    ], // align libs with target
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "types": ["node"], // removed "svelte" so tsc won't search for a missing 'svelte' type library
-    "isolatedModules": true,
-    "strict": true, // Enable strict mode for better type safety
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": true,
-    "noEmit": true, // prevent tsc from writing .js outputs that conflict with Svelte/Vite
-
-    "typeRoots": [
-      "./node_modules/@types",
-      "./sveltekit-frontend/src/lib/types",
-      "./sveltekit-frontend/src/lib/types/vendor"
-    ]
+    "skipLibCheck": true
   },
-  // ensure the proto outputs are part of the project used by eslint's parser
-  "include": [
-    ".opencode/tools/**/*.ts",
-    "src/**/*",
-    "tests/**/*",
-    "uno.config.ts",
-    "playwright.config.ts",
-    "types.d.ts",
-    "src/proto/**/*.js"
-  ],
   "exclude": [
-    "node_modules/**",
-    "build/**",
-    "dist/**",
-    ".svelte-kit/**",
-    "sveltekit-frontend/**",
-    "sveltekit-frontend/archives/**",
-    "sveltekit-frontend/src/archived/**",
-    "sveltekit-frontend/archived-components/**",
-    "**/*.svelte.js"
-    // nested SvelteKit app is handled by sveltekit-frontend/tsconfig.json
+    "node_modules",
+    "dist",
+    "build",
+    ".svelte-kit",
+    "llama-cpp-turboquant-gemma4/**",
+    "turbovec/**",
+    "models/**",
+    "*.backup*",
+    "deeds_labs/**"
   ]
 }

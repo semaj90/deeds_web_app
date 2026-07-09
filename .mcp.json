@@ -1,5 +1,15 @@
 {
   "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser", "chromium"
+      ],
+      "env": {
+        "PLAYWRIGHT_BASE_URL": "http://localhost:5173"
+      }
+    },
     "trace": {
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp"

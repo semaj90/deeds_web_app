@@ -1,0 +1,2225 @@
+{
+  "timestamp": "2026-07-09T05:19:52.903Z",
+  "mode": "sample(100)",
+  "dryRun": false,
+  "totalProcessed": 100,
+  "successCount": 100,
+  "failureCount": 100,
+  "validationErrorCount": 0,
+  "domainCounts": {
+    "auth": 0,
+    "ui": 31,
+    "retrieval": 3,
+    "network": 36,
+    "database": 3,
+    "cache": 2,
+    "agent": 6,
+    "graph": 0,
+    "ml": 0,
+    "general": 19
+  },
+  "errors": [
+    {
+      "packet_key": "packet:0003260092b1",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0003850e84ca",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0003ab694534",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0003dda5e534",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0004b466d863",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0004f849be72",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0006ca4a45e3",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0008d535a1f6",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0009951ee430",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0009a56456fc",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000b1b923bf4",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000b2df0cfdf",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000db15dc8ef",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000e4d5a58e7",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000f10a13a57",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000f50f509c8",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000f704e5207",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:000fde9311af",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001007058f4a",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0011712c94d1",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0011a232d0b8",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001375b841d0",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0014d8ac7795",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0014edb0c6e4",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0015b28db252",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00175bb3b887",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001789105fcc",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0017ebe58f96",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00191bed434b",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001929a5e2e1",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001c3fdaad12",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001d358f9d1f",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001d524f1582",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001d67925876",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001d9f093944",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001ddd6f58b5",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001f13a6f8f0",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001fb12712cf",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:001ff2d2cfd0",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0023f9ea26b9",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:002461508185",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00247841354c",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0025cf347c12",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0027fdaf45c1",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:002863f1b4a5",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0029bc81879d",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:002b62662acc",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:002cac2b6dd3",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:002e5998065a",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:002ff3c143b4",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00302d7214ce",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003100ceb172",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0032cb0988c7",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0032e6c21c4a",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0033cace702e",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003515fbe118",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0036072859d5",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003655c2cdf4",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0036e4ee6f75",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003738556103",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0037e8373280",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003a93cd3333",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003aa64cea09",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003b42f31b83",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003b604bd196",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003ccb8a42d2",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:003e12b0489a",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0040120ab709",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00425c075e28",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0045d6820f9b",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00461c1eb14e",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0046c7db4fb2",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:004719ec513f",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0047e3c255c4",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0047ef44251e",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:004a43bb7fa1",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:004bde1a063c",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:004dd7732740",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:004ec0f69a1e",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0051e7a96992",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00521aea4913",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005302795e41",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0053310c1182",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00538bda9644",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0053d32088fe",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005428ba3dd3",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00548ef34afb",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0055a733c702",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0055c2d04c92",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005641f71d3c",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00569919dc47",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0057df284547",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:00581022d8d5",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0058e67db61b",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:0059ae33a823",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005a13f9efc3",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005b17476a9e",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005c88ea34f1",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005c92019c46",
+      "error": "relation \"packet_source_features\" does not exist"
+    },
+    {
+      "packet_key": "packet:005dd51b9a6b",
+      "error": "relation \"packet_source_features\" does not exist"
+    }
+  ],
+  "records": [
+    {
+      "packet_key": "packet:0003260092b1",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.3333333333333333,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0003850e84ca",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0003ab694534",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.3333333333333333,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0003dda5e534",
+      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0004b466d863",
+      "source_ref": ".svelte-error-fixes-backup/sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0004f849be72",
+      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0006ca4a45e3",
+      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
+      "predicted_domain": "agent",
+      "domain_confidence": 0.75,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 3,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0008d535a1f6",
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
+      "predicted_domain": "agent",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0009951ee430",
+      "source_ref": ".tmp/parent_atlas_packets/0056213574662f41.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0009a56456fc",
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/pip/_vendor/rich/terminal_theme.py",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000b1b923bf4",
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-05-13T00-19-01-475Z.json",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000b2df0cfdf",
+      "source_ref": "sveltekit-frontend/tests/phase76-acp-tools.property.test.ts",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 2,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000db15dc8ef",
+      "source_ref": "sveltekit-frontend/src/lib/utils/keyboard-shortcuts.svelte.ts",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000e4d5a58e7",
+      "source_ref": "neschrom97/cards/914feea85742abf0.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000f10a13a57",
+      "source_ref": "crates/turbovec-napi/target/release/deps/libryu-555024bdb0a51304.rlib",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000f50f509c8",
+      "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/serde_json-f2f0d07b853d9365/LLMS.md",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000f704e5207",
+      "source_ref": ".python311/share/terminfo/b/bq300-8rv",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:000fde9311af",
+      "source_ref": "sveltekit-frontend/src/routes/api/ai/bifrost/+server.ts",
+      "predicted_domain": "network",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001007058f4a",
+      "source_ref": "scripts/atlas/generate-concept-temperature-report.mjs",
+      "predicted_domain": "agent",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0011712c94d1",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/workers/jobs/clean-server/LLMS.md",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0011a232d0b8",
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001375b841d0",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0014d8ac7795",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
+      "predicted_domain": "network",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0014edb0c6e4",
+      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0015b28db252",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 1,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00175bb3b887",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__components__ui__table__tablebody.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 2,
+        "retrieval": 0,
+        "network": 0,
+        "database": 1,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001789105fcc",
+      "source_ref": "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-06-13T15-21-32-591Z.json",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0017ebe58f96",
+      "source_ref": "scripts/run-migration.mjs",
+      "predicted_domain": "database",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 1,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00191bed434b",
+      "source_ref": "crates/turbovec-napi/target/debug/.fingerprint/npyz-0bb0c4b019944695/dep-lib-npyz",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001929a5e2e1",
+      "source_ref": "neschrom97/cards/12c1a2f41904835f.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001c3fdaad12",
+      "source_ref": "simd-bridge/cpp/build-x64-cuda-cublas/CMakeFiles/CheckCUDA/ZERO_CHECK.vcxproj.filters",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001d358f9d1f",
+      "source_ref": "llama-cpp-turboquant-gemma4/ggml/src/ggml-cpu/hbm.cpp",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001d524f1582",
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/rpc/CMakeLists.txt",
+      "predicted_domain": "agent",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001d67925876",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-07T03-08-06/qdrant_cluster_tags.json",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.25,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 1,
+        "network": 1,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001d9f093944",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__phase72__clustererrors.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001ddd6f58b5",
+      "source_ref": "sveltekit-frontend/docs_readme/deeds_labs_archive/components/CaseOutcomePrediction.svelte",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 2,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 1,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001f13a6f8f0",
+      "source_ref": "scripts/packets/load-packets-postgres.mjs",
+      "predicted_domain": "database",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 1,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001fb12712cf",
+      "source_ref": "neschrom97/cards/ac71ad48cb5da659.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:001ff2d2cfd0",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/error-brain/recommend/LLMS.md",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0023f9ea26b9",
+      "source_ref": "neschrom97/cards/c94dd0c954afedf3.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:002461508185",
+      "source_ref": "data/external-docs/raw/drizzle/queries.md",
+      "predicted_domain": "database",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 1,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00247841354c",
+      "source_ref": "logs/turboquant/launch-2026-06-25T08-15-06.err",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0025cf347c12",
+      "source_ref": "docs/reports/neschrom97-card-taxonomy.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0027fdaf45c1",
+      "source_ref": "simd-bridge/rust/hmm-repair/target/debug/.fingerprint/ctor-9cae0776433f9677/lib-ctor",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:002863f1b4a5",
+      "source_ref": "llama-cpp-turboquant-gemma4/vendor/stb/stb_image.h",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0029bc81879d",
+      "source_ref": "turbovec/target/release/.fingerprint/dyn-stack-macros-13130cbab826f9a2/dep-lib-dyn_stack_macros",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:002b62662acc",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/embed/search/+server.ts.batch1000-backup",
+      "predicted_domain": "network",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 1,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:002cac2b6dd3",
+      "source_ref": "simd-bridge/rust/hmm-repair/target/x86_64-pc-windows-msvc/release/.fingerprint/lazy_static-4ffe90688c9f1b57/lib-lazy_static.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:002e5998065a",
+      "source_ref": "neschrom97/cards/9d16ff996faa64e0.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:002ff3c143b4",
+      "source_ref": "crates/omni-bridge/target/debug/incremental/build_script_build-3o4ftf73gkctt/s-hjhrh8b7bp-1ob89gm-1s4cinpdytbmroshz5tarlbc1/akiemssc2zksgnjnh4yvdcy4p.o",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00302d7214ce",
+      "source_ref": "get_proper_metadata_retrieval_packetreader_wired_up_test_615.txt",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003100ceb172",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/upload/finalize/+server.ts.disabled",
+      "predicted_domain": "network",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0032cb0988c7",
+      "source_ref": "simd-bridge/rust-simdjson/target/release/.fingerprint/libloading-c85d0550b9c11bd3/dep-lib-libloading",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0032e6c21c4a",
+      "source_ref": "qdrant-windows/storage/collections/legal_evidence/0/segments/3d4f0fd9-6e58-4be5-ad71-68d17695803d/payload_storage/gaps.dat",
+      "predicted_domain": "retrieval",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 1,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0033cace702e",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__global.d.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003515fbe118",
+      "source_ref": "services/go-index-worker/internal/progress/valkey.go",
+      "predicted_domain": "cache",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0036072859d5",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/websearch/LLMS.md",
+      "predicted_domain": "retrieval",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 1,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003655c2cdf4",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-08T21-32-08/plan.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0036e4ee6f75",
+      "source_ref": "simd-bridge/rust/graph-engine/target/x86_64-pc-windows-msvc/release/.fingerprint/equivalent-c0f63c909c40281b/dep-lib-equivalent",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003738556103",
+      "source_ref": "claude-mem/src/services/integrations/CursorHooksInstaller.ts",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0037e8373280",
+      "source_ref": "crates/turbovec-napi/target/release/.fingerprint/bitflags-27a80a92b75ba5f1/invoked.timestamp",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003a93cd3333",
+      "source_ref": "neschrom97/cards/b3fcf23e0dfa4249.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003aa64cea09",
+      "source_ref": "llama-cpp-turboquant-gemma4/tools/server/webui/src/lib/components/ui/dropdown-menu/dropdown-menu-content.svelte",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 2,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003b42f31b83",
+      "source_ref": "neschrom97/cards/30e6b5d0c6a8f393.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003b604bd196",
+      "source_ref": ".python311/share/terminfo/f/f100-rv",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003ccb8a42d2",
+      "source_ref": "sveltekit-frontend/docs/graph/repo-neo4j-graphrag-report.json",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.3333333333333333,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 1,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:003e12b0489a",
+      "source_ref": ".python311/include/python3.11/internal/pycore_sliceobject.h",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0040120ab709",
+      "source_ref": "neschrom97/cards/349bc44c8847a587.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00425c075e28",
+      "source_ref": "scripts/tests/screenshots/2026-04-15T04-06-50/admin-error-brain.png",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0045d6820f9b",
+      "source_ref": "crates/turbovec-napi/target/x86_64-pc-windows-msvc/release/deps/simdutf8-81e8dad566a49a12.d",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00461c1eb14e",
+      "source_ref": "claude-mem/tests/worker/http/routes/memory-routes.test.ts",
+      "predicted_domain": "network",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0046c7db4fb2",
+      "source_ref": "sveltekit-frontend/src/lib/server/features/ai/index.ts",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:004719ec513f",
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/TagInput.svelte",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 2,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0047e3c255c4",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/ai/LLMS.md",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0047ef44251e",
+      "source_ref": ".python311/share/terminfo/d/d413-unix",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:004a43bb7fa1",
+      "source_ref": "scripts/phase76-ace-prompt-engineer.mjs",
+      "predicted_domain": "agent",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:004bde1a063c",
+      "source_ref": "neschrom97/cards/9376055b7688313d.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:004dd7732740",
+      "source_ref": "scripts/api-cleanup/recovery.ts",
+      "predicted_domain": "network",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:004ec0f69a1e",
+      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__helpers__env-ports.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0051e7a96992",
+      "source_ref": "sveltekit-frontend/memory/runs/2026-05-17T22-17-52/qdrant_cluster_tags.json",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.25,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 1,
+        "network": 1,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00521aea4913",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/route-operations/log/LLMS.md",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005302795e41",
+      "source_ref": ".svelte-error-fixes-backup/sveltekit-frontend/src/lib/components/_archive/svelte4/ProgressIndicator.svelte",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 2,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0053310c1182",
+      "source_ref": ".error-brain/backups/2025-12-16T22-27-26-550Z_C",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00538bda9644",
+      "source_ref": ".python311/share/terminfo/s/screen.vte-256color",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0053d32088fe",
+      "source_ref": "simd-bridge/cpp/build-x64-fallback/CMakeFiles/TargetDirectories.txt",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005428ba3dd3",
+      "source_ref": "llama-cpp-turboquant-gemma4/ggml/src/ggml-opencl/kernels/mul_mv_q4_0_f32_8x_flat.cl",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00548ef34afb",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/gpu-error-processing/+server.ts",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0055a733c702",
+      "source_ref": "sveltekit-frontend/docs/design/2026-05-11_agents-directory-card-regen.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0055c2d04c92",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/gallery/+server.ts.disabled",
+      "predicted_domain": "network",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005641f71d3c",
+      "source_ref": "crates/turbovec-napi/target/debug/.fingerprint/raw-cpuid-a1a9b5bff40c2b58/dep-lib-raw_cpuid",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00569919dc47",
+      "source_ref": "neschrom97/cards/d6cb07d0ea3a0b1d.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0057df284547",
+      "source_ref": "scripts/atlas/test-p4-nats-wiring.mts",
+      "predicted_domain": "cache",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 1,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:00581022d8d5",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/code-intel/wiki/LLMS.md",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0058e67db61b",
+      "source_ref": "scripts/tests/test-warmup-import.mjs",
+      "predicted_domain": "general",
+      "domain_confidence": 0,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:0059ae33a823",
+      "source_ref": "scripts/atlas/audit-som-canonical-location.mjs",
+      "predicted_domain": "agent",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 1,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005a13f9efc3",
+      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/f2py/_backends/meson.build.template",
+      "predicted_domain": "ui",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 0,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005b17476a9e",
+      "source_ref": "sveltekit-frontend/tests/routes/auto/api/codebase/auto-research.test.ts",
+      "predicted_domain": "ui",
+      "domain_confidence": 0.3333333333333333,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 1,
+        "retrieval": 1,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005c88ea34f1",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/poi/+server.ts",
+      "predicted_domain": "network",
+      "domain_confidence": 0.6666666666666666,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 2,
+        "database": 0,
+        "cache": 0,
+        "agent": 1,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005c92019c46",
+      "source_ref": "neschrom97/cards/e60e5d78cdd9ddfb.json",
+      "predicted_domain": "network",
+      "domain_confidence": 1,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 0,
+        "network": 1,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 0,
+        "general": 0
+      }
+    },
+    {
+      "packet_key": "packet:005dd51b9a6b",
+      "source_ref": "storage/collections/phase72_evidence_embeddings/0/wal/open-1",
+      "predicted_domain": "retrieval",
+      "domain_confidence": 0.5,
+      "keyword_counts": {
+        "auth": 0,
+        "ui": 0,
+        "retrieval": 1,
+        "network": 0,
+        "database": 0,
+        "cache": 0,
+        "agent": 0,
+        "graph": 0,
+        "ml": 1,
+        "general": 0
+      }
+    }
+  ]
+}

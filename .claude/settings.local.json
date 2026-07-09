@@ -599,7 +599,13 @@
       "PowerShell(docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_name LIKE '%packet%' OR table_name LIKE '%artifact%' ORDER BY table_name;\" 2>&1)",
       "Bash(jq '.[] | select\\(.name | contains\\(\"phase7\"\\)\\) | {name, messages, consumers}' echo -e \"\\\\n=== CURRENT ACTIVE CONSUMERS ===\" curl -s -u guest:guest http://127.0.0.1:15672/api/consumers)",
       "PowerShell(npm show opencode-ai version)",
-      "PowerShell(npm install -g opencode-ai@latest 2>&1)"
+      "PowerShell(npm install -g opencode-ai@latest 2>&1)",
+      "Bash(opencode run *)",
+      "Bash(GEMMA4_ADAPTER_DEBUG=1 opencode run --agent antigravity \"use bash to run: echo test\")",
+      "Bash(.venv/Scripts/python --version)",
+      "Bash(.venv/Scripts/pip show *)",
+      "Bash(.venv/Scripts/pip install *)",
+      "Bash(.venv/Scripts/python -c \"import xgboost as xgb; print\\(f'XGBoost {xgb.__version__} ✓'\\); import sklearn; print\\(f'scikit-learn {sklearn.__version__} ✓'\\)\")"
     ],
     "deny": [],
     "ask": []

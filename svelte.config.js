@@ -1,17 +1,8 @@
-import adapter from '@sveltejs/adapter-node';
-import preprocess from 'svelte-preprocess';
-
 /**
- * Minimal SvelteKit configuration (ESM) — ensures tooling like svelte-check
- * can load the config. Adjust adapters and preprocessors as needed.
+ * Root svelte.config.js — delegates to sveltekit-frontend
+ * (This file exists only to satisfy workspace-level svelte-check;
+ *  the real config is in sveltekit-frontend/svelte.config.js)
  */
-const config = {
-  preprocess: preprocess(),
-  kit: {
-    adapter: adapter(),
-    // preserve original vite config if present
 
-  },
-};
-
-export default config;
+// Re-export the actual config from sveltekit-frontend
+export { default } from './sveltekit-frontend/svelte.config.js';

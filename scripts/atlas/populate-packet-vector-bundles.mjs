@@ -74,7 +74,10 @@ async function main() {
            ap.packet_key, ap.source_ref,
            (ci.content_embedding::float4[])[1:384]::vector(384)::text AS emb
     FROM atlas_packets ap
-    JOIN codebase_chunk_index ci ON ci.source_ref = ap.source_ref
+    JOIN codebase_chunk_index ci ON (
+      ci.source_ref = ap.source_ref OR
+      ci.source_ref = REPLACE(ap.source_ref, 'sveltekit-frontend/', '')
+    )
     WHERE ci.content_embedding IS NOT NULL
       AND NOT EXISTS (
         SELECT 1 FROM packet_vector_bundles pvb

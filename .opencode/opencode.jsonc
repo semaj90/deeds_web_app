@@ -19,36 +19,19 @@
     "engram_*": "allow",
     "langextract_*": "allow",
     "bash": {
-      "npm run tools:check:structural": "allow",
-      "npm run index:*": "allow",
-      "npm run graphify:dependency:audit": "allow",
-      "npm --prefix * run index:*": "allow",
-      "npm --prefix * run graphify:dependency:audit": "allow",
-      "node scripts/index/*": "allow",
-      "rg *": "allow",
-      "ast-grep *": "allow",
-      "sg *": "allow",
-      "jq *": "allow",
-      "git status": "allow",
-      "git diff *": "allow",
       "rm *": "deny",
       "del *": "deny",
       "Remove-Item *": "deny",
-      "docker exec *": "allow",
-      "docker ps *": "allow",
-      "npm run ace:packet -- *": "allow",
-      "npm run ace:ask -- *": "allow",
-      "npm run ace:stream -- *": "allow",
-      "npm run index:clusters:query -- *": "allow",
-      "node scripts/ace/*.mjs *": "allow",
-      "Get-Content * | Select-Object -Skip * -First *": "allow",
+      "rmdir *": "deny",
       "cat *.md": "deny",
       "cat *.txt": "deny",
       "cat *.json": "deny",
       "Get-Content docs/llms/generated/*": "deny",
       "Get-Content *.json": "deny",
-      "*": "ask"
-    }
+      "*": "allow"
+    },
+    "webfetch": "allow",
+    "websearch": "allow"
   },
   "provider": {
     "turboquant": {
@@ -113,6 +96,24 @@
       }
     }
   },
+  "lsp": {
+    "typescript": {
+      "command": ["node", "sveltekit-frontend/node_modules/typescript-language-server/lib/cli.mjs", "--stdio"],
+      "extensions": ["ts", "tsx", "js", "jsx"]
+    },
+    "svelte": {
+      "command": ["node", "sveltekit-frontend/node_modules/svelte-language-server/bin/server.js", "--stdio"],
+      "extensions": ["svelte"]
+    },
+    "json": {
+      "command": ["node", "sveltekit-frontend/node_modules/vscode-langservers-extracted/bin/vscode-json-language-server", "--stdio"],
+      "extensions": ["json", "jsonc"]
+    },
+    "css": {
+      "command": ["node", "sveltekit-frontend/node_modules/vscode-langservers-extracted/bin/vscode-css-language-server", "--stdio"],
+      "extensions": ["css"]
+    }
+  },
   "command": {
     "atlas-context": {
       "description": "Use Atlas-first retrieval without reading full files",
@@ -152,6 +153,17 @@
     }
   },
   "mcp": {
+    "playwright": {
+      "type": "local",
+      "description": "Browser automation for UI testing, screenshots, regression detection",
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--browser", "chromium"],
+      "enabled": true,
+      "timeout": 30000,
+      "env": {
+        "PLAYWRIGHT_BASE_URL": "http://localhost:5173"
+      }
+    },
     "trace": {
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
@@ -248,11 +260,11 @@
       }
     },
     "antigravity": {
-      "description": "General-purpose agent: bash, MCP tools, read, grep. Use for tool-calling tests and operational tasks.",
+      "description": "General-purpose agent: bash, read, grep, MCP tools. Use for tool-calling tests and operational tasks.",
       "model": "turboquant/gemma4-legal.gguf",
       "temperature": 0,
       "steps": 10,
-      "prompt": "You have access to bash, read, grep, and MCP tools. RULE: When the user asks you to run a command, you MUST call the bash tool. Do NOT write text explanations. Do NOT describe what you will do. Call the tool immediately with the exact command. First action = tool call, not text.",
+      "prompt": "You have access to bash, read, grep, glob, and MCP tools. RULE: When the user asks you to run a command, you MUST call the bash tool immediately. Do NOT write text explanations first. Do NOT describe what you will do. Call the tool with the exact command. First action = tool call, not text.",
       "permission": {
         "*": "deny",
         "read": "allow",
@@ -278,6 +290,15 @@
           "rg *": "allow",
           "git status": "allow",
           "git diff *": "allow",
+          "npm run *": "allow",
+          "node scripts/*": "allow",
+          "node sveltekit-frontend/scripts/*": "allow",
+          "Get-Content *": "allow",
+          "cat *": "allow",
+          "ls *": "allow",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item *": "deny",
           "*": "allow"
         }
       }

@@ -1,0 +1,24 @@
+{
+  "model_type": "xgboost",
+  "num_classes": 4,
+  "classes": [
+    "bm25-fallback",
+    "neo4j-authority",
+    "qdrant-dense",
+    "som-topology"
+  ],
+  "num_features": 10,
+  "feature_names": [
+    "pagerank",
+    "som_row",
+    "som_col",
+    "community_id",
+    "days_old",
+    "has_content_vec",
+    "has_summary_vec",
+    "has_keyword_vec",
+    "graph_degree",
+    "bm25_score"
+  ],
+  "format": "json-trees"
+}

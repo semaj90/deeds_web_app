@@ -33,6 +33,10 @@ bld/
 /[Ll]og/
 /[Ll]ogs/
 
+# Large model/data directories
+/granite-docling-258M/
+/models/embeddinggemma_300m/
+
 # Build results on 'Bin' directories
 **/[Bb]in/*
 

@@ -1,0 +1,10 @@
+  { "nodeid": 0, "depth": 0, "split": "has_content_vec", "split_condition": 1, "yes": 1, "no": 2, "missing": 2 , "children": [
+    { "nodeid": 1, "depth": 1, "split": "som_col", "split_condition": 1, "yes": 3, "no": 4, "missing": 4 , "children": [
+      { "nodeid": 3, "depth": 2, "split": "som_row", "split_condition": 1, "yes": 5, "no": 6, "missing": 6 , "children": [
+        { "nodeid": 5, "leaf": 0.0531688519 }, 
+        { "nodeid": 6, "leaf": -0.511500895 }
+      ]}, 
+      { "nodeid": 4, "leaf": -0.62300235 }
+    ]}, 
+    { "nodeid": 2, "leaf": -0.691959262 }
+  ]}
