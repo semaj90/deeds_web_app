@@ -1,4 +1,5 @@
 /// <reference lib="webworker" />
+import { buildRuntimeCacheKey } from './lib/runtime-cache/runtime-cache-key';
 
 // Define SyncEvent interface, as it might not be fully provided by lib="webworker" in all environments
 interface SyncEvent extends Event {
@@ -19,7 +20,7 @@ let isRedisConnected: boolean = false;
 let somCacheReady: boolean = false;
 let webgpuInitialized: boolean = false;
 
-// Placeholder for integration clients
+// Same-origin integration clients. Server endpoints own Redis/Valkey access.
 let redisWebGPUIntegration: any;
 let simdJSONClient: any;
 let somWebGPUCache: any;
@@ -35,27 +36,39 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 		(async () => {
 			redisWebGPUIntegration = {
 				getCachedResult: async (key: string) => {
-					console.log('Dummy redis get', key);
-					return null;
+					const res = await fetch(`/api/atlas/runtime-cache/redis?key=${encodeURIComponent(key)}`);
+					if (!res.ok) return null;
+					const data = await res.json().catch(() => null);
+					return data?.ok ? data.data : null;
 				},
 				cacheResult: async (key: string, data: Record<string, unknown>, options: unknown) => {
-					console.log('Dummy redis cache', key, data, options);
+					await fetch('/api/atlas/runtime-cache/redis', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							key,
+							data,
+							ttl: typeof options === 'object' && options && 'ttl' in options ? (options as any).ttl : 900,
+						}),
+					}).catch(() => null);
 				},
 				getCacheKeys: async () => {
-					console.log('Dummy redis get keys');
-					return [];
+					const res = await fetch('/api/atlas/runtime-cache/redis?prefix=sw:&limit=100');
+					if (!res.ok) return [];
+					const data = await res.json().catch(() => null);
+					return Array.isArray(data?.keys) ? data.keys : [];
 				},
 				warmLegalDocumentCache: async (payload: unknown) => {
-					console.log('Dummy warmLegalDocumentCache', payload);
+					await redisWebGPUIntegration.cacheResult('sw:warm:legal-document', payload, { ttl: 3600 });
 				},
 				warmVectorSimilarityCache: async (payload: unknown) => {
-					console.log('Dummy warmVectorSimilarityCache', payload);
+					await redisWebGPUIntegration.cacheResult('sw:warm:vector-similarity', payload, { ttl: 3600 });
 				},
 				warmSearchResultsCache: async (payload: unknown) => {
-					console.log('Dummy warmSearchResultsCache', payload);
+					await redisWebGPUIntegration.cacheResult('sw:warm:search-results', payload, { ttl: 900 });
 				},
 				syncWithDistributedCache: async () => {
-					console.log('Dummy syncWithDistributedCache');
+					await redisWebGPUIntegration.getCacheKeys();
 				},
 			};
 			simdJSONClient = {
@@ -63,22 +76,33 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 			};
 			somWebGPUCache = {
 				get: async (key: string) => {
-					console.log('Dummy som get', key);
-					return null;
+					const res = await fetch(`/api/atlas/runtime-cache/som?key=${encodeURIComponent(key)}`);
+					if (!res.ok) return null;
+					const data = await res.json().catch(() => null);
+					return data?.ok ? data.data : null;
 				},
 				storeResult: async (key: string, data: unknown) => {
-					console.log('Dummy som store', key, data);
+					await fetch('/api/atlas/runtime-cache/som', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ key, data, ttl: 3600 }),
+					}).catch(() => null);
 				},
 				precomputeEmbeddings: async (payload: unknown) => {
-					console.log('Dummy som precompute', payload);
+					await somWebGPUCache.storeResult('precompute', payload);
 				},
 				trainInBackground: async () => {
-					console.log('Dummy som train');
+					await somWebGPUCache.storeResult('train-background', { requestedAt: new Date().toISOString() });
+				},
+				getEmbeddingsForCase: async (caseId: string) => {
+					return await somWebGPUCache.get(`case:${caseId}:embeddings`);
+				},
+				search: async () => {
+					return null;
 				},
 			};
 
-			isRedisConnected = true;
-			somCacheReady = true;
+			await refreshRuntimeCacheReadiness();
 			webgpuInitialized = true;
 
 			await caches.open('legal-ai-v1');
@@ -99,6 +123,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 			console.log('Service Worker: Old caches cleared.');
 			await (self as unknown as ServiceWorkerGlobalScope).clients.claim();
 			console.log('Service Worker: Clients claimed.');
+			await refreshRuntimeCacheReadiness();
 			startCacheWarming();
 			syncDistributedCaches();
 		})()
@@ -132,7 +157,7 @@ self.addEventListener('sync', (event: any) => {
  */
 async function handleAPIRequest(request: Request): Promise<Response> {
 	const url = new URL(request.url);
-	const cacheKey = generateCacheKey(request);
+	const cacheKey = await buildRuntimeCacheKey(request);
 
 	// ── SPECIAL HANDLING: Instant Local Search (WebGPU) ───────────────────────
 	if (url.pathname === '/api/rag/search' && request.method === 'POST') {
@@ -231,6 +256,60 @@ async function attemptLocalWebGPUSearch(body: any): Promise<any | null> {
 	}
 }
 
+async function checkCacheHierarchy(cacheKey: string, request: Request): Promise<Response | null> {
+	try {
+		if (request.method === 'GET') {
+			const cache = await caches.open('legal-ai-v1');
+			const cached = await cache.match(request);
+			if (cached) return cached;
+		}
+
+		if (somCacheReady && shouldSyncToSOM(cacheKey)) {
+			const somHit = await safeSomGet(cacheKey);
+			if (somHit) {
+				return new Response(JSON.stringify(somHit), {
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Cache-Source': 'som-runtime',
+					},
+				});
+			}
+		}
+
+		if (isRedisConnected) {
+			const redisHit = await redisWebGPUIntegration.getCachedResult(cacheKey);
+			if (redisHit) {
+				return new Response(JSON.stringify(redisHit), {
+					headers: {
+						'Content-Type': 'application/json',
+						'X-Cache-Source': 'redis-runtime',
+					},
+				});
+			}
+		}
+	} catch (err) {
+		console.warn('[SW] cache hierarchy miss after error:', err);
+	}
+
+	return null;
+}
+
+async function refreshRuntimeCacheReadiness(): Promise<void> {
+	try {
+		const redisProbe = await fetch('/api/atlas/runtime-cache/redis?prefix=sw:&limit=1');
+		isRedisConnected = redisProbe.ok;
+	} catch {
+		isRedisConnected = false;
+	}
+
+	try {
+		const somProbe = await fetch('/api/atlas/runtime-cache/som?key=__readiness__');
+		somCacheReady = somProbe.ok;
+	} catch {
+		somCacheReady = false;
+	}
+}
+
 /**
  * Cache response across all tiers
  */
@@ -245,8 +324,10 @@ async function cacheResponse(
 		const cachePromises: Promise<any>[] = [];
 
 		// 1. Browser cache
-		const cache = await caches.open('legal-ai-v1');
-		cachePromises.push(cache.put(request, response.clone()));
+		if (request.method === 'GET') {
+			const cache = await caches.open('legal-ai-v1');
+			cachePromises.push(cache.put(request, response.clone()));
+		}
 
 		// 2. Redis distributed cache
 		if (isRedisConnected && cacheStrategy.useRedis) {
@@ -296,24 +377,6 @@ function determineCacheStrategy(request: Request): {
 	}
 
 	return { useRedis: true, useSOM: false, ttl: 30 * 60, priority: 5 };
-}
-
-/**
- * Generate cache key for requests
- */
-function generateCacheKey(request: Request): string {
-	const url = new URL(request.url);
-	const method = request.method;
-	let key = `${method}:${url.pathname}`;
-
-	if (method === 'GET' && url.search) {
-		key += `?${url.search}`;
-	}
-
-	if (method === 'POST') {
-		key += ':' + Date.now().toString(36);
-	}
-	return key;
 }
 
 /**

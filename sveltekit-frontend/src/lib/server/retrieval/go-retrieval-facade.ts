@@ -27,6 +27,12 @@ import {
   type MultiVectorRequest,
   type MultiVectorResult
 } from './multi-vector-orchestrator.js';
+import {
+  orchestrateCacheLayers,
+  checkCacheLayersHealth,
+  type CacheLayers
+} from './cache-layers-orchestrator.js';
+import { recordCacheDecision } from './cache-layers-telemetry.js';
 import { validateCanonicalEnvelope, type CanonicalEnvelope } from '$lib/server/topology/canonical-id-hierarchy.js';
 import { createPermissionManager, type PermissionManager } from '$lib/server/topology/permission-manager.js';
 import { integrateDispatcher } from '$lib/server/dispatch/dispatcher-integration.js';
@@ -86,10 +92,14 @@ export interface GoRetrievalFacadeResponse {
     postgres_join_ms: number;
     total_ms: number;
     multi_vector_ms?: number;
+    cache_layers_ms?: number;
   };
   stages_completed: string[];
   fallback_used: boolean;
   multi_vector_used?: boolean;
+  cache_layers?: CacheLayers & {
+    decision: 'layer1_direct' | 'layer2_adapter' | 'layer3_exact' | 'layer4_semantic';
+  };
   identity_validation?: {
     candidates_before: number;
     candidates_after: number;
@@ -420,6 +430,35 @@ export async function executeGoRetrievalSearch(
       return await executeGoRetrievalSearchMultiVector(request, queryEmbedding, includeSummary);
     }
 
+    // ── Phase 3A: Cache Layers Orchestration ─────────────────────────────────────
+    // Measure Layer 1 (direct llama.cpp) + Layers 2-4 in parallel with 100ms timeout each
+    let cacheLayersResult: (typeof CacheLayers & { decision: string }) | undefined;
+    const cacheLayersStart = performance.now();
+
+    try {
+      cacheLayersResult = await orchestrateCacheLayers(
+        request.query,
+        request.query || 'default', // system prompt fallback
+        0 // Layer 1 latency will be populated during unified retrieval
+      );
+
+      const cacheLayersMs = performance.now() - cacheLayersStart;
+      console.log(
+        `[cache-layers] decision=${cacheLayersResult.decision} ` +
+          `layer2_hit=${cacheLayersResult.layer2_adapter?.hit || false} ` +
+          `layer3_hit=${cacheLayersResult.layer3_exact?.hit || false} ` +
+          `layer4_hit=${cacheLayersResult.layer4_semantic?.hit || false} ` +
+          `orchestration=${cacheLayersMs}ms`
+      );
+
+      // Record telemetry (non-blocking, fire-and-forget)
+      const queryHash = Buffer.from(request.query).toString('base64').slice(0, 16);
+      recordCacheDecision(cacheLayersResult, queryHash);
+    } catch (err) {
+      console.warn('[cache-layers] orchestration failed (non-blocking):', err);
+      cacheLayersResult = undefined;
+    }
+
     // ── Standard unified retrieval path ───────────────────────────────────────
     const unified = normalizeRequest(request);
     const shouldSummarize = includeSummary ?? request.includeSummary ?? request.include_summary ?? false;
@@ -513,6 +552,14 @@ export async function executeGoRetrievalSearch(
     }));
     response.identity_validation = identityValidation;
 
+    if (cacheLayersResult) {
+      response.cache_layers = {
+        ...cacheLayersResult,
+        decision: cacheLayersResult.decision as any
+      };
+      response.timing.cache_layers_ms = cacheLayersResult.total_orchestration_ms;
+    }
+
     if (dispatchResult) {
       response.dispatch = {
         decision: dispatchResult.decision,
@@ -556,12 +603,16 @@ export async function executeGoRetrievalSearch(
 
 /**
  * Health check for Go Retrieval facade
- * Verifies all 5 services are operational
+ * Verifies all 5 services + cache layers are operational
  */
 export async function checkGoRetrievalHealth(): Promise<{
   ok: boolean;
   services: Record<string, boolean>;
   details: Record<string, string>;
+  cache_layers?: {
+    ok: boolean;
+    layers: Record<string, string>;
+  };
 }> {
   const services: Record<string, boolean> = {};
   const details: Record<string, string> = {};
@@ -640,12 +691,29 @@ export async function checkGoRetrievalHealth(): Promise<{
     details.multi_vector = (err as Error).message;
   }
 
+  // Check cache layers (Layer 2 adapter, Layer 3-4 Valkey)
+  let cacheLayersHealth;
+  try {
+    cacheLayersHealth = await checkCacheLayersHealth();
+    services.cache_layers = cacheLayersHealth.healthy;
+    details.cache_layers = cacheLayersHealth.healthy ? 'OK' : 'Some layers DOWN';
+  } catch (err) {
+    services.cache_layers = false;
+    details.cache_layers = (err as Error).message;
+  }
+
   const ok = Object.values(services).every((s) => s);
 
   return {
     ok,
     services,
-    details
+    details,
+    cache_layers: cacheLayersHealth
+      ? {
+          ok: cacheLayersHealth.healthy,
+          layers: cacheLayersHealth.layers
+        }
+      : undefined
   };
 }
 

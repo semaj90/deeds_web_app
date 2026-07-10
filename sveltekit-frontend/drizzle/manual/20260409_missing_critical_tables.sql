@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS api_audit_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-    endpoint TEXT NOT NULL,
+    path TEXT NOT NULL,
     method TEXT NOT NULL,
     status_code INTEGER NOT NULL,
     request_body JSONB,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS api_audit_log (
 );
 
 CREATE INDEX IF NOT EXISTS idx_api_audit_log_user_id ON api_audit_log(user_id);
-CREATE INDEX IF NOT EXISTS idx_api_audit_log_endpoint ON api_audit_log(endpoint);
+CREATE INDEX IF NOT EXISTS idx_api_audit_log_path ON api_audit_log(path);
 CREATE INDEX IF NOT EXISTS idx_api_audit_log_created_at ON api_audit_log(created_at DESC);
 
 COMMENT ON TABLE api_audit_log IS 'API request audit trail with request/response logging';

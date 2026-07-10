@@ -14,6 +14,22 @@ import type {
   RouterObservation,
   RouterConstraint,
 } from './router-types.js';
+import {
+  scoreSemanticSimilarity,
+  scoreIntentMatch,
+  cosineSimilarity,
+} from './semantic-ranking-bridge.js';
+import {
+  getHistoricalSuccessRate,
+  getStateTransitionPriors,
+  getCacheWarmth,
+} from './telemetry-ranking-bridge.js';
+import {
+  scoreTopologyAuthority,
+  getPageRankScore,
+  getAuthorityScore,
+  getAttentionScore,
+} from './authority-ranking-bridge.js';
 
 // ── Eligibility Gates ────────────────────────────────────────────────────────
 
@@ -47,23 +63,17 @@ export function isEligible(
 
 // ── Scoring Functions (each returns [0, 1]) ─────────────────────────────────
 
-function scoreSemanticSimilarity(tool: ToolDescriptor, query: string): number {
-  // Placeholder: BM25 or EmbeddingGemma similarity
-  // Returns normalized score [0, 1]
-  // TODO: Wire to actual embedding/BM25 service
-  const toolKeywords = [tool.name, tool.namespace, tool.description]
-    .join(' ')
-    .toLowerCase();
-  const queryTokens = query.toLowerCase().split(/\s+/);
-  const matches = queryTokens.filter((t) => toolKeywords.includes(t)).length;
-  return Math.min(1, matches / Math.max(1, queryTokens.length));
+function scoreSemanticSimilarityRanker(tool: ToolDescriptor, query: string): number {
+  // Wire to semantic-ranking-bridge: BM25 + embedding blend (0.6·BM25 + 0.4·embedding)
+  const toolKeywords = [tool.name, tool.namespace, tool.description];
+  return scoreSemanticSimilarity(query, tool.name, tool.description, toolKeywords);
 }
 
-function scoreIntentMatch(tool: ToolDescriptor, query: string): number {
-  // Placeholder: Gemma intent classification
-  // TODO: Wire to actual intent detection service
-  // For now, return neutral default
-  return 0.5;
+function scoreIntentMatchRanker(tool: ToolDescriptor, query: string): number {
+  // Wire to semantic-ranking-bridge: keyword-based intent detection (sync)
+  // Fallback: Gemma intent classifier for async full analysis
+  const allowedIntents = ['CODE_SEARCH', 'SEMANTIC_SEARCH', 'GRAPH_EXPAND'];
+  return scoreIntentMatch(query, tool.name, allowedIntents);
 }
 
 function scoreSchemaFitness(tool: ToolDescriptor, _query: string): number {
@@ -96,11 +106,14 @@ function scoreHistoricalSuccess(
   tool: ToolDescriptor,
   telemetry: RouterObservation['telemetryContext']
 ): number {
-  // If telemetry available, use measured success rate; else neutral default
+  // Wire to telemetry-ranking-bridge: (state, toolName) → success rate
+  // Falls back to 0.5 if telemetry unavailable
   if (telemetry?.priorSuccessRate !== undefined) {
     return telemetry.priorSuccessRate;
   }
-  return 0.5; // Neutral default: no prior evidence
+  // TODO: Call getHistoricalSuccessRate(previousState, tool.name) for real lookup
+  // For now, use neutral default (actual DB query would be async)
+  return 0.5;
 }
 
 function scoreProvenance(tool: ToolDescriptor): number {
@@ -140,15 +153,15 @@ export function scoreToolCandidate(
   tool: ToolDescriptor,
   obs: RouterObservation
 ): ToolCandidate {
-  const semanticScore = scoreSemanticSimilarity(tool, obs.query);
-  const intentScore = scoreIntentMatch(tool, obs.query);
+  const semanticScore = scoreSemanticSimilarityRanker(tool, obs.query);
+  const intentScore = scoreIntentMatchRanker(tool, obs.query);
   const schemaFitness = scoreSchemaFitness(tool, obs.query);
   const transitionScore = scoreStateTransition(tool, obs.previousState);
   const healthScore = scoreServiceHealth(tool, obs);
   const historicalSuccessScore = scoreHistoricalSuccess(tool, obs.telemetryContext);
   const provenanceScore = scoreProvenance(tool);
   const latencyScore = scoreLatency(tool, obs.telemetryContext);
-  const topologyScore = scoreTopology(tool, obs.query);
+  const topologyScore = scoreTopologyAuthority(tool.name, tool.description, obs.query, obs);
 
   const compositeScore =
     SCORE_WEIGHTS.semantic * semanticScore +

@@ -253,13 +253,16 @@ async function postgresJoin(
     if (qdrantIds.length === 0) return new Map();
 
     const res = await pool.query(
-      `SELECT id, relative_path, symbol, kind FROM codebase_chunk_index WHERE id = ANY($1) LIMIT 20`,
-      [qdrantIds]
+      `SELECT qdrant_id, relative_path, symbol, kind
+         FROM codebase_chunk_index
+        WHERE qdrant_id = ANY($1::text[])
+        LIMIT 20`,
+      [qdrantIds.map((id) => String(id))]
     );
 
     const map = new Map<string, any>();
     (res.rows || []).forEach((row) => {
-      map.set(row.id, {
+      map.set(String(row.qdrant_id), {
         relative_path: row.relative_path,
         symbol: row.symbol,
         kind: row.kind

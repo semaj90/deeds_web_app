@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2026-07-10T14:54:11.144Z",
+  "mode": "apply",
+  "summary": {
+    "latentRows": 993,
+    "scoredRows": 993,
+    "rowsWritten": 993
+  },
+  "nextSafeAction": "Wire packet_jepa_similarity into the reranker only after held-out metrics beat the 384d baseline."
+}

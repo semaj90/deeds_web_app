@@ -26,6 +26,7 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { normalizeSourceRef } from '../lib/canonical-source-ref.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -34,9 +35,9 @@ const VERBOSE    = process.argv.includes('--verbose');
 const SAMPLE_ARG = process.argv.find(a => a.startsWith('--sample='));
 const SAMPLE     = SAMPLE_ARG ? parseInt(SAMPLE_ARG.split('=')[1], 10) : 100;
 
-const DATABASE_URL = process.env.DATABASE_URL ||
-  'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const QDRANT_URL   = process.env.QDRANT_URL   || 'http://127.0.0.1:6333';
+const env = loadRepoEnv(process.env);
+const DATABASE_URL = resolveDatabaseUrl(env);
+const QDRANT_URL = env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION   = 'codebase_chunks_768';
 
 // ── Qdrant helpers ─────────────────────────────────────────────────────────────
@@ -118,6 +119,9 @@ async function main() {
   // Analyse enrichment fields (as written by upsert-qdrant-packet-payload.mjs)
   let withFeatureId      = 0;
   let withCommunityId    = 0;
+  let withTreeNodeId     = 0;
+  let withPageRank       = 0;
+  let withSomCoordinates = 0;
   let withCommunityConf  = 0;
   let withPacketKey      = 0;
   let withAtlasEnriched  = 0;
@@ -133,6 +137,9 @@ async function main() {
     const pl = p.payload ?? {};
     if (pl.feature_id)                                withFeatureId++;
     if (pl.community_id != null)                      withCommunityId++;
+    if (pl.tree_node_id)                              withTreeNodeId++;
+    if (pl.page_rank_score != null || pl.pagerank != null) withPageRank++;
+    if (pl.som_row != null && pl.som_col != null)     withSomCoordinates++;
     if (pl.community_conf != null)                    withCommunityConf++;
     if (pl.packet_key)                                withPacketKey++;
     if (pl.atlas_enriched)                            withAtlasEnriched++;
@@ -153,6 +160,9 @@ async function main() {
   console.log(`  atlas_enriched:         ${withAtlasEnriched}/${n} (${pct(withAtlasEnriched)}%)`);
   console.log(`  feature_id:             ${withFeatureId}/${n} (${pct(withFeatureId)}%)`);
   console.log(`  community_id:           ${withCommunityId}/${n} (${pct(withCommunityId)}%)`);
+  console.log(`  tree_node_id:           ${withTreeNodeId}/${n} (${pct(withTreeNodeId)}%)`);
+  console.log(`  page_rank_score:        ${withPageRank}/${n} (${pct(withPageRank)}%)`);
+  console.log(`  SOM row/col:            ${withSomCoordinates}/${n} (${pct(withSomCoordinates)}%)`);
   console.log(`  community_conf:         ${withCommunityConf}/${n} (${pct(withCommunityConf)}%)`);
   console.log(`  packet_key:             ${withPacketKey}/${n} (${pct(withPacketKey)}%)`);
   console.log(`  concept_ids:            ${withConceptIds}/${n} (${pct(withConceptIds)}%)`);
@@ -204,6 +214,18 @@ async function main() {
     name: 'file_path_coverage_50pct',
     pass: parseFloat(pathPct) >= 50,
     detail: `${pathPct}% (${withMetaPath}/${n})`,
+  });
+
+  gates.push({
+    name: 'tree_node_id_95pct',
+    pass: parseFloat(pct(withTreeNodeId)) >= 95,
+    detail: `${pct(withTreeNodeId)}% (${withTreeNodeId}/${n})`,
+  });
+
+  gates.push({
+    name: 'page_rank_score_90pct',
+    pass: parseFloat(pct(withPageRank)) >= 90,
+    detail: `${pct(withPageRank)}% (${withPageRank}/${n})`,
   });
 
   // ── Metadata hash — informational only ────────────────────────────────────
@@ -329,6 +351,9 @@ async function main() {
       atlas_enriched_pct:   parseFloat(pct(withAtlasEnriched)),
       feature_id_pct:       parseFloat(pct(withFeatureId)),
       community_id_pct:     parseFloat(pct(withCommunityId)),
+      tree_node_id_pct:     parseFloat(pct(withTreeNodeId)),
+      page_rank_score_pct:  parseFloat(pct(withPageRank)),
+      som_coordinates_pct:  parseFloat(pct(withSomCoordinates)),
       community_conf_pct:   parseFloat(pct(withCommunityConf)),
       packet_key_pct:       parseFloat(pct(withPacketKey)),
       concept_ids_pct:      parseFloat(pct(withConceptIds)),

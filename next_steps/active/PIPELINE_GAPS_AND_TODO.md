@@ -109,6 +109,68 @@ Built `services/go-retrieval-service/retrieval-server.exe` (33MB). Health check:
 
 ---
 
+## Active ML Promotion Gates
+
+### Packet-JEPA promotion gate (Jul 10, 2026)
+
+- [ ] Do not wire `packet_jepa_similarity` into XGBoost/MLP yet
+- [ ] Raise canonical packet embedding coverage first
+- [ ] Re-run JEPA evaluation on a real 384d packet cohort
+- [ ] Compare against held-out baseline on `MRR` and `NDCG@10`
+- [ ] Promote JEPA only if it beats the baseline on both metrics
+
+**Reason**: current JEPA results are still an experiment-lane signal, not a production ranking feature.
+
+### DSPy placement gate
+
+- [ ] Keep DSPy above retrieval as a module optimizer
+- [ ] Do not use DSPy to replace HMM routing or canonical packet identity
+- [ ] Only introduce DSPy after retrieval and ranking contracts are stable
+
+### OpenTelemetry Phase 9 gate
+
+- [ ] Add explicit OpenTelemetry bootstrap in `sveltekit-frontend`
+- [ ] Instrument retrieval lane selection and candidate generation
+- [ ] Instrument HMM/ACP routing spans
+- [ ] Instrument packet materializer and registry writes
+- [ ] Keep OTel as execution evidence only, not storage or ranking truth
+
+### Runtime cache promotion gate
+
+- [ ] Lock stable cache-key semantics for POST input
+- [ ] Add exact-cell and radius-1 SOM lookup
+- [ ] Emit LOD0/LOD1 manifests before deeper materialization
+- [ ] Keep rejected candidates out of the hot cache
+- [ ] Add promotion decision records before learned promotion
+- [ ] Add logistic/XGBoost promotion learning only after the smoke test passes
+
+### End-to-end completion gate
+
+- [ ] Wire runtime-cache helpers into the route layer
+- [ ] Promote runtime-cache smoke coverage into integration coverage
+- [ ] Persist promotion decisions to Postgres
+- [ ] Add OpenTelemetry bootstrap and spans
+- [ ] Raise canonical packet embedding coverage
+- [ ] Re-run JEPA on the real 384d cohort before promotion
+
+### GPU topology gate
+
+- [ ] Keep LibTorch and TensorRT as separate lanes
+- [ ] Pin a concrete PyTorch topology training contract
+- [ ] Write SOM 20x20 and KMeans results back as derived metrics
+- [ ] Feed Neo4j classification from derived topology, not raw packets
+- [ ] Add a bounded smoke test for the GPU topology lane
+
+### Architecture smoke gate
+
+- [ ] Add LangGraph persistence smoke
+- [ ] Add OpenTelemetry bootstrap smoke
+- [ ] Add NetworkX backend smoke
+- [ ] Add end-to-end loop smoke across MCP / ACP / gRPC
+- [ ] Keep smoke tests deterministic and bounded
+
+---
+
 ## Production Hardening TODO
 
 - [ ] Reconcile Drizzle schema docs with real DB/runtime contracts (schema drift audit)

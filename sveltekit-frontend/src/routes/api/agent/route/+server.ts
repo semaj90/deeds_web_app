@@ -1,219 +1,179 @@
 import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
-import { makeRouteDecision, buildRouteTrace, validateRoute } from '$lib/server/router/viterbi-router';
-import type { RouterObservation, RouterDecision, RouteTrace } from '$lib/server/router/router-types';
+import { rankTools, selectTopTools } from '$lib/server/router/deterministic-tool-ranker';
+import type { RouterObservation, ToolDescriptor, RouterConstraint } from '$lib/server/router/router-types';
 import { v4 as uuid } from 'uuid';
 
 // Request schema
 const routeRequestSchema = z.object({
-  query: z.string().min(1, 'Query required'),
+  query: z.string(),
+  previousState: z.string().default('RETRIEVE'),
   constraints: z.object({
-    readOnly: z.boolean().default(true),
+    readOnly: z.boolean().default(false),
     requiresExactSourceRefs: z.boolean().default(false)
-  }).default({}),
-  previousState: z.string().default('START'),
-  healthyServices: z.array(z.string()).default(['postgres', 'redis', 'qdrant']),
+  }).optional(),
   telemetryContext: z.object({
     traceId: z.string().optional(),
     queryHash: z.string().optional(),
-    priorSuccessRate: z.number().min(0).max(1).optional(),
-    timeoutRiskScore: z.number().min(0).max(1).optional()
-  }).optional()
+    priorSuccessRate: z.number().optional(),
+    timeoutRiskScore: z.number().optional()
+  }).optional(),
+  topK: z.number().default(3).min(1).max(10)
 });
 
 type RouteRequest = z.infer<typeof routeRequestSchema>;
 
-// Response schema
-const routeResponseSchema = z.object({
-  traceId: z.string(),
-  decision: z.object({
-    decisionId: z.string(),
-    selectedTool: z.object({
-      name: z.string(),
-      namespace: z.string(),
-      description: z.string(),
-      readOnly: z.boolean(),
-      providesSourceRefs: z.boolean(),
-      requiresServices: z.array(z.string()),
-      resultClass: z.string(),
-      timeout: z.number(),
-      maxRetries: z.number()
-    }),
-    candidates: z.array(z.object({
-      tool: z.object({ name: z.string() }),
-      eligible: z.boolean(),
-      compositeScore: z.number()
-    })).length(3),
-    selectedState: z.string(),
-    reasoning: z.string()
-  }),
-  trace: z.object({
-    traceId: z.string(),
-    queryHash: z.string(),
-    query: z.string(),
-    selectedToolName: z.string(),
-    selectedState: z.string(),
-    candidateTools: z.array(z.string()),
-    schemaValid: z.boolean(),
-    approvalRequired: z.boolean()
-  }),
-  status: z.literal('ok')
-});
+// Mock tool registry for Phase 1
+const MOCK_TOOL_REGISTRY: ToolDescriptor[] = [
+  {
+    name: 'kb.trace_search',
+    namespace: 'kb',
+    description: 'Search knowledge base using semantic similarity + BM25',
+    readOnly: true,
+    providesSourceRefs: true,
+    requiresServices: ['postgres', 'qdrant'],
+    resultClass: 'candidates',
+    timeout: 5000,
+    maxRetries: 2
+  },
+  {
+    name: 'graph.expand_neighborhood',
+    namespace: 'graph',
+    description: 'Expand neighborhood in Neo4j topology graph',
+    readOnly: true,
+    providesSourceRefs: true,
+    requiresServices: ['neo4j'],
+    resultClass: 'candidates',
+    timeout: 3000,
+    maxRetries: 1
+  },
+  {
+    name: 'topology.search_near',
+    namespace: 'topology',
+    description: 'Search SOM topology for similar clusters',
+    readOnly: true,
+    providesSourceRefs: false,
+    requiresServices: ['postgres', 'redis'],
+    resultClass: 'candidates',
+    timeout: 2000,
+    maxRetries: 1
+  },
+  {
+    name: 'codebase.rg_search',
+    namespace: 'codebase',
+    description: 'Search codebase using ripgrep for lexical matches',
+    readOnly: true,
+    providesSourceRefs: true,
+    requiresServices: ['filesystem'],
+    resultClass: 'candidates',
+    timeout: 4000,
+    maxRetries: 2
+  },
+  {
+    name: 'context.build_kv_packet',
+    namespace: 'context',
+    description: 'Build key-value context packet for synthesis',
+    readOnly: true,
+    providesSourceRefs: false,
+    requiresServices: ['postgres', 'redis'],
+    resultClass: 'answer',
+    timeout: 3000,
+    maxRetries: 1
+  }
+];
 
-/**
- * POST /api/agent/route
- *
- * Deterministic tool selection with HMM-shaped telemetry (Phase 1).
- *
- * Flow:
- * 1. Parse + validate request (query, constraints, previousState)
- * 2. Build RouterObservation from available tools
- * 3. Make route decision (eligibility gates → weighted ranking → top 3)
- * 4. Build auditable trace
- * 5. Return decision + trace for execution (via /api/agent/execute)
- *
- * Three-table telemetry:
- * - proposed_tool_calls (this endpoint writes to agent_traces → decision_id)
- * - tool_call_events (execution writes to this)
- * - outcome_ledger (recovery/result classification writes to this)
- */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async ({ request }) => {
   try {
-    // 1. Parse request
     const body = await request.json() as RouteRequest;
     const validated = routeRequestSchema.parse(body);
 
-    // 2. Build observation
-    // TODO: Wire to real tool registry (MCP tools from /api/mcp/tools)
-    // For now, use mock tools with predictable behavior
-    const mockTools = new Map([
-      [
-        'kb.trace_search',
-        {
-          name: 'kb.trace_search',
-          namespace: 'kb',
-          description: 'Search knowledge base by query',
-          readOnly: true,
-          providesSourceRefs: true,
-          requiresServices: ['postgres', 'qdrant'],
-          resultClass: 'candidates' as const,
-          timeout: 5000,
-          maxRetries: 2
-        }
-      ],
-      [
-        'topology.search_near',
-        {
-          name: 'topology.search_near',
-          namespace: 'topology',
-          description: 'Find related topology nodes',
-          readOnly: true,
-          providesSourceRefs: true,
-          requiresServices: ['neo4j'],
-          resultClass: 'candidates' as const,
-          timeout: 3000,
-          maxRetries: 2
-        }
-      ],
-      [
-        'graph.expand_neighborhood',
-        {
-          name: 'graph.expand_neighborhood',
-          namespace: 'graph',
-          description: 'Expand k-hop neighborhood',
-          readOnly: true,
-          providesSourceRefs: false,
-          requiresServices: ['neo4j'],
-          resultClass: 'partial' as const,
-          timeout: 8000,
-          maxRetries: 1
-        }
-      ]
-    ]);
+    // Build RouterObservation for the ranker
+    const toolMap = new Map<string, ToolDescriptor>(
+      MOCK_TOOL_REGISTRY.map(t => [t.name, t])
+    );
 
-    const healthyServices = new Set(validated.healthyServices);
+    const constraints: RouterConstraint = {
+      readOnly: validated.constraints?.readOnly ?? false,
+      requiresExactSourceRefs: validated.constraints?.requiresExactSourceRefs ?? false
+    };
 
     const observation: RouterObservation = {
       query: validated.query,
-      constraints: validated.constraints,
       previousState: validated.previousState as any,
-      healthyServices,
-      availableTools: mockTools,
-      telemetryContext: validated.telemetryContext
+      constraints,
+      healthyServices: new Set(['postgres', 'qdrant', 'redis', 'neo4j', 'filesystem']),
+      availableTools: toolMap,
+      telemetryContext: validated.telemetryContext ? {
+        traceId: validated.telemetryContext.traceId || uuid(),
+        queryHash: validated.telemetryContext.queryHash || '',
+        priorSuccessRate: validated.telemetryContext.priorSuccessRate,
+        timeoutRiskScore: validated.telemetryContext.timeoutRiskScore
+      } : {
+        traceId: uuid(),
+        queryHash: ''
+      }
     };
 
-    // 3. Make route decision
-    const decision = makeRouteDecision(uuid(), observation);
+    // Rank tools using deterministic ranker
+    const rankedCandidates = rankTools(MOCK_TOOL_REGISTRY, observation);
+    const topK = selectTopTools(rankedCandidates, validated.topK);
 
-    // 4. Build trace
-    const traceId = validated.telemetryContext?.traceId || uuid();
-    const queryHash = validated.telemetryContext?.queryHash || '';
-    const trace = buildRouteTrace(
-      traceId,
-      validated.query,
-      queryHash,
-      decision,
-      uuid(), // proposalId
-      true    // schemaValid (placeholder)
-    );
-
-    // 5. Validate trace
-    const validation = validateRoute(trace);
-    if (!validation.valid) {
-      return json(
-        {
-          error: 'Trace validation failed',
-          errors: validation.errors
-        },
-        { status: 400 }
-      );
+    if (topK.length === 0) {
+      return json({
+        status: 'error',
+        candidates: [],
+        decisionId: uuid(),
+        error: 'No eligible tools found'
+      }, { status: 400 });
     }
 
-    // 6. Return decision + trace
-    const response = routeResponseSchema.parse({
-      traceId,
-      decision,
-      trace,
-      status: 'ok'
-    });
+    const selectedTool = topK[0];
+    const decisionId = uuid();
 
-    return json(response);
+    return json({
+      status: 'ok',
+      decisionId,
+      candidates: topK.map(c => ({
+        name: c.tool.name,
+        namespace: c.tool.namespace,
+        description: c.tool.description,
+        eligible: c.eligible,
+        ineligibilityReason: c.ineligibilityReason,
+        scores: {
+          semantic: c.semanticScore,
+          intent: c.intentScore,
+          schemaFitness: c.schemaFitness,
+          transition: c.transitionScore,
+          health: c.healthScore,
+          historicalSuccess: c.historicalSuccessScore,
+          provenance: c.provenanceScore,
+          latency: c.latencyScore,
+          topology: c.topologyScore
+        },
+        compositeScore: c.compositeScore
+      })),
+      selectedTool: {
+        name: selectedTool.tool.name,
+        namespace: selectedTool.tool.namespace,
+        description: selectedTool.tool.description,
+        compositeScore: selectedTool.compositeScore
+      },
+      confidenceScore: selectedTool.compositeScore,
+      reasoning: buildExplanation(selectedTool),
+      timing: {
+        routedAt: new Date().toISOString()
+      }
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    const statusCode = message.includes('validation') ? 400 : 500;
     return json(
       { error: message, status: 'error' },
-      { status: statusCode }
+      { status: message.includes('validation') ? 400 : 500 }
     );
   }
 };
 
-/**
- * GET /api/agent/route?q=...&constraints=...
- *
- * Query-string variant for testing (no approval workflow).
- */
-export const GET: RequestHandler = async ({ url }) => {
-  const query = url.searchParams.get('q') || '';
-  const readOnly = url.searchParams.get('readOnly') !== 'false';
-
-  if (!query) {
-    return json({ error: 'Missing query parameter' }, { status: 400 });
-  }
-
-  // Delegate to POST logic
-  return POST({
-    request: new Request(new URL(url), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query,
-        constraints: { readOnly, requiresExactSourceRefs: false },
-        previousState: 'START'
-      })
-    }),
-    locals,
-    params: {}
-  } as any);
-};
+function buildExplanation(candidate: any): string {
+  return `Selected ${candidate.tool.name} with ${(candidate.compositeScore * 100).toFixed(0)}% confidence`;
+}

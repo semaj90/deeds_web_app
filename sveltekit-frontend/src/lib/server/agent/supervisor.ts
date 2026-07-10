@@ -21,6 +21,7 @@ import { ChatOllama } from '@langchain/ollama';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
+import { buildLangGraphConfig, getLangGraphCheckpointer } from '$lib/server/langgraph/checkpointer.js';
 import {
 	createSubagent,
 	classifyIntent,
@@ -74,6 +75,7 @@ export interface SupervisorConfig {
 
 export class SupervisorAgent {
 	private graph: ReturnType<typeof StateGraph.prototype.compile> | null = null;
+	private graphPromise: Promise<ReturnType<typeof StateGraph.prototype.compile> | null> | null = null;
 	private subagents: Map<SubagentName, SubagentInstance> = new Map();
 	private allTools: DynamicStructuredTool[];
 	private routerLlm: ChatOllama;
@@ -93,7 +95,7 @@ export class SupervisorAgent {
 		});
 
 		this.initializeSubagents();
-		this.buildGraph();
+		this.graphPromise = this.buildGraph();
 	}
 
 	private initializeSubagents(): void {
@@ -111,8 +113,9 @@ export class SupervisorAgent {
 		}
 	}
 
-	private buildGraph(): void {
+	private async buildGraph(): Promise<ReturnType<typeof StateGraph.prototype.compile> | null> {
 		try {
+			const checkpointer = await getLangGraphCheckpointer();
 			const workflow = new StateGraph(SupervisorState)
 				.addNode('route_intent', this.routeIntentNode.bind(this))
 				.addNode('audio', this.makeSubagentNode('audio'))
@@ -128,11 +131,22 @@ export class SupervisorAgent {
 				.addEdge('codebase', END)
 				.addEdge('general', END);
 
-			this.graph = workflow.compile({ name: 'legal_supervisor' });
+			return workflow.compile({
+				name: 'legal_supervisor',
+				...(checkpointer ? { checkpointer: checkpointer as any } : {}),
+			});
 		} catch (err) {
 			console.error('[Supervisor] Failed to build StateGraph:', err);
-			this.graph = null;
+			return null;
 		}
+	}
+
+	private async ensureGraph(): Promise<ReturnType<typeof StateGraph.prototype.compile> | null> {
+		if (!this.graphPromise) {
+			this.graphPromise = this.buildGraph();
+		}
+		this.graph = await this.graphPromise;
+		return this.graph;
 	}
 
 	/**
@@ -274,6 +288,7 @@ export class SupervisorAgent {
 		options: {
 			enrichedQuery?: string;
 			aceContext?: any;
+			threadId?: string;
 		} = {}
 	): Promise<{
 		answer: string;
@@ -292,8 +307,12 @@ export class SupervisorAgent {
 			aceContext: options.aceContext || null,
 		};
 
-		if (this.graph) {
-			const result = await this.graph.invoke(initialState);
+		const graph = await this.ensureGraph();
+		if (graph) {
+			const result = await graph.invoke(
+				initialState,
+				buildLangGraphConfig(options.threadId, undefined, 'supervisor')
+			);
 			return {
 				answer: result.answer || 'Investigation complete.',
 				route: result.route,
@@ -330,6 +349,7 @@ export class SupervisorAgent {
 		options: {
 			enrichedQuery?: string;
 			aceContext?: any;
+			threadId?: string;
 		} = {}
 	): AsyncGenerator<{
 		node: string;
@@ -345,7 +365,8 @@ export class SupervisorAgent {
 			aceContext: options.aceContext || null,
 		};
 
-		if (!this.graph) {
+		const graph = await this.ensureGraph();
+		if (!graph) {
 			// Fallback: no streaming, yield single result
 			const route = classifyIntent(query);
 			const subagentNode = this.makeSubagentNode(route);
@@ -354,7 +375,8 @@ export class SupervisorAgent {
 			return;
 		}
 
-		const stream = await this.graph.stream(initialState, {
+		const stream = await graph.stream(initialState, {
+			...buildLangGraphConfig(options.threadId, undefined, 'supervisor'),
 			streamMode: 'updates',
 		});
 

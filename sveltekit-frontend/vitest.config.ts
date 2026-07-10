@@ -198,6 +198,9 @@ export default defineConfig({
       // MCP tool input hardening + rerank feedback aggregation
       'tests/mcp-trace-tools.spec.ts',
       'tests/qdrant-rerank-feedback.spec.ts',
+      // Runtime-cache + promotion pipeline smoke tests (Phase 130 readiness)
+      'tests/runtime-cache-promotion.spec.ts',
+      'tests/parent-atlas-workstation.spec.ts',
       // HMM-gated tool selection layer (Phase 9 — 2026-07-09)
       'tests/retrieval/tool-selection.spec.ts',
       // Schema Dependency Intelligence tool (Phase 10b — 2026-07-09)

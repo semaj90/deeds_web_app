@@ -1,0 +1,19 @@
+{
+  "generated_at": "2026-07-10T21:07:17.940Z",
+  "arrow_file": ".tmp/atlas/packets.arrow",
+  "rows": 200,
+  "columns": 48,
+  "ipc_bytes": 582082,
+  "split_counts": {
+    "train": 172,
+    "eval": 17,
+    "test": 11,
+    "invalid": 0
+  },
+  "index_entries": 200,
+  "missing_columns": [],
+  "duplicate_packet_keys": [],
+  "malformed_vectors": [],
+  "hard_failures": [],
+  "status": "PASS"
+}

@@ -2,8 +2,8 @@
 /**
  * P2 — Qdrant Payload Sync: Topology Signals
  *
- * Verifies and syncs topolog_cluster, som_cluster, community_id from Postgres
- * canonical packets to Qdrant codebase_chunks_768 payloads.
+ * Verifies and syncs lineage, topology, and graph-authority fields from
+ * canonical Postgres packets to Qdrant codebase_chunks_768 payloads.
  *
  * Usage:
  *   npm run atlas:p2:qdrant-payload-sync:verify      # Dry-run audit
@@ -19,19 +19,71 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, '../..');
 
-const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
+const env = loadRepoEnv(process.env);
+const QDRANT_URL = env.QDRANT_URL || 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const BATCH_SIZE = 100;
-const SAMPLE_SIZE = process.argv.includes('--full') ? 50000 : 500;
+const LIMIT_ARG = process.argv.find((arg) => arg.startsWith('--limit='));
+const SAMPLE_SIZE = LIMIT_ARG
+  ? Number.parseInt(LIMIT_ARG.slice('--limit='.length), 10)
+  : process.argv.includes('--full') ? 50000 : 500;
 const DRY_RUN = !process.argv.includes('--apply');
 
 // Topology fields to sync (P2 contract)
-const TOPOLOGY_FIELDS = ['topolog_cluster', 'som_cluster', 'community_id'];
-const TARGET_COVERAGE = { topolog_cluster: 0.66, som_cluster: 0.66, community_id: 0.96 };
+const TOPOLOGY_FIELDS = [
+  'tree_node_id',
+  'parent_packet_key',
+  'topolog_cluster',
+  'som_cluster',
+  'som_row',
+  'som_col',
+  'som_index',
+  'kmeans_cluster',
+  'community_id',
+  'page_rank_score',
+];
+const TARGET_COVERAGE = {
+  tree_node_id: 0.95,
+  parent_packet_key: 0.0,
+  topolog_cluster: 0.66,
+  som_cluster: 0.66,
+  som_row: 0.95,
+  som_col: 0.95,
+  som_index: 0.95,
+  kmeans_cluster: 0.95,
+  community_id: 0.90,
+  page_rank_score: 0.90,
+};
+
+function isMissing(value) {
+  return value === null || value === undefined || value === '';
+}
+
+function qdrantPointId(value) {
+  const text = String(value ?? '').trim();
+  if (!text) return null;
+  if (/^\d+$/.test(text)) {
+    const number = Number(text);
+    return Number.isSafeInteger(number) ? number : null;
+  }
+  return text;
+}
+
+function canonicalPayload(row) {
+  return Object.fromEntries([
+    ['packet_key', row.packet_key],
+    ['source_ref', row.source_ref],
+    ['feature_id', row.feature_id],
+    ['feature_label', row.feature_label],
+    ['title_id', row.title_id],
+    ...TOPOLOGY_FIELDS.map((field) => [field, row[field]]),
+  ].filter(([, value]) => !isMissing(value)));
+}
 
 console.log(`\n═══ P2: Qdrant Payload Sync — Topology Signals ═══\n`);
 console.log(`Collection: ${COLLECTION}`);
@@ -41,20 +93,17 @@ console.log(`Mode: ${DRY_RUN ? 'VERIFY (dry-run)' : 'SYNC (apply backfill)'}`);
 console.log(`Sample size: ${SAMPLE_SIZE}\n`);
 
 // 1. Connect to Postgres (truth source)
-const pool = new pg.Pool({
-  host: process.env.DB_HOST || '127.0.0.1',
-  port: parseInt(process.env.DB_PORT || '5434'),
-  user: process.env.DB_USER || 'legal_admin',
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'legal_ai_db'
-});
+const pool = new pg.Pool({ connectionString: resolveDatabaseUrl(env) });
 
 // 2. Verify Qdrant connection via HTTP API
 async function verifyQdrantConnection() {
   try {
-    const res = await fetch(`${QDRANT_URL}/health`, { timeout: 5000 });
-    if (!res.ok) {
-      throw new Error(`Qdrant health check failed: ${res.status}`);
+    const ready = await fetch(`${QDRANT_URL}/readyz`, { signal: AbortSignal.timeout(5000) });
+    if (!ready.ok) {
+      const collection = await fetch(`${QDRANT_URL}/collections/${COLLECTION}`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!collection.ok) throw new Error(`Qdrant readiness failed: ${ready.status}; collection probe: ${collection.status}`);
     }
     console.log(`✅ Qdrant connection OK\n`);
     return true;
@@ -118,14 +167,12 @@ async function auditPayloadCoverage() {
       samplePoints.push({
         id: point.id,
         packet_key: payload.packet_key,
-        topolog_cluster: payload.topolog_cluster,
-        som_cluster: payload.som_cluster,
-        community_id: payload.community_id
+        ...Object.fromEntries(TOPOLOGY_FIELDS.map((field) => [field, payload[field]])),
       });
 
       // Count coverage
       TOPOLOGY_FIELDS.forEach(field => {
-        if (payload[field] === null || payload[field] === undefined || payload[field] === '') {
+        if (isMissing(payload[field])) {
           fieldCoverage[field].missing++;
         } else {
           fieldCoverage[field].present++;
@@ -158,9 +205,16 @@ async function loadCanonicalPackets(packet_keys) {
   const query = `
     SELECT
       packet_key,
+      tree_node_id::text AS tree_node_id,
+      parent_packet_key,
       topolog_cluster,
       som_cluster,
-      community_id
+      som_row,
+      som_col,
+      som_index,
+      kmeans_cluster,
+      community_id,
+      page_rank_score
     FROM atlas_packets
     WHERE packet_key = ANY($1::text[])
   `;
@@ -168,12 +222,124 @@ async function loadCanonicalPackets(packet_keys) {
   const result = await pool.query(query, [packet_keys]);
   return result.rows.reduce((acc, row) => {
     acc[row.packet_key] = {
+      tree_node_id: row.tree_node_id,
+      parent_packet_key: row.parent_packet_key,
       topolog_cluster: row.topolog_cluster,
       som_cluster: row.som_cluster,
-      community_id: row.community_id
+      som_row: row.som_row,
+      som_col: row.som_col,
+      som_index: row.som_index,
+      kmeans_cluster: row.kmeans_cluster,
+      community_id: row.community_id,
+      page_rank_score: row.page_rank_score,
     };
     return acc;
   }, {});
+}
+
+async function loadCanonicalPointsDirect(limit) {
+  const result = await pool.query(`
+    WITH eligible AS (
+      SELECT
+        qdrant_point_id,
+        COUNT(*) OVER (PARTITION BY qdrant_point_id) AS point_owners,
+        packet_key,
+        source_ref,
+        feature_id,
+        feature_label,
+        title_id,
+        tree_node_id::text AS tree_node_id,
+        parent_packet_key,
+        topolog_cluster,
+        som_cluster,
+        som_row,
+        som_col,
+        som_index,
+        kmeans_cluster,
+        community_id,
+        page_rank_score,
+        updated_at
+      FROM atlas_packets
+      WHERE qdrant_point_id IS NOT NULL
+        AND LENGTH(TRIM(qdrant_point_id)) > 0
+    )
+    SELECT *
+    FROM eligible
+    ORDER BY qdrant_point_id, updated_at DESC NULLS LAST, packet_key
+    LIMIT $1
+  `, [limit]);
+
+  const ambiguous = result.rows.filter((row) => Number(row.point_owners) > 1);
+  const rows = result.rows.filter((row) => Number(row.point_owners) === 1 && qdrantPointId(row.qdrant_point_id) !== null);
+  return { rows, ambiguous };
+}
+
+async function syncCanonicalByPointId(limit) {
+  const { rows, ambiguous } = await loadCanonicalPointsDirect(limit);
+  console.log(`Direct Postgres bridge: ${rows.length} unique point IDs, ${ambiguous.length} ambiguous rows`);
+
+  let synced = 0;
+  let failed = 0;
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const operations = batch.map((row) => ({
+      set_payload: {
+        payload: canonicalPayload(row),
+        points: [qdrantPointId(row.qdrant_point_id)],
+      },
+    }));
+
+    if (DRY_RUN) {
+      synced += operations.length;
+      console.log(`[DRY-RUN] Would patch ${operations.length} existing points in batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+      continue;
+    }
+
+    const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/batch?wait=true`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ operations }),
+    });
+    if (!response.ok) {
+      failed += operations.length;
+      console.error(`Batch ${Math.floor(i / BATCH_SIZE) + 1} failed: ${response.status} ${await response.text()}`);
+      continue;
+    }
+    synced += operations.length;
+    console.log(`Patched ${operations.length} existing points in batch ${Math.floor(i / BATCH_SIZE) + 1}`);
+  }
+
+  let verification = null;
+  if (!DRY_RUN && synced > 0) {
+    const sample = rows.slice(0, Math.min(20, rows.length));
+    const response = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ids: sample.map((row) => qdrantPointId(row.qdrant_point_id)),
+        with_payload: true,
+        with_vector: false,
+      }),
+    });
+    if (response.ok) {
+      const payload = await response.json();
+      const returned = payload.result ?? [];
+      const byId = new Map(returned.map((point) => [String(point.id), point.payload ?? {}]));
+      verification = {
+        requested: sample.length,
+        returned: returned.length,
+        packet_key_matches: sample.filter((row) => byId.get(String(row.qdrant_point_id))?.packet_key === row.packet_key).length,
+        tree_node_id_matches: sample.filter((row) => byId.get(String(row.qdrant_point_id))?.tree_node_id === row.tree_node_id).length,
+        som_coordinates_present: sample.filter((row) => {
+          const point = byId.get(String(row.qdrant_point_id));
+          return point?.som_row != null && point?.som_col != null;
+        }).length,
+        page_rank_present: sample.filter((row) => byId.get(String(row.qdrant_point_id))?.page_rank_score != null).length,
+      };
+    }
+  }
+
+  return { synced, failed, skipped: ambiguous.length, ambiguous: ambiguous.length, verification };
 }
 
 // 6. Sync missing payloads
@@ -181,8 +347,8 @@ async function syncMissingPayloads(samplePoints) {
   console.log(`\n🔄 Syncing payloads (${DRY_RUN ? 'DRY-RUN' : 'APPLY'})...\n`);
 
   // Filter points with missing fields
-  const pointsToSync = samplePoints.filter(p =>
-    !p.topolog_cluster || !p.som_cluster || !p.community_id
+  const pointsToSync = samplePoints.filter((point) =>
+    TOPOLOGY_FIELDS.some((field) => isMissing(point[field]))
   );
 
   if (pointsToSync.length === 0) {
@@ -237,11 +403,16 @@ async function syncMissingPayloads(samplePoints) {
       synced += updates.length;
     } else {
       try {
-        const updateRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points`, {
-          method: 'PUT',
+        const updateRes = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/batch?wait=true`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            points: updates
+            operations: updates.map((update) => ({
+              set_payload: {
+                payload: update.payload,
+                points: [update.id],
+              },
+            })),
           })
         });
 
@@ -274,11 +445,9 @@ async function main() {
     // Audit
     const { samplePoints, fieldCoverage, pointsScanned } = await auditPayloadCoverage();
 
-    // Sync if requested
-    let syncResult = { synced: 0, failed: 0, skipped: 0 };
-    if (!DRY_RUN && pointsScanned > 0) {
-      syncResult = await syncMissingPayloads(samplePoints);
-    }
+    // The deterministic bridge is Postgres qdrant_point_id -> existing Qdrant
+    // point. Scroll payload packet_key is audit evidence only and may be absent.
+    const syncResult = await syncCanonicalByPointId(SAMPLE_SIZE);
 
     // Report
     console.log(`\n📋 Summary (${DRY_RUN ? 'DRY-RUN' : 'APPLIED'}):`);
@@ -286,6 +455,25 @@ async function main() {
     console.log(`  Synced: ${syncResult.synced}`);
     console.log(`  Failed: ${syncResult.failed}`);
     console.log(`  Skipped: ${syncResult.skipped}\n`);
+    if (syncResult.verification) {
+      console.log(`  Direct verification: ${syncResult.verification.tree_node_id_matches}/${syncResult.verification.requested} tree IDs matched`);
+    }
+
+    const reportDir = join(ROOT, 'docs', 'reports');
+    mkdirSync(reportDir, { recursive: true });
+    writeFileSync(join(reportDir, 'p2-qdrant-payload-sync-topology.json'), JSON.stringify({
+      generated_at: new Date().toISOString(),
+      mode: DRY_RUN ? 'dry-run' : 'apply',
+      collection: COLLECTION,
+      points_scanned: pointsScanned,
+      field_coverage: fieldCoverage,
+      direct_bridge: syncResult,
+      contract: {
+        identity_source: 'atlas_packets.qdrant_point_id',
+        mutation: 'qdrant_set_payload_batch',
+        tree_node_id_role: 'graph_fanout_and_topology_rerank_join',
+      },
+    }, null, 2));
 
     // Next steps
     if (DRY_RUN) {

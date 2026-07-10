@@ -10,19 +10,21 @@
  */
 
 import { pool } from '$lib/server/db/client';
+import { z } from 'zod';
 
-export interface AuditEntry {
-	requestId?: string;
-	method: string;
-	path: string;
-	statusCode: number;
-	durationMs?: number;
-	userId?: string;
-	ipAddress?: string;
-	userAgent?: string;
-	requestBodySize?: number;
-	errorMessage?: string;
-}
+export const AuditLogInputSchema = z.object({
+	userId: z.string().uuid().nullable().optional(),
+	path: z.string().min(1).max(2048),
+	method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']),
+	statusCode: z.number().int().min(100).max(599),
+	requestBodySize: z.number().int().positive().optional(),
+	errorMessage: z.string().max(1000).optional(),
+	durationMs: z.number().int().nonnegative().optional(),
+	ipAddress: z.string().max(45).optional(),
+	userAgent: z.string().max(500).optional()
+});
+
+export type AuditEntry = z.infer<typeof AuditLogInputSchema>;
 
 const FLUSH_INTERVAL_MS = 5_000;
 const MAX_BUFFER_SIZE = 100;
@@ -62,21 +64,24 @@ class ApiAuditBuffer {
 
 		try {
 			// Build parameterized batch INSERT
-			// Note: Table schema has: id, user_id, endpoint, method, status_code, request_body, response_body, ip_address, user_agent, duration_ms, created_at, metadata
+			// Note: Table schema has: id, user_id, path, method, status_code, request_body_size,
+			// error_message, ip_address, user_agent, duration_ms, created_at
 			const values: unknown[] = [];
 			const placeholders: string[] = [];
 
 			for (let i = 0; i < batch.length; i++) {
-				const offset = i * 6; // Changed from 10 to 6 params
+				const offset = i * 8;
 				const entry = batch[i];
 				placeholders.push(
-					`($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5}, $${offset + 6})`
+					`($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5}, $${offset + 6}, $${offset + 7}, $${offset + 8})`
 				);
 				values.push(
 					entry.userId ?? null,
-					entry.path, // Maps to 'endpoint' column
+					entry.path,
 					entry.method,
 					entry.statusCode,
+					entry.requestBodySize ?? null,
+					entry.errorMessage ?? null,
 					entry.ipAddress ?? null,
 					entry.durationMs ?? null
 				);
@@ -84,7 +89,7 @@ class ApiAuditBuffer {
 
 			const sql = `
 				INSERT INTO api_audit_log
-					(user_id, endpoint, method, status_code, ip_address, duration_ms)
+					(user_id, path, method, status_code, request_body_size, error_message, ip_address, duration_ms)
 				VALUES ${placeholders.join(', ')}
 			`;
 

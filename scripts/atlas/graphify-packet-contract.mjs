@@ -28,6 +28,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { normalizeSourceRef } from './lib/canonical-source-ref.mjs';
 import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -35,15 +36,16 @@ const ROOT  = path.resolve(__dir, '../..');
 const APPLY   = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
 const DRY_RUN = !APPLY;
+const TREE_ONLY = process.argv.includes('--tree-only');
 const LIMIT_ARG      = process.argv.find(a => a.startsWith('--limit='));
 const BATCH_SIZE_ARG = process.argv.find(a => a.startsWith('--batch-size='));
 const MAX_ROWS  = LIMIT_ARG      ? parseInt(LIMIT_ARG.split('=')[1], 10)      : Infinity;
 
-const DATABASE_URL = process.env.DATABASE_URL ||
-  'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const NEO4J_URL  = process.env.NEO4J_URL  || 'http://localhost:7474';
-const NEO4J_USER = process.env.NEO4J_USER || 'neo4j';
-const NEO4J_PASS = process.env.NEO4J_PASS || 'neo4j123';
+const env = loadRepoEnv(process.env);
+const DATABASE_URL = resolveDatabaseUrl(env);
+const NEO4J_URL = env.NEO4J_HTTP_URL || env.NEO4J_URL || 'http://127.0.0.1:7474';
+const NEO4J_USER = env.NEO4J_USER || 'neo4j';
+const NEO4J_PASS = env.NEO4J_PASSWORD || env.NEO4J_PASS || 'neo4j';
 
 const BATCH_SIZE = BATCH_SIZE_ARG ? parseInt(BATCH_SIZE_ARG.split('=')[1], 10) : 250;
 
@@ -88,6 +90,7 @@ async function neo4jBatchChunked(statement, paramKey, values, chunkSize = BATCH_
 
 async function main() {
   console.log(`\n═══ Graphify Packet Contract ${DRY_RUN ? '(dry-run)' : '(APPLY)'} ═══\n`);
+  if (TREE_ONLY) console.log('Mode: tree lineage only\n');
 
   const pool = new pg.Pool({ connectionString: DATABASE_URL, max: 2 });
 
@@ -141,6 +144,7 @@ async function main() {
 
     writeReport({
       generated_at: new Date().toISOString(), mode: 'dry-run',
+      tree_only: TREE_ONLY,
       eligible_packets: packets.length,
       with_source_ref: hasSrc, with_feature_id: hasFeat, with_community_id: hasCom,
     });
@@ -165,7 +169,7 @@ async function main() {
   const treeNodeIds = [...new Set(packets.filter(p => p.tree_node_id).map(p => String(p.tree_node_id).trim()).filter(Boolean))];
   const comIds  = [...new Set(packets.filter(p => p.community_id != null).map(p => p.community_id))];
 
-  if (srcRefs.length > 0) {
+  if (!TREE_ONLY && srcRefs.length > 0) {
     await neo4jBatchChunked(
       `UNWIND $refs AS ref MERGE (s:SourceRef {source_ref: ref}) SET s.updated_at = datetime()`,
       'refs', srcRefs, 100, 180_000,
@@ -173,7 +177,7 @@ async function main() {
     console.log(`Pre-created/merged ${srcRefs.length} SourceRef nodes`);
   }
 
-  if (titleIds.length > 0) {
+  if (!TREE_ONLY && titleIds.length > 0) {
     await neo4jBatchChunked(
       `UNWIND $ids AS tid MERGE (t:Title {title_id: tid}) SET t.updated_at = datetime()`,
       'ids', titleIds, 150, 120_000,
@@ -189,7 +193,7 @@ async function main() {
     console.log(`Pre-created/merged ${treeNodeIds.length} TreeNode nodes`);
   }
 
-  if (comIds.length > 0) {
+  if (!TREE_ONLY && comIds.length > 0) {
     await neo4jBatchChunked(
       `UNWIND $ids AS cid MERGE (c:Community {community_id: cid}) SET c.updated_at = datetime()`,
       'ids', comIds, 200, 120_000,
@@ -205,13 +209,13 @@ async function main() {
   const EDGE_BATCH_SIZE = Math.max(50, Math.floor(BATCH_SIZE / 2));
 
   for (let i = 0; i < packets.length; i += EDGE_BATCH_SIZE) {
-    const batch = packets.slice(i, i + BATCH_SIZE);
+    const batch = packets.slice(i, i + EDGE_BATCH_SIZE);
 
     const statements = [];
 
     // FROM_SOURCE edges — MERGE Packet so new packets are created if absent
     const srcBatch = batch.filter(p => p.source_ref);
-    if (srcBatch.length > 0) {
+    if (!TREE_ONLY && srcBatch.length > 0) {
       statements.push({
         statement: `
           UNWIND $rows AS row
@@ -228,7 +232,7 @@ async function main() {
 
     // IMPLEMENTS_FEATURE edges — Feature nodes use {name: sha_hex}
     const featBatch = batch.filter(p => p.feature_id);
-    if (featBatch.length > 0) {
+    if (!TREE_ONLY && featBatch.length > 0) {
       statements.push({
         statement: `
           UNWIND $rows AS row
@@ -244,7 +248,7 @@ async function main() {
     }
 
     const titleBatch = batch.filter(p => p.title_id);
-    if (titleBatch.length > 0) {
+    if (!TREE_ONLY && titleBatch.length > 0) {
       statements.push({
         statement: `
           UNWIND $rows AS row
@@ -275,7 +279,7 @@ async function main() {
 
     // IN_COMMUNITY edges
     const comBatch = batch.filter(p => p.community_id != null);
-    if (comBatch.length > 0) {
+    if (!TREE_ONLY && comBatch.length > 0) {
       statements.push({
         statement: `
           UNWIND $rows AS row
@@ -332,7 +336,7 @@ async function main() {
   console.log(`  IN_COMMUNITY:        ${nCom}`);
   console.log(`  Batch errors:        ${batchErrors}`);
 
-  const gatePass = nSrc > 0 || nFeat > 0 || nCom > 0;
+  const gatePass = TREE_ONLY ? nTree > 0 : (nSrc > 0 || nFeat > 0 || nCom > 0);
   const errRate  = batchErrors / Math.ceil(packets.length / BATCH_SIZE);
   const errGate  = errRate < 0.1;
 
@@ -342,6 +346,7 @@ async function main() {
 
   writeReport({
     generated_at: new Date().toISOString(), mode: 'apply',
+    tree_only: TREE_ONLY,
     eligible_packets: packets.length,
     edges_written: { FROM_SOURCE: nSrc, IMPLEMENTS_FEATURE: nFeat, HAS_TITLE: nTitle, HAS_TREE_NODE: nTree, IN_COMMUNITY: nCom },
     batch_errors: batchErrors,

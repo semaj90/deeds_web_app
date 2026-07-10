@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-07-10T21:07:16.237Z",
+  "mode": "apply",
+  "inputs": {
+    "limit": 200,
+    "offset": 0
+  },
+  "outputs": {
+    "arrow_ipc": ".tmp/atlas/packets.arrow",
+    "row_index": ".tmp/atlas/packets.index.json"
+  },
+  "summary": {
+    "rows": 200,
+    "columns": 48,
+    "ipc_bytes": 582082,
+    "duplicate_packet_keys": 0,
+    "splits": {
+      "train": 172,
+      "eval": 17,
+      "test": 11
+    },
+    "coverage": {
+      "source_ref": 200,
+      "feature_id": 200,
+      "feature_label": 200,
+      "title_id": 200,
+      "tree_node_id": 200,
+      "domain_class": 200,
+      "feature_evidence": 200,
+      "embedding_vector": 0,
+      "latent64_blob": 2,
+      "topology": 200
+    }
+  },
+  "contract": {
+    "canonical_store": "postgres",
+    "batch_transport": "apache_arrow_ipc_file",
+    "hot_packet_transport": "msgpack_mmap_registry",
+    "vector_encoding": "little_endian_float32",
+    "row_index_semantics": "arrow_row_index_not_byte_offset",
+    "split_semantics": "sha256_packet_key_80_10_10"
+  }
+}

@@ -1,8 +1,19 @@
 {
-  "generated_at": "2026-07-05T01:49:44.857Z",
-  "mode": "dry-run",
-  "eligible_packets": 50,
-  "with_source_ref": 50,
-  "with_feature_id": 50,
-  "with_community_id": 0
+  "generated_at": "2026-07-10T21:04:56.433Z",
+  "mode": "apply",
+  "tree_only": true,
+  "eligible_packets": 10,
+  "edges_written": {
+    "FROM_SOURCE": 34408,
+    "IMPLEMENTS_FEATURE": 18936,
+    "HAS_TITLE": 18810,
+    "HAS_TREE_NODE": 18811,
+    "IN_COMMUNITY": 1183
+  },
+  "batch_errors": 0,
+  "gate": {
+    "edges_written": true,
+    "error_rate_ok": true,
+    "pass": true
+  }
 }

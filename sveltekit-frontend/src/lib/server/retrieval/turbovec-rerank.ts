@@ -15,12 +15,17 @@ export interface QdrantHit {
 		file_name?: string;
 		content?: string;
 		som_cluster?: number;
+		tree_node_id?: string;
+		packet_key?: string;
+		page_rank_score?: number;
 		[key: string]: any;
 	};
 }
 
 export interface GraphRAGHints {
-	authorityScores?: Record<string, number>; // file_path -> pagerank / authority
+	authorityScores?: Record<string, number>; // file_path, packet_key, or tree_node_id -> authority
+	targetTreeNodeId?: string;
+	treeNodeScores?: Record<string, number>; // tree_node_id -> bounded locality/authority score
 	connections?: Array<{ source: string; target: string; weight?: number }>;
 }
 
@@ -79,6 +84,8 @@ export async function turbovecRerank(options: RerankOptions): Promise<RerankResu
 			const ptId = String(hit.id);
 			const filePath = hit.payload?.file_path || '';
 			const sourceId = hit.payload?.source_id || hit.payload?.chunk_id || '';
+			const packetKey = hit.payload?.packet_key || '';
+			const treeNodeId = hit.payload?.tree_node_id || '';
 
 			// 1. Semantic score (normalized roughly to 0..1 range)
 			const sScore = hit.score || 0;
@@ -86,8 +93,18 @@ export async function turbovecRerank(options: RerankOptions): Promise<RerankResu
 			// 2. Topology score from Neo4j pagerank/authority
 			let tScore = 0;
 			if (graphHints?.authorityScores) {
-				tScore = graphHints.authorityScores[filePath] || 0;
+				tScore = Math.max(
+					graphHints.authorityScores[filePath] || 0,
+					graphHints.authorityScores[packetKey] || 0,
+					graphHints.authorityScores[treeNodeId] || 0
+				);
 			}
+			const payloadAuthority = Number(hit.payload?.page_rank_score ?? 0);
+			const treeScore = treeNodeId
+				? (graphHints?.treeNodeScores?.[treeNodeId]
+					?? (graphHints?.targetTreeNodeId === treeNodeId ? 1 : 0))
+				: 0;
+			tScore = Math.max(tScore, Number.isFinite(payloadAuthority) ? payloadAuthority : 0, treeScore);
 
 			// 3. Latent similarity score
 			const lScore = aeScores?.[ptId] || aeScores?.[Number(ptId)] || 0;

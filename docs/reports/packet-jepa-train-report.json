@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-07-10T14:53:55.339040Z",
+  "mode": "train",
+  "inputs": {
+    "pairs": ".tmp/packet-jepa-training-pairs.ndjson",
+    "eval": ".tmp/packet-jepa-eval-candidates.ndjson"
+  },
+  "outputs": {
+    "latents": ".tmp/packet-jepa-latents.ndjson",
+    "model": "models/packet-jepa/packet-jepa.pt"
+  },
+  "summary": {
+    "pair_rows": 2979,
+    "eval_rows": 197,
+    "unique_packets": 993,
+    "train_packets": 796,
+    "eval_packets": 197,
+    "input_dim": 64
+  },
+  "training": {
+    "final_loss": 0.09300155937671661,
+    "device": "cpu"
+  },
+  "evaluation": {
+    "embedding384_cosine": {
+      "recall_at_10": 0.9661590524534684,
+      "mrr": 0.7761058738216099,
+      "ndcg_at_10": 0.7985048746427579,
+      "domain_f1": 0.06358922506546369
+    },
+    "pca128_cosine": {
+      "recall_at_10": 0.962774957698815,
+      "mrr": 0.7875533800660705,
+      "ndcg_at_10": 0.8001589167799275,
+      "domain_f1": 0.07356715141146278
+    },
+    "packet_jepa_128": {
+      "recall_at_10": 0.9661590524534684,
+      "mrr": 0.7443255982596086,
+      "ndcg_at_10": 0.7817774670142908,
+      "domain_f1": 0.06681587854888528
+    }
+  },
+  "nextSafeAction": "node scripts/atlas/score-packet-jepa-similarity.mjs --dry-run --limit=500"
+}

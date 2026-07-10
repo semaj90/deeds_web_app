@@ -1,0 +1,19 @@
+{
+  "generatedAt": "2026-07-10T20:52:39.192Z",
+  "mode": "dry-run",
+  "inputs": {
+    "limit": 50,
+    "offset": 0
+  },
+  "outputs": {
+    "trainingPairs": ".tmp/packet-jepa-training-pairs.ndjson",
+    "evalCandidates": ".tmp/packet-jepa-eval-candidates.ndjson"
+  },
+  "summary": {
+    "packetsLoaded": 50,
+    "trainingPairs": 146,
+    "evalRows": 5,
+    "negativesPerEvalRow": 9
+  },
+  "nextSafeAction": "node scripts/atlas/run-venv-python.mjs scripts/atlas/train-packet-jepa.py --dry-run"
+}

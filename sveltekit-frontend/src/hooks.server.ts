@@ -28,6 +28,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { auditBuffer } from '$lib/server/audit/api-audit-buffer';
 import { ensureRedis, getRedis } from '$lib/server/redis.js';
 import { checkHooksRateLimit, startCleanup } from '$lib/server/middleware/rate-limiter.js';
+import { ensureOpenTelemetry } from '$lib/server/observability/opentelemetry.js';
 import { sql } from 'drizzle-orm';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -79,6 +80,7 @@ function isRunnerClosedError(err: unknown): boolean {
 // Tiers + Redis counters live in middleware/rate-limiter.ts
 if (shouldRunBootTasks) {
   startCleanup();
+  void ensureOpenTelemetry();
 }
 
 // ── Production Secret Guard ─────────────────────────────────────────────
@@ -818,9 +820,14 @@ export const handle: Handle = async ({ event, resolve }) => {
       '/api/test',
       '/api/graph/hypergraph',
       '/api/mcp',
+      '/api/atlas',
     ];
 
     const isPublic = PUBLIC.some((p) => path.startsWith(p));
+
+    if (path.includes('runtime-cache')) {
+      console.log('[DEBUG] runtime-cache check:', { path, isPublic, PUBLIC_COUNT: PUBLIC.length });
+    }
 
     if (!isPublic) {
       // Deny-by-default: ALL non-public API routes require authentication

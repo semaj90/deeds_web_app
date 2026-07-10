@@ -67,35 +67,34 @@ validated packet envelope
 
 | Gate | Required proof |
 |---|---|
-| service-worker no dummy clients | no `Dummy redis` / `Dummy som` paths in production build |
+| service-worker no dummy clients | same-origin runtime-cache endpoints replace dummy Redis/SOM clients |
 | stable POST cache key | request body hash instead of timestamp |
 | packet telemetry on retrieval | packet_context written for retrieval attempts |
-| LOD cache manifest | IndexedDB entries keyed by packet/domain/SOM/community |
+| LOD cache manifest | `src/lib/runtime-cache/packet-lod-manifest.ts` validates packet/domain/SOM/community cache entries |
 | WebGPU local rerank | deterministic fixture proving CPU/WebGPU top-k parity |
 | hot/warm/cold promotion | winners promoted to Redis/IndexedDB, losers logged to telemetry/archive |
 | synthesis gate | Gemma4 synthesis only after packet validation threshold |
 
 ## Next Execution Cards
 
-1. Replace service-worker dummy Redis/SOM clients with HTTP endpoints that read server-side cache/centroid state.
-2. Replace service-worker POST timestamp cache keys with stable request body hashes.
-3. Add a `packet_lod_manifest` JSON shape for browser cache entries:
+1. Wire runtime-cache endpoint smoke tests against authenticated route handlers.
+2. Add telemetry promotion ledger writes for winner/loser retrieval attempts.
+3. Use the packet LOD manifest in the first IndexedDB packet cache writer:
    `packet_key`, `source_ref`, `feature_id`, `domain_class`, `som_cell`, `community_id`, `qdrant_point_id`, `summary_hash`, `msgpack_ref`.
 4. Add an IndexedDB packet LOD cache wrapper over the existing `indexdb-cache.svelte.ts`.
 5. Wire retrieval telemetry so each cache promotion records attempt id, packet key, lane, latency, hit/miss, and action state.
-6. Add a smoke test for service-worker cache key determinism.
-7. Add a WebGPU top-k parity smoke using a small fixed embedding fixture.
-8. Keep Gemma4 synthesis behind the HMM tool-router packet-validation rule.
+6. Add a WebGPU top-k parity smoke using a small fixed embedding fixture.
+7. Keep Gemma4 synthesis behind the HMM tool-router packet-validation rule.
 
 ## Priority
 
 Do first:
 
 ```text
-stable cache keys
--> no dummy service-worker clients
--> packet LOD manifest
+runtime-cache route smoke
+-> IndexedDB packet LOD writer
 -> telemetry promotion ledger
+-> WebGPU top-k parity
 ```
 
 Do later:
@@ -106,4 +105,3 @@ browser SharedArrayBuffer packet slabs
 WebGPU topology visualization
 client-side SOM navigation
 ```
-

@@ -1,6 +1,9 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { eq } from 'drizzle-orm';
+import { db } from '$lib/server/db/client.js';
+import { agentTraces } from '$lib/server/db/schema/agent-traces.js';
 
 // Query params for trace retrieval
 const traceQuerySchema = z.object({
@@ -31,105 +34,113 @@ export const GET: RequestHandler = async ({ params, url }) => {
       return json({ error: 'Missing traceId' }, { status: 400 });
     }
 
-    // TODO: Query agent_traces by traceId
-    // JOIN with proposed_tool_calls (proposal_id → decision flow)
-    // JOIN with tool_call_events (execution flow)
-    // JOIN with outcome_ledger (result classification + recovery)
+    const [trace] = await db
+      .select()
+      .from(agentTraces)
+      .where(eq(agentTraces.traceId, traceId))
+      .limit(1);
 
-    // Mock response showing the three-table structure
-    const mockTrace = {
-      traceId,
-      queryHash: 'abc123',
-      query: 'Find legal precedent for X',
-      createdAt: new Date().toISOString(),
+    if (!trace) {
+      return json({ error: `Trace ${traceId} not found` }, { status: 404 });
+    }
 
-      decision: {
-        decisionId: 'dec123',
-        selectedTool: {
-          name: 'kb.trace_search',
-          namespace: 'kb',
-          description: 'Search knowledge base',
-          readOnly: true,
-          providesSourceRefs: true
-        },
-        candidates: [
-          {
-            tool: { name: 'kb.trace_search' },
-            compositeScore: 0.847,
-            reasoning: 'High semantic match + source refs available'
-          },
-          {
-            tool: { name: 'topology.search_near' },
-            compositeScore: 0.721,
-            reasoning: 'Moderate topology alignment'
-          },
-          {
-            tool: { name: 'graph.expand_neighborhood' },
-            compositeScore: 0.614,
-            reasoning: 'Lower transition fit + higher timeout risk'
-          }
-        ],
-        selectedState: 'RETRIEVE',
-        timestamp: new Date().toISOString()
-      },
+    const toolCalls = Array.isArray(trace.toolCalls) ? trace.toolCalls : [];
+    const commands = Array.isArray(trace.commands) ? trace.commands : [];
+    const retrievedPackets = Array.isArray(trace.retrievedPackets) ? trace.retrievedPackets : [];
+    const selectedConcepts = Array.isArray(trace.selectedConcepts) ? trace.selectedConcepts : [];
 
-      proposal: {
-        proposalId: 'prop123',
-        toolName: 'kb.trace_search',
-        arguments: { query: 'legal precedent X' },
-        schemaValid: true,
-        validationErrors: [],
+    const firstToolCall = toolCalls[0] ?? null;
+    const firstToolName =
+      typeof firstToolCall?.tool === 'string'
+        ? firstToolCall.tool
+        : typeof firstToolCall?.name === 'string'
+          ? firstToolCall.name
+          : typeof commands[0] === 'string'
+            ? commands[0]
+            : 'unknown';
+
+    const decision = {
+      decisionId: `decision:${traceId}`,
+      selectedTool: {
+        name: firstToolName,
+        namespace: firstToolName.includes('.') ? firstToolName.split('.')[0] : 'internal',
+        description: firstToolName,
         readOnly: true,
-        sideEffectClass: 'none',
-        approvalRequired: false,
-        createdAt: new Date().toISOString()
+        providesSourceRefs: true
       },
+      candidates: toolCalls.slice(0, 3).map((call: any, index: number) => ({
+        tool: { name: call.tool ?? call.name ?? `tool:${index}` },
+        compositeScore: typeof call.score === 'number' ? call.score : 1 - index * 0.1,
+        reasoning: call.reasoning ?? 'Recorded agent trace'
+      })),
+      selectedState: trace.retrievalStrategy === 'structural_only'
+        ? 'STRUCTURE'
+        : trace.retrievalStrategy === 'lexical_only'
+          ? 'RETRIEVE'
+          : 'SYNTHESIZE',
+      timestamp: trace.createdAt.toISOString()
+    };
 
-      execution: {
-        executionId: 'exec123',
-        toolName: 'kb.trace_search',
-        success: true,
-        resultClass: 'candidates',
-        resultCount: 5,
-        sourceRefCount: 5,
-        sourceRefs: [
-          'kb:precedent:001',
-          'kb:precedent:002',
-          'kb:precedent:003',
-          'kb:precedent:004',
-          'kb:precedent:005'
-        ],
-        durationMs: 1247,
-        executedAt: new Date().toISOString(),
-        completedAt: new Date().toISOString()
-      },
+    const proposal = {
+      proposalId: `proposal:${traceId}`,
+      toolName: firstToolName,
+      arguments: firstToolCall?.input ?? {},
+      schemaValid: true,
+      validationErrors: [],
+      readOnly: true,
+      sideEffectClass: 'none',
+      approvalRequired: false,
+      createdAt: trace.createdAt.toISOString()
+    };
 
-      recovery: null, // No recovery needed if success
+    const execution = {
+      executionId: `execution:${traceId}`,
+      toolName: firstToolName,
+      success: trace.outcome !== 'failure',
+      resultClass: trace.outcome === 'success' ? 'answer' : 'partial',
+      resultCount: retrievedPackets.length,
+      sourceRefCount: retrievedPackets.length,
+      sourceRefs: retrievedPackets,
+      durationMs: 0,
+      executedAt: trace.createdAt.toISOString(),
+      completedAt: trace.createdAt.toISOString()
+    };
 
-      outcome: {
-        finalState: 'SYNTHESIZE',
-        finalOutcome: 'success',
-        timestamp: new Date().toISOString(),
-        score: 0.95,
-        feedback: 'Excellent retrieval quality'
-      }
+    const outcome = {
+      finalState: trace.outcome === 'success' ? 'SYNTHESIZE' : 'RECOVER',
+      finalOutcome: trace.outcome,
+      timestamp: trace.createdAt.toISOString(),
+      score: trace.score ?? 0,
+      feedback: `retrieval_strategy=${trace.retrievalStrategy}; concepts=${selectedConcepts.length}`
+    };
+
+    const response = {
+      traceId,
+      queryHash: trace.traceId,
+      query: trace.prompt,
+      createdAt: trace.createdAt.toISOString(),
+      decision,
+      proposal,
+      execution,
+      recovery: null,
+      outcome
     };
 
     // Format response based on query param
     if (query.format === 'jsonl') {
       // Return line-delimited JSON for streaming
       const lines = [
-        JSON.stringify({ type: 'decision', data: mockTrace.decision }),
-        JSON.stringify({ type: 'proposal', data: mockTrace.proposal }),
-        JSON.stringify({ type: 'execution', data: mockTrace.execution }),
-        JSON.stringify({ type: 'outcome', data: mockTrace.outcome })
+        JSON.stringify({ type: 'decision', data: response.decision }),
+        JSON.stringify({ type: 'proposal', data: response.proposal }),
+        JSON.stringify({ type: 'execution', data: response.execution }),
+        JSON.stringify({ type: 'outcome', data: response.outcome })
       ];
       return new Response(lines.join('\n'), {
         headers: { 'Content-Type': 'application/x-ndjson' }
       });
     }
 
-    return json(mockTrace);
+    return json(response);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return json(

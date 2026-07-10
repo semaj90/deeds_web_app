@@ -1,0 +1,77 @@
+{
+  "generated_at": "2026-07-10T20:59:54.477Z",
+  "mode": "apply",
+  "collection": "codebase_chunks_768",
+  "points_scanned": 200,
+  "field_coverage": {
+    "tree_node_id": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "parent_packet_key": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "topolog_cluster": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "som_cluster": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "som_row": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "som_col": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "som_index": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "kmeans_cluster": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "community_id": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    },
+    "page_rank_score": {
+      "present": 0,
+      "missing": 200,
+      "null": 0
+    }
+  },
+  "direct_bridge": {
+    "synced": 196,
+    "failed": 0,
+    "skipped": 4,
+    "ambiguous": 4,
+    "verification": {
+      "requested": 20,
+      "returned": 20,
+      "packet_key_matches": 20,
+      "tree_node_id_matches": 20,
+      "som_coordinates_present": 20,
+      "page_rank_present": 13
+    }
+  },
+  "contract": {
+    "identity_source": "atlas_packets.qdrant_point_id",
+    "mutation": "qdrant_set_payload_batch",
+    "tree_node_id_role": "graph_fanout_and_topology_rerank_join"
+  }
+}

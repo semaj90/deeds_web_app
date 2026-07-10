@@ -1,0 +1,186 @@
+{
+  "generated_at": "2026-07-10T21:06:46.067Z",
+  "overall_status": "READY_WITH_BLOCKERS",
+  "database": {
+    "packets": {
+      "total": 58365,
+      "distinct_packet_keys": 58365,
+      "source_ref": 58365,
+      "feature_id": 58365,
+      "feature_label": 58365,
+      "title_id": 58365,
+      "tree_node_id": 58365,
+      "domain_class": 58365,
+      "summary": 4180,
+      "qdrant_point_id": 4713,
+      "embedding": 10,
+      "latent_64": 1250,
+      "som_20x20": 4186
+    },
+    "features": {
+      "total": 58366,
+      "distinct_packet_keys": 58366,
+      "used_concepts": 58361,
+      "lexical_features": 58357,
+      "ast_symbols": 516,
+      "entities": 0
+    },
+    "metrics": {
+      "total": 993,
+      "distinct_packet_keys": 993,
+      "pca_latent": 993,
+      "jepa_latent": 993,
+      "jepa_similarity": 993
+    }
+  },
+  "coverage_percent": {
+    "summary": 7.1618,
+    "embedding": 0.0171,
+    "latent64": 2.1417,
+    "som_20x20": 7.1721,
+    "qdrant_point_id": 8.075,
+    "used_concepts": 99.9914,
+    "lexical_features": 99.9846,
+    "ast_symbols": 0.8841
+  },
+  "promotion": {
+    "arrow_batch_export": true,
+    "qlora_semantic_dataset": false,
+    "autoencoder_training": false,
+    "packet_jepa_reranker": false,
+    "gpu_topology_mapreduce": false,
+    "hyperrag_packet_materialization": true,
+    "tree_fanout_full_parity": false
+  },
+  "gates": [
+    {
+      "name": "packet identity uniqueness",
+      "status": "PASS",
+      "target": null,
+      "evidence": "58365/58365 distinct packet_key"
+    },
+    {
+      "name": "canonical labels and tree lineage",
+      "status": "PASS",
+      "target": ">=95%",
+      "evidence": "tree=100%, feature=100%, domain=100%"
+    },
+    {
+      "name": "lexical and concept evidence",
+      "status": "PASS",
+      "target": ">=95%",
+      "evidence": "concepts=99.9914%, lexical=99.9846%"
+    },
+    {
+      "name": "AST structural evidence",
+      "status": "WARN",
+      "target": ">=95%",
+      "evidence": "0.8841%"
+    },
+    {
+      "name": "summary coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "7.1618%"
+    },
+    {
+      "name": "canonical embedding coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "0.0171%"
+    },
+    {
+      "name": "SOM 20x20 packet coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "7.1721%"
+    },
+    {
+      "name": "Arrow IPC replay",
+      "status": "PASS",
+      "target": null,
+      "evidence": "200 rows, 48 columns, 0 failures"
+    },
+    {
+      "name": "Qdrant tree fan-out mirror",
+      "status": "PASS_BOUNDED",
+      "target": null,
+      "evidence": "20/20 direct tree IDs matched"
+    },
+    {
+      "name": "Neo4j tree fan-out mirror",
+      "status": "PASS_BOUNDED",
+      "target": null,
+      "evidence": "18811 HAS_TREE_NODE edges; tree-only=true"
+    },
+    {
+      "name": "native CUDA addon",
+      "status": "PASS",
+      "target": null,
+      "evidence": "C:\\Users\\james\\Videos\\deeds-web-app\\simd-bridge\\cpp\\build\\Release\\tensorrt_bridge.node"
+    },
+    {
+      "name": "Python CUDA training lane",
+      "status": "FAIL",
+      "target": null,
+      "evidence": "2.13.0+cpu"
+    },
+    {
+      "name": "JEPA promotion",
+      "status": "BLOCKED",
+      "target": null,
+      "evidence": "MRR 0.7443 vs 0.7761; NDCG@10 0.7818 vs 0.7985"
+    }
+  ],
+  "status_model": [
+    {
+      "lane": "canonical packet and feature joins",
+      "status": "PROVEN",
+      "evidence": "live Postgres counts plus bounded Arrow replay"
+    },
+    {
+      "lane": "Arrow IPC batch transport",
+      "status": "PROVEN",
+      "evidence": "200-row file round-trip with identity/vector checks"
+    },
+    {
+      "lane": "HyperRAG MsgPack/mmap hot packet path",
+      "status": "PROVEN_BOUNDED",
+      "evidence": "bounded materializer dry-run/apply evidence; not a full-corpus promotion"
+    },
+    {
+      "lane": "tree_node_id fan-out",
+      "status": "PROVEN_BOUNDED",
+      "evidence": "Qdrant direct payload readback plus Neo4j HAS_TREE_NODE graphify"
+    },
+    {
+      "lane": "QLoRA semantic training corpus",
+      "status": "WIRED_BLOCKED",
+      "evidence": "labels are complete; summaries and AST evidence remain incomplete"
+    },
+    {
+      "lane": "Packet-JEPA",
+      "status": "PROVEN_NOT_PROMOTED",
+      "evidence": "held-out MRR and NDCG@10 do not beat baseline"
+    },
+    {
+      "lane": "native CUDA addon",
+      "status": "PROVEN",
+      "evidence": "native addon smoke result"
+    },
+    {
+      "lane": "Python CUDA / RAPIDS topology workers",
+      "status": "CREATED_NOT_READY",
+      "evidence": "repo venv remains CPU-only; RAPIDS stays WSL2-targeted"
+    }
+  ],
+  "next_actions": [
+    "Backfill canonical packet embeddings in bounded batches; do not train AE/JEPA on mixed latent fallbacks.",
+    "Expand AST symbol extraction from the current low-coverage structural cohort before QLoRA topic training.",
+    "Raise summary coverage with bounded Gemma4 synthesis, preserving packet_key and source_ref provenance.",
+    "Recompute KMeans/SOM only after the embedding cohort is canonical and versioned.",
+    "Widen Qdrant and Neo4j tree-node mirrors in bounded batches until full parity gates pass.",
+    "Install CUDA-enabled PyTorch in the dedicated training environment; keep RAPIDS/cuVS in WSL2.",
+    "Re-run JEPA on the same deterministic split and promote only if both MRR and NDCG@10 beat baseline."
+  ]
+}
