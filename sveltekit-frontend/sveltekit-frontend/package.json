@@ -8,5 +8,10 @@
   },
   "optionalDependencies": {
     "zod-to-json-schema-original": "npm:null@3"
+  },
+  "scripts": {
+    "atlas:phase10:mcp:index:dry": "node scripts/atlas/phase10-mcp-tool-indexing.mjs --dry-run --check-grpc",
+    "atlas:phase10:mcp:index:apply": "node scripts/atlas/phase10-mcp-tool-indexing.mjs --apply --check-grpc",
+    "atlas:phase10:mcp:index:test": "node scripts/atlas/phase10-mcp-tool-indexing.mjs --check-grpc"
   }
 }

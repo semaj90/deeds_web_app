@@ -1,7 +1,7 @@
 {
-  "ok": true,
+  "ok": false,
   "strict": false,
-  "timestamp": "2026-05-31T19:28:57.9389966Z",
+  "timestamp": "2026-07-09T23:37:31.1165476Z",
   "output_file": "docs/reports/startup-health-trace-report.json",
   "neo4j_credential_source": {
     "user": ".env",
@@ -9,30 +9,19 @@
   },
   "checks": {
     "trace-health": {
-      "ok": true,
+      "ok": false,
       "required": true,
-      "result": {
-        "status": 200
-      }
+      "error": "No connection could be made because the target machine actively refused it. (127.0.0.1:8788)"
     },
     "trace-mcp-initialize": {
-      "ok": true,
+      "ok": false,
       "required": true,
-      "result": {
-        "status": 200,
-        "hasResult": true
-      }
+      "error": "No connection could be made because the target machine actively refused it. (127.0.0.1:8788)"
     },
     "trace-engram-redis-health": {
-      "ok": true,
+      "ok": false,
       "required": false,
-      "result": {
-        "status": 200,
-        "result": {
-          "ok": true,
-          "pong": "PONG"
-        }
-      }
+      "error": "No connection could be made because the target machine actively refused it. (127.0.0.1:8788)"
     },
     "neo4j-auth-tx-commit": {
       "ok": true,
@@ -40,18 +29,18 @@
       "result": {
         "uri": "http://127.0.0.1:7474/db/neo4j/tx/commit",
         "user_source": ".env",
-        "password_source": ".env",
+        "authenticated": true,
         "status": 200,
-        "authenticated": true
+        "password_source": ".env"
       }
     },
     "redis": {
       "ok": true,
       "required": false,
       "result": {
-        "method": "redis-cli",
-        "error": "NOAUTH Authentication required.\r\n\r\nAUTH failed: WRONGPASS invalid username-password pair or user is disabled.",
+        "error": "redis-cli shim: no running redis container found",
         "status": "degraded",
+        "method": "redis-cli",
         "auth_mode": "auth-or-noauth-mismatch"
       }
     },
@@ -63,11 +52,9 @@
       }
     },
     "bifrost": {
-      "ok": true,
+      "ok": false,
       "required": false,
-      "result": {
-        "status": 200
-      }
+      "error": "The request was canceled due to the configured HttpClient.Timeout of 4 seconds elapsing."
     },
     "llama-server-health": {
       "ok": true,
@@ -105,5 +92,16 @@
       }
     }
   },
-  "errors": []
+  "errors": [
+    "trace-health failed: No connection could be made because the target machine actively refused it. (127.0.0.1:8788)",
+    "trace-mcp-initialize failed: No connection could be made because the target machine actively refused it. (127.0.0.1:8788)",
+    "trace-engram-redis-health failed: No connection could be made because the target machine actively refused it. (127.0.0.1:8788)",
+    "bifrost failed: The request was canceled due to the configured HttpClient.Timeout of 4 seconds elapsing."
+  ],
+  "recovery": [
+    "Run npm run services:health:json to cross-check core infrastructure.",
+    "If TRACE MCP checks fail, restart the managed TRACE process bound to port 8788 and rerun this script.",
+    "If Neo4j auth fails, verify .env NEO4J_USER/NEO4J_PASSWORD and test POST http://127.0.0.1:7474/db/neo4j/tx/commit with Basic auth.",
+    "If Redis/Qdrant/Bifrost checks fail, verify docker compose services and local port mapping before retries."
+  ]
 }

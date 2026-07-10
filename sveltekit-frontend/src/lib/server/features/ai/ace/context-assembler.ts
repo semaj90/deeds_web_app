@@ -94,6 +94,7 @@ import {
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { determineACEPolicy } from '../../../ace/policy.js';
 import { fetchDbSchemaContext } from '$lib/server/ai/ldr/db-schema-tools.js';
+import { findSchemaDependents } from '$lib/server/tools/schema-dependents';
 import {
   recordChunkHits,
   recordQueryLog,
@@ -1334,6 +1335,98 @@ function mergeACPKnowledgeChunks(
 }
 
 /**
+ * Detect schema-change queries and fetch schema-dependents if applicable
+ */
+async function fetchSchemaDependentsIfRelevant(
+  query: string
+): Promise<{ tableAnalyzed: string | null; schemaDependents: any } | null> {
+  // Keywords that suggest schema-change context
+  const schemaChangeKeywords = [
+    'add column',
+    'remove column',
+    'alter table',
+    'schema change',
+    'migration',
+    'not null',
+    'primary key',
+    'foreign key',
+    'index',
+    'constraint',
+    'database change',
+  ];
+
+  const isSchemaChangeQuery = schemaChangeKeywords.some((kw) =>
+    query.toLowerCase().includes(kw)
+  );
+
+  if (!isSchemaChangeQuery) {
+    return null;
+  }
+
+  // Extract table name from query (heuristic: look for table names before keywords)
+  const tableNames = [
+    'users',
+    'cases',
+    'evidence',
+    'documents',
+    'citations',
+    'statutes',
+    'sessions',
+    'reports',
+    'personas',
+  ];
+
+  let tableAnalyzed: string | null = null;
+  for (const tableName of tableNames) {
+    if (query.toLowerCase().includes(tableName)) {
+      tableAnalyzed = tableName;
+      break;
+    }
+  }
+
+  if (!tableAnalyzed) {
+    return null;
+  }
+
+  try {
+    // Get Neo4j session and Postgres pool dynamically
+    let neo4jSession: any = null;
+    let postgresPool: any = null;
+
+    try {
+      const { neo4jDriver } = await import('$lib/server/db/neo4j.js');
+      neo4jSession = neo4jDriver?.session?.();
+    } catch {
+      // Neo4j not available, will degrade gracefully
+    }
+
+    try {
+      const { pool } = await import('$lib/server/db/client.js');
+      postgresPool = pool;
+    } catch {
+      // Postgres not available, will degrade gracefully
+    }
+
+    const schemaDependents = await findSchemaDependents(
+      { table: tableAnalyzed, includeAce: true },
+      {
+        neo4j: neo4jSession ? { session: () => neo4jSession } : null,
+        postgres: postgresPool,
+      }
+    );
+
+    if (neo4jSession) {
+      await neo4jSession.close();
+    }
+
+    return { tableAnalyzed, schemaDependents };
+  } catch {
+    // Non-blocking: if schema-dependents fails, continue without it
+    return null;
+  }
+}
+
+/**
  * Assemble a complete ACE context from all data sources.
  * All fetches run in parallel with graceful fallbacks.
  */
@@ -1853,6 +1946,7 @@ export async function assembleACEContext(opts: {
               codebaseContext: codebaseContext ?? null,
               activeClusterSummary,
               dbSchemaContext: '',
+              schemaDependentsContext: null,
               policyDecision: null,
               cachePlanner: {
                 hit: true,
@@ -2029,6 +2123,7 @@ export async function assembleACEContext(opts: {
         qdrantDocsResults,
         relationshipContext,
         featureWikiPacket,
+        schemaDependentsResult,
       ] = await Promise.all([
         userId ? fetchUserProfile(userId) : Promise.resolve(null),
         caseId ? fetchCaseContext(caseId) : Promise.resolve(null),
@@ -2100,11 +2195,37 @@ export async function assembleACEContext(opts: {
         acePlannerHit
           ? Promise.resolve(acePlannerHit.packet)
           : fetchACEContextPacket(query).catch(() => null),
+        fetchSchemaDependentsIfRelevant(query).catch(() => null),
       ]);
 
       const dbSchemaContext = Array.isArray(dbSchemaRows)
         ? dbSchemaRows.map((entry) => entry.content).join('\n\n')
         : '';
+
+      let schemaDependentsContext = '';
+      if (schemaDependentsResult && schemaDependentsResult.tableAnalyzed) {
+        const { tableAnalyzed, schemaDependents } = schemaDependentsResult;
+        const depLines: string[] = [
+          `## Schema Dependencies for table: ${tableAnalyzed}`,
+          `Migration Risk: ${schemaDependents.migration_risk.toUpperCase()}`,
+          `Total Dependents: ${schemaDependents.summary.total}`,
+          `- Reads: ${schemaDependents.summary.reads}`,
+          `- Writes: ${schemaDependents.summary.writes}`,
+          `- Deletes: ${schemaDependents.summary.deletes}`,
+          `- High-Risk Count: ${schemaDependents.summary.high_risk_count}`,
+        ];
+
+        if (schemaDependents.dependents.length > 0) {
+          depLines.push('\n### Dependent Operations:');
+          for (const dep of schemaDependents.dependents.slice(0, 10)) {
+            depLines.push(
+              `- **${dep.source_ref}** (${dep.operation}) @ line ${dep.line_num}: Risk=${dep.risk}`
+            );
+          }
+        }
+
+        schemaDependentsContext = depLines.join('\n');
+      }
 
       let { ragChunks } = ragResult;
       const { kbChunks, caseChunks } = ragResult;
@@ -2480,6 +2601,7 @@ export async function assembleACEContext(opts: {
         userAnalyticsContext: userAnalyticsContext ?? null,
         codebaseContext: codebaseContext ?? null,
         dbSchemaContext: dbSchemaContext || null,
+        schemaDependentsContext: schemaDependentsContext || null,
         policyDecision: null,
         cachePlanner: cachePlannerTrace,
         retrievalTrace: (() => {
@@ -4592,6 +4714,12 @@ export function buildACEPrompt(context: ACEContext, query: string): ACEPrompt {
   if (context.dbSchemaContext) {
     lines.push(`\n## Database Schema Context\n${context.dbSchemaContext}`);
     confidenceFactors.dbSchema = 0.95;
+  }
+
+  // 5c. Schema Dependencies (Schema Change Intelligence)
+  if (context.schemaDependentsContext) {
+    lines.push(`\n${context.schemaDependentsContext}`);
+    confidenceFactors.schemaDependents = 0.85;
   }
 
   // 6. Retrieved context — tiered (KB corpus first, then case evidence)

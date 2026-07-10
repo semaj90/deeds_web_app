@@ -162,12 +162,12 @@ async function persistApis() {
       try {
         const result = await pool.query(
           `INSERT INTO tool_registry (
-             tool_id, tool_name, summary, packet_type,
+             tool_id, name, summary,
              tool_capabilities, tool_constraints, tool_examples, tool_tags,
-             embedding, indexed_at, updated_at
-           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+             embedding, created_at, updated_at
+           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
            ON CONFLICT (tool_id) DO UPDATE SET
-             tool_name = EXCLUDED.tool_name,
+             name = EXCLUDED.name,
              summary = EXCLUDED.summary,
              tool_capabilities = EXCLUDED.tool_capabilities,
              tool_constraints = EXCLUDED.tool_constraints,
@@ -179,7 +179,6 @@ async function persistApis() {
             api.tool_id,
             `API: ${api.route_path}`,
             api.description,
-            'api', // packet_type
             JSON.stringify(api.handlers), // tool_capabilities
             JSON.stringify({
               auth_required: api.auth_required,
@@ -192,7 +191,7 @@ async function persistApis() {
               input_schema: api.input_schema,
               output_schema: api.output_schema
             }), // tool_examples
-            JSON.stringify(['auto-indexed', api.complexity, ...api.handlers.map(h => h.toLowerCase())]), // tool_tags
+            ['auto-indexed', api.complexity, ...api.handlers.map(h => h.toLowerCase())], // tool_tags (native array, not JSON)
             null // embedding (would be populated by separate phase10-api-indexing.mjs --embed)
           ]
         );

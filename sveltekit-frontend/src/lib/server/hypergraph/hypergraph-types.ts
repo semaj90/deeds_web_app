@@ -166,7 +166,19 @@ export interface HyperedgeActivation {
   activatedByTerms: string[];
   membersCovered: number;
   coverageRatio: number;
+  activationReasons?: ActivationReason[];
+  routingDecision?: 'semantic' | 'structural' | 'topological' | 'authority' | 'composite';
+  confidence?: number;
+  explanation?: string;
 }
+
+export type ActivationReason =
+  | { type: 'member_match'; member_key: string; term: string; score: number }
+  | { type: 'label_match'; label: string; term: string; score: number }
+  | { type: 'metadata_match'; path: string; term: string; score: number }
+  | { type: 'topology_boost'; topo_class: string; score: number }
+  | { type: 'authority_boost'; authority_score: number; score: number }
+  | { type: 'weight_boost'; edge_weight: number; score: number };
 
 export interface HyperedgeExpansion {
   edge: Hyperedge | null;

@@ -28,7 +28,7 @@ export const packetTypeEnum = pgEnum('packet_type', [
  * Partitioned by timestamp for efficient queries and retention policies
  */
 export const toolExecutionLog = pgTable('tool_execution_log', {
-  id: bigserial('id').primaryKey().notNull(),  // Event sequence number
+  id: bigserial('id', { mode: 'number' }).primaryKey().notNull(),  // Event sequence number
   toolId: text('tool_id').notNull(),  // Reference to tool_registry.tool_id
   query: text('query'),  // First 500 chars of query text for debugging
   success: integer('success').notNull(),  // 1 = success, 0 = failure (int for aggregation)

@@ -613,7 +613,14 @@
     "atlas:hmm:error:smoke": "node scripts/atlas/smoke-hmm-error.mjs",
     "atlas:hmm:tool-router:smoke": "vitest run tests/hmm/tool-router-hmm.spec.ts",
     "atlas:ace:packet-swap:smoke": "node scripts/atlas/smoke-ace-packet-swap.mjs",
-    "atlas:error:mapreduce:apply": "cross-env PGHOST=127.0.0.1 PGPORT=5434 PGDATABASE=legal_ai_db PGUSER=legal_admin PGPASSWORD=123456 REDIS_PASSWORD=redis node scripts/atlas/agentic-error-mapreduce.mjs"
+    "atlas:error:mapreduce:apply": "cross-env PGHOST=127.0.0.1 PGPORT=5434 PGDATABASE=legal_ai_db PGUSER=legal_admin PGPASSWORD=123456 REDIS_PASSWORD=redis node scripts/atlas/agentic-error-mapreduce.mjs",
+    "hmm:collect": "cd sveltekit-frontend && npx tsx scripts/atlas/phase-hmm-pattern-observation-collector.ts",
+    "hmm:collect:dry": "cd sveltekit-frontend && npx tsx scripts/atlas/phase-hmm-pattern-observation-collector.ts --dry-run",
+    "hmm:matrix:compute": "node scripts/atlas/compute-hmm-transition-matrix.mjs",
+    "hmm:matrix:compute:dry": "node scripts/atlas/compute-hmm-transition-matrix.mjs --dry-run",
+    "hmm:matrix:compute:verbose": "node scripts/atlas/compute-hmm-transition-matrix.mjs --verbose",
+    "hmm:score": "cd sveltekit-frontend && npx tsx scripts/atlas/phase-hmm-pattern-observation-collector.ts --apply",
+    "hmm:score:dry": "cd sveltekit-frontend && npx tsx scripts/atlas/phase-hmm-pattern-observation-collector.ts --dry-run"
   },
   "devDependencies": {
     "@ast-grep/cli": "0.42.3",

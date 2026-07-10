@@ -20,7 +20,14 @@ const PORT = process.env.TRACE_MCP_PORT ?? '8788';
 const BASE = `http://${HOST}:${PORT}`;
 const TIMEOUT = 500;
 const RETRIES = 60;
-const REQUIRED_TOOLS = ['kag.record_agent_run', 'kag.ingest_memory_directory', 'runtime.simdjson_status', 'runtime.sse_probe'];
+const REQUIRED_TOOLS = [
+  'kag.record_agent_run',
+  'kag.ingest_memory_directory',
+  'runtime.simdjson_status',
+  'runtime.sse_probe',
+  'hypergraph.explain_activation',
+  'trace.kag_search',
+];
 
 export async function isTraceMcpHealthy() {
   try {
@@ -102,7 +109,7 @@ function hasTraceMcpListener() {
 export async function ensureTraceMcp() {
   if (await isTraceMcpHealthy()) {
     const tools = await getTraceMcpTools();
-    if (!tools || REQUIRED_TOOLS.every((tool) => tools.includes(tool))) return true;
+    if (tools && REQUIRED_TOOLS.every((tool) => tools.includes(tool))) return true;
 
     console.warn('[ensure-mcp-server] TRACE MCP is healthy but missing required tools; restarting listener...');
     stopTraceMcpListener();

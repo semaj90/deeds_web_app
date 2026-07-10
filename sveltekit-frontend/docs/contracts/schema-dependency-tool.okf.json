@@ -1,0 +1,164 @@
+{
+  "title": "Schema Dependency Intelligence Tool",
+  "description": "Wires table name → Neo4j USES_DB edges → dependent files/functions → packet_key joins → ACE context → migration/risk report",
+  "version": "1.0.0",
+  "status": "DESIGN_READY",
+  
+  "input_contract": {
+    "type": "object",
+    "required": ["table"],
+    "properties": {
+      "table": {
+        "type": "string",
+        "description": "Table name (e.g., 'users', 'cases')",
+        "minLength": 1
+      },
+      "includeAce": {
+        "type": "boolean",
+        "default": true,
+        "description": "Include ACE context packet in response"
+      }
+    }
+  },
+
+  "output_contract": {
+    "type": "object",
+    "required": ["table", "dependents", "summary", "ace_context", "migration_risk"],
+    "properties": {
+      "table": {
+        "type": "string",
+        "description": "Table name"
+      },
+      "dependents": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["source_ref", "operation", "packet_key", "risk"],
+          "properties": {
+            "source_ref": {
+              "type": "string",
+              "description": "File path (canonical_source_ref from atlas_packets)"
+            },
+            "operation": {
+              "type": "string",
+              "enum": ["SELECT", "INSERT", "UPDATE", "DELETE"],
+              "description": "SQL operation type from Neo4j USES_DB edge"
+            },
+            "line_num": {
+              "type": ["number", "null"],
+              "description": "Line number in source file"
+            },
+            "packet_key": {
+              "type": ["string", "null"],
+              "description": "Canonical packet_key from atlas_packets join"
+            },
+            "feature_id": {
+              "type": ["string", "null"],
+              "description": "Feature identifier (e.g., auth.sessions)"
+            },
+            "feature_label": {
+              "type": ["string", "null"],
+              "description": "Human-readable feature name"
+            },
+            "tree_node_id": {
+              "type": ["string", "null"],
+              "description": "Tree node identifier for hierarchy"
+            },
+            "risk": {
+              "type": "string",
+              "enum": ["low", "medium", "high"],
+              "description": "Risk level: high=writes to critical path, medium=any write, low=reads"
+            }
+          }
+        }
+      },
+      "summary": {
+        "type": "object",
+        "required": ["total", "reads", "writes", "deletes", "high_risk_count"],
+        "properties": {
+          "total": { "type": "number" },
+          "reads": { "type": "number" },
+          "writes": { "type": "number" },
+          "deletes": { "type": "number" },
+          "high_risk_count": { "type": "number" }
+        }
+      },
+      "ace_context": {
+        "type": "boolean",
+        "description": "Whether ACE context packet was built"
+      },
+      "migration_risk": {
+        "type": "string",
+        "enum": ["low", "medium", "high", "unknown"],
+        "description": "Overall migration risk assessment"
+      }
+    }
+  },
+
+  "data_flow": [
+    "Input: table name (e.g., 'users')",
+    "Query Neo4j: MATCH (f:CodebaseFile)-[r:USES_DB]->(t:Table {name: $table})",
+    "Extract: source_ref, operation, line_num from USES_DB edge properties",
+    "Join Postgres: SELECT packet_key, feature_id, feature_label, tree_node_id FROM atlas_packets WHERE canonical_source_ref = source_ref",
+    "Classify risk: high=writes in auth/security/payment, medium=any write, low=read",
+    "Build summary: count by operation type, high_risk_count",
+    "Assess migration_risk: high if high_risk_count > 0, medium if writes > 2, else low",
+    "Return: dependents array + summary + migration_risk"
+  ],
+
+  "api_endpoints": [
+    {
+      "method": "GET",
+      "path": "/api/atlas/schema-dependents",
+      "query_params": ["table (required)", "includeAce (optional, default=true)"],
+      "response": "FindSchemaDependentsResponse"
+    },
+    {
+      "method": "POST",
+      "path": "/api/atlas/schema-dependents",
+      "body": "{ table: string, includeAce?: boolean }",
+      "response": "FindSchemaDependentsResponse"
+    }
+  ],
+
+  "mcp_tool": {
+    "name": "atlas-tools:find-schema-dependents",
+    "description": "Find all files/functions that depend on a table; returns migration risk and ACE context",
+    "input_type": "FindSchemaDependentsInput",
+    "output_type": "FindSchemaDependentsResponse"
+  },
+
+  "ace_integration": {
+    "context_type": "schema-change",
+    "packet_materializer": "src/lib/server/tools/schema-dependents.ts:findSchemaDependents",
+    "flow": [
+      "1. User asks: 'What files use the users table?'",
+      "2. ACE receives schema-change context hint",
+      "3. Calls atlas-tools:find-schema-dependents with table='users'",
+      "4. Response includes dependents, summary, migration_risk",
+      "5. ACE packages dependents array into context before Gemma4 synthesis",
+      "6. Gemma4 generates migration impact report with grounded file references"
+    ]
+  },
+
+  "responsibility_split": {
+    "neo4j": "Stores USES_DB edges (source_ref, operation, line_num) from static analysis",
+    "postgres": "Stores canonical packet_key, feature_id, feature_label for each file",
+    "tool": "Joins Neo4j + Postgres results, classifies risk, builds summary",
+    "ace": "Packages results into context before Gemma4 synthesis"
+  },
+
+  "non_blocking_edges": [
+    "Neo4j unavailable: returns empty dependents array (non-blocking)",
+    "Postgres join fails for a source_ref: returns row with packet_key=null (non-blocking)",
+    "No USES_DB edges found: returns empty dependents, summary={total:0,...}, migration_risk='low'"
+  ],
+
+  "production_value": [
+    "Migration risk assessment for schema changes",
+    "Hotspot detection (which files are high-touch on a table)",
+    "Impacted files report for deployment planning",
+    "Grounded schema-aware retrieval (files that touch this table)",
+    "Code audit trail (who accesses critical tables)"
+  ]
+}

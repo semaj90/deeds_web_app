@@ -8,7 +8,11 @@
  */
 
 import { Command } from 'commander';
-import { pool } from '../lib/db.mjs';
+import pg from 'pg';
+
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
+});
 
 const program = new Command();
 

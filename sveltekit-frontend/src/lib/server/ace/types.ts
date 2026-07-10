@@ -320,6 +320,7 @@ export interface ACEContext {
     durationMs: number;
   } | null;
   dbSchemaContext?: string;
+  schemaDependentsContext?: string | null;
   compactSearch?: {
     contextTreeId: string;
     query: string;

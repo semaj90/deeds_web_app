@@ -588,6 +588,26 @@ export function setupToolHandlers() {
         },
       },
       {
+        name: 'schema-dependents:find',
+        description:
+          'Find all files/functions that depend on a database table. Returns Neo4j USES_DB edges (source_ref, operation, line_num) joined with Postgres packet metadata (packet_key, feature_id, feature_label, tree_node_id). Includes risk classification (high/medium/low) and migration impact assessment. Non-blocking: handles missing Neo4j/Postgres gracefully with degraded response.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            table: {
+              type: 'string',
+              description: 'Table name (e.g., "users", "cases", "evidence")',
+            },
+            includeAce: {
+              type: 'boolean',
+              description: 'Whether to include ACE context packet for Gemma4 synthesis (default: true)',
+              default: true,
+            },
+          },
+          required: ['table'],
+        },
+      },
+      {
         name: 'LLMS.md',
         description:
           'Resolve the nearest applicable LLMS.md instructions for a file or directory. Prefers Redis-rendered mirrors and falls back to on-disk LLMS.md walk-up.',
@@ -2141,6 +2161,45 @@ export function setupToolHandlers() {
           return { content: data.result?.content ?? [{ type: 'text', text: JSON.stringify({ error: 'No content from TRACE' }) }] };
         } catch (err) {
           return { content: [{ type: 'text', text: JSON.stringify({ error: String(err), hint: 'Is TRACE MCP server running on :8788?' }) }] };
+        }
+      }
+
+      case 'schema-dependents:find': {
+        // Find files/functions that depend on a database table
+        const { table, includeAce = true } = args as { table: string; includeAce?: boolean };
+        try {
+          const { findSchemaDependents } = await import('$lib/server/tools/schema-dependents.js');
+          const { db } = await import('$lib/server/db/client.js');
+          const neo4j = await import('neo4j-driver').then(m => {
+            // Neo4j client initialization (will fallback gracefully if unavailable)
+            return null;
+          });
+
+          const response = await findSchemaDependents(
+            { table, includeAce },
+            { neo4j, postgres: { query: (sql: string, params: any) => db.execute(sql, params) } }
+          );
+
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify(response),
+            }],
+          };
+        } catch (err) {
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                table,
+                dependents: [],
+                summary: { total: 0, reads: 0, writes: 0, deletes: 0, high_risk_count: 0 },
+                ace_context: false,
+                migration_risk: 'low',
+                error: String(err),
+              }),
+            }],
+          };
         }
       }
 

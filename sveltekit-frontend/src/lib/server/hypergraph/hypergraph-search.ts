@@ -11,6 +11,7 @@ import type {
   HyperedgeCard,
   HyperedgeActivation,
   HyperedgeExpansion,
+  ActivationReason,
 } from './hypergraph-types.js';
 
 const DB_URL = ENV.DATABASE_URL;
@@ -269,20 +270,135 @@ export async function explainEdgeActivation(
   if (!edge) return { edge: null, activatedByTerms: [], membersCovered: 0, coverageRatio: 0 };
 
   const terms = queryTerms.map(t => t.toLowerCase());
-  const activatedByTerms = terms.filter(t =>
-    edge.members.some(m => m.member_key.toLowerCase().includes(t)) ||
-    (edge.label ?? '').toLowerCase().includes(t) ||
-    JSON.stringify(edge.metadata ?? {}).toLowerCase().includes(t)
-  );
-  const membersCovered = edge.members.filter(m =>
-    terms.some(t => m.member_key.toLowerCase().includes(t))
-  ).length;
+  const reasons: ActivationReason[] = [];
+  let semanticScore = 0;
+  let structuralScore = 0;
+  let topologicalScore = 0;
+
+  // ── SEMANTIC ACTIVATION (member + label + metadata matches) ────────────────────
+  const matchedMembers = new Set<string>();
+  for (const member of edge.members) {
+    for (const term of terms) {
+      if (member.member_key.toLowerCase().includes(term)) {
+        matchedMembers.add(member.member_key);
+        const matchScore = 0.8; // High confidence for direct member match
+        semanticScore += matchScore;
+        reasons.push({
+          type: 'member_match',
+          member_key: member.member_key,
+          term,
+          score: matchScore,
+        });
+      }
+    }
+  }
+
+  // Label + metadata semantic matches
+  for (const term of terms) {
+    if ((edge.label ?? '').toLowerCase().includes(term)) {
+      const matchScore = 0.6;
+      semanticScore += matchScore;
+      reasons.push({
+        type: 'label_match',
+        label: edge.label ?? '',
+        term,
+        score: matchScore,
+      });
+    }
+
+    const metadataStr = JSON.stringify(edge.metadata ?? {}).toLowerCase();
+    if (metadataStr.includes(term)) {
+      const matchScore = 0.4;
+      semanticScore += matchScore;
+      reasons.push({
+        type: 'metadata_match',
+        path: 'metadata',
+        term,
+        score: matchScore,
+      });
+    }
+  }
+
+  // ── STRUCTURAL ACTIVATION (member coverage ratio) ───────────────────────────────
+  if (edge.members.length > 0) {
+    const coverageRatio = matchedMembers.size / edge.members.length;
+    structuralScore = coverageRatio * 1.0; // Max 1.0 for full member coverage
+  }
+
+  // ── TOPOLOGICAL ACTIVATION (SOM cluster, glyph, authority) ───────────────────────
+  if (edge.topology) {
+    if (edge.topology.som_cluster) {
+      const topoBonus = 0.3;
+      topologicalScore += topoBonus;
+      reasons.push({
+        type: 'topology_boost',
+        topo_class: `som_${edge.topology.som_cluster}`,
+        score: topoBonus,
+      });
+    }
+
+    if (edge.topology.graphAuthorityScore) {
+      const authorityBonus = edge.topology.graphAuthorityScore * 0.25;
+      topologicalScore += authorityBonus;
+      reasons.push({
+        type: 'authority_boost',
+        authority_score: edge.topology.graphAuthorityScore,
+        score: authorityBonus,
+      });
+    }
+
+    if (edge.topology.glyph_cluster) {
+      const glyphBonus = 0.15;
+      topologicalScore += glyphBonus;
+      reasons.push({
+        type: 'topology_boost',
+        topo_class: `glyph_${edge.topology.glyph_cluster}`,
+        score: glyphBonus,
+      });
+    }
+  }
+
+  // ── EDGE WEIGHT CONTRIBUTION ──────────────────────────────────────────────────
+  const weightBonus = Math.min(edge.weight, 1.0) * 0.2;
+  reasons.push({
+    type: 'weight_boost',
+    edge_weight: edge.weight,
+    score: weightBonus,
+  });
+
+  // ── ROUTING DECISION (pick dominant lane) ─────────────────────────────────────
+  const scores = { semanticScore, structuralScore, topologicalScore };
+  const maxScore = Math.max(scores.semanticScore, scores.structuralScore, scores.topologicalScore);
+
+  let routingDecision: 'semantic' | 'structural' | 'topological' | 'authority' | 'composite' = 'composite';
+  if (maxScore === scores.semanticScore && scores.semanticScore > 0) {
+    routingDecision = 'semantic';
+  } else if (maxScore === scores.structuralScore && scores.structuralScore > 0) {
+    routingDecision = 'structural';
+  } else if (maxScore === scores.topologicalScore && scores.topologicalScore > 0) {
+    routingDecision = 'topological';
+  }
+
+  const activationScore = semanticScore + structuralScore + topologicalScore + weightBonus;
+  const maxPossibleScore = 10.0; // Normalization denominator
+  const confidence = Math.min(activationScore / maxPossibleScore, 1.0);
+
+  const explanation = `Edge activated via ${routingDecision} lane: ${matchedMembers.size} members matched (${
+    (structuralScore * 100).toFixed(0)
+  }% coverage), semantic score: ${semanticScore.toFixed(2)}, topology bonus: ${topologicalScore.toFixed(2)}`;
 
   return {
     edge,
-    activatedByTerms,
-    membersCovered,
-    coverageRatio: edge.members.length ? membersCovered / edge.members.length : 0,
+    activatedByTerms: [...new Set(terms.filter(t =>
+      edge.members.some(m => m.member_key.toLowerCase().includes(t)) ||
+      (edge.label ?? '').toLowerCase().includes(t)
+    ))],
+    membersCovered: matchedMembers.size,
+    coverageRatio: edge.members.length ? matchedMembers.size / edge.members.length : 0,
+    activationReasons: reasons,
+    routingDecision,
+    confidence,
+    explanation,
   };
 }
 
