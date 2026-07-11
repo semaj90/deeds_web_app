@@ -179,7 +179,7 @@ Core lanes are live, but the pipeline is not production-complete until the ident
 
 ## Topology Recommendation Slice
 
-Generated: 2026-07-11T07:48:18.631Z
+Generated: 2026-07-11T07:51:38.046Z
 Total features indexed: 1000
 Total packets: 18514
 Summarized packets: 1427
@@ -188,45 +188,41 @@ Qdrant-bridged features: missing 979
 
 | priority | gap | feature | packets | tree linked | qdrant keyed | todo score | command |
 |---:|---|---|---:|---:|---:|---:|---|
-| 2339 | missing_summary | +server.ts.disabled | 2397 | 2397 | 0 | 18401 | npm run atlas:phase8:step3:langextract:apply |
-| 1443 | missing_summary | LLMS.md | 1429 | 1429 | 214 | 10803 | npm run atlas:phase8:step3:langextract:apply |
-| 1352 | missing_summary | +server.ts | 1327 | 1327 | 212 | 10044 | npm run atlas:phase8:step3:langextract:apply |
-| 828 | missing_summary | +server.ts | 777 | 777 | 648 | 5307 | npm run atlas:phase8:step3:langextract:apply |
-| 687 | missing_summary | LLMS.md | 639 | 639 | 0 | 4867 | npm run atlas:phase8:step3:langextract:apply |
-| 597 | missing_summary | invoked.timestamp | 534 | 534 | 0 | 4102 | npm run atlas:phase8:step3:langextract:apply |
+| 2339 | missing_summary | +server.ts.disabled | 2397 | 2397 | 22 | 18379 | npm run atlas:phase8:step3:langextract:apply |
+| 1443 | missing_summary | LLMS.md | 1429 | 1429 | 229 | 10788 | npm run atlas:phase8:step3:langextract:apply |
+| 1352 | missing_summary | +server.ts | 1327 | 1327 | 220 | 10036 | npm run atlas:phase8:step3:langextract:apply |
+| 828 | missing_summary | +server.ts | 777 | 777 | 649 | 5306 | npm run atlas:phase8:step3:langextract:apply |
+| 687 | missing_summary | LLMS.md | 639 | 639 | 4 | 4863 | npm run atlas:phase8:step3:langextract:apply |
+| 597 | missing_summary | invoked.timestamp | 534 | 534 | 5 | 4097 | npm run atlas:phase8:step3:langextract:apply |
 | 398 | missing_summary | +page.ts | 321 | 321 | 304 | 2133 | npm run atlas:phase8:step3:langextract:apply |
-| 354 | missing_summary | invoked.timestamp | 279 | 279 | 0 | 2122 | npm run atlas:phase8:step3:langextract:apply |
-| 276 | missing_summary | relationship_map.json | 185 | 185 | 0 | 1450 | npm run atlas:phase8:step3:langextract:apply |
+| 354 | missing_summary | invoked.timestamp | 279 | 279 | 2 | 2120 | npm run atlas:phase8:step3:langextract:apply |
+| 276 | missing_summary | relationship_map.json | 185 | 185 | 1 | 1449 | npm run atlas:phase8:step3:langextract:apply |
 | 275 | missing_summary | next_actions.md | 185 | 185 | 0 | 1445 | npm run atlas:phase8:step3:langextract:apply |
 | 273 | missing_summary | graph_nodes.json | 181 | 181 | 0 | 1423 | npm run atlas:phase8:step3:langextract:apply |
-| 268 | missing_summary | qdrant_cluster_tags.json | 181 | 181 | 0 | 1398 | npm run atlas:phase8:step3:langextract:apply |
-| 268 | missing_summary | ace_hit_relationships.json | 181 | 181 | 0 | 1398 | npm run atlas:phase8:step3:langextract:apply |
-| 267 | missing_summary | graph_edges.json | 181 | 181 | 0 | 1393 | npm run atlas:phase8:step3:langextract:apply |
-| 265 | missing_summary | llm_synthesis_mapping.json | 181 | 181 | 0 | 1383 | npm run atlas:phase8:step3:langextract:apply |
-| 261 | missing_summary | ingest.ts | 185 | 185 | 0 | 1375 | npm run atlas:phase8:step3:langextract:apply |
-| 252 | missing_summary | LLMS.md | 160 | 160 | 4 | 1251 | npm run atlas:phase8:step3:langextract:apply |
+| 268 | missing_summary | ace_hit_relationships.json | 181 | 181 | 1 | 1397 | npm run atlas:phase8:step3:langextract:apply |
+| 268 | missing_summary | qdrant_cluster_tags.json | 181 | 181 | 3 | 1395 | npm run atlas:phase8:step3:langextract:apply |
+| 267 | missing_summary | graph_edges.json | 181 | 181 | 1 | 1392 | npm run atlas:phase8:step3:langextract:apply |
+| 265 | missing_summary | llm_synthesis_mapping.json | 181 | 181 | 2 | 1381 | npm run atlas:phase8:step3:langextract:apply |
+| 261 | missing_summary | ingest.ts | 185 | 185 | 1 | 1374 | npm run atlas:phase8:step3:langextract:apply |
+| 252 | missing_summary | LLMS.md | 160 | 160 | 7 | 1248 | npm run atlas:phase8:step3:langextract:apply |
 | 249 | missing_summary | run-build-script-build-script-build.json | 160 | 160 | 0 | 1240 | npm run atlas:phase8:step3:langextract:apply |
 | 247 | missing_summary | LLMS.md | 156 | 156 | 0 | 1218 | npm run atlas:phase8:step3:langextract:apply |
-| 223 | missing_summary | __init__.pyi | 129 | 129 | 0 | 1017 | npm run atlas:phase8:step3:langextract:apply |
+| 223 | missing_summary | __init__.pyi | 129 | 129 | 1 | 1016 | npm run atlas:phase8:step3:langextract:apply |
 
 ## Semantic Fanout Top-K
 
-Generated: 2026-07-11T07:48:18.707Z
-Mode: dry-run
-Limit: 500  Offset: 0  Top-K: 12
+Generated: 2026-07-11T07:51:38.094Z
+Mode: apply
+Limit: 20  Offset: 0  Top-K: 8
 Community min size: 3
 
 | priority | feature | domain | packets | summary | qdrant | tree | todo score | top concepts |
 |---:|---|---|---:|---:|---:|---:|---:|---|
-| 16034 | +server.ts.disabled | retrieval | 2397 | 6.59% | 0% | 100% | 16034 | server, batch1000, backup, scripts, +server, api |
-| 9618 | LLMS.md | retrieval | 1429 | 6.02% | 14.98% | 100% | 9618 | llms, scripts, infrastructure, api, cleanup, reports |
-| 8959 | +server.ts | retrieval | 1327 | 5.65% | 15.98% | 100% | 8959 | server, scripts, +server, api, cleanup, reports |
-| 5198 | +server.ts | frontend | 777 | 6.31% | 83.4% | 100% | 5198 | server, sveltekit, frontend, +server, src, routes |
-| 4258 | LLMS.md | retrieval | 639 | 8.14% | 0% | 100% | 4258 | llms, sveltekit, frontend, src, routes, (app) |
-| 3598 | invoked.timestamp | retrieval | 534 | 6.93% | 0% | 100% | 3598 | invoked, timestamp, crates, turbovec, napi, target |
+| 16034 | +server.ts.disabled | retrieval | 2397 | 6.59% | 0.92% | 100% | 16034 | server, batch1000, backup, scripts, +server, api |
+| 9618 | LLMS.md | retrieval | 1429 | 6.02% | 16.03% | 100% | 9618 | llms, scripts, infrastructure, api, cleanup, reports |
+| 8959 | +server.ts | retrieval | 1327 | 5.65% | 16.58% | 100% | 8959 | server, scripts, +server, api, cleanup, reports |
+| 5198 | +server.ts | frontend | 777 | 6.31% | 83.53% | 100% | 5198 | server, sveltekit, frontend, +server, src, routes |
+| 4258 | LLMS.md | retrieval | 639 | 8.14% | 0.63% | 100% | 4258 | llms, sveltekit, frontend, src, routes, (app) |
+| 3598 | invoked.timestamp | retrieval | 534 | 6.93% | 0.94% | 100% | 3598 | invoked, timestamp, crates, turbovec, napi, target |
 | 2140 | +page.ts | frontend | 321 | 7.17% | 94.7% | 100% | 2140 | page, sveltekit, frontend, +page, src, routes |
-| 1873 | invoked.timestamp | retrieval | 279 | 8.96% | 0% | 100% | 1873 | invoked, timestamp, simd, bridge, retrieval, rust |
-| 1295 | relationship_map.json | retrieval | 185 | 4.86% | 0% | 100% | 1295 | relationship, map, json, sveltekit, frontend, memory |
-| 1290 | next_actions.md | retrieval | 185 | 5.41% | 0% | 100% | 1290 | next, actions, sveltekit, frontend, memory, runs |
-| 1272 | graph_nodes.json | retrieval | 181 | 4.42% | 0% | 100% | 1272 | graph, nodes, json, sveltekit, frontend, memory |
-| 1247 | ace_hit_relationships.json | retrieval | 181 | 7.18% | 0% | 100% | 1247 | ace, hit, relationships, json, sveltekit, frontend |
+| 1873 | invoked.timestamp | retrieval | 279 | 8.96% | 0.72% | 100% | 1873 | invoked, timestamp, simd, bridge, retrieval, rust |
