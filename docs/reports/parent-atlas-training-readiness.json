@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-10T21:06:46.067Z",
+  "generated_at": "2026-07-11T07:16:12.700Z",
   "overall_status": "READY_WITH_BLOCKERS",
   "database": {
     "packets": {
@@ -12,7 +12,7 @@
       "tree_node_id": 58365,
       "domain_class": 58365,
       "summary": 4180,
-      "qdrant_point_id": 4713,
+      "qdrant_point_id": 4725,
       "embedding": 10,
       "latent_64": 1250,
       "som_20x20": 4186
@@ -22,7 +22,7 @@
       "distinct_packet_keys": 58366,
       "used_concepts": 58361,
       "lexical_features": 58357,
-      "ast_symbols": 516,
+      "ast_symbols": 2184,
       "entities": 0
     },
     "metrics": {
@@ -38,10 +38,10 @@
     "embedding": 0.0171,
     "latent64": 2.1417,
     "som_20x20": 7.1721,
-    "qdrant_point_id": 8.075,
+    "qdrant_point_id": 8.0956,
     "used_concepts": 99.9914,
     "lexical_features": 99.9846,
-    "ast_symbols": 0.8841
+    "ast_symbols": 3.7419
   },
   "promotion": {
     "arrow_batch_export": true,
@@ -75,7 +75,7 @@
       "name": "AST structural evidence",
       "status": "WARN",
       "target": ">=95%",
-      "evidence": "0.8841%"
+      "evidence": "3.7419%"
     },
     {
       "name": "summary coverage",
@@ -121,9 +121,9 @@
     },
     {
       "name": "Python CUDA training lane",
-      "status": "FAIL",
+      "status": "PASS",
       "target": null,
-      "evidence": "2.13.0+cpu"
+      "evidence": "2.13.0+cu130"
     },
     {
       "name": "JEPA promotion",
@@ -170,7 +170,7 @@
     },
     {
       "lane": "Python CUDA / RAPIDS topology workers",
-      "status": "CREATED_NOT_READY",
+      "status": "PROVEN",
       "evidence": "repo venv remains CPU-only; RAPIDS stays WSL2-targeted"
     }
   ],

@@ -2,6 +2,8 @@
 
 Generated: 2026-07-05
 
+Last verified: 2026-07-11
+
 ## Current Slice Status
 
 | Task | Status | Evidence |
@@ -10,7 +12,8 @@ Generated: 2026-07-05
 | Tree node ID propagation | proven in Postgres, bounded mirrors | 58,365 / 58,365 packet rows; Qdrant readback matched 20/20 and Neo4j tree-only graphify passed |
 | Title ID propagation | proven in Postgres | Live readiness gate reports 58,365 / 58,365 packet rows; downstream mirrors remain derived |
 | Semantic fanout / rerank | partial | Domain topic inference still depends on widening LangExtract + EmbeddingGemma + TurboVec + BM25 + AE/KMeans/SOM coverage; AST backfill lane is now writing bounded batches and the qdrant bridge is materially populated |
-| Domain classification readiness | ready_with_gaps | Naive Bayes and XGBoost artifacts exist; canonical RRF lane is wired; remaining blockers are AST coverage, qdrant bridge backfill, and latent/topology recompute |
+| Representation ladder | partial | `EmbeddingGemma 384d -> latent128 -> latent64` exists as a lane split; canonical 384d corpus still needs widening before JEPA/AE promotion |
+| Domain classification readiness | ready_with_gaps | Naive Bayes and XGBoost artifacts exist; canonical RRF lane is wired; `npm run atlas:domain-classification:readiness` is the live audit; current coverage is qdrant_point_id 8.1%, AST 3.74%, summary 7.16%, embedding 0.017%, latent64 2.14%, SOM 7.17% |
 | MapReduce consolidation | proven | `mapreduce-consolidated-index.mjs --dry-run --limit 50 --slim` passes and aggregates file/import/topic evidence |
 | QLoRA dataset prep | blocked on corpus quality | Canonical labels are complete, but summary coverage is 7.16% and AST-symbol coverage is 3.74% |
 | Arrow batch transport | proven bounded | 200 rows / 48 columns round-trip through Arrow IPC with stable splits, row index, and vector-buffer validation |
@@ -148,6 +151,8 @@ Core lanes are live, but the pipeline is not production-complete until the ident
 14. Promote the service-worker cache lane by replacing dummy Redis/SOM clients, using stable request hashes, and adding packet LOD manifests.
 15. Backfill `qdrant_point_id` using the deterministic identity bridge once AST and lexical evidence stabilize.
 16. Wire the domain-classification readiness audit into the startup board so top-k samples and gaps are visible on every run.
+17. Keep DSPy as a prompt/module optimizer above retrieval, and keep JEPA experimental until it beats the 384d baseline on held-out MRR and NDCG@10.
+18. Treat source-ref propagation as a hard provenance bridge: concrete file path first, synthetic identity never.
 
 ## Missing Script Prompts
 

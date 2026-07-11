@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-11T01:19:13.460Z",
+  "timestamp": "2026-07-11T07:15:51.762Z",
   "gate": "PASS",
   "synthetic": {
     "total": 4,
@@ -57,9 +57,9 @@
   },
   "live_sample": {
     "total": 200,
-    "changed": 52,
+    "changed": 42,
     "safe_after": 200,
-    "usable_after": 192,
+    "usable_after": 159,
     "leaky_after": 0,
     "before_counts": {
       "channel": 0,
@@ -77,19 +77,9 @@
     },
     "samples": [
       {
-        "packet_key": "packet:f8a314460f8a",
-        "raw": "source_ref: claude-mem/docs/i18n/README.tl.md | feature_id: claude-mem.README.tl | tags:  | imports:  | exports:  | route_handlers:  | snippet: 🌐 Ito ay isang awtomatikong pagsasalin. Malugod na tinatanggap ang mga pagwawasto mula sa komunidad!  --- <h1 align=\"center\">",
-        "summary": "source_ref: claude-mem/docs/i18n/README.tl.md | feature_id: claude-mem.README.tl | tags: | imports: | exports: | route_handlers: | snippet: 🌐 Ito ay isang awtomatikong pagsasalin. Malugod na tinatanggap ang mga pagwawasto mula sa komunidad! --- <h1 align=\"center\">",
-        "changed": true,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:317e16997f64",
-        "raw": "Recommended operational settings for Claude-Mem deployment.",
-        "summary": "Recommended operational settings for Claude-Mem deployment.",
+        "packet_key": "0ba2345cd9c542fa",
+        "raw": "Health check: pgvector, Qdrant, Redis, embedding service",
+        "summary": "Health check: pgvector, Qdrant, Redis, embedding service",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -97,19 +87,39 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:f6c61d0022a4",
-        "raw": "source_ref: claude-mem/src/server/generation/providers/shared/error-classification.ts | feature_id: claude-mem.error-classification | domain_class: codebase | ontology_label: artifact | topology_label: codebase_layer | cluster_key: codebase:codebase_layer | tags:  | imports:  | exports:  | route_handlers:  | snippet: // SPDX-License-Identifier: Apache-2.0  // Server-beta-local copy of the worker provider error classification model. // Phase 5 anti-pattern guard: src/server/* must not import from",
-        "summary": "source_ref: claude-mem/src/server/generation/providers/shared/error-classification.ts | feature_id: claude-mem.error-classification | domain_class: codebase | ontology_label: artifact | topology_label: codebase_layer | cluster_key: codebase:codebase_layer | tags: | imports: | exports: | route_handlers: | snippet: // SPDX-License-Identifier: Apache-2.0 // Server-beta-local copy of the worker provider error classification model. // Phase 5 anti-pattern guard: src/server/* must not import from",
-        "changed": true,
+        "packet_key": "0bffe0382a0d44bb",
+        "raw": "No content available",
+        "summary": "No content available",
+        "changed": false,
         "safe": true,
         "leaky": false,
-        "usable": true,
+        "usable": false,
         "hasLeak": false
       },
       {
-        "packet_key": "packet:f6a85b7614f6",
-        "raw": "Implementation of a dedicated HTTP client for server-beta runtime communication.",
-        "summary": "Implementation of a dedicated HTTP client for server-beta runtime communication.",
+        "packet_key": "0ee918abc8c53e8d",
+        "raw": "No content available",
+        "summary": "No content available",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": false,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "1703d9c005252a62",
+        "raw": "Health check",
+        "summary": "Health check",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": false,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "175066b8a4ceee3c",
+        "raw": "Project vectors through a stored orthogonal transform (768→64 or identity)",
+        "summary": "Project vectors through a stored orthogonal transform (768→64 or identity)",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -117,9 +127,19 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0d71f73145d4",
-        "raw": "This file handles the logic for downloading specific evidence files via an API endpoint. --- **Example 1 (If the feature was about user authentication):** *Summary: This file manages the API endpoint for user login, handling credential validation and session creation.* **Example 2 (If the feature was about fetching data:** *Summary: This file provides an API endpoint to fetch specific data records based on a provided ID.* **Example 3 (If the feature was about file uploads:** *Summary: This file manages the API endpoint for uploading and processing new user-submitted files.* --- **Your Task",
-        "summary": "This file handles the logic for downloading specific evidence files via an API endpoint. --- **Example 1 (If the feature was about user authentication):** *Summary: This file manages the API endpoint for user login, handling credential validation and session creation.* **Example 2 (If the feature was about fetching data:** *Summary: This file provides an API endpoint to fetch specific data records based on a provided ID.* **Example 3 (If the feature was about file uploads:** *Summary: This file manages the API endpoint for uploading and processing new user-submitted files.* --- **Your Task",
+        "packet_key": "17dc1fe9f5f8a021",
+        "raw": "Poll enrichment job status",
+        "summary": "Poll enrichment job status",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": false,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "1d5eba7211dea6f9",
+        "raw": "Send a message and receive a complete response",
+        "summary": "Send a message and receive a complete response",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -127,9 +147,9 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0319e7f8800c",
-        "raw": "This group represents the server-side logic for handling API requests to retrieve cached AI results. It should be retrieved via a standard HTTP request to the endpoint defined by its source reference. The operator should review the implementation to ensure proper request validation and error handling for cache retrieval operations.",
-        "summary": "This group represents the server-side logic for handling API requests to retrieve cached AI results. It should be retrieved via a standard HTTP request to the endpoint defined by its source reference. The operator should review the implementation to ensure proper request validation and error handling for cache retrieval operations.",
+        "packet_key": "1dc5ac2b3cd9bfe8",
+        "raw": "Streaming: progressive delivery for large result sets",
+        "summary": "Streaming: progressive delivery for large result sets",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -137,43 +157,23 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0b79e6803c19",
-        "raw": "This component is responsible for displaying the detailed analysis results for a specific piece of evidence. --- **Example of a good summary:** *This component displays the detailed analysis results for a specific piece of evidence, allowing users to review the findings.* **Example of a bad summary:** *This component is responsible for displaying the detailed analysis results for a specific piece of evidence.* (Too wordy/formal) --- **Your Task:** Provide the summary based on the provided context.",
-        "summary": "This component is responsible for displaying the detailed analysis results for a specific piece of evidence. --- **Example of a good summary:** *This component displays the detailed analysis results for a specific piece of evidence, allowing users to review the findings.* **Example of a bad summary:** *This component is responsible for displaying the detailed analysis results for a specific piece of evidence.* (Too wordy/formal) --- **Your Task:** Provide the summary based on the provided context.",
+        "packet_key": "25c824811a2efd81",
+        "raw": "Batch embedding generation",
+        "summary": "Batch embedding generation",
         "changed": false,
         "safe": true,
         "leaky": false,
-        "usable": true,
+        "usable": false,
         "hasLeak": false
       },
       {
-        "packet_key": "packet:0354bfca81f5",
-        "raw": "This group contains server-side logic for the evidence detail page within the application. It is retrieved via the `load` function export in the corresponding server file. The operator should review the logic to ensure all necessary data fetching and validation are correctly implemented for the page view.",
-        "summary": "This group contains server-side logic for the evidence detail page within the application. It is retrieved via the `load` function export in the corresponding server file. The operator should review the logic to ensure all necessary data fetching and validation are correctly implemented for the page view.",
+        "packet_key": "271b5446f6a86a48",
+        "raw": "Clustering operations",
+        "summary": "Clustering operations",
         "changed": false,
         "safe": true,
         "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:058843f1a667",
-        "raw": "This file handles the API endpoint for reranking a codebase, allowing external services to trigger a re-ranking process. --- **Example of how to use the feature:** If a user wants to trigger a re-ranking of their codebase, they would call the API endpoint exposed by this file. **In a real-world scenario:** This endpoint allows automated systems or user-initiated actions to manually re-run the codebase re-ranking logic. **Key takeaway:** It provides a programmatic way to initiate a codebase re-ranking process via a dedicated API route. --- **Your task:** Write the",
-        "summary": "This file handles the API endpoint for reranking a codebase, allowing external services to trigger a re-ranking process. --- **Example of how to use the feature:** If a user wants to trigger a re-ranking of their codebase, they would call the API endpoint exposed by this file. **In a real-world scenario:** This endpoint allows automated systems or user-initiated actions to manually re-run the codebase re-ranking logic. **Key takeaway:** It provides a programmatic way to initiate a codebase re-ranking process via a dedicated API route. --- **Your task:** Write the",
-        "changed": false,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:07f66c3a3ef9",
-        "raw": "This file handles the API endpoint for exporting data from a collaborative graph, likely triggered by a user action in the frontend. --- **Example of a good summary:** *This endpoint processes the request to generate and download a data export from the collaborative graph.* --- **Your task:** Provide the summary",
-        "summary": "This file handles the API endpoint for exporting data from a collaborative graph, likely triggered by a user action in the frontend. --- **Example of a good summary:** *This endpoint processes the request to generate and download a data export from the collaborative graph.* --- **Your task:** Provide the summary",
-        "changed": false,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
+        "usable": false,
         "hasLeak": false
       }
     ]

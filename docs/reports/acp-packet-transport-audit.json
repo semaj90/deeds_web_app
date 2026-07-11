@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T01:19:44.106Z",
+  "generated_at": "2026-07-11T07:16:25.342Z",
   "verdict": "PASS_WITH_WARNINGS",
   "apply": false,
   "sample": {
@@ -276,20 +276,20 @@
     }
   },
   "rabbitmq": {
-    "command": "C:\\Program Files\\nodejs\\node.exe -e \nconst amqp = require('amqplib');\nconst url = \"amqp://localhost:5672\";\nconst queues = [\"cache.invalidate\",\"document.embed\",\"chat.document.embed\",\"evidence.process\",\"vector.index\",\"chat.context\",\"analytics.track\",\"codebase.index\",\"ace.evaluate\",\"error.embed\",\"synthesis.generate\",\"knowledge.backfill\",\"audio.process\",\"glyph.tile.rebuild\",\"qlora.distill\",\"media.download\",\"media.transcribe\",\"cards.refresh\",\"repair.workflow.run\",\"inference.log.flush\"];\n(async () => {\n  const conn = await amqp.connect(url);\n  const ch = await conn.createChannel();\n  const out = [];\n  for (const name of queues) {\n    try {\n      const info = await ch.checkQueue(name);\n      out.push({ name, messages: info.messageCount, consumers: info.consumerCount, status: 'READY' });\n    } catch (error) {\n      out.push({ name, messages: null, consumers: null, status: 'MISSING', error: error.message });\n    }\n  }\n  await ch.close();\n  await conn.close();\n  console.log(JSON.stringify(out));\n})().catch((error) => {\n  console.error(error.message);\n  process.exit(1);\n});\n",
+    "command": "C:\\Program Files\\nodejs\\node.exe -e \nconst amqp = require('amqplib');\nconst url = \"amqp://guest:guest@localhost:5672\";\nconst queues = [\"cache.invalidate\",\"document.embed\",\"chat.document.embed\",\"evidence.process\",\"vector.index\",\"chat.context\",\"analytics.track\",\"codebase.index\",\"ace.evaluate\",\"error.embed\",\"synthesis.generate\",\"knowledge.backfill\",\"audio.process\",\"glyph.tile.rebuild\",\"qlora.distill\",\"media.download\",\"media.transcribe\",\"cards.refresh\",\"repair.workflow.run\",\"inference.log.flush\"];\n(async () => {\n  const conn = await amqp.connect(url);\n  const ch = await conn.createChannel();\n  const out = [];\n  for (const name of queues) {\n    try {\n      const info = await ch.checkQueue(name);\n      out.push({ name, messages: info.messageCount, consumers: info.consumerCount, status: 'READY' });\n    } catch (error) {\n      out.push({ name, messages: null, consumers: null, status: 'MISSING', error: error.message });\n    }\n  }\n  await ch.close();\n  await conn.close();\n  console.log(JSON.stringify(out));\n})().catch((error) => {\n  console.error(error.message);\n  process.exit(1);\n});\n",
     "ok": true,
     "queue_count": 20,
     "queues": [
       {
         "name": "cache.invalidate",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "document.embed",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
@@ -301,55 +301,55 @@
       {
         "name": "evidence.process",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "vector.index",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "chat.context",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "analytics.track",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "codebase.index",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "ace.evaluate",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "error.embed",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "synthesis.generate",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "knowledge.backfill",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
@@ -361,47 +361,47 @@
       {
         "name": "glyph.tile.rebuild",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "qlora.distill",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "media.download",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "media.transcribe",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "cards.refresh",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "repair.workflow.run",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       },
       {
         "name": "inference.log.flush",
         "messages": 0,
-        "consumers": 1,
+        "consumers": 0,
         "status": "READY"
       }
     ],
-    "output": "[{\"name\":\"cache.invalidate\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"document.embed\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"chat.document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"evidence.process\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"vector.index\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"chat.context\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"analytics.track\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"codebase.index\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"ace.evaluate\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"error.embed\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"synthesis.generate\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"knowledge.backfill\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"audio.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"glyph.tile.rebuild\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"qlora.distill\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"media.download\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"media.transcribe\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"cards.refresh\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"repair.workflow.run\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"},{\"name\":\"inference.log.flush\",\"messages\":0,\"consumers\":1,\"status\":\"READY\"}]",
+    "output": "[{\"name\":\"cache.invalidate\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"chat.document.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"evidence.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"vector.index\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"chat.context\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"analytics.track\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"codebase.index\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"ace.evaluate\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"error.embed\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"synthesis.generate\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"knowledge.backfill\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"audio.process\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"glyph.tile.rebuild\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"qlora.distill\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"media.download\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"media.transcribe\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"cards.refresh\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"repair.workflow.run\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"},{\"name\":\"inference.log.flush\",\"messages\":0,\"consumers\":0,\"status\":\"READY\"}]",
     "status": "READY_WITH_QUEUES"
   },
   "nats": {
@@ -409,7 +409,7 @@
     "ok": false,
     "connected": true,
     "status": "BROKER_ONLY_HANDLERS_MISSING",
-    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ❌ ERROR (4ms)\n   Error: 503\n\n📤 Testing retrieval.turbovec.rerank...\n   ❌ ERROR (1ms)\n   Error: 503\n\n📤 Testing gpu.cuvs.search...\n   ❌ ERROR (3ms)\n   Error: 503\n\n📤 Testing gpu.cuda.rank...\n   ❌ ERROR (2ms)\n   Error: 503\n\n📤 Testing engram.feedback.async...\n   ❌ ERROR (1ms)\n   Error: 503\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n❌ agent.task.execute\n   Duration: 4ms\n   Error: 503\n\n❌ retrieval.turbovec.rerank\n   Duration: 1ms\n   Error: 503\n\n❌ gpu.cuvs.search\n   Duration: 3ms\n   Error: 503\n\n❌ gpu.cuda.rank\n   Duration: 2ms\n   Error: 503\n\n❌ engram.feedback.async\n   Duration: 1ms\n   Error: 503\n\n======================================================================\n🎯 Result: 0/5 subjects passed\n======================================================================\n\n⚠️  5 subjects still failing\n   Start handlers: npm run nats:handlers\n   Then re-run: npm run nats:proof-of-life:all"
+    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ❌ ERROR (5ms)\n   Error: 503\n\n📤 Testing retrieval.turbovec.rerank...\n   ❌ ERROR (1ms)\n   Error: 503\n\n📤 Testing gpu.cuvs.search...\n   ❌ ERROR (2ms)\n   Error: 503\n\n📤 Testing gpu.cuda.rank...\n   ❌ ERROR (2ms)\n   Error: 503\n\n📤 Testing engram.feedback.async...\n   ❌ ERROR (1ms)\n   Error: 503\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n❌ agent.task.execute\n   Duration: 5ms\n   Error: 503\n\n❌ retrieval.turbovec.rerank\n   Duration: 1ms\n   Error: 503\n\n❌ gpu.cuvs.search\n   Duration: 2ms\n   Error: 503\n\n❌ gpu.cuda.rank\n   Duration: 2ms\n   Error: 503\n\n❌ engram.feedback.async\n   Duration: 1ms\n   Error: 503\n\n======================================================================\n🎯 Result: 0/5 subjects passed\n======================================================================\n\n⚠️  5 subjects still failing\n   Start handlers: npm run nats:handlers\n   Then re-run: npm run nats:proof-of-life:all"
   },
   "postgres": {
     "command": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c \nselect table_name\nfrom information_schema.tables\nwhere table_schema='public'\n  and table_name in ('agent_os_events','analytics_events','phase89_agentic_calls','trace_events','trace_runs','ace_retrieval_runs','ace_retrieval_hits','task_registry')\norder by table_name;\n",
@@ -431,5 +431,5 @@
     "nats_handlers_broker_only_handlers_missing"
   ],
   "next_action": "Start NATS handlers with `cd sveltekit-frontend; npm run nats:handlers`, then rerun `npm run nats:proof-of-life:all`.",
-  "run_id": "acp-audit-1783732784106"
+  "run_id": "acp-audit-1783754185342"
 }

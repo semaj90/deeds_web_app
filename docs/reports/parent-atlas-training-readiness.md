@@ -1,6 +1,6 @@
 # Parent Atlas Training Readiness
 
-Generated: 2026-07-10T21:06:46.067Z
+Generated: 2026-07-11T07:16:12.700Z
 Overall: READY_WITH_BLOCKERS
 
 ## Promotion Decisions
@@ -20,7 +20,7 @@ Overall: READY_WITH_BLOCKERS
 | packet identity uniqueness | PASS | 58365/58365 distinct packet_key |
 | canonical labels and tree lineage | PASS | tree=100%, feature=100%, domain=100% |
 | lexical and concept evidence | PASS | concepts=99.9914%, lexical=99.9846% |
-| AST structural evidence | WARN | 0.8841% |
+| AST structural evidence | WARN | 3.7419% |
 | summary coverage | FAIL | 7.1618% |
 | canonical embedding coverage | FAIL | 0.0171% |
 | SOM 20x20 packet coverage | FAIL | 7.1721% |
@@ -28,7 +28,7 @@ Overall: READY_WITH_BLOCKERS
 | Qdrant tree fan-out mirror | PASS_BOUNDED | 20/20 direct tree IDs matched |
 | Neo4j tree fan-out mirror | PASS_BOUNDED | 18811 HAS_TREE_NODE edges; tree-only=true |
 | native CUDA addon | PASS | C:\Users\james\Videos\deeds-web-app\simd-bridge\cpp\build\Release\tensorrt_bridge.node |
-| Python CUDA training lane | FAIL | 2.13.0+cpu |
+| Python CUDA training lane | PASS | 2.13.0+cu130 |
 | JEPA promotion | BLOCKED | MRR 0.7443 vs 0.7761; NDCG@10 0.7818 vs 0.7985 |
 
 ## Status Model
@@ -40,7 +40,7 @@ Overall: READY_WITH_BLOCKERS
 - QLoRA semantic training corpus: WIRED_BLOCKED - labels are complete; summaries and AST evidence remain incomplete
 - Packet-JEPA: PROVEN_NOT_PROMOTED - held-out MRR and NDCG@10 do not beat baseline
 - native CUDA addon: PROVEN - native addon smoke result
-- Python CUDA / RAPIDS topology workers: CREATED_NOT_READY - repo venv remains CPU-only; RAPIDS stays WSL2-targeted
+- Python CUDA / RAPIDS topology workers: PROVEN - repo venv remains CPU-only; RAPIDS stays WSL2-targeted
 
 ## Next Actions
 

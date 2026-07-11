@@ -22,6 +22,23 @@ If JEPA does not beat the baseline on those held-out metrics, it stays experimen
 
 ---
 
+## Representation Ladder
+
+Use the vector surfaces in this order:
+
+```text
+EmbeddingGemma 384d
+  canonical semantic retrieval cohort
+latent128
+  representation-learning / compression staging
+latent64
+  routing, clustering, SOM, compact cache feature
+```
+
+Keep `source_ref` as provenance only. Do not use it as identity.
+
+---
+
 ## Why It Stays Out Of Reranking For Now
 
 - Current packet coverage is not yet the right cohort for a fair JEPA promotion decision.

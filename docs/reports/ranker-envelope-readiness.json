@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-11T01:19:43.370Z",
+  "generated_at": "2026-07-11T07:16:24.377Z",
   "status": "WARN",
   "rule": "Summary apply is allowed only when active ranker identity, score, provenance, and summary-context envelope are not FAIL.",
   "candidates_file": ".tmp/turbovec-candidates.ndjson",
