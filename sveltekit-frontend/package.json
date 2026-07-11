@@ -618,6 +618,8 @@
     "atlas:feature-recommendation:index:apply": "node ../scripts/atlas/materialize-feature-recommendation-index.mjs --apply --limit=500",
     "atlas:feature-recommendations:refresh": "node ../scripts/atlas/refresh-feature-recommendations.mjs --apply --limit=500",
     "atlas:feature-recommendations:refresh:dry": "node ../scripts/atlas/refresh-feature-recommendations.mjs --dry-run --limit=500",
+    "atlas:semantic-fanout:refresh": "node ../scripts/atlas/refresh-semantic-fanout-topk.mjs --apply",
+    "atlas:semantic-fanout:refresh:dry": "node ../scripts/atlas/refresh-semantic-fanout-topk.mjs --dry-run",
     "atlas:recovery-template:dry": "node ../scripts/atlas/generate-recovery-template-from-packet.mjs --dry-run",
     "atlas:recovery-template:apply": "node ../scripts/atlas/generate-recovery-template-from-packet.mjs --apply",
     "atlas:feature-todos:dry": "node ../scripts/atlas/generate-feature-todos.mjs --limit=100",
