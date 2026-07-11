@@ -153,6 +153,7 @@
     "atlas:export:arrow:verify": "node scripts/atlas/verify-arrow-batch-export.mjs",
     "atlas:export:arrow:sample:verify": "node scripts/atlas/verify-arrow-batch-export.mjs --file=.tmp/atlas/packets.arrow",
     "atlas:training:readiness": "node scripts/atlas/validate-parent-atlas-training-readiness.mjs",
+    "atlas:validate:progressive-semantic-compiler": "node scripts/atlas/validate-progressive-semantic-compiler.mjs",
     "atlas:summary:envelopes:queue:dry": "node scripts/atlas/publish-summary-envelopes-to-rabbitmq.mjs --dry-run",
     "atlas:summary:envelopes:queue:apply": "node scripts/atlas/publish-summary-envelopes-to-rabbitmq.mjs --apply",
     "atlas:error:verify": "node scripts/atlas/verify-error-fixes.mjs",

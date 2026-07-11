@@ -201,6 +201,8 @@ export default defineConfig({
       // Runtime-cache + promotion pipeline smoke tests (Phase 130 readiness)
       'tests/runtime-cache-promotion.spec.ts',
       'tests/parent-atlas-workstation.spec.ts',
+      'tests/retrieval/autoencoder-cuvs-bridge.spec.ts',
+      'tests/agent/execution-review.spec.ts',
       // HMM-gated tool selection layer (Phase 9 — 2026-07-09)
       'tests/retrieval/tool-selection.spec.ts',
       // Schema Dependency Intelligence tool (Phase 10b — 2026-07-09)

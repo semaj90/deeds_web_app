@@ -1,6 +1,6 @@
 # Gemma4 Summary Sanitizer Hardened Report
 
-- Timestamp: 2026-07-05T00:01:08.518Z
+- Timestamp: 2026-07-11T01:19:13.460Z
 - DB sample size: 200
 - Synthetic cases: 4
 - Gate: PASS
@@ -17,10 +17,10 @@
 ## Live Sample
 
 - Safe after sanitize: 200
-- Usable after sanitize: 184
-- Changed: 59
+- Usable after sanitize: 192
+- Changed: 52
 - Leaky after sanitize: 0
-- Markers before: {"channel":3,"turns":0,"bos":0,"eos":0,"thought":0}
+- Markers before: {"channel":0,"turns":0,"bos":0,"eos":0,"thought":0}
 - Markers after: {"channel":0,"turns":0,"bos":0,"eos":0,"thought":0}
 
 ## Gaps

@@ -1,6 +1,6 @@
 # Summary Layer Quality Cleanup
 
-- generated_at: 2026-07-05T00:01:14.629Z
+- generated_at: 2026-07-11T01:19:15.883Z
 - mode: dry-run
 - status: PASS
 - selected_rows: 581
@@ -14,28 +14,28 @@
 - atlas_summary_layers:
   - total_rows: 15470
   - summary_text_rows: 4687
-  - embedded_rows: 1621
+  - embedded_rows: 1721
   - leaked_rows: 11
   - distinct_packet_keys: 10494
   - duplicate_rows: 4976
 - atlas_packets:
   - total_rows: 58365
-  - summary_text_rows: 1286
-  - leaked_rows: 0
+  - summary_text_rows: 4180
+  - leaked_rows: 10
 
 ## After
 
 - atlas_summary_layers:
   - total_rows: 15470
   - summary_text_rows: 4687
-  - embedded_rows: 1621
+  - embedded_rows: 1721
   - leaked_rows: 11
   - distinct_packet_keys: 10494
   - duplicate_rows: 4976
 - atlas_packets:
   - total_rows: 58365
-  - summary_text_rows: 1286
-  - leaked_rows: 0
+  - summary_text_rows: 4180
+  - leaked_rows: 10
 
 ## Notes
 

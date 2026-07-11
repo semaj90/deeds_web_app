@@ -11,7 +11,7 @@
   "batches": 5,
   "batchSize": 20,
   "concurrency": 1,
-  "elapsedMs": 11066,
+  "elapsedMs": 5353,
   "failures": [],
   "schemaFailures": [],
   "schemaHints": [

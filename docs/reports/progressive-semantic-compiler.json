@@ -1,0 +1,131 @@
+{
+  "generated_at": "2026-07-11T05:24:36.347Z",
+  "overall_status": "READY_WITH_BLOCKERS",
+  "coverage_percent": {
+    "source_ref": 100,
+    "feature_id": 100,
+    "title_id": 100,
+    "tree_node_id": 100,
+    "domain_class": 100,
+    "summary": 7.1618,
+    "embedding": 0.0171,
+    "latent_64": 2.1417,
+    "som_20x20": 7.1721,
+    "qdrant_point_id": 8.075,
+    "used_concepts": 99.9914,
+    "lexical_features": 99.9846,
+    "ast_symbols": 0.8841,
+    "metric_feature_density": 100,
+    "metric_complexity_score": 100,
+    "metric_semantic_entropy": 100,
+    "metric_retrieval_relevance": 100,
+    "metric_authority_score": 100,
+    "metric_kmeans_cluster": 0
+  },
+  "tree_fanout": {
+    "qdrant_tree_mirror": true,
+    "neo4j_tree_mirror": true,
+    "tree_node_id_is_fanout_join": true
+  },
+  "gates": [
+    {
+      "name": "packet identity spine",
+      "status": "PASS",
+      "target": ">=95%",
+      "evidence": "100% source_ref, 100% tree_node_id"
+    },
+    {
+      "name": "feature envelope coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "used_concepts=99.9914%, lexical=99.9846%, ast=0.8841%"
+    },
+    {
+      "name": "metric lane coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "density=100%, complexity=100%, semantic_entropy=100%"
+    },
+    {
+      "name": "summary coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "7.1618%"
+    },
+    {
+      "name": "canonical embedding coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "0.0171%"
+    },
+    {
+      "name": "latent_64 coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "2.1417%"
+    },
+    {
+      "name": "SOM 20x20 packet coverage",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "7.1721%"
+    },
+    {
+      "name": "qdrant_point_id bridge",
+      "status": "FAIL",
+      "target": ">=95%",
+      "evidence": "8.075%"
+    },
+    {
+      "name": "Qdrant tree fan-out mirror",
+      "status": "PASS_BOUNDED",
+      "target": null,
+      "evidence": "20/20 direct tree IDs matched"
+    },
+    {
+      "name": "Neo4j tree fan-out mirror",
+      "status": "PASS_BOUNDED",
+      "target": null,
+      "evidence": "18811 HAS_TREE_NODE edges; tree-only=true"
+    }
+  ],
+  "status_model": [
+    {
+      "lane": "identity spine",
+      "status": "PROVEN",
+      "evidence": "packet_key + source_ref + title_id + tree_node_id"
+    },
+    {
+      "lane": "feature compiler",
+      "status": "WIRED_BLOCKED",
+      "evidence": "used_concepts + lexical_features + ast_symbols"
+    },
+    {
+      "lane": "metrics compiler",
+      "status": "WIRED_BLOCKED",
+      "evidence": "feature_density + complexity + semantic_entropy + authority"
+    },
+    {
+      "lane": "topology ladder",
+      "status": "WIRED_BLOCKED",
+      "evidence": "latent_64 + SOM 20x20"
+    },
+    {
+      "lane": "tree fan-out",
+      "status": "PROVEN_BOUNDED",
+      "evidence": "Qdrant tree payload mirror + Neo4j tree graph mirror"
+    },
+    {
+      "lane": "retrieval readiness",
+      "status": "WIRED_BLOCKED",
+      "evidence": "Qdrant ids, summaries, embeddings"
+    }
+  ],
+  "next_actions": [
+    "Expand AST symbol extraction before promotion of semantic clustering lanes.",
+    "Raise summary and canonical embedding coverage before training any downstream reranker.",
+    "Widen the qdrant_point_id bridge in bounded batches, then re-run tree fan-out mirroring.",
+    "Keep tree_node_id as the packet-level fan-out join for Neo4j GDS, Qdrant payload filtering, and reranking.",
+    "Recompute KMeans/SOM only after the canonical embedding cohort is stable and versioned."
+  ]
+}

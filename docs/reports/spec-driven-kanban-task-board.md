@@ -15,6 +15,7 @@ Generated: 2026-07-05
 | Arrow batch transport | proven bounded | 200 rows / 48 columns round-trip through Arrow IPC with stable splits, row index, and vector-buffer validation |
 | mmap registry payloads | proven bounded | HyperRAG materializer writes validated MsgPack packets and registry rows; full-corpus promotion remains pending |
 | ACP routing fan-out | wired | HMM router exists and emits bounded routing suggestions |
+| Progressive semantic compiler gate | wired | Explicit live validator now checks identity, feature, metrics, and tree fan-out coverage |
 | HyperRAG packet materializer | proven | `scripts/atlas/hyperrag-packet-materializer.mjs` now passes dry-run and apply on a bounded slice, writing MsgPack + hot registry rows |
 | Game-engine runtime cache | wired | Service worker now uses same-origin runtime-cache endpoints, stable POST body hashes, and a packet LOD manifest schema |
 | Stub/mock cleanup | partial | New lanes are bounded and real, but older schema drift still needs cleanup |
@@ -47,6 +48,7 @@ Generated: 2026-07-05
 - Deep semantic routing stays on Qdrant + TurboVec + RRF + reranker.
 - HMM/ACP should consume semantic evidence, not Fuse.js fuzzy matches.
 - Domain clustering for code/data/legal is a required semantic validation gate, not an optional enhancement.
+- `tree_node_id` is the packet-level fan-out join for Neo4j GDS PageRank/community context, Qdrant payload filtering, and reranking.
 - Semantic fanout should follow: LangExtract/lexical pass -> EmbeddingGemma -> Qdrant/BM25 candidate set -> AE latent64 -> KMeans -> SOM -> TurboVec rerank -> final reranker.
 - MapReduce consolidation is the wiki-style consolidation pass for file/import/topic aggregation before cluster fanout.
 - QLoRA adapter training should use canonical feature/metrics tuples plus topic labels; it does not need `qdrant_id` as a training feature.

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-05T00:01:08.518Z",
+  "timestamp": "2026-07-11T01:19:13.460Z",
   "gate": "PASS",
   "synthetic": {
     "total": 4,
@@ -57,12 +57,12 @@
   },
   "live_sample": {
     "total": 200,
-    "changed": 59,
+    "changed": 52,
     "safe_after": 200,
-    "usable_after": 184,
+    "usable_after": 192,
     "leaky_after": 0,
     "before_counts": {
-      "channel": 3,
+      "channel": 0,
       "turns": 0,
       "bos": 0,
       "eos": 0,
@@ -77,9 +77,9 @@
     },
     "samples": [
       {
-        "packet_key": "packet:022d19be3ccd",
-        "raw": "source_ref: 620_26.txt | feature_id: 620_26 | tags:  | imports:  | exports:  | route_handlers:  | snippet: yes continue I would add Provenance Trees\r New table:\r atlas_provenance_tree\r provenance_id",
-        "summary": "source_ref: 620_26.txt | feature_id: 620_26 | tags: | imports: | exports: | route_handlers: | snippet: yes continue I would add Provenance Trees New table: atlas_provenance_tree provenance_id",
+        "packet_key": "packet:f8a314460f8a",
+        "raw": "source_ref: claude-mem/docs/i18n/README.tl.md | feature_id: claude-mem.README.tl | tags:  | imports:  | exports:  | route_handlers:  | snippet: 🌐 Ito ay isang awtomatikong pagsasalin. Malugod na tinatanggap ang mga pagwawasto mula sa komunidad!  --- <h1 align=\"center\">",
+        "summary": "source_ref: claude-mem/docs/i18n/README.tl.md | feature_id: claude-mem.README.tl | tags: | imports: | exports: | route_handlers: | snippet: 🌐 Ito ay isang awtomatikong pagsasalin. Malugod na tinatanggap ang mga pagwawasto mula sa komunidad! --- <h1 align=\"center\">",
         "changed": true,
         "safe": true,
         "leaky": false,
@@ -87,19 +87,9 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:07db78a3e18e",
-        "raw": "source_ref: 6_14_26__to_do_parent_atlas_registery.txt | feature_id: 6_14_26__to_do_parent_atlas_registery | tags:  | imports:  | exports:  | route_handlers:  | snippet: yes continue find all files even rg gitignored files yes continue  the repo is deeds-web-app? sveltekit-frontend will be opencode integration in the app. i want to make parent atlas into a library plugin to ingest repos reasuring before I touch the next backfill. Ran Get-Content C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\scripts\\atlas\\audit-higher-hop-schema-repair.mjs -TotalCount 260 The repair and audit both passed. I’m pulling the generated backfill report once so I can summarize the exact counts back to you cleanly. Ran Get-Content C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\tree-nodes-backfill.json -TotalCount 220 I’ve fixed the underlying audit path, so I’m re-running the package alias once to confirm the repo entrypoint is green too, not just the direct script.for yo",
-        "summary": "source_ref: 6_14_26__to_do_parent_atlas_registery.txt | feature_id: 6_14_26__to_do_parent_atlas_registery | tags: | imports: | exports: | route_handlers: | snippet: yes continue find all files even rg gitignored files yes continue the repo is deeds-web-app? sveltekit-frontend will be opencode integration in the app. i want to make parent atlas into a library plugin to ingest repos reasuring before I touch the next backfill. Ran Get-Content C:\\Users\\james\\Documents\\Codex\\2026-05-12\\ve-updated-the-local-quantization-notebook\\scripts\\atlas\\audit-higher-hop-schema-repair.mjs -TotalCount 260 The repair and audit both passed. I’m pulling the generated backfill report once so I can summarize the exact counts back to you cleanly. Ran Get-Content C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\tree-nodes-backfill.json -TotalCount 220 I’ve fixed the underlying audit path, so I’m re-running the package alias once to confirm the repo entrypoint is green too, not just the direct script.for yo",
-        "changed": true,
-        "safe": true,
-        "leaky": false,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:0e90ff37c40f",
-        "raw": "Debugging a 'Permission denied' error during hook execution within a WSL/bash environment.",
-        "summary": "Debugging a 'Permission denied' error during hook execution within a WSL/bash environment.",
+        "packet_key": "packet:317e16997f64",
+        "raw": "Recommended operational settings for Claude-Mem deployment.",
+        "summary": "Recommended operational settings for Claude-Mem deployment.",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -107,9 +97,9 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:1bda0f118249",
-        "raw": "source_ref: 6_24_26__test.txt | feature_id: 6_24_26__test | tags:  | imports:  | exports:  | route_handlers:  | snippet: Yes File: scripts/launch-llama-server-parallel.ps1\r Status: Ready to deploy\r Configuration:\r --parallel 4 --slots 4 (4 concurrent workers, 4 KV cache slots)",
-        "summary": "source_ref: 6_24_26__test.txt | feature_id: 6_24_26__test | tags: | imports: | exports: | route_handlers: | snippet: Yes File: scripts/launch-llama-server-parallel.ps1 Status: Ready to deploy Configuration: --parallel 4 --slots 4 (4 concurrent workers, 4 KV cache slots)",
+        "packet_key": "packet:f6c61d0022a4",
+        "raw": "source_ref: claude-mem/src/server/generation/providers/shared/error-classification.ts | feature_id: claude-mem.error-classification | domain_class: codebase | ontology_label: artifact | topology_label: codebase_layer | cluster_key: codebase:codebase_layer | tags:  | imports:  | exports:  | route_handlers:  | snippet: // SPDX-License-Identifier: Apache-2.0  // Server-beta-local copy of the worker provider error classification model. // Phase 5 anti-pattern guard: src/server/* must not import from",
+        "summary": "source_ref: claude-mem/src/server/generation/providers/shared/error-classification.ts | feature_id: claude-mem.error-classification | domain_class: codebase | ontology_label: artifact | topology_label: codebase_layer | cluster_key: codebase:codebase_layer | tags: | imports: | exports: | route_handlers: | snippet: // SPDX-License-Identifier: Apache-2.0 // Server-beta-local copy of the worker provider error classification model. // Phase 5 anti-pattern guard: src/server/* must not import from",
         "changed": true,
         "safe": true,
         "leaky": false,
@@ -117,9 +107,9 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:24abbee99423",
-        "raw": "Advancement in AI development moving beyond traditional RAG systems.",
-        "summary": "Advancement in AI development moving beyond traditional RAG systems.",
+        "packet_key": "packet:f6a85b7614f6",
+        "raw": "Implementation of a dedicated HTTP client for server-beta runtime communication.",
+        "summary": "Implementation of a dedicated HTTP client for server-beta runtime communication.",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -127,9 +117,9 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:2c29665425b7",
-        "raw": "Completion and readiness of the `6_26_26_todo_re` feature.",
-        "summary": "Completion and readiness of the `6_26_26_todo_re` feature.",
+        "packet_key": "packet:0d71f73145d4",
+        "raw": "This file handles the logic for downloading specific evidence files via an API endpoint. --- **Example 1 (If the feature was about user authentication):** *Summary: This file manages the API endpoint for user login, handling credential validation and session creation.* **Example 2 (If the feature was about fetching data:** *Summary: This file provides an API endpoint to fetch specific data records based on a provided ID.* **Example 3 (If the feature was about file uploads:** *Summary: This file manages the API endpoint for uploading and processing new user-submitted files.* --- **Your Task",
+        "summary": "This file handles the logic for downloading specific evidence files via an API endpoint. --- **Example 1 (If the feature was about user authentication):** *Summary: This file manages the API endpoint for user login, handling credential validation and session creation.* **Example 2 (If the feature was about fetching data:** *Summary: This file provides an API endpoint to fetch specific data records based on a provided ID.* **Example 3 (If the feature was about file uploads:** *Summary: This file manages the API endpoint for uploading and processing new user-submitted files.* --- **Your Task",
         "changed": false,
         "safe": true,
         "leaky": false,
@@ -137,40 +127,50 @@
         "hasLeak": false
       },
       {
-        "packet_key": "packet:351b10e524dc",
-        "raw": "source_ref: 6_25_26_manifold_truth.txt | feature_id: 6_25_26_manifold_truth | tags:  | imports:  | exports:  | route_handlers:  | snippet: ying the payload contract is stable for checked fields, but the topology/domain layer is under-modeled. The safest fix is not “patch Qdrant harder”; it is to add a canonical topology projection table and validate it daily.\r Next Steps\r From the user's follow-up message: \"Do not block on Valkey OpenCode rule seeding. That is optional developer memory cache.\"",
-        "summary": "source_ref: 6_25_26_manifold_truth.txt | feature_id: 6_25_26_manifold_truth | tags: | imports: | exports: | route_handlers: | snippet: ying the payload contract is stable for checked fields, but the topology/domain layer is under-modeled. The safest fix is not “patch Qdrant harder”; it is to add a canonical topology projection table and validate it daily. Next Steps From the user's follow-up message: \"Do not block on Valkey OpenCode rule seeding. That is optional developer memory cache.\"",
-        "changed": true,
+        "packet_key": "packet:0319e7f8800c",
+        "raw": "This group represents the server-side logic for handling API requests to retrieve cached AI results. It should be retrieved via a standard HTTP request to the endpoint defined by its source reference. The operator should review the implementation to ensure proper request validation and error handling for cache retrieval operations.",
+        "summary": "This group represents the server-side logic for handling API requests to retrieve cached AI results. It should be retrieved via a standard HTTP request to the endpoint defined by its source reference. The operator should review the implementation to ensure proper request validation and error handling for cache retrieval operations.",
+        "changed": false,
         "safe": true,
         "leaky": false,
         "usable": true,
         "hasLeak": false
       },
       {
-        "packet_key": "packet:3f83579bfc52",
-        "raw": "source_ref: 6_27_26_todo_pt2.txt | feature_id: 6_27_26_todo_pt2 | tags:  | imports:  | exports:  | route_handlers:  | snippet: we need to move scripts atlas that work in packages/atlas? then review using supersede checks? use the parent-atlas / packages/atlas-core adapters for shared infrastructure, but do not force the SvelteKit app to stop using Drizzle.\r Use this split:\r sveltekit-frontend/src/lib/server/db/schema-postgres.ts\r = app-local typed Drizzle schema for SvelteKit routes/actions",
-        "summary": "source_ref: 6_27_26_todo_pt2.txt | feature_id: 6_27_26_todo_pt2 | tags: | imports: | exports: | route_handlers: | snippet: then review using supersede checks? use the parent-atlas / packages/atlas-core adapters for shared infrastructure, but do not force the SvelteKit app to stop using Drizzle. Use this split: sveltekit-frontend/src/lib/server/db/schema-postgres.ts = app-local typed Drizzle schema for SvelteKit routes/actions",
-        "changed": true,
-        "safe": true,
-        "leaky": true,
-        "usable": true,
-        "hasLeak": false
-      },
-      {
-        "packet_key": "packet:4db0031b7a9b",
-        "raw": "source_ref: 61026__.txt | feature_id: 61026__ | tags:  | imports:  | exports:  | route_handlers:  | snippet: run a pass again reviewing supeseded older files into next_steps compltely for temporal kanban task completion under parent atlas codebase indexing moving to seaweedfs for coldstorage once indexed embedded summarized qdrant tags multi vector search gds neighbouring for 4d manifold dense search using nes chrom packet engram \r use rg search git ignored for atlas nes chro97 directories not files we need directory mapping from path mapping sourceref feature_id to feature_labeling from functions in the repo tied to node modules files our hypergraphrag dense seach multi vector search qdrant tags gemma4 sumamrized and move extracted files to cold storage seaweedfs with summaries with path mapping sourceref file path summaries postgresql 18 pgvector mirrored qdrant collections redis centroids for json packets after we finish lanes yes continue the review the .md update to do list use ru",
-        "summary": "source_ref: 61026__.txt | feature_id: 61026__ | tags: | imports: | exports: | route_handlers: | snippet: run a pass again reviewing supeseded older files into next_steps compltely for temporal kanban task completion under parent atlas codebase indexing moving to seaweedfs for coldstorage once indexed embedded summarized qdrant tags multi vector search gds neighbouring for 4d manifold dense search using nes chrom packet engram use rg search git ignored for atlas nes chro97 directories not files we need directory mapping from path mapping sourceref feature_id to feature_labeling from functions in the repo tied to node modules files our hypergraphrag dense seach multi vector search qdrant tags gemma4 sumamrized and move extracted files to cold storage seaweedfs with summaries with path mapping sourceref file path summaries postgresql 18 pgvector mirrored qdrant collections redis centroids for json packets after we finish lanes yes continue the review the .md update to do list use ru",
-        "changed": true,
+        "packet_key": "packet:0b79e6803c19",
+        "raw": "This component is responsible for displaying the detailed analysis results for a specific piece of evidence. --- **Example of a good summary:** *This component displays the detailed analysis results for a specific piece of evidence, allowing users to review the findings.* **Example of a bad summary:** *This component is responsible for displaying the detailed analysis results for a specific piece of evidence.* (Too wordy/formal) --- **Your Task:** Provide the summary based on the provided context.",
+        "summary": "This component is responsible for displaying the detailed analysis results for a specific piece of evidence. --- **Example of a good summary:** *This component displays the detailed analysis results for a specific piece of evidence, allowing users to review the findings.* **Example of a bad summary:** *This component is responsible for displaying the detailed analysis results for a specific piece of evidence.* (Too wordy/formal) --- **Your Task:** Provide the summary based on the provided context.",
+        "changed": false,
         "safe": true,
         "leaky": false,
         "usable": true,
         "hasLeak": false
       },
       {
-        "packet_key": "packet:4ee7308faeac",
-        "raw": "source_ref: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt | feature_id: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard | tags:  | imports:  | exports:  | route_handlers:  | snippet: review this file  carrying load typescript utilities web workers, go routines? typescript global utility types service_workers loops rabbitmq, exporting json loops, registry gate checks, que deque loops? search our cannonical sources client vs server cpu vs gpu http http/2 http3 faster if we can organize the udp packets back into our pipeline how? langextract is python? we need something more primitive? msgpack ? go-routine how do we packet assembler? materializer? packer validator(need to make) tied to our registry? eval times? packages/parent-atlas telemetry library. tree_node star, pentagram. \r Every packet should be the central entity\r One canonical atlas_packet_registry that every se",
-        "summary": "source_ref: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard.txt | feature_id: 625_26_batchsummarizer_needs_proper_field_for_pipeline_loop_graphify_temporal_append_foragentictaskboard | tags: | imports: | exports: | route_handlers: | snippet: review this file carrying load typescript utilities web workers, go routines? typescript global utility types service_workers loops rabbitmq, exporting json loops, registry gate checks, que deque loops? search our cannonical sources client vs server cpu vs gpu http http/2 http3 faster if we can organize the udp packets back into our pipeline how? langextract is python? we need something more primitive? msgpack ? go-routine how do we packet assembler? materializer? packer validator(need to make) tied to our registry? eval times? packages/parent-atlas telemetry library. tree_node star, pentagram. Every packet should be the central entity One canonical atlas_packet_registry that every se",
-        "changed": true,
+        "packet_key": "packet:0354bfca81f5",
+        "raw": "This group contains server-side logic for the evidence detail page within the application. It is retrieved via the `load` function export in the corresponding server file. The operator should review the logic to ensure all necessary data fetching and validation are correctly implemented for the page view.",
+        "summary": "This group contains server-side logic for the evidence detail page within the application. It is retrieved via the `load` function export in the corresponding server file. The operator should review the logic to ensure all necessary data fetching and validation are correctly implemented for the page view.",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:058843f1a667",
+        "raw": "This file handles the API endpoint for reranking a codebase, allowing external services to trigger a re-ranking process. --- **Example of how to use the feature:** If a user wants to trigger a re-ranking of their codebase, they would call the API endpoint exposed by this file. **In a real-world scenario:** This endpoint allows automated systems or user-initiated actions to manually re-run the codebase re-ranking logic. **Key takeaway:** It provides a programmatic way to initiate a codebase re-ranking process via a dedicated API route. --- **Your task:** Write the",
+        "summary": "This file handles the API endpoint for reranking a codebase, allowing external services to trigger a re-ranking process. --- **Example of how to use the feature:** If a user wants to trigger a re-ranking of their codebase, they would call the API endpoint exposed by this file. **In a real-world scenario:** This endpoint allows automated systems or user-initiated actions to manually re-run the codebase re-ranking logic. **Key takeaway:** It provides a programmatic way to initiate a codebase re-ranking process via a dedicated API route. --- **Your task:** Write the",
+        "changed": false,
+        "safe": true,
+        "leaky": false,
+        "usable": true,
+        "hasLeak": false
+      },
+      {
+        "packet_key": "packet:07f66c3a3ef9",
+        "raw": "This file handles the API endpoint for exporting data from a collaborative graph, likely triggered by a user action in the frontend. --- **Example of a good summary:** *This endpoint processes the request to generate and download a data export from the collaborative graph.* --- **Your task:** Provide the summary",
+        "summary": "This file handles the API endpoint for exporting data from a collaborative graph, likely triggered by a user action in the frontend. --- **Example of a good summary:** *This endpoint processes the request to generate and download a data export from the collaborative graph.* --- **Your task:** Provide the summary",
+        "changed": false,
         "safe": true,
         "leaky": false,
         "usable": true,

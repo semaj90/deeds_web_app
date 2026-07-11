@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T00:04:57.226Z",
+  "generated_at": "2026-07-11T01:19:52.104Z",
   "status": "PASS_WITH_WARNINGS",
   "summary": {
     "livePass": 9,
@@ -16,7 +16,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 120,
+      "duration_ms": 44,
       "details": {
         "http_status": 200,
         "body": {
@@ -56,7 +56,7 @@
               "aliases": [],
               "tags": [],
               "object": "model",
-              "created": 1783209894,
+              "created": 1783732790,
               "owned_by": "llamacpp",
               "meta": {
                 "vocab_type": 2,
@@ -78,7 +78,7 @@
       "transport": "http",
       "status": "FALLBACK_PASS",
       "fallback_used": true,
-      "duration_ms": 10,
+      "duration_ms": 5,
       "error": "LangExtract unavailable; inline Gemma4 fallback available (fetch failed)",
       "details": {
         "fallback_url": "http://127.0.0.1:8090"
@@ -91,7 +91,7 @@
       "transport": "grpc",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 2
+      "duration_ms": 0
     },
     {
       "service_name": "go-retrieval",
@@ -100,7 +100,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 1890,
+      "duration_ms": 1849,
       "details": {
         "http_status": 200,
         "body": {
@@ -109,7 +109,7 @@
           "qdrantConnected": true,
           "redisConnected": true,
           "status": "healthy",
-          "timestamp": 1783209894827
+          "timestamp": 1783732790070
         }
       }
     },
@@ -120,7 +120,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 18,
+      "duration_ms": 5,
       "details": {
         "http_status": 200,
         "body": {
@@ -155,7 +155,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 40,
+      "duration_ms": 9,
       "details": {
         "http_status": 200,
         "body": {
@@ -163,6 +163,9 @@
             "collections": [
               {
                 "name": "BifrostSemanticCachePlugin"
+              },
+              {
+                "name": "acp_inverse_hnsw"
               },
               {
                 "name": "agent_memory_observations"
@@ -266,7 +269,7 @@
             ]
           },
           "status": "ok",
-          "time": 0.002720299
+          "time": 0.000521533
         }
       }
     },
@@ -277,7 +280,7 @@
       "transport": "postgres",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 51
+      "duration_ms": 18
     },
     {
       "service_name": "seaweedfs",
@@ -286,10 +289,10 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 18,
+      "duration_ms": 3,
       "details": {
         "http_status": 403,
-        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18BF3BF40CE30D3970DC756C</RequestId></Error>"
+        "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Error><Code>AccessDenied</Code><Message>Access Denied.</Message><Resource>/</Resource><RequestId>18C117860E9AC9F63768CF92</RequestId></Error>"
       }
     },
     {
@@ -299,7 +302,7 @@
       "transport": "http",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 14,
+      "duration_ms": 6,
       "details": {
         "http_status": 200,
         "body": {
@@ -319,7 +322,7 @@
       "transport": "redis",
       "status": "LIVE_PASS",
       "fallback_used": false,
-      "duration_ms": 335
+      "duration_ms": 131
     }
   ],
   "legacy_warnings": [
@@ -334,7 +337,7 @@
         "transport": "http",
         "status": "FAIL",
         "fallback_used": false,
-        "duration_ms": 4,
+        "duration_ms": 2,
         "error": "fetch failed"
       }
     }

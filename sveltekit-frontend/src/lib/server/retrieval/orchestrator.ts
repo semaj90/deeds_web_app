@@ -36,6 +36,7 @@ import { logInference } from '$lib/server/observability/inference-log.js';
 import { ENV } from '$lib/server/env.server.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { turbovecRerank } from '$lib/server/retrieval/turbovec-rerank.js';
+import { rerank as semanticRerank, healthCheckReranker } from '$lib/server/retrieval/semantic-vector-reranker.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { attentionScoreChunks } from '$lib/server/gpu/libtorch-bridge.js';
 import { getRedis } from '$lib/server/redis.js';
@@ -489,6 +490,72 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 					glyphRewardCount: Object.keys(glyphRewardScores).length,
 				},
 			});
+		}
+	}
+
+	// 3.7 Semantic Vector Multi-Vector Reranker (GPU + SOM + domain + recency)
+	if (!req.skipRerank && chunks.length > 0) {
+		try {
+			const t27 = performance.now();
+
+			// Convert chunks to Qdrant search results format
+			const qdrantForSemantic = chunks.map((c, i) => ({
+				id: c.documentId || String(i),
+				score: c.similarity || 0,
+				payload: {
+					packet_key: c.documentId?.split(':')[1] || c.documentId,
+					source_ref: c.sourceId,
+					title: c.title,
+				},
+			}));
+
+			// Apply semantic reranker (composite score: vector + SOM + domain + recency + depth)
+			const rerankCandidates = await semanticRerank(qdrantForSemantic, {
+				topK: Math.min(50, chunks.length),
+				verbose: false,
+			});
+
+			if (rerankCandidates.length > 0) {
+				// Map reranked candidates back to ContextDoc[]
+				chunks = rerankCandidates
+					.map((candidate) => {
+						const original = chunks.find((c) =>
+							c.documentId.includes(candidate.packetKey)
+						);
+						if (!original) return null;
+						return {
+							...original,
+							similarity: candidate.compositeScore, // Use composite score
+							__semanticDiagnostics: candidate.diagnostics,
+						};
+					})
+					.filter((c): c is typeof chunks[number] => c !== null);
+
+				const semanticLatency = Math.round(performance.now() - t27);
+				timings.semantic_rerank = semanticLatency;
+
+				// Log semantic reranking
+				logInference({
+					type: 'semantic_vector_rerank',
+					backend: 'postgres+redis',
+					latencyMs: semanticLatency,
+					cacheHit: false,
+					resultCount: chunks.length,
+					metadata: {
+						somCoverage: rerankCandidates.filter((c) => c.diagnostics.hasSomCluster).length,
+						blendWeights: {
+							vector: 0.4,
+							som_authority: 0.25,
+							domain_match: 0.2,
+							recency: 0.1,
+							tree_depth: 0.05,
+						},
+					},
+				});
+			}
+		} catch (e) {
+			// Semantic reranker failure: log but continue with original ranking
+			console.warn('[Orchestrator] Semantic reranker error:', e instanceof Error ? e.message : String(e));
 		}
 	}
 

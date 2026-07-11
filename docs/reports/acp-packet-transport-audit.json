@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-05T00:04:35.165Z",
+  "generated_at": "2026-07-11T01:19:44.106Z",
   "verdict": "PASS_WITH_WARNINGS",
   "apply": false,
   "sample": {
@@ -409,7 +409,7 @@
     "ok": false,
     "connected": true,
     "status": "BROKER_ONLY_HANDLERS_MISSING",
-    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ❌ ERROR (28ms)\n   Error: 503\n\n📤 Testing retrieval.turbovec.rerank...\n   ❌ ERROR (4ms)\n   Error: 503\n\n📤 Testing gpu.cuvs.search...\n   ❌ ERROR (7ms)\n   Error: 503\n\n📤 Testing gpu.cuda.rank...\n   ❌ ERROR (13ms)\n   Error: 503\n\n📤 Testing engram.feedback.async...\n   ❌ ERROR (2ms)\n   Error: 503\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n❌ agent.task.execute\n   Duration: 28ms\n   Error: 503\n\n❌ retrieval.turbovec.rerank\n   Duration: 4ms\n   Error: 503\n\n❌ gpu.cuvs.search\n   Duration: 7ms\n   Error: 503\n\n❌ gpu.cuda.rank\n   Duration: 13ms\n   Error: 503\n\n❌ engram.feedback.async\n   Duration: 2ms\n   Error: 503\n\n======================================================================\n🎯 Result: 0/5 subjects passed\n======================================================================\n\n⚠️  5 subjects still failing\n   Start handlers: npm run nats:handlers\n   Then re-run: npm run nats:proof-of-life:all"
+    "output": "🚀 NATS Proof-of-Life Test Suite (Request/Reply)\n\n   URL: nats://localhost:4222\n   Timeout: 5000ms\n\n✅ Connected to NATS\n\n\n📤 Testing agent.task.execute...\n   ❌ ERROR (4ms)\n   Error: 503\n\n📤 Testing retrieval.turbovec.rerank...\n   ❌ ERROR (1ms)\n   Error: 503\n\n📤 Testing gpu.cuvs.search...\n   ❌ ERROR (3ms)\n   Error: 503\n\n📤 Testing gpu.cuda.rank...\n   ❌ ERROR (2ms)\n   Error: 503\n\n📤 Testing engram.feedback.async...\n   ❌ ERROR (1ms)\n   Error: 503\n\n======================================================================\n📊 PROOF-OF-LIFE TEST SUMMARY\n======================================================================\n\n❌ agent.task.execute\n   Duration: 4ms\n   Error: 503\n\n❌ retrieval.turbovec.rerank\n   Duration: 1ms\n   Error: 503\n\n❌ gpu.cuvs.search\n   Duration: 3ms\n   Error: 503\n\n❌ gpu.cuda.rank\n   Duration: 2ms\n   Error: 503\n\n❌ engram.feedback.async\n   Duration: 1ms\n   Error: 503\n\n======================================================================\n🎯 Result: 0/5 subjects passed\n======================================================================\n\n⚠️  5 subjects still failing\n   Start handlers: npm run nats:handlers\n   Then re-run: npm run nats:proof-of-life:all"
   },
   "postgres": {
     "command": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c \nselect table_name\nfrom information_schema.tables\nwhere table_schema='public'\n  and table_name in ('agent_os_events','analytics_events','phase89_agentic_calls','trace_events','trace_runs','ace_retrieval_runs','ace_retrieval_hits','task_registry')\norder by table_name;\n",
@@ -431,5 +431,5 @@
     "nats_handlers_broker_only_handlers_missing"
   ],
   "next_action": "Start NATS handlers with `cd sveltekit-frontend; npm run nats:handlers`, then rerun `npm run nats:proof-of-life:all`.",
-  "run_id": "acp-audit-1783209875164"
+  "run_id": "acp-audit-1783732784106"
 }

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-02T04:06:51.642Z",
+  "generated_at": "2026-07-11T01:20:28.512Z",
   "status": "LIVE_PASS",
   "cutoff": "CPU fp32 packet truth and queryability first; GPU/TensorRT/cuVS only as acceleration lanes.",
   "lanes": {
@@ -16,21 +16,21 @@
         "fts": true
       },
       "counts": {
-        "total": 58304,
-        "with_packet_key": 58304,
-        "with_source_ref": 58304,
-        "with_feature_id": 58304,
-        "with_source_ref_key": 58304,
-        "with_qdrant_point_id": 3092,
-        "with_packet_summary": 412,
-        "with_pgvector_embedding": 0,
+        "total": 58365,
+        "with_packet_key": 58365,
+        "with_source_ref": 58365,
+        "with_feature_id": 58365,
+        "with_source_ref_key": 58365,
+        "with_qdrant_point_id": 4713,
+        "with_packet_summary": 4180,
+        "with_pgvector_embedding": 10,
         "packet_key_pct": 100,
         "source_ref_pct": 100,
         "feature_id_pct": 100,
         "source_ref_key_pct": 100,
-        "qdrant_point_id_pct": 5.3,
-        "packet_summary_pct": 0.71,
-        "pgvector_embedding_pct": 0
+        "qdrant_point_id_pct": 8.08,
+        "packet_summary_pct": 7.16,
+        "pgvector_embedding_pct": 0.02
       },
       "fts_sample_count": 0,
       "fts_samples": []
@@ -39,8 +39,8 @@
       "status": "LIVE_PASS",
       "url": "http://127.0.0.1:6333",
       "collection": "codebase_chunks_768",
-      "points": 40573,
-      "indexed_vectors": 121704,
+      "points": 55117,
+      "indexed_vectors": 144062,
       "named_vectors": [
         "content",
         "error",
@@ -52,12 +52,12 @@
       "status": "LIVE_PASS",
       "container": "legal-ai-valkey",
       "counts": {
-        "bifrost:*": 55,
-        "bifrost:sem:packet:*": 26,
-        "bifrost:sem:feature:*": 28,
-        "ace:context:*": 1,
-        "centroid:*": 8,
-        "som:*": 62
+        "bifrost:*": 50,
+        "bifrost:sem:packet:*": 25,
+        "bifrost:sem:feature:*": 25,
+        "ace:context:*": 25,
+        "centroid:*": 0,
+        "som:*": 0
       }
     },
     "code": {

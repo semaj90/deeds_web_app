@@ -303,6 +303,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       console.error('[/api/agent/execute] Telemetry persistence error:', dbError);
     }
 
+    // Phase 3.2: Execute review cycle (proposal → execution → outcome → decision)
+    let executionReview: any = null;
+    try {
+      const { reviewAndSaveExecution } = await import('$lib/server/agent/execution-review.js');
+      executionReview = await reviewAndSaveExecution(toolResult.executionId);
+    } catch (reviewError) {
+      console.error('[/api/agent/execute] Review cycle error:', reviewError);
+      // Non-blocking: review failure doesn't fail the request
+    }
+
     // 6. Return response
     return json({
       status: 'ok',
@@ -310,6 +320,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       result: toolResult,
       nextState,
       recoveryPlan,
+      review: executionReview ? {
+        decision: executionReview.decision,
+        issues: executionReview.issues,
+        recommendation: executionReview.recommendation
+      } : null,
       timing: {
         executedAt: new Date().toISOString(),
         durationMs: toolResult.durationMs

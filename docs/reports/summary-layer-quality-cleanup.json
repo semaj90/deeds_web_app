@@ -1,13 +1,54 @@
 {
-  "generated_at": "2026-07-05T00:01:14.629Z",
+  "generated_at": "2026-07-11T01:19:15.883Z",
   "mode": "dry-run",
   "status": "PASS",
   "limit": 5000,
   "selected_rows": 581,
   "packet_cleanup": {
-    "selected": 0,
+    "selected": 10,
     "invalidated": 0,
-    "samples": []
+    "samples": [
+      {
+        "packet_key": "packet:140ace4b6035",
+        "preview": "This component provides an enhanced interface for running AI chat tests, offering improved user experience and advanced testing features over previous versions. --- **Example Usage:** (Assume this component is used within a larger chat appl"
+      },
+      {
+        "packet_key": "packet:137a99ed0439",
+        "preview": "This component demonstrates advanced bit manipulation techniques within a Svelte component structure. --- **Example Usage:** (No example usage provided) **Analysis:** The component showcases how to manipulate individual bits within a number"
+      },
+      {
+        "packet_key": "packet:068ba01d58ce",
+        "preview": "This module handles the retrieval and management of SSL/TLS certificates required for secure network connections. It provides mechanisms to locate or download the necessary root certificates. --- **Example Usage:** (No example usage provide"
+      },
+      {
+        "packet_key": "packet:0b42d349f468",
+        "preview": "This feature file seems to be a placeholder or an unclassified feature, as it lacks associated keywords. **How to summarize the code feature:** 1. **Identify the core purpose:** Determine what the feature file represents conceptually. 2. **"
+      },
+      {
+        "packet_key": "packet:11bd77a00870",
+        "preview": "--- **Analysis:** The code feature is related to caching discovery documents for the Google API Client, specifically for the `baremetalsolution.v2` service. **Conclusion:** This feature manages the local caching of metadata required by the "
+      },
+      {
+        "packet_key": "packet:114bacf03345",
+        "preview": "This feature appears to be a backup of a server endpoint file, likely containing recommendations or cleanup logic, from a specific date. --- **Example 1 (Concise):** This feature is a backup of a server endpoint file containing cleanup reco"
+      },
+      {
+        "packet_key": "packet:0e7a07301f6e",
+        "preview": "This file appears to be a transcript or set of notes from a session, containing unstructured text that requires manual review or processing to extract meaningful data. **Example Use Case:** * **Data Extraction:** Manually reviewing the text"
+      },
+      {
+        "packet_key": "packet:0dbd2c7635f8",
+        "preview": "This module handles the encoding and decoding of words within email messages. --- **Example 1: (General Functionality)** **Summary:** This module provides utilities for encoding and decoding text content found within email messages. **Examp"
+      },
+      {
+        "packet_key": "packet:076acb4c1381",
+        "preview": "This feature documentation details the process of generating and analyzing outputs from Large Language Models (LLMs). --- **How to use it:** 1. **Generation:** It outlines the steps required to prompt and execute an LLM to generate specific"
+      },
+      {
+        "packet_key": "packet:07744ae2afd6",
+        "preview": "This file processes raw transcript data, likely performing necessary cleaning, structuring, or enhancement before it can be used by downstream services. --- **Example 1 (Focus on Data Transformation):** \"This processor handles the transform"
+      }
+    ]
   },
   "actions": {
     "cleaned_reasoning_leak": 0,
@@ -18,30 +59,30 @@
     "atlas_summary_layers": {
       "total_rows": 15470,
       "summary_text_rows": 4687,
-      "embedded_rows": 1621,
+      "embedded_rows": 1721,
       "leaked_rows": 11,
       "distinct_packet_keys": 10494,
       "duplicate_rows": 4976
     },
     "atlas_packets": {
       "total_rows": 58365,
-      "summary_text_rows": 1286,
-      "leaked_rows": 0
+      "summary_text_rows": 4180,
+      "leaked_rows": 10
     }
   },
   "after": {
     "atlas_summary_layers": {
       "total_rows": 15470,
       "summary_text_rows": 4687,
-      "embedded_rows": 1621,
+      "embedded_rows": 1721,
       "leaked_rows": 11,
       "distinct_packet_keys": 10494,
       "duplicate_rows": 4976
     },
     "atlas_packets": {
       "total_rows": 58365,
-      "summary_text_rows": 1286,
-      "leaked_rows": 0
+      "summary_text_rows": 4180,
+      "leaked_rows": 10
     }
   },
   "samples": [

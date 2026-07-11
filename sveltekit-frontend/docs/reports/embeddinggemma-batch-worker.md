@@ -12,7 +12,7 @@
 - batches: 5
 - batch_size: 20
 - concurrency: 1
-- elapsed_ms: 11066
+- elapsed_ms: 5353
 - schema_failures: 0
 - schema_hints: 1
 - report_json: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend\docs\reports\embeddinggemma-batch-worker.json
