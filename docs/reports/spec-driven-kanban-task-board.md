@@ -6,12 +6,13 @@ Generated: 2026-07-05
 
 | Task | Status | Evidence |
 |---|---:|---|
-| Qdrant point ID bridge | proven bounded, partial coverage | Direct `atlas_packets.qdrant_point_id` set-payload apply patched 196/200 rows; 4 ambiguous mappings were skipped |
+| Qdrant point ID bridge | proven bounded, partial coverage | Deterministic `packet_key -> source_ref -> relative_path -> qdrant_id` bridge now materializes 4,725 rows and updates `atlas_packets.qdrant_point_id` on a bounded apply slice |
 | Tree node ID propagation | proven in Postgres, bounded mirrors | 58,365 / 58,365 packet rows; Qdrant readback matched 20/20 and Neo4j tree-only graphify passed |
 | Title ID propagation | proven in Postgres | Live readiness gate reports 58,365 / 58,365 packet rows; downstream mirrors remain derived |
-| Semantic fanout / rerank | partial | Domain topic inference still depends on widening LangExtract + EmbeddingGemma + TurboVec + BM25 + AE/KMeans/SOM coverage |
+| Semantic fanout / rerank | partial | Domain topic inference still depends on widening LangExtract + EmbeddingGemma + TurboVec + BM25 + AE/KMeans/SOM coverage; AST backfill lane is now writing bounded batches and the qdrant bridge is materially populated |
+| Domain classification readiness | ready_with_gaps | Naive Bayes and XGBoost artifacts exist; canonical RRF lane is wired; remaining blockers are AST coverage, qdrant bridge backfill, and latent/topology recompute |
 | MapReduce consolidation | proven | `mapreduce-consolidated-index.mjs --dry-run --limit 50 --slim` passes and aggregates file/import/topic evidence |
-| QLoRA dataset prep | blocked on corpus quality | Canonical labels are complete, but summary coverage is 7.16% and AST-symbol coverage is 0.88% |
+| QLoRA dataset prep | blocked on corpus quality | Canonical labels are complete, but summary coverage is 7.16% and AST-symbol coverage is 3.74% |
 | Arrow batch transport | proven bounded | 200 rows / 48 columns round-trip through Arrow IPC with stable splits, row index, and vector-buffer validation |
 | mmap registry payloads | proven bounded | HyperRAG materializer writes validated MsgPack packets and registry rows; full-corpus promotion remains pending |
 | ACP routing fan-out | wired | HMM router exists and emits bounded routing suggestions |
@@ -106,44 +107,47 @@ The existing Packet-JEPA experiment is proven but not promoted: its held-out MRR
 
 Scripts and board contracts exist.
 
-### Wired: 89%
+### Wired: 90%
 
 The live retrieval, semantic training, NB, HMM, topology audit, and bounded packet materializer lanes are connected to the real schema.
 
-### Proven: 79%
+### Proven: 80%
 
 Bounded slices and sidecar smoke tests pass, and the HyperRAG packet materializer now has a passing bounded apply slice.
 
-### Done: 62%
+### Done: 63%
 
 Core lanes are live, but the pipeline is not production-complete until the identity bridges and topology propagation are finished.
 
 ## Remaining Blockers
 
-1. Canonical packet embedding coverage for AE/JEPA/topology training
-2. AST symbol extraction coverage for structural supervision
-3. Summary coverage for comprehensive QLoRA topic training
-4. SOM assignment coverage after embeddings are versioned
-5. `qdrant_point_id` bridge materialization for mirror repair
+1. AST symbol extraction coverage for structural supervision
+2. `qdrant_point_id` bridge parity beyond the current bounded materialization slice
+3. Canonical packet embedding coverage for AE/JEPA/topology training
+4. Summary coverage for comprehensive QLoRA topic training
+5. SOM assignment coverage after embeddings are versioned
 6. Rejected-envelope archive ingestion
 7. Python CUDA training environment; native addon is ready, repo venv remains CPU-only
 8. RAPIDS/cuVS/nx-cugraph WSL2 worker lane
 
 ## Next Execution Cards
 
-1. Backfill `qdrant_point_id` by real Qdrant point IDs only.
-2. Audit `tree_node_id` mirror parity without regenerating the now-complete Postgres identity.
-3. Expand AST extraction, summaries, and canonical embedding coverage in bounded batches.
-4. Materialize SOM adjacency and topology density after embedding coverage is versioned.
-5. Add rejected-envelope archive input for mixed NB training.
-6. Keep Fuse.js out of the deep semantic/routing path.
-7. Scale the pgvector embed/write lane before reopening Qdrant tagging.
-8. Add LOD streaming as a derived zoom layer over topology fields.
-9. Treat semantic reranking and clustering as a required gate for domain topic inference.
-10. Use map-reduction to consolidate wiki-like file/topic evidence before clustering and rerank.
-11. Build the QLoRA dataset from feature/metrics evidence and canonical topic labels, not from vector IDs; block training until summary and AST gates pass.
-12. Add a bounded HyperRAG packet materializer that joins RPC input, packet assembly, validator output, and telemetry before any cache promotion.
-13. Promote the service-worker cache lane by replacing dummy Redis/SOM clients, using stable request hashes, and adding packet LOD manifests.
+1. Expand the AST backfill lane beyond the bounded sample, then rerun the progressive semantic compiler gate.
+2. Backfill `lexical_features` and `used_concepts` to match the new AST lane.
+3. Materialize `qdrant_point_id` using only the deterministic `packet_key -> source_ref -> relative_path -> qdrant_id` bridge.
+4. Audit `tree_node_id` mirror parity without regenerating the now-complete Postgres identity.
+5. Expand canonical embeddings in bounded batches, then recompute `latent_64`, KMeans, SOM, and community metrics.
+6. Add rejected-envelope archive input for mixed NB training.
+7. Keep Fuse.js out of the deep semantic/routing path.
+8. Scale the pgvector embed/write lane before reopening Qdrant tagging.
+9. Add LOD streaming as a derived zoom layer over topology fields.
+10. Treat semantic reranking and clustering as a required gate for domain topic inference.
+11. Use map-reduction to consolidate wiki-like file/topic evidence before clustering and rerank.
+12. Build the QLoRA dataset from feature/metrics evidence and canonical topic labels, not from vector IDs; block training until summary and AST gates pass.
+13. Add a bounded HyperRAG packet materializer that joins RPC input, packet assembly, validator output, and telemetry before any cache promotion.
+14. Promote the service-worker cache lane by replacing dummy Redis/SOM clients, using stable request hashes, and adding packet LOD manifests.
+15. Backfill `qdrant_point_id` using the deterministic identity bridge once AST and lexical evidence stabilize.
+16. Wire the domain-classification readiness audit into the startup board so top-k samples and gaps are visible on every run.
 
 ## Missing Script Prompts
 
@@ -199,3 +203,20 @@ Qdrant-bridged features: missing 979
 | 249 | missing_summary | run-build-script-build-script-build.json | 160 | 160 | 0 | 1240 | npm run atlas:phase8:step3:langextract:apply |
 | 247 | missing_summary | LLMS.md | 156 | 156 | 0 | 1218 | npm run atlas:phase8:step3:langextract:apply |
 | 223 | missing_summary | __init__.pyi | 129 | 129 | 0 | 1017 | npm run atlas:phase8:step3:langextract:apply |
+
+## Domain Classification Readiness
+
+- Naive Bayes model artifact: present
+- Naive Bayes predictions: present
+- XGBoost feature export: present
+- XGBoost training report: present
+- XGBoost reranker model: present
+- Canonical RRF lane: wired
+- Top-k sample mapping: generated from real packet evidence
+
+Current blocker order:
+
+1. AST symbol backfill
+2. Qdrant bridge backfill
+3. Canonical embedding / latent / SOM recompute
+4. Summary coverage expansion for topic labels

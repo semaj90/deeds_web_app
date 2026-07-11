@@ -1,0 +1,187 @@
+{
+  "generated_at": "2026-07-11T06:39:45.207Z",
+  "overall_status": "READY_WITH_GAPS",
+  "tables": {
+    "atlas_packets": true,
+    "atlas_packet_features": true,
+    "atlas_packet_metrics": true,
+    "codebase_chunk_index": true
+  },
+  "coverage_percent": {
+    "source_ref": 100,
+    "feature_id": 100,
+    "title_id": 100,
+    "tree_node_id": 100,
+    "domain_class": 100,
+    "qdrant_point_id": 8.1,
+    "summary": 7.16,
+    "pagerank": 21.62,
+    "som": 7.17,
+    "latent_64": 2.14,
+    "used_concepts": 99.99,
+    "lexical_features": 99.98,
+    "ast_symbols": 3.74,
+    "entities": 0,
+    "content_embedding": 99.65,
+    "naive_bayes_predictions": 100,
+    "jepa_similarity": 100,
+    "kmeans_cluster": 0
+  },
+  "artifacts": {
+    "naive_bayes_model": true,
+    "naive_bayes_report": true,
+    "naive_bayes_predictions": true,
+    "xgboost_features_csv": true,
+    "xgboost_features_meta": true,
+    "xgboost_training_report": true,
+    "xgboost_reranker_model": true
+  },
+  "rrf": {
+    "helper_present": true,
+    "canonical_lane_wired": true,
+    "blocker": "none"
+  },
+  "gates": [
+    {
+      "name": "identity spine",
+      "status": "PASS",
+      "evidence": "100% source_ref, 100% tree_node_id",
+      "target": ">=95%"
+    },
+    {
+      "name": "feature envelope",
+      "status": "FAIL",
+      "evidence": "used_concepts=99.99%, lexical=99.98%, ast=3.74%",
+      "target": ">=95%"
+    },
+    {
+      "name": "metric lane",
+      "status": "PARTIAL",
+      "evidence": "nb=100%, jepa=100%, kmeans=0%, som=0%",
+      "target": ">=95%"
+    },
+    {
+      "name": "embedding corpus",
+      "status": "PASS",
+      "evidence": "99.65% content_embedding",
+      "target": ">=95%"
+    },
+    {
+      "name": "retrieval mirror",
+      "status": "FAIL",
+      "evidence": "8.1% qdrant_point_id",
+      "target": ">=95%"
+    },
+    {
+      "name": "topology readiness",
+      "status": "FAIL",
+      "evidence": "som=7.17%, latent_64=2.14%, pagerank=21.62%",
+      "target": ">=95%"
+    },
+    {
+      "name": "Naive Bayes lane",
+      "status": "PASS",
+      "evidence": "model present; report=present",
+      "target": "train + apply"
+    },
+    {
+      "name": "XGBoost lane",
+      "status": "PASS",
+      "evidence": "csv=present, meta=present, report=present, model=present",
+      "target": "export + train + serve"
+    },
+    {
+      "name": "RRF activation",
+      "status": "FAIL",
+      "evidence": "helpers present; unified-orchestrator TODO=no",
+      "target": "wire canonical lane"
+    }
+  ],
+  "topk_samples": [
+    {
+      "packet_key": "packet:055b9cde2d66",
+      "source_ref": "sveltekit-frontend/src/routes/api/codebase-index/karpathy-tag/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 10
+    },
+    {
+      "packet_key": "packet:07d5bb528993",
+      "source_ref": "sveltekit-frontend/src/routes/api/codebase/apply-patch/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 10
+    },
+    {
+      "packet_key": "packet:156fa8119692",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/citations/law/[citation]/+page.server.ts",
+      "feature_id": "sveltekit-frontend.+page.server",
+      "title_id": "page.server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 10
+    },
+    {
+      "packet_key": "packet:18742adf0d17",
+      "source_ref": "sveltekit-frontend/src/routes/api/search/filters/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 10
+    },
+    {
+      "packet_key": "packet:1ec59f25ab9e",
+      "source_ref": "sveltekit-frontend/src/routes/api/tools/batch/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 9
+    },
+    {
+      "packet_key": "packet:2c90dd0b0846",
+      "source_ref": "sveltekit-frontend/src/routes/api/sse/chat/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 9
+    },
+    {
+      "packet_key": "packet:2dd3a5e049f5",
+      "source_ref": "sveltekit-frontend/src/lib/server/analytics/unified-research-query.ts",
+      "feature_id": "sveltekit-frontend.unified-research-query",
+      "title_id": "unified.research.query.ts",
+      "domain_class": "backend",
+      "evidence_score": 9
+    },
+    {
+      "packet_key": "packet:2ee20d8a0277",
+      "source_ref": "sveltekit-frontend/src/routes/(dev)/odin/+page.server.ts",
+      "feature_id": "sveltekit-frontend.+page.server",
+      "title_id": "page.server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 9
+    },
+    {
+      "packet_key": "packet:3779986ad404",
+      "source_ref": "sveltekit-frontend/src/routes/api/cache/metrics/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 9
+    },
+    {
+      "packet_key": "packet:3e92ce301de6",
+      "source_ref": "sveltekit-frontend/src/routes/api/error-brain/diagnosis-history/similar/+server.ts",
+      "feature_id": "sveltekit-frontend.+server",
+      "title_id": "server.ts",
+      "domain_class": "frontend",
+      "evidence_score": 9
+    }
+  ],
+  "next_actions": [
+    "Backfill atlas_packet_features.ast_symbols, lexical_features, and used_concepts, then rerun the progressive semantic compiler gate.",
+    "Materialize the packet_key → qdrant_point_id bridge before any payload mutation or RRF fan-out.",
+    "Recompute latent_64, KMeans, SOM, and pagerank/community metrics after the feature lane stabilizes."
+  ]
+}

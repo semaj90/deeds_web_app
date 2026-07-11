@@ -86,6 +86,43 @@ Do **not** use DSPy as a substitute for:
   - [ ] PCA/AE latent baseline
   - [ ] Packet-JEPA 128
 
+### P0.5 — Gradient-checkpoint trade-off benchmark
+
+Do not assume checkpointing is beneficial. Measure it as a separate experiment lane.
+
+Benchmark matrix:
+
+| Profile | Precision | Checkpointing | Microbatch |
+|---|---|---|---|
+| A | FP32 | Off | 256 |
+| B | FP16 AMP | Off | 256 |
+| C | FP16 AMP | On | 256 |
+| D | FP16 AMP | On | 512 or highest safe |
+| E | FP16 AMP | On | smaller batch + accumulation |
+
+Record for each profile:
+
+- peak allocated VRAM
+- peak reserved VRAM
+- examples/second
+- step latency
+- epoch latency
+- final validation loss
+- gradient norm
+- NaN/Inf count
+- OOM count
+- checkpoint size
+
+Promotion gates:
+
+- Peak VRAM falls by at least 20%, or checkpointing stays off.
+- Validation loss regression stays below 1%.
+- No NaN or Inf gradients.
+- Throughput loss is measured and accepted.
+- Resume-from-checkpoint reproduces the next step within tolerance.
+- Model artifact includes training config and corpus hash.
+- Gradient checkpointing defaults off for inference.
+
 ### P1 — Evaluation gate
 
 - [ ] Record held-out `Recall@10`

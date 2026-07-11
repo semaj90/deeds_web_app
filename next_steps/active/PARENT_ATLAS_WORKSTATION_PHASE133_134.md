@@ -113,6 +113,9 @@ Tasks:
 - [ ] Keep ONNX and browser lanes separate from server GPU lanes
 - [ ] Keep any `.pt` / Torch export path tied to a concrete training script
 - [ ] Keep SOM/KMeans writeback as derived metrics
+- [ ] Benchmark gradient checkpointing as a trade-off, not a default
+- [ ] Promote checkpointing only if peak VRAM drops by at least 20% and validation loss regression stays below 1%
+- [ ] Record peak allocated VRAM, peak reserved VRAM, examples/second, step latency, epoch latency, gradient norm, NaN/Inf count, OOM count, and checkpoint size for every profile
 
 ### 5. Browser synthesis lane
 
@@ -142,6 +145,7 @@ These are the smoke/eval conditions that should pass before the lane is consider
 - JEPA evaluation still beats baseline before promotion
 - Arrow IPC replay has no duplicate packet keys, missing required columns, invalid splits, or malformed float buffers
 - QLoRA/AE/JEPA promotion is blocked when the live coverage report is below threshold
+- Gradient checkpointing stays off by default unless the benchmark matrix proves the trade-off
 
 Current command: `npm run atlas:training:readiness`
 
@@ -157,6 +161,7 @@ Current result: `READY_WITH_BLOCKERS`. Arrow and bounded HyperRAG materializatio
 4. Wire the GPU topology lane to derived metrics.
 5. Keep browser ONNX and server GPU lanes separated.
 6. Re-run the JEPA gate only after the embedding coverage is real.
+7. Run the gradient-checkpoint benchmark matrix before turning checkpointing on by default.
 
 ---
 

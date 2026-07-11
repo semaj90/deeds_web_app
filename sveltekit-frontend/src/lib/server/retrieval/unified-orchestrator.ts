@@ -17,6 +17,7 @@
 import fetch from 'node-fetch';
 import { Pool } from 'pg';
 import { getRgPool, type RgSearchOptions } from '$lib/server/search/rg-pool.js';
+import { combineRRFLanes } from './rrf-combiner-utils.js';
 
 export interface RetrievalConfig {
   qdrant: { host: string; port: number };
@@ -99,6 +100,13 @@ const DEFAULT_CONFIG: RetrievalConfig = {
   gemma4: { host: '127.0.0.1', port: 8090 }
 };
 
+const RRF_CONSTANT_K = 60;
+const RRF_LANE_WEIGHTS = {
+  dense_vector: 1.0,
+  turbovec: 0.8,
+  lexical: 0.6
+} as const;
+
 /**
  * STAGE 1: Generate 768-dim embedding via embeddinggemma
  */
@@ -160,8 +168,6 @@ async function qdrantSearch(
     const denseData = await denseRes.json() as { result: Array<{ id: string; score: number; payload: any }> };
     const denseHits = denseData.result || [];
 
-    // TODO: RRF fusion (combine dense + lexical + payload filters)
-    // For now, return dense hits only
     return denseHits.map((hit, idx) => ({
       ...hit,
       payload: { ...hit.payload, qdrant_rank: idx + 1 }
@@ -282,88 +288,85 @@ async function postgresJoin(
  * Combine all ranks using weighted formula:
  * score = 0.30·qdrant + 0.20·turbovec + 0.20·rg_lexical + 0.15·ast + 0.10·postgres + 0.05·freshness
  */
-function rankCandidates(
+function laneContribution(rank: number, laneWeight: number): number {
+  return laneWeight / (RRF_CONSTANT_K + rank);
+}
+
+function buildRrfLaneMap(
+  qdrantHits: Array<{ id: string; score: number; payload: any }>,
+  turboVecHits: Array<{ id: string; score: number; rank: number }>,
+  rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }>,
+): Map<string, Array<{ id: string; rrfContribution: number; rank: number; metadata?: Record<string, unknown>; text?: string }>> {
+  const laneMap = new Map<string, Array<{ id: string; rrfContribution: number; rank: number; metadata?: Record<string, unknown>; text?: string }>>();
+
+  laneMap.set(
+    'dense_vector',
+    qdrantHits.map((hit, idx) => ({
+      id: hit.id,
+      rank: idx + 1,
+      rrfContribution: laneContribution(idx + 1, RRF_LANE_WEIGHTS.dense_vector),
+      metadata: {
+        source: 'qdrant_dense',
+        score: hit.score,
+        payload: hit.payload
+      },
+      text: hit.payload?.relative_path ?? hit.payload?.source_ref ?? hit.id
+    }))
+  );
+
+  laneMap.set(
+    'turbovec',
+    turboVecHits.map((hit) => ({
+      id: hit.id,
+      rank: hit.rank,
+      rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.turbovec),
+      metadata: { source: 'turbovec', score: hit.score }
+    }))
+  );
+
+  laneMap.set(
+    'lexical',
+    rgLexicalHits.map((hit) => ({
+      id: hit.id,
+      rank: hit.rank,
+      rrfContribution: laneContribution(hit.rank, RRF_LANE_WEIGHTS.lexical),
+      metadata: { source: 'rg_pool', score: hit.score, file: hit.file, line: hit.line },
+      text: `${hit.file}:${hit.line}`
+    }))
+  );
+
+  return laneMap;
+}
+
+export function rankCandidates(
   qdrantHits: Array<{ id: string; score: number; payload: any }>,
   turboVecHits: Array<{ id: string; score: number; rank: number }>,
   rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }>,
   postgresMap: Map<string, any>
 ): RankedCandidate[] {
-  const turboVecMap = new Map(turboVecHits.map((h) => [h.id, h]));
-  const rgLexicalMap = new Map(rgLexicalHits.map((h) => [h.id, h]));
-  const scores = new Map<string, RankedCandidate>();
+  const combined = combineRRFLanes(buildRrfLaneMap(qdrantHits, turboVecHits, rgLexicalHits));
 
-  // Qdrant contribution (0.30 weight)
-  qdrantHits.forEach((hit, idx) => {
-    const normalized = 1 - (idx / Math.max(qdrantHits.length, 1));
-    const pgData = postgresMap.get(hit.id) || { relative_path: 'N/A', symbol: 'N/A', kind: 'N/A' };
+  return combined
+    .map((result) => {
+      const pgData = postgresMap.get(result.id) || { relative_path: 'N/A', symbol: 'N/A', kind: 'N/A' };
+      const breakdown = new Map(result.rrfBreakdown.map((item) => [item.lane, item.contribution]));
 
-    scores.set(hit.id, {
-      id: hit.id,
-      score: hit.score,
-      path: pgData.relative_path,
-      symbol: pgData.symbol,
-      kind: pgData.kind,
-      rg_matches: 0,
-      ranks: {
-        qdrant_dense: normalized
-      }
-    });
-  });
-
-  // TurboVec contribution (0.20 weight)
-  turboVecMap.forEach((tv, id) => {
-    const normalized = 1 - (tv.rank / Math.max(turboVecHits.length, 1));
-    const existing = scores.get(id);
-    if (existing) {
-      existing.ranks.turbovec = normalized;
-      existing.score = (existing.score * 0.6) + (tv.score * 0.4);
-    }
-  });
-
-  // rg-pool lexical contribution (0.20 weight)
-  rgLexicalMap.forEach((rg, id) => {
-    const normalized = rg.score;
-    const existing = scores.get(id);
-    if (existing) {
-      existing.ranks.rg_lexical = normalized;
-      existing.rg_matches = (existing.rg_matches || 0) + 1;
-    } else {
-      // Create new entry if only rg-pool matched
-      const pgData = postgresMap.get(id) || { relative_path: rg.file, symbol: 'N/A', kind: 'N/A' };
-      scores.set(id, {
-        id,
-        score: 0,
+      return {
+        id: result.id,
+        score: result.finalScore,
         path: pgData.relative_path,
         symbol: pgData.symbol,
         kind: pgData.kind,
-        rg_matches: 1,
+        rg_matches: breakdown.has('lexical') ? 1 : 0,
         ranks: {
-          rg_lexical: normalized
+          qdrant_dense: breakdown.get('dense_vector'),
+          turbovec: breakdown.get('turbovec'),
+          rg_lexical: breakdown.get('lexical')
         }
-      });
-    }
-  });
-
-  // Compute final blended scores
-  const ranked = Array.from(scores.values()).map((c) => {
-    const qdrant_w = c.ranks.qdrant_dense || 0;
-    const turbovec_w = c.ranks.turbovec || 0;
-    const rg_lexical_w = c.ranks.rg_lexical || 0;
-    const blended =
-      0.30 * qdrant_w +
-      0.20 * turbovec_w +
-      0.20 * rg_lexical_w +
-      0.15 * 0 + // ast_relation (placeholder)
-      0.10 * 1 + // postgres (always present)
-      0.05 * 1; // freshness (placeholder)
-
-    return {
-      ...c,
-      score: blended
-    };
-  });
-
-  return ranked.sort((a, b) => b.score - a.score).slice(0, 10);
+      } satisfies RankedCandidate;
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
 }
 
 /**

@@ -30,15 +30,15 @@ if (-not (Test-Path $ScriptPath)) {
     throw "Runner not found: $ScriptPath"
 }
 
-$args = @('node', $ScriptPath)
+[string[]]$cmdArgs = @('node', $ScriptPath)
 if ($DryRun) {
-    $args += '--dry-run'
+    $cmdArgs += '--dry-run'
 }
 
-& $args[0] $args[1..($args.Count - 1)]
+& $cmdArgs[0] $cmdArgs[1..($cmdArgs.Count - 1)]
 if ($LASTEXITCODE -ne 0) {
     throw "Phase 4 runner failed with exit code $LASTEXITCODE"
 }
 
 Write-Host ''
-Write-Host '[done] Phase 4 launcher co
+Write-Host '[done] Phase 4 launcher completed.'

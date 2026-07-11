@@ -33,6 +33,7 @@ const pgPool = new pg.Pool({ connectionString: POSTGRES_URL });
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
 const BATCH_SIZE = Number(process.argv.find((value) => value.startsWith('--batch-size='))?.split('=')[1] ?? 500);
+const LIMIT = Number(process.argv.find((value) => value.startsWith('--limit='))?.split('=')[1] ?? 0);
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║  Qdrant Point ID Bridge                                        ║');
@@ -40,13 +41,49 @@ console.log('║  Deterministic packet_key ↔ qdrant_point_id(s) mapping       
 console.log(`║  Mode: ${APPLY ? 'APPLY' : 'DRY-RUN'.padEnd(54)}║`);
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
 console.log(`   Batch size: ${BATCH_SIZE}`);
+if (LIMIT > 0) console.log(`   Limit: ${LIMIT}`);
+
+function normalizeJoinRef(value) {
+  return String(value ?? '')
+    .replace(/\\/g, '/')
+    .replace(/^[.\\/]+/, '')
+    .replace(/^file:/i, '')
+    .replace(/^C:\/Users\/james\/Videos\/deeds-web-app\//i, '')
+    .replace(/^sveltekit-frontend\//i, '')
+    .trim();
+}
+
+function joinRefVariants(value) {
+  const normalized = normalizeJoinRef(value);
+  if (!normalized) return [];
+  const variants = new Set([normalized]);
+  if (normalized.startsWith('src/')) variants.add(`sveltekit-frontend/${normalized}`);
+  if (normalized.startsWith('sveltekit-frontend/src/')) variants.add(normalized.replace(/^sveltekit-frontend\//, ''));
+  return [...variants];
+}
+
+function candidatePacketRefs(packet) {
+  return [
+    packet.file_path,
+    packet.source_path,
+    packet.canonical_source_ref,
+    packet.source_ref,
+  ].flatMap(joinRefVariants);
+}
+
+function candidateChunkRefs(chunk) {
+  return [
+    chunk.source_ref,
+    chunk.relative_path,
+  ].flatMap(joinRefVariants);
+}
 
 async function bridgeQdrantPoints() {
   try {
     console.log('📊 Step 1: Audit current state\n');
 
     // Count atlas_packets with source_ref
-    const packetRes = await pgPool.query(`
+    const packetRowsRes = await pgPool.query(`
       SELECT
         COUNT(*) total,
         COUNT(CASE WHEN source_ref IS NOT NULL THEN 1 END) with_ref,
@@ -63,7 +100,7 @@ async function bridgeQdrantPoints() {
       with_source_path: packetWithSourcePath,
       with_directory_path: packetWithDirectoryPath,
       with_qdrant_point_id: packetWithQdrantPointId,
-    } = packetRes.rows[0];
+    } = packetRowsRes.rows[0];
     console.log(`   Atlas packets: ${packetTotal} (${packetWithRef} with source_ref)`);
     console.log(`   Canonical refs: ${packetWithCanonical}`);
     console.log(`   Source paths:   ${packetWithSourcePath}`);
@@ -95,56 +132,66 @@ async function bridgeQdrantPoints() {
         ON packet_qdrant_bridge (source_ref);
     `);
 
-    // Join: atlas_packets + codebase_chunk_index
-    // Goal: for each packet_key, resolve one concrete qdrant_point_id and persist provenance
-    const bridgeRes = await pgPool.query(`
+    // Load canonical packets and chunk index separately, then join in JS using
+    // the same provenance normalization logic the other Atlas bridge lanes use.
+    const packetRes = await pgPool.query(`
       SELECT
-        ap.packet_key,
-        ap.source_ref,
-        ap.canonical_source_ref,
-        ap.source_ref_key,
-        ap.source_path,
-        ap.file_path,
-        ap.directory_path,
-        ap.feature_id,
-        ap.title_id,
-        ap.tree_node_id,
-        ap.feature_label,
-        ap.concept_ids,
-        ap.domain_class,
-        ap.community_id,
-        ap.som_cluster,
-        ap.qdrant_point_id,
-        COUNT(DISTINCT cci.id)::int as chunk_count,
-        array_agg(DISTINCT NULLIF(cci.qdrant_id::text, '')) FILTER (WHERE NULLIF(cci.qdrant_id::text, '') IS NOT NULL) AS chunk_qdrant_ids,
-        array_agg(DISTINCT NULLIF(cci.relative_path, '')) FILTER (WHERE NULLIF(cci.relative_path, '') IS NOT NULL) AS chunk_relative_paths
-      FROM atlas_packets ap
-      LEFT JOIN codebase_chunk_index cci
-        ON cci.relative_path = COALESCE(
-          NULLIF(ap.file_path, ''),
-          NULLIF(ap.source_path, ''),
-          NULLIF(ap.canonical_source_ref, ''),
-          NULLIF(ap.source_ref, '')
-        )
-      WHERE COALESCE(NULLIF(ap.source_ref, ''), NULLIF(ap.canonical_source_ref, ''), NULLIF(ap.source_path, ''), NULLIF(ap.file_path, '')) IS NOT NULL
-      GROUP BY
-        ap.packet_key,
-        ap.source_ref,
-        ap.canonical_source_ref,
-        ap.source_ref_key,
-        ap.source_path,
-        ap.file_path,
-        ap.directory_path,
-        ap.feature_id,
-        ap.title_id,
-        ap.tree_node_id,
-        ap.feature_label,
-        ap.concept_ids,
-        ap.domain_class,
-        ap.community_id,
-        ap.som_cluster,
-        ap.qdrant_point_id
+        packet_key,
+        source_ref,
+        canonical_source_ref,
+        source_ref_key,
+        source_path,
+        file_path,
+        directory_path,
+        feature_id,
+        title_id,
+        tree_node_id,
+        feature_label,
+        concept_ids,
+        domain_class,
+        community_id,
+        som_cluster,
+        qdrant_point_id
+      FROM atlas_packets
+      WHERE COALESCE(NULLIF(source_ref, ''), NULLIF(canonical_source_ref, ''), NULLIF(source_path, ''), NULLIF(file_path, '')) IS NOT NULL
+      ${LIMIT > 0 ? 'LIMIT ' + Number(LIMIT) : ''}
     `);
+
+    const chunkRes = await pgPool.query(`
+      SELECT
+        id,
+        qdrant_id,
+        relative_path,
+        source_ref
+      FROM codebase_chunk_index
+      WHERE qdrant_id IS NOT NULL
+    `);
+
+    const chunkMap = new Map();
+    for (const chunk of chunkRes.rows) {
+      for (const ref of candidateChunkRefs(chunk)) {
+        if (!chunkMap.has(ref)) chunkMap.set(ref, []);
+        chunkMap.get(ref).push({
+          qdrant_id: String(chunk.qdrant_id),
+          relative_path: chunk.relative_path ?? chunk.source_ref ?? null,
+        });
+      }
+    }
+
+    const bridgeRes = {
+      rows: packetRes.rows.map((packet) => {
+        const candidates = candidatePacketRefs(packet)
+          .flatMap((ref) => chunkMap.get(ref) ?? []);
+        const uniqueIds = [...new Set(candidates.map((item) => item.qdrant_id))];
+        const uniquePaths = [...new Set(candidates.map((item) => item.relative_path).filter(Boolean))];
+        return {
+          ...packet,
+          chunk_count: candidates.length,
+          chunk_qdrant_ids: uniqueIds,
+          chunk_relative_paths: uniquePaths,
+        };
+      }),
+    };
 
     let validationFailures = 0;
     const validatedRows = [];
@@ -213,15 +260,15 @@ async function bridgeQdrantPoints() {
               ? String(row.chunk_qdrant_ids[0])
               : null);
 
-          const resolvedRelativePath =
-            (Array.isArray(row.chunk_relative_paths) && row.chunk_relative_paths.length > 0
-              ? String(row.chunk_relative_paths[0])
-              : null) ||
-            row.source_path ||
-            row.file_path ||
-            row.canonical_source_ref ||
-            row.source_ref ||
-            null;
+      const resolvedRelativePath =
+        (Array.isArray(row.chunk_relative_paths) && row.chunk_relative_paths.length > 0
+          ? String(row.chunk_relative_paths[0])
+          : null) ||
+        row.source_path ||
+        row.file_path ||
+        row.canonical_source_ref ||
+        row.source_ref ||
+        null;
 
           if (!resolvedPointId) continue;
 
