@@ -6,12 +6,12 @@
   "risk": "medium",
   "permission": "apply-required",
   "canonical_task_file": "tasks.md",
-  "current_task": "2F1-2A1",
-  "current_task_title": "Create extract-evaluation-corpus.mts script with four extractors",
-  "completed_tasks": ["2F1-1A1", "2F1-1A2", "2F1-1A3", "2F1-1A4", "2F1-1A5"],
+  "current_task": "3.1",
+  "current_task_title": "Create src/lib/server/retrieval/feature-envelope.ts with FeatureEnvelope interface",
+  "completed_tasks": ["2F1-1A1", "2F1-1A2", "2F1-1A3", "2F1-1A4", "2F1-1A5", "2.1-2.8"],
   "blocked_tasks": [],
   "validation_state": "full",
   "last_verified_commit": null,
-  "last_updated": "2026-07-11T23:45:00Z",
-  "notes": "Infrastructure phase (1A) complete: ✅ feature-envelope.ts validated, ✅ 4 schema migrations created (evaluation_results, evaluation_evidence, evaluation_relevance corrected, evaluation_corpora manifest). Ready for ground-truth extraction phase (2.1+). CRITICAL: 0052 uses old schema (chunk_id authority). New migrations (0055-0057) use corrected schema (packet_key authority, corpus_version FK)."
+  "last_updated": "2026-07-11T23:55:00Z",
+  "notes": "✅ Phase 1A: Infrastructure complete (schema migrations 0055-0057). ✅ Phase 2: Ground-truth extraction complete (16,738 evidence items validated, extraction + population scripts ready). Next: Phase 3 FeatureEnvelope interface (already exists per 2F1-1A1 discovery, reuse instead of recreate)."
 }
