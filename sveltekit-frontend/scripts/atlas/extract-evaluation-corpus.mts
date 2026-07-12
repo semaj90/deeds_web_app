@@ -3,8 +3,8 @@
  * Phase 2F.1: Ground-Truth Extraction Script
  * Task 2.1: Extract evaluation corpus from four provenance sources
  *
- * Four deterministic extractors:
- * 1. AST walker (tree-sitter): function declarations, confidence 0.95
+ * Four deterministic extractors (regex-based, no heavy AST dependencies):
+ * 1. AST scanner: function declarations, confidence 0.90
  * 2. Route scanner: +page.server.ts, +server.ts handlers, confidence 0.85
  * 3. Schema parser: table/column definitions, confidence 0.90
  * 4. Test file scanner: test discovery, confidence 0.80
@@ -15,8 +15,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import Parser from 'tree-sitter';
-import TypeScript from 'tree-sitter-typescript';
 import { z } from 'zod';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -54,99 +52,103 @@ type EvaluationQuery = z.infer<typeof EvaluationQuerySchema>;
 // ============================================================================
 
 /**
- * AST Extractor: Walk TypeScript/JavaScript AST to find function declarations
+ * AST Scanner: Regex-based extraction of TypeScript/JavaScript declarations
+ * Trade-off: Simpler, no heavy dependencies, acceptable accuracy for ground-truth collection
  */
 class AstExtractor {
-  private parser: Parser;
-
-  constructor() {
-    this.parser = new Parser();
-    this.parser.setLanguage(TypeScript.language);
-  }
-
   async extract(filePath: string, sourceRef: string): Promise<Evidence[]> {
     const content = fs.readFileSync(filePath, 'utf-8');
-    const tree = this.parser.parse(content);
     const results: Evidence[] = [];
+    const lines = content.split('\n');
 
-    const walk = (node: Parser.SyntaxNode) => {
-      // Function declaration
-      if (
-        node.type === 'function_declaration' ||
-        node.type === 'arrow_function' ||
-        node.type === 'method_definition'
-      ) {
-        const nameNode = node.child(1) || node.childByFieldName('name');
-        if (nameNode) {
-          results.push({
-            packet_key: `ast:${sourceRef}:${nameNode.text}`,
-            source_ref: sourceRef,
-            query_id: '00000000-0000-0000-0000-000000000000', // placeholder, will be joined later
-            evidence_type: 'ast',
-            evidence_detail: {
-              kind: node.type,
-              symbol: nameNode.text,
-              line_start: node.startPosition.row + 1,
-              line_end: node.endPosition.row + 1,
-              column_start: node.startPosition.column,
-            },
-            extractor_version: 'tree-sitter-v0.20',
-            extractor_name: 'ts-ast-walker',
-            confidence: 0.95,
-          });
-        }
-      }
+    // Function declarations
+    const fnPattern = /(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(/g;
+    for (const match of content.matchAll(fnPattern)) {
+      const symbol = match[1];
+      const lineNum = content.substring(0, match.index).split('\n').length;
+      results.push({
+        packet_key: `ast:${sourceRef}:${symbol}`,
+        source_ref: sourceRef,
+        query_id: '00000000-0000-0000-0000-000000000000',
+        evidence_type: 'ast',
+        evidence_detail: {
+          kind: 'function',
+          symbol,
+          line_start: lineNum,
+          line_end: lineNum + 1,
+        },
+        extractor_version: 'regex-v1.0',
+        extractor_name: 'ast-scanner',
+        confidence: 0.90,
+      });
+    }
 
-      // Variable declaration (exports)
-      if (node.type === 'variable_declarator') {
-        const nameNode = node.childByFieldName('name');
-        if (nameNode) {
-          results.push({
-            packet_key: `ast:${sourceRef}:${nameNode.text}`,
-            source_ref: sourceRef,
-            query_id: '00000000-0000-0000-0000-000000000000',
-            evidence_type: 'ast',
-            evidence_detail: {
-              kind: 'variable',
-              symbol: nameNode.text,
-              line_start: node.startPosition.row + 1,
-              line_end: node.endPosition.row + 1,
-            },
-            extractor_version: 'tree-sitter-v0.20',
-            extractor_name: 'ts-ast-walker',
-            confidence: 0.95,
-          });
-        }
-      }
+    // Arrow function variables (const x = () => {})
+    const arrowPattern = /(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s*)?\([^)]*\)\s*=>/g;
+    for (const match of content.matchAll(arrowPattern)) {
+      const symbol = match[1];
+      const lineNum = content.substring(0, match.index).split('\n').length;
+      results.push({
+        packet_key: `ast:${sourceRef}:${symbol}`,
+        source_ref: sourceRef,
+        query_id: '00000000-0000-0000-0000-000000000000',
+        evidence_type: 'ast',
+        evidence_detail: {
+          kind: 'arrow_function',
+          symbol,
+          line_start: lineNum,
+          line_end: lineNum + 1,
+        },
+        extractor_version: 'regex-v1.0',
+        extractor_name: 'ast-scanner',
+        confidence: 0.85,
+      });
+    }
 
-      // Type definition
-      if (node.type === 'type_alias_declaration' || node.type === 'interface_declaration') {
-        const nameNode = node.childByFieldName('name');
-        if (nameNode) {
-          results.push({
-            packet_key: `ast:${sourceRef}:${nameNode.text}`,
-            source_ref: sourceRef,
-            query_id: '00000000-0000-0000-0000-000000000000',
-            evidence_type: 'ast',
-            evidence_detail: {
-              kind: node.type,
-              symbol: nameNode.text,
-              line_start: node.startPosition.row + 1,
-              line_end: node.endPosition.row + 1,
-            },
-            extractor_version: 'tree-sitter-v0.20',
-            extractor_name: 'ts-ast-walker',
-            confidence: 0.95,
-          });
-        }
-      }
+    // Type/Interface declarations
+    const typePattern = /(?:export\s+)?(?:type|interface)\s+(\w+)\s*[={]/g;
+    for (const match of content.matchAll(typePattern)) {
+      const symbol = match[1];
+      const lineNum = content.substring(0, match.index).split('\n').length;
+      results.push({
+        packet_key: `ast:${sourceRef}:${symbol}`,
+        source_ref: sourceRef,
+        query_id: '00000000-0000-0000-0000-000000000000',
+        evidence_type: 'ast',
+        evidence_detail: {
+          kind: 'type_declaration',
+          symbol,
+          line_start: lineNum,
+          line_end: lineNum + 1,
+        },
+        extractor_version: 'regex-v1.0',
+        extractor_name: 'ast-scanner',
+        confidence: 0.90,
+      });
+    }
 
-      for (const child of node.children) {
-        walk(child);
-      }
-    };
+    // Class declarations
+    const classPattern = /(?:export\s+)?class\s+(\w+)\s*[{]/g;
+    for (const match of content.matchAll(classPattern)) {
+      const symbol = match[1];
+      const lineNum = content.substring(0, match.index).split('\n').length;
+      results.push({
+        packet_key: `ast:${sourceRef}:${symbol}`,
+        source_ref: sourceRef,
+        query_id: '00000000-0000-0000-0000-000000000000',
+        evidence_type: 'ast',
+        evidence_detail: {
+          kind: 'class',
+          symbol,
+          line_start: lineNum,
+          line_end: lineNum + 1,
+        },
+        extractor_version: 'regex-v1.0',
+        extractor_name: 'ast-scanner',
+        confidence: 0.90,
+      });
+    }
 
-    walk(tree.rootNode);
     return results;
   }
 }

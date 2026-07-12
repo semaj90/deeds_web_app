@@ -12,6 +12,6 @@
   "blocked_tasks": [],
   "validation_state": "full",
   "last_verified_commit": null,
-  "last_updated": "2026-07-11T23:55:00Z",
-  "notes": "✅ Phase 1A: Infrastructure complete (schema migrations 0055-0057). ✅ Phase 2: Ground-truth extraction complete (16,738 evidence items validated, extraction + population scripts ready). Next: Phase 3 FeatureEnvelope interface (already exists per 2F1-1A1 discovery, reuse instead of recreate)."
+  "last_updated": "2026-07-12T04:30:00Z",
+  "notes": "✅ Phase 1A: Schema complete (6 tables, 0058 evaluation_relevance_corrected deployed). ✅ Phase 2: Full database population complete (33,398 evidence items inserted: 23,415 AST + 5,592 routes + 3,810 tests + 581 schemas; 52 evaluation_queries; 1 corpus_version manifest). Next: Phase 3 FeatureEnvelope interface (already exists, reuse) → Phase 4 evaluation runner (read real ground-truth from evaluation_relevance_corrected) → Phase 5 ablation study (6 configurations, 50 queries)."
 }
