@@ -1,0 +1,17 @@
+{
+  "change_id": "phase-2f1-real-evaluation-corpus",
+  "title": "Phase 2F.1 Real Evaluation Corpus",
+  "stage": "implementing",
+  "status": "in_progress",
+  "risk": "medium",
+  "permission": "apply-required",
+  "canonical_task_file": "tasks.md",
+  "current_task": "2F1-2A1",
+  "current_task_title": "Create extract-evaluation-corpus.mts script with four extractors",
+  "completed_tasks": ["2F1-1A1", "2F1-1A2", "2F1-1A3", "2F1-1A4", "2F1-1A5"],
+  "blocked_tasks": [],
+  "validation_state": "full",
+  "last_verified_commit": null,
+  "last_updated": "2026-07-11T23:45:00Z",
+  "notes": "Infrastructure phase (1A) complete: ✅ feature-envelope.ts validated, ✅ 4 schema migrations created (evaluation_results, evaluation_evidence, evaluation_relevance corrected, evaluation_corpora manifest). Ready for ground-truth extraction phase (2.1+). CRITICAL: 0052 uses old schema (chunk_id authority). New migrations (0055-0057) use corrected schema (packet_key authority, corpus_version FK)."
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-12T03:35:00Z",
+  "features": [
+    {
+      "change_id": "phase-2f1-real-evaluation-corpus",
+      "title": "Phase 2F.1 Real Evaluation Corpus",
+      "lane": "retrieval-evaluation",
+      "stage": "implementing",
+      "status": "in_progress",
+      "priority": "P1",
+      "risk": "medium",
+      "permission": "apply-required",
+      "task_file": "changes/phase-2f1-real-evaluation-corpus/tasks.md",
+      "status_file": "changes/phase-2f1-real-evaluation-corpus/status.json",
+      "proposal_file": "changes/phase-2f1-real-evaluation-corpus/proposal.md",
+      "design_file": "changes/phase-2f1-real-evaluation-corpus/design.md",
+      "specs_files": [
+        "changes/phase-2f1-real-evaluation-corpus/specs/real-evaluation-corpus/spec.md",
+        "changes/phase-2f1-real-evaluation-corpus/specs/deterministic-judgments/spec.md",
+        "changes/phase-2f1-real-evaluation-corpus/specs/feature-envelope-contract/spec.md",
+        "changes/phase-2f1-real-evaluation-corpus/specs/rrf-ablations/spec.md"
+      ],
+      "evidence_folder": "changes/phase-2f1-real-evaluation-corpus/evidence",
+      "completed_tasks": [
+        "2F1-1A1",
+        "2F1-1A2",
+        "2F1-1A3",
+        "2F1-1A4",
+        "2F1-1A5"
+      ],
+      "blocked_tasks": [],
+      "current_task": "2F1-2A1",
+      "total_tasks": 46,
+      "completed_count": 5,
+      "in_progress_count": 0,
+      "ready_count": 8,
+      "blocked_count": 0,
+      "validation_state": "partial",
+      "last_verified_commit": null,
+      "updated_at": "2026-07-12T03:35:00Z",
+      "depends_on": [],
+      "unblocks": [
+        "phase-2f2-ast-signal",
+        "phase-2g-langfuse-tracing"
+      ]
+    }
+  ]
+}

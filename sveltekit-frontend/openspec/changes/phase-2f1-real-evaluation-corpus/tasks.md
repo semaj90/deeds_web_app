@@ -1,9 +1,89 @@
-## 1. Database Schema Setup
+## 1. Infrastructure (Database Schema)
 
-- [ ] 1.1 Create `evaluation_queries` table with columns: id (UUID PK), query (TEXT), domain (VARCHAR), difficulty (INT), expected_count (INT), created_at (TIMESTAMP)
-- [ ] 1.2 Create `evaluation_relevance` table with columns: query_id (UUID FK), chunk_id (UUID), grade (SMALLINT 0-3), source_type (VARCHAR: AST/route/schema/test), extractor_version (VARCHAR), confidence (REAL 0-1), created_at (TIMESTAMP), PRIMARY KEY (query_id, chunk_id)
-- [ ] 1.3 Add ablation_id (INT) and lane_name (VARCHAR) columns to `phase2f_evaluation_results` table
-- [ ] 1.4 Verify schema migration applies cleanly via `npm run migrate`
+- [x] **2F1-1A1 Locate and validate FeatureEnvelope contract**
+  - Stage: validated
+  - Evidence:
+    - `src/lib/server/retrieval/feature-envelope.ts` (502 lines)
+  - Verified exports:
+    - `FeatureEnvelopeSchema` (Zod schema with chunk_id, query_id, optional signals)
+    - `DenseSignalSchema`, `LexicalSignalSchema`, `ASTSignalSchema`, `MetadataSignalSchema`, `AuthoritySignalSchema`, `RecencySignalSchema`
+    - `ABLATION_CONFIGS` (6 configurations: dense_only, lexical_only, rrf_50_50, dense_heavy, lexical_heavy, all_signals)
+    - `computeRRFScore()`, `computeWeightedScore()`, `applyAblationConfig()`
+    - Type guards: `isValidFeatureEnvelope()`, `parseFeatureEnvelope()`
+  - Decision: Reuse existing contract; do not recreate
+  - Commit: TBD (discovery phase)
+  - Validation: import resolution confirmed ✅
+
+- [x] **2F1-1A2 Create evaluation_results migration**
+  - Status: completed
+  - Depends on: `2F1-1A1` ✅
+  - Target:
+    - `drizzle/0055_evaluation_results.sql`
+    - Add `evaluation_results` table per contract corrections
+  - Acceptance:
+    - ✅ uses canonical `packet_key` (not chunk_id as authority)
+    - ✅ records `corpus_version` for snapshot freezing
+    - ✅ stores per-signal FeatureEnvelope as JSONB
+    - ✅ supports all 6 declared ablations via ablation_id
+    - ✅ RRF formula deterministic (k=60, one-indexed ranks)
+  - Validation:
+    - `npm run drizzle:check` passes
+    - schema inspection confirms columns
+    - rollback test passes
+  - Commit: TBD (migration file created)
+
+- [x] **2F1-1A3 Create evaluation_evidence migration**
+  - Status: completed
+  - Depends on: `2F1-1A2` ✅
+  - Target:
+    - `drizzle/0056_evaluation_evidence.sql` (deterministic extraction provenance)
+  - Acceptance:
+    - ✅ packet_key, source_ref, query_id, evidence_type (ast/route/schema/test/semantic)
+    - ✅ evidence_detail JSONB for type-specific structured detail
+    - ✅ extractor_version, extractor_name for version tracking
+    - ✅ confidence (0.0-1.0) for extraction reliability
+    - ✅ separates evidence extraction (deterministic) from judgment (human)
+  - Validation:
+    - migration applies cleanly
+    - indexes on query_id, evidence_type, extractor for query efficiency
+  - Commit: TBD (migration file created)
+
+- [x] **2F1-1A4 Create evaluation_relevance migration (corrected schema)**
+  - Status: completed
+  - Depends on: `2F1-1A3` ✅
+  - Target:
+    - `drizzle/0057_evaluation_relevance.sql` (human judgment with packet_key authority)
+  - Acceptance:
+    - ✅ CORRECTED from 0052: uses packet_key (not chunk_id) as canonical authority
+    - ✅ query_id, packet_key, corpus_version identity
+    - ✅ relevance_grade (0-3): 0=not relevant, 1=marginal, 2=relevant, 3=highly relevant
+    - ✅ judgment_source enum (human, synthetic, derived, audit)
+    - ✅ evidence_ids UUID[] array linking to evaluation_evidence rows
+    - ✅ content_hash for audit trail of evidence changes
+    - ✅ PRIMARY KEY (query_id, packet_key, corpus_version) enforces uniqueness per corpus
+    - ✅ confidence (0.0-1.0) for judgment reliability
+  - Validation:
+    - migration applies cleanly
+    - UNIQUE constraint prevents double-judging same query/packet/corpus
+    - schema review confirms separation of evidence from judgment
+  - Commit: TBD (migration file created)
+
+- [x] **2F1-1A5 Create evaluation_corpora manifest migration**
+  - Status: completed
+  - Depends on: `2F1-1A4` ✅
+  - Target:
+    - `drizzle/0054_evaluation_corpora.sql` (frozen corpus snapshots)
+  - Acceptance:
+    - ✅ corpus_version TEXT PRIMARY KEY
+    - ✅ git_commit, embedding_model, embedding_dimension, packet_count, qdrant_collection, qdrant_point_count
+    - ✅ embedding_model_version for model versioning
+    - ✅ query_set_hash, judgment_set_hash for reproducibility audit
+    - ✅ created_at timestamp for manifest lifecycle tracking
+  - Validation:
+    - migration applies
+    - sample manifest insertable
+    - indexes on git_commit, embedding_model, created_at for query performance
+  - Commit: TBD (migration file created)
 
 ## 2. Ground-Truth Extraction Scripts
 
