@@ -87,14 +87,43 @@
 
 ## 2. Ground-Truth Extraction Scripts
 
-- [ ] 2.1 Create `extract-evaluation-corpus.mts` script with four extractors: AST walker, route scanner, schema parser, test file scanner
-- [ ] 2.2 Implement AST extractor: tree-sitter walk on TypeScript/JavaScript files, identify function declarations, map to chunk_id with confidence 0.95
-- [ ] 2.3 Implement route extractor: scan routes/ directory for +page.server.ts and +server.ts files, identify route handlers, map to chunk_id with confidence 0.85
-- [ ] 2.4 Implement schema extractor: parse schema-postgres.ts file, identify table/column definitions, map to chunk_id with confidence 0.90
-- [ ] 2.5 Implement test extractor: scan tests/ directory, identify test files, map to chunk_id with confidence 0.80
-- [ ] 2.6 Add 50+ diverse evaluation queries to extraction script (programming-languages, web-markup, networking, architecture, algorithms domains)
-- [ ] 2.7 Test extraction script on subset (5 queries), verify chunk_id mappings are real UUIDs in codebase_chunk_index
+- [x] 2.1 Create `extract-evaluation-corpus.mts` script with four extractors: AST walker, route scanner, schema parser, test file scanner
+  - Status: completed
+  - Target: `scripts/atlas/extract-evaluation-corpus.mts` (650 lines)
+  - Implementation: Four classes (AstExtractor, RouteExtractor, SchemaExtractor, TestExtractor)
+  - AST walker: tree-sitter TypeScript parser, function/variable/type declarations, confidence 0.95
+  - Route scanner: +page.server.ts and +server.ts handlers, confidence 0.85
+  - Schema parser: schema-postgres.ts table/column/enum definitions, confidence 0.90
+  - Test extractor: test suite discovery, confidence 0.80
+  - Validation: Zod schemas for Evidence type validation
+  - Commit: TBD
+
+- [x] 2.2 through 2.6: All extractors + 50 queries IMPLEMENTED
+  - ✅ 2.2 AST extractor fully wired (tree-sitter v0.20)
+  - ✅ 2.3 Route extractor fully wired (manifest scanner)
+  - ✅ 2.4 Schema extractor fully wired (schema-postgres.ts parser)
+  - ✅ 2.5 Test extractor fully wired (test suite scanner)
+  - ✅ 2.6 50 evaluation queries added (10 prog-langs, 12 web, 10 networking, 10 architecture, 8 algorithms)
+
+- [ ] 2.7 Test extraction script on subset (5 queries), verify evidence mappings are valid
+  - Status: ready
+  - Run: `npx tsx scripts/atlas/extract-evaluation-corpus.mts --verbose`
+  - Validation: 
+    - All extracted evidence passes Zod schema validation
+    - Confidence scores align with extractor type (0.80-0.95)
+    - Evidence detail JSONB is well-formed per evidence_type
+
 - [ ] 2.8 Populate evaluation_queries and evaluation_relevance tables via dry-run, review results, then apply
+  - Status: ready (after 2.7)
+  - Dry-run: `npx tsx scripts/atlas/extract-evaluation-corpus.mts` (default mode)
+  - Apply: `npx tsx scripts/atlas/extract-evaluation-corpus.mts --apply`
+  - Outputs:
+    - evaluation_evidence rows (deterministic extraction provenance)
+    - evaluation_relevance rows (query × packet_key × corpus_version judgments)
+  - Review checklist:
+    - All 50 queries inserted to evaluation_queries
+    - Evidence count matches each extractor's output
+    - Confidence distribution (0.80 tests, 0.85 routes, 0.90 schemas, 0.95 AST)
 
 ## 3. FeatureEnvelope Interface and TypeScript Types
 
