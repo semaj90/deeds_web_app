@@ -21,9 +21,8 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 	// Check Qdrant
 	try {
-		const { QdrantClient } = await import('@qdrant/js-client-rest');
-		const { ENV } = await import('$lib/server/env.server.js');
-		const client = new QdrantClient({ url: ENV.QDRANT_URL });
+		const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+		const client = getQdrantClient();
 		const start = Date.now();
 		await client.getCollections();
 		services.qdrant = { status: 'healthy', latency: Date.now() - start };

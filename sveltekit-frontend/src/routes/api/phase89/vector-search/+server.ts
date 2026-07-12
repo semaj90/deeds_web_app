@@ -1,14 +1,10 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
-const qdrant = new QdrantClient({
-	url: ENV.QDRANT_URL
-});
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -54,6 +50,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const queryEmbedding = await generateEmbedding(query);
 
 		// Search in Qdrant using cosine similarity
+		const qdrant = getQdrantClient();
 		const searchResults = await qdrant.search('phase89_error_clusters', {
 			vector: queryEmbedding,
 			limit,

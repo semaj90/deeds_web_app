@@ -440,9 +440,8 @@ export async function getBagOfWordsTexture(
   // L3: build from Qdrant tags (lazy, non-fatal)
   if (!tile) {
     try {
-      const { QdrantClient } = await import('@qdrant/js-client-rest');
-      const { ENV } = await import('$lib/server/env.server.js');
-      const qdrant = new QdrantClient({ url: ENV.QDRANT_URL }) as unknown as {
+      const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+      const qdrant = getQdrantClient() as unknown as {
         scroll: (col: string, opts: unknown) => Promise<{ points: { id: string; payload?: Record<string, unknown> }[] }>;
         retrieve: (col: string, opts: unknown) => Promise<{ id: string; payload?: Record<string, unknown> }[]>;
       };

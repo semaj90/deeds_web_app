@@ -13,7 +13,8 @@
  *
  * Date: 2025-10-17
  */
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '../vector/qdrant-singleton.js';
+import type { QdrantClient } from '@qdrant/js-client-rest';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
 import { VECTOR_CONFIG } from '../config/vector-config.js';
@@ -102,28 +103,15 @@ export async function closeRedis(): Promise<void> {
 // ============================================================================
 // Qdrant Connection Pool
 // ============================================================================
-let qdrantInstance: QdrantClient | null = null;
 
 /**
  * Get or create Qdrant client (singleton)
  * Thread-safe for concurrent QUIC requests
  */
-export function ensureQdrantInstance(): QdrantClient {
-	if (qdrantInstance) {
-		return qdrantInstance;
-	}
-
-	const url = process.env?.QDRANT_URL || VECTOR_CONFIG.DOCKER_SERVICES.QDRANT_URL;
-	const apiKey = process.env.QDRANT_API_KEY;
-
-	qdrantInstance = new QdrantClient({
-		url,
-		apiKey,
-		timeout: 10000 // 10 second timeout
-	});
-
+export function ensureQdrantInstance(): ReturnType<typeof getQdrantClient> {
+	const client = getQdrantClient();
 	console.log('Qdrant client initialized');
-	return qdrantInstance;
+	return client;
 }
 
 /**

@@ -6,7 +6,7 @@
 
 import pg from 'pg';
 import crypto from 'crypto';
-import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 
 const { Pool } = pg;
 

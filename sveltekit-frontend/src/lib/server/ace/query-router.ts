@@ -396,7 +396,7 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
 
             // Map reranked hits back to original Qdrant hit structure
             const rerankedMap = new Map(reranked.hits.map(rh => [rh.id, rh.score]));
-            hits = hits.sort((a, b) => (rerankedMap.get(String(b.id)) ?? b.score) - (rerankedMap.get(String(a.id)) ?? a.score));
+            hits = hits.sort((a, b) => (rerankedMap.get(String(b.id)) ?? Number(b.score)) - (rerankedMap.get(String(a.id)) ?? Number(a.score)));
 
             trace.push({ lane: 'gpu-rerank', hit: true, latency_ms: Date.now() - t0 });
           }
@@ -531,6 +531,8 @@ export async function routeQuery(opts: QueryRouterOpts): Promise<QueryRouterResu
   const packetInput = {
     query,
     query_hash: queryHash,
+    packet_ulid: null,
+    title_id: null,
     source_refs: [...new Set(sourceRefs)],
     feature_ids: [...new Set(featureIds)],
     lane_ids: [...new Set(laneIds)],

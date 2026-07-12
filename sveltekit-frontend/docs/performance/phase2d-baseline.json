@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-07-11T23:50:10.331Z",
+  "environment": {
+    "node": "v22.17.1",
+    "platform": "win32",
+    "arch": "x64",
+    "qdrantUrl": "http://127.0.0.1:6333"
+  },
+  "metrics": [
+    {
+      "operation": "hybridSearch",
+      "collection": "codebase_chunks_768",
+      "iterations": 30,
+      "meanLatencyMs": 0.2394466666666555,
+      "medianLatencyMs": 0.19639999999992597,
+      "p95LatencyMs": 0.4515999999999849,
+      "p99LatencyMs": 0.48879999999996926,
+      "minLatencyMs": 0.16620000000000346,
+      "maxLatencyMs": 0.48879999999996926,
+      "totalTimeMs": 7,
+      "throughputOpsPerSec": 4285.714285714285,
+      "memoryUsageMb": 12.831871032714844
+    },
+    {
+      "operation": "raw.search",
+      "collection": "codebase_chunks_768",
+      "iterations": 30,
+      "meanLatencyMs": 4.327379999999994,
+      "medianLatencyMs": 4.007200000000012,
+      "p95LatencyMs": 6.321199999999976,
+      "p99LatencyMs": 7.852999999999952,
+      "minLatencyMs": 2.9488999999999805,
+      "maxLatencyMs": 7.852999999999952,
+      "totalTimeMs": 130,
+      "throughputOpsPerSec": 230.76923076923077,
+      "memoryUsageMb": 16.630401611328125
+    }
+  ],
+  "summary": {
+    "totalOperations": 60,
+    "totalTimeMs": 137
+  }
+}

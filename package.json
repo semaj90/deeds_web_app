@@ -13,6 +13,8 @@
     "turbo:start:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
     "turbo:start:text:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached -TextOnly",
     "turbo:status": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -StatusOnly",
+    "native:probe:capabilities": "node scripts/native/probe-capabilities.mjs",
+    "native:probe:capabilities:verbose": "node scripts/native/probe-capabilities.mjs --verbose",
     "atlas:smoke:packet-contract": "ts-node --project tsconfig.json scripts/atlas/validate-packet-contract.mjs",
     "atlas:packet-contract-mirrors": "node scripts/atlas/audit-packet-contract-mirrors.mjs",
     "atlas:packet-contract-repair": "node scripts/atlas/repair-packet-contract-mirrors.mjs",

@@ -1,4 +1,4 @@
-import { QdrantManager } from '../vector/qdrant-manager.js';
+import { getQdrantClient } from '../vector/qdrant-singleton.js';
 import { getNeo4jDriver } from '../neo4j-driver.js';
 import { couchPut } from './karpathy-wiki.js';
 import type { KarpathyHookOutput } from './karpathy-hook.js';
@@ -16,7 +16,7 @@ export async function persistKarpathyHook(output: KarpathyHookOutput) {
 
 	// ── 1. Qdrant: Vector Payloads ────────────────────────────────────────────
 	// Embeddings are generated upstream by the caller before this function runs.
-	void new QdrantManager(); // ensure client is initialised (noop if already cached)
+	void getQdrantClient(); // ensure client is initialised (singleton pattern)
 
 	// ── 2. Neo4j: Graph Topology (APOC batch → serial fallback) ──────────────
 	if (output.neo4jEdges.length > 0) {

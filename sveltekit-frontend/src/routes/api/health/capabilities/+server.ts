@@ -71,10 +71,10 @@ export const GET: RequestHandler = async ({ locals }) => {
     // Qdrant: check server + collection health
     (async () => {
       try {
-        const { QdrantClient } = await import('@qdrant/js-client-rest');
+        const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
         const { checkQdrantHealth } = await import('$lib/server/vector/qdrant-health.js');
 
-        const client = new QdrantClient({ url: qdrantUrl });
+        const client = getQdrantClient();
         const health = await checkQdrantHealth(client, {
           timeout: TIMEOUT,
           includeVectorCounts: false,

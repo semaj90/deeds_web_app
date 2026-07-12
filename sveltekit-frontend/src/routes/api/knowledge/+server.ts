@@ -1,4 +1,3 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { JSDOM } from 'jsdom';
@@ -10,8 +9,9 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
-const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+const qdrant = getQdrantClient();
 let knowledgeBaseTableAvailable: boolean | null = null;
 let knowledgeBaseSupportsSparse: boolean | null = null;
 
@@ -27,7 +27,7 @@ interface QdrantScoredPoint {
 /** Qdrant query response wrapper */
 interface QdrantQueryResponse { points: QdrantScoredPoint[] }
 
-const qd = qdrant as QdrantClient & {
+const qd = qdrant as ReturnType<typeof getQdrantClient> & {
   query(collection: string, params: Record<string, unknown>): Promise<QdrantQueryResponse>;
   upsert(collection: string, params: Record<string, unknown>): Promise<void>;
 };

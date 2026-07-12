@@ -7,6 +7,7 @@
  */
 import { getJson, setJsonWithTtl } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
 type ScenarioCacheValue = {
   queryHash: string;
@@ -66,8 +67,7 @@ export async function setScenarioCache(
   // Best-effort Qdrant L2 persistence if configured
   if (ENV.QDRANT_URL) {
     try {
-      const { QdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
-      const mgr = new QdrantManager(ENV.QDRANT_URL);
+      const qdrant = getQdrantClient();
       const collection = 'scenario_cache';
       // Upsert a single point with id = queryHash (safe short id)
       const pointId = queryHash.slice(0, 32); // trimmed deterministic string id
@@ -86,14 +86,14 @@ export async function setScenarioCache(
         ],
       };
       try {
-        // try client.upsert (wrapped in manager)
-        await mgr.client.upsert(collection, upsertBody as any);
+        // upsert via singleton
+        await qdrant.upsert(collection, upsertBody as any);
       } catch (e) {
         // If upsert fails, just log; Qdrant L2 is optional
         console.warn('[scenario-cache] qdrant upsert failed (non-fatal):', e?.message ?? e);
       }
     } catch (e) {
-      // Import failure / Qdrant unavailable — do not block
+      // Singleton unavailable — do not block
       // keep silent-ish but informative on first occurrences
       console.info('[scenario-cache] Qdrant unavailable, skipping L2 persistence');
     }
@@ -109,13 +109,13 @@ export async function getScenarioCacheFromQdrant(
 ): Promise<ScenarioCacheValue | null> {
   if (!ENV.QDRANT_URL) return null;
   try {
-    const { QdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
-    const mgr = new QdrantManager(ENV.QDRANT_URL);
+    const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+    const mgr = getQdrantClient();
     const collection = 'scenario_cache';
     const pointId = queryHash.slice(0, 32);
     try {
       // Use getPoint (client has getPoint in js client)
-      const res = await (mgr.client as any).getPoint(collection, pointId);
+      const res = await (mgr as any).getPoint(collection, pointId);
       const payload = res?.result?.payload ?? res?.payload ?? null;
       if (!payload) return null;
       return {

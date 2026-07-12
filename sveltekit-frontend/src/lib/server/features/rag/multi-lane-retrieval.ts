@@ -293,7 +293,8 @@ async function runDenseLane(query: MultiLaneQuery, embedding: number[] | null): 
 		const searchResult = await qdrant._denseSearch({
 			query: query.text,
 			collection: 'codebase_chunks_768',
-			queryEmbedding: embedding,
+			queryVector: embedding,
+			vectorName: 'semantic_embedding',
 			limit: query.topK ?? 10,
 		}).catch(() => null);
 		const rawChunks = searchResult?.results ?? [];

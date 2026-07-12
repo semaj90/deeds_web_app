@@ -1,4 +1,4 @@
-import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
 export type TraceRerankResult = {
 	id: string | number;
@@ -19,7 +19,7 @@ export async function traceRerank(params: {
 	limit?: number;
 	intentOverride?: string[];
 }): Promise<TraceRerankResult[]> {
-	const qdrant = new QdrantManager();
+	const qdrant = getQdrantClient();
 	const limit = params.limit ?? 10;
 
 	// 1. Triage Intent

@@ -378,8 +378,8 @@ Return ONLY valid JSON.`;
   // ── Step 4: Store caption embedding in Qdrant (evidence_items collection) ──
   if (captionEmbedding.length === 768) {
     try {
-      const { QdrantClient } = await import('@qdrant/js-client-rest');
-      const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+      const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+      const qdrant = getQdrantClient();
 
       // Deterministic point ID from photoId
       const pointId =

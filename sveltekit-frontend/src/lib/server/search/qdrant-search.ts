@@ -3,8 +3,8 @@
  * Returns candidates with stable_key for dedup merge in hybrid-search.ts.
  */
 
-import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
 import { getCodebaseAnnBackend } from './codebase-ann-backend.js';
 import { searchTurboVecCode } from './turbovec-search.js';
@@ -31,12 +31,6 @@ export interface QdrantCodeResult {
   qdrant_id: string;
 }
 
-let _mgr: QdrantManager | null = null;
-function getManager(): QdrantManager {
-  if (!_mgr) _mgr = new QdrantManager(ENV.QDRANT_URL);
-  return _mgr;
-}
-
 class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
   readonly name = 'qdrant' as const;
 
@@ -44,7 +38,7 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
     const { embedding, limit = 30, topoClass, collection = 'codebase_chunks_768' } = request;
 
     try {
-      const mgr = getManager();
+      const mgr = getQdrantClient();
       const filters: Record<string, unknown> = {};
 
       if (collection === 'codebase_chunks_768') {
@@ -69,7 +63,7 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
         }
       }
 
-      const res = await mgr.hybridSearch({
+      const res = await mgr.search({
         collection,
         query: '',
         queryEmbedding: embedding,

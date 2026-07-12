@@ -187,24 +187,31 @@ ${text.slice(0, 8000)}`;
             return [];
           }
 
-          for await (const chunk of res.body) {
-            buffer += decoder.decode(chunk, { stream: true });
-            const lines = buffer.split('\n');
-            buffer = lines.pop() ?? '';
+          const reader = res.body.getReader();
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() ?? '';
 
-            for (const line of lines) {
-              if (!line.trim().startsWith('data:')) continue;
-              const payload = line.slice(5).trim();
-              if (payload === '[DONE]') break;
+              for (const line of lines) {
+                if (!line.trim().startsWith('data:')) continue;
+                const payload = line.slice(5).trim();
+                if (payload === '[DONE]') break;
 
-              try {
-                const parsed = JSON.parse(payload);
-                const content = parsed.choices?.[0]?.delta?.content ?? '';
-                accumulated += content;
-              } catch {
-                // Skip malformed lines
+                try {
+                  const parsed = JSON.parse(payload);
+                  const content = parsed.choices?.[0]?.delta?.content ?? '';
+                  accumulated += content;
+                } catch {
+                  // Skip malformed lines
+                }
               }
             }
+          } finally {
+            reader.releaseLock();
           }
 
           // Parse JSON response
@@ -225,7 +232,7 @@ ${text.slice(0, 8000)}`;
               source: 'llm' as const,
             }));
 
-          gen.end({ output: `${entities.length} entities`, level: 'SUCCESS' });
+          gen.end({ output: `${entities.length} entities`, level: 'DEFAULT' });
           return entities;
         } finally {
           clearTimeout(timeoutId);

@@ -66,9 +66,10 @@ async function enrichTranscription(
 				const { qdrant } = await import('$lib/server/vector/qdrant-manager.js');
 				const searchResult = await qdrant._denseSearch({
 					query: text.slice(0, 500),
-					queryEmbedding: embedding,
+					queryVector: embedding,
+					vectorName: 'semantic_embedding',
 					collection: 'evidence_items',
-					filters: { must: [{ key: 'case_id', match: { value: caseId } }] },
+					filter: { must: [{ key: 'case_id', match: { value: caseId } }] },
 					limit: 5,
 				});
 				if (searchResult.results.length > 0) {

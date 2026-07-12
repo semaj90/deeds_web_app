@@ -4,6 +4,7 @@ import { tensorAnalysisCache } from '$lib/server/db/schema/topology.js';
 import { atlasFeatureMap } from '$lib/server/db/schema/atlas-feature-map.js';
 import { desc, count, eq, sql, avg } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { getGraphMLStatus } from '$lib/server/grpc/graph-ml-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { getOllamaEndpoint } from '$lib/server/ollama.js';
@@ -293,17 +294,15 @@ export async function checkSystemHealth() {
 
 export async function generateClaudePlan(params: { goal: string; scope: string }) {
 	const { generateSingleEmbedding } = await import('../grpc/embedding-client.js');
-	const { QdrantManager } = await import('../vector/qdrant-manager.js');
-	const qdrant = new QdrantManager();
 	const queryEmbedding = await generateSingleEmbedding(params.goal);
-	const hits = await qdrant.hybridSearch({
-		collection: 'codebase_chunks_768',
-		query: params.goal,
-		queryEmbedding,
-		limit: 3
+	const qdrant = getQdrantClient();
+	const hits = await qdrant.search('codebase_chunks_768', {
+		vector: queryEmbedding,
+		limit: 3,
+		with_payload: true
 	});
 
-	const filesToInspect = [...new Set(hits.results.map(h => h.payload?.path as string))];
+	const filesToInspect = [...new Set((hits as any[]).map(h => h.payload?.path as string))];
 
 	return {
 		task: `Implement: ${params.goal}`,

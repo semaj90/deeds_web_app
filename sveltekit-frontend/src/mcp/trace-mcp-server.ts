@@ -6922,9 +6922,9 @@ server.registerTool(
       let promoted = false;
       if (totalVotes >= PROMOTE_THRESHOLD) {
         const trustScore = Math.max(0, Math.min(1, (netScore / totalVotes + 1) / 2));
-        const { QdrantManager } = await import('../lib/server/vector/qdrant-manager.js');
-        const qdrant = new QdrantManager();
-        await qdrant.client
+        const { getQdrantClient } = await import('../lib/server/vector/qdrant-singleton.js');
+        const qdrant = getQdrantClient();
+        await qdrant
           .setPayload(collection, {
             payload: {
               trust_score: trustScore,
@@ -7268,15 +7268,15 @@ server.registerTool(
     const { analyzeEvidenceImage } = await import(
       '../lib/server/analysis/vlm-evidence-analyzer.js'
     );
-    const { QdrantManager } = await import('../lib/server/vector/qdrant-manager.js');
+    const { getQdrantClient } = await import('../lib/server/vector/qdrant-singleton.js');
 
-    const qdrant = new QdrantManager();
+    const qdrant = getQdrantClient();
     const pid = String(point_id);
 
     // ── 1. Fetch the existing Qdrant payload ──────────────────────────────────
     let existingPayload: Record<string, unknown> = {};
     try {
-      const pts = await qdrant.client.retrieve(collection, { ids: [pid], with_payload: true });
+      const pts = await qdrant.retrieve(collection, { ids: [pid], with_payload: true });
       if (!pts.length) throw new Error(`Point ${pid} not found in ${collection}`);
       existingPayload = (pts[0].payload as Record<string, unknown>) ?? {};
     } catch (e) {

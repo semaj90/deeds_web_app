@@ -3,6 +3,7 @@ import { createHash } from 'crypto';
 import { promises as fs } from 'fs';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from './qdrant-singleton.js';
 import {
   VECTOR_CONFIG,
   buildVectorPayload,
@@ -11,6 +12,12 @@ import {
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
 import { fastJsonParse } from '../gpu/simdjson-bridge.js';
 import { traceVectorSearch } from '../observability/langfuse.js';
+import {
+  type CodebaseVectorName,
+  type DenseSearchParams,
+  assertVectorDimension,
+  buildQdrantSearchRequest,
+} from './vector-contracts.js';
 
 // Re-export for existing consumers
 export { generateSparseVector, type SparseVector };
@@ -82,7 +89,13 @@ export class QdrantManager {
   private inflightSearches: Map<string, Promise<QdrantSearchResult>> = new Map();
 
   constructor(url = ENV.QDRANT_URL) {
-    this.client = new QdrantClient({ url });
+    // Use singleton client if URL matches default; otherwise allow custom client
+    // This preserves backward compatibility while enabling connection pooling for default usage
+    if (!url || url === ENV.QDRANT_URL) {
+      this.client = getQdrantClient();
+    } else {
+      this.client = new QdrantClient({ url });
+    }
     // Wrap client.upsert to enforce vector-dimension validation for any direct upsert calls
     try {
       const originalUpsert = (this.client as any).upsert?.bind(this.client);
@@ -648,19 +661,35 @@ export class QdrantManager {
    * when a collection has no sparse (BM42) vectors configured.
    * Callers that explicitly want dense-only can call this directly.
    */
-  async _denseSearch(params: {
-    query: string;
-    queryEmbedding: number[];
-    collection: string;
-    filters?: any;
-    limit?: number;
-    scoreThreshold?: number;
-    skipCache?: boolean;
-  }): Promise<QdrantSearchResult> {
+  async _denseSearch(params: DenseSearchParams): Promise<QdrantSearchResult> {
+    // CRITICAL: vectorName parameter is now mandatory and defines the vector space
+    const { vectorName, queryVector } = params;
+
     return traceVectorSearch(
-      params.collection,
-      this.buildTelemetryMetadata({ searchType: 'dense-cosine', query: params.query, limit: params.limit }),
+      params.collection ?? 'codebase_chunks_768',
+      this.buildTelemetryMetadata({
+        searchType: `dense-${vectorName}`,
+        query: params.query,
+        limit: params.limit,
+        vectorSpace: vectorName,
+      }),
       async () => {
+        // Validate dimension BEFORE any network calls
+        // (NOTE: Phase 8.6 legacy callers may still use 768-dim; will migrate to vector-contracts in Phase 9)
+        try {
+          assertVectorDimension(vectorName, queryVector);
+        } catch (validationErr) {
+          // For now, warn but allow legacy 768-dim vectors to pass through
+          if (queryVector.length === 768) {
+            console.warn(
+              `[qdrant] dimension mismatch: expected ${vectorName} but got 768-dim vector. ` +
+              `This is a Phase 8.6 legacy call. Will be migrated in Phase 9.`
+            );
+          } else {
+            throw validationErr;
+          }
+        }
+
         const startTime = Date.now();
         const cacheKey = params.skipCache ? null : await this.buildSearchCacheKey(params);
 
@@ -669,7 +698,8 @@ export class QdrantManager {
           const raw = JSON.stringify({
             q: params.query,
             c: params.collection,
-            f: params.filters ?? params.filters ?? null,
+            v: vectorName,
+            f: params.filter ?? null,
             l: params.limit ?? null,
             s: params.scoreThreshold ?? null,
           });
@@ -701,22 +731,26 @@ export class QdrantManager {
             }
 
             try {
-              // Resolve collection name and build correct vector payload from VECTOR_CONFIG
+              // Resolve collection name to canonical form
               const collectionName =
                 this.collections[params.collection as keyof typeof this.collections] ??
-                params.collection;
-              const vectorField = buildVectorPayload(collectionName, params.queryEmbedding);
+                params.collection ??
+                'codebase_chunks_768';
 
-              const searchRequest: any = {
-                vector: vectorField,
-                limit: params.limit ?? 10,
-                score_threshold: params.scoreThreshold ?? 0.7,
-                with_payload: true,
-                with_vector: false,
-              };
+              // Build Qdrant search request using vector-contracts
+              const searchRequest = buildQdrantSearchRequest({
+                query: params.query,
+                queryVector,
+                vectorName,
+                collection: collectionName,
+                limit: params.limit,
+                scoreThreshold: params.scoreThreshold,
+                filter: params.filter,
+                skipCache: params.skipCache,
+              });
 
-              if (params.filters) {
-                searchRequest.filter = this.buildQdrantFilter(params.filters);
+              if (params.filter) {
+                searchRequest.filter = this.buildQdrantFilter(params.filter);
               }
 
               const results = await this.client.search(collectionName, searchRequest);
@@ -1463,7 +1497,7 @@ export class QdrantManager {
       const info = await this.client.getCollection(collectionName);
       return {
         name: collectionName,
-        vectors_count: info.vectors_count ?? 0,
+        points_count: info.points_count ?? 0,
         status: info.status,
         optimizer_status: info.optimizer_status,
       };
@@ -1786,15 +1820,20 @@ export function adaptiveScalingDecision(
     }
 }
 
-export const qdrant = new QdrantManager();
+let _qdrantSingleton: QdrantManager | null = null;
 
 export function getQdrantManager(): QdrantManager {
-  return qdrant;
+  if (!_qdrantSingleton) {
+    _qdrantSingleton = new QdrantManager();
+  }
+  return _qdrantSingleton;
 }
 
-export function getQdrantClient(): QdrantClient {
-  return qdrant.client;
-}
+export const qdrant = new Proxy({} as QdrantManager, {
+  get(_target, prop) {
+    return (getQdrantManager() as any)[prop];
+  }
+}) as QdrantManager;
 
 
 

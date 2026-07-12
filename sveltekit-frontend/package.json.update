@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "extract:lexical": "node --require tsx scripts/atlas/extract-lexical-layer.mts",
+    "extract:semantic": "node --require tsx scripts/atlas/phase1-semantic-backfill.mts",
+    "extract:domain": "node --require tsx scripts/atlas/extract-domain-layer.mts",
+    "extract:embeddings": "node --require tsx scripts/atlas/embed-multi-vectors.mts",
+    "extract:all": "npm run extract:lexical && npm run extract:domain && npm run extract:semantic && npm run extract:embeddings",
+    "feature:alignment:plan": "cat docs/FEATURE-ALIGNMENT-SPECIFICATION.md",
+    "feature:alignment:check": "node --require tsx scripts/atlas/feature-alignment-check.mts"
+  }
+}

@@ -1,6 +1,6 @@
 
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { db } from './client.js';
 import * as schema from './schema.js';
 import { eq, sql } from 'drizzle-orm';
@@ -12,13 +12,10 @@ export interface QdrantConfig {
 }
 
 export class QdrantPostgreSQLService {
-    private qdrant: QdrantClient;
+    private qdrant: ReturnType<typeof getQdrantClient>;
 
     constructor(config: QdrantConfig) {
-        this.qdrant = new QdrantClient({
-            url: `http://${config.host}:${config.port}`,
-            apiKey: config.apiKey,
-        });
+        this.qdrant = getQdrantClient();
     }
 
     async ensureCollection(collectionName: string, vectorSize: number = 768): Promise<void> {

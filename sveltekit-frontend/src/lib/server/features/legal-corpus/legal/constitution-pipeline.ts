@@ -113,9 +113,8 @@ async function upsertToQdrant(
 	}>
 ): Promise<void> {
 	try {
-		const { QdrantClient } = await import('@qdrant/js-client-rest');
-		const { ENV } = await import('$lib/server/env.server');
-		const client = new QdrantClient({ url: ENV.QDRANT_URL });
+		const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+		const client = getQdrantClient();
 
 		const COLLECTION = 'legal_documents';
 		try {

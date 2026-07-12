@@ -18,7 +18,7 @@
 
 import { json, error }             from '@sveltejs/kit';
 import type { RequestHandler }      from './$types';
-import { QdrantManager }            from '$lib/server/vector/qdrant-manager.js';
+import { getQdrantClient }          from '$lib/server/vector/qdrant-singleton.js';
 import { getRedis }                 from '$lib/server/redis.js';
 import { z }                        from 'zod';
 import { createHash }               from 'node:crypto';
@@ -66,8 +66,8 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
   // ── Layer 2: Qdrant setPayload (only at threshold) ─────────────────────────
   if (totalVotes >= PROMOTE_THRESHOLD) {
     const trustScore = Math.max(0, Math.min(1, (netScore / totalVotes + 1) / 2)); // map [-1,1]→[0,1]
-    const qdrant = new QdrantManager();
-    qdrant.client.setPayload(collection, {
+    const qdrant = getQdrantClient();
+    qdrant.setPayload(collection, {
       payload: {
         trust_score:   trustScore,
         user_approved: netScore > 0,

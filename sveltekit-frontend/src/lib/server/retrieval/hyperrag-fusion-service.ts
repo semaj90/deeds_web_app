@@ -1,4 +1,4 @@
-﻿import { getRedis } from '$lib/server/redis.js';
+import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -513,7 +513,7 @@ export class HyperRagFusionService {
       if (!allHitsInLanes.has(lane)) {
         allHitsInLanes.set(lane, []);
       }
-      allHitsInLanes.get(lane)!.push({ id, signals });
+      allHitsInLanes.get(lane)!.push({ id, score: signals.dense ?? 0 });
 
       // RRF Scoring: compute consensus-amplified score via reciprocal rank fusion
       const rrfResult = computeRRFScore(id, signals, allHitsInLanes);

@@ -10,8 +10,8 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { searchCartridgeTensors, type TensorSearchResponse } from '$lib/server/cache/cartridge-tensor-bridge.js';
 import type { RuneData } from '$lib/server/cartridge/chr97-builder.js';
 import { z } from 'zod';
@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   // Build fetchRunes function that scrolls Qdrant
   const fetchRunes = async (): Promise<RuneData[]> => {
-    const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+    const qdrant = getQdrantClient();
     const allPoints: Array<{
       id: string | number;
       vector: number[];

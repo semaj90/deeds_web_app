@@ -16,7 +16,7 @@
 
 import { Client } from 'pg';
 import * as Redis from 'ioredis';
-import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
 
 const env = loadRepoEnv(process.env);
@@ -130,7 +130,7 @@ async function extractEntities() {
     // Query packets with summaries but no used_concepts
     const query = `
       SELECT
-        id as packet_id,
+        packet_id,
         packet_key,
         summary
       FROM atlas_packets
@@ -193,14 +193,14 @@ async function extractEntities() {
       envelope.used_concepts = conceptTexts;
 
       // Update Postgres metadata
-      await pgClient.query(
-        `UPDATE atlas_packets
-         SET metadata = COALESCE(metadata, '{}'::jsonb) || $1,
-             used_concepts = $2,
-             updated_at = NOW()
-         WHERE id = $3`,
-        [JSON.stringify({ used_concepts: conceptTexts }), JSON.stringify(conceptTexts), p.packet_id]
-      );
+        await pgClient.query(
+          `UPDATE atlas_packets
+           SET metadata = COALESCE(metadata, '{}'::jsonb) || $1,
+               used_concepts = $2,
+               updated_at = NOW()
+           WHERE packet_id = $3`,
+          [JSON.stringify({ used_concepts: conceptTexts }), JSON.stringify(conceptTexts), p.packet_id]
+        );
 
       // Update Valkey cache if it exists
       const cacheKey = `bifrost:packet:${p.packet_key}`;

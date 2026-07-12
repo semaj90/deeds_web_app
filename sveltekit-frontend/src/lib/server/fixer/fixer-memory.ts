@@ -17,7 +17,8 @@
 import { createHash }        from 'node:crypto';
 import type { Pool }         from 'pg';
 import type { Redis }        from 'ioredis';
-import { QdrantClient }      from '@qdrant/js-client-rest';
+import { getQdrantClient }   from '$lib/server/vector/qdrant-singleton.js';
+import type { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV }               from '$lib/server/env.server.js';
 
 // ── constants ─────────────────────────────────────────────────────────────────
@@ -69,10 +70,8 @@ function makePointId(errorHash: string): string {
           hex.slice(20,32)].join('-');
 }
 
-function qdrantClient(): QdrantClient {
-  return new QdrantClient({
-    url: ENV.QDRANT_URL,
-  });
+function qdrantClient(): ReturnType<typeof getQdrantClient> {
+  return getQdrantClient();
 }
 
 // ── ensure collection exists ──────────────────────────────────────────────────

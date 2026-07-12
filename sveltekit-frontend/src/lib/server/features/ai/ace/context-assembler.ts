@@ -1394,8 +1394,9 @@ async function fetchSchemaDependentsIfRelevant(
     let postgresPool: any = null;
 
     try {
-      const { neo4jDriver } = await import('$lib/server/db/neo4j.js');
-      neo4jSession = neo4jDriver?.session?.();
+      const { getNeo4jDriver } = await import('$lib/server/db/neo4j-gds-retrieval.js');
+      const neo4jDriverInstance = getNeo4jDriver?.();
+      neo4jSession = neo4jDriverInstance?.session?.();
     } catch {
       // Neo4j not available, will degrade gracefully
     }
@@ -4132,7 +4133,7 @@ export async function assembleACEContext(opts: {
         schemaVersion: 1,
         embeddingVersion: 'embeddinggemma:latest',
         toolVersion: 'mcp:1.0',
-        gpuKernelVersion: ENV.TENSORRT_BRIDGE_VERSION ?? 'tensorrt_bridge:1.0',
+        gpuKernelVersion: (process.env.TENSORRT_BRIDGE_VERSION ?? 'tensorrt_bridge:1.0'),
         rpcTransport: 'jsonrpc',
       }).catch(() => {
         // Telemetry failure is non-fatal
@@ -5323,9 +5324,10 @@ async function fetchKBChunks(
       qdrantMgr
         ._denseSearch({
           query: '',
-          queryEmbedding: embedding,
+          queryVector: embedding,
+          vectorName: 'semantic_embedding',
           collection: 'legal_documents',
-          filters: graphFilter,
+          filter: graphFilter,
           limit: 4,
           scoreThreshold: 0.45,
         })
@@ -5333,9 +5335,10 @@ async function fetchKBChunks(
       qdrantMgr
         ._denseSearch({
           query: '',
-          queryEmbedding: embedding,
+          queryVector: embedding,
+          vectorName: 'semantic_embedding',
           collection: 'legal_canon_chunks',
-          filters: graphFilter,
+          filter: graphFilter,
           limit: 6,
           scoreThreshold: 0.4,
         })
@@ -5343,9 +5346,10 @@ async function fetchKBChunks(
       qdrantMgr
         ._denseSearch({
           query: '',
-          queryEmbedding: embedding,
+          queryVector: embedding,
+          vectorName: 'semantic_embedding',
           collection: 'knowledge_base',
-          filters: graphFilter,
+          filter: graphFilter,
           limit: 4,
           scoreThreshold: 0.4,
         })
@@ -5477,9 +5481,10 @@ async function fetchResearchSummaryChunks(
       const preRes = await qdrantMgr
         ._denseSearch({
           query: '',
-          queryEmbedding: embedding,
+          queryVector: embedding,
+          vectorName: 'semantic_embedding',
           collection: 'research_summaries',
-          filters: { som_cluster: somCluster },
+          filter: { som_cluster: somCluster },
           limit: baseLimit,
           scoreThreshold: 0.38,
         })
@@ -5492,7 +5497,8 @@ async function fetchResearchSummaryChunks(
       const fullRes = await qdrantMgr
         ._denseSearch({
           query: '',
-          queryEmbedding: embedding,
+          queryVector: embedding,
+          vectorName: 'semantic_embedding',
           collection: 'research_summaries',
           limit: baseLimit,
           scoreThreshold: 0.38,
@@ -7307,14 +7313,15 @@ function extractPracticeArea(
  */
 async function fetchACEContextPacket(query: string): Promise<any | null> {
   try {
-    const { QdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
-    const qdrant = new QdrantManager();
+    const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+    const qdrant = getQdrantClient();
     const embedding = await embedText(query);
 
     const res = await qdrant
       ._denseSearch({
         query: '',
-        queryEmbedding: embedding,
+        queryVector: embedding,
+        vectorName: 'semantic_embedding',
         collection: 'feature_maps',
         limit: 1,
         scoreThreshold: 0.0,

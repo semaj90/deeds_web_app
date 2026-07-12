@@ -15,7 +15,7 @@ import { pgRows } from './client.js';
 
 import { CONFIG } from '$lib/config/env.server.js';
 import { db } from '$lib/server/db/client';
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import {
   getDocumentsNeedingSync,
   markDocumentSynced,
@@ -28,14 +28,12 @@ const QDRANT_URL = CONFIG?.QDRANT_URL;
 const COLLECTION_NAME = 'knowledge_graph';
 const VECTOR_SIZE = 384;
 
-// Initialize Qdrant client
-const qdrant = new QdrantClient({ url: QDRANT_URL });
-
 /**
  * Initialize Qdrant collection for knowledge graph
  */
 export async function initQdrantCollection(): Promise<boolean> {
   try {
+    const qdrant = getQdrantClient();
     // Check if collection exists
     const collections = await qdrant.getCollections();
     const exists = collections.collections.some((c) => c.name === COLLECTION_NAME);
@@ -85,6 +83,7 @@ async function syncDocumentToQdrant(doc: KnowledgeDocument): Promise<boolean> {
       return false;
     }
 
+    const qdrant = getQdrantClient();
     // Upsert to Qdrant
     await qdrant.upsert(COLLECTION_NAME, {
       wait: true,

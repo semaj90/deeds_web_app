@@ -17,7 +17,7 @@
 import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 
-import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { ENV } from '$lib/server/env.server.js';
 import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
@@ -94,13 +94,7 @@ type QdrantScrollPoint = {
   vectors?: unknown;
 };
 
-let _mgr: QdrantManager | null = null;
 let _native: TurboVecNativeModule | null | undefined;
-
-function getManager(): QdrantManager {
-  if (!_mgr) _mgr = new QdrantManager(ENV.QDRANT_URL);
-  return _mgr;
-}
 
 function getNativeModuleName(): string | null {
   const raw =
@@ -360,7 +354,7 @@ async function searchQdrantDirect(
   topoClass?: string,
   collection = 'codebase_chunks_768'
 ): Promise<QdrantCodeResult[]> {
-  const mgr = getManager();
+  const mgr = getQdrantClient();
   const filter = await maybeApplyEncodedPrefilter(embedding, buildSearchFilter(topoClass));
 
   const res = await mgr.hybridSearch({

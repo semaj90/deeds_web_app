@@ -1,0 +1,286 @@
+# TypeScript Language Specification for OKF
+
+version: 1
+language: typescript
+name: TypeScript / JavaScript / Svelte
+
+extensions:
+  - .ts
+  - .tsx
+  - .mts
+  - .cts
+  - .svelte.ts
+  - .js
+  - .jsx
+  - .mjs
+  - .cjs
+  - .svelte
+
+exclude_paths:
+  - "**/node_modules/**"
+  - "**/build/**"
+  - "**/dist/**"
+  - "**/coverage/**"
+  - "**/backup-*/**"
+  - "**/.next/**"
+  - "**/.nuxt/**"
+  - "**/out/**"
+  - "**/*.d.ts"
+  - "**/archive/**"
+  - "**/logs/**"
+  - "**/temp/**"
+  - "**/.tmp/**"
+
+# Symbol extraction rules (ast-grep patterns)
+symbol_kinds:
+  function:
+    weight: 1.0
+    description: Function declarations and implementations
+    ast_labels:
+      - function_declaration
+      - arrow_function
+      - method_definition
+    evidence_weight: high
+
+  class:
+    weight: 0.9
+    description: Class declarations
+    ast_labels:
+      - class_declaration
+    evidence_weight: high
+
+  interface:
+    weight: 0.8
+    description: Type interfaces (TypeScript)
+    ast_labels:
+      - interface_declaration
+    evidence_weight: medium
+
+  type_alias:
+    weight: 0.7
+    description: Type aliases (TypeScript)
+    ast_labels:
+      - type_alias_declaration
+    evidence_weight: medium
+
+  route_handler:
+    weight: 1.0
+    description: SvelteKit route handlers (+server.ts exports)
+    evidence:
+      exports:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+      path_markers:
+        - "/+server.ts"
+        - "/+page.server.ts"
+    evidence_weight: high
+
+  schema:
+    weight: 0.95
+    description: Schema definitions (Zod, Drizzle, database)
+    imports:
+      - zod
+      - "drizzle-orm"
+    symbol_patterns:
+      - "*Schema"
+      - "*Table"
+      - "*Enum"
+    evidence_weight: high
+
+  store:
+    weight: 0.8
+    description: Svelte stores (.svelte.ts)
+    path_patterns:
+      - "**/*.svelte.ts"
+    evidence_weight: medium
+
+  hook:
+    weight: 0.85
+    description: SvelteKit hooks (handle, handleError)
+    filename_patterns:
+      - "hooks.server.ts"
+      - "hooks.client.ts"
+    evidence_weight: high
+
+  layout:
+    weight: 0.7
+    description: SvelteKit layouts (+layout.svelte, +layout.server.ts)
+    path_markers:
+      - "/+layout.svelte"
+      - "/+layout.server.ts"
+    evidence_weight: medium
+
+  component:
+    weight: 0.7
+    description: Svelte components (.svelte files)
+    path_patterns:
+      - "**/*.svelte"
+    exclude_patterns:
+      - "**/+page.svelte"
+      - "**/+layout.svelte"
+    evidence_weight: medium
+
+  test:
+    weight: 0.6
+    description: Test files
+    filename_patterns:
+      - "*.test.ts"
+      - "*.spec.ts"
+    path_patterns:
+      - "**/tests/**"
+      - "**/__tests__/**"
+    evidence_weight: low
+
+# Feature domain mapping (path terms + imports → domain classification)
+features:
+  retrieval:
+    description: Code retrieval, search, ranking, RRF
+    path_terms:
+      - retrieval
+      - search
+      - rerank
+      - qdrant
+      - hyperrag
+      - candidate
+    imports:
+      - "@qdrant/js-client-rest"
+      - qdrant
+    symbols:
+      - search
+      - retrieve
+      - rerank
+      - score
+    evidence_weight: high
+
+  cache:
+    description: Caching layers, Redis, Valkey, Bifrost
+    path_terms:
+      - cache
+      - valkey
+      - redis
+      - bifrost
+      - bitfrost
+    imports:
+      - redis
+      - ioredis
+      - "@ioredis/mock"
+    symbols:
+      - cache
+      - get
+      - set
+      - invalidate
+    evidence_weight: high
+
+  database:
+    description: Database operations, Postgres, Drizzle
+    path_terms:
+      - database
+      - db
+      - postgres
+      - drizzle
+      - query
+    imports:
+      - "drizzle-orm"
+      - "pg"
+      - "@vercel/postgres"
+    symbols:
+      - query
+      - insert
+      - update
+      - select
+    evidence_weight: high
+
+  embedding:
+    description: Vector embeddings, Ollama, ONNX
+    path_terms:
+      - embed
+      - embedding
+      - vector
+      - ollama
+      - onnx
+    imports:
+      - "@onnxruntime"
+      - ollama
+    symbols:
+      - embed
+      - embedding
+      - similarity
+    evidence_weight: high
+
+  graph:
+    description: Knowledge graphs, Neo4j, topology
+    path_terms:
+      - graph
+      - neo4j
+      - topology
+      - relationship
+    imports:
+      - "neo4j"
+    symbols:
+      - cypher
+      - relationship
+      - node
+    evidence_weight: medium
+
+  inference:
+    description: LLM inference, model serving
+    path_terms:
+      - inference
+      - llm
+      - model
+      - gemma
+      - ollama
+    imports:
+      - ollama
+      - langchain
+    symbols:
+      - generate
+      - inference
+      - complete
+    evidence_weight: high
+
+  authentication:
+    description: Auth, sessions, JWT, Lucia
+    path_terms:
+      - auth
+      - session
+      - login
+      - lucia
+    imports:
+      - lucia
+      - "oslo/password"
+    symbols:
+      - authenticate
+      - authorize
+      - session
+    evidence_weight: high
+
+  api:
+    description: API endpoints, routes, HTTP
+    path_markers:
+      - "/+server.ts"
+      - "/+page.server.ts"
+    imports:
+      - "@sveltejs/kit"
+    symbols:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+    evidence_weight: high
+
+# Validation and quality gates
+validation:
+  min_symbol_name_length: 2
+  max_symbol_name_length: 128
+  require_source_ref: true
+  require_packet_key: true
+  exclude_generated_markers:
+    - ".min.js"
+    - ".min.css"
+    - ".generated"
+    - "__generated__"

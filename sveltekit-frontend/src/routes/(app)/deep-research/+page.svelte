@@ -188,7 +188,7 @@
 							</div>
 
 							<Button
-								variant="danger"
+								variant="destructive"
 								size="sm"
 								onclick={() => confirmDelete(selectedReport.id)}
 								class="gap-2"
@@ -297,7 +297,7 @@
 								>
 									<input type="hidden" name="reportId" value={selectedReport.id} />
 									<Button
-										variant="danger"
+										variant="destructive"
 										size="sm"
 										disabled={deleting}
 										type="submit"

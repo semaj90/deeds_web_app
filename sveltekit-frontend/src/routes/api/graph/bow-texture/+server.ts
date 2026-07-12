@@ -86,9 +86,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 async function buildFromQdrant(args: z.infer<typeof bodySchema>): Promise<BowTextureTile | null> {
   try {
-    const { QdrantClient } = await import('@qdrant/js-client-rest');
-    const { ENV } = await import('$lib/server/env.server.js');
-    const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+    const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+    const qdrant = getQdrantClient();
 
     if ('chunkId' in args) {
       const res = await (qdrant as { retrieve: (col: string, opts: unknown) => Promise<{ id: string; payload?: Record<string, unknown> }[]> })

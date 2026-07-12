@@ -389,9 +389,10 @@ async function searchQdrantGlyphs(
 
     const searchResult = await qdrant._denseSearch({
       query: 'glyph search',
-      queryEmbedding: Array.from(queryVec),
+      queryVector: Array.from(queryVec),
+      vectorName: 'semantic_embedding',
       collection: 'research_summaries',
-      filters: filter,
+      filter: filter,
       limit,
     });
 

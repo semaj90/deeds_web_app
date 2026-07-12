@@ -74,8 +74,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     }> = [];
 
     try {
-      const { QdrantClient } = await import('@qdrant/js-client-rest');
-      const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+      const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+      const qdrant = getQdrantClient();
 
       // Get current POI name for filtering
       const [currentPoi] = await db

@@ -56,6 +56,11 @@ export const CanonicalFeatureEnvelopeSchema = z.object({
   // Feature Enrichment (REQUIRED)
   used_concepts: z.array(z.string()).min(0),
 
+  // Summary embedding mirror (soft, but persisted on canonical envelopes)
+  summary_embedding: z.array(z.number()).optional(),
+  summary_model: z.string().nullable().optional(),
+  summary_generated_at: z.string().datetime().nullable().optional(),
+
   // Mirrors & Cache Pointers (Soft)
   qdrant_point_id: z.union([z.string(), z.number()]).nullable().optional(),
 
@@ -105,6 +110,9 @@ export function buildCanonicalFeatureEnvelope(packet: {
   ontology_label?: string | null;
   topology_label?: string | null;
   used_concepts?: string[] | null;
+  summary_embedding?: number[] | null;
+  summary_model?: string | null;
+  summary_generated_at?: string | null;
   qdrant_point_id?: string | number | null;
   community_id?: number | null;
   graph_community_id?: number | null;
@@ -174,6 +182,9 @@ export function buildCanonicalFeatureEnvelope(packet: {
     topology_label: packet.topology_label || null,
 
     used_concepts: packet.used_concepts || [],
+    summary_embedding: packet.summary_embedding || undefined,
+    summary_model: packet.summary_model || null,
+    summary_generated_at: packet.summary_generated_at || null,
 
     qdrant_point_id: packet.qdrant_point_id || null,
 

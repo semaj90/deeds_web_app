@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db/client';
 import { enhancedGraphMappings } from '$lib/server/db/schema/graph-mappings.js';
 import { sql, eq, inArray } from 'drizzle-orm';
-import { QdrantManager } from './qdrant-manager.js';
+import { getQdrantClient } from './qdrant-singleton.js';
 import { traceDB } from '$lib/server/observability/langfuse.js';
 
 export interface StarGraph {
@@ -20,7 +20,7 @@ export interface StarGraph {
 }
 
 export class HypergraphService {
-  private qdrant = new QdrantManager();
+  private qdrant = getQdrantClient();
 
   /**
    * Performs a Linked Semantic Multi-Query Search.

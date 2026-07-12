@@ -3,7 +3,7 @@ import { execFile } from 'node:child_process';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { promisify } from 'node:util';
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import Redis from 'ioredis';
 import { ENV } from '$lib/server/env.server.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
@@ -586,7 +586,7 @@ export async function buildAcePromptPreflight(
     degraded = true;
   }
 
-  const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+  const qdrant = getQdrantClient();
   const qdrantCandidates: Array<Record<string, unknown>> = [];
   if (queryEmbedding) {
     const search = async (collection: string, limit: number) => {

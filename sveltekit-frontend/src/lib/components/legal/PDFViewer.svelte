@@ -65,7 +65,7 @@
 		canvas.width = viewport.width;
 		canvas.height = viewport.height;
 
-		renderTask = page.render({ canvasContext: ctx, viewport });
+		renderTask = page.render({ canvas, viewport } as Parameters<typeof page.render>[0]);
 		try {
 			await renderTask.promise;
 		} catch (err: unknown) {

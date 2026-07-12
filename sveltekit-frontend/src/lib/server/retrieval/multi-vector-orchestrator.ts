@@ -14,8 +14,8 @@
  * - Result normalization to [0, 1]
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import {
   fuseLanesViaRrf,
   validateRRFConfig,
@@ -67,7 +67,7 @@ export async function executeMultiVectorRetrieval(
   request: MultiVectorRequest
 ): Promise<MultiVectorResult> {
   const startTime = performance.now();
-  const qdrant = new QdrantClient({ url: ENV.QDRANT_URL || 'http://127.0.0.1:6333' });
+  const qdrant = getQdrantClient();
 
   const config: RRFConfig = {
     weights: {
@@ -254,7 +254,7 @@ export async function checkMultiVectorHealth(): Promise<{
   };
   keywords_indexed: boolean;
 }> {
-  const qdrant = new QdrantClient({ url: ENV.QDRANT_URL || 'http://127.0.0.1:6333' });
+  const qdrant = getQdrantClient();
 
   try {
     const collInfo = await qdrant.getCollection('codebase_chunks_768');

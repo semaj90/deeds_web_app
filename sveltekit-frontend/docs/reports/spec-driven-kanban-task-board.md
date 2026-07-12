@@ -6,11 +6,11 @@
 
 ## TL;DR
 
-**Current Slice**: Phase 8.5 — Materialization & Transport  
-**Tasks**: 7 (concrete, bounded, executable)  
+**Current Slice**: Phase 8.6 — Identity & Topology Bridges  
+**Tasks**: 8 (concrete, bounded, executable)  
 **Strategy**: Dry-run first, bounded batches, Postgres canonical  
-**Duration**: ~4.7 hours  
-**Unblocks**: Phase 8.6 (Neo4j GDS) + Phase 9 (Benchmark)
+**Duration**: ~5.2 hours  
+**Unblocks**: Phase 8.7 (Neo4j GDS / topology math) + Phase 9 (Benchmark)
 
 ---
 
@@ -26,10 +26,55 @@
 
 ---
 
-## Current Slice: Phase 8.5 Tasks (Priority Order)
+## Wired This Slice
+
+1. **Semantic topK rerank storage**
+   - Persist per-query candidate sets and rerank evidence into `atlas_packet_metrics.semantic_topk_*`
+   - Keep canonical identity in Postgres and keep derived topK state separate from `atlas_packets`
+   - Use `chunk_hit_log.rerank_breakdown` / search analytics as the per-query evidence sink and `atlas_packet_metrics` as the durable per-feature projection
+
+## Current Confirmed Gaps
+
+Summary embedding is now complete for the canonical summary classes. The remaining work is bridge propagation and topology/materialization:
+
+1. **Qdrant point ID bridge**
+   - Materialize `packet_key -> qdrant_point_id` deterministically from `codebase_chunk_index`
+   - Validate duplicates and orphans before updating `atlas_packets`
+
+2. **Concrete source-ref propagation**
+   - Resolve `source_ref`, `file_path`, `directory_path`, and `source_ref_key` from canonical joins
+   - Reject synthetic or ambiguous provenance
+
+3. **Tree-node propagation audit**
+   - Verify `tree_node_id` on the owning packet/envelope tables before writing any fan-out lanes
+   - Keep summary-layer propagation only as a mirror path
+
+4. **Concept coverage backfill**
+   - Populate `used_concepts` in the feature-envelope lane, not as a direct identity field
+   - Use LangExtract plus lexical fallback in bounded batches
+
+5. **SOM 20x20 contract repair**
+   - Normalize row/col values and re-run topology validation
+   - Require deterministic occupancy and repeatable mapping
+
+6. **Arrow batch import**
+   - Add resumable batch import to the existing export lane
+   - Keep Arrow as batch transport only
+
+7. **mmap hot registry writer**
+   - Serialize only validated packets into MsgPack
+   - Persist offset / length / checksum in Postgres
+
+8. **ACP routing fan-out**
+   - Route HMM-classified failures into repair actions
+   - Keep execution, scoring, and evidence separate
+
+---
+
+## Current Slice: Phase 8.6 Tasks (Priority Order)
 
 ### 1️⃣ Qdrant Point ID Bridge (15 min)
-Materialize `qdrant_point_id` for all 54,650 points. Bridge from Qdrant's native scroll (using `next_page_offset`) to Postgres `atlas_packets.qdrant_point_id`.
+Materialize `qdrant_point_id` for all addressable packets. Bridge from `codebase_chunk_index.relative_path` / canonical source joins to Postgres `atlas_packets.qdrant_point_id`.
 
 **Acceptance**: `SELECT COUNT(DISTINCT qdrant_point_id) FROM atlas_packets` returns 54,650  
 **Dry-run**: `npm run atlas:qdrant-point-id:bridge --dry-run`  
@@ -37,8 +82,8 @@ Materialize `qdrant_point_id` for all 54,650 points. Bridge from Qdrant's native
 
 ---
 
-### 2️⃣ Tree Node ID Propagation (20 min)
-Propagate `tree_node_id` from atlas_packets → feature envelopes → recommendation cards → Neo4j. Ensures Neo4j topology identity chain is preserved.
+### 2️⃣ Tree Node ID Propagation Audit (20 min)
+Propagate `tree_node_id` through the owning packet/envelope path and validate the mirror tables separately. Preserve the canonical identity chain before Neo4j fan-out.
 
 **Acceptance**: `SELECT COUNT(*) FROM atlas_feature_envelopes WHERE tree_node_id IS NOT NULL` returns 58,365  
 **Dry-run**: `npm run atlas:envelope:propagate-tree-node --dry-run`  
@@ -46,48 +91,55 @@ Propagate `tree_node_id` from atlas_packets → feature envelopes → recommenda
 
 ---
 
-### 3️⃣ Title ID Propagation (20 min)
-Propagate `title_id` through envelopes, cards, and ACE context. Ensures consistent feature grouping downstream.
+### 3️⃣ Concrete Source-Ref Propagation (20 min)
+Backfill `source_ref`, `file_path`, `directory_path`, and `source_ref_key` from canonical joins. Reject synthetic or ambiguous provenance.
 
-**Acceptance**: All envelopes have title_id; distinct count matches identity layer  
-**Dry-run**: `npm run atlas:envelope:propagate-title-id --dry-run`  
-**Apply**: `npm run atlas:envelope:propagate-title-id --apply`
-
----
-
-### 4️⃣ Arrow Batch Transport (45 min)
-Wire Arrow columnar serialization for batch-only packet transport. Enables zero-copy mmap and GPU tensor hand-off. **Batch-only**: no streaming single packets.
-
-**Acceptance**: 100 packets round-trip Postgres → Arrow → Postgres with zero divergence  
-**Dry-run**: `npm run atlas:arrow:batch:export --batch-size 5000 --dry-run`  
-**Apply**: `npm run atlas:arrow:batch:export --batch-size 5000 --apply`
+**Acceptance**: `source_ref`, `file_path`, and `source_ref_key` are populated deterministically for the canonical packet set  
+**Dry-run**: `npm run atlas:envelope:propagate-source-ref --dry-run`  
+**Apply**: `npm run atlas:envelope:propagate-source-ref --apply`
 
 ---
 
-### 5️⃣ mmap Registry Payloads (60 min)
-Wire memory-mapped registry for Parent Atlas 0-latency lookups. Enables L0 cache tier before Redis L1.
+### 4️⃣ Concept Coverage Backfill (30 min)
+Populate `used_concepts` in the feature-envelope lane with LangExtract plus lexical fallback. Keep it separate from canonical identity.
 
-**Acceptance**: L0 latency < 1ms after warm-up, mmap hit rate > 95%  
-**Dry-run**: `npm run atlas:mmap-registry:build --output /tmp/test-registry.mmap --dry-run`  
-**Apply**: `npm run atlas:mmap-registry:build --output sveltekit-frontend/.cache/packet-registry.mmap --apply`
+**Acceptance**: `used_concepts` reaches the target coverage threshold with no identity drift  
+**Dry-run**: `npm run atlas:concepts:backfill --dry-run`  
+**Apply**: `npm run atlas:concepts:backfill --apply`
 
 ---
 
-### 6️⃣ ACP Routing Fan-Out (90 min)
-Wire ACP (Agent Control Plane) routing for keyword/query/error fan-out. Enables agentic error-fixing MapReduce clustering.
+### 5️⃣ SOM 20x20 Contract Repair (45 min)
+Normalize `som_row` / `som_col` values to the 20x20 contract and re-run topology validation. Fix contract drift before more clustering.
 
-**Acceptance**: Keyword query routes < 5ms, error clustering is repeatable  
+**Acceptance**: SOM occupancy and coordinate bounds pass the 20x20 validation gate  
+**Dry-run**: `npm run atlas:som:20x20:validate --dry-run`  
+**Apply**: `npm run atlas:som:20x20:repair --apply`
+
+---
+
+### 6️⃣ Arrow Batch Import (45 min)
+Add the resumable import companion to the Arrow export lane. Keep Arrow batch-only and validate round-trip fidelity.
+
+**Acceptance**: Arrow import/export round-trips a bounded sample with zero divergence  
+**Dry-run**: `npm run atlas:arrow:batch:import --dry-run`  
+**Apply**: `npm run atlas:arrow:batch:import --apply`
+
+---
+
+### 7️⃣ mmap Hot Registry Writer (60 min)
+Serialize only validated packets into MsgPack and persist mmap offset / length / checksum in Postgres. Do not admit rejected packets into the hot registry.
+
+**Acceptance**: Validated packets produce deterministic mmap offsets and checksum-backed registry rows  
+**Dry-run**: `npm run atlas:mmap:registry:build --dry-run`  
+**Apply**: `npm run atlas:mmap:registry:build --apply`
+
+### 8️⃣ ACP Routing Fan-Out (90 min)
+Wire ACP (Agent Control Plane) routing for keyword/query/error fan-out. Keep the HMM router separate from execution and scoring.
+
+**Acceptance**: HMM classifications produce deterministic repair actions and stable traces across repeated runs  
 **Dry-run**: `npm run acp:routing:validate --verbose --dry-run`  
 **Apply**: `npm run acp:routing:wire --apply`
-
----
-
-### 7️⃣ Stub/Mock Cleanup (30 min)
-Remove all @mock/@todo/@stubbed code from Phase 8 live paths. Ensure all code uses real services (Postgres, Qdrant, Redis).
-
-**Acceptance**: `grep -r '@mock\|stubbed' sveltekit-frontend/src/lib/server/acp/` returns 0 hits  
-**Audit**: `npm run audit:stubs:find -- sveltekit-frontend/src/lib/server/acp`  
-**Cleanup**: `npm run audit:stubs:cleanup -- --apply`
 
 ---
 
@@ -96,7 +148,7 @@ Remove all @mock/@todo/@stubbed code from Phase 8 live paths. Ensure all code us
 | Gate | Check | Expected | Rationale |
 |------|-------|----------|-----------|
 | **G1** | `SELECT COUNT(DISTINCT qdrant_point_id) FROM atlas_packets WHERE qdrant_point_id IS NOT NULL` | 54,650 | All points have stable IDs |
-| **G2** | `SELECT packet_id, qdrant_point_id, tree_node_id, title_id FROM atlas_feature_envelopes LIMIT 1` | All four populated | Identity chain preserved |
+| **G2** | `SELECT packet_key, qdrant_point_id, tree_node_id, title_id FROM atlas_feature_envelopes LIMIT 1` | All four populated | Identity chain preserved |
 | **G3** | `npm run atlas:arrow:batch:validate` | 100/100 round-trip, sha256 match | Transport fidelity |
 | **G4** | `npm run benchmark:l0-latency -- --iterations 1000` | p99 < 2ms | 0-latency requirement |
 | **G5** | `npm run acp:routing:stability-test -- --runs 3` | 3 runs identical | Deterministic clustering |
@@ -126,13 +178,13 @@ Remove all @mock/@todo/@stubbed code from Phase 8 live paths. Ensure all code us
 
 ## Success Criteria
 
-**Phase 8.5 Complete** when:
-- ✅ All 7 tasks PASS
-- ✅ All 6 validation gates GREEN
-- ✅ Total duration: ~4.7 hours
+- **Phase 8.6 Complete** when:
+  - ✅ All 8 tasks PASS
+  - ✅ All 6 validation gates GREEN
+  - ✅ Total duration: ~5.2 hours
 
 **Unblocks**:
-- Phase 8.6 (Neo4j GDS suite: PageRank, CheiRank, Louvain, K-core)
+- Phase 8.7 (Neo4j GDS suite: PageRank, CheiRank, Louvain, K-core)
 - Phase 9 (Retrieval benchmark: precision@10, latency breakdown)
 
 ---

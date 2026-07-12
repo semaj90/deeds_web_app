@@ -12,8 +12,8 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import {
 	checkQdrantHealth,
 	ensureCollections,
@@ -36,7 +36,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const includeVectorCounts = counts === 'true';
 
 	try {
-		const client = new QdrantClient({ url: ENV.QDRANT_URL });
+		const client = getQdrantClient();
 
 		// Run health check
 		const health = await checkQdrantHealth(client, {
@@ -89,7 +89,7 @@ export const POST: RequestHandler = async ({ url, locals }) => {
 	}
 
 	try {
-		const client = new QdrantClient({ url: ENV.QDRANT_URL });
+		const client = getQdrantClient();
 
 		// Run health check first
 		const healthBefore = await checkQdrantHealth(client, {

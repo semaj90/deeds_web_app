@@ -16,6 +16,7 @@ import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { Pool } from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
+import { CANONICAL_SUMMARY_LEVELS, canonicalSummaryLevelPredicate } from './lib/summary-selection.mjs';
 
 type SummaryRow = {
   ctid: string;
@@ -43,6 +44,7 @@ type SchemaCheck = {
   failures: string[];
   summaryExpression: string;
   orderBy: string;
+  summaryLevelPredicate: string;
   selectSourceRef: string;
   selectFeatureId: string;
   selectLayerType: string;
@@ -85,6 +87,7 @@ const EXPECTED_DIM = Number(repoEnv.EMBEDDING_DIM || 768);
 const REPORT_DIR = path.resolve('docs', 'reports');
 const JSON_REPORT = path.join(REPORT_DIR, 'embeddinggemma-batch-worker.json');
 const MD_REPORT = path.join(REPORT_DIR, 'embeddinggemma-batch-worker.md');
+const CANONICAL_SUMMARY_LEVEL_LIST = CANONICAL_SUMMARY_LEVELS.join(', ');
 
 const pgPool = new Pool({
   connectionString: DATABASE_URL,
@@ -124,6 +127,7 @@ async function fetchSummaryRows(limit: number): Promise<SummaryRow[]> {
   const summaryLevel = schema?.selectSummaryLevel ?? 'summary_level';
   const summaryExpression = schema?.summaryExpression ?? "coalesce(summary, summary_text, '')";
   const orderBy = schema?.orderBy ?? 'updated_at NULLS FIRST, created_at NULLS FIRST, packet_key';
+  const summaryLevelPredicate = schema?.summaryLevelPredicate ?? canonicalSummaryLevelPredicate(summaryLevel);
   const result = await pgPool.query<SummaryRow>(
     `
       SELECT
@@ -137,6 +141,7 @@ async function fetchSummaryRows(limit: number): Promise<SummaryRow[]> {
       FROM atlas_summary_layers
       WHERE embedding IS NULL
         AND length(trim(${summaryExpression})) > 0
+        AND ${summaryLevelPredicate}
       ORDER BY ${orderBy}
       LIMIT $1
     `,
@@ -194,7 +199,7 @@ async function validateSchema(): Promise<SchemaCheck> {
   }
 
   if (!columns.has('canonical_source_ref')) {
-    hints.push('canonical_source_ref is not a scalar column in this database; derive it from source_ref/source_ref_key/file_path or JSONB metadata/payload.');
+    hints.push('atlas_summary_layers does not own canonical_source_ref as a scalar column; derive provenance from source_ref/source_ref_key/file_path or JSONB metadata/payload, and keep canonical_source_ref on the owning packet/envelope table.');
   }
 
   const embeddingType = columnTypes.embedding;
@@ -229,6 +234,9 @@ async function validateSchema(): Promise<SchemaCheck> {
     failures,
     summaryExpression,
     orderBy: orderColumns,
+    summaryLevelPredicate: columns.has('summary_level')
+      ? canonicalSummaryLevelPredicate('summary_level')
+      : 'TRUE',
     selectSourceRef: columns.has('source_ref') ? 'source_ref' : 'NULL::text AS source_ref',
     selectFeatureId: columns.has('feature_id') ? 'feature_id' : 'NULL::text AS feature_id',
     selectLayerType: columns.has('layer_type') ? 'layer_type' : 'NULL::text AS layer_type',
@@ -379,6 +387,7 @@ async function main() {
   const start = performance.now();
   console.log('EmbeddingGemma Batch Worker');
   console.log(`mode=${DRY_RUN ? 'dry-run' : 'apply'} limit=${LIMIT} batchSize=${BATCH_SIZE} concurrency=${CONCURRENCY}`);
+  console.log(`canonicalSummaryLevels=${CANONICAL_SUMMARY_LEVEL_LIST}`);
   console.log(`postgres=${redactDatabaseUrl(DATABASE_URL)} embed=${EMBED_URL} transport=${EMBED_TRANSPORT} model=${EMBED_MODEL} expectedDim=${EXPECTED_DIM}`);
 
   schemaCheck = await validateSchema();

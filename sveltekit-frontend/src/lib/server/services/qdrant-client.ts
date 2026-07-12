@@ -4,18 +4,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import { QdrantClient } from '@qdrant/js-client-rest';
-
-const QDRANT_URL = ENV.QDRANT_URL;
-
-let client: QdrantClient | null = null;
-
-function getClient(): QdrantClient {
-  if (!client) {
-    client = new QdrantClient({ url: QDRANT_URL });
-  }
-  return client;
-}
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
 const qdrantClient = {
   async search(params: {
@@ -25,7 +14,7 @@ const qdrantClient = {
     filter?: Record<string, unknown>;
   }): Promise<unknown[]> {
     try {
-      const results = await getClient().search(params.collectionName, {
+      const results = await getQdrantClient().search(params.collectionName, {
         vector: params.vector,
         limit: params.limit ?? 10,
         filter: params.filter as any,
@@ -43,7 +32,7 @@ const qdrantClient = {
     points: Array<{ id: string; vector: number[]; payload?: Record<string, unknown> }>;
   }): Promise<void> {
     try {
-      await getClient().upsert(params.collectionName, {
+      await getQdrantClient().upsert(params.collectionName, {
         wait: true,
         points: params.points,
       });

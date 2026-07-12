@@ -17,6 +17,7 @@ const privateEnv: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import type {
 	MinIOClient,
 	MinIOConfig,
@@ -35,7 +36,6 @@ import type {
 	ServiceEnvironment,
 	ServiceUrls
 } from '$lib/types/external-services';
-import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 
 // ===== Environment Configuration Loader =====
 /**
@@ -334,20 +334,11 @@ export class RedisAdapter implements RedisCacheService {
 export class QdrantAdapter implements QdrantClient {
   private client: any;
 
-  constructor(private config: QdrantConfig) {}
-
-  private async ensureClient() {
-    if (this.client) return;
-    const { QdrantClient: QdrantClientLib } = await import('@qdrant/js-client-rest');
-    this.client = new QdrantClientLib({
-      url: 'http://' + this.config.host + ':' + this.config.port,
-      apiKey: this.config.apiKey,
-      timeout: this.config.timeout || 30000,
-    });
+  constructor(private config: QdrantConfig) {
+    this.client = getQdrantClient();
   }
 
   async createCollection(name: string, vectorSize: number): Promise<void> {
-    await this.ensureClient();
     await this.client.createCollection(name, {
       vectors: { size: vectorSize, distance: 'Cosine' },
       hnsw_config: VECTOR_CONFIG.QDRANT_HNSW,
@@ -356,7 +347,6 @@ export class QdrantAdapter implements QdrantClient {
   }
 
   async indexCollection(name: string, vectors: QdrantVectorPayload[]): Promise<void> {
-    await this.ensureClient();
     const points = vectors.map(function (v) {
       return {
         id: v.id,
@@ -364,8 +354,7 @@ export class QdrantAdapter implements QdrantClient {
         payload: v.payload || {},
       };
     });
-    // Use the centralized qdrant upsert wrapper to enforce dimension checks
-    await qdrant.upsert({ collection: name, points: points } as any);
+    await this.client.upsert(name, { points });
   }
 
   async search(
@@ -373,7 +362,6 @@ export class QdrantAdapter implements QdrantClient {
     vector: number[],
     limit?: number
   ): Promise<QdrantSearchResult<any>[]> {
-    await this.ensureClient();
     const results = await this.client.search(collection, {
       vector: vector,
       limit: limit || 10,
@@ -391,13 +379,10 @@ export class QdrantAdapter implements QdrantClient {
   }
 
   async upsert(collection: string, points: QdrantVectorPayload[]): Promise<void> {
-    await this.ensureClient();
-    // Delegate to central qdrant wrapper to get validation, batching and cache invalidation
-    await qdrant.upsert({ collection, points } as any);
+    await this.client.upsert(collection, { points });
   }
 
   async deleteCollection(name: string): Promise<void> {
-    await this.ensureClient();
     await this.client.deleteCollection(name);
   }
 }

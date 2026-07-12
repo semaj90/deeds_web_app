@@ -12,7 +12,7 @@
  */
 
 import pg from 'pg';
-import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
 
 const { Pool } = pg;
@@ -75,7 +75,7 @@ async function backfillTreeNodes() {
     console.log('📦 Step 1: Fetch packets missing tree_node_id...');
     const packets = await pool.query(`
       SELECT
-        id as packet_id,
+        packet_id,
         packet_key,
         source_ref,
         feature_id,
@@ -139,7 +139,7 @@ async function backfillTreeNodes() {
 
         // Update Postgres
         await pool.query(
-          `UPDATE atlas_packets SET tree_node_id = $1, updated_at = NOW() WHERE id = $2`,
+          `UPDATE atlas_packets SET tree_node_id = $1, updated_at = NOW() WHERE packet_id = $2`,
           [treeNodeId, p.packet_id]
         );
 

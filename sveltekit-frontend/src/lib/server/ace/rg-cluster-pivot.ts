@@ -18,7 +18,7 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
-import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { readLatestQdrantClusterTags } from './cluster-tags-cache.js';
 import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 
@@ -53,14 +53,14 @@ function parseEncoded(csv: string): number[] {
 // ── Qdrant: get som_cluster + topoClass for a list of file paths ─────────────
 
 async function getClusterMembership(
-  qdrant: QdrantManager,
+  qdrant: any,
   filePaths: string[],
 ): Promise<Map<number, { topoClass: string; files: string[] }>> {
   const clusterMap = new Map<number, { topoClass: string; files: string[] }>();
   if (!filePaths.length) return clusterMap;
 
   try {
-    const client = (qdrant as any).client;
+    const client = qdrant;
     const result: any = await client.scroll(CODEBASE_COLLECTION, {
       filter: {
         must: [{ key: 'file_path', match: { any: filePaths.slice(0, 20) } }],
@@ -119,7 +119,7 @@ function meanCentroid(vecs: number[][]): number[] | null {
 // ── Qdrant: expand to files belonging to pivot cluster ids ───────────────────
 
 async function expandClusters(
-  qdrant: QdrantManager,
+  qdrant: any,
   clusterIds: number[],
   excludePaths: Set<string>,
   karpathyScores: Map<string, number>,
@@ -128,7 +128,7 @@ async function expandClusters(
   const results: UnifiedRetrievalResult[] = [];
 
   try {
-    const client = (qdrant as any).client;
+    const client = qdrant;
     const result: any = await client.scroll(CODEBASE_COLLECTION, {
       filter: {
         must: [{ key: 'som_cluster', match: { any: clusterIds } }],
@@ -274,7 +274,7 @@ export async function clusterPivot(
   const empty: ClusterPivotResult = { hits: [], pivotClusters: [], anchoredFiles: 0 };
   if (!fastAstFilePaths.length) return empty;
 
-  const qdrant = new QdrantManager();
+  const qdrant = getQdrantClient();
   const redis = getRedis();
 
   // Step 1: get som_cluster membership for rg-matched files

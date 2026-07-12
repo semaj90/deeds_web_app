@@ -41,9 +41,8 @@ export const POST: RequestHandler = async (event) => {
 		}
 
 		// Search across evidence and document collections
-		const { QdrantClient } = await import('@qdrant/js-client-rest');
-		const { ENV } = await import('$lib/server/env.server.js');
-		const client = new QdrantClient({ url: ENV.QDRANT_URL });
+		const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+		const client = getQdrantClient();
 
 		const results: Array<{ id: string; title: string; score: number; tags?: string[] }> = [];
 

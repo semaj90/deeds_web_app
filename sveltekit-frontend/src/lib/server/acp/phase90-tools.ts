@@ -9,23 +9,10 @@
  * - Neo4j knowledge graph relationships
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import type Redis from 'ioredis';
-
-// Extended Qdrant client interface (use intersection to avoid incompatible override)
-interface QdrantClientExt extends QdrantClient {
-	scroll(
-		collection_name: string,
-		args?: {
-			limit?: number;
-			filter?: unknown;
-			with_payload?: boolean;
-		}
-	): Promise<{
-	points: Array<{ id: string | number; payload?: Record<string, unknown> }> }>;
-}
 
 // ioredis client type alias
 type RedisClientExt = Redis;
@@ -56,16 +43,6 @@ interface ClusterInfo {
 	topCodes: string[];
 	topFiles: string[];
 	summary?: string;
-}
-
-// Connections
-let qdrant: QdrantClientExt | null = null;
-
-async function getQdrant(): Promise<QdrantClientExt> {
-	if (!qdrant) {
-		qdrant = new QdrantClient({ url: ENV.QDRANT_URL }) as QdrantClientExt;
-	}
-	return qdrant;
 }
 
 async function getRedisClient(): Promise<RedisClientExt> {
@@ -171,7 +148,7 @@ export async function phase90_search_errors(
 	topK: number = 10,
 	clusterId?: number
 ): Promise<SearchResult[]> {
-	const client = await getQdrant();
+	const client = getQdrantClient();
 
 	const filter = clusterId !== undefined
 		? { must: [{
@@ -206,7 +183,7 @@ export async function phase90_search_errors(
 }
 
 export async function phase90_get_cluster(clusterId: number): Promise<ClusterInfo | null> {
-	const client = await getQdrant();
+	const client = getQdrantClient();
 
 	const clusterResults = await client.scroll('phase90_error_clusters', {
 		limit: 100,
@@ -261,7 +238,7 @@ export async function phase90_get_fix_order(): Promise<
 	{ clusterId: number;
 	errorCount: number, priority: number }[]
 > {
-	const client = await getQdrant();
+	const client = getQdrantClient();
 
 	const results = await client.scroll('phase90_error_clusters', {
 		limit: 100,
@@ -334,7 +311,7 @@ export async function phase90_get_stats(): Promise<{
 	totalKeys: number, glyphKeys: number;
 	embedKeys: number };
 }> {
-	const qdrantClient = await getQdrant();
+	const qdrantClient = getQdrantClient();
 	const redisClient = await getRedisClient();
 
 	const embeddings = await qdrantClient.getCollection('phase90_cuda_embeddings');
@@ -377,7 +354,7 @@ export async function phase90_get_file_errors(
 	filePath: string,
 	limit: number = 50
 ): Promise<SearchResult[]> {
-	const client = await getQdrant();
+	const client = getQdrantClient();
 
 	const results = await client.scroll('phase90_cuda_embeddings', {
 		limit: limit * 5,
@@ -409,7 +386,7 @@ export async function phase90_get_fix_recommendation(clusterId: number): Promise
 	priority: string;
 	affectedFiles: string[];
 } | null> {
-	const client = await getQdrant();
+	const client = getQdrantClient();
 
 	const results = await client.scroll('phase90_fix_recommendations', {
 		limit: 100,

@@ -97,6 +97,8 @@ export async function assemblePacketForSourceRef(opts: AssembleOpts): Promise<As
   const packet = await writeAcePacket({
     query: effectiveQuery,
     query_hash: queryHash,
+    packet_ulid: null,
+    title_id: null,
     source_refs: allSourceRefs,
     feature_ids: allFeatureIds,
     lane_ids: [...new Set(laneIds)],

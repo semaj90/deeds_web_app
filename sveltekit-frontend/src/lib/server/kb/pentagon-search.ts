@@ -1,4 +1,4 @@
-import { QdrantManager } from '../vector/qdrant-manager.js';
+import { getQdrantClient } from '../vector/qdrant-singleton.js';
 import { getNeo4jDriver } from '../neo4j-driver.js';
 import { db } from '../db/client.js';
 import { enhancedGraphMappings } from '../db/schema/graph-mappings.js';
@@ -20,7 +20,7 @@ export interface PentagonTrace {
 export async function executePentagonSearch(query: string, options: { limit?: number; dryRun?: boolean } = {}) {
   const limit = options.limit ?? 10;
   const dryRun = options.dryRun ?? false;
-  const qdrant = new QdrantManager();
+  const qdrant = getQdrantClient();
   const neo4j = getNeo4jDriver();
   
   const trace: PentagonTrace = {

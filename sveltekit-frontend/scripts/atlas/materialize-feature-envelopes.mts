@@ -21,6 +21,7 @@ import { Pool } from 'pg';
 import process from 'process';
 import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 import { buildTopologyEnvelope, deriveCentroidKeys, deriveDomainClass } from '../../../scripts/atlas/lib/topology-ontology.mjs';
+import { CANONICAL_SUMMARY_LEVELS, canonicalSummaryLevelOrder } from '../../../scripts/atlas/lib/summary-selection.mjs';
 
 const ENV = loadRepoEnv(process.env);
 
@@ -201,6 +202,7 @@ async function main() {
 
   try {
     console.log(`[MATERIALIZE] Starting feature envelope materialization ${DRY_RUN ? '(DRY_RUN)' : ''}`);
+    console.log(`[MATERIALIZE] Canonical summary levels: ${CANONICAL_SUMMARY_LEVELS.join(', ')}`);
 
     // Create output table if not exists
     if (!DRY_RUN) {
@@ -359,7 +361,8 @@ async function main() {
         SELECT *
         FROM atlas_summary_layers layer
         WHERE layer.packet_key = ap.packet_key
-        ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
+          AND layer.summary_level IN ('packet', 'gemma4_packet_summary', 'file')
+        ORDER BY ${canonicalSummaryLevelOrder('layer')}
         LIMIT 1
       ) asl ON TRUE
       LEFT JOIN LATERAL (
@@ -420,7 +423,8 @@ async function main() {
           SELECT *
           FROM atlas_summary_layers layer
           WHERE layer.packet_key = ap.packet_key
-          ORDER BY layer.generated_at DESC NULLS LAST, layer.created_at DESC NULLS LAST
+            AND layer.summary_level IN ('packet', 'gemma4_packet_summary', 'file')
+          ORDER BY ${canonicalSummaryLevelOrder('layer')}
           LIMIT 1
         ) asl ON TRUE
         LIMIT 1;

@@ -3,7 +3,8 @@
  * Auto-creates missing collections on server startup
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import type { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
 import { checkQdrantHealth, ensureCollections } from '$lib/server/vector/qdrant-health.js';
 
@@ -30,7 +31,7 @@ export async function initializeQdrant(): Promise<void> {
 		console.log('🔍 Checking Qdrant collection health...');
 
 		try {
-			const client = new QdrantClient({ url: ENV.QDRANT_URL });
+			const client = getQdrantClient();
 
 			// Check current health
 			const healthBefore = await checkQdrantHealth(client, {

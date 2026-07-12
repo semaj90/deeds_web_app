@@ -19,6 +19,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { persistSemanticTopkRows } from './lib/semantic-topk-storage.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -238,6 +239,39 @@ async function main() {
       with_tree: topClusters.filter((row) => row.tree_linked_count > 0).length,
     },
     top_clusters: topClusters.slice(0, TOP_K),
+  };
+
+  let storageResult = { attempted: 0, written: 0, failed: 0 };
+  if (APPLY) {
+    log('3/3 persisting semantic top-k analysis to atlas_packet_metrics...');
+    storageResult = await persistSemanticTopkRows(pool, report.top_clusters, {
+      generatedAt: report.generated_at,
+      mode: report.mode,
+      limit: report.limit,
+      offset: report.offset,
+      topK: report.top_k,
+      minCommunitySize: report.min_community_size,
+      source: 'semantic-fanout-topk',
+    });
+    log(`persisted ${storageResult.written}/${storageResult.attempted} semantic top-k rows`);
+  } else {
+    log('3/3 dry-run: semantic top-k persistence skipped');
+  }
+
+  report.storage = {
+    ...storageResult,
+    applied: APPLY,
+    target_table: 'atlas_packet_metrics',
+    target_columns: [
+      'semantic_topk_rank',
+      'semantic_topk_score',
+      'semantic_topk_feature_id',
+      'semantic_topk_domain_class',
+      'semantic_topk_title_id',
+      'semantic_topk_source',
+      'semantic_topk_generated_at',
+      'semantic_topk_analysis',
+    ],
   };
 
   await writeReports(report);

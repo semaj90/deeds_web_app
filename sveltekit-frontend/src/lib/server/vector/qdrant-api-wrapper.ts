@@ -1,16 +1,13 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from './qdrant-singleton.js';
 import { productionLogger as logger } from '../production-logger.js';
 import { ENV } from '$lib/server/env.server.js';
 
 export class QdrantApiWrapper {
-    private client: QdrantClient;
+    private client: ReturnType<typeof getQdrantClient>;
 
     constructor(config: {
 	url: string; apiKey?: string }) {
-        this.client = new QdrantClient({
-            url: config.url,
-            apiKey: config.apiKey,
-        });
+        this.client = getQdrantClient();
     }
 
     async getCollections() {

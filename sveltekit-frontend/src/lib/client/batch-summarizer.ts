@@ -12,7 +12,7 @@
  * 5. POST hints to SvelteKit API for server validation + RabbitMQ queueing
  */
 
-import type { Pipeline } from '@xenova/transformers';
+// Note: Pipeline is a union type in @xenova/transformers — use any for the field
 
 interface TupleClassification {
   tupleId: string;
@@ -32,7 +32,8 @@ interface BatchSummaryHints {
 }
 
 export class BatchSummarizer {
-  private pipeline: Pipeline | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private pipeline: any = null;
   private initialized = false;
 
   /**
@@ -43,10 +44,11 @@ export class BatchSummarizer {
     if (this.initialized) return;
 
     try {
-      const { pipeline } = await import('@xenova/transformers');
+      const transformers = await import('@xenova/transformers');
+      const pipelineFn = (transformers as any).pipeline ?? transformers.pipeline;
 
       console.log('🚀 Loading Gemma4 E2B ONNX (q4f16)...');
-      this.pipeline = await pipeline(
+      this.pipeline = await pipelineFn(
         'text-generation',
         'onnx-community/gemma-4-E2B-it-ONNX',
         {

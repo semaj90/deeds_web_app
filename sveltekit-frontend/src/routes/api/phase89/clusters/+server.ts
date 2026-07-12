@@ -1,13 +1,8 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
 import type { RequestHandler } from './$types';
 import { pool as aiPool } from '$lib/server/db/client';
-import { ENV } from '$lib/server/env.server.js';
-
-const qdrant = new QdrantClient({
-	url: ENV.QDRANT_URL
-});
 
 function isMissingRelationError(error: unknown): boolean {
   return (

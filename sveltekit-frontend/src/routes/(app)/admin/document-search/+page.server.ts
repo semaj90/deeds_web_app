@@ -81,7 +81,8 @@ export const actions: Actions = {
       }
 
       const qdrantCollection = QDRANT_COLLECTION[collection] ?? collection;
-      const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+      const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+      const qdrant = getQdrantClient();
 
       const searchOpts: Record<string, unknown> = {
         vector,

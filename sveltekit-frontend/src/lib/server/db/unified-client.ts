@@ -12,7 +12,7 @@
  */
 
 import { building } from '$app/environment';
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
@@ -20,6 +20,7 @@ import path from 'path';
 import postgres from 'postgres';
 import * as schema from './schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
+import type { QdrantClient } from '@qdrant/js-client-rest';
 
 // Define DocumentMetadata locally since it may not be exported from schema-unified
 interface DocumentMetadata {
@@ -107,7 +108,7 @@ class DatabaseManager {
     static instance: DatabaseManager;
     private runtimeConnection?: postgres.Sql;
     private adminConnection?: postgres.Sql;
-    private qdrantClient?: QdrantClient;
+    private qdrantClient?: ReturnType<typeof getQdrantClient>;
     private runtimeDb?: ReturnType<typeof drizzle>;
     private adminDb?: ReturnType<typeof drizzle>;
     private initialized = false;
@@ -160,12 +161,9 @@ class DatabaseManager {
         return this.adminConnection;
     }
 
-    private createQdrantClient(): QdrantClient | undefined {
+    private createQdrantClient(): ReturnType<typeof getQdrantClient> | undefined {
         if (config.qdrant && !this.qdrantClient) {
-            this.qdrantClient = new QdrantClient({
-                url: config.qdrant.url,
-                apiKey: config.qdrant.apiKey
-            });
+            this.qdrantClient = getQdrantClient();
         }
         return this.qdrantClient;
     }

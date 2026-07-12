@@ -5,6 +5,7 @@
 
 	let results = $state<Array<{ name: string; status: 'pass' | 'fail' | 'skip'; message: string; duration?: number }>>([]);
 	let isRunning = $state(false);
+	let testStatus = $state<'idle' | 'running' | 'complete'>('idle');
 
 	function addResult(name: string, status: 'pass' | 'fail' | 'skip', message: string, duration?: number) {
 		results = [...results, { name, status, message, duration }];

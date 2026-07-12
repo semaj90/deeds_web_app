@@ -273,10 +273,10 @@ async function getCouchDbStats() {
 
 async function getQdrantStats() {
   return safe('qdrant:wiki-stats', async () => {
-    const { QdrantManager } = await import('../vector/qdrant-manager.js');
-    const qdrant = new QdrantManager();
-    const collection = qdrant.collections.codebase_chunks;
-    const info = await qdrant.client.getCollection(collection);
+    const { getQdrantClient } = await import('../vector/qdrant-singleton.js');
+    const qdrant = getQdrantClient();
+    const collection = 'codebase_chunks_768';
+    const info = await qdrant.getCollection(collection);
     const pointCount = Number((info as any).points_count ?? (info as any).vectors_count ?? 0);
     const payloadSchema = (info as any).payload_schema ?? {};
     return {
@@ -367,10 +367,10 @@ async function searchAgentsMarkdown(query: string, limit: number): Promise<WikiS
 
 async function searchQdrantPayloads(query: string, limit: number): Promise<WikiSearchHit[]> {
   return safe('qdrant:payload-search', async () => {
-    const { QdrantManager } = await import('../vector/qdrant-manager.js');
-    const qdrant = new QdrantManager();
-    const collection = qdrant.collections.codebase_chunks;
-    const response = await qdrant.client.scroll(collection, {
+    const { getQdrantClient } = await import('../vector/qdrant-singleton.js');
+    const qdrant = getQdrantClient();
+    const collection = 'codebase_chunks_768';
+    const response = await qdrant.scroll(collection, {
       limit: Math.min(limit * 10, 100),
       with_payload: true,
       with_vector: false,

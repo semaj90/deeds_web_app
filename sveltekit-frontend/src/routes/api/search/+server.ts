@@ -278,8 +278,9 @@ async function searchRaptorAtlas(q: string, limit: number): Promise<PlatformSear
 		const results = await qdrant._denseSearch({
 			collection: 'summary_lenses',
 			query: q,
-			queryEmbedding: queryVec,
-			filters: { lens_type: 'thematic_summary' },
+			queryVector: queryVec,
+			vectorName: 'semantic_embedding',
+			filter: { lens_type: 'thematic_summary' },
 			limit
 		});
 

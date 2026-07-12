@@ -15,6 +15,7 @@ export default defineConfig({
       // Vitest unit tests — explicitly listed to avoid picking up 66+ Playwright files in tests/
       'tests/bitmap-optimization.spec.ts',
       'tests/ace-policy.spec.ts',
+      'tests/okf-loader.spec.ts',
       'tests/code-llm-index.spec.ts',
       'tests/openai-facade.spec.ts',
       'tests/intent-ranker.spec.ts',

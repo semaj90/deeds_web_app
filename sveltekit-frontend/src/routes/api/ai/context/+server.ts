@@ -76,14 +76,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Attempt vector search for query-relevant documents
 		try {
-			const { QdrantClient } = await import('@qdrant/js-client-rest');
+			const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
 			const { generateEmbeddings } = await import('$lib/server/grpc/embedding-client.js');
 			const embResult = await generateEmbeddings([query]);
 			const embedding = embResult?.vectors?.[0];
 
 			if (embedding?.length === 768) {
-				const { ENV: env } = await import('$lib/server/env.server.js');
-				const client = new QdrantClient({ url: env.QDRANT_URL });
+				const client = getQdrantClient();
 				const results = await client.search('legal_documents', {
 					vector: embedding,
 					limit,

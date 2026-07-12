@@ -14,7 +14,7 @@
  * Returns top-K results with unified score and source attribution.
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import Redis from 'ioredis';
 import pg from 'pg';
 import type { QueryResult } from 'pg';
@@ -127,9 +127,7 @@ async function searchQdrant(
   timeout: number
 ): Promise<SearchResult[]> {
   try {
-    const qdrant = new QdrantClient({
-      url: process.env.QDRANT_URL || 'http://127.0.0.1:6333',
-    });
+    const qdrant = getQdrantClient();
 
     const signal = AbortSignal.timeout(timeout);
     const searchRes = await qdrant.search('codebase_chunks_768', {

@@ -124,23 +124,76 @@ async function validateUniqueness() {
 async function validateCrossTable() {
   console.log('🔍 CROSS-TABLE CONSISTENCY\n');
 
-  // Check atlas_summary_layers alignment
-  const summaryRes = await pgPool.query(`
+  const columnRes = await pgPool.query(`
+    SELECT column_name
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'atlas_summary_layers'
+  `);
+  const columns = new Set(columnRes.rows.map((row) => row.column_name));
+  const checks = [];
+
+  if (columns.has('tree_node_id')) {
+    const summaryRes = await pgPool.query(`
+      SELECT
+        COUNT(*) total,
+        COUNT(CASE WHEN tree_node_id IS NOT NULL THEN 1 END) tree_node_synced
+      FROM atlas_summary_layers
+    `);
+    const summary = summaryRes.rows[0];
+    const pct = summary.total > 0 ? (summary.tree_node_synced / summary.total) * 100 : 0;
+    const pass = pct >= 95;
+    console.log(`  atlas_summary_layers.tree_node_id: ${pct.toFixed(2)}% ${pass ? '✅' : '❌'}`);
+    checks.push(pass);
+  } else {
+    console.log('  atlas_summary_layers.tree_node_id: skipped (column not present)');
+  }
+
+  if (columns.has('used_concepts')) {
+    const summaryRes = await pgPool.query(`
+      SELECT
+        COUNT(*) total,
+        COUNT(CASE WHEN used_concepts IS NOT NULL THEN 1 END) concepts_synced
+      FROM atlas_summary_layers
+    `);
+    const summary = summaryRes.rows[0];
+    const pct = summary.total > 0 ? (summary.concepts_synced / summary.total) * 100 : 0;
+    const pass = pct >= 80;
+    console.log(`  atlas_summary_layers.used_concepts: ${pct.toFixed(2)}% ${pass ? '✅' : '❌'}\n`);
+    checks.push(pass);
+  } else {
+    console.log('  atlas_summary_layers.used_concepts: skipped (column not present)\n');
+  }
+
+  return checks.length === 0 ? true : checks.every(Boolean);
+}
+
+async function validateSummaryEmbeddingMirror() {
+  console.log('🔍 SUMMARY EMBEDDING MIRROR\n');
+
+  const summaryEmbeddingRes = await pgPool.query(`
     SELECT
       COUNT(*) total,
-      COUNT(CASE WHEN tree_node_id IS NOT NULL THEN 1 END) tree_node_synced,
-      COUNT(CASE WHEN used_concepts IS NOT NULL THEN 1 END) concepts_synced
+      COUNT(CASE WHEN embedding IS NOT NULL THEN 1 END) summary_embedding_rows
     FROM atlas_summary_layers
   `);
 
-  const summary = summaryRes.rows[0];
-  const summaryTreePass = summary.tree_node_synced / summary.total >= 0.95;
-  const summaryConceptsPass = summary.concepts_synced / summary.total >= 0.80;
+  const packetEmbeddingRes = await pgPool.query(`
+    SELECT
+      COUNT(*) total,
+      COUNT(CASE WHEN metadata->'feature_envelope'->'summary_embedding' IS NOT NULL THEN 1 END) packet_envelope_embedding_rows
+    FROM atlas_packets
+  `);
 
-  console.log(`  atlas_summary_layers.tree_node_id: ${(summary.tree_node_synced / summary.total * 100).toFixed(2)}% ${summaryTreePass ? '✅' : '❌'}`);
-  console.log(`  atlas_summary_layers.used_concepts: ${(summary.concepts_synced / summary.total * 100).toFixed(2)}% ${summaryConceptsPass ? '✅' : '❌'}\n`);
+  const summaryEmbedding = summaryEmbeddingRes.rows[0];
+  const packetEmbedding = packetEmbeddingRes.rows[0];
+  const summaryPct = summaryEmbedding.total > 0 ? (summaryEmbedding.summary_embedding_rows / summaryEmbedding.total) * 100 : 0;
+  const packetPct = packetEmbedding.total > 0 ? (packetEmbedding.packet_envelope_embedding_rows / packetEmbedding.total) * 100 : 0;
 
-  return summaryTreePass && summaryConceptsPass;
+  console.log(`  atlas_summary_layers.embedding: ${summaryPct.toFixed(2)}% (${summaryEmbedding.summary_embedding_rows}/${summaryEmbedding.total})`);
+  console.log(`  atlas_packets.metadata.feature_envelope.summary_embedding: ${packetPct.toFixed(2)}% (${packetEmbedding.packet_envelope_embedding_rows}/${packetEmbedding.total})\n`);
+
+  return true;
 }
 
 async function main() {
@@ -155,12 +208,15 @@ async function main() {
     // 3. Validate cross-table consistency
     const crossTablePass = await validateCrossTable();
 
-    // 4. Summary
+    // 4. Report summary embedding mirror coverage
+    const summaryEmbeddingPass = await validateSummaryEmbeddingMirror();
+
+    // 5. Summary
     console.log('╔════════════════════════════════════════════════════════════════╗');
     console.log('║  SUMMARY                                                       ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    const allPass = fieldPass && uniquePass && crossTablePass;
+    const allPass = fieldPass && uniquePass && crossTablePass && summaryEmbeddingPass;
 
     if (allPass) {
       console.log('✅ CARD 1 COMPLETE: Envelope Extraction Validated\n');

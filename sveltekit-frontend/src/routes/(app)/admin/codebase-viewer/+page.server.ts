@@ -18,8 +18,8 @@ export const load: PageServerLoad = async () => {
 
 		// Try Qdrant (may not be running)
 		try {
-			const { QdrantClient } = await import('@qdrant/js-client-rest');
-			const qdrant = new QdrantClient({ url: getQdrantUrl(), timeout: 5000 });
+			const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+			const qdrant = getQdrantClient();
 
 			const collections = await qdrant.getCollections();
 			const collectionStats = await Promise.all(

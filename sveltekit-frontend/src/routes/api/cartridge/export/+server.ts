@@ -10,8 +10,8 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { buildCartridge, type RuneData, type CartridgeMetadata } from '$lib/server/cartridge/chr97-builder.js';
@@ -60,13 +60,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     // Redis unavailable — proceed without cache
   }
 
-  // Connect to Qdrant
-  let qdrant: QdrantClient;
-  try {
-    qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
-  } catch (err) {
-    return json({ error: 'Qdrant connection failed' }, { status: 503 });
-  }
+  // Connect to Qdrant (singleton pooled client)
+  const qdrant = getQdrantClient();
 
   // Scroll all evidence chunks matching this caseId
   const collectionName = collections?.[0] ?? 'evidence_items';

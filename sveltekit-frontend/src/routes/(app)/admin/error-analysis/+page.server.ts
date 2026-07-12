@@ -4,7 +4,7 @@
  * SSR data from Qdrant + PostgreSQL for RAG+KAG powered error analysis
  */
 
-import { QdrantClient } from '@qdrant/js-client-rest';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { getDatabaseUrl, getQdrantUrl } from '$lib/config/env.server.js';
 import pg from 'pg';
 import type { PageServerLoad } from './$types';
@@ -13,7 +13,7 @@ const { Pool } = pg;
 
 
 export const load: PageServerLoad = async () => {
-	const qdrant = new QdrantClient({ url: getQdrantUrl() });
+	const qdrant = getQdrantClient();
 
 	const aiPool = new Pool({ connectionString: getDatabaseUrl() });
 

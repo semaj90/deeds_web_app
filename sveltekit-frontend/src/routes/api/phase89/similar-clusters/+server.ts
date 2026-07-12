@@ -1,12 +1,7 @@
-import { QdrantClient } from '@qdrant/js-client-rest';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
-
-const qdrant = new QdrantClient({
-	url: ENV.QDRANT_URL
-});
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 
 const similarClustersSchema = z.object({
 	cluster_id: z.number().int().optional(),
@@ -24,6 +19,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { cluster_id, embedding, limit } = parsed.data;
 
 		// Search for similar clusters using cosine similarity
+		const qdrant = getQdrantClient();
 		const searchResults = await qdrant.search('phase89_error_clusters', {
 			vector: embedding,
 			limit: limit + 1, // +1 to exclude the query cluster itself

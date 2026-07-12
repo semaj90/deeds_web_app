@@ -12,7 +12,7 @@
  */
 
 import pg from 'pg';
-import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
+import { loadRepoEnv, resolveDatabaseUrl } from '../../../scripts/atlas/connection-config.mjs';
 import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
 
 const { Pool } = pg;
@@ -95,7 +95,7 @@ async function extractConcepts() {
     console.log('📦 Step 1: Fetch packets missing concept_ids...');
     const packets = await pool.query(`
       SELECT
-        id as packet_id,
+        packet_id,
         packet_key,
         summary
       FROM atlas_packets
@@ -159,7 +159,7 @@ async function extractConcepts() {
         await pool.query(
           `UPDATE atlas_packets
            SET concept_ids = $1, updated_at = NOW()
-           WHERE id = $2`,
+           WHERE packet_id = $2`,
           [JSON.stringify(uniqueConcepts), p.packet_id]
         );
 

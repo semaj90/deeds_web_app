@@ -32,8 +32,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { QdrantClient } from '@qdrant/js-client-rest';
-import { ENV } from '$lib/server/env.server.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import {
   buildGlyphTileAtlas,
   type EmbeddingPoint,
@@ -90,7 +89,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const points: EmbeddingPoint[] = [];
 
   try {
-    const qdrant = new QdrantClient({ url: ENV.QDRANT_URL });
+    const qdrant = getQdrantClient();
     let nextOffset: string | number | undefined;
 
     for (let page = 0; page < 100; page++) {

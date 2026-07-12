@@ -2,13 +2,13 @@ import { db } from '$lib/server/db/client';
 import { enhancedGraphMappings } from '$lib/server/db/schema/graph-mappings.js';
 import { featureMaps, grpoMemorySticks } from '$lib/server/db/schema/features.js';
 import { getRedis } from '$lib/server/redis.js';
-import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { sql, count, eq, ilike, or, and } from 'drizzle-orm';
 import { readWikiCard } from './wiki-couchdb-client.js';
 
 export class WikiMcpService {
-  private qdrant = new QdrantManager();
+  private qdrant = getQdrantClient();
 
   /**
    * wiki.status
