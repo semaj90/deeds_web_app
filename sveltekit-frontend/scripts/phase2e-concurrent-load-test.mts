@@ -70,8 +70,10 @@ async function runConcurrentRequests(
 ): Promise<{ requests: ConcurrentRequest[]; peakMemory: number; avgMemory: number }> {
   const requests: ConcurrentRequest[] = [];
   const memorySnapshots: number[] = [];
+  const inFlightRequests: Promise<void>[] = [];
   const startTime = Date.now();
   let requestId = 0;
+  let shouldStop = false;
 
   const queryVariations = [
     { text: 'authentication', embedding: Array(384).fill(0.3) },
@@ -106,8 +108,8 @@ async function runConcurrentRequests(
 
       request.endTime = opEnd;
       request.latencyMs = opEnd - opStart;
-      request.success = result.results && result.results.length > 0;
-      request.cached = (result.results?.length ?? 0) > 0; // Simplified: assume success = cached
+      request.success = (result?.results?.length ?? 0) > 0;
+      request.cached = (result?.results?.length ?? 0) > 0; // Simplified: assume success = cached
 
       requests.push(request);
     } catch (e) {
@@ -122,6 +124,7 @@ async function runConcurrentRequests(
   // Queue requests at steady rate to achieve target concurrency
   const queueInterval = setInterval(() => {
     if (Date.now() - startTime > duration * 1000) {
+      shouldStop = true;
       clearInterval(queueInterval);
       return;
     }
@@ -129,9 +132,8 @@ async function runConcurrentRequests(
     // Submit `concurrency` requests in parallel
     for (let i = 0; i < concurrency; i++) {
       const queryVar = queryVariations[requestId % queryVariations.length];
-      submitRequest(queryVar).catch(err => {
-        console.error(`Request error: ${err instanceof Error ? err.message : String(err)}`);
-      });
+      const promise = submitRequest(queryVar);
+      inFlightRequests.push(promise);
     }
   }, 100); // Submit batch every 100ms
 
@@ -141,9 +143,15 @@ async function runConcurrentRequests(
     memorySnapshots.push(memUsage.heapUsed / 1024 / 1024);
   }, 500);
 
-  // Wait for test duration + 2 seconds for pending requests
-  await sleep((duration + 2) * 1000);
+  // Wait for test duration
+  await sleep(duration * 1000);
+  shouldStop = true;
   clearInterval(queueInterval);
+
+  // Wait for all in-flight requests to complete (with timeout)
+  const timeoutPromise = new Promise<void>(resolve => setTimeout(resolve, 5000));
+  await Promise.race([Promise.all(inFlightRequests), timeoutPromise]);
+
   clearInterval(memoryInterval);
 
   const peakMemory = Math.max(...memorySnapshots, 0);
@@ -186,7 +194,7 @@ async function main() {
 
   const successfulRequests = requests.filter(r => r.success);
   const failedRequests = requests.filter(r => !r.success);
-  const latencies = successfulRequests.map(r => r.latencyMs ?? 0);
+  const latencies = requests.map(r => r.latencyMs ?? 0).filter(l => l > 0);
   const cachedRequests = successfulRequests.filter(r => r.cached).length;
 
   const stats = latencies.length > 0 ? calculateStats(latencies) : { mean: 0, median: 0, p95: 0, p99: 0, min: 0, max: 0 };

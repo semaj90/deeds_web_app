@@ -564,48 +564,66 @@ export class QdrantManager {
         }
 
         // Fallback: original behavior (no dedupe)
-        const collectionName =
-          this.collections[params.collection as keyof typeof this.collections] ?? params.collection;
-        const prefetches = params.queries.map((q) => {
-          const prefetch: any = { limit: q.limit ?? params.limit ?? 20 };
-          if (q.vector) {
-            if (Array.isArray(q.vector)) {
-              prefetch.query = q.vector;
-              if (q.vectorName) prefetch.using = q.vectorName;
-            } else {
-              prefetch.query = { indices: q.vector.indices, values: q.vector.values };
-              prefetch.using = q.vectorName ?? 'bm25';
+        try {
+          const collectionName =
+            this.collections[params.collection as keyof typeof this.collections] ?? params.collection;
+          const prefetches = params.queries.map((q) => {
+            const prefetch: any = { limit: q.limit ?? params.limit ?? 20 };
+            if (q.vector) {
+              if (Array.isArray(q.vector)) {
+                prefetch.query = q.vector;
+                if (q.vectorName) prefetch.using = q.vectorName;
+              } else {
+                prefetch.query = { indices: q.vector.indices, values: q.vector.values };
+                prefetch.using = q.vectorName ?? 'bm25';
+              }
             }
-          }
-          if (q.filter) prefetch.filter = this.buildQdrantFilter(q.filter);
-          return prefetch;
-        });
+            if (q.filter) prefetch.filter = this.buildQdrantFilter(q.filter);
+            return prefetch;
+          });
 
-        const searchRequest: any = {
-          prefetch: prefetches,
-          query: { fusion: params.fusion ?? 'rrf' },
-          limit: params.limit ?? 10,
-          score_threshold: params.scoreThreshold ?? 0.01,
-          with_payload: true,
-        };
-        const results = (await this.client.query(collectionName, searchRequest)) as any;
-        const responseTime = Date.now() - startTime;
-        return {
-          results: results.points.map((p: any) => ({
-            id: p.id,
-            score: p.score,
-            payload: p.payload,
-          })),
-          metadata: {
-            query: 'multi-query-fusion',
-            collection: params.collection,
-            responseTime,
-            total_results: results.points.length,
-            cached: false,
-            searchType: 'multi-query-fusion',
-            fusion: params.fusion ?? 'rrf',
-          },
-        };
+          const searchRequest: any = {
+            prefetch: prefetches,
+            query: { fusion: params.fusion ?? 'rrf' },
+            limit: params.limit ?? 10,
+            score_threshold: params.scoreThreshold ?? 0.01,
+            with_payload: true,
+          };
+
+          const results = (await this.client.query(collectionName, searchRequest)) as any;
+
+          // Validate response structure
+          if (!results || !results.points || !Array.isArray(results.points)) {
+            console.error('[qdrant] multiQuerySearch response missing .points array:', {
+              hasResults: !!results,
+              hasPoints: results?.points !== undefined,
+              pointsType: typeof results?.points,
+              responseKeys: results ? Object.keys(results) : null,
+            });
+            throw new Error(`Qdrant query returned invalid response structure: ${JSON.stringify(results)}`);
+          }
+
+          const responseTime = Date.now() - startTime;
+          return {
+            results: results.points.map((p: any) => ({
+              id: p.id,
+              score: p.score,
+              payload: p.payload,
+            })),
+            metadata: {
+              query: 'multi-query-fusion',
+              collection: params.collection,
+              responseTime,
+              total_results: results.points.length,
+              cached: false,
+              searchType: 'multi-query-fusion',
+              fusion: params.fusion ?? 'rrf',
+            },
+          };
+        } catch (err) {
+          console.error('[qdrant] multiQuerySearch fallback failed:', err?.message ?? err);
+          throw new Error(`Qdrant multiQuerySearch failed: ${err instanceof Error ? err.message : String(err)}`);
+        }
       }
     );
   }
@@ -626,7 +644,18 @@ export class QdrantManager {
     const sparseAvailable = await this.getSparseSupport(params.collection, 'bm25');
 
     if (!sparseAvailable) {
-      return this._denseSearch(params);
+      // Fall back to dense-only search when BM25 not available
+      // Map queryEmbedding to queryVector for DenseSearchParams
+      return this._denseSearch({
+        query: params.query,
+        queryVector: params.queryEmbedding,
+        vectorName: 'content',
+        collection: params.collection,
+        limit: params.limit,
+        scoreThreshold: params.scoreThreshold,
+        filter: params.filters,
+        skipCache: params.skipCache,
+      });
     }
 
     const sparseVector = await generateSparseVector(params.query);

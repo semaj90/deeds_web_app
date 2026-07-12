@@ -13,8 +13,11 @@
 /**
  * Canonical vector space names
  * These MUST match Qdrant collection named vector definitions exactly
+ *
+ * Phase 2D legacy: Live Qdrant uses 'content', 'error', 'signature' (768-dim)
+ * Phase 9+ will migrate to semantic_embedding (384-dim), etc.
  */
-export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | 'latent_embedding';
+export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | 'latent_embedding' | 'content' | 'error' | 'signature';
 
 /**
  * Authoritative vector dimensions
@@ -24,6 +27,9 @@ export const VECTOR_DIMENSIONS: Record<CodebaseVectorName, number> = {
   semantic_embedding: 384,
   topology_embedding: 128,
   latent_embedding: 64,
+  content: 768,        // Phase 2D legacy Qdrant named vector
+  error: 768,          // Phase 2D legacy Qdrant named vector
+  signature: 768,      // Phase 2D legacy Qdrant named vector
 };
 
 /**
@@ -55,6 +61,24 @@ export const VECTOR_STRATEGIES: Record<
     distance_metric: 'Cosine',
     use_case: 'Routing features for clustering and cache selection',
     score_threshold: 0.4,
+  },
+  content: {
+    dimension: 768,
+    distance_metric: 'Cosine',
+    use_case: 'Phase 2D legacy: Full-context content vector for dense retrieval',
+    score_threshold: 0.3,
+  },
+  error: {
+    dimension: 768,
+    distance_metric: 'Cosine',
+    use_case: 'Phase 2D legacy: Error relevance vector for error analysis',
+    score_threshold: 0.3,
+  },
+  signature: {
+    dimension: 768,
+    distance_metric: 'Cosine',
+    use_case: 'Phase 2D legacy: Structural signature vector for function/class matching',
+    score_threshold: 0.3,
   },
 };
 
