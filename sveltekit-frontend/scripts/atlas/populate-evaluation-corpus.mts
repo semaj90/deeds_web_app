@@ -3,11 +3,20 @@
  * Phase 2F.1: Populate Evaluation Corpus Database
  * Task 2.8: Insert ground-truth into evaluation_queries, evaluation_evidence, evaluation_relevance
  *
+ * SCHEMA NOTE (Session 138):
+ * Live database has TWO evaluation_relevance schemas:
+ * - 0052 (OLD): query_id, chunk_id, grade, source_type, extractor_version, confidence
+ * - 0057 (NEW, not yet applied): query_id, packet_key, corpus_version, relevance_grade, etc.
+ *
+ * This script targets the CORRECTED schema (0057).
+ * Before running --apply, ensure migrations 0055-0057 are applied:
+ *   npm run drizzle:migrate
+ *
  * Flow:
  * 1. Create corpus_version manifest (git commit + indexing stats)
  * 2. Insert 50 evaluation queries
  * 3. Extract evidence items and insert into evaluation_evidence
- * 4. For each evidence item, infer relevance grade and insert into evaluation_relevance
+ * 4. For each evidence item, join to atlas_packets.packet_key and infer relevance grade
  */
 
 import { execSync } from 'child_process';
@@ -144,6 +153,59 @@ const EVALUATION_QUERIES = [
 ];
 
 // ============================================================================
+// SCHEMA VALIDATION
+// ============================================================================
+
+function validateSchemaReadiness(): string[] {
+  const issues: string[] = [];
+
+  console.log('Checking schema readiness...');
+  console.log('');
+
+  // Check for 0055_evaluation_results table
+  try {
+    execSync(
+      'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -At -c "SELECT 1 FROM information_schema.tables WHERE table_name=\'evaluation_results\';"',
+      { encoding: 'utf-8' }
+    );
+  } catch {
+    issues.push('❌ evaluation_results table missing (0055 migration not applied)');
+  }
+
+  // Check for 0056_evaluation_evidence table
+  try {
+    execSync(
+      'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -At -c "SELECT 1 FROM information_schema.tables WHERE table_name=\'evaluation_evidence\';"',
+      { encoding: 'utf-8' }
+    );
+  } catch {
+    issues.push('❌ evaluation_evidence table missing (0056 migration not applied)');
+  }
+
+  // Check for evaluation_corpora table
+  try {
+    execSync(
+      'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -At -c "SELECT 1 FROM information_schema.tables WHERE table_name=\'evaluation_corpora\';"',
+      { encoding: 'utf-8' }
+    );
+  } catch {
+    issues.push('❌ evaluation_corpora table missing (0054 migration not applied)');
+  }
+
+  // Check for corrected evaluation_relevance schema (packet_key column)
+  try {
+    execSync(
+      'docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -At -c "SELECT 1 FROM information_schema.columns WHERE table_name=\'evaluation_relevance\' AND column_name=\'packet_key\';"',
+      { encoding: 'utf-8' }
+    );
+  } catch {
+    issues.push('⚠️  evaluation_relevance.packet_key missing (0057 migration may not be fully applied)');
+  }
+
+  return issues;
+}
+
+// ============================================================================
 // MAIN
 // ============================================================================
 
@@ -154,6 +216,25 @@ async function main() {
 
   console.log('Phase 2F.1: Populate Evaluation Corpus Database');
   console.log(`Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
+  console.log('');
+
+  // Validate schema before proceeding
+  const schemaIssues = validateSchemaReadiness();
+  if (schemaIssues.length > 0) {
+    console.log('Schema Validation Issues:');
+    for (const issue of schemaIssues) {
+      console.log(`  ${issue}`);
+    }
+    console.log('');
+    console.log('ACTION REQUIRED:');
+    console.log('  1. Apply corrected migrations: npm run drizzle:migrate');
+    console.log('  2. Verify tables exist: npm run drizzle:check');
+    console.log('  3. Re-run this script');
+    console.log('');
+    process.exit(1);
+  }
+
+  console.log('✓ Schema validation passed');
   console.log('');
 
   try {

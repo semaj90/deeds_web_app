@@ -255,12 +255,23 @@ directory_path → source_ref → file_path → function_symbol → feature_id
 
 ## Known Gaps & Deferred Work
 
-### Existing Schema Debt
-- **0052_evaluation_corpus.sql** (old): Uses `chunk_id` as authority
-- **0053_evaluation_corpus_queries.sql** (old): Inserts 50 queries (compatible)
-- **0055-0057** (new): Corrected schema with `packet_key` authority
+### Existing Schema Debt (Session 138 Discovery)
+Live database schema inspection reveals:
+- **0052_evaluation_corpus.sql** (APPLIED): evaluation_queries + evaluation_relevance tables exist
+- **evaluation_relevance columns**: `query_id, chunk_id, grade, source_type, extractor_version, confidence, created_at`
+  - Uses `chunk_id` as join authority (NOT `packet_key`)
+  - Missing: `corpus_version, packet_key, source_ref, qdrant_point_id, judgment_source, evidence_ids, content_hash`
+- **0055-0057** (NOT YET APPLIED): Corrected schema migrations
+  - Introduces `packet_key` as canonical authority
+  - Adds `corpus_version` for snapshot freezing
+  - Separates evidence from judgment
 
-**Plan**: Both schemas coexist until Phase 2F.1 evaluation run, then deprecate 0052.
+**Migration Plan**:
+1. Apply 0055-0057 migrations: `npm run drizzle:migrate`
+2. This creates new tables (`evaluation_results`, `evaluation_evidence`) and adds columns to `evaluation_relevance`
+3. Old 0052 tables remain for backward compatibility
+4. Phase 2F.1 population uses corrected schema (0057)
+5. At production cutover, migrate historical data or deprecate old schema
 
 ### Phase 3+ Tasks (Deferred)
 - 3.1: Feature-envelope.ts interface (ALREADY EXISTS, reuse)
