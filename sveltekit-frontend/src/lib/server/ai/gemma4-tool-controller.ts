@@ -33,7 +33,10 @@ import { compressToHCACard, hcaCardToContextSnippet, type HCACard } from './hca-
 import { recordAgentAction } from '$lib/server/trace/trace-collector.js';
 import { callTraceMcpTool } from './mcp-tool-bridge.js';
 import { createHash } from 'crypto';
+import { db } from '$lib/server/db/client.js';
+import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
+import { classifyToolResult } from '$lib/server/router/viterbi-router.js';
 
 // ── Allowlist ─────────────────────────────────────────────────────────────────
 
@@ -156,19 +159,17 @@ export function buildToolResultMessage(
  * with proper tools/call JSON-RPC envelope.
  */
 async function dispatchViaHTTP(toolName: string, args: Record<string, unknown>): Promise<MCPToolResult | null> {
+  let tid: ReturnType<typeof setTimeout> | undefined;
   try {
-    const ctrl = new AbortController();
-    const tid  = setTimeout(() => ctrl.abort(), MCP_TIMEOUT_MS);
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      tid = setTimeout(() => reject(new Error('timeout')), MCP_TIMEOUT_MS);
+    });
 
     // Use callTraceMcpTool from mcp-tool-bridge which handles JSON-RPC 2.0
     const result = await Promise.race([
       callTraceMcpTool(toolName, args),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('timeout')), MCP_TIMEOUT_MS)
-      )
+      timeoutPromise,
     ]);
-
-    clearTimeout(tid);
 
     // callTraceMcpTool returns { error: ... } on failure, actual result on success
     if (result && typeof result === 'object' && 'error' in result) {
@@ -178,6 +179,8 @@ async function dispatchViaHTTP(toolName: string, args: Record<string, unknown>):
     return result as MCPToolResult;
   } catch {
     return null; // server not running or timeout — fall through to in-process
+  } finally {
+    if (tid) clearTimeout(tid);
   }
 }
 
@@ -211,8 +214,83 @@ export async function dispatchToolCall(
 
 // ── Call hash for dedup detection ────────────────────────────────────────────
 
+function stableStringify(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
+  return `{${entries
+    .map(([key, entry]) => `${JSON.stringify(key)}:${stableStringify(entry)}`)
+    .join(',')}}`;
+}
+
 function callHash(toolName: string, args: Record<string, unknown>): string {
-  return createHash('sha1').update(toolName + ':' + JSON.stringify(args)).digest('hex').slice(0, 12);
+  return createHash('sha1').update(toolName + ':' + stableStringify(args)).digest('hex').slice(0, 12);
+}
+
+function toolExecutionId(sessionId: string | undefined, round: number, toolName: string, args: Record<string, unknown>): string {
+  const prefix = sessionId?.trim() ? sessionId.trim() : 'global';
+  return `toolcall:${prefix}:${round}:${callHash(toolName, args)}`;
+}
+
+async function recordToolTimelineEvent(input: {
+  sessionId?: string;
+  userId?: string;
+  round: number;
+  toolName: string;
+  args: Record<string, unknown>;
+  result: MCPToolResult;
+  fromServer: boolean;
+  durationMs: number;
+  resultText: string;
+}): Promise<void> {
+  const executionId = toolExecutionId(input.sessionId, input.round, input.toolName, input.args);
+  const toolResult = {
+    toolName: input.toolName,
+    executionId,
+    success: input.result.success,
+    resultClass: input.result.success ? 'candidates' : 'tool_error',
+    resultCount: Array.isArray(input.result.data) ? input.result.data.length : 0,
+    sourceRefCount: Array.isArray(input.result.data)
+      ? input.result.data.filter((item) => Boolean((item as Record<string, unknown>)?.source_ref)).length
+      : 0,
+    sourceRefs: [],
+    summary: input.result.success ? String(input.result.data ?? '') : input.result.error ?? undefined,
+    fullResult: input.result.data,
+    schemaError: false,
+    transportError: false,
+    timeout: false,
+    durationMs: input.durationMs,
+    requiresProvenance: false,
+  };
+  const selectedState = input.result.success ? classifyToolResult(toolResult) : 'RECOVER';
+
+  await db.insert(contextTimeline).values({
+    sessionId: input.sessionId ?? '',
+    userId: input.userId ? Number(input.userId) : null,
+    eventType: 'tool_call',
+    pipeline: 'gemma4-agent',
+    payload: {
+      executionId,
+      round: input.round,
+      toolName: input.toolName,
+      args: input.args,
+      fromServer: input.fromServer,
+      durationMs: input.durationMs,
+      resultCode: input.result.success ? 0 : 1,
+      resultClass: input.result.success ? 'candidates' : 'tool_error',
+      selectedState,
+      nextState: selectedState,
+      toolResult: input.result.success
+        ? { success: true, resultCount: Array.isArray(input.result.data) ? input.result.data.length : 0 }
+        : { success: false, error: input.result.error ?? null },
+      resultText: input.resultText,
+    },
+  }).catch(() => {
+    /* non-fatal */
+  });
 }
 
 // ── Main tool loop ────────────────────────────────────────────────────────────
@@ -341,6 +419,18 @@ export async function runGemma4ToolLoop(input: RunToolLoopInput): Promise<ToolLo
 
       toolRecords.push({ toolName: name, args, result: resultStr, durationMs, fromServer, error: result.error });
       toolMessages.push(buildToolResultMessage({ name, arguments: args }, resultStr));
+
+      void recordToolTimelineEvent({
+        sessionId,
+        userId,
+        round,
+        toolName: name,
+        args,
+        result,
+        fromServer,
+        durationMs,
+        resultText: resultStr,
+      });
 
       // Fire-and-forget trace record
       recordAgentAction('mcp_tool', {

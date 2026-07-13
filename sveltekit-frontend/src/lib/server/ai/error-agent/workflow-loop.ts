@@ -250,7 +250,7 @@ export async function runWorkflowLoop(
         toolsCalled: ['workflow-loop', 'hmm-classifier', classification.lane],
         outcome: smoke.passed ? 'success' : 'partial',
         reward: smoke.passed ? Math.max(0.5, 1 - classification.riskScore * 0.5) : 0.3,
-        taskId: input.caseId ?? undefined,
+        taskId: input.caseId ?? runId,
         traceSource: 'error-agent',
       });
     } catch (err) {

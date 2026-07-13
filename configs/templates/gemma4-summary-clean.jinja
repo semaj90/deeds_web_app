@@ -2,8 +2,6 @@
 {%- if message['role'] == 'system' -%}
 <start_of_turn>user
 {{ message['content'] }}<end_of_turn>
-<start_of_turn>model
-Understood.<end_of_turn>
 {%- elif message['role'] == 'user' -%}
 <start_of_turn>user
 {{ message['content'] }}<end_of_turn>

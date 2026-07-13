@@ -8,7 +8,7 @@ import { runRg } from '../../../../scripts/rg-atlas/run-rg.mjs';
 import { rewriteQuery } from './multi-query.js';
 import { getQdrantUnionHits } from './qdrant-union.js';
 import { getKarpathyBlendScores } from './karpathy-blend.js';
-import { rerankWithGemma4 } from '$lib/server/retrieval/cross-encoder-reranker.js';
+import { rerankWithCrossEncoder } from '$lib/server/retrieval/cross-encoder-reranker.js';
 import { rerankWithLangExtractGRPO } from '$lib/server/retrieval/langextract-reranker.js';
 import { clusterHits } from './kmeans-cluster.js';
 import { cosineBlend, DEFAULT_WEIGHTS } from './cosine-blend.js';
@@ -125,12 +125,12 @@ export async function runRgSearchAtlas(
             content: c.content,
             retrievalScore: c.scores!.qdrantCosine || 0.5
         }));
-        const marcoRes = await rerankWithGemma4(opts.query, marcoRerankInput, { topN: 100, returnTopK: 100 });
-        const marcoScoreMap = new Map(marcoRes.results.map(r => [r.doc.documentId, r.rerankScore]));
+        const crossEncoderRes = await rerankWithCrossEncoder(opts.query, marcoRerankInput, { topN: 100, returnTopK: 100 });
+        const crossEncoderScoreMap = new Map(crossEncoderRes.results.map(r => [r.doc.documentId, r.rerankScore]));
         
         for (const c of initialCandidates) {
             const key = `${c.filePath}:${c.lineNumber ?? 0}`;
-            c.scores!.marco = marcoScoreMap.get(key) ?? 0;
+            c.scores!.marco = crossEncoderScoreMap.get(key) ?? 0;
         }
     }
     diagnostics.marcoMs = Math.round(performance.now() - marcoStart);

@@ -1,11 +1,11 @@
 /**
- * Cross-Encoder Reranker — Gemma4 pointwise scoring with Redis score cache.
+ * Cross-Encoder Reranker — Mixedbread-first pointwise scoring with Redis score cache.
  *
  * Pipeline:
  *   candidates (20–80)
  *     → L0  Redis result-set cache  (1ms — full ranked list on exact hit)
  *     → L1  Redis score batch lookup  (5ms — individual (query,doc) pair scores)
- *     → uncached pairs → Gemma4 JSON-format scoring  (sequential, exploits KV prefix cache)
+ *     → uncached pairs → cross-encoder scoring  (batchable when a backend is available)
  *     → write new scores to Redis (24h TTL)
  *     → sort all by score → write full ranked list to Redis (1h TTL)
  *     → return top_n
@@ -20,14 +20,12 @@
  *                           value: float string  TTL: 24h
  *                           Hit means: individual (query, doc) pair score is known
  *
- * KV prefix caching (Ollama):
- *   All scoring prompts share the same `"Query: {query}\n\nDocument:\n"` prefix.
- *   Ollama's built-in prefix KV cache (Flash Attention + Q8_0 KV enabled) reuses
- *   query token states across sequential document calls — only the doc portion is
- *   fresh per pair. Effective ~40–60% TTFT reduction for batches ≥ 4.
+ * Legacy generative fallback:
+ *   If the cross-encoder backend is unavailable, the scorer can fall back to the
+ *   historical prompt-scoring path for compatibility.
  *
  * Fallback chain:
- *   Gemma4 JSON parse error → raw numeric extraction → 0.5 passthrough
+ *   Legacy prompt parse error → raw numeric extraction → 0.5 passthrough
  *   webSearch unavailable → skip (don't block synthesis)
  *   Redis unavailable → score every pair fresh (graceful degradation)
  */
@@ -73,10 +71,20 @@ const REDIS_PREFIX = 'rr';
 const REDIS_LIST_PREFIX = 'rr:list';
 
 /** Model short tag embedded in list cache key (avoids cross-model collisions) */
-const MODEL_TAG = 'g4l'; // gemma4-rotorquant:latest
+const MODEL_TAG = 'mxbai'; // mixedbread-ai/mxbai-rerank-base-v2
 
-/** Model used for reranking — fine-tuned legal Gemma4 */
-const RERANK_MODEL = VLM_MODELS.legal; // 'gemma4-rotorquant:latest'
+/** Canonical cross-encoder model used by the batch backend */
+const CROSS_ENCODER_MODEL =
+  process.env.CROSS_ENCODER_MODEL ??
+  ENV.CROSS_ENCODER_MODEL ??
+  'mixedbread-ai/mxbai-rerank-base-v2';
+
+/** Legacy generative rerank model used only for prompt-scoring fallback */
+const LEGACY_RERANK_MODEL =
+  process.env.LEGACY_RERANK_MODEL ??
+  process.env.LOCAL_GEMMA_MODEL ??
+  process.env.RERANK_MODEL ??
+  VLM_MODELS.legal;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -133,7 +141,7 @@ export interface RerankReturn<T extends RerankCandidate = RerankCandidate> {
 }
 
 /**
- * Convert a batch of RerankResult<T> (from rerankWithGemma4) to UnifiedRetrievalResult[].
+ * Convert a batch of RerankResult<T> (from rerankWithCrossEncoder) to UnifiedRetrievalResult[].
  * Convenience wrapper so callers don't need to import fromRerankResult directly.
  */
 export function rerankToUnified<T extends RerankCandidate>(
@@ -246,7 +254,7 @@ async function _batchSetCached(
   }
 }
 
-// ── Gemma4 pointwise scorer ───────────────────────────────────────────────────
+// ── Legacy prompt-scoring fallback ────────────────────────────────────────────
 
 const SCORE_PROMPT_PREFIX = (query: string) =>
   `You are a legal relevance scorer.\n` +
@@ -280,11 +288,7 @@ async function _scoreLlamaServer(prompt: string): Promise<number | null> {
     ENV.RERANK_BASE_URL;
   if (!baseUrl) return null;
 
-  const model =
-    process.env.LOCAL_GEMMA_MODEL ??
-    process.env.RERANK_MODEL ??
-    RERANK_MODEL ??
-    'gemma4-legal-iq4xs-direct.gguf';
+  const model = process.env.LOCAL_GEMMA_MODEL ?? LEGACY_RERANK_MODEL;
 
   try {
     const base = baseUrl.replace(/\/$/, '');
@@ -372,7 +376,7 @@ async function _scoreOne(query: string, doc: RerankCandidate): Promise<number> {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: RERANK_MODEL,
+          model: LEGACY_RERANK_MODEL,
           prompt,
           format: 'json',
           stream: false,
@@ -579,16 +583,16 @@ async function _webSearchFallback(query: string, maxResults = 5): Promise<Rerank
 // ── Main export ───────────────────────────────────────────────────────────────
 
 /**
- * Rerank retrieval candidates using Gemma4 pointwise scoring.
+ * Rerank retrieval candidates using the canonical cross-encoder scoring path.
  *
  * Two-tier Redis cache:
- *   L0 result-set list — exact (query, candidates, topK) hit → reconstruct from list, 0 Gemma4 calls
+ *   L0 result-set list — exact (query, candidates, topK) hit → reconstruct from list, 0 cross-encoder calls
  *   L1 per-score        — individual (query, doc) hits → only score uncached pairs
  *
  * Flow:
  *   1. L0 result-set cache lookup — if hit, reconstruct + return immediately
  *   2. L1 Redis batch lookup for per-score cache
- *   3. Sequential Gemma4 calls for uncached pairs (exploits Ollama prefix KV cache)
+ *   3. Cross-encoder scoring for uncached pairs
  *   4. Write new scores to L1 Redis
  *   5. Sort full result set, write to L0 result-set cache
  *   6. If maxScore < RERANK_FALLBACK_THRESHOLD → web search → score web results
@@ -598,7 +602,7 @@ async function _webSearchFallback(query: string, maxResults = 5): Promise<Rerank
  * @param candidates Retrieval results (from Qdrant / graph expansion)
  * @param opts       Tuning options
  */
-export async function rerankWithGemma4<T extends RerankCandidate>(
+export async function rerankWithCrossEncoder<T extends RerankCandidate>(
   query: string,
   candidates: T[],
   opts: RerankOptions = {}
@@ -612,7 +616,7 @@ export async function rerankWithGemma4<T extends RerankCandidate>(
   }
 
   return traceGraph(
-    'rerank:gemma4',
+    'rerank:cross-encoder',
     { query: query.slice(0, 80), candidateCount: candidates.length, userId: opts.userId },
     async () => {
       const pool = candidates.slice(0, topN);
@@ -664,10 +668,7 @@ export async function rerankWithGemma4<T extends RerankCandidate>(
       const uncached = pool.filter(d => !cachedScores.has(d.documentId));
       const toWrite: Array<{ doc: T; score: number }> = [];
 
-      // ── Gemma4 scoring for uncached pairs (sequential — prefix KV cache) ──
-      // Sequential (not parallel) so Ollama keeps the model hot and the
-      // query-prefix KV states are warm across all doc calls.
-      // ── Scorer for uncached pairs (Batch preferred) ─────────────────────────
+      // ── Cross-encoder scoring for uncached pairs (batch preferred) ────────
       const freshScores = await scoreBatchWithBackendFallback(query, uncached);
       for (const [docId, score] of freshScores.entries()) {
         const doc = uncached.find(d => d.documentId === docId);
@@ -743,7 +744,7 @@ export async function rerankWithGemma4<T extends RerankCandidate>(
       const finalResults = results.filter(r => r.rerankScore >= minScore).slice(0, returnTopK);
 
       // ── Write final ranked list to L0 result-set cache ───────────────
-      // Only cache if we have real Gemma4 scores (not all passthrough 0.5s)
+      // Only cache if we have real cross-encoder scores (not all passthrough 0.5s)
       const hasRealScores = finalResults.some(r => r.rerankScore !== 0.5);
       if (hasRealScores && !opts.noFallback) {
         const listEntries: ListEntry[] = finalResults.map(r => ({
@@ -778,10 +779,12 @@ export function getRerankStatus(): {
   scoreCacheTtlS: number;
 } {
   return {
-    model: RERANK_MODEL,
+    model: CROSS_ENCODER_MODEL,
     cacheBackend: 'redis',
     fallback: 'web-search',
     listCacheTtlS: LIST_TTL_S,
     scoreCacheTtlS: SCORE_TTL_S,
   };
 }
+
+export const rerankWithGemma4 = rerankWithCrossEncoder;

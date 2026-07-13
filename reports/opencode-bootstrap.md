@@ -1,6 +1,6 @@
 # OpenCode Workspace Bootstrap
 
-Generated: 2026-06-16T16:26:52.181Z
+Generated: 2026-07-13T15:29:40.215Z
 Repo: C:\Users\james\Videos\deeds-web-app
 
 ## Steps
@@ -18,6 +18,8 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - C:\Users\james\Videos\deeds-web-app\.tmp\claude-mem-ensure.json
 
 ## Loaded Docs
+- docs\ACE-COMMAND-CHAIN-REFERENCE.md
+- docs\ACE-MATERIALIZER-QUICK-START.md
 - docs\ATLAS-BASELINE-MIGRATION-PLAN.md
 - docs\atlas-calls-extractor-implementation.md
 - docs\atlas-contract-final-integration.md
@@ -26,6 +28,7 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\atlas-contract-step-2-retrieval-escalation.md
 - docs\atlas-graph-plan-update.md
 - docs\ATLAS-LEGAL-GGUF-QUICKSTART.md
+- docs\ATLAS-NEXT-PASS-ARCHITECTURE.md
 - docs\ATLAS-PHASE-0-COMPLETION.md
 - docs\ATLAS-PHASES-ROADMAP-INDEX.md
 - docs\atlas-runtime-intent-graph-architecture.md
@@ -34,81 +37,123 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - docs\ATLAS_NEXT_PHASE_SUMMARY.md
 - docs\atlas_synthesis_report.md
 - docs\BIFROST-ATLAS-INTEGRATION.md
+- docs\cache-probe-context.md
+- docs\CLASSIFIER-FEATURE-ENRICHMENT-PIPELINE.md
 - docs\CODEBASE-FEATURE-MAPPING-2026-05-29.md
+- docs\CODEBASE-GRAPH-GITIGNORE-AND-SEARCHABILITY.md
 - docs\CONSOLIDATION-COMPLETION-REPORT-JUNE-15.md
+- docs\CONSOLIDATION-IMPLEMENTATION-SUMMARY.md
+- docs\DEPLOYMENT-SUMMARY-THREE-TIER-SEARCH.md
+- docs\DOCKER_STARTUP_GUIDE.md
 - docs\documents-atlas-index.md
+- docs\ENGRAM-ACE-MEMORY-SYSTEM-ARCHITECTURE.md
+- docs\FEATURE-ALIGNMENT-SPECIFICATION.md
 - docs\feature-pillar-barrel-migration.md
+- docs\FEATURE-TRACKING-ARCHITECTURE.md
 - docs\FINAL-SESSION-SUMMARY.md
+- docs\FOUR-LANE-PROOF-SUMMARY.md
+- docs\GEMMA4-FEATURE-REGISTRY-COMPREHENSIVE-ANALYSIS.md
 - docs\GPU-ACCELERATION-REVIEW-PARENT-ATLAS.md
+- docs\GRAPHIFY-GSD-INTEGRATION-PLAN.md
+- docs\INFRASTRUCTURE-AUDIT-INTEGRATION-SUMMARY.md
+- docs\integration-summary-feedback-loops.md
+- docs\LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md
+- docs\LAYER-2-FEATURE-TRACKING-INTEGRATION.md
 - docs\LEGAL-GGUF-BIFROST-ATLAS-SETUP.md
 - docs\MULTIHOP-ENRICHMENT-FINAL-SUMMARY.md
 - docs\MULTIHOP-ENRICHMENT-GENERATOR-SUMMARY.md
+- docs\OFFLINE-SUMMARY-OPTIMIZATION-GUIDE.md
+- docs\opencode-engram-memory-corrected.md
 - docs\P0-COMPLETION-SUMMARY-JUNE-15.md
 - docs\P1-TASK-1-QDRANT-TRANSPORT-COMPLETE.md
+- docs\P3G-CLASSIFICATION-REPORT.md
+- docs\P4-ACE-MCP-INTEGRATION-GUIDE.md
+- docs\P4-GAP-ANALYSIS-SUMMARY-INDEXING-SOM-AE.md
+- docs\P4-GRAPH-REFRESH-PLAN.md
+- docs\P4-PHASE-1-SUMMARY-INDEXING-COMPLETE.md
+- docs\P4-SESSION-81-COMPLETION-SUMMARY.md
 - docs\parent-atlas-100pct-next-steps.md
+- docs\PARENT-ATLAS-COMPLETION-STATUS.md
+- docs\PARENT-ATLAS-COMPLETION-SUMMARY.md
 - docs\PARENT-ATLAS-CONSOLIDATION-INVENTORY.md
 - docs\PARENT-ATLAS-CONTRACT-SUMMARY.md
 - docs\PARENT-ATLAS-IDENTITY-OS-LOCKED.md
 - docs\PARENT-ATLAS-IDENTITY-RECONCILIATION.md
+- docs\PARENT-ATLAS-OPERATIONAL-COMPLETION-PLAN.md
+- docs\PARENT-ATLAS-PACKAGE-ARCHITECTURE.md
 - docs\PARENT-ATLAS-PACKAGE-INTEGRATION.md
 - docs\PARENT-ATLAS-PACKET-IDENTITY-OS.md
 - docs\PARENT-ATLAS-PLUGIN-SCHEMA.md
+- docs\PARENT-ATLAS-RUNTIME-IMPLEMENTATION.md
+- docs\PARENT-ATLAS-SYSTEM-BOUNDARIES.md
 - docs\PHASE-1-COMPLETION-SUMMARY.md
+- docs\PHASE-1-SESSION-83-MIGRATION-SUMMARY.md
+- docs\phase-102-packet-architecture-summary.md
+- docs\PHASE-110-FEATURE-EXTRACTION-CHECKLIST.md
 - docs\PHASE-16-H-COMPLETION-REPORT.md
 - docs\PHASE-17-GRAPH-WIRING-GAPS.md
 - docs\PHASE-1B-COMPLETION-REPORT.md
 - docs\phase-3d-implementation-summary.md
 - docs\phase-3e-concept-memory-guide.md
 - docs\PHASE-3F-4B-ARCHITECTURE-SUMMARY.md
-- docs\PHASE-4A-COMPLETE-SUMMARY.md
-- docs\PHASE-D-TURBOVEC-FIRST-EXECUTION.md
-- docs\PHASE-DE-STATUS-REPORT.md
-- docs\PHASE-DE-SUMMARY.txt
-- docs\PHASE-DEBUG-EXECUTION-SUMMARY.md
-- docs\REDIS-CACHE-CONSOLIDATION-2026-05-29.md
-- docs\REDIS-SHARED-UTILITIES-API.md
-- docs\SESSION-JUNE-11-2026-SUMMARY.md
-- docs\SESSION_2026-05-29_COMPLETE_SUMMARY.md
-- docs\STARTUP-BRIEFING-CONTRACT.md
-- docs\test-opencode-atlas-integration.md
-- docs\status\feature-tracking-roadmap.md
-- docs\status\GPU_SEMANTIC_WIKI_SUMMARY.md
-- docs\status\GPU_UTILIZATION_REPORT_2026-04-11.md
-- docs\skills\parent-atlas-batch-summarizer.md
-- docs\session-notes\46_26__adiff.txt
-- docs\session-notes\58_26_next_steps_graphanalysis_ingestion_analysis.txt
-- docs\session-notes\59_26cudagraphdeepresearch.txt
-- docs\session-notes\5_13_evidnce_processing_features.txt
-- docs\session-notes\5_27summarytododate.md
-- docs\session-notes\cudagraphloops_59.txt
-- docs\session-notes\cudagraphs510_26.txt
-- docs\session-notes\cudagraph_510.txt
-- docs\session-notes\cudagraph_519implemntation.txt
-- docs\session-notes\feature_321_contextgraph_.txt
-- docs\session-notes\gemma4_mapping_token_quantization_ace_518.txt
-- docs\session-notes\hermes_workspace_51126.txt
-- docs\session-notes\hypergraphcache_sarch_518_todo.txt
-- docs\session-notes\knowledgecard_validations.md
-- docs\session-notes\langgraph_chain_4626.txt
-- docs\session-notes\parentatlast_pt3_52226.txt
-- docs\session-notes\redis-backup-20260412-203517.txt
-- docs\session-notes\TODO-2026-05-19-codebase-multihop-feature-labeling.md
-- docs\session-notes\TODO-2026-05-20-production-feature-map.md
-- docs\session-notes\TODO_ATLAS.md
-- docs\session-notes\trace_response.txt
-- docs\reports\ace-cache-index-dry-run.json
-- docs\reports\ace-cache-manifest.json
+- docs\PHASE-85-MASTER-SUMMARY.md
+- docs\PHASE-85-P5-COMPLETION-SUMMARY.md
 
 ## Bash Tools
 - atlas:smoke:packet-contract => ts-node --project tsconfig.json scripts/atlas/validate-packet-contract.mjs
 - atlas:packet-contract-mirrors => node scripts/atlas/audit-packet-contract-mirrors.mjs
 - atlas:packet-contract-repair => node scripts/atlas/repair-packet-contract-mirrors.mjs
+- atlas:addressable-packets:materialize => node scripts/atlas/materialize-addressable-packets.mjs
+- atlas:addressable-packets:materialize:apply => node scripts/atlas/materialize-addressable-packets.mjs --apply
+- atlas:ast-grep-map => cd sveltekit-frontend && node scripts/index/ast-grep-map.mjs
+- atlas:source-tuples:dry => node scripts/atlas/materialize-source-tuples.mjs --limit=1000
+- atlas:source-tuples:apply => node scripts/atlas/materialize-source-tuples.mjs --apply --limit=58304 --out=.tmp/source-tuples-all.ndjson --report=docs/reports/source-tuples-materialization-all.json
+- atlas:turbovec:candidates:dry => node scripts/atlas/build-turbovec-candidates-from-tuples.mjs --limit=1000
+- atlas:turbovec:candidates:apply => node scripts/atlas/build-turbovec-candidates-from-tuples.mjs --apply --limit=5000
+- atlas:turbovec:ann-grpc:proof => node scripts/atlas/prove-turbovec-ann-grpc.mjs --limit=1000
+- atlas:ontology-kag:readiness => node scripts/atlas/evaluate-ontology-kag-readiness.mjs
+- atlas:qdrant:tag-mirror => node scripts/atlas/qdrant-tag-mirror.mjs
+- atlas:qdrant:tag-mirror:apply => node scripts/atlas/qdrant-tag-mirror.mjs --apply
+- atlas:qdrant:feature-map-sync => node scripts/atlas/sync-atlas-feature-map-from-qdrant.mjs --dry-run
+- atlas:qdrant:feature-map-sync:apply => node scripts/atlas/sync-atlas-feature-map-from-qdrant.mjs
+- atlas:turbovec:import-edges => node scripts/graph/import-turbovec-edges.mjs
+- atlas:turbovec:import-edges:apply => node scripts/graph/import-turbovec-edges.mjs --apply
 - atlas:bitfrost-semantic-cache:audit => node scripts/atlas/audit-bitfrost-semantic-cache.mjs
 - atlas:bitfrost-semantic-cache:warm => node scripts/atlas/warm-bitfrost-semantic-cache.mjs
 - atlas:bitfrost-semantic-cache:warm:apply => node scripts/atlas/warm-bitfrost-semantic-cache.mjs --apply
+- atlas:tree-nodes:audit => node sveltekit-frontend/scripts/atlas/audit-tree-nodes.mjs
+- atlas:langextract:gemma4:start => node scripts/atlas/start-langextract-gemma4.mjs
+- atlas:langextract:gemma4:check => node scripts/atlas/start-langextract-gemma4.mjs --check
+- atlas:langextract:gemma4:test => npm run atlas:langextract:gemma4:start && npm run atlas:langextract:turbovec:proof
+- atlas:langextract:turbovec:proof => node scripts/atlas/test-langextract-turbovec.mjs
+- atlas:phase8:step3:langextract:dry => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:dry
+- atlas:phase8:step3:langextract:apply => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:apply
+- atlas:phase8:step3:langextract:full => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:full
+- atlas:phase8:step3:langextract:verbose => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:verbose
+- atlas:phase8:step3:langextract:gate => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:dry -- --limit=10
+- atlas:packets:indexes:ensure => node scripts/atlas/add-atlas-packets-columns.mjs
+- atlas:cpu-first:readiness => node scripts/atlas/audit-cpu-first-packet-retrieval.mjs
+- atlas:services:probe => node scripts/atlas/probe-parent-atlas-services.mjs
+- atlas:embeddinggemma:health => node scripts/atlas/test-embedding-qdrant-turbovec.mjs --limit=1 --out=docs/reports/embeddinggemma-health-proof.json --out-md=docs/reports/embeddinggemma-health-proof.md
+- atlas:qdrant:codebase768:health => node scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs --limit=250
+- atlas:turbovec:health => node scripts/atlas/turbovec-grpc-health.mjs
+- atlas:turbovec:qdrant-ingest:test => npm run atlas:turbovec:ann-grpc:proof
+- atlas:embedding-qdrant-turbovec:test => node scripts/atlas/test-embedding-qdrant-turbovec.mjs
+- atlas:gemma4:onnx:triton:repo => node scripts/atlas/materialize-gemma4-onnx-triton-repo.mjs --apply
+- atlas:gemma4:onnx:triton:repo:dry => node scripts/atlas/materialize-gemma4-onnx-triton-repo.mjs
+- atlas:gemma4:onnx:triton:start => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/start-gemma4-onnx-triton.ps1 -Detached
+- atlas:gemma4:onnx:triton:status => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/start-gemma4-onnx-triton.ps1 -StatusOnly
+- atlas:gemma4:onnx:adapter => python scripts/gemma4/gemma4_onnx_triton_adapter.py
+- atlas:gemma4:onnx:adapter:health => curl -s http://127.0.0.1:8098/health
+- atlas:retrieval-summarization:proof => node scripts/atlas/prove-retrieval-summarization-flow.mjs
+- atlas:gpu-retrieval-summary-envelope => node scripts/atlas/build-gpu-retrieval-summary-envelope.mjs
+- atlas:gpu-retrieval-summary-fanout:test => node scripts/atlas/test-gpu-retrieval-summary-fanout.mjs
+- atlas:evidence-spine:validate => npm run atlas:services:probe && npm run atlas:pipeline:accelerator-proof
+- atlas:pipeline:accelerator-proof => npm run atlas:langextract:gemma4:start && npm run atlas:langextract:turbovec:proof && npm run atlas:turbovec:ann-grpc:proof && npm run atlas:go-retrieval:smoke && npm run verify:summary-storage
 - atlas:redis-centroid:mirror:dry => node scripts/atlas/wire-redis-centroid-mirror.mjs --dry-run
 - atlas:redis-centroid:mirror:apply => node scripts/atlas/wire-redis-centroid-mirror.mjs --apply
 - atlas:qdrant-postgres:mirror:reconcile => node scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs
+- atlas:go-retrieval:smoke => node scripts/atlas/go-retrieval-smoke.mjs
 - atlas:turbovec:grpc-health => cd sveltekit-frontend && node ../scripts/atlas/turbovec-grpc-health.mjs
 - atlas:turbovec:contract-test => cd sveltekit-frontend && node ../scripts/atlas/test-turbovec-sidecar-contract.mjs
 - atlas:packet-metadata:backfill:dry => node scripts/atlas/backfill-packet-metadata.mjs
@@ -116,70 +161,25 @@ Repo: C:\Users\james\Videos\deeds-web-app
 - atlas:packet-metadata:verify => node scripts/atlas/verify-packet-metadata.mjs
 - atlas:qdrant-payload:verify => node scripts/atlas/verify-qdrant-packet-payload.mjs
 - atlas:qdrant-payload:verify:verbose => node scripts/atlas/verify-qdrant-packet-payload.mjs --verbose
-- atlas:graphify:packet-contract:dry => node scripts/atlas/graphify-packet-contract.mjs
-- atlas:graphify:packet-contract:apply => node scripts/atlas/graphify-packet-contract.mjs --apply
-- atlas:backfill-reward => node scripts/atlas/backfill-reward-prior.mjs
-- atlas:backfill-reward:apply => node scripts/atlas/backfill-reward-prior.mjs --apply
-- atlas:seed-reward-sets => node scripts/atlas/seed-redis-reward-sets.mjs
-- atlas:seed-reward-sets:apply => node scripts/atlas/seed-redis-reward-sets.mjs --apply
-- atlas:mcp:tool-manifest => node scripts/atlas/build-mcp-tool-manifest-packets.mjs --apply
-- atlas:mcp:tool-manifest:dry => node scripts/atlas/build-mcp-tool-manifest-packets.mjs
-- atlas:mcp:tool-manifest:verbose => node scripts/atlas/build-mcp-tool-manifest-packets.mjs --apply --verbose
-- atlas:mcp:registry:index => node scripts/atlas/build-mcp-tool-registry-index.mjs
-- agent:startup-briefing => node scripts/agentic/startup-briefing.mjs
-- opencode:bootstrap => node scripts/opencode/bootstrap-workspace.mjs
-- atlas:pipeline => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply
-- atlas:pipeline:dry => node scripts/atlas/graphify-langgraph-pipeline.mjs
-- atlas:pipeline:verbose => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --verbose
-- atlas:pipeline:features => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage feature_extract
-- atlas:pipeline:embed => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage embed_missing
-- atlas:pipeline:bm25 => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage index_bm25
-- atlas:pipeline:rank => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage rank_signals
-- atlas:pipeline:prune => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage prune_noise
-- atlas:pipeline:kanban => node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage kanban_task
-- atlas:mcp:select-tools => node scripts/atlas/runtime-mcp-tool-selector.mjs --audit
-- atlas:mcp:select-tools:query => node scripts/atlas/runtime-mcp-tool-selector.mjs
-- atlas:temporal:build => node scripts/atlas/build-temporal-bitfrost-index.mjs --apply
-- atlas:temporal:build:dry => node scripts/atlas/build-temporal-bitfrost-index.mjs
-- atlas:temporal:build:verbose => node scripts/atlas/build-temporal-bitfrost-index.mjs --apply --verbose
-- atlas:temporal:build:window => node scripts/atlas/build-temporal-bitfrost-index.mjs --apply --window=30d
-- atlas:mcp:ontology => node scripts/atlas/audit-mcp-tool-ontology.mjs
-- atlas:ontology:classify => node scripts/atlas/classify-domain-ontology.mjs --apply
-- atlas:ontology:classify:dry => node scripts/atlas/classify-domain-ontology.mjs
-- atlas:ontology:classify:verbose => node scripts/atlas/classify-domain-ontology.mjs --apply --verbose
-- atlas:ontology:classify:qdrant => node scripts/atlas/classify-domain-ontology.mjs --apply --qdrant
-- atlas:concept-evidence:audit => node scripts/atlas/audit-concept-evidence-spine.mjs --save
-- atlas:concept-evidence:backfill:dry => node scripts/atlas/backfill-concept-evidence-spine.mjs --save
-- atlas:concept-evidence:backfill => node scripts/atlas/backfill-concept-evidence-spine.mjs --apply --save
-- atlas:feature-metadata:verify => node sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs --verify
-- atlas:feature-metadata:backfill => node sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs
-- atlas:feature-metadata:backfill:apply => node sveltekit-frontend/scripts/atlas/backfill-feature-metadata.mjs --apply
-- atlas:qdrant-payload:sync:dry => node sveltekit-frontend/scripts/atlas/sync-qdrant-packet-payload.mjs --dry
-- atlas:qdrant-payload:sync:apply => node sveltekit-frontend/scripts/atlas/sync-qdrant-packet-payload.mjs --apply
-- atlas:workspace:ingest:dry => node sveltekit-frontend/scripts/atlas/ingest-workspace-metadata.mjs --dry
-- atlas:workspace:ingest => node sveltekit-frontend/scripts/atlas/ingest-workspace-metadata.mjs
-- atlas:supernode:pressure:audit => node scripts/atlas/audit-higher-hop-enrichment.mjs --save
-- atlas:classify-supernode-pressure => node scripts/atlas/classify-supernode-pressure.mjs --save
-- atlas:seed-neo4j-used-concept:safe-only:dry => node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --save
-- atlas:seed-neo4j-used-concept:safe-only:apply => node scripts/atlas/seed-neo4j-used-concept-edges.mjs --safe-only --apply --save
-- atlas:seed-neo4j-used-concept => node scripts/atlas/seed-neo4j-used-concept-edges.mjs
-- atlas:lane-12-3 => node scripts/atlas/seed-neo4j-rpc-graph.mjs
-- atlas:lane-12-3:apply => node scripts/atlas/seed-neo4j-rpc-graph.mjs --apply
-- atlas:graph:density:check => echo 'TODO: Graph density verification script'
-- atlas:concept:reachability:check => echo 'TODO: Concept reachability verification script'
-- atlas:turbovec:load => node scripts/atlas/load-turbovec-index-from-qdrant.mjs --apply
-- atlas:turbovec:load:dry => node scripts/atlas/load-turbovec-index-from-qdrant.mjs
-- atlas:turbovec:load:verbose => node scripts/atlas/load-turbovec-index-from-qdrant.mjs --apply --verbose
-- atlas:xgboost:export => node scripts/atlas/export-xgboost-features.mjs --apply
-- atlas:xgboost:export:dry => node scripts/atlas/export-xgboost-features.mjs
-- atlas:xgboost:export:verbose => node scripts/atlas/export-xgboost-features.mjs --apply --verbose
-- atlas:cascade:smoke => node scripts/atlas/smoke-atlas-ann-cascade.mjs
-- atlas:cascade:smoke:verbose => node scripts/atlas/smoke-atlas-ann-cascade.mjs --verbose
-- atlas:retrieval:e2e => node scripts/atlas/benchmark-retrieval-e2e.mjs
-- atlas:xgboost:serve => cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py
-- atlas:xgboost:serve:lgbm => cross-env PYTHONIOENCODING=utf-8 python scripts/atlas/serve-xgboost-reranker.py --lightgbm
-- sidecars:turbovec-grpc => node scripts/sidecars/turbovec-grpc-bridge.mjs
-- sidecars:turbovec-grpc:health => node sveltekit-frontend/scripts/atlas/turbovec-grpc-health.mjs
+- atlas:gpu:networkx-backend:smoke => py -3.13 scripts/gpu/networkx-backend-smoke.py
+- atlas:gpu:topology:readiness => py -3.13 scripts/gpu/gpu-topology-readiness-smoke.py
+- atlas:gpu:bootstrap-check => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/gpu/gpu-bootstrap-check.ps1
+- atlas:cache-probe:harness => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/cache-probe-harness.ps1
+- atlas:cache-probe:harness:dry => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/cache-probe-harness.ps1 -Iterations 1
+- atlas:cache-probe:instrumented => pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/cache-probe-instrumented.ps1
+- atlas:cache-probe:analyze => node scripts/cache-probe-analyze.mjs
+- atlas:cache-probe:analyze:write-db => node scripts/cache-probe-analyze.mjs --write-db
+- verify:atlas => node scripts/verify/parent-atlas-traversal.mjs
+- atlas:error:audit => node scripts/atlas/audit-error-fixes.mjs
+- atlas:error:audit:verbose => node scripts/atlas/audit-error-fixes.mjs --verbose
+- atlas:error:plan => node scripts/atlas/plan-error-fixes.mjs
+- atlas:error:plan:verbose => node scripts/atlas/plan-error-fixes.mjs --verbose
+- atlas:error:apply => node scripts/atlas/apply-error-fixes.mjs
+- atlas:error:apply:verbose => node scripts/atlas/apply-error-fixes.mjs --verbose
+- atlas:error:apply:force => node scripts/atlas/apply-error-fixes.mjs --apply
+- atlas:phase8:readiness => node scripts/atlas/phase8-readiness-matrix.mjs
+- atlas:phase8:fanout:dry => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:gate && npm --prefix sveltekit-frontend run atlas:summary:index:rank && npm --prefix sveltekit-frontend run atlas:summary:envelopes:build:dry && npm --prefix sveltekit-frontend run atlas:summary:envelopes:queue:dry && npm --prefix sveltekit-frontend run atlas:materialize:feature-envelopes:dry && npm run atlas:phase16:latent:dry && npm run atlas:phase16:som:dry && npm run atlas:phase16:gds:dry && npm run atlas:bitfrost-semantic-cache:warm
+- atlas:phase8:fanout:apply => npm --prefix sveltekit-frontend run atlas:phase8:step3:langextract:apply && npm --prefix sveltekit-frontend run atlas:summary:index:rank:apply && npm --prefix sveltekit-frontend run atlas:summary:envelopes:build:apply && npm --prefix sveltekit-frontend run atlas:summary:envelopes:queue:apply && npm --prefix sveltekit-frontend run atlas:materialize:feature-envelopes:apply && npm run atlas:phase16:latent:apply && npm run atlas:phase16:som:apply && npm run atlas:phase16:gds:apply && npm run atlas:bitfrost-semantic-cache:warm:apply
 
 ## Warnings
 - None

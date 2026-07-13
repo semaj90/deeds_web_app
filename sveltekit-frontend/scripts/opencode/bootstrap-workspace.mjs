@@ -38,6 +38,7 @@ async function main() {
     json: PATHS.agentEnvironmentJson,
     md: PATHS.agentEnvironmentMd,
   });
+  const agentEnvironment = await readJson(PATHS.agentEnvironmentJson);
 
   const state = await readJson(PATHS.taskStateJson);
   if (!state) throw new Error('task state not found after refresh');
@@ -64,6 +65,7 @@ async function main() {
     const truth = {
       generatedAt: new Date().toISOString(),
       startupContext,
+      agentEnvironment: agentEnvironment ?? null,
       taskState: {
         path: path.relative(ROOT, PATHS.taskStateJson),
         md: path.relative(ROOT, PATHS.taskStateMd),
@@ -76,14 +78,16 @@ async function main() {
     await fs.writeFile(path.join(ROOT, '.opencode', 'startup-truth.json'), JSON.stringify(truth, null, 2) + '\n', 'utf8');
   }
 
-  console.log(JSON.stringify({
-    ok: true,
-    generatedAt: startupContext.generatedAt,
-    taskState: startupContext.tasks.stateJson,
-    recommendationSnapshot: startupContext.recommendations.snapshotJson,
-    startupContext: path.relative(ROOT, PATHS.startupContext),
-  }, null, 2));
-}
+    console.log(JSON.stringify({
+      ok: true,
+      generatedAt: startupContext.generatedAt,
+      taskState: startupContext.tasks.stateJson,
+      recommendationSnapshot: startupContext.recommendations.snapshotJson,
+      taskStateMarkdown: startupContext.tasks.stateMd,
+      agentEnvironment: path.relative(ROOT, PATHS.agentEnvironmentJson),
+      startupContext: path.relative(ROOT, PATHS.startupContext),
+    }, null, 2));
+  }
 
 main().catch((err) => {
   console.error(err);

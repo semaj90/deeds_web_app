@@ -55,7 +55,7 @@ function resolveLlamaServerModelId() {
   const gemma4 = String(process.env.GEMMA4_MODEL ?? '').trim();
   if (gemma4 && !/^gemma4-rotorquant(?::latest)?$/i.test(gemma4)) return gemma4;
 
-  return 'gemma4-legal-iq4xs-direct.gguf';
+  return 'hforf.gguf';
 }
 
 const DEFAULT_MODEL = resolveLlamaServerModelId();

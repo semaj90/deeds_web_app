@@ -13,9 +13,27 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
+const mocks = vi.hoisted(() => ({
+  runGemma4Agent: vi.fn(),
+  recordSearchQuery: vi.fn(),
+  redisIncr: vi.fn().mockResolvedValue(1),
+  redisExpire: vi.fn().mockResolvedValue(1),
+}));
+
+vi.mock('$lib/server/ai/gemma4-agent.js', () => ({
+  runGemma4Agent: mocks.runGemma4Agent,
+}));
+
+vi.mock('$lib/server/features/observability/index.js', () => ({
+  recordSearchQuery: mocks.recordSearchQuery,
+}));
+
+vi.mock('$lib/server/redis.js', () => ({
+  getRedis: () => ({
+    incr: mocks.redisIncr,
+    expire: mocks.redisExpire,
+  }),
+}));
 
 describe('src/routes/api/ai/agent/+server.ts', () => {
   describe('POST /api/ai/agent', () => {
@@ -23,6 +41,8 @@ describe('src/routes/api/ai/agent/+server.ts', () => {
 
     beforeEach(async () => {
       vi.resetAllMocks();
+      mocks.redisIncr.mockResolvedValue(1);
+      mocks.redisExpire.mockResolvedValue(1);
       const mod = await import('../../../../../src/routes/api/ai/agent/+server.js') as Record<string, unknown>;
       handler = mod.POST as typeof handler;
     });
@@ -51,6 +71,37 @@ describe('src/routes/api/ai/agent/+server.ts', () => {
     it.todo('400 — bad input shape returns degraded JSON envelope');
     it.todo('200 — happy path returns expected schema');
     it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+
+    it('200 — native handler forwards taskId in metadata to the agent layer', async () => {
+      mocks.runGemma4Agent.mockResolvedValue({
+        answer: 'ok',
+        toolsUsed: [],
+        rounds: 1,
+        cacheTier: undefined,
+      });
+
+      const resp = await handler({
+        request: makeReq({
+          query: 'diagnose tool calling',
+          pipeline: 'ace',
+          metadata: { taskId: 'task-123' },
+        }),
+        locals: { user: { id: 'user-1' } },
+        url: makeUrl(),
+        params: {},
+      });
+
+      expect(resp.status).toBe(200);
+      expect(mocks.runGemma4Agent).toHaveBeenCalledWith(
+        'diagnose tool calling',
+        expect.objectContaining({
+          pipeline: 'ace',
+          userId: 'user-1',
+          sessionId: 'user-1',
+          metadata: expect.objectContaining({ taskId: 'task-123' }),
+        }),
+      );
+    });
   });
 
 });

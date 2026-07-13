@@ -78,10 +78,12 @@ const checks = [
     validate: (data) => {
       const model = data.data?.[0];
       const isGemma4 = model?.id?.includes('gemma4');
+      const isHForF = model?.id?.includes('hforf');
+      const isAccepted = isGemma4 || isHForF;
       const quantNote = isGemma4 && model.id.includes('iq4') ? ' (IQ4_XS)' : '';
       return {
-        ok: isGemma4,
-        msg: isGemma4 ? `✓ ${model.id}${quantNote}` : `✗ Wrong model: ${model?.id}`,
+        ok: isAccepted,
+        msg: isAccepted ? `✓ ${model.id}${quantNote}` : `✗ Wrong model: ${model?.id}`,
         schema: { service: 'llama-server', model: model?.id, quantization: 'iq4_xs' }
       };
     }

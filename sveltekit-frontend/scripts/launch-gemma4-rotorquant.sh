@@ -12,6 +12,7 @@
 #   - Concurrency: 8-16 requests (request queuing, not --parallel slots)
 
 MODEL_PATH="models/gemma4-e2b-rotorquant-iq4xs/gemma-4-E2B-it-RotorQuant-IQ4_XS.gguf"
+PORT="${PORT:-${LLAMA_SERVER_PORT:-8090}}"
 
 # Allow context override via env var or argument
 CONTEXT=${CONTEXT:-32768}
@@ -26,7 +27,7 @@ echo "🚀 Starting llama-server with Gemma4 RotorQuant IQ4_XS"
 echo "   Model: IQ4_XS quantized weights (3.1GB file, 1.7GB weights)"
 echo "   Context: $CONTEXT tokens (32K default, 64K max on 8GB)"
 echo "   KV Cache: q8_0 K + q8_0 V (standard llama.cpp, stable)"
-echo "   Port: 8090"
+echo "   Port: $PORT"
 echo "   Throughput: 40-50 tok/s per request"
 echo "   Concurrency: request queuing (internal batching, --parallel $PARALLEL)"
 echo ""
@@ -46,7 +47,7 @@ llama-server \
   -fa on \
   --cache-prompt \
   --cache-reuse 256 \
-  --port 8090 \
+  --port "$PORT" \
   --chat-template-file "$TEMPLATE_PATH" \
   --jinja \
   --reasoning-format none \

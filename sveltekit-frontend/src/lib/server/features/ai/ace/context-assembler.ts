@@ -79,7 +79,7 @@ const OPENCODE_MAX_OUTPUT_TOKENS = Number(
   process.env.OPENAI_MAX_OUTPUT_TOKENS ?? process.env.OPENCODE_MAX_OUTPUT_TOKENS ?? '2048'
 );
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
-import { rerankWithGemma4 } from '../../../retrieval/cross-encoder-reranker.js';
+import { rerankWithCrossEncoder } from '../../../retrieval/cross-encoder-reranker.js';
 import { applyTopologicalBoostAsync } from '../../../retrieval/topological-search.js';
 import {
   queryBmuCached,
@@ -6674,7 +6674,7 @@ export async function fetchCodebaseContext(
     // Step 3 — cross-encoder reranker pass (noFallback prevents web search on code queries)
     if (results.length > 1) {
       try {
-        const { rerankWithGemma4 } = await import(
+        const { rerankWithCrossEncoder } = await import(
           '$lib/server/retrieval/cross-encoder-reranker.js'
         );
         const candidates = results.map((r, i) => ({
@@ -6684,7 +6684,7 @@ export async function fetchCodebaseContext(
           // spread neo4j payload so reranker can use metadata
           ...(r.chunk as Record<string, unknown>),
         }));
-        const { results: reranked } = await rerankWithGemma4(query, candidates, {
+        const { results: reranked } = await rerankWithCrossEncoder(query, candidates, {
           topN: 20,
           returnTopK: 5,
           noFallback: true,

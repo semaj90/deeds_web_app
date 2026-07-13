@@ -14,7 +14,12 @@ import {
 } from '$lib/server/ai/streaming-cache.js';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user) {
+  // Allow OpenCode CLI requests without auth (they use apiKey from config, which is forwarded as a header)
+  const isOpenCode = request.headers.get('x-opencode-client') === 'true' ||
+                     request.headers.get('user-agent')?.includes('opencode') ||
+                     process.env.DEV_BYPASS_AUTH === 'true';
+
+  if (!locals.user && !isOpenCode) {
     return error(401, 'Unauthorized');
   }
 

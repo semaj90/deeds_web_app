@@ -595,21 +595,24 @@ if ($kvProfile -eq 'atomicbot') {
 
 
 
-# -- Reasoning format: suppress chain-of-thought for OpenCode/short queries --
-# Default: none (stops thinking loops on short prompts like "test").
-# Set TURBO_REASONING_FORMAT=deepseek in .env to re-enable for long-form tasks.
-# HARD RULE: Always pass --reasoning-budget 0 to block <|channel>thought leak.
+# -- Reasoning format: template-based reasoning for tool calling + analysis --
+# Reasoning is ENABLED via template + sanitizer combo (NOT via --reasoning-format flag).
+# Template instructs model to wrap reasoning in <reasoning>...</reasoning> tags.
+# Sanitizer preserves these tags while removing contamination markers.
+# Using 'none' here because Gemma4 doesn't support deepseek/think formats.
+# Reasoning happens in-template via the <reasoning> protocol.
 $reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT } else { 'none' }
 if (Test-LlamaFlag $llama '--reasoning-format') {
     $baseArgs = $baseArgs + @('--reasoning-format', $reasoningFormat)
-    Write-Host "Reasoning format: --reasoning-format $reasoningFormat" -ForegroundColor Cyan
+    Write-Host "Reasoning format: --reasoning-format $reasoningFormat (enabled via template)" -ForegroundColor Cyan
 } else {
-    Write-Host "Reasoning format: --reasoning-format not supported by this binary - skipping" -ForegroundColor DarkYellow
+    Write-Host "Reasoning format: --reasoning-format not supported by this binary (template-based reasoning active)" -ForegroundColor DarkYellow
 }
-# Block <|channel>thought output even if embedded in GGUF
+# Suppress <|channel>thought leak (Gemma4 internal markers)
+# Reasoning happens via template protocol, not via reasoning-format flag
 if (Test-LlamaFlag $llama '--reasoning-budget') {
     $baseArgs = $baseArgs + @('--reasoning-budget', '0')
-    Write-Host "Reasoning budget: --reasoning-budget 0 (suppress <|channel>thought leak)" -ForegroundColor Cyan
+    Write-Host "Reasoning budget: --reasoning-budget 0 (suppress internal markers, use template)" -ForegroundColor Cyan
 }
 
 # -- Chat template: use gemma4-tools.jinja to enable tool calling + suppress thinking markers --
@@ -634,6 +637,17 @@ if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
     Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in" -ForegroundColor Yellow
 } else {
     Write-Host "Chat template: $defaultTemplate not found - will use GGUF built-in (supports_tools may be false)" -ForegroundColor Yellow
+}
+
+# -- Stop sequences: prevent the model from emitting turn markers into the output.
+# The model/template stack is chat-format aware, but this model still tends to
+# echo `<end_of_turn>` / `<start_of_turn>` after short answers unless we stop on
+# the chat boundary itself.
+if (Test-LlamaFlag $llama '--stop') {
+    $baseArgs = $baseArgs + @('--stop', '<|mask_end|>', '--stop', '<end_of_turn>', '--stop', '<start_of_turn>')
+    Write-Host "Stop sequences: --stop <|mask_end|> / <end_of_turn> / <start_of_turn> enabled" -ForegroundColor Cyan
+} else {
+    Write-Host "Stop sequences: --stop not supported by this binary - leaving template boundary unguarded" -ForegroundColor DarkYellow
 }
 
 # -- Tool-calling: --jinja for OpenAI function-call format ----------------

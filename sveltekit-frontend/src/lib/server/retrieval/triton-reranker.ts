@@ -3,13 +3,15 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 /**
  * Triton Reranker Client
- * 
- * Optimized for Cross-Encoder models (e.g. BGE Reranker) running on Triton/TRT-LLM.
+ *
+ * Optimized for cross-encoder rerankers (Mixedbread / BGE-style) running on Triton/TRT-LLM
+ * or a Triton-compatible sidecar.
  * Supports batch inference to minimize RTT latency.
  */
 
 const getEndpoint = () => ENV.TRITON_URL;
-const getModel = () => ENV.TRITON_RERANKER_MODEL || 'bge-reranker';
+const getModel = () =>
+  ENV.CROSS_ENCODER_MODEL || ENV.TRITON_RERANKER_MODEL || 'mixedbread-ai/mxbai-rerank-base-v2';
 const withBasePath = (path: string) => `${getEndpoint().replace(/\/$/, '')}${path}`;
 
 export interface TritonRerankResult {
@@ -18,9 +20,9 @@ export interface TritonRerankResult {
 }
 
 /**
- * Score a batch of query-document pairs via Triton.
- * 
- * Triton Input Format (example for BGE):
+ * Score a batch of query-document pairs via Triton or a Triton-compatible sidecar.
+ *
+ * Input format is backend-specific but always batch-oriented:
  * - texts: [ [query, doc1], [query, doc2], ... ]
  * 
  * Returns scores in the same order as candidates.
@@ -81,12 +83,14 @@ export async function scoreBatchTriton(
  * Readiness check for the reranker model.
  */
 export async function isRerankerReady(): Promise<boolean> {
-    try {
-        const response = await fetch(withBasePath(`/v2/models/${encodeURIComponent(getModel())}/ready`), {
-            signal: AbortSignal.timeout(2000)
-        });
-        return response.ok;
-    } catch {
-        return false;
-    }
+  try {
+    const response = await fetch(withBasePath(`/v2/models/${encodeURIComponent(getModel())}/ready`), {
+      signal: AbortSignal.timeout(2000)
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
+
+export const scoreBatchCrossEncoder = scoreBatchTriton;

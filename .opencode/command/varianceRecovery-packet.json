@@ -1,8 +1,0 @@
-{
-  "varianceRecovery": {
-    "exactMatchFailed": true,
-    "didYouMean": ["sveltekit-frontend/memory/graphify/deep/deep-import-graph.json"],
-    "qdrantTags": ["graph-export-recovery"],
-    "nextSteps": ["Verify local node environment CWD paths inside scripts/dev/"]
-  }
-}

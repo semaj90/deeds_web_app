@@ -23,7 +23,7 @@ import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { searchByError } from '$lib/server/indexer/dual-embedder.js';
-import { rerankWithGemma4 } from '$lib/server/retrieval/cross-encoder-reranker.js';
+import { rerankWithCrossEncoder } from '$lib/server/retrieval/cross-encoder-reranker.js';
 import { logRagHitWithTopology } from '$lib/server/indexer/ast-ingest-logger.js';
 import {
   getCachedEmbedding,
@@ -580,7 +580,7 @@ export async function loadCodebaseContext(query: string): Promise<{
       chunk: c, // Pass original chunk through
     }));
 
-    const gemmasResult = await rerankWithGemma4(query, rerankPool, {
+    const gemmasResult = await rerankWithCrossEncoder(query, rerankPool, {
       returnTopK: 5,
       noFallback: true, // Internal codebase search doesn't fallback to web here
     });
@@ -598,7 +598,7 @@ export async function loadCodebaseContext(query: string): Promise<{
 
     // Fetch MARCO scores in batch
     const { scoreBatchTriton } = await import('$lib/server/retrieval/triton-reranker');
-    const marcoScores = await scoreBatchTriton(query, finalChunks.map(c => c.content));
+    const crossEncoderScores = await scoreBatchTriton(query, finalChunks.map(c => c.content));
 
     // -- P5: 64d latent similarity for decision-tree f8 signal -----------------
     let queryEncoded64: Float32Array | undefined;
@@ -639,7 +639,7 @@ export async function loadCodebaseContext(query: string): Promise<{
 
         const signals = await combineRerankSignals(query, {
             gemmaScore: chunk.score,
-            marcoScore: marcoScores[idx],
+            crossEncoderScore: crossEncoderScores[idx],
             wikiScore: Math.min(1.0, wikiScore),
             activityScore: card?.activityScore || 0,
             encodedSimilarity,

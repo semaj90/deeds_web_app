@@ -880,7 +880,7 @@ export async function bifrostChat(
       source: 'bifrostChat',
       cache_backend: 'redis-exact-match',
     });
-    return exactMatch.content;
+    return sanitizeModelOutput(exactMatch.content);
   }
 
   // ── L2 Cache: Qdrant HTTP Semantic Search (bypasses Bifrost gRPC bug) ──
@@ -947,7 +947,7 @@ export async function bifrostChat(
                 const parsed = JSON.parse(hit.payload.response) as {
                   choices?: Array<{ message?: { content?: string } }>;
                 };
-                const cachedContent = parsed.choices?.[0]?.message?.content ?? '';
+                const cachedContent = sanitizeModelOutput(parsed.choices?.[0]?.message?.content ?? '');
                 if (cachedContent) {
                   cacheHitLevel = 'L2';
                   console.debug(
@@ -1026,7 +1026,7 @@ export async function bifrostChat(
 
           if (turboquantRes.ok) {
             const turboquantData = (await turboquantRes.json()) as any;
-            content = turboquantData.choices?.[0]?.message?.content ?? '';
+            content = sanitizeModelOutput(turboquantData.choices?.[0]?.message?.content ?? '');
             tool_calls = turboquantData.choices?.[0]?.message?.tool_calls;
             t_l3 = performance.now() - bifrostStart;
             usedBackend = 'turboquant';
@@ -1063,7 +1063,7 @@ export async function bifrostChat(
     }
 
     const ollamaData = fastJsonParse<OllamaResponse>(await ollamaRes.text());
-    content = ollamaData.message?.content ?? '';
+    content = sanitizeModelOutput(ollamaData.message?.content ?? '');
     tool_calls = ollamaData.message?.tool_calls;
     t_l3 = performance.now() - bifrostStart;
     usedBackend = 'ollama';
@@ -1130,7 +1130,7 @@ export async function bifrostChat(
           }>(rawText);
           const debug = data.extra_fields?.cache_debug;
           const choice = data.choices?.[0]?.message;
-          content = choice?.content ?? '';
+          content = sanitizeModelOutput(choice?.content ?? '');
           tool_calls = choice?.tool_calls;
           cacheHit = !!debug?.cache_hit;
           hitType = debug?.hit_type;
@@ -1317,6 +1317,51 @@ export async function bifrostChat(
   }
 
   return content;
+}
+
+// ── Output Sanitizer ───────────────────────────────────────────────────────
+// Strips training-trace markers (e.g., <end_of_turn>, <start_of_turn>) that some models
+// emit as part of their generated content. This is a workaround for models like HForF
+// that have these markers embedded in their training data.
+function sanitizeModelOutput(text: string): string {
+  if (!text) return text;
+
+  // PRESERVE reasoning blocks — they're part of the model's valid output
+  // Extract reasoning if present (keep for later re-insertion)
+  const reasoningMatch = text.match(/<reasoning>([\s\S]*?)<\/reasoning>/);
+  const hasReasoning = !!reasoningMatch;
+
+  // Remove training/control markers from HForF and other models
+  // HForF embeds these as tokens mid-response, not just at boundaries
+  let cleaned = text
+    // Turn markers
+    .replace(/<end_of_turn>/g, '')
+    .replace(/<start_of_turn>/g, '')
+    // Thinking/reasoning markers (model-internal, not user-facing reasoning)
+    .replace(/<\|endthinking\|>/g, '')
+    .replace(/<thinking>/g, '')
+    .replace(/<\/thinking>/g, '')
+    // Channel/mode markers (both closed and open forms)
+    .replace(/<\|channel>/g, '')
+    .replace(/<\|channel>[\s\S]*?<\/channel>/g, '') // Remove full <|channel>...content...</channel>
+    .replace(/<\|channel>\w+/g, '') // Remove opening <|channel>thought, <|channel>search, etc.
+    // HForF-specific contamination patterns
+    .replace(/<\|mask_end\|>/g, '')
+    .replace(/Understood\.<\|mask_end\|>/g, '')
+    .replace(/▣\s+Build\s+·\s+\w+\s+GGUF/g, '') // e.g., "▣  Build · HForF GGUF"
+    // Additional HForF control sequences
+    .replace(/<\|im_start\|>/g, '')
+    .replace(/<\|im_end\|>/g, '')
+    // Whitespace normalization (remove spurious control chars)
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .trim();
+
+  // Restore reasoning block if it was present (it's a valid protocol component)
+  if (hasReasoning && !cleaned.includes('<reasoning>')) {
+    cleaned = `<reasoning>${reasoningMatch[1]}</reasoning>\n${cleaned}`;
+  }
+
+  return cleaned;
 }
 
 // ── Chat Functions (merged from ollama-service.ts) ──────────────────────

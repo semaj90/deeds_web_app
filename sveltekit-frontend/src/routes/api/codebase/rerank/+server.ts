@@ -57,7 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const useGemma = request.headers.get('x-rerank-stage') === 'C' || true;
 		if (useGemma && rerank.results.length > 0) {
-			const { rerankWithGemma4 } = await import('$lib/server/retrieval/cross-encoder-reranker.js');
+			const { rerankWithCrossEncoder } = await import('$lib/server/retrieval/cross-encoder-reranker.js');
 			const pool = rerank.results.map(c => ({
 				documentId: `${c.relativePath}:${c.lineStart}`,
 				content: c.content,
@@ -65,7 +65,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				chunk: c
 			}));
 
-			const gemmas = await rerankWithGemma4(body.query, pool, {
+			const gemmas = await rerankWithCrossEncoder(body.query, pool, {
 				returnTopK: body.limit,
 				noFallback: false
 			});

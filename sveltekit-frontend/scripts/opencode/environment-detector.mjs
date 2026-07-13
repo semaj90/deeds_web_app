@@ -72,6 +72,7 @@ export function detectAgentEnvironment() {
     detected: exists(path.join(APP_ROOT, 'opencode.json')) || exists(path.join(APP_ROOT, '.opencode')),
     config: exists(path.join(APP_ROOT, 'opencode.json')) ? 'opencode.json' : null,
     startupContext: exists(path.join(APP_ROOT, '.opencode', 'startup-context.json')) ? '.opencode/startup-context.json' : null,
+    taskStateMarkdown: exists(path.join(APP_ROOT, '.opencode', 'tasks', 'task-state.md')) ? '.opencode/tasks/task-state.md' : null,
     taskState: exists(path.join(APP_ROOT, '.opencode', 'tasks', 'task-state.json')) ? '.opencode/tasks/task-state.json' : null,
   };
 
@@ -170,6 +171,8 @@ export function renderAgentEnvironmentMarkdown(report) {
     `- VS Code tasks: ${report.vscode.tasksFiles.length ? report.vscode.tasksFiles.join(', ') : 'none'}`,
     `- OpenCode detected: ${report.opencode.detected}`,
     `- OpenCode config: ${report.opencode.config ?? 'n/a'}`,
+    `- OpenCode task state markdown: ${report.opencode.taskStateMarkdown ?? 'n/a'}`,
+    `- OpenCode task state json: ${report.opencode.taskState ?? 'n/a'}`,
     `- Codex detected: ${report.codex.detected}`,
     '',
     '## Runtime Roles',

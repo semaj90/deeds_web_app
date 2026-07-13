@@ -148,7 +148,10 @@ async function handleNative(body: unknown, userId: string): Promise<Response> {
       userId,
       sessionId: userId,
       bypassCache,
-      metadata,
+      metadata: {
+        ...(metadata ?? {}),
+        taskId: (metadata as Record<string, unknown> | undefined)?.taskId ?? null,
+      },
     });
     const cacheHit = result.cacheTier === 'L1_redis' || result.cacheTier === 'L2_qdrant';
     recordSearchQuery({ query, pipeline: pipeline as HitPipeline, cacheHit, userId });
@@ -203,7 +206,10 @@ async function handleA2ATask(body: unknown, request: Request, userId: string): P
       pipeline,
       userId,
       sessionId: userId,
-      metadata: task.metadata,
+      metadata: {
+        ...(task.metadata ?? {}),
+        taskId: task.id,
+      },
     });
 
     const taskResult: A2ATaskResult = {
@@ -291,6 +297,7 @@ function handleA2AStream(taskId: string, query: string, pipeline: string, userId
           sessionId: userId,
           metadata: {
             source: 'a2a-stream',
+            taskId,
             ...(typeof taskId === 'string' ? { route: taskId } : {}),
           },
         });

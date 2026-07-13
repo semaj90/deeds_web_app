@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T23:21:19.166Z",
+  "generatedAt": "2026-07-13T02:44:07.981Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -13,23 +13,35 @@
     "snapshotJson": ".opencode\\recommendations\\recommendations.json",
     "snapshotMd": ".opencode\\recommendations\\recommendations.md",
     "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
-    "currentCount": 300
+    "currentCount": 314
   },
   "tasks": {
     "stateJson": ".opencode\\tasks\\task-state.json",
     "stateMd": ".opencode\\tasks\\task-state.md",
     "eventsJsonl": ".opencode\\tasks\\task-events.jsonl",
-    "currentCount": 22,
-    "openCount": 0
+    "currentCount": 24,
+    "openCount": 2
   },
-  "activeLane": null,
+  "activeLane": {
+    "taskId": "task_1_circular_dependency_chains_of_3_files",
+    "title": "1 circular dependency chains of 3+ files",
+    "priority": "HIGH",
+    "status": "TODO",
+    "command": null,
+    "sourceRecommendationKey": "1_circular_dependency_chains_of_3_files"
+  },
   "openLanesTodo": "reports\\parent-atlas-open-lanes-todo.md",
   "reports": {
     "temporalTaskRegistry": "docs\\reports\\temporal-task-registry-report.md",
     "agentEnvironment": "docs\\reports\\opencode-agent-environment-report.md",
-    "startupBriefing": ".opencode\\startup-briefing.md",
+    "startupBriefing": "..\\.opencode\\startup-briefing.md",
     "engramAdapterDecision": "docs/reports/engram-adapter-decision-report.md",
     "parentAtlasOverlay": "docs/reports/parent-atlas-overlay-sync-report.md"
   },
-  "startupBriefing": null
+  "startupBriefing": {
+    "path": "..\\.opencode\\startup-briefing.json",
+    "nextLane": "Retrieval telemetry depth / replay breadth",
+    "tasksOpen": 0,
+    "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
+  }
 }

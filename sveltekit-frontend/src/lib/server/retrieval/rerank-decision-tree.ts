@@ -7,6 +7,7 @@ import path from 'node:path';
 export interface RerankSignals {
 	gemmaScore: number;
 	marcoScore?: number;
+	crossEncoderScore?: number;
 	langScore?: number;
 	wikiScore?: number;
 	activityScore?: number;
@@ -77,7 +78,7 @@ export async function combineRerankSignals(
 
 		const finalScore =
 			(signals.gemmaScore * weights.gemma) +
-			((signals.marcoScore ?? 0.5) * weights.marco) +
+			((signals.crossEncoderScore ?? signals.marcoScore ?? 0.5) * weights.marco) +
 			((langScore ?? 0.5) * weights.lang) +
 			((signals.wikiScore ?? 0.5) * weights.wiki) +
 			((signals.activityScore  ?? 0.0) * (weights.activity ?? 0.0)) +

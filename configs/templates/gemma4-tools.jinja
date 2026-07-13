@@ -1,0 +1,39 @@
+{%- if tools -%}
+<start_of_turn>user
+You have access to tools and reasoning. Use the following protocol:
+
+1. First, think through the problem inside <reasoning> tags:
+<reasoning>
+Your reasoning about the task and which tools to use
+</reasoning>
+
+2. Then execute the appropriate tool using this JSON format:
+<tool_call>
+{"name": "<tool_name>", "arguments": {<arguments>}}
+</tool_call>
+
+Available tools:
+{%- for tool in tools %}
+- {{ tool.function.name }}: {{ tool.function.description }}
+  Parameters: {{ tool.function.parameters }}
+{%- endfor %}
+<end_of_turn>
+{%- endif -%}
+{%- for message in messages -%}
+{%- if message['role'] == 'system' -%}
+<start_of_turn>user
+{{ message['content'] }}<end_of_turn>
+{%- elif message['role'] == 'user' -%}
+<start_of_turn>user
+{{ message['content'] }}<end_of_turn>
+{%- elif message['role'] == 'assistant' -%}
+<start_of_turn>model
+{{ message['content'] }}<end_of_turn>
+{%- elif message['role'] == 'tool' -%}
+<start_of_turn>user
+Tool result for {{ message.get('name', 'unknown') }}: {{ message['content'] }}<end_of_turn>
+{%- endif -%}
+{%- endfor -%}
+{%- if add_generation_prompt -%}
+<start_of_turn>model
+{%- endif -%}

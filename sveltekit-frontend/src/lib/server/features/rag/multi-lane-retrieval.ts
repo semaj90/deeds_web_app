@@ -408,13 +408,13 @@ function mergeAndRank(lanes: LaneResult[]): MultiLaneHit[] {
 }
 
 /**
- * Cross-encoder rerank pass — wraps `rerankWithGemma4` with the
+ * Cross-encoder rerank pass — wraps `rerankWithCrossEncoder` with the
  * MultiLaneHit ↔ RerankCandidate adapter shape.
  *
  * Phase 1 wire-up per docs/audit/2026-05-11-feature-spec-implementation-audit.md
  * action #2. Gated behind `MULTILANE_CROSS_ENCODER_ENABLED` env flag (canary):
  * when off, returns input unchanged. When on, top-N candidates are rescored
- * by Gemma4 cross-encoder (with L0/L1 cache layers per cross-encoder-reranker.ts).
+ * by the cross-encoder backend (with L0/L1 cache layers per cross-encoder-reranker.ts).
  *
  * Returns `null` on rerank failure so caller falls back to RRF order — never
  * throws, never blocks the synthesis lane.
@@ -428,14 +428,14 @@ async function maybeCrossEncoderRerank(
 	if (merged.length === 0 || !queryText.trim()) return null;
 
 	try {
-		const { rerankWithGemma4 } = await import('$lib/server/retrieval/cross-encoder-reranker.js');
+		const { rerankWithCrossEncoder } = await import('$lib/server/retrieval/cross-encoder-reranker.js');
 		const candidates = merged.slice(0, opts.topN ?? 40).map((hit) => ({
 			documentId: hit.id,
 			content: hit.text ?? '',
 			retrievalScore: hit.score,
 			__hit: hit, // round-trip the original MultiLaneHit
 		}));
-		const { results } = await rerankWithGemma4(queryText, candidates, {
+		const { results } = await rerankWithCrossEncoder(queryText, candidates, {
 			topN: opts.topN ?? 40,
 			returnTopK: opts.returnTopK ?? merged.length,
 			userId: opts.userId,

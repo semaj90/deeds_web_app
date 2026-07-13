@@ -4,10 +4,34 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 const mocks = vi.hoisted(() => ({
   dispatchFn:   vi.fn(),
   recordAction: vi.fn(),
+  dbInsertValues: vi.fn(),
 }));
 
 vi.mock('$lib/server/trace/trace-collector.js', () => ({
   recordAgentAction: mocks.recordAction,
+}));
+
+vi.mock('$lib/server/ai/preflight.js', () => ({
+  preflight: vi.fn(async () => ({
+    prevent: false,
+    reason: '',
+    suggestion: '',
+  })),
+}));
+
+vi.mock('$lib/server/db/client.js', () => ({
+  db: {
+    insert: vi.fn(() => ({
+      values: (...args: unknown[]) => {
+        mocks.dbInsertValues(...args);
+        return Promise.resolve(undefined);
+      },
+    })),
+  },
+}));
+
+vi.mock('$lib/server/db/schema-postgres.js', () => ({
+  contextTimeline: { __name: 'context_timeline' },
 }));
 
 // Stub TOOL_DISPATCH and MCPToolResult without real server deps
@@ -22,6 +46,7 @@ describe('gemma4-tool-controller', () => {
   beforeEach(() => {
     mocks.dispatchFn.mockReset();
     mocks.recordAction.mockReset();
+    mocks.dbInsertValues.mockReset();
     mocks.recordAction.mockReturnValue(undefined);
   });
 
@@ -78,9 +103,9 @@ describe('gemma4-tool-controller', () => {
       callModel,
     });
 
-    // callModel invoked at most maxToolRounds + 1 times (last call for final answer)
-    expect(callModel).toHaveBeenCalledTimes(4); // 3 tool rounds + 1 final answer call
-    expect(result.toolRounds).toBe(3);
+    // Dedup stops the loop on the first repeated tool call, so only two model calls are needed.
+    expect(callModel).toHaveBeenCalledTimes(2);
+    expect(result.toolRounds).toBeLessThanOrEqual(2);
     expect(result.mcpPort).toBe(8788);
   });
 
@@ -107,6 +132,71 @@ describe('gemma4-tool-controller', () => {
 
     expect(result.stuckTool).toBe('trace.kag_search');
     expect(result.answer).toMatch(/repeated identical tool call/);
+  });
+
+  it('dedups semantically identical tool calls even when argument key order differs', async () => {
+    const { runGemma4ToolLoop } = await import('$lib/server/ai/gemma4-tool-controller.js');
+
+    const callModel = vi.fn()
+      .mockResolvedValueOnce({
+        content: '',
+        tool_calls: [{ function: { name: 'trace.kag_search', arguments: { query: 'ordered', a: 1, b: 2 } } }],
+      })
+      .mockResolvedValueOnce({
+        content: '',
+        tool_calls: [{ function: { name: 'trace.kag_search', arguments: { b: 2, a: 1, query: 'ordered' } } }],
+      });
+
+    mocks.dispatchFn.mockResolvedValue({ tool: 'trace.kag_search', success: true, data: [] });
+
+    const result = await runGemma4ToolLoop({
+      messages: [{ role: 'user', content: 'q' }],
+      callModel,
+    });
+
+    expect(result.stuckTool).toBe('trace.kag_search');
+    expect(result.answer).toMatch(/repeated identical tool call/);
+  });
+
+  it('records a canonical execution ledger event with next state', async () => {
+    const { runGemma4ToolLoop } = await import('$lib/server/ai/gemma4-tool-controller.js');
+
+    const callModel = vi.fn()
+      .mockResolvedValueOnce({
+        content: '',
+        tool_calls: [{ function: { name: 'trace.kag_search', arguments: { query: 'timeline' } } }],
+      })
+      .mockResolvedValueOnce({ content: 'done', tool_calls: [] });
+
+    mocks.dispatchFn.mockResolvedValue({
+      tool: 'trace.kag_search',
+      success: true,
+      data: [{ source_ref: 'src/lib/server/ai/gemma4-tool-controller.ts' }],
+    });
+
+    const result = await runGemma4ToolLoop({
+      messages: [{ role: 'user', content: 'trace the call' }],
+      sessionId: 'session-123',
+      userId: '42',
+      callModel,
+    });
+
+    await new Promise((resolve) => setImmediate(resolve));
+
+    const timelineInsert = mocks.dbInsertValues.mock.calls.find((call) => {
+      const value = call[0] as Record<string, unknown>;
+      return value?.eventType === 'tool_call';
+    })?.[0] as Record<string, unknown> | undefined;
+
+    expect(result.toolsUsed).toContain('trace.kag_search');
+    expect(timelineInsert).toBeDefined();
+    expect(timelineInsert?.sessionId).toBe('session-123');
+    expect(timelineInsert?.userId).toBe(42);
+
+    const payload = timelineInsert?.payload as Record<string, unknown>;
+    expect(payload?.executionId).toMatch(/^toolcall:session-123:0:/);
+    expect(payload?.nextState).toBeDefined();
+    expect(payload?.toolName).toBe('trace.kag_search');
   });
 
   it('records toolsUsed metadata in the output', async () => {

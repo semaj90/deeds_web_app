@@ -27,6 +27,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { logToolTrace, type ToolTraceStatus } from '$lib/server/observability/tool-trace.js';
+import { parseToolCalls as parseToolCallsFromText } from '$lib/server/ai/tool-shim.js';
 
 const RUNTIME_CONTEXT_SIZE = Number(
   process.env.LLM_CONTEXT_SIZE ??
@@ -280,9 +281,21 @@ export async function callGemma4WithTools(
     );
 
     const assistantMsg = chatResponse.message;
+    const fallbackToolCalls =
+      !assistantMsg.tool_calls?.length && typeof assistantMsg.content === 'string'
+        ? parseToolCallsFromText(assistantMsg.content).map((tc) => ({
+            function: {
+              name: tc.tool,
+              arguments: tc.args,
+            },
+          }))
+        : [];
+    const normalizedToolCalls = assistantMsg.tool_calls?.length
+      ? assistantMsg.tool_calls
+      : fallbackToolCalls;
 
     // ── No tool calls? The model is done — return final answer ───────────
-    if (!assistantMsg.tool_calls?.length) {
+    if (!normalizedToolCalls.length) {
       messages.push({
         role: 'assistant',
         content: assistantMsg.content,
@@ -316,11 +329,11 @@ export async function callGemma4WithTools(
     messages.push({
       role: 'assistant',
       content: assistantMsg.content || '',
-      tool_calls: assistantMsg.tool_calls,
+      tool_calls: normalizedToolCalls,
     });
 
     // ── Step 3: Execute each tool call ──────────────────────────────────
-    for (const tc of assistantMsg.tool_calls) {
+    for (const tc of normalizedToolCalls) {
       const fnName = tc.function.name;
       const fnArgs = tc.function.arguments ?? {};
       const handler = handlers.get(fnName);

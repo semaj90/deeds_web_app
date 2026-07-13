@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-11T03:54:55.242Z",
+  "generatedAt": "2026-07-13T02:44:08.023Z",
   "surface": "opencode",
   "workspace": {
     "appRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
@@ -10,12 +10,12 @@
     "hostname": "DESKTOP-Q18MPHM",
     "shell": "powershell",
     "envFilesLoaded": [
-      ".env.local",
       ".env",
-      ".env.development.local",
+      ".env.local",
       ".env.development",
-      "..\\.env.local",
-      "..\\.env"
+      ".env.development.local",
+      "..\\.env",
+      "..\\.env.local"
     ]
   },
   "vscode": {
@@ -34,6 +34,7 @@
     "detected": true,
     "config": "opencode.json",
     "startupContext": ".opencode/startup-context.json",
+    "taskStateMarkdown": ".opencode/tasks/task-state.md",
     "taskState": ".opencode/tasks/task-state.json"
   },
   "codex": {

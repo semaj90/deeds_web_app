@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-19T23:21:19.166Z",
+  "generatedAt": "2026-07-13T02:44:07.981Z",
   "sourceFiles": {
     "recommendationEvents": ".opencode\\recommendations\\recommendation-events.jsonl",
     "taskEvents": ".opencode\\tasks\\task-events.jsonl",
@@ -7,25 +7,144 @@
   },
   "counts": {
     "findings": 0,
-    "recommendations": 300,
-    "tasks": 22,
-    "historyPackets": 45
+    "recommendations": 314,
+    "tasks": 24,
+    "historyPackets": 47
   },
   "summary": {
-    "runId": "2026-06-19T23:21:19.166Z",
+    "runId": "2026-07-13T02:44:07.981Z",
     "findingCount": 0,
-    "recommendationCount": 300,
-    "taskCount": 22,
-    "historyCount": 45,
-    "promotedRecommendations": 22,
-    "activeLane": null
+    "recommendationCount": 314,
+    "taskCount": 24,
+    "historyCount": 47,
+    "promotedRecommendations": 24,
+    "activeLane": {
+      "taskId": "task_1_circular_dependency_chains_of_3_files",
+      "title": "1 circular dependency chains of 3+ files",
+      "priority": "HIGH",
+      "status": "TODO",
+      "command": null,
+      "sourceRecommendationKey": "1_circular_dependency_chains_of_3_files"
+    }
   },
   "taskState": {
-    "generatedAt": "2026-06-19T23:21:19.166Z",
-    "recommendationEventsCount": 300,
-    "taskEventsCount": 45,
-    "promotedRecommendationsCount": 22,
+    "generatedAt": "2026-07-13T02:44:07.981Z",
+    "recommendationEventsCount": 314,
+    "taskEventsCount": 47,
+    "promotedRecommendationsCount": 24,
     "tasks": [
+      {
+        "task_id": "task_1_circular_dependency_chains_of_3_files",
+        "title": "1 circular dependency chains of 3+ files",
+        "description": "Large cycles increase coupling and make tree-shaking impossible. Break by extracting shared types to a third module.",
+        "priority": "HIGH",
+        "status": "TODO",
+        "source_recommendation_key": "1_circular_dependency_chains_of_3_files",
+        "command": null,
+        "feature_id": "general",
+        "source_refs": [
+          "claude-mem/src/services/worker/session/SessionCompletionHandler.ts",
+          "claude-mem/src/services/worker/session/GeneratorExitHandler.ts",
+          "claude-mem/src/services/worker-service.ts",
+          "claude-mem/src/services/worker/events/SessionEventBroadcaster.ts"
+        ],
+        "evidence_refs": [
+          "docs\\graph\\recommendations.json"
+        ],
+        "first_seen": "2026-07-13T02:44:07.883Z",
+        "last_seen": "2026-07-13T02:44:07.883Z",
+        "created_at": "2026-07-13T02:44:07.883Z",
+        "updated_at": "2026-07-13T02:44:07.883Z",
+        "history": [
+          {
+            "event_id": "task_5884c632bc03",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-07-13T02:44:07.883Z",
+            "run_id": "2026-07-13T02:44:07.681Z",
+            "task_id": "task_1_circular_dependency_chains_of_3_files",
+            "source_recommendation_key": "1_circular_dependency_chains_of_3_files",
+            "title": "1 circular dependency chains of 3+ files",
+            "description": "Large cycles increase coupling and make tree-shaking impossible. Break by extracting shared types to a third module.",
+            "priority": "HIGH",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": null,
+            "feature_id": "general",
+            "source_refs": [
+              "claude-mem/src/services/worker/session/SessionCompletionHandler.ts",
+              "claude-mem/src/services/worker/session/GeneratorExitHandler.ts",
+              "claude-mem/src/services/worker-service.ts",
+              "claude-mem/src/services/worker/events/SessionEventBroadcaster.ts"
+            ],
+            "evidence_refs": [
+              "docs\\graph\\recommendations.json"
+            ]
+          }
+        ],
+        "seen_count": 1
+      },
+      {
+        "task_id": "task_10_api_route_handlers_lack_auth_guards",
+        "title": "10 API route handlers lack auth guards",
+        "description": "Every non-public +server.ts should check locals.user or call requireAuth(). Reference: G18 in the 47-gate audit system.",
+        "priority": "HIGH",
+        "status": "TODO",
+        "source_recommendation_key": "10_api_route_handlers_lack_auth_guards",
+        "command": null,
+        "feature_id": "general",
+        "source_refs": [
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts",
+          "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts",
+          "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+          "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts",
+          "sveltekit-frontend/src/routes/api/search/rrf/+server.ts"
+        ],
+        "evidence_refs": [
+          "docs\\graph\\recommendations.json"
+        ],
+        "first_seen": "2026-07-13T02:44:07.883Z",
+        "last_seen": "2026-07-13T02:44:07.883Z",
+        "created_at": "2026-07-13T02:44:07.883Z",
+        "updated_at": "2026-07-13T02:44:07.883Z",
+        "history": [
+          {
+            "event_id": "task_21903f9a2fcc",
+            "event_type": "TASK_CREATED",
+            "created_at": "2026-07-13T02:44:07.883Z",
+            "run_id": "2026-07-13T02:44:07.681Z",
+            "task_id": "task_10_api_route_handlers_lack_auth_guards",
+            "source_recommendation_key": "10_api_route_handlers_lack_auth_guards",
+            "title": "10 API route handlers lack auth guards",
+            "description": "Every non-public +server.ts should check locals.user or call requireAuth(). Reference: G18 in the 47-gate audit system.",
+            "priority": "HIGH",
+            "status": "TODO",
+            "parent_task_id": null,
+            "command": null,
+            "feature_id": "general",
+            "source_refs": [
+              "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+              "sveltekit-frontend/src/routes/.well-known/llms-full.txt/+server.ts",
+              "sveltekit-frontend/src/routes/.well-known/llms.txt/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/index-doc/+server.ts",
+              "sveltekit-frontend/src/routes/api/atlas/search/+server.ts",
+              "sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts",
+              "sveltekit-frontend/src/routes/api/search/rrf/+server.ts"
+            ],
+            "evidence_refs": [
+              "docs\\graph\\recommendations.json"
+            ]
+          }
+        ],
+        "seen_count": 1
+      },
       {
         "task_id": "task_4_circular_dependency_chains_of_3_files",
         "title": "4 circular dependency chains of 3+ files",
@@ -366,7 +485,7 @@
             ]
           }
         ],
-        "seen_count": 5
+        "seen_count": 6
       },
       {
         "task_id": "task_feature_parent_join_repair",
@@ -427,7 +546,7 @@
             ]
           }
         ],
-        "seen_count": 4
+        "seen_count": 5
       },
       {
         "task_id": "task_route_runtime_packets_materialization",
@@ -488,7 +607,7 @@
             ]
           }
         ],
-        "seen_count": 4
+        "seen_count": 5
       },
       {
         "task_id": "task_concept_evidence_spine_backfill",
@@ -819,7 +938,7 @@
             "reason": "TRACE/Gemma4 command mapping is normalized across dot, underscore, and double-underscore names; Go retrieval tool smoke passes 7/7 and tool schema validation has 0 failures."
           }
         ],
-        "seen_count": 24
+        "seen_count": 25
       },
       {
         "task_id": "task_parent_atlas_evaluation_gates",
@@ -1280,7 +1399,7 @@
             ]
           }
         ],
-        "seen_count": 4
+        "seen_count": 5
       },
       {
         "task_id": "task_synthetic_evidence_concept_cards",
@@ -1338,7 +1457,7 @@
             "reason": "The synthetic evidence recommendation is superseded by the completed concept evidence spine backfill: packet_keys and feature_ids are canonical, evidence_cards is compatibility history."
           }
         ],
-        "seen_count": 24
+        "seen_count": 25
       },
       {
         "task_id": "task_atlas_topology_mirror_infer_siblings",
@@ -1435,13 +1554,13 @@
       },
       {
         "recommendation_key": "30_files_each_depended_on_by_50_files_transitively",
-        "count": 24,
+        "count": 25,
         "first_seen": "2026-06-11T03:18:47.300Z",
-        "last_seen": "2026-06-19T04:03:40.176Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
         "title": "30 files each depended on by >50 files transitively",
         "severity": "MEDIUM",
         "command": null,
-        "source": ".opencode\\recommendations\\recommendations.json",
+        "source": "docs\\graph\\recommendations.json",
         "feature_id": "general"
       },
       {
@@ -1534,9 +1653,9 @@
       },
       {
         "recommendation_key": "task-semantic-packets-drift",
-        "count": 4,
+        "count": 5,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-19T04:03:40.177Z",
+        "last_seen": "2026-07-13T02:44:07.788Z",
         "title": "task_semantic_packets manual SQL mirror drift",
         "severity": "MEDIUM",
         "command": "npm run atlas:postgres-contract-mirrors",
@@ -1556,9 +1675,9 @@
       },
       {
         "recommendation_key": "command-mapping-mcp-allowlist",
-        "count": 24,
+        "count": 25,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-19T04:03:40.177Z",
+        "last_seen": "2026-07-13T02:44:07.788Z",
         "title": "Command Mapping -> MCP allowlist",
         "severity": "MEDIUM",
         "command": "npm run opencode:tasks:refresh",
@@ -1567,9 +1686,9 @@
       },
       {
         "recommendation_key": "synthetic-evidence-concept-cards",
-        "count": 24,
+        "count": 25,
         "first_seen": "2026-06-11T03:18:47.301Z",
-        "last_seen": "2026-06-19T04:03:40.177Z",
+        "last_seen": "2026-07-13T02:44:07.788Z",
         "title": "Synthetic Evidence concept cards",
         "severity": "LOW",
         "command": "npm run opencode:tasks:refresh",
@@ -1600,9 +1719,9 @@
       },
       {
         "recommendation_key": "higher-hop-coverage-repair",
-        "count": 5,
+        "count": 6,
         "first_seen": "2026-06-12T12:42:11.456Z",
-        "last_seen": "2026-06-19T04:03:40.176Z",
+        "last_seen": "2026-07-13T02:44:07.788Z",
         "title": "Higher-hop coverage repair",
         "severity": "HIGH",
         "command": "npm run atlas:higher-hop:coverage",
@@ -1611,9 +1730,9 @@
       },
       {
         "recommendation_key": "feature-parent-join-repair",
-        "count": 4,
+        "count": 5,
         "first_seen": "2026-06-12T12:45:29.302Z",
-        "last_seen": "2026-06-19T04:03:40.176Z",
+        "last_seen": "2026-07-13T02:44:07.788Z",
         "title": "atlas_feature_map parent join repair",
         "severity": "HIGH",
         "command": "npm run atlas:feature-parent-join",
@@ -1622,9 +1741,9 @@
       },
       {
         "recommendation_key": "route-runtime-packets-materialization",
-        "count": 4,
+        "count": 5,
         "first_seen": "2026-06-12T12:45:29.303Z",
-        "last_seen": "2026-06-19T04:03:40.176Z",
+        "last_seen": "2026-07-13T02:44:07.788Z",
         "title": "route_runtime_packets materialization",
         "severity": "HIGH",
         "command": "npm run atlas:route-runtime-packets:materialize:apply",
@@ -1641,6 +1760,83 @@
         "command": "npm run atlas:concept-evidence:backfill",
         "source": "report:concept-evidence-spine",
         "feature_id": "evidence"
+      },
+      {
+        "recommendation_key": "1_circular_dependency_chains_of_3_files",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "1 circular dependency chains of 3+ files",
+        "severity": "HIGH",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "10_api_route_handlers_lack_auth_guards",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "10 API route handlers lack auth guards",
+        "severity": "HIGH",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "173_files_have_0_importers_and_are_not_entrypoints",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "173 files have 0 importers and are not entrypoints",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "34_api_routes_lack_zod_input_validation",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "34 API routes lack Zod input validation",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "7_files_in_circular_dependency_chains_have_no_paired_test",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "7 files in circular dependency chains have no paired test",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "357_substantial_files_import_libraries_but_have_0_consumers",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "357 substantial files import libraries but have 0 consumers",
+        "severity": "MEDIUM",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
+      },
+      {
+        "recommendation_key": "2_2_file_circular_dependency_pairs",
+        "count": 1,
+        "first_seen": "2026-07-13T02:44:07.787Z",
+        "last_seen": "2026-07-13T02:44:07.787Z",
+        "title": "2 2-file circular dependency pairs",
+        "severity": "LOW",
+        "command": null,
+        "source": "docs\\graph\\recommendations.json",
+        "feature_id": "general"
       }
     ]
   }

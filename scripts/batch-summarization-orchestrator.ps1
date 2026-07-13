@@ -7,12 +7,12 @@ Batch Summarization Pipeline Orchestrator (3-lane dual-execution)
 Orchestrates three independent lanes working in parallel:
 
 LANE 1 (Browser Client-side Classification):
-  - Transformers.js ONNX WebGPU (Gemma4 E2B q4f16)
+  - Transformers.js ONNX WebGPU (legacy browser lane)
   - Non-blocking UI, IndexedDB caching
   - Runs via SvelteKit admin dashboard at http://localhost:5173/admin/batch-summaries
 
-LANE 2 (Server Gemma4 Synthesis):
-  - llama-server :8090 (gemma4-legal-iq4xs-direct.gguf)
+LANE 2 (Server HFOR Synthesis):
+  - llama-server :8090 (HFOR GGUF)
   - RabbitMQ queue-based job processing
   - Sequential synthesis (no --parallel slots to fit 8GB VRAM)
   - Persists summaries to Postgres
@@ -35,7 +35,7 @@ LANE 3 (Parallel Embedding Generation):
 .NOTES
 Execution order:
 1. Verify all services (Ollama, Docker, Redis, RabbitMQ, Postgres)
-2. Start llama-server :8090 (Gemma4 synthesis)
+2. Start llama-server :8090 (HFOR synthesis)
 3. Start SvelteKit dev server (browser admin UI)
 4. Open admin dashboard
 5. Click "▶️ Start Batch Processing" to begin
@@ -135,9 +135,13 @@ if (-not $SkipEmbedding -and -not $StartSynthesisOnly) {
 
 Write-Log ""
 
-# Lane 2: Start llama-server :8090 for Gemma4 synthesis
+# Lane 2: Start llama-server :8090 for HFOR synthesis
 if (-not $StartBrowserAndSynthesis -or $StartAll -or $StartSynthesisOnly) {
-    Write-Log "Lane 2: Starting llama-server :8090 (Gemma4 synthesis)" "INFO"
+    Write-Log "Lane 2: Starting llama-server :8090 (HFOR synthesis)" "INFO"
+    $model_path = $env:ROTORQUANT_MODEL_PATH
+    if (-not $model_path) {
+        $model_path = Join-Path $PSScriptRoot "..\models\hfor\hforf.gguf"
+    }
 
     # Kill any existing llama-server processes
     Get-Process | Where-Object { $_.Name -like "*llama*" } | ForEach-Object {
@@ -148,7 +152,7 @@ if (-not $StartBrowserAndSynthesis -or $StartAll -or $StartSynthesisOnly) {
 
     # Start llama-server with synthesis config
     $llama_args = @(
-        "-m", "models/gemma4-legal-iq4xs-direct.gguf",
+        "-m", $model_path,
         "--port", "8090",
         "-c", "65536",
         "-ctk", "q8_0",
@@ -175,7 +179,7 @@ if (-not $StartBrowserAndSynthesis -or $StartAll -or $StartSynthesisOnly) {
         while (-not $ready -and $timeout -lt 30) {
             try {
                 $health = curl.exe -s http://127.0.0.1:8090/v1/models 2>$null | ConvertFrom-Json
-                if ($health.data -and $health.data[0].id -like "*gemma4*") {
+                if ($health.data -and $health.data[0].id -like "*hfor*") {
                     $ready = $true
                     Write-Log "  ✓ Lane 2 (synthesis) ready at :8090" "INFO"
                 }
@@ -236,15 +240,15 @@ Write-Log ""
 Write-Log "THREE-LANE EXECUTION MODEL:"
 Write-Log ""
 Write-Log "Lane 1 — Browser Client Classification (CONCURRENT):" "INFO"
-Write-Log "  • Transformers.js ONNX WebGPU (Gemma4 E2B q4f16)" "INFO"
+Write-Log "  • Transformers.js ONNX WebGPU (legacy browser lane)" "INFO"
 Write-Log "  • URL: http://localhost:5173/admin/batch-summaries" "INFO"
 Write-Log "  • Click '▶️ Start Batch Processing' to begin" "INFO"
 Write-Log "  • Time: 2-4 min for 501 jobs × 20 tuples" "INFO"
 Write-Log "  • Output: Hints cached in IndexedDB" "INFO"
 Write-Log ""
 
-Write-Log "Lane 2 — Server Gemma4 Synthesis (SEQUENTIAL):" "INFO"
-Write-Log "  • llama-server :8090 (gemma4-legal-iq4xs-direct.gguf)" "INFO"
+Write-Log "Lane 2 — Server HFOR Synthesis (SEQUENTIAL):" "INFO"
+Write-Log "  • llama-server :8090 ($model_path)" "INFO"
 Write-Log "  • RabbitMQ queue-based job processing" "INFO"
 Write-Log "  • Time: 2-3 hours for 501 summary jobs" "INFO"
 Write-Log "  • Output: Summaries persisted to Postgres" "INFO"

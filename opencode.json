@@ -2,7 +2,7 @@
   "$schema": "https://opencode.ai/config.json",
   "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
   "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-  "default_agent": "antigravity",
+  "default_agent": "gemma4-function-caller",
   "shell": "pwsh.exe",
 
   "provider": {
@@ -44,7 +44,74 @@
       },
       "models": {
         "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal llama-server",
+          "name": "Gemma4 Legal IQ4_XS Direct",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "temperature": 0,
+            "stream": true,
+            "stop": [
+              "<|mask_end|>",
+              "<end_of_turn>",
+              "<start_of_turn>"
+            ]
+          }
+        },
+        "hforf.gguf": {
+          "name": "HFOR llama-server",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "temperature": 0,
+            "stream": true,
+            "stop": [
+              "<think>",
+              "</think>",
+              "Thinking:",
+              "Self-Correction"
+            ]
+          }
+        }
+      }
+    }
+    ,
+    "turboquant": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local llama-server :8090 (64K gemma4 lane)",
+      "options": {
+        "baseURL": "http://127.0.0.1:8090/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-legal-iq4xs-direct.gguf": {
+          "name": "Gemma4 Legal IQ4_XS Direct 64K",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "temperature": 0,
+            "stream": true,
+            "stop": [
+              "<think>",
+              "</think>",
+              "Thinking:",
+              "Self-Correction"
+            ]
+          }
+        },
+        "hforf.gguf": {
+          "name": "HFOR llama-server 64K",
           "tools": true,
           "reasoning": false,
           "limit": {
@@ -73,7 +140,7 @@
   "command": {
     "workspace-bootstrap": {
       "description": "Refresh ACE hits, local health, and report artifacts before starting OpenCode work",
-      "agent": "antigravity",
+      "agent": "gemma4-function-caller",
       "subtask": false,
       "prompt": "Run npm run agent:hello first, then run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then refresh and load TRACE MCP evidence, the ranked MCP tool registry index, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, BitFrost/Redis cache health, startup briefing, and codebase semantic-index report. Prefer TRACE MCP, then the MCP tool registry index, then atlas-tools, then cache-backed ACE/BitFrost hits, then Engram, then LDR research. If a packages/atlas workspace exists, use it; otherwise use the current Parent Atlas reports and scripts. Return sourceRefs, loaded docs/reports, cache hits, tool names, and the next safe action. Do not edit files.",
       "template": "npm run agent:hello && npm run atlas:mcp:registry:index && npm run opencode:bootstrap"
@@ -155,7 +222,7 @@
 
   "agent": {
     "antigravity": {
-      "description": "Repo-audit-first Gemma4 agent for VS Code/OpenCode.",
+      "description": "Repo-audit-first HFOR agent for VS Code/OpenCode.",
       "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 10,
@@ -258,7 +325,7 @@
     },
 
     "gemma4-function-caller": {
-      "description": "Gemma4 agent with automatic function-calling for tool dispatch",
+      "description": "HFOR agent with automatic function-calling for tool dispatch",
       "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 12,
@@ -305,3 +372,6 @@
 
   "share": "disabled"
 }
+
+
+

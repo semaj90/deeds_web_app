@@ -692,6 +692,7 @@
     "@langchain/textsplitters": "^1.0.0",
     "@modelcontextprotocol/sdk": "1.22.0",
     "@mozilla/readability": "0.6.0",
+    "@opencode-ai/sdk": "1.17.19",
     "@qdrant/js-client-rest": "1.15.1",
     "@types/cheerio": "0.22.35",
     "ai": "6.0.190",

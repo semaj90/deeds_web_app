@@ -8,6 +8,7 @@
  * If null, QLoRA export will skip the trace (missing_selected_concepts counter).
  */
 
+import { createHash } from 'crypto';
 import { pool } from '../db/client';
 
 export interface AgentTraceInput {
@@ -42,6 +43,20 @@ export async function recordAgentTrace(input: AgentTraceInput): Promise<void> {
       );
     }
 
+    const taskId =
+      typeof input.taskId === 'string' && input.taskId.trim() && input.taskId !== 'global'
+        ? input.taskId.trim()
+        : `trace:${createHash('sha1')
+            .update(
+              JSON.stringify({
+                query: input.query,
+                retrievalStrategy: input.retrievalStrategy,
+                traceSource: input.traceSource ?? 'gemma4',
+              }),
+            )
+            .digest('hex')
+            .slice(0, 16)}`;
+
     await pool.query(
       `
         INSERT INTO agent_traces (
@@ -58,7 +73,7 @@ export async function recordAgentTrace(input: AgentTraceInput): Promise<void> {
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       `,
       [
-        input.taskId || 'global',
+        taskId,
         input.query,
         JSON.stringify(input.selectedPackets || []),
         JSON.stringify(input.toolsCalled.map((t) => ({ tool: t }))),

@@ -74,7 +74,8 @@ const DEV = {
   TRITON_URL: `http://${LOOPBACK_IP}:8000`,
   TRITON_VLM_MODEL: 'gemma_vlm_ensemble',
   TRITON_VISION_MODEL: 'siglip_vision',
-  TRITON_RERANKER_MODEL: 'bge-reranker',
+  TRITON_RERANKER_MODEL: 'mxbai-rerank-base-v2',
+  CROSS_ENCODER_MODEL: 'mixedbread-ai/mxbai-rerank-base-v2',
   PUBLIC_API_URL: `http://${LOOPBACK_IP}:5173`,
   MINIO_ENDPOINT: LOOPBACK_IP,
   MINIO_PORT: '9000',
@@ -274,6 +275,11 @@ export const ENV = {
   TRITON_VLM_MODEL: privateEnv.TRITON_VLM_MODEL ?? DEV.TRITON_VLM_MODEL,
   TRITON_VISION_MODEL: privateEnv.TRITON_VISION_MODEL ?? DEV.TRITON_VISION_MODEL,
   TRITON_RERANKER_MODEL: privateEnv.TRITON_RERANKER_MODEL ?? DEV.TRITON_RERANKER_MODEL,
+  CROSS_ENCODER_MODEL:
+    privateEnv.CROSS_ENCODER_MODEL ??
+    privateEnv.MIXEDBREAD_RERANK_MODEL ??
+    privateEnv.TRITON_RERANKER_MODEL ??
+    DEV.CROSS_ENCODER_MODEL,
   CUDA_MAX_STREAMS: privateEnv.CUDA_MAX_STREAMS !== undefined ? Number(privateEnv.CUDA_MAX_STREAMS) : undefined,
   CUDA_DEVICE_ID: privateEnv.CUDA_DEVICE_ID !== undefined ? Number(privateEnv.CUDA_DEVICE_ID) : undefined,
   // Inference cascade: Bifrost L2 cache (:3040) → Reranker (:8090) → TurboQuant (:8080) → VLM (:8085) → LiteRT (:8070)

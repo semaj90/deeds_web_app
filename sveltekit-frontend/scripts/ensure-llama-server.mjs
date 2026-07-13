@@ -128,8 +128,14 @@ if (CTX < CTX_MIN && !SHORT_CTX_OK) {
   CTX = CTX_MIN;
 }
 const NGL = process.env.TURBO_NGL ?? process.env.LLAMA_SERVER_NGL ?? '99';
-const CACHE_TYPE_K = process.env.LLAMA_CACHE_TYPE_K ?? process.env.TURBO_KV_K ?? 'q8_0';
-const CACHE_TYPE_V = process.env.LLAMA_CACHE_TYPE_V ?? process.env.TURBO_KV_V ?? 'q8_0';
+function resolveCacheType(suffix, fallback = 'q8_0') {
+  const turboKey = process.env[`TURBO_KV_${suffix}`];
+  const llamaKey = process.env[`LLAMA_CACHE_TYPE_${suffix}`];
+  return turboKey ?? llamaKey ?? fallback;
+}
+
+const CACHE_TYPE_K = resolveCacheType('K');
+const CACHE_TYPE_V = resolveCacheType('V');
 const THREADS_BATCH = Math.max(
   1,
   parseInt(process.env.LLAMA_SERVER_THREADS_BATCH ?? String(THREADS), 10)

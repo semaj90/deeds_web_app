@@ -38,6 +38,7 @@ import { logInference } from '$lib/server/observability/inference-log.js';
 import { appendOutcomeLedger, computeAgentReward } from '$lib/server/observability/outcome-ledger.js';
 import { recordAgentTrace } from '$lib/server/observability/agent-trace-recorder.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
+import { parseToolCalls as parseToolShims } from '$lib/server/ai/tool-shim.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant, gatePreferredBackend } from '$lib/server/ai/backend-runtime-guards.js';
 import { ENV } from '$lib/server/env.server.js';
@@ -1002,6 +1003,16 @@ export function parseToolRequest(content: string): OllamaToolCall[] {
     }
   }
 
+  const shimCalls = parseToolShims(content);
+  if (shimCalls.length > 0) {
+    return shimCalls.map((call) => ({
+      function: {
+        name: call.tool,
+        arguments: call.args,
+      },
+    }));
+  }
+
   return [];
 }
 
@@ -1925,6 +1936,8 @@ export async function runGemma4Agent(
 ): Promise<AgentRunResult> {
   const t0 = Date.now();
   const pipeline = options?.pipeline ?? 'ace';
+  const taskId =
+    typeof options?.metadata?.taskId === 'string' ? options.metadata.taskId : undefined;
   const toolsUsed: string[] = [];
   const sources: unknown[] = [];
   // Accumulates cluster/topology hits from Go retrieval tools across all rounds.
@@ -1957,8 +1970,6 @@ export async function runGemma4Agent(
     system = getStableSystemPrefix();
 
     // ── Level 2 + 3: build KV context packet when caller provides hints ────
-    const taskId =
-      typeof options?.metadata?.taskId === 'string' ? options.metadata.taskId : undefined;
     const hotFiles = Array.isArray(options?.metadata?.hotFiles)
       ? (options!.metadata!.hotFiles as string[])
       : [];
@@ -2402,11 +2413,12 @@ export async function runGemma4Agent(
       sessionId: options?.sessionId ?? '',
       eventType: 'tool_call',
       pipeline,
-      payload: {
-        query,
-        toolsUsed,
-        rounds: round,
-        durationMs,
+    payload: {
+      query,
+      taskId: taskId ?? null,
+      toolsUsed,
+      rounds: round,
+      durationMs,
         requestedBackend,
         inferenceBackend,
         backendFallbackReason: backendFallbackReason ?? null,
@@ -2434,6 +2446,7 @@ export async function runGemma4Agent(
       feature_id: pipeline ?? null,
       tools: toolsUsed,
       sourceRefs: filePathMeta ? [filePathMeta] : [],
+      taskId: taskId ?? null,
       graphVersion: process.env.ATLAS_VERSION ?? null,
       outcome: hasSideEffect ? 'side_effect' : 'answer',
       cacheTier: resultCacheTier ?? null,
@@ -2576,7 +2589,7 @@ export async function runGemma4Agent(
       toolsCalled: toolsUsed,
       outcome: finalAnswer ? 'success' : 'partial',
       reward: agentReward,
-      taskId: undefined, // Would come from options.metadata.taskId if provided
+      taskId,
       traceSource: 'gemma4',
     }).catch((err) => {
       console.error('[Phase3F] Agent trace recording failed (non-blocking):', (err as Error)?.message);

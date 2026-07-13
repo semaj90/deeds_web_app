@@ -29,8 +29,8 @@ This enables:
 # Canonical embeddings only (no summaries)
 .\scripts\launch-llama-server-parallel.ps1 -Model "embeddinggemma:latest" -Port 11434
 
-# Gemma4 summaries + embedding validation
-.\scripts\launch-llama-server-parallel.ps1 -Model "gemma4-legal-iq4xs-direct.gguf" -Port 8090
+# HFOR summaries + embedding validation
+.\scripts\launch-llama-server-parallel.ps1 -Model "hforf.gguf" -Port 8090
 
 .NOTES
 Requires:
@@ -48,7 +48,7 @@ Bitfrost + LibTorch Benefits:
 #>
 
 param(
-    [string]$Model = "gemma4-legal-iq4xs-direct.gguf",
+    [string]$Model = "hforf.gguf",
     [int]$Port = 8090,
     [int]$Parallel = 4,
     [int]$Slots = 4,
@@ -239,7 +239,7 @@ try {
     Write-Log "Quick verification:"
     Write-Log "  curl -X POST http://localhost:$Port/v1/chat/completions \"
     Write-Log "    -H 'Content-Type: application/json' \"
-    Write-Log "    -d '{\"model\":\"gemma4-legal-iq4xs-direct.gguf\",\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}],\"max_tokens\":10}'"
+    Write-Log "    -d '{\"model\":\"hforf.gguf\",\"messages\":[{\"role\":\"user\",\"content\":\"hello\"}],\"max_tokens\":10}'"
     Write-Log ""
     Write-Log "Press Ctrl+C to stop the server"
     Write-Log ""

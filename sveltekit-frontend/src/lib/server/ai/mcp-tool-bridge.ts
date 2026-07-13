@@ -20,6 +20,56 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 
 const TRACE_MCP_URL = ENV.TRACE_MCP_URL;
+let requestSequence = 0;
+
+function nextRequestId(): number {
+	requestSequence += 1;
+	return requestSequence;
+}
+
+function tryParseJson(text: string): unknown | null {
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
+
+function extractJsonRpcBody(text: string): Record<string, unknown> | null {
+	const direct = tryParseJson(text);
+	if (direct && typeof direct === 'object') {
+		return direct as Record<string, unknown>;
+	}
+
+	const events = text.split(/\r?\n\r?\n/);
+	for (const event of events) {
+		const data = event
+			.split(/\r?\n/)
+			.filter((line) => line.startsWith('data:'))
+			.map((line) => line.replace(/^data:\s?/, ''))
+			.join('\n');
+		if (!data || data === '[DONE]') continue;
+		const parsed = tryParseJson(data);
+		if (parsed && typeof parsed === 'object') {
+			return parsed as Record<string, unknown>;
+		}
+	}
+
+	return null;
+}
+
+async function readMcpJsonRpcResponse(res: Response): Promise<Record<string, unknown>> {
+	const text = await res.text();
+	const body = extractJsonRpcBody(text);
+
+	if (!body) {
+		throw new Error(
+			`MCP returned no valid JSON-RPC payload; content-type=${res.headers.get('content-type') ?? 'unknown'}`
+		);
+	}
+
+	return body;
+}
 
 /**
  * Call a TRACE MCP tool via JSON-RPC 2.0.
@@ -28,6 +78,7 @@ const TRACE_MCP_URL = ENV.TRACE_MCP_URL;
  * not plain JSON. Response format: event: message\ndata: {json}\n\n
  */
 export async function callTraceMcpTool(name: string, args: Record<string, unknown>) {
+	const requestId = nextRequestId();
 
 	const res = await fetch(`${TRACE_MCP_URL}/mcp`, {
 		method: 'POST',
@@ -37,7 +88,7 @@ export async function callTraceMcpTool(name: string, args: Record<string, unknow
 		},
 		body: JSON.stringify({
 			jsonrpc: '2.0',
-			id: 1,
+			id: requestId,
 			method: 'tools/call',
 			params: { name, arguments: args },
 		}),
@@ -45,50 +96,53 @@ export async function callTraceMcpTool(name: string, args: Record<string, unknow
 	});
 
 	if (!res.ok) {
-		return { error: `MCP HTTP ${res.status}` };
+		const detail = await res.text().catch(() => '');
+		throw new Error(`MCP HTTP ${res.status}${detail ? `: ${detail.slice(0, 300)}` : ''}`);
 	}
 
 	try {
-		// StreamableHTTPServerTransport uses Server-Sent Events (SSE)
-		// Parse the response to extract JSON from data: lines
-		const text = await res.text();
-		const lines = text.split('\n');
-		let body: Record<string, unknown> | null = null;
-
-		for (const line of lines) {
-			if (line.startsWith('data: ')) {
-				const dataStr = line.slice(6);
-				try {
-					body = JSON.parse(dataStr);
-					break;
-				} catch {
-					// skip invalid JSON lines
-				}
-			}
-		}
-
-		if (!body) {
-			return { error: 'No valid JSON in MCP response' };
-		}
+		const body = await readMcpJsonRpcResponse(res);
 
 		// Check for MCP errors
 		if ('error' in body && body.error) {
-			return { error: `MCP error: ${JSON.stringify(body.error)}` };
+			return { error: `MCP error: ${JSON.stringify(body.error)}`, isError: true };
+		}
+		if (body.id !== undefined && body.id !== requestId) {
+			return { error: `MCP response id mismatch: expected ${requestId}, got ${String(body.id)}`, isError: true };
 		}
 
-		// Extract the result content
-		const content = (body.result as any)?.content?.[0]?.text;
-		if (content) {
-			try {
-				return JSON.parse(content);
-			} catch {
-				return { text: content };
+		// Extract the result content. Prefer structured JSON if present.
+		const result = body.result as Record<string, unknown> | undefined;
+		const structuredContent = result?.structuredContent;
+		if (structuredContent && typeof structuredContent === 'object') {
+			return structuredContent as Record<string, unknown>;
+		}
+
+		const contentItems = Array.isArray(result?.content) ? result.content : [];
+		const textContent = contentItems
+			.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
+			.filter((item) => typeof item.type === 'string' && item.type === 'text')
+			.map((item) => String(item.text ?? '').trim())
+			.filter(Boolean)
+			.join('\n\n');
+		if (textContent) {
+			const structured = tryParseJson(textContent);
+			if (structured && typeof structured === 'object') {
+				return structured as Record<string, unknown>;
+			}
+			return { text: textContent, isError: Boolean(result?.isError) };
+		}
+
+		if (result && typeof result === 'object') {
+			const structured = tryParseJson(JSON.stringify(result));
+			if (structured && typeof structured === 'object') {
+				return { ...(structured as Record<string, unknown>), isError: Boolean(result?.isError) };
 			}
 		}
 
 		return { error: 'Empty MCP response content' };
 	} catch (e) {
-		return { error: String(e) };
+		throw e;
 	}
 }
 
@@ -110,7 +164,7 @@ async function fetchMcpToolList() {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				jsonrpc: '2.0',
-				id: 0,
+				id: nextRequestId(),
 				method: 'tools/list',
 				params: {},
 			}),
@@ -122,7 +176,7 @@ async function fetchMcpToolList() {
 			return [];
 		}
 
-		const body = await res.json();
+		const body = await readMcpJsonRpcResponse(res);
 		_toolListCache = body?.result?.tools ?? [];
 	} catch (e) {
 		console.warn(`[mcp-tool-bridge] tools/list failed: ${e}, using fallback`);
@@ -144,7 +198,7 @@ function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
 
 	const props = (schema.properties as Record<
 		string,
-		{ type?: string; description?: string }
+		{ type?: string; description?: string; enum?: unknown[] }
 	>) ?? {};
 	const required = (schema.required as string[]) ?? [];
 	const shape: Record<string, z.ZodTypeAny> = {};
@@ -152,18 +206,33 @@ function jsonSchemaToZod(schema: Record<string, unknown>): z.ZodTypeAny {
 	for (const [key, def] of Object.entries(props)) {
 		let field: z.ZodTypeAny;
 
-		switch (def.type) {
-			case 'number':
-				field = z.number();
-				break;
-			case 'boolean':
-				field = z.boolean();
-				break;
-			case 'array':
-				field = z.array(z.unknown());
-				break;
-			default:
-				field = z.string();
+		if (Array.isArray(def.enum) && def.enum.length > 0 && def.enum.every((value) => typeof value === 'string')) {
+			field = z.enum(def.enum as [string, ...string[]]);
+		} else {
+			switch (def.type) {
+				case 'string':
+					field = z.string();
+					break;
+				case 'number':
+				case 'integer':
+					field = z.number();
+					break;
+				case 'boolean':
+					field = z.boolean();
+					break;
+				case 'array':
+					field = z.array(z.unknown());
+					break;
+				case 'object':
+					field = z.object({}).passthrough();
+					break;
+				case 'null':
+					field = z.null();
+					break;
+				case undefined:
+				default:
+					field = z.unknown();
+			}
 		}
 
 		// Make optional if not in required list

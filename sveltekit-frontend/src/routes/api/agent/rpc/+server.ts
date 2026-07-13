@@ -26,6 +26,15 @@ import {
 import { ToolDiagnostics } from '$lib/agent/tool-diagnostic';
 import { recordAgentTrace } from '$lib/server/observability/agent-trace-recorder';
 import { ENV } from '$lib/server/env.server';
+import { createHash } from 'crypto';
+
+function stableStringify(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stableStringify).join(',')}]`;
+  const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b));
+  return `{${entries.map(([key, entry]) => `${JSON.stringify(key)}:${stableStringify(entry)}`).join(',')}}`;
+}
 
 /**
  * Handle POST requests: tools/list, tools/call, or direct tool method names
@@ -108,6 +117,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   if (locals.user && ENV.AGENT_TRACE_ENABLED !== 'false' && response.result && !response.error) {
     const ok = Boolean((response.result as { ok?: boolean })?.ok ?? true);
+    const taskId = `rpc:${method}:${createHash('sha1')
+      .update(stableStringify(params))
+      .digest('hex')
+      .slice(0, 12)}`;
 
     recordAgentTrace({
       query: method,
@@ -117,7 +130,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       toolsCalled: [method],
       outcome: ok ? 'success' : 'failure',
       reward: ok ? 1.0 : 0.0,
-      taskId: 'global',
+      taskId,
       traceSource: 'gemma4',
     }).catch((err) => console.error('Failed to record agent trace:', err));
   }
@@ -157,4 +170,3 @@ export const GET: RequestHandler = async ({ url }) => {
     method: 'tools/list',
   });
 };
-

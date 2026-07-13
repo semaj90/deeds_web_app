@@ -1,10 +1,13 @@
 # Temporal Task Registry
 
-- recommendationEvents: 300
-- taskEvents: 45
-- taskCount: 22
-- openTaskCount: 0
-- promotedRecommendations: 22
+- recommendationEvents: 314
+- taskEvents: 47
+- taskCount: 24
+- openTaskCount: 2
+- promotedRecommendations: 24
 
 ## Top Tasks
 
+- activeLane: [HIGH] 1 circular dependency chains of 3+ files (TODO)
+- [HIGH] 1 circular dependency chains of 3+ files (TODO)
+- [HIGH] 10 API route handlers lack auth guards (TODO)

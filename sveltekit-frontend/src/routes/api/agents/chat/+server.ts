@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { recordSearchQuery } from '$lib/server/features/observability/index.js';
+import { parseToolCalls } from '$lib/server/ai/tool-shim.js';
 
 const agentChatSchema = z.object({
 	prompt: z.string().max(10000).optional(),
@@ -238,7 +239,20 @@ Rules:
 			const data = await chatRes.json();
 
 			// Check if LLM wants to call tools
-			const toolCalls = data.message?.tool_calls;
+			let toolCalls = data.message?.tool_calls;
+			if ((!toolCalls || toolCalls.length === 0) && typeof data.message?.content === 'string') {
+				const parsed = parseToolCalls(data.message.content);
+				if (parsed.length > 0) {
+					toolCalls = parsed.map((tc, index) => ({
+						id: `toolcall-${toolRounds + 1}-${index + 1}`,
+						type: 'function' as const,
+						function: {
+							name: tc.tool,
+							arguments: JSON.stringify(tc.args ?? {}),
+						},
+					}));
+				}
+			}
 			if (!toolCalls || toolCalls.length === 0) {
 				// No tool calls — return final response with trace
 				return json({

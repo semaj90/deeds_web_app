@@ -1,6 +1,6 @@
 # OpenCode Agent Environment
 
-Generated: 2026-06-11T03:54:55.242Z
+Generated: 2026-07-13T02:44:08.023Z
 
 ## Surface
 
@@ -13,12 +13,14 @@ Generated: 2026-06-11T03:54:55.242Z
 
 - app root: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
 - repo root: C:\Users\james\Videos\deeds-web-app
-- env files loaded: .env.local, .env, .env.development.local, .env.development, ..\.env.local, ..\.env
+- env files loaded: .env, .env.local, .env.development, .env.development.local, ..\.env, ..\.env.local
 - VS Code detected: true
 - VS Code workspace: ..\deeds-web-app.code-workspace
 - VS Code tasks: .vscode\tasks.json, ..\.vscode\tasks.json
 - OpenCode detected: true
 - OpenCode config: opencode.json
+- OpenCode task state markdown: .opencode/tasks/task-state.md
+- OpenCode task state json: .opencode/tasks/task-state.json
 - Codex detected: false
 
 ## Runtime Roles
