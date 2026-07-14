@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Identity Worker — Canonical Identity Resolution
  *

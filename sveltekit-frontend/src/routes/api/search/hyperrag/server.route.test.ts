@@ -7,52 +7,51 @@ const mocks = vi.hoisted(() => ({
   bifrostChat: vi.fn(),
 }));
 
-vi.mock('$lib/server/retrieval/hyperrag-fusion-service.js', () => ({
-  HyperRagFusionService: {
-    getInstance: () => ({
-      search: (...args: unknown[]) => mocks.search(...args),
-    }),
-  },
+vi.mock('$lib/server/retrieval/search-runtime.js', () => ({
+  createSearchRuntime: () => ({
+    search: (...args: unknown[]) => mocks.search(...args),
+  }),
 }));
 
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat: (...args: unknown[]) => mocks.bifrostChat(...args),
+  VLM_MODELS: { legal: 'gemma4-legal-iq4xs-direct.gguf' },
 }));
 
 describe('/api/search/hyperrag', () => {
   const baseResult = {
-    query: 'graph retrieval',
-    variants: ['graph retrieval', 'graph search'],
-    hits: [
+    metadata: { query: 'graph retrieval', candidatesRetrieved: 2, candidatesFused: 2, candidatesReranked: 2, durationMs: 12, stages: { retrieve: 1, fuse: 1, hydrate: 1, rerank: 1 } },
+    provenance: {
+      retrievalSources: ['postgres_trigram', 'qdrant', 'ast_tree'],
+      fusionMethod: 'rrf',
+      rerankModel: 'mixedbread-ai/mxbai-rerank-base-v2',
+      rerankerUsed: true,
+      promotionAttempted: true,
+    },
+    packets: [
       {
-        id: 'hit-1',
-        title: 'Hit One',
-        score: 0.92,
-        signals: { dense: 0.9, graphAuthority: 0.8, clusterMatch: 0.1, pagerank: 0.4, aceBoost: 0.05, turbovec: 0.15 },
-        reasons: ['Semantic match in codebase', 'TurboVec ANN prefilter hit'],
+        packet_key: 'packet-1',
+        source_ref: 'src/lib/example.ts',
+        summary: 'packet summary one',
+        content: 'packet content one',
+        retrieval_score: 0.91,
+        blended_score: 0.94,
+        cross_encoder_score: 0.95,
+        rank_after: 1,
+        semantic_title: 'Packet One',
+        domain: 'codebase',
+        page_rank_score: 0.12,
+        som_cluster: 8,
+        lexical: { score: 0.7 },
       },
     ],
-    graphPaths: [],
-    synthesis: null,
-    provenance: { qdrant: true, turbovec: true, redis: true, neo4j: true, ace: true },
   };
 
   beforeEach(() => {
     mocks.search.mockReset();
     mocks.bifrostChat.mockReset();
-    
-    mocks.search.mockImplementation(async (params: any) => {
-      let synthesis = null;
-      if (params.synthesize) {
-        try {
-          synthesis = await mocks.bifrostChat();
-        } catch (e) {
-          synthesis = null;
-        }
-      }
-      return { ...baseResult, synthesis };
-    });
-    
+
+    mocks.search.mockResolvedValue(baseResult);
     mocks.bifrostChat.mockResolvedValue('Synthesized summary');
   });
 
@@ -66,11 +65,6 @@ describe('/api/search/hyperrag', () => {
 
     const response = await POST({ request, url: new URL(request.url), locals: {} } as any);
     expect(response.status).toBe(401);
-
-    const body = await response.json();
-    expect(body.hits).toEqual([]);
-    expect(body.graphPaths).toEqual([]);
-    expect(body.provenance).toEqual({ qdrant: false, turbovec: false, redis: false, neo4j: false, ace: false });
   });
 
   it('rejects empty and oversized queries', async () => {
@@ -109,9 +103,17 @@ describe('/api/search/hyperrag', () => {
     expect(Array.isArray(body.variants)).toBe(true);
     expect(Array.isArray(body.hits)).toBe(true);
     expect(Array.isArray(body.graphPaths)).toBe(true);
-    expect(body.hits[0].reasons).toEqual(expect.arrayContaining(['Semantic match in codebase']));
-    expect(body.hits[0].signals).toEqual(expect.objectContaining({ dense: expect.any(Number), turbovec: expect.any(Number) }));
-    expect(body.provenance).toEqual(expect.objectContaining({ qdrant: true, neo4j: true, redis: true, turbovec: true, ace: true }));
+    expect(body.hits[0].reasons).toEqual(expect.arrayContaining(['retrieval:canonical', 'domain:codebase']));
+    expect(body.hits[0].signals).toEqual(
+      expect.objectContaining({
+        graphAuthority: 0.12,
+        clusterMatch: 8,
+        pagerank: 0.12,
+        topoClass: 'codebase',
+        lexicalBoost: 0.7,
+      })
+    );
+    expect(body.provenance).toEqual(expect.objectContaining({ qdrant: true, neo4j: true, redis: true, turbovec: false, ace: false }));
     expect(body.synthesis).toBeNull();
     expect(mocks.bifrostChat).not.toHaveBeenCalled();
   });

@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "gemma4-iq4xs-direct.gguf",
+  "model": "llama-local/gemma4-iq4xs-direct.gguf",
   "shell": "pwsh",
   "permission": {
     "bash": {

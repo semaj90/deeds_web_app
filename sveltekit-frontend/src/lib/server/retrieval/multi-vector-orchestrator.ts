@@ -167,13 +167,13 @@ export async function executeMultiVectorRetrieval(
     titleMs = performance.now() - performance.now();
   }
 
-  // ── Lane 4: Keywords Lexical (BM25 via Qdrant payload filter) ─────────────
+  // ── Lane 4: Keywords Lexical (Qdrant payload filter + lexical fallback) ────
   let keywordResults: QdrantSearchResult[] = [];
   let keywordsMs = 0;
   try {
     const keywordsStart = performance.now();
 
-    // BM25 retrieval via Qdrant full-text search on keywords payload
+    // Lexical retrieval via Qdrant full-text search on keywords payload
     // (Note: requires BM25 indexing to be enabled on 'keywords' field)
     try {
       const keywordResponse = await (qdrant as any).search(collection, {

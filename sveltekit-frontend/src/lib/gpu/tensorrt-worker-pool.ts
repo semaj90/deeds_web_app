@@ -26,7 +26,7 @@ export interface GPUTask {
 	centroids?: Float32Array;
 	queryEmbedding?: Float32Array;
 	keys?: Float32Array;
-	corpus?: Float32Array;
+	corpus?: Float32Array[];
 	dim?: number;
 	n?: number;
 	k?: number;

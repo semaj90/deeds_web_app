@@ -3,7 +3,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { createRedisConnection } from '$lib/server/redis';
 import { sanitizeBrowserContext, emptyContext } from '../../../admin/browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
-import { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
+import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -153,7 +154,7 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
 
     // 6. Agentic Multi-Query Retrieval
     intent === 'agentic_multiquery' || intent === 'general'
-      ? HyperRagFusionService.getInstance().search({ query, mode: 'codebase', topK: 10 }).catch(() => null)
+      ? createSearchRuntime({ userId }).search({ text: query, topK: 10 }).then((result) => searchResultToHyperRagResult(result, { query })).catch(() => null)
       : Promise.resolve(null),
 
     // 7. Command Suggestions (Phase 76 MCP)

@@ -596,9 +596,9 @@ export async function loadCodebaseContext(query: string): Promise<{
     
     const cardMap = new Map(cards.map(c => [c.dirPath, c]));
 
-    // Fetch MARCO scores in batch
-    const { scoreBatchTriton } = await import('$lib/server/retrieval/triton-reranker');
-    const crossEncoderScores = await scoreBatchTriton(query, finalChunks.map(c => c.content));
+    // Fetch cross-encoder scores in batch
+    const { scoreBatchCrossEncoder } = await import('$lib/server/retrieval/triton-reranker');
+    const crossEncoderScores = await scoreBatchCrossEncoder(query, finalChunks.map(c => c.content));
 
     // -- P5: 64d latent similarity for decision-tree f8 signal -----------------
     let queryEncoded64: Float32Array | undefined;

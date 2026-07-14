@@ -21,7 +21,7 @@ import type { GPUTask, GPUResult } from './tensorrt-worker-pool';
 import { getWorkerPool } from './tensorrt-worker-pool';
 import { loadPolicyReranker } from './policy-reranker-bridge';
 import { planQuery } from './gemma4-decomposition-planner';
-import type { ACEPacket, ACEContext } from '../server/ace/types';
+import type { ACEContext } from '../server/ace/types';
 
 /**
  * DECOMPOSITION LAYER
@@ -98,7 +98,7 @@ export interface PolicyScore {
  */
 
 export interface ACEAssemblyPlan {
-  selectedPackets: ACEPacket[];
+  selectedPackets: ScoredCandidate[];
   rerankerPolicySummary: {
     topK: number;
     threshold: number;
@@ -137,7 +137,7 @@ export interface RLMTraceEntry {
   userFeedback?: {
     helpfulness: number; // 1-5 scale
     accuracy: number; // 1-5 scale
-    citations: string[]; // which packetIds user found useful
+    citations?: string[]; // which packetIds user found useful
   };
   reward: {
     baseReward: number; // accuracy + helpfulness
@@ -157,7 +157,7 @@ export class Gemma4PolicyOrchestrator {
   async initialize() {
     this.policyModel = await loadPolicyReranker(
       'models/policy-reranker.pt',
-      { gpu: true }
+      { modelPath: 'models/policy-reranker.pt', gpu: true, batchSize: 32, returnConfidence: true }
     );
   }
 
@@ -315,7 +315,7 @@ export class Gemma4PolicyOrchestrator {
       .sort((a, b) => b.policyScore - a.policyScore);
 
     // Greedily select packets until token budget exhausted
-    const selectedPackets: ACEPacket[] = [];
+    const selectedPackets: ScoredCandidate[] = [];
     let usedTokens = 0;
 
     for (const item of ranked) {
@@ -369,9 +369,9 @@ export class Gemma4PolicyOrchestrator {
     userQuery: string,
     decomposition: DecomposedQuery,
     policyScores: PolicyScore[],
-    acePackets: ACEPacket[],
+    acePackets: ScoredCandidate[],
     gemmaResponse: string,
-    userFeedback?: { helpfulness: number; accuracy: number }
+    userFeedback?: { helpfulness: number; accuracy: number; citations?: string[] }
   ): Promise<void> {
     const baseReward = userFeedback
       ? (userFeedback.helpfulness + userFeedback.accuracy) / 2 / 5 // normalize to [0, 1]
@@ -387,7 +387,7 @@ export class Gemma4PolicyOrchestrator {
         topK: acePackets.length
       },
       policyScores,
-      selectedACEPackets: acePackets.map((p) => p.id),
+      selectedACEPackets: acePackets.map((p) => p.packetId),
       gemmaResponse,
       userFeedback,
       reward: {
@@ -395,7 +395,7 @@ export class Gemma4PolicyOrchestrator {
         policyGradientWeight: baseReward > 0.7 ? 1.0 : 0.1, // high reward → strong gradient
         packetReward: new Map(
           acePackets.map((p) => [
-            p.id,
+            p.packetId,
             userFeedback?.citations?.includes(p.sourceRef)
               ? 1.0
               : baseReward * 0.5 // was packet cited by user?

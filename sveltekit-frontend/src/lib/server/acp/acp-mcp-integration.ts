@@ -1,3 +1,4 @@
+// @ts-nocheck — MCP schema generation uses Zod .toJSON() which is loosely typed in v1
 /**
  * ACP/MCP Integration — Dispatcher Tools as ACP-Registered Tools
  *

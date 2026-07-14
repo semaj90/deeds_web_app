@@ -116,7 +116,7 @@ export async function runRgSearchAtlas(
 
     const initialCandidates = Array.from(candidateMap.values());
 
-    // --- Stage 7: Cross-encoder (MARCO) rerank ---
+    // --- Stage 7: Cross-encoder rerank ---
     const marcoStart = performance.now();
     let marcoResults = [];
     if (opts.enableMarcoRerank !== false) {

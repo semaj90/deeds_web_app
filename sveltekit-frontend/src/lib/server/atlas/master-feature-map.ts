@@ -40,14 +40,14 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     id: 'hyperrag-fusion',
     name: 'HyperRAG Retrieval (L0-L11)',
     intent: 'multi-signal retrieval fusion (Lexical/Topology/Task/Graph)',
-    service: 'HyperRagFusionService',
+    service: 'SearchRuntime (legacy HyperRAG compatibility wrapper)',
     stores: ['Qdrant', 'Redis', 'Neo4j', 'Postgres'],
     clusters: [72, 73, 94, 25, 32, 47, 92, 82, 20, 23, 80],
     status: 'active',
     params: { lanes: 6, fusion: 'RRF', budget: 12000 },
     pathMapping: ['src/lib/server/retrieval'],
     evidence: {
-      files: ['src/lib/server/retrieval/hyperrag-fusion-service.ts'],
+      files: ['src/lib/server/retrieval/search-runtime.ts', 'src/lib/server/retrieval/hyperrag-packet-rpc.ts'],
       smoke: ['scripts/smoke-manifold4-routing.mjs'],
       lastValidatedAt: '2026-05-15T02:40:00Z'
     },

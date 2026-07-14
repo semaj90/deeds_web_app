@@ -157,7 +157,7 @@ export const POST: RequestHandler = async ({ request }) => {
     return json(response, { status: 200 });
   } catch (error) {
     const message = error instanceof z.ZodError
-      ? `Validation error: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join('; ')}`
+      ? `Validation error: ${error.issues.map(e => `${e.path.join('.')}: ${e.message}`).join('; ')}`
       : error instanceof Error
         ? error.message
         : 'Unknown error';

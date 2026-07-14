@@ -72,7 +72,7 @@ export async function emitLodManifests(
         packet_key: packet.packet_key,
         lod_manifest: manifest,
         destination,
-        promotion_state
+        promotionState
       });
 
       // Log emission with telemetry

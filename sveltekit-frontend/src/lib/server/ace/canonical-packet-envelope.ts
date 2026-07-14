@@ -1,14 +1,14 @@
 import { z } from 'zod';
 
 export type CanonicalAcePacketEnvelope = {
-  packet_id: string | null;
-  packet_ulid: string | null;
+  packet_id?: string | null;
+  packet_ulid?: string | null;
   packet_key: string;
-  title_id: string | null;
-  feature_id: string | null;
+  title_id?: string | null;
+  feature_id?: string | null;
   source_ref: string;
   canonical_source_ref: string;
-  som_cell: string | null;
+  som_cell?: string | null;
   som_row?: number | null;
   som_col?: number | null;
   community_id?: string | number | null;
@@ -119,14 +119,14 @@ export type CanonicalAcePacketEnvelopeContext = {
 };
 
 export const CanonicalAcePacketEnvelopeSchema = z.object({
-  packet_id: z.string().min(1).nullable(),
-  packet_ulid: z.string().min(1).nullable(),
+  packet_id: z.string().min(1).nullable().optional(),
+  packet_ulid: z.string().min(1).nullable().optional(),
   packet_key: z.string().min(1),
-  title_id: z.string().min(1).nullable(),
-  feature_id: z.string().min(1).nullable(),
+  title_id: z.string().min(1).nullable().optional(),
+  feature_id: z.string().min(1).nullable().optional(),
   source_ref: z.string().min(1),
   canonical_source_ref: z.string().min(1),
-  som_cell: z.string().min(1).nullable(),
+  som_cell: z.string().min(1).nullable().optional(),
   som_row: z.number().int().nonnegative().nullable().optional(),
   som_col: z.number().int().nonnegative().nullable().optional(),
   community_id: z.union([z.string(), z.number()]).nullable().optional(),

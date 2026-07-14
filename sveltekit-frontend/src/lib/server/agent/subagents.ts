@@ -1,26 +1,31 @@
 /**
  * Subagent Definitions for Supervisor-Routed Agent Architecture
  *
- * Splits the 32-tool flat pool into 5 focused subagents:
- *   - AudioSubagent: Transcription, speaker analysis, audio search
- *   - DocumentSubagent: VLM, OCR, entity extraction, evidence pipeline
- *   - CaseSubagent: Case CRUD, citations, POI, reports
- *   - CodebaseSubagent: Ripgrep, file analysis, imports, semantic search
- *   - GeneralSubagent: RAG, glossary, ACE context, system health
- *
- * Each subagent is a mini ReAct agent with its own scoped tool subset
- * and domain-specific system prompt.
+ * Legacy domains remain available, but HyperRAG work now also routes to a
+ * small specialist team:
+ *   - retrieval_contract
+ *   - ranking
+ *   - identity_promotion
+ *   - semantic_enrichment
+ *   - graph
+ *   - transport
+ *   - validation
  */
 
 import { ChatOllama } from '@langchain/ollama';
 import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
+import {
+  SPECIALIST_AGENT_NAMES,
+  SPECIALIST_AGENT_PROFILES,
+  type SpecialistAgentName,
+} from './specialist-team.js';
 
-export type SubagentName = 'audio' | 'document' | 'case' | 'codebase' | 'general';
+export type LegacySubagentName = 'audio' | 'document' | 'case' | 'codebase' | 'general';
+export type SubagentName = LegacySubagentName | SpecialistAgentName;
 
-/** Which tools belong to each subagent */
-export const SUBAGENT_TOOL_MAP: Record<SubagentName, string[]> = {
+const LEGACY_SUBAGENT_TOOL_MAP: Record<LegacySubagentName, string[]> = {
 	audio: [
 		'whisper_transcribe',
 		'transcribe_audio',
@@ -48,14 +53,17 @@ export const SUBAGENT_TOOL_MAP: Record<SubagentName, string[]> = {
 		'reports_generate',
 	],
 	codebase: [
+		'search_codebase',
+		'codebase_search',
 		'ripgrep_search',
 		'find_files',
 		'analyze_file',
 		'extract_pattern',
 		'analyze_imports',
-		'codebase_search',
 	],
 	general: [
+		'search_codebase',
+		'codebase_search',
 		'rag_search',
 		'glossary_search',
 		'ace_context',
@@ -67,8 +75,7 @@ export const SUBAGENT_TOOL_MAP: Record<SubagentName, string[]> = {
 	],
 };
 
-/** Domain-specific system prompts for each subagent */
-const SUBAGENT_PROMPTS: Record<SubagentName, string> = {
+const LEGACY_SUBAGENT_PROMPTS: Record<LegacySubagentName, string> = {
 	audio: `You are an Audio Analysis Subagent for a legal AI platform.
 Your specialty: transcribing audio evidence (depositions, recordings, 911 calls, wiretaps),
 identifying speakers, extracting entities from transcripts, and finding similar audio.
@@ -91,21 +98,53 @@ Always confirm actions taken and return the affected case/citation IDs.`,
 	codebase: `You are a Codebase Investigation Subagent for a legal AI platform.
 Your specialty: searching codebases, analyzing files, tracing imports and dependencies,
 finding patterns, and performing code audits.
-Tools: ripgrep_search, find_files, analyze_file, extract_pattern, analyze_imports, codebase_search.
+Tools: search_codebase, codebase_search, ripgrep_search, find_files, analyze_file, extract_pattern, analyze_imports.
 Return file paths, line numbers, and code snippets with context.`,
 
 	general: `You are a General Assistant Subagent for a legal AI platform.
 Your specialty: semantic search across legal documents, glossary lookup, ACE contextual synthesis,
 web research, summarization, and system health checks.
-Tools: rag_search, glossary_search, ace_context, web_search, summarize, system_health, multimodal_analyze, ast_query.
+Tools: search_codebase, codebase_search, rag_search, glossary_search, ace_context, web_search, summarize, system_health, multimodal_analyze, ast_query.
 Provide well-sourced answers with relevant document references.`,
 };
+
+const SPECIALIST_SUBAGENT_TOOL_MAP: Record<SpecialistAgentName, string[]> = Object.fromEntries(
+	SPECIALIST_AGENT_NAMES.map((name) => [name, SPECIALIST_AGENT_PROFILES[name].tools]),
+) as Record<SpecialistAgentName, string[]>;
+
+const SPECIALIST_SUBAGENT_PROMPTS: Record<SpecialistAgentName, string> = Object.fromEntries(
+	SPECIALIST_AGENT_NAMES.map((name) => [name, SPECIALIST_AGENT_PROFILES[name].prompt]),
+) as Record<SpecialistAgentName, string>;
+
+export const SUBAGENT_TOOL_MAP: Record<SubagentName, string[]> = {
+	...SPECIALIST_SUBAGENT_TOOL_MAP,
+	...LEGACY_SUBAGENT_TOOL_MAP,
+};
+
+export const SUBAGENT_PROMPTS: Record<SubagentName, string> = {
+	...SPECIALIST_SUBAGENT_PROMPTS,
+	...LEGACY_SUBAGENT_PROMPTS,
+};
+
+export const SUBAGENT_NAMES = [
+	...SPECIALIST_AGENT_NAMES,
+	'audio',
+	'document',
+	'case',
+	'codebase',
+	'general',
+] as const satisfies readonly SubagentName[];
 
 export interface SubagentInstance {
 	name: SubagentName;
 	agent: ReturnType<typeof createReactAgent>;
 	toolNames: string[];
 	prompt: string;
+	authorization: {
+		readOnly: boolean;
+		writeAccess: boolean;
+		shellAccess: boolean;
+	};
 }
 
 /**
@@ -134,17 +173,145 @@ export function createSubagent(
 		description: `${name} subagent — ${scopedTools.length} tools: ${scopedTools.map((t) => t.name).join(', ')}`,
 	});
 
-	return { name, agent, toolNames: scopedTools.map((t) => t.name), prompt };
+	const authorization = name === 'identity_promotion' || name === 'semantic_enrichment'
+		? { readOnly: false, writeAccess: true, shellAccess: false }
+		: { readOnly: true, writeAccess: false, shellAccess: false };
+
+	return { name, agent, toolNames: scopedTools.map((t) => t.name), prompt, authorization };
+}
+
+function includesAny(query: string, terms: string[]): boolean {
+	return terms.some((term) => query.includes(term));
 }
 
 /**
- * Intent classification keywords for routing to subagents.
- * The supervisor LLM is the primary router; this is the fallback.
+ * Intent classification for routing to subagents.
+ * Specialist routes are checked first, then legacy domains.
  */
 export function classifyIntent(query: string): SubagentName {
 	const q = query.toLowerCase();
 
-	// Audio signals
+	if (
+		includesAny(q, [
+			'retrieval',
+			'rrf',
+			'topk',
+			'candidate',
+			'fan-out',
+			'fanout',
+			'search runtime',
+			'searchruntime',
+			'packet envelope',
+			'packet envelope',
+			'postgres_trigram',
+			'qdrant',
+		])
+	) {
+		return 'retrieval_contract';
+	}
+
+	if (
+		includesAny(q, [
+			'rank',
+			're-rank',
+			'rerank',
+			'xgboost',
+			'crossencoder',
+			'mixedbread',
+			'bge',
+			'fallback',
+			'cache',
+			'provenance',
+		])
+	) {
+		return 'ranking';
+	}
+
+	if (
+		includesAny(q, [
+			'packet key',
+			'packet_key',
+			'source ref',
+			'source_ref',
+			'summary-layer',
+			'summary layer',
+			'qdrant point',
+			'qdrant_point',
+			'promotion',
+			'outbox',
+			'title id',
+			'title_id',
+			'identity',
+		])
+	) {
+		return 'identity_promotion';
+	}
+
+	if (
+		includesAny(q, [
+			'summary',
+			'domain',
+			'concept',
+			'embeddinggemma',
+			'kmeans',
+			'som',
+			'semantic title',
+			'title',
+			'embedding',
+		])
+	) {
+		return 'semantic_enrichment';
+	}
+
+	if (
+		includesAny(q, [
+			'graph',
+			'tree_node',
+			'pagerank',
+			'neo4j',
+			'community',
+			'relationship',
+			'k-hop',
+			'k hop',
+		])
+	) {
+		return 'graph';
+	}
+
+	if (
+		includesAny(q, [
+			'mcp',
+			'grpc',
+			'protobuf',
+			'hyperrag rpc',
+			'hyperrag-rpc',
+			'acp',
+			'packet envelope',
+			'zod',
+			'schema',
+			'transport',
+		])
+	) {
+		return 'transport';
+	}
+
+	if (
+		includesAny(q, [
+			'validate',
+			'validation',
+			'typecheck',
+			'health',
+			'smoke',
+			'test',
+			'reconstruct',
+			'vitest',
+			'evidence',
+		])
+	) {
+		return 'validation';
+	}
+
+	// Legacy domains remain as fallbacks for non-HyperRAG work.
 	if (
 		q.includes('audio') ||
 		q.includes('transcri') ||
@@ -158,7 +325,6 @@ export function classifyIntent(query: string): SubagentName {
 		return 'audio';
 	}
 
-	// Document signals
 	if (
 		q.includes('document') ||
 		q.includes('ocr') ||
@@ -175,7 +341,6 @@ export function classifyIntent(query: string): SubagentName {
 		return 'document';
 	}
 
-	// Case management signals
 	if (
 		q.includes('case') ||
 		q.includes('citation') ||
@@ -195,7 +360,6 @@ export function classifyIntent(query: string): SubagentName {
 		return 'case';
 	}
 
-	// Codebase signals
 	if (
 		q.includes('codebase') ||
 		q.includes('import') ||
@@ -214,6 +378,5 @@ export function classifyIntent(query: string): SubagentName {
 		return 'codebase';
 	}
 
-	// Default to general
 	return 'general';
 }

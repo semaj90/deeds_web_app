@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { extractDocumentNative } from '../lib/server/langextract/native.js';

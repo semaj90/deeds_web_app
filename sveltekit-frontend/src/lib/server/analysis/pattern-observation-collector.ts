@@ -65,7 +65,7 @@ export async function collectPatternObservations(limit = 1000): Promise<PatternO
   // Join error_logs + error_clusters + error_suggestions + error_feedback
   // to get complete repair history
 
-  const rows = await db
+  const result = await db
     .select({
       clusterId: errorClusters.id,
       errorKind: errorClusters.kind,
@@ -82,7 +82,7 @@ export async function collectPatternObservations(limit = 1000): Promise<PatternO
       fixedAt: errorLogs.fixed_at,
       helpful: errorFeedback.helpful,
       accurate: errorFeedback.accurate,
-      worksSoon: errorFeedback.works_soon,
+      worksSoon: errorFeedback.worksSoon,
     })
     .from(errorLogs)
     .leftJoin(
@@ -98,7 +98,9 @@ export async function collectPatternObservations(limit = 1000): Promise<PatternO
       eq(errorSuggestions.id, errorFeedback.suggestionId)
     )
     .limit(limit)
-    .catch(() => ({ rows: [] as any[] }));
+    .catch(() => [] as any[]);
+
+  const rows = result || [];
 
   const observations: PatternObservation[] = [];
 

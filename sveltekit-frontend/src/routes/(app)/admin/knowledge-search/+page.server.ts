@@ -3,7 +3,7 @@ import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { createQdrantService } from '$lib/server/db/qdrant-integration';
 import { tryEmbedOllama } from '$lib/server/embedding/ollama-embed';
-import { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
     return {
@@ -48,15 +48,35 @@ export const actions: Actions = {
         }
 
         try {
-            const hyperRag = HyperRagFusionService.getInstance();
-            const result = await hyperRag.search({
-                query,
-                mode: mode as any,
-                topK: 10,
-                synthesize
+            const runtime = createSearchRuntime();
+            const result = await runtime.search({
+                text: query,
+                topK: 10
             });
 
-            return { success: true, hyperRagResult: result };
+            return {
+                success: true,
+                hyperRagResult: {
+                    query,
+                    mode,
+                    synthesis: synthesize ? null : null,
+                    summaryLenses: [],
+                    hits: result.packets.map((packet) => ({
+                        id: (packet as any).packetKey ?? (packet as any).packet_key,
+                        score: (packet as any).retrieval?.crossEncoderScore ?? (packet as any).retrieval?.xgboostScore ?? (packet as any).retrieval?.rrfScore ?? 0,
+                        title: (packet as any).semantic?.title ?? (packet as any).semanticTitle ?? (packet as any).title ?? '',
+                        sourcePath: (packet as any).sourceRef ?? (packet as any).source_ref ?? '',
+                        text: (packet as any).summary ?? '',
+                        signals: {
+                            topoClass: (packet as any).classification?.domainClass ?? (packet as any).domainClass ?? undefined,
+                            pagerank: (packet as any).topology?.pageRank ?? undefined,
+                            clusterMatch: (packet as any).topology?.somCell ?? undefined,
+                            lexicalBoost: undefined,
+                        },
+                        reasons: ['retrieval:canonical'],
+                    })),
+                },
+            };
         } catch (error) {
             console.error('HyperRAG search failed:', error);
             return fail(500, { error: 'HyperRAG search failed' });

@@ -24,6 +24,7 @@ import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { autoTagDocument } from '$lib/server/ace/auto-tagger.js';
 import { ENV } from '$lib/server/env.server.js';
+import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { resolve } from 'path';
 
 const AGENT_API_BASE = () => `${ENV.PUBLIC_API_URL}/api`;
@@ -135,6 +136,35 @@ export class AutonomousAgent {
    */
   private initializeTools(): DynamicStructuredTool[] {
     const tools: DynamicStructuredTool[] = [];
+    const runCanonicalSearch = async (query: string, limit: number) => {
+      const runtime = createSearchRuntime({
+        userId: this.config.userId ?? 'agent',
+      });
+      const result = await runtime.search({
+        text: query,
+        topK: Math.max(1, Math.min(limit, 20)),
+      });
+
+      return {
+        query,
+        topK: limit,
+        metadata: result.metadata,
+        provenance: result.provenance,
+        packets: result.packets.slice(0, limit).map((packet) => {
+          const p = packet as any;
+          return {
+            packet_key: p.packetKey ?? p.packet_key,
+            source_ref: p.sourceRef ?? p.source_ref,
+            summary: p.summary ?? '',
+            title: p.semanticTitle ?? p.title ?? p.semantic?.title ?? '',
+            domain_class: p.domainClass ?? p.domain_class ?? p.classification?.domainClass ?? undefined,
+            qdrant_point_id: p.qdrantPointId ?? p.qdrant_point_id ?? undefined,
+            tree_node_id: p.treeNodeId ?? p.tree_node_id ?? undefined,
+            retrieval: p.retrieval ?? undefined,
+          };
+        }),
+      };
+    };
 
     // 1. Evidence Analysis Tool
     tools.push(
@@ -809,24 +839,19 @@ export class AutonomousAgent {
       })
     );
 
-    // 23. Codebase Semantic Search Tool
+    // 23. Canonical codebase search tool
     tools.push(
       new DynamicStructuredTool({
-        name: 'codebase_search',
+        name: 'search_codebase',
         description:
-          'Semantic code search using dual-vector (content + signature) embeddings in Qdrant. Returns ranked code chunks with file paths, line numbers, and relevance scores.',
+          'Canonical HyperRAG codebase search using SearchRuntime.search(). Returns packet envelopes, provenance, and topK evidence from the same retrieval spine used by the app.',
         schema: z.object({
           query: z.string().describe('Natural language or code search query'),
-          limit: z.number().optional().default(10).describe('Max results (1-50)'),
+          limit: z.number().optional().default(10).describe('Max results (1-20)'),
         }),
         func: async ({ query, limit }) => {
           try {
-            const response = await fetchWithTimeout(`${AGENT_API_BASE()}/search`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ query, limit, domain: 'codebase' }),
-            });
-            return JSON.stringify(await response.json());
+            return JSON.stringify(await runCanonicalSearch(query, limit));
           } catch (error) {
             return JSON.stringify({ error: String(error) });
           }
@@ -834,7 +859,27 @@ export class AutonomousAgent {
       })
     );
 
-    // 24. ACE Context Synthesis Tool
+    // 24. Legacy alias retained for compatibility
+    tools.push(
+      new DynamicStructuredTool({
+        name: 'codebase_search',
+        description:
+          'Compatibility alias for search_codebase. Uses the canonical HyperRAG search runtime.',
+        schema: z.object({
+          query: z.string().describe('Natural language or code search query'),
+          limit: z.number().optional().default(10).describe('Max results (1-50)'),
+        }),
+        func: async ({ query, limit }) => {
+          try {
+            return JSON.stringify(await runCanonicalSearch(query, limit));
+          } catch (error) {
+            return JSON.stringify({ error: String(error) });
+          }
+        },
+      })
+    );
+
+    // 25. ACE Context Synthesis Tool
     tools.push(
       new DynamicStructuredTool({
         name: 'ace_context',
@@ -863,7 +908,7 @@ export class AutonomousAgent {
       })
     );
 
-    // 25. Whisper Audio Transcription Tool
+    // 26. Whisper Audio Transcription Tool
     tools.push(
       new DynamicStructuredTool({
         name: 'whisper_transcribe',
@@ -1238,18 +1283,31 @@ export class AutonomousAgent {
     if (q.includes('summarize') || q.includes('summary') || q.includes('brief')) {
       selected.push('summarize', 'rag_search');
     }
+    if (
+      q.includes('retrieval') ||
+      q.includes('search runtime') ||
+      q.includes('searchruntime') ||
+      q.includes('packet key') ||
+      q.includes('packet_key') ||
+      q.includes('rerank') ||
+      q.includes('rank') ||
+      q.includes('qdrant') ||
+      q.includes('rrf')
+    ) {
+      selected.push('search_codebase', 'codebase_search', 'rag_search');
+    }
     // Code / technical debugging
     if (q.includes('todo') || q.includes('fixme')) {
-      selected.push('ripgrep_search', 'extract_pattern', 'analyze_file');
+      selected.push('ripgrep_search', 'extract_pattern', 'analyze_file', 'search_codebase');
     }
     if (q.includes('drop table') || q.includes('migration') || q.includes('drizzle')) {
-      selected.push('find_files', 'ripgrep_search', 'analyze_file', 'web_search');
+      selected.push('find_files', 'ripgrep_search', 'analyze_file', 'web_search', 'search_codebase');
     }
     if (q.includes('endpoint') || q.includes('api') || q.includes('500')) {
-      selected.push('find_files', 'ripgrep_search', 'analyze_file');
+      selected.push('find_files', 'ripgrep_search', 'analyze_file', 'search_codebase');
     }
     if (q.includes('redis') || q.includes('embedding') || q.includes('docker')) {
-      selected.push('find_files', 'analyze_file', 'ripgrep_search');
+      selected.push('find_files', 'analyze_file', 'ripgrep_search', 'search_codebase');
     }
     // System health
     if (q.includes('health') || q.includes('status') || q.includes('infrastructure')) {

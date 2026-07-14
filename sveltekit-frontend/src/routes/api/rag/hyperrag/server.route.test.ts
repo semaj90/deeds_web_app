@@ -2,106 +2,59 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$env/dynamic/private', () => ({ env: {} }));
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
-
 const mocks = vi.hoisted(() => ({
-  generateEmbeddings: vi.fn(async () => ({ vectors: [Array.from({ length: 768 }, () => 0.01)] })),
-  hybridSearch: vi.fn(async ({ collection }: { collection: string }) => {
-    if (collection === 'codebase_chunks_768') {
-      return {
-        results: [
-          {
-            id: 'semantic-1',
-            score: 0.91,
-            payload: {
-              dir: 'src/lib/server/vector',
-              filePath: 'src/lib/server/vector/qdrant-manager.ts',
-              summary: 'Vector manager summary',
-              pageRank: 0.2,
-              gpuCluster: 1,
-              topoClass: 'gpu',
-            },
-          },
-        ],
-      };
-    }
+  search: vi.fn(),
+  bifrostChat: vi.fn(),
+}));
 
-    return {
-      results: [
-        {
-          id: 'kag-1',
-          score: 0.81,
-          payload: {
-            directoryPath: 'src/lib/server/wiki',
-            relativePath: 'src/lib/server/wiki/wiki-mcp-service.ts',
-            content: 'Wiki content body',
-          },
-        },
-      ],
-    };
+vi.mock('$lib/server/retrieval/search-runtime.js', () => ({
+  createSearchRuntime: () => ({
+    search: (...args: unknown[]) => mocks.search(...args),
   }),
-  getRedis: vi.fn(() => ({
-    get: vi.fn(async (key: string) => {
-      if (key === 'cluster:kmeans:k20:manifold4:all') {
-        return JSON.stringify([{ topoLabel: 'gpu', somRow: 1, somCol: 2 }]);
-      }
-      if (key === 'cluster:kmeans:k20:centroids') {
-        return JSON.stringify([Array.from({ length: 768 }, () => 0.01)]);
-      }
-      if (key === 'wiki:note:dir:src:lib:server:vector') {
-        return JSON.stringify({ summary: 'Redis wiki note' });
-      }
-      return null;
-    }),
-  })),
-  readWikiCard: vi.fn(async () => ({ id: 'src/lib/server/wiki', summary: 'CouchDB wiki summary' })),
 }));
 
-vi.mock('$lib/server/grpc/embedding-client.js', () => ({
-  generateEmbeddings: (...args: unknown[]) => mocks.generateEmbeddings(...args),
-}));
-
-vi.mock('$lib/server/vector/qdrant-manager.js', () => ({
-  qdrant: {
-    hybridSearch: (...args: unknown[]) => mocks.hybridSearch(...args),
-  },
-}));
-
-vi.mock('$lib/server/redis.js', () => ({
-  getRedis: (...args: unknown[]) => mocks.getRedis(...args),
-}));
-
-vi.mock('$lib/server/wiki/wiki-couchdb-client.js', () => ({
-  readWikiCard: (...args: unknown[]) => mocks.readWikiCard(...args),
+vi.mock('$lib/server/ollama.js', () => ({
+  bifrostChat: (...args: unknown[]) => mocks.bifrostChat(...args),
+  VLM_MODELS: { legal: 'gemma4-legal-iq4xs-direct.gguf' },
 }));
 
 describe('/api/rag/hyperrag', () => {
   beforeEach(() => {
-    vi.resetModules();
-    vi.clearAllMocks();
+    mocks.search.mockReset();
+    mocks.bifrostChat.mockReset();
 
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (input: RequestInfo | URL) => {
-        const url = String(input);
-        if (url.includes(':8099/search')) {
-          return new Response(JSON.stringify({ ids: ['semantic-1'] }), { status: 200 });
-        }
+    mocks.search.mockResolvedValue({
+      metadata: { query: 'graph retrieval', candidatesRetrieved: 2, candidatesFused: 2, candidatesReranked: 1, durationMs: 17, stages: { retrieve: 4, fuse: 3, hydrate: 5, rerank: 5 } },
+      provenance: {
+        retrievalSources: ['postgres_trigram', 'qdrant', 'ast_tree'],
+        fusionMethod: 'rrf',
+        rerankModel: 'mixedbread-ai/mxbai-rerank-base-v2',
+        rerankerUsed: true,
+        promotionAttempted: true,
+      },
+      packets: [
+        {
+          packet_key: 'packet-1',
+          source_ref: 'src/lib/example.ts',
+          summary: 'packet summary one',
+          content: 'packet content one',
+          retrieval_score: 0.91,
+          blended_score: 0.94,
+          cross_encoder_score: 0.95,
+          rank_after: 1,
+          semantic_title: 'Packet One',
+          domain: 'codebase',
+          page_rank_score: 0.12,
+          som_cluster: 8,
+          lexical: { score: 0.7 },
+        },
+      ],
+    });
 
-        if (url.includes(':3040/v1/chat/completions')) {
-          return new Response(
-            JSON.stringify({ choices: [{ message: { content: '- one\n- two\n- three\nNext: do the thing' } }] }),
-            { status: 200, headers: { 'Content-Type': 'application/json' } }
-          );
-        }
-
-        return new Response('{}', { status: 404 });
-      })
-    );
+    mocks.bifrostChat.mockResolvedValue('Synthesized summary');
   });
 
-  it('returns a minified hyperrag packet for authenticated users', async () => {
+  it('returns a canonical compatibility packet for authenticated users', async () => {
     const { POST } = await import('./+server.js');
     const request = new Request('http://localhost/api/rag/hyperrag', {
       method: 'POST',
@@ -114,11 +67,14 @@ describe('/api/rag/hyperrag', () => {
 
     const body = await response.json();
     expect(body.ok).toBe(true);
-    expect(body.packet.turbovecPrefilter).toBe(true);
-    expect(body.packet.turbovecCandidates).toEqual(['semantic-1']);
-    expect(body.packet.cluster.id).toBe(0);
-    expect(body.packet.results).toHaveLength(2);
-    expect(body.bitfrostSummary).toContain('Next: do the thing');
+    expect(body.packet.query).toBe('graph retrieval');
+    expect(body.packet.results).toHaveLength(1);
+    expect(body.packet.results[0].id).toBe('packet-1');
+    expect(body.packet.results[0].summary).toBe('packet summary one');
+    expect(body.packet.turbovecPrefilter).toBe(false);
+    expect(body.packet.turbovecCandidates).toEqual(['packet-1']);
+    expect(body.bitfrostSummary).toBe('Synthesized summary');
+    expect(mocks.search).toHaveBeenCalledTimes(1);
   });
 
   it('rejects unauthenticated requests', async () => {

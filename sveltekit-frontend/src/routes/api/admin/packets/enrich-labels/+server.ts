@@ -12,7 +12,7 @@ import {
 } from '$lib/server/indexer/feature-label-enricher.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
-  if (!locals.user?.isAdmin) {
+  if (locals.user?.role !== 'admin') {
     return json({ error: 'Admin only' }, { status: 403 });
   }
 
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 };
 
 export const POST: RequestHandler = async ({ locals }) => {
-  if (!locals.user?.isAdmin) {
+  if (locals.user?.role !== 'admin') {
     return json({ error: 'Admin only' }, { status: 403 });
   }
 

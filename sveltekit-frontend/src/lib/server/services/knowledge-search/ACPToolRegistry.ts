@@ -13,6 +13,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { redis } from '$lib/server/redis.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
+import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
+import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
 import type { ACPTool, ToolResult, ToolPlanStep } from './types.js';
 
 export interface ACPKnowledgeSearchResult {
@@ -678,14 +680,13 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const { HyperRagFusionService } = await import('$lib/server/retrieval/hyperrag-fusion-service.js');
-      const service = HyperRagFusionService.getInstance();
-      const result = await service.search({
-        query: query.trim(),
-        mode: mode as any,
+      const runtime = createSearchRuntime();
+      const searchResult = await runtime.search({
+        text: query.trim(),
         topK,
-        synthesize
+        caseId: mode === 'legal' ? 'legal' : undefined,
       });
+      const result = searchResultToHyperRagResult(searchResult, { query: query.trim() });
 
       return {
         success: true,

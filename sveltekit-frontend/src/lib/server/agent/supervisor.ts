@@ -22,9 +22,11 @@ import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import type { DynamicStructuredTool } from '@langchain/core/tools';
 import { ENV } from '$lib/server/env.server.js';
 import { buildLangGraphConfig, getLangGraphCheckpointer } from '$lib/server/langgraph/checkpointer.js';
+import { recordOutcome } from '$lib/server/telemetry/tool-call-recorder.js';
 import {
 	createSubagent,
 	classifyIntent,
+	SUBAGENT_NAMES,
 	type SubagentName,
 	type SubagentInstance,
 } from './subagents.js';
@@ -55,6 +57,13 @@ type SupervisorStateType = typeof SupervisorState.State;
 const ROUTING_PROMPT = `You are a routing supervisor for a legal AI investigation platform.
 Given a user query, classify it into exactly ONE of these domains:
 
+- retrieval_contract: canonical retrieval runtime, identity aggregation, topK, RRF, candidate fan-out
+- ranking: rerank, XGBoost, CrossEncoder, cache, provenance, fallback
+- identity_promotion: packet_key, source_ref, summary backfill, Qdrant linkage, promotion/outbox
+- semantic_enrichment: summary promotion, title_id, domain classification, EmbeddingGemma, SOM/KMeans
+- graph: tree_node_id, Neo4j, PageRank, community IDs, bounded graph expansion
+- transport: MCP, gRPC, protobuf, packet envelopes, ACP tool schemas, JSON Schema
+- validation: typecheck, smoke tests, health checks, reconstruction, evidence gates
 - audio: Audio transcription, recordings, depositions, wiretaps, 911 calls, speaker diarization
 - document: Document analysis, images, PDFs, OCR, VLM, evidence upload, forensic patterns, entity extraction from documents
 - case: Case management, citations, persons of interest, legal reports, motions, warrants, plea agreements
@@ -99,7 +108,7 @@ export class SupervisorAgent {
 	}
 
 	private initializeSubagents(): void {
-		const names: SubagentName[] = ['audio', 'document', 'case', 'codebase', 'general'];
+		const names = [...SUBAGENT_NAMES] as SubagentName[];
 		for (const name of names) {
 			try {
 				const subagent = createSubagent(name, this.allTools, {
@@ -116,20 +125,16 @@ export class SupervisorAgent {
 	private async buildGraph(): Promise<ReturnType<typeof StateGraph.prototype.compile> | null> {
 		try {
 			const checkpointer = await getLangGraphCheckpointer();
-			const workflow = new StateGraph(SupervisorState)
-				.addNode('route_intent', this.routeIntentNode.bind(this))
-				.addNode('audio', this.makeSubagentNode('audio'))
-				.addNode('document', this.makeSubagentNode('document'))
-				.addNode('case', this.makeSubagentNode('case'))
-				.addNode('codebase', this.makeSubagentNode('codebase'))
-				.addNode('general', this.makeSubagentNode('general'))
-				.addEdge(START, 'route_intent')
-				.addConditionalEdges('route_intent', (state: SupervisorStateType) => state.route)
-				.addEdge('audio', END)
-				.addEdge('document', END)
-				.addEdge('case', END)
-				.addEdge('codebase', END)
-				.addEdge('general', END);
+			let workflow: any = new StateGraph(SupervisorState).addNode('route_intent', this.routeIntentNode.bind(this)).addEdge(START, 'route_intent');
+
+			for (const name of SUBAGENT_NAMES) {
+				workflow = workflow.addNode(name, this.makeSubagentNode(name));
+			}
+
+			workflow = workflow.addConditionalEdges('route_intent', (state: SupervisorStateType) => state.route);
+			for (const name of SUBAGENT_NAMES) {
+				workflow = workflow.addEdge(name, END);
+			}
 
 			return workflow.compile({
 				name: 'legal_supervisor',
@@ -170,7 +175,7 @@ export class SupervisorAgent {
 					? response.content.trim().toLowerCase()
 					: '';
 
-			const validRoutes: SubagentName[] = ['audio', 'document', 'case', 'codebase', 'general'];
+			const validRoutes = [...SUBAGENT_NAMES] as SubagentName[];
 			route = validRoutes.includes(content as SubagentName)
 				? (content as SubagentName)
 				: classifyIntent(query);
@@ -313,6 +318,13 @@ export class SupervisorAgent {
 				initialState,
 				buildLangGraphConfig(options.threadId, undefined, 'supervisor')
 			);
+			await this.persistValidatedOutcome(
+				query,
+				result.route,
+				result.answer || '',
+				Array.isArray(result.toolCalls) ? result.toolCalls.length : 0,
+				options.threadId
+			).catch(() => {});
 			return {
 				answer: result.answer || 'Investigation complete.',
 				route: result.route,
@@ -331,6 +343,13 @@ export class SupervisorAgent {
 		} as SupervisorStateType;
 
 		const result = await subagentNode(fallbackState);
+		await this.persistValidatedOutcome(
+			query,
+			route,
+			result.answer || '',
+			Array.isArray(result.toolCalls) ? result.toolCalls.length : 0,
+			options.threadId
+		).catch(() => {});
 		return {
 			answer: result.answer || 'Investigation complete.',
 			route,
@@ -396,6 +415,7 @@ export class SupervisorAgent {
 			name,
 			toolCount: sa.toolNames.length,
 			tools: sa.toolNames,
+			authorization: sa.authorization,
 		}));
 
 		return {
@@ -405,5 +425,30 @@ export class SupervisorAgent {
 			routing: 'LLM classification → keyword fallback',
 			graph: this.graph ? 'compiled' : 'fallback-only',
 		};
+	}
+
+	private async persistValidatedOutcome(
+		query: string,
+		route: SubagentName,
+		answer: string,
+		toolCallCount: number,
+		threadId?: string,
+	): Promise<void> {
+		if (!answer.trim()) return;
+		await recordOutcome({
+			outcomeType: 'supervisor_validated',
+			taskId: threadId,
+			traceId: threadId,
+			score: 1,
+			reward: 1,
+			feedback: `route=${route}; tools=${toolCallCount}; query=${query.slice(0, 120)}`,
+			metadata: {
+				query: query.slice(0, 200),
+				route,
+				toolCallCount,
+				answerLength: answer.length,
+				architecture: 'LangGraph StateGraph + Supervisor Routing',
+			},
+		});
 	}
 }

@@ -44,7 +44,7 @@ export const GET: RequestHandler = async () => {
     let redis_status: 'connected' | 'disconnected' = 'disconnected';
 
     try {
-      if (!redis.isOpen) {
+      if (redis.status !== 'ready') {
         await redis.connect();
       }
 

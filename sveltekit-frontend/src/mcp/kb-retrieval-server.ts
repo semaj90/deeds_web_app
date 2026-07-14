@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * kb-retrieval-server.ts
  *

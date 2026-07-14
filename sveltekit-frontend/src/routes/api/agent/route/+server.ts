@@ -19,7 +19,7 @@ const routeRequestSchema = z.object({
     priorSuccessRate: z.number().optional(),
     timeoutRiskScore: z.number().optional()
   }).optional(),
-  topK: z.number().default(3).min(1).max(10)
+  topK: z.number().min(1).max(10).default(3)
 });
 
 type RouteRequest = z.infer<typeof routeRequestSchema>;

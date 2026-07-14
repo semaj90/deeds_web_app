@@ -47,6 +47,22 @@ export type {
 // ── ACE retrieval logging and evaluation ────────────────────────────────────
 export * from '$lib/server/features/rag/ace-retrieval-logger.js';
 
+// ── Canonical feature-envelope rerank bridge ────────────────────────────────
+export type {
+  CanonicalRerankEnvelope,
+  CanonicalRerankResult,
+  CanonicalRerankProvenance,
+} from './canonical-rerank-executor.js';
+export {
+  DEFAULT_CANONICAL_RERANK_WEIGHTS,
+  buildCanonicalRerankCacheKey,
+  canonicalEnvelopeToRerankCandidate,
+  envelopeToMixedbreadCandidate,
+  rerankedCandidateToCanonicalEnvelope,
+  rerankCanonicalFeatureEnvelopes,
+  MixedbreadCanonicalReranker,
+} from './canonical-rerank-executor.js';
+
 // ── Query evaluation and timing (multi-datastore testing) ────────────────────
 export type {
   QueryExecution,

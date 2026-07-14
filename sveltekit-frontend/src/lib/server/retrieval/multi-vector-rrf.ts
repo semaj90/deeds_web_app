@@ -3,7 +3,7 @@
  *
  * Combines multiple ranking signals into a unified score:
  *   1. Qdrant named-vector ANN (content + summary vectors)
- *   2. Lexical search (rg/BM25 via PostgreSQL)
+ *   2. Lexical search (rg/ts_rank/trigram via PostgreSQL)
  *   3. Noun overlap (Jaccard similarity on extracted terms)
  *   4. PageRank authority (from Neo4j, cached in Postgres)
  *   5. SOM topology proximity (distance in self-organizing map)

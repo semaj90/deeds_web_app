@@ -11,7 +11,7 @@
  * This is the durable persistence layer for the canonical 5-step truth flow.
  */
 
-import type { PacketTopologyEnvelope } from './packet-topology-envelope.js';
+import type { PacketTopologyEnvelope } from '../db/packet-topology-envelope.js';
 import type { PoolClient } from 'pg';
 
 /**

@@ -2,7 +2,7 @@
  * MARCO MiniLM Cross-Encoder Reranker
  * 
  * Provides pointwise scoring for retrieval candidates using 
- * the cross-encoder/ms-marco-MiniLM-L-12-v2 model.
+ * the Mixedbread reranker backend.
  */
 
 import { ENV } from '$lib/server/env.server.js';
@@ -31,7 +31,7 @@ export async function rerankWithMarco(query: string, candidates: string[]): Prom
 			body: JSON.stringify({
 				query,
 				documents: candidates,
-				model: 'cross-encoder/ms-marco-MiniLM-L-12-v2'
+				model: 'mixedbread-ai/mxbai-rerank-base-v2'
 			}),
 			signal: AbortSignal.timeout(10000)
 		});

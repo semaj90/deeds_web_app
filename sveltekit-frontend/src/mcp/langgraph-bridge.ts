@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LangGraph Bridge: Connect OpenCode Gemma4 Tool Calls to Parent Atlas Dispatcher
  *

@@ -37,7 +37,7 @@ import { webSearch, type WebSearchResult } from '$lib/server/retrieval/web-searc
 import { traceCache, traceGraph } from '$lib/server/observability/langfuse.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { fromRerankResult, type UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
-import { scoreBatchTriton, isRerankerReady } from './triton-reranker.js';
+import { scoreBatchCrossEncoder, isRerankerReady } from './triton-reranker.js';
 import { ENV } from '$lib/server/env.server.js';
 import { getOllamaEndpoint } from '$lib/server/ollama.js';
 
@@ -100,7 +100,7 @@ export interface RerankCandidate {
 
 export interface RerankResult<T extends RerankCandidate = RerankCandidate> {
   doc: T;
-  /** Gemma4 relevance score 0–1 */
+  /** Cross-encoder relevance score 0–1 */
   rerankScore: number;
   /** Whether score came from Redis cache */
   cached: boolean;
@@ -125,13 +125,13 @@ export interface RerankOptions {
 
 /** Per-call cache statistics returned alongside rerank results */
 export interface RerankStats {
-  /** True when the full ranked list was served from L0 result-set cache (0 Gemma4 calls) */
+  /** True when the full ranked list was served from L0 result-set cache (0 cross-encoder calls) */
   l0Hit: boolean;
   /** Number of individual (query,doc) score pairs served from L1 Redis cache */
   l1Hits: number;
-  /** Number of pairs that were NOT in L1 cache (required Gemma4 scoring) */
+  /** Number of pairs that were NOT in L1 cache (required cross-encoder scoring) */
   l1Misses: number;
-  /** Number of candidates scored via Gemma4 this call */
+  /** Number of candidates scored via the cross-encoder this call */
   freshScored: number;
 }
 
@@ -525,7 +525,7 @@ async function scoreBatchWithBackendFallback(
   if (useTritonBatch) {
     try {
         const docTexts = candidates.map(c => c.content.slice(0, SCORE_MAX_CHARS));
-        const batchScores = await scoreBatchTriton(query, docTexts);
+        const batchScores = await scoreBatchCrossEncoder(query, docTexts);
 
         if (batchScores.length === candidates.length) {
             tritonHealth.ok = true;

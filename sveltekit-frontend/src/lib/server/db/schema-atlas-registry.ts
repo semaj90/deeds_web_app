@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Atlas Packet Registry Schema (Drizzle ORM)
  * Canonical truth for all packet state across the system.

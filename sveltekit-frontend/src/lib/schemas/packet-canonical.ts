@@ -217,7 +217,7 @@ export function validatePacketAfterLayer1(data: unknown): { ok: boolean; packet?
 
 // ── Examples ─────────────────────────────────────────────────────────────
 
-export const PACKET_EXAMPLE_LAYER_1: PacketAfterLayer1 = {
+export const PACKET_EXAMPLE_LAYER_1: CanonicalPacket = {
   packet_key: 'ace:chunk:auth:001',
   source_ref: 'src/lib/server/auth.ts',
   source_id: '550e8400-e29b-41d4-a716-446655440000',
@@ -246,7 +246,7 @@ export const PACKET_EXAMPLE_LAYER_1: PacketAfterLayer1 = {
   updated_at: new Date().toISOString(),
 };
 
-export const PACKET_EXAMPLE_LAYER_2: PacketAfterLayer2 = {
+export const PACKET_EXAMPLE_LAYER_2: CanonicalPacket = {
   ...PACKET_EXAMPLE_LAYER_1,
   dimension: 384,
   model: 'embeddinggemma:latest',

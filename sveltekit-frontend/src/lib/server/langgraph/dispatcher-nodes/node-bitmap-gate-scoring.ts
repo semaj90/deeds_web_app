@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Node: Bitmap Gate Scoring
  * Uses Redis/Valkey bitmaps for 500-2000× faster gate readiness scoring

@@ -38,7 +38,7 @@ interface RetrievalCandidate {
   packet_type: string;
 
   // RRF scores from 7 lanes
-  postgres_trigram_score: number; // BM25
+  postgres_trigram_score: number; // PostgreSQL trigram / ILIKE fallback
   concept_overlap_score: number; // Concept matching
   qdrant_vector_score: number; // Dense vector (content_embedding)
   turbovec_score: number; // 4-bit quantized prefilter
@@ -62,7 +62,7 @@ interface RetrievalCandidate extends CanonicalIDHierarchy {
   packet_type: string;
 
   // RRF scores from 7 lanes
-  postgres_trigram_score: number; // BM25
+  postgres_trigram_score: number; // PostgreSQL trigram / ILIKE fallback
   concept_overlap_score: number; // Concept matching
   qdrant_vector_score: number; // Dense vector (content_embedding)
   turbovec_score: number; // 4-bit quantized prefilter

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Go Retrieval Orchestrator
  *

@@ -136,29 +136,30 @@ Respond with ONLY valid JSON, no other text.`;
     // Fallback: simple extraction of keywords
     const keywords = extractKeywordsNaive(originalQuery);
 
+    const subgoals: Subgoal[] = [
+      {
+        id: 'sg-1',
+        type: 'codebase_search',
+        query: originalQuery,
+        priority: 1.0,
+        expectedResults: 50
+      }
+    ];
+
+    if (keywords.length > 0) {
+      subgoals.push({
+        id: 'sg-2',
+        type: 'retrieval',
+        query: keywords.join(' '),
+        priority: 0.7,
+        expectedResults: 30
+      });
+    }
+
     return {
       originalQuery,
       intent: 'search',
-      subgoals: [
-        {
-          id: 'sg-1',
-          type: 'codebase_search',
-          query: originalQuery,
-          priority: 1.0,
-          expectedResults: 50
-        },
-        ...(keywords.length > 0
-          ? [
-              {
-                id: 'sg-2',
-                type: 'retrieval',
-                query: keywords.join(' '),
-                priority: 0.7,
-                expectedResults: 30
-              }
-            ]
-          : [])
-      ],
+      subgoals,
       reasoning: `Fallback decomposition (Gemma4 unavailable): single codebase search + keyword retrieval`
     };
   }

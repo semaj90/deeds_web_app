@@ -17,7 +17,7 @@ import type {
   PacketTopologyEnvelope,
   CanonicalPacketIdentity,
   PacketMetadata,
-} from './packet-topology-envelope.js';
+} from '../db/packet-topology-envelope.js';
 
 /**
  * Metadata about the gRPC call that produced this response

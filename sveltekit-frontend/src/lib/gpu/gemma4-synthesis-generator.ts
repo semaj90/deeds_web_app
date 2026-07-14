@@ -7,7 +7,8 @@
  * Pattern: Gemma4 receives evidence bundle from ACE assembler, generates answer
  */
 
-import type { ACEContext, DecomposedQuery } from './gemma4-policy-orchestrator';
+import type { DecomposedQuery } from './gemma4-policy-orchestrator';
+import type { ACEContext } from '../server/ace/types';
 
 interface SynthesisRequest {
   query: string;

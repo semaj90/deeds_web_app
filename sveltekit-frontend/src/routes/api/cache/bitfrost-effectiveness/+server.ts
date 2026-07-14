@@ -193,7 +193,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  if (!locals.user?.isAdmin) {
+  if (locals.user?.role !== 'admin') {
     return json({ error: 'Admin only' }, { status: 403 });
   }
 

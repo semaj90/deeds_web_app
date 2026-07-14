@@ -75,8 +75,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		try {
 			await db
 				.update(atlasPackets)
-				.set({ updated_at: new Date() })
-				.where(eq(atlasPackets.packet_key, packetKey));
+				.set({ updatedAt: new Date() })
+				.where(eq(atlasPackets.packetKey, packetKey));
 		} catch (e) {
 			// Non-blocking: cache write succeeded even if Postgres fails
 			console.warn(`Failed to update packet ${packetKey}:`, e);

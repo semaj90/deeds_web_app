@@ -1,4 +1,5 @@
 import { db } from '$lib/server/db/client';
+import { sql } from 'drizzle-orm';
 import type { RetrievalPromotionDecision } from '$lib/runtime-cache/contracts';
 import { RetrievalPromotionDecisionSchema, validatePacketIdentity } from '$lib/runtime-cache/contracts';
 
@@ -41,7 +42,7 @@ export async function recordPromotionDecision(
     // Persist to Postgres
     try {
       await db.execute(
-        db.sql`
+        sql`
           INSERT INTO retrieval_promotion_decisions
             (trace_id, packet_key, rank, final_score, selected, destination, validation_gate_passed, reason_codes)
           VALUES

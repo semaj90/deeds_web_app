@@ -27,7 +27,7 @@ export interface TritonRerankResult {
  * 
  * Returns scores in the same order as candidates.
  */
-export async function scoreBatchTriton(
+export async function scoreBatchCrossEncoder(
     query: string,
     candidates: string[]
 ): Promise<number[]> {
@@ -70,10 +70,10 @@ export async function scoreBatchTriton(
     } catch (err) {
         const code = (err as { cause?: { code?: string }; code?: string })?.cause?.code ?? (err as { code?: string }).code;
         if (code === 'ECONNREFUSED') {
-            console.warn('[triton-reranker] Triton unavailable (ECONNREFUSED), falling back to Gemma4 scorer.');
+            console.warn('[triton-reranker] Triton unavailable (ECONNREFUSED), falling back to cross-encoder legacy scorer.');
         } else {
             const message = err instanceof Error ? err.message : String(err);
-            console.warn(`[triton-reranker] Batch inference failed, falling back to Gemma4 scorer: ${message}`);
+            console.warn(`[triton-reranker] Batch inference failed, falling back to cross-encoder legacy scorer: ${message}`);
         }
         return [];
     }
@@ -92,5 +92,3 @@ export async function isRerankerReady(): Promise<boolean> {
     return false;
   }
 }
-
-export const scoreBatchCrossEncoder = scoreBatchTriton;

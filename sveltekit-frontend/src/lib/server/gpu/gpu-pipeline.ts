@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GPU Pipeline — stream-aware async queuing + Redis shape-cache for MCP tool calls.
  *

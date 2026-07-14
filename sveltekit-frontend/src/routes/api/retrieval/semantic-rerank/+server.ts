@@ -13,7 +13,7 @@
 
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { rerank, healthCheckReranker } from '$lib/server/retrieval/semantic-vector-reranker';
-import { qdrantManager } from '$lib/server/vector/qdrant-manager';
+import { qdrant } from '$lib/server/vector/qdrant-manager';
 
 export const GET: RequestHandler = async ({ url }) => {
 	const query = url.searchParams.get('q');
@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		// 1. Search Qdrant for the query
-		const qdrantResults = await qdrantManager.search('codebase_chunks_768', query, topK, {
+		const qdrantResults = await qdrant.search('codebase_chunks_768', query, topK, {
 			// optional filters or advanced params
 		});
 

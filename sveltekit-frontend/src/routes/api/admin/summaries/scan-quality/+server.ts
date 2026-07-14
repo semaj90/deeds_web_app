@@ -14,7 +14,7 @@ import {
 import { getRedis } from '$lib/server/redis.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
-	if (!locals.user?.isAdmin) {
+	if (locals.user?.role !== 'admin') {
 		return json({ error: 'Admin only' }, { status: 403 });
 	}
 
@@ -39,7 +39,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-	if (!locals.user?.isAdmin) {
+	if (locals.user?.role !== 'admin') {
 		return json({ error: 'Admin only' }, { status: 403 });
 	}
 

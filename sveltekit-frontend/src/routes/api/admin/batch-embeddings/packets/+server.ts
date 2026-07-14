@@ -8,12 +8,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 		// Fetch packets needing embeddings
 		const packets = await db
 			.select({
-				packet_key: atlasPackets.packet_key,
-				feature_label: atlasPackets.feature_label,
+				packet_key: atlasPackets.packetKey,
+				feature_label: atlasPackets.featureLabel,
 				summary: atlasPackets.summary,
 			})
 			.from(atlasPackets)
-			.where((t) => t.feature_label !== null)
+			.where((t) => t.featureLabel !== null)
 			.limit(5000);
 
 		return json(packets);

@@ -151,7 +151,12 @@ export const FeatureEnvelopeSchema = z.object({
   // Identity
   // ─────────────────────────────────────────────────────────
   chunk_id: z.string().describe('Foreign key to codebase_chunk_index.id'),
+  packet_key: z.string().optional().describe('Canonical packet identity if already assigned'),
   query_id: z.string().optional().describe('Evaluation query ID if in test context'),
+  retrieved_rank: z.number().int().positive().optional().describe('Rank before reranking if already known'),
+  feature_id: z.string().optional().describe('Canonical feature identity if already assigned'),
+  tree_node_id: z.string().optional().describe('Canonical topology node identity if already assigned'),
+  qdrant_point_id: z.string().optional().describe('Canonical dense retrieval point identity if already assigned'),
 
   // ─────────────────────────────────────────────────────────
   // Independent Signals (each computed separately)
@@ -206,6 +211,7 @@ export const FeatureEnvelopeSchema = z.object({
   source_ref: z.string().optional().describe('File path or reference ID'),
   relative_path: z.string().optional().describe('Relative path in codebase'),
   summary: z.string().optional().describe('Brief chunk summary for human review'),
+  content: z.string().optional().describe('Full candidate text for reranking when hydrated'),
 
   // Extraction provenance
   created_at: z.date().default(() => new Date()),

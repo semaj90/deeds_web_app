@@ -937,8 +937,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   // Push to persistent audit log (batched, best-effort)
   auditBuffer.push({
-    requestId,
-    method: event.request.method,
+    method: event.request.method as 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'OPTIONS',
     path: event.url.pathname,
     statusCode: response.status,
     durationMs: duration,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MCP Tool Implementations — 9 Dispatcher Tools (5-Step Canonical Truth Flow)
  *

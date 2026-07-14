@@ -1,132 +1,72 @@
 /**
- * GET /api/retrieval/unified
- * POST /api/retrieval/unified
+ * DEPRECATED: This endpoint has been consolidated into the canonical SearchRuntime.
  *
- * Unified retrieval endpoint orchestrating:
- * Postgres → Embedding → Qdrant → TurboVec → Postgres join → Ranking
+ * @deprecated Use /api/retrieval/search-unified instead
+ * @see /api/retrieval/search-unified
  *
- * Query parameters (GET):
- * - q: search query (required)
- * - limit: max results (default: 10)
- * - rrf: enable RRF fusion (default: true)
- * - lexical: include lexical/BM25 (default: false)
- * - summarize: include Gemma4 summary (default: false)
- *
- * POST body:
- * {
- *   "query": "string",
- *   "limit": number,
- *   "useRRF": boolean,
- *   "useLexical": boolean,
- *   "includeSummary": boolean,
- *   "summaryOptions": { "max_tokens": number, "temperature": number }
- * }
+ * This route now redirects to /api/retrieval/search-unified to maintain backward compatibility
+ * while eliminating duplicate code paths. The canonical unified retrieval runtime is the only
+ * production control plane for code search.
  */
 
 import type { RequestHandler } from '@sveltejs/kit';
-import {
-  executeUnifiedRetrieval,
-  executeUnifiedRetrievalWithSummarization,
-  type RetrievalRequest
-} from '$lib/server/retrieval/unified-orchestrator.js';
+import { json } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async ({ url }) => {
-  const query = url.searchParams.get('q');
-  const limit = parseInt(url.searchParams.get('limit') || '10');
-  const rrf = url.searchParams.get('rrf') !== 'false';
-  const lexical = url.searchParams.get('lexical') === 'true';
-  const summarize = url.searchParams.get('summarize') === 'true';
+export const GET: RequestHandler = async ({ url, locals }) => {
+  const q = url.searchParams.get('q');
+  const limit = url.searchParams.get('limit') || '10';
 
-  if (!query) {
-    return new Response(
-      JSON.stringify({ error: 'query parameter required' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
+  if (!q) {
+    return json({ error: 'Missing query parameter: q' }, { status: 400 });
   }
 
-  try {
-    const request: RetrievalRequest = {
-      query,
-      limit,
-      useRRF: rrf,
-      useLexical: lexical
-    };
+  // Build redirect URL to canonical endpoint
+  const redirectUrl = `/api/retrieval/search-unified?q=${encodeURIComponent(q)}&topK=${limit}`;
 
-    if (summarize) {
-      const result = await executeUnifiedRetrievalWithSummarization(request);
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } else {
-      const result = await executeUnifiedRetrieval(request);
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-  } catch (err) {
-    console.error('Unified retrieval error:', err);
-    return new Response(
-      JSON.stringify({
-        error: err instanceof Error ? err.message : 'Unknown error',
-        candidates: [],
-        stages_completed: [],
-        fallback_used: true
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
+  console.warn(`[DEPRECATED] GET /api/retrieval/unified redirecting to ${redirectUrl}`);
+
+  // HTTP 307 temporary redirect (maintain GET method)
+  return new Response(null, {
+    status: 307,
+    headers: {
+      'Location': redirectUrl,
+      'X-Forwarded-From': '/api/retrieval/unified (deprecated)',
+      'Cache-Control': 'no-store',
+    },
+  });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
   try {
     const body = (await request.json()) as {
       query: string;
       limit?: number;
-      useRRF?: boolean;
-      useLexical?: boolean;
-      includeSummary?: boolean;
-      summaryOptions?: { max_tokens?: number; temperature?: number };
     };
 
     if (!body.query) {
-      return new Response(
-        JSON.stringify({ error: 'query required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return json({ error: 'query required' }, { status: 400 });
     }
 
-    const retrievalRequest: RetrievalRequest = {
-      query: body.query,
-      limit: body.limit,
-      useRRF: body.useRRF,
-      useLexical: body.useLexical
-    };
+    // Build redirect URL to canonical endpoint
+    const limit = body.limit || 10;
+    const redirectUrl = `/api/retrieval/search-unified?q=${encodeURIComponent(body.query)}&topK=${limit}`;
 
-    if (body.includeSummary) {
-      const result = await executeUnifiedRetrievalWithSummarization(retrievalRequest, undefined, body.summaryOptions);
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } else {
-      const result = await executeUnifiedRetrieval(retrievalRequest);
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    console.warn(`[DEPRECATED] POST /api/retrieval/unified redirecting to ${redirectUrl}`);
+
+    // HTTP 307 temporary redirect (maintain POST method)
+    return new Response(null, {
+      status: 307,
+      headers: {
+        'Location': redirectUrl,
+        'X-Forwarded-From': '/api/retrieval/unified (deprecated)',
+        'Cache-Control': 'no-store',
+      },
+    });
   } catch (err) {
-    console.error('Unified retrieval error:', err);
-    return new Response(
-      JSON.stringify({
-        error: err instanceof Error ? err.message : 'Unknown error',
-        candidates: [],
-        stages_completed: [],
-        fallback_used: true
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    console.error('Unified retrieval redirect error:', err);
+    return json(
+      { error: err instanceof Error ? err.message : 'Unknown error' },
+      { status: 500 }
     );
   }
 };

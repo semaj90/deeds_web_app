@@ -177,6 +177,7 @@ export async function processSyncQueue(): Promise<number> {
 
     console.log(`🔄 Processing ${rows.length} sync queue items...`);
 
+    const qdrant = getQdrantClient();
     let successCount = 0;
     for (const row of rows) {
       try {
@@ -306,6 +307,7 @@ export async function getQdrantStats(): Promise<{
   status: string;
 } | null> {
   try {
+    const qdrant = getQdrantClient();
     const info = await qdrant.getCollection(COLLECTION_NAME);
     return {
       points_count: info?.points_count ?? 0,
@@ -340,6 +342,7 @@ export async function startSyncWorker(intervalMs: number = 10000): Promise<void>
  */
 export async function qdrantHealthCheck(): Promise<boolean> {
   try {
+    const qdrant = getQdrantClient();
     const collections = await qdrant.getCollections();
     return collections.collections.length >= 0;
   } catch {
@@ -353,6 +356,7 @@ export async function qdrantHealthCheck(): Promise<boolean> {
 export async function fullResync(): Promise<number> {
   try {
     console.log('🔄 Starting full re-sync from Postgres to Qdrant...');
+    const qdrant = getQdrantClient();
 
     // Delete collection
     await qdrant.deleteCollection(COLLECTION_NAME).catch(() => {});

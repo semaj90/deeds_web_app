@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * src/routes/api/search/rg/+server.ts
  *

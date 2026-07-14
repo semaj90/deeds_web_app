@@ -1,6 +1,7 @@
-import { HyperRagFusionService } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
+import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
 import { countTokens } from '$lib/server/llm/token-budget.js';
-import type { HyperRagResult, HyperRagHit } from '$lib/server/retrieval/hyperrag-fusion-service.js';
+import type { HyperRagResult, HyperRagHit } from '$lib/server/retrieval/hyperrag-compat-types.js';
 
 export type AceSearchInput = {
   query: string;
@@ -178,23 +179,16 @@ function buildSynthesis(result: HyperRagResult): AceSearchSynthesis {
 }
 
 export async function searchAce(input: AceSearchInput, userId?: string): Promise<AceSearchOutput> {
-  const service = HyperRagFusionService.getInstance();
-  const mode = input.intent ? INTENT_MODE_MAP[input.intent] : 'codebase';
   const topK = input.limit ?? 3;
 
-  const result = await service.search({
-    query: input.query,
-    mode: mode as any,
+  const runtime = createSearchRuntime({ userId });
+  const searchResult = await runtime.search({
+    text: input.query,
     topK: topK * 3,
-    synthesize: true,
-    useAceCache: true,
-    useGraph: true,
-    useTurboVec: true,
-    useTopologyRouting: true,
-    topologyTopK: Math.min(5, topK),
     userId,
-    tokenBudget: input.tokenBudget,
+    caseId: undefined,
   });
+  const result = searchResultToHyperRagResult(searchResult, { query: input.query });
 
   const hits = result.hits.slice(0, topK).map((hit) => normalizeHit(hit, Boolean(input.includeFullText)));
 

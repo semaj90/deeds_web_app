@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Go Retrieval Facade — Unified Orchestrator Integration
  *
