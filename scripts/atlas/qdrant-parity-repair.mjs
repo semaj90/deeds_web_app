@@ -38,7 +38,7 @@
  */
 
 import pg from 'pg';
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
 
 const { Pool } = pg;
 
@@ -68,8 +68,7 @@ const sampleResolved = resolveSample();
 const QDRANT_URL           = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const CANONICAL_COLLECTION = 'codebase_chunks_768';
 const EXPECTED_DIM         = 768;
-const REQUIRED_VECTORS     = ['content', 'signature'];  // error vector optional
-const OPTIONAL_VECTORS     = ['error'];
+const REQUIRED_VECTORS     = ['content', 'signature'];
 const BM42_PAYLOAD_KEY     = 'bm42_sparse';
 const BATCH_SIZE           = 25;
 
@@ -141,16 +140,24 @@ const report = {
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────
 
-async function qdrantGetPoint(pointId, withVector = true) {
-  const url = `${QDRANT_URL}/collections/${CANONICAL_COLLECTION}/points/${pointId}?with_payload=true&with_vector=${withVector}`;
-  const res = await fetch(url);
-  if (res.status === 404) return null;
+async function qdrantBatchRetrieve(pointIds) {
+  const url = `${QDRANT_URL}/collections/${CANONICAL_COLLECTION}/points/retrieve`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ids: pointIds, with_payload: true, with_vector: true }),
+  });
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    throw new Error(`Qdrant GET ${pointId} → ${res.status}: ${body.slice(0, 200)}`);
+    throw new Error(`Qdrant batch retrieve → ${res.status}: ${body.slice(0, 200)}`);
   }
   const data = await res.json();
-  return data.result ?? null;
+  /** @type {Map<string, object>} */
+  const byId = new Map();
+  for (const point of (data.result ?? [])) {
+    byId.set(String(point.id), point);
+  }
+  return byId;
 }
 
 async function qdrantUpsertPayload(pointId, payload) {
@@ -268,16 +275,14 @@ function classifyParity(pgRow, point) {
 
   // ── Payload staleness ────────────────────────────────────────────────────
 
-  if (row.state !== 'incomplete_point') {
-    const stale = [];
-    if (pgRow.feature_id   && payload.feature_id   !== pgRow.feature_id)   stale.push('feature_id');
-    if (pgRow.domain_class && payload.domain_class !== pgRow.domain_class)  stale.push('domain_class');
-    if (pgRow.summary      && payload.summary      !== pgRow.summary)       stale.push('summary');
-    if (pgRow.title_id     && payload.title_id     !== pgRow.title_id)      stale.push('title_id');
-    if (stale.length > 0) {
-      row.state = 'stale_point';
-      row.reasons.push(...stale.map(f => `stale field: ${f}`));
-    }
+  const stale = [];
+  if (pgRow.feature_id   && payload.feature_id   !== pgRow.feature_id)   stale.push('feature_id');
+  if (pgRow.domain_class && payload.domain_class !== pgRow.domain_class)  stale.push('domain_class');
+  if (pgRow.summary      && payload.summary      !== pgRow.summary)       stale.push('summary');
+  if (pgRow.title_id     && payload.title_id     !== pgRow.title_id)      stale.push('title_id');
+  if (stale.length > 0) {
+    if (row.state === 'ok') row.state = 'stale_point';
+    row.reasons.push(...stale.map(f => `stale field: ${f}`));
   }
 
   return row;
@@ -360,7 +365,10 @@ function generateRepairEvents(parityRow, pgRow) {
 // ── Repair application ────────────────────────────────────────────────────────
 
 async function applyPayloadRepair(event, client) {
-  const outboxId = randomUUID().replace(/-/g, '').slice(0, 16);
+  const outboxId = createHash('sha256')
+    .update(`${event.packet_key}:${event.event_type}`)
+    .digest('hex')
+    .slice(0, 16);
   let result = 'dry-run';
 
   if (APPLY) {
@@ -452,17 +460,25 @@ async function main() {
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, i + BATCH_SIZE);
 
-      await Promise.all(batch.map(async (pgRow) => {
-        // Only audit rows targeting the canonical collection
-        if (pgRow.qdrant_collection && pgRow.qdrant_collection !== CANONICAL_COLLECTION) return;
+      // Filter to canonical collection, then batch-fetch all point IDs in one request
+      const eligible = batch.filter(r => !r.qdrant_collection || r.qdrant_collection === CANONICAL_COLLECTION);
+      const pointIds = eligible.map(r => r.qdrant_point_id);
 
-        let point;
-        try {
-          point = await qdrantGetPoint(pgRow.qdrant_point_id, true);
-        } catch (err) {
-          if (VERBOSE) console.warn(`  ⚠️  Fetch error ${pgRow.qdrant_point_id}: ${err.message}`);
-          return;
+      let pointMap = new Map();
+      try {
+        pointMap = await qdrantBatchRetrieve(pointIds);
+      } catch (err) {
+        if (VERBOSE) console.warn(`  ⚠️  Batch fetch error: ${err.message}`);
+        // Classify each eligible row as missing (conservative — don't skip entirely)
+        for (const pgRow of eligible) {
+          classified.push(classifyParity(pgRow, null));
         }
+        process.stdout.write(`\r  Audited: ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length} ...`);
+        continue;
+      }
+
+      for (const pgRow of eligible) {
+        const point = pointMap.get(String(pgRow.qdrant_point_id)) ?? null;
 
         const parityRow = classifyParity(pgRow, point);
         classified.push(parityRow);
@@ -500,7 +516,7 @@ async function main() {
             for (const r of parityRow.reasons) console.log(`       ${r}`);
             break;
         }
-      }));
+      }
 
       process.stdout.write(`\r  Audited: ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length} ...`);
     }
