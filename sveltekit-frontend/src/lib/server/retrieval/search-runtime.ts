@@ -83,7 +83,7 @@ export interface Candidate {
   summary: string;
   content: string;
   score: number;
-  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema' | 'rg_keyword';
+  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema';
 }
 
 /**
@@ -256,7 +256,7 @@ export class SearchRuntime {
     // Group by source and get ranking within each
     const sourceRanks = new Map<string, Map<string, number>>();
 
-    const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema'] as const;
+    const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema', 'rg_keyword'] as const;
     for (const source of sources) {
       const sourceCards = candidates.filter(c => c.scoreSource === source);
       sourceCards.sort((a, b) => b.score - a.score || a.packetKey.localeCompare(b.packetKey));
@@ -337,11 +337,11 @@ export class SearchRuntime {
   /**
    * Helper: Extract which sources contributed to the final candidate set
    */
-  private getRetrievalSources(candidates: Candidate[]): Array<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree'> {
-    const sources = new Set<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree'>();
+  private getRetrievalSources(candidates: Candidate[]): Array<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'> {
+    const sources = new Set<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>();
     for (const c of candidates) {
       if (c.scoreSource !== 'schema') {
-        sources.add(c.scoreSource as 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree');
+        sources.add(c.scoreSource as 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword');
       }
     }
     return Array.from(sources);
