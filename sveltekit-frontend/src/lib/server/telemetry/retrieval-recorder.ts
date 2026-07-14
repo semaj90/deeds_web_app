@@ -105,7 +105,7 @@ function getConceptIdForFeatureOrPacket(id: string): string {
   if (clean.includes('topology') || clean.includes('cluster') || clean.includes('som')) {
     return 'emergent_topology';
   }
-  return 'general_abstractions';
+  return 'general';
 }
 
 /**

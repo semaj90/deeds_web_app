@@ -139,14 +139,20 @@ describe('Promotion Enrichment Service', () => {
 
   it('domain classification works correctly', () => {
     const authEnvelope = createTestEnvelope({
+      source_ref: 'src/lib/server/auth/session.ts',
+      feature_id: 'auth.sessions',
       summary: 'Handles user authentication and JWT token validation.',
     });
 
     const uiEnvelope = createTestEnvelope({
+      source_ref: 'src/lib/components/ui/Button.svelte',
+      feature_id: 'ui.button',
       summary: 'React component for rendering a button with custom styling.',
     });
 
     const dbEnvelope = createTestEnvelope({
+      source_ref: 'src/lib/server/db/migrations/001_user_table.sql',
+      feature_id: 'database.user_table',
       summary: 'Database migration script for user table schema updates.',
     });
 
@@ -155,8 +161,11 @@ describe('Promotion Enrichment Service', () => {
     const dbEnriched = enrichPacketSemantics(dbEnvelope);
 
     expect(authEnriched._enrichment.domainClass).toBe('auth');
+    expect(authEnriched._enrichment.domainClassification?.primary_domain).toBe('auth');
     expect(uiEnriched._enrichment.domainClass).toBe('ui');
+    expect(uiEnriched._enrichment.domainClassification?.primary_domain).toBe('ui');
     expect(dbEnriched._enrichment.domainClass).toBe('database');
+    expect(dbEnriched._enrichment.domainClassification?.primary_domain).toBe('database');
   });
 
   // ── Test 7: Enrichment Validation Gates ────────────────────
@@ -215,6 +224,7 @@ describe('Promotion Enrichment Service', () => {
     expect(writeData.domain_class).toBeDefined();
     expect(writeData.title_id).toBeDefined();
     expect(writeData.title_generator_version).toBe(PROMOTION_TITLE_GENERATOR_VERSION);
+    expect(writeData.classifier_version).toBeDefined();
   });
 
   // ── Test 10: Title ID Format Validation ────────────────────

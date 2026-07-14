@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-14T03:05:26.026Z",
+  "generatedAt": "2026-07-14T16:12:53.495Z",
   "mode": "dry-run",
   "stats": {
     "atlas_packets": {
-      "missing": 8653,
+      "missing": 0,
       "updated": 0
     },
     "nes_chrom_packets": {
@@ -11,14 +11,20 @@
       "updated": 0
     },
     "glyph_records": {
-      "missing": 14515,
+      "missing": 0,
       "updated": 0
     },
     "codebase_chunk_index": {
-      "missing": 40754,
+      "missing": 0,
       "updated": 0
     }
   },
-  "totalMissing": 63922,
+  "skippedTables": [
+    "nes_chrom_packets",
+    "nes_chrom_packets",
+    "glyph_records",
+    "codebase_chunk_index"
+  ],
+  "totalMissing": 0,
   "totalUpdated": 0
 }

@@ -1,6 +1,6 @@
 # Parent Atlas Workstation Status
 
-Generated: 2026-06-29T00:47:37.534Z
+Generated: 2026-07-14T16:12:52.044Z
 
 ## Boundary
 
@@ -17,7 +17,7 @@ Legal-app runtime stores are mirrors/caches, not truth.
 
 | Lane | Status |
 |---|---|
-| canonical_spine | READY |
+| canonical_spine | NEEDS_REBUILD |
 | summaries | STARTED |
 | summary_layers | STARTED |
 | mirrors | READY_FOR_MIRROR_REFRESH |
@@ -26,25 +26,25 @@ Legal-app runtime stores are mirrors/caches, not truth.
 
 | Table | Rows |
 |---|---:|
-| atlas_packets | 58304 |
-| atlas_packet_registry | 58304 |
-| atlas_summary_layers | 336 |
+| atlas_packets | 58365 |
+| atlas_packet_registry | 58324 |
+| atlas_summary_layers | 18423 |
 | atlas_artifacts | 58312 |
-| codebase_chunk_index | 40754 |
+| codebase_chunk_index | 52417 |
 | parent_atlas_documents | missing |
-| atlas_feature_envelopes | missing |
-| atlas_retrieval_eval_times | missing |
+| atlas_feature_envelopes | 58365 |
+| atlas_retrieval_eval_times | 25 |
 | atlas_provenance_tree | missing |
 
 ## Metrics
 
 | Metric | Value |
 |---|---:|
-| packet_summaries | 337 |
-| summary_layers_populated | 336 |
-| json_shaped_packet_summaries | 0 |
-| json_shaped_summary_layers | 0 |
-| missing_packet_registry_rows | 0 |
+| packet_summaries | 6883 |
+| summary_layers_populated | 7640 |
+| json_shaped_packet_summaries | 17 |
+| json_shaped_summary_layers | 17 |
+| missing_packet_registry_rows | 41 |
 
 ## Next Commands
 

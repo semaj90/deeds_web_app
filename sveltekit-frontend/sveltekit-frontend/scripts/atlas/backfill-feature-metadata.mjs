@@ -41,8 +41,41 @@ async function backfillMetadata() {
     'glyph_records': { missing: 0, updated: 0 },
     'codebase_chunk_index': { missing: 0, updated: 0 },
   };
+  const skippedTables = [];
 
   try {
+    const tableExists = async (tableName) => {
+      const result = await pool.query(
+        `SELECT to_regclass($1) IS NOT NULL AS exists`,
+        [tableName],
+      );
+      return Boolean(result.rows[0]?.exists);
+    };
+
+    const tableHasColumn = async (tableName, columnName) => {
+      const result = await pool.query(
+        `
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND table_name = $1
+            AND column_name = $2
+          LIMIT 1
+        `,
+        [tableName, columnName],
+      );
+      return result.rowCount > 0;
+    };
+
+    const availableTables = new Set();
+    for (const tableName of Object.keys(stats)) {
+      if (await tableExists(tableName)) {
+        availableTables.add(tableName);
+      } else {
+        skippedTables.push(tableName);
+      }
+    }
+
     // 1. atlas_packets: backfill source_ref from packet_key
     console.log('1. atlas_packets: backfill source_ref...');
     const apResult = await pool.query(`
@@ -68,78 +101,93 @@ async function backfillMetadata() {
 
     // 2. nes_chrom_packets: backfill feature_id
     console.log('2. nes_chrom_packets: backfill feature_id...');
-    const ncResult = await pool.query(`
-      SELECT COUNT(*) as count FROM nes_chrom_packets WHERE feature_id IS NULL OR feature_id = ''
-    `);
-    const ncMissing = parseInt(ncResult.rows[0].count);
-    stats['nes_chrom_packets'].missing = ncMissing;
+    if (availableTables.has('nes_chrom_packets') && await tableHasColumn('nes_chrom_packets', 'feature_id')) {
+      const ncResult = await pool.query(`
+        SELECT COUNT(*) as count FROM nes_chrom_packets WHERE feature_id IS NULL OR feature_id = ''
+      `);
+      const ncMissing = parseInt(ncResult.rows[0].count);
+      stats['nes_chrom_packets'].missing = ncMissing;
 
-    if (ncMissing > 0) {
-      if (APPLY) {
-        // Use first available source: feature_id field, ndb_id, or placeholder
-        await pool.query(`
-          UPDATE nes_chrom_packets
-          SET feature_id = COALESCE(
-            (metadata->>'feature_id'),
-            'feature:' || SUBSTR(MD5(id::text), 1, 8)
-          )
-          WHERE feature_id IS NULL OR feature_id = ''
-        `);
-        stats['nes_chrom_packets'].updated = ncMissing;
-        console.log(`  ✅ Updated ${ncMissing} rows`);
-      } else {
-        console.log(`  📊 ${ncMissing} rows need feature_id backfill`);
+      if (ncMissing > 0) {
+        if (APPLY) {
+          // Use first available source: feature_id field, ndb_id, or placeholder
+          await pool.query(`
+            UPDATE nes_chrom_packets
+            SET feature_id = COALESCE(
+              (metadata->>'feature_id'),
+              'feature:' || SUBSTR(MD5(id::text), 1, 8)
+            )
+            WHERE feature_id IS NULL OR feature_id = ''
+          `);
+          stats['nes_chrom_packets'].updated = ncMissing;
+          console.log(`  ✅ Updated ${ncMissing} rows`);
+        } else {
+          console.log(`  📊 ${ncMissing} rows need feature_id backfill`);
+        }
       }
+    } else {
+      console.log('  ⚠️  skipped: nes_chrom_packets table is not present or has no feature_id column');
+      skippedTables.push('nes_chrom_packets');
     }
 
     // 3. glyph_records: backfill feature_id
     console.log('3. glyph_records: backfill feature_id...');
-    const grResult = await pool.query(`
-      SELECT COUNT(*) as count FROM glyph_records WHERE feature_id IS NULL OR feature_id = ''
-    `);
-    const grMissing = parseInt(grResult.rows[0].count);
-    stats['glyph_records'].missing = grMissing;
+    if (availableTables.has('glyph_records') && await tableHasColumn('glyph_records', 'feature_id')) {
+      const grResult = await pool.query(`
+        SELECT COUNT(*) as count FROM glyph_records WHERE feature_id IS NULL OR feature_id = ''
+      `);
+      const grMissing = parseInt(grResult.rows[0].count);
+      stats['glyph_records'].missing = grMissing;
 
-    if (grMissing > 0) {
-      if (APPLY) {
-        await pool.query(`
-          UPDATE glyph_records
-          SET feature_id = COALESCE(
-            id::text,
-            'glyph:' || SUBSTR(MD5(id::text), 1, 8)
-          )
-          WHERE feature_id IS NULL OR feature_id = ''
-        `);
-        stats['glyph_records'].updated = grMissing;
-        console.log(`  ✅ Updated ${grMissing} rows`);
-      } else {
-        console.log(`  📊 ${grMissing} rows need feature_id backfill`);
+      if (grMissing > 0) {
+        if (APPLY) {
+          await pool.query(`
+            UPDATE glyph_records
+            SET feature_id = COALESCE(
+              id::text,
+              'glyph:' || SUBSTR(MD5(id::text), 1, 8)
+            )
+            WHERE feature_id IS NULL OR feature_id = ''
+          `);
+          stats['glyph_records'].updated = grMissing;
+          console.log(`  ✅ Updated ${grMissing} rows`);
+        } else {
+          console.log(`  📊 ${grMissing} rows need feature_id backfill`);
+        }
       }
+    } else {
+      console.log('  ⚠️  skipped: glyph_records table is not present or has no feature_id column');
+      skippedTables.push('glyph_records');
     }
 
     // 4. codebase_chunk_index: backfill feature_id
     console.log('4. codebase_chunk_index: backfill feature_id...');
-    const ccResult = await pool.query(`
-      SELECT COUNT(*) as count FROM codebase_chunk_index WHERE feature_id IS NULL OR feature_id = ''
-    `);
-    const ccMissing = parseInt(ccResult.rows[0].count);
-    stats['codebase_chunk_index'].missing = ccMissing;
+    if (availableTables.has('codebase_chunk_index') && await tableHasColumn('codebase_chunk_index', 'feature_id')) {
+      const ccResult = await pool.query(`
+        SELECT COUNT(*) as count FROM codebase_chunk_index WHERE feature_id IS NULL OR feature_id = ''
+      `);
+      const ccMissing = parseInt(ccResult.rows[0].count);
+      stats['codebase_chunk_index'].missing = ccMissing;
 
-    if (ccMissing > 0) {
-      if (APPLY) {
-        await pool.query(`
-          UPDATE codebase_chunk_index
-          SET feature_id = COALESCE(
-            file_id,
-            'chunk:' || SUBSTR(MD5(id::text), 1, 8)
-          )
-          WHERE feature_id IS NULL OR feature_id = ''
-        `);
-        stats['codebase_chunk_index'].updated = ccMissing;
-        console.log(`  ✅ Updated ${ccMissing} rows`);
-      } else {
-        console.log(`  📊 ${ccMissing} rows need feature_id backfill`);
+      if (ccMissing > 0) {
+        if (APPLY) {
+          await pool.query(`
+            UPDATE codebase_chunk_index
+            SET feature_id = COALESCE(
+              file_id,
+              'chunk:' || SUBSTR(MD5(id::text), 1, 8)
+            )
+            WHERE feature_id IS NULL OR feature_id = ''
+          `);
+          stats['codebase_chunk_index'].updated = ccMissing;
+          console.log(`  ✅ Updated ${ccMissing} rows`);
+        } else {
+          console.log(`  📊 ${ccMissing} rows need feature_id backfill`);
+        }
       }
+    } else {
+      console.log('  ⚠️  skipped: codebase_chunk_index table is not present or has no feature_id column');
+      skippedTables.push('codebase_chunk_index');
     }
 
     // Summary
@@ -165,6 +213,7 @@ async function backfillMetadata() {
       generatedAt: new Date().toISOString(),
       mode: DRY_RUN ? 'dry-run' : 'apply',
       stats,
+      skippedTables,
       totalMissing: Object.values(stats).reduce((sum, s) => sum + s.missing, 0),
       totalUpdated: Object.values(stats).reduce((sum, s) => sum + s.updated, 0),
     }, null, 2));

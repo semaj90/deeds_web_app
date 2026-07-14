@@ -37,7 +37,7 @@ function classifyPacket(sourceRef: string): { domain_labels: any[]; primary_doma
       { name: 'search', weight: 0.80 },
       { name: 'rerank', weight: 0.90 },
     ],
-    frontend: [
+    ui: [
       { name: '.svelte', weight: 0.95 },
       { name: 'component', weight: 0.85 },
       { name: 'page', weight: 0.80 },
@@ -49,30 +49,28 @@ function classifyPacket(sourceRef: string): { domain_labels: any[]; primary_doma
       { name: 'migration', weight: 0.95 },
       { name: 'drizzle', weight: 0.90 },
     ],
-    authentication: [
+    auth: [
       { name: 'auth', weight: 0.90 },
       { name: 'lucia', weight: 0.95 },
       { name: 'session', weight: 0.85 },
       { name: 'password', weight: 0.90 },
     ],
-    api: [
+    network: [
       { name: '/api/', weight: 0.95 },
       { name: '+server.ts', weight: 0.90 },
       { name: 'handler', weight: 0.80 },
       { name: 'endpoint', weight: 0.80 },
     ],
-    gpu: [
+    ml: [
       { name: '/gpu/', weight: 0.95 },
       { name: 'cuda', weight: 0.95 },
       { name: 'tensor', weight: 0.90 },
       { name: 'kernel', weight: 0.90 },
-    ],
-    embedding: [
       { name: 'embed', weight: 0.90 },
       { name: 'embedding', weight: 0.90 },
       { name: 'ollama', weight: 0.85 },
     ],
-    rag: [
+    retrieval: [
       { name: 'rag', weight: 0.90 },
       { name: 'retrieval', weight: 0.80 },
       { name: 'context', weight: 0.75 },
@@ -106,7 +104,7 @@ function classifyPacket(sourceRef: string): { domain_labels: any[]; primary_doma
     }))
     .sort((a, b) => b.score - a.score);
 
-  const primary = labels[0] || { name: 'unknown', score: 0.0 };
+  const primary = labels[0] || { name: 'general', score: 0.15 };
 
   return {
     domain_labels: labels,

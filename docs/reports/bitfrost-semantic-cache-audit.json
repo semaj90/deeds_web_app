@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T07:16:08.202Z",
+  "generatedAt": "2026-07-14T16:13:26.136Z",
   "status": "PASS",
   "redis": {
     "container": "legal-ai-valkey",
@@ -8,8 +8,8 @@
   "summary": {
     "gpuKarpathyScores": 0,
     "gpuKarpathyEncoded": 0,
-    "bifrostKeys": 50,
-    "centroidKeys": 0,
+    "bifrostKeys": 140,
+    "centroidKeys": 66,
     "somKeys": 0
   },
   "patterns": [
@@ -34,38 +34,38 @@
     {
       "key": "bifrost:*",
       "pattern": "bifrost:*",
-      "count": 50,
+      "count": 140,
       "sample": [
-        "bifrost:sem:packet:packet:000e4d5a58e7",
-        "bifrost:sem:packet:packet:0003ab694534",
-        "bifrost:sem:feature:.python311.bq300-8rv",
-        "bifrost:sem:packet:packet:0003850e84ca",
-        "bifrost:sem:packet:packet:0006ca4a45e3"
+        "bifrost:summary:summary:69a4728a49940ebe",
+        "bifrost:summary:summary:f4b2a3dc8df030f8",
+        "bifrost:summary:summary:1fe26c21f0cfda8a",
+        "bifrost:summary:summary:372601efabd34eab",
+        "bifrost:sem:feature:sveltekit-frontend.prefilter.types"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:sem:packet:packet:000e4d5a58e7",
-          "ttl": 63076,
+          "key": "bifrost:summary:summary:69a4728a49940ebe",
+          "ttl": 532650,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0003ab694534",
-          "ttl": 63049,
+          "key": "bifrost:summary:summary:f4b2a3dc8df030f8",
+          "ttl": 532651,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:.python311.bq300-8rv",
-          "ttl": 63083,
+          "key": "bifrost:summary:summary:1fe26c21f0cfda8a",
+          "ttl": 532670,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0003850e84ca",
-          "ttl": 63047,
+          "key": "bifrost:summary:summary:372601efabd34eab",
+          "ttl": 532670,
           "ok": true
         },
         {
-          "key": "bifrost:sem:packet:packet:0006ca4a45e3",
-          "ttl": 63059,
+          "key": "bifrost:sem:feature:sveltekit-frontend.prefilter.types",
+          "ttl": 532662,
           "ok": true
         }
       ],
@@ -75,9 +75,41 @@
     {
       "key": "centroid:*",
       "pattern": "centroid:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 66,
+      "sample": [
+        "centroid:kmeans:31",
+        "centroid:kmeans:1",
+        "centroid:kmeans:25",
+        "centroid:kmeans:33",
+        "centroid:kmeans:41"
+      ],
+      "ttlSamples": [
+        {
+          "key": "centroid:kmeans:31",
+          "ttl": 42675,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:1",
+          "ttl": 42675,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:25",
+          "ttl": 42675,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:33",
+          "ttl": 42675,
+          "ok": true
+        },
+        {
+          "key": "centroid:kmeans:41",
+          "ttl": 42675,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },
@@ -93,79 +125,47 @@
     {
       "key": "bifrost:sem:packet:*",
       "pattern": "bifrost:sem:packet:*",
-      "count": 25,
-      "sample": [
-        "bifrost:sem:packet:packet:000e4d5a58e7",
-        "bifrost:sem:packet:packet:0003ab694534",
-        "bifrost:sem:packet:packet:0003850e84ca",
-        "bifrost:sem:packet:packet:0006ca4a45e3",
-        "bifrost:sem:packet:packet:0011712c94d1"
-      ],
-      "ttlSamples": [
-        {
-          "key": "bifrost:sem:packet:packet:000e4d5a58e7",
-          "ttl": 63074,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0003ab694534",
-          "ttl": 63048,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0003850e84ca",
-          "ttl": 63045,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0006ca4a45e3",
-          "ttl": 63058,
-          "ok": true
-        },
-        {
-          "key": "bifrost:sem:packet:packet:0011712c94d1",
-          "ttl": 63089,
-          "ok": true
-        }
-      ],
+      "count": 0,
+      "sample": [],
+      "ttlSamples": [],
       "ok": true,
       "error": null
     },
     {
       "key": "bifrost:sem:feature:*",
       "pattern": "bifrost:sem:feature:*",
-      "count": 25,
+      "count": 40,
       "sample": [
-        "bifrost:sem:feature:.python311.bq300-8rv",
-        "bifrost:sem:feature:sveltekit-frontend.+server",
-        "bifrost:sem:feature:sveltekit-frontend.sprint5-6-monitoring.spec",
-        "bifrost:sem:feature:scripts.generate-concept-temperature-report",
-        "bifrost:sem:feature:sveltekit-frontend.launch-2026-06-25T22-12-53-881Z"
+        "bifrost:sem:feature:sveltekit-frontend.prefilter.types",
+        "bifrost:sem:feature:sveltekit-frontend.relationship_map",
+        "bifrost:sem:feature:llama-cpp-turboquant-gemma4.fattn-vec-instance-q4_0-f16",
+        "bifrost:sem:feature:sveltekit-frontend.graph_nodes",
+        "bifrost:sem:feature:sveltekit-frontend.20260601_research_summaries_source_refs_backfill"
       ],
       "ttlSamples": [
         {
-          "key": "bifrost:sem:feature:.python311.bq300-8rv",
-          "ttl": 63080,
+          "key": "bifrost:sem:feature:sveltekit-frontend.prefilter.types",
+          "ttl": 532661,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:sveltekit-frontend.+server",
-          "ttl": 63082,
+          "key": "bifrost:sem:feature:sveltekit-frontend.relationship_map",
+          "ttl": 532673,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:sveltekit-frontend.sprint5-6-monitoring.spec",
-          "ttl": 63054,
+          "key": "bifrost:sem:feature:llama-cpp-turboquant-gemma4.fattn-vec-instance-q4_0-f16",
+          "ttl": 532660,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:scripts.generate-concept-temperature-report",
-          "ttl": 63085,
+          "key": "bifrost:sem:feature:sveltekit-frontend.graph_nodes",
+          "ttl": 532677,
           "ok": true
         },
         {
-          "key": "bifrost:sem:feature:sveltekit-frontend.launch-2026-06-25T22-12-53-881Z",
-          "ttl": 63056,
+          "key": "bifrost:sem:feature:sveltekit-frontend.20260601_research_summaries_source_refs_backfill",
+          "ttl": 532675,
           "ok": true
         }
       ],
@@ -202,9 +202,41 @@
     {
       "key": "ace:summary:*",
       "pattern": "ace:summary:*",
-      "count": 0,
-      "sample": [],
-      "ttlSamples": [],
+      "count": 100,
+      "sample": [
+        "ace:summary:summary:3ffcb2db93a1b932",
+        "ace:summary:summary:b948ec52fe38a0c2",
+        "ace:summary:summary:29f9da7e53884e0d",
+        "ace:summary:summary:84ad0b303222653b",
+        "ace:summary:summary:342a13fc935ff793"
+      ],
+      "ttlSamples": [
+        {
+          "key": "ace:summary:summary:3ffcb2db93a1b932",
+          "ttl": 532649,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:summary:b948ec52fe38a0c2",
+          "ttl": 532672,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:summary:29f9da7e53884e0d",
+          "ttl": 532660,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:summary:84ad0b303222653b",
+          "ttl": 532669,
+          "ok": true
+        },
+        {
+          "key": "ace:summary:summary:342a13fc935ff793",
+          "ttl": 532643,
+          "ok": true
+        }
+      ],
       "ok": true,
       "error": null
     },

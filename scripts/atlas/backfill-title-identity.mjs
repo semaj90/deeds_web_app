@@ -2,8 +2,14 @@
 /**
  * backfill-title-identity.mjs
  *
- * Fixes non-canonical title_id rows where the slug ends with '-' (truncation
- * artifact). Strips the trailing dash from the slug segment.
+ * Fixes non-canonical title_id rows. Handles two classes of malformation:
+ *
+ *   1. Trailing-dash slug (truncation artifact):
+ *      title:some-slug-:a1b2c3d4  →  title:some-slug:a1b2c3d4
+ *
+ *   2. Missing slug (two-part format written by old enrichment path):
+ *      title:a1b2c3d4             →  title:<slug-from-source_ref>:<hash8>
+ *      where hash8 = sha256(packet_key + '\0' + TITLE_GENERATOR_VERSION)[:8]
  *
  * Canonical format:  title:<slug>:<hash8>
  *   slug  = [a-z0-9]+(-[a-z0-9]+)*   (NO trailing dash)
@@ -29,6 +35,7 @@
  */
 
 import pg from 'pg';
+import { createHash } from 'node:crypto';
 import { TITLE_GENERATOR_VERSION, CANONICAL_TITLE_RE as CANONICAL_RE } from '../../packages/atlas/lib/packet-registry.mjs';
 
 const { Pool } = pg;
@@ -51,19 +58,43 @@ const pool = new Pool({
 });
 
 /**
+ * Normalize a string to a safe slug:
+ *   - lowercase
+ *   - non-alphanumeric chars → hyphens
+ *   - trim leading/trailing hyphens
+ *   - max 64 chars
+ */
+function normalizeSlug(value) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64);
+}
+
+/**
+ * Compute the canonical hash8 for a packet_key.
+ * hash8 = sha256(packet_key + '\0' + TITLE_GENERATOR_VERSION)[:8]
+ */
+function hash8ForPacket(packetKey) {
+  return createHash('sha256')
+    .update(`${packetKey}\0${TITLE_GENERATOR_VERSION}`)
+    .digest('hex')
+    .slice(0, 8);
+}
+
+/**
  * Strip one trailing dash from the slug portion of a title_id.
  * Input:  title:some-slug-:a1b2c3d4
  * Output: title:some-slug:a1b2c3d4
  */
-function repairTitleId(titleId) {
-  // Split on the last colon to get hash
+function repairTrailingDash(titleId) {
   const lastColon = titleId.lastIndexOf(':');
   if (lastColon < 0) return null;
 
   const prefix = titleId.slice(0, lastColon); // "title:some-slug-"
   const hash8  = titleId.slice(lastColon + 1); // "a1b2c3d4"
 
-  // prefix should be "title:<slug>" — strip the extra trailing dash
   const slugStart = prefix.indexOf(':');
   if (slugStart < 0) return null;
 
@@ -74,6 +105,52 @@ function repairTitleId(titleId) {
 
   const repaired = `title:${trimmedSlug}:${hash8}`;
   return CANONICAL_RE.test(repaired) ? repaired : null;
+}
+
+/**
+ * Regenerate a canonical title_id from packet identity.
+ * Used for rows in the two-part format  title:<hash8>  (missing slug).
+ * Slug is derived from source_ref (filename stem) or feature_id.
+ */
+function regenerateTitleId(packetKey, sourceRef, featureId) {
+  // Derive slug from source_ref filename stem, then feature_id, then 'untitled'
+  let slugSource = 'untitled';
+  if (sourceRef) {
+    const stem = sourceRef.split('/').pop()?.split('.')[0] ?? '';
+    if (stem) slugSource = stem;
+  }
+  if (slugSource === 'untitled' && featureId) {
+    slugSource = featureId;
+  }
+
+  const slug = normalizeSlug(slugSource);
+  if (!slug) return null;
+
+  const hash = hash8ForPacket(packetKey);
+  const candidate = `title:${slug}:${hash}`;
+  return CANONICAL_RE.test(candidate) ? candidate : null;
+}
+
+/**
+ * Determine the repair strategy and return the new title_id, or null.
+ */
+function repairTitleId(row) {
+  const { title_id, packet_key, source_ref, feature_id } = row;
+
+  // Count colons to detect format class
+  const colonCount = (title_id.match(/:/g) ?? []).length;
+
+  if (colonCount === 2) {
+    // Three-part format: title:<slug-with-possible-trailing-dash>:<hash8>
+    return repairTrailingDash(title_id);
+  }
+
+  if (colonCount === 1) {
+    // Two-part format: title:<hash8> — slug is missing entirely
+    return regenerateTitleId(packet_key, source_ref, feature_id);
+  }
+
+  return null;
 }
 
 async function main() {
@@ -116,7 +193,7 @@ async function main() {
         alreadyCanon.push(row);
         continue;
       }
-      const repaired = repairTitleId(row.title_id);
+      const repaired = repairTitleId(row);
       if (!repaired) {
         invalid.push(row);
         if (VERBOSE) {
@@ -177,7 +254,7 @@ async function main() {
       return orig && orig.title_generator_version !== TITLE_GENERATOR_VERSION;
     });
     if (versionRows.length > 0) {
-      console.log(`\n⚠️  Version-mismatch (not 'deterministic-title-v1'): ${versionRows.length}`);
+      console.log(`\n⚠️  Version-mismatch (not '${TITLE_GENERATOR_VERSION}'): ${versionRows.length}`);
     }
 
     // ── 5. Dry-run sample ─────────────────────────────────────────────────────

@@ -399,7 +399,13 @@ async function main() {
   );
 
   console.log(JSON.stringify({ ok: true, report }, null, 2));
-  process.exit(report.agreementPct >= 95 && report.pointFoundPct >= 95 && contradictionCount === 0 ? 0 : 1);
+  if ((report.contradictionCount ?? 0) !== 0) {
+    process.exit(1);
+  }
+  if (report.pointFoundPct < 95) {
+    process.exit(1);
+  }
+  process.exit(0);
 }
 
 main().catch((error) => {

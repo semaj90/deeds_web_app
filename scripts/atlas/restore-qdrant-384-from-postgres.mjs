@@ -3,10 +3,10 @@
 /**
  * RESTORE QDRANT 384-DIM FROM POSTGRES CANONICAL
  *
- * Restores codebase_chunks_384 Qdrant collection from Postgres pgvector.
+ * Restores codebase_chunks_384 Qdrant collection from Postgres canonical packets.
  * Read-only from Postgres, upserts into Qdrant.
  *
- * Only processes rows where content_embedding_384 IS NOT NULL.
+ * Only processes rows where atlas_packets.content_embedding_384 IS NOT NULL.
  *
  * Usage:
  *   node scripts/atlas/restore-qdrant-384-from-postgres.mjs [--dry-run]
@@ -63,6 +63,18 @@ console.log(`Collection: ${COLLECTION_NAME}`);
 console.log(`Batch size: ${batchSize}`);
 console.log(`Limit: ${limit > 0 ? limit : 'none (full)'}\n`);
 
+function parsePgVector(value) {
+  if (Array.isArray(value)) return value.map(Number).filter(Number.isFinite);
+  const text = String(value ?? '').trim();
+  if (!text) return [];
+  return text
+    .replace(/^\[/, '')
+    .replace(/\]$/, '')
+    .split(',')
+    .map((item) => Number.parseFloat(item.trim()))
+    .filter(Number.isFinite);
+}
+
 // ── Step 1: Count eligible rows in Postgres ────────────────────────────
 console.log('Step 1: Counting eligible rows in Postgres...');
 
@@ -70,7 +82,7 @@ let eligibleCount = 0;
 try {
   const countRes = await pool.query(`
     SELECT COUNT(*) as cnt
-    FROM codebase_chunk_index
+    FROM atlas_packets
     WHERE content_embedding_384 IS NOT NULL
   `);
   eligibleCount = parseInt(countRes.rows[0].cnt);
@@ -150,21 +162,17 @@ try {
     // Fetch rows from Postgres
     const rows = await pool.query(`
       SELECT
-        id,
-        relative_path,
+        packet_id,
         packet_key,
         source_ref,
-        source_id,
         feature_id,
-        chunk_hash,
-        summary_hash,
         som_cluster,
         kmeans_cluster,
-        ontology_tags,
+        payload,
         content_embedding_384,
-        summary_embedding_384,
+        summary,
         updated_at
-      FROM codebase_chunk_index
+      FROM atlas_packets
       WHERE content_embedding_384 IS NOT NULL
       ORDER BY updated_at DESC
       LIMIT $1 OFFSET $2
@@ -176,23 +184,19 @@ try {
     }
 
     // Convert to Qdrant format
-    const points = rows.rows.map((row, idx) => ({
-      id: (offset + idx + 1), // Use numeric ID
+    const points = rows.rows.map((row) => ({
+      id: row.packet_id,
       vector: {
-        content: row.content_embedding_384,
-        summary: row.summary_embedding_384 || row.content_embedding_384 // Fallback to content if summary missing
+        content: parsePgVector(row.content_embedding_384),
+        summary: parsePgVector(row.content_embedding_384)
       },
       payload: {
-        relative_path: row.relative_path,
         packet_key: row.packet_key,
         source_ref: row.source_ref,
-        source_id: row.source_id,
         feature_id: row.feature_id,
-        chunk_hash: row.chunk_hash,
-        summary_hash: row.summary_hash,
         som_cluster: row.som_cluster,
         kmeans_cluster: row.kmeans_cluster,
-        ontology_tags: row.ontology_tags || [],
+        summary: row.summary || null,
         updated_at: row.updated_at?.toISOString()
       }
     }));

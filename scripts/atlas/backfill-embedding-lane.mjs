@@ -216,7 +216,7 @@ async function writeEmbeddingBatch(rows, vectors) {
 /**
  * Verify addon availability at startup (informational only)
  */
-function verifyAddonStartup() {
+async function verifyAddonStartup() {
   console.log('🔍 Verifying native addon (simdjson + LibTorch)...');
   try {
     // Use createRequire for ESM context

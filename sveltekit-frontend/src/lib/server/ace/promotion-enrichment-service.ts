@@ -18,42 +18,15 @@
 
 import type { FeatureEnvelope } from './feature-envelope.js';
 import { generateTitleIdentity, TITLE_GENERATOR_VERSION as TITLE_GENERATOR_VERSION_IMPORTED } from './title-id-generator.js';
+import {
+  CANONICAL_DOMAINS,
+  classifyDomainTaxonomy,
+  DOMAIN_TAXONOMY_VERSION,
+  normalizeDomainLabel,
+} from '../atlas/domain-taxonomy.js';
 import type { PacketSemanticEnrichment } from './packet-io.js';
 
 export const TITLE_GENERATOR_VERSION = TITLE_GENERATOR_VERSION_IMPORTED;
-
-/**
- * Domain classifier (keyword-based, 10 domains)
- * Extracted from src/lib/server/classifier/domain-classifier.ts
- */
-function classifyDomain(text: string): string {
-  const domains: Record<string, string[]> = {
-    auth: ['auth', 'session', 'login', 'password', 'jwt', 'oauth', 'credential', 'verification'],
-    ui: ['component', 'button', 'form', 'input', 'render', 'display', 'visual', 'interface'],
-    retrieval: ['search', 'query', 'retrieve', 'find', 'index', 'lookup', 'match', 'result'],
-    network: ['http', 'request', 'response', 'api', 'endpoint', 'socket', 'connection', 'client'],
-    database: ['database', 'query', 'table', 'schema', 'migration', 'index', 'sql', 'orm'],
-    cache: ['cache', 'redis', 'memcache', 'ttl', 'expire', 'invalidate', 'store', 'retrieve'],
-    agent: ['agent', 'tool', 'action', 'orchestrate', 'dispatch', 'handler', 'processor', 'worker'],
-    graph: ['graph', 'node', 'edge', 'topology', 'relationship', 'path', 'traversal', 'neighbor'],
-    ml: ['model', 'tensor', 'vector', 'embedding', 'neural', 'inference', 'training', 'weight'],
-    general: [],
-  };
-
-  const lowerText = text.toLowerCase();
-  const scores: Record<string, number> = {};
-
-  for (const [domain, keywords] of Object.entries(domains)) {
-    scores[domain] = keywords.filter(kw => lowerText.includes(kw)).length;
-  }
-
-  const maxScore = Math.max(...Object.values(scores));
-  if (maxScore === 0) {
-    return 'general';
-  }
-
-  return Object.entries(scores).find(([_, score]) => score === maxScore)?.[0] || 'general';
-}
 
 /**
  * Enrichment validation gates
@@ -92,8 +65,14 @@ function validateEnrichment(
   }
 
   // Gate 4: Consistency gate
-  const validDomains = ['auth', 'ui', 'retrieval', 'network', 'database', 'cache', 'agent', 'graph', 'ml', 'general'];
-  if (enrichment.domainClass && !validDomains.includes(enrichment.domainClass)) {
+  const domainClass = String(enrichment.domainClass ?? '').trim();
+  const classification = enrichment.domainClassification;
+  const isFallbackGeneral =
+    domainClass === 'general' &&
+    classification?.primary_domain == null &&
+    classification?.fallback_label === 'general';
+
+  if (domainClass && !isFallbackGeneral && !CANONICAL_DOMAINS.includes(domainClass as (typeof CANONICAL_DOMAINS)[number])) {
     errors.push(`Gate 4: domain_class '${enrichment.domainClass}' not in valid set`);
   }
 
@@ -117,8 +96,20 @@ export function enrichPacketSemantics(envelope: FeatureEnvelope): FeatureEnvelop
   const enrichment: PacketSemanticEnrichment = {};
 
   // Domain classification
-  const textSource = envelope.summary || envelope.content || envelope.source_ref || '';
-  enrichment.domainClass = classifyDomain(textSource);
+  const classification = classifyDomainTaxonomy({
+    sourceRef: envelope.source_ref,
+    featureId: envelope.feature_id,
+    summary: envelope.summary,
+    title: envelope.feature_id,
+    symbol: envelope.ast?.symbol,
+    metadata: envelope.content ? [envelope.content] : [],
+  });
+  enrichment.domainClassification = classification;
+  enrichment.domainClass = classification.primary_domain ?? classification.fallback_label ?? 'general';
+  enrichment.domainClassSource = classification.primary_domain
+    ? normalizeDomainLabel(classification.primary_domain).normalization
+    : 'fallback';
+  enrichment.classifierVersion = DOMAIN_TAXONOMY_VERSION;
 
   // Title generation
   if (envelope.packet_key) {
@@ -174,6 +165,7 @@ export interface PacketAtlasWrite {
   semantic_slug: string;
   title_id: string;
   title_generator_version: string;
+  classifier_version?: string;
 }
 
 export function extractAtlasWriteData(enriched: ReturnType<typeof enrichPacketSemantics>): Partial<PacketAtlasWrite> {
@@ -183,5 +175,6 @@ export function extractAtlasWriteData(enriched: ReturnType<typeof enrichPacketSe
     semantic_slug: enriched._enrichment.semanticSlug,
     title_id: enriched._enrichment.titleId,
     title_generator_version: enriched._enrichment.titleGeneratorVersion,
+    classifier_version: enriched._enrichment.classifierVersion,
   };
 }

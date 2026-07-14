@@ -54,6 +54,7 @@
         "github.copilot.chat.skillTool.enabled": true,
         "editor.codeActions.triggerOnFocusChange": true,
         "chat.mcp.assisted.nuget.enabled": false,
-        "chat.tools.compressOutput.enabled": true
+        "chat.tools.compressOutput.enabled": true,
+        "chat.byokUtilityModelDefault": "mainAgent"
     }
 }

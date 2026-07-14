@@ -56,6 +56,11 @@ export {
   TITLE_GENERATOR_VERSION,
 } from './title-id-generator.js';
 export type { GeneratedTitle } from './title-id-generator.js';
+export type {
+  CanonicalDomain,
+  DomainClassification,
+  DomainEvidence,
+} from '../atlas/domain-taxonomy.js';
 
 /**
  * Semantic enrichment envelope
@@ -70,6 +75,9 @@ export interface PacketSemanticEnrichment {
   titleId?: string;
   titleGeneratorVersion?: string;
   domainClass?: string;
+  domainClassification?: import('../atlas/domain-taxonomy.js').DomainClassification;
+  domainClassSource?: import('../atlas/domain-taxonomy.js').NormalizedDomainLabel['normalization'];
+  classifierVersion?: string;
 }
 
 // ── Promotion Enrichment Service ──────────────────────────────────────────

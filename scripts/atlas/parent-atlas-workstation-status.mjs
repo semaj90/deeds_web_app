@@ -170,7 +170,7 @@ async function main() {
       metrics,
       status: statusFromCounts(tables, metrics),
       next_actions: [
-        'Continue bounded Gemma4 summary batches with atlas:workstation:summaries:100.',
+        'Promote already-generated Gemma4 chunk summaries into atlas_summary_layers with atlas:workstation:summaries:100.',
         'Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.',
         'Use atlas_summary_layers as the canonical envelope source for downstream feature extraction.',
       ],

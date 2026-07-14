@@ -94,7 +94,10 @@ export async function recordPromotionIntent(
           semantic_title: enriched._enrichment.semanticTitle,
           title_id: enriched._enrichment.titleId,
           title_generator_version: enriched._enrichment.titleGeneratorVersion,
+          classifier_version: enriched._enrichment.classifierVersion,
           domain_class: enriched._enrichment.domainClass,
+          domain_classification: enriched._enrichment.domainClassification,
+          domain_class_source: enriched._enrichment.domainClassSource,
           enrichment_valid: enriched._enrichmentValid,
         },
       });
@@ -114,6 +117,7 @@ export async function recordPromotionIntent(
             semantic_title: enriched._enrichment.semanticTitle,
             title_id: enriched._enrichment.titleId,
             domain_class: enriched._enrichment.domainClass,
+            classifier_version: enriched._enrichment.classifierVersion,
           },
         });
       }

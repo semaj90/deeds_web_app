@@ -40,7 +40,8 @@ const FEATURE_MAP = {
   'src/lib/server/db': 'database_orm',
   'src/lib/server/cache': 'infrastructure_config',
   'src/lib/server/vector': 'api_endpoints',
-  'src/lib/ai': 'general_abstractions',
+  // Fallback bucket only; do not treat as a terminal domain label.
+  'src/lib/ai': 'general',
   'src/routes': 'ui_components',
   'src/lib/components': 'ui_components',
   'src/lib/server/gpu': 'native_accelerators',

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-29T00:47:37.534Z",
+  "generated_at": "2026-07-14T16:12:52.044Z",
   "database": {
     "database": "legal_ai_db",
     "username": "legal_admin",
@@ -20,31 +20,31 @@
     "rule": "Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist."
   },
   "tables": {
-    "atlas_packets": 58304,
-    "atlas_packet_registry": 58304,
-    "atlas_summary_layers": 336,
+    "atlas_packets": 58365,
+    "atlas_packet_registry": 58324,
+    "atlas_summary_layers": 18423,
     "atlas_artifacts": 58312,
-    "codebase_chunk_index": 40754,
+    "codebase_chunk_index": 52417,
     "parent_atlas_documents": null,
-    "atlas_feature_envelopes": null,
-    "atlas_retrieval_eval_times": null,
+    "atlas_feature_envelopes": 58365,
+    "atlas_retrieval_eval_times": 25,
     "atlas_provenance_tree": null
   },
   "metrics": {
-    "packetSummaries": 337,
-    "summaryLayersPopulated": 336,
-    "jsonShapedPacketSummaries": 0,
-    "jsonShapedSummaryLayers": 0,
-    "missingPacketRegistryRows": 0
+    "packetSummaries": 6883,
+    "summaryLayersPopulated": 7640,
+    "jsonShapedPacketSummaries": 17,
+    "jsonShapedSummaryLayers": 17,
+    "missingPacketRegistryRows": 41
   },
   "status": {
-    "canonicalSpine": "READY",
+    "canonicalSpine": "NEEDS_REBUILD",
     "summaries": "STARTED",
     "summaryLayers": "STARTED",
     "mirrors": "READY_FOR_MIRROR_REFRESH"
   },
   "next_actions": [
-    "Continue bounded Gemma4 summary batches with atlas:workstation:summaries:100.",
+    "Promote already-generated Gemma4 chunk summaries into atlas_summary_layers with atlas:workstation:summaries:100.",
     "Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.",
     "Use atlas_summary_layers as the canonical envelope source for downstream feature extraction."
   ]

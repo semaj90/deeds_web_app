@@ -5,119 +5,57 @@
  * Audits atlas_packets rows against their corresponding Qdrant points and
  * generates bounded repair events for coverage debt.
  *
- * Identity model (three distinct keys, never conflated):
- *   packet_id       — Postgres relational PK (join key within this checkout)
- *   packet_key      — stable higher-level packet identity carried across services
- *   qdrant_point_id — physical Qdrant point ID
- *
- * Parity states:
- *   ok                       — point present, all identity fields match, named vectors present
- *   missing_point            — qdrant_point_id set but no point in Qdrant (coverage debt → WARN)
- *   stale_point              — payload fields drift from Postgres (coverage debt → WARN)
- *   incomplete_point         — missing required named vectors (coverage debt → WARN)
- *   projection_contradiction — wrong vector dimension or named-vector mismatch (→ FAIL)
- *   identity_contradiction   — packet_key/source_ref in Qdrant payload disagrees with Postgres (→ FAIL)
- *
- * Repair policy:
- *   coverage debt (missing/stale/incomplete) → auto-repair eligible (payload_repair only)
- *   identity contradiction                  → quarantine only, no auto-repair
- *   projection contradiction                → quarantine only, no auto-repair
- *   full_projection (missing point)         → outbox event only — never created directly here
- *
- * Payload repair guard (compare-before-write):
- *   Reject repair when Qdrant aggregate_version >= Postgres aggregate_version
- *   (Qdrant appears newer than the event being applied — skip, do not overwrite)
- *
- * Status policy (computed, never hardcoded):
- *   contradictions > 0 → FAIL  (exit 1)
- *   otherwise          → WARN or PASS (exit 0)
- *
- * Collection contracts (versioned, explicit):
- *   codebase_chunks_384  — canonical (new repairs target this)
- *   codebase_chunks_768  — legacy/read-only (audited but never repaired)
- *
- * Sampling:
- *   Precedence: --sample N > ATLAS_QDRANT_PARITY_SAMPLE env > npm_config_sample > default (50)
+ * Pure parity logic lives in qdrant-parity-contract.mjs (importable without
+ * live Postgres or Qdrant — used by unit tests and the provisioner).
  *
  * Usage:
- *   node scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_384 [--sample N] [--apply] [--verbose]
- *   node scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_384 --preflight
- *   npm run atlas:qdrant:repair -- --collection codebase_chunks_384 --sample 25
- *   npm run atlas:qdrant:repair:apply -- --collection codebase_chunks_384 --sample 25
+ *   node scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_384_v2 [--sample N] [--apply] [--verbose]
+ *   node scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_384_v2 --preflight
+ *   npm run atlas:qdrant:repair
+ *   npm run atlas:qdrant:repair:apply
+ *   npm run atlas:qdrant:repair:preflight
  */
 
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import pg from 'pg';
-import { createHash } from 'node:crypto';
+import {
+  COLLECTION_CONTRACTS,
+  resolveSample,
+  classifyParity,
+  buildCanonicalPayload,
+  generateRepairEvents,
+  computeOverallStatus,
+  outboxEventId,
+} from './qdrant-parity-contract.mjs';
 
 const { Pool } = pg;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '../..');
+const WORKSPACE = path.join(REPO_ROOT, 'sveltekit-frontend');
+const REPORT_PATH = path.join(WORKSPACE, 'docs', 'reports', 'qdrant-component-parity.json');
 
-// ── Collection contracts ──────────────────────────────────────────────────────
-
-/**
- * Versioned per-collection schema contracts.
- * namedVectors: { vectorName → expected dimension }
- * requiredVectors: must be present (absence → incomplete_point)
- * sparseVectors: BM42 sparse payload key
- * legacy: read-only; repairs are never applied to legacy collections
- */
-const COLLECTION_CONTRACTS = {
-  codebase_chunks_384: {
-    contractVersion:  'atlas-qdrant-384-v1',
-    legacy:           false,
-    namedVectors: {
-      content_384:   384,
-      summary_384:   384,
-      signature_384: 384,
-      latent64:       64,
-    },
-    requiredVectors: ['content_384', 'signature_384'],
-    sparseVectorKey: 'bm42_sparse',
-  },
-  codebase_chunks_768: {
-    contractVersion:  'atlas-qdrant-768-v0-legacy',
-    legacy:           true,
-    namedVectors: {
-      content:   768,
-      signature: 768,
-      error:     768,
-    },
-    requiredVectors: ['content', 'signature'],
-    sparseVectorKey: 'bm42_sparse',
-  },
-};
-
-// ── CLI / env resolution ──────────────────────────────────────────────────────
+// ── CLI flags ─────────────────────────────────────────────────────────────────
 
 const APPLY     = process.argv.includes('--apply');
 const VERBOSE   = process.argv.includes('--verbose');
 const PREFLIGHT = process.argv.includes('--preflight');
 
 function resolveCollection() {
-  const idx = process.argv.indexOf('--collection');
-  if (idx !== -1 && process.argv[idx + 1]) {
-    return process.argv[idx + 1];
+  const idx = process.argv.findIndex((arg) => arg === '--collection' || arg.startsWith('--collection='));
+  if (idx !== -1) {
+    const arg = process.argv[idx];
+    if (arg.includes('=')) return arg.split('=', 2)[1];
+    if (process.argv[idx + 1]) return process.argv[idx + 1];
   }
   return null;
 }
 
-function resolveSample() {
-  const argIdx = process.argv.indexOf('--sample');
-  if (argIdx !== -1 && process.argv[argIdx + 1]) {
-    return { value: parseInt(process.argv[argIdx + 1], 10), source: 'argument' };
-  }
-  if (process.env.ATLAS_QDRANT_PARITY_SAMPLE) {
-    return { value: parseInt(process.env.ATLAS_QDRANT_PARITY_SAMPLE, 10), source: 'environment' };
-  }
-  if (process.env.npm_config_sample) {
-    return { value: parseInt(process.env.npm_config_sample, 10), source: 'npm_config' };
-  }
-  return { value: 50, source: 'default' };
-}
-
-const collectionName  = resolveCollection();
-const sampleResolved  = resolveSample();
-const BATCH_SIZE      = 25;
-const QDRANT_URL      = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
+const collectionName = resolveCollection();
+const sampleResolved = resolveSample();
+const BATCH_SIZE     = 25;
+const QDRANT_URL     = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 
 const pool = new Pool({
   host:     process.env.DB_HOST     || '127.0.0.1',
@@ -128,69 +66,11 @@ const pool = new Pool({
   max: 3,
 });
 
-// ── Type definitions (JSDoc) ──────────────────────────────────────────────────
-
-/**
- * @typedef {'ok'|'missing_point'|'stale_point'|'incomplete_point'|
- *           'projection_contradiction'|'identity_contradiction'} ParityState
- */
-
-/**
- * @typedef {Object} QdrantParityRow
- * @property {string}       packet_id
- * @property {string}       packet_key
- * @property {string}       qdrant_point_id
- * @property {boolean}      point_present
- * @property {boolean|null} packet_key_matches
- * @property {boolean|null} source_ref_matches
- * @property {Record<string, boolean>} vector_presence   e.g. { content_384: true }
- * @property {boolean}      bm42_present
- * @property {string|null}  expected_updated_at
- * @property {string|null}  mirrored_updated_at
- * @property {ParityState}  state
- * @property {string[]}     reasons
- */
-
-/**
- * @typedef {Object} QdrantParityReport
- * @property {string}  collection
- * @property {string}  contract_version
- * @property {boolean} legacy_collection
- * @property {string}  status
- * @property {number}  sampled_packets
- * @property {number}  points_present
- * @property {number}  identity_matches
- * @property {number}  current_versions
- * @property {Record<string, number>} vector_counts  per named-vector presence count
- * @property {number}  bm42_present
- * @property {number}  missing_points
- * @property {number}  stale_points
- * @property {number}  incomplete_points
- * @property {number}  contradictions
- */
-
 // ── Preflight: collection schema validation ───────────────────────────────────
 
-/**
- * @typedef {Object} PreflightResult
- * @property {boolean}  passed
- * @property {string[]} errors
- * @property {string[]} warnings
- */
-
-/**
- * Validate that the Qdrant collection matches the registered contract.
- * Checks: collection exists, named-vector names, dimensions, distance metric,
- * BM42 sparse lane, payload indexes.
- * @param {string} name
- * @param {object} contract
- * @returns {Promise<PreflightResult>}
- */
 async function runPreflight(name, contract) {
-  /** @type {PreflightResult} */
   const result = { passed: true, errors: [], warnings: [] };
 
-  // 1. Collection exists?
   const infoRes = await fetch(`${QDRANT_URL}/collections/${name}`);
   if (!infoRes.ok) {
     result.errors.push(`collection "${name}" not found (HTTP ${infoRes.status})`);
@@ -199,9 +79,8 @@ async function runPreflight(name, contract) {
   }
   const info = await infoRes.json();
   const config = info?.result?.config ?? {};
-  const qdrantVectors = config.params?.vectors ?? {};  // named vectors map
+  const qdrantVectors = config.params?.vectors ?? {};
 
-  // 2. Named-vector names and dimensions
   for (const [vecName, expectedDim] of Object.entries(contract.namedVectors)) {
     const qdrantVec = qdrantVectors[vecName];
     if (!qdrantVec) {
@@ -216,25 +95,28 @@ async function runPreflight(name, contract) {
       );
       result.passed = false;
     }
+    const actualDistance = String(qdrantVec.distance ?? qdrantVec.metric ?? '').toLowerCase();
+    const expectedDistance = String(contract.distance ?? 'Cosine').toLowerCase();
+    if (actualDistance && actualDistance !== expectedDistance) {
+      result.errors.push(
+        `named vector "${vecName}" distance=${qdrantVec.distance ?? qdrantVec.metric}, contract expects ${contract.distance}`
+      );
+      result.passed = false;
+    }
   }
 
-  // 3. Sparse vector lane (BM42) — warn-only; absence is coverage debt not schema error
   const sparseVectors = config.params?.sparse_vectors ?? {};
   if (!sparseVectors[contract.sparseVectorKey ?? 'bm42_sparse']) {
-    result.warnings.push(`sparse vector "${contract.sparseVectorKey}" absent — BM42 lane not configured`);
+    result.errors.push(`sparse vector "${contract.sparseVectorKey}" absent — BM42 lane not configured`);
+    result.passed = false;
   }
 
-  // 4. Payload indexes — warn-only
-  const indexRes = await fetch(`${QDRANT_URL}/collections/${name}/index`).catch(() => null);
-  if (!indexRes || !indexRes.ok) {
-    result.warnings.push('could not retrieve payload index info');
-  } else {
-    const indexData = await indexRes.json();
-    const indexed = Object.keys(indexData?.result?.field_index_info ?? {});
-    for (const field of ['packet_key', 'source_ref', 'feature_id']) {
-      if (!indexed.includes(field)) {
-        result.warnings.push(`payload field "${field}" has no index`);
-      }
+  const payloadSchema = info?.result?.payload_schema ?? {};
+  const indexed = Object.keys(payloadSchema);
+  for (const field of ['packet_key', 'source_ref', 'feature_id', 'domain_class', 'title_id', 'tags', 'updated_at']) {
+    if (!indexed.includes(field)) {
+      result.errors.push(`payload field "${field}" has no index`);
+      result.passed = false;
     }
   }
 
@@ -243,12 +125,6 @@ async function runPreflight(name, contract) {
 
 // ── Qdrant helpers ────────────────────────────────────────────────────────────
 
-/**
- * Batch-retrieve points from Qdrant (one HTTP round-trip for the whole batch).
- * @param {string[]} pointIds
- * @param {string} collection
- * @returns {Promise<Map<string, object>>}
- */
 async function qdrantBatchRetrieve(pointIds, collection) {
   const url = `${QDRANT_URL}/collections/${collection}/points/retrieve`;
   const res = await fetch(url, {
@@ -261,7 +137,6 @@ async function qdrantBatchRetrieve(pointIds, collection) {
     throw new Error(`Qdrant batch retrieve → ${res.status}: ${body.slice(0, 200)}`);
   }
   const data = await res.json();
-  /** @type {Map<string, object>} */
   const byId = new Map();
   for (const point of (data.result ?? [])) {
     byId.set(String(point.id), point);
@@ -269,12 +144,6 @@ async function qdrantBatchRetrieve(pointIds, collection) {
   return byId;
 }
 
-/**
- * Set (merge) payload fields on an existing Qdrant point.
- * @param {string} pointId
- * @param {object} payload
- * @param {string} collection
- */
 async function qdrantUpsertPayload(pointId, payload, collection) {
   const url = `${QDRANT_URL}/collections/${collection}/points/payload`;
   const res = await fetch(url, {
@@ -288,253 +157,18 @@ async function qdrantUpsertPayload(pointId, payload, collection) {
   }
 }
 
-// ── Parity classification ─────────────────────────────────────────────────────
-
-/**
- * Classify a single Postgres row against its Qdrant point.
- * @param {object} pgRow   Postgres atlas_packets row
- * @param {object|null} point  Qdrant point (with_vector=true) or null
- * @param {object} contract    Collection contract from COLLECTION_CONTRACTS
- * @returns {QdrantParityRow}
- */
-function classifyParity(pgRow, point, contract) {
-  /** @type {QdrantParityRow} */
-  const row = {
-    packet_id:          pgRow.id,
-    packet_key:         pgRow.packet_key,
-    qdrant_point_id:    pgRow.qdrant_point_id,
-    point_present:      point !== null,
-    packet_key_matches: null,
-    source_ref_matches: null,
-    vector_presence:    {},
-    bm42_present:       false,
-    expected_updated_at: pgRow.updated_at?.toISOString() ?? null,
-    mirrored_updated_at: null,
-    state:   'ok',
-    reasons: [],
-  };
-
-  if (!point) {
-    row.state = 'missing_point';
-    row.reasons.push('point absent in Qdrant');
-    return row;
-  }
-
-  const payload = point.payload ?? {};
-  row.mirrored_updated_at = payload.updated_at ?? null;
-
-  // ── Identity checks (contradiction = FAIL) ───────────────────────────────
-
-  if (payload.packet_key !== undefined) {
-    row.packet_key_matches = payload.packet_key === pgRow.packet_key;
-  }
-
-  if (row.packet_key_matches === false) {
-    row.state = 'identity_contradiction';
-    row.reasons.push(
-      `packet_key: qdrant="${payload.packet_key}" ≠ postgres="${pgRow.packet_key}"`
-    );
-  }
-
-  if (payload.source_ref !== undefined) {
-    row.source_ref_matches = payload.source_ref === pgRow.source_ref;
-    if (row.source_ref_matches === false) {
-      if (row.state !== 'identity_contradiction') row.state = 'identity_contradiction';
-      row.reasons.push(
-        `source_ref: qdrant="${payload.source_ref}" ≠ postgres="${pgRow.source_ref}"`
-      );
-    }
-  }
-
-  if (row.state === 'identity_contradiction') return row;
-
-  // ── Named vector checks (dimension per contract) ─────────────────────────
-
-  const vectors = point.vectors ?? {};
-  const namedVectors = typeof vectors === 'object' && !Array.isArray(vectors) ? vectors : {};
-
-  for (const [vecName, expectedDim] of Object.entries(contract.namedVectors)) {
-    const vec = namedVectors[vecName];
-    row.vector_presence[vecName] = Array.isArray(vec) && vec.length > 0;
-
-    if (Array.isArray(vec) && vec.length > 0 && vec.length !== expectedDim) {
-      if (row.state !== 'projection_contradiction') row.state = 'projection_contradiction';
-      row.reasons.push(
-        `named vector "${vecName}" has dim=${vec.length}, contract expects ${expectedDim}`
-      );
-    }
-  }
-
-  if (row.state === 'projection_contradiction') return row;
-
-  // BM42 sparse payload presence
-  row.bm42_present = payload[contract.sparseVectorKey] != null;
-
-  // Required vector absence → incomplete
-  const missingRequired = contract.requiredVectors.filter(n => !row.vector_presence[n]);
-  if (missingRequired.length > 0) {
-    if (row.state === 'ok') row.state = 'incomplete_point';
-    row.reasons.push(...missingRequired.map(n => `missing required vector "${n}"`));
-  }
-
-  // ── Payload staleness ────────────────────────────────────────────────────
-
-  const stale = [];
-  if (pgRow.feature_id   && payload.feature_id   !== pgRow.feature_id)   stale.push('feature_id');
-  if (pgRow.domain_class && payload.domain_class !== pgRow.domain_class)  stale.push('domain_class');
-  if (pgRow.summary      && payload.summary      !== pgRow.summary)       stale.push('summary');
-  if (pgRow.title_id     && payload.title_id     !== pgRow.title_id)      stale.push('title_id');
-  if (stale.length > 0) {
-    if (row.state === 'ok') row.state = 'stale_point';
-    row.reasons.push(...stale.map(f => `stale field: ${f}`));
-  }
-
-  return row;
-}
-
-// ── Canonical payload builder ─────────────────────────────────────────────────
-
-/**
- * Mutable projection-metadata only — never invents vectors or point IDs.
- * Allowed fields: packet_id, packet_key, source_ref, aggregate_version,
- * classifier_version, title_generator_version, reranker_version, and
- * domain/topology metadata.
- */
-function buildCanonicalPayload(pgRow) {
-  return {
-    packet_id:                 pgRow.id,
-    packet_key:                pgRow.packet_key,
-    source_ref:                pgRow.source_ref,
-    feature_id:                pgRow.feature_id    ?? null,
-    feature_label:             pgRow.feature_label ?? null,
-    domain_class:              pgRow.domain_class  ?? null,
-    summary:                   pgRow.summary       ?? null,
-    title_id:                  pgRow.title_id      ?? null,
-    tags:                      pgRow.tags          ?? [],
-    aggregate_version:         pgRow.aggregate_version         ?? null,
-    classifier_version:        pgRow.classifier_version        ?? null,
-    title_generator_version:   pgRow.title_generator_version   ?? null,
-    reranker_version:          pgRow.reranker_version          ?? null,
-    updated_at:                pgRow.updated_at?.toISOString() ?? new Date().toISOString(),
-  };
-}
-
-// ── Repair event generators ───────────────────────────────────────────────────
-
-/**
- * @typedef {Object} RepairEvent
- * @property {string}  event_type        'full_projection'|'payload_repair'|'summary_vector_repair'|'quarantine'
- * @property {string}  packet_key
- * @property {string}  packet_id
- * @property {string}  qdrant_point_id
- * @property {string}  collection
- * @property {string[]} [missing_components]   for full_projection events
- * @property {object}  [payload]              for payload_repair events
- * @property {string}  reason
- */
-
-/**
- * @param {QdrantParityRow} parityRow
- * @param {object} pgRow
- * @param {string} collection
- * @returns {RepairEvent[]}
- */
-function generateRepairEvents(parityRow, pgRow, collection) {
-  const events = [];
-  const base = {
-    packet_key:     parityRow.packet_key,
-    packet_id:      parityRow.packet_id,
-    qdrant_point_id: parityRow.qdrant_point_id,
-    collection,
-  };
-
-  switch (parityRow.state) {
-    case 'missing_point': {
-      // full_projection → outbox only; this script never creates Qdrant points
-      const missing = ['point', ...Object.keys(COLLECTION_CONTRACTS[collection]?.namedVectors ?? {})];
-      events.push({
-        ...base,
-        event_type: 'full_projection',
-        missing_components: missing,
-        reason: 'point absent in Qdrant',
-      });
-      break;
-    }
-
-    case 'stale_point':
-      events.push({
-        ...base,
-        event_type: 'payload_repair',
-        payload: buildCanonicalPayload(pgRow),
-        reason: parityRow.reasons.join('; '),
-      });
-      break;
-
-    case 'incomplete_point': {
-      events.push({
-        ...base,
-        event_type: 'payload_repair',
-        payload: buildCanonicalPayload(pgRow),
-        reason: parityRow.reasons.join('; '),
-      });
-      // Missing summary vector specifically needs its own repair lane
-      const contract = COLLECTION_CONTRACTS[collection];
-      const summaryVecName = contract
-        ? Object.keys(contract.namedVectors).find(n => n.includes('summary'))
-        : undefined;
-      if (summaryVecName && !parityRow.vector_presence[summaryVecName]) {
-        events.push({
-          ...base,
-          event_type: 'summary_vector_repair',
-          reason: `${summaryVecName} absent`,
-        });
-      }
-      break;
-    }
-
-    case 'identity_contradiction':
-    case 'projection_contradiction':
-      events.push({
-        ...base,
-        event_type: 'quarantine',
-        reason: parityRow.reasons.join('; '),
-      });
-      break;
-
-    case 'ok':
-      break;
-  }
-
-  return events;
-}
-
 // ── Repair application ────────────────────────────────────────────────────────
 
-/**
- * Apply a payload_repair event.
- * Guards: only payload_repair events accepted; legacy collections rejected;
- * compare-before-write rejects when Qdrant aggregate_version >= Postgres version.
- * @param {RepairEvent} event
- * @param {object} currentQdrantPayload  live Qdrant payload at time of classification
- * @param {pg.PoolClient} client
- * @param {object} contract
- * @param {string} collection
- * @returns {Promise<{event_type: string, packet_key: string, result: string, outbox_event_id: string}>}
- */
 async function applyPayloadRepair(event, currentQdrantPayload, client, contract, collection) {
-  // Only payload_repair allowed here — full_projection / quarantine are never applied by this fn
   if (event.event_type !== 'payload_repair') {
     return { event_type: event.event_type, packet_key: event.packet_key,
-             result: `skipped:not_payload_repair`, outbox_event_id: '' };
+             result: 'skipped:not_payload_repair', outbox_event_id: '' };
   }
-
-  // Never repair legacy collections
   if (contract.legacy) {
     return { event_type: event.event_type, packet_key: event.packet_key,
-             result: `skipped:legacy_collection`, outbox_event_id: '' };
+             result: 'skipped:legacy_collection', outbox_event_id: '' };
   }
 
-  // Compare-before-write: reject when Qdrant appears newer than Postgres event
   const qdrantVersion = Number(currentQdrantPayload?.aggregate_version ?? -1);
   const pgVersion     = Number(event.payload?.aggregate_version ?? -1);
   if (qdrantVersion >= 0 && pgVersion >= 0 && qdrantVersion >= pgVersion) {
@@ -543,17 +177,12 @@ async function applyPayloadRepair(event, currentQdrantPayload, client, contract,
              outbox_event_id: '' };
   }
 
-  const outboxId = createHash('sha256')
-    .update(`${event.packet_key}:${event.event_type}`)
-    .digest('hex')
-    .slice(0, 16);
-
+  const outbox_event_id = outboxEventId(event.packet_key, event.event_type);
   let result = 'dry-run';
 
   if (APPLY) {
     try {
       await qdrantUpsertPayload(event.qdrant_point_id, event.payload, collection);
-
       await client.query(`
         INSERT INTO atlas_qdrant_repair_log (
           packet_key, qdrant_point_id, collection_name, repair_reason,
@@ -568,27 +197,19 @@ async function applyPayloadRepair(event, currentQdrantPayload, client, contract,
         event.reason,
         JSON.stringify([]),
         JSON.stringify(Object.keys(event.payload ?? {})),
-        outboxId,
+        outbox_event_id,
       ]).catch(() => {});
-
       result = 'success';
     } catch (err) {
       result = `error: ${err.message}`;
     }
   }
 
-  return { event_type: event.event_type, packet_key: event.packet_key, result, outbox_event_id: outboxId };
+  return { event_type: event.event_type, packet_key: event.packet_key, result, outbox_event_id };
 }
 
 // ── Quarantine persistence ────────────────────────────────────────────────────
 
-/**
- * Persist contradiction rows to atlas_projection_quarantine.
- * @param {QdrantParityRow[]} quarantined
- * @param {string} collection
- * @param {string} runId
- * @param {pg.PoolClient} client
- */
 async function persistQuarantine(quarantined, collection, runId, client) {
   if (quarantined.length === 0) return;
 
@@ -619,17 +240,9 @@ async function persistQuarantine(quarantined, collection, runId, client) {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
       ON CONFLICT (packet_key, collection_name, report_run_id) DO NOTHING
     `, [
-      row.packet_id,
-      row.packet_key,
-      row.qdrant_point_id,
-      collection,
-      row.state,        // 'identity_contradiction' | 'projection_contradiction'
-      null,             // expected_value — populated from reason text where parseable
-      firstReason,
-      runId,
-    ]).catch(err => {
-      if (VERBOSE) console.warn(`  quarantine insert: ${err.message}`);
-    });
+      row.packet_id, row.packet_key, row.qdrant_point_id,
+      collection, row.state, null, firstReason, runId,
+    ]).catch(err => { if (VERBOSE) console.warn(`  quarantine insert: ${err.message}`); });
   }
 }
 
@@ -637,12 +250,11 @@ async function persistQuarantine(quarantined, collection, runId, client) {
 
 async function main() {
   const startTime = Date.now();
+  const { createHash } = await import('node:crypto');
   const runId = createHash('sha256')
     .update(`${Date.now()}:${process.pid}`)
     .digest('hex')
     .slice(0, 16);
-
-  // ── Validate --collection flag ─────────────────────────────────────────────
 
   if (!collectionName) {
     console.error('❌  --collection <name> is required.\n');
@@ -660,8 +272,6 @@ async function main() {
     process.exit(1);
   }
 
-  // ── Header ─────────────────────────────────────────────────────────────────
-
   console.log('🔍 Qdrant Parity Audit + Bounded Repair\n');
   console.log(`Collection:       ${collectionName}`);
   console.log(`Contract:         ${contract.contractVersion}`);
@@ -675,12 +285,21 @@ async function main() {
   console.log(`Qdrant:           ${QDRANT_URL}`);
   console.log(`Run ID:           ${runId}\n`);
 
-  // ── Preflight mode ─────────────────────────────────────────────────────────
-
   if (PREFLIGHT) {
     console.log('Running preflight schema validation…\n');
     const pf = await runPreflight(collectionName, contract);
-
+    const preflightReport = {
+      generatedAt: new Date().toISOString(),
+      mode: 'PREFLIGHT',
+      collection: collectionName,
+      contract_version: contract.contractVersion,
+      legacy_collection: contract.legacy,
+      status: pf.passed ? 'PASS' : 'FAIL',
+      errors: pf.errors,
+      warnings: pf.warnings,
+    };
+    await fs.mkdir(path.dirname(REPORT_PATH), { recursive: true });
+    await fs.writeFile(REPORT_PATH, `${JSON.stringify(preflightReport, null, 2)}\n`, 'utf8');
     if (pf.errors.length > 0) {
       console.log('❌  PREFLIGHT FAIL\n');
       for (const e of pf.errors) console.log(`  ERROR:   ${e}`);
@@ -690,11 +309,8 @@ async function main() {
     if (pf.warnings.length > 0) {
       for (const w of pf.warnings) console.log(`  WARNING: ${w}`);
     }
-
     process.exit(pf.passed ? 0 : 1);
   }
-
-  // ── Warn if legacy collection selected for apply ───────────────────────────
 
   if (contract.legacy && APPLY) {
     console.error(`❌  Cannot --apply to legacy collection "${collectionName}" (read-only contract).`);
@@ -708,7 +324,6 @@ async function main() {
   let exitCode = 0;
 
   try {
-    // Ensure repair log table exists (collection_name column added)
     await client.query(`
       CREATE TABLE IF NOT EXISTS atlas_qdrant_repair_log (
         id                     BIGSERIAL PRIMARY KEY,
@@ -726,14 +341,15 @@ async function main() {
       )
     `).catch(err => console.warn(`⚠️  Repair log table: ${err.message}`));
 
-    // ── 1. Sample atlas_packets rows targeting this collection ────────────────
     const rows = (await client.query(`
       SELECT
-        id, packet_key, source_ref, feature_id, feature_label,
+        packet_id, packet_key, source_ref, feature_id, feature_label,
         domain_class, summary, tags, title_id, qdrant_point_id,
         qdrant_collection, updated_at,
-        aggregate_version, classifier_version,
-        title_generator_version, reranker_version
+        lineage_version AS aggregate_version,
+        title_generator_version,
+        NULL::text AS classifier_version,
+        NULL::text AS reranker_version
       FROM atlas_packets
       WHERE qdrant_point_id IS NOT NULL
         AND (qdrant_collection = $1 OR qdrant_collection IS NULL)
@@ -749,36 +365,36 @@ async function main() {
       process.exit(0);
     }
 
-    // ── 2. Build counters keyed to contract vectors ───────────────────────────
     const vectorCounts = Object.fromEntries(
       Object.keys(contract.namedVectors).map(n => [n, 0])
+    );
+    // Optional-completeness counters (do not affect parity status)
+    const optionalMissingCounts = Object.fromEntries(
+      (contract.recommendedVectors ?? []).map(n => [n, 0])
     );
     const report = {
       collection:       collectionName,
       contract_version: contract.contractVersion,
       legacy_collection: contract.legacy,
       status:           'PASS',
-      sampled_packets:  0,
+      sampled_packets:  rows.length,
       points_present:   0,
       identity_matches: 0,
       current_versions: 0,
       vector_counts:    vectorCounts,
+      optional_missing: optionalMissingCounts,
       bm42_present:     0,
       missing_points:   0,
       stale_points:     0,
       incomplete_points: 0,
       contradictions:   0,
     };
-    report.sampled_packets = rows.length;
 
-    // ── 3. Classify each point ────────────────────────────────────────────────
-    /** @type {QdrantParityRow[]} */
-    const classified = [];
-    /** @type {Map<string, object>} maps packet_key → live Qdrant payload (for compare-before-write) */
+    const classified   = [];
     const qdrantPayloads = new Map();
 
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-      const batch = rows.slice(i, i + BATCH_SIZE);
+      const batch    = rows.slice(i, i + BATCH_SIZE);
       const pointIds = batch.map(r => r.qdrant_point_id);
 
       let pointMap = new Map();
@@ -787,6 +403,7 @@ async function main() {
       } catch (err) {
         if (VERBOSE) console.warn(`  ⚠️  Batch fetch error: ${err.message}`);
         for (const pgRow of batch) classified.push(classifyParity(pgRow, null, contract));
+        report.missing_points += batch.length;
         process.stdout.write(`\r  Audited: ${Math.min(i + BATCH_SIZE, rows.length)} / ${rows.length} ...`);
         continue;
       }
@@ -808,6 +425,11 @@ async function main() {
             if (parityRow.vector_presence[vecName]) vectorCounts[vecName]++;
           }
           if (parityRow.bm42_present) report.bm42_present++;
+        }
+
+        // Track optional-completeness gaps
+        for (const vecName of (parityRow.missing_optional_components ?? [])) {
+          if (optionalMissingCounts[vecName] !== undefined) optionalMissingCounts[vecName]++;
         }
 
         switch (parityRow.state) {
@@ -836,23 +458,16 @@ async function main() {
     }
     console.log('');
 
-    // ── 4. Compute overall status ─────────────────────────────────────────────
-    report.status =
-      report.contradictions > 0
-        ? 'FAIL'
-        : report.missing_points > 0 || report.stale_points > 0 || report.incomplete_points > 0
-          ? 'WARN'
-          : 'PASS';
-
+    report.status = computeOverallStatus(report);
     if (report.contradictions > 0) exitCode = 1;
 
-    // ── 5. Print audit report ─────────────────────────────────────────────────
     console.log('\n📊 Parity Audit Report');
     console.log('═'.repeat(62));
     console.log(JSON.stringify(report, null, 2));
     console.log('═'.repeat(62));
+    await fs.mkdir(path.dirname(REPORT_PATH), { recursive: true });
+    await fs.writeFile(REPORT_PATH, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 
-    // ── 6. Quarantine persistence ─────────────────────────────────────────────
     const quarantined = classified.filter(r =>
       r.state === 'identity_contradiction' || r.state === 'projection_contradiction'
     );
@@ -865,7 +480,6 @@ async function main() {
       await persistQuarantine(quarantined, collectionName, runId, client);
     }
 
-    // ── 7. Missing points → outbox events (not applied here) ─────────────────
     const missingRows = classified.filter(r => r.state === 'missing_point');
     if (missingRows.length > 0) {
       console.log(`\n📭 Missing points: ${missingRows.length}`);
@@ -889,18 +503,13 @@ async function main() {
       }
     }
 
-    // ── 8. Payload repairs (stale / incomplete, non-legacy) ───────────────────
     const repairEligible = contract.legacy
       ? []
       : classified.filter(r => r.state === 'stale_point' || r.state === 'incomplete_point');
 
     if (repairEligible.length > 0) {
       console.log(`\n${APPLY ? 'Applying' : 'Would apply'} payload repairs for ${repairEligible.length} point(s)…`);
-
-      let succeeded = 0;
-      let skipped   = 0;
-      let failed    = 0;
-
+      let succeeded = 0, skipped = 0, failed = 0;
       const rowByKey = new Map(rows.map(r => [r.packet_key, r]));
 
       for (const parityRow of repairEligible) {
