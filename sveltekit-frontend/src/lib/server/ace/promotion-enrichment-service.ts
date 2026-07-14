@@ -132,6 +132,7 @@ export function enrichPacketSemantics(envelope: FeatureEnvelope): FeatureEnvelop
     });
 
     enrichment.semanticTitle = generated.title;
+    enrichment.semanticSlug = generated.slug;
     enrichment.titleId = generated.titleId;
     enrichment.titleGeneratorVersion = generated.generatorVersion;
   }
@@ -170,6 +171,7 @@ export function enrichPacketBatch(envelopes: FeatureEnvelope[]): Array<
 export interface PacketAtlasWrite {
   packet_key: string;
   domain_class: string;
+  semantic_slug: string;
   title_id: string;
   title_generator_version: string;
 }
@@ -178,6 +180,7 @@ export function extractAtlasWriteData(enriched: ReturnType<typeof enrichPacketSe
   return {
     packet_key: enriched.packet_key,
     domain_class: enriched._enrichment.domainClass,
+    semantic_slug: enriched._enrichment.semanticSlug,
     title_id: enriched._enrichment.titleId,
     title_generator_version: enriched._enrichment.titleGeneratorVersion,
   };

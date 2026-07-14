@@ -3,7 +3,7 @@
  *
  * Validates:
  * 1. Same packet_key + generator version → same title_id
- * 2. Summary wording change → packet_key unchanged, title_id unchanged
+ * 2. Evidence wording change → packet_key unchanged, title_id unchanged
  * 3. Source path separator change → packet_key unchanged after normalization
  * 4. Different packet_key → different title_id
  * 5. Rerank score change → title_id unchanged
@@ -34,22 +34,20 @@ describe('Title ID Generator', () => {
 
   // ── Test 2: Summary Mutation Independence ──────────────────
 
-  it('summary wording change → title_id unchanged (immutable identity)', () => {
+  it('feature evidence change → title_id unchanged (immutable identity)', () => {
     const packetKey = 'ace:packet:auth:001';
 
     const title1 = generateTitleIdentity(packetKey, {
-      symbolName: 'validateSession',
-      summary: 'Handles Lucia session validation and expiry checks.',
+      featureLabel: 'Redis cache management',
     });
 
     const title2 = generateTitleIdentity(packetKey, {
-      symbolName: 'validateSession',
-      summary: 'Validates user sessions and manages expiration logic.',
+      featureLabel: 'Completely rewritten summary',
     });
 
     // title_id should be the same (packet_key is the determinant)
     expect(title1.titleId).toBe(title2.titleId);
-    // But title text may differ (based on different evidence sources)
+    expect(title1.slug).not.toBe(title2.slug);
   });
 
   // ── Test 3: Source Path Normalization ──────────────────────
@@ -116,7 +114,7 @@ describe('Title ID Generator', () => {
     const packetKey = 'ace:packet:auth:001';
 
     const titleWithFilename = generateTitleIdentity(packetKey, {
-      sourceFilename: 'src/lib/server/auth.ts',
+      sourceFilename: 'src\\lib\\server\\auth.ts',
       summary: '',
     });
 
@@ -211,6 +209,20 @@ describe('Title ID Generator', () => {
     const title = generateTitleIdentity(packetKey, opts);
 
     expect(title.generatorVersion).toBe(TITLE_GENERATOR_VERSION);
-    expect(title.titleId).toContain(`${title.slug}:`);
+    expect(title.titleId).toMatch(/^title:[a-f0-9]{8}$/);
+  });
+
+  it('titleId ignores mutable evidence while staying stable per packet_key', () => {
+    const packetKey = 'packet:abc';
+    const first = generateTitleIdentity(packetKey, {
+      summary: 'Redis cache management',
+    });
+    const second = generateTitleIdentity(packetKey, {
+      summary: 'Completely rewritten summary',
+      featureLabel: 'New display title',
+    });
+
+    expect(first.titleId).toBe(second.titleId);
+    expect(first.titleId).toMatch(/^title:[a-f0-9]{8}$/);
   });
 });

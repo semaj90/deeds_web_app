@@ -66,6 +66,7 @@ export type { GeneratedTitle } from './title-id-generator.js';
  */
 export interface PacketSemanticEnrichment {
   semanticTitle?: string;
+  semanticSlug?: string;
   titleId?: string;
   titleGeneratorVersion?: string;
   domainClass?: string;

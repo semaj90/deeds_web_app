@@ -113,7 +113,23 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
  */
 async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
   try {
-    const searchTerm = `%${query.replace(/%/g, '\\%').replace(/_/g, '\\_').toLowerCase()}%`;
+    const terms = query
+      .toLowerCase()
+      .split(/[^\w]+/)
+      .map((term) => term.trim())
+      .filter((term) => term.length > 2)
+      .slice(0, 8);
+
+    if (terms.length === 0) return [];
+
+    const likePredicates = terms.map((term) => {
+      const searchTerm = `%${term.replace(/%/g, '\\%').replace(/_/g, '\\_')}%`;
+      return sql`(
+        LOWER(summary) LIKE ${searchTerm}
+        OR LOWER(content) LIKE ${searchTerm}
+        OR LOWER(source_ref) LIKE ${searchTerm}
+      )`;
+    });
 
     const result = await db.execute(sql`
       SELECT
@@ -123,13 +139,12 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
         summary,
         content,
         CASE
-          WHEN LOWER(summary) LIKE ${searchTerm} THEN 2
-          WHEN LOWER(content) LIKE ${searchTerm} THEN 1
+          WHEN ${sql.join(likePredicates, sql` OR `)} THEN 1.0
           ELSE 0.5
         END as score
       FROM codebase_chunk_index
       WHERE summary IS NOT NULL AND LENGTH(TRIM(summary)) > 0
-        AND (LOWER(summary) LIKE ${searchTerm} OR LOWER(content) LIKE ${searchTerm})
+        AND (${sql.join(likePredicates, sql` OR `)})
       ORDER BY score DESC, id ASC
       LIMIT ${BM25_LIMIT}
     `);
@@ -354,9 +369,21 @@ async function embedQuery(text: string): Promise<number[] | null> {
     if (!text || text.trim().length === 0) {
       return null;
     }
-    return await embedText(text.slice(0, 2000));
+    const embedding = await embedText(text.slice(0, 2000));
+    return normalizeEmbedding(embedding, 384);
   } catch (error) {
     console.warn('Query embedding failed:', error);
     return null;
   }
+}
+
+function normalizeEmbedding(values: number[] | null | undefined, dimension: number): number[] | null {
+  if (!values || values.length === 0) return null;
+  if (values.length === dimension) return values;
+  if (values.length > dimension) return values.slice(0, dimension);
+  const output = values.slice();
+  while (output.length < dimension) {
+    output.push(0);
+  }
+  return output;
 }

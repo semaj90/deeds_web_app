@@ -219,11 +219,11 @@ describe('Promotion Enrichment Service', () => {
 
   // ── Test 10: Title ID Format Validation ────────────────────
 
-  it('title_id follows correct format: title:<slug>:<hash>', () => {
+  it('title_id follows correct format: title:<hash>', () => {
     const envelope = createTestEnvelope();
     const enriched = enrichPacketSemantics(envelope);
 
     const titleId = enriched._enrichment.titleId;
-    expect(titleId).toMatch(/^title:[a-z0-9-]+:[a-f0-9]{8}$/);
+    expect(titleId).toMatch(/^title:[a-f0-9]{8}$/);
   });
 });

@@ -20,9 +20,9 @@
 import { createHash } from 'node:crypto';
 import type { FeatureEnvelope } from './feature-envelope.js';
 
-// Canonical version — must stay in sync with packages/atlas/lib/packet-registry.mjs TITLE_GENERATOR_VERSION.
-// Do not change this value independently. Update the registry first, then mirror here.
-export const TITLE_GENERATOR_VERSION = 'semantic-title-v1';
+// Canonical version for the title identity algorithm.
+// Keep this as the single source of truth in the runtime until a shared package is genuinely needed.
+export const TITLE_GENERATOR_VERSION = 'semantic-title-v2';
 
 /**
  * Generated title artifact with all provenance
@@ -94,8 +94,8 @@ function extractKeywords(text: string, maxKeywords: number = 3): string[] {
  * - Summary wording changes do NOT affect title_id
  * - Rerank scores do NOT affect title_id
  *
- * title_id format: title:<slug>:<hash8>
- *   where slug is derived from evidence, and hash8 is sha256(packet_key + generator_version)[:8]
+ * title_id format: title:<hash8>
+ *   where hash8 is sha256(packet_key + generator_version)[:8]
  */
 export function generateTitleIdentity(
   packetKey: string,
@@ -124,7 +124,7 @@ export function generateTitleIdentity(
     title = `${options.domain} ${options.symbolKind}`;
   } else if (options.sourceFilename) {
     // Fallback: use filename stem (stable)
-    title = options.sourceFilename.split('/').pop()?.split('.')[0] || 'untitled';
+    title = options.sourceFilename.replaceAll('\\', '/').split('/').pop()?.split('.')[0] || 'untitled';
   } else if (options.summary) {
     // Last resort: extract keywords from summary (but use sparingly, as summary is mutable)
     const keywords = extractKeywords(options.summary);
@@ -147,7 +147,7 @@ export function generateTitleIdentity(
     .slice(0, 8);
 
   return {
-    titleId: `title:${slug}:${suffix}`,
+    titleId: `title:${suffix}`,
     title,
     slug,
     generatorVersion: TITLE_GENERATOR_VERSION,
