@@ -262,6 +262,8 @@ export default defineConfig({
       'tests/telemetry/dispatcher-e2e-integration.spec.ts',
       'tests/telemetry/mcp-tool-telemetry.spec.ts',
       'tests/telemetry/dispatcher-mcp-tool-integration.spec.ts',
+      // HyperRAG pipeline contract smoke — Zod schema + identity invariants
+      'tests/hyperrag-contract-smoke.spec.ts',
     ],
     exclude: [
       'node_modules/**',

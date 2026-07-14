@@ -1,0 +1,400 @@
+{
+  "generatedAt": "2026-07-14T04:55:06.888Z",
+  "runId": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+  "mode": "dry-run",
+  "limit": 100,
+  "totals": {
+    "packetsSeen": 58365,
+    "chunksSeen": 52380,
+    "packetCandidates": 4012,
+    "selectedPackets": 100
+  },
+  "problems": {
+    "invalidSourceRefs": 0,
+    "emptyPathRows": 0,
+    "ambiguousMappings": 429,
+    "unmappedChunks": 5204,
+    "parseFailures": 0,
+    "nonFiniteVectors": 0,
+    "emptySourceMappedChunks": 0
+  },
+  "samples": {
+    "selectedPackets": [
+      {
+        "packetKey": "packet:7f08f6b3ea65",
+        "sourceRef": "src/lib/server/db/schema-postgres.ts",
+        "chunkCount": 369,
+        "centroidChecksum": "1f828f477f92ece6",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:7f08f6b3ea65",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 369,
+            "source_ref": "src/lib/server/db/schema-postgres.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 369,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "1f828f477f92ece6",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.869Z",
+            "sample_chunk_ids": [
+              "000700dd-d698-4589-a3b3-62c404909095",
+              "01006550-52aa-4453-8245-576062d9f026",
+              "019f202d-684f-4bb0-97b4-aa318c7e14d0",
+              "02370486-bd92-40c8-8582-b39e22cf02fb",
+              "02703543-513e-4038-8fc6-317e7357dbbb",
+              "030129de-b5df-46ff-af82-ea6229d10f20",
+              "04422461-e086-4391-bacd-85ec273c6020",
+              "04948193-9f69-48bd-af39-fdd9fb2057d5",
+              "057cba80-3883-4f03-829c-b539f1567966",
+              "05f52294-e528-4bff-8438-d227664251b0"
+            ],
+            "sample_kind": "type"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:a3ac5bb79fbf",
+        "sourceRef": "src/lib/server/ai/gemma4-agent.ts",
+        "chunkCount": 270,
+        "centroidChecksum": "6e803a900301f2f5",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:a3ac5bb79fbf",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 270,
+            "source_ref": "src/lib/server/ai/gemma4-agent.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 270,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "6e803a900301f2f5",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.870Z",
+            "sample_chunk_ids": [
+              "007a5c9e-bb61-4459-9d30-3d11cd10e724",
+              "00fca614-f74e-4079-ae8b-1b0629c4680d",
+              "0342ec84-13a1-4de1-9c9e-d0e1c2cc945f",
+              "039fb4e9-dcdd-466e-bad0-1d20c7fb48b2",
+              "0717a900-8c84-4eff-a7d0-5018029227b5",
+              "0843899a-50a5-467e-89dc-ded66702301f",
+              "08b2b168-22d3-47d6-8132-b42c1ad5a6ae",
+              "09c98a91-6a55-4cb1-856a-3ae7fcc193fe",
+              "0a16e403-a06b-4baf-ada1-f7f66f3a5034",
+              "0a933a18-50aa-42a0-b9bd-0a90b86b878a"
+            ],
+            "sample_kind": "type"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:5785ab73014d",
+        "sourceRef": "src/routes/api/evidence/upload/+server.ts",
+        "chunkCount": 245,
+        "centroidChecksum": "9399434af9b0e737",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:5785ab73014d",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 245,
+            "source_ref": "src/routes/api/evidence/upload/+server.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 245,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "9399434af9b0e737",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.870Z",
+            "sample_chunk_ids": [
+              "0141ae01-4cf0-457d-96ff-ce3919d6f67e",
+              "01ffca1c-389d-4509-ab72-7273154bc89d",
+              "023b4e23-119c-43f9-9706-534eb1e43e99",
+              "04a69a92-9e45-46ce-ba8e-5af90be25dab",
+              "04d30ffb-5be0-48a6-b97b-d4830eb8d33c",
+              "051a6947-b526-43ca-bcea-51ff3e1e6bf5",
+              "05932b59-06e5-4446-8d29-cc35d024fa4a",
+              "063a8454-3cb9-4f70-ba3c-2967c71c5a2d",
+              "08263c09-d771-4046-a93f-3e2447cc9e74",
+              "08dafc06-50dc-4b8d-82da-6db63c2b0e07"
+            ],
+            "sample_kind": "route-handler"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:3ad208a4ede0",
+        "sourceRef": "src/lib/server/gpu/libtorch-bridge.ts",
+        "chunkCount": 159,
+        "centroidChecksum": "73f487e22869280b",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:3ad208a4ede0",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 159,
+            "source_ref": "src/lib/server/gpu/libtorch-bridge.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 159,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "73f487e22869280b",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.870Z",
+            "sample_chunk_ids": [
+              "0055f29f-26b2-4bdc-9f07-610150d7e751",
+              "019833b2-3c21-4be4-8f9c-4ebdbd0936b1",
+              "01f8f106-6d9d-41a1-b451-d737a43836b1",
+              "04b05212-ba79-47e7-bdc1-2ee7aad5f238",
+              "06b7aa9d-605d-4a0a-bf44-b36ec0bbdb6f",
+              "073859f8-b330-4303-9620-56646f356793",
+              "079ff5d8-2edd-43a8-a9c5-a1a7f91d743d",
+              "07b2cb7e-c80d-43cf-b6af-a9724f3971d7",
+              "0a9b1f67-1c4b-4277-96e7-e19211282e06",
+              "0ade236c-0839-41b9-a334-81f2774931fe"
+            ],
+            "sample_kind": "function"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:986cd5776e72",
+        "sourceRef": "src/mcp/trace-mcp-server.ts",
+        "chunkCount": 141,
+        "centroidChecksum": "550fa7cf81f5ae41",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:986cd5776e72",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 141,
+            "source_ref": "src/mcp/trace-mcp-server.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 141,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "550fa7cf81f5ae41",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.870Z",
+            "sample_chunk_ids": [
+              "018e4fe4-0166-4e5c-88a4-fdd18e175962",
+              "026dd8ec-f1a2-42eb-8e6d-b5b96f911694",
+              "04849e2a-2ad5-4f43-ba78-b51a70915947",
+              "06171994-27f8-45b2-a3e5-b3f014c1b8dd",
+              "071abd0e-26c1-435d-8edb-fe82776a95ec",
+              "0a3eb246-110e-4d5d-921e-edd5d0b92b7f",
+              "0b7b0066-441d-43d9-9466-c98c8f100c27",
+              "0b86af1d-225e-4c72-8ab7-de0379373e40",
+              "0f6622a5-0c6c-4511-bcc4-48438796b752",
+              "0f6c84ac-4d6f-44c0-8ebb-6d769d03da82"
+            ],
+            "sample_kind": null
+          }
+        }
+      },
+      {
+        "packetKey": "packet:3c275cde759f",
+        "sourceRef": "src/routes/(app)/cases/[id]/board/+page.svelte",
+        "chunkCount": 126,
+        "centroidChecksum": "7e9321a97db1d20d",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:3c275cde759f",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 126,
+            "source_ref": "src/routes/(app)/cases/[id]/board/+page.svelte",
+            "source_ref_count": 1,
+            "qdrant_id_count": 126,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "7e9321a97db1d20d",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.870Z",
+            "sample_chunk_ids": [
+              "02cce6b9-c349-419d-824a-e8f06059ff66",
+              "03118e79-dee4-41b6-840a-4ecaf0b75142",
+              "0394e4c3-787b-476a-a78d-22eb42b54e5c",
+              "045a0a94-1ec6-4dff-930b-ee0b22524909",
+              "04e30828-afe4-4170-ab93-ccf1898799ca",
+              "05cc55b1-c76a-471e-85fe-5c03ff8af948",
+              "0d7557a0-6164-4af5-a728-f4ff5b9af4c4",
+              "0f848c49-7e3a-4e4a-92a1-a53f3e0f6a26",
+              "10087efd-46fc-42d0-9164-d0aac2d2532f",
+              "123ff654-6fd7-43ec-9711-a66a7ffb0ef0"
+            ],
+            "sample_kind": "component"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:d073761bc618",
+        "sourceRef": "src/lib/server/ai/contextual-tools.ts",
+        "chunkCount": 124,
+        "centroidChecksum": "74d4ac146b143f9c",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:d073761bc618",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 124,
+            "source_ref": "src/lib/server/ai/contextual-tools.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 124,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "74d4ac146b143f9c",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.871Z",
+            "sample_chunk_ids": [
+              "0365c2cd-8d3e-4a9c-a70a-dd14f6b624fd",
+              "049d62df-98c4-4119-ba60-0c3c25756dac",
+              "051e269c-58fe-4ca5-ad98-ca2d982c0cda",
+              "0737a1e9-a9de-4e33-9481-71702f1af0c9",
+              "09a7b08d-00ab-438d-903d-c84287b1bbe9",
+              "0a0eee1a-f819-4b32-9b21-1be446a28108",
+              "0f48d2e0-7350-4946-ab59-f390f4e7390f",
+              "1036ac80-28e3-4214-b902-4c8883483536",
+              "11f1534d-49ec-4886-8f41-7121b25fa2b7",
+              "135cad91-8e03-435b-993d-2206568db5bd"
+            ],
+            "sample_kind": "function"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:225cff0e9939",
+        "sourceRef": "src/routes/(app)/analytics/+page.svelte",
+        "chunkCount": 117,
+        "centroidChecksum": "01fe3df1e0d1d89a",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:225cff0e9939",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 117,
+            "source_ref": "src/routes/(app)/analytics/+page.svelte",
+            "source_ref_count": 1,
+            "qdrant_id_count": 117,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "01fe3df1e0d1d89a",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.871Z",
+            "sample_chunk_ids": [
+              "01ab6929-fb8d-4180-8f49-7857b4e7e5e4",
+              "02c32db5-4ce4-47bc-af25-2defdf1d41b1",
+              "03159f7d-e6b6-48d4-a26c-ed88dcb7efd9",
+              "04f0a394-6f9f-476c-8352-4d1fa70b3f09",
+              "05a95a9f-18f9-47a9-b9f0-0e955940c100",
+              "127d4888-6e83-4edf-b775-a73bddb081ce",
+              "12b6f711-689e-4d2e-87f8-d98e0cba68ca",
+              "17cde94e-cbb2-49dd-abc0-c57e7adc8efc",
+              "188aad86-eb5e-45aa-b620-89ad6f324781",
+              "1aa51390-b68f-4139-8622-1634e92057f1"
+            ],
+            "sample_kind": "component"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:1f18437ee58f",
+        "sourceRef": "src/routes/(app)/demos/+page.svelte",
+        "chunkCount": 110,
+        "centroidChecksum": "6f482124ad8de622",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:1f18437ee58f",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 110,
+            "source_ref": "src/routes/(app)/demos/+page.svelte",
+            "source_ref_count": 1,
+            "qdrant_id_count": 110,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "6f482124ad8de622",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.871Z",
+            "sample_chunk_ids": [
+              "0001981c-da69-4b0e-9acb-ad29544029c8",
+              "07f23175-a295-4824-b881-c9864ab682f6",
+              "0df17032-80c4-4240-896b-a3d59b323e36",
+              "0df1babb-6ea1-4db2-a500-2273e5ba46f4",
+              "0df657b9-211e-457a-b3ca-a288d1c508d9",
+              "0e67edf5-3898-437f-a858-f1d673ca06e7",
+              "117d8fc4-abbe-46ff-bb4f-981892a9aa30",
+              "14b8b3e1-4a35-496f-a3ef-3cf48b6a34cd",
+              "153e043d-f182-46a8-b8bf-5c907db23656",
+              "17c2d877-200d-473b-b3e2-eac14908722b"
+            ],
+            "sample_kind": "component"
+          }
+        }
+      },
+      {
+        "packetKey": "packet:ac6b054af73a",
+        "sourceRef": "src/lib/server/env.server.ts",
+        "chunkCount": 103,
+        "centroidChecksum": "2e52b459401a73dd",
+        "packetTopology": {
+          "packet_centroid_768": {
+            "packet_key": "packet:ac6b054af73a",
+            "vector_model": "codebase_chunks_768",
+            "vector_dimension": 768,
+            "aggregation": "normalized_mean",
+            "chunk_count": 103,
+            "source_ref": "src/lib/server/env.server.ts",
+            "source_ref_count": 1,
+            "qdrant_id_count": 103,
+            "feature_id_count": 0,
+            "tree_node_id_count": 0,
+            "centroid_checksum": "2e52b459401a73dd",
+            "centroid_norm": 1,
+            "run_id": "packet-centroid-a3077e52d9ed7f9cf0989cb5",
+            "materialized_at": "2026-07-14T04:55:06.871Z",
+            "sample_chunk_ids": [
+              "061f9d96-11da-41d9-99ec-a799d52dee5a",
+              "0645cbf6-e28c-4b68-bea6-2fccb885238c",
+              "08d4e0ad-e6bf-4b9f-a2d1-87839d9ece86",
+              "0b78f6bb-41e2-4fc0-92ee-f2b48079a497",
+              "1159e4e9-069b-4542-a7f4-e488a4f6528d",
+              "12e8457e-8597-4544-814f-24088662968e",
+              "16b689ca-c3f3-4766-9db6-e6dfca83b817",
+              "19cc9742-17e3-4855-8096-266a9f0a668c",
+              "1ca19d4d-3f64-4492-9cb7-d15cf3d38749",
+              "21776bf9-cbae-45f4-884e-4eb85e897aff"
+            ],
+            "sample_kind": "const"
+          }
+        }
+      }
+    ]
+  },
+  "status": "WARN",
+  "notes": [
+    "Vectors are parsed from content_embedding (768-dim) and normalized before mean aggregation.",
+    "Packet centroids are materialized at packet level and written to atlas_packets.topology.packet_centroid_768 only when --apply is provided."
+  ]
+}

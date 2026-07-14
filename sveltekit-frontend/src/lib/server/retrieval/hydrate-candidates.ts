@@ -11,8 +11,9 @@
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
-import type { FeatureEnvelope } from './feature-envelope.js';
+import { FeatureEnvelopeSchema, type FeatureEnvelope } from './feature-envelope.js';
 import type { FusedCandidate } from './fuse-candidates.js';
+import { generateTitleIdentity } from '../ace/title-id-generator.js';
 
 /**
  * Hydrate fused candidates into complete feature envelopes
@@ -31,8 +32,8 @@ export async function hydrateCandidates(
 
     // Build WHERE clause: match by source_ref (primary) or packetKey (fallback)
     const predicates: any[] = [
-      sourceRefs.length > 0 ? sql`chunk.source_ref IN ${sql.join(sourceRefs.map((value) => sql`${value}`), sql`, `)}` : null,
-      packetKeys.length > 0 ? sql`chunk.id IN ${sql.join(packetKeys.map((value) => sql`${value}`), sql`, `)}` : null,
+      sourceRefs.length > 0 ? sql`chunk.source_ref IN (${sql.join(sourceRefs.map((value) => sql`${value}`), sql`, `)})` : null,
+      packetKeys.length > 0 ? sql`COALESCE(chunk.metadata->>'packet_key', chunk.id::text) IN (${sql.join(packetKeys.map((value) => sql`${value}`), sql`, `)})` : null,
     ].filter(Boolean);
 
     const whereCondition = predicates.length > 0
@@ -58,7 +59,8 @@ export async function hydrateCandidates(
         chunk.content_hash,
         chunk.updated_at,
         chunk.language,
-        chunk.kind
+        chunk.kind,
+        chunk.output_meta
       FROM codebase_chunk_index chunk
       ${whereCondition}
       LIMIT ${Math.max(candidates.length, sourceRefs.length, packetKeys.length) + 10}
@@ -82,17 +84,30 @@ export async function hydrateCandidates(
       updated_at: Date;
       language: string | null;
       kind: string | null;
+      output_meta: Record<string, unknown> | null;
     };
 
     const rows = result.rows as ChunkRow[];
-    const rowsByKey = new Map(
-      rows.map(r => [r.source_ref || r.id, r])
-    );
+    const rowsByKey = new Map<string, ChunkRow>();
+    for (const row of rows) {
+      const keys = [
+        row.source_ref || row.relative_path || row.id,
+        (row.metadata?.packet_key as string | undefined) || row.id,
+        (row.output_meta?.packet_key as string | undefined) || null,
+        row.qdrant_id || null,
+      ].filter((value): value is string => Boolean(value));
+
+      for (const key of keys) {
+        if (!rowsByKey.has(key)) {
+          rowsByKey.set(key, row);
+        }
+      }
+    }
 
     // Map candidates to envelopes, preserving order
     const envelopes: FeatureEnvelope[] = [];
     for (const candidate of candidates) {
-      const row = rowsByKey.get(candidate.sourceRef || candidate.packetKey);
+      const row = rowsByKey.get(candidate.sourceRef) || rowsByKey.get(candidate.packetKey);
       if (!row) {
         console.warn(`Hydration: No row found for candidate ${candidate.packetKey}`);
         continue;
@@ -149,9 +164,18 @@ function buildFeatureEnvelope(input: {
 
   return {
     // Canonical identity (source_ref is the primary key from retrieval)
-    packet_key: row.qdrant_id || row.id,
+    chunk_id: row.id,
+    packet_key: (row.metadata?.packet_key as string) || candidate.packetKey || row.id,
     source_ref: row.source_ref || row.relative_path,
     content_hash: row.content_hash || '',
+    title_id: generateTitleIdentity((row.metadata?.packet_key as string) || candidate.packetKey || row.id, {
+      featureLabel: String((row.metadata?.feature_label ?? row.metadata?.feature_id ?? candidate.featureId ?? row.symbol ?? row.kind ?? 'packet')),
+      symbolName: row.symbol || undefined,
+      symbolKind: row.kind || undefined,
+      domain: row.domain || undefined,
+      summary: row.summary || undefined,
+      sourceFilename: row.relative_path || row.source_ref || undefined,
+    }).titleId,
 
     // Retrieved content
     summary: row.summary || '',
@@ -165,6 +189,7 @@ function buildFeatureEnvelope(input: {
 
     // Domain classification
     domain: row.domain || null,
+    domain_class: normalizeDomainClass(row.domain),
 
     // Topology
     som_cluster: row.som_cluster || null,
@@ -181,7 +206,7 @@ function buildFeatureEnvelope(input: {
     gan_validated: false,
 
     // Timing
-    updated_at: row.updated_at.toISOString(),
+    updated_at: new Date(row.updated_at as unknown as string | number | Date).toISOString(),
 
     // Code structure
     symbol: row.symbol || undefined,
@@ -190,7 +215,25 @@ function buildFeatureEnvelope(input: {
 
     // Forward all JSONB fields if present
     ...(row.metadata || {}),
+
+    // Re-assert canonical normalized domain after metadata spread
+    domain_class: normalizeDomainClass(row.domain),
   };
+}
+
+function normalizeDomainClass(domain: string | null): FeatureEnvelope['domain_class'] {
+  const value = (domain || '').trim().toLowerCase();
+  if (!value) return 'general';
+  if (value.includes('auth')) return 'auth';
+  if (value.includes('ui') || value.includes('frontend') || value.includes('svelte')) return 'ui';
+  if (value.includes('retriev')) return 'retrieval';
+  if (value.includes('network') || value.includes('grpc') || value.includes('mcp')) return 'network';
+  if (value.includes('db') || value.includes('sql') || value.includes('postgres') || value.includes('atlas_packets')) return 'database';
+  if (value.includes('cache') || value.includes('redis') || value.includes('valkey')) return 'cache';
+  if (value.includes('agent') || value.includes('acp') || value.includes('gsd')) return 'agent';
+  if (value.includes('graph') || value.includes('neo4j') || value.includes('pagerank')) return 'graph';
+  if (value.includes('ml') || value.includes('embed') || value.includes('rerank') || value.includes('qdrant')) return 'ml';
+  return 'general';
 }
 
 /**

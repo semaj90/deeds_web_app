@@ -212,6 +212,14 @@ export const FeatureEnvelopeSchema = z.object({
   relative_path: z.string().optional().describe('Relative path in codebase'),
   summary: z.string().optional().describe('Brief chunk summary for human review'),
   content: z.string().optional().describe('Full candidate text for reranking when hydrated'),
+  domain_class: z.enum(['auth', 'ui', 'retrieval', 'network', 'database', 'cache', 'agent', 'graph', 'ml', 'general']).optional().describe('Semantic domain classification (auth/ui/retrieval/etc)'),
+
+  // ─────────────────────────────────────────────────────────
+  // Title Enrichment (populated by promotion/enrichment service)
+  // ─────────────────────────────────────────────────────────
+  semantic_title: z.string().optional().describe('Human-readable semantic title (generated, may change with improvements)'),
+  title_id: z.string().optional().describe('Stable title identifier (packet_key-derived, immutable per generator version)'),
+  title_generator_version: z.string().optional().describe('Version of title generation algorithm'),
 
   // Extraction provenance
   created_at: z.date().default(() => new Date()),

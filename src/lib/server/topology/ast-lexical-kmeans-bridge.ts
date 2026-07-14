@@ -9,7 +9,6 @@
  */
 
 import { Pool, QueryResult } from 'pg';
-import { v4 as uuidv4 } from 'uuid';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -130,10 +129,10 @@ export async function compressToLatentSpace(
 
   if (!addon) {
     console.warn('[AstLexicalKmeans] TensorRT unavailable, using mock latent vectors');
-    return enrichedSymbols.map(sym => ({
+    return enrichedSymbols.map((sym) => ({
       ...sym,
       latent_64: Array.from({ length: 64 }, () => Math.random() * 2 - 1),
-      ae_quality_score: 0.5 + Math.random() * 0.4
+      ae_quality_score: 0.5 + Math.random() * 0.4,
     }));
   }
 
@@ -145,14 +144,16 @@ export async function compressToLatentSpace(
       compressed.push({
         ...sym,
         latent_64: Array.isArray(latent) ? latent : Array.from(latent),
-        ae_quality_score: 0.8 + Math.random() * 0.15
+        ae_quality_score: 0.8 + Math.random() * 0.15,
       });
     } catch (e) {
-      console.warn(`[AstLexicalKmeans] Autoencoder failed for ${sym.packet_id}, using random vector`);
+      console.warn(
+        `[AstLexicalKmeans] Autoencoder failed for ${sym.packet_id}, using random vector`
+      );
       compressed.push({
         ...sym,
         latent_64: Array.from({ length: 64 }, () => Math.random() * 2 - 1),
-        ae_quality_score: 0.4
+        ae_quality_score: 0.4,
       });
     }
   }
@@ -176,36 +177,35 @@ export async function runKmeansClustering(
   }
 
   try {
-    const vectors = symbols.map(s => new Float32Array(s.latent_64));
+    const vectors = symbols.map((s) => new Float32Array(s.latent_64));
     const result = addon.kmeansWithCentroids(vectors, K);
 
     const assignments: TopologyClusterAssignment[] = symbols.map((sym, idx) => ({
       ...sym,
       cluster_id: result.clusters[idx] || idx % K,
       centroid_distance: 0.1 + Math.random() * 0.3,
-      cluster_confidence: 0.7 + Math.random() * 0.25
+      cluster_confidence: 0.7 + Math.random() * 0.25,
     }));
 
     return {
       assignments,
       centroids: result.centroids || null,
-      inertia: result.inertia || null
+      inertia: result.inertia || null,
     };
   } catch (e) {
-    console.warn(`[AstLexicalKmeans] K-means failed: ${(e as Error).message}, using mock clustering`);
+    console.warn(
+      `[AstLexicalKmeans] K-means failed: ${(e as Error).message}, using mock clustering`
+    );
     return assignClustersViaMockKmeans(symbols, K);
   }
 }
 
-function assignClustersViaMockKmeans(
-  symbols: LatentVector[],
-  K: number
-): KmeansResult {
+function assignClustersViaMockKmeans(symbols: LatentVector[], K: number): KmeansResult {
   const assignments: TopologyClusterAssignment[] = symbols.map((sym, idx) => ({
     ...sym,
     cluster_id: idx % K,
     centroid_distance: 0.2 + Math.random() * 0.3,
-    cluster_confidence: 0.6 + Math.random() * 0.35
+    cluster_confidence: 0.6 + Math.random() * 0.35,
   }));
 
   return { assignments, centroids: null, inertia: null };
@@ -226,7 +226,7 @@ export async function attachToPostgresSchema(
     if (dryRun) {
       console.log('[AstLexicalKmeans] DRY_RUN mode: validating schema only');
       const sample = clusteredSymbols.slice(0, 3);
-      sample.forEach(pkt => {
+      sample.forEach((pkt) => {
         console.log(
           `  packet_id=${pkt.packet_id}, cluster=${pkt.cluster_id}, confidence=${pkt.cluster_confidence.toFixed(3)}`
         );
@@ -256,19 +256,23 @@ export async function attachToPostgresSchema(
             sym.cluster_id,
             sym.cluster_confidence,
             'phase_2a_ast_kmeans',
-            new Date().toISOString()
+            new Date().toISOString(),
           ]);
 
           if (res.rowCount && res.rowCount > 0) {
             packetsUpdated++;
           }
         } catch (e) {
-          console.warn(`[AstLexicalKmeans] Failed to update packet_id=${sym.packet_id}: ${(e as Error).message}`);
+          console.warn(
+            `[AstLexicalKmeans] Failed to update packet_id=${sym.packet_id}: ${(e as Error).message}`
+          );
         }
       }
     }
 
-    console.log(`[AstLexicalKmeans] Updated ${packetsUpdated}/${clusteredSymbols.length} packets in atlas_packets`);
+    console.log(
+      `[AstLexicalKmeans] Updated ${packetsUpdated}/${clusteredSymbols.length} packets in atlas_packets`
+    );
     return { success: true, packetsUpdated };
   } catch (e) {
     const message = (e as Error).message;
@@ -292,7 +296,7 @@ export async function writeTopologyEdgesToPostgres(
     if (dryRun) {
       console.log('[AstLexicalKmeans] DRY_RUN mode: validating topology edges');
       const sample = clusteredSymbols.slice(0, 2);
-      sample.forEach(sym => {
+      sample.forEach((sym) => {
         console.log(
           `  ${sym.packet_id} -[BELONGS_TO_TOPOLOGY_CLUSTER]-> cluster_${sym.cluster_id}`
         );
@@ -382,7 +386,8 @@ export async function orchestrateAstLexicalKmeansTopology(
     dryRun = false,
     verbose = false,
     K = 16,
-    connectionString = process.env.DATABASE_URL || 'postgresql://legal_admin:legalai@127.0.0.1:5434/legal_ai_db'
+    connectionString = process.env.DATABASE_URL ||
+      'postgresql://legal_admin:legalai@127.0.0.1:5434/legal_ai_db',
   } = options;
 
   const log = (msg: string) => {
@@ -390,49 +395,98 @@ export async function orchestrateAstLexicalKmeansTopology(
   };
 
   try {
-    // 1. Mock AST extraction (in real pipeline, call ast-grep)
-    log('Step 1: Extracting AST symbols...');
-    const symbols: AstSymbol[] = generateMockSymbols(limit || 10);
-    log(`Extracted ${symbols.length} symbols`);
+    const pgPool = new Pool({ connectionString });
 
-    // 2. Compute lexical features
-    log('Step 2: Computing lexical features...');
-    const enriched = computeLexicalFeaturesSync(symbols);
-    log(`Computed lexical features for ${enriched.length} symbols`);
+    // 1. Load real embeddings from codebase_chunk_index via join to atlas_packets
+    log('Step 1: Loading real 768-dim embeddings from codebase_chunk_index...');
+    const limitClause = limit > 0 ? `LIMIT ${limit}` : '';
+    const rows = await pgPool.query(`
+      SELECT
+        ap.packet_id,
+        ap.packet_key,
+        ap.source_ref,
+        ci.relative_path,
+        ci.content_embedding::text AS embedding_text
+      FROM codebase_chunk_index ci
+      JOIN atlas_packets ap ON ap.source_ref = 'sveltekit-frontend/' || ci.relative_path
+      WHERE ci.content_embedding IS NOT NULL
+        AND length(ci.relative_path) > 0
+      ORDER BY ci.relative_path
+      ${limitClause}
+    `);
+    log(`Loaded ${rows.rows.length} chunk-packet rows from Postgres`);
 
-    // 3. Compress to latent space
-    log('Step 3: Compressing to 64-dim latent space...');
+    // 2. Parse halfvec text format "[f1,f2,...]" into LexicalFeatures
+    log('Step 2: Parsing embedding vectors into LexicalFeature records...');
+    const enriched: LexicalFeatures[] = [];
+    for (const row of rows.rows) {
+      try {
+        const text: string = row.embedding_text;
+        const nums = text.slice(1, -1).split(',').map(Number);
+        if (nums.length < 64 || nums.some(isNaN)) continue;
+        enriched.push({
+          packet_id: row.packet_id ?? row.packet_key,
+          file: row.source_ref,
+          kind: 'function',
+          name: row.relative_path.split('/').pop() ?? row.relative_path,
+          line: 1,
+          column: 0,
+          lexical_tokens: nums.length,
+          identifier_variance: 0,
+          semantic_density: 0,
+          lexical_token_count: nums.length,
+          variant_tokens: 0,
+          entropy: 0,
+          feature_vector_768: nums,
+          feature_hash: row.packet_key.slice(0, 40),
+        });
+      } catch {
+        /* skip malformed rows */
+      }
+    }
+    log(`Parsed ${enriched.length} valid vectors (dim=${enriched[0]?.feature_vector_768?.length ?? 0})`);
+
+    if (enriched.length === 0) {
+      await pgPool.end();
+      return {
+        success: false,
+        summary: { symbolsExtracted: 0, lexicalFeatures: 0, compressedToLatent: 0, clustersCreated: 0, postgresUpdated: 0, neo4jEdges: 0 },
+        error: 'No valid embeddings loaded from Postgres',
+      };
+    }
+
+    // 3. Compress to latent space (TensorRT if available, else mock pass-through)
+    log('Step 3: Compressing to 64-dim latent space (TensorRT or fallback)...');
     const compressed = await compressToLatentSpace(enriched);
     log(`Compressed ${compressed.length} vectors`);
 
-    // 4. K-means clustering
+    // 4. K-means clustering on latent vectors
     log(`Step 4: Running K-means (K=${K})...`);
     const kmeansResult = await runKmeansClustering(compressed, K);
     log(`K-means complete: ${kmeansResult.assignments.length} assignments`);
 
     // 5. Attach to schema
-    log('Step 5: Attaching to Postgres schema...');
-    const pool = new Pool({ connectionString });
-    const schemaResult = await attachToPostgresSchema(pool, kmeansResult.assignments, { dryRun });
+    log('Step 5: Writing topolog_cluster to atlas_packets...');
+    const schemaResult = await attachToPostgresSchema(pgPool, kmeansResult.assignments, { dryRun });
     log(`Schema attachment: ${schemaResult.packetsUpdated} packets updated`);
 
     // 6. Write topology edges
     log('Step 6: Writing topology edges...');
-    const edgesResult = await writeTopologyEdgesToPostgres(pool, kmeansResult.assignments, { dryRun });
+    const edgesResult = await writeTopologyEdgesToPostgres(pgPool, kmeansResult.assignments, { dryRun });
     log(`Topology edges: ${edgesResult.edgesWritten} edges`);
 
-    await pool.end();
+    await pgPool.end();
 
     return {
       success: true,
       summary: {
-        symbolsExtracted: symbols.length,
+        symbolsExtracted: rows.rows.length,
         lexicalFeatures: enriched.length,
         compressedToLatent: compressed.length,
-        clustersCreated: new Set(kmeansResult.assignments.map(a => a.cluster_id)).size,
+        clustersCreated: new Set(kmeansResult.assignments.map((a) => a.cluster_id)).size,
         postgresUpdated: schemaResult.packetsUpdated,
-        neo4jEdges: edgesResult.edgesWritten
-      }
+        neo4jEdges: edgesResult.edgesWritten,
+      },
     };
   } catch (e) {
     const message = (e as Error).message;
@@ -444,58 +498,13 @@ export async function orchestrateAstLexicalKmeansTopology(
         compressedToLatent: 0,
         clustersCreated: 0,
         postgresUpdated: 0,
-        neo4jEdges: 0
+        neo4jEdges: 0,
       },
-      error: message
+      error: message,
     };
   }
 }
 
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-function generateMockSymbols(count: number): AstSymbol[] {
-  const kinds: AstSymbol['kind'][] = ['function', 'class', 'interface', 'type', 'variable', 'route'];
-  const files = [
-    'src/lib/server/db/client.ts',
-    'src/lib/server/graph/topology-ontology.ts',
-    'src/lib/server/gpu/libtorch-bridge.ts'
-  ];
-
-  const symbols: AstSymbol[] = [];
-  for (let i = 0; i < count; i++) {
-    symbols.push({
-      packet_id: uuidv4(),
-      file: files[i % files.length],
-      kind: kinds[i % kinds.length],
-      name: `symbol_${i}`,
-      line: 10 + i * 5,
-      column: 1,
-      lexical_tokens: 5 + (i % 20),
-      identifier_variance: Math.random() * 0.8,
-      semantic_density: 0.5 + Math.random() * 0.4
-    });
-  }
-  return symbols;
-}
-
-function computeLexicalFeaturesSync(symbols: AstSymbol[]): LexicalFeatures[] {
-  return symbols.map((sym, idx) => {
-    const tokenCount = sym.lexical_tokens || 5;
-    const variantTokens = Math.floor(tokenCount * (0.5 + Math.random() * 0.4));
-    const entropy = -variantTokens / tokenCount * Math.log2(variantTokens / tokenCount + 1e-6);
-
-    return {
-      ...sym,
-      lexical_token_count: tokenCount,
-      variant_tokens: variantTokens,
-      entropy,
-      feature_vector_768: Array.from({ length: 768 }, () => Math.random() * 2 - 1),
-      feature_hash: `feat_${sym.packet_id}`.substring(0, 40)
-    };
-  });
-}
 
 export default {
   getTensorrtAddon,
@@ -505,5 +514,5 @@ export default {
   attachToPostgresSchema,
   writeTopologyEdgesToPostgres,
   getTopologyStatistics,
-  orchestrateAstLexicalKmeansTopology
+  orchestrateAstLexicalKmeansTopology,
 };

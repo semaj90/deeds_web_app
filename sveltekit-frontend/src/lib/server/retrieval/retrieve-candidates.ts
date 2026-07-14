@@ -66,6 +66,7 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
       SELECT
         id,
         source_ref,
+        metadata,
         summary,
         content,
         ts_rank(search_vector, to_tsquery('english', ${queryTsQuery})) as score
@@ -79,6 +80,7 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
       type BM25Row = {
         id: string;
         source_ref: string;
+        metadata: Record<string, unknown> | null;
         summary: string;
         content: string;
         score: number;
@@ -86,7 +88,7 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
 
       return (result.rows as BM25Row[]).map(row => ({
         id: row.id,
-        packetKey: row.id, // Use id as packet_key
+        packetKey: (row.metadata?.packet_key as string) || row.id,
         sourceRef: row.source_ref || '',
         summary: row.summary || '',
         content: row.content || '',
@@ -117,6 +119,7 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
       SELECT
         id,
         source_ref,
+        metadata,
         summary,
         content,
         CASE
@@ -134,6 +137,7 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
     type TrigRamRow = {
       id: string;
       source_ref: string;
+      metadata: Record<string, unknown> | null;
       summary: string;
       content: string;
       score: number;
@@ -141,7 +145,7 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 
     return (result.rows as TrigRamRow[]).map(row => ({
       id: row.id,
-      packetKey: row.id,
+      packetKey: (row.metadata?.packet_key as string) || row.id,
       sourceRef: row.source_ref || '',
       summary: row.summary || '',
       content: row.content || '',
@@ -242,22 +246,25 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
     const result = await db.execute(sql`
       SELECT
         id,
-        packet_key,
         source_ref,
+        metadata,
         summary,
         content,
         1.0 as score
       FROM codebase_chunk_index
-      WHERE function_symbol IS NOT NULL
-        AND (function_symbol ILIKE ${searchPattern} OR packet_key ILIKE ${searchPattern})
+      WHERE COALESCE(metadata->>'function_symbol', symbol) IS NOT NULL
+        AND (
+          COALESCE(metadata->>'function_symbol', symbol) ILIKE ${searchPattern}
+          OR COALESCE(metadata->>'packet_key', id::text) ILIKE ${searchPattern}
+        )
       ORDER BY id ASC
       LIMIT ${EXACT_LIMIT}
     `);
 
     type ExactRow = {
       id: string;
-      packet_key: string;
       source_ref: string;
+      metadata: Record<string, unknown> | null;
       summary: string;
       content: string;
       score: number;
@@ -265,7 +272,7 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
 
     return (result.rows as ExactRow[]).map(row => ({
       id: row.id,
-      packetKey: row.packet_key,
+      packetKey: (row.metadata?.packet_key as string) || row.id,
       sourceRef: row.source_ref,
       summary: row.summary || '',
       content: row.content || '',
@@ -292,31 +299,31 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
 
     if (identifiers.length === 0) return [];
 
+    const identifierPredicates = identifiers.map((identifier) => sql`COALESCE(metadata->>'tree_node_id', output_meta->>'tree_node_id') ILIKE ${identifier}`);
+
     // Search for packets with tree_node_ids that match query identifiers
     // tree_node_ids is a TEXT[] array in Postgres
     const result = await db.execute(sql`
       SELECT
         id,
-        packet_key,
         source_ref,
+        metadata,
+        output_meta,
         summary,
         content,
         0.8 as score
       FROM codebase_chunk_index
-      WHERE tree_node_ids IS NOT NULL
-        AND array_length(tree_node_ids, 1) > 0
-        AND (
-          SELECT COUNT(*) FROM unnest(tree_node_ids) AS node_id
-          WHERE node_id ILIKE ANY(${identifiers})
-        ) > 0
-      ORDER BY array_length(tree_node_ids, 1) DESC
+      WHERE COALESCE(metadata->>'tree_node_id', output_meta->>'tree_node_id') IS NOT NULL
+        AND (${sql.join(identifierPredicates, sql` OR `)})
+      ORDER BY COALESCE(metadata->>'tree_node_id', output_meta->>'tree_node_id') ASC, id ASC
       LIMIT ${AST_LIMIT}
     `);
 
     type ASTRow = {
       id: string;
-      packet_key: string;
       source_ref: string;
+      metadata: Record<string, unknown> | null;
+      output_meta: Record<string, unknown> | null;
       summary: string;
       content: string;
       score: number;
@@ -324,7 +331,7 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
 
     return (result.rows as ASTRow[]).map(row => ({
       id: row.id,
-      packetKey: row.packet_key,
+      packetKey: (row.metadata?.packet_key as string) || (row.output_meta?.packet_key as string) || row.id,
       sourceRef: row.source_ref,
       summary: row.summary || '',
       content: row.content || '',

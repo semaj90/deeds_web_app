@@ -20,7 +20,7 @@ export function calculateFinalScore(result: AtlasSearchResult): number {
   if (!scores) {
     return 0.0;
   }
-  
+
   // Weights: 0.35 (Vector) + 0.25 (Graph) + 0.20 (Telemetry) + 0.10 (Recency) + 0.10 (Validation)
   return (
     0.35 * scores.vector +
@@ -60,7 +60,7 @@ export async function executeTricubicSearch(request: AtlasSearchRequest): Promis
   // 3. Combine and Rank (The core logic)
   // This step would involve merging the results from the three sources,
   // resolving conflicts, and applying the final scoring formula.
-  
+
   // For now, we return a mock result structure to satisfy the contract.
   const mockResult: AtlasSearchResult = {
     id: "mock-id-1",

@@ -5,6 +5,9 @@
  * Phase 1 (✅ Complete): Reader, Writer, Validator — smoke-tested
  * Phase 2 (⏳ In Progress): Token remapping for RL datasets
  * Phase 3: GPU acceleration (P5)
+ *
+ * For serialization-only boundaries (token remapping, mmap export), use packet-io.ts instead.
+ * This barrel maintains full scope; packet-io.ts is a narrow I/O boundary.
  */
 
 // ── ACE Atlas Packets (Canonical Truth) ────────────────────────────────────

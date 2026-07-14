@@ -18,6 +18,7 @@ import type {
   CanonicalPacketIdentity,
   PacketMetadata,
 } from '../db/packet-topology-envelope.js';
+import { generateTitleIdentity } from '../ace/title-id-generator.js';
 
 /**
  * Metadata about the gRPC call that produced this response
@@ -49,7 +50,7 @@ export function assemblePacketFromGrpcResponse(
   const identity = extractIdentity(toolResponse, metadata);
 
   // Extract semantics (optional but recommended)
-  const semantics = extractSemantics(toolResponse, metadata);
+  const semantics = extractSemantics(toolResponse, metadata, identity.packet_key, identity.feature_id);
 
   // Extract topology (optional)
   const topology = extractTopology(toolResponse, metadata);
@@ -158,16 +159,23 @@ function extractIdentity(
  */
 function extractSemantics(
   response: Record<string, any>,
-  metadata: AssemblyMetadata
+  metadata: AssemblyMetadata,
+  packetKey?: string,
+  featureId?: string
 ): Partial<PacketMetadata> | null {
-  const title_id = response.title_id ?? response.titleId ?? null;
   const summary = response.summary ?? null;
   const domain_class = response.domain_class ?? response.domainClass ?? null;
   const semantic_tags = response.semantic_tags ?? response.semanticTags ?? [];
 
-  if (!title_id && !summary && !domain_class && semantic_tags.length === 0) {
+  if (!summary && !domain_class && semantic_tags.length === 0) {
     return null; // No semantics extracted
   }
+
+  // Always regenerate title_id through the canonical generator — never forward gRPC passthrough values.
+  // This ensures every packet written via ACP uses the same derivation as the promotion enrichment path.
+  const title_id = packetKey
+    ? generateTitleIdentity(packetKey, { featureId: featureId ?? undefined }).titleId
+    : null;
 
   return {
     title_id,

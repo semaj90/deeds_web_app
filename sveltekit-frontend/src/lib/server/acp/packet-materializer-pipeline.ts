@@ -13,6 +13,10 @@
 
 import type { PacketTopologyEnvelope } from '../db/packet-topology-envelope.js';
 import type { PoolClient } from 'pg';
+import { generateTitleIdentity } from '../ace/title-id-generator.js';
+
+// Canonical title_id format: title:<slug>:<8-char-hex> where slug = [a-z0-9]+(-[a-z0-9]+)*
+const CANONICAL_TITLE_RE = /^title:[a-z0-9]+(?:-[a-z0-9]+)*:[a-f0-9]{8}$/;
 
 /**
  * Configuration for materialization behavior
@@ -234,11 +238,26 @@ function validatePacketStructure(packet: PacketTopologyEnvelope): void {
 
 /**
  * Step 3: Write packet to Postgres
+ *
+ * Enforces canonical title_id format before persisting. Any non-canonical value
+ * (gRPC passthrough, legacy format, missing value) is regenerated here so the DB
+ * never receives a non-canonical title_id regardless of how the packet was assembled.
  */
 async function writePacketToPostgres(
   packet: PacketTopologyEnvelope,
   pgClient: PoolClient
 ): Promise<void> {
+  // Canonical title_id guard: must match `title:<slug>:<8-char-hex>` pattern.
+  // Regenerate if missing or not in canonical format.
+  if (!packet.title_id || !CANONICAL_TITLE_RE.test(packet.title_id)) {
+    const enrichedPacket = {
+      ...packet,
+      title_id: generateTitleIdentity(packet.packet_key, {
+        featureId: packet.feature_id ?? undefined,
+      }).titleId,
+    };
+    packet = enrichedPacket;
+  }
   const query = `
     INSERT INTO atlas_packets (
       packet_key, source_ref, file_path, function_symbol, feature_id, feature_label,

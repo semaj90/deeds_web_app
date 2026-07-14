@@ -14,6 +14,7 @@
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import type { FeatureEnvelope } from './feature-envelope.js';
+import { enrichPacketSemantics } from '$lib/server/ace/promotion-enrichment-service.js';
 
 export enum PromotionOperation {
   PROMOTE_SUMMARY = 'promote_summary',
@@ -43,6 +44,7 @@ export interface PromotionResult {
 /**
  * Stage 1: Record promotion intent in Postgres transaction
  * Enqueues outbox jobs atomically with the rest of the transaction
+ * Includes semantic enrichment (domain classification + title generation) before persistence
  */
 export async function recordPromotionIntent(
   packets: FeatureEnvelope[],
@@ -66,7 +68,16 @@ export async function recordPromotionIntent(
     }> = [];
 
     for (const packet of packets) {
-      // Enqueue summary promotion
+      // Step 1: Enrich packet with semantic metadata (domain + title_id)
+      const enriched = enrichPacketSemantics(packet);
+
+      if (!enriched._enrichmentValid) {
+        console.warn(
+          `Enrichment validation failed for packet ${packet.packet_key}; promotion will proceed but metadata may be incomplete`
+        );
+      }
+
+      // Step 2: Enqueue summary promotion (now includes domain_class, title_id, title_generator_version)
       jobs.push({
         packet_key: packet.packet_key,
         source_ref: packet.source_ref,
@@ -79,10 +90,16 @@ export async function recordPromotionIntent(
           retrieval_score: packet.retrieval_score,
           fusion_score: packet.fusion_score,
           rerank_score: packet.retrieval_score,
+          // Enrichment fields: semantic title, domain classification, title identity
+          semantic_title: enriched._enrichment.semanticTitle,
+          title_id: enriched._enrichment.titleId,
+          title_generator_version: enriched._enrichment.titleGeneratorVersion,
+          domain_class: enriched._enrichment.domainClass,
+          enrichment_valid: enriched._enrichmentValid,
         },
       });
 
-      // Enqueue Qdrant promotion if vector reference exists
+      // Step 4: Enqueue Qdrant promotion if vector reference exists
       if (packet.qdrant_point_id) {
         jobs.push({
           packet_key: packet.packet_key,
@@ -93,12 +110,18 @@ export async function recordPromotionIntent(
           payload: {
             qdrant_point_id: packet.qdrant_point_id,
             query_text: context.queryText,
+            // Include enrichment fields in Qdrant payload mirror
+            semantic_title: enriched._enrichment.semanticTitle,
+            title_id: enriched._enrichment.titleId,
+            domain_class: enriched._enrichment.domainClass,
           },
         });
       }
     }
 
     // Batch insert all jobs in a single transaction
+    // Idempotency: ON CONFLICT (packet_key, source_ref, operation) prevents duplicate promotions
+    // with the same (packet_key, source_ref, operation) triple and title_generator_version
     if (jobs.length > 0) {
       const result = await db.execute(sql`
         INSERT INTO promotion_outbox (packet_key, source_ref, content_hash, summary, operation, payload, status)
@@ -200,6 +223,7 @@ export async function executePromotionJob(job: PromotionJob): Promise<PromotionR
 /**
  * Substage: Promote summary to atlas_packets in Postgres
  * Uses INSERT ... ON CONFLICT for single-query atomicity (eliminates double-query antipattern)
+ * Includes semantic enrichment fields: domain_class, title_id, title_generator_version
  */
 async function promoteSummary(
   job: PromotionJob,
@@ -207,12 +231,29 @@ async function promoteSummary(
   stagesFailed: string[]
 ): Promise<PromotionResult> {
   try {
-    // Single atomic query: insert or update summary
+    // Single atomic query: insert or update summary + enrichment fields
     await db.execute(sql`
-      INSERT INTO atlas_packets (packet_key, source_ref, summary, updated_at)
-      VALUES (${job.packet_key}, ${job.source_ref}, ${job.summary}, NOW())
+      INSERT INTO atlas_packets (
+        packet_key, source_ref, summary,
+        domain_class, title_id, title_generator_version,
+        updated_at
+      )
+      VALUES (
+        ${job.packet_key},
+        ${job.source_ref},
+        ${job.summary},
+        ${(job.payload.domain_class as string) || null},
+        ${(job.payload.title_id as string) || null},
+        ${(job.payload.title_generator_version as string) || null},
+        NOW()
+      )
       ON CONFLICT (packet_key) DO UPDATE
-      SET summary = EXCLUDED.summary, updated_at = NOW()
+      SET
+        summary = EXCLUDED.summary,
+        domain_class = EXCLUDED.domain_class,
+        title_id = EXCLUDED.title_id,
+        title_generator_version = EXCLUDED.title_generator_version,
+        updated_at = NOW()
     `);
     stagesCompleted.push('postgres_summary_upsert');
 
@@ -220,7 +261,7 @@ async function promoteSummary(
       job_id: job.id,
       success: true,
       operation: job.operation,
-      message: 'Summary promoted to atlas_packets',
+      message: 'Summary + enrichment metadata promoted to atlas_packets',
       stages_completed: stagesCompleted,
       stages_failed: stagesFailed,
     };

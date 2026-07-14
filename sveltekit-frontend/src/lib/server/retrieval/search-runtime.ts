@@ -197,6 +197,7 @@ export class SearchRuntime {
       stageTiming.rerank = Date.now() - rerankStart;
 
       // Stage 5: Finalize and return
+      // Domain classification and title generation happen in enrichment/promotion service, not here
       const finalPackets = reranked.slice(0, query.topK);
 
       // Stage 6: Promotion (transactional outbox, non-blocking)

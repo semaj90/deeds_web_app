@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-07-14T04:56:28.972Z",
+  "runId": "title-smoke-8a99e51e22c53a9efb5d1575",
+  "limit": 25,
+  "mode": "apply",
+  "generatorVersion": "semantic-title-v1",
+  "totals": {
+    "selectedRows": 25,
+    "firstApplyUpdated": 25,
+    "firstApplySkipped": 0,
+    "secondApplyUpdated": 0,
+    "secondApplySkipped": 25,
+    "verifyMismatches": 0
+  },
+  "checks": {
+    "packetKeyStable": true,
+    "sourceRefStable": true,
+    "featureIdStable": true,
+    "qdrantPointIdStable": true,
+    "titleIdCanonical": true
+  },
+  "sample": [
+    {
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "6154722635406530000",
+      "title_id_before": "title:grpc-service:dd39eb4c",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:9bd07771"
+    },
+    {
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "6110266167187884000",
+      "title_id_before": "title:grpc-service:32a82e5c",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:fc9dc689"
+    },
+    {
+      "packet_key": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "5039325894668581000",
+      "title_id_before": "title:grpc-service:29c02d6e",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:e920288f"
+    },
+    {
+      "packet_key": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "8043140365143042000",
+      "title_id_before": "title:grpc-service:972fae62",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:d015d33f"
+    },
+    {
+      "packet_key": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "7602461015851946000",
+      "title_id_before": "title:grpc-service:ccbe6c8b",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:57c1e0cd"
+    },
+    {
+      "packet_key": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "2247177181138465500",
+      "title_id_before": "title:grpc-service:07da347c",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:3b46d1bc"
+    },
+    {
+      "packet_key": "1d5eba7211dea6f9",
+      "source_ref": "proto:ChatAssistantService.SendMessage",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "2565377371098813400",
+      "title_id_before": "title:grpc-service:ff72972d",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:e4a6b701"
+    },
+    {
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "7101807950526120000",
+      "title_id_before": "title:grpc-service:c357c9ed",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:747ed8eb"
+    },
+    {
+      "packet_key": "25c824811a2efd81",
+      "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "4627679610974966000",
+      "title_id_before": "title:grpc-service:f79ea7df",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:e988f76e"
+    },
+    {
+      "packet_key": "271b5446f6a86a48",
+      "source_ref": "proto:CyberElephantService.GetClusters",
+      "feature_id": "grpc_service",
+      "qdrant_point_id": "5147741077320206000",
+      "title_id_before": "title:grpc-service:ce27cb20",
+      "title_generator_version_before": "deterministic-title-v1",
+      "canonical_title_id": "title:grpc-service:b7cfe554"
+    }
+  ],
+  "mismatches": [],
+  "status": "PASS",
+  "durationMs": 392
+}
