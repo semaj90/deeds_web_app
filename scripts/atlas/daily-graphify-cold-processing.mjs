@@ -15,7 +15,8 @@
  *   node scripts/atlas/daily-graphify-cold-processing.mjs --skip-duckdb --limit=10
  *
  * Flags:
- *   --apply-couchdb         Write CouchDB docs (default: dry-run only)
+ *   --apply-tsvector        Refresh search_vector tsvector for NULL/stale rows (trigger covers new rows automatically)
+ *   --apply-couchdb         Write CouchDB docs (default: dry-run only); also implies --apply-tsvector
  *   --apply-profile-cards   Write profile card JSON files (default: dry-run only)
  *   --skip-duckdb           Skip DuckDB offline synthesis step
  *   --limit=<n>             Limit number of profile cards generated
@@ -35,6 +36,7 @@ const REPO_ROOT = resolve(__dirname, '../..');
 const args = new Set(process.argv.slice(2));
 const APPLY_COUCHDB = args.has('--apply-couchdb');
 const APPLY_PROFILE_CARDS = args.has('--apply-profile-cards');
+const APPLY_TSVECTOR = args.has('--apply-tsvector') || args.has('--apply-couchdb'); // also run on --apply-couchdb
 const SKIP_DUCKDB = args.has('--skip-duckdb');
 const LIMIT_ARG = [...args].find(a => a.startsWith('--limit='))?.split('=')[1];
 const LIMIT = LIMIT_ARG ? parseInt(LIMIT_ARG, 10) : 0;
@@ -47,7 +49,7 @@ const DATABASE_URL = resolveDatabaseUrl(repoEnv);
 const results = {
   runId: RUN_ID,
   startedAt: new Date().toISOString(),
-  flags: { APPLY_COUCHDB, APPLY_PROFILE_CARDS, SKIP_DUCKDB, LIMIT },
+  flags: { APPLY_COUCHDB, APPLY_PROFILE_CARDS, APPLY_TSVECTOR, SKIP_DUCKDB, LIMIT },
   steps: {},
   errors: [],
   summary: {},
@@ -61,6 +63,45 @@ function logStep(step, result) {
   results.steps[step] = result;
   const icon = result.ok ? '✓' : '✗';
   log(`${icon} ${step}: ${result.message}`);
+}
+
+// ── Step 0: Refresh search_vector tsvector (opt-in: --apply-tsvector) ────────
+// NOTE: A Postgres trigger `trig_update_codebase_chunk_search_vector` handles
+// automatic search_vector maintenance on INSERT/UPDATE (see drizzle/0019_bm25_search_vector.sql).
+// This step is a safety net for rows that predate the trigger or were inserted
+// outside normal flows. Pass --apply-tsvector (or --apply-couchdb) to run it.
+async function refreshTsvector() {
+  if (!APPLY_TSVECTOR) {
+    log('── Step 0: search_vector refresh (SKIPPED — pass --apply-tsvector to enable) ─');
+    logStep('tsvector-refresh', { ok: true, message: 'Skipped: pass --apply-tsvector to refresh stale rows' });
+    return true;
+  }
+
+  log('── Step 0: Refreshing search_vector tsvector ────────────────────────────');
+  const pool = new pg.Pool({ connectionString: DATABASE_URL });
+  try {
+    const { rowCount } = await pool.query(`
+      UPDATE codebase_chunk_index
+      SET search_vector = to_tsvector('english',
+        COALESCE(summary, '') || ' ' ||
+        COALESCE(content, '') || ' ' ||
+        COALESCE(source_ref, ''))
+      WHERE search_vector IS NULL
+        OR updated_at > (NOW() - INTERVAL '24 hours')
+    `);
+
+    const n = rowCount ?? 0;
+    results.summary.tsvectorRefresh = { rowsUpdated: n };
+    log(`  Refreshed search_vector for ${n} chunks`);
+    logStep('tsvector-refresh', { ok: true, message: `Refreshed search_vector for ${n} chunks` });
+    return true;
+  } catch (err) {
+    results.errors.push(`tsvector-refresh: ${err.message}`);
+    logStep('tsvector-refresh', { ok: false, message: `FAILED: ${err.message}` });
+    return false;
+  } finally {
+    await pool.end();
+  }
 }
 
 // ── Step 1: Postgres lineage coverage audit ───────────────────────────────────
@@ -458,6 +499,7 @@ function writeSummaryReport() {
 
 | Flag | Value |
 |------|-------|
+| \`--apply-tsvector\` | ${APPLY_TSVECTOR} |
 | \`--apply-couchdb\` | ${APPLY_COUCHDB} |
 | \`--apply-profile-cards\` | ${APPLY_PROFILE_CARDS} |
 | \`--skip-duckdb\` | ${SKIP_DUCKDB} |
@@ -514,9 +556,10 @@ ${results.errors.length === 0 ? '_None_' : results.errors.map(e => `- ${e}`).joi
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
   log(`Starting Parent Atlas Cold-Processing Pipeline [runId=${RUN_ID}]`);
-  log(`Flags: couchdb=${APPLY_COUCHDB ? 'APPLY' : 'dry'} | cards=${APPLY_PROFILE_CARDS ? 'APPLY' : 'dry'} | duckdb=${SKIP_DUCKDB ? 'SKIP' : 'run'} | limit=${LIMIT || 'none'}`);
+  log(`Flags: tsvector=${APPLY_TSVECTOR ? 'APPLY' : 'skip'} | couchdb=${APPLY_COUCHDB ? 'APPLY' : 'dry'} | cards=${APPLY_PROFILE_CARDS ? 'APPLY' : 'dry'} | duckdb=${SKIP_DUCKDB ? 'SKIP' : 'run'} | limit=${LIMIT || 'none'}`);
   log('');
 
+  await refreshTsvector();
   await auditPostgresLineage();
   runCouchDBMapReduce();
   runDuckDBMapReduce();

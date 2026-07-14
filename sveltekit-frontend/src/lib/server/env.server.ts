@@ -422,6 +422,8 @@ export const ENV = {
   RAG_SERVICE_URL: privateEnv.RAG_SERVICE_URL ?? `http://${LOOPBACK_IP}:8103`,
   // Image Synthesis + 3D Reconstruction service (Wan2.1 + DepthAnything, port 8092)
   IMAGE_SYNTHESIS_URL: privateEnv.IMAGE_SYNTHESIS_URL ?? `http://${LOOPBACK_IP}:8092`,
+  // CrossEncoder reranker sidecar (mixedbread-ai/mxbai-rerank-base-v2, port 8093)
+  RERANKER_SIDECAR_URL: privateEnv.RERANKER_SIDECAR_URL ?? `http://${LOOPBACK_IP}:8093`,
   // Redis host + port (for ioredis explicit config)
   REDIS_HOST: privateEnv.REDIS_HOST ?? LOOPBACK_IP,
   REDIS_PORT: Number(privateEnv.REDIS_PORT ?? '6379'),

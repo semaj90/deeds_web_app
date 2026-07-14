@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 CrossEncoder reranker HTTP sidecar.
-Runs on port 8092, independent of SvelteKit and Gemma4.
+Runs on port 8093, independent of SvelteKit and Gemma4.
 Model: mixedbread-ai/mxbai-rerank-base-v2 (0.5B params, 384-dim output)
 """
 
@@ -167,7 +167,7 @@ async def health() -> dict:
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("RERANKER_PORT", "8092"))
+    port = int(os.getenv("RERANKER_PORT", "8093"))
     host = os.getenv("RERANKER_HOST", "127.0.0.1")
 
     print(f"[Reranker] Starting on {host}:{port}")

@@ -16,12 +16,15 @@ import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { execFile } from 'node:child_process';
+import { basename, extname, resolve as pathResolve } from 'node:path';
 import type { Candidate } from './search-runtime.js';
 
 const BM25_LIMIT = 100;
 const QDRANT_LIMIT = 100;
 const EXACT_LIMIT = 50;
 const AST_LIMIT = 50;
+const RG_LIMIT = 30;
 
 /**
  * Retrieve candidates from all sources
@@ -30,14 +33,15 @@ export async function retrieveAllCandidates(
   query: string,
   _limit: number = 128,
 ): Promise<Candidate[]> {
-  const [bm25, qdrant, exact, ast] = await Promise.all([
+  const [bm25, qdrant, exact, ast, rg] = await Promise.all([
     retrieveBM25(query),
     retrieveQdrant(query),
     retrieveExactMatches(query),
     retrieveASTMatches(query),
+    retrieveRipgrep(query),
   ]);
 
-  return [...bm25, ...qdrant, ...exact, ...ast];
+  return [...bm25, ...qdrant, ...exact, ...ast, ...rg];
 }
 
 /**
@@ -355,6 +359,124 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
     }));
   } catch (error) {
     console.warn('AST match retrieval failed:', error);
+    return [];
+  }
+}
+
+const RG_STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'this', 'that', 'from', 'have', 'not', 'are', 'was', 'were']);
+
+/**
+ * Ripgrep keyword lane — file-system lexical search
+ * Extracts identifier-like keywords from the query, runs rg against src/ to find
+ * matching files, then looks up chunks by source_ref in Postgres.
+ * Silent on any rg error (binary absent, timeout, no matches).
+ */
+export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
+  try {
+    // Extract identifier-like keywords from query
+    const keywords = (query.match(/\b[a-zA-Z_][a-zA-Z0-9_]{2,}\b/g) ?? [])
+      .filter(kw => !RG_STOP_WORDS.has(kw.toLowerCase()))
+      .slice(0, 8);
+
+    if (keywords.length === 0) return [];
+
+    // Run rg for each keyword in parallel, collect matched file paths
+    const rgResults = await Promise.all(
+      keywords.map(kw =>
+        new Promise<string[]>((resolve) => {
+          // cwd: SvelteKit dev server runs from sveltekit-frontend/, so process.cwd() is correct
+          const child = execFile(
+            'rg',
+            ['--json', '-l', '-i', kw, 'src/'],
+            { cwd: pathResolve(process.cwd()), timeout: 5000 },
+            (err, stdout) => {
+              if (err) {
+                resolve([]);
+                return;
+              }
+              // rg --json -l emits one JSON object per line; "match" type lines contain path.text
+              const paths: string[] = [];
+              for (const line of stdout.split('\n')) {
+                if (!line.trim()) continue;
+                try {
+                  const obj = JSON.parse(line);
+                  if (obj.type === 'match' || obj.type === 'path') {
+                    const p = obj.data?.path?.text ?? obj.data?.lines?.text;
+                    if (p) paths.push(p as string);
+                  }
+                } catch {
+                  // skip malformed lines
+                }
+              }
+              resolve(paths);
+            }
+          );
+          // Belt-and-suspenders timeout via AbortController is not available on execFile;
+          // the `timeout` option above handles it.
+          void child;
+        })
+      )
+    );
+
+    // Collect unique file stems across all keyword results
+    const stems = new Set<string>();
+    for (const paths of rgResults) {
+      for (const filePath of paths) {
+        const stem = basename(filePath, extname(filePath));
+        if (stem) stems.add(stem);
+      }
+    }
+
+    if (stems.size === 0) return [];
+
+    // Query codebase_chunk_index for chunks whose source_ref contains any of the file stems
+    const candidates: Candidate[] = [];
+    for (const stem of stems) {
+      if (candidates.length >= RG_LIMIT) break;
+
+      const stemPattern = `%${stem}%`;
+      const remaining = RG_LIMIT - candidates.length;
+
+      try {
+        const result = await db.execute(sql`
+          SELECT
+            id,
+            source_ref,
+            metadata,
+            summary,
+            content
+          FROM codebase_chunk_index
+          WHERE source_ref ILIKE ${stemPattern}
+          ORDER BY id ASC
+          LIMIT ${remaining}
+        `);
+
+        type RgRow = {
+          id: string;
+          source_ref: string;
+          metadata: Record<string, unknown> | null;
+          summary: string;
+          content: string;
+        };
+
+        for (const row of result.rows as RgRow[]) {
+          candidates.push({
+            id: row.id,
+            packetKey: (row.metadata?.packet_key as string) || row.id,
+            sourceRef: row.source_ref || '',
+            summary: row.summary || '',
+            content: row.content || '',
+            score: 0.7,
+            scoreSource: 'rg_keyword' as const,
+          });
+        }
+      } catch {
+        // ignore per-stem DB errors
+      }
+    }
+
+    return candidates;
+  } catch {
     return [];
   }
 }

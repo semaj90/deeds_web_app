@@ -83,7 +83,7 @@ export interface Candidate {
   summary: string;
   content: string;
   score: number;
-  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema';
+  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema' | 'rg_keyword';
 }
 
 /**

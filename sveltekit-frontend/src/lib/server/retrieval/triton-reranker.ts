@@ -32,7 +32,33 @@ export async function scoreBatchCrossEncoder(
     candidates: string[]
 ): Promise<number[]> {
     if (candidates.length === 0) return [];
-    
+
+    // Try sidecar first if configured
+    if (ENV.RERANKER_SIDECAR_URL) {
+        try {
+            const res = await fetch(`${ENV.RERANKER_SIDECAR_URL}/rerank`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query,
+                    candidates: candidates.map((text, i) => ({ packet_key: String(i), text })),
+                    batch_size: 32,
+                }),
+                signal: AbortSignal.timeout(10_000),
+            });
+            if (res.ok) {
+                const data = await res.json() as { ranked: Array<{ packet_key: string; score: number }> };
+                // ranked is sorted descending; re-associate scores back to original positions
+                const scoreByIndex = new Map<number, number>(
+                    data.ranked.map(r => [Number(r.packet_key), r.score])
+                );
+                return candidates.map((_, i) => scoreByIndex.get(i) ?? 0);
+            }
+        } catch {
+            // fall through to Triton
+        }
+    }
+
     try {
         const payload = {
             inputs: [
