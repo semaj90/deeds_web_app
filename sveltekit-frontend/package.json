@@ -58,6 +58,8 @@
     "atlas:embed:full-corpus:apply:verbose": "node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64 --verbose",
     "atlas:backfill:topology:dry": "node ../scripts/atlas/backfill-topology-lane.mjs --dry-run --check-prerequisites",
     "atlas:backfill:topology:plan": "node ../scripts/atlas/backfill-topology-lane.mjs --check-prerequisites",
+    "atlas:backfill:hybrid": "node scripts/atlas/backfill-hybrid-collection.mjs",
+    "atlas:backfill:hybrid:dry": "node scripts/atlas/backfill-hybrid-collection.mjs --dry-run",
     "atlas:validate:completeness": "node scripts/atlas/validate-canonical-completeness.mjs",
     "atlas:validate:completeness:watch": "node scripts/atlas/validate-canonical-completeness.mjs --watch",
     "atlas:workstation:status": "node ../scripts/atlas/parent-atlas-workstation-status.mjs",

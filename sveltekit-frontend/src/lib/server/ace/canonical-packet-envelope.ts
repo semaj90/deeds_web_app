@@ -37,6 +37,10 @@ export type CanonicalAcePacketEnvelope = {
   };
   columnar_tables?: string[];
   mmap_vector_refs?: string[];
+  // Structural identity (AST-derived, not synthetic)
+  tree_node_id?: string | null;
+  // Qdrant mirror identity (set after upsert)
+  qdrant_point_id?: string | null;
 };
 
 export type CanonicalAcePacketEnvelopeRow = Partial<Record<
@@ -102,7 +106,11 @@ export type CanonicalAcePacketEnvelopeRow = Partial<Record<
   | 'columnar_tables'
   | 'columnarTables'
   | 'mmap_vector_refs'
-  | 'mmapVectorRefs',
+  | 'mmapVectorRefs'
+  | 'tree_node_id'
+  | 'treeNodeId'
+  | 'qdrant_point_id'
+  | 'qdrantPointId',
   unknown
 >>;
 
@@ -160,6 +168,8 @@ export const CanonicalAcePacketEnvelopeSchema = z.object({
   }),
   columnar_tables: z.array(z.string().min(1)).default([]),
   mmap_vector_refs: z.array(z.string().min(1)).default([]),
+  tree_node_id: z.string().min(1).nullable().optional(),
+  qdrant_point_id: z.string().min(1).nullable().optional(),
 }).strict();
 
 function stringArray(...values: unknown[]): string[] {
@@ -294,9 +304,11 @@ export function buildCanonicalAcePacketEnvelope(
     packed_arrays: packedArrays,
     columnar_tables: columnarTables,
     mmap_vector_refs: mmapVectorRefs,
+    tree_node_id: (row.tree_node_id ?? row.treeNodeId ?? null) as string | null | undefined,
+    qdrant_point_id: (row.qdrant_point_id ?? row.qdrantPointId ?? null) as string | null | undefined,
   };
 
-  return CanonicalAcePacketEnvelopeSchema.parse(envelope);
+  return CanonicalAcePacketEnvelopeSchema.parse(envelope) as unknown as CanonicalAcePacketEnvelope;
 }
 
 export function validateCanonicalAcePacketEnvelope(
@@ -304,7 +316,7 @@ export function validateCanonicalAcePacketEnvelope(
 ): { ok: boolean; envelope?: CanonicalAcePacketEnvelope; error?: string } {
   const result = CanonicalAcePacketEnvelopeSchema.safeParse(value);
   if (result.success) {
-    return { ok: true, envelope: result.data };
+    return { ok: true, envelope: result.data as unknown as CanonicalAcePacketEnvelope };
   }
   return { ok: false, error: result.error.message };
 }

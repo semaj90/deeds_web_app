@@ -130,7 +130,7 @@ Output: Categorized TODO files + priority matrix + roadmap
 
 **Key features**:
 - 5 scenario categories (25%, 25%, 20%, 15%, 15% distribution)
-- ShareGPT message format (Gemma 3 compatible)
+- ShareGPT message format (Gemma 3(4)? compatible)
 - Realistic tool argument generation
 - Multi-step reasoning chains (2-4 tools per example)
 
@@ -393,12 +393,10 @@ Run the 4 validation tests (TODO aggregation, migration safety, ML inventory, AP
 ### 5. Deploy
 ```bash
 # Export from Colab (GGUF format)
-# Import to Ollama
-ollama create gemma3-legal-detective -f Modelfile-gemma3-legal-detective
-ollama tag gemma3-legal-detective gemma3-legal:latest
+trt-ll
 
 # Test
-ollama run gemma3-legal "Analyze all TODOs and create a sprint plan"
+gemma4 "Analyze all TODOs and create a sprint plan"m
 ```
 
 ---

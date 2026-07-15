@@ -283,3 +283,67 @@ export interface ClusterAssignments {
   community_id?: bigint; // Leiden/Louvain result
   pagerank?: number; // Graph authority score
 }
+
+export interface DenseEmbedding {
+  values: number[];
+  model: string;
+  dimension: number;
+  version: string;
+}
+
+export interface SparseEncoding {
+  indices: number[];
+  values: number[];
+  encoderVersion: string;
+  vocabularyVersion: string;
+}
+
+export function assertDenseEmbedding(e: DenseEmbedding, expectedDim: number): void {
+  if (e.dimension !== expectedDim || e.values.length !== expectedDim) {
+    throw new Error(
+      `Dense embedding contract mismatch: got ${e.dimension}/${e.values.length}, expected ${expectedDim}`
+    );
+  }
+  if (e.values.some(v => !Number.isFinite(v))) {
+    throw new Error('Dense embedding contains non-finite values');
+  }
+}
+
+export type SparseVectorName = 'bm42_sparse';
+
+/**
+ * Per-collection contract — prevents callers from relying on Qdrant to return
+ * application-level metadata. Smoke tests use COLLECTION_CONTRACTS directly.
+ */
+export interface CollectionContract {
+  contractVersion: string;
+  denseVectors: Partial<Record<CodebaseVectorName, number>>;
+  sparseVectors?: SparseVectorName[];
+  primaryDenseVector: CodebaseVectorName;
+  primaryDimension: number;
+  description: string;
+}
+
+export const COLLECTION_CONTRACTS: Record<string, CollectionContract> = {
+  codebase_chunks_384_hybrid: {
+    contractVersion: 'atlas-qdrant-384-hybrid-v1',
+    denseVectors: { content: 384 },
+    sparseVectors: ['bm42_sparse'],
+    primaryDenseVector: 'content',
+    primaryDimension: 384,
+    description: 'Hybrid collection: dense content (384-dim) + BM42 sparse. Canonical retrieval target.',
+  },
+  codebase_chunks_384: {
+    contractVersion: 'atlas-qdrant-384-dense-v1',
+    denseVectors: { content: 384 },
+    primaryDenseVector: 'content',
+    primaryDimension: 384,
+    description: 'Dense-only collection (transitional). Migrate reads to codebase_chunks_384_hybrid.',
+  },
+};
+
+/** Canonical hybrid collection — dense (384-dim content) + BM42 sparse. */
+export const CANONICAL_HYBRID_COLLECTION = 'codebase_chunks_384_hybrid' as const;
+
+/** Transitional dense-only collection — fallback when hybrid is not yet populated. */
+export const TRANSITIONAL_DENSE_COLLECTION = 'codebase_chunks_384' as const;

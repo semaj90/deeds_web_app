@@ -19,12 +19,16 @@ import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';
 import type { Candidate } from './search-runtime.js';
+import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
 
 const BM25_LIMIT = 100;
 const QDRANT_LIMIT = 100;
 const EXACT_LIMIT = 50;
 const AST_LIMIT = 50;
 const RG_LIMIT = 30;
+const SPARSE_LIMIT = 50;
+
+const _sparseRetriever = createBm42SparseRetriever();
 
 /**
  * Retrieve candidates from all sources
@@ -33,15 +37,37 @@ export async function retrieveAllCandidates(
   query: string,
   _limit: number = 128,
 ): Promise<Candidate[]> {
-  const [bm25, qdrant, exact, ast, rg] = await Promise.all([
+  const [bm25, qdrant, exact, ast, rg, sparse] = await Promise.all([
     retrieveBM25(query),
     retrieveQdrant(query),
     retrieveExactMatches(query),
     retrieveASTMatches(query),
     retrieveRipgrep(query),
+    retrieveBM42Sparse(query),
   ]);
 
-  return [...bm25, ...qdrant, ...exact, ...ast, ...rg];
+  return [...bm25, ...qdrant, ...exact, ...ast, ...rg, ...sparse];
+}
+
+/**
+ * BM42 sparse retrieval via Qdrant named sparse vector (bm42_sparse lane)
+ * Runs against codebase_chunks_384_hybrid collection.
+ */
+async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
+  try {
+    const laneCandidates = await _sparseRetriever.retrieve({ query, limit: SPARSE_LIMIT });
+    return laneCandidates.map(lc => ({
+      id: lc.qdrantPointId ?? lc.packetKey,
+      packetKey: lc.packetKey,
+      sourceRef: lc.sourceRef,
+      summary: (lc.metadata?.summary as string) || '',
+      content: (lc.metadata?.content as string) || '',
+      score: lc.score ?? 0,
+      scoreSource: 'qdrant' as const,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -179,32 +205,29 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 
 /**
  * Semantic retrieval via Qdrant ANN search
- * Uses canonical codebase_chunks_384 collection (384-dimensional embeddings)
- * Fallback to codebase_chunks_768 (legacy) if 384 unavailable
+ * Primary: codebase_chunks_384_hybrid (dense 384-dim + BM42 sparse)
+ * Fallback: codebase_chunks_384 (dense-only, transitional)
  */
 export async function retrieveQdrant(query: string): Promise<Candidate[]> {
+  const embedding = await embedQuery(query);
+  if (!embedding) return [];
+
+  if (embedding.length !== 384) {
+    console.warn(
+      `Embedding dimension mismatch: expected 384, got ${embedding.length}.`
+    );
+  }
+
+  const qdrant = getQdrantManager();
+
   try {
-    // Embed query using EmbeddingGemma (384-dim canonical)
-    const embedding = await embedQuery(query);
-    if (!embedding) return [];
-
-    // Verify embedding dimension matches canonical 384
-    if (embedding.length !== 384) {
-      console.warn(
-        `Embedding dimension mismatch: expected 384, got ${embedding.length}. Query embedding will be truncated/padded.`
-      );
-    }
-
-    // Search Qdrant (canonical 384-dim collection)
-    const qdrant = getQdrantManager();
     const results = await qdrant.hybridSearch({
-      collection: 'codebase_chunks_384', // CANONICAL: 384-dimensional
+      collection: 'codebase_chunks_384_hybrid', // CANONICAL: hybrid dense+sparse
       query,
       queryEmbedding: embedding,
       limit: QDRANT_LIMIT,
     });
 
-    // Map Qdrant results to candidates
     return results.results.map(hit => ({
       id: String(hit.id),
       packetKey: (hit.payload?.packet_key as string) || String(hit.id),
@@ -215,15 +238,11 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
       scoreSource: 'qdrant' as const,
     }));
   } catch (error) {
-    console.warn('Qdrant (384) retrieval failed, attempting legacy 768-dim fallback:', error);
-    // Fallback to legacy 768-dim collection if 384 fails
+    console.warn('[retrieveQdrant] hybrid collection failed, falling back to dense-only:', (error as Error).message);
+    // Fallback: dense-only 384-dim collection (run npm run atlas:backfill:hybrid to populate hybrid)
     try {
-      const embedding = await embedQuery(query);
-      if (!embedding) return [];
-
-      const qdrant = getQdrantManager();
       const results = await qdrant.hybridSearch({
-        collection: 'codebase_chunks_768', // LEGACY FALLBACK: 768-dimensional
+        collection: 'codebase_chunks_384', // TRANSITIONAL FALLBACK
         query,
         queryEmbedding: embedding,
         limit: QDRANT_LIMIT,
@@ -235,11 +254,11 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
         sourceRef: (hit.payload?.source_ref as string) || '',
         summary: (hit.payload?.summary as string) || '',
         content: (hit.payload?.content as string) || '',
-        score: hit.score * 0.95, // Slight penalty for legacy fallback
+        score: hit.score * 0.95,
         scoreSource: 'qdrant' as const,
       }));
     } catch (fallbackError) {
-      console.warn('Qdrant (768) fallback also failed:', fallbackError);
+      console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);
       return [];
     }
   }

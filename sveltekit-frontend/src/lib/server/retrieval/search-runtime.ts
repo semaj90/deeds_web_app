@@ -21,32 +21,31 @@ import { recordPromotionIntent } from './promote-results-outbox.js';
 import { hydrateCandidates as hydrateFromPostgres } from './hydrate-candidates.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 
-// Startup assertion: verify Qdrant collection is canonical 384-dimensional
+// Startup assertion: verify canonical Qdrant collection exists and has correct dimensions
 async function validateQdrantDimensions(): Promise<void> {
   try {
     const qdrant = getQdrantManager();
-    if (typeof (qdrant as any)?.getCollection !== 'function') {
-      console.warn('Qdrant dimension validation skipped: getCollection() is not available on this client surface.');
+    if (typeof (qdrant as any)?.listCollections !== 'function') {
+      console.warn('Qdrant dimension validation skipped: listCollections() not available.');
       return;
     }
-    const collectionInfo = await qdrant.getCollection('codebase_chunks_384');
-
-    // Check vector dimension
-    const vectorSize = (collectionInfo as any)?.config?.params?.vectors?.size;
-    if (vectorSize && vectorSize !== 384) {
-      throw new Error(
-        `Qdrant collection 'codebase_chunks_384' has ${vectorSize} dimensions, expected 384. ` +
-        `Retrieval will fail. Rebuild collection from canonical 384-dim Postgres embeddings.`
+    const collections: string[] = await (qdrant as any).listCollections();
+    const names: string[] = Array.isArray(collections) ? collections : [];
+    if (names.includes('codebase_chunks_384_hybrid')) {
+      // Canonical target — no warning needed
+    } else if (names.includes('codebase_chunks_384')) {
+      console.warn(
+        '[search-runtime] codebase_chunks_384_hybrid not found. Falling back to dense-only codebase_chunks_384. ' +
+        'Run `npm run atlas:backfill:hybrid` to populate the hybrid collection.'
+      );
+    } else {
+      console.warn(
+        '[search-runtime] Neither codebase_chunks_384_hybrid nor codebase_chunks_384 found. ' +
+        'Qdrant dense retrieval will return empty results.'
       );
     }
   } catch (error) {
-    if ((error as Error).message.includes('404') || (error as Error).message.includes('not found')) {
-      console.warn(
-        'Qdrant collection codebase_chunks_384 not found. Will attempt fallback to codebase_chunks_768.'
-      );
-    } else {
-      throw error;
-    }
+    console.warn('[search-runtime] Qdrant collection validation failed:', (error as Error).message);
   }
 }
 

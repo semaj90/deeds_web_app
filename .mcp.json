@@ -2,10 +2,7 @@
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--browser", "chromium"
-      ],
+      "args": ["@playwright/mcp@latest", "--browser", "chromium"],
       "env": {
         "PLAYWRIGHT_BASE_URL": "http://localhost:5173"
       }
@@ -13,6 +10,20 @@
     "trace": {
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp"
+    },
+    "socraticode": {
+      "command": "node",
+      "args": ["C:/Users/james/AppData/Local/npm-cache/_npx/39052607b6e520af/node_modules/socraticode/dist/index.js", "mcp"],
+      "env": {
+        "QDRANT_MODE": "external",
+        "QDRANT_URL": "http://localhost:6333",
+        "OLLAMA_MODE": "external",
+        "OLLAMA_HOST": "http://localhost:11434",
+        "EMBEDDING_MODEL": "embeddinggemma:latest",
+        "EMBEDDING_DIMENSIONS": "768",
+        "QDRANT_COLLECTION_PREFIX": "sc_deeds",
+        "SOCRATICODE_PROJECT_ID": "deeds-web-app"
+      }
     }
   }
 }
