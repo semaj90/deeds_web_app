@@ -1,0 +1,98 @@
+{
+  "$id": "atlas.source-ref.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["sourceRefKey", "sourceType", "contentHash", "symbol", "span"],
+  "additionalProperties": false,
+  "properties": {
+    "sourceRefKey": {
+      "type": "string",
+      "minLength": 3,
+      "pattern": "^.+#.+"
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": ["code", "legal", "documentation", "git", "video", "transcript", "web"]
+    },
+    "repositoryId": { "type": ["string", "null"] },
+    "relativePath":  { "type": ["string", "null"] },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "symbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "qualifiedName": { "type": ["string", "null"] },
+        "kind": {
+          "type": ["string", "null"],
+          "enum": [
+            "file", "module", "class", "interface", "type",
+            "function", "method", "constructor", "parameter",
+            "route", "schema", "test", "call_site", "import", "export", null
+          ]
+        }
+      }
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "startByte":   { "type": ["integer", "null"] },
+        "endByte":     { "type": ["integer", "null"] },
+        "startLine":   { "type": ["integer", "null"] },
+        "startColumn": { "type": ["integer", "null"] },
+        "endLine":     { "type": ["integer", "null"] },
+        "endColumn":   { "type": ["integer", "null"] }
+      }
+    },
+    "parentSourceRefKey": { "type": ["string", "null"] },
+    "fragments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fragmentType", "fragmentKey", "contentHash"],
+        "additionalProperties": false,
+        "properties": {
+          "fragmentType": {
+            "type": "string",
+            "enum": ["signature", "body", "comment", "definition", "citation", "summary", "transcript_segment"]
+          },
+          "fragmentKey":  { "type": "string", "minLength": 1 },
+          "span": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "startByte":   { "type": ["integer", "null"] },
+              "endByte":     { "type": ["integer", "null"] },
+              "startLine":   { "type": ["integer", "null"] },
+              "startColumn": { "type": ["integer", "null"] },
+              "endLine":     { "type": ["integer", "null"] },
+              "endColumn":   { "type": ["integer", "null"] }
+            }
+          },
+          "contentHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "parser": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name":    { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "sourceVersion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commitSha":      { "type": ["string", "null"] },
+        "corpusVersion":  { "type": ["string", "null"] },
+        "effectiveFrom":  { "type": ["string", "null"] },
+        "effectiveTo":    { "type": ["string", "null"] }
+      }
+    }
+  }
+}

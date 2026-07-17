@@ -1,0 +1,60 @@
+{
+  "$id": "atlas.embedding-contract.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "subject_type",
+    "subject_id",
+    "vector_role",
+    "vector_contract",
+    "model_name",
+    "model_version",
+    "dimension",
+    "normalized",
+    "input_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "subject_type": {
+      "enum": ["chunk", "packet", "tree_node", "feature", "summary"]
+    },
+    "subject_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vector_role": {
+      "enum": ["content", "summary", "signature", "latent", "routing"]
+    },
+    "vector_contract": {
+      "type": "string",
+      "const": "canonical-content384-v1"
+    },
+    "model_name": {
+      "type": "string",
+      "const": "embeddinggemma"
+    },
+    "model_version": {
+      "type": "string"
+    },
+    "dimension": {
+      "type": "integer",
+      "const": 384
+    },
+    "dtype": {
+      "type": "string",
+      "const": "float32"
+    },
+    "normalized": {
+      "type": "boolean",
+      "const": true
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "vector_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

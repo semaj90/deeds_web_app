@@ -1,0 +1,32 @@
+{
+  "$id": "atlas.qdrant-projection.v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "packet_key",
+    "source_ref_key",
+    "metadata_version",
+    "contract_version",
+    "projection_hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "packet_key":       { "type": "string", "minLength": 1 },
+    "source_ref_key":   { "type": "string", "minLength": 1 },
+    "tree_node_id":     { "type": ["string", "null"] },
+    "feature_id":       { "type": ["string", "null"] },
+    "language":         { "type": ["string", "null"] },
+    "symbol_kind":      { "type": ["string", "null"] },
+    "domain_class":     { "type": ["string", "null"] },
+    "concepts": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "kmeans_cluster":   { "type": ["integer", "null"], "minimum": 0 },
+    "som_cluster":      { "type": ["integer", "null"], "minimum": 0 },
+    "community_id":     { "type": ["integer", "string", "null"] },
+    "metadata_version": { "type": "integer", "minimum": 1 },
+    "contract_version": { "type": "string", "minLength": 1 },
+    "projection_hash":  { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  }
+}

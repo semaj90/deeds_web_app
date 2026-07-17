@@ -1,0 +1,108 @@
+schema_id: atlas.source-ref
+schema_version: 1
+schema_kind: source_ref_contract
+status: ACTIVE
+
+description: >
+  Structured source reference contract.
+  A flat string like "src/lib/search.ts#L20-L80" is sufficient for display
+  but insufficient as canonical source identity. This contract defines the
+  structured object that all atlas stores use for identity anchoring.
+
+contract_name: atlas-source-ref-v1
+
+fields:
+  sourceRefKey:
+    type: string
+    description: >
+      Opaque stable key. For code: "relative/path.ts#QualifiedSymbol".
+      For anonymous spans: "relative/path.ts#L{startLine}-{endLine}".
+    pattern: "^.+#.+"
+
+  sourceType:
+    type: string
+    enum: [code, legal, documentation, git, video, transcript, web]
+
+  repositoryId:
+    type: [string, null]
+    description: Stable repository identity (e.g. "deeds-web-app").
+
+  relativePath:
+    type: [string, null]
+    description: Path relative to repository root, forward slashes, no leading slash.
+
+  contentHash:
+    type: string
+    description: sha256 of the raw content at this source ref (file bytes or span bytes).
+    pattern: "^[0-9a-f]{64}$"
+
+  symbol:
+    type: object
+    properties:
+      qualifiedName:
+        type: [string, null]
+        description: Fully qualified symbol name (e.g. "QdrantManager.search").
+      kind:
+        type: [string, null]
+        enum:
+          [file, module, class, interface, type, function, method, constructor,
+           parameter, route, schema, test, call_site, import, export, null]
+
+  span:
+    type: object
+    description: >
+      Byte and line spans are versioned location metadata, NOT part of the stable
+      structural identity. Lines move when code is edited; use symbol for stability.
+    properties:
+      startByte:   { type: [integer, null] }
+      endByte:     { type: [integer, null] }
+      startLine:   { type: [integer, null] }
+      startColumn: { type: [integer, null] }
+      endLine:     { type: [integer, null] }
+      endColumn:   { type: [integer, null] }
+
+  parentSourceRefKey:
+    type: [string, null]
+    description: sourceRefKey of the enclosing scope (e.g. class → file, method → class).
+
+  fragments:
+    type: array
+    description: Sub-regions of this source ref.
+    items:
+      type: object
+      properties:
+        fragmentType:
+          type: string
+          enum: [signature, body, comment, definition, citation, summary, transcript_segment]
+        fragmentKey:
+          type: string
+        span:
+          $ref: "#/fields/span"
+        contentHash:
+          type: string
+          pattern: "^[0-9a-f]{64}$"
+
+  parser:
+    type: object
+    properties:
+      name:    { type: [string, null], description: "e.g. tree-sitter" }
+      version: { type: [string, null] }
+
+  sourceVersion:
+    type: object
+    properties:
+      commitSha:      { type: [string, null] }
+      corpusVersion:  { type: [string, null] }
+      effectiveFrom:  { type: [string, null], format: date-time }
+      effectiveTo:    { type: [string, null], format: date-time }
+
+rules:
+  - sourceRefKey must be stable across edits that do not rename the symbol or move the file.
+  - span is VERSIONED METADATA, not identity. Do not hash line numbers into sourceRefKey.
+  - contentHash covers the bytes of this specific ref's content, not the whole file.
+  - parentSourceRefKey enables parent-child derivation: file > module > class > method > block.
+  - For anonymous spans (no symbol), use "path#L{startLine}-{endLine}" as sourceRefKey.
+  - parser.name = "tree-sitter" for code parsed by tree-sitter.
+  - All code source refs MUST have sourceType = "code".
+
+compiled_schema: atlas-source-ref.v1.schema.json

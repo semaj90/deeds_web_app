@@ -20650,7 +20650,7 @@ This document serves as the master catalog of indexed documents inside the deeds
     "1. WEB RESEARCH FINDINGS",
     "1A. HyperRAG Dense Search (2026)",
     "1B. Tricubic Interpolation Search (2014-2015)",
-    "1C. LangGraph Deep Agents + Subagents (2026)",
+    "1C. LangGraph Deep Agents + mastra durable agents(token memory remapping? 4x6) Subagents (2026)",
     "2. YOUR EXISTING STACK ANALYSIS",
     "2A. Retrieval Pipeline (Context Assembler)",
     "2B. Graphify LangGraph Pipeline",

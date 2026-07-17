@@ -1,0 +1,75 @@
+{
+  "$id": "atlas.feature-envelope.v3",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "feature_id",
+    "tree_node_id",
+    "source_ref_key",
+    "feature_type",
+    "extractor_version",
+    "labels"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "feature_id": {
+      "type": "string",
+      "pattern": "^feature:[0-9a-f]{8,}$"
+    },
+    "tree_node_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_ref_key": {
+      "type": "string",
+      "pattern": "^.+#.+$"
+    },
+    "feature_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "feature_namespace": {
+      "type": "string"
+    },
+    "extractor_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "normalized_value": {},
+    "labels": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "array", "null"]
+      }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kmeans_cluster": { "type": ["integer", "null"] },
+        "som_cluster":    { "type": ["integer", "null"] },
+        "community_id":   { "type": ["integer", "string", "null"] },
+        "pagerank":       { "type": ["number", "null"], "minimum": 0 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["generator_type", "generator_version"],
+      "additionalProperties": false,
+      "properties": {
+        "generator_type": {
+          "enum": ["AST", "DETERMINISTIC", "MODEL", "HUMAN", "IMPORT"]
+        },
+        "generator_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}

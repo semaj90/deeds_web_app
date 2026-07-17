@@ -1,0 +1,87 @@
+schema_id: atlas.qdrant-projection
+schema_version: 1
+schema_kind: qdrant_projection
+status: ACTIVE
+target_collection: codebase_chunks_384_hybrid
+
+description: >
+  Qdrant payload projection contract for the canonical 384-dim hybrid collection.
+  Only routing, identity, and classification fields are projected.
+  Source text, full AST, validation history, and graph facts stay in Postgres.
+
+required:
+  - packet_key
+  - source_ref_key
+  - metadata_version
+  - contract_version
+  - projection_hash
+
+fields:
+  packet_key:
+    type: string
+    description: Canonical packet identity. References atlas_packets.packet_key.
+
+  source_ref_key:
+    type: string
+    description: Location anchor. Format: "relative/path.ts#Symbol"
+
+  tree_node_id:
+    type: [string, null]
+    description: AST structural identity, if available.
+
+  feature_id:
+    type: [string, null]
+    description: Feature envelope identity, if available.
+
+  language:
+    type: [string, null]
+    description: Programming language of the source.
+
+  symbol_kind:
+    type: [string, null]
+    description: AST node kind. Example: function, class, interface.
+
+  domain_class:
+    type: [string, null]
+    description: Classified domain. Example: retrieval, auth, data-transform.
+
+  concepts:
+    type: array
+    items: {type: string}
+    description: Extracted concept labels for keyword-augmented search.
+
+  kmeans_cluster:
+    type: [integer, null]
+    description: K-means routing cluster ID (0-indexed). Null until clustering runs.
+
+  som_cluster:
+    type: [integer, null]
+    description: SOM topology cluster ID. Null until SOM runs.
+
+  community_id:
+    type: [integer, string, null]
+    description: Graph community from Neo4j Louvain. Null until graph pipeline runs.
+
+  metadata_version:
+    type: integer
+    description: Monotonically increasing payload schema version. Increment on schema changes.
+
+  contract_version:
+    type: string
+    description: Version string of this Qdrant projection contract.
+
+  projection_hash:
+    type: string
+    description: sha256 of the canonical_data that produced this projection.
+
+do_not_project:
+  - full source content
+  - complete AST subtree JSON
+  - validation history
+  - all graph facts
+  - training examples
+  - full .okf source text
+  - large ontology documents
+  - model outputs beyond domain_class/concepts
+
+compiled_schema: codebase-384-hybrid.v1.schema.json

@@ -1,0 +1,115 @@
+schema_id: atlas.feature-envelope
+schema_version: 3
+schema_kind: feature_envelope
+status: ACTIVE
+
+description: >
+  Canonical feature envelope contract.
+  A feature envelope is a validated, provenance-annotated semantic fact
+  extracted from a single AST node. It binds a normalized value and
+  typed label set to a stable structural identity (tree_node_id).
+
+required:
+  - feature_id
+  - tree_node_id
+  - source_ref_key
+  - feature_type
+  - extractor_version
+  - labels
+
+fields:
+  feature_id:
+    type: string
+    description: Stable feature identity. Format: "feature:<sha256-prefix>"
+
+  tree_node_id:
+    type: string
+    description: >
+      AST structural identity. References atlas_ast_nodes.tree_node_id.
+      Computed as sha256(repo:relative_path:node_kind:qualified_symbol:normalized_node_hash).
+
+  source_ref_key:
+    type: string
+    description: >
+      Human-readable location anchor. Format: "relative/path.ts#SymbolName".
+      Used for display and retrieval routing. Not a primary key.
+
+  feature_type:
+    type: string
+    description: >
+      Semantic category of the feature.
+      Examples: retrieval-capability, auth-guard, schema-validator,
+      data-transformer, side-effect, configuration-reader.
+
+  feature_namespace:
+    type: string
+    optional: true
+    description: Domain namespace. Example: "atlas.code", "atlas.legal"
+
+  extractor_version:
+    type: string
+    description: >
+      Version string of the extractor that produced this envelope.
+      Example: "atlas-feature-extractor-v4".
+
+  normalized_value:
+    type: any
+    optional: true
+    description: >
+      The extracted semantic value in normalized form.
+      Type depends on feature_type. Can be a string, number, or object.
+
+  labels:
+    type: object
+    description: >
+      Typed label set. Keys are label names; values are string, number,
+      boolean, array, or null. Label schema is feature_type-specific.
+    additionalProperties:
+      type: [string, number, boolean, array, null]
+
+  routing:
+    type: object
+    optional: true
+    description: >
+      Routing assignments populated after offline clustering.
+      Never set by the extractor — populated by the clustering pipeline.
+    additionalProperties: false
+    fields:
+      kmeans_cluster:  {type: [integer, null]}
+      som_cluster:     {type: [integer, null]}
+      community_id:    {type: [integer, string, null]}
+      pagerank:        {type: [number, null]}
+
+  provenance:
+    type: object
+    description: Generator attribution and confidence.
+    required:
+      - generator_type
+      - generator_version
+    additionalProperties: false
+    fields:
+      generator_type:
+        enum: [AST, DETERMINISTIC, MODEL, HUMAN, IMPORT]
+      generator_version:
+        type: string
+      confidence:
+        type: [number, null]
+        range: [0.0, 1.0]
+
+validation_rules:
+  - feature_id must match /^feature:[0-9a-f]{8,}$/
+  - tree_node_id must exist in atlas_ast_nodes
+  - source_ref_key must contain "#" separator
+  - routing fields are null until clustering pipeline runs
+  - confidence is null for AST/DETERMINISTIC generators (it is always 1.0 by construction)
+
+write_path: >
+  extractor output
+    → Zod/JSON Schema validation
+    → cross-field checks (tree_node_id exists, source_ref_key format)
+    → INSERT INTO atlas_knowledge_objects (canonical_data, ...)
+    → INSERT INTO atlas_features (...)
+    → outbox event → Qdrant/Neo4j projection
+
+projection: atlas.qdrant-projection.v1
+compiled_schema: feature-envelope.v3.schema.json

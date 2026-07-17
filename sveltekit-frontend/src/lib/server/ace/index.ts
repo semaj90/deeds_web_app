@@ -48,3 +48,50 @@ export {
   PacketMsgpackTags,
 } from '../serialization/packet-msgpack-codec.js';
 export type { PacketTopologyEnvelope } from '../hyperrag/packet-topology-envelope.js';
+
+// ── Production Hardening (Audit §9, §13, §15, §8) ─────────────────────────
+
+// §9: Evidence sufficiency gate — deterministic pre-synthesis coverage check
+export {
+  computeEvidenceSufficiency,
+} from './evidence-sufficiency-gate.js';
+export type {
+  EvidenceSufficiencyInput,
+  EvidenceSufficiencyResult,
+  SufficiencyDomain,
+} from './evidence-sufficiency-gate.js';
+
+// §13/§15: Recommendation records, finding schema, approval policy, scoring
+export {
+  APPROVAL_POLICY,
+  classifyApprovalLevel,
+  scoreHypothesis,
+  scoreDidYouMean,
+  scorePageRankRecommendation,
+  makeRecommendation,
+} from './recommendation-record.js';
+export type {
+  RecommendationRecord,
+  FindingRecord,
+  RecommendationType,
+  FindingType,
+  Severity,
+  CostEstimate,
+  ApprovalLevel,
+  HypothesisScore,
+  DidYouMeanScore,
+  PageRankRecommendationScore,
+} from './recommendation-record.js';
+
+// §8: Atlas tool registry — Zod-validated, permission-checked, allow-listed
+export {
+  atlasToolRegistry,
+  invokeTool,
+  invokeApprovedTool,
+  GEMMA4_SAMPLING,
+} from './atlas-tool-registry.js';
+export type {
+  AtlasToolName,
+  AtlasToolPermission,
+  PermissionGrant,
+} from './atlas-tool-registry.js';

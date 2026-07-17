@@ -1,0 +1,77 @@
+schema_id: atlas.embedding-contract
+schema_version: 1
+schema_kind: embedding_contract
+status: ACTIVE
+
+description: >
+  Canonical 384-dim content embedding contract.
+  Governs all embeddings stored in codebase_chunk_index.content_embedding_384
+  and mirrored in Qdrant codebase_chunks_384_hybrid (content named-vector).
+
+contract_name: canonical-content384-v1
+dimension: 384
+dtype: float32
+normalized: true
+model_name: embeddinggemma
+model_version: latest
+
+# ── Provenance (established by code audit 2026-07-16) ────────────────────────
+#
+# Source model  : embeddinggemma:latest via Ollama /api/embed
+# Native output : 768-dim, unnormalized (norm ≈ √2 observed)
+# Reduction     : prefix truncation — first 384 of 768 native dims
+# Reduction type: mrl-truncate (NOT learned projection, NOT PCA, NOT matryoshka official)
+# Normalization : L2-normalization applied by Qdrant on Cosine-distance ingest
+#                 (not applied by the backfill script itself)
+# Pipeline      :
+#   1. Ollama embeddinggemma:latest → float32[768] (unnormalized)
+#   2. truncate(vec, 384) → float32[384] (unnormalized prefix)
+#   3. Qdrant Cosine ingest → L2-normalize → float32[384] (unit sphere)
+#   4. Qdrant → backfill → codebase_chunk_index.content_embedding_384 (unit sphere)
+#
+# Classification:
+#   This is an ACCELERATION/SEARCH PROJECTION, not the canonical embedding.
+#   The canonical 768-dim embedding is in codebase_chunk_index.content_embedding (halfvec(768)).
+#   The 384-dim version is suitable for:
+#     - ANN search (Cosine, Qdrant HNSW)
+#     - Rough similarity ranking
+#     - Cluster assignment (K-means trained on this space)
+#   NOT suitable for:
+#     - Mixing with true MRL-384 embeddings from a different model
+#     - Cross-corpus compatibility claims
+#     - Transfer to models expecting standard Matryoshka MRL sizes
+#
+# Verification (pending Ollama restart):
+#   Run: node scripts/atlas/audit-embedding-provenance-384.mjs --sample 100
+#   Required: p50 cosine(stored, re-embedded+truncated+normalized) >= 0.98
+#
+# ─────────────────────────────────────────────────────────────────────────────
+
+provenance:
+  original_dimension: 768
+  stored_dimension: 384
+  reduction_method: mrl-truncate
+  reduction_note: >
+    First 384 of 768 native dims. Deterministic and reproducible.
+    Not an officially documented Matryoshka Representation Learning reduction size
+    for this model (official MRL sizes: 512, 256, 128).
+    Treated as a project-local acceleration projection.
+  source_column: codebase_chunk_index.content_embedding
+  source_type: halfvec(768)
+  normalized_by: qdrant-cosine-ingest
+  original_norm: approximately_sqrt2
+  task_prompt: null
+
+rules:
+  - All vectors MUST be L2-normalized before storage.
+  - Do NOT mix 384-dim and 768-dim vectors in any ANN index.
+  - Do NOT use latent 64-dim vectors for ANN search.
+  - Qdrant collection codebase_chunks_384_hybrid is the production ANN index.
+  - Postgres codebase_chunk_index.content_embedding_384 is the canonical 384-dim store.
+  - Postgres codebase_chunk_index.content_embedding (halfvec 768) is the original embedding store.
+  - Input text must be the chunk content without leading/trailing whitespace.
+  - input_hash = sha256(stripped input text bytes, utf-8).
+  - vector_hash = sha256(float32 bytes, little-endian, of the 384-dim normalized vector).
+  - This is a search projection; do NOT claim it is embeddinggemma native-384-dim output.
+
+compiled_schema: content-384.v1.schema.json

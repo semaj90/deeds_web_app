@@ -25,9 +25,15 @@ const RRF_CONSTANT = 60;
  * Returns ranked list with fusion scores
  */
 export function fuseCandidates(candidates: Candidate[]): FusedCandidate[] {
+  // Validate at adapter boundary — drop malformed candidates before grouping
+  const valid = candidates.filter(c =>
+    c.packetKey && c.packetKey.trim() !== '' &&
+    c.sourceRef && c.sourceRef.trim() !== ''
+  );
+
   // Group candidates by packet_key to identify which sources mentioned each
   const groupedByKey = new Map<string, Candidate[]>();
-  for (const candidate of candidates) {
+  for (const candidate of valid) {
     if (!groupedByKey.has(candidate.packetKey)) {
       groupedByKey.set(candidate.packetKey, []);
     }
@@ -36,14 +42,14 @@ export function fuseCandidates(candidates: Candidate[]): FusedCandidate[] {
 
   // Get unique sources
   const sources = new Set<string>();
-  for (const candidate of candidates) {
+  for (const candidate of valid) {
     sources.add(candidate.scoreSource);
   }
 
   // Rank candidates within each source
   const sourceRanks = new Map<string, Map<string, number>>();
   for (const source of sources) {
-    const sourceCards = candidates.filter(c => c.scoreSource === source);
+    const sourceCards = valid.filter(c => c.scoreSource === source);
     // Sort by original score (descending)
     const sorted = [...sourceCards].sort((a, b) => b.score - a.score);
     const ranks = new Map<string, number>();

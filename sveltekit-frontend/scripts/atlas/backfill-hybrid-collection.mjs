@@ -37,6 +37,7 @@ const PG_CONFIG = {
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const UPDATE_SPARSE = args.includes('--update-sparse'); // re-populate bm42_sparse on existing points
 const batchIdx = args.indexOf('--batch');
 const BATCH_SIZE = batchIdx !== -1 ? parseInt(args[batchIdx + 1], 10) : DEFAULT_BATCH;
 
@@ -231,6 +232,23 @@ async function upsertBatch(points) {
   }
 }
 
+/**
+ * Update only the vector component of existing points (--update-sparse mode).
+ * Uses PUT /points/vectors which patches named vectors without touching payload.
+ */
+async function updateVectorsBatch(points) {
+  // points format: [{ id, vectors: { bm42_sparse: { indices, values } } }]
+  const res = await fetch(`${QDRANT_BASE}/collections/${COLLECTION}/points/vectors?wait=true`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ points }),
+  });
+  if (!res.ok) {
+    const txt = await res.text().catch(() => '');
+    throw new Error(`Qdrant PUT /points/vectors → ${res.status}: ${txt}`);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -240,6 +258,7 @@ async function main() {
   console.log(`[${timestamp()}] Collection : ${COLLECTION}`);
   console.log(`[${timestamp()}] Batch size : ${BATCH_SIZE}`);
   console.log(`[${timestamp()}] Dry run    : ${DRY_RUN}`);
+  if (UPDATE_SPARSE) console.log(`[${timestamp()}] Mode       : --update-sparse (patch bm42_sparse on all existing points)`);
   console.log('');
 
   // Verify collection exists
@@ -252,8 +271,8 @@ async function main() {
     process.exit(1);
   }
 
-  // Load existing IDs for deduplication
-  const existingIds = await loadExistingIds();
+  // In --update-sparse mode skip the existing-ID scan (we want to update ALL points)
+  const existingIds = UPDATE_SPARSE ? new Set() : await loadExistingIds();
 
   // Connect to Postgres — keepAlive prevents router/OS from dropping idle TCP sockets
   const pool = new pg.Pool({
@@ -348,33 +367,34 @@ async function main() {
         // Build sparse BM42 vector from content
         const sparse = buildSparseVector(row.content ?? '');
 
-        // Named vectors payload
-        const vector = { content: contentVec384 };
-        if (summaryVec384) vector.summary = summaryVec384;
+        // Named vectors payload — Qdrant 1.7+ unifies dense and sparse under "vectors"
+        // sparse_vectors (separate key) is silently ignored; sparse must go in "vectors"
+        const vectors = { content: contentVec384 };
+        if (summaryVec384) vectors.summary = summaryVec384;
+        if (sparse.indices.length > 0) vectors.bm42_sparse = sparse;
 
-        const point = {
-          id,
-          vector,
-          sparse_vectors: {
-            bm42_sparse: sparse,
-          },
-          payload: {
-            chunk_id: row.chunk_id ?? null,
-            source_ref: row.relative_path ?? null,
-            relative_path: row.relative_path ?? null,
-            symbol: row.symbol ?? null,
-            kind: row.kind ?? null,
-            line_start: row.line_start ?? null,
-            line_end: row.line_end ?? null,
-            content: row.content ?? null,
-            summary: row.summary ?? null,
-            language: row.language ?? null,
-            domain: row.domain ?? null,
-            semantic_tags: row.semantic_tags ?? [],
-            content_hash: row.content_hash ?? null,
-            token_count: row.token_count ?? null,
-          },
-        };
+        const point = UPDATE_SPARSE
+          ? { id, vectors: { bm42_sparse: sparse } }  // vector-patch only, no payload re-upload
+          : {
+            id,
+            vectors,
+            payload: {
+              chunk_id: row.chunk_id ?? null,
+              source_ref: row.relative_path ?? null,
+              relative_path: row.relative_path ?? null,
+              symbol: row.symbol ?? null,
+              kind: row.kind ?? null,
+              line_start: row.line_start ?? null,
+              line_end: row.line_end ?? null,
+              content: row.content ?? null,
+              summary: row.summary ?? null,
+              language: row.language ?? null,
+              domain: row.domain ?? null,
+              semantic_tags: row.semantic_tags ?? [],
+              content_hash: row.content_hash ?? null,
+              token_count: row.token_count ?? null,
+            },
+          };
 
         points.push(point);
       }
@@ -389,17 +409,23 @@ async function main() {
           if (offset === 0 && points.length > 0) {
             const sample = points[0];
             console.log(`[${timestamp()}] [DRY-RUN] Sample point id=${sample.id}`);
-            console.log(`[${timestamp()}] [DRY-RUN]   content vec[0..4]: ${sample.vector.content.slice(0, 4).join(', ')}`);
-            console.log(`[${timestamp()}] [DRY-RUN]   summary vec present: ${!!sample.vector.summary}`);
-            console.log(`[${timestamp()}] [DRY-RUN]   sparse indices count: ${sample.sparse_vectors.bm42_sparse.indices.length}`);
-            console.log(`[${timestamp()}] [DRY-RUN]   payload.source_ref: ${sample.payload.source_ref}`);
+            if (!UPDATE_SPARSE) {
+              console.log(`[${timestamp()}] [DRY-RUN]   content vec[0..4]: ${sample.vectors.content.slice(0, 4).join(', ')}`);
+              console.log(`[${timestamp()}] [DRY-RUN]   summary vec present: ${!!sample.vectors.summary}`);
+              console.log(`[${timestamp()}] [DRY-RUN]   payload.source_ref: ${sample.payload?.source_ref}`);
+            }
+            console.log(`[${timestamp()}] [DRY-RUN]   sparse indices count: ${(sample.vectors.bm42_sparse?.indices ?? []).length}`);
           }
         }
         totalUpserted += points.length;
         totalSkipped += rows.length - points.length;
       } else {
         if (points.length > 0) {
-          await upsertBatch(points);
+          if (UPDATE_SPARSE) {
+            await updateVectorsBatch(points);
+          } else {
+            await upsertBatch(points);
+          }
           totalUpserted += points.length;
         }
         totalSkipped += rows.length - points.length;

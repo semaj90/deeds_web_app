@@ -25,8 +25,8 @@
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import { embedText as embedEmbeddingGemmaText } from '$lib/server/embedding/embed.js';
-import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import type { FeatureEnvelope } from './feature-envelope.js';
+import { syncSummaryPayloadToQdrant } from './qdrant-summary-sync.js';
 
 /**
  * Promotion result tracking
@@ -258,7 +258,7 @@ async function embedSummaries(results: FeatureEnvelope[]): Promise<PromotionResu
 
 /**
  * Stage 4: Sync summary embeddings to Qdrant
- * Adds or updates payload in codebase_chunks_768 collection
+ * Adds or updates payload in the canonical codebase_chunks_384 hybrid/dense collection.
  */
 async function syncToQdrant(
   results: FeatureEnvelope[],
@@ -277,12 +277,14 @@ async function syncToQdrant(
     }
 
     // Fetch updated summaries from Postgres
-    const packetKeys = results.map(r => r.packet_key).slice(0, embeddedCount);
+    const packetKeys = results.map(r => r.packet_key);
     const summaries = await db.execute(sql`
       SELECT
         packet_key,
+        source_ref,
         summary,
-        summary_embedding_384
+        summary_embedding_384,
+        qdrant_point_id
       FROM atlas_packets
       WHERE packet_key = ANY($1::text[])
         AND summary_embedding_384 IS NOT NULL
@@ -290,22 +292,31 @@ async function syncToQdrant(
 
     type SummaryRow = {
       packet_key: string;
+      source_ref: string | null;
       summary: string;
       summary_embedding_384: number[];
+      qdrant_point_id?: string | null;
     };
 
     const rows = summaries.rows as SummaryRow[];
-
-    // Update Qdrant payloads
-    const qdrant = getQdrantManager();
+    let updatedPoints = 0;
+    let failedPoints = 0;
     for (const row of rows) {
       try {
-        // TODO: Find point by packet_key in Qdrant, update payload
-        // This requires qdrant.updatePayload() or search + update
-        // For now, just log
-        console.log(`Would sync summary for ${row.packet_key} to Qdrant`);
+        const syncResult = await syncSummaryPayloadToQdrant({
+          packetKey: row.packet_key,
+          qdrantPointId: row.qdrant_point_id ?? null,
+          payload: {
+            source_ref: row.source_ref,
+            summary: row.summary,
+            summary_embedding_384: row.summary_embedding_384,
+            summary_synced_at: new Date().toISOString(),
+          },
+        });
+        updatedPoints += syncResult.updatedPoints;
       } catch (e) {
         console.warn(`Failed to sync ${row.packet_key} to Qdrant:`, e);
+        failedPoints += 1;
       }
     }
 
@@ -313,9 +324,9 @@ async function syncToQdrant(
       success: true,
       stage: 'qdrant_sync',
       recordsProcessed: embeddedCount,
-      recordsCommitted: rows.length,
-      recordsFailed: embeddedCount - rows.length,
-      message: `Synced ${rows.length} summaries to Qdrant`,
+      recordsCommitted: updatedPoints,
+      recordsFailed: failedPoints,
+      message: `Synced ${updatedPoints}/${rows.length} summaries to Qdrant`,
     };
   } catch (error) {
     console.error('Stage 4 failed:', error);

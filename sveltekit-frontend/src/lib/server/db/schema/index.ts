@@ -119,6 +119,7 @@ export * from './agent-traces.js';
 export * from './atlas-packets.js';
 export * from './packet-binary-registry.js';
 export * from './atlas-tree-nodes.js';
+export * from './atlas-ast-nodes.js';
 export * from './retrieval-eval-times.js';
 export * from './repo-function-registry.js';
 export * from './topology-eval-times.js';

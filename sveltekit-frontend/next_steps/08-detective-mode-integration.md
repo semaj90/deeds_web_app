@@ -393,7 +393,7 @@ Run the 4 validation tests (TODO aggregation, migration safety, ML inventory, AP
 ### 5. Deploy
 ```bash
 # Export from Colab (GGUF format)
-trt-ll
+trt-llm
 
 # Test
 gemma4 "Analyze all TODOs and create a sprint plan"m

@@ -15,6 +15,7 @@ import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import type { FeatureEnvelope } from './feature-envelope.js';
 import { enrichPacketSemantics } from '$lib/server/ace/promotion-enrichment-service.js';
+import { syncSummaryPayloadToQdrant } from './qdrant-summary-sync.js';
 
 export enum PromotionOperation {
   PROMOTE_SUMMARY = 'promote_summary',
@@ -287,63 +288,43 @@ async function promoteQdrant(
   stagesFailed: string[]
 ): Promise<PromotionResult> {
   try {
-    const { getQdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
-    const qdrant = getQdrantManager();
-
     if (!job.payload.qdrant_point_id) {
-      stagesFailed.push('qdrant_payload_update: missing_point_id');
-      return {
-        job_id: job.id,
-        success: false,
-        operation: job.operation,
-        message: 'Qdrant point ID not found; skipping vector payload update',
-        stages_completed: stagesCompleted,
-        stages_failed: stagesFailed,
-      };
+      console.warn(
+        `[promotion-worker] Qdrant point id missing for ${job.packet_key}; falling back to packet_key lookup`,
+      );
     }
+    const syncResult = await syncSummaryPayloadToQdrant({
+      packetKey: job.packet_key,
+      qdrantPointId: (job.payload.qdrant_point_id as string | null) ?? null,
+      payload: {
+        source_ref: job.source_ref,
+        summary: job.summary,
+        semantic_title: job.payload.semantic_title ?? null,
+        title_id: job.payload.title_id ?? null,
+        domain_class: job.payload.domain_class ?? null,
+        classifier_version: job.payload.classifier_version ?? null,
+        updated_at: new Date().toISOString(),
+      },
+    });
 
-    // Fetch current point to preserve existing payload
-    const collection = 'codebase_chunks_768';
-    const point = await qdrant.client.getPoint(collection, job.payload.qdrant_point_id as string | number);
-
-    if (!point.result) {
+    if (syncResult.updatedPoints === 0) {
       stagesFailed.push('qdrant_payload_update: point_not_found');
       return {
         job_id: job.id,
         success: false,
         operation: job.operation,
-        message: `Qdrant point ${job.payload.qdrant_point_id} not found`,
+        message: `Qdrant point not found for packet ${job.packet_key}`,
         stages_completed: stagesCompleted,
         stages_failed: stagesFailed,
       };
     }
-
-    // Merge new summary/metadata into existing payload
-    const updatedPayload = {
-      ...point.result.payload,
-      summary: job.summary || point.result.payload?.summary,
-      updated_at: new Date().toISOString(),
-      source_ref: job.source_ref,
-      packet_key: job.packet_key,
-    };
-
-    // Upsert point with updated payload (vector unchanged)
-    await qdrant.client.upsert(collection, {
-      points: [
-        {
-          id: job.payload.qdrant_point_id as string | number,
-          payload: updatedPayload,
-          // vector unchanged; only payload updates
-        },
-      ],
-    });
 
     stagesCompleted.push('qdrant_payload_update');
     return {
       job_id: job.id,
       success: true,
       operation: job.operation,
-      message: `Qdrant payload updated for point ${job.payload.qdrant_point_id}`,
+      message: `Qdrant payload updated for packet ${job.packet_key} (${syncResult.updatedPoints} point(s))`,
       stages_completed: stagesCompleted,
       stages_failed: stagesFailed,
     };

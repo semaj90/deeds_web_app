@@ -1,0 +1,140 @@
+schema_id: atlas.ast-node
+schema_version: 1
+schema_kind: ast_node_contract
+status: ACTIVE
+
+description: >
+  Contract for AST structural identity nodes stored in atlas_ast_nodes.
+  Defines the stable tree_node_id derivation formula and the parent-child
+  hierarchy required before any graph, feature, or topology work.
+
+contract_name: atlas-ast-node-v1
+
+# ── Stable identity formula ───────────────────────────────────────────────────
+#
+# tree_node_id = sha256(
+#   repository_id + "\x00"
+#   + normalized_relative_path + "\x00"
+#   + parser_language + "\x00"
+#   + node_kind + "\x00"
+#   + qualified_symbol + "\x00"
+#   + structural_parent_key + "\x00"   (tree_node_id of parent, or "ROOT")
+#   + normalized_signature             (parameter types + return type, no names)
+# )
+#
+# NOTE: Do NOT include raw line numbers or byte offsets in the identity hash.
+# Lines move when code is edited. Use spans only as versioned location metadata.
+#
+# normalized_relative_path: forward slashes, no leading slash, lowercased
+# qualified_symbol: "ClassName.methodName" or "functionName" or filename stem
+# normalized_signature: "(T1, T2) => ReturnType" — types only, no param names
+
+tree_node_id_formula:
+  inputs:
+    - name: repository_id
+      note: stable repo name, e.g. "deeds-web-app"
+    - name: normalized_relative_path
+      note: lowercased, forward slashes, no leading slash
+    - name: parser_language
+      note: e.g. "typescript", "javascript", "css", "svelte"
+    - name: node_kind
+      note: one of the minimum_ast_kinds below
+    - name: qualified_symbol
+      note: "ClassName.methodName" or bare name; empty string for anonymous
+    - name: structural_parent_key
+      note: tree_node_id of parent node, or literal "ROOT" for top-level
+    - name: normalized_signature
+      note: parameter types + return type only (no names); empty string if not applicable
+  hash_algorithm: sha256
+  separator: "\x00"
+  encoding: hex, 64 chars
+
+# ── Version identity (separate from stable identity) ─────────────────────────
+#
+# source_content_hash = sha256(raw bytes of the span content)
+# normalized_node_hash = sha256(normalized AST subtree JSON)
+# Together these allow: "same function, edited body" → same tree_node_id, new version
+
+# ── Parent-child hierarchy ────────────────────────────────────────────────────
+#
+# repository
+#   package
+#     directory
+#       file
+#         module
+#           class
+#             method / function / constructor
+#               parameter
+#               block
+#                 call_site
+#                 import / export
+#
+# Minimum kinds for first proof (do NOT persist every expression/token):
+
+minimum_ast_kinds:
+  - file
+  - module
+  - class
+  - interface
+  - type
+  - function
+  - method
+  - constructor
+  - parameter
+  - route
+  - schema
+  - test
+  - call_site
+  - import
+  - export
+
+fields:
+  tree_node_id:
+    type: string
+    description: sha256 stable identity (64 hex chars)
+    pattern: "^[0-9a-f]{64}$"
+
+  structural_key:
+    type: string
+    description: >
+      Human-readable identity string before hashing:
+      "{repository_id}/{normalized_relative_path}#{node_kind}:{qualified_symbol}"
+
+  repo_id:         { type: string }
+  relative_path:   { type: string }
+  node_kind:       { type: string, enum_ref: minimum_ast_kinds }
+  qualified_symbol: { type: string }
+
+  start_byte:   { type: [integer, null] }
+  end_byte:     { type: [integer, null] }
+  line_start:   { type: integer }
+  line_end:     { type: integer }
+
+  normalized_node_hash:
+    type: string
+    description: sha256 of the normalized AST subtree JSON (for versioning).
+    pattern: "^[0-9a-f]{64}$"
+
+  source_content_hash:
+    type: string
+    description: sha256 of the raw span content bytes.
+    pattern: "^[0-9a-f]{64}$"
+
+  parser_name:    { type: string, const: tree-sitter }
+  parser_version: { type: string }
+
+  superseded_by:
+    type: [string, null]
+    description: tree_node_id of the node that replaces this one after refactoring.
+
+rules:
+  - tree_node_id MUST be derived deterministically from the 7 identity inputs.
+  - Do NOT include line numbers or byte offsets in the identity hash.
+  - line_start / line_end / start_byte / end_byte are versioned metadata only.
+  - normalized_node_hash and source_content_hash together define the version.
+  - parent_tree_node_id links to atlas_ast_nodes.tree_node_id of the enclosing scope.
+  - For top-level nodes (file kind), structural_parent_key = "ROOT".
+  - Persist only the minimum_ast_kinds for the first proof run.
+  - Do NOT persist every expression, token, or statement.
+
+compiled_schema: atlas-ast-node.v1.schema.json

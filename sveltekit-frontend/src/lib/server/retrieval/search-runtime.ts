@@ -20,6 +20,7 @@ import { rerankCanonicalFeatureEnvelopes } from './canonical-rerank-executor.js'
 import { recordPromotionIntent } from './promote-results-outbox.js';
 import { hydrateCandidates as hydrateFromPostgres } from './hydrate-candidates.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import type { Retriever, Reranker } from './lane-contracts.js';
 
 // Startup assertion: verify canonical Qdrant collection exists and has correct dimensions
 async function validateQdrantDimensions(): Promise<void> {
@@ -132,15 +133,34 @@ export interface SearchResult {
 }
 
 /**
+ * Dependency-injection config for SearchRuntime.
+ * When `retrievers` is omitted the runtime falls back to `retrieveAllCandidates()`
+ * (production default). Tests inject fakes via `retrievers` to avoid touching
+ * Qdrant/Postgres/Redis.
+ */
+export interface SearchRuntimeConfig {
+  userId?: string;
+  caseId?: string;
+  /** Injected retrieval adapters. When absent, production singletons are used. */
+  retrievers?: Retriever[];
+  /** Injected reranker. When absent, `rerankCanonicalFeatureEnvelopes` is used. */
+  reranker?: Reranker;
+}
+
+/**
  * Single entry point for all retrieval operations
  */
 export class SearchRuntime {
   private userId?: string;
   private caseId?: string;
+  private injectedRetrievers?: Retriever[];
+  private injectedReranker?: Reranker;
 
-  constructor(config: { userId?: string; caseId?: string }) {
+  constructor(config: SearchRuntimeConfig) {
     this.userId = config.userId;
     this.caseId = config.caseId;
+    this.injectedRetrievers = config.retrievers;
+    this.injectedReranker = config.reranker;
   }
 
   /**
@@ -239,12 +259,36 @@ export class SearchRuntime {
   }
 
   /**
-   * Stage 1: Retrieve candidates deterministically from multiple sources
-   * Sources (in parallel): PostgreSQL lexical fallback, Qdrant ANN, exact symbol matches, AST matches
-   * Returns top-K candidates before fusion
+   * Stage 1: Retrieve candidates deterministically from multiple sources.
+   * When injected retrievers are present (DI / test path), each is called in
+   * parallel and their LaneCandidates are projected into the Candidate shape.
+   * When no retrievers are injected, falls back to the production singleton path.
    */
   private async retrieveCandidates(query: SearchQuery): Promise<Candidate[]> {
-    return retrieveAllCandidates(query.text);
+    if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
+      return retrieveAllCandidates(query.text);
+    }
+
+    const input = { query: query.text, limit: query.topK * 5 };
+    const perLane = await Promise.all(
+      this.injectedRetrievers.map(r => r.retrieve(input).catch(err => {
+        console.warn(`[search-runtime] retriever(${r.lane}) failed:`, (err as Error).message);
+        return [];
+      }))
+    );
+
+    return perLane.flat().map(lc => ({
+      id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
+      packetKey: lc.packetKey,
+      sourceRef: lc.sourceRef,
+      summary: String(lc.metadata?.['summary'] ?? ''),
+      content: String(lc.metadata?.['content'] ?? ''),
+      score: lc.score ?? 0,
+      scoreSource: (lc.lane === 'dense' ? 'qdrant'
+        : lc.lane === 'exact' ? 'exact_symbol'
+        : lc.lane === 'ast' ? 'ast_tree'
+        : 'postgres_trigram') as Candidate['scoreSource'],
+    }));
   }
 
   /**
@@ -252,12 +296,17 @@ export class SearchRuntime {
    * Only one fusion implementation. No other score combiners exist.
    */
   private async fuseCandidates(candidates: Candidate[]): Promise<FusedCandidate[]> {
+    // Drop malformed candidates before grouping
+    const valid = candidates.filter(
+      c => c.packetKey && c.packetKey.trim() !== '' && c.sourceRef && c.sourceRef.trim() !== ''
+    );
+
     // Group by source and get ranking within each
     const sourceRanks = new Map<string, Map<string, number>>();
 
     const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema', 'rg_keyword'] as const;
     for (const source of sources) {
-      const sourceCards = candidates.filter(c => c.scoreSource === source);
+      const sourceCards = valid.filter(c => c.scoreSource === source);
       sourceCards.sort((a, b) => b.score - a.score || a.packetKey.localeCompare(b.packetKey));
       const ranked = new Map<string, number>();
       sourceCards.forEach((c, idx) => {
@@ -269,7 +318,7 @@ export class SearchRuntime {
     // Apply RRF formula: score = Σ(1 / (k + rank)) for each source
     // k = 60 (standard RRF constant)
     const rrfScores = new Map<string, number>();
-    for (const [packetKey, candidate] of new Map(candidates.map(c => [c.packetKey, c]))) {
+    for (const [packetKey] of new Map(valid.map(c => [c.packetKey, c]))) {
       let rrfScore = 0;
       for (const [source, ranks] of sourceRanks) {
         const rank = ranks.get(packetKey);
@@ -281,7 +330,7 @@ export class SearchRuntime {
     }
 
     // Sort by RRF score and assign new ranks
-    const sorted = Array.from(candidates).sort((a, b) => {
+    const sorted = Array.from(valid).sort((a, b) => {
       const scoreA = rrfScores.get(a.packetKey) ?? 0;
       const scoreB = rrfScores.get(b.packetKey) ?? 0;
       return scoreB - scoreA;
@@ -348,8 +397,17 @@ export class SearchRuntime {
 }
 
 /**
- * Factory for creating search runtime instances
+ * Factory for creating search runtime instances (production path — no injected adapters).
+ * Backward-compatible: existing callers require no changes.
  */
 export function createSearchRuntime(config?: { userId?: string; caseId?: string }): SearchRuntime {
+  return new SearchRuntime(config ?? {});
+}
+
+/**
+ * Production factory with explicitly named adapters.
+ * Equivalent to `createSearchRuntime()` but makes the adapter wiring visible.
+ */
+export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string }): SearchRuntime {
   return new SearchRuntime(config ?? {});
 }
