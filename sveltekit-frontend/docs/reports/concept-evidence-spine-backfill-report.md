@@ -1,22 +1,22 @@
 # Concept Evidence Spine Backfill
 
-Generated: 2026-06-12T13:16:16.861Z
+Generated: 2026-07-17T06:17:52.600Z
 
 ## Summary
 
 - mode: dry-run
-- limit: 25
-- totalRows: 10
+- limit: all
+- totalRows: 0
 - eligibleRows: 0
 - updatedRows: 0
-- skippedRows: 10
+- skippedRows: 0
 - missingSpineRows: 0
 - staleLegacyRows: 0
 
 ## Coverage
 
-- packetKeys coverage: 100%
-- featureIds coverage: 100%
+- packetKeys coverage: 0%
+- featureIds coverage: 0%
 - evidenceCards stale-legacy coverage: 0%
 
 ## Notes

@@ -130,6 +130,27 @@ export const RecencySignalSchema = z.object({
 
 export type RecencySignal = z.infer<typeof RecencySignalSchema>;
 
+/**
+ * Collaborative filtering signal (ALS/BPR/FM factorization)
+ * Derived offline from the query_cluster × packet interaction matrix.
+ * Populated when a collaborative_score exists in feature_records for this packet.
+ */
+export const CollaborativeSignalSchema = z.object({
+  name: z.literal('collaborative'),
+  // ALS/BPR dot product score, normalized to [0, 1]
+  score: z.number().min(0).max(1),
+  // Query cluster that produced this score
+  query_cluster_id: z.string().optional(),
+  // Model version that computed this score (e.g. "als-k64-v1")
+  model_version: z.string().optional(),
+  // Number of (cluster × packet) interactions that trained this score
+  interaction_count: z.number().int().nonnegative().optional(),
+  // Confidence [0, 1] — lower when interaction_count is small
+  confidence: z.number().min(0).max(1),
+});
+
+export type CollaborativeSignal = z.infer<typeof CollaborativeSignalSchema>;
+
 // ============================================================================
 // ENVELOPE: Unified Container for All Signals
 // ============================================================================
@@ -167,6 +188,7 @@ export const FeatureEnvelopeSchema = z.object({
   metadata: MetadataSignalSchema.optional().describe('Tags, domain, language, path'),
   authority: AuthoritySignalSchema.optional().describe('PageRank, centrality, community'),
   recency: RecencySignalSchema.optional().describe('Freshness, modification date'),
+  collaborative: CollaborativeSignalSchema.optional().describe('ALS/BPR collaborative filtering score'),
 
   // ─────────────────────────────────────────────────────────
   // Computed Blends (derived from signals above)
@@ -233,7 +255,7 @@ export const FeatureEnvelopeSchema = z.object({
    * Enables filtering results by config in analysis
    */
   ablation_config_id: z
-    .enum(['dense_only', 'lexical_only', 'rrf_50_50', 'dense_heavy', 'lexical_heavy', 'all_signals'])
+    .enum(['dense_only', 'lexical_only', 'rrf_50_50', 'dense_heavy', 'lexical_heavy', 'all_signals', 'all_signals_collaborative'])
     .optional()
     .describe('Which ablation configuration was used'),
 });
@@ -248,7 +270,7 @@ export type FeatureEnvelope = z.infer<typeof FeatureEnvelopeSchema>;
  * AblationConfig: Specifies which signals to include and how to blend
  */
 export const AblationConfigSchema = z.object({
-  id: z.enum(['dense_only', 'lexical_only', 'rrf_50_50', 'dense_heavy', 'lexical_heavy', 'all_signals']),
+  id: z.enum(['dense_only', 'lexical_only', 'rrf_50_50', 'dense_heavy', 'lexical_heavy', 'all_signals', 'all_signals_collaborative']),
   name: z.string(),
   description: z.string(),
 
@@ -259,6 +281,7 @@ export const AblationConfigSchema = z.object({
   include_metadata: z.boolean(),
   include_authority: z.boolean(),
   include_recency: z.boolean(),
+  include_collaborative: z.boolean().default(false),
 
   // Blending strategy
   blend_strategy: z.enum(['rrf', 'weighted_sum', 'learned']),
@@ -272,6 +295,7 @@ export const AblationConfigSchema = z.object({
       metadata: z.number().default(0),
       authority: z.number().default(0),
       recency: z.number().default(0),
+      collaborative: z.number().default(0),
     })
     .optional(),
 });
@@ -292,8 +316,9 @@ export const ABLATION_CONFIGS: Record<string, AblationConfig> = {
     include_metadata: false,
     include_authority: false,
     include_recency: false,
+    include_collaborative: false,
     blend_strategy: 'weighted_sum',
-    weights: { dense: 1.0, lexical: 0, ast: 0, metadata: 0, authority: 0, recency: 0 },
+    weights: { dense: 1.0, lexical: 0, ast: 0, metadata: 0, authority: 0, recency: 0, collaborative: 0 },
   },
 
   lexical_only: {
@@ -306,8 +331,9 @@ export const ABLATION_CONFIGS: Record<string, AblationConfig> = {
     include_metadata: false,
     include_authority: false,
     include_recency: false,
+    include_collaborative: false,
     blend_strategy: 'weighted_sum',
-    weights: { dense: 0, lexical: 1.0, ast: 0, metadata: 0, authority: 0, recency: 0 },
+    weights: { dense: 0, lexical: 1.0, ast: 0, metadata: 0, authority: 0, recency: 0, collaborative: 0 },
   },
 
   rrf_50_50: {
@@ -320,8 +346,9 @@ export const ABLATION_CONFIGS: Record<string, AblationConfig> = {
     include_metadata: false,
     include_authority: false,
     include_recency: false,
+    include_collaborative: false,
     blend_strategy: 'rrf',
-    weights: { dense: 0.5, lexical: 0.5, ast: 0, metadata: 0, authority: 0, recency: 0 },
+    weights: { dense: 0.5, lexical: 0.5, ast: 0, metadata: 0, authority: 0, recency: 0, collaborative: 0 },
   },
 
   dense_heavy: {
@@ -334,8 +361,9 @@ export const ABLATION_CONFIGS: Record<string, AblationConfig> = {
     include_metadata: false,
     include_authority: false,
     include_recency: false,
+    include_collaborative: false,
     blend_strategy: 'weighted_sum',
-    weights: { dense: 0.7, lexical: 0.3, ast: 0, metadata: 0, authority: 0, recency: 0 },
+    weights: { dense: 0.7, lexical: 0.3, ast: 0, metadata: 0, authority: 0, recency: 0, collaborative: 0 },
   },
 
   lexical_heavy: {
@@ -348,20 +376,22 @@ export const ABLATION_CONFIGS: Record<string, AblationConfig> = {
     include_metadata: false,
     include_authority: false,
     include_recency: false,
+    include_collaborative: false,
     blend_strategy: 'weighted_sum',
-    weights: { dense: 0.3, lexical: 0.7, ast: 0, metadata: 0, authority: 0, recency: 0 },
+    weights: { dense: 0.3, lexical: 0.7, ast: 0, metadata: 0, authority: 0, recency: 0, collaborative: 0 },
   },
 
   all_signals: {
     id: 'all_signals',
     name: 'All Signals (RRF)',
-    description: 'RRF fusion of all 6 signals with equal weight',
+    description: 'RRF fusion of all 6 deterministic signals with equal weight',
     include_dense: true,
     include_lexical: true,
     include_ast: true,
     include_metadata: true,
     include_authority: true,
     include_recency: true,
+    include_collaborative: false,
     blend_strategy: 'rrf',
     weights: {
       dense: 1.0,
@@ -370,6 +400,30 @@ export const ABLATION_CONFIGS: Record<string, AblationConfig> = {
       metadata: 1.0,
       authority: 1.0,
       recency: 1.0,
+      collaborative: 0,
+    },
+  },
+
+  all_signals_collaborative: {
+    id: 'all_signals_collaborative',
+    name: 'All Signals + Collaborative (RRF)',
+    description: 'RRF of all 6 deterministic signals plus ALS/BPR collaborative score',
+    include_dense: true,
+    include_lexical: true,
+    include_ast: true,
+    include_metadata: true,
+    include_authority: true,
+    include_recency: true,
+    include_collaborative: true,
+    blend_strategy: 'rrf',
+    weights: {
+      dense: 1.0,
+      lexical: 1.0,
+      ast: 1.0,
+      metadata: 1.0,
+      authority: 1.0,
+      recency: 1.0,
+      collaborative: 1.0,
     },
   },
 };
@@ -410,6 +464,9 @@ export function computeRRFScore(envelope: FeatureEnvelope, config: AblationConfi
   }
   if (config.include_recency && envelope.recency?.score !== undefined) {
     scores.push(envelope.recency.score);
+  }
+  if (config.include_collaborative && envelope.collaborative?.score !== undefined) {
+    scores.push(envelope.collaborative.score);
   }
 
   if (scores.length === 0) return 0;

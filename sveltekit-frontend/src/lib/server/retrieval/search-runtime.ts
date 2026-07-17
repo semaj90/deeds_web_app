@@ -18,6 +18,7 @@ import {
 } from './retrieve-candidates.js';
 import { rerankCanonicalFeatureEnvelopes } from './canonical-rerank-executor.js';
 import { recordPromotionIntent } from './promote-results-outbox.js';
+import { logExposureEvents } from './recommendation-events.js';
 import { hydrateCandidates as hydrateFromPostgres } from './hydrate-candidates.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
@@ -233,6 +234,21 @@ export class SearchRuntime {
       }).catch(error => {
         console.error('Promotion intent recording failed (non-blocking):', error);
       });
+
+      // Log exposure events for the recommendation ledger (fire-and-forget)
+      // Must happen after final ranking so positions are accurate.
+      logExposureEvents(
+        finalPackets.map((pkt, idx) => ({
+          packet_key: pkt.packet_key ?? pkt.chunk_id,
+          source_ref: pkt.source_ref ?? '',
+          position: idx + 1,
+        })),
+        {
+          query_text: query.text,
+          session_key: query.spanContext?.traceId,
+          actor_key: this.userId,
+        },
+      );
 
       return {
         packets: finalPackets,

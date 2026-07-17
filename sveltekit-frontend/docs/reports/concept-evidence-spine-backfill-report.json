@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-06-12T13:16:16.861Z",
+  "generatedAt": "2026-07-17T06:17:52.600Z",
   "mode": "dry-run",
-  "limit": 25,
+  "limit": 0,
   "backupPath": "docs\\reports\\concept-evidence-spine-backfill-backup.json",
-  "totalRows": 10,
+  "totalRows": 0,
   "samples": [],
   "summary": {
-    "totalRows": 10,
+    "totalRows": 0,
     "eligibleRows": 0,
     "updatedRows": 0,
-    "skippedRows": 10,
+    "skippedRows": 0,
     "missingSpineRows": 0,
     "staleLegacyRows": 0,
-    "packetKeysCoveragePct": 100,
-    "featureIdsCoveragePct": 100,
+    "packetKeysCoveragePct": 0,
+    "featureIdsCoveragePct": 0,
     "staleLegacyCoveragePct": 0
   }
 }
