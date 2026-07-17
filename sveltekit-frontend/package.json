@@ -9,6 +9,8 @@
     "compile:protos": "node ../scripts/compile-protos.mjs",
     "build": "npm run compile:protos && vite build",
     "test": "vitest",
+    "test:lane-contracts": "vitest run --config vitest.lane-contracts.config.ts",
+    "test:hyperrag": "vitest run --config vitest.lane-contracts.config.ts tests/hyperrag/",
     "test:telemetry:dispatcher": "vitest run tests/telemetry/dispatcher-telemetry-wrapper.spec.ts",
     "test:cache-layers": "vitest run tests/cache-layers.spec.ts tests/cache-layers-integration.spec.ts",
     "test:cache-layers:unit": "vitest run tests/cache-layers.spec.ts",
