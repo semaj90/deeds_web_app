@@ -21,7 +21,7 @@ const RUNTIME_CONTEXT_SIZE = Number(
 );
 
 
-const MODEL = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4:e4b-it-q4_K_M';
+const MODEL = ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4:e4b-it-q4_K_M';
 const TURBOQUANT_BASE_URL = ENV.TURBOQUANT_BASE_URL;
 
 const synthesisSchema = z.object({

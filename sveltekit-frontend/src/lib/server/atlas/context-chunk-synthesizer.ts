@@ -133,7 +133,7 @@ export async function synthesizeFeatureChunks(
     ? `${ENV.TURBOQUANT_URL}/v1/chat/completions`
     : `${getOllamaEndpoint()}/v1/chat/completions`;
 
-  const modelName = isTurboActive ? ENV.GEMMA4_MODEL : ENV.OLLAMA_CHAT_MODEL;
+  const modelName = ENV.ROTORQUANT_CHAT_MODEL;
 
   const systemPrompt = SYSTEM_PROMPT;
   const userPrompt = buildUserPrompt(featureKey, chunks);

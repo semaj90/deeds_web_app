@@ -141,9 +141,20 @@ export const ENV = {
    * Falls back to OLLAMA_BASE_URL when not set.
    */
   OLLAMA_EMBED_BASE_URL: privateEnv.OLLAMA_EMBED_BASE_URL ?? privateEnv.EMBED_SERVER_URL ?? null,
-  /** Legal reasoning / chat / tool-calling model (unified GRPO legal + VLM, 5.3GB) */
+  /** Canonical chat / tool-calling model for the local RotorQuant lane. */
+  ROTORQUANT_CHAT_MODEL:
+    privateEnv.ROTORQUANT_CHAT_MODEL ??
+    privateEnv.OLLAMA_CHAT_MODEL ??
+    privateEnv.OLLAMA_MODEL ??
+    privateEnv.GEMMA4_MODEL ??
+    'gemma4-rotorquant:latest',
+  /** Backward-compatible alias kept for legacy codepaths. */
   OLLAMA_CHAT_MODEL:
-    privateEnv.OLLAMA_CHAT_MODEL ?? privateEnv.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest',
+    privateEnv.OLLAMA_CHAT_MODEL ??
+    privateEnv.OLLAMA_MODEL ??
+    privateEnv.ROTORQUANT_CHAT_MODEL ??
+    privateEnv.GEMMA4_MODEL ??
+    'gemma4-rotorquant:latest',
   /** Vision-language model for image/document understanding (same unified model) */
   OLLAMA_VLM_MODEL:
     privateEnv.OLLAMA_VLM_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest',
@@ -304,6 +315,8 @@ export const ENV = {
     privateEnv.TURBOQUANT_BASE_URL ??
     `http://${LOOPBACK_IP}:8090`,
   ROTORQUANT_MODEL_PATH: privateEnv.ROTORQUANT_MODEL_PATH ?? null,
+  ROTORQUANT_CHAT_MODEL:
+    privateEnv.ROTORQUANT_CHAT_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest',
   TURBO_MODEL_PATH: privateEnv.TURBO_MODEL_PATH ?? null,
   TURBOQUANT_MODEL_PATH: privateEnv.TURBOQUANT_MODEL_PATH ?? null,
   TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8792`,

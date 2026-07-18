@@ -1,6 +1,14 @@
 {
+  "schemaVersion": "atlas-model-manifest-v3",
   "_comment": "Canonical model registry. Every production-grade model used by the YorHA legal stack is declared here. rg-searchable — do NOT add to .gitignore. Binary GGUF/ONNX blobs are stored outside git (see pathEnv). Update this file when adding or removing models.",
-  "_lastUpdated": "2026-05-16",
+  "_lastUpdated": "2026-07-17",
+  "canonicalDimensions": {
+    "semantic": 384,
+    "latent": 64,
+    "somRows": 20,
+    "somColumns": 20,
+    "_note": "Project canonical is 384-dim (embeddinggemma). Legacy 768-dim inputs exist only in migration paths. latent64 is derived routing only, never canonical ANN."
+  },
   "models": [
     {
       "id": "gemma4-rotorquant:latest",
@@ -33,19 +41,25 @@
       "tags": ["vlm", "sidecar", "vision"]
     },
     {
-      "id": "embeddinggemma-768d",
-      "displayName": "EmbeddingGemma 768d (Ollama)",
-      "description": "Primary embedding model. 768-dimensional dense vectors for codebase, evidence, and legal document retrieval.",
+      "id": "embeddinggemma-384d",
+      "displayName": "EmbeddingGemma 300M (Ollama, 384-dim canonical)",
+      "description": "Primary embedding model. 384-dimensional dense vectors — project canonical dimension. Used for content_384, summary_384, signature_384 vectors in codebase_chunks_384_hybrid.",
+      "role": "embedding",
       "runtime": "ollama",
       "pathEnv": null,
       "ollamaTag": "embeddinggemma:latest",
+      "localGGUF": "models/embeddinggemma-300m-f16.gguf",
       "filename": null,
-      "notes": "Pulled via Ollama. No GGUF path needed. Served at localhost:11434/api/embed. Canonical lane for Qdrant codebase_chunks_768, evidence_vectors, legal_documents.",
-      "embeddingDim": 768,
+      "normalize": "l2",
+      "embeddingDimension": 384,
+      "endpoint": "http://127.0.0.1:11434",
+      "notes": "Ollama pulls this at embeddinggemma:latest. Native output is 768-dim; project truncates/projects to 384 as canonical. Do NOT use 768-dim vectors in codebase_chunks_384_hybrid. Legacy codebase_chunks_768 collection is migration provenance only.",
+      "embeddingDim": 384,
       "port": 11434,
       "contextLen": null,
-      "quantization": "q4_K_M",
-      "tags": ["embeddings", "768d", "canonical", "primary"]
+      "quantization": "f16",
+      "canonical": true,
+      "tags": ["embeddings", "384d", "canonical", "primary"]
     },
     {
       "id": "gemma3-270m-onnx",
@@ -64,18 +78,21 @@
     },
     {
       "id": "embeddinggemma-300m-onnx",
-      "displayName": "EmbeddingGemma 300M ONNX (client-side)",
-      "description": "Client-side embedding model for browser-local retrieval fallback. 768-dim output.",
+      "displayName": "EmbeddingGemma 300M ONNX (client-side, 384-dim)",
+      "description": "Client-side embedding model for browser-local retrieval fallback. Raw output is 768-dim; client-embed.ts projects to 384 to match server canonical.",
+      "role": "embedding-client-fallback",
       "runtime": "onnx-runtime-web",
       "pathEnv": null,
       "localPath": "sveltekit-frontend/static/embeddinggemma_300m_onnx/",
       "filename": null,
-      "notes": "Served from /embeddinggemma_300m_onnx/. Used by client-embed.ts when server embeddings are unavailable. Not gitignored — rg-searchable.",
-      "embeddingDim": 768,
+      "notes": "Served from /embeddinggemma_300m_onnx/. client-embed.ts mean-pools + L2-norms then projects to 384-dim to match server vectors. Not gitignored — rg-searchable.",
+      "embeddingDim": 384,
+      "rawModelDim": 768,
       "port": null,
       "contextLen": null,
       "quantization": "int8",
-      "tags": ["client-side", "onnx", "embeddings", "768d", "fallback"]
+      "canonical": false,
+      "tags": ["client-side", "onnx", "embeddings", "384d", "fallback"]
     },
     {
       "id": "gemma4-rotorquant:latest-vendor-gguf",
@@ -108,18 +125,42 @@
       "tags": ["vlm", "sidecar", "vision", "vendor"]
     },
     {
-      "id": "gemma4-rotorquant:latest-iq4xs-direct",
+      "id": "gemma4-legal-iq4xs-direct",
       "displayName": "Gemma 4 Legal IQ4_XS Direct (canonical merged)",
-      "description": "LoRA-merged Gemma 4 E4B in IQ4_XS quant. Legal fine-tune baked in — no runtime LoRA injection needed. 59.8 tok/s, 220ms TTFT on RTX 3060 Ti. This is the canonical production GGUF.",
+      "description": "LoRA-merged Gemma 4 E2B in IQ4_XS quant. Legal fine-tune baked in — no runtime LoRA injection needed. Canonical production GGUF, verified loaded on :8090. 7.5B params, 4.7 GB on disk.",
+      "role": "generation",
       "runtime": "llama-server",
       "pathEnv": "ROTORQUANT_MODEL_PATH",
-      "localPath": "models/gemma4-rotorquant:latest-iq4xs-direct.gguf",
-      "filename": "gemma4-rotorquant:latest-iq4xs-direct.gguf",
-      "notes": "Place at models/gemma4-rotorquant:latest-iq4xs-direct.gguf. ROTORQUANT_MODEL_PATH and TURBO_MODEL_PATH both point here in .env. Runs on stock llama.cpp (no TurboQuant binary needed). 59.8 tok/s vs 21.6 for round-trip variant. DO NOT replace with the non-direct (round-trip) build.",
+      "familyDirectory": "models/gemma4-e2b-rotorquant-iq4xs",
+      "artifact": "models/gemma4-legal-iq4xs-direct.gguf",
+      "filename": "gemma4-legal-iq4xs-direct.gguf",
+      "endpoint": "http://127.0.0.1:8090",
+      "openAICompatible": true,
+      "capabilities": ["chat-completions", "streaming", "tool-calling", "vision", "ace-synthesis"],
+      "gpu": {
+        "device": "cuda",
+        "offloadLayers": 99,
+        "kvCacheTypeK": "q8_0",
+        "kvCacheTypeV": "q8_0"
+      },
+      "defaults": {
+        "contextSize": 65536,
+        "fallbackContextSize": 16384
+      },
+      "drafting": {
+        "enabledEnv": "ENABLE_MTP_DRAFTER",
+        "draftModelEnv": "MTP_DRAFT_MODEL",
+        "mtpHeadEnv": "MTP_HEAD_PATH",
+        "recommendedDraftId": "gemma4-e4b-assistant-mtp-q4km",
+        "fallbackDraftId": "gemma4-e2b-rotorquant-iq4xs-base",
+        "_note": "Mode C (75MB assistant MTP head) is preferred. Mode B (3.1GB full E2B GGUF) is fallback when Mode C binary support is unavailable."
+      },
+      "notes": "ROTORQUANT_MODEL_PATH and TURBO_MODEL_PATH both point to models/gemma4-legal-iq4xs-direct.gguf in .env. Runs on stock llama.cpp. DO NOT replace with the base E2B RotorQuant (no legal merge) or the round-trip LoRA-injection variant.",
       "embeddingDim": null,
       "port": 8090,
-      "contextLen": 64000,
+      "contextLen": 65536,
       "quantization": "iq4_xs",
+      "canonical": true,
       "tags": ["chat", "legal", "rotorquant", "canonical", "primary", "merged"]
     },
     {
@@ -135,8 +176,195 @@
       "contextLen": 64000,
       "quantization": "iq4_xs",
       "tags": ["chat", "rotorquant", "base-model", "non-canonical"]
+    },
+    {
+      "id": "gemma4-e2b-rotorquant-iq4xs-base",
+      "displayName": "Gemma 4 E2B RotorQuant IQ4_XS (base, draft lane)",
+      "description": "Speculative draft / assistant lane for MTP-assisted decoding. Base model — no legal LoRA merged. Pair with the :8090 synthesis lane when ENABLE_MTP_DRAFTER is enabled.",
+      "role": "draft",
+      "runtime": "llama-server",
+      "pathEnv": "MTP_DRAFT_MODEL",
+      "familyDirectory": "models/gemma4-e2b-rotorquant-iq4xs",
+      "artifact": "models/gemma4-e2b-rotorquant-iq4xs/gemma-4-E2B-it-RotorQuant-IQ4_XS.gguf",
+      "filename": "gemma-4-E2B-it-RotorQuant-IQ4_XS.gguf",
+      "notes": "3.1 GB. Draft-only companion — no legal fine-tune. Use ENABLE_MTP_DRAFTER=1 with a compatible llama-server binary. This is NOT the canonical synthesis model; do not replace gemma4-legal-iq4xs-direct with this.",
+      "embeddingDim": null,
+      "port": null,
+      "contextLen": 128000,
+      "quantization": "iq4_xs",
+      "canonical": false,
+      "tags": ["draft", "mtp", "speculative", "assistant", "rotorquant", "e2b"]
+    },
+    {
+      "id": "gemma4-e4b-assistant-mtp-q4km",
+      "displayName": "Gemma 4 E4B MTP Assistant Q4_K_M (75MB drafter)",
+      "description": "Official Google MTP assistant head for Gemma 4 E4B. Lightweight speculative drafter — 75 MB Q4_K_M. Mode C speculative decoding: tiny dedicated drafter paired with gemma4-legal-iq4xs-direct on :8090. Converted from google/gemma-4-E4B-it-assistant safetensors.",
+      "role": "draft-mtp-assistant",
+      "runtime": "llama-server",
+      "pathEnv": "MTP_DRAFT_MODEL",
+      "draftMode": "C",
+      "artifact": ".tmp/atomic-mtp/gemma-4-E4B-it-assistant.Q4_K_M.gguf",
+      "filename": "gemma-4-E4B-it-assistant.Q4_K_M.gguf",
+      "source": "https://huggingface.co/google/gemma-4-E4B-it-assistant",
+      "siblingArtifacts": {
+        "f16": ".tmp/google-gemma4-e4b-assistant/gemma-e4b-assistant-mtp-f16.gguf",
+        "e4b-base-q4km": ".tmp/atomic-mtp/gemma-4-E4B-it-Q4_K_M.gguf",
+        "unsloth-q4km": ".tmp/atomic-mtp-unsloth/gemma-4-E4B-it-Q4_K_M.gguf"
+      },
+      "notes": "75 MB on disk. Pair with --draft-model flag on a TurboQuant-capable llama-server binary. Use ENABLE_MTP_DRAFTER=1 + MTP_DRAFT_MODEL=<artifact path>. The 164 MB F16 sibling in .tmp/google-gemma4-e4b-assistant/ is available for higher-quality drafting at ~2× size cost. NOT a standalone chat model — assistant/MTP architecture only.",
+      "embeddingDim": null,
+      "port": null,
+      "contextLen": null,
+      "quantization": "q4_K_M",
+      "canonical": false,
+      "tags": ["draft", "mtp", "speculative", "assistant", "e4b", "mode-c", "75mb"]
     }
   ],
+  "retrieval": {
+    "canonicalCollection": "codebase_chunks_384_hybrid",
+    "identityField": "packet_key",
+    "fusionAuthority": "typescript-search-runtime",
+    "_legacyCollection": "codebase_chunks_768",
+    "_legacyNote": "codebase_chunks_768 is migration provenance only. All new retrieval uses codebase_chunks_384_hybrid.",
+
+    "denseVectors": {
+      "content": {
+        "name": "content_384",
+        "dimension": 384,
+        "distance": "Cosine",
+        "candidateTopK": 60,
+        "purpose": "canonical semantic retrieval"
+      },
+      "summary": {
+        "name": "summary_384",
+        "dimension": 384,
+        "distance": "Cosine",
+        "candidateTopK": 40,
+        "purpose": "summary-level semantic retrieval"
+      },
+      "signature": {
+        "name": "signature_384",
+        "dimension": 384,
+        "distance": "Cosine",
+        "candidateTopK": 30,
+        "purpose": "symbol and API-shape retrieval"
+      },
+      "latent": {
+        "name": "latent64",
+        "dimension": 64,
+        "distance": "Cosine",
+        "purpose": "coarse routing only — not canonical ANN"
+      }
+    },
+
+    "sparseVectors": {
+      "canonical": {
+        "name": "bm42_sparse",
+        "candidateTopK": 60,
+        "purpose": "lexical and exact-term recall"
+      }
+    },
+
+    "fusion": {
+      "algorithm": "rrf",
+      "postFusionTopK": 100,
+      "deduplicateBy": "packet_key"
+    },
+
+    "graphExpansion": {
+      "store": "neo4j",
+      "seedTopK": 5,
+      "maxDepth": 2,
+      "maxExpandedCandidates": 25,
+      "phase": "after-semantic-retrieval",
+      "_note": "Graph expansion runs AFTER initial fused semantic retrieval, seeded from top-5 results. Not an unseeded PageRank query.",
+      "allowedRelationships": [
+        "IMPORTS", "CALLS", "CONTAINS", "IMPLEMENTS",
+        "USES_CONCEPT", "SIMILAR_TOPOLOGY", "IN_SOM", "BELONGS_TO_CLUSTER"
+      ],
+      "pageRank": {
+        "mode": "static-prior",
+        "weightCap": 0.1
+      }
+    },
+
+    "ranking": {
+      "candidateHydrationAuthority": "postgres",
+      "stages": [
+        "exact",
+        "sparse-bm42",
+        "dense-content",
+        "dense-summary",
+        "dense-signature",
+        "ast",
+        "topology",
+        "rrf",
+        "xgboost",
+        "cross-encoder"
+      ],
+      "finalEvidenceTopK": 12
+    },
+
+    "cuvs": {
+      "enabledEnv": "ATLAS_CUVS_ENABLED",
+      "environment": "miniforge-wsl2",
+      "algorithm": "cagra",
+      "fallbackAlgorithm": "ivf-flat",
+      "role": "benchmark-and-acceleration",
+      "sourceOfTruth": false,
+      "candidateTopK": 100,
+      "_note": "cuVS is a benchmark/acceleration lane. Do not promote to canonical serving without recall and latency gates vs Qdrant.",
+      "requiredGates": [
+        "exclude-self-matches",
+        "compare-gpu-brute-force",
+        "measure-recall-at-10",
+        "compare-qdrant-latency",
+        "compare-qdrant-recall"
+      ]
+    }
+  },
+
+  "summaries": {
+    "canonicalTable": "atlas_summary_layers",
+    "levels": ["chunk", "symbol", "file", "feature", "domain"],
+    "retrieval": {
+      "vector": "summary_384",
+      "candidateTopK": 40,
+      "finalTopK": 12,
+      "hydrateFromPostgres": true,
+      "requirePacketKey": true
+    }
+  },
+
+  "topology": {
+    "autoencoder": {
+      "modelPath": "models/autoencoder",
+      "latentIndexPath": "models/autoencoder/autoencoder_latent_index.json",
+      "architecture": [384, 128, 64],
+      "inputDim": 384,
+      "_legacyInputDim": 768,
+      "_migrationNote": "Existing autoencoder was trained on 768-dim inputs. Rebuild against 384-dim canonical embeddings, or document as legacy routing artifact only.",
+      "latentDim": 64,
+      "uses": ["som-input", "kmeans-routing", "coarse-prefiltering"],
+      "role": "routing-feature-lane",
+      "sourceOfTruth": false
+    },
+
+    "som": {
+      "rows": 20,
+      "columns": 20,
+      "cellCount": 400,
+      "adjacentRadius": 1,
+      "maxExpansionCandidates": 20
+    },
+
+    "kmeans": {
+      "vector": "latent64",
+      "nearestCentroids": 4,
+      "hardFilter": false,
+      "rankingBoostOnly": true
+    }
+  },
   "envVarPolicy": {
     "TURBO_MODEL_PATH":           "Absolute path to primary Gemma 4 GGUF. Required for llama-server launch. Points to models/gemma4-rotorquant:latest-iq4xs-direct.gguf in canonical setup.",
     "ROTORQUANT_MODEL_PATH":      "Alias for TURBO_MODEL_PATH — read first by vlm-lifecycle.ts fallback chain. Same value in canonical setup.",
@@ -145,6 +373,7 @@
     "MMPROJ_PATH":                "Fallback mmproj path. Set in .env — used when TURBOQUANT_MMPROJ_PATH is not set.",
     "TURBOQUANT_EXE_PATH":        "Path to llama-server.exe. Read first by inference-router.ts. Falls back to LLAMA_SERVER_PATH.",
     "LLAMA_SERVER_PATH":          "Fallback path to llama-server.exe. Set in .env — used when TURBOQUANT_EXE_PATH is not set.",
+    "MTP_DRAFT_MODEL":            "Absolute path to the speculative draft / assistant model GGUF used by the MTP wrapper at 8090. Companion lane only; do not treat as the canonical synthesis model.",
     "TURBO_PORT":                 "Port for llama-server (default: 8090).",
     "TURBO_PROFILE":              "KV cache profile: stock | turboquant | turboquant-safe | atomicbot (default: stock).",
     "TURBO_KV_K":                 "Override KV key cache type (e.g. q8_0, turbo3).",

@@ -9,13 +9,21 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		.then(async (r) => (r.ok ? await r.json() : null))
 		.catch(() => null);
 
+	const runtimeRegistryPromise = fetch('/api/admin/atlas/runtime-registry')
+		.then(async (r) => (r.ok ? await r.json() : null))
+		.catch(() => null);
+
 	const cacheStatsPromise = locals.user.role === 'admin'
 		? fetch('/api/admin/cache-stats')
 			.then(async (r) => (r.ok ? await r.json() : null))
 			.catch(() => null)
 		: Promise.resolve(null);
 
-	const [health, cacheStats] = await Promise.all([healthPromise, cacheStatsPromise]);
+	const [health, runtimeRegistry, cacheStats] = await Promise.all([
+		healthPromise,
+		runtimeRegistryPromise,
+		cacheStatsPromise
+	]);
 
 	const workflowTaskId = url.searchParams.get('taskId');
 	const workflowQueueId = url.searchParams.get('queueId');
@@ -36,10 +44,12 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 
 	return {
 		health,
+		runtimeRegistry,
 		cacheStats,
 		workflowStatus: workflowStatus?.status ?? null,
-		chatModel: ENV.OLLAMA_CHAT_MODEL,
+		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? 'models/gemma4-rotorquant:latest-iq4xs-direct.gguf',
 		embedModel: ENV.OLLAMA_EMBED_MODEL,
+		graniteDoclingModel: ENV.GRANITE_DOCLING_MODEL,
 		kvProfile: process.env.TURBO_PROFILE ?? 'stock'
 	};
 };

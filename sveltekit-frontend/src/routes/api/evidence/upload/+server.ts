@@ -1153,7 +1153,7 @@ async function processAndEmbed(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: ENV.OLLAMA_CHAT_MODEL,
+          model: ENV.ROTORQUANT_CHAT_MODEL,
           prompt: `You are a legal document analyst. Below are sections extracted from an evidence document via structural analysis.\n\nFor each section, assess its legal relevance. Output a JSON object with:\n- "quality": overall document structural quality score 0.0 to 1.0\n- "sections": array of detected legal section types from this list: FACTS, LEGAL_AUTHORITY, CLAIMS, PROCEDURAL_HISTORY, EVIDENCE, PRAYER_HOLDING, TESTIMONY, FINANCIAL, CONTRACT, CORRESPONDENCE, OTHER\n\nSections:\n${sectionSummary}\n\nRespond with ONLY the JSON object, no explanation.`,
           stream: false,
           options: { temperature: 0, num_predict: 512 },

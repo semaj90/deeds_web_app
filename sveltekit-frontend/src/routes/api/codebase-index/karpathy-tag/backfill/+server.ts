@@ -162,7 +162,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 	const batchSize  = Math.min(parseInt(url.searchParams.get('batchSize') ?? '20', 10) || 20, 50);
 	const dryRun     = url.searchParams.get('dryRun') === 'true';
 	const forceRetag = url.searchParams.get('forceRetag') === 'true';
-	const model      = ENV.OLLAMA_CHAT_MODEL;
+	const model      = ENV.ROTORQUANT_CHAT_MODEL;
 
 	const encoder = new TextEncoder();
 	let cancelled = false;

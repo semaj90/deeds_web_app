@@ -2,7 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { validateCandidate } from '../src/lib/server/retrieval/lane-contracts.js';
-import type { LaneCandidate } from '../src/lib/server/retrieval/lane-contracts.js';
+import type { LaneCandidate, FusedLaneCandidate } from '../src/lib/server/retrieval/lane-contracts.js';
 
 // Helper: build a valid candidate with overrides
 function makeCandidate(overrides: Partial<LaneCandidate> = {}): LaneCandidate {
@@ -91,6 +91,16 @@ describe('validateCandidate', () => {
     expect(validateCandidate(c)).toBe(c);
   });
 
+  it('accepts lane: bm42', () => {
+    const c = makeCandidate({ lane: 'bm42' });
+    expect(validateCandidate(c)).toBe(c);
+  });
+
+  it('accepts lane: go-retrieval', () => {
+    const c = makeCandidate({ lane: 'go-retrieval' });
+    expect(validateCandidate(c)).toBe(c);
+  });
+
   // optional fields do not affect validity
   it('accepts a candidate with optional fields omitted', () => {
     const c: LaneCandidate = {
@@ -121,5 +131,41 @@ describe('validateCandidate', () => {
   it('accepts rank: 100 (large valid rank)', () => {
     const c = makeCandidate({ rank: 100 });
     expect(validateCandidate(c)).toBe(c);
+  });
+
+  // fusionStage: optional on LaneCandidate, not checked by validateCandidate
+  it('accepts fusionStage: lane (adapter-emitted candidate)', () => {
+    const c = makeCandidate({ fusionStage: 'lane' });
+    expect(validateCandidate(c)).toBe(c);
+  });
+
+  it('accepts fusionStage: search_runtime (post-RRF candidate)', () => {
+    const c = makeCandidate({ fusionStage: 'search_runtime' });
+    expect(validateCandidate(c)).toBe(c);
+  });
+
+  it('accepts a candidate with fusionStage omitted (field is optional)', () => {
+    const c = makeCandidate();
+    expect(c.fusionStage).toBeUndefined();
+    expect(validateCandidate(c)).toBe(c);
+  });
+});
+
+describe('FusedLaneCandidate shape', () => {
+  it('FusedLaneCandidate is assignable with required fusedScore and rrfScore', () => {
+    const fused: FusedLaneCandidate = {
+      packetKey: 'ace:packet:test:001',
+      sourceRef: 'src/index.ts',
+      rank: 1,
+      score: 0.9,
+      lane: 'dense',
+      fusionStage: 'search_runtime',
+      fusedScore: 0.017,
+      rrfScore: 0.017,
+    };
+    // Type-level assertion — the object construction above would fail tsc if types are wrong.
+    expect(fused.fusionStage).toBe('search_runtime');
+    expect(typeof fused.fusedScore).toBe('number');
+    expect(typeof fused.rrfScore).toBe('number');
   });
 });

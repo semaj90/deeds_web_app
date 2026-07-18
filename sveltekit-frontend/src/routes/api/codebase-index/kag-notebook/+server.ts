@@ -321,7 +321,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				{ role: 'system', content: systemPrompt },
 				{ role: 'user',   content: userPrompt },
 			],
-			ENV.OLLAMA_CHAT_MODEL,
+			ENV.ROTORQUANT_CHAT_MODEL,
 			{
 				temperature: 0.2,
 				maxTokens:   800,
@@ -336,7 +336,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			fixText,
 			errorCount:  errorCards.length,
 			filesContext: affectedFiles,
-			model:       ENV.OLLAMA_CHAT_MODEL,
+			model:       ENV.ROTORQUANT_CHAT_MODEL,
 			cached:      false,  // bifrostChat sets L1 on write; next identical call returns instantly
 			degraded:    errorCards.length === 0,
 		});

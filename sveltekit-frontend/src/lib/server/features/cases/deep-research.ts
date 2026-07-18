@@ -39,7 +39,7 @@ import type { HitPipeline } from '$lib/server/features/observability/search-anal
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const RESEARCH_CACHE_TTL = 1800; // 30 min
-const RESEARCH_MODEL = ENV.OLLAMA_CHAT_MODEL;
+const RESEARCH_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 const MAX_TOPICS = 8;
 const HOT_QUERY_KEY = 'analytics:hot_queries';
 const QUERY_VEC_KEY = 'analytics:query_vecs';

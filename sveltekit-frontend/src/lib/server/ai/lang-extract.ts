@@ -146,7 +146,7 @@ export async function extractStructured<T>(
 	}
 ): Promise<ExtractResult<T>> {
 	const t0    = performance.now();
-	const model = options?.model ?? ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? ENV.OLLAMA_CHAT_MODEL;
+	const model = options?.model ?? ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? ENV.ROTORQUANT_CHAT_MODEL;
 
 	// Build JSON shape description for system prompt
 	const shapeDesc = describeShape(schema as z.ZodTypeAny);
@@ -396,4 +396,3 @@ export async function extractQueryFeatures(query: string, model?: string): Promi
 		candidateTools: [],
 	};
 }
-

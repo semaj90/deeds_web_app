@@ -15,8 +15,27 @@ export interface LaneCandidate {
   rank: number;            // 1-based position within lane
   score: number | null;    // null = unscored (disabled lane)
 
-  lane: 'dense' | 'sparse' | 'exact' | 'ast' | 'bm25' | 'rg';
+  lane: 'dense' | 'sparse' | 'bm42' | 'exact' | 'ast' | 'bm25' | 'rg' | 'go-retrieval';
   metadata?: Record<string, unknown>;
+
+  /**
+   * Where fusion was applied. Adapters emit 'lane' (single-lane raw scores).
+   * SearchRuntime promotes to 'search_runtime' after RRF across all lanes.
+   * Allows downstream consumers to detect accidental double-fusion.
+   */
+  fusionStage?: 'lane' | 'search_runtime';
+}
+
+/**
+ * A LaneCandidate that has been through RRF in SearchRuntime.
+ * Carries the fused score alongside the original lane score and is
+ * narrowed so fusionStage is always 'search_runtime'.
+ */
+export interface FusedLaneCandidate extends LaneCandidate {
+  fusionStage: 'search_runtime';
+  fusedScore: number;
+  /** Sum of reciprocal ranks from all lanes (RRF numerics). */
+  rrfScore: number;
 }
 
 export interface RetrievalInput {

@@ -77,6 +77,13 @@ CLIENT (Browser)                    SERVER (SvelteKit + Docker)
 - SOM 20x20 and KMeans still need a single derived-metrics writeback path
 - Neo4j classification support should consume derived topology, not raw runtime packets
 
+### 6. Plugin boundary gap
+
+- Headroom is currently only a plugin integration concept, not a control-plane authority
+- no thin adapter exists yet to isolate plugin inputs, outputs, and failures
+- plugin telemetry is not explicitly defined as execution evidence
+- plugin calls must stay side-effect free with respect to canonical truth
+
 ---
 
 ## Concrete Execution Order
@@ -88,6 +95,7 @@ CLIENT (Browser)                    SERVER (SvelteKit + Docker)
 5. Raise canonical packet embedding coverage.
 6. Re-run JEPA on the real 384d cohort.
 7. Promote JEPA only if it beats baseline `MRR` and `NDCG@10`.
+8. Add the optional plugin adapter after retrieval and cache wiring are stable.
 
 ---
 
@@ -103,6 +111,7 @@ CLIENT (Browser)                    SERVER (SvelteKit + Docker)
 - `scripts/atlas/export-packet-jepa-training-pairs.mjs`
 - `scripts/atlas/train-packet-jepa.py`
 - `scripts/atlas/score-packet-jepa-similarity.mjs`
+- `sveltekit-frontend/src/lib/server/plugins/`
 
 ---
 

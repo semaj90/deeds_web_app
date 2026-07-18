@@ -2,7 +2,7 @@
 
 **Date**: 2026-05-17
 **Status**: design
-**Scope**: SvelteKit 2 app wiring for merged Gemma4 legal chat, embeddings, KV cache policy, TurboVec retrieval acceleration, and BitFrost/Redis app caching.
+**Scope**: SvelteKit 2 app wiring for local RotorQuant chat, embeddings, KV cache policy, TurboVec retrieval acceleration, and BitFrost/Redis app caching.
 
 ## Related
 
@@ -10,7 +10,7 @@
 
 ## Goal
 
-Define a buildable inference stack where the merged legal Gemma4 model handles generation, `embeddinggemma` handles embeddings, llama.cpp runtime KV caching stays isolated in the launcher, and TurboVec acts as a local retrieval accelerator before Qdrant/Postgres fallback.
+Define a buildable inference stack where the local RotorQuant GGUF handles generation, `embeddinggemma` handles embeddings, llama.cpp runtime KV caching stays isolated in the launcher, and TurboVec acts as a local retrieval accelerator before Qdrant/Postgres fallback.
 
 ## Canonical env and runtime map
 
@@ -18,6 +18,8 @@ Define a buildable inference stack where the merged legal Gemma4 model handles g
 |-----|-----------------|-------|
 | `TURBO_PROFILE` | `stock` | default until patched llama-server is validated |
 | `TURBO_CTX` | `16384` | working baseline for this session |
+| `ROTORQUANT_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | canonical local chat GGUF |
+| `TURBO_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | alias to the same local chat artifact |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | legacy/fallback Ollama lane |
 | `OLLAMA_URL` | `http://localhost:11434` | older code/docs alias |
 | `PUBLIC_APP_URL` | `http://localhost:5173` | frontend origin in dev |
@@ -30,15 +32,16 @@ Define a buildable inference stack where the merged legal Gemma4 model handles g
 - 8 GB VRAM stays effectively single-GPU-process territory.
 - `llama-server` owns runtime KV cache only.
 - BitFrost / Redis stores app cache only.
-- Embeddings stay on the embedding lane; do not merge them into the Gemma4 chat lane.
+- Embeddings stay on the embedding lane; do not merge them into the RotorQuant chat lane.
 - `turbo3` / `turbo4` stay disabled until the patched binary is confirmed.
 - MTP drafter is generation speed only and never picks sourceRefs.
+- The local 5-6 GB GGUF plus CUDA buffers and KV cache can pressure an 8 GB card; validate with `--metrics` and `--perf` before widening context.
 
 ## Service endpoint map
 
 | Service | Canonical endpoint | Notes |
 |---------|--------------------|-------|
-| TurboQuant llama-server | `http://localhost:8090` | primary text + vision lane |
+| RotorQuant / TurboQuant llama-server | `http://localhost:8090` | primary local chat + vision lane |
 | TensorRT-LLM | `http://localhost:8099` | optional accelerator |
 | Triton | `http://localhost:8000` | optional accelerator |
 | HF VLM Server | `http://localhost:8085` | vision fallback |
@@ -61,6 +64,8 @@ Define a buildable inference stack where the merged legal Gemma4 model handles g
 | `TURBO_CTX` | `16384` | working baseline |
 | `LLAMACP_URL` | local llama.cpp lane | appears in repo-root atlas env inventory |
 | `OLLAMA_BASE_URL` | `http://localhost:11434` | fallback LLM / embeddings lane |
+| `ROTORQUANT_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | canonical local GGUF path |
+| `TURBO_MODEL_PATH` | `models/gemma4-rotorquant:latest-iq4xs-direct.gguf` | alias to the same local chat artifact |
 | `PUBLIC_APP_URL` | `http://localhost:5173` | frontend origin for local requests |
 | `DATABASE_URL` | `postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db` | canonical app DB |
 | `REDIS_URL` | `redis://127.0.0.1:6379` | BitFrost / hot cache |
@@ -102,7 +107,7 @@ SvelteKit 2 route / API handler
   |
   +--> embeddinggemma for query vectors
   |
-  +--> merged legal Gemma4 chat model
+  +--> local RotorQuant GGUF chat model
            |
            +--> stock KV cache or turbo3/turbo4 KV mode
            +--> optional MTP drafter for generation speed only
@@ -120,13 +125,13 @@ SvelteKit 2 route / API handler
 | Redis / BitFrost | hot answers, hot retrieval context, short TTL cache |
 | TurboVec | local compressed vector short-circuit |
 | embeddinggemma | embeddings only |
-| merged legal Gemma4 | answer generation and multimodal input |
+| local RotorQuant GGUF | answer generation and multimodal input |
 | llama.cpp KV | runtime attention cache only |
 | MTP drafter | speculative decode / generation acceleration only |
 
 ## Runtime rules
 
-1. The merged legal Gemma4 model is the only chat/generation model.
+1. The local RotorQuant GGUF model is the canonical chat/generation model.
 2. The model server does not own embeddings.
 3. TurboQuant is runtime-only and only affects llama.cpp KV behavior.
 4. BitFrost caches application artifacts, not model KV state.
@@ -136,7 +141,7 @@ SvelteKit 2 route / API handler
 
 ## Notes: model and modalities
 
-- Merged legal model: `gemma4-rotorquant:latest-iq4xs-direct.gguf`.
+- Merged local model: `models/gemma4-rotorquant:latest-iq4xs-direct.gguf`.
 - LoRA merged: yes.
 - Multimodal / VLM: `capabilities: ["completion", "multimodal"]` means the server can accept multimodal inputs.
 - True VLM still requires a vision encoder plus projector in the model/export.
@@ -146,12 +151,13 @@ SvelteKit 2 route / API handler
 
 ### Generation
 
-- Load the merged legal GGUF in the llama-server lane.
+- Load the merged local RotorQuant GGUF in the llama-server lane.
 - Keep `TURBO_PROFILE=stock` as the default.
 - Enable `turbo3` or `turbo4` only after the patched binary is confirmed.
 - Keep KV cache settings separate from model weights and LoRA merge status.
 - Treat KV cache as internal llama.cpp state, not as an app cache.
 - KV modes: `q8_0/q8_0` for stock, `turbo3` / `turbo4` only after validation.
+- Start `llama-server` with `--metrics` and `--perf` during cache verification so the prompt token and prediction counters are visible.
 
 ### Embeddings
 
@@ -192,7 +198,7 @@ SvelteKit 2 route / API handler
 
 ## Build order
 
-1. Lock the canonical model wiring in config: merged legal Gemma4 for chat, `embeddinggemma` for vectors.
+1. Lock the canonical model wiring in config: local RotorQuant GGUF for chat, `embeddinggemma` for vectors.
 2. Keep `TURBO_PROFILE=stock` as the default startup profile.
 3. Add Zod-guarded SvelteKit routes for chat and atlas query flow.
 4. Add Redis/BitFrost cache checks around retrieval and answer reuse.
@@ -253,8 +259,8 @@ SvelteKit 2 route / API handler
 
 ## Clean split
 
-- Model weights: merged legal Gemma4.
-- Generation lane: same merged legal Gemma4 model.
+- Model weights: local RotorQuant GGUF.
+- Generation lane: same local RotorQuant GGUF model.
 - Multimodal lane: available only if the server build actually includes it.
 - Embeddings: `embeddinggemma`.
 - KV cache: internal llama.cpp runtime state.

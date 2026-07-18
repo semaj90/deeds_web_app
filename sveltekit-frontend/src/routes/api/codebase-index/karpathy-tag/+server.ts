@@ -35,7 +35,7 @@ const QDRANT_URL   = ENV.QDRANT_URL;
 const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
 const COLLECTION   = 'codebase_chunks_768';
 const OPENAI_TAG_MODEL = AI_CONFIG.openai.model;
-const OLLAMA_TAG_MODEL = ENV.OLLAMA_CHAT_MODEL;
+const OLLAMA_TAG_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 
 // ── Semantic tag vocabulary ────────────────────────────────────────────────────
 
@@ -423,7 +423,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		total,
 		pct:             total > 0 ? Math.round((tagged / total) * 100) : 0,
 		semanticTagDist: dist,
-		model:           AI_CONFIG.openai.enabled ? OPENAI_TAG_MODEL : ENV.OLLAMA_CHAT_MODEL,
+		model:           AI_CONFIG.openai.enabled ? OPENAI_TAG_MODEL : ENV.ROTORQUANT_CHAT_MODEL,
 		note:            AI_CONFIG.openai.enabled
 			? 'Uses the OpenAI-compatible gateway when enabled; otherwise local Ollama + Bifrost cache.'
 			: 'Uses Ollama local + Bifrost L1/L2 cache — zero API cost',

@@ -95,7 +95,7 @@ export async function switchVlmMode(targetMode: VlmMode): Promise<{ success: boo
     console.info(`[vlm-lifecycle] Switching mode: ${currentMode} -> ${targetMode}`);
 
     const ollamaModel =
-      process.env.OLLAMA_CHAT_MODEL ??
+      process.env.ROTORQUANT_CHAT_MODEL ??
       process.env.OLLAMA_MODEL ??
       process.env.GEMMA4_MODEL ??
       'gemma4:e4b-it-q4_K_M';

@@ -16,7 +16,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const MODEL = ENV.OLLAMA_CHAT_MODEL;
+const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 
 export interface SentimentResult {
 	sentiment: 'positive' | 'negative' | 'neutral' | 'mixed';

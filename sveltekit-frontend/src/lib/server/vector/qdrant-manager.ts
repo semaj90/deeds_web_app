@@ -686,6 +686,58 @@ export class QdrantManager {
   }
 
   /**
+   * Single-lane sparse retrieval via the Universal Query API.
+   *
+   * Use this instead of multiQuerySearch when you have exactly one sparse sub-query.
+   * Single-input RRF (multiQuerySearch with one prefetch) adds no fusion value — it
+   * converts the existing rank to an RRF score without combining result sets, which
+   * obscures the original sparse score.
+   *
+   * Returns [] (fail-closed) when the collection has no sparse vector field.
+   */
+  async querySparse(params: {
+    collection: string;
+    sparseVector: SparseVector;
+    sparseVectorName?: string;
+    filter?: any;
+    limit?: number;
+    scoreThreshold?: number;
+  }): Promise<QdrantSearchResult> {
+    const sparseVectorName = params.sparseVectorName ?? 'bm25';
+    const sparseAvailable = await this.getSparseSupport(params.collection, sparseVectorName).catch(() => false);
+    if (!sparseAvailable) {
+      this.noteDenseOnly(params.collection, sparseVectorName, 'no-sparse-index');
+      return [];
+    }
+
+    return traceVectorSearch(
+      params.collection,
+      this.buildTelemetryMetadata({ searchType: 'sparse-query', limit: params.limit }),
+      async () => {
+        const collectionName =
+          this.collections[params.collection as keyof typeof this.collections] ??
+          params.collection;
+
+        const searchRequest: any = {
+          query: { indices: params.sparseVector.indices, values: params.sparseVector.values },
+          using: sparseVectorName,
+          limit: params.limit ?? 10,
+          with_payload: true,
+        };
+        if (params.filter) searchRequest.filter = this.buildQdrantFilter(params.filter);
+        if (params.scoreThreshold != null) searchRequest.score_threshold = params.scoreThreshold;
+
+        const results = (await this.client.query(collectionName, searchRequest)) as any;
+        return Array.isArray(results)
+          ? results
+          : Array.isArray(results?.points)
+            ? results.points
+            : [];
+      }
+    );
+  }
+
+  /**
    * Dense-only cosine search. Used as automatic fallback by sparseHybridSearch
    * when a collection has no sparse (BM42) vectors configured.
    * Callers that explicitly want dense-only can call this directly.
@@ -1490,31 +1542,23 @@ export class QdrantManager {
   }
 
   async getCachedEmbedding(key: string) {
+    // Use scroll + payload filter — cache_key is an indexed identity field.
+    // A zero-vector search was previously used here, but cosine similarity
+    // against a zero vector is semantically undefined and wastes HNSW traversal.
     try {
-      const results = await this.client.search(this.collections.embeddings_cache, {
-        vector: {
-          name: 'embedding',
-          vector: new Array(768).fill(0),
-        },
-        limit: 1,
+      const result = await this.client.scroll(this.collections.embeddings_cache, {
         filter: {
           must: [
-            {
-              key: 'cache_key',
-              match: {
-                value: key,
-              },
-            },
-            {
-              key: 'expires_at',
-              range: {
-                gt: Date.now(),
-              },
-            },
+            { key: 'cache_key', match: { value: key } },
+            { key: 'expires_at', range: { gt: Date.now() } },
           ],
         },
+        limit: 1,
+        with_payload: true,
+        with_vector: false,
       });
-      return results.length > 0 ? results[0] : null;
+      const points = result?.points ?? [];
+      return points.length > 0 ? points[0] : null;
     } catch (error) {
       return null;
     }

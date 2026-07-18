@@ -184,7 +184,7 @@ export function buildGemma4AcePrompt(context: AceCodeIntelContext, task?: string
 // LLM caller
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DEFAULT_MODEL = ENV.OLLAMA_CHAT_MODEL ?? ENV.GEMMA4_MODEL;
+const DEFAULT_MODEL = ENV.ROTORQUANT_CHAT_MODEL ?? ENV.GEMMA4_MODEL;
 
 export async function callGemma4WithAceContext(
   context: AceCodeIntelContext,

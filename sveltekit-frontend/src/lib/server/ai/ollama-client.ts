@@ -10,7 +10,7 @@ import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils
 
 const DEFAULT_OLLAMA_URL = getOllamaEndpoint();
 const DEFAULT_EMBED_OLLAMA_URL = getOllamaEmbeddingEndpoint();
-const DEFAULT_GENERATE_MODEL = ENV.OLLAMA_CHAT_MODEL;
+const DEFAULT_GENERATE_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 const DEFAULT_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const DEFAULT_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 45_000);
 
@@ -155,4 +155,3 @@ export async function listOllamaModels(): Promise<string[]> {
     });
     return data.models?.map((m) => m.name) ?? [];
 }
-

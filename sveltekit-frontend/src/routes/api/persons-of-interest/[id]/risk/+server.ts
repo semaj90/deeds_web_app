@@ -167,7 +167,7 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.OLLAMA_CHAT_MODEL,
+        model: ENV.ROTORQUANT_CHAT_MODEL,
         prompt,
         format: riskResponseJsonSchema,
         stream: false,
@@ -200,4 +200,3 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
 
   return json({ success: true, aiProfile });
 };
-

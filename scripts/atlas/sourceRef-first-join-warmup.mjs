@@ -421,7 +421,13 @@ async function main() {
   const databaseUrl = process.env.DATABASE_URL || env.DATABASE_URL || DEFAULT_DATABASE_URL;
   const bifrostUrl = process.env.BIFROST_URL || env.BIFROST_URL || DEFAULT_BIFROST_URL;
   const bifrostModel = normalizeBifrostModel(
-    process.env.BIFROST_MODEL || env.BIFROST_MODEL || process.env.OLLAMA_CHAT_MODEL || env.OLLAMA_CHAT_MODEL || DEFAULT_BIFROST_MODEL
+    process.env.BIFROST_MODEL ||
+    env.BIFROST_MODEL ||
+    process.env.ROTORQUANT_CHAT_MODEL ||
+    env.ROTORQUANT_CHAT_MODEL ||
+    process.env.OLLAMA_CHAT_MODEL ||
+    env.OLLAMA_CHAT_MODEL ||
+    DEFAULT_BIFROST_MODEL
   );
   const bifrostModelCandidates = uniqueModels([
     bifrostModel,

@@ -22,6 +22,12 @@ import { logExposureEvents } from './recommendation-events.js';
 import { hydrateCandidates as hydrateFromPostgres } from './hydrate-candidates.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
+import { createQdrantDenseRetriever } from './adapters/qdrant-dense-retriever.js';
+import { createQdrantBM42Retriever } from './adapters/qdrant-bm42-retriever.js';
+import { createDisabledRetriever } from './adapters/disabled-retriever.js';
+import { createPostgresExactRetriever } from './adapters/postgres-exact-retriever.js';
+import { createPostgresAstRetriever } from './adapters/postgres-ast-retriever.js';
+import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
 
 // Startup assertion: verify canonical Qdrant collection exists and has correct dimensions
 async function validateQdrantDimensions(): Promise<void> {
@@ -293,7 +299,14 @@ export class SearchRuntime {
       }))
     );
 
-    return perLane.flat().map(lc => ({
+    // Stamp each lane candidate before projecting — allows fusion-stage tracking
+    // and prevents accidental double-fusion detection downstream.
+    const stamped = perLane.flat().map(lc => ({
+      ...lc,
+      fusionStage: 'lane' as const,
+    }));
+
+    return stamped.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
       packetKey: lc.packetKey,
       sourceRef: lc.sourceRef,
@@ -421,9 +434,42 @@ export function createSearchRuntime(config?: { userId?: string; caseId?: string 
 }
 
 /**
- * Production factory with explicitly named adapters.
- * Equivalent to `createSearchRuntime()` but makes the adapter wiring visible.
+ * Embed function adapter: wraps the project-canonical embedText path into the
+ * DenseEmbedding contract expected by QdrantDenseRetrieverConfig.embedFn.
+ *
+ * Lazily imports embedText to avoid circular deps at module load time.
+ */
+async function makeEmbedFn(text: string): Promise<DenseEmbedding> {
+  const { embedText } = await import('$lib/server/embedding/embed.js');
+  const values: number[] = await embedText(text.slice(0, 2000));
+  return {
+    values,
+    model: 'embeddinggemma:latest',
+    dimension: values.length,
+    version: '1',
+  };
+}
+
+/**
+ * Production factory with explicitly wired DI adapters.
+ * Each adapter is fail-closed: returns [] on any error, never throws.
  */
 export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string }): SearchRuntime {
-  return new SearchRuntime(config ?? {});
+  const retrievers: Retriever[] = [
+    createQdrantDenseRetriever({
+      collection: 'codebase_chunks_384',
+      vectorName: 'content',
+      embedFn: makeEmbedFn,
+      expectedDimension: 384,
+    }),
+    createQdrantBM42Retriever({
+      collection: 'codebase_chunks_384',
+      sparseVectorName: 'bm25',
+    }),
+    createDisabledRetriever('sparse', 'sparse_not_provisioned'),
+    createPostgresExactRetriever(),
+    createPostgresAstRetriever(),
+  ];
+
+  return new SearchRuntime({ ...(config ?? {}), retrievers });
 }

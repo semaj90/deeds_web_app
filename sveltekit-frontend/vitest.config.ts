@@ -264,6 +264,11 @@ export default defineConfig({
       'tests/telemetry/dispatcher-mcp-tool-integration.spec.ts',
       // HyperRAG pipeline contract smoke — Zod schema + identity invariants
       'tests/hyperrag-contract-smoke.spec.ts',
+      // Atlas retrieval adapter skeleton + ranking interface smoke tests
+      'tests/atlas-skeleton-smoke.spec.ts',
+      'tests/atlas-retrieval-leaf-adapters.spec.ts',
+      'tests/atlas-query-analysis.spec.ts',
+      'tests/lane-contracts.spec.ts',
     ],
     exclude: [
       'node_modules/**',

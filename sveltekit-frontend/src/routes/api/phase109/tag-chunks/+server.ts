@@ -29,7 +29,7 @@ const TAG_CATEGORIES = [
  */
 async function classifyChunk(content: string): Promise<string[]> {
 	const ollamaUrl = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-	const model = process.env.OLLAMA_CHAT_MODEL ?? 'gemma3-legal:latest';
+	const model = process.env.ROTORQUANT_CHAT_MODEL ?? 'gemma3-legal:latest';
 
 	const prompt = `Classify this TypeScript/Svelte code chunk into 1-3 of these exact categories: ${TAG_CATEGORIES.join(', ')}.
 Respond ONLY with comma-separated category names from the list above. Nothing else.

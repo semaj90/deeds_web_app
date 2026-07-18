@@ -29,7 +29,7 @@ const COUCHDB_DB   = 'karpathy_wiki';
 const COUCHDB_URL  = () => ENV.COUCHDB_URL;
 const REDIS_PREFIX = 'wiki:note:';
 const REDIS_TTL    = 86_400; // 24h
-const CHAT_MODEL   = ENV.OLLAMA_CHAT_MODEL;
+const CHAT_MODEL   = ENV.ROTORQUANT_CHAT_MODEL;
 
 // ── Note types ───────────────────────────────────────────────────────────────
 

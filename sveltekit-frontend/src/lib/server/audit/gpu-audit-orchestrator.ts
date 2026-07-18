@@ -244,7 +244,7 @@ async function runContractAudit(): Promise<ContractAudit> {
   );
   const protoFiles = await rgList('syntax = "proto3"|^message\\s+|^service\\s+', ['proto']);
   const routingFiles = await rgList(
-    'OLLAMA_CHAT_MODEL|OLLAMA_VLM_MODEL|VLM_MODELS\\.(legal|vision)|GEMMA4_MODEL',
+    'ROTORQUANT_CHAT_MODEL|OLLAMA_VLM_MODEL|VLM_MODELS\\.(legal|vision)|GEMMA4_MODEL',
     ['src/lib/server', 'src/routes/api']
   );
 

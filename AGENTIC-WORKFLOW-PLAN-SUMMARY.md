@@ -164,7 +164,7 @@ npm run implement:wire-agentic-workflows-e2e-test
 
 ### After Implementation (Sessions 120+)
 1. Monitor agentic workflow performance in production
-2. Implement Netflix Headroom integration (optional, but recommended)
+2. Implement Headroom as an optional plugin integration behind a thin adapter
 3. Build automated reranking based on agentic feedback
 4. Expand subagent library for specialized agent tasks (code analysis, legal reasoning, etc.)
 5. Integrate with Claude Code / OpenCode for IDE-native agentic work
@@ -196,4 +196,3 @@ npm run implement:wire-agentic-workflows-e2e-test
 **Status:** ✅ READY FOR IMPLEMENTATION  
 **Estimated Duration:** 20 hours (5 sessions × 4 hours)  
 **Target Completion:** Sessions 119a-119e (one session = 4 hours, can be compressed into 2-3 days if run consecutively)
-

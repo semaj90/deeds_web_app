@@ -549,7 +549,7 @@ async function stageLLMSynthesis(
 
   // ── Two-part composite cache key ──────────────────────────────────────────
   // stableDigest: hash of the parts that rarely change (prompt template + model)
-  const stableDigest = _ck(`v${ARCH_VERSION}:${ENV.OLLAMA_CHAT_MODEL}:0.2:${systemPrompt}`);
+  const stableDigest = _ck(`v${ARCH_VERSION}:${ENV.ROTORQUANT_CHAT_MODEL}:0.2:${systemPrompt}`);
 
   // contextDigest: hash of retrieved-item IDs — captures current codebase state
   // Using IDs (not content) keeps the hash short and content-change-sensitive
@@ -570,7 +570,7 @@ async function stageLLMSynthesis(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      ENV.OLLAMA_CHAT_MODEL,
+      ENV.ROTORQUANT_CHAT_MODEL,
       {
         temperature: 0.2,
         maxTokens: 1000,
@@ -582,7 +582,7 @@ async function stageLLMSynthesis(
       stage: 'llm-synthesis',
       data: {
         response,
-        model: ENV.OLLAMA_CHAT_MODEL,
+        model: ENV.ROTORQUANT_CHAT_MODEL,
         tokenCached: true,
         cacheKey: cacheKey.slice(-16),
       },
@@ -1282,7 +1282,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		pipeline:       'gpu-codebase-index',
 		version:        '2.0.0',
 		collections:    checks,
-		model:          ENV.OLLAMA_CHAT_MODEL,
+		model:          ENV.ROTORQUANT_CHAT_MODEL,
 		embeddingModel: 'embeddinggemma:latest',
 		cacheStrategy:  'L1-Redis → L2-Bifrost → L3-Ollama',
 		namedVectors:   { codebase_chunks_768: ['content', 'signature', 'error'] },

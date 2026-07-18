@@ -50,7 +50,8 @@ $env:QDRANT_URL = "http://127.0.0.1:6333"
 $env:REDIS_URL = "redis://127.0.0.1:6379"
 $env:OLLAMA_URL = "http://127.0.0.1:11434"
 $env:OLLAMA_EMBED_MODEL = "embeddinggemma:latest"
-$env:OLLAMA_CHAT_MODEL = "gemma3-legal:latest"
+$env:ROTORQUANT_CHAT_MODEL = "gemma4-rotorquant:latest"
+$env:OLLAMA_CHAT_MODEL = $env:ROTORQUANT_CHAT_MODEL
 $env:API_PORT = $Port
 
 Write-Host "   ✅ Environment configured"

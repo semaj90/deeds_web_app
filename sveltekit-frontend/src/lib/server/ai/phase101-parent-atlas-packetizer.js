@@ -189,7 +189,7 @@ function resolveProviderConfig() {
   const model =
     String(process.env.LOCAL_GEMMA_MODEL ?? '').trim() ||
     String(process.env.GEMMA4_MODEL ?? '').trim() ||
-    String(process.env.OLLAMA_CHAT_MODEL ?? '').trim() ||
+    String(process.env.ROTORQUANT_CHAT_MODEL ?? '').trim() ||
     String(process.env.MODEL ?? '').trim() ||
     'gemma4-rotorquant:latest';
 

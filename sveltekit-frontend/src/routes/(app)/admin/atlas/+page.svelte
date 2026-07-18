@@ -32,6 +32,33 @@
 		recommendations?: string[];
 	};
 
+	type AtlasRuntimeRegistryItem = {
+		key: string;
+		title: string;
+		path: string;
+		owner: string;
+		status: 'active' | 'partial' | 'planned' | 'blocked';
+		notes: string;
+	};
+
+	type AtlasRuntimeRegistrySection = {
+		id: string;
+		title: string;
+		owner: string;
+		status: 'active' | 'partial' | 'planned' | 'blocked';
+		adminPath: string;
+		searchPath: string;
+		notes: string;
+		items: AtlasRuntimeRegistryItem[];
+	};
+
+	type AtlasRuntimeRegistrySnapshot = {
+		version: string;
+		adminPath: string;
+		searchPath: string;
+		sections: AtlasRuntimeRegistrySection[];
+	};
+
 	type TaskPacketWorkflowStatus = {
 		mode: 'task' | 'queue' | 'next';
 		taskId: number | null;
@@ -60,10 +87,12 @@
 
 	type AtlasPageData = {
 		health: AtlasHealthStatus | null;
+		runtimeRegistry?: AtlasRuntimeRegistrySnapshot | null;
 		cacheStats?: AdminCacheStats | null;
 		workflowStatus?: TaskPacketWorkflowStatus | null;
-		chatModel?: string;
+		rotorquantModelPath?: string;
 		embedModel?: string;
+		graniteDoclingModel?: string;
 		kvProfile?: string;
 	};
 
@@ -71,6 +100,7 @@
 
 	// ── Health & Collections ──────────────────────────────────────────────────
 	let health = $state<AtlasHealthStatus | null>(null);
+	let runtimeRegistry = $state<AtlasRuntimeRegistrySnapshot | null>(null);
 	let cacheStats = $state<AdminCacheStats | null>(null);
 	let healthLoading = $state(false);
 	let workflowTaskId = $state('');
@@ -82,6 +112,7 @@
 
 	$effect(() => {
 		health = data.health;
+		runtimeRegistry = data.runtimeRegistry ?? null;
 		cacheStats = data.cacheStats ?? null;
 		workflowStatus = data.workflowStatus ?? workflowStatus;
 		if (data.workflowStatus?.taskId != null) workflowTaskId = String(data.workflowStatus.taskId);
@@ -638,18 +669,25 @@
 
 	let runtime = $derived.by(() => {
 		const models = health?.ollama?.models ?? [];
-		const chatModel = data.chatModel ?? 'gemma4-legal-vlm:latest';
+		const rotorquantModelPath = data.rotorquantModelPath ?? 'models/gemma4-rotorquant:latest-iq4xs-direct.gguf';
+		const rotorquantModel = 'gemma4-rotorquant:latest';
 		const embedModel = data.embedModel ?? 'embeddinggemma:latest';
+		const graniteDoclingModel = data.graniteDoclingModel ?? 'ibm/granite-docling:258m';
 		const profile = data.kvProfile ?? 'stock';
 
 		return {
-			gemma4: {
-				online: modelOnline(models, chatModel),
-				model: chatModel,
+			chat: {
+				online: modelOnline(models, rotorquantModel) || Boolean(rotorquantModelPath),
+				model: rotorquantModel,
+				path: rotorquantModelPath,
 			},
 			embedding: {
 				online: modelOnline(models, embedModel),
 				model: embedModel,
+			},
+			docling: {
+				online: modelOnline(models, graniteDoclingModel),
+				model: graniteDoclingModel,
 			},
 			kvProfile: profile,
 			kvPair: kvPair(profile),
@@ -689,7 +727,7 @@
 		</div>
 		<div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
 			{#if health}
-				{#each [['REDIS', health.redis], ['QDRANT', health.qdrant], ['NEO4J', health.neo4j], ['OLLAMA', health.ollama]] as [name, svc] (name)}
+				{#each [['REDIS', health.redis], ['QDRANT', health.qdrant], ['NEO4J', health.neo4j], ['ROTORQUANT', health.ollama]] as [name, svc] (name)}
 					{@const st = serviceStatus(svc as { ok: boolean; latencyMs: number })}
 					<span class="flex items-center gap-1.5 border border-[#3f3e37] px-2 py-1 bg-[#1c1b18]">
 						<span class={`w-1.5 h-1.5 rounded-none ${st.label === 'offline' ? 'bg-[#c25953]' : 'bg-[#8c9f7a]'}`}></span>
@@ -723,23 +761,24 @@
 					<div>
 						<p class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider">// Runtime Lanes</p>
 						<p class="mt-1 text-[0.62rem] text-[#5c594c] leading-relaxed">
-							Gemma4 handles synthesis, embeddinggemma handles retrieval, KV cache stays runtime-only, Redis backs app memory, and Qdrant stores vector hits.
+							RotorQuant handles chat and synthesis from the local /models GGUF, EmbeddingGemma handles retrieval, Granite Docling handles document understanding, KV cache stays runtime-only, Redis backs app memory, and Qdrant stores vector hits.
 						</p>
 					</div>
-					<span class={`px-2 py-1 border text-[0.6rem] font-bold uppercase tracking-wider ${runtime.gemma4.online && runtime.embedding.online ? 'border-[#8c9f7a] text-[#8c9f7a]' : 'border-[#c8a635] text-[#c8a635]'}`}>
+					<span class={`px-2 py-1 border text-[0.6rem] font-bold uppercase tracking-wider ${runtime.chat.online && runtime.embedding.online ? 'border-[#8c9f7a] text-[#8c9f7a]' : 'border-[#c8a635] text-[#c8a635]'}`}>
 						{healthLoading ? 'SYNCING' : 'LANE_SYNC'}
 					</span>
 				</div>
 
-				<div class="grid grid-cols-1 gap-2 text-[0.68rem]">
+					<div class="grid grid-cols-1 gap-2 text-[0.68rem]">
 					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
 						<div class="flex items-center justify-between gap-3">
-							<span class="text-[#a39f90] font-bold">GEMMA4_STATUS</span>
-							<span class={runtime.gemma4.online ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
-								{runtime.gemma4.online ? 'READY' : 'MISSING'}
+							<span class="text-[#a39f90] font-bold">ROTORQUANT_CHAT</span>
+							<span class={runtime.chat.online ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
+								{runtime.chat.online ? 'READY' : 'MISSING'}
 							</span>
 						</div>
-						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.gemma4.model}</div>
+						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.chat.model}</div>
+						<div class="mt-0.5 text-[#5c594c] truncate">{runtime.chat.path}</div>
 					</div>
 
 					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
@@ -750,6 +789,16 @@
 							</span>
 						</div>
 						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.embedding.model}</div>
+					</div>
+
+					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+						<div class="flex items-center justify-between gap-3">
+							<span class="text-[#a39f90] font-bold">DOC_LANE</span>
+							<span class={runtime.docling.online ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
+								{runtime.docling.online ? 'READY' : 'MISSING'}
+							</span>
+						</div>
+						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.docling.model}</div>
 					</div>
 
 					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
@@ -787,9 +836,9 @@
 							<span class="text-[#d1cdb8] font-bold">TEXT / MULTIMODAL</span>
 						</div>
 						<div class="space-y-1 text-[#5c594c] leading-relaxed">
-							<p>Legal model: gemma4-legal-iq4xs-direct.gguf is the merged LoRA path for synthesis and final answers.</p>
+							<p>RotorQuant is the merged local GGUF path for synthesis and final answers.</p>
 							<p>Text-only GGUF works for chat; image inputs require a build that includes the vision encoder and projector.</p>
-							<p>Embeddings stay on embeddinggemma, KV cache stays runtime-only, Redis / BitFrost is cross-request memory, and MTP only speeds generation.</p>
+							<p>Embeddings stay on embeddinggemma, Granite Docling stays on document understanding, KV cache stays runtime-only, Redis / BitFrost is cross-request memory, and MTP only speeds generation.</p>
 						</div>
 					</div>
 				</div>
@@ -797,6 +846,61 @@
 				<p class="text-[0.6rem] text-[#5c594c] leading-relaxed">
 					Last sync: {runtime.refreshedAt || 'pending'}
 				</p>
+			</div>
+
+			<!-- Runtime Registry -->
+			<div class="p-4 border-b border-[#3f3e37] bg-[#1c1b18]/40 space-y-3">
+				<div class="flex items-start justify-between gap-3">
+					<div>
+						<p class="text-[0.68rem] text-[#a39f90] font-bold uppercase tracking-wider">// Atlas Runtime Registry</p>
+						<p class="mt-1 text-[0.62rem] text-[#5c594c] leading-relaxed">
+							Administrative index of the live Atlas contract, capability, projection, model, embedding, worker, pipeline, feature, and recommendation lanes.
+						</p>
+					</div>
+					<span class="px-2 py-1 border border-[#5c594c] bg-[#1c1b18] text-[0.6rem] font-bold uppercase tracking-wider text-[#d1cdb8]">
+						{runtimeRegistry?.version ?? 'registry_offline'}
+					</span>
+				</div>
+
+				{#if runtimeRegistry}
+					<div class="grid grid-cols-2 gap-2 text-[0.68rem]">
+						<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+							<div class="text-[#a39f90] font-bold uppercase">ADMIN_PATH</div>
+							<div class="mt-1 text-[#efede4] font-mono break-all">{runtimeRegistry.adminPath}</div>
+						</div>
+						<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+							<div class="text-[#a39f90] font-bold uppercase">SEARCH_PATH</div>
+							<div class="mt-1 text-[#efede4] font-mono break-all">{runtimeRegistry.searchPath}</div>
+						</div>
+					</div>
+
+					<div class="space-y-2">
+						{#each runtimeRegistry.sections as section (section.id)}
+							<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2 space-y-2">
+								<div class="flex items-start justify-between gap-3">
+									<div class="min-w-0">
+										<div class="text-[#efede4] font-bold uppercase tracking-wider text-[0.65rem]">{section.title}</div>
+										<div class="text-[#5c594c] text-[0.62rem] truncate">{section.owner} · {section.notes}</div>
+									</div>
+									<span class="px-2 py-0.5 border border-[#3f3e37] text-[#a39f90] text-[0.6rem] font-bold uppercase tracking-wider">
+										{section.items.length} items
+									</span>
+								</div>
+								<div class="flex flex-wrap gap-1.5">
+									{#each section.items as item (item.key)}
+										<span class="px-2 py-0.5 border border-[#3f3e37] bg-[#1c1b18] text-[#a39f90] text-[0.6rem] font-mono truncate max-w-full" title={`${item.title} · ${item.path}`}>
+											{item.title}
+										</span>
+									{/each}
+								</div>
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<div class="text-center py-4 border border-[#c25953]/25 bg-[#c25953]/5 text-[#c25953] text-[0.7rem] font-bold uppercase tracking-wider">
+						Registry unavailable
+					</div>
+				{/if}
 			</div>
 
 			<!-- Task Packet Workflow -->
@@ -1325,7 +1429,7 @@
 										<div>[QDRANT] Named vector mapping codebase_chunks_768 validated successfully</div>
 										<div>[REDIS] Sub-millisecond exact cache indexer ready</div>
 										<div>[BIFROST] OpenAI L2 semantic proxy bound on port 3040</div>
-										<div>[OLLAMA] Vector embedding service running via /api/embed</div>
+										<div>[ROTORQUANT] Chat server running from models/gemma4-rotorquant:latest-iq4xs-direct.gguf</div>
 										{#if health?.neo4j?.ok}
 											<div>[NEO4J] Manifold database containing {health.neo4j.nodeCount ?? 0} active topological nodes connected</div>
 										{/if}

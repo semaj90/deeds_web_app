@@ -126,7 +126,7 @@ Tags:`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.OLLAMA_CHAT_MODEL,
+        model: ENV.ROTORQUANT_CHAT_MODEL,
         prompt,
         stream: false,
         options: { temperature: 0.1, num_predict: 80 },

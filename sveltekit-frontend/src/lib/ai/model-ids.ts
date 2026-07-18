@@ -17,10 +17,10 @@ export type { QuantRuntimeConfig, RuntimeBackend } from './quant-config.js';
  *   2. Triton (:8000)
  *   3. TurboQuant llama-server (turbo3 KV cache, :8090)
  *   4. Bifrost/LiteLLM (semantic cache)
- *   5. Ollama (gemma4-rotorquant:latest, Q4_K_M + Q8_0 KV)
+ *   5. Local RotorQuant GGUF (models/gemma4-rotorquant:latest-iq4xs-direct.gguf)
  *
- * Server models (Ollama):
- *   - gemma4-rotorquant:latest for LLM (CUDA RTX)
+ * Server models:
+ *   - gemma4-rotorquant:latest for LLM (CUDA RTX, local /models lane)
  *   - embeddinggemma:latest for embeddings (768-dim)
  */
 
@@ -85,20 +85,20 @@ export const CLIENT_EMBEDDING_TOKENIZER_PATH = '/embeddinggemma_300m_onnx/tokeni
 
 // ── Server-side models (Ollama + CUDA RTX) ───────────────────────────────
 
-/** gemma4-rotorquant:latest — Gemma 4 E4B fine-tuned legal LLM via Ollama (GRPO-trained) */
+/** gemma4-rotorquant:latest — Gemma 4 E4B fine-tuned legal LLM served from the local RotorQuant GGUF lane */
 export const SERVER_CHAT_MODEL = 'gemma4-rotorquant:latest';
 
 /** gemma4:e4b Q4_K_M — 8B params, 131K context, native tool calling + thinking via Ollama */
 export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
-/** embeddinggemma:latest — 768-dim server embeddings via Ollama */
+/** embeddinggemma:latest — 768-dim server embeddings via the embedding lane */
 export const SERVER_EMBEDDING_MODEL = 'embeddinggemma:latest';
 export const SERVER_EMBEDDING_DIMS = 768;
 
 /** Fallback embedding model (if embeddinggemma unavailable) */
 export const SERVER_EMBEDDING_FALLBACK = 'nomic-embed-text';
 
-/** IBM Granite-Docling-258M — document understanding VLM via Ollama (522 MB) */
+/** IBM Granite-Docling-258M — document understanding VLM lane (522 MB) */
 export const SERVER_GRANITE_DOCLING_MODEL = 'ibm/granite-docling:258m';
 
 /** gemma4-rotorquant:latest — merged Gemma 4 legal VLM exposed through the VLM server */

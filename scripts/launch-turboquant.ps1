@@ -684,6 +684,23 @@ if (Test-LlamaFlag $llama '--cache-reuse') {
     Write-Host "KV cache: --cache-reuse not supported by this binary - skipping" -ForegroundColor DarkYellow
 }
 
+# -- Telemetry: Prometheus metrics + per-request performance timing --------
+# --metrics exposes /metrics (llamacpp:prompt_tokens_total, predicted_tokens, etc.)
+# --perf adds timings.cache_n / prompt_n / predicted_per_second to each response
+# Both are read-only; no effect on model behavior or memory.
+if (Test-LlamaFlag $llama '--metrics') {
+    $baseArgs = $baseArgs + @('--metrics')
+    Write-Host "Telemetry: --metrics enabled (/metrics endpoint active)" -ForegroundColor Cyan
+} else {
+    Write-Host "Telemetry: --metrics not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+if (Test-LlamaFlag $llama '--perf') {
+    $baseArgs = $baseArgs + @('--perf')
+    Write-Host "Telemetry: --perf enabled (timings.cache_n / prompt_n in responses)" -ForegroundColor Cyan
+} else {
+    Write-Host "Telemetry: --perf not supported by this binary - skipping" -ForegroundColor DarkYellow
+}
+
 if ($batchSize) {
     if (Test-LlamaFlag $llama '--batch-size') {
         $baseArgs = $baseArgs + @('--batch-size', $batchSize)

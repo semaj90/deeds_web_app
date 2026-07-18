@@ -11,7 +11,7 @@ import type { ResearchTopic } from './deep-research.js';
  * Uses cross-encoder batch-reranking to score topics against actual codebase facts.
  */
 
-const REFINEMENT_MODEL = ENV.OLLAMA_CHAT_MODEL;
+const REFINEMENT_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 const EVIDENCE_THRESHOLD = 0.3;
 
 export interface ValidationResult {

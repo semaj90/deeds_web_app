@@ -377,7 +377,7 @@ async function generateSelfPromptChain(
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
-        model:   ENV.OLLAMA_CHAT_MODEL,
+        model:   ENV.ROTORQUANT_CHAT_MODEL,
         prompt,
         stream:  false,
         options: { temperature: 0.55, num_predict: 300 },

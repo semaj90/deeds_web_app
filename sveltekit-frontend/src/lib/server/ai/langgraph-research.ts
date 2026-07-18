@@ -204,7 +204,7 @@ async function redisSet(key: string, value: unknown, ttl: number): Promise<void>
 
 const QDRANT_URL  = ENV.QDRANT_URL;
 const COLLECTION  = 'codebase_chunks_768';
-const CHAT_MODEL  = ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? ENV.OLLAMA_CHAT_MODEL;   // llama-server / TurboQuant unified chat model
+const CHAT_MODEL  = ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? ENV.ROTORQUANT_CHAT_MODEL;   // llama-server / TurboQuant unified chat model
 
 // ── Neo4j topology expansion ─────────────────────────────────────────────────
 

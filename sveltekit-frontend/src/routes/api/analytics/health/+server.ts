@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ locals }) => {
             const models = data.models.map((m: any) => m.name);
             stats.services.ollama = 'OK';
             stats.models = {
-                chat: models.includes(ENV.OLLAMA_CHAT_MODEL) ? 'Available' : 'Missing',
+                chat: models.includes(ENV.ROTORQUANT_CHAT_MODEL) ? 'Available' : 'Missing',
                 embed: models.includes(ENV.OLLAMA_EMBED_MODEL) ? 'Available' : 'Missing',
                 rerank: models.includes('gemma4-rotorquant:latest') ? 'Available' : 'Missing',
             };

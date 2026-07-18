@@ -108,7 +108,7 @@ export function getOllamaGenerationEndpoint(): string {
 }
 
 const OLLAMA_BASE_URL = CHAT_BASE_URL;
-const CHAT_MODEL = ENV.OLLAMA_CHAT_MODEL;
+const CHAT_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '600000');
 
 export function getOllamaRequestTimeoutMs(): number {
@@ -169,7 +169,7 @@ export function assertDirectOllamaAllowed(
 // CRITICAL: Embedding uses Ollama. Synthesis uses llama-server :8090.
 VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
 // Synthesis models: prefer env overrides, else use llama-server canonical
-VLM_MODELS.legal = ENV.OLLAMA_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+VLM_MODELS.legal = ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';

@@ -53,7 +53,7 @@ export interface ReasoningChainResult {
 	totalDurationMs: number;
 }
 
-const MODEL = ENV.OLLAMA_CHAT_MODEL;
+const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 const TIMEOUT_MS = 60_000;
 
 function buildStepPrompt(stepName: string, context: string): string {

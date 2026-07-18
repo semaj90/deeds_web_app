@@ -1269,7 +1269,7 @@ export class RabbitMQManager extends EventEmitter {
           // Stage 2: Direct Ollama LLM call (no Bifrost — single Ollama request)
           const { ollamaFetch } = await import('../ollama.js');
           const { ENV } = await import('../env.server.js');
-          const MODEL = ENV.OLLAMA_CHAT_MODEL;
+          const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
           const maxTokens = data.maxTokens ?? 2048;
           const temperature = data.temperature ?? 0.3;
 
@@ -2737,5 +2737,3 @@ export const rabbitmq = (function () {
 	}
 	return new RabbitMQManager();
 })();
-
-

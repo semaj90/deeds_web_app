@@ -50,7 +50,7 @@ const COUCHDB_URL = ENV.COUCHDB_URL;
 const GLYPH_DB = 'glyph_topology';
 const MATRIX_CACHE_KEY = 'mapreduce:matrix:';
 const MATRIX_CACHE_TTL = 900; // 15 min
-const MODEL = ENV.OLLAMA_CHAT_MODEL;
+const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 
 // Pipeline weight vector for cosine similarity aggregation
 const PIPELINE_WEIGHTS: Record<string, number> = {

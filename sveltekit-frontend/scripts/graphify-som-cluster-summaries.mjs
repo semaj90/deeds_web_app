@@ -29,7 +29,7 @@ const NEO4J_URL   = process.env.NEO4J_URI   ?? 'bolt://localhost:7687';
 const NEO4J_USER  = process.env.NEO4J_USER  ?? 'neo4j';
 const NEO4J_PASS  = process.env.NEO4J_PASSWORD ?? 'neo4j123';
 const OLLAMA_URL  = process.env.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-const CHAT_MODEL  = process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
+const CHAT_MODEL  = process.env.ROTORQUANT_CHAT_MODEL ?? process.env.OLLAMA_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
 
 const REDIS_CENTROIDS_HASH = 'gpu:autoencoder:centroids_64';
 const REDIS_META_HASH      = 'gpu:autoencoder:centroids_64_meta';

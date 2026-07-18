@@ -17,7 +17,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const TOP_CHUNKS         = 10;
-const MODEL = ENV.OLLAMA_CHAT_MODEL;
+const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
 
 export interface ClusterSummary {
 	clusterId: number;

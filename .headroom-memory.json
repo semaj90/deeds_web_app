@@ -1,0 +1,16 @@
+[
+  {
+    "fact": "SearchRuntime is the only fusion authority � Go Retrieval returns lane-separated candidates only",
+    "scope": "deeds-web-app",
+    "source": "cline",
+    "confidence": 0.94,
+    "recorded_at": "2026-07-17T18:50:59.505Z"
+  },
+  {
+    "fact": "BM25 is the canonical sparse baseline; BM42 is experimental",
+    "scope": "deeds-web-app",
+    "source": "cline",
+    "confidence": 0.9,
+    "recorded_at": "2026-07-17T18:50:59.695Z"
+  }
+]

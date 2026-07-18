@@ -71,6 +71,7 @@
     "atlas:redis-centroid:mirror:apply": "node scripts/atlas/wire-redis-centroid-mirror.mjs --apply",
     "atlas:qdrant-postgres:mirror:reconcile": "node scripts/atlas/qdrant-postgres-mirror-reconciliation.mjs",
     "atlas:go-retrieval:smoke": "node scripts/atlas/go-retrieval-smoke.mjs",
+    "atlas:go-retrieval:contract": "node sveltekit-frontend/scripts/atlas/smoke-go-retrieval-contract.mjs",
     "atlas:turbovec:grpc-health": "cd sveltekit-frontend && node ../scripts/atlas/turbovec-grpc-health.mjs",
     "atlas:turbovec:contract-test": "cd sveltekit-frontend && node ../scripts/atlas/test-turbovec-sidecar-contract.mjs",
     "atlas:packet-metadata:backfill:dry": "node scripts/atlas/backfill-packet-metadata.mjs",
