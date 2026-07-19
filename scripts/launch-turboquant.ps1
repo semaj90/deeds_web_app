@@ -92,6 +92,64 @@ function Test-LlamaFlag {
     }
 }
 
+function Test-TruthyValue {
+    param([object]$Value)
+
+    if ($null -eq $Value) { return $false }
+    if ($Value -is [bool]) { return $Value }
+
+    $normalized = ([string]$Value).Trim().ToLowerInvariant()
+    return @('1', 'true', 'yes', 'on', 'y') -contains $normalized
+}
+
+function Get-TurboLaunchStatusPath {
+    $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..')
+    $statusDir = Join-Path $repoRoot 'logs/turboquant'
+    New-Item -ItemType Directory -Force -Path $statusDir | Out-Null
+    return (Join-Path $statusDir 'latest-launch-status.json')
+}
+
+function Write-TurboLaunchStatus {
+    param([hashtable]$Payload)
+
+    $statusPath = Get-TurboLaunchStatusPath
+    $Payload['generated_at'] = (Get-Date).ToString('o')
+    $Payload['status_artifact'] = $statusPath
+    ($Payload | ConvertTo-Json -Depth 8) | Set-Content -Path $statusPath -Encoding UTF8
+    return $statusPath
+}
+
+function Remove-TurboDraftArgs {
+    param([string[]]$Args)
+
+    $draftFlagsWithValues = @(
+        '--spec-draft-model',
+        '--spec-type',
+        '--spec-draft-n-max',
+        '--spec-draft-n-min',
+        '--spec-draft-ngl',
+        '-ctkd',
+        '-ctvd',
+        '--model-draft',
+        '--draft-max',
+        '--draft-min',
+        '--draft-p-min',
+        '--n-gpu-layers-draft'
+    )
+
+    $clean = New-Object System.Collections.Generic.List[string]
+    for ($i = 0; $i -lt $Args.Length; $i++) {
+        $arg = $Args[$i]
+        if ($draftFlagsWithValues -contains $arg) {
+            $i++
+            continue
+        }
+        $clean.Add($arg)
+    }
+
+    return ,$clean.ToArray()
+}
+
 
 # -- Load .env files if present --------------------------------------------
 # Keep the same precedence convention as the app checkout:
@@ -341,19 +399,116 @@ if ($turboRequested) {
 # -- Speculative Draft Model Policy ---------------------------------------
 $TurboDraftModel = $null
 $TurboSpeculative = $false
+$TurboDraftMode = 'disabled'
+$draftRequested = Test-TruthyValue $env:ENABLE_MTP_DRAFTER
+$allowLegacyDraft = Test-TruthyValue $env:TURBO_ALLOW_LEGACY_DRAFT
+$safeProfile = ($kvProfile -eq 'turboquant-safe')
 
-if ($env:ENABLE_MTP_DRAFTER -and $env:ENABLE_MTP_DRAFTER.ToLower() -eq 'true') {
-  if ($env:MTP_DRAFT_MODEL) {
-    if (Test-Path $env:MTP_DRAFT_MODEL) {
-      $TurboDraftModel = $env:MTP_DRAFT_MODEL
-      $TurboSpeculative = $true
-    } else {
-      Write-Host ("Speculative decoding requested but MTP_DRAFT_MODEL not found at $($env:MTP_DRAFT_MODEL) - skipping") -ForegroundColor Yellow
-    }
-  } else {
+if ($safeProfile) {
+  Write-Host "Speculative decoding disabled by turboquant-safe profile - target-only startup enforced" -ForegroundColor DarkGray
+} elseif ($draftRequested) {
+  if (-not $env:MTP_DRAFT_MODEL) {
     Write-Host 'Speculative decoding requested but MTP_DRAFT_MODEL is not set - skipping' -ForegroundColor Yellow
+  } elseif (-not (Test-Path $env:MTP_DRAFT_MODEL)) {
+    Write-Host ("Speculative decoding requested but MTP_DRAFT_MODEL not found at '$($env:MTP_DRAFT_MODEL)' - skipping") -ForegroundColor Yellow
+  } else {
+    # Two-gate check before handing the draft model to llama-server:
+    #
+    # Gate 1 — Binary supports --spec-draft-model.
+    #   The AtomicBot fork exposes this flag; stock llama.cpp does not.
+    #   If absent, skip rather than crash.
+    #
+    # Gate 2 — Draft GGUF architecture is loadable by this binary.
+    #   'gemma4_assistant' is an MTP-head-only format that only AtomicBot
+    #   binaries understand. Probe it by running a single-token, zero-context
+    #   dry load (--n-predict 0) and checking whether stderr contains
+    #   "unknown model architecture". This is the same error llama-server
+    #   emits at startup — catching it here lets us skip gracefully.
+
+    $binaryHelp = (& $llama -h 2>&1 | Out-String)
+    $binaryHasSpecDraft = $binaryHelp -match 'spec.draft.model|spec-draft-model'
+    $binaryHasLegacyDraft = $binaryHelp -match 'model-draft|draft-max'
+
+    if (-not $binaryHasSpecDraft -and -not $binaryHasLegacyDraft) {
+      Write-Host ("Speculative decoding skipped: llama-server binary does not advertise draft flags. " +
+        "Use an AtomicBot-compatible binary or keep ENABLE_MTP_DRAFTER=false.") -ForegroundColor Yellow
+    } else {
+      if (-not $binaryHasSpecDraft -and $binaryHasLegacyDraft) {
+        if ($allowLegacyDraft) {
+          Write-Host ("Speculative decoding will use the explicit legacy draft lane (--model-draft / --draft-max). " +
+            "This lane requires TURBO_ALLOW_LEGACY_DRAFT=true and stays off by default.") -ForegroundColor DarkGray
+        } else {
+          Write-Host ("Speculative decoding skipped: binary only advertises legacy draft flags. " +
+            "Set TURBO_ALLOW_LEGACY_DRAFT=true to opt into that lane explicitly, or use an AtomicBot-compatible binary.") -ForegroundColor Yellow
+          $binaryHasLegacyDraft = $false
+        }
+      }
+      # Gate 2a — GGUF header scan: read the first 64 KB of the draft GGUF and
+      # look for MTP-head-only architecture strings (gemma4_assistant, etc.) that
+      # only AtomicBot binaries support. This runs before the binary probe because
+      # the CLI codepath (--model --n-predict 0) and the server codepath
+      # (--model-draft) use different architecture validators — the CLI path does
+      # not always surface the same "unknown model architecture" error that the
+      # server's srv_load_model does.
+      $draftGgufArch = $null
+      try {
+        $ggufStream = [System.IO.File]::OpenRead($env:MTP_DRAFT_MODEL)
+        $ggufBuf    = New-Object byte[] 65536
+        $ggufRead   = $ggufStream.Read($ggufBuf, 0, $ggufBuf.Length)
+        $ggufStream.Close()
+        $ggufText   = [System.Text.Encoding]::UTF8.GetString($ggufBuf, 0, $ggufRead)
+        # The general.architecture value is stored as a length-prefixed string in
+        # GGUF metadata. Scanning the raw bytes for known MTP-head arch names is
+        # reliable enough for a pre-flight gate.
+        $archNames  = @('gemma4_assistant', 'llama_assistant', 'qwen2_assistant')
+        foreach ($a in $archNames) {
+          if ($ggufText -match [regex]::Escape($a)) { $draftGgufArch = $a; break }
+        }
+      } catch {
+        # Can't read the file — let the binary probe decide.
+      }
+
+      $knownMtpOnlyArchs = @('gemma4_assistant', 'llama_assistant', 'qwen2_assistant')
+      $draftRequiresAtomicBot = $false
+      if ($draftGgufArch -and $knownMtpOnlyArchs -contains $draftGgufArch) {
+        $draftRequiresAtomicBot = $true
+        Write-Host ("Speculative decoding skipped: draft GGUF has MTP-head-only architecture '$draftGgufArch'. " +
+          "The file '$($env:MTP_DRAFT_MODEL)' requires the AtomicBot llama-server binary. " +
+          "Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set ENABLE_MTP_DRAFTER=false.") -ForegroundColor Yellow
+      } else {
+        # Gate 2b — Dry-load the draft GGUF with zero predictions and a minimal context.
+        # Redirect stdout to null; capture stderr to detect arch errors.
+        $draftProbeArgs = @(
+          '--model', $env:MTP_DRAFT_MODEL,
+        '--ctx-size', '1',
+        '--n-predict', '0',
+        '--log-disable',
+          '--no-mmap'
+      )
+      $draftProbeOut = & $llama @draftProbeArgs 2>&1 | Out-String
+      $draftArchError = $draftProbeOut -match 'unknown model architecture'
+
+      if ($draftArchError) {
+        # Extract the arch name from the error for a useful message.
+        $archMatch = [regex]::Match($draftProbeOut, "unknown model architecture: '([^']+)'")
+        $badArch = if ($archMatch.Success) { $archMatch.Groups[1].Value } else { 'unknown' }
+        Write-Host ("Speculative decoding skipped: draft model has unsupported architecture '$badArch'. " +
+          "The GGUF at '$($env:MTP_DRAFT_MODEL)' is an MTP-head-only format that requires the AtomicBot " +
+          "llama-server binary. Either set LLAMA_SERVER_PATH to the AtomicBot binary, or set " +
+          "ENABLE_MTP_DRAFTER=false to use the main model without speculative decoding.") -ForegroundColor Yellow
+        } else {
+          $TurboDraftModel = $env:MTP_DRAFT_MODEL
+          $TurboSpeculative = $true
+          if ($binaryHasSpecDraft) {
+            $TurboDraftMode = 'spec-draft-model'
+          } elseif ($binaryHasLegacyDraft -and $allowLegacyDraft) {
+            $TurboDraftMode = 'legacy-draft'
+          }
+        }
+        }
+      }
+    }
   }
-}
 
 if ($env:DRAFT_MODEL_PATH) {
   Write-Host 'Deprecated DRAFT_MODEL_PATH is ignored by this launcher. Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> instead.' -ForegroundColor Yellow
@@ -467,8 +622,50 @@ if ($StatusOnly) {
     try {
         $health = Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 2
         Write-Host "Health: OK (status: $($health.status))" -ForegroundColor Green
+        $null = Write-TurboLaunchStatus ([ordered]@{
+            status = 'ok'
+            port = $port
+            model = $model
+            draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+            speculative = [bool]$TurboSpeculative
+            draft_mode = $TurboDraftMode
+            text_only = [bool]$TextOnly
+            detached = [bool]$Detached
+            turbo_profile = $kvProfile
+            llama_server = $llama
+            launch_mode = 'status-only'
+            server_healthy = $true
+            retry_count = 0
+            retry_reason = ''
+            exit_code = 0
+            error = ''
+            health_url = "http://127.0.0.1:$port/health"
+            stdout_path = ''
+            stderr_path = ''
+        })
     } catch {
         Write-Host "Health: FAILED (server likely down on port $port)" -ForegroundColor Red
+        $null = Write-TurboLaunchStatus ([ordered]@{
+            status = 'failed'
+            port = $port
+            model = $model
+            draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+            speculative = [bool]$TurboSpeculative
+            draft_mode = $TurboDraftMode
+            text_only = [bool]$TextOnly
+            detached = [bool]$Detached
+            turbo_profile = $kvProfile
+            llama_server = $llama
+            launch_mode = 'status-only'
+            server_healthy = $false
+            retry_count = 0
+            retry_reason = ''
+            exit_code = 1
+            error = $_.Exception.Message
+            health_url = "http://127.0.0.1:$port/health"
+            stdout_path = ''
+            stderr_path = ''
+        })
     }
     exit 0
 }
@@ -511,11 +708,11 @@ if ($kvProfile -eq 'atomicbot') {
     }
 }
 # -- Speculative Decoding: inject Atomic/spec-draft flags for accelerated throughput --
-if ($TurboDraftModel) {
-  $specDraftFlagsSupported = Test-LlamaFlag $llama '--spec-draft-n-max'
-  Write-Host ("Speculative Decoding: draft model enabled ($TurboDraftModel)") -ForegroundColor Cyan
-  Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
-  $TextOnly = $true
+if ($TurboDraftModel -and -not $draftRequiresAtomicBot) {
+    $specDraftFlagsSupported = Test-LlamaFlag $llama '--spec-draft-n-max'
+    Write-Host ("Speculative Decoding: draft model enabled ($TurboDraftModel)") -ForegroundColor Cyan
+    Write-Host ("Speculative Decoding automatically disables vision/multimodal (--mmproj)") -ForegroundColor Yellow
+    $TextOnly = $true
   if ($specDraftFlagsSupported) {
     $baseArgs = $baseArgs + @(
       '--spec-draft-model', $TurboDraftModel,
@@ -743,33 +940,103 @@ New-Item -ItemType Directory -Force -Path $logDir | Out-Null
 $stamp    = (Get-Date).ToString('yyyy-MM-ddTHH-mm-ss')
 $errPath  = Join-Path $logDir ("launch-$stamp.err")
 $outPath  = Join-Path $logDir ("launch-$stamp.out")
-$detachedArgs = $baseArgs
-
-$proc = Start-Process -FilePath $llama `
-                      -ArgumentList $detachedArgs `
-                      -PassThru -WindowStyle Hidden `
-                      -RedirectStandardError $errPath `
-                      -RedirectStandardOutput $outPath
-
-# Poll /health for up to 120s (model load + GPU warm)
+$launchAttempt = 0
+$retryReason = ''
 $ready = $false
-for ($i = 0; $i -lt 240; $i++) {
-  if ($proc.HasExited) { break }
-  try {
-    Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null
-    $ready = $true; break
-  } catch {
-    Start-Sleep -Milliseconds 500
-  }
-}
+$proc = $null
+$finalArgs = $baseArgs
 
-if (-not $ready) {
+while ($launchAttempt -lt 2) {
+  if ($launchAttempt -gt 0) {
+    $finalArgs = Remove-TurboDraftArgs $baseArgs
+    $TurboSpeculative = $false
+    $TurboDraftModel = $null
+    $TurboDraftMode = 'disabled'
+    $retryReason = 'draft-architecture'
+    Write-Host "Retrying TurboQuant once without speculative decoding" -ForegroundColor Yellow
+  }
+
+  $proc = Start-Process -FilePath $llama `
+                        -ArgumentList $finalArgs `
+                        -PassThru -WindowStyle Hidden `
+                        -RedirectStandardError $errPath `
+                        -RedirectStandardOutput $outPath
+
+  # Poll /health for up to 120s (model load + GPU warm)
+  $ready = $false
+  for ($i = 0; $i -lt 240; $i++) {
+    if ($proc.HasExited) { break }
+    try {
+      Invoke-RestMethod ('http://127.0.0.1:' + $port + '/health') -TimeoutSec 1 | Out-Null
+      $ready = $true
+      break
+    } catch {
+      Start-Sleep -Milliseconds 500
+    }
+  }
+
+  if ($ready) { break }
+
+  $stderrTail = ''
+  if (Test-Path $errPath) {
+    $stderrTail = (Get-Content $errPath -Tail 50 | Out-String)
+  }
+  $draftFailure = $stderrTail -match 'unknown model architecture|unsupported architecture'
+
   try { Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue } catch { }
+
+  if ($draftFailure -and $launchAttempt -eq 0 -and ($TurboSpeculative -or $TurboDraftModel)) {
+    $launchAttempt++
+    continue
+  }
+
   Write-Host '--- llama-server stderr (tail) ---' -ForegroundColor Red
-  if (Test-Path $errPath) { Get-Content $errPath -Tail 25 | ForEach-Object { Write-Host $_ -ForegroundColor DarkYellow } }
-  throw ("TurboQuant failed to become healthy on :$port - see $errPath")
+  if ($stderrTail) { $stderrTail.TrimEnd().Split("`n") | ForEach-Object { Write-Host $_ -ForegroundColor DarkYellow } }
+  $statusPath = Write-TurboLaunchStatus ([ordered]@{
+      status = 'failed'
+      port = $port
+      model = $model
+      draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+      speculative = [bool]$TurboSpeculative
+      draft_mode = $TurboDraftMode
+      text_only = [bool]$TextOnly
+      detached = [bool]$Detached
+      turbo_profile = $kvProfile
+      llama_server = $llama
+      launch_mode = 'detached'
+      server_healthy = $false
+      retry_count = $launchAttempt
+      retry_reason = $retryReason
+      exit_code = if ($proc) { $proc.ExitCode } else { 1 }
+      error = if ($stderrTail) { $stderrTail.Trim() } else { 'TurboQuant failed to become healthy' }
+      health_url = "http://127.0.0.1:$port/health"
+      stdout_path = $outPath
+      stderr_path = $errPath
+  })
+  throw ("TurboQuant failed to become healthy on :$port - see $errPath (status: $statusPath)")
 }
 
 $variant = if ($TextOnly) { 'text-only' } else { 'with VLM' }
 Write-Host ("TurboQuant ready ($variant, kv=$kvK/$kvV) on http://127.0.0.1:$port (PID $($proc.Id))") -ForegroundColor Green
 Write-Host ("  stderr: $errPath") -ForegroundColor DarkGray
+$statusPath = Write-TurboLaunchStatus ([ordered]@{
+    status = 'healthy'
+    port = $port
+    model = $model
+    draft_model = if ($TurboDraftModel) { $TurboDraftModel } else { '' }
+    speculative = [bool]$TurboSpeculative
+    draft_mode = $TurboDraftMode
+    text_only = [bool]$TextOnly
+    detached = [bool]$Detached
+    turbo_profile = $kvProfile
+    llama_server = $llama
+    launch_mode = 'detached'
+    server_healthy = $true
+    retry_count = $launchAttempt
+    retry_reason = $retryReason
+    exit_code = 0
+    error = ''
+    health_url = "http://127.0.0.1:$port/health"
+    stdout_path = $outPath
+    stderr_path = $errPath
+})

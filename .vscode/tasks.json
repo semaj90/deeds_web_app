@@ -518,7 +518,8 @@
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
-          "DEV_BYPASS_AUTH": "true"
+          "DEV_BYPASS_AUTH": "true",
+          "DEV_GPU_ENABLE_MTP": "false"
         }
       },
       "runOptions": {
@@ -594,9 +595,9 @@
       "detail": "Start TurboQuant llama-server (gemma4-rotorquant:latest + mmproj VLM on :8090), Go retrieval gRPC (:50053), and the GPU-optimized frontend dev server (:5173)"
     },
     {
-      "label": "TurboQuant llama-server (VLM)",
+      "label": "⚡ TurboQuant: Start (text-only, :8090)",
       "type": "shell",
-      "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
+      "command": "npm run turbo:start:text:detached",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -613,7 +614,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Spawn gemma4-legal-iq4xs-direct.gguf + mmproj VLM on :8090. Pre-evicts Ollama VRAM, probes binary for --jinja/--cache-prompt/--cache-reuse/Flash-Attn, 64K ctx, q8_0/q8_0 KV, -np 1. Waits up to 120s for /health."
+      "detail": "Spawn gemma4-legal-iq4xs-direct.gguf on :8090 in text-only mode. Speculative decoding is disabled, and the launcher writes a machine-readable status artifact for board evidence."
     },
     {
       "label": "Gemma4 Tool-Call Sanitizer (:8091)",
@@ -626,7 +627,7 @@
         "runOn": "folderOpen"
       },
       "isBackground": true,
-      "dependsOn": ["TurboQuant llama-server (VLM)"],
+      "dependsOn": ["⚡ TurboQuant: Start (text-only, :8090)"],
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -983,7 +984,7 @@
       "label": "Backend Stack (MCP + TurboQuant detached)",
       "dependsOn": [
         "MCP TRACE Server (detached)",
-        "TurboQuant llama-server (VLM)"
+        "⚡ TurboQuant: Start (text-only, :8090)"
       ],
       "dependsOrder": "parallel",
       "problemMatcher": [],
@@ -1001,7 +1002,7 @@
       "label": "Agentic Stack: Ensure MCP + TurboQuant + Topology",
       "dependsOn": [
         "MCP TRACE Server (detached)",
-        "TurboQuant llama-server (VLM)",
+        "⚡ TurboQuant: Start (text-only, :8090)",
         "Topology Search: Ensure"
       ],
       "dependsOrder": "parallel",

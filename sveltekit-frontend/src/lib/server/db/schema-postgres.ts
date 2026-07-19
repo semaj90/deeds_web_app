@@ -4974,3 +4974,131 @@ export * from './schema/packet-binary-registry.js';
 export * from './schema/atlas-artifacts.js';
 export * from './schema/atlas-semantic-diffs.js';
 
+// ---------------------------------------------------------------------------
+// Agent workflow tables (Step 3 of integration order)
+// Canonical action ledger — Postgres decides what happened.
+// Separate from legacy agent_actions (UI session log, no run_id).
+// ---------------------------------------------------------------------------
+
+const agentRunStatus = [
+    'PROPOSED', 'VALIDATED', 'AUTHORIZED', 'READY',
+    'RUNNING', 'SUCCEEDED', 'FAILED', 'DENIED', 'WAITING_APPROVAL',
+] as const;
+
+const agentActionStatus = [
+    'PROPOSED', 'VALIDATED', 'AUTHORIZED', 'READY',
+    'RUNNING', 'SUCCEEDED', 'RETRY_PENDING', 'DENIED', 'WAITING_APPROVAL', 'FAILED',
+] as const;
+
+export const agentRuns = pgTable('agent_runs', {
+    runId:           uuid('run_id').primaryKey().defaultRandom(),
+    workflowName:    text('workflow_name').notNull(),
+    workflowVersion: text('workflow_version').notNull(),
+    status:          text('status').notNull().default('PROPOSED'),
+    tenantId:        uuid('tenant_id').notNull(),
+    initiatedBy:     text('initiated_by').notNull(),
+    state:           jsonb('state').notNull().default({}),
+    startedAt:       timestamp('started_at', { withTimezone: true }).defaultNow().notNull(),
+    completedAt:     timestamp('completed_at', { withTimezone: true }),
+}, (t) => ({
+    statusIdx: index('idx_agent_runs_status').on(t.status, t.startedAt),
+    tenantIdx: index('idx_agent_runs_tenant').on(t.tenantId, t.startedAt),
+}));
+
+export type AgentRun    = typeof agentRuns.$inferSelect;
+export type NewAgentRun = typeof agentRuns.$inferInsert;
+
+export const agentRunActions = pgTable('agent_run_actions', {
+    actionId:        uuid('action_id').primaryKey().defaultRandom(),
+    runId:           uuid('run_id').notNull().references(() => agentRuns.runId),
+    sequenceNo:      bigint('sequence_no', { mode: 'number' }).notNull(),
+    actionType:      text('action_type').notNull(),
+    inputPacket:     jsonb('input_packet').notNull(),
+    inputHash:       text('input_hash').notNull(),
+    permissionScope: text('permission_scope').array().notNull().default(sql`'{}'::text[]`),
+    riskLevel:       integer('risk_level').notNull().default(0),
+    status:          text('status').notNull().default('PROPOSED'),
+    idempotencyKey:  text('idempotency_key').notNull().unique(),
+    causationId:     uuid('causation_id'),
+    startedAt:       timestamp('started_at', { withTimezone: true }),
+    finishedAt:      timestamp('finished_at', { withTimezone: true }),
+}, (t) => ({
+    runSeqUniq:  unique('agent_run_actions_run_seq').on(t.runId, t.sequenceNo),
+    runIdx:      index('idx_agent_run_actions_run').on(t.runId, t.sequenceNo),
+    statusIdx:   index('idx_agent_run_actions_status').on(t.status, t.startedAt),
+}));
+
+export type AgentRunAction    = typeof agentRunActions.$inferSelect;
+export type NewAgentRunAction = typeof agentRunActions.$inferInsert;
+
+export const agentActionResults = pgTable('agent_action_results', {
+    resultId:     uuid('result_id').primaryKey().defaultRandom(),
+    actionId:     uuid('action_id').notNull().references(() => agentRunActions.actionId),
+    outputPacket: jsonb('output_packet'),
+    outputHash:   text('output_hash'),
+    exitCode:     integer('exit_code'),
+    errorCode:    text('error_code'),
+    errorDetail:  jsonb('error_detail'),
+    durationMs:   integer('duration_ms').notNull(),
+    createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type AgentActionResult    = typeof agentActionResults.$inferSelect;
+export type NewAgentActionResult = typeof agentActionResults.$inferInsert;
+
+// Append-only. Never UPDATE or DELETE; corrections are new events.
+export const workflowEvents = pgTable('workflow_events', {
+    eventId:    uuid('event_id').primaryKey().defaultRandom(),
+    runId:      uuid('run_id').notNull().references(() => agentRuns.runId),
+    actionId:   uuid('action_id'),
+    eventType:  text('event_type').notNull(),
+    sequenceNo: bigint('sequence_no', { mode: 'number' }).notNull(),
+    payload:    jsonb('payload').notNull(),
+    occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull(),
+    recordedAt: timestamp('recorded_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+    runSeqUniq: unique('workflow_events_run_seq').on(t.runId, t.sequenceNo),
+    runIdx:     index('idx_workflow_events_run').on(t.runId, t.sequenceNo),
+}));
+
+export type WorkflowEvent    = typeof workflowEvents.$inferSelect;
+export type NewWorkflowEvent = typeof workflowEvents.$inferInsert;
+
+// Transactional outbox — written atomically with the action row.
+// Workers poll this table and fan out to Redis / Qdrant / mmap builders.
+export const outboxEvents = pgTable('outbox_events', {
+    outboxId:      uuid('outbox_id').primaryKey().defaultRandom(),
+    aggregateType: text('aggregate_type').notNull(),
+    aggregateId:   uuid('aggregate_id').notNull(),
+    eventType:     text('event_type').notNull(),
+    payload:       jsonb('payload').notNull(),
+    publishedAt:   timestamp('published_at', { withTimezone: true }),
+    createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+    unpublishedIdx: index('idx_outbox_events_unpublished').on(t.createdAt)
+        .where(sql`published_at IS NULL`),
+}));
+
+export type OutboxEvent    = typeof outboxEvents.$inferSelect;
+export type NewOutboxEvent = typeof outboxEvents.$inferInsert;
+
+// Token artifact manifest.
+// Postgres stores WHERE the token sequence lives; mmap stores WHAT it contains.
+// Never store token_ids integer[] inline — use snapshot_uri + offsets.
+export const tokenArtifacts = pgTable('token_artifacts', {
+    artifactId:        uuid('artifact_id').primaryKey().defaultRandom(),
+    sourceRef:         text('source_ref').notNull(),
+    tokenizerId:       text('tokenizer_id').notNull(),
+    tokenizerHash:     text('tokenizer_hash').notNull(),
+    contentHash:       text('content_hash').notNull(),
+    tokenCount:        integer('token_count').notNull(),
+    snapshotUri:       text('snapshot_uri').notNull(),
+    tokenOffsetStart:  bigint('token_offset_start', { mode: 'number' }).notNull(),
+    tokenOffsetEnd:    bigint('token_offset_end', { mode: 'number' }).notNull(),
+    metadata:          jsonb('metadata').notNull().default({}),
+    createdAt:         timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+    contentTokenizerUniq: unique('token_artifacts_content_tokenizer').on(t.contentHash, t.tokenizerHash),
+    sourceIdx:            index('idx_token_artifacts_source').on(t.sourceRef),
+}));
+

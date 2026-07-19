@@ -21,6 +21,16 @@ import { clientCache } from './client-cache.js';
 let tokenizer: any = null;
 let tokenizerLoading: Promise<any> | null = null;
 
+function simpleHash(str: string): string {
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		const char = str.charCodeAt(i);
+		hash = ((hash << 5) - hash) + char;
+		hash |= 0;
+	}
+	return hash.toString(36);
+}
+
 /** Load the embedding tokenizer (memoized) */
 async function ensureTokenizer(): Promise<any> {
 	if (tokenizer) return tokenizer;
@@ -59,36 +69,64 @@ export async function embedText(text: string): Promise<Float32Array> {
 		throw new Error('embedText() is browser-only');
 	}
 
+	const tokenCacheKey = simpleHash(`${CLIENT_EMBEDDING_ONNX_PATH}::${text}`);
+
 	// 1. Check cache (convert number[] to Float32Array if needed)
 	const cached = await clientCache.getEmbedding(text);
 	if (cached && cached.length === CLIENT_EMBEDDING_DIMS) {
 		return cached instanceof Float32Array ? cached : new Float32Array(cached);
 	}
 
-	// 2. Load model + tokenizer
-	const [session, tok] = await Promise.all([
-		getOnnxSession(CLIENT_EMBEDDING_ONNX_PATH),
-		ensureTokenizer()
-	]);
+	// 2. Reuse cached tokenization when available; otherwise tokenize and cache.
+	const cachedTokens = await clientCache.getTokenizedInput(tokenCacheKey);
+	let encoded: {
+		input_ids: { data: Int32Array };
+		attention_mask: { data: Int32Array };
+		token_type_ids?: { data: Int32Array };
+	};
 
-	// 3. Tokenize
-	const encoded = tok(text, {
-		return_tensors: 'np',
-		padding: true,
-		truncation: true,
-		max_length: 512
-	});
+	if (cachedTokens) {
+		encoded = {
+			input_ids: { data: Int32Array.from(cachedTokens.inputIds) },
+			attention_mask: { data: Int32Array.from(cachedTokens.attentionMask) },
+			...(cachedTokens.tokenTypeIds
+				? { token_type_ids: { data: Int32Array.from(cachedTokens.tokenTypeIds) } }
+				: {})
+		};
+	} else {
+		const tok = await ensureTokenizer();
+		const fresh = tok(text, {
+			return_tensors: 'np',
+			padding: true,
+			truncation: true,
+			max_length: 512
+		});
+		encoded = fresh;
+		await clientCache.putTokenizedInput(tokenCacheKey, {
+			modelId: CLIENT_EMBEDDING_ONNX_PATH,
+			inputIds: Array.from(fresh.input_ids.data as ArrayLike<number>),
+			attentionMask: Array.from(fresh.attention_mask.data as ArrayLike<number>),
+			...(fresh.token_type_ids
+				? {
+						tokenTypeIds: Array.from(fresh.token_type_ids.data as ArrayLike<number>)
+					}
+				: {})
+		});
+	}
+
+	// 3. Load model session
+	const session = await getOnnxSession(CLIENT_EMBEDDING_ONNX_PATH);
 
 	// 4. Build ONNX tensors
 	const { Tensor } = await import('onnxruntime-web');
 	const inputIds = new Tensor(
 		'int64',
-		new BigInt64Array(Array.from(encoded.input_ids.data as number[], (v: number) => BigInt(v))),
+		new BigInt64Array(Array.from(encoded.input_ids.data as ArrayLike<number>, (v) => BigInt(v))),
 		[1, encoded.input_ids.data.length]
 	);
 	const attentionMask = new Tensor(
 		'int64',
-		new BigInt64Array(Array.from(encoded.attention_mask.data as number[], (v: number) => BigInt(v))),
+		new BigInt64Array(Array.from(encoded.attention_mask.data as ArrayLike<number>, (v) => BigInt(v))),
 		[1, encoded.attention_mask.data.length]
 	);
 
@@ -102,7 +140,7 @@ export async function embedText(text: string): Promise<Float32Array> {
 	if (encoded.token_type_ids) {
 		feeds.token_type_ids = new Tensor(
 			'int64',
-			new BigInt64Array(Array.from(encoded.token_type_ids.data as number[], (v: number) => BigInt(v))),
+			new BigInt64Array(Array.from(encoded.token_type_ids.data as ArrayLike<number>, (v) => BigInt(v))),
 			[1, encoded.token_type_ids.data.length]
 		);
 	}
@@ -121,7 +159,7 @@ export async function embedText(text: string): Promise<Float32Array> {
 	const dims = CLIENT_EMBEDDING_DIMS;
 
 	// 7. Mean pooling over sequence dimension (with attention mask)
-	const maskData = encoded.attention_mask.data as number[];
+	const maskData = encoded.attention_mask.data as ArrayLike<number>;
 	const pooled = new Float32Array(dims);
 	let maskSum = 0;
 

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": [
+    "src/lib/server/retrieval/**/*.ts",
+    "src/lib/server/vector/vector-contracts.ts",
+    "tests/lane-contracts.spec.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".svelte-kit"
+  ]
+}

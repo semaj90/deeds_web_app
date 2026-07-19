@@ -33,6 +33,12 @@
    - Keep canonical identity in Postgres and keep derived topK state separate from `atlas_packets`
    - Use `chunk_hit_log.rerank_breakdown` / search analytics as the per-query evidence sink and `atlas_packet_metrics` as the durable per-feature projection
 
+2. **Ranking pipeline: scoring + post-process stages** ✅ PROVEN (July 18, 2026)
+   - `candidate-scorer.ts` — Stage 3b: deterministic `blendedScore` on every `FusedCandidate`; preserves identity, model-scorer hook ready (`ModelScorer` interface)
+   - `post-process-reranker.ts` — Stage 4b: freshness boost, dislike suppression, diversity dedup, anti-cluster cap; configurable via `PostProcessConfig`; never mutates `packetKey`/`sourceRef`/`blendedScore`
+   - `search-runtime.ts` wired: scoring runs after RRF fusion (pre-hydration), post-process runs after canonical reranker; `StageTiming` extended with `score`/`postProcess` ms
+   - Tests: `__tests__/scoring-rerank.test.ts` — 17/17 pass; covers determinism, identity invariance, freshness, dislike, dedup, anti-cluster, model-scorer override, fallback
+
 ## Current Confirmed Gaps
 
 Summary embedding is now complete for the canonical summary classes. The remaining work is bridge propagation and topology/materialization:

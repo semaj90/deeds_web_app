@@ -15,6 +15,88 @@ import {
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
+const FALLBACK_COURTROOM_MODEL_URL = '/models/courtroom/character_alice.glb';
+const FALLBACK_COURTROOM_ANIMATIONS = [
+	{
+		name: 'Cross-Stage Speaking',
+		animType: 'speaking',
+		animationUrl: '/models/courtroom/speaking_crossstage.glb',
+		durationMs: 8000,
+		loop: false,
+	},
+	{
+		name: 'Dramatic Objection',
+		animType: 'objection',
+		animationUrl: '/models/courtroom/objection_dramatic.glb',
+		durationMs: 3000,
+		loop: false,
+	},
+	{
+		name: 'Point at Audience',
+		animType: 'point',
+		animationUrl: '/models/courtroom/point_audience.glb',
+		durationMs: 6000,
+		loop: false,
+	},
+	{
+		name: 'Teaching Gesture',
+		animType: 'gesture',
+		animationUrl: '/models/courtroom/gesture_teaching.glb',
+		durationMs: 5000,
+		loop: false,
+	},
+	{
+		name: 'Normal Walk Cycle',
+		animType: 'walk',
+		animationUrl: '/models/courtroom/walk_normal.glb',
+		durationMs: 1800,
+		loop: true,
+	},
+] as const;
+
+const FALLBACK_COURTROOM_MODELS = [
+	{
+		id: 'fallback-prosecutor',
+		name: 'Courtroom Prosecutor',
+		role: 'prosecutor',
+		modelUrl: FALLBACK_COURTROOM_MODEL_URL,
+		thumbnailUrl: null,
+		skeletonType: 'mixamo',
+		scale: { x: 1, y: 1, z: 1 },
+		animations: [...FALLBACK_COURTROOM_ANIMATIONS],
+	},
+	{
+		id: 'fallback-defense',
+		name: 'Courtroom Defense',
+		role: 'defense',
+		modelUrl: FALLBACK_COURTROOM_MODEL_URL,
+		thumbnailUrl: null,
+		skeletonType: 'mixamo',
+		scale: { x: 1, y: 1, z: 1 },
+		animations: [...FALLBACK_COURTROOM_ANIMATIONS],
+	},
+	{
+		id: 'fallback-judge',
+		name: 'Courtroom Judge',
+		role: 'judge',
+		modelUrl: FALLBACK_COURTROOM_MODEL_URL,
+		thumbnailUrl: null,
+		skeletonType: 'mixamo',
+		scale: { x: 1, y: 1, z: 1 },
+		animations: [...FALLBACK_COURTROOM_ANIMATIONS],
+	},
+	{
+		id: 'fallback-witness',
+		name: 'Courtroom Witness',
+		role: 'witness',
+		modelUrl: FALLBACK_COURTROOM_MODEL_URL,
+		thumbnailUrl: null,
+		skeletonType: 'mixamo',
+		scale: { x: 1, y: 1, z: 1 },
+		animations: [...FALLBACK_COURTROOM_ANIMATIONS],
+	},
+] as const;
+
 /** GET — List all available models + their animations */
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) {
@@ -26,6 +108,21 @@ export const GET: RequestHandler = async ({ locals }) => {
 			db.select().from(courtroomModels).catch(() => []),
 			db.select().from(courtroomAnimations).catch(() => []),
 		]);
+
+		if (models.length === 0) {
+			return json({
+				models: FALLBACK_COURTROOM_MODELS,
+				animations: FALLBACK_COURTROOM_ANIMATIONS.map((a, idx) => ({
+					id: `fallback-animation-${idx}`,
+					name: a.name,
+					animType: a.animType,
+					animationUrl: a.animationUrl,
+					durationMs: a.durationMs,
+					loop: a.loop,
+					skeletonType: 'mixamo',
+				})),
+			});
+		}
 
 		// Group animations by skeleton type for easy client-side matching
 		const animsByType = new Map<string, typeof animations>();

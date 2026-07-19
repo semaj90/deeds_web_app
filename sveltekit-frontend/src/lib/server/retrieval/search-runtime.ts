@@ -20,6 +20,8 @@ import { rerankCanonicalFeatureEnvelopes } from './canonical-rerank-executor.js'
 import { recordPromotionIntent } from './promote-results-outbox.js';
 import { logExposureEvents } from './recommendation-events.js';
 import { hydrateCandidates as hydrateFromPostgres } from './hydrate-candidates.js';
+import { scoreCandidates, type ScorerOptions } from './candidate-scorer.js';
+import { postProcessCandidates, type PostProcessConfig } from './post-process-reranker.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
 import { createQdrantDenseRetriever } from './adapters/qdrant-dense-retriever.js';
@@ -28,30 +30,93 @@ import { createDisabledRetriever } from './adapters/disabled-retriever.js';
 import { createPostgresExactRetriever } from './adapters/postgres-exact-retriever.js';
 import { createPostgresAstRetriever } from './adapters/postgres-ast-retriever.js';
 import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
+import {
+  CODEBASE_QDRANT_COLLECTION_PRIORITY,
+  resolvePreferredCodebaseCollection,
+} from '$lib/server/config/vector-config.js';
 
-// Startup assertion: verify canonical Qdrant collection exists and has correct dimensions
+const PROJECT_CANONICAL_EMBED_DIM = 384;
+
+/**
+ * Startup assertion: verify canonical Qdrant collection exists AND has the correct
+ * vector dimension (384) on the 'content' named vector.
+ *
+ * Warnings (non-fatal):
+ *  - Collection missing → dense retrieval will return empty results
+ *  - Wrong dimension → silently wrong scores; must run re-index
+ *  - 'content' named vector absent → adapter will fail at query time
+ */
 async function validateQdrantDimensions(): Promise<void> {
   try {
     const qdrant = getQdrantManager();
-    if (typeof (qdrant as any)?.listCollections !== 'function') {
-      console.warn('Qdrant dimension validation skipped: listCollections() not available.');
+
+    let activeCollection: string | null = null;
+
+    const collectionsResult = await qdrant.getCollections().catch(() => null);
+    if (!collectionsResult) {
+      console.warn('[search-runtime] Qdrant dimension validation skipped: getCollections() failed.');
       return;
     }
-    const collections: string[] = await (qdrant as any).listCollections();
-    const names: string[] = Array.isArray(collections) ? collections : [];
-    if (names.includes('codebase_chunks_384_hybrid')) {
-      // Canonical target — no warning needed
-    } else if (names.includes('codebase_chunks_384')) {
+
+    const existingNames = new Set(
+      (collectionsResult.collections ?? []).map((c: { name: string }) => c.name)
+    );
+
+    activeCollection = resolvePreferredCodebaseCollection(existingNames).toString();
+
+    if (!activeCollection) {
       console.warn(
-        '[search-runtime] codebase_chunks_384_hybrid not found. Falling back to dense-only codebase_chunks_384. ' +
+        `[search-runtime] None of ${CODEBASE_QDRANT_COLLECTION_PRIORITY.join(', ')} found in Qdrant. ` +
+        'Dense retrieval will return empty results. Run `npm run atlas:qdrant:384:restore:apply`.'
+      );
+      return;
+    }
+
+    if (activeCollection === 'codebase_chunks_384') {
+      console.warn(
+        '[search-runtime] codebase_chunks_384_hybrid not found. Using dense-only codebase_chunks_384. ' +
         'Run `npm run atlas:backfill:hybrid` to populate the hybrid collection.'
       );
-    } else {
+    }
+
+    // Fetch collection info and verify 'content' named vector dimension
+    const info = await (qdrant as any).client.getCollection(activeCollection).catch(() => null);
+    if (!info) {
+      console.warn(`[search-runtime] Could not fetch collection info for ${activeCollection}.`);
+      return;
+    }
+
+    // Qdrant SDK response shape: info.config.params.vectors.<name>.size
+    const vectorsConfig: Record<string, unknown> | undefined =
+      (info as any)?.config?.params?.vectors ??
+      (info as any)?.result?.config?.params?.vectors;
+
+    if (!vectorsConfig || typeof vectorsConfig !== 'object') {
       console.warn(
-        '[search-runtime] Neither codebase_chunks_384_hybrid nor codebase_chunks_384 found. ' +
-        'Qdrant dense retrieval will return empty results.'
+        `[search-runtime] ${activeCollection}: could not read vectors config from collection info. ` +
+        'Dimension validation skipped.'
+      );
+      return;
+    }
+
+    const contentVec = vectorsConfig['content'] as { size?: number } | undefined;
+    if (!contentVec) {
+      console.warn(
+        `[search-runtime] ${activeCollection}: 'content' named vector is absent. ` +
+        'Dense retrieval will fail at query time. Re-create the collection with the content vector.'
+      );
+      return;
+    }
+
+    const actualDim = contentVec.size;
+    if (actualDim !== PROJECT_CANONICAL_EMBED_DIM) {
+      console.warn(
+        `[search-runtime] ${activeCollection}: 'content' vector has dimension ${actualDim}, ` +
+        `expected ${PROJECT_CANONICAL_EMBED_DIM}. ` +
+        'Search scores will be wrong. Run `npm run atlas:qdrant:384:restore:apply` to rebuild.'
       );
     }
+    // Dimension matches — no warning needed
   } catch (error) {
     console.warn('[search-runtime] Qdrant collection validation failed:', (error as Error).message);
   }
@@ -111,13 +176,17 @@ export interface SearchResult {
     queryEmbedding?: number[];
     candidatesRetrieved: number;
     candidatesFused: number;
+    candidatesScored: number;
     candidatesReranked: number;
+    candidatesPostProcessed: number;
     durationMs: number;
     stages: {
       retrieve: number;
       fuse: number;
+      score: number;
       hydrate: number;
       rerank: number;
+      postProcess: number;
       promote?: number;
     };
   };
@@ -152,6 +221,31 @@ export interface SearchRuntimeConfig {
   retrievers?: Retriever[];
   /** Injected reranker. When absent, `rerankCanonicalFeatureEnvelopes` is used. */
   reranker?: Reranker;
+  /** Options for Stage 3b: candidate scorer. */
+  scorerOptions?: ScorerOptions;
+  /** Options for Stage 4b: post-process reranker (freshness, dislike, diversity). */
+  postProcessConfig?: Partial<PostProcessConfig>;
+  /**
+   * Per-query freshness map: packetKey → last updated Date.
+   * Typically populated from atlas_packets.updated_at during hydration.
+   */
+  updatedAtMap?: ReadonlyMap<string, Date>;
+  /**
+   * Per-session disliked packet keys (from user feedback / recommendation ledger).
+   * Passed here so post-process doesn't need a DB call.
+   */
+  dislikedPacketKeys?: ReadonlySet<string>;
+}
+
+/** Stage timings extended with scorer and post-process steps. */
+interface StageTiming {
+  retrieve: number;
+  fuse: number;
+  score: number;
+  hydrate: number;
+  rerank: number;
+  postProcess: number;
+  promote?: number;
 }
 
 /**
@@ -162,12 +256,22 @@ export class SearchRuntime {
   private caseId?: string;
   private injectedRetrievers?: Retriever[];
   private injectedReranker?: Reranker;
+  private scorerOptions?: ScorerOptions;
+  private postProcessConfig?: Partial<PostProcessConfig>;
+  private updatedAtMap: ReadonlyMap<string, Date>;
+  private dislikedPacketKeys: ReadonlySet<string>;
 
   constructor(config: SearchRuntimeConfig) {
     this.userId = config.userId;
     this.caseId = config.caseId;
     this.injectedRetrievers = config.retrievers;
     this.injectedReranker = config.reranker;
+    this.scorerOptions = config.scorerOptions;
+    this.postProcessConfig = config.postProcessConfig;
+    this.updatedAtMap = config.updatedAtMap ?? new Map();
+    this.dislikedPacketKeys = config.dislikedPacketKeys
+      ? new Set(config.dislikedPacketKeys)
+      : new Set();
   }
 
   /**
@@ -176,7 +280,14 @@ export class SearchRuntime {
    */
   async search(queryInput: SearchQuery): Promise<SearchResult> {
     const startTime = Date.now();
-    const stageTiming = { retrieve: 0, fuse: 0, hydrate: 0, rerank: 0 };
+    const stageTiming: StageTiming = {
+      retrieve: 0,
+      fuse: 0,
+      score: 0,
+      hydrate: 0,
+      rerank: 0,
+      postProcess: 0,
+    };
 
     try {
       // Validate query
@@ -194,7 +305,9 @@ export class SearchRuntime {
             query: query.text,
             candidatesRetrieved: 0,
             candidatesFused: 0,
+            candidatesScored: 0,
             candidatesReranked: 0,
+            candidatesPostProcessed: 0,
             durationMs: Date.now() - startTime,
             stages: stageTiming,
           },
@@ -212,9 +325,45 @@ export class SearchRuntime {
       const fused = await this.fuseCandidates(candidates);
       stageTiming.fuse = Date.now() - fuseStart;
 
-      // Stage 3: Hydrate candidates into feature envelopes
+      // Stage 3b: Score — deterministic blended score per candidate (pre-hydration)
+      // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
+      const scoreStart = Date.now();
+      const scored = await scoreCandidates(
+        query.text,
+        fused.map(c => ({
+          packetKey: c.packetKey,
+          sourceRef: c.sourceRef,
+          fusionScore: c.fusionScore,
+          rankBefore: c.rankBefore,
+          score: c.score,
+          scoreSource: c.scoreSource,
+          qdrantPointId: (c as any).qdrantPointId,
+          packetId: (c as any).packetId,
+        })),
+        this.scorerOptions,
+      );
+      stageTiming.score = Date.now() - scoreStart;
+
+      // Sort by blendedScore before hydration so we hydrate the best candidates first
+      const scoredSorted = [...scored].sort(
+        (a, b) => b.blendedScore - a.blendedScore || a.packetKey.localeCompare(b.packetKey)
+      );
+
+      // Stage 3: Hydrate candidates into feature envelopes (top-K by blended score)
       const hydrateStart = Date.now();
-      const envelopes = await this.hydrateCandidates(fused.slice(0, query.topK));
+      const envelopes = await this.hydrateCandidates(
+        scoredSorted.slice(0, query.topK).map(sc => ({
+          id: sc.packetKey,
+          packetKey: sc.packetKey,
+          sourceRef: sc.sourceRef,
+          summary: '',
+          content: '',
+          score: sc.blendedScore,
+          scoreSource: sc.scoreSource as FusedCandidate['scoreSource'],
+          fusionScore: sc.fusionScore,
+          rankBefore: sc.rankBefore,
+        })),
+      );
       stageTiming.hydrate = Date.now() - hydrateStart;
 
       // Stage 4: Rerank with the canonical executor
@@ -222,9 +371,44 @@ export class SearchRuntime {
       const reranked = await this.rerankCandidates(envelopes, query);
       stageTiming.rerank = Date.now() - rerankStart;
 
-      // Stage 5: Finalize and return
-      // Domain classification and title generation happen in enrichment/promotion service, not here
-      const finalPackets = reranked.slice(0, query.topK);
+      // Stage 4b: Post-process — business-rule adjustments (freshness, dislike, diversity)
+      // Re-join reranked envelope order with scored candidates to produce ScoredCandidate[]
+      const ppStart = Date.now();
+      const scoredByKey = new Map(scored.map(s => [s.packetKey, s]));
+      const rerankedAsScored = reranked.map((env, idx) => {
+        const key = env.packet_key ?? env.chunk_id ?? '';
+        const base = scoredByKey.get(key) ?? {
+          packetKey: key,
+          sourceRef: env.source_ref ?? '',
+          fusionScore: 0,
+          rankBefore: idx + 1,
+          score: 0,
+          scoreSource: 'qdrant' as const,
+          blendedScore: 0,
+          scorerVersion: 'passthrough',
+          modelScored: false,
+        };
+        return { ...base, blendedScore: base.blendedScore || (reranked.length - idx) / reranked.length };
+      });
+
+      const postProcessed = postProcessCandidates(
+        rerankedAsScored,
+        {
+          ...this.postProcessConfig,
+          dislikedPacketKeys: this.dislikedPacketKeys,
+        },
+        this.updatedAtMap,
+      );
+      stageTiming.postProcess = Date.now() - ppStart;
+
+      // Apply post-process ordering back to envelopes
+      const envByKey = new Map(
+        reranked.map(env => [env.packet_key ?? env.chunk_id ?? '', env])
+      );
+      const finalPackets = postProcessed
+        .slice(0, query.topK)
+        .map(pp => envByKey.get(pp.packetKey))
+        .filter((env): env is (typeof reranked)[number] => env !== undefined);
 
       // Stage 6: Promotion (transactional outbox, non-blocking)
       const promoteStart = Date.now();
@@ -262,7 +446,9 @@ export class SearchRuntime {
           query: query.text,
           candidatesRetrieved: candidates.length,
           candidatesFused: fused.length,
+          candidatesScored: scored.length,
           candidatesReranked: reranked.length,
+          candidatesPostProcessed: postProcessed.length,
           durationMs: Date.now() - startTime,
           stages: stageTiming,
         },

@@ -9,6 +9,7 @@
  * IndexedDB: Persistent storage for embeddings + chat history.
  *   - Model outputs (keyed by prompt hash)
  *   - Embeddings (keyed by doc chunk hash)
+ *   - Tokenized inputs (keyed by prompt hash + model id)
  *   - Chat history for offline replay
  *   - 7-day TTL with automatic eviction
  *
@@ -68,10 +69,11 @@ function ensureLoki(): { replies: Collection<LokiReplyEntry>; router: Collection
 // ── IndexedDB: Persistent Cache ──────────────────────────────────────────
 
 const DB_NAME = 'deeds-ai-cache';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 const STORES = {
 	replies: 'replies',
 	embeddings: 'embeddings',
+	tokenizedInputs: 'tokenizedInputs',
 	chatHistory: 'chatHistory',
 	cartridges: 'cartridges',
 	gpuResults: 'gpuResults',
@@ -93,6 +95,9 @@ function getDB(): Promise<IDBPDatabase> {
 				}
 				if (!db.objectStoreNames.contains(STORES.embeddings)) {
 					db.createObjectStore(STORES.embeddings, { keyPath: 'chunkHash' });
+				}
+				if (!db.objectStoreNames.contains(STORES.tokenizedInputs)) {
+					db.createObjectStore(STORES.tokenizedInputs, { keyPath: 'cacheKey' });
 				}
 				if (!db.objectStoreNames.contains(STORES.chatHistory)) {
 					const store = db.createObjectStore(STORES.chatHistory, { keyPath: 'id', autoIncrement: true });
@@ -227,6 +232,59 @@ export const clientCache = {
       });
     } catch {
       // Non-critical
+    }
+  },
+
+  /** Cache tokenized input for repeated browser-side inference */
+  async putTokenizedInput(
+    cacheKey: string,
+    payload: {
+      modelId: string;
+      inputIds: number[];
+      attentionMask: number[];
+      tokenTypeIds?: number[];
+    }
+  ): Promise<void> {
+    if (typeof window === 'undefined') return;
+    try {
+      const db = await getDB();
+      await db.put(STORES.tokenizedInputs, {
+        cacheKey,
+        modelId: payload.modelId,
+        inputIds: payload.inputIds,
+        attentionMask: payload.attentionMask,
+        tokenTypeIds: payload.tokenTypeIds,
+        timestamp: Date.now(),
+      });
+    } catch {
+      /* non-critical */
+    }
+  },
+
+  /** Retrieve cached tokenized input for repeated browser-side inference */
+  async getTokenizedInput(cacheKey: string): Promise<{
+    modelId: string;
+    inputIds: number[];
+    attentionMask: number[];
+    tokenTypeIds?: number[];
+  } | null> {
+    if (typeof window === 'undefined') return null;
+    try {
+      const db = await getDB();
+      const entry = await db.get(STORES.tokenizedInputs, cacheKey);
+      if (!entry) return null;
+      if (Date.now() - entry.timestamp > TTL_MS) {
+        await db.delete(STORES.tokenizedInputs, cacheKey);
+        return null;
+      }
+      return {
+        modelId: entry.modelId,
+        inputIds: entry.inputIds,
+        attentionMask: entry.attentionMask,
+        tokenTypeIds: entry.tokenTypeIds,
+      };
+    } catch {
+      return null;
     }
   },
 
@@ -414,7 +472,7 @@ export const clientCache = {
     const cutoff = Date.now() - TTL_MS;
     try {
       const db = await getDB();
-      for (const storeName of [STORES.replies, STORES.embeddings, STORES.gpuResults, STORES.llmSynthesis]) {
+      for (const storeName of [STORES.replies, STORES.embeddings, STORES.tokenizedInputs, STORES.gpuResults, STORES.llmSynthesis]) {
         const tx = db.transaction(storeName, 'readwrite');
         let cursor = await tx.store.openCursor();
         while (cursor) {

@@ -41,6 +41,22 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+function Test-LlamaFlag {
+  param([string]$Exe, [string]$Pattern)
+  $oldPreference = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  try {
+    $h1 = (& $Exe --help 2>&1 | Out-String)
+    if ($h1 -match $Pattern) { return $true }
+    $h2 = (& $Exe -h 2>&1 | Out-String)
+    return $h2 -match $Pattern
+  } catch {
+    return $false
+  } finally {
+    $ErrorActionPreference = $oldPreference
+  }
+}
+
 # -- Load .env ----------------------------------------------------------------
 # Match scripts/atlas/connection-config.mjs semantics:
 # .env primary, .env.local override, explicit process env wins.
@@ -79,12 +95,13 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
 if (-not (Test-Path $llama)) { throw "llama-server.exe not found at: $llama" }
 
 # -- Resolve embedding model GGUF --------------------------------------------
-# Priority: EMBED_MODEL_PATH > embeddinggemma Ollama blob > nomic-embed-text blob
+# Priority: EMBED_MODEL_PATH > repo-local GGUF > embeddinggemma Ollama blob > nomic-embed-text blob
 $model = if ($env:EMBED_MODEL_PATH) {
   $env:EMBED_MODEL_PATH
 } else {
   $vendorEmbed = Join-Path $PSScriptRoot "..\vendor\models\embeddinggemma.gguf"
-  $localEmbed  = Join-Path $PSScriptRoot "..\models\embeddinggemma.gguf"
+  $localEmbed  = Join-Path $PSScriptRoot "..\models\embeddinggemma-300m-f16.gguf"
+  $localQ8     = Join-Path $PSScriptRoot "..\models\embeddinggemma-300m-q8_0.gguf"
 
   $ollamaBlob  = $null
   $manifestRoot = Join-Path $env:USERPROFILE '.ollama\models\manifests\registry.ollama.ai\library'
@@ -107,8 +124,9 @@ $model = if ($env:EMBED_MODEL_PATH) {
     } catch { }
   }
 
-  if     (Test-Path $vendorEmbed) { $vendorEmbed }
-  elseif (Test-Path $localEmbed)  { $localEmbed }
+  if     (Test-Path $localEmbed)  { $localEmbed }
+  elseif (Test-Path $localQ8)     { $localQ8 }
+  elseif (Test-Path $vendorEmbed) { $vendorEmbed }
   elseif ($ollamaBlob)            { $ollamaBlob }
   else                            { $null }
 }
@@ -132,7 +150,7 @@ Write-Host "  Model:       $model"
 Write-Host "  GPU layers:  $ngl"
 Write-Host "  Batch size:  $batchSize / $ubatchSize"
 Write-Host "  Context:     $ctxLen"
-Write-Host "  Pooling:     mean  (--embd-normalize 2)"
+Write-Host "  Pooling:     mean  (normalize if supported)"
 Write-Host ""
 
 # -- Already healthy? ---------------------------------------------------------
@@ -154,12 +172,18 @@ $args = @(
   '-ngl',           $ngl,
   '--embedding',
   '--pooling',      'mean',
-  '--embd-normalize', '2',
   '-c',             $ctxLen,
   '-b',             $batchSize,
   '-ub',            $ubatchSize,
   '-t',             $threads
 )
+
+if (Test-LlamaFlag $llama '--embd-normalize') {
+  $args = $args + @('--embd-normalize', '2')
+  Write-Host "Pooling normalize: --embd-normalize 2 enabled" -ForegroundColor Cyan
+} else {
+  Write-Host "Pooling normalize: --embd-normalize not supported by this binary - continuing without it" -ForegroundColor Yellow
+}
 
 # -- Foreground ---------------------------------------------------------------
 if (-not $Detached) {

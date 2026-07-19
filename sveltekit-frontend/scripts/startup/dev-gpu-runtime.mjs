@@ -21,6 +21,10 @@ const REPO_ROOT = path.resolve(FRONTEND_ROOT, '..');
 const envFromFiles = loadRepoEnv(process.env);
 
 function mergedEnv(extra = {}) {
+  const devGpuEnableMtp = String(
+    extra.DEV_GPU_ENABLE_MTP ?? envFromFiles.DEV_GPU_ENABLE_MTP ?? process.env.DEV_GPU_ENABLE_MTP ?? 'false',
+  ).toLowerCase() === 'true';
+
   return {
     ...process.env,
     ...envFromFiles,
@@ -42,6 +46,11 @@ function mergedEnv(extra = {}) {
     TURBO_PARALLEL: envFromFiles.TURBO_PARALLEL ?? '1',
     TURBO_BATCH_SIZE: envFromFiles.TURBO_BATCH_SIZE ?? '512',
     TURBO_UBATCH_SIZE: envFromFiles.TURBO_UBATCH_SIZE ?? '128',
+    // dev:gpu should boot the canonical 8090 synthesis lane reliably.
+    // Speculative draft decoding remains available through the dedicated
+    // turbo:* launchers, but it is not part of the default dev startup path.
+    ENABLE_MTP_DRAFTER: devGpuEnableMtp ? (envFromFiles.ENABLE_MTP_DRAFTER ?? 'true') : 'false',
+    MTP_DRAFT_MODEL: devGpuEnableMtp ? (envFromFiles.MTP_DRAFT_MODEL ?? process.env.MTP_DRAFT_MODEL ?? '') : '',
     ...extra,
   };
 }
@@ -49,11 +58,14 @@ function mergedEnv(extra = {}) {
 function runChecked(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     console.log(`[dev:gpu] ${command} ${args.join(' ')}`);
+    // Never use shell:true for pwsh commands — cmd.exe wrapping breaks semicolons
+    // in -Command strings. Pass pwsh.exe args directly via Node spawn.
+    const useShell = process.platform === 'win32' && command !== 'pwsh' && command !== 'pwsh.exe';
     const child = spawn(command, args, {
       cwd: options.cwd ?? REPO_ROOT,
       env: options.env ?? mergedEnv(),
       stdio: options.stdio ?? 'inherit',
-      shell: process.platform === 'win32',  // Use shell on Windows for .cmd resolution
+      shell: useShell,
       windowsHide: true,
     });
     child.on('error', reject);
@@ -83,34 +95,83 @@ function spawnForeground(command, args, options = {}) {
   });
 }
 
-async function main() {
-  // Launch TurboQuant llama-server (Gemma4 at :8090)
-  // On Windows, PowerShell subprocess must receive env vars via explicit shell command
-  const launcherEnv = mergedEnv();
-  const psEnvAssign = `$env:TURBO_CTX='${launcherEnv.TURBO_CTX}'; $env:LLM_CONTEXT_SIZE='${launcherEnv.LLM_CONTEXT_SIZE}'; $env:TURBO_CTX_ALLOW_SHORT_CONTEXT='${launcherEnv.TURBO_CTX_ALLOW_SHORT_CONTEXT}';`;
-  const psCommand = `${psEnvAssign} & '${path.join(REPO_ROOT, 'scripts/launch-turboquant.ps1')}' -Detached -TextOnly`;
-
-  await runChecked('pwsh', [
-    '-NoProfile',
-    '-ExecutionPolicy',
-    'Bypass',
-    '-Command',
-    psCommand,
-  ], { cwd: REPO_ROOT, env: launcherEnv });
-
-  console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active');
-
-  // Try to start ONNX embedding server if available
-  const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+async function isLlamaServerRunning(port = 8090) {
   try {
-    await runChecked(npm, ['run', 'embed:onnx:start:detached'], {
-      cwd: FRONTEND_ROOT,
-      env: mergedEnv(),
+    const res = await fetch(`http://127.0.0.1:${port}/health`, {
+      signal: AbortSignal.timeout(2000),
     });
-    console.log('[dev:gpu] ✅ ONNX Embedding server started on :8081');
-  } catch (err) {
-    console.log('[dev:gpu] ⚠️  ONNX Embedding server unavailable, using Ollama fallback');
-    console.log('[dev:gpu] Will use Ollama embeddinggemma:latest at :11434/api');
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function isTcpPortOpen(port) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 500);
+    const res = await fetch(`http://127.0.0.1:${port}`, {
+      signal: controller.signal,
+    }).catch(() => null);
+    clearTimeout(timeout);
+    return Boolean(res);
+  } catch {
+    return false;
+  }
+}
+
+async function findFreePort(startPort) {
+  let port = startPort;
+  for (let i = 0; i < 20; i++, port++) {
+    const open = await isTcpPortOpen(port);
+    if (!open) return port;
+  }
+  return startPort;
+}
+
+async function main() {
+  // Launch TurboQuant llama-server (Gemma4 at :8090) unless already running
+  const turboPort = parseInt(process.env.TURBO_PORT ?? '8090');
+  if (await isLlamaServerRunning(turboPort)) {
+    console.log(`[dev:gpu] ✅ llama-server already running on :${turboPort} — skipping launch`);
+  } else {
+    if (String(process.env.DEV_GPU_ENABLE_MTP ?? 'false').toLowerCase() !== 'true') {
+      console.log('[dev:gpu] MTP speculative decoding is disabled for dev:gpu; use turbo:* launchers for the benchmark lane.');
+    }
+    // Pass env vars directly through Node's env inheritance — PowerShell subprocess
+    // will see them as $env:TURBO_CTX etc. without needing inline assignment.
+    const launcherEnv = mergedEnv();
+    const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-turboquant.ps1');
+
+    await runChecked('pwsh', [
+      '-NoProfile',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      launcherScript,
+      '-Detached',
+      '-TextOnly',
+    ], { cwd: REPO_ROOT, env: launcherEnv });
+
+    console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active');
+  }
+
+  // Start ONNX embedding server unless already running on :8081
+  const embedPort = parseInt(process.env.EMBED_SERVER_PORT ?? '8081');
+  if (await isLlamaServerRunning(embedPort)) {
+    console.log(`[dev:gpu] ✅ Embed server already running on :${embedPort} — skipping launch`);
+  } else {
+    const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    try {
+      await runChecked(npm, ['run', 'embed:onnx:start:detached'], {
+        cwd: FRONTEND_ROOT,
+        env: mergedEnv(),
+      });
+      console.log('[dev:gpu] ✅ ONNX Embedding server started on :8081');
+    } catch {
+      console.log('[dev:gpu] ⚠️  ONNX Embedding server unavailable, using Ollama fallback');
+      console.log('[dev:gpu] Will use Ollama embeddinggemma:latest at :11434/api');
+    }
   }
 
   console.log('[dev:gpu] --- GPU Runtime Ready ---');
@@ -132,13 +193,19 @@ async function main() {
     console.warn('[dev:gpu] ⚠️  TRACE MCP server error:', err.message);
   }
 
-  console.log('[dev:gpu] Starting Vite dev server (:5173)...\n');
+  const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
+  const vitePort = await findFreePort(desiredVitePort);
+  if (vitePort !== desiredVitePort) {
+    console.log(`[dev:gpu] :${desiredVitePort} is busy — starting Vite on :${vitePort}`);
+  } else {
+    console.log(`[dev:gpu] Starting Vite dev server (:${vitePort})...\n`);
+  }
 
   // Launch Vite dev server in foreground
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
-  spawnForeground(npx, ['vite', 'dev'], {
+  spawnForeground(npx, ['vite', 'dev', '--port', String(vitePort)], {
     cwd: FRONTEND_ROOT,
-    env: mergedEnv(),
+    env: mergedEnv({ VITE_PORT: String(vitePort) }),
   });
 }
 

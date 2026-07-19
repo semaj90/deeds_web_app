@@ -61,6 +61,8 @@ export const VECTOR_CONFIG = {
     legal_canon_chunks: 'legal_canon_chunks',
     fictional_case_chunks: 'fictional_case_chunks',
     codebase_chunks: 'codebase_chunks_768',
+    codebase_chunks_384_hybrid: 'codebase_chunks_384_hybrid',
+    codebase_chunks_384: 'codebase_chunks_384',
     codebase_topology_128: 'codebase_topology_128',
     codebase_topology_64: 'codebase_topology_64',
     error_embeddings: 'error_embeddings',
@@ -97,6 +99,14 @@ export const VECTOR_CONFIG = {
     fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
     codebase_chunks_768: {
       vectors: ['content', 'signature', 'error'],
+      on_disk_payload: true,
+    },
+    codebase_chunks_384_hybrid: {
+      vectors: ['content'],
+      on_disk_payload: true,
+    },
+    codebase_chunks_384: {
+      vectors: ['content'],
       on_disk_payload: true,
     },
     codebase_topology_128: {
@@ -169,6 +179,8 @@ const COLLECTION_DIMENSIONS: Record<string, number> = {
   legal_canon_chunks: 768,
   fictional_case_chunks: 768,
   codebase_chunks_768: 768,
+  codebase_chunks_384_hybrid: 384,
+  codebase_chunks_384: 384,
   codebase_topology_128: 128,
   codebase_topology_64: 64,
   error_embeddings: 768,
@@ -207,6 +219,31 @@ export function collectionForVector(vector: number[]): CollectionName | 'codebas
   if (vector.length === 128) return VECTOR_CONFIG.COLLECTIONS.codebase_topology_128;
   if (vector.length === 64) return VECTOR_CONFIG.COLLECTIONS.codebase_topology_64;
   throw new Error(`Unsupported vector dimension: ${vector.length}`);
+}
+
+export const CODEBASE_QDRANT_COLLECTION_PRIORITY = [
+  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
+  VECTOR_CONFIG.COLLECTIONS.codebase_chunks,
+] as const;
+
+export type CodebaseQdrantCollectionName = (typeof CODEBASE_QDRANT_COLLECTION_PRIORITY)[number];
+
+export function resolvePreferredCodebaseCollection(
+  existingCollections?: Iterable<string> | null,
+): CodebaseQdrantCollectionName | null {
+  if (!existingCollections) {
+    return CODEBASE_QDRANT_COLLECTION_PRIORITY[0];
+  }
+
+  const names = new Set(existingCollections);
+  for (const preferred of CODEBASE_QDRANT_COLLECTION_PRIORITY) {
+    if (names.has(preferred)) {
+      return preferred;
+    }
+  }
+
+  return null;
 }
 
 export function assertCollectionSlot(collection: string, slot: string): void {

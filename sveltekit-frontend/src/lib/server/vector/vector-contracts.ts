@@ -98,6 +98,8 @@ export interface DenseSearchParams {
   scoreThreshold?: number;
   filter?: Record<string, unknown>;
   skipCache?: boolean;
+  /** HNSW ef override — higher = better recall, higher latency. Use HnswEfProfile helpers. */
+  efSearch?: number;
 }
 
 /**
@@ -198,6 +200,8 @@ export interface QdrantSearchPayload {
   filter?: Record<string, unknown>;
   with_payload: boolean;
   with_vector: boolean;
+  /** Optional HNSW search-time params. Absent = Qdrant collection default. */
+  params?: { hnsw_ef: number };
 }
 
 /**
@@ -208,7 +212,7 @@ export function buildQdrantSearchRequest(
 ): QdrantSearchPayload {
   const strategy = VECTOR_STRATEGIES[params.vectorName];
 
-  return {
+  const payload: QdrantSearchPayload = {
     vector: buildQdrantVectorPayload(params.vectorName, params.queryVector),
     limit: params.limit ?? 10,
     score_threshold: params.scoreThreshold ?? strategy.score_threshold,
@@ -216,6 +220,12 @@ export function buildQdrantSearchRequest(
     with_payload: true,
     with_vector: false,
   };
+
+  if (params.efSearch !== undefined) {
+    payload.params = { hnsw_ef: params.efSearch };
+  }
+
+  return payload;
 }
 
 /**

@@ -1,16 +1,35 @@
 #!/usr/bin/env python3
 """
-CrossEncoder reranker HTTP sidecar.
-Runs on port 8093, independent of SvelteKit and Gemma4.
-Model: mixedbread-ai/mxbai-rerank-base-v2 (0.5B params, 384-dim output)
+Mixedbread CrossEncoder reranker HTTP sidecar.
+Runs on port 8099 (default), independent of SvelteKit and Gemma4.
+
+Model: mixedbread-ai/mxbai-rerank-base-v2
+  - ~0.5B params, Qwen2 causal-LM backbone
+  - Sentence Transformers CrossEncoder interface
+  - Apache-2.0 license
+  - 100+ human languages + code/SQL
+
+Candidate text format (matches Atlas canonical shape):
+  SOURCE: src/lib/server/auth.ts
+  SYMBOL: validateSession
+  KIND: function
+  CALLS: getSession, lucia.validateSession
+  <blank line>
+  <first 300 chars of chunk content>
+
+Endpoint: POST /rerank
+  { query: str, candidates: [{packet_key, text}], batch_size?: int }
+  → { ranked: [{packet_key, score}], latency_ms, vram_peak_mb, ... }
+
+Endpoint: GET /health
+  → { status, model_loaded, device, model_id }
 """
 
 from __future__ import annotations
 
-import time
 import os
-from dataclasses import dataclass
-from typing import Optional
+import time
+from typing import Annotated, Optional
 
 import torch
 from fastapi import FastAPI, HTTPException
@@ -18,72 +37,75 @@ from pydantic import BaseModel, Field
 from sentence_transformers import CrossEncoder
 import uvicorn
 
-app = FastAPI(title="CrossEncoder Reranker", version="1.0.0")
+app = FastAPI(title="Mixedbread CrossEncoder Reranker", version="2.0.0")
 
-# Model configuration
-MODEL_ID = "mixedbread-ai/mxbai-rerank-base-v2"
-MAX_LENGTH = 512
-BATCH_SIZE = 8
+MODEL_ID = os.getenv("RERANKER_MODEL", "mixedbread-ai/mxbai-rerank-base-v2")
+MAX_LENGTH = int(os.getenv("RERANKER_MAX_LENGTH", "512"))
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Global model state
 _model: Optional[CrossEncoder] = None
 _model_loaded = False
 
 
 def load_model() -> CrossEncoder:
-    """Load or cache the reranker model from Hugging Face Hub using sentence-transformers."""
     global _model, _model_loaded
-
-    if _model_loaded and _model:
+    if _model_loaded and _model is not None:
         return _model
 
-    print(f"[Reranker] Loading model {MODEL_ID}...")
+    print(f"[Reranker] Loading {MODEL_ID} on {DEVICE} …")
+    t0 = time.perf_counter()
 
-    try:
-        _model = CrossEncoder(MODEL_ID, default_activation_function=None)
-        if DEVICE == "cuda":
-            _model = _model.to("cuda")
+    # mxbai-rerank-base-v2 uses a Qwen2 causal backbone; device goes in the
+    # constructor (not .to()), and we must not pass default_activation_function.
+    _model = CrossEncoder(
+        MODEL_ID,
+        max_length=MAX_LENGTH,
+        device=DEVICE,
+        automodel_args={"torch_dtype": torch.float16 if DEVICE == "cuda" else torch.float32},
+        tokenizer_args={"use_fast": True},
+    )
 
-        _model_loaded = True
-        print(f"[Reranker] Model loaded successfully on {DEVICE}")
-        return _model
-    except Exception as e:
-        print(f"[Reranker] Failed to load model: {e}")
-        raise
+    _model_loaded = True
+    elapsed = (time.perf_counter() - t0) * 1_000
+    print(f"[Reranker] Ready in {elapsed:.0f} ms on {DEVICE}")
+    return _model
 
 
 @app.on_event("startup")
-async def startup():
-    """Load model on server startup."""
+async def on_startup() -> None:
     try:
         load_model()
-    except Exception as e:
-        print(f"[Reranker] Startup error: {e}")
-        # Non-fatal; sidecar can still respond with error
+    except Exception as exc:
+        # Non-fatal at startup — sidecar stays up, returns 503 on /rerank until fixed
+        print(f"[Reranker] Model load failed at startup: {exc}")
 
+
+# ── Request / Response models ────────────────────────────────────────────────
 
 class Candidate(BaseModel):
-    """A candidate packet to rerank."""
     packet_key: str = Field(..., min_length=1)
+    # Hydrated text in Atlas canonical format:
+    #   SOURCE: <source_ref>
+    #   SYMBOL: <function_symbol>
+    #   KIND: <node_kind>
+    #   CALLS: <comma-separated call list>
+    #
+    #   <content excerpt, first ~300 chars>
     text: str = Field(..., min_length=1)
 
 
 class RerankRequest(BaseModel):
-    """Rerank request."""
     query: str = Field(..., min_length=1)
-    candidates: list[Candidate] = Field(..., min_items=1, max_items=1024)
-    batch_size: int = Field(default=8, ge=1, le=64)
+    candidates: Annotated[list[Candidate], Field(min_length=1, max_length=1024)]
+    batch_size: Annotated[int, Field(ge=1, le=64)] = 8
 
 
 class RankedResult(BaseModel):
-    """A reranked candidate with score."""
     packet_key: str
     score: float
 
 
 class RerankResponse(BaseModel):
-    """Rerank response."""
     ranked: list[RankedResult]
     latency_ms: float
     vram_peak_mb: float
@@ -92,46 +114,45 @@ class RerankResponse(BaseModel):
     batch_count: int
 
 
+# ── Endpoints ────────────────────────────────────────────────────────────────
+
 @app.post("/rerank", response_model=RerankResponse)
 async def rerank(req: RerankRequest) -> RerankResponse:
-    """
-    Rerank candidates by query relevance using CrossEncoder.
+    """Score and rank candidates against the query using CrossEncoder."""
+    if not _model_loaded or _model is None:
+        try:
+            load_model()
+        except Exception as exc:
+            raise HTTPException(status_code=503, detail=f"Model unavailable: {exc}")
 
-    Returns top-ranked candidates with scores.
-    """
-    try:
-        model = load_model()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Model load failed: {e}")
+    model = _model
 
     if DEVICE == "cuda":
         torch.cuda.reset_peak_memory_stats()
         torch.cuda.synchronize()
 
-    started = time.perf_counter()
+    t0 = time.perf_counter()
     scored: list[tuple[str, float]] = []
     batch_count = 0
 
-    # Process candidates in batches
     for start in range(0, len(req.candidates), req.batch_size):
         batch = req.candidates[start : start + req.batch_size]
         batch_count += 1
 
-        # Pair each candidate with the query
-        pairs = [[req.query, candidate.text] for candidate in batch]
+        # CrossEncoder expects list of [query, document] string pairs
+        pairs = [[req.query, c.text] for c in batch]
 
-        # Score using sentence-transformers CrossEncoder
-        scores = model.predict(pairs, show_progress_bar=False)
+        # model.predict() returns a numpy array or list of floats
+        raw_scores = model.predict(pairs, show_progress_bar=False)
 
-        # Collect results with candidate IDs
-        for candidate, score in zip(batch, scores, strict=True):
+        for candidate, score in zip(batch, raw_scores, strict=True):
             scored.append((candidate.packet_key, float(score)))
 
     if DEVICE == "cuda":
         torch.cuda.synchronize()
-    elapsed_ms = (time.perf_counter() - started) * 1_000
 
-    # Memory stats
+    elapsed_ms = (time.perf_counter() - t0) * 1_000
+
     if DEVICE == "cuda":
         peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
         current_mb = torch.cuda.memory_allocated() / (1024 * 1024)
@@ -139,14 +160,13 @@ async def rerank(req: RerankRequest) -> RerankResponse:
         peak_mb = 0.0
         current_mb = 0.0
 
-    # Sort by score (descending)
-    ranked_results = [
-        RankedResult(packet_key=pk, score=score)
-        for pk, score in sorted(scored, key=lambda x: x[1], reverse=True)
+    ranked = [
+        RankedResult(packet_key=pk, score=s)
+        for pk, s in sorted(scored, key=lambda x: x[1], reverse=True)
     ]
 
     return RerankResponse(
-        ranked=ranked_results,
+        ranked=ranked,
         latency_ms=elapsed_ms,
         vram_peak_mb=peak_mb,
         vram_current_mb=current_mb,
@@ -157,21 +177,26 @@ async def rerank(req: RerankRequest) -> RerankResponse:
 
 @app.get("/health")
 async def health() -> dict:
-    """Health check."""
+    vram_mb = 0.0
+    if DEVICE == "cuda" and torch.cuda.is_available():
+        vram_mb = torch.cuda.memory_allocated() / (1024 * 1024)
     return {
-        "status": "healthy",
+        "status": "healthy" if _model_loaded else "loading",
         "model_loaded": _model_loaded,
         "device": DEVICE,
         "model_id": MODEL_ID,
+        "max_length": MAX_LENGTH,
+        "vram_current_mb": vram_mb,
     }
 
 
+# ── Entry point ──────────────────────────────────────────────────────────────
+
 if __name__ == "__main__":
-    port = int(os.getenv("RERANKER_PORT", "8093"))
+    port = int(os.getenv("RERANKER_PORT", "8099"))
     host = os.getenv("RERANKER_HOST", "127.0.0.1")
 
-    print(f"[Reranker] Starting on {host}:{port}")
-    print(f"[Reranker] Model: {MODEL_ID}")
-    print(f"[Reranker] Device: {DEVICE}")
+    print(f"[Reranker] {MODEL_ID}")
+    print(f"[Reranker] Listening on {host}:{port}  device={DEVICE}  max_length={MAX_LENGTH}")
 
     uvicorn.run(app, host=host, port=port, log_level="info")

@@ -1134,122 +1134,9 @@ services:
     stdin_open: true
     tty: true
 
-  # ═══════════════════════════════════════════════════════════════════
-  # LEARNING CIRCUIT: Three-Layer Gemma4 + LangGraph Orchestration
-  # Profile: learning-circuit (native llama-server.exe required, not in Docker)
-  # Usage: npm run learning-circuit:start (starts all three in parallel)
-  # ═══════════════════════════════════════════════════════════════════
-
-  # Layer 1: Observation/Classification Engine (Port 8091)
-  # Specialized Role: Error parsing, intent extraction, error type classification
-  # Input: raw error messages
-  # Output: { errorType, intent, confidence, targetSymbols, suggestedApproaches }
-  gemma4-observation:
-    image: ollama/ollama:latest
-    container_name: legal-ai-gemma4-observation
-    restart: unless-stopped
-    profiles: ["learning-circuit"]
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2.0'
-        reservations:
-          memory: 2G
-          cpus: '1.0'
-    logging:
-      driver: json-file
-      options:
-        max-size: "20m"
-        max-file: "3"
-    environment:
-      - OLLAMA_HOST=0.0.0.0:8091
-    ports:
-      - "8091:8091"
-    volumes:
-      - gemma4_observation_cache:/root/.ollama
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8091/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-  # Layer 2: Evidence Research Worker (Port 8194, remapped from 8092 due to image-synthesis conflict)
-  # Specialized Role: Deep research — AST walking, schema validation, graph expansion
-  # Input: classified error + target files
-  # Output: evidence bundle { sourceRef, symbols, schemaEvidence, retrievalScores }
-  gemma4-evidence-research:
-    image: ollama/ollama:latest
-    container_name: legal-ai-gemma4-evidence-research
-    restart: unless-stopped
-    profiles: ["learning-circuit"]
-    deploy:
-      resources:
-        limits:
-          memory: 6G
-          cpus: '3.0'
-        reservations:
-          memory: 3G
-          cpus: '1.5'
-    logging:
-      driver: json-file
-      options:
-        max-size: "20m"
-        max-file: "3"
-    environment:
-      - OLLAMA_HOST=0.0.0.0:8194
-    ports:
-      - "8194:8194"
-    volumes:
-      - gemma4_evidence_cache:/root/.ollama
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8194/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-
-  # Layer 3: Recommendation/Execution Engine (Port 8093)
-  # Specialized Role: Scoring candidates via RRF, Kanban card generation, test planning
-  # Input: evidence bundle + ranked candidates
-  # Output: recommendations { approach, confidence, suggestedFiles, testPlan, rationale }
-  gemma4-recommendation:
-    image: ollama/ollama:latest
-    container_name: legal-ai-gemma4-recommendation
-    restart: unless-stopped
-    profiles: ["learning-circuit"]
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-          cpus: '2.0'
-        reservations:
-          memory: 2G
-          cpus: '1.0'
-    logging:
-      driver: json-file
-      options:
-        max-size: "20m"
-        max-file: "3"
-    environment:
-      - OLLAMA_HOST=0.0.0.0:8093
-    ports:
-      - "8093:8093"
-    volumes:
-      - gemma4_recommendation_cache:/root/.ollama
-    networks:
-      - legal-ai-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8093/api/tags"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+  # LEARNING CIRCUIT (removed 2026-07-18)
+  # Three CPU-only Ollama gemma2:2b containers (:8091, :8194, :8093) superseded by
+  # Gemma 4 + TurboQuant at :8090. Ports 8091 and 8093 freed for other services.
 
 # ═══════════════════════════════════════════════════════════════════
 # VOLUMES — names preserved for existing data compatibility
@@ -1306,14 +1193,6 @@ volumes:
   seaweed_volume_data:
     driver: local
     name: ${SEAWEED_VOLUME_NAME:-deeds-web-app_seaweed_volume_data}
-
-  # Learning Circuit Gemma4 cache volumes (profile: learning-circuit)
-  gemma4_observation_cache:
-    driver: local
-  gemma4_evidence_cache:
-    driver: local
-  gemma4_recommendation_cache:
-    driver: local
 
   # torch.compile() / Triton kernel caches — shared between GPU containers.
   # Persists compiled sm_86 .cubin/.ttgir artefacts so containers don't recompile

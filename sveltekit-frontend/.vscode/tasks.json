@@ -431,24 +431,26 @@
 			"detail": "Ensure go-search-service is running on :8096"
 		},
 		{
-			"label": "⚡ TRACE: Start llama-server (TurboQuant)",
+			"label": "⚡ TRACE: Start llama-server (TurboQuant Safe)",
 			"type": "shell",
-			"command": "npm run turbo:start:detached",
+			"command": "npm run turbo:start:text:detached",
 			"options": {
 				"cwd": "${workspaceFolder}",
 				"env": {
 					"TURBO_CTX": "65536",
 					"LLM_CONTEXT_SIZE": "65536",
 					"LLAMA_SERVER_CTX": "65536",
-					"TURBO_PROFILE": "turboquant-safe"
+					"TURBO_PROFILE": "turboquant-safe",
+					"ENABLE_MTP_DRAFTER": "false",
+					"DEV_GPU_ENABLE_MTP": "false"
 				}
 			},
-			"isBackground": true,
+			"isBackground": false,
 			"runOptions": { "runOn": "folderOpen" },
 			"presentation": { "reveal": "silent", "panel": "dedicated", "clear": false, "showReuseMessage": false },
 			"group": "build",
 			"problemMatcher": [],
-			"detail": "Detached TurboQuant startup on :8090 with explicit 64K ctx, prompt-cache, cache-reuse, and env-pinned context settings"
+			"detail": "Target-only Gemma4 startup on :8090. Draft/MTP speculative decoding is explicitly disabled."
 		},
 
         {
