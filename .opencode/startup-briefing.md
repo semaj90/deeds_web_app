@@ -21,7 +21,7 @@ Hello James.
 - bitfrost warm: applied
 - redis mirror: PASS
 - runtime evidence packetization: materialized
-- ldjson coverage: 96.2%
+- ldjson coverage: 0%
 - recommendation matrices: READY
 - repo function registry: indexed (1479 rows)
 - mcp tool summary registry: summarized (87 groups)
@@ -31,13 +31,13 @@ Hello James.
 
 ## Validation Quality
 
-- replay trace status: pass_with_warnings
+- replay trace status: pass
 - retrieval benchmark status: pass
 - concept evidence status: LIVE_SPINE_PACKET_KEYS
 - replay trace qdrant hit pct: 100.0%
 - replay trace cache hit pct: 100.0%
-- replay trace total p50 / p95: 5741 / 6099
-- retrieval benchmark total p50 / p95: 3539 / 6081
+- replay trace total p50 / p95: 2731 / 3682
+- retrieval benchmark total p50 / p95: 2731 / 3682
 - retrieval benchmark qdrant hits: yes
 - retrieval benchmark ledger matches: yes
 - retrieval benchmark all answered: yes
@@ -53,10 +53,10 @@ Hello James.
 ## Recommended Next Lane
 
 1. Retrieval telemetry depth / replay breadth
-2. Apply the Qdrant tag mirror from the materialized packet spine so packet_key, source_ref, feature_id, lane_ids, tags, and bm25_text land in the vector payload before retrieval fusion.
-3. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
-4. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
-5. Use dev:gpu as the capture harness, but keep llama-server.exe on :8090 for chat/synthesis and Ollama/EmbeddingGemma embeddings-only; route RTX into batching, compression, and rerank, not canonical truth.
+2. With the Qdrant tag mirror applied, move to the Neo4j / GDS PageRank pass until graph scores, community labels, and sourceRef projection are fully applied.
+3. The Neo4j sourceRef projection is now applied; move to SOM 20x20 / auto-clustering once the graph lane is stable.
+4. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
+5. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
 
 ## Notes
 
@@ -65,7 +65,7 @@ Hello James.
 - runtime coverage status: HIGHER_HOP_ENRICHMENT_PENDING
 - higher-hop status: HIGHER_HOP_GAP
 - packet contract status: wired
-- packet contract ACE hit fields: packetType, canonicalSourceRef, recommendedAction, verificationCommand
+- packet contract ACE hit fields: n/a
 - higher-hop schema repair status: COMPLETE
 - higher-hop schema repair blockers: n/a
 - active temporal lane: 1 circular dependency chains of 3+ files
@@ -130,6 +130,6 @@ I will structure the summary by file/module, detailing the functions and their p
 - tool routing health status: READY
 - tool routing health live service ready: yes
 - tool routing health execution pool size: 4-6 required tools
-- recommendation workflow status: READY
+- recommendation workflow status: DRY_RUN_READY
 - turbovec plan status: READY
 

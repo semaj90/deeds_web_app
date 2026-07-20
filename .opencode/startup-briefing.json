@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T23:12:08.042Z",
+  "generatedAt": "2026-07-20T04:47:45.093Z",
   "appRoot": "C:/Users/james/Videos/deeds-web-app",
   "readOnly": true,
   "env": {
@@ -103,22 +103,22 @@
     },
     "runtimeCoverage": {
       "exists": true,
-      "generatedAt": "2026-06-14T20:53:03.675Z",
+      "generatedAt": "2026-07-19T01:54:50.913Z",
       "status": "HIGHER_HOP_ENRICHMENT_PENDING",
       "nextLane": "higher-hop enrichment backfill",
       "selectedConceptCoveragePct": 100,
       "usedConceptEdgeCoveragePct": 100,
       "joinCoveragePct": 0,
-      "somCoveragePct": 0,
-      "cacheHitPct": 96.2,
+      "somCoveragePct": 81.12,
+      "cacheHitPct": 0,
       "higherHopStatus": "HIGHER_HOP_GAP",
       "higherHopNeo4jNodeCoveragePct": 0
     },
     "replayTraceSummary": {
       "exists": true,
-      "generatedAt": "2026-06-29T00:19:10.723Z",
-      "status": "pass_with_warnings",
-      "queryCount": 5,
+      "generatedAt": "2026-07-19T09:49:58.934Z",
+      "status": "pass",
+      "queryCount": 50,
       "coverage": {
         "qdrantHitPct": "100.0%",
         "cacheHitPct": "100.0%",
@@ -127,55 +127,55 @@
         "sourceRefPct": "100.0%"
       },
       "latency": {
-        "totalP50": 5741,
-        "totalP95": 6099,
-        "bm25P50": 177,
-        "bm25P95": 178,
-        "qdrantP50": 16,
+        "totalP50": 2731,
+        "totalP95": 3682,
+        "bm25P50": 178,
+        "bm25P95": 236,
+        "qdrantP50": 12,
         "qdrantP95": 17,
-        "redisP50": 852,
-        "redisP95": 1134,
-        "neo4jP50": 128,
-        "neo4jP95": 130,
-        "fusionP50": 4694,
-        "fusionP95": 5005
+        "redisP50": 708,
+        "redisP95": 886,
+        "neo4jP50": 362,
+        "neo4jP95": 554,
+        "fusionP50": 1872,
+        "fusionP95": 2759
       },
       "top": {
-        "packetKey": "docs/+server.ts:4c62f7025d50f175",
-        "sourceRef": "src/routes/api/library/ingest-codebase-docs/+server.ts",
-        "featureId": "scripts",
-        "domainClass": null,
+        "packetKey": "packet:06de21082abe",
+        "sourceRef": "docs/atlas/parent-atlas-table-of-contents.md",
+        "featureId": "docs.parent-atlas-table-of-contents",
+        "domainClass": "documentation",
         "cacheHitSource": "valkey-semantic",
-        "fusionScore": 0.387303
+        "fusionScore": 0
       }
     },
     "retrievalBenchmark": {
       "exists": true,
-      "generatedAt": "2026-07-14T18:37:17.552Z",
+      "generatedAt": "2026-07-19T09:47:37.343Z",
       "status": "pass",
-      "queryCount": 5,
+      "queryCount": 50,
       "latency": {
-        "totalP50": 3539,
-        "totalP95": 6081,
-        "qdrantP50": 228,
-        "qdrantP95": 279,
-        "postgresP50": 836,
-        "postgresP95": 869,
-        "neo4jP50": 656,
-        "neo4jP95": 1099,
-        "redisP50": 706,
-        "redisP95": 719,
-        "gpuP50": 3,
-        "gpuP95": 4,
-        "answerP50": 1183,
-        "answerP95": 1321
+        "totalP50": 2731,
+        "totalP95": 3682,
+        "qdrantP50": 12,
+        "qdrantP95": 17,
+        "postgresP50": 823,
+        "postgresP95": 1047,
+        "neo4jP50": 362,
+        "neo4jP95": 554,
+        "redisP50": 708,
+        "redisP95": 886,
+        "gpuP50": 0,
+        "gpuP95": 0,
+        "answerP50": 473,
+        "answerP95": 1438
       },
       "gates": {
         "allQdrantHits": true,
         "allLedgerMatches": true,
         "allAnswered": true,
         "degradedQueries": 0,
-        "replayQueries": 5
+        "replayQueries": 50
       },
       "services": {
         "qdrant": "healthy",
@@ -361,30 +361,30 @@
     },
     "qdrantTagMirror": {
       "exists": true,
-      "generatedAt": "2026-07-12T00:17:15.646Z",
-      "mode": "dry-run",
-      "status": "DRY_RUN_READY",
-      "inputRows": 3,
-      "selectedRows": 3,
-      "eligibleRows": 0,
-      "patchedRows": 0,
-      "skippedNoQdrantPointId": 3,
-      "qdrantReachable": false,
-      "patchRatePct": 0,
-      "nextSafeAction": "Review the dry-run patch list, then re-run with --apply once the addressable packet materializer has produced rows."
+      "generatedAt": "2026-07-19T23:53:32.629Z",
+      "mode": "apply",
+      "status": "APPLIED",
+      "inputRows": 58309,
+      "selectedRows": 58309,
+      "eligibleRows": 5,
+      "patchedRows": 5,
+      "skippedNoQdrantPointId": 58304,
+      "qdrantReachable": true,
+      "patchRatePct": 100,
+      "nextSafeAction": "Run the materializer again only if the packet ledger changed; do not re-embed or recreate collections."
     },
     "sourceRefContextNeo4j": {
       "exists": true,
-      "generatedAt": "2026-07-17T15:16:54.216Z",
-      "status": "DRY_RUN_READY",
+      "generatedAt": "2026-07-20T01:47:43.573Z",
+      "status": "PASS",
       "totalSamples": 40,
       "readyToProjectRows": 40,
       "alreadyProjectedRows": 0,
       "missingJoinRows": 0,
-      "applyAttempted": false,
-      "applyRowsMerged": 0,
+      "applyAttempted": true,
+      "applyRowsMerged": 5,
       "applyError": null,
-      "nextSafeAction": "Create a bounded Neo4j projection writer after confirming the sourceRef -> feature_id spine stays stable."
+      "nextSafeAction": "Re-run the sourceRef projection dry-run and then move to SOM 20x20 / auto-clustering if the graph lane stays stable."
     },
     "usedPacketEdgeSeed": {
       "exists": true,
@@ -425,9 +425,9 @@
     },
     "agenticRecommendationWorkflow": {
       "exists": true,
-      "generatedAt": "2026-07-18T22:30:54.197Z",
-      "mode": "READY",
-      "status": "READY",
+      "generatedAt": "2026-07-19T19:45:50.658Z",
+      "mode": "DRY_RUN",
+      "status": "DRY_RUN_READY",
       "cardsGenerated": 17,
       "readyCount": 15,
       "blockedCount": 2,
@@ -891,12 +891,12 @@
       "appLlmsRoute": true,
       "appLlmsFullRoute": true,
       "packetContractHelper": true,
-      "packetRpc": true,
+      "packetRpc": false,
       "aceHitFieldsPresent": {
-        "packetType": true,
-        "canonicalSourceRef": true,
-        "recommendedAction": true,
-        "verificationCommand": true
+        "packetType": false,
+        "canonicalSourceRef": false,
+        "recommendedAction": false,
+        "verificationCommand": false
       },
       "nextSafeAction": "Read the shared Parent Atlas packet contract first, then use packet RPC / HyperRAG hits before broad source scans."
     },
@@ -1449,8 +1449,8 @@
         "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\llms\\parent-atlas-agent-contract.ts"
       },
       "appPacketRpc": {
-        "exists": true,
-        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\retrieval\\hyperrag-packet-rpc.ts"
+        "exists": false,
+        "path": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\routes\\api\\retrieval\\search\\+server.ts"
       },
       "runtimeCoverage": {
         "exists": true,
@@ -1607,7 +1607,7 @@
       "agentContextRun": "PASS",
       "contextGymEvals": "PASS",
       "gepaPolicyAudit": "PASS",
-      "ldjson": "96.2%",
+      "ldjson": "0%",
       "repoFunctionRegistry": "indexed (1479 rows)",
       "mcpToolSummaryRegistry": "summarized (87 groups)",
       "toolRoutingHealth": "READY",
@@ -1633,11 +1633,11 @@
       ]
     },
     "recommendations": [
-      "Apply the Qdrant tag mirror from the materialized packet spine so packet_key, source_ref, feature_id, lane_ids, tags, and bm25_text land in the vector payload before retrieval fusion.",
+      "With the Qdrant tag mirror applied, move to the Neo4j / GDS PageRank pass until graph scores, community labels, and sourceRef projection are fully applied.",
+      "The Neo4j sourceRef projection is now applied; move to SOM 20x20 / auto-clustering once the graph lane is stable.",
       "With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.",
       "Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.",
-      "Use dev:gpu as the capture harness, but keep llama-server.exe on :8090 for chat/synthesis and Ollama/EmbeddingGemma embeddings-only; route RTX into batching, compression, and rerank, not canonical truth.",
-      "Use the indexed repo function registry before broad chat routing; summarize only the top-k packet hits."
+      "Use dev:gpu as the capture harness, but keep llama-server.exe on :8090 for chat/synthesis and Ollama/EmbeddingGemma embeddings-only; route RTX into batching, compression, and rerank, not canonical truth."
     ],
     "nextLane": "Retrieval telemetry depth / replay breadth",
     "notes": {
@@ -1648,10 +1648,10 @@
       "higherHopSchemaRepairStatus": "COMPLETE",
       "packetContractStatus": "wired",
       "packetContractAceHitFields": {
-        "packetType": true,
-        "canonicalSourceRef": true,
-        "recommendedAction": true,
-        "verificationCommand": true
+        "packetType": false,
+        "canonicalSourceRef": false,
+        "recommendedAction": false,
+        "verificationCommand": false
       },
       "liveServiceEnvStatus": "READY",
       "goRetrievalHttpStatus": "READY",
@@ -1739,15 +1739,15 @@
       "toolRoutingHealthGemmaSummarizerAvailable": true,
       "toolRoutingHealthRecommendedExecutionPoolSize": "4-6 required tools",
       "validationQualityStatus": {
-        "replayTrace": "pass_with_warnings",
+        "replayTrace": "pass",
         "retrievalBenchmark": "pass",
         "conceptEvidence": "LIVE_SPINE_PACKET_KEYS"
       },
       "validationQualityReplayTrace": {
         "exists": true,
-        "generatedAt": "2026-06-29T00:19:10.723Z",
-        "status": "pass_with_warnings",
-        "queryCount": 5,
+        "generatedAt": "2026-07-19T09:49:58.934Z",
+        "status": "pass",
+        "queryCount": 50,
         "coverage": {
           "qdrantHitPct": "100.0%",
           "cacheHitPct": "100.0%",
@@ -1756,55 +1756,55 @@
           "sourceRefPct": "100.0%"
         },
         "latency": {
-          "totalP50": 5741,
-          "totalP95": 6099,
-          "bm25P50": 177,
-          "bm25P95": 178,
-          "qdrantP50": 16,
+          "totalP50": 2731,
+          "totalP95": 3682,
+          "bm25P50": 178,
+          "bm25P95": 236,
+          "qdrantP50": 12,
           "qdrantP95": 17,
-          "redisP50": 852,
-          "redisP95": 1134,
-          "neo4jP50": 128,
-          "neo4jP95": 130,
-          "fusionP50": 4694,
-          "fusionP95": 5005
+          "redisP50": 708,
+          "redisP95": 886,
+          "neo4jP50": 362,
+          "neo4jP95": 554,
+          "fusionP50": 1872,
+          "fusionP95": 2759
         },
         "top": {
-          "packetKey": "docs/+server.ts:4c62f7025d50f175",
-          "sourceRef": "src/routes/api/library/ingest-codebase-docs/+server.ts",
-          "featureId": "scripts",
-          "domainClass": null,
+          "packetKey": "packet:06de21082abe",
+          "sourceRef": "docs/atlas/parent-atlas-table-of-contents.md",
+          "featureId": "docs.parent-atlas-table-of-contents",
+          "domainClass": "documentation",
           "cacheHitSource": "valkey-semantic",
-          "fusionScore": 0.387303
+          "fusionScore": 0
         }
       },
       "validationQualityRetrievalBenchmark": {
         "exists": true,
-        "generatedAt": "2026-07-14T18:37:17.552Z",
+        "generatedAt": "2026-07-19T09:47:37.343Z",
         "status": "pass",
-        "queryCount": 5,
+        "queryCount": 50,
         "latency": {
-          "totalP50": 3539,
-          "totalP95": 6081,
-          "qdrantP50": 228,
-          "qdrantP95": 279,
-          "postgresP50": 836,
-          "postgresP95": 869,
-          "neo4jP50": 656,
-          "neo4jP95": 1099,
-          "redisP50": 706,
-          "redisP95": 719,
-          "gpuP50": 3,
-          "gpuP95": 4,
-          "answerP50": 1183,
-          "answerP95": 1321
+          "totalP50": 2731,
+          "totalP95": 3682,
+          "qdrantP50": 12,
+          "qdrantP95": 17,
+          "postgresP50": 823,
+          "postgresP95": 1047,
+          "neo4jP50": 362,
+          "neo4jP95": 554,
+          "redisP50": 708,
+          "redisP95": 886,
+          "gpuP50": 0,
+          "gpuP95": 0,
+          "answerP50": 473,
+          "answerP95": 1438
         },
         "gates": {
           "allQdrantHits": true,
           "allLedgerMatches": true,
           "allAnswered": true,
           "degradedQueries": 0,
-          "replayQueries": 5
+          "replayQueries": 50
         },
         "services": {
           "qdrant": "healthy",
@@ -1945,7 +1945,7 @@
       "conceptEvidenceSpinePacketKeysCoveragePct": 82.61,
       "conceptEvidenceSpineFeatureIdsCoveragePct": 85.98,
       "conceptEvidenceSpineEvidenceCardsCoveragePct": 82.61,
-      "agenticRecommendationWorkflowStatus": "READY",
+      "agenticRecommendationWorkflowStatus": "DRY_RUN_READY",
       "turbovecPlanStatus": "READY",
       "recommendationMatricesStatus": "READY",
       "recommendationMatricesSummary": {
