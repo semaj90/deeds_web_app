@@ -1,13 +1,13 @@
 # Qdrant / Postgres Mirror Reconciliation
 
-Generated: 2026-07-04T18:29:13.121Z
+Generated: 2026-07-19T23:23:46.843Z
 Status: IN_SYNC
 Collection: codebase_chunks_768
-Apply requested: no
+Apply requested: yes
 
 ## Summary
 
-- canonical rows: 58144
+- canonical rows: 58357
 - qdrant points scanned: 250
 - joinable points: 0
 - orphan points: 250
@@ -15,6 +15,16 @@ Apply requested: no
 - agreement after: 0
 - suggested patches: 0
 - applied patches: 0
+
+## Proof
+
+- batching logic: NOT_YET_PROVEN
+- full materialization: NOT_YET_PROVEN
+- resume semantics: RESUME_SEMANTICS_NOT_YET_PROVEN
+- atomic publication: ATOMIC_PUBLICATION_NOT_YET_PROVEN
+- qdrant mirror: PROVEN
+- identity coverage: STILL_PARTIAL
+- proof states: FULL_MATERIALIZATION_NOT_YET_PROVEN, RESUME_SEMANTICS_NOT_YET_PROVEN, ATOMIC_PUBLICATION_NOT_YET_PROVEN, QDRANT_MIRROR_PROVEN, IDENTITY_COVERAGE_STILL_PARTIAL
 
 ## Field Coverage
 
@@ -36,13 +46,13 @@ Apply requested: no
 ## Sample Orphans
 
 - 990761 (not joinable to canonical Postgres spine)
+- 1167479 (not joinable to canonical Postgres spine)
+- 1181912 (not joinable to canonical Postgres spine)
 - 1576768 (not joinable to canonical Postgres spine)
 - 1636755 (not joinable to canonical Postgres spine)
+- 2021966 (not joinable to canonical Postgres spine)
 - 2434769 (not joinable to canonical Postgres spine)
-- 4006069 (not joinable to canonical Postgres spine)
-- 4180125 (not joinable to canonical Postgres spine)
-- 4261983 (not joinable to canonical Postgres spine)
-- 5166037 (not joinable to canonical Postgres spine)
+- 3085081 (not joinable to canonical Postgres spine)
 
 ## Patch Candidates
 
@@ -50,18 +60,18 @@ Apply requested: no
 
 ## Gemma4 Context Visibility
 
-- feature_id: MISSING (sveltekit-frontend.EvidencePrimaryUpload)
-- source_ref: MISSING (sveltekit-frontend/src/lib/components/evidence/EvidencePrimaryUpload.svelte)
+- feature_id: MISSING (sveltekit-frontend.+page)
+- source_ref: MISSING (sveltekit-frontend/src/routes/(app)/demos/+page.svelte)
 - metadata: VISIBLE ([object Object])
-- packet_key: VISIBLE (packet:12dfac568730)
+- packet_key: VISIBLE (packet:1f18437ee58f)
 - cluster_id: MISSING
-- community_id: VISIBLE (38514)
-- topology_label: MISSING
+- community_id: VISIBLE (39055)
+- topology_label: VISIBLE (Graph)
 - ontology_label: MISSING
 - cluster_key: MISSING
 - kmeans_cluster: MISSING
 - som_cluster: MISSING
-- domain: VISIBLE (classification failed)
+- domain: VISIBLE (frontend)
 - qdrant_tag_id: DEFERRED
 - karpathy_score: DEFERRED
 - redis_hot_key: DEFERRED

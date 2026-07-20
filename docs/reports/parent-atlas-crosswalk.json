@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-12T19:31:15.591Z",
-  "rootCount": 18,
+  "generatedAt": "2026-07-20T04:26:39.181Z",
+  "rootCount": 19,
   "appCount": 4209,
-  "rootMatchedCount": 18,
+  "rootMatchedCount": 19,
   "rootUnmatchedCount": 0,
   "crosswalk": [
     {
@@ -405,41 +405,80 @@
       ]
     },
     {
+      "feature_id": "domain_classification_lane",
+      "status": "partial",
+      "storage_lane": "postgres + docs bootstrap + higher-hop",
+      "retrieval_lane": "domain-classification-routing",
+      "nextAction": "Backfill domain_class from sourceRef -> feature_id -> featureLabel rows, then treat Naive Bayes as a routing prior rather than an identity source.",
+      "appMatches": [
+        {
+          "featureKey": "ace_packet_integration_smoke_report",
+          "title": "ACE Packet Integration Smoke Report",
+          "status": "implemented",
+          "score": 0.4166666666666667
+        },
+        {
+          "featureKey": "sequential_vram_recovery_smoke_report",
+          "title": "Sequential VRAM Recovery Smoke Report",
+          "status": "implemented",
+          "score": 0.4166666666666667
+        },
+        {
+          "featureKey": "workstation_vram_pipeline_hygiene_smoke_report",
+          "title": "Workstation VRAM & Pipeline Hygiene Smoke Report",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "compact_384d_warden_routing_cache_prewarm_report",
+          "title": "Compact 384d Warden Routing Cache Prewarm Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "2_critical_discrepancies",
+          "title": "2. Critical Discrepancies",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
+          "featureKey": "workstation_gpu_job_mutex_queue_smoke_report",
+          "title": "Workstation GPU Job Mutex Queue Smoke Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        }
+      ]
+    },
+    {
       "feature_id": "pgvector_multi_table_lane",
       "status": "implemented",
       "storage_lane": "postgres pgvector",
       "retrieval_lane": "vector-recall",
-      "nextAction": "Keep dimension drift frozen until the live 384d/768d reconciliation is explicit.",
+      "nextAction": "Keep 768d canonical for active retrieval and quarantine 384d paths until they are explicitly migrated or retired.",
       "appMatches": [
         {
-          "featureKey": "db_schema_drift_audit_2026_05_10",
-          "title": "DB Schema Drift Audit - 2026-05-10",
+          "featureKey": "phase_15b_adaptive_retrieval_lane_routing_evaluator",
+          "title": "Phase 15B — Adaptive Retrieval Lane-Routing Evaluator",
           "status": "implemented",
-          "score": 0.3125
+          "score": 0.29411764705882354
         },
         {
-          "featureKey": "layer_1_cold_tier_ground_truth_768d",
-          "title": "Layer 1: Cold Tier — Ground Truth 768d",
+          "featureKey": "storage_tier_architecture_vector_retrieval_stack",
+          "title": "Storage Tier Architecture — Vector Retrieval Stack",
           "status": "implemented",
-          "score": 0.2916666666666667
-        },
-        {
-          "featureKey": "3_high_performance_pgvector_hnsw_indexing",
-          "title": "3. High-Performance pgvector HNSW Indexing",
-          "status": "implemented",
-          "score": 0.2916666666666667
-        },
-        {
-          "featureKey": "pgvector_hnsw_index_plan_phase_6e",
-          "title": "pgvector HNSW Index Plan (Phase 6E)",
-          "status": "implemented",
-          "score": 0.2916666666666667
-        },
-        {
-          "featureKey": "vector_dimension_policy_operator_gate_no_code_change_yet",
-          "title": "Vector Dimension Policy (operator gate — no code change yet)",
-          "status": "implemented",
-          "score": 0.2916666666666667
+          "score": 0.2857142857142857
         },
         {
           "featureKey": "drizzle_postgres_contract_report",
@@ -454,8 +493,26 @@
           "score": 0.2857142857142857
         },
         {
-          "featureKey": "db_schema_drift_2026_05_10__summary",
-          "title": "Summary",
+          "featureKey": "pgvector_hnsw_index_plan_phase_6e",
+          "title": "pgvector HNSW Index Plan (Phase 6E)",
+          "status": "implemented",
+          "score": 0.27586206896551724
+        },
+        {
+          "featureKey": "multi_lane_retrieval_health",
+          "title": "Multi-Lane Retrieval Health",
+          "status": "implemented",
+          "score": 0.2631578947368421
+        },
+        {
+          "featureKey": "2_high_dimensional_indexing_pgvector_pass",
+          "title": "2. High-Dimensional Indexing (pgvector): **PASS**",
+          "status": "implemented",
+          "score": 0.2631578947368421
+        },
+        {
+          "featureKey": "top_scripts",
+          "title": "top scripts",
           "status": "implemented",
           "score": 0.25
         }
@@ -475,46 +532,46 @@
           "score": 0.38461538461538464
         },
         {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "1_retrieval_stages",
+          "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "session_summary_april_9_2026",
+          "title": "Session Summary — April 9, 2026",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "error_analysis_architecture",
+          "title": "Error Analysis Architecture",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "script_contract",
+          "title": "Script Contract",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
           "featureKey": "6_aggregate_and_cache_active_feature_context_cards_in_redis",
           "title": "6. Aggregate and cache active feature context cards in Redis",
           "status": "implemented",
           "score": 0.3333333333333333
         },
         {
-          "featureKey": "repo_redis_ace_cards__top_entries",
-          "title": "Top Entries",
+          "featureKey": "ace_packet_integration_smoke_report",
+          "title": "ACE Packet Integration Smoke Report",
           "status": "implemented",
-          "score": 0.3076923076923077
-        },
-        {
-          "featureKey": "subgraph_instruction_programming_kag_ace_topology_todo",
-          "title": "Subgraph Instruction Programming + KAG/ACE Topology TODO",
-          "status": "implemented",
-          "score": 0.2857142857142857
-        },
-        {
-          "featureKey": "q2_2026_current",
-          "title": "Q2 2026 (Current)",
-          "status": "implemented",
-          "score": 0.2727272727272727
-        },
-        {
-          "featureKey": "missing_tables",
-          "title": "Missing Tables",
-          "status": "implemented",
-          "score": 0.2647058823529412
-        },
-        {
-          "featureKey": "session_summary_april_9_2026",
-          "title": "Session Summary — April 9, 2026",
-          "status": "implemented",
-          "score": 0.25
-        },
-        {
-          "featureKey": "native_bridge_verification_audit_2026_05_12",
-          "title": "Native Bridge Verification Audit — 2026-05-12",
-          "status": "implemented",
-          "score": 0.25
+          "score": 0.3333333333333333
         }
       ]
     },
@@ -526,8 +583,38 @@
       "nextAction": "Use as a pattern reference only; keep durable memory Postgres-first.",
       "appMatches": [
         {
+          "featureKey": "simd_bridge_memory_vram_safety_audit",
+          "title": "SIMD Bridge Memory & VRAM Safety Audit",
+          "status": "implemented",
+          "score": 0.38461538461538464
+        },
+        {
+          "featureKey": "findings",
+          "title": "Findings",
+          "status": "implemented",
+          "score": 0.36363636363636365
+        },
+        {
+          "featureKey": "drizzle_postgres_contract_report",
+          "title": "Drizzle ↔ Postgres Contract Report",
+          "status": "implemented",
+          "score": 0.35714285714285715
+        },
+        {
           "featureKey": "1_retrieval_stages",
           "title": "1. Retrieval Stages",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "session_summary_april_9_2026",
+          "title": "Session Summary — April 9, 2026",
+          "status": "implemented",
+          "score": 0.3333333333333333
+        },
+        {
+          "featureKey": "native_bridge_verification_audit_2026_05_12",
+          "title": "Native Bridge Verification Audit — 2026-05-12",
           "status": "implemented",
           "score": 0.3333333333333333
         },
@@ -538,40 +625,10 @@
           "score": 0.3333333333333333
         },
         {
-          "featureKey": "postgres17_reference",
-          "title": "postgres17-reference",
+          "featureKey": "script_contract",
+          "title": "Script Contract",
           "status": "implemented",
           "score": 0.3333333333333333
-        },
-        {
-          "featureKey": "pathway_cards_spec__root",
-          "title": "pathway-cards-spec",
-          "status": "implemented",
-          "score": 0.3
-        },
-        {
-          "featureKey": "rabbitmq_workflow_fabric",
-          "title": "RabbitMQ Workflow Fabric",
-          "status": "implemented",
-          "score": 0.3
-        },
-        {
-          "featureKey": "postgresql_17_postgres17_reference",
-          "title": "PostgreSQL 17 — postgres17-reference",
-          "status": "implemented",
-          "score": 0.29411764705882354
-        },
-        {
-          "featureKey": "workspace_and_vs_code_scope",
-          "title": "Workspace and VS Code Scope",
-          "status": "implemented",
-          "score": 0.2857142857142857
-        },
-        {
-          "featureKey": "layered_architecture",
-          "title": "Layered Architecture",
-          "status": "implemented",
-          "score": 0.2727272727272727
         }
       ]
     },

@@ -56,6 +56,7 @@ import {
 	getAtlasCacheVersions,
 	type AtlasCacheHit,
 } from '$lib/server/cache/atlas-cache-cascade.js';
+import { unifiedSearch } from '$lib/server/retrieval/service.js';
 import type { RequestHandler } from './$types';
 
 const { Pool } = pg;
@@ -73,6 +74,7 @@ const SearchSchema = z.object({
   kmeans_cluster: z.union([z.string(), z.number()]).optional(), // pre-filter hint
   skip_neo4j:   z.boolean().optional().default(false),
   skip_rerank:  z.boolean().optional().default(false),
+  use_unified_lane: z.boolean().optional().default(false), // Phase 3 A/B testing
 });
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -776,8 +778,34 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({ error: 'Invalid request', issues: parsed.error.issues }, { status: 400 });
   }
 
-  const { query, top_k, feature_id, community_id, domain_class, topology_label, ontology_label, cluster_key, kmeans_cluster, skip_neo4j, skip_rerank } = parsed.data;
+  const { query, top_k, feature_id, community_id, domain_class, topology_label, ontology_label, cluster_key, kmeans_cluster, skip_neo4j, skip_rerank, use_unified_lane } = parsed.data;
   const t0 = Date.now();
+
+  // Optional Phase 3 unified lane comparison (A/B testing)
+  if (use_unified_lane) {
+    try {
+      const unifiedResult = await unifiedSearch({
+        query,
+        k: top_k,
+        lanes: ['gpu-cuvs', 'qdrant', 'bm25'],
+        summarize: false,
+      });
+
+      return json({
+        cascade_results: null, // Omitted for brevity in A/B test
+        unified_results: unifiedResult,
+        comparison_metadata: {
+          cascade_enabled: false,
+          unified_enabled: true,
+          lanes_tested: ['gpu-cuvs', 'qdrant', 'bm25'],
+          test_mode: 'phase3_week2_integration',
+        },
+      });
+    } catch (err) {
+      console.error('[atlas/search] unified_lane error:', err instanceof Error ? err.message : '');
+      // Fall through to cascade if unified lane fails
+    }
+  }
 
   const stats: Record<string, number | string | boolean | null> = {};
   let cacheEnvelope: AtlasCacheHit | null = null;

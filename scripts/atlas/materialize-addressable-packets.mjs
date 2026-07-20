@@ -8,6 +8,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import pkg from 'pg';
 const { Pool } = pkg;
+import { deriveMaterializationProofDetail, deriveMaterializationProofStates } from './lib/materialization-proof-state.mjs';
 import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,14 +21,20 @@ const POSTGRES_PASSWORD = process.env.PARENT_ATLAS_POSTGRES_PASSWORD || '123456'
 
 const OUTPUT_NDJSON = path.join(REPO_ROOT, '.tmp', 'addressable-packets.ndjson');
 const OUTPUT_MANIFEST = path.join(REPO_ROOT, '.tmp', 'addressable-packets.manifest.json');
+const OUTPUT_STAGE_NDJSON = path.join(REPO_ROOT, '.tmp', 'addressable-packets.ndjson.stage');
+const OUTPUT_CHECKPOINT = path.join(REPO_ROOT, '.tmp', 'addressable-packets.checkpoint.json');
 const REPORT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'packet-reader-writer-audit.json');
 const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'packet-reader-writer-audit.md');
 
 const argv = process.argv.slice(2);
 const APPLY_REQUESTED = argv.includes('--apply');
+const RESUME_REQUESTED = argv.includes('--resume');
 const LIMIT = parseIntFlag(argv, '--limit', 0);
 const SAMPLE = parseIntFlag(argv, '--sample', 8);
+const BATCH_SIZE = parseIntFlag(argv, '--batch-size', 1000);
 const MAX_SOURCE_BYTES = parseIntFlag(argv, '--max-source-bytes', 12 * 1024 * 1024);
+const STOP_AFTER_BATCHES = parseIntFlag(argv, '--stop-after-batches', 0);
+const CHECKPOINT_PATH = parseStringFlag(argv, '--checkpoint-file', OUTPUT_CHECKPOINT);
 
 const TABLE_CANDIDATES = [
   'atlas_packets',
@@ -70,6 +77,53 @@ function parseIntFlag(args, name, fallback) {
     if (Number.isFinite(parsed) && parsed >= 0) return parsed;
   }
   return fallback;
+}
+
+function parseStringFlag(args, name, fallback) {
+  const prefix = `${name}=`;
+  const inline = args.find((arg) => arg.startsWith(prefix));
+  if (inline) {
+    const parsed = normalizeText(inline.slice(prefix.length));
+    if (parsed) return parsed;
+  }
+  const idx = args.findIndex((arg) => arg === name);
+  if (idx >= 0 && idx < args.length - 1) {
+    const parsed = normalizeText(args[idx + 1]);
+    if (parsed) return parsed;
+  }
+  return fallback;
+}
+
+function ensureParentDir(filePath) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+}
+
+function cleanupPath(filePath) {
+  try {
+    fs.rmSync(filePath, { force: true });
+  } catch {
+    // Ignore stale artifact cleanup failures.
+  }
+}
+
+function readJsonFileSafe(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function writeJsonFile(filePath, value) {
+  ensureParentDir(filePath);
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+}
+
+function writeNdjsonFile(filePath, rows) {
+  ensureParentDir(filePath);
+  const text = `${rows.map((row) => JSON.stringify(row)).join('\n')}${rows.length ? '\n' : ''}`;
+  fs.writeFileSync(filePath, text, 'utf8');
 }
 
 function normalizeText(value) {
@@ -189,6 +243,28 @@ function loadNdjsonFile(filePath) {
   try {
     const stat = fs.statSync(filePath);
     if (!stat.isFile() || stat.size > MAX_SOURCE_BYTES) return [];
+    return fs
+      .readFileSync(filePath, 'utf8')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        try {
+          return JSON.parse(line);
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function loadStageNdjsonFile(filePath) {
+  try {
+    const stat = fs.statSync(filePath);
+    if (!stat.isFile()) return [];
     return fs
       .readFileSync(filePath, 'utf8')
       .split(/\r?\n/)
@@ -615,7 +691,58 @@ async function findTable() {
   throw new Error(`No canonical packet table found. Tried: ${TABLE_CANDIDATES.join(', ')}`);
 }
 
-async function loadRows(table, limit = 0) {
+function buildCheckpoint({
+  sourceTable,
+  limit,
+  batchSize,
+  orderHash,
+  rowsWritten,
+  nextOffset,
+  batchNumber,
+  rowsRead,
+  interrupted = false,
+  resumeFromCheckpoint = false,
+}) {
+  return {
+    schema: 'addressable_packets_materialization_checkpoint.v1',
+    generatedAt: new Date().toISOString(),
+    sourceTable,
+    limit,
+    batchSize,
+    orderHash,
+    rowsWritten,
+    nextOffset,
+    batchNumber,
+    rowsRead,
+    interrupted,
+    resumeFromCheckpoint,
+  };
+}
+
+function validateCheckpoint(checkpoint, { sourceTable, limit, batchSize, orderHash }) {
+  if (!checkpoint || checkpoint.schema !== 'addressable_packets_materialization_checkpoint.v1') {
+    throw new Error('Invalid or unsupported checkpoint schema');
+  }
+  if (checkpoint.sourceTable !== sourceTable) throw new Error('Checkpoint source table mismatch');
+  if (Number(checkpoint.limit || 0) !== Number(limit || 0)) throw new Error('Checkpoint limit mismatch');
+  if (Number(checkpoint.batchSize || 0) !== Number(batchSize || 0)) throw new Error('Checkpoint batch size mismatch');
+  if (checkpoint.orderHash !== orderHash) throw new Error('Checkpoint ordering mismatch');
+}
+
+function writeOutputsAtomically(rows, manifest) {
+  ensureParentDir(OUTPUT_NDJSON);
+  const tmpSuffix = `${process.pid}-${Date.now()}`;
+  const tmpNdjson = `${OUTPUT_NDJSON}.tmp-${tmpSuffix}`;
+  const tmpManifest = `${OUTPUT_MANIFEST}.tmp-${tmpSuffix}`;
+  writeNdjsonFile(tmpNdjson, rows);
+  writeJsonFile(tmpManifest, manifest);
+  cleanupPath(OUTPUT_NDJSON);
+  cleanupPath(OUTPUT_MANIFEST);
+  fs.renameSync(tmpNdjson, OUTPUT_NDJSON);
+  fs.renameSync(tmpManifest, OUTPUT_MANIFEST);
+}
+
+async function loadRows(table, limit = 0, options = {}) {
   const columns = parseTsvRows(
     await runPsql(`
       select column_name
@@ -633,32 +760,127 @@ async function loadRows(table, limit = 0) {
   }
   if (orderParts.length === 0) orderParts.push('ctid asc');
 
-  const sql = `
-    select to_jsonb(t)::text as row_json
-    from public.${table} t
-    order by ${orderParts.join(', ')}
-    ${limit > 0 ? `limit ${limit}` : ''}
-  `;
+  const rows = [];
+  const pageSize = Number.isFinite(BATCH_SIZE) && BATCH_SIZE > 0 ? BATCH_SIZE : 1000;
+  const orderHash = sha256(orderParts.join('|'));
+  const checkpointPath = options.checkpointPath || CHECKPOINT_PATH;
+  const stagingPath = options.stagingPath || OUTPUT_STAGE_NDJSON;
+  const resumeRequested = options.resume === true;
+  const stopAfterBatches = Number.isFinite(options.stopAfterBatches) ? Number(options.stopAfterBatches) : 0;
+  const resumeCheckpoint = resumeRequested ? readJsonFileSafe(checkpointPath) : null;
+  let offset = 0;
+  let batchNumber = 0;
 
-  return parseTsvRows(await runPsql(sql), ['row_json']).map((row) => {
-    try {
-      return JSON.parse(row.row_json);
-    } catch {
-      return null;
+  if (resumeRequested) {
+    if (!resumeCheckpoint) throw new Error(`Resume requested but checkpoint missing: ${checkpointPath}`);
+    validateCheckpoint(resumeCheckpoint, { sourceTable: table, limit, batchSize: pageSize, orderHash });
+    const stagedRows = loadStageNdjsonFile(stagingPath);
+    if (Number(resumeCheckpoint.rowsWritten || 0) !== stagedRows.length) {
+      throw new Error(`Resume staging mismatch: checkpoint rowsWritten=${resumeCheckpoint.rowsWritten} stagedRows=${stagedRows.length}`);
     }
-  }).filter(Boolean);
-}
+    rows.push(...stagedRows);
+    offset = Number(resumeCheckpoint.nextOffset || stagedRows.length || 0);
+    batchNumber = Number(resumeCheckpoint.batchNumber || 0);
+  } else {
+    cleanupPath(stagingPath);
+    cleanupPath(checkpointPath);
+  }
 
-function writeOutputs(rows, manifest) {
-  fs.mkdirSync(path.dirname(OUTPUT_NDJSON), { recursive: true });
-  fs.writeFileSync(OUTPUT_NDJSON, `${rows.map((row) => JSON.stringify(row)).join('\n')}${rows.length ? '\n' : ''}`, 'utf8');
-  fs.writeFileSync(OUTPUT_MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
+  while (true) {
+    const remaining = limit > 0 ? limit - rows.length : pageSize;
+    const pageLimit = limit > 0 ? Math.min(pageSize, remaining) : pageSize;
+    if (pageLimit <= 0) break;
+
+    const sql = `
+      select to_jsonb(t)::text as row_json
+      from public.${table} t
+      order by ${orderParts.join(', ')}
+      limit ${pageLimit}
+      offset ${offset}
+    `;
+
+    const pageRows = parseTsvRows(await runPsql(sql), ['row_json']).map((row) => {
+      try {
+        return JSON.parse(row.row_json);
+      } catch {
+        return null;
+      }
+    }).filter(Boolean);
+
+    rows.push(...pageRows);
+    batchNumber += 1;
+
+    if (options.persistStage === true) {
+      ensureParentDir(stagingPath);
+      fs.appendFileSync(stagingPath, `${pageRows.map((row) => JSON.stringify(row)).join('\n')}${pageRows.length ? '\n' : ''}`, 'utf8');
+    }
+
+    const checkpoint = buildCheckpoint({
+      sourceTable: table,
+      limit,
+      batchSize: pageSize,
+      orderHash,
+      rowsWritten: rows.length,
+      nextOffset: offset + pageRows.length,
+      batchNumber,
+      rowsRead: rows.length,
+      interrupted: false,
+      resumeFromCheckpoint: Boolean(resumeCheckpoint),
+    });
+    writeJsonFile(checkpointPath, checkpoint);
+
+    if (stopAfterBatches > 0 && batchNumber >= stopAfterBatches) {
+      return {
+        rows,
+        interrupted: true,
+        checkpoint: buildCheckpoint({
+          sourceTable: table,
+          limit,
+          batchSize: pageSize,
+          orderHash,
+          rowsWritten: rows.length,
+          nextOffset: offset + pageRows.length,
+          batchNumber,
+          rowsRead: rows.length,
+          interrupted: true,
+          resumeFromCheckpoint: Boolean(resumeCheckpoint),
+        }),
+      };
+    }
+
+    if (pageRows.length < pageLimit) break;
+    offset += pageRows.length;
+  }
+
+  return {
+    rows,
+    interrupted: false,
+    checkpoint: buildCheckpoint({
+      sourceTable: table,
+      limit,
+      batchSize: pageSize,
+      orderHash,
+      rowsWritten: rows.length,
+      nextOffset: offset,
+      batchNumber,
+      rowsRead: rows.length,
+      interrupted: false,
+      resumeFromCheckpoint: Boolean(resumeCheckpoint),
+    }),
+  };
 }
 
 async function main() {
   const sourceTable = await findTable();
   const evidence = buildEvidenceIndex();
-  const ledgerRows = await loadRows(sourceTable, LIMIT);
+  const loaded = await loadRows(sourceTable, LIMIT, {
+    resume: RESUME_REQUESTED,
+    checkpointPath: CHECKPOINT_PATH,
+    stagingPath: OUTPUT_STAGE_NDJSON,
+    stopAfterBatches: STOP_AFTER_BATCHES,
+    persistStage: APPLY_REQUESTED || RESUME_REQUESTED,
+  });
+  const ledgerRows = loaded.rows;
   const packets = ledgerRows.map((row) => {
     const matchedEvidence = firstEvidence(
       evidence.index,
@@ -710,15 +932,47 @@ async function main() {
     outputSha256: sha256(packets.map((row) => stableStringify(row)).join('\n')),
   };
 
-  if (APPLY_REQUESTED) writeOutputs(packets, manifest);
+  if (APPLY_REQUESTED && !loaded.interrupted) {
+    writeOutputsAtomically(packets, manifest);
+    cleanupPath(OUTPUT_STAGE_NDJSON);
+    cleanupPath(CHECKPOINT_PATH);
+  }
 
   fs.mkdirSync(path.dirname(REPORT_JSON), { recursive: true });
+  const mirrorReport = readJsonFileSafe(path.join(REPO_ROOT, 'docs', 'reports', 'qdrant-postgres-mirror-reconciliation.json'));
+  const qdrantMirrorProven = Boolean(
+    mirrorReport &&
+    (
+      mirrorReport.status === 'IN_SYNC' ||
+      mirrorReport.proof?.qdrantMirror === 'PROVEN' ||
+      mirrorReport.summary?.status === 'IN_SYNC'
+    )
+  );
+  const fullMaterializationProven = Boolean(APPLY_REQUESTED && !loaded.interrupted && LIMIT <= 0);
+  const proof = deriveMaterializationProofDetail(summary, {
+    fullMaterializationProven,
+    resumeSemanticsProven: Boolean(RESUME_REQUESTED && loaded.checkpoint?.resumeFromCheckpoint),
+    atomicPublicationProven: Boolean(APPLY_REQUESTED && !loaded.interrupted),
+    qdrantMirrorProven,
+  });
   const report = {
     ...manifest,
-    status: summary.addressableRows > 0 ? (APPLY_REQUESTED ? 'MATERIALIZED' : 'DRY_RUN_READY') : 'NO_ADDRESSABLE_PACKETS',
+    checkpointPath: path.relative(REPO_ROOT, CHECKPOINT_PATH).replace(/\\/g, '/'),
+    stagingPath: path.relative(REPO_ROOT, OUTPUT_STAGE_NDJSON).replace(/\\/g, '/'),
+    interrupted: loaded.interrupted,
+    proof,
+    proofStates: deriveMaterializationProofStates(proof),
+    status: loaded.interrupted
+      ? 'INTERRUPTED'
+      : summary.addressableRows > 0
+        ? (APPLY_REQUESTED ? 'MATERIALIZED' : 'DRY_RUN_READY')
+        : 'NO_ADDRESSABLE_PACKETS',
     nextSafeAction: summary.addressableRows > 0
-      ? 'Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.'
+      ? (loaded.interrupted
+        ? `Resume with --resume --checkpoint-file=${path.relative(REPO_ROOT, CHECKPOINT_PATH).replace(/\\/g, '/')} to complete the remaining batches.`
+        : 'Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.')
       : 'Investigate why the ledger has no addressable packets before rerunning atlas:pipeline.',
+    checkpoint: loaded.checkpoint,
     samples: packets.slice(0, SAMPLE).map((row) => ({
       packet_key: row.packet_key,
       source_ref: row.source_ref,
@@ -757,6 +1011,16 @@ async function main() {
     `- missing qdrant_point_id: ${summary.missingQdrantPointId}`,
     `- missing qdrant_collection: ${summary.missingQdrantCollection}`,
     '',
+    '## Proof',
+    '',
+    `- batching logic: ${report.proof.batchingLogic}`,
+    `- full materialization: ${report.proof.fullMaterialization}`,
+    `- resume semantics: ${report.proof.resumeSemantics}`,
+    `- atomic publication: ${report.proof.atomicPublication}`,
+    `- qdrant mirror: ${report.proof.qdrantMirror}`,
+    `- identity coverage: ${report.proof.identityCoverage}`,
+    `- proof states: ${report.proofStates.join(', ')}`,
+    '',
     '## Packet Kind Counts',
     '',
     ...summary.classCounts.map((item) => `- ${item.key}: ${item.count}`),
@@ -789,8 +1053,13 @@ async function main() {
   console.log(`Wrote ${path.relative(REPO_ROOT, REPORT_JSON)}`);
   console.log(`Wrote ${path.relative(REPO_ROOT, REPORT_MD)}`);
   if (APPLY_REQUESTED) {
-    console.log(`Wrote ${path.relative(REPO_ROOT, OUTPUT_NDJSON)}`);
-    console.log(`Wrote ${path.relative(REPO_ROOT, OUTPUT_MANIFEST)}`);
+    if (loaded.interrupted) {
+      console.log(`Checkpoint: ${path.relative(REPO_ROOT, CHECKPOINT_PATH)}`);
+      console.log(`Staging: ${path.relative(REPO_ROOT, OUTPUT_STAGE_NDJSON)}`);
+    } else {
+      console.log(`Wrote ${path.relative(REPO_ROOT, OUTPUT_NDJSON)}`);
+      console.log(`Wrote ${path.relative(REPO_ROOT, OUTPUT_MANIFEST)}`);
+    }
   }
   console.log(JSON.stringify({
     status: report.status,
@@ -799,9 +1068,11 @@ async function main() {
     qdrantBackedRows: summary.qdrantBackedRows,
     evidenceMatchedRows: summary.evidenceMatchedRows,
     missingQdrantPointId: summary.missingQdrantPointId,
+    interrupted: report.interrupted,
   }, null, 2));
 
   if (pool) await pool.end();
+  if (report.status === 'INTERRUPTED') process.exitCode = 2;
 }
 
 main().catch(async (error) => {
@@ -809,4 +1080,3 @@ main().catch(async (error) => {
   console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
   process.exit(1);
 });
-

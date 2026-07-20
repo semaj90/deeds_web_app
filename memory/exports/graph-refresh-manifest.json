@@ -253,6 +253,6 @@
   },
   "generator": "scripts/atlas/write-graph-refresh-manifest.mjs",
   "notes": "Read from docs/graph/codebase-graph.json",
-  "invalidated_at": "2026-07-04T23:43:09.720Z",
+  "invalidated_at": "2026-07-20T01:00:02.752Z",
   "invalidation_reason": "classify-domain-ontology --apply completed"
 }

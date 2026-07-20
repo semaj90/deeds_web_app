@@ -14,7 +14,7 @@
 
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
-import { embedText } from '$lib/server/embedding/embed.js';
+import { embedTextDual as embedText } from '$lib/server/embedding/embed-dual-onnx-ollama.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';

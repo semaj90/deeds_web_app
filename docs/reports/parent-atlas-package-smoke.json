@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-07-19T22:07:49.745Z",
+  "status": "PASS",
+  "packageRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\parent-atlas",
+  "distEntry": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\parent-atlas\\dist\\index.js",
+  "packageJsonPath": "C:\\Users\\james\\Videos\\deeds-web-app\\packages\\parent-atlas\\package.json",
+  "smokeCommand": "node packages/parent-atlas/test/canonical-surface.test.mjs",
+  "importMode": "clean-process-node-esm",
+  "requiredExports": [
+    "extractPacketIdentityFromRow",
+    "validatePacketIdentityFromRow",
+    "verifyPacketIdentityConsistency",
+    "createEnvelopeFromRow",
+    "buildSummaryContext",
+    "makeGemma4SummaryPacket",
+    "makeChrom97Packet",
+    "toNdjsonLine",
+    "PacketValidator",
+    "loadRepoEnv",
+    "resolveRedisConfig",
+    "resolveDatabaseUrl",
+    "createQdrantAdapter",
+    "createNeo4jAdapter",
+    "createPostgresAdapter"
+  ],
+  "missingExports": [],
+  "exportCount": 48
+}

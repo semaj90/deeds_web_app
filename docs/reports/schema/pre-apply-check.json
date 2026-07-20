@@ -1,0 +1,32 @@
+{
+  "status": "PRE_APPLY_CLEAR",
+  "blockCount": 0,
+  "warnCount": 3,
+  "noteCount": 2,
+  "blocks": [],
+  "warns": [
+    {
+      "check": "MIGRATION_SQL_EXISTS",
+      "message": "SQL file for last journal entry not found: drizzle\\0037_0037_phase_102_noun_reranker.sql (may have been applied externally)"
+    },
+    {
+      "check": "TABLES_FILTER_RISKY",
+      "message": "tablesFilter may be missing protections for: kg_nodes, kg_edges, warden_, embedded_summaries"
+    },
+    {
+      "check": "LIVE_SCHEMA",
+      "message": "live-schema-redacted.json not found — run schema:inspect before applying migrations (drift check unavailable)"
+    }
+  ],
+  "notes": [
+    {
+      "check": "JOURNAL_LAST",
+      "message": "Last journal entry: idx=37 tag=0037_phase_102_noun_reranker"
+    },
+    {
+      "check": "TABLES_FILTER",
+      "message": "tablesFilter present with ~77 exclusion patterns"
+    }
+  ],
+  "generatedAt": "2026-07-19T06:38:00.156Z"
+}

@@ -1,0 +1,1132 @@
+{
+  "generated_at": "2026-07-19T22:25:59.164Z",
+  "status": "PASS_WITH_WARNINGS",
+  "signature": "089f704796c4540c1a80156d2c0c78a60a24c9bad64ecad34694277f229045ea",
+  "totals": {
+    "tables": 3,
+    "missingTables": 0,
+    "columns": 29,
+    "canonical": 28,
+    "aliasOnly": 1,
+    "missing": 0,
+    "typeMismatch": 0,
+    "indexes": 9,
+    "indexesFound": 9,
+    "indexesMissing": 0
+  },
+  "tables": [
+    {
+      "table": "atlas_tree_nodes",
+      "title": "Tree Nodes",
+      "exists": true,
+      "row_count": 116608,
+      "columns": [
+        {
+          "column_name": "node_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "NO",
+          "column_default": null,
+          "ordinal_position": 1
+        },
+        {
+          "column_name": "root_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 2
+        },
+        {
+          "column_name": "parent_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 3
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 4
+        },
+        {
+          "column_name": "feature_id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 5
+        },
+        {
+          "column_name": "feature_label",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 6
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 7
+        },
+        {
+          "column_name": "file_path",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 8
+        },
+        {
+          "column_name": "page_index_path",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 9
+        },
+        {
+          "column_name": "node_type",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": "'document'::text",
+          "ordinal_position": 10
+        },
+        {
+          "column_name": "tree_depth",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "0",
+          "ordinal_position": 11
+        },
+        {
+          "column_name": "title",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 12
+        },
+        {
+          "column_name": "summary",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 13
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "NO",
+          "column_default": "'{}'::jsonb",
+          "ordinal_position": 14
+        },
+        {
+          "column_name": "ledger_type",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": "'canonical'::text",
+          "ordinal_position": 15
+        },
+        {
+          "column_name": "lineage_version",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": "'tree-nodes-v1'::text",
+          "ordinal_position": 16
+        },
+        {
+          "column_name": "community_id",
+          "data_type": "bigint",
+          "udt_name": "int8",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 17
+        },
+        {
+          "column_name": "som_cluster",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 18
+        },
+        {
+          "column_name": "som_x",
+          "data_type": "smallint",
+          "udt_name": "int2",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 19
+        },
+        {
+          "column_name": "som_y",
+          "data_type": "smallint",
+          "udt_name": "int2",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 20
+        },
+        {
+          "column_name": "qdrant_point_id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 21
+        },
+        {
+          "column_name": "neo4j_node_id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 22
+        },
+        {
+          "column_name": "glyph_record_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 23
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "ordinal_position": 24
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "ordinal_position": 25
+        },
+        {
+          "column_name": "content_preview",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 26
+        }
+      ],
+      "groups": [
+        {
+          "canonical": "node_id",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "node_id",
+          "actual_type": "uuid",
+          "actual_db_type": "uuid",
+          "udt_name": "uuid",
+          "nullable": false,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "packet_key",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "packet_key",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "root_id",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "root_id",
+          "actual_type": "uuid",
+          "actual_db_type": "uuid",
+          "udt_name": "uuid",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "parent_id",
+          "aliases": [
+            "parent_node_id"
+          ],
+          "status": "CANONICAL",
+          "resolved_column": "parent_id",
+          "actual_type": "uuid",
+          "actual_db_type": "uuid",
+          "udt_name": "uuid",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "source_ref",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "source_ref",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "file_path",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "file_path",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "page_index_path",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "page_index_path",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "node_type",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "node_type",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": false,
+          "default": "'document'::text",
+          "type_ok": true
+        },
+        {
+          "canonical": "tree_depth",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "tree_depth",
+          "actual_type": "integer",
+          "actual_db_type": "integer",
+          "udt_name": "int4",
+          "nullable": false,
+          "default": "0",
+          "type_ok": true
+        },
+        {
+          "canonical": "title",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "title",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "summary",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "summary",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "metadata",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "metadata",
+          "actual_type": "jsonb",
+          "actual_db_type": "jsonb",
+          "udt_name": "jsonb",
+          "nullable": false,
+          "default": "'{}'::jsonb",
+          "type_ok": true
+        },
+        {
+          "canonical": "ledger_type",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "ledger_type",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": false,
+          "default": "'canonical'::text",
+          "type_ok": true
+        },
+        {
+          "canonical": "lineage_version",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "lineage_version",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": false,
+          "default": "'tree-nodes-v1'::text",
+          "type_ok": true
+        }
+      ],
+      "expectedIndexes": [
+        {
+          "label": "packet_key",
+          "columns": [
+            "packet_key"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_tree_nodes_packet_key"
+          ]
+        },
+        {
+          "label": "source_ref",
+          "columns": [
+            "source_ref"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_tree_nodes_source_ref"
+          ]
+        },
+        {
+          "label": "parent_id",
+          "columns": [
+            "parent_id",
+            "parent_node_id"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_tree_nodes_parent_id"
+          ]
+        }
+      ],
+      "counts": {
+        "total": 14,
+        "canonical": 14,
+        "aliasOnly": 0,
+        "missing": 0,
+        "typeMismatch": 0,
+        "indexes": {
+          "total": 3,
+          "found": 3,
+          "aliasOnly": 0,
+          "missing": 0
+        }
+      }
+    },
+    {
+      "table": "atlas_summary_layers",
+      "title": "Summary Layers",
+      "exists": true,
+      "row_count": 18423,
+      "columns": [
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null,
+          "ordinal_position": 1
+        },
+        {
+          "column_name": "layer_type",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 2
+        },
+        {
+          "column_name": "summary_level",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 3
+        },
+        {
+          "column_name": "summary",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 4
+        },
+        {
+          "column_name": "summary_text",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 5
+        },
+        {
+          "column_name": "keywords",
+          "data_type": "ARRAY",
+          "udt_name": "_text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 6
+        },
+        {
+          "column_name": "entities",
+          "data_type": "ARRAY",
+          "udt_name": "_text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 7
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "udt_name": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "'{}'::jsonb",
+          "ordinal_position": 8
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 9
+        },
+        {
+          "column_name": "embedding_model",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": "'embeddinggemma:latest'::text",
+          "ordinal_position": 10
+        },
+        {
+          "column_name": "vector_dim",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": "768",
+          "ordinal_position": 11
+        },
+        {
+          "column_name": "model_name",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 12
+        },
+        {
+          "column_name": "generated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 13
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()",
+          "ordinal_position": 14
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()",
+          "ordinal_position": 15
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 16
+        },
+        {
+          "column_name": "feature_id",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 17
+        },
+        {
+          "column_name": "source_ref_key",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 18
+        },
+        {
+          "column_name": "kmeans_cluster",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 19
+        },
+        {
+          "column_name": "som_x",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 20
+        },
+        {
+          "column_name": "som_y",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 21
+        }
+      ],
+      "groups": [
+        {
+          "canonical": "packet_key",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "packet_key",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": false,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "summary_type",
+          "aliases": [
+            "summary_level"
+          ],
+          "status": "ALIAS_ONLY",
+          "resolved_column": "summary_level",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "summary_text",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "summary_text",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "embedding",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "embedding",
+          "actual_type": "vector",
+          "actual_db_type": "USER-DEFINED",
+          "udt_name": "vector",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "keywords",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "keywords",
+          "actual_type": "array",
+          "actual_db_type": "ARRAY",
+          "udt_name": "_text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "metadata",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "metadata",
+          "actual_type": "jsonb",
+          "actual_db_type": "jsonb",
+          "udt_name": "jsonb",
+          "nullable": true,
+          "default": "'{}'::jsonb",
+          "type_ok": true
+        },
+        {
+          "canonical": "generated_at",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "generated_at",
+          "actual_type": "timestamp",
+          "actual_db_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "model_name",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "model_name",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        }
+      ],
+      "expectedIndexes": [
+        {
+          "label": "packet_key",
+          "columns": [
+            "packet_key"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_atlas_summary_layers_packet_key",
+            "idx_summary_layers_packet_effective_level",
+            "idx_summary_layers_packet_key"
+          ]
+        },
+        {
+          "label": "summary_type",
+          "columns": [
+            "summary_type",
+            "summary_level"
+          ],
+          "status": "ALIAS_ONLY",
+          "indexes": [
+            "idx_summary_layers_packet_effective_level"
+          ]
+        }
+      ],
+      "counts": {
+        "total": 8,
+        "canonical": 7,
+        "aliasOnly": 1,
+        "missing": 0,
+        "typeMismatch": 0,
+        "indexes": {
+          "total": 2,
+          "found": 2,
+          "aliasOnly": 1,
+          "missing": 0
+        }
+      }
+    },
+    {
+      "table": "atlas_topology_index",
+      "title": "Topology Index",
+      "exists": true,
+      "row_count": 63895,
+      "columns": [
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "NO",
+          "column_default": null,
+          "ordinal_position": 1
+        },
+        {
+          "column_name": "relation_type",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 2
+        },
+        {
+          "column_name": "x_cosine",
+          "data_type": "real",
+          "udt_name": "float4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 3
+        },
+        {
+          "column_name": "y_graph",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 4
+        },
+        {
+          "column_name": "z_som",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 5
+        },
+        {
+          "column_name": "w_authority",
+          "data_type": "real",
+          "udt_name": "float4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 6
+        },
+        {
+          "column_name": "cheirank_score",
+          "data_type": "real",
+          "udt_name": "float4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 7
+        },
+        {
+          "column_name": "cheirank_rank",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 8
+        },
+        {
+          "column_name": "som_source",
+          "data_type": "text",
+          "udt_name": "text",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 9
+        },
+        {
+          "column_name": "karpathy_score",
+          "data_type": "real",
+          "udt_name": "float4",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 10
+        },
+        {
+          "column_name": "latent_64",
+          "data_type": "bytea",
+          "udt_name": "bytea",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 11
+        },
+        {
+          "column_name": "community_id",
+          "data_type": "bigint",
+          "udt_name": "int8",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 12
+        },
+        {
+          "column_name": "tree_node_id",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 13
+        },
+        {
+          "column_name": "pagerank",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 14
+        },
+        {
+          "column_name": "betweenness",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 15
+        },
+        {
+          "column_name": "eigenvector",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 16
+        },
+        {
+          "column_name": "nn_1",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 17
+        },
+        {
+          "column_name": "nn_2",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 18
+        },
+        {
+          "column_name": "nn_3",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 19
+        },
+        {
+          "column_name": "nn_4",
+          "data_type": "uuid",
+          "udt_name": "uuid",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 20
+        },
+        {
+          "column_name": "ae_distance",
+          "data_type": "double precision",
+          "udt_name": "float8",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 21
+        },
+        {
+          "column_name": "topology_version",
+          "data_type": "integer",
+          "udt_name": "int4",
+          "is_nullable": "NO",
+          "column_default": "1",
+          "ordinal_position": 22
+        },
+        {
+          "column_name": "topology_updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": null,
+          "ordinal_position": 23
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()",
+          "ordinal_position": 24
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "udt_name": "timestamptz",
+          "is_nullable": "YES",
+          "column_default": "now()",
+          "ordinal_position": 25
+        }
+      ],
+      "groups": [
+        {
+          "canonical": "packet_key",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "packet_key",
+          "actual_type": "text",
+          "actual_db_type": "text",
+          "udt_name": "text",
+          "nullable": false,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "x_cosine",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "x_cosine",
+          "actual_type": "numeric",
+          "actual_db_type": "real",
+          "udt_name": "float4",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "y_graph",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "y_graph",
+          "actual_type": "integer",
+          "actual_db_type": "integer",
+          "udt_name": "int4",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "z_som",
+          "aliases": [
+            "som_cluster"
+          ],
+          "status": "CANONICAL",
+          "resolved_column": "z_som",
+          "actual_type": "integer",
+          "actual_db_type": "integer",
+          "udt_name": "int4",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "w_authority",
+          "aliases": [
+            "authority_score"
+          ],
+          "status": "CANONICAL",
+          "resolved_column": "w_authority",
+          "actual_type": "numeric",
+          "actual_db_type": "real",
+          "udt_name": "float4",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "community_id",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "community_id",
+          "actual_type": "integer",
+          "actual_db_type": "bigint",
+          "udt_name": "int8",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        },
+        {
+          "canonical": "tree_node_id",
+          "aliases": [],
+          "status": "CANONICAL",
+          "resolved_column": "tree_node_id",
+          "actual_type": "uuid",
+          "actual_db_type": "uuid",
+          "udt_name": "uuid",
+          "nullable": true,
+          "default": null,
+          "type_ok": true
+        }
+      ],
+      "expectedIndexes": [
+        {
+          "label": "packet_key",
+          "columns": [
+            "packet_key"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "atlas_topology_index_pkey"
+          ]
+        },
+        {
+          "label": "tree_node_id",
+          "columns": [
+            "tree_node_id"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_atlas_topology_index_tree_node_id"
+          ]
+        },
+        {
+          "label": "community_id",
+          "columns": [
+            "community_id"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_atlas_topology_index_community_id"
+          ]
+        },
+        {
+          "label": "z_som",
+          "columns": [
+            "z_som",
+            "som_cluster"
+          ],
+          "status": "CANONICAL",
+          "indexes": [
+            "idx_atlas_topology_index_z_som"
+          ]
+        }
+      ],
+      "counts": {
+        "total": 7,
+        "canonical": 7,
+        "aliasOnly": 0,
+        "missing": 0,
+        "typeMismatch": 0,
+        "indexes": {
+          "total": 4,
+          "found": 4,
+          "aliasOnly": 0,
+          "missing": 0
+        }
+      }
+    }
+  ],
+  "recommended_actions": [
+    {
+      "kind": "alias",
+      "table": "atlas_summary_layers",
+      "canonical": "summary_type",
+      "aliases": [
+        "summary_level"
+      ],
+      "action": "Normalize callsites to summary_type and preserve summary_level only as compatibility aliases."
+    }
+  ]
+}

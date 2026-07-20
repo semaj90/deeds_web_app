@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-07-20T03:07:42.154Z",
+  "mode": "apply",
+  "summary": {
+    "total_concepts": 0,
+    "updated_count": 0,
+    "skipped_count": 0,
+    "error_count": 0,
+    "compatibility_count": 0
+  },
+  "mutations": [],
+  "ace_kag_dag_hit": {
+    "ace_kag_dag_hit": {
+      "packet_kind": "concept_evidence",
+      "packet_key": "ace:packet:concept-evidence:001",
+      "source_ref": "backfill-concept-evidence-spine.mjs",
+      "feature_id": "concept_evidence_spine",
+      "evidence": [
+        "audit-concept-evidence-spine",
+        "concept_records",
+        "packet_keys"
+      ],
+      "confidence": 0.95,
+      "timestamp": "2026-07-20T03:07:42.154Z"
+    },
+    "gates": {
+      "syntax": "PASS",
+      "producer": "PENDING",
+      "artifact_valid": "PENDING",
+      "consumer_dry_run": "PASS",
+      "ace_kag_dag_hit": "PASS",
+      "smoke": "FAIL",
+      "final_apply": "DEFER"
+    },
+    "error_log": [
+      {
+        "gate": "smoke",
+        "message": "No compatible packet_keys"
+      }
+    ],
+    "topology": {
+      "community_id": null,
+      "concept_ids": []
+    },
+    "packets_affected": 7753
+  },
+  "errors": []
+}

@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "description": "Cline configuration for deeds-web-app with direct llama-server streaming + KV caching",
+
+  "models": [
+    {
+      "id": "gemma4-local",
+      "provider": "openai-compatible",
+      "baseUrl": "http://127.0.0.1:8090/v1",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
+      "displayName": "Gemma4 (Local, KV Cached)",
+      "temperature": 0.3,
+      "maxTokens": 2048,
+      "topP": 0.9,
+      "tools": {
+        "enabled": true,
+        "maxRounds": 3
+      },
+      "streaming": {
+        "enabled": true,
+        "kvCache": {
+          "enabled": true,
+          "ttl": 256,
+          "reuseBudget": 16384
+        }
+      }
+    },
+    {
+      "id": "gemma4-with-rag",
+      "provider": "openai-compatible",
+      "baseUrl": "http://127.0.0.1:5173/api/cline/chat",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
+      "displayName": "Gemma4 (With RAG Context)",
+      "temperature": 0.3,
+      "maxTokens": 4096,
+      "context": {
+        "retrieval": {
+          "enabled": true,
+          "strategy": "rag"
+        },
+        "kvCache": {
+          "enabled": true,
+          "prefillContext": true
+        }
+      }
+    }
+  ],
+
+  "defaultModel": "gemma4-local",
+
+  "tools": {
+    "enabled": true,
+    "allowlist": [
+      "bash",
+      "grep",
+      "find",
+      "read_file",
+      "write_file",
+      "edit_file",
+      "execute_code"
+    ]
+  },
+
+  "features": {
+    "codeAnalysis": {
+      "enabled": true,
+      "language": "typescript"
+    },
+    "fileWatching": true,
+    "autoSave": false,
+    "streaming": true
+  },
+
+  "performance": {
+    "lowLatency": true,
+    "kvCaching": true,
+    "directConnection": true,
+    "skipIntermediateCache": false
+  },
+
+  "debugging": {
+    "verbose": false,
+    "logRequests": false,
+    "logResponses": false
+  }
+}

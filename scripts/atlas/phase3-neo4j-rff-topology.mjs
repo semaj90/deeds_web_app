@@ -17,6 +17,15 @@
  */
 
 import neo4j from 'neo4j-driver';
+import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '../..');
+
+dotenv.config({ path: path.join(REPO_ROOT, '.env') });
+dotenv.config({ path: path.join(REPO_ROOT, 'sveltekit-frontend', '.env.local'), override: false });
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
@@ -183,6 +192,10 @@ async function verifyTopology() {
     console.log(`\n  Total RFF-critical relationships: ${totalNew}`);
 
     return totalNew > 0;
+  } catch (error) {
+    const message = error?.message || String(error);
+    console.warn(`  ⚠ Verification skipped: ${message}`);
+    return false;
   } finally {
     await session.close();
   }

@@ -1,0 +1,23 @@
+{
+  "status": "APPLY_COMPLETE",
+  "mode": "apply",
+  "startedAt": "2026-07-19T19:51:22.093Z",
+  "pairCounts": {
+    "other:optional": 58365
+  },
+  "derivedMappings": {
+    "other:optional": "cb293080-6fbd-5cbb-9997-040194f0f78e"
+  },
+  "stats": {
+    "filesProcessed": 58366,
+    "filesWithGsdId": 58365,
+    "filesAlreadyHaveId": 0,
+    "filesNewlyAssigned": 58365,
+    "filesSkipped": 0,
+    "errors": []
+  },
+  "timing": {
+    "elapsedMs": 441504
+  },
+  "completedAt": "2026-07-19T19:58:43.597Z"
+}

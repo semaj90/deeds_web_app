@@ -154,10 +154,10 @@ Approx completion: ~65%
 - 5-stage ANN cascade operational: BM25 + Qdrant ANN + TurboVec + Neo4j expansion + RRF fusion
 - XGBoost reranker (Stage 4): all 7 training gates now pass; training unblocked
 - higher-hop enrichment and supernode backfill: open
-- packet reader / writer: implementation lane for replayable NDJSON/JSONL packet flow
+- packet reader / writer: implementation lane for replayable NDJSON/JSONL packet flow; the current full-corpus bounded apply now tags batching, full materialization, resume semantics, atomic publication, and Qdrant mirror as PROVEN while identity coverage remains partial; evidence: `docs/reports/packet-reader-writer-audit.json` and `docs/reports/qdrant-postgres-mirror-reconciliation.json`
 - SOM 20x20 / auto-clustering: follows the packet reader/writer and graph pass before board consolidation
 - Qdrant embedding tags + pgvector mirror: follow the SOM pass, then refresh the kanban task board
-- packages/parent-atlas consolidation: production directory target after the staging lanes are complete
+- packages/parent-atlas consolidation: pure contract smoke PASS; downstream WSL2/Postgres/Qdrant wire-up report READY_FOR_DOWNSTREAM_IMPORT; runtime adapters remain in their server/browser lanes
 
 ### Stage 4 - Agent Memory & Scoring Pipeline
 
@@ -183,14 +183,14 @@ Current live spine: every packet has `packet_key`, `source_ref`, `feature_id`, `
 
 The next work moves into:
 
-1. Live schema reconciliation for tree nodes, summary layers, and topology indexes
-2. Neo4j / GDS topology pass on the aligned bridge spine
-3. packet reader / writer lane for replayable NDJSON/JSONL datasets
-4. RRF / Neo4j / HyperRAG wiring and packet ranking stabilization
-5. SOM 20x20 / auto-clustering pass
+1. Live schema reconciliation for tree nodes, summary layers, and topology indexes — PROVEN_WITH_WARNINGS; `node scripts/atlas/reconcile-parent-atlas-live-schema.mjs --json` PASS; evidence: `docs/reports/parent-atlas-live-schema-reconciliation.json`; live tables present, `summary_level` remains the alias lane for `summary_type`, and the audit now reflects the actual drift surface instead of a guessed schema.
+2. Replayable packet reader / writer for NDJSON and JSONL datasets — PROVEN; `node scripts/atlas/replayable-packet-reader-writer.mjs --input .tmp/addressable-packets.ndjson --apply --json` PASS; evidence: `docs/reports/parent-atlas-replayable-packet-reader-writer.json` plus `.tmp/parent-atlas-replayable-packets.ndjson` and `.tmp/parent-atlas-replayable-packets.manifest.json`; the materializer now carries explicit proof states for batching, full materialization, resume semantics, atomic publication, Qdrant mirror, and identity coverage in `docs/reports/packet-reader-writer-audit.json`.
+3. Neo4j / GDS topology pass on the aligned bridge spine — PROVEN_WITH_WARNINGS; `npm run atlas:phase16:gds:topology:dry` PASS; evidence: `docs/reports/addressable-packet-topology-report.json`; topology relationship resolved to `SIMILAR_TOPOLOGY`, with 59,692 projected nodes and 102,666 relationships.
+4. RRF / Neo4j / HyperRAG wiring and packet ranking stabilization — PROVEN_WITH_WARNINGS; `npm run atlas:phase3:neo4j:rff:dry` PASS; evidence: `docs/reports/addressable-packet-topology-report.json`; env loading now resolves Neo4j correctly, dry-run sees `SIMILAR_TOPOLOGY`, and verification classifies auth/service issues instead of crashing.
+5. SOM 20x20 / auto-clustering pass — ACTIVE_DEGRADED; `npm run atlas:validate:som:20x20 -- --gates-only` now shows Gate 4 PASS after `npm run atlas:phase16:som:adjacency:apply`; evidence: `docs/reports/som-tricubic-adjacency-report.json`; remaining blockers are 210/400 populated cells and latent_64 coverage at 2.14%, so occupancy / latent backfill still gates promotion.
 6. Qdrant embedding tags + pgvector mirror refresh
 7. Parent Atlas kanban task board refresh from validated evidence
-8. packages/atlas consolidation after the staging lanes are complete
+8. packages/parent-atlas consolidation after the staging lanes are complete
 9. XGBoost supervised reranker — train + smoke (`npm run atlas:xgboost:train` then `atlas:xgboost:serve`)
 10. Proto/RPC tool registry packetization
 11. Reward prior backfill (reward_prior column on packets without traces)
@@ -202,6 +202,21 @@ The next work moves into:
 17. high-ROI parser / embedding lanes
 18. agentic startup briefing for read-only planning bootstraps
 19. merged packet-lane implementation on the stable packet identity spine
+
+### End-to-End Missing Features Plan
+
+The missing work is now a dependency chain, not a single lane:
+
+1. Live schema reconciliation for tree nodes, summary layers, and topology indexes — PROVEN_WITH_WARNINGS; evidence: `docs/reports/parent-atlas-live-schema-reconciliation.json`.
+2. Replayable packet reader / writer for NDJSON and JSONL datasets — PROVEN; evidence: `docs/reports/parent-atlas-replayable-packet-reader-writer.json`, `.tmp/parent-atlas-replayable-packets.ndjson`, `.tmp/parent-atlas-replayable-packets.manifest.json`.
+3. Neo4j / GDS topology pass, then SOM 20x20 auto-clustering on the aligned spine.
+4. Qdrant embedding tags, pgvector mirror refresh, and semantic index mirroring.
+5. RRF stabilization, XGBoost supervised reranker smoke, and reward_prior backfill.
+6. Proto/RPC tool registry packetization plus the agentic startup briefing surface.
+7. Cold-storage manifest population and restore verification.
+8. Evaluation harnesses, replay checks, and agent-learning gates.
+9. Parent Atlas downstream import refresh and kanban board resync from validated evidence.
+10. Merged packet-lane implementation on the stable packet identity spine.
 
 ### Active GPU / Parser Lanes
 
@@ -478,7 +493,7 @@ The focused coverage/provenance cleanup is closed. Glyph presentation uses
 Next broader workstation lanes:
 
 1. Cold-storage manifest population and restore verification.
-2. `packages/parent-atlas` consolidation.
+2. `packages/parent-atlas` downstream wire-up and pure contract promotion.
 3. Evaluation and agent-learning gates.
 
 Temporal Kanban consolidation is complete. The append-only registry now holds

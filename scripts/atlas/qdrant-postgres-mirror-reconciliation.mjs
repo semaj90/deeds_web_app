@@ -5,6 +5,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
+import { deriveMaterializationProofDetail, deriveMaterializationProofStates } from './lib/materialization-proof-state.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -924,6 +925,16 @@ function renderMarkdown(report) {
     `- suggested patches: ${report.summary.patchCandidates}`,
     `- applied patches: ${report.summary.appliedPatches}`,
     '',
+    '## Proof',
+    '',
+    `- batching logic: ${report.proof.batchingLogic}`,
+    `- full materialization: ${report.proof.fullMaterialization}`,
+    `- resume semantics: ${report.proof.resumeSemantics}`,
+    `- atomic publication: ${report.proof.atomicPublication}`,
+    `- qdrant mirror: ${report.proof.qdrantMirror}`,
+    `- identity coverage: ${report.proof.identityCoverage}`,
+    `- proof states: ${report.proofStates.join(', ')}`,
+    '',
     '## Field Coverage',
     '',
     '| field | canonical | payload-present | matched | mismatched | deferred |',
@@ -1088,6 +1099,18 @@ async function main() {
       error: scroll.error ?? null,
       collectionInfo: scroll.collectionInfo ?? null,
     },
+    proof: deriveMaterializationProofDetail({
+      materializedRows: joinablePoints,
+      missingQdrantPointId: orphanPoints,
+      missingQdrantCollection: patchCandidates.length,
+      missingFeatureId: 0,
+      missingCanonicalSourceRef: 0,
+    }, {
+      fullMaterializationProven: false,
+      resumeSemanticsProven: false,
+      atomicPublicationProven: APPLY_REQUESTED && qdrantReachable && applyFailures.length === 0 && patchCandidates.length > 0,
+      qdrantMirrorProven: qdrantReachable && (patchCandidates.length === 0 || (APPLY_REQUESTED && applyFailures.length === 0)),
+    }),
     summary: {
       canonicalRows: canonicalRows.length,
       qdrantPointsScanned,
@@ -1100,6 +1123,18 @@ async function main() {
       applyFailures: applyFailures.length,
       deferredFields: Object.fromEntries(Object.entries(deferredFields).map(([key, value]) => [key, value.status])),
     },
+    proofStates: deriveMaterializationProofStates(deriveMaterializationProofDetail({
+      materializedRows: joinablePoints,
+      missingQdrantPointId: orphanPoints,
+      missingQdrantCollection: patchCandidates.length,
+      missingFeatureId: 0,
+      missingCanonicalSourceRef: 0,
+    }, {
+      fullMaterializationProven: false,
+      resumeSemanticsProven: false,
+      atomicPublicationProven: APPLY_REQUESTED && qdrantReachable && applyFailures.length === 0 && patchCandidates.length > 0,
+      qdrantMirrorProven: qdrantReachable && (patchCandidates.length === 0 || (APPLY_REQUESTED && applyFailures.length === 0)),
+    })),
     fieldCoverage,
     orphanSamples,
     patchCandidates,

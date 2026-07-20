@@ -1,0 +1,103 @@
+{
+  "generated_at": "2026-07-19T22:42:44.321Z",
+  "mode": "apply",
+  "grid_size": 20,
+  "summary": {
+    "cell_count": 400,
+    "edge_count": 2964,
+    "orthogonal_edges": 1520,
+    "diagonal_edges": 1444
+  },
+  "sample": [
+    {
+      "source_cell_id": "som:0:0",
+      "target_cell_id": "som:0:1",
+      "source_row": 0,
+      "source_col": 0,
+      "target_row": 0,
+      "target_col": 1,
+      "direction": "east",
+      "distance": 1,
+      "weight": 1
+    },
+    {
+      "source_cell_id": "som:0:0",
+      "target_cell_id": "som:1:0",
+      "source_row": 0,
+      "source_col": 0,
+      "target_row": 1,
+      "target_col": 0,
+      "direction": "south",
+      "distance": 1,
+      "weight": 1
+    },
+    {
+      "source_cell_id": "som:0:0",
+      "target_cell_id": "som:1:1",
+      "source_row": 0,
+      "source_col": 0,
+      "target_row": 1,
+      "target_col": 1,
+      "direction": "south_east",
+      "distance": 1.4142135623730951,
+      "weight": 0.707
+    },
+    {
+      "source_cell_id": "som:0:1",
+      "target_cell_id": "som:0:0",
+      "source_row": 0,
+      "source_col": 1,
+      "target_row": 0,
+      "target_col": 0,
+      "direction": "west",
+      "distance": 1,
+      "weight": 1
+    },
+    {
+      "source_cell_id": "som:0:1",
+      "target_cell_id": "som:0:2",
+      "source_row": 0,
+      "source_col": 1,
+      "target_row": 0,
+      "target_col": 2,
+      "direction": "east",
+      "distance": 1,
+      "weight": 1
+    },
+    {
+      "source_cell_id": "som:0:1",
+      "target_cell_id": "som:1:0",
+      "source_row": 0,
+      "source_col": 1,
+      "target_row": 1,
+      "target_col": 0,
+      "direction": "south_west",
+      "distance": 1.4142135623730951,
+      "weight": 0.707
+    },
+    {
+      "source_cell_id": "som:0:1",
+      "target_cell_id": "som:1:1",
+      "source_row": 0,
+      "source_col": 1,
+      "target_row": 1,
+      "target_col": 1,
+      "direction": "south",
+      "distance": 1,
+      "weight": 1
+    },
+    {
+      "source_cell_id": "som:0:1",
+      "target_cell_id": "som:1:2",
+      "source_row": 0,
+      "source_col": 1,
+      "target_row": 1,
+      "target_col": 2,
+      "direction": "south_east",
+      "distance": 1.4142135623730951,
+      "weight": 0.707
+    }
+  ],
+  "status": "PASS",
+  "output_table": "som_adjacency_matrix"
+}

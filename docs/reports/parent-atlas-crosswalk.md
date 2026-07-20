@@ -1,12 +1,12 @@
 # Parent Atlas Overlay Crosswalk
 
-Generated: 2026-06-12T19:31:15.591Z
+Generated: 2026-07-20T04:26:39.181Z
 
 ## Summary
 
-- External root entries: **18**
+- External root entries: **19**
 - App registry entries: **4209**
-- Root entries with ≥1 app match: **18**
+- Root entries with ≥1 app match: **19**
 - Root entries with zero app match: **0**
 
 ## Root → App Crosswalk
@@ -97,17 +97,29 @@ Each root lane mapped to the best-matching app features (score ≥ 0.15).
   - [0.23] `repo_qdrant_payload_atlas__top_entries` (implemented) — Top Entries
   - [0.22] `feature_parity_2026_05_10__summary` (implemented) — Summary
 
+### domain_classification_lane
+- status: partial
+- storage_lane: postgres + docs bootstrap + higher-hop
+- retrieval_lane: domain-classification-routing
+- nextAction: Backfill domain_class from sourceRef -> feature_id -> featureLabel rows, then treat Naive Bayes as a routing prior rather than an identity source.
+- App matches (top 8):
+  - [0.42] `ace_packet_integration_smoke_report` (implemented) — ACE Packet Integration Smoke Report
+  - [0.42] `sequential_vram_recovery_smoke_report` (implemented) — Sequential VRAM Recovery Smoke Report
+  - [0.38] `workstation_vram_pipeline_hygiene_smoke_report` (implemented) — Workstation VRAM & Pipeline Hygiene Smoke Report
+  - [0.36] `findings` (implemented) — Findings
+  - [0.36] `compact_384d_warden_routing_cache_prewarm_report` (implemented) — Compact 384d Warden Routing Cache Prewarm Report
+
 ### pgvector_multi_table_lane
 - status: implemented
 - storage_lane: postgres pgvector
 - retrieval_lane: vector-recall
-- nextAction: Keep dimension drift frozen until the live 384d/768d reconciliation is explicit.
+- nextAction: Keep 768d canonical for active retrieval and quarantine 384d paths until they are explicitly migrated or retired.
 - App matches (top 8):
-  - [0.31] `db_schema_drift_audit_2026_05_10` (implemented) — DB Schema Drift Audit - 2026-05-10
-  - [0.29] `layer_1_cold_tier_ground_truth_768d` (implemented) — Layer 1: Cold Tier — Ground Truth 768d
-  - [0.29] `3_high_performance_pgvector_hnsw_indexing` (implemented) — 3. High-Performance pgvector HNSW Indexing
-  - [0.29] `pgvector_hnsw_index_plan_phase_6e` (implemented) — pgvector HNSW Index Plan (Phase 6E)
-  - [0.29] `vector_dimension_policy_operator_gate_no_code_change_yet` (implemented) — Vector Dimension Policy (operator gate — no code change yet)
+  - [0.29] `phase_15b_adaptive_retrieval_lane_routing_evaluator` (implemented) — Phase 15B — Adaptive Retrieval Lane-Routing Evaluator
+  - [0.29] `storage_tier_architecture_vector_retrieval_stack` (implemented) — Storage Tier Architecture — Vector Retrieval Stack
+  - [0.29] `drizzle_postgres_contract_report` (implemented) — Drizzle ↔ Postgres Contract Report
+  - [0.29] `model_artifact_inventory_phase_9c` (implemented) — Model Artifact Inventory (Phase 9C)
+  - [0.28] `pgvector_hnsw_index_plan_phase_6e` (implemented) — pgvector HNSW Index Plan (Phase 6E)
 
 ### redis_agent_memory_server_eval
 - status: missing
@@ -116,10 +128,10 @@ Each root lane mapped to the best-matching app features (score ≥ 0.15).
 - nextAction: Evaluate in an isolated redis:8 container and compare against ACE Context Pack Cache.
 - App matches (top 8):
   - [0.38] `redis_bitfrost_lane` (implemented) — Redis/BitFrost Lane
-  - [0.33] `6_aggregate_and_cache_active_feature_context_cards_in_redis` (implemented) — 6. Aggregate and cache active feature context cards in Redis
-  - [0.31] `repo_redis_ace_cards__top_entries` (implemented) — Top Entries
-  - [0.29] `subgraph_instruction_programming_kag_ace_topology_todo` (implemented) — Subgraph Instruction Programming + KAG/ACE Topology TODO
-  - [0.27] `q2_2026_current` (implemented) — Q2 2026 (Current)
+  - [0.36] `findings` (implemented) — Findings
+  - [0.33] `1_retrieval_stages` (implemented) — 1. Retrieval Stages
+  - [0.33] `session_summary_april_9_2026` (implemented) — Session Summary — April 9, 2026
+  - [0.33] `error_analysis_architecture` (implemented) — Error Analysis Architecture
 
 ### claude_mem_opencode_reference
 - status: partial
@@ -127,11 +139,11 @@ Each root lane mapped to the best-matching app features (score ≥ 0.15).
 - retrieval_lane: open-code-memory-pattern
 - nextAction: Use as a pattern reference only; keep durable memory Postgres-first.
 - App matches (top 8):
+  - [0.38] `simd_bridge_memory_vram_safety_audit` (implemented) — SIMD Bridge Memory & VRAM Safety Audit
+  - [0.36] `findings` (implemented) — Findings
+  - [0.36] `drizzle_postgres_contract_report` (implemented) — Drizzle ↔ Postgres Contract Report
   - [0.33] `1_retrieval_stages` (implemented) — 1. Retrieval Stages
-  - [0.33] `error_analysis_architecture` (implemented) — Error Analysis Architecture
-  - [0.33] `postgres17_reference` (implemented) — postgres17-reference
-  - [0.30] `pathway_cards_spec__root` (implemented) — pathway-cards-spec
-  - [0.30] `rabbitmq_workflow_fabric` (implemented) — RabbitMQ Workflow Fabric
+  - [0.33] `session_summary_april_9_2026` (implemented) — Session Summary — April 9, 2026
 
 ### feature_gap_registry
 - status: partial

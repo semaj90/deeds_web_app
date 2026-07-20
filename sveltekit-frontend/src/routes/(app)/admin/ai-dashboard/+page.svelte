@@ -43,6 +43,13 @@
 			<p>CHR97 fast-path, Qdrant fallback, Redis cache, and sourceRefs in one operator surface.</p>
 			<span class="card-link">Open atlas studio</span>
 		</a>
+
+		<a class="hub-card infrastructure" href="/admin/graphify-readiness">
+			<div class="card-topline">Infrastructure Status</div>
+			<h2>Graphify Readiness</h2>
+			<p>Lane-by-lane pipeline status: core structural, optional enrichment, and gated integrations.</p>
+			<span class="card-link">Open readiness dashboard</span>
+		</a>
 	</section>
 </div>
 
@@ -140,6 +147,11 @@
 	.hub-card.assistant:hover {
 		border-color: rgba(96, 165, 250, 0.28);
 		background: rgba(17, 22, 28, 0.92);
+	}
+
+	.hub-card.infrastructure:hover {
+		border-color: rgba(168, 85, 247, 0.28);
+		background: rgba(24, 20, 28, 0.92);
 	}
 
 	.card-topline {

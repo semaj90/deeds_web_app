@@ -24,6 +24,7 @@ import type {
   OpenAIMessage,
   TimingTrace,
 } from './openai-types.js';
+import { parseToolCalls, hasToolCalls } from './tool-call-parser.js';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import type { ACEContext } from '$lib/server/ace/types.js';
 import {
@@ -1762,11 +1763,17 @@ export async function runChatCompletion(
     /* best-effort telemetry — ignore errors */
   }
 
+  // Check if response contains tool calls
+  const hasTools = hasToolCalls(text);
+  const toolCallData = hasTools ? parseToolCalls(text) : null;
+  const finalContent = toolCallData?.responseText || text;
+
   return wrapResponse({
-    content: text,
+    content: finalContent,
     model: finalModelUsed,
     durationMs: Date.now() - startMs,
     inferenceLane,
+    toolCalls: toolCallData?.toolCalls,
     runtimeProfile: runtime.profile,
     runtimeAvailable: runtime.runtimeAvailable,
     turboQuantEnabled: runtime.turboQuant,
@@ -1837,6 +1844,7 @@ function wrapResponse(args: {
   content: string;
   model: string;
   durationMs: number;
+  toolCalls?: Array<{ id: string; type: 'function'; function: { name: string; arguments: string } }>;
   ace: {
     used: boolean;
     chunks: number;
@@ -1908,8 +1916,12 @@ function wrapResponse(args: {
     choices: [
       {
         index: 0,
-        message: { role: 'assistant', content: assistantContent },
-        finish_reason: 'stop',
+        message: {
+          role: 'assistant',
+          content: assistantContent,
+          tool_calls: args.toolCalls && args.toolCalls.length > 0 ? args.toolCalls : undefined,
+        },
+        finish_reason: args.toolCalls && args.toolCalls.length > 0 ? 'tool_calls' : 'stop',
       },
     ],
     usage: {

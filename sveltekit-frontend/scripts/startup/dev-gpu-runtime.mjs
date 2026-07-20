@@ -179,6 +179,27 @@ async function main() {
   console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX)');
   console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
 
+  // Check graphify readiness (advisory only, non-blocking)
+  console.log('[dev:gpu] Checking graphify readiness...');
+  try {
+    const graphifyCheck = await fetch('http://127.0.0.1:5173/api/graphify/status', {
+      signal: AbortSignal.timeout(3000),
+    }).catch(() => null);
+    if (graphifyCheck?.ok) {
+      const data = await graphifyCheck.json();
+      const coreStatus = data.status?.coreStructural ?? 'unknown';
+      console.log(`[dev:gpu] ✅ Graphify core: ${coreStatus}`);
+      if (coreStatus !== 'PASS') {
+        console.log('[dev:gpu] ⚠️  Advisory: Some graphify lanes are degraded.');
+        console.log('[dev:gpu]    View: http://localhost:5173/admin/graphify-readiness');
+      }
+    } else {
+      console.log('[dev:gpu] ℹ️  Graphify status check skipped (SvelteKit not yet up)');
+    }
+  } catch {
+    console.log('[dev:gpu] ℹ️  Graphify readiness check unavailable');
+  }
+
   // Ensure TRACE MCP server is running before Vite starts
   console.log('[dev:gpu] Starting TRACE MCP server (:8788)...');
   try {
@@ -200,6 +221,39 @@ async function main() {
   } else {
     console.log(`[dev:gpu] Starting Vite dev server (:${vitePort})...\n`);
   }
+
+  // Launch downstream pipeline orchestrator in background (after Vite warmup)
+  const orchestratorScript = path.resolve(REPO_ROOT, 'scripts/atlas/graphify-trigger-downstream-pipeline.mjs');
+  const orchestratorEnv = mergedEnv({ SVELTEKIT_URL: `http://127.0.0.1:${vitePort}` });
+  const orchestratorChild = spawn('node', [orchestratorScript, '--wait-ready', '--verbose'], {
+    cwd: REPO_ROOT,
+    env: orchestratorEnv,
+    detached: process.platform !== 'win32', // Allow backgrounding on Unix
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+
+  orchestratorChild.stdout?.on('data', (data) => {
+    const lines = data.toString().split('\n').filter(l => l.trim());
+    lines.forEach(line => console.log(`[orchestrator] ${line}`));
+  });
+
+  orchestratorChild.stderr?.on('data', (data) => {
+    const lines = data.toString().split('\n').filter(l => l.trim());
+    lines.forEach(line => console.error(`[orchestrator] ${line}`));
+  });
+
+  orchestratorChild.on('exit', (code) => {
+    if (code !== 0) {
+      console.log(`[orchestrator] Exited with code ${code}`);
+    } else {
+      console.log(`[orchestrator] ✅ Pipeline complete`);
+    }
+  });
+
+  // Unref the orchestrator so it doesn't keep the process alive
+  if (orchestratorChild.unref) orchestratorChild.unref();
+
+  console.log('[dev:gpu] Downstream pipeline orchestrator started (background)\n');
 
   // Launch Vite dev server in foreground
   const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';

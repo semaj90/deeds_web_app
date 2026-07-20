@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-06-23T18:50:12.068Z",
+  "generated_at": "2026-07-19T22:35:48.529Z",
   "mode": "dry-run",
   "input_file": ".tmp/addressable-packets.enriched.ndjson",
   "statistics": {
     "total_packets_processed": 10,
     "success_count": 10,
-    "gds_enriched": 9,
+    "gds_enriched": 0,
     "som_enriched": 0,
     "error_count": 0
   },
   "neo4j": {
     "reachable": true,
-    "total_scored": 8804,
-    "resolved_matches": 9
+    "total_scored": 59631,
+    "resolved_matches": 0
   },
   "som": {
     "loaded": true,

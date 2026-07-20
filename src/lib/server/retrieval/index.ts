@@ -1,21 +1,40 @@
 /**
- * Performs a semantic search against the Qdrant vector store.
- * @param query The natural language query.
- * @param limit The maximum number of results to return.
- * @returns {Promise<RawCandidate[]>} A promise resolving to an array of raw search candidates.
- */
-/**
- * Qdrant semantic search adapter for ACE/OpenCode retrieval.
+ * Phase 3 Unified Retrieval Module
  *
- * Uses your env:
- * - OPENAI_BASE_URL=http://127.0.0.1:3040/v1
- * - OPENAI_API_KEY=_
- * - OLLAMA_EMBED_MODEL=embeddinggemma:latest
- * - QDRANT_URL=http://127.0.0.1:6333
- * - QDRANT_COLLECTION=legal_documents
- * - EMBEDDING_DIMENSION=768
+ * Consolidates retrieval logic from 5+ endpoints into unified pipeline:
+ * 1. embedQuery() - Cached embedding via Bifrost L1/L2
+ * 2. unifiedSearch() - Multi-lane orchestrator (GPU + Qdrant + BM25)
+ * 3. SearchLaneRegistry - Pluggable lane registration
+ *
+ * Backward compatible with existing RawCandidate type
  */
 
+export type {
+  SearchResult,
+  SearchRequest,
+  SearchResponse,
+  SearchLane,
+  SearchFilter,
+  SearchLaneConfig,
+  EmbeddingResult,
+} from './types.js';
+
+export { unifiedSearch, initRetrievalService } from './service.js';
+
+export { embedQuery, initEmbeddingService, getEmbeddingServiceConfig } from './embedding-service.js';
+
+export { getSearchLaneRegistry, SearchLaneRegistry, type ISearchLane } from './search-lanes.js';
+
+export {
+  getUnifiedRetrievalResult,
+  searchCodebase,
+  searchByEmbedding,
+  executeUnifiedCrossRanking,
+  fetchCanonicalRecords,
+  type LegacyRetrievalRequest,
+} from './unified-orchestrator.js';
+
+// Re-export legacy RawCandidate for backward compatibility
 export type RawCandidate = {
   score: number;
   lane: 'qdrant_atlas_index';

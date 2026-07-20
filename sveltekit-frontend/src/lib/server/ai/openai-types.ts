@@ -18,6 +18,14 @@ export const openAIMessageSchema = z.object({
   content: z.string().or(z.null()).optional(),
   name:    z.string().optional(),
   tool_call_id: z.string().optional(),
+  tool_calls: z.array(z.object({
+    id: z.string(),
+    type: z.literal('function'),
+    function: z.object({
+      name: z.string(),
+      arguments: z.string(),
+    }),
+  })).optional(),
 });
 
 export const openAIChatCompletionRequestSchema = z.object({
@@ -58,9 +66,22 @@ export interface AceHmmMeta {
 
 // ── Response ───────────────────────────────────────────────────────────────
 
+export interface ToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string; // JSON string
+  };
+}
+
 export interface OpenAIChatCompletionChoice {
   index: number;
-  message: { role: 'assistant'; content: string };
+  message: {
+    role: 'assistant';
+    content: string;
+    tool_calls?: ToolCall[];
+  };
   finish_reason: 'stop' | 'length' | 'tool_calls' | 'content_filter';
 }
 

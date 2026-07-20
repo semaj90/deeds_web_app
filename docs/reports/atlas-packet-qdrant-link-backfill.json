@@ -2,12 +2,12 @@
   "status": "WARN",
   "mode": "dry-run",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-07-11T07:16:51.328Z",
+  "started_at": "2026-07-19T23:51:07.251Z",
   "packets_loaded": 55042,
   "all_packets_loaded": 58365,
   "already_linked_seen": 0,
-  "no_postgres_join_seen": 10,
-  "qdrant_points_scanned": 10,
+  "no_postgres_join_seen": 100,
+  "qdrant_points_scanned": 100,
   "matches": 0,
   "updated": 0,
   "skipped_duplicate_packet": 0,
@@ -104,5 +104,5 @@
   "errors": [
     "Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads."
   ],
-  "finished_at": "2026-07-11T07:16:55.437Z"
+  "finished_at": "2026-07-19T23:51:10.229Z"
 }

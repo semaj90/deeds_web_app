@@ -10,12 +10,7 @@
       "sveltekit-frontend/scripts/turbovec-sidecar.py",
       "scripts/atlas/load-turbovec-index-from-qdrant.mjs"
     ],
-    "graph_neighbors": [
-      "sveltekit-frontend/scripts/index-registry.mjs",
-      "sveltekit-frontend/scripts/verify-turbovec-sidecar.py",
-      "scripts/atlas/index-registry.mjs",
-      "scripts/atlas/verify-load-turbovec-index-from-qdrant.mjs"
-    ],
+    "graph_neighbors": [],
     "prior_fixes": [
       {
         "ts": "2026-06-20T08:00:00.000Z",
@@ -30,8 +25,7 @@
       "node scripts/atlas/smoke-turbovec-ann.mjs"
     ],
     "confidence": 0.95,
-    "status": "verified",
-    "recommendation_score": 0.935
+    "status": "verified"
   },
   {
     "task_id": "rec-task-0002",
@@ -44,11 +38,7 @@
       "scripts/atlas/train-turbovec-kmeans.mjs",
       "scripts/atlas/warm-turbovec-centroids-redis.mjs"
     ],
-    "graph_neighbors": [
-      "scripts/atlas/index-registry.mjs",
-      "scripts/atlas/verify-train-turbovec-kmeans.mjs",
-      "scripts/atlas/verify-warm-turbovec-centroids-redis.mjs"
-    ],
+    "graph_neighbors": [],
     "prior_fixes": [
       {
         "ts": "2026-06-20T08:15:00.000Z",
@@ -63,8 +53,7 @@
       "node -e \"import('ioredis').then(({Redis}) => { const r = new Redis('redis://:redis@127.0.0.1:6379'); r.exists('gpu:autoencoder:centroids_64').then(e => console.log('centroids exist:', e)).then(()=>r.disconnect()) })\""
     ],
     "confidence": 0.9,
-    "status": "verified",
-    "recommendation_score": 0.9
+    "status": "verified"
   },
   {
     "task_id": "rec-task-0003",
@@ -77,12 +66,7 @@
       "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts",
       "sveltekit-frontend/src/lib/server/retrieval/hyperrag-packet-rpc.ts"
     ],
-    "graph_neighbors": [
-      "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/index-registry.mjs",
-      "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/verify-+server.ts",
-      "sveltekit-frontend/src/lib/server/retrieval/index-registry.mjs",
-      "sveltekit-frontend/src/lib/server/retrieval/verify-hyperrag-packet-rpc.ts"
-    ],
+    "graph_neighbors": [],
     "prior_fixes": [],
     "recommended_commands": [
       "node -e \"console.log('telemetry injected')\""
@@ -91,8 +75,7 @@
       "npm run smoke:hyperrag-packet-rpc"
     ],
     "confidence": 0.85,
-    "status": "ready",
-    "recommendation_score": 0.805
+    "status": "ready"
   },
   {
     "task_id": "rec-task-0004",
@@ -105,12 +88,7 @@
       "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts",
       "sveltekit-frontend/src/routes/api/atlas/search/+server.ts"
     ],
-    "graph_neighbors": [
-      "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/index-registry.mjs",
-      "sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/verify-+server.ts",
-      "sveltekit-frontend/src/routes/api/atlas/search/index-registry.mjs",
-      "sveltekit-frontend/src/routes/api/atlas/search/verify-+server.ts"
-    ],
+    "graph_neighbors": [],
     "prior_fixes": [],
     "recommended_commands": [
       "node -e \"console.log('replay trace return injected')\""
@@ -119,8 +97,7 @@
       "npm run smoke:hyperrag-packet-rpc"
     ],
     "confidence": 0.8,
-    "status": "ready",
-    "recommendation_score": 0.79
+    "status": "ready"
   },
   {
     "task_id": "rec-task-0005",
@@ -132,10 +109,7 @@
     "top_files": [
       "scripts/atlas/replay-agentic-recommendations.mjs"
     ],
-    "graph_neighbors": [
-      "scripts/atlas/index-registry.mjs",
-      "scripts/atlas/verify-replay-agentic-recommendations.mjs"
-    ],
+    "graph_neighbors": [],
     "prior_fixes": [],
     "recommended_commands": [
       "node scripts/atlas/replay-agentic-recommendations.mjs"
@@ -144,12 +118,11 @@
       "npm run atlas:recommendations:replay"
     ],
     "confidence": 0.88,
-    "status": "ready",
-    "recommendation_score": 0.609
+    "status": "ready"
   },
   {
-    "task_id": "rec-task-936d176e",
-    "trace_id": "53ee9450-0a02-49c8-b57a-e8ef90af621f",
+    "task_id": "rec-task-3577614d",
+    "trace_id": "7f9be041-91e5-4da8-93ed-ef81e2af562b",
     "intent": "error_fix",
     "query": "qdrant 64d mismatch",
     "symptom": "test_error",
@@ -162,7 +135,6 @@
       "npm run smoke:hyperrag-packet-rpc"
     ],
     "confidence": 0.7,
-    "status": "ready",
-    "recommendation_score": 0.31
+    "status": "ready"
   }
 ]

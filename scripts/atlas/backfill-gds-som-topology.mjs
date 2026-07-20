@@ -56,6 +56,27 @@ function toFloat(val) {
   return Number(val);
 }
 
+async function resolveTopologyRelationshipType(session) {
+  const candidates = ['SIMILAR_TOPOLOGY', 'SIMILAR_TO'];
+  try {
+    const result = await session.run(`
+      CALL db.relationshipTypes()
+      YIELD relationshipType
+      RETURN collect(relationshipType) AS relationshipTypes
+    `);
+    const row = result.records[0]?.toObject?.() ?? {};
+    const types = Array.isArray(row.relationshipTypes) ? row.relationshipTypes.map(String) : [];
+    for (const candidate of candidates) {
+      if (types.includes(candidate)) {
+        return candidate;
+      }
+    }
+    return types[0] || candidates[0];
+  } catch {
+    return candidates[0];
+  }
+}
+
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════════╗');
   console.log('║  GDS/SOM Topology Backfill Script                              ║');
@@ -72,13 +93,15 @@ async function main() {
   try {
     // Check projection
     console.log('   - Checking GDS projection for topoGraph...');
+    const topologyRelType = await resolveTopologyRelationshipType(neo4jSession);
+    console.log(`   - Topology relationship type: ${topologyRelType}`);
     await neo4jSession.run("CALL gds.graph.drop('topoGraph', false)").catch(() => {});
     
     const projectRes = await neo4jSession.run(`
       CALL gds.graph.project(
         'topoGraph',
         'Packet',
-        { SIMILAR_TO: { orientation: 'UNDIRECTED' } }
+        { ${topologyRelType}: { orientation: 'UNDIRECTED' } }
       )
       YIELD graphName, nodeCount, relationshipCount
       RETURN graphName, nodeCount, relationshipCount
@@ -149,7 +172,7 @@ async function main() {
     // Fetch neighbors
     console.log('   - Fetching neighbor relationships...');
     const neighborRes = await neo4jSession.run(`
-      MATCH (p:Packet)-[:SIMILAR_TO]->(n:Packet)
+      MATCH (p:Packet)-[:${topologyRelType}]->(n:Packet)
       RETURN COALESCE(p.packet_key, p.id, p.source_ref) AS source_id,
              collect(COALESCE(n.packet_key, n.id, n.source_ref)) AS neighbors
     `);

@@ -5,12 +5,12 @@
 - collection: codebase_chunks_768
 - packets_loaded: 55042
 - all_packets_loaded: 58365
-- qdrant_points_scanned: 10
+- qdrant_points_scanned: 100
 - matches: 0
 - updated: 0
 - skipped_duplicate_packet: 0
 - already_linked_seen: 0
-- no_postgres_join_seen: 10
+- no_postgres_join_seen: 100
 
 ## Matched Samples
 

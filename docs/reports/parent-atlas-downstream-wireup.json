@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-07-19T22:07:49.746Z",
+  "status": "READY_FOR_DOWNSTREAM_IMPORT",
+  "runtime": {
+    "host": "WSL2",
+    "stagingWorkspace": ".tmp",
+    "canonicalTruth": "postgres",
+    "derivedMirror": "qdrant",
+    "containerStack": [
+      "postgres",
+      "qdrant"
+    ]
+  },
+  "packageSmokeReport": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\parent-atlas-package-smoke.json",
+  "packageSmokeStatus": "PASS",
+  "services": {
+    "postgres": {
+      "url": "postgresql://127.0.0.1:5434/legal_ai_db",
+      "port": 5434,
+      "transport": "postgres",
+      "role": "Canonical packet, summary, feature, telemetry, and provenance truth store."
+    },
+    "qdrant": {
+      "url": "http://127.0.0.1:6333",
+      "port": 6333,
+      "transport": "http",
+      "role": "Dense vector mirror with payload tags; Postgres remains truth."
+    },
+    "neo4j": {
+      "url": "http://127.0.0.1:7474",
+      "port": 7474,
+      "transport": "http",
+      "role": "Graph mirror and GDS/PageRank lane, not canonical truth."
+    },
+    "redis-valkey": {
+      "url": "redis://127.0.0.1:6379",
+      "port": 6379,
+      "transport": "redis",
+      "role": "Hot cache and BitFrost semantic cache, not canonical truth."
+    }
+  }
+}

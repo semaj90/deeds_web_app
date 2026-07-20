@@ -1,28 +1,38 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-06-28T23:53:18.021Z
+Generated: 2026-07-19T23:47:54.875Z
 Status: MATERIALIZED
 Source table: atlas_packets
 
 ## Summary
 
-- ledger rows: 58304
-- materialized rows: 58304
-- addressable rows: 58304
-- qdrant-backed rows: 0
-- qdrant collection rows: 0
-- bm25 rows: 58304
-- concepts rows: 0
-- embedding ref rows: 0
-- evidence matches: 7501
+- ledger rows: 58365
+- materialized rows: 58365
+- addressable rows: 58365
+- qdrant-backed rows: 4725
+- qdrant collection rows: 4627
+- bm25 rows: 58365
+- concepts rows: 58360
+- embedding ref rows: 4627
+- evidence matches: 7690
 - missing feature_id: 0
 - missing canonical_source_ref: 0
-- missing qdrant_point_id: 58304
-- missing qdrant_collection: 58304
+- missing qdrant_point_id: 53640
+- missing qdrant_collection: 53738
+
+## Proof
+
+- batching logic: PROVEN
+- full materialization: PROVEN
+- resume semantics: PROVEN
+- atomic publication: PROVEN
+- qdrant mirror: PROVEN
+- identity coverage: STILL_PARTIAL
+- proof states: BATCHING_LOGIC_PROVEN, FULL_MATERIALIZATION_PROVEN, RESUME_SEMANTICS_PROVEN, ATOMIC_PUBLICATION_PROVEN, QDRANT_MIRROR_PROVEN, IDENTITY_COVERAGE_STILL_PARTIAL
 
 ## Packet Kind Counts
 
-- qdrant_chunk: 56552
+- qdrant_chunk: 4700
 - schema_stub: 1061
 - mcp_tool_stub: 691
 - legacy_qdrant_only: 0
@@ -30,27 +40,27 @@ Source table: atlas_packets
 
 ## Evidence Scan
 
-- files seen: 8
-- files loaded: 8
+- files seen: 7
+- files loaded: 7
 - files skipped too large: 0
-- records indexed: 8359
+- records indexed: 8358
 
 ## Output
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: e07266cc33bafc81244eb32a844ae35c0594b676fc1497b79df4421f0a95ca89
+- sha256: bd3f1486aa405e26a0d9e7e45b3cfec5b91d5ec665832ff5ade35835e88bffcf
 
 ## Samples
 
-- packet:0003260092b1 | qdrant_chunk | sveltekit-frontend.llm_synthesis_mapping | (no qdrant collection)
-- packet:0003850e84ca | qdrant_chunk | sveltekit-frontend.tests__cases-sub-routes.spec | (no qdrant collection)
-- packet:0003ab694534 | qdrant_chunk | sveltekit-frontend.tests__routes__auto__api__cache__metrics.test | (no qdrant collection)
-- packet:0003dda5e534 | qdrant_chunk | neschrom97.93f973562fff24ed | (no qdrant collection)
-- packet:0004b466d863 | qdrant_chunk | .svelte-error-fixes-backup.+layout | (no qdrant collection)
-- packet:0004f849be72 | qdrant_chunk | sveltekit-frontend.sprint5-6-monitoring.spec | (no qdrant collection)
-- packet:0006ca4a45e3 | qdrant_chunk | sveltekit-frontend.launch-2026-06-25T22-12-53-881Z | (no qdrant collection)
-- packet:0008d535a1f6 | qdrant_chunk | llama-cpp-turboquant-gemma4.completion | (no qdrant collection)
+- 0ba2345cd9c542fa | qdrant_chunk | grpc_service | codebase_chunks_768
+- 0bffe0382a0d44bb | qdrant_chunk | grpc_service | codebase_chunks_768
+- 0ee918abc8c53e8d | qdrant_chunk | grpc_service | codebase_chunks_768
+- 1703d9c005252a62 | qdrant_chunk | grpc_service | codebase_chunks_768
+- 175066b8a4ceee3c | qdrant_chunk | grpc_service | codebase_chunks_768
+- 17dc1fe9f5f8a021 | qdrant_chunk | grpc_service | codebase_chunks_768
+- 1d5eba7211dea6f9 | qdrant_chunk | grpc_service | codebase_chunks_768
+- 1dc5ac2b3cd9bfe8 | qdrant_chunk | grpc_service | codebase_chunks_768
 
 ## Next Safe Action
 

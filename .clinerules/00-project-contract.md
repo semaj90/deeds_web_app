@@ -1,5 +1,9 @@
 # Atlas universal contract
 
+- Repo authority lives in Postgres-backed canonical data and the current repo files.
+- Do not invent a parallel source of truth when a canonical module, table, or report already exists.
+- If two surfaces disagree, use the live proof artifact or canonical store, not a narrative note.
+
 - PostgreSQL is canonical truth. Repair canonical data before derived mirrors.
 - Search for existing ownership before editing: `rg "<symbol>" src/ --type ts`
 - Make the smallest patch that satisfies the active specification.

@@ -1,29 +1,29 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-06-28T23:53:18.021Z",
+  "generatedAt": "2026-07-19T23:47:54.875Z",
   "mode": "apply",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
   "outputManifest": ".tmp/addressable-packets.manifest.json",
   "summary": {
     "sourceTable": "atlas_packets",
-    "tableRows": 58304,
-    "materializedRows": 58304,
-    "addressableRows": 58304,
-    "qdrantBackedRows": 0,
-    "qdrantCollectionRows": 0,
-    "conceptsRows": 0,
-    "bm25Rows": 58304,
-    "embeddingRefRows": 0,
-    "evidenceMatchedRows": 7501,
+    "tableRows": 58365,
+    "materializedRows": 58365,
+    "addressableRows": 58365,
+    "qdrantBackedRows": 4725,
+    "qdrantCollectionRows": 4627,
+    "conceptsRows": 58360,
+    "bm25Rows": 58365,
+    "embeddingRefRows": 4627,
+    "evidenceMatchedRows": 7690,
     "missingFeatureId": 0,
     "missingCanonicalSourceRef": 0,
-    "missingQdrantPointId": 58304,
-    "missingQdrantCollection": 58304,
+    "missingQdrantPointId": 53640,
+    "missingQdrantCollection": 53738,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 56552
+        "count": 4700
       },
       {
         "key": "schema_stub",
@@ -42,134 +42,231 @@
         "count": 0
       }
     ],
-    "evidenceFilesSeen": 8,
-    "evidenceFilesLoaded": 8,
+    "evidenceFilesSeen": 7,
+    "evidenceFilesLoaded": 7,
     "evidenceFilesSkippedTooLarge": 0,
-    "evidenceRecordsIndexed": 8359
+    "evidenceRecordsIndexed": 8358
   },
   "samplePacketKeys": [
-    "packet:0003260092b1",
-    "packet:0003850e84ca",
-    "packet:0003ab694534",
-    "packet:0003dda5e534",
-    "packet:0004b466d863",
-    "packet:0004f849be72",
-    "packet:0006ca4a45e3",
-    "packet:0008d535a1f6"
+    "0ba2345cd9c542fa",
+    "0bffe0382a0d44bb",
+    "0ee918abc8c53e8d",
+    "1703d9c005252a62",
+    "175066b8a4ceee3c",
+    "17dc1fe9f5f8a021",
+    "1d5eba7211dea6f9",
+    "1dc5ac2b3cd9bfe8"
   ],
-  "outputSha256": "e07266cc33bafc81244eb32a844ae35c0594b676fc1497b79df4421f0a95ca89",
+  "outputSha256": "bd3f1486aa405e26a0d9e7e45b3cfec5b91d5ec665832ff5ade35835e88bffcf",
+  "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
+  "stagingPath": ".tmp/addressable-packets.ndjson.stage",
+  "interrupted": false,
+  "proof": {
+    "batchingLogic": "PROVEN",
+    "fullMaterialization": "PROVEN",
+    "resumeSemantics": "PROVEN",
+    "atomicPublication": "PROVEN",
+    "qdrantMirror": "PROVEN",
+    "identityCoverage": "STILL_PARTIAL"
+  },
+  "proofStates": [
+    "BATCHING_LOGIC_PROVEN",
+    "FULL_MATERIALIZATION_PROVEN",
+    "RESUME_SEMANTICS_PROVEN",
+    "ATOMIC_PUBLICATION_PROVEN",
+    "QDRANT_MIRROR_PROVEN",
+    "IDENTITY_COVERAGE_STILL_PARTIAL"
+  ],
   "status": "MATERIALIZED",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
+  "checkpoint": {
+    "schema": "addressable_packets_materialization_checkpoint.v1",
+    "generatedAt": "2026-07-19T23:47:53.780Z",
+    "sourceTable": "atlas_packets",
+    "limit": 0,
+    "batchSize": 5000,
+    "orderHash": "50c933022b74ec7d46e859cdf73c346707f43f4bfbe34106a611b415a8d35571",
+    "rowsWritten": 58365,
+    "nextOffset": 55000,
+    "batchNumber": 12,
+    "rowsRead": 58365,
+    "interrupted": false,
+    "resumeFromCheckpoint": true
+  },
   "samples": [
     {
-      "packet_key": "packet:0003260092b1",
-      "source_ref": "sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json",
-      "feature_id": "sveltekit-frontend.llm_synthesis_mapping",
+      "packet_key": "0ba2345cd9c542fa",
+      "source_ref": "proto:RetrievalService.Health",
+      "feature_id": "grpc_service",
       "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "llm_synthesis_mapping.json sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.json sveltekit-frontend/memory/runs/2026-05-29T04-11-06/llm_synthesis_mapping.js",
-      "concepts": [],
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "6154722635406530000",
+      "bm25_text": "The primary goal is to provide a high-level operational summary. --- [START OF OUTPUT] [END OF OUTPUT] gRPC Proto Services proto:RetrievalService.Health proto:RetrievalService.Heal",
+      "concepts": [
+        "embedding",
+        "grpc",
+        "health",
+        "retrieval",
+        "search",
+        "vector"
+      ],
       "tags": [
-        "llm_synthesis_mapping.json",
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
         "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "packet:0003850e84ca",
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md",
-      "feature_id": "sveltekit-frontend.tests__cases-sub-routes.spec",
+      "packet_key": "0bffe0382a0d44bb",
+      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+      "feature_id": "grpc_service",
       "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "tests__cases-sub-routes.spec.md sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.spec.md sveltekit-frontend/docs/obsidian-vault/Files/tests__cases-sub-routes.sp",
-      "concepts": [],
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "6110266167187884000",
+      "bm25_text": "This group represents the execution of a batch of tool calls via a gRPC service. It is retrieved by specifying the batch execution endpoint. The operator should use this mechanism ",
+      "concepts": [
+        "agent",
+        "batch",
+        "stream",
+        "tool_calling"
+      ],
       "tags": [
-        "qdrant_chunk",
-        "tests__cases-sub-routes.spec.md"
-      ]
-    },
-    {
-      "packet_key": "packet:0003ab694534",
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cache__metrics.test",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "tests__routes__auto__api__cache__metrics.test.md sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cache__metrics.test.md sveltekit-frontend/docs/obsidian-vaul",
-      "concepts": [],
-      "tags": [
-        "qdrant_chunk",
-        "tests__routes__auto__api__cache__metrics.test.md"
-      ]
-    },
-    {
-      "packet_key": "packet:0003dda5e534",
-      "source_ref": "neschrom97/cards/93f973562fff24ed.json",
-      "feature_id": "neschrom97.93f973562fff24ed",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "93f973562fff24ed.json neschrom97/cards/93f973562fff24ed.json neschrom97/cards/93f973562fff24ed.json",
-      "concepts": [],
-      "tags": [
-        "93f973562fff24ed.json",
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
         "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "packet:0004b466d863",
-      "source_ref": "sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
-      "feature_id": ".svelte-error-fixes-backup.+layout",
+      "packet_key": "0ee918abc8c53e8d",
+      "source_ref": "proto:TurboVecCudaService.Transform",
+      "feature_id": "grpc_service",
       "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "+layout.svelte sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte sveltekit-frontend/src/routes/(evidence)/canvas/+layout.svelte",
-      "concepts": [],
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "5039325894668581000",
+      "bm25_text": "This group summarizes the definition of a gRPC service defined in the proto:turboveccudaservice.transform file. It details the service methods, required messages, and underlying da",
+      "concepts": [
+        "cosine",
+        "cuda",
+        "gpu",
+        "grpc",
+        "turbovec",
+        "vector"
+      ],
       "tags": [
-        "+layout.svelte",
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
         "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "packet:0004f849be72",
-      "source_ref": "sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
-      "feature_id": "sveltekit-frontend.sprint5-6-monitoring.spec",
+      "packet_key": "1703d9c005252a62",
+      "source_ref": "proto:LibrarySearchService.Health",
+      "feature_id": "grpc_service",
       "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "sprint5-6-monitoring.spec.ts sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts sveltekit-frontend/tests/sprint5-6-monitoring.spec.ts",
-      "concepts": [],
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "8043140365143042000",
+      "bm25_text": "This packet group summarizes the health status of the Library Search Service via gRPC. It should be retrieved by querying the service's health endpoint. Operators should review the",
+      "concepts": [
+        "grpc",
+        "health",
+        "library",
+        "retrieval",
+        "search"
+      ],
       "tags": [
-        "qdrant_chunk",
-        "sprint5-6-monitoring.spec.ts"
-      ]
-    },
-    {
-      "packet_key": "packet:0006ca4a45e3",
-      "source_ref": "sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
-      "feature_id": "sveltekit-frontend.launch-2026-06-25T22-12-53-881Z",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "launch-2026-06-25T22-12-53-881Z.out sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out sveltekit-frontend/logs/trace-mcp/launch-2026-06-25T22-12-53-881Z.out",
-      "concepts": [],
-      "tags": [
-        "launch-2026-06-25T22-12-53-881Z.out",
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
         "qdrant_chunk"
       ]
     },
     {
-      "packet_key": "packet:0008d535a1f6",
-      "source_ref": "llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
-      "feature_id": "llama-cpp-turboquant-gemma4.completion",
+      "packet_key": "175066b8a4ceee3c",
+      "source_ref": "proto:TurboVecService.Transform",
+      "feature_id": "grpc_service",
       "packet_kind": "qdrant_chunk",
-      "qdrant_collection": null,
-      "qdrant_point_id": null,
-      "bm25_text": "completion.cpp llama-cpp-turboquant-gemma4/tools/completion/completion.cpp llama-cpp-turboquant-gemma4/tools/completion/completion.cpp",
-      "concepts": [],
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "7602461015851946000",
+      "bm25_text": "This group summarizes the functionality of applying a stored orthogonal transformation to project vectors. Retrieval should focus on the 'transform' concept within the 'turbovec' d",
+      "concepts": [
+        "cosine",
+        "search",
+        "transform",
+        "turbovec",
+        "upsert",
+        "vector"
+      ],
       "tags": [
-        "completion.cpp",
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
+        "qdrant_chunk"
+      ]
+    },
+    {
+      "packet_key": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "feature_id": "grpc_service",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "2247177181138465500",
+      "bm25_text": "This group documents the status checking mechanism for an enrichment job within the CodeIntel service. To retrieve the current status, the operator should use the gRPC client stub ",
+      "concepts": [
+        "cluster",
+        "codeintel",
+        "enrich",
+        "search"
+      ],
+      "tags": [
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
+        "qdrant_chunk"
+      ]
+    },
+    {
+      "packet_key": "1d5eba7211dea6f9",
+      "source_ref": "proto:ChatAssistantService.SendMessage",
+      "feature_id": "grpc_service",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "2565377371098813400",
+      "bm25_text": "This group summarizes the functionality for sending messages via a gRPC service. It should be retrieved when the user intends to send a message and expects a complete response. The",
+      "concepts": [
+        "chat",
+        "grpc",
+        "inference",
+        "stream"
+      ],
+      "tags": [
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
+        "qdrant_chunk"
+      ]
+    },
+    {
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "feature_id": "grpc_service",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "7101807950526120000",
+      "bm25_text": "This packet group summarizes the implementation of streaming capabilities within the library search service. It is retrieved by identifying the feature ID 'grpc_service' within the",
+      "concepts": [
+        "grpc",
+        "library",
+        "retrieval",
+        "search",
+        "stream"
+      ],
+      "tags": [
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
         "qdrant_chunk"
       ]
     }
