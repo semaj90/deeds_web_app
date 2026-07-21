@@ -1,9 +1,9 @@
 {
-  "ts": "2026-06-09T22:23:34.347Z",
-  "mode": "apply",
-  "total": 77248,
+  "ts": "2026-07-21T02:27:13.573Z",
+  "mode": "dry-run",
+  "total": 55119,
   "alreadySet": 0,
-  "updated": 52531,
-  "noise": 23467,
-  "skipped": 1250
+  "updated": 0,
+  "noise": 5027,
+  "skipped": 338
 }
