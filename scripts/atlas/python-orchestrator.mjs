@@ -19,22 +19,22 @@
  */
 
 import { spawn } from 'child_process';
-// Using 'pg' Pool might require dynamic imports or module context handling.
-// For simplicity in this POC, we'll keep the import but note the potential issue.
-import pg, { Pool } from 'pg';
-// Note: In a real setup, 'pg' connection pooling should be managed at the highest level.
-// For this module, we simulate the connection handling.
+import { fileURLToPath } from 'url';
+import { dirname, resolve } from 'path';
 
-// --- MOCK/PLACEHOLDER FOR DB CONNECTION ---
-// In a real scenario, this pool would be initialized once at application startup.
-const pgPool = new Pool({
-    // Configuration must be loaded from environment variables (e.g., process.env.DATABASE_URL)
-    user: 'postgres',
-    host: 'localhost',
-    database: 'your_db',
-    password: 'your_password',
-    port: 5432,
-});
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Dynamic import for db client (allows SvelteKit module aliases to resolve)
+async function getDbPool() {
+  try {
+    const { pool } = await import('$lib/server/db/client.js');
+    return pool;
+  } catch (err) {
+    console.warn('[Orchestrator] Could not load SvelteKit DB pool, using fallback');
+    return null;
+  }
+}
 
 /**
  * Runs an external Python script subprocess and captures its output.
@@ -86,43 +86,103 @@ function runPythonStage(pythonScriptPath, stage, limit, isDryRun) {
 
 
 /**
+ * Persists orchestration results to Postgres.
+ * @param {object} pool - Database connection pool
+ * @param {string} stageName - Stage identifier
+ * @param {object} resultData - Result data from subprocess
+ * @param {boolean} isDryRun - If true, skips actual writes
+ * @returns {Promise<object>} Summary of written records
+ */
+async function persistResults(pool, stageName, resultData, isDryRun) {
+    if (isDryRun || !pool) {
+        console.log(`[PERSIST DRY RUN] Would write ${resultData.count || 0} records for stage: ${stageName}`);
+        return { written: 0, stage: stageName };
+    }
+
+    const client = await pool.connect();
+    try {
+        // Validate result structure
+        if (!resultData.records || !Array.isArray(resultData.records)) {
+            throw new Error('Invalid result structure: missing records array');
+        }
+
+        // Example: Insert orchestration log entry
+        const query = `
+            INSERT INTO atlas_orchestration_log (stage_name, record_count, status, result_data, created_at)
+            VALUES ($1, $2, $3, $4, NOW())
+            RETURNING id
+        `;
+        const res = await client.query(query, [
+            stageName,
+            resultData.records.length,
+            'completed',
+            JSON.stringify(resultData)
+        ]);
+
+        console.log(`[DB WRITE] Persisted ${resultData.records.length} records (log entry ID: ${res.rows[0]?.id})`);
+        return { written: resultData.records.length, stage: stageName, logId: res.rows[0]?.id };
+    } finally {
+        await client.release();
+    }
+}
+
+/**
  * Main orchestration function.
  * @param {string} stageName - The name of the stage to run.
  * @param {number} limit - The batch limit.
  * @param {boolean} isDryRun - If true, only simulates writing.
- * @returns {Promise<void>}
+ * @param {object} options - Additional options
+ * @param {string} options.pythonScript - Path to Python script (relative to scripts/atlas/)
+ * @returns {Promise<object>} Orchestration result summary
  */
-export async function runOrchestrationStage(stageName, limit, isDryRun) {
+export async function runOrchestrationStage(stageName, limit, isDryRun, options = {}) {
     console.log(`\n========================================================`);
     console.log(`STARTING ATLAS ORCHESTRATION: ${stageName} ${isDryRun ? 'DRY RUN' : 'APPLY'}`);
     console.log(`========================================================`);
 
+    const pythonScript = options.pythonScript || 'phase4-model-inference.py';
+    const scriptPath = resolve(__dirname, pythonScript);
+
     try {
-        // 1. Execute the subprocess (Simulated external work)
-        const result = await runPythonStage(
-            'scripts/atlas/phase4-model-inference.py', // Placeholder script
-            stageName,
-            limit,
-            isDryRun
-        );
+        // 1. Execute the subprocess
+        console.log(`[SUBPROCESS] Running: python3 ${scriptPath}`);
+        const result = await runPythonStage(scriptPath, stageName, limit, isDryRun);
 
-        // 2. Process Results (This is where JSON parsing and validation happens)
-        // For simulation, we assume successful parsing and return the result.
-        const resultData = JSON.parse(result); // Assuming subprocess returns JSON
+        // 2. Parse and validate results
+        let resultData;
+        try {
+            resultData = JSON.parse(result);
+        } catch (err) {
+            throw new Error(`Failed to parse subprocess output as JSON: ${err.message}`);
+        }
 
-        console.log(`\n[DB WRITE] Simulating write of ${resultData.count || 'N/A'} records to Postgres...`);
-        // Example: await pool.query("UPDATE ... SET ... WHERE ... RETURNING id");
+        if (!resultData.success) {
+            throw new Error(`Subprocess reported failure: ${resultData.error || 'unknown error'}`);
+        }
+
+        // 3. Persist results to Postgres
+        const pool = await getDbPool();
+        const persistResult = await persistResults(pool, stageName, resultData, isDryRun);
 
         console.log(`\n========================================================`);
         console.log(`[COMPLETE] Orchestration Stage ${stageName} finished.`);
+        console.log(`Records processed: ${resultData.count || 0}, Written: ${persistResult.written}`);
         console.log(`========================================================`);
+
+        return {
+            stage: stageName,
+            success: true,
+            recordsProcessed: resultData.count || 0,
+            recordsWritten: persistResult.written,
+            logId: persistResult.logId,
+            timestamp: new Date().toISOString()
+        };
 
     } catch (error) {
         console.error("\n[FATAL ERROR] Orchestration failed at stage:", error.message);
-        // Re-throw to be caught by the caller's try/catch block
+        console.error("Stack:", error.stack);
         throw error;
     }
 }
 
-// Exporting necessary components for external use
 export { runOrchestrationStage };

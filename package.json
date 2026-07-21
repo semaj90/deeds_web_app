@@ -1,15 +1,15 @@
 {
   "name": "yorha-legal-ai-frontend",
   "version": "1.0.0",
-  "description": "YoRHa-styled legal AI frontend with Gemma4 integration - Phase 70 Clean",
-  "type": "module",
+  "description": "Legal AI platform",
   "scripts": {
     "dev": "...",
-    "dev:gpu": "npm --prefix sveltekit-frontend run dev:gpu",
     "build": "...",
-    "test": "...",
-    "lint": "...",
-    "turbo:start": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1",
+    "clean": "...",
+    "atlas:phase1:ast:dry": "node scripts/atlas/phase1-ast-grep-extraction.mjs --dry-run --limit=100",
+    "atlas:phase2:lexical:dry": "node scripts/atlas/phase2-lexical-extraction.mjs --dry-run --limit=100"
+  },
+  "dependencies": {
     "turbo:start:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached",
     "turbo:start:text:detached": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -Detached -TextOnly",
     "turbo:status": "pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/launch-turboquant.ps1 -StatusOnly",

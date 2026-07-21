@@ -97,6 +97,18 @@ export interface FeatureRow {
 	status:      string;
 	confidence:  number;
 	files:       readonly string[];
+	packetKey?:  string | null;
+	sourceRef?:   string | null;
+	contentHash?: string | null;
+	domainClass?: string | null;
+	keywords?:    readonly string[];
+	identifiers?: readonly string[];
+	treeNodeId?:  string | null;
+	pageRank?:    number | null;
+	somCluster?:  number | null;
+	kmeansCluster?: number | null;
+	usedConcepts?: readonly string[];
+	normalizedSource?: string;
 }
 
 export interface LoadFeaturesResult {
@@ -104,6 +116,7 @@ export interface LoadFeaturesResult {
 	byDir:    Map<string, FeatureRow[]>;
 	loadedAt: string;
 	source:   string;
+	fallbackUsed?: boolean;
 }
 
 // ── Activity rollup (context_timeline) ───────────────────────────────────────

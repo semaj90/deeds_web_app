@@ -1,0 +1,1128 @@
+{
+  "generated_at": "2026-07-21T15:58:51.443Z",
+  "tables": [
+    {
+      "table_name": "feature_implementations",
+      "row_count": "18",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_name",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "description",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "lane_ids",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "status",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "confidence",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "content_hash",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "processing_pass_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [],
+      "status": "PASS"
+    },
+    {
+      "table_name": "feature_file_edges",
+      "row_count": "34",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "file_path",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "entry_export",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "role",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "line_start",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "line_end",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "stable_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "content_hash",
+          "data_type": "text",
+          "is_nullable": "YES"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [],
+      "status": "PASS"
+    },
+    {
+      "table_name": "feature_lexical_facts",
+      "row_count": "0",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "keywords",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "identifiers",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "symbols",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "imported_modules",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "lexical_summary",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "language",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "content_hash",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "extractor_version",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "processing_pass_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [],
+      "status": "PASS"
+    },
+    {
+      "table_name": "feature_domain_facts",
+      "row_count": "61659",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "domain_class",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "domain_confidence",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "domain_probabilities",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "classifier_kind",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "classifier_version",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "model_hash",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "feature_contract_version",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "content_hash",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "processing_pass_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "evidence",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [],
+      "status": "PASS"
+    },
+    {
+      "table_name": "feature_structural_facts",
+      "row_count": "0",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "tree_node_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "symbol_name",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "symbol_kind",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "structural_path",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "line_start",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "line_end",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "imports",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "calls",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "exports",
+          "data_type": "ARRAY",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "content_hash",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "parser_version",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "processing_pass_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [],
+      "status": "PASS"
+    },
+    {
+      "table_name": "feature_ontology_tuples",
+      "row_count": "0",
+      "columns": [
+        {
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "feature_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "subject_type",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "subject_id",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "predicate",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "object_type",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "object_id",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "object_value",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "confidence",
+          "data_type": "real",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "ontology_version",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "extractor_version",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "processing_pass_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "evidence",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "valid_from",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "valid_to",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [],
+      "status": "PASS"
+    },
+    {
+      "table_name": "atlas_packets",
+      "row_count": "61659",
+      "columns": [
+        {
+          "column_name": "packet_id",
+          "data_type": "text",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "artifact_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "source_ref",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "source_ref_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "file_path",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "directory_path",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "feature_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "feature_label",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "community_id",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "concept_ids",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "cluster_id",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "payload",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "metadata",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "permissions",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "topology",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "vectors",
+          "data_type": "jsonb",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "summary",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "tags",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "byte_start",
+          "data_type": "bigint",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "byte_end",
+          "data_type": "bigint",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "sha256",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "source_kind",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "source_path",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "group_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_universe",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "qdrant_point_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "qdrant_collection",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "qdrant_vector_dim",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "identity_lane",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "identity_confidence",
+          "data_type": "double precision",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_cluster",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_row",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_col",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_index",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "kmeans_cluster",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "pagerank",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "betweenness",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "eigenvector",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "neo4j_node_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "redis_centroid_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "latent_64",
+          "data_type": "bytea",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "reward_prior",
+          "data_type": "double precision",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "function_symbol",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "content_embedding_384",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding_status",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding_timestamp",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "extracted_entities",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "keywords",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "error_pattern",
+          "data_type": "character varying",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "feature_group_id",
+          "data_type": "character varying",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "domain_class",
+          "data_type": "character varying",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "taxonomy_level",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "bm25_indexed_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "bm25_score",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "bm25_terms",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_ulid",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "title_id",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "canonical_source_ref",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "page_rank_score",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "kmeans_cluster_id",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "tree_node_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "routing_hints",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "community_source",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "community_confidence",
+          "data_type": "numeric",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "lineage_version",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "ledger_type",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "canonical",
+          "data_type": "boolean",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "payload_backfilled_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "k_core",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "ngrams",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "trigrams",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "engrams",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "used_concepts",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "topolog_cluster",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "topolog_confidence",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "topolog_method",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "topolog_applied_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "repository_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "directory_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "file_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "module_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "symbol_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "chunk_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "recovery_lane",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_cluster_id",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "ontology",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_type_test",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_type",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "packet_ontology",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "parent_packet_key",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "related_packets",
+          "data_type": "ARRAY",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "telemetry",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding_eligible",
+          "data_type": "boolean",
+          "is_nullable": "NO"
+        },
+        {
+          "column_name": "summary_hash",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding_version",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding_claimed_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "embedding_claimed_by",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "feature_envelope",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "domain_confidence",
+          "data_type": "double precision",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "title_generator_version",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "file_purpose",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "thoroughness",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "app_criticality",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "test_coverage_pct",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "file_understanding_computed_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "file_understanding_method",
+          "data_type": "text",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "openspec_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "gsd_id",
+          "data_type": "uuid",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "enrichment_updated_at",
+          "data_type": "timestamp without time zone",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_cell_x",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_cell_y",
+          "data_type": "integer",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "ast_score",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "community_boost",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "rerank_features",
+          "data_type": "jsonb",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "pagerank_score",
+          "data_type": "real",
+          "is_nullable": "YES"
+        },
+        {
+          "column_name": "som_distance",
+          "data_type": "real",
+          "is_nullable": "YES"
+        }
+      ],
+      "required_missing": [],
+      "recommended_missing": [
+        "content_hash"
+      ],
+      "status": "PASS"
+    }
+  ],
+  "tables_passed": 7,
+  "tables_failed": 0,
+  "feature_join_ready": true
+}

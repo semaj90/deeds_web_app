@@ -1,0 +1,148 @@
+{
+  "phase": "107",
+  "status": "audit_complete",
+  "audited_script": "scripts/atlas/materialize-registry-structural-lexical-domain.mts",
+  "callers": [
+    "scripts/atlas/unified-registry-repair-loop.mts"
+  ],
+  "tests_found": [],
+  "current_behavior": {
+    "source_tables": [
+      "atlas_packets",
+      "feature_structural",
+      "feature_lexical",
+      "feature_domain",
+      "feature_domains"
+    ],
+    "join_keys": [
+      "packet_key",
+      "source_ref"
+    ],
+    "output_target": "registry_enrichment_projection",
+    "output_fields": [
+      "packet_key",
+      "source_ref",
+      "symbols",
+      "ast_facts",
+      "keywords",
+      "bm25_terms",
+      "identifiers",
+      "file_tokens",
+      "domain_class",
+      "materialization_version"
+    ],
+    "conflict_key": "packet_key",
+    "dry_run_writes": false,
+    "missing_columns_crash": false,
+    "unresolved_rows_dropped": false,
+    "fallbacks": [
+      "empty arrays when optional feature tables are missing",
+      "null domain_class when the feature/domain lookup fails",
+      "heuristic domain inference from source_ref substrings"
+    ]
+  },
+  "live_schema": {
+    "feature_implementations": {
+      "rows": 18,
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        "feature_key"
+      ],
+      "columns_present": [
+        "packet_key",
+        "source_ref",
+        "content_hash",
+        "processing_pass_id"
+      ],
+      "coverage": {
+        "packet_key": 0,
+        "source_ref": 0,
+        "content_hash": 0
+      }
+    },
+    "feature_file_edges": {
+      "rows": 34,
+      "primary_key": [
+        "id"
+      ],
+      "foreign_keys": [
+        {
+          "column": "feature_key",
+          "references": "feature_implementations.feature_key"
+        }
+      ],
+      "columns_present": [
+        "packet_key",
+        "source_ref",
+        "content_hash",
+        "stable_key"
+      ],
+      "coverage": {
+        "packet_key": 28,
+        "source_ref": 28,
+        "content_hash": 0
+      },
+      "unresolved_rows": 6
+    },
+    "feature_domain_facts": {
+      "rows": 61659,
+      "primary_key": [
+        "id"
+      ],
+      "unique": [
+        "packet_key",
+        "classifier_version",
+        "content_hash"
+      ],
+      "coverage": {
+        "packet_key": 61659,
+        "source_ref": 61659,
+        "content_hash": 61659
+      }
+    },
+    "feature_lexical_facts": {
+      "rows": 0
+    },
+    "feature_structural_facts": {
+      "rows": 0
+    },
+    "feature_ontology_tuples": {
+      "rows": 0
+    },
+    "atlas_packets": {
+      "rows": 61659,
+      "primary_key": [
+        "packet_id"
+      ],
+      "unique": [
+        "packet_key"
+      ],
+      "sha256_non_null": 0,
+      "identity_coverage": {
+        "feature_id": 61659,
+        "feature_label": 58365,
+        "tree_node_id": 58365,
+        "qdrant_point_id": 4725
+      }
+    }
+  },
+  "phase_c_hash_census": {
+    "canonical_source_hash": 0,
+    "derived_migration_hash": 61659,
+    "missing_or_placeholder": 0,
+    "invalid_hashes": 0,
+    "algorithm": "md5(packet_key || source_ref)",
+    "source_hash_column": "atlas_packets.sha256",
+    "source_hash_presence": 0,
+    "reproducibility": "deterministic from packet_key + source_ref"
+  },
+  "unsafe_assumptions": [
+    "The checked-in materializer queries legacy table names that do not match the live aligned fact tables.",
+    "The checked-in Phase C script still points at atlas_packets.sha256 even though the live column is null on every row.",
+    "The script relies on heuristic source_ref substring inference for domain fallback.",
+    "The script does not emit a structured quarantine for unresolved joins."
+  ],
+  "conclusion": "The current materializer is not aligned with the live feature-fact schema and should be rewritten against normalized facts first, with atlas_packets as an explicit migration fallback."
+}

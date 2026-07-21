@@ -4801,10 +4801,16 @@ export const featureImplementations = pgTable('feature_implementations', {
   laneIds:     text('lane_ids').array().default(sql`'{}'`),
   status:      text('status').notNull().default('active'),
   confidence:  real('confidence').notNull().default(1.0),
+  packetKey:   text('packet_key'),
+  sourceRef:   text('source_ref'),
+  contentHash: text('content_hash'),
+  processingPassId: uuid('processing_pass_id'),
   createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),
   updatedAt:   timestamp('updated_at', { withTimezone: true }).default(sql`now()`),
 }, (t) => [
   index('feat_impl_status_idx').on(t.status),
+  index('feat_impl_packet_key_idx').on(t.packetKey),
+  index('feat_impl_source_ref_idx').on(t.sourceRef),
 ]);
 
 export type FeatureImplementation    = typeof featureImplementations.$inferSelect;
@@ -4818,15 +4824,180 @@ export const featureFileEdges = pgTable('feature_file_edges', {
   role:        text('role').notNull().default('primary'),
   lineStart:   integer('line_start'),
   lineEnd:     integer('line_end'),
+  stableKey:   text('stable_key'),
+  packetKey:   text('packet_key'),
+  sourceRef:   text('source_ref'),
+  contentHash: text('content_hash'),
   createdAt:   timestamp('created_at', { withTimezone: true }).default(sql`now()`),
 }, (t) => [
   index('feat_file_path_idx').on(t.filePath),
   index('feat_key_role_idx').on(t.featureKey, t.role),
+  index('feat_file_packet_key_idx').on(t.packetKey),
+  index('feat_file_source_ref_idx').on(t.sourceRef),
   unique('feat_file_unique').on(t.featureKey, t.filePath, t.entryExport),
 ]);
 
 export type FeatureFileEdge    = typeof featureFileEdges.$inferSelect;
 export type NewFeatureFileEdge = typeof featureFileEdges.$inferInsert;
+
+export const featureLexicalFacts = pgTable('feature_lexical_facts', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  packetKey: text('packet_key').notNull(),
+  sourceRef: text('source_ref').notNull(),
+  featureKey: text('feature_key'),
+  keywords: text('keywords').array().notNull().default(sql`'{}'::text[]`),
+  identifiers: text('identifiers').array().notNull().default(sql`'{}'::text[]`),
+  symbols: text('symbols').array().notNull().default(sql`'{}'::text[]`),
+  importedModules: text('imported_modules').array().notNull().default(sql`'{}'::text[]`),
+  lexicalSummary: text('lexical_summary'),
+  language: text('language'),
+  contentHash: text('content_hash').notNull(),
+  extractorVersion: text('extractor_version').notNull(),
+  processingPassId: uuid('processing_pass_id'),
+  metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  unique('feature_lexical_facts_packet_extractor_content_unique').on(t.packetKey, t.extractorVersion, t.contentHash),
+  index('feature_lexical_facts_packet_key_idx').on(t.packetKey),
+  index('feature_lexical_facts_source_ref_idx').on(t.sourceRef),
+  index('feature_lexical_facts_feature_key_idx').on(t.featureKey),
+  index('feature_lexical_facts_keywords_idx').using('gin', t.keywords),
+  index('feature_lexical_facts_symbols_idx').using('gin', t.symbols),
+]);
+
+export type FeatureLexicalFacts = typeof featureLexicalFacts.$inferSelect;
+export type NewFeatureLexicalFacts = typeof featureLexicalFacts.$inferInsert;
+
+export const featureDomainFacts = pgTable('feature_domain_facts', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  packetKey: text('packet_key').notNull(),
+  sourceRef: text('source_ref').notNull(),
+  featureKey: text('feature_key'),
+  domainClass: text('domain_class').notNull(),
+  domainConfidence: real('domain_confidence'),
+  domainProbabilities: jsonb('domain_probabilities').notNull().default(sql`'{}'::jsonb`),
+  classifierKind: text('classifier_kind').notNull(),
+  classifierVersion: text('classifier_version').notNull(),
+  modelHash: text('model_hash'),
+  featureContractVersion: text('feature_contract_version'),
+  contentHash: text('content_hash').notNull(),
+  processingPassId: uuid('processing_pass_id'),
+  evidence: jsonb('evidence').notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  unique('feature_domain_facts_packet_classifier_content_unique').on(t.packetKey, t.classifierVersion, t.contentHash),
+  index('feature_domain_facts_packet_key_idx').on(t.packetKey),
+  index('feature_domain_facts_source_ref_idx').on(t.sourceRef),
+  index('feature_domain_facts_domain_class_idx').on(t.domainClass),
+  index('feature_domain_facts_confidence_idx').on(t.domainConfidence),
+]);
+
+export type FeatureDomainFacts = typeof featureDomainFacts.$inferSelect;
+export type NewFeatureDomainFacts = typeof featureDomainFacts.$inferInsert;
+
+export const featureStructuralFacts = pgTable('feature_structural_facts', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  packetKey: text('packet_key').notNull(),
+  sourceRef: text('source_ref').notNull(),
+  featureKey: text('feature_key'),
+  treeNodeId: text('tree_node_id'),
+  symbolName: text('symbol_name'),
+  symbolKind: text('symbol_kind'),
+  structuralPath: text('structural_path').array(),
+  lineStart: integer('line_start'),
+  lineEnd: integer('line_end'),
+  imports: text('imports').array().notNull().default(sql`'{}'::text[]`),
+  calls: text('calls').array().notNull().default(sql`'{}'::text[]`),
+  exports: text('exports').array().notNull().default(sql`'{}'::text[]`),
+  contentHash: text('content_hash').notNull(),
+  parserVersion: text('parser_version').notNull(),
+  processingPassId: uuid('processing_pass_id'),
+  metadata: jsonb('metadata').notNull().default(sql`'{}'::jsonb`),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  index('feature_structural_facts_packet_key_idx').on(t.packetKey),
+  index('feature_structural_facts_source_ref_idx').on(t.sourceRef),
+  index('feature_structural_facts_feature_key_idx').on(t.featureKey),
+  index('feature_structural_facts_symbol_name_idx').on(t.symbolName),
+]);
+
+export type FeatureStructuralFacts = typeof featureStructuralFacts.$inferSelect;
+export type NewFeatureStructuralFacts = typeof featureStructuralFacts.$inferInsert;
+
+export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  packetKey: text('packet_key').notNull(),
+  sourceRef: text('source_ref').notNull(),
+  featureKey: text('feature_key'),
+  subjectType: text('subject_type').notNull(),
+  subjectId: text('subject_id').notNull(),
+  predicate: text('predicate').notNull(),
+  objectType: text('object_type').notNull(),
+  objectId: text('object_id').notNull(),
+  objectValue: jsonb('object_value'),
+  confidence: real('confidence').notNull().default(1.0),
+  ontologyVersion: text('ontology_version').notNull(),
+  extractorVersion: text('extractor_version').notNull(),
+  processingPassId: uuid('processing_pass_id'),
+  evidence: jsonb('evidence').notNull().default(sql`'{}'::jsonb`),
+  validFrom: timestamp('valid_from', { withTimezone: true }),
+  validTo: timestamp('valid_to', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  unique('feature_ontology_tuples_unique').on(
+    t.packetKey,
+    t.subjectType,
+    t.subjectId,
+    t.predicate,
+    t.objectType,
+    t.objectId,
+    t.ontologyVersion,
+  ),
+  index('feature_ontology_tuples_packet_key_idx').on(t.packetKey),
+  index('feature_ontology_tuples_source_ref_idx').on(t.sourceRef),
+  index('feature_ontology_tuples_subject_idx').on(t.subjectType, t.subjectId),
+  index('feature_ontology_tuples_predicate_idx').on(t.predicate),
+  index('feature_ontology_tuples_object_idx').on(t.objectType, t.objectId),
+]);
+
+export type FeatureOntologyTuples = typeof featureOntologyTuples.$inferSelect;
+export type NewFeatureOntologyTuples = typeof featureOntologyTuples.$inferInsert;
+
+// ── Feature Packet Bindings (Phase 107 F Materialization) ──────────────────────
+// Many-to-many relationship: feature → packet, with confidence scoring & provenance
+// Phase 107 Phase F: field-level precedence materialization with explicit binding types
+
+export const featurePacketBindings = pgTable('feature_packet_bindings', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  featureId: text('feature_id').notNull(),
+  packetKey: text('packet_key').notNull(),
+  sourceRef: text('source_ref').notNull(),
+
+  // binding_type: extracted (from feature facts), inferred (normalized chain), or promoted (high-confidence)
+  bindingType: text('binding_type').notNull().default('extracted'),
+
+  // confidence: 0.95 (feature facts), 0.6 (atlas_packets fallback), 0.3 (heuristic)
+  confidence: real('confidence').notNull().default(0.5),
+
+  // evidence_ids: references to feature_*_facts rows that contributed to this binding
+  evidenceIds: text('evidence_ids').array().notNull().default(sql`'{}'::text[]`),
+
+  // provenance tracking
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
+}, (t) => [
+  // Unique constraint: one feature → packet binding per source_ref
+  unique('feature_packet_bindings_unique').on(t.featureId, t.packetKey, t.sourceRef),
+
+  // Indexes for retrieval
+  index('feature_packet_bindings_feature_confidence_idx').on(t.featureId, t.confidence.desc()),
+  index('feature_packet_bindings_packet_key_idx').on(t.packetKey),
+  index('feature_packet_bindings_binding_type_idx').on(t.bindingType, t.confidence.desc()),
+  index('feature_packet_bindings_source_ref_idx').on(t.sourceRef),
+]);
+
+export type FeaturePacketBindings = typeof featurePacketBindings.$inferSelect;
+export type NewFeaturePacketBindings = typeof featurePacketBindings.$inferInsert;
 
 // ── Panel Activity Log (L11 prefetch) ─────────────────────────────────────────
 // §6 of docs/architecture/hyperrag-feature-atlas-runtime.md

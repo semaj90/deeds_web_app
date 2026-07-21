@@ -1,0 +1,117 @@
+{
+  "phase": "107",
+  "status": "audit_complete",
+  "total_rows": 34,
+  "resolved_rows": 28,
+  "unresolved_rows": 6,
+  "prefix_normalization_candidate_matches": 5,
+  "rows": [
+    {
+      "feature_key": "hypergraph.4d",
+      "file_path": "scripts/run-hypergraph.ts",
+      "entry_export": null,
+      "role": "consumer",
+      "normalized_path_candidate": "scripts/run-hypergraph.ts",
+      "candidate_count": 1,
+      "candidate_packet_keys": [
+        "packet:b95a210a8bcc"
+      ],
+      "candidate_source_refs": [
+        "sveltekit-frontend/scripts/run-hypergraph.ts"
+      ],
+      "cause": "PATH_NORMALIZATION_MISMATCH",
+      "confidence": 0.98,
+      "evidence": "Packet exists at sveltekit-frontend/scripts/run-hypergraph.ts; edge path is missing the app prefix."
+    },
+    {
+      "feature_key": "hyperrag.lane.feature_atlas",
+      "file_path": "scripts/seed-feature-atlas.mjs",
+      "entry_export": null,
+      "role": "primary",
+      "normalized_path_candidate": "scripts/seed-feature-atlas.mjs",
+      "candidate_count": 1,
+      "candidate_packet_keys": [
+        "packet:46b372ea79f6"
+      ],
+      "candidate_source_refs": [
+        "sveltekit-frontend/scripts/seed-feature-atlas.mjs"
+      ],
+      "cause": "PATH_NORMALIZATION_MISMATCH",
+      "confidence": 0.98,
+      "evidence": "Packet exists at sveltekit-frontend/scripts/seed-feature-atlas.mjs; edge path is missing the app prefix."
+    },
+    {
+      "feature_key": "hyperrag.lane.graph_neighbors",
+      "file_path": "src/lib/server/graph/graph-informed-retrieval.ts",
+      "entry_export": null,
+      "role": "consumer",
+      "normalized_path_candidate": "src/lib/server/graph/graph-informed-retrieval.ts",
+      "candidate_count": 0,
+      "candidate_packet_keys": [],
+      "candidate_source_refs": [],
+      "cause": "REGISTRY_DRIFT",
+      "confidence": 0.97,
+      "evidence": "Tracked file is sveltekit-frontend/src/lib/server/retrieval/graph-informed-retrieval.ts, which does not match the recorded path or directory."
+    },
+    {
+      "feature_key": "mcp.trace_server",
+      "file_path": "scripts/ensure-mcp-server.mjs",
+      "entry_export": null,
+      "role": "consumer",
+      "normalized_path_candidate": "scripts/ensure-mcp-server.mjs",
+      "candidate_count": 1,
+      "candidate_packet_keys": [
+        "packet:1c80ac554be1"
+      ],
+      "candidate_source_refs": [
+        "sveltekit-frontend/scripts/ensure-mcp-server.mjs"
+      ],
+      "cause": "PATH_NORMALIZATION_MISMATCH",
+      "confidence": 0.98,
+      "evidence": "Packet exists at sveltekit-frontend/scripts/ensure-mcp-server.mjs; edge path is missing the app prefix."
+    },
+    {
+      "feature_key": "synth.loop",
+      "file_path": "scripts/synth/handoff-to-claude.mjs",
+      "entry_export": null,
+      "role": "consumer",
+      "normalized_path_candidate": "scripts/synth/handoff-to-claude.mjs",
+      "candidate_count": 1,
+      "candidate_packet_keys": [
+        "packet:445fd8315e93"
+      ],
+      "candidate_source_refs": [
+        "sveltekit-frontend/scripts/synth/handoff-to-claude.mjs"
+      ],
+      "cause": "PATH_NORMALIZATION_MISMATCH",
+      "confidence": 0.98,
+      "evidence": "Packet exists at sveltekit-frontend/scripts/synth/handoff-to-claude.mjs; edge path is missing the app prefix."
+    },
+    {
+      "feature_key": "synth.loop",
+      "file_path": "scripts/synth/run-loop.mjs",
+      "entry_export": null,
+      "role": "primary",
+      "normalized_path_candidate": "scripts/synth/run-loop.mjs",
+      "candidate_count": 1,
+      "candidate_packet_keys": [
+        "packet:a3889fb32f1a"
+      ],
+      "candidate_source_refs": [
+        "sveltekit-frontend/scripts/synth/run-loop.mjs"
+      ],
+      "cause": "PATH_NORMALIZATION_MISMATCH",
+      "confidence": 0.98,
+      "evidence": "Packet exists at sveltekit-frontend/scripts/synth/run-loop.mjs; edge path is missing the app prefix."
+    }
+  ],
+  "summary": {
+    "path_normalization_mismatch": 5,
+    "registry_drift": 1,
+    "path_not_found": 0,
+    "generated_file": 0,
+    "deleted_file": 0,
+    "external_path": 0,
+    "unknown": 0
+  }
+}
