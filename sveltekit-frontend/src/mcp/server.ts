@@ -19,6 +19,7 @@ import { resolveAgentsMdQuickHit } from '$lib/server/graph/community-graph.js';
 import { registerDispatcherToolsAsACP, executeACPTool } from '$lib/server/acp/acp-mcp-integration.js';
 import { bootstrapACPRegistry } from '$lib/server/acp/acp-grpc-quic-bridge.js';
 import { withToolCallRecord } from '$lib/server/telemetry/tool-call-recorder.js';
+import { LDR_RESEARCH_TOOL, executeLDRResearch, formatLDRResultForAgent, type LDRToolInput } from './tools/ldr-research.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -121,6 +122,11 @@ export function setupToolHandlers() {
         name: 'rag:index_page',
         description: 'Index a web page for RAG knowledge',
         inputSchema: { type: 'object', properties: { url: { type: 'string' } }, required: ['url'] },
+      },
+      {
+        name: LDR_RESEARCH_TOOL.name,
+        description: LDR_RESEARCH_TOOL.description,
+        inputSchema: LDR_RESEARCH_TOOL.inputSchema as any,
       },
       {
         name: 'memory:prior_answer_lookup',
@@ -5292,6 +5298,15 @@ export function setupToolHandlers() {
         return await handleFaceIdentify(args as Record<string, unknown>);
       if (name === 'poi:face_synth')
         return await handlePoiFaceSynth(args as Record<string, unknown>);
+      if (name === LDR_RESEARCH_TOOL.name) {
+        const ldrInput = args as LDRToolInput;
+        const ldrOutput = await executeLDRResearch(ldrInput);
+        const formatted = formatLDRResultForAgent(ldrOutput);
+        return {
+          content: [{ type: 'text', text: formatted }],
+          isError: !ldrOutput.success,
+        };
+      }
       return await handleToolCall(name, args as Record<string, any>);
     } catch (error: any) {
       return {

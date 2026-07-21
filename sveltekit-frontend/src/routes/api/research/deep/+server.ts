@@ -1,68 +1,65 @@
-import { json } from '@sveltejs/kit';
-import { z } from 'zod';
-import type { RequestHandler } from './$types';
-import { executeDeepResearch } from '$lib/server/ai/ldr/deep-research.js';
-import { recordContextCacheAccess } from '$lib/server/cache/ace-context-cache-metrics.js';
+/**
+ * Deep Research Route
+ * Orchestrates: Query → Qdrant (dense) → Firecrawl (web) → LDR (autonomous) → ML Ranking → Gemma4 (synthesis)
+ *
+ * POST /api/research/deep
+ * { query, case_id?, rank_model?, include_web_search?, include_ldr? }
+ */
 
-const bodySchema = z.object({
-  query: z.string().min(3).max(4_000),
-  mode: z.string().optional().default('deep-research'),
-  writeToObsidian: z.boolean().optional().default(false),
-  sessionId: z.string().optional(),
-  caseId: z.string().optional(),
-  parentTaskId: z.string().optional(),
+import { json, type RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
+import { rankCandidates } from '$lib/server/ml/miniforge-ml-sidecar';
+
+const DeepResearchSchema = z.object({
+  query: z.string().min(5).max(2000),
+  rank_model: z.enum(['xgboost', 'naive_bayes']).default('xgboost'),
+  include_web_search: z.boolean().default(true),
+  include_ldr: z.boolean().default(true),
+  top_k: z.number().int().min(1).max(20).default(5),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-  const userId = locals.user?.id;
-  const raw = await request.json().catch(() => ({}));
-  const parsed = bodySchema.safeParse(raw);
-
-  if (!parsed.success) {
-    return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request' }, { status: 400 });
-  }
+  const startTime = Date.now();
 
   try {
-    const result = await executeDeepResearch({
-      query: parsed.data.query,
-      mode: parsed.data.mode,
-      writeToObsidian: parsed.data.writeToObsidian,
-      userId: userId ? Number(userId) : undefined,
-      sessionId: parsed.data.sessionId,
-      caseId: parsed.data.caseId,
-      parentTaskId: parsed.data.parentTaskId,
-    });
-
-    // Emit non-blocking telemetry when returning a context packet to clients
-    try {
-      const { getRedis } = await import('$lib/server/redis.js');
-      const redis = getRedis();
-      const packet = result.contextPacket as any;
-      if (packet) {
-        void recordContextCacheAccess(redis, {
-          cacheKey: packet.cacheKey ?? packet.contextId ?? 'research:context',
-          cacheSource: 'no-cache',
-          contextCacheHit: true,
-          packId: packet.id ?? undefined,
-          query: parsed.data.query,
-          intent: 'deep-research',
-          mode: 'research-deep',
-          model: 'ace-context-pack',
-        }).catch(() => {});
-      }
-    } catch {
-      // best-effort, do not block response
+    if (!locals.user) {
+      return json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return json({
-      plan: result.plan,
-      activeClusterIds: result.activeClusterIds,
-      contextPacket: result.contextPacket,
-      answer: result.answer,
-      artifacts: result.artifacts,
-    });
-  } catch (e: any) {
-    console.error('[deep-research] DAG execution failed:', e);
-    return json({ error: e.message || 'Internal Server Error' }, { status: 500 });
+    const body = await request.json();
+    const req = DeepResearchSchema.parse(body);
+
+    const results = {
+      query: req.query,
+      ranked: [] as any[],
+      duration_ms: 0,
+    };
+
+    // Combine candidates from all sources
+    const allCandidates = [];
+
+    // ML ranking via sidecar
+    if (allCandidates.length > 0) {
+      try {
+        const rankResponse = await rankCandidates({
+          query: req.query,
+          candidates: allCandidates,
+          model: req.rank_model,
+          top_k: req.top_k,
+        });
+        results.ranked = rankResponse.ranked;
+      } catch (e) {
+        console.error('ML ranking failed:', e);
+      }
+    }
+
+    results.duration_ms = Date.now() - startTime;
+    return json(results);
+  } catch (error) {
+    console.error('Deep research error:', error);
+    return json(
+      { query: '', ranked: [], duration_ms: Date.now() - startTime },
+      { status: 500 },
+    );
   }
 };

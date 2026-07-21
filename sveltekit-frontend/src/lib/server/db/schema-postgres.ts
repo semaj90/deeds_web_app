@@ -1667,6 +1667,110 @@ export const documentSummaries = pgTable('document_summaries', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// === DEEP RESEARCH (LDR + Miniforge ML) TABLES ===
+
+export const ldrResearchTasks = pgTable('ldr_research_tasks', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  caseId: uuid('case_id').references(() => cases.id, { onDelete: 'set null' }),
+  query: text('query').notNull(),
+  queryHash: varchar('query_hash', { length: 64 }).notNull().unique(),
+  status: varchar('status', { length: 20 }).notNull().default('pending'), // pending, running, completed, failed
+  rankModel: varchar('rank_model', { length: 20 }).notNull().default('xgboost'), // xgboost, naive_bayes
+  includeWebSearch: boolean('include_web_search').notNull().default(true),
+  includeLdr: boolean('include_ldr').notNull().default(true),
+  topK: integer('top_k').notNull().default(5),
+  sourceCounts: jsonb('source_counts'), // { qdrant: 5, web: 3, ldr: 2 }
+  totalCandidates: integer('total_candidates'),
+  mlScore: real('ml_score'), // avg ML score of top results
+  synthesisModel: varchar('synthesis_model', { length: 100 }),
+  synthesisLength: integer('synthesis_length'),
+  errorMessage: text('error_message'),
+  durationMs: integer('duration_ms'),
+  startedAt: timestamp('started_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const ldrResearchResults = pgTable('ldr_research_results', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  taskId: uuid('task_id')
+    .notNull()
+    .references(() => ldrResearchTasks.id, { onDelete: 'cascade' }),
+  rank: integer('rank').notNull(), // 1, 2, 3, ...
+  candidateId: varchar('candidate_id', { length: 255 }).notNull(),
+  source: varchar('source', { length: 20 }).notNull(), // qdrant, web, ldr
+  title: varchar('title', { length: 500 }),
+  text: text('text').notNull(),
+  url: varchar('url', { length: 2048 }),
+  upstreamScore: real('upstream_score'),
+  mlScore: real('ml_score').notNull(),
+  finalScore: real('final_score').notNull(),
+  metadata: jsonb('metadata'), // source-specific metadata
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const ldrSynthesis = pgTable('ldr_synthesis', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  taskId: uuid('task_id')
+    .notNull()
+    .unique()
+    .references(() => ldrResearchTasks.id, { onDelete: 'cascade' }),
+  synthesisText: text('synthesis_text').notNull(),
+  model: varchar('model', { length: 100 }).notNull(), // gemma4-rotorquant:latest, etc.
+  confidence: real('confidence'),
+  citedResultIds: text('cited_result_ids'), // comma-separated UUIDs
+  keyFindings: jsonb('key_findings'), // array of extracted findings
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const mlRankingCache = pgTable('ml_ranking_cache', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  queryHash: varchar('query_hash', { length: 64 }).notNull().unique(),
+  query: text('query').notNull(),
+  model: varchar('model', { length: 20 }).notNull(), // xgboost, naive_bayes
+  topKResults: jsonb('top_k_results').notNull(), // array of ranked results
+  modelVersion: varchar('model_version', { length: 50 }),
+  accuracy: real('accuracy'),
+  cacheTtlMinutes: integer('cache_ttl_minutes').notNull().default(1440), // 24h
+  hitCount: integer('hit_count').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+});
+
+export const mlClustering = pgTable('ml_clustering', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  taskId: uuid('task_id').references(() => ldrResearchTasks.id, { onDelete: 'set null' }),
+  algorithm: varchar('algorithm', { length: 30 }).notNull(), // cuVS_kmeans, rapids_umap
+  nClusters: integer('n_clusters').notNull(),
+  vectorDim: integer('vector_dim').notNull(),
+  nVectors: integer('n_vectors').notNull(),
+  clusterIds: text('cluster_ids').notNull(), // comma-separated or JSON
+  centroidsJson: jsonb('centroids_json'),
+  inertia: real('inertia'),
+  silhouetteScore: real('silhouette_score'),
+  durationMs: integer('duration_ms'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const deepResearchAuditLog = pgTable('deep_research_audit_log', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  taskId: uuid('task_id').references(() => ldrResearchTasks.id, { onDelete: 'set null' }),
+  action: varchar('action', { length: 50 }).notNull(), // task_created, result_ranked, synthesis_generated, etc.
+  details: jsonb('details'),
+  durationMs: integer('duration_ms'),
+  success: boolean('success').notNull().default(true),
+  errorMessage: text('error_message'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // === RELATIONS ===
 // (All relations are now defined only once, with syntax fixed and duplicates removed)
 
@@ -1699,6 +1803,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   caseScoresCalculated: many(caseScores, { relationName: 'calculatedBy' }),
   userAiQueries: many(userAiQueries),
   autoTagsConfirmed: many(autoTags, { relationName: 'confirmedBy' }),
+  ldrResearchTasks: many(ldrResearchTasks),
+  deepResearchAuditLogs: many(deepResearchAuditLog),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -2593,6 +2699,35 @@ export const yorhaChatMessagesRelations = relations(yorhaChatMessages, ({ one })
  fields: [yorhaChatMessages.session_id],
  references: [yorhaChatSessions.id],
  }),
+}));
+
+// === DEEP RESEARCH RELATIONS ===
+
+export const ldrResearchTasksRelations = relations(ldrResearchTasks, ({ one, many }) => ({
+  user: one(users, { fields: [ldrResearchTasks.userId], references: [users.id] }),
+  case: one(cases, { fields: [ldrResearchTasks.caseId], references: [cases.id] }),
+  results: many(ldrResearchResults),
+  synthesis: one(ldrSynthesis),
+  clustering: many(mlClustering),
+}));
+
+export const ldrResearchResultsRelations = relations(ldrResearchResults, ({ one }) => ({
+  task: one(ldrResearchTasks, { fields: [ldrResearchResults.taskId], references: [ldrResearchTasks.id] }),
+}));
+
+export const ldrSynthesisRelations = relations(ldrSynthesis, ({ one }) => ({
+  task: one(ldrResearchTasks, { fields: [ldrSynthesis.taskId], references: [ldrResearchTasks.id] }),
+}));
+
+export const mlRankingCacheRelations = relations(mlRankingCache, {});
+
+export const mlClusteringRelations = relations(mlClustering, ({ one }) => ({
+  task: one(ldrResearchTasks, { fields: [mlClustering.taskId], references: [ldrResearchTasks.id] }),
+}));
+
+export const deepResearchAuditLogRelations = relations(deepResearchAuditLog, ({ one }) => ({
+  user: one(users, { fields: [deepResearchAuditLog.userId], references: [users.id] }),
+  task: one(ldrResearchTasks, { fields: [deepResearchAuditLog.taskId], references: [ldrResearchTasks.id] }),
 }));
 
 // === TYPE EXPORTS ===

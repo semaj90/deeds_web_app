@@ -267,6 +267,13 @@
       "when": 1782952096274,
       "tag": "0037_phase_102_noun_reranker",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1784605503388,
+      "tag": "0038_deep_research_tables",
+      "breakpoints": true
     }
   ]
 }

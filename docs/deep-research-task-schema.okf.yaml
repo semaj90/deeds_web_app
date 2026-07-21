@@ -1,0 +1,458 @@
+---
+name: Deep Research Task Schema
+description: OKF schema for legal deep research task tracking, documentation, and agentic coding corpus
+type: schema
+version: '1.0'
+namespace: ldr
+status: production
+
+# Core task definitions for deep research workflow
+tasks:
+  # Phase 1: Query Understanding and Planning
+  query_analysis:
+    name: Query Understanding & Analysis
+    description: Parse user query, identify legal domains, extract entities (statutes, case names, entities)
+    subtasks:
+      - legal_domain_classification
+      - entity_extraction_statute_citations
+      - entity_extraction_case_names
+      - entity_extraction_parties
+      - temporal_scope_detection
+    corpus_needs:
+      - federal_rules_of_evidence
+      - state_evidence_codes_all_50
+      - ucc_code_sections
+      - model_penal_code
+      - federal_sentencing_guidelines
+      - restatements_law_all
+    documentation:
+      - query_classification_guide.md
+      - legal_entity_patterns.md
+      - statute_citation_format.md
+    agents_involved:
+      - legal-nlp-extractor
+      - domain-classifier
+      - statute-resolver
+
+  # Phase 2: Search Strategy Formation
+  search_strategy:
+    name: Search Strategy Formation
+    description: Build multi-source search plan combining dense vector, BM25, and graph traversal
+    subtasks:
+      - search_lane_selection
+      - keyword_expansion
+      - semantic_query_generation
+      - graph_entry_point_identification
+    corpus_needs:
+      - legal_term_synonymy_mapping
+      - procedural_statute_hierarchy
+      - case_law_citation_networks
+      - authority_scoring_tables
+    documentation:
+      - search_lanes_decision_tree.md
+      - keyword_expansion_strategies.md
+      - graph_traversal_patterns.md
+    agents_involved:
+      - search-planner
+      - keyword-enricher
+      - graph-navigator
+
+  # Phase 3: Multi-Source Retrieval
+  retrieval_execution:
+    name: Multi-Source Retrieval Execution
+    description: Execute parallel retrieval across Qdrant (dense), BM25 (lexical), and LDR (autonomous)
+    subtasks:
+      - qdrant_dense_search
+      - bm25_lexical_search
+      - local_deep_research_autonomous
+      - web_search_via_firecrawl
+    corpus_needs:
+      - codebase_chunks_768 # Qdrant collection
+      - legal_documents_full_text
+      - case_headnotes_and_summaries
+      - statute_text_with_annotations
+      - secondary_legal_sources
+    documentation:
+      - retrieval_pipeline_architecture.md
+      - qdrant_payload_schema.md
+      - bm25_ranking_factors.md
+      - ldr_orchestration_guide.md
+    agents_involved:
+      - retriever-orchestrator
+      - vector-search-executor
+      - full-text-search-executor
+      - ldr-autonomous-planner
+
+  # Phase 4: Candidate Ranking and Fusion
+  ranking_fusion:
+    name: Candidate Ranking & Fusion
+    description: Rank candidates via ML models, blend scores, and apply RRF fusion
+    subtasks:
+      - xgboost_candidate_ranking
+      - naive_bayes_alternative_ranking
+      - rrf_fusion_multirank
+      - freshness_boost
+      - authority_weighting
+    corpus_needs:
+      - xgboost_training_labels_7k
+      - case_importance_scores
+      - statute_authority_hierarchy
+      - publication_date_metadata
+      - update_frequency_signals
+    documentation:
+      - ml_ranking_models.md
+      - rrf_fusion_formula.md
+      - score_blending_weights.md
+      - freshness_calculation.md
+    agents_involved:
+      - ml-ranker
+      - score-blender
+      - fusion-orchestrator
+
+  # Phase 5: Synthesis via Gemma4
+  synthesis_generation:
+    name: Synthesis Generation
+    description: Generate coherent legal answer via Gemma4 with cited evidence
+    subtasks:
+      - context_packing_4800_tokens
+      - gemma4_generation
+      - citation_linking
+      - key_finding_extraction
+      - confidence_scoring
+    corpus_needs:
+      - gemma4_legal_iq4xs_model
+      - prompt_templates_legal
+      - citation_format_rules
+      - legal_writing_style_guide
+      - evidence_admissibility_criteria
+    documentation:
+      - gemma4_prompt_engineering.md
+      - context_packing_strategy.md
+      - citation_linking_algorithm.md
+      - confidence_calibration.md
+    agents_involved:
+      - context-assembler
+      - gemma4-synthesizer
+      - citation-linker
+      - finding-extractor
+
+  # Phase 6: Quality Assurance & Audit
+  quality_assurance:
+    name: Quality Assurance & Audit
+    description: Validate synthesis accuracy, citation integrity, and log all decisions
+    subtasks:
+      - synthesis_validation
+      - citation_verification
+      - legal_accuracy_check
+      - audit_logging
+      - feedback_collection
+    corpus_needs:
+      - validation_rubrics_legal_qa
+      - citation_checker_rules
+      - accuracy_benchmarks
+      - audit_log_schema
+    documentation:
+      - qa_validation_checklist.md
+      - citation_verification_guide.md
+      - audit_logging_standards.md
+    agents_involved:
+      - qa-validator
+      - citation-verifier
+      - audit-logger
+
+# Corpus definitions: knowledge bases agents need
+corpus:
+  federal_rules_of_evidence:
+    name: Federal Rules of Evidence
+    url: https://www.law.cornell.edu/rules/fre
+    format: annotated_statutes
+    updated_frequency: quarterly
+    scope: US Federal
+    integration_point: query_analysis, synthesis_generation
+    required_coverage: 100% (all 1000+ rules)
+    agents:
+      - legal-nlp-extractor
+      - domain-classifier
+
+  state_evidence_codes_all_50:
+    name: State Evidence Codes (All 50 States + DC)
+    format: json_statute_registry
+    updated_frequency: bi-annual
+    scope: US State + DC
+    integration_point: query_analysis, search_strategy
+    required_coverage: 100% (all state codes)
+    agents:
+      - domain-classifier
+      - statute-resolver
+
+  ucc_code_sections:
+    name: Uniform Commercial Code
+    url: https://www.uniformlaws.org/uccpage
+    format: annotated_statutes
+    scope: Commercial Law
+    integration_point: query_analysis
+    agents:
+      - domain-classifier
+
+  legal_term_synonymy_mapping:
+    name: Legal Term Synonymy & Relationships
+    description: Mapping of legal terms to synonyms, related terms, and context-dependent meanings
+    format: json_graph
+    integration_point: search_strategy, keyword_expansion
+    required_coverage: 5000+ legal terms with 3-10 synonyms each
+    agents:
+      - keyword-enricher
+
+  case_law_citation_networks:
+    name: Case Law Citation Networks
+    description: Graph of case citations, overrulings, and distinguishings
+    format: neo4j_graph
+    integration_point: graph_traversal, authority_weighting
+    scope: Federal + State appellate
+    agents:
+      - graph-navigator
+      - ml-ranker
+
+  codebase_chunks_768:
+    name: Qdrant Vector Collection (768-dim)
+    description: Embedded legal documents, cases, and statutes
+    format: qdrant_collection
+    embedding_model: embeddinggemma:latest
+    dimension: 768
+    integration_point: retrieval_execution
+    size: 40,568 points
+    agents:
+      - retriever-orchestrator
+      - vector-search-executor
+
+  legal_documents_full_text:
+    name: Full-Text Legal Document Index
+    description: Complete text of statutes, cases, treatises, and secondary sources
+    format: bm25_index
+    integration_point: retrieval_execution
+    agents:
+      - full-text-search-executor
+
+  xgboost_training_labels_7k:
+    name: XGBoost Training Labels (7K+ Samples)
+    description: Labeled relevance judgments for ML model training
+    format: jsonl
+    size: 7051 samples
+    distribution: 4-grade scale (0=irrelevant, 1=somewhat, 2=relevant, 3=highly relevant)
+    integration_point: ranking_fusion, ml_ranking_models
+    agents:
+      - ml-ranker
+
+  gemma4_legal_iq4xs_model:
+    name: Gemma4 Legal IQ4_XS Model
+    description: Quantized Gemma4 with legal fine-tuning
+    format: gguf_quantized
+    quantization: IQ4_XS
+    vram_required: 5.3GB
+    inference_endpoint: http://localhost:8090/v1/chat/completions
+    integration_point: synthesis_generation
+    agents:
+      - gemma4-synthesizer
+
+  prompt_templates_legal:
+    name: Legal Prompt Templates & Examples
+    description: Curated prompts for different legal query types (evidence, criminal, civil, etc.)
+    format: markdown_jinja2
+    integration_point: synthesis_generation
+    query_types:
+      - evidence_admissibility
+      - statute_interpretation
+      - case_precedent
+      - procedure_rules
+      - sentencing_guidelines
+    agents:
+      - context-assembler
+      - gemma4-synthesizer
+
+  validation_rubrics_legal_qa:
+    name: Legal QA Validation Rubrics
+    description: Scoring rubrics for legal answer quality across 6 dimensions
+    format: yaml_rubric
+    dimensions:
+      - accuracy (is the legal statement correct?)
+      - completeness (does it cover all relevant issues?)
+      - citation_quality (are sources properly cited?)
+      - legal_reasoning (is the logic sound?)
+      - clarity (is it understandable?)
+      - practical_applicability (can practitioners use it?)
+    integration_point: quality_assurance
+    agents:
+      - qa-validator
+
+# Documentation structure for agentic coding
+documentation_structure:
+  guides:
+    - query_classification_guide.md
+    - legal_entity_patterns.md
+    - statute_citation_format.md
+    - search_lanes_decision_tree.md
+    - keyword_expansion_strategies.md
+    - graph_traversal_patterns.md
+    - retrieval_pipeline_architecture.md
+    - qdrant_payload_schema.md
+    - bm25_ranking_factors.md
+    - ldr_orchestration_guide.md
+    - ml_ranking_models.md
+    - rrf_fusion_formula.md
+    - score_blending_weights.md
+    - freshness_calculation.md
+    - gemma4_prompt_engineering.md
+    - context_packing_strategy.md
+    - citation_linking_algorithm.md
+    - confidence_calibration.md
+    - qa_validation_checklist.md
+    - citation_verification_guide.md
+    - audit_logging_standards.md
+
+  api_specs:
+    - POST /api/research/deep (submit query)
+    - GET /api/research/ldr-status (check status)
+    - GET /admin/deep-research (dashboard)
+    - GET /api/research/results/{taskId} (retrieve results)
+
+  schema_definitions:
+    - ldr_research_tasks.ts
+    - ldr_research_results.ts
+    - ldr_synthesis.ts
+    - ml_ranking_cache.ts
+    - ml_clustering.ts
+    - deep_research_audit_log.ts
+
+  test_coverage:
+    - deep_research_task.spec.ts (integration tests)
+    - ml_sidecar_integration.spec.ts (ML ranking validation)
+    - retrieval_fusion.spec.ts (RRF fusion tests)
+    - synthesis_validation.spec.ts (Gemma4 output QA)
+
+# Agent definitions: LLMs and tools for each phase
+agents:
+  legal_nlp_extractor:
+    role: Legal NLP Entity Extraction
+    models: gemma4-legal-iq4xs, gpt-4-turbo
+    tools:
+      - statute_citation_parser
+      - case_name_recognizer
+      - party_entity_recognizer
+      - temporal_scope_parser
+    responsibilities:
+      - Extract statutes, cases, and entities from query
+      - Normalize citation formats
+      - Identify temporal scope (current law vs. historical)
+
+  domain_classifier:
+    role: Legal Domain Classification
+    models: xgboost (trained on 7k samples)
+    tools:
+      - domain_taxonomy
+      - statute_hierarchy
+      - procedural_classifier
+    responsibilities:
+      - Classify query into legal domain (evidence, criminal, civil, etc.)
+      - Identify applicable statutes and rules
+      - Determine jurisdiction scope
+
+  search_planner:
+    role: Search Strategy Formation
+    models: gemma4-legal-iq4xs
+    tools:
+      - search_lane_selector
+      - keyword_expander
+      - query_generator
+    responsibilities:
+      - Decide which search lanes to use (dense, BM25, graph)
+      - Plan multi-source strategy
+      - Estimate result quality and coverage
+
+  retriever_orchestrator:
+    role: Retrieval Orchestration
+    models: deterministic state machine
+    tools:
+      - qdrant_client
+      - bm25_executor
+      - ldr_autonomous_orchestrator
+    responsibilities:
+      - Coordinate parallel retrieval across all lanes
+      - Aggregate candidate pools
+      - Handle timeouts and failures
+
+  ml_ranker:
+    role: ML-Based Candidate Ranking
+    models: xgboost, naive_bayes (on :8095 miniforge sidecar)
+    tools:
+      - feature_extractor
+      - score_blender
+      - rrf_fuser
+    responsibilities:
+      - Rank candidates via ML models
+      - Blend scores from multiple models
+      - Apply freshness and authority boosts
+
+  gemma4_synthesizer:
+    role: Legal Answer Synthesis
+    models: gemma4-legal-iq4xs (gguf @ :8090)
+    tools:
+      - context_packer
+      - prompt_builder
+      - citation_mapper
+    responsibilities:
+      - Generate coherent legal answer
+      - Maintain 4800-token context limit
+      - Link citations to source documents
+
+  qa_validator:
+    role: Quality Assurance & Validation
+    models: gemma4-legal-iq4xs (for reasoning)
+    tools:
+      - accuracy_checker
+      - citation_verifier
+      - rubric_scorer
+    responsibilities:
+      - Validate synthesis accuracy
+      - Verify citations are correct
+      - Score output against 6-dimension rubric
+
+# Integration points with parent atlas
+parent_atlas_integration:
+  packet_storage: atlas_packets (58,304 rows)
+  chunk_embeddings: codebase_chunk_index (40,754 rows, 768-dim)
+  qdrant_collection: codebase_chunks_768 (40,568 points)
+  feature_registry: atlas_feature_labels (canonical labels)
+  audit_trail: deep_research_audit_log (all decisions logged)
+
+# Performance targets (SLA)
+performance_sla:
+  task_creation: 5ms
+  qdrant_search: 50-100ms
+  bm25_search: 100-200ms
+  ldr_autonomous: 5-30s
+  ml_ranking: 100-500ms
+  gemma4_synthesis: 5-15s
+  total_end_to_end: 30-60s
+  admin_page_load: 200-500ms
+
+# Deployment & operations
+deployment:
+  database: PostgreSQL 18 + pgvector
+  vector_db: Qdrant (:6333)
+  ml_sidecar: Miniforge (:8095)
+  llm_service: llama-server (:8090) for Gemma4
+  embedding_service: Ollama (:11434) for embeddinggemma
+  frontend: SvelteKit (:5173)
+  admin_dashboard: /admin/deep-research
+
+# Future enhancements
+roadmap:
+  phase_2:
+    - Implement graph-augmented ranking (Neo4j SIMILAR_TOPOLOGY edges)
+    - Add domain-specific scoring (evidence law boost vs. contract law)
+  phase_3:
+    - Cross-jurisdiction comparative analysis
+    - Temporal scope awareness (legislative history)
+  phase_4:
+    - Multi-language support (Spanish, French, German)
+    - Regulatory compliance checking (GDPR, etc.)
