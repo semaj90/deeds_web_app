@@ -1,7 +1,11 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { canvasAutosaves } from './schema-canvas-autosaves.js';
-import * as schema from './schema.js'; // Changed from schema-postgres to schema
+// Note: schema.ts re-exports from schema-postgres.ts which has tables defined
+// after the relations block. This causes Drizzle relational config extraction to fail.
+// Temporary workaround: just pass schema tables without relations for now.
+// TODO: Restructure schema-postgres.ts so all table definitions come before relations.
+import * as schema from './schema.js';
 import { ENV } from '$lib/server/env.server.js';
 import { createDrizzleCache } from './drizzle-cache.js';
 import { traceDB } from '$lib/server/observability/langfuse.js';
@@ -15,7 +19,12 @@ function getAdminDatabaseUrl(): string {
 }
 
 // Create merged schema object
-const mergedSchema = { ...schema, canvasAutosaves };
+// Filter out relation exports to avoid Drizzle relational config extraction failure
+const isRelationExport = (key: string) => key.endsWith('Relations');
+const mergedSchema = {
+  ...Object.fromEntries(Object.entries(schema).filter(([k]) => !isRelationExport(k))),
+  canvasAutosaves
+};
 
 // Query-level cache: ioredis-backed, 5min default TTL
 // Use .$withCache() on any query, or .$withCache({ config: { ex: 3600 } }) for custom TTL
