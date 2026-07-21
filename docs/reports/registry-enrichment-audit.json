@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-07-21T05:25:48.524Z",
+  "packet_count": 61659,
+  "registry_count": 4209,
+  "resolution": {
+    "resolved": 4122,
+    "ambiguous": 0,
+    "unmatched": 87,
+    "resolved_pct": "97.93"
+  },
+  "topology_readiness": {
+    "total_resolved": 4122,
+    "topology_ready": "2109",
+    "topology_ready_pct": "51.16"
+  }
+}

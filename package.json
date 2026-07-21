@@ -775,6 +775,7 @@
   },
   "workspaces": [
     "packages/atlas-core",
+    "packages/atlas-orchestrator",
     "packages/parent-atlas",
     "packages/parent-atlas-core",
     "packages/parent-atlas-retrieval",
