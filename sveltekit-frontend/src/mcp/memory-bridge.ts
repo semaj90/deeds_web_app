@@ -239,12 +239,12 @@ export class EngramMemoryBridge {
         );
       `);
 
-      // Create BM25 text search index (gin_trgm_ops for substring search)
+      // Keep lexical lookup lightweight and startup-safe.
+      // The fallback query path can still use Postgres FTS without this index;
+      // we index the tag array itself instead of a mutable expression.
       await client.query(`
-        CREATE INDEX IF NOT EXISTS idx_${this.tableName}_bm25_tsvector
-          ON ${this.tableName} USING GIN (
-            to_tsvector('english', bm25_tags::text || ' ' || output_summary)
-          );
+        CREATE INDEX IF NOT EXISTS idx_${this.tableName}_bm25_tags_gin
+          ON ${this.tableName} USING GIN (bm25_tags);
       `);
 
       // Create HNSW vector index (cosine distance)

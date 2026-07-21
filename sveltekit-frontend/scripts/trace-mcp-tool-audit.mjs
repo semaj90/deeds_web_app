@@ -23,7 +23,7 @@ const TIMEOUT = 5000;
 const DOMAINS = {
   'core-retrieval': [
     'kb.trace_search', 'kb.hybrid_search', 'kb.search_notecards',
-    'atlas.packet_search', 'atlas:packet_search', 'trace.kag_search',
+    'atlas.packet_search', 'trace.kag_search',
     'trace.graphrag_search', 'search.hybrid', 'search.go_hybrid', 'search.postgres_fts'
   ],
   'vector-search': [
@@ -35,7 +35,7 @@ const DOMAINS = {
     'graph.pagerank_top', 'graph.semantic_path_synthesis', 'hypergraph.semantic_path_synthesis'
   ],
   'schema-meta': [
-    'db.schema_overview', 'db.table_inspect', 'atlas.coverage', 'atlas:verify_coverage',
+    'db.schema_overview', 'db.table_inspect', 'atlas.coverage',
     'atlas.explain_trace', 'file.read_window'
   ],
   'entity-intelligence': [
@@ -126,7 +126,7 @@ const TEST_INPUTS = {
 
 // Classify tools as deterministic (idempotency testable) vs non-deterministic (live data)
 const DETERMINISTIC_TOOLS = new Set([
-  'atlas.coverage', 'atlas:verify_coverage', 'atlas.explain_trace',
+  'atlas.coverage', 'atlas.explain_trace',
   'db.schema_overview', 'db.table_inspect',
   'context.get_compressed_card', 'runtime.simdjson_status',
   'taxonomy.children', 'taxonomy.path',

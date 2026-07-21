@@ -165,11 +165,9 @@ const pool = new Pool({
 });
 pool.on('error', () => {});
 
-// Initialize Engram memory bridge (PostgreSQL agent memory)
+// Initialize Engram memory bridge (PostgreSQL agent memory).
+// Keep this lazy: Engram is hint-only and should not block MCP startup.
 const engramBridge = new EngramMemoryBridge(PG_URL);
-await engramBridge.ensureSchema().catch((err) => {
-  console.warn('[mcp] Engram schema creation failed (non-fatal):', err);
-});
 
 // Initialize LangGraph bridge (Netflix Headroom dispatcher)
 const langgraphBridge = new LangGraphBridge({ maxStateSize: 32_000, maxToolResultChars: 12_000 }, pool);
@@ -8165,28 +8163,6 @@ server.registerTool(
     }
   }
 );
-server.registerTool(
-  'atlas:packet_search',
-  {
-    description:
-      'Query the canonical atlas_packets table. Search by source_ref path (variants tried automatically), ' +
-      'feature_id, concept_id membership, or free-text summary match. ' +
-      'Returns packet_id, source_ref, feature_id, concept_ids, summary, reward_prior. ' +
-      'Use this to find which packets are associated with a file or feature before querying Qdrant.',
-    inputSchema: z.object({
-      source_ref: z.string().optional().describe(
-        'File path (any form: absolute, repo-relative, with/without sveltekit-frontend/ prefix). ' +
-        'Variants are tried automatically via canonicalization.'
-      ),
-      feature_id: z.string().optional().describe('Exact feature_id to filter on.'),
-      concept_id: z.string().optional().describe('Filter to packets whose concept_ids array contains this value.'),
-      summary_query: z.string().optional().describe('Full-text search against packet summaries.'),
-      limit: z.number().int().min(1).max(50).default(20).optional(),
-    }),
-  },
-  toolRegistry.get('atlas.packet_search') as any
-);
-
 // ── atlas.coverage ────────────────────────────────────────────────────────────
 // Phase 3I verification gate: reports coverage metrics for atlas_packets.
 // Gate: packet_key >= 95%, source_ref >= 90% before Phase 4A RRF can start.
@@ -8274,21 +8250,6 @@ server.registerTool(
     }
   }
 );
-server.registerTool(
-  'atlas:verify_coverage',
-  {
-    description:
-      'Phase 3I verification gate. Reports coverage metrics for the atlas_packets canonical warehouse: ' +
-      'total packets, source_ref coverage %, feature_id coverage %, concept_ids coverage %, ' +
-      'summary coverage %, embedding coverage %, and duplicate sha256 count. ' +
-      'Gate: source_ref >= 90% required before Phase 4A RRF ranking can start.',
-    inputSchema: z.object({
-      verbose: z.boolean().default(false).optional().describe('Include per-artifact_id breakdown'),
-    }),
-  },
-  toolRegistry.get('atlas.coverage') as any
-);
-
 // ── Shell Tool Wrapper (Safe bash execution for Gemma4) ────────────────────────
 server.registerTool(
   'shell.run',

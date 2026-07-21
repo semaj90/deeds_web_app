@@ -1,6 +1,8 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { selectTool } from '$lib/server/retrieval/hmm-tool-selector';
 import type { ToolCandidateResult } from '$lib/server/retrieval/hmm-tool-selector';
+import { analyzeQueryRouting } from '$lib/server/nlp/query-routing.js';
+import { buildAceRoutingPacket } from '$lib/server/ace/ace-routing.js';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -10,12 +12,54 @@ export const POST: RequestHandler = async ({ request }) => {
       return json({ error: 'query is required' }, { status: 400 });
     }
 
+    const analysis = await analyzeQueryRouting(query, {
+      repositoryId: filters.repositoryId,
+      previousIntent: filters.previousIntent,
+      taskState: filters.taskState,
+      domainHint: filters.domainHint,
+    });
+
     // Select best tool via HMM-gated routing
     const tool: ToolCandidateResult = await selectTool(
       query,
       query_embedding || [],
-      top_k
+      top_k,
+      undefined,
+      {
+        intent: analysis.intent,
+        domainClass: analysis.domainClass,
+        intentConfidence: analysis.intentConfidence,
+        domainConfidence: analysis.domainConfidence,
+        intentProbabilities: analysis.intentProbabilities,
+        domainProbabilities: analysis.domainProbabilities,
+        analysisSource: analysis.analysisSource,
+      }
     );
+
+    const rankedTools = tool.ranked_tools ?? (tool.tool_id ? [{ tool: tool.tool_id, score: tool.score }] : [])
+      .map((entry) => ({
+        toolId: entry.tool,
+        toolName: entry.tool,
+        score: entry.score,
+        eligible: entry.score > 0,
+      }));
+
+    const acePacket = buildAceRoutingPacket({
+      query,
+      analysis,
+      selectedToolId: tool.tool_id,
+      rankedTools,
+      selectedEvidenceIds: [],
+      sourceRefs: [],
+      allowedScopes: analysis.domainClass ? [analysis.domainClass] : [],
+      prohibitedActions: analysis.authorizationRequired ? ['mutation-without-approval'] : [],
+      requiresApproval: analysis.authorizationRequired,
+      traceId: filters.traceId ?? `routing:${analysis.query.length}:${Date.now()}`,
+      evidenceIds: [],
+      processingPassId: `ace-route:${Date.now()}`,
+      embeddingContractVersion: 'embeddinggemma-384',
+      retrievalContractVersion: 'hybrid-rrf-v1',
+    });
 
     return json({
       tool_id: tool.tool_id,
@@ -23,7 +67,10 @@ export const POST: RequestHandler = async ({ request }) => {
       confidence: tool.score,
       hmm_state: tool.hmm_state,
       domains: tool.domains,
-      fallback: tool.score < 0.70
+      fallback: tool.score < 0.70,
+      analysis,
+      ace_packet: acePacket,
+      candidate_tools: rankedTools,
     });
   } catch (error) {
     console.error('[/api/tools/search] Error:', error);
@@ -44,6 +91,11 @@ export const GET: RequestHandler = async () => {
         tool_id: 'trace.kag_search',
         name: 'KAG Search',
         domains: ['retrieval', 'graph', 'auth']
+      },
+      {
+        tool_id: 'trace.explain_retrieval',
+        name: 'Explain Retrieval',
+        domains: ['retrieval', 'graph']
       },
       {
         tool_id: 'atlas.topology_expand',
@@ -71,6 +123,6 @@ export const GET: RequestHandler = async () => {
         domains: ['synthesis', 'explanation']
       }
     ],
-    total: 6
+    total: 7
   });
 };

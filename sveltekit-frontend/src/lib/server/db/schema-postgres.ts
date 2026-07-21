@@ -2719,7 +2719,7 @@ export const ldrSynthesisRelations = relations(ldrSynthesis, ({ one }) => ({
   task: one(ldrResearchTasks, { fields: [ldrSynthesis.taskId], references: [ldrResearchTasks.id] }),
 }));
 
-export const mlRankingCacheRelations = relations(mlRankingCache, {});
+export const mlRankingCacheRelations = relations(mlRankingCache, () => ({}));
 
 export const mlClusteringRelations = relations(mlClustering, ({ one }) => ({
   task: one(ldrResearchTasks, { fields: [mlClustering.taskId], references: [ldrResearchTasks.id] }),

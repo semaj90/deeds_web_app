@@ -33,6 +33,16 @@ export type ToolObservation = {
   latencyScore: number;            // Normalized latency (1=fast, 0=slow)
 };
 
+export type RoutingSignals = {
+  intent?: string;
+  domainClass?: string;
+  intentConfidence?: number;
+  domainConfidence?: number;
+  intentProbabilities?: Record<string, number>;
+  domainProbabilities?: Record<string, number>;
+  analysisSource?: 'miniforge' | 'heuristic';
+};
+
 export type ToolCandidateResult = {
   tool_id: ToolId;
   name: string;
@@ -77,9 +87,19 @@ const STATE_TOOLS: Record<HMMState, ToolId[]> = {
  * Rule-based MVP (deterministic, testable, no training needed)
  * Future: Full Viterbi with transition probabilities
  */
-export function inferHMMState(obs: ToolObservation): HMMState {
+export function inferHMMState(obs: ToolObservation, signals?: RoutingSignals): HMMState {
   // Hard fail: validation score too low → quarantine
   if (obs.validationScore < 0.2) return 'QUARANTINE';
+
+  const intent = signals?.intent?.trim();
+  if (intent === 'task_board_action') return 'VALIDATE';
+  if (intent === 'schema_lookup') return 'VALIDATE';
+  if (intent === 'debug_error') return 'CODE_SEARCH';
+  if (intent === 'symbol_lookup') return 'CODE_SEARCH';
+  if (intent === 'dependency_trace') return 'GRAPH_EXPAND';
+  if (intent === 'deep_research') return obs.graphScore > 0.55 ? 'GRAPH_EXPAND' : 'SEMANTIC_SEARCH';
+  if (intent === 'code_explanation') return 'SYNTHESIZE';
+  if (intent === 'missing_work') return 'GRAPH_EXPAND';
 
   // Intent classification via keyword + score patterns (check graph first — higher priority)
   const graphKeywords = /depends?|calls?|imports?|uses?|connected|flows?|related|implements?|references?|what does.*depend|what.*call/i;
@@ -110,41 +130,45 @@ export function inferHMMState(obs: ToolObservation): HMMState {
  * Each tool gets a composite score based on observation features.
  * RRF can fuse multiple ranked lists from different routes.
  */
-export function rankTools(obs: ToolObservation): Array<{ tool: ToolId; score: number }> {
-  const state = inferHMMState(obs);
+export function rankTools(obs: ToolObservation, signals?: RoutingSignals): Array<{ tool: ToolId; score: number }> {
+  const state = inferHMMState(obs, signals);
   const allowed = new Set(STATE_TOOLS[state]);
 
   // Score each tool by relevant observation features
+  const intent = signals?.intent ?? '';
+  const domainClass = signals?.domainClass ?? '';
+  const intentConfidence = signals?.intentConfidence ?? 0;
+  const domainConfidence = signals?.domainConfidence ?? 0;
   const scores: Array<{ tool: ToolId; score: number }> = [
     // Lexical search: keyword + AST match
     {
       tool: 'rg.lexical_search',
-      score: 0.45 * obs.keywordScore + 0.35 * obs.astScore
+      score: 0.45 * obs.keywordScore + 0.35 * obs.astScore + (intent === 'symbol_lookup' ? 0.15 : 0) + (domainClass === 'retrieval' ? 0.05 * domainConfidence : 0)
     },
     // AST/code structure (implicit in topology_expand)
     {
       tool: 'atlas.topology_expand',
-      score: 0.65 * obs.astScore + 0.2 * obs.graphScore
+      score: 0.65 * obs.astScore + 0.2 * obs.graphScore + (intent === 'dependency_trace' || intent === 'missing_work' ? 0.15 * intentConfidence : 0)
     },
     // Dense vector similarity
     {
       tool: 'qdrant.dense_search',
-      score: 0.75 * obs.semanticScore + 0.15 * obs.keywordScore
+      score: 0.75 * obs.semanticScore + 0.15 * obs.keywordScore + (intent === 'deep_research' ? 0.1 * intentConfidence : 0)
     },
     // Graph traversal: graph + validation
     {
       tool: 'neo4j.dependency_closure',
-      score: 0.75 * obs.graphScore + 0.15 * obs.validationScore
+      score: 0.75 * obs.graphScore + 0.15 * obs.validationScore + (intent === 'dependency_trace' ? 0.1 * intentConfidence : 0)
     },
     // KAG: balanced multi-signal
     {
       tool: 'trace.kag_search',
-      score: 0.35 * obs.semanticScore + 0.35 * obs.graphScore + 0.2 * obs.keywordScore
+      score: 0.35 * obs.semanticScore + 0.35 * obs.graphScore + 0.2 * obs.keywordScore + (intent === 'deep_research' || intent === 'missing_work' ? 0.1 * intentConfidence : 0)
     },
     // Code synthesis: high validation only
     {
       tool: 'gemma4.explain_code',
-      score: obs.validationScore > 0.8 ? 0.6 * obs.validationScore : 0
+      score: obs.validationScore > 0.8 || intent === 'code_explanation' ? Math.max(0.6 * obs.validationScore, 0.7 * intentConfidence) : 0
     }
   ];
 
@@ -160,12 +184,13 @@ export async function selectTool(
   userQuery: string,
   queryEmbedding: number[],
   topK: number = 5,
-  pool?: PoolClient
+  pool?: PoolClient,
+  signals?: RoutingSignals
 ): Promise<ToolCandidateResult> {
   // Fallback if no embedding provided
   if (!queryEmbedding || queryEmbedding.length !== 384) {
-    const fallbackObs = computeObservationFromQuery(userQuery);
-    const state = inferHMMState(fallbackObs);
+    const fallbackObs = computeObservationFromQuery(userQuery, signals);
+    const state = inferHMMState(fallbackObs, signals);
 
     return {
       tool_id: 'rg.lexical_search',
@@ -179,10 +204,10 @@ export async function selectTool(
 
   try {
     // Compute observation features
-    const obs = computeObservationFromQuery(userQuery);
+    const obs = computeObservationFromQuery(userQuery, signals);
 
     // Infer HMM state
-    const state = inferHMMState(obs);
+    const state = inferHMMState(obs, signals);
 
     // Hard gate: quarantine blocks all execution
     if (state === 'QUARANTINE') {
@@ -197,7 +222,7 @@ export async function selectTool(
     }
 
     // Rank tools allowed in this state
-    const ranked = rankTools(obs);
+    const ranked = rankTools(obs, signals);
 
     if (!ranked || ranked.length === 0) {
       // No tools scored in allowed set → fallback to lexical
@@ -246,7 +271,7 @@ export async function selectTool(
  * - Semantic similarity (via Qdrant)
  * - Historical tool success rate (via telemetry table)
  */
-export function computeObservationFromQuery(query: string): ToolObservation {
+export function computeObservationFromQuery(query: string, signals?: RoutingSignals): ToolObservation {
   const lowerQuery = query.toLowerCase();
 
   // Keyword matching for intent signals (order matters — check specific patterns first)
@@ -256,11 +281,44 @@ export function computeObservationFromQuery(query: string): ToolObservation {
   const validationKeywords = /check|validate|verify|audit|test|schema|structure|integrity/i;
 
   // Keyword match scoring (graph takes precedence over code)
-  const graphScore = graphKeywords.test(query) ? 0.7 : 0.2;
-  const keywordScore = codeKeywords.test(query) && !graphKeywords.test(query) ? 0.6 : semanticKeywords.test(query) ? 0.5 : 0.3;
-  const semanticScore = semanticKeywords.test(query) ? 0.7 : 0.3;
-  const astScore = codeKeywords.test(query) ? 0.6 : 0.2;
-  const validationScore = validationKeywords.test(query) ? 0.7 : 0.4;
+  const intent = signals?.intent ?? '';
+  const domainClass = signals?.domainClass ?? '';
+  const intentConfidence = signals?.intentConfidence ?? 0;
+  const domainConfidence = signals?.domainConfidence ?? 0;
+
+  let graphScore = graphKeywords.test(query) ? 0.7 : 0.2;
+  let keywordScore = codeKeywords.test(query) && !graphKeywords.test(query) ? 0.6 : semanticKeywords.test(query) ? 0.5 : 0.3;
+  let semanticScore = semanticKeywords.test(query) ? 0.7 : 0.3;
+  let astScore = codeKeywords.test(query) ? 0.6 : 0.2;
+  let validationScore = validationKeywords.test(query) ? 0.7 : 0.4;
+
+  if (intent === 'symbol_lookup') {
+    keywordScore = Math.max(keywordScore, 0.78);
+    astScore = Math.max(astScore, 0.72);
+  } else if (intent === 'deep_research') {
+    semanticScore = Math.max(semanticScore, 0.82);
+    graphScore = Math.max(graphScore, 0.6);
+  } else if (intent === 'dependency_trace') {
+    graphScore = Math.max(graphScore, 0.85);
+  } else if (intent === 'schema_lookup') {
+    validationScore = Math.max(validationScore, 0.82);
+    keywordScore = Math.max(keywordScore, 0.65);
+  } else if (intent === 'code_explanation') {
+    semanticScore = Math.max(semanticScore, 0.74);
+    validationScore = Math.max(validationScore, 0.8);
+  } else if (intent === 'task_board_action') {
+    validationScore = Math.max(validationScore, 0.9);
+  } else if (intent === 'missing_work') {
+    graphScore = Math.max(graphScore, 0.68);
+    validationScore = Math.max(validationScore, 0.76);
+  }
+
+  if (domainClass === 'graph') graphScore = Math.max(graphScore, 0.8 * domainConfidence);
+  if (domainClass === 'retrieval') {
+    keywordScore = Math.max(keywordScore, 0.65 * domainConfidence);
+    semanticScore = Math.max(semanticScore, 0.55 * domainConfidence);
+  }
+  if (domainClass === 'schema') validationScore = Math.max(validationScore, 0.8 * domainConfidence);
 
   // Latency: assume rg is fast (lexical), Qdrant + Neo4j are slower
   const latencyScore = codeKeywords.test(query) ? 1.0 : 0.5;

@@ -73,16 +73,14 @@ async function auditFeatureViews(client: PoolClient): Promise<Partial<Joinabilit
 
   const row = result.rows[0];
 
-  // Query packet-feature joinability
+  // Query packet-feature joinability (via feature_domain canonical)
   const joinResult = await client.query(`
     SELECT
       COUNT(DISTINCT ap.packet_key) as joinable_by_packet_key,
       COUNT(DISTINCT ap.source_ref) as joinable_by_source_ref
     FROM atlas_packets ap
     WHERE EXISTS (
-      SELECT 1 FROM feature_implementations fi WHERE fi.packet_key = ap.packet_key
-    ) OR EXISTS (
-      SELECT 1 FROM feature_file_edges fe WHERE fe.source_ref = ap.source_ref
+      SELECT 1 FROM feature_domain fd WHERE fd.packet_key = ap.packet_key
     )
   `);
 

@@ -37,13 +37,14 @@ const MATERIALIZATION_VERSION = 1;
 
 async function extractStructuralFacts(client: any, packetKey: string): Promise<{ symbols: string[]; ast_facts: string[] }> {
   try {
-    // Try to read from feature_implementations AST symbols
+    // Read from feature_structural (AST extraction table)
     const result = await client.query(
       `SELECT
-        COALESCE(array_agg(DISTINCT symbol_name), '{}') as symbols,
-        COALESCE(array_agg(DISTINCT kind), '{}') as ast_facts
-      FROM feature_implementations
-      WHERE packet_key = $1`,
+        COALESCE(symbol_name, '{}') as symbols,
+        COALESCE(ast_facts, '{}') as ast_facts
+      FROM feature_structural
+      WHERE packet_key = $1
+      LIMIT 1`,
       [packetKey]
     );
 
@@ -53,8 +54,8 @@ async function extractStructuralFacts(client: any, packetKey: string): Promise<{
         ast_facts: result.rows[0].ast_facts || []
       };
     }
-  } catch {
-    // Table may not exist
+  } catch (err) {
+    // Fallback if table doesn't exist
   }
 
   return { symbols: [], ast_facts: [] };
@@ -93,9 +94,9 @@ async function extractLexicalFacts(client: any, source_ref: string): Promise<{ k
 async function extractDomainClass(client: any, packetKey: string, source_ref: string): Promise<string | null> {
   try {
     // Priority chain:
-    // 1. Canonical packet.domain_class (if exists)
+    // 1. feature_domain canonical classification (confidence 1.0)
     let result = await client.query(
-      `SELECT domain_class FROM atlas_packets WHERE packet_key = $1`,
+      `SELECT domain_class FROM feature_domain WHERE packet_key = $1 ORDER BY confidence DESC LIMIT 1`,
       [packetKey]
     ).catch(() => ({ rows: [] }));
 
