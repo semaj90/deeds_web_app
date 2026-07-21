@@ -36,13 +36,15 @@ export const POST: RequestHandler = async ({ request }) => {
       }
     );
 
-    const rankedTools = tool.ranked_tools ?? (tool.tool_id ? [{ tool: tool.tool_id, score: tool.score }] : [])
-      .map((entry) => ({
-        toolId: entry.tool,
-        toolName: entry.tool,
-        score: entry.score,
-        eligible: entry.score > 0,
-      }));
+    const rankedTools = (
+      tool.ranked_tools ??
+      (tool.tool_id ? [{ tool: tool.tool_id, score: tool.score }] : [])
+    ).map((entry) => ({
+      toolId: entry.tool,
+      toolName: entry.tool,
+      score: entry.score,
+      eligible: entry.score > 0,
+    }));
 
     const acePacket = buildAceRoutingPacket({
       query,

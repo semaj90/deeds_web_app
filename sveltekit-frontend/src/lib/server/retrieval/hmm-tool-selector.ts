@@ -15,6 +15,7 @@ export type HMMState =
 // Tools available in the registry
 export type ToolId =
   | 'trace.kag_search'           // Graph + KAG (graph/auth/retrieval domains)
+  | 'trace.explain_retrieval'    // Retrieval explanation / rationale
   | 'atlas.topology_expand'      // SOM topology navigation (topology/retrieval)
   | 'neo4j.dependency_closure'   // Graph traversal (graph/analysis)
   | 'qdrant.dense_search'        // Vector search (retrieval/vector)
@@ -72,12 +73,12 @@ export type ToolCandidateResult = {
  * Map HMM states to allowed tools
  */
 const STATE_TOOLS: Record<HMMState, ToolId[]> = {
-  UNKNOWN: ['rg.lexical_search', 'qdrant.dense_search', 'postgres.bm25'],
-  CODE_SEARCH: ['rg.lexical_search', 'atlas.topology_expand', 'trace.kag_search'],
-  SEMANTIC_SEARCH: ['qdrant.dense_search', 'trace.kag_search'],
-  GRAPH_EXPAND: ['neo4j.dependency_closure', 'trace.kag_search', 'atlas.topology_expand'],
+  UNKNOWN: ['rg.lexical_search', 'qdrant.dense_search', 'trace.kag_search', 'trace.explain_retrieval'],
+  CODE_SEARCH: ['rg.lexical_search', 'atlas.topology_expand', 'trace.kag_search', 'trace.explain_retrieval'],
+  SEMANTIC_SEARCH: ['qdrant.dense_search', 'trace.kag_search', 'trace.explain_retrieval'],
+  GRAPH_EXPAND: ['neo4j.dependency_closure', 'trace.kag_search', 'trace.explain_retrieval', 'atlas.topology_expand'],
   VALIDATE: ['qdrant.dense_search', 'rg.lexical_search'],
-  SYNTHESIZE: ['gemma4.explain_code'],
+  SYNTHESIZE: ['gemma4.explain_code', 'trace.explain_retrieval'],
   QUARANTINE: ['rg.lexical_search'] // Fallback only
 };
 
@@ -165,6 +166,11 @@ export function rankTools(obs: ToolObservation, signals?: RoutingSignals): Array
       tool: 'trace.kag_search',
       score: 0.35 * obs.semanticScore + 0.35 * obs.graphScore + 0.2 * obs.keywordScore + (intent === 'deep_research' || intent === 'missing_work' ? 0.1 * intentConfidence : 0)
     },
+    // Retrieval explanation: favors multi-signal explanations over pure search
+    {
+      tool: 'trace.explain_retrieval',
+      score: 0.3 * obs.semanticScore + 0.25 * obs.graphScore + 0.2 * obs.keywordScore + 0.15 * obs.validationScore + (intent === 'code_explanation' || intent === 'deep_research' ? 0.15 * intentConfidence : 0)
+    },
     // Code synthesis: high validation only
     {
       tool: 'gemma4.explain_code',
@@ -187,20 +193,7 @@ export async function selectTool(
   pool?: PoolClient,
   signals?: RoutingSignals
 ): Promise<ToolCandidateResult> {
-  // Fallback if no embedding provided
-  if (!queryEmbedding || queryEmbedding.length !== 384) {
-    const fallbackObs = computeObservationFromQuery(userQuery, signals);
-    const state = inferHMMState(fallbackObs, signals);
-
-    return {
-      tool_id: 'rg.lexical_search',
-      name: 'Lexical Search (ripgrep)',
-      score: 0,
-      hmm_state: state,
-      domains: ['lexical', 'search'],
-      observation: fallbackObs
-    };
-  }
+  const hasEmbedding = Array.isArray(queryEmbedding) && queryEmbedding.length === 384;
 
   try {
     // Compute observation features
@@ -244,7 +237,7 @@ export async function selectTool(
     return {
       tool_id: topTool.tool as ToolId,
       name: toolMetadata?.name || topTool.tool,
-      score: topTool.score,
+      score: hasEmbedding ? topTool.score : topTool.score * 0.95,
       hmm_state: state,
       domains: toolMetadata?.domains || [],
       observation: obs,
@@ -350,6 +343,10 @@ async function getToolMetadata(
     'trace.kag_search': {
       name: 'KAG Search',
       domains: ['retrieval', 'graph', 'auth']
+    },
+    'trace.explain_retrieval': {
+      name: 'Explain Retrieval',
+      domains: ['retrieval', 'explanation']
     },
     'atlas.topology_expand': {
       name: 'Topology Expansion',
