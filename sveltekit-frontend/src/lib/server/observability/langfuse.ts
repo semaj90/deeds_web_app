@@ -136,7 +136,8 @@ export async function traceLLM<T>(
 export async function traceEmbedding<T>(
 	text: string,
 	model: string,
-	callback: () => Promise<T>
+	callback: () => Promise<T>,
+	metadata: Record<string, unknown> = {}
 ): Promise<T> {
 	const langfuse = await getLangfuse();
 	const safeCb = _safeCallback(callback, undefined as unknown as T);
@@ -144,16 +145,31 @@ export async function traceEmbedding<T>(
 
 	const trace = langfuse.trace({
 		name: 'embedding',
-		metadata: { model, textLength: text.length },
+		metadata: {
+			model,
+			textLength: text.length,
+			...metadata,
+		},
 		tags: ['embedding', model],
 	});
 
-	const span = trace.span({ name: 'embed-generation', input: text.slice(0, 200) });
+	const span = trace.span({
+		name: 'embed-generation',
+		input: _safeStringify({
+			model,
+			textLength: text.length,
+			...metadata,
+		}, 500),
+	});
 	const start = Date.now();
 
 	try {
 		const result = await callback();
-		span.end({ output: `768-dim vector (${Date.now() - start}ms)` });
+		const dimension =
+			typeof metadata.expectedDimensions === 'number'
+				? `${metadata.expectedDimensions}-dim vector`
+				: 'embedding vector';
+		span.end({ output: `${dimension} (${Date.now() - start}ms)` });
 		return result;
 	} catch (err) {
 		span.end({ statusMessage: (err as Error).message, level: 'ERROR' });

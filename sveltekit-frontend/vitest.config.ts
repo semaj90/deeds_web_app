@@ -264,6 +264,8 @@ export default defineConfig({
       'tests/telemetry/dispatcher-mcp-tool-integration.spec.ts',
       // HyperRAG pipeline contract smoke — Zod schema + identity invariants
       'tests/hyperrag-contract-smoke.spec.ts',
+      // P1: ONNX embedding fallback integration (Session 138+)
+      'tests/embedding-onnx-integration.spec.ts',
       // Atlas retrieval adapter skeleton + ranking interface smoke tests
       'tests/atlas-skeleton-smoke.spec.ts',
       'tests/atlas-retrieval-leaf-adapters.spec.ts',

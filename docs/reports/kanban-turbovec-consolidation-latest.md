@@ -1,11 +1,11 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-07-20T03:09:59.658Z
+Generated: 2026-07-20T16:16:34.348Z
 Board tasks: 122
 Mass inputs: 6888
 Unique records: 6746
 Embedded records: 6724
-TurboVec backend mix: offline=6724
+TurboVec backend mix: search-derived=6, offline=6718
 simdjson parses: 3953833 bytes
 
 ## Consolidation groups
@@ -33,6 +33,9 @@ simdjson parses: 3953833 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:79**: 5 records, 5 open, clusters=79, 96, 110, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Document the WSL2 GPU override as optional deployment flavor only; default to host-side CUDA inference when it is already available. | Track 5C–5E: Model/GGUF cleanup | Unsloth + PyTorch install and validation
+- **lib:cluster:none**: 4 records, 4 open, clusters=none, families=lib
+  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
+  - top: lib › icons | lib › shims | lib › agent | lib › schemas
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:48**: 4 records, 4 open, clusters=48, 65, 79, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats | Clustering quality cleanup (deferred)
@@ -78,9 +81,6 @@ simdjson parses: 3953833 bytes
 - **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:57**: 3 records, 3 open, clusters=57, 74, 88, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores
-- **todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md:cluster:122**: 3 records, 3 open, clusters=11, 25, 122, families=todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md
-  - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
 
 ## Suggested board actions
 - Merge the highest-overlap open groups into one parent kanban item per feature family.

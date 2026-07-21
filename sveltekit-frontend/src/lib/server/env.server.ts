@@ -117,6 +117,20 @@ function goRetrievalGrpcEnabled(): boolean {
   return (privateEnv.GO_RETRIEVAL_GRPC_ENABLED ?? privateEnv.RETRIEVAL_GRPC_ENABLED ?? 'false') === 'true';
 }
 
+function inferEmbeddingProvider(baseUrl?: string): 'ollama' | 'llama-server' {
+  if (!baseUrl) return 'ollama';
+
+  try {
+    const port = new URL(baseUrl).port;
+    if (port === '8081') return 'llama-server';
+    if (port === '11434') return 'ollama';
+  } catch {
+    // fall through to default
+  }
+
+  return 'ollama';
+}
+
 // Canonical DB resolution: only the modern Postgres on :5434 is supported.
 // The legacy :5432 stub used to live behind a DATABASE_URL_FALLBACK chain;
 // removed 2026-05-08 because the two instances had drifted independently
@@ -138,9 +152,33 @@ export const ENV = {
    * Dedicated embedding server URL. Set to http://127.0.0.1:8081 to route
    * embeddinggemma through llama-server.exe --embedding instead of Ollama.
    * llama-server exposes /v1/embeddings (OpenAI) + /embedding (llama.cpp native).
-   * Falls back to OLLAMA_BASE_URL when not set.
+   * Falls back to the local llama-server lane when not set; callers can still
+   * override to OLLAMA_BASE_URL explicitly if they need legacy routing.
    */
-  OLLAMA_EMBED_BASE_URL: privateEnv.OLLAMA_EMBED_BASE_URL ?? privateEnv.EMBED_SERVER_URL ?? null,
+  OLLAMA_EMBED_BASE_URL:
+    privateEnv.OLLAMA_EMBED_BASE_URL ??
+    privateEnv.EMBED_SERVER_URL ??
+    `http://${LOOPBACK_IP}:8081`,
+  /** Local GGUF used by the dedicated embedding llama-server lane. */
+  EMBED_MODEL_PATH:
+    privateEnv.EMBED_MODEL_PATH ??
+    privateEnv.EMBEDDING_MODEL_PATH ??
+    privateEnv.OLLAMA_EMBED_MODEL_PATH ??
+    null,
+  /** Explicit embedding provider selection: 'ollama' or 'llama-server' */
+  EMBEDDING_PROVIDER:
+    privateEnv.EMBEDDING_PROVIDER ??
+    inferEmbeddingProvider(
+      privateEnv.OLLAMA_EMBED_BASE_URL ??
+        privateEnv.EMBEDDING_BASE_URL ??
+        privateEnv.EMBED_SERVER_URL,
+    ),
+  /** Embedding service base URL (new naming convention; replaces OLLAMA_EMBED_BASE_URL) */
+  EMBEDDING_BASE_URL:
+    privateEnv.EMBEDDING_BASE_URL ??
+    privateEnv.OLLAMA_EMBED_BASE_URL ??
+    privateEnv.EMBED_SERVER_URL ??
+    `http://${LOOPBACK_IP}:8081`,
   /** Canonical chat / tool-calling model for the local RotorQuant lane. */
   ROTORQUANT_CHAT_MODEL:
     privateEnv.ROTORQUANT_CHAT_MODEL ??
@@ -148,6 +186,10 @@ export const ENV = {
     privateEnv.OLLAMA_MODEL ??
     privateEnv.GEMMA4_MODEL ??
     'gemma4-rotorquant:latest',
+  /** Alternative local GGUF lane used for the HFORF model registry entry. */
+  HFORF_MODEL_PATH:
+    privateEnv.HFORF_MODEL_PATH ??
+    'models/hfor/hforf.gguf',
   /** Backward-compatible alias kept for legacy codepaths. */
   OLLAMA_CHAT_MODEL:
     privateEnv.OLLAMA_CHAT_MODEL ??

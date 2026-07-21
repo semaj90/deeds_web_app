@@ -7,7 +7,7 @@ import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import Redis from 'ioredis';
 import { ENV } from '$lib/server/env.server.js';
 import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
-import { tryEmbedOllama } from '$lib/server/embeddings/ollama.js';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { countTokens, enforceTokenBudget } from '$lib/server/llm/token-budget.js';
 import { getRedis } from '$lib/server/redis.js';
 import { turbovecPrefilter, turbovecSearch } from '$lib/server/retrieval/turbovec-prefilter.js';
@@ -575,7 +575,7 @@ export async function buildAcePromptPreflight(
   // 4. Qdrant dense search
   const qdrantStart = Date.now();
   let queryEmbedding: number[] | null = null;
-    const embedded = await tryEmbedOllama(input.query, {
+    const embedded = await tryEmbedCanonical(input.query, {
       model: 'embeddinggemma:latest',
       baseUrl: getOllamaEmbeddingEndpoint(),
       timeoutMs: 4000,

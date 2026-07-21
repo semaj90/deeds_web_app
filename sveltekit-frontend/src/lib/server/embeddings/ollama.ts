@@ -13,6 +13,7 @@ import { ollamaFetch } from '$lib/server/ollama.js';
 export type OllamaEmbedResult = {
   model: string;
   embedding: number[];
+  source?: 'onnx-local' | 'llama-server' | 'ollama';
 };
 
 type OllamaEmbedResponse = {
@@ -64,6 +65,42 @@ export async function tryEmbedOllama(
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+export async function tryEmbedCanonical(
+  text: string,
+  opts?: {
+    model?: string;
+    baseUrl?: string;
+    signal?: AbortSignal;
+    timeoutMs?: number;
+  },
+): Promise<OllamaEmbedResult | null> {
+  try {
+    const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('../embedding/onnx-embed.js');
+    if (isOnnxEmbedAvailable()) {
+      const embedding = await tryEmbedOnnx(text);
+      if (embedding) {
+        return {
+          model: opts?.model ?? 'embeddinggemma-onnx',
+          embedding,
+          source: 'onnx-local',
+        };
+      }
+    }
+  } catch {
+    // ONNX lane is best-effort and should not block the server-side fallback.
+  }
+
+  const result = await tryEmbedOllama(text, opts);
+  if (result) {
+    return {
+      ...result,
+      source: 'ollama',
+    };
+  }
+
+  return null;
 }
 
 export function embeddingDims(vec: number[] | null | undefined): number | null {

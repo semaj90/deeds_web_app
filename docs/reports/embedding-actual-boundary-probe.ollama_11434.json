@@ -1,0 +1,161 @@
+{
+  "generatedAt": "2026-07-20T21:05:42.199Z",
+  "resolution": {
+    "provider": "ollama",
+    "baseUrl": "http://127.0.0.1:11434",
+    "endpoint": "/v1/embeddings",
+    "model": "embeddinggemma:latest"
+  },
+  "counts": [
+    8,
+    16,
+    24,
+    32,
+    48,
+    64,
+    80,
+    96,
+    112,
+    120,
+    124,
+    126,
+    127,
+    128,
+    129,
+    132
+  ],
+  "probes": [
+    {
+      "wordCount": 8,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 10,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 16,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 18,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 24,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 26,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 32,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 34,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 48,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 50,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 64,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 66,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 80,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 82,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 96,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 98,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 112,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 114,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 120,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 122,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 124,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 126,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 126,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 128,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 127,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 129,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 128,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 130,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 129,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 131,
+      "actualCount": null,
+      "error": null
+    },
+    {
+      "wordCount": 132,
+      "ok": true,
+      "status": 200,
+      "promptTokens": 134,
+      "actualCount": null,
+      "error": null
+    }
+  ],
+  "firstFailureAtWordCount": null,
+  "firstFailureActualTokenCount": null,
+  "status": "PASS_WITH_WARNINGS",
+  "note": "This sweep uses a minimal x-token payload so the service-reported prompt token counts are visible. The probe records the server-reported actual token count on failure."
+}

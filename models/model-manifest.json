@@ -11,6 +11,21 @@
   },
   "models": [
     {
+      "id": "hforf-gguf",
+      "displayName": "HFORF local GGUF lane",
+      "description": "Local experimental GGUF lane registered for synthesis / lab routing. Used as the current default admin atlas chat path via /models/hfor/hforf.gguf.",
+      "runtime": "llama-server",
+      "pathEnv": "HFORF_MODEL_PATH",
+      "localPath": "models/hfor/hforf.gguf",
+      "filename": "hforf.gguf",
+      "notes": "Registered local artifact under /models/hfor. Keep the RotorQuant GGUF as fallback while validating this lane.",
+      "embeddingDim": null,
+      "port": 8090,
+      "contextLen": 64000,
+      "quantization": "unknown",
+      "tags": ["chat", "lab", "gguf", "current-default"]
+    },
+    {
       "id": "gemma4-rotorquant:latest",
       "displayName": "Gemma 4 Legal VLM (merged)",
       "description": "Gemma 4 E4B with GRPO legal LoRA merged. Serves text + vision (unified model). Primary generation lane.",

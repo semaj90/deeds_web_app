@@ -10,8 +10,17 @@ import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
+import {
+	resolveEmbeddingBackend,
+	classifyEmbeddingError,
+} from '$lib/server/embedding/embedding-backend-resolution.js';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
+const EMBEDDING_BACKEND = resolveEmbeddingBackend('embeddinggemma:latest', {
+	configuredProvider: ENV.EMBEDDING_PROVIDER,
+	configuredBaseUrl: ENV.EMBEDDING_BASE_URL,
+	fallbackBaseUrl: ENV.OLLAMA_BASE_URL,
+});
 
 const embedRequestSchema = z.object({
 	text: z.string().min(1, 'Text is required').max(50000),
@@ -122,6 +131,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch (err) {
 		const category = categorizeError(err);
 		const severity = categorizeSeverity(category);
+		const failureKind = classifyEmbeddingError(String(err));
 
 		console.error('Embedding error:', err);
 
@@ -133,7 +143,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			stack: err instanceof Error ? err.stack : undefined,
 			routePath: '/api/embed',
 			filePath: 'src/routes/api/embed/+server.ts',
-			contextKey: 'embed',
+			contextKey: `embed:${failureKind}`,
 		});
 
 		// Degraded response — return mock embedding instead of 500
@@ -144,9 +154,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 export const GET: RequestHandler = async () => {
 	return apiResponses.ok({
 		message: 'Embedding API endpoint',
-		methods: ['POST'],
-		models: ['embeddinggemma', 'nomic', 'mock'],
-		maxTextLength: 50000,
-		ollamaUrl: OLLAMA_URL,
-	});
+			methods: ['POST'],
+			models: ['embeddinggemma', 'nomic', 'mock'],
+			maxTextLength: 50000,
+			ollamaUrl: OLLAMA_URL,
+			embeddingBackend: EMBEDDING_BACKEND,
+		});
 };

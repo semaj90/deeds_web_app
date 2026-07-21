@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { tryEmbedOllama } from '$lib/server/embedding/ollama-embed.js';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 
 const wikiSearchSchema = z.object({
 	query: z.string().min(1, 'query is required').max(500),
@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const { query, limit, domain } = parsed.data;
 
 		// Generate embedding for the search query
-		const embeddingResult = await tryEmbedOllama(query, { timeoutMs: 5000 });
+		const embeddingResult = await tryEmbedCanonical(query, { timeoutMs: 5000 });
 
 		if (!embeddingResult || !embeddingResult.embedding) {
 			return json({

@@ -47,6 +47,9 @@ export type {
 // ── ACE retrieval logging and evaluation ────────────────────────────────────
 export * from '$lib/server/features/rag/ace-retrieval-logger.js';
 
+// ── App-side executor tree (cross-encoder, LangExtract, trace reranker) ─────
+export * from './executor-tree.js';
+
 // ── Canonical feature-envelope rerank bridge ────────────────────────────────
 export type {
   CanonicalRerankEnvelope,

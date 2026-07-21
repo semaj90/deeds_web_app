@@ -1,0 +1,40 @@
+{
+  "runId": "phase17-2026-07-20T20:05:50.700Z-c196aee9",
+  "startedAt": "2026-07-20T20:05:50.702Z",
+  "counts": {
+    "filesDiscovered": 1,
+    "filesProcessed": 0,
+    "packetsBuilt": 0,
+    "postgresUpserts": 0,
+    "qdrantUpserts": 0,
+    "neo4jUpserts": 0,
+    "redisWrites": 0,
+    "failures": 1
+  },
+  "gates": {
+    "FILE_DISCOVERY_PASS": true,
+    "PACKET_BUILD_PASS": false,
+    "MSGPACK_ROUNDTRIP_PASS": false,
+    "HEXADECIMAL_EXTRACTION_PASS": true,
+    "DECOMPILED_SIGNAL_PASS": true,
+    "POSTGRES_AUTHORITY_PASS": true,
+    "QDRANT_MIRROR_PASS": true,
+    "NEO4J_GRAPHIFY_PASS": true,
+    "REDIS_ACE_BITFROST_PASS": true,
+    "RPC_HEALTH_PASS": false,
+    "CHECKPOINT_PASS": false,
+    "ZERO_FAILURES": false
+  },
+  "failures": [
+    {
+      "sourceRef": "ace-kag-howto.md",
+      "error": "Embedding service 500: {\"error\":{\"code\":500,\"message\":\"input (162 tokens) is too large to process. increase the physical batch size (current batch size: 128)\",\"type\":\"server_error\"}}"
+    }
+  ],
+  "finalStatus": "FAIL",
+  "rpc": {
+    "status": "FAIL",
+    "error": "fetch failed"
+  },
+  "finishedAt": "2026-07-20T20:05:50.810Z"
+}

@@ -1,11 +1,12 @@
 /**
  * Multi-Protocol Embedding Client — server-only.
  *
- * 4-tier fallback chain for batch 768d embeddings:
+ * 5-tier fallback chain for batch 768d embeddings:
  *   1. gRPC (50051) — binary protocol, lowest latency
  *   2. QUIC/NATS (4222) — HTTP/3, 0-RTT, multiplexed
  *   3. HTTP/Ollama Batch (/api/embed) — standard REST
  *   4. HTTP/Ollama Sequential (/api/embeddings) — legacy fallback
+ *   5. ONNX Local (no network) — network-independent last resort
  *
  * All addresses resolved via ENV.* getters in env.server.ts.
  */
@@ -13,6 +14,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { SERVER_EMBEDDING_MODEL } from '$lib/ai/model-ids.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { buildGrpcClientChannelOptions } from './client-options.js';
+import { batchEmbedOnnx, isOnnxEmbedAvailable } from '$lib/server/embedding/onnx-embed.js';
 // Proto types inlined (generated/proto archived — regenerate from proto/*.proto if gRPC revived)
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -41,7 +43,7 @@ export interface EmbeddingOptions {
   skipCacheWrite?: boolean;
 }
 
-type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local';
+type EmbeddingSource = 'grpc' | 'quic' | 'http-ollama' | 'http-ollama-sequential' | 'onnx-local' | 'cache';
 
 export type EmbeddingAttemptStatus = 'success' | 'failed' | 'skipped' | 'cache-hit';
 
@@ -758,8 +760,11 @@ export async function generateEmbeddingsWithTags(
 
 /**
  * Generate embeddings for a batch of texts.
- * Checks Redis cache first, then falls back through 4-tier chain.
- * 4-tier fallback: gRPC → QUIC/NATS → HTTP batch → HTTP sequential.
+ * Checks Redis cache first, then falls back through 5-tier chain.
+ * 5-tier fallback: gRPC → QUIC/NATS → HTTP batch → HTTP sequential → ONNX local (no network).
+ *
+ * Dimension contract: 768-dim (embeddinggemma, L2-normalized).
+ * ONNX fallback ensures network-down scenarios don't block embedding generation.
  */
 export async function generateEmbeddings(
   texts: string[],
@@ -906,35 +911,43 @@ export async function generateEmbeddings(
     }
   }
 
-  // Tier 5: ONNX local (embeddinggemma_300m_onnx — no network, no Ollama)
-  if (!newVectors) {
+  // Tier 5: ONNX local (embeddinggemma_300m_onnx — 768-dim, no network, no Ollama)
+  if (!newVectors && isOnnxEmbedAvailable()) {
     const onnxStart = performance.now();
     try {
-      const { tryEmbedOnnx, isOnnxEmbedAvailable } = await import('../embedding/onnx-embed.js');
-      if (isOnnxEmbedAvailable()) {
-        const onnxVectors: (number[] | null)[] = [];
-        for (const t of uncachedTexts) {
-          onnxVectors.push(await tryEmbedOnnx(t));
-        }
-        if (onnxVectors.every((v) => v !== null)) {
-          newVectors = onnxVectors as number[][];
-          source = 'onnx-local';
-          model = 'embeddinggemma-onnx';
-          attempts.push({
-            transport: 'onnx-local',
-            status: 'success',
-            durationMs: Math.round(performance.now() - onnxStart),
-          });
-        } else {
-          attempts.push({
-            transport: 'onnx-local',
-            status: 'failed',
-            detail: 'partial null results from ONNX inference',
-            durationMs: Math.round(performance.now() - onnxStart),
-          });
-        }
+      const onnxVectors = await batchEmbedOnnx(uncachedTexts);
+      const validVectors = onnxVectors.filter((v) => v !== null) as number[][];
+
+      if (validVectors.length === uncachedTexts.length) {
+        // All ONNX embeddings succeeded
+        newVectors = validVectors;
+        source = 'onnx-local';
+        model = 'embeddinggemma-onnx-300m';
+        attempts.push({
+          transport: 'onnx-local',
+          status: 'success',
+          detail: 'local ONNX model, 768-dim L2-normalized',
+          durationMs: Math.round(performance.now() - onnxStart),
+        });
+      } else if (validVectors.length > 0) {
+        // Partial ONNX success — use available, warn about gaps
+        console.warn(
+          `[embedding-client] ONNX partial success: ${validVectors.length}/${uncachedTexts.length}`
+        );
+        attempts.push({
+          transport: 'onnx-local',
+          status: 'failed',
+          detail: `${validVectors.length}/${uncachedTexts.length} embeddings succeeded, rest null`,
+          durationMs: Math.round(performance.now() - onnxStart),
+        });
       } else {
-        attempts.push({ transport: 'onnx-local', status: 'skipped', detail: 'model not present' });
+        // All ONNX embeddings failed
+        attempts.push({
+          transport: 'onnx-local',
+          status: 'failed',
+          detail: 'all embeddings null from ONNX model',
+          durationMs: Math.round(performance.now() - onnxStart),
+        });
       }
     } catch (onnxErr) {
       attempts.push({
@@ -944,6 +957,12 @@ export async function generateEmbeddings(
         durationMs: Math.round(performance.now() - onnxStart),
       });
     }
+  } else if (!newVectors && !isOnnxEmbedAvailable()) {
+    attempts.push({
+      transport: 'onnx-local',
+      status: 'skipped',
+      detail: 'model not available',
+    });
   }
 
   if (!newVectors) {
@@ -957,6 +976,15 @@ export async function generateEmbeddings(
     vectors[idx] = newVectors[j];
   }
 
+  // Validate dimension contract (768-dim canonical for embeddinggemma)
+  const dimension = vectors[0]?.length ?? 768;
+  if (dimension !== 768) {
+    console.warn(
+      `[embedding-client] WARNING: Received ${dimension}-dim embedding from ${source}, expected 768-dim. ` +
+      `This may indicate a model mismatch or misconfiguration (source: ${model}).`
+    );
+  }
+
   // Fire-and-forget cache writes for new embeddings
   for (let j = 0; !options.skipCacheWrite && j < uncachedIndices.length; j++) {
     setCachedEmbedding(texts[uncachedIndices[j]], newVectors[j], source).catch(() => {});
@@ -965,7 +993,7 @@ export async function generateEmbeddings(
   return {
     vectors,
     model,
-    dimension: vectors[0]?.length ?? 768,
+    dimension,
     source,
     totalMs: Math.round(performance.now() - start),
     cacheHit: false,

@@ -1,13 +1,23 @@
 /**
  * Stage 6 — Batched Ollama /api/embed with Redis cache
  * Reuses embeddingCacheService for L1 exact-match persistence.
+ * Backend validation wired via fingerprintBackend on module init.
  */
 
 import { ENV } from '$lib/server/env.server.js';
 import { embeddingCacheService } from '$lib/server/embedding-cache-service.js';
+import {
+	validateResolvedBackend,
+	resolveEmbeddingBackend,
+	type ResolutionValidationError,
+} from '$lib/server/embedding/embedding-backend-resolution.js';
+
+let backendValidated = false;
+let backendValidationError: ResolutionValidationError[] | null = null;
 
 /**
  * Batched embedding generator.
+ * Validates backend fingerprint on first call; fails fast on provider-URL mismatch.
  * @param inputs Texts to embed
  * @param model Model name (default: embeddinggemma:latest)
  */
@@ -15,7 +25,48 @@ export async function getBatchedEmbeddings(
 	inputs: string[],
 	model: string = 'embeddinggemma:latest'
 ): Promise<number[][]> {
-	const results: number[][] = new Array(inputs.length);
+	// P0: Validate backend on first call (prevent silent provider-URL mismatch)
+	if (!backendValidated) {
+		const resolution = resolveEmbeddingBackend(model, {
+			configuredProvider: ENV.EMBEDDING_PROVIDER,
+			configuredBaseUrl: ENV.EMBEDDING_BASE_URL,
+			fallbackBaseUrl: ENV.OLLAMA_BASE_URL,
+		});
+
+		const validation = await validateResolvedBackend(resolution.provider, resolution.baseUrl);
+		backendValidated = true;
+		backendValidationError = validation.errors.length > 0 ? validation.errors : null;
+
+		if (!validation.valid) {
+			const errorSummary = validation.errors.join(', ');
+			console.error(
+				`[embed] Backend validation failed: ${errorSummary}`,
+				`(provider=${resolution.provider}, url=${resolution.baseUrl})`,
+				`detected=${validation.fingerprint.isOllama ? 'ollama' : validation.fingerprint.isLlamaServer ? 'llama-server' : 'unknown'}`
+			);
+			throw new Error(
+				`Embedding backend validation failed: ${errorSummary}. ` +
+					`Configured: ${resolution.provider} @ ${resolution.baseUrl}. ` +
+					`Please verify EMBEDDING_PROVIDER and EMBEDDING_BASE_URL environment variables.`
+			);
+		}
+
+		console.log(
+			`[embed] Backend validation passed (provider=${resolution.provider}, ` +
+				`embeddings_supported=${validation.fingerprint.supportsEmbeddings})`
+		);
+	}
+
+	// If validation failed on a prior call, throw immediately
+	if (backendValidationError !== null) {
+		throw new Error(
+			`Embedding backend validation failed on startup. ` +
+				`Errors: ${backendValidationError.join(', ')}. ` +
+				`Restart required after fixing environment variables.`
+		);
+	}
+
+	const results = new Array<number[] | null>(inputs.length).fill(null);
 	const misses: { text: string; index: number }[] = [];
 
 	// 1. Check Redis cache for each input
@@ -28,10 +79,9 @@ export async function getBatchedEmbeddings(
 		}
 	}
 
-	if (misses.length === 0) return results;
+	if (misses.length === 0) return results as number[][];
 
 	// 2. Batch call Ollama for misses
-	// Note: Ollama /api/embed supports multiple inputs in one call
 	try {
 		const response = await fetch(`${ENV.OLLAMA_BASE_URL}/api/embed`, {
 			method: 'POST',
@@ -44,25 +94,39 @@ export async function getBatchedEmbeddings(
 		});
 
 		if (!response.ok) {
-			throw new Error(`Ollama embed failed: ${response.status}`);
+			throw new Error(`Ollama embed failed: ${response.status} ${response.statusText}`);
 		}
 
-		const data = await response.json() as { embeddings: number[][] };
-		
-		// 3. Update cache and populate results
+		const data = await response.json() as { embeddings?: unknown };
+
+		// Validate response structure
+		if (!Array.isArray(data.embeddings)) {
+			throw new Error(`Invalid Ollama response: embeddings is not an array`);
+		}
+
+		if (data.embeddings.length !== misses.length) {
+			throw new Error(
+				`Ollama response mismatch: expected ${misses.length} embeddings, got ${data.embeddings.length}`
+			);
+		}
+
+		// 3. Populate results and update cache
 		for (let i = 0; i < misses.length; i++) {
 			const emb = data.embeddings[i];
-			if (emb) {
-				results[misses[i].index] = emb;
-				// Background cache update
-				void embeddingCacheService.cacheEmbedding(misses[i].text, emb, model);
+
+			if (!Array.isArray(emb) || emb.length === 0) {
+				throw new Error(`Invalid embedding at index ${i}: expected non-empty array, got ${typeof emb}`);
 			}
+
+			const embedding = emb as number[];
+			results[misses[i].index] = embedding;
+			void embeddingCacheService.cacheEmbedding(misses[i].text, embedding, model);
 		}
 	} catch (err) {
-		console.error('[rg-atlas-embed] Error:', err);
-		// Fill misses with zero vectors or throw? 
-		// For now, return what we have (nulls will be filtered by downstream)
+		const errorMsg = err instanceof Error ? err.message : String(err);
+		console.error(`[rg-atlas-embed] Failed to embed ${misses.length} texts: ${errorMsg}`);
+		throw new Error(`Embedding service error: ${errorMsg}`);
 	}
 
-	return results;
+	return results as number[][];
 }

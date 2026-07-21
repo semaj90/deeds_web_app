@@ -1,0 +1,177 @@
+{
+  "generatedAt": "2026-07-20T21:02:53.666Z",
+  "resolution": {
+    "provider": "llama-server",
+    "baseUrl": "http://127.0.0.1:8081",
+    "endpoint": "/v1/embeddings",
+    "model": "embeddinggemma:latest"
+  },
+  "backendValidation": {
+    "valid": true,
+    "errors": [],
+    "fingerprint": {
+      "isOllama": false,
+      "isLlamaServer": true,
+      "supportsEmbeddings": true,
+      "modelList": [
+        "embeddinggemma-300m-f16.gguf"
+      ]
+    }
+  },
+  "detectedRuntime": {
+    "configuredProvider": "llama-server",
+    "configuredBaseUrl": "http://127.0.0.1:8081",
+    "endpointPath": "/v1/embeddings",
+    "detectedRuntime": "llama-server",
+    "version": null,
+    "modelIds": [
+      "embeddinggemma-300m-f16.gguf"
+    ],
+    "detectionEvidence": [
+      "/health",
+      "/v1/models"
+    ]
+  },
+  "originalFailure": {
+    "file": "launch-2026-07-20T09-12-56.err",
+    "lines": [
+      "srv  log_server_r: done request: POST /v1/embeddings 127.0.0.1 500",
+      "srv  update_slots: no tokens to decode",
+      "srv  update_slots: all slots are idle",
+      "slot get_availabl: id  0 | task -1 | selected slot by LRU, t_last = 13176011095",
+      "slot launch_slot_: id  0 | task 342 | processing task, is_child = 0",
+      "slot update_slots: id  0 | task 342 | new prompt, n_ctx_slot = 2048, n_keep = 0, task.n_tokens = 162",
+      "srv    send_error: task id = 342, error: input (162 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+      "slot      release: id  0 | task 342 | stop processing: n_tokens = 0, truncated = 0",
+      "srv          stop: cancel task, id_task = 342",
+      "srv  log_server_r: done request: POST /v1/embeddings 127.0.0.1 500"
+    ]
+  },
+  "lengths": [
+    16,
+    64,
+    96,
+    120,
+    127,
+    128,
+    129,
+    162
+  ],
+  "probes": [
+    {
+      "tokenCount": 16,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": true,
+          "status": 200,
+          "error": null,
+          "boundaryKind": "PASS"
+        }
+      ],
+      "acceptedBy": "/v1/embeddings"
+    },
+    {
+      "tokenCount": 64,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (184 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    },
+    {
+      "tokenCount": 96,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (280 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    },
+    {
+      "tokenCount": 120,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (372 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    },
+    {
+      "tokenCount": 127,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (400 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    },
+    {
+      "tokenCount": 128,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (404 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    },
+    {
+      "tokenCount": 129,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (408 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    },
+    {
+      "tokenCount": 162,
+      "attempts": [
+        {
+          "endpoint": "/v1/embeddings",
+          "url": "http://127.0.0.1:8081/v1/embeddings",
+          "ok": false,
+          "status": 500,
+          "error": "input (540 tokens) is too large to process. increase the physical batch size (current batch size: 128)",
+          "boundaryKind": "INPUT_BATCH_TOO_LARGE"
+        }
+      ],
+      "acceptedBy": null
+    }
+  ],
+  "firstFailureAt": 64,
+  "status": "PASS_WITH_WARNINGS",
+  "note": "This report is endpoint-specific and does not fall back between providers. It separates configuration, runtime fingerprint, and the preserved original failure context from logs."
+}

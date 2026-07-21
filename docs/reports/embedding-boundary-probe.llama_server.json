@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-07-20T21:05:29.495Z",
+  "endpoint": "LLAMA_SERVER",
+  "testPayload": {
+    "text": "In the case of Smith v. Jones, the court found that the defendant failed to comply with\nthe discovery requirements as established under Federal Rules of Civil Procedure 26(a). The plaintiff\nargued that the defendant's failure to produce relevant documents within the prescribed timeframe constituted\na material breach of the discovery obligations. The court agreed, noting that discovery is a fundamental\ncomponent of civil litigation and serves to ensure that both parties have access to relevant evidence.\nThe defendant's obstruction of this process, intentional or otherwise, undermines the integrity of the\njudicial system and the fair resolution of disputes. Accordingly, the court imposed sanctions and ordered\nthe production of all withheld documents within five business days.",
+    "textLength": 784,
+    "wordCount": 116
+  },
+  "data": {
+    "fingerprint": {
+      "name": "LLAMA_SERVER",
+      "baseUrl": "http://127.0.0.1:8081",
+      "timestamp": "2026-07-20T21:05:30.781Z",
+      "tests": {
+        "apiVersion": {
+          "status": 404,
+          "ok": false
+        },
+        "health": {
+          "status": 200,
+          "ok": true
+        },
+        "v1Models": {
+          "status": 200,
+          "ok": true
+        },
+        "apiEmbeddings": {
+          "status": 404,
+          "ok": false
+        }
+      },
+      "fingerprint": {
+        "isOllama": false,
+        "isLlamaServer": true,
+        "supportsEmbeddings": true,
+        "modelList": [
+          "embeddinggemma-300m-f16.gguf"
+        ],
+        "versionInfo": null
+      }
+    },
+    "embedding": {
+      "model": "embeddinggemma:latest",
+      "textLength": 784,
+      "wordCount": 116,
+      "endpoints": {
+        "apiEmbeddings": {
+          "status": 404,
+          "ok": false,
+          "durationMs": 1,
+          "error": "{\"error\":{\"message\":\"File Not Found\",\"type\":\"not_found_error\",\"code\":404}}"
+        },
+        "v1Embeddings": {
+          "status": 500,
+          "ok": false,
+          "durationMs": 145,
+          "error": "{\"error\":{\"code\":500,\"message\":\"input (145 tokens) is too large to process. increase the physical batch size (current batch size: 128)\",\"type\":\"server_error\"}}"
+        },
+        "embedding": {
+          "status": 500,
+          "ok": false,
+          "durationMs": 14,
+          "error": "{\"error\":{\"code\":500,\"message\":\"input (145 tokens) is too large to process. increase the physical batch size (current batch size: 128)\",\"type\":\"server_error\"}}"
+        }
+      }
+    }
+  }
+}

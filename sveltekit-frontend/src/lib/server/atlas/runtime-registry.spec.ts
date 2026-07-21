@@ -54,6 +54,9 @@ describe('atlas runtime registry', () => {
       expect.arrayContaining([
         'gemma4-rotorquant-iq4xs-direct',
         'embeddinggemma-768d',
+        'hforf-gguf',
+        'embeddinggemma-300m-onnx',
+        'packet-jepa-pt',
         'granite-docling-258m',
       ]),
     );
@@ -63,6 +66,15 @@ describe('atlas runtime registry', () => {
         'langgraph-agentic-reranker',
         'hmm-tool-selector',
         'engram-registry',
+      ]),
+    );
+
+    const worker = getAtlasRuntimeRegistrySection('worker');
+    expect(worker?.items.map((item) => item.key)).toEqual(
+      expect.arrayContaining([
+        'langgraph-dag',
+        'retrieval-executor-tree',
+        'daily-graphify',
       ]),
     );
   });

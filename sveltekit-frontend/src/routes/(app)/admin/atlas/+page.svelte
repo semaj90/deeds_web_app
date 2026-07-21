@@ -91,6 +91,9 @@
 		cacheStats?: AdminCacheStats | null;
 		workflowStatus?: TaskPacketWorkflowStatus | null;
 		rotorquantModelPath?: string;
+		hforfModelPath?: string;
+		embeddingOnnxPath?: string;
+		packetJepaPath?: string;
 		embedModel?: string;
 		graniteDoclingModel?: string;
 		kvProfile?: string;
@@ -670,6 +673,9 @@
 	let runtime = $derived.by(() => {
 		const models = health?.ollama?.models ?? [];
 		const rotorquantModelPath = data.rotorquantModelPath ?? 'models/gemma4-rotorquant:latest-iq4xs-direct.gguf';
+		const hforfModelPath = data.hforfModelPath ?? 'models/hfor/hforf.gguf';
+		const embeddingOnnxPath = data.embeddingOnnxPath ?? 'models/embeddinggemma_300m_onnx/model.onnx';
+		const packetJepaPath = data.packetJepaPath ?? 'models/packet-jepa/packet-jepa.pt';
 		const rotorquantModel = 'gemma4-rotorquant:latest';
 		const embedModel = data.embedModel ?? 'embeddinggemma:latest';
 		const graniteDoclingModel = data.graniteDoclingModel ?? 'ibm/granite-docling:258m';
@@ -684,6 +690,21 @@
 			embedding: {
 				online: modelOnline(models, embedModel),
 				model: embedModel,
+			},
+			lab: {
+				registered: Boolean(hforfModelPath),
+				model: 'hforf.gguf',
+				path: hforfModelPath,
+			},
+			onnx: {
+				registered: Boolean(embeddingOnnxPath),
+				model: 'embeddinggemma_300m_onnx',
+				path: embeddingOnnxPath,
+			},
+			latent: {
+				registered: Boolean(packetJepaPath),
+				model: 'packet-jepa.pt',
+				path: packetJepaPath,
 			},
 			docling: {
 				online: modelOnline(models, graniteDoclingModel),
@@ -793,12 +814,45 @@
 
 					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
 						<div class="flex items-center justify-between gap-3">
+							<span class="text-[#a39f90] font-bold">LAB_GGUF</span>
+							<span class={runtime.lab.registered ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
+								{runtime.lab.registered ? 'REGISTERED' : 'MISSING'}
+							</span>
+						</div>
+						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.lab.model}</div>
+						<div class="mt-0.5 text-[#5c594c] truncate">{runtime.lab.path}</div>
+					</div>
+
+					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+						<div class="flex items-center justify-between gap-3">
 							<span class="text-[#a39f90] font-bold">DOC_LANE</span>
 							<span class={runtime.docling.online ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
 								{runtime.docling.online ? 'READY' : 'MISSING'}
 							</span>
 						</div>
 						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.docling.model}</div>
+					</div>
+
+					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+						<div class="flex items-center justify-between gap-3">
+							<span class="text-[#a39f90] font-bold">ONNX_ARTIFACT</span>
+							<span class={runtime.onnx.registered ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
+								{runtime.onnx.registered ? 'REGISTERED' : 'MISSING'}
+							</span>
+						</div>
+						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.onnx.model}</div>
+						<div class="mt-0.5 text-[#5c594c] truncate">{runtime.onnx.path}</div>
+					</div>
+
+					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">
+						<div class="flex items-center justify-between gap-3">
+							<span class="text-[#a39f90] font-bold">LATENT_PT</span>
+							<span class={runtime.latent.registered ? 'text-[#8c9f7a] font-bold' : 'text-[#c25953] font-bold'}>
+								{runtime.latent.registered ? 'REGISTERED' : 'MISSING'}
+							</span>
+						</div>
+						<div class="mt-1 text-[#efede4] truncate font-bold">{runtime.latent.model}</div>
+						<div class="mt-0.5 text-[#5c594c] truncate">{runtime.latent.path}</div>
 					</div>
 
 					<div class="border border-[#3f3e37] bg-[#23221c] px-3 py-2">

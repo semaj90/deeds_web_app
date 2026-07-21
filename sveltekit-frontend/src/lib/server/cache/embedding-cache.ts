@@ -85,8 +85,11 @@ export async function getCachedEmbedding(
   // L3: Ollama /api/embeddings (cold path)
   let vector: Float32Array;
   try {
-    const ollama = await import('$lib/server/embeddings/ollama.js');
-    const response = await ollama.getOllamaEmbedding(text, { model });
+    const { tryEmbedCanonical } = await import('$lib/server/embedding/canonical-embed.js');
+    const response = await tryEmbedCanonical(text, { model });
+    if (!response?.embedding) {
+      throw new Error('Canonical embedding lane returned no vector');
+    }
     vector = new Float32Array(response.embedding);
   } catch (err) {
     throw new Error(`Embedding failed: ${err instanceof Error ? err.message : String(err)}`);

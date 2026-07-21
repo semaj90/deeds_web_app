@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-07-20T03:09:59.658Z",
+  "generatedAt": "2026-07-20T16:16:34.348Z",
   "inputs": {
-    "boardPath": "c:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
-    "featureLabelsPath": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
-    "kanbanTasksPath": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\kanban_tasks.jsonl",
-    "missingTodosPath": "c:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\missing_feature_todos.jsonl"
+    "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
+    "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
+    "kanbanTasksPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\kanban_tasks.jsonl",
+    "missingTodosPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\missing_feature_todos.jsonl"
   },
   "options": {
     "apply": false,
@@ -20,11 +20,12 @@
     "uniqueRecordCount": 6746,
     "scopedRecordCount": 6724,
     "embeddedCount": 6724,
-    "groupCount": 6517,
+    "groupCount": 6515,
     "consolidationCandidateGroups": 131,
     "highOverlapGroups": 8,
     "turbovecBackendCounts": {
-      "offline": 6724
+      "search-derived": 6,
+      "offline": 6718
     },
     "libtorchAvailable": true,
     "libtorchGroupsScored": 131,
@@ -34,7 +35,7 @@
       "nativeParses": 1,
       "fallbackParses": 6625,
       "totalBytesParsed": 3953833,
-      "nativeTimeMs": 2.403400000000147,
+      "nativeTimeMs": 4.363499999999931,
       "cacheBytes": 7809826,
       "cacheSize": 6626
     },
@@ -463,6 +464,43 @@
         "source": "cpu",
         "cohesion": -0.0087,
         "pairCount": 10
+      },
+      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
+    },
+    {
+      "groupId": "lib:cluster:none",
+      "recordCount": 4,
+      "openCount": 4,
+      "clusterIds": [],
+      "featureFamilies": [
+        "lib"
+      ],
+      "sourceRefs": [],
+      "topTitles": [
+        "lib › icons",
+        "lib › shims",
+        "lib › agent",
+        "lib › schemas"
+      ],
+      "topFeatureIds": [],
+      "topSourceRefs": [
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconAiAssistant.svelte#L1",
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconCitation.svelte#L1",
+        "local:sveltekit-frontend/src/lib/icons/yorha/IconEvidenceFile.svelte#L1",
+        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/shims/melt-ui-shim.ts#L1",
+        "local:sveltekit-frontend/src/lib/shims/commonjs-shim.js#L1"
+      ],
+      "statuses": {
+        "BACKLOG": 4
+      },
+      "backendCounts": {
+        "search-derived": 4
+      },
+      "priorityMax": 2,
+      "libtorch": {
+        "source": "cpu",
+        "cohesion": 0.002,
+        "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     },
@@ -2247,45 +2285,6 @@
         "source": "cpu",
         "cohesion": -0.0278,
         "pairCount": 3
-      },
-      "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
-    },
-    {
-      "groupId": "lib:cluster:121",
-      "recordCount": 2,
-      "openCount": 2,
-      "clusterIds": [
-        10,
-        24,
-        121
-      ],
-      "featureFamilies": [
-        "lib"
-      ],
-      "sourceRefs": [],
-      "topTitles": [
-        "lib › schemas",
-        "lib › command-center-manifest › ts"
-      ],
-      "topFeatureIds": [],
-      "topSourceRefs": [
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/schemas/vector.ts#L1",
-        "local:sveltekit-frontend/src/lib/schemas/board.ts#L1",
-        "local:sveltekit-frontend/src/lib/schemas/evidence-upload.ts#L1",
-        "local:sveltekit-frontend/scripts/phase104-backups/src/lib/command-center-manifest.ts#L1",
-        "local:sveltekit-frontend/src/lib/command-center-manifest.ts#L1"
-      ],
-      "statuses": {
-        "BACKLOG": 2
-      },
-      "backendCounts": {
-        "offline": 2
-      },
-      "priorityMax": 2,
-      "libtorch": {
-        "source": "cpu",
-        "cohesion": 0.0076,
-        "pairCount": 1
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."
     }

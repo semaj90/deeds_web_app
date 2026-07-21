@@ -1,0 +1,73 @@
+{
+  "timestamp": "2026-07-20T21:05:29.495Z",
+  "endpoint": "OLLAMA",
+  "testPayload": {
+    "text": "In the case of Smith v. Jones, the court found that the defendant failed to comply with\nthe discovery requirements as established under Federal Rules of Civil Procedure 26(a). The plaintiff\nargued that the defendant's failure to produce relevant documents within the prescribed timeframe constituted\na material breach of the discovery obligations. The court agreed, noting that discovery is a fundamental\ncomponent of civil litigation and serves to ensure that both parties have access to relevant evidence.\nThe defendant's obstruction of this process, intentional or otherwise, undermines the integrity of the\njudicial system and the fair resolution of disputes. Accordingly, the court imposed sanctions and ordered\nthe production of all withheld documents within five business days.",
+    "textLength": 784,
+    "wordCount": 116
+  },
+  "data": {
+    "fingerprint": {
+      "name": "OLLAMA",
+      "baseUrl": "http://127.0.0.1:11434",
+      "timestamp": "2026-07-20T21:05:29.497Z",
+      "tests": {
+        "apiVersion": {
+          "status": 200,
+          "ok": true
+        },
+        "health": {
+          "status": 404,
+          "ok": false
+        },
+        "v1Models": {
+          "status": 200,
+          "ok": true
+        },
+        "apiEmbeddings": {
+          "status": 200,
+          "ok": true,
+          "embeddingDim": 768
+        }
+      },
+      "fingerprint": {
+        "isOllama": true,
+        "isLlamaServer": false,
+        "supportsEmbeddings": true,
+        "modelList": [
+          "embeddinggemma:latest",
+          "ibm/granite-docling:258m",
+          "nomic-embed-text:latest"
+        ],
+        "versionInfo": "0.32.1"
+      }
+    },
+    "embedding": {
+      "model": "embeddinggemma:latest",
+      "textLength": 784,
+      "wordCount": 116,
+      "endpoints": {
+        "apiEmbeddings": {
+          "status": 200,
+          "ok": true,
+          "durationMs": 404,
+          "embeddingDim": 768,
+          "success": true
+        },
+        "v1Embeddings": {
+          "status": 200,
+          "ok": true,
+          "durationMs": 257,
+          "embeddingDim": 768,
+          "success": true
+        },
+        "embedding": {
+          "status": 404,
+          "ok": false,
+          "durationMs": 3,
+          "error": "404 page not found"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,787 @@
+---
+# OKF Schema: Mastra Workflows
+# Defines workflow templates, tool bindings, and durable execution patterns for Atlas agents
+#
+# Usage:
+#   - Agents query this schema to discover available workflows
+#   - Workflow registry uses this to validate step definitions
+#   - Recovery system uses this to resume workflows after crashes
+#
+# Version: 1.0
+# Last Updated: July 20, 2026
+
+apiVersion: okf.atlas.ai/v1
+kind: WorkflowSchema
+metadata:
+  name: mastra-durable-workflows
+  namespace: atlas.ai
+  description: Mastra workflow definitions with durable execution support
+  version: '1.0'
+  created: '2026-07-20T00:00:00Z'
+  author: Atlas Engineering
+
+# ============================================================================
+# Workflow Definitions (templates for common agent tasks)
+# ============================================================================
+
+workflows:
+
+  # ────────────────────────────────────────────────────────────────────────
+  # Error-Repair Workflow
+  # ────────────────────────────────────────────────────────────────────────
+
+  error-repair-durable:
+    apiVersion: mastra.workflow/v1
+    kind: Workflow
+    metadata:
+      name: error-repair-durable
+      description: Classify, repair, and validate code fixes with crash recovery
+      agent: error-repair-agent
+      tags:
+        - repair
+        - error-fixing
+        - code-generation
+        - crash-safe
+      criticality: high
+      estimated_duration_ms: 30000
+
+    spec:
+      # Workflow input contract
+      input:
+        type: object
+        required:
+          - query
+          - errorClass
+          - filePath
+        properties:
+          query:
+            type: string
+            description: User query or error description
+            minLength: 1
+            maxLength: 2000
+
+          errorClass:
+            type: string
+            enum:
+              - meta_hygiene
+              - stale_migration
+              - schema_mismatch
+              - vector_infra_missing
+              - env_url_mismatch
+              - route_contract_mismatch
+              - api_validation_gap
+              - ssr_safety_violation
+              - unknown
+            description: Classified error type
+
+          filePath:
+            type: string
+            description: Path to file needing repair
+            pattern: '^[a-zA-Z0-9_./-]+$'
+
+          taskId:
+            type: string
+            description: Task identifier for audit trail
+
+          userId:
+            type: string
+            description: User requesting repair
+
+          metadata:
+            type: object
+            description: Additional context
+            additionalProperties: true
+
+      # Workflow output contract
+      output:
+        type: object
+        required:
+          - ok
+          - summary
+          - runId
+        properties:
+          ok:
+            type: boolean
+            description: Whether repair succeeded
+
+          summary:
+            type: string
+            description: Human-readable outcome
+
+          runId:
+            type: string
+            description: Unique execution identifier
+            pattern: '^[a-zA-Z0-9-]{36}$'  # UUID format
+
+          patchApplied:
+            type: boolean
+            description: Whether patch was written to disk
+
+          smokeTestPassed:
+            type: boolean
+            description: Whether validation passed
+
+      # Step definitions (orchestration order)
+      steps:
+
+        - name: classify-error
+          stepType: llm_completion
+          description: Classify error and assess severity
+          model: gemma4-legal-iq4xs-direct.gguf
+          timeout_ms: 10000
+
+          input:
+            type: object
+            properties:
+              query: { $ref: '#/workflows/error-repair-durable/spec/input/properties/query' }
+              errorClass: { $ref: '#/workflows/error-repair-durable/spec/input/properties/errorClass' }
+
+          output:
+            type: object
+            properties:
+              errorClass: { type: string }
+              classification: { type: string }
+              riskScore: { type: number, minimum: 0, maximum: 1 }
+              severity: { enum: ['low', 'medium', 'high'] }
+
+          idempotency:
+            enabled: true
+            key_formula: 'runId:classify-error:input_hash'
+            cache_ttl_seconds: 3600
+
+          retry:
+            max_attempts: 2
+            backoff_ms: 1000
+
+        - name: propose-repair
+          stepType: llm_completion
+          description: Generate patch using Gemma4
+          model: gemma4-legal-iq4xs-direct.gguf
+          timeout_ms: 15000
+
+          depends_on:
+            - classify-error
+
+          input:
+            type: object
+            properties:
+              errorClass: { type: string }
+              filePath: { type: string }
+              classification: { type: string, description: 'Output from classify-error' }
+
+          output:
+            type: object
+            properties:
+              patch: { type: string }
+              summary: { type: string }
+              confidence: { type: number, minimum: 0, maximum: 1 }
+
+          idempotency:
+            enabled: true
+            key_formula: 'runId:propose-repair:input_hash'
+            cache_ttl_seconds: 3600
+
+          retry:
+            max_attempts: 2
+            backoff_ms: 1000
+
+        - name: apply-repair
+          stepType: db_mutation
+          description: Write patch to filesystem
+          timeout_ms: 5000
+
+          depends_on:
+            - propose-repair
+
+          input:
+            type: object
+            properties:
+              filePath: { type: string }
+              patch: { type: string }
+
+          output:
+            type: object
+            properties:
+              applied: { type: boolean }
+              filePath: { type: string }
+              alreadyApplied: { type: boolean }
+
+          idempotency:
+            enabled: true
+            key_formula: 'runId:apply-repair:resource_id'
+            strategy: write_guard
+            check_table: execution_side_effects
+            check_columns:
+              - resource_id
+              - operation
+
+          side_effects:
+            - type: file_write
+              resource_id: filePath
+              operation: WRITE
+              reversible: true
+              reverse_operation: REVERT
+
+          retry:
+            max_attempts: 1  # Mutations cannot retry safely
+
+        - name: run-smoke-test
+          stepType: validation
+          description: Verify patch works (npm run check)
+          timeout_ms: 30000
+
+          depends_on:
+            - apply-repair
+
+          input:
+            type: object
+            properties:
+              command: { type: string, default: 'npm run check' }
+
+          output:
+            type: object
+            properties:
+              passed: { type: boolean }
+              output: { type: string }
+              durationMs: { type: integer }
+
+          idempotency:
+            enabled: true
+            key_formula: 'runId:run-smoke-test:command_hash'
+            cache_ttl_seconds: 300  # Shorter TTL for tests
+
+          retry:
+            max_attempts: 2
+            backoff_ms: 2000
+
+        - name: log-outcome
+          stepType: db_mutation
+          description: Record result in agent_memory_registry
+          timeout_ms: 5000
+
+          depends_on:
+            - run-smoke-test
+
+          input:
+            type: object
+            properties:
+              taskId: { type: string }
+              passed: { type: boolean }
+              summary: { type: string }
+
+          output:
+            type: object
+            properties:
+              recorded: { type: boolean }
+              recordId: { type: string }
+
+          idempotency:
+            enabled: true
+            key_formula: 'runId:log-outcome:task_id'
+            strategy: write_guard
+            check_table: execution_side_effects
+            check_columns:
+              - resource_id
+              - operation
+
+          side_effects:
+            - type: db_write
+              resource_id: agent_memory_registry
+              operation: INSERT
+              reversible: false
+
+# ============================================================================
+# Tool Bindings (MCP tools available to workflows)
+# ============================================================================
+
+tools:
+
+  search-codebase:
+    apiVersion: mcp.tool/v1
+    kind: Tool
+    metadata:
+      name: search-codebase
+      provider: atlas-tools
+      description: Search Atlas packet index via hybrid retrieval
+
+    spec:
+      input:
+        type: object
+        required: [query]
+        properties:
+          query:
+            type: string
+            description: Search query
+          limit:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          filter:
+            type: object
+            description: Optional filters
+
+      output:
+        type: object
+        properties:
+          packets:
+            type: array
+            items:
+              type: object
+              properties:
+                packet_key: { type: string }
+                source_ref: { type: string }
+                summary: { type: string }
+                score: { type: number }
+
+      timeout_ms: 5000
+      retry_policy: exponential_backoff
+
+  classify-error:
+    apiVersion: mcp.tool/v1
+    kind: Tool
+    metadata:
+      name: classify-error
+      provider: gemma4-offload
+      description: Classify code error via Gemma4
+
+    spec:
+      input:
+        type: object
+        required: [query]
+        properties:
+          query: { type: string }
+          context: { type: string }
+
+      output:
+        type: object
+        properties:
+          errorClass: { type: string }
+          riskScore: { type: number }
+          explanation: { type: string }
+
+      timeout_ms: 10000
+
+  validate-patch:
+    apiVersion: mcp.tool/v1
+    kind: Tool
+    metadata:
+      name: validate-patch
+      provider: ast-tools
+      description: Syntax and semantic validation
+
+    spec:
+      input:
+        type: object
+        required: [patch, language]
+        properties:
+          patch: { type: string }
+          language: { enum: ['typescript', 'python', 'go', 'rust'] }
+
+      output:
+        type: object
+        properties:
+          valid: { type: boolean }
+          errors: { type: array, items: { type: string } }
+
+      timeout_ms: 5000
+
+# ============================================================================
+# Step Type Definitions (reusable templates)
+# ============================================================================
+
+stepTypes:
+
+  llm_completion:
+    description: Call LLM (Gemma4 or Ollama)
+    idempotent: true
+    retryable: true
+
+    execution_rules:
+      - model_required: true
+      - timeout_required: true
+      - cache_key_formula: 'runId:step_name:messages_hash'
+      - tokens_tracked: true
+
+    side_effects: none
+
+  tool_call:
+    description: Invoke MCP tool
+    idempotent: true
+    retryable: true
+
+    execution_rules:
+      - tool_name_required: true
+      - timeout_required: true
+      - cache_key_formula: 'runId:step_name:input_hash'
+
+    side_effects: none
+
+  db_mutation:
+    description: Write to database
+    idempotent: false
+    retryable: false
+
+    execution_rules:
+      - write_guard_required: true
+      - idempotency_key_required: true
+      - side_effects_required: true
+      - must_check_execution_side_effects: true
+
+    side_effects: required
+
+  file_write:
+    description: Write to filesystem
+    idempotent: false
+    retryable: false
+
+    execution_rules:
+      - write_guard_required: true
+      - resource_id_required: true
+      - reversible_recommended: true
+
+    side_effects: required
+
+  validation:
+    description: Pure computation (no side effects)
+    idempotent: true
+    retryable: true
+
+    execution_rules:
+      - no_side_effects_allowed: true
+      - cache_recommended: true
+
+    side_effects: none
+
+# ============================================================================
+# Idempotency Strategies
+# ============================================================================
+
+idempotency_strategies:
+
+  step_cache:
+    description: Cache step output by idempotency key
+    applicable_to:
+      - llm_completion
+      - tool_call
+      - validation
+
+    key_formula_template: 'runId:step_name:input_hash'
+    storage: execution_journal_steps
+    ttl_default_seconds: 3600
+
+    on_cache_hit: skip_execution
+    on_cache_miss: execute_and_record
+
+  write_guard:
+    description: Check if mutation already applied
+    applicable_to:
+      - db_mutation
+      - file_write
+
+    check_strategy: query_execution_side_effects
+    before_write: always
+    after_write: record_in_side_effects
+
+    on_already_applied: return_cached_result
+    on_first_time: execute_and_record
+
+# ============================================================================
+# Recovery Patterns
+# ============================================================================
+
+recovery:
+
+  checkpoint:
+    description: Checkpoint is recorded after each step completes
+    storage: execution_runs.checkpoint_step_id
+    granularity: per_step
+    automatic: true
+
+  resume:
+    description: Resume from checkpoint on next workflow invocation
+
+    algorithm:
+      - load_execution_run_by_run_id
+      - build_recovery_map_from_completed_steps
+      - skip_steps_in_recovery_map
+      - continue_from_checkpoint_step
+      - record_recovery_count
+
+    safety_checks:
+      - verify_step_status_is_success
+      - verify_idempotency_key_matches
+      - verify_side_effects_were_recorded
+
+  rollback:
+    description: Optional automatic rollback on failure
+    supported_for:
+      - file_write (if reversible: true)
+
+    strategy: apply_reverse_operation
+    on_rollback_failure: manual_review
+
+# ============================================================================
+# Error Handling & Retry Policy
+# ============================================================================
+
+error_handling:
+
+  hard_failures:
+    - step_type: db_mutation
+      max_retries: 0
+      action: suspend_for_review
+      reason: Mutations are not safely retryable
+
+    - step_type: file_write
+      max_retries: 0
+      action: suspend_for_review
+      reason: File writes need manual verification
+
+  soft_failures:
+    - step_type: llm_completion
+      max_retries: 2
+      backoff_ms: 1000
+      action: retry_then_fail
+
+    - step_type: tool_call
+      max_retries: 2
+      backoff_ms: 1000
+      action: retry_then_fail
+
+    - step_type: validation
+      max_retries: 2
+      backoff_ms: 2000
+      action: retry_then_fail
+
+  circuit_breaker:
+    failure_threshold: 5
+    success_threshold: 2
+    timeout_seconds: 300
+    state_tracking: per_workflow_per_step
+
+# ============================================================================
+# Observability & Metrics
+# ============================================================================
+
+observability:
+
+  metrics:
+    - name: workflow_executions_total
+      type: counter
+      dimensions: [agent, workflow, status]
+
+    - name: workflow_steps_duration_seconds
+      type: histogram
+      dimensions: [workflow, step_name, status]
+      buckets: [0.1, 0.5, 1, 5, 10, 30, 60]
+
+    - name: workflow_cache_hits_total
+      type: counter
+      dimensions: [workflow, step_type, cache_type]
+
+    - name: workflow_side_effects_total
+      type: counter
+      dimensions: [workflow, effect_type, operation]
+
+    - name: workflow_recovery_count
+      type: histogram
+      dimensions: [workflow]
+
+    - name: workflow_tokens_used_total
+      type: counter
+      dimensions: [workflow, model]
+
+  tracing:
+    enabled: true
+    export_to: [postgres_journal, langfuse_optional]
+    trace_fields:
+      - run_id
+      - task_id
+      - step_name
+      - step_index
+      - status
+      - duration_ms
+      - tokens_used
+      - cache_hit
+      - error_message
+
+  logging:
+    level: info
+    export_to: [postgres_journal, stdout]
+    log_on_events:
+      - workflow_start
+      - step_complete
+      - step_fail
+      - cache_hit
+      - side_effect_recorded
+      - workflow_complete
+      - recovery_resume
+
+# ============================================================================
+# Workflow Registry (discovery & validation)
+# ============================================================================
+
+registry:
+
+  discovery:
+    endpoint: /api/workflows/registry
+    cache_ttl_seconds: 300
+
+    list_all: true
+    list_by_agent: true
+    list_by_tag: true
+    search_by_description: true
+
+  validation:
+    on_load: strict
+    on_execution: strict
+
+    rules:
+      - all_steps_must_have_names: true
+      - all_steps_must_have_types: true
+      - circular_dependencies_forbidden: true
+      - input_schema_must_be_valid: true
+      - output_schema_must_be_valid: true
+      - all_dependencies_must_exist: true
+      - all_models_must_be_available: true
+
+  versioning:
+    semantic: true
+    breaking_changes_detected: true
+    migration_required_on: major
+    deprecation_period_days: 30
+
+# ============================================================================
+# Annotations & Extensions
+# ============================================================================
+
+annotations:
+
+  # Cost estimation
+  cost_per_execution:
+    classify_error: 0.01  # Gemma4 call
+    propose_repair: 0.02  # Longer Gemma4 call
+    apply_repair: 0       # Filesystem only
+    run_smoke_test: 0     # External tool
+    log_outcome: 0        # DB write
+
+  # Compliance
+  compliance:
+    gdpr_applicable: false
+    hipaa_applicable: false
+    pii_handling: none
+    audit_trail_required: true
+    retention_days: 90
+
+  # SLA targets
+  sla:
+    p99_latency_ms: 60000
+    success_rate: 0.98
+    availability: 0.999
+
+# ============================================================================
+# Integration Examples (reference implementations)
+# ============================================================================
+
+examples:
+
+  basic_workflow_execution:
+    description: Start a new error-repair workflow
+
+    pseudo_code: |
+      executor = await startExecution(db, {
+        runId: 'repair-abc123',
+        taskId: 'task-456',
+        agent: 'error-repair-agent',
+        input: {
+          query: 'fix missing imports',
+          errorClass: 'import_error',
+          filePath: 'src/test.ts'
+        }
+      });
+
+      result = await errorRepairWorkflow.execute({
+        ...input,
+        _durable_executor: executor
+      });
+
+      await executor.complete(result);
+
+  crash_recovery:
+    description: Resume from checkpoint after crash
+
+    pseudo_code: |
+      { executor, recoveryMap } = await resumeExecution(runId, db);
+
+      // executor automatically skips steps in recoveryMap
+      result = await errorRepairWorkflow.execute({
+        ...input,
+        _durable_executor: executor
+      });
+
+      await executor.complete(result);
+
+  idempotent_write:
+    description: Guard a mutation against duplicates
+
+    pseudo_code: |
+      { alreadyWritten, result } = await idempotentWrite(db, {
+        runId,
+        stepName: 'apply-repair',
+        resourceId: 'src/foo.ts',
+        operation: 'WRITE',
+        write: async () => writeFile(path, patch),
+        newValue: { patch }
+      });
+
+      if (alreadyWritten) {
+        console.log('Patch already applied, skipping');
+      }
+
+# ============================================================================
+# Validation Rules (JSON Schema compliance checks)
+# ============================================================================
+
+validation_rules:
+  - name: input_required
+    applies_to: workflow
+    rule: spec.input must be valid JSON Schema
+    severity: error
+
+  - name: output_required
+    applies_to: workflow
+    rule: spec.output must be valid JSON Schema
+    severity: error
+
+  - name: steps_required
+    applies_to: workflow
+    rule: spec.steps must be non-empty array
+    severity: error
+
+  - name: step_names_unique
+    applies_to: workflow
+    rule: all step names within spec.steps must be unique
+    severity: error
+
+  - name: dependencies_valid
+    applies_to: workflow
+    rule: all depends_on references must exist in spec.steps
+    severity: error
+
+  - name: no_cycles
+    applies_to: workflow
+    rule: dependency graph must be acyclic
+    severity: error
+
+  - name: models_available
+    applies_to: step
+    rule: if stepType is llm_completion, model must be available
+    severity: warning
+
+  - name: timeout_reasonable
+    applies_to: step
+    rule: timeout_ms must be between 1000 and 300000
+    severity: warning
+
+# End of OKF Schema

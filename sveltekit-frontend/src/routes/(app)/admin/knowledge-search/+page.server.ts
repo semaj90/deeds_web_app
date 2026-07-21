@@ -2,7 +2,7 @@
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
 import { createQdrantService } from '$lib/server/db/qdrant-integration';
-import { tryEmbedOllama } from '$lib/server/embedding/ollama-embed';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -22,7 +22,7 @@ export const actions: Actions = {
 
         try {
             // 1. Generate embedding
-            const embedResult = await tryEmbedOllama(query);
+            const embedResult = await tryEmbedCanonical(query, { timeoutMs: 5000 });
             if (!embedResult || !embedResult.embedding) {
                 return fail(500, { error: 'Failed to generate embedding' });
             }

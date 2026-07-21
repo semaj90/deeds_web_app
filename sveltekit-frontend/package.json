@@ -92,6 +92,8 @@
     "atlas:backfill:lexical:apply": "node ../scripts/atlas/backfill-lexical-lane.mjs --limit=10000",
     "atlas:backfill:embedding:dry": "node ../scripts/atlas/backfill-embedding-lane.mjs --dry-run --limit=100",
     "atlas:backfill:embedding:apply": "node ../scripts/atlas/backfill-embedding-lane.mjs --limit=500",
+    "embedding:test:validation": "npx tsx ../scripts/atlas/test-embedding-validation.mts",
+    "embedding:test:boundary-probe": "node ../scripts/atlas/embedding-boundary-probe.mjs",
     "atlas:embed:full-corpus:dry": "node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --dry-run --limit=100",
     "atlas:embed:full-corpus:apply": "node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64",
     "atlas:embed:full-corpus:apply:verbose": "node scripts/atlas/backfill-codebase-chunk-embeddings.mjs --apply --batch-size=64 --verbose",

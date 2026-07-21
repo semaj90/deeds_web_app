@@ -47,7 +47,10 @@ export const load: PageServerLoad = async ({ locals, fetch, url }) => {
 		runtimeRegistry,
 		cacheStats,
 		workflowStatus: workflowStatus?.status ?? null,
-		rotorquantModelPath: ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? 'models/gemma4-rotorquant:latest-iq4xs-direct.gguf',
+		rotorquantModelPath: ENV.HFORF_MODEL_PATH ?? ENV.ROTORQUANT_MODEL_PATH ?? ENV.TURBO_MODEL_PATH ?? 'models/hfor/hforf.gguf',
+		hforfModelPath: ENV.HFORF_MODEL_PATH ?? 'models/hfor/hforf.gguf',
+		embeddingOnnxPath: 'models/embeddinggemma_300m_onnx/model.onnx',
+		packetJepaPath: 'models/packet-jepa/packet-jepa.pt',
 		embedModel: ENV.OLLAMA_EMBED_MODEL,
 		graniteDoclingModel: ENV.GRANITE_DOCLING_MODEL,
 		kvProfile: process.env.TURBO_PROFILE ?? 'stock'
