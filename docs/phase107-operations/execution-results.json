@@ -1,0 +1,68 @@
+{
+  "stage": "init",
+  "timestamp": "2026-07-21T03:10:41.551Z",
+  "tracks": {
+    "latencyMonitor": {
+      "status": "monitoring_active",
+      "sla_target_ms": 250,
+      "baseline_metrics": {
+        "postgres_latency_ms": 8.5,
+        "qdrant_latency_p50_ms": 130,
+        "qdrant_latency_p95_ms": 190,
+        "valkey_latency_ms": 4.2,
+        "cache_hit_rate_pct": 78.5,
+        "total_requests": 55119,
+        "requests_cached": 43218,
+        "cache_bypass_requests": 11901
+      },
+      "monitoring_window": "14d",
+      "decision_points": [
+        "If p95 > 250ms for 2+ consecutive days → trigger Phase 107c (256-dim MRL)",
+        "If p95 stays < 250ms → defer Phase 107c, continue Phase 1 AST"
+      ]
+    },
+    "astExtraction": {
+      "status": "background_task",
+      "current_coverage_pct": 19.3,
+      "target_coverage_pct": 95,
+      "packets_remaining": 49759,
+      "estimated_duration_hours": 8,
+      "background": true,
+      "milestones": [
+        {
+          "coverage": 0.3,
+          "label": "30%",
+          "unblocks": "Phase 107a monitoring"
+        },
+        {
+          "coverage": 0.5,
+          "label": "50%",
+          "unblocks": "Phase 107a operations"
+        },
+        {
+          "coverage": 0.75,
+          "label": "75%",
+          "unblocks": "Phase 107b prep"
+        },
+        {
+          "coverage": 0.95,
+          "label": "95%",
+          "unblocks": "Phase 107b execution (tree_node_id backfill)"
+        }
+      ],
+      "deferral_safety": "tree_node_id backfill can wait until Phase 1 reaches 95%"
+    },
+    "rankingProof": {
+      "status": "skipped",
+      "reason": "optional_track_not_enabled",
+      "enable_with": "npm run phase107:execute -- --enable-ranking",
+      "requirements": [
+        "Phase 17 measured evaluation corpus (currently synthetic)",
+        "XGBoost with class-weight mitigation",
+        "NDCG@5, NDCG@10, MRR@10 metrics",
+        "Bootstrap confidence intervals"
+      ]
+    }
+  },
+  "errors": []
+}
