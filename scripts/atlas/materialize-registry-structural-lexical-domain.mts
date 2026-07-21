@@ -1,219 +1,190 @@
 #!/usr/bin/env npx tsx
 /**
- * Materialize Registry Structural, Lexical, Domain Projections
+ * Materialize Registry Enrichment Projection (Cheap Lanes)
  *
- * Joins atlas_packets, feature views, Valkey cache, and canonical packet data.
- * Materializes three derived projections (not new sources of truth):
- * 1. Structural: source_ref, title_id, symbols, AST facts
- * 2. Lexical: keywords, bm25_terms, identifiers, file tokens
- * 3. Domain: domain_class from canonical packet + feature view + cache + fallback
+ * Extracts structural (AST), lexical, and domain facts from packets and materializes
+ * them into the registry_enrichment_projection table.
  *
- * Creates registry_enrichment_projection table or updates if exists.
+ * This is the FIRST barrier in the unified registry enrichment pipeline.
+ * Input: atlas_packets (canonical)
+ * Output: registry_enrichment_projection (derived, VIEW-like)
+ *
+ * Architecture:
+ * - Structural: symbols, ast_facts from feature_implementations or ast_symbols column
+ * - Lexical: keywords, bm25_terms, identifiers, file_tokens (from code text or feature_lexical)
+ * - Domain: domain_class via priority chain (canonical → feature_view → cache → fallback)
+ *
+ * Usage:
+ *   npx tsx scripts/atlas/materialize-registry-structural-lexical-domain.mts [--limit N] [--dry-run]
  */
 
 import { pool } from '$lib/server/db/client.js';
-import { Redis } from 'ioredis';
-import type { PoolClient } from 'pg';
+import { sql } from 'drizzle-orm';
 
-interface RegistryEnrichmentRow {
+interface EnrichmentRow {
   packet_key: string;
   source_ref: string;
-  title_id: string | null;
   symbols: string[];
-  ast_facts: Record<string, unknown>;
+  ast_facts: string[];
   keywords: string[];
   bm25_terms: string[];
   identifiers: string[];
   file_tokens: string[];
-  domain_class: string;
-  enriched_at: Date;
-  materialization_version: number;
+  domain_class: string | null;
 }
 
 const MATERIALIZATION_VERSION = 1;
 
-async function ensureProjectionTable(client: PoolClient): Promise<void> {
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS registry_enrichment_projection (
-      id SERIAL PRIMARY KEY,
-      packet_key TEXT NOT NULL UNIQUE,
-      source_ref TEXT NOT NULL,
-      title_id TEXT,
-      symbols TEXT[] DEFAULT '{}',
-      ast_facts JSONB,
-      keywords TEXT[] DEFAULT '{}',
-      bm25_terms TEXT[] DEFAULT '{}',
-      identifiers TEXT[] DEFAULT '{}',
-      file_tokens TEXT[] DEFAULT '{}',
-      domain_class TEXT,
-      enriched_at TIMESTAMP DEFAULT NOW(),
-      materialization_version INT DEFAULT ${MATERIALIZATION_VERSION},
-      created_at TIMESTAMP DEFAULT NOW(),
-      updated_at TIMESTAMP DEFAULT NOW()
-    )
-  `);
-
-  // Create indexes for fast lookups
-  await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_enrichment_packet_key ON registry_enrichment_projection (packet_key)
-  `);
-  await client.query(`
-    CREATE INDEX IF NOT EXISTS idx_enrichment_source_ref ON registry_enrichment_projection (source_ref)
-  `);
-}
-
-async function extractStructuralFacts(
-  client: PoolClient,
-  packetKey: string,
-  sourceRef: string
-): Promise<{ symbols: string[]; ast_facts: Record<string, unknown> }> {
-  // Query AST symbols from feature_implementations or tree_node_ids JSONB
-  const result = await client.query(`
-    SELECT
-      COALESCE(
-        (SELECT array_agg(DISTINCT symbol_name) FROM feature_implementations WHERE packet_key = $1),
-        '{}'::TEXT[]
-      ) as symbols,
-      (SELECT jsonb_object_agg(kind, count)
-       FROM (
-         SELECT kind, COUNT(*) as count
-         FROM feature_implementations
-         WHERE packet_key = $1
-         GROUP BY kind
-       ) t
-      ) as ast_by_kind
-    LIMIT 1
-  `, [packetKey]);
-
-  const row = result.rows[0];
-  return {
-    symbols: row.symbols || [],
-    ast_facts: {
-      by_kind: row.ast_by_kind || {},
-      total_symbols: (row.symbols || []).length,
-    },
-  };
-}
-
-async function extractLexicalFacts(
-  client: PoolClient,
-  sourceRef: string
-): Promise<{ keywords: string[]; bm25_terms: string[]; identifiers: string[]; file_tokens: string[] }> {
-  // Extract from file name, BM25 index, or cached lexical features
-  const fileNameTokens = sourceRef.split(/[\/-_]/).filter(t => t.length > 0);
-
-  // Query for BM25 terms if available
-  const bm25Result = await client.query(`
-    SELECT DISTINCT term
-    FROM bm25_index
-    WHERE source_ref = $1
-    LIMIT 20
-  `, [sourceRef]).catch(() => ({ rows: [] }));
-
-  return {
-    keywords: fileNameTokens.slice(0, 5),
-    bm25_terms: bm25Result.rows.map((r: any) => r.term),
-    identifiers: fileNameTokens.filter(t => /^[a-zA-Z_]/.test(t)),
-    file_tokens: fileNameTokens,
-  };
-}
-
-async function extractDomainClass(
-  client: PoolClient,
-  redis: Redis,
-  packetKey: string,
-  sourceRef: string
-): Promise<string> {
-  // Priority: canonical packet data → feature view → Valkey cache → deterministic fallback
-
-  // 1. Check canonical packet data
-  const packetResult = await client.query(`
-    SELECT domain_class FROM atlas_packets WHERE packet_key = $1 LIMIT 1
-  `, [packetKey]);
-  if (packetResult.rows[0]?.domain_class) {
-    return packetResult.rows[0].domain_class;
-  }
-
-  // 2. Check feature view
-  const featureResult = await client.query(`
-    SELECT domain_classification FROM feature_implementations
-    WHERE packet_key = $1 LIMIT 1
-  `, [packetKey]).catch(() => ({ rows: [] }));
-  if (featureResult.rows[0]?.domain_classification) {
-    return featureResult.rows[0].domain_classification;
-  }
-
-  // 3. Check Valkey cache
+async function extractStructuralFacts(client: any, packetKey: string): Promise<{ symbols: string[]; ast_facts: string[] }> {
   try {
-    const cached = await redis.get(`domain:${packetKey}`);
-    if (cached) return cached;
+    // Try to read from feature_implementations AST symbols
+    const result = await client.query(
+      `SELECT
+        COALESCE(array_agg(DISTINCT symbol_name), '{}') as symbols,
+        COALESCE(array_agg(DISTINCT kind), '{}') as ast_facts
+      FROM feature_implementations
+      WHERE packet_key = $1`,
+      [packetKey]
+    );
+
+    if (result.rows[0]) {
+      return {
+        symbols: result.rows[0].symbols || [],
+        ast_facts: result.rows[0].ast_facts || []
+      };
+    }
   } catch {
-    // cache miss, continue
+    // Table may not exist
   }
 
-  // 4. Deterministic fallback based on source_ref pattern
-  if (sourceRef.includes('test')) return 'test';
-  if (sourceRef.includes('spec')) return 'test';
-  if (sourceRef.includes('component') || sourceRef.includes('ui')) return 'ui';
-  if (sourceRef.includes('server') || sourceRef.includes('lib')) return 'backend';
-  if (sourceRef.includes('config') || sourceRef.includes('setup')) return 'config';
-  if (sourceRef.includes('doc') || sourceRef.includes('readme')) return 'documentation';
-
-  return 'unknown';
+  return { symbols: [], ast_facts: [] };
 }
 
-async function materializeProjection(
-  client: PoolClient,
-  redis: Redis,
-  limit: number = 0
-): Promise<{ materialized: number; errors: number }> {
+async function extractLexicalFacts(client: any, source_ref: string): Promise<{ keywords: string[]; bm25_terms: string[]; identifiers: string[]; file_tokens: string[] }> {
+  try {
+    // Try to read from feature_lexical if it exists
+    const result = await client.query(
+      `SELECT
+        COALESCE(keywords, '{}') as keywords,
+        COALESCE(bm25_terms, '{}') as bm25_terms,
+        COALESCE(identifiers, '{}') as identifiers,
+        COALESCE(file_tokens, '{}') as file_tokens
+      FROM feature_lexical
+      WHERE source_ref = $1
+      LIMIT 1`,
+      [source_ref]
+    ).catch(() => ({ rows: [] }));
+
+    if (result.rows[0]) {
+      return {
+        keywords: result.rows[0].keywords || [],
+        bm25_terms: result.rows[0].bm25_terms || [],
+        identifiers: result.rows[0].identifiers || [],
+        file_tokens: result.rows[0].file_tokens || []
+      };
+    }
+  } catch {
+    // Table may not exist
+  }
+
+  return { keywords: [], bm25_terms: [], identifiers: [], file_tokens: [] };
+}
+
+async function extractDomainClass(client: any, packetKey: string, source_ref: string): Promise<string | null> {
+  try {
+    // Priority chain:
+    // 1. Canonical packet.domain_class (if exists)
+    let result = await client.query(
+      `SELECT domain_class FROM atlas_packets WHERE packet_key = $1`,
+      [packetKey]
+    ).catch(() => ({ rows: [] }));
+
+    if (result.rows[0]?.domain_class) {
+      return result.rows[0].domain_class;
+    }
+
+    // 2. Feature view domain classification
+    result = await client.query(
+      `SELECT domain_class FROM feature_domains WHERE source_ref = $1 LIMIT 1`,
+      [source_ref]
+    ).catch(() => ({ rows: [] }));
+
+    if (result.rows[0]?.domain_class) {
+      return result.rows[0].domain_class;
+    }
+
+    // 3. Redis cache fallback (if available)
+    // (Skipped in this impl; can add via ioredis if needed)
+
+    // 4. Infer from file path (heuristic fallback)
+    if (source_ref.includes('/legal') || source_ref.includes('case') || source_ref.includes('evidence')) {
+      return 'legal';
+    }
+    if (source_ref.includes('/server') || source_ref.includes('db') || source_ref.includes('sql')) {
+      return 'backend';
+    }
+    if (source_ref.includes('/lib') || source_ref.includes('component')) {
+      return 'frontend';
+    }
+  } catch {
+    // Fallback to null
+  }
+
+  return null;
+}
+
+async function materializeProjection(client: any, limit: number = 0, isDryRun: boolean = false): Promise<{ materialized: number; errors: number }> {
   let materialized = 0;
   let errors = 0;
 
-  // Query all packets (with optional limit)
+  // Query all packets
   const query = limit > 0
     ? `SELECT packet_key, source_ref FROM atlas_packets LIMIT ${limit}`
     : 'SELECT packet_key, source_ref FROM atlas_packets';
 
   const packets = await client.query(query);
 
-  console.log(`📝 Materializing ${packets.rows.length} packets...`);
+  console.log(`📝 Materializing ${packets.rows.length} packets with structural/lexical/domain facts...`);
 
   for (const packet of packets.rows) {
     try {
-      const { symbols, ast_facts } = await extractStructuralFacts(client, packet.packet_key, packet.source_ref);
-      const { keywords, bm25_terms, identifiers, file_tokens } = await extractLexicalFacts(client, packet.source_ref);
-      const domain_class = await extractDomainClass(client, redis, packet.packet_key, packet.source_ref);
+      // Extract facts
+      const structural = await extractStructuralFacts(client, packet.packet_key);
+      const lexical = await extractLexicalFacts(client, packet.source_ref);
+      const domain = await extractDomainClass(client, packet.packet_key, packet.source_ref);
 
-      // Upsert into projection table
-      await client.query(`
-        INSERT INTO registry_enrichment_projection (
-          packet_key, source_ref, symbols, ast_facts,
-          keywords, bm25_terms, identifiers, file_tokens,
-          domain_class, materialization_version
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        ON CONFLICT (packet_key) DO UPDATE SET
-          symbols = EXCLUDED.symbols,
-          ast_facts = EXCLUDED.ast_facts,
-          keywords = EXCLUDED.keywords,
-          bm25_terms = EXCLUDED.bm25_terms,
-          identifiers = EXCLUDED.identifiers,
-          file_tokens = EXCLUDED.file_tokens,
-          domain_class = EXCLUDED.domain_class,
-          materialization_version = EXCLUDED.materialization_version,
-          updated_at = NOW()
-      `, [
-        packet.packet_key,
-        packet.source_ref,
-        symbols,
-        JSON.stringify(ast_facts),
-        keywords,
-        bm25_terms,
-        identifiers,
-        file_tokens,
-        domain_class,
-        MATERIALIZATION_VERSION,
-      ]);
+      if (!isDryRun) {
+        // Upsert into projection
+        await client.query(
+          `INSERT INTO registry_enrichment_projection (
+            packet_key, source_ref, symbols, ast_facts, keywords, bm25_terms,
+            identifiers, file_tokens, domain_class, materialization_version
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          ON CONFLICT (packet_key) DO UPDATE SET
+            source_ref = EXCLUDED.source_ref,
+            symbols = EXCLUDED.symbols,
+            ast_facts = EXCLUDED.ast_facts,
+            keywords = EXCLUDED.keywords,
+            bm25_terms = EXCLUDED.bm25_terms,
+            identifiers = EXCLUDED.identifiers,
+            file_tokens = EXCLUDED.file_tokens,
+            domain_class = EXCLUDED.domain_class,
+            materialization_version = EXCLUDED.materialization_version,
+            updated_at = NOW()`,
+          [
+            packet.packet_key,
+            packet.source_ref,
+            structural.symbols,
+            structural.ast_facts,
+            lexical.keywords,
+            lexical.bm25_terms,
+            lexical.identifiers,
+            lexical.file_tokens,
+            domain,
+            MATERIALIZATION_VERSION
+          ]
+        );
+      }
 
       materialized++;
 
@@ -233,26 +204,26 @@ async function materializeProjection(
 
 async function main() {
   const client = await pool.connect();
-  const redis = new Redis({
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    password: process.env.REDIS_PASSWORD,
-  });
 
   try {
-    console.log('🔧 Materializing Registry Enrichment Projection\n');
+    const args = process.argv.slice(2);
+    const limitArg = args.find(a => a.startsWith('--limit='));
+    const isDryRun = args.includes('--dry-run');
 
-    // Ensure table exists
-    await ensureProjectionTable(client);
-    console.log('✅ Projection table ensured\n');
+    const limit = limitArg ? parseInt(limitArg.split('=')[1], 10) : 0;
+
+    console.log('🔧 Materializing Registry Enrichment Projection (Cheap Lanes)\n');
+    console.log(`Mode: ${isDryRun ? 'DRY-RUN' : 'APPLY'}`);
+    console.log(`Limit: ${limit > 0 ? limit : 'all packets'}\n`);
 
     // Materialize the projection
-    const { materialized, errors } = await materializeProjection(client, redis);
+    const { materialized, errors } = await materializeProjection(client, limit, isDryRun);
 
     console.log(`\n📊 Materialization Complete`);
     console.log(`  ✓ Materialized: ${materialized}`);
     console.log(`  ⚠️  Errors: ${errors}`);
     console.log(`  📦 Version: ${MATERIALIZATION_VERSION}`);
+    console.log(`  🔄 Barrier: CHEAP_LANES (structural/lexical/domain)`);
 
     process.exit(errors > materialized * 0.01 ? 1 : 0);
   } catch (err) {
@@ -260,7 +231,6 @@ async function main() {
     process.exit(1);
   } finally {
     await client.release();
-    await redis.quit();
   }
 }
 
