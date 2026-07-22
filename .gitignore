@@ -957,3 +957,7 @@ exports/
 exports/phase7-summaries-*.json
 exports/phase7-summaries-*.csv
 exports/phase7-export-manifest-*.json
+
+# DuckDB data files (too large for GitHub)
+*.duckdb
+data/atlas-ml/
