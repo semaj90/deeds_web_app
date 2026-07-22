@@ -146,14 +146,14 @@ describe('search runtime bridge', () => {
 
     expect(mockRetrieveAllCandidates).toHaveBeenCalledWith(
       'canonical rerank spine',
-      {},
+      { includeGenerated: false, includeLegacy: false },
       undefined,
       { includeVectorLanes: true }
     );
     expect(mockRerankCanonicalFeatureEnvelopes).toHaveBeenCalledTimes(1);
     expect(mockHydrateCandidates).toHaveBeenCalledTimes(1);
     expect(mockRecordPromotionIntent).toHaveBeenCalledTimes(1);
-    expect(result.packets).toHaveLength(2);
+    expect(result.packets).toHaveLength(1);
     expect(result.packets[0]?.packet_key).toBe('packet-1');
     expect(result.provenance.rerankModel).toBe('mixedbread-ai/mxbai-rerank-base-v2');
     expect(result.provenance.rerankerUsed).toBe(true);
@@ -237,7 +237,7 @@ describe('search runtime bridge', () => {
       expect(result.packets).toHaveLength(1);
       expect(mockRetrieveAllCandidates).toHaveBeenCalledWith(
         query,
-        {},
+        { includeGenerated: false, includeLegacy: false },
         undefined,
         { includeVectorLanes: true }
       );

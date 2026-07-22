@@ -605,7 +605,9 @@
       "Bash(.venv/Scripts/python --version)",
       "Bash(.venv/Scripts/pip show *)",
       "Bash(.venv/Scripts/pip install *)",
-      "Bash(.venv/Scripts/python -c \"import xgboost as xgb; print\\(f'XGBoost {xgb.__version__} ✓'\\); import sklearn; print\\(f'scikit-learn {sklearn.__version__} ✓'\\)\")"
+      "Bash(.venv/Scripts/python -c \"import xgboost as xgb; print\\(f'XGBoost {xgb.__version__} ✓'\\); import sklearn; print\\(f'scikit-learn {sklearn.__version__} ✓'\\)\")",
+      "Bash(git stash *)",
+      "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --index-filter 'git rm --cached --ignore-unmatch \"data/atlas-ml/atlas-analytics.duckdb\" \"sveltekit-frontend/data/atlas-ml/atlas-analytics.duckdb\"' -- 41679af192..HEAD)"
     ],
     "deny": [],
     "ask": []

@@ -93,8 +93,8 @@ async function validateQdrantDimensions(): Promise<void> {
       return;
     }
 
-    const existingNames = new Set(
-      (collectionsResult.collections ?? []).map((c: { name: string }) => c.name)
+    const existingNames = new Set<string>(
+      (collectionsResult.collections ?? []).map((c: { name: string }) => String(c.name))
     );
 
     activeCollection = resolvePreferredCodebaseCollection(existingNames).toString();
@@ -171,7 +171,10 @@ export const SearchQuerySchema = z.object({
   caseId: z.string().optional(),
   topK: z.number().int().min(1).max(100).default(20),
   threshold: z.number().min(0).max(1).optional(),
-  filters: SearchMetadataFilterSchema.default({}),
+  filters: SearchMetadataFilterSchema.default({
+    includeGenerated: false,
+    includeLegacy: false,
+  } as any),
   spanContext: z.object({
     traceId: z.string().optional(),
     parentSpanId: z.string().optional(),
@@ -190,7 +193,7 @@ export interface Candidate {
   summary: string;
   content: string;
   score: number;
-  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema';
+  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema' | 'rg_keyword';
 }
 
 /**
@@ -226,7 +229,7 @@ export interface SearchResult {
     };
   };
   provenance: {
-    retrievalSources: Array<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree'>;
+    retrievalSources: Array<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
     fusionMethod: 'rrf';
     rerankModel: string;
     rerankerUsed: boolean;
@@ -377,7 +380,7 @@ export class SearchRuntime {
 
       // Stage 2: Fuse candidates with RRF
       const fuseStart = Date.now();
-      const fused = await this.fuseCandidates(candidates);
+    const fused = await this.fuseCandidates(candidates);
       stageTiming.fuse = Date.now() - fuseStart;
 
       if (!embeddingHealthy) {
@@ -392,7 +395,7 @@ export class SearchRuntime {
             scoreSource: candidate.scoreSource,
             fusionScore: candidate.fusionScore,
             rankBefore: candidate.rankBefore,
-          })),
+          })) as any,
         );
 
         return {
@@ -678,7 +681,7 @@ export class SearchRuntime {
    */
   private async hydrateCandidates(candidates: FusedCandidate[]): Promise<FeatureEnvelope[]> {
     if (candidates.length === 0) return [];
-    return hydrateFromPostgres(candidates);
+    return hydrateFromPostgres(candidates as any);
   }
 
   /**

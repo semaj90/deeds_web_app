@@ -282,6 +282,23 @@ export interface SearchFilter {
   /** Arbitrary JSONB contains filter for Qdrant payload */
   jsonb_contains?: Record<string, unknown>;
 
+  /** Nested metadata alias used by some lane adapters and HTTP facades. */
+  metadata?: {
+    source_ref?: string;
+    source_ref_pattern?: string;
+    directory_path?: string;
+    packet_type?: string;
+    language?: string;
+    file_extension?: string;
+    domain_class?: string;
+    jsonb_contains?: Record<string, unknown>;
+    som_row?: number;
+    som_col?: number;
+  };
+
+  /** Optional lane selector alias used by older facades. */
+  search_kinds?: SearchLane[];
+
   // ── Keyword surface for lexical lanes ─────────────────────────────────────
 
   /** Canonical keyword terms used by lexical and semantic lanes. */

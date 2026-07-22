@@ -14,7 +14,7 @@
 
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
-import { embedTextDual as embedText } from '$lib/server/embedding/embed-dual-onnx-ollama.js';
+import { embedText } from '$lib/server/embedding/embed.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';
@@ -525,7 +525,7 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
             summary: row.summary || '',
             content: row.content || '',
             score: 0.7,
-            scoreSource: 'postgres_trigram' as const,
+            scoreSource: 'rg_keyword' as const,
           });
         }
       } catch {

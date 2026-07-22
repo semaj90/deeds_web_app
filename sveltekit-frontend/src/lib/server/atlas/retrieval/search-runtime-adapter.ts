@@ -1,5 +1,6 @@
 import { SearchRuntime, type SearchQuery, type SearchResult } from '$lib/server/retrieval/search-runtime.js';
 import { graphRetrieve, type GraphCandidate } from './graph-retriever.js';
+import { SearchMetadataFilterSchema } from '$lib/server/retrieval/search-contract.js';
 
 export interface AtlasSearchRequest {
   query: string;
@@ -30,7 +31,7 @@ export function createAtlasSearchAdapter(config?: { userId?: string; caseId?: st
         topK: req.topK ?? 20,
         userId: req.userId ?? config?.userId,
         caseId: req.caseId ?? config?.caseId,
-        filters: req.filters,
+        filters: SearchMetadataFilterSchema.parse(req.filters ?? {}),
         spanContext: req.traceId ? { traceId: req.traceId } : undefined,
       };
       const result = await runtime.search(query);
