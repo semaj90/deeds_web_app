@@ -1,0 +1,48 @@
+{
+  "session": "140",
+  "title": "SOM write-path audit",
+  "verified": [
+    "feature-extraction-orchestrator calls somClusterer.cluster and then materializeToPostgres in apply mode only",
+    "som-clustering performs one Postgres UPDATE per assignment and increments updated after each awaited update call",
+    "CLI exits with process.exit(result.failed > 0 ? 1 : 0)"
+  ],
+  "findings": [
+    "There is no explicit zero-update guard in materializeToPostgres",
+    "There is no rowcount check on the update call before incrementing updated",
+    "Dry-run mode skips writes by branching, but it does not establish read-only transaction semantics",
+    "Success is still implicit: no thrown error plus failed === 0"
+  ],
+  "todo": [
+    "Inspect the UPDATE return value and enforce rowCount > 0 where supported",
+    "Add a terminal guard that fails the run when updated === 0 in apply mode",
+    "Convert dry-run to a read-only transaction or equivalent explicit no-write proof",
+    "Run a bounded smoke case and confirm write/readback parity"
+  ],
+  "status": {
+    "implemented": [
+      "SOM clustering assignment contract",
+      "apply-mode write path",
+      "CLI result reporting"
+    ],
+    "proven": [
+      "zero-update guard is absent",
+      "success path is not rowcount-aware"
+    ],
+    "expected_gaps": [
+      "write/readback proof",
+      "read-only dry-run proof"
+    ],
+    "unresolved": [
+      "whether the current database state already reflects valid SOM assignments"
+    ],
+    "unsafe_constraints": [
+      "treating zero throws as success",
+      "treating a branch-based dry-run as a write-proof"
+    ],
+    "not_yet_proven": [
+      "the materializer fails when nothing is persisted",
+      "the apply path is operationally safe under silent no-op conditions"
+    ],
+    "next_safe_action": "patch the materializer to fail closed on zero successful updates, then rerun a bounded smoke test"
+  }
+}

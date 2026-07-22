@@ -1,8 +1,10 @@
 import type { SearchResult } from './search-runtime.js';
 import type { HyperRagHit, HyperRagResult } from './hyperrag-compat-types.js';
+import { resolvePageRankAuthority } from '$lib/server/topology/pagerank-authority.js';
 
 export function toCanonicalHyperRagHit(packet: SearchResult['packets'][number]): HyperRagHit {
   const enriched = packet as any;
+  const pageRank = resolvePageRankAuthority(enriched);
   return {
     id: String(enriched.packetKey ?? enriched.packet_key ?? enriched.chunk_id ?? enriched.sourceRef ?? enriched.source_ref ?? 'unknown'),
     sourcePath: enriched.sourceRef ?? enriched.source_ref ?? enriched.filePath ?? enriched.relative_path ?? undefined,
@@ -12,9 +14,9 @@ export function toCanonicalHyperRagHit(packet: SearchResult['packets'][number]):
     scoreWeightedSum: Number(enriched.retrieval?.xgboostScore ?? enriched.blended_score ?? enriched.retrieval_score ?? 0),
     signals: {
       dense: enriched.dense?.score ?? enriched.retrieval?.denseScore ?? undefined,
-      graphAuthority: enriched.authority?.score ?? enriched.page_rank_score ?? enriched.topology?.pageRank ?? undefined,
+      graphAuthority: enriched.authority?.score ?? pageRank.l1 ?? pageRank.raw ?? pageRank.legacy ?? enriched.topology?.pageRank ?? undefined,
       clusterMatch: enriched.som_cluster ?? enriched.topology?.somCell ?? undefined,
-      pagerank: enriched.page_rank_score ?? enriched.topology?.pageRank ?? undefined,
+      pagerank: pageRank.raw ?? pageRank.l1 ?? pageRank.legacy ?? enriched.topology?.pageRank ?? undefined,
       aceBoost: enriched.ace_boost ?? undefined,
       turbovec: enriched.turbovec_score ?? undefined,
       topoClass: enriched.domain ?? enriched.classification?.domainClass ?? undefined,

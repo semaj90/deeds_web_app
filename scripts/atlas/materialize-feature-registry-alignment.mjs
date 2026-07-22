@@ -47,6 +47,28 @@ async function main() {
   console.log(`╚════════════════════════════════════════════════════════════╝\n`);
 
   try {
+    // 0. Ensure registry alignment table exists
+    if (!dryRun) {
+      console.log('STEP 0: Initialize registry alignment table...');
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS atlas_registry_alignment (
+          id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+          registry_id VARCHAR(255) NOT NULL,
+          packet_key VARCHAR(255) NOT NULL,
+          source_ref VARCHAR(512) NOT NULL,
+          feature_id VARCHAR(255),
+          alignment_confidence REAL DEFAULT 0.97,
+          som_cluster VARCHAR(50),
+          authority_score REAL,
+          pagerank_score REAL,
+          community_id VARCHAR(100),
+          materialized_at TIMESTAMP DEFAULT NOW(),
+          UNIQUE(registry_id, packet_key)
+        )
+      `);
+      console.log('  ✓ Table ready\n');
+    }
+
     // 1. Load canonical packet index
     console.log('STEP 1: Load canonical packet identities...');
     const packetRes = await pool.query(`
@@ -105,9 +127,65 @@ async function main() {
       topologyReady++;
 
       if (!dryRun) {
-        // Write materialized topology to registry-aligned table
-        // This would be a separate table or view that maps registry → packets
-        materialized++;
+        // Write materialized topology to atlas_packets payload (top-level fields)
+        // Extract topology coordinates from nested object
+        const som_cluster = topo.som_cluster || null;
+        const authority_score = parseFloat(topo.w_authority) || null;
+        const pagerank_score = null; // Will be filled by PageRank materialization
+        const community_id = packetRow.community_id || null;
+
+        try {
+          // Update atlas_packets with topology evidence as top-level payload fields
+          const updateRes = await pool.query(
+            `UPDATE atlas_packets
+             SET payload = jsonb_set(
+               jsonb_set(
+                 jsonb_set(
+                   jsonb_set(payload, '{som_cluster}', $1::jsonb),
+                   '{authority_score}', $2::jsonb
+                 ),
+                 '{community_id}', $3::jsonb
+               ),
+               '{topology_materialized}', $4::jsonb
+             )
+             WHERE packet_key = $5`,
+            [
+              JSON.stringify(som_cluster),
+              JSON.stringify(authority_score),
+              JSON.stringify(community_id),
+              JSON.stringify(topo),
+              packetRow.packet_key
+            ]
+          );
+          if (updateRes.rowCount > 0) {
+            materialized++;
+
+            // Also write to registry_alignment projection table
+            const som_cluster = topo.som_cluster || null;
+            const authority_score = parseFloat(topo.w_authority) || null;
+            // Use a stable registry_id based on feature_id (avoid null constraint)
+            const registryId = `registry:${registryRow.feature_id || registryRow.id || 'unknown'}`;
+
+            await pool.query(
+              `INSERT INTO atlas_registry_alignment
+               (registry_id, packet_key, source_ref, feature_id, som_cluster, authority_score, community_id)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)
+               ON CONFLICT(registry_id, packet_key) DO UPDATE SET
+                 som_cluster = $5, authority_score = $6, community_id = $7`,
+              [
+                registryId,
+                packetRow.packet_key,
+                packetRow.source_ref,
+                registryRow.feature_id,
+                som_cluster,
+                authority_score,
+                packetRow.community_id || null
+              ]
+            );
+          }
+        } catch (err) {
+          if (verbose) console.error(`  ❌ Update failed for ${registryRow.feature_id}: ${err.message}`);
+        }
       }
     }
 
@@ -119,6 +197,12 @@ async function main() {
       console.log(`  Coverage: ${(100.0 * topologyReady / Math.min(limit, registryRows.length)).toFixed(2)}%\n`);
       console.log(`To apply, run with --apply flag.\n`);
     } else {
+      if (materialized === 0) {
+        throw new Error(
+          `Registry alignment materialization failed: 0/${topologyReady} eligible rows were updated`
+        );
+      }
+
       console.log(`✅ Materialized ${materialized} registry rows\n`);
       console.log(`Expected topology lane improvement:`);
       console.log(`  Before: 1.85% (78/4,209)`);

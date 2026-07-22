@@ -3,10 +3,37 @@
  * Consolidates RawCandidate, QdrantSearchResult, and GpuSearchCandidate into single SearchResult
  */
 
+import type { LaneRegistryKind } from '../vector/lane-registry.js';
+
 /**
  * Search lanes available in the retrieval pipeline
  */
 export type SearchLane = 'qdrant' | 'gpu-cuvs' | 'bm25' | 'lexical' | 'turbovec' | 'hybrid';
+
+/**
+ * RRF fusion weights by lane kind — mirrors LANE_REGISTRY roles.
+ * These are the canonical weights for Reciprocal Rank Fusion.
+ * semantic + topology + retrieval + routing + authority + memory + legacy-vector = 1.0
+ */
+export const RRF_WEIGHTS_BY_LANE_KIND: Record<LaneRegistryKind, number> = {
+  semantic:       0.35,
+  retrieval:      0.25,
+  topology:       0.15,
+  authority:      0.12,
+  routing:        0.08,
+  memory:         0.05,
+  'legacy-vector': 0.00,
+} as const;
+
+/** Map from SearchLane runtime name to LaneRegistryKind */
+export const SEARCH_LANE_KIND: Record<SearchLane, LaneRegistryKind> = {
+  qdrant:      'retrieval',
+  'gpu-cuvs':  'retrieval',
+  bm25:        'semantic',
+  lexical:     'semantic',
+  turbovec:    'retrieval',
+  hybrid:      'retrieval',
+} as const;
 
 /**
  * Unified search result type used across all retrieval endpoints
@@ -27,6 +54,9 @@ export interface SearchResult {
 
   /** Which search lane produced this result */
   source: SearchLane;
+
+  /** Lane registry ID (from LANE_REGISTRY.*.laneId) — traces provenance to embedding contract */
+  lane_id?: string;
 
   /** Canonical packet identity */
   packet_key: string | null;
@@ -91,6 +121,21 @@ export interface SearchRequest {
   /** Number of results to return */
   k?: number;
 
+  /** Per-lane cap before RRF fusion. */
+  topKPerLane?: number;
+
+  /** Final result cap after reranking/fusion. */
+  finalTopK?: number;
+
+  /** Number of candidates sent to the reranker. */
+  rerankTopK?: number;
+
+  /** Page size for cursor pagination. */
+  pageSize?: number;
+
+  /** Signed pagination cursor. */
+  cursor?: string | null;
+
   /** Embedding dimension override (default: 384 for GPU, 768 for Qdrant) */
   embedding_dim?: number;
 
@@ -105,6 +150,16 @@ export interface SearchRequest {
 
   /** Which search lanes to use (default: ['qdrant', 'gpu-cuvs']) */
   lanes?: SearchLane[];
+
+  /** Optional lane-scoped filters and explicit keyword bundles. */
+  filters?: SearchFilter;
+  exactKeywords?: string[];
+  expandedKeywords?: string[];
+
+  /** Include graph/document relation bundles in the response. */
+  includeRelations?: boolean;
+  relationDepth?: number;
+  includeDebugScores?: boolean;
 
   /** Summarize results via LLM */
   summarize?: boolean;
@@ -176,23 +231,83 @@ export interface SearchResponse {
 }
 
 /**
- * Filter for search results
+ * Flat filter for search — all pushdown fields live at the top level.
+ *
+ * Pushdown contract per lane:
+ *   qdrant      → payload filter on source_ref/feature_id/directory_path/kmeans_cluster_id
+ *   bm25/lexical → SQL WHERE source_ref / feature_id / directory_path
+ *   gpu-cuvs    → pre-mask packet IDs by cluster membership
+ *   turbovec    → metadata filter on feature_id / packet_type
+ *
+ * All fields are optional. Lane selection belongs on SearchRequest.lanes, not here.
  */
 export interface SearchFilter {
+  // ── Pushdown fields — forwarded INTO backend queries ──────────────────────
+
+  /** Restrict to a single source_ref (exact match; Qdrant payload filter + SQL WHERE) */
+  source_ref?: string;
+
+  /** Restrict to source_refs matching this prefix pattern (SQL LIKE / Qdrant match) */
+  source_ref_pattern?: string;
+
+  /** Restrict to packets under this directory_path (SQL prefix match + Qdrant filter) */
+  directory_path?: string;
+
+  /** Restrict to one or more feature_ids (Qdrant must_match array + SQL IN) */
+  feature_ids?: string[];
+
+  /** Restrict to packets in these KMeans cluster IDs (Qdrant filter + GPU pre-mask) */
+  kmeans_cluster_ids?: number[];
+
+  /** Restrict to packets on this SOM row [0-19] (Qdrant payload + SQL WHERE) */
+  som_row?: number;
+
+  /** Restrict to packets on this SOM column [0-19] (Qdrant payload + SQL WHERE) */
+  som_col?: number;
+
+  /** Restrict to a packet_type ('code' | 'doc' | 'test' | 'config' | etc.) */
+  packet_type?: string;
+
+  // ── Qdrant-payload-only filters (not in SQL tables) ───────────────────────
+
+  /** Filter by language tag stored in Qdrant payload */
+  language?: string;
+
+  /** Filter by file extension stored in Qdrant payload */
+  file_extension?: string;
+
+  /** Filter by domain classification stored in Qdrant payload */
+  domain_class?: string;
+
+  /** Arbitrary JSONB contains filter for Qdrant payload */
+  jsonb_contains?: Record<string, unknown>;
+
+  // ── Keyword surface for lexical lanes ─────────────────────────────────────
+
+  /** Canonical keyword terms used by lexical and semantic lanes. */
+  keywords?: string[];
+
+  /** Optional expanded keyword surface forms. */
+  keyword_variants?: string[];
+
+  // ── Post-fetch gates (applied after retrieval, not pushed into queries) ───
+
   /** Minimum confidence threshold */
   min_confidence?: number;
 
   /** Minimum score threshold */
   min_score?: number;
 
-  /** Allowed search lanes */
-  lanes?: SearchLane[];
-
-  /** Exclude certain feature_ids */
+  /** Exclude these feature_ids from results */
   exclude_feature_ids?: string[];
 
-  /** Only include specific packet_keys */
+  /** Only include results for these specific packet_keys */
   include_packet_keys?: string[];
+
+  // ── Pagination / lane sizing ───────────────────────────────────────────────
+
+  /** Max results per lane before RRF fusion */
+  per_lane_limit?: number;
 }
 
 /**

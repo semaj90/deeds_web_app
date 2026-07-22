@@ -68,6 +68,13 @@ const report = {
 
 const startTime = Date.now();
 
+function resolveSpawnCommand(command) {
+  if (process.platform !== 'win32') return command;
+  if (command === 'npm') return 'npm.cmd';
+  if (command === 'npx') return 'npx.cmd';
+  return command;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Stage 1: Poll /api/graphify/status until ready
 // ─────────────────────────────────────────────────────────────────────────────
@@ -137,7 +144,7 @@ async function runPageRank() {
   report.stages[stage] = { status: 'running' };
 
   return new Promise((resolve) => {
-    const cmd = 'npm';
+    const cmd = resolveSpawnCommand('npm');
     const cmdArgs = ['run', 'atlas:code-features:pagerank', ...(APPLY ? ['--apply'] : ['--dry-run'])];
 
     if (VERBOSE) log(`Running: ${cmd} ${cmdArgs.join(' ')}`);
@@ -145,7 +152,8 @@ async function runPageRank() {
     const child = spawn(cmd, cmdArgs, {
       cwd: FRONTEND_ROOT,
       stdio: APPLY ? 'pipe' : 'inherit',
-      shell: process.platform === 'win32',
+      shell: false,
+      windowsHide: true,
     });
 
     let output = '';
@@ -262,7 +270,7 @@ async function runTurboVecConsolidation() {
   report.stages[stage] = { status: 'running' };
 
   return new Promise((resolve) => {
-    const cmd = 'npx';
+    const cmd = resolveSpawnCommand('npx');
     const script = path.join(FRONTEND_ROOT, 'scripts/atlas/kanban-turbovec-consolidation.mts');
     const cmdArgs = ['tsx', script, ...(APPLY ? ['--apply'] : [])];
 
@@ -271,7 +279,8 @@ async function runTurboVecConsolidation() {
     const child = spawn(cmd, cmdArgs, {
       cwd: FRONTEND_ROOT,
       stdio: APPLY ? 'pipe' : 'inherit',
-      shell: process.platform === 'win32',
+      shell: false,
+      windowsHide: true,
     });
 
     let output = '';

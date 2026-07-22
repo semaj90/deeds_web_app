@@ -37,6 +37,8 @@ import { recordCacheDecision } from './cache-layers-telemetry.js';
 import { validateCanonicalEnvelope, type CanonicalEnvelope } from '$lib/server/topology/canonical-id-hierarchy.js';
 import { createPermissionManager, type PermissionManager } from '$lib/server/topology/permission-manager.js';
 import { integrateDispatcher } from '$lib/server/dispatch/dispatcher-integration.js';
+import { RETRIEVAL_LIMITS, type SearchMetadataFilter } from './search-contract.js';
+import type { SearchFilter } from './types.js';
 
 export interface GoRetrievalFacadeRequest {
   query: string;
@@ -49,19 +51,29 @@ export interface GoRetrievalFacadeRequest {
   use_lexical?: boolean;
   useMultiVector?: boolean;
   use_multi_vector?: boolean;
+  topKPerLane?: number;
+  finalTopK?: number;
+  rerankTopK?: number;
+  pageSize?: number;
+  cursor?: string | null;
   rrfWeights?: {
     content?: number;
     summary?: number;
     title?: number;
     keywords?: number;
   };
+  filters?: SearchMetadataFilter;
+  exactKeywords?: string[];
+  expandedKeywords?: string[];
+  includeRelations?: boolean;
+  relationDepth?: number;
+  includeDebugScores?: boolean;
   includeSummary?: boolean;
   include_summary?: boolean;
   summaryMaxTokens?: number;
   summary_max_tokens?: number;
   summaryTemperature?: number;
   summary_temperature?: number;
-  filters?: Record<string, unknown>;
   caseId?: string;
   case_id?: string;
 }
@@ -127,12 +139,55 @@ export interface GoRetrievalFacadeResponse {
 /**
  * Normalize Go Retrieval request to unified orchestrator format
  */
-function normalizeRequest(req: GoRetrievalFacadeRequest): RetrievalRequest {
+function normalizeRequest(req: GoRetrievalFacadeRequest): RetrievalRequest & { filters?: SearchFilter } {
+  const limit = Math.min(
+    req.limit ?? req.topK ?? req.top_k ?? req.finalTopK ?? req.pageSize ?? RETRIEVAL_LIMITS.defaultFinalResults,
+    RETRIEVAL_LIMITS.maxFinalResults
+  );
+
+  const filterMetadata = req.filters
+    ? {
+        packet_type: req.filters.fileKinds?.[0] ?? undefined,
+        language: req.filters.languages?.[0] ?? undefined,
+        file_extension: req.filters.extensions?.[0] ?? undefined,
+        domain_class: req.filters.domainIds?.[0] ?? undefined,
+        source_ref: req.filters.sourceRefs?.[0] ?? undefined,
+        source_ref_pattern: req.filters.pathPrefixes?.[0] ?? undefined,
+        directory_path: req.filters.pathPrefixes?.[0] ?? undefined,
+        kmeans_cluster_ids: req.filters.kmeansClusters,
+        som_row: req.filters.somCells?.[0] !== undefined ? req.filters.somCells[0] % 20 : undefined,
+        som_col: req.filters.somCells?.[0] !== undefined ? Math.floor(req.filters.somCells[0] / 20) : undefined,
+        jsonb_contains: {
+          workspaceIds: req.filters.workspaceIds,
+          fileKinds: req.filters.fileKinds,
+          symbolKinds: req.filters.symbolKinds,
+          conceptIds: req.filters.conceptIds,
+          communityIds: req.filters.communityIds,
+          embeddingLaneIds: req.filters.embeddingLaneIds,
+          graphSnapshotId: req.filters.graphSnapshotId,
+          includeGenerated: req.filters.includeGenerated,
+          includeLegacy: req.filters.includeLegacy
+        }
+      }
+    : undefined;
+
+  const searchFilter: SearchFilter | undefined = req.filters
+    ? {
+        keywords: req.exactKeywords ?? [],
+        keyword_variants: req.expandedKeywords ?? [],
+        search_kinds: req.lanes,
+        metadata: filterMetadata,
+        include_packet_keys: req.cursor ? [] : undefined,
+        per_lane_limit: limit
+      }
+    : undefined;
+
   return {
     query: req.query,
-    limit: req.limit ?? req.topK ?? req.top_k ?? 10,
+    limit,
     useRRF: req.useRRF ?? req.use_rrf ?? true,
-    useLexical: req.useLexical ?? req.use_lexical ?? false
+    useLexical: req.useLexical ?? req.use_lexical ?? false,
+    filters: searchFilter
   };
 }
 
@@ -208,7 +263,10 @@ async function executeGoRetrievalSearchMultiVector(
   };
 
   try {
-    const topK = request.topK ?? request.top_k ?? 10;
+    const topK = Math.min(
+      request.topKPerLane ?? request.topK ?? request.top_k ?? request.finalTopK ?? request.pageSize ?? RETRIEVAL_LIMITS.defaultFinalResults,
+      RETRIEVAL_LIMITS.maxTopKPerLane
+    );
     const weights = request.rrfWeights || undefined;
 
     const result = await executeMultiVectorRetrieval({

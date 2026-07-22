@@ -2378,8 +2378,12 @@ export class RabbitMQManager extends EventEmitter {
         argsList.push('--fail-open');
       }
 
-      console.log(`[cards.refresh] Spawning child process: node ${argsList.join(' ')}`);
-      const child = spawn('node', argsList, { cwd: rootDir, shell: true });
+      console.log(`[cards.refresh] Spawning child process: ${process.execPath} ${argsList.join(' ')}`);
+      const child = spawn(process.execPath, argsList, {
+        cwd: rootDir,
+        shell: false,
+        windowsHide: true,
+      });
 
       const startTime = Date.now();
       let stdout = '';
@@ -2499,8 +2503,18 @@ export class RabbitMQManager extends EventEmitter {
       }
 
       const { spawn } = await import('child_process');
-      console.log(`[repair.workflow.run] Spawning child process: npx tsx ${argsList.join(' ')}`);
-      const child = spawn('npx', ['tsx', ...argsList], { cwd: rootDir, shell: true });
+      const isWindows = process.platform === 'win32';
+      const spawnCommand = isWindows ? 'npx.cmd' : 'npx';
+      const spawnArgs = ['tsx', ...argsList];
+
+      console.log(
+        `[repair.workflow.run] Spawning child process: ${spawnCommand} ${spawnArgs.join(' ')}`
+      );
+      const child = spawn(spawnCommand, spawnArgs, {
+        cwd: rootDir,
+        shell: false,
+        windowsHide: true,
+      });
 
       const startTime = Date.now();
       let stdout = '';

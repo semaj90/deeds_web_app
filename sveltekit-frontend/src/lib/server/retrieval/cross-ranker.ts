@@ -223,23 +223,23 @@ async function fetchTopologyScores(
       `
       SELECT
         packet_key,
-        page_rank_score
+        COALESCE(pagerank_l1, page_rank_score, pagerank) AS pagerank_l1
       FROM v_packet_topology_scores
       WHERE packet_key = ANY($1)
       `,
       [packet_keys]
     );
 
-    const maxScore = Math.max(...result.rows.map(r => r.page_rank_score || 0), 0.01);
+    const maxScore = Math.max(...result.rows.map(r => r.pagerank_l1 || 0), 0.01);
     for (const row of result.rows) {
-      const normalized = Math.min(1, (row.page_rank_score || 0) / (maxScore || 1));
+      const normalized = Math.min(1, (row.pagerank_l1 || 0) / (maxScore || 1));
       topology_scores.set(row.packet_key, normalized);
     }
 
     // Fill in fallback scores (average) for missing packets
     const covered = new Set(result.rows.map(r => r.packet_key));
     const avgScore = result.rows.length > 0
-      ? result.rows.reduce((sum, r) => sum + (r.page_rank_score || 0), 0) / result.rows.length / (maxScore || 1)
+      ? result.rows.reduce((sum, r) => sum + (r.pagerank_l1 || 0), 0) / result.rows.length / (maxScore || 1)
       : 0.5;
 
     for (const key of packet_keys) {

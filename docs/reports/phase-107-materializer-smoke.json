@@ -1,0 +1,65 @@
+{
+  "contractVersion": "atlas-feature-registry-enrichment-v1",
+  "generatedAt": "2026-07-21T18:50:04.104Z",
+  "dryRun": true,
+  "limit": 1,
+  "summary": {
+    "packetsSelected": 1,
+    "recordsEmitted": 1,
+    "normalizedRecords": 1,
+    "fallbackRecords": 1,
+    "unresolvedRecords": 0,
+    "ambiguousRecords": 0,
+    "duplicateRecords": 0,
+    "missingContentHashRecords": 0,
+    "countsBySourceTable": {
+      "feature_domain_facts": 1
+    },
+    "countsByJoinMethod": {
+      "packet_key": 1
+    },
+    "countsByFallbackReason": {
+      "ontology_fallback": 1
+    },
+    "contentHashStatusCounts": {
+      "CANONICAL_SOURCE_HASH": 0,
+      "DERIVED_MIGRATION_HASH": 1,
+      "MISSING": 0,
+      "INVALID_PLACEHOLDER": 0
+    },
+    "schemaValidationFailures": 0
+  },
+  "duckDbProfile": {
+    "rowCount": 1,
+    "normalizedRecords": 1,
+    "fallbackRecords": 1,
+    "unresolvedRecords": 0,
+    "duplicateRecords": 0,
+    "missingContentHashRecords": 0,
+    "schemaValidationFailures": 0,
+    "countsBySourceTable": {
+      "feature_domain_facts": 1
+    },
+    "countsByJoinMethod": {
+      "packet_key": 1
+    },
+    "countsByContentHashStatus": {
+      "DERIVED_MIGRATION_HASH": 1
+    }
+  },
+  "duckDbValidation": {
+    "matchesSummary": true,
+    "mismatches": []
+  },
+  "sampleRows": [
+    {
+      "packetKey": "0ba2345cd9c542fa",
+      "sourceRef": "proto:RetrievalService.Health",
+      "contentHash": "e2e6768c65f97df503721910c51c4a0d",
+      "contentHashStatus": "DERIVED_MIGRATION_HASH",
+      "sourceTable": "feature_domain_facts",
+      "joinMethod": "packet_key",
+      "fallbackUsed": true
+    }
+  ]
+}

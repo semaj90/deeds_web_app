@@ -3,6 +3,8 @@
  * Resilient client with SDK-first dynamic import: HTTP fallback, and API key support
  */
 
+import { CANONICAL_EMBEDDING_DIM } from './lib/server/embedding/embedding-contract.js';
+
 // Type definitions
 interface SearchRequestBody {
     vector?: number[];
@@ -318,7 +320,11 @@ async function initQdrantIndexes(
         const exists = cols?.collections?.some((c) => c.name === collectionName);
 
         if (!exists) {
-            const vectorSize = Number(process.env.EMBED_DIM ?? '1536');
+            const envDim = Number(process.env.EMBED_DIM);
+            const vectorSize =
+                Number.isFinite(envDim) && envDim > 0
+                    ? envDim
+                    : CANONICAL_EMBEDDING_DIM;
             await qdrant.createCollection(collectionName, {
                 vectors: { size: vectorSize, distance: 'Cosine' }
             });

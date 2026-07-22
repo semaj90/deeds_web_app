@@ -1,0 +1,16 @@
+{
+  "session": "140",
+  "title": "Vector registry consumer audit",
+  "verified": [
+    "retrieve-candidates imports VECTOR_INDEX_REGISTRY from vector-index-registry.ts",
+    "retrieve-candidates uses the runtime registry to choose qdrantHybrid and qdrantDense collections",
+    "the SQL vector_index_registry table was not found in live retrieval code during this audit"
+  ],
+  "conclusion": "The runtime registry is the active selector; the SQL table is advisory unless a hydration bridge is added.",
+  "gaps": [
+    "no live SQL-to-runtime bridge",
+    "no status hydration path",
+    "no proof that SQL registry rows are consumed by retrieval"
+  ],
+  "next_safe_action": "decide whether to hydrate VECTOR_INDEX_REGISTRY from Postgres or keep it as a static contract file"
+}

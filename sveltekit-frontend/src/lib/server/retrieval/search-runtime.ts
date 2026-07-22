@@ -30,12 +30,47 @@ import { createDisabledRetriever } from './adapters/disabled-retriever.js';
 import { createPostgresExactRetriever } from './adapters/postgres-exact-retriever.js';
 import { createPostgresAstRetriever } from './adapters/postgres-ast-retriever.js';
 import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
+import { ENV } from '$lib/server/env.server.js';
 import {
   CODEBASE_QDRANT_COLLECTION_PRIORITY,
   resolvePreferredCodebaseCollection,
 } from '$lib/server/config/vector-config.js';
+import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
 
 const PROJECT_CANONICAL_EMBED_DIM = 384;
+const EMBEDDING_HEALTH_CACHE_MS = 60_000;
+
+let embeddingHealthCache:
+  | {
+      checkedAt: number;
+      healthy: boolean;
+    }
+  | null = null;
+
+async function isEmbeddingHealthy(): Promise<boolean> {
+  const cached = embeddingHealthCache;
+  if (cached && Date.now() - cached.checkedAt < EMBEDDING_HEALTH_CACHE_MS) {
+    return cached.healthy;
+  }
+
+  try {
+    const res = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, {
+      signal: AbortSignal.timeout(1500),
+    });
+    const healthy = res.ok;
+    embeddingHealthCache = {
+      checkedAt: Date.now(),
+      healthy,
+    };
+    return healthy;
+  } catch {
+    embeddingHealthCache = {
+      checkedAt: Date.now(),
+      healthy: false,
+    };
+    return false;
+  }
+}
 
 /**
  * Startup assertion: verify canonical Qdrant collection exists AND has the correct
@@ -136,7 +171,7 @@ export const SearchQuerySchema = z.object({
   caseId: z.string().optional(),
   topK: z.number().int().min(1).max(100).default(20),
   threshold: z.number().min(0).max(1).optional(),
-  filters: z.record(z.unknown()).optional(),
+  filters: SearchMetadataFilterSchema.default({}),
   spanContext: z.object({
     traceId: z.string().optional(),
     parentSpanId: z.string().optional(),
@@ -237,6 +272,25 @@ export interface SearchRuntimeConfig {
   dislikedPacketKeys?: ReadonlySet<string>;
 }
 
+function applySearchMetadataFilter(
+  candidates: Candidate[],
+  filters?: SearchMetadataFilter
+): Candidate[] {
+  if (!filters) return candidates;
+
+  return candidates.filter((candidate) => {
+    if (filters.sourceRefs?.length && !filters.sourceRefs.includes(candidate.sourceRef)) {
+      return false;
+    }
+
+    if (filters.pathPrefixes?.length && !filters.pathPrefixes.some((prefix) => candidate.sourceRef.startsWith(prefix))) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
 /** Stage timings extended with scorer and post-process steps. */
 interface StageTiming {
   retrieve: number;
@@ -292,10 +346,11 @@ export class SearchRuntime {
     try {
       // Validate query
       const query = SearchQuerySchema.parse(queryInput);
+      const embeddingHealthy = await isEmbeddingHealthy();
 
       // Stage 1: Retrieve candidates from multiple sources
       const retrieveStart = Date.now();
-      const candidates = await this.retrieveCandidates(query);
+      const candidates = await this.retrieveCandidates(query, { includeVectorLanes: embeddingHealthy });
       stageTiming.retrieve = Date.now() - retrieveStart;
 
       if (candidates.length === 0) {
@@ -324,6 +379,49 @@ export class SearchRuntime {
       const fuseStart = Date.now();
       const fused = await this.fuseCandidates(candidates);
       stageTiming.fuse = Date.now() - fuseStart;
+
+      if (!embeddingHealthy) {
+        const topPackets = await this.hydrateCandidates(
+          fused.slice(0, query.topK).map((candidate) => ({
+            id: candidate.packetKey,
+            packetKey: candidate.packetKey,
+            sourceRef: candidate.sourceRef,
+            summary: '',
+            content: '',
+            score: candidate.score,
+            scoreSource: candidate.scoreSource,
+            fusionScore: candidate.fusionScore,
+            rankBefore: candidate.rankBefore,
+          })),
+        );
+
+        return {
+          packets: topPackets,
+          metadata: {
+            query: query.text,
+            candidatesRetrieved: candidates.length,
+            candidatesFused: fused.length,
+            candidatesScored: fused.length,
+            candidatesReranked: 0,
+            candidatesPostProcessed: 0,
+            durationMs: Date.now() - startTime,
+            stages: {
+              ...stageTiming,
+              score: 0,
+              hydrate: Date.now() - retrieveStart,
+              rerank: 0,
+              postProcess: 0,
+            },
+          },
+          provenance: {
+            retrievalSources: this.getRetrievalSources(candidates),
+            fusionMethod: 'rrf',
+            rerankModel: 'degraded-no-rerank',
+            rerankerUsed: false,
+            promotionAttempted: false,
+          },
+        };
+      }
 
       // Stage 3b: Score — deterministic blended score per candidate (pre-hydration)
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
@@ -472,12 +570,18 @@ export class SearchRuntime {
    * parallel and their LaneCandidates are projected into the Candidate shape.
    * When no retrievers are injected, falls back to the production singleton path.
    */
-  private async retrieveCandidates(query: SearchQuery): Promise<Candidate[]> {
+  private async retrieveCandidates(
+    query: SearchQuery,
+    options?: { includeVectorLanes?: boolean }
+  ): Promise<Candidate[]> {
     if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
-      return retrieveAllCandidates(query.text);
+      return applySearchMetadataFilter(
+        await retrieveAllCandidates(query.text, query.filters, undefined, options),
+        query.filters
+      );
     }
 
-    const input = { query: query.text, limit: query.topK * 5 };
+    const input = { query: query.text, limit: query.topK * 5, filters: query.filters as Record<string, unknown> };
     const perLane = await Promise.all(
       this.injectedRetrievers.map(r => r.retrieve(input).catch(err => {
         console.warn(`[search-runtime] retriever(${r.lane}) failed:`, (err as Error).message);
@@ -492,7 +596,7 @@ export class SearchRuntime {
       fusionStage: 'lane' as const,
     }));
 
-    return stamped.map(lc => ({
+    return applySearchMetadataFilter(stamped.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
       packetKey: lc.packetKey,
       sourceRef: lc.sourceRef,
@@ -503,7 +607,7 @@ export class SearchRuntime {
         : lc.lane === 'exact' ? 'exact_symbol'
         : lc.lane === 'ast' ? 'ast_tree'
         : 'postgres_trigram') as Candidate['scoreSource'],
-    }));
+    })), query.filters);
   }
 
   /**

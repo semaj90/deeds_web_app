@@ -20,13 +20,15 @@ import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';
 import type { Candidate } from './search-runtime.js';
 import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
+import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
+import { RETRIEVAL_LIMITS, identifierVariants, tokenizeKeywordSurface } from './search-contract.js';
 
-const BM25_LIMIT = 100;
-const QDRANT_LIMIT = 100;
-const EXACT_LIMIT = 50;
-const AST_LIMIT = 50;
-const RG_LIMIT = 30;
-const SPARSE_LIMIT = 50;
+const BM25_LIMIT = RETRIEVAL_LIMITS.postgresFtsTopK;
+const QDRANT_LIMIT = RETRIEVAL_LIMITS.denseTopK;
+const EXACT_LIMIT = RETRIEVAL_LIMITS.exactLexicalTopK;
+const AST_LIMIT = RETRIEVAL_LIMITS.topologyTopK;
+const RG_LIMIT = RETRIEVAL_LIMITS.maxGraphNeighbors;
+const SPARSE_LIMIT = RETRIEVAL_LIMITS.sparseTopK;
 
 const _sparseRetriever = createBm42SparseRetriever();
 
@@ -35,18 +37,51 @@ const _sparseRetriever = createBm42SparseRetriever();
  */
 export async function retrieveAllCandidates(
   query: string,
+  filters?: { sourceRefs?: string[]; pathPrefixes?: string[] },
   _limit: number = 128,
+  options?: { includeVectorLanes?: boolean },
 ): Promise<Candidate[]> {
+  const includeVectorLanes = options?.includeVectorLanes ?? true;
+
   const [bm25, qdrant, exact, ast, rg, sparse] = await Promise.all([
     retrieveBM25(query),
-    retrieveQdrant(query),
+    includeVectorLanes ? withTimeout(retrieveQdrant(query), 5000, []) : Promise.resolve([]),
     retrieveExactMatches(query),
     retrieveASTMatches(query),
     retrieveRipgrep(query),
-    retrieveBM42Sparse(query),
+    includeVectorLanes ? withTimeout(retrieveBM42Sparse(query), 5000, []) : Promise.resolve([]),
   ]);
 
-  return [...bm25, ...qdrant, ...exact, ...ast, ...rg, ...sparse];
+  const combined = [...bm25, ...qdrant, ...exact, ...ast, ...rg, ...sparse];
+  if (!filters) {
+    return combined;
+  }
+
+  return combined.filter((candidate) => {
+    if (filters.sourceRefs?.length && !filters.sourceRefs.includes(candidate.sourceRef)) {
+      return false;
+    }
+    if (filters.pathPrefixes?.length && !filters.pathPrefixes.some((prefix) => candidate.sourceRef.startsWith(prefix))) {
+      return false;
+    }
+    return true;
+  });
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timeout = setTimeout(() => resolve(fallback), timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+  }
 }
 
 /**
@@ -222,7 +257,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
 
   try {
     const results = await qdrant.hybridSearch({
-      collection: 'codebase_chunks_384_hybrid', // CANONICAL: hybrid dense+sparse
+      collection: VECTOR_INDEX_REGISTRY.qdrantHybrid.collection ?? 'codebase_chunks_384_hybrid', // CANONICAL: hybrid dense+sparse
       query,
       queryEmbedding: embedding,
       limit: QDRANT_LIMIT,
@@ -242,7 +277,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
     // Fallback: dense-only 384-dim collection (run npm run atlas:backfill:hybrid to populate hybrid)
     try {
       const results = await qdrant.hybridSearch({
-        collection: 'codebase_chunks_384', // TRANSITIONAL FALLBACK
+        collection: VECTOR_INDEX_REGISTRY.qdrantDense.collection ?? 'codebase_chunks_384', // TRANSITIONAL FALLBACK
         query,
         queryEmbedding: embedding,
         limit: QDRANT_LIMIT,
@@ -393,9 +428,13 @@ const RG_STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'this', 'that', 'fro
 export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
   try {
     // Extract identifier-like keywords from query
-    const keywords = (query.match(/\b[a-zA-Z_][a-zA-Z0-9_]{2,}\b/g) ?? [])
-      .filter(kw => !RG_STOP_WORDS.has(kw.toLowerCase()))
-      .slice(0, 8);
+    const keywords = [...new Set(
+      (query.match(/\b[a-zA-Z_][a-zA-Z0-9_]{2,}\b/g) ?? [])
+        .flatMap((kw) => identifierVariants(kw))
+        .flatMap((kw) => tokenizeKeywordSurface(kw))
+        .filter((kw) => kw.length > 2)
+        .filter((kw) => !RG_STOP_WORDS.has(kw.toLowerCase()))
+    )].slice(0, Math.min(8, RETRIEVAL_LIMITS.maxExactKeywords));
 
     if (keywords.length === 0) return [];
 
@@ -486,7 +525,7 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
             summary: row.summary || '',
             content: row.content || '',
             score: 0.7,
-            scoreSource: 'rg_keyword' as const,
+            scoreSource: 'postgres_trigram' as const,
           });
         }
       } catch {

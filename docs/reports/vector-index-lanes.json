@@ -1,0 +1,151 @@
+{
+  "generated_at": "2026-07-21T22:37:01.082Z",
+  "contract_version": "embeddinggemma-prefix384-v1",
+  "snapshot": {
+    "limit": 5000,
+    "selected_rows": 5000,
+    "input_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k.ndjson",
+    "turbovec_input_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
+    "turbovec_output_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec.ndjson",
+    "turbovec_shadow_limit": 4096,
+    "turbovec_shadow_rows": 4096
+  },
+  "qdrant": {
+    "collection": "codebase_chunks_384_hybrid",
+    "applied": true,
+    "upserted_rows": 5000,
+    "sample_overlap_mean": 0.64
+  },
+  "turbovec": {
+    "shadow_built": true,
+    "shadow_rows": 4096,
+    "sample_overlap_mean": 0.7
+  },
+  "reference": {
+    "brute_force": true,
+    "sample_rows": [
+      {
+        "packet_key": "0ee918abc8c53e8d",
+        "topk": [
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "748e8cfa0abd4e6a",
+          "8d44b9719637706f",
+          "c6cd8b39d33db2aa",
+          "packet:008ab6ba7104",
+          "packet:008d73851bef",
+          "packet:00dd22dcf754",
+          "packet:00f1beb71096",
+          "packet:00fc57afabf3"
+        ]
+      },
+      {
+        "packet_key": "1703d9c005252a62",
+        "topk": [
+          "1703d9c005252a62",
+          "4d4c2e69d3f629ba",
+          "dacc099376a3c299",
+          "e0226ded9d79084d",
+          "cbd1423a7a39317f",
+          "packet:1363bae01217",
+          "packet:04f51a57023c",
+          "packet:081849eda76f",
+          "packet:0b4aa72f2f79",
+          "packet:0a6eba174aa1"
+        ]
+      },
+      {
+        "packet_key": "175066b8a4ceee3c",
+        "topk": [
+          "175066b8a4ceee3c",
+          "d15cb3849bdef3b8",
+          "482abc5766b6f8ed",
+          "packet:07f88529d9d5",
+          "271b5446f6a86a48",
+          "packet:01899e352198",
+          "packet:1356ab8e57f9",
+          "packet:01211014a27b",
+          "aae4f83738c25068",
+          "3d0da82598d9064a"
+        ]
+      },
+      {
+        "packet_key": "17dc1fe9f5f8a021",
+        "topk": [
+          "17dc1fe9f5f8a021",
+          "1703d9c005252a62",
+          "4d4c2e69d3f629ba",
+          "dacc099376a3c299",
+          "cbd1423a7a39317f",
+          "271b5446f6a86a48",
+          "64090fce409bb5c9",
+          "packet:123b55a30711",
+          "885c6c04322f6095",
+          "packet:008ab6ba7104"
+        ]
+      },
+      {
+        "packet_key": "1dc5ac2b3cd9bfe8",
+        "topk": [
+          "1dc5ac2b3cd9bfe8",
+          "69af5ffe1b3af354",
+          "bbbe630740c5d753",
+          "packet:012d26cd35e4",
+          "packet:0cf5ed27cb85",
+          "packet:13c1d7b35e72",
+          "packet:0bd2646b2486",
+          "packet:00db25ddf795",
+          "packet:08a65b6c2dc7",
+          "3d0da82598d9064a"
+        ]
+      }
+    ]
+  },
+  "samples": {
+    "qdrant": [
+      {
+        "packet_key": "0ee918abc8c53e8d",
+        "overlap": 1
+      },
+      {
+        "packet_key": "1703d9c005252a62",
+        "overlap": 0.9
+      },
+      {
+        "packet_key": "175066b8a4ceee3c",
+        "overlap": 0.2
+      },
+      {
+        "packet_key": "17dc1fe9f5f8a021",
+        "overlap": 0.4
+      },
+      {
+        "packet_key": "1dc5ac2b3cd9bfe8",
+        "overlap": 0.7
+      }
+    ],
+    "turbovec": [
+      {
+        "packet_key": "0ee918abc8c53e8d",
+        "overlap": 0.4
+      },
+      {
+        "packet_key": "1703d9c005252a62",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "175066b8a4ceee3c",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "17dc1fe9f5f8a021",
+        "overlap": 0.7
+      },
+      {
+        "packet_key": "1dc5ac2b3cd9bfe8",
+        "overlap": 0.8
+      }
+    ]
+  },
+  "duration_ms": 24724
+}

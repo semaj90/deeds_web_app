@@ -24,7 +24,7 @@ import { findBMU, getGridNeighbors, initializeCentroids, type BMUResult } from '
 
 export interface SOMPrefilterConfig {
 	radius?: number; // Neighborhood radius in grid cells (default: 2)
-	gridSize?: number; // SOM grid dimension (default: 20, so 20×20 = 272 cells)
+	gridSize?: number; // SOM grid dimension (default: 20, so 20×20 = 400 cells)
 	enableCache?: boolean; // Cache centroids in Redis (default: true)
 	cacheTTL?: number; // Redis cache TTL in seconds (default: 86400 = 24h)
 	forceEnable?: boolean; // Force prefilter even if cache miss (default: false)
@@ -84,7 +84,7 @@ export async function somTopologyPrefilter(
 	}
 
 	if (!centroids) {
-		// Compute centroids (CPU, ~50ms for 20×20 = 272 centroids)
+		// Compute centroids (CPU, ~50ms for 20×20 = 400 centroids)
 		centroids = initializeCentroids(gridSize, 768);
 
 		// Cache for future use
@@ -111,7 +111,7 @@ export async function somTopologyPrefilter(
 	const neighbors = getGridNeighbors(somRow, somCol, radius, gridSize);
 
 	// Step 4: Estimate candidate count per cell
-	// Heuristic: 272 cells total, assume uniform distribution
+	// Heuristic: 400 cells total, assume uniform distribution
 	// With radius=2, typical neighborhood = 13 cells → ~5% of corpus per query
 	const estimatedPacketsPerCell = Math.ceil(50000 / (gridSize * gridSize)); // Assume ~50K packets total
 	const candidateCount = neighbors.length * estimatedPacketsPerCell;

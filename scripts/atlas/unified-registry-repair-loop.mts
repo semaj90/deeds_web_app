@@ -17,9 +17,14 @@
  * the domain-specific materializers.
  */
 
+import { spawn } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 interface RepairLoopStep {
   name: string;
-  script: string;
+  command?: string;
+  args?: string[];
   description: string;
   critical: boolean;
   timeout_minutes: number;
@@ -37,79 +42,106 @@ interface RepairLoopResult {
 const REPAIR_LOOP_STEPS: RepairLoopStep[] = [
   {
     name: 'audit-validator-predicates',
-    script: 'npx tsx scripts/atlas/audit-validator-predicates.mts',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/audit-validator-predicates.mts'],
     description: 'Check validator rule consistency and predicate alignment',
     critical: true,
     timeout_minutes: 5,
   },
   {
     name: 'audit-joinability',
-    script: 'npx tsx scripts/atlas/audit-registry-enrichment-joins.mts',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/audit-registry-enrichment-joins.mts'],
     description: 'Verify packet_key + source_ref join coverage',
     critical: true,
     timeout_minutes: 10,
   },
   {
     name: 'materialize-cheap-lanes',
-    script: 'npx tsx scripts/atlas/materialize-registry-structural-lexical-domain.mts',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/materialize-registry-structural-lexical-domain.mts'],
     description: 'Materialize structural, lexical, domain projections',
     critical: true,
     timeout_minutes: 30,
   },
   {
     name: 'rerun-validator-after-cheap',
-    script: 'npx tsx scripts/atlas/validate-feature-set-alignment.mts --quick',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/validate-feature-set-alignment.mts', '--quick'],
     description: 'Measure validator score improvement after cheap lanes',
     critical: false,
     timeout_minutes: 10,
   },
   {
     name: 'backfill-embeddings',
-    script: 'npx tsx scripts/atlas/backfill-missing-embeddings.mts',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/backfill-missing-embeddings.mts'],
     description: 'Fill gaps in embedding coverage (if any)',
     critical: false,
     timeout_minutes: 60,
   },
   {
     name: 'materialize-embedding-identity',
-    script: 'npx tsx scripts/atlas/materialize-registry-embedding-identity.mts',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/materialize-registry-embedding-identity.mts'],
     description: 'Materialize embedding metadata projection',
     critical: true,
     timeout_minutes: 20,
   },
   {
     name: 'materialize-topology',
-    script: 'npx tsx scripts/atlas/materialize-registry-topology.mts',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/materialize-registry-topology.mts'],
     description: 'Materialize topology projection (tree_node_id, community, PR, SOM, KMeans)',
     critical: true,
     timeout_minutes: 20,
   },
   {
     name: 'rerun-validator-after-topology',
-    script: 'npx tsx scripts/atlas/validate-feature-set-alignment.mts --full',
+    command: 'npx',
+    args: ['tsx', 'scripts/atlas/validate-feature-set-alignment.mts', '--full'],
     description: 'Measure final validator score improvement',
     critical: false,
     timeout_minutes: 15,
   },
   {
     name: 'daily-graphify',
-    script: 'npm run graphify:daily',
+    command: 'npm',
+    args: ['run', 'graphify:daily'],
     description: 'Run Daily Graphify with all enrichment lanes',
     critical: true,
     timeout_minutes: 30,
   },
 ];
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const REPO_ROOT = resolve(__dirname, '../..');
+const isWindows = process.platform === 'win32';
+
+function resolveSpawnCommand(command: string): string {
+  if (!isWindows) return command;
+  if (command === 'npx') return 'npx.cmd';
+  if (command === 'npm') return 'npm.cmd';
+  return command;
+}
+
 async function executeStep(step: RepairLoopStep): Promise<RepairLoopResult> {
   const startTime = Date.now();
-  const { spawn } = await import('child_process');
+  const command = resolveSpawnCommand(step.command || 'node');
+  const args = step.args || [];
 
   return new Promise((resolve) => {
     console.log(`\n▶️  ${step.name}: ${step.description}`);
 
-    const proc = spawn('sh', ['-c', step.script], {
+    console.log(`  $ ${command} ${args.join(' ')}`);
+
+    const proc = spawn(command, args, {
+      cwd: REPO_ROOT,
       stdio: 'inherit',
       timeout: step.timeout_minutes * 60 * 1000,
+      windowsHide: true,
+      shell: false,
     });
 
     proc.on('exit', (code) => {
@@ -203,11 +235,16 @@ async function main() {
   console.log(`\n✅ Completed: ${successCount}/${totalCount}`);
   console.log(`⚠️  Failed: ${failedCount}`);
 
-  if (failedCount === 0) {
-    console.log('\n🎉 All critical steps passed! Registry enrichment complete.');
+  if (dryRun) {
+    console.log('\n📋 Dry-run complete. No steps were executed.');
+    process.exit(0);
+  }
+
+  if (failedCount === 0 && successCount > 0) {
+    console.log('\n🎉 All executed critical steps passed! Registry enrichment complete.');
     process.exit(0);
   } else {
-    console.log('\n❌ Some critical steps failed. Review logs above.');
+    console.log('\n❌ Some critical steps failed or no steps executed. Review logs above.');
     process.exit(1);
   }
 }

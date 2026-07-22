@@ -30,7 +30,13 @@ function getEmbedding(row) {
 }
 
 function getId(row, i) {
-  return row.id ?? row.packet_id ?? row.packetId ?? row.source_ref ?? row.canonical_source_ref ?? String(i);
+  return row.packet_key
+    ?? row.id
+    ?? row.packet_id
+    ?? row.packetId
+    ?? row.source_ref
+    ?? row.canonical_source_ref
+    ?? String(i);
 }
 
 function packEmbeddings(rows) {

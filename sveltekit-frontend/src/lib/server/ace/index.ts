@@ -95,3 +95,43 @@ export type {
   AtlasToolPermission,
   PermissionGrant,
 } from './atlas-tool-registry.js';
+
+// ── ACE Foundation Layer (New Contracts + Providers + Retrieval) ────────────
+
+// Contracts: Internal program refs, query/context packets, semantic RPC
+export * from './contracts/internal-program-ref.js';
+export * from './contracts/ace-query-packet.js';
+export * from './contracts/ace-context-packet.js';
+export * from './contracts/semantic-rpc-envelope.js';
+
+// Providers: GeneratorProvider interface + llama-server default
+export * from './providers/generator-provider.js';
+export * from './providers/llama-server-provider.js';
+
+// Tokenizer: TokenAccountant interface + llama.cpp native client
+export * from './tokenizer/token-accountant.js';
+export * from './tokenizer/llama-tokenizer-client.js';
+
+// Cache: Revision-aware cache identity + Redis operations
+export * from './cache/cache-key.js';
+export * from './cache/revision-aware-cache.js';
+
+// Retrieval: HyperRAG fan-out + evidence lanes + context selection
+export * from './retrieval/evidence-lanes.js';
+export * from './retrieval/hyperrag-retriever.js';
+export * from './retrieval/context-selector.js';
+
+// State: Deterministic state machine + advisory HMM estimator
+export * from './state/workflow-state.js';
+export * from './state/hmm-state-estimator.js';
+
+// Transport: Semantic RPC envelope + inbox/outbox durability
+export * from './transport/semantic-rpc.js';
+export * from './transport/inbox-outbox.js';
+
+// Features: Deterministic feature extraction + SOM clustering (Gate 12)
+export * from './features/feature-vector-generator.js';
+export * from './features/tree-node-extractor.js';
+export * from './features/domain-classifier.js';
+export * from './features/som-clustering.js';
+export * from './features/feature-extraction-orchestrator.js';

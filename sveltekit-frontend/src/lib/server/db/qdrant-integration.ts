@@ -1,5 +1,6 @@
 
 import { ENV } from '$lib/server/env.server.js';
+import { CANONICAL_EMBEDDING_DIM } from '$lib/server/embedding/embedding-contract.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { db } from './client.js';
 import * as schema from './schema.js';
@@ -18,7 +19,7 @@ export class QdrantPostgreSQLService {
         this.qdrant = getQdrantClient();
     }
 
-    async ensureCollection(collectionName: string, vectorSize: number = 768): Promise<void> {
+    async ensureCollection(collectionName: string, vectorSize: number = CANONICAL_EMBEDDING_DIM): Promise<void> {
         try {
             const result = await this.qdrant.getCollections();
             const exists = result.collections.some((c) => c.name === collectionName);

@@ -43,15 +43,15 @@ async function validateIdentityLanes() {
 
   console.table(result);
 
-  const canonical = result.find(r => r.identity_lane === 'canonical')?.count || 0;
-  const total = result.reduce((sum, r) => sum + r.count, 0);
-  const canonicalPct = (100 * canonical / total).toFixed(1);
+  const canonical = Number(result.find(r => r.identity_lane === 'canonical')?.count ?? 0);
+  const total = result.reduce((sum, r) => sum + Number(r.count ?? 0), 0);
+  const canonicalPct = total > 0 ? (100 * canonical / total).toFixed(1) : '0.0';
 
   if (canonical > 0 && canonicalPct >= 60) {
-    console.log(`✅ Canonical coverage: ${canonicalPct}% (expected 65–70%)`);
+    console.log(`✅ Canonical coverage: ${canonicalPct}% (majority canonical lane)`);
     return true;
   } else {
-    console.log(`❌ Canonical coverage: ${canonicalPct}% (expected 65–70%)`);
+    console.log(`❌ Canonical coverage: ${canonicalPct}% (majority canonical lane)`);
     return false;
   }
 }

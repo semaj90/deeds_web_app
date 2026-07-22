@@ -1,4 +1,5 @@
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
+import { QDRANT_SPARSE_VECTOR_NAME } from '$lib/server/vector/retrieval-semantics.js';
 import type { Retriever, LaneCandidate, RetrievalInput } from '../lane-contracts.js';
 import { validateCandidate } from '../lane-contracts.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
@@ -27,7 +28,7 @@ export function createBm42SparseRetriever(): Retriever {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: { sparse: { indices: sparse.indices, values: sparse.values } },
-            using: 'bm42_sparse',
+            using: QDRANT_SPARSE_VECTOR_NAME,
             limit: input.limit,
             with_payload: true,
           }),

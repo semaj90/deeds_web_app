@@ -132,7 +132,7 @@ function logStage(stage, status, manifest = {}) {
 // Manifest Generation
 // ─────────────────────────────────────────────────────────────────────────
 
-function generateManifest(stageName, input, output, duration, warnings = [], failedIdentities = []) {
+async function generateManifest(stageName, input, output, duration, warnings = [], failedIdentities = []) {
   const inputHash = createHash('sha256').update(JSON.stringify(input || {})).digest('hex');
   const outputHash = createHash('sha256').update(JSON.stringify(output || {})).digest('hex');
 
@@ -544,9 +544,10 @@ async function stage10_computeGraphAnalytics() {
   try {
     // Compute PageRank (would call GPU CUDA kernel or Neo4j GDS)
     const result = await pool.query(
-      `SELECT COUNT(DISTINCT source_ref) as nodes_ranked
-       FROM atlas_packets
-       WHERE page_rank_score IS NOT NULL`
+      `SELECT COUNT(DISTINCT node_key) as nodes_ranked
+       FROM atlas_graph_authority_scores
+       WHERE pagerank_l1 IS NOT NULL
+         AND contract_version = 'atlas.pagerank-authority.v1'`
     );
 
     const nodesRanked = parseInt(result.rows[0].nodes_ranked || 0, 10);
@@ -554,7 +555,7 @@ async function stage10_computeGraphAnalytics() {
     const manifest = {
       recordCount: nodesRanked,
       pageRankComputed: nodesRanked,
-      algorithmVersion: 'pagerank_v2',
+      algorithmVersion: 'pagerank_authority_v1',
       duration: Date.now() - stageStartTime,
       failedIdentities: [],
       warnings: nodesRanked === 0 ? ['No PageRank scores computed'] : [],

@@ -1,0 +1,32 @@
+{
+  "session": "140",
+  "title": "Vector registry live proof",
+  "table_exists": true,
+  "row_count": 4,
+  "rows": [
+    {"index_name": "qdrant_codebase_chunks_384", "index_type": "dense_vector", "index_backend": "qdrant", "vector_dimension": 384, "total_points": 0, "validation_status": "not_validated"},
+    {"index_name": "turbovec_quantized_4bit", "index_type": "quantized_vector", "index_backend": "turbovec", "vector_dimension": 64, "total_points": 0, "validation_status": "not_validated"},
+    {"index_name": "kmeans_k32", "index_type": "clustering", "index_backend": "gpu", "vector_dimension": 384, "total_points": 0, "validation_status": "not_validated"},
+    {"index_name": "som_20x20", "index_type": "topology", "index_backend": "gpu", "vector_dimension": 384, "total_points": 0, "validation_status": "not_validated"}
+  ],
+  "live_columns": [
+    "id",
+    "index_name",
+    "index_type",
+    "index_backend",
+    "vector_dimension",
+    "total_points",
+    "created_at",
+    "updated_at",
+    "last_validation",
+    "validation_status",
+    "config"
+  ],
+  "gaps": [
+    "no validation proofs",
+    "no populated points",
+    "no parity benchmark evidence",
+    "live schema is older than the newer initializer contract"
+  ],
+  "next_safe_action": "inspect registry consumers and patch the naming bridge only where the live path already reads the table"
+}

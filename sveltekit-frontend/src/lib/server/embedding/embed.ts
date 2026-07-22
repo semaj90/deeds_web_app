@@ -51,10 +51,15 @@ export {
 export {
 	cosineSimilarity,
 	dot,
+	topKDomainCentroids,
 	norm,
 	euclideanDistance,
 	topKNearest,
+	validateVectorContract,
 	type Vector,
+	type VectorContract,
+	type DomainCentroid,
+	type DomainCentroidMatch,
 } from '$lib/server/embedding/knn-helper.js';
 
 export { embeddingCacheService } from '$lib/server/embedding-cache-service.js';

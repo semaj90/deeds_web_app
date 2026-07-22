@@ -12,11 +12,13 @@ import {
     pgEnum,
     pgTable,
     primaryKey,
+    doublePrecision,
     real,
     serial,
     text,
     timestamp,
     unique,
+    uniqueIndex,
     uuid,
     varchar,
     vector,
@@ -4963,38 +4965,57 @@ export const featureOntologyTuples = pgTable('feature_ontology_tuples', {
 export type FeatureOntologyTuples = typeof featureOntologyTuples.$inferSelect;
 export type NewFeatureOntologyTuples = typeof featureOntologyTuples.$inferInsert;
 
-// ── Feature Packet Bindings (Phase 107 F Materialization) ──────────────────────
-// Many-to-many relationship: feature → packet, with confidence scoring & provenance
-// Phase 107 Phase F: field-level precedence materialization with explicit binding types
-
-export const featurePacketBindings = pgTable('feature_packet_bindings', {
-  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  featureId: text('feature_id').notNull(),
-  packetKey: text('packet_key').notNull(),
-  sourceRef: text('source_ref').notNull(),
-
-  // binding_type: extracted (from feature facts), inferred (normalized chain), or promoted (high-confidence)
-  bindingType: text('binding_type').notNull().default('extracted'),
-
-  // confidence: 0.95 (feature facts), 0.6 (atlas_packets fallback), 0.3 (heuristic)
-  confidence: real('confidence').notNull().default(0.5),
-
-  // evidence_ids: references to feature_*_facts rows that contributed to this binding
-  evidenceIds: text('evidence_ids').array().notNull().default(sql`'{}'::text[]`),
-
-  // provenance tracking
-  createdAt: timestamp('created_at', { withTimezone: true }).notNull().default(sql`now()`),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().default(sql`now()`),
-}, (t) => [
-  // Unique constraint: one feature → packet binding per source_ref
-  unique('feature_packet_bindings_unique').on(t.featureId, t.packetKey, t.sourceRef),
-
-  // Indexes for retrieval
-  index('feature_packet_bindings_feature_confidence_idx').on(t.featureId, t.confidence.desc()),
-  index('feature_packet_bindings_packet_key_idx').on(t.packetKey),
-  index('feature_packet_bindings_binding_type_idx').on(t.bindingType, t.confidence.desc()),
-  index('feature_packet_bindings_source_ref_idx').on(t.sourceRef),
+// Binding relationship kinds (semantic meaning of feature ↔ packet connection)
+export const featureBindingKindEnum = pgEnum('feature_binding_kind', [
+  'implements',
+  'documents',
+  'tests',
+  'configures',
+  'supports',
+  'uses',
+  'references',
 ]);
+
+// ── Feature Packet Bindings (Phase 107 F: Identity + Precedence Only) ────────
+// Many-to-many relationship: feature → packet, with explicit binding kinds.
+// Bindings require evidence and are created during Phase 108 ACE curation.
+// Phase 107 F: schema only (table empty), no automatic binding creation.
+// Bindings do NOT represent semantic inference; they are curator-approved relationships.
+
+export const featurePacketBindings = pgTable(
+  'feature_packet_bindings',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    featureKey: varchar('feature_key', { length: 255 }).notNull(),
+    packetKey: varchar('packet_key', { length: 255 }).notNull(),
+    bindingKind: featureBindingKindEnum('binding_kind').notNull(),
+    joinMethod: varchar('join_method', { length: 100 }).notNull(),
+    evidence: jsonb('evidence')
+      .$type<{
+        evidenceRefs: string[];
+        sourceRef?: string;
+        symbol?: string;
+        matchKind?: string;
+        evidenceStrength?: 'exact' | 'strong' | 'moderate' | 'weak';
+      }>()
+      .notNull(),
+    sourceRef: varchar('source_ref', { length: 500 }),
+    processingPassId: uuid('processing_pass_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  table => [
+    uniqueIndex('feature_packet_bindings_identity_uq').on(
+      table.featureKey,
+      table.packetKey,
+      table.bindingKind
+    ),
+    index('feature_packet_bindings_feature_key_idx').on(table.featureKey),
+    index('feature_packet_bindings_packet_key_idx').on(table.packetKey),
+    index('feature_packet_bindings_binding_kind_idx').on(table.bindingKind),
+    index('feature_packet_bindings_processing_pass_idx').on(table.processingPassId),
+  ]
+);
 
 export type FeaturePacketBindings = typeof featurePacketBindings.$inferSelect;
 export type NewFeaturePacketBindings = typeof featurePacketBindings.$inferInsert;

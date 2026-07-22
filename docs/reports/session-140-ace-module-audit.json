@@ -1,0 +1,63 @@
+{
+  "session": "140",
+  "report": "ACE module audit",
+  "verified": [
+    "sveltekit-frontend/src/lib/server/ace tree exists and is exported from index.ts",
+    "hyperrag-retriever uses RevisionAwareCache and LlamaTokenizerClient",
+    "feature-extraction-orchestrator loads packets, extracts features, extracts tree nodes, optionally classifies domain, and clusters with SOM",
+    "som-clustering defines a 20x20 assignment contract and has GPU and CPU paths",
+    "workflow-state contains the 9-state chain",
+    "hmm-state-estimator mirrors the same state space as advisory-only logic",
+    "transport/inbox-outbox persists semantic RPC messages with idempotency conflict handling"
+  ],
+  "in_progress": [
+    "runtime correctness of SOM fallback",
+    "materialization behavior under apply mode",
+    "Phase 107 scope safety"
+  ],
+  "deferred_or_not_proven": [
+    "deterministic full-corpus clustering parity",
+    "production-safe PageRank materialization",
+    "registry projection correctness against the live database",
+    "full dry-run/apply smoke coverage",
+    "claim that the full ACE stack is complete"
+  ],
+  "todo": [
+    "Audit feature-extraction-orchestrator.ts and som-clustering.ts for write-path safety and determinism",
+    "Verify materialization writes only intended SOM fields in apply mode",
+    "Confirm live database state before accepting the pasted summary as completed work",
+    "Keep the report split between verified code, live runtime proof, and deferred claims"
+  ],
+  "status": {
+    "implemented": [
+      "ACE module tree",
+      "retrieval fan-out",
+      "workflow state machine",
+      "inbox/outbox durability"
+    ],
+    "proven": [
+      "live source files inspected",
+      "export surface present",
+      "SOM clustering contract present"
+    ],
+    "expected_gaps": [
+      "full-corpus runtime proof",
+      "write-path proof",
+      "database projection proof"
+    ],
+    "unresolved": [
+      "whether the pasted session summary reflects current live state",
+      "whether all module paths are production-safe"
+    ],
+    "unsafe_constraints": [
+      "treating summary text as proof",
+      "assuming complete without write/readback verification"
+    ],
+    "not_yet_proven": [
+      "end-to-end ACE stack completion",
+      "production materialization parity",
+      "deterministic clustering under live inputs"
+    ],
+    "next_safe_action": "inspect the SOM write path and generate a bounded smoke proof"
+  }
+}

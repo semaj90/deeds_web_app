@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-07-21T00:00:00-07:00",
+  "database": {
+    "name": "legal_ai_db",
+    "schema": "public"
+  },
+  "live_counts": {
+    "feature_domain_facts": 61659,
+    "feature_lexical_facts": 0,
+    "feature_structural_facts": 0,
+    "feature_ontology_tuples": 0
+  },
+  "tables": [
+    {
+      "name": "sveltekit-frontend/src/lib/server/classifier/domain-classifier.ts",
+      "status": "PARTIAL",
+      "notes": [
+        "Keyword-based",
+        "No POS/provenance",
+        "Single-label only"
+      ]
+    },
+    {
+      "name": "sveltekit-frontend/src/lib/server/enrichment/domain-classifier.ts",
+      "status": "PARTIAL",
+      "notes": [
+        "Lexical + semantic + external validation",
+        "No canonical multi-label prediction table",
+        "No persisted POS/lemma lane"
+      ]
+    },
+    {
+      "name": "scripts/atlas/classify-domain-ontology.mjs",
+      "status": "DEPRECATED",
+      "notes": [
+        "Writes directly to atlas_packets and Redis",
+        "Bypasses canonical fact tables"
+      ]
+    },
+    {
+      "name": "scripts/atlas/domain-classifier-with-semantic-validation.mts",
+      "status": "PARTIAL",
+      "notes": [
+        "Lexical + LDR + external validation",
+        "Heuristic only"
+      ]
+    },
+    {
+      "name": "scripts/atlas/phase-107-f-field-materializer.mts",
+      "status": "PARTIAL",
+      "notes": [
+        "Precedence resolver",
+        "feature_domain_facts -> atlas_packets -> heuristic fallback",
+        "feature_lexical_facts, feature_structural_facts, feature_ontology_tuples still empty"
+      ]
+    }
+  ],
+  "missing_tables": [
+    "feature_domain_predictions",
+    "feature_packet_bindings"
+  ],
+  "next_safe_action": [
+    "Add the multi-label prediction table",
+    "Populate lexical, structural, and ontology fact lanes",
+    "Disable legacy direct atlas_packets domain writers for canonical decisions"
+  ]
+}

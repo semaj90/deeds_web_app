@@ -1,0 +1,64 @@
+{
+  "contractVersion": "atlas.vector-lane-registry.v1",
+  "activeCanonicalLane": "atlas-retrieval-384-v1",
+  "lanes": [
+    {
+      "laneId": "embeddinggemma-source-768-v1",
+      "status": "native",
+      "role": "archive",
+      "modelId": "embeddinggemma",
+      "modelRevision": "pinned-revision",
+      "sourceDimensions": 768,
+      "outputDimensions": 768,
+      "projection": "none",
+      "normalization": "l2",
+      "dtype": "float32",
+      "distance": "cosine",
+      "purpose": "Native source embedding artifact from embeddinggemma:latest"
+    },
+    {
+      "laneId": "atlas-retrieval-384-v1",
+      "status": "canonical",
+      "role": "retrieval",
+      "modelId": "embeddinggemma",
+      "modelRevision": "pinned-revision",
+      "sourceDimensions": 768,
+      "outputDimensions": 384,
+      "projection": "direct-slice",
+      "normalization": "l2",
+      "dtype": "float32",
+      "distance": "cosine",
+      "purpose": "Canonical Atlas code and documentation retrieval",
+      "collection": "codebase_chunks_384_hybrid"
+    },
+    {
+      "laneId": "atlas-topology-128-v1",
+      "status": "derived",
+      "role": "topology",
+      "modelId": "atlas-topology-projector",
+      "modelRevision": "v1",
+      "sourceDimensions": 384,
+      "outputDimensions": 128,
+      "projection": "graph-projection",
+      "normalization": "l2",
+      "dtype": "float32",
+      "distance": "cosine",
+      "purpose": "Derived topology similarity for Neo4j projection"
+    },
+    {
+      "laneId": "atlas-latent-64-v1",
+      "status": "experimental",
+      "role": "centroid-routing",
+      "modelId": "atlas-autoencoder",
+      "modelRevision": "768x64-v1",
+      "sourceDimensions": 768,
+      "outputDimensions": 64,
+      "projection": "autoencoder",
+      "normalization": "l2",
+      "dtype": "float32",
+      "distance": "cosine",
+      "purpose": "K-means and SOM routing (awaiting autoencoder training)",
+      "artifactUri": "artifact://atlas/latent64/current"
+    }
+  ]
+}

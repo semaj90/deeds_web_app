@@ -1,0 +1,60 @@
+{
+  "session": "140",
+  "generated_at": "2026-07-21T00:00:00-07:00",
+  "verified": {
+    "snapshot_script": "scripts/atlas/duckdb/freeze-vector-snapshot.mts",
+    "vector_lane_script": "scripts/atlas/duckdb/build-vector-index-lanes.mts",
+    "vector_lane_report": {
+      "path": "docs/reports/vector-index-lanes.json",
+      "selected_rows": 5000,
+      "qdrant_upserted_rows": 5000,
+      "qdrant_sample_overlap_mean": 0.64,
+      "turbovec_shadow_rows": 4096,
+      "turbovec_sample_overlap_mean": 0.70
+    },
+    "ace_tree_exists": true,
+    "repo_boundary": {
+      "app_boundary": "packages/parent-atlas",
+      "operational_lane": "scripts/atlas"
+    },
+    "scope_audit": {
+      "commit": "740668fd2f",
+      "required": [
+        "scripts/atlas/phase-107-schema-audit.mts",
+        "scripts/atlas/phase-107-backfill-joins.mts",
+        "sveltekit-frontend/drizzle/0044_phase_107_feature_layer_schema.sql"
+      ],
+      "related_but_separate": [
+        "scripts/atlas/python-orchestrator.mjs",
+        "sveltekit-frontend/src/lib/server/ace/ace-query-packet.spec.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.ts",
+        "sveltekit-frontend/src/lib/server/retrieval/hmm-tool-selector.spec.ts",
+        "sveltekit-frontend/src/routes/api/tools/search/+server.ts"
+      ]
+    }
+  },
+  "not_proven": [
+    "session 140 complete",
+    "ACE Foundation Full Stack complete",
+    "Track A unblocked autoencoder/tree_node_id/PageRank gates",
+    "full semantic stack complete",
+    "full ACE stack complete",
+    "K-means / SOM 20x20 complete",
+    "PageRank complete",
+    "tree_node_id propagation complete"
+  ],
+  "in_progress": [
+    "identity resolution and ContentIdentity discipline",
+    "narrow SOM assignment output",
+    "topology enrichment as a second pass",
+    "retrieval routing after persisted facts exist",
+    "ACE assembly after retrieval evidence exists",
+    "review cleanup"
+  ],
+  "todo": [
+    "audit the ACE module tree against the completion claims one module at a time",
+    "verify each claimed ACE module against tests or live report output",
+    "rewrite the status summary so it says only what is proven",
+    "keep the Phase 107 feature-layer work separate from the ACE progress note"
+  ]
+}

@@ -21,6 +21,32 @@ import {
   type GoRetrievalFacadeRequest
 } from '$lib/server/retrieval/go-retrieval-facade.js';
 import { CanonicalEnvelopeSchema } from '$lib/server/topology/canonical-id-hierarchy.js';
+import {
+  RetrievalSearchRequestSchema,
+  RETRIEVAL_LIMITS,
+  SearchMetadataFilterSchema
+} from '$lib/server/retrieval/search-contract.js';
+
+const GoRetrievalRequestSchema = RetrievalSearchRequestSchema.extend({
+  limit: z.number().int().positive().max(RETRIEVAL_LIMITS.maxFinalResults).optional(),
+  topK: z.number().int().positive().max(RETRIEVAL_LIMITS.maxTopKPerLane).optional(),
+  top_k: z.number().int().positive().max(RETRIEVAL_LIMITS.maxTopKPerLane).optional(),
+  useRRF: z.boolean().optional(),
+  use_rrf: z.boolean().optional(),
+  useLexical: z.boolean().optional(),
+  use_lexical: z.boolean().optional(),
+  useMultiVector: z.boolean().optional(),
+  use_multi_vector: z.boolean().optional(),
+  includeSummary: z.boolean().optional(),
+  include_summary: z.boolean().optional(),
+  summaryMaxTokens: z.number().int().positive().max(1024).optional(),
+  summary_max_tokens: z.number().int().positive().max(1024).optional(),
+  summaryTemperature: z.number().finite().min(0).max(2).optional(),
+  summary_temperature: z.number().finite().min(0).max(2).optional(),
+  filters: SearchMetadataFilterSchema.optional(),
+  caseId: z.string().optional(),
+  case_id: z.string().optional()
+}).strict();
 
 const RetrievalResponseSchema = z.object({
   candidates: z.array(
@@ -35,7 +61,7 @@ const RetrievalResponseSchema = z.object({
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const body = (await request.json()) as GoRetrievalFacadeRequest;
+    const body = GoRetrievalRequestSchema.parse(await request.json()) as GoRetrievalFacadeRequest;
 
     if (!body.query) {
       return new Response(
@@ -101,7 +127,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
   // Search endpoint (GET with query parameter)
   const query = url.searchParams.get('q');
-  const limit = parseInt(url.searchParams.get('limit') || '10');
+  const limit = parseInt(url.searchParams.get('limit') || String(RETRIEVAL_LIMITS.defaultFinalResults), 10);
   const useRRF = url.searchParams.get('rrf') !== 'false';
   const useLexical = url.searchParams.get('lexical') === 'true';
   const includeSummary = url.searchParams.get('summarize') === 'true';
@@ -114,13 +140,13 @@ export const GET: RequestHandler = async ({ url }) => {
   }
 
   try {
-    const request: GoRetrievalFacadeRequest = {
+    const request = GoRetrievalRequestSchema.parse({
       query,
       limit,
       useRRF,
       useLexical,
       includeSummary
-    };
+    }) as GoRetrievalFacadeRequest;
 
     const result = await executeGoRetrievalSearch(request, includeSummary);
 

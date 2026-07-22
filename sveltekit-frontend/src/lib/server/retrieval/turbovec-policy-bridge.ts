@@ -11,6 +11,7 @@
 
 import { recordRetrievalMetrics } from './retrieval-metrics.js';
 import type { RetrievalMetrics } from './retrieval-metrics.js';
+import { RETRIEVAL_LIMITS } from './search-contract.js';
 
 /**
  * @typedef {Object} TurboVecResult
@@ -65,7 +66,7 @@ export async function logTurboVecMetrics(params) {
     turbovecFallback,
     karphathyUsed: false,
     finalCandidateCount: candidates.length,
-    finalTopK: candidates.slice(0, 10).map((c, i) => ({
+    finalTopK: candidates.slice(0, RETRIEVAL_LIMITS.defaultFinalResults).map((c, i) => ({
       id: c.id,
       score: c.score,
       rank: i + 1,

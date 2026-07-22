@@ -10,6 +10,26 @@ import { getSearchLaneRegistry } from './search-lanes.js';
 import { sql } from 'drizzle-orm';
 import { inArray } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
+import {
+  RETRIEVAL_LIMITS,
+  normalizeRetrievalSearchRequest
+} from './search-contract.js';
+import type { SearchFilter } from './types.js';
+
+function buildLaneFilter(
+  req: SearchRequest,
+  normalizedRequest: ReturnType<typeof normalizeRetrievalSearchRequest> | null,
+  perLaneLimit: number
+): SearchFilter {
+  return {
+    ...req.filters,
+    keywords: normalizedRequest?.exactKeywords ?? req.exactKeywords ?? req.filters?.keywords,
+    keyword_variants: normalizedRequest?.expandedKeywords ?? req.expandedKeywords ?? req.filters?.keyword_variants,
+    search_kinds: normalizedRequest?.lanes ?? req.lanes ?? req.filters?.search_kinds,
+    include_packet_keys: normalizedRequest?.cursor ? [] : req.filters?.include_packet_keys,
+    per_lane_limit: perLaneLimit
+  };
+}
 
 /**
  * Execute unified retrieval
@@ -22,14 +42,37 @@ import { db } from '$lib/server/db/client.js';
  * 5. Optional LLM summary
  */
 export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse> {
+  const normalizedRequest = typeof req.query === 'string'
+    ? normalizeRetrievalSearchRequest({
+        ...(req as any),
+        query: req.query
+      } as any)
+    : null;
+
   const startTime = performance.now();
   const timing: SearchResponse['timing'] = {
     total_ms: 0,
   };
 
-  const k = req.k ?? 10;
-  if (k < 1 || k > 1000) {
-    throw new Error('k must be between 1 and 1000');
+  const perLaneLimit = Math.min(
+    normalizedRequest?.topKPerLane ?? req.k ?? RETRIEVAL_LIMITS.defaultTopKPerLane,
+    RETRIEVAL_LIMITS.maxTopKPerLane
+  );
+  const rerankTopK = Math.min(
+    normalizedRequest?.rerankTopK ?? RETRIEVAL_LIMITS.defaultRerankCandidates,
+    RETRIEVAL_LIMITS.maxRerankCandidates
+  );
+  const finalTopK = Math.min(
+    normalizedRequest?.finalTopK ?? RETRIEVAL_LIMITS.defaultFinalResults,
+    RETRIEVAL_LIMITS.maxFinalResults
+  );
+  const pageSize = Math.min(
+    normalizedRequest?.pageSize ?? finalTopK,
+    finalTopK
+  );
+
+  if (perLaneLimit < 1) {
+    throw new Error('topKPerLane must be at least 1');
   }
 
   // Step 1: Embed query
@@ -59,7 +102,8 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   const lanesFailed: string[] = [];
   let combinedResults: SearchResult[] = [];
 
-  const laneNames = req.lanes ?? ['gpu-cuvs', 'qdrant'];
+  const laneNames = normalizedRequest?.lanes ?? req.lanes ?? ['gpu-cuvs', 'qdrant'];
+  const laneFilters = buildLaneFilter(req, normalizedRequest, perLaneLimit);
   const laneSearches = laneNames.map(async (laneName) => {
     const lane = registry.get(laneName);
     if (!lane) {
@@ -77,10 +121,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
       }
 
       const startSearch = performance.now();
-      const results = await lane.search(queryEmbedding, k, {
-        min_confidence: 0,
-        min_score: 0,
-      });
+      const results = await lane.search(queryEmbedding, perLaneLimit, laneFilters);
       const elapsed = performance.now() - startSearch;
 
       lanesSucceeded.push(laneName);
@@ -131,13 +172,13 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   }
 
   // Truncate to k
-  const candidates = deduped.slice(0, k).map((r, idx) => ({ ...r, rank: idx }));
+  const candidates = deduped.slice(0, finalTopK).map((r, idx) => ({ ...r, rank: idx }));
 
   // Step 5: Optional LLM summary
   let summary: string | undefined;
   if (req.summarize) {
     const summaryStartTime = performance.now();
-    summary = await summarizeResults(candidates);
+    summary = await summarizeResults(candidates.slice(0, pageSize));
     timing.summary_ms = performance.now() - summaryStartTime;
   }
 
@@ -148,11 +189,12 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
     candidates,
     timing,
     metadata: {
-      lanes_attempted: lanesAttempted,
-      lanes_succeeded: lanesSucceeded,
-      lanes_failed: lanesFailed,
+      lanes_attempted: lanesAttempted as SearchResponse['metadata']['lanes_attempted'],
+      lanes_succeeded: lanesSucceeded as SearchResponse['metadata']['lanes_succeeded'],
+      lanes_failed: lanesFailed as SearchResponse['metadata']['lanes_failed'],
+      candidates_before_rerank: combinedResults.length,
       candidates_count: candidates.length,
-      truncated: combinedResults.length > k,
+      truncated: combinedResults.length > finalTopK,
       query_embedding_hash: hashEmbedding(queryEmbedding),
       warnings: lanesFailed.length > 0 ? [`${lanesFailed.length} lanes failed`] : undefined,
     },

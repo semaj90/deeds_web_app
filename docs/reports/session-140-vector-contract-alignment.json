@@ -1,0 +1,24 @@
+{
+  "session": "140",
+  "title": "Vector contract alignment",
+  "verified": [
+    "vector contract layer exists under sveltekit-frontend/src/lib/server/vector",
+    "embeddinggemma-prefix384.ts defines embeddinggemma-prefix384-v1",
+    "vector-contracts.ts declares semantic_embedding, topology_embedding, latent_embedding, and bm42_sparse lanes",
+    "init-vector-index-registry.mts initializes qdrant_codebase_chunks_384, turbovec_quantized_4bit, kmeans_k32, and som_20x20",
+    "ace-materializer.ts still uses the 768-dim legacy Qdrant path",
+    "mutation-gate.ts treats SOM as a 64-dim routing feature and keeps policy separate"
+  ],
+  "gaps": [
+    "live population of vector_index_registry",
+    "Qdrant vs TurboVec vs brute-force parity",
+    "runtime migration from 768 legacy path to 384 contract path",
+    "proof that tokenizer IDs are fully isolated from routing vectors in the runtime path"
+  ],
+  "next_steps": [
+    "confirm whether vector_index_registry is populated in the live database or only initialized by script",
+    "unify naming between live vector modules and the proposed content_384/routing_64 scheme",
+    "add or inspect parity proofs for Qdrant, TurboVec, and brute-force reference search",
+    "keep tokenizer IDs separate from retrieval vectors"
+  ]
+}

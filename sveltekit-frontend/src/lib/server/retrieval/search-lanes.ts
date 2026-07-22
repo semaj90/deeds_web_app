@@ -1,85 +1,163 @@
 /**
  * Search lanes abstraction for Phase 3
  * Consolidates Qdrant client, cuVS client, TurboVec prefilter, and BM25 fallback
- * behind a unified SearchLane interface
+ * behind a unified SearchLane interface.
  *
- * Each lane implements: search(query, k, filters) -> Promise<SearchResult[]>
- * Built-in fallback chain: GPU → Qdrant HNSW → BM25
+ * FILTER PUSHDOWN CONTRACT:
+ *   source_ref / feature_ids / directory_path / kmeans_cluster_ids / som_row / som_col / packet_type
+ *   are pushed INTO backend queries (Qdrant filter payload, SQL WHERE clause, GPU pre-mask).
+ *   min_confidence / min_score / exclude_feature_ids / include_packet_keys are post-fetch gates.
  */
 
 import type { SearchResult, SearchLaneConfig, SearchFilter } from './types.js';
-import { sql } from 'drizzle-orm';
+import { RETRIEVAL_LIMITS } from './search-contract.js';
+import { sql, type SQL } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
 
+// ── LIKE wildcard escaping ────────────────────────────────────────────────────
+
+/** Escape PostgreSQL LIKE metacharacters so user input is treated as a literal prefix. */
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, '\\$&');
+}
+
+// ── Qdrant filter builder ────────────────────────────────────────────────────
+
 /**
- * Interface for a single search lane
+ * Build a Qdrant must[] filter array from SearchFilter pushdown fields.
+ * Only reads top-level canonical filter fields — not the deprecated metadata sub-object.
  */
-export interface ISearchLane {
-  /** Lane name */
-  name: string;
+function buildQdrantFilter(filters?: SearchFilter): Record<string, unknown> | undefined {
+  if (!filters) return undefined;
+  const must: Record<string, unknown>[] = [];
 
-  /** Check if this lane is healthy */
-  health(): Promise<boolean>;
+  if (filters.source_ref) must.push({ key: 'source_ref', match: { value: filters.source_ref } });
+  if (filters.source_ref_pattern) must.push({ key: 'source_ref', match: { text: filters.source_ref_pattern } });
+  if (filters.directory_path) must.push({ key: 'directory_path', match: { text: filters.directory_path } });
+  if (filters.feature_ids?.length) must.push({ key: 'feature_id', match: { any: filters.feature_ids } });
+  if (filters.kmeans_cluster_ids?.length) must.push({ key: 'kmeans_cluster_id', match: { any: filters.kmeans_cluster_ids } });
+  if (filters.som_row !== undefined) must.push({ key: 'som_row', match: { value: filters.som_row } });
+  if (filters.som_col !== undefined) must.push({ key: 'som_col', match: { value: filters.som_col } });
+  if (filters.packet_type) must.push({ key: 'packet_type', match: { value: filters.packet_type } });
 
-  /** Execute search */
-  search(query: Float32Array, k: number, filters?: SearchFilter): Promise<SearchResult[]>;
+  // Additional metadata sub-object fields (Qdrant payload only — not in SQL tables)
+  const meta = filters.metadata ?? {};
+  if (meta.language) must.push({ key: 'language', match: { value: meta.language } });
+  if (meta.file_extension) must.push({ key: 'file_extension', match: { value: meta.file_extension } });
+  if (meta.domain_class) must.push({ key: 'domain_class', match: { value: meta.domain_class } });
+  if (meta.jsonb_contains) must.push({ key: 'metadata', match: { value: meta.jsonb_contains } });
 
-  /** Get lane configuration */
-  config(): SearchLaneConfig;
+  return must.length > 0 ? { must } : undefined;
+}
+
+// ── SQL WHERE clause builders — one per physical schema ──────────────────────
+
+/**
+ * Build parameterised SQL WHERE fragments for the atlas_packets table (alias ap).
+ * Uses explicit ::text[] and ::integer[] casts for ANY() arrays.
+ * Uses ESCAPE '\\' for LIKE patterns so % and _ in user input are literal.
+ * Never uses sql.raw() — all values are Drizzle parameters.
+ */
+function buildPacketConditions(filters?: SearchFilter): SQL | undefined {
+  if (!filters) return undefined;
+  const frags: SQL[] = [];
+
+  if (filters.source_ref) {
+    frags.push(sql`ap.source_ref = ${filters.source_ref}`);
+  }
+  if (filters.source_ref_pattern) {
+    frags.push(sql`ap.source_ref LIKE ${escapeLike(filters.source_ref_pattern) + '%'} ESCAPE '\\'`);
+  }
+  if (filters.directory_path) {
+    frags.push(sql`ap.directory_path LIKE ${escapeLike(filters.directory_path) + '%'} ESCAPE '\\'`);
+  }
+  if (filters.feature_ids?.length) {
+    frags.push(sql`ap.feature_id = ANY(${filters.feature_ids}::text[])`);
+  }
+  if (filters.kmeans_cluster_ids?.length) {
+    frags.push(sql`ap.kmeans_cluster_id = ANY(${filters.kmeans_cluster_ids}::integer[])`);
+  }
+  if (filters.som_row !== undefined) {
+    frags.push(sql`ap.som_row = ${filters.som_row}`);
+  }
+  if (filters.som_col !== undefined) {
+    frags.push(sql`ap.som_col = ${filters.som_col}`);
+  }
+  if (filters.packet_type) {
+    frags.push(sql`ap.packet_type = ${filters.packet_type}`);
+  }
+
+  if (frags.length === 0) return undefined;
+  return frags.reduce((acc, frag) => sql`${acc} AND ${frag}`);
 }
 
 /**
- * Abstract base class for search lanes
+ * Build parameterised SQL WHERE fragments for the codebase_chunk_index table (alias c).
+ * Only includes columns that actually exist on codebase_chunk_index.
  */
+function buildChunkConditions(filters?: SearchFilter): SQL | undefined {
+  if (!filters) return undefined;
+  const frags: SQL[] = [];
+
+  // codebase_chunk_index has source_ref and feature_id; no directory_path or SOM columns
+  if (filters.source_ref) {
+    frags.push(sql`c.source_ref = ${filters.source_ref}`);
+  }
+  if (filters.source_ref_pattern) {
+    frags.push(sql`c.source_ref LIKE ${escapeLike(filters.source_ref_pattern) + '%'} ESCAPE '\\'`);
+  }
+  if (filters.feature_ids?.length) {
+    frags.push(sql`c.feature_id = ANY(${filters.feature_ids}::text[])`);
+  }
+
+  if (frags.length === 0) return undefined;
+  return frags.reduce((acc, frag) => sql`${acc} AND ${frag}`);
+}
+
+// ── Interface ────────────────────────────────────────────────────────────────
+
+export interface ISearchLane {
+  name: string;
+  health(): Promise<boolean>;
+  search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]>;
+  config(): SearchLaneConfig;
+}
+
+// ── Abstract base ────────────────────────────────────────────────────────────
+
 export abstract class SearchLaneBase implements ISearchLane {
   abstract name: string;
-
   abstract health(): Promise<boolean>;
-  abstract search(query: Float32Array, k: number, filters?: SearchFilter): Promise<SearchResult[]>;
-
+  abstract search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]>;
   abstract config(): SearchLaneConfig;
 
-  /**
-   * Helper: apply filters to results
-   */
-  protected applyFilters(results: SearchResult[], filters?: SearchFilter): SearchResult[] {
+  /** Post-fetch gates only — min_confidence, min_score, exclusions */
+  protected applyPostFetchFilters(results: SearchResult[], filters?: SearchFilter): SearchResult[] {
     if (!filters) return results;
 
     return results.filter((r) => {
-      if (filters.min_confidence !== undefined && r.confidence < filters.min_confidence) {
-        return false;
-      }
-      if (filters.min_score !== undefined && r.score < filters.min_score) {
-        return false;
-      }
-      if (filters.exclude_feature_ids?.includes(r.feature_id ?? '')) {
-        return false;
-      }
-      if (filters.include_packet_keys && !filters.include_packet_keys.includes(r.packet_key ?? '')) {
-        return false;
-      }
+      if (filters.min_confidence !== undefined && r.confidence < filters.min_confidence) return false;
+      if (filters.min_score !== undefined && r.score < filters.min_score) return false;
+      if (filters.exclude_feature_ids?.includes(r.feature_id ?? '')) return false;
+      if (filters.include_packet_keys && !filters.include_packet_keys.includes(r.packet_key ?? '')) return false;
       return true;
     });
   }
 
-  /**
-   * Helper: rank results
-   */
   protected rankResults(results: SearchResult[]): SearchResult[] {
     return results.map((r, idx) => ({ ...r, rank: idx }));
   }
 }
 
-/**
- * GPU cuVS search lane (Stage 3A)
- */
+// ── GPU cuVS lane ────────────────────────────────────────────────────────────
+
 export class GpuCuvSLane extends SearchLaneBase {
   name = 'gpu-cuvs';
 
   private url: string;
   private timeout: number;
 
-  constructor(url: string = 'http://127.0.0.1:8791', timeout: number = 30000) {
+  constructor(url = 'http://127.0.0.1:8791', timeout = 30000) {
     super();
     this.url = url;
     this.timeout = timeout;
@@ -87,37 +165,39 @@ export class GpuCuvSLane extends SearchLaneBase {
 
   async health(): Promise<boolean> {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`${this.url}/health`, { signal: controller.signal });
-      clearTimeout(timeoutId);
+      const ac = new AbortController();
+      const t = setTimeout(() => ac.abort(), 5000);
+      const res = await fetch(`${this.url}/health`, { signal: ac.signal });
+      clearTimeout(t);
       return res.ok;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }
 
-  async search(query: Float32Array, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
-    if (!(await this.health())) {
-      throw new Error('GPU cuVS service unavailable');
-    }
+  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+    if (!(await this.health())) throw new Error('GPU cuVS service unavailable');
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    // Build cluster pre-mask if kmeans_cluster_ids filter present
+    const body: Record<string, unknown> = {
+      query: query instanceof Float32Array ? Array.from(query) : query,
+      k: filters?.per_lane_limit ?? k,
+    };
+    if (filters?.kmeans_cluster_ids?.length) {
+      body.cluster_filter = filters.kmeans_cluster_ids;
+    }
+    if (filters?.source_ref) body.source_ref_filter = filters.source_ref;
+    if (filters?.feature_ids?.length) body.feature_id_filter = filters.feature_ids;
+
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), this.timeout);
     const res = await fetch(`${this.url}/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: Array.from(query),
-        k,
-      }),
-      signal: controller.signal,
+      body: JSON.stringify(body),
+      signal: ac.signal,
     });
-    clearTimeout(timeoutId);
+    clearTimeout(t);
 
-    if (!res.ok) {
-      throw new Error(`GPU search failed: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`GPU search failed: ${res.status}`);
 
     const data = (await res.json()) as {
       indices: number[];
@@ -125,14 +205,13 @@ export class GpuCuvSLane extends SearchLaneBase {
       metric: string;
     };
 
-    // Convert GPU indices + distances to SearchResult
     const results: SearchResult[] = data.indices.map((idx, i) => ({
       id: String(idx),
       rank: i,
       score: this.distanceToScore(data.distances[i], data.metric),
       confidence: 0.95,
-      source: 'gpu-cuvs',
-      packet_key: null, // Will be joined from Postgres
+      source: 'gpu-cuvs' as const,
+      packet_key: null,
       source_ref: null,
       feature_id: null,
       file_path: null,
@@ -143,38 +222,23 @@ export class GpuCuvSLane extends SearchLaneBase {
       },
     }));
 
-    return this.applyFilters(results, filters);
+    return this.applyPostFetchFilters(results, filters);
   }
 
   config(): SearchLaneConfig {
-    return {
-      enabled: true,
-      priority: 0, // Highest priority
-      weight: 0.4,
-      fallback: 'qdrant',
-    };
+    return { enabled: true, priority: 0, weight: 0.4, fallback: 'qdrant' };
   }
 
   private distanceToScore(distance: number, metric: string): number {
-    // Convert distance to [0, 1] similarity score
-    if (metric === 'cosine') {
-      return Math.max(0, 1 - distance);
-    }
-    if (metric === 'l2') {
-      // L2 distance: smaller is better, convert to [0, 1]
-      return Math.exp(-distance);
-    }
-    if (metric === 'inner_product') {
-      // Inner product: already in suitable range
-      return Math.max(0, distance);
-    }
-    return 0.5; // Default
+    if (metric === 'cosine') return Math.max(0, 1 - distance);
+    if (metric === 'l2') return Math.exp(-distance);
+    if (metric === 'inner_product') return Math.max(0, distance);
+    return 0.5;
   }
 }
 
-/**
- * Qdrant vector search lane (existing fallback)
- */
+// ── Qdrant lane ──────────────────────────────────────────────────────────────
+
 export class QdrantLane extends SearchLaneBase {
   name = 'qdrant';
 
@@ -183,9 +247,9 @@ export class QdrantLane extends SearchLaneBase {
   private timeout: number;
 
   constructor(
-    url: string = 'http://127.0.0.1:6333',
-    collection: string = 'codebase_chunks_768',
-    timeout: number = 30000
+    url = 'http://127.0.0.1:6333',
+    collection = 'codebase_chunks_768',
+    timeout = 30000
   ) {
     super();
     this.url = url;
@@ -195,45 +259,42 @@ export class QdrantLane extends SearchLaneBase {
 
   async health(): Promise<boolean> {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`${this.url}/collections/${this.collection}`, { signal: controller.signal });
-      clearTimeout(timeoutId);
+      const ac = new AbortController();
+      const t = setTimeout(() => ac.abort(), 5000);
+      const res = await fetch(`${this.url}/collections/${this.collection}`, { signal: ac.signal });
+      clearTimeout(t);
       return res.ok;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }
 
-  async search(query: Float32Array, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
-    if (!(await this.health())) {
-      throw new Error('Qdrant service unavailable');
-    }
+  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+    if (!(await this.health())) throw new Error('Qdrant service unavailable');
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    // Build Qdrant filter from pushdown fields
+    const qdrantFilter = buildQdrantFilter(filters);
+    const limit = filters?.per_lane_limit ?? k;
+
+    const body: Record<string, unknown> = {
+      vector: query instanceof Float32Array ? Array.from(query) : query,
+      limit,
+      with_payload: true,
+    };
+    if (qdrantFilter) body.filter = qdrantFilter;
+
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), this.timeout);
     const res = await fetch(`${this.url}/collections/${this.collection}/points/search`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        vector: Array.from(query),
-        limit: k,
-        with_payload: true,
-      }),
-      signal: controller.signal,
+      body: JSON.stringify(body),
+      signal: ac.signal,
     });
-    clearTimeout(timeoutId);
+    clearTimeout(t);
 
-    if (!res.ok) {
-      throw new Error(`Qdrant search failed: ${res.status}`);
-    }
+    if (!res.ok) throw new Error(`Qdrant search failed: ${res.status}`);
 
     const data = (await res.json()) as {
-      result: Array<{
-        id: string;
-        score: number;
-        payload: Record<string, unknown>;
-      }>;
+      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
     };
 
     const results: SearchResult[] = (data.result ?? []).map((point, i) => ({
@@ -241,7 +302,7 @@ export class QdrantLane extends SearchLaneBase {
       rank: i,
       score: Math.min(1, Math.max(0, point.score)),
       confidence: 0.85,
-      source: 'qdrant',
+      source: 'qdrant' as const,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
@@ -254,170 +315,215 @@ export class QdrantLane extends SearchLaneBase {
       },
     }));
 
-    return this.applyFilters(results, filters);
+    return this.applyPostFetchFilters(results, filters);
   }
 
   config(): SearchLaneConfig {
-    return {
-      enabled: true,
-      priority: 1,
-      weight: 0.35,
-      fallback: 'bm25',
-    };
+    return { enabled: true, priority: 1, weight: 0.35, fallback: 'bm25' };
   }
 }
 
+// ── Lexical lane (keyword BM25/FTS) ─────────────────────────────────────────
+
 /**
- * BM25 lexical search lane (fallback)
+ * Lexical lane: keyword extraction from query string + Postgres FTS/trigram search.
+ * Accepts string queries directly (no vector required).
+ * topk range: 1–10 per call, slight score variance from tsvector rank.
  */
+export class LexicalLane extends SearchLaneBase {
+  name = 'lexical';
+
+  async health(): Promise<boolean> {
+    try {
+      await db.execute(sql`SELECT 1`);
+      return true;
+    } catch { return false; }
+  }
+
+  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+    // Float32Array input has no keyword surface — skip this lane
+    const queryStr = typeof query === 'string' ? query : '';
+    if (!queryStr.trim()) return [];
+
+    const limit = Math.min(filters?.per_lane_limit ?? k, RETRIEVAL_LIMITS.exactLexicalTopK);
+
+    // Surface token list for metadata — websearch_to_tsquery handles actual query parsing
+    const queryTokens = queryStr.trim().split(/\s+/).filter(t => t.length >= 2).slice(0, 16);
+
+    const condition = buildPacketConditions(filters);
+
+    try {
+      const results = await db.execute(sql`
+        SELECT
+          ap.packet_key,
+          ap.source_ref,
+          ap.feature_id,
+          ap.file_path,
+          ap.summary,
+          ap.kmeans_cluster_id,
+          ap.som_row,
+          ap.som_col,
+          ts_rank_cd(
+            to_tsvector('english', COALESCE(ap.summary, '') || ' ' || COALESCE(ap.source_ref, '')),
+            websearch_to_tsquery('english', ${queryStr})
+          ) AS ts_rank
+        FROM atlas_packets ap
+        WHERE to_tsvector('english', COALESCE(ap.summary, '') || ' ' || COALESCE(ap.source_ref, ''))
+              @@ websearch_to_tsquery('english', ${queryStr})
+          ${condition ? sql`AND ${condition}` : sql``}
+        ORDER BY ts_rank DESC
+        LIMIT ${limit}
+      `);
+
+      const rows = (results.rows ?? []) as Array<{
+        packet_key: string | null;
+        source_ref: string | null;
+        feature_id: string | null;
+        file_path: string | null;
+        summary: string | null;
+        kmeans_cluster_id: number | null;
+        som_row: number | null;
+        som_col: number | null;
+        ts_rank: number;
+      }>;
+
+      const mapped: SearchResult[] = rows.map((row, i) => ({
+        id: row.packet_key ?? `lexical-${i}`,
+        rank: i,
+        // Slight variance: ts_rank + position decay
+        score: Math.min(0.99, Math.max(0.01, (row.ts_rank ?? 0.1) * (1 - i * 0.02))),
+        confidence: 0.70,
+        source: 'lexical' as const,
+        packet_key: row.packet_key,
+        source_ref: row.source_ref,
+        feature_id: row.feature_id,
+        file_path: row.file_path,
+        summary: row.summary,
+        metadata: {
+          ts_rank: row.ts_rank,
+          keywords: queryTokens,
+          kmeans_cluster_id: row.kmeans_cluster_id,
+          som_cell_x: row.som_row,
+          som_cell_y: row.som_col,
+        },
+      }));
+
+      return this.applyPostFetchFilters(mapped, filters);
+    } catch (err) {
+      console.error('[LexicalLane] Search error:', err instanceof Error ? err.message : '');
+      return [];
+    }
+  }
+
+  config(): SearchLaneConfig {
+    return { enabled: true, priority: 2, weight: 0.20 };
+  }
+}
+
+// ── BM25 lane (trigram fallback) ─────────────────────────────────────────────
+
 export class Bm25Lane extends SearchLaneBase {
   name = 'bm25';
 
   async health(): Promise<boolean> {
-    // BM25 uses Postgres FTS which is always available if DB is up
     try {
       await db.execute(sql`SELECT 1`);
       return true;
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }
 
-  async search(query: Float32Array, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+    const queryStr = typeof query === 'string' ? query : '';
+    if (!queryStr) return [];
+
+    const limit = filters?.per_lane_limit ?? k;
+    const condition = buildChunkConditions(filters);
+
     try {
-      // Convert Float32Array vector to query string by extracting top-K indices
-      const queryStr = this.vectorToQueryString(query);
-
-      if (!queryStr) {
-        return [];
-      }
-
-      // Use Postgres trigram similarity for fast FTS
       const results = await db.execute(sql`
         SELECT
-          id,
-          summary,
-          source_ref,
-          similarity(content, ${queryStr}) as sim_score
-        FROM codebase_chunk_index
-        WHERE content % ${queryStr}
+          c.id,
+          c.summary,
+          c.source_ref,
+          similarity(
+            COALESCE(c.summary, '') || ' ' || COALESCE(c.source_ref, ''),
+            ${queryStr}
+          ) AS sim_score
+        FROM codebase_chunk_index c
+        WHERE (COALESCE(c.summary, '') || ' ' || COALESCE(c.source_ref, ''))
+              % ${queryStr}
+          ${condition ? sql`AND ${condition}` : sql``}
         ORDER BY sim_score DESC
-        LIMIT ${k}
+        LIMIT ${limit}
       `);
 
-      if (!results.rows || results.rows.length === 0) {
-        return [];
-      }
+      if (!results.rows?.length) return [];
 
-      return (results.rows as Array<{id: number; summary: string | null; source_ref: string | null; sim_score: number}>)
-        .map((row, idx) => ({
-          id: String(row.id),
-          rank: idx,
-          score: Math.min(1.0, row.sim_score || 0.5),
-          confidence: 0.75,
-          source: 'bm25',
-          packet_key: null,
-          source_ref: row.source_ref,
-          feature_id: null,
-          file_path: row.source_ref,
-          summary: row.summary || 'No summary available',
-          metadata: {
-            bm25_similarity: row.sim_score,
-          },
-        }));
+      return (results.rows as Array<{
+        id: number;
+        summary: string | null;
+        source_ref: string | null;
+        sim_score: number;
+      }>).map((row, idx) => ({
+        id: String(row.id),
+        rank: idx,
+        score: Math.min(1.0, row.sim_score || 0.5),
+        confidence: 0.75,
+        source: 'bm25' as const,
+        packet_key: null,
+        source_ref: row.source_ref,
+        feature_id: null,
+        file_path: row.source_ref,
+        summary: row.summary,
+        metadata: { bm25_similarity: row.sim_score },
+      }));
     } catch (err) {
       console.error('[Bm25Lane] Search error:', err instanceof Error ? err.message : '');
       return [];
     }
   }
 
-  private vectorToQueryString(vec: Float32Array): string {
-    if (!vec || vec.length === 0) {
-      return '';
-    }
-
-    // Extract top 10 indices by absolute value magnitude
-    const indices = Array.from(vec)
-      .map((val, idx) => ({ val, idx }))
-      .sort((a, b) => Math.abs(b.val) - Math.abs(a.val))
-      .slice(0, 10)
-      .filter((x) => Math.abs(x.val) > 0.1); // Filter out near-zero values
-
-    if (indices.length === 0) {
-      return '';
-    }
-
-    // Create query string from keywords
-    const keywords = indices.map((x) => `keyword_${x.idx}`).join(' ');
-    return keywords || 'default';
-  }
-
   config(): SearchLaneConfig {
-    return {
-      enabled: true,
-      priority: 2,
-      weight: 0.25,
-    };
+    return { enabled: true, priority: 3, weight: 0.15 };
   }
 }
 
-/**
- * Search lane registry: manages all available lanes
- */
+// ── Registry ─────────────────────────────────────────────────────────────────
+
 export class SearchLaneRegistry {
   private lanes: Map<string, ISearchLane> = new Map();
   private fallbackChain: string[] = [];
 
   constructor() {
-    // Register default lanes in priority order
     this.register(new GpuCuvSLane());
     this.register(new QdrantLane());
+    this.register(new LexicalLane());
     this.register(new Bm25Lane());
-
-    // Set default fallback chain
-    this.fallbackChain = ['gpu-cuvs', 'qdrant', 'bm25'];
+    this.fallbackChain = ['gpu-cuvs', 'qdrant', 'lexical', 'bm25'];
   }
 
-  /**
-   * Register a search lane
-   */
   register(lane: ISearchLane): void {
     this.lanes.set(lane.name, lane);
   }
 
-  /**
-   * Get a lane by name
-   */
   get(name: string): ISearchLane | undefined {
     return this.lanes.get(name);
   }
 
-  /**
-   * Get all registered lanes
-   */
   getAll(): ISearchLane[] {
     return Array.from(this.lanes.values());
   }
 
-  /**
-   * Get fallback chain
-   */
   getFallbackChain(): string[] {
     return [...this.fallbackChain];
   }
 
-  /**
-   * Set fallback chain
-   */
   setFallbackChain(chain: string[]): void {
     this.fallbackChain = chain;
   }
 
-  /**
-   * Execute search with fallback chain
-   */
   async searchWithFallback(
-    query: Float32Array,
+    query: Float32Array | string,
     k: number,
     filters?: SearchFilter
   ): Promise<{ results: SearchResult[]; lane: string }> {
@@ -432,7 +538,6 @@ export class SearchLaneRegistry {
           console.warn(`[SearchLane] ${laneName} unhealthy, trying next`);
           continue;
         }
-
         const results = await lane.search(query, k, filters);
         return { results, lane: laneName };
       } catch (err) {
@@ -441,22 +546,13 @@ export class SearchLaneRegistry {
       }
     }
 
-    // All lanes failed
     throw new Error('All search lanes failed');
   }
 }
 
-/**
- * Global singleton registry
- */
 let registry: SearchLaneRegistry | null = null;
 
-/**
- * Get or create global search lane registry
- */
 export function getSearchLaneRegistry(): SearchLaneRegistry {
-  if (!registry) {
-    registry = new SearchLaneRegistry();
-  }
+  if (!registry) registry = new SearchLaneRegistry();
   return registry;
 }

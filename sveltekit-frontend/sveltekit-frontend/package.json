@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "duckdb": "^1.4.4",
     "pg": "^8.21.0"
   },
   "devDependencies": {

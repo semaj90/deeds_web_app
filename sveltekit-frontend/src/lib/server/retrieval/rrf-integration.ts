@@ -10,6 +10,7 @@
 
 import type { Pool } from 'pg';
 import type { Redis } from 'ioredis';
+import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { bm25SearchIndexed } from './bm25-search.js';
 import { conceptOverlapSearch } from './concept-overlap-search.js';
 import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
@@ -330,7 +331,7 @@ function deriveGraphConceptSeeds(query: string, extracted: Array<{ name: string;
     .filter(Boolean);
 
   if (extractedNames.length > 0) {
-    return [...new Set(extractedNames.map((name) => name.toLowerCase()))].slice(0, 10);
+    return [...new Set(extractedNames.map((name) => name.toLowerCase()))].slice(0, RETRIEVAL_LIMITS.maxExactKeywords);
   }
 
   const rawTerms = query
@@ -359,7 +360,7 @@ function deriveGraphConceptSeeds(query: string, extracted: Array<{ name: string;
     'done',
   ]);
 
-  return [...new Set(rawTerms.filter((term) => !stopWords.has(term)))].slice(0, 10);
+  return [...new Set(rawTerms.filter((term) => !stopWords.has(term)))].slice(0, RETRIEVAL_LIMITS.maxExactKeywords);
 }
 
 async function queryNeo4jFileGraphSignal(seedRefs: string[], topK: number): Promise<Array<{
@@ -420,7 +421,7 @@ async function loadFallbackGraphSeedRefs(pool: Pool, limit: number): Promise<str
         order by updated_at desc nulls last, id desc
         limit $1
       `,
-      [Math.max(1, Math.min(limit, 10))],
+      [Math.max(1, Math.min(limit, RETRIEVAL_LIMITS.defaultFinalResults))],
     );
 
     return [...new Set(
@@ -452,7 +453,7 @@ export async function multiLaneRetrievalWithRRF(
   const t0 = Date.now();
   const {
     k = 60,
-    topK = 20,
+    topK = RETRIEVAL_LIMITS.defaultFinalResults,
     minScore = 0.001,
     deduplicateBy = 'id',
     weights = {},

@@ -20,13 +20,14 @@ import type { Redis }        from 'ioredis';
 import { getQdrantClient }   from '$lib/server/vector/qdrant-singleton.js';
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import { ENV }               from '$lib/server/env.server.js';
+import { EMBEDDING_CONTRACT } from '$lib/server/embedding/embedding-contract.js';
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
 const REDIS_KEY       = 'ace:fixer:patterns';       // hash: errorHash → JSON
 const REDIS_TTL       = 60 * 60 * 24 * 7;           // 7 days
 const QDRANT_COLL     = 'fixer_memory_768';
-const EMBED_DIM       = 768;
+const FIXER_MEMORY_EMBED_DIM = EMBEDDING_CONTRACT.native_dimension;
 const TRUST_PROMOTE   = 0.75;                        // auto-promote to T1 above this
 
 // ── types ─────────────────────────────────────────────────────────────────────
@@ -82,7 +83,7 @@ export async function ensureFixerMemoryCollection(): Promise<void> {
     await q.getCollection(QDRANT_COLL);
   } catch {
     await q.createCollection(QDRANT_COLL, {
-      vectors: { size: EMBED_DIM, distance: 'Cosine' },
+    vectors: { size: FIXER_MEMORY_EMBED_DIM, distance: 'Cosine' },
       hnsw_config: { m: 16, ef_construct: 64 },
       quantization_config: { scalar: { type: 'int8', always_ram: true } },
     });
@@ -176,7 +177,7 @@ export async function recallFixerPattern(
   const pgHit = await recallFixerPatternPg(pool, errorHash);
 
   // L3 semantic — only when embedding provided
-  const similar = queryEmbedding?.length === EMBED_DIM
+  const similar = queryEmbedding?.length === FIXER_MEMORY_EMBED_DIM
     ? await recallFixerPatternSemantic(pool, queryEmbedding, 5)
     : [];
 
@@ -258,7 +259,7 @@ export async function storeFixerPattern(
   }
 
   // ── Qdrant upsert (only when embedding provided) ──────────────────────────
-  if (opts.embedding?.length === EMBED_DIM) {
+  if (opts.embedding?.length === FIXER_MEMORY_EMBED_DIM) {
     const q = qdrantClient();
     await q.upsert(QDRANT_COLL, {
       wait: false,

@@ -18,18 +18,19 @@
 
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
+import { QDRANT_SPARSE_VECTOR_NAME } from '$lib/server/vector/retrieval-semantics.js';
 import type { Retriever, LaneCandidate, RetrievalInput } from '../lane-contracts.js';
 import { validateCandidate } from '../lane-contracts.js';
 import { normalizeQdrantPoints } from './qdrant-dense-retriever.js';
 
 export interface QdrantBM42RetrieverConfig {
   collection: string;
-  /** Name of the sparse vector field in the collection (default: 'bm25' — existing field name) */
+  /** Name of the sparse vector field in the collection (default: 'bm42_sparse') */
   sparseVectorName?: string;
 }
 
 export function createQdrantBM42Retriever(config: QdrantBM42RetrieverConfig): Retriever {
-  const sparseVectorName = config.sparseVectorName ?? 'bm25';
+  const sparseVectorName = config.sparseVectorName ?? QDRANT_SPARSE_VECTOR_NAME;
 
   return {
     lane: 'bm42' as const,

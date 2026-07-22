@@ -18,6 +18,7 @@ import fetch from 'node-fetch';
 import { Pool } from 'pg';
 import { getRgPool, type RgSearchOptions } from '$lib/server/search/rg-pool.js';
 import { combineRRFLanes } from './rrf-combiner-utils.js';
+import type { SearchFilter } from './types.js';
 
 export interface RetrievalConfig {
   qdrant: { host: string; port: number };
@@ -36,6 +37,7 @@ export interface RetrievalRequest {
   useLexical?: boolean;
   useAST?: boolean;
   useRgPool?: boolean;
+  filters?: SearchFilter;
 }
 
 export interface RankedCandidate {
@@ -107,6 +109,69 @@ const RRF_LANE_WEIGHTS = {
   lexical: 0.6
 } as const;
 
+function buildQdrantFilter(filters?: SearchFilter): Record<string, unknown> | undefined {
+  if (!filters) return undefined;
+
+  const metadata = filters.metadata ?? {};
+  const must: Record<string, unknown>[] = [];
+
+  const sourceRef = metadata.source_ref ?? filters.source_ref;
+  if (sourceRef) {
+    must.push({ key: 'source_ref', match: { value: sourceRef } });
+  }
+
+  const sourceRefPattern = metadata.source_ref_pattern ?? filters.source_ref_pattern;
+  if (sourceRefPattern) {
+    must.push({ key: 'source_ref', match: { text: sourceRefPattern } });
+  }
+
+  const directoryPath = metadata.directory_path ?? filters.directory_path;
+  if (directoryPath) {
+    must.push({ key: 'directory_path', match: { text: directoryPath } });
+  }
+
+  if (filters.feature_ids?.length) {
+    must.push({ key: 'feature_id', match: { any: filters.feature_ids } });
+  }
+
+  if (filters.kmeans_cluster_ids?.length) {
+    must.push({ key: 'kmeans_cluster_id', match: { any: filters.kmeans_cluster_ids } });
+  }
+
+  const somRow = metadata.som_row ?? filters.som_row;
+  if (somRow !== undefined) {
+    must.push({ key: 'som_row', match: { value: somRow } });
+  }
+
+  const somCol = metadata.som_col ?? filters.som_col;
+  if (somCol !== undefined) {
+    must.push({ key: 'som_col', match: { value: somCol } });
+  }
+
+  const packetType = metadata.packet_type ?? filters.packet_type;
+  if (packetType) {
+    must.push({ key: 'packet_type', match: { value: packetType } });
+  }
+
+  if (metadata.language) {
+    must.push({ key: 'language', match: { value: metadata.language } });
+  }
+
+  if (metadata.file_extension) {
+    must.push({ key: 'file_extension', match: { value: metadata.file_extension } });
+  }
+
+  if (metadata.domain_class) {
+    must.push({ key: 'domain_class', match: { value: metadata.domain_class } });
+  }
+
+  if (metadata.jsonb_contains) {
+    must.push({ key: 'metadata', match: { value: metadata.jsonb_contains } });
+  }
+
+  return must.length > 0 ? { must } : undefined;
+}
+
 /**
  * STAGE 1: Generate 768-dim embedding via embeddinggemma
  */
@@ -141,7 +206,8 @@ async function qdrantSearch(
   embedding: number[],
   config: RetrievalConfig,
   useRRF: boolean,
-  useLexical: boolean
+  useLexical: boolean,
+  filters?: SearchFilter
 ): Promise<Array<{ id: string; score: number; payload: any }>> {
   const startTime = Date.now();
   try {
@@ -151,18 +217,19 @@ async function qdrantSearch(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          vector: {
-            name: 'content',
-            vector: embedding
-          },
-          limit: 20,
-          with_payload: true,
-          with_vector: false,
-          score_threshold: 0.3
-        })
-      }
-    );
+          body: JSON.stringify({
+            vector: {
+              name: 'content',
+              vector: embedding
+            },
+            limit: filters?.per_lane_limit ?? 20,
+            with_payload: true,
+            with_vector: false,
+            filter: buildQdrantFilter(filters),
+            score_threshold: 0.3
+          })
+        }
+      );
 
     if (!denseRes.ok) throw new Error(`Qdrant search failed: ${denseRes.status}`);
     const denseData = await denseRes.json() as { result: Array<{ id: string; score: number; payload: any }> };
@@ -185,15 +252,16 @@ async function qdrantSearch(
 async function rgPoolLexicalSearch(
   query: string,
   config: RetrievalConfig,
-  limit: number = 10
+  limit: number = 10,
+  filters?: SearchFilter
 ): Promise<Array<{ id: string; file: string; line: number; score: number; rank: number }>> {
   const startTime = Date.now();
   try {
     const pool = getRgPool();
     const results = await pool.search({
-      query,
+      query: filters?.keywords?.join(' ') || query,
       type: 'ts',
-      limit,
+      limit: filters?.per_lane_limit ?? limit,
       cwd: process.cwd()
     });
 
@@ -216,7 +284,8 @@ async function rgPoolLexicalSearch(
 async function turboVecPrefilter(
   embedding: number[],
   config: RetrievalConfig,
-  limit: number = 10
+  limit: number = 10,
+  filters?: SearchFilter
 ): Promise<Array<{ id: string; score: number; rank: number }>> {
   const startTime = Date.now();
   try {
@@ -227,7 +296,8 @@ async function turboVecPrefilter(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           vector: embedding.slice(0, 64), // Use first 64-dim as proxy
-          limit,
+          limit: filters?.per_lane_limit ?? limit,
+          cluster_filter: filters?.kmeans_cluster_ids,
           threshold: 0.3
         })
       }
@@ -442,19 +512,19 @@ export async function executeUnifiedRetrieval(
     stages.push('embedding');
 
     // STAGE 2: Qdrant search
-    const qdrantHits = await qdrantSearch(embedding, config, request.useRRF ?? true, request.useLexical ?? false);
+    const qdrantHits = await qdrantSearch(embedding, config, request.useRRF ?? true, request.useLexical ?? false, request.filters);
     const qdrantIds = qdrantHits.map((h) => h.id);
     stages.push('qdrant_search');
 
     // STAGE 2.5: rg-pool lexical search (opt-in via useRgPool)
     let rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }> = [];
     if (request.useRgPool ?? true) {
-      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, request.limit ?? 10);
+      rgLexicalHits = await rgPoolLexicalSearch(request.query, config, request.limit ?? 10, request.filters);
       stages.push('rg_pool_lexical');
     }
 
     // STAGE 3: TurboVec prefilter
-    const turboVecHits = await turboVecPrefilter(embedding, config, request.limit ?? 10);
+    const turboVecHits = await turboVecPrefilter(embedding, config, request.limit ?? 10, request.filters);
     stages.push('turbovec_prefilter');
 
     // STAGE 4: Postgres join

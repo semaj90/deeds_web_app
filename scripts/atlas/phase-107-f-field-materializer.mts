@@ -1,17 +1,21 @@
 #!/usr/bin/env npx tsx
 /**
- * Phase 107 Phase F — Field-Level Precedence Materializer
+ * Phase 107 Phase F — Field-Level Precedence Materializer (Minimal Safe Scope)
  *
- * Replaces lane-level hard failures with per-field graceful degradation.
- * Materializes normalized feature facts + fallback atlas_packets into
- * feature_packet_bindings with explicit provenance tracking.
+ * Establishes canonical packet identity + provenance tracking.
  *
- * Architecture:
- * - Task 1 (Audit): Read existing materializer, document precedence gaps
- * - Task 2 (Hash Provenance): Verify content_hash determinism Postgres/Qdrant/Redis
- * - Task 3 (Bindings Migration): Create feature_packet_bindings table + Drizzle schema
- * - Task 4 (File Edges): Classify 6 unresolved feature_file_edges rows
- * - Task 5 (Rewrite): Field-level resolution + empty-lane reporting
+ * Field-level resolution with field-specific precedence chains:
+ * - Domain: feature_domain_facts → atlas_packets.domain_class → unresolved
+ * - Lexical: feature_lexical_facts → unresolved
+ * - Structural: feature_structural_facts → unresolved
+ * - Ontology: feature_ontology_tuples → unresolved
+ *
+ * NO cross-lane fallback. NO semantic inference. NO binding creation.
+ * Does NOT populate feature_packet_bindings (Phase 108+ work).
+ *
+ * Output:
+ * - FeatureLoadProvenance: audit trail of which source provided each field
+ *   (per-lane resolution tracking, content identity, processing pass)
  *
  * Usage:
  *   npx tsx scripts/atlas/phase-107-f-field-materializer.mts [--limit N] [--dry-run] [--smoke]
@@ -20,35 +24,8 @@
 
 import { pool } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
-
-interface FieldResolution<T = unknown> {
-  value: T | null;
-  source: string | null;
-  fallbackUsed: boolean;
-  confidence: number;
-  unresolvedReason?: string;
-}
-
-interface ContentIdentity {
-  value: string | null;
-  kind: 'canonical-source-sha256' | 'derived-summary-hash' | 'synthetic-migration-hash' | 'missing';
-  algorithm: 'sha256' | 'unknown' | null;
-  inputContract: 'source-bytes' | 'normalized-summary' | 'migration-fields-v1' | null;
-  canonical: boolean;
-}
-
-interface FeatureLoadProvenance {
-  packetKey: string;
-  laneSources: {
-    domain: string;
-    lexical: string;
-    structural: string;
-    ontology: string;
-  };
-  fallbackUsed: boolean;
-  fallbackReasons: string[];
-  unresolvedReasons: string[];
-}
+import type { FieldResolution, LaneProvenance, ContentIdentity, FeatureLoadProvenance } from '$lib/server/types/field-resolution.js';
+import { FIELD_PRECEDENCE } from '$lib/server/types/field-resolution.js';
 
 const MATERIALIZATION_VERSION = 'phase-107-f-v1';
 const PROCESSING_PASS_ID = 'phase-107-f-' + Date.now().toString();
@@ -59,53 +36,52 @@ const PROCESSING_PASS_ID = 'phase-107-f-' + Date.now().toString();
 
 async function resolveDomain(
   client: any,
-  packetKey: string,
-  sourceRef: string
+  packetKey: string
 ): Promise<FieldResolution<string>> {
-  try {
-    // Try feature_domain_facts first (primary, high confidence)
-    const result = await client.query(
-      `SELECT domain_class, confidence FROM feature_domain_facts WHERE packet_key = $1 ORDER BY confidence DESC LIMIT 1`,
-      [packetKey]
-    ).catch(() => ({ rows: [] }));
+  // Domain: feature_domain_facts → atlas_packets.domain_class → unresolved
+  const sources = ['feature_domain_facts', 'atlas_packets_fallback'];
 
-    if (result.rows[0]?.domain_class) {
-      return {
-        value: result.rows[0].domain_class,
-        source: 'feature_domain_facts',
-        fallbackUsed: false,
-        confidence: result.rows[0].confidence || 0.95
-      };
+  for (const source of sources) {
+    try {
+      if (source === 'feature_domain_facts') {
+        const result = await client.query(
+          `SELECT domain_class FROM feature_domain_facts WHERE packet_key = $1 LIMIT 1`,
+          [packetKey]
+        );
+        if (result.rows[0]?.domain_class) {
+          return {
+            value: result.rows[0].domain_class,
+            source,
+            resolutionKind: 'normalized-primary',
+            fallbackUsed: false,
+          };
+        }
+      } else if (source === 'atlas_packets_fallback') {
+        const result = await client.query(
+          `SELECT domain_class FROM atlas_packets WHERE packet_key = $1`,
+          [packetKey]
+        );
+        if (result.rows[0]?.domain_class) {
+          return {
+            value: result.rows[0].domain_class,
+            source,
+            resolutionKind: 'compatibility-fallback',
+            fallbackUsed: true,
+          };
+        }
+      }
+    } catch (error) {
+      // Source unavailable; continue to next in chain
+      continue;
     }
-  } catch {
-    // Fallback path
   }
 
-  try {
-    // Fallback to atlas_packets domain_class
-    const result = await client.query(
-      `SELECT domain_class FROM atlas_packets WHERE packet_key = $1`,
-      [packetKey]
-    ).catch(() => ({ rows: [] }));
-
-    if (result.rows[0]?.domain_class) {
-      return {
-        value: result.rows[0].domain_class,
-        source: 'atlas_packets_fallback',
-        fallbackUsed: true,
-        confidence: 0.6
-      };
-    }
-  } catch {
-    // Completely unresolved
-  }
-
+  // No source matched precedence chain
   return {
     value: null,
     source: null,
+    resolutionKind: 'unresolved',
     fallbackUsed: false,
-    confidence: 0,
-    unresolvedReason: 'DOMAIN_NOT_AVAILABLE'
   };
 }
 
@@ -113,31 +89,37 @@ async function resolveStructuralFacts(
   client: any,
   packetKey: string
 ): Promise<FieldResolution<string[]>> {
-  try {
-    const result = await client.query(
-      `SELECT symbol_name, ast_facts FROM feature_structural_facts WHERE packet_key = $1 LIMIT 10`,
-      [packetKey]
-    ).catch(() => ({ rows: [] }));
+  // Structural: feature_structural_facts → unresolved (NO cross-lane fallback)
+  const sources = ['feature_structural_facts'];
 
-    if (result.rows.length > 0) {
-      const symbols = result.rows.map((r: any) => r.symbol_name).filter(Boolean);
-      return {
-        value: symbols,
-        source: 'feature_structural_facts',
-        fallbackUsed: false,
-        confidence: 0.95
-      };
+  for (const source of sources) {
+    try {
+      if (source === 'feature_structural_facts') {
+        const result = await client.query(
+          `SELECT symbol_name, ast_facts FROM feature_structural_facts WHERE packet_key = $1 LIMIT 10`,
+          [packetKey]
+        );
+
+        if (result.rows.length > 0) {
+          const symbols = result.rows.map((r: any) => r.symbol_name).filter(Boolean);
+          return {
+            value: symbols,
+            source,
+            resolutionKind: 'normalized-primary',
+            fallbackUsed: false,
+          };
+        }
+      }
+    } catch (error) {
+      continue;
     }
-  } catch {
-    // Fallthrough to unresolved
   }
 
   return {
     value: [],
     source: null,
+    resolutionKind: 'unresolved',
     fallbackUsed: false,
-    confidence: 0,
-    unresolvedReason: 'STRUCTURAL_LANE_NOT_MATERIALIZED'
   };
 }
 
@@ -145,31 +127,37 @@ async function resolveLexicalFacts(
   client: any,
   sourceRef: string
 ): Promise<FieldResolution<string[]>> {
-  try {
-    const result = await client.query(
-      `SELECT keywords, bm25_terms FROM feature_lexical_facts WHERE source_ref = $1 LIMIT 1`,
-      [sourceRef]
-    ).catch(() => ({ rows: [] }));
+  // Lexical: feature_lexical_facts → unresolved (NO cross-lane fallback)
+  const sources = ['feature_lexical_facts'];
 
-    if (result.rows[0]) {
-      const terms = [...(result.rows[0].keywords || []), ...(result.rows[0].bm25_terms || [])];
-      return {
-        value: terms,
-        source: 'feature_lexical_facts',
-        fallbackUsed: false,
-        confidence: 0.95
-      };
+  for (const source of sources) {
+    try {
+      if (source === 'feature_lexical_facts') {
+        const result = await client.query(
+          `SELECT keywords, bm25_terms FROM feature_lexical_facts WHERE source_ref = $1 LIMIT 1`,
+          [sourceRef]
+        );
+
+        if (result.rows[0]) {
+          const terms = [...(result.rows[0].keywords || []), ...(result.rows[0].bm25_terms || [])];
+          return {
+            value: terms,
+            source,
+            resolutionKind: 'normalized-primary',
+            fallbackUsed: false,
+          };
+        }
+      }
+    } catch (error) {
+      continue;
     }
-  } catch {
-    // Fallthrough to unresolved
   }
 
   return {
     value: [],
     source: null,
+    resolutionKind: 'unresolved',
     fallbackUsed: false,
-    confidence: 0,
-    unresolvedReason: 'LEXICAL_LANE_NOT_MATERIALIZED'
   };
 }
 
@@ -177,30 +165,36 @@ async function resolveOntologyTuples(
   client: any,
   packetKey: string
 ): Promise<FieldResolution<any[]>> {
-  try {
-    const result = await client.query(
-      `SELECT subject_id, predicate, object_id, confidence FROM feature_ontology_tuples WHERE packet_key = $1 LIMIT 20`,
-      [packetKey]
-    ).catch(() => ({ rows: [] }));
+  // Ontology: feature_ontology_tuples → unresolved (NO cross-lane fallback)
+  const sources = ['feature_ontology_tuples'];
 
-    if (result.rows.length > 0) {
-      return {
-        value: result.rows,
-        source: 'feature_ontology_tuples',
-        fallbackUsed: false,
-        confidence: Math.min(...result.rows.map((r: any) => r.confidence || 0.9))
-      };
+  for (const source of sources) {
+    try {
+      if (source === 'feature_ontology_tuples') {
+        const result = await client.query(
+          `SELECT subject_id, predicate, object_id, confidence FROM feature_ontology_tuples WHERE packet_key = $1 LIMIT 20`,
+          [packetKey]
+        );
+
+        if (result.rows.length > 0) {
+          return {
+            value: result.rows,
+            source,
+            resolutionKind: 'normalized-primary',
+            fallbackUsed: false,
+          };
+        }
+      }
+    } catch (error) {
+      continue;
     }
-  } catch {
-    // Fallthrough to unresolved
   }
 
   return {
     value: [],
     source: null,
+    resolutionKind: 'unresolved',
     fallbackUsed: false,
-    confidence: 0,
-    unresolvedReason: 'ONTOLOGY_LANE_NOT_MATERIALIZED'
   };
 }
 
@@ -211,7 +205,8 @@ async function resolveOntologyTuples(
 function resolveContentIdentity(row: {
   sha256: string | null;
   summaryHash: string | null;
-  packetId?: string;
+  packetKey?: string;
+  sourceRef?: string;
 }): ContentIdentity {
   if (row.sha256) {
     return {
@@ -227,8 +222,22 @@ function resolveContentIdentity(row: {
     return {
       value: row.summaryHash,
       kind: 'derived-summary-hash',
-      algorithm: 'unknown',
+      algorithm: null,
       inputContract: 'normalized-summary',
+      canonical: false
+    };
+  }
+
+  const syntheticFingerprint = row.packetKey && row.sourceRef
+    ? Buffer.from(`${row.packetKey}|${row.sourceRef}|${MATERIALIZATION_VERSION}`).toString('hex').slice(0, 64)
+    : null;
+
+  if (syntheticFingerprint) {
+    return {
+      value: syntheticFingerprint,
+      kind: 'synthetic-migration-hash',
+      algorithm: null,
+      inputContract: 'migration-fields-v1',
       canonical: false
     };
   }
@@ -236,9 +245,9 @@ function resolveContentIdentity(row: {
   return {
     value: null,
     kind: 'missing',
-    algorithm: null,
-    inputContract: null,
-    canonical: false
+      algorithm: null,
+      inputContract: null,
+      canonical: false
   };
 }
 
@@ -249,47 +258,62 @@ function resolveContentIdentity(row: {
 async function runControlledSmoke(client: any): Promise<boolean> {
   console.log('\n🧪 CONTROLLED SMOKE TEST (4 rows)\n');
 
+  function createSmokeClient(responses: Array<{ rows: any[] }>) {
+    let index = 0;
+    return {
+      async query() {
+        return responses[index++] ?? { rows: [] };
+      }
+    };
+  }
+
   const testCases = [
     {
       name: 'A: Normalized domain + packet fallback → normalized wins (labeled)',
-      query: `
-        SELECT ap.packet_key, ap.source_ref, fdf.domain_class as normalized_domain
-        FROM atlas_packets ap
-        LEFT JOIN feature_domain_facts fdf ON ap.packet_key = fdf.packet_key
-        WHERE ap.domain_class IS NOT NULL AND fdf.domain_class IS NOT NULL
-        LIMIT 1
-      `
+      run: async () => {
+        const smokeClient = createSmokeClient([
+          { rows: [{ domain_class: 'retrieval' }] }
+        ]);
+        return resolveDomain(smokeClient, 'packet:a');
+      }
     },
     {
       name: 'B: No normalized domain + packet domain → fallback labeled',
-      query: `
-        SELECT ap.packet_key, ap.source_ref, ap.domain_class as packet_domain
-        FROM atlas_packets ap
-        LEFT JOIN feature_domain_facts fdf ON ap.packet_key = fdf.packet_key
-        WHERE ap.domain_class IS NOT NULL AND fdf.domain_class IS NULL
-        LIMIT 1
-      `
+      run: async () => {
+        const smokeClient = createSmokeClient([
+          { rows: [] },
+          { rows: [{ domain_class: 'retrieval' }] }
+        ]);
+        return resolveDomain(smokeClient, 'packet:b');
+      }
     },
     {
-      name: 'C: Ontology tuples present → concepts lifted with evidence',
-      query: `
-        SELECT ap.packet_key, ap.source_ref, COUNT(*) as tuple_count
-        FROM atlas_packets ap
-        JOIN feature_ontology_tuples fot ON ap.packet_key = fot.packet_key
-        GROUP BY ap.packet_key, ap.source_ref
-        HAVING COUNT(*) > 0
-        LIMIT 1
-      `
+      name: 'C: Ontology tuples remain read-only → no inference or invention',
+      run: async () => {
+        const smokeClient = createSmokeClient([
+          {
+            rows: [
+              {
+                subject_id: 'packet:c',
+                predicate: 'CLASSIFIED_AS',
+                object_id: 'domain:retrieval',
+                confidence: 1
+              }
+            ]
+          }
+        ]);
+        return resolveOntologyTuples(smokeClient, 'packet:c');
+      }
     },
     {
       name: 'D: Neither normalized nor fallback → unresolved record',
-      query: `
-        SELECT ap.packet_key, ap.source_ref
-        FROM atlas_packets ap
-        LEFT JOIN feature_domain_facts fdf ON ap.packet_key = fdf.packet_key
-        WHERE ap.domain_class IS NULL AND fdf.domain_class IS NULL
-        LIMIT 1
-      `
+      run: async () => {
+        const smokeClient = createSmokeClient([
+          { rows: [] },
+          { rows: [] }
+        ]);
+        return resolveDomain(smokeClient, 'packet:d');
+      }
     }
   ];
 
@@ -297,13 +321,31 @@ async function runControlledSmoke(client: any): Promise<boolean> {
 
   for (const tc of testCases) {
     try {
-      const result = await client.query(tc.query);
-      if (result.rows.length > 0) {
+      const result = await tc.run();
+
+      const passes =
+        (tc.name.startsWith('A') &&
+          result.resolutionKind === 'normalized-primary' &&
+          result.fallbackUsed === false &&
+          result.value === 'retrieval') ||
+        (tc.name.startsWith('B') &&
+          result.resolutionKind === 'compatibility-fallback' &&
+          result.fallbackUsed === true &&
+          result.value === 'retrieval') ||
+        (tc.name.startsWith('C') &&
+          result.resolutionKind === 'normalized-primary' &&
+          Array.isArray(result.value) &&
+          result.value.length === 1) ||
+        (tc.name.startsWith('D') &&
+          result.resolutionKind === 'unresolved' &&
+          result.value === null);
+
+      if (passes) {
         console.log(`✅ ${tc.name}`);
-        console.log(`   Sample: ${JSON.stringify(result.rows[0])}\n`);
+        console.log(`   Result: ${JSON.stringify(result)}\n`);
         passCount++;
       } else {
-        console.log(`⚠️  ${tc.name} (no matching rows)\n`);
+        console.log(`⚠️  ${tc.name} (unexpected result: ${JSON.stringify(result)})\n`);
       }
     } catch (err) {
       console.log(`❌ ${tc.name} (query error: ${err})\n`);
@@ -320,64 +362,94 @@ async function runControlledSmoke(client: any): Promise<boolean> {
 
 async function materializePacket(
   client: any,
-  packetKey: string,
-  sourceRef: string,
+  packet: {
+    packet_key: string;
+    source_ref: string;
+    sha256: string | null;
+    summary_hash: string | null;
+  },
   isDryRun: boolean
 ): Promise<{ success: boolean; provenance: FeatureLoadProvenance }> {
   try {
     // Resolve each field independently (not lane-level, field-level)
-    const domain = await resolveDomain(client, packetKey, sourceRef);
-    const structural = await resolveStructuralFacts(client, packetKey);
-    const lexical = await resolveLexicalFacts(client, sourceRef);
-    const ontology = await resolveOntologyTuples(client, packetKey);
+    const domain = await resolveDomain(client, packet.packet_key);
+    const structural = await resolveStructuralFacts(client, packet.packet_key);
+    const lexical = await resolveLexicalFacts(client, packet.source_ref);
+    const ontology = await resolveOntologyTuples(client, packet.packet_key);
 
-    // Build provenance
+    const contentIdentity = resolveContentIdentity({
+      sha256: packet.sha256,
+      summaryHash: packet.summary_hash,
+      packetKey: packet.packet_key,
+      sourceRef: packet.source_ref,
+    });
+
+    // Build provenance audit trail (NO binding creation in Phase 107 F)
+    // Bindings are created in Phase 108+ with explicit evidence-backed relationships
     const provenance: FeatureLoadProvenance = {
-      packetKey,
-      laneSources: {
-        domain: domain.source || 'missing',
-        lexical: lexical.source || 'missing',
-        structural: structural.source || 'missing',
-        ontology: ontology.source || 'missing'
+      packetKey: packet.packet_key,
+      lanes: {
+        domain: {
+          source: domain.source || null,
+          resolutionKind: domain.resolutionKind,
+          fallbackUsed: domain.fallbackUsed,
+          value: domain.value
+        },
+        lexical: {
+          source: lexical.source || null,
+          resolutionKind: lexical.resolutionKind,
+          fallbackUsed: lexical.fallbackUsed,
+          value: lexical.value
+        },
+        structural: {
+          source: structural.source || null,
+          resolutionKind: structural.resolutionKind,
+          fallbackUsed: structural.fallbackUsed,
+          value: structural.value
+        },
+        ontology: {
+          source: ontology.source || null,
+          resolutionKind: ontology.resolutionKind,
+          fallbackUsed: ontology.fallbackUsed,
+          value: ontology.value
+        }
       },
+      contentIdentity,
+      processingPassId: PROCESSING_PASS_ID,
       fallbackUsed: domain.fallbackUsed || lexical.fallbackUsed || structural.fallbackUsed || ontology.fallbackUsed,
       fallbackReasons: [
         domain.fallbackUsed ? 'domain from atlas_packets' : null,
-        lexical.fallbackUsed ? 'lexical from atlas_packets' : null,
+        lexical.fallbackUsed ? 'lexical from legacy' : null,
         structural.fallbackUsed ? 'structural from legacy' : null,
         ontology.fallbackUsed ? 'ontology from legacy' : null
       ].filter(Boolean) as string[],
       unresolvedReasons: [
-        domain.unresolvedReason ? `domain: ${domain.unresolvedReason}` : null,
-        lexical.unresolvedReason ? `lexical: ${lexical.unresolvedReason}` : null,
-        structural.unresolvedReason ? `structural: ${structural.unresolvedReason}` : null,
-        ontology.unresolvedReason ? `ontology: ${ontology.unresolvedReason}` : null
+        domain.resolutionKind === 'unresolved' ? 'domain unresolved' : null,
+        lexical.resolutionKind === 'unresolved' ? 'lexical unresolved' : null,
+        structural.resolutionKind === 'unresolved' ? 'structural unresolved' : null,
+        ontology.resolutionKind === 'unresolved' ? 'ontology unresolved' : null
       ].filter(Boolean) as string[]
     };
 
-    if (!isDryRun) {
-      // Create feature_packet_bindings entries if domains resolved
-      if (domain.value && domain.source) {
-        const featureId = domain.value.toLowerCase().replace(/\s+/g, '_');
-        await client.query(
-          `INSERT INTO feature_packet_bindings (feature_id, packet_key, source_ref, binding_type, confidence)
-           VALUES ($1, $2, $3, $4, $5)
-           ON CONFLICT (feature_id, packet_key, source_ref) DO UPDATE SET
-             confidence = EXCLUDED.confidence,
-             updated_at = NOW()`,
-          [featureId, packetKey, sourceRef, domain.fallbackUsed ? 'promoted' : 'extracted', domain.confidence]
-        );
-      }
-    }
+    // AUDIT ONLY: output provenance, do NOT insert into feature_packet_bindings
+    // Phase 108+ will create bindings with explicit evidence relationships
 
     return { success: true, provenance };
   } catch (err) {
+    const packetKey = packet.packet_key;
     console.warn(`Error materializing ${packetKey}:`, err);
     return {
       success: false,
       provenance: {
         packetKey,
-        laneSources: { domain: 'missing', lexical: 'missing', structural: 'missing', ontology: 'missing' },
+        lanes: {
+          domain: { source: null, resolutionKind: 'unresolved', fallbackUsed: false, value: null },
+          lexical: { source: null, resolutionKind: 'unresolved', fallbackUsed: false, value: null },
+          structural: { source: null, resolutionKind: 'unresolved', fallbackUsed: false, value: null },
+          ontology: { source: null, resolutionKind: 'unresolved', fallbackUsed: false, value: null }
+        },
+        contentIdentity: { value: null, kind: 'missing', algorithm: null, inputContract: null, canonical: false },
+        processingPassId: PROCESSING_PASS_ID,
         fallbackUsed: false,
         fallbackReasons: [],
         unresolvedReasons: [(err instanceof Error ? err.message : String(err))]
@@ -392,8 +464,8 @@ async function runMaterialization(
   isDryRun: boolean = false
 ): Promise<{ materialized: number; fallback: number; unresolved: number; failures: number }> {
   const query = limit > 0
-    ? `SELECT packet_key, source_ref FROM atlas_packets LIMIT ${limit}`
-    : 'SELECT packet_key, source_ref FROM atlas_packets';
+    ? `SELECT packet_key, source_ref, sha256, summary_hash FROM atlas_packets ORDER BY packet_key LIMIT ${limit}`
+    : 'SELECT packet_key, source_ref, sha256, summary_hash FROM atlas_packets ORDER BY packet_key';
 
   const packets = await client.query(query);
   console.log(`📝 Materializing ${packets.rows.length} packets (field-level precedence)\n`);
@@ -404,7 +476,7 @@ async function runMaterialization(
   let failures = 0;
 
   for (const packet of packets.rows) {
-    const { success, provenance } = await materializePacket(client, packet.packet_key, packet.source_ref, isDryRun);
+    const { success, provenance } = await materializePacket(client, packet, isDryRun);
 
     if (success) {
       if (provenance.fallbackUsed) fallback++;

@@ -1,0 +1,48 @@
+{
+  "session": "140",
+  "generated_at": "2026-07-21T00:00:00-07:00",
+  "verified": [
+    {
+      "artifact": "scripts/atlas/duckdb/freeze-vector-snapshot.mts",
+      "status": "exists"
+    },
+    {
+      "artifact": "scripts/atlas/duckdb/build-vector-index-lanes.mts",
+      "status": "completed_live_run"
+    },
+    {
+      "artifact": "docs/reports/vector-index-lanes.json",
+      "status": "proves_vector_lane",
+      "selected_rows": 5000,
+      "qdrant_upserted_rows": 5000,
+      "qdrant_sample_overlap_mean": 0.64,
+      "turbovec_shadow_rows": 4096,
+      "turbovec_sample_overlap_mean": 0.70
+    },
+    {
+      "artifact": "sveltekit-frontend/src/lib/server/ace/",
+      "status": "tree_exists"
+    }
+  ],
+  "in_progress": [
+    "identity resolution and ContentIdentity discipline",
+    "narrow SOM assignment output",
+    "topology enrichment as a second pass",
+    "retrieval routing after persisted facts exist",
+    "ACE assembly after retrieval evidence exists"
+  ],
+  "deferred": [
+    "full-corpus semantic classification claims",
+    "K-means / SOM 20x20 completion claims",
+    "PageRank completion claims",
+    "tree_node_id propagation claims",
+    "ontology assertions without a report-backed proof",
+    "full ACE stack completion claims"
+  ],
+  "todo": [
+    "audit the ACE tree against the pasted completion claims",
+    "verify each claimed ACE module against tests or live report output",
+    "cross-check tree_node_id, used_concepts, and topology write ownership",
+    "rewrite the status summary so it says only what is proven"
+  ]
+}

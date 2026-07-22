@@ -181,7 +181,7 @@ async function main() {
   console.log('║              Probe Summary                     ║');
   console.log('╚════════════════════════════════════════════════╝\n');
 
-  if (stats.with_pagerank === '0') {
+  if (Number(stats.with_pagerank) === 0) {
     console.log('⚠️  READY FOR COMPUTATION');
     console.log('   PageRank is not yet computed.');
     console.log('   Next: Run PageRank computation via Mastra orchestrator\n');

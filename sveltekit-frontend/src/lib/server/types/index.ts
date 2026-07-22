@@ -60,3 +60,10 @@ export type {
   RankExplain,
   UnifiedRetrievalResult,
 } from './retrieval.js';
+
+// ── Topology contracts ───────────────────────────────────────────────────────
+export type {
+  RawPageRankScore,
+  DerivedAuthorityScore,
+  PageRankEvaluation,
+} from '../topology/pagerank-types.js';

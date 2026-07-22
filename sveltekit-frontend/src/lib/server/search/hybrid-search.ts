@@ -15,6 +15,7 @@ import { searchCodeLexical, searchCodeHybridPg } from './postgres-fts.js';
 import { searchQdrantCode }                       from './qdrant-search.js';
 import { fetchAuthorityScores }                   from './neo4j-rerank.js';
 import { rerankCandidates }                       from './gpu-rerank.js';
+import { applyAuthorityBoost }                    from '../retrieval/authority-boost.js';
 import { buildRetrievalTrace, SCORE_WEIGHTS }     from './retrieval-explainer.js';
 import { recordEvent }                            from '$lib/server/trace/trace-collector.js';
 import { createHash }                             from 'crypto';
@@ -267,8 +268,13 @@ export async function hybridSearch(
     for (const c of candidates) {
       const auth = authorityMap[c.stable_key];
       if (auth) {
-        c.authority_score = auth.pagerank;
-        c.final_score += auth.pagerank * (weights.neo4j ?? 0.20);
+        const boosted = applyAuthorityBoost({
+          semanticScore: c.final_score,
+          authorityScore: auth.pagerank,
+          maximumBoost: weights.neo4j ?? 0.20,
+        });
+        c.authority_score = boosted.authorityScore;
+        c.final_score = boosted.finalScore;
       }
     }
   }

@@ -29,11 +29,38 @@ const pgPool = new pg.Pool({
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
+const GRAPH_SNAPSHOT_ID = crypto.randomUUID();
+const RUN_ID = crypto.randomUUID();
 
 console.log('╔════════════════════════════════════════════════════════════════╗');
 console.log('║  P4 Phase 2: Compute PageRank (Neo4j GDS)                     ║');
 console.log(`║  Mode: ${APPLY ? 'APPLY' : 'DRY-RUN'.padEnd(56)}║`);
 console.log('╚════════════════════════════════════════════════════════════════╝\n');
+
+function toFiniteNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function deriveAuthorityPercentiles(rows) {
+  const ordered = [...rows].sort((a, b) => a.pagerank_l1 - b.pagerank_l1);
+  const denominator = Math.max(ordered.length - 1, 1);
+  const percentiles = new Map();
+
+  ordered.forEach((row, index) => {
+    percentiles.set(row.source_ref, index / denominator);
+  });
+
+  return percentiles;
+}
+
+function deriveAuthorityBand(percentile) {
+  if (percentile >= 0.99) return 'very-high';
+  if (percentile >= 0.9) return 'high';
+  if (percentile >= 0.5) return 'medium';
+  if (percentile >= 0.1) return 'low';
+  return 'very-low';
+}
 
 async function computePageRank() {
   const session = driver.session();
@@ -61,92 +88,251 @@ async function computePageRank() {
 
     console.log('🔄 Step 2: Run PageRank algorithm\n');
 
-    // Run PageRank
-    const prRes = await session.run(`
+    const rawRes = await session.run(`
       CALL gds.pageRank.stream('codebaseGraph', {
         maxIterations: 20,
-        dampingFactor: 0.85
+        dampingFactor: 0.85,
+        scaler: 'None'
       })
       YIELD nodeId, score
-      WITH gds.util.asNode(nodeId) as node, score
-      SET node.pageRankScore = score
-      RETURN count(*) as nodeCount, min(score) as minScore, max(score) as maxScore, avg(score) as avgScore
+      RETURN gds.util.asNode(nodeId).path as path, score as pagerank_raw
+      ORDER BY path
     `);
 
-    const stats = prRes.records[0].toObject();
-    console.log(`   Updated ${stats.nodeCount} nodes`);
-    console.log(`   Scores: min=${stats.minScore.toFixed(4)}, max=${stats.maxScore.toFixed(4)}, avg=${stats.avgScore.toFixed(4)}\n`);
+    const l1Res = await session.run(`
+      CALL gds.pageRank.stream('codebaseGraph', {
+        maxIterations: 20,
+        dampingFactor: 0.85,
+        scaler: 'L1Norm'
+      })
+      YIELD nodeId, score
+      RETURN gds.util.asNode(nodeId).path as path, score as pagerank_l1
+      ORDER BY path
+    `);
+
+    const rawByPath = new Map(
+      rawRes.records.map((record) => {
+        const { path, pagerank_raw } = record.toObject();
+        return [path, toFiniteNumber(pagerank_raw)];
+      }),
+    );
+    const l1ByPath = new Map(
+      l1Res.records.map((record) => {
+        const { path, pagerank_l1 } = record.toObject();
+        return [path, toFiniteNumber(pagerank_l1)];
+      }),
+    );
+
+    const mergedRows = [...rawByPath.entries()]
+      .filter(([, raw]) => raw !== null)
+      .map(([path, pagerank_raw]) => {
+        const pagerank_l1 = l1ByPath.get(path);
+        if (pagerank_l1 == null) {
+          throw new Error(`Missing L1 PageRank for ${path}`);
+        }
+        return {
+          path,
+          pagerank_raw,
+          pagerank_l1,
+        };
+      });
+
+    const rawSum = mergedRows.reduce((sum, row) => sum + row.pagerank_raw, 0);
+    const gdsL1Sum = mergedRows.reduce((sum, row) => sum + row.pagerank_l1, 0);
+    const canonicalRows =
+      Math.abs(gdsL1Sum - 1) <= 1e-6
+        ? mergedRows
+        : mergedRows.map((row) => ({
+            ...row,
+            pagerank_l1: rawSum > 0 ? row.pagerank_raw / rawSum : 0,
+          }));
+    const normalizationAppliedBy =
+      Math.abs(gdsL1Sum - 1) <= 1e-6 ? 'neo4j-gds-pagerank-scaler' : 'atlas-postprocess';
+    const canonicalL1Sum = canonicalRows.reduce((sum, row) => sum + row.pagerank_l1, 0);
+
+    if (normalizationAppliedBy !== 'neo4j-gds-pagerank-scaler') {
+      console.warn(`   ⚠️  GDS L1 sum=${gdsL1Sum.toFixed(6)}; deriving canonical L1 normalization in-process from raw scores`);
+    }
+
+    const percentiles = deriveAuthorityPercentiles(canonicalRows);
+    const authorityRows = canonicalRows.map((row) => {
+      const authority_percentile = percentiles.get(row.path) ?? 0;
+      return {
+        path: row.path,
+        pagerank_raw: row.pagerank_raw,
+        pagerank_l1: row.pagerank_l1,
+        authority_percentile,
+        authority_band: deriveAuthorityBand(authority_percentile),
+      };
+    });
+
+    const rawMin = mergedRows.length ? Math.min(...mergedRows.map((row) => row.pagerank_raw)) : 0;
+    const rawMax = mergedRows.length ? Math.max(...mergedRows.map((row) => row.pagerank_raw)) : 0;
+    const l1Sum = mergedRows.reduce((sum, row) => sum + row.pagerank_l1, 0);
+    console.log(`   Loaded ${mergedRows.length} scored nodes`);
+    console.log(`   Raw scores: min=${rawMin.toFixed(6)}, max=${rawMax.toFixed(6)}`);
+    console.log(`   GDS L1 sum: ${l1Sum.toFixed(6)}`);
+    console.log(`   Canonical L1 sum: ${canonicalL1Sum.toFixed(6)}\n`);
 
     console.log('📝 Step 3: Sync PageRank scores to Postgres\n');
 
-    // Fetch ALL scores — join via n.path → atlas_packets.source_ref
-    // Neo4j nodes have path='src/...' which maps to source_ref='sveltekit-frontend/src/...'
-    const allRes = await session.run(`
-      MATCH (n:Packet)
-      WHERE n.pageRankScore IS NOT NULL AND n.path IS NOT NULL
-      RETURN n.path as path, n.pageRankScore as score
-    `);
-
     if (DRY_RUN) {
-      console.log(`   DRY-RUN: Would sync ${allRes.records.length} PageRank scores to Postgres`);
-      const topScore = allRes.records[0]?.toObject().score;
-      console.log(`   Top score: ${topScore != null ? parseFloat(topScore).toFixed(4) : 'N/A'}`);
+      console.log(`   DRY-RUN: Would sync ${authorityRows.length} PageRank scores to Postgres`);
+      const topScore = authorityRows[0]?.pagerank_l1;
+      console.log(`   Top L1 score: ${topScore != null ? topScore.toFixed(6) : 'N/A'}`);
     } else {
       // Batch UPDATE via path → source_ref join (same pattern as Louvain sync)
       const BATCH_SIZE = 500;
       let synced = 0;
-      const records = allRes.records;
+      let authorityUpserts = 0;
 
-      for (let i = 0; i < records.length; i += BATCH_SIZE) {
-        const batch = records.slice(i, i + BATCH_SIZE);
+      for (let i = 0; i < authorityRows.length; i += BATCH_SIZE) {
+        const batch = authorityRows.slice(i, i + BATCH_SIZE);
         const values = [];
         const placeholders = [];
         let paramIndex = 1;
 
         for (const record of batch) {
-          const { path, score } = record.toObject();
-          const sourceRef = 'sveltekit-frontend/' + path;
-          values.push(sourceRef, parseFloat(score));
-          placeholders.push(`($${paramIndex}, $${paramIndex + 1}::real)`);
-          paramIndex += 2;
+          const sourceRef = 'sveltekit-frontend/' + record.path;
+          values.push(
+            sourceRef,
+            record.pagerank_raw,
+            record.pagerank_l1,
+            record.authority_percentile,
+            record.authority_band,
+          );
+          placeholders.push(
+            `($${paramIndex}, $${paramIndex + 1}::double precision, $${paramIndex + 2}::double precision, $${paramIndex + 3}::double precision, $${paramIndex + 4}::text)`,
+          );
+          paramIndex += 5;
         }
 
         const res = await pgPool.query(
-          `UPDATE atlas_packets AS p
-           SET pagerank = v.score,
-               page_rank_score = v.score,
-               updated_at = NOW()
-           FROM (VALUES ${placeholders.join(', ')})
-           AS v(source_ref, score)
-           WHERE p.source_ref = v.source_ref`,
-          values
+          `
+          WITH incoming(source_ref, pagerank_raw, pagerank_l1, authority_percentile, authority_band) AS (
+            VALUES ${placeholders.join(', ')}
+          ),
+          node_rows AS (
+            SELECT
+              i.pagerank_raw,
+              i.pagerank_l1,
+              i.authority_percentile,
+              i.authority_band,
+              i.source_ref,
+              p.packet_key
+            FROM incoming i
+            LEFT JOIN atlas_packets p ON p.source_ref = i.source_ref
+          ),
+          updated_packets AS (
+            UPDATE atlas_packets AS p
+            SET
+              pagerank = node_rows.pagerank_raw::real,
+              page_rank_score = node_rows.pagerank_l1::real,
+              updated_at = NOW()
+            FROM node_rows
+            WHERE p.packet_key = node_rows.packet_key
+            RETURNING 1
+          ),
+          upsert_authority AS (
+            INSERT INTO atlas_graph_authority_scores (
+              graph_snapshot_id,
+              run_id,
+              node_key,
+              packet_key,
+              source_ref,
+              pagerank_raw,
+              pagerank_l1,
+              authority_percentile,
+              authority_band,
+              normalization_method,
+              normalization_applied_by,
+              damping_factor,
+              max_iterations,
+              tolerance,
+              did_converge,
+              ran_iterations,
+              contract_version,
+              created_at
+            )
+            SELECT
+              $${paramIndex}::uuid,
+              $${paramIndex + 1}::uuid,
+              node_rows.source_ref,
+              node_rows.packet_key,
+              node_rows.source_ref,
+              node_rows.pagerank_raw,
+              node_rows.pagerank_l1,
+              node_rows.authority_percentile,
+              node_rows.authority_band,
+              'L1Norm',
+              $${paramIndex + 2}::text,
+              0.85,
+              20,
+              1e-6,
+              true,
+              20,
+              'atlas.pagerank-authority.v1',
+              NOW()
+            FROM node_rows
+            ON CONFLICT (graph_snapshot_id, node_key)
+            DO UPDATE SET
+              packet_key = EXCLUDED.packet_key,
+              source_ref = EXCLUDED.source_ref,
+              pagerank_raw = EXCLUDED.pagerank_raw,
+              pagerank_l1 = EXCLUDED.pagerank_l1,
+              authority_percentile = EXCLUDED.authority_percentile,
+              authority_band = EXCLUDED.authority_band,
+              normalization_method = EXCLUDED.normalization_method,
+              normalization_applied_by = EXCLUDED.normalization_applied_by,
+              damping_factor = EXCLUDED.damping_factor,
+              max_iterations = EXCLUDED.max_iterations,
+              tolerance = EXCLUDED.tolerance,
+              did_converge = EXCLUDED.did_converge,
+              ran_iterations = EXCLUDED.ran_iterations,
+              contract_version = EXCLUDED.contract_version,
+              created_at = EXCLUDED.created_at
+            RETURNING 1
+          )
+          SELECT
+            (SELECT COUNT(*) FROM updated_packets) AS packet_updates,
+            (SELECT COUNT(*) FROM upsert_authority) AS authority_updates
+          `,
+          [...values, GRAPH_SNAPSHOT_ID, RUN_ID, normalizationAppliedBy]
         );
-        synced += res.rowCount;
+
+        const packetUpdates = Number(res.rows[0]?.packet_updates || 0);
+        const authorityUpdates = Number(res.rows[0]?.authority_updates || 0);
+        synced += packetUpdates;
+        authorityUpserts += authorityUpdates;
         if (i % 5000 === 0 && i > 0) {
-          console.log(`   ✓ Synced ${synced}/${records.length} scores...`);
+          console.log(`   ✓ Synced ${synced}/${authorityRows.length} packet rows, ${authorityUpserts} authority rows...`);
         }
       }
-      console.log(`   ✅ Synced ${synced} scores to Postgres\n`);
+      if (synced === 0 || authorityUpserts === 0) {
+        throw new Error(`PageRank materialization failed: ${synced}/${authorityRows.length} packet rows updated, ${authorityUpserts} authority rows upserted`);
+      }
+      console.log(`   ✅ Synced ${synced} packet rows and ${authorityUpserts} authority rows to Postgres\n`);
     }
 
     console.log('💾 Step 4: Cache top-100 scores in Redis\n');
 
     // Fetch top-100 for Redis cache keyed by source_ref (canonical path)
-    const topRes = await session.run(`
-      MATCH (n:Packet)
-      WHERE n.pageRankScore IS NOT NULL AND n.path IS NOT NULL
-      RETURN n.path as path, n.pageRankScore as score
-      ORDER BY score DESC
-      LIMIT 100
-    `);
+    const topRes = authorityRows
+      .slice()
+      .sort((a, b) => b.pagerank_l1 - a.pagerank_l1)
+      .slice(0, 100);
 
     if (!DRY_RUN) {
       const scoreMap = {};
-      for (const record of topRes.records) {
-        const { path, score } = record.toObject();
-        const key = path ? 'sveltekit-frontend/' + path : null;
+      for (const record of topRes) {
+        const key = record.path ? 'sveltekit-frontend/' + record.path : null;
         if (key) {
-          scoreMap[key] = parseFloat(score).toFixed(6);
+          scoreMap[key] = {
+            pagerank_raw: record.pagerank_raw,
+            pagerank_l1: record.pagerank_l1,
+            authority_percentile: record.authority_percentile,
+            authority_band: record.authority_band,
+          };
         }
       }
 
@@ -172,6 +358,7 @@ async function computePageRank() {
         manifold_4d: null,
         qdrant_point_id: null,
         neo4j_neighbors: [],
+        pagerank_raw: null,
         page_rank_score: null,
         summary: `PageRank top-100 cache for ${topEntries.length} packet keys.`,
         lexical_nouns: ['pagerank', 'score', 'packet', 'graph'],
@@ -186,7 +373,7 @@ async function computePageRank() {
         confidence: 1,
         extraction_method: 'neo4j-gds-pagerank',
         provenance: {
-          node_count: allRes.records.length,
+          node_count: authorityRows.length,
           top_score_count: topEntries.length,
           source: 'neo4j-gds',
         },
@@ -194,6 +381,12 @@ async function computePageRank() {
       const payload = JSON.stringify({
         envelope,
         top_scores: scoreMap,
+        authority_contract: {
+          contractVersion: 'atlas.pagerank-authority.v1',
+          graphSnapshotId: GRAPH_SNAPSHOT_ID,
+          runId: RUN_ID,
+          normalization: 'L1Norm',
+        },
       });
       const cacheResult = runRedisCli(
         redisCtx.container,
@@ -210,7 +403,7 @@ async function computePageRank() {
 
       console.log(`   ✅ Cached ${Object.keys(scoreMap).length} top scores to Redis`);
     } else {
-      console.log(`   DRY-RUN: Would cache ${topRes.records.length} top scores to Redis\n`);
+      console.log(`   DRY-RUN: Would cache ${topRes.length} top scores to Redis\n`);
     }
 
     console.log('🧹 Step 5: Clean up GDS projection\n');

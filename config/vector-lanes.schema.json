@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://atlas.local/schemas/vector-lane-registry.v1.json",
+  "title": "Atlas Vector Lane Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contractVersion",
+    "activeCanonicalLane",
+    "lanes"
+  ],
+  "properties": {
+    "contractVersion": {
+      "const": "atlas.vector-lane-registry.v1"
+    },
+    "activeCanonicalLane": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lanes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/lane"
+      }
+    }
+  },
+  "$defs": {
+    "lane": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "laneId",
+        "status",
+        "role",
+        "modelId",
+        "modelRevision",
+        "sourceDimensions",
+        "outputDimensions",
+        "projection",
+        "normalization",
+        "dtype",
+        "distance",
+        "purpose"
+      ],
+      "properties": {
+        "laneId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "canonical",
+            "native",
+            "derived",
+            "accelerator",
+            "legacy",
+            "experimental",
+            "retired"
+          ]
+        },
+        "role": {
+          "enum": [
+            "retrieval",
+            "fixer-memory",
+            "reranking",
+            "topology",
+            "clustering",
+            "som-training",
+            "centroid-routing",
+            "archive"
+          ]
+        },
+        "modelId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modelRevision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceDimensions": {
+          "enum": [64, 128, 384, 768]
+        },
+        "outputDimensions": {
+          "enum": [64, 128, 384, 768]
+        },
+        "projection": {
+          "enum": [
+            "none",
+            "direct-slice",
+            "mrl",
+            "autoencoder",
+            "graph-projection"
+          ]
+        },
+        "normalization": {
+          "enum": [
+            "none",
+            "l2"
+          ]
+        },
+        "dtype": {
+          "enum": [
+            "float32",
+            "float16",
+            "int8",
+            "int4",
+            "binary"
+          ]
+        },
+        "distance": {
+          "enum": [
+            "cosine",
+            "dot",
+            "euclidean"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "collection": {
+          "type": ["string", "null"]
+        },
+        "artifactUri": {
+          "type": ["string", "null"]
+        },
+        "quantization": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "rescoring"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "scalar-int8",
+                "scalar-int4",
+                "binary",
+                "product",
+                "turboquant"
+              ]
+            },
+            "rescoring": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

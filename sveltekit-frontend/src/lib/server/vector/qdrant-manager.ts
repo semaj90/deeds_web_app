@@ -9,6 +9,11 @@ import {
   buildVectorPayload,
   getCollectionDimension,
 } from '$lib/server/config/vector-config.js';
+import {
+  QDRANT_DENSE_VECTOR_NAME,
+  QDRANT_FUSION_STRATEGY,
+  QDRANT_SPARSE_VECTOR_NAME,
+} from './retrieval-semantics.js';
 import { generateSparseVector, type SparseVector } from './bm42-sparse.js';
 import { fastJsonParse } from '../gpu/simdjson-bridge.js';
 import { traceVectorSearch } from '../observability/langfuse.js';
@@ -532,7 +537,7 @@ export class QdrantManager {
                   if (q.vectorName) prefetch.using = q.vectorName;
                 } else {
                   prefetch.query = { indices: q.vector.indices, values: q.vector.values };
-                  prefetch.using = q.vectorName ?? 'bm25';
+                  prefetch.using = q.vectorName ?? QDRANT_SPARSE_VECTOR_NAME;
                 }
               }
               if (q.filter) prefetch.filter = this.buildQdrantFilter(q.filter);
@@ -541,7 +546,7 @@ export class QdrantManager {
 
             const searchRequest: any = {
               prefetch: prefetches,
-              query: { fusion: params.fusion ?? 'rrf' },
+            query: { fusion: params.fusion ?? QDRANT_FUSION_STRATEGY },
               limit: params.limit ?? 10,
               score_threshold: params.scoreThreshold ?? 0.01,
               with_payload: true,
@@ -563,7 +568,7 @@ export class QdrantManager {
                 total_results: results.points.length,
                 cached: false,
                 searchType: 'multi-query-fusion',
-                fusion: params.fusion ?? 'rrf',
+                fusion: params.fusion ?? QDRANT_FUSION_STRATEGY,
               },
             };
           })();
@@ -593,7 +598,7 @@ export class QdrantManager {
                 if (q.vectorName) prefetch.using = q.vectorName;
               } else {
                 prefetch.query = { indices: q.vector.indices, values: q.vector.values };
-                prefetch.using = q.vectorName ?? 'bm25';
+                prefetch.using = q.vectorName ?? QDRANT_SPARSE_VECTOR_NAME;
               }
             }
             if (q.filter) prefetch.filter = this.buildQdrantFilter(q.filter);
@@ -602,7 +607,7 @@ export class QdrantManager {
 
           const searchRequest: any = {
             prefetch: prefetches,
-            query: { fusion: params.fusion ?? 'rrf' },
+            query: { fusion: params.fusion ?? QDRANT_FUSION_STRATEGY },
             limit: params.limit ?? 10,
             score_threshold: params.scoreThreshold ?? 0.01,
             with_payload: true,
@@ -635,7 +640,7 @@ export class QdrantManager {
               total_results: results.points.length,
               cached: false,
               searchType: 'multi-query-fusion',
-              fusion: params.fusion ?? 'rrf',
+                fusion: params.fusion ?? QDRANT_FUSION_STRATEGY,
             },
           };
         } catch (err) {
@@ -659,7 +664,7 @@ export class QdrantManager {
     scoreThreshold?: number;
     skipCache?: boolean;
   }): Promise<QdrantSearchResult> {
-    const sparseAvailable = await this.getSparseSupport(params.collection, 'bm25');
+    const sparseAvailable = await this.getSparseSupport(params.collection, QDRANT_SPARSE_VECTOR_NAME);
 
     if (!sparseAvailable) {
       // Fall back to dense-only search when BM25 not available
@@ -667,7 +672,7 @@ export class QdrantManager {
       return this._denseSearch({
         query: params.query,
         queryVector: params.queryEmbedding,
-        vectorName: 'content',
+        vectorName: QDRANT_DENSE_VECTOR_NAME,
         collection: params.collection,
         limit: params.limit,
         scoreThreshold: params.scoreThreshold,
@@ -690,7 +695,7 @@ export class QdrantManager {
         },
         {
           vector: sparseVector,
-          vectorName: 'bm25',
+          vectorName: QDRANT_SPARSE_VECTOR_NAME,
           limit: params.limit ?? 20,
           weight: 1.0,
           filter: params.filters,
@@ -721,7 +726,7 @@ export class QdrantManager {
     limit?: number;
     scoreThreshold?: number;
   }): Promise<QdrantSearchResult> {
-    const sparseVectorName = params.sparseVectorName ?? 'bm25';
+    const sparseVectorName = params.sparseVectorName ?? QDRANT_SPARSE_VECTOR_NAME;
     const sparseAvailable = await this.getSparseSupport(params.collection, sparseVectorName).catch(() => false);
     if (!sparseAvailable) {
       this.noteDenseOnly(params.collection, sparseVectorName, 'no-sparse-index');
@@ -1724,9 +1729,9 @@ export class QdrantManager {
 
   /**
    * Ensure a collection has sparse vector support for BM42 hybrid search.
-   * Adds a 'bm25' sparse vector config if not already present.
+   * Adds a BM42 sparse vector config if not already present.
    */
-  async ensureSparseVectors(collectionName: string, sparseVectorName = 'bm25') {
+  async ensureSparseVectors(collectionName: string, sparseVectorName = QDRANT_SPARSE_VECTOR_NAME) {
     try {
       const info = await this.client.getCollection(collectionName);
       const sparseVecs = (info as any).config?.params?.sparse_vectors;
