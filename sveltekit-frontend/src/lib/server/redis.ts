@@ -4,7 +4,7 @@
  */
 
 import Redis from 'ioredis';
-import { ENV } from '$lib/server/env.server.js';
+import { ENV } from './env.server.js';
 
 const REDIS_URL = ENV.REDIS_URL;
 const REDIS_PASSWORD = ENV.REDIS_PASSWORD;

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
-import { getRedis } from '$lib/server/redis.js';
+import { getRedis } from '../../redis.js';
 import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
 
 export type DailyGraphifyBoardTask = {

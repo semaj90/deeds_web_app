@@ -1,7 +1,7 @@
 import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
-import { TaskPromotionGateSchema } from '$lib/server/atlas/contracts/recommendation.js';
+import { TaskPromotionGateSchema } from '../contracts/recommendation.js';
 
 const PrioritySchema = z.enum(['P0', 'P1', 'P2', 'P3']);
 

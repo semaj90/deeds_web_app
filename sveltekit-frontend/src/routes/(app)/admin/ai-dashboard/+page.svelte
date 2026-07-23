@@ -169,6 +169,68 @@
 				<strong>{workflowStatus || 'Board-driven validation queued from task cards'}</strong>
 			</div>
 		</div>
+
+		<div class="recommendation-ledger">
+			<div class="ledger-column">
+				<div class="ledger-head">
+					<h3>Promoted recommendations</h3>
+					<span>{board().promotedRecommendations.length}</span>
+				</div>
+				{#if board().promotedRecommendations.length === 0}
+					<p class="empty-state">No promoted recommendations.</p>
+				{:else}
+					{#each board().promotedRecommendations as rec}
+						<article class="ledger-card promoted">
+							<div class="task-topline">
+								<span>{rec.recommendation_id}</span>
+								<span class="task-status">PROMOTE</span>
+							</div>
+							<h4>{rec.title ?? rec.source_ref ?? rec.recommendation_id}</h4>
+							<p>
+								{rec.tree_node_id ?? 'tree_node_id unavailable'}
+							</p>
+							{#if rec.reason_codes.length}
+								<div class="chip-row">
+									{#each rec.reason_codes as reason}
+										<span class="chip">{reason}</span>
+									{/each}
+								</div>
+							{/if}
+						</article>
+					{/each}
+				{/if}
+			</div>
+
+			<div class="ledger-column">
+				<div class="ledger-head">
+					<h3>Review required</h3>
+					<span>{board().reviewRequiredRecommendations.length}</span>
+				</div>
+				{#if board().reviewRequiredRecommendations.length === 0}
+					<p class="empty-state">No review-required recommendations.</p>
+				{:else}
+					{#each board().reviewRequiredRecommendations as rec}
+						<article class="ledger-card review">
+							<div class="task-topline">
+								<span>{rec.recommendation_id}</span>
+								<span class="task-status">REVIEW</span>
+							</div>
+							<h4>{rec.title ?? rec.source_ref ?? rec.recommendation_id}</h4>
+							<p>
+								{rec.tree_node_id ?? 'tree_node_id unavailable'}
+							</p>
+							{#if rec.reason_codes.length}
+								<div class="chip-row">
+									{#each rec.reason_codes as reason}
+										<span class="chip">{reason}</span>
+									{/each}
+								</div>
+							{/if}
+						</article>
+					{/each}
+				{/if}
+			</div>
+		</div>
 	</section>
 </div>
 
@@ -396,6 +458,68 @@
 		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		gap: 0.75rem;
 		margin-top: 0.9rem;
+	}
+
+	.recommendation-ledger {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+		gap: 0.9rem;
+		margin-top: 1rem;
+	}
+
+	.ledger-column {
+		padding: 0.95rem;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+	}
+
+	.ledger-head {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.75rem;
+		align-items: center;
+		margin-bottom: 0.75rem;
+	}
+
+	.ledger-head h3 {
+		margin: 0;
+		font-size: 0.92rem;
+		color: rgba(245, 240, 223, 0.96);
+	}
+
+	.ledger-head span {
+		font-size: 0.78rem;
+		color: #93c5fd;
+	}
+
+	.ledger-card {
+		padding: 0.85rem;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		margin-bottom: 0.65rem;
+	}
+
+	.ledger-card.promoted {
+		border-color: rgba(34, 197, 94, 0.18);
+	}
+
+	.ledger-card.review {
+		border-color: rgba(245, 158, 11, 0.18);
+	}
+
+	.ledger-card h4 {
+		margin: 0;
+		font-size: 0.94rem;
+		color: rgba(245, 240, 223, 0.96);
+	}
+
+	.ledger-card p {
+		margin: 0.35rem 0 0;
+		font-size: 0.84rem;
+		color: rgba(212, 199, 163, 0.72);
+		line-height: 1.5;
 	}
 
 	.footer-card {
