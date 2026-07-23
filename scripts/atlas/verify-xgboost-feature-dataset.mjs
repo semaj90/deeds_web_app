@@ -142,7 +142,7 @@ async function main() {
 
     console.log('\n  Required before training:');
     if (Number(r.with_pagerank) === 0) {
-      console.log('    node scripts/atlas/compute-pagerank-neo4j.mjs --apply');
+      console.log('    Parent Atlas V2 authority promotion is intentionally blocked pending persisted live parity.');
     }
     if (Number(r.with_som_index) === 0) {
       console.log('    node scripts/atlas/backfill-som-coordinates.mjs --apply');

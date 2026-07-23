@@ -90,7 +90,7 @@ if (JSON_OUT) {
     if (!results.find(r => r.id === 'neo4j')?.passed) {
       console.log('    1. node scripts/atlas/write-used-concept-edges-from-packets.mjs --apply');
     }
-    console.log('    2. node scripts/atlas/compute-pagerank-neo4j.mjs --apply');
+    console.log('    2. Run the Parent Atlas V2 fixture parity runner; legacy PageRank materialization is disabled.');
     console.log('    3. node scripts/atlas/atlas-verify.mjs  (re-run after fixes)');
     console.log('');
   }

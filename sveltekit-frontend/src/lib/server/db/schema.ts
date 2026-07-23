@@ -157,6 +157,7 @@ export * from './schema/kag-dag';
 export * from './schema/directory-clusters';
 export * from './schema/embedded-summaries';
 export * from './schema/topology';
+export * from './schema/graph-authority-v2';
 export * from './schema/graph-pathway-cards';
 export * from './schema/admin-chat';
 export * from './schema/admin-ai-skills';

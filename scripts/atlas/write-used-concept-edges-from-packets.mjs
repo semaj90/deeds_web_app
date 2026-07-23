@@ -153,7 +153,7 @@ async function main() {
 
     console.log('\n  Next step:');
     console.log('    node scripts/atlas/verify-neo4j-gds-readiness.mjs');
-    console.log('    node scripts/atlas/compute-pagerank-neo4j.mjs --apply');
+    console.log('    node scripts/atlas/compute-pagerank-neo4j-v2.mjs --json  # fixture parity only');
 
   } catch (err) {
     console.error(`\n❌ Error: ${err.message}`);

@@ -107,7 +107,7 @@ async function main() {
     if (usedConcept === 0) {
       console.log('    1. node scripts/atlas/write-used-concept-edges-from-packets.mjs --apply');
     }
-    console.log('    2. node scripts/atlas/compute-pagerank-neo4j.mjs --apply');
+    console.log('    2. Run scripts/atlas/compute-pagerank-neo4j-v2.mjs for fixture parity; legacy authority materialization is disabled.');
 
   } catch (err) {
     console.error(`\n❌ Neo4j error: ${err.message}`);

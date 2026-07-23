@@ -73,10 +73,8 @@ const STEPS = [
   },
   {
     id: 4,
-    name: 'Neo4j GDS PageRank (20 iterations)',
-    script: 'scripts/atlas/compute-pagerank-neo4j.mjs',
-    args: APPLY ? ['--apply'] : [],
-    timeout: 900000, // 15 min
+    name: 'Neo4j GDS PageRank (legacy materializer disabled)',
+    disabledReason: 'Parent Atlas V2 requires a validated PostgreSQL snapshot and persisted NetworkX/GDS parity before authority promotion.',
   },
   {
     id: 5,
@@ -213,6 +211,11 @@ async function executePhase8() {
     console.log(`\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
     console.log(`Step ${step.id}: ${step.name}`);
     console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`);
+
+    if (step.disabledReason) {
+      console.log(`⏸️  Step ${step.id} blocked: ${step.disabledReason}\n`);
+      continue;
+    }
 
     try {
       await runScript(step.script, step.args, step.timeout);
