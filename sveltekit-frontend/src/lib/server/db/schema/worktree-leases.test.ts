@@ -13,6 +13,8 @@ describe('worktree lease schema', () => {
     expect(worktreeLeases.ownerAgent.name).toBe('owner_agent');
     expect(worktreeLeases.worktreePath.name).toBe('worktree_path');
     expect(worktreeLeases.branchName.name).toBe('branch_name');
+    expect(worktreeLeases.heartbeatAt.name).toBe('heartbeat_at');
+    expect(worktreeLeases.releasedAt.name).toBe('released_at');
     expect(worktreeLeases.status.name).toBe('status');
   });
 });
