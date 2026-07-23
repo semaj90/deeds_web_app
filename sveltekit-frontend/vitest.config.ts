@@ -25,6 +25,7 @@ export default defineConfig({
       'tests/agent-memory-schema-matching.spec.ts',
       'tests/redis-disposable.spec.ts',
       'tests/langextract-native.spec.ts',
+      'tests/langextract-sidecar-routing.spec.ts',
       'tests/ace-context-glossary.spec.ts',
       'tests/ace-ingest-route.spec.ts',
       'tests/ace-status-route.spec.ts',

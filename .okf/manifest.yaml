@@ -89,3 +89,42 @@ pipeline:
   6: documentation_concept     # (docstring + comment extraction)
   7: domain_model              # (multi-evidence domain scoring)
   8: ontology_tuple_builder    # (feature relationships)
+
+# Parent Atlas contextual-graph projection policy. This is configuration only;
+# PostgreSQL remains the canonical graph snapshot store.
+relationships:
+  - contains
+  - materializes
+  - imports
+  - calls
+  - references
+  - depends_on
+  - implements
+  - uses_concept
+  - participates_in
+
+graph_projection:
+  node_types:
+    - file
+    - symbol
+    - packet
+  pagerank_edges:
+    - imports
+    - calls
+    - references
+    - depends_on
+  traversal_edges:
+    - contains
+    - materializes
+    - imports
+    - calls
+    - references
+    - depends_on
+    - uses_concept
+    - participates_in
+  excluded_edges:
+    - semantic_similar
+  default_weight: 1.0
+  minimum_confidence: 0.65
+  max_hops: 2
+  max_fanout: 20

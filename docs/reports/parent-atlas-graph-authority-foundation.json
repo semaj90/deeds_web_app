@@ -1,0 +1,73 @@
+{
+  "status": "FIXTURE_PROVEN",
+  "statuses": {
+    "PREFLIGHT_COMPLETE": "PROVEN",
+    "OKF_SCHEMA_PROVEN": "PROVEN",
+    "GRAPH_IDENTITY_PROVEN": "PROVEN",
+    "NETWORKX_REFERENCE_PROVEN": "PROVEN",
+    "NEO4J_GDS_PROVEN": "PROVEN",
+    "PAGERANK_PARITY_PROVEN": "PROVEN",
+    "PRODUCTION_SCORE_UNCHANGED": "PROVEN",
+    "PRODUCTION_MUTATION_DETECTED": false,
+    "FIXTURE_PROVEN": true,
+    "LIVE_PARTIAL": false,
+    "BLOCKED": false
+  },
+  "okf_registry_path": ".okf/manifest.yaml",
+  "fixture": {
+    "snapshot_id": "11111111-1111-4111-8111-111111111111",
+    "node_count": 6,
+    "edge_count": 5,
+    "topology_hash": "33586a9976159cc7a4fcb7f290c62da7e5508b8c4938f6f3d196dec97101dcae",
+    "included_edge_types": ["CALLS", "DEPENDS_ON", "IMPORTS", "REFERENCES"],
+    "excluded_edge_types": ["SEMANTIC_SIMILAR"]
+  },
+  "networkx": {
+    "run_id": "4b920b42-350b-5f8d-9046-b8bd95bf760d",
+    "result_hash": "37ceeb856f68a9363e0e563c8c2eb7df20388d946e3afb7f07525740b78836e5",
+    "normalization_applied_by": "none"
+  },
+  "neo4j_gds": {
+    "version": "2.13.10",
+    "run_id": "556b46bd-86bc-4d4b-b43d-7fcd0456f0cf",
+    "graph_name": "atlas_authority_fixture_556b46bd_86bc_4d4b_b43d_7fcd0456f0cf",
+    "result_hash": "07e4117077a14c185f8949fd6a5209ba0616613b8886171bd605053632f42055",
+    "node_count": 6,
+    "relationship_count": 5,
+    "did_converge": true,
+    "ran_iterations": 4,
+    "normalization_applied_by": "none"
+  },
+  "parity": {
+    "top_k_overlap": 1,
+    "spearman_correlation": 1,
+    "maximum_score_delta": 2.7548415493239276e-9
+  },
+  "production_witness_before": {
+    "row_count": 61659,
+    "pagerank_score_distinct": 2,
+    "pagerank_score_min": 0,
+    "pagerank_score_max": 0.5,
+    "pagerank_score_sum": 29182.5,
+    "authority_populated": 12616,
+    "authority_sum": 19.140244,
+    "page_rank_score_distinct": 1526,
+    "page_rank_score_sum": 1458.4077,
+    "karpathy_field_count": 0,
+    "karpathy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "production_witness_after": {
+    "row_count": 61659,
+    "pagerank_score_distinct": 2,
+    "pagerank_score_min": 0,
+    "pagerank_score_max": 0.5,
+    "pagerank_score_sum": 29182.5,
+    "authority_populated": 12616,
+    "authority_sum": 19.140244,
+    "page_rank_score_distinct": 1526,
+    "page_rank_score_sum": 1458.4077,
+    "karpathy_field_count": 0,
+    "karpathy_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "mutation_detected": false
+}

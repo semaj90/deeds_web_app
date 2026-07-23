@@ -29,6 +29,7 @@ const pgPool = new pg.Pool({
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
+const WRITE_LEGACY_PACKET_COLUMNS = process.argv.includes('--allow-legacy-compatibility-write');
 const GRAPH_SNAPSHOT_ID = crypto.randomUUID();
 const RUN_ID = crypto.randomUUID();
 
@@ -48,7 +49,7 @@ function deriveAuthorityPercentiles(rows) {
   const percentiles = new Map();
 
   ordered.forEach((row, index) => {
-    percentiles.set(row.source_ref, index / denominator);
+    percentiles.set(row.path, index / denominator);
   });
 
   return percentiles;
@@ -90,23 +91,13 @@ async function computePageRank() {
 
     const rawRes = await session.run(`
       CALL gds.pageRank.stream('codebaseGraph', {
-        maxIterations: 20,
+        maxIterations: 100,
         dampingFactor: 0.85,
+        tolerance: 1e-8,
         scaler: 'None'
       })
       YIELD nodeId, score
       RETURN gds.util.asNode(nodeId).path as path, score as pagerank_raw
-      ORDER BY path
-    `);
-
-    const l1Res = await session.run(`
-      CALL gds.pageRank.stream('codebaseGraph', {
-        maxIterations: 20,
-        dampingFactor: 0.85,
-        scaler: 'L1Norm'
-      })
-      YIELD nodeId, score
-      RETURN gds.util.asNode(nodeId).path as path, score as pagerank_l1
       ORDER BY path
     `);
 
@@ -116,43 +107,18 @@ async function computePageRank() {
         return [path, toFiniteNumber(pagerank_raw)];
       }),
     );
-    const l1ByPath = new Map(
-      l1Res.records.map((record) => {
-        const { path, pagerank_l1 } = record.toObject();
-        return [path, toFiniteNumber(pagerank_l1)];
-      }),
-    );
-
     const mergedRows = [...rawByPath.entries()]
       .filter(([, raw]) => raw !== null)
-      .map(([path, pagerank_raw]) => {
-        const pagerank_l1 = l1ByPath.get(path);
-        if (pagerank_l1 == null) {
-          throw new Error(`Missing L1 PageRank for ${path}`);
-        }
-        return {
-          path,
-          pagerank_raw,
-          pagerank_l1,
-        };
-      });
+      .map(([path, pagerank_raw]) => ({ path, pagerank_raw }));
 
     const rawSum = mergedRows.reduce((sum, row) => sum + row.pagerank_raw, 0);
-    const gdsL1Sum = mergedRows.reduce((sum, row) => sum + row.pagerank_l1, 0);
-    const canonicalRows =
-      Math.abs(gdsL1Sum - 1) <= 1e-6
-        ? mergedRows
-        : mergedRows.map((row) => ({
-            ...row,
-            pagerank_l1: rawSum > 0 ? row.pagerank_raw / rawSum : 0,
-          }));
-    const normalizationAppliedBy =
-      Math.abs(gdsL1Sum - 1) <= 1e-6 ? 'neo4j-gds-pagerank-scaler' : 'atlas-postprocess';
+    if (rawSum <= 0) throw new Error('PageRank raw score sum must be positive for L1 normalization');
+    const canonicalRows = mergedRows.map((row) => ({
+      ...row,
+      pagerank_l1: row.pagerank_raw / rawSum,
+    }));
+    const normalizationAppliedBy = 'atlas-postprocess';
     const canonicalL1Sum = canonicalRows.reduce((sum, row) => sum + row.pagerank_l1, 0);
-
-    if (normalizationAppliedBy !== 'neo4j-gds-pagerank-scaler') {
-      console.warn(`   ⚠️  GDS L1 sum=${gdsL1Sum.toFixed(6)}; deriving canonical L1 normalization in-process from raw scores`);
-    }
 
     const percentiles = deriveAuthorityPercentiles(canonicalRows);
     const authorityRows = canonicalRows.map((row) => {
@@ -168,11 +134,10 @@ async function computePageRank() {
 
     const rawMin = mergedRows.length ? Math.min(...mergedRows.map((row) => row.pagerank_raw)) : 0;
     const rawMax = mergedRows.length ? Math.max(...mergedRows.map((row) => row.pagerank_raw)) : 0;
-    const l1Sum = mergedRows.reduce((sum, row) => sum + row.pagerank_l1, 0);
+    const l1Sum = canonicalL1Sum;
     console.log(`   Loaded ${mergedRows.length} scored nodes`);
     console.log(`   Raw scores: min=${rawMin.toFixed(6)}, max=${rawMax.toFixed(6)}`);
-    console.log(`   GDS L1 sum: ${l1Sum.toFixed(6)}`);
-    console.log(`   Canonical L1 sum: ${canonicalL1Sum.toFixed(6)}\n`);
+    console.log(`   Atlas L1 sum: ${l1Sum.toFixed(6)}\n`);
 
     console.log('📝 Step 3: Sync PageRank scores to Postgres\n');
 
@@ -219,9 +184,9 @@ async function computePageRank() {
               i.authority_percentile,
               i.authority_band,
               i.source_ref,
-              p.packet_key
+              p.packet_key AS node_key
             FROM incoming i
-            LEFT JOIN atlas_packets p ON p.source_ref = i.source_ref
+            JOIN atlas_packets p ON p.source_ref = i.source_ref
           ),
           updated_packets AS (
             UPDATE atlas_packets AS p
@@ -230,7 +195,8 @@ async function computePageRank() {
               page_rank_score = node_rows.pagerank_l1::real,
               updated_at = NOW()
             FROM node_rows
-            WHERE p.packet_key = node_rows.packet_key
+            WHERE $${paramIndex + 3}::boolean
+              AND p.packet_key = node_rows.node_key
             RETURNING 1
           ),
           upsert_authority AS (
@@ -257,8 +223,8 @@ async function computePageRank() {
             SELECT
               $${paramIndex}::uuid,
               $${paramIndex + 1}::uuid,
-              node_rows.source_ref,
-              node_rows.packet_key,
+              node_rows.node_key,
+              node_rows.node_key,
               node_rows.source_ref,
               node_rows.pagerank_raw,
               node_rows.pagerank_l1,
@@ -297,7 +263,7 @@ async function computePageRank() {
             (SELECT COUNT(*) FROM updated_packets) AS packet_updates,
             (SELECT COUNT(*) FROM upsert_authority) AS authority_updates
           `,
-          [...values, GRAPH_SNAPSHOT_ID, RUN_ID, normalizationAppliedBy]
+          [...values, GRAPH_SNAPSHOT_ID, RUN_ID, normalizationAppliedBy, WRITE_LEGACY_PACKET_COLUMNS]
         );
 
         const packetUpdates = Number(res.rows[0]?.packet_updates || 0);
@@ -308,10 +274,13 @@ async function computePageRank() {
           console.log(`   ✓ Synced ${synced}/${authorityRows.length} packet rows, ${authorityUpserts} authority rows...`);
         }
       }
-      if (synced === 0 || authorityUpserts === 0) {
+      if (authorityUpserts === 0 || (WRITE_LEGACY_PACKET_COLUMNS && synced === 0)) {
         throw new Error(`PageRank materialization failed: ${synced}/${authorityRows.length} packet rows updated, ${authorityUpserts} authority rows upserted`);
       }
-      console.log(`   ✅ Synced ${synced} packet rows and ${authorityUpserts} authority rows to Postgres\n`);
+      console.log(
+        `   ✅ Synced ${synced} legacy packet rows and ${authorityUpserts} authority rows to Postgres` +
+        `${WRITE_LEGACY_PACKET_COLUMNS ? '' : ' (legacy packet writes disabled)'}\n`,
+      );
     }
 
     console.log('💾 Step 4: Cache top-100 scores in Redis\n');

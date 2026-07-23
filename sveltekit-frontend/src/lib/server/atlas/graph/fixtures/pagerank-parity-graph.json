@@ -1,0 +1,19 @@
+{
+  "snapshotId": "11111111-1111-4111-8111-111111111111",
+  "nodes": [
+    { "nodeKey": "file:a", "nodeType": "file", "packetKey": null, "treeNodeId": null, "sourceRef": "fixture/file-a.ts", "properties": {} },
+    { "nodeKey": "symbol:b", "nodeType": "symbol", "packetKey": null, "treeNodeId": null, "sourceRef": "fixture/file-b.ts", "properties": {} },
+    { "nodeKey": "file:c", "nodeType": "file", "packetKey": null, "treeNodeId": null, "sourceRef": "fixture/file-c.ts", "properties": {} },
+    { "nodeKey": "packet:d", "nodeType": "packet", "packetKey": "packet:fixture-d", "treeNodeId": null, "sourceRef": "fixture/file-d.ts", "properties": {} },
+    { "nodeKey": "file:e", "nodeType": "file", "packetKey": null, "treeNodeId": null, "sourceRef": "fixture/file-e.ts", "properties": {} },
+    { "nodeKey": "file:f", "nodeType": "file", "packetKey": null, "treeNodeId": null, "sourceRef": "fixture/file-f.ts", "properties": {} }
+  ],
+  "edges": [
+    { "edgeKey": "e1", "sourceNodeKey": "file:a", "targetNodeKey": "symbol:b", "edgeType": "IMPORTS", "weight": 1.0, "confidence": 1.0, "provenance": "fixture", "properties": {} },
+    { "edgeKey": "e2", "sourceNodeKey": "file:a", "targetNodeKey": "file:c", "edgeType": "REFERENCES", "weight": 0.6, "confidence": 1.0, "provenance": "fixture", "properties": {} },
+    { "edgeKey": "e3", "sourceNodeKey": "file:c", "targetNodeKey": "symbol:b", "edgeType": "CALLS", "weight": 1.4, "confidence": 1.0, "provenance": "fixture", "properties": {} },
+    { "edgeKey": "e4", "sourceNodeKey": "file:c", "targetNodeKey": "packet:d", "edgeType": "MATERIALIZES", "weight": 1.0, "confidence": 1.0, "provenance": "fixture", "properties": {} },
+    { "edgeKey": "e5", "sourceNodeKey": "packet:d", "targetNodeKey": "file:a", "edgeType": "DEPENDS_ON", "weight": 0.8, "confidence": 1.0, "provenance": "fixture", "properties": {} },
+    { "edgeKey": "e6", "sourceNodeKey": "file:e", "targetNodeKey": "file:c", "edgeType": "IMPORTS", "weight": 0.5, "confidence": 1.0, "provenance": "fixture", "properties": {} }
+  ]
+}

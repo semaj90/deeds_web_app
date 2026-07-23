@@ -140,7 +140,9 @@ function inferEmbeddingProvider(baseUrl?: string): 'ollama' | 'llama-server' {
 // for the full diagnosis.
 
 export const ENV = {
-  DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
+	DATABASE_URL: privateEnv.DATABASE_URL ?? privateEnv.POSTGRES_URL ?? DEV.DATABASE_URL,
+	ATLAS_GRAPH_AUTHORITY_V2_ENABLED: privateEnv.ATLAS_GRAPH_AUTHORITY_V2_ENABLED ?? 'false',
+	ATLAS_GRAPH_AUTHORITY_V2_PROMOTION_ENABLED: privateEnv.ATLAS_GRAPH_AUTHORITY_V2_PROMOTION_ENABLED ?? 'false',
   AGENT_TRACE_ENABLED: privateEnv.AGENT_TRACE_ENABLED ?? 'true',
   REDIS_URL: normalizeRedisUrl(privateEnv.REDIS_URL ?? privateEnv.VALKEY_URL ?? DEV.REDIS_URL),
   REDIS_PASSWORD: privateEnv.REDIS_PASSWORD ?? privateEnv.REDIS_PASS ?? privateEnv.VALKEY_PASSWORD ?? privateEnv.VALKEY_PASS ?? 'redis',
