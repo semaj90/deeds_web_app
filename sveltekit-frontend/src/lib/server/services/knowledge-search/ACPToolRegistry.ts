@@ -15,6 +15,12 @@ import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
+import { loadDailyGraphifyBoard } from '$lib/server/atlas/board/daily-graphify-board.js';
+import {
+  buildPhase89WorkflowPlan,
+  recordPhase89WorkflowPlan,
+  Phase89WorkflowRequestSchema,
+} from '$lib/server/atlas/board/phase89-workflow.js';
 import type { ACPTool, ToolResult, ToolPlanStep } from './types.js';
 
 export interface ACPKnowledgeSearchResult {
@@ -697,6 +703,45 @@ const handlers: Record<string, HandlerFn> = {
     } catch (error: any) {
       return fail(error.message ?? String(error), startTime);
     }
+  },
+
+  async phase89BoardWorkflow(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+    const startTime = Date.now();
+    const parsed = Phase89WorkflowRequestSchema.safeParse({
+      ...args,
+      dryRun: options?.dryRun ?? args?.dryRun ?? false,
+    });
+
+    if (!parsed.success) {
+      return fail(parsed.error.issues[0]?.message ?? 'Invalid workflow request', startTime);
+    }
+
+    try {
+      const board = await loadDailyGraphifyBoard();
+      const plan = buildPhase89WorkflowPlan(board, parsed.data);
+
+      if (parsed.data.dryRun || options?.dryRun) {
+        return planResult(plan.steps as ToolPlanStep[], startTime);
+      }
+
+      const queued = await recordPhase89WorkflowPlan(plan);
+
+      return {
+        success: true,
+        kind: 'result',
+        data: {
+          workflowId: queued.workflowId,
+          taskId: plan.taskId,
+          taskLabel: plan.taskLabel,
+          validationRoutes: queued.queuedRoutes,
+          queuedAt: new Date().toISOString(),
+          plan,
+        },
+        duration: Date.now() - startTime,
+      };
+    } catch (error: any) {
+      return fail(error.message ?? String(error), startTime);
+    }
   }
 };
 
@@ -709,6 +754,7 @@ const DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
   'langextract:extract', 'langextract:batch', 'search:hyperrag'
+  , 'phase89:board-workflow'
 ]);
 
 export const TOOLS: Record<string, ACPTool> = {
@@ -1029,6 +1075,28 @@ export const TOOLS: Record<string, ACPTool> = {
       { input: { query: 'context assembler', mode: 'codebase' }, output: {}, description: 'Search codebase for context assembler' }
     ],
     handler: handlers.searchHyperRag
+  },
+  'phase89:board-workflow': {
+    name: 'phase89:board-workflow',
+    description: 'Queue a daily-graphify taskboard workflow and Playwright validation from ACP',
+    category: 'error-analysis',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string', description: 'Task ID from the daily graphify board' },
+        validationRoute: { type: 'string', description: 'Optional Playwright validation route override' },
+        dryRun: { type: 'boolean', default: false }
+      }
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'rank_signals', validationRoute: '/admin/ai-dashboard', dryRun: true },
+        output: { workflowId: 'phase89-board-workflow:rank_signals:...' },
+        description: 'Plan a board-driven workflow and validation'
+      }
+    ],
+    handler: handlers.phase89BoardWorkflow
   }
 };
 

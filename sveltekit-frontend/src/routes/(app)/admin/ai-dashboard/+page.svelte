@@ -3,8 +3,31 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	let workflowBusy = false;
+	let workflowStatus = '';
 
 	const board = () => data.dailyGraphifyBoard;
+
+	async function queueWorkflow(taskId: string) {
+		workflowBusy = true;
+		workflowStatus = '';
+
+		try {
+			const response = await fetch('/api/phase89/workflow', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ taskId, dryRun: false }),
+			});
+			const payload = await response.json().catch(() => null);
+			workflowStatus = response.ok
+				? `Queued ${taskId}${payload?.result?.queuedRoutes?.length ? ` for ${payload.result.queuedRoutes.join(', ')}` : ''}`
+				: payload?.error ?? 'Workflow queue failed';
+		} catch (error) {
+			workflowStatus = error instanceof Error ? error.message : 'Workflow queue failed';
+		} finally {
+			workflowBusy = false;
+		}
+	}
 </script>
 
 <div class="ai-dashboard-hub">
@@ -108,6 +131,19 @@
 										{/each}
 									</div>
 								{/if}
+								{#if task.script}
+									<div class="task-actions">
+										<button
+											class="workflow-button"
+											type="button"
+											on:click={() => queueWorkflow(task.id)}
+											disabled={workflowBusy}
+										>
+											<Icon name="play" class="w-3.5 h-3.5" />
+											Queue validation
+										</button>
+									</div>
+								{/if}
 							</article>
 						{/each}
 					{/if}
@@ -127,6 +163,10 @@
 			<div class="footer-card">
 				<span class="meta-label">Warnings</span>
 				<strong>{board().warnings.length ? board().warnings.join(', ') : 'none'}</strong>
+			</div>
+			<div class="footer-card workflow-card">
+				<span class="meta-label">Workflow</span>
+				<strong>{workflowStatus || 'Board-driven validation queued from task cards'}</strong>
 			</div>
 		</div>
 	</section>
@@ -303,6 +343,30 @@
 		line-height: 1.5;
 	}
 
+	.task-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 0.7rem;
+	}
+
+	.workflow-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		border: 1px solid rgba(96, 165, 250, 0.24);
+		background: rgba(96, 165, 250, 0.08);
+		color: #bfdbfe;
+		border-radius: 10px;
+		padding: 0.5rem 0.75rem;
+		font-size: 0.78rem;
+		cursor: pointer;
+	}
+
+	.workflow-button:disabled {
+		opacity: 0.55;
+		cursor: wait;
+	}
+
 	.chip-row {
 		display: flex;
 		flex-wrap: wrap;
@@ -339,6 +403,10 @@
 		border-radius: 12px;
 		background: rgba(255, 255, 255, 0.02);
 		border: 1px solid rgba(212, 199, 163, 0.08);
+	}
+
+	.workflow-card strong {
+		line-height: 1.4;
 	}
 
 	.hub-card {
