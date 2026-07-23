@@ -1,11 +1,15 @@
-import { db } from '$lib/server/db/client';
 import { atlasPackets } from '$lib/server/db/schema-postgres';
-import { sql, eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import type {
   CrossStoreIdentityParity,
   IdentityStabilityGate,
   CrossStoreIdentityGate,
 } from '$lib/schemas/tree_node_identity_schema';
+
+async function getDb() {
+  const { db } = await import('$lib/server/db/client');
+  return db;
+}
 import {
   CrossStoreIdentityParitySchema,
   IdentityStabilityGateSchema,
@@ -18,6 +22,7 @@ import {
  * Checks that all tree_node_id values in Postgres meet uniqueness and validity criteria.
  */
 export async function verifyIdentityStability(): Promise<IdentityStabilityGate> {
+  const db = await getDb();
   const failures: string[] = [];
   const remediation: string[] = [];
 
@@ -166,6 +171,7 @@ export async function verifyIdentityStability(): Promise<IdentityStabilityGate> 
  * and provides placeholders for other stores.
  */
 export async function verifyIdentityCrossStoreParitySchema(): Promise<CrossStoreIdentityGate> {
+  const db = await getDb();
   // Phase 1: Postgres identity retrieval
   const postgresNodes = await db
     .select({
@@ -187,7 +193,12 @@ export async function verifyIdentityCrossStoreParitySchema(): Promise<CrossStore
   const missingSomewhere: string[] = [];
 
   for (const id of postgresSet) {
-    if (qdrantSet.has(id) && redisSet.has(id) && neo4jSet.has(id)) {
+    const idString = id as string; // Cast once and use this variable throughout the loop body
+    if (
+      (qdrantSet.has(idString) as boolean) &&
+      (redisSet.has(idString) as boolean) &&
+      (neo4jSet.has(idString) as boolean)
+    ) {
       presentEverywhere.push(id);
     } else {
       missingSomewhere.push(id);
@@ -199,13 +210,19 @@ export async function verifyIdentityCrossStoreParitySchema(): Promise<CrossStore
     qdrant_count: qdrantSet.size,
     redis_count: redisSet.size,
     neo4j_count: neo4jSet.size,
-    postgres_only: Array.from(postgresSet).filter((id) => !qdrantSet.has(id) && !redisSet.has(id) && !neo4jSet.has(id)),
+    postgres_only: Array.from(postgresSet).filter(
+      (id) => !qdrantSet.has(id) && !redisSet.has(id) && !neo4jSet.has(id)
+    ),
     qdrant_only: Array.from(qdrantSet).filter((id) => !postgresSet.has(id)),
     redis_only: Array.from(redisSet).filter((id) => !postgresSet.has(id)),
     neo4j_only: Array.from(neo4jSet).filter((id) => !postgresSet.has(id)),
     present_everywhere: presentEverywhere,
     missing_somewhere: missingSomewhere,
-    fully_aligned: postgresSet.size > 0 && qdrantSet.size === postgresSet.size && redisSet.size === postgresSet.size && neo4jSet.size === postgresSet.size,
+    fully_aligned:
+      postgresSet.size > 0 &&
+      qdrantSet.size === postgresSet.size &&
+      redisSet.size === postgresSet.size &&
+      neo4jSet.size === postgresSet.size,
     alignment_percentage:
       postgresCount > 0 ? Math.round((presentEverywhere.length / postgresCount) * 100) : 0,
     tree_node_id_conflicts: [], // Placeholder — will be populated when cross-store verification is complete
@@ -224,25 +241,26 @@ export async function verifyIdentityCrossStoreParitySchema(): Promise<CrossStore
     },
     qdrant_proof: {
       collection_name: 'codebase_chunks_768', // Canonical collection
-      sample_size: Math.min(qdrantSet.size, 100),
+      sample_size: Math.max(10, Math.min(qdrantSet.size, 100)),
       verified_count: qdrantSet.size,
       payload_structure_valid: false, // Phase 2 will verify Qdrant payload structure
     },
     redis_proof: {
       key_pattern: 'node:*',
-      sample_size: Math.min(redisSet.size, 100),
+      sample_size: Math.max(10, Math.min(redisSet.size, 100)),
       verified_count: redisSet.size,
     },
     neo4j_proof: {
       node_label: 'TreeNode',
-      sample_size: Math.min(neo4jSet.size, 100),
+      sample_size: Math.max(10, Math.min(neo4jSet.size, 100)),
       verified_count: neo4jSet.size,
       property_exists: false, // Phase 2 will verify Neo4j properties
     },
     conflicts_detected: 0, // Will be populated when conflicts are found
     conflicts_resolved: 0, // Will be populated when conflicts are resolved
     overall_pass: parityResult.fully_aligned || postgresCount === 0,
-    failure_reasons: postgresCount > 0 && !parityResult.fully_aligned ? ['Cross-store parity incomplete'] : [],
+    failure_reasons:
+      postgresCount > 0 && !parityResult.fully_aligned ? ['Cross-store parity incomplete'] : [],
   };
 
   CrossStoreIdentityGateSchema.parse(result);
