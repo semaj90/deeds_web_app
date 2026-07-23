@@ -160,7 +160,7 @@ export const POST: RequestHandler = async (event) => {
 
 		// Track analytics event (non-blocking)
 		import('$lib/server/queue/dispatch-inline.js').then(({ dispatchOrExecuteInline }) =>
-			dispatchOrExecuteInline('analytics.track', { eventType: 'case_create', payload: { caseId: newCase[0].id, userId: auth.user.id } })
+			dispatchOrExecuteInline('analytics.track', { eventType: 'case_created', payload: { caseId: newCase[0].id, userId: auth.user.id } })
 		).catch(() => {});
 
 		return apiResponses.created({

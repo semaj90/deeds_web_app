@@ -4,7 +4,7 @@
  * based section detection + legal-domain entity extraction. No Python, no GIL.
  *
  * Why this exists:
- *   - The Python service (phase66-langextract on :8095) added 200-300MB RAM,
+ *   - The Python sidecar (miniforge-nlp-sidecar on :8095) added 200-300MB RAM,
  *     a Python toolchain dependency, and GIL-bound single-threaded NER.
  *   - The "langextract-go" candidate at :8090 is aspirational — no Go impl
  *     was ever shipped. Graphify shows fanIn=0 for the entire langextract

@@ -42,19 +42,16 @@ export interface LangExtractOutput {
 }
 
 /**
- * Phase 1: empty LANGEXTRACT_URL = disabled, use TypeScript heuristic directly.
- * Only probe the network when an explicit URL is configured.
- *
- * Legacy localhost fallbacks removed — they caused silent coupling to the
- * phase66-langextract container and blocked normal RAG/evidence/ACP flows
- * when that container was not running.
+ * Phase 1: empty LANGEXTRACT_URL / MINIFORGE_SIDECAR_URL = disabled,
+ * use TypeScript heuristic directly. Only probe the network when an explicit
+ * sidecar URL is configured.
  */
 let cachedBaseUrl: string | null = null;
 
 async function resolveLangExtractBaseUrl(): Promise<string> {
 	if (cachedBaseUrl) return cachedBaseUrl;
 
-	const explicit = ENV.LANGEXTRACT_URL?.trim();
+	const explicit = ENV.LANGEXTRACT_URL?.trim() || ENV.MINIFORGE_SIDECAR_URL?.trim();
   if (!explicit) {
     throw new Error('LANGEXTRACT_URL is not set (disabled)');
   }
@@ -104,7 +101,7 @@ function normalizeOutput(raw: unknown, documentId: string): LangExtractOutput {
  *
  * Phase 1 behaviour:
  *   - LANGEXTRACT_URL empty/unset → heuristic directly, no network call
- *   - LANGEXTRACT_URL set + service healthy → Python/Go service
+ *   - LANGEXTRACT_URL or MINIFORGE_SIDECAR_URL set + service healthy → Python sidecar
  *   - LANGEXTRACT_URL set + service down/error → heuristic fallback
  *   - Service returns 0 sections → heuristic fallback
  */
@@ -122,7 +119,7 @@ export async function extractSectionsFromText(
     return legacy;
   }
   // Phase 1: disabled path — no network call when URL is empty
-  const langextractUrl = ENV.LANGEXTRACT_URL?.trim();
+  const langextractUrl = ENV.LANGEXTRACT_URL?.trim() || ENV.MINIFORGE_SIDECAR_URL?.trim();
   if (!langextractUrl) {
     return {
       ...detectSectionsHeuristic(documentText, documentId),
@@ -144,6 +141,8 @@ export async function extractSectionsFromText(
         prompt,
         extract_metadata: true,
         extract_crimes: documentType === 'case',
+        source_type: 'plain_text',
+        extraction_mode: 'full',
       }),
     });
 

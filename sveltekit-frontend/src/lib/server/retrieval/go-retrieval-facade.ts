@@ -17,31 +17,25 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import {
-  executeUnifiedRetrieval,
-  executeUnifiedRetrievalWithSummarization,
   type RetrievalRequest,
   type RetrievalResult
 } from './unified-orchestrator.js';
 import {
-  executeMultiVectorRetrieval,
-  checkMultiVectorHealth,
   type MultiVectorRequest,
   type MultiVectorResult
 } from './multi-vector-orchestrator.js';
 import {
-  orchestrateCacheLayers,
-  checkCacheLayersHealth,
   type CacheLayers
 } from './cache-layers-orchestrator.js';
-import { recordCacheDecision } from './cache-layers-telemetry.js';
-import { validateCanonicalEnvelope, type CanonicalEnvelope } from '$lib/server/topology/canonical-id-hierarchy.js';
-import { createPermissionManager, type PermissionManager } from '$lib/server/topology/permission-manager.js';
-import { integrateDispatcher } from '$lib/server/dispatch/dispatcher-integration.js';
+import type { CanonicalEnvelope } from '$lib/server/topology/canonical-id-hierarchy.js';
 import { RETRIEVAL_LIMITS, type SearchMetadataFilter } from './search-contract.js';
-import type { SearchFilter } from './types.js';
+import type { SearchFilter, SearchLane } from './types.js';
+import type { SearchTier } from './search-contract.js';
 
 export interface GoRetrievalFacadeRequest {
   query: string;
+  lanes?: SearchLane[];
+  search_kinds?: SearchLane[];
   limit?: number;
   topK?: number;
   top_k?: number;
@@ -76,6 +70,7 @@ export interface GoRetrievalFacadeRequest {
   summary_temperature?: number;
   caseId?: string;
   case_id?: string;
+  retrievalTier?: SearchTier;
 }
 
 export interface GoRetrievalFacadeResponse {
@@ -151,6 +146,8 @@ function normalizeRequest(req: GoRetrievalFacadeRequest): RetrievalRequest & { f
         language: req.filters.languages?.[0] ?? undefined,
         file_extension: req.filters.extensions?.[0] ?? undefined,
         domain_class: req.filters.domainIds?.[0] ?? undefined,
+        artifact_tier: req.filters.artifactTier ?? undefined,
+        artifact_tiers: req.filters.artifactTiers,
         source_ref: req.filters.sourceRefs?.[0] ?? undefined,
         source_ref_pattern: req.filters.pathPrefixes?.[0] ?? undefined,
         directory_path: req.filters.pathPrefixes?.[0] ?? undefined,
@@ -171,12 +168,15 @@ function normalizeRequest(req: GoRetrievalFacadeRequest): RetrievalRequest & { f
       }
     : undefined;
 
+  // Lane selection lives on the request, never inside filters.
+  const laneSelection = req.lanes ?? req.search_kinds;
+
   const searchFilter: SearchFilter | undefined = req.filters
     ? {
         keywords: req.exactKeywords ?? [],
         keyword_variants: req.expandedKeywords ?? [],
-        search_kinds: req.lanes,
-        metadata: filterMetadata,
+        // Flatten legacy filterMetadata fields directly (no sub-object).
+        ...(filterMetadata ?? {}),
         include_packet_keys: req.cursor ? [] : undefined,
         per_lane_limit: limit
       }
@@ -185,8 +185,10 @@ function normalizeRequest(req: GoRetrievalFacadeRequest): RetrievalRequest & { f
   return {
     query: req.query,
     limit,
+    lanes: laneSelection,
     useRRF: req.useRRF ?? req.use_rrf ?? true,
     useLexical: req.useLexical ?? req.use_lexical ?? false,
+    retrievalTier: req.retrievalTier,
     filters: searchFilter
   };
 }
@@ -263,6 +265,11 @@ async function executeGoRetrievalSearchMultiVector(
   };
 
   try {
+    const {
+      executeMultiVectorRetrieval,
+    } = await import('./multi-vector-orchestrator.js');
+    const { validateCanonicalEnvelope } = await import('$lib/server/topology/canonical-id-hierarchy.js');
+    const { integrateDispatcher } = await import('$lib/server/dispatch/dispatcher-integration.js');
     const topK = Math.min(
       request.topKPerLane ?? request.topK ?? request.top_k ?? request.finalTopK ?? request.pageSize ?? RETRIEVAL_LIMITS.defaultFinalResults,
       RETRIEVAL_LIMITS.maxTopKPerLane
@@ -449,6 +456,14 @@ export async function executeGoRetrievalSearch(
   };
 
   try {
+    const {
+      executeUnifiedRetrieval,
+      executeUnifiedRetrievalWithSummarization,
+    } = await import('./unified-orchestrator.js');
+    const { orchestrateCacheLayers } = await import('./cache-layers-orchestrator.js');
+    const { recordCacheDecision } = await import('./cache-layers-telemetry.js');
+    const { validateCanonicalEnvelope } = await import('$lib/server/topology/canonical-id-hierarchy.js');
+    const { integrateDispatcher } = await import('$lib/server/dispatch/dispatcher-integration.js');
     // ── Route based on multi-vector flag ──────────────────────────────────────
     if (useMultiVector) {
       // For multi-vector, we need to embed the query first
@@ -675,6 +690,8 @@ export async function checkGoRetrievalHealth(): Promise<{
 }> {
   const services: Record<string, boolean> = {};
   const details: Record<string, string> = {};
+  const { checkMultiVectorHealth } = await import('./multi-vector-orchestrator.js');
+  const { checkCacheLayersHealth } = await import('./cache-layers-orchestrator.js');
 
   // Check Ollama (embedding)
   try {

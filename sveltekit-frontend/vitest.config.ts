@@ -266,6 +266,7 @@ export default defineConfig({
       'tests/hyperrag-contract-smoke.spec.ts',
       // P1: ONNX embedding fallback integration (Session 138+)
       'tests/embedding-onnx-integration.spec.ts',
+      'tests/embedding-backend-resolution.spec.ts',
       // Atlas retrieval adapter skeleton + ranking interface smoke tests
       'tests/atlas-skeleton-smoke.spec.ts',
       'tests/atlas-retrieval-leaf-adapters.spec.ts',
@@ -284,6 +285,8 @@ export default defineConfig({
     ],
     exclude: [
       'node_modules/**',
+      '.claude/**',
+      '**/.claude/**',
       // Phase 99 corrupted — pervasive syntax errors throughout 684-line file
       'src/lib/components/agentic/__tests__/AgentChat.test.ts',
     ],

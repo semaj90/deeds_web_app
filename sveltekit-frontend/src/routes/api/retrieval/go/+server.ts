@@ -28,6 +28,17 @@ import {
 } from '$lib/server/retrieval/search-contract.js';
 
 const GoRetrievalRequestSchema = RetrievalSearchRequestSchema.extend({
+  search_kinds: z.array(z.enum([
+    'lexical',
+    'dense',
+    'sparse',
+    'topology',
+    'authority',
+    'routing',
+    'documentation',
+    'temporal',
+    'memory'
+  ])).min(1).optional(),
   limit: z.number().int().positive().max(RETRIEVAL_LIMITS.maxFinalResults).optional(),
   topK: z.number().int().positive().max(RETRIEVAL_LIMITS.maxTopKPerLane).optional(),
   top_k: z.number().int().positive().max(RETRIEVAL_LIMITS.maxTopKPerLane).optional(),

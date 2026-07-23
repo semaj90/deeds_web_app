@@ -15,7 +15,7 @@ This directory contains curated knowledge concepts for the deeds-web-app legal A
 ## Directory Structure
 
 - **systems/**: Core architectural systems (HyperRAG, deep research orchestration, packet identity)
-- **pipelines/**: Data flow and orchestration pipelines (content ingestion, retrieval, ranking, synthesis)
+- **pipelines/**: Data flow and orchestration pipelines (content ingestion, web sources, retrieval, ranking, synthesis)
 - **datasets/**: Corpus and data definitions (legal knowledge bases, training labels, references)
 - **tools/**: Agentic tools and integrations (MCP servers, ML sidecars, synthesis models)
 - **runbooks/**: Operational guides and setup procedures

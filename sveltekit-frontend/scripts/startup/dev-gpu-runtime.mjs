@@ -36,6 +36,7 @@ function mergedEnv(extra = {}) {
     EMBED_BACKEND: envFromFiles.EMBED_BACKEND ?? 'onnx',
     EMBED_SERVER_PORT: envFromFiles.EMBED_SERVER_PORT ?? '8081',
     EMBED_MAX_BATCH: envFromFiles.EMBED_MAX_BATCH ?? '64',
+    MINIFORGE_SIDECAR_URL: envFromFiles.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095',
     LOCAL_OPENAI_BASE_URL: envFromFiles.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1',
     LOCAL_OPENAI_API_KEY: envFromFiles.LOCAL_OPENAI_API_KEY ?? 'local',
     LOCAL_GEMMA_MODEL: envFromFiles.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
@@ -101,6 +102,19 @@ async function isLlamaServerRunning(port = 8090) {
       signal: AbortSignal.timeout(2000),
     });
     return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function isMiniforgeNlpRunning(port = 8095) {
+  try {
+    const res = await fetch(`http://127.0.0.1:${port}/health`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => null);
+    return data?.status === 'ok' && data?.model === 'miniforge-nlp-sidecar';
   } catch {
     return false;
   }
@@ -174,10 +188,30 @@ async function main() {
     }
   }
 
+  // Start the NLP sidecar unless already running on :8095
+  const nlpPort = parseInt(process.env.MINIFORGE_SIDECAR_PORT ?? '8095', 10);
+  if (await isMiniforgeNlpRunning(nlpPort)) {
+    console.log(`[dev:gpu] ✅ NLP sidecar already running on :${nlpPort} — skipping launch`);
+  } else {
+    const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-miniforge-nlp-sidecar.ps1');
+    await runChecked('pwsh', [
+      '-NoProfile',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-File',
+      launcherScript,
+      '-Detached',
+      '-Port',
+      String(nlpPort),
+    ], { cwd: REPO_ROOT, env: mergedEnv({ MINIFORGE_SIDECAR_PORT: String(nlpPort) }) });
+    console.log(`[dev:gpu] ✅ NLP sidecar started on :${nlpPort}`);
+  }
+
   console.log('[dev:gpu] --- GPU Runtime Ready ---');
   console.log('[dev:gpu] LLM (synthesis):  http://127.0.0.1:8090/v1');
   console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX)');
   console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
+  console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
 
   // Check graphify readiness (advisory only, non-blocking)
   console.log('[dev:gpu] Checking graphify readiness...');

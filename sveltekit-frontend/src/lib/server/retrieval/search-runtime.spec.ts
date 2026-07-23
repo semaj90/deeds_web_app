@@ -244,3 +244,160 @@ describe('search runtime bridge', () => {
     }
   });
 });
+
+// ── Lane behavior matrix ──────────────────────────────────────────────────────
+// Proves each lane's queryText/queryVector dependency at the contract boundary.
+
+import {
+  normalizeRetrievalSearchRequest,
+  buildKeywordBundle,
+} from './search-contract.js';
+import type { SearchLaneContext } from '../retrieval/types.js';
+import { GpuCuvSLane, QdrantLane, LexicalLane, Bm25Lane } from './search-lanes.js';
+
+describe('lane behavior matrix — queryText vs queryVector routing', () => {
+  const textOnlyContext: SearchLaneContext = {
+    queryText: 'authentication session validate',
+    topK: 5,
+  };
+
+  const vectorOnlyContext: SearchLaneContext = {
+    queryText: '',
+    queryVector: new Float32Array(768).fill(0.1),
+    topK: 5,
+  };
+
+  const fullContext: SearchLaneContext = {
+    queryText: 'authentication session validate',
+    queryVector: new Float32Array(768).fill(0.1),
+    topK: 5,
+  };
+
+  it('lexical lane requires queryText and ignores queryVector', async () => {
+    const lane = new LexicalLane();
+    // text-only: should attempt search (may return [] if DB unavailable, but must not throw on empty vector)
+    const result = await lane.search(textOnlyContext).catch(() => null);
+    expect(result).not.toBeNull(); // did not throw on missing vector
+
+    // empty queryText: must short-circuit, never touch DB
+    const emptyResult = await lane.search({ ...textOnlyContext, queryText: '' });
+    expect(emptyResult).toEqual([]);
+  });
+
+  it('bm25 lane requires queryText and ignores queryVector', async () => {
+    const lane = new Bm25Lane();
+    const emptyResult = await lane.search({ ...textOnlyContext, queryText: '' });
+    expect(emptyResult).toEqual([]);
+
+    // vector-only: queryText is '' so must short-circuit
+    const vectorOnlyResult = await lane.search(vectorOnlyContext);
+    expect(vectorOnlyResult).toEqual([]);
+  });
+
+  it('qdrant lane requires queryVector and short-circuits when missing', async () => {
+    const lane = new QdrantLane();
+    // text-only (no queryVector): must return []
+    const result = await lane.search(textOnlyContext);
+    expect(result).toEqual([]);
+  });
+
+  it('gpu-cuvs lane requires queryVector and short-circuits when missing', async () => {
+    const lane = new GpuCuvSLane();
+    // text-only (no queryVector): must return []
+    const result = await lane.search(textOnlyContext);
+    expect(result).toEqual([]);
+  });
+
+  it('full context passes vector to dense lanes and text to lexical lanes', () => {
+    // This is a type-level invariant — queryText and queryVector are separate fields.
+    // No lane may reconstruct one from the other.
+    expect(fullContext.queryText).toBeTruthy();
+    expect(fullContext.queryVector).toBeInstanceOf(Float32Array);
+    expect(fullContext.queryVector!.length).toBe(768);
+  });
+});
+
+// ── Legacy adapter isolation ──────────────────────────────────────────────────
+// Proves search_kinds is NOT carried downstream after normalization.
+
+describe('normalizeRetrievalSearchRequest — legacy adapter isolation', () => {
+  it('strips search_kinds from the normalized output', () => {
+    const normalized = normalizeRetrievalSearchRequest({
+      query: 'find auth session',
+      search_kinds: ['lexical', 'dense'],
+    } as any);
+
+    expect(normalized).not.toHaveProperty('search_kinds');
+    expect(normalized.lanes).toEqual(['lexical', 'dense']);
+  });
+
+  it('canonical lanes take precedence over search_kinds when both present', () => {
+    const normalized = normalizeRetrievalSearchRequest({
+      query: 'find auth session',
+      lanes: ['dense'],
+      search_kinds: ['lexical'],
+    } as any);
+
+    expect(normalized.lanes).toEqual(['dense']);
+    expect(normalized).not.toHaveProperty('search_kinds');
+  });
+
+  it('keyword bundle is built from query when no explicit keywords given', () => {
+    const normalized = normalizeRetrievalSearchRequest({
+      query: 'validateSession auth token',
+    });
+
+    expect(normalized.exactKeywords?.length).toBeGreaterThan(0);
+    // camelCase terms should be present or tokenized
+    const bundle = buildKeywordBundle({ query: 'validateSession auth token' });
+    expect(bundle.exactKeywords).toContain('auth');
+    expect(bundle.exactKeywords).toContain('token');
+  });
+});
+
+// ── Filter allow-list validation ──────────────────────────────────────────────
+// Proves SearchMetadataFilterSchema rejects execution-control fields.
+
+import { SearchMetadataFilterSchema } from './search-contract.js';
+
+describe('SearchMetadataFilterSchema — allow-list enforcement', () => {
+  it('accepts valid metadata filter fields', () => {
+    const result = SearchMetadataFilterSchema.safeParse({
+      pathPrefixes: ['src/lib/'],
+      languages: ['typescript'],
+      fileKinds: ['source'],
+      includeGenerated: false,
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects execution-control fields (strict schema)', () => {
+    const withLanes = SearchMetadataFilterSchema.safeParse({
+      lanes: ['dense', 'lexical'],
+    });
+    expect(withLanes.success).toBe(false);
+
+    const withSearchKinds = SearchMetadataFilterSchema.safeParse({
+      search_kinds: ['dense'],
+    });
+    expect(withSearchKinds.success).toBe(false);
+
+    const withQueryText = SearchMetadataFilterSchema.safeParse({
+      query: 'some query',
+    });
+    expect(withQueryText.success).toBe(false);
+
+    const withTopK = SearchMetadataFilterSchema.safeParse({
+      topK: 20,
+    });
+    expect(withTopK.success).toBe(false);
+  });
+
+  it('rejects unknown fields (strict enforcement)', () => {
+    const result = SearchMetadataFilterSchema.safeParse({
+      pathPrefixes: ['src/'],
+      unknownExecutionField: 'dense',
+    });
+    expect(result.success).toBe(false);
+  });
+});

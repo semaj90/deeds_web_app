@@ -44,13 +44,19 @@ export interface EmbeddingServiceConfig {
   /** Ollama embed model (default: embeddinggemma:latest) */
   embed_model?: string;
 
+  /** Optional explicit model for the 768-dim source lane. */
+  embed_model_768?: string;
+
+  /** Optional explicit model for the 384-dim retrieval lane. */
+  embed_model_384?: string;
+
   /** Ollama API URL (default: http://127.0.0.1:11434) */
   ollama_url?: string;
 
   /** Bifrost semantic cache URL (default: http://127.0.0.1:3040/v1) */
   bifrost_url?: string;
 
-  /** Target embedding dimension (default: 768) */
+  /** Target embedding dimension (default: 384 — canonical retrieval projection) */
   target_dim?: number;
 
   /** Enable L1 Redis cache */
@@ -68,8 +74,11 @@ export interface EmbeddingServiceConfig {
 
 const DEFAULT_CONFIG: Required<EmbeddingServiceConfig> = {
   embed_model: 'embeddinggemma:latest',
+  embed_model_768: 'embeddinggemma:latest',
+  embed_model_384: process.env.ATLAS_EMBED_MODEL_384 ?? '',
   ollama_url: 'http://127.0.0.1:11434',
   bifrost_url: 'http://127.0.0.1:3040/v1',
+  // Legacy default remains 768; lane-aware callers should use embedQueryForLane().
   target_dim: 768,
   enable_l1_cache: true,
   enable_l2_cache: true,
@@ -181,6 +190,37 @@ export async function embedQuery(
   return { ...result, cached: false, exec_ms: elapsed };
 }
 
+export type QueryEmbeddingLane = 'dense_384' | 'dense_768' | 'latent_64';
+
+export interface QueryVectorBundle {
+  dense384: EmbeddingResult | null;
+  dense768: EmbeddingResult | null;
+  latent64?: EmbeddingResult | null;
+}
+
+export async function embedQueryForLane(
+  query: string,
+  lane: QueryEmbeddingLane
+): Promise<EmbeddingResult> {
+  const start = performance.now();
+
+  if (lane === 'dense_768') {
+    const model = config.embed_model_768 || config.embed_model;
+    return embedViaOllama(query, 768, model, start);
+  }
+
+  if (lane === 'dense_384') {
+    if (!config.embed_model_384) {
+      throw new Error(
+        'dense_384 lane requires ATLAS_EMBED_MODEL_384 or embed_model_384; refusing to derive 384 dims by slicing a 768-dim vector.'
+      );
+    }
+    return embedViaOllama(query, 384, config.embed_model_384, start);
+  }
+
+  throw new Error(`Unsupported embedding lane: ${lane}`);
+}
+
 /**
  * Truncate or pad embedding to target dimension
  */
@@ -256,14 +296,19 @@ async function getL2Cache(query: string, dim: number): Promise<EmbeddingResult |
 /**
  * Embed via Ollama (primary path)
  */
-async function embedViaOllama(query: string, dim: number): Promise<EmbeddingResult> {
+async function embedViaOllama(
+  query: string,
+  dim: number,
+  modelOverride = config.embed_model,
+  startTime = performance.now()
+): Promise<EmbeddingResult> {
   const url = `${config.ollama_url}/api/embeddings`;
 
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: config.embed_model,
+      model: modelOverride,
       prompt: query,
     }),
     timeout: config.timeout_ms,
@@ -284,10 +329,10 @@ async function embedViaOllama(query: string, dim: number): Promise<EmbeddingResu
 
   return {
     vector: vec,
-    model: config.embed_model,
+    model: modelOverride,
     dimension: vec.length,
     cached: false,
-    exec_ms: 0, // Measured by caller
+    exec_ms: performance.now() - startTime,
   };
 }
 

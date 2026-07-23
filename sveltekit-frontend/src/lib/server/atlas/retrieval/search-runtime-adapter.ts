@@ -1,6 +1,6 @@
 import { SearchRuntime, type SearchQuery, type SearchResult } from '$lib/server/retrieval/search-runtime.js';
 import { graphRetrieve, type GraphCandidate } from './graph-retriever.js';
-import { SearchMetadataFilterSchema } from '$lib/server/retrieval/search-contract.js';
+import { RETRIEVAL_LIMITS, SearchMetadataFilterSchema } from '$lib/server/retrieval/search-contract.js';
 
 export interface AtlasSearchRequest {
   query: string;
@@ -28,7 +28,7 @@ export function createAtlasSearchAdapter(config?: { userId?: string; caseId?: st
     async search(req: AtlasSearchRequest): Promise<AtlasSearchResponse> {
       const query: SearchQuery = {
         text: req.query,
-        topK: req.topK ?? 20,
+        topK: req.topK ?? RETRIEVAL_LIMITS.defaultTopKPerLane,
         userId: req.userId ?? config?.userId,
         caseId: req.caseId ?? config?.caseId,
         filters: SearchMetadataFilterSchema.parse(req.filters ?? {}),

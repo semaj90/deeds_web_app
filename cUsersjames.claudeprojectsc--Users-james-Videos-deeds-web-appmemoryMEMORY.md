@@ -12,3 +12,6 @@
 - `:11434` = Ollama embeddings (separate, immutable)
 - No local docling model artifact; no local embeddinggemma ONNX artifact
 - This repo = contracts + Atlas scripts only (not app checkout with opencode.json)
+
+- [Retrieval Pipeline 20-Step Plan](RETRIEVAL-PIPELINE-20STEP-PLAN.md) — Complete roadmap for aggressive Bitfrost cache, vector indexing, clustering, ACE integration (14h critical path, 3 phases parallel)
+- [Retrieval 20-Step TODO Tracker](.claude/RETRIEVAL-20-STEP-TODO.md) — Checklist for Steps 1-18 implementation with validation gates

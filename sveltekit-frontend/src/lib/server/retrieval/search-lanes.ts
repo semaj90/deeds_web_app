@@ -9,10 +9,20 @@
  *   min_confidence / min_score / exclude_feature_ids / include_packet_keys are post-fetch gates.
  */
 
-import type { SearchResult, SearchLaneConfig, SearchFilter } from './types.js';
+import type {
+  SearchResult,
+  SearchLaneConfig,
+  SearchFilter,
+  SearchLaneContext
+} from './types.js';
 import { RETRIEVAL_LIMITS } from './search-contract.js';
+import { VECTOR_LANES } from '../vector/lane-registry.js';
 import { sql, type SQL } from 'drizzle-orm';
-import { db } from '$lib/server/db/client.js';
+
+async function getDb() {
+  const mod = await import('$lib/server/db/client.js');
+  return mod.db;
+}
 
 // ── LIKE wildcard escaping ────────────────────────────────────────────────────
 
@@ -39,13 +49,11 @@ function buildQdrantFilter(filters?: SearchFilter): Record<string, unknown> | un
   if (filters.som_row !== undefined) must.push({ key: 'som_row', match: { value: filters.som_row } });
   if (filters.som_col !== undefined) must.push({ key: 'som_col', match: { value: filters.som_col } });
   if (filters.packet_type) must.push({ key: 'packet_type', match: { value: filters.packet_type } });
-
-  // Additional metadata sub-object fields (Qdrant payload only — not in SQL tables)
-  const meta = filters.metadata ?? {};
-  if (meta.language) must.push({ key: 'language', match: { value: meta.language } });
-  if (meta.file_extension) must.push({ key: 'file_extension', match: { value: meta.file_extension } });
-  if (meta.domain_class) must.push({ key: 'domain_class', match: { value: meta.domain_class } });
-  if (meta.jsonb_contains) must.push({ key: 'metadata', match: { value: meta.jsonb_contains } });
+  // Qdrant-payload-only fields (not in SQL tables)
+  if (filters.language) must.push({ key: 'language', match: { value: filters.language } });
+  if (filters.file_extension) must.push({ key: 'file_extension', match: { value: filters.file_extension } });
+  if (filters.domain_class) must.push({ key: 'domain_class', match: { value: filters.domain_class } });
+  if (filters.jsonb_contains) must.push({ key: 'metadata', match: { value: filters.jsonb_contains } });
 
   return must.length > 0 ? { must } : undefined;
 }
@@ -86,7 +94,6 @@ function buildPacketConditions(filters?: SearchFilter): SQL | undefined {
   if (filters.packet_type) {
     frags.push(sql`ap.packet_type = ${filters.packet_type}`);
   }
-
   if (frags.length === 0) return undefined;
   return frags.reduce((acc, frag) => sql`${acc} AND ${frag}`);
 }
@@ -109,9 +116,31 @@ function buildChunkConditions(filters?: SearchFilter): SQL | undefined {
   if (filters.feature_ids?.length) {
     frags.push(sql`c.feature_id = ANY(${filters.feature_ids}::text[])`);
   }
-
   if (frags.length === 0) return undefined;
   return frags.reduce((acc, frag) => sql`${acc} AND ${frag}`);
+}
+
+function getQueryVectorForLane(
+  context: SearchLaneContext,
+  lane: 'gpu-cuvs' | 'qdrant' | 'qdrant-768' | 'qdrant-384'
+): Float32Array | undefined {
+  if (lane === 'qdrant-384') {
+    return context.queryVectorBundle?.dense384?.vector
+      ?? context.queryVectorBundle?.dense384
+      ?? undefined;
+  }
+
+  if (lane === 'qdrant' || lane === 'qdrant-768') {
+    return context.queryVectorBundle?.dense768?.vector
+      ?? context.queryVectorBundle?.dense768
+      ?? context.queryVector
+      ?? undefined;
+  }
+
+  return context.queryVectorBundle?.latent64?.vector
+    ?? context.queryVectorBundle?.latent64
+    ?? context.queryVector
+    ?? undefined;
 }
 
 // ── Interface ────────────────────────────────────────────────────────────────
@@ -119,7 +148,7 @@ function buildChunkConditions(filters?: SearchFilter): SQL | undefined {
 export interface ISearchLane {
   name: string;
   health(): Promise<boolean>;
-  search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]>;
+  search(context: SearchLaneContext): Promise<SearchResult[]>;
   config(): SearchLaneConfig;
 }
 
@@ -128,7 +157,7 @@ export interface ISearchLane {
 export abstract class SearchLaneBase implements ISearchLane {
   abstract name: string;
   abstract health(): Promise<boolean>;
-  abstract search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]>;
+  abstract search(context: SearchLaneContext): Promise<SearchResult[]>;
   abstract config(): SearchLaneConfig;
 
   /** Post-fetch gates only — min_confidence, min_score, exclusions */
@@ -173,19 +202,21 @@ export class GpuCuvSLane extends SearchLaneBase {
     } catch { return false; }
   }
 
-  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+  async search(context: SearchLaneContext): Promise<SearchResult[]> {
     if (!(await this.health())) throw new Error('GPU cuVS service unavailable');
+    const queryVector = getQueryVectorForLane(context, 'gpu-cuvs');
+    if (!queryVector || queryVector.length === 0) return [];
 
     // Build cluster pre-mask if kmeans_cluster_ids filter present
     const body: Record<string, unknown> = {
-      query: query instanceof Float32Array ? Array.from(query) : query,
-      k: filters?.per_lane_limit ?? k,
+      query: Array.from(queryVector),
+      k: context.topK,
     };
-    if (filters?.kmeans_cluster_ids?.length) {
-      body.cluster_filter = filters.kmeans_cluster_ids;
+    if (context.filters?.kmeans_cluster_ids?.length) {
+      body.cluster_filter = context.filters.kmeans_cluster_ids;
     }
-    if (filters?.source_ref) body.source_ref_filter = filters.source_ref;
-    if (filters?.feature_ids?.length) body.feature_id_filter = filters.feature_ids;
+    if (context.filters?.source_ref) body.source_ref_filter = context.filters.source_ref;
+    if (context.filters?.feature_ids?.length) body.feature_id_filter = context.filters.feature_ids;
 
     const ac = new AbortController();
     const t = setTimeout(() => ac.abort(), this.timeout);
@@ -222,7 +253,7 @@ export class GpuCuvSLane extends SearchLaneBase {
       },
     }));
 
-    return this.applyPostFetchFilters(results, filters);
+    return this.applyPostFetchFilters(results, context.filters);
   }
 
   config(): SearchLaneConfig {
@@ -244,16 +275,19 @@ export class QdrantLane extends SearchLaneBase {
 
   private url: string;
   private collection: string;
+  private embeddingDimension: number;
   private timeout: number;
 
   constructor(
     url = 'http://127.0.0.1:6333',
-    collection = 'codebase_chunks_768',
+    collection = VECTOR_LANES.source768.collection,
+    embeddingDimension = VECTOR_LANES.source768.dimension,
     timeout = 30000
   ) {
     super();
     this.url = url;
     this.collection = collection;
+    this.embeddingDimension = embeddingDimension;
     this.timeout = timeout;
   }
 
@@ -267,15 +301,17 @@ export class QdrantLane extends SearchLaneBase {
     } catch { return false; }
   }
 
-  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
+  async search(context: SearchLaneContext): Promise<SearchResult[]> {
     if (!(await this.health())) throw new Error('Qdrant service unavailable');
+    const queryVector = getQueryVectorForLane(context, 'qdrant');
+    if (!queryVector || queryVector.length === 0) return [];
 
     // Build Qdrant filter from pushdown fields
-    const qdrantFilter = buildQdrantFilter(filters);
-    const limit = filters?.per_lane_limit ?? k;
+    const qdrantFilter = buildQdrantFilter(context.filters);
+    const limit = context.topK;
 
     const body: Record<string, unknown> = {
-      vector: query instanceof Float32Array ? Array.from(query) : query,
+      vector: Array.from(queryVector),
       limit,
       with_payload: true,
     };
@@ -302,7 +338,8 @@ export class QdrantLane extends SearchLaneBase {
       rank: i,
       score: Math.min(1, Math.max(0, point.score)),
       confidence: 0.85,
-      source: 'qdrant' as const,
+      source: this.name as SearchResult['source'],
+      lane_id: `${this.collection}:content`,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
@@ -311,15 +348,143 @@ export class QdrantLane extends SearchLaneBase {
       metadata: {
         qdrant_point_id: point.id,
         qdrant_collection: this.collection,
+        embedding_dim: this.embeddingDimension,
         payload: point.payload,
       },
     }));
 
-    return this.applyPostFetchFilters(results, filters);
+    return this.applyPostFetchFilters(results, context.filters);
   }
 
   config(): SearchLaneConfig {
     return { enabled: true, priority: 1, weight: 0.35, fallback: 'bm25' };
+  }
+}
+
+// ── Qdrant 768-dim lane (source semantic lane) ───────────────────────────────
+
+export class QdrantLane768 extends QdrantLane {
+  name = 'qdrant-768' as const;
+
+  constructor(
+    url = 'http://127.0.0.1:6333',
+    collection = VECTOR_LANES.source768.collection,
+    embeddingDimension = VECTOR_LANES.source768.dimension,
+    timeout = 30000
+  ) {
+    super(url, collection, embeddingDimension, timeout);
+  }
+}
+
+// ── Qdrant 384-dim lane (codebase_chunks_384_hybrid — canonical retrieval contract) ──
+
+/**
+ * Dense retrieval lane targeting the 384-dim canonical collection.
+ * Uses named vector "content" which `codebase_chunks_384_hybrid` exposes.
+ * This is the canonical retrieval contract for truncated-aware multi-hop traversal.
+ * Falls back gracefully if the collection has 0 indexed points (TurboVec not yet
+ * retargeted) — returns empty slice rather than throwing.
+ */
+export class QdrantLane384 extends SearchLaneBase {
+  name = 'qdrant-384' as const;
+
+  private url: string;
+  private collection: string;
+  private namedVector: string;
+  private embeddingDimension: number;
+  private timeout: number;
+
+  constructor(
+    url = 'http://127.0.0.1:6333',
+    collection = VECTOR_LANES.retrieval384.collection,
+    namedVector = VECTOR_LANES.retrieval384.vectorName,
+    embeddingDimension = VECTOR_LANES.retrieval384.dimension,
+    timeout = 30000
+  ) {
+    super();
+    this.url = url;
+    this.collection = collection;
+    this.namedVector = namedVector;
+    this.embeddingDimension = embeddingDimension;
+    this.timeout = timeout;
+  }
+
+  async health(): Promise<boolean> {
+    try {
+      const ac = new AbortController();
+      const t = setTimeout(() => ac.abort(), 5000);
+      const res = await fetch(`${this.url}/collections/${this.collection}`, { signal: ac.signal });
+      clearTimeout(t);
+      if (!res.ok) return false;
+      const data = (await res.json()) as { result?: { vectors_count?: number } };
+      // Degrade gracefully when collection is empty (indexed: 0 during TurboVec transition)
+      const count = data.result?.vectors_count ?? 0;
+      return count > 0;
+    } catch { return false; }
+  }
+
+  async search(context: SearchLaneContext): Promise<SearchResult[]> {
+    const healthy = await this.health();
+    if (!healthy) return [];
+    const queryVector = getQueryVectorForLane(context, 'qdrant-384');
+    if (!queryVector || queryVector.length === 0) return [];
+
+    const qdrantFilter = buildQdrantFilter(context.filters);
+    const limit = context.topK;
+
+    // Use named vector syntax for collections with multiple vector configs
+    const body: Record<string, unknown> = {
+      vector: { name: this.namedVector, vector: Array.from(queryVector) },
+      limit,
+      with_payload: true,
+    };
+    if (qdrantFilter) body.filter = qdrantFilter;
+
+    const ac = new AbortController();
+    const t = setTimeout(() => ac.abort(), this.timeout);
+    const res = await fetch(`${this.url}/collections/${this.collection}/points/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: ac.signal,
+    });
+    clearTimeout(t);
+
+    if (!res.ok) {
+      console.warn(`[QdrantLane384] Search returned ${res.status}`);
+      return [];
+    }
+
+    const data = (await res.json()) as {
+      result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
+    };
+
+    const results: SearchResult[] = (data.result ?? []).map((point, i) => ({
+      id: point.id,
+      rank: i,
+      score: Math.min(1, Math.max(0, point.score)),
+      confidence: 0.88,
+      source: 'qdrant-384' as const,
+      lane_id: 'codebase_chunks_384_hybrid:content',
+      packet_key: (point.payload?.packet_key as string | null) ?? null,
+      source_ref: (point.payload?.source_ref as string | null) ?? null,
+      feature_id: (point.payload?.feature_id as string | null) ?? null,
+      file_path: (point.payload?.file_path as string | null) ?? null,
+      summary: (point.payload?.summary as string | null) ?? null,
+      metadata: {
+        qdrant_point_id: point.id,
+        qdrant_collection: this.collection,
+        embedding_dim: this.embeddingDimension,
+        payload: point.payload,
+      },
+    }));
+
+    return this.applyPostFetchFilters(results, context.filters);
+  }
+
+  config(): SearchLaneConfig {
+    // Slightly higher weight than the 768-dim lane — 384-dim is the retrieval contract
+    return { enabled: true, priority: 1, weight: 0.38, fallback: 'bm25' };
   }
 }
 
@@ -335,24 +500,27 @@ export class LexicalLane extends SearchLaneBase {
 
   async health(): Promise<boolean> {
     try {
+      const db = await getDb();
       await db.execute(sql`SELECT 1`);
       return true;
     } catch { return false; }
   }
 
-  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
-    // Float32Array input has no keyword surface — skip this lane
-    const queryStr = typeof query === 'string' ? query : '';
+  async search(context: SearchLaneContext): Promise<SearchResult[]> {
+    const queryStr = (context.keywordBundle?.exactKeywords?.length
+      ? context.keywordBundle.exactKeywords.join(' ')
+      : context.queryText).trim();
     if (!queryStr.trim()) return [];
 
-    const limit = Math.min(filters?.per_lane_limit ?? k, RETRIEVAL_LIMITS.exactLexicalTopK);
+    const limit = Math.min(context.topK, RETRIEVAL_LIMITS.exactLexicalTopK);
 
     // Surface token list for metadata — websearch_to_tsquery handles actual query parsing
     const queryTokens = queryStr.trim().split(/\s+/).filter(t => t.length >= 2).slice(0, 16);
 
-    const condition = buildPacketConditions(filters);
+    const condition = buildPacketConditions(context.filters);
 
     try {
+      const db = await getDb();
       const results = await db.execute(sql`
         SELECT
           ap.packet_key,
@@ -408,7 +576,7 @@ export class LexicalLane extends SearchLaneBase {
         },
       }));
 
-      return this.applyPostFetchFilters(mapped, filters);
+      return this.applyPostFetchFilters(mapped, context.filters);
     } catch (err) {
       console.error('[LexicalLane] Search error:', err instanceof Error ? err.message : '');
       return [];
@@ -427,19 +595,23 @@ export class Bm25Lane extends SearchLaneBase {
 
   async health(): Promise<boolean> {
     try {
+      const db = await getDb();
       await db.execute(sql`SELECT 1`);
       return true;
     } catch { return false; }
   }
 
-  async search(query: Float32Array | string, k: number, filters?: SearchFilter): Promise<SearchResult[]> {
-    const queryStr = typeof query === 'string' ? query : '';
+  async search(context: SearchLaneContext): Promise<SearchResult[]> {
+    const queryStr = (context.keywordBundle?.exactKeywords?.length
+      ? context.keywordBundle.exactKeywords.join(' ')
+      : context.queryText).trim();
     if (!queryStr) return [];
 
-    const limit = filters?.per_lane_limit ?? k;
-    const condition = buildChunkConditions(filters);
+    const limit = context.topK;
+    const condition = buildChunkConditions(context.filters);
 
     try {
+      const db = await getDb();
       const results = await db.execute(sql`
         SELECT
           c.id,
@@ -496,10 +668,16 @@ export class SearchLaneRegistry {
 
   constructor() {
     this.register(new GpuCuvSLane());
+    // 768-dim lane: explicit source semantic lane for adaptive hot/warm/cold routing.
+    this.register(new QdrantLane768());
+    // Backward-compatible alias used by older retrieval call sites.
     this.register(new QdrantLane());
+    // 384-dim lane: truncated-aware canonical retrieval contract, codebase_chunks_384_hybrid
+    this.register(new QdrantLane384());
     this.register(new LexicalLane());
     this.register(new Bm25Lane());
-    this.fallbackChain = ['gpu-cuvs', 'qdrant', 'lexical', 'bm25'];
+    // Fallback chain for single-lane queries — prefers the explicit 768 source lane before legacy alias.
+    this.fallbackChain = ['gpu-cuvs', 'qdrant-384', 'qdrant-768', 'qdrant', 'lexical', 'bm25'];
   }
 
   register(lane: ISearchLane): void {
@@ -523,9 +701,7 @@ export class SearchLaneRegistry {
   }
 
   async searchWithFallback(
-    query: Float32Array | string,
-    k: number,
-    filters?: SearchFilter
+    context: SearchLaneContext
   ): Promise<{ results: SearchResult[]; lane: string }> {
     const chain = this.getFallbackChain();
 
@@ -538,7 +714,7 @@ export class SearchLaneRegistry {
           console.warn(`[SearchLane] ${laneName} unhealthy, trying next`);
           continue;
         }
-        const results = await lane.search(query, k, filters);
+        const results = await lane.search(context);
         return { results, lane: laneName };
       } catch (err) {
         console.warn(`[SearchLane] ${laneName} failed:`, err instanceof Error ? err.message : '');

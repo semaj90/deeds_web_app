@@ -2,7 +2,7 @@
  * server-fastmcp.ts — FastMCP TypeScript codebase intelligence server
  *
  * Tools: topology_search · graph.expand_neighborhood · graph.shortest_path
- *        clusters.get_summary_lenses · trace.kag_search
+ *        clusters.get_summary_lenses · clusters.som_cell_lookup · clusters.kmeans_members · trace.kag_search
  *
  * Run: npx tsx src/mcp/server-fastmcp.ts
  * Or:  npm run mcp:intel
@@ -11,7 +11,7 @@
 import { FastMCP } from 'fastmcp';
 import { topologySearchTool }                              from './tools/topology-search.tool.js';
 import { graphExpandNeighborhoodTool, graphShortestPathTool } from './tools/graph-analysis.tool.js';
-import { clusterSummaryLensesTool }                        from './tools/cluster-lenses.tool.js';
+import { clusterSummaryLensesTool, somCellLookupTool, kmeansClusterMembersTool } from './tools/cluster-lenses.tool.js';
 import { traceKagSearchTool }                              from './tools/trace-kag.tool.js';
 import {
   vaultSearchTool,
@@ -39,6 +39,10 @@ const server = new FastMCP({
 (server.addTool as (t: any) => void)(graphShortestPathTool);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server.addTool as (t: any) => void)(clusterSummaryLensesTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(somCellLookupTool);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(server.addTool as (t: any) => void)(kmeansClusterMembersTool);
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (server.addTool as (t: any) => void)(traceKagSearchTool);
 

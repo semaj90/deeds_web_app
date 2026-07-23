@@ -13,15 +13,43 @@
 
 // ── Collection contracts ──────────────────────────────────────────────────────
 
+const SHARED_INDEXED_PAYLOAD_FIELDS = {
+  packet_key: 'keyword',
+  source_ref: 'keyword',
+  content_hash: 'keyword',
+  language: 'keyword',
+  domain_class: 'keyword',
+  artifact_tier: 'keyword',
+  concepts: 'keyword',
+  som_cluster: 'integer',
+  kmeans_cluster: 'integer',
+  metadata_version: 'integer',
+} as const;
+
+const SHARED_NON_INDEXED_PAYLOAD_FIELDS = [
+  'postgres_id',
+  'content_hash',
+  'contract_version',
+  'metadata_schema',
+  'file_path',
+  'kmeans_model_version',
+  'kmeans_vector_contract',
+  'cluster_margin',
+  'embedding_model',
+  'embedding_dimension',
+  'indexed_at',
+] as const;
+
 export const COLLECTION_CONTRACTS = {
   codebase_chunks_384_hybrid: {
     contractVersion: 'atlas-qdrant-384-hybrid-v1' as const,
     vectors: {
-      content_384: {
+      // Named vector in live collection is "content" (not "content_384") — verified 2026-07-22
+      content: {
         size: 384,
         distance: 'Cosine' as const,
       },
-      summary_384: {
+      summary: {
         size: 384,
         distance: 'Cosine' as const,
       },
@@ -29,7 +57,6 @@ export const COLLECTION_CONTRACTS = {
     sparseVectors: {
       bm42: {},
     },
-    /** Fields that must exist on every valid point. */
     requiredPayloadFields: [
       'packet_key',
       'source_ref',
@@ -43,38 +70,69 @@ export const COLLECTION_CONTRACTS = {
       'embedding_model',
       'embedding_dimension',
     ] as const,
-    /**
-     * Only these fields are indexed in Qdrant.
-     * Routing/filter fields only — never large text or nested objects.
-     */
-    indexedPayloadFields: {
-      packet_key:       'keyword',
-      source_ref:       'keyword',
-      content_hash:     'keyword',
-      language:         'keyword',
-      domain_class:     'keyword',
-      concepts:         'keyword',   // array of strings
-      som_cluster:      'integer',
-      kmeans_cluster:   'integer',
-      metadata_version: 'integer',
-    } as const,
-    /**
-     * Fields present in payload but NOT indexed.
-     * Returned in search results but not filterable.
-     */
-    nonIndexedPayloadFields: [
+    indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
+    nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
+  },
+  codebase_chunks_768: {
+    contractVersion: 'atlas-qdrant-768-source-v1' as const,
+    vectors: {
+      // Named vectors in live collection are "content", "error", "signature" — verified 2026-07-22
+      content: {
+        size: 768,
+        distance: 'Cosine' as const,
+      },
+      signature: {
+        size: 768,
+        distance: 'Cosine' as const,
+      },
+      error: {
+        size: 768,
+        distance: 'Cosine' as const,
+      },
+    },
+    sparseVectors: {
+      bm42: {},
+    },
+    requiredPayloadFields: [
+      'packet_key',
+      'source_ref',
       'postgres_id',
       'content_hash',
       'contract_version',
       'metadata_schema',
+      'metadata_version',
       'file_path',
-      'kmeans_model_version',
-      'kmeans_vector_contract',
-      'cluster_margin',
+      'language',
       'embedding_model',
       'embedding_dimension',
-      'indexed_at',
     ] as const,
+    indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
+    nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
+  },
+  codebase_topology_64: {
+    contractVersion: 'atlas-qdrant-64-routing-v1' as const,
+    vectors: {
+      latent_64: {
+        size: 64,
+        distance: 'Cosine' as const,
+      },
+    },
+    sparseVectors: {},
+    requiredPayloadFields: [
+      'packet_key',
+      'source_ref',
+      'postgres_id',
+      'content_hash',
+      'contract_version',
+      'metadata_schema',
+      'metadata_version',
+      'file_path',
+      'language',
+      'embedding_model',
+      'embedding_dimension',
+    ] as const,
+    indexedPayloadFields: SHARED_INDEXED_PAYLOAD_FIELDS,
+    nonIndexedPayloadFields: SHARED_NON_INDEXED_PAYLOAD_FIELDS,
   },
 } as const;
 
@@ -98,7 +156,7 @@ export interface QdrantChunkPayload {
   content_hash: string;
 
   // Contract version — required, not indexed
-  contract_version:  'atlas-qdrant-384-hybrid-v1';
+  contract_version: string;
   metadata_schema:   'atlas-semantic-metadata-v1';
   metadata_version:  number;
 
@@ -108,6 +166,7 @@ export interface QdrantChunkPayload {
 
   // Routing signals — optional, indexed
   domain_class?:  string;
+  artifact_tier?: 'hot' | 'warm' | 'cold';
   concepts?:      string[];
   som_cluster?:   number;
   kmeans_cluster?: number;
@@ -119,7 +178,7 @@ export interface QdrantChunkPayload {
 
   // Embedding provenance — not indexed
   embedding_model:     string;
-  embedding_dimension: 384;
+  embedding_dimension: 64 | 384 | 768;
   indexed_at:          string; // ISO timestamp
 }
 
@@ -167,19 +226,38 @@ export class PayloadValidationError extends Error {
  * Validates a QdrantChunkPayload against the collection contract.
  * Throws PayloadValidationError on the first missing required field.
  */
-export function validateQdrantPayload(
+export function validateQdrantPayloadForCollection(
+  collection: CollectionName,
   payload: Partial<QdrantChunkPayload>
 ): asserts payload is QdrantChunkPayload {
-  const contract = COLLECTION_CONTRACTS.codebase_chunks_384_hybrid;
+  const contract = COLLECTION_CONTRACTS[collection];
   for (const field of contract.requiredPayloadFields) {
     const val = (payload as Record<string, unknown>)[field];
     if (val === undefined || val === null || val === '') {
       throw new PayloadValidationError(field, `Required field is missing or empty`);
     }
   }
-  if (payload.embedding_dimension !== 384) {
-    throw new PayloadValidationError('embedding_dimension', `Expected 384, got ${payload.embedding_dimension}`);
+  // Infer expected dimension from the size of the "content" named vector
+  const contentVec = ('content' in contract.vectors)
+    ? (contract.vectors as Record<string, { size: number }>)['content']
+    : undefined;
+  const expectedDimension: 64 | 384 | 768 =
+    contentVec?.size === 768 ? 768 :
+    contentVec?.size === 64  ? 64  :
+    384;
+
+  if (payload.embedding_dimension !== expectedDimension) {
+    throw new PayloadValidationError(
+      'embedding_dimension',
+      `Expected ${expectedDimension}, got ${payload.embedding_dimension}`
+    );
   }
+}
+
+export function validateQdrantPayload(
+  payload: Partial<QdrantChunkPayload>
+): asserts payload is QdrantChunkPayload {
+  validateQdrantPayloadForCollection('codebase_chunks_384_hybrid', payload);
 }
 
 // ── Qdrant index creation SQL helper ────────────────────────────────────────────

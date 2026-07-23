@@ -16,9 +16,6 @@
  *   - Risk ranking
  */
 
-import { reankPatternsViaGemma4 } from './gemma4-nlp-reranker.js';
-import { extractEntities } from './entity-extraction.js';
-
 export interface ExtractedFeature {
 	type:
 		| 'ast_function'
@@ -39,6 +36,15 @@ export interface ExtractedFeature {
 	confidence?: number;
 }
 
+async function getMiniforgeNlpClient() {
+	try {
+		const mod = await import('$lib/server/nlp/miniforge-nlp-sidecar.js');
+		return mod.createMiniforgeNlpSidecarClient();
+	} catch {
+		return null;
+	}
+}
+
 export interface RankedFeature extends ExtractedFeature {
 	legalRelevance: number; // 0-1
 	severity: 'low' | 'medium' | 'high';
@@ -51,34 +57,95 @@ export interface RankedFeature extends ExtractedFeature {
  */
 export async function extractAstAndEntities(text: string, isCode: boolean = false): Promise<ExtractedFeature[]> {
 	const features: ExtractedFeature[] = [];
+	const sidecar = await getMiniforgeNlpClient();
 
-	// Path 1: LangExtract entities (works on all text types)
-	try {
-		const entities = await extractEntities(text.slice(0, 50_000));
-		for (const entity of entities) {
-			const typeMapping: Record<string, ExtractedFeature['type']> = {
-				PERSON: 'entity_person',
-				ORG: 'entity_org',
-				LOCATION: 'entity_location',
-				STATUTE: 'entity_statute',
-				CASE: 'entity_case',
-				COURT: 'entity_case',
-			};
+	if (sidecar) {
+		try {
+			const analysis = await sidecar.analyze({
+				text: text.slice(0, 100_000),
+				sourceType: isCode ? 'codebase' : 'plain_text',
+				extractionMode: isCode ? 'full' : 'entities',
+			});
 
-			const mappedType = typeMapping[entity.label];
-			if (mappedType) {
-				features.push({
-					type: mappedType,
-					name: entity.text,
-					description: `${entity.label} entity: "${entity.text}"`,
-					source: 'langextract',
-					rawText: entity.text,
-					confidence: entity.score,
-				});
+			for (const entity of analysis.entities) {
+				const typeMapping: Record<string, ExtractedFeature['type']> = {
+					PERSON: 'entity_person',
+					ORG: 'entity_org',
+					LOCATION: 'entity_location',
+					STATUTE: 'entity_statute',
+					CASE: 'entity_case',
+					CODE_SYMBOL: 'ast_function',
+				};
+				const mappedType = typeMapping[entity.label];
+				if (mappedType) {
+					features.push({
+						type: mappedType,
+						name: entity.text,
+						description: `${entity.label} entity: "${entity.text}"`,
+						source: 'langextract',
+						rawText: entity.text,
+						confidence: entity.confidence,
+					});
+				}
 			}
+
+			for (const feature of analysis.features) {
+				const mappedType = (feature.kind as ExtractedFeature['type']) ?? 'ast_function';
+				if (
+					mappedType === 'ast_function' ||
+					mappedType === 'ast_class' ||
+					mappedType === 'ast_method' ||
+					mappedType === 'ast_arrow' ||
+					mappedType === 'ast_import'
+				) {
+					features.push({
+						type: mappedType,
+						name: feature.name,
+						description: feature.description,
+						source: feature.source === 'ast-grep' ? 'ast-grep' : 'pattern',
+						rawText: feature.rawText,
+						lineNumber: feature.lineNumber,
+						confidence: feature.confidence,
+					});
+				}
+			}
+		} catch (err) {
+			console.warn('[AstLangextractBridge] Miniforge NLP sidecar unavailable:', err);
 		}
-	} catch (err) {
-		console.warn('[AstLangextractBridge] Entity extraction failed:', err);
+	}
+
+	// Path 1: LangExtract entities (preferred for non-code text).
+	// Code paths already get entity coverage from the sidecar, so avoid the
+	// extra unified entity extractor there to keep the bridge responsive.
+	if (!isCode) {
+		try {
+			const { extractEntities } = await import('./entity-extraction.js');
+			const entities = await extractEntities(text.slice(0, 50_000));
+			for (const entity of entities) {
+				const typeMapping: Record<string, ExtractedFeature['type']> = {
+					PERSON: 'entity_person',
+					ORG: 'entity_org',
+					LOCATION: 'entity_location',
+					STATUTE: 'entity_statute',
+					CASE: 'entity_case',
+					COURT: 'entity_case',
+				};
+
+				const mappedType = typeMapping[entity.label];
+				if (mappedType) {
+					features.push({
+						type: mappedType,
+						name: entity.text,
+						description: `${entity.label} entity: "${entity.text}"`,
+						source: 'langextract',
+						rawText: entity.text,
+						confidence: entity.score,
+					});
+				}
+			}
+		} catch (err) {
+			console.warn('[AstLangextractBridge] Entity extraction failed:', err);
+		}
 	}
 
 	// Path 2: AST-Grep features (code only)
@@ -101,7 +168,13 @@ export async function extractAstAndEntities(text: string, isCode: boolean = fals
 		}
 	}
 
-	return features;
+	const deduped = new Map<string, ExtractedFeature>();
+	for (const feature of features) {
+		const key = `${feature.type}:${feature.name}:${feature.lineNumber ?? 0}:${feature.source}`;
+		if (!deduped.has(key)) deduped.set(key, feature);
+	}
+
+	return [...deduped.values()];
 }
 
 /**
@@ -141,6 +214,7 @@ ${featureList}
 Return JSON: {"rankings": [{"name": "...", "legalRelevance": 0.8, "severity": "high", "contextSummary": "..."}]}`;
 
 	try {
+		const { reankPatternsViaGemma4 } = await import('./gemma4-nlp-reranker.js');
 		const ranked = await reankPatternsViaGemma4(
 			features.map((f) => ({
 				type: f.type,
@@ -186,4 +260,12 @@ export async function extractAndRankAstAndEntities(text: string, isCode: boolean
 
 	// Step 2: Rerank via Gemma4 for legal relevance
 	return await reankAstAndEntitiesViaGemma4(features, text);
+}
+
+/**
+ * Backward-compatible alias for callers that expect the older bridge name.
+ * This returns the lightweight extraction pass only; ranking stays explicit.
+ */
+export async function analyzeCodeWithLangExtract(text: string, isCode: boolean = false): Promise<ExtractedFeature[]> {
+	return extractAstAndEntities(text, isCode);
 }

@@ -338,6 +338,15 @@ function runSingletonBootTasks(): void {
         .catch((err) =>
           console.warn('[Boot] Dummy PDF OCR worker failed (non-fatal):', (err as Error).message)
         );
+
+      // Start transactional outbox publisher — polls workflow_outbox and delivers
+      // to RabbitMQ; guarantees Postgres-first ordering for all WorkCommands.
+      import('$lib/server/queue/outbox-boot.js')
+        .then(({ startOutboxPublisherWithRabbit }) => startOutboxPublisherWithRabbit())
+        .then(() => console.log('[Boot] Outbox publisher active'))
+        .catch((err) =>
+          console.warn('[Boot] Outbox publisher failed (non-fatal):', (err as Error).message)
+        );
     })
     .catch((err) => {
       if (isRunnerClosedError(err)) return;

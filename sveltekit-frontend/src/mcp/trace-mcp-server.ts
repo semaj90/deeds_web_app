@@ -5044,6 +5044,133 @@ server.registerTool(
   }
 );
 
+// ── clusters.som_cell_lookup ──────────────────────────────────────────────────
+// Returns atlas_packets in a SOM 20×20 grid cell and its Moore neighborhood.
+// Marks assignments as 'unverified' until a SOM distribution audit passes.
+
+server.registerTool(
+  'clusters.som_cell_lookup',
+  {
+    description:
+      'Look up packets in a 20×20 SOM grid cell and its Moore neighborhood (8 adjacent cells). ' +
+      'Returns packet_key, source_ref, authority scores, and provenance. ' +
+      'NOTE: som_assignment_health is "unverified" until SOM distribution audit completes.',
+    inputSchema: z.object({
+      som_row: z.number().int().min(0).max(19).describe('SOM row index (0–19)'),
+      som_col: z.number().int().min(0).max(19).describe('SOM column index (0–19)'),
+      include_neighbors: z.boolean().default(true).describe('Include Moore neighborhood (8 adjacent cells)'),
+      limit: z.number().int().min(1).max(200).default(50).describe('Max packets to return'),
+    }),
+  },
+  async ({ som_row, som_col, include_neighbors, limit }) => {
+    try {
+      const rowMin = include_neighbors ? Math.max(0, som_row - 1) : som_row;
+      const rowMax = include_neighbors ? Math.min(19, som_row + 1) : som_row;
+      const colMin = include_neighbors ? Math.max(0, som_col - 1) : som_col;
+      const colMax = include_neighbors ? Math.min(19, som_col + 1) : som_col;
+
+      const { rows } = await pool.query<{
+        packet_key: string; source_ref: string; feature_id: string; feature_label: string | null;
+        som_row: number; som_col: number; authority_score: number | null; pagerank_score: number | null;
+      }>(
+        `SELECT packet_key, source_ref, feature_id, feature_label,
+                som_row, som_col, authority_score, pagerank_score
+         FROM atlas_packets
+         WHERE som_row BETWEEN $1 AND $2 AND som_col BETWEEN $3 AND $4
+         ORDER BY COALESCE(authority_score, 0) DESC
+         LIMIT $5`,
+        [rowMin, rowMax, colMin, colMax, limit]
+      );
+
+      const result = {
+        routing_provenance: {
+          source_table: 'atlas_packets',
+          embedding_lane: 'dense_384',
+          cell: { row: som_row, col: som_col },
+          include_neighbors,
+          som_assignment_health: 'unverified', // until SOM distribution audit passes
+        },
+        center_count: rows.filter(r => r.som_row === som_row && r.som_col === som_col).length,
+        neighbor_count: rows.filter(r => r.som_row !== som_row || r.som_col !== som_col).length,
+        total: rows.length,
+        packets: rows.map(r => ({
+          packet_key: r.packet_key,
+          source_ref: r.source_ref,
+          feature_id: r.feature_id,
+          feature_label: r.feature_label,
+          som_row: r.som_row,
+          som_col: r.som_col,
+          authority: r.authority_score != null ? Number(r.authority_score) : null,
+          pagerank: r.pagerank_score != null ? Number(r.pagerank_score) : null,
+          is_center: r.som_row === som_row && r.som_col === som_col,
+        })),
+      };
+
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
+// ── clusters.kmeans_members ───────────────────────────────────────────────────
+// Returns atlas_packets belonging to one or more K-means clusters (0–19).
+
+server.registerTool(
+  'clusters.kmeans_members',
+  {
+    description:
+      'List packets belonging to K-means clusters (0–19, from atlas_packets.som_cluster). ' +
+      'Returns source refs, authority scores, and SOM grid positions.',
+    inputSchema: z.object({
+      cluster_ids: z.array(z.number().int().min(0).max(99)).min(1).max(5).describe('K-means cluster IDs (from atlas_packets.som_cluster_id)'),
+      limit: z.number().int().min(1).max(200).default(50).describe('Max packets per cluster'),
+      min_authority: z.number().min(0).max(1).default(0).describe('Minimum authority_score filter'),
+    }),
+  },
+  async ({ cluster_ids, limit, min_authority }) => {
+    try {
+      const results = await Promise.all(
+        cluster_ids.map(async (clusterId) => {
+          const { rows } = await pool.query<{
+            packet_key: string; source_ref: string; feature_id: string; feature_label: string | null;
+            som_row: number | null; som_col: number | null;
+            authority_score: number | null; pagerank_score: number | null; total_count: string;
+          }>(
+            `SELECT packet_key, source_ref, feature_id, feature_label,
+                    som_row, som_col, authority_score, pagerank_score,
+                    COUNT(*) OVER() AS total_count
+             FROM atlas_packets
+             WHERE som_cluster_id = $1 AND COALESCE(authority_score, 0) >= $2
+             ORDER BY COALESCE(authority_score, 0) DESC
+             LIMIT $3`,
+            [clusterId, min_authority, limit]
+          );
+          return {
+            cluster_id: clusterId,
+            total_in_cluster: rows.length > 0 ? parseInt(rows[0].total_count, 10) : 0,
+            returned: rows.length,
+            packets: rows.map(r => ({
+              packet_key: r.packet_key,
+              source_ref: r.source_ref,
+              feature_id: r.feature_id,
+              feature_label: r.feature_label,
+              som_row: r.som_row,
+              som_col: r.som_col,
+              authority: r.authority_score != null ? Number(r.authority_score) : null,
+              pagerank: r.pagerank_score != null ? Number(r.pagerank_score) : null,
+            })),
+          };
+        })
+      );
+
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ clusters: results }) }] };
+    } catch (err) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify({ ok: false, error: String(err) }) }] };
+    }
+  }
+);
+
 // ── trace.validate_ace_hit ────────────────────────────────────────────────────
 // Validates whether a retrieved chunk is a true ACE hit by checking the
 // cache key contract, Qdrant payload freshness, and rerank breakdown presence.

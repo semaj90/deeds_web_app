@@ -1,68 +1,147 @@
 #!/usr/bin/env node
 
-// Simple Redis L1 + Bifrost L2 Cache Test
+// Direct llama-server smoke test — hits :8090 with gemma4-legal-iq4xs-direct.gguf
 // Usage: node scripts/tests/test-cache-simple.mjs
+//
+// Requirements: llama-server running at :8090 with the canonical Gemma4 GGUF.
+// Do NOT route through Ollama or the SvelteKit dev server.
 
-console.log('\n=== Redis L1 + Bifrost L2 Cache Test ===\n');
+const LLAMA_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
+const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 
-async function testCache() {
-  const query = 'What is hearsay evidence in California criminal law?';
-  
-  console.log('Query:', query);
-  console.log('\nRun 1 (Cold - expect ~30s with gemma4-rotorquant:latest)...');
-  let start = Date.now();
-  
-  const run1 = await fetch('http://localhost:5173/api/test/cache-demo', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ query, runs: 1 })
-  }).then(r => r.json());
-  
-  console.log(`✓ ${Date.now() - start}ms`);
-  
-  console.log('\nRun 2 (Warm - expect <10s if Bifrost L2 hit)...');
-  start = Date.now();
-  
-  const run2 = await fetch('http://localhost:5173/api/test/cache-demo', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ query, runs: 1 })
-  }).then(r => r.json());
-  
-  console.log(`✓ ${Date.now() - start}ms`);
-  
-  console.log('\nRun 3 (Hot - expect <100ms if Redis L1 hit)...');
-  start = Date.now();
-  
-  const run3 = await fetch('http://localhost:5173/api/test/cache-demo', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ query, runs: 1 })
-  }).then(r => r.json());
-  
-  const elapsed3 = Date.now() - start;
-  console.log(`✓ ${elapsed3}ms`);
-  
-  console.log('\n=== Results ===');
+// SSE streaming helper — assembles content deltas per CLAUDE.md Gemma4 rules.
+async function streamChat(messages, { maxTokens = 512, temperature = 0.3 } = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 90_000);
 
-  // Check for errors
-  if (run1.error || run2.error || run3.error) {
-    console.error('❌ Test failed - one or more requests returned errors:');
-    if (run1.error) console.error(`  Run 1: ${run1.error}`);
-    if (run2.error) console.error(`  Run 2: ${run2.error}`);
-    if (run3.error) console.error(`  Run 3: ${run3.error}`);
-    console.error('\n💡 Likely cause: Dev server needs restart to pick up cache-demo endpoint changes');
-    console.error('   Fix: Ctrl+C then run `npm run dev` in sveltekit-frontend/');
-    return;
+  const res = await fetch(`${LLAMA_URL}/v1/chat/completions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    signal: controller.signal,
+    body: JSON.stringify({
+      model: MODEL,
+      messages,
+      max_tokens: maxTokens,
+      temperature,
+      stream: true,
+    }),
+  });
+
+  if (!res.ok) {
+    clearTimeout(timer);
+    const body = await res.text().catch(() => '');
+    throw new Error(`llama-server ${res.status}: ${body.slice(0, 200)}`);
   }
 
-  console.log(`Run 1: ${run1.results[0].latencyMs}ms (${run1.results[0].expectedTier})`);
-  console.log(`Run 2: ${run2.results[0].latencyMs}ms (${run2.results[0].expectedTier})`);
-  console.log(`Run 3: ${run3.results[0].latencyMs}ms (${run3.results[0].expectedTier})`);
+  let assembled = '';
+  const decoder = new TextDecoder();
+  let buf = '';
 
-  const speedup = Math.round(run1.results[0].latencyMs / run3.results[0].latencyMs);
-  console.log(`\n🚀 Speedup: ${speedup}× (cold → hot)`);
-  console.log(`\nCache Stats: ${run3.cacheStats.after.totalKeys} keys, ${run3.cacheStats.after.memoryMB}MB`);
+  try {
+    for await (const chunk of res.body) {
+      buf += decoder.decode(chunk, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() ?? '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data:')) continue;
+        const payload = trimmed.slice(5).trim();
+        if (payload === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(payload);
+          assembled += parsed.choices?.[0]?.delta?.content ?? '';
+        } catch {
+          // skip malformed SSE line
+        }
+      }
+    }
+  } finally {
+    clearTimeout(timer);
+  }
+
+  return assembled.trim();
 }
 
-testCache().catch(console.error);
+function pass(label) { console.log(`  ✅ ${label}`); }
+function fail(label, detail) { console.error(`  ❌ ${label}${detail ? `: ${detail}` : ''}`); }
+
+let passed = 0;
+let failed = 0;
+
+async function step(label, fn) {
+  try {
+    await fn();
+    pass(label);
+    passed++;
+  } catch (err) {
+    fail(label, err?.message ?? String(err));
+    failed++;
+  }
+}
+
+console.log(`\n=== llama-server Gemma4 Smoke Test ===`);
+console.log(`Target: ${LLAMA_URL}  Model: ${MODEL}\n`);
+
+// Step 0 — server health + system role support
+await step('GET /props — server alive + supports_system_role', async () => {
+  const res = await fetch(`${LLAMA_URL}/props`, { signal: AbortSignal.timeout(10_000) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const props = await res.json();
+  if (!props.supports_system_role) {
+    throw new Error(
+      'supports_system_role=false — restart with --chat-template-file configs/templates/gemma4-opencode.jinja'
+    );
+  }
+});
+
+// Step 1 — model list confirms the GGUF is loaded
+await step('GET /v1/models — canonical GGUF loaded', async () => {
+  const res = await fetch(`${LLAMA_URL}/v1/models`, { signal: AbortSignal.timeout(10_000) });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const { data } = await res.json();
+  const ids = (data ?? []).map((m) => m.id);
+  if (!ids.includes(MODEL)) {
+    throw new Error(`Model not found. Available: ${ids.join(', ')}`);
+  }
+});
+
+// Step 2 — simple factual completion
+await step('Simple completion — capital of France', async () => {
+  const start = Date.now();
+  const text = await streamChat([{ role: 'user', content: 'What is the capital of France? Answer in one word.' }]);
+  const ms = Date.now() - start;
+  if (!text.toLowerCase().includes('paris')) {
+    throw new Error(`Expected "Paris" in response, got: ${text.slice(0, 120)}`);
+  }
+  console.log(`     → "${text.slice(0, 60)}" (${ms}ms)`);
+});
+
+// Step 3 — system prompt isolation
+await step('System prompt — SYSTEM_OK isolation', async () => {
+  const text = await streamChat([
+    { role: 'system', content: 'Reply with exactly the word: SYSTEM_OK' },
+    { role: 'user', content: 'hello' },
+  ], { maxTokens: 16, temperature: 0 });
+  if (!text.includes('SYSTEM_OK')) {
+    throw new Error(`System prompt not honored. Got: "${text.slice(0, 80)}"`);
+  }
+});
+
+// Step 4 — legal domain prompt
+await step('Legal domain — hearsay definition', async () => {
+  const start = Date.now();
+  const text = await streamChat([
+    { role: 'system', content: 'You are a legal assistant specializing in evidence law.' },
+    { role: 'user', content: 'Define hearsay evidence in two sentences.' },
+  ], { maxTokens: 200 });
+  const ms = Date.now() - start;
+  const lower = text.toLowerCase();
+  const hasLegalTerm = lower.includes('out-of-court') || lower.includes('statement') || lower.includes('declarant') || lower.includes('hearsay');
+  if (!hasLegalTerm) {
+    throw new Error(`Response lacks legal terminology: "${text.slice(0, 120)}"`);
+  }
+  console.log(`     → "${text.slice(0, 80)}..." (${ms}ms)`);
+});
+
+console.log(`\n=== Results: ${passed} passed, ${failed} failed ===\n`);
+process.exit(failed > 0 ? 1 : 0);

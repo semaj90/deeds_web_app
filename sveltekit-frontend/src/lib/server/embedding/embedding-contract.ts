@@ -1,8 +1,9 @@
 /**
- * Step 3: Embedding Contract — embeddinggemma-prefix384-v1
+ * Step 3: Embedding Contract
  *
- * Single source of truth for embedding model, dimension, normalization, pooling.
- * All downstream modules (Qdrant, TurboVec, GPU, storage) refer to this contract.
+ * This file keeps the legacy 384 projection contract for downstream validators,
+ * while also declaring the 768 source lane explicitly. The retrieval stack now
+ * treats these as separate contracts rather than one ambiguous dimension.
  */
 
 export const EMBEDDING_CONTRACT = {
@@ -23,14 +24,20 @@ export const EMBEDDING_CONTRACT = {
   variant: 'latest',
 
   /**
-   * Primary embedding dimension
+   * Derived retrieval dimension used by the 384-dim canonical lane.
    */
   embedding_dimension: 384,
 
   /**
-   * Native Ollama output dimension (before any truncation)
+   * Native Ollama output dimension (before any truncation).
    */
   native_dimension: 768,
+
+  /**
+   * Explicit source/retrieval lane metadata for adaptive routing.
+   */
+  source_embedding_dimension: 768,
+  retrieval_embedding_dimension: 384,
 
   /**
    * Truncation from 768 to 384 is applied by Ollama on this model config
@@ -62,9 +69,12 @@ export const EMBEDDING_CONTRACT = {
   ollama_endpoint: '/api/embeddings',
 
   /**
-   * Qdrant collection name (must exist)
+   * Qdrant collection names (must exist).
+   * source: 768-dim lane
+   * retrieval: 384-dim hybrid lane
    */
-  qdrant_collection: 'codebase_chunks_384',
+  qdrant_source_collection: 'codebase_chunks_768',
+  qdrant_collection: 'codebase_chunks_384_hybrid',
 
   /**
    * TurboVec configuration
@@ -133,6 +143,11 @@ export const EMBEDDING_CONTRACT = {
     'Legal AI platform canonical embedding contract. 384-dim Embedding Gemma via Ollama. ' +
     'L2-normalized. Used by Qdrant ANN search, TurboVec prefilter, GPU reranking, and ACE context assembly.',
 } as const;
+
+export const SOURCE_EMBEDDING_DIMENSION = EMBEDDING_CONTRACT.source_embedding_dimension;
+export const RETRIEVAL_EMBEDDING_DIMENSION = EMBEDDING_CONTRACT.retrieval_embedding_dimension;
+export const SOURCE_QDRANT_COLLECTION = EMBEDDING_CONTRACT.qdrant_source_collection;
+export const RETRIEVAL_QDRANT_COLLECTION = EMBEDDING_CONTRACT.qdrant_collection;
 
 /**
  * Type guard: verify embedding has correct dimension and normalization

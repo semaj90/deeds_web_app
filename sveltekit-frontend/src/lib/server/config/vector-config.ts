@@ -14,6 +14,7 @@
  * Model: embeddinggemma:latest (768 dimensions native)
  */
 import { ENV } from '$lib/server/env.server.js';
+import type { SearchTier } from '$lib/server/retrieval/search-contract.js';
 
 /** Per-collection search config — tells callers how to build Qdrant queries */
 export interface VectorSearchConfig {
@@ -61,6 +62,7 @@ export const VECTOR_CONFIG = {
     legal_canon_chunks: 'legal_canon_chunks',
     fictional_case_chunks: 'fictional_case_chunks',
     codebase_chunks: 'codebase_chunks_768',
+    codebase_chunks_768: 'codebase_chunks_768',
     codebase_chunks_384_hybrid: 'codebase_chunks_384_hybrid',
     codebase_chunks_384: 'codebase_chunks_384',
     codebase_topology_128: 'codebase_topology_128',
@@ -163,6 +165,42 @@ export const VECTOR_CONFIG = {
   },
 } as const;
 
+export const VECTOR_LANES = {
+  dense_384: {
+    kind: 'dense',
+    dimension: 384,
+    modelId: 'embeddinggemma-prefix384-v1',
+    collections: ['codebase_chunks_384_hybrid', 'codebase_chunks_384'],
+    evidenceAuthority: true,
+  },
+  dense_768: {
+    kind: 'dense',
+    dimension: 768,
+    modelId: 'embeddinggemma:latest',
+    collections: ['codebase_chunks_768'],
+    evidenceAuthority: true,
+  },
+  sparse_bm42: {
+    kind: 'sparse',
+    vectorName: 'bm42_sparse',
+    evidenceAuthority: true,
+  },
+  latent_128: {
+    kind: 'dense',
+    dimension: 128,
+    projectionId: 'atlas-ae-768x128-v1',
+    collections: ['codebase_topology_128'],
+    evidenceAuthority: false,
+  },
+  latent_64: {
+    kind: 'dense',
+    dimension: 64,
+    projectionId: 'atlas-ae-384x64-v3',
+    collections: ['codebase_topology_64'],
+    evidenceAuthority: false,
+  },
+} as const;
+
 const COLLECTION_DIMENSIONS: Record<string, number> = {
   legal_documents: 768,
   legal_cases: 768,
@@ -204,30 +242,52 @@ export type CollectionAlias = keyof typeof VECTOR_CONFIG.COLLECTIONS;
 export type CollectionName = (typeof VECTOR_CONFIG.COLLECTIONS)[CollectionAlias];
 
 export function getCollectionDimension(collection: string): number {
-  return COLLECTION_DIMENSIONS[collection] ?? VECTOR_CONFIG.DIMENSIONS;
+  const dimension = COLLECTION_DIMENSIONS[collection];
+  if (dimension === undefined) {
+    throw new Error(`Unknown vector collection contract: ${collection}`);
+  }
+  return dimension;
 }
 
-export function vectorSlotFor(vector: number[]): 'embeddinggemma_768' | 'latent_128' | 'latent_64' {
-  if (vector.length === 768) return 'embeddinggemma_768';
+export function vectorSlotFor(vector: number[]): 'dense_384' | 'dense_768' | 'latent_128' | 'latent_64' {
+  if (vector.length === 384) return 'dense_384';
+  if (vector.length === 768) return 'dense_768';
   if (vector.length === 128) return 'latent_128';
   if (vector.length === 64) return 'latent_64';
   throw new Error(`Unsupported vector dimension: ${vector.length}`);
 }
 
-export function collectionForVector(vector: number[]): CollectionName | 'codebase_topology_128' | 'codebase_topology_64' {
-  if (vector.length === 768) return VECTOR_CONFIG.COLLECTIONS.codebase_chunks;
-  if (vector.length === 128) return VECTOR_CONFIG.COLLECTIONS.codebase_topology_128;
-  if (vector.length === 64) return VECTOR_CONFIG.COLLECTIONS.codebase_topology_64;
-  throw new Error(`Unsupported vector dimension: ${vector.length}`);
+export function collectionForVector(vector: number[]): never {
+  throw new Error(
+    `collectionForVector is retired. Resolve collection from domain + lane contract, not vector length ${vector.length}.`
+  );
 }
 
 export const CODEBASE_QDRANT_COLLECTION_PRIORITY = [
   VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
   VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
-  VECTOR_CONFIG.COLLECTIONS.codebase_chunks,
 ] as const;
 
 export type CodebaseQdrantCollectionName = (typeof CODEBASE_QDRANT_COLLECTION_PRIORITY)[number];
+
+export const CODEBASE_QDRANT_COLLECTIONS_BY_TIER: Record<SearchTier, readonly CodebaseQdrantCollectionName[]> = {
+  hot: [
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
+  ],
+  warm: [
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
+  ],
+  cold: [
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
+  ],
+} as const;
 
 export function resolvePreferredCodebaseCollection(
   existingCollections?: Iterable<string> | null,
@@ -238,6 +298,26 @@ export function resolvePreferredCodebaseCollection(
 
   const names = new Set(existingCollections);
   for (const preferred of CODEBASE_QDRANT_COLLECTION_PRIORITY) {
+    if (names.has(preferred)) {
+      return preferred;
+    }
+  }
+
+  return null;
+}
+
+export function resolvePreferredCodebaseCollectionForTier(
+  tier: SearchTier,
+  existingCollections?: Iterable<string> | null,
+): CodebaseQdrantCollectionName | null {
+  const priority = CODEBASE_QDRANT_COLLECTIONS_BY_TIER[tier];
+
+  if (!existingCollections) {
+    return priority[0] ?? null;
+  }
+
+  const names = new Set(existingCollections);
+  for (const preferred of priority) {
     if (names.has(preferred)) {
       return preferred;
     }

@@ -1,5 +1,7 @@
 /**
- * Analytics schema — matches raw SQL in event-logger.ts
+ * Legacy user analytics schema.
+ *
+ * Retained for compatibility with older read paths and migrations.
  */
 import { pgTable, uuid, varchar, jsonb, timestamp, integer } from 'drizzle-orm/pg-core';
 

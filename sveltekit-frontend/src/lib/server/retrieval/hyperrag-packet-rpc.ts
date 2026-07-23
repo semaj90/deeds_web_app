@@ -2,18 +2,8 @@ import pg from 'pg';
 import crypto from 'node:crypto';
 import { ENV } from '$lib/server/env.server.js';
 import type { FTSResult } from '$lib/server/search/postgres-fts.js';
-import { expandNeighbours } from '$lib/server/search/neo4j-rerank.js';
-import { recordRetrievalTelemetry, type RetrievalHit } from '../telemetry/retrieval-recorder.js';
-import { multiLaneRetrievalWithRRF } from './rrf-integration.js';
-import { toStableFileKey } from './subgraph-seed-neighborhood.js';
-import { getRedis } from '../redis.js';
-import { getAceContextPackPointer } from '../cache/ace-context-pack-cache.js';
-import { QueryProfileRouter } from './query-profile-router.js';
-import { createSearchRuntime } from './search-runtime.js';
-import {
-  buildCanonicalAcePacketEnvelope,
-  type CanonicalAcePacketEnvelope,
-} from '../ace/canonical-packet-envelope.js';
+import type { RetrievalHit } from '../telemetry/retrieval-recorder.js';
+import type { CanonicalAcePacketEnvelope } from '../ace/canonical-packet-envelope.js';
 
 export type HyperRagPacketRpcInput = {
   query: string;
@@ -429,6 +419,7 @@ async function recordPacketRpcTelemetry(params: {
   };
 }): Promise<void> {
   try {
+    const { recordRetrievalTelemetry } = await import('../telemetry/retrieval-recorder.js');
     const packetKeys = params.packets.map((packet) => packet.packet_key).filter(Boolean);
     const featureIds = [...new Set(params.packets.map((packet) => packet.feature_id).filter((featureId): featureId is string => Boolean(featureId)))];
 
@@ -793,6 +784,7 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   const canonicalQuery = cleanText(input.query);
   const canonicalLimit = Math.max(1, Math.min(Number(input.limit ?? 10), 25));
 
+  const { createSearchRuntime } = await import('./search-runtime.js');
   const runtime = createSearchRuntime({ userId: 'hyperrag-packet-rpc' });
   const runtimeResult = await runtime.search({
     text: canonicalQuery,

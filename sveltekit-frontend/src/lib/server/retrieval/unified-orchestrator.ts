@@ -18,7 +18,10 @@ import fetch from 'node-fetch';
 import { Pool } from 'pg';
 import { getRgPool, type RgSearchOptions } from '$lib/server/search/rg-pool.js';
 import { combineRRFLanes } from './rrf-combiner-utils.js';
-import type { SearchFilter } from './types.js';
+import type { SearchFilter, SearchLane } from './types.js';
+import type { SearchTier } from './search-contract.js';
+import { inferRetrievalTier } from './search-contract.js';
+import { embedQueryForLane, type QueryVectorBundle } from './embedding-service.js';
 
 export interface RetrievalConfig {
   qdrant: { host: string; port: number };
@@ -31,12 +34,14 @@ export interface RetrievalConfig {
 
 export interface RetrievalRequest {
   query: string;
+  lanes?: SearchLane[];
   limit?: number;
   includePayload?: boolean;
   useRRF?: boolean;
   useLexical?: boolean;
   useAST?: boolean;
   useRgPool?: boolean;
+  retrievalTier?: SearchTier;
   filters?: SearchFilter;
 }
 
@@ -102,6 +107,26 @@ const DEFAULT_CONFIG: RetrievalConfig = {
   gemma4: { host: '127.0.0.1', port: 8090 }
 };
 
+let unifiedRetrievalRuntimeInitialized = false;
+
+/**
+ * Explicit boot hook for orchestrator startup policy.
+ * Keep module import side-effect free; perform environment-dependent setup here.
+ */
+export async function initializeUnifiedRetrievalRuntime(config?: Partial<RetrievalConfig>): Promise<RetrievalConfig> {
+  if (config) {
+    Object.assign(DEFAULT_CONFIG.qdrant, config.qdrant ?? {});
+    Object.assign(DEFAULT_CONFIG.turbovec, config.turbovec ?? {});
+    Object.assign(DEFAULT_CONFIG.goRetrieval, config.goRetrieval ?? {});
+    Object.assign(DEFAULT_CONFIG.postgres, config.postgres ?? {});
+    Object.assign(DEFAULT_CONFIG.ollama, config.ollama ?? {});
+    Object.assign(DEFAULT_CONFIG.gemma4, config.gemma4 ?? {});
+  }
+
+  unifiedRetrievalRuntimeInitialized = true;
+  return DEFAULT_CONFIG;
+}
+
 const RRF_CONSTANT_K = 60;
 const RRF_LANE_WEIGHTS = {
   dense_vector: 1.0,
@@ -112,22 +137,18 @@ const RRF_LANE_WEIGHTS = {
 function buildQdrantFilter(filters?: SearchFilter): Record<string, unknown> | undefined {
   if (!filters) return undefined;
 
-  const metadata = filters.metadata ?? {};
   const must: Record<string, unknown>[] = [];
 
-  const sourceRef = metadata.source_ref ?? filters.source_ref;
-  if (sourceRef) {
-    must.push({ key: 'source_ref', match: { value: sourceRef } });
+  if (filters.source_ref) {
+    must.push({ key: 'source_ref', match: { value: filters.source_ref } });
   }
 
-  const sourceRefPattern = metadata.source_ref_pattern ?? filters.source_ref_pattern;
-  if (sourceRefPattern) {
-    must.push({ key: 'source_ref', match: { text: sourceRefPattern } });
+  if (filters.source_ref_pattern) {
+    must.push({ key: 'source_ref', match: { text: filters.source_ref_pattern } });
   }
 
-  const directoryPath = metadata.directory_path ?? filters.directory_path;
-  if (directoryPath) {
-    must.push({ key: 'directory_path', match: { text: directoryPath } });
+  if (filters.directory_path) {
+    must.push({ key: 'directory_path', match: { text: filters.directory_path } });
   }
 
   if (filters.feature_ids?.length) {
@@ -138,35 +159,32 @@ function buildQdrantFilter(filters?: SearchFilter): Record<string, unknown> | un
     must.push({ key: 'kmeans_cluster_id', match: { any: filters.kmeans_cluster_ids } });
   }
 
-  const somRow = metadata.som_row ?? filters.som_row;
-  if (somRow !== undefined) {
-    must.push({ key: 'som_row', match: { value: somRow } });
+  if (filters.som_row !== undefined) {
+    must.push({ key: 'som_row', match: { value: filters.som_row } });
   }
 
-  const somCol = metadata.som_col ?? filters.som_col;
-  if (somCol !== undefined) {
-    must.push({ key: 'som_col', match: { value: somCol } });
+  if (filters.som_col !== undefined) {
+    must.push({ key: 'som_col', match: { value: filters.som_col } });
   }
 
-  const packetType = metadata.packet_type ?? filters.packet_type;
-  if (packetType) {
-    must.push({ key: 'packet_type', match: { value: packetType } });
+  if (filters.packet_type) {
+    must.push({ key: 'packet_type', match: { value: filters.packet_type } });
   }
 
-  if (metadata.language) {
-    must.push({ key: 'language', match: { value: metadata.language } });
+  if (filters.language) {
+    must.push({ key: 'language', match: { value: filters.language } });
   }
 
-  if (metadata.file_extension) {
-    must.push({ key: 'file_extension', match: { value: metadata.file_extension } });
+  if (filters.file_extension) {
+    must.push({ key: 'file_extension', match: { value: filters.file_extension } });
   }
 
-  if (metadata.domain_class) {
-    must.push({ key: 'domain_class', match: { value: metadata.domain_class } });
+  if (filters.domain_class) {
+    must.push({ key: 'domain_class', match: { value: filters.domain_class } });
   }
 
-  if (metadata.jsonb_contains) {
-    must.push({ key: 'metadata', match: { value: metadata.jsonb_contains } });
+  if (filters.jsonb_contains) {
+    must.push({ key: 'metadata', match: { value: filters.jsonb_contains } });
   }
 
   return must.length > 0 ? { must } : undefined;
@@ -203,42 +221,78 @@ async function generateEmbedding(query: string, config: RetrievalConfig): Promis
  * STAGE 2: Qdrant named-vector search + RRF fusion
  */
 async function qdrantSearch(
-  embedding: number[],
+  queryVectors: QueryVectorBundle,
   config: RetrievalConfig,
   useRRF: boolean,
   useLexical: boolean,
-  filters?: SearchFilter
+  filters?: SearchFilter,
+  retrievalTier?: SearchTier
 ): Promise<Array<{ id: string; score: number; payload: any }>> {
   const startTime = Date.now();
   try {
-    // Dense vector search on named vector "content"
-    const denseRes = await fetch(
-      `http://${config.qdrant.host}:${config.qdrant.port}/collections/codebase_chunks_768/points/search`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    const filter = buildQdrantFilter(filters);
+    const limit = filters?.per_lane_limit ?? 20;
+    const preferredCollection = retrievalTier === 'cold'
+      ? 'codebase_chunks_768'
+      : 'codebase_chunks_384_hybrid';
+    const secondaryCollection = preferredCollection === 'codebase_chunks_768'
+      ? 'codebase_chunks_384_hybrid'
+      : 'codebase_chunks_768';
+    const collections = [preferredCollection, secondaryCollection];
+
+    const denseHitsById = new Map<string, { id: string; score: number; payload: any }>();
+
+    const collectionRuns = await Promise.allSettled(collections.map(async (collection) => {
+      const queryVector =
+        collection === 'codebase_chunks_384_hybrid'
+          ? queryVectors.dense384?.vector ?? queryVectors.dense384
+          : queryVectors.dense768?.vector ?? queryVectors.dense768;
+
+      if (!queryVector || queryVector.length === 0) {
+        throw new Error(`Missing query vector for collection ${collection}`);
+      }
+
+      const denseRes = await fetch(
+        `http://${config.qdrant.host}:${config.qdrant.port}/collections/${collection}/points/search`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             vector: {
               name: 'content',
-              vector: embedding
+              vector: Array.from(queryVector)
             },
-            limit: filters?.per_lane_limit ?? 20,
+            limit,
             with_payload: true,
             with_vector: false,
-            filter: buildQdrantFilter(filters),
+            filter,
             score_threshold: 0.3
           })
         }
       );
 
-    if (!denseRes.ok) throw new Error(`Qdrant search failed: ${denseRes.status}`);
-    const denseData = await denseRes.json() as { result: Array<{ id: string; score: number; payload: any }> };
-    const denseHits = denseData.result || [];
+      if (!denseRes.ok) throw new Error(`Qdrant search failed for ${collection}: ${denseRes.status}`);
+      const denseData = await denseRes.json() as { result: Array<{ id: string; score: number; payload: any }> };
+      const denseHits = denseData.result || [];
 
-    return denseHits.map((hit, idx) => ({
-      ...hit,
-      payload: { ...hit.payload, qdrant_rank: idx + 1 }
+      for (const [idx, hit] of denseHits.entries()) {
+        const existing = denseHitsById.get(hit.id);
+        const projected = {
+          ...hit,
+          payload: { ...hit.payload, qdrant_rank: idx + 1, qdrant_collection: collection }
+        };
+        if (!existing || hit.score > existing.score) {
+          denseHitsById.set(hit.id, projected);
+        }
+      }
     }));
+
+    const fulfilled = collectionRuns.filter((run): run is PromiseFulfilledResult<void> => run.status === 'fulfilled');
+    if (fulfilled.length === 0 && denseHitsById.size === 0) {
+      throw new Error('Qdrant search failed for all adaptive collections');
+    }
+
+    return Array.from(denseHitsById.values()).sort((a, b) => b.score - a.score).slice(0, limit);
   } catch (err) {
     console.error('Qdrant search failed:', err);
     throw err;
@@ -505,14 +559,40 @@ export async function executeUnifiedRetrieval(
   const totalStart = Date.now();
   const stages: string[] = [];
   let fallbackUsed = false;
+  const retrievalTier =
+    request.retrievalTier ??
+    inferRetrievalTier({
+      query: request.query,
+      exactKeywords: request.filters?.keywords,
+      expandedKeywords: request.filters?.keyword_variants
+    });
 
   try {
     // STAGE 1: Embedding
-    const embedding = await generateEmbedding(request.query, config);
+    const [dense384, dense768] = await Promise.allSettled([
+      embedQueryForLane(request.query, 'dense_384'),
+      embedQueryForLane(request.query, 'dense_768'),
+    ]);
+    const queryVectors: QueryVectorBundle = {
+      dense384: dense384.status === 'fulfilled' ? dense384.value : null,
+      dense768: dense768.status === 'fulfilled' ? dense768.value : null,
+      latent64: null,
+    };
+    const embedding = queryVectors.dense768?.vector ?? queryVectors.dense384?.vector;
+    if (!embedding) {
+      throw new Error('Failed to generate query vector bundle');
+    }
     stages.push('embedding');
 
     // STAGE 2: Qdrant search
-    const qdrantHits = await qdrantSearch(embedding, config, request.useRRF ?? true, request.useLexical ?? false, request.filters);
+    const qdrantHits = await qdrantSearch(
+      queryVectors,
+      config,
+      request.useRRF ?? true,
+      request.useLexical ?? false,
+      request.filters,
+      retrievalTier
+    );
     const qdrantIds = qdrantHits.map((h) => h.id);
     stages.push('qdrant_search');
 

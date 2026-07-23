@@ -12,11 +12,17 @@ import { z } from 'zod';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 
 const ANALYTICS_EVENT_TYPES = [
-	'chat_query', 'tool_search', 'codebase_search', 'route_opened',
+	'chat_query', 'tool_search', 'codebase_search', 'route_opened', 'page_view',
 	'case_created', 'case_updated', 'evidence_uploaded', 'rag_search',
 	'embedding_generated', 'cache_hit', 'cache_miss', 'error_analyzed',
 	'patch_applied', 'document_indexed'
 ] as const;
+
+type AnalyticsEventInputType = (typeof ANALYTICS_EVENT_TYPES)[number];
+
+function normalizeEventType(eventType: AnalyticsEventInputType): AnalyticsEvent['eventType'] {
+	return eventType === 'page_view' ? 'route_opened' : eventType;
+}
 
 const singleEventSchema = z.object({
 	userId: z.string().max(200).nullish(),
@@ -41,12 +47,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid batch' }, { status: 400 });
 			}
 			const events: AnalyticsEvent[] = parsed.data.batch.map(e => ({
-				userId: e.userId ?? null,
-				sessionId: e.sessionId ?? null,
-				eventType: e.eventType,
+				userId: e.userId ?? undefined,
+				sessionId: e.sessionId ?? undefined,
+				eventType: normalizeEventType(e.eventType),
 				payload: e.payload
 			}));
-			const logged = await logEventBatch(events);
+			void logEventBatch(events);
 
 			// Fire-and-forget: publish user-associated events to RabbitMQ for async processing
 			const userEvents = events.filter(e => e.userId);
@@ -61,7 +67,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				}).catch(() => {});
 			}
 
-			return json({ ok: true, logged });
+			return json({ ok: true, logged: events.length });
 		}
 
 		// Single event mode (backwards compatible)
@@ -70,12 +76,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
 		}
 		const event: AnalyticsEvent = {
-			userId: parsed.data.userId ?? null,
-			sessionId: parsed.data.sessionId ?? null,
-			eventType: parsed.data.eventType,
+			userId: parsed.data.userId ?? undefined,
+			sessionId: parsed.data.sessionId ?? undefined,
+			eventType: normalizeEventType(parsed.data.eventType),
 			payload: parsed.data.payload
 		};
-		await logEvent(event);
+		void logEvent(event);
 		return json({ ok: true });
 	} catch {
 		return json({ ok: false, error: 'Failed to log event' }, { status: 500 });
@@ -83,7 +89,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 const eventListQuerySchema = z.object({
-	userId: z.string().uuid().optional(),
+	userId: z.string().max(200).optional(),
 	limit: z.coerce.number().int().min(1).max(200).default(50),
 });
 
@@ -94,13 +100,18 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 		return json({ ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid query' }, { status: 400 });
 	}
 	const { userId, limit } = parsed.data;
+	const scopedUserIdText = locals.user.role === 'admin' && userId ? userId : String(locals.user.id);
+	const scopedUserIdInt = Number(scopedUserIdText);
+	const userIdFilter = Number.isFinite(scopedUserIdInt)
+		? sql`user_id = ${scopedUserIdInt}`
+		: sql`user_id::text = ${scopedUserIdText}`;
 
 	try {
 		const { db } = await import('$lib/server/db/client');
 		const rows = await db.execute(
 			sql`SELECT id, user_id, session_id, event_type, payload, created_at
-				FROM user_analytics_events
-				WHERE (${userId}::text IS NULL OR user_id::text = ${userId ?? ''})
+				FROM analytics_events
+				WHERE ${userIdFilter}
 				ORDER BY created_at DESC
 				LIMIT ${limit}`
 		);

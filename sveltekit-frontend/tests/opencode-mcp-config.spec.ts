@@ -53,6 +53,8 @@ describe('opencode MCP wiring', () => {
   it('keeps required frontend MCP servers enabled with expected endpoints', () => {
     const cfg = readJson(frontendConfigPath);
     expect(cfg.mcp).toBeTruthy();
+    expect(cfg.model).toBe('hforf.gguf');
+    expect(cfg.small_model).toBe('hforf.gguf');
 
     expect(cfg.mcp.trace).toMatchObject({
       type: 'remote',
@@ -84,6 +86,19 @@ describe('opencode MCP wiring', () => {
       'langextract_*': 'allow',
     });
     expect(cfg.skills?.paths).toContain('../.opencode/skills');
+  });
+
+  it('keeps the HForF model schema aligned with the local gguf path', () => {
+    const cfg = readJson(frontendConfigPath);
+    const modelPath = path.join(repoRoot, 'models', 'hfor', 'hforf.gguf');
+
+    expect(fs.existsSync(modelPath)).toBe(true);
+    expect(cfg.model).toBe('hforf.gguf');
+    expect(cfg.small_model).toBe('hforf.gguf');
+
+    const turboquant = cfg.provider?.turboquant as Record<string, unknown>;
+    expect(turboquant.npm).toBe('@ai-sdk/openai-compatible');
+    expect((turboquant.options as Record<string, unknown>).baseURL).toBe('http://127.0.0.1:8090/v1');
   });
 
   it('contains resource labels for docs and datastore lanes', () => {

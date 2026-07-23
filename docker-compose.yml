@@ -175,11 +175,13 @@ services:
     environment:
       - QDRANT__SERVICE__HTTP_PORT=6333
       - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__STORAGE__SNAPSHOTS_PATH=/qdrant/snapshots
     ports:
       - "6333:6333"
       - "6334:6334"
     volumes:
-      - qdrant_data:/qdrant/storage
+      - qdrant_production_data:/qdrant/storage
+      - qdrant_snapshots:/qdrant/snapshots
     networks:
       - legal-ai-network
     healthcheck:
@@ -1146,7 +1148,13 @@ volumes:
     driver: local
   valkey_data:
     driver: local
-  qdrant_data:
+  # Fixed external-style names prevent Compose project-name drift from silently creating a new empty volume.
+  # One-time setup: docker volume create deeds_qdrant_production_data && docker volume create deeds_qdrant_snapshots
+  qdrant_production_data:
+    name: deeds_qdrant_production_data
+    driver: local
+  qdrant_snapshots:
+    name: deeds_qdrant_snapshots
     driver: local
   minio_data:
     driver: local

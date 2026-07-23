@@ -10,6 +10,7 @@ source_refs:
   - docs/DEEP-RESEARCH-COMPLETION-SUMMARY.md
   - sveltekit-frontend/src/lib/server/db/schema-postgres.ts
 related:
+  - pipeline/web-sources
   - pipeline/retrieval-ranking-synthesis
   - pipeline/content-ingestion
   - datasets/legal-corpus

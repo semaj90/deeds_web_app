@@ -335,6 +335,13 @@ export interface CollectionContract {
 }
 
 export const COLLECTION_CONTRACTS: Record<string, CollectionContract> = {
+  codebase_chunks_768: {
+    contractVersion: 'atlas-qdrant-768-source-v1',
+    denseVectors: { content: 768 },
+    primaryDenseVector: 'content',
+    primaryDimension: 768,
+    description: 'Source semantic collection: native EmbeddingGemma 768-dim vectors for adaptive hot/warm/cold routing.',
+  },
   codebase_chunks_384_hybrid: {
     contractVersion: 'atlas-qdrant-384-hybrid-v1',
     denseVectors: { content: 384 },

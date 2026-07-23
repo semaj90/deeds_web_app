@@ -181,11 +181,19 @@ export const ATLAS_RUNTIME_REGISTRY: AtlasRuntimeRegistrySection[] = [
       },
       {
         key: 'embeddinggemma-768d',
-        title: 'EmbeddingGemma server lane',
+        title: 'EmbeddingGemma source lane',
         path: 'sveltekit-frontend/src/lib/ai/model-ids.ts',
         owner: 'embedding',
         status: 'active',
-        notes: 'Canonical retrieval embedding lane used for Qdrant, clustering, and cache routing.',
+        notes: 'Native 768-dim source lane used for full-dimension embeddings, clustering, and cache routing.',
+      },
+      {
+        key: 'embeddinggemma-prefix384',
+        title: 'EmbeddingGemma retrieval lane',
+        path: 'sveltekit-frontend/src/lib/server/embedding/embedding-contract.ts',
+        owner: 'embedding',
+        status: 'active',
+        notes: 'Canonical 384-dim retrieval projection lane used for Qdrant ANN and reranking.',
       },
       {
         key: 'hforf-gguf',

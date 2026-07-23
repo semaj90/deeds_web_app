@@ -113,6 +113,19 @@ async function probeGpuWarm() {
   return gate.requireBoth ? (tq && ol) : (tq || ol);
 }
 
+async function isMiniforgeNlpRunning(port = 8095) {
+  try {
+    const res = await fetch(`http://127.0.0.1:${port}/health`, {
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!res.ok) return false;
+    const body = await res.json().catch(() => null);
+    return body?.status === 'ok' && body?.model === 'miniforge-nlp-sidecar';
+  } catch {
+    return false;
+  }
+}
+
 async function probeServices() {
   async function hit(url, timeoutMs = 2500) {
     try {
@@ -128,15 +141,16 @@ async function probeServices() {
   // 4. Confirm CouchDB inference logs.
   // 5. Confirm Postgres proxy on :5434.
   // 6. Treat TurboQuant :8090 as optional unless the command explicitly requires local GPU inference.
-  const [caddy, bifrost, goRetrieval, traceMcp, turboQuant, topology] = await Promise.all([
+  const [caddy, bifrost, goRetrieval, traceMcp, turboQuant, topology, miniforgeNlp] = await Promise.all([
     hit('http://127.0.0.1:5178/health'),          // Caddy QUIC proxy
     hit('http://127.0.0.1:3040/health'),           // Bifrost semantic cache
     hit('http://127.0.0.1:8100/health'),           // Go retrieval gRPC/HTTP
     hit('http://127.0.0.1:8788/health'),           // TRACE MCP
     hit('http://127.0.0.1:8090/health'),           // TurboQuant llama-server
     hit('http://127.0.0.1:8101/health'),           // Topology Search Engine
+    hit('http://127.0.0.1:8095/health'),           // Miniforge NLP sidecar
   ]);
-  return { caddy, bifrost, goRetrieval, traceMcp, turboQuant, topology };
+  return { caddy, bifrost, goRetrieval, traceMcp, turboQuant, topology, miniforgeNlp };
 }
 
 async function ensureDevServer() {
@@ -309,6 +323,27 @@ async function runIncrementalLane(redis) {
     // Ensures the stack is up on every folder-open, even cold starts with no
     // git changes. ensureDevServer spawns dev:everything if :5173 is cold.
     await ensureDevServer();
+
+    // ── Miniforge NLP sidecar (:8095) ────────────────────────────────────────
+    // LangExtract + tree-sitter + ast-grep lane for middleware / feature extraction.
+    // Fail-open: if it cannot start, native TS extraction still works.
+    const nlpCooldownKey = 'startup:miniforge-nlp:last_spawn';
+    const nlpStampRaw = await redis.get(nlpCooldownKey).catch(() => null);
+    const nlpAge = nlpStampRaw ? (Date.now() - new Date(nlpStampRaw).getTime()) / 60_000 : Infinity;
+    const nlpHealthy = await isMiniforgeNlpRunning(8095);
+    if (!nlpHealthy && nlpAge > 30) {
+      await runStep('miniforge nlp sidecar', 'nlp:sidecar:start:detached', {
+        required: false,
+        timeout: 30_000,
+      });
+      log.miniforgeNlp = { status: 'spawned' };
+      await redis.set(nlpCooldownKey, new Date().toISOString(), 'EX', 3600).catch(() => {});
+    } else if (nlpHealthy) {
+      log.miniforgeNlp = { status: 'already-up' };
+      console.log('[startup] Miniforge NLP sidecar already healthy on :8095');
+    } else {
+      log.miniforgeNlp = { status: 'cooldown', ageMin: nlpAge.toFixed(1) };
+    }
 
     // Probe ancillary services started by dev:everything and log their status.
     // Non-blocking — failures are recorded in log.services but don't abort the lane.

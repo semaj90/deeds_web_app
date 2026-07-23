@@ -36,6 +36,7 @@ export const serviceUrls = {
   // Misc services
   langfuse:   ENV.LANGFUSE_HOST,
   langextract: ENV.LANGEXTRACT_URL,
+  miniforgeNlp: ENV.MINIFORGE_SIDECAR_URL,
   topologySearch: ENV.TOPOLOGY_SEARCH_URL,
   retrievalHttp:  ENV.RETRIEVAL_HTTP_URL,
   legalGateway:   ENV.LEGAL_GATEWAY_URL,

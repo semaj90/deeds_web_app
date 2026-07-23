@@ -239,6 +239,16 @@ export const ENV = {
   TOPOLOGY_SEARCH_URL: privateEnv.TOPOLOGY_SEARCH_URL ?? `http://${LOOPBACK_IP}:8101`,
   /** Hypergraph lookup service URL */
   HG_LOOKUP_URL: privateEnv.HG_LOOKUP_URL ?? undefined,
+  /** Canonical NLP sidecar URL (Miniforge FastAPI: spaCy, LangExtract, tree-sitter, ast-grep, torch) */
+  NLP_SIDECAR_URL:
+    privateEnv.NLP_SIDECAR_URL ??
+    privateEnv.MINIFORGE_SIDECAR_URL ??
+    `http://${LOOPBACK_IP}:8095`,
+  /** Legacy alias for NLP_SIDECAR_URL (deprecated; use NLP_SIDECAR_URL instead) */
+  MINIFORGE_SIDECAR_URL:
+    privateEnv.NLP_SIDECAR_URL ??
+    privateEnv.MINIFORGE_SIDECAR_URL ??
+    `http://${LOOPBACK_IP}:8095`,
   /** Trace MCP server (trace-mcp-server.ts, Streamable HTTP, port 8788) */
   TRACE_MCP_URL: privateEnv.TRACE_MCP_URL ?? `http://${LOOPBACK_IP}:8788`,
   /** KB retrieval MCP server (kb-retrieval-server.ts, Streamable HTTP, port 8789) */
@@ -282,19 +292,34 @@ export const ENV = {
   // TurboVec gRPC
   TURBOVEC_SIDECAR_GRPC_URL: privateEnv.TURBOVEC_SIDECAR_GRPC_URL ?? privateEnv.TURBOVEC_GRPC_URL ?? `${LOOPBACK_IP}:50062`,
   TURBOVEC_SIDECAR_GRPC_ENABLED: (privateEnv.TURBOVEC_SIDECAR_GRPC_ENABLED ?? privateEnv.TURBOVEC_GRPC_ENABLED ?? 'false') === 'true',
-  // LangExtract — pure-TS native extractor (langextract/native.ts) is now the default.
-  // The Python FastAPI service (phase66-langextract :8095) is DECOMMISSIONED:
-  //   - 11/11 native tests pass (citations, statutes, case names, money, dates, persons, etc.)
-  //   - No network hop, no GIL, ~10× faster than the Python service for typical legal text
-  //   - To re-enable the Python service for benchmarking: set LANGEXTRACT_ENABLED=true
-  //     AND LANGEXTRACT_NATIVE=false explicitly.
-  // LangExtract — pure-TS native extractor (langextract/native.ts) is now the default.
-  // The Python FastAPI service (phase66-langextract :8095) is DECOMMISSIONED:
+  // LangExtract Routing — TWO EXPLICIT MODES (not silent fallback):
+  //
+  // Mode 1: NATIVE_DOCUMENT_EXTRACT (default)
+  //   - LANGEXTRACT_NATIVE=true (default)
+  //   - Route: TypeScript native extractor (pure-TS, no external deps)
+  //   - Capabilities: document structure + basic entity regex
+  //   - Use case: lightweight legal document parsing (no GPU needed)
+  //
+  // Mode 2: MINIFORGE_NLP_ANALYZE (opt-in)
+  //   - LANGEXTRACT_NATIVE=false (explicitly set in .env)
+  //   - Route: Miniforge NLP sidecar (Python FastAPI on NLP_SIDECAR_URL:8095)
+  //   - Capabilities: spaCy NER, tree-sitter AST, ast-grep patterns, LangExtract analysis, GPU torch
+  //   - Use case: full AST/NLP analysis (requires sidecar running)
+  //
+  // To enable Miniforge NLP sidecar analysis, set in .env:
+  //   NLP_SIDECAR_URL=http://127.0.0.1:8095
+  //   LANGEXTRACT_NATIVE=false
+  //   LANGEXTRACT_ENABLED=true
+  //
   LANGEXTRACT_ENABLED:
     (privateEnv.LANGEXTRACT_ENABLED ?? privateEnv.MINIO_SIMD_ENABLED ?? 'false') === 'true',
+  /** Canonical NLP sidecar URL for MINIFORGE_NLP_ANALYZE mode (python service) */
   LANGEXTRACT_URL:
-    privateEnv.LANGEXTRACT_URL?.trim() || privateEnv.LANGEXTRACT_API_URL?.trim() || '',
-  /** Native TS langextract is the default. Override to 'false' to fall back to the Python service. */
+    privateEnv.NLP_SIDECAR_URL ??
+    privateEnv.LANGEXTRACT_URL?.trim() ??
+    privateEnv.LANGEXTRACT_API_URL?.trim() ??
+    '',
+  /** Route mode: 'true' = NATIVE_DOCUMENT_EXTRACT (default TS), 'false' = MINIFORGE_NLP_ANALYZE (sidecar) */
   LANGEXTRACT_NATIVE:
     (privateEnv.LANGEXTRACT_NATIVE ?? 'true') === 'true' ? 'true' : 'false',
   /** HTTP port for the langextract-mcp.ts stdio-HTTP bridge (default 8793) */
@@ -357,8 +382,6 @@ export const ENV = {
     privateEnv.TURBOQUANT_BASE_URL ??
     `http://${LOOPBACK_IP}:8090`,
   ROTORQUANT_MODEL_PATH: privateEnv.ROTORQUANT_MODEL_PATH ?? null,
-  ROTORQUANT_CHAT_MODEL:
-    privateEnv.ROTORQUANT_CHAT_MODEL ?? privateEnv.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest',
   TURBO_MODEL_PATH: privateEnv.TURBO_MODEL_PATH ?? null,
   TURBOQUANT_MODEL_PATH: privateEnv.TURBOQUANT_MODEL_PATH ?? null,
   TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL ?? privateEnv.TURBOVEC_SIDECAR ?? `http://${LOOPBACK_IP}:8792`,

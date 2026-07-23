@@ -57,7 +57,7 @@ export {
 	type NewEvidenceBoardEdge,
 } from './schema/citations';
 
-// Analytics events (used by event-logger.ts)
+// Legacy analytics events table (compatibility only)
 export { userAnalyticsEvents, type UserAnalyticsEvent, type NewUserAnalyticsEvent } from './schema/analytics';
 
 // Search analytics pipeline tables (search-intelligence dashboard + QLoRA training)

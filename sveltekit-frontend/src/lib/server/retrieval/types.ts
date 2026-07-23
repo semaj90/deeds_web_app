@@ -4,11 +4,13 @@
  */
 
 import type { LaneRegistryKind } from '../vector/lane-registry.js';
+import type { SearchTier } from './search-contract.js';
+import type { QueryVectorBundle } from './embedding-service.js';
 
 /**
  * Search lanes available in the retrieval pipeline
  */
-export type SearchLane = 'qdrant' | 'gpu-cuvs' | 'bm25' | 'lexical' | 'turbovec' | 'hybrid';
+export type SearchLane = 'qdrant' | 'qdrant-768' | 'qdrant-384' | 'gpu-cuvs' | 'bm25' | 'lexical' | 'turbovec' | 'hybrid';
 
 /**
  * RRF fusion weights by lane kind — mirrors LANE_REGISTRY roles.
@@ -27,12 +29,14 @@ export const RRF_WEIGHTS_BY_LANE_KIND: Record<LaneRegistryKind, number> = {
 
 /** Map from SearchLane runtime name to LaneRegistryKind */
 export const SEARCH_LANE_KIND: Record<SearchLane, LaneRegistryKind> = {
-  qdrant:      'retrieval',
-  'gpu-cuvs':  'retrieval',
-  bm25:        'semantic',
-  lexical:     'semantic',
-  turbovec:    'retrieval',
-  hybrid:      'retrieval',
+  qdrant:        'retrieval',
+  'qdrant-768':  'retrieval',
+  'qdrant-384':  'retrieval',
+  'gpu-cuvs':    'retrieval',
+  bm25:          'semantic',
+  lexical:       'semantic',
+  turbovec:      'retrieval',
+  hybrid:        'retrieval',
 } as const;
 
 /**
@@ -93,6 +97,9 @@ export interface SearchResult {
     /** TurboVec rerank score if applicable */
     turbovec_score?: number;
 
+    /** Embedding dimension that produced this result (384 or 768) */
+    embedding_dim?: number;
+
     /** SOM grid coordinates if available */
     som_cell_x?: number;
     som_cell_y?: number;
@@ -115,8 +122,14 @@ export interface SearchResult {
  * Request contract for unified search
  */
 export interface SearchRequest {
-  /** Query string or pre-embedded vector */
+  /** Legacy overloaded query field. Prefer queryText + queryVector. */
   query: string | Float32Array;
+
+  /** Canonical text surface for lexical lanes. */
+  queryText?: string;
+
+  /** Canonical vector surface for dense lanes. */
+  queryVector?: Float32Array;
 
   /** Number of results to return */
   k?: number;
@@ -136,7 +149,10 @@ export interface SearchRequest {
   /** Signed pagination cursor. */
   cursor?: string | null;
 
-  /** Embedding dimension override (default: 384 for GPU, 768 for Qdrant) */
+  /** Adaptive retrieval tier inferred from query shape or explicitly requested. */
+  retrievalTier?: SearchTier;
+
+  /** Embedding dimension override (default: 768 so 384 lanes can truncate safely). */
   embedding_dim?: number;
 
   /** Filter by packet_key if known */
@@ -166,6 +182,24 @@ export interface SearchRequest {
 
   /** Include full payload in metadata (may be large) */
   full_payload?: boolean;
+}
+
+/**
+ * Canonical lane execution context shared by all lane implementations.
+ * This keeps lexical text and dense vectors separate at the execution boundary.
+ */
+export interface SearchLaneContext {
+  queryText: string;
+  queryVector?: Float32Array;
+  queryVectorBundle?: QueryVectorBundle;
+  topK: number;
+  retrievalTier?: SearchTier;
+  filters?: SearchFilter;
+  keywordBundle?: {
+    exactKeywords: string[];
+    normalizedKeywords: string[];
+    expandedKeywords: string[];
+  };
 }
 
 /**
@@ -279,25 +313,14 @@ export interface SearchFilter {
   /** Filter by domain classification stored in Qdrant payload */
   domain_class?: string;
 
+  /** Filter by retrieval tier stored in Qdrant payload (hot/warm/cold) */
+  artifact_tier?: SearchTier;
+
+  /** Filter by retrieval tiers stored in Qdrant payload */
+  artifact_tiers?: SearchTier[];
+
   /** Arbitrary JSONB contains filter for Qdrant payload */
   jsonb_contains?: Record<string, unknown>;
-
-  /** Nested metadata alias used by some lane adapters and HTTP facades. */
-  metadata?: {
-    source_ref?: string;
-    source_ref_pattern?: string;
-    directory_path?: string;
-    packet_type?: string;
-    language?: string;
-    file_extension?: string;
-    domain_class?: string;
-    jsonb_contains?: Record<string, unknown>;
-    som_row?: number;
-    som_col?: number;
-  };
-
-  /** Optional lane selector alias used by older facades. */
-  search_kinds?: SearchLane[];
 
   // ── Keyword surface for lexical lanes ─────────────────────────────────────
 

@@ -20,13 +20,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                      process.env.DEV_BYPASS_AUTH === 'true';
 
   if (!locals.user && !isOpenCode) {
-    return error(401, 'Unauthorized');
+    throw error(401, 'Unauthorized');
   }
 
   try {
     const input = openAIChatCompletionRequestSchema.parse(await request.json());
     const options = {
-      userId: String(locals.user.id),
+      userId: String(locals.user?.id ?? 'anonymous'),
       useMcp: input.use_mcp,
     };
 

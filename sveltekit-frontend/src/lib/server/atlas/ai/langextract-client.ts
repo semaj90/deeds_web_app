@@ -44,7 +44,7 @@ let _healthCacheTs = 0;
 
 function getBaseUrl(baseUrl?: string): string {
   // Explicit arg wins; then ENV; then hard default matching LANGEXTRACT_URL default port
-  return baseUrl ?? (ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8094');
+  return baseUrl ?? (ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095');
 }
 
 export function createLangExtractClient(baseUrl?: string): LangExtractClient {

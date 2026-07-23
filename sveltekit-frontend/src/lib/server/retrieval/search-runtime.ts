@@ -12,32 +12,12 @@
 
 import { z } from 'zod';
 import type { FeatureEnvelope } from './feature-envelope.js';
-import { FeatureEnvelopeSchema } from './feature-envelope.js';
-import {
-  retrieveAllCandidates,
-} from './retrieve-candidates.js';
-import { rerankCanonicalFeatureEnvelopes } from './canonical-rerank-executor.js';
-import { recordPromotionIntent } from './promote-results-outbox.js';
-import { logExposureEvents } from './recommendation-events.js';
-import { hydrateCandidates as hydrateFromPostgres } from './hydrate-candidates.js';
-import { scoreCandidates, type ScorerOptions } from './candidate-scorer.js';
-import { postProcessCandidates, type PostProcessConfig } from './post-process-reranker.js';
-import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import type { ScorerOptions } from './candidate-scorer.js';
+import type { PostProcessConfig } from './post-process-reranker.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
-import { createQdrantDenseRetriever } from './adapters/qdrant-dense-retriever.js';
-import { createQdrantBM42Retriever } from './adapters/qdrant-bm42-retriever.js';
-import { createDisabledRetriever } from './adapters/disabled-retriever.js';
-import { createPostgresExactRetriever } from './adapters/postgres-exact-retriever.js';
-import { createPostgresAstRetriever } from './adapters/postgres-ast-retriever.js';
 import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
 import { ENV } from '$lib/server/env.server.js';
-import {
-  CODEBASE_QDRANT_COLLECTION_PRIORITY,
-  resolvePreferredCodebaseCollection,
-} from '$lib/server/config/vector-config.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
-
-const PROJECT_CANONICAL_EMBED_DIM = 384;
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
 
 let embeddingHealthCache:
@@ -73,8 +53,8 @@ async function isEmbeddingHealthy(): Promise<boolean> {
 }
 
 /**
- * Startup assertion: verify canonical Qdrant collection exists AND has the correct
- * vector dimension (384) on the 'content' named vector.
+ * Startup assertion: verify the active Qdrant collection exists AND has the correct
+ * vector dimension for its lane contract on the 'content' named vector.
  *
  * Warnings (non-fatal):
  *  - Collection missing → dense retrieval will return empty results
@@ -83,6 +63,12 @@ async function isEmbeddingHealthy(): Promise<boolean> {
  */
 async function validateQdrantDimensions(): Promise<void> {
   try {
+    const {
+      CODEBASE_QDRANT_COLLECTION_PRIORITY,
+      resolvePreferredCodebaseCollection,
+    } = await import('$lib/server/config/vector-config.js');
+    const { getVectorLaneByCollection } = await import('../vector/lane-registry.js');
+    const { getQdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
     const qdrant = getQdrantManager();
 
     let activeCollection: string | null = null;
@@ -97,7 +83,8 @@ async function validateQdrantDimensions(): Promise<void> {
       (collectionsResult.collections ?? []).map((c: { name: string }) => String(c.name))
     );
 
-    activeCollection = resolvePreferredCodebaseCollection(existingNames).toString();
+    const resolvedCollection = resolvePreferredCodebaseCollection(existingNames);
+    activeCollection = resolvedCollection ? String(resolvedCollection) : null;
 
     if (!activeCollection) {
       console.warn(
@@ -109,8 +96,8 @@ async function validateQdrantDimensions(): Promise<void> {
 
     if (activeCollection === 'codebase_chunks_384') {
       console.warn(
-        '[search-runtime] codebase_chunks_384_hybrid not found. Using dense-only codebase_chunks_384. ' +
-        'Run `npm run atlas:backfill:hybrid` to populate the hybrid collection.'
+        '[search-runtime] codebase_chunks_384_hybrid not found. Using legacy dense-only codebase_chunks_384. ' +
+        'Run `npm run atlas:backfill:hybrid` to populate the canonical hybrid collection.'
       );
     }
 
@@ -143,11 +130,15 @@ async function validateQdrantDimensions(): Promise<void> {
       return;
     }
 
+    const expectedDim =
+      getVectorLaneByCollection(activeCollection)?.dimension ??
+      (activeCollection === 'codebase_chunks_384' ? 384 : 768);
+
     const actualDim = contentVec.size;
-    if (actualDim !== PROJECT_CANONICAL_EMBED_DIM) {
+    if (actualDim !== expectedDim) {
       console.warn(
         `[search-runtime] ${activeCollection}: 'content' vector has dimension ${actualDim}, ` +
-        `expected ${PROJECT_CANONICAL_EMBED_DIM}. ` +
+        `expected ${expectedDim}. ` +
         'Search scores will be wrong. Run `npm run atlas:qdrant:384:restore:apply` to rebuild.'
       );
     }
@@ -157,10 +148,23 @@ async function validateQdrantDimensions(): Promise<void> {
   }
 }
 
-// Run validation on first module load (non-blocking, logs warnings)
-validateQdrantDimensions().catch(err => {
-  console.error('⚠️ Qdrant dimension validation failed:', err);
-});
+let searchRuntimeValidated = false;
+
+/**
+ * Explicit boot hook for runtime validation.
+ * Importing this module must remain side-effect free so retrieval entrypoints
+ * can load cheaply during SSR and unit tests.
+ */
+export async function initializeSearchRuntime(): Promise<void> {
+  if (searchRuntimeValidated) return;
+  searchRuntimeValidated = true;
+
+  try {
+    await validateQdrantDimensions();
+  } catch (err) {
+    console.error('⚠️ Qdrant dimension validation failed:', err);
+  }
+}
 
 /**
  * Canonical query request shape
@@ -429,6 +433,7 @@ export class SearchRuntime {
       // Stage 3b: Score — deterministic blended score per candidate (pre-hydration)
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
       const scoreStart = Date.now();
+      const { scoreCandidates } = await import('./candidate-scorer.js');
       const scored = await scoreCandidates(
         query.text,
         fused.map(c => ({
@@ -492,6 +497,7 @@ export class SearchRuntime {
         return { ...base, blendedScore: base.blendedScore || (reranked.length - idx) / reranked.length };
       });
 
+      const { postProcessCandidates } = await import('./post-process-reranker.js');
       const postProcessed = postProcessCandidates(
         rerankedAsScored,
         {
@@ -516,6 +522,7 @@ export class SearchRuntime {
       stageTiming.promote = 0;
 
       // Queue promotion jobs in outbox table (async, no wait)
+      const { recordPromotionIntent } = await import('./promote-results-outbox.js');
       recordPromotionIntent(finalPackets, {
         queryText: query.text,
         userId: this.userId,
@@ -528,6 +535,7 @@ export class SearchRuntime {
 
       // Log exposure events for the recommendation ledger (fire-and-forget)
       // Must happen after final ranking so positions are accurate.
+      const { logExposureEvents } = await import('./recommendation-events.js');
       logExposureEvents(
         finalPackets.map((pkt, idx) => ({
           packet_key: pkt.packet_key ?? pkt.chunk_id,
@@ -578,6 +586,7 @@ export class SearchRuntime {
     options?: { includeVectorLanes?: boolean }
   ): Promise<Candidate[]> {
     if (!this.injectedRetrievers || this.injectedRetrievers.length === 0) {
+      const { retrieveAllCandidates } = await import('./retrieve-candidates.js');
       return applySearchMetadataFilter(
         await retrieveAllCandidates(query.text, query.filters, undefined, options),
         query.filters
@@ -681,6 +690,7 @@ export class SearchRuntime {
    */
   private async hydrateCandidates(candidates: FusedCandidate[]): Promise<FeatureEnvelope[]> {
     if (candidates.length === 0) return [];
+    const { hydrateCandidates: hydrateFromPostgres } = await import('./hydrate-candidates.js');
     return hydrateFromPostgres(candidates as any);
   }
 
@@ -694,6 +704,7 @@ export class SearchRuntime {
     envelopes: FeatureEnvelope[],
     query: SearchQuery,
   ): Promise<Array<FeatureEnvelope & { model_version?: string; blended_score?: number }>> {
+    const { rerankCanonicalFeatureEnvelopes } = await import('./canonical-rerank-executor.js');
     const result = await rerankCanonicalFeatureEnvelopes(query.text, envelopes as any, {
       authScope: query.userId ?? this.userId ?? 'public',
       rendererVersion: 'search-runtime-v1',
@@ -743,26 +754,31 @@ async function makeEmbedFn(text: string): Promise<DenseEmbedding> {
   };
 }
 
+function projectEmbedding(values: number[], dimension: number): number[] {
+  if (values.length <= dimension) return values;
+  const projected = values.slice(0, dimension);
+  let norm = 0;
+  for (let i = 0; i < projected.length; i++) {
+    norm += projected[i] * projected[i];
+  }
+  norm = Math.sqrt(norm);
+  return norm > 0 ? projected.map((value) => value / norm) : projected;
+}
+
+async function makeProjected384EmbedFn(text: string): Promise<DenseEmbedding> {
+  const embedding = await makeEmbedFn(text);
+  const values = projectEmbedding(embedding.values, 384);
+  return {
+    ...embedding,
+    values,
+    dimension: 384,
+  };
+}
+
 /**
  * Production factory with explicitly wired DI adapters.
  * Each adapter is fail-closed: returns [] on any error, never throws.
  */
 export function createProductionSearchRuntime(config?: { userId?: string; caseId?: string }): SearchRuntime {
-  const retrievers: Retriever[] = [
-    createQdrantDenseRetriever({
-      collection: 'codebase_chunks_384',
-      vectorName: 'content',
-      embedFn: makeEmbedFn,
-      expectedDimension: 384,
-    }),
-    createQdrantBM42Retriever({
-      collection: 'codebase_chunks_384',
-      sparseVectorName: 'bm25',
-    }),
-    createDisabledRetriever('sparse', 'sparse_not_provisioned'),
-    createPostgresExactRetriever(),
-    createPostgresAstRetriever(),
-  ];
-
-  return new SearchRuntime({ ...(config ?? {}), retrievers });
+  return new SearchRuntime({ ...(config ?? {}) });
 }

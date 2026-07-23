@@ -69,7 +69,7 @@ export function classifyEmbeddingError(message: string): EmbeddingFailureKind {
     return 'MODEL_NOT_FOUND';
   }
 
-  if (/dimension|mismatch/i.test(message)) {
+  if (/dimension|dimensions|dim(?:s)?|mismatch/i.test(message)) {
     return 'INVALID_DIMENSIONS';
   }
 

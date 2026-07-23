@@ -437,8 +437,8 @@ export class AnalyticsTrackWorker extends QueueWorker<{
 
 	/** Recommendation-relevant event types that should feed UserHistoryTracker */
 	private static readonly TRACKABLE_EVENTS = new Set([
-		'case_created', 'case_updated', 'evidence_uploaded',
-		'rag_search', 'chat_query', 'document_indexed'
+		'case_created', 'case_create', 'case_updated', 'evidence_uploaded',
+		'rag_search', 'chat_query', 'document_indexed', 'report_create'
 	]);
 
 	async process(data: {

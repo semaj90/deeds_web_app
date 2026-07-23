@@ -1,4 +1,6 @@
 import {
+  EMBEDDINGGEMMA_FULL768_CONTRACT,
+  EMBEDDINGGEMMA_FULL768_V1,
   ATLAS_EMBEDDINGGEMMA_DIRECT_SLICE384_V1,
   EMBEDDINGGEMMA_PREFIX384_CONTRACT,
   type EmbeddingGemmaProjectionContract,
@@ -51,6 +53,17 @@ export const VECTOR_INDEX_REGISTRY = {
     indexKind: 'hybrid',
     buildScript: 'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
     notes: 'Primary dense+sparse retrieval lane.',
+  },
+  qdrantSource768: {
+    id: 'qdrant-codebase-chunks-768',
+    name: 'Qdrant source 768-dim semantic index',
+    backend: 'qdrant-hnsw',
+    contractVersion: EMBEDDINGGEMMA_FULL768_V1,
+    vectorContract: EMBEDDINGGEMMA_FULL768_CONTRACT,
+    collection: 'codebase_chunks_768',
+    indexKind: 'dense',
+    buildScript: 'scripts/atlas/restore-qdrant-768-from-postgres.mjs',
+    notes: 'Native EmbeddingGemma source lane for full-dimension search and adaptive reranking.',
   },
   qdrantDense: {
     id: 'qdrant-codebase-chunks-384',

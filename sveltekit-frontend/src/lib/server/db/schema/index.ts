@@ -36,7 +36,7 @@ export * from '../schema-ace.js';
 export * from './atlas-semantic-diffs.js';
 export * from './atlas-artifacts.js';
 
-// Analytics (user_analytics_events — used via raw SQL in event-logger.ts)
+// Analytics (canonical analytics_events ledger + legacy user analytics table)
 export * from './analytics.js';
 
 // Search Intelligence pipeline tables (chunk_hit_log, rag_query_log, qlora_examples, response_feedback, query_variance_pairs)

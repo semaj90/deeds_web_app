@@ -209,6 +209,7 @@ $model = if ($env:ROTORQUANT_MODEL_PATH) {
 } else {
     $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
     $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant.gguf"
+    $hforfModel   = Join-Path $PSScriptRoot "..\models\hfor\hforf.gguf"
     $localModel   = Join-Path $PSScriptRoot "..\models\gemma4-legal-iq4xs-direct.gguf"
     $localLegacy  = Join-Path $PSScriptRoot "..\models\gemma4-turboquant-rotorquant.gguf"
 
@@ -239,7 +240,8 @@ $model = if ($env:ROTORQUANT_MODEL_PATH) {
         }
     }
 
-    if (Test-Path $vendorModel) { $vendorModel }
+    if (Test-Path $hforfModel) { $hforfModel }
+    elseif (Test-Path $vendorModel) { $vendorModel }
     elseif (Test-Path $vendorDirect) { $vendorDirect }
     elseif (Test-Path $localModel) { $localModel }
     elseif (Test-Path $localLegacy) { $localLegacy }
@@ -269,7 +271,27 @@ if ($ctxLen -lt 65536 -and -not $allowShortCtx) {
     Write-Warning "Requested TurboQuant context $ctxLen is below the repo default of 65536. Clamping to 65536. Set TURBO_CTX_ALLOW_SHORT_CONTEXT=true to opt in to a shorter context."
     $ctxLen = 65536
 }
-$threads = if ($env:TURBO_THREADS)     { $env:TURBO_THREADS }     else { [System.Environment]::ProcessorCount.ToString() }
+$threadsRequested = if ($env:TURBO_CPU_THREADS) {
+    $env:TURBO_CPU_THREADS
+} elseif ($env:TURBO_THREADS) {
+    $env:TURBO_THREADS
+} else {
+    6
+}
+$batchThreadsRequested = if ($env:TURBO_CPU_THREADS_BATCH) {
+    $env:TURBO_CPU_THREADS_BATCH
+} elseif ($env:TURBO_THREADS_BATCH) {
+    $env:TURBO_THREADS_BATCH
+} else {
+    8
+}
+
+$threads = [Math]::Max(1, [int]$threadsRequested)
+$batchThreads = [Math]::Max(1, [int]$batchThreadsRequested)
+if ($batchThreads -lt $threads) {
+    $batchThreads = $threads
+}
+
 $batchSize = if ($env:TURBO_BATCH_SIZE) { $env:TURBO_BATCH_SIZE } else { $null }
 $ubatchSize = if ($env:TURBO_UBATCH_SIZE) { $env:TURBO_UBATCH_SIZE } else { $null }
 
@@ -805,20 +827,17 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
 } else {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary (template-based reasoning active)" -ForegroundColor DarkYellow
 }
-# Suppress <|channel>thought leak (Gemma4 internal markers)
-# Reasoning happens via template protocol, not via reasoning-format flag
-if (Test-LlamaFlag $llama '--reasoning-budget') {
-    $baseArgs = $baseArgs + @('--reasoning-budget', '0')
-    Write-Host "Reasoning budget: --reasoning-budget 0 (suppress internal markers, use template)" -ForegroundColor Cyan
-}
+# Keep the model output path unconstrained here.
+# The repo smoke gate expects the server to handle system prompts and tool calls
+# without forcing reasoning budget to zero.
 
-# -- Chat template: use gemma4-tools.jinja to enable tool calling + suppress thinking markers --
-# DEFAULT: gemma4-tools.jinja — handles system role, tool injection, tool_call parsing,
-# and strips <|channel>thought markers. The GGUF has <|tool_response> baked in so the
-# embedded template supports tools; gemma4-summary-clean.jinja clobbered that support.
+# -- Chat template: use gemma4-opencode.jinja for OpenCode-compatible chat/tool calling --
+# DEFAULT: gemma4-opencode.jinja — handles system role and OpenCode/llama-server
+# compatibility. Keep this as the launcher default; older summary-clean templates
+# and ad-hoc tool templates tend to poison /props capability detection.
 # HARD RULE: always pass --chat-template-file. Never use --chat-template <name>.
 # To use summary-only mode (no tools): set TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
-$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\gemma4-tools.jinja"
+$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\gemma4-opencode.jinja"
 $chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
     $env:TURBO_CHAT_TEMPLATE_FILE
 } elseif (Test-Path $defaultTemplate) {
@@ -855,16 +874,18 @@ if (Test-LlamaFlag $llama '--jinja') {
     Write-Host "Tool calling: --jinja not in this binary - Gemma4 uses generic tool-call path" -ForegroundColor DarkYellow
 }
 
-# -- Skip chat template parsing to avoid Jinja2 filter compatibility issues --
-# --skip-chat-parsing bypasses common_chat_verify_template so custom jinja templates
-# (like gemma4-tools.jinja) don't need to survive the C++ Jinja2 output validator.
-# The model still receives the rendered template; it just won't be parsed for tool-call
-# extraction by llama-server's built-in parser (Gemma4 emits tool calls inline anyway).
-if (Test-LlamaFlag $llama '--skip-chat-parsing') {
-    Write-Host "Chat parsing: --skip-chat-parsing enabled (bypasses template validator)" -ForegroundColor Cyan
+# -- Skip chat template parsing only when explicitly requested -----------------
+# The OpenCode template should validate cleanly on a healthy llama-server build.
+# If you need to bypass template validation for a local experiment, set
+# TURBO_SKIP_CHAT_PARSING=true.
+$skipChatParsing = $env:TURBO_SKIP_CHAT_PARSING -and ("$($env:TURBO_SKIP_CHAT_PARSING)" -match '^(1|true|yes|on)$')
+if ($skipChatParsing -and (Test-LlamaFlag $llama '--skip-chat-parsing')) {
+    Write-Host "Chat parsing: --skip-chat-parsing enabled (explicit override)" -ForegroundColor Cyan
     $baseArgs = $baseArgs + @('--skip-chat-parsing')
+} elseif ($skipChatParsing) {
+    Write-Host "Chat parsing: requested but not supported by this binary - continuing without it" -ForegroundColor DarkYellow
 } else {
-    Write-Host "Chat parsing: --skip-chat-parsing not supported - using default template validator" -ForegroundColor DarkYellow
+    Write-Host "Chat parsing: using llama-server template validation" -ForegroundColor Cyan
 }
 
 # -- KV prefix reuse: reduce prefill cost on repeated system prompts -------
@@ -924,8 +945,8 @@ if ($ubatchSize) {
 
 # -- Batch threads check ---------------------------------------------------
 if (Test-LlamaFlag $llama '--threads-batch') {
-    $baseArgs = $baseArgs + @('--threads-batch', $threads)
-    Write-Host "Batch threads: --threads-batch $threads enabled" -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--threads-batch', $batchThreads)
+    Write-Host "Batch threads: --threads-batch $batchThreads enabled" -ForegroundColor Cyan
 }
 
 # -- Foreground branch ----------------------------------------------------

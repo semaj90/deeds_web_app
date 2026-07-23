@@ -4,8 +4,8 @@
  * Logs contextual events for predictive analytics + todo summaries.
  * Events, not raw content — privacy-safe by default.
  *
- * Event schema stored in PostgreSQL JSONB (user_analytics_events table).
- * Redis pub/sub for real-time dashboards. ClickHouse for heavy analytics later.
+ * Event schema stored in the canonical analytics_events table.
+ * Redis Streams fan out real-time signals; ClickHouse remains a future lane.
  *
  * Generates:
  * - Weekly summaries ("top intents", "slow endpoints", "most used tools")
@@ -16,6 +16,8 @@ import dbClient from '$lib/server/db/client';
 const db = dbClient.db;
 import { sql } from 'drizzle-orm';
 import { createHash } from 'crypto';
+import { analyticsEvents } from '$lib/server/db/schema-postgres.js';
+import { emit, makeEvent } from './analytics-sink.js';
 
 // ── Event Types ──────────────────────────────────────────────────────────
 
@@ -101,20 +103,51 @@ export interface UserAnalyticsEvent {
  * Non-blocking — errors are swallowed to never break the main flow.
  */
 export async function logEvent(event: AnalyticsEvent): Promise<void> {
+	const canonicalType = legacyToCanonical(event.eventType);
+
 	try {
-		await db.execute(sql`
-			INSERT INTO user_analytics_events (
-				user_id, session_id, event_type, payload, created_at
-			) VALUES (
-				${event.userId ?? null},
-				${event.sessionId ?? null},
-				${event.eventType},
-				${event.payload}::jsonb,
-				NOW()
-			)
-		`);
+		await db.insert(analyticsEvents).values({
+			eventType: canonicalType,
+			userId: event.userId ? (Number.isInteger(Number(event.userId)) ? Number(event.userId) : null) : null,
+			sessionId: event.sessionId ?? null,
+			payload: {
+				...event.payload,
+				legacyEventType: event.eventType,
+			},
+		});
 	} catch {
 		// Never break the main flow for analytics
+	}
+
+	// Fan out to the canonical envelope sink (Postgres analytics_events + Redis Streams).
+	// Legacy event names collapse onto the canonical envelope types.
+	emit(makeEvent({
+		eventType: canonicalType,
+		userId: event.userId ? (Number.isInteger(Number(event.userId)) ? Number(event.userId) : undefined) : undefined,
+		sessionId: event.sessionId,
+		queryHash: event.payload?.queryHash,
+		traceId: event.sessionId ?? `legacy:${event.eventType}`,
+		latencyMs: event.payload?.latencyMs,
+		metadata: {
+			legacyEventType: event.eventType,
+			source: event.payload?.source,
+			cacheLayer: event.payload?.cacheLayer,
+			resultCount: event.payload?.resultCount,
+			confidence: event.payload?.confidence,
+		},
+	}));
+}
+
+/** Map legacy event-logger types to canonical AnalyticsEventType. */
+function legacyToCanonical(t: AnalyticsEventType): import('./analytics-event-envelope.js').AnalyticsEventType {
+	switch (t) {
+		case 'cache_hit':   return 'cache.hit';
+		case 'cache_miss':  return 'cache.miss';
+		case 'chat_query':
+		case 'rag_search':
+		case 'codebase_search':
+		case 'tool_search': return 'request.received';
+		default:            return 'request.routed';
 	}
 }
 
@@ -125,19 +158,36 @@ export async function logEvent(event: AnalyticsEvent): Promise<void> {
 export async function logEventBatch(events: AnalyticsEvent[]): Promise<number> {
 	if (events.length === 0) return 0;
 	try {
-		// Build a single INSERT with multiple VALUES rows
-		const rows = events.map(e => ({
-			user_id: e.userId ?? null,
-			session_id: e.sessionId ?? null,
-			event_type: e.eventType,
-			payload: e.payload,
+		const rows = events.map((e) => ({
+			eventType: legacyToCanonical(e.eventType),
+			userId: e.userId ? (Number.isInteger(Number(e.userId)) ? Number(e.userId) : null) : null,
+			sessionId: e.sessionId ?? null,
+			payload: {
+				...e.payload,
+				legacyEventType: e.eventType,
+			},
 		}));
-		await db.execute(sql`
-			INSERT INTO user_analytics_events (user_id, session_id, event_type, payload, created_at)
-			SELECT r.user_id, r.session_id, r.event_type, r.payload::jsonb, NOW()
-			FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
-			AS r(user_id text, session_id text, event_type text, payload jsonb)
-		`);
+		await db.insert(analyticsEvents).values(rows.map((row) => ({
+			eventType: row.eventType,
+			userId: row.userId,
+			sessionId: row.sessionId,
+			payload: row.payload,
+		})));
+		emitBatch(events.map((event) => makeEvent({
+			eventType: legacyToCanonical(event.eventType),
+			userId: event.userId ? (Number.isInteger(Number(event.userId)) ? Number(event.userId) : undefined) : undefined,
+			sessionId: event.sessionId,
+			queryHash: event.payload?.queryHash,
+			traceId: event.sessionId ?? `legacy:${event.eventType}`,
+			latencyMs: event.payload?.latencyMs,
+			metadata: {
+				legacyEventType: event.eventType,
+				source: event.payload?.source,
+				cacheLayer: event.payload?.cacheLayer,
+				resultCount: event.payload?.resultCount,
+				confidence: event.payload?.confidence,
+			},
+		})));
 		return events.length;
 	} catch {
 		return 0;
@@ -237,15 +287,17 @@ export async function getTopQueryPatterns(
 	userId: string,
 	limit = 10
 ): Promise<Array<{ query_hash: string; count: number; last_seen: string }>> {
+	const userIdInt = Number(userId);
+	if (!Number.isFinite(userIdInt)) return [];
 	try {
 		const result = await db.execute(sql`
 			SELECT
 				payload->>'queryHash' as query_hash,
 				COUNT(*) as count,
 				MAX(created_at) as last_seen
-			FROM user_analytics_events
-			WHERE user_id = ${userId}
-			  AND event_type IN ('chat_query', 'codebase_search', 'rag_search')
+			FROM analytics_events
+			WHERE user_id = ${userIdInt}
+			  AND event_type IN ('request.received', 'request.routed')
 			  AND created_at > NOW() - INTERVAL '30 days'
 			GROUP BY payload->>'queryHash'
 			ORDER BY count DESC
@@ -268,15 +320,26 @@ export async function getWeeklySummary(userId: string): Promise<{
 	mostUsedTools: string[];
 	slowEndpoints: string[];
 }> {
+	const userIdInt = Number(userId);
+	if (!Number.isFinite(userIdInt)) {
+		return {
+			totalQueries: 0,
+			topIntents: [],
+			avgLatencyMs: 0,
+			cacheHitRate: 0,
+			mostUsedTools: [],
+			slowEndpoints: [],
+		};
+	}
 	try {
 		const result = await db.execute(sql`
 			SELECT
 				COUNT(*) as total,
 				AVG((payload->>'latencyMs')::numeric) as avg_latency,
-				COUNT(*) FILTER (WHERE event_type = 'cache_hit') as cache_hits,
-				COUNT(*) FILTER (WHERE event_type IN ('cache_hit', 'cache_miss')) as cache_total
-			FROM user_analytics_events
-			WHERE user_id = ${userId}
+				COUNT(*) FILTER (WHERE event_type = 'cache.hit') as cache_hits,
+				COUNT(*) FILTER (WHERE event_type IN ('cache.hit', 'cache.miss')) as cache_total
+			FROM analytics_events
+			WHERE user_id = ${userIdInt}
 			  AND created_at > NOW() - INTERVAL '7 days'
 		`);
 

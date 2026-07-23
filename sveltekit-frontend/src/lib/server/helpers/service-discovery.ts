@@ -124,8 +124,8 @@ export const COMMON_SERVICES: Record<string, ServiceConfig> = {
   },
   langextract: {
     envVar: 'LANGEXTRACT_URL',
-    fallback: ENV.LANGEXTRACT_URL || 'http://phase66-langextract:8095',
-    containerName: 'phase66-langextract',
+    fallback: ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095',
+    containerName: 'miniforge-nlp-sidecar',
     port: 8095,
     verify: false,
     verifyTimeout: 3000,

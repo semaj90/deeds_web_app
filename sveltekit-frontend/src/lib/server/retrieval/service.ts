@@ -5,30 +5,51 @@
  */
 
 import type { SearchRequest, SearchResponse, SearchResult } from './types.js';
-import { embedQuery, initEmbeddingService, getEmbeddingServiceConfig } from './embedding-service.js';
-import { getSearchLaneRegistry } from './search-lanes.js';
+import { initEmbeddingService, getEmbeddingServiceConfig, type QueryVectorBundle } from './embedding-service.js';
 import { sql } from 'drizzle-orm';
 import { inArray } from 'drizzle-orm';
-import { db } from '$lib/server/db/client.js';
 import {
   RETRIEVAL_LIMITS,
-  normalizeRetrievalSearchRequest
+  buildKeywordBundle,
+  inferRetrievalTier,
+  normalizeRetrievalSearchRequest,
+  type SearchMetadataFilter
 } from './search-contract.js';
-import type { SearchFilter } from './types.js';
+import type { SearchFilter, SearchLaneContext } from './types.js';
+
+async function getDb() {
+  const mod = await import('$lib/server/db/client.js');
+  return mod.db;
+}
 
 function buildLaneFilter(
   req: SearchRequest,
   normalizedRequest: ReturnType<typeof normalizeRetrievalSearchRequest> | null,
   perLaneLimit: number
 ): SearchFilter {
+  const normalizedFilters = normalizedRequest?.filters as SearchMetadataFilter | undefined;
+
   return {
     ...req.filters,
     keywords: normalizedRequest?.exactKeywords ?? req.exactKeywords ?? req.filters?.keywords,
     keyword_variants: normalizedRequest?.expandedKeywords ?? req.expandedKeywords ?? req.filters?.keyword_variants,
-    search_kinds: normalizedRequest?.lanes ?? req.lanes ?? req.filters?.search_kinds,
+    artifact_tier: req.filters?.artifact_tier ?? normalizedFilters?.artifactTier,
+    artifact_tiers: req.filters?.artifact_tiers ?? normalizedFilters?.artifactTiers,
     include_packet_keys: normalizedRequest?.cursor ? [] : req.filters?.include_packet_keys,
     per_lane_limit: perLaneLimit
   };
+}
+
+function selectLaneNamesForTier(tier: 'hot' | 'warm' | 'cold'): SearchRequest['lanes'] {
+  switch (tier) {
+    case 'hot':
+      return ['lexical', 'qdrant-384', 'gpu-cuvs', 'qdrant-768'];
+    case 'cold':
+      return ['lexical', 'qdrant-768', 'qdrant-384', 'bm25', 'gpu-cuvs'];
+    case 'warm':
+    default:
+      return ['lexical', 'qdrant-768', 'qdrant-384', 'bm25', 'gpu-cuvs'];
+  }
 }
 
 /**
@@ -42,12 +63,28 @@ function buildLaneFilter(
  * 5. Optional LLM summary
  */
 export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse> {
-  const normalizedRequest = typeof req.query === 'string'
+  const queryText = typeof req.query === 'string'
+    ? req.query
+    : req.queryText ?? '';
+
+  const queryVector = req.query instanceof Float32Array
+    ? req.query
+    : req.queryVector;
+
+  const normalizedRequest = queryText
     ? normalizeRetrievalSearchRequest({
         ...(req as any),
-        query: req.query
+        query: queryText,
+        queryText
       } as any)
     : null;
+  const retrievalTier =
+    normalizedRequest?.retrievalTier ??
+    inferRetrievalTier({
+      query: queryText || String(req.query ?? ''),
+      exactKeywords: normalizedRequest?.exactKeywords ?? req.exactKeywords,
+      expandedKeywords: normalizedRequest?.expandedKeywords ?? req.expandedKeywords
+    });
 
   const startTime = performance.now();
   const timing: SearchResponse['timing'] = {
@@ -75,19 +112,38 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
     throw new Error('topKPerLane must be at least 1');
   }
 
-  // Step 1: Embed query
+  // Step 1: Embed query bundle
   const embedStartTime = performance.now();
+  const { embedQueryForLane } = await import('./embedding-service.js');
   let queryEmbedding: Float32Array;
-  let embeddingModel = '';
+  let queryVectorBundle: QueryVectorBundle = {
+    dense384: null,
+    dense768: null,
+    latent64: null,
+  };
 
   if (typeof req.query === 'string') {
-    const result = await embedQuery(req.query, req.embedding_dim);
-    queryEmbedding = result.vector;
-    embeddingModel = result.model;
+    const [dense384, dense768] = await Promise.allSettled([
+      embedQueryForLane(req.query, 'dense_384'),
+      embedQueryForLane(req.query, 'dense_768'),
+    ]);
+
+    queryVectorBundle = {
+      dense384: dense384.status === 'fulfilled' ? dense384.value : null,
+      dense768: dense768.status === 'fulfilled' ? dense768.value : null,
+      latent64: null,
+    };
+
+    const sourceVector = queryVectorBundle.dense768?.vector ?? queryVectorBundle.dense384?.vector;
+    if (!sourceVector) {
+      throw new Error('Failed to generate a query vector bundle');
+    }
+    queryEmbedding = sourceVector;
     timing.embed_ms = performance.now() - embedStartTime;
   } else {
     // Pre-embedded vector
     queryEmbedding = req.query instanceof Float32Array ? req.query : new Float32Array(req.query);
+    queryVectorBundle = { dense384: null, dense768: { vector: queryEmbedding, model: 'pre-embedded', dimension: queryEmbedding.length, cached: false, exec_ms: 0 }, latent64: null };
     timing.embed_ms = performance.now() - embedStartTime;
   }
 
@@ -96,14 +152,29 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   }
 
   // Step 2: Search all requested lanes in parallel
+  const { getSearchLaneRegistry } = await import('./search-lanes.js');
   const registry = getSearchLaneRegistry();
   const lanesAttempted: string[] = [];
   const lanesSucceeded: string[] = [];
   const lanesFailed: string[] = [];
   let combinedResults: SearchResult[] = [];
 
-  const laneNames = normalizedRequest?.lanes ?? req.lanes ?? ['gpu-cuvs', 'qdrant'];
+  // Default lane selection is tier-aware: hot favors exact/384, warm keeps both dense lanes, cold widens to 768.
+  const laneNames = normalizedRequest?.lanes ?? req.lanes ?? selectLaneNamesForTier(retrievalTier);
   const laneFilters = buildLaneFilter(req, normalizedRequest, perLaneLimit);
+  const laneContext: SearchLaneContext = {
+    queryText,
+    queryVector: queryEmbedding,
+    queryVectorBundle,
+    topK: perLaneLimit,
+    retrievalTier,
+    filters: laneFilters,
+    keywordBundle: buildKeywordBundle({
+      query: queryText || (typeof req.query === 'string' ? req.query : ''),
+      exactKeywords: normalizedRequest?.exactKeywords ?? req.exactKeywords,
+      expandedKeywords: normalizedRequest?.expandedKeywords ?? req.expandedKeywords
+    })
+  };
   const laneSearches = laneNames.map(async (laneName) => {
     const lane = registry.get(laneName);
     if (!lane) {
@@ -121,14 +192,14 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
       }
 
       const startSearch = performance.now();
-      const results = await lane.search(queryEmbedding, perLaneLimit, laneFilters);
+      const results = await lane.search(laneContext);
       const elapsed = performance.now() - startSearch;
 
       lanesSucceeded.push(laneName);
 
       // Record lane-specific timing
       if (laneName === 'gpu-cuvs') timing.gpu_ms = elapsed;
-      else if (laneName === 'qdrant') timing.qdrant_ms = elapsed;
+      else if (laneName === 'qdrant' || laneName === 'qdrant-768') timing.qdrant_ms = elapsed;
 
       return results;
     } catch (err) {
@@ -141,9 +212,15 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   const laneResults = await Promise.all(laneSearches);
   combinedResults = laneResults.flat();
 
-  // Step 3: Join Postgres for canonical metadata (if packet_key missing)
+  // Step 3: Join Postgres for canonical metadata
+  // 768-dim: join when source_ref missing and qdrant_point_id present
+  // 384-dim: join when packet_key missing (need atlas_packets for packet_key even if source_ref known)
   const postgresStartTime = performance.now();
-  const resultsNeedingJoin = combinedResults.filter((r) => !r.source_ref && r.metadata?.qdrant_point_id);
+  const resultsNeedingJoin = combinedResults.filter(
+    (r) =>
+      (!r.source_ref && r.metadata?.qdrant_point_id) ||   // 768-dim path
+      (r.source === 'qdrant-384' && !r.packet_key)         // 384-dim path
+  );
 
   if (resultsNeedingJoin.length > 0) {
     const joined = await joinPostgres(resultsNeedingJoin);
@@ -203,67 +280,101 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
 }
 
 /**
- * Join Postgres for canonical metadata
- * Enriches SearchResult with title, summary, file_path, updated_at from codebase_chunk_index
+ * Join Postgres for canonical metadata.
+ *
+ * Two join paths:
+ *   - 768-dim results (source: 'qdrant' or 'qdrant-768'): join codebase_chunk_index by UUID qdrant_point_id
+ *   - 384-dim results (source: 'qdrant-384'): join atlas_packets by source_ref (payload always populated)
+ *
+ * Both paths are tried; first match wins so cross-dim results merge cleanly into one set.
  */
 async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
-  if (results.length === 0) {
-    return results;
-  }
+  if (results.length === 0) return results;
 
   try {
-    // Extract Qdrant point IDs for lookup
+    const db = await getDb();
+    // --- 768-dim path: codebase_chunk_index by UUID ---
     const qdrantPointIds = results
+      .filter((r) => r.source === 'qdrant' || r.source === 'qdrant-768' || r.metadata?.embedding_dim === 768)
       .map((r) => r.metadata?.qdrant_point_id)
       .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
-    if (qdrantPointIds.length === 0) {
-      return results;
-    }
+    // --- 384-dim path: atlas_packets by source_ref ---
+    const sourceRefs384 = results
+      .filter((r) => r.source === 'qdrant-384' || r.metadata?.embedding_dim === 384)
+      .map((r) => r.source_ref ?? (r.metadata?.payload as Record<string, unknown> | undefined)?.source_ref as string | undefined)
+      .filter((ref): ref is string => typeof ref === 'string' && ref.length > 0);
 
-    // Fetch canonical metadata from codebase_chunk_index using raw SQL for flexibility
-    const packets = await db.execute(sql`
-      SELECT
-        id::text as id,
-        summary,
-        source_ref,
-        source_ref as file_path,
-        updated_at
-      FROM codebase_chunk_index
-      WHERE id::text = ANY(${qdrantPointIds})
-      LIMIT ${results.length}
-    `);
+    const [chunkRows, packetRows] = await Promise.all([
+      qdrantPointIds.length > 0
+        ? db.execute(sql`
+            SELECT
+              id::text as id,
+              summary,
+              source_ref,
+              source_ref as file_path,
+              updated_at
+            FROM codebase_chunk_index
+            WHERE id::text = ANY(${qdrantPointIds})
+            LIMIT ${qdrantPointIds.length + 1}
+          `)
+        : Promise.resolve({ rows: [] }),
 
-    if (!packets.rows || packets.rows.length === 0) {
-      return results;
-    }
+      sourceRefs384.length > 0
+        ? db.execute(sql`
+            SELECT
+              source_ref,
+              file_path,
+              summary,
+              packet_key,
+              updated_at
+            FROM atlas_packets
+            WHERE source_ref = ANY(${sourceRefs384}::text[])
+            LIMIT ${sourceRefs384.length + 1}
+          `)
+        : Promise.resolve({ rows: [] }),
+    ]);
 
-    // Build lookup map by id
+    type ChunkRow = { id: string; summary: string | null; source_ref: string | null; file_path: string | null; updated_at: Date };
+    type PacketRow = { source_ref: string; file_path: string | null; summary: string | null; packet_key: string | null; updated_at: Date };
+
+    const chunkMap = new Map(
+      (chunkRows.rows as ChunkRow[]).map((p) => [p.id, p])
+    );
     const packetMap = new Map(
-      (packets.rows as Array<{ id: string; summary: string | null; source_ref: string | null; file_path: string | null; updated_at: Date }>)
-        .map((p) => [p.id, p])
+      (packetRows.rows as PacketRow[]).map((p) => [p.source_ref, p])
     );
 
-    // Enrich results with canonical metadata
     return results.map((r) => {
-      const packet = packetMap.get(r.metadata?.qdrant_point_id as string);
-      if (!packet) {
-        return r;
+      // Try chunk join (768-dim path)
+      const chunk = chunkMap.get(r.metadata?.qdrant_point_id as string);
+      if (chunk) {
+        return {
+          ...r,
+          source_ref: chunk.source_ref || r.source_ref,
+          file_path: chunk.file_path || r.file_path,
+          summary: chunk.summary || r.summary,
+          metadata: { ...r.metadata, updated_at: chunk.updated_at },
+        };
       }
 
-      return {
-        ...r,
-        source_ref: packet.source_ref || r.source_ref,
-        file_path: packet.file_path || r.file_path,
-        summary: packet.summary || r.summary,
-        metadata: {
-          ...r.metadata,
-          updated_at: packet.updated_at,
-        },
-      };
+      // Try packet join (384-dim path)
+      const ref = r.source_ref ?? (r.metadata?.payload as Record<string, unknown> | undefined)?.source_ref as string | undefined;
+      const packet = ref ? packetMap.get(ref) : undefined;
+      if (packet) {
+        return {
+          ...r,
+          source_ref: packet.source_ref || r.source_ref,
+          file_path: packet.file_path || r.file_path,
+          summary: packet.summary || r.summary,
+          packet_key: packet.packet_key || r.packet_key,
+          metadata: { ...r.metadata, updated_at: packet.updated_at },
+        };
+      }
+
+      return r;
     });
   } catch (err) {
-    // Graceful degradation: if Postgres is unavailable, return original results
     console.error('[UnifiedSearch] Postgres join failed:', err instanceof Error ? err.message : '');
     return results;
   }
@@ -329,4 +440,29 @@ export function initRetrievalService(config: { embed_model?: string; qdrant_url?
   initEmbeddingService({
     embed_model: config.embed_model,
   });
+}
+
+let retrievalRuntimeInitialized = false;
+
+/**
+ * Explicit boot hook for retrieval runtime setup.
+ * Importing this module must remain side-effect free; callers should invoke this
+ * once during app startup when they want embedding defaults to be applied.
+ */
+export async function initializeRetrievalRuntime(config: {
+  embed_model_384?: string;
+  embed_model_768?: string;
+} = {}): Promise<void> {
+  if (retrievalRuntimeInitialized) return;
+
+  const { initializeSearchRuntime } = await import('./search-runtime.js');
+  initEmbeddingService({
+    embed_model: config.embed_model_768 ?? config.embed_model_384 ?? 'embeddinggemma:latest',
+    embed_model_384: config.embed_model_384,
+    embed_model_768: config.embed_model_768,
+    target_dim: 768,
+  });
+  await initializeSearchRuntime();
+
+  retrievalRuntimeInitialized = true;
 }

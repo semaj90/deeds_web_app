@@ -12,16 +12,13 @@
  * from multiple lanes before reciprocal rank fusion.
  */
 
-import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
-import { embedText } from '$lib/server/embedding/embed.js';
-import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';
 import type { Candidate } from './search-runtime.js';
 import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
-import { RETRIEVAL_LIMITS, identifierVariants, tokenizeKeywordSurface } from './search-contract.js';
+import { RETRIEVAL_LIMITS, identifierVariants, inferRetrievalTier, tokenizeKeywordSurface } from './search-contract.js';
 
 const BM25_LIMIT = RETRIEVAL_LIMITS.postgresFtsTopK;
 const QDRANT_LIMIT = RETRIEVAL_LIMITS.denseTopK;
@@ -30,7 +27,24 @@ const AST_LIMIT = RETRIEVAL_LIMITS.topologyTopK;
 const RG_LIMIT = RETRIEVAL_LIMITS.maxGraphNeighbors;
 const SPARSE_LIMIT = RETRIEVAL_LIMITS.sparseTopK;
 
-const _sparseRetriever = createBm42SparseRetriever();
+let sparseRetriever: ReturnType<typeof createBm42SparseRetriever> | null = null;
+
+async function getDb() {
+  const mod = await import('$lib/server/db/client.js');
+  return mod.db;
+}
+
+async function getQdrantManager() {
+  const mod = await import('$lib/server/vector/qdrant-manager.js');
+  return mod.getQdrantManager();
+}
+
+function getSparseRetriever(): ReturnType<typeof createBm42SparseRetriever> {
+  if (!sparseRetriever) {
+    sparseRetriever = createBm42SparseRetriever();
+  }
+  return sparseRetriever;
+}
 
 /**
  * Retrieve candidates from all sources
@@ -112,6 +126,7 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
  */
 export async function retrieveBM25(query: string): Promise<Candidate[]> {
   try {
+    const db = await getDb();
     // Clean query for ts_rank (PostgreSQL Boolean query syntax)
     const queryTerms = query
       .trim()
@@ -196,6 +211,7 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
       )`;
     });
 
+    const db = await getDb();
     const result = await db.execute(sql`
       SELECT
         id,
@@ -241,25 +257,83 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 /**
  * Semantic retrieval via Qdrant ANN search
  * Primary: codebase_chunks_384_hybrid (dense 384-dim + BM42 sparse)
- * Fallback: codebase_chunks_384 (dense-only, transitional)
+ * Secondary: codebase_chunks_768 (dense-only detail lane)
  */
 export async function retrieveQdrant(query: string): Promise<Candidate[]> {
-  const embedding = await embedQuery(query);
+  const [dense384, dense768] = await Promise.allSettled([
+    embedQueryForLane(query, 'dense_384'),
+    embedQueryForLane(query, 'dense_768'),
+  ]);
+  const queryVectors = {
+    dense384: dense384.status === 'fulfilled' ? dense384.value.vector : null,
+    dense768: dense768.status === 'fulfilled' ? dense768.value.vector : null,
+  };
+  const embedding = queryVectors.dense768 ?? queryVectors.dense384;
   if (!embedding) return [];
 
-  if (embedding.length !== 384) {
-    console.warn(
-      `Embedding dimension mismatch: expected 384, got ${embedding.length}.`
-    );
-  }
-
-  const qdrant = getQdrantManager();
+  const qdrant = await getQdrantManager();
+  const retrievalTier = inferRetrievalTier({ query });
+  const collections = retrievalTier === 'cold'
+    ? ['codebase_chunks_768', 'codebase_chunks_384_hybrid']
+    : ['codebase_chunks_384_hybrid', 'codebase_chunks_768'];
+  const resultsByKey = new Map<string, Candidate>();
 
   try {
+    for (const collection of collections) {
+      const queryEmbedding =
+        collection === 'codebase_chunks_384_hybrid'
+          ? queryVectors.dense384
+          : queryVectors.dense768;
+
+      if (!queryEmbedding) continue;
+
+      try {
+        const results = await qdrant.hybridSearch({
+          collection,
+          query,
+          queryEmbedding,
+          limit: QDRANT_LIMIT,
+        });
+
+        for (const hit of results.results) {
+          const candidate: Candidate = {
+            id: String(hit.id),
+            packetKey: (hit.payload?.packet_key as string) || String(hit.id),
+            sourceRef: (hit.payload?.source_ref as string) || '',
+            summary: (hit.payload?.summary as string) || '',
+            content: (hit.payload?.content as string) || '',
+            score: hit.score,
+            scoreSource: 'qdrant' as const,
+          };
+
+          const existing = resultsByKey.get(candidate.packetKey) ?? resultsByKey.get(candidate.id);
+          if (!existing || candidate.score > existing.score) {
+            resultsByKey.set(candidate.packetKey, candidate);
+            resultsByKey.set(candidate.id, candidate);
+          }
+        }
+      } catch (error) {
+        console.warn(`[retrieveQdrant] ${collection} search failed:`, (error as Error).message);
+      }
+    }
+
+    if (resultsByKey.size > 0) {
+      return [...new Map(
+        [...resultsByKey.values()].map((candidate) => [candidate.packetKey || candidate.id, candidate])
+      ).values()]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, QDRANT_LIMIT);
+    }
+  } catch (error) {
+    console.warn('[retrieveQdrant] adaptive hybrid search failed, falling back to dense-only:', (error as Error).message);
+  }
+
+  // Fallback: dense-only 384-dim legacy collection (run npm run atlas:backfill:hybrid to populate hybrid)
+  try {
     const results = await qdrant.hybridSearch({
-      collection: VECTOR_INDEX_REGISTRY.qdrantHybrid.collection ?? 'codebase_chunks_384_hybrid', // CANONICAL: hybrid dense+sparse
+      collection: VECTOR_INDEX_REGISTRY.qdrantSource768.collection ?? 'codebase_chunks_768',
       query,
-      queryEmbedding: embedding,
+      queryEmbedding: queryVectors.dense768 ?? queryVectors.dense384 ?? Array.from(embedding),
       limit: QDRANT_LIMIT,
     });
 
@@ -269,33 +343,12 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
       sourceRef: (hit.payload?.source_ref as string) || '',
       summary: (hit.payload?.summary as string) || '',
       content: (hit.payload?.content as string) || '',
-      score: hit.score,
+      score: hit.score * 0.95,
       scoreSource: 'qdrant' as const,
     }));
-  } catch (error) {
-    console.warn('[retrieveQdrant] hybrid collection failed, falling back to dense-only:', (error as Error).message);
-    // Fallback: dense-only 384-dim collection (run npm run atlas:backfill:hybrid to populate hybrid)
-    try {
-      const results = await qdrant.hybridSearch({
-        collection: VECTOR_INDEX_REGISTRY.qdrantDense.collection ?? 'codebase_chunks_384', // TRANSITIONAL FALLBACK
-        query,
-        queryEmbedding: embedding,
-        limit: QDRANT_LIMIT,
-      });
-
-      return results.results.map(hit => ({
-        id: String(hit.id),
-        packetKey: (hit.payload?.packet_key as string) || String(hit.id),
-        sourceRef: (hit.payload?.source_ref as string) || '',
-        summary: (hit.payload?.summary as string) || '',
-        content: (hit.payload?.content as string) || '',
-        score: hit.score * 0.95,
-        scoreSource: 'qdrant' as const,
-      }));
-    } catch (fallbackError) {
-      console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);
-      return [];
-    }
+  } catch (fallbackError) {
+    console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);
+    return [];
   }
 }
 
@@ -316,6 +369,7 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
     const firstIdentifier = identifiers[0];
     const searchPattern = `%${firstIdentifier}%`;
 
+    const db = await getDb();
     const result = await db.execute(sql`
       SELECT
         id,
@@ -376,6 +430,7 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
 
     // Search for packets with tree_node_ids that match query identifiers
     // tree_node_ids is a TEXT[] array in Postgres
+    const db = await getDb();
     const result = await db.execute(sql`
       SELECT
         id,
@@ -496,6 +551,7 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
       const remaining = RG_LIMIT - candidates.length;
 
       try {
+        const db = await getDb();
         const result = await db.execute(sql`
           SELECT
             id,
@@ -540,30 +596,22 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
 }
 
 /**
- * Helper: Embed query text using EmbeddingGemma
- * Returns 384-dimensional embedding or null on failure
- * Wired to Ollama embeddinggemma:latest model
+ * Legacy helper: embed query text using an explicit lane contract.
+ * Prefer `embedQueryForLane()` at call sites.
  */
-async function embedQuery(text: string): Promise<number[] | null> {
+async function embedQuery(
+  text: string,
+  lane: 'dense_384' | 'dense_768' = 'dense_768'
+): Promise<number[] | null> {
   try {
     if (!text || text.trim().length === 0) {
       return null;
     }
-    const embedding = await embedText(text.slice(0, 2000));
-    return normalizeEmbedding(embedding, 384);
+    const { embedQueryForLane } = await import('./embedding-service.js');
+    const result = await embedQueryForLane(text, lane);
+    return Array.from(result.vector);
   } catch (error) {
     console.warn('Query embedding failed:', error);
     return null;
   }
-}
-
-function normalizeEmbedding(values: number[] | null | undefined, dimension: number): number[] | null {
-  if (!values || values.length === 0) return null;
-  if (values.length === dimension) return values;
-  if (values.length > dimension) return values.slice(0, dimension);
-  const output = values.slice();
-  while (output.length < dimension) {
-    output.push(0);
-  }
-  return output;
 }

@@ -1,8 +1,8 @@
 /**
  * LangExtract Sidecar Client — server-only.
  *
- * Proxies document extraction to phase66-langextract (Python FastAPI + spaCy + NER).
- * Container: phase66-langextract on port 8095
+ * Proxies document extraction to miniforge-nlp-sidecar (Python FastAPI + spaCy + NER).
+ * Container: miniforge-nlp-sidecar on port 8095
  *
  * Available endpoints (from OpenAPI):
  *   POST /extract      — text structure + entity extraction (JSON body)
@@ -11,7 +11,7 @@
  *
  * URL resolution (priority order):
  *   1. ENV.LANGEXTRACT_URL (explicit env var)
- *   2. Docker service discovery (container: phase66-langextract, port range 8090-8099)
+ *   2. Docker service discovery (container: miniforge-nlp-sidecar, port range 8090-8099)
  *   3. Fallback: ENV default / container service URL
  *
  * NOTE: The legacy MinIO SIMD Go service (bytedance/sonic AVX2) that used to occupy
@@ -50,14 +50,28 @@ export interface LangExtractResponse {
 	processing_time: number;
 }
 
+/**
+ * NLP Sidecar Capabilities — matches live Miniforge service /health endpoint
+ * Supports both native TS route + sidecar route
+ */
+export interface NlpSidecarCapabilities {
+  spacy: boolean;
+  langextract: boolean;
+  tree_sitter: boolean;
+  ast_grep: boolean;
+  torch: boolean;
+  gpu?: boolean;
+}
+
 export interface LangExtractHealthStatus {
   enabled: boolean;
   healthy: boolean;
-  services: { spacy?: boolean; transformers_ner?: boolean; gpu?: boolean };
+  services: NlpSidecarCapabilities;
   version: string;
   latencyMs: number;
-  source?: 'env' | 'discovery' | 'fallback';
+  source?: 'env' | 'discovery' | 'fallback' | 'native-ts';
   resolvedUrl?: string;
+  runtime?: 'native-ts' | 'miniforge-nlp-sidecar';
 }
 
 /** @deprecated Use LangExtractHealthStatus */
@@ -66,10 +80,10 @@ export type SIMDHealthStatus = LangExtractHealthStatus;
 // ── Service Discovery Config ──────────────────────────────────────────────
 
 const LANGEXTRACT_SERVICE_CONFIG: ServiceConfig = {
-  envVar: 'LANGEXTRACT_URL',
-  containerName: 'phase66-langextract',
+  envVar: 'NLP_SIDECAR_URL',
+  containerName: 'miniforge-nlp-sidecar',
   port: 8095,
-  fallback: ENV.LANGEXTRACT_URL || 'http://phase66-langextract:8095',
+  fallback: ENV.NLP_SIDECAR_URL || ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095',
   verify: true,
   verifyTimeout: 3000,
 };
@@ -77,7 +91,7 @@ const LANGEXTRACT_SERVICE_CONFIG: ServiceConfig = {
 // ── URL Resolution ────────────────────────────────────────────────────────
 
 let resolvedUrl: string | null = null;
-let resolvedSource: 'env' | 'discovery' | 'fallback' = 'fallback';
+let resolvedSource: 'env' | 'discovery' | 'fallback' | 'loopback' = 'fallback';
 let lastResolution = 0;
 const RESOLUTION_TTL = 5 * 60_000; // 5 min cache
 
@@ -87,8 +101,8 @@ async function getBaseUrl(): Promise<string> {
     return resolvedUrl;
   }
 
-  // Priority 1: Explicit env var
-  const explicit = ENV.LANGEXTRACT_URL?.trim();
+  // Priority 1: Canonical NLP_SIDECAR_URL env var
+  const explicit = ENV.NLP_SIDECAR_URL?.trim() || ENV.MINIFORGE_SIDECAR_URL?.trim() || ENV.LANGEXTRACT_URL?.trim();
   if (explicit) {
     resolvedUrl = explicit;
     resolvedSource = 'env';
@@ -96,7 +110,21 @@ async function getBaseUrl(): Promise<string> {
     return resolvedUrl;
   }
 
-  // Priority 2: Docker service discovery with port range scan
+  // Priority 2: Loopback health probe (127.0.0.1:8095)
+  const loopbackUrl = 'http://127.0.0.1:8095';
+  try {
+    const healthRes = await fetch(`${loopbackUrl}/health`, { signal: AbortSignal.timeout(2000) });
+    if (healthRes.ok) {
+      resolvedUrl = loopbackUrl;
+      resolvedSource = 'loopback';
+      lastResolution = now;
+      return resolvedUrl;
+    }
+  } catch {
+    // Loopback not available, fall through to discovery
+  }
+
+  // Priority 3: Docker service discovery with port range scan
   try {
     const discovery = getServiceDiscovery();
     const result = await discovery.getServiceUrl('langextract', LANGEXTRACT_SERVICE_CONFIG);
@@ -167,6 +195,7 @@ export function invalidateLangExtractResolution(): void {
  */
 export async function langextractFetch(path: string, init?: RequestInit): Promise<Response | null> {
   // Native-TS path — covers /extract POST and /health GET.
+  // Routing witness: 'x-langextract-source' header proves which implementation was used.
   if (ENV.LANGEXTRACT_NATIVE === 'true') {
     if (path === '/extract' && init?.method === 'POST') {
       try {
@@ -178,7 +207,11 @@ export async function langextractFetch(path: string, init?: RequestInit): Promis
         const out = extractDocumentNative(text, docId, docType);
         return new Response(JSON.stringify(out), {
           status: 200,
-          headers: { 'Content-Type': 'application/json', 'x-langextract-source': 'native-ts' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-langextract-source': 'native-ts',
+            'x-nlp-runtime': 'native-ts',
+          },
         });
       } catch (err) {
         console.warn(
@@ -198,11 +231,16 @@ export async function langextractFetch(path: string, init?: RequestInit): Promis
           version: 'native-ts',
           latencyMs: 0,
           source: 'native-ts',
+          runtime: 'native-ts',
           resolvedUrl: 'native-ts',
         }),
         {
           status: 200,
-          headers: { 'Content-Type': 'application/json', 'x-langextract-source': 'native-ts' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-langextract-source': 'native-ts',
+            'x-nlp-runtime': 'native-ts',
+          },
         }
       );
     }
@@ -213,7 +251,20 @@ export async function langextractFetch(path: string, init?: RequestInit): Promis
   const healthy = await checkHealth();
   if (!healthy) return null;
   const baseUrl = await getBaseUrl();
-  return fetch(`${baseUrl}${path}`, init);
+
+  // Fetch from Miniforge sidecar and inject routing witness header
+  const response = await fetch(`${baseUrl}${path}`, init);
+
+  // Clone response to add routing witness header (responses are immutable)
+  const clonedResponse = response.clone();
+  const headers = new Headers(clonedResponse.headers);
+  headers.set('x-nlp-runtime', 'miniforge-nlp-sidecar');
+
+  return new Response(clonedResponse.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 // ── Extraction API ────────────────────────────────────────────────────────
@@ -360,10 +411,40 @@ export async function getManifestViaSIMD(): Promise<null> {
 
 /**
  * Health status for monitoring dashboard.
+ * Returns routing witness (runtime field) indicating whether the request
+ * used the native TS implementation or the Miniforge NLP sidecar.
  */
 export async function getLangExtractStatus(): Promise<LangExtractHealthStatus> {
   const start = Date.now();
   const enabled = ENV.LANGEXTRACT_ENABLED;
+
+  // Native-TS path takes precedence (if enabled, it wins)
+  if (ENV.LANGEXTRACT_NATIVE === 'true') {
+    return {
+      enabled,
+      healthy: true,
+      services: { native: true },
+      version: 'native-ts',
+      latencyMs: Date.now() - start,
+      source: 'native-ts',
+      runtime: 'native-ts',
+      resolvedUrl: 'native-ts',
+    };
+  }
+
+  // Miniforge sidecar path
+  if (!enabled) {
+    return {
+      enabled,
+      healthy: false,
+      services: {},
+      version: '',
+      latencyMs: Date.now() - start,
+      source: resolvedSource,
+      runtime: undefined,
+      resolvedUrl: resolvedUrl ?? undefined,
+    };
+  }
 
   try {
     const baseUrl = await getBaseUrl();
@@ -380,6 +461,7 @@ export async function getLangExtractStatus(): Promise<LangExtractHealthStatus> {
         version: '',
         latencyMs,
         source: resolvedSource,
+        runtime: 'miniforge-nlp-sidecar',
         resolvedUrl: resolvedUrl ?? undefined,
       };
     }
@@ -392,6 +474,7 @@ export async function getLangExtractStatus(): Promise<LangExtractHealthStatus> {
       version: data.version ?? '',
       latencyMs,
       source: resolvedSource,
+      runtime: 'miniforge-nlp-sidecar',
       resolvedUrl: resolvedUrl ?? undefined,
     };
   } catch {
@@ -402,6 +485,7 @@ export async function getLangExtractStatus(): Promise<LangExtractHealthStatus> {
       version: '',
       latencyMs: Date.now() - start,
       source: resolvedSource,
+      runtime: 'miniforge-nlp-sidecar',
       resolvedUrl: resolvedUrl ?? undefined,
     };
   }

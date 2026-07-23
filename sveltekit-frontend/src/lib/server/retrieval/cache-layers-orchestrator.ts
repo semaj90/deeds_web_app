@@ -10,8 +10,6 @@
  * Non-blocking: failures in Layer 2-4 do not cascade; fallback to Layer 1 (direct llama.cpp).
  */
 
-import { ENV } from '$lib/server/env.server.js';
-import { getRedis } from '$lib/server/redis.js';
 import { createHash } from 'crypto';
 
 export interface CacheLayerMetrics {
@@ -105,6 +103,7 @@ async function measureLayer2Adapter(
 async function measureLayer3Exact(intentHash: string): Promise<CacheLayerMetrics> {
   const start = performance.now();
   try {
+    const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
     const cacheKey = `bifrost:packet:${intentHash}`;
 
@@ -146,6 +145,7 @@ async function measureLayer4Semantic(
 ): Promise<CacheLayerMetrics> {
   const start = performance.now();
   try {
+    const { getRedis } = await import('$lib/server/redis.js');
     const redis = getRedis();
     const cacheKey = `ace:cache:${intentHash}:${hmmState}`;
 
@@ -241,14 +241,20 @@ export async function checkCacheLayersHealth(): Promise<{
     fetch('http://127.0.0.1:8091/v1/models', { signal: AbortSignal.timeout(1000) })
       .then((r) => r.ok)
       .catch(() => false),
-    getRedis()
-      .ping()
-      .then(() => true)
-      .catch(() => false),
-    getRedis()
-      .ping()
-      .then(() => true)
-      .catch(() => false)
+    (async () => {
+      const { getRedis } = await import('$lib/server/redis.js');
+      return getRedis()
+        .ping()
+        .then(() => true)
+        .catch(() => false);
+    })(),
+    (async () => {
+      const { getRedis } = await import('$lib/server/redis.js');
+      return getRedis()
+        .ping()
+        .then(() => true)
+        .catch(() => false);
+    })()
   ]);
 
   return {

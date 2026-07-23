@@ -1,6 +1,6 @@
 # Retrieval Summarization Flow Proof
 
-Generated: 2026-07-02T23:32:47.267Z
+Generated: 2026-07-23T01:50:14.439Z
 Status: WARN
 Query: Parent Atlas Qdrant TurboVec Go Retrieval LangExtract Gemma4 summarization flow
 
@@ -22,20 +22,21 @@ EmbeddingGemma -> Qdrant content shortlist -> TurboVec gRPC transform/prefilter 
 
 ```json
 {
-  "summary": "The provided context outlines several components related to advanced data processing, retrieval, and summarization within a SvelteKit frontend structure. Key features include: `gemmaIntake.ts` for Gemma integration, `web-research-crawler.ts` for web data acquisition, `hypergraph-4d.ts` for graph representation, `gemma4-agent.ts` for AI agent logic, `research-summaries-db.ts` for storing summaries, `langextract-service.ts` for language extraction, and `cluster-summary.ts` for indexing/clustering. The overall flow suggests a system that crawls web data, processes it using language extraction and AI agents (like Gemma/Gemma4), builds a knowledge graph, and stores/summarizes the results.",
-  "domain_class": "Data Processing & Knowledge Graph Management",
-  "ontology_label": "Retrieval-Augmented Generation (RAG) Pipeline",
-  "topology_label": "Web Crawling -> Language Extraction -> AI Processing/Graph Building -> Summarization/Indexing",
+  "summary": "The provided source references point to various components involved in AI/ML integration, context assembly, and data processing, such as multi-vector enrichment, model orchestration, and language extraction services. The summary should synthesize how these components relate to a retrieval and summarization flow.",
+  "domain_class": "AI/ML Integration & Retrieval",
+  "ontology_label": "Parent Atlas Feature Envelope",
+  "topology_label": "Retrieval-Augmented Generation (RAG) Summarization Flow",
   "source_refs": [
-    "sveltekit-frontend/src/lib/server/llm/gemmaIntake.ts",
-    "sveltekit-frontend/src/lib/server/analytics/web-research-crawler.ts",
-    "sveltekit-frontend/src/lib/server/graph/hypergraph-4d.ts",
-    "sveltekit-frontend/src/lib/server/ai/gemma4-agent.ts",
-    "sveltekit-frontend/src/lib/server/analytics/research-summaries-db.ts",
+    "docs/PHASE-2-PART-4-MULTIVECTOR-ENRICHMENT.md",
+    "sveltekit-frontend/src/lib/components/ai/IntelligentModelOrchestrator.svelte",
+    "sveltekit-frontend/src/lib/server/ace/context-assembler.ts",
+    "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts",
+    "docs/PHASE-85-P9-LANGEXTRACT-AGENTIC-INTEGRATION.md",
     "sveltekit-frontend/src/lib/server/services/langextract-service.ts",
-    "sveltekit-frontend/src/lib/server/indexer/cluster-summary.ts"
+    "sveltekit-frontend/src/lib/types.ts",
+    "docs/BIFROST-ATLAS-INTEGRATION.md"
   ],
-  "missing_evidence": "Specific details on the 'Qdrant TurboVec' integration or the exact 'LangExtract' usage within the flow are not explicitly detailed in the provided file names/snippets.",
+  "missing_evidence": "Specific details on the 'Qdrant TurboVec Go Retrieval' implementation within the context of the 'Parent Atlas' flow are not explicitly detailed in the provided source file names or snippets, requiring synthesis from the general integration points.",
   "confidence": "High"
 }
 ```

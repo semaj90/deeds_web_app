@@ -11,44 +11,84 @@
 import type { Pool } from 'pg';
 import type { Redis } from 'ioredis';
 import { RETRIEVAL_LIMITS } from './search-contract.js';
-import { bm25SearchIndexed } from './bm25-search.js';
-import { conceptOverlapSearch } from './concept-overlap-search.js';
 import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
-import { extractQueryConceptsViaGemma } from './concept-extraction-tool.js';
-import { queryNeoJsGraphSignal, queryNeoJsGraphSignalByNames } from './neo4j-graph-signal.js';
-import { expandNeighbours, fetchAuthorityScores } from '$lib/server/search/neo4j-rerank.js';
-import { turbovecSearch } from './turbovec-prefilter.js';
-import { searchCodebaseAnn } from '$lib/server/search/qdrant-search.js';
-import { buildVectorPayload } from '$lib/server/config/vector-config.js';
-import { toStableFileKey } from './subgraph-seed-neighborhood.js';
-import {
-  computeTopologClusterMatchSignal,
-  computeCommunityAuthoritySignal,
-  computeTopologyBlendSignal,
-  extractCanonicalPacketFromMetadata,
-  buildCommunityAuthorityMap,
-  mergeTopologyWeights,
-  TOPOLOGY_RRF_WEIGHTS,
-} from './signal-normalizer.js';
 import type { DispatcherOrchestrationResult } from '../dispatcher/dispatcher-orchestrator.js';
-import { generateDispatcherTopologyHits, getDispatcherSignalLaneWeight } from '../dispatcher/dispatcher-topology-service.js';
-import { DISPATCHER_RRF_WEIGHTS } from '../dispatcher/dispatcher-signal-extractor.js';
+import { RRF_DEFAULT_WEIGHTS } from './rrf-contract.js';
 
-/**
- * Canonical default RRF lane weights across all retrieval modes
- * Must be consistent across all integration points for stable ranking
- * 7 primary lanes + 1 dispatcher topology signal (Session 117)
- */
-export const RRF_DEFAULT_WEIGHTS = {
-  postgres_trigram: 1.0,
-  concept_overlap: 1.2,
-  qdrant_vector: 1.0,
-  turbovec_ann: 0.9,
-  neo4j_graph: 0.8,
-  som_topology: 0.5,
-  neo4j_community: 0.3,
-  dispatcher_signal: 0.6, // Session 117: Dispatcher topology signal weight
-} as const;
+function truncateEmbeddingForCollection(
+  embedding: number[],
+  collection: string
+): number[] {
+  if (collection === 'codebase_chunks_384_hybrid') {
+    if (embedding.length !== 384) {
+      throw new Error(
+        `384-hybrid collection requires a 384-dim query vector; got ${embedding.length}`
+      );
+    }
+    const norm = Math.sqrt(embedding.reduce((sum, value) => sum + value * value, 0));
+    return norm > 0 ? embedding.map((value) => value / norm) : embedding;
+  }
+
+  if (collection === 'codebase_chunks_768' && embedding.length !== 768) {
+    throw new Error(`768 collection requires a 768-dim query vector; got ${embedding.length}`);
+  }
+
+  return embedding;
+}
+
+async function loadRrfExecutionDeps() {
+  const [
+    bm25Module,
+    conceptModule,
+    gemmaModule,
+    neoGraphModule,
+    neoRerankModule,
+    turboModule,
+    qdrantModule,
+    vectorConfigModule,
+    subgraphModule,
+    signalModule,
+    dispatcherTopoModule,
+    dispatcherSignalModule,
+  ] = await Promise.all([
+    import('./bm25-search.js'),
+    import('./concept-overlap-search.js'),
+    import('./concept-extraction-tool.js'),
+    import('./neo4j-graph-signal.js'),
+    import('$lib/server/search/neo4j-rerank.js'),
+    import('./turbovec-prefilter.js'),
+    import('$lib/server/search/qdrant-search.js'),
+    import('$lib/server/config/vector-config.js'),
+    import('./subgraph-seed-neighborhood.js'),
+    import('./signal-normalizer.js'),
+    import('../dispatcher/dispatcher-topology-service.js'),
+    import('../dispatcher/dispatcher-signal-extractor.js'),
+  ]);
+
+  return {
+    bm25SearchIndexed: bm25Module.bm25SearchIndexed,
+    conceptOverlapSearch: conceptModule.conceptOverlapSearch,
+    extractQueryConceptsViaGemma: gemmaModule.extractQueryConceptsViaGemma,
+    queryNeoJsGraphSignal: neoGraphModule.queryNeoJsGraphSignal,
+    queryNeoJsGraphSignalByNames: neoGraphModule.queryNeoJsGraphSignalByNames,
+    expandNeighbours: neoRerankModule.expandNeighbours,
+    fetchAuthorityScores: neoRerankModule.fetchAuthorityScores,
+    turbovecSearch: turboModule.turbovecSearch,
+    searchCodebaseAnn: qdrantModule.searchCodebaseAnn,
+    buildVectorPayload: vectorConfigModule.buildVectorPayload,
+    toStableFileKey: subgraphModule.toStableFileKey,
+    computeTopologClusterMatchSignal: signalModule.computeTopologClusterMatchSignal,
+    computeCommunityAuthoritySignal: signalModule.computeCommunityAuthoritySignal,
+    computeTopologyBlendSignal: signalModule.computeTopologyBlendSignal,
+    extractCanonicalPacketFromMetadata: signalModule.extractCanonicalPacketFromMetadata,
+    buildCommunityAuthorityMap: signalModule.buildCommunityAuthorityMap,
+    mergeTopologyWeights: signalModule.mergeTopologyWeights,
+    TOPOLOGY_RRF_WEIGHTS: signalModule.TOPOLOGY_RRF_WEIGHTS,
+    generateDispatcherTopologyHits: dispatcherTopoModule.generateDispatcherTopologyHits,
+    getDispatcherSignalLaneWeight: dispatcherTopoModule.getDispatcherSignalLaneWeight,
+    DISPATCHER_RRF_WEIGHTS: dispatcherSignalModule.DISPATCHER_RRF_WEIGHTS,
+  };
+}
 
 export interface RRFIntegrationOptions {
   k?: number; // RRF constant (default 60)
@@ -99,17 +139,19 @@ async function queryQdrantVectorSignal(
   if (!embedding) return [];
 
   try {
+    const { buildVectorPayload } = await import('$lib/server/config/vector-config.js');
+    const { searchCodebaseAnn } = await import('$lib/server/search/qdrant-search.js');
     const denseLimit = Math.max(topK * 2, topK);
-    const collections = ['codebase_chunks_768'];
+    const collections = ['codebase_chunks_384_hybrid', 'codebase_chunks_768'];
 
     if (seedRefs.length > 0) {
       const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
       if (cleanedSeeds.length > 0) {
-        const seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/codebase_chunks_768/points/search`, {
+        const seededRes = await fetch(`${process.env.QDRANT_URL ?? 'http://127.0.0.1:6333'}/collections/${collections[0]}/points/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            vector: buildVectorPayload('codebase_chunks_768', embedding),
+            vector: buildVectorPayload(collections[0], truncateEmbeddingForCollection(embedding, collections[0])),
             limit: denseLimit,
             score_threshold: 0.001,
             with_payload: true,
@@ -147,7 +189,7 @@ async function queryQdrantVectorSignal(
                   feature_id: payload.feature_id ?? payload.featureId ?? null,
                   file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
                   qdrant_point_id: String(r.id),
-                  qdrant_collection: 'codebase_chunks_768',
+                  qdrant_collection: collections[0],
                   som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
                   som_bmu_row: payload.som_bmu_row ?? null,
                   som_bmu_col: payload.som_bmu_col ?? null,
@@ -166,7 +208,12 @@ async function queryQdrantVectorSignal(
     }
 
     const collectionResults = await Promise.allSettled(
-      collections.map((collection) => searchCodebaseAnn(embedding, denseLimit, undefined, collection))
+      collections.map((collection) => searchCodebaseAnn(
+        truncateEmbeddingForCollection(embedding, collection),
+        denseLimit,
+        undefined,
+        collection
+      ))
     );
 
     const mergedResults = new Map<string, { id: string; score: number; text?: string; metadata?: Record<string, unknown> }>();
@@ -217,7 +264,7 @@ async function queryQdrantVectorSignal(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        vector: buildVectorPayload('codebase_chunks_768', embedding),
+        vector: buildVectorPayload('codebase_chunks_768', truncateEmbeddingForCollection(embedding, 'codebase_chunks_768')),
         limit: denseLimit,
         score_threshold: 0.001,
         with_payload: true,
@@ -274,6 +321,7 @@ async function queryTopology64Signal(
   embedding: number[],
   denseLimit: number
 ): Promise<Array<{ id: string; score: number; text?: string; metadata?: Record<string, unknown> }>> {
+  const { buildVectorPayload } = await import('$lib/server/config/vector-config.js');
   const topologyVector = await Promise.race([
     (async () => {
       const { encode768to64 } = await import('$lib/server/gpu/encode-768-to-64.js');
@@ -369,6 +417,8 @@ async function queryNeo4jFileGraphSignal(seedRefs: string[], topK: number): Prom
   text?: string;
   metadata?: Record<string, unknown>;
 }>> {
+  const { toStableFileKey } = await import('./subgraph-seed-neighborhood.js');
+  const { expandNeighbours, fetchAuthorityScores } = await import('$lib/server/search/neo4j-rerank.js');
   const normalizedSeeds = [...new Set(
     seedRefs
       .flatMap((ref) => {
@@ -461,6 +511,24 @@ export async function multiLaneRetrievalWithRRF(
   } = opts;
 
   const finalWeights = { ...RRF_DEFAULT_WEIGHTS, ...weights };
+  const {
+    bm25SearchIndexed,
+    conceptOverlapSearch,
+    extractQueryConceptsViaGemma,
+    queryNeoJsGraphSignal,
+    queryNeoJsGraphSignalByNames,
+    turbovecSearch,
+    computeTopologClusterMatchSignal,
+    computeCommunityAuthoritySignal,
+    computeTopologyBlendSignal,
+    extractCanonicalPacketFromMetadata,
+    buildCommunityAuthorityMap,
+    mergeTopologyWeights,
+    TOPOLOGY_RRF_WEIGHTS,
+    generateDispatcherTopologyHits,
+    getDispatcherSignalLaneWeight,
+    DISPATCHER_RRF_WEIGHTS,
+  } = await loadRrfExecutionDeps();
 
   try {
     let pgvectorMs = 0;

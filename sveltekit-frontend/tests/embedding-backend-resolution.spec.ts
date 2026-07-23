@@ -25,4 +25,10 @@ describe('embedding backend resolution', () => {
       classifyEmbeddingError('input: 162 tokens physical batch size: 128'),
     ).toBe('SEQUENCE_EXCEEDS_PHYSICAL_BATCH');
   });
+
+  it('classifies the 384-vs-768 embedding mismatch as invalid dimensions', () => {
+    expect(
+      classifyEmbeddingError('embeddinggemma returned 384 dims, expected 768'),
+    ).toBe('INVALID_DIMENSIONS');
+  });
 });

@@ -35,7 +35,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		try {
 			const { dispatchOrExecuteInline } = await import('$lib/server/queue/dispatch-inline.js');
 			dispatchOrExecuteInline('analytics.track', {
-				eventType: 'search',
+				eventType: 'rag_search',
 				payload: {
 					query: query.slice(0, 500),
 					resultCount,

@@ -22,6 +22,7 @@ import {
     uuid,
     varchar,
     vector,
+    halfvec,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
 
@@ -4379,9 +4380,8 @@ export type NewCourtroomKeyframe = typeof courtroomKeyframes.$inferInsert;
 // ─────────────────────────────────────────────────────────────────────────────
 // Code-intel tables (codebase_chunk_index, cluster_summaries, enrichment_jobs)
 // These mirror the GPU-enriched codebase index built by the indexer pipeline.
-// NOTE: content_embedding uses halfvec(768) in the DB — modelled as text here
-//       so Drizzle can read/write rows; do NOT use Drizzle for HNSW queries on
-//       that column (use raw SQL or Qdrant instead).
+// content_embedding / summary_embedding / signature_embedding are halfvec(768).
+// Drizzle now models them correctly; HNSW queries work via Drizzle or raw SQL.
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** GPU-enriched codebase chunk index — mirrors codebase_chunk_index in Postgres */
@@ -4431,10 +4431,11 @@ export const codebaseChunkIndex = pgTable('codebase_chunk_index', {
 	embeddingModel: varchar('embedding_model', { length: 100 }),
 	summaryModel: varchar('summary_model', { length: 100 }),
 
-	// vector(768) summary embedding — use for cluster/semantic queries
-	summaryEmbedding: vector('summary_embedding', { dimensions: 768 }),
-	signatureEmbedding: vector('signature_embedding', { dimensions: 768 }),
-	// NOTE: content_embedding is halfvec(768) — not modelled here, use raw SQL
+	// halfvec(768) embeddings — live column type verified 2026-07-22
+	// Use halfvec_cosine_ops HNSW index for ANN queries (see schema DDL)
+	contentEmbedding: halfvec('content_embedding', { dimensions: 768 }),
+	summaryEmbedding: halfvec('summary_embedding', { dimensions: 768 }),
+	signatureEmbedding: halfvec('signature_embedding', { dimensions: 768 }),
 
 	// 4D manifold coords: [som_x, som_y, semantic_z, grpo_w] — matches research_summaries.manifold4
 	manifold4: real('manifold4').array(),

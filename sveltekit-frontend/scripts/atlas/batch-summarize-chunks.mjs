@@ -19,6 +19,7 @@
  */
 
 import process from 'process';
+import crypto from 'crypto';
 import pkg from 'pg';
 import fetch from 'node-fetch';
 
@@ -32,6 +33,25 @@ const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 
+// ── Embedding contract (lane: summary_embedding_768) ──────────────────────────
+// Provider:  Ollama http://127.0.0.1:11434
+// Model:     embeddinggemma:latest
+// Dimension: 768 (verified 2026-07-22 via direct Ollama probe)
+// Column:    codebase_chunk_index.summary_embedding halfvec(768)
+//
+// DISTINCT from lane dense_384 (ONNX :8081, embeddinggemma 384-dim).
+// Do NOT assume the model label alone implies identical output dimensions
+// across endpoints.
+const SUMMARY_EMBEDDING_DIMENSION = 768;
+const SUMMARY_EMBEDDING_ENDPOINT  = 'http://127.0.0.1:11434';
+const SUMMARY_EMBEDDING_MODEL     = 'embeddinggemma:latest';
+const SUMMARY_GENERATION_MODEL    = 'gemma4-legal-iq4xs-direct.gguf';
+const SUMMARY_PROMPT_VERSION      = 'v1';
+
+// Quality gate: reject summaries outside this character range
+const SUMMARY_MIN_CHARS = 80;
+const SUMMARY_MAX_CHARS = 1200;
+
 // Parse command-line args
 const isDryRun = process.argv.includes('--dry-run');
 const isApply = process.argv.includes('--apply');
@@ -39,9 +59,11 @@ const batchSizeArg = process.argv.find(arg => arg.startsWith('--batch-size='));
 const batchSize = batchSizeArg ? parseInt(batchSizeArg.split('=')[1]) : 50;
 const limitArg = process.argv.find(arg => arg.startsWith('--limit='));
 const limit = limitArg ? parseInt(limitArg.split('=')[1]) : 1000;
+const offsetArg = process.argv.find(arg => arg.startsWith('--offset='));
+const offset = offsetArg ? parseInt(offsetArg.split('=')[1]) : 0;
 
 if (!isDryRun && !isApply) {
-  console.error('Usage: node batch-summarize-chunks.mjs [--dry-run|--apply] [--batch-size=N] [--limit=N]');
+  console.error('Usage: node batch-summarize-chunks.mjs [--dry-run|--apply] [--batch-size=N] [--limit=N] [--offset=N]');
   process.exit(1);
 }
 
@@ -77,7 +99,7 @@ async function logAcpEvent(eventType, status, metadata) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 /**
- * Generate summary via Gemma4 llama-server
+ * Generate summary via Gemma4 llama-server (stream:true required — thinking model)
  */
 async function generateSummary(content, sourceRef) {
   const prompt = `Summarize this code/documentation in 2-3 sentences (max 150 words).
@@ -97,17 +119,36 @@ ${content.slice(0, 2000)}`;
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 200,
         temperature: 0.3,
-        stream: false
+        stream: true,
       }),
-      signal: AbortSignal.timeout(30_000)
+      signal: AbortSignal.timeout(90_000),
     });
 
     if (!response.ok) {
       throw new Error(`Gemma4 returned ${response.status}`);
     }
 
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content?.trim() || null;
+    // Assemble SSE stream — required for Gemma4 thinking model
+    let assembled = '';
+    const decoder = new TextDecoder();
+    let buf = '';
+    for await (const chunk of response.body) {
+      buf += decoder.decode(chunk, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() ?? '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.startsWith('data:')) continue;
+        const payload = trimmed.slice(5).trim();
+        if (payload === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(payload);
+          assembled += parsed.choices?.[0]?.delta?.content ?? '';
+        } catch { /* skip malformed SSE line */ }
+      }
+    }
+    const text = assembled.trim();
+    return text.length > 0 ? text : null;
   } catch (err) {
     console.error(`  ✗ Gemma4 error for ${sourceRef}:`, err.message);
     return null;
@@ -115,15 +156,17 @@ ${content.slice(0, 2000)}`;
 }
 
 /**
- * Embed summary via Ollama embeddinggemma
+ * Embed summary via Ollama embeddinggemma (lane: summary_embedding_768).
+ * Asserts exact dimension before returning — fails hard if the endpoint
+ * returns a different length so mismatches are caught before any DB write.
  */
 async function embedSummary(summary) {
   try {
-    const response = await fetch(`http://127.0.0.1:11434/api/embeddings`, {
+    const response = await fetch(`${SUMMARY_EMBEDDING_ENDPOINT}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'embeddinggemma:latest',
+        model: SUMMARY_EMBEDDING_MODEL,
         prompt: summary
       }),
       signal: AbortSignal.timeout(30_000)
@@ -134,11 +177,27 @@ async function embedSummary(summary) {
     }
 
     const data = await response.json();
-    return data.embedding || null;
+    const embedding = data.embedding;
+
+    // Hard dimension assertion — do NOT silently truncate or pad
+    if (!Array.isArray(embedding) || embedding.length !== SUMMARY_EMBEDDING_DIMENSION) {
+      throw new Error(
+        `SUMMARY_EMBEDDING_DIMENSION_MISMATCH: expected ${SUMMARY_EMBEDDING_DIMENSION}, ` +
+        `got ${Array.isArray(embedding) ? embedding.length : 'non-array'} ` +
+        `(endpoint=${SUMMARY_EMBEDDING_ENDPOINT}, model=${SUMMARY_EMBEDDING_MODEL})`
+      );
+    }
+
+    return embedding;
   } catch (err) {
     console.error(`  ✗ Embedding error:`, err.message);
     return null;
   }
+}
+
+/** SHA-256 of content for provenance tracking */
+function contentHash(text) {
+  return crypto.createHash('sha256').update(text, 'utf8').digest('hex').slice(0, 16);
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -164,10 +223,12 @@ async function upsertQdrantSummary(qdrantId, summary, summaryEmbedding) {
                 summary: summaryEmbedding
               },
               payload: {
-                summary_text: summary,
-                summary_model: 'gemma4-legal-iq4xs',
-                summary_embedding_model: 'embeddinggemma:latest',
-                summary_generated_at: new Date().toISOString()
+                summary_text:              summary,
+                summary_model:             SUMMARY_GENERATION_MODEL,
+                summary_prompt_version:    SUMMARY_PROMPT_VERSION,
+                summary_embedding_model:   SUMMARY_EMBEDDING_MODEL,
+                summary_embedding_dim:     SUMMARY_EMBEDDING_DIMENSION,
+                summary_generated_at:      new Date().toISOString()
               }
             }
           ]
@@ -201,14 +262,14 @@ async function main() {
   console.log();
 
   try {
-    // Fetch chunks without summaries
+    // Fetch chunks without summaries; use --offset=N to split work across parallel workers
     const result = await pool.query(
       `SELECT id, qdrant_id, relative_path, source_ref, content
        FROM codebase_chunk_index
        WHERE summary IS NULL OR summary = ''
-       ORDER BY id
-       LIMIT $1`,
-      [limit]
+       ORDER BY updated_at, id
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
     );
 
     const chunks = result.rows;
@@ -250,21 +311,51 @@ async function main() {
           continue;
         }
 
+        // Quality gate: reject out-of-range summaries before any write
+        if (summary.length < SUMMARY_MIN_CHARS) {
+          console.log(`✗ (quality: too short ${summary.length} < ${SUMMARY_MIN_CHARS})`);
+          failed++;
+          processed++;
+          continue;
+        }
+        if (summary.length > SUMMARY_MAX_CHARS) {
+          console.log(`✗ (quality: too long ${summary.length} > ${SUMMARY_MAX_CHARS})`);
+          failed++;
+          processed++;
+          continue;
+        }
+
         if (isDryRun) {
-          console.log(`✓ (${summary.length} chars)`);
+          console.log(`✓ (${summary.length} chars, hash=${contentHash(chunk.content)})`);
           successful++;
           processed++;
           continue;
         }
 
-        // Apply: Write to Postgres
+        // Apply: Write to Postgres with full generation contract
         try {
+          // summary_embedding is halfvec(768) — pass full 768-dim vector as '[x,x,...]'
+          const vecLiteral = `[${summaryEmbedding.join(',')}]`;
+          // Columns verified live 2026-07-22:
+          //   summary, summary_model, summary_hash, summary_embedding (halfvec(768)), enriched_at
+          // Provenance columns not yet in schema (summary_prompt_version, summary_embedding_model,
+          //   summary_embedding_dim) — tracked in Qdrant payload + log instead.
+          const chunkContentHash = contentHash(chunk.content);
           await pool.query(
             `UPDATE codebase_chunk_index
-             SET summary = $1, summary_model = 'gemma4-legal-iq4xs',
-                 summary_embedding = $2, enriched_at = NOW()
-             WHERE id = $3`,
-            [summary, JSON.stringify(summaryEmbedding.slice(0, 384)), chunk.id]
+             SET summary           = $1,
+                 summary_model     = $2,
+                 summary_hash      = $3,
+                 summary_embedding = $4::halfvec,
+                 enriched_at      = NOW()
+             WHERE id = $5`,
+            [
+              summary,
+              SUMMARY_GENERATION_MODEL,
+              chunkContentHash,
+              vecLiteral,
+              chunk.id,
+            ]
           );
 
           // Upsert to Qdrant

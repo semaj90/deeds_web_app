@@ -51,7 +51,7 @@ export async function syncUserInteractionToGraph(event: AnalyticsEvent): Promise
 
 	const session = driver.session({ database: 'neo4j' });
 	try {
-		if (eventType === 'page_view' && caseId) {
+		if ((eventType === 'page_view' || eventType === 'route_opened') && caseId) {
 			await session.run(
 				`MERGE (u:User {id: $userId})
 				 MERGE (c:Case {id: $caseId})
@@ -60,7 +60,7 @@ export async function syncUserInteractionToGraph(event: AnalyticsEvent): Promise
 				     r.viewCount = coalesce(r.viewCount, 0) + 1`,
 				{ userId, caseId, ts }
 			);
-		} else if (eventType === 'case_create' && caseId) {
+		} else if ((eventType === 'case_create' || eventType === 'case_created') && caseId) {
 			const title = (payload?.title as string) ?? '';
 			await session.run(
 				`MERGE (u:User {id: $userId})

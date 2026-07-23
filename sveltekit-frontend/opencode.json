@@ -1,7 +1,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "turboquant/hforf.gguf",
-  "small_model": "turboquant/hforf.gguf",
+  "model": "hforf.gguf",
+  "small_model": "hforf.gguf",
   "default_agent": "atlas-context",
   "shell": "pwsh",
   "skills": {
@@ -64,14 +64,21 @@
       },
       "models": {
         "hforf.gguf": {
-          "name": "HFOR GGUF (Ornith/HFOR)",
+          "name": "HForF TurboQuant (tool-calling)",
           "limit": {
             "context": 65536,
             "output": 4096
           }
         },
         "hforf.gguf-legacy": {
-          "name": "HFOR GGUF 64K (legacy alias)",
+          "name": "HForF TurboQuant 64K (legacy alias)",
+          "limit": {
+            "context": 65536,
+            "output": 4096
+          }
+        },
+        "gemma4-legal-iq4xs-direct.gguf": {
+          "name": "Gemma4 Legal IQ4_XS Direct",
           "limit": {
             "context": 65536,
             "output": 4096
@@ -234,7 +241,7 @@
   "agent": {
     "atlas-context": {
       "description": "Atlas-first retrieval agent using ACE packets and strict context-budget rules.",
-      "model": "turboquant/hforf.gguf",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0.2,
       "steps": 8,
       "prompt": "Repo evidence first. Check .opencode/recommendations/recommendations.json, .opencode/recommendations/recommendations.md, .opencode/recommendations/recommendation-events.jsonl, .opencode/tasks/task-state.json, .opencode/tasks/task-state.md, .opencode/tasks/task-events.jsonl, docs/graph/recommendations.md, docs/reports/temporal-task-registry-report.md, and the relevant Parent Atlas or ACE report before answering. Use report or command output only. Findings are historical, recommendations are append-only inbox items, tasks are persistent, and task-history packets record transitions. If evidence is missing, say what report or command is needed. Use Gemma4 only after evidence is gathered, and only for repo-audit summaries. Never use it for generic chat, model selection, or tutorials.",
@@ -289,7 +296,7 @@
     },
     "antigravity": {
       "description": "Minimal MCP-first Gemma4 agent that uses only core tools by default.",
-      "model": "turboquant/hforf.gguf",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 10,
       "prompt": "Repo evidence first. Check .opencode/recommendations/recommendations.json, .opencode/recommendations/recommendations.md, .opencode/recommendations/recommendation-events.jsonl, .opencode/tasks/task-state.json, .opencode/tasks/task-state.md, .opencode/tasks/task-events.jsonl, docs/graph/recommendations.md, reports/parent-atlas-open-lanes-todo.md, docs/reports/engram-adapter-decision-report.md, and the relevant Parent Atlas or ACE evidence before answering. Use MCP tools in this order: trace.kag_search or trace.atlas_query, then context.build_kv_packet, then ace.compact_search. Treat gemma4-offload as repo-audit-only: use repo_report_answer for report snippets, file snippets, or command output; gemma4_chat is deprecated. Keep engram-embed, turbovec-sidecar, and langextract opt-in unless the user explicitly asks for those lanes.",
@@ -315,7 +322,7 @@
     },
     "trace-audit": {
       "description": "Read-only TRACE audit agent with compact context tools.",
-      "model": "turboquant/hforf.gguf",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 8,
       "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval, keep the stable system prefix unchanged, and prefer cached compressed cards over raw file expansion. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
@@ -366,7 +373,7 @@
     },
     "audit-hermes": {
       "description": "Hermes 64K direct fallback lane via Ollama; no ACE enrichment",
-      "model": "ollama_disabled/gemma4-rotorquant:latest",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 8,
       "prompt": "Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval, keep the stable system prefix unchanged, and prefer cached compressed cards over raw file expansion. Follow .github/instructions/opencode-context-prefetch.instructions.md. Use atlas.compact_context first, then atlas.query or trace.kag_search only as needed. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem.",
@@ -417,7 +424,7 @@
     },
     "hermes-ace": {
       "description": "Hermes-ACE local agent using ACE context, MCP tools, and repo-audit-only local Gemma4.",
-      "model": "turboquant/hforf.gguf",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 12,
       "prompt": "Repo evidence first. Check .opencode/recommendations/recommendations.json, .opencode/recommendations/recommendations.md, .opencode/recommendations/recommendation-events.jsonl, .opencode/tasks/task-state.json, .opencode/tasks/task-state.md, .opencode/tasks/task-events.jsonl, docs/graph/recommendations.md, docs/reports/temporal-task-registry-report.md, docs/reports/engram-adapter-decision-report.md, and the matching Parent Atlas report before answering. Before reading any .md, .json, .sql, or schema file, call: 1. atlas.compact_context, 2. context.build_kv_packet, 3. ace.compact_search. Do not read whole Markdown files. Use grep/list first. If raw file access is required, read only the smallest line window needed using file.read_window. Prefer compressed cards, source refs, and stablePrefixHash. Use MCP tools in this order: trace.kag_search or trace.atlas_query, then turbovec-sidecar, then engram-embed, then langextract, then ldr.search_history / ldr.quick_summary, then ldr.start_research / ldr.poll_status. Use Gemma4 only after repo evidence is gathered, and only for repo-audit summaries or runtime diagnostics. Never use it for generic chat, model selection, or tutorials. Prefer repo_report_answer over gemma4_chat, which is deprecated.",
@@ -468,7 +475,7 @@
     },
     "audit": {
       "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor (no MCP, local files only)",
-      "model": "turboquant/hforf.gguf",
+      "model": "gemma4-legal-iq4xs-direct.gguf",
       "prompt": "You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Do not edit files.",
       "permission": {
         "*": "deny",

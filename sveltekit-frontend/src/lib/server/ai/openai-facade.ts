@@ -851,14 +851,16 @@ export async function runChatCompletion(
       { timeoutMs: 12_000 }
     );
 
+    const safeMcpResult = mcpResult ?? { ok: false, ms: 0, error: 'ace.compact_search unavailable' };
+
     aceStats.mcpCompactSearch = {
-      ok: mcpResult.ok,
-      ms: mcpResult.ms,
-      error: mcpResult.ok ? undefined : mcpResult.error,
+      ok: safeMcpResult.ok,
+      ms: safeMcpResult.ms,
+      error: safeMcpResult.ok ? undefined : safeMcpResult.error,
     };
 
-    if (mcpResult.ok && typeof mcpResult.data === 'object' && mcpResult.data !== null) {
-      const data = mcpResult.data as Record<string, unknown>;
+    if (safeMcpResult.ok && typeof safeMcpResult.data === 'object' && safeMcpResult.data !== null) {
+      const data = safeMcpResult.data as Record<string, unknown>;
       const hits = Array.isArray(data.hits) ? data.hits : [];
       mcpCompactSearch = {
         contextTreeId: String(data.context_tree_id ?? ''),
@@ -1272,18 +1274,65 @@ export async function runChatCompletion(
   const cachedPrompt = await getExactMatchCache(completionKey);
   redisMs = Date.now() - redisLookupStartMs;
 
-  const intentRankerDecision = await rankIntent({
-    query,
-    model: finalModelUsed,
-    userId: opts.userId,
-    history,
-    completionKey,
-    packetKey,
-    exactCacheEntry: cachedPrompt,
-    exactCacheChecked: true,
-    caseId: req.case_id,
-    filePath: req.file_path,
-  });
+  const fallbackRankerDecision = {
+    queryHash: hashStr(query),
+    decision: 'run_retrieval' as const,
+    confidence: 0.35,
+    rankedCandidates: [
+      {
+        decision: 'run_retrieval' as const,
+        score: 0.35,
+        rawScore: 0.35,
+        probability: 0.35,
+        reasons: ['intent ranker unavailable'],
+      },
+    ],
+    rankingLoss: {
+      bestDecision: 'run_retrieval' as const,
+      margin: 0,
+      entropy: 0,
+      negativeLogLikelihood: 0,
+    },
+    intentLabel: 'unknown',
+    intentConfidence: 0.35,
+    selectedFeatureInputs: {
+      exactCacheHit: Boolean(cachedPrompt),
+      exactCacheAgeSeconds: null,
+      engramDidYouMean: false,
+      engramPriorQueries: 0,
+      engramBmuHints: 0,
+      workflowMemories: 0,
+      intentLabel: 'unknown',
+      intentConfidence: 0.35,
+      semanticCacheHit: false,
+      semanticCacheScore: null,
+      packetKeyAvailable: Boolean(packetKey),
+      completionKeyAvailable: Boolean(completionKey),
+      embeddingAvailable: false,
+    },
+    cacheKeys: [completionKey, packetKey].filter((v): v is string => Boolean(v)),
+    expectedTokenSavings: null,
+    evalTraceId: hashStr(`${query}:${Date.now()}`).slice(0, 16),
+  };
+
+  let intentRankerDecision;
+  try {
+    intentRankerDecision = await rankIntent({
+      query,
+      model: finalModelUsed,
+      userId: opts.userId,
+      history,
+      completionKey,
+      packetKey,
+      exactCacheEntry: cachedPrompt,
+      exactCacheChecked: true,
+      caseId: req.case_id,
+      filePath: req.file_path,
+    });
+  } catch (err) {
+    console.warn('[IntentRanker] degraded to fallback decision:', err);
+    intentRankerDecision = fallbackRankerDecision;
+  }
 
   void logIntentEvalEvent({
     userId: opts.userId,
@@ -1301,7 +1350,7 @@ export async function runChatCompletion(
     didYouMean: intentRankerDecision.didYouMean,
     durationMs: Date.now() - startMs,
     queryPreview: query,
-  });
+  }).catch((err) => console.warn('[IntentRanker] event log skipped:', err));
 
   if (cachedPrompt) {
     // Emit cache access metrics for prompt-cache hit (best-effort, non-blocking)
@@ -1764,8 +1813,8 @@ export async function runChatCompletion(
   }
 
   // Check if response contains tool calls
-  const hasTools = hasToolCalls(text);
-  const toolCallData = hasTools ? parseToolCalls(text) : null;
+  const responseHasTools = hasToolCalls(text);
+  const toolCallData = responseHasTools ? parseToolCalls(text) : null;
   const finalContent = toolCallData?.responseText || text;
 
   return wrapResponse({

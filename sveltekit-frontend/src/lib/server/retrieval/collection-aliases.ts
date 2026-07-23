@@ -31,6 +31,7 @@ export const CODEBASE_ALIAS = 'codebase_live';
 /** Priority-ordered fallback collection names when the alias is absent. */
 export const CODEBASE_COLLECTION_PRIORITY = [
   'codebase_chunks_384_hybrid',
+  'codebase_chunks_768',
   'codebase_chunks_384',
 ] as const;
 
