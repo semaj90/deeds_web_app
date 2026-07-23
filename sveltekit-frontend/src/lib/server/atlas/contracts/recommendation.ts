@@ -65,11 +65,106 @@ const finiteProbability = z.number().finite().min(0).max(1);
 const nonEmptyStringArray = z.array(z.string().min(1));
 
 /**
- * Persisted ranker inputs are scalar and versioned. Raw tensors and tokenizer
- * identifiers are not valid recommendation features or durable identities.
+ * Canonical recommendation tree-node identity.
+ *
+ * This is intentionally separate from packet identity and recommendation_id.
+ * It identifies the parsed structural entity that may be referenced by many
+ * derived stores and recommendation records.
  */
-export const RecommendationFeaturesSchema = z
-  .record(z.string().min(1), z.number().finite())
+export const RecommendationTreeNodeIdentitySchema = z
+  .object({
+    tree_node_id: z.string().min(1),
+    node_type: z.enum(['file', 'module', 'function', 'class', 'interface', 'enum', 'subsystem', 'symbol']),
+    symbol_name: z.string().min(1).nullable(),
+    source_ref: z.string().min(1),
+    start_byte: z.number().int().nonnegative().nullable(),
+    end_byte: z.number().int().nonnegative().nullable(),
+    content_hash: z.string().min(1),
+    parser_name: z.string().min(1),
+    parser_language: z.string().min(1),
+    parser_version: z.string().min(1),
+    packet_key: z.string().min(1).nullable().optional(),
+    feature_id: z.string().min(1).nullable().optional(),
+  })
+  .strict();
+
+export type RecommendationTreeNodeIdentity = z.infer<typeof RecommendationTreeNodeIdentitySchema>;
+
+const RecommendationFeatureValueKeys = {
+  semantic_similarity: true,
+  normalized_semantic_similarity: true,
+  raw_semantic_similarity: true,
+  sparse_score: true,
+  normalized_sparse_score: true,
+  raw_sparse_score: true,
+  lexical_score: true,
+  normalized_lexical_score: true,
+  raw_lexical_score: true,
+  graph_distance: true,
+  page_rank_percentile: true,
+  authority_percentile: true,
+  authority_band: true,
+  page_rank_raw: true,
+  kmeans_cluster_compatibility: true,
+  som_neighborhood_distance: true,
+  domain_match: true,
+  symbol_match: true,
+  language_match: true,
+  incoming_dependency_count: true,
+  outgoing_dependency_count: true,
+  file_recency: true,
+  error_frequency: true,
+  prior_task_success_rate: true,
+  candidate_token_cost: true,
+  estimated_latency_ms: true,
+  identity_resolved: true,
+  content_hash_verified: true,
+  source_snapshot_current: true,
+  has_semantic_score: true,
+  has_sparse_score: true,
+  has_graph_features: true,
+  has_historical_outcome: true,
+  feature_schema_version: true,
+} as const;
+
+const featureValueSchema = z
+  .object({
+    semantic_similarity: finiteProbability.nullable().optional(),
+    normalized_semantic_similarity: finiteProbability.nullable().optional(),
+    raw_semantic_similarity: z.number().finite().nullable().optional(),
+    sparse_score: finiteProbability.nullable().optional(),
+    normalized_sparse_score: finiteProbability.nullable().optional(),
+    raw_sparse_score: z.number().finite().nullable().optional(),
+    lexical_score: finiteProbability.nullable().optional(),
+    normalized_lexical_score: finiteProbability.nullable().optional(),
+    raw_lexical_score: z.number().finite().nullable().optional(),
+    graph_distance: z.number().int().nonnegative().nullable().optional(),
+    page_rank_percentile: finiteProbability.nullable().optional(),
+    authority_percentile: finiteProbability.nullable().optional(),
+    authority_band: z.string().min(1).nullable().optional(),
+    page_rank_raw: z.number().finite().nullable().optional(),
+    kmeans_cluster_compatibility: finiteProbability.nullable().optional(),
+    som_neighborhood_distance: finiteProbability.nullable().optional(),
+    domain_match: finiteProbability.nullable().optional(),
+    symbol_match: finiteProbability.nullable().optional(),
+    language_match: finiteProbability.nullable().optional(),
+    incoming_dependency_count: z.number().int().nonnegative().nullable().optional(),
+    outgoing_dependency_count: z.number().int().nonnegative().nullable().optional(),
+    file_recency: finiteProbability.nullable().optional(),
+    error_frequency: finiteProbability.nullable().optional(),
+    prior_task_success_rate: finiteProbability.nullable().optional(),
+    candidate_token_cost: z.number().int().nonnegative().nullable().optional(),
+    estimated_latency_ms: z.number().int().nonnegative().nullable().optional(),
+    identity_resolved: z.boolean().optional(),
+    content_hash_verified: z.boolean().optional(),
+    source_snapshot_current: z.boolean().optional(),
+    has_semantic_score: z.boolean().optional(),
+    has_sparse_score: z.boolean().optional(),
+    has_graph_features: z.boolean().optional(),
+    has_historical_outcome: z.boolean().optional(),
+    feature_schema_version: z.string().min(1),
+  })
+  .passthrough()
   .superRefine((features, ctx) => {
     for (const key of Object.keys(features)) {
       if (/(tensor|tokenizer|token_ids?|embedding_vector)/i.test(key)) {
@@ -79,8 +174,41 @@ export const RecommendationFeaturesSchema = z
           message: 'Recommendation features must be reconstructable scalar values, not model tensors or tokenizer IDs.',
         });
       }
+      if (!(key in RecommendationFeatureValueKeys)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `Unknown recommendation feature key: ${key}`,
+        });
+      }
     }
   });
+
+export const RecommendationFeaturesSchema = featureValueSchema;
+export type RecommendationFeatures = z.infer<typeof RecommendationFeaturesSchema>;
+
+export const RecommendationScoreSchema = z
+  .object({
+    recommendation_id: z.string().min(1),
+    query_id: z.string().min(1),
+    candidate_id: z.string().min(1),
+    packet_key: z.string().min(1),
+    tree_node_id: z.string().min(1).nullable(),
+    heuristic_relevance_score: z.number().finite().nullable(),
+    ranker_score: z.number().finite().nullable(),
+    usefulness_probability: finiteProbability,
+    confidence: finiteProbability,
+    estimated_context_tokens: z.number().int().nonnegative(),
+    estimated_tokens_avoided: z.number().int().nonnegative(),
+    estimated_latency_ms: z.number().int().nonnegative(),
+    reason_codes: nonEmptyStringArray.min(1),
+    feature_schema_version: z.string().min(1),
+    ranker_model_version: z.string().min(1),
+    calibration_version: z.string().min(1),
+  })
+  .strict();
+
+export type RecommendationScore = z.infer<typeof RecommendationScoreSchema>;
 
 export const RecommendationRecordSchema = z
   .object({
