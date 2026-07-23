@@ -69,6 +69,8 @@
     "atlas:pipeline:20step": "npm run atlas:phase0:foundation && npm run atlas:phase1:indexing && npm run atlas:phase2:clustering && npm run atlas:phase3:routing && npm run atlas:phase4:ace"
   },
   "dependencies": {
+    "@deeds/atlas-contracts": "file:packages/atlas",
+    "@deeds/parent-atlas": "file:packages/parent-atlas",
     "@ai-sdk/openai-compatible": "2.0.47",
     "@google/genai": "1.50.1",
     "@langchain/community": "^1.0.0",
@@ -142,6 +144,7 @@
     "zod-to-json-schema": "file:C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/mcp/zod-to-json-schema-bridge"
   },
   "workspaces": [
+    "packages/atlas",
     "packages/atlas-core",
     "packages/atlas-orchestrator",
     "packages/parent-atlas",

@@ -1,0 +1,28 @@
+{
+  "contract_version": "atlas.contextual-tree-snapshot-report.v1",
+  "status": "PROVEN_FIXTURE_ONLY",
+  "implementation": "packages/parent-atlas/src/core/contextual-tree-snapshot.ts",
+  "side_effects": {
+    "postgres": false,
+    "neo4j": false,
+    "qdrant": false,
+    "valkey": false,
+    "authority_promotion": false
+  },
+  "fixture": {
+    "snapshot_id": "2eca90d4-6d95-5b55-8a55-6ed8fc0946fd",
+    "source_manifest_hash": "c1cfeb5723b7f696e2004de273a736eed18dc72519e4a39557f3e3c5a5b15ba2",
+    "topology_hash": "49da114bcf23a6a160b001b8f4a1908e6f96173c6f189732611111aa218817bf",
+    "node_count": 9,
+    "edge_count": 8,
+    "exclusion_count": 0
+  },
+  "proof": {
+    "contextual_tree_node_tests": "4 passed",
+    "parent_atlas_canonical_surface": "6 passed",
+    "graph_authority_vitest": "12 passed",
+    "networkx_pytest": "1 passed",
+    "typescript_build": "passed"
+  },
+  "next_safe_milestone": "Persist validated immutable snapshots through a PostgreSQL adapter before any derived-store projection."
+}

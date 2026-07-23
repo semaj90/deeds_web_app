@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "lib": ["ES2022"]
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/pipelines/backfill-summary-stubs.ts",
+    "src/pipelines/backfill-topology-index.ts",
+    "src/pipelines/backfill-tree-nodes.ts",
+    "src/pipelines/test-qdrant-connectivity.ts",
+    "src/pipelines/verify-p1-lineage.ts"
+  ]
+}

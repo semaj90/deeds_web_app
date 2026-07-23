@@ -1,0 +1,61 @@
+{
+  "contractVersion": "atlas.parent-atlas-implementation-progress.v1",
+  "generatedAt": "2026-07-23",
+  "roadmapCompletionEstimate": 81,
+  "releaseDecision": "LIVE_PARTIAL",
+  "states": {
+    "graphAuthorityFoundation": "FIXTURE_PROVEN",
+    "contextualTreeReplay": "FIXTURE_PROVEN",
+    "postgresGraphPersistence": "LIVE_PROVEN",
+    "resolutionIssueLedger": "LIVE_PROVEN",
+    "appSideV2DrizzleIntegration": "IMPLEMENTED",
+    "packageOwnershipRuntimeBoundary": "LIVE_PARTIAL",
+    "packageSourceTrackingPolicy": "IMPLEMENTED",
+    "fullCorpusGraphSnapshot": "NOT_RUN",
+    "persistedLiveParity": "NOT_RUN",
+    "boundedGraphTraversal": "NOT_RUN",
+    "graphRrfCanary": "NOT_RUN",
+    "agenticErrorRepair": "LIVE_PARTIAL",
+    "authorityPromotion": "BLOCKED"
+  },
+  "evidence": {
+    "v2PersistenceSmoke": {
+      "postgresGraphPersistenceProven": true,
+      "resolutionIssueLedgerProven": true,
+      "edgeEndpointForeignKeyEnforced": true,
+      "validatedSnapshotImmutable": true,
+      "authorityRunRequiresValidatedSnapshot": true,
+      "productionScoreUnchanged": true
+    },
+    "v2DrizzleSchema": {
+      "schemaExport": true,
+      "repositoryWrapper": true,
+      "runtimeImport": true,
+      "tableNames": [
+        "atlas_graph_snapshots_v2",
+        "atlas_graph_nodes_v2",
+        "atlas_graph_edges_v2",
+        "atlas_graph_relation_events_v2",
+        "atlas_graph_relation_participants_v2",
+        "atlas_graph_snapshot_exclusions_v2",
+        "atlas_graph_resolution_issues_v2",
+        "atlas_graph_authority_runs_v2",
+        "atlas_graph_authority_scores_v2"
+      ]
+    },
+    "packageBoundary": {
+      "runtimeImports": true,
+      "ciEnforcement": false,
+      "ciCommand": "node scripts/atlas/verify-atlas-package-boundaries.mjs"
+    },
+    "focusedTests": {
+      "parentAtlasTypeScriptCompile": "PASS",
+      "graphSnapshotV2": "2/2",
+      "contextualTreeSnapshot": "4/4"
+    }
+  },
+  "promotion": {
+    "authorityPromotionEnabled": false,
+    "reason": "No full-corpus snapshot, persisted parity artifact, traversal implementation, or retrieval canary exists."
+  }
+}

@@ -60,3 +60,170 @@ export const RecommendationSchema = z.object({
 export type Recommendation = z.infer<typeof RecommendationSchema>;
 export type RecommendationEvidence = z.infer<typeof EvidenceSchema>;
 export type RecommendationGemma4 = z.infer<typeof Gemma4Schema>;
+
+const finiteProbability = z.number().finite().min(0).max(1);
+const nonEmptyStringArray = z.array(z.string().min(1));
+
+/**
+ * Persisted ranker inputs are scalar and versioned. Raw tensors and tokenizer
+ * identifiers are not valid recommendation features or durable identities.
+ */
+export const RecommendationFeaturesSchema = z
+  .record(z.string().min(1), z.number().finite())
+  .superRefine((features, ctx) => {
+    for (const key of Object.keys(features)) {
+      if (/(tensor|tokenizer|token_ids?|embedding_vector)/i.test(key)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: 'Recommendation features must be reconstructable scalar values, not model tensors or tokenizer IDs.',
+        });
+      }
+    }
+  });
+
+export const RecommendationRecordSchema = z
+  .object({
+    recommendation_id: z.string().min(1),
+    query_id: z.string().min(1),
+    candidate_tree_node_id: z.string().min(1),
+    usefulness_probability: finiteProbability,
+    confidence: finiteProbability,
+    ranker_model_id: z.string().min(1),
+    feature_contract_version: z.string().min(1),
+    feature_values: RecommendationFeaturesSchema,
+    evidence_refs: nonEmptyStringArray.min(1),
+    reason_codes: nonEmptyStringArray.min(1),
+    corpus_snapshot_id: z.string().min(1),
+    graph_projection_id: z.string().min(1).nullable(),
+    created_at: z.string().datetime(),
+  })
+  .strict();
+
+const ACPGraphPathSchema = z
+  .object({
+    nodes: nonEmptyStringArray.min(2).max(4),
+    edges: nonEmptyStringArray.min(1).max(3),
+    path_score: finiteProbability,
+  })
+  .strict()
+  .superRefine((path, ctx) => {
+    if (path.edges.length !== path.nodes.length - 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['edges'],
+        message: 'Graph path edges must connect adjacent graph path nodes.',
+      });
+    }
+  });
+
+const ACPRecommendationCandidateSchema = z
+  .object({
+    tree_node_id: z.string().min(1),
+    source_ref: z.string().min(1),
+    relevance_probability: finiteProbability,
+    reason_codes: nonEmptyStringArray.min(1),
+    evidence_refs: nonEmptyStringArray.min(1),
+    estimated_context_tokens: z.number().int().nonnegative(),
+    graph_paths: z.array(ACPGraphPathSchema).max(20),
+  })
+  .strict();
+
+export const ACPRecommendationPacketSchema = z
+  .object({
+    contract: z.literal('atlas.acp.recommendation.v1'),
+    query_id: z.string().min(1),
+    intent: z.string().min(1),
+    candidates: z.array(ACPRecommendationCandidateSchema).min(1).max(20),
+    budget: z
+      .object({
+        max_source_files: z.number().int().min(1).max(20),
+        max_raw_tokens: z.number().int().min(1),
+        max_tool_calls: z.number().int().min(1),
+        max_graph_hops: z.number().int().min(0).max(3),
+      })
+      .strict(),
+    permissions: z
+      .object({
+        mode: z.enum(['read_only', 'proposal_only', 'patch_allowed']),
+        allowed_roots: nonEmptyStringArray.min(1),
+      })
+      .strict(),
+    corpus_snapshot_id: z.string().min(1),
+  })
+  .strict()
+  .superRefine((packet, ctx) => {
+    const totalTokens = packet.candidates.reduce((sum, candidate) => sum + candidate.estimated_context_tokens, 0);
+    if (totalTokens > packet.budget.max_raw_tokens) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidates'], message: 'ACP candidates exceed the raw token budget.' });
+    }
+
+    const sourceRefs = new Set(packet.candidates.map((candidate) => candidate.source_ref));
+    if (sourceRefs.size > packet.budget.max_source_files) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['candidates'], message: 'ACP candidates exceed the source file budget.' });
+    }
+
+    for (const [candidateIndex, candidate] of packet.candidates.entries()) {
+      if (!packet.permissions.allowed_roots.some((root) => candidate.source_ref === root || candidate.source_ref.startsWith(`${root}/`))) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['candidates', candidateIndex, 'source_ref'],
+          message: 'Candidate source_ref is outside the permitted roots.',
+        });
+      }
+      for (const [pathIndex, graphPath] of candidate.graph_paths.entries()) {
+        if (graphPath.edges.length > packet.budget.max_graph_hops) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['candidates', candidateIndex, 'graph_paths', pathIndex],
+            message: 'Graph path exceeds the packet hop budget.',
+          });
+        }
+      }
+    }
+  });
+
+export const TaskPromotionGateSchema = z
+  .object({
+    recommendation_id: z.string().min(1),
+    retrieval_confidence: finiteProbability,
+    evidence_completeness: finiteProbability,
+    duplicate_task_probability: finiteProbability,
+    actionable: z.boolean(),
+    affected_paths_known: z.boolean(),
+    acceptance_criteria_present: z.boolean(),
+    permissions_resolved: z.boolean(),
+    permission_mode: z.enum(['read_only', 'proposal_only', 'patch_allowed']).optional(),
+    gate_decision: z.enum(['PROMOTE', 'REVIEW_REQUIRED', 'REJECT']),
+    failure_reasons: z.array(z.string().min(1)),
+  })
+  .strict();
+
+export type TaskPromotionGate = z.infer<typeof TaskPromotionGateSchema>;
+export type TaskPromotionGateInput = Omit<TaskPromotionGate, 'gate_decision' | 'failure_reasons'>;
+
+export function evaluateTaskPromotion(input: TaskPromotionGateInput): TaskPromotionGate {
+  const failureReasons: string[] = [];
+
+  if (!input.actionable) failureReasons.push('NOT_ACTIONABLE');
+  if (!input.acceptance_criteria_present) failureReasons.push('MISSING_ACCEPTANCE_CRITERIA');
+  if (input.permission_mode === 'read_only') failureReasons.push('READ_ONLY_PERMISSION');
+  if (failureReasons.length > 0) {
+    return TaskPromotionGateSchema.parse({ ...input, gate_decision: 'REJECT', failure_reasons: failureReasons });
+  }
+
+  if (!input.affected_paths_known) failureReasons.push('AFFECTED_PATHS_UNKNOWN');
+  if (!input.permissions_resolved) failureReasons.push('PERMISSIONS_UNRESOLVED');
+  if (input.retrieval_confidence < 0.8) failureReasons.push('RETRIEVAL_CONFIDENCE_BELOW_THRESHOLD');
+  if (input.evidence_completeness < 0.85) failureReasons.push('EVIDENCE_COMPLETENESS_BELOW_THRESHOLD');
+  if (input.duplicate_task_probability > 0.2) failureReasons.push('DUPLICATE_TASK_RISK');
+
+  return TaskPromotionGateSchema.parse({
+    ...input,
+    gate_decision: failureReasons.length === 0 ? 'PROMOTE' : 'REVIEW_REQUIRED',
+    failure_reasons: failureReasons,
+  });
+}
+
+export type RecommendationRecord = z.infer<typeof RecommendationRecordSchema>;
+export type ACPRecommendationPacket = z.infer<typeof ACPRecommendationPacketSchema>;

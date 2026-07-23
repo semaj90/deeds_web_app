@@ -1,0 +1,28 @@
+{
+  "contract_version": "parent-atlas-readiness-audit.v1",
+  "generated_on": "2026-07-23",
+  "overall": "LIVE_PARTIAL",
+  "critical_findings": [
+    "Authority scores reference four snapshot IDs but no graph_snapshots table exists.",
+    "Only 8706 of 50164 authority score rows have both packet_key and source_ref.",
+    "codebase_topology_64 and codebase_topology_128 contain zero points.",
+    "315 code references directly name codebase_chunks_768.",
+    "packages/atlas is not an enforceable package or declared mirror.",
+    "No closed-loop ErrorResolutionIssue contract was found; durable run tables are empty."
+  ],
+  "proven": [
+    "Graph fixture OKF/identity/NetworkX/GDS parity foundation",
+    "Postgres, Qdrant, Neo4j, Valkey, Go Retrieval, Llama health",
+    "384 and 768 Qdrant semantic collections exist",
+    "App-side V2 Drizzle graph schema and repository wrapper"
+  ],
+  "blocked": [
+    "Immutable graph snapshot persistence",
+    "Full-corpus graph identity and parity",
+    "Bounded snapshot-scoped traversal",
+    "Collection registry enforcement",
+    "Closed-loop agentic error resolution",
+    "Release/restore evidence"
+  ],
+  "next_phase": "Phase 0: package ownership and legacy-write containment"
+}

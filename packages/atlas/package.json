@@ -1,0 +1,11 @@
+{
+  "name": "@deeds/atlas-contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Portable Parent Atlas identity and contract helpers",
+  "exports": {
+    "./packet-identity": "./lib/packet-identity-bridge.mjs",
+    "./packet-registry": "./lib/packet-registry.mjs"
+  }
+}

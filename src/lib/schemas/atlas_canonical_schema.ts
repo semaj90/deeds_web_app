@@ -146,7 +146,7 @@ export interface CanonicalRecord {
 }
 
 // =============================================================================
-// 7. VALIDATION (Minimal, No Conditionals)
+// 7. VALIDATION AND PAGE RANK OUTPUT (Schema & Logic Definitions)
 // =============================================================================
 
 /**
@@ -179,6 +179,33 @@ export interface GraphResolutionIssue {
 }
 
 /**
+ * Container for the full PageRank execution result set, which serves as the
+ * canonical source of truth for identity resolution gaps.
+ */
+export interface PageRankResult {
+  resolvedScores: {
+    nodeKey: string;
+    rawScore: number;
+    l1Normalized: number;
+    authority: number;
+    percentile: number;
+  }[];
+  unresolvedIdentityIssues: GraphResolutionIssue[];
+  policyExclusions: {
+    edgeKey: string;
+    reason: string;
+    confidence: number;
+  }[];
+}
+
+/**
+ * Container for the full PageRank execution result set, which serves as the
+ * canonical source of truth for identity resolution gaps.
+ */
+export type PageRankResultWrapper = PageRankResult;
+
+
+/**
  * Validate GPU lane input (IdentityCore + features).
  * Fast path: 3 checks, no optional field branching.
  */
@@ -195,62 +222,49 @@ export function validateGpuLaneInput(identity: IdentityCore, features: number[])
 }
 
 /**
- * Validate GPU lane output (SomAssignment).
- * Fast path: 5 field checks, direct Postgres write.
+ * Validate OKF Graph Rule Compliance (Structural, Semantic, and Confidence).
+ * Comprehensive checks covering non-empty extensions, relationship existence, exclusion separation,
+ * and minimum confidence thresholds based on current Atlas best practices.
+ * @param evidence Object containing necessary graph context: edges, relationships, and confidence scores.
+ * @returns boolean indicating successful validation.
  */
-export function validateSomAssignment(som: SomAssignment): boolean {
-  if (!som.packetKey || som.clusterId === undefined || som.confidence === undefined) {
-    console.error('Validation Failed: SomAssignment incomplete.');
-    return false;
-  }
-  if (som.somBmuRow < 0 || som.somBmuRow > 19 || som.somBmuCol < 0 || som.somBmuCol > 19) {
-    console.error('Validation Failed: SOM coordinates out of bounds [0-19].');
-    return false;
-  }
-  if (som.confidence < 0 || som.confidence > 1.0) {
-    console.error('Validation Failed: Confidence not in [0.0, 1.0].');
-    return false;
-  }
-  return true;
-}
-
-/**
-* Validate OKF Graph Rule Compliance (Structural, Semantic, and Confidence).
-* Comprehensive checks covering non-empty extensions, relationship existence, exclusion separation,
-* and minimum confidence thresholds based on current Atlas best practices.
-* @param evidence Object containing necessary graph context: edges, relationships, and confidence scores.
-* @returns boolean indicating successful validation.
-*/
 export function validateOkfGraphRule(evidence: {
   // Required inputs for validation context
   edges?: { from: string; to: string; weight: number }[];
   relationships?: { from: string; to: string }[];
   confidences?: { relationship: string; confidence: number }[];
-  extensions?: { name: string; hasEdges: boolean; hasRelationships: boolean; minConfidence: number }[];
+  extensions?: {
+    name: string;
+    hasEdges: boolean;
+    hasRelationships: boolean;
+    minConfidence: number;
+  }[];
   excludedEdges?: { edge: string; confidence: number }[];
   semanticSimilar?: { relationship: string; confidence: number }[];
-}: boolean) {
+}): boolean {
   // 1. Non-empty extensions check
-  if (!evidence.extensions || evidence.extensions.some(e => !e.name)) {
+  if (!evidence.extensions || evidence.extensions.some((e) => !e.name)) {
     console.warn('Validation Failed: One or more extensions are missing a name.');
     return false;
   }
 
   // 2. Relationship existence check (must ensure all required relationships are defined)
-  const requiredRelationshipsExist = evidence.relationships?.every((rel) => {
-    // Placeholder for actual check against a canonical list
-    return true;
-  }) ?? false;
+  const requiredRelationshipsExist =
+    evidence.relationships?.every((rel) => {
+      // Placeholder for actual check against a canonical list
+      return true;
+    }) ?? false;
   if (!requiredRelationshipsExist) {
     console.error('Validation Failed: Required relationships are missing or unvalidated.');
     return false;
   }
 
   // 3. Exclusion separation check: An excluded edge cannot be a ranked edge.
-  const excludedEdgesAreNotRanked = evidence.excludedEdges?.every((e) => {
-    // Placeholder for checking if an excluded edge is also a PageRank edge
-    return true;
-  }) ?? true;
+  const excludedEdgesAreNotRanked =
+    evidence.excludedEdges?.every((e) => {
+      // Placeholder for checking if an excluded edge is also a PageRank edge
+      return true;
+    }) ?? true;
   if (!excludedEdgesAreNotRanked) {
     console.error('Validation Failed: An excluded edge was found to also be a PageRank edge.');
     return false;
@@ -266,17 +280,17 @@ export function validateOkfGraphRule(evidence: {
   }
 
   // 5. Hard constraints check (e.g., min_confidence must be >= 0.1)
-  const minConfidenceCheck = evidence.extensions?.every(e => e.minConfidence >= 0.1) ?? false;
+  const minConfidenceCheck = evidence.extensions?.every((e) => e.minConfidence >= 0.1) ?? false;
   if (!minConfidenceCheck) {
-      console.error('Validation Failed: Minimum extension confidence (0.1) not met.');
-      return false;
+    console.error('Validation Failed: Minimum extension confidence (0.1) not met.');
+    return false;
   }
 
   // 6. Semantic similarity check (if provided)
-  const semanticCheck = evidence.semanticSimilar?.every(c => c.confidence >= 0.1) ?? true;
+  const semanticCheck = evidence.semanticSimilar?.every((c) => c.confidence >= 0.1) ?? true;
   if (!semanticCheck) {
-      console.error('Validation Failed: Minimum semantic confidence (0.1) not met.');
-      return false;
+    console.error('Validation Failed: Minimum semantic confidence (0.1) not met.');
+    return false;
   }
 
   // 7. Final structural validation passed.

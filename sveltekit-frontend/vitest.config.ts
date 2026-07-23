@@ -283,6 +283,9 @@ export default defineConfig({
       'tests/discover-clusters.spec.ts',
       'tests/quantization-recall.spec.ts',
       'tests/quantization-recall-eval.spec.ts',
+      // Phase 1-10 Atlas Implementation Tests
+      'tests/atlas/**/*.spec.ts',
+      'tests/atlas/**/*.test.ts',
     ],
     exclude: [
       'node_modules/**',

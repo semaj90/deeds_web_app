@@ -1,5 +1,10 @@
 <script lang="ts">
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+
+	const board = () => data.dailyGraphifyBoard;
 </script>
 
 <div class="ai-dashboard-hub">
@@ -50,6 +55,80 @@
 			<p>Lane-by-lane pipeline status: core structural, optional enrichment, and gated integrations.</p>
 			<span class="card-link">Open readiness dashboard</span>
 		</a>
+	</section>
+
+	<section class="board-shell">
+		<div class="board-header">
+			<div>
+				<p class="eyebrow">Daily Graphify</p>
+				<h2>Kanban Task Board</h2>
+				<p class="subtitle compact">
+					Promoted recommendation work flows into the daily board. Review-required proposals remain visible but do not become tasks.
+				</p>
+			</div>
+			<div class="board-meta">
+				<div>
+					<span class="meta-label">Collection</span>
+					<strong>{board().collection}</strong>
+				</div>
+				<div>
+					<span class="meta-label">Updated</span>
+					<strong>{new Date(board().generated).toLocaleString()}</strong>
+				</div>
+			</div>
+		</div>
+
+		<div class="board-grid">
+			{#each board().columns as column}
+				<div class="priority-column">
+					<div class="column-head">
+						<h3>{column.label}</h3>
+						<span>{column.tasks.length}</span>
+					</div>
+
+					{#if column.tasks.length === 0}
+						<p class="empty-state">No tasks.</p>
+					{:else}
+						{#each column.tasks as task}
+							<article class="task-card">
+								<div class="task-topline">
+									<span>{task.id}</span>
+									{#if task.status}
+										<span class="task-status">{task.status}</span>
+									{/if}
+								</div>
+								<h4>{task.label}</h4>
+								{#if task.gate}
+									<p>{task.gate}</p>
+								{/if}
+								{#if task.blockedBy?.length}
+									<div class="chip-row">
+										{#each task.blockedBy as blocker}
+											<span class="chip">blocked by {blocker}</span>
+										{/each}
+									</div>
+								{/if}
+							</article>
+						{/each}
+					{/if}
+				</div>
+			{/each}
+		</div>
+
+		<div class="board-footer">
+			<div class="footer-card">
+				<span class="meta-label">Promotion</span>
+				<strong>{board().recommendationPromotion.promotedCount}/{board().recommendationPromotion.proposalCount} promoted</strong>
+			</div>
+			<div class="footer-card">
+				<span class="meta-label">Review Required</span>
+				<strong>{board().recommendationPromotion.reviewRequiredCount}</strong>
+			</div>
+			<div class="footer-card">
+				<span class="meta-label">Warnings</span>
+				<strong>{board().warnings.length ? board().warnings.join(', ') : 'none'}</strong>
+			</div>
+		</div>
 	</section>
 </div>
 
@@ -113,6 +192,153 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 1rem;
+	}
+
+	.board-shell {
+		margin-top: 2rem;
+		padding: 1.25rem;
+		border: 1px solid rgba(212, 199, 163, 0.1);
+		border-radius: 18px;
+		background: rgba(14, 15, 18, 0.82);
+		box-shadow: 0 20px 44px rgba(0, 0, 0, 0.22);
+	}
+
+	.board-header {
+		display: flex;
+		justify-content: space-between;
+		gap: 1rem;
+		align-items: flex-start;
+		margin-bottom: 1rem;
+	}
+
+	.compact {
+		max-width: 56rem;
+		font-size: 0.92rem;
+	}
+
+	.board-meta {
+		display: grid;
+		gap: 0.75rem;
+		min-width: 14rem;
+	}
+
+	.board-meta strong {
+		display: block;
+		margin-top: 0.2rem;
+		color: rgba(245, 240, 223, 0.96);
+	}
+
+	.meta-label {
+		display: block;
+		font-size: 0.68rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: rgba(212, 199, 163, 0.52);
+	}
+
+	.board-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 0.9rem;
+	}
+
+	.priority-column {
+		min-height: 240px;
+		padding: 0.95rem;
+		border-radius: 14px;
+		background: rgba(19, 21, 25, 0.76);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+	}
+
+	.column-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.column-head h3 {
+		margin: 0;
+		font-size: 0.9rem;
+		color: rgba(245, 240, 223, 0.96);
+	}
+
+	.column-head span {
+		font-size: 0.78rem;
+		color: #93c5fd;
+	}
+
+	.task-card {
+		padding: 0.9rem;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+		margin-bottom: 0.75rem;
+	}
+
+	.task-topline {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5rem;
+		font-size: 0.72rem;
+		color: rgba(212, 199, 163, 0.52);
+		margin-bottom: 0.35rem;
+	}
+
+	.task-status {
+		color: #93c5fd;
+	}
+
+	.task-card h4 {
+		margin: 0;
+		font-size: 0.96rem;
+		color: rgba(245, 240, 223, 0.96);
+	}
+
+	.task-card p {
+		margin: 0.35rem 0 0;
+		font-size: 0.84rem;
+		color: rgba(212, 199, 163, 0.72);
+		line-height: 1.5;
+	}
+
+	.chip-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-top: 0.6rem;
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.22rem 0.52rem;
+		border-radius: 999px;
+		background: rgba(96, 165, 250, 0.12);
+		border: 1px solid rgba(96, 165, 250, 0.18);
+		font-size: 0.68rem;
+		color: #bfdbfe;
+	}
+
+	.empty-state {
+		margin: 0;
+		color: rgba(212, 199, 163, 0.45);
+		font-size: 0.84rem;
+	}
+
+	.board-footer {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+		gap: 0.75rem;
+		margin-top: 0.9rem;
+	}
+
+	.footer-card {
+		padding: 0.85rem 0.95rem;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.08);
 	}
 
 	.hub-card {

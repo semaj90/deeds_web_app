@@ -26,7 +26,7 @@
 
 import pg             from 'pg';
 import { createHash } from 'node:crypto';
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -50,7 +50,22 @@ const NEO4J_USER   = process.env.NEO4J_USER   || 'neo4j';
 const NEO4J_PASS   = process.env.NEO4J_PASS   || 'neo4j123';
 const _ollamaRaw   = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
 const OLLAMA_URL   = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_ollamaRaw}:11434`;
-const COLLECTION   = 'codebase_chunks_768';
+// Graphify's current embed_missing writer is a 768-dimensional ingestion lane.
+// Do not redirect it to the 384-dimensional hybrid retrieval collection until
+// it produces a lane-specific query/vector contract.
+const COLLECTION   = process.env.ATLAS_QDRANT_GRAPHIFY_COLLECTION || 'codebase_chunks_768';
+const RECOMMENDATION_PROPOSALS_PATH = join(REPORT, 'atlas-recommendation-proposals.json');
+
+function readRecommendationProposals() {
+  if (!existsSync(RECOMMENDATION_PROPOSALS_PATH)) return [];
+  try {
+    const parsed = JSON.parse(readFileSync(RECOMMENDATION_PROPOSALS_PATH, 'utf8'));
+    return Array.isArray(parsed.recommendations) ? parsed.recommendations : [];
+  } catch (error) {
+    log(`  warning: recommendation proposal ledger ignored: ${error.message}`);
+    return [];
+  }
+}
 
 // ── Lightweight StateGraph shim ───────────────────────────────────────────────
 // Avoids importing the full LangGraph npm package while preserving the same
@@ -372,6 +387,9 @@ async function kanbanTask(state) {
 
   const tasks = [];
   const now   = new Date().toISOString();
+  const recommendationProposals = readRecommendationProposals();
+  const promotedRecommendations = recommendationProposals.filter((proposal) => proposal?.task_promotion?.gate_decision === 'PROMOTE');
+  const reviewRequiredRecommendations = recommendationProposals.filter((proposal) => proposal?.task_promotion?.gate_decision === 'REVIEW_REQUIRED');
 
   // Priority order: data density gates first, then enrichment, then pruning
   if (state.missingFeatureId > 0) tasks.push({
@@ -424,6 +442,27 @@ async function kanbanTask(state) {
     blockedBy: ['index_bm25', 'concept_backfill'],
   });
 
+  // Recommendation-originated work is admitted only after the explicit gate.
+  // Gate-failure tasks above remain operational tasks and do not impersonate
+  // ranker output.
+  for (const proposal of promotedRecommendations) {
+    const promotion = proposal.task_promotion;
+    tasks.push({
+      id: `recommendation:${promotion.recommendation_id}`,
+      priority: 'P2',
+      status: 'PROPOSED',
+      origin: 'atlas_recommendation',
+      recommendation_id: promotion.recommendation_id,
+      label: proposal.title ?? `Review recommendation for ${proposal.source_ref ?? promotion.recommendation_id}`,
+      source_ref: proposal.source_ref ?? null,
+      tree_node_id: proposal.tree_node_id ?? null,
+      evidence_refs: proposal.evidence_refs ?? [],
+      reason_codes: proposal.reason_codes ?? [],
+      gate: 'task promotion gate = PROMOTE',
+      blockedBy: [],
+    });
+  }
+
   if (state.noiseRefs > 0) tasks.push({
     id:       'prune_noise',
     priority: 'P3',
@@ -452,7 +491,16 @@ async function kanbanTask(state) {
   mkdirSync(REPORT, { recursive: true });
   if (APPLY) {
     writeFileSync(join(REPORT, 'atlas-kanban-tasks.json'),
-      JSON.stringify({ generated: now, tasks }, null, 2));
+      JSON.stringify({
+        generated: now,
+        collection: COLLECTION,
+        recommendation_promotion: {
+          proposal_count: recommendationProposals.length,
+          promoted_count: promotedRecommendations.length,
+          review_required_count: reviewRequiredRecommendations.length,
+        },
+        tasks,
+      }, null, 2));
     log('  wrote docs/reports/atlas-kanban-tasks.json');
   }
 

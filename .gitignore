@@ -207,6 +207,13 @@ PublishScripts/
 *.snupkg
 **/[Pp]ackages/*
 !**/[Pp]ackages/build/
+
+# Parent Atlas source packages are repository-owned code, not NuGet artifacts.
+!packages/
+!packages/atlas/
+!packages/atlas/**
+!packages/parent-atlas/
+!packages/parent-atlas/**
 *.nuget.props
 *.nuget.targets
 
@@ -779,6 +786,10 @@ heapdump-*.heapsnapshot
 *.heapsnapshot
 core
 core.[0-9]*
+
+# The Parent Atlas core directory contains source code, not crash dumps.
+!packages/parent-atlas/src/core/
+!packages/parent-atlas/src/core/**
 
 ########################################
 # Diagnostic outputs & project-specific temp files

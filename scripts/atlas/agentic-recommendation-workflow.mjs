@@ -29,6 +29,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { evaluateTaskPromotion } from './lib/task-promotion-gate.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -465,20 +466,35 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
   const benchmarkGraphProof = String(benchmarkReport?.summary?.graph_proof_status ?? '').trim();
   const graphProofReady = benchmarkGraphProof === 'PASS' || l4Evidence.graph_hit_count > 0;
 
-  const graphProofTask = {
-    task_id: 'neo4j-graph-proof-runtime-repair',
-    title: 'Repair Neo4j graph proof runtime',
-    status: graphProofReady ? 'READY' : 'OPEN',
-    evidence: [
-      'docs/reports/retrieval-e2e-benchmark.json',
-      'docs/reports/replay-trace-summary.json',
-      'docs/reports/provenance-tree-summary.json',
-      'docs/reports/contract-field-coverage.json',
-    ],
-    reason: graphProofReady
-      ? 'Benchmark graph proof is PASS; query-local graph hits remain coverage-dependent.'
-      : 'Graph expansion returned no hits or degraded status.',
-  };
+  const permissionMode = decision === 'patch_existing' ? 'patch_allowed' : 'read_only';
+  const taskPromotion = evaluateTaskPromotion({
+    recommendation_id: createHash('sha256').update(`${userQuery}:${identity.packet_key ?? normalized}`).digest('hex').slice(0, 24),
+    retrieval_confidence: rerankResult.top_score,
+    evidence_completeness: graphProofReady && identity.tree_node_id && rgMatches.length > 0 ? 0.9 : 0.5,
+    // No durable duplicate detector is available in this legacy workflow. Do
+    // not silently treat that absence as no duplicate risk.
+    duplicate_task_probability: 0.5,
+    actionable: rgMatches.length > 0 && decision !== 'ask_permission',
+    affected_paths_known: rgMatches.length > 0,
+    acceptance_criteria_present: true,
+    permissions_resolved: decision !== 'ask_permission',
+    permission_mode: permissionMode,
+  });
+
+  const graphProofTask = taskPromotion.gate_decision === 'PROMOTE'
+    ? {
+        task_id: 'neo4j-graph-proof-runtime-repair',
+        title: 'Repair Neo4j graph proof runtime',
+        status: 'PROPOSED',
+        evidence: [
+          'docs/reports/retrieval-e2e-benchmark.json',
+          'docs/reports/replay-trace-summary.json',
+          'docs/reports/provenance-tree-summary.json',
+          'docs/reports/contract-field-coverage.json',
+        ],
+        reason: 'Recommendation passed retrieval, evidence, duplication, actionability, and permission gates.',
+      }
+    : null;
 
   const recommendation = {
     source_id: createHash('sha256').update(userQuery).digest('hex').slice(0, 12),
@@ -491,9 +507,9 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     community_id: identity.community_id,
     tree_node_id: identity.tree_node_id,
     qdrant_point_id: identity.qdrant_point_id,
-    kanban_card_id: graphProofReady ? null : graphProofTask.task_id,
+    kanban_card_id: graphProofTask?.task_id ?? null,
     decision,
-    permission_level: decision === 'patch_existing' ? 'patch_allowed' : 'read_only',
+    permission_level: permissionMode,
     target_files: rgMatches.slice(0, 5),
     evidence: {
       rg_matches: rgMatches,
@@ -503,6 +519,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
       cache_hits: l4Evidence.cache_hits,
       rerank_score: rerankResult.top_score,
     },
+    task_promotion: taskPromotion,
     kanban_recommendation: graphProofTask,
     gemma4,
     validation_commands: [
@@ -533,6 +550,37 @@ export async function generateGatedRecommendation(userQuery, initialSourceRefs) 
   };
 }
 
+export async function emitBoardProposal(recommendation) {
+  const proposalPath = path.join(REPO_ROOT, 'docs/reports/atlas-recommendation-proposals.json');
+  let recommendations = [];
+  try {
+    const existing = JSON.parse(await fs.readFile(proposalPath, 'utf8'));
+    recommendations = Array.isArray(existing.recommendations) ? existing.recommendations : [];
+  } catch {
+    // The first proposal creates the ledger; malformed previous data is never
+    // overwritten by a recommendation workflow run.
+    try { await fs.access(proposalPath); throw new Error(`Proposal ledger is not valid JSON: ${proposalPath}`); } catch (error) {
+      if (error?.code !== 'ENOENT') throw error;
+    }
+  }
+
+  const proposal = {
+    recommendation_id: recommendation.task_promotion.recommendation_id,
+    source_ref: recommendation.source_ref,
+    tree_node_id: recommendation.tree_node_id,
+    title: `Atlas recommendation: ${recommendation.feature_label ?? recommendation.source_ref}`,
+    evidence_refs: recommendation.evidence.rg_matches.slice(0, 20),
+    reason_codes: recommendation.task_promotion.failure_reasons,
+    task_promotion: recommendation.task_promotion,
+    created_at: new Date().toISOString(),
+  };
+  const filtered = recommendations.filter((entry) => entry?.recommendation_id !== proposal.recommendation_id);
+  filtered.push(proposal);
+  await fs.mkdir(path.dirname(proposalPath), { recursive: true });
+  await fs.writeFile(proposalPath, JSON.stringify({ contract: 'atlas.recommendation.board-proposals.v1', recommendations: filtered }, null, 2));
+  return proposal;
+}
+
 // ── CLI entrypoint ────────────────────────────────────────────────────────────
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -543,7 +591,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const query = queryIdx >= 0 ? args[queryIdx + 1] : (sourceIdx >= 0 ? args[sourceIdx + 1] : args[0] ?? 'atlas identity spine');
 
   runRecommendationWorkflow(query, [query])
-    .then(rec => {
+    .then(async (rec) => {
+      if (args.includes('--emit-board-proposal')) {
+        const proposal = await emitBoardProposal(rec);
+        rec.board_proposal = proposal;
+      }
       console.log('\n' + JSON.stringify(rec, null, 2));
     })
     .catch(err => {

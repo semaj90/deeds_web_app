@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "packages": {
+    "@deeds/atlas-contracts": {
+      "path": "packages/atlas",
+      "exports": ["./packet-identity", "./packet-registry"]
+    },
+    "@deeds/parent-atlas": {
+      "path": "packages/parent-atlas",
+      "exports": ["./core/contextual-tree-snapshot", "./core/graph-snapshot-v2"]
+    }
+  },
+  "owners": {
+    "packet_identity": "packages/atlas/lib/packet-identity-bridge.mjs",
+    "packet_registry": "packages/atlas/lib/packet-registry.mjs",
+    "contextual_tree_snapshot": "packages/parent-atlas/src/core/contextual-tree-snapshot.ts",
+    "graph_snapshot_v2": "packages/parent-atlas/src/core/graph-snapshot-v2.ts"
+  },
+  "forbidden_mirrors": [
+    "scripts/atlas/lib/packet-identity-bridge.mjs",
+    "scripts/atlas/lib/packet-registry.mjs"
+  ],
+  "required_imports": {
+    "scripts/atlas/smoke-parent-atlas-graph-v2.mjs": "@deeds/parent-atlas/core/graph-snapshot-v2"
+  },
+  "runtime_imports": [
+    "@deeds/atlas-contracts/packet-identity",
+    "@deeds/atlas-contracts/packet-registry",
+    "@deeds/parent-atlas/core/contextual-tree-snapshot",
+    "@deeds/parent-atlas/core/graph-snapshot-v2"
+  ]
+}

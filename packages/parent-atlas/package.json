@@ -1,0 +1,42 @@
+{
+  "name": "@deeds/parent-atlas",
+  "version": "0.1.0",
+  "description": "Atlas audit gates, adapters, and pipeline CLI for the deeds-web-app monorepo",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./dist/index.js",
+    "./core/contextual-tree-snapshot": "./dist/core/contextual-tree-snapshot.js",
+    "./core/graph-snapshot-v2": "./dist/core/graph-snapshot-v2.js"
+  },
+  "bin": {
+    "atlas": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test:canonical-surface": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/canonical-surface.test.mjs",
+    "gate:identity": "node --experimental-vm-modules dist/cli.js gate identity",
+    "gate:replay": "node --experimental-vm-modules dist/cli.js gate replay --all",
+    "gate:lineage": "node --experimental-vm-modules dist/cli.js gate lineage",
+    "gate:final": "node --experimental-vm-modules dist/cli.js gate final",
+    "ingest": "node --experimental-vm-modules dist/cli.js ingest",
+    "enrich:karpathy": "node --experimental-vm-modules dist/cli.js enrich karpathy",
+    "cache:hydrate": "node --experimental-vm-modules dist/cli.js cache hydrate",
+    "mapreduce": "node --experimental-vm-modules dist/cli.js mapreduce",
+    "verify:boundaries": "node ../../scripts/atlas/verify-atlas-package-boundaries.mjs"
+  },
+  "dependencies": {
+    "@deeds/atlas-core": "file:../atlas-core",
+    "ioredis": "^5.3.2",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.6",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
