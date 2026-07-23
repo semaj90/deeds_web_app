@@ -234,6 +234,8 @@ export const graphAuthorityScoresV2 = pgTable('atlas_graph_authority_scores_v2',
 
 export type GraphSnapshotV2Row = typeof graphSnapshotsV2.$inferSelect;
 export type NewGraphSnapshotV2Row = typeof graphSnapshotsV2.$inferInsert;
+export type GraphSnapshotExclusionV2Row = typeof graphSnapshotExclusionsV2.$inferSelect;
+export type NewGraphSnapshotExclusionV2Row = typeof graphSnapshotExclusionsV2.$inferInsert;
 export type GraphNodeV2Row = typeof graphNodesV2.$inferSelect;
 export type NewGraphNodeV2Row = typeof graphNodesV2.$inferInsert;
 export type GraphEdgeV2Row = typeof graphEdgesV2.$inferSelect;

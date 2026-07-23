@@ -115,6 +115,8 @@ export * from './route_runtime_packets.js';
 export * from './concept-records.js';
 export * from './retrieval-telemetry.js';
 export * from './kanban-tasks.js';
+export * from './agent-os-registry.js';
+export * from './worktree-leases.js';
 export * from './agent-traces.js';
 export * from './atlas-packets.js';
 export * from './packet-binary-registry.js';
