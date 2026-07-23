@@ -238,6 +238,84 @@ HARD REQUIREMENTS (do not skip):
 9. Cache invalidation happens AFTER Postgres succeeds
 10. Mirrors agree (Qdrant point_count ≈ Neo4j Packet count ≈ Postgres row count)
 
+---
+
+## Repository Instruction Reconciliation Gate
+
+Before any further Parent Atlas implementation work, reconcile the repository root instructions and the attached search findings.
+
+### 1) Normalize instruction authority
+
+- Classify every `AGENTS.md` instruction as one of:
+  `GLOBAL`, `PROFILE_PARENT_ATLAS_FULL`, `PROFILE_ENGRAM_ONLY`, `PROFILE_DEVELOPMENT`, `PROFILE_CI_FIXTURE`, `LEGACY`, `DUPLICATE`, `CONFLICTING`.
+- Do not delete or rewrite root guidance as part of this task.
+- Produce a normalized, non-destructive proposal and archive evidence before editing instruction files.
+- Record source file, line range, classification, applicable profiles, conflicts, and recommended canonical wording.
+
+### 2) Resolve profile-dependent startup behavior
+
+- Treat runtime readiness as profile-driven, not global.
+- Resolve the active profile first: `parent_atlas_full`, `engram_only`, `development`, or `ci_fixture`.
+- Do not mark services that are intentionally disabled by the active profile as failed or degraded.
+- In `engram_only`, `REDIS_ENABLED=false`, `QDRANT_ENABLED=false`, `NEO4J_ENABLED=false`, and `GRAPHIFY_STARTUP_ENABLED=false` are policy, not failure.
+
+### 3) Keep LangGraph mutation-bounded
+
+- LangGraph may plan, validate, sequence subagents, and run dry-run reasoning.
+- LangGraph may not directly write Postgres, Qdrant, Redis, Neo4j, DuckDB, SeaweedFS, or perform archive/move/delete operations.
+- Durable mutations must flow through proposal, promotion queue, schema gates, validation reports, and bounded apply scripts.
+- Any repair state machine must use explicit mutation boundaries such as `PROPOSE_MUTATION`, `VALIDATE_MUTATION`, `AUTHORIZE_PROMOTION`, `BOUNDED_APPLY_SCRIPT`, and `RECORD_WITNESS`.
+
+### 4) Enforce retrieval abstraction boundaries
+
+- New retrieval, traversal, and graph-RRF code must go through the repository’s search abstraction boundary.
+- Do not call the Qdrant client directly from new runtime code outside approved backend modules.
+- Use filter-first candidate selection, then compressed approximate semantic search, then bounded exact rescoring.
+- Optional cuVS/CAGRA implementations must remain behind `SearchBackend`.
+
+### 5) Keep embedding lane classifications explicit
+
+- Treat `768` as canonical native, `384` as canonical retrieval contract, and `64` as routing feature where the repository says so.
+- Do not assume every `codebase_chunks_768` reference is stale.
+- Classify collection references as `CANONICAL_NATIVE_768`, `MIGRATE_TO_RETRIEVAL_384`, `ROUTING_64`, `TEST_ONLY`, `LEGACY_DISABLED`, `UNCLASSIFIED`, or `DELETE`.
+- The defect is bypassing the registry or using an unexplained lane, not merely using `768`.
+
+### 6) Keep migration policy strict
+
+- Use `migrate`; do not use `drizzle-kit push` against live data.
+- Keep `drizzle/meta` JSON-only.
+- Sidecar migrations not represented in `_journal.json` must be registered in `drizzle/sidecar-migrations.json`.
+
+### 7) Require structured subagent closure
+
+- Every Codex / Claude subtask must conclude with:
+  `likely_cause`, `evidence`, `patch_targets`, `safe_next_command`, `smoke_command`, `report_path`.
+- Include `do_not_do` as an explicit safety boundary.
+- Do not accept a task as complete without these fields.
+
+### 8) Route retrieval through ACE packets
+
+- Raw retrieval results must not be passed directly to a patching or synthesis agent.
+- The Context Retrieval Agent must return a versioned ACE packet, not an arbitrary list of hits.
+- Required ACE fields include `sourceRef`, `ConceptID`, `ConfidenceScore`, and `ContextBlob`.
+
+### 9) Archive, do not delete
+
+- When cleanup is necessary, archive stale scripts, duplicate contracts, and legacy adapters instead of deleting them.
+- Record SHA-256, original path, reason, and recovery instructions.
+
+### Required reconciliation outputs
+
+- `docs/architecture/PARENT_ATLAS_INSTRUCTION_AUTHORITY.md`
+- `docs/reports/parent-atlas-instruction-authority.json`
+
+### Required proofs
+
+- `DUPLICATE_INSTRUCTIONS_IDENTIFIED`
+- `PROFILE_CONFLICTS_IDENTIFIED`
+- `GLOBAL_RULES_IDENTIFIED`
+- `NO_INSTRUCTION_SILENTLY_DROPPED`
+
 DO NOT claim production PASS unless:
 - Postgres insert proven (transaction committed)
 - Qdrant/TurboVec upsert proven (point count matches)

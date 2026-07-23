@@ -1,0 +1,200 @@
+{
+  "reportType": "parent_atlas_instruction_authority",
+  "generatedAt": "2026-07-23T00:00:00-07:00",
+  "status": "RECONCILIATION_PROPOSED",
+  "sources": [
+    {
+      "file": "AGENTS.md",
+      "lineRanges": ["1-19", "21-35", "39-49", "51-62", "63-90", "93-104", "106-115", "118-125", "127-133", "135-140", "142-155", "157-169"]
+    },
+    {
+      "file": "CLAUDE.md",
+      "lineRanges": ["1-27", "31-68", "70-82", "84-109", "111-161", "165-204", "208-217"]
+    },
+    {
+      "file": "docs/PRODUCTION-HARDENING-CLAUDE-PROMPT.md",
+      "lineRanges": ["243-317", "319-336"]
+    }
+  ],
+  "classifications": [
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "1-19",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Search before opening files; do not load whole markdown files into context."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "21-35",
+      "classification": "PROFILE_PARENT_ATLAS_FULL",
+      "applicableProfiles": ["parent_atlas_full"],
+      "conflicts": ["Potentially overlaps with the engram-only profile if not explicitly scoped."],
+      "canonicalWording": "Parent Atlas workstation status applies only to the full profile."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "39-49",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Core Svelte, Drizzle, Zod, and archive-not-delete constraints."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "51-62",
+      "classification": "DUPLICATE",
+      "applicableProfiles": ["all"],
+      "conflicts": ["Repeated OpenCode Skill Contract block."],
+      "canonicalWording": "Keep one canonical OpenCode Skill Contract section."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "63-90",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Use ACE context injection; do not pass raw retrieval hits directly to the model."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "93-104",
+      "classification": "DUPLICATE",
+      "applicableProfiles": ["all"],
+      "conflicts": ["Repeated repo map block."],
+      "canonicalWording": "Keep one repo map section or split into canonical/legacy ownership references."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "106-115",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Command snippets are reference entrypoints, not proof of runtime state."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "118-125",
+      "classification": "PROFILE_ENGRAM_ONLY",
+      "applicableProfiles": ["engram_only"],
+      "conflicts": ["Disabled derived stores must not be reported as failures in this profile."],
+      "canonicalWording": "Engram-only profile intentionally disables Redis, Qdrant, Neo4j, and Graphify startup."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "127-133",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Apply gotcha handling for schema, SeaweedFS, UnoCSS, and drizzle metadata."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "135-140",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Treat reference docs as on-demand context, not startup requirements."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "142-155",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Use the retrieval abstraction boundary and SearchBackend; keep Qdrant as a mirror."
+    },
+    {
+      "sourceFile": "AGENTS.md",
+      "lineRange": "157-169",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "LangGraph may orchestrate and validate only; durable mutation must go through bounded apply scripts."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "1-27",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Archive rather than delete."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "31-68",
+      "classification": "LEGACY",
+      "applicableProfiles": ["historical"],
+      "conflicts": ["Session-specific tooling fix reads as historical status, not a standing repo contract."],
+      "canonicalWording": "Keep as a historical note unless converted into a live policy file."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "70-82",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Use the connected MCP surface as documented."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "84-109",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "LSP wiring guidance is informational and environment dependent."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "111-161",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Playwright and trace MCP are separate concerns; keep the source-of-truth declaration explicit."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "165-204",
+      "classification": "PROFILE_PARENT_ATLAS_FULL",
+      "applicableProfiles": ["parent_atlas_full"],
+      "conflicts": ["Live phase-7 status should not be treated as proof for later phases."],
+      "canonicalWording": "Phase 7 operational status applies to that historical snapshot only."
+    },
+    {
+      "sourceFile": "CLAUDE.md",
+      "lineRange": "208-217",
+      "classification": "GLOBAL",
+      "applicableProfiles": ["all"],
+      "conflicts": [],
+      "canonicalWording": "Quick reference table is informational."
+    },
+    {
+      "sourceFile": "docs/PRODUCTION-HARDENING-CLAUDE-PROMPT.md",
+      "lineRange": "243-317",
+      "classification": "PROFILE_PARENT_ATLAS_FULL",
+      "applicableProfiles": ["parent_atlas_full"],
+      "conflicts": [],
+      "canonicalWording": "Use the repository instruction reconciliation gate before further Parent Atlas implementation work."
+    },
+    {
+      "sourceFile": "docs/PRODUCTION-HARDENING-CLAUDE-PROMPT.md",
+      "lineRange": "319-336",
+      "classification": "PROFILE_PARENT_ATLAS_FULL",
+      "applicableProfiles": ["parent_atlas_full"],
+      "conflicts": [],
+      "canonicalWording": "Keep the hard requirements and task scaffolding as task-local guidance."
+    }
+  ],
+  "proofTargets": [
+    "DUPLICATE_INSTRUCTIONS_IDENTIFIED",
+    "PROFILE_CONFLICTS_IDENTIFIED",
+    "GLOBAL_RULES_IDENTIFIED",
+    "NO_INSTRUCTION_SILENTLY_DROPPED"
+  ],
+  "notes": [
+    "This report is non-destructive and does not rewrite root guidance.",
+    "The prompt file now contains the reconciliation gate for future implementation work.",
+    "The repository-root instruction files should be normalized into a single machine-readable profile manifest in a follow-up slice."
+  ]
+}
