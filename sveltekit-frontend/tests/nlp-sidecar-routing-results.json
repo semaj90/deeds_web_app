@@ -1,0 +1,49 @@
+{
+  "timestamp": "2026-07-23T17:55:19.107Z",
+  "summary": {
+    "passed": 16,
+    "failed": 0,
+    "total": 16,
+    "successRate": "100.00%"
+  },
+  "tests": [
+    {
+      "test": "Native TS Health Check",
+      "passed": true,
+      "runtime": "native-ts",
+      "headers": {
+        "Content-Type": "application/json",
+        "x-langextract-source": "native-ts",
+        "x-nlp-runtime": "native-ts"
+      }
+    },
+    {
+      "test": "Miniforge Sidecar Health Check",
+      "passed": true,
+      "runtime": "miniforge-nlp-sidecar",
+      "capabilities": {
+        "spacy": true,
+        "langextract": true,
+        "tree_sitter": true,
+        "ast_grep": true,
+        "torch": true
+      }
+    },
+    {
+      "test": "Native TS Extraction (5 sample files)",
+      "passed": true,
+      "runtime": "native-ts",
+      "filesProcessed": 5
+    },
+    {
+      "test": "Miniforge Extraction (5 sample files)",
+      "passed": true,
+      "runtime": "miniforge-nlp-sidecar",
+      "filesProcessed": 5
+    },
+    {
+      "test": "Routing Witness Consistency",
+      "passed": true
+    }
+  ]
+}
