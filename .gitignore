@@ -972,3 +972,22 @@ exports/phase7-export-manifest-*.json
 # DuckDB data files (too large for GitHub)
 *.duckdb
 data/atlas-ml/
+
+# Graphify stage outputs (large NDJSON files, 10MB+; kept on disk for reproducibility, never committed)
+docs/stage*/
+docs/stage1/*.ndjson
+docs/stage1/*.json
+docs/stage2/*.ndjson
+docs/stage3/*.ndjson
+docs/stage3/*.jsonl
+docs/stage4/*.ndjson
+docs/stage4/*.tmp
+docs/stage4b/*.json
+docs/stage5/*.ndjson
+docs/stage5/*.json
+!docs/stage*/README.md
+
+# Graphify execution logs and temp files
+docs/graphify-execution-log.md
+docs/graphify-execution-manifest.okf
+docs/vector-governance/vector-governance-report.json

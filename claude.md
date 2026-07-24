@@ -1,5 +1,33 @@
 # Legal AI Platform — Claude Project Instructions
 
+## Archival Rules (NOT DELETION — July 23, 2026)
+
+**We do NOT delete. We archive.**
+
+Files that need removal from the active repo are moved to cold storage with:
+- **Manifest entry**: `manifest.json` in archive directory listing SHA-256, path, date archived, reason
+- **SHA-256 hash**: Computed at archival time, verified on recovery
+- **Recovery path**: Full retrieval instructions documented in memory
+- **Lifecycle**: Archived files can be recovered; deleted files cannot
+
+**Archive locations**:
+- `deeds_labs/archive/` — primary cold storage (gitignored)
+- `.archive/` — secondary if deeds_labs unavailable (gitignored)
+- `docs/archive-manifest.json` — manifest index (NOT gitignored, readable for recovery)
+
+**Example**:
+```bash
+# Archive a file (do NOT delete)
+mkdir -p deeds_labs/archive/2026-07-23
+cp src/old-module.ts deeds_labs/archive/2026-07-23/old-module.ts.bak
+echo '{"path":"src/old-module.ts","sha256":"abc123...","archived":"2026-07-23T20:35:00Z","reason":"superseded by new-module.ts"}' >> docs/archive-manifest.json
+
+# Recovery (if needed)
+cp deeds_labs/archive/2026-07-23/old-module.ts.bak src/old-module.ts
+```
+
+---
+
 ## Last Updated: July 8, 2026 (Session 125+ — OpenCode Bash Tool Calling FIXED)
 ## Status: All services UP ✅ | Gemma4 :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
 ## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
