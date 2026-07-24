@@ -1,7 +1,7 @@
 # Unified Retrieval + Summarization Pipeline
 
-**Status**: ✅ **VALIDATED END-TO-END** (6/6 stages PASS)  
-**Total Pipeline Time**: ~25 seconds (mostly embedding + Gemma4, not bottleneck)  
+**Status**: ✅ **VALIDATED END-TO-END** (6/6 stages PASS)
+**Total Pipeline Time**: ~25 seconds (mostly embedding + Gemma4, not bottleneck)
 **Command**: `npm run retrieval:unified:validate`
 
 ---
@@ -61,7 +61,7 @@ INPUT: Query → "authentication session validation"
 └─ Top-10 ranked candidates ───────────────────────────────────┘
         ↓
 ┌─ STAGE 6: Gemma4 Summarization ───────────────────────────────┐
-│ Service: llama-server (gemma4-rotorquant :8090)              │
+│ Service: llama-server (gemma4-legal-iq4xs-direct.gguf :8090)              │
 │ Input: Top-5 references + query                              │
 │ Output: 1-2 sentence bounded summary                          │
 │ Options: temperature=0.3, max_tokens=128                     │
@@ -107,7 +107,7 @@ OUTPUT: { candidates, ranking_scores, summary, timing }
 ### 4. **Go Retrieval (Search API Facade)**
 - **Role**: Unified HTTP API for orchestration
 - **Port**: :8100 (search endpoint) or :8096 (standalone)
-- **Responsibilities**: 
+- **Responsibilities**:
   - Embed query
   - Call Qdrant ANN
   - Optionally call rg/lexical
@@ -185,8 +185,8 @@ const prefiltered = await turbovec.search({
 ### TurboVec → Postgres Join (Stage 4)
 ```typescript
 const metadata = await postgres.query(
-  `SELECT id, relative_path, symbol, kind 
-   FROM codebase_chunk_index 
+  `SELECT id, relative_path, symbol, kind
+   FROM codebase_chunk_index
    WHERE id = ANY($1)`,
   [qdrantIds]
 );
@@ -205,15 +205,15 @@ const metadata = await postgres.query(
 const ranked = candidates.map((c, idx) => {
   const qdrant_w = 1 - (idx / candidates.length);
   const turbovec_w = turboVecMap[c.id] ? 1 - (tv_idx / turbovec.length) : 0;
-  
-  const score = 
+
+  const score =
     0.30 * qdrant_w +        // Dense vector relevance
     0.20 * turbovec_w +       // RAM-resident rerank
     0.20 * 0 +                // rg lexical (placeholder)
     0.15 * 0 +                // AST relations (placeholder)
     0.10 * 1 +                // Postgres presence
     0.05 * 1;                 // Freshness
-  
+
   return { ...c, score };
 }).sort((a, b) => b.score - a.score).slice(0, 10);
 ```
@@ -235,7 +235,7 @@ const summary = await gemma4.chat({
   messages: [{
     role: 'user',
     content: `Based on: src/routes/api/auth/session/+server.ts::validateSession
-             
+
 Query: authentication session validation
 
 Provide a 1-2 sentence summary.`
@@ -394,14 +394,14 @@ RRF_score = 1/(K + rank_1) + 1/(K + rank_2) + ...  (where K=60)
 
 ## Validation Checklist
 
-✅ **Stage 1**: embeddinggemma generates 768-dim vectors correctly  
-✅ **Stage 2**: Qdrant named-vector "content" search returns 20+ candidates  
-✅ **Stage 3**: TurboVec transforms 768→64 and returns 10 prefiltered  
-✅ **Stage 4**: Postgres joins candidates with metadata  
-✅ **Stage 5**: Unified ranking produces top-10 with blended scores  
-✅ **Stage 6**: Gemma4 generates bounded summaries  
+✅ **Stage 1**: embeddinggemma generates 768-dim vectors correctly
+✅ **Stage 2**: Qdrant named-vector "content" search returns 20+ candidates
+✅ **Stage 3**: TurboVec transforms 768→64 and returns 10 prefiltered
+✅ **Stage 4**: Postgres joins candidates with metadata
+✅ **Stage 5**: Unified ranking produces top-10 with blended scores
+✅ **Stage 6**: Gemma4 generates bounded summaries
 
-**Validated**: July 1, 2026, 22:19 UTC  
+**Validated**: July 1, 2026, 22:19 UTC
 **Next**: Wire Go Retrieval facade to use this orchestrator
 
 ---
@@ -426,6 +426,6 @@ RRF_score = 1/(K + rank_1) + 1/(K + rank_2) + ...  (where K=60)
 
 ---
 
-**Owner**: TurboVec + Qdrant + Go Retrieval integration effort  
-**Status**: Production-ready (6/6 stages validated)  
+**Owner**: TurboVec + Qdrant + Go Retrieval integration effort
+**Status**: Production-ready (6/6 stages validated)
 **Date**: 2026-07-01

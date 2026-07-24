@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-07-23T00:00:00Z",
+  "repositoryRoot": "C:/Users/james/Videos/deeds-web-app",
+  "proposal": {
+    "proposalId": "graphify-stage-4-5-execution-continuation",
+    "title": "Graphify Stage 4 to Stage 5 execution tracking",
+    "status": "ACTIVE",
+    "intent": "Finish Graphify Stage 4 topology extraction, Stage 4b edge endpoint validation, and Stage 5 PageRank authority with OpenSpec-style task tracking."
+  },
+  "proofModel": {
+    "authoritativeStates": [
+      "IMPLEMENTED",
+      "FIXTURE_PROVEN",
+      "RUNTIME_PROVEN",
+      "LIVE_STORE_PROVEN",
+      "CROSS_STORE_PROVEN",
+      "EVALUATED",
+      "PRODUCTION_PROVEN",
+      "UNAVAILABLE",
+      "FAILED",
+      "NOT_IMPLEMENTED"
+    ],
+    "roadmapEstimatePercent": 28
+  },
+  "tasks": [
+    {
+      "taskId": "stage4_topology_extraction",
+      "specId": "spec_stage4_topology_extraction",
+      "state": "IN_PROGRESS",
+      "proofState": "IMPLEMENTED",
+      "blockedBy": [],
+      "command": "node scripts/atlas/stage4-topology-extraction-parallel.mjs",
+      "workingDirectory": "C:/Users/james/Videos/deeds-web-app",
+      "gate": "TOPOLOGY_EXTRACTION_PROVEN",
+      "acceptanceCriteria": [
+        "Topology output file exists",
+        "Record count is validated",
+        "Sample rows are inspected"
+      ],
+      "expectedOutputs": [
+        "docs/stage4/topology_facts.ndjson"
+      ],
+      "evidenceArtifacts": [],
+      "nextAction": "Poll for output, then validate the record count and sample records."
+    },
+    {
+      "taskId": "stage4b_edge_endpoint_validation",
+      "specId": "spec_stage4b_edge_endpoint_validation",
+      "state": "BLOCKED",
+      "proofState": "IMPLEMENTED",
+      "blockedBy": [
+        "stage4_topology_extraction"
+      ],
+      "command": "node scripts/atlas/stage4b-edge-endpoint-validation.mjs",
+      "workingDirectory": "C:/Users/james/Videos/deeds-web-app",
+      "gate": "EDGE_ENDPOINT_INTEGRITY_PROVEN",
+      "acceptanceCriteria": [
+        "Zero orphaned edges",
+        "Canonical endpoints only"
+      ],
+      "expectedOutputs": [
+        "docs/stage4b/edge_endpoint_validation_report.json"
+      ],
+      "evidenceArtifacts": [],
+      "nextAction": "Run after Stage 4 output exists."
+    },
+    {
+      "taskId": "stage5_pagerank_authority",
+      "specId": "spec_stage5_pagerank_authority",
+      "state": "BLOCKED",
+      "proofState": "IMPLEMENTED",
+      "blockedBy": [
+        "stage4b_edge_endpoint_validation"
+      ],
+      "command": "node scripts/atlas/stage5-pagerank-authority-validated.mjs",
+      "workingDirectory": "C:/Users/james/Videos/deeds-web-app",
+      "gate": "NETWORKX_REFERENCE_PROVEN",
+      "acceptanceCriteria": [
+        "Deterministic reference PageRank validated",
+        "Gate recorded"
+      ],
+      "expectedOutputs": [
+        "docs/stage5/pagerank_validation_report.json"
+      ],
+      "evidenceArtifacts": [],
+      "nextAction": "Run only after Stage 4b passes."
+    }
+  ],
+  "currentBlockers": [
+    "Earlier Stage 4b and Stage 5 results are superseded by the filtered corpus rerun",
+    "Filtered Stage 4 rerun stopped before producing a fresh topology artifact",
+    "Stage 4b is blocked until the filtered Stage 4 output lands again",
+    "Stage 5 is blocked by Stage 4b and the filtered corpus rerun"
+  ],
+  "knownArtifacts": [
+    "scripts/atlas/stage4-topology-extraction-parallel.mjs",
+    "scripts/atlas/stage4b-edge-endpoint-validation.mjs",
+    "scripts/atlas/stage5-pagerank-authority-validated.mjs",
+    "docs/PARENT-ATLAS-KANBAN-CORRECTED.md",
+    "docs/GRAPHIFY-STAGES-0-5-EXECUTION-COMPLETE.md"
+  ]
+}

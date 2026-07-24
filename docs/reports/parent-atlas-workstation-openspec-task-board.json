@@ -1,0 +1,161 @@
+{
+  "generatedAt": "2026-07-23T00:00:00Z",
+  "repositoryRoot": "C:/Users/james/Videos/deeds-web-app",
+  "boardId": "parent-atlas-workstation-openspec-task-board",
+  "authorityModel": "state-based gates are authoritative; percentages are roadmap estimates only",
+  "currentSnapshot": [
+    {
+      "area": "Instruction authority reconciliation",
+      "state": "FIXTURE_PROVEN",
+      "roadmapPercent": 100,
+      "notes": "Repo instruction drift classified and documented."
+    },
+    {
+      "area": "Runtime profile and health gating",
+      "state": "RUNTIME_PROVEN",
+      "roadmapPercent": 92,
+      "notes": "Profile-aware health routes are wired and validated locally."
+    },
+    {
+      "area": "Graph authority foundation",
+      "state": "FIXTURE_PROVEN",
+      "roadmapPercent": 74,
+      "notes": "Fixture parity and contract repair are in place; live persistence remains pending."
+    },
+    {
+      "area": "Graph snapshot persistence",
+      "state": "NOT_IMPLEMENTED",
+      "roadmapPercent": 0,
+      "notes": "Canonical immutable snapshot tables/materializer still missing."
+    },
+    {
+      "area": "Persisted live NetworkX/GDS parity",
+      "state": "NOT_RUN",
+      "roadmapPercent": 0,
+      "notes": "Blocked by snapshot persistence."
+    },
+    {
+      "area": "Bounded traversal",
+      "state": "NOT_IMPLEMENTED",
+      "roadmapPercent": 0,
+      "notes": "Needs snapshot-aware request/response contract."
+    },
+    {
+      "area": "Worktree lease orchestration",
+      "state": "IMPLEMENTED",
+      "roadmapPercent": 58,
+      "notes": "Durable worktree lease adapter exists; needs more workflow coverage."
+    },
+    {
+      "area": "Agentic error-resolution loop",
+      "state": "LIVE_PARTIAL",
+      "roadmapPercent": 62,
+      "notes": "Durable run loop is present but not yet closed by full evidence gates."
+    },
+    {
+      "area": "Package ownership enforcement",
+      "state": "BLOCKED",
+      "roadmapPercent": 35,
+      "notes": "Mirror/authority boundaries still need a machine-enforced check."
+    },
+    {
+      "area": "Graphify stage 4-5 execution",
+      "state": "IN_PROGRESS",
+      "roadmapPercent": 28,
+      "notes": "Stage 4 is running; 4b and 5 are blocked on its output."
+    }
+  ],
+  "phaseBoard": [
+    {
+      "phase": 0,
+      "name": "Runtime Workstation and Service Routing",
+      "state": "RUNTIME_PROVEN",
+      "roadmapPercent": 80,
+      "exitGate": "service manifest, profile resolution, route evidence, startup/shutdown idempotence"
+    },
+    {
+      "phase": 1,
+      "name": "Canonical Identity and Data",
+      "state": "LIVE_PARTIAL",
+      "roadmapPercent": 86,
+      "exitGate": "graph resolution issues ledger, full corpus node-key coverage, edge endpoint coverage"
+    },
+    {
+      "phase": 2,
+      "name": "Graph Authority Foundation",
+      "state": "FIXTURE_PROVEN",
+      "roadmapPercent": 74,
+      "exitGate": "immutable PostgreSQL snapshot persistence and live parity proof"
+    },
+    {
+      "phase": 3,
+      "name": "Retrieval and Ranking",
+      "state": "LIVE_PARTIAL",
+      "roadmapPercent": 76,
+      "exitGate": "bounded traversal, graph-aware rerank canary, snapshot-aware candidate routing"
+    },
+    {
+      "phase": 4,
+      "name": "Agentic Error Fixing",
+      "state": "LIVE_PARTIAL",
+      "roadmapPercent": 62,
+      "exitGate": "durable issue run loop, independent validation, rollback proof"
+    },
+    {
+      "phase": 5,
+      "name": "Package Ownership and Release Boundaries",
+      "state": "BLOCKED",
+      "roadmapPercent": 35,
+      "exitGate": "one owner per module path, zero divergent mirrors, CI boundary verifier"
+    },
+    {
+      "phase": 6,
+      "name": "Immutable Graph Snapshot Materializer",
+      "state": "NOT_IMPLEMENTED",
+      "roadmapPercent": 0,
+      "exitGate": "deterministic snapshot manifest, topology hash stability, exclusion accounting"
+    },
+    {
+      "phase": 7,
+      "name": "Persisted Live PageRank Parity",
+      "state": "NOT_RUN",
+      "roadmapPercent": 0,
+      "exitGate": "NetworkX/GDS parity on the same snapshot, no production mutation"
+    },
+    {
+      "phase": 8,
+      "name": "Bounded Graph Traversal",
+      "state": "NOT_IMPLEMENTED",
+      "roadmapPercent": 0,
+      "exitGate": "hop bounds, fanout bounds, canonical identity resolution, explicit truncation"
+    },
+    {
+      "phase": 9,
+      "name": "Durable Error Resolution Run",
+      "state": "LIVE_PARTIAL",
+      "roadmapPercent": 62,
+      "exitGate": "schema-valid issues, scoped patches, independent validator, rollback artifact"
+    },
+    {
+      "phase": 10,
+      "name": "Release Hardening",
+      "state": "NOT_RUN",
+      "roadmapPercent": 0,
+      "exitGate": "backup/restore, package boundary enforcement, mutation witnesses, release manifest"
+    }
+  ],
+  "currentBlockers": [
+    "Immutable graph snapshot persistence is missing",
+    "Persisted live NetworkX/GDS parity is not yet proven",
+    "Bounded traversal is still a design task, not a live gate",
+    "Error-resolution runs need a closed evidence loop",
+    "Package ownership still needs a machine-enforced boundary check"
+  ],
+  "immediateNextSteps": [
+    "Materialize the immutable graph snapshot from canonical Postgres identities",
+    "Run NetworkX/GDS parity on that snapshot only",
+    "Add snapshot-aware bounded traversal",
+    "Close the error-resolution run loop with independent validation",
+    "Add the package boundary verifier and mirror inventory check"
+  ]
+}

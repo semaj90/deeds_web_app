@@ -1,0 +1,69 @@
+{
+  "manifestVersion": 1,
+  "profiles": {
+    "parent_atlas_full": {
+      "services": {
+        "postgres": { "state": "required", "rationale": "Canonical store and orchestration registry", "probe": "SELECT 1" },
+        "redis": { "state": "required", "rationale": "Warm cache and board acceleration", "probe": "PING" },
+        "qdrant": { "state": "required", "rationale": "Durable semantic retrieval projection", "probe": "GET /collections" },
+        "neo4j": { "state": "required", "rationale": "Derived topology index and graph authority lane", "probe": "RETURN 1" },
+        "ollama": { "state": "required", "rationale": "Chat and embedding runtime", "probe": "GET /api/tags" },
+        "engram_embed": { "state": "required", "rationale": "Engram MCP / TurboVec sidecar for bounded context memory", "probe": "GET /health on :8792" }
+      },
+      "features": {
+        "graphify_startup": { "state": "required", "rationale": "Graphify startup is part of the full workstation readiness contract", "probe": "startup guard" }
+      },
+      "notes": [
+        "Full workstation profile keeps the graph authority, retrieval and cache lanes online."
+      ]
+    },
+    "engram_only": {
+      "services": {
+        "postgres": { "state": "required", "rationale": "Canonical store remains live", "probe": "SELECT 1" },
+        "redis": { "state": "disabled", "rationale": "Explicitly disabled by engram-only policy", "probe": "skip probe" },
+        "qdrant": { "state": "disabled", "rationale": "Explicitly disabled by engram-only policy", "probe": "skip probe" },
+        "neo4j": { "state": "disabled", "rationale": "Explicitly disabled by engram-only policy", "probe": "skip probe" },
+        "ollama": { "state": "required", "rationale": "Engram still needs model/runtime support", "probe": "GET /api/tags" },
+        "engram_embed": { "state": "required", "rationale": "Engram MCP / TurboVec sidecar is required", "probe": "GET /health on :8792" }
+      },
+      "features": {
+        "graphify_startup": { "state": "disabled", "rationale": "Graphify startup is disabled in engram-only mode", "probe": "skip startup" }
+      },
+      "notes": [
+        "Engram-only mode suppresses Redis, Qdrant, Neo4j and Graphify as policy-disabled."
+      ]
+    },
+    "development": {
+      "services": {
+        "postgres": { "state": "required", "rationale": "Local development still relies on the canonical DB", "probe": "SELECT 1" },
+        "redis": { "state": "optional", "rationale": "Useful warm cache, but not mandatory in development", "probe": "PING" },
+        "qdrant": { "state": "optional", "rationale": "Semantic retrieval lane, but dev can run degraded", "probe": "GET /collections" },
+        "neo4j": { "state": "optional", "rationale": "Graph lane can be offline while iterating locally", "probe": "RETURN 1" },
+        "ollama": { "state": "required", "rationale": "Local model runtime is required for app workflows", "probe": "GET /api/tags" },
+        "engram_embed": { "state": "optional", "rationale": "Sidecar accelerates memory and ANN routing when present", "probe": "GET /health on :8792" }
+      },
+      "features": {
+        "graphify_startup": { "state": "optional", "rationale": "Graphify startup can be present but is not mandatory during dev", "probe": "startup guard" }
+      },
+      "notes": [
+        "Development mode tolerates missing derived stores but still treats Postgres and Ollama as required."
+      ]
+    },
+    "ci_fixture": {
+      "services": {
+        "postgres": { "state": "optional", "rationale": "Fixture jobs may use a mocked or ephemeral DB", "probe": "SELECT 1" },
+        "redis": { "state": "optional", "rationale": "Fixture tests may stub Redis", "probe": "PING" },
+        "qdrant": { "state": "optional", "rationale": "Fixture tests may stub Qdrant", "probe": "GET /collections" },
+        "neo4j": { "state": "optional", "rationale": "Fixture tests may stub Neo4j", "probe": "RETURN 1" },
+        "ollama": { "state": "optional", "rationale": "Fixture tests may stub the model runtime", "probe": "GET /api/tags" },
+        "engram_embed": { "state": "optional", "rationale": "Fixture tests may stub the 8792 sidecar", "probe": "GET /health on :8792" }
+      },
+      "features": {
+        "graphify_startup": { "state": "disabled", "rationale": "Fixture runs do not need graphify startup", "probe": "skip startup" }
+      },
+      "notes": [
+        "CI fixture mode must not turn missing live services into a hard failure."
+      ]
+    }
+  }
+}

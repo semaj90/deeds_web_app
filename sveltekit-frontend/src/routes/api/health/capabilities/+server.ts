@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { getParentAtlasRuntimeProfileManifest } from '$lib/server/runtime-profile.js';
 
 import { getGpuLeaseStatus } from '$lib/server/inference/gpu-arbiter.js';
 import { getLangExtractStatus } from '$lib/server/langextract-client.js';
@@ -143,6 +144,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 	const rag = ollama && embedding && qdrantHealth.ok;
 	const ragEnabled = rag && postgresOk;
 	const serverReady = ollama && postgresOk;
+	const runtimeProfile = getParentAtlasRuntimeProfileManifest();
 
 	return json(
     {
@@ -165,6 +167,14 @@ export const GET: RequestHandler = async ({ locals }) => {
         leaseFree: !gpuLease,
         leaseExpiresAt: gpuLease?.expiresAt ?? null,
         leaseRemainingMs: gpuLease ? Math.max(0, gpuLease.expiresAt - Date.now()) : null,
+      },
+      runtimeProfile: {
+        profile: runtimeProfile.profile,
+        source: runtimeProfile.source,
+        manifestVersion: runtimeProfile.manifestVersion,
+        services: runtimeProfile.services,
+        features: runtimeProfile.features,
+        notes: runtimeProfile.notes,
       },
       ragEnabled,
       serverReady,

@@ -17,6 +17,7 @@ import {
 import { getInFlightCount } from '$lib/server/embedding/embed.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { ENV, SEAWEED_MASTER_PORT } from '$lib/server/env.server.js';
+import { getParentAtlasRuntimeProfileManifest } from '$lib/server/runtime-profile.js';
 
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
@@ -68,6 +69,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     return json({ error: parsed.error.issues[0]?.message ?? 'Invalid service' }, { status: 400 });
   }
   const { service } = parsed.data;
+  const runtimeProfile = getParentAtlasRuntimeProfileManifest();
 
   if (service) {
     return handleServiceHealth(service);
@@ -97,7 +99,9 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     nats,
   ] = await Promise.all([
     probe(`${ENV.OLLAMA_BASE_URL}/api/tags`, 5000),
-    probe(`${ENV.QDRANT_URL}`, 3000),
+    runtimeProfile.services.qdrant.state === 'disabled'
+      ? Promise.resolve({ ok: true, latencyMs: 0 })
+      : probe(`${ENV.QDRANT_URL}`, 3000),
     probe(`${trtllmUrl}/health`, 3000),
     probe(`${tritonUrl}/v2/health/ready`, 3000),
     probe(`${langextractUrl}/health`, 3000).catch(() => ({
@@ -117,7 +121,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       error: 'go-search probe failed',
     })),
     // --- Data-tier probes ---
-    probeRedis(),
+    runtimeProfile.services.redis.state === 'disabled' ? Promise.resolve({ ok: true, latencyMs: 0 }) : probeRedis(),
     probePostgres(),
     probeTcp(
       new URL(ENV.RABBITMQ_URL).hostname,
@@ -134,14 +138,16 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       latencyMs: 0,
       error: 'couchdb probe failed',
     })),
-    probe(
-      `http://${new URL(ENV.NEO4J_URI.replace('bolt://', 'http://')).hostname}:7474/`,
-      3000
-    ).catch(() => ({
-      ok: false,
-      latencyMs: 0,
-      error: 'neo4j probe failed',
-    })),
+    runtimeProfile.services.neo4j.state === 'disabled'
+      ? Promise.resolve({ ok: true, latencyMs: 0 })
+      : probe(
+          `http://${new URL(ENV.NEO4J_URI.replace('bolt://', 'http://')).hostname}:7474/`,
+          3000
+        ).catch(() => ({
+          ok: false,
+          latencyMs: 0,
+          error: 'neo4j probe failed',
+        })),
     probeTcp(
       new URL(ENV.NATS_URL).hostname,
       parseInt(new URL(ENV.NATS_URL).port || '4222', 10),
@@ -167,7 +173,11 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   };
 
   // Core services: ollama + qdrant + redis + postgres must be healthy
-  const coreOk = ollama.ok && qdrant.ok && redis.ok && postgres.ok;
+  const coreOk =
+    (runtimeProfile.services.ollama.state !== 'required' || ollama.ok) &&
+    (runtimeProfile.services.qdrant.state !== 'required' || qdrant.ok) &&
+    (runtimeProfile.services.redis.state !== 'required' || redis.ok) &&
+    (runtimeProfile.services.postgres.state !== 'required' || postgres.ok);
 
   await persistServiceHealth({
     ollama,
@@ -193,6 +203,14 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   return json(
     {
       status: coreOk ? 'healthy' : 'degraded',
+      runtimeProfile: {
+        profile: runtimeProfile.profile,
+        source: runtimeProfile.source,
+        manifestVersion: runtimeProfile.manifestVersion,
+        services: runtimeProfile.services,
+        features: runtimeProfile.features,
+        notes: runtimeProfile.notes,
+      },
       uptime: Math.round((Date.now() - startedAt) / 1000),
       time: new Date().toISOString(),
       checks,
