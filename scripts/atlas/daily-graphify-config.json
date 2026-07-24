@@ -1,0 +1,121 @@
+{
+  "workspace_id": "legal-ai:deeds-web-app",
+  "schedule": {
+    "enabled": true,
+    "cron": "0 9 * * *",
+    "timezone": "America/Chicago",
+    "description": "Daily graphify at 09:00 AM"
+  },
+  "stages": [
+    {
+      "stageId": 1,
+      "name": "Incremental File Inventory",
+      "script": "stage1-incremental-file-inventory.mjs",
+      "timeout_seconds": 120,
+      "critical": true,
+      "description": "Enumerate files via ripgrep, compute SHA-256, detect changes"
+    },
+    {
+      "stageId": 2,
+      "name": "Structural Extraction (Delta)",
+      "script": "stage2-structural-extraction.mjs",
+      "timeout_seconds": 120,
+      "critical": true,
+      "deltaMode": true,
+      "description": "Extract structural facts for changed files only"
+    },
+    {
+      "stageId": 3,
+      "name": "Semantic Embeddings",
+      "script": "stage3-semantic-extraction.mjs",
+      "timeout_seconds": 600,
+      "critical": true,
+      "description": "Embed new/changed symbols (embeddinggemma @ :11434)"
+    },
+    {
+      "stageId": 4,
+      "name": "Topology Extraction (Partial)",
+      "script": "stage4-topology-extraction-parallel.mjs",
+      "timeout_seconds": 900,
+      "critical": true,
+      "deltaMode": true,
+      "description": "Extract USES/IMPORTS edges for changed symbols + impacted neighbors"
+    },
+    {
+      "stageId": 4,
+      "substage": "4b",
+      "name": "Edge Endpoint Validation",
+      "script": "stage4b-edge-endpoint-validation.mjs",
+      "timeout_seconds": 120,
+      "critical": true,
+      "gate": "EDGE_ENDPOINT_INTEGRITY_PROVEN",
+      "description": "Validate all edge endpoints resolve to canonical identities"
+    },
+    {
+      "stageId": 5,
+      "name": "PageRank Authority",
+      "script": "stage5-pagerank-authority-validated.mjs",
+      "timeout_seconds": 300,
+      "critical": true,
+      "gate": "NETWORKX_REFERENCE_PROVEN",
+      "description": "Compute PageRank on full topology graph (not delta)"
+    },
+    {
+      "stageId": 6,
+      "name": "K-Means Clustering (20 clusters)",
+      "script": "stage6-kmeans-clustering.mjs",
+      "timeout_seconds": 180,
+      "critical": false,
+      "description": "Cluster symbols via K-means++ on 768-dim embeddings"
+    },
+    {
+      "stageId": 7,
+      "name": "SOM Clustering (20x20 grid)",
+      "script": "stage7-som-clustering.mjs",
+      "timeout_seconds": 600,
+      "critical": false,
+      "runFrequency": "weekly",
+      "description": "Self-organizing map training (expensive; run weekly)"
+    },
+    {
+      "stageId": 8,
+      "name": "Neo4j Topology Materialization",
+      "script": "stage8-neo4j-topology-materialization.mjs",
+      "timeout_seconds": 300,
+      "critical": false,
+      "description": "Create SIMILAR_TOPOLOGY + MEMBER_OF edges in Neo4j"
+    }
+  ],
+  "errorHandling": {
+    "maxRetries": 3,
+    "retryBackoff": "exponential",
+    "retryDelayMs": 1000,
+    "criticalStageFailureAction": "abort",
+    "nonCriticalStageFailureAction": "continue",
+    "captureStackTraces": true
+  },
+  "reporting": {
+    "logFile": "docs/graphify-execution-log.md",
+    "jsonReport": "docs/reports/graphify-daily-execution-report.json",
+    "webhookUrl": null,
+    "slackChannel": null,
+    "emailRecipients": [],
+    "notifyOnSuccess": false,
+    "notifyOnFailure": true
+  },
+  "monitoring": {
+    "emitMetricsToRedis": true,
+    "redisKeyPrefix": "graphify:daily",
+    "captureExecutionTimes": true,
+    "captureStageCounts": true,
+    "captureGateStatus": true
+  },
+  "deltaMode": {
+    "enabled": true,
+    "snapshotFile": "docs/stage1/prior_snapshot.json",
+    "reindexAllIfSnapshotMissing": true,
+    "description": "Only process changed/new files; skip unchanged"
+  },
+  "version": "1.0",
+  "lastUpdated": "2026-07-23T15:00:00Z"
+}
