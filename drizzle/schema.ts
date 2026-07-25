@@ -21,13 +21,34 @@ export const cases = pgTable('cases', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+/**
+ * IMPORTANT: SCHEMA AUDIT REQUIRED
+ * 
+ * The schema must be validated against the outputs of the adaptive schema recommendations engine.
+ * Run: npm run atlas:schema:audit
+ * 
+ * The required migration must be applied manually:
+ * $ psql -U legal_admin -d legal_ai_db -f 0045_adaptive_schema_recommendations.generated.sql
+ * 
+ * This ensures necessary columns like 'cold_storage_uri' and 'summary_cached' exist on the 'documents' table.
+ */
 export const documents = pgTable('documents', {
   id: uuid('id').primaryKey(),
   caseId: uuid('case_id').references(() => cases.id),
   filename: text('filename').notNull(),
   jurisdiction: text('jurisdiction').notNull(),
   prosecutionScore: real('prosecution_score').notNull(),
-  metadata: jsonb('metadata').$type<any | null>(), // Store ProcessingMetadata here (nullable)
+  metadata: jsonb('metadata').$type<any | null>(),
+  /**
+   * --- Schema Audit Additions (From 0045_adaptive_schema_recommendations.generated.sql) ---
+   * These fields are added to maintain consistency with the canonical data warehouse view.
+   */
+  'cold_storage_uri': text('cold_storage_uri').default('NULL') .optional(), // Added via audit
+  'summary_cached': boolean('summary_cached').default(false).notNull(), // Added via audit
+  'summary_level': integer('summary_level').default(0).notNull(), // Added via audit
+  /**
+   * -------------------------------------------------------------------------------
+   */
   createdAt: timestamp('created_at').defaultNow(),
 });
 
