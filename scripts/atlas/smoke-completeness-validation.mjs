@@ -85,8 +85,21 @@ async function runAudit() {
       { encoding: 'utf-8' }
     ).trim();
 
-    const [line] = result.split('\n').filter(l => l.trim());
-    const [total, ...counts] = line.match(/\d+/g).map(Number);
+const [line] = result.split('\n').filter(l => l.trim());
+const dataLine = line.match(/total\s+.*?\n(.+)/s); // Capture the full line containing numbers
+const rawMatch = dataLine ? dataLine[1].trim() : null;
+const matches = rawMatch ? rawMatch.match(/\d+/g) : [];
+
+if (!matches || matches.length < 9) {
+    log(\`\${colors.red}❌ CRITICAL: Could not parse any numerical data from the result. Output received: "\${result.substring(0, 500).replace(/"/g, '\\"')}"\${colors.reset}\`);
+    return;
+}
+
+const [total, ...counts] = matches.map(Number);
+
+// Now we have total and counts, which should be correct.
+// ... rest of the logic follows using total and counts
+
 
     if (!total) {
       log(`${colors.red}❌ No data found in atlas_packets${colors.reset}\n`);
@@ -203,10 +216,12 @@ async function runAudit() {
 
 async function watchLoop() {
   await runAudit();
-
+  
   if (isWatch) {
-    log(`${colors.gray}[Watching — next update in ${interval}s, Ctrl+C to exit]${colors.reset}\n`);
-    setTimeout(watchLoop, interval * 1000);
+    log(\`[Watching — next update in \${interval}s, Ctrl+C to exit]\n\`);
+    setInterval(async () => {
+        await runAudit();
+    }, interval * 1000);
   }
 }
 
