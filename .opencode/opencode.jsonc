@@ -1,81 +1,166 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "llama-local/gemma4-iq4xs-direct.gguf",
   "shell": "pwsh",
-  "permission": {
-    "bash": {
-      "*": "allow"
-    },
-    "read": "allow",
-    "grep": "allow",
-    "glob": "allow"
-  },
+  "enabled_providers": ["llama-server"],
   "provider": {
-    "llama-local": {
+    "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "llama-server :8090",
+      "name": "Gemma4 Direct GGUF",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
-        "apiKey": "local"
+        "apiKey": "local",
+        "timeout": 600000,
+        "chunkTimeout": 60000
       },
       "models": {
-        "gemma4-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal IQ4_XS (65K context)",
+        "gemma4-legal-iq4xs-direct.gguf": {
+          "name": "Gemma4 Legal IQ4_XS Direct GGUF",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 8192
+          },
+          "options": {
+            "temperature": 0,
+            "stream": true,
+            "maxTokens": 8192,
+            "stop": [
+              "Thinking:",
+              "Self-Correction",
+              "_gemma3",
+              "gemma3.5-27"
+            ]
+          }
+        },
+        "hforf.gguf": {
+          "name": "HForF Qwen (Reasoning Model)",
           "tools": true,
           "reasoning": true,
           "limit": {
-            "context": 65536,
+            "context": 8192,
             "output": 4096
           },
-          "system": "You are a helpful assistant with access to bash, read, grep, and other tools. When you need to run a tool, think about it first, then execute it."
+          "options": {
+            "temperature": 0.7,
+            "stream": true,
+            "maxTokens": 4096,
+            "stop": [
+              "Human:",
+              "Assistant:",
+              "<|im_end|>"
+            ]
+          }
         }
       }
     }
   },
+  "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+  "permission": {
+    "bash": "ask",
+    "read": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "lsp": "allow",
+    "todowrite": "allow",
+    "edit": "ask",
+    "write": "ask",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "skill": "allow",
+    "trace_*": "allow",
+    "turbovec_*": "allow",
+    "engram_*": "allow",
+    "langextract_*": "allow"
+  },
   "mcp": {
-    "atlas-tools": {
-      "type": "local",
-      "command": ["node", "sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
+    "trace": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8788/mcp",
+      "enabled": true,
+      "timeout": 60000,
+      "headers": {
+        "Accept": "application/json, text/event-stream"
+      }
+    },
+    "turbovec": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8791/mcp",
       "enabled": true,
       "timeout": 30000
     },
     "engram-embed": {
       "type": "local",
-      "command": ["node", "sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs"],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs", "--stdio"],
       "enabled": true,
-      "timeout": 30000
+      "timeout": 60000,
+      "env": {
+        "ENGRAM_ONLY": "true",
+        "REDIS_ENABLED": "false"
+      }
     },
     "gemma4-offload": {
       "type": "local",
-      "command": ["node", "sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
+      "command": ["node", "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
       "enabled": true,
-      "timeout": 30000
-    },
-    "ldr-research": {
-      "type": "local",
-      "command": ["node", "sveltekit-frontend/scripts/mcp/ldr-mcp.mjs"],
-      "enabled": true,
-      "timeout": 120000
-    },
-    "trace": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8788/mcp",
-      "enabled": true,
-      "timeout": 60000
+      "timeout": 30000,
+      "env": {
+        "ENGRAM_ONLY": "true"
+      }
     }
   },
-  "lsp": {
-    "typescript": {
-      "command": ["node", "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/typescript-language-server/lib/cli.mjs", "--stdio"],
-      "extensions": ["ts", "tsx", "js", "jsx"]
-    },
-    "svelte": {
-      "command": ["node", "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/svelte-language-server/bin/server.js", "--stdio"],
-      "extensions": ["svelte"]
-    },
-    "json": {
-      "command": ["node", "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/node_modules/vscode-langservers-extracted/bin/vscode-json-language-server", "--stdio"],
-      "extensions": ["json", "jsonc"]
-    }
+  "instructions": [
+    ".opencode/system.md",
+    "sveltekit-frontend/.opencode/skills/no-placeholder-policy.md",
+    "AGENTS.md"
+  ],
+  "watcher": {
+    "ignore": [
+      "node_modules/",
+      "dist/",
+      ".git/",
+      ".svelte-kit/",
+      "memory/",
+      "tmp/",
+      ".opencode/cards/**",
+      ".opencode/cache/**",
+      ".opencode/ndjson/**",
+      ".opencode/embeddings/**",
+      ".opencode/ace-packet.json",
+      ".opencode/ace-packet-*.json",
+      ".opencode/ace-packets/**",
+      ".opencode/ace-packets_stale/**",
+      ".opencode/ace-context.json",
+      ".opencode/feature-files.json",
+      ".opencode/startup-context.json",
+      ".opencode/ace-seed-*.json",
+      ".opencode/patchcard-*.json",
+      ".opencode/ingest/**",
+      ".opencode/summaries/**",
+      ".opencode/jobs/**",
+      ".opencode/tasks/**",
+      ".opencode/commits/**",
+      ".opencode/fixes/**",
+      ".opencode/quarantine/**",
+      ".opencode/recommendations/**",
+      ".opencode/context/**",
+      ".opencode/agents/**",
+      ".opencode/kanban/**",
+      ".opencode/feature-map/**",
+      ".opencode/memory/**",
+      ".opencode/tools/**",
+      ".opencode/node_modules/**",
+      "neschrom97/**",
+      "sveltekit-frontend/node_modules/**",
+      "sveltekit-frontend/.svelte-kit/**",
+      "sveltekit-frontend/static/ort/**",
+      "sveltekit-frontend/static/gemma3_270m_onnx/**",
+      "sveltekit-frontend/static/embeddinggemma_300m_onnx/**",
+      "simd-bridge/cpp/build/**",
+      "granite-docling-258M/**",
+      "turbovec/**",
+      "models/**"
+    ]
   }
 }

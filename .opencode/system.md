@@ -18,9 +18,6 @@ Invoke skills only when they are relevant to the current task.
 
 ## Output rules
 ## Runtime
-
-- Prefer Ollama `:11434` for Gemma4 unless llama-server template tests pass.
-- Ollama `:11434` requires `think: false`.
 - llama-server `:8090` requires:
   - `stream: true`
   - exact `/v1/models` model id
@@ -48,10 +45,7 @@ Read only matched line ranges (±20 lines). Never read whole markdown files.
 ## Runtime
 
 - llama-server `:8090` requires `stream: true` for all completions
-- Ollama `:11434` requires `think: false`
 - Never call `generateText()` against reasoning models — use `streamText()`
-- Strip `<think>` / reasoning metadata before display
-
 ## Memory
 
 Save only: decisions, file anchors, command anchors, next actions (max 3).

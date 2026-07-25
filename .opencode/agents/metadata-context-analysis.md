@@ -8,6 +8,7 @@ permission:
   grep: allow
   glob: allow
   list: allow
+  bash: ask
   skill: allow
   trace_*: allow
   langextract_*: allow

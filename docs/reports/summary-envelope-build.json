@@ -1,0 +1,30 @@
+{
+  "timestamp": "2026-07-24T05:46:13.285Z",
+  "dry_run": true,
+  "total_envelopes": 50,
+  "total_jobs": 50,
+  "tuples_to_summarize": 50,
+  "avg_tuples_per_envelope": 1,
+  "top_k_groups": 500,
+  "tuple_limit_per_group": 2000,
+  "distribution": {
+    "by_domain_class": {
+      "database": 1,
+      "agent": 1,
+      "Other": 11,
+      "gpu": 1,
+      "case_management": 4,
+      "evidence_upload_storage": 6,
+      "rag_retrieval": 14,
+      "repair_workflow": 2,
+      "embedding_indexing": 9,
+      "citation_engine": 1
+    },
+    "by_rank": {
+      "top_10": 10,
+      "top_50": 50,
+      "top_100": 50,
+      "top_500": 50
+    }
+  }
+}

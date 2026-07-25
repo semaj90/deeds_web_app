@@ -1,24 +1,24 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-07-04T17:43:41.563Z
-Apply mode: no
-Rows: 1
+Generated: 2026-07-25T00:49:28.209Z
+Apply mode: yes
+Rows: 0
 
 ## Coverage
 
-- packet_key: 1/1
-- source_ref: 1/1
-- feature_id: 1/1
-- feature_label: 1/1
-- permissions envelope: 1/1
-- metadata envelope: 1/1
-- topology envelope: 1/1
-- vectors envelope: 1/1
-- qdrant_point_id: 1/1
-- som_cluster: 0/1
+- packet_key: 0/0
+- source_ref: 0/0
+- feature_id: 0/0
+- feature_label: 0/0
+- permissions envelope: 0/0
+- metadata envelope: 0/0
+- topology envelope: 0/0
+- vectors envelope: 0/0
+- qdrant_point_id: 0/0
+- som_cluster: 0/0
 
 ## Tables
 
-- atlas_packets: 1 rows (1 addressable)
+- atlas_packets: 0 rows (0 addressable)
 - nes_chrom_packets: 0 rows (0 addressable)
 - atlas_feature_packets: 0 rows (0 addressable)

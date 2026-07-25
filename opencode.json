@@ -1,180 +1,84 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-  "default_agent": "gemma4-function-caller",
-  "shell": "pwsh.exe",
-
+  "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+  "default_agent": "ornith-trace-audit",
   "provider": {
-    "ollama": {
+    "atomic": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
+      "name": "Atomic Chat (Ornith :1337)",
       "options": {
-        "baseURL": "http://127.0.0.1:11434/v1",
+        "baseURL": "http://127.0.0.1:1337/v1",
         "apiKey": "local"
       },
       "models": {
-        "gemma4-rotorquant:latest": {
-          "name": "Gemma4 RotorQuant",
+        "unsloth/Ornith-1_0-9B-Q4_K_S": {
+          "name": "Ornith 1.0 9B Q4_K_S (65K)",
           "tools": true,
-          "reasoning": false,
+          "reasoning": true,
           "limit": {
             "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "think": false,
-            "stop": [
-              "<think>",
-              "</think>",
-              "Thinking:",
-              "Self-Correction"
-            ]
+            "output": 4096
+          }
+        },
+        "ornith": {
+          "name": "Ornith 1.0 9B Q4_K_S (65K)",
+          "tools": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 4096
           }
         }
       }
     },
     "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "llama-server",
+      "name": "llama-server (:8090)",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
       },
       "models": {
         "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal IQ4_XS Direct",
+          "name": "Gemma4 Legal Direct 65K",
           "tools": true,
           "reasoning": false,
           "limit": {
             "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "stream": true,
-            "stop": [
-              "<|mask_end|>",
-              "<end_of_turn>",
-              "<start_of_turn>"
-            ]
+            "output": 4096
           }
         },
-        "hforf.gguf": {
-          "name": "HFOR llama-server",
+        "unsloth/Ornith-1_0-9B-Q4_K_S": {
+          "name": "Ornith 1.0 9B 65K",
           "tools": true,
-          "reasoning": false,
+          "reasoning": true,
           "limit": {
             "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "stream": true,
-            "stop": [
-              "<think>",
-              "</think>",
-              "Thinking:",
-              "Self-Correction"
-            ]
+            "output": 4096
           }
         }
       }
-    }
-    ,
-    "turboquant": {
+    },
+    "gemma4-adapter": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Local llama-server :8090 (64K gemma4 lane)",
+      "name": "Gemma4 Adapter (:8091)",
       "options": {
-        "baseURL": "http://127.0.0.1:8090/v1",
+        "baseURL": "http://127.0.0.1:8091/v1",
         "apiKey": "local"
       },
       "models": {
         "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal IQ4_XS Direct 64K",
+          "name": "Gemma4 Legal Direct 65K",
           "tools": true,
           "reasoning": false,
           "limit": {
             "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "stream": true,
-            "stop": [
-              "<think>",
-              "</think>",
-              "Thinking:",
-              "Self-Correction"
-            ]
-          }
-        },
-        "hforf.gguf": {
-          "name": "HFOR llama-server 64K",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "stream": true,
-            "stop": [
-              "<think>",
-              "</think>",
-              "Thinking:",
-              "Self-Correction"
-            ]
+            "output": 4096
           }
         }
       }
     }
   },
-
-  "skills": {
-    "paths": [".opencode/skills"]
-  },
-
-  "command": {
-    "workspace-bootstrap": {
-      "description": "Refresh ACE hits, local health, and report artifacts before starting OpenCode work",
-      "agent": "gemma4-function-caller",
-      "subtask": false,
-      "prompt": "Run npm run agent:hello first, then run npm run opencode:bootstrap from repo root. The bootstrap must first ensure Claude-Mem is launched detached when available, then refresh and load TRACE MCP evidence, the ranked MCP tool registry index, Parent Atlas recommendations, daily TODO summary, startup truth, MCP health, BitFrost/Redis cache health, startup briefing, and codebase semantic-index report. Prefer TRACE MCP, then the MCP tool registry index, then atlas-tools, then cache-backed ACE/BitFrost hits, then Engram, then LDR research. If a packages/atlas workspace exists, use it; otherwise use the current Parent Atlas reports and scripts. Return sourceRefs, loaded docs/reports, cache hits, tool names, and the next safe action. Do not edit files.",
-      "template": "npm run agent:hello && npm run atlas:mcp:registry:index && npm run opencode:bootstrap"
-    }
-  },
-
-  "permission": {
-    "read": "allow",
-    "grep": "allow",
-    "glob": "allow",
-    "lsp": "allow",
-    "todowrite": "allow",
-    "webfetch": "allow",
-    "websearch": "allow",
-    "bash": {
-      "npm run tools:check:structural": "allow",
-      "npm run index:*": "allow",
-      "npm run graphify:dependency:audit": "allow",
-      "npm --prefix * run index:*": "allow",
-      "npm --prefix * run graphify:dependency:audit": "allow",
-      "node scripts/index/*": "allow",
-      "rg *": "allow",
-      "ast-grep *": "allow",
-      "sg *": "allow",
-      "jq *": "allow",
-      "git status": "allow",
-      "git diff *": "allow",
-      "rm *": "deny",
-      "del *": "deny",
-      "Remove-Item *": "deny",
-      "*": "ask"
-    }
-  },
-
   "mcp": {
     "trace": {
       "type": "remote",
@@ -184,194 +88,256 @@
       "headers": {
         "Accept": "application/json, text/event-stream"
       }
-    },
-    "turbovec": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8791/mcp",
-      "enabled": false,
-      "_comment": "TurboVec at :8791 is a custom HTTP service, not MCP/JSON-RPC. Keep disabled until an MCP wrapper exists.",
-      "timeout": 30000
-    },
-    "engram-embed": {
-      "type": "local",
-      "description": "stdio-only embeddings MCP; no chat or generic generation.",
-      "command": ["node", "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs", "--stdio"],
-      "enabled": true,
-      "timeout": 60000
-    },
-    "ldr-research": {
-      "type": "local",
-      "description": "Local Deep Research MCP for async research, history lookup, and quick summaries.",
-      "command": ["node", "./sveltekit-frontend/scripts/mcp/ldr-mcp.mjs"],
-      "enabled": true,
-      "timeout": 120000
-    },
-    "gemma4-offload": {
-      "type": "local",
-      "command": ["node", "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
-      "enabled": true,
-      "timeout": 30000
-    },
-    "atlas-tools": {
-      "type": "local",
-      "command": ["node", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
-      "enabled": true,
-      "timeout": 30000
     }
   },
-
   "agent": {
-    "antigravity": {
-      "description": "Repo-audit-first HFOR agent for VS Code/OpenCode.",
+    "ornith-trace-audit": {
+      "mode": "primary",
+      "description": "Read-only repository auditor using native TRACE retrieval tools",
+      "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+      "temperature": 0,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "Get-Location": "allow",
+        "git status": "allow",
+        "git diff": "allow",
+        "rg": "allow",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "taxonomy.*": "allow",
+        "clusters.*": "allow",
+        "hypergraph.*": "allow",
+        "knowledge.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "runtime.*": "allow",
+        "LLMS.md.*": "allow",
+        "evidence.*": "allow",
+        "image.*": "allow",
+        "shell.*": "allow",
+        "edit": "deny"
+      }
+    },
+    "gemma4-function-caller": {
+      "mode": "subagent",
+      "description": "Gemma4 function calling auditor on port 8090",
       "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
       "temperature": 0,
       "steps": 10,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Use exact registry names only. Do not derive tool names from namespaces. Repo evidence first. Start with TRACE MCP and Parent Atlas evidence. Then inspect the ranked MCP tool registry index for multi-hop tool pickup before broader retrieval. Then use atlas-tools in this order: classify_intent, build_agentic_rag_context, build_recommendation, find_source_refs, find_feature, find_route, trace_database, trace_tool_chain, record_outcome. Then use BitFrost/Redis cache evidence, then Engram memory, then LDR research, then langextract for citation/entity extraction, then turbovec for cosine ranking if enabled. If a packages/atlas workspace exists, prefer it; otherwise use the current Parent Atlas reports/scripts. Include chunk_ids and cluster_labels only when present in the evidence. Do not edit files without explicit approval.",
-      "tools": {
-        "trace": true,
-        "atlas-tools": true,
-        "engram-embed": true,
-        "ldr-research": true,
-        "gemma4-offload": true,
-        "turbovec": false
-      },
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
       "permission": {
         "*": "deny",
         "read": "allow",
-        "list": "allow",
-        "glob": "allow",
         "grep": "allow",
+        "glob": "allow",
         "lsp": "allow",
-        "todowrite": "allow",
-        "atlas_*": "allow",
+        "bash": "ask",
         "atlas.*": "allow",
-        "atlas-tools.*": "allow",
-        "context_*": "allow",
-        "context.*": "allow",
-        "trace_*": "allow",
-        "trace.*": "allow",
-        "ace_*": "allow",
         "ace.*": "allow",
-        "graph_*": "allow",
-        "graph.*": "allow",
-        "edit": "deny"
-      }
-    },
-
-    "trace-audit": {
-      "description": "Read-only TRACE audit agent with compact context tools.",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-      "temperature": 0,
-      "steps": 8,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Repo evidence first. Inspect .opencode/recommendations/recommendations.md, the latest ACE hits, and the relevant Parent Atlas or ACE report before answering. Use TRACE MCP prompt-cache flow first: call context.build_kv_packet or atlas.compact_context before broad retrieval. Prefer cached compressed cards and BitFrost/Redis hot hits over raw file expansion. If no TRACE tool is visible, stop with TRACE_MCP_NOT_AVAILABLE. Do not edit files or mutate Postgres, Redis, Qdrant, Neo4j, or the filesystem. Prefer Parent Atlas package/report evidence over chat memory; if a packages/atlas workspace exists, use it, otherwise stay with the current workspace evidence.",
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "list": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "lsp": "allow",
-        "todowrite": "allow",
-        "atlas_*": "allow",
-        "atlas.*": "allow",
-        "context_*": "allow",
-        "context.*": "allow",
-        "wiki_*": "allow",
-        "wiki.*": "allow",
-        "graph_*": "allow",
-        "graph.*": "allow",
-        "kag_*": "allow",
+        "trace.*": "allow",
         "kag.*": "allow",
-        "trace_*": "allow",
-        "trace.*": "allow",
-        "search_*": "allow",
-        "search.*": "allow",
-        "edit": "deny",
-        "webfetch": "allow",
-        "websearch": "allow"
-      }
-    },
-
-    "audit": {
-      "description": "Read-only SvelteKit 2 / Svelte 5 / Drizzle / Zod auditor.",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-      "temperature": 0,
-      "steps": 8,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Repo evidence first. You are a read-only codebase auditor. Focus on SvelteKit 2, Svelte 5 runes, Bits UI, Drizzle ORM, PostgreSQL schemas, Zod validations, SSR boundaries, API routes, and deep audit safety. Use TRACE MCP, Parent Atlas, atlas-tools, and cache-backed ACE hits first when the question touches retrieval, cache, or routing. Do not edit files.",
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "list": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "lsp": "allow",
-        "todowrite": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
         "edit": "deny"
-      }
-    },
-
-    "atlas-audit": {
-      "description": "Searches Parent Atlas/Qdrant before editing code",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-      "temperature": 0,
-      "steps": 8,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. Always retrieve sourceRefs first. Never answer architecture questions without file paths, line refs, and commands. Prefer TRACE MCP and Parent Atlas over generic chat memory.",
-      "tools": {
-        "read": true,
-        "grep": true,
-        "bash": true,
-        "edit": false
-      }
-    },
-
-    "gemma4-function-caller": {
-      "description": "HFOR agent with automatic function-calling for tool dispatch",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-      "temperature": 0,
-      "steps": 12,
-      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash> or pseudo syntax such as <|tool_call>. When a shell command is needed, call the runtime shell tool directly. If shell tools are unavailable, output only a plain fenced PowerShell block and stop. Do not narrate that you will run a command unless you actually called the tool. You are a function-calling agent. Analyze the user query and automatically select the best tools to use from the available MCP tool set. Prefer TRACE MCP, atlas-tools, Parent Atlas reports, cache-backed ACE hits, then Engram. Always use function calls to accomplish tasks rather than explanations. Do not edit files without explicit approval.",
-      "tools": {
-        "trace": true,
-        "atlas-tools": true,
-        "engram-embed": true,
-        "gemma4-offload": true,
-        "turbovec": false
-      },
-      "permission": {
-        "*": "deny",
-        "read": "allow",
-        "list": "allow",
-        "glob": "allow",
-        "grep": "allow",
-        "lsp": "allow",
-        "todowrite": "allow",
-        "mcp_*": "allow",
-        "graph_*": "allow",
-        "graph.*": "allow",
-        "topology_*": "allow",
-        "topology.*": "allow",
-        "trace_*": "allow",
-        "trace.*": "allow",
-        "context_*": "allow",
-        "context.*": "allow",
-        "clusters_*": "allow",
-        "clusters.*": "allow",
-        "edit": "deny",
-        "webfetch": "allow"
       }
     }
   },
-
+  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+  "agent": {
+    "ornith-trace-audit": {
+      "mode": "primary",
+      "description": "Read-only repository auditor using native TRACE retrieval tools",
+      "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+      "temperature": 0,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "Get-Location": "allow",
+        "git status": "allow",
+        "git diff": "allow",
+        "rg": "allow",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "taxonomy.*": "allow",
+        "clusters.*": "allow",
+        "hypergraph.*": "allow",
+        "knowledge.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "runtime.*": "allow",
+        "LLMS.md.*": "allow",
+        "evidence.*": "allow",
+        "image.*": "allow",
+        "shell.*": "allow",
+        "edit": "deny"
+      },
+      "options": {}
+    },
+    "gemma4-function-caller": {
+      "mode": "subagent",
+      "description": "Gemma4 function calling auditor on port 8090",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+      "temperature": 0,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "edit": "deny"
+      },
+      "options": {}
+    },
+    "trace-mcp-tooling": {
+      "name": "trace-mcp-tooling",
+      "description": "TRACE MCP orchestration agent mirroring the Claude trace-mcp-tooling workflow.",
+      "mode": "subagent",
+      "temperature": 0,
+      "steps": 7,
+      "permission": {
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "bash": "ask",
+        "skill": "allow",
+        "trace_*": "allow",
+        "turbovec_*": "allow",
+        "engram_*": "allow",
+        "langextract_*": "allow",
+        "edit": "deny"
+      },
+      "prompt": "You are the trace-mcp-tooling agent.\n\nRun order:\n1. trace tools for exact retrieval and graph context.\n2. turbovec for reranking.\n3. engram for memory lane context.\n4. langextract for compact structured output.\n\nOutput style:\n- Vercel AI tool-loop style: deterministic tool calls and bounded iterations.\n- Compact sourceRef-backed response only.",
+      "options": {}
+    },
+    "rg-atlas": {
+      "name": "rg-atlas",
+      "description": "Tool-first retrieval agent for exact repo search, compact extraction, and sourceRef-backed answers.",
+      "mode": "subagent",
+      "temperature": 0,
+      "steps": 6,
+      "permission": {
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "bash": "ask",
+        "skill": "allow",
+        "trace_*": "allow",
+        "turbovec_*": "allow",
+        "engram_*": "allow",
+        "langextract_*": "allow"
+      },
+      "prompt": "You are the rg-atlas retrieval agent.\n\nWorkflow:\n1. Treat requests containing \"rg\", \"grep\", \"find where\", or exact code-location questions as tool-first retrieval.\n2. Run ripgrep first.\n3. Use LangExtract or equivalent compact extraction to normalize entities, files, APIs, and symbols.\n4. Return only compact output with sourceRefs, short path lists, and a minimal llm_output.\n5. If the result set is weak, mark furtherResearch=true and stop.\n6. Never edit files.\n\nRules:\n- rg = exact recall.\n- LangExtract = compact structure.\n- RotorQuant = rerank if available.\n- Gemma4 may synthesize only from sourceRefs returned by tools.\n- RabbitMQ stays backend-only.\n- Browser updates flow through SSE/WebSocket to the UI.",
+      "options": {}
+    },
+    "metadata-context-analysis": {
+      "name": "metadata-context-analysis",
+      "description": "Metadata context analyzer mirroring the Claude metadata-context-analysis workflow.",
+      "mode": "subagent",
+      "temperature": 0,
+      "steps": 6,
+      "permission": {
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "bash": "ask",
+        "skill": "allow",
+        "trace_*": "allow",
+        "langextract_*": "allow",
+        "edit": "deny"
+      },
+      "prompt": "You are the metadata-context-analysis agent.\n\nWorkflow:\n1. Find metadata envelope definitions and usage with exact search.\n2. Use compact extraction for field maps and call paths.\n3. Return concise findings with source refs and risk flags.\n\nDo not perform edits.",
+      "options": {}
+    },
+    "mcp-toolchain": {
+      "name": "mcp-toolchain",
+      "description": "Orchestrate TRACE, TurboVec, Engram, and LangExtract as a strict retrieval pipeline.",
+      "mode": "subagent",
+      "temperature": 0,
+      "steps": 8,
+      "permission": {
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "list": "allow",
+        "bash": "ask",
+        "skill": "allow",
+        "trace_*": "allow",
+        "turbovec_*": "allow",
+        "engram_*": "allow",
+        "langextract_*": "allow",
+        "edit": "deny"
+      },
+      "prompt": "You are the mcp-toolchain agent.\n\nPipeline:\n1. trace: gather exact code and graph context.\n2. turbovec: rerank retrieved chunks by semantic fit.\n3. engram: pull short-term memory and prior packet traces.\n4. langextract: compact entities, citations, symbols, and source refs.\n5. synthesize only from returned sourceRefs.\n\nOutput contract:\n- Keep answers compact.\n- Include file-level sourceRefs.\n- If evidence is weak, return a short insufficiency note and stop.\n\nVercel AI style:\n- Use tool-loop behavior equivalent to streamText + tools.\n- Keep tool calls deterministic and bounded.\n- Do not invent results not returned by tools.",
+      "options": {}
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 2,
+    "reserved": 3072
+  },
+  "tool_output": {
+    "max_lines": 400,
+    "max_bytes": 18000
+  },
+  "share": "disabled",
+  "mode": {},
+  "plugin": [],
+  "command": {
+    "rg-atlas": {
+      "template": "Run the tool-first retrieval lane.\n\n1. Use `rg` for exact repo search.\n2. Use Atlas or LangExtract-style compact extraction for sourceRefs.\n3. Return only verified paths, symbols, and a short answer.\n4. If evidence is weak, stop and say so."
+    },
+    "mcp-turbovec": {
+      "template": "Use TurboVec MCP tools.\n\n1. Rerank retrieved chunks by semantic fit.\n2. Keep answers compact and grounded.\n3. Stop early when evidence is weak."
+    },
+    "mcp-trace": {
+      "template": "Use TRACE MCP tools first.\n\n1. Query TRACE for exact repo context.\n2. Keep output compact and sourceRef-backed.\n3. Do not read raw infra directly."
+    },
+    "mcp-langextract": {
+      "template": "Use LangExtract MCP tools.\n\n1. Compact entities, citations, symbols, and source refs.\n2. Return only structured evidence-backed output.\n3. Stop when the result set is weak."
+    },
+    "mcp-health": {
+      "template": "Run MCP health checks.\n\n1. Run `npm run check`.\n2. Run `npm run audit:contracts`.\n3. Verify:\n   - http://127.0.0.1:8791/mcp\n   - http://127.0.0.1:8792/mcp\n   - http://127.0.0.1:8793/mcp\n4. Verify cache trace writes.\n5. Report broken MCP tools only. Do not delete tools."
+    },
+    "mcp-engram": {
+      "template": "Use Engram MCP tools.\n\n1. Pull short-term memory and prior packet traces.\n2. Keep output compact.\n3. Do not invent results not returned by tools."
+    }
+  },
+  "enabled_providers": ["llama-server"],
   "instructions": [
-    ".github/instructions/opencode-context-prefetch.instructions.md",
-    "sveltekit-frontend/docs/architecture/cline-opencode-system-prompt.md",
-    "AGENTS.md",
-    ".claude/skills/trace-mcp-tooling/SKILL.md",
-    "sveltekit-frontend/docs/architecture/gemma4-to-claude-code-handoff.md"
+    ".opencode/system.md",
+    "sveltekit-frontend/.opencode/skills/no-placeholder-policy.md",
+    "AGENTS.md"
   ],
-
-  "share": "disabled"
+  "watcher": {}
 }
-
-
-

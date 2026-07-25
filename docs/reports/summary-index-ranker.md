@@ -1,22 +1,22 @@
 # Summary Index Ranker
 
-Generated: 2026-07-17T06:17:04.299Z
-Mode: dry-run
+Generated: 2026-07-25T00:56:29.945Z
+Mode: apply
 Source of truth: postgres.atlas_summary_layers + atlas_packets
 
 ## Stats
 
 - Total ranked: 5000
 - READY: 0
-- NEAR_READY: 2110
-- PARTIAL: 2775
-- BLOCKED: 115
-- Average score: 55.27
+- NEAR_READY: 2158
+- PARTIAL: 2733
+- BLOCKED: 109
+- Average score: 55.48
 
 ## Redis index
 
 - Key: `bitfrost:summary:index:ranked:v1`
-- Applied: no
+- Applied: yes
 
 ## Top packets
 
@@ -40,5 +40,5 @@ Source of truth: postgres.atlas_summary_layers + atlas_packets
 | 16 | 78 | NEAR_READY | title.sveltekit.frontend.05.sidebar.verified.9b0aba45 | sveltekit-frontend.05-sidebar-verified | sveltekit-frontend/tests/screenshots/user-flow/05-sidebar-verified.png | sveltekit-frontend/tests/screenshots/user-flow/05-sidebar-verified.png | 33 words; 2 sentences; packet_id present |
 | 17 | 78 | NEAR_READY | title.sveltekit.frontend.graphify.deep.imports.2026.05.20t17.48.27.438.6cfcaebb | sveltekit-frontend.graphify_deep_imports_2026-05-20T17-48-27-438Z | sveltekit-frontend/memory/ingest/processed/graphify_deep_imports_2026-05-20T17-48-27-438Z.jsonl | sveltekit-frontend/memory/ingest/processed/graphify_deep_imports_2026-05-20T17-48-27-438Z.jsonl | 32 words; 2 sentences; packet_id present |
 | 18 | 78 | NEAR_READY | title.scripts.server.ts.1cdde9c6 | scripts.+server.ts | scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/evidence/organize/[caseId]/+server.ts.disabled | scripts/api-cleanup/reports/backup-2025-12-14T21-11-49-641Z/v1/evidence/organize/[caseId]/+server.ts.disabled | 33 words; 2 sentences; packet_id present |
-| 19 | 77 | NEAR_READY | title.turbovec.lib.version.check.a21421de | turbovec.lib-version_check | turbovec/target/release/.fingerprint/version_check-b2d2ed20f9c4f52f/lib-version_check.json | turbovec/target/release/.fingerprint/version_check-b2d2ed20f9c4f52f/lib-version_check.json | 34 words; 2 sentences; packet_id present |
-| 20 | 77 | NEAR_READY | title.sveltekit.frontend.src.lib.server.db.schema.charges.75e7ec03 | sveltekit-frontend.src__lib__server__db__schema-charges | sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__db__schema-charges.md | sveltekit-frontend/docs/obsidian-vault/Files/src__lib__server__db__schema-charges.md | 30 words; 2 sentences; packet_id present |
+| 19 | 77 | NEAR_READY | title.sveltekit.frontend.n643dpanel.a97914b3 | sveltekit-frontend.N643DPanel | sveltekit-frontend/src/lib/components/ui/gaming/n64/N643DPanel.svelte | sveltekit-frontend/src/lib/components/ui/gaming/n64/N643DPanel.svelte | 32 words; 2 sentences; packet_id present |
+| 20 | 77 | NEAR_READY | title.sveltekit.frontend.page.6a73af21 | sveltekit-frontend.+page | sveltekit-frontend/src/routes/(app)/demos/contextual-chat/+page.svelte | sveltekit-frontend/src/routes/(app)/demos/contextual-chat/+page.svelte | 32 words; 2 sentences; packet_id present |

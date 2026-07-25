@@ -1,39 +1,110 @@
-{%- if tools -%}
-<start_of_turn>user
-You have access to tools and reasoning. Use the following protocol:
+{# Gemma4/OpenCode tool-aware chat template.
+This file must contain Jinja only. Do not append PowerShell launcher code. #}
 
-1. First, think through the problem inside <reasoning> tags:
-<reasoning>
-Your reasoning about the task and which tools to use
-</reasoning>
-
-2. Then execute the appropriate tool using this JSON format:
-<tool_call>
-{"name": "<tool_name>", "arguments": {<arguments>}}
-</tool_call>
-
-Available tools:
-{%- for tool in tools %}
-- {{ tool.function.name }}: {{ tool.function.description }}
-  Parameters: {{ tool.function.parameters }}
-{%- endfor %}
-<end_of_turn>
+{%- macro json_value(value) -%}
+{%- if value is string -%}
+{{- value | tojson -}}
+{%- elif value is mapping or value is sequence -%}
+{{- value | tojson -}}
+{%- elif value is boolean -%}
+{{- 'true' if value else 'false' -}}
+{%- elif value is none -%}
+{{- 'null' -}}
+{%- else -%}
+{{- value -}}
 {%- endif -%}
+{%- endmacro -%}
+
+{%- set ns = namespace(system_text='') -%}
+
+{# Collect system and developer instructions. #}
 {%- for message in messages -%}
-{%- if message['role'] == 'system' -%}
-<start_of_turn>user
-{{ message['content'] }}<end_of_turn>
-{%- elif message['role'] == 'user' -%}
-<start_of_turn>user
-{{ message['content'] }}<end_of_turn>
-{%- elif message['role'] == 'assistant' -%}
-<start_of_turn>model
-{{ message['content'] }}<end_of_turn>
-{%- elif message['role'] == 'tool' -%}
-<start_of_turn>user
-Tool result for {{ message.get('name', 'unknown') }}: {{ message['content'] }}<end_of_turn>
+{%- if message['role'] in ['system', 'developer'] -%}
+{%- if ns.system_text -%}
+{%- set ns.system_text = ns.system_text + '\n\n' -%}
+{%- endif -%}
+{%- set ns.system_text = ns.system_text + (message['content'] | string) -%}
 {%- endif -%}
 {%- endfor -%}
+
+{# Emit one system-style user turn because this Gemma format has no
+independent system role. #}
+{%- if ns.system_text or tools -%}
+<start_of_turn>user
+{%- if ns.system_text %}
+{{ ns.system_text | trim }}
+{%- endif %}
+
+{%- if tools %}
+
+You have access to the following tools:
+
+{{ tools | tojson }}
+
+When a tool is required, respond with exactly one tool call using this format:
+
+<tool_call>
+{"name":"tool_name","arguments":{"argument_name":"argument value"}}
+</tool_call>
+
+Rules:
+
+* Use only a tool name present in the supplied tools.
+* Arguments must be one valid JSON object.
+* Follow the tool's JSON schema exactly.
+* Do not put a tool call inside Markdown.
+* Do not add prose before or after a tool call.
+* Do not claim a tool succeeded until its result is returned.
+* When no tool is required, answer normally.
+  {%- endif %}
+  <end_of_turn>
+  {%- endif -%}
+
+{# Serialize conversation history. #}
+{%- for message in messages -%}
+{%- set role = message['role'] -%}
+
+{%- if role == 'user' -%}
+<start_of_turn>user
+{{ message['content'] | trim }}
+<end_of_turn>
+
+{%- elif role == 'assistant' -%}
+<start_of_turn>model
+{%- if message.get('reasoning_content') %}
+{{ message['reasoning_content'] | trim }}
+{%- endif -%}
+
+```
+{%- if message.get('tool_calls') %}
+  {%- for tool_call in message['tool_calls'] %}
+    {%- set function = tool_call['function'] %}
+```
+
+<tool_call>
+{"name":{{ function['name'] | tojson }},"arguments":{{ function['arguments'] if function['arguments'] is string else function['arguments'] | tojson }}}
+</tool_call>
+{%- endfor -%}
+{%- elif message.get('content') %}
+{{ message['content'] | trim }}
+{%- endif %}
+<end_of_turn>
+
+{%- elif role == 'tool' -%}
+<start_of_turn>user
+<tool_result>
+{%- if message.get('name') %}
+{"name":{{ message['name'] | tojson }},"result":{{ message['content'] | tojson }}}
+{%- else %}
+{{ message['content'] | tojson }}
+{%- endif %}
+</tool_result>
+Continue from this tool result. Do not repeat an already completed tool call.
+<end_of_turn>
+
+{%- endif -%}
+{%- endfor -%}
+
 {%- if add_generation_prompt -%}
 <start_of_turn>model
 {%- endif -%}

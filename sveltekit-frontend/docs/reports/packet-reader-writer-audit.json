@@ -1,12 +1,14 @@
 {
-  "generatedAt": "2026-07-04T17:43:41.563Z",
-  "applyMode": false,
-  "totalRows": 1,
+  "generatedAt": "2026-07-25T00:49:28.209Z",
+  "applyMode": true,
+  "databaseAvailable": false,
+  "error": "Invalid string length",
+  "totalRows": 0,
   "tableStats": [
     {
       "table": "atlas_packets",
-      "rows": 1,
-      "addressableRows": 1
+      "rows": 0,
+      "addressableRows": 0
     },
     {
       "table": "nes_chrom_packets",
@@ -19,33 +21,16 @@
       "addressableRows": 0
     }
   ],
-  "byTable": {
-    "atlas_packets": {
-      "table": "atlas_packets",
-      "rows": 1,
-      "addressableRows": 1
-    },
-    "nes_chrom_packets": {
-      "table": "nes_chrom_packets",
-      "rows": 0,
-      "addressableRows": 0
-    },
-    "atlas_feature_packets": {
-      "table": "atlas_feature_packets",
-      "rows": 0,
-      "addressableRows": 0
-    }
-  },
   "coverage": {
-    "packet_key": 1,
-    "source_ref": 1,
-    "feature_id": 1,
-    "feature_label": 1,
-    "permissions": 1,
-    "metadata": 1,
-    "topology": 1,
-    "vectors": 1,
-    "qdrant_point_id": 1,
+    "packet_key": 0,
+    "source_ref": 0,
+    "feature_id": 0,
+    "feature_label": 0,
+    "permissions": 0,
+    "metadata": 0,
+    "topology": 0,
+    "vectors": 0,
+    "qdrant_point_id": 0,
     "som_cluster": 0
   },
   "outputFiles": {}

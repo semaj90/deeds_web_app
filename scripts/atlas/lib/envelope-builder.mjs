@@ -10,13 +10,14 @@
  *
  * Note: tree_node_id can be NULL (not all packets have tree nodes)
  * but must be a defined field in the envelope
+ *
+ * Note: source_ref_key is derived from source_ref if not provided
+ * so it is NOT a hard requirement in the input packet
  */
 const REQUIRED_FIELDS = [
   'packet_key',
-  'source_ref_key',
   'feature_id',
   'title_id',
-  'used_concepts',
 ];
 
 /**
@@ -95,6 +96,7 @@ export function buildCanonicalFeatureEnvelope(packet) {
     domain_class: normalized.domain_class || null,
     ontology_label: normalized.ontology_label || null,
     topology_label: normalized.topology_label || null,
+    source_kind: classifySourceKind(normalized.source_ref, normalized.feature_label) || 'source_code',
 
     // Feature Enrichment (REQUIRED)
     used_concepts: normalized.used_concepts || [],
@@ -132,6 +134,67 @@ export function buildCanonicalFeatureEnvelope(packet) {
 }
 
 /**
+ * Derive source_ref_key deterministically from source_ref
+ * Handles both Windows and POSIX paths
+ */
+function deriveSourceRefKey(sourceRef) {
+  if (!sourceRef) return null;
+  // Normalize path separators and remove leading/trailing slashes
+  const normalized = sourceRef
+    .replace(/\\/g, '/')
+    .replace(/^\/+/, '')
+    .replace(/\/+$/, '');
+  // Use lowercase for determinism
+  return normalized.toLowerCase();
+}
+
+/**
+ * Classify packet by source kind (eligibility for concept enrichment)
+ * Generated files and build artifacts are REFERENCE_ONLY, not CONCEPT_ENVELOPE
+ */
+function classifySourceKind(sourceRef, fileLabel) {
+  if (!sourceRef) return 'unknown';
+
+  const lower = sourceRef.toLowerCase();
+
+  // Generated files patterns
+  if (
+    lower.includes('$types.d.ts') ||
+    lower.includes('.svelte-kit/') ||
+    lower.includes('/build/') ||
+    lower.includes('/dist/') ||
+    lower.includes('/generated/') ||
+    lower.includes('node_modules/') ||
+    lower.endsWith('.d.ts')
+  ) {
+    return 'generated_declaration';
+  }
+
+  // Build artifacts
+  if (lower.includes('/.next/') || lower.includes('/.nuxt/') || lower.includes('/coverage/')) {
+    return 'build_artifact';
+  }
+
+  // Test files
+  if (lower.includes('.test.') || lower.includes('.spec.') || lower.includes('/__tests__/')) {
+    return 'test_file';
+  }
+
+  // Config files (usually sparse on concepts)
+  if (
+    lower.match(/\.(json|yaml|yml|toml|ini|cfg)$/) ||
+    lower.includes('package.json') ||
+    lower.includes('tsconfig') ||
+    lower.includes('eslint')
+  ) {
+    return 'configuration';
+  }
+
+  // Regular source code
+  return 'source_code';
+}
+
+/**
  * Normalize packet input to canonical field names
  *
  * Handles both raw Postgres rows and partially-populated objects
@@ -146,10 +209,13 @@ function normalizePacket(packet) {
   const payload = packet.payload && typeof packet.payload === 'object' ? packet.payload : {};
 
   // Priority chain: payload > packet > metadata > fallback
+  const sourceRef = packet.source_ref || payload.source_ref || metadata.source_ref;
+  const sourceRefKey = packet.source_ref_key || payload.source_ref_key || metadata.source_ref_key || (sourceRef ? deriveSourceRefKey(sourceRef) : null);
+
   return {
     packet_key: packet.packet_key || payload.packet_key || metadata.packet_key,
-    source_ref: packet.source_ref || payload.source_ref || metadata.source_ref,
-    source_ref_key: packet.source_ref_key || payload.source_ref_key || metadata.source_ref_key,
+    source_ref: sourceRef,
+    source_ref_key: sourceRefKey,
     canonical_source_ref:
       packet.canonical_source_ref || payload.canonical_source_ref || metadata.canonical_source_ref,
     source_path: packet.source_path || payload.source_path || metadata.source_path,
@@ -263,3 +329,8 @@ export function reportValidation(validation, packetKey) {
     console.warn(`Canonical envelope warnings for ${packetKey}:`, validation.softWarnings);
   }
 }
+
+/**
+ * Export helper functions for packet classification
+ */
+export { deriveSourceRefKey, classifySourceKind };

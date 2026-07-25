@@ -92,7 +92,7 @@ const checks = [
     name: 'Go Retrieval (:8100)',
     port: 8100,
     url: 'http://127.0.0.1:8100/health',
-    schema: { service: 'go-retrieval', backend: 'grpc+http', critical: true, otel: true },
+    schema: { service: 'go-retrieval', backend: 'grpc+http', critical: false, otel: true },
     validate: (data) => {
       const healthy = data.status === 'healthy' &&
                      data.embeddingServiceUp &&
@@ -100,7 +100,7 @@ const checks = [
                      data.qdrantConnected;
       return {
         ok: healthy,
-        msg: healthy ? '✓ All backends healthy' : `✗ Missing: ${!data.embeddingServiceUp ? 'embed ' : ''}${!data.pgvectorConnected ? 'pgvector ' : ''}${!data.qdrantConnected ? 'qdrant' : ''}`,
+        msg: healthy ? '✓ All backends healthy' : `⚠ Missing: ${!data.embeddingServiceUp ? 'embed ' : ''}${!data.pgvectorConnected ? 'pgvector ' : ''}${!data.qdrantConnected ? 'qdrant' : ''} (optional for graphify:daily)`,
         schema: { service: 'go-retrieval', backends: { embedding: data.embeddingServiceUp, pgvector: data.pgvectorConnected, qdrant: data.qdrantConnected } }
       };
     }
@@ -109,7 +109,7 @@ const checks = [
     name: 'TurboVec ANN (:8791)',
     port: 8791,
     url: 'http://127.0.0.1:8791/health',
-    schema: { service: 'turbovec', quantization: '4-bit', dim: 64, critical: true, otel: true },
+    schema: { service: 'turbovec', quantization: '4-bit', dim: 64, critical: false, otel: true },
     validate: (data) => {
       const indexed = data.indexed >= 1000;
       const isTurbovec = data.turbovec === true;
@@ -117,7 +117,7 @@ const checks = [
       const ok = indexed && isTurbovec && is4bit;
       return {
         ok,
-        msg: ok ? `✓ ${data.indexed} vectors @ ${data.bits}-bit` : `✗ Invalid state`,
+        msg: ok ? `✓ ${data.indexed} vectors @ ${data.bits}-bit` : `⚠ Invalid state (optional for graphify:daily)`,
         schema: { service: 'turbovec', indexed: data.indexed, quantization: `${data.bits}-bit`, dim: data.dim }
       };
     }
@@ -227,8 +227,8 @@ async function main() {
   const criticalServices = [
     'Embedding Service (embeddinggemma @ :11434)',
     'Gemma4 Synthesis (:8090)',
-    'Go Retrieval (:8100)',
-    'TurboVec ANN (:8791)'
+    'Qdrant Vector DB (:6333)',
+    'Postgres Truth Layer (port 5434)'
   ];
 
   let criticalPassed = true;

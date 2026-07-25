@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-07-25T04:15:32.941Z",
+  "amqp_connected": false,
+  "protocol_status": "UNTESTED",
+  "host_reachable": false,
+  "credentials_valid": false,
+  "errors": [
+    "Connection/Operation Failed: Handshake terminated by server: 403 (ACCESS-REFUSED) with message \"ACCESS_REFUSED - Login was refused using authentication mechanism PLAIN. For details see the broker logfile.\""
+  ],
+  "connection_attempt": {
+    "url_used": "amqp://localhost:5672",
+    "status_code": 0,
+    "message": "Failed to connect or perform operation. Check Handshake terminated by server: 403 (ACCESS-REFUSED) with message \"ACCESS_REFUSED - Login was refused using authentication mechanism PLAIN. For details see the broker logfile.\""
+  }
+}

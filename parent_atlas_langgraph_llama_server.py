@@ -30,7 +30,8 @@ import re
 import subprocess
 import time
 import uuid
-from typing import Any, AsyncGenerator, TypedDict
+from dataclasses import dataclass
+from typing import Any, AsyncGenerator, Mapping, Sequence, TypedDict
 
 import httpx
 import numpy as np
@@ -39,8 +40,6 @@ import torch
 from fastapi import FastAPI, HTTPException, Query
 from collections import Counter
 from fastapi.responses import StreamingResponse
-from langchain_core.messages import HumanMessage, SystemMessage
-from langchain_ollama import ChatOllama
 from langgraph.graph import END, StateGraph
 from pydantic import BaseModel
 from qdrant_client import AsyncQdrantClient
@@ -50,7 +49,7 @@ from qdrant_client import AsyncQdrantClient
 log = logging.getLogger("langgraph-synthesis")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
-OLLAMA_URL         = os.environ.get("OLLAMA_URL",       "http://host.docker.internal:11434")
+LLAMA_SERVER_URL   = os.environ.get("LLAMA_SERVER_URL", "http://host.docker.internal:8090").rstrip("/")
 QDRANT_URL         = os.environ.get("QDRANT_URL",       "http://qdrant:6333")
 BIFROST_URL        = os.environ.get("BIFROST_URL",      "http://host.docker.internal:3040")
 REDIS_URL          = os.environ.get("REDIS_URL",        "redis://redis:6379/0")
@@ -58,8 +57,9 @@ NEO4J_URI          = os.environ.get("NEO4J_URI",        "bolt://neo4j:7687")
 NEO4J_USER         = os.environ.get("NEO4J_USER",       "neo4j")
 NEO4J_PASSWORD     = os.environ.get("NEO4J_PASSWORD",   "password")
 SEARXNG_URL        = os.environ.get("SEARXNG_URL",      "http://searxng:8080")
-LLM_MODEL          = os.environ.get("LLM_MODEL",        "gemma4-legal-vlm:latest")
-EMBED_MODEL        = os.environ.get("EMBED_MODEL",      "embeddinggemma:latest")
+LLM_MODEL          = os.environ.get("LLM_MODEL",        "gemma4-legal-iq4xs-direct.gguf")
+EMBED_SERVER_URL   = os.environ.get("EMBED_SERVER_URL", "http://host.docker.internal:8081").rstrip("/")
+EMBED_MODEL        = os.environ.get("EMBED_MODEL",      "embeddinggemma-384")
 REPO_ROOT          = os.environ.get("REPO_ROOT",        "/workspace/repo")
 CONFIDENCE_THRESHOLD = float(os.environ.get("CONFIDENCE_THRESHOLD", "0.65"))
 REDIS_L1_PREFIX    = "llm:exact:"
@@ -67,6 +67,8 @@ REDIS_L1_TTL       = 3600  # 1 hour — matches TS redis-exact-match.ts
 REDIS_KAG_PREFIX   = "langgraph:kag:neighbors:"  # pre-warm cache written by Colab Cell 11
 REDIS_KAG_TTL      = 86_400  # 24 h — refreshed by nightly Colab run
 BIFROST_THRESHOLD  = float(os.environ.get("BIFROST_THRESHOLD", "0.80"))
+CODE_COLLECTION    = os.environ.get("CODE_COLLECTION", "codebase_chunks_384_hybrid")
+CODE_TOP_K         = int(os.environ.get("CODE_TOP_K", "12"))
 
 # ── FastAPI ───────────────────────────────────────────────────────────────────
 
@@ -167,13 +169,85 @@ async def l2_check(messages: list[dict], model: str, temperature: float) -> str 
 # ═══════════════════════════════════════════════════════════════════════════════
 
 async def embed_query(text: str) -> list[float]:
+    """Embed text through an OpenAI-compatible embedding server."""
     async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.post(
-            f"{OLLAMA_URL}/api/embed",
-            json={"model": EMBED_MODEL, "input": text[:2048]},
+        response = await client.post(
+            f"{EMBED_SERVER_URL}/v1/embeddings",
+            json={"model": EMBED_MODEL, "input": text[:4096]},
+            headers={"Authorization": "Bearer local"},
         )
-        r.raise_for_status()
-        return r.json()["embeddings"][0]
+        response.raise_for_status()
+        data = response.json().get("data", [])
+        if not data or "embedding" not in data[0]:
+            raise RuntimeError("Embedding server returned no embedding")
+        return [float(value) for value in data[0]["embedding"]]
+
+
+async def llama_chat_completion(
+    messages: list[dict[str, str]],
+    *,
+    temperature: float,
+    max_tokens: int,
+) -> str:
+    """Call llama-server through its OpenAI-compatible chat endpoint."""
+    async with httpx.AsyncClient(timeout=600) as client:
+        response = await client.post(
+            f"{LLAMA_SERVER_URL}/v1/chat/completions",
+            json={
+                "model": LLM_MODEL,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "stream": False,
+            },
+            headers={"Authorization": "Bearer local"},
+        )
+        response.raise_for_status()
+        choices = response.json().get("choices", [])
+        if not choices:
+            raise RuntimeError("llama-server returned no choices")
+        content = choices[0].get("message", {}).get("content", "")
+        return content if isinstance(content, str) else str(content)
+
+
+async def llama_chat_stream(
+    messages: list[dict[str, str]],
+    *,
+    temperature: float,
+    max_tokens: int,
+) -> AsyncGenerator[str, None]:
+    """Stream OpenAI-compatible SSE deltas from llama-server."""
+    async with httpx.AsyncClient(timeout=None) as client:
+        async with client.stream(
+            "POST",
+            f"{LLAMA_SERVER_URL}/v1/chat/completions",
+            json={
+                "model": LLM_MODEL,
+                "messages": messages,
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+                "stream": True,
+            },
+            headers={"Authorization": "Bearer local"},
+        ) as response:
+            response.raise_for_status()
+            async for line in response.aiter_lines():
+                if not line.startswith("data:"):
+                    continue
+                payload = line[5:].strip()
+                if not payload or payload == "[DONE]":
+                    continue
+                try:
+                    event = json.loads(payload)
+                except json.JSONDecodeError:
+                    continue
+                choices = event.get("choices", [])
+                if not choices:
+                    continue
+                token = choices[0].get("delta", {}).get("content", "")
+                if token:
+                    yield str(token)
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Web search  (SearXNG → DuckDuckGo fallback)
@@ -230,7 +304,7 @@ def rg_search(query: str, path: str = REPO_ROOT, limit: int = 8) -> list[dict]:
         return []
     try:
         result = subprocess.run(
-            ["rg", "--json", "-i", "-l", "--max-count", "1", query, path,
+            ["rg", "--json", "-i", "--max-count", "3", query, path,
              "--glob", "*.ts", "--glob", "*.svelte", "--glob", "*.py", "--glob", "*.md",
              "--glob", "!node_modules", "--glob", "!.svelte-kit", "--glob", "!dist"],
             capture_output=True, text=True, timeout=10,
@@ -255,6 +329,110 @@ def rg_search(query: str, path: str = REPO_ROOT, limit: int = 8) -> list[dict]:
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
         log.debug(f"[rg_search] unavailable: {exc}")
         return []
+
+def _query_identifiers(query: str) -> list[str]:
+    """Extract likely code identifiers without using OCR or an LLM."""
+    candidates = re.findall(r"[A-Za-z_][A-Za-z0-9_.:-]{2,}", query)
+    stop = {"the", "and", "for", "with", "from", "into", "using", "file", "code"}
+    unique: list[str] = []
+    for value in candidates:
+        if value.lower() in stop or value in unique:
+            continue
+        if "_" in value or "." in value or any(ch.isupper() for ch in value[1:]):
+            unique.append(value)
+    return unique[:8]
+
+
+def ast_grep_search(query: str, path: str = REPO_ROOT, limit: int = 8) -> list[dict]:
+    """Best-effort structural search. ast-grep uses Tree-sitter parsers internally."""
+    if not os.path.isdir(path):
+        return []
+    identifiers = _query_identifiers(query)
+    if not identifiers:
+        return []
+    hits: list[dict] = []
+    language_globs = (
+        ("python", "*.py"),
+        ("typescript", "*.ts"),
+        ("typescript", "*.tsx"),
+    )
+    for identifier in identifiers[:4]:
+        safe_identifier = identifier.rsplit(".", 1)[-1].split(":", 1)[-1]
+        patterns = {
+            "python": [
+                f"def {safe_identifier}($$$ARGS): $$$BODY",
+                f"async def {safe_identifier}($$$ARGS): $$$BODY",
+                f"{safe_identifier}($$$ARGS)",
+            ],
+            "typescript": [
+                f"function {safe_identifier}($$$ARGS) {{ $$$BODY }}",
+                f"{safe_identifier}($$$ARGS)",
+            ],
+        }
+        for language, file_glob in language_globs:
+            for pattern in patterns[language]:
+                try:
+                    completed = subprocess.run(
+                        [
+                            "ast-grep", "run", "--json=stream", "--lang", language,
+                            "--pattern", pattern, "--globs", file_glob, path,
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=8,
+                    )
+                except (FileNotFoundError, subprocess.TimeoutExpired):
+                    return hits[:limit]
+                for line in completed.stdout.splitlines():
+                    try:
+                        item = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    file_name = item.get("file", "")
+                    range_data = item.get("range", {})
+                    start = range_data.get("start", {})
+                    text_value = item.get("text", "")
+                    if file_name:
+                        hits.append({
+                            "file": file_name,
+                            "line": int(start.get("line", 0)) + 1,
+                            "column": int(start.get("column", 0)) + 1,
+                            "text": str(text_value).strip()[:400],
+                            "source": "ast-grep",
+                            "identifier": safe_identifier,
+                        })
+                    if len(hits) >= limit:
+                        return hits
+    return hits[:limit]
+
+
+def reciprocal_rank_fusion(
+    lanes: Mapping[str, Sequence[Mapping[str, Any]]],
+    *,
+    weights: Mapping[str, float] | None = None,
+    k: int = 60,
+    limit: int = 12,
+) -> list[dict]:
+    """Fuse independently ranked retrieval lanes without comparing raw scores."""
+    lane_weights = dict(weights or {})
+    fused: dict[str, dict[str, Any]] = {}
+    for lane_name, candidates in lanes.items():
+        weight = float(lane_weights.get(lane_name, 1.0))
+        for rank, candidate in enumerate(candidates, start=1):
+            identity = str(
+                candidate.get("tree_node_id")
+                or candidate.get("symbol_id")
+                or candidate.get("source_ref")
+                or candidate.get("file")
+                or candidate.get("id")
+                or f"{lane_name}:{rank}"
+            )
+            entry = fused.setdefault(identity, {**dict(candidate), "rrf_score": 0.0, "lanes": []})
+            entry["rrf_score"] += weight / (k + rank)
+            if lane_name not in entry["lanes"]:
+                entry["lanes"].append(lane_name)
+    return sorted(fused.values(), key=lambda item: item["rrf_score"], reverse=True)[:limit]
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # HMM Legal Section Tagger  (salvaged from deeds_labs/services/hmm-topic-service)
@@ -396,28 +574,33 @@ class LegalHMM:
             log.info(f"[HMM] adapt_from_texts: {len(texts)} texts, {total_tokens} tokens")
         return total_tokens
 
-    def adapt_from_qdrant_hits(self, hits: list[dict], langfuse_context: Any, lr: float = 0.20) -> int:
-        """
-        Supervised adaptation from Qdrant hits with 'tags' payloads.
-        Sources: legal_documents, evidence_items, statute_chunks — any collection
-        whose chunks carry tags that map to known legal section states.
-        """
-        supervised: dict[str, dict[str, float]] = {s: {} for s in self.STATES}
+    def adapt_from_qdrant_hits(self, hits: Sequence[Mapping[str, Any]], lr: float = 0.20) -> int:
+        """Supervised emission adaptation from Qdrant payload tags."""
+        supervised: dict[str, dict[str, float]] = {state: {} for state in self.STATES}
         n_adapted = 0
         for hit in hits:
-            tags: list[str] = hit.get("tags", []) or []
+            raw_tags = hit.get("tags", []) or []
+            tags = [raw_tags] if isinstance(raw_tags, str) else list(raw_tags)
             mapped: set[str] = set()
-            for tag in tags:
-                state = self._TAG_STATE.get(tag.lower().replace(" ", "_")) \
-                             or self._TAG_STATE.get(tag.lower())
+            for raw_tag in tags:
+                tag = str(raw_tag).strip().lower()
+                state = self._TAG_STATE.get(tag.replace(" ", "_")) or self._TAG_STATE.get(tag)
                 if state:
                     mapped.add(state)
-        # ── Tag → state supervision map  (Qdrant payload tags / statute glossary) ───
-        # CALL: self.parent_atlas_core.adapt_from_qdrant_hits(hits, langfuse_context, lr)
-        n_adapted = self.parent_atlas_core.adapt_from_qdrant_hits(hits, langfuse_context, lr)
-
+            if not mapped:
+                continue
+            tokens = self._tokens(str(hit.get("text", "")))[:200]
+            if not tokens:
+                continue
+            weight = 1.0 / len(mapped)
+            for state in mapped:
+                state_counts = supervised[state]
+                for word in tokens:
+                    state_counts[word] = state_counts.get(word, 0.0) + weight
+            n_adapted += 1
         if n_adapted:
-            log.info(f"[HMM] Successfully adapted {n_adapted} hits.")
+            self._blend_counts(supervised, lr)
+            log.info("[HMM] adapt_from_qdrant_hits: %s/%s hits tagged", n_adapted, len(hits))
         return n_adapted
 
     def to_redis_payload(self) -> str:
@@ -450,6 +633,98 @@ class LegalHMM:
 _hmm = LegalHMM()  # module-level singleton — numpy, no GPU, safe to share
 _HMM_REDIS_KEY = "hmm:emissions:v1"
 _HMM_REDIS_TTL = 7 * 86_400  # 7 days
+
+
+@dataclass(frozen=True)
+class HMMAdaptationResult:
+    input_count: int
+    adapted_count: int
+    persisted: bool
+
+
+class ParentAtlasCore:
+    """Canonical owner for HMM adaptation, persistence, and retrieval helpers."""
+
+    def __init__(self, hmm: LegalHMM) -> None:
+        self.hmm = hmm
+
+    async def adapt_from_qdrant_hits(
+        self,
+        hits: Sequence[Mapping[str, Any]],
+        *,
+        learning_rate: float = 0.20,
+        trace_context: Mapping[str, Any] | None = None,
+        persist: bool = True,
+    ) -> HMMAdaptationResult:
+        started = time.perf_counter()
+        adapted_count = self.hmm.adapt_from_qdrant_hits(hits, lr=learning_rate)
+        persisted = False
+        if adapted_count and persist:
+            try:
+                redis = await get_redis()
+                await redis.set(
+                    _HMM_REDIS_KEY,
+                    self.hmm.to_redis_payload(),
+                    ex=_HMM_REDIS_TTL,
+                )
+                persisted = True
+            except Exception as exc:
+                log.debug("[ParentAtlasCore] HMM persist skipped: %s", exc)
+        log.info(
+            "[ParentAtlasCore] hmm_adapt input=%s adapted=%s persisted=%s latency_ms=%s trace_id=%s",
+            len(hits),
+            adapted_count,
+            persisted,
+            round((time.perf_counter() - started) * 1000, 2),
+            (trace_context or {}).get("trace_id", ""),
+        )
+        return HMMAdaptationResult(
+            input_count=len(hits),
+            adapted_count=adapted_count,
+            persisted=persisted,
+        )
+
+    async def retrieve_code_candidates(self, query: str, limit: int = CODE_TOP_K) -> list[dict]:
+        """Fuse lexical, structural, and dense code retrieval for edit localization."""
+        lexical_task = asyncio.to_thread(rg_search, query, REPO_ROOT, max(limit, 12))
+        structural_task = asyncio.to_thread(ast_grep_search, query, REPO_ROOT, max(6, limit // 2))
+        lexical, structural = await asyncio.gather(lexical_task, structural_task)
+
+        dense: list[dict] = []
+        try:
+            embedding = await embed_query(query)
+            qdrant = await get_qdrant()
+            results = await qdrant.query_points(
+                collection_name=CODE_COLLECTION,
+                query=embedding,
+                limit=max(limit, 20),
+                with_payload=True,
+            )
+            for point in results.points:
+                payload = point.payload or {}
+                dense.append({
+                    "id": str(point.id),
+                    "score": float(point.score),
+                    "source_ref": payload.get("source_ref") or payload.get("sourceRef") or payload.get("file", ""),
+                    "file": payload.get("source_ref") or payload.get("sourceRef") or payload.get("file", ""),
+                    "line": payload.get("start_line", payload.get("line", 0)),
+                    "text": payload.get("summary") or payload.get("chunk_text") or payload.get("text", ""),
+                    "tree_node_id": payload.get("tree_node_id", ""),
+                    "feature_id": payload.get("feature_id", ""),
+                    "domain_class": payload.get("domain_class", payload.get("domain", "")),
+                    "source": "qdrant-dense",
+                })
+        except Exception as exc:
+            log.debug("[ParentAtlasCore] dense code retrieval skipped: %s", exc)
+
+        return reciprocal_rank_fusion(
+            {"ast": structural, "rg": lexical, "dense": dense},
+            weights={"ast": 1.6, "rg": 1.3, "dense": 1.1},
+            limit=limit,
+        )
+
+
+_parent_atlas_core = ParentAtlasCore(_hmm)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # ACE entity extraction  (regex — mirrors tag-extractor.ts)
@@ -578,7 +853,7 @@ async def node_web_search(state: SynthesisState) -> dict:
     return {"web_results": results}
 
 async def node_rg_search(state: SynthesisState) -> dict:
-    results = rg_search(state["query"])
+    results = await _parent_atlas_core.retrieve_code_candidates(state["query"], limit=CODE_TOP_K)
     return {"rg_results": results}
 
 async def node_retrieve_rag(state: SynthesisState) -> dict:
@@ -598,6 +873,8 @@ async def node_retrieve_rag(state: SynthesisState) -> dict:
                     "text": p.get("chunk_text", p.get("text", ""))[:600],
                     "title": p.get("title", p.get("doc_title", "")),
                     "source": collection,
+                    "tags": p.get("tags", []) or [],
+                    "source_ref": p.get("source_ref") or p.get("sourceRef") or "",
                 })
         except Exception as exc:
             log.debug(f"[rag] {collection}: {exc}")
@@ -667,35 +944,49 @@ async def node_merge(state: SynthesisState) -> dict:
     return {"merged_context": state["ace_context"]}
 
 async def node_synthesize(state: SynthesisState) -> dict:
-    llm = ChatOllama(base_url=OLLAMA_URL, model=LLM_MODEL, temperature=0.3)
     context = state["merged_context"] or "No context retrieved."
     system = (
         "You are a legal AI assistant (ACE — Adaptive Context Engine). "
         "Answer using ONLY the provided context. Cite sources by [N] index. "
         "If context is insufficient, say so explicitly."
     )
-    user_msg = f"Context:\n{context}\n\nQuestion: {state['query']}"
-    response = await llm.ainvoke([SystemMessage(content=system), HumanMessage(content=user_msg)])
-    text = response.content or ""
-    confidence = min(0.95, 0.5 + len(state["rag_hits"]) * 0.05 + (0.1 if "[" in text else 0)
-                     + (0.05 if state["web_results"] else 0))
+    user_content = "Context:\n{}\n\nQuestion: {}".format(context, state["query"])
+    text = await llama_chat_completion(
+        [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user_content},
+        ],
+        temperature=0.3,
+        max_tokens=1024,
+    )
+    confidence = min(
+        0.95,
+        0.5
+        + len(state["rag_hits"]) * 0.05
+        + (0.1 if "[" in text else 0)
+        + (0.05 if state["web_results"] else 0),
+    )
     return {"llm_response": text, "confidence": confidence}
+
 
 async def node_self_eval(state: SynthesisState) -> dict:
     if state["confidence"] >= CONFIDENCE_THRESHOLD or state["retried"]:
         return {}
-    llm = ChatOllama(base_url=OLLAMA_URL, model=LLM_MODEL, temperature=0.5)
-    retry = (
-        f"Your previous answer may be incomplete. Provide a more thorough legal analysis.\n\n"
-        f"Context:\n{state['merged_context']}\n\nQuestion: {state['query']}\n\n"
-        f"Previous (incomplete) answer:\n{state['llm_response']}"
+    retry_prompt = (
+        "Your previous answer may be incomplete. Provide a more thorough legal analysis.\n\n"
+        "Context:\n{}\n\nQuestion: {}\n\nPrevious (incomplete) answer:\n{}"
+    ).format(state["merged_context"], state["query"], state["llm_response"])
+    text = await llama_chat_completion(
+        [{"role": "user", "content": retry_prompt}],
+        temperature=0.5,
+        max_tokens=1024,
     )
-    response = await llm.ainvoke([HumanMessage(content=retry)])
     return {
-        "llm_response": response.content or state["llm_response"],
+        "llm_response": text or state["llm_response"],
         "confidence": min(0.95, state["confidence"] + 0.15),
         "retried": True,
     }
+
 
 def _should_retry(state: SynthesisState) -> str:
     return "retry" if state["confidence"] < CONFIDENCE_THRESHOLD and not state["retried"] else "done"
@@ -785,7 +1076,7 @@ async def _hmm_adapt_startup() -> None:
         qdrant_hits: list[dict] = []
         try:
             qdrant = await get_qdrant()
-            for collection in ("legal_documents", "statute_chunk",           "docling_vlm_evidence", "evidence_items"):
+            for collection in ("legal_documents", "statute_chunks", "docling_vlm_evidence", "evidence_items"):
                 try:
                     # Scroll up to 200 points per collection
                     results, _ = await qdrant.scroll(
@@ -801,8 +1092,13 @@ async def _hmm_adapt_startup() -> None:
                             qdrant_hits.append({"text": text, "tags": tags})
                 except Exception:
                     pass
-            adapted = _hmm.adapt_from_qdrant_hits(qdrant_hits, lr=0.20)
-            log.info(f"[HMM startup] Qdrant adapt: {adapted} hits from {len(qdrant_hits)} chunks")
+            adaptation = await _parent_atlas_core.adapt_from_qdrant_hits(
+                qdrant_hits, learning_rate=0.20, persist=False
+            )
+            log.info(
+                "[HMM startup] Qdrant adapt: %s hits from %s chunks",
+                adaptation.adapted_count, len(qdrant_hits),
+            )
         except Exception as exc:
             log.debug(f"[HMM startup] Qdrant adapt skipped: {exc}")
 
@@ -833,20 +1129,17 @@ async def _hmm_adapt_startup() -> None:
         log.warning(f"[HMM startup] Adaptation failed (non-fatal, using prior): {exc}")
 
 
-async def _hmm_adapt_from_hits(hits: list[dict]) -> None:
-    """
-    Background task: supervised-adapt HMM from one synthesis query's RAG hits,
-    then persist updated emissions to Redis. Called after every L3 synthesis.
-    Non-fatal — errors are logged at DEBUG level only.
-    """
+async def _hmm_adapt_from_hits(hits: list[dict], trace_id: str | None = None) -> None:
+    """Incrementally adapt through ParentAtlasCore and persist atomically."""
     try:
-        n = _hmm.adapt_from_qdrant_hits(hits, lr=0.05)  # small lr for incremental updates
-        if n > 0:
-            redis = await get_redis()
-            await redis.set(_HMM_REDIS_KEY, _hmm.to_redis_payload(), ex=_HMM_REDIS_TTL)
-            log.debug(f"[HMM bg] adapted {n} hits, emissions persisted")
+        await _parent_atlas_core.adapt_from_qdrant_hits(
+            hits,
+            learning_rate=0.05,
+            trace_context={"trace_id": trace_id or ""},
+            persist=True,
+        )
     except Exception as exc:
-        log.debug(f"[HMM bg] non-fatal: {exc}")
+        log.debug("[HMM bg] non-fatal: %s", exc)
 
 
 @app.on_event("startup")
@@ -958,7 +1251,7 @@ async def synthesize(req: SynthesizeRequest) -> dict:
         log.debug(f"[grpo] reward compute skipped: {exc}")
 
     # Background HMM adaptation — fire-and-forget, non-blocking
-    asyncio.create_task(_hmm_adapt_from_hits(result["rag_hits"]))
+    asyncio.create_task(_hmm_adapt_from_hits(result["rag_hits"], trace_id))
 
     return {
         "answer": answer,
@@ -1017,8 +1310,15 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
                 res = await qdrant.query_points(col, query=embedding, limit=5, with_payload=True)
                 for pt in res.points:
                     p = pt.payload or {}
-                    rag_hits.append({"score": pt.score, "text": p.get("chunk_text","")[:400],
-                                     "title": p.get("title",""), "id": str(pt.id)})
+                    rag_hits.append({
+                        "score": pt.score,
+                        "text": (p.get("chunk_text") or p.get("text") or "")[:400],
+                        "title": p.get("title", ""),
+                        "id": str(pt.id),
+                        "tags": p.get("tags", []) or [],
+                        "source": col,
+                        "source_ref": p.get("source_ref") or p.get("sourceRef") or "",
+                    })
             except Exception:
                 pass
         rag_hits.sort(key=lambda h: h["score"], reverse=True)
@@ -1050,17 +1350,20 @@ async def synthesize_stream(req: SynthesizeRequest) -> StreamingResponse:
         yield f"data: {json.dumps({'stage':'llm','status':'running'})}\n\n"
         system = ("You are ACE — a legal AI assistant. Answer using ONLY the provided context. "
                   "Cite sources by [N] index.")
-        llm = ChatOllama(base_url=OLLAMA_URL, model=LLM_MODEL, temperature=req.temperature, streaming=True)
         full_text = ""
-        async for chunk in llm.astream([
-            SystemMessage(content=system),
-            HumanMessage(content=f"Context:\n{context}\n\nQuestion: {req.query}"),
-        ]):
-            token = chunk.content or ""
+        async for token in llama_chat_stream(
+            [
+                {"role": "system", "content": system},
+                {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {req.query}"},
+            ],
+            temperature=req.temperature,
+            max_tokens=req.max_tokens,
+        ):
             full_text += token
             yield f"data: {json.dumps({'stage':'llm','token':token})}\n\n"
 
         await l1_set(cache_key, full_text, LLM_MODEL, "langgraph-stream")
+        asyncio.create_task(_hmm_adapt_from_hits(rag_hits, trace_id))
         confidence = min(0.95, 0.5 + len(rag_hits) * 0.05 + (0.1 if "[" in full_text else 0))
         citations = build_citations(rag_hits)
         grpo_reward_score: float | None = None
@@ -1140,12 +1443,18 @@ async def health() -> dict:
         checks["redis"] = f"error: {exc}"
 
     try:
-        async with httpx.AsyncClient(timeout=4) as c:
-            r = await c.get(f"{OLLAMA_URL}/api/tags")
-            checks["ollama"] = "ok"
-            checks["ollama_models"] = [m["name"] for m in r.json().get("models", [])]
+        async with httpx.AsyncClient(timeout=4) as client:
+            response = await client.get(
+                f"{LLAMA_SERVER_URL}/v1/models",
+                headers={"Authorization": "Bearer local"},
+            )
+            response.raise_for_status()
+            checks["llama_server"] = "ok"
+            checks["llama_models"] = [
+                item.get("id", "") for item in response.json().get("data", [])
+            ]
     except Exception as exc:
-        checks["ollama"] = f"error: {exc}"
+        checks["llama_server"] = f"error: {exc}"
 
     try:
         async with httpx.AsyncClient(timeout=3) as c:
@@ -1160,7 +1469,7 @@ async def health() -> dict:
         checks["rg_available"] = False
     checks["status"] = "ok" if all(
         v in ("ok", True) for k, v in checks.items()
-        if k in ("qdrant", "redis", "ollama", "gpu")
+        if k in ("qdrant", "redis", "llama_server", "gpu")
     ) else "degraded"
     return checks
 

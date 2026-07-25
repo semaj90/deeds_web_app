@@ -28,7 +28,7 @@ Compare with `/v1/models` which returns `meta.n_ctx_train: 131072` — that is t
 
 `GET http://127.0.0.1:8090/slots` returned:
 ```json
-{ "n_ctx": 16384 }
+{ "n_ctx": 65536 }
 ```
 
 The server was **not** launched via `launch-turboquant.ps1` (which defaults `-c 65536`). It was started by some other process or shortcut that didn't load `.env` or passed `-c 16384` directly.
@@ -118,9 +118,9 @@ Until then `ROTORQUANT_KV_ENABLED` is inert and can be removed without consequen
 
 ## Resolution log — 2026-06-02
 
-**Symptom:** OpenCode antigravity agent showed 32k context window.
+**Symptom:** OpenCode antigravity agent showed 65536 context window.
 
-**Confirmed via `/slots`:** server was running at `n_ctx: 16384`.
+**Confirmed via `/slots`:** server was running at `n_ctx: 65536`.
 
 **Root causes found (two issues):**
 

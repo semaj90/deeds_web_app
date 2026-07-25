@@ -500,7 +500,7 @@
     "atlas:envelope:backfill": "node ../scripts/atlas/backfill-canonical-envelope-fields.mjs",
     "atlas:envelope:backfill:apply": "node ../scripts/atlas/backfill-canonical-envelope-fields.mjs --apply",
     "atlas:summary:envelopes:build:dry": "node ../scripts/atlas/build-summary-envelopes-from-tuples.mjs --dry-run",
-    "atlas:summary:envelopes:build:apply": "node ../scripts/atlas/build-summary-envelopes-from-tuples.mjs --apply",
+    "atlas:summary:envelopes:build:apply": "node ../scripts/atlas/build-summary-envelopes-from-tuples.mjs --apply --skip-invalid",
     "atlas:summary:envelopes:queue:dry": "node ../scripts/atlas/publish-summary-envelopes-to-rabbitmq.mjs --dry-run",
     "atlas:summary:envelopes:queue:apply": "node ../scripts/atlas/publish-summary-envelopes-to-rabbitmq.mjs --apply",
     "atlas:backfill:unified-id-hierarchy:dry": "node scripts/atlas/backfill-unified-id-hierarchy.mjs",

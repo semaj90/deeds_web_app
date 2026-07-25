@@ -1,82 +1,84 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "shell": "pwsh",
+  "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+  "default_agent": "ornith-trace-audit",
   "provider": {
-    "ollama": {
+    "atomic": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama",
+      "name": "Atomic Chat (Ornith :1337)",
       "options": {
-        "baseURL": "http://127.0.0.1:11434/v1",
+        "baseURL": "http://127.0.0.1:1337/v1",
         "apiKey": "local"
       },
       "models": {
-        "gemma4-rotorquant:latest": {
-          "name": "Gemma4 RotorQuant",
+        "unsloth/Ornith-1_0-9B-Q4_K_S": {
+          "name": "Ornith 1.0 9B Q4_K_S (65K)",
           "tools": true,
-          "reasoning": false,
+          "reasoning": true,
           "limit": {
             "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "think": false,
-            "stop": [
-              "<think>",
-              "</think>",
-              "Thinking:",
-              "Self-Correction",
-              "_gemma3",
-              "gemma3.5-27"
-            ]
+            "output": 3090
+          }
+        },
+        "ornith": {
+          "name": "Ornith 1.0 9B Q4_K_S (65K)",
+          "tools": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 3090
           }
         }
       }
     },
     "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "llama-server",
+      "name": "llama-server (:8090)",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local"
       },
       "models": {
         "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal llama-server",
+          "name": "Gemma4 Legal Direct 65K",
           "tools": true,
           "reasoning": false,
           "limit": {
             "context": 65536,
-            "output": 8192
-          },
-          "options": {
-            "temperature": 0,
-            "stream": true,
-            "stop": [
-              "<think>",
-              "</think>",
-              "Thinking:",
-              "Self-Correction",
-              "_gemma3",
-              "gemma3.5-27"
-            ]
+            "output": 4096
+          }
+        },
+        "unsloth/Ornith-1_0-9B-Q4_K_S": {
+          "name": "Ornith 1.0 9B 65K",
+          "tools": true,
+          "reasoning": true,
+          "limit": {
+            "context": 65536,
+            "output": 4090
+          }
+        }
+      }
+    },
+    "gemma4-adapter": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Gemma4 Adapter (:8091)",
+      "options": {
+        "baseURL": "http://127.0.0.1:8091/v1",
+        "apiKey": "local"
+      },
+      "models": {
+        "gemma4-legal-iq4xs-direct.gguf": {
+          "name": "Gemma4 Legal Direct 65K",
+          "tools": true,
+          "reasoning": false,
+          "limit": {
+            "context": 65536,
+            "output": 4096
           }
         }
       }
     }
-  },
-  "model": "ollama/gemma4-rotorquant:latest",
-  "permission": {
-    "bash": "ask",
-    "edit": "ask",
-    "write": "ask",
-    "webfetch": "allow",
-    "websearch": "allow",
-    "skill": "allow",
-    "trace_*": "allow",
-    "turbovec_*": "allow",
-    "engram_*": "allow",
-    "langextract_*": "allow"
   },
   "mcp": {
     "trace": {
@@ -87,91 +89,78 @@
       "headers": {
         "Accept": "application/json, text/event-stream"
       }
-    },
-    "turbovec": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8791/mcp",
-      "enabled": true,
-      "timeout": 30000
-    },
-    "engram-embed": {
-      "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs",
-        "--stdio"
-      ],
-      "enabled": true,
-      "timeout": 60000,
-      "env": {
-        "ENGRAM_ONLY": "true",
-        "REDIS_ENABLED": "false"
+    }
+  },
+  "agent": {
+    "ornith-trace-audit": {
+      "mode": "primary",
+      "description": "Read-only repository auditor using native TRACE retrieval tools",
+      "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+      "temperature": 0.8,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "Get-Location": "allow",
+        "git status": "allow",
+        "git diff": "allow",
+        "rg": "allow",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "taxonomy.*": "allow",
+        "clusters.*": "allow",
+        "hypergraph.*": "allow",
+        "knowledge.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "runtime.*": "allow",
+        "LLMS.md.*": "allow",
+        "evidence.*": "allow",
+        "image.*": "allow",
+        "shell.*": "allow",
+        "edit": "deny"
       }
     },
-    "gemma4-offload": {
-      "type": "local",
-      "command": [
-        "node",
-        "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"
-      ],
-      "enabled": true,
-      "timeout": 30000,
-      "env": {
-        "ENGRAM_ONLY": "true"
+    "gemma4-function-caller": {
+      "mode": "subagent",
+      "description": "Gemma4 function calling auditor on port 8090",
+      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+      "temperature": 0.8,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "edit": "deny"
       }
     }
   },
-  "instructions": [
-    ".opencode/system.md",
-    "sveltekit-frontend/.opencode/skills/no-placeholder-policy.md",
-    "AGENTS.md"
-  ],
-  "watcher": {
-    "ignore": [
-      "node_modules/**",
-      "dist/**",
-      ".git/**",
-      ".svelte-kit/**",
-      "memory/**",
-      "tmp/**",
-      ".opencode/cards/**",
-      ".opencode/cache/**",
-      ".opencode/ndjson/**",
-      ".opencode/embeddings/**",
-      ".opencode/ace-packet.json",
-      ".opencode/ace-packet-*.json",
-      ".opencode/ace-packets/**",
-      ".opencode/ace-packets_stale/**",
-      ".opencode/ace-context.json",
-      ".opencode/feature-files.json",
-      ".opencode/startup-context.json",
-      ".opencode/ace-seed-*.json",
-      ".opencode/patchcard-*.json",
-      ".opencode/ingest/**",
-      ".opencode/summaries/**",
-      ".opencode/jobs/**",
-      ".opencode/tasks/**",
-      ".opencode/commits/**",
-      ".opencode/fixes/**",
-      ".opencode/quarantine/**",
-      ".opencode/recommendations/**",
-      ".opencode/context/**",
-      ".opencode/agents/**",
-      ".opencode/kanban/**",
-      ".opencode/feature-map/**",
-      ".opencode/memory/**",
-      ".opencode/tools/**",
-      ".opencode/node_modules/**",
-      "neschrom97/**",
-      "sveltekit-frontend/node_modules/**",
-      "sveltekit-frontend/.svelte-kit/**",
-      "sveltekit-frontend/static/ort/**",
-      "sveltekit-frontend/static/gemma3_270m_onnx/**",
-      "sveltekit-frontend/static/embeddinggemma_300m_onnx/**",
-      "simd-bridge/cpp/build/**",
-      "granite-docling-258M/**",
-      "turbovec/**",
-      "models/**"
-    ]
-  }
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 2,
+    "reserved": 3072
+  },
+  "tool_output": {
+    "max_lines": 400,
+    "max_bytes": 18000
+  },
+  "share": "disabled"
 }

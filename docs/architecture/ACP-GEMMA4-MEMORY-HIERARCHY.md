@@ -1,7 +1,7 @@
 # ACP Memory Hierarchy: Infrastructure First, Gemma4 Last
 
-**Last Updated**: June 26, 2026  
-**Author**: James Woodard + Claude  
+**Last Updated**: June 26, 2026
+**Author**: James Woodard + Claude
 **Status**: Architecture Reference (Canonical)
 
 ---
@@ -198,8 +198,8 @@ Neo4j topology            RAM (8–16GB, ~100ns)
      ↓
 Filesystem (rg search)    SSD (1–2TB, ~10μs)
      ↓
-Firecrawl (web fetch)     Network (internet, ~100ms)
-```
+Firecrawl (web fetch)     Network, networkx, pytorch xgboost domain classification while embeddingemma multi vector semantic dense sparse jsonb autoendoing ranking index retrieved(find relevant pipeline, bm25, inverse, cagra, redis centroid qdrant rff neo4j fan out, into ace packet simdjson synthesis ranking, recommendation engine.) (internet, ~100ms)
+```snk
 
 **Hierarchy principle**: Faster layers (Redis) are consulted first. Slower, deeper searches (Neo4j) only if cache misses.
 
@@ -249,7 +249,7 @@ Query 1: "Analyze gpu-reranker impact"
   ├─ Tool 3: Fetch schema from Postgres
   ├─ Tool 4: Call Gemma (synthesis)
   └─ Result: "GPU reranker improves latency 50×"
-  
+
   Store as workflow packet:
   {
     trace_id: "trace:gpu-reranker:20260626",
@@ -329,11 +329,11 @@ CREATE TABLE workflow_summaries (
   timestamp timestamptz DEFAULT now(),
   domain text,
   tags text[],
-  
+
   -- Embedding
   embedding vector(768),
   latent64 vector(64),
-  
+
   -- Metadata JSONB
   metadata jsonb,  -- { tool_args: {...}, latencies: {...} }
   packet_ids text[],
@@ -615,7 +615,7 @@ The ACP infrastructure layer asks those questions *before* Gemma runs. Gemma rec
 
 ---
 
-**Maintained by**: Claude (Anthropic) + James Woodard  
-**Last Updated**: June 26, 2026  
-**Status**: Canonical Architecture Reference  
+**Maintained by**: Claude (Anthropic) + James Woodard
+**Last Updated**: June 26, 2026
+**Status**: Canonical Architecture Reference
 **Next**: Implement BitFrost cache pre-population + packet compaction service

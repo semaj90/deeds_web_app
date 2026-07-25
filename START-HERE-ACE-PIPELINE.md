@@ -17,93 +17,59 @@ This runs the complete ACE packet materialization pipeline:
 4. 🔄 **Topology** — Refresh Neo4j edges
 5. ✓ **Validate** — Verify all mirrors synced
 
-**Total time**: ~9–10 seconds (dry-run tested ✅)
-
----
-
+**Total time**: ~9–10 seconds (dry-run tested ✅
 ## Three Usage Modes
 
 ### Mode 1: Preview (Recommended First)
 ```bash
 npm run startup:ace:materialize:dry
-```
 Shows what would change without applying anything.
-
-### Mode 2: Apply (Production)
+# Mode 2: Apply (Production)
 ```bash
 npm run startup:ace:materialize
 ```
 Executes all 5 stages and syncs all mirrors.
-
-### Mode 3: Debug (Troubleshooting)
+# Mode 3: Debug (Troubleshooting)
 ```bash
 npm run startup:ace:materialize:verbose
-```
 Verbose logging with detailed output.
-
----
-
-## Single Stages (If You Need Isolation)
-
+# Single Stages (If You Need Isolation)
 ```bash
 # Just audit
 npm run startup:ace:materialize:audit
-
 # Just materialize Qdrant
 npm run startup:ace:materialize:materialize
-
 # Just warm Redis
 npm run startup:ace:materialize:redis
-
 # Just topology
 npm run startup:ace:materialize:topology
-
 # Just validation
 npm run startup:ace:materialize:validate
-```
-
----
-
 ## Backward Compatible: Manual Chain
-
 If you prefer step-by-step:
-
 ```bash
 npm run graphify:audit                # Step 1: Audit
 npm run graphify:materialize:apply    # Step 2: Materialize
 npm run graphify:redis:import         # Step 3: Warm Redis
 npm run atlas:packet-contract-repair  # Step 4: Topology
 npm run atlas:startup:validate        # Step 5: Validate
-```
-
----
 
 ## What Gets Synced
-
 | Store | What | Update Frequency |
-|-------|------|-------------------|
 | **Postgres** | Source of truth (packet_key, feature_id, source_ref) | Per audit |
 | **Qdrant** | Dense vector payloads + metadata | Per materialize |
 | **Redis** | ACE context cache (bifrost:packet:*) | Per redis:import |
 | **Neo4j** | Topology edges (eventually consistent) | Per topology refresh |
 
----
-
-## Troubleshooting
-
+# Troubleshooting
 | Problem | Fix |
-|---------|-----|
 | Redis connection fails | Check `.env` has `REDIS_URL="redis://:redis@127.0.0.1:6379"` |
 | Qdrant sync incomplete | Run `npm run atlas:qdrant-payload:verify --verbose` |
 | Neo4j edges missing | Run `npm run atlas:packet-contract-repair` (async eventually consistent) |
 | All 5 stages fail | Run `npm run startup:ace:materialize:verbose` for logs |
 
----
-
-## Performance Targets
-
+# Performance Targets
 | Stage | Expected Time | Acceptable |
-|-------|---------------|-----------|
 | Audit | 0.9–2s | <5s |
 | Materialize | 3.2–3.8s | <10s |
 | Redis Import | 1.7–2.8s | <5s |
@@ -114,10 +80,6 @@ npm run atlas:startup:validate        # Step 5: Validate
 If any stage exceeds acceptable time, check backend service health:
 ```bash
 npm run audit:infrastructure
-```
-
----
-
 ## Documentation
 
 For full details, see:

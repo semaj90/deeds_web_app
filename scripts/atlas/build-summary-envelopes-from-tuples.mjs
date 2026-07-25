@@ -35,6 +35,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
+const SKIP_INVALID = process.argv.includes('--skip-invalid');
+const STRICT = process.argv.includes('--strict');
 const LIMIT = process.argv.find(a => a.startsWith('--limit='))?.split('=')[1] || null;
 
 // Config
@@ -105,6 +107,26 @@ async function log(...args) {
   if (!process.env.QUIET) console.log('[summary-envelopes]', ...args);
 }
 
+/**
+ * Check if a packet has enrichment proof via feature_ontology_tuples
+ * Before failing validation on missing concepts, check canonical enrichment source
+ */
+async function checkEnrichmentProof(featureId) {
+  const query = `
+    SELECT COUNT(*) as cnt
+    FROM feature_ontology_tuples
+    WHERE feature_id = $1
+    LIMIT 1
+  `;
+  try {
+    const result = await pool.query(query, [featureId]);
+    return result.rows[0]?.cnt > 0;
+  } catch (err) {
+    // Table may not exist yet; treat as no proof
+    return false;
+  }
+}
+
 async function readTuples() {
   const query = `
     SELECT
@@ -136,6 +158,17 @@ async function readTuples() {
 
   // Validate each packet against canonical envelope contract
   const validated = [];
+  const quarantine = [];
+  const stats = {
+    total: result.rows.length,
+    valid: 0,
+    quarantined: 0,
+    sourceRefMissing: 0,
+    conceptsMissing: 0,
+    generated: 0,
+    enrichmentProofFound: 0,
+  };
+
   for (const row of result.rows) {
     // Ensure used_concepts is an array
     const packet = {
@@ -147,13 +180,56 @@ async function readTuples() {
       console.warn(`[${row.packet_key}] soft warnings:`, validation.softWarnings);
     }
     if (!validation.isValid) {
-      reportValidation(validation, row.packet_key);
+      // Before failing, check if this is just missing concepts but enrichment proof exists
+      const hasConceptsFailure = validation.hardFailures.some(f => f.includes('used_concepts'));
+      if (hasConceptsFailure) {
+        const hasEnrichmentProof = await checkEnrichmentProof(row.feature_id);
+        if (hasEnrichmentProof) {
+          stats.enrichmentProofFound++;
+          stats.valid++;
+          if (VERBOSE) {
+            console.log(`[${row.packet_key}] Enrichment proof found in feature_ontology_tuples, validating`);
+          }
+          validated.push({ ...row, ...envelope });
+          continue;
+        }
+      }
+
+      const msg = `Invalid packet ${row.packet_key}: ${validation.hardFailures.join(', ')}`;
+      stats.quarantined++;
+
+      // Track specific failure reasons
+      if (validation.hardFailures.some(f => f.includes('source_ref'))) stats.sourceRefMissing++;
+      if (validation.hardFailures.some(f => f.includes('used_concepts'))) stats.conceptsMissing++;
+
+      quarantine.push({
+        packet_key: row.packet_key,
+        source_ref: row.source_ref,
+        errors: validation.hardFailures,
+      });
+
+      if (STRICT) {
+        console.error(`[summary-envelopes] FATAL: ${msg}`);
+        await pool.end();
+        process.exit(1);
+      }
+      if (SKIP_INVALID || VERBOSE) {
+        console.warn(`[summary-envelopes] Skipping ${msg}`);
+      }
       continue;
+    }
+    stats.valid++;
+    if (envelope.source_kind === 'generated_declaration') {
+      stats.generated++;
     }
     validated.push({ ...row, ...envelope });
   }
 
-  return validated;
+  if (quarantine.length > 0) {
+    console.warn(`[summary-envelopes] Quarantine (${quarantine.length}):`, JSON.stringify(quarantine.slice(0, 3)));
+  }
+
+  return { validated, stats, quarantine };
 }
 
 function groupTuples(tuples) {
@@ -417,12 +493,20 @@ async function main() {
 
     // 1. Read tuples from Postgres
     log('Reading tuples from atlas_packets...');
-    const tuples = await readTuples();
-    log(`✅ Read ${tuples.length} tuples`);
+    const { validated, stats, quarantine } = await readTuples();
+    log(`✅ Read ${stats.total} tuples (${stats.valid} valid, ${stats.quarantined} invalid)`);
+    if (stats.enrichmentProofFound > 0) {
+      log(`  📊 Enrichment proof found: ${stats.enrichmentProofFound} (via feature_ontology_tuples)`);
+    }
+    if (stats.quarantined > 0) {
+      log(`  Generated files: ${stats.generated}`);
+      log(`  Missing source_ref: ${stats.sourceRefMissing}`);
+      log(`  Missing concepts: ${stats.conceptsMissing}`);
+    }
 
     // 2. Group by feature_id
     log('Grouping tuples by feature_id...');
-    const groups = groupTuples(tuples);
+    const groups = groupTuples(validated);
     log(`✅ Created ${groups.size} groups`);
 
     // 3. Rank groups
@@ -454,7 +538,9 @@ async function main() {
     // 7. Summary
     log('');
     log('📊 Summary Envelope Build Complete:');
-    log(`  Total tuples processed: ${tuples.length}`);
+    log(`  Total tuples read: ${stats.total}`);
+    log(`  Valid tuples: ${stats.valid} (${((stats.valid / stats.total) * 100).toFixed(1)}%)`);
+    log(`  Quarantined: ${stats.quarantined} (${((stats.quarantined / stats.total) * 100).toFixed(1)}%)`);
     log(`  Groups created: ${groups.size}`);
     log(`  Groups selected: ${envelopes.length}`);
     log(`  Summary jobs queued: ${jobs.length}`);

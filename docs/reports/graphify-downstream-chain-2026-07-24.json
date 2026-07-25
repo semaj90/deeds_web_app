@@ -1,0 +1,23 @@
+{
+  "timestamp": "2026-07-24T06:41:17.949Z",
+  "mode": "dry-run",
+  "dryRun": true,
+  "stages": {
+    "graphify_readiness_check": {
+      "status": "timeout",
+      "polls": 60,
+      "elapsed_ms": 420928
+    },
+    "pagerank": {
+      "status": "running"
+    }
+  },
+  "errors": [
+    "spawn EINVAL"
+  ],
+  "summary": {
+    "success": false,
+    "message": "",
+    "elapsed_ms": 420946
+  }
+}
