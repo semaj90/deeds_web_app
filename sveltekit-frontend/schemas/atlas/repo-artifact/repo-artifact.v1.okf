@@ -1,0 +1,187 @@
+schema_id: atlas.repo-artifact
+schema_version: 1
+schema_kind: repo_artifact_classification
+status: ACTIVE
+
+description: >
+  Classification schema for organizing codebase content into typed repo artifacts.
+  Every file in the repository maps to exactly one artifact_kind.
+  This schema drives agentic dense search routing: different artifact kinds
+  are indexed into different Qdrant named-vectors and retrieved via different lanes.
+
+  Artifact kinds are stable — they do not change when files are renamed.
+  Routing is deterministic from (artifact_kind, source_ref) alone.
+
+# ── Artifact taxonomy ─────────────────────────────────────────────────────────
+artifact_kinds:
+  source_module:
+    description: TypeScript/JavaScript/Svelte source files that export logic
+    extensions: [.ts, .js, .mts, .mjs, .svelte]
+    excludes: [.spec.ts, .test.ts, .d.ts]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: semantic + lexical
+
+  type_declaration:
+    description: TypeScript type definitions and interfaces
+    extensions: [.d.ts]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: lexical_priority
+
+  schema_contract:
+    description: OKF, JSON Schema, Zod schema files — formal data contracts
+    extensions: [.okf, .schema.json]
+    path_patterns: ["schemas/**", "src/**/*.schema.*"]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: semantic + exact_match
+    special: schema_versioning_required
+
+  migration_script:
+    description: Database migrations and schema evolution scripts
+    extensions: [.sql]
+    path_patterns: ["drizzle/**", "migrations/**"]
+    embedding_lane: sparse_bm25
+    index_collection: null
+    search_lane: lexical_only
+
+  atlas_script:
+    description: Node.js Atlas pipeline scripts (ingestion, alignment, audit)
+    extensions: [.mjs, .mts]
+    path_patterns: ["scripts/atlas/**"]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: semantic + lexical
+
+  test_file:
+    description: Unit, integration, and E2E test files
+    extensions: [.spec.ts, .test.ts, .spec.js]
+    path_patterns: ["tests/**", "src/**/*.spec.*", "src/**/*.test.*"]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: lexical_priority
+
+  config_file:
+    description: Build, lint, deployment, and tooling configuration
+    extensions: [.json, .jsonc, .toml, .yaml, .yml]
+    excludes_if_path: ["src/**", "schemas/**"]
+    embedding_lane: null
+    index_collection: null
+    search_lane: exact_match_only
+
+  documentation_page:
+    description: Markdown documentation files
+    extensions: [.md]
+    path_patterns: ["docs/**", "memory/**", "*.md"]
+    embedding_lane: dense_768
+    index_collection: docs_chunks_768
+    search_lane: semantic
+
+  agent_card:
+    description: AGENTS.md directory context files
+    filename_exact: AGENTS.md
+    embedding_lane: dense_768
+    index_collection: docs_chunks_768
+    search_lane: semantic + directory_walk
+
+  okf_schema:
+    description: Atlas OKF domain schema files (this kind)
+    extensions: [.okf]
+    path_patterns: ["schemas/**"]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: semantic + exact_match
+    note: Schema files are both artifact and contract — indexed and validated
+
+  binary_asset:
+    description: Images, fonts, WASM, compiled objects
+    extensions: [.png, .jpg, .svg, .wasm, .node, .bin]
+    embedding_lane: null
+    index_collection: null
+    search_lane: metadata_only
+
+  proto_file:
+    description: Protobuf service and message definitions
+    extensions: [.proto]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: lexical_priority
+
+  native_source:
+    description: C/C++/CUDA native source files (simd-bridge, Go services, Rust crates)
+    extensions: [.c, .h, .cpp, .cc, .hpp, .cu, .cuh, .go, .rs, .py, .pyi]
+    path_patterns: ["simd-bridge/**", "services/**", "packages/**/*.rs"]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: lexical_priority
+
+  shader_source:
+    description: GPU shader programs (WebGPU WGSL, GLSL, HLSL, Metal)
+    extensions: [.wgsl, .glsl, .hlsl, .metal]
+    embedding_lane: dense_768
+    index_collection: codebase_chunks_768
+    search_lane: semantic + lexical
+
+# ── Routing table ─────────────────────────────────────────────────────────────
+routing:
+  dense_768:
+    collection: codebase_chunks_768
+    vector_name: content
+    dim: 768
+    model: embeddinggemma:latest
+
+  docs_768:
+    collection: docs_chunks_768
+    vector_name: content
+    dim: 768
+    model: embeddinggemma:latest
+
+  sparse_bm25:
+    collection: null
+    backend: postgres_fts
+    column: content_tsv
+
+# ── Identity fields ───────────────────────────────────────────────────────────
+fields:
+  artifact_id:
+    type: string
+    description: >
+      Stable artifact identity. Format: "artifact:<sha256-prefix-of-source-ref>".
+      Does not change when file is renamed (tracked in atlas_source_refs).
+
+  source_ref:
+    type: string
+    description: Repo-relative path. Primary lookup key.
+
+  artifact_kind:
+    type: enum
+    values: [source_module, type_declaration, schema_contract, migration_script,
+             atlas_script, test_file, config_file, documentation_page, agent_card,
+             okf_schema, binary_asset, proto_file, native_source, shader_source]
+
+  packet_key:
+    type: string
+    description: FK into atlas_packets. Format matches atlas_packets.packet_key.
+    nullable: true
+    note: Set after atlas_packets ingestion completes. Not required for classification.
+
+  index_status:
+    type: enum
+    values: [PENDING, INDEXED, SKIPPED_NO_LANE, FAILED]
+    description: Current state in the indexing pipeline for this artifact.
+
+validation_rules:
+  - Every source_ref must map to exactly one artifact_kind
+  - binary_asset and config_file artifacts are never embedded (embedding_lane=null)
+  - schema_contract artifacts require schema_versioning_required=true processing
+  - okf_schema artifacts are both indexed AND validated against the meta-schema
+
+write_path: >
+  file scan (Stage 1)
+    → artifact classification (artifact_kind assignment)
+    → INSERT INTO atlas_artifact_index (source_ref, artifact_kind, index_status=PENDING)
+    → embedding lane routing
+    → chunk + embed (if embedding_lane != null)
+    → Qdrant upsert
+    → UPDATE atlas_artifact_index SET index_status=INDEXED

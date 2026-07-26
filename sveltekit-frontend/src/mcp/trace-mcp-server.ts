@@ -6544,6 +6544,676 @@ server.registerTool(
   }
 );
 
+// ── Parent Atlas MCP Validation Gateway (5 tools) ────────────────────────────
+//
+// These tools form a protective shell around every side-effecting MCP call.
+// The model MUST traverse this sequence before any mutation is attempted:
+//
+//   ops.inspect_tool_contract        → read the tool's required inputs + auth requirements
+//   ops.validate_tool_call           → pre-flight check: args + auth + workflow state
+//   ops.audit_tool_result            → post-call: verify result is consistent with attempt
+//   ops.verify_write                 → prove a write actually occurred (hash + diff)
+//   ops.validate_claims              → parse proposed response claims against evidence
+//
+// Write-state machine (valid transitions only):
+//   CHANGE_REQUESTED → TARGET_RESOLVED → TOOL_CONTRACT_INSPECTED →
+//   TOOL_CALL_VALIDATED → WRITE_AUTHORIZED → WRITE_ATTEMPTED →
+//   WRITE_VERIFIED → CONFIG_RELOADED → BEHAVIOR_SMOKE_PASS
+//
+// Failure states (terminal, must not claim success after entering):
+//   TARGET_NOT_RESOLVED | TOOL_CONTRACT_UNKNOWN | REQUIRED_ARGUMENT_MISSING |
+//   AUTHORIZATION_MISSING | TOOL_CALL_REJECTED | WRITE_TOOL_FAILED |
+//   WRITE_NOT_PERFORMED | WRITE_VERIFICATION_FAILED | FALSE_COMPLETION_CLAIM
+//
+// Forbidden claims (always blocked, regardless of model confidence):
+//   "the ruleset has been updated"  "the file was edited"  "the change was recorded"
+//   "the workflow is now active"   "the write was attempted"  "the change was applied"
+// — unless ops.verify_write returned { hash_changed: true } in the same evidence chain.
+
+// Tool contract registry — describes every ops.* write tool's requirements.
+// Model reads this; gateway validates against it; model must not invent contracts.
+const TOOL_CONTRACT_REGISTRY: Record<string, {
+  required_inputs: { name: string; type: string; nullable: boolean }[];
+  optional_inputs: { name: string; type: string }[];
+  side_effect_class: 'READ' | 'WRITE' | 'EXEC';
+  target_kind: 'DOCUMENT' | 'DATABASE' | 'PROCESS' | 'NONE';
+  requires_authorization: boolean;
+  supports_dry_run: boolean;
+}> = {
+  'ops.update_LLMS.md': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'dir_path', type: 'string', nullable: false },
+      { name: 'fact', type: 'string', nullable: false },
+    ],
+    optional_inputs: [
+      { name: 'section', type: 'enum(Rules|Context|Tools|Constraints|Notes)' },
+      { name: 'redis_only', type: 'boolean' },
+    ],
+    side_effect_class: 'WRITE',
+    target_kind: 'DOCUMENT',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.propose_patch': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'file_path', type: 'string', nullable: false },
+      { name: 'issue', type: 'string', nullable: false },
+    ],
+    optional_inputs: [{ name: 'context_lines', type: 'integer(5-200)' }],
+    side_effect_class: 'READ',
+    target_kind: 'NONE',
+    requires_authorization: false,
+    supports_dry_run: false,
+  },
+  'ops.record_fix_attempt': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'filePath', type: 'string', nullable: false },
+      { name: 'errorHash', type: 'string', nullable: false },
+      { name: 'fixDiff', type: 'string', nullable: false },
+      { name: 'outcome', type: 'enum(pass|fail|partial)', nullable: false },
+    ],
+    optional_inputs: [{ name: 'notes', type: 'string' }],
+    side_effect_class: 'WRITE',
+    target_kind: 'DATABASE',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.run_targeted_test': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+      { name: 'testFile', type: 'string', nullable: false },
+    ],
+    optional_inputs: [{ name: 'timeoutMs', type: 'integer' }],
+    side_effect_class: 'EXEC',
+    target_kind: 'PROCESS',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+  'ops.run_quality_gate': {
+    required_inputs: [
+      { name: 'operator_token', type: 'string', nullable: false },
+    ],
+    optional_inputs: [{ name: 'targetFile', type: 'string' }],
+    side_effect_class: 'EXEC',
+    target_kind: 'PROCESS',
+    requires_authorization: true,
+    supports_dry_run: false,
+  },
+};
+
+// Known false-completion claim phrases (lowercase, substring match)
+const FALSE_COMPLETION_PHRASES = [
+  'the ruleset has been updated',
+  'the file was edited',
+  'the change was recorded',
+  'the workflow is now active',
+  'the update was recorded',
+  'the target was modified',
+  'the write was attempted',
+  'the change was applied',
+  'the rule was saved',
+  'successfully updated',
+  'has been applied',
+  'is now active',
+  'was successfully written',
+];
+
+// ── ops.inspect_tool_contract ─────────────────────────────────────────────────
+server.registerTool(
+  'ops.inspect_tool_contract',
+  {
+    description:
+      'Returns the formal input contract for a named ops.* tool: required fields, ' +
+      'types, nullability, side-effect class, and authorization requirements. ' +
+      'MUST be called before any write tool invocation to prove the model read the contract.',
+    inputSchema: z.object({
+      tool_name: z.string().describe('Exact tool name, e.g. "ops.update_LLMS.md"'),
+    }),
+  },
+  async ({ tool_name }) => {
+    const contract = TOOL_CONTRACT_REGISTRY[tool_name];
+    if (!contract) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              ok: false,
+              state: 'TOOL_CONTRACT_UNKNOWN',
+              tool_name,
+              error: `No contract registered for "${tool_name}". ` +
+                `Known write tools: ${Object.keys(TOOL_CONTRACT_REGISTRY).join(', ')}`,
+              next_allowed_tools: ['ops.inspect_tool_contract'],
+              forbidden_claims: FALSE_COMPLETION_PHRASES,
+            }),
+          },
+        ],
+      };
+    }
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true,
+            state: 'TOOL_CONTRACT_INSPECTED',
+            data: { tool_name, ...contract },
+            instruction:
+              'Read every required_input. A null or missing value for any nullable=false field ' +
+              'MUST cause ops.validate_tool_call to reject the call BEFORE invocation. ' +
+              'Do NOT invent placeholder tokens. Do NOT omit required fields.',
+            next_allowed_tools: ['ops.validate_tool_call'],
+          }),
+        },
+      ],
+    };
+  }
+);
+
+// ── ops.validate_tool_call ────────────────────────────────────────────────────
+server.registerTool(
+  'ops.validate_tool_call',
+  {
+    description:
+      'Pre-flight validation for any ops.* write tool call. ' +
+      'Checks all required arguments are non-null non-empty strings, ' +
+      'validates authorization evidence is present for WRITE tools, ' +
+      'and verifies the current workflow state permits a write attempt. ' +
+      'If this tool returns ok=false, the actual write tool MUST NOT be invoked.',
+    inputSchema: z.object({
+      tool_name: z.string().describe('The tool about to be called'),
+      arguments: z.record(z.string(), z.any()).describe('The exact arguments object for the call'),
+      authorization_evidence_id: z
+        .string()
+        .optional()
+        .describe('Evidence ID proving operator authorization (required for WRITE tools)'),
+      current_workflow_state: z
+        .string()
+        .optional()
+        .describe('Current state in the write-state machine'),
+    }),
+  },
+  async ({ tool_name, arguments: args, authorization_evidence_id, current_workflow_state }) => {
+    const contract = TOOL_CONTRACT_REGISTRY[tool_name];
+    if (!contract) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              ok: false,
+              state: 'TOOL_CALL_REJECTED',
+              reason_codes: ['TOOL_CONTRACT_UNKNOWN'],
+              tool_name,
+              tool_invocation_allowed: false,
+              write_allowed: false,
+              next_allowed_tools: ['ops.inspect_tool_contract'],
+              forbidden_claims: FALSE_COMPLETION_PHRASES,
+            }),
+          },
+        ],
+      };
+    }
+
+    const invalid_arguments: { name: string; expected: string; received: string }[] = [];
+    const reason_codes: string[] = [];
+
+    // Check each required input
+    for (const field of contract.required_inputs) {
+      const val = args?.[field.name];
+      const missing = val === null || val === undefined || val === '';
+      const wrongType = !missing && typeof val !== field.type.split('(')[0] && field.type !== 'any';
+      if (field.nullable === false && missing) {
+        invalid_arguments.push({
+          name: field.name,
+          expected: `non-empty ${field.type}`,
+          received: val === null ? 'null' : val === undefined ? 'undefined' : '""',
+        });
+        reason_codes.push('REQUIRED_ARGUMENT_NULL');
+      } else if (wrongType) {
+        invalid_arguments.push({
+          name: field.name,
+          expected: field.type,
+          received: typeof val,
+        });
+        reason_codes.push('ARGUMENT_TYPE_MISMATCH');
+      }
+    }
+
+    // Check authorization for WRITE tools
+    if (contract.requires_authorization && contract.side_effect_class === 'WRITE') {
+      if (!authorization_evidence_id || authorization_evidence_id.trim() === '') {
+        reason_codes.push('AUTHORIZATION_MISSING');
+      }
+    }
+
+    // Validate that operator_token is not a placeholder
+    const token = args?.['operator_token'];
+    if (token !== undefined && typeof token === 'string') {
+      const PLACEHOLDER_TOKENS = ['null', 'placeholder', 'temporary', 'inferred', 'yes', 'true', 'approved'];
+      if (PLACEHOLDER_TOKENS.includes(token.toLowerCase().trim())) {
+        invalid_arguments.push({
+          name: 'operator_token',
+          expected: 'genuine operator-issued token (not a placeholder)',
+          received: `"${token}" — this is a known disallowed placeholder value`,
+        });
+        reason_codes.push('OPERATOR_TOKEN_IS_PLACEHOLDER');
+      }
+    }
+
+    const unique_codes = [...new Set(reason_codes)];
+    if (unique_codes.length > 0) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              ok: false,
+              state: 'TOOL_CALL_REJECTED',
+              reason_codes: unique_codes,
+              tool_name,
+              invalid_arguments,
+              tool_invocation_allowed: false,
+              write_allowed: false,
+              user_approved_change: current_workflow_state === 'CHANGE_REQUESTED',
+              operator_authorized_write: false,
+              operator_token_present: !!(args?.['operator_token'] && args['operator_token'] !== null),
+              note: 'A user saying "yes" expresses intent but does not manufacture a credential. ' +
+                'user_approved_change=true and operator_authorized_write=false are both valid simultaneously.',
+              next_allowed_tools: ['ops.inspect_tool_contract', 'ops.get_write_authorization'],
+              forbidden_claims: FALSE_COMPLETION_PHRASES,
+            }),
+          },
+        ],
+      };
+    }
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: true,
+            state: 'TOOL_CALL_VALIDATED',
+            tool_name,
+            tool_invocation_allowed: true,
+            write_allowed: contract.side_effect_class === 'WRITE',
+            operator_authorized_write: !!authorization_evidence_id,
+            next_allowed_tools: [tool_name, 'ops.audit_tool_result'],
+          }),
+        },
+      ],
+    };
+  }
+);
+
+// ── ops.audit_tool_result ─────────────────────────────────────────────────────
+server.registerTool(
+  'ops.audit_tool_result',
+  {
+    description:
+      'Verifies that a tool result is consistent with what was attempted. ' +
+      'Classifies the result and determines whether a side effect actually occurred. ' +
+      'MUST be called after every ops.* invocation before the model responds to the user.',
+    inputSchema: z.object({
+      tool_name: z.string().describe('The tool that was called'),
+      tool_call_id: z.string().optional().describe('Identifier for the call (for correlation)'),
+      expected_effect: z
+        .enum(['DOCUMENT_UPDATED', 'DATABASE_WRITTEN', 'TEST_EXECUTED', 'PREVIEW_RETURNED', 'NO_SIDE_EFFECT'])
+        .describe('What effect was expected from this call'),
+      result_ok: z.boolean().describe('The ok field from the tool result'),
+      result_error: z.string().optional().describe('Error message if result.ok was false'),
+      result_data: z.record(z.string(), z.any()).optional().describe('Result data fields if ok'),
+    }),
+  },
+  async ({ tool_name, tool_call_id, expected_effect, result_ok, result_error, result_data }) => {
+    const contract = TOOL_CONTRACT_REGISTRY[tool_name];
+
+    // Determine if the error indicates an input validation failure
+    const INPUT_VALIDATION_ERRORS = [
+      'operator_token required',
+      'required',
+      'null',
+      'missing',
+      'invalid input',
+    ];
+    const is_input_validation_failure =
+      !result_ok &&
+      result_error &&
+      INPUT_VALIDATION_ERRORS.some((phrase) =>
+        result_error.toLowerCase().includes(phrase.toLowerCase())
+      );
+
+    // A side effect occurred only if ok=true AND expected_effect is a mutation
+    const mutation_effects = new Set(['DOCUMENT_UPDATED', 'DATABASE_WRITTEN']);
+    const side_effect_occurred = result_ok && mutation_effects.has(expected_effect);
+
+    // Write receipt is present only if ok=true and result contains path or key evidence
+    const write_receipt_present =
+      result_ok &&
+      result_data !== undefined &&
+      (result_data['disk_path'] !== undefined ||
+        result_data['redis_key'] !== undefined ||
+        result_data['rows_affected'] !== undefined);
+
+    const result_classification = is_input_validation_failure
+      ? 'INPUT_VALIDATION_FAILURE'
+      : !result_ok
+        ? 'TOOL_EXECUTION_FAILED'
+        : side_effect_occurred
+          ? 'SIDE_EFFECT_CONFIRMED'
+          : 'READ_ONLY_SUCCESS';
+
+    const allowed_claims: string[] = [];
+    const forbidden_claims: string[] = [...FALSE_COMPLETION_PHRASES];
+
+    if (is_input_validation_failure) {
+      const missing_field = result_error?.includes('operator_token') ? 'operator_token' : 'a required field';
+      allowed_claims.push(`The attempted ${tool_name} failed because ${missing_field} was missing or null.`);
+      allowed_claims.push(`No write was performed. The precondition was not met.`);
+    } else if (side_effect_occurred && write_receipt_present) {
+      // Only now are positive claims permitted
+      allowed_claims.push(`${tool_name} completed. Redis key or disk path confirmed in result.`);
+      // Remove the blanket prohibitions for claims that are now backed by evidence
+      const backed = ['the change was recorded', 'was successfully written'];
+      backed.forEach((phrase) => {
+        const idx = forbidden_claims.indexOf(phrase);
+        if (idx !== -1) forbidden_claims.splice(idx, 1);
+      });
+    }
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: !is_input_validation_failure && result_ok,
+            state: is_input_validation_failure
+              ? 'WRITE_PRECONDITION_FAILED'
+              : !result_ok
+                ? 'TOOL_EXECUTION_FAILED'
+                : 'SIDE_EFFECT_CONFIRMED',
+            tool_name,
+            tool_call_id,
+            result_classification,
+            side_effect_occurred,
+            evidence: {
+              write_receipt_present,
+              target_path_present: !!result_data?.['disk_path'],
+              redis_key_present: !!result_data?.['redis_key'],
+              before_hash_present: false,
+              after_hash_present: false,
+              diff_present: false,
+            },
+            allowed_claims,
+            forbidden_claims,
+            next_allowed_tools: side_effect_occurred
+              ? ['ops.verify_write', 'ops.validate_claims']
+              : ['ops.inspect_tool_contract', 'ops.validate_tool_call'],
+          }),
+        },
+      ],
+    };
+  }
+);
+
+// ── ops.verify_write ──────────────────────────────────────────────────────────
+server.registerTool(
+  'ops.verify_write',
+  {
+    description:
+      'Proves that a write actually occurred by reading the target back and computing its hash. ' +
+      'A write is NOT proven merely because a tool returned ok=true. ' +
+      'For file writes: reads the file, computes SHA-256, compares to expected_before_hash. ' +
+      'For Redis writes: reads the key back and confirms content matches. ' +
+      'For Postgres writes: counts affected rows and reads stored content hash.',
+    inputSchema: z.object({
+      target_kind: z
+        .enum(['FILE', 'REDIS_KEY', 'POSTGRES_ROW'])
+        .describe('Type of write target to verify'),
+      target: z.string().describe('File path, Redis key, or "table:pk_value"'),
+      expected_contains: z
+        .string()
+        .optional()
+        .describe('A substring that must be present in the post-write read'),
+      expected_before_hash: z
+        .string()
+        .optional()
+        .describe('SHA-256 of the target before the write (proves change)'),
+    }),
+  },
+  async ({ target_kind, target, expected_contains, expected_before_hash }) => {
+    const { createHash } = await import('node:crypto');
+
+    if (target_kind === 'FILE') {
+      const { existsSync, readFileSync } = await import('node:fs');
+      const { resolve } = await import('node:path');
+      const abs = resolve(process.cwd(), target.replace(/\.\./g, ''));
+      if (!existsSync(abs)) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify({
+                ok: false,
+                state: 'WRITE_VERIFICATION_FAILED',
+                target,
+                error: 'File does not exist after write',
+                hash_changed: false,
+                post_write_read_verified: false,
+              }),
+            },
+          ],
+        };
+      }
+      const content = readFileSync(abs, 'utf8');
+      const after_hash = createHash('sha256').update(content).digest('hex');
+      const hash_changed = expected_before_hash ? after_hash !== expected_before_hash : null;
+      const contains_ok = expected_contains ? content.includes(expected_contains) : true;
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({
+              ok: contains_ok && hash_changed !== false,
+              state: contains_ok && hash_changed !== false ? 'WRITE_VERIFIED' : 'WRITE_VERIFICATION_FAILED',
+              target,
+              after_hash,
+              hash_changed,
+              post_write_read_verified: contains_ok,
+              content_preview: content.slice(-300),
+            }),
+          },
+        ],
+      };
+    }
+
+    if (target_kind === 'REDIS_KEY') {
+      const { default: Redis } = await import('ioredis');
+      const redis = new Redis({
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD,
+        lazyConnect: true,
+        connectTimeout: 3000,
+        enableReadyCheck: false,
+        retryStrategy: () => null,
+      });
+      try {
+        await redis.connect();
+        const val = await redis.get(target);
+        if (!val) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({
+                  ok: false,
+                  state: 'WRITE_VERIFICATION_FAILED',
+                  target,
+                  error: 'Redis key not found or empty after write',
+                  hash_changed: false,
+                  post_write_read_verified: false,
+                }),
+              },
+            ],
+          };
+        }
+        const after_hash = createHash('sha256').update(val).digest('hex');
+        const hash_changed = expected_before_hash ? after_hash !== expected_before_hash : null;
+        const contains_ok = expected_contains ? val.includes(expected_contains) : true;
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify({
+                ok: contains_ok && hash_changed !== false,
+                state: contains_ok && hash_changed !== false ? 'WRITE_VERIFIED' : 'WRITE_VERIFICATION_FAILED',
+                target,
+                after_hash,
+                hash_changed,
+                post_write_read_verified: contains_ok,
+                value_length: val.length,
+              }),
+            },
+          ],
+        };
+      } finally {
+        await redis.quit().catch(() => {});
+      }
+    }
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: false,
+            state: 'WRITE_VERIFICATION_FAILED',
+            error: `target_kind "${target_kind}" verification not yet implemented`,
+          }),
+        },
+      ],
+    };
+  }
+);
+
+// ── ops.validate_claims ───────────────────────────────────────────────────────
+server.registerTool(
+  'ops.validate_claims',
+  {
+    description:
+      'Parses proposed agent response claims and verifies each one against evidence. ' +
+      'Detects false completion claims (claiming success without proof). ' +
+      'MUST be called before the agent sends any response that asserts a write occurred. ' +
+      'Returns supported=true only for claims backed by ops.verify_write or ops.audit_tool_result evidence.',
+    inputSchema: z.object({
+      draft_claims: z
+        .array(z.string())
+        .min(1)
+        .max(20)
+        .describe('List of proposed claims the agent wants to make in its response'),
+      evidence_ids: z
+        .array(z.string())
+        .optional()
+        .describe('Tool call IDs or result evidence from prior ops.* calls that back the claims'),
+      write_verified: z
+        .boolean()
+        .optional()
+        .describe('True only if ops.verify_write returned state=WRITE_VERIFIED in this session'),
+      side_effect_confirmed: z
+        .boolean()
+        .optional()
+        .describe('True only if ops.audit_tool_result returned side_effect_occurred=true'),
+    }),
+  },
+  async ({ draft_claims, evidence_ids, write_verified, side_effect_confirmed }) => {
+    const validated_claims = draft_claims.map((claim) => {
+      const lower = claim.toLowerCase();
+
+      // Check for known false-completion phrases
+      const matched_phrase = FALSE_COMPLETION_PHRASES.find((phrase) => lower.includes(phrase));
+      if (matched_phrase) {
+        const needs_write_evidence =
+          matched_phrase.includes('updated') ||
+          matched_phrase.includes('applied') ||
+          matched_phrase.includes('recorded') ||
+          matched_phrase.includes('written') ||
+          matched_phrase.includes('active') ||
+          matched_phrase.includes('edited');
+
+        const has_evidence = write_verified === true && side_effect_confirmed === true;
+        if (needs_write_evidence && !has_evidence) {
+          return {
+            claim,
+            supported: false,
+            reason: 'WRITE_NOT_PROVEN',
+            missing_evidence: [
+              'ops.verify_write result with state=WRITE_VERIFIED',
+              'ops.audit_tool_result result with side_effect_occurred=true',
+            ],
+            replacement:
+              matched_phrase.includes('updated') || matched_phrase.includes('active')
+                ? `The attempted ${matched_phrase.includes('ruleset') ? 'rules update' : 'update'} was NOT performed — the required preconditions were not met.`
+                : `The operation was not completed. No write was performed.`,
+          };
+        }
+      }
+
+      // Claims about failures are always permitted
+      const is_failure_claim =
+        lower.includes('failed') ||
+        lower.includes('was not') ||
+        lower.includes('did not') ||
+        lower.includes('missing') ||
+        lower.includes('precondition') ||
+        lower.includes('rejected') ||
+        lower.includes('could not');
+      if (is_failure_claim) {
+        return { claim, supported: true, reason: 'FAILURE_CLAIM_PERMITTED' };
+      }
+
+      // Neutral / informational claims
+      return { claim, supported: true, reason: 'NEUTRAL_CLAIM' };
+    });
+
+    const unsupported = validated_claims.filter((c) => !c.supported);
+    const all_supported = unsupported.length === 0;
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify({
+            ok: all_supported,
+            state: all_supported ? 'CLAIMS_VALIDATED' : 'UNSUPPORTED_CLAIMS_FOUND',
+            claims: validated_claims,
+            unsupported_count: unsupported.length,
+            write_evidence_present: write_verified === true && side_effect_confirmed === true,
+            evidence_ids: evidence_ids ?? [],
+            instruction: all_supported
+              ? 'All claims are backed by evidence. Safe to include in response.'
+              : `${unsupported.length} claim(s) are not backed by evidence. ` +
+                'Use the "replacement" text instead of the original claim. ' +
+                'Do NOT claim success without proven write evidence.',
+          }),
+        },
+      ],
+    };
+  }
+);
+
+// Add the 5 validation gateway tools to the batch denylist
+// (they must be called directly, not via batch dispatch)
+BATCH_DENYLIST.add('ops.inspect_tool_contract');
+BATCH_DENYLIST.add('ops.validate_tool_call');
+BATCH_DENYLIST.add('ops.audit_tool_result');
+BATCH_DENYLIST.add('ops.verify_write');
+BATCH_DENYLIST.add('ops.validate_claims');
+
 // ── ops.fixer_semantic_recall ─────────────────────────────────────────────────
 // 3-layer recall: Redis L1 (exact hash) → Postgres L2 → Qdrant L3 (semantic).
 

@@ -1,0 +1,9 @@
+[
+  {
+    "path": "sveltekit-frontend/configs/templates/gemma4-opencode.jinja",
+    "archive_path": "deeds_labs/archive/2026-07-25/sveltekit-gemma4-opencode.jinja.bak",
+    "sha256": "12b59551490af791f50f4262fc3988768f048ea0db2be0f44e9ab91fbeb828b1",
+    "archived": "2026-07-25T00:00:00Z",
+    "reason": "Duplicate of root configs/templates/gemma4-opencode.jinja (also stale — uses OpenAI-style fences, not native Gemma4 DSL). Canonical template is configs/templates/custom_pub_chat_template_gemma4.jinja. This copy was a silent regression risk if anything resolved the sveltekit-frontend path first."
+  }
+]

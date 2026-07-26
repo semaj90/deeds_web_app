@@ -1,0 +1,209 @@
+schema_id: atlas.mcp-validation-contract
+schema_version: 1
+schema_kind: mcp_tool_contract
+status: ACTIVE
+
+description: >
+  Formal contract schema for MCP tool validation gateway.
+  Defines the input/output shape for the five ops.* validation tools,
+  the write-state machine transitions, forbidden claim detection,
+  and operator authorization separation.
+
+  The gateway enforces that the model cannot claim a write occurred
+  without cryptographic proof (before/after hash + diff).
+
+# ── Write-state machine ───────────────────────────────────────────────────────
+write_state_machine:
+  initial: CHANGE_REQUESTED
+
+  transitions:
+    CHANGE_REQUESTED:
+      allowed_next: [TARGET_RESOLVED, TARGET_NOT_RESOLVED]
+      required_tool: ops.inspect_tool_contract
+
+    TARGET_RESOLVED:
+      allowed_next: [TOOL_CONTRACT_INSPECTED, TOOL_CONTRACT_UNKNOWN]
+      required_tool: ops.inspect_tool_contract
+
+    TOOL_CONTRACT_INSPECTED:
+      allowed_next: [TOOL_CALL_VALIDATED, REQUIRED_ARGUMENT_MISSING, AUTHORIZATION_MISSING]
+      required_tool: ops.validate_tool_call
+
+    TOOL_CALL_VALIDATED:
+      allowed_next: [WRITE_AUTHORIZED, AUTHORIZATION_MISSING]
+      required_tool: ops.validate_tool_call
+
+    WRITE_AUTHORIZED:
+      allowed_next: [WRITE_ATTEMPTED, TOOL_CALL_REJECTED]
+      required_tool: <the actual write tool>
+
+    WRITE_ATTEMPTED:
+      allowed_next: [WRITE_VERIFIED, WRITE_NOT_PERFORMED, WRITE_TOOL_FAILED]
+      required_tool: ops.audit_tool_result
+
+    WRITE_VERIFIED:
+      allowed_next: [CONFIG_RELOADED, BEHAVIOR_SMOKE_PASS, CLAIMS_VALIDATED]
+      required_tool: ops.verify_write
+
+    CONFIG_RELOADED:
+      allowed_next: [BEHAVIOR_SMOKE_PASS]
+      required_tool: ops.verify_write
+
+    BEHAVIOR_SMOKE_PASS:
+      allowed_next: [CLAIMS_VALIDATED]
+      required_tool: ops.validate_claims
+
+  failure_states:
+    - TARGET_NOT_RESOLVED
+    - TOOL_CONTRACT_UNKNOWN
+    - REQUIRED_ARGUMENT_MISSING
+    - AUTHORIZATION_MISSING
+    - TOOL_CALL_REJECTED
+    - WRITE_TOOL_FAILED
+    - WRITE_NOT_PERFORMED
+    - WRITE_VERIFICATION_FAILED
+    - CONFIG_NOT_RELOADED
+    - BEHAVIOR_NOT_VALIDATED
+    - FALSE_COMPLETION_CLAIM
+
+  terminal_on_failure: true
+  note: >
+    Once in a failure state the machine MUST NOT transition to WRITE_ATTEMPTED,
+    WRITE_VERIFIED, or any state that implies success. The machine stops at the
+    failure state and the model must report the failure to the user.
+
+# ── Tool contracts ────────────────────────────────────────────────────────────
+tools:
+  ops.inspect_tool_contract:
+    side_effect_class: READ
+    input:
+      tool_name: {type: string, nullable: false}
+    output_state_on_success: TOOL_CONTRACT_INSPECTED
+    output_state_on_failure: TOOL_CONTRACT_UNKNOWN
+
+  ops.validate_tool_call:
+    side_effect_class: READ
+    input:
+      tool_name: {type: string, nullable: false}
+      arguments: {type: object, nullable: false}
+      authorization_evidence_id: {type: string, nullable: true, optional: true}
+      current_workflow_state: {type: string, nullable: true, optional: true}
+    output_state_on_success: TOOL_CALL_VALIDATED
+    output_state_on_failure: TOOL_CALL_REJECTED
+
+  ops.audit_tool_result:
+    side_effect_class: READ
+    input:
+      tool_name: {type: string, nullable: false}
+      tool_call_id: {type: string, nullable: true, optional: true}
+      expected_effect:
+        type: enum
+        values: [DOCUMENT_UPDATED, DATABASE_WRITTEN, TEST_EXECUTED, PREVIEW_RETURNED, NO_SIDE_EFFECT]
+        nullable: false
+      result_ok: {type: boolean, nullable: false}
+      result_error: {type: string, nullable: true, optional: true}
+      result_data: {type: object, nullable: true, optional: true}
+    output_state_on_success: SIDE_EFFECT_CONFIRMED
+    output_state_on_failure: WRITE_PRECONDITION_FAILED
+
+  ops.verify_write:
+    side_effect_class: READ
+    input:
+      target_kind:
+        type: enum
+        values: [FILE, REDIS_KEY, POSTGRES_ROW]
+        nullable: false
+      target: {type: string, nullable: false}
+      expected_contains: {type: string, nullable: true, optional: true}
+      expected_before_hash: {type: string, nullable: true, optional: true}
+    output_state_on_success: WRITE_VERIFIED
+    output_state_on_failure: WRITE_VERIFICATION_FAILED
+    proof_requirements:
+      - after_hash: sha256 of post-write content
+      - hash_changed: true when before_hash supplied and differs
+      - post_write_read_verified: content actually read back
+
+  ops.validate_claims:
+    side_effect_class: READ
+    input:
+      draft_claims: {type: array<string>, min: 1, max: 20, nullable: false}
+      evidence_ids: {type: array<string>, nullable: true, optional: true}
+      write_verified: {type: boolean, nullable: true, optional: true}
+      side_effect_confirmed: {type: boolean, nullable: true, optional: true}
+    output_state_on_success: CLAIMS_VALIDATED
+    output_state_on_failure: UNSUPPORTED_CLAIMS_FOUND
+
+# ── Authorization contract ────────────────────────────────────────────────────
+authorization:
+  operator_token_policy:
+    description: >
+      The model MUST NOT invent, guess, or use placeholder tokens.
+      Three valid paths only:
+        1. Token supplied by an authorized user or operator in the current session
+        2. Token retrieved from a configured secure credential provider
+        3. Tool call BLOCKED — no third option
+    disallowed_values:
+      - null
+      - ""
+      - "placeholder"
+      - "temporary"
+      - "inferred"
+      - "yes"
+      - "true"
+      - "approved"
+    note: >
+      user_approved_change=true and operator_authorized_write=false are simultaneously
+      valid. A user saying "yes" or "go ahead" expresses intent but does NOT
+      manufacture an operator_token. Intent and authorization are distinct concepts.
+
+# ── Forbidden claim detection ─────────────────────────────────────────────────
+forbidden_claims:
+  phrases:
+    - "the ruleset has been updated"
+    - "the file was edited"
+    - "the change was recorded"
+    - "the workflow is now active"
+    - "the update was recorded"
+    - "the target was modified"
+    - "the write was attempted"
+    - "the change was applied"
+    - "the rule was saved"
+    - "successfully updated"
+    - "has been applied"
+    - "is now active"
+    - "was successfully written"
+  detection: substring match, case-insensitive
+  unblock_condition: >
+    A claim is unblocked only when ops.verify_write returned state=WRITE_VERIFIED
+    AND ops.audit_tool_result returned side_effect_occurred=true in the same
+    evidence chain (same conversation, same tool_call_id lineage).
+
+# ── Correct response contract ────────────────────────────────────────────────
+correct_failure_response:
+  example_incident: ops.update_LLMS.md called with operator_token=null
+  correct_state: WRITE_PRECONDITION_FAILED
+  proven:
+    - "The requested rules update was understood."
+    - "The write tool requires a non-empty operator_token."
+    - "The attempted call supplied null."
+    - "The tool rejected the call."
+    - "No edit was performed."
+  not_proven:
+    - "The target rules file was modified."
+    - "The new MCP workflow is active."
+    - "OpenCode or Gemma4 loaded the new rules."
+    - "The mandatory entry gate behavior works."
+  contradictions:
+    - "'the ruleset has been updated' conflicts with failed tool result"
+  next_allowed_tool: ops.inspect_tool_contract
+  after_valid_token: ops.validate_tool_call
+
+write_path: >
+  CHANGE_REQUESTED
+    → ops.inspect_tool_contract → TOOL_CONTRACT_INSPECTED
+    → ops.validate_tool_call → TOOL_CALL_VALIDATED
+    → <write tool> → WRITE_ATTEMPTED
+    → ops.audit_tool_result → SIDE_EFFECT_CONFIRMED
+    → ops.verify_write → WRITE_VERIFIED
+    → ops.validate_claims → CLAIMS_VALIDATED
+    → respond to user with validated claims only

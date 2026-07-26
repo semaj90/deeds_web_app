@@ -1,0 +1,92 @@
+{
+  "total_scanned": 1602,
+  "matched": 845,
+  "updated": 845,
+  "orphaned": 757,
+  "no_source_ref": 0,
+  "errors": 0,
+  "orphaned_points": [
+    {
+      "id": "02a1d423-face-43ba-b851-7c0fd94424a3",
+      "source_ref": "sveltekit-frontend/src/routes/(dev)/odin/AGENTS.md"
+    },
+    {
+      "id": "02a456f1-b2bb-4889-8568-0e04227d9a0b",
+      "source_ref": "sveltekit-frontend/src/lib/components/recommendations/AGENTS.md"
+    },
+    {
+      "id": "02e919ae-9bdc-42d4-bc5f-dd6bc521c470",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/chat/[id]/AGENTS.md"
+    },
+    {
+      "id": "02e919e6-96ab-4660-9004-050b1f8d5c7c",
+      "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/KAGTraverser.ts"
+    },
+    {
+      "id": "02f10f38-4f90-4001-af58-041d7c89a4ec",
+      "source_ref": "sveltekit-frontend/src/lib/server/ocr/AGENTS.md"
+    },
+    {
+      "id": "031cf4bf-4e4a-4c51-8a5e-d67b8c0270a4",
+      "source_ref": "sveltekit-frontend/src/lib/components/ui/bits/AGENTS.md"
+    },
+    {
+      "id": "032d1a20-b1e9-4d70-8824-910726301b7c",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/fictional-cases/AGENTS.md"
+    },
+    {
+      "id": "032f0488-f502-451c-829e-9e48771a83f4",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts"
+    },
+    {
+      "id": "0489c739-45c7-4879-8854-a08f488a8a60",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/library/AGENTS.md"
+    },
+    {
+      "id": "04948651-3380-4313-b843-60a3d4ad64ec",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/library/[documentId]/AGENTS.md"
+    },
+    {
+      "id": "049ea5dc-e462-4572-af9a-b669fb32b4fb",
+      "source_ref": "sveltekit-frontend/src/routes/(app)/rag-search/AGENTS.md"
+    },
+    {
+      "id": "04aa76c0-2804-4fb6-922f-a3806451bb0e",
+      "source_ref": "sveltekit-frontend/src/lib/server/evidence/AGENTS.md"
+    },
+    {
+      "id": "04ca3cbb-3e98-43ba-9a83-9ebaecc6b59d",
+      "source_ref": "sveltekit-frontend/src/lib/components/legal/AGENTS.md"
+    },
+    {
+      "id": "04dca991-193e-4dbb-9add-385b3db376a3",
+      "source_ref": "sveltekit-frontend/src/lib/server/grpc/AGENTS.md"
+    },
+    {
+      "id": "04f13100-f681-48ea-a756-ec6e41f7e2de",
+      "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/AGENTS.md"
+    },
+    {
+      "id": "05074737-9760-42f1-81b4-95200c16c04d",
+      "source_ref": "sveltekit-frontend/src/lib/server/db/schema-week3-kb.ts"
+    },
+    {
+      "id": "050a943e-ba09-4e14-b3c9-7a166d1d92fd",
+      "source_ref": "sveltekit-frontend/src/lib/services/error-analysis/OllamaService.ts"
+    },
+    {
+      "id": "0511ecca-47fd-4bfe-b017-453b538b0a26",
+      "source_ref": "sveltekit-frontend/src/lib/server/agents-md/AGENTS.md"
+    },
+    {
+      "id": "081c5d3b-58ca-402a-9f9f-7ae06f356be1",
+      "source_ref": "sveltekit-frontend/src/lib/server/evidence/services/drizzle-stub.ts"
+    },
+    {
+      "id": "08270e95-7a76-4b9c-95fa-df0074669aa5",
+      "source_ref": "sveltekit-frontend/src/lib/ai/AGENTS.md"
+    }
+  ],
+  "run_at": "2026-07-25T22:38:23.114Z",
+  "dry_run": false
+}

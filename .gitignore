@@ -664,6 +664,15 @@ src/lib/wasm/dist/
 *.deb
 
 ########################################
+# Vector data files (>100 MB, not for git)
+# These are local binary artifacts; use vectors/*_row_map.json
+# or scripts/atlas/ to regenerate from Postgres.
+########################################
+vectors/*.arrow
+vectors/*.parquet
+vectors/*.feather
+
+########################################
 # Large text & data files
 ########################################
 *.jsonl

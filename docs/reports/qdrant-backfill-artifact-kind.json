@@ -1,0 +1,18 @@
+{
+  "run_at": "2026-07-26T00:22:15.541Z",
+  "dry_run": false,
+  "collection": "codebase_chunks_768",
+  "kind_filter": null,
+  "missing_only": false,
+  "total_scanned": 1343,
+  "no_source_ref": 0,
+  "already_classified": 1343,
+  "classification": {
+    "native_source": 826,
+    "source_module": 425,
+    "shader_source": 91,
+    "test_file": 1
+  },
+  "updated": 1343,
+  "errors": 0
+}

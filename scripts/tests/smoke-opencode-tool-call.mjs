@@ -29,7 +29,7 @@ async function checkProps() {
   const d = await res.json();
   const caps = d.chat_template_caps ?? {};
   if (caps.supports_system_role) ok('supports_system_role');
-  else fail('supports_system_role', 'false — embedded GGUF template lacks system role; restart with --chat-template-file configs/templates/gemma4-opencode.jinja');
+  else fail('supports_system_role', 'false — embedded GGUF template lacks system role; restart with --chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja');
   if (caps.supports_tool_calls) ok('supports_tool_calls');
   else fail('supports_tool_calls', 'false');
 }
@@ -112,7 +112,7 @@ async function main() {
   console.log(`\n── Result: ${passed} passed, ${failed} failed ─────────────`);
   if (failed > 0) {
     console.log('\n  Hard rules for llama-server.exe:');
-    console.log('    ✓ DO pass  --chat-template-file configs/templates/gemma4-opencode.jinja');
+    console.log('    ✓ DO pass  --chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja');
     console.log('    ✗ DO NOT pass --chat-template gemma or --chat-template gemma3 (drops system role)');
     console.log('    ✗ DO NOT pass --reasoning auto or --reasoning-budget 0');
     console.log('    ✓ DO pass  --jinja --reasoning-format none');

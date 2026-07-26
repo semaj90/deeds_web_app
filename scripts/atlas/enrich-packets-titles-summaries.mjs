@@ -98,7 +98,7 @@ async function queryMissingTitlesAndSummaries() {
         cci.content,
         cci.summary
       FROM atlas_packets ap
-      LEFT JOIN codebase_chunk_index cci ON ap.packet_key = cci.packet_key
+      LEFT JOIN codebase_chunk_index cci ON ap.source_ref = cci.source_ref
       WHERE
         ap.packet_key IS NOT NULL
         AND ap.source_ref IS NOT NULL

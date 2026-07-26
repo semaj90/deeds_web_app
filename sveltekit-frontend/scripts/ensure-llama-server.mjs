@@ -144,7 +144,7 @@ const CACHE_REUSE = process.env.LLAMA_CACHE_REUSE ?? '256';
 
 // Chat template: file-based override takes priority, then default to repo template.
 // Set TURBO_CHAT_TEMPLATE_FILE=none to skip (only if GGUF has a correct embedded template).
-const _defaultTemplateFile = path.resolve(workspaceRoot, 'configs', 'templates', 'gemma4-opencode.jinja');
+const _defaultTemplateFile = path.resolve(workspaceRoot, 'configs', 'templates', 'custom_pub_chat_template_gemma4.jinja');
 const CHAT_TEMPLATE_FILE =
   process.env.TURBO_CHAT_TEMPLATE_FILE === 'none'
     ? null

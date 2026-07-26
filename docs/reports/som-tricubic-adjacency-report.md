@@ -1,7 +1,7 @@
 # SOM Tricubic Adjacency Report
 
-Generated: 2026-07-19T22:42:44.321Z
-Mode: **APPLY**
+Generated: 2026-07-25T19:40:23.929Z
+Mode: **DRY-RUN**
 
 ## Summary
 

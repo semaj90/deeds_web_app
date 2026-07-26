@@ -583,23 +583,29 @@ if (-not $StatusOnly) {
             $runningCtx = $slotsInfo[0].n_ctx
             $ctxOk = ($runningCtx -eq [int]$ctxLen)
 
-            # Verify supports_system_role via /props (requires --jinja on this binary)
+            # Verify supports_system_role AND supports_tools via /props (requires --jinja + correct template)
+            # A server can have system_role=true but tools=false if started with gemma4-opencode.jinja
+            # (OpenAI-style fences) instead of the native Gemma4 DSL template.
             $jinjaOk = $false
+            $supportsTools = $false
             try {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
+                $supportsTools = ($props.chat_template_caps.supports_tool_calls -eq $true) -or ($props.chat_template_caps.supports_tools -eq $true) -or ($props.supports_tool_calls -eq $true)
             } catch {
                 # /props unavailable on old builds — treat as unknown, require restart
                 $jinjaOk = $false
+                $supportsTools = $false
             }
 
-            if ($ctxOk -and $jinjaOk) {
-                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK)" -ForegroundColor Yellow
+            if ($ctxOk -and $jinjaOk -and $supportsTools) {
+                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK, tools=OK)" -ForegroundColor Yellow
                 exit 0
             } else {
                 $reason = @()
-                if (-not $ctxOk)   { $reason += "ctx mismatch: running=$runningCtx target=$ctxLen" }
-                if (-not $jinjaOk) { $reason += "supports_system_role:false (stale --chat-template or missing --jinja)" }
+                if (-not $ctxOk)       { $reason += "ctx mismatch: running=$runningCtx target=$ctxLen" }
+                if (-not $jinjaOk)     { $reason += "supports_system_role:false (stale --chat-template or missing --jinja)" }
+                if (-not $supportsTools) { $reason += "supports_tools:false (wrong template — needs custom_pub_chat_template_gemma4.jinja)" }
                 Write-Host ("TurboQuant on :$port needs restart — $($reason -join '; ')") -ForegroundColor Cyan
                 $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                 if ($runningPids) {
@@ -613,11 +619,15 @@ if (-not $StatusOnly) {
             try {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
-                if ($jinjaOk) {
-                    Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK)" -ForegroundColor Yellow
+                $supportsTools = ($props.chat_template_caps.supports_tool_calls -eq $true) -or ($props.chat_template_caps.supports_tools -eq $true) -or ($props.supports_tool_calls -eq $true)
+                if ($jinjaOk -and $supportsTools) {
+                    Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK, tools=OK)" -ForegroundColor Yellow
                     exit 0
                 } else {
-                    Write-Host "TurboQuant on :$port has supports_system_role:false — killing stale server" -ForegroundColor Cyan
+                    $reason2 = @()
+                    if (-not $jinjaOk)     { $reason2 += "supports_system_role:false" }
+                    if (-not $supportsTools) { $reason2 += "supports_tools:false (needs custom_pub_chat_template_gemma4.jinja)" }
+                    Write-Host "TurboQuant on :$port needs restart — $($reason2 -join '; ')" -ForegroundColor Cyan
                     $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                     if ($runningPids) {
                         $runningPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
@@ -831,13 +841,13 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
 # The repo smoke gate expects the server to handle system prompts and tool calls
 # without forcing reasoning budget to zero.
 
-# -- Chat template: use gemma4-opencode.jinja for OpenCode-compatible chat/tool calling --
-# DEFAULT: gemma4-opencode.jinja — handles system role and OpenCode/llama-server
-# compatibility. Keep this as the launcher default; older summary-clean templates
-# and ad-hoc tool templates tend to poison /props capability detection.
+# -- Chat template: use custom_pub_chat_template_gemma4.jinja for OpenCode-compatible chat/tool calling --
+# DEFAULT: custom_pub_chat_template_gemma4.jinja — uses native Gemma 4 DSL (<|tool_call>, <|turn>),
+# fixes 4 known bugs (null→"None", string args corruption, reasoning preservation, turn-tag asymmetry),
+# enables thinking by default (P2 patch improves tool-call accuracy per model card).
 # HARD RULE: always pass --chat-template-file. Never use --chat-template <name>.
 # To use summary-only mode (no tools): set TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
-$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\gemma4-opencode.jinja"
+$defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\custom_pub_chat_template_gemma4.jinja"
 $chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
     $env:TURBO_CHAT_TEMPLATE_FILE
 } elseif (Test-Path $defaultTemplate) {
@@ -856,12 +866,10 @@ if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
 }
 
 # -- Stop sequences: prevent the model from emitting turn markers into the output.
-# The model/template stack is chat-format aware, but this model still tends to
-# echo `<end_of_turn>` / `<start_of_turn>` after short answers unless we stop on
-# the chat boundary itself.
+# custom_pub_chat_template_gemma4.jinja uses native Gemma 4 DSL tokens (<turn|>, <|turn>).
 if (Test-LlamaFlag $llama '--stop') {
-    $baseArgs = $baseArgs + @('--stop', '<|mask_end|>', '--stop', '<end_of_turn>', '--stop', '<start_of_turn>')
-    Write-Host "Stop sequences: --stop <|mask_end|> / <end_of_turn> / <start_of_turn> enabled" -ForegroundColor Cyan
+    $baseArgs = $baseArgs + @('--stop', '<turn|>', '--stop', '<|turn>', '--stop', '<|mask_end|>')
+    Write-Host "Stop sequences: --stop <turn|> / <|turn> / <|mask_end|> enabled" -ForegroundColor Cyan
 } else {
     Write-Host "Stop sequences: --stop not supported by this binary - leaving template boundary unguarded" -ForegroundColor DarkYellow
 }

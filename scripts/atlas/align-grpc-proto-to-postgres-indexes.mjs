@@ -116,18 +116,18 @@ const GEMMA4_OUTPUT_CONTRACT = {
 const INDEX_CAPABILITIES = {
   'codebase_chunk_index': [
     {
-      name: 'feature_id lookup',
-      columns: ['feature_id'],
+      name: 'source_ref lookup',
+      columns: ['source_ref'],
       type: 'btree',
-      description: 'Single-column btree for feature_id GROUP BY and equality filters',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_feature_id ON codebase_chunk_index (feature_id);',
+      description: 'Single-column btree for source_ref GROUP BY and equality filters',
+      sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_source_ref ON codebase_chunk_index (source_ref);',
     },
     {
-      name: 'source_feature multi-hop',
-      columns: ['source_ref', 'feature_id'],
+      name: 'qdrant_id lookup',
+      columns: ['qdrant_id'],
       type: 'btree',
-      description: 'Composite index for source_ref + feature_id joins',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_source_feature ON codebase_chunk_index (source_ref, feature_id);',
+      description: 'Single-column btree for qdrant_id joins back to Qdrant',
+      sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_qdrant_id ON codebase_chunk_index (qdrant_id);',
     },
     {
       name: 'metadata JSONB',
@@ -137,11 +137,11 @@ const INDEX_CAPABILITIES = {
       sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_metadata_gin ON codebase_chunk_index USING gin (metadata);',
     },
     {
-      name: 'packet_key exact',
-      columns: ['packet_key'],
+      name: 'chunk_id exact',
+      columns: ['chunk_id'],
       type: 'btree',
-      description: 'Unique lookup by packet_key (if populated)',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_packet_key ON codebase_chunk_index (packet_key);',
+      description: 'Unique lookup by chunk_id',
+      sql: 'CREATE INDEX IF NOT EXISTS idx_codebase_chunk_index_chunk_id ON codebase_chunk_index (chunk_id);',
     },
     {
       name: 'unsummarized partial',

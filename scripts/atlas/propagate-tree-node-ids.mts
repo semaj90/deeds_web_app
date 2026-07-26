@@ -19,6 +19,9 @@
  */
 
 import pg from 'pg';
+import crypto from 'crypto';
+import { createReadStream } from 'fs';
+import { createInterface } from 'readline';
 
 interface Gate3Options {
   dryRun: boolean;
@@ -37,6 +40,24 @@ function parseArgs(): Gate3Options {
   };
 }
 
+function computeTreeNodeId(summary: string | null, sourceRef: string): string {
+  if (!summary) {
+    return crypto.createHash('sha256').update(sourceRef).digest('hex');
+  }
+  return crypto.createHash('sha256').update(`${sourceRef}:${summary}`).digest('hex');
+}
+
+async function queryPacketStats(pool: pg.Pool) {
+  const result = await pool.query(`
+    SELECT
+      COUNT(*) as total,
+      COUNT(CASE WHEN tree_node_id IS NOT NULL THEN 1 END) as with_id,
+      COUNT(CASE WHEN tree_node_id IS NULL THEN 1 END) as without_id
+    FROM atlas_packets
+  `);
+  return result.rows[0];
+}
+
 async function propagateTreeNodeIds() {
   const opts = parseArgs();
 
@@ -45,117 +66,128 @@ async function propagateTreeNodeIds() {
   console.log('═'.repeat(80));
   console.log();
 
-  if (opts.dryRun) {
-    console.log('DRY RUN MODE: Validating tree_node_id coverage');
-    console.log();
+  const pool = new pg.Pool({
+    host: '127.0.0.1',
+    port: 5434,
+    database: 'legal_ai_db',
+    user: 'legal_admin',
+    password: process.env.POSTGRES_PASSWORD || '123456',
+  });
 
-    // Simulate database query
-    const stats = {
-      totalPackets: 61659,
-      existingTreeNodeIds: 5697,
-      needsExtraction: 55962,
-      needsContentHash: 0,
-    };
+  try {
+    if (opts.dryRun) {
+      console.log('DRY RUN MODE: Validating tree_node_id coverage');
+      console.log();
 
-    console.log('Current coverage:');
-    console.log(`  Total packets:           ${stats.totalPackets}`);
-    console.log(`  With tree_node_id:       ${stats.existingTreeNodeIds} (9.2%)`);
-    console.log(`  Needs AST extraction:    ${stats.needsExtraction} (90.8%)`);
-    console.log(`  Will use content hash:   ${stats.needsContentHash} (0%)`);
-    console.log();
+      const stats = await queryPacketStats(pool);
+      const total = Number(stats.total || 0);
+      const withId = Number(stats.with_id || 0);
+      const withoutId = Number(stats.without_id || 0);
 
-    console.log('Extraction strategy:');
-    console.log('  • Use existing IDs for packets with tree_node_id (reuse)');
-    console.log('  • Extract via TreeNodeExtractor (language-specific AST)');
-    console.log('  • Fallback to SHA-256(content) if AST extraction fails');
-    console.log();
+      console.log('Current coverage:');
+      console.log(`  Total packets:           ${total}`);
+      console.log(`  With tree_node_id:       ${withId} (${(withId / total * 100).toFixed(1)}%)`);
+      console.log(`  Needs ID assignment:     ${withoutId} (${(withoutId / total * 100).toFixed(1)}%)`);
+      console.log();
 
-    console.log('Language coverage:');
-    console.log('  • TypeScript/JavaScript: ~28,000 packets');
-    console.log('  • Rust:                  ~2,100 packets');
-    console.log('  • C/C++:                 ~1,200 packets');
-    console.log('  • Other/Unknown:         ~30,359 packets (content hash)');
-    console.log();
+      console.log('Extraction strategy:');
+      console.log('  • Reuse existing tree_node_id (already computed)');
+      console.log('  • Compute SHA-256(source_ref + summary) for new IDs');
+      console.log('  • Batch update via Postgres');
+      console.log();
 
-    console.log('Expected extraction time: 6 hours CPU');
-    console.log('Postgres batch writes:    ~1000 writes/s');
-    console.log();
-    console.log('✅ DRY RUN COMPLETE: Propagation strategy valid');
-    console.log();
-    process.exit(0);
-  }
-
-  if (opts.apply) {
-    console.log('APPLY MODE: Starting tree_node_id propagation');
-    console.log();
-
-    const startTime = Date.now();
-    const batchSize = 1000;
-    const targetPackets = opts.limit || 61659;
-
-    let processed = 0;
-    let extracted = 0;
-    let reuseExisting = 0;
-    let contentHashFallback = 0;
-    let failed = 0;
-
-    // Simulate propagation phases
-    const phases = [
-      { label: 'Connect to Postgres', duration: 5 },
-      { label: 'Load packets', duration: 30 },
-      { label: 'Extract tree_node_ids', duration: 350 },
-      { label: 'Batch write to Postgres', duration: 50 },
-      { label: 'Verify propagation', duration: 20 },
-    ];
-
-    for (const phase of phases) {
-      console.log(`▶ ${phase.label}...`);
-      // Simulate: await sleep(phase.duration * 1000);
-      console.log(`✅ ${phase.label}`);
+      console.log('Expected timing:');
+      console.log(`  Fetch packets:      ~2-5s`);
+      console.log(`  Compute hashes:     ~${Math.max(5, Math.ceil(withoutId / 100000))}s (CPU-bound)`);
+      console.log(`  Batch updates:      ~${Math.ceil(withoutId / 1000)}s`);
+      console.log();
+      console.log('✅ DRY RUN COMPLETE: Propagation strategy valid');
+      console.log();
+      process.exit(0);
     }
 
-    console.log();
-    console.log('═'.repeat(80));
-    console.log('GATE 3 RESULTS');
-    console.log('═'.repeat(80));
-    console.log();
+    if (opts.apply) {
+      console.log('APPLY MODE: Starting tree_node_id propagation');
+      console.log();
 
-    // Simulate results
-    processed = targetPackets;
-    extracted = Math.floor(targetPackets * 0.9);
-    reuseExisting = Math.floor(targetPackets * 0.09);
-    contentHashFallback = Math.floor(targetPackets * 0.01);
+      const startTime = Date.now();
+      const batchSize = 1000;
+      const limit = opts.limit || 61659;
 
-    console.log('Propagation summary:');
-    console.log(`  Total packets:           ${processed}`);
-    console.log(`  Extracted via AST:       ${extracted} (${(extracted / processed * 100).toFixed(1)}%)`);
-    console.log(`  Reused existing IDs:     ${reuseExisting} (${(reuseExisting / processed * 100).toFixed(1)}%)`);
-    console.log(`  Content hash fallback:   ${contentHashFallback} (${(contentHashFallback / processed * 100).toFixed(1)}%)`);
-    console.log(`  Failed:                  ${failed}`);
-    console.log();
+      // Fetch packets needing tree_node_id
+      const query = `
+        SELECT packet_key, source_ref, summary, tree_node_id
+        FROM atlas_packets
+        WHERE tree_node_id IS NULL
+        AND packet_key IS NOT NULL
+        AND source_ref IS NOT NULL
+        LIMIT $1
+      `;
 
-    console.log('Coverage by language:');
-    console.log('  TypeScript/JavaScript: 28,000/28,000 (100%)');
-    console.log('  Rust:                  2,100/2,100 (100%)');
-    console.log('  C/C++:                 1,200/1,200 (100%)');
-    console.log('  Other/Unknown:         30,359/30,359 (100% via content hash)');
-    console.log();
+      const result = await pool.query(query, [limit]);
+      const packets = result.rows;
 
-    console.log('Database writes:');
-    console.log(`  Batch size:              ${batchSize}`);
-    console.log(`  Total batches:           ${Math.ceil(processed / batchSize)}`);
-    console.log(`  Average throughput:      ${Math.floor(processed / ((Date.now() - startTime) / 1000))}/s`);
-    console.log();
+      console.log(`Fetched ${packets.length} packets needing tree_node_id assignment`);
+      console.log();
 
-    const duration = Date.now() - startTime;
-    console.log(`Duration: ${(duration / 1000).toFixed(1)}s`);
-    console.log('✅ GATE 3 PASS: tree_node_id propagation complete (100% coverage)');
-    console.log();
-    process.exit(0);
+      // Process in batches using individual updates (safer than VALUES clause)
+      let processed = 0;
+      let batchCount = 0;
+
+      for (let i = 0; i < packets.length; i += batchSize) {
+        const batch = packets.slice(i, i + batchSize);
+        batchCount++;
+
+        for (const packet of batch) {
+          const treeNodeId = computeTreeNodeId(packet.summary, packet.source_ref);
+          const updateQuery = `
+            UPDATE atlas_packets
+            SET tree_node_id = $1, updated_at = NOW()
+            WHERE packet_key = $2
+          `;
+          await pool.query(updateQuery, [treeNodeId, packet.packet_key]);
+          processed++;
+        }
+
+        if (opts.verbose) {
+          console.log(`✅ Batch ${batchCount}: ${batch.length} packets updated (total: ${processed})`);
+        }
+      }
+
+      console.log();
+      console.log('═'.repeat(80));
+      console.log('GATE 3 RESULTS');
+      console.log('═'.repeat(80));
+      console.log();
+
+      const finalStats = await queryPacketStats(pool);
+      const finalTotal = Number(finalStats.total || 0);
+      const finalWithId = Number(finalStats.with_id || 0);
+      const coverage = (finalWithId / finalTotal * 100).toFixed(1);
+
+      console.log('Propagation summary:');
+      console.log(`  Total packets:           ${finalTotal}`);
+      console.log(`  With tree_node_id:       ${finalWithId} (${coverage}%)`);
+      console.log(`  Processed this run:      ${processed}`);
+      console.log();
+
+      const duration = Date.now() - startTime;
+      console.log(`Duration: ${(duration / 1000).toFixed(1)}s`);
+
+      if (coverage === '100.0') {
+        console.log('✅ GATE 3 PASS: tree_node_id propagation complete (100% coverage)');
+      } else {
+        console.log(`⚠️ GATE 3 PARTIAL: ${coverage}% coverage (${finalTotal - finalWithId} packets remain)`);
+      }
+      console.log();
+      process.exit(0);
+    }
+
+    console.error('Error: Specify --dry-run or --apply');
+    process.exit(1);
+  } finally {
+    await pool.end();
   }
-
-  console.error('Error: Specify --dry-run or --apply');
-  process.exit(1);
 }
 
 propagateTreeNodeIds().catch(err => {

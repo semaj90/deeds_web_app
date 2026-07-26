@@ -89,7 +89,7 @@ await step('GET /props — server alive + supports_system_role', async () => {
   const props = await res.json();
   if (!props.supports_system_role) {
     throw new Error(
-      'supports_system_role=false — restart with --chat-template-file configs/templates/gemma4-opencode.jinja'
+      'supports_system_role=false — restart with --chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja'
     );
   }
 });

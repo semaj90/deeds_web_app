@@ -39,7 +39,7 @@ const QUEUE_NAME = process.argv.find((arg) => arg.startsWith('--queue='))?.split
 const LIMIT_ARG = process.argv.find((arg) => arg.startsWith('--limit='))?.split('=')[1];
 const LIMIT = LIMIT_ARG ? Math.max(0, Number.parseInt(LIMIT_ARG, 10) || 0) : 0;
 const DRY_RUN = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://$RABBITMQ_USER:$RABBITMQ_PASSWORD@rabbitmq:5672/%2F';
 
 let nativeJsonlLoader = null;
 try {

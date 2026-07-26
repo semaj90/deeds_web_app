@@ -25,6 +25,8 @@ const INDEXES = [
   { field_name: 'som_cluster',      field_schema: 'integer' },
   { field_name: 'kmeans_cluster',   field_schema: 'integer' },
   { field_name: 'metadata_version', field_schema: 'integer' },
+  // Agentic dense search artifact classification (repo-artifact.v1.okf)
+  { field_name: 'artifact_kind',    field_schema: 'keyword' },
 ];
 
 console.log('=== Ensure Qdrant Payload Indexes ===');

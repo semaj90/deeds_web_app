@@ -1,0 +1,129 @@
+{
+  "run_at": "2026-07-25T23:18:36.860Z",
+  "collection": "codebase_chunks_768",
+  "total_points": 54224,
+  "pg_rows_with_qdrant_id": 52417,
+  "classification": {
+    "directory_cluster": 728,
+    "exact_match": 13172,
+    "id_match_no_source_ref": 0,
+    "source_ref_mismatch": 0,
+    "payload_incomplete": 0,
+    "orphan_no_pg_row": 40324
+  },
+  "safe_actions": {
+    "backfill_source_ref": 0,
+    "backfill_packet_key": 0,
+    "investigate_mismatch": 0,
+    "quarantine_candidates": 0,
+    "atlas_only_orphans": 40324,
+    "no_action_exact": 13172
+  },
+  "samples": {
+    "source_ref_mismatch": [],
+    "quarantine_candidates": [],
+    "atlas_only_orphans": [
+      {
+        "id": "195179612",
+        "source_ref": "proto:RetrievalService.Health",
+        "packet_key": "0ba2345cd9c542fa"
+      },
+      {
+        "id": "201318456",
+        "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+        "packet_key": "0bffe0382a0d44bb"
+      },
+      {
+        "id": "250157227",
+        "source_ref": "proto:TurboVecCudaService.Transform",
+        "packet_key": "0ee918abc8c53e8d"
+      },
+      {
+        "id": "386128320",
+        "source_ref": "proto:LibrarySearchService.Health",
+        "packet_key": "1703d9c005252a62"
+      },
+      {
+        "id": "391145144",
+        "source_ref": "proto:TurboVecService.Transform",
+        "packet_key": "175066b8a4ceee3c"
+      },
+      {
+        "id": "400302057",
+        "source_ref": "proto:CodeIntelService.GetJobStatus",
+        "packet_key": "17dc1fe9f5f8a021"
+      },
+      {
+        "id": "492747378",
+        "source_ref": "proto:ChatAssistantService.SendMessage",
+        "packet_key": "1d5eba7211dea6f9"
+      },
+      {
+        "id": "499493931",
+        "source_ref": "proto:LibrarySearchService.StreamLibrary",
+        "packet_key": "1dc5ac2b3cd9bfe8"
+      },
+      {
+        "id": "633873537",
+        "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+        "packet_key": "25c824811a2efd81"
+      },
+      {
+        "id": "656102470",
+        "source_ref": "proto:CyberElephantService.GetClusters",
+        "packet_key": "271b5446f6a86a48"
+      },
+      {
+        "id": "686375646",
+        "source_ref": "proto:CodeIntelService.LookupChunk",
+        "packet_key": "28e942decdcdb342"
+      },
+      {
+        "id": "826103798",
+        "source_ref": "proto:CodeIntelService.SummarizeCluster",
+        "packet_key": "313d57f685058b60"
+      },
+      {
+        "id": "841719032",
+        "source_ref": "proto:RetrievalService.GetTopologyContext",
+        "packet_key": "322b9cf893125f07"
+      },
+      {
+        "id": "851919978",
+        "source_ref": "proto:RetrievalService.SearchCodebase",
+        "packet_key": "32c7446a769f9c86"
+      },
+      {
+        "id": "900720362",
+        "source_ref": "proto:TurboVecCudaService.Search",
+        "packet_key": "35afe6ea3fdb17b8"
+      },
+      {
+        "id": "915173712",
+        "source_ref": "proto:RetrievalService.StreamCodebase",
+        "packet_key": "368c71501e9385c5"
+      },
+      {
+        "id": "953813387",
+        "source_ref": "proto:RetrievalService.SearchEvidence",
+        "packet_key": "38da098bc2c36c22"
+      },
+      {
+        "id": "1005829132",
+        "source_ref": "proto:LibrarySearchService.GetDocumentToc",
+        "packet_key": "3bf3bc0c64d433c0"
+      },
+      {
+        "id": "1024305189",
+        "source_ref": "proto:RetrievalService.SearchChunks",
+        "packet_key": "3d0da82598d9064a"
+      },
+      {
+        "id": "1054683242",
+        "source_ref": "proto:ChatAssistantService.CreateSession",
+        "packet_key": "3edd306a02055c3a"
+      }
+    ],
+    "payload_incomplete": []
+  }
+}

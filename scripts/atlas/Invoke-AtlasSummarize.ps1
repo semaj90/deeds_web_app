@@ -194,7 +194,7 @@ try {
         Write-Ok "Template OK — model responds to instruction"
     } elseif ($probeResult -match '-2b-it|Self-Correction|trained by Google|large language model') {
         Write-Err "Poisoned template detected. llama-server must be restarted with:"
-        Write-Host "  --chat-template-file configs/templates/gemma4-opencode.jinja --jinja" -ForegroundColor Yellow
+        Write-Host "  --chat-template-file configs/templates/custom_pub_chat_template_gemma4.jinja --jinja" -ForegroundColor Yellow
         Write-Host "  (See CLAUDE.md 'OpenCode + llama-server Config' section)" -ForegroundColor Gray
         exit 1
     } else {

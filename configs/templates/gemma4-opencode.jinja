@@ -74,13 +74,9 @@ Rules:
 {%- if message.get('reasoning_content') %}
 {{ message['reasoning_content'] | trim }}
 {%- endif -%}
-
-```
 {%- if message.get('tool_calls') %}
   {%- for tool_call in message['tool_calls'] %}
     {%- set function = tool_call['function'] %}
-```
-
 <tool_call>
 {"name":{{ function['name'] | tojson }},"arguments":{{ function['arguments'] if function['arguments'] is string else function['arguments'] | tojson }}}
 </tool_call>

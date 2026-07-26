@@ -1,0 +1,208 @@
+schema_id: atlas.agentic-dense-search
+schema_version: 1
+schema_kind: retrieval_pipeline_contract
+status: ACTIVE
+
+description: >
+  Retrieval pipeline contract for agentic dense search.
+  Defines the 7-lane fan-out architecture used by Go Retrieval to satisfy
+  natural-language agent queries over the indexed repo artifact corpus.
+
+  An agentic search query is NOT a single-vector ANN lookup.
+  It is a structured multi-lane retrieval that fuses lexical, dense, sparse,
+  topology, documentation, centroid, and temporal evidence before ranking.
+
+  This schema also governs the MCP tool surface that agents use to query:
+  ops.* tools read this contract to determine which lanes to activate.
+
+# ── Query classification ──────────────────────────────────────────────────────
+query_classification:
+  intent_kinds:
+    semantic_concept:
+      description: "what does X mean / how does X work"
+      primary_lanes: [dense, docs]
+      secondary_lanes: [topology, centroid]
+
+    structural_dependency:
+      description: "what imports X / what depends on X"
+      primary_lanes: [topology, lexical]
+      secondary_lanes: [dense]
+
+    exact_symbol:
+      description: "find function X / find class Y"
+      primary_lanes: [lexical, bm25]
+      secondary_lanes: [dense]
+
+    error_pattern:
+      description: "find code similar to this error / fix this pattern"
+      primary_lanes: [dense, sparse]
+      secondary_lanes: [lexical, centroid]
+
+    temporal:
+      description: "what changed recently / show history of X"
+      primary_lanes: [temporal, lexical]
+      secondary_lanes: [dense]
+
+    directory_context:
+      description: "what is in this directory / what does this module own"
+      primary_lanes: [docs, lexical]
+      secondary_lanes: [centroid]
+
+# ── 7-Lane fan-out ────────────────────────────────────────────────────────────
+lanes:
+  dense:
+    description: 768-dim HNSW ANN over codebase_chunks_768
+    backend: qdrant
+    collection: codebase_chunks_768
+    vector: content
+    top_k: 20
+    activation: always
+    score_weight: 0.30
+
+  lexical:
+    description: BM25 / ripgrep full-text search
+    backend: postgres_fts + rg
+    top_k: 20
+    activation: always
+    score_weight: 0.20
+
+  sparse:
+    description: Sparse vector (BM42 / SPLADE) for terminology-heavy queries
+    backend: qdrant_sparse
+    collection: codebase_chunks_768
+    vector: sparse
+    top_k: 15
+    activation: if_query_has_identifiers
+    score_weight: 0.15
+
+  topology:
+    description: Neo4j k-hop neighborhood expansion from seed nodes
+    backend: neo4j
+    max_hops: 2
+    activation: if_structural_dependency_intent
+    score_weight: 0.15
+    hard_rule: max_hops must be bounded — never unbounded traversal
+
+  documentation:
+    description: Documentation pages and AGENTS.md context cards
+    backend: qdrant
+    collection: docs_chunks_768
+    vector: content
+    top_k: 10
+    activation: if_semantic_concept_or_directory_intent
+    score_weight: 0.10
+
+  centroid:
+    description: K-means / SOM cluster centroid proximity (routing signal)
+    backend: redis_karpathy_scores
+    key_prefix: "gpu:karpathy:scores"
+    top_k: 5
+    activation: always_as_rerank_boost
+    score_weight: 0.05
+    note: centroid lane reranks, does not retrieve new candidates
+
+  temporal:
+    description: Recent-change signal from git log + atlas_packets.updated_at
+    backend: postgres
+    table: atlas_packets
+    order: updated_at DESC
+    top_k: 10
+    activation: if_temporal_intent
+    score_weight: 0.05
+
+# ── Fusion and reranking ──────────────────────────────────────────────────────
+fusion:
+  algorithm: RRF
+  description: Reciprocal Rank Fusion across active lanes
+  formula: >
+    score(d) = sum over active lanes of (weight_lane / (60 + rank_lane(d)))
+  final_rerank: karpathy_blend
+  karpathy_blend: >
+    0.4 * pagerank + 0.3 * attention + 0.3 * authority
+    (from Redis gpu:karpathy:scores hash, 24h TTL)
+
+# ── MCP tool surface ──────────────────────────────────────────────────────────
+mcp_tools:
+  primary_entry: atlas.packet_search
+  description: Accepts a natural-language query, activates appropriate lanes, returns ranked results
+  input:
+    query: {type: string, nullable: false}
+    intent_hint: {type: string, optional: true, description: "semantic_concept | structural_dependency | exact_symbol | error_pattern | temporal | directory_context"}
+    top_k: {type: integer, default: 10, max: 50}
+    artifact_kinds: {type: array<string>, optional: true, description: "filter to these artifact_kinds from repo-artifact schema"}
+  output:
+    results:
+      - artifact_id: string
+        source_ref: string
+        artifact_kind: string
+        packet_key: string
+        score: float
+        lane_contributions: object
+        content_preview: string
+
+  auxiliary_tools:
+    - name: atlas.coverage
+      description: Show coverage stats per artifact_kind (how many indexed vs total)
+    - name: search.hybrid
+      description: Raw 7-lane hybrid search with explicit lane weights
+    - name: topology.search_4d
+      description: 4D topology-aware search (SOM coordinates + dense)
+    - name: clusters.get_summary_lenses
+      description: Get semantic summary lenses for a K-means cluster
+
+# ── Docker container log correlation ─────────────────────────────────────────
+container_log_correlation:
+  description: >
+    Errors in Docker container logs correlate to repo artifacts via source_ref.
+    When an error log contains a file path, stack trace, or module name,
+    the agentic dense search pipeline maps it to artifact_kind and retrieves
+    the relevant source_module chunks for diagnosis.
+  pipeline:
+    - step: parse_container_log
+      input: raw log line (stdout/stderr from docker logs)
+      output: {error_message, stack_frames[], container_name, timestamp}
+    - step: extract_source_refs
+      method: regex on known path patterns (src/, scripts/, packages/)
+    - step: agentic_search
+      lanes: [dense, lexical, topology]
+      query: error_message + stack_frames joined
+    - step: atlas_packet_lookup
+      join: atlas_packets WHERE source_ref IN extracted_refs
+    - step: gemma4_synthesis
+      input: error context + retrieved chunks (max 12K tokens ACE-compressed)
+      output: diagnosis + suggested fix
+
+# ── Indexing pipeline trigger ─────────────────────────────────────────────────
+indexing:
+  trigger: graphify:daily (Stage 1 → Stage 5)
+  stages:
+    0: service health gate (7 services)
+    1: file inventory (repo-artifact classification)
+    2: structural extraction (tree-sitter AST)
+    3: semantic extraction (embedding via embeddinggemma:latest)
+    4: edge construction (import graph, topology)
+    5: PageRank + authority scoring
+  output_tables:
+    - codebase_chunk_index (chunks + embeddings)
+    - atlas_packets (identity + metadata)
+    - atlas_artifact_index (kind + routing + status)
+  output_collections:
+    - codebase_chunks_768 (dense 768-dim)
+
+validation_rules:
+  - Every indexed artifact_kind must have an embedding_lane in repo-artifact.v1.okf
+  - Dense lane top_k must not exceed 50 (latency constraint)
+  - Topology lane hops must be bounded (max_hops: 2)
+  - Centroid lane is rerank-only — must not introduce new candidates
+  - Karpathy blend is the final rerank — custom per-feature scoring is forbidden
+  - Container log correlation must join back to Postgres before Gemma4 synthesis
+
+write_path: >
+  agentic query
+    → query_classification
+    → lane_activation
+    → 7-lane fan-out (parallel)
+    → RRF fusion
+    → karpathy_blend rerank
+    → ACE context compression (max 12K tokens)
+    → Gemma4 synthesis

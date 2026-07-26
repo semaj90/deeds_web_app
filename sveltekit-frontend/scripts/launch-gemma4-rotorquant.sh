@@ -33,7 +33,7 @@ echo "   Concurrency: request queuing (internal batching, --parallel $PARALLEL)"
 echo ""
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)"
-TEMPLATE_PATH="$SCRIPT_DIR/configs/templates/gemma4-opencode.jinja"
+TEMPLATE_PATH="$SCRIPT_DIR/configs/templates/custom_pub_chat_template_gemma4.jinja"
 
 if [ ! -f "$TEMPLATE_PATH" ]; then
   echo "❌ Template not found at $TEMPLATE_PATH"

@@ -53,7 +53,9 @@ param(
     [int]$Parallel = 4,
     [int]$Slots = 4,
     [int]$ContextLength = 16384,
-    [switch]$CPUOnly
+    [switch]$CPUOnly,
+    # Pass --NoJinja to skip --jinja / --chat-template-file (e.g. for pure embedding models)
+    [switch]$NoJinja
 )
 
 $ErrorActionPreference = "Stop"
@@ -141,6 +143,18 @@ Write-Log "  - Concurrency: $Parallel workers (will use $Slots slots)"
 Write-Log "  - KV cache: Enabled (q8_0 key, q8_0 value)"
 Write-Log ""
 
+# Resolve canonical Jinja template for tool-calling support.
+# Required for any generation model on port 8090 — without it, llama-server starts
+# with the embedded GGUF template which may not support tools (finish_reason:stop instead
+# of finish_reason:tool_calls). Skip only for pure embedding models (-NoJinja).
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$templateFile = Join-Path (Split-Path -Parent $scriptDir) "configs\templates\custom_pub_chat_template_gemma4.jinja"
+$isEmbeddingModel = $Model -match "embed|embedding" -or $NoJinja
+if (-not $isEmbeddingModel -and -not (Test-Path $templateFile)) {
+    Write-Log "⚠️  Template not found at $templateFile — tool calling may be broken" "WARN"
+    $isEmbeddingModel = $true  # skip template args so server still starts
+}
+
 # Build command line with Bifrost + LibTorch optimizations
 $args_list = @(
     "-m", $Model,
@@ -154,6 +168,16 @@ $args_list = @(
     "--cache-prompt",                 # Enable KV cache reuse for Bifrost semantic matching
     "--cache-reuse", "256"            # Keep cached prompts up to 256 tokens
 )
+
+# Wire Jinja template for tool-calling models (native Gemma4 DSL — supports_tools:true)
+if (-not $isEmbeddingModel) {
+    $args_list += "--chat-template-file", $templateFile
+    $args_list += "--jinja"
+    $args_list += "--reasoning-format", "none"
+    Write-Log "✅ Tool-calling template: $templateFile"
+} else {
+    Write-Log "ℹ️  Embedding model — skipping Jinja template (tool calling not needed)"
+}
 
 # GPU acceleration + tensor ops
 if (-not $CPUOnly) {

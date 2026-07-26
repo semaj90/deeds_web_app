@@ -1,0 +1,24 @@
+{
+  "k_values": [
+    64
+  ],
+  "results": [
+    {
+      "k": 64,
+      "inertia": 3.0819308099243963,
+      "silhouette": 0.9952795115341352,
+      "domain_purity": 0.2788887267065635,
+      "size_stats": {
+        "min": 3,
+        "max": 20540,
+        "mean": 963,
+        "stddev": 3019,
+        "empty_clusters": 0
+      },
+      "iterations": 3,
+      "elapsed_ms": 6818
+    }
+  ],
+  "run_at": "2026-07-25T23:11:22.155Z",
+  "dry_run": false
+}

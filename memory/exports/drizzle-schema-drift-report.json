@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-05-31T23:34:54.214Z",
-  "schemaFilesScanned": 155,
-  "totalColumnDeclarations": 2748,
+  "timestamp": "2026-07-25T23:37:20.275Z",
+  "schemaFilesScanned": 203,
+  "totalColumnDeclarations": 3742,
   "focusColumns": [
     "user_id",
     "uploaded_by"
   ],
-  "focusDeclarationsCount": 73,
+  "focusDeclarationsCount": 77,
   "liveDbDistribution": {
     "user_id": {
-      "integer": 43,
-      "text": 3
+      "integer": 45,
+      "text": 2
     },
     "uploaded_by": {
       "integer": 2
     }
   },
   "drift": {
-    "totalMismatches": 92,
+    "totalMismatches": 94,
     "byFile": {
-      "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts": 46,
-      "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts": 3,
-      "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts": 43
+      "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts": 47,
+      "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts": 2,
+      "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts": 45
     },
     "details": [
       {
@@ -180,6 +180,16 @@
         "varName": "userId",
         "colName": "user_id",
         "drizzleDeclared": "uuid",
+        "liveTable": "deep_research_audit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
         "liveTable": "diagnosis_events",
         "liveType": "integer",
         "severity": "HIGH (uuid→int migrated)"
@@ -231,6 +241,16 @@
         "colName": "user_id",
         "drizzleDeclared": "uuid",
         "liveTable": "evidence_audit_log",
+        "liveType": "integer",
+        "severity": "HIGH (uuid→int migrated)"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
+        "line": 45,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "uuid",
+        "liveTable": "ldr_research_tasks",
         "liveType": "integer",
         "severity": "HIGH (uuid→int migrated)"
       },
@@ -360,16 +380,6 @@
         "varName": "userId",
         "colName": "user_id",
         "drizzleDeclared": "uuid",
-        "liveTable": "saved_citation_annotations",
-        "liveType": "text",
-        "severity": "MEDIUM"
-      },
-      {
-        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/additional-tables.ts",
-        "line": 45,
-        "varName": "userId",
-        "colName": "user_id",
-        "drizzleDeclared": "uuid",
         "liveTable": "saved_citations",
         "liveType": "text",
         "severity": "MEDIUM"
@@ -491,16 +501,6 @@
         "colName": "user_id",
         "drizzleDeclared": "integer",
         "liveTable": "admin_ai_chat_sessions",
-        "liveType": "text",
-        "severity": "MEDIUM"
-      },
-      {
-        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/schema-actual.ts",
-        "line": 28,
-        "varName": "userId",
-        "colName": "user_id",
-        "drizzleDeclared": "integer",
-        "liveTable": "saved_citation_annotations",
         "liveType": "text",
         "severity": "MEDIUM"
       },
@@ -660,6 +660,16 @@
         "varName": "userId",
         "colName": "user_id",
         "drizzleDeclared": "text",
+        "liveTable": "deep_research_audit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
         "liveTable": "diagnosis_events",
         "liveType": "integer",
         "severity": "MEDIUM"
@@ -711,6 +721,16 @@
         "colName": "user_id",
         "drizzleDeclared": "text",
         "liveTable": "evidence_audit_log",
+        "liveType": "integer",
+        "severity": "MEDIUM"
+      },
+      {
+        "file": "sveltekit-frontend/src/lib/server/db/archived-schemas/vector-schema.ts",
+        "line": 26,
+        "varName": "userId",
+        "colName": "user_id",
+        "drizzleDeclared": "text",
+        "liveTable": "ldr_research_tasks",
         "liveType": "integer",
         "severity": "MEDIUM"
       },

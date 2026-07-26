@@ -1,0 +1,22 @@
+{
+  "run_at": "2026-07-25T23:28:26.657Z",
+  "dry_run": false,
+  "collection": "codebase_chunks_768",
+  "qdrant_uuid_points": 52984,
+  "ap": {
+    "total": 61659,
+    "had_id": 4725,
+    "missing": 56934,
+    "backfilled": 99,
+    "no_match": 56835,
+    "errors": 0
+  },
+  "cci": {
+    "total": 52417,
+    "had_id": 52417,
+    "missing": 0,
+    "backfilled": 0,
+    "no_match": 0,
+    "errors": 0
+  }
+}

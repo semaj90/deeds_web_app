@@ -68,7 +68,9 @@ export default ts.config(
   {
     files: ['**/*.{mjs,cjs}', 'scripts/**/*.js'],
     languageOptions: {
-      parserOptions: { project: null },
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      parserOptions: { project: null, ecmaVersion: 'latest', sourceType: 'module' },
     },
     rules: {
       'no-console': 'off',

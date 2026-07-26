@@ -1,0 +1,63 @@
+{
+  "gate": "ATLAS_CROSS_STORE_IDENTITY_PROVEN",
+  "run_at": "2026-07-25T22:42:32.856Z",
+  "counts": {
+    "postgres": {
+      "atlas_packets": 61659,
+      "codebase_chunks": 52380,
+      "total_eligible": 52380,
+      "total_atlas_packets": 61659,
+      "som_enriched": 61659
+    },
+    "qdrant": {
+      "total_points": 54224,
+      "directory_cluster_points": 728,
+      "code_points": 53496,
+      "with_packet_key": 53496,
+      "with_source_ref": 53842,
+      "content_hash_present": 0,
+      "sampled_hashes": [],
+      "error": null
+    },
+    "neo4j": {
+      "total_nodes": 349411,
+      "with_packet_key": 18951,
+      "with_source_ref": 144555,
+      "error": null
+    }
+  },
+  "checks": {
+    "pg_qdrant_count_parity": {
+      "pg": 52380,
+      "qdrant": 53496,
+      "qdrant_total": 54224,
+      "qdrant_dir_clusters": 728,
+      "diff_pct": "2.09",
+      "pass": true
+    },
+    "qdrant_packet_key_coverage": {
+      "total": 54224,
+      "with_key": 53496,
+      "rate": "98.66",
+      "pass": true
+    },
+    "qdrant_source_ref_coverage": {
+      "total": 54224,
+      "with_ref": 53842,
+      "rate": "99.30",
+      "pass": true
+    },
+    "neo4j_coverage": {
+      "pg": 52380,
+      "neo4j": 18951,
+      "rate": "36.18",
+      "pass": false
+    }
+  },
+  "gate_result": "PASS",
+  "failures": [],
+  "warnings": [
+    "Content-hash match not verified — Qdrant sample returned no hashes",
+    "Neo4j topology coverage 36.18% below 50% (topology mirror may need rebuild)"
+  ]
+}

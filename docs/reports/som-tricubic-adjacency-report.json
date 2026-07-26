@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-19T22:42:44.321Z",
-  "mode": "apply",
+  "generated_at": "2026-07-25T19:40:23.929Z",
+  "mode": "dry-run",
   "grid_size": 20,
   "summary": {
     "cell_count": 400,
