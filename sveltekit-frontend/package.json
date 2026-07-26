@@ -1441,6 +1441,7 @@
     "@opentelemetry/sdk-node": "0.220.0",
     "@opentelemetry/sdk-trace-base": "2.9.0",
     "@qdrant/js-client-rest": "1.18.0",
+    "@qdrant/qdrant-js": "1.18.0",
     "@trpc/client": "11.18.0",
     "@trpc/server": "11.18.0",
     "@types/cheerio": "0.22.35",

@@ -2,8 +2,11 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema-postgres.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
-export const GET: RequestHandler = async ({ locals }) => {
+export const GET: RequestHandler = async (event) => {
+	requireAdmin(event);
+
 	try {
 		// Fetch packets needing embeddings
 		const packets = await db

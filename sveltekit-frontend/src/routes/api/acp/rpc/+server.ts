@@ -23,12 +23,19 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { runAcpRpcLoop } from '$lib/server/ai/acp-rpc-loop.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
+import { toolAuthorizationGuard, validateToolName, checkToolAccess } from '$lib/server/auth/tool-authorization';
 
 const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  requireAdmin(event);
+
+  // Phase 3: Establish permission grant for tool authorization
+  const permissionGrant = toolAuthorizationGuard(event);
+
   try {
-    const body = await request.json();
+    const body = await event.request.json();
     const {
       query,
       system_prompt = 'You are a helpful assistant with access to tools.',
@@ -40,6 +47,11 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (!query) {
       return error(400, 'query is required');
+    }
+
+    // Phase 3: Validate tools parameter if present
+    if (tools && typeof tools !== 'boolean') {
+      return error(400, 'tools parameter must be a boolean');
     }
 
     const encoder = new TextEncoder();
@@ -61,6 +73,7 @@ export const POST: RequestHandler = async ({ request }) => {
               useKvCache: use_kv_cache,
               kvCacheTtl: 256,
               mcpPort: 8788,
+              permissionGrant,
             },
             system_prompt,
             query

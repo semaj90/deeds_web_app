@@ -19,6 +19,8 @@
 import type { OpenAIMessage } from './openai-types.js';
 import type { ToolCall } from './tool-call-parser.js';
 import { parseToolCalls, hasToolCalls } from './tool-call-parser.js';
+import type { PermissionGrant } from '$lib/server/ace/atlas-tool-registry';
+import { checkToolAccess, validateToolName } from '$lib/server/auth/tool-authorization';
 
 export interface AcpRpcLoopConfig {
   llamaBaseUrl: string;
@@ -29,6 +31,7 @@ export interface AcpRpcLoopConfig {
   useKvCache: boolean;
   kvCacheTtl: number;
   mcpPort?: number;
+  permissionGrant?: PermissionGrant;
 }
 
 export interface ToolExecutionResult {
@@ -40,12 +43,28 @@ export interface ToolExecutionResult {
 }
 
 /**
- * Execute MCP tools (or mock tools for testing)
+ * Execute MCP tools with authorization check
  */
-export async function executeMcpTool(toolName: string, arguments_: Record<string, any>): Promise<string> {
-  // In production, call MCP at localhost:8788
-  // For now, return mock results
-  console.log(`[ACP RPC] Executing tool: ${toolName}`, arguments_);
+export async function executeMcpTool(
+  toolName: string,
+  arguments_: Record<string, any>,
+  permissionGrant?: PermissionGrant
+): Promise<string> {
+  // Validate tool name format
+  const validatedToolName = validateToolName(toolName);
+
+  // Check authorization if grant provided
+  if (permissionGrant) {
+    try {
+      checkToolAccess(validatedToolName, permissionGrant);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Permission denied';
+      console.error(`[ACP RPC] Tool authorization failed: ${toolName}`, message);
+      return JSON.stringify({ error: message });
+    }
+  }
+
+  console.log(`[ACP RPC] Executing tool: ${validatedToolName}`, arguments_);
 
   // Mock tools for testing
   const mockResults: Record<string, string> = {
@@ -54,7 +73,7 @@ export async function executeMcpTool(toolName: string, arguments_: Record<string
     list_files: JSON.stringify({ files: [] }),
   };
 
-  return mockResults[toolName] || JSON.stringify({ error: `Unknown tool: ${toolName}` });
+  return mockResults[validatedToolName] || JSON.stringify({ error: `Unknown tool: ${validatedToolName}` });
 }
 
 /**
@@ -147,7 +166,7 @@ export async function* apcRpcLoopTurn(
       const startMs = Date.now();
       try {
         const args = JSON.parse(toolCall.function.arguments);
-        const result = await executeMcpTool(toolCall.function.name, args);
+        const result = await executeMcpTool(toolCall.function.name, args, config.permissionGrant);
 
         toolResults.push({
           role: 'tool',

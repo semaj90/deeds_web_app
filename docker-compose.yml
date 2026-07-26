@@ -94,8 +94,9 @@ services:
       - RABBITMQ_DEFAULT_PASS=secret123
       - RABBITMQ_DEFAULT_VHOST=/
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5673:5672"
+      - "15673:15672"
+      - "15693:15692"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:

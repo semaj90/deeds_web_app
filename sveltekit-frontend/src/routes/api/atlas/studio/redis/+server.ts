@@ -19,7 +19,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { getRedis } from '$lib/server/redis.js';
-import { requireUser } from '$lib/server/auth-utils.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 // ── Allowed prefix allowlist ──────────────────────────────────────────────────
 const ALLOWED_PREFIXES = ['ace:', 'atlas:', 'rag:', 'startup:', 'qdrant:'] as const;
@@ -62,7 +62,7 @@ function resolvePrefix(param: string | null): AllowedPrefix | null {
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 export const GET: RequestHandler = async (event) => {
-  requireUser(event);
+  requireAdmin(event);
   const { url } = event;
 	const prefixParam = url.searchParams.get('prefix');
 	const cursorParam = url.searchParams.get('cursor') ?? '0';

@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import pg from 'pg';
+import { requireUser } from '$lib/server/auth-utils.js';
 
 const pool = new pg.Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin@localhost/legal_ai_db',
@@ -43,7 +44,9 @@ interface LabelStats {
  *   - offset: pagination offset (default 0)
  *   - stats: if true, return aggregated statistics instead of individual labels
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  requireUser(event);
+  const { url } = event;
   const client = await pool.connect();
   try {
     const purpose = url.searchParams.get('purpose');
@@ -180,10 +183,11 @@ export const GET: RequestHandler = async ({ url }) => {
  *     reasoning?: string
  *   }
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  requireUser(event);
   const client = await pool.connect();
   try {
-    const body = await request.json();
+    const body = await event.request.json();
     const {
       packet_key,
       file_purpose,

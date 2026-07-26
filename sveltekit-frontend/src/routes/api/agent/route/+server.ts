@@ -83,7 +83,16 @@ const MOCK_TOOL_REGISTRY: ToolDescriptor[] = [
   }
 ];
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return json({
+      status: 'error',
+      candidates: [],
+      decisionId: '',
+      error: 'Unauthorized'
+    }, { status: 401 });
+  }
+
   try {
     const body = await request.json() as RouteRequest;
     const validated = routeRequestSchema.parse(body);

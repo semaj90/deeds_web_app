@@ -25,6 +25,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { searchGoService } from '$lib/server/retrieval/go-search-bridge.js';
 import type { GoSearchHit } from '$lib/server/retrieval/go-search-bridge.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 interface PaginationCursor {
   offset: number;
@@ -50,7 +51,9 @@ function encodeCursor(offset: number, score: number): string {
   return Buffer.from(payload).toString('base64');
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { url } = event;
   const query = url.searchParams.get('q')?.trim();
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100);
   const cursor = url.searchParams.get('cursor');

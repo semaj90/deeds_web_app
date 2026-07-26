@@ -16,6 +16,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client.js';
 import { codeFeatures } from '$lib/server/db/schema-postgres.js';
 import { eq, like, gt, desc, sql, and } from 'drizzle-orm';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 interface SearchRequest {
   query: string;
@@ -159,7 +160,9 @@ async function performSearch(req: SearchRequest): Promise<{ results: SearchResul
   }
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { url } = event;
   const query = url.searchParams.get('q') || '';
   const limit = parseInt(url.searchParams.get('limit') || '10');
   const offset = parseInt(url.searchParams.get('offset') || '0');
@@ -187,9 +190,10 @@ export const GET: RequestHandler = async ({ url }) => {
   });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async (event) => {
+  requireAdmin(event);
   try {
-    const body = (await request.json()) as SearchRequest;
+    const body = (await event.request.json()) as SearchRequest;
     const { results, total } = await performSearch(body);
 
     const response: SearchResponse = {

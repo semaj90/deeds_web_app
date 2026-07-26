@@ -1,6 +1,6 @@
 # Qdrant Connectivity Audit
 
-**Timestamp**: 2026-06-14T23:33:20.097Z
+**Timestamp**: 2026-07-26T09:04:38.115Z
 **Status**: WARN
 **Transport Recommendation**: gRPC
 

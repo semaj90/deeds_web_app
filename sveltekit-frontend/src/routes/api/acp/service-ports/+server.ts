@@ -19,6 +19,7 @@ import {
   negotiateQuicTransport,
   type A2AServicePort,
 } from '$lib/server/acp/acp-grpc-quic-bridge.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 const defaultRegistry: Partial<ACPServiceRegistry> = {
   embedding: {
@@ -63,7 +64,10 @@ const defaultRegistry: Partial<ACPServiceRegistry> = {
   },
 };
 
-export const GET: RequestHandler = ({ url }) => {
+export const GET: RequestHandler = (event) => {
+  requireAdmin(event);
+  const { url } = event;
+
   const host = url.hostname || '127.0.0.1';
 
   // Build A2A agent descriptor with service ports
@@ -114,8 +118,7 @@ export const GET: RequestHandler = ({ url }) => {
     },
     {
       headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=300',
+        'Cache-Control': 'private, max-age=300',
         'Alt-Svc': 'h3=":443"; ma=3600',
       },
     }

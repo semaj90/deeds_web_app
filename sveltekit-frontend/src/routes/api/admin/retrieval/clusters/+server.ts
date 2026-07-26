@@ -23,6 +23,7 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 export interface ClusterSummary {
   id: string;
@@ -32,7 +33,9 @@ export interface ClusterSummary {
   durationMs: number;
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { url } = event;
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100);
   const offset = Math.max(parseInt(url.searchParams.get('offset') ?? '0', 10), 0);
   const sortBy = url.searchParams.get('sortBy') ?? 'authority';

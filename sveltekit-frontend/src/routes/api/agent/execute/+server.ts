@@ -5,6 +5,8 @@ import { classifyToolResult, nextLegalState, attemptRecovery, finalizeTrace } fr
 import type { RouteTrace, ToolResult } from '$lib/server/router/router-types';
 import { v4 as uuid } from 'uuid';
 import { sql } from 'drizzle-orm';
+import { requireUser } from '$lib/server/auth-utils.js';
+import { toolAuthorizationGuard, validateToolName, checkToolAccess } from '$lib/server/auth/tool-authorization';
 
 // Incoming execution request (from /api/agent/route response)
 const executeRequestSchema = z.object({
@@ -66,11 +68,28 @@ const toolResultSchema = z.object({
  * - Escalate on failure (no infinite loop)
  * - Every execution is auditable (all three tables written)
  */
-export const POST: RequestHandler = async ({ request, locals }) => {
+export const POST: RequestHandler = async (event) => {
+  requireUser(event);
+
+  // Phase 3.2: Establish authorization
+  const permissionGrant = toolAuthorizationGuard(event);
+
   try {
     // 1. Parse request
-    const body = await request.json() as ExecuteRequest;
+    const body = await event.request.json() as ExecuteRequest;
     const validated = executeRequestSchema.parse(body);
+
+    // Validate and authorize tool name
+    const toolName = validateToolName(validated.selectedTool.name);
+    try {
+      checkToolAccess(toolName, permissionGrant);
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : 'Tool authorization failed';
+      return json(
+        { error: message, status: 'unauthorized' },
+        { status: 403 }
+      );
+    }
 
     // 2. Execute real MCP tool or dry-run mock
     let toolResult: ToolResult;
@@ -345,7 +364,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  *
  * Retrieve execution result by ID (for polling, not websocket).
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  requireUser(event);
+  const { url } = event;
   const executionId = url.searchParams.get('executionId');
 
   if (!executionId) {

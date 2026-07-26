@@ -70,9 +70,9 @@
     "atlas:pipeline:20step": "npm run atlas:phase0:foundation && npm run atlas:phase1:indexing && npm run atlas:phase2:clustering && npm run atlas:phase3:routing && npm run atlas:phase4:ace"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "2.0.47",
     "@deeds/atlas-contracts": "file:packages/atlas",
     "@deeds/parent-atlas": "file:packages/parent-atlas",
-    "@ai-sdk/openai-compatible": "2.0.47",
     "@google/genai": "1.50.1",
     "@langchain/community": "^1.0.0",
     "@langchain/core": "^1.0.0",
@@ -85,6 +85,7 @@
     "@mozilla/readability": "0.6.0",
     "@opencode-ai/sdk": "1.17.19",
     "@qdrant/js-client-rest": "1.15.1",
+    "@qdrant/qdrant-js": "1.18.0",
     "@types/cheerio": "0.22.35",
     "ai": "6.0.190",
     "amqplib": "0.10.9",
@@ -100,7 +101,7 @@
     "nes.css": "^2.3.0",
     "ollama": "^0.6.0",
     "pdf-parse": "2.4.5",
-    "pg": "^8.0.0",
+    "pg": "8.22.0",
     "redis": "4.7.1",
     "svelte-preprocess": "6.0.4",
     "sveltekit-superforms": "^2.0.0",
