@@ -3,7 +3,10 @@ import type { Redis as RedisType } from 'ioredis';
 import process from 'process';
 import util from 'util';
 
-const VALKEY_URL = process.env.VALKEY_URL || 'redis://127.0.0.1:6379';
+const envValKeyUrl = process.env.VALKEY_URL;
+const valkeyUrl = (envValKeyUrl && typeof envValKeyUrl === 'string' && envValKeyUrl.length > 0)
+  ? envValKeyUrl
+  : 'redis://127.0.0.1:6379';
 const redis: RedisType = new Redis(VALKEY_URL);
 
 export { redis as valkey };

@@ -5,10 +5,10 @@
  * 1. Qdrant: Fast vector search (ANN)
  * 2. CouchDB: Topological graph context (MapReduce)
  * 3. PostgreSQL: Metadata enrichment (relational)
- * 4. MinIO: Blob storage (PDFs/images)
+ * 4. SeaweedFS S3: Blob storage (PDFs/images)
  *
  * Query Flow:
- * Query → Qdrant (get IDs) → CouchDB (topology) → Postgres (metadata) → MinIO (blobs)
+ * Query → Qdrant (get IDs) → CouchDB (topology) → Postgres (metadata) → SeaweedFS (blobs)
  */
 
 import { S3Client } from '@aws-sdk/client-s3';
@@ -17,20 +17,21 @@ import { ENV } from '$lib/server/env.server.js';
 // import { getNeighbors, traverseGraph, type KnowledgeNode } from './couchdb';
 // import { searchQdrant } from './qdrant-sync';
 
-// Stub environment config access
+// Stub environment config access. Keep MINIO_* as a compatibility surface while
+// the active object store remains SeaweedFS behind the S3 gateway.
 const CONFIG = {
-    MINIO_URL: ENV.MINIO_URL,
-    MINIO_REGION: process.env.MINIO_REGION || 'us-east-1',
-    MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY || 'minioadmin',
-    MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY || 'minioadmin'
+    OBJECT_STORAGE_URL: ENV.SEAWEED_S3_ENDPOINT || ENV.MINIO_URL,
+    OBJECT_STORAGE_REGION: process.env.SEAWEED_S3_REGION || process.env.MINIO_REGION || 'us-east-1',
+    OBJECT_STORAGE_ACCESS_KEY: process.env.SEAWEED_ACCESS_KEY || process.env.MINIO_ACCESS_KEY || 'minioadmin',
+    OBJECT_STORAGE_SECRET_KEY: process.env.SEAWEED_SECRET_KEY || process.env.MINIO_SECRET_KEY || 'minioadmin'
 };
 
-// MinIO Configuration
+// SeaweedFS S3 configuration
 const minioClient = new S3Client({
-    endpoint: CONFIG.MINIO_URL,
-    region: CONFIG.MINIO_REGION,
-    credentials: { accessKeyId: CONFIG.MINIO_ACCESS_KEY,
-        secretAccessKey: CONFIG.MINIO_SECRET_KEY
+    endpoint: CONFIG.OBJECT_STORAGE_URL,
+    region: CONFIG.OBJECT_STORAGE_REGION,
+    credentials: { accessKeyId: CONFIG.OBJECT_STORAGE_ACCESS_KEY,
+        secretAccessKey: CONFIG.OBJECT_STORAGE_SECRET_KEY
     },
 	forcePathStyle: true
 });
@@ -60,7 +61,7 @@ export interface MirrorQueryResult {
     }>;
     performance: { qdrant_ms: number;
         couchdb_ms: number, postgres_ms: number;
-        minio_ms: number, total_ms: number;
+        object_storage_ms: number, total_ms: number;
     };
 }
 
@@ -80,6 +81,6 @@ export async function mirrorQuery(
         graph_context: { nodes: [], neighbors: {},
 	traversal_depth: 0 },
 	metadata: [],
-        performance: { qdrant_ms: 0, couchdb_ms: 0, postgres_ms: 0, minio_ms: 0, total_ms: 0 }
+        performance: { qdrant_ms: 0, couchdb_ms: 0, postgres_ms: 0, object_storage_ms: 0, total_ms: 0 }
     };
 }

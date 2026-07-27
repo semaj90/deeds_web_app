@@ -11,6 +11,7 @@ export interface PromptListenerOptions {
   qdrantUrl?: string;
   postgresUrl?: string;
   fallbackReason?: string;
+  aliasId?: string;  // Phase 10-19: stable cross-store alias field
 }
 
 export interface RetrievalResult {
@@ -18,9 +19,11 @@ export interface RetrievalResult {
   selectedCards: string[];
   droppedCards: string[];
   sourceRefs: string[];
+  featureIds?: string[];  // Phase 10-19: feature IDs for reconciliation
   latencyMs: number;
   fallbackReason: string | null;
   missingNotes: string | null;
+  aliasId?: string;  // Phase 10-19: threaded alias for request tracking
 }
 
 export async function promptRetrieve(
@@ -30,12 +33,14 @@ export async function promptRetrieve(
   const startTime = Date.now();
   const queryHash = createHash('sha256').update(query).digest('hex');
   const redisKey = `ace:ctx:${queryHash}`;
+  const aliasId = opts.aliasId;  // Phase 10-19: Thread alias_id through
 
   let cachedPacket: string | null = null;
   let fallbackReason: string | null = null;
   const selectedCards: string[] = [];
   const droppedCards: string[] = [];
   const sourceRefs: string[] = [];
+  const featureIds: string[] = [];  // Phase 10-19: Collect feature IDs for reconciliation
 
   try {
     // 1. Redis exact cache lookup
@@ -53,9 +58,11 @@ export async function promptRetrieve(
       selectedCards: ['cached_packet'],
       droppedCards: [],
       sourceRefs: [],
+      featureIds: [],
       latencyMs: elapsed,
       fallbackReason: 'exact_redis_hit',
-      missingNotes: null
+      missingNotes: null,
+      aliasId,  // Phase 10-19: Thread alias_id
     };
     await logRetrievalEvent(trace);
     return { acePacket: cachedPacket, trace };
@@ -77,9 +84,11 @@ export async function promptRetrieve(
     selectedCards,
     droppedCards,
     sourceRefs,
+    featureIds,  // Phase 10-19: Include feature IDs in trace
     latencyMs: elapsed,
     fallbackReason: fallbackReason || 'qdrant_cosine_fallback',
-    missingNotes: 'missing_quic_listener'
+    missingNotes: 'missing_quic_listener',
+    aliasId,  // Phase 10-19: Thread alias_id through trace
   };
 
   // Build compact ACE context packet from profile card details

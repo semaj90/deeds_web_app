@@ -6,7 +6,8 @@
  *
  * Embedding contract:
  * - Semantic native: 768-dim (mandatory, canonical)
- * - Semantic retrieval: 768 or 256-dim MRL (post-evaluation)
+ * - Semantic retrieval: 768 native or explicit truncated EmbeddingGemma projections
+ *   such as 384/256 when projection lineage is declared
  * - Latent routing: 64-dim autoencoder (clustering/SOM only, never retrieval)
  *
  * No agent in the inner loop. Validation at boundaries only.
@@ -43,7 +44,7 @@ export const EmbeddingContractSchema = z.object({
   nativeDimensions: z.number().int().positive().describe('Model native output, e.g., 768 for EmbeddingGemma'),
 
   // STORED DIMENSION (what we persist)
-  storedDimensions: z.number().int().positive().describe('Canonical: 768, 512, 256, or 128. NO 384.'),
+  storedDimensions: z.number().int().positive().describe('Persisted representation dimension. 768 is native; truncated projections such as 384/256 are valid when projection lineage is declared.'),
 
   // TRANSFORMATION (if different from native)
   normalized: z.boolean().default(true).describe('L2 normalization applied'),
@@ -72,7 +73,19 @@ export const CANONICAL_EMBEDDING_CONTRACTS = {
     contractVersion: '1.0',
   } as const satisfies EmbeddingContract,
 
-  // Tier 2: Matryoshka 256 (Phase 107+, requires evaluation pass)
+  // Tier 2: Truncated 384 projection (allowed when lineage is explicit)
+  MRL_384: {
+    modelId: 'embeddinggemma',
+    modelRevision: '20260720',
+    nativeDimensions: 768,
+    storedDimensions: 384,
+    normalized: true,
+    pooling: 'mean',
+    projectionVersion: 'mrl-384-v1',
+    contractVersion: '1.0',
+  } as const satisfies EmbeddingContract,
+
+  // Tier 3: Matryoshka 256 (Phase 107+, requires evaluation pass)
   MRL_256: {
     modelId: 'embeddinggemma',
     modelRevision: '20260720',
@@ -84,7 +97,7 @@ export const CANONICAL_EMBEDDING_CONTRACTS = {
     contractVersion: '1.0',
   } as const satisfies EmbeddingContract,
 
-  // Tier 3: Autoencoder latent (routing/clustering only)
+  // Tier 4: Autoencoder latent (routing/clustering only)
   LATENT_64: {
     modelId: 'autoencoder-768-to-64',
     modelRevision: '20260801',
@@ -97,14 +110,11 @@ export const CANONICAL_EMBEDDING_CONTRACTS = {
   } as const satisfies EmbeddingContract,
 };
 
-// Forbidden dimensions (reject at validation boundary)
-const FORBIDDEN_DIMENSIONS = new Set([384]); // Ollama truncation is undocumented
-
 export const validateEmbeddingContract = (contract: EmbeddingContract): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
-  if (FORBIDDEN_DIMENSIONS.has(contract.storedDimensions)) {
-    errors.push(`Stored dimension ${contract.storedDimensions} is not an approved contract. Use 768 (native), 256 (MRL), or 64 (autoencoder latent).`);
+  if (contract.storedDimensions > contract.nativeDimensions) {
+    errors.push(`Stored dimension ${contract.storedDimensions} cannot exceed native dimension ${contract.nativeDimensions}.`);
   }
 
   if (contract.storedDimensions !== contract.nativeDimensions && !contract.projectionVersion) {
@@ -113,6 +123,10 @@ export const validateEmbeddingContract = (contract: EmbeddingContract): { valid:
 
   if (contract.nativeDimensions !== 768 && contract.modelId === 'embeddinggemma') {
     errors.push(`EmbeddingGemma native dimension is 768, not ${contract.nativeDimensions}.`);
+  }
+
+  if (contract.modelId === 'embeddinggemma' && contract.storedDimensions < contract.nativeDimensions && !contract.normalized) {
+    errors.push(`Truncated EmbeddingGemma projection ${contract.storedDimensions} requires normalized=true unless a projection contract explicitly says otherwise.`);
   }
 
   return {
@@ -214,10 +228,10 @@ export const validateEnrichedPacketForPromotion = (packet: EnrichedPacket): { va
     }
   }
 
-  // Projected embedding (if present) must match contract
+  // Projected embedding (if present) must match the declared stored dimension
   if (packet.embeddingProjected) {
-    if (packet.embeddingProjected.length !== 256) {
-      errors.push(`Projected embedding must be 256-dim, got ${packet.embeddingProjected.length}-dim.`);
+    if (packet.embeddingProjected.length !== packet.embeddingContract.storedDimensions) {
+      errors.push(`Projected embedding must be ${packet.embeddingContract.storedDimensions}-dim, got ${packet.embeddingProjected.length}-dim.`);
     }
     if (!packet.embeddingContract.projectionVersion) {
       errors.push(`Projected embedding requires projectionVersion in contract.`);
@@ -265,7 +279,7 @@ export const workerDispatchRules = {
     timeout: 5000,
   },
   project_mrl: {
-    description: 'Optional Matryoshka projection (Phase 107+, after validation)',
+    description: 'Optional truncated semantic projection with explicit lineage (Phase 107+, after validation)',
     handler: 'mrl-projection-worker.ts',
     timeout: 5000,
   },
@@ -294,8 +308,11 @@ export const buildIngestionWorkerDispatch = (
     priority: 'high',
   });
 
-  // Optional: project to 256-dim MRL (post-Phase 106 evaluation)
-  if (packet.embeddingContract.storedDimensions === 256) {
+  // Optional: project native 768 embeddings into a declared truncated semantic lane
+  if (
+    packet.embeddingContract.modelId === 'embeddinggemma' &&
+    packet.embeddingContract.storedDimensions < packet.embeddingContract.nativeDimensions
+  ) {
     jobs.push({
       jobType: 'project_mrl',
       packet,

@@ -16,7 +16,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { rgKeywordSearch, normalizeRgScore, type RgMatch } from '$lib/server/retrieval/rg-search-bridge';
 import { extractBM25Scores, extractQueryTerms, type BM25ScoreMap } from '$lib/server/retrieval/bm25-score-extractor';
 import { rerankerBlend, type QdrantResult, type RerankerCandidate } from '$lib/server/retrieval/reranker-blend';
-import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import fetch from 'node-fetch';
 
 interface SearchRequest {
@@ -81,9 +81,10 @@ async function searchQdrant(queryEmbedding: number[], limit: number): Promise<Qd
   }
 
   try {
-    const qdrant = getQdrantClient();
-    // Phase 8.6: Legacy reranker using 768-dim vectors
-    // TODO: Migrate to canonical 384-dim semantic_embedding in Phase 9
+    const qdrant = getQdrantManager();
+    // Phase 8.6: Legacy reranker using the 768-dim recall lane.
+    // Keep this as a compatibility path until the 384-vs-768 parity gate decides
+    // whether the 768 lane remains useful beyond recall and migration.
     const result = await qdrant._denseSearch({
       query: 'reranker-query',
       queryVector: queryEmbedding,

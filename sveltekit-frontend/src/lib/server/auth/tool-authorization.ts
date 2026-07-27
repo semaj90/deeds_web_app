@@ -50,6 +50,31 @@ export function derivePermissionGrant(event: RequestEvent): PermissionGrant {
 }
 
 /**
+ * Check cache for permission grant; fall back to deriving
+ */
+async function getOrDerivePermissionGrant(event: RequestEvent): Promise<PermissionGrant> {
+  const user = event.locals.user;
+  if (!user) {
+    throw new Error('getOrDerivePermissionGrant called without authenticated user');
+  }
+
+  // Try cache first
+  const { getGrantFromCache } = await import('./tool-authorization-cache.js');
+  const cached = await getGrantFromCache(user.id).catch(() => null);
+
+  if (cached) {
+    return cached;
+  }
+
+  // Derive and cache
+  const grant = derivePermissionGrant(event);
+  const { setGrantInCache } = await import('./tool-authorization-cache.js');
+  await setGrantInCache(grant).catch(() => {}); // Non-blocking cache write
+
+  return grant;
+}
+
+/**
  * Check if tool is in allowlist and caller has permission to invoke it
  * Logs authorization decisions asynchronously (non-blocking)
  *
@@ -106,14 +131,15 @@ export async function checkToolAccess(toolName: string, grant: PermissionGrant):
  * Tool authorization middleware for request handlers
  *
  * Returns permission grant or throws 401/403
+ * Integrates cache layer: tries Redis cache first, falls back to deriving
  */
-export function toolAuthorizationGuard(event: RequestEvent): PermissionGrant {
+export async function toolAuthorizationGuard(event: RequestEvent): Promise<PermissionGrant> {
   const user = event.locals.user;
   if (!user) {
     throw new Error('Tool dispatch requires authenticated user (401)');
   }
 
-  return derivePermissionGrant(event);
+  return getOrDerivePermissionGrant(event);
 }
 
 /**
@@ -131,7 +157,7 @@ export function validateToolName(toolName: unknown): string {
 
   // Tool names follow pattern: namespace.name or namespace.category.name
   // Example: atlas.search, atlas.graph.expand, kb.trace_search
-  const validPattern = /^[a-z_][a-z0-9_]*(\.[a-z0-9_]+)*$/i;
+  const validPattern = /^[a-z_][a-z0-9_]*(\.[a-z0-9_]+)*$/;
   if (!validPattern.test(toolName)) {
     throw new Error(
       `Invalid tool name format: '${toolName}'. Must match pattern: namespace.name (alphanumeric and underscores)`

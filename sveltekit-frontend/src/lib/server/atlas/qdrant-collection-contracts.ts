@@ -16,6 +16,8 @@
 const SHARED_INDEXED_PAYLOAD_FIELDS = {
   packet_key: 'keyword',
   source_ref: 'keyword',
+  workspace_id: 'keyword',
+  ontology_version: 'keyword',
   content_hash: 'keyword',
   language: 'keyword',
   domain_class: 'keyword',
@@ -37,6 +39,14 @@ const SHARED_NON_INDEXED_PAYLOAD_FIELDS = [
   'cluster_margin',
   'embedding_model',
   'embedding_dimension',
+  'embedding_lane',
+  'embedding_role',
+  'embedding_status',
+  'embedding_native_dimension',
+  'projection_source_dimension',
+  'projection_method',
+  'projection_version',
+  'normalization',
   'indexed_at',
 ] as const;
 
@@ -60,6 +70,8 @@ export const COLLECTION_CONTRACTS = {
     requiredPayloadFields: [
       'packet_key',
       'source_ref',
+      'workspace_id',
+      'ontology_version',
       'postgres_id',
       'content_hash',
       'contract_version',
@@ -96,6 +108,8 @@ export const COLLECTION_CONTRACTS = {
     requiredPayloadFields: [
       'packet_key',
       'source_ref',
+      'workspace_id',
+      'ontology_version',
       'postgres_id',
       'content_hash',
       'contract_version',
@@ -121,6 +135,8 @@ export const COLLECTION_CONTRACTS = {
     requiredPayloadFields: [
       'packet_key',
       'source_ref',
+      'workspace_id',
+      'ontology_version',
       'postgres_id',
       'content_hash',
       'contract_version',
@@ -152,6 +168,8 @@ export interface QdrantChunkPayload {
   // Identity — required, indexed
   packet_key:  string;
   source_ref:  string;
+  workspace_id: string;
+  ontology_version: string;
   postgres_id: string;    // codebase_chunk_index.id (UUID as text)
   content_hash: string;
 
@@ -179,6 +197,14 @@ export interface QdrantChunkPayload {
   // Embedding provenance — not indexed
   embedding_model:     string;
   embedding_dimension: 64 | 384 | 768;
+  embedding_lane?: 'dense_384' | 'dense_768' | 'latent_64';
+  embedding_role?: 'canonical_online_retrieval' | 'canonical_native_semantic' | 'routing_only' | 'derived';
+  embedding_status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED';
+  embedding_native_dimension?: 384 | 768;
+  projection_source_dimension?: 384 | 768;
+  projection_method?: 'none' | 'direct_slice' | 'autoencoder' | 'latent' | 'projection';
+  projection_version?: string;
+  normalization?: 'L2' | 'none';
   indexed_at:          string; // ISO timestamp
 }
 
@@ -250,6 +276,34 @@ export function validateQdrantPayloadForCollection(
     throw new PayloadValidationError(
       'embedding_dimension',
       `Expected ${expectedDimension}, got ${payload.embedding_dimension}`
+    );
+  }
+
+  if (payload.embedding_dimension === 384) {
+    if (payload.embedding_native_dimension !== undefined && payload.embedding_native_dimension !== 768) {
+      throw new PayloadValidationError(
+        'embedding_native_dimension',
+        `384 retrieval projections must declare native dimension 768 when lineage is present`
+      );
+    }
+    if (payload.embedding_lane !== undefined && payload.embedding_lane !== 'dense_384') {
+      throw new PayloadValidationError(
+        'embedding_lane',
+        `384 retrieval projections must use embedding_lane=dense_384`
+      );
+    }
+    if (payload.projection_method !== undefined && payload.projection_method === 'none') {
+      throw new PayloadValidationError(
+        'projection_method',
+        `384 retrieval projections cannot declare projection_method=none`
+      );
+    }
+  }
+
+  if (payload.embedding_dimension === 768 && payload.embedding_lane !== undefined && payload.embedding_lane !== 'dense_768') {
+    throw new PayloadValidationError(
+      'embedding_lane',
+      `768 native embeddings must use embedding_lane=dense_768 when lane lineage is declared`
     );
   }
 }

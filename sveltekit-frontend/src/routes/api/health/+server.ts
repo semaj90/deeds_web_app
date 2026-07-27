@@ -49,6 +49,35 @@ interface CheckResult {
   error?: string;
 }
 
+function tryParseUrl(raw: string | undefined | null): URL | null {
+  const normalized = String(raw ?? '').trim();
+  if (!normalized) return null;
+  try {
+    return new URL(normalized);
+  } catch {
+    return null;
+  }
+}
+
+function tryParseNeo4jHttpUrl(raw: string | undefined | null): URL | null {
+  const normalized = String(raw ?? '').trim();
+  if (!normalized) return null;
+  const httpUrl = normalized.replace('bolt://', 'http://');
+  return tryParseUrl(httpUrl);
+}
+
+async function probeTcpUrl(raw: string | undefined | null, fallbackPort: number, name: string): Promise<CheckResult> {
+  const parsed = tryParseUrl(raw);
+  if (!parsed) {
+    return {
+      ok: false,
+      latencyMs: 0,
+      error: `Invalid or missing ${name} URL`,
+    };
+  }
+  return probeTcp(parsed.hostname, parseInt(parsed.port || String(fallbackPort), 10), name);
+}
+
 async function probe(url: string, timeoutMs = 5000): Promise<CheckResult> {
   const start = performance.now();
   try {
@@ -78,7 +107,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
   const trtllmUrl = ENV.TENSORRT_URL;
   const tritonUrl = ENV.TRITON_URL;
   const langextractUrl = ENV.LANGEXTRACT_URL;
-  const seaweedMasterUrl = `http://${ENV.MINIO_ENDPOINT}:${SEAWEED_MASTER_PORT}/cluster/status`;
+  const seaweedHost = ENV.SEAWEED_ENDPOINT || ENV.MINIO_ENDPOINT;
+  const seaweedMasterUrl = `http://${seaweedHost}:${SEAWEED_MASTER_PORT}/cluster/status`;
 
   // Run all probes in parallel
   const [
@@ -123,11 +153,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     // --- Data-tier probes ---
     runtimeProfile.services.redis.state === 'disabled' ? Promise.resolve({ ok: true, latencyMs: 0 }) : probeRedis(),
     probePostgres(),
-    probeTcp(
-      new URL(ENV.RABBITMQ_URL).hostname,
-      parseInt(new URL(ENV.RABBITMQ_URL).port || '5672', 10),
-      'rabbitmq'
-    ),
+    probeTcpUrl(ENV.RABBITMQ_URL, 5672, 'rabbitmq'),
     probe(seaweedMasterUrl, 2000).catch(() => ({
       ok: false,
       latencyMs: 0,
@@ -140,19 +166,18 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     })),
     runtimeProfile.services.neo4j.state === 'disabled'
       ? Promise.resolve({ ok: true, latencyMs: 0 })
-      : probe(
-          `http://${new URL(ENV.NEO4J_URI.replace('bolt://', 'http://')).hostname}:7474/`,
-          3000
-        ).catch(() => ({
-          ok: false,
-          latencyMs: 0,
-          error: 'neo4j probe failed',
-        })),
-    probeTcp(
-      new URL(ENV.NATS_URL).hostname,
-      parseInt(new URL(ENV.NATS_URL).port || '4222', 10),
-      'nats'
-    ),
+      : (() => {
+          const neo4jUrl = tryParseNeo4jHttpUrl(ENV.NEO4J_URI);
+          if (!neo4jUrl) {
+            return Promise.resolve({ ok: false, latencyMs: 0, error: 'Invalid or missing neo4j URL' });
+          }
+          return probe(`http://${neo4jUrl.hostname}:7474/`, 3000).catch(() => ({
+            ok: false,
+            latencyMs: 0,
+            error: 'neo4j probe failed',
+          }));
+        })(),
+    probeTcpUrl((ENV as Record<string, unknown>).NATS_URL as string | undefined, 4222, 'nats'),
   ]);
 
   const checks = {
@@ -337,11 +362,7 @@ async function handleServiceHealth(service: string) {
       return json({ service: 'go-search', ...result, grpcUrl: ENV.GO_SEARCH_GRPC_URL });
     }
     case 'rabbitmq': {
-      const result = await probeTcp(
-        new URL(ENV.RABBITMQ_URL).hostname,
-        parseInt(new URL(ENV.RABBITMQ_URL).port || '5672', 10),
-        'rabbitmq'
-      );
+      const result = await probeTcpUrl(ENV.RABBITMQ_URL, 5672, 'rabbitmq');
       return json({ service: 'rabbitmq', ...result });
     }
     case 'seaweedfs': {
@@ -357,16 +378,14 @@ async function handleServiceHealth(service: string) {
       return json({ service: 'couchdb', ...result });
     }
     case 'neo4j': {
-      const host = new URL(ENV.NEO4J_URI.replace('bolt://', 'http://')).hostname;
-      const result = await probe(`http://${host}:7474/`, 3000);
+      const parsed = tryParseNeo4jHttpUrl(ENV.NEO4J_URI);
+      const result = parsed
+        ? await probe(`http://${parsed.hostname}:7474/`, 3000)
+        : { ok: false, latencyMs: 0, error: 'Invalid or missing neo4j URL' };
       return json({ service: 'neo4j', ...result });
     }
     case 'nats': {
-      const result = await probeTcp(
-        new URL(ENV.NATS_URL).hostname,
-        parseInt(new URL(ENV.NATS_URL).port || '4222', 10),
-        'nats'
-      );
+      const result = await probeTcpUrl((ENV as Record<string, unknown>).NATS_URL as string | undefined, 4222, 'nats');
       return json({ service: 'nats', ...result });
     }
     default:

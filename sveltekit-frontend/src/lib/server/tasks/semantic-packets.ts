@@ -23,6 +23,7 @@ import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { traceSpan } from '$lib/server/observability/langfuse';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { desc, eq, sql } from 'drizzle-orm';
+import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 
 const TASK_COLLECTION = process.env.TASKS_QDRANT_COLLECTION || 'codebase_chunks_768';
 const TASK_COLLECTION_NAME = qdrantManager.collections.codebase_chunks;
@@ -45,47 +46,50 @@ type TaskSummaryPlan = {
 };
 
 type TaskSemanticPacketCacheRecord = {
-  taskId: number;
-  packetId: string;
-  queueId: string | null;
-  qdrantPointId: string;
-  workspaceId: string | null;
-  featureId: string | null;
-  sourceRef: string;
+  task_id: number;
+  packet_id: string;
+  queue_id: string | null;
+  qdrant_point_id: string;
+  workspace_id: string | null;
+  feature_id: string | null;
+  source_ref: string;
+  packet_key: string;
   summary: string;
-  nextAction: string;
+  next_action: string;
   confidence: number;
   status: TaskSemanticPacketBundle['status'];
-  relatedFeatureIds: string[];
-  relatedTaskIds: string[];
-  relatedFilePaths: string[];
-  clusterId: string | null;
-  centroidId: string | null;
-  parentCentroidId: string | null;
-  agentPickupReady: boolean;
-  cachedAt: string;
+  related_feature_ids: string[];
+  related_task_ids: string[];
+  related_file_paths: string[];
+  cluster_id: string | null;
+  centroid_id: string | null;
+  parent_centroid_id: string | null;
+  agent_pickup_ready: boolean;
+  cached_at: string;
 };
 
 export interface TaskSemanticPacketBundle {
-  queueId?: string;
-  taskId: number;
-  packetId: string;
-  qdrantPointId: string;
-  workspaceId: string | null;
-  featureId: string | null;
+  queue_id?: string;
+  task_id: number;
+  packet_id: string;
+  packet_key: string;
+  qdrant_point_id: string;
+  workspace_id: string | null;
+  feature_id: string | null;
+  source_ref: string;
   summary: string;
-  nextAction: string;
+  next_action: string;
   confidence: number;
   status: 'todo' | 'doing' | 'blocked' | 'done';
-  relatedFeatureIds: string[];
-  relatedTaskIds: string[];
-  relatedFilePaths: string[];
-  clusterId: string | null;
-  centroidId: string | null;
-  packetRow?: Record<string, unknown>;
-  taskRow?: Record<string, unknown>;
-  summaryHash?: string;
-  summaryModel?: string;
+  related_feature_ids: string[];
+  related_task_ids: string[];
+  related_file_paths: string[];
+  cluster_id: string | null;
+  centroid_id: string | null;
+  packet_row?: Record<string, unknown>;
+  task_row?: Record<string, unknown>;
+  summary_hash?: string;
+  summary_model?: string;
 }
 
 function normalizeText(value: unknown): string {
@@ -150,9 +154,9 @@ function getTaskTitle(task: Record<string, unknown>): string {
 }
 
 function getTaskSourceRef(task: Record<string, unknown>): string {
-  const workspaceId = getWorkspaceId(task);
-  const taskId = normalizeText(task.id);
-  return `${workspaceId}:task:${taskId || 'unknown'}`;
+  const workspace_id = getWorkspaceId(task);
+  const task_id = normalizeText(task.id);
+  return `${workspace_id}:task:${task_id || 'unknown'}`;
 }
 
 export async function traceTaskPacketLifecycle(
@@ -198,10 +202,10 @@ async function updatePacketPayloadOnQdrant(pointId: string, payload: Record<stri
 }
 
 async function generateTaskSummary(task: Record<string, unknown>): Promise<TaskSummaryPlan> {
-  const taskId = Number(task.id);
+  const task_id = Number(task.id);
   const title = getTaskTitle(task);
-  const workspaceId = getWorkspaceId(task);
-  const featureId = normalizeText(task.feature_id);
+  const workspace_id = getWorkspaceId(task);
+  const feature_id = normalizeText(task.feature_id);
 
   const prompt = [
     'You are producing a task semantic packet for an engineering Kanban system.',
@@ -213,9 +217,9 @@ async function generateTaskSummary(task: Record<string, unknown>): Promise<TaskS
     'Task context:',
     JSON.stringify(
       {
-        workspace_id: workspaceId,
-        task_id: taskId,
-        feature_id: featureId || null,
+        workspace_id,
+        task_id,
+        feature_id: feature_id || null,
         title,
         name: normalizeText(task.name),
         task: task,

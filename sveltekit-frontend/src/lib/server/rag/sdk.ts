@@ -6,6 +6,8 @@ import type { RagShardJob, DocStatus, DocStatusInfo } from './types.js';
 
 export async function enqueueDocumentForRag(params: {
 	docId: string;
+    objectStorageBucket?: string;
+	objectStorageKey?: string;
     minioBucket: string;
 	minioKey: string;
     fileSizeBytes: number;
@@ -22,6 +24,8 @@ export async function enqueueDocumentForRag(params: {
         jobs.push({
             shardId: i,
             docId: params.docId,
+            objectStorageBucket: params.objectStorageBucket ?? params.minioBucket,
+            objectStorageKey: params.objectStorageKey ?? params.minioKey,
             minioBucket: params.minioBucket,
             minioKey: params.minioKey,
             byteStart,

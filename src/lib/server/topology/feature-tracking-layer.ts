@@ -3,6 +3,7 @@
  *
  * Bridges Postgres (truth), Qdrant (mirror), and Neo4j (topology)
  * Ensures all three stores expose the same 9 core fields + 2 retrieval fields
+ * while keeping embedding identity separate from retrieval projection dimensions.
  *
  * Canonical fields (must exist in ALL stores):
  * 1. packet_key (identity)
@@ -68,11 +69,35 @@ export interface CanonicalPacket {
   retrieval_strategy?: string;
 
   // === AUDIT ===
-  /** Embedding model used (canonical: 'embeddinggemma:latest') */
+  /** Embedding model family anchor */
   embedding_model: string;
 
-  /** Embedding dimension (canonical: 384) */
+  /** Native semantic embedding dimension for the packet contract */
+  embedding_native_dim: number;
+
+  /** Optional truncated retrieval projection dimension such as 384 */
+  embedding_projection_dim?: number | null;
+
+  /** Compatibility alias for older consumers that still expect one dimension field */
   embedding_dim: number;
+
+  /** Named representation lane, e.g. dense_384 or dense_768 */
+  embedding_lane?: string;
+
+  /** Representation status for parity and promotion decisions */
+  embedding_status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED';
+
+  /** Projection source dimension when this row reflects a derived lane */
+  projection_source_dimension?: number | null;
+
+  /** Projection method when this row reflects a derived lane */
+  projection_method?: string | null;
+
+  /** Projection contract or lineage version */
+  projection_version?: string | null;
+
+  /** Representation policy marker for parity/audit reporting */
+  representation_policy: string;
 
   /** Row created timestamp (Postgres source of truth) */
   created_at: Date;
@@ -127,6 +152,10 @@ export interface FeatureTrackingRecord {
   verification_errors?: string[];
 }
 
+const EMBEDDING_MODEL_ANCHOR = 'embeddinggemma:latest';
+const EMBEDDING_NATIVE_DIM = 768;
+const REPRESENTATION_POLICY = 'canonical_search_384_with_native_768_and_explicit_projection_lineage';
+
 // ============================================================================
 // POSTGRES QUERIES (TRUTH LAYER)
 // ============================================================================
@@ -151,8 +180,16 @@ export async function getCanonicalPacketFromPostgres(
         ap.topolog_cluster,
         ap.updated_at,
         ap.created_at,
-        'embeddinggemma:latest' AS embedding_model,
-        384 AS embedding_dim
+        '${EMBEDDING_MODEL_ANCHOR}' AS embedding_model,
+        ${EMBEDDING_NATIVE_DIM} AS embedding_native_dim,
+        384 AS embedding_projection_dim,
+        384 AS embedding_dim,
+        'dense_384' AS embedding_lane,
+        'ACTIVE' AS embedding_status,
+        ${EMBEDDING_NATIVE_DIM} AS projection_source_dimension,
+        'direct_slice' AS projection_method,
+        'atlas-embeddinggemma-direct-slice384-v1' AS projection_version,
+        '${REPRESENTATION_POLICY}' AS representation_policy
       FROM atlas_packets ap
       WHERE ap.packet_key = $1
       LIMIT 1
@@ -172,7 +209,15 @@ export async function getCanonicalPacketFromPostgres(
       title_id: row.title_id,
       topolog_cluster: row.topolog_cluster,
       embedding_model: row.embedding_model,
+      embedding_native_dim: row.embedding_native_dim,
+      embedding_projection_dim: row.embedding_projection_dim,
       embedding_dim: row.embedding_dim,
+      embedding_lane: row.embedding_lane,
+      embedding_status: row.embedding_status,
+      projection_source_dimension: row.projection_source_dimension,
+      projection_method: row.projection_method,
+      projection_version: row.projection_version,
+      representation_policy: row.representation_policy,
       created_at: row.created_at,
       updated_at: row.updated_at
     };
@@ -206,8 +251,16 @@ export async function getCanonicalPacketsFromPostgres(
         ap.topolog_cluster,
         ap.updated_at,
         ap.created_at,
-        'embeddinggemma:latest' AS embedding_model,
-        384 AS embedding_dim
+        '${EMBEDDING_MODEL_ANCHOR}' AS embedding_model,
+        ${EMBEDDING_NATIVE_DIM} AS embedding_native_dim,
+        384 AS embedding_projection_dim,
+        384 AS embedding_dim,
+        'dense_384' AS embedding_lane,
+        'ACTIVE' AS embedding_status,
+        ${EMBEDDING_NATIVE_DIM} AS projection_source_dimension,
+        'direct_slice' AS projection_method,
+        'atlas-embeddinggemma-direct-slice384-v1' AS projection_version,
+        '${REPRESENTATION_POLICY}' AS representation_policy
       FROM atlas_packets ap
       WHERE ap.packet_key = ANY($1)
       LIMIT $2
@@ -224,7 +277,15 @@ export async function getCanonicalPacketsFromPostgres(
       title_id: row.title_id,
       topolog_cluster: row.topolog_cluster,
       embedding_model: row.embedding_model,
+      embedding_native_dim: row.embedding_native_dim,
+      embedding_projection_dim: row.embedding_projection_dim,
       embedding_dim: row.embedding_dim,
+      embedding_lane: row.embedding_lane,
+      embedding_status: row.embedding_status,
+      projection_source_dimension: row.projection_source_dimension,
+      projection_method: row.projection_method,
+      projection_version: row.projection_version,
+      representation_policy: row.representation_policy,
       created_at: row.created_at,
       updated_at: row.updated_at
     }));
@@ -254,6 +315,27 @@ export async function enrichFromQdrantPayload(
     qdrant_point_id: qdrantPayload.qdrant_point_id || undefined,
     som_cluster: qdrantPayload.som_cluster || packet.som_cluster,
     community_id: qdrantPayload.community_id || packet.community_id,
+    embedding_projection_dim: Number.isFinite(Number(qdrantPayload.embedding_dimension ?? qdrantPayload.embedding_dim))
+      ? Number(qdrantPayload.embedding_dimension ?? qdrantPayload.embedding_dim)
+      : packet.embedding_projection_dim,
+    embedding_lane: typeof qdrantPayload.embedding_lane === 'string'
+      ? qdrantPayload.embedding_lane
+      : packet.embedding_lane,
+    embedding_status: typeof qdrantPayload.embedding_status === 'string'
+      ? qdrantPayload.embedding_status
+      : packet.embedding_status,
+    projection_source_dimension: Number.isFinite(Number(qdrantPayload.projection_source_dimension ?? qdrantPayload.embedding_native_dimension))
+      ? Number(qdrantPayload.projection_source_dimension ?? qdrantPayload.embedding_native_dimension)
+      : packet.projection_source_dimension,
+    projection_method: typeof qdrantPayload.projection_method === 'string'
+      ? qdrantPayload.projection_method
+      : packet.projection_method,
+    projection_version: typeof qdrantPayload.projection_version === 'string'
+      ? qdrantPayload.projection_version
+      : packet.projection_version,
+    embedding_dim: Number.isFinite(Number(qdrantPayload.embedding_dimension ?? qdrantPayload.embedding_dim))
+      ? Number(qdrantPayload.embedding_dimension ?? qdrantPayload.embedding_dim)
+      : packet.embedding_dim,
     retrieval_strategy: qdrantPayload.retrieval_strategy || undefined
   };
 }

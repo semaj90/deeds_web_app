@@ -19,6 +19,12 @@ describe('canonical rerank executor bridge', () => {
         name: 'dense',
         score: 0.91,
         qdrant_point_id: 'q-1',
+        embedding_lane: 'dense_384',
+        embedding_status: 'ACTIVE',
+        embedding_native_dimension: 768,
+        projection_source_dimension: 768,
+        projection_method: 'direct_slice',
+        projection_version: 'embeddinggemma-768-to-384-direct-slice-v1',
         metric: 'cosine',
         confidence: 0.9,
       },
@@ -44,6 +50,9 @@ describe('canonical rerank executor bridge', () => {
     expect(candidate.content).toBe('hello world');
     expect(candidate.retrievedRank).toBe(7);
     expect(candidate.denseScore).toBe(0.91);
+    expect(candidate.embeddingLane).toBe('dense_384');
+    expect(candidate.embeddingStatus).toBe('ACTIVE');
+    expect(candidate.projectionVersion).toBe('embeddinggemma-768-to-384-direct-slice-v1');
     expect(candidate.bm25Score).toBe(0.8);
     expect(candidate.pagerankScore).toBe(0.42);
   });

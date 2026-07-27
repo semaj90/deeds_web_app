@@ -17,6 +17,7 @@ import { execFile } from 'node:child_process';
 import { basename, extname, resolve as pathResolve } from 'node:path';
 import type { Candidate } from './search-runtime.js';
 import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
+import { embedQueryForLane } from './embedding-service.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
 import { RETRIEVAL_LIMITS, identifierVariants, inferRetrievalTier, tokenizeKeywordSurface } from './search-contract.js';
 
@@ -104,7 +105,7 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
  */
 async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
   try {
-    const laneCandidates = await _sparseRetriever.retrieve({ query, limit: SPARSE_LIMIT });
+    const laneCandidates = await getSparseRetriever().retrieve({ query, limit: SPARSE_LIMIT });
     return laneCandidates.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetKey,
       packetKey: lc.packetKey,
@@ -113,6 +114,7 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
       content: (lc.metadata?.content as string) || '',
       score: lc.score ?? 0,
       scoreSource: 'qdrant' as const,
+      embeddingLane: 'bm42_sparse' as const,
     }));
   } catch {
     return [];
@@ -291,7 +293,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
         const results = await qdrant.hybridSearch({
           collection,
           query,
-          queryEmbedding,
+          queryEmbedding: Array.from(queryEmbedding),
           limit: QDRANT_LIMIT,
         });
 
@@ -303,7 +305,14 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
             summary: (hit.payload?.summary as string) || '',
             content: (hit.payload?.content as string) || '',
             score: hit.score,
-            scoreSource: 'qdrant' as const,
+            scoreSource:
+              collection === 'codebase_chunks_384_hybrid'
+                ? 'qdrant_384'
+                : 'qdrant_768',
+            embeddingLane:
+              collection === 'codebase_chunks_384_hybrid'
+                ? 'dense_384'
+                : 'dense_768',
           };
 
           const existing = resultsByKey.get(candidate.packetKey) ?? resultsByKey.get(candidate.id);
@@ -333,7 +342,7 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
     const results = await qdrant.hybridSearch({
       collection: VECTOR_INDEX_REGISTRY.qdrantSource768.collection ?? 'codebase_chunks_768',
       query,
-      queryEmbedding: queryVectors.dense768 ?? queryVectors.dense384 ?? Array.from(embedding),
+      queryEmbedding: Array.from(queryVectors.dense768 ?? queryVectors.dense384 ?? embedding),
       limit: QDRANT_LIMIT,
     });
 
@@ -344,7 +353,8 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
       summary: (hit.payload?.summary as string) || '',
       content: (hit.payload?.content as string) || '',
       score: hit.score * 0.95,
-      scoreSource: 'qdrant' as const,
+      scoreSource: 'qdrant_768' as const,
+      embeddingLane: 'dense_768' as const,
     }));
   } catch (fallbackError) {
     console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);

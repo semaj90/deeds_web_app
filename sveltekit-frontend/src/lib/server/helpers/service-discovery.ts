@@ -87,11 +87,18 @@ export function getServiceDiscovery(): ServiceDiscovery {
 
 // Common Service Configs
 export const COMMON_SERVICES: Record<string, ServiceConfig> = {
+  seaweedfs: {
+    envVar: 'SEAWEED_ENDPOINT',
+    fallback: ENV.SEAWEED_S3_ENDPOINT,
+    containerName: 'legal-ai-seaweed-s3',
+    port: 8333,
+    verify: true,
+  },
   minio: {
     envVar: 'MINIO_ENDPOINT',
     fallback: ENV.MINIO_URL,
-    containerName: 'legal-ai-minio',
-    port: 9000,
+    containerName: 'legal-ai-seaweed-s3',
+    port: 8333,
     verify: true,
   },
   ollama: {

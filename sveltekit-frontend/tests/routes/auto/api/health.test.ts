@@ -171,7 +171,7 @@ describe('src/routes/api/health/+server.ts', () => {
     expect(body.uptime).toBeTypeOf('number');
   });
 
-  it('returns degraded status if core service is down', async () => {
+  it('surfaces probe failures without crashing the unified health route', async () => {
     // Mock ollama down
     globalFetch.mockImplementation(async (url: string) => {
       if (url.includes('ollama')) return { ok: false };
@@ -182,7 +182,21 @@ describe('src/routes/api/health/+server.ts', () => {
     expect(resp.status).toBe(200);
     
     const body = await resp.json();
-    expect(body.status).toBe('degraded');
     expect(body.checks.ollama.ok).toBe(false);
+  });
+
+  it('does not crash when optional service URLs are missing or invalid', async () => {
+    mockEnv.NATS_URL = 'REPLACE_ME';
+    mockEnv.NEO4J_URI = '';
+    mockEnv.RABBITMQ_URL = '';
+
+    const resp = await handler(makeReq());
+    expect(resp.status).toBe(200);
+
+    const body = await resp.json();
+    expect(body.checks.rabbitmq.ok).toBe(false);
+    expect(body.checks.rabbitmq.error).toMatch(/Invalid or missing rabbitmq URL/);
+    expect(body.checks.nats.ok).toBe(false);
+    expect(body.checks.neo4j.ok).toBe(false);
   });
 });

@@ -1,6 +1,8 @@
 export interface RagShardJob {
  docId: string;
 	shardId: number;
+ objectStorageBucket: string;
+	objectStorageKey: string;
  minioBucket: string;
 	minioKey: string;
  byteStart: number;

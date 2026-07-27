@@ -50,6 +50,9 @@ export const RerankCandidateSchema = z.object({
   content: z.string().min(0),
   retrievedRank: z.number().int().min(1),
   denseScore: z.number().min(0).max(1).optional(),
+  embeddingLane: z.enum(['dense_384', 'dense_768']).optional(),
+  embeddingStatus: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).optional(),
+  projectionVersion: z.string().optional(),
   bm25Score: z.number().min(0).max(1).optional(),
   astScore: z.number().min(0).max(1).optional(),
   graphScore: z.number().min(0).max(1).optional(),
@@ -234,4 +237,3 @@ export class DeterministicReranker implements RuntimeReranker {
     return this.version;
   }
 }
-

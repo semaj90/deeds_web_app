@@ -294,6 +294,9 @@ export function canonicalEnvelopeToRerankCandidate(
     content: pickEnvelopeContent(envelope, maxLength),
     retrievedRank: envelope.retrieved_rank ?? fallbackIndex + 1,
     denseScore: envelope.dense?.score,
+    embeddingLane: envelope.dense?.embedding_lane,
+    embeddingStatus: envelope.dense?.embedding_status,
+    projectionVersion: envelope.dense?.projection_version,
     bm25Score: envelope.lexical?.score,
     astScore: envelope.ast?.score,
     graphScore: envelope.metadata?.score ?? envelope.authority?.score,
@@ -368,7 +371,9 @@ export class MixedbreadCanonicalReranker implements RuntimeReranker {
           modelVersion: this.version,
           blendWeights: this.blendWeights as any,
           evidence: {
-            semanticLane: candidate.denseScore !== undefined ? `dense=${candidate.denseScore.toFixed(2)}` : undefined,
+            semanticLane: candidate.denseScore !== undefined
+              ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
+              : undefined,
             lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
             topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
           },
@@ -483,7 +488,9 @@ async function scoreWithXgboostSidecar(
             crossEncoder: 0,
           },
           evidence: {
-            semanticLane: candidate.denseScore !== undefined ? `dense=${candidate.denseScore.toFixed(2)}` : undefined,
+            semanticLane: candidate.denseScore !== undefined
+              ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
+              : undefined,
             lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
             topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
           },
@@ -538,7 +545,9 @@ function localFallbackRerank(candidates: RerankCandidate[]): { modelVersion: str
           crossEncoder: 0,
         },
         evidence: {
-          semanticLane: candidate.denseScore !== undefined ? `dense=${candidate.denseScore.toFixed(2)}` : undefined,
+          semanticLane: candidate.denseScore !== undefined
+            ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
+            : undefined,
           lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
           topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
         },

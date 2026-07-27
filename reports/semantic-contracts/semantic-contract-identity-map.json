@@ -1,0 +1,25 @@
+{
+  "canonical_identity": "packet_key (deterministic sha256 of source_ref + tree_node_id + title_id)",
+  "derivation": {
+    "source_file": "source_ref (file path)",
+    "structural_identity": "tree_node_id (AST node identifier from tree-sitter)",
+    "grouping_identity": "title_id (semantic grouping key)",
+    "content_integrity": "content_hash (sha256 of content)"
+  },
+  "immutability_rule": "packet_key MUST remain identical across all storage layers",
+  "traversal_layers": {
+    "source": "Original file → source_ref extracted",
+    "validation": "Zod schema validation → packet_key computed",
+    "postgres": "atlas_packets.packet_key canonical row",
+    "qdrant": "codebase_chunks_768 payload.packet_key",
+    "redis": "bifrost:packet:{packet_key}",
+    "hyperrag": "HyperRagPacketRpcPacket.packet_key in response",
+    "agent": "ACE context packet.packet_key unchanged"
+  },
+  "evidence_gates": [
+    "packet_key immutability across storage (Postgres → Qdrant → Redis → HyperRAG → Agent)",
+    "content_hash matches original file (no mutation)",
+    "no unresolved state silently converted to RESOLVED",
+    "feature routing fields (som_cluster, kmeans_cluster) maintain routing/topology semantics only"
+  ]
+}

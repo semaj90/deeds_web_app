@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { v4 as uuidv4 } from 'crypto';
+import { randomUUID } from 'node:crypto';
 
 export const SemanticRpcMessageSchema = z.object({
   messageId: z.string().uuid(),
@@ -8,7 +8,7 @@ export const SemanticRpcMessageSchema = z.object({
   method: z.string().min(1),
   destination: z.string().min(1),
 
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
 
   contractVersion: z.string().min(1),
   idempotencyKey: z.string().min(1),
@@ -39,7 +39,7 @@ export class SemanticRpcEnvelope {
     const deadline = new Date(now.getTime() + 30 * 60 * 1000); // 30 minute deadline
 
     return {
-      messageId: uuidv4().toString(),
+      messageId: randomUUID(),
       runId,
       method,
       destination,

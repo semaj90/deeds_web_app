@@ -5,7 +5,13 @@ import { FeatureVectorGenerator } from './feature-vector-generator.js';
 import { TreeNodeExtractor } from './tree-node-extractor.js';
 import { DomainClassifier } from './domain-classifier.js';
 import { SomClusterer } from './som-clustering.js';
-import type { IdentityCore } from '../../../../schemas/atlas_canonical_schema.js';
+
+interface IdentityCore {
+  sourceRef: string;
+  packetKey: string;
+  featureId: string;
+  nodeId: string;
+}
 
 /**
  * Feature Extraction → SOM Clustering Orchestrator
@@ -75,7 +81,7 @@ export class FeatureExtractionOrchestrator {
 
     try {
       // Step 1: Load packets from Postgres
-      let query = db
+      const baseQuery = db
         .select({
           packetKey: atlasPackets.packetKey,
           sourceRef: atlasPackets.sourceRef,
@@ -87,11 +93,9 @@ export class FeatureExtractionOrchestrator {
         .from(atlasPackets)
         .where(isNotNull(atlasPackets.sourceRef));
 
-      if (options.limit) {
-        query = query.limit(options.limit);
-      }
-
-      const packets = await query;
+      const packets = options.limit
+        ? await baseQuery.limit(options.limit)
+        : await baseQuery;
       result.totalPackets = packets.length;
 
       if (options.verbose) {

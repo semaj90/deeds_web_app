@@ -95,7 +95,7 @@ function normalizeRequest(request: LegacyRetrievalRequest | SearchRequest): Sear
   return {
     query: legacy.query,
     k: legacy.k ?? legacy.limit ?? 10,
-    embedding_dim: 384, // Default to canonical GPU dimension
+    embedding_dim: 384, // Default to canonical online dense lane
     lanes: normalizeLanes(legacy.lanes),
     summarize: false,
   };

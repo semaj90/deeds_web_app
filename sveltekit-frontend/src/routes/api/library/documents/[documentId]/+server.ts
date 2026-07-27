@@ -8,6 +8,10 @@ import type { RequestHandler } from './$types';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import { pool } from '$lib/server/db/client';
 import { isUuid } from '$lib/server/validation.js';
+import {
+  buildObjectStorageCompatibilityFields,
+  resolveObjectStorageKey,
+} from '$lib/server/storage/object-storage-compat.js';
 
 const documentUpdateSchema = z.object({
 	title: z.string().max(500).optional(),
@@ -40,6 +44,12 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 	if (docRes.rowCount === 0) return json({ error: 'Not found' }, { status: 404 });
 	const doc = docRes.rows[0];
+  const compatibilityFields = buildObjectStorageCompatibilityFields(
+    resolveObjectStorageKey({
+      objectStorageKey: doc.object_storage_key,
+      minioKey: doc.minio_key,
+    })
+  );
 
 	const versionsRes = await pool.query(`
 		SELECT id, version_label, source_date, is_current, amendment_note, created_at
@@ -67,7 +77,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
         officialUrl: doc.official_url,
         sourceHash: doc.source_hash,
         mimeType: doc.mime_type,
-        minioKey: doc.minio_key,
+        objectStorageKey: compatibilityFields.objectStorageKey,
+        minioKey: compatibilityFields.minioKey,
         nodeCount: doc.node_count,
         chunkCount: doc.chunk_count,
         createdAt: doc.created_at,

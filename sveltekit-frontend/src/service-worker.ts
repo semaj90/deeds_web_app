@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 import { buildRuntimeCacheKey } from './lib/runtime-cache/runtime-cache-key';
+import { handlePhase18OfflineMessage } from './lib/client/phase18-offline-sync.js';
 
 // Define SyncEvent interface, as it might not be fully provided by lib="webworker" in all environments
 interface SyncEvent extends Event {
@@ -599,6 +600,16 @@ self.addEventListener('message', (event: MessageEvent) => {
 				warmingQueueLength: warmingQueue.length,
 				activeWarmingTasksSize: activeWarmingTasks.size,
 			});
+			break;
+		case 'phase18:sync-offline':
+			event.waitUntil(
+				(async () => {
+					const result = await handlePhase18OfflineMessage(event.data);
+					if (event.ports && event.ports.length > 0) {
+						event.ports[0].postMessage(result);
+					}
+				})()
+			);
 			break;
 	}
 });

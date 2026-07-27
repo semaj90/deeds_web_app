@@ -8,20 +8,20 @@ const isDocker = env.DOCKER_ENV === 'true';
 const LOCALHOST = ['local', 'host'].join('');
 const LOOPBACK_IP = ['127', '0', '0', '1'].join('.');
 
-function getMinioPort(): number {
-  return parseInt(env?.MINIO_PORT ?? '9000', 10);
+function getObjectStoragePort(): number {
+  return parseInt(env?.SEAWEED_S3_PORT ?? env?.MINIO_PORT ?? '9000', 10);
 }
 
-function getMinioUseSSL(): boolean {
+function getObjectStorageUseSSL(): boolean {
   return env.MINIO_USE_SSL === 'true';
 }
 
-function normalizeMinioEndpoint(rawValue?: string): string {
-  const fallbackHost = isDocker ? 'minio' : LOCALHOST;
+function normalizeObjectStorageEndpoint(rawValue?: string): string {
+  const fallbackHost = isDocker ? 'seaweed-s3' : LOCALHOST;
   const raw = rawValue?.trim();
   const input = raw && raw.length > 0 ? raw : fallbackHost;
   let endpoint = input;
-  let port = getMinioPort();
+  let port = getObjectStoragePort();
 
   try {
     if (input.includes('://')) {
@@ -52,8 +52,8 @@ function normalizeMinioEndpoint(rawValue?: string): string {
   return `${endpoint}:${port}`;
 }
 
-function normalizeMinioUrl(rawValue?: string): string {
-  const scheme = getMinioUseSSL() ? 'https' : 'http';
+function normalizeObjectStorageUrl(rawValue?: string): string {
+  const scheme = getObjectStorageUseSSL() ? 'https' : 'http';
   const raw = rawValue?.trim();
 
   if (raw && raw.length > 0) {
@@ -61,10 +61,10 @@ function normalizeMinioUrl(rawValue?: string): string {
       return raw;
     }
 
-    return `${scheme}://${normalizeMinioEndpoint(raw)}`;
+    return `${scheme}://${normalizeObjectStorageEndpoint(raw)}`;
   }
 
-  return `${scheme}://${normalizeMinioEndpoint(env?.MINIO_ENDPOINT)}`;
+  return `${scheme}://${normalizeObjectStorageEndpoint(env?.SEAWEED_ENDPOINT ?? env?.MINIO_ENDPOINT)}`;
 }
 
 function normalizeRedisUrl(rawValue?: string): string {
@@ -145,11 +145,11 @@ export function getMcpMulticoreUrl(): string {
 
 export function getMinioConfig() {
  return {
-   endpoint: normalizeMinioEndpoint(env?.MINIO_ENDPOINT ?? env?.MINIO_URL),
-   accessKey: env?.MINIO_ACCESS_KEY ?? 'minioadmin',
-   secretKey: env?.MINIO_SECRET_KEY ?? 'minioadmin',
-   useSSL: getMinioUseSSL(),
- };
+   endpoint: normalizeObjectStorageEndpoint(env?.SEAWEED_ENDPOINT ?? env?.MINIO_ENDPOINT ?? env?.MINIO_URL),
+   accessKey: env?.SEAWEED_ACCESS_KEY ?? env?.MINIO_ACCESS_KEY ?? 'minioadmin',
+   secretKey: env?.SEAWEED_SECRET_KEY ?? env?.MINIO_SECRET_KEY ?? 'minioadmin',
+   useSSL: getObjectStorageUseSSL(),
+  };
 }
 
 export function getNeo4jConfig() {
@@ -219,7 +219,7 @@ const ConfigSchema = z.object({
   NEO4J_URL: z.string().url().default(getNeo4jConfig().uri),
   NEO4J_USER: z.string().default('neo4j'),
   NEO4J_PASSWORD: z.string().default('neo4j123'),
-  MINIO_URL: z.string().url().default(normalizeMinioUrl()),
+  MINIO_URL: z.string().url().default(normalizeObjectStorageUrl()),
   MINIO_ACCESS_KEY: z.string().default('minioadmin'),
   MINIO_SECRET_KEY: z.string().default('minioadmin'),
   MINIO_BUCKET: z.string().default('deeds-storage'),
@@ -240,7 +240,7 @@ const ConfigSchema = z.object({
   ENABLE_STRUCTURED_LOGGING: z.coerce.boolean().default(false),
   // Backward-compatible (legacy) aliases — no .url() since these can be host:port or connection strings
   DATABASE_URL: z.string().optional(),
-  MINIO_ENDPOINT: z.string().default(normalizeMinioEndpoint(env?.MINIO_ENDPOINT ?? env?.MINIO_URL)),
+  MINIO_ENDPOINT: z.string().default(normalizeObjectStorageEndpoint(env?.SEAWEED_ENDPOINT ?? env?.MINIO_ENDPOINT ?? env?.MINIO_URL)),
   MINIO_REGION: z.string().optional(),
 });
 
@@ -260,7 +260,7 @@ const parsed = ConfigSchema.safeParse({
   NEO4J_URL: env.NEO4J_URI,
   NEO4J_USER: env.NEO4J_USER,
   NEO4J_PASSWORD: env.NEO4J_PASSWORD,
-  MINIO_URL: normalizeMinioUrl(env?.MINIO_URL ?? env.MINIO_ENDPOINT),
+  MINIO_URL: normalizeObjectStorageUrl(env?.SEAWEED_S3_ENDPOINT ?? env?.MINIO_URL ?? env.MINIO_ENDPOINT),
   MINIO_ACCESS_KEY: env.MINIO_ACCESS_KEY,
   MINIO_SECRET_KEY: env.MINIO_SECRET_KEY,
   MINIO_BUCKET: env.MINIO_BUCKET,
@@ -280,7 +280,7 @@ const parsed = ConfigSchema.safeParse({
   LOG_LEVEL: env.LOG_LEVEL,
   ENABLE_STRUCTURED_LOGGING: env.ENABLE_STRUCTURED_LOGGING,
   DATABASE_URL: env.DATABASE_URL,
-  MINIO_ENDPOINT: normalizeMinioEndpoint(env.MINIO_ENDPOINT ?? env.MINIO_URL),
+  MINIO_ENDPOINT: normalizeObjectStorageEndpoint(env.SEAWEED_ENDPOINT ?? env.MINIO_ENDPOINT ?? env.MINIO_URL),
   MINIO_REGION: env.MINIO_REGION,
 });if (!parsed.success) {
  console.warn('⚠️ CONFIG validation issues (non-fatal): ', parsed.error.format());

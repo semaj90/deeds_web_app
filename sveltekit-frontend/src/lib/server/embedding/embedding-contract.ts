@@ -1,9 +1,10 @@
 /**
  * Step 3: Embedding Contract
  *
- * This file keeps the legacy 384 projection contract for downstream validators,
- * while also declaring the 768 source lane explicitly. The retrieval stack now
- * treats these as separate contracts rather than one ambiguous dimension.
+ * This file keeps the canonical 384 retrieval lane explicit,
+ * while also declaring the native or legacy 768 lane separately.
+ * The retrieval stack must treat these as separate contracts rather than one
+ * ambiguous canonical dimension.
  */
 
 export const EMBEDDING_CONTRACT = {
@@ -24,12 +25,12 @@ export const EMBEDDING_CONTRACT = {
   variant: 'latest',
 
   /**
-   * Derived retrieval dimension used by the 384-dim canonical lane.
+   * Canonical online retrieval dimension.
    */
   embedding_dimension: 384,
 
   /**
-   * Native Ollama output dimension (before any truncation).
+   * Native Ollama output dimension (before truncation).
    */
   native_dimension: 768,
 
@@ -99,7 +100,7 @@ export const EMBEDDING_CONTRACT = {
    */
   validation: {
     min_dimension: 384,
-    max_dimension: 384,
+    max_dimension: 768,
     min_norm_squared: 0.98, // 1.0 ± 0.02
     max_norm_squared: 1.02,
     allow_denormalized: false, // Hard fail if not normalized
@@ -129,7 +130,48 @@ export const EMBEDDING_CONTRACT = {
    * Version identifier (for migrations + schema versioning)
    */
   version: '1.0',
-  schema_version: '384-canonical-v1',
+  schema_version: '384-canonical-plus-768-legacy-v3',
+
+  /**
+   * Explicit representation lineage contract.
+   * Keep each lane separate and fuse downstream by rank or calibrated score,
+   * never by raw coordinate concatenation.
+   */
+  representations: {
+    semantic_384: {
+      lane_id: 'dense_384',
+      role: 'canonical_online_retrieval',
+      status: 'ACTIVE',
+      source_dimension: 768,
+      output_dimension: 384,
+      projection_method: 'direct_slice',
+      projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
+      normalization: 'L2',
+      collection: 'codebase_chunks_384_hybrid',
+    },
+    legacy_768: {
+      lane_id: 'dense_768',
+      role: 'canonical_native_semantic',
+      status: 'REFERENCE_ONLY',
+      source_dimension: 768,
+      output_dimension: 768,
+      projection_method: 'none',
+      projection_version: 'embeddinggemma-full768-v1',
+      normalization: 'L2',
+      collection: 'codebase_chunks_768',
+    },
+    latent_64: {
+      lane_id: 'latent_64',
+      role: 'routing_only',
+      status: 'ACTIVE',
+      source_dimension: 384,
+      output_dimension: 64,
+      projection_method: 'autoencoder',
+      projection_version: 'atlas-ae-384x64-v3',
+      normalization: 'L2',
+      collection: 'codebase_topology_64',
+    },
+  },
 
   /**
    * Canonical timestamp (when this contract was locked)
@@ -140,7 +182,8 @@ export const EMBEDDING_CONTRACT = {
    * Description for documentation
    */
   description:
-    'Legal AI platform canonical embedding contract. 384-dim Embedding Gemma via Ollama. ' +
+    'Legal AI platform embedding contract. 384-dim is the canonical online semantic search lane; ' +
+    '768-dim remains the native or legacy recall lane when lineage is explicit. ' +
     'L2-normalized. Used by Qdrant ANN search, TurboVec prefilter, GPU reranking, and ACE context assembly.',
 } as const;
 
@@ -148,6 +191,11 @@ export const SOURCE_EMBEDDING_DIMENSION = EMBEDDING_CONTRACT.source_embedding_di
 export const RETRIEVAL_EMBEDDING_DIMENSION = EMBEDDING_CONTRACT.retrieval_embedding_dimension;
 export const SOURCE_QDRANT_COLLECTION = EMBEDDING_CONTRACT.qdrant_source_collection;
 export const RETRIEVAL_QDRANT_COLLECTION = EMBEDDING_CONTRACT.qdrant_collection;
+export type EmbeddingRepresentationName = keyof typeof EMBEDDING_CONTRACT.representations;
+
+export function getEmbeddingRepresentation(name: EmbeddingRepresentationName) {
+  return EMBEDDING_CONTRACT.representations[name];
+}
 
 /**
  * Type guard: verify embedding has correct dimension and normalization
@@ -155,7 +203,11 @@ export const RETRIEVAL_QDRANT_COLLECTION = EMBEDDING_CONTRACT.qdrant_collection;
 export function isValidEmbedding(embedding: number[] | Float32Array): boolean {
   if (!embedding) return false;
 
-  if (embedding.length !== EMBEDDING_CONTRACT.embedding_dimension) {
+  if (
+    embedding.length !== EMBEDDING_CONTRACT.embedding_dimension &&
+    embedding.length !== EMBEDDING_CONTRACT.retrieval_embedding_dimension &&
+    embedding.length !== EMBEDDING_CONTRACT.native_dimension
+  ) {
     return false;
   }
 

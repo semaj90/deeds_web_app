@@ -1,6 +1,6 @@
 /**
- * MinIO Evidence Storage Health Check Utility
- * Validates MinIO connectivity and bucket access
+ * Object Storage Health Check Utility
+ * Validates SeaweedFS or MinIO-compatible connectivity and bucket access
  *
  * Requirements: 5.1, 5.3, 5.5
  */
@@ -24,23 +24,23 @@ export interface MinioHealthResult {
 
 // Bucket names from environment
 const EVIDENCE_BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
-const AI_CHAT_IMAGES_BUCKET = ENV.MINIO_LIBRARY_BUCKET;
+const AI_CHAT_IMAGES_BUCKET = process.env.SEAWEED_S3_BUCKET ?? ENV.MINIO_LIBRARY_BUCKET;
 
 /**
- * Create MinIO client for health checks
+ * Create object-storage client for health checks
  */
 function createMinioClient(): Client {
 	return new Client({
-		endPoint: ENV.MINIO_ENDPOINT,
-		port: parseInt(ENV.MINIO_PORT, 10),
+		endPoint: ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT,
+		port: parseInt(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT, 10),
 		useSSL: ENV.MINIO_USE_SSL === 'true',
-		accessKey: ENV.MINIO_ACCESS_KEY,
-		secretKey: ENV.MINIO_SECRET_KEY
+		accessKey: ENV.SEAWEED_ACCESS_KEY ?? ENV.MINIO_ACCESS_KEY,
+		secretKey: ENV.SEAWEED_SECRET_KEY ?? ENV.MINIO_SECRET_KEY
 	});
 }
 
 /**
- * Check MinIO connectivity and bucket status
+ * Check object-storage connectivity and bucket status
  */
 export async function checkMinioHealth(): Promise<MinioHealthResult> {
 	const startTime = Date.now();
@@ -58,13 +58,13 @@ export async function checkMinioHealth(): Promise<MinioHealthResult> {
 
 	try {
 		const client = createMinioClient();
-		const endpoint = ENV.MINIO_ENDPOINT;
+		const endpoint = ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT;
 		result.connection.endpoint = endpoint;
 
 		// Test connection by listing buckets (with timeout)
 		const bucketListPromise = client.listBuckets();
 		const timeoutPromise = new Promise<never>((_, reject) =>
-			setTimeout(() => reject(new Error('MinIO connection timeout')), 5000)
+			setTimeout(() => reject(new Error('Object storage connection timeout')), 5000)
 		);
 
 		const buckets = await Promise.race([bucketListPromise, timeoutPromise]);
@@ -82,9 +82,9 @@ export async function checkMinioHealth(): Promise<MinioHealthResult> {
 
 	} catch (error: unknown) {
 		const err = error as Error;
-		result.connection.error = err.message || 'Unknown MinIO error';
+		result.connection.error = err.message || 'Unknown object storage error';
 		result.latency = Date.now() - startTime;
-		console.warn('⚠️ MinIO health check failed:', err.message);
+		console.warn('⚠️ Object storage health check failed:', err.message);
 	}
 
 	return result;
@@ -104,7 +104,7 @@ export async function verifyUploadCapability(): Promise<{
 		const bucketExists = await client.bucketExists(EVIDENCE_BUCKET);
 		if (!bucketExists) {
 			await client.makeBucket(EVIDENCE_BUCKET);
-			console.log(`✅ Created MinIO bucket: ${EVIDENCE_BUCKET}`);
+			console.log(`✅ Created object storage bucket: ${EVIDENCE_BUCKET}`);
 		}
 
 		// Test upload with a small test file
@@ -158,7 +158,7 @@ export async function verifyRetrievalCapability(
 }
 
 /**
- * Get MinIO storage status for API endpoints
+ * Get object-storage status for API endpoints
  */
 export async function getMinioStatus(): Promise<{
 	status: 'healthy' | 'degraded' | 'unavailable';
@@ -206,7 +206,7 @@ export async function safeUploadFile(
 		return { success: true, objectName };
 	} catch (error: unknown) {
 		const err = error as Error;
-		console.error('❌ MinIO upload failed:', err.message);
+		console.error('❌ Object storage upload failed:', err.message);
 		return {
 			success: false,
 			error: err.message || 'Upload failed'

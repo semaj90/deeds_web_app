@@ -143,14 +143,28 @@ export type OntologyEdge = z.infer<typeof OntologyEdgeSchema>;
  */
 export const PacketVectorBundleSchema = z.object({
   packet_key: z.string(),
-  content_vector: z.array(z.number()).length(384).describe('Canonical 384-dim embedding'),
-  title_vector: z.array(z.number()).length(384).optional(),
-  summary_vector: z.array(z.number()).length(384).optional(),
-  keyword_vector: z.array(z.number()).length(384).optional(),
-  api_vector: z.array(z.number()).length(384).optional(),
-  topology_vector: z.array(z.number()).length(384).optional(),
+  content_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'Content vector must be 384 or 768 dimensions',
+  }).describe('EmbeddingGemma semantic vector. 768 is native; 384 is an accepted truncated projection when lineage is declared.'),
+  title_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'Title vector must be 384 or 768 dimensions',
+  }).optional(),
+  summary_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'Summary vector must be 384 or 768 dimensions',
+  }).optional(),
+  keyword_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'Keyword vector must be 384 or 768 dimensions',
+  }).optional(),
+  api_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'API vector must be 384 or 768 dimensions',
+  }).optional(),
+  topology_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'Topology vector must be 384 or 768 dimensions',
+  }).optional(),
   latent64_vector: z.array(z.number()).length(64).optional(),
-  graph_vector: z.array(z.number()).length(384).optional(),
+  graph_vector: z.array(z.number()).refine((value) => value.length === 384 || value.length === 768, {
+    message: 'Graph vector must be 384 or 768 dimensions',
+  }).optional(),
 });
 
 export type PacketVectorBundle = z.infer<typeof PacketVectorBundleSchema>;

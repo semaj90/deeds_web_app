@@ -76,8 +76,11 @@ export const POST: RequestHandler = async ({ request }) => {
       cross_encoder_score: envelope.cross_encoder_score,
       blended_score: envelope.blended_score,
       model_version: envelope.model_version,
+      retrieval_source: envelope.retrieval_source,
+      embedding_lane: envelope.dense?.embedding_lane,
+      embedding_status: envelope.dense?.embedding_status,
+      projection_version: envelope.dense?.projection_version,
     })),
     provenance: ranked.provenance,
   });
 };
-

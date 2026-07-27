@@ -397,6 +397,77 @@ function featureLabelFrom(row: ParentAtlasRow | NesPacketRow | AtlasPacketRow | 
   return cleanText(label) || cleanText((row as AtlasPacketRow | undefined)?.feature_label) || featureId;
 }
 
+function buildHyperRagPacketFromAtlasRow(
+  row: AtlasPacketRow,
+  rank: number,
+  query: string,
+): HyperRagPacketRpcPacket {
+  const sourceRef =
+    cleanText(row.source_ref) ||
+    cleanText(row.source_path) ||
+    cleanText(row.file_path) ||
+    cleanText(row.source_ref_key) ||
+    cleanText(row.packet_key) ||
+    `hyperrag:${rank}`;
+  const featureId = canonicalFeatureId(
+    row.feature_id,
+    row.payload?.feature_id,
+    row.payload?.featureId,
+    row.metadata?.feature_id,
+    row.metadata?.featureId,
+  );
+  const ontologyLabel =
+    cleanText(
+      row.metadata?.ontology_version ??
+      row.metadata?.ontologyVersion ??
+      row.payload?.ontology_version ??
+      row.payload?.ontologyVersion
+    ) || null;
+  const topologyLabel =
+    cleanText(
+      row.topology?.topology_label ??
+      row.topology?.topologyLabel ??
+      row.payload?.topology_label ??
+      row.payload?.topologyLabel
+    ) || null;
+
+  return {
+    packet_id: row.packet_id,
+    packet_key: cleanText(row.packet_key) || sourceRef,
+    packet_ulid: row.packet_ulid,
+    packet_type: 'chrom97',
+    source_ref: sourceRef,
+    canonical_source_ref: sourceRef,
+    title_id: cleanText(row.title_id) || null,
+    feature_id: featureId,
+    feature_label: featureLabelFrom(row, featureId),
+    topology_label: topologyLabel,
+    ontology_label: ontologyLabel,
+    cluster_key: cleanText(row.payload?.cluster_key ?? row.payload?.clusterKey ?? row.metadata?.cluster_key ?? row.metadata?.clusterKey) || null,
+    kmeans_cluster: row.kmeans_cluster ?? row.cluster_id ?? null,
+    qdrant_point_id: cleanText(row.qdrant_point_id) || null,
+    community_id: row.community_id != null ? String(row.community_id) : null,
+    som_cluster: cleanText(row.som_cluster) || null,
+    directory_path: directoryPath(sourceRef),
+    qdrant_tags: splitTags(row.tags ?? row.payload?.tags ?? row.metadata?.tags),
+    neo4j_neighbors: [],
+    retrieval_lanes: {
+      dense: row.qdrant_point_id ? 1 : 0,
+      fts: 0,
+      trigram: 0,
+      jsonb: 0,
+    },
+    fusion_score: 1,
+    fusion_sources: ['exact_identity'],
+    gemma4_summary: cleanText(row.summary) || cleanText(row.payload?.summary) || null,
+    recommended_action: null,
+    verification_command: query.startsWith('packet:')
+      ? `atlas proof --packet-key ${query}`
+      : sourceRef,
+    rank,
+  };
+}
+
 async function recordPacketRpcTelemetry(params: {
   query: string;
   latencyMs: number;
@@ -597,6 +668,80 @@ async function loadAtlasPacketsByIdentity(keys: string[]): Promise<Map<string, A
   }
 }
 
+async function loadAtlasPacketsForExactQuery(query: string): Promise<AtlasPacketRow[]> {
+  const canonicalQuery = cleanText(query);
+  if (!canonicalQuery) return [];
+
+  try {
+    const { rows } = await getPacketRpcPool().query<AtlasPacketRow>(
+      canonicalQuery.startsWith('packet:')
+        ? `
+          select
+            packet_id,
+            packet_key,
+            packet_ulid,
+            source_ref,
+            source_ref_key,
+            file_path,
+            source_path,
+            title_id,
+            feature_id,
+            feature_label,
+            summary,
+            tags,
+            payload,
+            metadata,
+            topology,
+            qdrant_point_id,
+            qdrant_collection,
+            community_id,
+            cluster_id,
+            som_cluster,
+            kmeans_cluster
+          from atlas_packets
+          where packet_key = $1
+          order by updated_at desc nulls last, created_at desc nulls last
+          limit 25
+        `
+        : `
+          select
+            packet_id,
+            packet_key,
+            packet_ulid,
+            source_ref,
+            source_ref_key,
+            file_path,
+            source_path,
+            title_id,
+            feature_id,
+            feature_label,
+            summary,
+            tags,
+            payload,
+            metadata,
+            topology,
+            qdrant_point_id,
+            qdrant_collection,
+            community_id,
+            cluster_id,
+            som_cluster,
+            kmeans_cluster
+          from atlas_packets
+          where source_ref = $1
+             or source_ref_key = $1
+             or file_path = $1
+             or source_path = $1
+          order by updated_at desc nulls last, created_at desc nulls last
+          limit 25
+        `,
+      [canonicalQuery],
+    );
+    return rows;
+  } catch {
+    return [];
+  }
+}
+
 async function loadNesPackets(sourceRefs: string[]): Promise<Map<string, NesPacketRow>> {
   if (!sourceRefs.length) return new Map();
   try {
@@ -783,6 +928,42 @@ function getSeedMetadata(seed: unknown): Record<string, any> {
 export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<HyperRagPacketRpcResult> {
   const canonicalQuery = cleanText(input.query);
   const canonicalLimit = Math.max(1, Math.min(Number(input.limit ?? 10), 25));
+
+  if (input.useExactMatchCache !== false) {
+    const exactPackets = [...new Map(
+      (await loadAtlasPacketsForExactQuery(canonicalQuery)).map((row) => [
+        cleanText(row.packet_key) || cleanText(row.source_ref) || cleanText(row.packet_id) || cleanText(row.qdrant_point_id),
+        row,
+      ])
+    ).values()].filter((row) => Boolean(cleanText(row.packet_key) || cleanText(row.source_ref)));
+
+    if (exactPackets.length > 0) {
+      const packets = exactPackets
+        .slice(0, canonicalLimit)
+        .map((row, index) => buildHyperRagPacketFromAtlasRow(row, index + 1, canonicalQuery));
+
+      return {
+        query: canonicalQuery,
+        strategy: 'fusion',
+        packets,
+        trace: {
+          retrieval_strategy: 'fusion',
+          cache_hit_source: null,
+          qdrant_hits: packets.filter((packet) => Number(packet.retrieval_lanes.dense) > 0).length,
+          postgres_hits: packets.length,
+          rrf_hits: packets.length,
+          neo4j_expansions: 0,
+          duckdb_join_used: false,
+          latency_ms: 0,
+          fusion_used: true,
+          collection_split: {
+            runtime_legal: 'legal_documents',
+            codebase_topology: 'codebase_chunks_768',
+          },
+        },
+      };
+    }
+  }
 
   const { createSearchRuntime } = await import('./search-runtime.js');
   const runtime = createSearchRuntime({ userId: 'hyperrag-packet-rpc' });

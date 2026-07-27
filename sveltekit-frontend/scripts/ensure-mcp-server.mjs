@@ -11,13 +11,13 @@ import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { loadRuntimeEnv } from '../src/lib/server/config/load-runtime-env.js';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDir, '..');
+const dotenvMode = process.env.DOTENV_LOAD_MODE ?? (process.env.NODE_ENV === 'production' ? 'process' : 'development');
+loadRuntimeEnv({ cwd: projectRoot, mode: dotenvMode });
 
-const HOST = process.env.TRACE_MCP_HOST ?? '127.0.0.1';
-const PORT = process.env.TRACE_MCP_PORT ?? '8788';
-const BASE = `http://${HOST}:${PORT}`;
 const TIMEOUT = 500;
 const RETRIES = 60;
 const REQUIRED_TOOLS = [
@@ -29,12 +29,23 @@ const REQUIRED_TOOLS = [
   'trace.kag_search',
 ];
 
+function getTraceMcpBase() {
+  const host = process.env.TRACE_MCP_HOST ?? '127.0.0.1';
+  const port = process.env.TRACE_MCP_PORT ?? '8788';
+  return {
+    host,
+    port,
+    base: process.env.TRACE_MCP_URL?.replace(/\/$/, '') ?? `http://${host}:${port}`,
+  };
+}
+
 export async function isTraceMcpHealthy() {
   try {
-    const res = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(TIMEOUT) });
+    const { base } = getTraceMcpBase();
+    const res = await fetch(`${base}/health`, { signal: AbortSignal.timeout(TIMEOUT) });
     if (!res.ok) return false;
     const body = await res.json();
-    return body?.ok === true;
+    return body?.ok === true && body?.dependencies?.mcp === true;
   } catch {
     return false;
   }
@@ -42,7 +53,8 @@ export async function isTraceMcpHealthy() {
 
 async function getTraceMcpTools() {
   try {
-    const res = await fetch(`${BASE}/mcp`, {
+    const { base } = getTraceMcpBase();
+    const res = await fetch(`${base}/mcp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} }),
@@ -74,12 +86,13 @@ async function getTraceMcpTools() {
 
 function stopTraceMcpListener() {
   if (process.platform !== 'win32') return false;
+  const { port } = getTraceMcpBase();
 
   try {
     const ps = spawnSync('powershell', [
       '-NoProfile',
       '-Command',
-      `$tcp = Get-NetTCPConnection -LocalPort ${PORT} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if ($tcp) { Stop-Process -Id $tcp.OwningProcess -Force -ErrorAction SilentlyContinue }`,
+      `$tcp = Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if ($tcp) { Stop-Process -Id $tcp.OwningProcess -Force -ErrorAction SilentlyContinue }`,
     ], { stdio: 'ignore' });
     return ps.status === 0;
   } catch {
@@ -89,6 +102,7 @@ function stopTraceMcpListener() {
 
 function hasTraceMcpListener() {
   if (process.platform !== 'win32') return false;
+  const { port } = getTraceMcpBase();
 
   try {
     const ps = spawnSync(
@@ -96,7 +110,7 @@ function hasTraceMcpListener() {
       [
         '-NoProfile',
         '-Command',
-        `$tcp = Get-NetTCPConnection -LocalPort ${PORT} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if ($tcp) { exit 0 } else { exit 1 }`,
+        `$tcp = Get-NetTCPConnection -LocalPort ${port} -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1; if ($tcp) { exit 0 } else { exit 1 }`,
       ],
       { stdio: 'ignore' }
     );

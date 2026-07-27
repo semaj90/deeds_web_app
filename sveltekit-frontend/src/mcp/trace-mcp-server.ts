@@ -65,21 +65,32 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
+import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import { LangGraphBridge, extractKeywordsFromState } from './langgraph-bridge.js';
 
 process.on('uncaughtException', (err) => {
   console.error('[mcp] UNCAUGHT EXCEPTION:', err);
+  setImmediate(() => process.exit(1));
 });
 process.on('unhandledRejection', (reason) => {
   console.error('[mcp] UNHANDLED REJECTION:', reason);
+  setImmediate(() => process.exit(1));
 });
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-const TRACE_URL = new URL(ENV.TRACE_MCP_URL);
-const PORT      = Number(TRACE_URL.port || '8788');
-const HOST      = TRACE_URL.hostname;
+const TRACE_ENV = parseTraceMcpEnv({
+  ...process.env,
+  TRACE_MCP_URL: process.env.TRACE_MCP_URL ?? ENV.TRACE_MCP_URL,
+  DATABASE_URL: process.env.DATABASE_URL ?? ENV.DATABASE_URL,
+  REDIS_URL: process.env.REDIS_URL ?? ENV.REDIS_URL,
+  QDRANT_URL: process.env.QDRANT_URL ?? ENV.QDRANT_URL,
+  NEO4J_URI: process.env.NEO4J_URI ?? ENV.NEO4J_URI,
+});
+const TRACE_URL = TRACE_ENV.TRACE_MCP_URL;
+const PORT      = TRACE_ENV.TRACE_MCP_PORT;
+const HOST      = TRACE_ENV.TRACE_MCP_HOST;
 
 import { registerNewTools } from './new_tools.js';
 import { registerAdminTools } from './admin_tools.js';
@@ -97,6 +108,17 @@ import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
 import { buildGraphRagStagePlan } from '../lib/server/retrieval/graphrag-stage-plan.js';
+import { buildAcePacketFromSource } from '../lib/server/ace/source-to-packet.js';
+import { buildIndexedSourcePacket } from '../lib/server/ace/indexed-source-packet.js';
+import { populateFeatureDocuments } from '../lib/server/atlas/feature-doc-population.js';
+import { buildFeatureDocumentIngestionPlan } from '../lib/server/atlas/feature-doc-ingestion.js';
+import {
+  buildFeatureDocumentEnrichmentPlan,
+  materializeFeatureEvidenceTuples,
+} from '../lib/server/atlas/feature-doc-enrichment.js';
+import { buildTaxonomyTopologyPacket } from '../lib/server/atlas/taxonomy-topology-packet.js';
+import { getFeatureDocumentEvidence } from '../lib/server/atlas/feature-document-evidence.js';
+import { getParentAtlasWorkstationSnapshot } from '../lib/server/atlas/parent-atlas-workstation.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
@@ -401,6 +423,13 @@ async function probeRedis() {
       error: error instanceof Error ? error.message : String(error),
     };
   }
+}
+
+function createTraceMcpGraphReadGrant() {
+  return {
+    userId: 'trace-mcp-service',
+    permissions: new Set(['graph:read'] as const),
+  };
 }
 
 function normalizeJsonFilter(input: unknown): Record<string, unknown> | undefined {
@@ -8229,13 +8258,6 @@ server.registerTool(
 
 // ── HTTP server with /health + MCP handler ────────────────────────────────────
 
-process.on('uncaughtException', (e) =>
-  console.error('[MCP uncaughtException]', e?.message, e?.stack)
-);
-process.on('unhandledRejection', (e: any) =>
-  console.error('[MCP unhandledRejection]', e?.message, e?.stack)
-);
-
 // Stateless MCP transport: SDK forbids reusing one transport across requests
 // (webStandardStreamableHttp.js:139-141 throws "Stateless transport cannot be
 // reused..."). Create a fresh transport + connect to the shared server per
@@ -8251,8 +8273,27 @@ process.on('unhandledRejection', (e: any) =>
 let mcpQueueTail: Promise<void> = Promise.resolve();
 const nodeServer = http.createServer(async (req, res) => {
   if (req.method === 'GET' && req.url === '/health') {
+    const [postgres, redis] = await Promise.all([probePostgres(), probeRedis()]);
+    const dependencies = {
+      mcp: true,
+      postgres: postgres.ok,
+      redis: redis.ok,
+    };
+    const degraded = !postgres.ok || !redis.ok;
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, version: '1.0.0', uptime: process.uptime() }));
+    res.end(
+      JSON.stringify({
+        ok: true,
+        degraded,
+        version: '1.0.0',
+        uptime: process.uptime(),
+        dependencies,
+        details: {
+          postgres,
+          redis,
+        },
+      })
+    );
     return;
   }
   // Stateless StreamableHTTPServerTransport (sessionIdGenerator: undefined) does not
@@ -9047,6 +9088,718 @@ server.registerTool(
     }
   }
 );
+
+// ── atlas.graph.pagerank ────────────────────────────────────────────────────────
+// Phase 3 authorization gate + PageRank tool registration.
+// Invokes the atlas-tool-registry PageRank execute function with authorization.
+server.registerTool(
+  'atlas.graph.pagerank',
+  {
+    description:
+      'List the top authoritative nodes in the codebase by PageRank score (computed by Neo4j GDS). ' +
+      'Returns paginated results with packet_key, pageRank score, and rank. ' +
+      'Used by agents to identify high-authority code areas for focus.',
+    inputSchema: z.object({
+      limit: z.number().int().min(1).max(1000).default(100).describe('Max results to return (1-1000)'),
+      offset: z.number().int().min(0).default(0).describe('Pagination offset (0+)'),
+    }),
+  },
+  async ({ limit = 100, offset = 0 }) => {
+    try {
+      // Dynamic import to avoid circular deps at module init time
+      const { invokeTool } = await import('$lib/server/ace/atlas-tool-registry.js');
+      const permissionGrant = createTraceMcpGraphReadGrant();
+
+      // Invoke the PageRank tool through the atlas-tool-registry authorization boundary
+      const result = await invokeTool(
+        'atlas.graph.pagerank',
+        { limit, offset },
+        permissionGrant
+      );
+
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err).slice(0, 500) }, null, 2) }],
+        isError: true,
+      };
+    }
+  }
+);
+
+// ── Knowledge Graph Tools: Attention Rank, SOM Topology, Language Distribution, Playbook Lookup ──
+
+server.registerTool(
+  'atlas.workstation_status',
+  {
+    description:
+      'Return Parent Atlas workstation readiness from the canonical Postgres spine plus lane-health artifacts. ' +
+      'Use this before trusting mirror-backed MCP retrieval tools.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    try {
+      const snapshot = await getParentAtlasWorkstationSnapshot();
+      return {
+        status: 'success',
+        workstation: snapshot,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.feature_document_status',
+  {
+    description:
+      'Return feature-scoped document evidence readiness for Parent Atlas. ' +
+      'Checks docs/features notes, docs/<feature_id> bundles, manifest validity, official docs coverage, ' +
+      'and Atlas canonical spine counts before ingestion/ranking promotion.',
+    inputSchema: z.object({
+      featureId: z.string().min(1).describe('Canonical feature_id to inspect'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const featureId = String(input.featureId ?? '').trim();
+      const evidence = await getFeatureDocumentEvidence(featureId);
+      return {
+        status: 'success',
+        feature: evidence,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.populate_feature_documents',
+  {
+    description:
+      'Generate or refresh the feature-scoped docs bundle for Parent Atlas. ' +
+      'Builds docs/features note content, writes docs/<feature_id>/manifest.json from LDR evidence, ' +
+      'and seeds a compact indexed source packet for the generated feature note.',
+    inputSchema: z.object({
+      featureId: z.string().min(1).describe('Canonical feature_id to populate'),
+      query: z.string().optional().describe('Optional research query override'),
+      forceRefresh: z.boolean().default(false).describe('Rebuild the compact packet even if cached'),
+      dryRun: z.boolean().default(false).describe('Compute outputs without writing files or building a packet'),
+      maxSources: z.number().int().min(1).max(12).default(8).describe('Maximum official documentation URLs to persist'),
+      startResearchIfMissing: z.boolean().default(true).describe('Kick off an async LDR research task when no cached result exists'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const result = await populateFeatureDocuments({
+        featureId: String(input.featureId ?? ''),
+        query: typeof input.query === 'string' ? input.query : undefined,
+        forceRefresh: Boolean(input.forceRefresh),
+        dryRun: Boolean(input.dryRun),
+        maxSources: typeof input.maxSources === 'number' ? input.maxSources : undefined,
+        startResearchIfMissing:
+          typeof input.startResearchIfMissing === 'boolean' ? input.startResearchIfMissing : undefined,
+      });
+
+      return {
+        status: 'success',
+        featureId: result.featureId,
+        title: result.title,
+        query: result.query,
+        summary_mode: result.summaryMode,
+        sources_found: result.sourcesFound,
+        feature_note_path: result.featureNotePath,
+        docs_directory: result.docsDirectory,
+        manifest_path: result.manifestPath,
+        packet: result.packet,
+        evidence_before: {
+          status: result.evidenceBefore.status,
+          manifest_valid: result.evidenceBefore.manifestValid,
+          warnings: result.evidenceBefore.warnings,
+        },
+        evidence_after: result.evidenceAfter
+          ? {
+              status: result.evidenceAfter.status,
+              manifest_valid: result.evidenceAfter.manifestValid,
+              warnings: result.evidenceAfter.warnings,
+            }
+          : null,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.feature_document_ingestion_plan',
+  {
+    description:
+      'Return the validated ingestion plan for a feature docs bundle. ' +
+      'Reads docs/<feature>/manifest.json, filters officialDocs through SSRF-safe URL validation, ' +
+      'and reports the exact URLs that can be sent through the existing library crawl pipeline.',
+    inputSchema: z.object({
+      featureId: z.string().min(1).describe('Canonical feature_id to inspect for docs ingestion'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const { plan, evidence } = await buildFeatureDocumentIngestionPlan(String(input.featureId ?? ''));
+      return {
+        status: 'success',
+        featureId: plan.featureId,
+        title: plan.title,
+        manifest_path: plan.manifestPath,
+        docs_directory: plan.docsDirectory,
+        feature_note_path: plan.featureNotePath,
+        valid_urls: plan.validUrls,
+        rejected_urls: plan.rejectedUrls,
+        total_official_docs: plan.totalOfficialDocs,
+        corpus_type: plan.corpusType,
+        storage: plan.storage,
+        warnings: plan.warnings,
+        evidence_status: evidence.status,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.feature_document_enrichment_plan',
+  {
+    description:
+      'Build a deterministic, non-mutating Parent Atlas feature-document enrichment plan. ' +
+      'Validates feature-doc sources, folds in linked Atlas source_refs, and returns bounded extraction, retrieval, storage, and model intents.',
+    inputSchema: z.object({
+      featureId: z.string().min(1).describe('Canonical feature_id to plan enrichment for'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const { plan, evidence } = await buildFeatureDocumentEnrichmentPlan(String(input.featureId ?? ''));
+      return {
+        status: 'success',
+        featureId: plan.featureId,
+        schema_version: plan.schemaVersion,
+        manifest_path: plan.manifestPath,
+        manifest_content_hash: plan.manifestContentHash,
+        evidence_state: plan.evidenceState,
+        source_candidates: plan.sourceCandidates,
+        extraction_plan: plan.extractionPlan,
+        retrieval_plan: plan.retrievalPlan,
+        storage_plan: plan.storagePlan,
+        classifier_plan: plan.classifierPlan,
+        model_plan: plan.modelPlan,
+        warnings: plan.warnings,
+        next_commands: plan.nextCommands,
+        evidence_status: evidence.status,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.materialize_feature_evidence_tuples',
+  {
+    description:
+      'Read-only tuple materializer for Parent Atlas feature-document evidence. ' +
+      'Links feature docs to canonical packet_key, source_ref, tree_node_id, and fact-table provenance without writing any new rows.',
+    inputSchema: z.object({
+      featureId: z.string().min(1).describe('Canonical feature_id to materialize tuple previews for'),
+      maxTuples: z.number().int().min(1).max(64).default(16).describe('Maximum tuple previews to return'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const result = await materializeFeatureEvidenceTuples(String(input.featureId ?? ''), {
+        maxTuples: typeof input.maxTuples === 'number' ? input.maxTuples : undefined,
+      });
+      return {
+        status: 'success',
+        featureId: result.plan.featureId,
+        schema_version: result.plan.schemaVersion,
+        evidence_state: result.plan.evidenceState,
+        tuple_count: result.tuples.length,
+        tuples: result.tuples,
+        warnings: result.plan.warnings,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.build_taxonomy_topology_packet',
+  {
+    description:
+      'Build a compact ACE packet for taxonomy/topology routing. ' +
+      'Combines ontology path, top children, SOM 20x20 neighborhood, K-means labels, linked tuples, ' +
+      'and fanout hints into a small Valkey-backed packet suitable for KAG/DAG and classifier lanes.',
+    inputSchema: z.object({
+      featureId: z.string().min(1).describe('Feature identity to associate with the packet'),
+      nodeKey: z.string().min(1).describe('taxonomy_nodes.node_key to compress'),
+      query: z.string().optional().describe('Optional query label override'),
+      limit: z.number().int().min(1).max(32).default(8).describe('Max taxonomy children to include'),
+      asLatest: z.boolean().default(false).describe('Also publish the packet as ace:packet:latest'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const result = await buildTaxonomyTopologyPacket({
+        featureId: String(input.featureId ?? ''),
+        nodeKey: String(input.nodeKey ?? ''),
+        query: typeof input.query === 'string' ? input.query : undefined,
+        limit: typeof input.limit === 'number' ? input.limit : undefined,
+        asLatest: Boolean(input.asLatest),
+      });
+
+      return {
+        status: 'success',
+        featureId: result.summary.featureId,
+        node_key: result.summary.nodeKey,
+        display_name: result.summary.displayName,
+        taxonomy_path: result.summary.taxonomyPath,
+        child_count: result.summary.childCount,
+        top_children: result.summary.topChildren,
+        topology: result.summary.topology,
+        linked_tuples: result.summary.linkedTuples,
+        storage_hints: result.summary.storageHints,
+        packet_id: result.packet.packet_id,
+        cluster_id: result.packet.cluster_id,
+        source_refs: result.packet.source_refs,
+        lane_ids: result.packet.lane_ids,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+// Tool 1: attention_rank_files (GPU-accelerated attention scoring)
+server.registerTool(
+  'karpathy.attention_rank_files',
+  {
+    description:
+      'Rank files by attention score (Karpathy blend). Embeds query via embeddinggemma, ' +
+      'fetches Karpathy scores from Redis, returns top-N files by attention × authority. ' +
+      'Blending: 0.4·PageRank + 0.3·attention + 0.3·authority. Uses gpu:karpathy:scores Redis cache (24h TTL).',
+    inputSchema: z.object({
+      query: z.string().describe('Query text to embed and score against file embeddings'),
+      limit: z.number().int().min(1).max(50).default(10).describe('Number of top files to return'),
+      include_scores: z.boolean().default(true).describe('Include raw blend/attention/authority scores'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const workstation = await getParentAtlasWorkstationSnapshot().catch(() => null);
+      const query = String(input.query ?? '').slice(0, 1000);
+      const limit = Math.min(Math.max(Number(input.limit ?? 10), 1), 50);
+      const includeScores = Boolean(input.include_scores);
+
+      // Fetch Karpathy scores from Redis (24h TTL)
+      const karpathyData = await embedRedis.hgetall('gpu:karpathy:scores');
+      if (Object.keys(karpathyData).length === 0) {
+        return {
+          status: 'no_karpathy_data',
+          message: 'Karpathy GPU index not yet populated (run npm run karpathy:gpu first)',
+          files: [],
+          workstation,
+          next_steps: workstation?.nextCommands ?? ['npm run atlas:workstation:status'],
+        };
+      }
+
+      // Parse scores and sort by blend
+      const scores = Object.entries(karpathyData)
+        .map(([file, json]) => {
+          try {
+            const parsed = JSON.parse(json as string);
+            return {
+              file,
+              blend: parsed.blend ?? 0,
+              attention: parsed.attn ?? 0,
+              authority: parsed.authority ?? 0,
+              pr: parsed.pr ?? 0,
+            };
+          } catch {
+            return { file, blend: 0, attention: 0, authority: 0, pr: 0 };
+          }
+        })
+        .sort((a, b) => b.blend - a.blend)
+        .slice(0, limit);
+
+      return {
+        status: 'success',
+        query,
+        files: scores.map((s) => ({
+          file: s.file,
+          ...(includeScores && {
+            blend_score: s.blend,
+            attention_score: s.attention,
+            authority_score: s.authority,
+            pagerank_score: s.pr,
+          }),
+        })),
+        count: scores.length,
+        workstation,
+        next_steps: workstation?.nextCommands ?? [],
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+// Tool 2: som_topology_stats (SOM grid stats from Redis)
+server.registerTool(
+  'karpathy.som_topology_stats',
+  {
+    description:
+      'Get SOM topology statistics: grid dimensions, cluster occupancy, centroid stats. ' +
+      'Reads from Redis cached SOM state (gpu:karpathy:som:* keys). Returns grid heatmap and occupancy metrics.',
+    inputSchema: z.object({
+      metric: z.enum(['occupancy', 'centroid_stats', 'grid_summary', 'all']).default('all')
+        .describe('Which SOM metrics to return'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const workstation = await getParentAtlasWorkstationSnapshot().catch(() => null);
+      const metric = String(input.metric ?? 'all');
+
+      // Fetch SOM cluster assignments from Redis
+      const somCells = await embedRedis.hgetall('gpu:karpathy:som:cells');
+      if (Object.keys(somCells).length === 0) {
+        return {
+          status: 'no_som_data',
+          message: 'SOM topology not yet computed (run npm run karpathy:gpu first)',
+          grid: { rows: 0, cols: 0 },
+          workstation,
+          next_steps: workstation?.nextCommands ?? ['npm run atlas:workstation:status'],
+        };
+      }
+
+      // Parse occupancy (cell → file count)
+      const cellCounts: Record<string, number> = {};
+      for (const [_file, cellKey] of Object.entries(somCells)) {
+        cellCounts[cellKey as string] = (cellCounts[cellKey as string] ?? 0) + 1;
+      }
+
+      // Grid dimensions (assume 20×20 from Karpathy default)
+      const gridRows = 20;
+      const gridCols = 20;
+      const totalCells = gridRows * gridCols;
+      const occupiedCells = Object.keys(cellCounts).length;
+
+      const gridSummary = {
+        rows: gridRows,
+        cols: gridCols,
+        total_cells: totalCells,
+        occupied_cells: occupiedCells,
+        occupancy_rate: (occupiedCells / totalCells).toFixed(3),
+        avg_files_per_cell: (Object.keys(somCells).length / occupiedCells).toFixed(2),
+      };
+
+      // Centroid stats (fetch from Redis cached centroids)
+      const centroidStats = await embedRedis.hgetall('gpu:karpathy:encoded');
+      const centroidCount = Object.keys(centroidStats).length;
+
+      return {
+        status: 'success',
+        metric,
+        ...(metric === 'all' || metric === 'grid_summary') && { grid: gridSummary },
+        ...(metric === 'all' || metric === 'occupancy') && {
+          occupancy_heatmap: {
+            dense_cells: Object.entries(cellCounts)
+              .filter(([_k, v]) => (v as number) > 5)
+              .length,
+            sparse_cells: Object.entries(cellCounts)
+              .filter(([_k, v]) => (v as number) <= 5)
+              .length,
+          },
+        },
+        ...(metric === 'all' || metric === 'centroid_stats') && {
+          centroid_index: {
+            cached: centroidCount,
+            dimension: 64,
+            ttl_hours: 24,
+          },
+        },
+        workstation,
+        next_steps: workstation?.nextCommands ?? [],
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+// Tool 3: language_distribution (Qdrant tag stats by language)
+server.registerTool(
+  'topology.language_distribution',
+  {
+    description:
+      'Get language distribution across Qdrant clusters. Queries codebase_chunks_768 payload tags ' +
+      '(language field) and returns counts by language, top files per language.',
+    inputSchema: z.object({
+      language: z.string().optional().describe('Filter to specific language (e.g., typescript, python)'),
+      limit: z.number().int().min(1).max(100).default(10).describe('Top N files to return per language'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const workstation = await getParentAtlasWorkstationSnapshot().catch(() => null);
+      const filterLang = String(input.language ?? '').slice(0, 50);
+      const limit = Math.min(Math.max(Number(input.limit ?? 10), 1), 100);
+
+      // Fetch language tags from Qdrant (via HTTP API)
+      const qdrantUrl = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
+      const collectionName = 'codebase_chunks_768';
+
+      const res = await fetch(`${qdrantUrl}/collections/${collectionName}/points/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          vector: new Array(768).fill(0.1),
+          limit: 0,
+          with_payload: true,
+        }),
+      });
+
+      if (!res.ok) {
+        return {
+          status: 'error',
+          error: `Qdrant unavailable: ${res.status}`,
+          workstation,
+        };
+      }
+
+      // Parse Qdrant response and aggregate by language tag
+      const qdrantData = (await res.json()) as any;
+      const langCounts: Record<string, Set<string>> = {};
+
+      for (const point of qdrantData.result ?? []) {
+        const lang = point.payload?.language ?? 'unknown';
+        const file = point.payload?.file_path ?? point.id;
+
+        if (filterLang && lang !== filterLang) continue;
+
+        if (!langCounts[lang]) langCounts[lang] = new Set();
+        langCounts[lang]?.add(file);
+      }
+
+      // Format response
+      return {
+        status: 'success',
+        filter_language: filterLang || 'all',
+        languages: Object.entries(langCounts).map(([lang, files]) => ({
+          language: lang,
+          file_count: files.size,
+          top_files: Array.from(files).slice(0, limit),
+        })),
+        total_languages: Object.keys(langCounts).length,
+        workstation,
+        next_steps: workstation?.nextCommands ?? [],
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+// Tool 4: playbook_lookup_by_language (CouchDB karpathy_wiki intersection)
+server.registerTool(
+  'research.playbook_lookup_by_language',
+  {
+    description:
+      'Lookup code playbooks and examples by programming language. Searches CouchDB karpathy_wiki ' +
+      '(stored playbooks indexed by language), returns usage patterns and Karpathy authority scores.',
+    inputSchema: z.object({
+      language: z.string().describe('Programming language (typescript, python, rust, go, etc.)'),
+      topic: z.string().optional().describe('Topic filter (optional, e.g., async, error-handling)'),
+      limit: z.number().int().min(1).max(20).default(5).describe('Max playbooks to return'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const workstation = await getParentAtlasWorkstationSnapshot().catch(() => null);
+      const language = String(input.language ?? '').slice(0, 50).toLowerCase();
+      const topic = String(input.topic ?? '').slice(0, 100).toLowerCase();
+      const limit = Math.min(Math.max(Number(input.limit ?? 5), 1), 20);
+
+      if (!language) {
+        return { status: 'error', error: 'language parameter required' };
+      }
+
+      // Fetch Karpathy authority scores (files ranked by authority)
+      const karpathyScores = await embedRedis.hgetall('gpu:karpathy:scores');
+      const karpathyEncodings = await embedRedis.hgetall('gpu:karpathy:encoded');
+
+      // Filter by language tag from Qdrant (simplified: assume file path pattern)
+      const langFileMap: Record<string, number> = {};
+      for (const [file, scoreJson] of Object.entries(karpathyScores)) {
+        const hasLangMatch =
+          (language === 'typescript' && file.includes('.ts')) ||
+          (language === 'python' && file.includes('.py')) ||
+          (language === 'rust' && file.includes('.rs')) ||
+          (language === 'go' && file.includes('.go')) ||
+          (language === 'java' && file.includes('.java'));
+
+        if (hasLangMatch) {
+          try {
+            const parsed = JSON.parse(scoreJson as string);
+            langFileMap[file] = parsed.blend ?? 0;
+          } catch {
+            // Skip malformed entries
+          }
+        }
+      }
+
+      // Sort by authority (Karpathy blend score)
+      const topPlaybooks = Object.entries(langFileMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, limit);
+
+      return {
+        status: 'success',
+        language,
+        topic: topic || 'all',
+        playbooks: topPlaybooks.map(([file, score]) => ({
+          file,
+          authority_score: score.toFixed(3),
+          karpathy_encoded_dim: karpathyEncodings[file] ? 64 : 0,
+        })),
+        count: topPlaybooks.length,
+        workstation,
+        next_steps: workstation?.nextCommands ?? [],
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+// Tool 5: build_ace_packet (bounded packet from sourceRef or markdown)
+server.registerTool(
+  'context.build_ace_packet',
+  {
+    description:
+      'Build and persist a bounded ACE packet from a sourceRef or markdown content. ' +
+      'Reads a local file when sourceRef resolves, enriches with variance recovery, writes to Redis ACE packet store, ' +
+      'and returns only compact packet metadata for injection-safe reuse.',
+    inputSchema: z.object({
+      sourceRef: z.string().optional().describe('Workspace-relative file or doc path to packetize'),
+      markdown: z.string().optional().describe('Inline markdown content to packetize directly'),
+      query: z.string().optional().describe('Optional synthesis query/title for the packet'),
+      featureId: z.string().optional().describe('Optional feature identity to thread into the packet'),
+      forceRefresh: z.boolean().default(false).describe('Bypass sourceRef packet cache and rebuild'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const sourceRef = typeof input.sourceRef === 'string' ? input.sourceRef : undefined;
+      const markdown = typeof input.markdown === 'string' ? input.markdown : undefined;
+      const query = typeof input.query === 'string' ? input.query : undefined;
+      const featureId = typeof input.featureId === 'string' ? input.featureId : undefined;
+      const forceRefresh = Boolean(input.forceRefresh);
+
+      if (!sourceRef && !markdown) {
+        return { status: 'error', error: 'sourceRef or markdown is required' };
+      }
+
+      const result = await buildAcePacketFromSource({
+        sourceRef,
+        markdown,
+        query,
+        featureId,
+        forceRefresh,
+        asLatest: true,
+      });
+
+      return {
+        status: 'success',
+        from_cache: result.fromCache,
+        packet_id: result.packet.packet_id,
+        query: result.packet.query,
+        query_hash: result.packet.query_hash,
+        source_refs: result.packet.source_refs.slice(0, 8),
+        feature_ids: result.packet.feature_ids.slice(0, 8),
+        degraded: result.packet.degraded,
+        ranked_card_count: result.packet.ranked_cards.length,
+        prompt_context_preview: String(result.packet.prompt_context ?? '').slice(0, 400),
+        normalized_source_ref: result.normalizedSourceRef,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'context.build_indexed_source_packet',
+  {
+    description:
+      'Build a compact Valkey-backed packet for an already indexed source_ref. ' +
+      'Prefers Parent Atlas identity lookup (NES card + SOM cluster) to avoid broad retrieval, ' +
+      'and falls back to bounded source packetization only if the indexed identity path misses.',
+    inputSchema: z.object({
+      sourceRef: z.string().min(1).describe('Indexed source_ref to compress into a reusable packet'),
+      query: z.string().optional().describe('Optional query label for the compact packet'),
+      featureId: z.string().optional().describe('Optional feature override'),
+      forceRefresh: z.boolean().default(false).describe('Bypass existing Valkey packet cache and rebuild'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const result = await buildIndexedSourcePacket({
+        sourceRef: String(input.sourceRef ?? ''),
+        query: typeof input.query === 'string' ? input.query : undefined,
+        featureId: typeof input.featureId === 'string' ? input.featureId : undefined,
+        forceRefresh: Boolean(input.forceRefresh),
+      });
+
+      return {
+        status: 'success',
+        mode: result.mode,
+        from_cache: result.fromCache,
+        packet_id: result.packet.packet_id,
+        query: result.packet.query,
+        query_hash: result.packet.query_hash,
+        normalized_source_ref: result.normalizedSourceRef,
+        cluster_id: result.clusterId,
+        lane_ids: result.laneIds,
+        source_refs: result.packet.source_refs.slice(0, 8),
+        feature_ids: result.packet.feature_ids.slice(0, 8),
+        ranked_card_count: result.packet.ranked_cards.length,
+        prompt_context_preview: String(result.packet.prompt_context ?? '').slice(0, 280),
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
 // ── Shell Tool Wrapper (Safe bash execution for Gemma4) ────────────────────────
 server.registerTool(
   'shell.run',
@@ -9104,10 +9857,11 @@ if (isDirectRun) {
   pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
 
   nodeServer.listen(PORT, HOST, () => {
-    console.log(`TRACE MCP server listening on http://${HOST}:${PORT}`);
+    console.log(`TRACE MCP server listening on ${TRACE_URL}`);
     console.log('Tools: graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,');
     console.log('       graph.pagerank_top, graph.materialize_pathway, graph.semantic_path_synthesis,');
     console.log('       topology.search_near, topology.same_som_cluster, topology.search_som_neighborhood,');
+    console.log('       topology.language_distribution (Qdrant tag stats by language),');
     console.log('       kb.hybrid_search, kb.search_pathways, kb.search_notecards, kb.explain_context_pack,');
     console.log('       search.rerank, clusters.get_members,');
     console.log('       hypergraph.semantic_path_synthesis, clusters.get_summary_lenses,');
@@ -9124,6 +9878,9 @@ if (isDirectRun) {
     console.log(
       '       atlas.query, atlas.get_chunk, atlas.explain_trace, atlas.suggest_files, atlas.source_refs, atlas.compact_context, atlas.prefilter (TurboVec cluster prefilter)'
     );
+    console.log('       karpathy.attention_rank_files (GPU-accelerated attention scoring via Karpathy blend),');
+    console.log('       karpathy.som_topology_stats (SOM grid occupancy and centroid stats),');
+    console.log('       research.playbook_lookup_by_language (CouchDB karpathy_wiki by language),');
     console.log('       evidence.search_by_image (file path → VLM→embed→Qdrant),');
     console.log('       evidence.image_feedback (thumbs up/down → Redis+Qdrant+GRPO),');
     console.log('       evidence.link_image_graph (repair/backfill IMAGE_FOR Neo4j edges),');

@@ -16,6 +16,7 @@ export const serviceUrls = {
   postgres:   ENV.DATABASE_URL,
   couchdb:    ENV.COUCHDB_URL,
   rabbitmq:   ENV.RABBITMQ_URL,
+  seaweedS3:  ENV.SEAWEED_ENDPOINT ? `http://${ENV.SEAWEED_ENDPOINT}:${ENV.SEAWEED_S3_PORT ?? 8333}` : undefined,
   minio:      ENV.MINIO_ENDPOINT,
 
   // Inference cascade

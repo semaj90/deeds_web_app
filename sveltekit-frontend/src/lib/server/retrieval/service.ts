@@ -8,6 +8,7 @@ import type { SearchRequest, SearchResponse, SearchResult } from './types.js';
 import { initEmbeddingService, getEmbeddingServiceConfig, type QueryVectorBundle } from './embedding-service.js';
 import { sql } from 'drizzle-orm';
 import { inArray } from 'drizzle-orm';
+import { getSearchLaneRegistry } from './search-lanes.js';
 import {
   RETRIEVAL_LIMITS,
   buildKeywordBundle,
@@ -283,8 +284,8 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
  * Join Postgres for canonical metadata.
  *
  * Two join paths:
- *   - 768-dim results (source: 'qdrant' or 'qdrant-768'): join codebase_chunk_index by UUID qdrant_point_id
- *   - 384-dim results (source: 'qdrant-384'): join atlas_packets by source_ref (payload always populated)
+ *   - dense_768 results: join codebase_chunk_index by UUID qdrant_point_id
+ *   - dense_384 results: join atlas_packets by source_ref (payload always populated)
  *
  * Both paths are tried; first match wins so cross-dim results merge cleanly into one set.
  */
@@ -295,13 +296,22 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
     const db = await getDb();
     // --- 768-dim path: codebase_chunk_index by UUID ---
     const qdrantPointIds = results
-      .filter((r) => r.source === 'qdrant' || r.source === 'qdrant-768' || r.metadata?.embedding_dim === 768)
+      .filter((r) =>
+        r.source === 'qdrant' ||
+        r.source === 'qdrant-768' ||
+        r.metadata?.embedding_lane === 'dense_768' ||
+        (r.metadata?.embedding_lane == null && r.metadata?.embedding_dim === 768)
+      )
       .map((r) => r.metadata?.qdrant_point_id)
       .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
     // --- 384-dim path: atlas_packets by source_ref ---
     const sourceRefs384 = results
-      .filter((r) => r.source === 'qdrant-384' || r.metadata?.embedding_dim === 384)
+      .filter((r) =>
+        r.source === 'qdrant-384' ||
+        r.metadata?.embedding_lane === 'dense_384' ||
+        (r.metadata?.embedding_lane == null && r.metadata?.embedding_dim === 384)
+      )
       .map((r) => r.source_ref ?? (r.metadata?.payload as Record<string, unknown> | undefined)?.source_ref as string | undefined)
       .filter((ref): ref is string => typeof ref === 'string' && ref.length > 0);
 

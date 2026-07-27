@@ -76,7 +76,7 @@ export interface PacketSemanticEnrichment {
   titleGeneratorVersion?: string;
   domainClass?: string;
   domainClassification?: import('../atlas/domain-taxonomy.js').DomainClassification;
-  domainClassSource?: import('../atlas/domain-taxonomy.js').NormalizedDomainLabel['normalization'];
+  domainClassSource?: import('../atlas/domain-taxonomy.js').NormalizedDomainLabel['normalization'] | 'fallback';
   classifierVersion?: string;
 }
 
@@ -86,6 +86,5 @@ export {
   enrichPacketSemantics,
   enrichPacketBatch,
   extractAtlasWriteData,
-  TITLE_GENERATOR_VERSION,
 } from './promotion-enrichment-service.js';
 export type { PacketAtlasWrite } from './promotion-enrichment-service.js';

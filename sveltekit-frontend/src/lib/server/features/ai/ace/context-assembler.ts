@@ -1394,7 +1394,7 @@ async function fetchSchemaDependentsIfRelevant(
     let postgresPool: any = null;
 
     try {
-      const { getNeo4jDriver } = await import('$lib/server/db/neo4j-gds-retrieval.js');
+      const { getNeo4jDriver } = await import('$lib/server/neo4j-driver.js');
       const neo4jDriverInstance = getNeo4jDriver?.();
       neo4jSession = neo4jDriverInstance?.session?.();
     } catch {
@@ -7313,8 +7313,8 @@ function extractPracticeArea(
  */
 async function fetchACEContextPacket(query: string): Promise<any | null> {
   try {
-    const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
-    const qdrant = getQdrantClient();
+    const { getQdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
+    const qdrant = getQdrantManager();
     const embedding = await embedText(query);
 
     const res = await qdrant

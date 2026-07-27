@@ -28,3 +28,18 @@
 # Python virtual environments — gitignored but searchable by rg
 !.venv-gemma4/
 !.venv-gemma4/**
+
+# Env files — keep gitignored for safety, but searchable for local runtime audits
+!.env
+!.env.local
+!.env.example
+!.env.sample
+!/sveltekit-frontend/
+!sveltekit-frontend/.env
+!sveltekit-frontend/.env.local
+!sveltekit-frontend/.env.example
+!sveltekit-frontend/.env.local.example
+!/sveltekit-frontend/.env
+!/sveltekit-frontend/.env.local
+!/sveltekit-frontend/.env.example
+!/sveltekit-frontend/.env.local.example

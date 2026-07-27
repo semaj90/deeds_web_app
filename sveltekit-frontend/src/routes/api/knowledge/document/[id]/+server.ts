@@ -2,7 +2,7 @@
  * Knowledge Document API Endpoint
  * GET /api/knowledge/document/:id
  *
- * Fetches full document content from MinIO with metadata.
+ * Fetches full document content from object storage with metadata.
  *
  * Requirements: 8.2
  */
@@ -13,6 +13,10 @@ import type { RequestHandler } from './$types.js';
 import { detectEnvironment } from '$lib/types/enhanced-svelte5-types';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
+import {
+  buildObjectStorageCompatibilityFields,
+  resolveObjectStorageKey,
+} from '$lib/server/storage/object-storage-compat.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -25,6 +29,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     entities: [],
     tags: [],
     scrapedAt: '',
+    objectStorageKey: '',
     minioKey: '',
   };
   try {
@@ -49,6 +54,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       );
     }
 
+    const compatibilityFields = buildObjectStorageCompatibilityFields(
+      resolveObjectStorageKey(document)
+    );
+
     // Return document with metadata
     return json(
       {
@@ -62,7 +71,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
           entities: document.entities,
           tags: document.tags,
           scrapedAt: document.scrapedAt.toISOString(),
-          minioKey: document.minioKey,
+          objectStorageKey: compatibilityFields.objectStorageKey ?? '',
+          minioKey: compatibilityFields.minioKey ?? '',
         },
       },
       { headers: cacheControl.medium }

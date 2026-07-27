@@ -16,7 +16,7 @@
  *   6. Emit events for mirror sync (async, non-blocking)
  */
 
-import type { FeatureEnvelope } from './feature-envelope.js';
+import type { FeatureEnvelope } from '../retrieval/feature-envelope.js';
 import { generateTitleIdentity, TITLE_GENERATOR_VERSION as TITLE_GENERATOR_VERSION_IMPORTED } from './title-id-generator.js';
 import {
   CANONICAL_DOMAINS,

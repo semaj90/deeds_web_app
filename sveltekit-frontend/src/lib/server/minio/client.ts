@@ -1,10 +1,10 @@
 import { Client as MinioClient } from 'minio';
 import { ENV } from '$lib/server/env.server.js';
 
-// Parse MINIO_ENDPOINT which may be: 'host', 'host:port', or 'http(s)://host:port'
-const _raw = ENV.MINIO_ENDPOINT;
+// Parse the object-storage endpoint which may be: 'host', 'host:port', or 'http(s)://host:port'
+const _raw = ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT;
 let _host = _raw;
-let _port = Number(ENV.MINIO_PORT ?? 9000);
+let _port = Number(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT ?? 9000);
 let _useSSL = (ENV.MINIO_USE_SSL ?? 'false') === 'true';
 try {
 	if (_raw.includes('://')) {
@@ -28,8 +28,8 @@ const MINIO_ENDPOINT = _host;
 const MINIO_PORT = _port;
 const MINIO_USE_SSL = _useSSL;
 
-const MINIO_ACCESS_KEY = ENV.MINIO_ACCESS_KEY;
-const MINIO_SECRET_KEY = ENV.MINIO_SECRET_KEY;
+const MINIO_ACCESS_KEY = ENV.SEAWEED_ACCESS_KEY ?? ENV.MINIO_ACCESS_KEY;
+const MINIO_SECRET_KEY = ENV.SEAWEED_SECRET_KEY ?? ENV.MINIO_SECRET_KEY;
 
 export const minio = new MinioClient({
 	endPoint: MINIO_ENDPOINT,
@@ -48,9 +48,9 @@ export async function ensureBucket(bucketName: string): Promise<boolean> {
 		return true;
 	} catch (err: unknown) {
 		if (err instanceof Error) {
-			console.error('MinIO ensureBucket error:', err.message, err);
+			console.error('Object storage ensureBucket error:', err.message, err);
 		} else {
-			console.error('MinIO ensureBucket error (non-Error):', err);
+			console.error('Object storage ensureBucket error (non-Error):', err);
 		}
 		throw err;
 	}
@@ -67,10 +67,10 @@ export async function putObject(
 		const result = await minio.putObject(bucketName, objectName, buffer, meta || {});
 		return (result as unknown as string) ?? undefined;
 	} catch (err: unknown) {
-		// If MinIO is not configured or credentials are invalid in dev, fall back to local storage
+		// If object storage is not configured or credentials are invalid in dev, fall back to local storage
 		try {
 			console.warn(
-				'MinIO putObject failed, falling back to local storage:',
+				'Object storage putObject failed, falling back to local storage:',
 				err instanceof Error ? err.message : String(err)
 			);
 			const path = await import('path');
@@ -82,7 +82,7 @@ export async function putObject(
 			await fs.writeFile(localPath, buffer);
 			return `file://${localPath}`;
 		} catch (fsErr) {
-			console.error('MinIO fallback to local storage failed:', fsErr);
+			console.error('Object storage fallback to local storage failed:', fsErr);
 			throw err;
 		}
 	}

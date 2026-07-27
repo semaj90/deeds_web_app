@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "feature-document-manifest.v2",
+  "featureId": "trace-mcp",
+  "title": "TRACE MCP / Agentic Tool Surface",
+  "officialDocs": [
+    {
+      "title": "Model Context Protocol: What is MCP?",
+      "url": "https://modelcontextprotocol.io/docs/getting-started/intro",
+      "sourceType": "official_docs",
+      "screenshotPaths": [],
+      "filePaths": []
+    },
+    {
+      "title": "Model Context Protocol: Architecture",
+      "url": "https://modelcontextprotocol.io/docs/learn/architecture",
+      "sourceType": "official_docs",
+      "screenshotPaths": [],
+      "filePaths": []
+    },
+    {
+      "title": "Model Context Protocol TypeScript SDK",
+      "url": "https://github.com/modelcontextprotocol/typescript-sdk",
+      "sourceType": "github_repo",
+      "screenshotPaths": [],
+      "filePaths": []
+    }
+  ],
+  "sources": [
+    {
+      "sourceRef": "src/mcp/trace-mcp-server.ts",
+      "sourceType": "first_party_repository",
+      "authorityClass": "first_party",
+      "localPath": "src/mcp/trace-mcp-server.ts",
+      "title": "TRACE MCP server implementation"
+    },
+    {
+      "sourceRef": "docs/features/feature_trace-mcp.md",
+      "sourceType": "local_spec",
+      "authorityClass": "first_party",
+      "localPath": "docs/features/feature_trace-mcp.md",
+      "title": "TRACE MCP feature note"
+    }
+  ],
+  "storage": {
+    "postgres": {
+      "documentsTable": "library_documents",
+      "chunksTable": "legal_chunks"
+    },
+    "seaweedfs": {
+      "bucket": "legal-documents"
+    },
+    "qdrant": {
+      "collection": "documents",
+      "embeddingDimension": 768
+    }
+  }
+}

@@ -6,7 +6,7 @@
  * - Redis caching (IORedis)
  * - Qdrant vector indexing (@qdrant/js-client-rest)
  * - PostgreSQL + pgvector (pg + drizzle-orm)
- * - MinIO object storage (minio)
+ * - SeaweedFS object storage via the S3-compatible MinIO client
  * - Neo4j graph database (neo4j-driver)
  * - RabbitMQ message queue (amqplib)
  *
@@ -84,13 +84,13 @@ export function loadServiceEnvironment(): ServiceEnvironment {
       gpuLayers: parseInt(privateEnv.OLLAMA_GPU_LAYERS || '30', 10),
       timeout: 60000,
     },
-    // MinIO
+    // SeaweedFS via legacy MinIO-compatible config
     minioConfig: {
       endPoint: ENV.MINIO_ENDPOINT,
-      port: parseInt(ENV.MINIO_PORT, 10),
+      port: Number(ENV.MINIO_PORT),
       accessKey: ENV.MINIO_ACCESS_KEY,
       secretKey: ENV.MINIO_SECRET_KEY,
-      useSSL: ENV.MINIO_USE_SSL === 'true',
+      useSSL: Boolean(ENV.MINIO_USE_SSL),
       region: 'us-east-1',
     },
     // Neo4j
@@ -465,7 +465,7 @@ export class PgVectorAdapter implements PgVectorClient {
 	}
 }
 
-// ===== MinIO Adapter =====
+// ===== SeaweedFS S3 Adapter (legacy MinIO-compatible interface) =====
 export class MinIOAdapter implements MinIOClient {
 	private client: any;
 
@@ -639,7 +639,7 @@ export async function healthCheckServices() {
 		services.pgvector = false;
 	}
 
-	// Check SeaweedFS / legacy MinIO adapter
+	// Check SeaweedFS through the legacy MinIO-compatible adapter
 	try {
 		await adapters.minio.bucketExists('health-check-bucket');
 		services.minio = true;

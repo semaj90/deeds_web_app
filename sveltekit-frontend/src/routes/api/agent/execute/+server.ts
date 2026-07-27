@@ -72,7 +72,7 @@ export const POST: RequestHandler = async (event) => {
   requireUser(event);
 
   // Phase 3.2: Establish authorization
-  const permissionGrant = toolAuthorizationGuard(event);
+  const permissionGrant = await toolAuthorizationGuard(event);
 
   try {
     // 1. Parse request
@@ -82,7 +82,7 @@ export const POST: RequestHandler = async (event) => {
     // Validate and authorize tool name
     const toolName = validateToolName(validated.selectedTool.name);
     try {
-      checkToolAccess(toolName, permissionGrant);
+      await checkToolAccess(toolName, permissionGrant);
     } catch (authError) {
       const message = authError instanceof Error ? authError.message : 'Tool authorization failed';
       return json(

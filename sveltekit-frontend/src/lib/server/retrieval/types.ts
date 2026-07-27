@@ -100,6 +100,32 @@ export interface SearchResult {
     /** Embedding dimension that produced this result (384 or 768) */
     embedding_dim?: number;
 
+    /** Named representation lane that produced this result */
+    embedding_lane?: 'dense_384' | 'dense_768' | 'latent_64' | 'bm42_sparse';
+
+    /** Role of the representation lane */
+    embedding_role?:
+      | 'canonical_online_retrieval'
+      | 'canonical_native_semantic'
+      | 'routing_only'
+      | 'derived'
+      | 'lexical_sparse';
+
+    /** Lifecycle status of the representation lane */
+    embedding_status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED' | 'EXPERIMENTAL';
+
+    /** Native source dimension when this result is derived from another lane */
+    embedding_native_dimension?: number;
+
+    /** Source dimension used by the projection when lineage is explicit */
+    projection_source_dimension?: number;
+
+    /** Projection method when lineage is explicit */
+    projection_method?: 'none' | 'direct_slice' | 'autoencoder' | 'latent' | 'projection';
+
+    /** Projection or lane contract version */
+    projection_version?: string;
+
     /** SOM grid coordinates if available */
     som_cell_x?: number;
     som_cell_y?: number;

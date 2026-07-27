@@ -423,6 +423,7 @@ export class QdrantKnowledgeStore {
         : String(payload?.entities ?? '').split(',').filter(Boolean),
       tags: Array.isArray(payload.tags) ? payload.tags as string[] : [],
       scrapedAt: new Date(String(payload?.scrapedAt || new Date().toISOString())),
+      objectStorageKey: String(payload?.objectStorageKey ?? payload?.minioKey ?? ''),
       minioKey: String(payload?.minioKey ?? '')
     };
   }

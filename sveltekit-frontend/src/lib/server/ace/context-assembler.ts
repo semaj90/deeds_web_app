@@ -13,6 +13,15 @@
 import crypto from 'crypto';
 import pg from 'pg';
 import Redis from 'ioredis';
+export {
+  assembleACEContext,
+  buildACEPromptCached,
+  fetchGlossaryMatches,
+  fetchCachedACEChunks,
+  persistACEChunks,
+  fetchCodebaseContext,
+} from '../features/ai/ace/context-assembler.js';
+export type { BowClusterScore } from '../features/ai/ace/context-assembler.js';
 
 export interface RetrievalTraceEntry {
   lane: 'qdrant' | 'turbovec' | 'postgres' | 'neo4j';

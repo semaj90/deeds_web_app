@@ -199,7 +199,7 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 		jurisdiction_id: number | null;
 	};
 
-	// ── Stage A: Fetch file from MinIO ──────────────────────────────────────
+	// ── Stage A: Fetch file from SeaweedFS via the legacy storage key field ──
 	await setStage(jobId, 'extracting', 5);
 
 	const fileBuffer = await getFile(BUCKET, doc.minio_key);
@@ -536,7 +536,7 @@ async function _runPipeline(documentId: string, jobId: string): Promise<IngestRe
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Upload helper: store raw PDF in MinIO, create DB records
+// Upload helper: store raw PDF in SeaweedFS, create DB records
 // ─────────────────────────────────────────────────────────────────────────────
 
 export async function uploadLibraryDocument(opts: {
@@ -556,7 +556,7 @@ export async function uploadLibraryDocument(opts: {
 }> {
   const documentId = randomUUID();
   const jobId = randomUUID();
-  const minioKey = `uploads/raw/${documentId}.pdf`;
+  const objectStorageKey = `uploads/raw/${documentId}.pdf`;
 
   // Compute SHA-256 before storage so duplicate uploads can be treated as idempotent.
   const { createHash } = await import('crypto');
@@ -586,8 +586,8 @@ export async function uploadLibraryDocument(opts: {
     };
   }
 
-  // Upload to MinIO (ensureBucket called inside putObject)
-  await putObject(BUCKET, minioKey, opts.fileBuffer, opts.fileBuffer.length, {
+  // Upload to SeaweedFS through the S3-compatible storage client.
+  await putObject(BUCKET, objectStorageKey, opts.fileBuffer, opts.fileBuffer.length, {
     'Content-Type': 'application/pdf',
     'x-original-filename': opts.fileName,
   });
@@ -611,7 +611,7 @@ export async function uploadLibraryDocument(opts: {
       opts.title,
       opts.officialUrl || null,
       sourceHash,
-      minioKey,
+      objectStorageKey,
       opts.effectiveDate || null,
       opts.userId,
     ]

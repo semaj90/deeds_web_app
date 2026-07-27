@@ -1612,20 +1612,18 @@ export const ROUTE_FEATURE_MAP: Record<string, RouteFeatureMapEntry> = {
   '/api/ai/hermes-run': {
     route: '/api/ai/hermes-run',
     file: 'src/routes/api/ai/hermes-run/+server.ts',
-    service: 'unknown', // Manual annotation required
+    service: 'hermes-mastra-orchestrator',
+    description: 'Hermes agent planner (Mastra + paperclip + Gemma4 fallback)',
     clusters: [],
     qdrant_collections: ['codebase_chunks_768'],
-    redis_keys: [],
-    env: []
-  },
-  '/api/ai/intent-dispatch': {
-    route: '/api/ai/intent-dispatch',
-    file: 'src/routes/api/ai/intent-dispatch/+server.ts',
-    service: 'unknown', // Manual annotation required
-    clusters: [],
-    qdrant_collections: ['codebase_chunks_768'],
-    redis_keys: [],
-    env: []
+    redis_keys: ['ace:cluster:*'],
+    env: ['MASTRA_ENABLED', 'LLAMA_SERVER_URL'],
+    tools: [
+      'karpathy.attention_rank_files',
+      'karpathy.som_topology_stats',
+      'topology.language_distribution',
+      'research.playbook_lookup_by_language',
+    ],
   },
   '/api/ai/judge': {
     route: '/api/ai/judge',

@@ -37,21 +37,21 @@ export interface StoredDocument {
 }
 
 const DEFAULT_CONFIG: MinioConfig = {
-  endpoint: ENV.MINIO_ENDPOINT,
-  port: Number(ENV.MINIO_PORT),
+  endpoint: ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT,
+  port: Number(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT),
   useSSL: ENV.MINIO_USE_SSL === 'true',
-  accessKey: ENV.MINIO_ACCESS_KEY,
-  secretKey: ENV.MINIO_SECRET_KEY,
-  bucket: process.env?.MINIO_BUCKET ?? 'knowledge-docs',
-  region: process.env?.MINIO_REGION ?? 'us-east-1'
+  accessKey: ENV.SEAWEED_ACCESS_KEY ?? ENV.MINIO_ACCESS_KEY,
+  secretKey: ENV.SEAWEED_SECRET_KEY ?? ENV.MINIO_SECRET_KEY,
+  bucket: process.env?.SEAWEED_S3_BUCKET ?? process.env?.MINIO_BUCKET ?? 'knowledge-docs',
+  region: process.env?.SEAWEED_S3_REGION ?? process.env?.MINIO_REGION ?? 'us-east-1'
 };
 
 // Maximum content size before chunking (100KB)
 const MAX_CHUNK_SIZE = 100 * 1024;
 
 /**
- * MinIO Knowledge Store
- * Handles full document content storage in S3-compatible object storage
+ * Legacy MinIO-compatible Knowledge Store
+ * Handles full document content storage in SeaweedFS through the S3-compatible interface
  */
 export class MinioKnowledgeStore {
   private config: MinioConfig;
@@ -74,9 +74,9 @@ export class MinioKnowledgeStore {
       }
 
       this.initialized = true;
-      console.log(`✅ MinIO bucket "${this.config.bucket}" ready`);
+      console.log(`✅ Object storage bucket "${this.config.bucket}" ready`);
     } catch (error) {
-      console.error('❌ Failed to initialize MinIO:', error);
+      console.error('❌ Failed to initialize object storage:', error);
       throw error;
     }
   }

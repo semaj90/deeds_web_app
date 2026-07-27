@@ -117,6 +117,8 @@ export default defineConfig({
       'tests/manifold4-retrieval.spec.ts',
       'tests/autoencoder-projection-smoke.spec.ts',
       'tests/topology-projection-pipeline.spec.ts',
+      // Phase 3: Tool Authorization Gate Tests (added 2026-07-26)
+      'tests/phase3-tool-authorization.test.ts',
       // GPU-accelerated ACE codebase indexing cache (added 2026-05-06)
       'tests/centroid-cache-gpu.spec.ts',
       'tests/ace-code-cache.spec.ts',

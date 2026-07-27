@@ -17,6 +17,7 @@ import type {
 } from './types.js';
 import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { VECTOR_LANES } from '../vector/lane-registry.js';
+import { VECTOR_LANES as VECTOR_CONFIG_LANES, getVectorLaneMetadata } from '../config/vector-config.js';
 import { sql, type SQL } from 'drizzle-orm';
 
 async function getDb() {
@@ -124,21 +125,21 @@ function getQueryVectorForLane(
   context: SearchLaneContext,
   lane: 'gpu-cuvs' | 'qdrant' | 'qdrant-768' | 'qdrant-384'
 ): Float32Array | undefined {
+  const toVector = (value: SearchLaneContext['queryVectorBundle'][keyof NonNullable<SearchLaneContext['queryVectorBundle']>] | Float32Array | undefined) =>
+    value instanceof Float32Array ? value : value?.vector;
+
   if (lane === 'qdrant-384') {
-    return context.queryVectorBundle?.dense384?.vector
-      ?? context.queryVectorBundle?.dense384
+    return toVector(context.queryVectorBundle?.dense384)
       ?? undefined;
   }
 
   if (lane === 'qdrant' || lane === 'qdrant-768') {
-    return context.queryVectorBundle?.dense768?.vector
-      ?? context.queryVectorBundle?.dense768
+    return toVector(context.queryVectorBundle?.dense768)
       ?? context.queryVector
       ?? undefined;
   }
 
-  return context.queryVectorBundle?.latent64?.vector
-    ?? context.queryVectorBundle?.latent64
+  return toVector(context.queryVectorBundle?.latent64)
     ?? context.queryVector
     ?? undefined;
 }
@@ -276,18 +277,21 @@ export class QdrantLane extends SearchLaneBase {
   private url: string;
   private collection: string;
   private embeddingDimension: number;
+  private embeddingLane: 'dense_384' | 'dense_768';
   private timeout: number;
 
   constructor(
     url = 'http://127.0.0.1:6333',
     collection = VECTOR_LANES.source768.collection,
     embeddingDimension = VECTOR_LANES.source768.dimension,
+    embeddingLane: 'dense_384' | 'dense_768' = 'dense_768',
     timeout = 30000
   ) {
     super();
     this.url = url;
     this.collection = collection;
     this.embeddingDimension = embeddingDimension;
+    this.embeddingLane = embeddingLane;
     this.timeout = timeout;
   }
 
@@ -334,12 +338,23 @@ export class QdrantLane extends SearchLaneBase {
     };
 
     const results: SearchResult[] = (data.result ?? []).map((point, i) => ({
+      ...(() => {
+        const laneMetadata = this.embeddingLane === 'dense_384'
+          ? VECTOR_CONFIG_LANES.dense_384
+          : VECTOR_CONFIG_LANES.dense_768;
+
+        return {
       id: point.id,
       rank: i,
       score: Math.min(1, Math.max(0, point.score)),
       confidence: 0.85,
       source: this.name as SearchResult['source'],
-      lane_id: `${this.collection}:content`,
+      lane_id:
+        point.payload?.embedding_lane === 'dense_384'
+          ? getVectorLaneMetadata('dense_384').laneId
+          : point.payload?.embedding_lane === 'dense_768'
+            ? getVectorLaneMetadata('dense_768').laneId
+            : getVectorLaneMetadata(this.embeddingLane).laneId,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
@@ -349,8 +364,23 @@ export class QdrantLane extends SearchLaneBase {
         qdrant_point_id: point.id,
         qdrant_collection: this.collection,
         embedding_dim: this.embeddingDimension,
+        embedding_lane: (point.payload?.embedding_lane as SearchResult['metadata']['embedding_lane']) ?? this.embeddingLane,
+        embedding_role: (point.payload?.embedding_role as SearchResult['metadata']['embedding_role'])
+          ?? laneMetadata.role,
+        embedding_status: (point.payload?.embedding_status as SearchResult['metadata']['embedding_status'])
+          ?? laneMetadata.status,
+        embedding_native_dimension: Number(point.payload?.embedding_native_dimension ?? point.payload?.projection_source_dimension)
+          || (this.embeddingLane === 'dense_384' ? 768 : this.embeddingDimension),
+        projection_source_dimension: Number(point.payload?.projection_source_dimension ?? point.payload?.embedding_native_dimension)
+          || (this.embeddingLane === 'dense_384' ? 768 : this.embeddingDimension),
+        projection_method: (point.payload?.projection_method as SearchResult['metadata']['projection_method'])
+          ?? laneMetadata.projectionMethod,
+        projection_version: (point.payload?.projection_version as string | undefined)
+          ?? laneMetadata.projectionVersion,
         payload: point.payload,
       },
+        };
+      })(),
     }));
 
     return this.applyPostFetchFilters(results, context.filters);
@@ -372,7 +402,7 @@ export class QdrantLane768 extends QdrantLane {
     embeddingDimension = VECTOR_LANES.source768.dimension,
     timeout = 30000
   ) {
-    super(url, collection, embeddingDimension, timeout);
+    super(url, collection, embeddingDimension, 'dense_768', timeout);
   }
 }
 
@@ -460,12 +490,17 @@ export class QdrantLane384 extends SearchLaneBase {
     };
 
     const results: SearchResult[] = (data.result ?? []).map((point, i) => ({
+      ...(() => {
+        const laneMetadata = getVectorLaneMetadata('dense_384');
+        const dense384Metadata = VECTOR_CONFIG_LANES.dense_384;
+
+        return {
       id: point.id,
       rank: i,
       score: Math.min(1, Math.max(0, point.score)),
       confidence: 0.88,
       source: 'qdrant-384' as const,
-      lane_id: 'codebase_chunks_384_hybrid:content',
+      lane_id: getVectorLaneMetadata('dense_384').laneId,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
@@ -475,8 +510,21 @@ export class QdrantLane384 extends SearchLaneBase {
         qdrant_point_id: point.id,
         qdrant_collection: this.collection,
         embedding_dim: this.embeddingDimension,
+        embedding_lane: (point.payload?.embedding_lane as SearchResult['metadata']['embedding_lane']) ?? 'dense_384',
+        embedding_role: (point.payload?.embedding_role as SearchResult['metadata']['embedding_role'])
+          ?? dense384Metadata.role,
+        embedding_status: (point.payload?.embedding_status as SearchResult['metadata']['embedding_status'])
+          ?? dense384Metadata.status,
+        embedding_native_dimension: Number(point.payload?.embedding_native_dimension ?? point.payload?.projection_source_dimension) || 768,
+        projection_source_dimension: Number(point.payload?.projection_source_dimension ?? point.payload?.embedding_native_dimension) || 768,
+        projection_method: (point.payload?.projection_method as SearchResult['metadata']['projection_method'])
+          ?? dense384Metadata.projectionMethod,
+        projection_version: (point.payload?.projection_version as string | undefined)
+          ?? dense384Metadata.projectionVersion,
         payload: point.payload,
       },
+        };
+      })(),
     }));
 
     return this.applyPostFetchFilters(results, context.filters);

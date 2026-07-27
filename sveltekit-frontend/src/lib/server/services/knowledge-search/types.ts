@@ -19,6 +19,7 @@ export interface IndexResult {
   id: string;
 	qdrantId: number;
   pgId: number;
+	objectStorageKey: string;
 	minioKey: string;
   summary: string;
 	entities: string[];
@@ -112,6 +113,7 @@ export interface FullDocument {
   entities: string[];
   tags: string[];
   scrapedAt: Date;
+  objectStorageKey: string;
   minioKey: string;
 }
 

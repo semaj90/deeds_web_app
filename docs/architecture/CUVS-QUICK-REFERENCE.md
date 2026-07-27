@@ -27,8 +27,8 @@
   L1 │   L2 │   L3a│          └─ L4 / L5 Fallback
   RED│  BIF │  cuVS│
   IS │ ROST │  GRP│
-     │      │      │          
-     ↓      ↓      ↓ (NEW)    
+     │      │      │
+     ↓      ↓      ↓ (NEW)
 ┌────────┐ ┌──────────┐ ┌──────────────────────────────────────┐
 │ Redis  │ │ Bifrost  │ │ Docker Container (Port 50051)         │
 │ Cache  │ │ Semantic │ │ ┌────────────────────────────────┐    │
@@ -101,7 +101,7 @@
 |------|---------|----------|--------|-------|
 | 5173 | SvelteKit dev | HTTP | Active | Frontend |
 | 5432 | Postgres | TCP | Active | Main DB |
-| 5433 | Postgres (test) | TCP | Active | Test replica |
+| 5434 | Postgres (test) | TCP | Active | Test replica |
 | 5672 | RabbitMQ | AMQP | Active | Message queue |
 | 6379 | Redis/Valkey | TCP | Active | Cache + pub/sub |
 | 6333 | Qdrant | HTTP | Active | Vector store |

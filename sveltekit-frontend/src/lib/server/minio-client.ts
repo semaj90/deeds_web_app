@@ -8,7 +8,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { Client } from 'minio';
 import crypto from 'crypto';
 
-// Centralized MinIO client initialization — singleton
+// Centralized MinIO-compatible client initialization — singleton
 let minioClient: Client | null = null;
 
 function parseMinioEndpoint(rawValue: string, fallbackPort: number): { endPoint: string; port: number } {
@@ -40,20 +40,22 @@ function parseMinioEndpoint(rawValue: string, fallbackPort: number): { endPoint:
 /** Raw MinIO Client singleton — use for advanced ops (statObject, getPartialObject, streaming) */
 export function getMinioClient(): Client {
   if (!minioClient) {
-    const { endPoint, port } = parseMinioEndpoint(ENV.MINIO_ENDPOINT, Number.parseInt(ENV.MINIO_PORT, 10));
+    const endpointInput = ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT;
+    const fallbackPort = Number.parseInt(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT, 10);
+    const { endPoint, port } = parseMinioEndpoint(endpointInput, fallbackPort);
     minioClient = new Client({
       endPoint,
       port,
       useSSL: ENV.MINIO_USE_SSL === 'true',
-      accessKey: ENV.MINIO_ACCESS_KEY,
-      secretKey: ENV.MINIO_SECRET_KEY,
+      accessKey: ENV.SEAWEED_ACCESS_KEY ?? ENV.MINIO_ACCESS_KEY,
+      secretKey: ENV.SEAWEED_SECRET_KEY ?? ENV.MINIO_SECRET_KEY,
     });
   }
   return minioClient;
 }
 
 /**
- * Uploads a file to MinIO.
+ * Uploads a file to object storage through the MinIO-compatible client.
  * @param bucketName The name of the bucket.
  * @param objectName The name of the object (file) to create.
  * @param buffer The file content as a Buffer.
@@ -71,7 +73,7 @@ export async function uploadFile(
   const bucketExists = await client.bucketExists(bucketName);
   if (!bucketExists) {
     await client.makeBucket(bucketName);
-    console.log(`MinIO bucket '${bucketName}' created.`);
+    console.log(`Object storage bucket '${bucketName}' created.`);
   }
 
   await client.putObject(bucketName, objectName, buffer, metaData);
@@ -80,7 +82,7 @@ export async function uploadFile(
 }
 
 /**
- * Deletes a file from MinIO. Non-fatal — logs and returns false on failure.
+ * Deletes a file from object storage. Non-fatal — logs and returns false on failure.
  */
 export async function deleteFile(bucketName: string, objectName: string): Promise<boolean> {
   try {
@@ -88,13 +90,13 @@ export async function deleteFile(bucketName: string, objectName: string): Promis
     await client.removeObject(bucketName, objectName);
     return true;
   } catch (err) {
-    console.warn(`[minio] deleteFile failed: ${bucketName}/${objectName}`, err);
+    console.warn(`[object-storage] deleteFile failed: ${bucketName}/${objectName}`, err);
     return false;
   }
 }
 
 const BUCKET = ENV.MINIO_EVIDENCE_BUCKET;
-const AI_CHAT_IMAGES_BUCKET = process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-chat-images';
+const AI_CHAT_IMAGES_BUCKET = process.env.SEAWEED_S3_BUCKET ?? process.env.MINIO_AI_CHAT_IMAGES_BUCKET ?? 'ai-chat-images';
 
 /**
  * Upload evidence file from FormData for AI chat
@@ -117,10 +119,10 @@ export async function uploadEvidenceFile(opts: {
   const bucketExists = await client.bucketExists(BUCKET);
   if (!bucketExists) {
     await client.makeBucket(BUCKET);
-    console.log(`MinIO bucket '${BUCKET}' created.`);
+    console.log(`Object storage bucket '${BUCKET}' created.`);
   }
 
-  // Convert File to Buffer for MinIO
+  // Convert File to Buffer for object storage
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
@@ -151,10 +153,10 @@ export async function uploadChatImage(opts: { caseId?: string; chatTurnId: strin
   const bucketExists = await client.bucketExists(AI_CHAT_IMAGES_BUCKET);
   if (!bucketExists) {
     await client.makeBucket(AI_CHAT_IMAGES_BUCKET);
-    console.log(`MinIO bucket '${AI_CHAT_IMAGES_BUCKET}' created.`);
+    console.log(`Object storage bucket '${AI_CHAT_IMAGES_BUCKET}' created.`);
   }
 
-  // Convert File to Buffer for MinIO
+  // Convert File to Buffer for object storage
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
@@ -165,12 +167,12 @@ export async function uploadChatImage(opts: { caseId?: string; chatTurnId: strin
   return {
     bucket: AI_CHAT_IMAGES_BUCKET,
     objectName,
-    url: `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`,
+    url: `seaweedfs://${AI_CHAT_IMAGES_BUCKET}/${objectName}`,
   };
 }
 
 /**
- * Fetches a file from MinIO as a Buffer.
+ * Fetches a file from object storage as a Buffer.
  */
 export async function getFile(bucketName: string, objectName: string): Promise<Buffer> {
   const client = getMinioClient();
@@ -190,7 +192,7 @@ export async function ensureBucket(bucketName: string): Promise<boolean> {
   const exists = await client.bucketExists(bucketName);
   if (!exists) {
     await client.makeBucket(bucketName);
-    console.log(`MinIO bucket '${bucketName}' created.`);
+    console.log(`Object storage bucket '${bucketName}' created.`);
   }
   return true;
 }
@@ -255,7 +257,7 @@ export async function removeObject(bucketName: string, objectName: string) {
 }
 
 /**
- * Check MinIO connectivity + bucket health.
+ * Check object-storage connectivity + bucket health.
  */
 export async function checkHealth(): Promise<{
   healthy: boolean;
@@ -266,7 +268,9 @@ export async function checkHealth(): Promise<{
   error?: string;
 }> {
   const start = Date.now();
-  const { endPoint, port } = parseMinioEndpoint(ENV.MINIO_ENDPOINT, Number.parseInt(ENV.MINIO_PORT, 10));
+  const endpointInput = ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT;
+  const fallbackPort = Number.parseInt(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT, 10);
+  const { endPoint, port } = parseMinioEndpoint(endpointInput, fallbackPort);
   const endpoint = `${endPoint}:${port}`;
   try {
     const client = getMinioClient();
@@ -303,6 +307,6 @@ export async function getChatImageUrl(objectName: string): Promise<string> {
     return url;
   } catch (err) {
     console.error('Failed to get presigned URL:', err);
-    return `minio://${AI_CHAT_IMAGES_BUCKET}/${objectName}`;
+    return `seaweedfs://${AI_CHAT_IMAGES_BUCKET}/${objectName}`;
   }
 }

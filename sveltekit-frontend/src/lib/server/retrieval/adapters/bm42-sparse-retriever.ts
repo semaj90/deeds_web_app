@@ -1,65 +1,57 @@
 import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { QDRANT_SPARSE_VECTOR_NAME } from '$lib/server/vector/retrieval-semantics.js';
+import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import type { Retriever, LaneCandidate, RetrievalInput } from '../lane-contracts.js';
 import { validateCandidate } from '../lane-contracts.js';
-import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
+import { normalizeQdrantPoints } from './qdrant-dense-retriever.js';
 
 const COLLECTION = 'codebase_chunks_384_hybrid';
 
 /**
- * BM42 sparse retriever — queries the bm42_sparse named sparse vector in Qdrant.
- * Complements the dense lane; intended for RRF fusion, not standalone use.
+ * Legacy BM42 sparse lane used by SearchRuntime.
+ * Keep the lane name stable, but route the request through QdrantManager.querySparse
+ * so this path stays aligned with the repo's current Universal Query API contract.
  */
 export function createBm42SparseRetriever(): Retriever {
   return {
     lane: 'sparse' as const,
 
     async retrieve(input: RetrievalInput): Promise<LaneCandidate[]> {
-      const sparse = generateSparseVector(input.query);
-      if (sparse.indices.length === 0) return [];
+      const sparseVector = generateSparseVector(input.query);
+      if (sparseVector.indices.length === 0) return [];
 
       const qdrant = getQdrantManager();
 
-      let raw: unknown;
+      let rawResponse: unknown;
       try {
-        // QdrantManager may not expose sparse search directly — use raw HTTP
-        const res = await fetch(`http://localhost:6333/collections/${COLLECTION}/points/query`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: { sparse: { indices: sparse.indices, values: sparse.values } },
-            using: QDRANT_SPARSE_VECTOR_NAME,
-            limit: input.limit,
-            with_payload: true,
-          }),
+        rawResponse = await qdrant.querySparse({
+          collection: COLLECTION,
+          sparseVector,
+          sparseVectorName: QDRANT_SPARSE_VECTOR_NAME,
+          limit: input.limit,
+          filter: input.filters as Record<string, unknown> | undefined,
         });
-        if (!res.ok) {
-          const txt = await res.text().catch(() => '');
-          console.warn(`[bm42-sparse-retriever] Qdrant sparse query failed ${res.status}: ${txt}`);
-          return [];
-        }
-        raw = await res.json();
       } catch (err) {
-        console.warn('[bm42-sparse-retriever] fetch error:', (err as Error).message);
+        console.warn(
+          `[bm42-sparse-retriever] ${COLLECTION} sparse search failed (lane disabled):`,
+          (err as Error).message
+        );
         return [];
       }
 
-      const points = normalizeQueryResponse(raw);
+      const points = normalizeQdrantPoints(rawResponse);
       const candidates: LaneCandidate[] = [];
 
       for (let i = 0; i < points.length; i++) {
-        const pt = points[i];
-        const payload = (pt.payload ?? {}) as Record<string, unknown>;
-        const packetKey = (payload.packet_key as string) || String(pt.id);
-        const sourceRef = (payload.source_ref as string) || '';
-
+        const point = points[i];
+        const payload = point.payload ?? {};
         const candidate = validateCandidate({
-          packetKey,
-          packetId: payload.chunk_id as string | undefined,
-          qdrantPointId: String(pt.id),
-          sourceRef,
+          packetKey: String(payload['packet_key'] ?? point.id),
+          packetId: payload['chunk_id'] as string | undefined,
+          qdrantPointId: String(point.id),
+          sourceRef: String(payload['source_ref'] ?? ''),
           rank: i + 1,
-          score: typeof pt.score === 'number' ? pt.score : null,
+          score: point.score ?? null,
           lane: 'sparse' as const,
           metadata: payload,
         });
@@ -70,19 +62,4 @@ export function createBm42SparseRetriever(): Retriever {
       return candidates;
     },
   };
-}
-
-function normalizeQueryResponse(raw: unknown): Array<{
-  id: string | number;
-  score?: number;
-  payload?: Record<string, unknown>;
-}> {
-  if (!raw || typeof raw !== 'object') return [];
-  const r = raw as Record<string, unknown>;
-  // Qdrant /points/query response shape: { result: { points: [...] } }
-  const result = r['result'] as Record<string, unknown> | undefined;
-  if (result && Array.isArray(result['points'])) return result['points'] as any[];
-  if (Array.isArray(r['points'])) return r['points'] as any[];
-  if (Array.isArray(r['result'])) return r['result'] as any[];
-  return [];
 }

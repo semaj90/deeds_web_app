@@ -253,7 +253,7 @@ async function writePacketToPostgres(
     const enrichedPacket = {
       ...packet,
       title_id: generateTitleIdentity(packet.packet_key, {
-        featureId: packet.feature_id ?? undefined,
+        featureLabel: packet.feature_id ?? undefined,
       }).titleId,
     };
     packet = enrichedPacket;

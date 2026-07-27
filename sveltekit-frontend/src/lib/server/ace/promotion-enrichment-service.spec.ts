@@ -18,7 +18,7 @@ import {
   extractAtlasWriteData,
   TITLE_GENERATOR_VERSION as PROMOTION_TITLE_GENERATOR_VERSION,
 } from './promotion-enrichment-service.js';
-import type { FeatureEnvelope } from './feature-envelope.js';
+import type { FeatureEnvelope } from '../retrieval/feature-envelope.js';
 
 // Helper: create a test FeatureEnvelope
 function createTestEnvelope(overrides: Partial<FeatureEnvelope> = {}): FeatureEnvelope {

@@ -33,6 +33,7 @@ export interface DocumentDetail extends DocumentCard {
 	officialUrl: string | null;
 	sourceHash: string | null;
 	mimeType: string | null;
+	objectStorageKey: string;
 	minioKey: string;
 	versions: DocumentVersionSummary[];
 }

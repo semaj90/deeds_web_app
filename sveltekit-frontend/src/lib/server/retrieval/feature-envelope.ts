@@ -25,6 +25,13 @@ export const DenseSignalSchema = z.object({
   score: z.number().min(0).max(1),
   // Qdrant point ID for traceability
   qdrant_point_id: z.string(),
+  // Explicit lane provenance
+  embedding_lane: z.enum(['dense_384', 'dense_768']).optional(),
+  embedding_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).optional(),
+  embedding_native_dimension: z.number().int().positive().optional(),
+  projection_source_dimension: z.number().int().positive().optional(),
+  projection_method: z.enum(['none', 'direct_slice', 'autoencoder', 'latent', 'projection']).optional(),
+  projection_version: z.string().optional(),
   // Distance metric used (e.g., "cosine", "dot")
   metric: z.enum(['cosine', 'dot', 'euclid']),
   // Confidence in this score [0, 1]
@@ -173,6 +180,7 @@ export const FeatureEnvelopeSchema = z.object({
   // ─────────────────────────────────────────────────────────
   chunk_id: z.string().describe('Foreign key to codebase_chunk_index.id'),
   packet_key: z.string().optional().describe('Canonical packet identity if already assigned'),
+  content_hash: z.string().optional().describe('Immutable content revision identity for the hydrated packet'),
   query_id: z.string().optional().describe('Evaluation query ID if in test context'),
   retrieved_rank: z.number().int().positive().optional().describe('Rank before reranking if already known'),
   feature_id: z.string().optional().describe('Canonical feature identity if already assigned'),
@@ -234,7 +242,22 @@ export const FeatureEnvelopeSchema = z.object({
   relative_path: z.string().optional().describe('Relative path in codebase'),
   summary: z.string().optional().describe('Brief chunk summary for human review'),
   content: z.string().optional().describe('Full candidate text for reranking when hydrated'),
+  keywords: z.array(z.string()).optional().describe('Keyword or semantic tag hints from the hydrated chunk'),
+  tree_node_ids: z.array(z.string()).optional().describe('Structural identifiers associated with the hydrated chunk'),
+  domain: z.string().nullable().optional().describe('Raw domain label before canonical domain_class normalization'),
   domain_class: z.enum(['auth', 'ui', 'retrieval', 'network', 'database', 'cache', 'agent', 'graph', 'ml', 'general']).optional().describe('Semantic domain classification (auth/ui/retrieval/etc)'),
+  som_cluster: z.number().nullable().optional().describe('SOM routing cluster identifier when available'),
+  page_rank_score: z.number().nullable().optional().describe('Topological authority score if present on the hydrated chunk'),
+  community_id: z.string().nullable().optional().describe('Topological community identifier when available'),
+  retrieval_score: z.number().optional().describe('Original pre-fusion retrieval score for this packet'),
+  retrieval_source: z.string().optional().describe('Retrieval lane that surfaced this packet before reranking'),
+  fusion_score: z.number().optional().describe('RRF fusion score prior to reranking'),
+  fusion_rank: z.number().int().positive().optional().describe('Rank after fusion and before canonical reranking'),
+  gan_validated: z.boolean().optional().describe('Whether downstream GAN or policy validation gates approved the packet'),
+  updated_at: z.string().optional().describe('ISO timestamp of the hydrated source row'),
+  symbol: z.string().optional().describe('Primary symbol name when the chunk maps to code structure'),
+  language: z.string().optional().describe('Detected programming or document language'),
+  kind: z.string().optional().describe('Structural kind such as function, class, route, or document'),
 
   // ─────────────────────────────────────────────────────────
   // Title Enrichment (populated by promotion/enrichment service)

@@ -22,11 +22,11 @@ export interface MinioS3ClientConfig {
 
 export function getMinioConfig(): MinioS3ClientConfig {
   return {
-    endPoint: ENV.MINIO_ENDPOINT,
-    port: parseInt(ENV.MINIO_PORT ?? '9000', 10),
+    endPoint: ENV.SEAWEED_ENDPOINT ?? ENV.MINIO_ENDPOINT,
+    port: parseInt(ENV.SEAWEED_S3_PORT ?? ENV.MINIO_PORT ?? '9000', 10),
     useSSL: ENV.MINIO_USE_SSL === 'true',
-    accessKey: ENV.MINIO_ACCESS_KEY,
-    secretKey: ENV.MINIO_SECRET_KEY,
+    accessKey: ENV.SEAWEED_ACCESS_KEY ?? ENV.MINIO_ACCESS_KEY,
+    secretKey: ENV.SEAWEED_SECRET_KEY ?? ENV.MINIO_SECRET_KEY,
     bucket: ENV.MINIO_EVIDENCE_BUCKET,
   };
 }
@@ -88,7 +88,7 @@ export class MinIOService {
 
       return { bucket: this.bucket, key, url };
     } catch (error) {
-      console.error('MinIO upload error:', error);
+      console.error('Object storage upload error:', error);
       throw error;
     }
   }
@@ -119,6 +119,9 @@ export class MinIOService {
   static extractKeyFromUrl(url: string, bucket: string): string {
     if (url.startsWith('minio://')) {
       return url.replace('minio://', '');
+    }
+    if (url.startsWith('seaweedfs://')) {
+      return url.replace('seaweedfs://', '');
     }
     if (url.startsWith('http')) {
       // Try to extract key from URL: http://host:port/bucket/key

@@ -4,7 +4,8 @@
  * Crawl one or more URLs → chunk → embed → upsert into library corpus (Qdrant +
  * library_documents DB rows).  Mirrors the PDF ingestion pipeline but for web content.
  *
- * corpusType 'docs'  → stored with source_type='web' + corpus_type='treatise'
+ * corpusType 'docs'  → stored with schema-safe source_type='upload' and
+ *                       source_kind='web_docs' + corpus_type='treatise'
  *                       (dev docs, API references — separated from legal corpus)
  * corpusType 'legal' → stored with corpus_type='statute'/'regulation'/etc.
  *
@@ -20,6 +21,7 @@ import { pool } from '$lib/server/db/client';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
+import { extractWebDocument } from '$lib/server/web/web-crawl.js';
 
 // ── Schema ────────────────────────────────────────────────────────────────────
 
@@ -56,6 +58,13 @@ function chunkText(text: string): Array<{ text: string; index: number }> {
 	return chunks;
 }
 
+// Legacy DB columns still say `minio_key`, but this route is SeaweedFS-first:
+// store a SeaweedFS/S3-compatible object key here until the schema is renamed.
+function buildWebSeaweedObjectKey(hash: string, url: string): string {
+	const hostname = new URL(url).hostname.replace(/[^a-zA-Z0-9.-]+/g, '-');
+	return `web-crawl/${hostname}/${hash}.txt`;
+}
+
 // ── Jurisdiction lookup (cached per request) ──────────────────────────────────
 
 async function getJurisdictionId(code: string): Promise<number | null> {
@@ -65,7 +74,7 @@ async function getJurisdictionId(code: string): Promise<number | null> {
 
 // ── Main handler ──────────────────────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ request, locals, fetch }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 
 	const raw = await request.json().catch(() => null);
@@ -98,20 +107,16 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 
 	for (const url of urls) {
 		try {
-			// 1. Crawl via existing /api/web/crawl proxy
-			const crawlRes = await fetch('/api/web/crawl', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ url, extractText: true, generateEmbedding: false }),
-			});
-			if (!crawlRes.ok) throw new Error(`Crawl failed: HTTP ${crawlRes.status}`);
-			const crawled = await crawlRes.json() as { title: string; text: string };
+			// 1. Extract text directly through the shared web crawl helper to avoid
+			// nested route auth/context drift during server-side ingestion.
+			const crawled = await extractWebDocument(url);
 
 			const text  = (crawled.text ?? '').trim();
 			const title = (crawled.title || new URL(url).hostname) + ' — ' + new URL(url).pathname;
 			if (text.length < 50) throw new Error('Extracted text too short');
 
 			const hash = createHash('sha256').update(text).digest('hex');
+			const objectStorageKey = buildWebSeaweedObjectKey(hash, url);
 
 			// 2. Dedup
 			if (skipDuplicates) {
@@ -135,10 +140,22 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			await pool.query(
 				`INSERT INTO library_documents
 				   (id, source_type, corpus_type, jurisdiction_id, title, short_title,
-				    source_hash, official_url, processing_status, created_at, updated_at)
-				 VALUES ($1, 'web', $2, $3, $4, $5, $6, $7, 'processing', now(), now())
+				    source_hash, official_url, minio_key, minio_key_normalized, mime_type,
+				    source_kind, is_official, fetched_at, processing_status, created_at, updated_at)
+				 VALUES ($1, 'upload', $2, $3, $4, $5, $6, $7, $8, $9, 'text/html', $10, true, now(), 'queued', now(), now())
 				 ON CONFLICT (id) DO NOTHING`,
-				[documentId, dbCorpus, jurisdictionId, title, title.slice(0, 80), hash, url]
+				[
+					documentId,
+					dbCorpus,
+					jurisdictionId,
+					title,
+					title.slice(0, 80),
+					hash,
+					url,
+					objectStorageKey,
+					objectStorageKey,
+					corpusType === 'docs' ? 'web_docs' : 'web_legal',
+				]
 			);
 
 			// 4. Version + root node
@@ -223,7 +240,11 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 		} catch (err) {
 			console.error(`[library/crawl] failed for ${url}:`, err);
 			result.failed++;
-			result.items.push({ url, status: 'failed', error: 'Crawl failed' });
+			result.items.push({
+				url,
+				status: 'failed',
+				error: err instanceof Error ? err.message.slice(0, 300) : 'Crawl failed',
+			});
 		}
 	}
 

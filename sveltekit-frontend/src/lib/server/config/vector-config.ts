@@ -170,6 +170,13 @@ export const VECTOR_LANES = {
     kind: 'dense',
     dimension: 384,
     modelId: 'embeddinggemma-prefix384-v1',
+    laneId: 'dense_384',
+    role: 'canonical_online_retrieval',
+    status: 'ACTIVE',
+    sourceDimension: 768,
+    projectionMethod: 'direct_slice',
+    projectionVersion: 'atlas-embeddinggemma-direct-slice384-v1',
+    normalization: 'L2',
     collections: ['codebase_chunks_384_hybrid', 'codebase_chunks_384'],
     evidenceAuthority: true,
   },
@@ -177,17 +184,34 @@ export const VECTOR_LANES = {
     kind: 'dense',
     dimension: 768,
     modelId: 'embeddinggemma:latest',
+    laneId: 'dense_768',
+    role: 'canonical_native_semantic',
+    status: 'REFERENCE_ONLY',
+    sourceDimension: 768,
+    projectionMethod: 'none',
+    projectionVersion: 'embeddinggemma-full768-v1',
+    normalization: 'L2',
     collections: ['codebase_chunks_768'],
     evidenceAuthority: true,
   },
   sparse_bm42: {
     kind: 'sparse',
+    laneId: 'bm42_sparse',
+    role: 'lexical_sparse',
+    status: 'ACTIVE',
     vectorName: 'bm42_sparse',
     evidenceAuthority: true,
   },
   latent_128: {
     kind: 'dense',
     dimension: 128,
+    laneId: 'latent_128',
+    role: 'routing_projection',
+    status: 'EXPERIMENTAL',
+    sourceDimension: 768,
+    projectionMethod: 'autoencoder',
+    projectionVersion: 'atlas-ae-768x128-v1',
+    normalization: 'L2',
     projectionId: 'atlas-ae-768x128-v1',
     collections: ['codebase_topology_128'],
     evidenceAuthority: false,
@@ -195,11 +219,24 @@ export const VECTOR_LANES = {
   latent_64: {
     kind: 'dense',
     dimension: 64,
+    laneId: 'latent_64',
+    role: 'routing_projection',
+    status: 'ACTIVE',
+    sourceDimension: 384,
+    projectionMethod: 'autoencoder',
+    projectionVersion: 'atlas-ae-384x64-v3',
+    normalization: 'L2',
     projectionId: 'atlas-ae-384x64-v3',
     collections: ['codebase_topology_64'],
     evidenceAuthority: false,
   },
 } as const;
+
+export type VectorLaneName = keyof typeof VECTOR_LANES;
+
+export function getVectorLaneMetadata(lane: VectorLaneName) {
+  return VECTOR_LANES[lane];
+}
 
 const COLLECTION_DIMENSIONS: Record<string, number> = {
   legal_documents: 768,

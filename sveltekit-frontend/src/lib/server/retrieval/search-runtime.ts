@@ -197,7 +197,16 @@ export interface Candidate {
   summary: string;
   content: string;
   score: number;
-  scoreSource: 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'schema' | 'rg_keyword';
+  scoreSource:
+    | 'postgres_trigram'
+    | 'qdrant'
+    | 'qdrant_384'
+    | 'qdrant_768'
+    | 'exact_symbol'
+    | 'ast_tree'
+    | 'schema'
+    | 'rg_keyword';
+  embeddingLane?: 'dense_384' | 'dense_768' | 'bm42_sparse';
 }
 
 /**
@@ -233,7 +242,7 @@ export interface SearchResult {
     };
   };
   provenance: {
-    retrievalSources: Array<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
+    retrievalSources: Array<'postgres_trigram' | 'qdrant' | 'qdrant_384' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>;
     fusionMethod: 'rrf';
     rerankModel: string;
     rerankerUsed: boolean;
@@ -489,7 +498,7 @@ export class SearchRuntime {
           fusionScore: 0,
           rankBefore: idx + 1,
           score: 0,
-          scoreSource: 'qdrant' as const,
+          scoreSource: 'qdrant_384' as const,
           blendedScore: 0,
           scorerVersion: 'passthrough',
           modelScored: false,
@@ -615,10 +624,25 @@ export class SearchRuntime {
       summary: String(lc.metadata?.['summary'] ?? ''),
       content: String(lc.metadata?.['content'] ?? ''),
       score: lc.score ?? 0,
-      scoreSource: (lc.lane === 'dense' ? 'qdrant'
+      scoreSource: (
+        lc.lane === 'dense'
+          ? lc.metadata?.['embedding_lane'] === 'dense_384'
+            ? 'qdrant_384'
+            : lc.metadata?.['embedding_lane'] === 'dense_768'
+              ? 'qdrant_768'
+              : 'qdrant'
         : lc.lane === 'exact' ? 'exact_symbol'
         : lc.lane === 'ast' ? 'ast_tree'
-        : 'postgres_trigram') as Candidate['scoreSource'],
+        : 'postgres_trigram'
+      ) as Candidate['scoreSource'],
+      embeddingLane:
+        lc.metadata?.['embedding_lane'] === 'dense_384'
+          ? 'dense_384'
+          : lc.metadata?.['embedding_lane'] === 'dense_768'
+            ? 'dense_768'
+            : lc.metadata?.['embedding_lane'] === 'bm42_sparse'
+              ? 'bm42_sparse'
+              : undefined,
     })), query.filters);
   }
 
@@ -718,11 +742,11 @@ export class SearchRuntime {
   /**
    * Helper: Extract which sources contributed to the final candidate set
    */
-  private getRetrievalSources(candidates: Candidate[]): Array<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'> {
-    const sources = new Set<'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>();
+  private getRetrievalSources(candidates: Candidate[]): Array<'postgres_trigram' | 'qdrant' | 'qdrant_384' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'> {
+    const sources = new Set<'postgres_trigram' | 'qdrant' | 'qdrant_384' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword'>();
     for (const c of candidates) {
       if (c.scoreSource !== 'schema') {
-        sources.add(c.scoreSource as 'postgres_trigram' | 'qdrant' | 'exact_symbol' | 'ast_tree' | 'rg_keyword');
+        sources.add(c.scoreSource as 'postgres_trigram' | 'qdrant' | 'qdrant_384' | 'qdrant_768' | 'exact_symbol' | 'ast_tree' | 'rg_keyword');
       }
     }
     return Array.from(sources);

@@ -116,12 +116,17 @@ export async function checkToolAccessWithAudit(
   }
 ): Promise<{ allowed: boolean; error?: string }> {
   const { checkToolAccess } = await import('./tool-authorization.js');
+  const safeAuditLog = async (event: AuthorizationAuditEvent): Promise<void> => {
+    await logAuthorizationAudit(event).catch((auditError) => {
+      console.error('[Authorization Audit] Non-blocking wrapper failure:', auditError);
+    });
+  };
 
   try {
-    checkToolAccess(toolName, grant);
+    await checkToolAccess(toolName, grant);
 
     // Log successful access
-    await logAuthorizationAudit({
+    await safeAuditLog({
       userId: grant.userId,
       toolName,
       action: 'ACCESS_ALLOWED',
@@ -135,7 +140,7 @@ export async function checkToolAccessWithAudit(
     const errorMessage = err instanceof Error ? err.message : String(err);
 
     // Log denied access
-    await logAuthorizationAudit({
+    await safeAuditLog({
       userId: grant.userId,
       toolName,
       action: 'ACCESS_DENIED',
@@ -173,6 +178,8 @@ export async function derivePermissionGrantWithAudit(
     ipAddress: context?.ipAddress,
     userAgent: context?.userAgent,
     timestamp: new Date(),
+  }).catch((auditError) => {
+    console.error('[Authorization Audit] Non-blocking derivation failure:', auditError);
   });
 
   return grant;

@@ -9,39 +9,88 @@
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import fs from 'node:fs';
+import { loadRuntimeEnv } from '../../sveltekit-frontend/src/lib/server/config/load-runtime-env.js';
+import { parseTraceMcpEnv } from '../../sveltekit-frontend/src/lib/server/config/trace-mcp-env.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = join(__dirname, '..', '..');
 const svelteKitDir = join(workspaceRoot, 'sveltekit-frontend');
+
+function resolveTsRunner() {
+  const tsxCliCandidates = [
+    join(svelteKitDir, 'node_modules', 'tsx', 'dist', 'cli.mjs'),
+    join(workspaceRoot, 'node_modules', 'tsx', 'dist', 'cli.mjs'),
+  ];
+
+  for (const candidate of tsxCliCandidates) {
+    if (fs.existsSync(candidate)) {
+      return {
+        command: process.execPath,
+        argsPrefix: [candidate],
+        label: `${process.execPath} ${candidate}`,
+      };
+    }
+  }
+
+  const fallbackCandidates = process.platform === 'win32'
+    ? [
+        join(svelteKitDir, 'node_modules', '.bin', 'ts-node.cmd'),
+        join(workspaceRoot, 'node_modules', '.bin', 'ts-node.cmd'),
+      ]
+    : [
+        join(svelteKitDir, 'node_modules', '.bin', 'ts-node'),
+        join(workspaceRoot, 'node_modules', '.bin', 'ts-node'),
+      ];
+
+  for (const candidate of fallbackCandidates) {
+    if (fs.existsSync(candidate)) {
+      return {
+        command: candidate,
+        argsPrefix: [],
+        label: candidate,
+      };
+    }
+  }
+
+  return {
+    command: 'tsx',
+    argsPrefix: [],
+    label: 'tsx',
+  };
+}
 
 console.log(`🚀 Starting MCP TRACE Server...`);
 console.log(`   Workspace: ${workspaceRoot}`);
 console.log(`   SvelteKit: ${svelteKitDir}`);
 console.log('');
 
-// Check if tsx is available (required for TS execution)
-let tsRunner = 'tsx';
-try {
-  await import('tsx');
-} catch (e) {
-  console.warn('⚠️  tsx not found, falling back to ts-node');
-  tsRunner = 'ts-node';
-}
+loadRuntimeEnv({ cwd: svelteKitDir, mode: process.env.DOTENV_LOAD_MODE || 'development' });
+const traceEnv = parseTraceMcpEnv(process.env);
 
-console.log(`📦 Using TS runner: ${tsRunner}`);
+const tsRunner = resolveTsRunner();
+
+console.log(`📦 Using TS runner: ${tsRunner.label}`);
+console.log(`🔧 Env present: TRACE_MCP_URL=${Boolean(traceEnv.TRACE_MCP_URL)} DATABASE_URL=${Boolean(traceEnv.DATABASE_URL)} REDIS_URL=${Boolean(process.env.REDIS_URL || process.env.VALKEY_URL)}`);
 console.log('');
 
 // Spawn the MCP server via tsx/ts-node
-const mcp = spawn(tsRunner, [
-  'src/mcp/server.ts',
+const mcp = spawn(tsRunner.command, [
+  ...tsRunner.argsPrefix,
+  'src/mcp/trace-mcp-server.ts',
 ], {
   cwd: svelteKitDir,
   stdio: ['pipe', 'pipe', 'pipe'],
   env: {
     ...process.env,
-    NODE_ENV: 'development',
-    MCP_PORT: '8788',
-    MCP_LOG_LEVEL: 'info',
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    DOTENV_LOAD_MODE: process.env.DOTENV_LOAD_MODE || 'development',
+    TRACE_MCP_HOST: traceEnv.TRACE_MCP_HOST,
+    TRACE_MCP_PORT: String(traceEnv.TRACE_MCP_PORT),
+    TRACE_MCP_URL: traceEnv.TRACE_MCP_URL,
+    MCP_PORT: String(traceEnv.TRACE_MCP_PORT),
+    MCP_LOG_LEVEL: process.env.MCP_LOG_LEVEL || 'info',
+    FRONTEND_ROOT: process.env.FRONTEND_ROOT || svelteKitDir,
   },
 });
 
@@ -58,12 +107,11 @@ mcp.stdout.on('data', (data) => {
     console.log('✅ MCP Server is ready!');
     console.log('');
     console.log('📌 MCP Endpoints:');
-    console.log('   • TRACE tools: http://localhost:8788/tools');
-    console.log('   • Gemma4 agent: POST http://localhost:8788/agent');
+    console.log(`   • TRACE health: ${traceEnv.TRACE_MCP_URL}/health`);
+    console.log(`   • TRACE MCP: POST ${traceEnv.TRACE_MCP_URL}/mcp`);
     console.log('');
     console.log('🔗 Integration points:');
     console.log('   • SvelteKit /api/ai/agent routes');
-    console.log('   • OpenAI-compatible /api/v1/chat/completions');
     console.log('   • VS Code Cursor/Cline IDE extensions');
     console.log('');
     console.log('💡 To debug: connect debugger to ws://127.0.0.1:9229');
@@ -111,10 +159,11 @@ setTimeout(() => {
     console.error('❌ MCP Server failed to start within 60 seconds');
     console.error('');
     console.error('Troubleshooting:');
-    console.error('  1. Verify tsx/ts-node is installed: npm install -g tsx');
+    console.error('  1. Verify local dependencies are installed: npm install');
     console.error('  2. Check TypeScript compilation: npm run typecheck');
-    console.error('  3. Verify Redis is running: docker start legal-ai-valkey');
-    console.error('  4. View logs: tail -f logs/mcp-server.log');
+    console.error('  3. Verify the trace entrypoint imports resolve under tsx');
+    console.error('  4. Verify Redis is running: docker start legal-ai-valkey');
+    console.error('  5. View logs: tail -f logs/mcp-server.log');
     mcp.kill();
     process.exit(1);
   }

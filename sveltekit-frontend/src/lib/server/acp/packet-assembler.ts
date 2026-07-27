@@ -12,6 +12,7 @@
  * 5. Emit events
  */
 
+import { createHash, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import type {
   PacketTopologyEnvelope,
@@ -61,15 +62,25 @@ export function assemblePacketFromGrpcResponse(
   // Build canonical envelope
   const envelope: PacketTopologyEnvelope = {
     // Identity layer (required)
+    packet_id: randomUUID(),
     packet_key: identity.packet_key,
+    title_id: semantics?.title_id ?? `title:${identity.packet_key.slice(0, 8)}`,
+    created_at: metadata.timestamp.toISOString(),
     source_ref: identity.source_ref,
+    directory_path: identity.file_path.split(/[\\/]/).slice(0, -1).join('/'),
     file_path: identity.file_path,
     function_symbol: identity.function_symbol,
     feature_id: identity.feature_id,
     feature_label: identity.feature_label,
+    neo4j_neighbors: [],
+    lexical_nouns: [],
+    lexical_verbs: [],
+    lexical_adverbs_ly: [],
+    routing_hints: [],
+    used_concepts: [],
+    supersedes: [],
 
     // Semantics layer (optional)
-    title_id: semantics?.title_id ?? null,
     summary: semantics?.summary ?? null,
     domain_class: semantics?.domain_class ?? null,
     semantic_tags: semantics?.semantic_tags ?? [],
@@ -123,8 +134,7 @@ function extractIdentity(
 
   // Generate packet_key if missing (deterministic from source_ref + symbol)
   if (!packet_key && source_ref) {
-    const hash = require('crypto')
-      .createHash('sha256')
+    const hash = createHash('sha256')
       .update(`${source_ref}:${function_symbol || 'default'}`)
       .digest('hex')
       .slice(0, 8);
@@ -174,7 +184,7 @@ function extractSemantics(
   // Always regenerate title_id through the canonical generator — never forward gRPC passthrough values.
   // This ensures every packet written via ACP uses the same derivation as the promotion enrichment path.
   const title_id = packetKey
-    ? generateTitleIdentity(packetKey, { featureId: featureId ?? undefined }).titleId
+    ? generateTitleIdentity(packetKey, { featureLabel: featureId ?? undefined }).titleId
     : null;
 
   return {

@@ -1,0 +1,27 @@
+# OKF: v1.0 - Identity Canonicalization and Source-of-Truth Enforcement
+
+**Status**: Draft (Awaiting Phase 108C Completion) | **Commit**: N/A | **Date**: 2026-07-26
+
+---
+
+## TL;DR
+This document formalizes the new, canonical identity resolution pipeline, ensuring that the final `projectionId` derived from the multi-source validation process is **always** persisted to the `atlas_vector_projections` table before being used for core business logic. This enforces a single, durable source of truth for any entity's core identity.
+
+## Key Changes
+*   **Canonical Schema**: Defined `AtlasVectorProjection` in `src/lib/schemas/atlas_canonical_schema.ts`.
+*   **Identity Gate**: Implemented a mandatory, synchronous write-gate within `mapKMeansToCanonicalId` to `atlas_vector_projections`, making the write to the canonical table the final step of the identification process.
+*   **Naming Convention**: All services (`SchemaService`, `GraphService`, `SemanticService`) now use `snake_case` for field names and identifiers (e.g., `source_ref`, `feature_id`) to align with the canonical identity model.
+
+## Core Rule
+The **source of truth for an entity's identity** is the record written to `atlas_vector_projections`. All downstream consumers **must** read the `projectionId` from this table, not from the raw service output.
+
+## Enforcement Details
+The `mapKMeansToCanonicalId` flow must complete this sequence:
+1.  `SchemaService.validate`
+2.  `GraphService.validate`
+3.  `SemanticService.validate`
+4.  **`AtlasDatabase.upsertProjection` (The write-gate)** $\leftarrow$ **This is the authoritative step.**
+5.  Return the `projectionId` and the combined metadata.
+
+## Verification
+The primary goal is to pass a full `smoke:opencode` run, proving that the write gate correctly commits the composite evidence to the canonical table and that subsequent reads use the correct `projectionId`.

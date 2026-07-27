@@ -12,6 +12,10 @@ import { langextractFetch } from '$lib/server/langextract-client.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 import { isUuid } from '$lib/server/validation.js';
+import {
+  buildObjectStorageCompatibilityFields,
+  resolveObjectStorageKey,
+} from '$lib/server/storage/object-storage-compat.js';
 
 const deletePhotoSchema = z.object({
   photoId: z.string().min(1, 'photoId required').max(500),
@@ -64,8 +68,8 @@ export const GET: RequestHandler = async ({ params, locals }) => {
  * Upload a photo for a POI — immediate response, background VLM analysis
  *
  * Pipeline:
- * 1. Validate + hash + upload original to MinIO
- * 2. Generate thumbnail via Sharp → upload to MinIO
+ * 1. Validate + hash + upload original to object storage
+ * 2. Generate thumbnail via Sharp → upload to object storage
  * 3. Insert DB record (returns immediately to client)
  * 4. Background: Gemma3 VLM analysis (caption + tags + forensics)
  * 5. Background: EmbeddingGemma → caption embedding → Qdrant
@@ -111,17 +115,17 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
     const buffer = Buffer.from(await file.arrayBuffer());
     const hash = createHash('sha256').update(buffer).digest('hex').slice(0, 16);
     const ext = file.name.split('.').pop() || 'jpg';
-    const minioKey = `${poiId}/${hash}.${ext}`;
+    const objectStorageKey = `${poiId}/${hash}.${ext}`;
     const thumbKey = `${poiId}/${hash}_thumb.webp`;
 
-    // 1. Upload original to MinIO
-    await uploadFile(BUCKET, minioKey, buffer, {
+    // 1. Upload original to object storage
+    await uploadFile(BUCKET, objectStorageKey, buffer, {
       'Content-Type': file.type,
       'X-POI-Id': poiId,
       'X-Original-Name': file.name,
     });
 
-    const url = `/minio/${BUCKET}/${minioKey}`;
+    const url = `/seaweed/${BUCKET}/${objectStorageKey}`;
 
     // 2. Generate thumbnail via Sharp (300px wide, webp)
     let thumbnailUrl: string | null = null;
@@ -135,7 +139,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         'Content-Type': 'image/webp',
         'X-POI-Id': poiId,
       });
-      thumbnailUrl = `/minio/${THUMB_BUCKET}/${thumbKey}`;
+      thumbnailUrl = `/seaweed/${THUMB_BUCKET}/${thumbKey}`;
     } catch (err) {
       console.warn('[poi-photos] Thumbnail generation failed (non-fatal):', err);
     }
@@ -145,7 +149,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
       .insert(poiPhotos)
       .values({
         poiId,
-        minioKey,
+        minioKey: objectStorageKey,
         thumbnailKey: thumbnailUrl ? thumbKey : null,
         url,
         thumbnailUrl,
@@ -154,13 +158,24 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         size: file.size,
       })
       .returning();
+    const compatibilityFields = buildObjectStorageCompatibilityFields(objectStorageKey);
 
     // 4. Fire-and-forget: VLM analysis pipeline
     runVLMAnalysisPipeline(photo.id, poiId, buffer, poi.name ?? 'Unknown').catch((err) =>
       console.warn('[poi-photos] Background VLM pipeline failed:', err)
     );
 
-    return json({ success: true, photo }, { status: 201 });
+    return json(
+      {
+        success: true,
+        photo: {
+          ...photo,
+          objectStorageKey: compatibilityFields.objectStorageKey,
+          minioKey: compatibilityFields.minioKey,
+        },
+      },
+      { status: 201 }
+    );
   } catch (err) {
     console.error('[poi-photos] POST error:', err);
     return json({ error: 'Failed to upload photo' }, { status: 500 });
@@ -201,9 +216,12 @@ export const DELETE: RequestHandler = async ({ params, request, locals }) => {
       return json({ error: 'Photo not found' }, { status: 404 });
     }
 
-    // Clean up MinIO objects (non-fatal)
-    if (deleted.minioKey) {
-      deleteFile(BUCKET, deleted.minioKey).catch(() => {});
+    // Clean up object-storage objects (non-fatal)
+    const deletedStorageKey = resolveObjectStorageKey({
+      minioKey: deleted.minioKey,
+    });
+    if (deletedStorageKey) {
+      deleteFile(BUCKET, deletedStorageKey).catch(() => {});
     }
     if (deleted.thumbnailKey) {
       deleteFile(BUCKET, deleted.thumbnailKey).catch(() => {});

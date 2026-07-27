@@ -25,6 +25,9 @@ export const PacketTopologyEnvelopeSchema = z.object({
   feature_id: z.string().min(1).describe('Feature layer identifier (immutable)'),
   source_ref: z.string().min(1).describe('File path or source reference (immutable)'),
   directory_path: z.string().optional().describe('Directory context for routing'),
+  file_path: z.string().optional().describe('Compatibility file path alias used by ACP writers'),
+  function_symbol: z.string().nullable().optional().describe('Compatibility symbol field used by ACP writers'),
+  feature_label: z.string().nullable().optional().describe('Human-readable feature label'),
 
   // topology labels (NOT identity — used for routing and locality, not joins)
   community_id: z.number().int().nonnegative().nullable().optional()
@@ -41,6 +44,8 @@ export const PacketTopologyEnvelopeSchema = z.object({
   // derived latent/manifold representations
   latent_64: z.array(z.number()).length(64).nullable().optional()
     .describe('64-dim autoencoder latent (optional, derived)'),
+  manifold_t: z.union([z.number(), z.string()]).nullable().optional()
+    .describe('Legacy time-axis compatibility field'),
   manifold_4d: z.object({
     x: z.number().describe('SOM column (X-axis)'),
     y: z.number().describe('SOM row (Y-axis)'),
@@ -52,6 +57,18 @@ export const PacketTopologyEnvelopeSchema = z.object({
   // retrieval mirrors (derived, read-only)
   qdrant_point_id: z.string().nullable().optional()
     .describe('Qdrant vector point ID (mirror only)'),
+  qdrant_collection: z.string().nullable().optional()
+    .describe('Qdrant collection name used by legacy ACP materializers'),
+  redis_key: z.string().nullable().optional()
+    .describe('Redis cache key compatibility field'),
+  neo4j_node_id: z.string().nullable().optional()
+    .describe('Neo4j node ID compatibility field'),
+  neo4j_edges: z.array(z.string()).default([])
+    .describe('Neo4j edge identifiers or neighbors for legacy ACP consumers'),
+  topological_neighbors: z.array(z.string()).default([])
+    .describe('Legacy topology neighbor list used by ACP persistence'),
+  cold_storage_uri: z.string().nullable().optional()
+    .describe('Cold object storage compatibility field'),
   neo4j_neighbors: z.array(z.string()).default([])
     .describe('Neo4j neighbor packet_keys (topology expansion)'),
   page_rank_score: z.number().nonnegative().nullable().optional()
@@ -60,6 +77,10 @@ export const PacketTopologyEnvelopeSchema = z.object({
   // lexical enrichment (from feature materialization)
   summary: z.string().nullable().optional()
     .describe('Human-readable summary'),
+  domain_class: z.string().nullable().optional()
+    .describe('Canonical or compatibility domain label'),
+  semantic_tags: z.array(z.string()).default([])
+    .describe('Compatibility semantic tag array used by ACP writers'),
   lexical_nouns: z.array(z.string()).default([])
     .describe('Extracted nouns from feature label'),
   lexical_verbs: z.array(z.string()).default([])
@@ -88,11 +109,29 @@ export const PacketTopologyEnvelopeSchema = z.object({
     .describe('Extraction confidence score'),
   extraction_method: z.string().optional()
     .describe('Which extractor/synthesizer produced this'),
-  provenance: z.record(z.unknown()).optional()
+  extracted_from_service: z.string().nullable().optional()
+    .describe('Service that produced this packet in ACP compatibility mode'),
+  extracted_from_method: z.string().nullable().optional()
+    .describe('Method that produced this packet in ACP compatibility mode'),
+  extraction_duration_ms: z.number().nonnegative().nullable().optional()
+    .describe('Extraction duration for ACP compatibility mode'),
+  extracted_at: z.string().datetime().nullable().optional()
+    .describe('Extraction timestamp for ACP compatibility mode'),
+  request_id: z.string().nullable().optional()
+    .describe('Trace or request identifier for ACP compatibility mode'),
+  provenance: z.record(z.string(), z.unknown()).optional()
     .describe('Extraction context (summary rank, feature label, etc.)')
 }).strict();
 
 export type PacketTopologyEnvelope = z.infer<typeof PacketTopologyEnvelopeSchema>;
+export type CanonicalPacketIdentity = Pick<
+  PacketTopologyEnvelope,
+  'packet_key' | 'source_ref' | 'file_path' | 'function_symbol' | 'feature_id' | 'feature_label'
+>;
+export type PacketMetadata = Pick<
+  PacketTopologyEnvelope,
+  'title_id' | 'summary' | 'domain_class' | 'semantic_tags'
+>;
 
 /**
  * Validate a packet envelope against the canonical schema.

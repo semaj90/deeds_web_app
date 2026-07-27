@@ -18,42 +18,47 @@ import Redis from 'ioredis';
 import { publishMirrorSyncEvent } from './mirror-sync-publisher.js';
 import { withMcpToolTelemetry } from '$lib/server/telemetry/mcp-tool-telemetry.js';
 import { getRedis } from '$lib/server/redis.js';
+import {
+  computePacketKey,
+  validatePacketKeyImmutability,
+  validatePacketKeyLineageChain,
+} from '$lib/server/atlas/identity/packet-key-builder.js';
 
 // ──────────────────────────────────────────────────────────────────────
-// Zod Schemas (5-Step Gate 2: Validation)
+// Zod Schemas (5-Step Gate 2: Validation) — SNAKE_CASE CANONICAL
 // ──────────────────────────────────────────────────────────────────────
 
 const IdentityRecoverInputSchema = z.object({
-  packetKey: z.string().min(1),
-  sourceRef: z.string(),
-  featureId: z.string(),
+  packet_key: z.string().min(1),
+  source_ref: z.string(),
+  feature_id: z.string(),
 });
 
 const EnvelopeValidateInputSchema = z.object({
-  packetKey: z.string().min(1),
+  packet_key: z.string().min(1),
   envelope: z.record(z.unknown()),
 });
 
 const MirrorSyncQdrantInputSchema = z.object({
-  packetKey: z.string().min(1),
-  identityLane: z.enum(['canonical', 'recoverable', 'quarantine']),
+  packet_key: z.string().min(1),
+  identity_lane: z.enum(['canonical', 'recoverable', 'quarantine']),
   payload: z.record(z.unknown()),
 });
 
 const MirrorSyncNeo4jInputSchema = z.object({
-  packetKey: z.string().min(1),
-  sourceRef: z.string(),
-  featureId: z.string(),
+  packet_key: z.string().min(1),
+  source_ref: z.string(),
+  feature_id: z.string(),
 });
 
 const GraphExpandInputSchema = z.object({
-  featureId: z.string().min(1),
-  maxHops: z.number().min(1).max(5).default(3),
+  feature_id: z.string().min(1),
+  max_hops: z.number().min(1).max(5).default(3),
 });
 
 const RetrievalRerankInputSchema = z.object({
   candidates: z.array(z.object({
-    packetKey: z.string(),
+    packet_key: z.string(),
     score: z.number(),
   })),
   query: z.string(),
@@ -62,7 +67,7 @@ const RetrievalRerankInputSchema = z.object({
 const AnswerSynthesizeInputSchema = z.object({
   question: z.string().min(1),
   context: z.array(z.object({
-    packetKey: z.string(),
+    packet_key: z.string(),
     content: z.string(),
   })),
 });
@@ -73,7 +78,7 @@ const EscalationRouteInputSchema = z.object({
 });
 
 const IdentityQuarantineInputSchema = z.object({
-  packetKey: z.string().min(1),
+  packet_key: z.string().min(1),
   reason: z.string(),
 });
 
@@ -131,7 +136,7 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
     const packets = await db
       .select()
       .from(atlas_packets)
-      .where(eq(atlas_packets.packet_key, input.packetKey))
+      .where(eq(atlas_packets.packet_key, input.packet_key))
       .limit(1);
 
     if (packets.length === 0) {
@@ -148,11 +153,12 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
       };
     }
 
-    // Step 2: Validate envelope
+    // Step 2: Validate envelope via canonical identity builder
     const packet = packets[0];
-    const isCanonical = !!(input.sourceRef && input.featureId && packet.packet_key);
-    const identityLane = isCanonical ? 'canonical' : 'recoverable';
-    const confidence = isCanonical ? 1.0 : 0.85;
+    const canonical_packet_key = computePacketKey(input.source_ref, packet.tree_node_id, packet.title_id);
+    const validation = validatePacketKeyImmutability(input.packet_key, canonical_packet_key);
+    const identityLane = validation.is_valid ? 'canonical' : 'recoverable';
+    const confidence = validation.is_valid ? 1.0 : 0.85;
 
     // Step 3: Write to Postgres
     const updated = await db
@@ -162,7 +168,7 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
         identity_confidence: confidence,
         updated_at: new Date(),
       })
-      .where(eq(atlas_packets.packet_key, input.packetKey));
+      .where(eq(atlas_packets.packet_key, input.packet_key));
 
     // Step 4: Invalidate Redis
     redis = new Redis({
@@ -174,13 +180,13 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
       retryStrategy: () => null,
     });
     await redis.connect();
-    const invalidated = await invalidateBitfrostKeys(redis, input.packetKey);
+    const invalidated = await invalidateBitfrostKeys(redis, input.packet_key);
 
     // Step 5: Emit Events (non-blocking)
     publishMirrorSyncEvent({
-      packetKey: input.packetKey,
-      sourceRef: input.sourceRef,
-      identityLane,
+      packet_key: input.packet_key,
+      source_ref: input.source_ref,
+      identity_lane: identityLane,
       action: 'identity_recovered',
       timestamp: new Date().toISOString(),
     }).catch((err) => {
@@ -235,7 +241,7 @@ async function toolEnvelopeValidateImpl(args: unknown): Promise<ToolResult> {
     const packets = await db
       .select()
       .from(atlas_packets)
-      .where(eq(atlas_packets.packet_key, input.packetKey))
+      .where(eq(atlas_packets.packet_key, input.packet_key))
       .limit(1);
 
     if (packets.length === 0) {
@@ -264,7 +270,7 @@ async function toolEnvelopeValidateImpl(args: unknown): Promise<ToolResult> {
         identity_confidence: confidence,
         updated_at: new Date(),
       })
-      .where(eq(atlas_packets.packet_key, input.packetKey));
+      .where(eq(atlas_packets.packet_key, input.packet_key));
 
     // Step 4: Invalidate Redis
     redis = new Redis({
@@ -276,13 +282,13 @@ async function toolEnvelopeValidateImpl(args: unknown): Promise<ToolResult> {
       retryStrategy: () => null,
     });
     await redis.connect();
-    const invalidated = await invalidateBitfrostKeys(redis, input.packetKey);
+    const invalidated = await invalidateBitfrostKeys(redis, input.packet_key);
 
     // Step 5: Emit Events (non-blocking)
     publishMirrorSyncEvent({
-      packetKey: input.packetKey,
-      sourceRef: '',
-      identityLane: 'canonical',
+      packet_key: input.packet_key,
+      source_ref: '',
+      identity_lane: 'canonical',
       action: 'envelope_validated',
       timestamp: new Date().toISOString(),
     }).catch((err) => {

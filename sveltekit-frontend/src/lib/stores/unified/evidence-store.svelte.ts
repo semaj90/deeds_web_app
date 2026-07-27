@@ -35,6 +35,7 @@ type EvidenceUploadResponse = Partial<EvidenceFile> & {
   description?: string;
   metadata?: Record<string, unknown>;
   jobId?: string;
+  objectStorageKey?: string;
   minioKey?: string;
   status?: string;
 };
@@ -141,6 +142,10 @@ class EvidenceStore {
       if (response.ok) {
         const data = (await response.json()) as EvidenceUploadResponse;
         const payload = data.evidence ?? (data.data as Partial<EvidenceFile> | undefined) ?? data;
+        const resolvedObjectStorageKey = resolveObjectStorageKey({
+          objectStorageKey: data.objectStorageKey,
+          minioKey: data.minioKey,
+        });
         const evidenceFile: EvidenceFile = {
           id: String(payload.id ?? data.id ?? crypto.randomUUID()),
           name: String(payload.name ?? data.originalName ?? data.fileName ?? file.name),
@@ -163,6 +168,7 @@ class EvidenceStore {
             uploadedAt: Number(payload.uploadedAt ?? data.uploadedAt ?? Date.now()),
             jobId: data.jobId,
             status: data.status,
+            objectStorageKey: resolvedObjectStorageKey,
             minioKey: data.minioKey,
           },
         };
@@ -202,3 +208,4 @@ class EvidenceStore {
 }
 
 export const evidenceStore = new EvidenceStore();
+import { resolveObjectStorageKey } from '$lib/server/storage/object-storage-compat.js';

@@ -2,38 +2,10 @@
 // AND under standalone tsx tools (MCP server, scripts) where $env is unresolvable.
 // SvelteKit forwards all $env/dynamic/private values onto process.env at runtime,
 // so process.env is always the canonical source server-side.
-import dotenv from 'dotenv';
-import fs from 'node:fs';
-import path from 'node:path';
+import { loadRuntimeEnv } from './config/load-runtime-env.js';
 
-function loadEnvFile(filePath: string, baseValues: Record<string, string> = {}): Record<string, string> {
-  if (!fs.existsSync(filePath)) return {};
-  const parsed = dotenv.parse(fs.readFileSync(filePath));
-  for (const [key, value] of Object.entries(parsed)) {
-    const current = process.env[key];
-    if (current === undefined || current === baseValues[key]) {
-      process.env[key] = value;
-    }
-  }
-  return parsed;
-}
-
-// Environment loading precedence (explicit mode-based — no automatic dotenv override in production)
-function loadEnvironment(mode: 'development' | 'process' = 'process') {
-  if (mode === 'development') {
-    // Local development: .env.local overrides .env
-    const envRoot = path.resolve(process.cwd(), '.env');
-    const envLocal = path.resolve(process.cwd(), '.env.local');
-    const rootValues = loadEnvFile(envRoot);
-    loadEnvFile(envLocal, rootValues);
-  }
-  // 'process' mode: use process.env only (container/CI, respects mounted secrets)
-}
-
-// Default mode: 'process' (use environment as-is, no dotenv override)
-// Set DOTENV_LOAD_MODE='development' to enable local .env.local precedence
-const dotenvMode = process.env.DOTENV_LOAD_MODE ?? 'process';
-loadEnvironment(dotenvMode as 'development' | 'process');
+const dotenvMode = process.env.DOTENV_LOAD_MODE ?? (process.env.NODE_ENV === 'production' ? 'process' : 'development');
+loadRuntimeEnv({ mode: dotenvMode });
 
 const privateEnv: Record<string, string | undefined> = process.env;
 const publicEnv: Record<string, string | undefined> = process.env;
@@ -127,6 +99,7 @@ function embeddingServiceUrl(): string | undefined {
 
 // Export typed ENV object with all configuration
 export const ENV = {
+  NODE_ENV: privateEnv.NODE_ENV ?? 'development',
   // Database
   DATABASE_URL: privateEnv.DATABASE_URL ?? DEV.DATABASE_URL,
 
@@ -152,23 +125,57 @@ export const ENV = {
 
   // Ollama
   OLLAMA_URL: privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
+  OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
+  OLLAMA_EMBED_BASE_URL: privateEnv.OLLAMA_EMBED_BASE_URL ?? privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
   OLLAMA_HOST: privateEnv.OLLAMA_HOST ?? LOCALHOST,
   OLLAMA_PORT: parseInt(privateEnv.OLLAMA_PORT ?? '11434', 10),
+  OLLAMA_EMBED_MODEL: privateEnv.OLLAMA_EMBED_MODEL,
+  OLLAMA_VLM_MODEL: privateEnv.OLLAMA_VLM_MODEL,
 
   // Triton (optional)
   TRITON_URL: tritonUrl() ?? DEV.TRITON_URL,
+  TENSORRT_URL: privateEnv.TENSORRT_URL,
+  TRITON_LLM_MODEL: privateEnv.TRITON_LLM_MODEL,
   TRITON_VLM_MODEL: privateEnv.TRITON_VLM_MODEL ?? DEV.TRITON_VLM_MODEL,
   TRITON_VISION_MODEL: privateEnv.TRITON_VISION_MODEL ?? DEV.TRITON_VISION_MODEL,
   TRITON_RERANKER_MODEL: privateEnv.TRITON_RERANKER_MODEL ?? DEV.TRITON_RERANKER_MODEL,
 
   // Embedding Service (optional)
   EMBEDDING_SERVICE_URL: embeddingServiceUrl(),
+  EMBEDDING_BASE_URL: privateEnv.EMBEDDING_BASE_URL ?? embeddingServiceUrl(),
+  EMBEDDING_PROVIDER: privateEnv.EMBEDDING_PROVIDER,
+  EMBEDDING_GRPC_ENABLED: privateEnv.EMBEDDING_GRPC_ENABLED === 'true',
+  EMBEDDING_GRPC_URL: privateEnv.EMBEDDING_GRPC_URL,
   CROSS_ENCODER_MODEL: privateEnv.CROSS_ENCODER_MODEL ?? DEV.CROSS_ENCODER_MODEL,
+  EMBED_MODEL_PATH: privateEnv.EMBED_MODEL_PATH,
 
   // Go Retrieval
   GO_RETRIEVAL_HTTP_URL: goRetrievalHttpUrl(),
+  GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? privateEnv.GO_RETRIEVAL_HTTP_URL ?? privateEnv.RETRIEVAL_HTTP_URL ?? `http://${LOOPBACK_IP}:8096`,
+  GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? `http://${LOOPBACK_IP}:50051`,
+  LANGGRAPH_URL: privateEnv.LANGGRAPH_URL,
+  LANGGRAPH_ENABLED: privateEnv.LANGGRAPH_ENABLED === 'true',
+  LDR_BASE_URL: privateEnv.LDR_BASE_URL,
+  LDR_USERNAME: privateEnv.LDR_USERNAME,
+  LDR_PASSWORD: privateEnv.LDR_PASSWORD,
+  ORCHESTRATOR_URL: privateEnv.ORCHESTRATOR_URL,
+  INDEX_WORKER_URL: privateEnv.INDEX_WORKER_URL,
+  NATS_URL: privateEnv.NATS_URL,
+  RAG_SERVICE_URL: privateEnv.RAG_SERVICE_URL,
+  ENHANCED_RAG_URL: privateEnv.ENHANCED_RAG_URL,
+  PYTHON_PATH: privateEnv.PYTHON_PATH,
+  CUDA_SERVICE_URL: privateEnv.CUDA_SERVICE_URL,
+  FASTAPI_URL: privateEnv.FASTAPI_URL,
+  CUVS_BENCH_URL: privateEnv.CUVS_BENCH_URL,
+  LANGEXTRACT_URL: privateEnv.LANGEXTRACT_URL,
+  MINIFORGE_SIDECAR_URL: privateEnv.MINIFORGE_SIDECAR_URL,
+  TOPOLOGY_SEARCH_URL: privateEnv.TOPOLOGY_SEARCH_URL,
+  RETRIEVAL_HTTP_URL: privateEnv.RETRIEVAL_HTTP_URL ?? privateEnv.GO_RETRIEVAL_HTTP_URL,
+  LEGAL_GATEWAY_URL: privateEnv.LEGAL_GATEWAY_URL,
+  VLLM_URL: privateEnv.VLLM_URL,
+  CONTEXT7_MCP_URL: privateEnv.CONTEXT7_MCP_URL,
 
-  // MinIO / SeaweedFS
+  // Legacy MinIO-compatible names. SeaweedFS is the canonical object store.
   MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? DEV.MINIO_ENDPOINT,
   MINIO_PORT: parseInt(privateEnv.MINIO_PORT ?? DEV.MINIO_PORT, 10),
   MINIO_ACCESS_KEY: privateEnv.MINIO_ACCESS_KEY ?? DEV.MINIO_ACCESS_KEY,
@@ -176,8 +183,13 @@ export const ENV = {
   MINIO_USE_SSL: privateEnv.MINIO_USE_SSL === 'true' || DEV.MINIO_USE_SSL === 'true',
   MINIO_REGION: privateEnv.MINIO_REGION ?? 'us-east-1',
   MINIO_EVIDENCE_BUCKET: privateEnv.MINIO_EVIDENCE_BUCKET ?? DEV.MINIO_EVIDENCE_BUCKET,
+  MINIO_LIBRARY_BUCKET: privateEnv.MINIO_LIBRARY_BUCKET ?? privateEnv.MINIO_EVIDENCE_BUCKET ?? DEV.MINIO_EVIDENCE_BUCKET,
+  MINIO_URL: privateEnv.MINIO_URL,
   // SeaweedFS S3 gateway (override MinIO settings if present)
   SEAWEED_S3_PORT: privateEnv.SEAWEED_S3_PORT ? parseInt(privateEnv.SEAWEED_S3_PORT, 10) : undefined,
+  SEAWEED_S3_ENDPOINT: privateEnv.SEAWEED_S3_ENDPOINT ?? privateEnv.SEAWEED_ENDPOINT,
+  SEAWEED_S3_REGION: privateEnv.SEAWEED_S3_REGION ?? privateEnv.MINIO_REGION ?? 'us-east-1',
+  SEAWEED_S3_BUCKET: privateEnv.SEAWEED_S3_BUCKET ?? privateEnv.MINIO_EVIDENCE_BUCKET ?? DEV.MINIO_EVIDENCE_BUCKET,
   SEAWEED_ENDPOINT: privateEnv.SEAWEED_ENDPOINT,
   SEAWEED_ACCESS_KEY: privateEnv.SEAWEED_ACCESS_KEY,
   SEAWEED_SECRET_KEY: privateEnv.SEAWEED_SECRET_KEY,
@@ -186,26 +198,101 @@ export const ENV = {
 
   // Public API
   PUBLIC_API_URL: privateEnv.PUBLIC_API_URL ?? DEV.PUBLIC_API_URL,
+  PUBLIC_APP_URL: privateEnv.PUBLIC_APP_URL ?? privateEnv.PUBLIC_API_URL ?? DEV.PUBLIC_API_URL,
+  FRONTEND_BASE_URL: privateEnv.FRONTEND_BASE_URL ?? privateEnv.PUBLIC_APP_URL ?? privateEnv.PUBLIC_API_URL ?? DEV.PUBLIC_API_URL,
 
   // MCP
+  TRACE_MCP_HOST: privateEnv.TRACE_MCP_HOST ?? LOOPBACK_IP,
+  TRACE_MCP_PORT: parseInt(privateEnv.TRACE_MCP_PORT ?? '8788', 10),
+  TRACE_MCP_URL: privateEnv.TRACE_MCP_URL ?? `http://${privateEnv.TRACE_MCP_HOST ?? LOOPBACK_IP}:${privateEnv.TRACE_MCP_PORT ?? '8788'}`,
   KB_MCP_URL: privateEnv.KB_MCP_URL ?? DEV.KB_MCP_URL,
   MCP_PORT: privateEnv.MCP_PORT ?? '3001',
   MCP_MULTICORE_URL: privateEnv.MCP_MULTICORE_URL ?? `http://${LOOPBACK_IP}:3001`,
+  LLAMA_SERVER_URL: privateEnv.LLAMA_SERVER_URL,
+  TURBOQUANT_URL: privateEnv.TURBOQUANT_URL,
+  TURBOQUANT_BASE_URL: privateEnv.TURBOQUANT_BASE_URL ?? privateEnv.TURBOQUANT_URL,
+  TURBOVEC_SIDECAR: privateEnv.TURBOVEC_SIDECAR,
+  TURBOVEC_SIDECAR_JSONRPC_URL: privateEnv.TURBOVEC_SIDECAR_JSONRPC_URL,
+  TURBOVEC_SIDECAR_GRPC_ENABLED: privateEnv.TURBOVEC_SIDECAR_GRPC_ENABLED === 'true',
+  TURBOQUANT_MODEL_PATH: privateEnv.TURBOQUANT_MODEL_PATH,
+  TURBO_MODEL_PATH: privateEnv.TURBO_MODEL_PATH,
+  ROTORQUANT_MODEL_PATH: privateEnv.ROTORQUANT_MODEL_PATH,
+  ROTORQUANT_CHAT_MODEL: privateEnv.ROTORQUANT_CHAT_MODEL,
+  GEMMA4_MODEL: privateEnv.GEMMA4_MODEL,
+  FUNCTION_GEMMA_MODEL: privateEnv.FUNCTION_GEMMA_MODEL,
+  BIFROST_URL: privateEnv.BIFROST_URL,
+  BIFROST_ENABLED: privateEnv.BIFROST_ENABLED === 'true',
+  VLM_BASE_URL: privateEnv.VLM_BASE_URL,
+  LITERT_BASE_URL: privateEnv.LITERT_BASE_URL,
+  ACE_EMBED_BATCH_TIMEOUT_MS: parseInt(privateEnv.ACE_EMBED_BATCH_TIMEOUT_MS ?? '30000', 10),
+  ACE_ENCODED_PREFILTER_ENABLED: privateEnv.ACE_ENCODED_PREFILTER_ENABLED === 'true',
+  ACE_ENCODED_PREFILTER_MODE: privateEnv.ACE_ENCODED_PREFILTER_MODE,
+  ACE_ENCODED_RERANK_ENABLED: privateEnv.ACE_ENCODED_RERANK_ENABLED === 'true',
+  ACE_ENCODED_RERANK_WEIGHT: privateEnv.ACE_ENCODED_RERANK_WEIGHT ? parseFloat(privateEnv.ACE_ENCODED_RERANK_WEIGHT) : undefined,
+  EMBEDDING_QUIC_ENABLED: privateEnv.EMBEDDING_QUIC_ENABLED === 'true',
+  QUIC_HEALTH_URL: privateEnv.QUIC_HEALTH_URL,
+  WHISPER_USE_SERVER: privateEnv.WHISPER_USE_SERVER === 'true',
+  WHISPER_SERVER_URL: privateEnv.WHISPER_SERVER_URL,
+  WHISPER_PATH: privateEnv.WHISPER_PATH,
+  WHISPER_MODEL: privateEnv.WHISPER_MODEL,
+  WHISPER_DEVICE: privateEnv.WHISPER_DEVICE,
+  FFMPEG_PATH: privateEnv.FFMPEG_PATH,
+  SEARXNG_URL: privateEnv.SEARXNG_URL,
+  OBSIDIAN_URL: privateEnv.OBSIDIAN_URL,
+  OBSIDIAN_API_KEY: privateEnv.OBSIDIAN_API_KEY,
+  OBSIDIAN_VAULT_PATH: privateEnv.OBSIDIAN_VAULT_PATH,
+  FIRECRAWL_API_KEY: privateEnv.FIRECRAWL_API_KEY,
+  DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL,
+  GRANITE_DOCLING_ENABLED: privateEnv.GRANITE_DOCLING_ENABLED === 'true',
+  GRANITE_DOCLING_MODEL: privateEnv.GRANITE_DOCLING_MODEL,
+  LANGEXTRACT_NATIVE: privateEnv.LANGEXTRACT_NATIVE === 'true',
+  BIFROST_OPENAI_BASE_URL: privateEnv.BIFROST_OPENAI_BASE_URL,
+  RERANK_URL: privateEnv.RERANK_URL,
+  RERANK_BASE_URL: privateEnv.RERANK_BASE_URL ?? privateEnv.RERANK_URL,
+  AGENT_TRACE_ENABLED: privateEnv.AGENT_TRACE_ENABLED === 'true',
+  IMAGE_SYNTHESIS_URL: privateEnv.IMAGE_SYNTHESIS_URL,
+  LOCAL_OPENAI_BASE_URL: privateEnv.LOCAL_OPENAI_BASE_URL,
+  CODEBASE_INDEX_URL: privateEnv.CODEBASE_INDEX_URL,
+  CODEINTEL_GRPC_ENABLED: privateEnv.CODEINTEL_GRPC_ENABLED === 'true',
+  CODEINTEL_GRPC_URL: privateEnv.CODEINTEL_GRPC_URL,
+  CHR97_GRPC_URL: privateEnv.CHR97_GRPC_URL,
+  CHR97_GRPC_ENABLED: privateEnv.CHR97_GRPC_ENABLED === 'true',
+  SDXL_SERVICE_URL: privateEnv.SDXL_SERVICE_URL,
+  HFORF_MODEL_PATH: privateEnv.HFORF_MODEL_PATH,
+  GITHUB_TOKEN: privateEnv.GITHUB_TOKEN,
+  ENABLE_LEGACY_ATLAS_FIELDS: privateEnv.ENABLE_LEGACY_ATLAS_FIELDS === 'true',
+
+  // Neo4j
+  NEO4J_URI: privateEnv.NEO4J_URI,
+  NEO4J_USER: privateEnv.NEO4J_USER,
+  NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD,
+  NEO4J_HTTP_URL: privateEnv.NEO4J_HTTP_URL ?? (privateEnv.NEO4J_URI ? privateEnv.NEO4J_URI.replace(/^bolt:\/\//, 'http://') : undefined),
 
   // Auth
   JWT_SECRET: privateEnv.JWT_SECRET ?? DEV.JWT_SECRET,
   SERVICE_AUTH_TOKEN: privateEnv.SERVICE_AUTH_TOKEN ?? DEV.SERVICE_AUTH_TOKEN,
+  DEV_BYPASS_AUTH: privateEnv.DEV_BYPASS_AUTH === 'true',
+  VAPID_PUBLIC_KEY: privateEnv.VAPID_PUBLIC_KEY,
+  VAPID_PRIVATE_KEY: privateEnv.VAPID_PRIVATE_KEY,
 
   // Observability
   LANGFUSE_PUBLIC_KEY: privateEnv.LANGFUSE_PUBLIC_KEY,
   LANGFUSE_SECRET_KEY: privateEnv.LANGFUSE_SECRET_KEY,
   LANGFUSE_BASEURL: privateEnv.LANGFUSE_BASEURL ?? 'http://localhost:3030',
+  LANGFUSE_HOST: privateEnv.LANGFUSE_HOST ?? privateEnv.LANGFUSE_BASEURL ?? 'http://localhost:3030',
+  LANGFUSE_ENABLED: privateEnv.LANGFUSE_ENABLED === 'true',
+  OPENAI_BASE_URL: privateEnv.OPENAI_BASE_URL,
+  COUCHDB_URL: privateEnv.COUCHDB_URL,
 
   // Feature flags
   ENABLE_BIFROST_CACHE: privateEnv.ENABLE_BIFROST_CACHE === 'true',
   ENABLE_GEMMA4_PLANNER: privateEnv.ENABLE_GEMMA4_PLANNER === 'true',
   ENABLE_GPU_ACCELERATION: privateEnv.ENABLE_GPU_ACCELERATION !== 'false', // Default true
   ENABLE_VECTOR_SEARCH: privateEnv.ENABLE_VECTOR_SEARCH !== 'false', // Default true
+  ENABLE_CUVS_SEARCH: privateEnv.ENABLE_CUVS_SEARCH === 'true',
+
+  // Optional service credentials
+  QDRANT_API_KEY: privateEnv.QDRANT_API_KEY,
 } as const;
 
 // Helper functions

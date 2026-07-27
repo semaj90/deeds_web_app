@@ -1529,6 +1529,12 @@ page.on('requestfailed', (req) => log.requestFailures.push({url, failure}));
 
 **MinIO has license issues (AGPL change → commercial/restricted use).** The repo has cut over to **SeaweedFS S3 gateway** as the canonical object store. SeaweedFS is Apache 2.0, S3-compatible, and the existing MinIO SDK speaks to it unchanged.
 
+**Current implementation rule (July 26, 2026):**
+- Treat SeaweedFS as the storage product in all new code, prompts, and docs.
+- Do not introduce new MinIO-first naming for routes, features, or storage contracts.
+- Legacy schema fields and compatibility shims such as `minio_key`, `MINIO_*`, or `minio-client.ts` may remain only until an explicit storage-contract migration renames them.
+- When the schema still requires those legacy names, write SeaweedFS-compatible S3 object keys into them rather than inventing a parallel storage path.
+
 **Architecture:**
 - `legal-ai-seaweed-master` (port 9333) — metadata
 - `legal-ai-seaweed-volume` (host port 8380 → container 8080) — file blobs
@@ -1563,7 +1569,7 @@ SEAWEED_SECRET_KEY=minio123
 - `POST /api/evidence/upload` 1-byte file → HTTP 201
 - `mc ls local/legal-evidence/.../<new-key>` → empty (NOT in MinIO)
 - `HEAD /buckets/legal-evidence/.../<new-key>` on SeaweedFS filer → HTTP 200 ✅
-- All `evidence.fileUrl` records continue to use the `minio://...` URL prefix (semantically just an S3 prefix; no consumer parses it strictly as MinIO)
+- Existing `evidence.fileUrl` records may still carry a legacy `minio://...` prefix, but new guidance and new storage semantics are SeaweedFS-first unless and until the persistence contract is renamed.
 
 **`.env` is gitignored** — production deployments must set the 4 SEAWEED_* env vars in their orchestrator (k8s, fly.io, docker-compose `environment:`, etc.) for the override to fire.
 
@@ -2976,6 +2982,7 @@ NPM scripts: `agent:fix:batch:{quiet,summary}`, `audit:dirs:{quiet,summary}`, `a
 ## Key Lessons (Proven Patterns)
 
 - **rg search on gitignored NES/CHROM packets**: `.opencode/ndjson/`, `.opencode/cards/`, `.opencode/gemma4_candidates.ndjson`, and related packet files are gitignored but searchable via `.rgignore` at repo root (uses `!path` negation rules). Plain `rg` finds them. For explicit override: `rg --no-ignore` (ripgrep 14.x) — NOT `--uu` which was removed in rg 14. MapReduce pipeline: `npm run ndjson:mapreduce`. Outputs: 396 SOM cluster summaries, 745 adjacency edges, 2.5 KB minified ACE index in `.opencode/ndjson/`. Candidate join (0/2033) is expected until `graphify:semantic` writes codebase cards with `file:src/...` ids matching the candidate namespace.
+- **Env-file discoverability rule**: keep real `.env` and `.env.local` files gitignored. Plain content search against the target env paths works for the main repo and `sveltekit-frontend` env files, while Git still ignores them. For file discovery, use `rg --files -g ".env*"` rather than plain `rg --files`. If a path falls outside the usual target files, search with explicit overrides such as `rg -n --hidden --no-ignore "DATABASE_URL|REDIS_URL|TRACE_MCP_URL" .env .env.local sveltekit-frontend/.env sveltekit-frontend/.env.local`. For repeatable presence-only audits, use `npm run env:audit` or pass a custom key set such as `npm run env:audit -- --keys DATABASE_URL,POSTGRES_URL,REDIS_URL,VALKEY_URL,QDRANT_URL,NEO4J_URI,TRACE_MCP_URL`. Prefer `.env` as the primary source and `.env.local` as the local override when tracing runtime configuration.
 - **binding.cc corruption recovery**: The `PcaProjectWrapper` body and `Init` function have been corrupted multiple times by incremental edits. Recovery pattern: `git show <last-clean-commit>:simd-bridge/cpp/binding.cc | sed -n '<split_line>,<end>p' > /tmp/tail.txt && head -<split_line-1> binding.cc > /tmp/head.txt && cat /tmp/head.txt /tmp/tail.txt > binding.cc`. Last clean commit: `0abba595f3`. Split point: line 1091 (end of `AutoencoderDecodeWrapper`). Never incrementally edit the Init/PcaProject region — restore from git.
 - **OpenCode skills vs instructions**: `.opencode/skills/<name>/SKILL.md` (with `name`+`description` frontmatter) = on-demand agent-requested context. `.opencode/command/<name>.md` = slash commands invoked via `/name`. `instructions` array in `opencode.jsonc` = permanent system context (every session). Do NOT put command files in `instructions` — Gemma4 reads them as tasks. Repo-state first: do not suggest installing `gemma-2b-it`, `gemma2-b-it`, Ollama defaults, or generic chatbot models unless explicitly asked. Current task is Atlas audit/linkage repair, not model selection. Skill routing table lives in `docs/ai-os/opencode-skill-routing.md` (keyword → skill mapping injected as permanent instruction).
 - **TurboQuant-safe is the daily default**: `TURBO_PROFILE=turboquant-safe` + `TURBO_CTX=65536` + `-ngl 99 -fa on -cache-prompt -cache-reuse 256`. For RTX 3060 Ti 8GB with Gemma4 IQ4_XS/Q4: don't try to fit the 26B model in VRAM — use partial GPU offload with `-ngl 99` and let system RAM carry the rest. Qdrant/Postgres/Atlas retrieval keeps prompts small. Always launch via `scripts/launch-turboquant.ps1`, never bare exe. Verify context: `(Invoke-RestMethod http://127.0.0.1:8090/slots)[0].n_ctx` should be 65536.

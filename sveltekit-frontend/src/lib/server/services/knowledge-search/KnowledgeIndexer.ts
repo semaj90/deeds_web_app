@@ -5,7 +5,7 @@
  * Responsible for processing crawled documents and storing in all backends:
  * - Qdrant (768-dim vectors)
  * - PostgreSQL (pgvector + metadata)
- * - MinIO (full document text)
+ * - SeaweedFS / S3-compatible object storage (full document text)
  * - Redis (caching)
  */
 
@@ -17,8 +17,8 @@ export interface KnowledgeIndexerConfig {
   qdrantUrl: string;
 	qdrantCollection: string;
   postgresUrl: string;
-	minioEndpoint: string;
-  minioBucket: string;
+	objectStorageEndpoint: string;
+  objectStorageBucket: string;
 	redisUrl: string;
   ollamaUrl: string;
 	embeddingModel: string;
@@ -29,8 +29,8 @@ const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
   qdrantUrl: ENV.QDRANT_URL,
   qdrantCollection: 'phase76_knowledge_base',
   postgresUrl: ENV.DATABASE_URL,
-  minioEndpoint: ENV.MINIO_ENDPOINT,
-  minioBucket: process.env?.MINIO_BUCKET ?? 'knowledge-docs',
+  objectStorageEndpoint: ENV.SEAWEED_S3_ENDPOINT ?? ENV.MINIO_ENDPOINT,
+  objectStorageBucket: process.env?.SEAWEED_S3_BUCKET ?? process.env?.MINIO_BUCKET ?? 'knowledge-docs',
   redisUrl: ENV.REDIS_URL,
   ollamaUrl: ENV.OLLAMA_BASE_URL,
   embeddingModel: process.env?.EMBEDDING_MODEL ?? 'nomic-embed-text:latest',
@@ -39,7 +39,7 @@ const DEFAULT_CONFIG: KnowledgeIndexerConfig = {
 
 /**
  * Knowledge Indexer
- * Indexes crawled documents into Qdrant: PostgreSQL, and MinIO
+ * Indexes crawled documents into Qdrant, PostgreSQL, and object storage
  */
 export class KnowledgeIndexer {
   private config: KnowledgeIndexerConfig;
@@ -91,6 +91,7 @@ export class KnowledgeIndexer {
       scrapedAt: doc.scrapedAt.toISOString(),
       contentLength: doc.content.length,
       format: 'markdown',
+      objectStorageKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       minioKey: `${this.config.qdrantCollection}/${urlHash}.md`,
       tfIdfVector: Object.fromEntries(tfIdfVector)
     });
@@ -102,7 +103,7 @@ export class KnowledgeIndexer {
       tfIdfVector
     );
 
-    const minioKey = await this.storeInMinio(urlHash, doc.content);
+    const minioKey = await this.storeInObjectStorage(urlHash, doc.content);
 
     // Update stats
     this.stats.totalIndexed++;
@@ -114,6 +115,7 @@ export class KnowledgeIndexer {
       id,
       qdrantId,
       pgId: 0,
+      objectStorageKey: minioKey,
       minioKey,
       summary,
       entities,
@@ -178,8 +180,8 @@ export class KnowledgeIndexer {
       await this.deleteFromQdrant(id);
       // Delete from PostgreSQL
       await this.deleteFromPostgres(id);
-      // Delete from MinIO
-      await this.deleteFromMinio(id);
+      // Delete from object storage
+      await this.deleteFromObjectStorage(id);
       // Invalidate cache
       await this.invalidateCache(id);
 
@@ -404,10 +406,10 @@ Summary:`;
     return "pg_" + id;
   }
 
-  private async storeInMinio(urlHash: string, content: string): Promise<string> {
+  private async storeInObjectStorage(urlHash: string, content: string): Promise<string> {
     const key = `${this.config.qdrantCollection}/${urlHash}.md`;
-    // MinIO storage will be implemented in Task 6.1
-    console.log(`📦 MinIO storage pending for: ${key}`);
+    // Object storage implementation will be completed behind the SeaweedFS-first path.
+    console.log(`📦 Object storage pending for: ${key}`);
     return key;
   }
 
@@ -419,7 +421,7 @@ Summary:`;
     // Implementation pending
   }
 
-  private async deleteFromMinio(id: string): Promise<void> {
+  private async deleteFromObjectStorage(id: string): Promise<void> {
     // Implementation pending
   }
 

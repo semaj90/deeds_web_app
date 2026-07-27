@@ -18,14 +18,15 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.
 - [x] **Phase KG-5**: Verified the end-to-end attention-rank smoke test script (`scripts/smoke-attention-rank.mjs`) and executed Obsidian vault JSONL export (`npm run graph:export:jsonl`). The Karpathy GPU inference loop is now live.
 
-- [ ] **Knowledge Graph Tool Lanes**
-  - [ ] `attention_rank_files` — embed query → `attentionScoreGPU` via LibTorch → top-N from Karpathy scores
-  - [ ] `som_topology_stats` — delegate to `gpu:som_topology` for Redis SOM grid / centroid stats
-  - [ ] `language_distribution` — delegate to `gpu:language_distribution` for Qdrant cluster tag stats
-  - [ ] `playbook_lookup_by_language` — use CouchDB `karpathy_wiki` plus top Karpathy file intersection
-  - [x] OpenCode agents/skills already expose these lanes; Hermes is archived to the deeds_labs legacy surface, and the remaining work is OpenCode/Gemma4 exposure and lane productization, not new runtime implementation
-  - [x] Register RabbitMQ `media.download` and `media.transcribe` queues in `src/lib/server/queue/rabbitmq-manager-fixed.ts`
-- [x] Route these tools into the correct skill families (`gpu-acceleration`, `vector-cluster`, `codebase`, `research`) without creating a parallel graph source of truth
+- [x] **Knowledge Graph Tool Lanes — MCP Server Registration (Contract-Only, Callable)**
+  - [x] `attention_rank_files` — embed query → Karpathy blend scores from Redis → top-N files (MCP callable, OpenCode dispatch stubbed)
+  - [x] `som_topology_stats` — SOM grid occupancy, centroid stats from Redis cache (MCP callable, OpenCode dispatch stubbed)
+  - [x] `language_distribution` — Qdrant cluster tag stats by language (MCP callable, OpenCode dispatch stubbed)
+  - [x] `playbook_lookup_by_language` — CouchDB karpathy_wiki + Karpathy authority ranking (MCP callable, OpenCode dispatch stubbed)
+  - [x] Wired all 4 tools into MCP server (trace-mcp-server.ts, July 26, 2026)
+  - [x] Status: **Contract-only, production-false for OpenCode dispatch, production-true for MCP server**
+  - [x] Next: Verify MCP callability post-restart; optional—restore OpenCode dispatch if needed
+  - [x] Note: Hermes routes archived; topological encyclopedia still live at `/api/research/topological-encyclopedia`
 
 - [x] **Phase KG-6 (legacy Hermes Tool Wiring / deeds_labs archive)**
   - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores
@@ -287,9 +288,22 @@ dependency graph, sourceRefs, startup context, package scripts.
 **Goal**: Close the remaining productization gaps across retrieval, analysis, and lane completion.
 
 **Tasks**:
-- [ ] Option 2: ClusterCard schema + Redis/Qdrant wiring + API route
-- [ ] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field
-- [ ] Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path
+- [x] Option 2: ClusterCard schema + Redis/Qdrant wiring + API route — `TEST_VERIFIED` / `RUNTIME_BLOCKED` (updated July 26, 2026)
+  - `src/routes/api/atlas/cluster-cards/+server.ts` now uses a versioned derived DTO over the live legacy `cluster_cards` table instead of assuming the newer `centroid_id/source_refs/authority_score` schema is already live
+  - Redis cache contract corrected to `ace:cluster-cards:v1:{queryHash}` with validated JSON parsing and TTL 300s
+  - Focused tests pass for auth boundary, stable query hashing, canonical DTO mapping, and cache-hit path
+  - Runtime caveat: live app HTTP proof is still blocked; the currently running dev server on port 5173 had been returning `500` before this correction, and the isolated TS runtime probe did not complete within the command budget
+  - Qdrant wiring claim was overstated for this route; payload fields were verified live in Qdrant, but this route is not yet doing live Qdrant search or reconciliation dispatch
+- [x] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field — `STATICALLY_PRESENT` only (updated July 26, 2026)
+  - `src/lib/server/retrieval/prompt-listener.ts` accepts `aliasId` and threads it through trace/log output
+  - Live database evidence does not support `alias_id` as a durable cross-store identity today: `parent_atlas_documents` has no `alias_id` column in the running database, and `task_semantic_packets` is not present live
+  - `aliasId` should be treated as request correlation only until the live identity contract exists end to end
+- [x] Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path — `TEST_VERIFIED` / `RUNTIME_BLOCKED` (updated July 26, 2026)
+  - `src/lib/server/retrieval/retrieval-loop-reconciliation.ts` was rewritten to emit explicit warning states instead of silently merging conflicts
+  - Cache contract corrected to `ace:reconciliation:v1:{hash}` and no longer depends only on `aliasId`
+  - Reconciliation now uses `parent_atlas_documents` when available and marks `TASK_SEMANTIC_PACKETS_UNAVAILABLE` when the richer live table is absent
+  - Focused tests pass for conflict classification and warning counting
+  - Score fusion from the prior implementation should be treated as removed/uncalibrated rather than production-ready; Phase 17 remains blocked behind runtime proof and calibrated ranking evidence
 - [x] Wire Qdrant real search in `scripts/ingest/retrieval-pass.mjs` and feed its hits into recommendation scoring ✅
 - [x] Wire Neo4j edge expansion so neighbor `sourceRef`s boost score ✅
 - [x] Wire Redis packet cache with TTL 300s and key `ace:retrieval:packet:{queryHash}` ✅
@@ -522,7 +536,7 @@ dependency graph, sourceRefs, startup context, package scripts.
 **Reference**: `docs/architecture/local-deep-research-boundary.md`, `docs/architecture/scheduler-gpu-bridge-roadmap.md`
 
 **Tasks**:
-- [ ] Inventory the current `local-deep-research` compose and note the current boundary: local SQLite state on the research side, canonical backend stores in the repo.
+- [ ] Inventory the current `local-deep-research` compose and note the current boundary: local postgresql to replace sqlite state on the research side, canonical backend stores in the repo.
 - [ ] Compare the local-deep-research container against the repo's current OpenCode/Gemma4 function-calling path and document the exact role split.
 - [ ] Recreate the `local-deep-research` container for GPU use when needed by bringing it up from the WSL2 GPU override path, then verify the host/container model boundary before promoting it to the checklist.
 - [ ] Align `local-deep-research` to an OpenAI-compatible `llama-server` endpoint when using `llama.cpp`; keep Hermes archived in deeds_labs/test-only unless it proves useful as a separate lane.
@@ -610,14 +624,11 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 - [x] **Phase KG-4**: Ran `npm run graphify:autoencoder:train` to execute the full autoencoder training, backfill Qdrant, encode Redis, and compute centroids.
 - [x] **Phase KG-5**: Verified the end-to-end attention-rank smoke test script (`scripts/smoke-attention-rank.mjs`) and executed Obsidian vault JSONL export (`npm run graph:export:jsonl`). The Karpathy GPU inference loop is now live.
 
-- [x] **Phase KG-6 (Hermes Tool Wiring)**
-  - [x] `attention_rank_files` — embed query → attentionScoreGPU via libtorch → top-N from Karpathy scores
-  - [x] `som_topology_stats` — delegates to `gpu:som_topology` (Redis SOM grid/centroid stats)
-  - [x] `language_distribution` — delegates to `gpu:language_distribution` (Qdrant cluster tags)
-  - [x] `playbook_lookup_by_language` — CouchDB karpathy_wiki + top Karpathy file intersection
-  - [x] Registered all 4 tools into appropriate skill families (gpu-acceleration, vector-cluster, codebase, research)
-  - [x] Updated Hermes planner system prompt with tool signatures
-  - [x] TypeScript type check (task-655 succeeded)
+- [x] **Phase KG-6 (Hermes Tool Wiring → MCP Migration)**
+  - [x] ~~Hermes planner tool wiring~~ (ARCHIVED to deeds_labs, routes deleted)
+  - [x] **MCP Migration (July 26, 2026)**: All 4 tools re-implemented and wired into trace-mcp-server.ts
+  - [x] Status: Contract-only, callable via MCP server only (OpenCode dispatch stubbed)
+  - [x] See: docs/reports/PHASE-3-MCP-TOOL-AUDIT-2026-07-26.md for full audit
 
 - [x] **Verification**
   - [x] TypeScript check passes cleanly (0 errors, 7 pre-existing warnings)
@@ -705,6 +716,205 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [x] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
   - [x] Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
   - [x] Register new scripts in `package.json` and verify pipeline
+  - [x] Confirm existing first-party ML/training assets already exist in-repo before adding new lanes:
+    - `scripts/atlas/train-xgboost-classifier.py`
+    - `scripts/atlas/train-xgboost-reranker.py`
+    - `scripts/atlas/train-ae-pytorch.py`
+    - `scripts/atlas/serve-xgboost-reranker.py`
+    - `sveltekit-frontend/src/native/libtorch_inference.cc`
+    - `models/xgboost-reranker.ubj`
+    - `sveltekit-frontend/classifier-models/xgboost-lane-classifier.json`
+  - [x] Confirm existing parser/indexing assets already exist in-repo before adding new AST lanes:
+    - `scripts/atlas/phase1-ast-grep-extraction.mjs`
+    - `src/lib/server/atlas/indexing/tree-sitter-chunker.ts`
+    - `src/lib/server/classification/document-classifier.ts`
+    - `src/lib/server/schemas/document-classification.ts`
+  - [x] Confirm existing topology/routing assets already exist in-repo before adding new graph-routing lanes:
+    - `scripts/atlas/compute-pagerank-neo4j.mjs`
+    - `scripts/atlas/compute-pagerank-networkx.mjs`
+    - `scripts/atlas/train-som-20x20.mjs`
+    - `scripts/atlas/train-kmeans-384.mts`
+    - `scripts/atlas/sync-community-from-neo4j.mjs`
+    - `sveltekit-frontend/src/lib/server/topology/pagerank-contract.ts`
+  - [x] Confirm existing ontology / packet / HyperRAG seams already exist in-repo before adding new semantic execution layers:
+    - `.okf/manifest.yaml`
+    - `.okf/systems/hyperrag.md`
+    - `docs/deep-research-task-schema.okf.yaml`
+    - `docs/contracts/latent64.okf.json`
+    - `config/vector-lanes.schema.json`
+    - `src/routes/api/export/okf/+server.ts`
+    - `src/lib/server/export/okf-serializer.ts`
+    - `sveltekit-frontend/src/lib/server/okf/mastra-workflows.okf.yaml`
+    - `sveltekit-frontend/src/lib/server/okf/mastra-okf-loader.ts`
+    - `src/lib/server/ingest/ingest-packet-schema.ts`
+    - `src/lib/server/atlas/ace-kag-dag-evidence-schema.ts`
+    - `sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts`
+    - `sveltekit-frontend/src/lib/server/identity/ulid.ts`
+    - `sveltekit-frontend/src/lib/server/hyperrag/hyperrag-projection-contract.ts`
+    - `sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts`
+    - `sveltekit-frontend/src/routes/api/atlas/hyperrag-packet-rpc/+server.ts`
+    - `src/lib/server/topology/feature-tracking-layer.ts`
+  - [ ] Align the feature matrix contract so the system is not framed as only `384` versus `768`
+    - Canonical dense semantic lane: `embeddinggemma` full `768`
+    - Decomposed dense lane(s): bounded projections such as `384` or domain-specific subspaces when explicitly versioned
+    - Latent routing lane: compressed `64` for cuVS / centroid / SOM / prefilter work
+    - Sparse lexical lanes: BM25 baseline and BM42 experimental lane
+    - Structural feature lane: AST, tree-sitter, ast-grep, route/schema/import/call facts
+    - Classifier feature lane: logistic-regression / naive-Bayes / XGBoost input matrix over structural + lexical + topology + routing features
+  - [ ] Define the missing knowledge layer explicitly rather than treating vectors as the knowledge model
+    - `.okf` ontology registry and version source
+    - ontology version
+    - domain registry
+    - feature registry
+    - evidence rules
+    - exclusion rules
+    - authority class per fact (`ast`, `runtime`, `test`, `semantic`, `derived`)
+    - explicit unresolved states: `UNCLASSIFIED`, `AMBIGUOUS`, `ONTOLOGY_GAP`
+  - [ ] Reconcile existing `.okf` sources and loaders into one promoted active ontology contract path
+    - repo root `.okf/`
+    - docs `.okf` contract artifacts
+    - `sveltekit-frontend/src/lib/server/okf/`
+    - export path versus runtime loader path
+  - [ ] Keep the canonical identity spine ahead of all feature matrices and vector mirrors:
+    - `repository_id`
+    - `source_ref`
+    - `title_id`
+    - `content_hash`
+    - `tree_node_id`
+    - `symbol_id`
+    - `chunk_id`
+    - `packet_key`
+    - `packet_version`
+    - `uuid` for durable row identity where appropriate
+    - `ulid` for ordered run, event, trace, and materialization instance IDs
+    - derive `qdrant_point_id` and graph node identities from the canonical packet identity rather than the reverse
+  - [ ] Reconcile existing identity rules so `title_id`, `tree_node_id`, `packet_key`, `uuid`, and `ulid` have one promoted policy across Postgres, Qdrant, Neo4j, TypeScript, and Python
+  - [ ] Split the canonical contract boundary into four promoted contracts instead of one oversized object
+    - `SemanticPacketV1`
+    - `HypergraphFactV1`
+    - `FeatureMatrixRowV1`
+    - `ContractValidationResult`
+  - [ ] Define the typed `SemanticPacketV1` contract for KAG / HyperRAG execution, not just dense retrieval
+    - packet identity
+    - source evidence
+    - ontology entities
+    - representation references
+    - evidence state
+    - knowledge resolution
+    - validation state
+    - transport/storage identities
+  - [ ] Define `HypergraphFactV1` persistence instead of relying only on pairwise graph edges
+    - `semantic_facts`
+    - `semantic_fact_participants`
+    - `semantic_fact_evidence`
+    - hypergraph projection rules into Neo4j
+    - retrieval path must recover whole facts, not reconstruct them lossy from independent edge hits
+  - [ ] Define `FeatureMatrixRowV1` as a derived row contract rather than canonical truth
+    - semantic features
+    - lexical features
+    - structural features
+    - topology features
+    - routing features
+    - ontology features
+    - classifier features
+  - [ ] Define `ContractValidationResult` as the admission envelope for packets and facts
+    - schema version
+    - validator version
+    - identity payload
+    - violation codes
+    - severity
+    - validated timestamp
+  - [ ] Make `.okf` the ontology contract source and compile it into runtime validation artifacts
+    - JSON Schema generation
+    - Zod validators
+    - TypeScript packet/fact types
+    - Python sidecar schema validation
+    - database constraint alignment
+  - [ ] Establish the ownership rule between root and runtime `.okf` paths
+    - repo root `.okf` manifest = canonical declarative source
+    - runtime `.okf` loader = generated or validated projection
+    - export route = serialization boundary
+    - Mastra loader = runtime consumer
+    - HyperRAG routes = consumers of resolved ontology and packet contracts
+  - [ ] Reconcile existing Zod packet and evidence schemas into one promoted semantic-packet contract
+    - `src/lib/server/ingest/ingest-packet-schema.ts`
+    - `src/lib/server/atlas/ace-kag-dag-evidence-schema.ts`
+    - `sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts`
+    - HyperRAG packet route request/response schemas
+  - [ ] Require feature-matrix decomposition and versioning to be explicit in contracts:
+    - `dense_768` = canonical native semantic representation, preserved for lineage, compatibility, and recall benchmarking
+    - `dense_384` = canonical online retrieval representation when projection lineage, normalization, and producer version are contractually defined
+    - `latent_64` = routing / topology / clustering representation only
+    - `topology_4` = reduced-space visualization or storage-order metadata only
+    - token or view multivectors = bounded late-interaction rerank lane only
+    - sparse vectors must remain named separately from dense vectors
+    - topology metrics must never be stored as if they were semantic embeddings
+    - never concatenate `384` and `768` into a synthetic `1152`-dim semantic vector
+    - fuse ranks or calibrated probabilities across lanes rather than raw coordinates across latent spaces
+  - [ ] Define one bounded classifier matrix contract instead of ad hoc feature bags
+    - path tokens
+    - AST kind / symbol kind
+    - imports / called APIs
+    - lexical BM25/BM42 signals
+    - dense similarity features
+    - topology features (`pagerank`, `community_id`, fanout, path proximity)
+    - routing features (`kmeans_cluster_id`, `som_cell_id`, centroid distance, latent neighborhood)
+    - ontology match features
+    - runtime or test evidence features
+  - [ ] Keep vector-lane status explicit in payloads and registries
+    - `ACTIVE`
+    - `REFERENCE_ONLY`
+    - `MIGRATION_SOURCE`
+    - `SUPERSEDED`
+  - [ ] Add canonical validation gates before tool execution or recommendation writes
+    - packet JSON Schema pass
+    - Zod runtime pass
+    - ontology constraint pass
+    - unresolved-state handling (`UNCLASSIFIED`, `AMBIGUOUS`, `ONTOLOGY_GAP`)
+    - state-machine or authorization pass before MCP / Mastra execution
+  - [ ] Keep runtime validity and semantic resolution as separate axes
+    - `EvidenceState`: `ACTIVE_VERIFIED`, `ACTIVE_DEGRADED`, `GATED`, `REFERENCE_ONLY`, `SUPERSEDED`, `FAILED`
+    - `KnowledgeResolution`: `RESOLVED`, `UNCLASSIFIED`, `AMBIGUOUS`, `ONTOLOGY_GAP`, `CONFLICTING_EVIDENCE`
+  - [ ] Keep the five evidence lanes explicitly separate in schema, payloads, and scoring:
+    - Structural identity: `source_ref`, `tree_node_id`, symbol/AST facts, parser-backed `CALLS` / `IMPORTS` / `DEFINES`
+    - Lexical/semantic meaning: summaries, dense vectors, sparse/BM25/BM42, extracted concepts
+    - Graph topology: `pagerank`, `community_id`, path/authority metrics
+    - Geometric routing: `kmeans_cluster`, SOM coordinates / cell IDs, centroid distance
+    - Derived classification: `domain_class`, `feature_label`, workflow labels, confidence, evidence refs
+  - [ ] Update the knowledge-layer and feature-matrix schemas so one source can legitimately produce one-to-many packets, symbols, chunks, summaries, graph facts, and vector representations without overloading `source_ref` as immutable identity
+  - [ ] Treat Neo4j GDS PageRank as a current topology/authority signal, not as deprecated functionality and not as a domain/feature authority source
+  - [ ] Ensure final retrieval and classification contracts use PageRank only as a bounded prior or rerank feature, never as the sole assignment authority for `domain_class`, `feature_id`, or `feature_label`
+  - [ ] Audit existing contracts so `feature_label`, `domain_class`, `tree_node_id`, `community_id`, `kmeans_cluster`, and SOM fields are not collapsed into a single generic cluster/class field
+  - [ ] Add or update proof gates for the existing lanes instead of reimplementing them:
+    - focused tests for XGBoost lane classifier/reranker inputs and outputs
+    - focused tests for tree-sitter/ast-grep chunking and structural fact extraction
+    - focused tests for SOM/KMeans/PageRank payload writeback and schema validation
+    - runtime proof that topology/routing/classification signals remain distinct in ACE packets and retrieval payloads
+    - runtime proof that `dense_768`, any derived `dense_384`, `latent_64`, and sparse lanes are named, versioned, and consumed as separate representations rather than one ambiguous "AI index"
+    - runtime proof that late-interaction multivectors remain bounded to reranking rather than replacing packet-level ANN
+    - runtime proof that `.okf`, JSON Schema, and Zod validators agree on packet and fact admission rules
+    - runtime proof that `title_id`, `tree_node_id`, `packet_key`, `uuid`, and `ulid` are generated and consumed consistently across TypeScript, Python, Postgres, Qdrant, and Neo4j
+    - runtime proof that HyperRAG fact retrieval returns whole fact contexts, not only pairwise edge fragments
+  - [ ] Add the `384` versus `768` parity benchmark gate before adding another ANN index
+    - exact GPU brute-force top-k ground truth
+    - Qdrant HNSW baseline
+    - optional cuVS CAGRA benchmark
+    - optional cuVS IVF Flat / IVF PQ benchmark
+    - optional cuVS Vamana build benchmark for DiskANN-compatible artifacts
+    - RRF versus calibrated score-fusion comparison
+    - explicit decision whether `dense_768` materially improves recall over `dense_384`
+  - [ ] Keep future acceleration lanes behind the same retrieval and identity contract
+    - cuVS Vamana = build-time or benchmark lane
+    - DiskANN = future SSD-scale artifact lane
+    - Redis SVS VAMANA = separate infrastructure experiment only
+    - Hilbert ordering = reduced-space storage locality only
+    - rotation before quantization = compression artifact, not semantic identity transform
+  - [ ] Add a read-only semantic-contract reconciliation artifact pass before more lane expansion
+    - `scripts/atlas/reconcile-semantic-contracts.mjs`
+    - `artifacts/semantic-contract-reconciliation.json`
+    - `artifacts/semantic-contract-conflicts.ndjson`
+    - `artifacts/semantic-contract-identity-map.parquet`
+    - fail the gate on root-vs-runtime `.okf` drift, schema drift, identity drift, or cross-store packet mismatch
 
 - [ ] **Phase 20 — Colab/A6000 training lane**
   - [ ] Support high-RAM LLM tagging

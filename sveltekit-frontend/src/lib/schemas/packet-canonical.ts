@@ -137,6 +137,12 @@ export const SummarySchema = z.object({
   summary_generated_at: z.string().datetime().optional(),
 }).strict();
 
+export const TimestampSchema = z.object({
+  created_at: z.string().datetime().describe('Packet creation timestamp'),
+  updated_at: z.string().datetime().describe('Last update timestamp'),
+  indexed_at: z.string().datetime().optional().describe('Qdrant indexing timestamp'),
+});
+
 // ── CANONICAL PACKET (full schema) ───────────────────────────────────────
 
 export const CanonicalPacketSchema = z.object({
@@ -166,9 +172,7 @@ export const CanonicalPacketSchema = z.object({
   ...SummarySchema.shape,
 
   // Timestamps
-  created_at: z.string().datetime().describe('Packet creation timestamp'),
-  updated_at: z.string().datetime().describe('Last update timestamp'),
-  indexed_at: z.string().datetime().optional().describe('Qdrant indexing timestamp'),
+  ...TimestampSchema.shape,
 });
 
 // ── Type Exports ─────────────────────────────────────────────────────────
@@ -184,8 +188,15 @@ export type CanonicalPacket = z.infer<typeof CanonicalPacketSchema>;
 
 // ── Partial Schemas (for intermediate stages) ────────────────────────────
 
-export const PacketAfterLayer1Schema = PacketIdentitySchema.merge(SourceLocationSchema).merge(ExtractionPayloadSchema).merge(ValidationSchema);
-export const PacketAfterLayer2Schema = PacketAfterLayer1Schema.merge(EmbeddingSchema).merge(TopologySchema);
+export const PacketAfterLayer1Schema = PacketIdentitySchema
+  .merge(SourceLocationSchema)
+  .merge(ExtractionPayloadSchema)
+  .merge(ValidationSchema)
+  .merge(TimestampSchema.pick({ created_at: true, updated_at: true }));
+export const PacketAfterLayer2Schema = PacketAfterLayer1Schema
+  .merge(EmbeddingSchema)
+  .merge(TopologySchema)
+  .merge(TimestampSchema.pick({ indexed_at: true }));
 export const PacketAfterLayer3Schema = PacketAfterLayer2Schema
   .merge(SummarySchema)
   .merge(SemanticLabelSchema)
@@ -217,7 +228,7 @@ export function validatePacketAfterLayer1(data: unknown): { ok: boolean; packet?
 
 // ── Examples ─────────────────────────────────────────────────────────────
 
-export const PACKET_EXAMPLE_LAYER_1: CanonicalPacket = {
+export const PACKET_EXAMPLE_LAYER_1: PacketAfterLayer1 = {
   packet_key: 'ace:chunk:auth:001',
   source_ref: 'src/lib/server/auth.ts',
   source_id: '550e8400-e29b-41d4-a716-446655440000',
@@ -246,7 +257,7 @@ export const PACKET_EXAMPLE_LAYER_1: CanonicalPacket = {
   updated_at: new Date().toISOString(),
 };
 
-export const PACKET_EXAMPLE_LAYER_2: CanonicalPacket = {
+export const PACKET_EXAMPLE_LAYER_2: PacketAfterLayer2 = {
   ...PACKET_EXAMPLE_LAYER_1,
   dimension: 384,
   model: 'embeddinggemma:latest',

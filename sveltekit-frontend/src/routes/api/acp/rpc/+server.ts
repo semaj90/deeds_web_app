@@ -32,7 +32,7 @@ export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
 
   // Phase 3: Establish permission grant for tool authorization
-  const permissionGrant = toolAuthorizationGuard(event);
+  const permissionGrant = await toolAuthorizationGuard(event);
 
   try {
     const body = await event.request.json();

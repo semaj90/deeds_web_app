@@ -56,7 +56,7 @@ export async function executeMcpTool(
   // Check authorization if grant provided
   if (permissionGrant) {
     try {
-      checkToolAccess(validatedToolName, permissionGrant);
+      await checkToolAccess(validatedToolName, permissionGrant);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Permission denied';
       console.error(`[ACP RPC] Tool authorization failed: ${toolName}`, message);

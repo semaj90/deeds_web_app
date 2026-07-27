@@ -17,7 +17,10 @@ import { z } from 'zod';
 export const RetrievalStageResultSchema = z.object({
 	score: z.number().min(0).max(1).describe('Score for this result (0.0 to 1.0)'),
 	packet_key: z.string().describe('Unique packet identifier'),
-	rank: z.number().int().positive().describe('Rank in this stage (1-based)')
+	rank: z.number().int().positive().describe('Rank in this stage (1-based)'),
+	embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42_sparse']).optional().describe('Named representation lane for this result when applicable'),
+	embedding_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).optional().describe('Lifecycle status of the representation lane when applicable'),
+	projection_version: z.string().optional().describe('Projection or lane contract version when applicable')
 });
 
 export type RetrievalStageResult = z.infer<typeof RetrievalStageResultSchema>;
@@ -29,7 +32,7 @@ export type RetrievalStageResult = z.infer<typeof RetrievalStageResultSchema>;
 export const RRFFusionResultSchema = z.object({
 	score: z.number().min(0).max(1),
 	packet_key: z.string(),
-	sources: z.array(z.enum(['vector', 'bm25', 'ast'])).min(1).describe('Which lanes produced this result')
+	sources: z.array(z.enum(['vector', 'qdrant_384', 'qdrant_768', 'bm25', 'ast'])).min(1).describe('Which lanes produced this result')
 });
 
 export type RRFFusionResult = z.infer<typeof RRFFusionResultSchema>;
@@ -61,7 +64,7 @@ export const RecommendationSchema = z.object({
 		'suggested_agent'
 	]),
 	score: z.number().min(0).max(1).describe('Recommendation confidence (0.0 to 1.0)'),
-	payload: z.record(z.unknown()).describe('Type-specific recommendation details')
+	payload: z.record(z.string(), z.unknown()).describe('Type-specific recommendation details')
 });
 
 export type Recommendation = z.infer<typeof RecommendationSchema>;
@@ -79,7 +82,10 @@ export const RetrievalEventSchema = z.object({
 	// ========== QUERY INPUT ==========
 	query_text: z.string().min(1).describe('The query text'),
 	embedding_model: z.string().default('embeddinggemma:latest').describe('Model used for query embedding'),
-	query_embedding_dim: z.number().int().positive().default(384).describe('Embedding dimensionality'),
+	query_embedding_dim: z.number().int().positive().default(384).describe('Default online query embedding dimensionality. Canonical search lane is 384; native or legacy 768 queries must be recorded explicitly.'),
+	query_embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42_sparse']).default('dense_384').describe('Named query lane used for the primary semantic retrieval path'),
+	query_embedding_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).default('ACTIVE').describe('Lifecycle status of the primary query lane'),
+	query_projection_version: z.string().default('atlas-embeddinggemma-direct-slice384-v1').describe('Projection contract for the primary query lane'),
 
 	// ========== VECTOR LANE ==========
 	vector_lane_latency_ms: z.number().nonnegative().describe('Time to embed query + search Qdrant'),
@@ -139,6 +145,9 @@ export function createRetrievalEvent(overrides: Partial<RetrievalEvent>): Retrie
 		query_text: '',
 		embedding_model: 'embeddinggemma:latest',
 		query_embedding_dim: 384,
+		query_embedding_lane: 'dense_384',
+		query_embedding_status: 'ACTIVE',
+		query_projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
 		vector_lane_latency_ms: 0,
 		vector_lane_top_k: 10,
 		vector_lane_results: [],
@@ -167,7 +176,7 @@ export function validateRetrievalEvent(event: unknown): [boolean, string[]] {
 	const result = RetrievalEventSchema.safeParse(event);
 
 	if (!result.success) {
-		const errors = result.error.errors.map(err => {
+		const errors = result.error.issues.map(err => {
 			const path = err.path.join('.');
 			return `${path || 'root'}: ${err.message}`;
 		});

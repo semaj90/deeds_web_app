@@ -5430,3 +5430,101 @@ export const tokenArtifacts = pgTable('token_artifacts', {
     sourceIdx:            index('idx_token_artifacts_source').on(t.sourceRef),
 }));
 
+export type TokenArtifact    = typeof tokenArtifacts.$inferSelect;
+export type NewTokenArtifact = typeof tokenArtifacts.$inferInsert;
+
+// Phase 109: Unknown Packet Resolution Tables
+// Tracks unknown packet progression through 4-stage resolution pipeline
+export const unknownPackets = pgTable('unknown_packets', {
+    // Identity
+    unknownId:          text('unknown_id').primaryKey(),
+    observationId:      text('observation_id').notNull().unique(),
+
+    // Proposed identity
+    workspaceId:        varchar('workspace_id', { length: 256 }).notNull(),
+    potentialSourceRef: text('potential_source_ref').notNull(),
+    potentialFeatureId: varchar('potential_feature_id', { length: 256 }),
+    potentialFeatureLabel: varchar('potential_feature_label', { length: 512 }),
+    potentialPacketKey: text('potential_packet_key'),
+
+    // Stage tracking (OBSERVATION → CANDIDATE → VALIDATED → PROMOTED / REJECTED)
+    status:             varchar('status', { length: 32 }).notNull().default('OBSERVATION'),
+
+    // Scoring (Stage 2 - Candidate Scorer)
+    identityScore:      real('identity_score'),
+    semanticScore:      real('semantic_score'),
+    sourceScore:        real('source_score'),
+    topologyScore:      real('topology_score'),
+    freshnessScore:     real('freshness_score'),
+    combinedScore:      real('combined_score'),
+
+    // Evidence proofs (Stage 3 - Evidence Validator)
+    identityProof:      varchar('identity_proof', { length: 16 }),    // PASS/FAIL
+    semanticProof:      varchar('semantic_proof', { length: 16 }),    // PASS/WARN/FAIL
+    topologyProof:      varchar('topology_proof', { length: 16 }),    // PASS/WARN/FAIL
+    lineageProof:       varchar('lineage_proof', { length: 16 }),     // PASS/WARN/FAIL
+    contentProof:       varchar('content_proof', { length: 16 }),     // PASS/WARN/FAIL
+
+    // Promotion outcome (Stage 4 - Promotion Executor)
+    promotedPacketKey:  text('promoted_packet_key'),
+    promotionTimestamp: timestamp('promotion_timestamp', { withTimezone: true }),
+    rejectionReason:    text('rejection_reason'),
+    analystNotes:       text('analyst_notes'),
+
+    // Metadata
+    sourceKind:         varchar('source_kind', { length: 32 }).notNull(),  // scanner|ldr|user_submission|edge_case
+    evidencePayload:    jsonb('evidence_payload'),
+    ledgerHash:         text('ledger_hash'),
+
+    // Timestamps
+    ingestedAt:         timestamp('ingested_at', { withTimezone: true }).notNull().defaultNow(),
+    scoredAt:           timestamp('scored_at', { withTimezone: true }),
+    validatedAt:        timestamp('validated_at', { withTimezone: true }),
+    resolvedAt:         timestamp('resolved_at', { withTimezone: true }),
+    updatedAt:          timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+    statusIdx:          index('idx_unknown_status').on(t.status),
+    workspaceIdx:       index('idx_unknown_workspace').on(t.workspaceId),
+    sourceRefIdx:       index('idx_unknown_source_ref').on(t.potentialSourceRef),
+    combinedScoreIdx:   index('idx_unknown_combined_score').on(t.combinedScore),
+    ingestedAtIdx:      index('idx_unknown_ingested_at').on(t.ingestedAt),
+    identityUniq:       uniqueIndex('idx_unknown_identity_unique').on(t.workspaceId, t.potentialSourceRef),
+}));
+
+export type UnknownPacket    = typeof unknownPackets.$inferSelect;
+export type NewUnknownPacket = typeof unknownPackets.$inferInsert;
+
+// Phase 109: Unknown Resolution Ledger
+// Audit trail for every gate and stage transition
+export const unknownResolutionLedger = pgTable('unknown_resolution_ledger', {
+    // Identity
+    ledgerId:           text('ledger_id').primaryKey(),
+    unknownId:          text('unknown_id').notNull(),
+
+    // Stage progression
+    stage:              varchar('stage', { length: 32 }).notNull(),    // OBSERVATION|CANDIDATE|VALIDATED|PROMOTED|REJECTED
+    gateName:           varchar('gate_name', { length: 256 }).notNull(),
+    gateResult:         varchar('gate_result', { length: 16 }),       // PASS|FAIL|WARN
+
+    // Evidence
+    checkDescription:   text('check_description'),
+    checkTimestamp:     timestamp('check_timestamp', { withTimezone: true }).notNull().defaultNow(),
+    evidenceSummary:    jsonb('evidence_summary'),
+
+    // Action taken
+    actionTaken:        varchar('action_taken', { length: 256 }),
+    actionTimestamp:    timestamp('action_timestamp', { withTimezone: true }),
+}, (t) => ({
+    unknownIdx:         index('idx_ledger_unknown').on(t.unknownId),
+    stageIdx:           index('idx_ledger_stage').on(t.stage),
+    timestampIdx:       index('idx_ledger_timestamp').on(t.checkTimestamp),
+    fkUnknown:          foreignKey({
+        columns: [t.unknownId],
+        foreignColumns: [unknownPackets.unknownId],
+        name: 'fk_ledger_unknown_id',
+    }).onDelete('cascade'),
+}));
+
+export type UnknownResolutionLedger    = typeof unknownResolutionLedger.$inferSelect;
+export type NewUnknownResolutionLedger = typeof unknownResolutionLedger.$inferInsert;
+

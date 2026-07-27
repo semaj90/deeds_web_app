@@ -15,6 +15,26 @@ import { FeatureEnvelopeSchema, type FeatureEnvelope } from './feature-envelope.
 import type { FusedCandidate } from './fuse-candidates.js';
 import { generateTitleIdentity } from '../ace/title-id-generator.js';
 
+function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | null) {
+  if (candidate.embeddingLane !== 'dense_384' && candidate.embeddingLane !== 'dense_768') {
+    return undefined;
+  }
+
+  return {
+    name: 'dense' as const,
+    score: candidate.score,
+    qdrant_point_id: qdrantPointId ?? candidate.packetKey,
+    embedding_lane: candidate.embeddingLane,
+    embedding_status: candidate.embeddingLane === 'dense_384' ? 'ACTIVE' as const : 'REFERENCE_ONLY' as const,
+    embedding_native_dimension: 768,
+    projection_source_dimension: candidate.embeddingLane === 'dense_384' ? 768 : undefined,
+    projection_method: candidate.embeddingLane === 'dense_384' ? 'direct_slice' as const : 'none' as const,
+    projection_version: candidate.embeddingLane === 'dense_384' ? 'embeddinggemma-768-to-384-direct-slice-v1' : 'embeddinggemma-768-native-v1',
+    metric: 'cosine' as const,
+    confidence: candidate.score,
+  };
+}
+
 /**
  * Hydrate fused candidates into complete feature envelopes
  * Fetches all required fields from Postgres in bulk
@@ -161,6 +181,8 @@ function buildFeatureEnvelope(input: {
   };
 }): FeatureEnvelope {
   const { candidate, row } = input;
+  const dense = buildDenseSignal(candidate, row.qdrant_id);
+  const normalizedDomainClass = normalizeDomainClass(row.domain);
 
   return {
     // Canonical identity (source_ref is the primary key from retrieval)
@@ -169,7 +191,7 @@ function buildFeatureEnvelope(input: {
     source_ref: row.source_ref || row.relative_path,
     content_hash: row.content_hash || '',
     title_id: generateTitleIdentity((row.metadata?.packet_key as string) || candidate.packetKey || row.id, {
-      featureLabel: String((row.metadata?.feature_label ?? row.metadata?.feature_id ?? candidate.featureId ?? row.symbol ?? row.kind ?? 'packet')),
+      featureLabel: String((row.metadata?.feature_label ?? row.metadata?.feature_id ?? row.symbol ?? row.kind ?? 'packet')),
       symbolName: row.symbol || undefined,
       symbolKind: row.kind || undefined,
       domain: row.domain || undefined,
@@ -186,10 +208,10 @@ function buildFeatureEnvelope(input: {
 
     // Vector identity (qdrant_id is the embedding reference)
     qdrant_point_id: row.qdrant_id || null,
+    dense,
 
     // Domain classification
     domain: row.domain || null,
-    domain_class: normalizeDomainClass(row.domain),
 
     // Topology
     som_cluster: row.som_cluster || null,
@@ -206,6 +228,7 @@ function buildFeatureEnvelope(input: {
     gan_validated: false,
 
     // Timing
+    created_at: new Date(row.updated_at as unknown as string | number | Date),
     updated_at: new Date(row.updated_at as unknown as string | number | Date).toISOString(),
 
     // Code structure
@@ -217,7 +240,7 @@ function buildFeatureEnvelope(input: {
     ...(row.metadata || {}),
 
     // Re-assert canonical normalized domain after metadata spread
-    domain_class: normalizeDomainClass(row.domain),
+    domain_class: normalizedDomainClass,
   };
 }
 

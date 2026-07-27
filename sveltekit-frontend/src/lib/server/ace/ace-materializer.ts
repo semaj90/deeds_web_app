@@ -12,13 +12,14 @@
  *   5. Optional: Sync to TurboVec prefilter (SOM grid)
  */
 
-import { getQdrantClient } from '$lib/server/vector/qdrant-manager.js';
+import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { getRedis } from '$lib/server/redis.js';
-import { db } from '$lib/server/db/client.js';
+import { db, pgRows } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { bifrostKey } from '$lib/server/cache-keys.js';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import { toRedisValue, type SemanticPacketDomainObject as RedisPacketProjection } from '$lib/server/atlas/projections/redis-packet-projection.js';
 import { buildCanonicalAcePacketEnvelope } from './canonical-packet-envelope.js';
 
 export interface MaterializeOptions {
@@ -42,6 +43,87 @@ export interface MaterializeResult {
 const DEFAULT_COLLECTION = 'codebase_chunks_768';
 const DEFAULT_REDIS_TTL = 86400; // 24 hours
 const VECTOR_DIM = 768;
+
+type MaterializerProofFields = {
+  workspace_id: string | null;
+  ontology_version: string | null;
+  content_hash: string | null;
+};
+
+function readText(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function readNestedText(parent: unknown, ...keys: string[]): string | null {
+  if (!parent || typeof parent !== 'object') return null;
+  const record = parent as Record<string, unknown>;
+  for (const key of keys) {
+    const value = readText(record[key]);
+    if (value) return value;
+  }
+  return null;
+}
+
+function deriveWorkspaceIdFromPath(...paths: Array<string | null | undefined>): string | null {
+  for (const candidate of paths) {
+    const value = readText(candidate);
+    if (!value) continue;
+    const firstSegment = value.split(/[\\/]/).find((segment) => segment.trim().length > 0)?.trim() ?? null;
+    if (firstSegment) return firstSegment;
+  }
+  return null;
+}
+
+export function buildBifrostRedisPacketValue(
+  pkt: {
+    packetKey: string;
+    sourceRef: string;
+    featureId: string;
+    featureLabel: string | null;
+    canonicalSourceRef?: string | null;
+    filePath?: string | null;
+    directoryPath?: string | null;
+    metadata?: unknown;
+    payload?: unknown;
+  },
+  proofFields: MaterializerProofFields,
+  ttlSeconds: number,
+  cachedAt: string
+): string {
+  const workspaceId =
+    readText(proofFields.workspace_id)
+    ?? readNestedText(pkt.metadata, 'workspace_id', 'workspaceId')
+    ?? readNestedText(pkt.payload, 'workspace_id', 'workspaceId')
+    ?? readNestedText(pkt.metadata, 'workspace')
+    ?? deriveWorkspaceIdFromPath(pkt.canonicalSourceRef, pkt.sourceRef, pkt.filePath, pkt.directoryPath);
+
+  const ontologyVersion =
+    readText(proofFields.ontology_version)
+    ?? readNestedText(pkt.metadata, 'ontology_version', 'ontologyVersion')
+    ?? readNestedText(pkt.payload, 'ontology_version', 'ontologyVersion');
+
+  const contentHash =
+    readText(proofFields.content_hash)
+    ?? readNestedText(pkt.metadata, 'content_hash', 'contentHash');
+
+  const projection: RedisPacketProjection = {
+    packetKey: pkt.packetKey,
+    sourceRef: pkt.sourceRef,
+    featureId: pkt.featureId,
+    featureLabel: pkt.featureLabel ?? pkt.featureId,
+    workspaceId,
+    workspaceRevision: null,
+    ontologyVersion,
+    contentHash,
+    treeNodeId: null,
+    cachedAt,
+    ttlSeconds,
+  };
+
+  return toRedisValue(projection);
+}
 
 /**
  * Materialize a single ACE packet to distributed mirrors
@@ -69,6 +151,17 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
     }
 
     const pkt = packet[0];
+    const proofRows = pgRows<MaterializerProofFields>(await db.execute(sql`
+      SELECT workspace_id, ontology_version, content_hash
+      FROM atlas_packets
+      WHERE packet_key = ${options.packetKey}
+      LIMIT 1
+    `));
+    const proofFields: MaterializerProofFields = proofRows[0] ?? {
+      workspace_id: null,
+      ontology_version: null,
+      content_hash: null,
+    };
 
     // 2. Validate required fields
     if (!pkt.packetKey || !pkt.featureId || !pkt.summary) {
@@ -158,7 +251,7 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
         const redis = getRedis();
         const ttl = options.redisTtl || DEFAULT_REDIS_TTL;
         const cacheKey = bifrostKey.packet(options.packetKey);
-        const cacheValue = JSON.stringify(payload);
+        const cacheValue = buildBifrostRedisPacketValue(pkt, proofFields, ttl, new Date().toISOString());
 
         await redis.setex(cacheKey, ttl, cacheValue);
         result.redisSuccess = true;

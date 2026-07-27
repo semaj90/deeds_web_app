@@ -176,7 +176,8 @@ export class CuVSClient {
  * Factory function for cuVS client with environment-based defaults
  */
 export function createCuVSClient(overrides?: Partial<CuVSConfig>): CuVSClient {
-  const url = overrides?.url ?? process.env.CUVS_URL ?? 'http://127.0.0.1:8791';
+    const envUrl = process.env.CUVS_URL;
+    const url = (envUrl && envUrl.length > 0) ? envUrl : 'http://127.0.0.1:8791';
   const k = overrides?.k ?? parseInt(process.env.CUVS_K ?? '100', 10);
   const timeout = overrides?.timeout ?? parseInt(process.env.CUVS_TIMEOUT ?? '30000', 10);
   const verbose = overrides?.verbose ?? process.env.CUVS_VERBOSE === 'true';

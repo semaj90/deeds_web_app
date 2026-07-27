@@ -5,15 +5,23 @@
  */
 export async function GET({ locals }: { locals: { user: UserSession } }) {
     // VULNERABILITY: The logic assumes that if the user is an admin, they can list everything.
-    if (!locals.user || !locals.user.roles.includes('ADMIN')) {
-        return json({ error: "Forbidden", message: "Requires ADMIN role." }, { status: 403 });
-    }
-    
-    // Direct call to the retrieval core
-    const list = await retrieveDemoList(locals.user.id); 
-    
-    // Potential data leakage here: returning un-sanitized list details.
-    return json({ success: true, list: list });
+        const isAuthorized = await runGuardedAction(
+            { user: locals.user! },
+            "retrieveDemoList",
+            Role.ADMIN,
+            "Retrieving the list of active demonstration resources for an administrator."
+        );
+
+        if (!isAuthorized) {
+            if (typeof isAuthorized.status === 'number' && isAuthorized.status === 403) {
+                 return json({ error: isAuthorized.message || "Forbidden" }, { status: 403 });
+            }
+            return json({ error: isAuthorized.message || "Forbidden" }, { status: 403 });
+        }
+        
+        // If authorized, the result is available in isAuthorized.data
+        const list = await (isAuthorized as any).data.retrieveDemoList(locals.user!.id);
+        return json({ success: true, list: list });
 }
 
 // Simulated external dependency

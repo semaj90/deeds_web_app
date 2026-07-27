@@ -18,7 +18,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import type { FeatureEnvelope } from './feature-envelope.js';
+import type { FeatureEnvelope } from '../retrieval/feature-envelope.js';
 
 // Canonical version for the title identity algorithm.
 // Keep this as the single source of truth in the runtime until a shared package is genuinely needed.

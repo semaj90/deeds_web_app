@@ -116,9 +116,28 @@ export interface OutboxEvent {
   recordedAt: number; // Event timestamp
 }
 
-// =============================================================================
-// 6. CANONICAL RECORD (Full Record, Lazy-Loaded Metadata)
-// =============================================================================
+/**
+ * Defines the canonical, versioned schema for storing derived vector projections.
+ * This table is the source of truth for mapping a (sourceRef, contentHash) pair
+ * to specific dimensional vectors used for downstream querying.
+ * It must be written *after* the main record is persisted, and updated
+ * *before* cache invalidation to ensure consistency.
+ *
+ * @property {string} sourceRef - The canonical path/URI of the originating artifact.
+ * @property {string} contentHash - SHA256 hash of the chunk content.
+ * @property {number} version - Schema version of the projection (e.g., 1, 2, 3).
+ * @property {string} projectionVector - The raw, dense vector representation (e.g., "768-dim vector").
+ * @property {object} projectionMetadata - JSONB store for dimensional metadata (e.g., dimension, model used).
+ * @property {number} writtenAt - Unix timestamp of the write.
+ */
+export interface AtlasVectorProjection {
+    sourceRef: string;
+    contentHash: string;
+    version: number;
+    projectionVector: string;
+    projectionMetadata: Record<string, any>;
+    writtenAt: number;
+}
 
 /**
  * Complete record with optional metadata layers.

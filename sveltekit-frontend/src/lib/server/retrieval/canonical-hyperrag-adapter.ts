@@ -43,6 +43,12 @@ export function searchResultToHyperRagResult(
     synthesis?: string | null;
   } = {}
 ): HyperRagResult {
+  const retrievalSources = result.provenance.retrievalSources;
+  const hasQdrant =
+    retrievalSources.includes('qdrant') ||
+    retrievalSources.includes('qdrant_384') ||
+    retrievalSources.includes('qdrant_768');
+
   return {
     query: options.query ?? result.metadata.query,
     variants: options.query ? [options.query] : [result.metadata.query],
@@ -53,10 +59,10 @@ export function searchResultToHyperRagResult(
     taskDistillate: null,
     synthesis: options.synthesis ?? null,
     provenance: {
-      qdrant: result.provenance.retrievalSources.includes('qdrant'),
+      qdrant: hasQdrant,
       turbovec: false,
-      redis: result.provenance.retrievalSources.includes('postgres_trigram'),
-      neo4j: result.provenance.retrievalSources.includes('ast_tree'),
+      redis: retrievalSources.includes('postgres_trigram'),
+      neo4j: retrievalSources.includes('ast_tree'),
       ace: false,
       taskDistillates: false,
     },

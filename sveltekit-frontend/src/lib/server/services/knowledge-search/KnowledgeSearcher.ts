@@ -20,6 +20,7 @@ import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getSeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
 import { getRedisCacheService } from './RedisCacheService.js';
+import { buildObjectStorageCompatibilityFields, resolveObjectStorageKey } from '$lib/server/storage/object-storage-compat.js';
 
 export class KnowledgeSearcher {
   private qdrant = getQdrantKnowledgeStore();
@@ -167,13 +168,18 @@ export class KnowledgeSearcher {
         return null;
       }
 
-      const minioKey = point.payload?.minioKey as string;
-      if (!minioKey) {
-        console.warn(`No MinIO key for document ${id}`);
+      const storageKey = resolveObjectStorageKey({
+        objectStorageKey: point.payload?.objectStorageKey as string | undefined,
+        minioKey: point.payload?.minioKey as string | undefined,
+      });
+      if (!storageKey) {
+        console.warn(`No object storage key for document ${id}`);
         return null;
       }
 
-      const content = await this.seaweed.getDocument(minioKey);
+      const content = await this.seaweed.getDocument(storageKey);
+
+      const compatibilityFields = buildObjectStorageCompatibilityFields(storageKey);
 
       return {
         id: point.id.toString(),
@@ -184,7 +190,8 @@ export class KnowledgeSearcher {
         entities: (point.payload?.entities as string[]) ?? [],
         tags: (point.payload?.tags as string[]) ?? [],
         scrapedAt: new Date(point.payload?.scrapedAt as string),
-        minioKey,
+        objectStorageKey: compatibilityFields.objectStorageKey ?? '',
+        minioKey: compatibilityFields.minioKey ?? '',
       };
     } catch (error) {
       console.error(`Error fetching document ${id}:`, error);

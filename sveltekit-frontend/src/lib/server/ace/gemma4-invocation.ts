@@ -8,7 +8,7 @@
  * - Temperature: 0.3 (factual, legal domain)
  */
 
-import fetch from 'node-fetch';
+import fetch, { type Response as FetchResponse } from 'node-fetch';
 
 export interface GemmaRequest {
   model: string;
@@ -62,20 +62,20 @@ export class Gemma4Invoker {
     };
 
     try {
-      const response = await Promise.race([
+      const response = (await Promise.race([
         fetch(`${this.gemmaUrl}/v1/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(request),
         }),
         this.timeoutPromise(this.timeoutMs),
-      ]);
+      ])) as FetchResponse;
 
-      if (!response || !(response as Response).ok) {
-        throw new Error(`Gemma4 returned ${(response as Response)?.status || 'timeout'}`);
+      if (!response.ok) {
+        throw new Error(`Gemma4 returned ${response.status || 'timeout'}`);
       }
 
-      const data = (await (response as Response).json()) as any;
+      const data = (await response.json()) as any;
 
       return {
         model: this.model,

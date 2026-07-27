@@ -33,6 +33,7 @@ export interface PostgresDocument {
   source: string;
   scraped_at: Date;
   content_length: number;
+  object_storage_key?: string | null;
   minio_key: string | null;
   embedding: number[] | null;
   tfidf_vector: Record<string, number>;
@@ -89,6 +90,7 @@ export class PostgresKnowledgeStore {
     source: string;
     scrapedAt: Date;
     contentLength: number;
+    objectStorageKey: string;
     minioKey: string;
     embedding: number[];
     tfIdfVector: Map<string, number>;

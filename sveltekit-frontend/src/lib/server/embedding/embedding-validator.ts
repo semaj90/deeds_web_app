@@ -4,7 +4,7 @@
  * Gate 1 validation:
  * - All 5K vectors are exactly L2-normalized (norm² = 1.0 ±0.01)
  * - No NULL embeddings
- * - Dimension matches contract (384)
+ * - Dimension matches an accepted lane contract (384 retrieval or 768 native)
  * - Packet identity is stable (packet_key, source_ref, feature_id)
  */
 
@@ -89,10 +89,13 @@ export class EmbeddingValidator {
         const norm = row.norm as number;
 
         // Check dimension
-        if (dim !== EMBEDDING_CONTRACT.embedding_dimension) {
+        if (
+          dim !== EMBEDDING_CONTRACT.retrieval_embedding_dimension &&
+          dim !== EMBEDDING_CONTRACT.native_dimension
+        ) {
           result.dimension_mismatches++;
           result.issues.push(
-            `Dimension mismatch for ${row.packet_key}: ${dim} (expected ${EMBEDDING_CONTRACT.embedding_dimension})`
+            `Dimension mismatch for ${row.packet_key}: ${dim} (expected ${EMBEDDING_CONTRACT.retrieval_embedding_dimension} or ${EMBEDDING_CONTRACT.native_dimension})`
           );
           continue;
         }

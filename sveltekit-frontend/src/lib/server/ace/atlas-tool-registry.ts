@@ -100,6 +100,32 @@ export type PatchApplyOutput = z.infer<typeof PatchApplyOutputSchema>;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const PageRankInputSchema = z.object({
+  limit: z.number().int().min(1).max(1000).default(100),
+  offset: z.number().int().min(0).default(0),
+});
+export type PageRankInput = z.infer<typeof PageRankInputSchema>;
+
+const PageRankOutputSchema = z.object({
+  results: z.array(z.object({
+    packetKey: z.string(),
+    sourceRef: z.string().nullable(),
+    pageRankScore: z.number(),
+    rank: z.number().int(),
+  })),
+  total: z.number().int(),
+  offset: z.number().int(),
+  limit: z.number().int(),
+  metadata: z.object({
+    source: z.string(),
+    snapshotVersion: z.string(),
+    handler: z.string(),
+  }),
+});
+export type PageRankOutput = z.infer<typeof PageRankOutputSchema>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export type AtlasToolPermission =
   | 'search:read'
   | 'graph:read'
@@ -151,6 +177,43 @@ async function applyPatch(input: PatchApplyInput, _grant: PermissionGrant): Prom
   return { appliedAt: new Date().toISOString(), testsPassed: false };
 }
 
+async function getPageRank(input: PageRankInput, _grant: PermissionGrant): Promise<PageRankOutput> {
+  const { db } = await import('$lib/server/db/client.js');
+  const { sql } = await import('drizzle-orm');
+  const rows = await db.execute(sql`
+    SELECT
+      packet_key,
+      source_ref,
+      COALESCE(pagerank_score, authority_score, 0) AS pagerank_score,
+      COUNT(*) OVER() AS total_count
+    FROM atlas_packets
+    WHERE COALESCE(pagerank_score, authority_score, 0) > 0
+    ORDER BY COALESCE(pagerank_score, authority_score, 0) DESC, packet_key ASC
+    LIMIT ${input.limit}
+    OFFSET ${input.offset}
+  `);
+
+  const resultRows = ((rows as { rows?: Array<Record<string, unknown>> }).rows ?? []).map((row, index) => ({
+    packetKey: String(row.packet_key ?? ''),
+    sourceRef: row.source_ref == null ? null : String(row.source_ref),
+    pageRankScore: Number(row.pagerank_score ?? 0),
+    rank: input.offset + index + 1,
+  }));
+  const total = Number(((rows as { rows?: Array<Record<string, unknown>> }).rows ?? [])[0]?.total_count ?? 0);
+
+  return {
+    results: resultRows,
+    total,
+    offset: input.offset,
+    limit: input.limit,
+    metadata: {
+      source: 'postgres:atlas_packets.pagerank_score',
+      snapshotVersion: 'atlas_packets-live',
+      handler: 'atlas-tool-registry.getPageRank',
+    },
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const atlasToolRegistry = {
@@ -167,6 +230,13 @@ export const atlasToolRegistry = {
     permission: 'graph:read' as AtlasToolPermission,
     execute: expandGraph,
   } satisfies AtlasToolDefinition<GraphExpandInput, GraphExpandOutput>,
+
+  'atlas.graph.pagerank': {
+    inputSchema: PageRankInputSchema,
+    outputSchema: PageRankOutputSchema,
+    permission: 'graph:read' as AtlasToolPermission,
+    execute: getPageRank,
+  } satisfies AtlasToolDefinition<PageRankInput, PageRankOutput>,
 
   'atlas.patch.propose': {
     inputSchema: PatchProposalInputSchema,
@@ -216,6 +286,9 @@ export async function invokeTool<N extends AtlasToolName>(
   if ('humanApproval' in tool && tool.humanApproval) {
     throw new Error(`Tool '${name}' requires explicit human approval before execution`);
   }
+
+  const { checkToolAccess } = await import('../auth/tool-authorization.js');
+  await checkToolAccess(name, grant);
 
   return executeToolUnchecked(name, rawInput, grant);
 }

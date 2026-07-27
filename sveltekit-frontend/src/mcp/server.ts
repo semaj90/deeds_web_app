@@ -20,6 +20,7 @@ import { registerDispatcherToolsAsACP, executeACPTool } from '$lib/server/acp/ac
 import { bootstrapACPRegistry } from '$lib/server/acp/acp-grpc-quic-bridge.js';
 import { withToolCallRecord } from '$lib/server/telemetry/tool-call-recorder.js';
 import { LDR_RESEARCH_TOOL, executeLDRResearch, formatLDRResultForAgent, type LDRToolInput } from './tools/ldr-research.js';
+import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './tools/phase18-reranker-tool.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -47,14 +48,15 @@ function checkAuth(request: any): void {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// MinIO helper — single place for client creation + file fetch
+// SeaweedFS S3 helper — single place for client creation + file fetch through
+// the legacy MinIO-compatible client.
 // ─────────────────────────────────────────────────────────────────────
 let _mcpMinioClient: any = null;
 async function getMcpMinioClient() {
   if (!_mcpMinioClient) {
     const { Client } = await import('minio');
     _mcpMinioClient = new Client({
-      endPoint: ENV.MINIO_ENDPOINT?.split(':')[0] || 'minio',
+      endPoint: ENV.SEAWEED_ENDPOINT?.split(':')[0] || ENV.MINIO_ENDPOINT?.split(':')[0] || '127.0.0.1',
       port: parseInt(ENV.MINIO_PORT || '9000', 10),
       useSSL: ENV.MINIO_USE_SSL === 'true',
       accessKey: ENV.MINIO_ACCESS_KEY || 'minioadmin',
@@ -66,7 +68,7 @@ async function getMcpMinioClient() {
 
 async function mcpGetFile(objectKey: string, bucket?: string): Promise<Buffer> {
   const client = await getMcpMinioClient();
-  const bucketName = bucket || process.env.MINIO_EVIDENCE_BUCKET || 'evidence';
+  const bucketName = bucket || process.env.MINIO_EVIDENCE_BUCKET || process.env.SEAWEED_S3_BUCKET || 'evidence';
   const chunks: Buffer[] = [];
   const stream = await client.getObject(bucketName, objectKey);
   for await (const chunk of stream) {
@@ -688,6 +690,11 @@ export function setupToolHandlers() {
       // Codebase Cluster Explain — VLM narrative for a GPU k-means cluster
       // Step 8: Claude / Copilot MCP bridge
       // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'phase18_reranker',
+        description: PHASE18_RERANKER_TOOL_SCHEMA.description,
+        inputSchema: PHASE18_RERANKER_TOOL_SCHEMA.inputSchema as any,
+      },
       {
         name: 'codebase:explain_cluster',
         description:
@@ -5306,6 +5313,9 @@ export function setupToolHandlers() {
           content: [{ type: 'text', text: formatted }],
           isError: !ldrOutput.success,
         };
+      }
+      if (name === 'phase18_reranker') {
+        return await handlePhase18RerankerToolCall(request);
       }
       return await handleToolCall(name, args as Record<string, any>);
     } catch (error: any) {

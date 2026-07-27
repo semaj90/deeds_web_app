@@ -90,6 +90,53 @@ describe('retrieval/adapters/qdrant-bm42-retriever', () => {
   });
 });
 
+describe('retrieval/adapters/bm42-sparse-retriever', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('exports createBm42SparseRetriever', async () => {
+    const mod = await import('$lib/server/retrieval/adapters/bm42-sparse-retriever.js');
+    expect(typeof mod.createBm42SparseRetriever).toBe('function');
+  });
+
+  it('lane is sparse', async () => {
+    const { createBm42SparseRetriever } = await import('$lib/server/retrieval/adapters/bm42-sparse-retriever.js');
+    const retriever = createBm42SparseRetriever();
+    expect(retriever.lane).toBe('sparse');
+  });
+
+  it('uses querySparse and returns [] when the sparse lane has no matches', async () => {
+    const { getQdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
+    const querySparse = vi.fn().mockResolvedValue([]);
+    vi.mocked(getQdrantManager).mockReturnValueOnce({
+      querySparse,
+    } as any);
+
+    const { createBm42SparseRetriever } = await import('$lib/server/retrieval/adapters/bm42-sparse-retriever.js');
+    const retriever = createBm42SparseRetriever();
+    const results = await retriever.retrieve({ query: 'test query', limit: 5 });
+
+    expect(querySparse).toHaveBeenCalledTimes(1);
+    expect(Array.isArray(results)).toBe(true);
+    expect(results).toHaveLength(0);
+  });
+
+  it('fails closed when querySparse throws', async () => {
+    const { getQdrantManager } = await import('$lib/server/vector/qdrant-manager.js');
+    vi.mocked(getQdrantManager).mockReturnValueOnce({
+      querySparse: vi.fn().mockRejectedValue(new Error('qdrant-error')),
+    } as any);
+
+    const { createBm42SparseRetriever } = await import('$lib/server/retrieval/adapters/bm42-sparse-retriever.js');
+    const retriever = createBm42SparseRetriever();
+    const results = await retriever.retrieve({ query: 'test query', limit: 5 });
+
+    expect(Array.isArray(results)).toBe(true);
+    expect(results).toHaveLength(0);
+  });
+});
+
 // ──────────────────────────────────────────────────────────────────────────
 // cuVS sidecar adapter
 // ──────────────────────────────────────────────────────────────────────────
