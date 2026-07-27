@@ -11,10 +11,21 @@
 `atlas-tools` is a local MCP (Model Context Protocol) server that provides safe, read-only access to the deeds-web-app project metadata:
 
 - **Codebase traversal** — File graph, imports, references
-- **Topology queries** — SOM clusters, PageRank, Neo4j neighbors
+- **Topology queries** — SOM clusters, PageRank, Neo4j neighbors (optional)
 - **Knowledge base** — Wiki notes, AGENTS.md, directory context
-- **Vector search** — Qdrant semantic search, embeddings
-- **Package identity** — Packet key resolution, lineage verification
+- **Vector search** — Qdrant semantic search (768-dim dual-vector: content + signature)
+- **Packet identity** — Packet key resolution, lineage verification
+- **KAG search** — Multi-hop graph traversal + community context (Neo4j)
+- **Synthesis** — Gemma4 answer generation via llama-server (TurboQuant :8090)
+
+### Tech Stack
+
+- **Chat/Synthesis**: llama-server (:8090, TurboQuant Gemma4 RotorQuant)
+- **Embeddings**: Ollama (:11434, embeddinggemma:latest, 384-dim ONLY)
+- **Vector index**: Qdrant (:6333, 768-dim dual-vector, codebase_chunks_768)
+- **Graph/topology**: Neo4j (:7687, optional for KAG queries)
+- **Cache**: Redis/Valkey (:6379, BitFrost semantic cache, ACE context)
+- **Truth layer**: PostgreSQL (:5434, atlas_packets + schema)
 
 ---
 
@@ -72,6 +83,8 @@ The atlas-tools MCP server exposes tools via the underlying MCP server at `svelt
 - **wiki_lookup** — Retrieve wiki notes by directory, search AGENTS.md
 - **packet_identity** — Resolve packet_key, verify lineage, validate feature_id
 - **vector_search** — Qdrant semantic search, dual-vector (content + signature) rerank
+- **kag_search** — KAG multi-hop graph search + Neo4j traversal (community context)
+- **pagerank_top** — Top-N files by PageRank authority scoring
 
 ### Dispatcher Tools (Requires Auth)
 
@@ -79,9 +92,9 @@ The atlas-tools MCP server exposes tools via the underlying MCP server at `svelt
 - **envelope_validate** — Validate packet envelope structure
 - **mirror_sync_qdrant** — Sync Qdrant payload with Postgres truth
 - **mirror_sync_neo4j** — Sync Neo4j topology with graph state
-- **graph_expand** — K-hop neighbor expansion (topology-aware)
-- **retrieval_rerank** — 6-signal fusion reranking (Qdrant + TurboVec + AST + SOM)
-- **answer_synthesize** — Gemma4 answer generation with ACE context
+- **graph_expand** — K-hop neighbor expansion (topology-aware, from Neo4j)
+- **retrieval_rerank** — 6-signal fusion reranking (Qdrant + TurboVec + AST + SOM + authority)
+- **answer_synthesize** — Gemma4 answer generation with ACE context (llama-server :8090)
 
 ---
 
@@ -121,13 +134,15 @@ npx mcporter call atlas-tools.codebase_traversal query:"reranker" limit:5
 
 atlas-tools requires the following services to be running:
 
-| Service | Port | Status Required |
-|---------|------|-----------------|
-| PostgreSQL | 5434 | ✅ Required (truth layer) |
-| Redis/Valkey | 6379 | ✅ Required (cache) |
-| Qdrant | 6333 | ✅ Required (vector search) |
-| Neo4j | 7687 | ⚠️ Optional (topology) |
-| Ollama (embeddings) | 11434 | ⚠️ Optional (embedding fallback) |
+| Service | Port | Status Required | Purpose |
+|---------|------|-----------------|---------|
+| PostgreSQL | 5434 | ✅ Required | Truth layer (canonical packets, identity) |
+| Redis/Valkey | 6379 | ✅ Required | Cache layer (BitFrost, ACE context, KAG) |
+| Qdrant | 6333 | ✅ Required | Vector search (768-dim semantic index) |
+| llama-server | 8090 | ✅ Required | LLM synthesis (Gemma4 RotorQuant, TurboQuant) |
+| Ollama | 11434 | ✅ Required | Embeddings ONLY (embeddinggemma:latest, 384-dim) |
+| Neo4j | 7687 | ⚠️ Optional | Topology queries (graph traversal, authority) |
+| TurboVec | 8791 | ⚠️ Optional | Vector prefilter (4-bit quantized 64-dim ANN) |
 
 ---
 
@@ -180,10 +195,22 @@ In Claude Code, use the atlas-tools via `/trace-mcp-tooling` skill:
 - Restart OpenCode / Claude Code
 - Verify Postgres connection: `psql -U legal_admin -d legal_ai_db -c "SELECT 1"`
 - Check Redis: `redis-cli PING`
+- Check Qdrant: `curl http://127.0.0.1:6333/collections`
 
 **Tool calls timeout?**
 - Increase timeout in `.opencode/opencode.jsonc` (try 60000ms)
 - Verify database is responsive: check for long-running queries
+- Verify llama-server running: `curl http://127.0.0.1:8090/v1/models`
+
+**Synthesis tools fail ("answer_synthesize")?**
+- Ensure llama-server is running with Gemma4 RotorQuant: `http://127.0.0.1:8090`
+- Verify model supports tools: `curl http://127.0.0.1:8090/v1/models | jq '.data[0].tools'`
+- Check system prompt template: should be custom `gemma4-opencode.jinja` (not stock)
+
+**Embedding searches fail?**
+- Verify Ollama is running EMBEDDINGS ONLY (not chat): `http://127.0.0.1:11434/api/tags`
+- Expected model: `embeddinggemma:latest` (384-dim, NOT 768-dim)
+- DO NOT use Ollama for chat — llama-server (TurboQuant) is the canonical chat endpoint
 
 **MCP_STDIO error?**
 - Ensure Node.js tsx is installed: `npm install -D tsx`
