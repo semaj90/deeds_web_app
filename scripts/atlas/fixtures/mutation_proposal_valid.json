@@ -1,0 +1,25 @@
+{
+  "proposal_id": "mut:domain-update-001",
+  "packet_key": "ace:packet:auth-001",
+  "mutation_type": "domain_membership_update",
+  "changes": {
+    "domain_memberships": {
+      "database": 0.55,
+      "typescript": 0.45
+    },
+    "primary_domain": "database"
+  },
+  "justification": "Observation evidence suggests database domain should have higher weight than typescript",
+  "observations_supporting": [
+    "obs:semantic-embedding-001",
+    "obs:lexical-bm25-001"
+  ],
+  "status": "proposed",
+  "created_at": "2026-07-27T18:42:50.878Z",
+  "created_by": "agent:classifier-v1",
+  "metadata": {
+    "confidence_score": 0.85,
+    "supporting_evidence_count": 2,
+    "requires_authorization": false
+  }
+}

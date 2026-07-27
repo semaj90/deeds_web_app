@@ -274,6 +274,17 @@ export const ENV = {
   DEV_BYPASS_AUTH: privateEnv.DEV_BYPASS_AUTH === 'true',
   VAPID_PUBLIC_KEY: privateEnv.VAPID_PUBLIC_KEY,
   VAPID_PRIVATE_KEY: privateEnv.VAPID_PRIVATE_KEY,
+  VAPID_CONTACT: privateEnv.VAPID_CONTACT,
+
+  // Push notifications
+  NTFY_URL: privateEnv.NTFY_URL,
+  NTFY_TOPIC: privateEnv.NTFY_TOPIC,
+
+  // Email (SMTP)
+  SMTP_USER: privateEnv.SMTP_USER,
+  SMTP_PASS: privateEnv.SMTP_PASS,
+  SMTP_HOST: privateEnv.SMTP_HOST,
+  SMTP_PORT: privateEnv.SMTP_PORT ? parseInt(privateEnv.SMTP_PORT, 10) : undefined,
 
   // Observability
   LANGFUSE_PUBLIC_KEY: privateEnv.LANGFUSE_PUBLIC_KEY,

@@ -1,0 +1,744 @@
+{
+  "$schema": "http://json-schema.org/draft-2020-12/schema",
+  "definitions": {
+    "ClassifierSplitManifest": {
+      "type": "object",
+      "title": "Immutable classifier training/validation/test split metadata",
+      "required": [
+        "schema_version",
+        "workspace_revision",
+        "split_hash",
+        "training_snapshot_sha256",
+        "vector_manifest",
+        "label_map_version",
+        "train_size",
+        "val_size",
+        "test_size",
+        "n_features",
+        "n_classes",
+        "classes",
+        "created_at"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "Contract version for breaking changes"
+        },
+        "workspace_revision": {
+          "type": "string",
+          "description": "Postgres database identifier (e.g., legal_ai_db @ Postgres 18.4)"
+        },
+        "split_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 of sorted packet_keys + labels + vector bytes (full provenance)"
+        },
+        "training_snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Alias for split_hash (canonical identity)"
+        },
+        "vector_manifest": {
+          "type": "object",
+          "required": [
+            "vector_name",
+            "embedding_model",
+            "embedding_model_revision",
+            "dimensions",
+            "distance_metric"
+          ],
+          "properties": {
+            "vector_name": {
+              "type": "string",
+              "const": "dense_768_legacy",
+              "description": "Canonical vector artifact name"
+            },
+            "embedding_model": {
+              "type": "string",
+              "const": "embeddinggemma:latest",
+              "description": "Ollama model tag"
+            },
+            "embedding_model_revision": {
+              "type": "string",
+              "description": "Model revision/commit hash (may be unknown)"
+            },
+            "dimensions": {
+              "type": "integer",
+              "const": 768,
+              "description": "Vector dimensionality (canonical native)"
+            },
+            "distance_metric": {
+              "type": "string",
+              "const": "cosine",
+              "description": "ANN distance metric"
+            }
+          }
+        },
+        "label_map_version": {
+          "type": "string",
+          "const": "1.0.0",
+          "description": "Domain label normalization version"
+        },
+        "train_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "val_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "test_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "n_features": {
+          "type": "integer",
+          "const": 768
+        },
+        "n_classes": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Number of unique domain labels"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sorted canonical domain labels"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this split was frozen"
+        }
+      }
+    },
+    "DomainFeaturePacket": {
+      "type": "object",
+      "title": "Single training packet (immutable snapshot)",
+      "required": [
+        "packet_key",
+        "source_ref",
+        "file_path",
+        "feature_id",
+        "feature_label",
+        "domain_class",
+        "embedding",
+        "semantic_sha256",
+        "created_at"
+      ],
+      "properties": {
+        "packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$",
+          "description": "Globally unique packet identifier"
+        },
+        "source_ref": {
+          "type": "string",
+          "description": "Source file reference (e.g., src/lib/server/auth.ts)"
+        },
+        "file_path": {
+          "type": "string",
+          "description": "Canonical file path"
+        },
+        "feature_id": {
+          "type": "string",
+          "description": "Feature namespace (e.g., auth.sessions)"
+        },
+        "feature_label": {
+          "type": "string",
+          "description": "Human-readable feature label"
+        },
+        "domain_class": {
+          "type": "string",
+          "description": "Domain classification label (from canonical label set)"
+        },
+        "embedding": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 768,
+          "maxItems": 768,
+          "description": "768-dimensional embedding vector"
+        },
+        "semantic_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 of embedding bytes (validation)"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "ModelRunManifest": {
+      "type": "object",
+      "title": "Trained model metadata and provenance",
+      "required": [
+        "schema_version",
+        "classifier",
+        "model_sha256",
+        "dataset_hash",
+        "model_version",
+        "training_timestamp",
+        "metadata"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "classifier": {
+          "type": "string",
+          "enum": ["logistic_regression", "xgboost", "pytorch_mlp"],
+          "description": "Classifier type"
+        },
+        "model_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Hash of model parameters/weights"
+        },
+        "dataset_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Training dataset hash (from ClassifierSplitManifest.split_hash)"
+        },
+        "model_version": {
+          "type": "string",
+          "const": "1.0"
+        },
+        "training_timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object",
+          "required": ["train_size", "n_classes", "n_features"],
+          "properties": {
+            "train_size": {
+              "type": "integer"
+            },
+            "n_classes": {
+              "type": "integer"
+            },
+            "n_features": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "EvaluationReport": {
+      "type": "object",
+      "title": "Model evaluation results (validation + test sets)",
+      "required": [
+        "schema_version",
+        "accuracy",
+        "macro_f1",
+        "weighted_f1",
+        "test_accuracy",
+        "test_macro_f1",
+        "gate_pass",
+        "per_domain_metrics"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Validation set accuracy"
+        },
+        "macro_f1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Macro F1 on validation set (gate metric)"
+        },
+        "weighted_f1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "test_accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Held-out test set accuracy"
+        },
+        "test_macro_f1": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Macro F1 on held-out test set"
+        },
+        "gate_pass": {
+          "type": "boolean",
+          "description": "true if macro_f1 >= 0.5"
+        },
+        "per_domain_metrics": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["precision", "recall", "f1", "support"],
+            "properties": {
+              "precision": {
+                "type": "number"
+              },
+              "recall": {
+                "type": "number"
+              },
+              "f1": {
+                "type": "number"
+              },
+              "support": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "DomainPrediction": {
+      "type": "object",
+      "title": "Single prediction result",
+      "required": [
+        "packet_key",
+        "predicted_domain",
+        "raw_scores",
+        "top_score",
+        "score_margin",
+        "status"
+      ],
+      "properties": {
+        "packet_key": {
+          "type": "string"
+        },
+        "predicted_domain": {
+          "type": "string",
+          "description": "Predicted domain class"
+        },
+        "raw_scores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Score for each domain class"
+        },
+        "top_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "score_margin": {
+          "type": "number",
+          "description": "top_score - second_best_score"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PREDICTED", "UNCERTAIN", "REJECTED"],
+          "description": "Prediction confidence status"
+        }
+      }
+    },
+    "DomainOntologyLabel": {
+      "type": "object",
+      "title": "Hierarchical domain ontology entry (Phase 1.5)",
+      "required": [
+        "domain",
+        "canonical_label",
+        "tier",
+        "parent_domain",
+        "keywords",
+        "description"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Unique domain identifier within tier"
+        },
+        "canonical_label": {
+          "type": "string",
+          "description": "Normalized label (lowercase, underscores)"
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["tier1_root", "tier2_major", "tier3_specific"],
+          "description": "Hierarchical tier"
+        },
+        "parent_domain": {
+          "type": ["string", "null"],
+          "description": "Parent domain for tier 3, null for roots"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Keywords for Naive Bayes feature extraction"
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable domain description"
+        }
+      }
+    },
+    "LinkedSemanticTuple": {
+      "type": "object",
+      "title": "Semantic relationship between packets (multi-signal evidence)",
+      "required": [
+        "source_packet_key",
+        "target_packet_key",
+        "evidence_lanes",
+        "combined_score",
+        "created_at"
+      ],
+      "properties": {
+        "source_packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$"
+        },
+        "target_packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$"
+        },
+        "evidence_lanes": {
+          "type": "object",
+          "description": "Weighted signals from independent retrieval lanes",
+          "properties": {
+            "semantic": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Embedding similarity (cosine)"
+            },
+            "lexical": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "BM25 lexical match"
+            },
+            "structural": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "AST/import graph connection"
+            },
+            "topology": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "PageRank or SOM neighborhood"
+            },
+            "recency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Temporal freshness"
+            }
+          }
+        },
+        "combined_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "RRF-fused score across lanes"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "RetrievalCandidate": {
+      "type": "object",
+      "title": "Ranked candidate from multi-signal retrieval",
+      "required": [
+        "packet_key",
+        "rank",
+        "rrf_score",
+        "evidence_signals",
+        "domain_boosts",
+        "matching_domains"
+      ],
+      "properties": {
+        "packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$"
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Rank position in result set"
+        },
+        "rrf_score": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Reciprocal Rank Fusion score"
+        },
+        "evidence_signals": {
+          "type": "object",
+          "required": ["semantic", "lexical", "structural", "topology", "recency"],
+          "properties": {
+            "semantic": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "lexical": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "structural": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "topology": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "recency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "domain_boosts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Naive Bayes domain probability boosts"
+        },
+        "matching_domains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Domains this packet belongs to"
+        }
+      }
+    },
+    "RankerFeatureEnvelope": {
+      "type": "object",
+      "title": "Feature vector for XGBoost ranker training",
+      "required": [
+        "query_id",
+        "packet_key",
+        "relevance_label",
+        "features"
+      ],
+      "properties": {
+        "query_id": {
+          "type": "string",
+          "description": "Query identifier for grouping"
+        },
+        "packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$"
+        },
+        "relevance_label": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Human judgment: 0=irrelevant, 1=marginal, 2=relevant, 3=highly_relevant"
+        },
+        "features": {
+          "type": "object",
+          "required": [
+            "semantic_score",
+            "bm25_score",
+            "domain_entropy",
+            "tree_node_distance",
+            "page_rank_score",
+            "recency_days"
+          ],
+          "properties": {
+            "semantic_score": {
+              "type": "number",
+              "description": "Query-packet embedding cosine similarity"
+            },
+            "bm25_score": {
+              "type": "number",
+              "description": "BM25 ranking score (normalized 0-1)"
+            },
+            "domain_entropy": {
+              "type": "number",
+              "description": "Shannon entropy of domain_memberships (0=certain, log(K)=uniform)"
+            },
+            "tree_node_distance": {
+              "type": "number",
+              "description": "Minimum graph distance to query's source tree (heuristic)"
+            },
+            "page_rank_score": {
+              "type": "number",
+              "description": "PageRank authority score (0-1 normalized)"
+            },
+            "recency_days": {
+              "type": "number",
+              "description": "Days since last update (log scale)"
+            }
+          }
+        }
+      }
+    },
+    "EvidenceObservation": {
+      "type": "object",
+      "title": "Immutable observed evidence for a packet (proof matrix entry)",
+      "required": [
+        "observation_id",
+        "packet_key",
+        "observation_type",
+        "evidence_lane",
+        "value",
+        "confidence",
+        "source",
+        "observed_at"
+      ],
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "pattern": "^obs:[a-z0-9_-]+$",
+          "description": "Globally unique observation identifier"
+        },
+        "packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$",
+          "description": "Packet this observation measures"
+        },
+        "observation_type": {
+          "type": "string",
+          "enum": [
+            "semantic_embedding",
+            "lexical_bm25",
+            "structural_ast",
+            "topology_pagerank",
+            "topology_som",
+            "domain_membership",
+            "recency_metadata",
+            "identity_resolution"
+          ],
+          "description": "What aspect was observed"
+        },
+        "evidence_lane": {
+          "type": "string",
+          "enum": ["semantic", "lexical", "structural", "topology", "recency", "identity"],
+          "description": "Retrieval lane this observation belongs to"
+        },
+        "value": {
+          "description": "Observed value (polymorphic: number, string, array, object)",
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string" },
+            { "type": "array" },
+            { "type": "object" }
+          ]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Measurement confidence (1.0 = definite, 0.0 = guess)"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["postgres", "qdrant", "neo4j", "computed", "manual"],
+          "description": "Where the observation came from"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this observation was recorded"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional context (e.g., query_id for ranking, model_version for embeddings)",
+          "additionalProperties": true
+        }
+      }
+    },
+    "MutationProposal": {
+      "type": "object",
+      "title": "Proposed change to canonical truth (before application)",
+      "required": [
+        "proposal_id",
+        "packet_key",
+        "mutation_type",
+        "changes",
+        "justification",
+        "observations_supporting",
+        "created_at"
+      ],
+      "properties": {
+        "proposal_id": {
+          "type": "string",
+          "pattern": "^mut:[a-z0-9_-]+$",
+          "description": "Globally unique proposal identifier"
+        },
+        "packet_key": {
+          "type": "string",
+          "pattern": "^ace:packet:[a-z0-9_-]+$",
+          "description": "Packet to be mutated"
+        },
+        "mutation_type": {
+          "type": "string",
+          "enum": [
+            "domain_membership_update",
+            "identity_correction",
+            "feature_extraction",
+            "feature_correction",
+            "label_override",
+            "confidence_adjustment"
+          ],
+          "description": "Type of change proposed"
+        },
+        "changes": {
+          "type": "object",
+          "description": "Fields to change: {field: new_value, ...}",
+          "additionalProperties": true
+        },
+        "justification": {
+          "type": "string",
+          "description": "Why this mutation is proposed (references to observations or analysis)"
+        },
+        "observations_supporting": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^obs:[a-z0-9_-]+$"
+          },
+          "description": "observation_ids that support this proposal"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["proposed", "under_review", "approved", "applied", "rejected"],
+          "description": "Proposal lifecycle status"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "applied_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When this proposal was applied to canonical truth"
+        },
+        "applied_by": {
+          "type": ["string", "null"],
+          "description": "User or system that applied this proposal"
+        }
+      }
+    }
+  }
+}

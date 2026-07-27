@@ -1,0 +1,27 @@
+{
+  "proposal_id": "mut:unauthorized-001",
+  "packet_key": "ace:packet:auth-001",
+  "mutation_type": "domain_membership_update",
+  "changes": {
+    "domain_memberships": {
+      "machine_learning": 0.9,
+      "database": 0.1
+    },
+    "primary_domain": "machine_learning",
+    "force_override": true
+  },
+  "justification": "Unauthorized attempt to override canonical membership without evidence",
+  "observations_supporting": [],
+  "status": "applied",
+  "created_at": "2026-07-27T18:00:00.000Z",
+  "created_by": "unknown:untrusted-source",
+  "applied_at": "2026-07-27T18:01:00.000Z",
+  "applied_by": "unknown:untrusted-source",
+  "metadata": {
+    "confidence_score": 0.0,
+    "supporting_evidence_count": 0,
+    "requires_authorization": true,
+    "authorization_attempted": false,
+    "validation_error": "UNAUTHORIZED_MUTATION - No supporting observations, applied without authorization gate"
+  }
+}

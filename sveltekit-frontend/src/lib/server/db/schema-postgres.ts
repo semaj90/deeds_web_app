@@ -30,14 +30,18 @@ import { relations } from 'drizzle-orm/relations';
 export { chatMessages, toolTraces, type ChatMessage, type NewChatMessage, type ToolTrace, type NewToolTrace } from './schema-chat';
 
 // === ENUMS FOR LEGAL AI APPLICATION ===
-export const userRoleEnum = pgEnum('user_role', ['prosecutor',
- 'detective',
- 'admin',
- 'analyst',
- 'paralegal',
- 'investigator',
- 'viewer',
- 'user']);
+export const userRoleEnum = pgEnum('user_role', [
+  'prosecutor',
+  'detective',
+  'admin',
+  'analyst',
+  'paralegal',
+  'investigator',
+  'viewer',
+  'user',
+  'promotion_gate',
+  'ontology_approver',
+]);
 export const caseStatusEnum = pgEnum('case_status', ['open',
  'in_progress',
  'pending_review',

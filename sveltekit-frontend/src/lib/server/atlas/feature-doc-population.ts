@@ -4,6 +4,7 @@ import { buildIndexedSourcePacket } from '$lib/server/ace/indexed-source-packet.
 import { ldrQuickSummary, searchLdrHistory, startLdrResearch, type LdrSource } from '$lib/server/analytics/ldr-client.js';
 import { getFeatureDocumentEvidence, type FeatureDocumentEvidence } from './feature-document-evidence.js';
 import { MASTER_FEATURE_MAP } from './master-feature-map.js';
+import { buildOkfTopicAnalysis } from './okf-topic-ingestion.js';
 import {
   normalizeFeatureSlug,
   resolvePreferredFeatureBundleDir,
@@ -127,6 +128,12 @@ function renderFeatureNote(args: {
   docs: string[];
   tests: string[];
   pathMapping: string[];
+  okf: {
+    keywordCorpus: string[];
+    domainClass: string | null;
+    ontologyIds: string[];
+    conceptIds: string[];
+  };
 }) {
   const {
     featureId,
@@ -139,6 +146,7 @@ function renderFeatureNote(args: {
     docs,
     tests,
     pathMapping,
+    okf,
   } = args;
 
   const officialDocList = officialDocs.length > 0
@@ -154,6 +162,10 @@ featureId: ${quoteYaml(featureId)}
 title: ${quoteYaml(title)}
 status: "research"
 keywords: ${yamlArray([featureId, title, ...entryIntent.split(/\s+/).slice(0, 6)].filter(Boolean))}
+okf_keywords: ${yamlArray(okf.keywordCorpus)}
+okf_domain_class: ${quoteYaml(okf.domainClass ?? 'general')}
+okf_ontology_ids: ${yamlArray(okf.ontologyIds)}
+okf_concept_ids: ${yamlArray(okf.conceptIds)}
 services: ${yamlArray(services)}
 docs: ${yamlArray(docs)}
 tests: ${yamlArray(tests)}
@@ -219,6 +231,22 @@ export async function populateFeatureDocuments(
       `${title} is tracked in Parent Atlas as ${intent || 'an active feature surface'}.`
   );
   const officialDocs = dedupeSources(history?.sources ?? [], Math.min(Math.max(input.maxSources ?? 8, 1), 12));
+  const okf = buildOkfTopicAnalysis({
+    topicId: `okf:topic:${featureId}`,
+    featureId,
+    title,
+    query,
+    summary,
+    sourceTitles: officialDocs.map((doc) => doc.title),
+    sourceSnippets: history?.sources?.map((source) => source.snippet).filter((snippet): snippet is string => Boolean(snippet?.trim())) ?? [],
+    sourceUrls: officialDocs.map((doc) => doc.url),
+    sourceEngine: history ? 'ldr' : quickSummary ? 'quick_summary' : 'feature_seed',
+    authorityClass: officialDocs.some((doc) => doc.sourceType === 'official_docs' || doc.sourceType === 'github_repo')
+      ? 'official'
+      : officialDocs.length > 0
+        ? 'secondary'
+        : 'generated',
+  });
 
   if (!history && input.startResearchIfMissing !== false) {
     startLdrResearch(query, { maxIterations: 3, searchEngines: ['searxng', 'wikipedia'] }).catch(() => {});
@@ -240,6 +268,12 @@ export async function populateFeatureDocuments(
     docs: officialDocs.map((doc) => doc.url),
     tests: entry.evidence?.tests ?? [],
     pathMapping: entry.pathMapping ?? [],
+    okf: {
+      keywordCorpus: okf.keyword_corpus.keywords,
+      domainClass: okf.domain_classification.primary_domain,
+      ontologyIds: okf.semantic_ontology.ontology_ids,
+      conceptIds: okf.semantic_ontology.concept_ids,
+    },
   });
 
   const manifest = {
@@ -253,6 +287,7 @@ export async function populateFeatureDocuments(
       filePaths: [],
     })),
     storage: evidenceBefore.storage,
+    okf,
   };
 
   if (!input.dryRun) {

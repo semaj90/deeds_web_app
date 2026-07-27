@@ -15,14 +15,21 @@ import { FeatureEnvelopeSchema, type FeatureEnvelope } from './feature-envelope.
 import type { FusedCandidate } from './fuse-candidates.js';
 import { generateTitleIdentity } from '../ace/title-id-generator.js';
 
+function asFiniteNumber(value: unknown, fallback = 0): number {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | null) {
   if (candidate.embeddingLane !== 'dense_384' && candidate.embeddingLane !== 'dense_768') {
     return undefined;
   }
 
+  const score = asFiniteNumber(candidate.score);
+
   return {
     name: 'dense' as const,
-    score: candidate.score,
+    score,
     qdrant_point_id: qdrantPointId ?? candidate.packetKey,
     embedding_lane: candidate.embeddingLane,
     embedding_status: candidate.embeddingLane === 'dense_384' ? 'ACTIVE' as const : 'REFERENCE_ONLY' as const,
@@ -31,7 +38,7 @@ function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | nul
     projection_method: candidate.embeddingLane === 'dense_384' ? 'direct_slice' as const : 'none' as const,
     projection_version: candidate.embeddingLane === 'dense_384' ? 'embeddinggemma-768-to-384-direct-slice-v1' : 'embeddinggemma-768-native-v1',
     metric: 'cosine' as const,
-    confidence: candidate.score,
+    confidence: score,
   };
 }
 
@@ -183,6 +190,9 @@ function buildFeatureEnvelope(input: {
   const { candidate, row } = input;
   const dense = buildDenseSignal(candidate, row.qdrant_id);
   const normalizedDomainClass = normalizeDomainClass(row.domain);
+  const retrievalScore = asFiniteNumber(candidate.score);
+  const fusionScore = asFiniteNumber(candidate.fusionScore);
+  const fusionRank = asFiniteNumber(candidate.rankBefore, 1);
 
   return {
     // Canonical identity (source_ref is the primary key from retrieval)
@@ -219,10 +229,10 @@ function buildFeatureEnvelope(input: {
     community_id: row.community_id ? String(row.community_id) : null,
 
     // Retrieval metadata
-    retrieval_score: candidate.score,
+    retrieval_score: retrievalScore,
     retrieval_source: candidate.scoreSource,
-    fusion_score: candidate.fusionScore,
-    fusion_rank: candidate.rankBefore,
+    fusion_score: fusionScore,
+    fusion_rank: fusionRank,
 
     // Validation
     gan_validated: false,

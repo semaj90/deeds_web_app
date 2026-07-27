@@ -1,0 +1,211 @@
+[
+  {
+    "id": "query:agent:001",
+    "text": "how do agents coordinate state across distributed systems",
+    "intent": "multi-agent orchestration pattern",
+    "expected_domains": [
+      "agent",
+      "distributed_systems",
+      "ml"
+    ]
+  },
+  {
+    "id": "query:agent:002",
+    "text": "state machine patterns for task delegation",
+    "intent": "FSM design for agent control",
+    "expected_domains": [
+      "agent",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "query:agent:003",
+    "text": "asynchronous event handling in agent frameworks",
+    "intent": "async/await patterns for agents",
+    "expected_domains": [
+      "agent",
+      "programming_languages"
+    ]
+  },
+  {
+    "id": "query:evidence:001",
+    "text": "evidence quality scoring and confidence measurement",
+    "intent": "evidence validation and filtering",
+    "expected_domains": [
+      "evidence",
+      "database",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "query:evidence:002",
+    "text": "chain of custody timeline reconstruction",
+    "intent": "forensic analysis patterns",
+    "expected_domains": [
+      "evidence",
+      "database"
+    ]
+  },
+  {
+    "id": "query:evidence:003",
+    "text": "deduplication and artifact classification",
+    "intent": "evidence clustering and analysis",
+    "expected_domains": [
+      "evidence",
+      "algorithms",
+      "database"
+    ]
+  },
+  {
+    "id": "query:auth:001",
+    "text": "Lucia session validation and token lifecycle",
+    "intent": "auth session management",
+    "expected_domains": [
+      "authentication",
+      "database"
+    ]
+  },
+  {
+    "id": "query:auth:002",
+    "text": "role-based access control implementation",
+    "intent": "RBAC patterns",
+    "expected_domains": [
+      "authentication",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "query:auth:003",
+    "text": "credential management and password hashing",
+    "intent": "crypto and auth patterns",
+    "expected_domains": [
+      "authentication",
+      "programming_languages"
+    ]
+  },
+  {
+    "id": "query:algo:001",
+    "text": "binary search and logarithmic time search patterns",
+    "intent": "search algorithm fundamentals",
+    "expected_domains": [
+      "algorithms",
+      "database"
+    ]
+  },
+  {
+    "id": "query:algo:002",
+    "text": "hash table collision handling and load factors",
+    "intent": "hash table internals",
+    "expected_domains": [
+      "algorithms",
+      "mathematics"
+    ]
+  },
+  {
+    "id": "query:algo:003",
+    "text": "tree traversal and graph algorithms",
+    "intent": "graph algorithm patterns",
+    "expected_domains": [
+      "algorithms",
+      "distributed_systems"
+    ]
+  },
+  {
+    "id": "query:network:001",
+    "text": "consensus protocols and Byzantine fault tolerance",
+    "intent": "distributed consensus",
+    "expected_domains": [
+      "distributed_systems",
+      "network",
+      "mathematics"
+    ]
+  },
+  {
+    "id": "query:network:002",
+    "text": "message passing and fault tolerance patterns",
+    "intent": "reliable distributed communication",
+    "expected_domains": [
+      "distributed_systems",
+      "network"
+    ]
+  },
+  {
+    "id": "query:network:003",
+    "text": "replication strategies and data consistency",
+    "intent": "distributed data management",
+    "expected_domains": [
+      "distributed_systems",
+      "database"
+    ]
+  },
+  {
+    "id": "query:db:001",
+    "text": "transaction isolation levels and ACID properties",
+    "intent": "database transaction semantics",
+    "expected_domains": [
+      "database",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "query:db:002",
+    "text": "index optimization and query planning",
+    "intent": "database performance tuning",
+    "expected_domains": [
+      "database",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "query:db:003",
+    "text": "schema design and normalization",
+    "intent": "relational design patterns",
+    "expected_domains": [
+      "database"
+    ]
+  },
+  {
+    "id": "query:ui:001",
+    "text": "modal dialog lifecycle and event handling",
+    "intent": "UI component state management",
+    "expected_domains": [
+      "ui",
+      "programming_languages"
+    ]
+  },
+  {
+    "id": "query:ui:002",
+    "text": "form validation and error display",
+    "intent": "form handling patterns",
+    "expected_domains": [
+      "ui",
+      "algorithms"
+    ]
+  },
+  {
+    "id": "query:ui:003",
+    "text": "reactive state and Svelte 5 runes",
+    "intent": "reactive programming patterns",
+    "expected_domains": [
+      "ui",
+      "programming_languages"
+    ]
+  },
+  {
+    "id": "query:infra:001",
+    "text": "Docker container orchestration and networking",
+    "intent": "containerization and deployment",
+    "expected_domains": [
+      "infrastructure",
+      "distributed_systems"
+    ]
+  },
+  {
+    "id": "query:infra:002",
+    "text": "CI/CD pipelines and automated testing",
+    "intent": "build and deployment automation",
+    "expected_domains": [
+      "infrastructure"
+    ]
+  }
+]

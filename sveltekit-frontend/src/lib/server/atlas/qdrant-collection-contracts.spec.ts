@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  COLLECTION_CONTRACTS,
   PayloadValidationError,
   validateQdrantPayloadForCollection,
 } from './qdrant-collection-contracts.js';
@@ -106,5 +107,16 @@ describe('qdrant collection contract lineage', () => {
         indexed_at: new Date('2026-07-27T00:00:00Z').toISOString(),
       })
     ).toThrow(PayloadValidationError);
+  });
+
+  it('keeps the hybrid dense lane and sparse lane separate from the 768 native lane', () => {
+    expect(COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.vectors.content.size).toBe(384);
+    expect(COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.sparseVectors).toEqual(
+      expect.objectContaining({ bm42: {} }),
+    );
+    expect(COLLECTION_CONTRACTS.codebase_chunks_768.vectors.content.size).toBe(768);
+    expect(Object.keys(COLLECTION_CONTRACTS.codebase_chunks_768.vectors)).toEqual(
+      expect.arrayContaining(['content', 'error', 'signature']),
+    );
   });
 });

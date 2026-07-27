@@ -730,7 +730,7 @@ export class QdrantManager {
     const sparseAvailable = await this.getSparseSupport(params.collection, sparseVectorName).catch(() => false);
     if (!sparseAvailable) {
       this.noteDenseOnly(params.collection, sparseVectorName, 'no-sparse-index');
-      return [];
+      return { results: [], metadata: {} };
     }
 
     return traceVectorSearch(
@@ -918,7 +918,7 @@ export class QdrantManager {
           const collectionName =
             this.collections[params.collection as keyof typeof this.collections] ??
             params.collection;
-          const vectorField = buildVectorPayload(collectionName, params.queryEmbedding);
+          const vectorField = buildVectorPayload(collectionName, params.queryVector);
 
           const searchRequest: any = {
             vector: vectorField,
@@ -928,8 +928,8 @@ export class QdrantManager {
             with_vector: false,
           };
 
-          if (params.filters) {
-            searchRequest.filter = this.buildQdrantFilter(params.filters);
+          if (params.filter) {
+            searchRequest.filter = this.buildQdrantFilter(params.filter);
           }
 
           const results = await this.client.search(collectionName, searchRequest);

@@ -52,7 +52,7 @@ export const VECTOR_INDEX_REGISTRY = {
     collection: 'codebase_chunks_384_hybrid',
     indexKind: 'hybrid',
     buildScript: 'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
-    notes: 'Primary dense+sparse retrieval lane.',
+    notes: 'Primary named-vector retrieval lane: dense 384 plus BM42 sparse; separate from the 768 native lane.',
   },
   qdrantSource768: {
     id: 'qdrant-codebase-chunks-768',
@@ -63,7 +63,7 @@ export const VECTOR_INDEX_REGISTRY = {
     collection: 'codebase_chunks_768',
     indexKind: 'dense',
     buildScript: 'scripts/atlas/restore-qdrant-768-from-postgres.mjs',
-    notes: 'Native EmbeddingGemma source lane for full-dimension search and adaptive reranking.',
+    notes: 'Native EmbeddingGemma source lane; keep separate from 384 retrieval projection and sparse/multivector lanes.',
   },
   qdrantDense: {
     id: 'qdrant-codebase-chunks-384',

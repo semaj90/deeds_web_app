@@ -11,11 +11,10 @@
  */
 
 import { db } from '$lib/server/db/client.js';
-import { atlas_packets } from '$lib/server/db/schema-postgres.js';
+import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import Redis from 'ioredis';
-import { publishMirrorSyncEvent } from './mirror-sync-publisher.js';
 import { withMcpToolTelemetry } from '$lib/server/telemetry/mcp-tool-telemetry.js';
 import { getRedis } from '$lib/server/redis.js';
 import {

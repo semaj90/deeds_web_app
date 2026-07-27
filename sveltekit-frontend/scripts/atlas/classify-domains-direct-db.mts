@@ -2,10 +2,12 @@
 /**
  * Stage 1: Domain Classifier — Direct DB, Keyset Batches
  *
- * Connects directly to PostgreSQL, processes 1000-packet batches with checkpointing.
- * No docker exec, no client-side buffer issues, deterministic classification + multi-label.
+ * Ledger-only classifier backfill.
+ * This script records feature_domain_facts rows but does not mutate canonical atlas_packets
+ * ontology fields. That promotion, if ever needed, must happen through a separate reviewed gate.
  */
 
+import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 
 // Parse DATABASE_URL or use individual env vars
@@ -28,14 +30,30 @@ if (dbUrl) {
 
 const pool = new pg.Pool(poolConfig);
 
-// Classifier logic: deterministic path patterns
-function classifyPacket(sourceRef: string): { domain_labels: any[]; primary_domain: string; primary_confidence: number } {
+type DomainLabel = { name: string; score: number };
+
+// Classifier logic: deterministic path patterns.
+function classifyPacket(sourceRef: string | null | undefined): {
+  domain_labels: DomainLabel[];
+  primary_domain: string;
+  primary_confidence: number;
+} {
+  if (!sourceRef) {
+    return {
+      domain_labels: [],
+      primary_domain: 'unknown',
+      primary_confidence: 0,
+    };
+  }
+
   const patterns: Record<string, { name: string; weight: number }[]> = {
     retrieval: [
       { name: 'qdrant', weight: 0.95 },
       { name: 'vector', weight: 0.85 },
       { name: 'search', weight: 0.80 },
       { name: 'rerank', weight: 0.90 },
+      { name: 'rag', weight: 0.90 },
+      { name: 'context', weight: 0.75 },
     ],
     ui: [
       { name: '.svelte', weight: 0.95 },
@@ -69,11 +87,6 @@ function classifyPacket(sourceRef: string): { domain_labels: any[]; primary_doma
       { name: 'embed', weight: 0.90 },
       { name: 'embedding', weight: 0.90 },
       { name: 'ollama', weight: 0.85 },
-    ],
-    retrieval: [
-      { name: 'rag', weight: 0.90 },
-      { name: 'retrieval', weight: 0.80 },
-      { name: 'context', weight: 0.75 },
     ],
     graph: [
       { name: 'neo4j', weight: 0.95 },
@@ -115,13 +128,24 @@ function classifyPacket(sourceRef: string): { domain_labels: any[]; primary_doma
 
 async function main() {
   const dryRun = !process.argv.includes('--apply');
+  const allowPromote = process.argv.includes('--promote');
   let cursor = '';
   let totalProcessed = 0;
-  let totalUpdated = 0;
+  let totalLedgerRows = 0;
+  let skippedMissingSourceRef = 0;
+  let skippedMissingContentHash = 0;
   const batchSize = 1000;
+  const processingPassId = randomUUID();
+
+  if (allowPromote) {
+    throw new Error(
+      'Canonical atlas_packets promotion has been removed from this script. Use a separate reviewed promotion gate.',
+    );
+  }
 
   console.log('Stage 1: Domain Classifier (Direct DB, Keyset Batches)');
   console.log(`Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
+  console.log(`Processing pass: ${processingPassId}`);
   console.log('');
 
   try {
@@ -137,7 +161,7 @@ async function main() {
       // Keyset pagination: fetch 1000 packets where packet_key > cursor
       const result = await pool.query(
         `
-        SELECT packet_key, source_ref
+        SELECT packet_key, source_ref, content_hash
         FROM atlas_packets
         WHERE domain_class IS NULL AND packet_key > $1
         ORDER BY packet_key
@@ -168,90 +192,140 @@ async function main() {
         cursor = packets[packets.length - 1].packet_key;
         totalProcessed += packets.length;
       } else {
-        // Apply: batch update using VALUES
-        const values: any[] = [];
-        const placeholders: string[] = [];
-        let paramIndex = 1;
+        const client = await pool.connect();
+        let inserted = 0;
+        try {
+          await client.query('BEGIN');
 
-        for (const packet of packets) {
-          const classification = classifyPacket(packet.source_ref);
-          values.push(
-            packet.packet_key,
-            classification.primary_domain,
-            classification.primary_confidence,
-            JSON.stringify(classification.domain_labels),
-            'domain_classifier_v1'
-          );
+          for (const packet of packets) {
+            if (!packet.source_ref) {
+              skippedMissingSourceRef++;
+              continue;
+            }
+            if (!packet.content_hash) {
+              skippedMissingContentHash++;
+              continue;
+            }
 
-          placeholders.push(
-            `($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}::jsonb, $${paramIndex + 4})`
-          );
-          paramIndex += 5;
+            const classification = classifyPacket(packet.source_ref);
+            const domainProbabilities = classification.domain_labels.reduce(
+              (acc, entry) => {
+                acc[entry.name] = entry.score;
+                return acc;
+              },
+              {} as Record<string, number>,
+            );
+
+            await client.query(
+              `
+              INSERT INTO feature_domain_facts (
+                packet_key,
+                source_ref,
+                feature_key,
+                domain_class,
+                domain_confidence,
+                domain_probabilities,
+                classifier_kind,
+                classifier_version,
+                model_hash,
+                feature_contract_version,
+                content_hash,
+                processing_pass_id,
+                evidence,
+                created_at
+              )
+              VALUES ($1, $2, NULL, $3, $4, $5::jsonb, $6, $7, NULL, $8, $9, NULL, $10::jsonb, NOW())
+              ON CONFLICT (packet_key, classifier_version, content_hash) DO UPDATE SET
+                source_ref = EXCLUDED.source_ref,
+                domain_class = EXCLUDED.domain_class,
+                domain_confidence = EXCLUDED.domain_confidence,
+                domain_probabilities = EXCLUDED.domain_probabilities,
+                classifier_kind = EXCLUDED.classifier_kind,
+                feature_contract_version = EXCLUDED.feature_contract_version,
+                evidence = EXCLUDED.evidence
+              `,
+              [
+                packet.packet_key,
+                packet.source_ref,
+                classification.primary_domain,
+                classification.primary_confidence,
+                JSON.stringify(domainProbabilities),
+                'heuristic_path_classifier',
+                'domain-classifier-v1',
+                'atlas-domain-classification-v1',
+                packet.content_hash,
+                processingPassId,
+                JSON.stringify({
+                  source: 'classify-domains-direct-db',
+                  packet_key: packet.packet_key,
+                  policy: 'ledger_only',
+                }),
+              ],
+            );
+
+            inserted++;
+          }
+
+          await client.query('COMMIT');
+          console.log(`  ✓ Recorded ${inserted} domain facts`);
+        } catch (err) {
+          await client.query('ROLLBACK');
+          throw err;
+        } finally {
+          client.release();
         }
-
-        const updateSQL = `
-          UPDATE atlas_packets AS p
-          SET
-            domain_class = v.domain_class,
-            domain_confidence = v.domain_confidence,
-            metadata = p.metadata || jsonb_build_object(
-              'domain_labels', v.domain_labels,
-              'domain_classifier_version', v.classifier_version,
-              'domain_classified_at', now()::text
-            )
-          FROM (
-            VALUES ${placeholders.join(', ')}
-          ) AS v(
-            packet_key,
-            domain_class,
-            domain_confidence,
-            domain_labels,
-            classifier_version
-          )
-          WHERE p.packet_key = v.packet_key;
-        `;
-
-        await pool.query(updateSQL, values);
-        console.log(`  ✓ Updated ${packets.length} packets`);
 
         cursor = packets[packets.length - 1].packet_key;
         totalProcessed += packets.length;
-        totalUpdated += packets.length;
+        totalLedgerRows += inserted;
       }
 
       console.log('');
     }
 
     // Verification
-    console.log('[VERIFY] Classification coverage...');
-    const verifyResult = await pool.query(`
+    console.log('[VERIFY] Ledger coverage for this run...');
+    const verifyResult = await pool.query(
+      `
       SELECT
         COUNT(*) as total,
         COUNT(CASE WHEN domain_class IS NOT NULL THEN 1 END) as classified,
         COUNT(CASE WHEN domain_class != 'unknown' THEN 1 END) as specifically_classified
-      FROM atlas_packets;
-    `);
+      FROM feature_domain_facts
+      WHERE processing_pass_id = $1;
+    `,
+      [processingPassId],
+    );
 
     const { total, classified, specifically_classified } = verifyResult.rows[0];
-    const coveragePct = (specifically_classified / total * 100).toFixed(2);
+    const coveragePct = Number(total) > 0 ? ((specifically_classified / total) * 100).toFixed(2) : '0.00';
 
-    console.log(`  Total packets: ${total}`);
+    console.log(`  Total ledger rows: ${total}`);
     console.log(`  Classified: ${classified}`);
     console.log(`  Specifically classified: ${specifically_classified} (${coveragePct}%)`);
+    if (skippedMissingSourceRef > 0) {
+      console.log(`  Skipped missing source_ref: ${skippedMissingSourceRef}`);
+    }
+    if (skippedMissingContentHash > 0) {
+      console.log(`  Skipped missing content_hash: ${skippedMissingContentHash}`);
+    }
     console.log('');
 
     // Distribution
     console.log('[DISTRIBUTION]');
-    const distResult = await pool.query(`
+    const distResult = await pool.query(
+      `
       SELECT
         domain_class,
         COUNT(*) as count,
         ROUND(AVG(domain_confidence)::numeric, 3) as avg_confidence
-      FROM atlas_packets
-      WHERE domain_class IS NOT NULL
+      FROM feature_domain_facts
+      WHERE processing_pass_id = $1
       GROUP BY domain_class
       ORDER BY count DESC;
-    `);
+    `,
+      [processingPassId],
+    );
 
     for (const row of distResult.rows) {
       console.log(`  ${row.domain_class}: ${row.count} (avg conf: ${row.avg_confidence})`);
@@ -263,11 +337,12 @@ async function main() {
       console.log('To apply:');
       console.log(`  npx tsx scripts/atlas/classify-domains-direct-db.mts --apply`);
     } else {
-      console.log(`✅ CLASSIFICATION COMPLETE`);
-      console.log(`   Total updated: ${totalUpdated} packets`);
+      console.log(`✅ CLASSIFICATION LEDGER COMPLETE`);
+      console.log('   Canonical atlas_packets promotion is disabled in this script.');
+      console.log(`   Ledger rows written: ${totalLedgerRows}`);
       console.log(`   Coverage: ${coveragePct}%`);
       console.log('');
-      console.log('Next: Audit evaluation_relevance_corrected grades (Gate 1 → Gate 2)');
+      console.log('Next: validate train/validation/test isolation before any separate promotion gate.');
     }
   } catch (err) {
     console.error('Fatal error:', err);

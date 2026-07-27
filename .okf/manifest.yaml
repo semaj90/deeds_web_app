@@ -26,6 +26,12 @@ registries:
       - cache.yaml
       - database.yaml
 
+  corpora:
+    path: corpora/
+    description: Keyword corpus, semantic ontology, and NLP-derived feature snapshots
+    schemas:
+      - keyword-corpus.yaml
+
   symbols:
     path: symbols/
     description: Symbol kinds, weights, and evidence patterns
@@ -78,6 +84,14 @@ extractors:
       - named_entities
       - technical_terms
       - error_patterns
+
+  semantic_ontology:
+    version: semantic-ontology-v1
+    description: LDR + LangExtract + mixedbread-derived keyword corpus and ontology metadata
+    features:
+      - keyword_corpus
+      - domain_classification
+      - semantic_ontology
 
 # Classification pipeline order (strict sequence)
 pipeline:

@@ -1,0 +1,64 @@
+{
+  "orchestration_timestamp": "2026-07-27T20:13:30.473Z",
+  "total_steps": 5,
+  "passed_steps": 0,
+  "failed_steps": 5,
+  "total_duration_ms": 14890,
+  "steps": [
+    {
+      "step": 9,
+      "name": "Identity Resolver",
+      "status": "FAIL",
+      "exit_code": 3,
+      "start_time": "2026-07-27T20:13:15.583Z",
+      "error_message": "Command failed: npm run phase3:identity:resolver",
+      "end_time": "2026-07-27T20:13:18.938Z",
+      "duration_ms": 3355
+    },
+    {
+      "step": 10,
+      "name": "Parquet + Arrow Exporters",
+      "status": "FAIL",
+      "exit_code": 2,
+      "start_time": "2026-07-27T20:13:18.938Z",
+      "error_message": "Command failed: npm run phase3:parquet:arrow:export",
+      "end_time": "2026-07-27T20:13:22.334Z",
+      "duration_ms": 3396
+    },
+    {
+      "step": 11,
+      "name": "Determinism Validator",
+      "status": "FAIL",
+      "exit_code": 2,
+      "start_time": "2026-07-27T20:13:22.334Z",
+      "error_message": "Command failed: npm run phase3:determinism:validator",
+      "end_time": "2026-07-27T20:13:25.400Z",
+      "duration_ms": 3066
+    },
+    {
+      "step": 12,
+      "name": "Feature Lane Materializers",
+      "status": "FAIL",
+      "exit_code": 2,
+      "start_time": "2026-07-27T20:13:25.400Z",
+      "error_message": "Command failed: npm run phase3:feature:lanes:materialize",
+      "end_time": "2026-07-27T20:13:27.941Z",
+      "duration_ms": 2541
+    },
+    {
+      "step": 13,
+      "name": "Observation Validation & Refinement",
+      "status": "FAIL",
+      "exit_code": 1,
+      "start_time": "2026-07-27T20:13:27.941Z",
+      "error_message": "Command failed: npm run phase3:observation:validation",
+      "end_time": "2026-07-27T20:13:30.473Z",
+      "duration_ms": 2532
+    }
+  ],
+  "overall_result": "FAIL",
+  "gates_summary": {
+    "Total validation gates": 25,
+    "Expected passing gates": 25
+  }
+}

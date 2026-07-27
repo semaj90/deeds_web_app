@@ -267,3 +267,209 @@ export const canvasStates = pgTable('canvas_states', {
 // Other UUID columns remain unchanged.
 
 // (The rest of the file is intentionally unchanged beyond user_id replacements to minimize diffs.)
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Phase 3 Step 7: Evidence Ledger Tables
+// ═══════════════════════════════════════════════════════════════════════════
+// Immutable proof matrix for evidence observation ledgers.
+
+export const observationTypeEnum = pgEnum('observation_type_enum', [
+  'semantic_embedding',
+  'lexical_bm25',
+  'structural_ast',
+  'domain_membership',
+  'identity_resolution',
+  'embedding_vector',
+  'bm25_ranking',
+  'ast_distance',
+]);
+
+export const evidenceLaneEnum = pgEnum('evidence_lane_enum', [
+  'semantic_embedding_qdrant',
+  'lexical_bm25_search',
+  'structural_ast_distance',
+  'domain_membership',
+  'identity_resolution',
+]);
+
+export const observationSourceEnum = pgEnum('observation_source_enum', [
+  'qdrant_dense_index',
+  'postgres_fts',
+  'tree_sitter_heuristic',
+  'postgres_classification',
+  'postgres_canonical',
+]);
+
+export const atlasEvidenceObservations = pgTable(
+  'atlas_evidence_observations',
+  {
+    observationId: varchar('observation_id', { length: 100 }).primaryKey().notNull(),
+    packetKey: varchar('packet_key', { length: 100 }).notNull(),
+    observationType: observationTypeEnum('observation_type').notNull(),
+    evidenceLane: evidenceLaneEnum('evidence_lane').notNull(),
+    value: jsonb().notNull(),
+    confidence: numeric({ precision: 3, scale: 2 }).notNull(),
+    source: observationSourceEnum().notNull(),
+    observedAt: timestamp('observed_at', { withTimezone: true, mode: 'string' }).notNull(),
+    metadata: jsonb(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.packetKey],
+      foreignColumns: [atlasPackets.packetKey],
+      name: 'fk_evidence_observations_packet',
+    }).onDelete('restrict'),
+    index('idx_evidence_observations_packet_type').on(table.packetKey, table.observationType),
+    index('idx_evidence_observations_lane').on(table.evidenceLane),
+    index('idx_evidence_observations_observed_at').on(table.observedAt.desc()),
+  ]
+);
+
+export const observationRelationshipTypeEnum = pgEnum('observation_relationship_type_enum', [
+  'corroborates',
+  'contradicts',
+  'refines',
+  'supersedes',
+]);
+
+export const atlasObservationRelationships = pgTable(
+  'atlas_observation_relationships',
+  {
+    id: serial().primaryKey().notNull(),
+    sourceObsId: varchar('source_obs_id', { length: 100 }).notNull(),
+    targetObsId: varchar('target_obs_id', { length: 100 }).notNull(),
+    relationshipType: observationRelationshipTypeEnum('relationship_type').notNull(),
+    confidence: numeric({ precision: 3, scale: 2 }),
+    evidenceText: text('evidence_text'),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.sourceObsId],
+      foreignColumns: [atlasEvidenceObservations.observationId],
+      name: 'fk_obs_rel_source',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.targetObsId],
+      foreignColumns: [atlasEvidenceObservations.observationId],
+      name: 'fk_obs_rel_target',
+    }).onDelete('cascade'),
+    index('idx_observation_relationships_type').on(table.relationshipType),
+    index('idx_observation_relationships_created_at').on(table.createdAt.desc()),
+  ]
+);
+
+export const domainMembershipSourceEnum = pgEnum('domain_membership_source_enum', [
+  'feature_extraction',
+  'manual',
+  'classification',
+  'agent_labeled',
+]);
+
+export const atlasPacketDomainMemberships = pgTable(
+  'atlas_packet_domain_memberships',
+  {
+    id: serial().primaryKey().notNull(),
+    packetKey: varchar('packet_key', { length: 100 }).notNull(),
+    domainClass: varchar('domain_class', { length: 100 }).notNull(),
+    probability: numeric({ precision: 3, scale: 2 }).notNull(),
+    observedAt: timestamp('observed_at', { withTimezone: true, mode: 'string' }).notNull(),
+    source: domainMembershipSourceEnum().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.packetKey],
+      foreignColumns: [atlasPackets.packetKey],
+      name: 'fk_packet_domains_packet',
+    }).onDelete('cascade'),
+    index('idx_packet_domains_domain_class').on(table.domainClass),
+    index('idx_packet_domains_probability_desc').on(table.probability.desc()),
+    index('idx_packet_domains_observed_at').on(table.observedAt.desc()),
+    unique('uq_packet_domain_observed').on(table.packetKey, table.domainClass, table.observedAt),
+  ]
+);
+
+export const mutationTypeEnum = pgEnum('mutation_type_enum', [
+  'domain_membership_update',
+  'feature_id_correction',
+  'source_ref_normalization',
+  'ontology_version_update',
+  'tree_node_id_assignment',
+  'identity_merge',
+]);
+
+export const mutationStatusEnum = pgEnum('mutation_status_enum', [
+  'proposed',
+  'under_review',
+  'approved',
+  'applied',
+  'rejected',
+]);
+
+export const atlasMutationProposals = pgTable(
+  'atlas_mutation_proposals',
+  {
+    proposalId: varchar('proposal_id', { length: 100 }).primaryKey().notNull(),
+    packetKey: varchar('packet_key', { length: 100 }).notNull(),
+    mutationType: mutationTypeEnum('mutation_type').notNull(),
+    changes: jsonb().notNull(),
+    justification: text().notNull(),
+    observationsSupporting: varchar('observations_supporting', { length: 100 }).array().notNull(),
+    status: mutationStatusEnum().default('proposed').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+    createdBy: varchar('created_by', { length: 100 }),
+    appliedAt: timestamp('applied_at', { withTimezone: true, mode: 'string' }),
+    appliedBy: varchar('applied_by', { length: 100 }),
+    metadata: jsonb(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.packetKey],
+      foreignColumns: [atlasPackets.packetKey],
+      name: 'fk_mutations_packet',
+    }).onDelete('restrict'),
+    index('idx_mutations_packet_status').on(table.packetKey, table.status),
+    index('idx_mutations_created_at_desc').on(table.createdAt.desc()),
+    index('idx_mutations_status').on(table.status),
+  ]
+);
+
+export const humanFeedbackTypeEnum = pgEnum('human_feedback_type_enum', [
+  'domain_correction',
+  'feature_label_fix',
+  'identity_fix',
+  'observation_quality',
+  'general_note',
+]);
+
+export const atlasHumanFeedback = pgTable(
+  'atlas_human_feedback',
+  {
+    id: serial().primaryKey().notNull(),
+    packetKey: varchar('packet_key', { length: 100 }).notNull(),
+    feedbackType: humanFeedbackTypeEnum('feedback_type').notNull(),
+    feedbackText: text('feedback_text').notNull(),
+    reviewerId: varchar('reviewer_id', { length: 100 }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+    approved: boolean().default(false).notNull(),
+    correspondingProposalId: varchar('corresponding_proposal_id', { length: 100 }),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.packetKey],
+      foreignColumns: [atlasPackets.packetKey],
+      name: 'fk_feedback_packet',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.correspondingProposalId],
+      foreignColumns: [atlasMutationProposals.proposalId],
+      name: 'fk_feedback_proposal',
+    }).onDelete('setNull'),
+    index('idx_human_feedback_type').on(table.feedbackType),
+    index('idx_human_feedback_approved_created').on(table.approved, table.createdAt.desc()),
+    index('idx_human_feedback_packet').on(table.packetKey),
+  ]
+);

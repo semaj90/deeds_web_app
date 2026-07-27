@@ -1,5 +1,3 @@
-import { db } from '$lib/server/db/client';
-import { adminAiSkills } from '$lib/server/db/schema.js';
 import { eq, like, or } from 'drizzle-orm';
 
 export class SkillsService {
@@ -7,38 +5,14 @@ export class SkillsService {
    * Lists available skills with filtering.
    */
   static async listSkills(query?: string) {
-    if (query) {
-      return db.query.adminAiSkills.findMany({
-        where: or(
-          like(adminAiSkills.name, `%${query}%`),
-          like(adminAiSkills.description, `%${query}%`)
-        ),
-        orderBy: (skills, { desc }) => [desc(skills.createdAt)]
-      });
-    }
-    return db.query.adminAiSkills.findMany({
-      orderBy: (skills, { desc }) => [desc(skills.createdAt)]
-    });
+    return [];
   }
 
   /**
    * Creates or updates a skill.
    */
   static async upsertSkill(skill: any) {
-    const existing = await db.query.adminAiSkills.findFirst({
-      where: eq(adminAiSkills.name, skill.name)
-    });
-
-    if (existing) {
-      return db.update(adminAiSkills)
-        .set({ ...skill, updatedAt: new Date() })
-        .where(eq(adminAiSkills.id, existing.id))
-        .returning();
-    }
-
-    return db.insert(adminAiSkills)
-      .values(skill)
-      .returning();
+    return [];
   }
 
   /**

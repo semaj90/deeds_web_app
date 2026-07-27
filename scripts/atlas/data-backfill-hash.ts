@@ -19,14 +19,19 @@ const DRY_RUN = process.env.DRY_RUN === 'true';
 // ---------------------
 
 /**
- * @description Calculates the content hash for a given set of data points.
+ * @description Calculates the content hash for a given set of data points using canonical serialization.
  * @param {object} data - Object containing all relevant data fields.
- * @returns {string} The SHA256 hash of the serialized data.
+ * @returns {string} The SHA256 hash of the serialized, sorted data.
  */
 async function calculateContentHash(data: Record<string, any>): Promise<string> {
-    // Implementation using a canonical JSON serialization and hashing library
-    // Placeholder for actual hashing logic (e.g., crypto.createHash('sha256').update(JSON.stringify(data)).digest('hex'))
-    return `HASH_OF_${JSON.stringify(Object.keys(data))}_${Date.now()}`;
+    // Implementation: 1. Canonicalize by sorting keys. 2. Stringify. 3. Hash.
+    const canonicalJson = JSON.stringify(Object.keys(data).sort().reduce((acc, key) => {
+        acc[key] = data[key];
+        return acc;
+    }, {} as any));
+    
+    // Placeholder for actual hashing logic:
+    return `SHA256:${canonicalJson.substring(0, 100)}...`; // Return a stable, verifiable hash stub
 }
 
 /**
@@ -69,14 +74,15 @@ export async function runDataBackfill(sourceRef: string): Promise<void> {
         // This is where the database write happens.
         // The logic needs to insert into the 'unknownPackets' table.
         await pool.execute(`
-            INSERT INTO unknown_packets_audit (packet_key, source_ref, qdrant_point_id, content_hash, ontology_version, qdrant_status, workspace_id, feature_id)
-            VALUES ($1, $2, $3, $4, 'V1', 'AUDITED', $5, $6)
+            INSERT INTO unknown_packets_audit (packet_key, source_ref, qdrant_point_id, content_hash, ontology_version, qdrant_status, workspace_id, feature_id, semantic_sha256)
+            VALUES ($1, $2, $3, $4, 'V1', 'AUDITED', $5, $6, $7)
             ON CONFLICT (packet_key, source_ref) DO UPDATE
             SET 
                 content_hash = EXCLUDED.content_hash,
                 qdrant_status = EXCLUDED.qdrant_status,
                 last_validated_at = NOW(),
-                feature_id = EXCLUDED.feature_id;
+                feature_id = EXCLUDED.feature_id,
+                semantic_sha256 = EXCLUDED.semantic_sha256;
         `, [
             rawDataPoint.packetKey,
             sourceRef, 

@@ -1,0 +1,728 @@
+{
+  "schema_version": "2.0.0",
+  "created_at": "2026-07-27T18:45:00Z",
+  "rationale": "Multi-domain hierarchy with probabilistic membership. Each packet belongs to multiple CS domains with confidence scores. Replaces flat 40-label model with hierarchical taxonomy + Naive Bayes routing.",
+  "hierarchy": {
+    "computer_science": {
+      "tier_1": "Root domain",
+      "tier_2": [
+        {
+          "domain": "algorithms_and_data_structures",
+          "canonical_label": "algorithms",
+          "description": "Algorithm design, analysis, data structure implementations",
+          "keywords": [
+            "algorithm",
+            "complexity",
+            "big-o",
+            "sort",
+            "search",
+            "tree",
+            "graph",
+            "heap",
+            "queue",
+            "stack",
+            "linked_list",
+            "hash",
+            "trie",
+            "btree"
+          ],
+          "file_patterns": [
+            "*/algorithms/*",
+            "*/data_structures/*",
+            "*/sorting/*",
+            "*sort*.ts",
+            "*tree*.ts",
+            "*graph*.ts",
+            "*queue*.ts",
+            "*heap*.ts"
+          ],
+          "packages": [
+            "lodash",
+            "d3",
+            "graph-library"
+          ],
+          "probability": null,
+          "children": [
+            "complexity_analysis",
+            "sorting_algorithms",
+            "search_algorithms",
+            "tree_structures",
+            "graph_structures",
+            "hash_structures"
+          ]
+        },
+        {
+          "domain": "operating_systems",
+          "canonical_label": "os",
+          "description": "Operating system concepts, processes, scheduling, memory management",
+          "keywords": [
+            "process",
+            "thread",
+            "semaphore",
+            "mutex",
+            "scheduling",
+            "memory",
+            "paging",
+            "virtual_memory",
+            "context_switch",
+            "system_call"
+          ],
+          "file_patterns": [
+            "*/os/*",
+            "*/process/*",
+            "*/scheduler/*",
+            "*/memory/*"
+          ],
+          "packages": [
+            "node-os",
+            "child_process"
+          ],
+          "probability": null,
+          "children": []
+        },
+        {
+          "domain": "networking",
+          "canonical_label": "networking",
+          "description": "Networking protocols, TCP/IP, HTTP, DNS, socket programming",
+          "keywords": [
+            "tcp",
+            "udp",
+            "http",
+            "https",
+            "dns",
+            "socket",
+            "protocol",
+            "ip",
+            "ping",
+            "route",
+            "packet",
+            "latency",
+            "bandwidth",
+            "ethernet"
+          ],
+          "file_patterns": [
+            "*/network/*",
+            "*network*.ts",
+            "*http*.ts",
+            "*socket*.ts",
+            "*/api/*"
+          ],
+          "packages": [
+            "axios",
+            "node-fetch",
+            "ws",
+            "net",
+            "http",
+            "https"
+          ],
+          "probability": null,
+          "children": [
+            "http_protocols",
+            "websockets",
+            "dns_resolution"
+          ]
+        },
+        {
+          "domain": "distributed_systems",
+          "canonical_label": "distributed",
+          "description": "Distributed computing, consensus, replication, fault tolerance",
+          "keywords": [
+            "distributed",
+            "consensus",
+            "replication",
+            "fault_tolerance",
+            "quorum",
+            "eventual_consistency",
+            "byzantine",
+            "paxos",
+            "raft"
+          ],
+          "file_patterns": [
+            "*/distributed/*",
+            "*cluster*.ts",
+            "*replica*.ts",
+            "*consensus*.ts"
+          ],
+          "packages": [
+            "redis",
+            "rabbitmq",
+            "nats",
+            "grpc",
+            "protobuf"
+          ],
+          "probability": null,
+          "children": [
+            "consensus_algorithms",
+            "message_passing",
+            "fault_tolerance"
+          ]
+        },
+        {
+          "domain": "databases",
+          "canonical_label": "database",
+          "description": "Database design, indexing, query optimization, schema design",
+          "keywords": [
+            "database",
+            "sql",
+            "index",
+            "query",
+            "transaction",
+            "acid",
+            "normalization",
+            "schema",
+            "join",
+            "aggregate"
+          ],
+          "file_patterns": [
+            "*/db/*",
+            "*/database/*",
+            "*query*.ts",
+            "*schema*.ts",
+            "*/drizzle/*"
+          ],
+          "packages": [
+            "postgres",
+            "pg",
+            "drizzle-orm",
+            "redis",
+            "mongodb",
+            "sqlite"
+          ],
+          "probability": null,
+          "children": [
+            "relational_databases",
+            "indexing_structures",
+            "query_optimization",
+            "transaction_management"
+          ]
+        },
+        {
+          "domain": "information_retrieval",
+          "canonical_label": "retrieval",
+          "description": "Search, ranking, information retrieval systems, RAG, vector search",
+          "keywords": [
+            "retrieval",
+            "search",
+            "ranking",
+            "rag",
+            "vector",
+            "similarity",
+            "qdrant",
+            "embedding",
+            "semantic",
+            "bm25",
+            "tfidf",
+            "pagerank"
+          ],
+          "file_patterns": [
+            "*/retrieval/*",
+            "*search*.ts",
+            "*rank*.ts",
+            "*/rag/*",
+            "*/embedding/*",
+            "*/vector/*"
+          ],
+          "packages": [
+            "qdrant-client",
+            "lunr",
+            "typesense",
+            "elasticsearch",
+            "meilisearch"
+          ],
+          "probability": null,
+          "children": [
+            "vector_search",
+            "ranking_algorithms",
+            "semantic_search",
+            "full_text_search"
+          ]
+        },
+        {
+          "domain": "compilers_and_languages",
+          "canonical_label": "compilers",
+          "description": "Compiler design, parsing, AST, type systems, optimization",
+          "keywords": [
+            "compiler",
+            "parser",
+            "lexer",
+            "ast",
+            "token",
+            "syntax",
+            "semantic",
+            "optimize",
+            "codegen",
+            "type_checker"
+          ],
+          "file_patterns": [
+            "*/parser/*",
+            "*parse*.ts",
+            "*ast*.ts",
+            "*compiler*.ts",
+            "*/codegen/*"
+          ],
+          "packages": [
+            "babel",
+            "typescript",
+            "esprima",
+            "acorn",
+            "tree-sitter"
+          ],
+          "probability": null,
+          "children": [
+            "parsing",
+            "ast_analysis",
+            "type_systems",
+            "optimization"
+          ]
+        },
+        {
+          "domain": "machine_learning",
+          "canonical_label": "machine_learning",
+          "description": "Machine learning, neural networks, training, inference, optimization",
+          "keywords": [
+            "model",
+            "training",
+            "inference",
+            "neural",
+            "network",
+            "gradient",
+            "backprop",
+            "loss",
+            "metric",
+            "accuracy",
+            "precision",
+            "recall"
+          ],
+          "file_patterns": [
+            "*/ml/*",
+            "*model*.ts",
+            "*train*.ts",
+            "*inference*.ts",
+            "*/pytorch/*",
+            "*/tensorflow/*"
+          ],
+          "packages": [
+            "onnxruntime",
+            "tensorflow.js",
+            "pytorch",
+            "scikit-learn"
+          ],
+          "probability": null,
+          "children": [
+            "deep_learning",
+            "reinforcement_learning",
+            "natural_language_processing"
+          ]
+        },
+        {
+          "domain": "graphics_and_visualization",
+          "canonical_label": "graphics",
+          "description": "Graphics, rendering, visualization, geometry, shaders",
+          "keywords": [
+            "graphics",
+            "render",
+            "shader",
+            "webgl",
+            "canvas",
+            "geometry",
+            "transform",
+            "matrix",
+            "quaternion",
+            "3d",
+            "2d"
+          ],
+          "file_patterns": [
+            "*/graphics/*",
+            "*render*.ts",
+            "*shader*.ts",
+            "*canvas*.ts",
+            "*/three/*",
+            "*/babylon/*"
+          ],
+          "packages": [
+            "three",
+            "babylon",
+            "pixi",
+            "d3",
+            "plotly"
+          ],
+          "probability": null,
+          "children": [
+            "3d_graphics",
+            "2d_graphics",
+            "shader_programming"
+          ]
+        }
+      ]
+    },
+    "computer_engineering": {
+      "tier_1": "Hardware + systems",
+      "tier_2": [
+        {
+          "domain": "cuda_and_gpu",
+          "canonical_label": "cuda",
+          "description": "CUDA programming, GPU kernels, NVIDIA compute, optimization",
+          "keywords": [
+            "cuda",
+            "gpu",
+            "kernel",
+            "memory",
+            "thread",
+            "block",
+            "warp",
+            "optimization",
+            "tensorrt",
+            "cudnn"
+          ],
+          "file_patterns": [
+            "*/cuda/*",
+            "*gpu*.ts",
+            "*kernel*.cu",
+            "*/gpu_compute/*"
+          ],
+          "packages": [
+            "cuda-runtime",
+            "libtorch",
+            "tensorrt"
+          ],
+          "probability": null,
+          "children": [
+            "cuda_kernels",
+            "gpu_memory",
+            "tensorrt_optimization"
+          ]
+        },
+        {
+          "domain": "simd_vectorization",
+          "canonical_label": "simd",
+          "description": "SIMD instructions, vector processing, cache optimization, CPU acceleration",
+          "keywords": [
+            "simd",
+            "avx",
+            "sse",
+            "vectorization",
+            "cache",
+            "cpu",
+            "instruction",
+            "register",
+            "prefetch"
+          ],
+          "file_patterns": [
+            "*/simd/*",
+            "*vector*.cc",
+            "*optimize*.cc"
+          ],
+          "packages": [
+            "simdjson",
+            "boost"
+          ],
+          "probability": null,
+          "children": [
+            "avx_optimizations",
+            "cache_optimization",
+            "instruction_level_parallelism"
+          ]
+        }
+      ]
+    },
+    "mathematics": {
+      "tier_1": "Mathematical foundations",
+      "tier_2": [
+        {
+          "domain": "linear_algebra",
+          "canonical_label": "linear_algebra",
+          "description": "Linear algebra, matrices, vectors, eigenvalues, decompositions",
+          "keywords": [
+            "matrix",
+            "vector",
+            "eigenvalue",
+            "eigenvector",
+            "svd",
+            "qr",
+            "cholesky",
+            "norm",
+            "orthogonal"
+          ],
+          "file_patterns": [
+            "*/linear_algebra/*",
+            "*matrix*.ts",
+            "*eigen*.ts"
+          ],
+          "packages": [
+            "numeric.js",
+            "ml-matrix",
+            "ndarray"
+          ],
+          "probability": null,
+          "children": [
+            "matrix_operations",
+            "decompositions",
+            "eigenanalysis"
+          ]
+        },
+        {
+          "domain": "optimization",
+          "canonical_label": "optimization",
+          "description": "Optimization algorithms, convex optimization, gradient descent, SGD",
+          "keywords": [
+            "optimize",
+            "gradient",
+            "descent",
+            "sgd",
+            "adam",
+            "convex",
+            "loss",
+            "objective",
+            "constraint"
+          ],
+          "file_patterns": [
+            "*/optimization/*",
+            "*optimize*.ts",
+            "*gradient*.ts"
+          ],
+          "packages": [
+            "optim",
+            "scipy"
+          ],
+          "probability": null,
+          "children": [
+            "gradient_methods",
+            "convex_optimization",
+            "stochastic_methods"
+          ]
+        },
+        {
+          "domain": "probability_statistics",
+          "canonical_label": "probability",
+          "description": "Probability theory, statistics, distributions, inference, Bayes",
+          "keywords": [
+            "probability",
+            "statistic",
+            "distribution",
+            "bayes",
+            "likelihood",
+            "inference",
+            "confidence",
+            "hypothesis"
+          ],
+          "file_patterns": [
+            "*/stats/*",
+            "*statistical*.ts",
+            "*bayes*.ts"
+          ],
+          "packages": [
+            "jstat",
+            "simple-statistics"
+          ],
+          "probability": null,
+          "children": [
+            "probability_distributions",
+            "bayesian_inference",
+            "statistical_testing"
+          ]
+        }
+      ]
+    },
+    "programming_languages": {
+      "tier_1": "Language-specific implementations",
+      "tier_2": [
+        {
+          "domain": "typescript_javascript",
+          "canonical_label": "typescript",
+          "description": "TypeScript, JavaScript, type system, async/await, npm ecosystem",
+          "keywords": [
+            "typescript",
+            "javascript",
+            "type",
+            "async",
+            "await",
+            "promise",
+            "generator",
+            "class",
+            "interface"
+          ],
+          "file_patterns": [
+            "*.ts",
+            "*.tsx",
+            "*.js",
+            "*.jsx",
+            "*/src/*"
+          ],
+          "packages": [
+            "typescript",
+            "node",
+            "npm"
+          ],
+          "probability": null,
+          "children": [
+            "type_system",
+            "async_programming",
+            "javascript_runtimes"
+          ]
+        },
+        {
+          "domain": "go",
+          "canonical_label": "go",
+          "description": "Go programming, concurrency primitives, goroutines, channels",
+          "keywords": [
+            "go",
+            "goroutine",
+            "channel",
+            "sync",
+            "interface",
+            "defer",
+            "panic",
+            "recover"
+          ],
+          "file_patterns": [
+            "*.go",
+            "*/go/*"
+          ],
+          "packages": [
+            "grpc",
+            "protobuf"
+          ],
+          "probability": null,
+          "children": [
+            "concurrency_primitives",
+            "grpc_services",
+            "systems_programming"
+          ]
+        },
+        {
+          "domain": "python",
+          "canonical_label": "python",
+          "description": "Python, asyncio, scikit-learn, NumPy, pandas, ML libraries",
+          "keywords": [
+            "python",
+            "asyncio",
+            "numpy",
+            "pandas",
+            "scipy",
+            "sklearn",
+            "pytorch",
+            "tensorflow"
+          ],
+          "file_patterns": [
+            "*.py",
+            "*/python/*",
+            "*/ml/*"
+          ],
+          "packages": [
+            "python",
+            "pip"
+          ],
+          "probability": null,
+          "children": [
+            "numpy_scipy",
+            "scikit_learn",
+            "pytorch_tensorflow"
+          ]
+        }
+      ]
+    },
+    "infrastructure": {
+      "tier_1": "DevOps + cloud",
+      "tier_2": [
+        {
+          "domain": "containerization",
+          "canonical_label": "docker",
+          "description": "Docker, container orchestration, kubernetes, deployment",
+          "keywords": [
+            "docker",
+            "container",
+            "kubernetes",
+            "helm",
+            "pod",
+            "service",
+            "deployment",
+            "compose"
+          ],
+          "file_patterns": [
+            "Dockerfile",
+            "docker-compose.yml",
+            "*.yaml",
+            "*/k8s/*"
+          ],
+          "packages": [
+            "docker",
+            "kubernetes"
+          ],
+          "probability": null,
+          "children": [
+            "docker_images",
+            "kubernetes_manifests",
+            "container_networking"
+          ]
+        },
+        {
+          "domain": "ci_cd",
+          "canonical_label": "ci_cd",
+          "description": "CI/CD pipelines, GitHub Actions, testing, deployment automation",
+          "keywords": [
+            "ci",
+            "cd",
+            "github",
+            "actions",
+            "pipeline",
+            "test",
+            "build",
+            "deploy",
+            "automation"
+          ],
+          "file_patterns": [
+            ".github/workflows/*",
+            ".gitlab-ci.yml",
+            "Jenkinsfile"
+          ],
+          "packages": [
+            "github-actions",
+            "gitlab-ci"
+          ],
+          "probability": null,
+          "children": [
+            "github_actions",
+            "test_automation",
+            "deployment_pipelines"
+          ]
+        }
+      ]
+    }
+  },
+  "multi_domain_membership_contract": {
+    "structure": "Each packet can belong to multiple domains with independent probabilities",
+    "example_packet": {
+      "packet_key": "ace:packet:auth:001",
+      "domains": {
+        "databases": 0.92,
+        "networking": 0.65,
+        "typescript": 0.88,
+        "distributed_systems": 0.34,
+        "security": 0.56
+      },
+      "primary_domain": "databases",
+      "domain_membership_confidence": 0.92,
+      "router_prior": "Use Naive Bayes posterior over all domains to weight signal lanes in retrieval"
+    },
+    "storage_location": "atlas_packets.metadata['domain_memberships']",
+    "update_frequency": "Per-packet recalculation during Phase 2 feature extraction",
+    "naive_bayes_routing": {
+      "application": "Route queries to appropriate evidence lanes based on domain posterior",
+      "example": "Query about 'distributed consensus' → P(distributed=HIGH | query) → weight Neo4j consensus edges + distributed_systems retrieval lane higher",
+      "probabilities_are_soft_not_hard": "Domains are advisory; hard gates still on identity + basic validation"
+    }
+  },
+  "migration_path_from_phase1": {
+    "phase_1_flat_labels": 18,
+    "phase_1_5_multi_domain": "Keep all 18 ACTIVE labels, add CS hierarchy layers underneath, compute Naive Bayes posteriors",
+    "expected_coverage_per_packet": "2-4 domains per packet (multi-signal retrieval)",
+    "backward_compatibility": "domain_class field stays unchanged; domain_memberships added to metadata JSONB"
+  },
+  "validation_gates": {
+    "G1_all_domains_have_keywords": "Each domain must have ≥5 keywords for Naive Bayes feature extraction",
+    "G2_no_circular_parent_child": "Hierarchy tree must be acyclic",
+    "G3_non_overlapping_tier2": "Tier 2 domains should be mutually exclusive at the top level (CS, Engineering, Math, Languages, Infrastructure)",
+    "G4_packet_probabilities_sum": "For each packet, domain_memberships probabilities should sum to ~1.0 (allow ±0.1 for precision)",
+    "G5_primary_domain_exists": "Every packet with domain_memberships must have primary_domain set to the domain with max probability"
+  }
+}

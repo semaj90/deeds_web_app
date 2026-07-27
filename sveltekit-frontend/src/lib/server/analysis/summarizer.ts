@@ -52,24 +52,31 @@ async function fetchGemma4Summary(systemPrompt: string, userPrompt: string, time
 			return '';
 		}
 
-		for await (const chunk of res.body) {
-			buffer += decoder.decode(chunk, { stream: true });
-			const lines = buffer.split('\n');
-			buffer = lines.pop() ?? '';
+		const reader = res.body.getReader();
+		try {
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split('\n');
+				buffer = lines.pop() ?? '';
 
-			for (const line of lines) {
-				if (!line.trim().startsWith('data:')) continue;
-				const payload = line.slice(5).trim();
-				if (payload === '[DONE]') break;
+				for (const line of lines) {
+					if (!line.trim().startsWith('data:')) continue;
+					const payload = line.slice(5).trim();
+					if (payload === '[DONE]') break;
 
-				try {
-					const parsed = JSON.parse(payload);
-					const content = parsed.choices?.[0]?.delta?.content ?? '';
-					accumulated += content;
-				} catch {
-					// Skip malformed JSON lines
+					try {
+						const parsed = JSON.parse(payload);
+						const content = parsed.choices?.[0]?.delta?.content ?? '';
+						accumulated += content;
+					} catch {
+						// Skip malformed JSON lines
+					}
 				}
 			}
+		} finally {
+			reader.releaseLock();
 		}
 
 		return accumulated.trim();

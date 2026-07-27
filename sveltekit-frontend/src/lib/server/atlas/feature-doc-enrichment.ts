@@ -31,12 +31,13 @@ export const FeatureDocSourceCandidateSchema = z.object({
     'code_source',
     'screenshot',
     'api_schema',
+    'runtime_report',
   ]),
   canonicalUrl: z.string().url().optional(),
   localPath: z.string().min(1).optional(),
   contentHash: z.string().min(1).optional(),
   title: z.string().min(1).optional(),
-  authorityClass: z.enum(['official', 'first_party', 'repository', 'secondary', 'unknown']),
+  authorityClass: z.enum(['official', 'first_party', 'repository', 'secondary', 'generated', 'unknown']),
   accepted: z.boolean(),
   rejectionReason: z.string().min(1).optional(),
 });
@@ -151,6 +152,18 @@ interface AtlasPacketRow {
 
 function sha256Hex(input: string): string {
   return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+function loadManifestOkf(manifestPath: string | null) {
+  if (!manifestPath) return null;
+
+  try {
+    const manifestRaw = fs.readFileSync(manifestPath, 'utf8');
+    const manifest = FeatureDocumentManifestSchema.parse(JSON.parse(manifestRaw));
+    return manifest.okf ?? null;
+  } catch {
+    return null;
+  }
 }
 
 function uniqueStable<T>(values: Iterable<T>): T[] {
@@ -303,7 +316,8 @@ export async function buildFeatureDocumentEnrichmentPlan(
   }
 
   const manifestRaw = fs.readFileSync(evidence.manifestPath, 'utf8');
-  FeatureDocumentManifestSchema.parse(JSON.parse(manifestRaw));
+  const manifest = FeatureDocumentManifestSchema.parse(JSON.parse(manifestRaw));
+  const manifestOkf = manifest.okf ?? null;
   const manifestContentHash = sha256Hex(manifestRaw);
   const evidenceState = toEvidenceState(evidence);
 
@@ -319,6 +333,17 @@ export async function buildFeatureDocumentEnrichmentPlan(
   )
     .map((value) => JSON.parse(value) as z.infer<typeof FeatureDocSourceCandidateSchema>)
     .slice(0, 64);
+
+  if (manifestOkf) {
+    sourceCandidates.push({
+      sourceRef: `okf:${featureId}`,
+      sourceType: 'runtime_report',
+      title: manifestOkf.domainClassification.primaryDomain ?? manifestOkf.keywordCorpus.keywords[0] ?? featureId,
+      authorityClass: 'generated',
+      accepted: true,
+      contentHash: manifestOkf.semanticOntology.ontologyVersion ?? manifestOkf.keywordCorpus.corpusVersion,
+    });
+  }
 
   const plan = FeatureDocEnrichmentPlanSchema.parse({
     schemaVersion: 'feature-doc-enrichment.v1',
@@ -491,6 +516,7 @@ export async function materializeFeatureEvidenceTuples(
   options?: { maxTuples?: number }
 ): Promise<MaterializeFeatureEvidenceTuplesResult> {
   const { evidence, plan } = await buildFeatureDocumentEnrichmentPlan(featureIdInput);
+  const manifestOkf = loadManifestOkf(evidence.manifestPath);
   const maxTuples = Math.min(64, Math.max(1, options?.maxTuples ?? 16));
   const packetRows = await loadAtlasPacketRows(plan.featureId, maxTuples);
   const packetKeys = packetRows
@@ -528,11 +554,20 @@ export async function materializeFeatureEvidenceTuples(
       treeNodeId: row.tree_node_id || undefined,
       documentId: row.document_id || documentIdMap.get(sourceRef) || undefined,
       qdrantPointId: row.qdrant_point_id || undefined,
-      domainClass: row.domain_class || undefined,
-      ontologyIds: ontology?.ontologyIds ?? [],
-      conceptIds: ontology?.conceptIds ?? [],
+      domainClass: row.domain_class || manifestOkf?.domainClassification.primaryDomain || undefined,
+      ontologyIds: uniqueStable([
+        ...(ontology?.ontologyIds ?? []),
+        ...(manifestOkf?.semanticOntology.ontologyIds ?? []),
+      ]).slice(0, 32),
+      conceptIds: uniqueStable([
+        ...(ontology?.conceptIds ?? []),
+        ...(manifestOkf?.semanticOntology.conceptIds ?? []),
+      ]).slice(0, 32),
       astSymbols: structural?.astSymbols ?? [],
-      lexicalFeatures: lexical?.lexicalFeatures ?? [],
+      lexicalFeatures: uniqueStable([
+        ...(lexical?.lexicalFeatures ?? []),
+        ...(manifestOkf?.keywordCorpus.keywords ?? []),
+      ]).slice(0, 64),
       entities: lexical?.entities ?? [],
       evidenceState: plan.evidenceState,
       provenance: {
@@ -541,6 +576,7 @@ export async function materializeFeatureEvidenceTuples(
           ontology ? 'feature_ontology_tuples' : '',
           lexical ? 'feature_lexical_facts' : '',
           structural ? 'feature_structural_facts' : '',
+          manifestOkf ? 'feature_document_manifest.okf' : '',
         ].filter(Boolean)).slice(0, 12),
         classifierVersion: plan.classifierPlan.classifierVersion ?? null,
         lexicalExtractorVersion: lexical?.lexicalExtractorVersion ?? null,
@@ -580,17 +616,18 @@ export async function materializeFeatureEvidenceTuples(
           treeNodeId: undefined,
           documentId: documentIdMap.get(candidate.sourceRef) ?? undefined,
           qdrantPointId: undefined,
-          domainClass: undefined,
-          ontologyIds: [],
-          conceptIds: [],
+          domainClass: manifestOkf?.domainClassification.primaryDomain || undefined,
+          ontologyIds: manifestOkf?.semanticOntology.ontologyIds ?? [],
+          conceptIds: manifestOkf?.semanticOntology.conceptIds ?? [],
           astSymbols: [],
-          lexicalFeatures: [],
+          lexicalFeatures: manifestOkf?.keywordCorpus.keywords ?? [],
           entities: [],
           evidenceState: plan.evidenceState,
           provenance: {
             sourceTables: uniqueStable([
               documentIdMap.has(candidate.sourceRef) ? 'library_documents' : '',
               'ace_packet_runtime',
+              manifestOkf ? 'feature_document_manifest.okf' : '',
             ].filter(Boolean)).slice(0, 12),
             classifierVersion: plan.classifierPlan.classifierVersion ?? null,
             lexicalExtractorVersion: null,

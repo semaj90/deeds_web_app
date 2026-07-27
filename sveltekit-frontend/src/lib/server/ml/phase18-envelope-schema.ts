@@ -331,7 +331,7 @@ export const databaseEnvelopeSchema = z.object({
   id: z.string().uuid().optional(),
 
   /** Foreign key to Phase 17 output */
-  packetKey: z.string().unique(),
+  packetKey: z.string(),
 
   /** Source reference (file path, etc.) */
   sourceRef: z.string(),

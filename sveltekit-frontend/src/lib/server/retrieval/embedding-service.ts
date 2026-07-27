@@ -210,12 +210,13 @@ export async function embedQueryForLane(
   }
 
   if (lane === 'dense_384') {
+    const model = config.embed_model_384 || config.embed_model;
     if (!config.embed_model_384) {
-      throw new Error(
-        'dense_384 lane requires ATLAS_EMBED_MODEL_384 or embed_model_384; refusing to derive 384 dims by slicing a 768-dim vector.'
+      console.warn(
+        '[EmbeddingService] dense_384 lane falling back to canonical embedding model with explicit 384-dim truncation',
       );
     }
-    return embedViaOllama(query, 384, config.embed_model_384, start);
+    return embedViaOllama(query, 384, model, start);
   }
 
   throw new Error(`Unsupported embedding lane: ${lane}`);

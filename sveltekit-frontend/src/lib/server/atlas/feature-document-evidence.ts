@@ -59,6 +59,42 @@ export const FeatureDocumentStorageSchema = z.object({
   }),
 });
 
+export const FeatureDocumentKeywordCorpusSchema = z.object({
+  corpusVersion: z.string().min(1),
+  keywords: z.array(z.string().min(1)).max(128),
+  sourceTerms: z.array(z.string().min(1)).max(128).default([]),
+});
+
+export const FeatureDocumentDomainClassificationSchema = z.object({
+  primaryDomain: z.string().nullable(),
+  secondaryDomains: z.array(z.string().min(1)).max(8),
+  confidence: z.number().min(0).max(1),
+  classifierVersion: z.string().min(1),
+  evidenceTerms: z.array(z.string().min(1)).max(32).default([]),
+});
+
+export const FeatureDocumentSemanticOntologySchema = z.object({
+  ontologyVersion: z.string().nullable(),
+  ontologyIds: z.array(z.string().min(1)).max(32),
+  conceptIds: z.array(z.string().min(1)).max(32),
+  extractionLane: z.string().min(1),
+  authorityClass: z.enum(['official', 'first_party', 'generated', 'secondary']),
+});
+
+export const FeatureDocumentNlpProvenanceSchema = z.object({
+  langextractVersion: z.string().nullable(),
+  mixedbreadModel: z.string().nullable(),
+  middleware: z.array(z.string().min(1)).max(16),
+  sourceEngines: z.array(z.string().min(1)).max(16).default([]),
+});
+
+export const FeatureDocumentOkfSchema = z.object({
+  keywordCorpus: FeatureDocumentKeywordCorpusSchema,
+  domainClassification: FeatureDocumentDomainClassificationSchema,
+  semanticOntology: FeatureDocumentSemanticOntologySchema,
+  nlp: FeatureDocumentNlpProvenanceSchema,
+});
+
 export const FeatureDocumentAuthorityClassSchema = z.enum([
   'official',
   'first_party',
@@ -104,6 +140,7 @@ export const FeatureDocumentManifestSchema = z.object({
   })).default([]),
   sources: z.array(FeatureDocumentManifestSourceSchema).default([]),
   storage: FeatureDocumentStorageSchema.optional(),
+  okf: FeatureDocumentOkfSchema.optional(),
 });
 
 export const FeatureDocumentEvidenceSchema = z.object({

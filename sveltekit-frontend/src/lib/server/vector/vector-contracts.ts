@@ -6,16 +6,18 @@
  * - topology_embedding (128-dim): structural relationships
  * - latent_embedding (64-dim): routing and clustering
  *
- * Named vectors are NOT multivectors (which are token-level ColBERT-style).
- * Each named vector is a complete independent representation of the same point.
+ * Named vectors are independent lanes, not interchangeable dimensions.
+ * Multivectors are a separate token-level contract (ColBERT-style) and should
+ * not be mixed into the dense named-vector space without an explicit schema.
  */
 
 /**
  * Canonical vector space names
  * These MUST match Qdrant collection named vector definitions exactly
  *
- * Phase 2D legacy: Live Qdrant uses 'content', 'error', 'signature' (768-dim)
- * Phase 9+ will migrate to semantic_embedding (384-dim), etc.
+ * Live Qdrant uses the named 768 lane set ('content', 'error', 'signature').
+ * Keep the canonical 384 retrieval lane and the 768 native/source lane
+ * separate, with explicit lineage and score fusion downstream.
  */
 export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | 'latent_embedding' | 'content' | 'error' | 'signature';
 
@@ -27,9 +29,9 @@ export const VECTOR_DIMENSIONS: Record<CodebaseVectorName, number> = {
   semantic_embedding: 384,
   topology_embedding: 128,
   latent_embedding: 64,
-  content: 768,        // Phase 2D legacy Qdrant named vector
-  error: 768,          // Phase 2D legacy Qdrant named vector
-  signature: 768,      // Phase 2D legacy Qdrant named vector
+  content: 768,        // Native/source Qdrant named vector
+  error: 768,          // Native/source Qdrant named vector
+  signature: 768,      // Native/source Qdrant named vector
 };
 
 /**
@@ -65,19 +67,19 @@ export const VECTOR_STRATEGIES: Record<
   content: {
     dimension: 768,
     distance_metric: 'Cosine',
-    use_case: 'Phase 2D legacy: Full-context content vector for dense retrieval',
+    use_case: 'Native source-lane full-context content vector for dense retrieval',
     score_threshold: 0.3,
   },
   error: {
     dimension: 768,
     distance_metric: 'Cosine',
-    use_case: 'Phase 2D legacy: Error relevance vector for error analysis',
+    use_case: 'Native source-lane error relevance vector for error analysis',
     score_threshold: 0.3,
   },
   signature: {
     dimension: 768,
     distance_metric: 'Cosine',
-    use_case: 'Phase 2D legacy: Structural signature vector for function/class matching',
+    use_case: 'Native source-lane structural signature vector for function/class matching',
     score_threshold: 0.3,
   },
 };
@@ -166,18 +168,20 @@ export const DEFAULT_VECTOR_NAME: CodebaseVectorName = 'semantic_embedding';
 /**
  * Collection → Vector Schema mapping
  *
- * Documents which named vectors are available in which collections
+ * Documents which named vectors are available in which collections.
+ * This registry includes live contracts and illustrative examples; keep the
+ * examples clearly labeled so callers do not treat them as deployed targets.
  */
 export const COLLECTION_VECTOR_SCHEMAS: Record<
   string,
   Partial<Record<CodebaseVectorName, number>>
 > = {
   codebase_chunks_768: {
-    // NOTE: This collection currently uses legacy 768-dim vectors
-    // Should migrate to semantic_embedding (384), topology_embedding (128), latent_embedding (64)
-    // For now, if this collection is queried, we need the old contracts
+    // NOTE: This collection currently uses the native 768-dim named-vector set.
+    // Keep it as the native/source semantic lane until ablation proves otherwise.
+    // Dense named vectors remain separate from sparse and multivector lanes.
   },
-  codebase_chunks_named: {
+  codebase_chunks_multivector: {
     semantic_embedding: 384,
     topology_embedding: 128,
     latent_embedding: 64,

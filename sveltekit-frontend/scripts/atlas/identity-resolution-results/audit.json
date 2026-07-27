@@ -1,0 +1,42 @@
+{
+  "gates": [
+    {
+      "gate_name": "Resolution Coverage",
+      "gate_type": "identity_resolution",
+      "check": "At least 80% of packets resolved (0.0% actual)",
+      "result": "FAIL",
+      "details": "0/1000 packets resolved",
+      "resolution_count": 0,
+      "failure_rate": 1
+    },
+    {
+      "gate_name": "Confidence Distribution",
+      "gate_type": "data_quality",
+      "check": "Average confidence ≥ 0.7 (0.50 actual)",
+      "result": "FAIL",
+      "details": "Avg confidence: 0.500"
+    },
+    {
+      "gate_name": "Source Hash Consistency",
+      "gate_type": "consistency_check",
+      "check": "Less than 5% source hash mismatches (0.0% actual)",
+      "result": "PASS",
+      "details": "0 mismatches found"
+    },
+    {
+      "gate_name": "Ambiguity Rate",
+      "gate_type": "data_quality",
+      "check": "Less than 2% ambiguous joins (0.0% actual)",
+      "result": "PASS",
+      "details": "0 ambiguous joins found"
+    },
+    {
+      "gate_name": "Phase 3 Step 9 Identity Resolution Complete",
+      "gate_type": "identity_resolution",
+      "check": "All identity resolution gates pass",
+      "result": "FAIL",
+      "details": "2/4 gates passed"
+    }
+  ],
+  "timestamp": "2026-07-27T20:13:18.853Z"
+}

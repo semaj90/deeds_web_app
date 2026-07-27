@@ -1,0 +1,37 @@
+{
+  "total_packets": 10,
+  "synthesized_packets": 10,
+  "gemma4_calls": 10,
+  "citation_accuracy": 0.9,
+  "groundedness_rate": 1,
+  "average_quality_score": 0.8586499493414376,
+  "gates": [
+    {
+      "gate": "Synthesis Coverage",
+      "status": "PASS",
+      "message": "10 summaries generated (threshold: 8)"
+    },
+    {
+      "gate": "Citation Accuracy",
+      "status": "PASS",
+      "message": "9/10 valid citations (threshold: 90%)"
+    },
+    {
+      "gate": "Evidence Grounding",
+      "status": "PASS",
+      "message": "10/10 grounded summaries (threshold: 80%)"
+    },
+    {
+      "gate": "Quality Score",
+      "status": "PASS",
+      "message": "Average quality: 0.859 (threshold: 0.7)"
+    },
+    {
+      "gate": "Phase 6 Synthesis Complete",
+      "status": "PASS",
+      "message": "Synthesized and grounded 10 packets"
+    }
+  ],
+  "overall_result": "PASS",
+  "duration_ms": 23
+}

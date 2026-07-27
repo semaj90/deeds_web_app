@@ -9,13 +9,16 @@
  *   2. Fetch candidates from 3 parallel sources (Qdrant RAG, Neo4j graph, PostgreSQL tags)
  *   3. Enrich RAG candidates with Neo4j centrality
  *   4. Rank combined results with 5-signal multi-modal ranker
- *   5. Store results in Redis (5min TTL)
+ *   5. Surface only the top 4 recommendations
+ *   6. Persist the overflow into PostgreSQL + RabbitMQ as potential recommendations
+ *   7. Store the bounded result set in Redis (5min TTL)
  *
  * GET /api/recommendations — user interaction history + topic preferences
  */
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { randomUUID } from 'node:crypto';
 import type { DocumentCandidate } from '$lib/server/ml/multi-modal-ranker.js';
 import { z } from 'zod';
 import { rankCombinedResults } from '$lib/server/ml/multi-modal-ranker.js';
@@ -28,6 +31,11 @@ import { db } from '$lib/server/db/client';
 import { legalDocuments } from '$lib/server/db/schema-postgres.js';
 import { sql } from 'drizzle-orm';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client.js';
+import {
+  buildResearchEvidenceBundle,
+  persistPotentialRecommendations,
+  selectBoundedRecommendations,
+} from '$lib/server/atlas/recommendations/bounded-research-pipeline.js';
 import {
   fetchGraphDocuments,
   computeCentralityForNodes,
@@ -173,7 +181,7 @@ export const POST: RequestHandler = async (event) => {
 		const queryTags = body.tags ?? [];
 
 		// Generate job ID
-		const jobId = crypto.randomUUID();
+		const jobId = randomUUID();
 		let redis: ReturnType<typeof getRedis>;
 
 		try {
@@ -283,9 +291,12 @@ async function processRecommendationJob(
 			JOB_TTL,
 			JSON.stringify({
 				recommendations: [],
+				potentialRecommendations: [],
 				query,
 				topK,
 				totalCandidates: 0,
+				surfaceLimit: 4,
+				overflowCount: 0,
 				metadata: {
 					timestamp: new Date().toISOString(),
 					processing_time: Date.now() - startTime,
@@ -344,18 +355,63 @@ async function processRecommendationJob(
 		.recordView(rankedDocuments[0]?.documentId || 'search', caseId || 'unknown', 0, query)
 		.catch(() => {});
 
-	const docIds = rankedDocuments.map((d) => d.documentId);
-	const topicIds = rankedDocuments
+	// Step 5: Bound visible recommendations to the top 4, send overflow to durable queue.
+	const selection = selectBoundedRecommendations(rankedDocuments, 4);
+	const recommendations = includeExplanations
+		? selection.ready
+		: selection.ready.map((doc) => ({ ...doc, explanationTokens: undefined }));
+
+	const docIds = selection.ready.map((d) => d.documentId);
+	const topicIds = selection.ready
 		.map((d) => (d as unknown as { topicId?: number }).topicId)
 		.filter((t): t is number => t !== undefined);
 	recommendationMetrics.recordImpression(userId, docIds, topicIds).catch(() => {});
 
-	// Step 5: Prepare results
-	const recommendations = includeExplanations
-		? rankedDocuments
-		: rankedDocuments.map((doc) => ({ ...doc, explanationTokens: undefined }));
+	const potentialRecommendations = selection.potential.map((doc) => ({
+		documentId: doc.documentId,
+		title: doc.title,
+		score: doc.score,
+		explanationTokens: includeExplanations ? doc.explanationTokens : undefined,
+	}));
 
-	const glyphs = encodeRecommendations(rankedDocuments);
+	const evidenceBundle = buildResearchEvidenceBundle({
+		query,
+		research: {
+			plan: 'recommendation-bounded-selection',
+			answer: `Ranked ${rankedDocuments.length} candidates; surfaced ${selection.ready.length} and queued ${selection.potential.length}.`,
+			artifacts: rankedDocuments.map((doc) => doc.documentId).slice(0, 25),
+			activeClusterIds: [],
+			contextPacket: {
+				jobId,
+				userId,
+				caseId: caseId ?? null,
+				topK,
+				totalCandidates: rankedDocuments.length,
+				categorySummary: selection.categorySummary,
+			},
+		},
+		contextPacket: {
+			jobId,
+			userId,
+			caseId: caseId ?? null,
+			topK,
+			totalCandidates: rankedDocuments.length,
+			categorySummary: selection.categorySummary,
+		},
+		evidenceState: 'ACTIVE_DEGRADED',
+	});
+
+	if (selection.potential.length > 0) {
+		await persistPotentialRecommendations({
+			runId: jobId,
+			queryId: jobId,
+			query,
+			research: evidenceBundle,
+			recommendations: selection.potential,
+		});
+	}
+
+	const glyphs = encodeRecommendations(selection.ready);
 	const glyphsCompact = glyphsToBase64(glyphs);
 
 	const processingTime = Date.now() - startTime;
@@ -363,10 +419,14 @@ async function processRecommendationJob(
 	// Store results in Redis
 	const resultPayload = {
 		recommendations,
+		potentialRecommendations,
 		glyphs: glyphsCompact,
 		query,
 		topK,
 		totalCandidates: ragResults.length + graphResults.length + tagResults.length,
+		surfaceLimit: 4,
+		overflowCount: selection.potential.length,
+		categorySummary: selection.categorySummary,
 		metadata: {
 			timestamp: new Date().toISOString(),
 			version: '1.0',
@@ -375,7 +435,12 @@ async function processRecommendationJob(
 				rag: ragResults.length,
 				graph: graphResults.length,
 				tags: tagResults.length
-			}
+			},
+			recommendation_bounding: {
+				visible: recommendations.length,
+				potential: potentialRecommendations.length,
+				surfaceLimit: 4,
+			},
 		}
 	};
 

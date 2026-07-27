@@ -1,0 +1,19 @@
+{
+  "observation_id": "obs:semantic-embedding-001",
+  "packet_key": "ace:packet:auth-001",
+  "observation_type": "semantic_embedding",
+  "evidence_lane": "semantic_embedding_qdrant",
+  "value": {
+    "vector_768d": [0.1, 0.2, 0.3],
+    "model": "embeddinggemma:latest",
+    "similarity_score": 0.9487
+  },
+  "confidence": 0.95,
+  "source": "qdrant_dense_index",
+  "observed_at": "2026-07-27T18:42:50.878Z",
+  "metadata": {
+    "query_timestamp": "2026-07-27T18:42:45.000Z",
+    "lane_version": "v1",
+    "validation_status": "passed"
+  }
+}

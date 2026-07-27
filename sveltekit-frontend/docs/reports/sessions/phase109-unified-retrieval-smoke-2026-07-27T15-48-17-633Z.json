@@ -1,0 +1,653 @@
+{
+  "generatedAt": "2026-07-27T15:48:45.152Z",
+  "reportPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\sessions\\phase109-unified-retrieval-smoke-2026-07-27T15-48-17-633Z.json",
+  "overallStatus": "FAIL",
+  "startSnapshot": {
+    "qdrant384": {
+      "collection": "codebase_chunks_384_hybrid",
+      "count": 57395,
+      "dimensions": 384,
+      "raw": {
+        "status": "green",
+        "optimizer_status": "ok",
+        "indexed_vectors_count": 114771,
+        "points_count": 57395,
+        "segments_count": 4,
+        "config": {
+          "params": {
+            "vectors": {
+              "content": {
+                "size": 384,
+                "distance": "Cosine",
+                "on_disk": false
+              },
+              "summary": {
+                "size": 384,
+                "distance": "Cosine",
+                "on_disk": false
+              }
+            },
+            "shard_number": 1,
+            "replication_factor": 1,
+            "write_consistency_factor": 1,
+            "on_disk_payload": true,
+            "sparse_vectors": {
+              "bm42_sparse": {}
+            }
+          },
+          "hnsw_config": {
+            "m": 16,
+            "ef_construct": 100,
+            "full_scan_threshold": 10000,
+            "max_indexing_threads": 0,
+            "on_disk": false
+          },
+          "optimizer_config": {
+            "deleted_threshold": 0.2,
+            "vacuum_min_vector_number": 1000,
+            "default_segment_number": 0,
+            "max_segment_size": null,
+            "memmap_threshold": null,
+            "indexing_threshold": 10000,
+            "flush_interval_sec": 5,
+            "max_optimization_threads": null,
+            "prevent_unoptimized": null
+          },
+          "wal_config": {
+            "wal_capacity_mb": 32,
+            "wal_segments_ahead": 0,
+            "wal_retain_closed": 1
+          },
+          "quantization_config": null
+        },
+        "payload_schema": {
+          "tags": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 57395
+          },
+          "artifact_kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_margin": {
+            "data_type": "float",
+            "points": 37007
+          },
+          "repository_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "concepts": {
+            "data_type": "keyword",
+            "points": 5000
+          },
+          "keywords": {
+            "data_type": "keyword",
+            "points": 25
+          },
+          "contract_version": {
+            "data_type": "keyword",
+            "points": 5025
+          },
+          "metadata_version": {
+            "data_type": "integer",
+            "points": 5000
+          },
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 57395
+          },
+          "domain_class": {
+            "data_type": "keyword",
+            "points": 17050
+          },
+          "content_hash": {
+            "data_type": "keyword",
+            "points": 50462
+          },
+          "title_id": {
+            "data_type": "keyword",
+            "points": 5229
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 18411
+          },
+          "som_cell": {
+            "data_type": "integer",
+            "points": 0
+          },
+          "symbol_kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "chunk_id": {
+            "data_type": "keyword",
+            "points": 16859
+          },
+          "kmeans_cluster": {
+            "data_type": "integer",
+            "points": 52370
+          },
+          "packet_key": {
+            "data_type": "keyword",
+            "points": 57395
+          }
+        },
+        "update_queue": {
+          "length": 0
+        }
+      }
+    },
+    "qdrant768": {
+      "collection": "codebase_chunks_768",
+      "count": 54224,
+      "dimensions": 768,
+      "raw": {
+        "status": "green",
+        "optimizer_status": "ok",
+        "indexed_vectors_count": 134538,
+        "points_count": 54224,
+        "segments_count": 4,
+        "config": {
+          "params": {
+            "vectors": {
+              "content": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "error": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "signature": {
+                "size": 768,
+                "distance": "Cosine"
+              }
+            },
+            "shard_number": 1,
+            "replication_factor": 1,
+            "write_consistency_factor": 1,
+            "on_disk_payload": true
+          },
+          "hnsw_config": {
+            "m": 16,
+            "ef_construct": 200,
+            "full_scan_threshold": 10000,
+            "max_indexing_threads": 0,
+            "on_disk": false
+          },
+          "optimizer_config": {
+            "deleted_threshold": 0.2,
+            "vacuum_min_vector_number": 1000,
+            "default_segment_number": 0,
+            "max_segment_size": null,
+            "memmap_threshold": null,
+            "indexing_threshold": 10000,
+            "flush_interval_sec": 5,
+            "max_optimization_threads": null,
+            "prevent_unoptimized": null
+          },
+          "wal_config": {
+            "wal_capacity_mb": 32,
+            "wal_segments_ahead": 0,
+            "wal_retain_closed": 1
+          },
+          "quantization_config": {
+            "scalar": {
+              "type": "int8",
+              "quantile": 0.99,
+              "always_ram": false
+            }
+          }
+        },
+        "payload_schema": {
+          "repo": {
+            "data_type": "keyword",
+            "points": 13173
+          },
+          "observed_at": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "feature_id": {
+            "data_type": "keyword",
+            "points": 53004
+          },
+          "source_ref": {
+            "data_type": "keyword",
+            "points": 53842
+          },
+          "tags": {
+            "data_type": "keyword",
+            "points": 34914
+          },
+          "language": {
+            "data_type": "keyword",
+            "points": 13519
+          },
+          "parent_centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "semantic_path": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "updated_at": {
+            "data_type": "integer",
+            "points": 0
+          },
+          "som_cluster": {
+            "data_type": "integer",
+            "points": 13801
+          },
+          "symbol_name": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "agent_pickup_ready": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "cluster_key": {
+            "data_type": "keyword",
+            "points": 38964
+          },
+          "path": {
+            "data_type": "keyword",
+            "points": 52044
+          },
+          "kind": {
+            "data_type": "keyword",
+            "points": 53712
+          },
+          "topo_class": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "workspace_task_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "point_kind": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "sourceRefs": {
+            "data_type": "keyword",
+            "points": 39071
+          },
+          "artifact_kind": {
+            "data_type": "keyword",
+            "points": 52984
+          },
+          "summary_hash": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "next_action": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "centroid_id": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "workspace_id": {
+            "data_type": "keyword",
+            "points": 8
+          },
+          "file_path": {
+            "data_type": "keyword",
+            "points": 52105
+          },
+          "status": {
+            "data_type": "keyword",
+            "points": 0
+          },
+          "error_id": {
+            "data_type": "keyword",
+            "points": 0
+          }
+        },
+        "update_queue": {
+          "length": 0
+        }
+      }
+    },
+    "neo4j": "configured",
+    "redis": true
+  },
+  "globalIssues": [],
+  "queryCacheStatus": [
+    {
+      "query": "reciprocalRankFusion",
+      "key": "qdrant:topk:v1:54505125e537f5a751c9edcb454e3027ef831d6f418fc1044b891642ec14ed15:128",
+      "hit": false
+    },
+    {
+      "query": "HyperRAG packet retrieval and ACE context assembly",
+      "key": "qdrant:topk:v1:7139d1bfd59883a5c6408d533a6f3d3e392504adda133e3f3bae735ae6564eb8:128",
+      "hit": false
+    },
+    {
+      "query": "where is local Gemma tool execution routed",
+      "key": "qdrant:topk:v1:01706ce7696696c0174c912f65b1013f261c716aa8d674bf74790db81703f25e:128",
+      "hit": false
+    },
+    {
+      "query": "crawl web document extraction and research ingestion",
+      "key": "qdrant:topk:v1:c7fb3bf92e00f2fae61c1e905e49ce411fb3785e054173f0a229b0f5b7b2b715:128",
+      "hit": false
+    }
+  ],
+  "queries": [
+    {
+      "query": "reciprocalRankFusion",
+      "queryId": "fb74d8fcd57f8c39",
+      "kind": "exact symbol",
+      "embedding": {
+        "provider": "embeddinggemma",
+        "model": "embeddinggemma:latest",
+        "dimensions": {
+          "dense384": 384,
+          "dense768": 768
+        },
+        "elapsedMs": 276.2135999999996
+      },
+      "lanes": {
+        "redis": {
+          "attempted": true,
+          "hit": false,
+          "count": 0
+        },
+        "qdrant": {
+          "collection": "codebase_chunks_384_hybrid",
+          "count": 0
+        },
+        "turboVec": {
+          "attempted": true,
+          "count": 0
+        },
+        "fallbackUsed": true
+      },
+      "postgres": {
+        "requested": 8,
+        "resolved": 1,
+        "unresolvedPacketKeys": [
+          "33380d90-7000-4dea-aedb-172e0e4b768d",
+          "c3a96752-c0db-4960-b857-338b10c95c23",
+          "a84bac62-9d8e-4447-bbf5-3fa1580d681c",
+          "e31a59e9-5f9e-490d-a3d4-b732525c5ec6",
+          "d4712cc0-d0d3-4a83-9da9-c93739a286ba",
+          "8fc9c122-330f-484c-8659-f1cc48146dfb",
+          "a03996f5-b172-48ed-8fce-57523bd3c1b3"
+        ]
+      },
+      "neo4j": {
+        "seedNodesFound": 0,
+        "expandedNodes": 0,
+        "edgeTypes": {
+          "SIMILAR_TOPOLOGY": 102666,
+          "BELONGS_TO": 0,
+          "IMPORTS": 0,
+          "USES": 0
+        }
+      },
+      "candidates": [],
+      "ace": {
+        "assembled": true,
+        "packetCount": 8,
+        "estimatedTokens": 1024
+      },
+      "synthesis": {
+        "attempted": false,
+        "provider": "",
+        "model": "",
+        "responseChars": 0,
+        "status": "FAIL"
+      },
+      "status": "FAIL",
+      "warnings": [
+        "TurboVec unavailable or unhealthy"
+      ],
+      "failures": [
+        "unresolved packet keys for \"reciprocalRankFusion\": 33380d90-7000-4dea-aedb-172e0e4b768d, c3a96752-c0db-4960-b857-338b10c95c23, a84bac62-9d8e-4447-bbf5-3fa1580d681c, e31a59e9-5f9e-490d-a3d4-b732525c5ec6, d4712cc0-d0d3-4a83-9da9-c93739a286ba, 8fc9c122-330f-484c-8659-f1cc48146dfb, a03996f5-b172-48ed-8fce-57523bd3c1b3"
+      ],
+      "elapsedMs": 6325
+    },
+    {
+      "query": "HyperRAG packet retrieval and ACE context assembly",
+      "queryId": "e91fab1d78bbebd3",
+      "kind": "feature",
+      "embedding": {
+        "provider": "embeddinggemma",
+        "model": "embeddinggemma:latest",
+        "dimensions": {
+          "dense384": 384,
+          "dense768": 768
+        },
+        "elapsedMs": 307.7392999999993
+      },
+      "lanes": {
+        "redis": {
+          "attempted": true,
+          "hit": false,
+          "count": 0
+        },
+        "qdrant": {
+          "collection": "codebase_chunks_384_hybrid",
+          "count": 0
+        },
+        "turboVec": {
+          "attempted": true,
+          "count": 0
+        },
+        "fallbackUsed": true
+      },
+      "postgres": {
+        "requested": 8,
+        "resolved": 1,
+        "unresolvedPacketKeys": [
+          "560d1d84-bc76-4eb1-a8d5-8bf147547988",
+          "bbaad439-647e-4e4f-90d1-9257eff1031f",
+          "4fccde1e-c9ba-4f10-965e-a290e13cd931",
+          "6cf0a1d4-21ab-4a68-95b5-c4b792d59d6c",
+          "7dfd7d22-cb7d-4cc3-94a5-7935430b74b4",
+          "a62eb088-80d8-49b7-9eef-55414166f58d",
+          "766c68df-c97e-4486-ab5a-9cf7f7fd0a5d"
+        ]
+      },
+      "neo4j": {
+        "seedNodesFound": 1,
+        "expandedNodes": 0,
+        "edgeTypes": {
+          "SIMILAR_TOPOLOGY": 102666,
+          "BELONGS_TO": 0,
+          "IMPORTS": 0,
+          "USES": 0
+        }
+      },
+      "candidates": [],
+      "ace": {
+        "assembled": true,
+        "packetCount": 8,
+        "estimatedTokens": 1024
+      },
+      "synthesis": {
+        "attempted": false,
+        "provider": "",
+        "model": "",
+        "responseChars": 0,
+        "status": "FAIL"
+      },
+      "status": "FAIL",
+      "warnings": [
+        "TurboVec unavailable or unhealthy"
+      ],
+      "failures": [
+        "unresolved packet keys for \"HyperRAG packet retrieval and ACE context assembly\": 560d1d84-bc76-4eb1-a8d5-8bf147547988, bbaad439-647e-4e4f-90d1-9257eff1031f, 4fccde1e-c9ba-4f10-965e-a290e13cd931, 6cf0a1d4-21ab-4a68-95b5-c4b792d59d6c, 7dfd7d22-cb7d-4cc3-94a5-7935430b74b4, a62eb088-80d8-49b7-9eef-55414166f58d, 766c68df-c97e-4486-ab5a-9cf7f7fd0a5d"
+      ],
+      "elapsedMs": 2485
+    },
+    {
+      "query": "where is local Gemma tool execution routed",
+      "queryId": "4b2af1c433dfb4b1",
+      "kind": "structural",
+      "embedding": {
+        "provider": "embeddinggemma",
+        "model": "embeddinggemma:latest",
+        "dimensions": {
+          "dense384": 384,
+          "dense768": 768
+        },
+        "elapsedMs": 368.7514999999985
+      },
+      "lanes": {
+        "redis": {
+          "attempted": true,
+          "hit": false,
+          "count": 0
+        },
+        "qdrant": {
+          "collection": "codebase_chunks_384_hybrid",
+          "count": 0
+        },
+        "turboVec": {
+          "attempted": true,
+          "count": 0
+        },
+        "fallbackUsed": true
+      },
+      "postgres": {
+        "requested": 8,
+        "resolved": 0,
+        "unresolvedPacketKeys": [
+          "0001981c-da69-4b0e-9acb-ad29544029c8",
+          "000700dd-d698-4589-a3b3-62c404909095",
+          "009aee31-481d-40c5-bde4-2ea6daaf51dd",
+          "31bc287f-6f7c-49e2-9ed1-84e44d721f6c",
+          "426838f4-afee-420e-906a-f60ac20a2f29",
+          "49c0f72a-039a-4cd0-b21d-ef1f6fa66be5",
+          "520d785e-6c8a-4639-a49c-b97509062d08",
+          "58f80807-d4cb-4400-b26f-d5d4e2efa3f2"
+        ]
+      },
+      "neo4j": {
+        "seedNodesFound": 0,
+        "expandedNodes": 0,
+        "edgeTypes": {
+          "SIMILAR_TOPOLOGY": 102666,
+          "BELONGS_TO": 0,
+          "IMPORTS": 0,
+          "USES": 0
+        }
+      },
+      "candidates": [],
+      "ace": {
+        "assembled": true,
+        "packetCount": 8,
+        "estimatedTokens": 1024
+      },
+      "synthesis": {
+        "attempted": false,
+        "provider": "",
+        "model": "",
+        "responseChars": 0,
+        "status": "FAIL"
+      },
+      "status": "FAIL",
+      "warnings": [
+        "TurboVec unavailable or unhealthy"
+      ],
+      "failures": [
+        "unresolved packet keys for \"where is local Gemma tool execution routed\": 0001981c-da69-4b0e-9acb-ad29544029c8, 000700dd-d698-4589-a3b3-62c404909095, 009aee31-481d-40c5-bde4-2ea6daaf51dd, 31bc287f-6f7c-49e2-9ed1-84e44d721f6c, 426838f4-afee-420e-906a-f60ac20a2f29, 49c0f72a-039a-4cd0-b21d-ef1f6fa66be5, 520d785e-6c8a-4639-a49c-b97509062d08, 58f80807-d4cb-4400-b26f-d5d4e2efa3f2"
+      ],
+      "elapsedMs": 3170
+    },
+    {
+      "query": "crawl web document extraction and research ingestion",
+      "queryId": "485d7263db715932",
+      "kind": "research",
+      "embedding": {
+        "provider": "embeddinggemma",
+        "model": "embeddinggemma:latest",
+        "dimensions": {
+          "dense384": 384,
+          "dense768": 768
+        },
+        "elapsedMs": 376.8616000000002
+      },
+      "lanes": {
+        "redis": {
+          "attempted": true,
+          "hit": false,
+          "count": 0
+        },
+        "qdrant": {
+          "collection": "codebase_chunks_384_hybrid",
+          "count": 0
+        },
+        "turboVec": {
+          "attempted": true,
+          "count": 0
+        },
+        "fallbackUsed": true
+      },
+      "postgres": {
+        "requested": 8,
+        "resolved": 0,
+        "unresolvedPacketKeys": [
+          "0000d635-8df8-4a03-a1b0-e33d2699f6c0",
+          "0001981c-da69-4b0e-9acb-ad29544029c8",
+          "00377645-b57a-4ad3-91fc-ccaa6236653c",
+          "2d4559ba-5724-420a-b47f-b86cbba36994",
+          "31bc287f-6f7c-49e2-9ed1-84e44d721f6c",
+          "49c0f72a-039a-4cd0-b21d-ef1f6fa66be5",
+          "51039ca4-ed97-4f8f-ab89-52a15d6dcd23",
+          "520d785e-6c8a-4639-a49c-b97509062d08"
+        ]
+      },
+      "neo4j": {
+        "seedNodesFound": 0,
+        "expandedNodes": 0,
+        "edgeTypes": {
+          "SIMILAR_TOPOLOGY": 102666,
+          "BELONGS_TO": 0,
+          "IMPORTS": 0,
+          "USES": 0
+        }
+      },
+      "candidates": [],
+      "ace": {
+        "assembled": true,
+        "packetCount": 8,
+        "estimatedTokens": 1024
+      },
+      "synthesis": {
+        "attempted": true,
+        "provider": "llama-server-openai-compatible",
+        "model": "gemma4-legal-iq4xs-direct.gguf",
+        "responseChars": 2038,
+        "status": "PASS"
+      },
+      "status": "FAIL",
+      "warnings": [
+        "TurboVec unavailable or unhealthy"
+      ],
+      "failures": [
+        "LlamaServerProvider is still a passthrough stub and must not be used as a synthesis provider"
+      ],
+      "elapsedMs": 14157
+    }
+  ]
+}

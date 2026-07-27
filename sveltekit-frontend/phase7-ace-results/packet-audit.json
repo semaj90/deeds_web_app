@@ -1,0 +1,50 @@
+{
+  "total_packets": 10,
+  "assembled_packets": 0,
+  "validation_errors": 10,
+  "average_packet_size": 0,
+  "gates": [
+    {
+      "gate": "Packet Coverage",
+      "status": "FAIL",
+      "message": "0/10 packets assembled (threshold: 95%)"
+    },
+    {
+      "gate": "Schema Compliance",
+      "status": "PASS",
+      "message": "All packets conform to ACE schema"
+    },
+    {
+      "gate": "Query Context",
+      "status": "PASS",
+      "message": "All packets have query context"
+    },
+    {
+      "gate": "Synthesis Quality",
+      "status": "PASS",
+      "message": "All packets have summary + citations"
+    },
+    {
+      "gate": "Metadata Completeness",
+      "status": "PASS",
+      "message": "All packets have complete metadata"
+    },
+    {
+      "gate": "Citation Grounding",
+      "status": "PASS",
+      "message": "0/0 packets grounded (threshold: 80%)"
+    },
+    {
+      "gate": "Average Packet Size",
+      "status": "PASS",
+      "message": "Average packet: NaNKB"
+    },
+    {
+      "gate": "Phase 7 Assembly Complete",
+      "status": "FAIL",
+      "message": "Assembled and validated 0 ACE packets"
+    }
+  ],
+  "overall_result": "FAIL",
+  "duration_ms": 13
+}

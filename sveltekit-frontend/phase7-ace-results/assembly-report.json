@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-07-27T20:13:41.860Z",
+  "phase_version": "7.0.0",
+  "total_input_summaries": 10,
+  "total_assembled_packets": 0,
+  "assembly_success_rate": 0,
+  "reranked_coverage": 0,
+  "embedding_coverage": 0,
+  "quality_metrics_coverage": 0,
+  "average_citations_per_packet": null,
+  "grounded_packet_rate": null,
+  "average_quality_score": null,
+  "packet_schema_version": "ACEPacket:7.0",
+  "authority_blend_formula": "0.6·cosine + 0.2·pagerank + 0.2·authority"
+}

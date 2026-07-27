@@ -10,7 +10,8 @@ import { ENV } from '$lib/server/env.server.js';
 import { expandNotecardNeighbors, getNotecardById, getNotecardBySourcePath, searchNotecards } from '$lib/server/kb/search-logic.js';
 import { runRgSearchAtlas } from '$lib/server/rg-atlas/run.js';
 import type { RgSearchAtlasOptions } from '$lib/server/rg-atlas/types.js';
-import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
+// import { REPAIR_TOOLS_SCHEMAS, handleRepairToolCall } from './tools/repair_tools.js';
+// TODO: fix broken retrieval module dependencies (rrf-fuse, noun-reranker not found)
 import { DISPATCHER_TOOLS_SCHEMAS } from './dispatcher-tools-schemas.js';
 import { toolIdentityRecover, toolEnvelopeValidate, toolMirrorSyncQdrant, toolMirrorSyncNeo4j, toolGraphExpand, toolRetrievalRerank, toolAnswerSynthesize, toolEscalationRoute, toolIdentityQuarantine } from '$lib/server/dispatch/mcp-tool-implementations.js';
 import { getWikiStatus, searchWiki, explainWikiPage, refreshDirectory } from '$lib/server/kb/wiki-logic.js';
@@ -1958,7 +1959,7 @@ export function setupToolHandlers() {
           required: ['path'],
         },
       },
-      ...REPAIR_TOOLS_SCHEMAS as any[],
+      // ...REPAIR_TOOLS_SCHEMAS as any[], // disabled: broken retrieval module deps
       ...DISPATCHER_TOOLS_SCHEMAS as any[],
 
     ],
@@ -2064,8 +2065,8 @@ export function setupToolHandlers() {
   }
 
   async function _handleToolCallInner(name: string, args: Record<string, any>): Promise<any> {
-    const repairResult = await handleRepairToolCall(name, args);
-    if (repairResult) return repairResult;
+    // const repairResult = await handleRepairToolCall(name, args); // disabled: broken retrieval module deps
+    // if (repairResult) return repairResult;
 
     switch (name) {
       case 'vlm:switch_mode': {

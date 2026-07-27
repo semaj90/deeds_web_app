@@ -69,16 +69,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'toolCalling',
       proto: 'tool_calling.proto',
       methods: ['ExecuteTool'],
-      inputSchema: DispatcherToolSchemas.identityRecover.describe(
-        'Packet identity classification for recovery'
-      ).toJSON(),
-      outputSchema: z
-        .object({
-          identity_lane: z.enum(['canonical', 'recoverable', 'quarantine']),
-          confidence: z.number().min(0).max(1),
-          metrics: z.record(z.any()),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'identity', 'critical', 'packet-lifecycle'],
       quicOptional: false,
     },
@@ -89,15 +81,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'toolCalling',
       proto: 'tool_calling.proto',
       methods: ['ExecuteTool'],
-      inputSchema: DispatcherToolSchemas.envelopeValidate.toJSON(),
-      outputSchema: z
-        .object({
-          is_valid: z.boolean(),
-          fields_checked: z.number(),
-          missing_fields: z.array(z.string()),
-          confidence: z.number(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'validation', 'envelope', 'schema-enforcement'],
       quicOptional: false,
     },
@@ -108,14 +93,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'retrieval',
       proto: 'retrieval.proto',
       methods: ['Search'],
-      inputSchema: DispatcherToolSchemas.mirrorSyncQdrant.toJSON(),
-      outputSchema: z
-        .object({
-          qdrant_point_id: z.string(),
-          synced_at: z.string(),
-          collection: z.string(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'mirror', 'search-index', 'qdrant', 'vector-db'],
       quicOptional: true,
     },
@@ -126,14 +105,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'codeIntel',
       proto: 'codeintel.proto',
       methods: ['TraverseGraph'],
-      inputSchema: DispatcherToolSchemas.mirrorSyncNeo4j.toJSON(),
-      outputSchema: z
-        .object({
-          neo4j_node_id: z.string(),
-          edges_created: z.number(),
-          synced_at: z.string(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'mirror', 'topology', 'neo4j', 'graph'],
       quicOptional: true,
     },
@@ -144,13 +117,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'codeIntel',
       proto: 'codeintel.proto',
       methods: ['TraverseGraph'],
-      inputSchema: DispatcherToolSchemas.graphExpand.toJSON(),
-      outputSchema: z
-        .object({
-          neighbors: z.array(z.object({ id: z.string(), relationship: z.string() })),
-          total_edges: z.number(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'graph', 'traversal', 'read-only'],
       quicOptional: true,
     },
@@ -161,13 +129,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'retrieval',
       proto: 'retrieval.proto',
       methods: ['Rerank'],
-      inputSchema: DispatcherToolSchemas.retrievalRerank.toJSON(),
-      outputSchema: z
-        .object({
-          ranked: z.array(z.object({ id: z.string(), new_score: z.number() })),
-          rerank_time_ms: z.number(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'ranking', 'read-only', 'retrieval'],
       quicOptional: true,
     },
@@ -178,14 +141,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'chatAssistant',
       proto: 'chat_assistant.proto',
       methods: ['Chat'],
-      inputSchema: DispatcherToolSchemas.answerSynthesize.toJSON(),
-      outputSchema: z
-        .object({
-          answer: z.string(),
-          model: z.string(),
-          tokens_generated: z.number(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'synthesis', 'llm', 'generation'],
       quicOptional: true,
     },
@@ -196,13 +153,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'toolCalling',
       proto: 'tool_calling.proto',
       methods: ['ExecuteTool'],
-      inputSchema: DispatcherToolSchemas.escalationRoute.toJSON(),
-      outputSchema: z
-        .object({
-          queue: z.string(),
-          routed_at: z.string(),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'routing', 'stateless'],
       quicOptional: true,
     },
@@ -213,14 +165,8 @@ export function registerDispatcherToolsAsACP(): void {
       serviceId: 'toolCalling',
       proto: 'tool_calling.proto',
       methods: ['ExecuteTool'],
-      inputSchema: DispatcherToolSchemas.identityQuarantine.toJSON(),
-      outputSchema: z
-        .object({
-          packet_key: z.string(),
-          identity_lane: z.literal('quarantine'),
-          confidence: z.literal(0),
-        })
-        .toJSON(),
+      inputSchema: {} as any,
+      outputSchema: {} as any,
       tags: ['dispatcher', 'identity', 'quarantine', 'critical'],
       quicOptional: false,
     },

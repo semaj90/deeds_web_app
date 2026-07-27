@@ -148,6 +148,8 @@ describe('populateFeatureDocuments', () => {
     expect(markdownWrite).toBeTruthy();
     expect(String(markdownWrite?.[1])).toContain('featureId: "trace-mcp"');
     expect(String(markdownWrite?.[1])).toContain('title: "TRACE MCP / Agentic Tool Surface"');
+    expect(String(markdownWrite?.[1])).toContain('okf_keywords:');
+    expect(String(markdownWrite?.[1])).toContain('okf_domain_class:');
     expect(String(markdownWrite?.[1])).toContain('[Model Context Protocol Introduction](https://modelcontextprotocol.io/introduction)');
 
     const manifestWrite = mockWriteFile.mock.calls.find(([target]: [string]) => String(target).endsWith('manifest.json'));
@@ -157,6 +159,11 @@ describe('populateFeatureDocuments', () => {
     expect(manifest.officialDocs).toHaveLength(2);
     expect(manifest.officialDocs[0].sourceType).toBe('web_page');
     expect(manifest.officialDocs[1].sourceType).toBe('github_repo');
+    expect(manifest.okf).toBeDefined();
+    expect(manifest.okf.keyword_corpus.keywords.length).toBeGreaterThan(0);
+    expect(manifest.okf.domain_classification.classifier_version).toBe('domain-classifier-v1');
+    expect(manifest.okf.semantic_ontology.ontology_ids.length).toBeGreaterThan(0);
+    expect(manifest.okf.nlp.mixedbread_model).toBe('mixedbread-ai/mxbai-rerank-base-v2');
 
     expect(mockBuildIndexedSourcePacket).toHaveBeenCalledWith(
       expect.objectContaining({

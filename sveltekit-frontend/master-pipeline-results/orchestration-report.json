@@ -1,0 +1,67 @@
+{
+  "orchestration_timestamp": "2026-07-27T20:13:41.911Z",
+  "total_phases": 5,
+  "passed_phases": 1,
+  "failed_phases": 4,
+  "total_duration_ms": 28947,
+  "phases": [
+    {
+      "phase": 3,
+      "name": "Snapshot Validation",
+      "status": "FAIL",
+      "exit_code": 1,
+      "start_time": "2026-07-27T20:13:12.964Z",
+      "error_message": "Command failed: npm run phase3:pipeline:orchestrator",
+      "end_time": "2026-07-27T20:13:30.537Z",
+      "duration_ms": 17573
+    },
+    {
+      "phase": 4,
+      "name": "GPU Embedding Indexing",
+      "status": "FAIL",
+      "exit_code": 2,
+      "start_time": "2026-07-27T20:13:30.537Z",
+      "error_message": "Command failed: npm run phase4:gpu:embedding:indexing",
+      "end_time": "2026-07-27T20:13:33.230Z",
+      "duration_ms": 2693
+    },
+    {
+      "phase": 5,
+      "name": "GPU Reranking",
+      "status": "FAIL",
+      "exit_code": 1,
+      "start_time": "2026-07-27T20:13:33.230Z",
+      "error_message": "Command failed: npm run phase5:gpu:reranking",
+      "end_time": "2026-07-27T20:13:36.014Z",
+      "duration_ms": 2784
+    },
+    {
+      "phase": 6,
+      "name": "Synthesis & Grounding",
+      "status": "PASS",
+      "exit_code": 0,
+      "start_time": "2026-07-27T20:13:36.014Z",
+      "end_time": "2026-07-27T20:13:39.085Z",
+      "duration_ms": 3071
+    },
+    {
+      "phase": 7,
+      "name": "ACE Packet Assembly",
+      "status": "FAIL",
+      "exit_code": 4,
+      "start_time": "2026-07-27T20:13:39.086Z",
+      "error_message": "Command failed: npm run phase7:ace:assembly",
+      "end_time": "2026-07-27T20:13:41.911Z",
+      "duration_ms": 2825
+    }
+  ],
+  "overall_result": "FAIL",
+  "summary": {
+    "phase_3_gates": 25,
+    "phase_4_gates": 7,
+    "phase_5_gates": 5,
+    "phase_6_gates": 5,
+    "phase_7_gates": 8,
+    "total_gates": 50
+  }
+}

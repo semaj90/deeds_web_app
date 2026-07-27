@@ -5,6 +5,8 @@
 **Timeline**: 1 week  
 **Impact**: Closes feedback loop between generation and regeneration
 
+> Scope note: this spec covers generic generated artifacts only. It does not define the canonical storage for domain classification rows, which are now modeled separately in `feature_domain` and `feature_domain_facts`.
+
 ---
 
 ## What Is an Artifact?
@@ -734,4 +736,3 @@ npm run test:artifacts:dashboard
 - Build replay database (what artifacts led to user acceptance?)
 
 This is the **foundation** for everything that comes next.
-

@@ -7,6 +7,12 @@ Generated: 2026-07-21
 Database: `legal_ai_db`
 Schema: `public`
 
+## Storage split
+
+- `feature_domain` is the older canonical domain-classification row table.
+- `feature_domain_facts` is the richer provenance ledger and the current active writer target.
+- `atlas_artifacts` is a generic artifact registry and should not be treated as the domain-classification home.
+
 | Table | Rows | Status |
 |---|---:|---|
 | `feature_domain_facts` | 61,659 | present |
@@ -63,4 +69,3 @@ That means the final domain decision cannot yet be fully fused from lexical + st
 2. Add a multi-label prediction table for non-canonical per-domain probabilities.
 3. Populate lexical, structural, and ontology fact lanes before promoting any broader fusion policy.
 4. Keep legacy direct `atlas_packets.domain_class` writers disabled for canonical decisions.
-

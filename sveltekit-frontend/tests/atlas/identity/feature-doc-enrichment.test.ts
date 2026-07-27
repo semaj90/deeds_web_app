@@ -36,6 +36,33 @@ vi.mock('../../../src/lib/server/atlas/feature-document-evidence.js', async () =
         })
       ).default([]),
       storage: z.any().optional(),
+      okf: z.object({
+        keywordCorpus: z.object({
+          corpusVersion: z.string(),
+          keywords: z.array(z.string()),
+          sourceTerms: z.array(z.string()),
+        }),
+        domainClassification: z.object({
+          primaryDomain: z.string().nullable(),
+          secondaryDomains: z.array(z.string()),
+          confidence: z.number(),
+          classifierVersion: z.string(),
+          evidenceTerms: z.array(z.string()),
+        }),
+        semanticOntology: z.object({
+          ontologyVersion: z.string().nullable(),
+          ontologyIds: z.array(z.string()),
+          conceptIds: z.array(z.string()),
+          extractionLane: z.string(),
+          authorityClass: z.enum(['official', 'first_party', 'generated', 'secondary']),
+        }),
+        nlp: z.object({
+          langextractVersion: z.string().nullable(),
+          mixedbreadModel: z.string().nullable(),
+          middleware: z.array(z.string()),
+          sourceEngines: z.array(z.string()),
+        }),
+      }).optional(),
     }),
     getFeatureDocumentEvidence: mockGetFeatureDocumentEvidence,
   };
@@ -118,6 +145,33 @@ describe('buildFeatureDocumentEnrichmentPlan', () => {
           { title: 'MCP Intro', url: 'https://modelcontextprotocol.io/introduction', sourceType: 'web_page', screenshotPaths: [], filePaths: [] },
           { title: 'Blocked', url: 'http://127.0.0.1/private', sourceType: 'web_page', screenshotPaths: [], filePaths: [] },
         ],
+        okf: {
+          keywordCorpus: {
+            corpusVersion: 'keyword-corpus-v1',
+            keywords: ['trace', 'mcp', 'agentic', 'tool'],
+            sourceTerms: ['trace-mcp', 'TRACE MCP / Agentic Tool Surface'],
+          },
+          domainClassification: {
+            primaryDomain: 'retrieval',
+            secondaryDomains: ['api'],
+            confidence: 0.91,
+            classifierVersion: 'domain-classifier-v1',
+            evidenceTerms: ['retrieval', 'api'],
+          },
+          semanticOntology: {
+            ontologyVersion: 'okf-ontology-v1',
+            ontologyIds: ['ontology:domain:retrieval'],
+            conceptIds: ['concept:keyword:trace'],
+            extractionLane: 'ldr',
+            authorityClass: 'generated',
+          },
+          nlp: {
+            langextractVersion: 'langextract-v1',
+            mixedbreadModel: 'mixedbread-ai/mxbai-rerank-base-v2',
+            middleware: ['ldr', 'langextract', 'mixedbread'],
+            sourceEngines: ['searxng', 'wikipedia'],
+          },
+        },
       })
     );
 
@@ -173,6 +227,15 @@ describe('buildFeatureDocumentEnrichmentPlan', () => {
     );
     expect(result.plan.extractionPlan.apiSchemas).toBe(true);
     expect(result.plan.classifierPlan.classifierVersion).toBe('domain-classifier-v1');
+    expect(result.plan.sourceCandidates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          sourceRef: 'okf:trace-mcp',
+          sourceType: 'runtime_report',
+          accepted: true,
+        }),
+      ])
+    );
     expect(result.plan.nextCommands.some((value: string) => value.includes('feature-doc-enrichment.test.ts'))).toBe(true);
   });
 });

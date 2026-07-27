@@ -60,6 +60,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 						status: 'complete',
 						jobId,
 						recommendations: [],
+						potentialRecommendations: [],
 						metadata: { error: 'Results expired' }
 					}
 				});
@@ -73,12 +74,16 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 					status: 'complete',
 					jobId,
 					recommendations: result.recommendations || [],
+					potentialRecommendations: result.potentialRecommendations || [],
 					glyphs: result.glyphs,
 					query: result.query,
 					topK: result.topK,
-					totalCandidates: result.totalCandidates
+					totalCandidates: result.totalCandidates,
+					surfaceLimit: result.surfaceLimit ?? 4,
+					overflowCount: result.overflowCount ?? 0,
 				},
-				metadata: result.metadata
+				metadata: result.metadata,
+				categorySummary: result.categorySummary ?? {}
 			});
 		}
 

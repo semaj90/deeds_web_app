@@ -4,6 +4,9 @@
  * Rules:
  *  - Postgres JSONB owns the complete canonical semantic record.
  *  - Qdrant payload is a compact, validated projection for retrieval routing.
+ *  - Named dense vectors, sparse vectors, and multivectors are separate lanes.
+ *  - The 384-dim canonical retrieval lane and 768-dim legacy/native lane may coexist
+ *    only as explicitly named vector spaces with declared lineage.
  *  - Only index fields that participate in filter or routing queries.
  *  - Do NOT index: summary, purpose, full source text, large ontology objects,
  *    complete AST JSON, large feature arrays — those live in Postgres.
@@ -54,7 +57,7 @@ export const COLLECTION_CONTRACTS = {
   codebase_chunks_384_hybrid: {
     contractVersion: 'atlas-qdrant-384-hybrid-v1' as const,
     vectors: {
-      // Named vector in live collection is "content" (not "content_384") — verified 2026-07-22
+      // Named dense vector in live collection is "content" (not "content_384") — verified 2026-07-22
       content: {
         size: 384,
         distance: 'Cosine' as const,
@@ -88,7 +91,7 @@ export const COLLECTION_CONTRACTS = {
   codebase_chunks_768: {
     contractVersion: 'atlas-qdrant-768-source-v1' as const,
     vectors: {
-      // Named vectors in live collection are "content", "error", "signature" — verified 2026-07-22
+      // Named dense vectors in live collection are "content", "error", "signature" — verified 2026-07-22
       content: {
         size: 768,
         distance: 'Cosine' as const,
