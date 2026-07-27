@@ -5,5 +5,20 @@
     "sha256": "12b59551490af791f50f4262fc3988768f048ea0db2be0f44e9ab91fbeb828b1",
     "archived": "2026-07-25T00:00:00Z",
     "reason": "Duplicate of root configs/templates/gemma4-opencode.jinja (also stale — uses OpenAI-style fences, not native Gemma4 DSL). Canonical template is configs/templates/custom_pub_chat_template_gemma4.jinja. This copy was a silent regression risk if anything resolved the sveltekit-frontend path first."
+  },
+  {
+    "path": "sveltekit-frontend/sveltekit-frontend (L1 duplicate)",
+    "archive_path": "deeds_labs/archive/2026-07-27/sveltekit-frontend-dup-L1.tar.gz",
+    "sha256": "fb6005e4c5a168a523c7c2f169ad2a5f2f6ce3caf81fd444f62be4d4b787a395",
+    "size_mb": 30,
+    "archived": "2026-07-27T13:52:00Z",
+    "reason": "Deeply nested duplicate directory (PowerShell path handling bug in prior session). Full L1 duplicate archived; L2/L3 levels removed during audit. Original path hierarchy: sveltekit-frontend/sveltekit-frontend/sveltekit-frontend/sveltekit-frontend (5 total levels). Audit A1-A4 confirmed: (1) regular directories not symlinks, (2) exact copy of project tree, (3) no open handles/git refs/worktree config, (4) no Docker/VSCode workspace refs. Duplicates fully isolated, safe for archival. Storage recovered: ~500MB across all levels. Canonical directory integrity verified post-removal.",
+    "recovery": "tar -xzf deeds_labs/archive/2026-07-27/sveltekit-frontend-dup-L1.tar.gz",
+    "audit_gates": {
+      "A1_structural_inspection": "PASS",
+      "A2_content_inventory": "PASS",
+      "A3_reference_check": "PASS",
+      "A4_docker_runtime_check": "PASS"
+    }
   }
 ]
