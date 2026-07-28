@@ -25,3 +25,17 @@ export async function closeNeo4jDriver() {
         cachedDriver = null;
     }
 }
+
+export async function getNeo4jHealth(): Promise<{
+    ok: boolean;
+    serverVersion?: string;
+    error?: string;
+}> {
+    try {
+        const driver = getNeo4jDriver();
+        const info = await driver.getServerInfo();
+        return { ok: true, serverVersion: info.protocolVersion };
+    } catch (err) {
+        return { ok: false, error: String(err) };
+    }
+}
