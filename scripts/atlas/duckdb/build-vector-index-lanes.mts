@@ -10,9 +10,13 @@
  *
  * Usage:
  *   npx tsx scripts/atlas/duckdb/build-vector-index-lanes.mts [--limit=5000] [--apply] [--compare]
+ *
+ * ⚠️ MUST be run from project root, NOT sveltekit-frontend/
+ * This prevents creating duplicate DuckDB files in wrong locations.
  */
 
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
@@ -38,6 +42,18 @@ const REPO_ROOT = path.resolve(__dirname, '../..', '..');
 const SNAPSHOT_DIR = path.join(REPO_ROOT, '.tmp', 'atlas-vector-snapshots');
 const INPUT_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k.ndjson');
 const TURBOVEC_INPUT_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k-turbovec-input.ndjson');
+
+/** Verify working directory is project root */
+function validateWorkingDirectory(): void {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  if (!fsSync.existsSync(packageJsonPath)) {
+    console.error(`❌ ERROR: Must be run from project root`);
+    console.error(`   Current directory: ${process.cwd()}`);
+    console.error(`   This script should be run from the workspace root, not from sveltekit-frontend/`);
+    console.error(`\n   Fix: cd $(git rev-parse --show-toplevel) && npx tsx scripts/atlas/duckdb/build-vector-index-lanes.mts`);
+    process.exit(1);
+  }
+}
 const TURBOVEC_OUTPUT_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k-turbovec.ndjson');
 const REPORT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'vector-index-lanes.json');
 const QDRANT_COLLECTION = 'codebase_chunks_384_hybrid';
@@ -301,7 +317,10 @@ function topKOverlap(expected: Array<{ packet_key: string }>, actual: Array<{ pa
 }
 
 async function main() {
+  validateWorkingDirectory();
+
   console.log(`🔨 Building 384-vector index lanes from snapshot (limit=${limit})`);
+  console.log(`Working directory: ${process.cwd()}`);
   console.log(`DuckDB threads: ${process.env.ATLAS_DUCKDB_THREADS || 'auto'}`);
 
   await fs.mkdir(SNAPSHOT_DIR, { recursive: true });

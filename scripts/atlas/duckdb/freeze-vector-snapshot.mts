@@ -7,9 +7,13 @@
  *
  * Usage:
  *   npx tsx scripts/atlas/duckdb/freeze-vector-snapshot.mts [--limit=5000] [--verify]
+ *
+ * ⚠️ MUST be run from project root, NOT sveltekit-frontend/
+ * This prevents creating duplicate DuckDB files in wrong locations.
  */
 
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -30,6 +34,18 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const SNAPSHOT_DIR = path.join(REPO_ROOT, '.tmp', 'atlas-vector-snapshots');
 const MANIFEST_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k-manifest.json');
 const PARQUET_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k.parquet');
+
+/** Verify working directory is project root */
+function validateWorkingDirectory(): void {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  if (!fsSync.existsSync(packageJsonPath)) {
+    console.error(`❌ ERROR: Must be run from project root`);
+    console.error(`   Current directory: ${process.cwd()}`);
+    console.error(`   This script should be run from the workspace root, not from sveltekit-frontend/`);
+    console.error(`\n   Fix: cd $(git rev-parse --show-toplevel) && npx tsx scripts/atlas/duckdb/freeze-vector-snapshot.mts`);
+    process.exit(1);
+  }
+}
 
 const args = process.argv.slice(2);
 const limit = parseIntegerFlag('--limit', 5000);
@@ -52,7 +68,10 @@ function stableHash(value: unknown): string {
 }
 
 async function main() {
+  validateWorkingDirectory();
+
   console.log(`🔨 Freezing ${limit}-packet vector snapshot...`);
+  console.log(`Working directory: ${process.cwd()}`);
   console.log(`Contract: ${EMBEDDINGGEMMA_PREFIX384_V1}`);
   console.log(`DuckDB output: ${path.relative(REPO_ROOT, PARQUET_PATH)}`);
   console.log(`Threads: ${process.env.ATLAS_DUCKDB_THREADS || 'auto'}`);

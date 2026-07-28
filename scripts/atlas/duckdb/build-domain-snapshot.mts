@@ -2,17 +2,37 @@
 /**
  * Build a 5,000-packet local DuckDB snapshot from PostgreSQL.
  * Usage: npx tsx scripts/atlas/duckdb/build-domain-snapshot.mts [--limit 5000] [--verify]
+ *
+ * ⚠️ MUST be run from project root, NOT sveltekit-frontend/
+ * This prevents creating duplicate DuckDB files in wrong locations.
  */
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import { createAtlasDuckDB, attachCanonicalPostgres, buildCorpusSnapshot, buildDomainTrainingRows } from '../../../packages/atlas-duckdb/src/index.ts';
+
+/** Verify working directory is project root */
+function validateWorkingDirectory(): void {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    console.error(`❌ ERROR: Must be run from project root`);
+    console.error(`   Current directory: ${process.cwd()}`);
+    console.error(`   This script should be run from the workspace root, not from sveltekit-frontend/`);
+    console.error(`\n   Fix: cd $(git rev-parse --show-toplevel) && npx tsx scripts/atlas/duckdb/build-domain-snapshot.mts`);
+    process.exit(1);
+  }
+}
 
 async function main() {
   const args = process.argv.slice(2);
   const limit = 5000;
   const verify = args.includes('--verify');
 
+  validateWorkingDirectory();
+
   console.log(`🔨 Building ${limit}-packet DuckDB snapshot...`);
-  console.log(`Database path: data/atlas-ml/atlas-analytics.duckdb`);
+  console.log(`Working directory: ${process.cwd()}`);
   console.log(`Threads: ${process.env.ATLAS_DUCKDB_THREADS || 'auto'}`);
   console.log(`Memory limit: ${process.env.ATLAS_DUCKDB_MEMORY_LIMIT || '4GB'}`);
 
