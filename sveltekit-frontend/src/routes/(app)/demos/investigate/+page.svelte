@@ -1,7 +1,9 @@
 <script lang="ts">
 	import AutonomousInvestigator from '$lib/components/agent/AutonomousInvestigator.svelte';
+	import AgentSpriteField from '$lib/components/agent/AgentSpriteField.svelte';
 	import RecommendationWidget from '$lib/components/recommendations/RecommendationWidget.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
+	import type { AgentVisualState } from '$lib/types/agent.js';
 
 	interface Investigation {
 		id: string;
@@ -135,6 +137,63 @@
 		if (score >= 0.6) return 'text-amber-400';
 		return 'text-red-400';
 	}
+
+	const demoAgentStates: AgentVisualState[] = [
+		{
+			agentId: 'trace-mcp',
+			state: 'SEARCHING',
+			progress: 32,
+			confidence: 0.58,
+			evidence: 0.42,
+			activity: 0.65,
+			clusterX: 8,
+			clusterY: 3,
+			previousX: -36,
+			previousY: -12,
+			x: 12,
+			y: 8,
+			spriteId: 1,
+			paletteIndex: 2,
+			animationId: 11,
+			updatedAtMs: 1_725_000_000_000,
+		},
+		{
+			agentId: 'turbovec',
+			state: 'ANALYZING',
+			progress: 68,
+			confidence: 0.74,
+			evidence: 0.64,
+			activity: 0.81,
+			clusterX: 14,
+			clusterY: 6,
+			previousX: 24,
+			previousY: -18,
+			x: 42,
+			y: 20,
+			spriteId: 2,
+			paletteIndex: 4,
+			animationId: 12,
+			updatedAtMs: 1_725_000_000_000,
+		},
+		{
+			agentId: 'ldr',
+			state: 'EDITING',
+			progress: 84,
+			confidence: 0.86,
+			evidence: 0.77,
+			activity: 0.49,
+			clusterX: 4,
+			clusterY: 11,
+			previousX: -14,
+			previousY: 18,
+			x: -28,
+			y: 30,
+			spriteId: 3,
+			paletteIndex: 1,
+			animationId: 14,
+			updatedAtMs: 1_725_000_000_000,
+		},
+	];
 </script>
 
 <svelte:head>
@@ -197,6 +256,18 @@
 			<div class="text-sm font-semibold text-sand-12">ReAct Agent</div>
 			<div class="text-xs text-sand-10 mt-1">LangChain + Ollama</div>
 		</div>
+	</div>
+
+	<!-- Agent Visual State Demo -->
+	<div class="panel p-4 space-y-3">
+		<div class="flex items-center justify-between">
+			<div>
+				<h2 class="text-lg font-semibold text-sand-12">Agent Visual State</h2>
+				<p class="text-xs text-sand-10">Interpolated browser state for future WebGPU sprite and progress rendering.</p>
+			</div>
+			<div class="text-xs text-sand-10">Canvas 2D fallback</div>
+		</div>
+		<AgentSpriteField states={demoAgentStates} width={1024} height={260} />
 	</div>
 
 	<!-- Main Layout: Investigator + Recommendations Sidebar -->

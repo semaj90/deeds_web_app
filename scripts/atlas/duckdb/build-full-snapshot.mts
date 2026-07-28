@@ -2,16 +2,49 @@
 /**
  * Build full-corpus DuckDB snapshot (61,659 packets).
  * Usage: npx tsx scripts/atlas/duckdb/build-full-snapshot.mts [--verify]
+ *
+ * ⚠️ MUST be run from project root, NOT sveltekit-frontend/
+ * This prevents creating duplicate DuckDB files in wrong locations.
  */
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createAtlasDuckDB, attachCanonicalPostgres, buildCorpusSnapshot, buildDomainTrainingRows } from '../../../packages/atlas-duckdb/src/index.js';
+
+/** Verify working directory is project root */
+function validateWorkingDirectory(): void {
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+  const cwd = process.cwd();
+  const expectedPath = path.join(cwd, 'scripts', 'atlas', 'duckdb', 'build-full-snapshot.mts');
+  const actualPath = scriptDir + '/build-full-snapshot.mts';
+
+  // Heuristic: check if we're in the right place by looking for package.json
+  const packageJsonPath = path.join(cwd, 'package.json');
+  const hasPackageJson = (() => {
+    try {
+      return require('node:fs').existsSync(packageJsonPath);
+    } catch {
+      return false;
+    }
+  })();
+
+  if (!hasPackageJson) {
+    console.error(`❌ ERROR: Must be run from project root`);
+    console.error(`   Current directory: ${cwd}`);
+    console.error(`   This script should be run from the workspace root, not from sveltekit-frontend/`);
+    console.error(`\n   Fix: cd $(git rev-parse --show-toplevel) && npx tsx scripts/atlas/duckdb/build-full-snapshot.mts`);
+    process.exit(1);
+  }
+}
 
 async function main() {
   const args = process.argv.slice(2);
   const verify = args.includes('--verify');
 
+  validateWorkingDirectory();
+
   console.log(`🔨 Building full-corpus DuckDB snapshot (61,659 packets)...`);
-  console.log(`Database path: data/atlas-ml/atlas-analytics.duckdb`);
+  console.log(`Working directory: ${process.cwd()}`);
   console.log(`Threads: ${process.env.ATLAS_DUCKDB_THREADS || 'auto'}`);
   console.log(`Memory limit: ${process.env.ATLAS_DUCKDB_MEMORY_LIMIT || '4GB'}`);
 

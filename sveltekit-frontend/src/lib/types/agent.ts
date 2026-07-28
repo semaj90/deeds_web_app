@@ -113,10 +113,66 @@ export interface CodeSearchResult {
  pattern: string;
 	path: string;
 	matches: Array<{
-	file: string;
-	line: number;
-	content: string;
+		file: string;
+		line: number;
+		content: string;
  }>;
+}
+
+/**
+ * Visual state used by canvas / WebGPU agent renderers.
+ * Keep this separate from task execution state so UI interpolation can evolve independently.
+ */
+export type AgentVisualStatus =
+	| 'IDLE'
+	| 'SEARCHING'
+	| 'ANALYZING'
+	| 'EDITING'
+	| 'TESTING'
+	| 'BLOCKED'
+	| 'DONE';
+
+export interface AgentVisualState {
+	agentId: string;
+	state: AgentVisualStatus;
+	progress: number;
+	confidence: number;
+	evidence: number;
+	activity: number;
+	clusterX: number;
+	clusterY: number;
+	previousX: number;
+	previousY: number;
+	x: number;
+	y: number;
+	spriteId: number;
+	paletteIndex: number;
+	animationId: number;
+	updatedAtMs: number;
+}
+
+export interface AgentVisualInstance extends AgentVisualState {
+	interpolatedX: number;
+	interpolatedY: number;
+	alpha: number;
+}
+
+export interface AgentSpriteManifest {
+	spriteId: number;
+	name: string;
+	width: number;
+	height: number;
+	bitsPerPixel: 2 | 4;
+	frameCount: number;
+	frameDurationMs: number;
+	atlasX: number;
+	atlasY: number;
+	allowedAgentStates: AgentVisualStatus[];
+}
+
+export interface AgentVisualFrame {
+	frameTimeMs: number;
+	instances: AgentVisualInstance[];
 }
 
 
