@@ -104,6 +104,7 @@ import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
+import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
 import { ripgrepSearch } from '../lib/server/agent/tools/ripgrep-search.js';
 import { explainWikiPage, getWikiStatus, refreshDirectory, searchWiki } from '../lib/server/kb/wiki-logic.js';
 import { buildSubgraphV1SeedNeighborhood } from '../lib/server/retrieval/subgraph-seed-neighborhood.js';
@@ -119,6 +120,7 @@ import {
 import { buildTaxonomyTopologyPacket } from '../lib/server/atlas/taxonomy-topology-packet.js';
 import { getFeatureDocumentEvidence } from '../lib/server/atlas/feature-document-evidence.js';
 import { getParentAtlasWorkstationSnapshot } from '../lib/server/atlas/parent-atlas-workstation.js';
+import { createMiniforgeNlpSidecarClient } from '../lib/server/nlp/miniforge-nlp-sidecar.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
@@ -140,6 +142,180 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
+type ServiceWorkerKind =
+  | 'context.build_ace_packet'
+  | 'context.build_indexed_source_packet'
+  | 'miniforge.analyze'
+  | 'miniforge.extract';
+type ServiceWorkerStatus = 'queued' | 'running' | 'completed' | 'failed';
+
+interface ServiceWorkerJob<T = unknown> {
+  id: string;
+  kind: ServiceWorkerKind;
+  status: ServiceWorkerStatus;
+  createdAt: string;
+  startedAt?: string;
+  finishedAt?: string;
+  payload: Record<string, unknown>;
+  result?: T;
+  error?: string;
+}
+
+const SERVICE_WORKER_CONCURRENCY = Math.max(
+  1,
+  Math.min(Number(process.env.TRACE_SERVICE_WORKER_CONCURRENCY ?? '2'), 4)
+);
+const serviceWorkerJobs = new Map<string, ServiceWorkerJob>();
+const serviceWorkerQueue: string[] = [];
+let serviceWorkerActive = 0;
+
+function makeServiceWorkerId(kind: ServiceWorkerKind): string {
+  const safeKind = kind.replace(/[^a-z0-9]+/gi, '_').replace(/^_+|_+$/g, '');
+  return `${safeKind}_${Date.now()}_${Math.random().toString(16).slice(2, 8)}`;
+}
+
+function snapshotServiceWorkers() {
+  const jobs = Array.from(serviceWorkerJobs.values());
+  return {
+    concurrency: SERVICE_WORKER_CONCURRENCY,
+    active: serviceWorkerActive,
+    queued: serviceWorkerQueue.length,
+    completed: jobs.filter((job) => job.status === 'completed').length,
+    failed: jobs.filter((job) => job.status === 'failed').length,
+    running: jobs.filter((job) => job.status === 'running').length,
+    total: jobs.length,
+  };
+}
+
+function getMiniforgeClient() {
+  return createMiniforgeNlpSidecarClient(
+    process.env.MINIFORGE_SIDECAR_URL ?? process.env.LANGEXTRACT_URL ?? ENV.MINIFORGE_SIDECAR_URL ?? ENV.LANGEXTRACT_URL,
+  );
+}
+
+function enqueueServiceWorker<T>(
+  kind: ServiceWorkerKind,
+  payload: Record<string, unknown>,
+): ServiceWorkerJob<T> {
+  const job: ServiceWorkerJob<T> = {
+    id: makeServiceWorkerId(kind),
+    kind,
+    status: 'queued',
+    createdAt: new Date().toISOString(),
+    payload,
+  };
+
+  serviceWorkerJobs.set(job.id, job);
+  serviceWorkerQueue.push(job.id);
+  void pumpServiceWorkers();
+  return job;
+}
+
+async function pumpServiceWorkers(): Promise<void> {
+  if (serviceWorkerActive >= SERVICE_WORKER_CONCURRENCY) return;
+
+  while (serviceWorkerActive < SERVICE_WORKER_CONCURRENCY && serviceWorkerQueue.length > 0) {
+    const jobId = serviceWorkerQueue.shift();
+    if (!jobId) break;
+
+    const job = serviceWorkerJobs.get(jobId);
+    if (!job || job.status !== 'queued') continue;
+
+    serviceWorkerActive += 1;
+    job.status = 'running';
+    job.startedAt = new Date().toISOString();
+
+    void (async () => {
+      try {
+        const payload = job.payload;
+        let result: unknown;
+
+        if (job.kind === 'context.build_ace_packet') {
+          const sourceRef = typeof payload.sourceRef === 'string' ? payload.sourceRef : undefined;
+          const markdown = typeof payload.markdown === 'string' ? payload.markdown : undefined;
+          const query = typeof payload.query === 'string' ? payload.query : undefined;
+          const featureId = typeof payload.featureId === 'string' ? payload.featureId : undefined;
+          const forceRefresh = Boolean(payload.forceRefresh);
+
+          if (!sourceRef && !markdown) {
+            throw new Error('sourceRef or markdown is required');
+          }
+
+          result = await buildAcePacketFromSource({
+            sourceRef,
+            markdown,
+            query,
+            featureId,
+            forceRefresh,
+            asLatest: true,
+          });
+        } else if (job.kind === 'context.build_indexed_source_packet') {
+          result = await buildIndexedSourcePacket({
+            sourceRef: String(payload.sourceRef ?? ''),
+            query: typeof payload.query === 'string' ? payload.query : undefined,
+            featureId: typeof payload.featureId === 'string' ? payload.featureId : undefined,
+            forceRefresh: Boolean(payload.forceRefresh),
+          });
+        } else if (job.kind === 'miniforge.analyze') {
+          const client = getMiniforgeClient();
+          const text = String(payload.text ?? '');
+          if (!text.trim()) {
+            throw new Error('text is required');
+          }
+
+          result = await client.analyze({
+            text,
+            sourceType: typeof payload.sourceType === 'string' ? payload.sourceType : undefined,
+            extractionMode: typeof payload.extractionMode === 'string' ? payload.extractionMode : undefined,
+            documentId: typeof payload.documentId === 'string' ? payload.documentId : undefined,
+            sourceRef: typeof payload.sourceRef === 'string' ? payload.sourceRef : undefined,
+            packetKey: typeof payload.packetKey === 'string' ? payload.packetKey : undefined,
+            language: typeof payload.language === 'string' ? payload.language : undefined,
+            modelId: typeof payload.modelId === 'string' ? payload.modelId : undefined,
+            maxChars: payload.maxChars !== undefined ? Number(payload.maxChars) : undefined,
+          });
+        } else if (job.kind === 'miniforge.extract') {
+          const client = getMiniforgeClient();
+          const text = String(payload.text ?? '');
+          if (!text.trim()) {
+            throw new Error('text is required');
+          }
+
+          result = await client.extract({
+            text,
+            sourceType: typeof payload.sourceType === 'string' ? payload.sourceType : undefined,
+            extractionMode: typeof payload.extractionMode === 'string' ? payload.extractionMode : undefined,
+            documentId: typeof payload.documentId === 'string' ? payload.documentId : undefined,
+            sourceRef: typeof payload.sourceRef === 'string' ? payload.sourceRef : undefined,
+            packetKey: typeof payload.packetKey === 'string' ? payload.packetKey : undefined,
+            language: typeof payload.language === 'string' ? payload.language : undefined,
+            modelId: typeof payload.modelId === 'string' ? payload.modelId : undefined,
+            maxChars: payload.maxChars !== undefined ? Number(payload.maxChars) : undefined,
+          });
+        } else {
+          throw new Error(`Unsupported service worker kind: ${job.kind}`);
+        }
+
+        job.result = result as T;
+        job.status = 'completed';
+      } catch (error) {
+        job.status = 'failed';
+        job.error = error instanceof Error ? error.message : String(error);
+      } finally {
+        job.finishedAt = new Date().toISOString();
+        serviceWorkerActive = Math.max(0, serviceWorkerActive - 1);
+        void pumpServiceWorkers();
+      }
+    })().catch((error) => {
+      job.status = 'failed';
+      job.error = error instanceof Error ? error.message : String(error);
+      job.finishedAt = new Date().toISOString();
+      serviceWorkerActive = Math.max(0, serviceWorkerActive - 1);
+      void pumpServiceWorkers();
+    });
+  }
+}
+
 // Two separate flags so unrelated things stop riding the same env var:
 //   MCP_LEGACY_ALIASES       — bare-name back-compat aliases in new_tools.ts
 //                              (`trace_search`, `wiki_note_lookup`).
@@ -154,6 +330,7 @@ registerAdminTools(server);
 registerSkillTools(server);
 registerLegalSkillsTools(server);
 registerEngramTools(server, REDIS_URL);
+registerAtlasEmbeddingTools(server, REDIS_URL);
 if (ENABLE_OPTIONAL_REGISTRIES) {
   registerCodebaseTools(server);
   registerResearchTools(server);
@@ -9712,6 +9889,7 @@ server.registerTool(
       query: z.string().optional().describe('Optional synthesis query/title for the packet'),
       featureId: z.string().optional().describe('Optional feature identity to thread into the packet'),
       forceRefresh: z.boolean().default(false).describe('Bypass sourceRef packet cache and rebuild'),
+      defer: z.boolean().default(false).describe('Queue the packet build on the local service worker and return a job id'),
     }),
   },
   async (input: Record<string, unknown>) => {
@@ -9721,6 +9899,24 @@ server.registerTool(
       const query = typeof input.query === 'string' ? input.query : undefined;
       const featureId = typeof input.featureId === 'string' ? input.featureId : undefined;
       const forceRefresh = Boolean(input.forceRefresh);
+      const defer = Boolean(input.defer);
+
+      if (defer) {
+        const job = enqueueServiceWorker('context.build_ace_packet', {
+          sourceRef,
+          markdown,
+          query,
+          featureId,
+          forceRefresh,
+        });
+
+        return {
+          status: 'queued',
+          job_id: job.id,
+          job_kind: job.kind,
+          worker: snapshotServiceWorkers(),
+        };
+      }
 
       if (!sourceRef && !markdown) {
         return { status: 'error', error: 'sourceRef or markdown is required' };
@@ -9767,10 +9963,28 @@ server.registerTool(
       query: z.string().optional().describe('Optional query label for the compact packet'),
       featureId: z.string().optional().describe('Optional feature override'),
       forceRefresh: z.boolean().default(false).describe('Bypass existing Valkey packet cache and rebuild'),
+      defer: z.boolean().default(false).describe('Queue the packet build on the local service worker and return a job id'),
     }),
   },
   async (input: Record<string, unknown>) => {
     try {
+      const defer = Boolean(input.defer);
+      if (defer) {
+        const job = enqueueServiceWorker('context.build_indexed_source_packet', {
+          sourceRef: String(input.sourceRef ?? ''),
+          query: typeof input.query === 'string' ? input.query : undefined,
+          featureId: typeof input.featureId === 'string' ? input.featureId : undefined,
+          forceRefresh: Boolean(input.forceRefresh),
+        });
+
+        return {
+          status: 'queued',
+          job_id: job.id,
+          job_kind: job.kind,
+          worker: snapshotServiceWorkers(),
+        };
+      }
+
       const result = await buildIndexedSourcePacket({
         sourceRef: String(input.sourceRef ?? ''),
         query: typeof input.query === 'string' ? input.query : undefined,
@@ -9797,6 +10011,208 @@ server.registerTool(
       const errorMsg = err instanceof Error ? err.message : String(err);
       return { status: 'error', error: errorMsg.slice(0, 500) };
     }
+  }
+);
+
+server.registerTool(
+  'service_workers.status',
+  {
+    description: 'Return the current local trace service worker queue status and recent job summaries.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    const jobs = Array.from(serviceWorkerJobs.values())
+      .slice(-10)
+      .map((job) => ({
+        id: job.id,
+        kind: job.kind,
+        status: job.status,
+        createdAt: job.createdAt,
+        startedAt: job.startedAt ?? null,
+        finishedAt: job.finishedAt ?? null,
+        error: job.error ?? null,
+      }));
+
+    return {
+      status: 'success',
+      worker: snapshotServiceWorkers(),
+      jobs,
+    };
+  }
+);
+
+server.registerTool(
+  'service_workers.result',
+  {
+    description: 'Fetch the result of a queued local trace service worker job by job id.',
+    inputSchema: z.object({
+      job_id: z.string().min(1).describe('Job id returned by service_workers.status or a deferred packet tool'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    const jobId = typeof input.job_id === 'string' ? input.job_id : '';
+    const job = serviceWorkerJobs.get(jobId);
+    if (!job) {
+      return { status: 'error', error: `Unknown job id: ${jobId}` };
+    }
+
+    return {
+      status: job.status,
+      job_id: job.id,
+      job_kind: job.kind,
+      createdAt: job.createdAt,
+      startedAt: job.startedAt ?? null,
+      finishedAt: job.finishedAt ?? null,
+      result: job.result ?? null,
+      error: job.error ?? null,
+    };
+  }
+);
+
+server.registerTool(
+  'miniforge.health',
+  {
+    description: 'Check the local Miniforge CUDA sidecar used for NLP and analysis.',
+    inputSchema: z.object({}),
+  },
+  async () => {
+    const client = getMiniforgeClient();
+    const health = await client.health();
+    return {
+      status: health.ready ? 'success' : 'error',
+      ready: health.ready,
+      sidecar_url: process.env.MINIFORGE_SIDECAR_URL ?? process.env.LANGEXTRACT_URL ?? ENV.MINIFORGE_SIDECAR_URL ?? ENV.LANGEXTRACT_URL ?? null,
+      model: health.model ?? null,
+      capabilities: health.capabilities ?? null,
+    };
+  }
+);
+
+server.registerTool(
+  'miniforge.analyze',
+  {
+    description:
+      'Run Miniforge CUDA-backed NLP analysis over text for entities, relationships, chunks, and features.',
+    inputSchema: z.object({
+      text: z.string().min(1).describe('Text to analyze'),
+      sourceType: z.enum(['plain_text', 'docling_markdown', 'docling_json', 'ocr_text', 'transcript', 'codebase', 'general']).default('plain_text'),
+      extractionMode: z.enum(['entities', 'relationships', 'concepts', 'full']).default('full'),
+      documentId: z.string().optional(),
+      sourceRef: z.string().optional(),
+      packetKey: z.string().optional(),
+      language: z.string().optional(),
+      modelId: z.string().optional(),
+      maxChars: z.number().int().positive().max(200000).default(50000),
+      defer: z.boolean().default(false).describe('Queue the sidecar call on the local service worker and return a job id'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    const defer = Boolean(input.defer);
+    const payload = {
+      text: String(input.text ?? ''),
+      sourceType: typeof input.sourceType === 'string' ? input.sourceType : 'plain_text',
+      extractionMode: typeof input.extractionMode === 'string' ? input.extractionMode : 'full',
+      documentId: typeof input.documentId === 'string' ? input.documentId : undefined,
+      sourceRef: typeof input.sourceRef === 'string' ? input.sourceRef : undefined,
+      packetKey: typeof input.packetKey === 'string' ? input.packetKey : undefined,
+      language: typeof input.language === 'string' ? input.language : undefined,
+      modelId: typeof input.modelId === 'string' ? input.modelId : undefined,
+      maxChars: typeof input.maxChars === 'number' ? input.maxChars : 50000,
+    };
+
+    if (defer) {
+      const job = enqueueServiceWorker('miniforge.analyze', payload);
+      return { status: 'queued', job_id: job.id, job_kind: job.kind, worker: snapshotServiceWorkers() };
+    }
+
+    const client = getMiniforgeClient();
+    const result = await client.analyze({
+      text: payload.text,
+      sourceType: payload.sourceType as any,
+      extractionMode: payload.extractionMode as any,
+      documentId: payload.documentId,
+      sourceRef: payload.sourceRef,
+      packetKey: payload.packetKey,
+      language: payload.language,
+      modelId: payload.modelId,
+      maxChars: payload.maxChars,
+    });
+
+    return {
+      status: 'success',
+      document_id: result.document_id,
+      source_type: result.source_type,
+      extraction_mode: result.extraction_mode,
+      entities: result.entities.slice(0, 20),
+      relationships: result.relationships.slice(0, 20),
+      concepts: result.concepts.slice(0, 20),
+      chunks: result.chunks.slice(0, 20),
+      features: result.features.slice(0, 20),
+      metadata: result.metadata,
+      capabilities: result.capabilities,
+      processing_time_ms: result.processing_time_ms,
+    };
+  }
+);
+
+server.registerTool(
+  'miniforge.extract',
+  {
+    description:
+      'Run Miniforge CUDA-backed extraction over text and return normalized structure plus extracted entities.',
+    inputSchema: z.object({
+      text: z.string().min(1).describe('Text to extract from'),
+      sourceType: z.enum(['plain_text', 'docling_markdown', 'docling_json', 'ocr_text', 'transcript', 'codebase', 'general']).default('plain_text'),
+      extractionMode: z.enum(['entities', 'relationships', 'concepts', 'full']).default('full'),
+      documentId: z.string().optional(),
+      sourceRef: z.string().optional(),
+      packetKey: z.string().optional(),
+      language: z.string().optional(),
+      modelId: z.string().optional(),
+      maxChars: z.number().int().positive().max(200000).default(50000),
+      defer: z.boolean().default(false).describe('Queue the sidecar call on the local service worker and return a job id'),
+    }),
+  },
+  async (input: Record<string, unknown>) => {
+    const defer = Boolean(input.defer);
+    const payload = {
+      text: String(input.text ?? ''),
+      sourceType: typeof input.sourceType === 'string' ? input.sourceType : 'plain_text',
+      extractionMode: typeof input.extractionMode === 'string' ? input.extractionMode : 'full',
+      documentId: typeof input.documentId === 'string' ? input.documentId : undefined,
+      sourceRef: typeof input.sourceRef === 'string' ? input.sourceRef : undefined,
+      packetKey: typeof input.packetKey === 'string' ? input.packetKey : undefined,
+      language: typeof input.language === 'string' ? input.language : undefined,
+      modelId: typeof input.modelId === 'string' ? input.modelId : undefined,
+      maxChars: typeof input.maxChars === 'number' ? input.maxChars : 50000,
+    };
+
+    if (defer) {
+      const job = enqueueServiceWorker('miniforge.extract', payload);
+      return { status: 'queued', job_id: job.id, job_kind: job.kind, worker: snapshotServiceWorkers() };
+    }
+
+    const client = getMiniforgeClient();
+    const result = await client.extract({
+      text: payload.text,
+      sourceType: payload.sourceType as any,
+      extractionMode: payload.extractionMode as any,
+      documentId: payload.documentId,
+      sourceRef: payload.sourceRef,
+      packetKey: payload.packetKey,
+      language: payload.language,
+      modelId: payload.modelId,
+      maxChars: payload.maxChars,
+    });
+
+    return {
+      status: 'success',
+      document_id: result.document_id,
+      structure: result.structure,
+      entities: result.entities.slice(0, 20),
+      metadata: result.metadata,
+      processing_time: result.processing_time,
+    };
   }
 );
 

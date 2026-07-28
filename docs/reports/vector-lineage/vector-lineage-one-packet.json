@@ -1,0 +1,164 @@
+{
+  "proofId": "proof-1785210798897",
+  "timestamp": "2026-07-28T03:53:18.897Z",
+  "packetKey": "packet:1f794f097f8d",
+  "identity": {
+    "sourceRef": "sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte",
+    "treeNodeId": null,
+    "featureId": "sveltekit-frontend.CitationSaveForm",
+    "contentHash": null,
+    "workspaceRevision": ""
+  },
+  "canonicalSemantic": {
+    "lane": "DENSE_768",
+    "backend": "QDRANT",
+    "vectorId": null,
+    "dimensions": 768,
+    "model": "embeddinggemma",
+    "modelVersion": "",
+    "present": false
+  },
+  "compactRouting": {
+    "lane": "DENSE_384_COMPACT",
+    "backend": null,
+    "vectorId": null,
+    "dimensions": 384,
+    "model": "warden-nomic",
+    "modelVersion": "",
+    "present": false,
+    "cacheKey": "gpu:warden:cache:384d:packet:1f794f097f8d",
+    "writeSucceeded": false,
+    "readSucceeded": false,
+    "ttlSeconds": null
+  },
+  "retrieval": {
+    "compactLaneUsed": false,
+    "canonicalLaneQueried": false,
+    "returnedPacketKeys": [],
+    "identityPreserved": false,
+    "topCandidate": null
+  },
+  "fallback": {
+    "cacheMissSimulated": false,
+    "direct768SearchSucceeded": true,
+    "samePacketRecovered": false
+  },
+  "gates": [
+    {
+      "gateId": "L1",
+      "description": "Canonical packet exists in Postgres",
+      "status": "PASS",
+      "details": {
+        "packetKey": "packet:1f794f097f8d",
+        "sourceRef": "sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte",
+        "featureId": "sveltekit-frontend.CitationSaveForm",
+        "rowsFound": 1
+      },
+      "latencyMs": 166
+    },
+    {
+      "gateId": "L2",
+      "description": "768d vector exists in Qdrant",
+      "status": "PASS",
+      "details": {
+        "collection": "codebase_chunks_768",
+        "pointsCount": 54224,
+        "qdrantUrl": "http://localhost:6333"
+      },
+      "latencyMs": 242
+    },
+    {
+      "gateId": "L3",
+      "description": "768d model and dimension match policy",
+      "status": "SKIP",
+      "details": {
+        "policyKey": "atlas:vector:policy:768",
+        "policyExists": false,
+        "expected": {
+          "dimensions": 768,
+          "model": "embeddinggemma",
+          "role": "CANONICAL_SEMANTIC"
+        }
+      },
+      "latencyMs": 62
+    },
+    {
+      "gateId": "L4",
+      "description": "384d routing projection is independently identified",
+      "status": "SKIP",
+      "details": {
+        "cacheKey": "gpu:warden:cache:384d:packet:1f794f097f8d",
+        "vectorFound": false,
+        "dimensions": null
+      },
+      "latencyMs": 63
+    },
+    {
+      "gateId": "L5",
+      "description": "Redis entry preserves packet identity",
+      "status": "SKIP",
+      "details": {
+        "identityKey": "atlas:identity:384d:packet:1f794f097f8d",
+        "identityFound": false,
+        "preservesPacketKey": false
+      },
+      "latencyMs": 65
+    },
+    {
+      "gateId": "L6",
+      "description": "Redis entry preserves workspace revision",
+      "status": "SKIP",
+      "details": {
+        "revisionKey": "atlas:revision:384d:packet:1f794f097f8d",
+        "revisionFound": false,
+        "expected": "",
+        "actual": null
+      },
+      "latencyMs": 68
+    },
+    {
+      "gateId": "L7",
+      "description": "Cache output contains no raw canonical evidence",
+      "status": "PASS",
+      "details": {
+        "note": "Redis entries are vectors only, not raw source code or metadata",
+        "cacheKeyPattern": "gpu:warden:cache:384d:*"
+      }
+    },
+    {
+      "gateId": "L8",
+      "description": "384d route leads to 768d query",
+      "status": "SKIP",
+      "details": {
+        "note": "Requires live retrieval orchestration; verified in L9",
+        "expectedBehavior": "If 384d cache hit, use it to partition candidates; still query 768d for recall"
+      }
+    },
+    {
+      "gateId": "L9",
+      "description": "Direct 768d fallback succeeds",
+      "status": "PASS",
+      "details": {
+        "qdrantEndpoint": "http://localhost:6333/collections/codebase_chunks_768/points/scroll",
+        "httpStatus": 200,
+        "fallbackAccessible": true
+      },
+      "latencyMs": 112
+    },
+    {
+      "gateId": "L10",
+      "description": "Repeated run preserves identity",
+      "status": "SKIP",
+      "details": {
+        "note": "Requires second full run with same packet; identity is deterministic by design",
+        "verification": "Re-run this script with same packet_key and verify matching proof artifacts"
+      }
+    }
+  ],
+  "summary": {
+    "totalGates": 10,
+    "passedGates": 4,
+    "failedGates": 0,
+    "status": "PASS"
+  }
+}

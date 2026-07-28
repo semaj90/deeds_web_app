@@ -1,6 +1,6 @@
 # Feature Card Semantics Report
 
-Generated: 2026-05-26T23:03:58.613Z
+Generated: 2026-07-28T04:43:01.808Z
 
 Cards: 19  |  Feature cards: 19  |  Rich cards: 19
 
@@ -89,6 +89,19 @@ Cards: 19  |  Feature cards: 19  |  Rich cards: 19
 - feature-map:legal-product (feature) [1.953]
 - feature-map:feature-atlas (feature) [1.952]
 - feature-map:karpathy-blend (feature) [1.952]
+
+### provenance-lane
+- query: provenance aware multi view classification clustering feature families
+- feature-map:hyperrag-fusion (feature) [2.955]
+- feature-map:ingestion-layer (feature) [2.953]
+- feature-map:grpc-mcp (feature) [2.951]
+- feature-map:gpu-ast (feature) [2.681]
+- feature-map:gpu-compute-plane (feature) [1.956]
+- feature-map:atlas-reconciliation (feature) [1.954]
+- feature-map:ace-envelope (feature) [1.953]
+- feature-map:hypergraph-4d (feature) [1.953]
+- feature-map:legal-product (feature) [1.953]
+- feature-map:feature-atlas (feature) [1.952]
 
 ### offline-lane
 - query: duckdb couchdb offline processing cache export

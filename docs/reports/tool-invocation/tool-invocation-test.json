@@ -1,0 +1,50 @@
+{
+  "timestamp": "2026-07-28T04:09:32.543Z",
+  "tools": {
+    "embedding_keywords": {
+      "status": "PASS",
+      "details": {
+        "keysScanned": 0,
+        "totalKeysAvailable": 0,
+        "topKeywords": []
+      }
+    },
+    "embedding_cluster_tags": {
+      "status": "PASS",
+      "details": {
+        "cellsScanned": 0,
+        "totalCellsAvailable": 0,
+        "topClusters": []
+      }
+    },
+    "embedding_neighbors": {
+      "status": "PASS",
+      "details": {
+        "queryStructure": {
+          "collection": "codebase_chunks_768",
+          "vectorDim": 768,
+          "limit": 10,
+          "payload": [
+            "packet_key",
+            "cluster_id",
+            "tags"
+          ]
+        },
+        "readyForExecution": true
+      }
+    },
+    "embedding_all_tags": {
+      "status": "PASS",
+      "details": {
+        "parallelExecution": {
+          "keywordKeysFound": 0,
+          "somCellsFound": 0,
+          "packetKey": "packet:1f794f097f8d",
+          "timestamp": "2026-07-28T04:09:33.123Z",
+          "vectorLane": "DENSE_768"
+        },
+        "orchestrationSuccessful": true
+      }
+    }
+  }
+}

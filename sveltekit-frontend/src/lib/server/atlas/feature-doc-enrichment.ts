@@ -5,6 +5,7 @@ import { tracedQuery } from '$lib/server/db/client.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 import { CLASSIFIER_VERSION } from '$lib/server/enrichment/domain-classifier.js';
 import { buildIndexedSourcePacket } from '$lib/server/ace/indexed-source-packet.js';
+import { OntologyLinkedTupleV1Schema, type OntologyLinkedTupleV1 } from './contracts/ontology-linked-tuple-v1.js';
 import { selectFeatureScopedRows } from './feature-scope-query.js';
 import {
   FeatureDocumentManifestSchema,
@@ -106,6 +107,7 @@ export const FeatureEvidenceTupleSchema = z.object({
   conceptIds: z.array(z.string().min(1)).max(32),
   astSymbols: z.array(z.string().min(1)).max(64),
   lexicalFeatures: z.array(z.string().min(1)).max(64),
+  ontologyLinkedTuples: z.array(OntologyLinkedTupleV1Schema).max(64).default([]),
   entities: z.array(
     z.object({
       type: z.string().min(1),
@@ -123,6 +125,7 @@ export const FeatureEvidenceTupleSchema = z.object({
 });
 
 export type FeatureEvidenceTuple = z.infer<typeof FeatureEvidenceTupleSchema>;
+export type OntologyLinkedTuple = OntologyLinkedTupleV1;
 
 export interface BuildFeatureDocEnrichmentPlanResult {
   evidence: FeatureDocumentEvidence;
@@ -537,6 +540,15 @@ export async function materializeFeatureEvidenceTuples(
     const lexical = lexicalMap.get(packetKey);
     const structural = structuralMap.get(packetKey);
     const sourceRef = String(row.source_ref ?? '').trim();
+    const ontologyIds = uniqueStable([
+      ...(ontology?.ontologyIds ?? []),
+      ...(manifestOkf?.semanticOntology.ontologyIds ?? []),
+    ]).slice(0, 32);
+    const conceptIds = uniqueStable([
+      ...(ontology?.conceptIds ?? []),
+      ...(manifestOkf?.semanticOntology.conceptIds ?? []),
+    ]).slice(0, 32);
+    const primaryLabel = row.domain_class || manifestOkf?.domainClassification.primaryDomain || plan.featureId;
 
     return FeatureEvidenceTupleSchema.parse({
       tupleId: sha256Hex(
@@ -555,19 +567,54 @@ export async function materializeFeatureEvidenceTuples(
       documentId: row.document_id || documentIdMap.get(sourceRef) || undefined,
       qdrantPointId: row.qdrant_point_id || undefined,
       domainClass: row.domain_class || manifestOkf?.domainClassification.primaryDomain || undefined,
-      ontologyIds: uniqueStable([
-        ...(ontology?.ontologyIds ?? []),
-        ...(manifestOkf?.semanticOntology.ontologyIds ?? []),
-      ]).slice(0, 32),
-      conceptIds: uniqueStable([
-        ...(ontology?.conceptIds ?? []),
-        ...(manifestOkf?.semanticOntology.conceptIds ?? []),
-      ]).slice(0, 32),
+      ontologyIds,
+      conceptIds,
       astSymbols: structural?.astSymbols ?? [],
       lexicalFeatures: uniqueStable([
         ...(lexical?.lexicalFeatures ?? []),
         ...(manifestOkf?.keywordCorpus.keywords ?? []),
       ]).slice(0, 64),
+      ontologyLinkedTuples: [
+        {
+          tupleId: sha256Hex(
+            [
+              'ontology-linked-tuple.v1',
+              plan.featureId,
+              sourceRef,
+              packetKey,
+            ].join('\0')
+          ),
+          schemaVersion: 'ontology-linked-tuple.v1',
+          packetKey: packetKey || undefined,
+          sourceRef,
+          treeNodeId: row.tree_node_id || undefined,
+          documentId: row.document_id || documentIdMap.get(sourceRef) || undefined,
+          titleId: manifestOkf ? `okf:${plan.featureId}` : undefined,
+          surfaceText: primaryLabel,
+          tokenIndex: 0,
+          partOfSpeech: null,
+          label: primaryLabel,
+          labelKind: row.domain_class ? 'ontology' : 'tag',
+          labelSource: row.domain_class ? 'semantic_tagger' : 'manual',
+          ontologyIds,
+          conceptIds,
+          confidence: row.domain_class ? 0.86 : 0.62,
+          evidenceState: plan.evidenceState,
+          provenance: {
+            sourceTables: uniqueStable([
+              'atlas_packets',
+              ontology ? 'feature_ontology_tuples' : '',
+              lexical ? 'feature_lexical_facts' : '',
+              structural ? 'feature_structural_facts' : '',
+              manifestOkf ? 'feature_document_manifest.okf' : '',
+            ].filter(Boolean)).slice(0, 12),
+            labelerVersion: plan.classifierPlan.classifierVersion ?? null,
+            taggerVersion: lexical?.lexicalExtractorVersion ?? null,
+            ontologyVersion: ontology?.ontologyVersion ?? null,
+            nlpVersion: manifestOkf?.nlp.langextract_version ?? null,
+          },
+        },
+      ],
       entities: lexical?.entities ?? [],
       evidenceState: plan.evidenceState,
       provenance: {
@@ -621,6 +668,45 @@ export async function materializeFeatureEvidenceTuples(
           conceptIds: manifestOkf?.semanticOntology.conceptIds ?? [],
           astSymbols: [],
           lexicalFeatures: manifestOkf?.keywordCorpus.keywords ?? [],
+          ontologyLinkedTuples: [
+            {
+              tupleId: sha256Hex(
+                [
+                  'ontology-linked-tuple.v1',
+                  plan.featureId,
+                  candidate.sourceRef,
+                  packet?.packet.packet_id ?? '',
+                ].join('\0')
+              ),
+              schemaVersion: 'ontology-linked-tuple.v1',
+              packetKey: packet?.packet.packet_id ?? undefined,
+              sourceRef: candidate.sourceRef,
+              treeNodeId: undefined,
+              documentId: documentIdMap.get(candidate.sourceRef) ?? undefined,
+              titleId: manifestOkf ? `okf:${plan.featureId}` : undefined,
+              surfaceText: manifestOkf?.domainClassification.primaryDomain ?? plan.featureId,
+              tokenIndex: 0,
+              partOfSpeech: null,
+              label: manifestOkf?.domainClassification.primaryDomain ?? plan.featureId,
+              labelKind: 'tag',
+              labelSource: 'manual',
+              ontologyIds: manifestOkf?.semanticOntology.ontologyIds ?? [],
+              conceptIds: manifestOkf?.semanticOntology.conceptIds ?? [],
+              confidence: 0.62,
+              evidenceState: plan.evidenceState,
+              provenance: {
+                sourceTables: uniqueStable([
+                  documentIdMap.has(candidate.sourceRef) ? 'library_documents' : '',
+                  'ace_packet_runtime',
+                  manifestOkf ? 'feature_document_manifest.okf' : '',
+                ].filter(Boolean)).slice(0, 12),
+                labelerVersion: plan.classifierPlan.classifierVersion ?? null,
+                taggerVersion: null,
+                ontologyVersion: null,
+                nlpVersion: manifestOkf?.nlp.langextract_version ?? null,
+              },
+            },
+          ],
           entities: [],
           evidenceState: plan.evidenceState,
           provenance: {

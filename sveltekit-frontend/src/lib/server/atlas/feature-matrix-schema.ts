@@ -13,7 +13,7 @@
  *   latent_64: Routing/clustering only
  *   lexical: BM25 coefficients
  *   topology: PageRank + SOM cell
- *   classifiers: naive_bayes + logistic_regression scores
+ *   classifiers: hybrid semantic classification scores
  *
  * Usage:
  *   import { FeatureMatrixRowV1Schema, insertFeatureRow } from './feature-matrix-schema';
@@ -115,7 +115,7 @@ export const TopologySchema = z
 export type Topology = z.infer<typeof TopologySchema>;
 
 /**
- * Classifier scores: naive Bayes + logistic regression.
+ * Classifier scores: provenance-aware hybrid semantic classification.
  */
 export const ClassifiersSchema = z
   .object({
@@ -154,7 +154,7 @@ export const FeatureMatrixRowV1Schema = z.object({
   /** Metadata flags */
   is_valid: z.boolean().default(true),
   validation_errors: z.array(z.string()).default([]),
-  feature_labels: z.array(z.string()).default([]).describe('Tags/labels for classification')
+  feature_labels: z.array(z.string()).default([]).describe('Provenance-aware tags/labels for classification and clustering')
 });
 
 export type FeatureMatrixRowV1 = z.infer<typeof FeatureMatrixRowV1Schema>;

@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-07-28T03:34:56.188Z",
+  "tests": {
+    "postgres_connection": {
+      "status": "PASS",
+      "details": {
+        "version": "PostgreSQL 18.4 (Debian 18.4-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit",
+        "dbUrl": "postgresql://legal_admin:***@127.0.0.1:5434/legal_ai_db"
+      }
+    },
+    "postgres_schema": {
+      "status": "PASS",
+      "details": {
+        "totalColumns": 20,
+        "sampleColumns": [
+          "packet_id(text)",
+          "artifact_id(text)",
+          "packet_key(text)",
+          "source_ref(text)",
+          "source_ref_key(text)",
+          "file_path(text)",
+          "directory_path(text)",
+          "feature_id(text)",
+          "feature_label(text)",
+          "community_id(integer)"
+        ]
+      }
+    },
+    "postgres_data": {
+      "status": "PASS",
+      "details": {
+        "packetKey": "packet:1f794f097f8d",
+        "sourceRef": "sveltekit-frontend/src/lib/components/citations/CitationSaveForm.svelte",
+        "featureId": "sveltekit-frontend.CitationSaveForm",
+        "sha256": "undefined...",
+        "qdrantPointId": "e5e4ef76-be9a-4341-a847-5062613f97c6"
+      }
+    },
+    "qdrant_connection": {
+      "status": "FAIL",
+      "details": {
+        "error": "HTTP 404"
+      }
+    },
+    "qdrant_collections": {
+      "status": "PENDING",
+      "details": {}
+    },
+    "redis_connection": {
+      "status": "PASS",
+      "details": {
+        "host": "localhost",
+        "port": "6379",
+        "ping": "PONG"
+      }
+    },
+    "redis_centroids": {
+      "status": "PASS",
+      "details": {
+        "keywordCentroidsCount": 0,
+        "somCentroidsCount": 0,
+        "sampleKeywordKeys": []
+      }
+    },
+    "vector_lineage": {
+      "status": "PENDING",
+      "details": {}
+    }
+  }
+}

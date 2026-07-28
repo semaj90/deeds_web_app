@@ -85,6 +85,7 @@ function collectCounts(cards, key) {
 function buildQueries(cards) {
   return [
     { id: 'feature-lane', query: 'feature labels modules imports dependencies languages networking' },
+    { id: 'provenance-lane', query: 'provenance aware multi view classification clustering feature families' },
     { id: 'offline-lane', query: 'duckdb couchdb offline processing cache export' },
     { id: 'graph-lane', query: 'neo4j imports dependency chain graph projection' },
     { id: 'inference-lane', query: 'gemma4 opencode inference fallback cache' },
@@ -205,6 +206,27 @@ function buildReport(cards) {
       details: `${offlineHeavy.length} cards already signal offline or fallback lanes. Keep those as evaluated paths rather than request-path dependencies.`,
       nextAction: 'Mirror the same cards into offline stores later, then keep runtime reads on the authoritative Postgres/Redis path.',
       sourceRefs: offlineHeavy.slice(0, 10).map((card) => card.id),
+    });
+  }
+
+  const provenanceAware = cards.filter((card) => {
+    const labels = Array.isArray(card?.labels) ? card.labels : [];
+    const payload = card?.payload ?? {};
+    const families = Array.isArray(payload?.featureFamilies) ? payload.featureFamilies : [];
+    return [
+      ...labels,
+      ...(families ?? []),
+      payload.classificationMode,
+      payload.clusteringMode,
+    ].some((value) => normalize(value).includes('provenance-aware') || normalize(value).includes('multi-view'));
+  });
+  if (provenanceAware.length > 0) {
+    recs.push({
+      priority: 'medium',
+      title: 'Keep provenance-aware multi-view feature cards stable',
+      details: `${provenanceAware.length} cards now expose provenance-aware and multi-view labels. Preserve those tags so downstream memory, docs, and offline mirrors stay aligned.`,
+      nextAction: 'Use the same card contract for generated docs, memory exports, and offline mirrors.',
+      sourceRefs: provenanceAware.slice(0, 10).map((card) => card.id),
     });
   }
 

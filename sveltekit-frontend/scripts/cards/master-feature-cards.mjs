@@ -163,7 +163,11 @@ function featureSummary(entry) {
     : 'none';
   const modules = inferModules(entry).slice(0, 3).join(', ') || 'none';
   const imports = inferImports(entry).slice(0, 3).join(', ') || 'none';
+  const classificationMode = String(entry?.params?.classificationMode ?? '').trim();
+  const clusteringMode = String(entry?.params?.clusteringMode ?? '').trim();
+  const featureFamilies = Array.isArray(entry?.params?.featureFamilies) ? entry.params.featureFamilies.map(String).join(', ') : 'none';
   return compact(
+    `classification ${classificationMode || 'unspecified'}; clustering ${clusteringMode || 'unspecified'}; families ${featureFamilies}. ` +
     `${entry.name} — ${entry.intent}. Status ${entry.status}. ` +
     `Service ${entry.service}; stores ${stores}; clusters ${clusters}; modules ${modules}; imports ${imports}`
   );
@@ -179,8 +183,13 @@ function featureLabels(entry) {
   const offlineProcessing = inferOfflineProcessing(entry).map((item) => `offline:${item}`);
   const cache = inferCache(entry).map((item) => `cache:${item}`);
   const inferenceFallbacks = inferFallbacks(entry).map((item) => `fallback:${item}`);
+  const featureFamilies = Array.isArray(entry?.params?.featureFamilies) ? entry.params.featureFamilies.map((family) => `family:${String(family)}`) : [];
+  const classificationMode = String(entry?.params?.classificationMode ?? '').trim() ? [`classification:${String(entry.params.classificationMode).trim()}`] : [];
+  const clusteringMode = String(entry?.params?.clusteringMode ?? '').trim() ? [`clustering:${String(entry.params.clusteringMode).trim()}`] : [];
   return cardLabels(
     'feature-map',
+    'provenance-aware',
+    'multi-view',
     `status:${entry.status}`,
     `service:${entry.service}`,
     ...stores,
@@ -192,6 +201,9 @@ function featureLabels(entry) {
     ...offlineProcessing,
     ...cache,
     ...inferenceFallbacks,
+    ...featureFamilies,
+    ...classificationMode,
+    ...clusteringMode,
   );
 }
 

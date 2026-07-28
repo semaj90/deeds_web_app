@@ -50,4 +50,38 @@ describe('master feature map', () => {
       ])
     );
   });
+
+  it('includes the provenance-aware enrichment entry', () => {
+    const entry = MASTER_FEATURE_MAP['provenance-aware-enrichment'];
+    const cards = buildMasterFeatureCards();
+    const card = cards.find((item) => item.id === 'feature-map:provenance-aware-enrichment');
+
+    expect(entry).toBeDefined();
+    expect(entry?.status).toBe('active');
+    expect(entry?.service).toBe('FeatureEnrichmentService');
+    expect(entry?.intent).toContain('provenance');
+    expect(entry?.intent).toContain('multi-view');
+    expect(entry?.pathMapping).toEqual(
+      expect.arrayContaining([
+        'src/lib/server/atlas/feature-matrix-schema.ts',
+        'src/lib/server/atlas/feature-doc-population.ts',
+        'src/lib/server/atlas/feature-doc-enrichment.ts',
+        'src/lib/server/atlas/okf-topic-ingestion.ts'
+      ])
+    );
+    expect(card).toBeTruthy();
+    expect(card?.labels).toEqual(
+      expect.arrayContaining([
+        'feature-map',
+        'provenance-aware',
+        'multi-view',
+        'classification:hybrid-semantic',
+        'clustering:multi-view',
+        'family:lexical',
+        'family:semantic',
+      ])
+    );
+    expect(String(card?.summary ?? '')).toContain('classification hybrid-semantic');
+    expect(String(card?.summary ?? '')).toContain('families lexical, semantic, graph, temporal, taxonomy, validation');
+  });
 });

@@ -176,6 +176,44 @@ export const MASTER_FEATURE_MAP: Record<string, MasterFeatureEntry> = {
     },
     failOpen: true
   },
+  // Family 6b: Provenance-Aware Entity Enrichment / Multi-View Clustering
+  'provenance-aware-enrichment': {
+    id: 'provenance-aware-enrichment',
+    name: 'Atlas Provenance-Aware Entity Enrichment',
+    intent: 'provenance-aware reconciliation of lexical, semantic, graph, temporal, and validation evidence into versioned entity features, probabilistic domain assignments, and multi-view clustering',
+    service: 'FeatureEnrichmentService',
+    stores: ['Postgres', 'Qdrant', 'Redis'],
+    modules: ['src/lib/server/atlas', 'src/lib/server/enrichment', 'src/lib/server/ldr'],
+    imports: ['feature-matrix-schema', 'feature-doc-enrichment', 'feature-document-evidence', 'okf-topic-ingestion', 'domain-taxonomy'],
+    dependencies: ['entity identity', 'provenance lineage', 'multi-view classification', 'clustering', 'validation evidence'],
+    languages: ['TypeScript', 'JSON', 'Markdown'],
+    networking: ['HTTP', 'OpenAI-compatible synthesis', 'MCP'],
+    offlineProcessing: ['DuckDB', 'Parquet'],
+    cache: ['Redis feature cache', 'Qdrant projection cache'],
+    inferenceFallbacks: ['Lexical keyword classifier', 'Naive Bayes prototype', 'logistic regression calibrator'],
+    clusters: [],
+    status: 'active',
+    params: {
+      featureFamilies: ['lexical', 'semantic', 'graph', 'temporal', 'taxonomy', 'validation'],
+      classificationMode: 'hybrid-semantic',
+      clusteringMode: 'multi-view',
+    },
+    pathMapping: [
+      'src/lib/server/atlas/feature-matrix-schema.ts',
+      'src/lib/server/atlas/feature-doc-population.ts',
+      'src/lib/server/atlas/feature-doc-enrichment.ts',
+      'src/lib/server/atlas/okf-topic-ingestion.ts',
+    ],
+    evidence: {
+      files: [
+        'src/lib/server/atlas/feature-matrix-schema.ts',
+        'src/lib/server/atlas/feature-doc-population.ts',
+        'src/lib/server/atlas/feature-doc-enrichment.ts',
+        'src/lib/server/atlas/okf-topic-ingestion.ts',
+      ],
+    },
+    failOpen: true
+  },
   // Family 7: Static / Dynamic Import Atlas
   'import-atlas': {
     id: 'import-atlas',

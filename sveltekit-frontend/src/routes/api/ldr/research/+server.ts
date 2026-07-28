@@ -7,7 +7,24 @@
  */
 
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { createHash } from 'node:crypto';
 import { runLocalDeepResearch, streamLocalDeepResearchSynthesis, type LDRConfig } from '$lib/server/ldr/ldr-orchestrator';
+import { buildOkfTopicAnalysis } from '$lib/server/atlas/okf-topic-ingestion.js';
+
+function buildLdrOkf(query: string, synthesis: string, sources: Array<{ url: string; title: string }>) {
+  const topicHash = createHash('sha256').update(query.trim().toLowerCase()).digest('hex').slice(0, 16);
+  return buildOkfTopicAnalysis({
+    topicId: `okf:ldr:${topicHash}`,
+    featureId: 'ldr.research',
+    title: query.trim(),
+    query,
+    summary: synthesis,
+    sourceTitles: sources.map((source) => source.title).filter(Boolean),
+    sourceUrls: sources.map((source) => source.url).filter(Boolean),
+    sourceEngine: 'ldr',
+    authorityClass: 'generated',
+  });
+}
 
 /**
  * GET /api/ldr/research?q=<query>
@@ -16,7 +33,7 @@ import { runLocalDeepResearch, streamLocalDeepResearchSynthesis, type LDRConfig 
 export const GET: RequestHandler = async ({ url, locals }) => {
   // Auth guard: require authenticated user
   if (!locals.user) {
-    return json({ error: 'Unauthorized' }, { status: 401 });
+    return json({ query: null, result: null, okf: null, timestamp: null, error: 'Unauthorized' }, { status: 401 });
   }
 
   const query = url.searchParams.get('q');
@@ -32,10 +49,12 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 
   try {
     const result = await runLocalDeepResearch(query, config);
+    const okf = buildLdrOkf(query, result.synthesis, result.sources);
 
     return json({
       query,
       result,
+      okf,
       timestamp: new Date().toISOString()
     });
   } catch (err) {
@@ -43,7 +62,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     console.error('[LDR API] GET error:', errorMsg);
 
     return json(
-      { error: 'Local Deep Research failed', details: errorMsg },
+      { query, result: null, okf: null, timestamp: new Date().toISOString(), error: 'Local Deep Research failed', details: errorMsg },
       { status: 500 }
     );
   }
@@ -97,7 +116,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        await streamLocalDeepResearchSynthesis(
+        const result = await streamLocalDeepResearchSynthesis(
           query,
           (chunk) => {
             const event = JSON.stringify({ type: 'chunk', content: chunk });
@@ -105,15 +124,16 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           },
           config
         );
+        const okf = buildLdrOkf(query, result.synthesis, result.sources);
 
         // Finalize with empty line
-        controller.enqueue(encoder.encode('data: {"type":"complete"}\n\n'));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'complete', result, okf })}\n\n`));
         controller.close();
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         console.error('[LDR API] POST stream error:', errorMsg);
 
-        const event = JSON.stringify({ type: 'error', error: errorMsg });
+        const event = JSON.stringify({ type: 'error', error: errorMsg, okf: null });
         controller.enqueue(encoder.encode(`data: ${event}\n\n`));
         controller.close();
       }

@@ -383,6 +383,14 @@ export const ATLAS_RUNTIME_REGISTRY: AtlasRuntimeRegistrySection[] = [
         status: 'active',
         notes: 'Universal derived artifact registry for generated payloads.',
       },
+      {
+        key: 'provenance-aware-enrichment',
+        title: 'Atlas provenance-aware entity enrichment',
+        path: 'sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts',
+        owner: 'feature-classification',
+        status: 'active',
+        notes: 'Hybrid semantic classification and multi-view clustering with provenance-aware labels.',
+      },
     ],
   },
   {

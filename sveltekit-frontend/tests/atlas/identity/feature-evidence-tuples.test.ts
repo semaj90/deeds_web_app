@@ -226,6 +226,17 @@ describe('materializeFeatureEvidenceTuples', () => {
         conceptIds: ['concept:mcp'],
         astSymbols: ['registerTool'],
         lexicalFeatures: ['trace', 'mcp', 'tool'],
+        ontologyLinkedTuples: expect.arrayContaining([
+          expect.objectContaining({
+            schemaVersion: 'ontology-linked-tuple.v1',
+            sourceRef: 'src/mcp/trace-mcp-server.ts',
+            label: 'retrieval',
+            labelKind: 'ontology',
+            labelSource: 'semantic_tagger',
+            ontologyIds: ['ontology:tooling'],
+            conceptIds: ['concept:mcp'],
+          }),
+        ]),
         evidenceState: 'ACTIVE_DEGRADED',
       })
     );

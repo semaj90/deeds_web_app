@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T23:03:58.613Z",
+  "generatedAt": "2026-07-28T04:43:01.808Z",
   "input": {
     "path": "memory/exports/feature-map-cards.jsonl",
     "count": 19,
@@ -1582,6 +1582,295 @@
               "src/lib/server/atlas/master-feature-map.ts",
               "src/lib/server/ace/karpathy-blend-orchestrator.ts",
               "src/lib/server/ace"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "provenance-lane",
+        "query": "provenance aware multi view classification clustering feature families",
+        "topCards": [
+          {
+            "id": "feature-map:hyperrag-fusion",
+            "kind": "feature",
+            "score": 2.955,
+            "labels": [
+              "cache:Redis hot cache",
+              "cluster:20",
+              "cluster:23",
+              "cluster:25",
+              "cluster:32",
+              "cluster:47",
+              "cluster:72",
+              "cluster:73",
+              "cluster:80",
+              "cluster:82",
+              "cluster:92",
+              "cluster:94",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/retrieval",
+              "net:Neo4j",
+              "net:Postgres",
+              "net:Qdrant",
+              "net:Redis",
+              "path:src/lib/server/retrieval",
+              "service:HyperRagFusionService",
+              "status:active",
+              "store:Neo4j",
+              "store:Postgres",
+              "store:Qdrant",
+              "store:Redis"
+            ],
+            "summary": "HyperRAG Retrieval (L0-L11) — multi-signal retrieval fusion (Lexical/Topology/Task/Graph). Status active. Service HyperRagFusionService; stores Qdrant, Redis, Neo4j, Postgres; clusters 72, 73, 94, 25, 32, 47, 92, 82, 20…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/lib/server/retrieval/hyperrag-fusion-service.ts",
+              "src/lib/server/retrieval"
+            ]
+          },
+          {
+            "id": "feature-map:ingestion-layer",
+            "kind": "feature",
+            "score": 2.953,
+            "labels": [
+              "cluster:32",
+              "cluster:92",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/db/schema/topology.ts",
+              "net:Postgres",
+              "net:Qdrant",
+              "path:src/lib/server/db/schema/topology.ts",
+              "service:TopologyProcessor",
+              "status:active",
+              "store:Postgres",
+              "store:Qdrant"
+            ],
+            "summary": "Docling / LangExtract / OCR Ingestion — multimodal document and code ingestion pipeline. Status active. Service TopologyProcessor; stores Postgres, Qdrant; clusters 32, 92; modules src/lib/server/db/schema/topology.ts;…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/lib/server/db/schema/topology.ts"
+            ]
+          },
+          {
+            "id": "feature-map:grpc-mcp",
+            "kind": "feature",
+            "score": 2.951,
+            "labels": [
+              "cluster:82",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/routes/api/mcp",
+              "path:src/routes/api/mcp",
+              "service:GrpcMcpService",
+              "status:active"
+            ],
+            "summary": "gRPC MCP Functions — multi-language function calling. Status active. Service GrpcMcpService; stores ; clusters 82; modules src/routes/api/mcp; imports GrpcMcpService, route-map",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/routes/api/mcp/+server.ts",
+              "src/routes/api/mcp"
+            ]
+          },
+          {
+            "id": "feature-map:gpu-ast",
+            "kind": "feature",
+            "score": 2.681,
+            "labels": [
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/atlas",
+              "path:src/lib/server/atlas",
+              "service:GpuAstMapper",
+              "status:dry_run"
+            ],
+            "summary": "GPU AST Mapping — fast multi-language parsing. Status dry_run. Service GpuAstMapper; stores ; clusters none; modules src/lib/server/atlas; imports GpuAstMapper, route-feature-map",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/lib/server/db/schema/topology.ts",
+              "src/lib/server/atlas"
+            ]
+          },
+          {
+            "id": "feature-map:gpu-compute-plane",
+            "kind": "feature",
+            "score": 1.956,
+            "labels": [
+              "cache:Redis hot cache",
+              "fallback:CPU fallback",
+              "fallback:Graceful fallback",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/gpu",
+              "module:src/lib/server/graph",
+              "module:src/lib/server/retrieval",
+              "module:src/lib/server/topology",
+              "module:src/mcp-gpu-orchestrator.ts",
+              "net:Postgres",
+              "net:Qdrant",
+              "net:Redis",
+              "path:src/lib/server/gpu",
+              "path:src/lib/server/graph",
+              "path:src/lib/server/retrieval",
+              "path:src/lib/server/topology",
+              "path:src/mcp-gpu-orchestrator.ts",
+              "service:GpuPipeline",
+              "status:active",
+              "store:Postgres",
+              "store:Qdrant",
+              "store:Redis"
+            ],
+            "summary": "GPU Compute Plane Integration — resilient GPU-accelerated graph analysis and retrieval fallback coordination. Status active. Service GpuPipeline; stores Redis, Qdrant, Postgres; clusters none; modules src/lib/server/gpu…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "docs/features/feature_gpu_compute_plane.md",
+              "src/mcp-gpu-orchestrator.ts",
+              "src/lib/server/gpu/gpu-pipeline.ts",
+              "src/lib/server/retrieval/gpu-reranker.ts",
+              "src/lib/server/audit/gpu-audit-orchestrator.ts",
+              "src/lib/server/gpu",
+              "src/lib/server/retrieval",
+              "src/lib/server/graph",
+              "src/lib/server/topology"
+            ]
+          },
+          {
+            "id": "feature-map:atlas-reconciliation",
+            "kind": "feature",
+            "score": 1.954,
+            "labels": [
+              "cache:Redis hot cache",
+              "feature-map",
+              "lang:JavaScript",
+              "lang:TypeScript",
+              "module:scripts/atlas/detect-manifold-drift.mjs",
+              "net:Postgres",
+              "net:Qdrant",
+              "net:Redis",
+              "path:scripts/atlas/detect-manifold-drift.mjs",
+              "service:ManifoldDriftMonitor",
+              "status:active",
+              "store:Postgres",
+              "store:Qdrant",
+              "store:Redis"
+            ],
+            "summary": "Master Atlas Reconciliation — drift detection and automatic manifold repair. Status active. Service ManifoldDriftMonitor; stores Redis, Postgres, Qdrant; clusters none; modules scripts/atlas/detect-manifold-drift.mjs; i…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "scripts/atlas/detect-manifold-drift.mjs"
+            ]
+          },
+          {
+            "id": "feature-map:ace-envelope",
+            "kind": "feature",
+            "score": 1.953,
+            "labels": [
+              "cache:Redis hot cache",
+              "cluster:72",
+              "cluster:94",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/ace",
+              "net:Postgres",
+              "net:Redis",
+              "path:src/lib/server/ace",
+              "service:ContextPacketBudgeter",
+              "status:active",
+              "store:Postgres",
+              "store:Redis"
+            ],
+            "summary": "ACE / BitFrost Context Cache — low-latency context assembly and budgeting. Status active. Service ContextPacketBudgeter; stores Redis, Postgres; clusters 72, 94; modules src/lib/server/ace; imports ContextPacketBudgeter…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/lib/server/ace/context-packet-budgeter.ts",
+              "src/lib/server/ace"
+            ]
+          },
+          {
+            "id": "feature-map:hypergraph-4d",
+            "kind": "feature",
+            "score": 1.953,
+            "labels": [
+              "cache:Redis hot cache",
+              "cluster:72",
+              "cluster:73",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/retrieval",
+              "net:Qdrant",
+              "net:Redis",
+              "path:src/lib/server/retrieval",
+              "service:HypergraphRoutingService",
+              "status:active",
+              "store:Qdrant",
+              "store:Redis"
+            ],
+            "summary": "Manifold4 / Hypergraph / Topological Routing — 4D manifold routing (som_x, som_y, semantic_z, activity_w). Status active. Service HypergraphRoutingService; stores Redis, Qdrant; clusters 72, 73; modules src/lib/server/r…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/lib/server/retrieval/hypergraph-routing-service.ts",
+              "src/lib/server/retrieval"
+            ]
+          },
+          {
+            "id": "feature-map:legal-product",
+            "kind": "feature",
+            "score": 1.953,
+            "labels": [
+              "cluster:47",
+              "fallback:Gemma4 Opencode",
+              "feature-map",
+              "lang:TypeScript",
+              "module:src/lib/server/ai",
+              "module:src/lib/server/kag",
+              "net:Neo4j",
+              "net:Postgres",
+              "path:src/lib/server/ai",
+              "path:src/lib/server/kag",
+              "service:Gemma4Synthesizer",
+              "status:active",
+              "store:Neo4j",
+              "store:Postgres"
+            ],
+            "summary": "Legal-AI Product Layer (KAG/DAG) — high-level legal reasoning and synthesis. Status active. Service Gemma4Synthesizer; stores Neo4j, Postgres; clusters 47; modules src/lib/server/ai, src/lib/server/kag; imports Gemma4Sy…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts",
+              "src/lib/server/ai/gemma4-agent.ts",
+              "src/lib/server/ai",
+              "src/lib/server/kag"
+            ]
+          },
+          {
+            "id": "feature-map:feature-atlas",
+            "kind": "feature",
+            "score": 1.952,
+            "labels": [
+              "cache:Redis atlas cache",
+              "cache:feature-map cache",
+              "fallback:CPU rerank fallback",
+              "fallback:Gemma4 Opencode",
+              "feature-map",
+              "lang:JSON",
+              "lang:Markdown",
+              "lang:TypeScript",
+              "module:docs/atlas-index",
+              "module:scripts/atlas",
+              "module:src/lib/server/atlas",
+              "module:src/lib/server/atlas/master-feature-map.ts",
+              "net:Postgres",
+              "net:Qdrant",
+              "net:Redis",
+              "offline:CouchDB",
+              "offline:DuckDB",
+              "path:src/lib/server/atlas/master-feature-map.ts",
+              "service:MasterFeatureMap",
+              "status:active",
+              "store:Postgres"
+            ],
+            "summary": "Feature Mapping Atlas — central registry for architectural intents and anchors. Status active. Service MasterFeatureMap; stores Postgres; clusters none; modules docs/atlas-index, scripts/atlas, src/lib/server/atlas; imp…",
+            "sourceRefs": [
+              "src/lib/server/atlas/master-feature-map.ts"
             ]
           }
         ]
