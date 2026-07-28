@@ -10,7 +10,7 @@
  */
 
 import pg from 'pg';
-import Redis from 'ioredis';
+import { createAtlasRedisClient, VECTOR_LANE_REGISTRY } from './lib/redis-client-factory.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const LIMIT = parseInt(
@@ -20,9 +20,6 @@ const LIMIT = parseInt(
 const VERBOSE = process.argv.includes('--verbose');
 
 const PG_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const REDIS_HOST = process.env.REDIS_HOST || '127.0.0.1';
-const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10);
-const REDIS_PASS = process.env.REDIS_PASSWORD || 'redis';
 
 function log(...args) { console.log(...args); }
 function vlog(...args) { if (VERBOSE) console.log(...args); }

@@ -1,13 +1,13 @@
 # Compact 384d Warden Routing Cache Prewarm Report
 
 ## Execution Summary
-- **Timestamp**: 2026-05-17T02:06:26.712Z
+- **Timestamp**: 2026-07-28T02:42:06.469Z
 - **Prewarm Status**: **PASS**
 - **GPU Usage Bypassed**: ✅ Yes (zero VRAM overhead)
 
 ## Architecture Parity Check
-- [x] **Compact Cache Lane**: `384d (Warden/Nomic routing only)` (Used for lightweight semantic routing).
-- [x] **Canonical Recall Authority**: `Qdrant codebase_chunks_768` (Qdrant remains authoritative 768d truth).
+- [x] **Compact Cache Lane**: `undefined` (Used for lightweight semantic routing).
+- [x] **Canonical Recall Authority**: `undefined` (Qdrant remains authoritative 768d truth).
 - [x] **Total Routing Keys Loaded**: 5 keys.
 
 ---

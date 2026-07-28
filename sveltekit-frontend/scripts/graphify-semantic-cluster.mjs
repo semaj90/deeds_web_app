@@ -47,8 +47,10 @@ const SKIP_BACKFILL  = has('--skip-backfill') || DRY_RUN;
 const FORCE          = has('--force');
 const QUIET          = has('--quiet');
 
-const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://127.0.0.1:6333';
-const REDIS_URL   = process.env.REDIS_URL   ?? 'redis://127.0.0.1:6379';
+const QDRANT_URL     = process.env.QDRANT_URL  ?? 'http://127.0.0.1:6333';
+const REDIS_HOST     = process.env.REDIS_HOST || '127.0.0.1';
+const REDIS_PORT     = parseInt(process.env.REDIS_PORT || '6379', 10);
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis';
 const GLYPH_ATLAS = 'glyph_atlas';
 const CHUNKS_COL  = 'codebase_chunks_768';
 const DIM         = 768;
@@ -103,8 +105,10 @@ function topoClass(dir) {
 // ── Redis ─────────────────────────────────────────────────────────────────────
 
 const { default: Redis } = await import('ioredis');
-const redis = new Redis(REDIS_URL, {
-  password: process.env.REDIS_PASSWORD || undefined,
+const redis = new Redis({
+  host: REDIS_HOST,
+  port: REDIS_PORT,
+  password: REDIS_PASSWORD,
   lazyConnect: true,
   connectTimeout: 4000,
   maxRetriesPerRequest: 1

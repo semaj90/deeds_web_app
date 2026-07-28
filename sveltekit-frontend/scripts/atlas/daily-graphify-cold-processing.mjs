@@ -112,7 +112,16 @@ if (!SKIP_REDIS) {
   ));
 }
 
-// Stage 4: Warm ACE compact cache (optional)
+// Stage 4: Generate missing KAG notes (via llama-server)
+// Finds directories in Neo4j without DirectoryNotes in CouchDB
+// Generates summaries using Gemma4 and upserts them
+results.push(run(
+  'KAG Notes Generation (Gemma4 via llama-server :8090)',
+  'graphify:kag-notes:missing',
+  { required: false, supportsDry: true }
+));
+
+// Stage 5: Warm ACE compact cache (optional)
 // Pre-materializes ACE context for next retrieval pass
 results.push(run(
   'ACE Context Pre-Warm',

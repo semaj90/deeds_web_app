@@ -5,15 +5,16 @@
  * Pre-warms the Redis Hot Cache for the compact 384d Warden/Nomic routing lane
  * without using the GPU (bypassing embedding generation models when VRAM pressure is high).
  *
- * Enforces that Qdrant 768d remains the final canonical recall authority.
+ * CANONICAL EMBEDDING: embeddinggemma:latest = 768-dim (Qdrant codebase_chunks_768)
+ * ROUTING OPTIMIZATION: 384d Warden/Nomic lane is secondary for cost-optimized re-ranking
+ * RETRIEVAL ORDER: 768d ANN (Qdrant) → 384d routing (Redis cache if available)
+ * FINAL AUTHORITY: Qdrant 768d codebase_chunks_768 is always canonical for recall
  */
 
 import { writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import Redis from 'ioredis';
-
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+import { createAtlasRedisClient, VECTOR_LANE_REGISTRY } from './lib/redis-client-factory.mjs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '../..');
 
@@ -28,19 +29,21 @@ const ANCHOR_FILES = [
 
 async function runPrewarm() {
   console.log('⚡ Starting Phase 12D: Compact 384d Warden/Nomic Cache Prewarm...');
-  console.log(`ℹ️ Redis Endpoint: ${REDIS_URL}`);
+  console.log(`ℹ️ Redis Endpoint: ${REDIS_HOST}:${REDIS_PORT}`);
 
   const report = {
     timestamp: new Date().toISOString(),
-    compactLane: '384d (Warden/Nomic routing only)',
-    canonicalRecallAuthority: 'Qdrant codebase_chunks_768',
+    canonicalEmbedding: 'embeddinggemma:latest (768-dim)',
+    primaryVectorStore: 'Qdrant codebase_chunks_768',
+    routingOptimization: '384d Warden/Nomic (secondary, cost-optimized)',
     gpuUsageBypassed: true,
     totalKeysPrewarmed: 0,
     prewarmedKeys: [],
     status: 'UNKNOWN'
   };
 
-  const redis = new Redis(REDIS_URL, { maxRetriesPerRequest: 1, connectTimeout: 3000 });
+  const redis = createAtlasRedisClient();
+  await redis.connect();
 
   try {
     // 1. Verify Redis is active

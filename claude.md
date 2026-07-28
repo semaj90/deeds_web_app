@@ -28,7 +28,43 @@ cp deeds_labs/archive/2026-07-23/old-module.ts.bak src/old-module.ts
 
 ---
 
-## Last Updated: July 8, 2026 (Session 125+ — OpenCode Bash Tool Calling FIXED)
+## 🧠 Embedding Dimensions Policy (CANONICAL — July 27, 2026)
+
+**PRIMARY EMBEDDING MODEL**: `embeddinggemma:latest` (768-dim)
+- **Canonical storage**: Qdrant `codebase_chunks_768` collection (40,568 points)
+- **Postgres mirror**: `codebase_chunk_index.content_embedding` (vector(768), 40,568 rows populated)
+- **Retrieval path**: Qdrant ANN → Postgres join by source_ref → optional Neo4j topology expansion
+
+**SECONDARY ROUTING LANE**: 384d Warden/Nomic (optional, cost-optimized re-ranking)
+- **Purpose**: Fast re-ranking when VRAM pressure is high (skip GPU cost)
+- **Storage**: Redis cache (`gpu:warden:cache:384d:*` keys, generated on demand)
+- **Use case**: Final ranking of top-K after primary 768d ANN retrieval
+- **NOT authoritative**: This lane never produces final recall results; it guides ranking only
+
+**HARD RULES** (non-negotiable):
+- ✅ Always use 768-dim embeddings from embeddinggemma for Qdrant and Postgres
+- ✅ Never store 384d vectors in Qdrant (no dimension mismatch)
+- ✅ 384d routing is OPTIONAL; don't block retrieval if Redis 384d cache miss
+- ❌ Never make 384d the primary retrieval lane (it's a secondary optimization)
+- ❌ Never use different embedding models for the same dimension (embeddinggemma only for 768d)
+
+**Retrieval Decision Tree**:
+```
+Query arrives
+  → Embed with embeddinggemma:latest (768-dim)
+  → Qdrant ANN on codebase_chunks_768 (top-20)
+  → Postgres join to get source_ref, summary, etc.
+  → Optional: Check Redis for 384d routing cache
+  → If cache hit: use 384d score for final re-ranking
+  → If cache miss: use 768d score directly
+  → Return top-10 candidates to ACE context assembler
+```
+
+**For New Scripts**: Reference `REDIS_CONNECTION_FIXES.md` for the correct Redis pattern (host/port/password, not URL strings).
+
+---
+
+## Last Updated: July 27, 2026 (Session 145+ — Redis Connection Fixes + Embedding Dimensions)
 ## Status: All services UP ✅ | Gemma4 :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
 ## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
 

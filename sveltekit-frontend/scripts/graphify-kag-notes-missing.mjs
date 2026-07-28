@@ -3,17 +3,29 @@
  * scripts/graphify-kag-notes-missing.mjs
  *
  * Finds directories in Neo4j that have no DirectoryNote in CouchDB karpathy_wiki.
- * Generates a summary for missing directories using Gemma4 and upserts them.
+ * Generates summaries for missing directories using Gemma4 (via llama-server :8090)
+ * and upserts them to CouchDB.
+ *
+ * Wired into daily graphify pipeline (scripts/daily-graphify.mjs).
+ * Requires llama-server running on LLAMA_SERVER_URL (default :8090).
  *
  * Usage:
  *   npm run graphify:kag-notes:missing
  *   npm run graphify:kag-notes:missing:dry
+ *
+ * Environment:
+ *   LLAMA_SERVER_URL=http://localhost:8090
+ *   LLAMA_MODEL=gemma4-legal-iq4xs-direct.gguf
+ *   COUCHDB_URL=http://localhost:5984
+ *   COUCHDB_USER=admin (from .env)
+ *   COUCHDB_PASSWORD=admin (from .env)
+ *   NEO4J_URI=bolt://localhost:7687
+ *   NEO4J_USER=neo4j
+ *   NEO4J_PASSWORD=neo4j123 (from .env)
  */
 
 import dotenv from 'dotenv';
 import path from 'node:path';
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import neo4j from 'neo4j-driver';
 
 dotenv.config();
@@ -21,17 +33,16 @@ dotenv.config();
 const NEO4J_URI  = process.env.NEO4J_URI  ?? 'bolt://localhost:7687';
 const NEO4J_USER = process.env.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? 'neo4j123';
-const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://admin:deeds123@localhost:5984';
-const OLLAMA_URL  = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-const MODEL       = 'gemma4-rotorquant:latest';
+const COUCHDB_URL = process.env.COUCHDB_URL ?? 'http://localhost:5984';
+const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://localhost:8090';
+const LLAMA_MODEL = process.env.LLAMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 
-const couchUrlParsed = new URL(COUCHDB_URL);
-const couchAuthHeader = couchUrlParsed.username
-    ? { Authorization: `Basic ${Buffer.from(`${decodeURIComponent(couchUrlParsed.username)}:${decodeURIComponent(couchUrlParsed.password)}`).toString('base64')}` }
-    : {};
-couchUrlParsed.username = '';
-couchUrlParsed.password = '';
-const COUCHDB_CLEAN_URL = couchUrlParsed.toString().replace(/\/$/, '');
+const COUCHDB_CLEAN_URL = COUCHDB_URL.replace(/\/$/, '');
+const couchdbUser = process.env.COUCHDB_USER ?? 'admin';
+const couchdbPass = process.env.COUCHDB_PASSWORD ?? 'admin';
+const couchAuthHeader = {
+  Authorization: `Basic ${Buffer.from(`${couchdbUser}:${couchdbPass}`).toString('base64')}`
+};
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
@@ -59,7 +70,7 @@ async function getNeo4jDirectories() {
     try {
         const res = await session.run(`MATCH (f:CodebaseFile) WHERE f.filePath IS NOT NULL RETURN f.filePath AS path`);
         const allFiles = res.records.map(r => r.get('path')).filter(p => typeof p === 'string');
-        
+
         const dirMap = new Map();
         for (const f of allFiles) {
             const dir = getRelativeDir(f);
@@ -87,7 +98,7 @@ async function getExistingCouchDbDirs() {
     return new Set(data.rows.map(r => r.id.replace('agents:dir:', '')));
 }
 
-// ── 3. Gemma4 Generation ─────────────────────────────────────────────────────
+// ── 3. Gemma4 Generation via llama-server ───────────────────────────────────
 async function generateSummary(dir, files) {
     const prompt = `You are an expert codebase summarizer.
 Analyze this directory: ${dir}
@@ -95,15 +106,36 @@ It contains these files: ${files.slice(0, 10).join(', ')}${files.length > 10 ? '
 Provide a single, concise sentence describing the technical purpose of this directory. Do not use conversational filler.`;
 
     try {
-        const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+        const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: MODEL, prompt, stream: false })
+            body: JSON.stringify({
+                model: LLAMA_MODEL,
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.3,
+                max_tokens: 200,
+                stream: false
+            }),
+            signal: AbortSignal.timeout(30000)
         });
         if (!res.ok) return `Directory containing ${files.length} files.`;
         const data = await res.json();
-        return data.response.trim();
-    } catch (e) {
+        let content = data.choices?.[0]?.message?.content?.trim();
+
+        // Sanitize training-trace tokens (verified issue from Phase 7)
+        if (content) {
+          content = content
+            .replace(/<end_of_turn>/g, '')
+            .replace(/<start_of_turn>/g, '')
+            .replace(/<\|channel>.*?<\/\|channel>/gs, '')
+            .replace(/<\|.*?>.*?<\/\|.*?>/gs, '')
+            .replace(/<thinking>.*?<\/thinking>/gs, '')
+            .replace(/<\|endthinking>/g, '')
+            .trim();
+        }
+
+        return content || `Directory containing ${files.length} files.`;
+    } catch (_err) {
         return `Directory containing ${files.length} files.`;
     }
 }
@@ -122,7 +154,9 @@ async function upsertDirectoryNote(dir, summary, files) {
             const data = await res.json();
             _rev = data._rev;
         }
-    } catch (e) {}
+    } catch (_err) {
+        // Document doesn't exist yet, will be created
+    }
 
     const note = {
         _id: id,
@@ -139,7 +173,7 @@ async function upsertDirectoryNote(dir, summary, files) {
 
     const res = await fetch(`${COUCHDB_CLEAN_URL}/karpathy_wiki/${encodeURIComponent(id)}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             ...couchAuthHeader
         },
@@ -150,39 +184,58 @@ async function upsertDirectoryNote(dir, summary, files) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
+    const startTime = Date.now();
+    const results = {
+        directoriesFound: 0,
+        existingNotes: 0,
+        missingCount: 0,
+        generated: 0,
+        failed: 0,
+        failedDirs: [],
+        generatedDirs: [],
+        duration_ms: 0
+    };
+
     console.log('=== Batch DirectoryNote Generation ===');
     console.log(`[cfg] dryRun=${DRY_RUN}`);
+    console.log(`[cfg] llmServer=${process.env.LLAMA_SERVER_URL ?? 'http://localhost:8090'}`);
+    console.log(`[cfg] model=${process.env.LLAMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf'}`);
 
-    console.log('[neo4j] Fetching codebase files...');
+    console.log('\n[neo4j] Fetching codebase files...');
     let dirMap;
     try {
         dirMap = await getNeo4jDirectories();
+        results.directoriesFound = dirMap.size;
     } catch (err) {
         console.warn('[neo4j] Failed to fetch directories from Neo4j (is it running?). Error:', err.message);
         dirMap = new Map();
     }
 
-    console.log(`[neo4j] Found ${dirMap.size} unique directories.`);
+    console.log(`[neo4j] Found ${results.directoriesFound} unique directories.`);
 
     console.log('[couchdb] Fetching existing DirectoryNotes...');
     let existingDirs;
     try {
         existingDirs = await getExistingCouchDbDirs();
+        results.existingNotes = existingDirs.size;
     } catch (err) {
         console.warn('[couchdb] Failed to fetch from CouchDB. Error:', err.message);
         existingDirs = new Set();
     }
 
-    console.log(`[couchdb] Found ${existingDirs.size} existing DirectoryNotes.`);
+    console.log(`[couchdb] Found ${results.existingNotes} existing DirectoryNotes.`);
 
     const missingDirs = Array.from(dirMap.keys()).filter(d => {
         const slug = getSlug(d);
         return !existingDirs.has(slug);
     });
-    console.log(`[diff] ${missingDirs.length} directories missing notes.`);
+    results.missingCount = missingDirs.length;
+    console.log(`[diff] ${results.missingCount} directories missing notes.`);
 
     if (missingDirs.length === 0) {
-        console.log('Nothing to do!');
+        console.log('\n✓ All directories have notes. Nothing to do!');
+        results.duration_ms = Date.now() - startTime;
+        console.log(`\nResults: ${JSON.stringify(results, null, 2)}`);
         return;
     }
 
@@ -192,30 +245,61 @@ async function main() {
             console.log(`  - ${d} (${dirMap.get(d).length} files)`);
         }
         if (missingDirs.length > 10) console.log(`  ... and ${missingDirs.length - 10} more.`);
+        results.duration_ms = Date.now() - startTime;
+        console.log(`\nResults (dry-run): ${JSON.stringify(results, null, 2)}`);
         return;
     }
 
-    console.log(`\n[llm] Generating summaries via ${MODEL}...`);
-    let generated = 0;
-    let failed = 0;
+    console.log(`\n[llm] Generating summaries via llama-server :8090 (${process.env.LLAMA_MODEL || 'gemma4-legal-iq4xs-direct.gguf'})...`);
+    const summaryStartTime = Date.now();
 
     for (const dir of missingDirs) {
-        process.stdout.write(`  [${generated+1}/${missingDirs.length}] ${dir} ... `);
+        process.stdout.write(`  [${results.generated + results.failed + 1}/${missingDirs.length}] ${dir} ... `);
         try {
             const files = dirMap.get(dir);
             const summary = await generateSummary(dir, files);
             await upsertDirectoryNote(dir, summary, files);
-            console.log('OK');
-            generated++;
-        } catch (e) {
-            console.log(`FAIL (${e.message})`);
-            failed++;
+            console.log('✓ OK');
+            results.generated++;
+            results.generatedDirs.push({
+                path: dir,
+                fileCount: files.length,
+                timestamp: new Date().toISOString()
+            });
+        } catch (err) {
+            console.log(`✗ FAIL (${err.message})`);
+            results.failed++;
+            results.failedDirs.push({
+                path: dir,
+                error: err.message,
+                timestamp: new Date().toISOString()
+            });
         }
     }
 
-    console.log(`\n=== Done ===`);
-    console.log(`Generated: ${generated}`);
-    console.log(`Failed:    ${failed}`);
+    results.duration_ms = Date.now() - startTime;
+    const summaryDuration = ((Date.now() - summaryStartTime) / 1000).toFixed(1);
+
+    console.log(`\n${'='.repeat(60)}`);
+    console.log('GENERATION REPORT');
+    console.log(`${'='.repeat(60)}`);
+    console.log(`Directories found:     ${results.directoriesFound}`);
+    console.log(`Existing notes:        ${results.existingNotes}`);
+    console.log(`Missing notes:         ${results.missingCount}`);
+    console.log(`Generated:             ${results.generated}`);
+    console.log(`Failed:                ${results.failed}`);
+    console.log(`Success rate:          ${((results.generated / results.missingCount) * 100).toFixed(1)}%`);
+    console.log(`Summary time:          ${summaryDuration}s`);
+    console.log(`Total duration:        ${(results.duration_ms / 1000).toFixed(1)}s`);
+
+    if (results.failed > 0) {
+        console.log(`\n⚠️  Failed directories:`);
+        for (const failed of results.failedDirs) {
+            console.log(`  - ${failed.path}: ${failed.error}`);
+        }
+    }
+
+    console.log(`\n✓ Full results saved to: ${JSON.stringify(results, null, 2)}`);
 }
 
 main().catch(err => {
