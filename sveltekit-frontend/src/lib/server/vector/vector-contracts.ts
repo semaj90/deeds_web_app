@@ -323,7 +323,7 @@ export function assertDenseEmbedding(e: DenseEmbedding, expectedDim: number): vo
   }
 }
 
-export type SparseVectorName = 'bm42_sparse';
+export type SparseVectorName = 'bm42'; // Canonical sparse vector name per qdrant-collection-contracts.ts
 
 /**
  * Per-collection contract — prevents callers from relying on Qdrant to return
@@ -349,7 +349,7 @@ export const COLLECTION_CONTRACTS: Record<string, CollectionContract> = {
   codebase_chunks_384_hybrid: {
     contractVersion: 'atlas-qdrant-384-hybrid-v1',
     denseVectors: { content: 384 },
-    sparseVectors: ['bm42_sparse'],
+    sparseVectors: ['bm42'], // Canonical sparse vector name per qdrant-collection-contracts.ts
     primaryDenseVector: 'content',
     primaryDimension: 384,
     description: 'Hybrid collection: dense content (384-dim) + BM42 sparse. Canonical retrieval target.',

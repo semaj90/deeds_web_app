@@ -11,7 +11,8 @@ export const QDRANT_VECTOR_NAMES = {
   lateInteraction: 'late_interaction',
 } as const;
 
-export const QDRANT_SPARSE_VECTOR_NAME = 'bm42_sparse' as const;
+// Canonical sparse vector name per qdrant-collection-contracts.ts (Phase 12 backfill convention)
+export const QDRANT_SPARSE_VECTOR_NAME = 'bm42' as const;
 
 export function resolveAtlasQdrantDefaultCollection(): string {
   return QDRANT_COLLECTION_REGISTRY.canonical;

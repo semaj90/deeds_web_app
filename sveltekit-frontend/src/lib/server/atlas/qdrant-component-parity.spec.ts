@@ -39,7 +39,7 @@ function makeCanonicalCollectionInfo() {
             latent64: { size: 64, distance: 'Cosine' },
           },
           sparse_vectors: {
-            bm42_sparse: { index: true },
+            bm42: { index: true }, // Canonical sparse vector name per qdrant-collection-contracts.ts
           },
         },
       },
@@ -65,7 +65,7 @@ function makeCanonicalPoint(overrides = {}) {
       qdrant_point_id: 'point-1',
       feature_id: 'feature-1',
       qdrant_payload_version: 'v1',
-      bm42_sparse: { indices: [1], values: [1] },
+      bm42: { indices: [1], values: [1] }, // Canonical sparse vector name per qdrant-collection-contracts.ts
       ...overrides.payload,
     },
     vector: {
@@ -75,7 +75,7 @@ function makeCanonicalPoint(overrides = {}) {
       latent64: new Array(64).fill(0),
     },
     sparse_vectors: {
-      bm42_sparse: {
+      bm42: { // Canonical sparse vector name per qdrant-collection-contracts.ts
         indices: [1],
         values: [1],
       },

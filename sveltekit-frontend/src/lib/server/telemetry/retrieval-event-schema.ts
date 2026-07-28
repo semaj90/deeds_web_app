@@ -18,7 +18,7 @@ export const RetrievalStageResultSchema = z.object({
 	score: z.number().min(0).max(1).describe('Score for this result (0.0 to 1.0)'),
 	packet_key: z.string().describe('Unique packet identifier'),
 	rank: z.number().int().positive().describe('Rank in this stage (1-based)'),
-	embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42_sparse']).optional().describe('Named representation lane for this result when applicable'),
+	embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42']).optional().describe('Named representation lane for this result when applicable'),
 	embedding_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).optional().describe('Lifecycle status of the representation lane when applicable'),
 	projection_version: z.string().optional().describe('Projection or lane contract version when applicable')
 });
@@ -83,7 +83,7 @@ export const RetrievalEventSchema = z.object({
 	query_text: z.string().min(1).describe('The query text'),
 	embedding_model: z.string().default('embeddinggemma:latest').describe('Model used for query embedding'),
 	query_embedding_dim: z.number().int().positive().default(384).describe('Default online query embedding dimensionality. Canonical search lane is 384; native or legacy 768 queries must be recorded explicitly.'),
-	query_embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42_sparse']).default('dense_384').describe('Named query lane used for the primary semantic retrieval path'),
+	query_embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42']).default('dense_384').describe('Named query lane used for the primary semantic retrieval path'),
 	query_embedding_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).default('ACTIVE').describe('Lifecycle status of the primary query lane'),
 	query_projection_version: z.string().default('atlas-embeddinggemma-direct-slice384-v1').describe('Projection contract for the primary query lane'),
 

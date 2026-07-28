@@ -206,7 +206,7 @@ export interface Candidate {
     | 'ast_tree'
     | 'schema'
     | 'rg_keyword';
-  embeddingLane?: 'dense_384' | 'dense_768' | 'bm42_sparse';
+  embeddingLane?: 'dense_384' | 'dense_768' | 'bm42'; // Canonical sparse vector name per qdrant-collection-contracts.ts
 }
 
 /**
@@ -640,8 +640,8 @@ export class SearchRuntime {
           ? 'dense_384'
           : lc.metadata?.['embedding_lane'] === 'dense_768'
             ? 'dense_768'
-            : lc.metadata?.['embedding_lane'] === 'bm42_sparse'
-              ? 'bm42_sparse'
+            : lc.metadata?.['embedding_lane'] === 'bm42'
+              ? 'bm42'
               : undefined,
     })), query.filters);
   }

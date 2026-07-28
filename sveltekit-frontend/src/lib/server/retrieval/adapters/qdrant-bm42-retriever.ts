@@ -25,7 +25,7 @@ import { normalizeQdrantPoints } from './qdrant-dense-retriever.js';
 
 export interface QdrantBM42RetrieverConfig {
   collection: string;
-  /** Name of the sparse vector field in the collection (default: 'bm42_sparse') */
+  /** Name of the sparse vector field in the collection (default: 'bm42' — canonical sparse vector name per qdrant-collection-contracts.ts) */
   sparseVectorName?: string;
 }
 

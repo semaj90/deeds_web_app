@@ -101,7 +101,7 @@ export interface SearchResult {
     embedding_dim?: number;
 
     /** Named representation lane that produced this result */
-    embedding_lane?: 'dense_384' | 'dense_768' | 'latent_64' | 'bm42_sparse';
+    embedding_lane?: 'dense_384' | 'dense_768' | 'latent_64' | 'bm42'; // Canonical sparse vector name per qdrant-collection-contracts.ts
 
     /** Role of the representation lane */
     embedding_role?:

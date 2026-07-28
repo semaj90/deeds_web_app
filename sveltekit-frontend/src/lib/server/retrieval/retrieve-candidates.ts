@@ -100,7 +100,7 @@ async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: 
 }
 
 /**
- * BM42 sparse retrieval via Qdrant named sparse vector (bm42_sparse lane)
+ * BM42 sparse retrieval via Qdrant named sparse vector (bm42 lane)
  * Runs against codebase_chunks_384_hybrid collection.
  */
 async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
@@ -114,7 +114,7 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
       content: (lc.metadata?.content as string) || '',
       score: lc.score ?? 0,
       scoreSource: 'qdrant' as const,
-      embeddingLane: 'bm42_sparse' as const,
+      embeddingLane: 'bm42' as const, // Canonical sparse vector name per qdrant-collection-contracts.ts
     }));
   } catch {
     return [];

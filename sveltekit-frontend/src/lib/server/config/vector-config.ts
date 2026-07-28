@@ -196,10 +196,10 @@ export const VECTOR_LANES = {
   },
   sparse_bm42: {
     kind: 'sparse',
-    laneId: 'bm42_sparse',
+    laneId: 'bm42', // Canonical sparse vector name per qdrant-collection-contracts.ts
     role: 'lexical_sparse',
     status: 'ACTIVE',
-    vectorName: 'bm42_sparse',
+    vectorName: 'bm42', // Canonical sparse vector name per qdrant-collection-contracts.ts
     evidenceAuthority: true,
   },
   latent_128: {

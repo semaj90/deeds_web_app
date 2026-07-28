@@ -6,7 +6,8 @@ export const QDRANT_SOURCE_EMBEDDING_DIMENSION = 768 as const;
 export const QDRANT_RETRIEVAL_EMBEDDING_DIMENSION = 384 as const;
 
 export const QDRANT_DENSE_VECTOR_NAME = 'content' as const;
-export const QDRANT_SPARSE_VECTOR_NAME = 'bm42_sparse' as const;
+// Canonical sparse vector name per qdrant-collection-contracts.ts
+export const QDRANT_SPARSE_VECTOR_NAME = 'bm42' as const;
 export const QDRANT_FUSION_STRATEGY = 'rrf' as const;
 
 export const QDRANT_COLLECTION_BY_TIER = {
