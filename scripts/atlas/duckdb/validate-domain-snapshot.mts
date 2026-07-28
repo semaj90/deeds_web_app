@@ -2,8 +2,14 @@
 /**
  * Validate a DuckDB snapshot against PostgreSQL.
  * Usage: npx tsx scripts/atlas/duckdb/validate-domain-snapshot.mts [--full]
+ *
+ * ⚠️ MUST be run from project root, NOT sveltekit-frontend/
+ * This prevents creating duplicate DuckDB files in wrong locations.
  */
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import {
   createAtlasDuckDB,
   attachCanonicalPostgres,
@@ -12,9 +18,23 @@ import {
   validateRowParity
 } from '../../../packages/atlas-duckdb/src/index.ts';
 
+/** Verify working directory is project root */
+function validateWorkingDirectory(): void {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    console.error(`❌ ERROR: Must be run from project root`);
+    console.error(`   Current directory: ${process.cwd()}`);
+    console.error(`   This script should be run from the workspace root, not from sveltekit-frontend/`);
+    console.error(`\n   Fix: cd $(git rev-parse --show-toplevel) && npx tsx scripts/atlas/duckdb/validate-domain-snapshot.mts`);
+    process.exit(1);
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const full = args.includes('--full');
+
+  validateWorkingDirectory();
 
   console.log(`🔍 Validating DuckDB snapshot...`);
   const startTime = performance.now();
