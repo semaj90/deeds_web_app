@@ -8,7 +8,7 @@ import { generateTags } from './tag-generator.js';
 import { mirrorTags } from './tag-sync.js';
 import type { GeneratedTag } from './types.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEmbeddingEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 export interface AutoTagResult {
 	documentId: string;
@@ -40,19 +40,18 @@ export async function autoTagDocument(opts: {
 	const embeddings = new Map<string, number[]>();
 	try {
 		const uniqueLabels = [...new Set(tagResult.tags.map((t) => t.label))];
-		const OLLAMA_URL = getOllamaEmbeddingEndpoint();
 
 		for (const label of uniqueLabels) {
 			try {
-				const res = await ollamaFetch(OLLAMA_URL + '/api/embed', {
+				const res = await fetch('http://localhost:5173/api/embed', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ model: 'embeddinggemma:latest', input: label })
+					body: JSON.stringify({ text: label, model: 'embeddinggemma' })
 				});
 				if (res.ok) {
-					const data = (await res.json()) as { embeddings?: number[][] };
-					if (data.embeddings?.[0]) {
-						embeddings.set(label, data.embeddings[0]);
+					const data = (await res.json()) as { embedding?: number[] };
+					if (data.embedding) {
+						embeddings.set(label, data.embedding);
 					}
 				}
 			} catch {

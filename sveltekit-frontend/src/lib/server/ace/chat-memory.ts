@@ -15,10 +15,8 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { getRedis } from '$lib/server/redis.js';
-import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
-const OLLAMA_URL = getOllamaEmbeddingEndpoint();
 const COLLECTION = 'chat_messages';
 const VECTOR_NAME = 'message';
 const EMBED_MODEL = 'embeddinggemma:latest';
@@ -300,10 +298,10 @@ export async function recordChatMessageForRecall(msg: {
   const qdrantId = typeof msg.id === 'number' ? msg.id : hashToQdrantId(String(msg.id));
 
   try {
-    const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
+    const res = await fetch(`http://localhost:5173/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: EMBED_MODEL, prompt: truncated }),
+      body: JSON.stringify({ text: truncated, model: 'embeddinggemma' }),
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return false;

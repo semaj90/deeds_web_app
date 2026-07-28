@@ -15,7 +15,6 @@ import { ENV } from '$lib/server/env.server.js';
 import { acePromptPreflightTool } from '$lib/server/ai/ace-prompt-preflight-tool.js';
 import { callGemma4WithTools, type Gemma4Tool, type Gemma4ToolCallResult } from './gemma4-codeintel.js';
 import { parseQdrantResponse } from '$lib/server/qdrant/parse-qdrant-json.js';
-import { getOllamaEmbeddingEndpoint } from '$lib/server/ollama.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tool definitions + executors
@@ -43,16 +42,16 @@ const searchCodebase: Gemma4Tool = {
     const domain = args.domain ? String(args.domain) : undefined;
 
     try {
-      // Embed the query then hit Qdrant
-      const embedResp = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embed`, {
+      // Embed the query then hit Qdrant (via local /api/embed for caching)
+      const embedResp = await fetch(`http://localhost:5173/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest', input: query }),
+        body: JSON.stringify({ text: query, model: 'embeddinggemma' }),
         signal: AbortSignal.timeout(15_000),
       });
       if (!embedResp.ok) throw new Error(`Embed HTTP ${embedResp.status}`);
-      const embedData = await embedResp.json() as { embeddings?: number[][] };
-      const vector = embedData.embeddings?.[0];
+      const embedData = await embedResp.json() as { embedding?: number[] };
+      const vector = embedData.embedding;
       if (!vector?.length) throw new Error('Empty embedding');
 
       const filter = domain
@@ -249,15 +248,15 @@ const webSearch: Gemma4Tool = {
 
     // Fallback: semantic search in the web_research Qdrant collection
     try {
-      const embedResp = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embed`, {
+      const embedResp = await fetch(`http://localhost:5173/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest', input: query }),
+        body: JSON.stringify({ text: query, model: 'embeddinggemma' }),
         signal: AbortSignal.timeout(10_000),
       });
       if (embedResp.ok) {
-        const eData = await embedResp.json() as { embeddings?: number[][] };
-        const vec = eData.embeddings?.[0];
+        const eData = await embedResp.json() as { embedding?: number[] };
+        const vec = eData.embedding;
         if (vec?.length) {
           const sResp = await fetch(
             `${ENV.QDRANT_URL}/collections/research_summaries/points/search`,

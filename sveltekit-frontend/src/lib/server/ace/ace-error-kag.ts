@@ -21,7 +21,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { db, qdrant } from '$lib/server/db/unified-client.js';
 import { sql } from 'drizzle-orm';
 import { assertDirectOllamaAllowed, ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -129,15 +129,15 @@ async function callGemma4ForErrorSummary(
 
 async function embedText(text: string): Promise<number[] | null> {
   try {
-    const resp = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embed`, {
+    const resp = await fetch(`http://localhost:5173/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest', input: text }),
+      body: JSON.stringify({ text, model: 'embeddinggemma' }),
       signal: AbortSignal.timeout(15_000),
     });
     if (!resp.ok) return null;
-    const data = await resp.json() as { embeddings?: number[][] };
-    return data.embeddings?.[0] ?? null;
+    const data = await resp.json() as { embedding?: number[] };
+    return data.embedding ?? null;
   } catch {
     return null;
   }

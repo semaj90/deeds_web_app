@@ -10,7 +10,6 @@ import { semanticCache as semanticCacheTable } from '../db/schema/schema-semanti
 import { sql } from 'drizzle-orm';
 import { ENV } from '../env.server.js';
 import { getRedis } from '../redis.js';
-import { getOllamaEmbeddingEndpoint } from '../ollama.js';
 import {
 	searchSemanticCache as searchRedisSemanticCache,
 	storeSemanticCache as storeRedisSemanticCache,
@@ -201,16 +200,16 @@ export interface SemanticCacheHit {
 // In a real scenario, this connects to Ollama embeddinggemma
 export async function generateEmbedding(text: string): Promise<number[]> {
 	try {
-		const res = await fetch(`${getOllamaEmbeddingEndpoint()}/api/embeddings`, {
+		const res = await fetch(`http://localhost:5173/api/embed`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'embeddinggemma:latest', prompt: text }),
+			body: JSON.stringify({ text, model: 'embeddinggemma' }),
 		});
-		if (!res.ok) throw new Error('Ollama not running');
-		const data = await res.json();
-		return data.embedding;
+		if (!res.ok) throw new Error('Embedding service not running');
+		const data = await res.json() as { embedding?: number[] };
+		return data.embedding ?? [];
 	} catch {
-		console.warn('Ollama unavailable, using stub 768-dim embedding');
+		console.warn('Embedding service unavailable, using stub 768-dim embedding');
 		return new Array(768).fill(0.01);
 	}
 }
