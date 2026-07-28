@@ -28,8 +28,9 @@ const ANCHOR_FILES = [
 ];
 
 async function runPrewarm() {
+  const config = { host: process.env.REDIS_HOST || '127.0.0.1', port: parseInt(process.env.REDIS_PORT || '6379', 10) };
   console.log('⚡ Starting Phase 12D: Compact 384d Warden/Nomic Cache Prewarm...');
-  console.log(`ℹ️ Redis Endpoint: ${REDIS_HOST}:${REDIS_PORT}`);
+  console.log(`ℹ️ Redis Endpoint: ${config.host}:${config.port}`);
 
   const report = {
     timestamp: new Date().toISOString(),

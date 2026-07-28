@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-28T02:42:06.469Z",
+  "timestamp": "2026-07-28T02:54:20.367Z",
   "canonicalEmbedding": "embeddinggemma:latest (768-dim)",
   "primaryVectorStore": "Qdrant codebase_chunks_768",
   "routingOptimization": "384d Warden/Nomic (secondary, cost-optimized)",
