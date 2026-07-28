@@ -9,28 +9,15 @@
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
 import { createAtlasDuckDB, attachCanonicalPostgres, buildCorpusSnapshot, buildDomainTrainingRows } from '../../../packages/atlas-duckdb/src/index.js';
 
 /** Verify working directory is project root */
 function validateWorkingDirectory(): void {
-  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const cwd = process.cwd();
-  const expectedPath = path.join(cwd, 'scripts', 'atlas', 'duckdb', 'build-full-snapshot.mts');
-  const actualPath = scriptDir + '/build-full-snapshot.mts';
-
-  // Heuristic: check if we're in the right place by looking for package.json
-  const packageJsonPath = path.join(cwd, 'package.json');
-  const hasPackageJson = (() => {
-    try {
-      return require('node:fs').existsSync(packageJsonPath);
-    } catch {
-      return false;
-    }
-  })();
-
-  if (!hasPackageJson) {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
     console.error(`❌ ERROR: Must be run from project root`);
-    console.error(`   Current directory: ${cwd}`);
+    console.error(`   Current directory: ${process.cwd()}`);
     console.error(`   This script should be run from the workspace root, not from sveltekit-frontend/`);
     console.error(`\n   Fix: cd $(git rev-parse --show-toplevel) && npx tsx scripts/atlas/duckdb/build-full-snapshot.mts`);
     process.exit(1);
