@@ -106,6 +106,7 @@ export const VECTOR_CONFIG = {
     codebase_chunks_384_hybrid: {
       vectors: ['content'],
       on_disk_payload: true,
+      sparse_vectors: ['bm42'], // Canonical sparse vector name per qdrant-collection-contracts.ts
     },
     codebase_chunks_384: {
       vectors: ['content'],

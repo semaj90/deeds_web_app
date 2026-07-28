@@ -287,6 +287,13 @@ export class QdrantManager {
         if ('on_disk_payload' in schema) {
           config.on_disk_payload = schema.on_disk_payload;
         }
+        // Add sparse vectors if defined in schema
+        if ('sparse_vectors' in schema && (schema as any).sparse_vectors?.length > 0) {
+          config.sparse_vectors = {};
+          for (const sparseVecName of (schema as any).sparse_vectors) {
+            config.sparse_vectors[sparseVecName] = {}; // Empty config uses Qdrant defaults
+          }
+        }
         return config;
       }
     );
@@ -294,8 +301,9 @@ export class QdrantManager {
     for (const config of collectionConfigs) {
       try {
         await this.client.createCollection(config.name, config as any);
+        const sparseInfo = config.sparse_vectors ? ` + sparse [${Object.keys(config.sparse_vectors).join(', ')}]` : '';
         console.log(
-          `✅ Qdrant collection created: ${config.name} (INT8 quantized, ef_construct=${hnsw.ef_construct})`
+          `✅ Qdrant collection created: ${config.name} (INT8 quantized, ef_construct=${hnsw.ef_construct}${sparseInfo})`
         );
       } catch (error: any) {
         if (!error?.message?.includes('already exists')) {
