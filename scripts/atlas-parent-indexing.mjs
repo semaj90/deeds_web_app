@@ -14,9 +14,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '..');
+process.chdir(ROOT);
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
@@ -26,6 +28,7 @@ const VERBOSE = argv.includes('--verbose');
 const CARDS_DIR = path.join(ROOT, '.opencode', 'cards');
 const EXPORT_DIR = path.join(ROOT, 'memory', 'exports', 'parent-atlas');
 const REPORT_PATH = path.join(ROOT, 'memory', 'exports', 'parent-atlas-report.json');
+const COMPRESS_THRESHOLD_BYTES = 100 * 1024 * 1024;
 
 // ─── CSV Helper ──────────────────────────────────────────────────────────
 
@@ -37,6 +40,22 @@ function toCsvRow(obj) {
       return String(v);
     })
     .join(',');
+}
+
+function writeMaybeCompressed(fileName, content) {
+  const filePath = path.join(EXPORT_DIR, fileName);
+  const gzPath = `${filePath}.gz`;
+  const buffer = Buffer.from(content, 'utf8');
+  if (buffer.byteLength > COMPRESS_THRESHOLD_BYTES) {
+    fs.writeFileSync(gzPath, gzipSync(buffer));
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    console.log(`  ✅ Exported compressed ${fileName} → ${gzPath}`);
+    return gzPath;
+  }
+  fs.writeFileSync(filePath, content, 'utf8');
+  if (fs.existsSync(gzPath)) fs.unlinkSync(gzPath);
+  console.log(`  ✅ Exported ${fileName} → ${filePath}`);
+  return filePath;
 }
 
 // ─── Main ────────────────────────────────────────────────────────────────
@@ -154,8 +173,7 @@ async function main() {
       '\n' +
       parentAtlas.map((entry) => toCsvRow(entry)).join('\n');
 
-    fs.writeFileSync(path.join(EXPORT_DIR, 'parent_atlas_index.csv'), parentAtlasCsv, 'utf8');
-    console.log(`  ✅ Exported parent atlas index → ${EXPORT_DIR}/parent_atlas_index.csv`);
+    writeMaybeCompressed('parent_atlas_index.csv', parentAtlasCsv);
 
     // Cluster summary CSV
     const clusterEntries = Object.values(clusterSummary);
@@ -165,8 +183,7 @@ async function main() {
       '\n' +
       clusterEntries.map((entry) => toCsvRow(entry)).join('\n');
 
-    fs.writeFileSync(path.join(EXPORT_DIR, 'cluster_summary.csv'), clusterCsv, 'utf8');
-    console.log(`  ✅ Exported cluster summary → ${EXPORT_DIR}/cluster_summary.csv`);
+    writeMaybeCompressed('cluster_summary.csv', clusterCsv);
 
     // Parent atlas index JSON (for Redis cache)
     const parentAtlasJson = {

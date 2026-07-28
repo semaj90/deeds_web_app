@@ -29,6 +29,17 @@ Two-lane storage split
 - Qdrant is the semantic lookup layer with payload filters and ANN search.
 - See also: [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
 
+Concrete lane map
+- `.okf` is the declarative contract lane, not the truth store.
+- MsgPack is the compact packet / cache codec lane.
+- Arrow IPC is the bounded batch export lane.
+- gRPC / protobuf is the live service boundary lane.
+- Redis / BitFrost is the hot cache and replay lane.
+- Qdrant is the semantic lookup mirror.
+- Postgres remains the canonical identity and provenance store.
+- `embeddinggemma` is the canonical embedding family, and `512` is the canonical embedding lane.
+- `384` is only a compact projection / routing lane when an explicit projection exists.
+
 Caveman architecture (compiler pipeline)
 -------------------------------------------------
 TypeScript/Drizzle schema
@@ -37,9 +48,11 @@ TypeScript/Drizzle schema
 → JSONL exports (nodes/edges/cards/schema/drizzle-map/vectors)
 → DuckDB hash joins / audits
 → Postgres truth tables (write-only with --write)
-→ Qdrant 768d semantics (seeded from vectors64.jsonl as a separate op)
+→ Qdrant 768d main codebase chunk lane
 → Neo4j graph paths (produce edges.jsonl for import)
-→ 64d autoencoder/SOM cold routing (offline transform)
+→ 512d canonical embedding contract
+→ 64d routing lane only (autoencoder/SOM cold routing)
+→ Arrow IPC batch export for offline workers
 → LoRA/tool-routing training rows
 
 ID rules (deterministic)
@@ -145,7 +158,7 @@ Offline MapReduce / hash-join lane (rules)
 
 Postgres / Qdrant / Neo4j responsibilities
 - Postgres: durable truth, partitioned tables (`outcome_ledger`, `chunk_hit_log`, `summary_cards`). Write via controlled migration or `--write` path.
-- Qdrant: 768d retrieval store (collection: `codebase_chunks_768`). Seeded from `vectors64.jsonl`/`qdrant-export.jsonl` via separate command — do not write from these scripts.
+- Qdrant: `codebase_chunks_768` is the main codebase chunk lane. Keep the separately versioned 512 embedding contract outside the chunk store unless a dedicated mirror lane exists. Seeded from `vectors64.jsonl`/`qdrant-export.jsonl` via separate command — do not write from these scripts.
 - Neo4j: graph path proofs; export `edges.jsonl` for manual/controlled import.
 - deeds/engram remains optional and fail-open; it is an adapter surface, not canonical storage.
 - XGBoost is the formal reranker contract for retrieval ordering; keep side-channel hotness scoring parallel only.
@@ -166,6 +179,7 @@ Next actions (recommended)
 3. Build `memory/exports/atlas/*` bundle using `build-parent-atlas-export-bundle.mjs` (dry-run).
 4. Run `duckdb-parent-atlas-audit.mjs` to identify unmatched refs, ambiguous suffixes, and generate `training-rows.jsonl` dry-run.
 5. Iterate: resolve ambiguousExamples, then consider guarded `--write` step to Postgres/Qdrant/Neo4j if required.
+6. Keep Arrow IPC for batch movement and MsgPack for compact packet transport; do not promote either as the source of truth.
 
 Appendix: quick command set
 ```bash

@@ -25,10 +25,11 @@
  */
 
 import fs from 'node:fs/promises';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { createInterface } from 'node:readline';
 import { evaluateTaskPromotion } from './lib/task-promotion-gate.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,9 @@ export const REPO_ROOT = path.resolve(__dirname, '../..');
 
 const TRACE_MCP_URL = (process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788').replace(/\/$/, '');
 const TURBOQUANT_URL = (process.env.TURBOQUANT_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/$/, '');
+const ATLAS_TOOLS_MCP_SERVER = path.join(REPO_ROOT, 'sveltekit-frontend', 'scripts', 'mcp', 'atlas-tools-mcp.mjs');
+const WORKFLOW_REPORT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'agentic-recommendation-workflow.json');
+const WORKFLOW_REPORT_PATH_ALT = path.join(REPO_ROOT, 'docs', 'reports', 'atlas', 'agentic-recommendation-workflow.json');
 
 function resolveLlamaServerModelId() {
   const explicit = String(process.env.LLAMA_MODEL ?? process.env.TURBOQUANT_MODEL ?? '').trim();
@@ -128,6 +132,85 @@ async function callMcpTool(toolName, args = {}) {
   return parsed?.result ?? null;
 }
 
+async function callAtlasToolsLocal(toolName, args = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn('node', [ATLAS_TOOLS_MCP_SERVER], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+
+    let pending = true;
+    const timer = setTimeout(() => {
+      if (!pending) return;
+      pending = false;
+      child.kill();
+      reject(new Error(`atlas-tools local fallback "${toolName}" timed out after 10 s`));
+    }, 10_000);
+
+    const rl = createInterface({ input: child.stdout, terminal: false });
+    rl.on('line', (line) => {
+      if (!line.trim()) return;
+      let msg = null;
+      try { msg = JSON.parse(line); } catch { return; }
+      if (msg.id === 2) {
+        clearTimeout(timer);
+        pending = false;
+        if (msg.error) {
+          reject(new Error(msg.error.message ?? 'atlas-tools local fallback error'));
+          child.kill();
+          return;
+        }
+        const textBlock = msg.result?.content?.find?.((entry) => entry?.type === 'text');
+        const text = textBlock?.text ?? '{}';
+        try { resolve(JSON.parse(text)); } catch { resolve(text); }
+        child.kill();
+      }
+    });
+
+    child.on('error', (err) => {
+      clearTimeout(timer);
+      if (pending) {
+        pending = false;
+        reject(err);
+      }
+    });
+
+    child.stdin.write(JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'initialize',
+      params: { protocolVersion: '2024-11-05', clientInfo: { name: 'agentic-recommendation-workflow', version: '1' } },
+    }) + '\n');
+    child.stdin.write(JSON.stringify({
+      jsonrpc: '2.0',
+      id: 2,
+      method: 'tools/call',
+      params: { name: toolName, arguments: args },
+    }) + '\n');
+    child.stdin.end();
+  });
+}
+
+async function callAtlasWorkflowTool(toolName, args = {}) {
+  try {
+    const result = await callMcpTool(toolName, args);
+    if (result !== null && result !== undefined) {
+      if (typeof result === 'string' && /not found|unknown tool|unavailable|MCP error/i.test(result)) {
+        throw new Error(result);
+      }
+      return result;
+    }
+  } catch (error) {
+    const message = String(error?.message ?? error);
+    if (!/not found|unknown tool|MCP .*error/i.test(message)) {
+      throw error;
+    }
+    if (!['classify_intent', 'build_agentic_rag_context', 'build_recommendation', 'record_outcome'].includes(toolName)) {
+      throw error;
+    }
+  }
+  return callAtlasToolsLocal(toolName, args);
+}
+
 // ── normalizeSourceRef ────────────────────────────────────────────────────────
 
 export function normalizeSourceRef(sourceRef) {
@@ -142,6 +225,133 @@ export function normalizeSourceRef(sourceRef) {
   }
   s = s.replace(/^\/+/, '').replace(/\/+/g, '/').replace(/\/$/, '').toLowerCase();
   return s || null;
+}
+
+function createWorkflowRun(query, normalizedQuery) {
+  return {
+    contract: 'atlas.recommendation.workflow.v1',
+    generated_at: new Date().toISOString(),
+    query,
+    normalized_query: normalizedQuery,
+    workflow_status: 'RUNNING',
+    workflow_state: 'DISCOVER',
+    dag: [],
+    state_history: [],
+    intent: null,
+    ace_context: null,
+    recommendation: null,
+    outcome: null,
+  };
+}
+
+function appendWorkflowStage(workflow, stage, state, details = {}) {
+  const timestamp = new Date().toISOString();
+  const node = {
+    stage,
+    state,
+    status: details.status ?? 'ok',
+    dependsOn: details.dependsOn ?? [],
+    evidenceRefs: Array.isArray(details.evidenceRefs) ? details.evidenceRefs.slice(0, 20) : [],
+    outputRef: details.outputRef ?? null,
+    updated_at: timestamp,
+    notes: details.notes ?? null,
+  };
+  workflow.dag.push(node);
+  workflow.state_history.push({
+    state,
+    stage,
+    status: node.status,
+    updated_at: timestamp,
+  });
+  workflow.workflow_state = state;
+  if (node.status === 'failed') workflow.workflow_status = 'FAILED';
+  return node;
+}
+
+async function writeWorkflowReport(workflow, recommendation = null, outcome = null) {
+  const report = {
+    ...workflow,
+    top: recommendation
+      ? [{
+          task_id: recommendation.task_promotion?.recommendation_id ?? recommendation.source_id ?? null,
+          title: recommendation.feature_label ?? recommendation.source_ref ?? recommendation.gemma4?.summary ?? 'Atlas recommendation',
+          intent: workflow.intent?.intent ?? recommendation.gemma4?.intent ?? null,
+          source_ref: recommendation.source_ref ?? null,
+          feature_id: recommendation.feature_id ?? null,
+          title_id: recommendation.title_id ?? null,
+          packet_key: recommendation.packet_key ?? null,
+          confidence: recommendation.task_promotion?.retrieval_confidence ?? recommendation.evidence?.rerank_score ?? recommendation.confidence ?? null,
+          updated_at: new Date().toISOString(),
+          recommended_commands: recommendation.validation_commands ?? [],
+          verification_commands: recommendation.validation_commands ?? [],
+          status: recommendation.task_promotion?.gate_decision ?? recommendation.decision ?? null,
+        }]
+      : [],
+  };
+
+  if (outcome) {
+    report.outcome = outcome;
+  }
+
+  await fs.mkdir(path.dirname(WORKFLOW_REPORT_PATH), { recursive: true });
+  await fs.writeFile(WORKFLOW_REPORT_PATH, JSON.stringify(report, null, 2));
+  await fs.mkdir(path.dirname(WORKFLOW_REPORT_PATH_ALT), { recursive: true });
+  await fs.writeFile(WORKFLOW_REPORT_PATH_ALT, JSON.stringify(report, null, 2));
+  return report;
+}
+
+async function classifyIntentStage(query, normalizedQuery) {
+  try {
+    const result = await callAtlasWorkflowTool('classify_intent', { prompt: query, context: normalizedQuery ?? query });
+    if (result && typeof result === 'object') return result;
+  } catch (error) {
+    vlog('classify_intent fallback', String(error?.message ?? error));
+  }
+
+  const lower = `${query} ${normalizedQuery ?? ''}`.toLowerCase();
+  const intent = /fix|bug|error|fail|broken|repair|patch/.test(lower)
+    ? 'repair'
+    : /research|analyz|inspect|review|evidence|prove/.test(lower)
+      ? 'research'
+      : 'planning';
+  const domain = /graph|neo4j|pagerank|topology/.test(lower)
+    ? 'graph'
+    : /qdrant|vector|embed|retrieval|search/.test(lower)
+      ? 'retrieval'
+      : /agent|workflow|kanban|dag/.test(lower)
+        ? 'agent-workflow'
+        : /ui|svelte|frontend/.test(lower)
+          ? 'frontend'
+          : /sql|db|postgres|drizzle/.test(lower)
+            ? 'database'
+            : 'general';
+  return {
+    intent,
+    domain,
+    subdomain: 'general',
+    confidence: 0.5,
+    safeNextCommand: 'review evidence before mutation',
+  };
+}
+
+async function buildAceContextStage(query) {
+  try {
+    const result = await callAtlasWorkflowTool('build_agentic_rag_context', { query, maxCards: 12 });
+    if (result && typeof result === 'object') return result;
+  } catch (error) {
+    vlog('build_agentic_rag_context fallback', String(error?.message ?? error));
+  }
+  return {
+    ok: false,
+    query,
+    totalCards: 0,
+    packetAge: 'unknown',
+    cards: [],
+    sourceRefs: [],
+    promptPacket: '',
+    safeNextCommand: 'run local retrieval before synthesis',
+    error: 'build_agentic_rag_context unavailable',
+  };
 }
 
 // ── L1: Local rg search ───────────────────────────────────────────────────────
@@ -323,11 +533,18 @@ async function l5Rerank(query, evidence) {
 
 // ── L6: Gemma4 synthesis (bounded) ───────────────────────────────────────────
 
-async function l6Synthesis(query, identity, ranked, memory) {
+async function l6Synthesis(query, identity, ranked, memory, aceContext = null) {
   const summaries = ranked.slice(0, 5)
     .map(h => h.summary ?? h.content ?? '')
     .filter(Boolean)
     .join('\n\n');
+
+  const acePacket = aceContext?.promptPacket
+    ? `ACE packet:\n${aceContext.promptPacket}\n`
+    : '';
+  const aceCards = Array.isArray(aceContext?.cards) && aceContext.cards.length > 0
+    ? `ACE cards:\n${aceContext.cards.slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`).join('\n')}\n`
+    : '';
 
   const priorFix = memory.prior_fix
     ? `Prior solution: ${memory.prior_fix.solution ?? 'see Engram record'}`
@@ -337,6 +554,8 @@ async function l6Synthesis(query, identity, ranked, memory) {
     'You are a code-analysis assistant. Respond with a JSON object only. No markdown fences.',
     '',
     'Evidence from the codebase retrieval system:',
+    acePacket,
+    aceCards,
     summaries || '(no retrieved summaries)',
     priorFix,
     '',
@@ -427,39 +646,137 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
   console.log(`\n[GATE v2] Query: "${userQuery}"`);
 
   const normalized = normalizeSourceRef(initialSourceRefs[0] ?? userQuery);
+  const workflow = createWorkflowRun(userQuery, normalized);
+
+  // L0 — Intent classification
+  process.stdout.write('  [L0] classify_intent... ');
+  const intent = await classifyIntentStage(userQuery, normalized);
+  workflow.intent = intent;
+  appendWorkflowStage(workflow, 'classify_intent', 'DISCOVER', {
+    outputRef: 'workflow.intent',
+    notes: `${intent.intent}/${intent.domain}`,
+  });
+  console.log(`${intent.intent ?? 'unknown'} / ${intent.domain ?? 'unknown'}`);
 
   // L1 — Local search
   process.stdout.write('  [L1] Local rg search... ');
   const rgMatches = l1LocalSearch(userQuery);
+  appendWorkflowStage(workflow, 'local_search', 'DISCOVER', {
+    dependsOn: ['classify_intent'],
+    outputRef: 'workflow.rg_matches',
+    evidenceRefs: rgMatches,
+  });
   console.log(`${rgMatches.length} files`);
 
   // L2 — Canonical identity
   process.stdout.write('  [L2] Canonical identity (3 MCP calls)... ');
   const identity = await l2CanonicalIdentity(userQuery, normalized);
+  appendWorkflowStage(workflow, 'canonical_identity', 'PLAN', {
+    dependsOn: ['classify_intent', 'local_search'],
+    outputRef: 'workflow.identity',
+    evidenceRefs: [identity.source_ref, identity.packet_key, identity.qdrant_point_id].filter(Boolean),
+  });
   console.log(identity.packet_key ? `FOUND: ${identity.packet_key}` : 'MISS (unregistered)');
+
+  // L2.5 — Build bounded ACE context packet
+  process.stdout.write('  [L2.5] build_agentic_rag_context... ');
+  const aceContext = await buildAceContextStage(userQuery);
+  workflow.ace_context = aceContext;
+  appendWorkflowStage(workflow, 'build_agentic_rag_context', 'PLAN', {
+    dependsOn: ['canonical_identity'],
+    outputRef: 'workflow.ace_context',
+    evidenceRefs: aceContext.sourceRefs ?? [],
+  });
+  console.log(aceContext.ok ? `${aceContext.totalCards} cards` : 'unavailable');
 
   // L3 — Memory
   process.stdout.write('  [L3] Memory lookup... ');
   const memory = await l3MemoryLookup(identity.feature_id, userQuery);
+  appendWorkflowStage(workflow, 'memory_lookup', 'RETRIEVE', {
+    dependsOn: ['build_agentic_rag_context'],
+    outputRef: 'workflow.memory',
+    evidenceRefs: memory.prior_fix ? ['engram.chat_memory_recent'] : [],
+  });
   console.log(memory.prior_fix ? 'prior fix found' : 'no prior fix');
 
   // L4 — Hybrid retrieval
   process.stdout.write('  [L4] Hybrid retrieval (BM25 + dense + graph)... ');
   const l4Evidence = await l4HybridRetrieval(userQuery, identity);
+  appendWorkflowStage(workflow, 'hybrid_retrieval', 'RETRIEVE', {
+    dependsOn: ['memory_lookup'],
+    outputRef: 'workflow.retrieval',
+    evidenceRefs: [
+      ...l4Evidence.bm25_hits.slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? ''),
+      ...l4Evidence.dense_hits.slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? ''),
+      ...l4Evidence.graph_hits.slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? ''),
+    ].filter(Boolean),
+  });
   console.log(`bm25:${l4Evidence.bm25_hits.length} dense:${l4Evidence.qdrant_hits} graph:${l4Evidence.graph_hit_count}`);
 
   // L5 — Rerank
   process.stdout.write('  [L5] Reranking... ');
   const rerankResult = await l5Rerank(userQuery, l4Evidence);
+  appendWorkflowStage(workflow, 'rerank', 'RERANK', {
+    dependsOn: ['hybrid_retrieval'],
+    outputRef: 'workflow.rerank',
+    evidenceRefs: rerankResult.ranked.slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? '').filter(Boolean),
+  });
   console.log(`top_score: ${rerankResult.top_score.toFixed(3)}, ${rerankResult.ranked.length} hits`);
 
   // L6 — Synthesis
   process.stdout.write('  [L6] Gemma4 synthesis (bounded)... ');
-  const gemma4 = await l6Synthesis(userQuery, identity, rerankResult.ranked, memory);
+  const gemma4 = await l6Synthesis(userQuery, identity, rerankResult.ranked, memory, aceContext);
+  appendWorkflowStage(workflow, 'synthesize', 'SYNTHESIZE', {
+    dependsOn: ['rerank'],
+    outputRef: 'workflow.gemma4',
+    evidenceRefs: rerankResult.ranked.slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? '').filter(Boolean),
+  });
   console.log(`priority: ${gemma4.priority}`);
+
+  // L6.5 — Structured recommendation gate
+  process.stdout.write('  [L6.5] build_recommendation... ');
+  let structuredRecommendation = null;
+  try {
+    structuredRecommendation = await callAtlasWorkflowTool('build_recommendation', {
+      intent: intent.intent ?? 'planning',
+      domain: intent.domain ?? 'general',
+      errorSummary: gemma4.summary ?? userQuery,
+      evidenceLines: [
+        ...rgMatches.slice(0, 10),
+        ...(aceContext.cards ?? []).slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`),
+        ...(rerankResult.ranked ?? []).slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? ''),
+      ].filter(Boolean).slice(0, 20),
+      patchTargets: rgMatches.slice(0, 5),
+      proposedFix: gemma4.rationale ?? null,
+    });
+  } catch (error) {
+    structuredRecommendation = {
+      likely_cause: gemma4.risk ?? 'unknown',
+      evidence: [...rgMatches.slice(0, 5)],
+      patch_targets: rgMatches.slice(0, 5),
+      proposed_fix: gemma4.rationale ?? null,
+      safe_next_command: 'review evidence before mutation',
+      do_not_do: ['treat synthesis as source of truth'],
+      intent: intent.intent ?? 'planning',
+      domain: intent.domain ?? 'general',
+      error: String(error?.message ?? error),
+    };
+  }
+  workflow.recommendation = structuredRecommendation;
+  appendWorkflowStage(workflow, 'build_recommendation', 'SYNTHESIZE', {
+    dependsOn: ['synthesize'],
+    outputRef: 'workflow.recommendation',
+    evidenceRefs: structuredRecommendation?.evidence ?? structuredRecommendation?.patch_targets ?? [],
+  });
+  console.log(structuredRecommendation?.safe_next_command ?? 'structured recommendation built');
 
   // L7 — Decision
   const decision = l7Decision(identity, rerankResult, gemma4, memory);
+  appendWorkflowStage(workflow, 'gate', 'GATE', {
+    dependsOn: ['build_recommendation'],
+    outputRef: 'workflow.decision',
+    notes: decision,
+  });
   console.log(`  [L7] Decision: ${decision}`);
 
   const benchmarkReport = await readJsonIfExists('docs/reports/retrieval-e2e-benchmark.json');
@@ -529,9 +846,40 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     supersedes: [],
     merged_from: [],
     do_not_do: [],
+    workflow_state: workflow.workflow_state,
+    workflow_status: workflow.workflow_status,
+    workflow_dag: workflow.dag,
+    ace_context: aceContext,
+    structured_recommendation: structuredRecommendation,
   };
 
-  return recommendation;
+  workflow.recommendation = recommendation;
+
+  workflow.workflow_status = 'COMPLETE';
+  workflow.workflow_state = 'COMPLETE';
+  appendWorkflowStage(workflow, 'record_outcome', 'RECORD', {
+    dependsOn: ['gate'],
+    outputRef: 'workflow.outcome',
+    evidenceRefs: recommendation.evidence.rg_matches.slice(0, 10),
+  });
+  appendWorkflowStage(workflow, 'complete', 'COMPLETE', {
+    dependsOn: ['record_outcome'],
+    outputRef: 'workflow.complete',
+  });
+
+  await writeWorkflowReport(workflow, recommendation, workflow.outcome);
+
+  return {
+    ...recommendation,
+    workflow_state: workflow.workflow_state,
+    workflow_status: workflow.workflow_status,
+    workflow_dag: workflow.dag,
+    state_history: workflow.state_history,
+    intent,
+    ace_context: aceContext,
+    structured_recommendation: structuredRecommendation,
+    workflow_report: workflow,
+  };
 }
 
 // ── generateGatedRecommendation (compat wrapper) ──────────────────────────────
@@ -581,6 +929,38 @@ export async function emitBoardProposal(recommendation) {
   return proposal;
 }
 
+// ── recordOutcome ────────────────────────────────────────────────────────────
+
+export async function recordOutcome(recommendation, outcome = {}) {
+  const outcomePath = path.join(REPO_ROOT, '.opencode', 'outcome-ledger.ndjson');
+  const entry = {
+    id: recommendation.task_promotion?.recommendation_id ?? recommendation.source_id ?? createHash('sha256').update(JSON.stringify(recommendation)).digest('hex').slice(0, 36),
+    intent: recommendation.gemma4?.intent ?? recommendation.decision ?? 'planning',
+    tool: recommendation.task_promotion?.gate_decision === 'PROMOTE'
+      ? 'atlas-tools_build_recommendation'
+      : 'atlas-tools_record_outcome',
+    sourceRefs: Array.from(new Set([
+      ...(recommendation.evidence?.rg_matches ?? []),
+      ...(recommendation.evidence?.sourceRefs ?? []),
+      ...(recommendation.target_files ?? []),
+      ...(outcome.sourceRefs ?? []),
+    ])).filter(Boolean).slice(0, 20),
+    recommendationAccepted: recommendation.task_promotion?.gate_decision === 'PROMOTE',
+    reward: typeof outcome.reward === 'number'
+      ? outcome.reward
+      : (recommendation.task_promotion?.gate_decision === 'PROMOTE' ? 1 : 0.5),
+    graphVersion: outcome.graphVersion ?? recommendation.task_promotion?.graph_version ?? '2026-07-28',
+    workflowState: recommendation.workflow_state ?? recommendation.workflow_report?.workflow_state ?? null,
+    workflowStatus: recommendation.workflow_status ?? recommendation.workflow_report?.workflow_status ?? null,
+    errorMsg: outcome.errorMsg ?? null,
+    timestamp: new Date().toISOString(),
+  };
+
+  await fs.mkdir(path.dirname(outcomePath), { recursive: true });
+  await fs.appendFile(outcomePath, `${JSON.stringify(entry)}\n`);
+  return entry;
+}
+
 // ── CLI entrypoint ────────────────────────────────────────────────────────────
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
@@ -595,6 +975,17 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       if (args.includes('--emit-board-proposal')) {
         const proposal = await emitBoardProposal(rec);
         rec.board_proposal = proposal;
+      }
+      if (args.includes('--record-outcome') || args.includes('--emit-board-proposal')) {
+        rec.outcome_record = await recordOutcome(rec, {
+          reward: rec.task_promotion?.gate_decision === 'PROMOTE' ? 1 : 0.5,
+          graphVersion: rec.task_promotion?.graph_version ?? '2026-07-28',
+          sourceRefs: rec.evidence?.rg_matches ?? [],
+        });
+        if (rec.workflow_report) {
+          rec.workflow_report.outcome = rec.outcome_record;
+          await writeWorkflowReport(rec.workflow_report, rec, rec.outcome_record);
+        }
       }
       console.log('\n' + JSON.stringify(rec, null, 2));
     })

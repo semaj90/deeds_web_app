@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { summarizeDailyGraphifyBoard } from './daily-graphify-board.js';
 
 describe('daily graphify board', () => {
-  it('separates promoted tasks from review-required intake', () => {
+	it('separates promoted tasks from review-required intake', () => {
     const board = {
       generated: '2026-07-23T00:00:00.000Z',
       collection: 'codebase_chunks_768',
@@ -75,5 +75,67 @@ describe('daily graphify board', () => {
       promotedCount: 1,
       reviewRequiredCount: 1,
     });
+  });
+
+  it('normalizes the generated graph board and surfaces temporal workflow recommendations', () => {
+    const board = {
+      generatedAt: '2026-07-23T00:00:00.000Z',
+      repoName: 'deeds-web-app',
+      columns: {
+        BACKLOG: {
+          label: 'Backlog',
+          tasks: [
+            {
+              id: 'review_previous_work',
+              priority: 'HIGH',
+              label: 'Review previous work',
+              script: 'node scripts/atlas/agentic-recommendation-workflow.mjs --dry-run',
+              gate: 'Inspect prior work and current tasks',
+            },
+          ],
+        },
+        IN_PROGRESS: {
+          label: 'In progress',
+          tasks: [
+            {
+              taskId: 'chunk_embedding',
+              priority: 'LOW',
+              label: 'Run embedding pass',
+              gate: 'Embedding state files available',
+            },
+          ],
+        },
+      },
+    };
+
+    const workflowReport = {
+      generated_at: '2026-07-23T00:00:00.000Z',
+      top: [
+        {
+          task_id: 'rec-task-0003',
+          intent: 'error_fix',
+          query: 'add retrieval telemetry to hyperrag rpc',
+          feature_label: 'HyperRAG telemetry',
+          source_ref: 'sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts',
+          recommended_commands: ['rg -n "packet-rpc" src/', 'npm run smoke:hyperrag-packet-rpc'],
+          verification_commands: ['npm run smoke:hyperrag-packet-rpc'],
+          confidence: 0.85,
+          status: 'ready',
+          updated_at: '2026-07-23T01:00:00.000Z',
+        },
+      ],
+    };
+
+    const summary = summarizeDailyGraphifyBoard(board, null, workflowReport);
+
+    expect(summary.collection).toBe('deeds-web-app');
+    expect(summary.columns).toHaveLength(4);
+    expect(summary.columns[0]?.tasks[0]?.priority).toBe('P0');
+    expect(summary.columns[2]?.tasks[0]?.priority).toBe('P2');
+    expect(summary.temporalRecommendations).toHaveLength(1);
+    expect(summary.temporalRecommendations[0]?.rank).toBe(1);
+    expect(summary.temporalRecommendations[0]?.recommendedCommands[0]).toContain('packet-rpc');
+    expect(summary.boardSource).toContain('docs/graph/kanban-board.json');
+    expect(summary.recommendationSource).toBe('agentic-recommendation-workflow');
   });
 });

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-03T08:03:05.419Z",
+  "generatedAt": "2026-07-28T21:07:28.779Z",
   "queueContracts": [
     {
       "queue": "phase7.summarization",
@@ -31,17 +31,11 @@
     {
       "proto": "Packet",
       "table": "atlas_packets",
-      "columns": 62,
+      "columns": 131,
       "columnsMissing": [],
-      "indexesTotal": 40,
-      "indexesMissing": [
-        "idx_atlas_packets_feature_id_composite",
-        "atlas_packets_metadata_gin_idx",
-        "idx_atlas_packets_payload_path",
-        "idx_packets_source_feature_multi_hop",
-        "idx_packets_centroid_cache"
-      ],
-      "indexesCoverage": "FAIL",
+      "indexesTotal": 85,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
       "fieldsCoverage": "PASS",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
@@ -72,18 +66,12 @@
     {
       "proto": "TaskSemanticPacket",
       "table": "task_semantic_packets",
-      "columns": 0,
-      "columnsMissing": [
-        "feature_id",
-        "metadata"
-      ],
-      "indexesTotal": 0,
-      "indexesMissing": [
-        "idx_task_semantic_packets_feature_id",
-        "idx_task_semantic_packets_metadata_gin"
-      ],
-      "indexesCoverage": "FAIL",
-      "fieldsCoverage": "FAIL",
+      "columns": 16,
+      "columnsMissing": [],
+      "indexesTotal": 9,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
+      "fieldsCoverage": "PASS",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
       "capabilityCoverage": "PASS"
@@ -91,17 +79,12 @@
     {
       "proto": "ConceptRecord",
       "table": "concept_records",
-      "columns": 17,
-      "columnsMissing": [
-        "metadata"
-      ],
-      "indexesTotal": 6,
-      "indexesMissing": [
-        "idx_concept_records_feature_ids_gin",
-        "idx_concept_records_metadata_gin"
-      ],
-      "indexesCoverage": "FAIL",
-      "fieldsCoverage": "FAIL",
+      "columns": 18,
+      "columnsMissing": [],
+      "indexesTotal": 8,
+      "indexesMissing": [],
+      "indexesCoverage": "PASS",
+      "fieldsCoverage": "PASS",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
       "capabilityCoverage": "PASS"

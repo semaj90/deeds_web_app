@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import {
+  EvidenceStateSchema,
+  KnowledgeResolutionSchema,
+  VectorLaneStatusSchema,
+} from '../atlas/contracts/classification-contracts';
 
 export type CanonicalAcePacketEnvelope = {
   packet_id?: string | null;
@@ -17,9 +22,19 @@ export type CanonicalAcePacketEnvelope = {
   kind: string | null;
   page_rank_score: number;
   prompt_template_id: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
   summary?: string | null;
   domain?: string | null;
   feature_label?: string | null;
+  domain_class?: string | null;
+  lane_status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED' | null;
+  evidence_state?: 'ACTIVE_VERIFIED' | 'ACTIVE_DEGRADED' | 'GATED' | 'REFERENCE_ONLY' | 'SUPERSEDED' | 'FAILED' | null;
+  knowledge_resolution?: 'RESOLVED' | 'UNCLASSIFIED' | 'AMBIGUOUS' | 'ONTOLOGY_GAP' | 'CONFLICTING_EVIDENCE' | null;
+  ontology_ids?: string[];
+  concept_ids?: string[];
+  runtime_evidence_refs?: string[];
+  test_evidence_refs?: string[];
   used_concepts?: string[];
   lexical_nouns?: string[];
   lexical_verbs?: string[];
@@ -76,9 +91,21 @@ export type CanonicalAcePacketEnvelopeRow = Partial<Record<
   | 'pageRankScore'
   | 'prompt_template_id'
   | 'promptTemplateId'
+  | 'created_at'
+  | 'createdAt'
+  | 'updated_at'
+  | 'updatedAt'
   | 'summary'
   | 'domain'
   | 'feature_label'
+  | 'domain_class'
+  | 'lane_status'
+  | 'evidence_state'
+  | 'knowledge_resolution'
+  | 'ontology_ids'
+  | 'concept_ids'
+  | 'runtime_evidence_refs'
+  | 'test_evidence_refs'
   | 'featureLabel'
   | 'used_concepts'
   | 'usedConcepts'
@@ -143,9 +170,19 @@ export const CanonicalAcePacketEnvelopeSchema = z.object({
   kind: z.string().min(1).nullable(),
   page_rank_score: z.number(),
   prompt_template_id: z.string().min(1).nullable(),
+  created_at: z.string().datetime().nullable().optional(),
+  updated_at: z.string().datetime().nullable().optional(),
   summary: z.string().nullable().optional(),
   domain: z.string().min(1).nullable().optional(),
   feature_label: z.string().min(1).nullable().optional(),
+  domain_class: z.string().min(1).nullable().optional(),
+  lane_status: VectorLaneStatusSchema.nullable().optional(),
+  evidence_state: EvidenceStateSchema.nullable().optional(),
+  knowledge_resolution: KnowledgeResolutionSchema.nullable().optional(),
+  ontology_ids: z.array(z.string().min(1)).default([]),
+  concept_ids: z.array(z.string().min(1)).default([]),
+  runtime_evidence_refs: z.array(z.string().min(1)).default([]),
+  test_evidence_refs: z.array(z.string().min(1)).default([]),
   used_concepts: z.array(z.string().min(1)).default([]),
   lexical_nouns: z.array(z.string().min(1)).default([]),
   lexical_verbs: z.array(z.string().min(1)).default([]),
@@ -245,9 +282,22 @@ export function buildCanonicalAcePacketEnvelope(
   const language = firstText(row.language, context.language);
   const kind = firstText(row.kind, context.kind);
   const promptTemplateId = firstText(row.prompt_template_id, row.promptTemplateId);
+  const createdAt = firstText((row as { created_at?: unknown }).created_at, (row as { createdAt?: unknown }).createdAt);
+  const updatedAt = firstText((row as { updated_at?: unknown }).updated_at, (row as { updatedAt?: unknown }).updatedAt);
   const summary = firstText(row.summary);
   const domain = firstText(row.domain);
   const featureLabel = firstText(row.feature_label, row.featureLabel);
+  const domainClass = firstText((row as { domain_class?: unknown }).domain_class, (row as { domainClass?: unknown }).domainClass, domain);
+  const laneStatus = firstText((row as { lane_status?: unknown }).lane_status, (row as { laneStatus?: unknown }).laneStatus) as CanonicalAcePacketEnvelope['lane_status'];
+  const evidenceState = firstText((row as { evidence_state?: unknown }).evidence_state, (row as { evidenceState?: unknown }).evidenceState) as CanonicalAcePacketEnvelope['evidence_state'];
+  const knowledgeResolution = firstText(
+    (row as { knowledge_resolution?: unknown }).knowledge_resolution,
+    (row as { knowledgeResolution?: unknown }).knowledgeResolution
+  ) as CanonicalAcePacketEnvelope['knowledge_resolution'];
+  const ontologyIds = stringArray((row as { ontology_ids?: unknown }).ontology_ids, (row as { ontologyIds?: unknown }).ontologyIds);
+  const conceptIds = stringArray((row as { concept_ids?: unknown }).concept_ids, (row as { conceptIds?: unknown }).conceptIds);
+  const runtimeEvidenceRefs = stringArray((row as { runtime_evidence_refs?: unknown }).runtime_evidence_refs, (row as { runtimeEvidenceRefs?: unknown }).runtimeEvidenceRefs);
+  const testEvidenceRefs = stringArray((row as { test_evidence_refs?: unknown }).test_evidence_refs, (row as { testEvidenceRefs?: unknown }).testEvidenceRefs);
   const usedConcepts = stringArray(
     row.used_concepts,
     row.usedConcepts,
@@ -289,9 +339,19 @@ export function buildCanonicalAcePacketEnvelope(
     kind,
     page_rank_score: Number(row.page_rank_score ?? row.pageRankScore ?? context.page_rank_score ?? 0) || 0,
     prompt_template_id: promptTemplateId,
+    created_at: createdAt,
+    updated_at: updatedAt,
     summary,
     domain,
     feature_label: featureLabel,
+    domain_class: domainClass,
+    lane_status: laneStatus,
+    evidence_state: evidenceState,
+    knowledge_resolution: knowledgeResolution,
+    ontology_ids: ontologyIds,
+    concept_ids: conceptIds,
+    runtime_evidence_refs: runtimeEvidenceRefs,
+    test_evidence_refs: testEvidenceRefs,
     used_concepts: usedConcepts,
     lexical_nouns: lexicalNouns,
     lexical_verbs: lexicalVerbs,

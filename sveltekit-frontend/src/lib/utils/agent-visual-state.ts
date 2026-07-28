@@ -25,7 +25,7 @@ const CODE_STATE: AgentVisualStatus[] = [
 	'DONE',
 ];
 
-export const AGENT_SPRITE_INSTANCE_STRIDE = 12;
+export const AGENT_SPRITE_INSTANCE_STRIDE = 13;
 
 export function clamp01(value: number): number {
 	if (!Number.isFinite(value)) return 0;
@@ -70,6 +70,7 @@ export function interpolateAgentVisualState(
 		interpolatedX: lerp(normalizedPrevious.x, normalizedCurrent.x, eased),
 		interpolatedY: lerp(normalizedPrevious.y, normalizedCurrent.y, eased),
 		alpha: eased,
+		ageMs: Math.max(0, normalizedCurrent.updatedAtMs - normalizedPrevious.updatedAtMs),
 	};
 }
 
@@ -85,8 +86,8 @@ export function packAgentVisualInstances(states: AgentVisualInstance[]): Float32
 	const packed = new Float32Array(states.length * AGENT_SPRITE_INSTANCE_STRIDE);
 	states.forEach((state, index) => {
 		const offset = index * AGENT_SPRITE_INSTANCE_STRIDE;
-		packed[offset + 0] = state.interpolatedX;
-		packed[offset + 1] = state.interpolatedY;
+		packed[offset + 0] = state.x;
+		packed[offset + 1] = state.y;
 		packed[offset + 2] = state.previousX;
 		packed[offset + 3] = state.previousY;
 		packed[offset + 4] = state.progress;
@@ -97,6 +98,7 @@ export function packAgentVisualInstances(states: AgentVisualInstance[]): Float32
 		packed[offset + 9] = state.clusterY;
 		packed[offset + 10] = state.spriteId;
 		packed[offset + 11] = stateToSpriteCode(state.state);
+		packed[offset + 12] = state.ageMs ?? 0;
 	});
 	return packed;
 }

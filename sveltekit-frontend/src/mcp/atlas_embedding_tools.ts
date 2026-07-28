@@ -1,5 +1,29 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { SOURCE_EMBEDDING_DIMENSION, SOURCE_QDRANT_COLLECTION } from "../lib/server/embedding/embedding-contract.js";
+
+export function resolveRedisOverrides(redisUrl?: string) {
+  if (!redisUrl) return {};
+
+  try {
+    const parsed = new URL(redisUrl);
+    const port = parsed.port ? Number(parsed.port) : undefined;
+    return {
+      host: parsed.hostname || undefined,
+      port: Number.isFinite(port) ? port : undefined,
+      password: parsed.password || undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+export function parsePacketIdentity(input: { packetKey: string; sourceRef?: string }) {
+  return {
+    packet_key: input.packetKey,
+    source_ref: input.sourceRef ?? null,
+  };
+}
 
 /**
  * Atlas Embedding Keywords Tools — MCP Wrapper
@@ -11,7 +35,7 @@ import { z } from "zod";
  * Prerequisites:
  *   - Redis/Valkey running at REDIS_URL with karpathy keyword centroids (gpu:karpathy:keywords:*)
  *   - Redis with SOM centroids (som:centroid:*)
- *   - Qdrant running with codebase_chunks_768 collection for neighbor search
+ *   - Qdrant running with the source semantic lane collection for neighbor search
  *
  * Exports:
  *   - atlas.embedding_keywords — Extract top-K keywords from embedding
@@ -21,17 +45,21 @@ import { z } from "zod";
  */
 
 export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string) {
+  const redisOverrides = resolveRedisOverrides(redisUrl);
+
   // Tool 1: Extract keywords from embedding
   server.registerTool(
     'atlas.embedding_keywords',
     {
       description:
-        'Extract top-K keywords from a 768-dimensional packet embedding using cosine similarity to cached keyword centroids in Redis.',
+        `Extract top-K keywords from a ${SOURCE_EMBEDDING_DIMENSION}-dimensional source embedding using cosine similarity to cached keyword centroids in Redis.`,
       inputSchema: z.object({
+        packetKey: z.string().min(1).describe('Canonical packet identity for the embedding source'),
+        sourceRef: z.string().min(1).optional().describe('Canonical source reference for traceability'),
         embedding: z
           .array(z.number())
-          .length(768)
-          .describe('768-dimensional embedding vector from embeddinggemma:latest'),
+          .length(SOURCE_EMBEDDING_DIMENSION)
+          .describe(`${SOURCE_EMBEDDING_DIMENSION}-dimensional embedding vector from embeddinggemma:latest`),
         topK: z
           .number()
           .int()
@@ -41,12 +69,12 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Number of top keywords to return'),
       }),
     },
-    async ({ embedding, topK }) => {
+    async ({ packetKey, sourceRef, embedding, topK }) => {
       try {
         const { createAtlasRedisClient } = await import(
-          '../../scripts/atlas/lib/redis-client-factory.mjs'
+          '../../../scripts/atlas/lib/redis-client-factory.mjs'
         );
-        const redis = createAtlasRedisClient();
+        const redis = createAtlasRedisClient(redisOverrides);
         await redis.connect();
 
         try {
@@ -85,9 +113,11 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
                 text: JSON.stringify(
                   {
                     status: 'success',
+                    ...parsePacketIdentity({ packetKey, sourceRef }),
                     keywords: topKeywords,
                     total_centroids_checked: keywordKeys.length,
                     embedding_dimension: embedding.length,
+                    vector_lane: 'dense_768',
                   },
                   null,
                   2
@@ -119,12 +149,14 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
     'atlas.embedding_cluster_tags',
     {
       description:
-        'Assign SOM cluster tags to a 768-dimensional embedding by matching against cached SOM centroids in Redis.',
+        `Assign SOM cluster tags to a ${SOURCE_EMBEDDING_DIMENSION}-dimensional embedding by matching against cached SOM centroids in Redis.`,
       inputSchema: z.object({
+        packetKey: z.string().min(1).describe('Canonical packet identity for the embedding source'),
+        sourceRef: z.string().min(1).optional().describe('Canonical source reference for traceability'),
         embedding: z
           .array(z.number())
-          .length(768)
-          .describe('768-dimensional embedding vector'),
+          .length(SOURCE_EMBEDDING_DIMENSION)
+          .describe(`${SOURCE_EMBEDDING_DIMENSION}-dimensional embedding vector`),
         topClusters: z
           .number()
           .int()
@@ -134,12 +166,12 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Number of top cluster tags to return'),
       }),
     },
-    async ({ embedding, topClusters }) => {
+    async ({ packetKey, sourceRef, embedding, topClusters }) => {
       try {
         const { createAtlasRedisClient } = await import(
-          '../../scripts/atlas/lib/redis-client-factory.mjs'
+          '../../../scripts/atlas/lib/redis-client-factory.mjs'
         );
-        const redis = createAtlasRedisClient();
+        const redis = createAtlasRedisClient(redisOverrides);
         await redis.connect();
 
         try {
@@ -178,8 +210,10 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
                 text: JSON.stringify(
                   {
                     status: 'success',
+                    ...parsePacketIdentity({ packetKey, sourceRef }),
                     cluster_tags: topTags,
                     total_som_cells_checked: somCentroids.length,
+                    vector_lane: 'latent_64',
                   },
                   null,
                   2
@@ -211,12 +245,14 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
     'atlas.embedding_neighbors',
     {
       description:
-        'Find semantically adjacent packets via Qdrant ANN search on a 768-dimensional embedding. Returns a query structure for agentic dense search in codebase_chunks_768 collection.',
+        `Find semantically adjacent packets via Qdrant ANN search on a ${SOURCE_EMBEDDING_DIMENSION}-dimensional embedding. Returns a query structure for agentic dense search in the source lane collection.`,
       inputSchema: z.object({
+        packetKey: z.string().min(1).describe('Canonical packet identity for the embedding source'),
+        sourceRef: z.string().min(1).optional().describe('Canonical source reference for traceability'),
         embedding: z
           .array(z.number())
-          .length(768)
-          .describe('768-dimensional embedding vector'),
+          .length(SOURCE_EMBEDDING_DIMENSION)
+          .describe(`${SOURCE_EMBEDDING_DIMENSION}-dimensional embedding vector`),
         limit: z
           .number()
           .int()
@@ -226,7 +262,7 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Maximum number of neighbors to find'),
       }),
     },
-    async ({ embedding, limit }) => {
+    async ({ packetKey, sourceRef, embedding, limit }) => {
       try {
         return {
           content: [
@@ -235,15 +271,16 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
               text: JSON.stringify(
                 {
                   status: 'success',
+                  ...parsePacketIdentity({ packetKey, sourceRef }),
                   neighbor_query: {
-                    method: 'qdrant_search',
-                    collection: 'codebase_chunks_768',
+                    method: 'qdrant_points_query',
+                    collection: SOURCE_QDRANT_COLLECTION,
                     vector: embedding,
                     limit,
                     vectorName: 'content',
                     withPayload: ['packet_key', 'cluster_id', 'tags'],
                   },
-                  note: 'This query structure should be passed to Qdrant `/search` endpoint for neighbor retrieval',
+                  note: 'This query structure should be passed to Qdrant named-vector query flow for neighbor retrieval',
                 },
                 null,
                 2
@@ -274,11 +311,12 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
       description:
         'Comprehensive tag derivation for a packet embedding. Combines keywords, cluster tags, and neighbor query in parallel. Returns combined metadata for packet enrichment.',
       inputSchema: z.object({
+        packetKey: z.string().min(1).describe('Canonical packet identity for the embedding source'),
+        sourceRef: z.string().min(1).optional().describe('Canonical source reference for traceability'),
         embedding: z
           .array(z.number())
-          .length(768)
-          .describe('768-dimensional embedding vector'),
-        packetKey: z.string().describe('Packet identity for deduplication and traceability'),
+          .length(SOURCE_EMBEDDING_DIMENSION)
+          .describe(`${SOURCE_EMBEDDING_DIMENSION}-dimensional embedding vector`),
         keywordTopK: z
           .number()
           .int()
@@ -302,13 +340,13 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Maximum semantic neighbors to query'),
       }),
     },
-    async ({ embedding, packetKey, keywordTopK, clusterTopK, neighborLimit }) => {
+    async ({ embedding, packetKey, sourceRef, keywordTopK, clusterTopK, neighborLimit }) => {
       try {
         const { createAtlasRedisClient, VECTOR_LANE_REGISTRY } = await import(
-          '../../scripts/atlas/lib/redis-client-factory.mjs'
+          '../../../scripts/atlas/lib/redis-client-factory.mjs'
         );
 
-        const redis = createAtlasRedisClient();
+        const redis = createAtlasRedisClient(redisOverrides);
         await redis.connect();
 
         try {
@@ -360,7 +398,7 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           // Construct neighbor query
           const neighborsQuery = {
             method: 'qdrant_search' as const,
-            collection: 'codebase_chunks_768',
+            collection: SOURCE_QDRANT_COLLECTION,
             vector: embedding,
             limit: neighborLimit,
             vectorName: 'content',
@@ -374,7 +412,7 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
                 text: JSON.stringify(
                   {
                     status: 'success',
-                    packetKey,
+                    ...parsePacketIdentity({ packetKey, sourceRef }),
                     timestamp: new Date().toISOString(),
                     vectorLane: VECTOR_LANE_REGISTRY?.DENSE_768?.role || 'DENSE_768',
                     keywords: topKeywords,
@@ -383,9 +421,10 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
                     metadata: {
                       keywordModel: 'karpathy-centroids',
                       clusterModel: 'som-20x20',
-                      retrievalModel: 'qdrant-codebase-768',
+                      retrievalModel: 'qdrant-codebase-source-768',
                       totalKeywordCentroidsChecked: keywordKeys.length,
                       totalSomCellsChecked: somCentroids.length,
+                      sourceRef: sourceRef ?? null,
                     },
                   },
                   null,

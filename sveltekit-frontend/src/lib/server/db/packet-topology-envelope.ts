@@ -79,6 +79,20 @@ export const PacketTopologyEnvelopeSchema = z.object({
     .describe('Human-readable summary'),
   domain_class: z.string().nullable().optional()
     .describe('Canonical or compatibility domain label'),
+  lane_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).nullable().optional()
+    .describe('Vector lane status (classification, routing, or migration)'),
+  evidence_state: z.enum(['ACTIVE_VERIFIED', 'ACTIVE_DEGRADED', 'GATED', 'REFERENCE_ONLY', 'SUPERSEDED', 'FAILED']).nullable().optional()
+    .describe('Evidence gate state for the packet envelope'),
+  knowledge_resolution: z.enum(['RESOLVED', 'UNCLASSIFIED', 'AMBIGUOUS', 'ONTOLOGY_GAP', 'CONFLICTING_EVIDENCE']).nullable().optional()
+    .describe('Ontology resolution state for downstream consumers'),
+  ontology_ids: z.array(z.string()).default([])
+    .describe('Ontology identifiers associated with the packet'),
+  concept_ids: z.array(z.string()).default([])
+    .describe('Concept identifiers associated with the packet'),
+  runtime_evidence_refs: z.array(z.string()).default([])
+    .describe('Runtime evidence references linked to the packet'),
+  test_evidence_refs: z.array(z.string()).default([])
+    .describe('Test evidence references linked to the packet'),
   semantic_tags: z.array(z.string()).default([])
     .describe('Compatibility semantic tag array used by ACP writers'),
   lexical_nouns: z.array(z.string()).default([])

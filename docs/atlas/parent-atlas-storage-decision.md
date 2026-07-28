@@ -15,6 +15,31 @@ This document records storage roles, recommended services, tooling, and quick ru
 - deeds/engram is the preferred optional memory adapter lane.
 - Tiny-Engram stays experimental only and is not the canonical contract.
 
+Concrete lane map
+-----------------
+- `.okf` is the declarative contract layer, not the truth store. Current owners are:
+  - `docs/contracts/*.okf.json`
+  - `sveltekit-frontend/schemas/atlas/*.okf`
+  - `sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts`
+  - `sveltekit-frontend/src/routes/api/ldr/research/+server.ts`
+- MsgPack is the compact packet transport / cache codec, owned by:
+  - `sveltekit-frontend/src/lib/server/serialization/packet-msgpack-codec.ts`
+  - `sveltekit-frontend/src/lib/server/ace/packet-io.ts`
+- Arrow IPC is the bounded batch export lane for offline work:
+  - `scripts/atlas/arrow-batch-export.mjs`
+- gRPC / protobuf is the live service boundary:
+  - `sveltekit-frontend/src/lib/server/grpc/*`
+  - route consumers that import the gRPC clients
+- Redis / BitFrost is the hot cache and replay lane:
+  - `sveltekit-frontend/src/lib/server/ace/query-router.ts`
+  - `sveltekit-frontend/src/lib/server/cache/*`
+  - `docs/architecture/packet-truth-flow-canonical-pattern.md`
+- Qdrant is the semantic lookup mirror:
+  - `codebase_chunks_768` is the main codebase chunk lane
+- Postgres remains the canonical identity and provenance store for packets, joins, and durable ledgers.
+- `embeddinggemma` is the canonical embedding family, and `512` is the canonical embedding lane.
+- `384` is only a compact projection / routing lane when an explicit projection exists.
+
 Related decisions now live in separate docs:
 - XGBoost formal reranker contract: `docs/atlas/xgboost-reranker-contract.md`
 - Native GEMM / pybind11 deferral: `docs/atlas/native-gemm-deferral.md`
@@ -30,6 +55,15 @@ Two-lane model
 - RabbitMQ: promotion and ingest work queue with separate lanes for urgent, normal, bulk, and dead-letter traffic.
 - SeaweedFS: cold original object store for large artifacts that have already been packetized and verified.
 - See also: [Dual-Lane Hot Brain, Cold Queue](</C:/Users/james/Videos/deeds-web-app/docs/architecture/dual-lane-hot-brain-cold-queue.md>)
+
+Retrieval contract
+------------------
+- `512` is the canonical embedding lane for retrieval and payload filtering.
+- `768` is the main codebase chunk lane used for overlap checks, graph fusion, and migration proof.
+- `384` is only a compact projection / routing lane when an explicit projection exists.
+- `64` is a routing lane only; it can help prefiltering or clustering, but it is not semantic truth.
+- `Tree/AST`, `title_id`, `feature_id`, `som_*`, and `bitfrost:*` are supporting identities or caches, not primary truth.
+- Any lane that cannot be traced back to Postgres `packet_key` and `sourceRef` is a projection, not authority.
 
 Caveman rule
 -----------
@@ -102,12 +136,15 @@ Qdrant (retained for large-scale ANN)
 -------------------------------------
 Rationale:
 - Qdrant is optimized for large-scale vector stores and production ANN retrieval with payload filters.
-- Keep Qdrant for heavy, large-dataset retrieval use-cases (e.g., `codebase_chunks_768`) and traversal surfaces where payload filtering matters.
+- Keep Qdrant for heavy, large-dataset retrieval use-cases where payload filtering matters.
+- Treat `codebase_chunks_768` as the main codebase chunk lane.
+- Keep `512` as the canonical embedding contract and `384` as a non-canonical projection lane unless an explicit projection contract says otherwise.
 - Treat quantization, multi-stage retrieval, and hybrid search as storage-efficiency and recall tools, not as a replacement for the durable ledger.
 - Keep quaternion / SOM / XGBoost / topology math outside Qdrant; compute those transforms in the CUDA, PyTorch, or LibTorch lane, then persist the resulting metadata or vectors back into the index.
 
 Suggested Qdrant responsibilities:
-- `codebase_chunks_768` (large code chunk vectors)
+- `codebase_chunks_768` (main codebase chunk lane)
+- canonical embedding mirror for `embeddinggemma` at `512` if the repo stores that lane separately
 - fast ANN retrieval for production query paths
 - payload filter-powered retrieval
 - production vector memory where high throughput and filtering are priority
@@ -164,8 +201,8 @@ Experimentation / Training:
 
 Practical Recommendations & Next Steps
 -------------------------------------
-- Run `graphify:semantic` and rebuild `codebase_chunks_768` before large backfill jobs.
-- Keep Qdrant for `codebase_chunks_768` and heavy ANN; use `pgvector` for transactional, metadata-bound vectors.
+- Run `graphify:semantic` and rebuild the main `codebase_chunks_768` lane before large backfill jobs.
+- Keep Qdrant for the main 768 lane and the separately versioned 512 embedding contract; use `pgvector` for transactional, metadata-bound vectors.
 - Add a small QA pass after any mass-enrich (backfill) to sample 200 files and compare `qdrant_tags` with `extractLegalTags` outputs.
 - Use Arrow/Parquet as the canonical export format for DuckDB analytic passes and for training ingestion.
 - Add Langfuse instrumentation around Gemma4 calls to capture prompt versions, tokens, and outcomes for reward aggregation.

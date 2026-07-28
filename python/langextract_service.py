@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-LangExtract Service — Uses Google's official library with local Ollama
-Replaces the 1GB Docker container with ~50MB using existing gemma4-legal
+LangExtract Service — Uses Google's official library with local llama-server
+Replaces the 1GB Docker container with ~50MB using existing Gemma4 on the
+OpenAI-compatible llama-server /v1 endpoint.
 
 Memory comparison:
   - Old: spaCy (500MB) + BERT (400MB) + EasyOCR (100MB) = 1GB
-  - New: langextract (5MB) + Ollama (shared, already running) = ~50MB
+  - New: langextract (5MB) + llama-server (shared, already running) = ~50MB
 """
 
 import os
@@ -20,19 +21,34 @@ import uvicorn
 
 # Google's official LangExtract library
 try:
-    import langextract
-    from langextract import data as lx_data
-    from langextract import extract
+    import langextract as lx  # type: ignore
+    from langextract.factory import ModelConfig  # type: ignore
+    from langextract import data as lx_data  # type: ignore
 except ImportError:
     raise ImportError("Install langextract: pip install langextract")
 
 # Configuration
-OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL", "gemma4-legal:latest")
+LANGEXTRACT_PROVIDER = os.getenv("LANGEXTRACT_PROVIDER", "openai")
+DEFAULT_MODEL = os.getenv("LANGEXTRACT_MODEL_ID", os.getenv("LANGEXTRACT_MODEL", "gemma4-legal-iq4xs-direct"))
+LANGEXTRACT_BASE_URL = (
+    os.getenv("LANGEXTRACT_BASE_URL")
+    or os.getenv("LLAMA_SERVER_URL")
+    or os.getenv("TURBOQUANT_BASE_URL")
+    or "http://localhost:8090/v1"
+).rstrip("/")
+LANGEXTRACT_API_KEY = os.getenv("LANGEXTRACT_API_KEY", "local")
+MODEL_CONFIG = ModelConfig(
+    model_id=DEFAULT_MODEL,
+    provider=LANGEXTRACT_PROVIDER,
+    provider_kwargs={
+        "api_key": LANGEXTRACT_API_KEY,
+        "base_url": LANGEXTRACT_BASE_URL,
+    },
+)
 
 app = FastAPI(
-    title="LangExtract Service (Ollama)",
-    description="Structured extraction using Google LangExtract + local Ollama",
+    title="LangExtract Service (llama-server)",
+    description="Structured extraction using Google LangExtract + local llama-server",
     version="2.0.0"
 )
 
@@ -219,22 +235,35 @@ def run_extraction(
     temperature: float = 0.3,
     max_workers: int = 4
 ) -> dict:
-    """Run LangExtract with Ollama backend."""
+    """Run LangExtract with Gemma4 on llama-server."""
 
     try:
-        result = extract(
-            text_or_documents=text,
-            prompt_description=prompt,
-            examples=examples,
-            model_id=model_id,
-            model_url=OLLAMA_URL,
-            fence_output=False,  # Required for Ollama
-            use_schema_constraints=False,  # Required for Ollama
-            extraction_passes=extraction_passes,
-            temperature=temperature,
-            max_workers=max_workers,
-            max_char_buffer=2000  # Chunk size for long docs
-        )
+        if MODEL_CONFIG is not None:
+            result = lx.extract(
+                text_or_documents=text,
+                prompt_description=prompt,
+                examples=examples,
+                config=MODEL_CONFIG,
+                extraction_passes=extraction_passes,
+                temperature=temperature,
+                max_workers=max_workers,
+                max_char_buffer=2000,  # Chunk size for long docs
+                max_output_tokens=2048,
+            )
+        else:
+            result = lx.extract(
+                text_or_documents=text,
+                prompt_description=prompt,
+                examples=examples,
+                model_id=model_id,
+                model_url=LANGEXTRACT_BASE_URL,
+                fence_output=False,
+                use_schema_constraints=False,
+                extraction_passes=extraction_passes,
+                temperature=temperature,
+                max_workers=max_workers,
+                max_char_buffer=2000,  # Chunk size for long docs
+            )
 
         # Convert LangExtract result to our format
         extractions = []
@@ -275,9 +304,10 @@ async def health():
     """Health check endpoint."""
     return {
         "status": "healthy",
-        "service": "langextract-ollama",
+        "service": "langextract-llama-server",
         "model": DEFAULT_MODEL,
-        "ollama_url": OLLAMA_URL
+        "llama_server_url": LANGEXTRACT_BASE_URL,
+        "provider": LANGEXTRACT_PROVIDER,
     }
 
 
@@ -457,10 +487,10 @@ if __name__ == "__main__":
 
     print(f"""
 ╔══════════════════════════════════════════════════════════════════╗
-║  LangExtract Service (Ollama Backend)                            ║
+║  LangExtract Service (llama-server Backend)                      ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Model: {DEFAULT_MODEL:<52} ║
-║  Ollama: {OLLAMA_URL:<51} ║
+║  llama-server: {LANGEXTRACT_BASE_URL:<46} ║
 ║  Port: {args.port:<54} ║
 ╠══════════════════════════════════════════════════════════════════╣
 ║  Endpoints:                                                      ║

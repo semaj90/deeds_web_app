@@ -2,8 +2,10 @@
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { alignCwdToRepoRoot, REPO_ROOT } from '../_repo-root.mjs';
 
-const CWD = process.cwd();
+alignCwdToRepoRoot();
+const CWD = REPO_ROOT;
 const OUT_DIR = path.join(CWD, '.tmp');
 const OUT_JSONL = path.join(OUT_DIR, 'parent-atlas-profile-cards.jsonl');
 const OUT_REPORT = path.join(CWD, 'reports', 'parent-atlas-profile-cards.md');

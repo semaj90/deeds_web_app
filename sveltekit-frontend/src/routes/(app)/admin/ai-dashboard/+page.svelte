@@ -86,7 +86,7 @@
 				<p class="eyebrow">Daily Graphify</p>
 				<h2>Kanban Task Board</h2>
 				<p class="subtitle compact">
-					Promoted recommendation work flows into the daily board. Review-required proposals remain visible but do not become tasks.
+					Promoted recommendation work flows into the daily board. Review-required proposals remain visible, and the temporal lane shows the current agentic workflow recommendations.
 				</p>
 			</div>
 			<div class="board-meta">
@@ -97,6 +97,10 @@
 				<div>
 					<span class="meta-label">Updated</span>
 					<strong>{new Date(board().generated).toLocaleString()}</strong>
+				</div>
+				<div>
+					<span class="meta-label">Board Source</span>
+					<strong>{board().boardSource}</strong>
 				</div>
 			</div>
 		</div>
@@ -168,6 +172,46 @@
 				<span class="meta-label">Workflow</span>
 				<strong>{workflowStatus || 'Board-driven validation queued from task cards'}</strong>
 			</div>
+		</div>
+
+		<div class="temporal-lane">
+			<div class="ledger-head">
+				<h3>Temporal recommendations</h3>
+				<span>{board().temporalRecommendations.length}</span>
+			</div>
+			{#if board().temporalRecommendations.length === 0}
+				<p class="empty-state">No temporal recommendations loaded.</p>
+			{:else}
+				<div class="temporal-grid">
+					{#each board().temporalRecommendations as rec}
+						<article class="temporal-card">
+							<div class="task-topline">
+								<span>#{rec.rank} · {rec.taskId}</span>
+								<span class="task-status">{rec.status ?? 'READY'}</span>
+							</div>
+							<h4>{rec.title}</h4>
+							<p>{rec.intent ?? 'workflow recommendation'} · {new Date(rec.updatedAt).toLocaleString()}</p>
+							{#if rec.sourceRef}
+								<p>{rec.sourceRef}</p>
+							{/if}
+							{#if rec.recommendedCommands.length}
+								<div class="chip-row">
+									{#each rec.recommendedCommands.slice(0, 3) as command}
+										<span class="chip">{command}</span>
+									{/each}
+								</div>
+							{/if}
+							{#if rec.verificationCommands.length}
+								<div class="chip-row">
+									{#each rec.verificationCommands.slice(0, 2) as command}
+										<span class="chip">{command}</span>
+									{/each}
+								</div>
+							{/if}
+						</article>
+					{/each}
+				</div>
+			{/if}
 		</div>
 
 		<div class="recommendation-ledger">
@@ -465,6 +509,28 @@
 		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 		gap: 0.9rem;
 		margin-top: 1rem;
+	}
+
+	.temporal-lane {
+		margin-top: 1rem;
+		padding: 1rem;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.02);
+		border: 1px solid rgba(212, 199, 163, 0.08);
+	}
+
+	.temporal-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		gap: 0.85rem;
+		margin-top: 0.8rem;
+	}
+
+	.temporal-card {
+		padding: 0.95rem;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.03);
+		border: 1px solid rgba(96, 165, 250, 0.12);
 	}
 
 	.ledger-column {

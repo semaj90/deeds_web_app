@@ -10,7 +10,10 @@
  */
 
 import pg from 'pg';
+import { loadRepoEnv } from './connection-config.mjs';
 import { createAtlasRedisClient, VECTOR_LANE_REGISTRY } from './lib/redis-client-factory.mjs';
+
+Object.assign(process.env, loadRepoEnv(process.env));
 
 const APPLY = process.argv.includes('--apply');
 const LIMIT = parseInt(
@@ -30,7 +33,12 @@ async function main() {
   log(`Limit: ${LIMIT}\n`);
 
   const pool = new pg.Pool({ connectionString: PG_URL, max: 5 });
-  const redis = new Redis({ host: REDIS_HOST, port: REDIS_PORT, password: REDIS_PASS });
+  const redis = createAtlasRedisClient({
+    host: process.env.REDIS_HOST || process.env.VALKEY_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT || process.env.VALKEY_PORT || '6379', 10),
+    password: process.env.REDIS_PASSWORD || process.env.VALKEY_PASSWORD || undefined,
+  });
+  await redis.connect();
 
   let cached = 0;
   const startTime = Date.now();

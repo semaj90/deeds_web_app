@@ -70,6 +70,7 @@ describe('agent visual state helpers', () => {
 		expect(packed[0]).toBeCloseTo(24, 5);
 		expect(packed[1]).toBeCloseTo(48, 5);
 		expect(spriteCodeToState(packed[11])).toBe('DONE');
+		expect(packed[12]).toBeGreaterThanOrEqual(0);
 		expect(stateToSpriteCode('DONE')).toBeGreaterThan(0);
 	});
 });

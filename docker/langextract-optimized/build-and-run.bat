@@ -26,7 +26,11 @@ echo Starting optimized container...
 docker run -d ^
     --name langextract-optimized ^
     -p 8095:8095 ^
-    -e OLLAMA_URL=http://host.docker.internal:11434 ^
+    -e LANGEXTRACT_PROVIDER=openai ^
+    -e LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct ^
+    -e LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1 ^
+    -e LANGEXTRACT_API_KEY=local ^
+    -e LLAMA_SERVER_URL=http://host.docker.internal:8090/v1 ^
     -e SPACY_MODEL=en_core_web_md ^
     -e ENABLE_SPACY=true ^
     --memory=512m ^

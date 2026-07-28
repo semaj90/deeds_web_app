@@ -155,6 +155,7 @@ export interface AgentVisualInstance extends AgentVisualState {
 	interpolatedX: number;
 	interpolatedY: number;
 	alpha: number;
+	ageMs: number;
 }
 
 export interface AgentSpriteManifest {

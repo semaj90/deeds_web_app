@@ -28,8 +28,11 @@
 import { spawnSync } from 'node:child_process';
 import { writeFileSync, existsSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { alignCwdToRepoRoot, REPO_ROOT } from '../_repo-root.mjs';
 
-const ROOT = resolve(process.cwd(), '.');
+alignCwdToRepoRoot();
+const ROOT = REPO_ROOT;
+const FRONTEND_ROOT = resolve(ROOT, 'sveltekit-frontend');
 const QUIET = /^(1|true|yes|on)$/i.test(process.env.GRAPHIFY_QUIET ?? process.argv.includes('--quiet') ? '1' : '');
 const DRY_RUN = process.argv.includes('--dry-run') || /^(1|true|yes)$/i.test(process.env.DRY_RUN ?? '');
 const SKIP_CLUSTERING = process.argv.includes('--skip-clustering');
@@ -53,7 +56,10 @@ function run(stage, npmScript, opts = {}) {
   log(`  Running: npm run ${cmd}`);
 
   const t0 = Date.now();
-  const result = spawnSync('npm', ['run', ...cmd.split(' ')], {
+  const [scriptName, ...scriptArgs] = cmd.split(' ');
+  const npmArgs = ['--prefix', FRONTEND_ROOT, 'run', scriptName];
+  if (scriptArgs.length > 0) npmArgs.push('--', ...scriptArgs);
+  const result = spawnSync('npm', npmArgs, {
     cwd: ROOT,
     stdio: 'inherit',
     shell: process.platform === 'win32',
@@ -107,7 +113,7 @@ if (!SKIP_CLUSTERING) {
 if (!SKIP_REDIS) {
   results.push(run(
     'Redis Cache Backfill',
-    'graphify:redis:import',
+    DRY_RUN ? 'graphify:redis:import:dry' : 'graphify:redis:import',
     { required: false, supportsDry: true }
   ));
 }
@@ -117,7 +123,7 @@ if (!SKIP_REDIS) {
 // Generates summaries using Gemma4 and upserts them
 results.push(run(
   'KAG Notes Generation (Gemma4 via llama-server :8090)',
-  'graphify:kag-notes:missing',
+  DRY_RUN ? 'graphify:kag-notes:missing:dry' : 'graphify:kag-notes:missing',
   { required: false, supportsDry: true }
 ));
 
@@ -125,7 +131,7 @@ results.push(run(
 // Pre-materializes ACE context for next retrieval pass
 results.push(run(
   'ACE Context Pre-Warm',
-  'graphify:ace:warm',
+  DRY_RUN ? 'graphify:ace:warm' : 'graphify:ace:warm:apply',
   { required: false, supportsDry: true }
 ));
 

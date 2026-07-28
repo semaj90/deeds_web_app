@@ -2,7 +2,7 @@
 /**
  * graphify-semantic-cluster.mjs — Phase B: Semantic cluster mapping
  *
- * After Gemma4 LLM summaries are embedded into glyph_atlas/codebase_chunks_768,
+ * After Gemma4 LLM summaries are embedded into glyph_atlas or a chunk lane,
  * this script:
  *   1. Scrolls Qdrant for directory glyph points (gemma4Summary + vector)
  *   2. GPU k-means via tensorrt_bridge.node (kmeansWithCentroids, k=20)
@@ -10,7 +10,7 @@
  *   3. SOM projection of centroids (trainSOM, 4×5 grid)
  *   4. Redis cache — centroids, BMU coords, per-dir assignments (24h TTL)
  *   5. Qdrant payload writeback — gpuCluster, somRow, somCol, clusterLabel
- *   6. Backfill codebase_chunks_768 — tag file chunks with gpuCluster by dir
+ *   6. Backfill the active chunk lane — tag file chunks with gpuCluster by dir
  *   7. 4D manifold coords — [topoClass/7, somRow/4, somCol/5, pageRank] per cluster
  *
  * Usage:
@@ -52,8 +52,7 @@ const REDIS_HOST     = process.env.REDIS_HOST || '127.0.0.1';
 const REDIS_PORT     = parseInt(process.env.REDIS_PORT || '6379', 10);
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis';
 const GLYPH_ATLAS = 'glyph_atlas';
-const CHUNKS_COL  = 'codebase_chunks_768';
-const DIM         = 768;
+const FALLBACK_COLLECTIONS = ['codebase_chunks_384_hybrid', 'codebase_chunks_768'];
 const REDIS_TTL   = 24 * 3600;
 const SCROLL_BATCH = 250;
 
@@ -257,8 +256,9 @@ async function scrollCollection(collection, withVector = true) {
   return collected;
 }
 
-// Try glyph_atlas first, fall back to codebase_chunks_768 (filtered to glyph points)
+// Try glyph_atlas first, then fall back to an active chunk lane.
 let rawPoints = [];
+let sourceCollection = GLYPH_ATLAS;
 try {
   const infoRes = await fetch(`${QDRANT_URL}/collections/${GLYPH_ATLAS}`, { signal: AbortSignal.timeout(5000) });
   if (infoRes.ok) {
@@ -269,41 +269,78 @@ try {
   }
 } catch { /* will try fallback */ }
 
-if (rawPoints.length < K) {
-  log(`  ${c.y('⚠')} glyph_atlas has <${K} points — scrolling codebase_chunks_768 for dir glyphs`);
-  try {
-    const allChunks = await scrollCollection(CHUNKS_COL, true);
-    // Keep only dir-level glyph points (those with gemma4Summary in payload)
-    rawPoints = allChunks.filter(p => p.payload?.gemma4Summary);
-  } catch (err) {
-    warn(`  ${c.r('✗')} Qdrant unavailable: ${err.message}`);
-    await redis.quit().catch(() => {});
-    process.exit(1);
+if (rawPoints.length === 0) {
+  for (const candidate of FALLBACK_COLLECTIONS) {
+    try {
+      const infoRes = await fetch(`${QDRANT_URL}/collections/${candidate}`, { signal: AbortSignal.timeout(5000) });
+      if (!infoRes.ok) continue;
+      const info = await infoRes.json();
+      const count = info.result?.points_count ?? 0;
+      log(`  ${candidate} has ${count} points`);
+      if (count === 0) continue;
+      const allChunks = await scrollCollection(candidate, true);
+      const filtered = allChunks.filter((p) => p.payload?.gemma4Summary);
+      if (filtered.length > 0) {
+        sourceCollection = candidate;
+        rawPoints = filtered;
+        log(`  ${c.g('✓')} Falling back to ${candidate} for semantic clustering`);
+        break;
+      }
+    } catch (err) {
+      warn(`  ${c.y('⚠')} ${candidate} fallback unavailable: ${err.message}`);
+    }
   }
+}
+
+if (rawPoints.length === 0) {
+  warn(`  ${c.y('⚠')} No glyph or chunk summary points available — skipping semantic clustering`);
+  await redis.quit().catch(() => {});
+  process.exit(0);
 }
 
 log(`  ${c.g('✓')} Loaded ${rawPoints.length} glyph points`);
 if (rawPoints.length < K) {
   warn(`  ${c.y('⚠')} Only ${rawPoints.length} glyphs, K=${K} — reducing K to ${rawPoints.length}`);
 }
-const effectiveK = Math.min(K, rawPoints.length);
+const dimOf = (pt) => {
+  const v = pt?.vector;
+  const arr = Array.isArray(v) ? v : Object.values(v ?? {});
+  return arr.length;
+};
+const DIM = dimOf(rawPoints.find((pt) => dimOf(pt) > 0)) || 0;
+if (DIM === 0) {
+  warn(`  ${c.y('⚠')} Unable to determine embedding dimension — skipping semantic clustering`);
+  await redis.quit().catch(() => {});
+  process.exit(0);
+}
+
+const normalizedPoints = rawPoints.filter((pt) => dimOf(pt) === DIM);
+if (normalizedPoints.length !== rawPoints.length) {
+  warn(`  ${c.y('⚠')} Dropped ${rawPoints.length - normalizedPoints.length} points with mismatched dimensions`);
+}
+if (normalizedPoints.length === 0) {
+  warn(`  ${c.y('⚠')} No points matched DIM=${DIM} — skipping semantic clustering`);
+  await redis.quit().catch(() => {});
+  process.exit(0);
+}
+
+const effectiveK = Math.min(K, normalizedPoints.length);
 
 // Build flat Float32Array for k-means
-const n = rawPoints.length;
+const n = normalizedPoints.length;
 const embedMatrix = new Float32Array(n * DIM);
 const pointMeta = [];
 
 for (let i = 0; i < n; i++) {
-  const pt = rawPoints[i];
+  const pt = normalizedPoints[i];
   const v = pt.vector;
   const arr = Array.isArray(v) ? v : Object.values(v ?? {});
-  if (arr.length !== DIM) { warn(`  ${c.y('⚠')} Point ${pt.id} has dim=${arr.length} (expected ${DIM}) — skipping`); continue; }
   for (let d = 0; d < DIM; d++) embedMatrix[i * DIM + d] = arr[d];
   pointMeta.push({
     id: pt.id,
     dir: pt.payload?.dir ?? pt.payload?.directoryPath ?? pt.payload?.filePath?.split('/').slice(0, -1).join('/') ?? '',
     gemma4Summary: pt.payload?.gemma4Summary ?? '',
-    collection: rawPoints === rawPoints ? GLYPH_ATLAS : CHUNKS_COL,
+    collection: sourceCollection,
   });
 }
 
@@ -427,7 +464,7 @@ if (!DRY_RUN) {
 
 // ── Stage 5: Qdrant payload writeback ─────────────────────────────────────────
 
-log(`\n${c.b('Stage 5')} — Qdrant payload writeback (${GLYPH_ATLAS} + ${CHUNKS_COL})`);
+log(`\n${c.b('Stage 5')} — Qdrant payload writeback (${sourceCollection})`);
 
 if (!SKIP_QDRANT) {
   // Group points by cluster assignment for efficient batch set-payload calls
@@ -463,7 +500,7 @@ if (!SKIP_QDRANT) {
     for (let b = 0; b < ids.length; b += 200) {
       const batch = ids.slice(b, b + 200);
       try {
-        const res = await fetch(`${QDRANT_URL}/collections/${GLYPH_ATLAS}/points/payload`, {
+        const res = await fetch(`${QDRANT_URL}/collections/${sourceCollection}/points/payload`, {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
           body:    JSON.stringify({ payload, points: batch }),
@@ -477,14 +514,16 @@ if (!SKIP_QDRANT) {
       }
     }
   }
-  log(`  ${c.g('✓')} glyph_atlas: ${qdrantOk} tagged, ${qdrantFail} failed`);
+  log(`  ${c.g('✓')} ${sourceCollection}: ${qdrantOk} tagged, ${qdrantFail} failed`);
 } else {
   log(`  ${c.d('[skipped]')}`);
 }
 
-// ── Stage 6: Backfill codebase_chunks_768 with gpuCluster by dir ──────────────
+// ── Stage 6: Backfill the selected chunk lane with gpuCluster by dir ─────────
 
-log(`\n${c.b('Stage 6')} — Backfill ${CHUNKS_COL} file-chunks with gpuCluster`);
+const BACKFILL_COLLECTION = sourceCollection === GLYPH_ATLAS ? 'codebase_chunks_768' : sourceCollection;
+
+log(`\n${c.b('Stage 6')} — Backfill ${BACKFILL_COLLECTION} file-chunks with gpuCluster`);
 
 if (!SKIP_BACKFILL) {
   // Build dir → centroid map
@@ -497,7 +536,7 @@ if (!SKIP_BACKFILL) {
     }
   }
 
-  // Scroll codebase_chunks_768 to find chunks by dir, batch set gpuCluster
+  // Scroll the selected chunk lane to find chunks by dir, batch set gpuCluster
   let bfOk = 0, bfFail = 0;
   let bfOffset = null;
 
@@ -506,15 +545,15 @@ if (!SKIP_BACKFILL) {
     if (bfOffset) body.offset = bfOffset;
     let res, d;
     try {
-      res = await fetch(`${QDRANT_URL}/collections/${CHUNKS_COL}/points/scroll`, {
+      res = await fetch(`${QDRANT_URL}/collections/${BACKFILL_COLLECTION}/points/scroll`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
         signal: AbortSignal.timeout(20_000),
       });
-      if (!res.ok) { warn(`  ${CHUNKS_COL} scroll HTTP ${res.status}`); break; }
+      if (!res.ok) { warn(`  ${BACKFILL_COLLECTION} scroll HTTP ${res.status}`); break; }
       d = await res.json();
-    } catch (err) { warn(`  ${CHUNKS_COL} scroll error: ${err.message}`); break; }
+    } catch (err) { warn(`  ${BACKFILL_COLLECTION} scroll error: ${err.message}`); break; }
 
     const pts = d.result?.points ?? [];
     // Group by new centroid assignment
@@ -542,7 +581,7 @@ if (!SKIP_BACKFILL) {
       for (let b = 0; b < ids.length; b += 200) {
         const batch = ids.slice(b, b + 200);
         try {
-          const pr = await fetch(`${QDRANT_URL}/collections/${CHUNKS_COL}/points/payload`, {
+          const pr = await fetch(`${QDRANT_URL}/collections/${BACKFILL_COLLECTION}/points/payload`, {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify({ payload, points: batch }),
@@ -557,7 +596,7 @@ if (!SKIP_BACKFILL) {
     if (!bfOffset || pts.length === 0) break;
   }
 
-  log(`  ${c.g('✓')} ${CHUNKS_COL}: ${bfOk} file-chunks backfilled, ${bfFail} failed`);
+  log(`  ${c.g('✓')} ${BACKFILL_COLLECTION}: ${bfOk} file-chunks backfilled, ${bfFail} failed`);
 } else {
   log(`  ${c.d('[skipped]')}`);
 }

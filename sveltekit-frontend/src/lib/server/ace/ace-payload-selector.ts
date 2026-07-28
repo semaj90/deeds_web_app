@@ -34,6 +34,7 @@ export type HmmErrorClass =
 export interface AcePayload {
   chunk_id:    string;
   source_ref:  string;
+  packet_key?: string;
   summary:     string;           // snippet or LLM summary, within budget
   error_labels: HmmErrorClass[];
   weights: {
@@ -90,6 +91,7 @@ export function selectAcePayload(
   const payload: AcePayload = {
     chunk_id:    hit.id,
     source_ref:  hit.filePath ?? hit.sourceId ?? hit.id,
+    packet_key:  hit.packetKey ?? (hit.metadata?.packet_key as string | undefined),
     summary,
     error_labels: assignErrorLabels(hit),
     weights: {

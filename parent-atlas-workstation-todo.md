@@ -1,12 +1,30 @@
 # Parent Atlas Workstation TODO
 
-**Status**: LAYER 1 ✅ COMPLETE (100% coverage) | EXPORT STACK ✅ READY | LAYER 2 ⏳ READY TO EXECUTE
+**Status**: LAYER 1 ✅ COMPLETE (100% coverage) | EXPORT STACK ✅ READY | LANE ALIGNMENT ⏳ IN PROGRESS
 
 ---
 
 ## Event Plane
 
 PostgreSQL is the canonical task, gate, checkpoint, and outbox store for Atlas work. RabbitMQ handles durable async dispatch, Redis / Valkey holds hot context and leases, Arrow + `mmap` hold immutable batch snapshots, and gRPC / Protobuf carries typed sidecar commands. Browser-local work stays in Web Workers, IndexedDB, Service Workers, and SharedArrayBuffer; those are compute or cache lanes only, not canonical state.
+
+Current lane map:
+
+- Postgres: canonical identity, packet spine, provenance, and recommendation log.
+- Qdrant: main codebase chunk retrieval lane, retrieval mirror, and named-vector / multivector semantic analysis lane.
+- Neo4j: CPU/JVM topology lane for PageRank, graph expansion, and multi-hop context; not GPU-enabled by Docker passthrough.
+- Redis / BitFrost: hot packet cache, centroid routing, and short-lived replay state.
+- cuVS / GPU: ANN staging, rerank input, batch graph analysis, and benchmark lanes in a separate analytics service.
+- `embeddinggemma`: canonical embedding family at `768`, with truncated `512`, `256`, and `128` lanes via MRL; use task/query/document prompt variants for retrieval, classification, clustering, and code search.
+- `768`: main codebase chunk lane.
+- `384`: projection / routing lane only when explicitly defined.
+- `64`: routing / clustering lane only.
+- `okf` YAML: declarative contract lane for LDR, semantic labeling, and workflow metadata.
+- Firecrawl / Pydantic: research ingestion, validation, and schema-gated extraction lane.
+- PyTorch / TorchInductor: GPU training, reranking, compiled numeric kernels, and sidecar analytics.
+- atlas-tools: query-context preamble lane for intent, retrieval hints, and compact RAG injection.
+- ACE packet: assembly / materialization lane for compact synthesis output and packet persistence.
+- ACE packet: compact synthesis and semantic labeling output, not raw corpus state.
 
 The gate model is executable state: task created -> PostgreSQL row written -> outbox event emitted -> RabbitMQ worker claimed -> gates evaluated -> task transitions READY / CLAIMED / RUNNING / AWAITING_GATE / COMPLETED / FAILED. LLMs may recommend the next transition, but smoke and authorization outcomes must be recorded by the worker and gate evaluator.
 
@@ -59,15 +77,63 @@ The gate model is executable state: task created -> PostgreSQL row written -> ou
 - **Batching**: 1000 packets/file with batch-index.json
 - **Keywords**: `som_cluster` → `msgpack_offset` → `packet_key` → `cache_hit`
 
-### Phase 4: QLoRA Dataset Preparation (Optional)
+### Phase 4: GPU + Research Runtime Prep
 
-**Purpose**: Export training records for autoencoder (768→384→64 compression)
+**Purpose**: Prepare the runtime lanes for LDR ingestion, GPU reranking, and semantic labeling
 - **Script**: `npm run atlas:export:qlora:analyze` (coverage stats)
 - **Script**: `npm run atlas:export:qlora:prepare` (full dataset, 58K records)
 - **Script**: `npm run atlas:export:qlora:prepare:sample` (1K sample for testing)
 - **CRITICAL**: DO NOT include qdrant_point_id, packet_key, or mmap offsets as training features
-- **Input**: embedding_384, domain_class, topology (som_row/col, pagerank), features (ast_symbols, lexical, entities)
-- **Keywords**: `embedding_384` → `domain_class` → `used_concepts` → `latent_64`
+- **Input**: embedding_768, embedding_512, domain_class, topology (som_row/col, pagerank), features (ast_symbols, lexical, entities)
+- **Keywords**: `embedding_768` → `embedding_512` → `domain_class` → `used_concepts`
+
+**Naive Bayes Domain Fallback v3**
+- **Purpose**: Provide a deterministic lexical fallback for domain classification when the semantic classifier is underconfident.
+- **Stack**: split train/validation/test rows, multinomial Naive Bayes baseline, calibrated abstention gate, immutable prediction ledger.
+- **Rules**: never write predictions back to canonical truth by `source_ref` alone; persist by `packet_key` with model/version lineage.
+- **Keywords**: `naive_bayes_v3` → `abstain_threshold` → `packet_key` → `prediction_ledger` → `domain_class`
+
+**LDR / OKF Lane**
+- **Purpose**: Use local deep research to build evidence bundles, not canonical truth.
+- **Stack**: `okf` YAML + Pydantic validation + Firecrawl fetch/extract + text normalization.
+- **Output**: OKF topic bundles, citations, screenshots, and compact ACE packets.
+- **Keywords**: `okf` → `pydantic` → `firecrawl` → `citations` → `ace_packet`
+
+**atlas-tools Query Context Lane**
+- **Purpose**: Build compact query context and intent preambles for ACE and chat routes.
+- **Stack**: `atlas-tools_classify_intent` → `atlas-tools_build_agentic_rag_context` → `atlas-tools_build_recommendation` → `atlas-tools_record_outcome`.
+- **Rules**: query context is not canonical truth and does not replace ACE packet assembly or LDR evidence. Do not invent a generic task agent hop or non-catalog tool names.
+- **Keywords**: `atlas-tools_classify_intent` → `atlas-tools_build_agentic_rag_context` → `atlas-tools_build_recommendation` → `atlas-tools_record_outcome`
+- **Flow**:
+  - classify intent and domain first
+  - build bounded ACE context from retrieved evidence
+  - synthesize recommendation only after the packet exists
+  - record outcome after success or failure is known
+
+**ACE Packet Assembly Lane**
+- **Purpose**: Materialize validated evidence into compact ACE packets for synthesis and persistence.
+- **Stack**: ACE materializer + packet store + stream/packet routes + trace-backed tool context.
+- **Rules**: ACE packets consume canonical and validated evidence; they do not establish source identity by themselves. A packet must reference authoritative packet keys, source refs, content hashes, and revision lineage before synthesis.
+- **Keywords**: `ace_materializer` → `packet_store` → `packet_persistence` → `synthesis_output`
+
+**Semantic Labeling / Recommendation Lane**
+- **Purpose**: Turn validated packets into semantic labels, recommendation logs, and bounded candidate sets.
+- **Stack**: PageRank + Neo4j projection updates + Qdrant RRF + PyTorch/TorchInductor rerank.
+- **Output**: recommendation log rows, candidate summaries, and potential recommendation tasks.
+- **Keywords**: `pagerank` → `neo4j` → `rrf` → `recommendation_log` → `potential_recommendations`
+
+**Multivector Semantic Analysis Lane**
+- **Purpose**: Keep dense, sparse, and late-interaction representations separate, then fuse them at query time.
+- **Stack**: EmbeddingGemma query/document prompts + Qdrant named vectors + sparse vectors + multivector payloads + RRF fusion.
+- **Rules**: do not collapse semantic, lexical, and late-interaction vectors into one unnamed embedding; preserve model/version lineage for each lane.
+- **Output**: multivector packets, fusion scores, retrieval explanations, and analysis-ready semantic labels.
+- **Keywords**: `embeddinggemma` → `named_vectors` → `sparse_vectors` → `multivector` → `rrf`
+
+**GPU Graph Analysis Lane**
+- **Purpose**: Export graph snapshots and batch metrics to a separate GPU analytics service.
+- **Stack**: Postgres authority → Arrow / Parquet / NumPy export → cuGraph / cuML / cuVS / PyTorch sidecar → versioned projection import.
+- **Rules**: GPU results are projections until written back through a versioned analysis run; Neo4j stays the topology projection store, not the authority.
+- **Keywords**: `graph_revision` → `pagerank_alpha` → `cugraph` → `cuml` → `projection_import`
 
 **Current Coverage**:
 - Embeddings: 99.7% ✅ READY
@@ -117,6 +183,7 @@ The gate model is executable state: task created -> PostgreSQL row written -> ou
 
 **Phase 3B: Neo4j GDS Suite** (PageRank, Louvain, CheiRank)
 - **Keywords**: `page_rank_score` → `community_id` → `k_core` → `centrality`
+- **Note**: Keep this on the JVM/CPU path; use the separate GPU analytics lane for batch experiments and projection refreshes.
 
 **Phase 3C: Semantic Metrics**
 - **Keywords**: `entropy` → `density` → `reachability` → `authority_score`
@@ -125,16 +192,34 @@ The gate model is executable state: task created -> PostgreSQL row written -> ou
 
 ## LAYER 4: Runtime & Training (⏳ DESIGNED)
 
-**Purpose**: Naive Bayes, PyTorch reranker, HMM error fixing, RL feedback
+**Purpose**: Semantic classification, compiled GPU reranking, HMM error fixing, RL feedback
 
-**Phase 4A: Naive Bayes Baseline** (text classifier on features)
-- **Keywords**: `classification_prob` → `feature_importance` → `prior_odds`
+**Phase 4A: Pydantic + OKF Validation** (schema-gated research input)
+- **Keywords**: `okf_yaml` → `pydantic` → `validation_error` → `evidence_bundle`
 
-**Phase 4B: PyTorch Reranker** (.pt adapter)
-- **Keywords**: `rerank_score` → `grpo_reward` → `policy_hint` → `adapter:auth|db|ui|repair`
+**Phase 4B: Firecrawl Ingestion** (web evidence extraction)
+- **Keywords**: `firecrawl` → `source_snapshot` → `citation` → `research_bundle`
 
-**Phase 4C: HMM Error Recovery**
+**Phase 4C: PyTorch / TorchInductor Reranker**
+- **Keywords**: `rerank_score` → `torchinductor` → `compiled_kernel` → `gpu_batch`
+
+**Phase 4D: ACE Packet Semantic Labeling**
+- **Keywords**: `ace_packet` → `semantic_label` → `recommendation_log` → `bounded_candidates`
+
+**Phase 4E: HMM Error Recovery**
 - **Keywords**: `error_state` → `recovery_packet` → `confidence` → `fallback_adapter`
+
+**Phase 4F: GPU Graph Analysis Export**
+- **Keywords**: `postgraph_export` → `arrow_snapshot` → `cugraph` → `cuvs` → `projection_refresh`
+- **Output**: graph metrics parquet, clusters parquet, centroids f16, and projection parity reports.
+
+**Phase 4G: Research Lane Integration**
+- **Keywords**: `firecrawl` → `pydantic` → `okf` → `ldr` → `ace_packet`
+- **Output**: research bundles, semantic labels, and recommendation log entries with bounded evidence.
+
+**Phase 4H: Multivector Retrieval**
+- **Keywords**: `dense_vector` → `sparse_vector` → `late_interaction` → `named_vector` → `rrf`
+- **Output**: hybrid candidate sets, per-lane scores, and packet-level semantic explanations.
 
 ---
 

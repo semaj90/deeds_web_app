@@ -8,7 +8,14 @@
  * <tool_call>
  * {"name": "get_time", "arguments": {"timezone": "UTC"}}
  * </tool_call>
+ *
+ * Also accepts OpenAI-compatible JSON tool call payloads from:
+ * - message.tool_calls[]
+ * - choices[0].message.tool_calls[]
+ * - plain JSON tool call envelopes
  */
+
+import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 
 export interface ToolCall {
   id: string;
@@ -25,6 +32,71 @@ export interface ParsedToolCalls {
   responseText: string;
 }
 
+function makeToolCall(name: string, args: unknown): ToolCall | null {
+  const trimmed = String(name ?? '').trim();
+  if (!trimmed) return null;
+
+  return {
+    id: `call_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    type: 'function',
+    function: {
+      name: trimmed,
+      arguments:
+        typeof args === 'string' ? args : JSON.stringify(args ?? {}),
+    },
+  };
+}
+
+function parseJsonToolCalls(content: string): {
+  toolCalls: ToolCall[];
+  responseText: string;
+} {
+  const trimmed = content.trim();
+  if (!trimmed || (!trimmed.startsWith('{') && !trimmed.startsWith('['))) {
+    return { toolCalls: [], responseText: content };
+  }
+
+  let parsed: any;
+  try {
+    parsed = fastJsonParse(trimmed);
+  } catch {
+    try {
+      parsed = JSON.parse(trimmed);
+    } catch {
+      return { toolCalls: [], responseText: content };
+    }
+  }
+
+  const candidateMessages = [
+    parsed?.choices?.[0]?.message,
+    parsed?.message,
+    parsed,
+  ].filter(Boolean);
+
+  for (const message of candidateMessages) {
+    const toolCalls = Array.isArray(message?.tool_calls) ? message.tool_calls : [];
+    if (!toolCalls.length) continue;
+
+    const normalized = toolCalls
+      .map((tc: any) =>
+        makeToolCall(tc?.function?.name ?? tc?.name ?? '', tc?.function?.arguments ?? tc?.arguments)
+      )
+      .filter((item): item is ToolCall => Boolean(item));
+
+    if (normalized.length > 0) {
+      const responseText =
+        typeof message?.content === 'string'
+          ? message.content.trim()
+          : typeof parsed?.choices?.[0]?.message?.content === 'string'
+            ? parsed.choices[0].message.content.trim()
+            : '';
+      return { toolCalls: normalized, responseText };
+    }
+  }
+
+  return { toolCalls: [], responseText: content };
+}
+
 export function parseToolCalls(content: string): ParsedToolCalls {
   const toolCalls: ToolCall[] = [];
   let reasoningText = '';
@@ -39,28 +111,26 @@ export function parseToolCalls(content: string): ParsedToolCalls {
   // Extract all tool calls
   const toolCallRegex = /<tool_call>\s*([\s\S]*?)\s*<\/tool_call>/g;
   let match;
-  let lastIndex = 0;
 
   while ((match = toolCallRegex.exec(content)) !== null) {
     const jsonStr = match[1].trim();
     try {
       const parsed = JSON.parse(jsonStr);
-      if (parsed.name) {
-        toolCalls.push({
-          id: `call_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          type: 'function',
-          function: {
-            name: parsed.name,
-            arguments: typeof parsed.arguments === 'string'
-              ? parsed.arguments
-              : JSON.stringify(parsed.arguments || {}),
-          },
-        });
+      const toolCall = makeToolCall(parsed?.name, parsed?.arguments);
+      if (toolCall) {
+        toolCalls.push(toolCall);
       }
     } catch (e) {
       console.warn('[Tool Call Parser] Failed to parse JSON:', jsonStr, e);
     }
-    lastIndex = match.index + match[0].length;
+  }
+
+  if (toolCalls.length === 0) {
+    const jsonToolCalls = parseJsonToolCalls(content);
+    toolCalls.push(...jsonToolCalls.toolCalls);
+    if (jsonToolCalls.toolCalls.length > 0) {
+      responseText = jsonToolCalls.responseText;
+    }
   }
 
   // Clean up response text: remove reasoning and tool_call blocks
@@ -71,6 +141,13 @@ export function parseToolCalls(content: string): ParsedToolCalls {
     .replace(/\n\n+/g, '\n')
     .trim();
 
+  if (toolCalls.length > 0) {
+    const jsonToolCallResponse = parseJsonToolCalls(content);
+    if (jsonToolCallResponse.toolCalls.length > 0) {
+      responseText = jsonToolCallResponse.responseText;
+    }
+  }
+
   return {
     toolCalls,
     reasoningText,
@@ -79,5 +156,5 @@ export function parseToolCalls(content: string): ParsedToolCalls {
 }
 
 export function hasToolCalls(content: string): boolean {
-  return /<tool_call>[\s\S]*?<\/tool_call>/.test(content);
+  return /<tool_call>[\s\S]*?<\/tool_call>/.test(content) || /"tool_calls"\s*:\s*\[/i.test(content);
 }

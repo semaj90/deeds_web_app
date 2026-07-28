@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   assembleACEContext: vi.fn(),
   buildACEPromptCached: vi.fn(),
   bifrostChat: vi.fn(),
-  generateCacheKey: vi.fn(),
   getExactMatchCache: vi.fn(),
   setExactMatchCache: vi.fn(),
   turboQuantChat: vi.fn(),
@@ -19,6 +18,8 @@ const mocks = vi.hoisted(() => ({
   classifyQuerySection: vi.fn(),
   callTraceMcp: vi.fn(),
   runTurbovecPreIngestion: vi.fn(),
+  lookupScenario: vi.fn(),
+  storeScenario: vi.fn(),
 }));
 
 vi.mock('$lib/server/ai/turbovec-ingest-sidecar.js', () => ({
@@ -30,10 +31,21 @@ vi.mock('$lib/server/ace/context-assembler.js', () => ({
   buildACEPromptCached:  mocks.buildACEPromptCached,
 }));
 
+vi.mock('$lib/server/cache-keys.js', () => ({
+  buildAceCompletionCacheKey: (packetKey: string, queryHash: string) => {
+    // Replicate the real logic: replace ace:packet: with ace:completion: and append query hash
+    return packetKey.replace('ace:packet:', 'ace:completion:') + `:${queryHash}`;
+  },
+  buildAcePacketCacheKey: (input: any) => 'ace:packet:mock',
+  hashStr: (input: string) => 'hash_mock',
+  generateCacheKey: (input: string) => 'cache:key:mock',
+  TTL: { ACE_PROMPT: 86400 },
+}));
+
 vi.mock('$lib/server/cache/redis-exact-match.js', () => ({
-  generateCacheKey: mocks.generateCacheKey,
   getExactMatchCache: mocks.getExactMatchCache,
   setExactMatchCache: mocks.setExactMatchCache,
+  generateCacheKey: (input: string) => 'cache:key:mock',
 }));
 
 vi.mock('$lib/server/ai/inference-configs.js', () => ({
@@ -48,7 +60,9 @@ vi.mock('$lib/server/ai/inference-configs.js', () => ({
 vi.mock('$lib/server/ollama.js', () => ({
   bifrostChat:    mocks.bifrostChat,
   turboQuantChat: mocks.turboQuantChat,
+  ollamaFetch:    vi.fn().mockResolvedValue({ embedding: new Array(384).fill(0) }),
   VLM_MODELS:     { legal: 'gemma4-rotorquant:latest', tool: 'gemma4-rotorquant:latest' },
+  getOllamaEmbeddingEndpoint: () => 'http://127.0.0.1:11434',
 }));
 
 vi.mock('$lib/server/ai/gemma4-agent.js', () => ({
@@ -72,12 +86,16 @@ vi.mock('$lib/server/analysis/hmm-ace-analyzer.js', () => ({
   classifyQuerySection: mocks.classifyQuerySection,
 }));
 
+vi.mock('$lib/server/ai/scenario-cache.js', () => ({
+  lookupScenario: mocks.lookupScenario,
+  storeScenario: mocks.storeScenario,
+}));
+
 describe('openai-facade — runChatCompletion', () => {
   beforeEach(() => {
     mocks.assembleACEContext.mockReset();
     mocks.buildACEPromptCached.mockReset();
     mocks.bifrostChat.mockReset();
-    mocks.generateCacheKey.mockReset();
     mocks.getExactMatchCache.mockReset();
     mocks.setExactMatchCache.mockReset();
     mocks.turboQuantChat.mockReset();
@@ -87,7 +105,6 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.buildDevContextPlan.mockResolvedValue(undefined);
     // Default: non-coding prompts; tests that want coding override this
     mocks.isCodingPrompt.mockReturnValue(false);
-    mocks.generateCacheKey.mockReturnValue('ace:llm:exact:mock');
     mocks.getExactMatchCache.mockResolvedValue(null);
     mocks.setExactMatchCache.mockResolvedValue(undefined);
     mocks.turboQuantChat.mockRejectedValue(new Error('TurboQuant unavailable'));
@@ -96,6 +113,9 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.classifyQuerySection.mockReturnValue({ section: 'FACTS', confidence: 0.82 });
     mocks.bifrostChat.mockResolvedValue('Default response');
     mocks.runTurbovecPreIngestion.mockResolvedValue('=== TURBOVEC PRE-INGEST SCAN ===\nNo direct task references found for terms.\n================================\n');
+    // Default: scenario cache returns null (tests that want a hit override this)
+    mocks.lookupScenario.mockResolvedValue(null);
+    mocks.storeScenario.mockResolvedValue(undefined);
   });
 
   it('extracts last user message as query, earlier messages as history', async () => {
@@ -512,9 +532,10 @@ describe('openai-facade — runChatCompletion', () => {
     mocks.bifrostChat.mockResolvedValue('ACE answer');
 
     const { runChatCompletion } = await import('$lib/server/ai/openai-facade.js');
+    const uniqueQuery = `hmm test ${Date.now()} unique query for test case authority`;
     const res = await runChatCompletion({
       model:    'yorha-legal',
-      messages: [{ role: 'user', content: 'Cite the controlling case on hearsay.' }],
+      messages: [{ role: 'user', content: uniqueQuery }],
       raw: false, stream: false, temperature: 0.3,
     });
 
@@ -573,8 +594,6 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
     mocks.assembleACEContext.mockReset();
     mocks.buildACEPromptCached.mockReset();
     mocks.bifrostChat.mockReset();
-    mocks.generateCacheKey.mockReset();
-    mocks.generateCacheKey.mockReturnValue('ace:llm:exact:mock');
     mocks.getExactMatchCache.mockReset();
     mocks.getExactMatchCache.mockResolvedValue(null);
     mocks.setExactMatchCache.mockReset();
@@ -588,14 +607,24 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
   });
 
   it('returns 401 without locals.user', async () => {
-    const { POST } = await import('../src/routes/api/v1/chat/completions/+server.js');
-    const res = await POST({
-      request: new Request('http://x', { method: 'POST', body: JSON.stringify({ model: 'm', messages: [{ role: 'user', content: 'q' }] }) }),
-      locals:  {},
-    } as Parameters<typeof POST>[0]);
-    expect(res.status).toBe(401);
-    const body = await res.json();
-    expect(body.error.code).toBe('unauthorized');
+    const oldBypass = process.env.DEV_BYPASS_AUTH;
+    process.env.DEV_BYPASS_AUTH = 'false';
+    let caught = false;
+    let error401 = false;
+    try {
+      const { POST } = await import('../src/routes/api/v1/chat/completions/+server.js');
+      await POST({
+        request: new Request('http://x', { method: 'POST', body: JSON.stringify({ model: 'm', messages: [{ role: 'user', content: 'q' }] }) }),
+        locals:  {},
+      } as Parameters<typeof POST>[0]);
+    } catch (err: any) {
+      caught = true;
+      error401 = err?.status === 401;
+    } finally {
+      process.env.DEV_BYPASS_AUTH = oldBypass;
+    }
+    expect(caught).toBe(true);
+    expect(error401).toBe(true);
   });
 
   it('streams SSE when stream:true is requested', async () => {
@@ -635,12 +664,18 @@ describe('openai-facade — POST /api/v1/chat/completions handler', () => {
 
   it('returns 400 on missing messages', async () => {
     const { POST } = await import('../src/routes/api/v1/chat/completions/+server.js');
-    const res = await POST({
-      request: new Request('http://x', { method: 'POST', body: JSON.stringify({ model: 'm' }) }),
-      locals:  { user: { id: 'u1' } },
-    } as Parameters<typeof POST>[0]);
-    expect(res.status).toBe(400);
-    const body = await res.json();
-    expect(body.error.code).toBe('invalid_params');
+    let caught = false;
+    let error400 = false;
+    try {
+      await POST({
+        request: new Request('http://x', { method: 'POST', body: JSON.stringify({ model: 'm' }) }),
+        locals:  { user: { id: 'u1' } },
+      } as Parameters<typeof POST>[0]);
+    } catch (err: any) {
+      caught = true;
+      error400 = err?.status === 400;
+    }
+    expect(caught).toBe(true);
+    expect(error400).toBe(true);
   });
 });

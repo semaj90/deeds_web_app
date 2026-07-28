@@ -444,11 +444,17 @@ export function createFeatureRowFromResearchPacket(
   updated_at: string;
   schema_version: string;
 } {
+  const laneStatus = packet.okf ? 'ACTIVE' : 'REFERENCE_ONLY';
+  const evidenceState = packet.okf ? 'ACTIVE_VERIFIED' : 'GATED';
+  const knowledgeResolution = packet.okf ? 'RESOLVED' : 'UNCLASSIFIED';
   return {
     schema_version: '1.0',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     workspace_revision: packet.workspace_revision,
+    lane_status: laneStatus,
+    evidence_state: evidenceState,
+    knowledge_resolution: knowledgeResolution,
     identity: {
       packet_key: packet.packet_key,
       source_ref: packet.source_ref,
@@ -495,7 +501,12 @@ export function createFeatureRowFromResearchPacket(
       ...(packet.okf?.keyword_corpus.keywords ?? []),
       ...(packet.okf?.semantic_ontology.concept_ids ?? []),
       ...(packet.okf?.semantic_ontology.ontology_ids ?? []),
-    ]
+    ],
+    domain_class: packet.okf?.domain_classification.primary_domain ?? null,
+    ontology_ids: packet.okf?.semantic_ontology.ontology_ids ?? [],
+    concept_ids: packet.okf?.semantic_ontology.concept_ids ?? [],
+    runtime_evidence_refs: packet.citations_resolved.map((citation) => citation.resolved_to ?? citation.text),
+    test_evidence_refs: [],
   };
 }
 

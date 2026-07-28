@@ -76,4 +76,46 @@ Sub-commands for independent pipeline steps:
   ```
 
 ---
+## 6. TRACE MCP Context Boundary
+
+- Use TRACE MCP for cross-store context, evidence assembly, graph traversal, and compressed context packets.
+- Do not write ad-hoc scripts that read raw Postgres, Qdrant, Neo4j, or Redis when a TRACE MCP tool already exists.
+- Use direct repository reads for local source files, generated board artifacts, and implementation diffs.
+- Parse TRACE MCP responses explicitly; they usually arrive as `{ content: [{ type: 'text', text: '...' }] }`.
+
+### Live tool surface
+
+Use the actual tool namespaces exposed by `sveltekit-frontend/src/mcp/trace-mcp-server.ts`:
+
+- `trace.kag_search`
+- `trace.explain_retrieval`
+- `trace.validate_ace_hit`
+- `context.build_kv_packet`
+- `context.get_compressed_card`
+- `kag.record_agent_run`
+- `kag.ingest_memory_directory`
+- `kag.multi_lane_search`
+- `graph.expand_neighborhood`
+- `graph.shortest_path`
+- `graph.community_for_node`
+- `graph.pagerank_top`
+- `topology.search_near`
+- `topology.same_som_cluster`
+- `clusters.get_members`
+- `clusters.get_summary_lenses`
+- `hypergraph.search`
+- `hypergraph.get_edge`
+- `hypergraph.explain_activation`
+- `hypergraph.expand_members`
+- `knowledge.get_minified_map`
+- `legal.*`
+- `ops.*`
+
+### Planned or external helpers
+
+- `atlas-tools_*` is an alias layer or wrapper naming convention, not the live TRACE MCP surface.
+- `gemma4-offload.*` is a separate short-form helper for small tasks, not a TRACE MCP tool.
+- `db.schema_overview` and `db.table_inspect` are planned database tools if/when they are registered.
+
+---
 *Maintained under Deeds Legal-AI Platform Guidelines.*

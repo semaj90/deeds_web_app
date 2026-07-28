@@ -82,6 +82,10 @@ export interface UnifiedRetrievalResult {
   // ── Identity ──────────────────────────────────────────────────────────────
   /** Qdrant point ID, pgvector row ID, graph node ID, or generated UUID */
   id: string;
+  /** Canonical packet identity when the source already resolved one */
+  packetKey?: string;
+  /** Canonical source reference when available */
+  sourceRef?: string;
   /** What kind of content this is */
   kind: RetrievalKind;
   /** Which index / service produced this */
@@ -172,6 +176,14 @@ export function fromQdrantPoint(
   const p = pt.payload ?? {};
   return {
     id: String(pt.id),
+    packetKey:
+      typeof (p['packet_key'] ?? p['packetKey']) === 'string'
+        ? String(p['packet_key'] ?? p['packetKey'])
+        : undefined,
+    sourceRef:
+      typeof (p['source_ref'] ?? p['sourceRef'] ?? p['file_path']) === 'string'
+        ? String(p['source_ref'] ?? p['sourceRef'] ?? p['file_path'])
+        : undefined,
     kind: opts.kind,
     source: 'qdrant',
     collection: opts.collection,

@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import AutonomousInvestigator from '$lib/components/agent/AutonomousInvestigator.svelte';
 	import AgentSpriteField from '$lib/components/agent/AgentSpriteField.svelte';
+	import { liveAgentVisuals } from '$lib/client/live-agent-visuals.svelte.js';
 	import RecommendationWidget from '$lib/components/recommendations/RecommendationWidget.svelte';
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { AgentVisualState } from '$lib/types/agent.js';
@@ -24,6 +26,9 @@
 	let selectedExample = $state<string>('');
 	let activeQuery = $state<string>('');
 	let selfPromptLoading = $state(false);
+	let liveWorkflowQuery = $state('Trace the live agent workflow and show its current stages');
+	let liveWorkflowBusy = $state(false);
+	let liveWorkflowMessage = $state('Idle');
 
 	// Example queries organized by category
 	const exampleQueries = {
@@ -138,6 +143,31 @@
 		return 'text-red-400';
 	}
 
+	async function startLiveWorkflow() {
+		if (liveWorkflowBusy) return;
+
+		liveWorkflowBusy = true;
+		liveWorkflowMessage = 'Starting workflow';
+
+		try {
+			await liveAgentVisuals.start(liveWorkflowQuery.trim() || 'Trace the live agent workflow');
+			liveWorkflowMessage = 'Workflow running';
+		} catch (error) {
+			liveWorkflowMessage = error instanceof Error ? error.message : 'Workflow failed';
+		} finally {
+			liveWorkflowBusy = false;
+		}
+	}
+
+	function stopLiveWorkflow() {
+		liveAgentVisuals.disconnect();
+		liveWorkflowMessage = 'Disconnected';
+	}
+
+	onDestroy(() => {
+		liveAgentVisuals.disconnect();
+	});
+
 	const demoAgentStates: AgentVisualState[] = [
 		{
 			agentId: 'trace-mcp',
@@ -194,6 +224,12 @@
 			updatedAtMs: 1_725_000_000_000,
 		},
 	];
+
+	const spriteStates = $derived(
+		liveAgentVisuals.sessionId && liveAgentVisuals.states.length > 0
+			? liveAgentVisuals.states
+			: demoAgentStates
+	);
 </script>
 
 <svelte:head>
@@ -202,13 +238,23 @@
 
 <div class="max-w-7xl mx-auto p-6 space-y-8">
 	<!-- Header -->
-	<div class="flex items-center gap-4">
-		<Icon name="bot" size="xl" class="text-accent" />
-		<div>
-			<h1 class="text-3xl font-bold text-sand-12">AI Investigation Center</h1>
-			<p class="text-sand-11 mt-1">
-				Autonomous multi-step investigation with 14 FastMCP tools + personalized recommendations
-			</p>
+	<div class="relative overflow-hidden rounded-3xl border border-sand-5 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.15),_transparent_34%),linear-gradient(180deg,_rgba(15,23,42,0.82),_rgba(2,6,23,0.9))] p-6 shadow-[0_24px_80px_rgba(2,6,23,0.35)]">
+		<div class="absolute inset-0 pointer-events-none bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0.04)_35%,transparent_70%)]"></div>
+		<div class="relative flex items-center gap-4">
+			<div class="grid h-14 w-14 place-items-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-200 shadow-[0_0_0_1px_rgba(34,211,238,0.08),0_0_40px_rgba(34,211,238,0.15)]">
+				<Icon name="bot" size="xl" class="text-cyan-200" />
+			</div>
+			<div class="min-w-0">
+				<div class="flex flex-wrap items-center gap-2">
+					<h1 class="text-3xl font-semibold tracking-tight text-sand-12">AI Investigation Center</h1>
+					<span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[11px] uppercase tracking-[0.18em] text-cyan-100">
+						Live workflow
+					</span>
+				</div>
+				<p class="mt-2 max-w-3xl text-sm leading-6 text-sand-10">
+					Autonomous multi-step investigation with real-time workflow visuals, live SSE stage updates, and a compact retrieval surface for recommendations.
+				</p>
+			</div>
 		</div>
 	</div>
 
@@ -258,16 +304,87 @@
 		</div>
 	</div>
 
-	<!-- Agent Visual State Demo -->
-	<div class="panel p-4 space-y-3">
-		<div class="flex items-center justify-between">
-			<div>
-				<h2 class="text-lg font-semibold text-sand-12">Agent Visual State</h2>
-				<p class="text-xs text-sand-10">Interpolated browser state for future WebGPU sprite and progress rendering.</p>
+	<!-- Live workflow -->
+	<div class="relative overflow-hidden rounded-3xl border border-sand-5 bg-[linear-gradient(180deg,rgba(15,23,42,0.82),rgba(2,6,23,0.88))] p-5 shadow-[0_20px_60px_rgba(2,6,23,0.28)]">
+		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.08),transparent_42%),radial-gradient(circle_at_bottom_left,rgba(167,139,250,0.08),transparent_35%)]"></div>
+		<div class="relative flex items-start justify-between gap-4 flex-wrap">
+			<div class="space-y-2">
+				<div class="flex items-center gap-2">
+					<div class="grid h-9 w-9 place-items-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 text-cyan-200">
+						<Icon name="activity" class="text-cyan-200" />
+					</div>
+					<div>
+						<h2 class="text-lg font-semibold tracking-tight text-sand-12">Live Workflow Visuals</h2>
+						<p class="text-xs text-sand-10">
+							SSE-driven stage stream mapped into the WebGPU sprite lane. Demo states stay as fallback until live events arrive.
+						</p>
+					</div>
+				</div>
+				<div class="flex flex-wrap gap-2 pt-1">
+					<span class="rounded-full border border-sand-6 bg-sand-2 px-2.5 py-1 text-[11px] text-sand-10">session: {liveAgentVisuals.sessionId ?? 'none'}</span>
+					<span class="rounded-full border border-sand-6 bg-sand-2 px-2.5 py-1 text-[11px] text-sand-10">state: {liveAgentVisuals.status}</span>
+					<span class="rounded-full border border-sand-6 bg-sand-2 px-2.5 py-1 text-[11px] text-sand-10">last: {liveAgentVisuals.lastLabel || 'idle'}</span>
+				</div>
 			</div>
-			<div class="text-xs text-sand-10">Canvas 2D fallback</div>
+			<div class="flex items-center gap-2 flex-wrap">
+				<button
+					type="button"
+					onclick={startLiveWorkflow}
+					disabled={liveWorkflowBusy}
+					class="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-50 transition hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-50"
+				>
+					<span class={`h-2 w-2 rounded-full bg-cyan-300 ${liveWorkflowBusy ? 'animate-pulse' : ''}`}></span>
+					{liveWorkflowBusy ? 'Starting workflow…' : 'Start live workflow'}
+				</button>
+				<button
+					type="button"
+					onclick={stopLiveWorkflow}
+					class="inline-flex items-center gap-2 rounded-full border border-sand-6 bg-sand-2 px-4 py-2 text-sm font-medium text-sand-12 transition hover:bg-sand-3"
+				>
+					Stop live feed
+				</button>
+			</div>
 		</div>
-		<AgentSpriteField states={demoAgentStates} width={1024} height={260} />
+		<div class="relative mt-4 grid grid-cols-1 gap-4 md:grid-cols-[1.2fr_0.8fr]">
+			<label class="space-y-2">
+				<span class="text-xs font-medium uppercase tracking-[0.18em] text-sand-10">Live query</span>
+				<input
+					bind:value={liveWorkflowQuery}
+					class="w-full rounded-2xl border border-sand-6 bg-sand-2/80 px-4 py-3 text-sand-12 shadow-inner outline-none transition placeholder:text-sand-9 focus:border-cyan-400/45 focus:ring-2 focus:ring-cyan-400/10"
+				/>
+			</label>
+			<div class="grid grid-cols-3 gap-3">
+				<div class="rounded-2xl border border-sand-6 bg-sand-2/70 p-3">
+					<div class="text-[11px] uppercase tracking-[0.16em] text-sand-10">Session</div>
+					<div class="mt-1 truncate text-sm text-sand-12">{liveAgentVisuals.sessionId ?? 'none'}</div>
+				</div>
+				<div class="rounded-2xl border border-sand-6 bg-sand-2/70 p-3">
+					<div class="text-[11px] uppercase tracking-[0.16em] text-sand-10">Status</div>
+					<div class="mt-1 text-sm text-sand-12">{liveWorkflowMessage}</div>
+				</div>
+				<div class="rounded-2xl border border-sand-6 bg-sand-2/70 p-3">
+					<div class="text-[11px] uppercase tracking-[0.16em] text-sand-10">Events</div>
+					<div class="mt-1 text-sm text-sand-12">{liveAgentVisuals.states.length}</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Agent Visual State Demo -->
+	<div class="relative overflow-hidden rounded-3xl border border-sand-5 bg-[linear-gradient(180deg,rgba(15,23,42,0.78),rgba(2,6,23,0.92))] p-5 shadow-[0_20px_60px_rgba(2,6,23,0.24)]">
+		<div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(251,191,36,0.08),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.08),transparent_32%)]"></div>
+		<div class="relative mb-3 flex items-center justify-between gap-3">
+			<div>
+				<h2 class="text-lg font-semibold tracking-tight text-sand-12">Agent Visual State</h2>
+				<p class="text-xs leading-5 text-sand-10">
+					Interpolated browser state for WebGPU sprite rendering, with a canvas fallback when hardware acceleration is unavailable.
+				</p>
+			</div>
+			<div class="rounded-full border border-sand-6 bg-sand-2 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-sand-10">WebGPU / canvas</div>
+		</div>
+		<div class="relative overflow-hidden rounded-2xl border border-sand-6 bg-slate-950/70 p-3">
+			<AgentSpriteField states={spriteStates} width={1024} height={260} />
+		</div>
 	</div>
 
 	<!-- Main Layout: Investigator + Recommendations Sidebar -->

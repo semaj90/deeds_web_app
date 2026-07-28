@@ -1,0 +1,246 @@
+import { describe, expect, it } from 'vitest';
+import { CanonicalAcePacketEnvelopeSchema } from '$lib/server/ace/canonical-packet-envelope.js';
+import { FeatureMatrixRowV1Schema } from '$lib/server/atlas/feature-matrix-schema.js';
+import { createValidationResultV1 } from './validation-result-v1.js';
+import { buildClassificationEnvelopeV1 } from './classification-envelope-v1.js';
+import { buildClassificationOutcomeLedgerEvent } from './classification-ledger-writer.js';
+
+describe('Classification ledger writer', () => {
+  it('builds a ledger event that preserves the packet identity spine', () => {
+    const now = '2026-07-28T00:00:00.000Z';
+    const packet = CanonicalAcePacketEnvelopeSchema.parse({
+      packet_key: 'pkt_0123456789abcdef0123456789abcdef',
+      source_ref: 'src/lib/server/auth.ts',
+      canonical_source_ref: 'src/lib/server/auth.ts',
+      title_id: 'title:auth',
+      feature_id: 'auth.sessions',
+      feature_label: 'Authentication Sessions',
+      domain_class: 'infrastructure',
+      lane_status: 'ACTIVE',
+      evidence_state: 'ACTIVE_VERIFIED',
+      knowledge_resolution: 'RESOLVED',
+      ontology_ids: ['ontology:auth'],
+      concept_ids: ['concept:session'],
+      runtime_evidence_refs: ['runtime:trace:1'],
+      test_evidence_refs: ['test:spec:1'],
+      used_concepts: ['session'],
+      lexical_nouns: ['session'],
+      lexical_verbs: ['validate'],
+      lexical_adverbs_ly: [],
+      relationship_hints: [],
+      routing_hints: [],
+      adjacency_packet_keys: [],
+      adjacency_feature_ids: [],
+      adjacency_source_refs: [],
+      packed_arrays: { packet_keys: [], feature_ids: [], source_refs: [], title_ids: [] },
+      columnar_tables: [],
+      mmap_vector_refs: [],
+      language: 'typescript',
+      kind: 'function',
+      page_rank_score: 0.84,
+      prompt_template_id: 'prompt:classification',
+      created_at: now,
+      updated_at: now,
+    });
+
+    const featureRow = FeatureMatrixRowV1Schema.parse({
+      schema_version: '1.0',
+      created_at: now,
+      updated_at: now,
+      workspace_revision: 'main',
+      lane_status: 'ACTIVE',
+      evidence_state: 'ACTIVE_VERIFIED',
+      knowledge_resolution: 'RESOLVED',
+      identity: {
+        packet_key: packet.packet_key,
+        source_ref: packet.source_ref,
+        file_path: 'src/lib/server/auth.ts',
+        function_symbol: 'validateSession',
+        feature_id: packet.feature_id ?? 'auth.sessions',
+        title_id: packet.title_id ?? 'title:auth',
+        tree_node_id: 'tree:src/lib/server/auth.ts:validateSession',
+      },
+      dense_768: null,
+      dense_384: null,
+      latent_64: null,
+      lexical: null,
+      topology: null,
+      classifiers: null,
+      is_valid: true,
+      validation_errors: [],
+      feature_labels: ['auth', 'sessions'],
+      domain_class: 'infrastructure',
+      ontology_ids: ['ontology:auth'],
+      concept_ids: ['concept:session'],
+      runtime_evidence_refs: ['runtime:trace:1'],
+      test_evidence_refs: ['test:spec:1'],
+    });
+
+    const validation = createValidationResultV1({
+      packetKey: packet.packet_key,
+      workspaceId: 'workspace:main',
+      validatedBy: 'phase-108d-proof-matrix',
+      phase: '108d-proof-matrix',
+      projections: {
+        postgres: {
+          layer: 'POSTGRES',
+          packetKey: packet.packet_key,
+          sourceRef: packet.source_ref,
+          featureId: packet.feature_id ?? null,
+          treeNodeId: featureRow.identity.tree_node_id ?? null,
+          workspaceId: 'workspace:main',
+          contentHash: 'sha256:content',
+          workspaceRevision: 'main',
+          ontologyVersion: 'ontology:v1',
+          laneStatus: 'ACTIVE',
+          evidenceState: 'ACTIVE_VERIFIED',
+          knowledgeResolution: 'RESOLVED',
+          domainClass: 'infrastructure',
+          featureLabel: 'Authentication Sessions',
+          snapshotAt: new Date(now),
+        },
+        qdrant: {
+          layer: 'QDRANT',
+          packetKey: packet.packet_key,
+          sourceRef: packet.source_ref,
+          featureId: packet.feature_id ?? null,
+          treeNodeId: featureRow.identity.tree_node_id ?? null,
+          workspaceId: 'workspace:main',
+          contentHash: 'sha256:content',
+          workspaceRevision: 'main',
+          ontologyVersion: 'ontology:v1',
+          laneStatus: 'ACTIVE',
+          evidenceState: 'ACTIVE_VERIFIED',
+          knowledgeResolution: 'RESOLVED',
+          domainClass: 'infrastructure',
+          featureLabel: 'Authentication Sessions',
+          snapshotAt: new Date(now),
+        },
+        redis: {
+          layer: 'REDIS',
+          packetKey: packet.packet_key,
+          sourceRef: packet.source_ref,
+          featureId: packet.feature_id ?? null,
+          treeNodeId: featureRow.identity.tree_node_id ?? null,
+          workspaceId: 'workspace:main',
+          contentHash: 'sha256:content',
+          workspaceRevision: 'main',
+          ontologyVersion: 'ontology:v1',
+          laneStatus: 'ACTIVE',
+          evidenceState: 'ACTIVE_VERIFIED',
+          knowledgeResolution: 'RESOLVED',
+          domainClass: 'infrastructure',
+          featureLabel: 'Authentication Sessions',
+          snapshotAt: new Date(now),
+        },
+        hyperrag_rpc: {
+          layer: 'HYPERRAG_RPC',
+          packetKey: packet.packet_key,
+          sourceRef: packet.source_ref,
+          featureId: packet.feature_id ?? null,
+          treeNodeId: featureRow.identity.tree_node_id ?? null,
+          workspaceId: 'workspace:main',
+          contentHash: 'sha256:content',
+          workspaceRevision: 'main',
+          ontologyVersion: 'ontology:v1',
+          laneStatus: 'ACTIVE',
+          evidenceState: 'ACTIVE_VERIFIED',
+          knowledgeResolution: 'RESOLVED',
+          domainClass: 'infrastructure',
+          featureLabel: 'Authentication Sessions',
+          snapshotAt: new Date(now),
+        },
+        ace: {
+          layer: 'ACE',
+          packetKey: packet.packet_key,
+          sourceRef: packet.source_ref,
+          featureId: packet.feature_id ?? null,
+          treeNodeId: featureRow.identity.tree_node_id ?? null,
+          workspaceId: 'workspace:main',
+          contentHash: 'sha256:content',
+          workspaceRevision: 'main',
+          ontologyVersion: 'ontology:v1',
+          laneStatus: 'ACTIVE',
+          evidenceState: 'ACTIVE_VERIFIED',
+          knowledgeResolution: 'RESOLVED',
+          domainClass: 'infrastructure',
+          featureLabel: 'Authentication Sessions',
+          snapshotAt: new Date(now),
+        },
+      },
+      violations: [],
+    });
+
+    const classification = buildClassificationEnvelopeV1({
+      identity: {
+        packetKey: packet.packet_key,
+        sourceRef: packet.source_ref,
+        contentHash: 'sha256:content',
+        workspaceRevision: 'main',
+        featureId: packet.feature_id ?? 'auth.sessions',
+        featureLabel: packet.feature_label ?? 'Authentication Sessions',
+        titleId: packet.title_id ?? null,
+        treeNodeId: featureRow.identity.tree_node_id ?? null,
+        qdrantPointId: packet.qdrant_point_id ?? null,
+      },
+      signals: {
+        laneStatus: 'ACTIVE',
+        evidenceState: 'ACTIVE_VERIFIED',
+        knowledgeResolution: 'RESOLVED',
+        domainClass: 'infrastructure',
+        ontologyIds: ['ontology:auth'],
+        conceptIds: ['concept:session'],
+        runtimeEvidenceRefs: ['runtime:trace:1'],
+        testEvidenceRefs: ['test:spec:1'],
+        pageRankScore: packet.page_rank_score,
+        communityId: packet.community_id ?? null,
+        kmeansCluster: packet.kmeans_cluster ?? null,
+        somCell: packet.som_cell ?? null,
+        somRow: packet.som_row ?? null,
+        somCol: packet.som_col ?? null,
+      },
+      validation: {
+        layer: 'validation',
+        packetKey: packet.packet_key,
+        sourceRef: packet.source_ref,
+        contentHash: 'sha256:content',
+        workspaceRevision: 'main',
+        validatedBy: 'phase-108d-proof-matrix',
+        phase: '108d-proof-matrix',
+        canPromotion: validation.canPromotion,
+        isValid: validation.isValid,
+        outcome: 'success',
+        ledgerPath: '.opencode/outcome-ledger.ndjson',
+        recordedAt: now,
+      },
+      provenance: {
+        packetSchemaVersion: 'atlas.canonical-ace-packet-envelope-v1',
+        featureSchemaVersion: '1.0',
+        validationSchemaVersion: '1.0',
+        ledgerSchemaVersion: 'outcome-ledger.ndjson',
+        serializerVersion: 'unit-test',
+        createdAt: now,
+      },
+    });
+
+    const ledgerEvent = buildClassificationOutcomeLedgerEvent({
+      classification,
+      featureRow,
+      validation,
+      reward: 1,
+      rewardReason: 'aligned',
+      outcome: 'success',
+    });
+
+    expect(ledgerEvent.packet_key).toBe(packet.packet_key);
+    expect(ledgerEvent.source_ref).toBe(packet.source_ref);
+    expect(ledgerEvent.content_hash).toBe('sha256:content');
+    expect(ledgerEvent.workspace_revision).toBe('main');
+    expect(ledgerEvent.feature_id).toBe('auth.sessions');
+    expect(ledgerEvent.lane_status).toBe('ACTIVE');
+    expect(ledgerEvent.evidence_state).toBe('ACTIVE_VERIFIED');
+    expect(ledgerEvent.knowledge_resolution).toBe('RESOLVED');
+    expect(ledgerEvent.validated_by).toBe('phase-108d-proof-matrix');
+    expect(ledgerEvent.can_promotion).toBe('CROSS_STORE_PROVEN');
+  });
+});

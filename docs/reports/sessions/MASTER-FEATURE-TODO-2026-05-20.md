@@ -198,6 +198,16 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 ## Phase 11E — Product Consolidation + Recommendation Layer
 
 **Goal**: Reduce system complexity and turn Graphify/Atlas outputs into actionable recommendations.
+The live workstation flow is:
+`classify intent` -> `build bounded ACE context` -> `synthesize recommendation` -> `record outcome`.
+
+**Live recommendation loop**
+- [x] `classify_intent` — live intent classification via `sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts`
+- [x] `build_agentic_rag_context` — bounded ACE context assembly via the same client seam
+- [x] `build_recommendation` — bounded synthesis over the evidence packet
+- [x] `record_outcome` — outcome / promotion ledger gate now writes to `.opencode/outcome-ledger.ndjson` and stays separate from synthesis
+- [x] `packet_key` reconciliation now prefers canonical packet identity over path/stable-key fallback in `sveltekit-frontend/src/lib/server/ai/openai-facade.ts`
+- [x] `atlas.embedding_*` MCP tools now require packet identity and echo it in emitted metadata via `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`
 
 **Inputs**: Graphify feature map, Atlas seeds, retrieval traces, TODO priorities, smoke/build failures,
 dependency graph, sourceRefs, startup context, package scripts.
@@ -321,14 +331,27 @@ dependency graph, sourceRefs, startup context, package scripts.
 **Goal**: Use structural analysis to trim the repo to production-ready source, schemas, scripts, and docs.
 **Scope**: full repo, not just `/src`; use `repo-root-atlas`, `docs/graph/`, `memory/exports/`, `scripts/`, `sveltekit-frontend/`, `docs/`, and the existing directory cards as analysis roots.
 **Hidden roots**: include gitignored workspace roots such as `.opencode/`, `.tmp/`, `.cache/`, `.svelte-kit/`, `.github/`, and `.vscode/` in the traversal surface.
+**Status**: dry-run analysis is ready; apply/archive stays blocked until the drift audits and archive reports agree.
 
 **Tasks**:
+
+**Dry-run analysis**
+- [x] Use `sveltekit-frontend/src/lib/server/indexer/ast-chunker.ts` as the primary structural chunking lane for file-role analysis.
+- [x] Use `sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts` as the LangExtract summary / rerank bridge for structural features.
 - [ ] Wire `ast-grep` into the directory analysis pipeline for codebase pruning.
+  - `sveltekit-frontend/scripts/tools/run-ast-grep.mjs`
+  - `sveltekit-frontend/scripts/index/ast-grep-map.mjs`
+  - `sveltekit-frontend/scripts/atlas/phase1-ast-grep-extraction.mjs`
+  - `sveltekit-frontend/scripts/atlas/phase1.5-ast-grep-extraction.mjs`
+  - `sveltekit-frontend/scripts/atlas/phase2a-ast-grep-synthetic-key-fix.mjs`
+  - fallback-only: `src/lib/server/atlas/indexing/tree-sitter-chunker.ts`
 - [ ] Use directory-role analysis plus AST maps to separate missing features from redundant features.
 - [ ] Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.
 - [ ] Chunk the huge ripgrep search dumps (`docs/reports/rg_turbovec.txt`, `docs/reports/rg_napi.txt`) into parent-atlas-ready packets keyed by `title_id`, `feature_id`, and `sourceRef`; treat the raw `.txt` dumps as generated evidence, not source.
 - [ ] Use the Obsidian-vault mirror as a downstream indexing surface only: ingest source files first, then pull the minimum mirror summaries needed to advance `next_steps/active/` and the parent atlas.
 - [ ] Use LangExtract to summarize source files, parent-atlas packets, and selected Obsidian mirror summaries into completion notes before archiving any stale generated tree.
+
+**Apply / archive gate**
 - [ ] Keep the repo minification split explicit: SeaweedFS (cold originals), Postgres/Qdrant/Neo4j/Redis (warm packets and indexes), and only completion notes plus active packet manifests in the repo.
 - [ ] Keep only production-readiness completion notes active (`docs/reports/phase-101-closeout.md`, `docs/reports/phase-102-handoff.md`); archive superseded generated reports, mirror trees, and raw search dumps after their content has been promoted.
 - [x] Rebuild the parent atlas from the production-ready feature list after archive decisions land.
@@ -337,7 +360,6 @@ dependency graph, sourceRefs, startup context, package scripts.
   - `docs/reports/repo-archive-move-plan-2026-06-01.{json,md}`
   - `node scripts/atlas/atlas-parent-indexing.mjs --apply`
   - bounded refresh run processed 9 lanes with 10,743 nodes and 9,398 edges
-- [ ] Keep the pruning lane offline-only; it should not become a startup dependency.
 - [ ] Audit PostgreSQL 17.6 vs 18 table/index drift and use the result to label canonical production tables vs experimental / archive-only tables.
 - [ ] Keep `research_summaries` as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres 18.
 - [ ] Use the repo consolidation feature map to label ship-path, planned production, experimental, and archive-only files before trimming the repo to source, schemas, scripts, and docs.
@@ -359,6 +381,10 @@ dependency graph, sourceRefs, startup context, package scripts.
   - the move list is still read-only; it only categorizes files into archive destinations
   - verified bucket split: `archive/review-needed/` (435), `archive/generated-reports/` (80), `archive/memory-exports/` (22), `archive/opencode-generated/` (6), `archive/obsidian-vault-mirror/` (5), `archive/model-blobs/` (2), `archive/legacy-doc-bundles/` (1), `archive/build-artifacts/` (1)
 - [ ] Refresh the all-lanes parent atlas build after the crosswalk and archive-plan reports land, then use the active TOC as the traversal entrypoint for codebase indexing.
+
+**Readiness gate**
+- [ ] Do not move, delete, or collapse any subtree until the dry-run reports, drift audit, and parent atlas refresh all agree on keep/archive decisions.
+- [ ] Keep the pruning lane offline-only; it must not become a startup dependency.
 
 ## NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)
 
@@ -754,10 +780,25 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts`
     - `sveltekit-frontend/src/routes/api/atlas/hyperrag-packet-rpc/+server.ts`
     - `src/lib/server/topology/feature-tracking-layer.ts`
-  - [ ] Align the feature matrix contract so the system is not framed as only `384` versus `768`
-    - Canonical dense semantic lane: `embeddinggemma` full `768`
-    - Decomposed dense lane(s): bounded projections such as `384` or domain-specific subspaces when explicitly versioned
-    - Latent routing lane: compressed `64` for cuVS / centroid / SOM / prefilter work
+    - `sveltekit-frontend/src/lib/server/atlas/contracts/semantic-packet-v1.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/contracts/dense-lane-policy.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/contracts/retrieval-candidate.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/contracts/validation-result-v1.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts`
+    - `sveltekit-frontend/src/routes/api/ldr/research/+server.ts`
+  - [x] Wire the shared semantic search workflow through the live retrieval route, tRPC search, and daily board loader
+    - `sveltekit-frontend/src/lib/server/retrieval/semantic-search-workflow.ts`
+    - `sveltekit-frontend/src/lib/server/trpc/routers/search.ts`
+    - `sveltekit-frontend/src/routes/api/retrieval/search-unified/+server.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board.ts`
+    - proof: `npx vitest run src/lib/server/retrieval/semantic-search-workflow.spec.ts` passed and confirmed report persistence + board loader consumption
+  - [x] Align `atlas_embedding_tools.ts` to the shared source-lane embedding contract constants
+    - `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`
+  - [ ] Align the feature-matrix contract so the system is not framed as only `384` versus `768`, but as a versioned multi-lane matrix
+    - Canonical dense semantic lane: `dense_768` / `embeddinggemma` full `768`
+    - Decomposed dense lane(s): bounded projections such as `dense_384` or domain-specific subspaces when explicitly versioned
+    - Latent routing lane: compressed `latent_64` for cuVS / centroid / SOM / prefilter work
     - Sparse lexical lanes: BM25 baseline and BM42 experimental lane
     - Structural feature lane: AST, tree-sitter, ast-grep, route/schema/import/call facts
     - Classifier feature lane: logistic-regression / naive-Bayes / XGBoost input matrix over structural + lexical + topology + routing features
@@ -895,6 +936,29 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - runtime proof that `.okf`, JSON Schema, and Zod validators agree on packet and fact admission rules
     - runtime proof that `title_id`, `tree_node_id`, `packet_key`, `uuid`, and `ulid` are generated and consumed consistently across TypeScript, Python, Postgres, Qdrant, and Neo4j
     - runtime proof that HyperRAG fact retrieval returns whole fact contexts, not only pairwise edge fragments
+    - [x] Classification payload envelope, validation snapshot, and ledger alignment bridge test
+      - `src/lib/server/atlas/contracts/classification-envelope-v1.spec.ts`
+      - `src/lib/server/atlas/contracts/classification-ledger-writer.spec.ts`
+      - `src/lib/server/ace/packet-io.spec.ts`
+      - `CanonicalAcePacketEnvelopeSchema`, `FeatureMatrixRowV1Schema`, `ValidationResultV1`, and the classification outcome ledger writer now share the same packet/source/workspace identity spine
+    - [x] Packet identity join now prefers canonical `packet_key` over path/stable-key fallbacks in the OpenAI facade
+      - `sveltekit-frontend/src/lib/server/ai/packet-identity-join.ts`
+      - `sveltekit-frontend/src/lib/server/ai/packet-identity-join.spec.ts`
+      - `sveltekit-frontend/src/lib/server/ai/openai-facade.ts`
+    - [x] Tool-call parsing now accepts both tagged blocks and OpenAI-compatible JSON envelopes via the simdjson bridge
+      - `sveltekit-frontend/src/lib/server/ai/tool-call-parser.ts`
+      - `sveltekit-frontend/src/lib/server/ai/tool-call-parser.spec.ts`
+      - `sveltekit-frontend/src/lib/server/ai/acp-rpc-loop.ts`
+      - `sveltekit-frontend/src/lib/server/ai/openai-facade.ts`
+    - [x] OpenCode ACE context bootstrap now emits explicit lane priorities for keyword, atlas, embedding, and centroid routing
+      - `scripts/opencode/get-ace-context.mjs`
+      - retrieval policy now prefers `codebase.rg_search` / `trace.kag_search` before raw file reads
+  - [x] Phase 108D single-packet proof captured with the live runner (`scripts/atlas/phase108d-single-packet-proof.mts`)
+    - Target packet: `packet:1f18437ee58f` (`sveltekit-frontend/src/routes/(app)/demos/+page.svelte`)
+    - Result: `PARTIAL_PROVEN`
+    - Postgres + HyperRAG exact match passed; `codebase_chunks_384_hybrid`, `codebase_chunks_384`, and `codebase_chunks_768` reported no indexed points for this packet-level proof
+    - Redis `bifrost:packet:*` / `ace:packet:*` cache entries were absent for this packet, and no ACE context packet was present
+    - `content_hash` remains null in Postgres for this packet, so freshness stays unproven
   - [ ] Add the `384` versus `768` parity benchmark gate before adding another ANN index
     - exact GPU brute-force top-k ground truth
     - Qdrant HNSW baseline

@@ -32,6 +32,13 @@ import {
   buildAcePacketCacheKey,
   buildAceCompletionCacheKey,
 } from '$lib/server/cache-keys.js';
+import {
+  collectPacketIdentityJoinMeta,
+  type PacketIdentityJoinCandidate,
+  type PacketIdentityJoinMeta,
+  readPacketKey,
+  readSourceRef,
+} from '$lib/server/ai/packet-identity-join.js';
 import { getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
 import { rankIntent, logIntentEvalEvent } from '$lib/server/ai/intent-ranker.js';
 import {
@@ -60,6 +67,7 @@ import {
   AcePromptPreflightResult,
 } from '$lib/server/ai/ace-prompt-preflight.js';
 import { lookupScenario, storeScenario } from '$lib/server/ai/scenario-cache.js';
+import { callTraceMcpTool } from '$lib/server/ai/mcp-tool-bridge.js';
 
 const OPENAI_DEFAULT_MAX_TOKENS = Number(process.env.OPENAI_DEFAULT_MAX_TOKENS ?? '1024');
 const OPENAI_MAX_OUTPUT_TOKENS = Number(
@@ -338,7 +346,10 @@ async function runLdrChat(
   _maxTokens: number,
   _temperature?: number
 ): Promise<string> {
-  const base = ENV.LDR_BASE_URL;
+  const base = ENV.LDR_BASE_URL ?? ENV.SVELTEKIT_ORIGIN ?? 'http://localhost:5173';
+  if (!base || base === 'undefined' || base.startsWith('undefined')) {
+    throw new Error('LDR base URL not configured (ENV.LDR_BASE_URL or SVELTEKIT_ORIGIN required)');
+  }
   // Build a query string from the last user message
   const lastUser = [...messages].reverse().find(m => m.role === 'user');
   const query = lastUser?.content ?? messages.map(m => m.content).join('\n');
@@ -466,6 +477,145 @@ function determineInferenceLane(
   return canUseTurboQuantNow ? 'turboquant' : 'ldr';
 }
 
+/**
+ * Execute a bounded tool loop with MCP integration.
+ *
+ * Processes tool calls from the model using TRACE MCP tools, accumulating
+ * results up to maxResultChars (12000 chars default). Exits when:
+ * - No more tool calls (empty response)
+ * - Max rounds reached (3 default)
+ * - Total result chars exceed budget
+ */
+async function executeToolLoop(
+  toolCalls: Array<{ id: string; type: 'function'; function: { name: string; arguments: string } }>,
+  context: {
+    model: string;
+    messages: Array<{ role: string; content: string }>;
+    temperature: number;
+    maxTokens: number;
+  },
+  options?: {
+    maxRounds?: number;
+    maxResultChars?: number;
+  }
+): Promise<{
+  finalContent: string;
+  toolsUsed: Array<{ name: string; result: string }>;
+  toolRounds: number;
+  toolResultChars: number;
+}> {
+  const maxRounds = options?.maxRounds ?? 3;
+  const maxResultChars = options?.maxResultChars ?? 12000;
+
+  const toolsUsed: Array<{ name: string; result: string }> = [];
+  let totalResultChars = 0;
+  let round = 0;
+  let currentContent = '';
+  let currentToolCalls = toolCalls;
+
+  while (round < maxRounds && currentToolCalls.length > 0 && totalResultChars < maxResultChars) {
+    round++;
+
+    // Execute each tool call in this round
+    const toolResults: Array<{ tool_call_id: string; role: 'tool'; content: string }> = [];
+
+    for (const toolCall of currentToolCalls) {
+      const toolName = toolCall.function.name;
+
+      try {
+        // Parse tool arguments (safe JSON parse with fallback)
+        let args: Record<string, unknown> = {};
+        try {
+          args = JSON.parse(toolCall.function.arguments);
+        } catch {
+          // Fallback: treat arguments as empty object if parse fails
+          console.warn(`[Tool Loop] Failed to parse arguments for ${toolName}`);
+        }
+
+        // Call the MCP tool via TRACE server
+        const result = await callTraceMcpTool(toolName, args);
+        const resultStr = typeof result === 'string' ? result : JSON.stringify(result);
+
+        // Check if adding this result would exceed budget
+        if (totalResultChars + resultStr.length > maxResultChars) {
+          console.warn(
+            `[Tool Loop] Result budget exceeded (${totalResultChars} + ${resultStr.length} > ${maxResultChars})`
+          );
+          break;
+        }
+
+        totalResultChars += resultStr.length;
+        toolsUsed.push({ name: toolName, result: resultStr });
+        toolResults.push({
+          tool_call_id: toolCall.id,
+          role: 'tool',
+          content: resultStr.slice(0, 4096), // Truncate per tool to prevent explosion
+        });
+      } catch (err) {
+        console.warn(`[Tool Loop] Tool call failed for ${toolName}:`, err);
+        toolResults.push({
+          tool_call_id: toolCall.id,
+          role: 'tool',
+          content: `Tool execution failed: ${(err as Error).message}`,
+        });
+      }
+    }
+
+    // If we have tool results and rounds remain, feed them back to the model
+    if (toolResults.length > 0 && round < maxRounds && totalResultChars < maxResultChars) {
+      // Rebuild messages with tool results
+      const messagesWithResults = [
+        ...context.messages,
+        {
+          role: 'assistant',
+          content: currentContent || '', // Include the previous assistant message
+        },
+        ...toolResults,
+      ];
+
+      // Call the model again (use bifrostChat without tools to avoid infinite loop)
+      try {
+        const bifrostResult = await bifrostChat(
+          messagesWithResults.map((m) => ({
+            role: m.role as any,
+            content: m.content,
+          })),
+          context.model,
+          {
+            temperature: context.temperature,
+            maxTokens: context.maxTokens,
+          }
+        );
+
+        // Extract content and check for more tool calls
+        currentContent = extractAssistantText(bifrostResult);
+
+        // Parse for tool calls in the new response
+        const responseHasTools = hasToolCalls(currentContent);
+        if (responseHasTools) {
+          const parsed = parseToolCalls(currentContent);
+          currentToolCalls = parsed.toolCalls;
+          currentContent = parsed.responseText;
+        } else {
+          currentToolCalls = [];
+        }
+      } catch (err) {
+        console.warn(`[Tool Loop] Model call failed in round ${round}:`, err);
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+
+  return {
+    finalContent: currentContent,
+    toolsUsed,
+    toolRounds: round,
+    toolResultChars: totalResultChars,
+  };
+}
+
 type AceSelectedLane = 'redis' | 'turboquant' | 'bifrost';
 
 function selectAceLane(opts: {
@@ -521,9 +671,15 @@ function uniqueStrings(values: Array<string | null | undefined>): string[] {
 function collectResponseContextMeta(aceCtx: ACEContext): {
   sourceRefs: string[];
   chunkIds: string[];
+  packetKeys: string[];
+  packetJoinValidation: PacketIdentityJoinMeta;
   contextPacketVersion?: string;
 } {
   const payloads = aceCtx.acePayloads ?? [];
+  const packetJoinValidation = collectPacketIdentityJoinMeta([
+    ...payloads,
+    ...((aceCtx.codebaseContext ?? []) as Array<Record<string, unknown>>),
+  ]);
   const sourceRefs = uniqueStrings([
     ...payloads.map((payload) => payload.source_ref),
     ...((aceCtx.ragChunks ?? []).map((chunk) => chunk.filePath) as Array<
@@ -547,7 +703,12 @@ function collectResponseContextMeta(aceCtx: ACEContext): {
       string | null | undefined
     >),
   ]);
-  return { sourceRefs, chunkIds };
+  return {
+    sourceRefs,
+    chunkIds,
+    packetKeys: packetJoinValidation.packetKeys,
+    packetJoinValidation,
+  };
 }
 
 /**
@@ -580,9 +741,10 @@ export async function runChatCompletion(
   }
 
   // Tiered Scenario Cache (Tier 1 Redis, Tier 2 Qdrant + Postgres hydration)
+  let cachedScenario: any = null;
   try {
-    const cachedScenario = await lookupScenario(query);
-    if (cachedScenario.hit && cachedScenario.response) {
+    cachedScenario = await lookupScenario(query);
+    if (cachedScenario && cachedScenario.hit && cachedScenario.response) {
       void persistEngramChatMemory({
         userId: opts.userId,
         query,
@@ -1076,6 +1238,11 @@ export async function runChatCompletion(
     ];
     responseContextMeta.contextPacketVersion = acePreflight.version;
   }
+  aceStats.packet_join_validation = {
+    packetKeyMissing: responseContextMeta.packetJoinValidation.packetKeyMissing,
+    pathOnlyCandidates: responseContextMeta.packetJoinValidation.pathOnlyCandidates,
+    packetKeyCount: responseContextMeta.packetKeys.length,
+  };
 
   let acePacketTokens = countTokens(prompt.systemPrompt);
   if (acePacketTokens > ACE_PACKET_TOKEN_CAP) {
@@ -1209,11 +1376,9 @@ export async function runChatCompletion(
   {
     const primaryCluster = aceCtx.clusterContext?.[0];
     const primaryChunk = aceCtx.codebaseContext?.[0];
-    const labelFileKey =
-      ((primaryChunk as Record<string, unknown> | undefined)?.['filePath'] as string) ||
-      ((primaryChunk as Record<string, unknown> | undefined)?.['stableKey'] as string) ||
-      req.file_path ||
-      qHash;
+    const primaryPacketKey = readPacketKey(primaryChunk as PacketIdentityJoinCandidate);
+    const primarySourceRef = readSourceRef(primaryChunk as PacketIdentityJoinCandidate);
+    const labelFileKey = primaryPacketKey ?? primarySourceRef ?? req.file_path ?? qHash;
     const labelClusterId =
       primaryCluster?.clusterKey ||
       ((primaryChunk as Record<string, unknown> | undefined)?.['clusterKey'] as string) ||
@@ -1589,6 +1754,10 @@ export async function runChatCompletion(
   // normal semantic-reuse path. If the primary lane fails, fall back once and
   // record the reason in the timing trace.
   let text: string;
+  let toolsUsedInLoop: Array<{ name: string; result: string }> = [];
+  let toolRoundsExecuted = 0;
+  let toolResultCharsAccumulated = 0;
+
   const runTurboquant = async () => {
     const turboStartedMs = Date.now();
     const result = await turboQuantChat(messages, internalModel, {
@@ -1609,7 +1778,34 @@ export async function runChatCompletion(
     bifrostMs = Date.now() - bifrostStartedMs;
     selectedLane = 'bifrost';
     inferenceLane = 'bifrost';
-    return extractAssistantText(result);
+
+    // Handle tool calls if present
+    let finalContent = extractAssistantText(result);
+    if (
+      typeof result === 'object' &&
+      result !== null &&
+      'tool_calls' in result &&
+      Array.isArray((result as any).tool_calls) &&
+      ((result as any).tool_calls as any[]).length > 0
+    ) {
+      try {
+        const toolResult = await executeToolLoop((result as any).tool_calls, {
+          model: internalModel,
+          messages: messages,
+          temperature: req.temperature,
+          maxTokens: requestedMaxTokens,
+        });
+        finalContent = toolResult.finalContent || finalContent;
+        toolsUsedInLoop = toolResult.toolsUsed;
+        toolRoundsExecuted = toolResult.toolRounds;
+        toolResultCharsAccumulated = toolResult.toolResultChars;
+      } catch (err) {
+        console.warn('[openai-facade] Tool loop execution failed:', err);
+        // Fallback: return the content without tool execution
+      }
+    }
+
+    return finalContent;
   };
 
   if (selectedLane === 'ldr') {
@@ -1873,9 +2069,9 @@ export async function runChatCompletion(
         }
       : undefined,
     toolLoop: {
-      toolsUsed: [],
-      toolRounds: 0,
-      toolResultChars: 0,
+      toolsUsed: toolsUsedInLoop,
+      toolRounds: toolRoundsExecuted,
+      toolResultChars: toolResultCharsAccumulated,
       priorAnswerKey,
       mcpPort: 8788,
       kvPacketTaskId,

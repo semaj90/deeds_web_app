@@ -22,6 +22,7 @@ import { bootstrapACPRegistry } from '$lib/server/acp/acp-grpc-quic-bridge.js';
 import { withToolCallRecord } from '$lib/server/telemetry/tool-call-recorder.js';
 import { LDR_RESEARCH_TOOL, executeLDRResearch, formatLDRResultForAgent, type LDRToolInput } from './tools/ldr-research.js';
 import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './tools/phase18-reranker-tool.js';
+import { ATLAS_IDENTITY_AUDIT_SCHEMA, ATLAS_CROSS_STORE_PROOF_SCHEMA, handleAtlasIdentityAudit, handleAtlasCrossStoreProof } from './atlas_identity_audit_tools.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -695,6 +696,25 @@ export function setupToolHandlers() {
         name: 'phase18_reranker',
         description: PHASE18_RERANKER_TOOL_SCHEMA.description,
         inputSchema: PHASE18_RERANKER_TOOL_SCHEMA.inputSchema as any,
+      },
+      // ─────────────────────────────────────────────────────────────────────
+      // Atlas Identity Audit Tools — Cross-Store Identity Parity Gate
+      // ─────────────────────────────────────────────────────────────────────
+      {
+        name: 'atlas.identity_audit',
+        description:
+          'Validate packet_key, source_ref, content_hash parity across Postgres, Qdrant, Neo4j, and Redis. ' +
+          'Phase 1 (Postgres-only) always runs. Phase 2+ requires active service connections (Qdrant, Neo4j). ' +
+          'Used by ATLAS_CROSS_STORE_IDENTITY_PROVEN gate to verify data consistency.',
+        inputSchema: ATLAS_IDENTITY_AUDIT_SCHEMA.strict().passthrough() as any,
+      },
+      {
+        name: 'atlas.cross_store_proof',
+        description:
+          'Generate a gate-ready proof report for ATLAS_CROSS_STORE_IDENTITY_PROVEN validation. ' +
+          'Includes five_counts (Postgres canonical, Qdrant packet_key, Qdrant source_ref, Qdrant content_hash, Neo4j tree_node_id), ' +
+          'gate sequence status, blockers, and next action. Pass criterion: ≥95% match.',
+        inputSchema: ATLAS_CROSS_STORE_PROOF_SCHEMA.strict().passthrough() as any,
       },
       {
         name: 'codebase:explain_cluster',
@@ -5317,6 +5337,22 @@ export function setupToolHandlers() {
       }
       if (name === 'phase18_reranker') {
         return await handlePhase18RerankerToolCall(request);
+      }
+      if (name === 'atlas.identity_audit') {
+        const input = ATLAS_IDENTITY_AUDIT_SCHEMA.parse(args);
+        const result = await handleAtlasIdentityAudit(input);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          isError: !result.validation_result.pass,
+        };
+      }
+      if (name === 'atlas.cross_store_proof') {
+        const input = ATLAS_CROSS_STORE_PROOF_SCHEMA.parse(args);
+        const result = await handleAtlasCrossStoreProof(input);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          isError: result.status === 'BLOCKED',
+        };
       }
       return await handleToolCall(name, args as Record<string, any>);
     } catch (error: any) {

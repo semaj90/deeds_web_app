@@ -5,7 +5,7 @@
  *  - Postgres JSONB owns the complete canonical semantic record.
  *  - Qdrant payload is a compact, validated projection for retrieval routing.
  *  - Named dense vectors, sparse vectors, and multivectors are separate lanes.
- *  - The 384-dim canonical retrieval lane and 768-dim legacy/native lane may coexist
+ *  - The 768-dim primary codebase chunk lane and the 384-dim derived retrieval lane may coexist
  *    only as explicitly named vector spaces with declared lineage.
  *  - Only index fields that participate in filter or routing queries.
  *  - Do NOT index: summary, purpose, full source text, large ontology objects,

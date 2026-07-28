@@ -2,8 +2,10 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { alignCwdToRepoRoot, REPO_ROOT } from '../_repo-root.mjs';
 
-const ROOT = resolve(process.cwd());
+alignCwdToRepoRoot();
+const ROOT = REPO_ROOT;
 const DUCKDB = process.env.DUCKDB_BIN || 'duckdb';
 
 const FILES = {

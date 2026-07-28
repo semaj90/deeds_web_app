@@ -1,5 +1,5 @@
 # Comprehensive Identity + Topology Stack Audit
-**Session 74 — June 23, 2026**  
+**Session 74 — June 23, 2026**
 **Status: READY FOR P3 METADATA SYNC + P4 NEO4J REDESIGN**
 
 ---
@@ -120,7 +120,7 @@ atlas_topology_index columns:
 ### Redis Cache
 | Pattern | Status |
 |---------|--------|
-| `gpu:karpathy:*` | 🔴 **NO REDIS SERVICE** — `legal-ai-redis` container not found |
+| `gpu:karpathy:*` | 🔴 **NO REDIS SERVICE** — `legal-ai-redis we're usin legal-ai-valkey now` container not found |
 | `bifrost:*` | 🔴 No service |
 | `som:*` | 🔴 No service |
 

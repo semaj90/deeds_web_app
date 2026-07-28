@@ -39,3 +39,15 @@ The missing pieces are package installation and CUDA-enabled torch alignment, no
 3. Install `cugraph` / `nx-cugraph` for NetworkX backend dispatch.
 4. Install `cuvs` only if the ANN lane is being promoted.
 5. Re-run the smoke tests before wiring topology clustering.
+
+## Current Daily Todo
+
+Keep this list short. Use the master feature todo for the full backlog.
+
+1. Prove the live packet spine end to end on one real packet: Postgres → Qdrant → Redis/Valkey → HyperRAG → ACE.
+2. Preserve canonical identity fields in every lane: `packet_key`, `source_ref`, `content_hash`, `workspace_revision`.
+3. Keep the `dense_768` / `dense_384` / `latent_64` lanes separate and benchmark them before adding another ANN index.
+4. Keep the Graphify GPU lane behind the same proof gates as the non-GPU lane.
+5. Compress the active context into an ACE packet and cache it in Redis/Valkey instead of reloading the master todo.
+6. Use Graphify task generation for the active todo surface; there is no installed Speckit tool in this repo.
+7. Leave the master feature todo as the canonical backlog, but only surface the currently active slice in the daily workflow.

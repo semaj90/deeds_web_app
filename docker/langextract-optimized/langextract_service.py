@@ -4,7 +4,7 @@ Optimized LangExtract Service - Memory-efficient version
 Target: ~200-300MB RAM (down from 1GB)
 Changes:
 - spaCy en_core_web_md (40MB) instead of en_core_web_trf (500MB)
-- Removed in-process BERT model — uses Gemma4 llama-server for NER
+- Uses Gemma4 via llama-server OpenAI-compatible /v1 endpoints for LLM extraction
 - Lazy model loading — models load on first use
 - Removed EasyOCR (use server-side tesseract.js instead)
 - Optional gRPC support for efficient binary payloads
@@ -27,6 +27,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel, Field
 
+try:
+    import langextract as lx  # type: ignore
+    from langextract.factory import ModelConfig  # type: ignore
+    from langextract import data as lx_data  # type: ignore
+    LANGEXTRACT_AVAILABLE = True
+except Exception:
+    lx = None  # type: ignore
+    ModelConfig = None  # type: ignore
+    lx_data = None  # type: ignore
+    LANGEXTRACT_AVAILABLE = False
+
 # Optional PyPDF2 and docx - lazy loaded
 PDF_AVAILABLE = False
 DOCX_AVAILABLE = False
@@ -39,14 +50,32 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Configuration
-LLAMA_SERVER_URL = (
-    os.environ.get('LLAMA_SERVER_URL')
+LANGEXTRACT_PROVIDER = os.environ.get('LANGEXTRACT_PROVIDER', 'openai')
+LANGEXTRACT_MODEL_ID = os.environ.get(
+    'LANGEXTRACT_MODEL_ID',
+    os.environ.get('LANGEXTRACT_MODEL', 'gemma4-legal-iq4xs-direct'),
+)
+LANGEXTRACT_BASE_URL = (
+    os.environ.get('LANGEXTRACT_BASE_URL')
+    or os.environ.get('LLAMA_SERVER_URL')
     or os.environ.get('TURBOQUANT_BASE_URL')
     or os.environ.get('TURBOQUANT_URL')
     or os.environ.get('LLAMA_URL')
-    or 'http://127.0.0.1:8090'
+    or 'http://127.0.0.1:8090/v1'
 ).rstrip('/')
-LLM_MODEL = os.environ.get('LANGEXTRACT_MODEL', 'gemma4-legal-iq4xs-direct.gguf')
+LANGEXTRACT_API_KEY = os.environ.get('LANGEXTRACT_API_KEY', 'local')
+MODEL_CONFIG = (
+    ModelConfig(
+        model_id=LANGEXTRACT_MODEL_ID,
+        provider=LANGEXTRACT_PROVIDER,
+        provider_kwargs={
+            'api_key': LANGEXTRACT_API_KEY,
+            'base_url': LANGEXTRACT_BASE_URL,
+        },
+    )
+    if ModelConfig is not None
+    else None
+)
 SPACY_MODEL = os.environ.get('SPACY_MODEL', 'en_core_web_md')  # 40MB vs 500MB
 ENABLE_SPACY = os.environ.get('ENABLE_SPACY', 'true').lower() == 'true'
 
@@ -56,7 +85,10 @@ class ExtractRequest(BaseModel):
     document_type: Optional[str] = Field("legal", description="Type of document")
     extract_entities: bool = Field(True, description="Extract named entities")
     extract_structure: bool = Field(True, description="Extract document structure")
-    use_ollama_ner: bool = Field(False, description="Use Gemma4 llama-server for NER")
+    use_gemma4_ner: bool = Field(
+        False,
+        description="Use Gemma4 via llama-server/OpenAI-compatible LangExtract extraction",
+    )
 
 class ExtractResponse(BaseModel):
     document_id: str
@@ -105,7 +137,7 @@ class LangExtractService:
             'case_refs': re.compile(r'[A-Z][a-z]+\s+v\.\s+[A-Z][a-z]+', re.IGNORECASE),
         }
 
-        # HTTP client for Ollama
+        # HTTP client for Gemma4 llama-server / OpenAI-compatible endpoints
         self.http_client: Optional[httpx.AsyncClient] = None
 
     async def get_http_client(self) -> httpx.AsyncClient:
@@ -147,62 +179,123 @@ class LangExtractService:
         return entities
 
     async def extract_entities_llm(self, content: str) -> List[Dict[str, Any]]:
-        """Extract entities using Gemma4 llama-server."""
-        client = await self.get_http_client()
+        """Extract entities using LangExtract with Gemma4 llama-server."""
 
         # Limit content for LLM
         max_len = 8000
         if len(content) > max_len:
             content = content[:max_len] + "..."
 
-        prompt = f"""Extract legal entities from this document. Return only a JSON array of objects with keys: text, label, importance.
-Labels should be: PERSON, ORG, DATE, MONEY, STATUTE, CASE_CITATION, CLAUSE, LOCATION.
-Document:
-{content}
+        prompt = f"""Extract legal entities from this document.
+Return only JSON with a top-level key named `extractions`.
+Each extraction should contain:
+- extraction_class
+- extraction_text
+- attributes
 
-JSON array:"""
+Use these labels: PERSON, ORG, DATE, MONEY, STATUTE, CASE_CITATION, CLAUSE, LOCATION.
+
+Document:
+{content}"""
+
+        if LANGEXTRACT_AVAILABLE and lx is not None and MODEL_CONFIG is not None:
+            try:
+                result = lx.extract(
+                    text_or_documents=content,
+                    prompt_description=prompt,
+                    examples=[],
+                    config=MODEL_CONFIG,
+                    temperature=0.0,
+                    max_output_tokens=2048,
+                    max_workers=1,
+                    max_char_buffer=max_len,
+                )
+                entities = self._normalize_langextract_result(result)
+                if entities:
+                    return entities
+            except Exception as e:
+                logger.warning(f"LangExtract Gemma4 extraction failed: {e}")
 
         try:
+            client = await self.get_http_client()
             response = await client.post(
-                f"{LLAMA_SERVER_URL}/v1/chat/completions",
+                f"{LANGEXTRACT_BASE_URL}/chat/completions",
                 json={
-                    "model": LLM_MODEL,
-                    "messages": [{"role": "user", "content": prompt}],
-                    "temperature": 0.1,
-                    "max_tokens": 1000,
-                    "stream": False
+                    "model": LANGEXTRACT_MODEL_ID,
+                    "messages": [
+                        {"role": "system", "content": "Return valid JSON only."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0.0,
+                    "max_tokens": 2048,
+                    "stream": False,
+                    "response_format": {"type": "json_object"},
                 }
             )
 
             if response.status_code == 200:
                 result = response.json()
-                text = result.get('response', '')
-                if not text and isinstance(result.get('choices'), list) and result['choices']:
-                    choice = result['choices'][0]
-                    message = choice.get('message') if isinstance(choice, dict) else None
-                    if isinstance(message, dict):
-                        text = message.get('content', '')
-                    elif isinstance(choice, dict):
-                        text = choice.get('text', '')
-
-                # Try to parse JSON from response
-                try:
-                    # Find JSON array in response
-                    start = text.find('[')
-                    end = text.rfind(']') + 1
-                    if start != -1 and end > start:
-                        entities = json.loads(text[start:end])
-                        return [
-                            {**e, 'source': 'gemma4-llama-server'}
-                            for e in entities
-                            if isinstance(e, dict) and 'text' in e
-                        ]
-                except json.JSONDecodeError:
-                    pass
+                text = self._extract_chat_content(result)
+                entities = self._parse_entities_json(text)
+                if entities:
+                    return [{**e, 'source': 'gemma4-openai-compatible'} for e in entities]
         except Exception as e:
-            logger.warning(f"Gemma4 llama-server NER failed: {e}")
+            logger.warning(f"Gemma4 LangExtract extraction failed: {e}")
 
         return []
+
+    def _extract_chat_content(self, response: Dict[str, Any]) -> str:
+        text = str(response.get('response', '') or '')
+        choices = response.get('choices')
+        if not text and isinstance(choices, list) and choices:
+            choice = choices[0]
+            if isinstance(choice, dict):
+                message = choice.get('message')
+                if isinstance(message, dict):
+                    text = str(message.get('content', '') or '')
+                else:
+                    text = str(choice.get('text', '') or '')
+        return text
+
+    def _parse_entities_json(self, text: str) -> List[Dict[str, Any]]:
+        if not text:
+            return []
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError:
+            start = text.find('{')
+            end = text.rfind('}') + 1
+            if start == -1 or end <= start:
+                return []
+            try:
+                data = json.loads(text[start:end])
+            except json.JSONDecodeError:
+                return []
+
+        if isinstance(data, list):
+            items = data
+        elif isinstance(data, dict):
+            items = data.get('extractions') or data.get('entities') or []
+        else:
+            return []
+
+        entities: List[Dict[str, Any]] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            text_value = str(item.get('extraction_text') or item.get('text') or '').strip()
+            label = str(item.get('extraction_class') or item.get('label') or item.get('type') or '').strip()
+            if not text_value or not label:
+                continue
+            entities.append({
+                'text': text_value,
+                'label': label,
+                'start': item.get('start_char') or item.get('start'),
+                'end': item.get('end_char') or item.get('end'),
+                'source': 'gemma4-llama-server',
+                'attributes': item.get('attributes') or {},
+            })
+        return entities
 
     async def extract_entities_regex(self, content: str) -> List[Dict[str, Any]]:
         """Extract entities using regex patterns (instant, zero-cost)"""
@@ -317,11 +410,11 @@ JSON array:"""
             entities.extend(await self.extract_entities_regex(request.content))
 
             # Use spaCy if available and not using the configured LLM
-            if not request.use_ollama_ner:
+            if not request.use_gemma4_ner:
                 spacy_ents = await self.extract_entities_spacy(request.content)
                 entities.extend(spacy_ents)
             else:
-                # Use the configured LLM for higher quality NER
+                # Use Gemma4 on llama-server for higher quality NER
                 llm_ents = await self.extract_entities_llm(request.content)
                 entities.extend(llm_ents)
 
@@ -339,8 +432,9 @@ JSON array:"""
             structure=structure,
             entities=unique_entities,
             metadata={
-                'model': SPACY_MODEL if not request.use_ollama_ner else f'gemma4-llama-server/{LLM_MODEL}',
-                'llm_url': None if not request.use_ollama_ner else LLAMA_SERVER_URL,
+                'model': SPACY_MODEL if not request.use_gemma4_ner else LANGEXTRACT_MODEL_ID,
+                'llm_url': None if not request.use_gemma4_ner else LANGEXTRACT_BASE_URL,
+                'provider': None if not request.use_gemma4_ner else LANGEXTRACT_PROVIDER,
                 'entity_count': len(unique_entities),
                 'section_count': len(structure['sections'])
             },
@@ -392,7 +486,7 @@ async def health():
     llama_server_ok = False
     try:
         async with httpx.AsyncClient(timeout=5.0) as client:
-            r = await client.get(f"{LLAMA_SERVER_URL}/v1/models")
+            r = await client.get(f"{LANGEXTRACT_BASE_URL}/models")
             llama_server_ok = r.status_code == 200
     except:
         pass
@@ -402,7 +496,7 @@ async def health():
         services={
             "spacy_loaded": LazySpaCy._nlp is not None,
             "spacy_enabled": ENABLE_SPACY,
-            "llama_server_available": llama_server_ok
+            "langextract_backend_available": llama_server_ok
         },
         memory_mb=round(mem_mb, 1)
     )

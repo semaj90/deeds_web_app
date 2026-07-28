@@ -13,7 +13,11 @@ services:
     ports:
       - "8095:8095"
     environment:
-      - OLLAMA_URL=http://host.docker.internal:11434
+      - LANGEXTRACT_PROVIDER=openai
+      - LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct
+      - LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1
+      - LANGEXTRACT_API_KEY=local
+      - LLAMA_SERVER_URL=http://host.docker.internal:8090/v1
       - SPACY_MODEL=en_core_web_md
       - ENABLE_SPACY=true
     deploy:

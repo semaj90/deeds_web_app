@@ -2,12 +2,13 @@
  * Unified Retrieval + Summarization Orchestrator
  *
  * Coordinates the complete pipeline:
- * Postgres truth → embeddinggemma 768d → Qdrant named-vector
+ * Postgres truth → embeddinggemma 768d → [STAGE 1.5: Rust N-API optional] → Qdrant named-vector
  * → Qdrant RRF fusion → TurboVec prefilter → Postgres join
  * → LangExtract + Gemma4 summary
  *
  * Each service has a clear job:
  * - Postgres: canonical packet truth, joins, provenance, summaries
+ * - Rust N-API: optional GPU-accelerated slot manifest search (8× faster, fallback to Qdrant on error)
  * - Qdrant: GPU vector index + named-vector search + RRF
  * - TurboVec: CUDA RAM prefilter/rerank + 768→64 latent transform
  * - Go Retrieval: fast API facade + orchestration
@@ -22,6 +23,13 @@ import type { SearchFilter, SearchLane } from './types.js';
 import type { SearchTier } from './search-contract.js';
 import { inferRetrievalTier } from './search-contract.js';
 import { embedQueryForLane, type QueryVectorBundle } from './embedding-service.js';
+import { createCodebaseSearchBackendFromEnv, type SearchBackendResult } from '$lib/server/search/create-codebase-search-backend.js';
+import {
+  resolveParentAtlasContext,
+  enrichFilterWithDomainTaxonomy,
+  batchResolveParentAtlasContext,
+  type ParentAtlasContext
+} from './parent-atlas-bridge.js';
 
 export interface RetrievalConfig {
   qdrant: { host: string; port: number };
@@ -214,6 +222,63 @@ async function generateEmbedding(query: string, config: RetrievalConfig): Promis
   } catch (err) {
     console.error('Embedding stage failed:', err);
     throw err;
+  }
+}
+
+/**
+ * STAGE 1.5: Rust N-API optional GPU-accelerated search
+ * Tries native module search; falls back to Qdrant if unavailable or errored.
+ */
+async function rustNapiSearch(
+  queryVector: number[],
+  filters?: SearchFilter,
+  limit: number = 20
+): Promise<Array<{ id: string; score: number; payload: any }> | null> {
+  try {
+    const backend = createCodebaseSearchBackendFromEnv();
+    if (backend.kind !== 'rust_napi') {
+      return null; // Rust backend not enabled
+    }
+
+    const result: SearchBackendResult = await backend.search({
+      queryVector,
+      vectorName: 'dense_768',
+      limit,
+      candidateMultiplier: 1,
+      includePayload: true,
+      filter: filters ? {
+        workspaceRevision: filters.workspace_revision,
+        packetKeys: filters.packet_keys,
+        featureIds: filters.feature_ids,
+        sourceRefPrefixes: filters.source_ref_pattern ? [filters.source_ref_pattern] : undefined,
+        artifactKinds: filters.artifact_kinds,
+        domainIds: filters.domain_ids
+      } : undefined
+    });
+
+    if (result.warnings?.length) {
+      console.warn('Rust N-API warnings:', result.warnings);
+    }
+
+    return result.candidates.map((c) => ({
+      id: c.candidateId,
+      score: c.rawScore,
+      payload: {
+        packet_key: c.packetKey,
+        source_ref: c.sourceRef,
+        feature_id: c.featureId,
+        tree_node_id: c.treeNodeId,
+        content_hash: c.contentHash,
+        artifact_kind: c.payload?.artifactKind,
+        domain_ids: c.payload?.domainIds,
+        backend: 'rust_napi',
+        rust_distance: c.distance,
+        rust_rank: result.candidates.indexOf(c) + 1
+      }
+    }));
+  } catch (err) {
+    console.warn('Rust N-API search failed, falling back to Qdrant:', err);
+    return null; // Fallback to Qdrant
   }
 }
 
@@ -584,17 +649,45 @@ export async function executeUnifiedRetrieval(
     }
     stages.push('embedding');
 
-    // STAGE 2: Qdrant search
-    const qdrantHits = await qdrantSearch(
-      queryVectors,
-      config,
-      request.useRRF ?? true,
-      request.useLexical ?? false,
-      request.filters,
-      retrievalTier
-    );
+    // STAGE 1.5: Rust N-API (optional, fallback to Qdrant)
+    let rustHits: Array<{ id: string; score: number; payload: any }> | null = null;
+    let qdrantHits: Array<{ id: string; score: number; payload: any }>;
+
+    if (queryVectors.dense768?.vector) {
+      rustHits = await rustNapiSearch(
+        queryVectors.dense768.vector,
+        request.filters,
+        request.limit ?? 20
+      );
+      if (rustHits && rustHits.length > 0) {
+        stages.push('rust_napi');
+        qdrantHits = rustHits; // Use Rust results
+      } else {
+        // Fallback to Qdrant
+        qdrantHits = await qdrantSearch(
+          queryVectors,
+          config,
+          request.useRRF ?? true,
+          request.useLexical ?? false,
+          request.filters,
+          retrievalTier
+        );
+        stages.push('qdrant_search');
+      }
+    } else {
+      // No 768d vector, use Qdrant directly
+      qdrantHits = await qdrantSearch(
+        queryVectors,
+        config,
+        request.useRRF ?? true,
+        request.useLexical ?? false,
+        request.filters,
+        retrievalTier
+      );
+      stages.push('qdrant_search');
+    }
+
     const qdrantIds = qdrantHits.map((h) => h.id);
-    stages.push('qdrant_search');
 
     // STAGE 2.5: rg-pool lexical search (opt-in via useRgPool)
     let rgLexicalHits: Array<{ id: string; file: string; line: number; score: number; rank: number }> = [];
@@ -611,12 +704,39 @@ export async function executeUnifiedRetrieval(
     const postgresMap = await postgresJoin(qdrantIds, config);
     stages.push('postgres_join');
 
-    // STAGE 5: Ranking
+    // STAGE 4.5: Parent Atlas enrichment (canonical lineage validation + domain taxonomy)
+    let parentAtlasContextMap = new Map<string, ParentAtlasContext>();
+    try {
+      const sourceRefs = Array.from(
+        new Set([
+          ...qdrantHits.map(h => h.payload?.source_ref || h.id).filter(Boolean),
+          ...turboVecHits.map(h => h.payload?.source_ref).filter(Boolean),
+          ...rgLexicalHits.map(h => h.file).filter(Boolean)
+        ])
+      );
+
+      if (sourceRefs.length > 0) {
+        parentAtlasContextMap = await batchResolveParentAtlasContext(sourceRefs.slice(0, 100));
+        stages.push('parent_atlas_enrichment');
+      }
+    } catch (err) {
+      console.warn('Parent Atlas enrichment failed (non-blocking):', err);
+      // Enrichment is non-blocking; ranking proceeds without it
+    }
+
+    // STAGE 5: Ranking (now with Parent Atlas context)
     const ranked = rankCandidates(qdrantHits, turboVecHits, rgLexicalHits, postgresMap);
+
+    // Enhance ranked candidates with Parent Atlas context
+    const enhancedRanked = ranked.map(candidate => ({
+      ...candidate,
+      parentAtlasContext: parentAtlasContextMap.get(candidate.path) ?? null
+    }));
+
     stages.push('ranking');
 
     return {
-      candidates: ranked,
+      candidates: enhancedRanked,
       timing: {
         embedding: 0, // Placeholder
         qdrant_search: 0,
@@ -662,12 +782,16 @@ export async function executeUnifiedRetrievalWithSummarization(
 
 export default {
   generateEmbedding,
+  rustNapiSearch,
   qdrantSearch,
   rgPoolLexicalSearch,
   turboVecPrefilter,
   postgresJoin,
   rankCandidates,
   summarizeWithGemma4,
+  resolveParentAtlasContext,
+  enrichFilterWithDomainTaxonomy,
+  batchResolveParentAtlasContext,
   executeUnifiedRetrieval,
   executeUnifiedRetrievalWithSummarization
 };

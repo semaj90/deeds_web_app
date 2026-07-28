@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T16:12:52.044Z",
+  "generated_at": "2026-07-28T17:01:38.154Z",
   "database": {
     "database": "legal_ai_db",
     "username": "legal_admin",
@@ -17,17 +17,31 @@
       "neo4j",
       "turbovec"
     ],
+    "lane_map": {
+      "okf": "declarative contract lane",
+      "msgpack": "compact packet / cache codec lane",
+      "arrow_ipc": "bounded batch export lane",
+      "grpc_protobuf": "live service boundary lane",
+      "redis_bitfrost": "hot cache and replay lane",
+      "qdrant": "semantic lookup mirror",
+      "postgres": "canonical identity and provenance store",
+      "embedding_family": "embeddinggemma",
+      "canonical_embedding_lane": "512",
+      "main_chunk_lane": "768",
+      "projection_lane": "384",
+      "routing_lane": "64"
+    },
     "rule": "Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist."
   },
   "tables": {
-    "atlas_packets": 58365,
+    "atlas_packets": 61659,
     "atlas_packet_registry": 58324,
     "atlas_summary_layers": 18423,
     "atlas_artifacts": 58312,
     "codebase_chunk_index": 52417,
-    "parent_atlas_documents": null,
+    "parent_atlas_documents": 61659,
     "atlas_feature_envelopes": 58365,
-    "atlas_retrieval_eval_times": 25,
+    "atlas_retrieval_eval_times": 26,
     "atlas_provenance_tree": null
   },
   "metrics": {
@@ -35,7 +49,7 @@
     "summaryLayersPopulated": 7640,
     "jsonShapedPacketSummaries": 17,
     "jsonShapedSummaryLayers": 17,
-    "missingPacketRegistryRows": 41
+    "missingPacketRegistryRows": 3335
   },
   "status": {
     "canonicalSpine": "NEEDS_REBUILD",
@@ -46,6 +60,7 @@
   "next_actions": [
     "Promote already-generated Gemma4 chunk summaries into atlas_summary_layers with atlas:workstation:summaries:100.",
     "Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.",
-    "Use atlas_summary_layers as the canonical envelope source for downstream feature extraction."
+    "Use atlas_summary_layers as the canonical envelope source for downstream feature extraction.",
+    "Keep 512 as the canonical embedding lane, 768 as the main chunk lane, and 384 as a projection lane only when explicitly defined."
   ]
 }

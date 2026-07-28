@@ -64,7 +64,92 @@ Query arrives
 
 ---
 
-## Last Updated: July 27, 2026 (Session 145+ — Redis Connection Fixes + Embedding Dimensions)
+## 🗂️ Cross-Directory Script Safety (INCIDENT FIX — July 28, 2026)
+
+**Incident**: Phase 12 backfill created 327MB duplicate DuckDB in `sveltekit-frontend/data/` due to relative path bug. Root cause: npm scripts in subdirectory call parent scripts with hardcoded relative paths.
+
+**Hard Rule**: ALL file paths in configs must be absolute or project-root-relative. Never use relative paths.
+
+**The Pattern (WRONG)**:
+```typescript
+// ❌ BAD: Works from root, breaks from sveltekit-frontend/
+databasePath: process.env.ATLAS_DUCKDB_PATH ?? 'data/atlas-ml/atlas-analytics.duckdb'
+```
+
+**The Fix (CORRECT)**:
+```typescript
+// ✅ GOOD: Works from any working directory
+function getProjectRoot(): string {
+  if (process.env.PROJECT_ROOT) return process.env.PROJECT_ROOT;
+  let current = path.dirname(fileURLToPath(import.meta.url));
+  for (let i = 0; i < 10; i++) {
+    if (current.endsWith('atlas-duckdb')) return path.join(current, '..', '..');
+    current = path.dirname(current);
+  }
+  return process.cwd();
+}
+
+const projectRoot = getProjectRoot();
+databasePath: path.join(projectRoot, 'data/atlas-ml/atlas-analytics.duckdb')
+```
+
+**When This Matters**: Any npm script in `sveltekit-frontend/package.json` that calls `../scripts/atlas/*` must use absolute paths internally.
+
+**Validation Pattern** (add to scripts called from cross-directory):
+```typescript
+function validateWorkingDirectory(): void {
+  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  if (!fs.existsSync(packageJsonPath)) {
+    console.error(`❌ Must be run from project root. Fix: cd $(git rev-parse --show-toplevel)`);
+    process.exit(1);
+  }
+}
+```
+
+**Files Already Fixed**:
+- `packages/atlas-duckdb/src/config.ts` (commit 1de4f4936a)
+- `scripts/atlas/duckdb/build-full-snapshot.mts` (commit 1de4f4936a)
+
+**Files Needing Same Fix** (Phase 12 scripts):
+- `scripts/atlas/duckdb/build-domain-snapshot.mts`
+- `scripts/atlas/duckdb/freeze-vector-snapshot-5k.mts`
+- `scripts/atlas/duckdb/build-vector-index-lanes.mts`
+- Any other script in `sveltekit-frontend/package.json` that uses relative paths
+
+---
+
+## Qdrant Payload workspace_id Convention (Snapshot Scoping — July 28, 2026)
+
+**workspace_id** is a required Qdrant payload field that scopes enrichment work to a specific snapshot or backfill. It enables:
+- Incremental enrichment (Phases 15+ add cluster metadata, SOM coordinates, policy hints)
+- Snapshot isolation (multiple simultaneous backfill runs don't interfere)
+- Rollback/replay (old workspace_id points can be re-indexed separately)
+
+**Population rules**:
+- **Phase 12 (DuckDB snapshot)**: Auto-generated from environment or timestamp
+  ```typescript
+  const workspaceId = process.env.ATLAS_WORKSPACE_ID ?? `snapshot-phase12-${new Date().toISOString().split('T')[0]}`;
+  ```
+  This gives Phase 12 snapshots an identifier like `snapshot-phase12-2026-07-28` (deterministic per calendar day).
+
+- **Phases 15+ (enrichment)**: Inherit from Postgres `atlas_packets.workspace_id` column
+  Once the column is added to the schema, enrichment scripts read and pass-through the value.
+
+- **Multi-tenant or multi-repo scenarios**: Override via `ATLAS_WORKSPACE_ID` environment variable
+  ```bash
+  ATLAS_WORKSPACE_ID=acme-legal-2026q3 npm run phase12:snapshot
+  ```
+
+**Do NOT**:
+- ❌ Leave workspace_id empty or undefined (Qdrant validation rejects it)
+- ❌ Use random UUIDs (loses determinism and traceability)
+- ❌ Mix different workspace_ids in the same Qdrant collection without explicit intent
+
+**Schema status**: The `atlas_packets.workspace_id` column does not exist yet. Phase 12 scripts populate it in Qdrant payloads for forward compatibility. When the column is added to Postgres (planned for Phases 15+), enrichment scripts will read it from there instead of generating it.
+
+---
+
+## Last Updated: July 28, 2026 (Cross-Directory Script Safety + Qdrant workspace_id Convention)
 ## Status: All services UP ✅ | Gemma4 :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
 ## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
 
@@ -346,6 +431,7 @@ docker exec legal-ai-redis redis-cli PING
 ### Hard Rules for Graphify Startup
 
 - ❌ **Do NOT use Ollama for synthesis.** Gemma4 RotorQuant at :8090 is canonical.
+- ✅ **Run graphify and DuckDB/RabbitMQ export scripts from the repo root** so spawned subprocesses and report paths resolve the same workspace. The scripts now align `cwd` internally and gzip large DuckDB exports automatically.
 - ✅ **Use `embeddinggemma:latest` for embeddings** (384-dim, Ollama :11434)
 - ✅ **All vectors must be 384-dim** (not 768, not 64-dim AE for ANN)
 - ✅ **Postgres is the truth** — all summaries and embeddings written to Postgres FIRST

@@ -66,6 +66,9 @@ function buildMarkdown(report) {
   const rows = Object.entries(report.tables)
     .map(([name, count]) => `| ${name} | ${count === null ? 'missing' : count} |`)
     .join('\n');
+  const laneRows = Object.entries(report.boundary.lane_map)
+    .map(([lane, value]) => `| ${lane} | ${value} |`)
+    .join('\n');
 
   return `# Parent Atlas Workstation Status
 
@@ -73,7 +76,7 @@ Generated: ${report.generated_at}
 
 ## Boundary
 
-Parent Atlas workstation logic is the canonical indexing lane:
+Parent Atlas workstation logic is the canonical packet and lane reconciliation boundary:
 
 1. Rebuild packet spine in Postgres.
 2. Generate Gemma4 summaries into \`atlas_packets.summary\`.
@@ -81,6 +84,12 @@ Parent Atlas workstation logic is the canonical indexing lane:
 4. Only after summaries exist, refresh feature envelopes, Qdrant, Redis/BitFrost, and Neo4j.
 
 Legal-app runtime stores are mirrors/caches, not truth.
+
+## Lane Map
+
+| Lane | Contract |
+|---|---|
+${laneRows}
 
 ## Status
 
@@ -158,23 +167,38 @@ async function main() {
       `),
     };
 
-    const report = {
-      generated_at: new Date().toISOString(),
-      database: context,
-      boundary: {
-        canonical_truth: ['atlas_packets', 'atlas_packet_registry', 'atlas_summary_layers'],
-        derived_mirrors: ['qdrant', 'redis_bitfrost', 'neo4j', 'turbovec'],
-        rule: 'Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist.',
+  const report = {
+    generated_at: new Date().toISOString(),
+    database: context,
+    boundary: {
+      canonical_truth: ['atlas_packets', 'atlas_packet_registry', 'atlas_summary_layers'],
+      derived_mirrors: ['qdrant', 'redis_bitfrost', 'neo4j', 'turbovec'],
+      lane_map: {
+        okf: 'declarative contract lane',
+        msgpack: 'compact packet / cache codec lane',
+        arrow_ipc: 'bounded batch export lane',
+        grpc_protobuf: 'live service boundary lane',
+        redis_bitfrost: 'hot cache and replay lane',
+        qdrant: 'semantic lookup mirror',
+        postgres: 'canonical identity and provenance store',
+        embedding_family: 'embeddinggemma',
+        canonical_embedding_lane: '512',
+        main_chunk_lane: '768',
+        projection_lane: '384',
+        routing_lane: '64',
       },
-      tables,
-      metrics,
-      status: statusFromCounts(tables, metrics),
-      next_actions: [
-        'Promote already-generated Gemma4 chunk summaries into atlas_summary_layers with atlas:workstation:summaries:100.',
-        'Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.',
-        'Use atlas_summary_layers as the canonical envelope source for downstream feature extraction.',
-      ],
-    };
+      rule: 'Postgres packet and summary spine first; mirrors are refreshed after canonical summaries exist.',
+    },
+    tables,
+    metrics,
+    status: statusFromCounts(tables, metrics),
+    next_actions: [
+      'Promote already-generated Gemma4 chunk summaries into atlas_summary_layers with atlas:workstation:summaries:100.',
+      'Do not mirror to Qdrant/Redis/Neo4j until summary coverage is intentionally advanced.',
+      'Use atlas_summary_layers as the canonical envelope source for downstream feature extraction.',
+      'Keep 512 as the canonical embedding lane, 768 as the main chunk lane, and 384 as a projection lane only when explicitly defined.',
+    ],
+  };
 
     await fs.mkdir(path.dirname(REPORT_JSON), { recursive: true });
     await fs.writeFile(REPORT_JSON, JSON.stringify(report, null, 2), 'utf8');

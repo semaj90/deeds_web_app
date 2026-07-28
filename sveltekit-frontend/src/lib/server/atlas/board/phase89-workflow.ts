@@ -23,6 +23,7 @@ export interface Phase89WorkflowPlan {
   workflowId: string;
   taskId: string | null;
   taskLabel: string | null;
+  taskPriority: string | null;
   validationRoutes: string[];
   validationQueueKeys: string[];
   warnings: string[];
@@ -55,6 +56,23 @@ function isPhase89Task(task: DailyGraphifyBoardTask): boolean {
   );
 }
 
+function priorityWeight(priority?: string): number {
+  switch ((priority ?? '').toUpperCase()) {
+    case 'P0':
+    case 'HIGH':
+    case 'CRITICAL':
+      return 0;
+    case 'P1':
+    case 'MEDIUM':
+      return 1;
+    case 'P2':
+    case 'LOW':
+      return 2;
+    default:
+      return 3;
+  }
+}
+
 export function flattenDailyGraphifyBoardTasks(board: DailyGraphifyBoardData): DailyGraphifyBoardTask[] {
   return board.columns.flatMap((column) => column.tasks as DailyGraphifyBoardTask[]);
 }
@@ -68,9 +86,15 @@ export function selectDailyGraphifyBoardTask(
     return tasks.find((task) => task.id === taskId) ?? null;
   }
 
+  const runnable = tasks
+    .filter((task) => task.status !== 'done')
+    .sort((a, b) => priorityWeight(a.priority) - priorityWeight(b.priority));
+
   return (
+    runnable.find((task) => typeof task.script === 'string' && task.script.length > 0) ??
+    runnable.find((task) => task.recommendation_id) ??
+    runnable[0] ??
     tasks.find((task) => typeof task.script === 'string' && task.script.length > 0) ??
-    tasks.find((task) => task.status !== 'done') ??
     tasks[0] ??
     null
   );
@@ -103,6 +127,7 @@ export function buildPhase89WorkflowPlan(
     workflowId,
     taskId: task?.id ?? null,
     taskLabel: task?.label ?? null,
+    taskPriority: task?.priority ?? null,
     validationRoutes,
     validationQueueKeys,
     warnings: [...board.warnings],
@@ -112,7 +137,7 @@ export function buildPhase89WorkflowPlan(
         action: 'queue:workflow',
         target: workflowId,
         detail: task
-          ? `Task ${task.id} from ${board.collection}`
+          ? `Task ${task.id} (${task.priority}) from ${board.collection}`
           : `No explicit task selected from ${board.collection}`,
       },
       ...validationQueueKeys.map((queueKey, index) => ({

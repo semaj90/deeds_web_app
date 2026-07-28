@@ -70,7 +70,18 @@
     "atlas:gates:parallel:apply": "npx tsx scripts/atlas/parallel-gates-orchestrator.mts --apply",
     "atlas:gates:parallel:monitor": "npx tsx scripts/atlas/parallel-gates-orchestrator.mts --monitor",
     "atlas:pipeline:full": "npm run atlas:gate12:apply && npm run atlas:gates:parallel:apply && npm run atlas:gate12:verify",
-    "atlas:pipeline:20step": "npm run atlas:phase0:foundation && npm run atlas:phase1:indexing && npm run atlas:phase2:clustering && npm run atlas:phase3:routing && npm run atlas:phase4:ace"
+    "atlas:pipeline:20step": "npm run atlas:phase0:foundation && npm run atlas:phase1:indexing && npm run atlas:phase2:clustering && npm run atlas:phase3:routing && npm run atlas:phase4:ace",
+    "parent-atlas:build": "cd packages/parent-atlas && npm run build",
+    "parent-atlas:gate:identity": "cd packages/parent-atlas && npm run gate:identity",
+    "parent-atlas:gate:replay": "cd packages/parent-atlas && npm run gate:replay",
+    "parent-atlas:gate:lineage": "cd packages/parent-atlas && npm run gate:lineage",
+    "parent-atlas:gate:final": "cd packages/parent-atlas && npm run gate:final",
+    "parent-atlas:ingest": "cd packages/parent-atlas && npm run ingest",
+    "parent-atlas:enrich:karpathy": "cd packages/parent-atlas && npm run enrich:karpathy",
+    "parent-atlas:cache:hydrate": "cd packages/parent-atlas && npm run cache:hydrate",
+    "parent-atlas:mapreduce": "cd packages/parent-atlas && npm run mapreduce",
+    "parent-atlas:verify:boundaries": "npm run verify:boundaries",
+    "parent-atlas:all": "npm run parent-atlas:build && npm run parent-atlas:gate:identity && npm run parent-atlas:gate:lineage && npm run parent-atlas:ingest"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "2.0.47",

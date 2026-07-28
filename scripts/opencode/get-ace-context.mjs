@@ -256,6 +256,29 @@ async function main() {
     'Run npm run opencode:bootstrap to refresh startup truth and report artifacts'
   );
 
+  const retrievalPolicy = {
+    preferredOrder: [
+      'codebase.rg_search',
+      'trace.kag_search',
+      'query_qdrant',
+      'redis.centroid_lookup',
+      'ace.build_context',
+    ],
+    laneHints: {
+      keywords: ['codebase.rg_search', 'trace.kag_search'],
+      atlasQuery: ['trace.kag_search', 'graph.expand_neighborhood'],
+      embeddings: ['query_qdrant'],
+      centroids: ['redis.centroid_lookup', 'som:centroid:*'],
+      synthesis: ['ace.build_context', 'gemma4-offload'],
+    },
+    routingNotes: [
+      'Prefer keyword and structural search before raw file reads for OpenCode planning.',
+      'Use atlas query / KAG for ACE, KAG, DAG, and HyperRAG synthesis contexts.',
+      'Use embeddings only after candidate narrowing; centroids are routing hints, not truth.',
+      'Keep Redis/Valkey centroid lookups as cache and routing support, not canonical evidence.',
+    ],
+  };
+
   // assemble patch-card per Parent Atlas shape
   const patchCard = {
     id: null,
@@ -268,6 +291,7 @@ async function main() {
       'scans env files',
       'finds owner files',
       'infers storage/retrieval lanes',
+      'defaults to file-read discovery',
       'writes .opencode/ace-context.json',
     ],
     desired_behavior: [
@@ -275,6 +299,7 @@ async function main() {
       'exclude generated folders',
       'emit compact JSON only',
       'write summary path instead of dumping huge output',
+      'emit retrieval lane priorities for keyword, atlas, embedding, and centroid paths',
     ],
     constraints: [
       'do not include secrets',
@@ -301,6 +326,7 @@ async function main() {
     fs.mkdirSync(outDir, { recursive: true });
   } catch (e) {}
   const outPath = path.join(outDir, 'ace-context.json');
+  out.retrievalPolicy = retrievalPolicy;
   // write compact JSON (no pretty-print)
   fs.writeFileSync(outPath, JSON.stringify(out));
 

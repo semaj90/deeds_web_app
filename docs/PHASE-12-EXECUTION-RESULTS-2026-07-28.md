@@ -87,23 +87,24 @@ $ npm run atlas:duckdb:snapshot:full
 
 ---
 
-## Stage 4: Index Lanes (BLOCKED) ⏳
+## Stage 4: Index Lanes ⏳
 
 ```bash
-$ npm run atlas:duckdb:index-lanes:5k:dry
+$ npm run atlas:duckdb:index-lanes:5k
 ```
 
-**Status**: Validation error — Qdrant payload missing workspace_id  
-**Expected**: This is correct behavior for a fresh snapshot
+**Status**: Payload validation FIXED ✅ | Sparse vector schema pending
 
-**Error**:
-```
-PayloadValidationError [workspace_id]: Required field is missing or empty
-```
+**Fix applied (Session 148 Continuation)**:
+- Added `workspace_id` population: derived from `ATLAS_WORKSPACE_ID` env var or auto-generated as `snapshot-phase12-{date}`
+- Added `ontology_version`: set to `'1.0'` for Phase 12 baseline (enriched in Phases 15+)
+- Payload now passes validation (all required fields present)
 
-**Context**: Index lanes require Qdrant collection to be enriched with workspace metadata before building index lanes. This is a downstream enrichment step (Phases 15+) and not a blocker for Phase 12 snapshot completion.
+**Remaining blocker**: Qdrant collection schema doesn't include sparse vectors (bm42_sparse undefined). This is a collection configuration task (create sparse vector named 'bm42_sparse'), not a blocker for Phase 12 snapshot completion.
 
-**Workaround**: Skip index lanes for now; snapshots are complete and ready for clustering/SOM training.
+**Context**: Index lanes with full Qdrant integration is a downstream refinement (Phases 15+). Core Phase 12 snapshots (domain, vector, full corpus) are complete and ready for clustering/SOM training.
+
+**Recommendation**: Skip Qdrant upsert for Phase 12; snapshots are production-ready. Phases 15+ will enrich Qdrant payloads and add sparse vector infrastructure.
 
 ---
 

@@ -75,9 +75,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     });
   } catch (err) {
     if (err instanceof z.ZodError) {
-      return error(400, 'Invalid request');
+      throw error(400, 'Invalid request');
     }
     console.error('[v1/completions]', err);
-    return error(500, 'Internal error');
+    throw error(500, 'Internal error');
   }
 };

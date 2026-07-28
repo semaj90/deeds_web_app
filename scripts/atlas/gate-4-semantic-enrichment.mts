@@ -11,7 +11,7 @@
  *
  * Prepares for enrichment by:
  * - Identifying packets ready for embedding
- * - Validating embedding model compatibility (384-dim canonical)
+ * - Validating embedding model compatibility (768-dim primary codebase lane, 384-dim derived projection)
  * - Planning semantic extraction tasks (NLP, AST, code structure)
  *
  * Expected duration: 2-5 minutes (validation only, no GPU work)
@@ -152,7 +152,7 @@ async function gate4SemanticEnrichment() {
       console.log();
 
       console.log('Semantic Enrichment Pipeline:');
-      console.log('  Lane 1: Vector Embeddings (embeddinggemma:latest, 384-dim)');
+      console.log('  Lane 1: Vector Embeddings (768-dim primary lane, 384-dim derived projection)');
       console.log('    • Ready: ' + metadata.readyForEmbedding + ' packets');
       console.log('    • Expected: ~45-60 min on CPU, ~2-5 min on GPU');
       console.log();
@@ -266,7 +266,7 @@ async function gate4SemanticEnrichment() {
         console.log('✅ GATE 4 PASS: Semantic enrichment pipeline is ready');
         console.log();
         console.log('Recommended next steps:');
-        console.log('  1. Run embedding pipeline (embeddinggemma:latest, 384-dim)');
+        console.log('  1. Run embedding pipeline (primary lane first, derived 384 projection second)');
         console.log('  2. Execute NLP feature extraction (LangExtract, entities)');
         console.log('  3. Process AST/code structure (tree-sitter)');
         console.log('  4. Proceed to Gate 5: Topology Validation');

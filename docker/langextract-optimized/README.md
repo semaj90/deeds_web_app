@@ -7,7 +7,7 @@ Memory-efficient legal document extraction service.
 | Component | Original | Optimized | Savings |
 |-----------|----------|-----------|---------|
 | spaCy model | `en_core_web_trf` (500MB) | `en_core_web_md` (40MB) | **460MB** |
-| BERT NER | HuggingFace in-process (400MB) | Uses Ollama (shared) | **400MB** |
+| BERT NER | HuggingFace in-process (400MB) | Uses Gemma4 on llama-server (shared) | **400MB** |
 | EasyOCR | In-process (100MB+) | Removed (use tesseract.js) | **100MB** |
 | PyTorch | Full runtime (50MB) | Minimal | **30MB** |
 | **Total RAM** | **~1GB** | **~200-300MB** | **70% reduction** |
@@ -16,7 +16,7 @@ Memory-efficient legal document extraction service.
 
 1. **Smaller spaCy Model**: Uses `en_core_web_md` (medium, 40MB) instead of `en_core_web_trf` (transformer, 500MB). Slightly lower accuracy but 10x smaller.
 
-2. **Ollama-based NER**: Instead of loading a separate BERT model, NER can use your existing Ollama `gemma4-rotorquant:latest` instance via HTTP. Pass `use_ollama_ner: true` in requests for higher quality.
+2. **Gemma4 llama-server NER**: Instead of loading a separate BERT model, NER can use your existing llama-server `gemma4-legal-iq4xs-direct` instance via the OpenAI-compatible `/v1` API. Pass `use_gemma4_ner: true` in requests for higher quality.
 
 3. **Lazy Model Loading**: spaCy model loads on first request, not at startup. Faster cold starts.
 
@@ -31,7 +31,10 @@ Memory-efficient legal document extraction service.
 cd docker/langextract-optimized
 docker build -t deeds-langextract-optimized:latest .
 docker run -d -p 8095:8095 --name langextract-optimized \
-    -e OLLAMA_URL=http://host.docker.internal:11434 \
+    -e LANGEXTRACT_PROVIDER=openai \
+    -e LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct \
+    -e LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1 \
+    -e LANGEXTRACT_API_KEY=local \
     --memory=512m \
     deeds-langextract-optimized:latest
 ```
@@ -52,10 +55,10 @@ curl -X POST http://localhost:8095/analyze \
   -H "Content-Type: application/json" \
   -d '{"content": "Contract between ACME Corp and John Doe dated January 15, 2025 for $50,000.", "document_type": "legal"}'
 
-# Extract with Ollama NER (higher quality, slower)
+# Extract with Gemma4 llama-server NER (higher quality, slower)
 curl -X POST http://localhost:8095/analyze \
   -H "Content-Type: application/json" \
-  -d '{"content": "...", "use_ollama_ner": true}'
+  -d '{"content": "...", "use_gemma4_ner": true}'
 ```
 
 ### Response Example
@@ -80,7 +83,11 @@ curl -X POST http://localhost:8095/analyze \
 
 | Env Variable | Default | Description |
 |--------------|---------|-------------|
-| `OLLAMA_URL` | `http://host.docker.internal:11434` | Ollama API URL |
+| `LANGEXTRACT_PROVIDER` | `openai` | LangExtract provider for the model backend |
+| `LANGEXTRACT_MODEL_ID` | `gemma4-legal-iq4xs-direct` | llama-server model ID or alias |
+| `LANGEXTRACT_BASE_URL` | `http://host.docker.internal:8090/v1` | OpenAI-compatible llama-server base URL |
+| `LANGEXTRACT_API_KEY` | `local` | API key passed to the OpenAI-compatible client |
+| `LLAMA_SERVER_URL` | `http://host.docker.internal:8090/v1` | Compatibility alias for the same backend URL |
 | `SPACY_MODEL` | `en_core_web_md` | spaCy model to load |
 | `ENABLE_SPACY` | `true` | Load spaCy at all |
 

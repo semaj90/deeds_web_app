@@ -61,14 +61,14 @@ export interface SemanticPacketV1 {
   // Same packet can have multiple embeddings in different dimensions/models
   embedding?: {
     semantic_384?: {
-      values: number[]; // 384-dim canonical online retrieval
+      values: number[]; // 384-dim derived retrieval projection
       modelVersion: string; // e.g., "embeddinggemma:384:v4"
       normalized: boolean; // L2-normalized
       qdrantPointId?: string | null;
       collectionName?: string; // "codebase_chunks_384"
     };
     legacy_768?: {
-      values?: number[] | null; // 768-dim legacy recall reference (may be null)
+      values?: number[] | null; // 768-dim primary codebase chunk lane (may be null)
       modelVersion?: string | null;
       normalized?: boolean;
       qdrantPointId?: string | null;

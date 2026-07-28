@@ -50,10 +50,16 @@ export interface ProjectionSnapshot {
   packetKey: string | null;
   sourceRef: string | null;
   featureId: string | null;
+  treeNodeId?: string | null;
   workspaceId: string | null;
   contentHash: string | null;
   workspaceRevision?: string | null;
   ontologyVersion?: string | null;
+  laneStatus?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED' | null;
+  evidenceState?: 'ACTIVE_VERIFIED' | 'ACTIVE_DEGRADED' | 'GATED' | 'REFERENCE_ONLY' | 'SUPERSEDED' | 'FAILED' | null;
+  knowledgeResolution?: 'RESOLVED' | 'UNCLASSIFIED' | 'AMBIGUOUS' | 'ONTOLOGY_GAP' | 'CONFLICTING_EVIDENCE' | null;
+  domainClass?: string | null;
+  featureLabel?: string | null;
   snapshotAt: Date;
 }
 

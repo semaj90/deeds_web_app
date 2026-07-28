@@ -4,7 +4,7 @@
  *
  * Steps:
  *  1. Freeze a deterministic 5,000-packet vector snapshot
- *  2. Upsert a Qdrant hybrid lane from the same snapshot
+ *  2. Upsert a Qdrant hybrid lane from the same snapshot (requires sparse vector schema in Qdrant)
  *  3. Build a TurboVec shadow lane from the same snapshot
  *  4. Compare both lanes against a brute-force cosine reference
  *
@@ -13,6 +13,10 @@
  *
  * ⚠️ MUST be run from project root, NOT sveltekit-frontend/
  * This prevents creating duplicate DuckDB files in wrong locations.
+ *
+ * ⚠️ Qdrant upsert (--apply) requires 'bm42' sparse vector defined in collection schema.
+ * Sparse vector support is added in Phases 15+ (not blocking Phase 12 snapshots).
+ * To work around: Remove --apply flag or wire sparse vector creation separately.
  */
 
 import fs from 'node:fs/promises';
@@ -59,7 +63,7 @@ const REPORT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'vector-index-lanes.
 const QDRANT_COLLECTION = 'codebase_chunks_384_hybrid';
 const QDRANT_DENSE_VECTOR = 'content';
 const QDRANT_SUMMARY_VECTOR = 'summary';
-const QDRANT_SPARSE_VECTOR = 'bm42_sparse';
+const QDRANT_SPARSE_VECTOR = 'bm42'; // Canonical sparse vector name per qdrant-collection-contracts.ts
 const TURBOVEC_SHADOW_LIMIT = 4096;
 
 const args = process.argv.slice(2);
@@ -158,9 +162,14 @@ function makeQdrantPayload(row: {
       .join('\n'),
   );
 
+  // workspace_id is derived from repository snapshot timestamp (deterministic, scopes enrichment work to this backfill)
+  const workspaceId = process.env.ATLAS_WORKSPACE_ID ?? `snapshot-phase12-${new Date().toISOString().split('T')[0]}`;
+
   const payload = {
     packet_key: row.packet_key,
     source_ref: row.source_ref,
+    workspace_id: workspaceId,
+    ontology_version: '1.0', // Phase 12 uses v1.0 baseline (enriched post-backfill in Phases 15+)
     postgres_id: row.packet_key,
     content_hash: contentHash,
     contract_version: COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.contractVersion,

@@ -3,7 +3,7 @@
 # Changes:
 #   - Python slim (not full)
 #   - spacy en_core_web_md (40MB) instead of en_core_web_trf (500MB)
-#   - Removed transformers/BERT (uses Ollama instead)
+#   - Removed transformers/BERT (uses Gemma4 llama-server/OpenAI-compatible API)
 #   - Removed EasyOCR (uses tesseract.js on client)
 #   - Multi-stage build to reduce image size
 
@@ -46,7 +46,11 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
 # Configuration
-ENV OLLAMA_URL=http://host.docker.internal:11434
+ENV LANGEXTRACT_PROVIDER=openai
+ENV LANGEXTRACT_MODEL_ID=gemma4-legal-iq4xs-direct
+ENV LANGEXTRACT_BASE_URL=http://host.docker.internal:8090/v1
+ENV LANGEXTRACT_API_KEY=local
+ENV LLAMA_SERVER_URL=http://host.docker.internal:8090/v1
 ENV SPACY_MODEL=en_core_web_md
 ENV ENABLE_SPACY=true
 

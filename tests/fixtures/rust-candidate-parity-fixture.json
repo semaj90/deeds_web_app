@@ -1,0 +1,58 @@
+{
+  "description": "Rust N-API candidate parity test fixture",
+  "schemaVersion": "1.0.0",
+  "metadata": {
+    "vectorName": "dense_768",
+    "dimensions": 768,
+    "queryHash": "sha256:abcd1234",
+    "timestamp": "2026-07-28T00:00:00Z"
+  },
+  "queryVector": "Float32Array [0.001, 0.002, ..., 0.768]",
+  "testCases": [
+    {
+      "name": "exact_query_parity",
+      "description": "Same query against Qdrant and Rust backend returns same candidate IDs in same order",
+      "limit": 20,
+      "candidateMultiplier": 1,
+      "filter": null,
+      "expectedBehavior": "candidates[].candidateId should match between backends",
+      "tolerance": 0,
+      "metric": "exact_match"
+    },
+    {
+      "name": "score_parity",
+      "description": "Raw scores differ by < 0.001 between backends (floating point rounding)",
+      "limit": 20,
+      "expectedBehavior": "candidates[].rawScore should match within 0.001",
+      "tolerance": 0.001,
+      "metric": "max_score_delta"
+    },
+    {
+      "name": "filtered_query_parity",
+      "description": "Filter by workspace_revision matches both backends",
+      "limit": 20,
+      "filter": {
+        "workspaceRevision": "snapshot-phase12-2026-07-28"
+      },
+      "expectedBehavior": "candidates all have matching workspaceRevision",
+      "tolerance": 0,
+      "metric": "filter_compliance"
+    },
+    {
+      "name": "packet_key_resolution",
+      "description": "Rust candidateId (slot number) resolves to same packetKey as Qdrant",
+      "limit": 20,
+      "expectedBehavior": "candidates[].packetKey should match between backends",
+      "tolerance": 0,
+      "metric": "exact_match"
+    },
+    {
+      "name": "recall_at_k",
+      "description": "Top-10 recall between Rust backend and cuVS brute force baseline >= 0.95",
+      "limit": 10,
+      "expectedBehavior": "At least 9/10 candidates in Rust top-10 appear in brute force top-20",
+      "tolerance": 0.05,
+      "metric": "recall@10"
+    }
+  ]
+}

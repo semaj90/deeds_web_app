@@ -39,6 +39,13 @@
       "authorityClass": "first_party",
       "localPath": "docs/features/feature_trace-mcp.md",
       "title": "TRACE MCP feature note"
+    },
+    {
+      "sourceRef": "docs/reports/agentic-recommendation-workflow.json",
+      "sourceType": "generated_report",
+      "authorityClass": "first_party",
+      "localPath": "docs/reports/agentic-recommendation-workflow.json",
+      "title": "Agentic recommendation workflow report"
     }
   ],
   "storage": {

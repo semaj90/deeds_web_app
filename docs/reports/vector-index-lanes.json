@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-07-21T22:37:01.082Z",
-  "contract_version": "embeddinggemma-prefix384-v1",
+  "generated_at": "2026-07-28T16:25:10.526Z",
+  "contract_version": "atlas-embeddinggemma-direct-slice384-v1",
   "snapshot": {
-    "limit": 5000,
-    "selected_rows": 5000,
+    "limit": 10,
+    "selected_rows": 10,
     "input_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k.ndjson",
     "turbovec_input_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
     "turbovec_output_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec.ndjson",
     "turbovec_shadow_limit": 4096,
-    "turbovec_shadow_rows": 4096
+    "turbovec_shadow_rows": 10
   },
   "qdrant": {
     "collection": "codebase_chunks_384_hybrid",
-    "applied": true,
-    "upserted_rows": 5000,
-    "sample_overlap_mean": 0.64
+    "applied": false,
+    "upserted_rows": 0,
+    "sample_overlap_mean": null
   },
   "turbovec": {
     "shadow_built": true,
-    "shadow_rows": 4096,
-    "sample_overlap_mean": 0.7
+    "shadow_rows": 10,
+    "sample_overlap_mean": 0.7999999999999999
   },
   "reference": {
     "brute_force": true,
@@ -29,44 +29,44 @@
         "topk": [
           "0ee918abc8c53e8d",
           "3bf3bc0c64d433c0",
-          "748e8cfa0abd4e6a",
-          "8d44b9719637706f",
-          "c6cd8b39d33db2aa",
-          "packet:008ab6ba7104",
-          "packet:008d73851bef",
-          "packet:00dd22dcf754",
-          "packet:00f1beb71096",
-          "packet:00fc57afabf3"
+          "1703d9c005252a62",
+          "271b5446f6a86a48",
+          "17dc1fe9f5f8a021",
+          "322b9cf893125f07",
+          "313d57f685058b60",
+          "35afe6ea3fdb17b8",
+          "1dc5ac2b3cd9bfe8",
+          "175066b8a4ceee3c"
         ]
       },
       {
         "packet_key": "1703d9c005252a62",
         "topk": [
           "1703d9c005252a62",
-          "4d4c2e69d3f629ba",
-          "dacc099376a3c299",
-          "e0226ded9d79084d",
-          "cbd1423a7a39317f",
-          "packet:1363bae01217",
-          "packet:04f51a57023c",
-          "packet:081849eda76f",
-          "packet:0b4aa72f2f79",
-          "packet:0a6eba174aa1"
+          "17dc1fe9f5f8a021",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "271b5446f6a86a48",
+          "313d57f685058b60",
+          "35afe6ea3fdb17b8",
+          "322b9cf893125f07",
+          "1dc5ac2b3cd9bfe8",
+          "175066b8a4ceee3c"
         ]
       },
       {
         "packet_key": "175066b8a4ceee3c",
         "topk": [
           "175066b8a4ceee3c",
-          "d15cb3849bdef3b8",
-          "482abc5766b6f8ed",
-          "packet:07f88529d9d5",
           "271b5446f6a86a48",
-          "packet:01899e352198",
-          "packet:1356ab8e57f9",
-          "packet:01211014a27b",
-          "aae4f83738c25068",
-          "3d0da82598d9064a"
+          "322b9cf893125f07",
+          "1703d9c005252a62",
+          "1dc5ac2b3cd9bfe8",
+          "35afe6ea3fdb17b8",
+          "313d57f685058b60",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "17dc1fe9f5f8a021"
         ]
       },
       {
@@ -74,29 +74,104 @@
         "topk": [
           "17dc1fe9f5f8a021",
           "1703d9c005252a62",
-          "4d4c2e69d3f629ba",
-          "dacc099376a3c299",
-          "cbd1423a7a39317f",
           "271b5446f6a86a48",
-          "64090fce409bb5c9",
-          "packet:123b55a30711",
-          "885c6c04322f6095",
-          "packet:008ab6ba7104"
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "322b9cf893125f07",
+          "313d57f685058b60",
+          "1dc5ac2b3cd9bfe8",
+          "35afe6ea3fdb17b8",
+          "175066b8a4ceee3c"
         ]
       },
       {
         "packet_key": "1dc5ac2b3cd9bfe8",
         "topk": [
           "1dc5ac2b3cd9bfe8",
-          "69af5ffe1b3af354",
-          "bbbe630740c5d753",
-          "packet:012d26cd35e4",
-          "packet:0cf5ed27cb85",
-          "packet:13c1d7b35e72",
-          "packet:0bd2646b2486",
-          "packet:00db25ddf795",
-          "packet:08a65b6c2dc7",
-          "3d0da82598d9064a"
+          "322b9cf893125f07",
+          "313d57f685058b60",
+          "271b5446f6a86a48",
+          "35afe6ea3fdb17b8",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "1703d9c005252a62",
+          "175066b8a4ceee3c",
+          "17dc1fe9f5f8a021"
+        ]
+      },
+      {
+        "packet_key": "271b5446f6a86a48",
+        "topk": [
+          "271b5446f6a86a48",
+          "322b9cf893125f07",
+          "1703d9c005252a62",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "17dc1fe9f5f8a021",
+          "1dc5ac2b3cd9bfe8",
+          "35afe6ea3fdb17b8",
+          "313d57f685058b60",
+          "175066b8a4ceee3c"
+        ]
+      },
+      {
+        "packet_key": "313d57f685058b60",
+        "topk": [
+          "313d57f685058b60",
+          "322b9cf893125f07",
+          "1dc5ac2b3cd9bfe8",
+          "271b5446f6a86a48",
+          "35afe6ea3fdb17b8",
+          "17dc1fe9f5f8a021",
+          "1703d9c005252a62",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "175066b8a4ceee3c"
+        ]
+      },
+      {
+        "packet_key": "322b9cf893125f07",
+        "topk": [
+          "322b9cf893125f07",
+          "271b5446f6a86a48",
+          "313d57f685058b60",
+          "1dc5ac2b3cd9bfe8",
+          "17dc1fe9f5f8a021",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "175066b8a4ceee3c",
+          "35afe6ea3fdb17b8",
+          "1703d9c005252a62"
+        ]
+      },
+      {
+        "packet_key": "35afe6ea3fdb17b8",
+        "topk": [
+          "35afe6ea3fdb17b8",
+          "271b5446f6a86a48",
+          "313d57f685058b60",
+          "1dc5ac2b3cd9bfe8",
+          "322b9cf893125f07",
+          "1703d9c005252a62",
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "175066b8a4ceee3c",
+          "17dc1fe9f5f8a021"
+        ]
+      },
+      {
+        "packet_key": "3bf3bc0c64d433c0",
+        "topk": [
+          "0ee918abc8c53e8d",
+          "3bf3bc0c64d433c0",
+          "1703d9c005252a62",
+          "271b5446f6a86a48",
+          "17dc1fe9f5f8a021",
+          "322b9cf893125f07",
+          "313d57f685058b60",
+          "35afe6ea3fdb17b8",
+          "1dc5ac2b3cd9bfe8",
+          "175066b8a4ceee3c"
         ]
       }
     ]
@@ -105,29 +180,49 @@
     "qdrant": [
       {
         "packet_key": "0ee918abc8c53e8d",
-        "overlap": 1
+        "overlap": null
       },
       {
         "packet_key": "1703d9c005252a62",
-        "overlap": 0.9
+        "overlap": null
       },
       {
         "packet_key": "175066b8a4ceee3c",
-        "overlap": 0.2
+        "overlap": null
       },
       {
         "packet_key": "17dc1fe9f5f8a021",
-        "overlap": 0.4
+        "overlap": null
       },
       {
         "packet_key": "1dc5ac2b3cd9bfe8",
-        "overlap": 0.7
+        "overlap": null
+      },
+      {
+        "packet_key": "271b5446f6a86a48",
+        "overlap": null
+      },
+      {
+        "packet_key": "313d57f685058b60",
+        "overlap": null
+      },
+      {
+        "packet_key": "322b9cf893125f07",
+        "overlap": null
+      },
+      {
+        "packet_key": "35afe6ea3fdb17b8",
+        "overlap": null
+      },
+      {
+        "packet_key": "3bf3bc0c64d433c0",
+        "overlap": null
       }
     ],
     "turbovec": [
       {
         "packet_key": "0ee918abc8c53e8d",
-        "overlap": 0.4
+        "overlap": 0.8
       },
       {
         "packet_key": "1703d9c005252a62",
@@ -139,13 +234,33 @@
       },
       {
         "packet_key": "17dc1fe9f5f8a021",
-        "overlap": 0.7
+        "overlap": 0.8
       },
       {
         "packet_key": "1dc5ac2b3cd9bfe8",
         "overlap": 0.8
+      },
+      {
+        "packet_key": "271b5446f6a86a48",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "313d57f685058b60",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "322b9cf893125f07",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "35afe6ea3fdb17b8",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "3bf3bc0c64d433c0",
+        "overlap": 0.8
       }
     ]
   },
-  "duration_ms": 24724
+  "duration_ms": 6304
 }

@@ -6,9 +6,9 @@
  * - Application domain objects (camelCase)
  *
  * Qdrant stores packets in multiple collections with different vector representations:
- * - codebase_chunks_768 (dense_768, legacy recall reference)
- * - codebase_chunks_384 (dense_384, canonical online retrieval)
- * - codebase_chunks_latent_64 (latent_64, routing/clustering)
+ * - codebase_chunks_768 (dense_768, primary codebase chunk / semantic reference lane)
+ * - codebase_chunks_384 (dense_384, derived online retrieval projection lane)
+ * - codebase_chunks_latent_64 (latent_64, routing/clustering lane)
  *
  * CRITICAL: packet_key must be identical across all collections for the same logical packet.
  */

@@ -32,11 +32,13 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '..');
+process.chdir(ROOT);
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
@@ -47,6 +49,7 @@ const DUCKDB_PATH = path.join(ROOT, 'duckdb', 'atlas.duckdb');
 const CARDS_DIR = path.join(ROOT, '.opencode', 'cards');
 const EXPORT_DIR = path.join(ROOT, 'memory', 'exports', 'duckdb');
 const REPORT_PATH = path.join(ROOT, 'memory', 'exports', 'duckdb-mapreduce-report.json');
+const COMPRESS_THRESHOLD_BYTES = 100 * 1024 * 1024;
 
 // ─── DuckDB Setup ────────────────────────────────────────────────────────
 
@@ -328,13 +331,29 @@ function exportTables(db) {
 
   fs.mkdirSync(EXPORT_DIR, { recursive: true });
 
+  function writeMaybeCompressed(fileName, content) {
+    const filePath = path.join(EXPORT_DIR, fileName);
+    const gzPath = `${filePath}.gz`;
+    const buffer = Buffer.from(content, 'utf8');
+    if (buffer.byteLength > COMPRESS_THRESHOLD_BYTES) {
+      fs.writeFileSync(gzPath, gzipSync(buffer));
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      console.log(`  ✅ Exported compressed ${fileName} → ${gzPath}`);
+      return gzPath;
+    }
+    fs.writeFileSync(filePath, content, 'utf8');
+    if (fs.existsSync(gzPath)) fs.unlinkSync(gzPath);
+    console.log(`  ✅ Exported ${fileName} → ${filePath}`);
+    return filePath;
+  }
+
   // Export enriched cards
   const enrichedCards = db.prepare('SELECT * FROM atlas_cards_enriched').all();
   const enrichedCsv = [
     Object.keys(enrichedCards[0]).join(','),
     ...enrichedCards.map(row => Object.values(row).join(','))
   ].join('\n');
-  fs.writeFileSync(path.join(EXPORT_DIR, 'atlas_cards_enriched.csv'), enrichedCsv, 'utf8');
+  writeMaybeCompressed('atlas_cards_enriched.csv', enrichedCsv);
   console.log(`  ✅ Exported ${enrichedCards.length} enriched cards to CSV`);
 
   // Export cluster summary
@@ -343,7 +362,7 @@ function exportTables(db) {
     Object.keys(clusterSummary[0]).join(','),
     ...clusterSummary.map(row => Object.values(row).join(','))
   ].join('\n');
-  fs.writeFileSync(path.join(EXPORT_DIR, 'cluster_summary.csv'), clusterCsv, 'utf8');
+  writeMaybeCompressed('cluster_summary.csv', clusterCsv);
   console.log(`  ✅ Exported ${clusterSummary.length} cluster summaries to CSV`);
 
   // Export parent atlas index
@@ -352,7 +371,7 @@ function exportTables(db) {
     Object.keys(parentAtlas[0]).join(','),
     ...parentAtlas.map(row => Object.values(row).join(','))
   ].join('\n');
-  fs.writeFileSync(path.join(EXPORT_DIR, 'parent_atlas_index.csv'), parentCsv, 'utf8');
+  writeMaybeCompressed('parent_atlas_index.csv', parentCsv);
   console.log(`  ✅ Exported ${parentAtlas.length} parent atlas entries to CSV`);
 
   return { enrichedCards, clusterSummary, parentAtlas };

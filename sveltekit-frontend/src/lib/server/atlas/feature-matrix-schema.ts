@@ -8,8 +8,8 @@
  *   packet_key → source_ref → file_path → function_symbol → feature_id → title_id → tree_node_id
  *
  * Feature representations (separate, versioned):
- *   dense_768: Native embeddinggemma canonical
- *   dense_384: Online retrieval projection
+ *   dense_768: Primary codebase chunk / native semantic reference lane
+ *   dense_384: Derived online retrieval projection
  *   latent_64: Routing/clustering only
  *   lexical: BM25 coefficients
  *   topology: PageRank + SOM cell
@@ -23,6 +23,11 @@
 
 import { z } from 'zod';
 import { DIMENSIONS } from './property-dimensions';
+import {
+  EvidenceStateSchema,
+  KnowledgeResolutionSchema,
+  VectorLaneStatusSchema,
+} from './contracts/classification-contracts';
 
 /**
  * Immutable identity chain.
@@ -40,7 +45,7 @@ export const IdentityChainSchema = z.object({
 export type IdentityChain = z.infer<typeof IdentityChainSchema>;
 
 /**
- * Dense 768-dim canonical vector (native embeddinggemma).
+ * Dense 768-dim primary semantic vector (native codebase chunk lane).
  */
 export const Dense768Schema = z
   .object({
@@ -137,6 +142,9 @@ export const FeatureMatrixRowV1Schema = z.object({
   created_at: z.string().datetime().default(() => new Date().toISOString()),
   updated_at: z.string().datetime().default(() => new Date().toISOString()),
   workspace_revision: z.string().default('main').describe('git branch or deployment version'),
+  lane_status: VectorLaneStatusSchema.optional().nullable(),
+  evidence_state: EvidenceStateSchema.optional().nullable(),
+  knowledge_resolution: KnowledgeResolutionSchema.optional().nullable(),
 
   /** Immutable identity chain */
   identity: IdentityChainSchema,
@@ -154,7 +162,12 @@ export const FeatureMatrixRowV1Schema = z.object({
   /** Metadata flags */
   is_valid: z.boolean().default(true),
   validation_errors: z.array(z.string()).default([]),
-  feature_labels: z.array(z.string()).default([]).describe('Provenance-aware tags/labels for classification and clustering')
+  feature_labels: z.array(z.string()).default([]).describe('Provenance-aware tags/labels for classification and clustering'),
+  domain_class: z.string().min(1).nullable().optional(),
+  ontology_ids: z.array(z.string().min(1)).default([]),
+  concept_ids: z.array(z.string().min(1)).default([]),
+  runtime_evidence_refs: z.array(z.string().min(1)).default([]),
+  test_evidence_refs: z.array(z.string().min(1)).default([]),
 });
 
 export type FeatureMatrixRowV1 = z.infer<typeof FeatureMatrixRowV1Schema>;
@@ -189,6 +202,14 @@ export function createFeatureRow(input: {
   topology?: Topology;
   classifiers?: Classifiers;
   feature_labels?: string[];
+  lane_status?: z.infer<typeof VectorLaneStatusSchema> | null;
+  evidence_state?: z.infer<typeof EvidenceStateSchema> | null;
+  knowledge_resolution?: z.infer<typeof KnowledgeResolutionSchema> | null;
+  domain_class?: string | null;
+  ontology_ids?: string[];
+  concept_ids?: string[];
+  runtime_evidence_refs?: string[];
+  test_evidence_refs?: string[];
   workspace_revision?: string;
 }): FeatureMatrixRowV1 {
   return {
@@ -196,6 +217,9 @@ export function createFeatureRow(input: {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     workspace_revision: input.workspace_revision ?? 'main',
+    lane_status: input.lane_status ?? null,
+    evidence_state: input.evidence_state ?? null,
+    knowledge_resolution: input.knowledge_resolution ?? null,
     identity: input.identity,
     dense_768: input.dense_768 ?? null,
     dense_384: input.dense_384 ?? null,
@@ -205,6 +229,11 @@ export function createFeatureRow(input: {
     classifiers: input.classifiers ?? null,
     is_valid: true,
     validation_errors: [],
-    feature_labels: input.feature_labels ?? []
+    feature_labels: input.feature_labels ?? [],
+    domain_class: input.domain_class ?? null,
+    ontology_ids: input.ontology_ids ?? [],
+    concept_ids: input.concept_ids ?? [],
+    runtime_evidence_refs: input.runtime_evidence_refs ?? [],
+    test_evidence_refs: input.test_evidence_refs ?? [],
   };
 }

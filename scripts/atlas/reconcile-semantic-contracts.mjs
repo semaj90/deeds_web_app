@@ -19,45 +19,47 @@ import { execSync } from 'child_process';
 const OUTPUT_DIR = 'reports/semantic-contracts';
 const REPO_ROOT = process.cwd();
 
-// Canonical contract shape per Session 142 reframing
+// Canonical contract shape per the live repo seams
 const CONTRACT_SHAPE = {
   SemanticPacketV1: {
-    identity: ['packet_key', 'tree_node_id', 'source_ref', 'title_id', 'content_hash'],
-    content: ['summary', 'embedding', 'gemma4_summary', 'tags'],
-    knowledge: ['feature_id', 'feature_label', 'ontology_label', 'topology_label'],
-    resolution: ['status', 'confidence', 'verified_at', 'verification_command'],
-    authority: ['karpathy_blend_score', 'pagerank_score', 'authority_class'],
-    representations: ['qdrant_point_id', 'postgres_row_id', 'redis_key', 'cold_storage_uri'],
+    identity: ['packetKey', 'workspaceId', 'sourceRef', 'semanticAnchor'],
+    semantic: ['featureId', 'featureLabel', 'titleId', 'domainClass'],
+    lineage: ['treeNodeId', 'qualifiedName', 'signatureHash', 'previousTreeNodeId', 'structuralRevision'],
+    content: ['contentHash', 'summary', 'summaryModel'],
+    representations: ['embedding.legacy_768', 'embedding.semantic_384', 'embedding.latent_64', 'embedding.topology_4d'],
+    derived: ['derivedParameters', 'rankFusion', 'identityLane', 'identityConfidence'],
   },
   HypergraphFactV1: {
-    identity: ['fact_id', 'fact_ulid', 'packet_key'],
-    structure: ['type', 'participants', 'properties'],
-    evidence: ['evidence_packet_ids', 'confidence', 'disputed'],
+    identity: ['factId', 'packetKey', 'workspaceId', 'factVersion'],
+    structure: ['factType', 'participants', 'participantsByRole', 'relations'],
+    evidence: ['evidencePacketKeys', 'evidenceRefs', 'confidence', 'authorityClass', 'resolutionState'],
   },
   FeatureMatrixRowV1: {
-    routing: ['som_cluster', 'kmeans_cluster', 'cluster_key'],
-    topology: ['neo4j_neighbors', 'community_id', 'directory_path'],
-    semantic: ['embedding', 'dense_score', 'sparse_score'],
-    lexical: ['trigram_score', 'fts_score'],
-    ontology: ['ontology_label', 'domain_class'],
-    classifier: ['required_verification', 'priority_rank'],
+    identity: ['identity.packet_key', 'identity.source_ref', 'identity.file_path', 'identity.feature_id', 'identity.title_id', 'identity.tree_node_id'],
+    dense: ['dense_768', 'dense_384', 'latent_64'],
+    lexical: ['lexical', 'bm25', 'bm42'],
+    topology: ['topology', 'pagerank_score', 'som_cell_row', 'som_cell_col', 'som_index', 'som_distance_to_centroid'],
+    classifiers: ['classifiers', 'naive_bayes_class', 'naive_bayes_score', 'logistic_regression_score', 'xgboost_score'],
+    provenance: ['workspace_revision', 'schema_version', 'feature_labels', 'is_valid', 'validation_errors'],
   },
   ContractValidationResult: {
-    outcome: ['is_valid', 'validation_errors'],
-    audit: ['validated_at', 'validated_by', 'trace_id'],
+    outcome: ['isValid', 'canPromotion', 'violations'],
+    audit: ['validatedAt', 'validatedBy', 'phase', 'blockedLayers', 'warnLayers', 'passLayers'],
+    snapshots: ['projections'],
   },
 };
 
 // Ownership lanes (canonical seam points)
 const OWNERSHIP_LANES = {
-  OKF_SOURCE: 'declarative semantic source (root files)',
-  PACKET_VALIDATION: 'phase18-envelope-schema.ts + Zod',
-  HYPERRAG_PACKET_RPC: 'hyperrag-packet-rpc.ts response contract',
-  PACKET_IDENTITY: 'packet identity utilities (packet-key, tree-node-id)',
-  TOPOLOGY_ROUTING: 'SOM/KMeans/Neo4j projection',
-  QDRANT_PAYLOAD: 'Qdrant collection payload schema',
-  POSTGRES_ROWS: 'atlas_packets + codebase_chunk_index tables',
-  REDIS_VALUES: 'bifrost:packet:*, centroid:*, gpu:karpathy:scores',
+  OKF_SOURCE: 'declarative semantic source (.okf and docs contracts)',
+  PACKET_VALIDATION: 'validation-result-v1.ts + Zod runtime gates',
+  HYPERRAG_PACKET_RPC: 'hyperrag-projection-contract.ts + packet RPC routes',
+  PACKET_IDENTITY: 'semantic-packet-v1.ts + identity utilities',
+  FEATURE_MATRIX: 'feature-matrix-schema.ts + dense-lane-policy.ts + retrieval-candidate.ts',
+  TOPOLOGY_ROUTING: 'SOM/KMeans/Neo4j projection + latent_64 routing',
+  QDRANT_PAYLOAD: 'Qdrant collection payload schema and named vectors',
+  POSTGRES_ROWS: 'atlas_packets + feature-matrix rows + OKF provenance tables',
+  REDIS_VALUES: 'bifrost:packet:*, centroid:*, ace:packet:*',
 };
 
 // Field name mappings (reconcile naming across layers)
@@ -233,28 +235,28 @@ async function buildIdentityMap() {
   console.log('🔗 Building packet_key identity lineage...');
 
   const map = {
-    canonical_identity: 'packet_key (deterministic sha256 of source_ref + tree_node_id + title_id)',
+    canonical_identity: 'packetKey / packet_key (canonical identity; all mirrors must preserve it)',
     derivation: {
-      source_file: 'source_ref (file path)',
-      structural_identity: 'tree_node_id (AST node identifier from tree-sitter)',
-      grouping_identity: 'title_id (semantic grouping key)',
-      content_integrity: 'content_hash (sha256 of content)',
+      source_file: 'sourceRef (file path / source provenance)',
+      structural_identity: 'treeNodeId / tree_node_id (AST identity)',
+      grouping_identity: 'titleId / title_id (semantic grouping key)',
+      content_integrity: 'contentHash / content_hash (sha256 of content)',
     },
     immutability_rule: 'packet_key MUST remain identical across all storage layers',
     traversal_layers: {
-      source: 'Original file → source_ref extracted',
-      validation: 'Zod schema validation → packet_key computed',
+      source: 'Original file / OKF contract → sourceRef extracted',
+      validation: 'Zod / schema validation → packet identity admitted',
       postgres: 'atlas_packets.packet_key canonical row',
-      qdrant: 'codebase_chunks_768 payload.packet_key',
-      redis: 'bifrost:packet:{packet_key}',
-      hyperrag: 'HyperRagPacketRpcPacket.packet_key in response',
-      agent: 'ACE context packet.packet_key unchanged',
+      qdrant: 'codebase_chunks_768 and codebase_chunks_384 payload.packet_key',
+      redis: 'bifrost:packet:{packet_key} / ace:packet:{runId}',
+      hyperrag: 'HyperRagProjectionRequest + packet RPC response',
+      agent: 'ACE context packet keeps packet identity unchanged',
     },
     evidence_gates: [
-      'packet_key immutability across storage (Postgres → Qdrant → Redis → HyperRAG → Agent)',
-      'content_hash matches original file (no mutation)',
+      'packet identity immutability across storage (Postgres → Qdrant → Redis → HyperRAG → Agent)',
+      'contentHash matches original file or canonical source materialization (no mutation)',
       'no unresolved state silently converted to RESOLVED',
-      'feature routing fields (som_cluster, kmeans_cluster) maintain routing/topology semantics only',
+      'feature routing fields (latent_64, SOM, PageRank, kmeans_cluster) keep routing/topology semantics only',
     ],
   };
 

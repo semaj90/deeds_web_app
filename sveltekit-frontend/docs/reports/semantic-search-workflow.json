@@ -1,0 +1,215 @@
+{
+  "generated_at": "2026-07-28T20:28:53.312Z",
+  "workflow_state": "COMPLETE",
+  "query": "semantic search workflow proof",
+  "top_k": 3,
+  "dag": [
+    {
+      "stage": "validate_request",
+      "state": "COMPLETED",
+      "status": "completed",
+      "dependsOn": [],
+      "evidenceRefs": [],
+      "outputRef": null,
+      "updated_at": "2026-07-28T20:28:53.312Z",
+      "notes": null
+    },
+    {
+      "stage": "build_agentic_rag_context",
+      "state": "SKIPPED",
+      "status": "skipped",
+      "dependsOn": [
+        "validate_request"
+      ],
+      "evidenceRefs": [],
+      "outputRef": null,
+      "updated_at": "2026-07-28T20:28:53.312Z",
+      "notes": "workflow preamble disabled"
+    },
+    {
+      "stage": "canonical_search",
+      "state": "COMPLETED",
+      "status": "completed",
+      "dependsOn": [
+        "build_agentic_rag_context"
+      ],
+      "evidenceRefs": [],
+      "outputRef": null,
+      "updated_at": "2026-07-28T20:28:53.312Z",
+      "notes": null
+    },
+    {
+      "stage": "rust_shadow_compare",
+      "state": "SKIPPED",
+      "status": "skipped",
+      "dependsOn": [
+        "canonical_search"
+      ],
+      "evidenceRefs": [],
+      "outputRef": null,
+      "updated_at": "2026-07-28T20:28:53.312Z",
+      "notes": "shadow comparison disabled"
+    },
+    {
+      "stage": "validate_response",
+      "state": "COMPLETED",
+      "status": "completed",
+      "dependsOn": [
+        "rust_shadow_compare"
+      ],
+      "evidenceRefs": [],
+      "outputRef": null,
+      "updated_at": "2026-07-28T20:28:53.312Z",
+      "notes": null
+    }
+  ],
+  "top_packet_keys": [
+    "0001981c-da69-4b0e-9acb-ad29544029c8",
+    "0006a6fd-d2ec-48ab-926b-2adb327acaaf"
+  ],
+  "preamble": null,
+  "ace": {
+    "query": "semantic search workflow proof",
+    "variants": [
+      "semantic search workflow proof"
+    ],
+    "hits": [
+      {
+        "id": "0001981c-da69-4b0e-9acb-ad29544029c8",
+        "sourcePath": "src/routes/(app)/demos/+page.svelte",
+        "text": "* `Citation Tools`: Focuses on citation management, Qdrant, and relevance scores (AI/Research).\n* `TOC Tree Reader`: Focuses on UI/UX, collapsible tables of contents, and document navigation (UI).\n* `YoRHa Terminal + Status`: Focuses on a terminal emulator, command handling, and system metrics",
+        "score": 0.2,
+        "scoreWeightedSum": 0.2,
+        "signals": {
+          "graphAuthority": 0,
+          "pagerank": 0,
+          "topoClass": "utility"
+        },
+        "reasons": [
+          "retrieval:postgres_trigram",
+          "domain:utility"
+        ],
+        "payload": {
+          "chunk_id": "3ade73fa-0612-4a18-b430-6c6a5724492a",
+          "packet_key": "0001981c-da69-4b0e-9acb-ad29544029c8",
+          "source_ref": "src/routes/(app)/demos/+page.svelte",
+          "content_hash": "8a9435bb3bdfa653",
+          "title_id": "title:55422bd3",
+          "summary": "* `Citation Tools`: Focuses on citation management, Qdrant, and relevance scores (AI/Research).\n* `TOC Tree Reader`: Focuses on UI/UX, collapsible tables of contents, and document navigation (UI).\n* `YoRHa Terminal + Status`: Focuses on a terminal emulator, command handling, and system metrics",
+          "keywords": [],
+          "tree_node_ids": [],
+          "qdrant_point_id": "5e5cf6cd-fdc7-d81e-083d-39400eb2c289",
+          "domain": "utility",
+          "som_cluster": null,
+          "page_rank_score": null,
+          "community_id": null,
+          "retrieval_score": 1,
+          "retrieval_source": "postgres_trigram",
+          "fusion_score": 0.01639344262295082,
+          "fusion_rank": 1,
+          "gan_validated": false,
+          "created_at": "2026-07-04T09:39:33.630Z",
+          "updated_at": "2026-07-04T09:39:33.630Z",
+          "provenance": {},
+          "tensor_stats": {},
+          "karpathy_debug": {},
+          "domain_class": "general",
+          "retrieved_rank": 1,
+          "cross_encoder_score": 0.2,
+          "blended_score": 0.2,
+          "rank_after": 3,
+          "model_version": "mixedbread-ai/mxbai-rerank-base-v2"
+        }
+      },
+      {
+        "id": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+        "sourcePath": "src/lib/server/analytics/unified-research-query.ts",
+        "text": "This code snippet finalizes a research process by sorting and selecting the top topics, then synthesizing a self-prompt chain and building a language graph state. Finally, it calculates the elapsed time and constructs a result object containing various synthesized research insights before returning the final data structure.",
+        "score": 0.3,
+        "scoreWeightedSum": 0.3,
+        "signals": {
+          "graphAuthority": 0,
+          "pagerank": 0,
+          "topoClass": "utility"
+        },
+        "reasons": [
+          "retrieval:postgres_trigram",
+          "domain:utility"
+        ],
+        "payload": {
+          "chunk_id": "ab22a279-1983-44ca-bc67-09f1107c1c06",
+          "packet_key": "0006a6fd-d2ec-48ab-926b-2adb327acaaf",
+          "source_ref": "src/lib/server/analytics/unified-research-query.ts",
+          "content_hash": "b3fce3e66a02e72c",
+          "title_id": "title:ade7fbf4",
+          "summary": "This code snippet finalizes a research process by sorting and selecting the top topics, then synthesizing a self-prompt chain and building a language graph state. Finally, it calculates the elapsed time and constructs a result object containing various synthesized research insights before returning the final data structure.",
+          "keywords": [],
+          "tree_node_ids": [],
+          "qdrant_point_id": "12321f8b-2c32-5b3b-6735-3e22b17a770f",
+          "domain": "utility",
+          "som_cluster": null,
+          "page_rank_score": null,
+          "community_id": null,
+          "retrieval_score": 0.9637919684002632,
+          "retrieval_source": "postgres_trigram",
+          "fusion_score": 0.016129032258064516,
+          "fusion_rank": 3,
+          "gan_validated": false,
+          "created_at": "2026-07-04T09:40:13.278Z",
+          "updated_at": "2026-07-04T09:40:13.278Z",
+          "provenance": {},
+          "tensor_stats": {},
+          "karpathy_debug": {},
+          "domain_class": "general",
+          "retrieved_rank": 2,
+          "cross_encoder_score": 0.3,
+          "blended_score": 0.3,
+          "rank_after": 2,
+          "model_version": "mixedbread-ai/mxbai-rerank-base-v2"
+        }
+      }
+    ],
+    "graphPaths": [],
+    "contextPack": null,
+    "summaryLenses": [],
+    "taskDistillate": null,
+    "synthesis": null,
+    "provenance": {
+      "qdrant": false,
+      "turbovec": false,
+      "redis": true,
+      "neo4j": false,
+      "ace": false,
+      "taskDistillates": false
+    }
+  },
+  "metadata": {
+    "query": "semantic search workflow proof",
+    "candidatesRetrieved": 61,
+    "candidatesFused": 61,
+    "candidatesScored": 61,
+    "candidatesReranked": 3,
+    "candidatesPostProcessed": 2,
+    "durationMs": 30516,
+    "stages": {
+      "retrieve": 19456,
+      "fuse": 19,
+      "score": 39,
+      "hydrate": 174,
+      "rerank": 10681,
+      "postProcess": 6,
+      "promote": 0
+    }
+  },
+  "provenance": {
+    "retrievalSources": [
+      "postgres_trigram",
+      "exact_symbol"
+    ],
+    "fusionMethod": "rrf",
+    "rerankModel": "mixedbread-ai/mxbai-rerank-base-v2",
+    "rerankerUsed": true,
+    "promotionAttempted": true
+  },
+  "shadow": null
+}
