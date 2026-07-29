@@ -1,9 +1,9 @@
 /**
  * Retrieval Candidate — Dense Lane Provenance Preserved
  *
- * Critical: A candidate retrieved from qdrant_384 lane must remain distinguishable
- * from the same packetKey retrieved from qdrant_768 lane through merge, ranking,
- * and XGBoost feature extraction. This shape preserves explicit lane information
+ * Critical: A candidate retrieved from the canonical qdrant_768 lane must remain
+ * distinguishable from legacy or compact lanes through merge, ranking, and
+ * XGBoost feature extraction. This shape preserves explicit lane information
  * so the candidate doesn't collapse during merge.
  */
 
@@ -13,12 +13,12 @@ import { DenseRepresentationName, DenseRole, DenseLifecycle } from './dense-lane
 /**
  * Where did this candidate score come from?
  * Critical: This enum is NOT the same as dense representation name.
- * A candidate with scoreSource='qdrant_384' may carry rawScores.dense768
+ * A candidate with scoreSource='qdrant_768' may carry rawScores.dense768
  * if the same packet appeared in both lanes and was merged.
  */
 export enum RetrievalScoreSource {
-  QDRANT_384 = 'qdrant_384',                    // From Qdrant semantic_384 collection
-  QDRANT_768 = 'qdrant_768',                    // From Qdrant semantic_768 collection
+  QDRANT_384 = 'qdrant_384',                    // Legacy Qdrant semantic_384 collection
+  QDRANT_768 = 'qdrant_768',                    // Canonical Qdrant semantic_768 collection
   BM25 = 'bm25',                                // BM25 lexical score
   BM42 = 'bm42',                                // Future: BM42 with semantic re-scoring
   POSTGRES_LEXICAL = 'postgres_lexical',        // PostgreSQL FTS or trigram match

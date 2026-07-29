@@ -33,5 +33,12 @@ export const EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT = {
 export const EMBEDDINGGEMMA_PREFIX384_RETRIEVAL_CONTRACT =
   EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT;
 
+/**
+ * Compatibility alias for legacy callers.
+ *
+ * The canonical dense retrieval contract is 768/v2. Keep this alias only for
+ * code paths that still expect the older 384 retrieval naming.
+ */
+
 export type QdrantRetrievalSemantics =
   typeof EMBEDDINGGEMMA_PREFIX768_RETRIEVAL_CONTRACT;

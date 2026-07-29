@@ -1,3 +1,5 @@
+import { CANONICAL_EMBEDDING_DIMENSION } from '../atlas/contracts/canonical-chunk-contract.js';
+
 /**
  * Vector Naming & Dimension Contracts
  *
@@ -16,8 +18,8 @@
  * These MUST match Qdrant collection named vector definitions exactly
  *
  * Live Qdrant uses the named 768 lane set ('content', 'error', 'signature').
- * Keep the canonical 768 source lane and the 384 legacy retrieval lane
- * separate, with explicit lineage and score fusion downstream.
+ * Keep the canonical 768 source lane separate from any legacy projections
+ * or compact routing lanes, with explicit lineage and score fusion downstream.
  */
 export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | 'latent_embedding' | 'content' | 'error' | 'signature';
 
@@ -26,12 +28,12 @@ export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | '
  * Used for validation BEFORE sending to Qdrant
  */
 export const VECTOR_DIMENSIONS: Record<CodebaseVectorName, number> = {
-  semantic_embedding: 384,
+  semantic_embedding: CANONICAL_EMBEDDING_DIMENSION,
   topology_embedding: 128,
   latent_embedding: 64,
-  content: 768,        // Native/source Qdrant named vector
-  error: 768,          // Native/source Qdrant named vector
-  signature: 768,      // Native/source Qdrant named vector
+  content: CANONICAL_EMBEDDING_DIMENSION,        // Native/source Qdrant named vector
+  error: CANONICAL_EMBEDDING_DIMENSION,          // Native/source Qdrant named vector
+  signature: CANONICAL_EMBEDDING_DIMENSION,      // Native/source Qdrant named vector
 };
 
 /**
@@ -47,7 +49,7 @@ export const VECTOR_STRATEGIES: Record<
   }
 > = {
   semantic_embedding: {
-    dimension: 384,
+    dimension: CANONICAL_EMBEDDING_DIMENSION,
     distance_metric: 'Cosine',
     use_case: 'Semantic content similarity via embeddinggemma',
     score_threshold: 0.3,
@@ -65,19 +67,19 @@ export const VECTOR_STRATEGIES: Record<
     score_threshold: 0.4,
   },
   content: {
-    dimension: 768,
+    dimension: CANONICAL_EMBEDDING_DIMENSION,
     distance_metric: 'Cosine',
     use_case: 'Native source-lane full-context content vector for dense retrieval',
     score_threshold: 0.3,
   },
   error: {
-    dimension: 768,
+    dimension: CANONICAL_EMBEDDING_DIMENSION,
     distance_metric: 'Cosine',
     use_case: 'Native source-lane error relevance vector for error analysis',
     score_threshold: 0.3,
   },
   signature: {
-    dimension: 768,
+    dimension: CANONICAL_EMBEDDING_DIMENSION,
     distance_metric: 'Cosine',
     use_case: 'Native source-lane structural signature vector for function/class matching',
     score_threshold: 0.3,
@@ -182,12 +184,12 @@ export const COLLECTION_VECTOR_SCHEMAS: Record<
     // Dense named vectors remain separate from sparse and multivector lanes.
   },
   codebase_chunks_multivector: {
-    semantic_embedding: 384,
+    semantic_embedding: CANONICAL_EMBEDDING_DIMENSION,
     topology_embedding: 128,
     latent_embedding: 64,
   },
   code_structural_facts: {
-    semantic_embedding: 384,
+    semantic_embedding: CANONICAL_EMBEDDING_DIMENSION,
     topology_embedding: 128,
     latent_embedding: 64,
   },
@@ -236,7 +238,7 @@ export function buildQdrantSearchRequest(
  * PostgreSQL pgvector schema for canonical storage
  *
  * All three vector spaces are stored in the canonical Postgres row:
- * - semantic_embedding vector(384): primary retrieval baseline
+ * - semantic_embedding vector(768): primary retrieval baseline
  * - topology_embedding vector(128): structural similarity
  * - latent_embedding vector(64): routing/clustering
  *
@@ -245,7 +247,7 @@ export function buildQdrantSearchRequest(
  *   id uuid PRIMARY KEY,
  *   packet_key text NOT NULL,
  *   source_ref text NOT NULL,
- *   semantic_embedding vector(384),
+ *   semantic_embedding vector(768),
  *   topology_embedding vector(128),
  *   latent_embedding vector(64),
  *   ...

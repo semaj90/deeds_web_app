@@ -1,7 +1,7 @@
 /**
  * Dense Lane Policy — Two-Axis Representation Classification
  *
- * Prevents the dense_768 vs dense_384 collapse by making both claims explicit:
+ * Prevents the canonical 768 lane from collapsing into legacy projections:
  * - representationName: What vector is this (semantic_768, semantic_384, latent_64)?
  * - role: What is it FOR (semantic authority, online retrieval, recall reference, routing)?
  * - lifecycle: Is it ACTIVE, REFERENCE_ONLY, MIGRATION_SOURCE, or SUPERSEDED?
@@ -54,10 +54,10 @@ export const CANONICAL_DENSE_LANES: Record<DenseRepresentationName, DenseLanePol
 
   [DenseRepresentationName.SEMANTIC_384]: {
     representationName: DenseRepresentationName.SEMANTIC_384,
-    role: DenseRole.ONLINE_RETRIEVAL,
+    role: DenseRole.RECALL_REFERENCE,
     lifecycle: DenseLifecycle.REFERENCE_ONLY,
     nativeDimension: 384,
-    producerModel: 'embeddinggemma:latest (truncated)',
+    producerModel: 'embeddinggemma:latest (legacy projection)',
     createdAt: '2026-07-15T00:00:00Z',
   },
 
@@ -78,8 +78,8 @@ export const CANONICAL_DENSE_LANES: Record<DenseRepresentationName, DenseLanePol
  * - Topology routing (SOM neighbors): Use ROUTING (latent_64 when available, else semantic_768)
  * - Historical analysis (why a lane existed): Use RECALL_REFERENCE
  *
- * Do NOT collapse both lanes into one "canonical embedding" — preserve both claims
- * through the entire retrieval pipeline.
+ * Do NOT collapse legacy projections into the canonical embedding lane.
+ * Preserve explicit lineage through the retrieval pipeline.
  */
 export function isPolicyActive(policy: DenseLanePolicy): boolean {
   return policy.lifecycle === DenseLifecycle.ACTIVE;
@@ -89,6 +89,6 @@ export function isSynonymous(
   rep1: DenseRepresentationName,
   rep2: DenseRepresentationName
 ): boolean {
-  // dense_384 and dense_768 are NOT synonymous — they're different lanes
+  // semantic_384 and semantic_768 are NOT synonymous — one is legacy/reference-only.
   return rep1 === rep2;
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CanonicalRepresentationNameSchema } from './canonical-chunk-contract.js';
 
 export const VectorLaneStatusSchema = z.enum([
   'ACTIVE',
@@ -24,12 +25,19 @@ export const KnowledgeResolutionSchema = z.enum([
   'CONFLICTING_EVIDENCE',
 ]);
 
-export const RepresentationNameSchema = z.enum([
+const LegacyRepresentationNameSchema = z.enum([
   'dense_768',
   'dense_384',
   'latent_64',
   'topology_4',
 ]);
+
+export const RepresentationNameSchema = z.union([
+  LegacyRepresentationNameSchema,
+  CanonicalRepresentationNameSchema,
+]);
+
+export { CanonicalRepresentationNameSchema };
 
 export const RepresentationRoleSchema = z.enum([
   'SEMANTIC_AUTHORITY',
@@ -52,5 +60,6 @@ export type VectorLaneStatus = z.infer<typeof VectorLaneStatusSchema>;
 export type EvidenceState = z.infer<typeof EvidenceStateSchema>;
 export type KnowledgeResolution = z.infer<typeof KnowledgeResolutionSchema>;
 export type RepresentationName = z.infer<typeof RepresentationNameSchema>;
+export type CanonicalRepresentationName = z.infer<typeof CanonicalRepresentationNameSchema>;
 export type RepresentationRole = z.infer<typeof RepresentationRoleSchema>;
 export type ClassificationLedgerKind = z.infer<typeof ClassificationLedgerKindSchema>;

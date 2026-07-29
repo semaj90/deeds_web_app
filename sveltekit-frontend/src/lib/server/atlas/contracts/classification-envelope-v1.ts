@@ -80,6 +80,8 @@ export const ClassificationEnvelopeV1Schema = z.object({
   identity: ClassificationIdentitySchema,
   signals: ClassificationSignalsSchema,
   representations: z.object({
+    semantic_768: ClassificationRepresentationSchema.nullable().optional(),
+    semantic768: ClassificationRepresentationSchema.nullable().optional(),
     dense768: ClassificationRepresentationSchema.nullable().optional(),
     dense384: ClassificationRepresentationSchema.nullable().optional(),
     latent64: ClassificationRepresentationSchema.nullable().optional(),

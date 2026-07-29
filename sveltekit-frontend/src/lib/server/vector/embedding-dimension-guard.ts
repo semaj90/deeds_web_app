@@ -1,4 +1,6 @@
-export const CANONICAL_EMBEDDING_DIMENSION = 768;
+import { CANONICAL_EMBEDDING_DIMENSION } from '../atlas/contracts/canonical-chunk-contract.js';
+
+export { CANONICAL_EMBEDDING_DIMENSION };
 
 export type EmbeddingLane = 'canonical_768d' | 'legacy_384d';
 export type ExpectedEmbeddingDim = 384 | 768;

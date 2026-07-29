@@ -119,6 +119,8 @@ export default defineConfig({
       'tests/topology-projection-pipeline.spec.ts',
       // Phase 3: Tool Authorization Gate Tests (added 2026-07-26)
       'tests/phase3-tool-authorization.test.ts',
+      // Phase 109A semantic signal lifecycle validation (added 2026-07-29)
+      'tests/phase109a-validation.test.ts',
       // GPU-accelerated ACE codebase indexing cache (added 2026-05-06)
       'tests/centroid-cache-gpu.spec.ts',
       'tests/ace-code-cache.spec.ts',

@@ -24,6 +24,7 @@ import { LDR_RESEARCH_TOOL, executeLDRResearch, formatLDRResultForAgent, type LD
 import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './tools/phase18-reranker-tool.js';
 import { ATLAS_IDENTITY_AUDIT_SCHEMA, ATLAS_CROSS_STORE_PROOF_SCHEMA, handleAtlasIdentityAudit, handleAtlasCrossStoreProof } from './atlas_identity_audit_tools.js';
 import { ATLAS_SEMANTIC_TOOL_DEFINITIONS, handleAtlasSemanticToolCall } from '$lib/server/atlas/atlas-semantic-tools.js';
+import { phase109aTools, getPhase109aToolDefinitions } from '$lib/server/mcp/phase109a-mcp-tools.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -1983,6 +1984,14 @@ export function setupToolHandlers() {
       },
       // ...REPAIR_TOOLS_SCHEMAS as any[], // disabled: broken retrieval module deps
       ...DISPATCHER_TOOLS_SCHEMAS as any[],
+      // ─────────────────────────────────────────────────────────────────────
+      // Phase 109A Semantic Signal Lifecycle Management
+      // Immutable audit trail, role-based access control, state machine
+      // ─────────────────────────────────────────────────────────────────────
+      ...getPhase109aToolDefinitions().map(tool => ({
+        ...tool,
+        inputSchema: tool.inputSchema as any,
+      })),
 
     ],
   }));
@@ -5370,6 +5379,62 @@ export function setupToolHandlers() {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
           isError: !result.ok,
         };
+      }
+      // Phase 109A Semantic Signal Lifecycle Tools
+      if (name === 'phase109a_archive_signal') {
+        const tool = phase109aTools.find(t => t.name === name);
+        if (tool) {
+          const input = tool.inputSchema.parse(args);
+          const result = await tool.handler(input);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+            isError: false,
+          };
+        }
+      }
+      if (name === 'phase109a_supersede_signal') {
+        const tool = phase109aTools.find(t => t.name === name);
+        if (tool) {
+          const input = tool.inputSchema.parse(args);
+          const result = await tool.handler(input);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+            isError: false,
+          };
+        }
+      }
+      if (name === 'phase109a_promote_recommendation') {
+        const tool = phase109aTools.find(t => t.name === name);
+        if (tool) {
+          const input = tool.inputSchema.parse(args);
+          const result = await tool.handler(input);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+            isError: false,
+          };
+        }
+      }
+      if (name === 'phase109a_query_signal_history') {
+        const tool = phase109aTools.find(t => t.name === name);
+        if (tool) {
+          const input = tool.inputSchema.parse(args);
+          const result = await tool.handler(input);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+            isError: false,
+          };
+        }
+      }
+      if (name === 'phase109a_validate_state_transition') {
+        const tool = phase109aTools.find(t => t.name === name);
+        if (tool) {
+          const input = tool.inputSchema.parse(args);
+          const result = await tool.handler(input);
+          return {
+            content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+            isError: false,
+          };
+        }
       }
       return await handleToolCall(name, args as Record<string, any>);
     } catch (error: any) {

@@ -6,7 +6,7 @@
  */
 
 import { db } from '$lib/server/db/client.js';
-import { QdrantManager } from './qdrant-manager.js';
+import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { sql } from 'drizzle-orm';
 
 export interface RetrievalCandidate {
@@ -129,6 +129,8 @@ export class MultiSignalRetriever {
         feature_label: r.payload?.feature_label,
         semantic_score: r.score,
         semantic_rank: idx,
+        rrf_score: 0,
+        final_rank: 0,
       }));
     } catch (error) {
       console.error('Semantic search failed:', error);
@@ -159,12 +161,16 @@ export class MultiSignalRetriever {
         `
       );
 
-      return (results as any[]).map((r, idx) => ({
+      const rows = ((results as { rows?: Array<Record<string, unknown>> }).rows ?? []);
+
+      return rows.map((r, idx) => ({
         packet_key: r.packet_key,
         source_ref: r.source_ref,
         feature_label: r.feature_label,
         lexical_score: r.ts_score,
         lexical_rank: idx,
+        rrf_score: 0,
+        final_rank: 0,
       }));
     } catch (error) {
       console.error('Lexical search failed:', error);

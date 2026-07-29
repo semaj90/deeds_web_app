@@ -218,6 +218,26 @@ describe('Classification envelope alignment', () => {
         },
       },
       representations: {
+        semantic_768: {
+          name: 'semantic_768',
+          role: 'SEMANTIC_AUTHORITY',
+          laneStatus: 'ACTIVE',
+          producerVersion: 'embeddinggemma:768:v1',
+          modelId: 'embeddinggemma',
+          dimension: 768,
+          projectionVersion: null,
+          normalized: true,
+        },
+        semantic768: {
+          name: 'semantic_768',
+          role: 'SEMANTIC_AUTHORITY',
+          laneStatus: 'ACTIVE',
+          producerVersion: 'embeddinggemma:768:v1',
+          modelId: 'embeddinggemma',
+          dimension: 768,
+          projectionVersion: null,
+          normalized: true,
+        },
         dense768: {
           name: 'dense_768',
           role: 'SEMANTIC_AUTHORITY',

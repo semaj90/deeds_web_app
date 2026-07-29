@@ -16,6 +16,7 @@ import type { ScorerOptions } from './candidate-scorer.js';
 import type { PostProcessConfig } from './post-process-reranker.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
 import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
+import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/atlas/contracts/canonical-chunk-contract.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
@@ -131,7 +132,7 @@ async function validateQdrantDimensions(): Promise<void> {
 
     const expectedDim =
       getVectorLaneByCollection(activeCollection)?.dimension ??
-      (activeCollection === 'codebase_chunks_384' ? 384 : 768);
+      CANONICAL_EMBEDDING_DIMENSION;
 
     const actualDim = contentVec.size;
     if (actualDim !== expectedDim) {

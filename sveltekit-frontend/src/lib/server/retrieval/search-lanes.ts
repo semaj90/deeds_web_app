@@ -18,6 +18,7 @@ import type {
 import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { VECTOR_LANES } from '../vector/lane-registry.js';
 import { VECTOR_LANES as VECTOR_CONFIG_LANES, getVectorLaneMetadata } from '../config/vector-config.js';
+import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/atlas/contracts/canonical-chunk-contract.js';
 import { sql, type SQL } from 'drizzle-orm';
 
 async function getDb() {
@@ -390,9 +391,11 @@ export class QdrantLane extends SearchLaneBase {
         embedding_status: (point.payload?.embedding_status as SearchResult['metadata']['embedding_status'])
           ?? laneMetadata.status,
         embedding_native_dimension: Number(point.payload?.embedding_native_dimension ?? point.payload?.projection_source_dimension)
-          || (this.embeddingLane === 'dense_384' ? 768 : this.embeddingDimension),
+          || laneMetadata.sourceDimension
+          || CANONICAL_EMBEDDING_DIMENSION,
         projection_source_dimension: Number(point.payload?.projection_source_dimension ?? point.payload?.embedding_native_dimension)
-          || (this.embeddingLane === 'dense_384' ? 768 : this.embeddingDimension),
+          || laneMetadata.sourceDimension
+          || CANONICAL_EMBEDDING_DIMENSION,
         projection_method: (point.payload?.projection_method as SearchResult['metadata']['projection_method'])
           ?? laneMetadata.projectionMethod,
         projection_version: (point.payload?.projection_version as string | undefined)

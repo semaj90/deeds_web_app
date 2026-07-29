@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   fetch: vi.fn(),
 }));
 
-vi.mock('../../../../../../../../sveltekit-frontend/src/lib/server/env.server.js', () => ({
+vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     QDRANT_URL: 'http://qdrant.test',
   },
@@ -17,8 +17,11 @@ describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => 
 
     beforeEach(async () => {
       vi.resetAllMocks();
+      vi.resetModules();
       vi.stubGlobal('fetch', mocks.fetch);
-      const mod = await import('../../../../../../../../sveltekit-frontend/src/routes/api/mcp/select-tools/+server.js') as Record<string, unknown>;
+      const { resetToolUsage } = await import('$lib/server/ai/tool-selection.js');
+      resetToolUsage();
+      const mod = await import('../../../../../../../../src/routes/api/mcp/select-tools/+server.js') as Record<string, unknown>;
       handler = mod.POST as typeof handler;
     });
 
@@ -43,7 +46,7 @@ describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => 
     });
 
     it('200 — returns bootstrap, recent, and qdrant-ranked tools', async () => {
-      const { recordToolUsage } = await import('../../../../../../../../sveltekit-frontend/src/lib/server/ai/tool-selection.js');
+      const { recordToolUsage } = await import('$lib/server/ai/tool-selection.js');
       recordToolUsage('graph.expand_neighborhood');
 
       mocks.fetch.mockImplementation(async (url: string, init?: RequestInit) => {
@@ -51,6 +54,7 @@ describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => 
           return {
             ok: true,
             status: 200,
+            json: async () => ({ embedding: Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0)) }),
             text: async () => JSON.stringify({ embedding: Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0)) }),
           } as Response;
         }
@@ -61,6 +65,26 @@ describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => 
           return {
             ok: true,
             status: 200,
+            json: async () => ({
+              result: [
+                {
+                  score: 0.92,
+                  payload: {
+                    tool_name: 'trace.kag_search',
+                    llama_name: 'trace__kag_search',
+                    ontology: ['retrieval'],
+                  },
+                },
+                {
+                  score: 0.87,
+                  payload: {
+                    tool_name: 'kb.search_cards',
+                    llama_name: 'kb__search_cards',
+                    ontology: ['knowledge_base'],
+                  },
+                },
+              ],
+            }),
             text: async () =>
               JSON.stringify({
                 result: [

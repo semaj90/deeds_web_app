@@ -1,182 +1,319 @@
--- Phase 109A Soft-Delete Safeguards
+-- Phase 109A Role-Based Safeguards + Explicit State Functions
 -- Timestamp: 2026-07-29T00:00:00Z
--- Description: Add soft-delete columns and audit logging for deletion safety
+-- Description: Role-based access control, lifecycle state management functions (NOT triggers), and immutable promotion workflow
 
--- ===== DELETION AUDIT TABLE =====
+-- ===== ROLE-BASED ACCESS CONTROL =====
 
-CREATE TABLE IF NOT EXISTS semantic_signal_deletions (
-  id uuid DEFAULT gen_random_uuid() PRIMARY KEY NOT NULL,
-  signal_id uuid NOT NULL,
-  deleted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  deleted_by VARCHAR(255),
-  reason_code VARCHAR(50), -- 'manual', 'cascade', 'retention_policy', 'user_request'
-  envelope_count_deleted integer DEFAULT 0, -- How many classification_envelopes cascaded
-  recovery_attempted boolean DEFAULT false,
-  recovery_attempted_at TIMESTAMP WITH TIME ZONE,
-  recovery_attempted_by VARCHAR(255),
-  CONSTRAINT fk_deletion_audit_signal FOREIGN KEY (signal_id) REFERENCES semantic_signals(id) ON DELETE SET NULL
-);
+DO $$ BEGIN
+  CREATE ROLE atlas_application WITH NOLOGIN;
+  EXCEPTION WHEN DUPLICATE_OBJECT THEN NULL;
+END $$;
 
-CREATE INDEX idx_semantic_signal_deletions_signal_id ON semantic_signal_deletions(signal_id);
-CREATE INDEX idx_semantic_signal_deletions_deleted_at ON semantic_signal_deletions(deleted_at DESC);
+DO $$ BEGIN
+  CREATE ROLE atlas_maintenance WITH NOLOGIN;
+  EXCEPTION WHEN DUPLICATE_OBJECT THEN NULL;
+END $$;
 
--- ===== SOFT-DELETE COLUMNS =====
+-- Application role: SELECT, INSERT, UPDATE only (no DELETE)
+GRANT SELECT, INSERT, UPDATE ON semantic_signals TO atlas_application;
+GRANT SELECT, INSERT, UPDATE ON classification_envelope TO atlas_application;
+GRANT SELECT, INSERT, UPDATE ON recommendation_log TO atlas_application;
+GRANT SELECT, INSERT, UPDATE ON semantic_lifecycle_events TO atlas_application;
+GRANT SELECT, INSERT, UPDATE ON domain_taxonomy_v1 TO atlas_application;
+GRANT USAGE ON SCHEMA public TO atlas_application;
+GRANT EXECUTE ON FUNCTION archive_semantic_signal(uuid, varchar, text) TO atlas_application;
+GRANT EXECUTE ON FUNCTION supersede_semantic_signal(uuid, uuid, varchar, text) TO atlas_application;
+GRANT EXECUTE ON FUNCTION promote_recommendation(uuid, varchar, uuid, varchar, boolean) TO atlas_application;
 
-ALTER TABLE semantic_signals
-ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE,
-ADD COLUMN IF NOT EXISTS deleted_by VARCHAR(255);
+-- Maintenance role: full privileges including DELETE
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO atlas_maintenance;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO atlas_maintenance;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO atlas_maintenance;
+GRANT USAGE ON SCHEMA public TO atlas_maintenance;
 
-ALTER TABLE classification_envelope
-ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE,
-ADD COLUMN IF NOT EXISTS deleted_by VARCHAR(255);
+-- ===== EXPLICIT STATE MANAGEMENT FUNCTIONS (NO HIDDEN TRIGGERS) =====
 
-ALTER TABLE recommendation_log
-ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE,
-ADD COLUMN IF NOT EXISTS deleted_by VARCHAR(255);
-
--- ===== SOFT-DELETE FUNCTION =====
-
-CREATE OR REPLACE FUNCTION soft_delete_semantic_signal(
+-- Archive a semantic signal: transitions ACTIVE → ARCHIVED
+CREATE OR REPLACE FUNCTION archive_semantic_signal(
   p_signal_id uuid,
-  p_deleted_by VARCHAR(255),
-  p_reason_code VARCHAR(50) DEFAULT 'manual'
+  p_actor_id varchar(255),
+  p_reason text
 )
-RETURNS TABLE(
-  deleted_signal_count int,
-  deleted_envelope_count int,
-  audit_id uuid
+RETURNS TABLE (
+  signal_id uuid,
+  previous_state varchar(50),
+  new_state varchar(50),
+  event_id uuid
 )
 AS $$
 DECLARE
-  v_envelope_count int;
-  v_audit_id uuid;
+  v_signal_row record;
+  v_event_id uuid;
+  v_old_state varchar(50);
 BEGIN
-  -- Mark signal as deleted
+  -- Fetch current signal
+  SELECT id, lifecycle_state, workspace_revision INTO v_signal_row
+  FROM semantic_signals
+  WHERE id = p_signal_id
+  FOR UPDATE;
+
+  IF v_signal_row IS NULL THEN
+    RAISE EXCEPTION 'Signal % not found', p_signal_id;
+  END IF;
+
+  v_old_state := v_signal_row.lifecycle_state;
+
+  -- Validate state transition
+  IF v_old_state NOT IN ('ACTIVE', 'SUPERSEDED') THEN
+    RAISE EXCEPTION 'Cannot archive signal in state %', v_old_state;
+  END IF;
+
+  -- Update signal state
   UPDATE semantic_signals
-  SET deleted_at = NOW(),
-      deleted_by = p_deleted_by
-  WHERE id = p_signal_id AND deleted_at IS NULL;
+  SET lifecycle_state = 'ARCHIVED',
+      state_reason = p_reason,
+      state_changed_at = NOW(),
+      state_changed_by = p_actor_id,
+      updated_at = NOW()
+  WHERE id = p_signal_id;
 
-  -- Mark dependent envelopes as deleted (soft cascade)
-  UPDATE classification_envelope
-  SET deleted_at = NOW(),
-      deleted_by = p_deleted_by
-  WHERE signal_id = p_signal_id AND deleted_at IS NULL;
+  -- Create immutable audit event
+  INSERT INTO semantic_lifecycle_events (
+    entity_type, entity_id, previous_state, new_state, reason,
+    actor_type, actor_id, workspace_revision, created_at
+  )
+  VALUES (
+    'semantic_signal', p_signal_id, v_old_state, 'ARCHIVED', p_reason,
+    'system', p_actor_id, v_signal_row.workspace_revision, NOW()
+  )
+  RETURNING id INTO v_event_id;
 
-  GET DIAGNOSTICS v_envelope_count = ROW_COUNT;
-
-  -- Mark dependent recommendations as deleted (optional, data cleanup)
-  UPDATE recommendation_log
-  SET deleted_at = NOW(),
-      deleted_by = p_deleted_by
-  WHERE signal_id = p_signal_id AND deleted_at IS NULL;
-
-  -- Log deletion to audit table
-  INSERT INTO semantic_signal_deletions (signal_id, deleted_by, reason_code, envelope_count_deleted)
-  VALUES (p_signal_id, p_deleted_by, p_reason_code, v_envelope_count)
-  RETURNING id INTO v_audit_id;
-
-  -- Return counts
-  RETURN QUERY SELECT 1::int, v_envelope_count::int, v_audit_id;
+  RETURN QUERY SELECT p_signal_id, v_old_state::varchar, 'ARCHIVED'::varchar, v_event_id;
 END;
 $$ LANGUAGE plpgsql;
 
--- ===== RECOVERY FUNCTION =====
-
-CREATE OR REPLACE FUNCTION recover_semantic_signal(
+-- Supersede a semantic signal with a replacement: transitions ACTIVE → SUPERSEDED
+CREATE OR REPLACE FUNCTION supersede_semantic_signal(
   p_signal_id uuid,
-  p_recovered_by VARCHAR(255)
+  p_replacement_signal_id uuid,
+  p_actor_id varchar(255),
+  p_reason text
 )
-RETURNS TABLE(
-  recovered_signal_count int,
-  recovered_envelope_count int,
-  recovered_recommendation_count int
+RETURNS TABLE (
+  signal_id uuid,
+  previous_state varchar(50),
+  new_state varchar(50),
+  event_id uuid
 )
 AS $$
 DECLARE
-  v_envelope_count int;
-  v_recommendation_count int;
+  v_signal_row record;
+  v_replacement_row record;
+  v_event_id uuid;
+  v_old_state varchar(50);
 BEGIN
-  -- Recover signal
+  -- Fetch current signal
+  SELECT id, lifecycle_state, workspace_revision INTO v_signal_row
+  FROM semantic_signals
+  WHERE id = p_signal_id
+  FOR UPDATE;
+
+  IF v_signal_row IS NULL THEN
+    RAISE EXCEPTION 'Signal % not found', p_signal_id;
+  END IF;
+
+  -- Verify replacement exists
+  SELECT id INTO v_replacement_row
+  FROM semantic_signals
+  WHERE id = p_replacement_signal_id;
+
+  IF v_replacement_row IS NULL THEN
+    RAISE EXCEPTION 'Replacement signal % not found', p_replacement_signal_id;
+  END IF;
+
+  v_old_state := v_signal_row.lifecycle_state;
+
+  -- Validate state transition
+  IF v_old_state NOT IN ('ACTIVE') THEN
+    RAISE EXCEPTION 'Can only supersede ACTIVE signals, current state: %', v_old_state;
+  END IF;
+
+  -- Update signal state and link to replacement
   UPDATE semantic_signals
-  SET deleted_at = NULL,
-      deleted_by = NULL
-  WHERE id = p_signal_id AND deleted_at IS NOT NULL;
+  SET lifecycle_state = 'SUPERSEDED',
+      state_reason = p_reason,
+      state_changed_at = NOW(),
+      state_changed_by = p_actor_id,
+      superseded_by = p_replacement_signal_id,
+      updated_at = NOW()
+  WHERE id = p_signal_id;
 
-  -- Recover dependent envelopes
-  UPDATE classification_envelope
-  SET deleted_at = NULL,
-      deleted_by = NULL
-  WHERE signal_id = p_signal_id AND deleted_at IS NOT NULL;
+  -- Create immutable audit event
+  INSERT INTO semantic_lifecycle_events (
+    entity_type, entity_id, previous_state, new_state, reason,
+    actor_type, actor_id, workspace_revision, created_at
+  )
+  VALUES (
+    'semantic_signal', p_signal_id, v_old_state, 'SUPERSEDED', p_reason,
+    'system', p_actor_id, v_signal_row.workspace_revision, NOW()
+  )
+  RETURNING id INTO v_event_id;
 
-  GET DIAGNOSTICS v_envelope_count = ROW_COUNT;
-
-  -- Recover dependent recommendations
-  UPDATE recommendation_log
-  SET deleted_at = NULL,
-      deleted_by = NULL
-  WHERE signal_id = p_signal_id AND deleted_at IS NOT NULL;
-
-  GET DIAGNOSTICS v_recommendation_count = ROW_COUNT;
-
-  -- Log recovery attempt
-  UPDATE semantic_signal_deletions
-  SET recovery_attempted = true,
-      recovery_attempted_at = NOW(),
-      recovery_attempted_by = p_recovered_by
-  WHERE signal_id = p_signal_id
-  ORDER BY deleted_at DESC
-  LIMIT 1;
-
-  RETURN QUERY SELECT 1::int, v_envelope_count::int, v_recommendation_count::int;
+  RETURN QUERY SELECT p_signal_id, v_old_state::varchar, 'SUPERSEDED'::varchar, v_event_id;
 END;
 $$ LANGUAGE plpgsql;
 
--- ===== SOFT-DELETE VIEWS (exclude deleted rows) =====
+-- Promote a recommendation: mutual approval enforced, transitions PROPOSED → APPROVED
+CREATE OR REPLACE FUNCTION promote_recommendation(
+  p_recommendation_id uuid,
+  p_approver_id varchar(255),
+  p_proof_manifest_id uuid,
+  p_actor_id varchar(255),
+  p_dry_run boolean DEFAULT false
+)
+RETURNS TABLE (
+  recommendation_id uuid,
+  new_status varchar(50),
+  event_id uuid,
+  validation_passed boolean
+)
+AS $$
+DECLARE
+  v_rec_row record;
+  v_event_id uuid;
+  v_creator_id varchar(255);
+  v_status_before varchar(50);
+BEGIN
+  -- Fetch recommendation
+  SELECT id, status, created_by, workspace_revision, lifecycle_state INTO v_rec_row
+  FROM recommendation_log
+  WHERE id = p_recommendation_id
+  FOR UPDATE;
+
+  IF v_rec_row IS NULL THEN
+    RAISE EXCEPTION 'Recommendation % not found', p_recommendation_id;
+  END IF;
+
+  v_creator_id := v_rec_row.created_by;
+  v_status_before := v_rec_row.status;
+
+  -- VALIDATION: Mutual approval safeguard
+  IF p_approver_id = v_creator_id THEN
+    RAISE EXCEPTION 'Approver must be different from creator (creator: %, approver: %)', v_creator_id, p_approver_id;
+  END IF;
+
+  -- VALIDATION: Proof manifest must exist
+  IF p_proof_manifest_id IS NOT NULL THEN
+    PERFORM 1 FROM semantic_lifecycle_events
+    WHERE id = p_proof_manifest_id LIMIT 1;
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Proof manifest % not found', p_proof_manifest_id;
+    END IF;
+  END IF;
+
+  -- VALIDATION: Status must be PROPOSED
+  IF v_status_before NOT IN ('PROPOSED', 'READY_FOR_REVIEW') THEN
+    RAISE EXCEPTION 'Can only promote from PROPOSED or READY_FOR_REVIEW, current: %', v_status_before;
+  END IF;
+
+  -- VALIDATION: Lifecycle state must be ACTIVE
+  IF v_rec_row.lifecycle_state != 'ACTIVE' THEN
+    RAISE EXCEPTION 'Recommendation lifecycle_state must be ACTIVE, current: %', v_rec_row.lifecycle_state;
+  END IF;
+
+  -- Dry-run mode: return validation result only
+  IF p_dry_run THEN
+    RETURN QUERY SELECT p_recommendation_id, 'APPROVED'::varchar, p_proof_manifest_id::uuid, true;
+    RETURN;
+  END IF;
+
+  -- Perform state update
+  UPDATE recommendation_log
+  SET status = 'APPROVED',
+      approved_by = p_approver_id,
+      approved_at = NOW(),
+      proof_manifest_id = p_proof_manifest_id,
+      approved_by_distinct_from_created_by = true,
+      updated_at = NOW(),
+      state_changed_at = NOW(),
+      state_changed_by = p_actor_id
+  WHERE id = p_recommendation_id;
+
+  -- Create immutable audit event
+  INSERT INTO semantic_lifecycle_events (
+    entity_type, entity_id, previous_state, new_state, reason,
+    actor_type, actor_id, proof_manifest_id, workspace_revision, created_at
+  )
+  VALUES (
+    'recommendation', p_recommendation_id, v_status_before, 'APPROVED',
+    'Approved by ' || p_approver_id,
+    'user', p_actor_id, p_proof_manifest_id, v_rec_row.workspace_revision, NOW()
+  )
+  RETURNING id INTO v_event_id;
+
+  RETURN QUERY SELECT p_recommendation_id, 'APPROVED'::varchar, v_event_id, true;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Purge eligible signals: bounded by retention_until, hard DELETE with role check
+CREATE OR REPLACE FUNCTION purge_eligible_signals(
+  p_retention_cutoff timestamp with time zone DEFAULT (NOW() - INTERVAL '90 days')
+)
+RETURNS TABLE (
+  purged_count integer,
+  purge_timestamp timestamp with time zone
+)
+AS $$
+DECLARE
+  v_count integer;
+BEGIN
+  -- Hard DELETE only signals that are:
+  -- 1. In PURGE_PENDING state
+  -- 2. retention_until is in the past OR NULL and created_at is before cutoff
+  -- 3. No dependent classification_envelope rows (cascade would fail)
+  DELETE FROM semantic_signals
+  WHERE lifecycle_state = 'PURGE_PENDING'
+    AND (retention_until < NOW() OR (retention_until IS NULL AND created_at < p_retention_cutoff))
+    AND id NOT IN (SELECT signal_id FROM classification_envelope WHERE lifecycle_state != 'PURGE_PENDING' AND lifecycle_state != 'ARCHIVED');
+
+  GET DIAGNOSTICS v_count = ROW_COUNT;
+
+  RETURN QUERY SELECT v_count, NOW();
+END;
+$$ LANGUAGE plpgsql;
+
+-- ===== ACTIVE/ARCHIVE VIEWS (immutable, no DELETE columns needed) =====
 
 CREATE OR REPLACE VIEW semantic_signals_active AS
 SELECT * FROM semantic_signals
-WHERE deleted_at IS NULL
-ORDER BY created_at DESC;
+WHERE lifecycle_state IN ('ACTIVE', 'SUPERSEDED')
+ORDER BY state_changed_at DESC;
 
 CREATE OR REPLACE VIEW classification_envelope_active AS
 SELECT * FROM classification_envelope
-WHERE deleted_at IS NULL
-ORDER BY created_at DESC;
+WHERE lifecycle_state IN ('ACTIVE', 'SUPERSEDED')
+ORDER BY state_changed_at DESC;
 
 CREATE OR REPLACE VIEW recommendation_log_active AS
 SELECT * FROM recommendation_log
-WHERE deleted_at IS NULL
-ORDER BY created_at DESC;
+WHERE lifecycle_state IN ('ACTIVE', 'SUPERSEDED')
+ORDER BY state_changed_at DESC;
 
--- ===== DELETION HISTORY VIEW =====
+-- ===== ELIGIBILITY VIEWS (for purge/archive operations) =====
 
-CREATE OR REPLACE VIEW semantic_signal_deletion_history AS
-SELECT
-  d.id as deletion_id,
-  d.signal_id,
-  d.deleted_at,
-  d.deleted_by,
-  d.reason_code,
-  d.envelope_count_deleted,
-  d.recovery_attempted,
-  d.recovery_attempted_at,
-  d.recovery_attempted_by,
-  CASE
-    WHEN d.recovery_attempted THEN 'RECOVERED'
-    WHEN d.deleted_at > NOW() - INTERVAL '30 days' THEN 'RECENT_DELETION'
-    ELSE 'ARCHIVED'
-  END as status
-FROM semantic_signal_deletions d
-ORDER BY d.deleted_at DESC;
+CREATE OR REPLACE VIEW signals_eligible_for_archive AS
+SELECT * FROM semantic_signals
+WHERE lifecycle_state IN ('ACTIVE', 'SUPERSEDED')
+  AND created_at < (NOW() - INTERVAL '180 days');
 
--- ===== INDEXES FOR SOFT-DELETE QUERIES =====
+CREATE OR REPLACE VIEW signals_eligible_for_purge AS
+SELECT * FROM semantic_signals
+WHERE lifecycle_state = 'PURGE_PENDING'
+  AND (retention_until < NOW() OR (retention_until IS NULL AND created_at < NOW() - INTERVAL '90 days'));
 
-CREATE INDEX IF NOT EXISTS idx_semantic_signals_deleted_at ON semantic_signals(deleted_at);
-CREATE INDEX IF NOT EXISTS idx_semantic_signals_not_deleted ON semantic_signals(created_at DESC) WHERE deleted_at IS NULL;
+-- ===== INDEXES FOR LIFECYCLE QUERIES =====
 
-CREATE INDEX IF NOT EXISTS idx_classification_envelope_deleted_at ON classification_envelope(deleted_at);
-CREATE INDEX IF NOT EXISTS idx_classification_envelope_not_deleted ON classification_envelope(created_at DESC) WHERE deleted_at IS NULL;
-
-CREATE INDEX IF NOT EXISTS idx_recommendation_log_deleted_at ON recommendation_log(deleted_at);
-CREATE INDEX IF NOT EXISTS idx_recommendation_log_not_deleted ON recommendation_log(created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_semantic_signals_lifecycle_state ON semantic_signals(lifecycle_state);
+CREATE INDEX IF NOT EXISTS idx_semantic_signals_state_changed_at ON semantic_signals(state_changed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_recommendation_log_approved_by ON recommendation_log(approved_by);
+CREATE INDEX IF NOT EXISTS idx_recommendation_log_proof_manifest_id ON recommendation_log(proof_manifest_id);

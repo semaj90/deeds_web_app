@@ -7,6 +7,12 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import {
+  normalizeRecentToolUsage,
+  selectToolDescriptors,
+  type ToolDescriptor as PolicyToolDescriptor,
+  type ToolUsage as PolicyToolUsage,
+} from './tool-selection-policy.js';
 
 export interface ToolDefinitionEntry {
   type: 'function';
@@ -23,6 +29,13 @@ export interface ToolSelectionInput {
   domain?: string;
   bootstrap?: boolean;
   recentToolNames?: string[];
+  requestedToolNames?: string[];
+  requiredCategories?: string[];
+  discoveryCallsInWindow?: number;
+  previousToolNames?: string[];
+  subagentRole?: string;
+  alwaysIncludeToolNames?: string[];
+  discoveredToolNames?: string[];
 }
 
 export interface ToolSelectionResult {
@@ -405,7 +418,7 @@ const DOMAIN_SIGNALS: Record<string, string[]> = {
   mcp: ['mcp_tools', 'agent', 'planning'],
 };
 
-const recentToolUsage = new Map<string, number>();
+const recentToolUsage = new Map<string, { lastUsedAt: number; callCount: number }>();
 let recentToolSequence = 0;
 
 function clampInt(value: number, min: number, max: number): number {
@@ -447,21 +460,42 @@ export function recordToolUsage(toolName: string): void {
   const normalized = normalizeToolName(toolName);
   if (!normalized) return;
   recentToolSequence += 1;
-  recentToolUsage.set(normalized, recentToolSequence);
+  const current = recentToolUsage.get(normalized);
+  recentToolUsage.set(normalized, {
+    lastUsedAt: recentToolSequence,
+    callCount: (current?.callCount ?? 0) + 1,
+  });
   if (recentToolUsage.size > 64) {
-    const oldest = [...recentToolUsage.entries()].sort((a, b) => a[1] - b[1]).slice(0, recentToolUsage.size - 64);
+    const oldest = [...recentToolUsage.entries()]
+      .sort((a, b) => a[1].lastUsedAt - b[1].lastUsedAt)
+      .slice(0, recentToolUsage.size - 64);
     for (const [name] of oldest) {
       recentToolUsage.delete(name);
     }
   }
 }
 
+export function resetToolUsage(): void {
+  recentToolUsage.clear();
+  recentToolSequence = 0;
+}
+
 export function getRecentToolNames(limit = RECENT_TOOL_LIMIT): string[] {
   const bounded = clampInt(limit, 0, 32);
+  return getRecentToolUsageSnapshot(bounded)
+    .map((entry) => entry.name);
+}
+
+export function getRecentToolUsageSnapshot(limit = RECENT_TOOL_LIMIT): PolicyToolUsage[] {
+  const bounded = clampInt(limit, 0, 32);
   return [...recentToolUsage.entries()]
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => b[1].lastUsedAt - a[1].lastUsedAt)
     .slice(0, bounded)
-    .map(([name]) => name);
+    .map(([name, info]) => ({
+      name,
+      lastUsedAt: info.lastUsedAt,
+      callCount: info.callCount,
+    }));
 }
 
 export function getAlwaysIncludeToolNames(bootstrap = false): string[] {
@@ -569,11 +603,26 @@ function normalizeToolDefs(names: string[]): ToolDefinitionEntry[] {
     .filter((entry): entry is ToolDefinitionEntry => Boolean(entry));
 }
 
+function inferCategory(name: string): string {
+  const normalized = normalizeToolName(name);
+  return normalized.includes('.') ? normalized.split('.')[0] : 'general';
+}
+
+const TOOL_POLICY_CATALOG: PolicyToolDescriptor[] = Object.entries(TOOL_DEF_REGISTRY).map(([name, entry]) => ({
+  name,
+  description: entry.function.description,
+  category: inferCategory(name),
+  inputSchema: entry.function.parameters,
+}));
+
 export async function selectToolsForQuery(input: ToolSelectionInput): Promise<ToolSelectionResult> {
   const topK = clampInt(input.topK ?? 12, 1, 30);
   const bootstrap = Boolean(input.bootstrap);
-  const alwaysInclude = getAlwaysIncludeToolNames(bootstrap);
-  const recentTools = dedupeOrdered(input.recentToolNames ?? getRecentToolNames());
+  const recentUsage = normalizeRecentToolUsage(input.recentToolNames ? input.recentToolNames.map((name, index) => ({
+    name,
+    lastUsedAt: input.recentToolNames!.length - index,
+    callCount: 1,
+  })) : getRecentToolUsageSnapshot());
   const signals = rankSignals(input.query, input.domain);
   const vector = await embedQuery(input.query);
 
@@ -592,7 +641,23 @@ export async function selectToolsForQuery(input: ToolSelectionInput): Promise<To
     rankedNames = [...FALLBACK_TOOLS];
   }
 
-  const mcpNames = mergeToolNames([alwaysInclude, recentTools, rankedNames], MAX_TOOL_RESULTS);
+  const selection = selectToolDescriptors({
+    query: input.query,
+    turnNumber: bootstrap ? 1 : 4,
+    tools: TOOL_POLICY_CATALOG,
+    usage: recentUsage,
+    requestedToolNames: input.requestedToolNames,
+    requiredCategories: input.requiredCategories,
+    discoveryCallsInWindow: input.discoveryCallsInWindow ?? 0,
+    previousToolNames: input.previousToolNames,
+    subagentRole: input.subagentRole,
+    toolBudget: topK,
+    rankedToolNames: rankedNames,
+    alwaysIncludeToolNames: input.alwaysIncludeToolNames ?? getAlwaysIncludeToolNames(bootstrap),
+    discoveredToolNames: input.discoveredToolNames,
+  });
+
+  const mcpNames = selection.selected.map((tool) => tool.name);
   const llamaNames = mcpNames.map((name) => name.replace(/\./g, '__'));
 
   return {
@@ -604,7 +669,9 @@ export async function selectToolsForQuery(input: ToolSelectionInput): Promise<To
     source,
     top_k: topK,
     bootstrap,
-    always_include: alwaysInclude,
-    recent_tools: recentTools,
+    always_include: selection.selected
+      .filter((tool) => selection.reasonByTool[tool.name] === 'always_include')
+      .map((tool) => tool.name),
+    recent_tools: recentUsage.map((entry) => entry.name),
   };
 }

@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS semantic_signals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workspace_id VARCHAR(255) NOT NULL,
   revision_id VARCHAR(255) NOT NULL,
+  workspace_revision TEXT NOT NULL,
 
   -- Identity
   subject_id VARCHAR(255) NOT NULL,
@@ -72,8 +73,21 @@ CREATE TABLE IF NOT EXISTS semantic_signals (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   created_by VARCHAR(255),
 
+  -- Lifecycle state management (replaces soft-delete timestamp)
+  lifecycle_state VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',
+  state_reason TEXT,
+  state_changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  state_changed_by VARCHAR(255),
+
+  -- Provenance linking
+  superseded_by UUID,
+  retention_until TIMESTAMP WITH TIME ZONE,
+
   CONSTRAINT semantic_signals_evidence_confidence_range
-    CHECK (evidence_confidence IS NULL OR (evidence_confidence >= 0.0 AND evidence_confidence <= 1.0))
+    CHECK (evidence_confidence IS NULL OR (evidence_confidence >= 0.0 AND evidence_confidence <= 1.0)),
+  CONSTRAINT lifecycle_state_valid CHECK (lifecycle_state IN (
+    'ACTIVE', 'SUPERSEDED', 'RETRACTED', 'ARCHIVED', 'PURGE_PENDING', 'PURGED'
+  ))
 );
 
 CREATE INDEX IF NOT EXISTS idx_semantic_signals_workspace_revision
@@ -129,8 +143,16 @@ CREATE TABLE IF NOT EXISTS classification_envelope (
   validated_by VARCHAR(255),
   failure_reason TEXT,
 
+  -- Lifecycle state management
+  lifecycle_state VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',
+  state_changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  state_changed_by VARCHAR(255),
+
+  CONSTRAINT lifecycle_state_valid_classification CHECK (lifecycle_state IN (
+    'ACTIVE', 'SUPERSEDED', 'ARCHIVED', 'PURGE_PENDING'
+  )),
   CONSTRAINT fk_classification_envelope_signal_id
-    FOREIGN KEY (signal_id) REFERENCES semantic_signals(id) ON DELETE CASCADE
+    FOREIGN KEY (signal_id) REFERENCES semantic_signals(id) ON DELETE RESTRICT
 );
 
 CREATE INDEX IF NOT EXISTS idx_classification_envelope_signal_status
@@ -172,8 +194,25 @@ CREATE TABLE IF NOT EXISTS recommendation_log (
 
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 
+  -- Lifecycle state management
+  lifecycle_state VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',
+  state_changed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  state_changed_by VARCHAR(255),
+
+  -- Mutual approval safeguard
+  approved_by_distinct_from_created_by BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- Proof linkage
+  proof_manifest_id UUID,
+
   CONSTRAINT recommendation_log_evidence_confidence_range
-    CHECK (evidence_confidence >= 0.0 AND evidence_confidence <= 1.0)
+    CHECK (evidence_confidence >= 0.0 AND evidence_confidence <= 1.0),
+  CONSTRAINT lifecycle_state_valid_recommendation CHECK (lifecycle_state IN (
+    'ACTIVE', 'SUPERSEDED', 'RETRACTED', 'ARCHIVED', 'PURGE_PENDING'
+  )),
+  CONSTRAINT approved_by_not_creator CHECK (
+    approved_by IS NULL OR approved_by != created_by
+  )
 );
 
 CREATE INDEX IF NOT EXISTS idx_recommendation_log_subject_workspace

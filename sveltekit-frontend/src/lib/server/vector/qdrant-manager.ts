@@ -24,6 +24,9 @@ import {
   buildQdrantSearchRequest,
 } from './vector-contracts.js';
 
+// Compatibility export for callers that still import the singleton helper
+export { getQdrantClient } from './qdrant-singleton.js';
+
 // Re-export for existing consumers
 export { generateSparseVector, type SparseVector };
 
@@ -1068,7 +1071,7 @@ export class QdrantManager {
 
   private async buildSearchCacheKey(params: {
     query: string;
-    collection: string;
+    collection?: string;
     filters?: any;
     limit?: number;
     scoreThreshold?: number;
@@ -1077,7 +1080,7 @@ export class QdrantManager {
       const { createHash } = await import('crypto');
       const raw = JSON.stringify({
         q: params.query,
-        c: params.collection,
+        c: params.collection ?? null,
         f: params.filters,
         l: params.limit,
         s: params.scoreThreshold,

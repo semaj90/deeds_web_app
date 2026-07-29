@@ -14,6 +14,7 @@
  */
 
 import { z } from 'zod';
+import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/atlas/contracts/canonical-chunk-contract.js';
 
 // ──────────────────────────────────────────────────────────────────────────
 // CHUNK IDENTITY (deterministic, no agents)
@@ -216,8 +217,8 @@ export const validateEnrichedPacketForPromotion = (packet: EnrichedPacket): { va
   const errors: string[] = [];
 
   // Embedding dimension validation
-  if (!packet.embeddingNative || packet.embeddingNative.length !== 768) {
-    errors.push(`Native embedding must be 768-dim L2-normalized, got ${packet.embeddingNative?.length ?? 0}-dim.`);
+  if (!packet.embeddingNative || packet.embeddingNative.length !== CANONICAL_EMBEDDING_DIMENSION) {
+    errors.push(`Native embedding must be ${CANONICAL_EMBEDDING_DIMENSION}-dim L2-normalized, got ${packet.embeddingNative?.length ?? 0}-dim.`);
   }
 
   // L2 norm check (within tolerance)
