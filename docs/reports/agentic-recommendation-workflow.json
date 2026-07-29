@@ -1,8 +1,8 @@
 {
   "contract": "atlas.recommendation.workflow.v1",
-  "generated_at": "2026-07-28T19:32:33.127Z",
-  "query": "graphify daily recommendations state machine",
-  "normalized_query": "graphify daily recommendations state machine",
+  "generated_at": "2026-07-29T01:39:13.258Z",
+  "query": "pagerank summaries lexical mixedbread langextract redis centroid ace packet",
+  "normalized_query": "pagerank summaries lexical mixedbread langextract redis centroid ace packet",
   "workflow_status": "COMPLETE",
   "workflow_state": "COMPLETE",
   "dag": [
@@ -13,8 +13,8 @@
       "dependsOn": [],
       "evidenceRefs": [],
       "outputRef": "workflow.intent",
-      "updated_at": "2026-07-28T19:32:34.891Z",
-      "notes": "planning/graph"
+      "updated_at": "2026-07-29T01:39:14.262Z",
+      "notes": "planning/retrieval"
     },
     {
       "stage": "local_search",
@@ -25,7 +25,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.rg_matches",
-      "updated_at": "2026-07-28T19:32:35.738Z",
+      "updated_at": "2026-07-29T01:39:14.589Z",
       "notes": null
     },
     {
@@ -37,11 +37,32 @@
         "local_search"
       ],
       "evidenceRefs": [
-        ".tmp/parent_atlas_packets/000678ef52ca67b0.json",
-        "packet:3ee066ddc85f"
+        "sveltekit-frontend/src/lib/components/atlas/AtlasGraphCanvas.svelte",
+        "packet:4342a597557c"
       ],
       "outputRef": "workflow.identity",
-      "updated_at": "2026-07-28T19:32:43.619Z",
+      "updated_at": "2026-07-29T01:39:19.468Z",
+      "notes": null
+    },
+    {
+      "stage": "atlas_get_active_context",
+      "state": "PLAN",
+      "status": "ok",
+      "dependsOn": [
+        "canonical_identity"
+      ],
+      "evidenceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "scripts/atlas/reconcile-semantic-contracts.mjs"
+      ],
+      "outputRef": "workflow.active_context",
+      "updated_at": "2026-07-29T01:39:19.485Z",
       "notes": null
     },
     {
@@ -51,9 +72,18 @@
       "dependsOn": [
         "canonical_identity"
       ],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+        "scripts/atlas/reconcile-semantic-contracts.mjs",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+        "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+      ],
       "outputRef": "workflow.ace_context",
-      "updated_at": "2026-07-28T19:32:45.102Z",
+      "updated_at": "2026-07-29T01:39:20.320Z",
       "notes": null
     },
     {
@@ -65,7 +95,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.memory",
-      "updated_at": "2026-07-28T19:32:45.116Z",
+      "updated_at": "2026-07-29T01:39:20.332Z",
       "notes": null
     },
     {
@@ -77,7 +107,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.retrieval",
-      "updated_at": "2026-07-28T19:32:45.202Z",
+      "updated_at": "2026-07-29T01:39:20.354Z",
       "notes": null
     },
     {
@@ -89,7 +119,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.rerank",
-      "updated_at": "2026-07-28T19:32:45.202Z",
+      "updated_at": "2026-07-29T01:39:20.354Z",
       "notes": null
     },
     {
@@ -101,7 +131,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.gemma4",
-      "updated_at": "2026-07-28T19:32:49.080Z",
+      "updated_at": "2026-07-29T01:39:24.706Z",
       "notes": null
     },
     {
@@ -111,9 +141,24 @@
       "dependsOn": [
         "synthesize"
       ],
-      "evidenceRefs": [],
+      "evidenceRefs": [
+        "PACKET_IDENTITY: Lane has contradictory identity or naming evidence.",
+        "PACKET_VALIDATION: Lane has no evidence in the current reconciliation snapshot.",
+        "TOPOLOGY_ROUTING: Lane has no evidence in the current reconciliation snapshot.",
+        "QDRANT_PAYLOAD: Lane has no evidence in the current reconciliation snapshot.",
+        "POSTGRES_ROWS: Lane has no evidence in the current reconciliation snapshot.",
+        "prove-one-entity: Run one bounded cross-store entity trace",
+        "validate-claims: Require tool evidence before status promotion",
+        "ace-summary-lens: Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+        "reranker-lens: mixedbread|phase18_reranker|langextract-grpo",
+        "Run one bounded cross-store entity trace :: reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "PACKET_IDENTITY: CONFLICTING :: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+        "Require tool evidence before status promotion :: scripts/atlas/reconcile-semantic-contracts.mjs",
+        "PACKET_VALIDATION: ABSENT :: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+        "summary lens :: reports/semantic-contracts/semantic-contract-identity-map.json"
+      ],
       "outputRef": "workflow.recommendation",
-      "updated_at": "2026-07-28T19:32:50.880Z",
+      "updated_at": "2026-07-29T01:39:25.550Z",
       "notes": null
     },
     {
@@ -125,7 +170,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.decision",
-      "updated_at": "2026-07-28T19:32:50.880Z",
+      "updated_at": "2026-07-29T01:39:25.550Z",
       "notes": "ask_permission"
     },
     {
@@ -137,7 +182,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.outcome",
-      "updated_at": "2026-07-28T19:32:50.885Z",
+      "updated_at": "2026-07-29T01:39:25.552Z",
       "notes": null
     },
     {
@@ -149,7 +194,7 @@
       ],
       "evidenceRefs": [],
       "outputRef": "workflow.complete",
-      "updated_at": "2026-07-28T19:32:50.885Z",
+      "updated_at": "2026-07-29T01:39:25.552Z",
       "notes": null
     }
   ],
@@ -158,97 +203,352 @@
       "state": "DISCOVER",
       "stage": "classify_intent",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:34.891Z"
+      "updated_at": "2026-07-29T01:39:14.262Z"
     },
     {
       "state": "DISCOVER",
       "stage": "local_search",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:35.738Z"
+      "updated_at": "2026-07-29T01:39:14.589Z"
     },
     {
       "state": "PLAN",
       "stage": "canonical_identity",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:43.619Z"
+      "updated_at": "2026-07-29T01:39:19.468Z"
+    },
+    {
+      "state": "PLAN",
+      "stage": "atlas_get_active_context",
+      "status": "ok",
+      "updated_at": "2026-07-29T01:39:19.485Z"
     },
     {
       "state": "PLAN",
       "stage": "build_agentic_rag_context",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:45.102Z"
+      "updated_at": "2026-07-29T01:39:20.320Z"
     },
     {
       "state": "RETRIEVE",
       "stage": "memory_lookup",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:45.116Z"
+      "updated_at": "2026-07-29T01:39:20.332Z"
     },
     {
       "state": "RETRIEVE",
       "stage": "hybrid_retrieval",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:45.202Z"
+      "updated_at": "2026-07-29T01:39:20.354Z"
     },
     {
       "state": "RERANK",
       "stage": "rerank",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:45.202Z"
+      "updated_at": "2026-07-29T01:39:20.354Z"
     },
     {
       "state": "SYNTHESIZE",
       "stage": "synthesize",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:49.080Z"
+      "updated_at": "2026-07-29T01:39:24.706Z"
     },
     {
       "state": "SYNTHESIZE",
       "stage": "build_recommendation",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:50.880Z"
+      "updated_at": "2026-07-29T01:39:25.550Z"
     },
     {
       "state": "GATE",
       "stage": "gate",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:50.880Z"
+      "updated_at": "2026-07-29T01:39:25.550Z"
     },
     {
       "state": "RECORD",
       "stage": "record_outcome",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:50.885Z"
+      "updated_at": "2026-07-29T01:39:25.552Z"
     },
     {
       "state": "COMPLETE",
       "stage": "complete",
       "status": "ok",
-      "updated_at": "2026-07-28T19:32:50.885Z"
+      "updated_at": "2026-07-29T01:39:25.552Z"
     }
   ],
   "intent": {
     "intent": "planning",
-    "domain": "graph",
-    "subdomain": "unknown",
-    "confidence": 0.65,
-    "safeNextCommand": "rg -n \"BELONGS_TO_CLUSTER|IMPORTS|topology\" src/lib/server/graph/ --type ts"
+    "domain": "retrieval",
+    "subdomain": "ace-pipeline",
+    "confidence": 0.85,
+    "safeNextCommand": "node scripts/ingest/cache-ace-packet.mjs --audit"
+  },
+  "active_context": {
+    "ok": true,
+    "objective": "Resume reconciliation from bounded evidence without rereading the full audit.",
+    "selectedEntities": [
+      {
+        "lane": "PACKET_IDENTITY",
+        "status": "CONFLICTING",
+        "summary": "Lane has contradictory identity or naming evidence.",
+        "sourceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY"
+        ]
+      },
+      {
+        "lane": "PACKET_VALIDATION",
+        "status": "ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION"
+        ]
+      },
+      {
+        "lane": "TOPOLOGY_ROUTING",
+        "status": "ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING"
+        ]
+      },
+      {
+        "lane": "QDRANT_PAYLOAD",
+        "status": "ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD"
+        ]
+      },
+      {
+        "lane": "POSTGRES_ROWS",
+        "status": "ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+        ]
+      }
+    ],
+    "violations": [
+      {
+        "code": "LANE_PACKET_VALIDATION",
+        "lane": "PACKET_VALIDATION",
+        "severity": "BLOCK",
+        "detail": "Lane has no evidence in the current reconciliation snapshot."
+      },
+      {
+        "code": "LANE_HYPERRAG_PACKET_RPC",
+        "lane": "HYPERRAG_PACKET_RPC",
+        "severity": "WARN",
+        "detail": "Lane is referenced in code or docs but not live-proven."
+      },
+      {
+        "code": "LANE_PACKET_IDENTITY",
+        "lane": "PACKET_IDENTITY",
+        "severity": "BLOCK",
+        "detail": "Lane has contradictory identity or naming evidence."
+      },
+      {
+        "code": "LANE_TOPOLOGY_ROUTING",
+        "lane": "TOPOLOGY_ROUTING",
+        "severity": "BLOCK",
+        "detail": "Lane has no evidence in the current reconciliation snapshot."
+      },
+      {
+        "code": "LANE_QDRANT_PAYLOAD",
+        "lane": "QDRANT_PAYLOAD",
+        "severity": "BLOCK",
+        "detail": "Lane has no evidence in the current reconciliation snapshot."
+      },
+      {
+        "code": "LANE_POSTGRES_ROWS",
+        "lane": "POSTGRES_ROWS",
+        "severity": "BLOCK",
+        "detail": "Lane has no evidence in the current reconciliation snapshot."
+      },
+      {
+        "code": "LANE_REDIS_VALUES",
+        "lane": "REDIS_VALUES",
+        "severity": "WARN",
+        "detail": "Lane is referenced in code or docs but not live-proven."
+      }
+    ],
+    "nextSteps": [
+      {
+        "taskId": "prove-one-entity",
+        "title": "Run one bounded cross-store entity trace",
+        "priority": "CRITICAL",
+        "sourceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json",
+          "reports/semantic-contracts/semantic-contract-identity-map.json"
+        ],
+        "validationCommands": [
+          "node scripts/atlas/phase108d-single-packet-proof.mts"
+        ],
+        "blockedBy": [
+          "CONTENT_HASH_MISSING",
+          "QDRANT_POINT_ID_MISSING",
+          "PACKET_VALIDATION_ABSENT"
+        ]
+      },
+      {
+        "taskId": "validate-claims",
+        "title": "Require tool evidence before status promotion",
+        "priority": "HIGH",
+        "sourceRefs": [
+          "scripts/atlas/reconcile-semantic-contracts.mjs"
+        ],
+        "validationCommands": [
+          "node scripts/atlas/reconcile-semantic-contracts.mjs"
+        ],
+        "blockedBy": [
+          "STATICALLY_REFERENCED",
+          "CONFLICTING"
+        ]
+      }
+    ],
+    "sourceRefs": [
+      "reports/semantic-contracts/semantic-contract-identity-map.json",
+      "reports/semantic-contracts/semantic-contract-reconciliation.json"
+    ],
+    "tokenBudget": 3000
   },
   "ace_context": {
-    "ok": false,
-    "error": "ACE packet not found. Run: npm run ingest:pipeline",
-    "safeNextCommand": "npm run ingest:pipeline",
-    "cards": [],
-    "promptPacket": "",
-    "sourceRefs": []
+    "ok": true,
+    "query": "pagerank summaries lexical mixedbread langextract redis centroid ace packet",
+    "totalCards": 10,
+    "signalSummary": {
+      "pagerank": null,
+      "summary": "Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+      "lexical": [
+        "OKF_SOURCE",
+        "PACKET_VALIDATION",
+        "HYPERRAG_PACKET_RPC",
+        "PACKET_IDENTITY",
+        "TOPOLOGY_ROUTING",
+        "QDRANT_PAYLOAD",
+        "POSTGRES_ROWS",
+        "REDIS_VALUES"
+      ],
+      "centroid": null,
+      "reranker": "mixedbread|phase18_reranker|langextract-grpo",
+      "langextract": "miniforge-sidecar",
+      "graph": {
+        "communityId": null,
+        "topology": null
+      }
+    },
+    "packetAge": "0min",
+    "cards": [
+      {
+        "title": "Run one bounded cross-store entity trace",
+        "summary": "priority=CRITICAL blockedBy=CONTENT_HASH_MISSING, QDRANT_POINT_ID_MISSING, PACKET_VALIDATION_ABSENT",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "domain": "planning",
+        "score": 1,
+        "kind": "nextStep",
+        "order": 0
+      },
+      {
+        "title": "PACKET_IDENTITY: CONFLICTING",
+        "summary": "Lane has contradictory identity or naming evidence.",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+        "domain": "retrieval",
+        "score": 1,
+        "kind": "selectedEntity",
+        "order": 0
+      },
+      {
+        "title": "Require tool evidence before status promotion",
+        "summary": "priority=HIGH blockedBy=STATICALLY_REFERENCED, CONFLICTING",
+        "sourceRef": "scripts/atlas/reconcile-semantic-contracts.mjs",
+        "domain": "planning",
+        "score": 0.9,
+        "kind": "nextStep",
+        "order": 1
+      },
+      {
+        "title": "PACKET_VALIDATION: ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+        "domain": "retrieval",
+        "score": 0.8,
+        "kind": "selectedEntity",
+        "order": 1
+      },
+      {
+        "title": "summary lens",
+        "summary": "Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "domain": "summary",
+        "score": 0.8,
+        "kind": "summarySignal"
+      },
+      {
+        "title": "lexical lens",
+        "summary": "OKF_SOURCE, PACKET_VALIDATION, HYPERRAG_PACKET_RPC, PACKET_IDENTITY, TOPOLOGY_ROUTING, QDRANT_PAYLOAD, POSTGRES_ROWS, REDIS_VALUES",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "domain": "lexical",
+        "score": 0.7,
+        "kind": "lexicalSignal"
+      },
+      {
+        "title": "reranker lens",
+        "summary": "reranker=mixedbread|phase18_reranker|langextract-grpo langextract=miniforge-sidecar",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "domain": "ranking",
+        "score": 0.75,
+        "kind": "rerankerSignal"
+      },
+      {
+        "title": "TOPOLOGY_ROUTING: ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+        "domain": "retrieval",
+        "score": 0.8,
+        "kind": "selectedEntity",
+        "order": 2
+      },
+      {
+        "title": "QDRANT_PAYLOAD: ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+        "domain": "retrieval",
+        "score": 0.8,
+        "kind": "selectedEntity",
+        "order": 3
+      },
+      {
+        "title": "POSTGRES_ROWS: ABSENT",
+        "summary": "Lane has no evidence in the current reconciliation snapshot.",
+        "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS",
+        "domain": "retrieval",
+        "score": 0.8,
+        "kind": "selectedEntity",
+        "order": 4
+      }
+    ],
+    "sourceRefs": [
+      "reports/semantic-contracts/semantic-contract-reconciliation.json",
+      "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+      "scripts/atlas/reconcile-semantic-contracts.mjs",
+      "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+      "reports/semantic-contracts/semantic-contract-identity-map.json",
+      "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+      "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+      "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+    ],
+    "promptPacket": "[ACE CONTEXT — 10 cards, query: \"pagerank summaries lexical mixedbread langextract redis centroid ace packet\"]\n1. Run one bounded cross-store entity trace (score: 1.000)\n   priority=CRITICAL blockedBy=CONTENT_HASH_MISSING, QDRANT_POINT_ID_MISSING, PACKET_VALIDATION_ABSENT\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json\n2. PACKET_IDENTITY: CONFLICTING (score: 1.000)\n   Lane has contradictory identity or naming evidence.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY\n3. Require tool evidence before status promotion (score: 0.900)\n   priority=HIGH blockedBy=STATICALLY_REFERENCED, CONFLICTING\n   sourceRef: scripts/atlas/reconcile-semantic-contracts.mjs\n4. PACKET_VALIDATION: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION\n5. summary lens (score: 0.800)\n   Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REF\n   sourceRef: reports/semantic-contracts/semantic-contract-identity-map.json\n6. lexical lens (score: 0.700)\n   OKF_SOURCE, PACKET_VALIDATION, HYPERRAG_PACKET_RPC, PACKET_IDENTITY, TOPOLOGY_ROUTING, QDRANT_PAYLOAD, POSTGRES_ROWS, RE\n   sourceRef: reports/semantic-contracts/semantic-contract-identity-map.json\n7. reranker lens (score: 0.750)\n   reranker=mixedbread|phase18_reranker|langextract-grpo langextract=miniforge-sidecar\n   sourceRef: reports/semantic-contracts/semantic-contract-identity-map.json\n8. TOPOLOGY_ROUTING: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING\n9. QDRANT_PAYLOAD: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD\n10. POSTGRES_ROWS: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS",
+    "safeNextCommand": "node scripts/ingest/cache-ace-packet.mjs --audit"
   },
   "recommendation": {
-    "source_id": "4204cebfce26",
-    "source_ref": ".tmp/parent_atlas_packets/000678ef52ca67b0.json",
-    "normalized_source_ref": "graphify daily recommendations state machine",
-    "feature_id": ".tmp.000678ef52ca67b0",
-    "feature_label": "000678ef52ca67b0.json",
-    "packet_key": "packet:3ee066ddc85f",
+    "source_id": "f49c0427c6ee",
+    "source_ref": "sveltekit-frontend/src/lib/components/atlas/AtlasGraphCanvas.svelte",
+    "normalized_source_ref": "pagerank summaries lexical mixedbread langextract redis centroid ace packet",
+    "feature_id": "sveltekit-frontend.AtlasGraphCanvas",
+    "feature_label": "AtlasGraphCanvas.svelte",
+    "packet_key": "packet:4342a597557c",
     "identity_lane": "canonical",
     "community_id": 0,
     "tree_node_id": null,
@@ -263,10 +563,35 @@
       "qdrant_hits": 0,
       "graph_hits": 0,
       "cache_hits": 0,
-      "rerank_score": 0
+      "rerank_score": 0,
+      "signal_summary": {
+        "active_context": null,
+        "ace_context": {
+          "pagerank": null,
+          "summary": "Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+          "lexical": [
+            "OKF_SOURCE",
+            "PACKET_VALIDATION",
+            "HYPERRAG_PACKET_RPC",
+            "PACKET_IDENTITY",
+            "TOPOLOGY_ROUTING",
+            "QDRANT_PAYLOAD",
+            "POSTGRES_ROWS",
+            "REDIS_VALUES"
+          ],
+          "centroid": null,
+          "reranker": "mixedbread|phase18_reranker|langextract-grpo",
+          "langextract": "miniforge-sidecar",
+          "graph": {
+            "communityId": null,
+            "topology": null
+          }
+        },
+        "memory_swap": null
+      }
     },
     "task_promotion": {
-      "recommendation_id": "871e9479478600bcd2aed7df",
+      "recommendation_id": "b7a7591d368ab02d042cc609",
       "retrieval_confidence": 0,
       "evidence_completeness": 0.5,
       "duplicate_task_probability": 0.5,
@@ -283,10 +608,10 @@
     },
     "kanban_recommendation": null,
     "gemma4": {
-      "summary": "This JSON file likely represents a state machine or data structure for managing daily recommendations. It probably defines states, transitions, or data points necessary to track the user's progress or the system's current recommendation status over time.",
-      "risk": "Modifying the state transitions or the data structure could lead to incorrect recommendation logic, causing the system to get stuck in an invalid state or fail to progress through the intended daily cycle.",
-      "rationale": "The user explicitly asks to 'graphify daily recommendations state machine,' and this file's name and context strongly suggest it contains the core logic or data model for such a state machine.",
-      "priority": "high"
+      "summary": "(synthesis unavailable)",
+      "risk": "unknown",
+      "rationale": "(no evidence synthesized)",
+      "priority": "medium"
     },
     "validation_commands": [
       "node --check <target_file>",
@@ -305,8 +630,8 @@
         "dependsOn": [],
         "evidenceRefs": [],
         "outputRef": "workflow.intent",
-        "updated_at": "2026-07-28T19:32:34.891Z",
-        "notes": "planning/graph"
+        "updated_at": "2026-07-29T01:39:14.262Z",
+        "notes": "planning/retrieval"
       },
       {
         "stage": "local_search",
@@ -317,7 +642,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.rg_matches",
-        "updated_at": "2026-07-28T19:32:35.738Z",
+        "updated_at": "2026-07-29T01:39:14.589Z",
         "notes": null
       },
       {
@@ -329,11 +654,32 @@
           "local_search"
         ],
         "evidenceRefs": [
-          ".tmp/parent_atlas_packets/000678ef52ca67b0.json",
-          "packet:3ee066ddc85f"
+          "sveltekit-frontend/src/lib/components/atlas/AtlasGraphCanvas.svelte",
+          "packet:4342a597557c"
         ],
         "outputRef": "workflow.identity",
-        "updated_at": "2026-07-28T19:32:43.619Z",
+        "updated_at": "2026-07-29T01:39:19.468Z",
+        "notes": null
+      },
+      {
+        "stage": "atlas_get_active_context",
+        "state": "PLAN",
+        "status": "ok",
+        "dependsOn": [
+          "canonical_identity"
+        ],
+        "evidenceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json",
+          "reports/semantic-contracts/semantic-contract-identity-map.json",
+          "scripts/atlas/reconcile-semantic-contracts.mjs"
+        ],
+        "outputRef": "workflow.active_context",
+        "updated_at": "2026-07-29T01:39:19.485Z",
         "notes": null
       },
       {
@@ -343,9 +689,18 @@
         "dependsOn": [
           "canonical_identity"
         ],
-        "evidenceRefs": [],
+        "evidenceRefs": [
+          "reports/semantic-contracts/semantic-contract-reconciliation.json",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+          "scripts/atlas/reconcile-semantic-contracts.mjs",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+          "reports/semantic-contracts/semantic-contract-identity-map.json",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+          "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+        ],
         "outputRef": "workflow.ace_context",
-        "updated_at": "2026-07-28T19:32:45.102Z",
+        "updated_at": "2026-07-29T01:39:20.320Z",
         "notes": null
       },
       {
@@ -357,7 +712,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.memory",
-        "updated_at": "2026-07-28T19:32:45.116Z",
+        "updated_at": "2026-07-29T01:39:20.332Z",
         "notes": null
       },
       {
@@ -369,7 +724,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.retrieval",
-        "updated_at": "2026-07-28T19:32:45.202Z",
+        "updated_at": "2026-07-29T01:39:20.354Z",
         "notes": null
       },
       {
@@ -381,7 +736,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.rerank",
-        "updated_at": "2026-07-28T19:32:45.202Z",
+        "updated_at": "2026-07-29T01:39:20.354Z",
         "notes": null
       },
       {
@@ -393,7 +748,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.gemma4",
-        "updated_at": "2026-07-28T19:32:49.080Z",
+        "updated_at": "2026-07-29T01:39:24.706Z",
         "notes": null
       },
       {
@@ -403,9 +758,24 @@
         "dependsOn": [
           "synthesize"
         ],
-        "evidenceRefs": [],
+        "evidenceRefs": [
+          "PACKET_IDENTITY: Lane has contradictory identity or naming evidence.",
+          "PACKET_VALIDATION: Lane has no evidence in the current reconciliation snapshot.",
+          "TOPOLOGY_ROUTING: Lane has no evidence in the current reconciliation snapshot.",
+          "QDRANT_PAYLOAD: Lane has no evidence in the current reconciliation snapshot.",
+          "POSTGRES_ROWS: Lane has no evidence in the current reconciliation snapshot.",
+          "prove-one-entity: Run one bounded cross-store entity trace",
+          "validate-claims: Require tool evidence before status promotion",
+          "ace-summary-lens: Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+          "reranker-lens: mixedbread|phase18_reranker|langextract-grpo",
+          "Run one bounded cross-store entity trace :: reports/semantic-contracts/semantic-contract-reconciliation.json",
+          "PACKET_IDENTITY: CONFLICTING :: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+          "Require tool evidence before status promotion :: scripts/atlas/reconcile-semantic-contracts.mjs",
+          "PACKET_VALIDATION: ABSENT :: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+          "summary lens :: reports/semantic-contracts/semantic-contract-identity-map.json"
+        ],
         "outputRef": "workflow.recommendation",
-        "updated_at": "2026-07-28T19:32:50.880Z",
+        "updated_at": "2026-07-29T01:39:25.550Z",
         "notes": null
       },
       {
@@ -417,7 +787,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.decision",
-        "updated_at": "2026-07-28T19:32:50.880Z",
+        "updated_at": "2026-07-29T01:39:25.550Z",
         "notes": "ask_permission"
       },
       {
@@ -429,7 +799,7 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.outcome",
-        "updated_at": "2026-07-28T19:32:50.885Z",
+        "updated_at": "2026-07-29T01:39:25.552Z",
         "notes": null
       },
       {
@@ -441,43 +811,308 @@
         ],
         "evidenceRefs": [],
         "outputRef": "workflow.complete",
-        "updated_at": "2026-07-28T19:32:50.885Z",
+        "updated_at": "2026-07-29T01:39:25.552Z",
         "notes": null
       }
     ],
     "ace_context": {
-      "ok": false,
-      "error": "ACE packet not found. Run: npm run ingest:pipeline",
-      "safeNextCommand": "npm run ingest:pipeline",
-      "cards": [],
-      "promptPacket": "",
-      "sourceRefs": []
+      "ok": true,
+      "query": "pagerank summaries lexical mixedbread langextract redis centroid ace packet",
+      "totalCards": 10,
+      "signalSummary": {
+        "pagerank": null,
+        "summary": "Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+        "lexical": [
+          "OKF_SOURCE",
+          "PACKET_VALIDATION",
+          "HYPERRAG_PACKET_RPC",
+          "PACKET_IDENTITY",
+          "TOPOLOGY_ROUTING",
+          "QDRANT_PAYLOAD",
+          "POSTGRES_ROWS",
+          "REDIS_VALUES"
+        ],
+        "centroid": null,
+        "reranker": "mixedbread|phase18_reranker|langextract-grpo",
+        "langextract": "miniforge-sidecar",
+        "graph": {
+          "communityId": null,
+          "topology": null
+        }
+      },
+      "packetAge": "0min",
+      "cards": [
+        {
+          "title": "Run one bounded cross-store entity trace",
+          "summary": "priority=CRITICAL blockedBy=CONTENT_HASH_MISSING, QDRANT_POINT_ID_MISSING, PACKET_VALIDATION_ABSENT",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json",
+          "domain": "planning",
+          "score": 1,
+          "kind": "nextStep",
+          "order": 0
+        },
+        {
+          "title": "PACKET_IDENTITY: CONFLICTING",
+          "summary": "Lane has contradictory identity or naming evidence.",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+          "domain": "retrieval",
+          "score": 1,
+          "kind": "selectedEntity",
+          "order": 0
+        },
+        {
+          "title": "Require tool evidence before status promotion",
+          "summary": "priority=HIGH blockedBy=STATICALLY_REFERENCED, CONFLICTING",
+          "sourceRef": "scripts/atlas/reconcile-semantic-contracts.mjs",
+          "domain": "planning",
+          "score": 0.9,
+          "kind": "nextStep",
+          "order": 1
+        },
+        {
+          "title": "PACKET_VALIDATION: ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+          "domain": "retrieval",
+          "score": 0.8,
+          "kind": "selectedEntity",
+          "order": 1
+        },
+        {
+          "title": "summary lens",
+          "summary": "Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+          "domain": "summary",
+          "score": 0.8,
+          "kind": "summarySignal"
+        },
+        {
+          "title": "lexical lens",
+          "summary": "OKF_SOURCE, PACKET_VALIDATION, HYPERRAG_PACKET_RPC, PACKET_IDENTITY, TOPOLOGY_ROUTING, QDRANT_PAYLOAD, POSTGRES_ROWS, REDIS_VALUES",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+          "domain": "lexical",
+          "score": 0.7,
+          "kind": "lexicalSignal"
+        },
+        {
+          "title": "reranker lens",
+          "summary": "reranker=mixedbread|phase18_reranker|langextract-grpo langextract=miniforge-sidecar",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+          "domain": "ranking",
+          "score": 0.75,
+          "kind": "rerankerSignal"
+        },
+        {
+          "title": "TOPOLOGY_ROUTING: ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+          "domain": "retrieval",
+          "score": 0.8,
+          "kind": "selectedEntity",
+          "order": 2
+        },
+        {
+          "title": "QDRANT_PAYLOAD: ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+          "domain": "retrieval",
+          "score": 0.8,
+          "kind": "selectedEntity",
+          "order": 3
+        },
+        {
+          "title": "POSTGRES_ROWS: ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRef": "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS",
+          "domain": "retrieval",
+          "score": 0.8,
+          "kind": "selectedEntity",
+          "order": 4
+        }
+      ],
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+        "scripts/atlas/reconcile-semantic-contracts.mjs",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+        "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+      ],
+      "promptPacket": "[ACE CONTEXT — 10 cards, query: \"pagerank summaries lexical mixedbread langextract redis centroid ace packet\"]\n1. Run one bounded cross-store entity trace (score: 1.000)\n   priority=CRITICAL blockedBy=CONTENT_HASH_MISSING, QDRANT_POINT_ID_MISSING, PACKET_VALIDATION_ABSENT\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json\n2. PACKET_IDENTITY: CONFLICTING (score: 1.000)\n   Lane has contradictory identity or naming evidence.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY\n3. Require tool evidence before status promotion (score: 0.900)\n   priority=HIGH blockedBy=STATICALLY_REFERENCED, CONFLICTING\n   sourceRef: scripts/atlas/reconcile-semantic-contracts.mjs\n4. PACKET_VALIDATION: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION\n5. summary lens (score: 0.800)\n   Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REF\n   sourceRef: reports/semantic-contracts/semantic-contract-identity-map.json\n6. lexical lens (score: 0.700)\n   OKF_SOURCE, PACKET_VALIDATION, HYPERRAG_PACKET_RPC, PACKET_IDENTITY, TOPOLOGY_ROUTING, QDRANT_PAYLOAD, POSTGRES_ROWS, RE\n   sourceRef: reports/semantic-contracts/semantic-contract-identity-map.json\n7. reranker lens (score: 0.750)\n   reranker=mixedbread|phase18_reranker|langextract-grpo langextract=miniforge-sidecar\n   sourceRef: reports/semantic-contracts/semantic-contract-identity-map.json\n8. TOPOLOGY_ROUTING: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING\n9. QDRANT_PAYLOAD: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD\n10. POSTGRES_ROWS: ABSENT (score: 0.800)\n   Lane has no evidence in the current reconciliation snapshot.\n   sourceRef: reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS",
+      "safeNextCommand": "node scripts/ingest/cache-ace-packet.mjs --audit"
+    },
+    "active_context": {
+      "ok": true,
+      "objective": "Resume reconciliation from bounded evidence without rereading the full audit.",
+      "selectedEntities": [
+        {
+          "lane": "PACKET_IDENTITY",
+          "status": "CONFLICTING",
+          "summary": "Lane has contradictory identity or naming evidence.",
+          "sourceRefs": [
+            "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY"
+          ]
+        },
+        {
+          "lane": "PACKET_VALIDATION",
+          "status": "ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRefs": [
+            "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION"
+          ]
+        },
+        {
+          "lane": "TOPOLOGY_ROUTING",
+          "status": "ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRefs": [
+            "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING"
+          ]
+        },
+        {
+          "lane": "QDRANT_PAYLOAD",
+          "status": "ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRefs": [
+            "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD"
+          ]
+        },
+        {
+          "lane": "POSTGRES_ROWS",
+          "status": "ABSENT",
+          "summary": "Lane has no evidence in the current reconciliation snapshot.",
+          "sourceRefs": [
+            "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+          ]
+        }
+      ],
+      "violations": [
+        {
+          "code": "LANE_PACKET_VALIDATION",
+          "lane": "PACKET_VALIDATION",
+          "severity": "BLOCK",
+          "detail": "Lane has no evidence in the current reconciliation snapshot."
+        },
+        {
+          "code": "LANE_HYPERRAG_PACKET_RPC",
+          "lane": "HYPERRAG_PACKET_RPC",
+          "severity": "WARN",
+          "detail": "Lane is referenced in code or docs but not live-proven."
+        },
+        {
+          "code": "LANE_PACKET_IDENTITY",
+          "lane": "PACKET_IDENTITY",
+          "severity": "BLOCK",
+          "detail": "Lane has contradictory identity or naming evidence."
+        },
+        {
+          "code": "LANE_TOPOLOGY_ROUTING",
+          "lane": "TOPOLOGY_ROUTING",
+          "severity": "BLOCK",
+          "detail": "Lane has no evidence in the current reconciliation snapshot."
+        },
+        {
+          "code": "LANE_QDRANT_PAYLOAD",
+          "lane": "QDRANT_PAYLOAD",
+          "severity": "BLOCK",
+          "detail": "Lane has no evidence in the current reconciliation snapshot."
+        },
+        {
+          "code": "LANE_POSTGRES_ROWS",
+          "lane": "POSTGRES_ROWS",
+          "severity": "BLOCK",
+          "detail": "Lane has no evidence in the current reconciliation snapshot."
+        },
+        {
+          "code": "LANE_REDIS_VALUES",
+          "lane": "REDIS_VALUES",
+          "severity": "WARN",
+          "detail": "Lane is referenced in code or docs but not live-proven."
+        }
+      ],
+      "nextSteps": [
+        {
+          "taskId": "prove-one-entity",
+          "title": "Run one bounded cross-store entity trace",
+          "priority": "CRITICAL",
+          "sourceRefs": [
+            "reports/semantic-contracts/semantic-contract-reconciliation.json",
+            "reports/semantic-contracts/semantic-contract-identity-map.json"
+          ],
+          "validationCommands": [
+            "node scripts/atlas/phase108d-single-packet-proof.mts"
+          ],
+          "blockedBy": [
+            "CONTENT_HASH_MISSING",
+            "QDRANT_POINT_ID_MISSING",
+            "PACKET_VALIDATION_ABSENT"
+          ]
+        },
+        {
+          "taskId": "validate-claims",
+          "title": "Require tool evidence before status promotion",
+          "priority": "HIGH",
+          "sourceRefs": [
+            "scripts/atlas/reconcile-semantic-contracts.mjs"
+          ],
+          "validationCommands": [
+            "node scripts/atlas/reconcile-semantic-contracts.mjs"
+          ],
+          "blockedBy": [
+            "STATICALLY_REFERENCED",
+            "CONFLICTING"
+          ]
+        }
+      ],
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-identity-map.json",
+        "reports/semantic-contracts/semantic-contract-reconciliation.json"
+      ],
+      "tokenBudget": 3000
     },
     "structured_recommendation": {
-      "likely_cause": "This JSON file likely represents a state machine or data structure for managing daily recommendations. It probably defines states, transitions, or data points necessary to track the user's progress or the system's current recommendation status over time.",
-      "evidence": [],
+      "likely_cause": "(synthesis unavailable)",
+      "evidence": [
+        "PACKET_IDENTITY: Lane has contradictory identity or naming evidence.",
+        "PACKET_VALIDATION: Lane has no evidence in the current reconciliation snapshot.",
+        "TOPOLOGY_ROUTING: Lane has no evidence in the current reconciliation snapshot.",
+        "QDRANT_PAYLOAD: Lane has no evidence in the current reconciliation snapshot.",
+        "POSTGRES_ROWS: Lane has no evidence in the current reconciliation snapshot.",
+        "prove-one-entity: Run one bounded cross-store entity trace",
+        "validate-claims: Require tool evidence before status promotion",
+        "ace-summary-lens: Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+        "reranker-lens: mixedbread|phase18_reranker|langextract-grpo",
+        "Run one bounded cross-store entity trace :: reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "PACKET_IDENTITY: CONFLICTING :: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY",
+        "Require tool evidence before status promotion :: scripts/atlas/reconcile-semantic-contracts.mjs",
+        "PACKET_VALIDATION: ABSENT :: reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION",
+        "summary lens :: reports/semantic-contracts/semantic-contract-identity-map.json"
+      ],
       "patch_targets": [],
-      "proposed_fix": "The user explicitly asks to 'graphify daily recommendations state machine,' and this file's name and context strongly suggest it contains the core logic or data model for such a state machine.",
-      "safe_next_command": "npm run smoke:opencode",
+      "proposed_fix": "(no evidence synthesized)",
+      "safe_next_command": "npm run ingest:pipeline",
       "do_not_do": [
+        "Do not clear Redis ace:packet:latest without running ingest:pipeline first",
         "Do not assume the fix succeeded — re-run the validator after patching"
       ],
       "intent": "planning",
-      "domain": "graph"
+      "domain": "retrieval"
     }
   },
   "outcome": null,
   "top": [
     {
-      "task_id": "871e9479478600bcd2aed7df",
-      "title": "000678ef52ca67b0.json",
+      "task_id": "b7a7591d368ab02d042cc609",
+      "title": "AtlasGraphCanvas.svelte",
       "intent": "planning",
-      "source_ref": ".tmp/parent_atlas_packets/000678ef52ca67b0.json",
-      "feature_id": ".tmp.000678ef52ca67b0",
+      "source_ref": "sveltekit-frontend/src/lib/components/atlas/AtlasGraphCanvas.svelte",
+      "feature_id": "sveltekit-frontend.AtlasGraphCanvas",
       "title_id": null,
-      "packet_key": "packet:3ee066ddc85f",
+      "packet_key": "packet:4342a597557c",
       "confidence": 0,
-      "updated_at": "2026-07-28T19:32:50.885Z",
+      "updated_at": "2026-07-29T01:39:25.552Z",
       "recommended_commands": [
         "node --check <target_file>",
         "npm run atlas:lineage:verify"

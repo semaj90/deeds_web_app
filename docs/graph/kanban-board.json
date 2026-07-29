@@ -2242,6 +2242,59 @@
           "usedLlm": true
         },
         {
+          "taskId": "TASK-7F3C2A19",
+          "featureKey": "atlas.recommendation_workflow",
+          "title": "atlas › recommendation workflow",
+          "description": "Keep the live recommendation path aligned with one end-to-end evidence pipeline: PostgreSQL 18 owns truth and workflow state, Qdrant/TurboVec/DiskANN retrieve candidates, Neo4j/cuGraph explain relationships, Arrow/mmap/JSON/MsgPack/gRPC move data, PyTorch/XGBoost rank candidates, ACE validates evidence, Gemma4 writes the recommendation, and the task board records proposed or verified outcomes. `atlas_get_active_context` injects the reconciliation packet before synthesis and now carries a compact signal bundle (`signalSummary` + `memorySwap`) so pagerank, summary, lexical, centroid, and reranker hints move with the ACE packet, while `build_agentic_rag_context` resolves the reconciliation packet shape. The current Phase 108D live run is still only `PARTIAL_PROVEN` for `packet:1f18437ee58f`, with Postgres and HyperRAG RPC present but Qdrant, Redis, and ACE still missing, so promotion remains blocked by the reconciliation snapshot marking packet identity, packet validation, topology routing, Qdrant payload, and Postgres rows absent or conflicting. The tool-surface parity note should compare the repo’s split MCP ownership against the Codebase-Memory example without claiming a unified graph API, and the remaining work is still to reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion, keep refresh-manifest invalidation bound to atlas truth promotion, preserve read-only append-only replay telemetry, and widen replay export coverage while the ACE facade stays wired end to end.",
+          "kanbanStatus": "TODO",
+          "priority": "HIGH",
+          "status": "partial",
+          "fileCount": 14,
+          "topFile": "scripts/atlas/agentic-recommendation-workflow.mjs",
+          "dbTables": [
+            "contextTimeline",
+            "workflowRuns",
+            "featureImplementations",
+            "evidence",
+            "sessions",
+            "documents",
+            "citations"
+          ],
+          "cacheKeys": [
+            "ace:packet:latest:reconciliation",
+            "ace:packet:latest",
+            "bifrost:packet:latest:reconciliation",
+            "gpu:karpathy:scores",
+            "gpu:karpathy:encoded"
+          ],
+          "mcpTools": [
+            "atlas_get_active_context"
+          ],
+          "routeTypes": [
+            "api_route"
+          ],
+          "hasLlmCall": true,
+          "files": [
+            "scripts/atlas/agentic-recommendation-workflow.mjs",
+            "scripts/atlas/build-reconciliation-ace-packet.mts",
+            "scripts/atlas/reconcile-semantic-contracts.mjs",
+            "scripts/atlas/validate-dev-services.mjs",
+            "scripts/ingest/retrieval-replay-eval.mjs",
+            "scripts/atlas/build-temporal-bitfrost-index.mjs",
+            "sveltekit-frontend/src/mcp/engram_tools.ts",
+            "sveltekit-frontend/src/lib/server/ai/openai-facade.ts",
+            "sveltekit-frontend/src/lib/server/ai/gemma4.ts",
+            "sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts"
+          ],
+          "sourceRefs": [
+            "local:scripts/atlas/agentic-recommendation-workflow.mjs#L1",
+            "local:scripts/atlas/build-reconciliation-ace-packet.mts#L1",
+            "local:scripts/atlas/reconcile-semantic-contracts.mjs#L1"
+          ],
+          "generatedAt": "2026-07-29T00:58:00.000Z",
+          "usedLlm": true
+        },
+        {
           "taskId": "TASK-C11760F1",
           "featureKey": "lib.components",
           "title": "lib › components",

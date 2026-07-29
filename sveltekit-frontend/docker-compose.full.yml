@@ -226,6 +226,7 @@ services:
       - "5984:5984"
     volumes:
       - couchdb_data:/opt/couchdb/data
+      - ../docker/couchdb/local.d/10-single-node.ini:/opt/couchdb/etc/local.d/10-single-node.ini:ro
     healthcheck:
       test: curl -f http://127.0.0.1:5984/_up || exit 1
       interval: 30s

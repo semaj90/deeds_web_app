@@ -32,6 +32,9 @@ const DRY_RUN = process.argv.includes('--dry-run');
 const SKIP_CONSUMER = process.argv.includes('--skip-consumer');
 const FULL_CODEBASE = process.argv.includes('--full');
 const VERBOSE = process.argv.includes('--verbose');
+const SKIP_AUDIT = process.argv.includes('--skip-audit') || process.env.GRAPHIFY_SKIP_AUDIT === '1';
+const INCLUDE_BITFROST_WARM = !/^(0|false|no|off)$/i.test(process.env.GRAPHIFY_INCLUDE_BITFROST_WARM ?? '1');
+const INCLUDE_CENTROID_WARM = !/^(0|false|no|off)$/i.test(process.env.GRAPHIFY_INCLUDE_CENTROID_WARM ?? '1');
 
 // Logging
 function log(msg, level = 'info') {
@@ -100,12 +103,43 @@ async function runPipeline() {
     log('\n📊 PHASE 1: Running Graphify Audit');
     log('─────────────────────────────────────────────────────────────');
     const auditScript = FULL_CODEBASE ? 'graphify:daily:full' : 'graphify:daily';
-    try {
-      await runNpmScript(auditScript);
-      log('✓ Audit complete');
-    } catch (err) {
-      log(`✗ Audit failed: ${err.message}`, 'error');
-      throw err;
+    let auditOutcome = 'skipped';
+    if (SKIP_AUDIT) {
+      log('⚠️  Skipping audit phase via --skip-audit', 'warn');
+      auditOutcome = 'skipped';
+    } else {
+      try {
+        await runNpmScript(auditScript);
+        log('✓ Audit complete');
+        auditOutcome = 'complete';
+      } catch (err) {
+        log(`✗ Audit failed: ${err.message}`, 'warn');
+        log('↪ Continuing with startup fallback so the rest of the pipeline remains visible', 'warn');
+        auditOutcome = 'degraded';
+      }
+    }
+
+    // PHASE 1.5: Warm BitFrost and centroid caches when available.
+    if (INCLUDE_BITFROST_WARM) {
+      log('\n🧊 PHASE 1.5: Warming BitFrost semantic cache');
+      log('─────────────────────────────────────────────────────────────');
+      try {
+        await runNpmScript('atlas:bitfrost-semantic-cache:warm:apply');
+        log('✓ BitFrost semantic cache warm complete');
+      } catch (err) {
+        log(`⚠️  BitFrost semantic cache warm failed: ${err.message}`, 'warn');
+      }
+    }
+
+    if (INCLUDE_CENTROID_WARM) {
+      log('\n🎯 PHASE 1.6: Warming centroid cache');
+      log('─────────────────────────────────────────────────────────────');
+      try {
+        await runNpmScript('atlas:centroids:cache:warm');
+        log('✓ Centroid cache warm complete');
+      } catch (err) {
+        log(`⚠️  Centroid cache warm failed: ${err.message}`, 'warn');
+      }
     }
 
     // PHASE 2: Start Consumer Daemon (if not skipped)
@@ -166,6 +200,7 @@ async function runPipeline() {
     log('═════════════════════════════════════════════════════════════');
     log(`Duration: ${elapsedSec}s`);
     log(`Output directory: ${tmpDir}`);
+    log(`Audit outcome: ${auditOutcome}`);
 
     if (!SKIP_CONSUMER) {
       log('\n📡 Consumer daemon is running in background');
@@ -179,7 +214,8 @@ async function runPipeline() {
     return {
       success: true,
       duration: elapsedSec,
-      phase: 'complete'
+      phase: 'complete',
+      auditOutcome,
     };
   } catch (err) {
     log(`\n✗ Pipeline failed: ${err.message}`, 'error');

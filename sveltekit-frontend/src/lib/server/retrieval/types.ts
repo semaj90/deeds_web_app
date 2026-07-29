@@ -65,6 +65,18 @@ export interface SearchResult {
   /** Canonical packet identity */
   packet_key: string | null;
 
+  /** Canonical AST / structural identity when available */
+  tree_node_id?: string | null;
+
+  /** Canonical immutable content revision hash when available */
+  content_hash?: string | null;
+
+  /** Workspace revision attached by the authority join when available */
+  workspace_revision?: string | null;
+
+  /** Canonical feature label when the packet join resolves it */
+  feature_label?: string | null;
+
   /** File/module reference */
   source_ref: string | null;
 

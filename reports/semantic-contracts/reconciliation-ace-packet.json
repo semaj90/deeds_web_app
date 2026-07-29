@@ -1,0 +1,234 @@
+{
+  "schemaVersion": "1.0.0",
+  "packetKind": "ace.reconciliation.context",
+  "acePacketId": "ace_c1582d1c-e3f3-46c0-a319-b9be5144c5df",
+  "runId": "run_857b6352-e4ff-445a-9f7a-35c3524e588b",
+  "workspaceId": "deeds-web-app",
+  "workspaceRevision": "1deff1ded06ad451e95192d6bc1b88ef11f610dd",
+  "objective": "Resume reconciliation from bounded evidence without rereading the full audit.",
+  "createdAt": "2026-07-29T01:39:16.834Z",
+  "expiresInSeconds": 1800,
+  "sourceArtifact": {
+    "sourceRef": "reports/semantic-contracts/semantic-contract-identity-map.json",
+    "sha256": "2aa56b71a6573761d3ce5dbfc9c7ad2c73951910a537d5d4f0fcde532af2c1b2",
+    "rowCount": 1
+  },
+  "sourceRefs": [
+    "reports/semantic-contracts/semantic-contract-identity-map.json",
+    "reports/semantic-contracts/semantic-contract-reconciliation.json"
+  ],
+  "selectedEntities": [
+    {
+      "lane": "PACKET_IDENTITY",
+      "status": "CONFLICTING",
+      "summary": "Lane has contradictory identity or naming evidence.",
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_IDENTITY"
+      ]
+    },
+    {
+      "lane": "PACKET_VALIDATION",
+      "status": "ABSENT",
+      "summary": "Lane has no evidence in the current reconciliation snapshot.",
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#PACKET_VALIDATION"
+      ]
+    },
+    {
+      "lane": "TOPOLOGY_ROUTING",
+      "status": "ABSENT",
+      "summary": "Lane has no evidence in the current reconciliation snapshot.",
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#TOPOLOGY_ROUTING"
+      ]
+    },
+    {
+      "lane": "QDRANT_PAYLOAD",
+      "status": "ABSENT",
+      "summary": "Lane has no evidence in the current reconciliation snapshot.",
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#QDRANT_PAYLOAD"
+      ]
+    },
+    {
+      "lane": "POSTGRES_ROWS",
+      "status": "ABSENT",
+      "summary": "Lane has no evidence in the current reconciliation snapshot.",
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json#POSTGRES_ROWS"
+      ]
+    }
+  ],
+  "laneStates": [
+    {
+      "lane": "OKF_SOURCE",
+      "status": "PRESENT",
+      "reason": "Lane exists in the repository but is not live-proven here.",
+      "evidenceRefs": [
+        "okf-source-files"
+      ]
+    },
+    {
+      "lane": "PACKET_VALIDATION",
+      "status": "ABSENT",
+      "reason": "Lane has no evidence in the current reconciliation snapshot.",
+      "evidenceRefs": []
+    },
+    {
+      "lane": "HYPERRAG_PACKET_RPC",
+      "status": "STATICALLY_REFERENCED",
+      "reason": "Lane is referenced in code or docs but not live-proven.",
+      "evidenceRefs": [
+        "hyperrag-rpc-files",
+        "hyperrag-rpc-usage"
+      ]
+    },
+    {
+      "lane": "PACKET_IDENTITY",
+      "status": "CONFLICTING",
+      "reason": "Lane has contradictory identity or naming evidence.",
+      "evidenceRefs": [
+        "packet-key-refs"
+      ]
+    },
+    {
+      "lane": "TOPOLOGY_ROUTING",
+      "status": "ABSENT",
+      "reason": "Lane has no evidence in the current reconciliation snapshot.",
+      "evidenceRefs": []
+    },
+    {
+      "lane": "QDRANT_PAYLOAD",
+      "status": "ABSENT",
+      "reason": "Lane has no evidence in the current reconciliation snapshot.",
+      "evidenceRefs": []
+    },
+    {
+      "lane": "POSTGRES_ROWS",
+      "status": "ABSENT",
+      "reason": "Lane has no evidence in the current reconciliation snapshot.",
+      "evidenceRefs": []
+    },
+    {
+      "lane": "REDIS_VALUES",
+      "status": "STATICALLY_REFERENCED",
+      "reason": "Lane is referenced in code or docs but not live-proven.",
+      "evidenceRefs": [
+        "bifrost-refs",
+        "redis-key-refs"
+      ]
+    }
+  ],
+  "violations": [
+    {
+      "code": "LANE_PACKET_VALIDATION",
+      "lane": "PACKET_VALIDATION",
+      "severity": "BLOCK",
+      "detail": "Lane has no evidence in the current reconciliation snapshot."
+    },
+    {
+      "code": "LANE_HYPERRAG_PACKET_RPC",
+      "lane": "HYPERRAG_PACKET_RPC",
+      "severity": "WARN",
+      "detail": "Lane is referenced in code or docs but not live-proven."
+    },
+    {
+      "code": "LANE_PACKET_IDENTITY",
+      "lane": "PACKET_IDENTITY",
+      "severity": "BLOCK",
+      "detail": "Lane has contradictory identity or naming evidence."
+    },
+    {
+      "code": "LANE_TOPOLOGY_ROUTING",
+      "lane": "TOPOLOGY_ROUTING",
+      "severity": "BLOCK",
+      "detail": "Lane has no evidence in the current reconciliation snapshot."
+    },
+    {
+      "code": "LANE_QDRANT_PAYLOAD",
+      "lane": "QDRANT_PAYLOAD",
+      "severity": "BLOCK",
+      "detail": "Lane has no evidence in the current reconciliation snapshot."
+    },
+    {
+      "code": "LANE_POSTGRES_ROWS",
+      "lane": "POSTGRES_ROWS",
+      "severity": "BLOCK",
+      "detail": "Lane has no evidence in the current reconciliation snapshot."
+    },
+    {
+      "code": "LANE_REDIS_VALUES",
+      "lane": "REDIS_VALUES",
+      "severity": "WARN",
+      "detail": "Lane is referenced in code or docs but not live-proven."
+    }
+  ],
+  "nextSteps": [
+    {
+      "taskId": "prove-one-entity",
+      "title": "Run one bounded cross-store entity trace",
+      "priority": "CRITICAL",
+      "sourceRefs": [
+        "reports/semantic-contracts/semantic-contract-reconciliation.json",
+        "reports/semantic-contracts/semantic-contract-identity-map.json"
+      ],
+      "validationCommands": [
+        "node scripts/atlas/phase108d-single-packet-proof.mts"
+      ],
+      "blockedBy": [
+        "CONTENT_HASH_MISSING",
+        "QDRANT_POINT_ID_MISSING",
+        "PACKET_VALIDATION_ABSENT"
+      ]
+    },
+    {
+      "taskId": "validate-claims",
+      "title": "Require tool evidence before status promotion",
+      "priority": "HIGH",
+      "sourceRefs": [
+        "scripts/atlas/reconcile-semantic-contracts.mjs"
+      ],
+      "validationCommands": [
+        "node scripts/atlas/reconcile-semantic-contracts.mjs"
+      ],
+      "blockedBy": [
+        "STATICALLY_REFERENCED",
+        "CONFLICTING"
+      ]
+    }
+  ],
+  "signalSummary": {
+    "summary": "Reconciliation packet covering 8 lanes: OKF_SOURCE:PRESENT, PACKET_VALIDATION:ABSENT, HYPERRAG_PACKET_RPC:STATICALLY_REFERENCED, PACKET_IDENTITY:CONFLICTING, TOPOLOGY_ROUTING:ABSENT, QDRANT_PAYLOAD:ABSENT",
+    "pagerank": null,
+    "lexical": [
+      "OKF_SOURCE",
+      "PACKET_VALIDATION",
+      "HYPERRAG_PACKET_RPC",
+      "PACKET_IDENTITY",
+      "TOPOLOGY_ROUTING",
+      "QDRANT_PAYLOAD",
+      "POSTGRES_ROWS",
+      "REDIS_VALUES"
+    ],
+    "centroid": null,
+    "reranker": "mixedbread|phase18_reranker|langextract-grpo",
+    "langextract": "miniforge-sidecar",
+    "graph": {
+      "communityId": null,
+      "topology": "reconciliation-snapshot"
+    }
+  },
+  "memorySwap": {
+    "cacheKey": "ace:packet:reconciliation:1deff1ded06a",
+    "aliasKey": "bifrost:packet:reconciliation:1deff1ded06a",
+    "packetKey": "reconciliation:1deff1ded06a",
+    "packetKind": "ace.reconciliation.context",
+    "source": "redis-valkey"
+  },
+  "tokenBudget": 3000,
+  "safeguards": {
+    "authoritative": false,
+    "mayPromoteAuditStatus": false,
+    "requiresLiveValidation": true
+  }
+}

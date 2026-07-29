@@ -5,8 +5,16 @@ import { resolvePageRankAuthority } from '$lib/server/topology/pagerank-authorit
 export function toCanonicalHyperRagHit(packet: SearchResult['packets'][number]): HyperRagHit {
   const enriched = packet as any;
   const pageRank = resolvePageRankAuthority(enriched);
+  const packetKey = String(enriched.packetKey ?? enriched.packet_key ?? enriched.chunk_id ?? enriched.sourceRef ?? enriched.source_ref ?? 'unknown');
   return {
-    id: String(enriched.packetKey ?? enriched.packet_key ?? enriched.chunk_id ?? enriched.sourceRef ?? enriched.source_ref ?? 'unknown'),
+    id: packetKey,
+    packetKey,
+    sourceRef: enriched.sourceRef ?? enriched.source_ref ?? enriched.filePath ?? enriched.relative_path ?? undefined,
+    contentHash: enriched.contentHash ?? enriched.content_hash ?? null,
+    workspaceRevision: enriched.workspaceRevision ?? enriched.workspace_revision ?? null,
+    treeNodeId: enriched.treeNodeId ?? enriched.tree_node_id ?? null,
+    featureId: enriched.featureId ?? enriched.feature_id ?? null,
+    featureLabel: enriched.featureLabel ?? enriched.feature_label ?? null,
     sourcePath: enriched.sourceRef ?? enriched.source_ref ?? enriched.filePath ?? enriched.relative_path ?? undefined,
     title: enriched.semanticTitle ?? enriched.semantic?.title ?? enriched.title ?? enriched.symbol ?? enriched.sourceRef ?? enriched.packetKey,
     text: enriched.summary ?? enriched.content ?? '',

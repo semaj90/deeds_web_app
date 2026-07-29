@@ -10,12 +10,26 @@
  *   - MCP tool codeintel.ace.context
  */
 
-import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import type { ResearchSource } from '../research/web-research-ingester.js';
-import { retrievalClient } from '../grpc/retrieval-client.js';
-import { linkResearchBatchToSession } from '../ai/hypergraph-store.js';
-import { recordResearchHits } from '../research/lane4-feedback.js';
+
+async function getDb() {
+  const mod = await import('$lib/server/db/client.js');
+  return mod.db;
+}
+
+async function getRetrievalClient() {
+  const mod = await import('../grpc/retrieval-client.js');
+  return mod.retrievalClient;
+}
+
+async function getHypergraphStore() {
+  return import('../ai/hypergraph-store.js');
+}
+
+async function getLane4Feedback() {
+  return import('../research/lane4-feedback.js');
+}
 
 /**
  * Resolve 'default' repoId to the actual repo UUID from the database.
@@ -26,6 +40,7 @@ async function resolveRepoId(repoId: string): Promise<string> {
   if (repoId !== 'default') return repoId;
   if (_cachedDefaultRepoId) return _cachedDefaultRepoId;
   try {
+    const db = await getDb();
     const rows = await db.execute(sql`
       SELECT repo_id FROM codebase_chunk_index LIMIT 1
     `);
@@ -55,6 +70,12 @@ export interface AceClusterSummary {
 export interface AceChunkContext {
   chunkId: string;
   relativePath: string | null;
+  packetKey?: string | null;
+  treeNodeId?: string | null;
+  featureId?: string | null;
+  featureLabel?: string | null;
+  contentHash?: string | null;
+  workspaceRevision?: string | null;
   kind: string | null;
   domain: string | null;
   language: string | null;
@@ -108,6 +129,7 @@ export async function getClusterSummariesForAce(opts: {
   const limit = Math.min(opts.limit ?? 20, 50);
 
   try {
+    const db = await getDb();
     const rows = opts.clusterIds?.length
       ? await db.execute(sql`
           SELECT gpu_cluster, COALESCE(summary,'') AS summary,
@@ -156,6 +178,7 @@ export async function getClusterSummaryForAce(
   clusterId: number
 ): Promise<{ cluster: AceClusterSummary | null; error?: string }> {
   try {
+    const db = await getDb();
     const rows = await db.execute(sql`
       SELECT gpu_cluster, COALESCE(summary,'') AS summary,
              COALESCE(purpose,'') AS purpose,
@@ -193,6 +216,7 @@ export async function getChunkForAce(
 ): Promise<{ chunk: AceChunkContext | null; error?: string }> {
   try {
     const repoId = await resolveRepoId(repoIdRaw);
+    const db = await getDb();
     const shouldFilterByRepoId =
       typeof repoId === 'string' &&
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(repoId);
@@ -203,6 +227,7 @@ export async function getChunkForAce(
       SELECT qdrant_id, relative_path, kind, domain, language, extension,
              COALESCE(semantic_tags, '{}') AS semantic_tags,
              COALESCE(summary, '') AS summary,
+             content_hash,
              gpu_cluster,
              som_cluster,
              som_bmu_row,
@@ -215,11 +240,58 @@ export async function getChunkForAce(
 
     if (rows.rows.length === 0) return { chunk: null };
     const r = rows.rows[0] as any;
+    const sourceRef = r.relative_path ? String(r.relative_path) : String(chunkIdOrPath);
+    let packetIdentity: {
+      packetKey: string | null;
+      treeNodeId: string | null;
+      featureId: string | null;
+      featureLabel: string | null;
+      contentHash: string | null;
+      workspaceRevision: string | null;
+    } | null = null;
+
+    try {
+      const packetRows = await db.execute(sql`
+        SELECT packet_key, tree_node_id, feature_id, feature_label, sha256, metadata
+        FROM atlas_packets
+        WHERE source_ref = ${sourceRef}
+           OR canonical_source_ref = ${sourceRef}
+           OR source_path = ${sourceRef}
+           OR file_path = ${sourceRef}
+        ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST
+        LIMIT 1
+      `);
+      const packet = packetRows.rows[0] as any | undefined;
+      if (packet) {
+        const metadata = (packet.metadata ?? {}) as Record<string, unknown>;
+        packetIdentity = {
+          packetKey: packet.packet_key ? String(packet.packet_key) : null,
+          treeNodeId: packet.tree_node_id ? String(packet.tree_node_id) : null,
+          featureId: packet.feature_id ? String(packet.feature_id) : null,
+          featureLabel: packet.feature_label ? String(packet.feature_label) : null,
+          contentHash: packet.sha256 ? String(packet.sha256) : null,
+          workspaceRevision:
+            typeof metadata.workspace_revision === 'string'
+              ? metadata.workspace_revision
+              : typeof metadata.workspaceRevision === 'string'
+                ? metadata.workspaceRevision
+                : null,
+        };
+      }
+    } catch {
+      packetIdentity = null;
+    }
 
     return {
       chunk: {
         chunkId: String(r.qdrant_id ?? ''),
         relativePath: r.relative_path || null,
+        packetKey: packetIdentity?.packetKey ?? null,
+        treeNodeId: packetIdentity?.treeNodeId ?? null,
+        featureId: packetIdentity?.featureId ?? null,
+        featureLabel: packetIdentity?.featureLabel ?? null,
+        contentHash: packetIdentity?.contentHash ?? (r.content_hash != null ? String(r.content_hash) : null),
+        workspaceRevision: packetIdentity?.workspaceRevision ?? null,
         kind: r.kind || null,
         domain: r.domain || null,
         language: r.language || null,
@@ -239,6 +311,7 @@ export async function getChunkForAce(
 
 export async function getCodeIntelHealthForAce(): Promise<AceHealthSummary> {
   try {
+    const db = await getDb();
     const [chunkStats, clusterStats] = await Promise.all([
       db.execute(sql`
         SELECT COUNT(*) AS total,
@@ -277,6 +350,7 @@ export async function getWebResearchForAce(
   limit: number = 10
 ): Promise<{ research: AceResearchContext[]; error?: string }> {
   try {
+    const retrievalClient = await getRetrievalClient();
     const result = await retrievalClient.getResearchContext({
       query,
       limit: limit * 2, // Fetch extra to allow for priority sorting
@@ -384,6 +458,7 @@ export async function assembleAceContext(
   // Link research provenance in one Neo4j write to avoid duplicate MERGE races.
   const researchChunks = researchResult?.research ?? [];
   if (opts.sessionId && researchChunks.length > 0) {
+    const { linkResearchBatchToSession } = await getHypergraphStore();
     await linkResearchBatchToSession(
       opts.sessionId,
       researchChunks.map((chunk) => ({
@@ -396,6 +471,7 @@ export async function assembleAceContext(
 
   // Lane 4: record hits for trust-score feedback loop (fire-and-forget)
   if (researchChunks.length > 0) {
+    const { recordResearchHits } = await getLane4Feedback();
     recordResearchHits(
       researchChunks.map((c) => ({ source: c.source, score: c.score })),
       'ace'

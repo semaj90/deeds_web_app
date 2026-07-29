@@ -46,6 +46,8 @@ export const ClassificationLedgerKindSchema = z.enum([
   'retrieval',
 ]);
 
+export const ClassificationPartOfSpeechSchema = z.string().min(1).nullable().optional();
+
 export type VectorLaneStatus = z.infer<typeof VectorLaneStatusSchema>;
 export type EvidenceState = z.infer<typeof EvidenceStateSchema>;
 export type KnowledgeResolution = z.infer<typeof KnowledgeResolutionSchema>;

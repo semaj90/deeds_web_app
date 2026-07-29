@@ -67,16 +67,13 @@ function getQdrantCollectionInfo() {
 // Query Postgres for sample packets
 function getPostgresPacketSample(): any[] {
   try {
-    const sql = `SELECT packet_key, source_ref, workspace_id, ontology_version
-      FROM atlas_packets
-      WHERE packet_key IS NOT NULL
-      LIMIT 5`;
-
+    const sql = `SELECT packet_key, source_ref, workspace_id, ontology_version FROM atlas_packets WHERE packet_key IS NOT NULL LIMIT 5`;
     const wrappedSql = `SELECT COALESCE(json_agg(row_to_json(x)), '[]'::json) FROM (${sql}) x`;
-    const escapedSql = wrappedSql.replace(/"/g, '\\"');
 
+    // Use JSON.stringify to safely pass SQL to docker exec
+    const cmd = `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c`;
     const output = execSync(
-      `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -c "${escapedSql}"`,
+      `${cmd} ${JSON.stringify(wrappedSql)}`,
       { encoding: 'utf-8' }
     );
 
@@ -149,6 +146,75 @@ function generateReport(): BackfillReport {
   return report;
 }
 
+// Fetch all packets from Postgres for backfill
+function getAllPostgresPackets(limit = 100000): any[] {
+  try {
+    const sql = `SELECT packet_key, source_ref, workspace_id, ontology_version FROM atlas_packets WHERE packet_key IS NOT NULL LIMIT ${limit}`;
+    const wrappedSql = `SELECT COALESCE(json_agg(row_to_json(x)), '[]'::json) FROM (${sql}) x`;
+
+    const cmd = `docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -t -A -c`;
+    const output = execSync(
+      `${cmd} ${JSON.stringify(wrappedSql)}`,
+      { encoding: 'utf-8' }
+    );
+
+    const trimmed = output.trim();
+    if (!trimmed || trimmed === '[]') return [];
+
+    return JSON.parse(trimmed);
+  } catch (err) {
+    console.error('Error fetching all Postgres packets:', (err as Error).message);
+    return [];
+  }
+}
+
+// Batch upsert packets to Qdrant with payload enrichment
+async function upsertQdrantBatch(packets: any[]): Promise<{ success: number; failed: number; duration: number }> {
+  const startTime = Date.now();
+  const batchSize = 1000;
+  let success = 0;
+  let failed = 0;
+
+  for (let i = 0; i < packets.length; i += batchSize) {
+    const batch = packets.slice(i, i + batchSize);
+
+    try {
+      // Prepare points for upsert: search by source_ref, update payload with packet metadata
+      const upsertBody = {
+        points: batch.map((packet, idx) => ({
+          id: i + idx + 1,  // Use sequential IDs for simplicity
+          payload: {
+            packet_key: packet.packet_key,
+            source_ref: packet.source_ref,
+            workspace_id: packet.workspace_id || `snapshot-phase12-${new Date().toISOString().split('T')[0]}`,
+            ontology_version: packet.ontology_version || '1.0',
+            backfilled_at: new Date().toISOString()
+          }
+        }))
+      };
+
+      const response = execSync(
+        `curl -s -X POST http://127.0.0.1:6333/collections/codebase_chunks_768/points -H 'Content-Type: application/json' -d ${JSON.stringify(JSON.stringify(upsertBody))}`,
+        { encoding: 'utf-8', shell: '/bin/bash' }
+      );
+
+      const result = JSON.parse(response);
+      if (result.status === 'ok') {
+        success += batch.length;
+      } else {
+        console.error(`Batch ${i / batchSize + 1} failed:`, result);
+        failed += batch.length;
+      }
+    } catch (err) {
+      console.error(`Error upserting batch ${i / batchSize + 1}:`, (err as Error).message);
+      failed += batch.length;
+    }
+  }
+
+  const duration = Date.now() - startTime;
+  return { success, failed, duration };
+}
+
 // Main execution
 try {
   const report = generateReport();
@@ -179,7 +245,29 @@ try {
   });
 
   console.log(`\n✅ Report written to ${REPORT_FILE}`);
-  console.log(`\n💡 Analysis complete. Manual backfill implementation required.`);
+
+  // If in apply mode, execute the backfill
+  if (!isDryRun) {
+    console.log(`\n⏳ Fetching all ${report.current_state.postgres_packets} packets from Postgres...`);
+    const allPackets = getAllPostgresPackets(report.current_state.postgres_packets);
+    console.log(`   ✅ Fetched ${allPackets.length} packets`);
+
+    console.log(`\n⏳ Upserting ${allPackets.length} packets to Qdrant...`);
+    const upsertResult = await upsertQdrantBatch(allPackets);
+
+    console.log(`\n📊 Upsert Results`);
+    console.log(`   Success: ${upsertResult.success}`);
+    console.log(`   Failed: ${upsertResult.failed}`);
+    console.log(`   Duration: ${(upsertResult.duration / 1000).toFixed(2)}s`);
+
+    if (upsertResult.success > 0) {
+      console.log(`\n✅ Backfill complete! Re-run the proof matrix to verify coverage.`);
+    } else {
+      console.log(`\n❌ Backfill failed. Check Qdrant service and retry.`);
+    }
+  } else {
+    console.log(`\n💡 DRY-RUN: No changes made. Re-run without --dry-run to execute the backfill.`);
+  }
 
   process.exit(0);
 } catch (err) {

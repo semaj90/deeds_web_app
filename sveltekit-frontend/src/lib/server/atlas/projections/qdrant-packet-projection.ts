@@ -13,6 +13,8 @@
  * CRITICAL: packet_key must be identical across all collections for the same logical packet.
  */
 
+import { toQdrantPayloadFromEnrichedTreeNode, type EnrichedTreeNodeProjectionSeed } from '../enriched-tree-node-projections.js';
+
 export interface QdrantPayload {
   packet_key: string;
   source_ref: string;
@@ -113,6 +115,29 @@ export function toQdrantPayload(packet: SemanticPacketDomainObject): QdrantPaylo
     som_cluster_id: packet.somClusterId,
     som_cell_x: packet.somCellX,
     som_cell_y: packet.somCellY,
+  };
+}
+
+export function toQdrantPayloadFromStrictTreeNode(seed: EnrichedTreeNodeProjectionSeed): QdrantPayload {
+  const payload = toQdrantPayloadFromEnrichedTreeNode(seed);
+  return {
+    packet_key: payload.packet_key,
+    source_ref: payload.source_ref,
+    file_path: payload.file_path,
+    feature_id: seed.node.identity.feature_id,
+    feature_label: seed.node.identity.feature_label,
+    domain_class: seed.node.identity.domain_class ?? '',
+    title_id: seed.titleId ?? '',
+    tree_node_id: payload.tree_node_id,
+    content_hash: payload.content_hash,
+    workspace_id: seed.workspaceId,
+    workspace_revision: seed.workspaceRevision,
+    ontology_id: seed.ontologyId ?? null,
+    ontology_version: seed.ontologyVersion ?? null,
+    collection_name: seed.collectionName,
+    som_cluster_id: seed.somClusterId ?? null,
+    som_cell_x: seed.somCellX ?? null,
+    som_cell_y: seed.somCellY ?? null,
   };
 }
 

@@ -26,6 +26,7 @@ import { DIMENSIONS } from './property-dimensions';
 import {
   EvidenceStateSchema,
   KnowledgeResolutionSchema,
+  ClassificationPartOfSpeechSchema,
   VectorLaneStatusSchema,
 } from './contracts/classification-contracts';
 
@@ -43,6 +44,15 @@ export const IdentityChainSchema = z.object({
 });
 
 export type IdentityChain = z.infer<typeof IdentityChainSchema>;
+
+/**
+ * Strict identity chain for canonicalized tree-node rows.
+ */
+export const IdentityChainV2Schema = IdentityChainSchema.extend({
+  tree_node_id: z.string().min(1).describe('AST node ID or glyph key'),
+});
+
+export type IdentityChainV2 = z.infer<typeof IdentityChainV2Schema>;
 
 /**
  * Dense 768-dim primary semantic vector (native codebase chunk lane).
@@ -97,6 +107,7 @@ export const LexicalSchema = z
     method: z.enum(['bm25', 'bm42', 'tf_idf']).default('bm25'),
     term_count: z.number().int().min(0),
     top_terms: z.array(z.tuple([z.string(), z.number()])).max(20).describe('[term, score] pairs'),
+    part_of_speech: ClassificationPartOfSpeechSchema.describe('Primary POS tag if available'),
     computed_at: z.string().datetime().optional()
   });
 
@@ -107,6 +118,9 @@ export type Lexical = z.infer<typeof LexicalSchema>;
  */
 export const TopologySchema = z
   .object({
+    graph_revision: z.string().min(1).optional().nullable().describe('Graph revision used to compute the topology payload'),
+    pagerank_version: z.string().min(1).optional().nullable().describe('PageRank algorithm or provenance version'),
+    pagerank_raw: z.number().min(0).optional().nullable().describe('Unnormalized PageRank score before scaling'),
     pagerank_score: z.number().min(0).max(1).optional().nullable().describe('Node authority (0-1 normalized)'),
     som_cell_row: z.number().int().min(0).max(19).optional().nullable().describe('SOM grid row (0-19 for 20x20)'),
     som_cell_col: z.number().int().min(0).max(19).optional().nullable().describe('SOM grid col (0-19 for 20x20)'),
@@ -164,6 +178,7 @@ export const FeatureMatrixRowV1Schema = z.object({
   validation_errors: z.array(z.string()).default([]),
   feature_labels: z.array(z.string()).default([]).describe('Provenance-aware tags/labels for classification and clustering'),
   domain_class: z.string().min(1).nullable().optional(),
+  secondary_domains: z.array(z.string().min(1)).optional().nullable(),
   ontology_ids: z.array(z.string().min(1)).default([]),
   concept_ids: z.array(z.string().min(1)).default([]),
   runtime_evidence_refs: z.array(z.string().min(1)).default([]),
@@ -171,6 +186,16 @@ export const FeatureMatrixRowV1Schema = z.object({
 });
 
 export type FeatureMatrixRowV1 = z.infer<typeof FeatureMatrixRowV1Schema>;
+
+/**
+ * FeatureMatrixRowV2 — strict identity bridge with required tree_node_id.
+ */
+export const FeatureMatrixRowV2Schema = FeatureMatrixRowV1Schema.extend({
+  schema_version: z.literal('2.0').default('2.0'),
+  identity: IdentityChainV2Schema,
+});
+
+export type FeatureMatrixRowV2 = z.infer<typeof FeatureMatrixRowV2Schema>;
 
 /**
  * Safe parsing with detailed error reporting.
@@ -183,7 +208,7 @@ export async function parseFeatureRow(
     return { ok: true, row };
   } catch (e) {
     if (e instanceof z.ZodError) {
-      return { ok: false, errors: e.errors.map(err => `${err.path.join('.')}: ${err.message}`) };
+      return { ok: false, errors: e.issues.map(err => `${err.path.join('.')}: ${err.message}`) };
     }
     return { ok: false, errors: ['Unknown parsing error'] };
   }
@@ -210,6 +235,7 @@ export function createFeatureRow(input: {
   concept_ids?: string[];
   runtime_evidence_refs?: string[];
   test_evidence_refs?: string[];
+  secondary_domains?: string[];
   workspace_revision?: string;
 }): FeatureMatrixRowV1 {
   return {
@@ -231,9 +257,40 @@ export function createFeatureRow(input: {
     validation_errors: [],
     feature_labels: input.feature_labels ?? [],
     domain_class: input.domain_class ?? null,
+    secondary_domains: input.secondary_domains ?? [],
     ontology_ids: input.ontology_ids ?? [],
     concept_ids: input.concept_ids ?? [],
     runtime_evidence_refs: input.runtime_evidence_refs ?? [],
     test_evidence_refs: input.test_evidence_refs ?? [],
   };
+}
+
+/**
+ * Create a feature row for the authoritative bridge.
+ */
+export function createFeatureRowV2(input: {
+  identity: IdentityChainV2;
+  dense_768?: Dense768;
+  dense_384?: Dense384;
+  latent_64?: Latent64;
+  lexical?: Lexical;
+  topology?: Topology;
+  classifiers?: Classifiers;
+  feature_labels?: string[];
+  lane_status?: z.infer<typeof VectorLaneStatusSchema> | null;
+  evidence_state?: z.infer<typeof EvidenceStateSchema> | null;
+  knowledge_resolution?: z.infer<typeof KnowledgeResolutionSchema> | null;
+  domain_class?: string | null;
+  ontology_ids?: string[];
+  concept_ids?: string[];
+  runtime_evidence_refs?: string[];
+  test_evidence_refs?: string[];
+  secondary_domains?: string[];
+  workspace_revision?: string;
+}): FeatureMatrixRowV2 {
+  return FeatureMatrixRowV2Schema.parse({
+    ...createFeatureRow(input),
+    schema_version: '2.0',
+    identity: input.identity,
+  });
 }

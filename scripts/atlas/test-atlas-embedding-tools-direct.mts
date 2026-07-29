@@ -70,6 +70,7 @@ async function main() {
 
   try {
     const { default: Redis } = await import('ioredis');
+    const { getQdrantManager } = await import('../../sveltekit-frontend/src/lib/server/vector/qdrant-manager.js');
     const redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
       port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -182,26 +183,34 @@ async function main() {
     // ════════════════════════════════════════════════════════════════════
     console.log('🔧 Tool 3: atlas.embedding_neighbors');
     try {
-      const neighborsQuery = {
-        method: 'qdrant_search',
+      const qdrant = getQdrantManager();
+      const searchResult = await qdrant.denseSearch({
+        query: 'test-atlas-embedding-tools-direct',
         collection: 'codebase_chunks_768',
-        vector: testEmbedding,
-        limit: 10,
+        queryVector: testEmbedding,
         vectorName: 'content',
-        withPayload: ['packet_key', 'cluster_id', 'tags'],
-      };
+        limit: 10,
+        scoreThreshold: 0,
+      });
+      const hits = Array.isArray(searchResult?.results) ? searchResult.results : [];
 
       result.tools.embedding_neighbors.status = 'PASS';
       result.tools.embedding_neighbors.details = {
-        queryStructure: {
-          collection: neighborsQuery.collection,
-          vectorDim: neighborsQuery.vector.length,
-          limit: neighborsQuery.limit,
-          payload: neighborsQuery.withPayload,
+        qdrantSearch: searchResult?.metadata ?? {
+          collection: 'codebase_chunks_768',
+          vectorDim: testEmbedding.length,
+          limit: 10,
         },
-        readyForExecution: true,
+        hitCount: hits.length,
+        sampleHit: hits[0]
+          ? {
+              id: hits[0].id,
+              score: hits[0].score,
+              payloadKeys: Object.keys(hits[0].payload ?? {}),
+            }
+          : null,
       };
-      console.log(`   ✅ PASS: Built Qdrant query structure\n`);
+      console.log(`   ✅ PASS: Executed Qdrant neighbor search\n`);
     } catch (err) {
       result.tools.embedding_neighbors.status = 'FAIL';
       result.tools.embedding_neighbors.details = {
@@ -220,12 +229,23 @@ async function main() {
         redis.keys('gpu:karpathy:keywords:*').catch(() => []),
         redis.keys('som:centroid:*').catch(() => []),
       ]);
+      const qdrant = getQdrantManager();
+      const neighborSearch = await qdrant.denseSearch({
+        query: 'test-atlas-embedding-tools-direct',
+        collection: 'codebase_chunks_768',
+        queryVector: testEmbedding,
+        vectorName: 'content',
+        limit: 10,
+        scoreThreshold: 0,
+      }).catch(() => null);
+      const neighborHits = Array.isArray((neighborSearch as any)?.results) ? (neighborSearch as any).results : [];
 
       result.tools.embedding_all_tags.status = 'PASS';
       result.tools.embedding_all_tags.details = {
         parallelExecution: {
           keywordKeysFound: keywordKeys.length,
           somCellsFound: somCentroids.length,
+          neighborHitsFound: neighborHits.length,
           packetKey: 'packet:1f794f097f8d',
           timestamp: new Date().toISOString(),
           vectorLane: 'DENSE_768',

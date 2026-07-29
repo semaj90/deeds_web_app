@@ -12,18 +12,31 @@
  * - Ranking signals: semantic_similarity (from embedding), keyword_match_score, topology_weight
  */
 
-import { qdrant } from '../vector/qdrant-manager.js';
-import { db } from '../db/client.js';
-import { codebase_chunk_index, feature_statistics } from '../db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { codebaseChunkIndex } from '../db/schema-postgres.js';
+import { sql } from 'drizzle-orm';
+
+async function getDb() {
+  const mod = await import('../db/client.js');
+  return mod.db;
+}
+
+async function getQdrant() {
+  const mod = await import('../vector/qdrant-manager.js');
+  return mod.qdrant;
+}
 
 export interface EnrichedPayload {
   // Feature identity
+  packet_key: string;
   feature_id: string;
   source_ref: string;
   directory_path: string;
   symbol: string;
   kind: string;
+  tree_node_id: string | null;
+  content_hash: string | null;
+  workspace_revision: string | null;
+  feature_label: string | null;
 
   // Statistics (from feature_statistics)
   pagerank: number;
@@ -76,14 +89,15 @@ export class QdrantPayloadEnricher {
     try {
       // Fetch chunks to enrich
       let chunks;
+      const db = await getDb();
       if (chunkIds.length > 0) {
         chunks = await db
           .select()
-          .from(codebase_chunk_index)
+          .from(codebaseChunkIndex)
           .where(/* WHERE id IN chunkIds */);
       } else {
         // Enrich all chunks
-        chunks = await db.select().from(codebase_chunk_index);
+        chunks = await db.select().from(codebaseChunkIndex);
       }
 
       console.log(`Enriching ${chunks.length} chunks...`);
@@ -97,7 +111,7 @@ export class QdrantPayloadEnricher {
           try {
             const payload = await this.buildPayload(chunk);
             payloads.push({
-              id: chunk.qdrant_id,
+              id: chunk.qdrantId ?? chunk.qdrant_id ?? chunk.id,
               payload: payload
             });
             success++;
@@ -131,41 +145,72 @@ export class QdrantPayloadEnricher {
   }
 
   private async buildPayload(chunk: any): Promise<EnrichedPayload> {
-    // Fetch feature statistics
-    const stats = await db
-      .select()
-      .from(feature_statistics)
-      .where(eq(feature_statistics.feature_id, chunk.feature_id))
-      .limit(1);
+    const sourceRef = String(
+      chunk.sourceRef ??
+      chunk.relativePath ??
+      chunk.source_ref ??
+      chunk.relative_path ??
+      ''
+    ).trim();
 
-    const stat = stats[0] || {};
+    const packetRows = sourceRef
+      ? await (await getDb()).execute(sql`
+      SELECT packet_key, tree_node_id, feature_label, sha256, metadata
+      FROM atlas_packets
+      WHERE source_ref = ${sourceRef}
+         OR canonical_source_ref = ${sourceRef}
+         OR source_path = ${sourceRef}
+         OR file_path = ${sourceRef}
+      ORDER BY updated_at DESC NULLS LAST, created_at DESC NULLS LAST
+      LIMIT 1
+    `)
+      : { rows: [] as any[] };
+    const packet = packetRows.rows[0] as any | undefined;
+    const packetMetadata = (packet?.metadata ?? {}) as Record<string, unknown>;
+    const workspaceRevision =
+      typeof packetMetadata.workspace_revision === 'string'
+        ? packetMetadata.workspace_revision
+        : typeof packetMetadata.workspaceRevision === 'string'
+          ? packetMetadata.workspaceRevision
+          : typeof packetMetadata.revision === 'string'
+            ? packetMetadata.revision
+            : null;
 
     // Parse noun_terms from JSONB
-    const nounTerms = chunk.noun_terms ? Object.keys(chunk.noun_terms as Record<string, any>) : [];
+    const nounTerms = chunk.noun_terms
+      ? Object.keys(chunk.noun_terms as Record<string, any>)
+      : Array.isArray(chunk.semanticTags)
+        ? chunk.semanticTags.map((tag: unknown) => String(tag))
+        : [];
 
     // Extract semantic tags from analysis
     const semanticTags = this.extractSemanticTags(chunk);
 
     // Build payload
     const payload: EnrichedPayload = {
-      feature_id: chunk.feature_id,
-      source_ref: chunk.source_ref,
-      directory_path: chunk.directory_path || this.extractDirectoryPath(chunk.source_ref),
-      symbol: chunk.symbol || '',
-      kind: chunk.kind || '',
+      packet_key: packet?.packet_key ? String(packet.packet_key) : String(chunk.packet_key ?? chunk.id ?? chunk.qdrant_id ?? chunk.source_ref),
+      feature_id: String(chunk.featureId ?? chunk.feature_id ?? sourceRef ?? chunk.id ?? chunk.qdrantId ?? 'unknown'),
+      source_ref: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
+      directory_path: chunk.directoryPath || chunk.directory_path || this.extractDirectoryPath(sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? '')),
+      symbol: chunk.symbol || chunk.functionSymbol || '',
+      kind: chunk.kind || chunk.sourceKind || chunk.source_kind || '',
+      tree_node_id: packet?.tree_node_id ? String(packet.tree_node_id) : (chunk.tree_node_id ?? null),
+      content_hash: packet?.sha256 ? String(packet.sha256) : (chunk.contentHash ?? chunk.content_hash ?? null),
+      workspace_revision: workspaceRevision,
+      feature_label: packet?.feature_label ?? chunk.feature_label ?? null,
 
-      pagerank: stat.pagerank || 0,
-      hits_authority: stat.hits_authority || 0,
-      hits_hub: stat.hits_hub || 0,
-      community: stat.community || 0,
-      som_cluster: stat.som_cluster || 0,
-      som_cell_x: stat.som_cell_x || 0,
-      som_cell_y: stat.som_cell_y || 0,
-      cluster_degree: stat.cluster_degree || 0,
-      in_degree: stat.in_degree || 0,
-      out_degree: stat.out_degree || 0,
-      betweenness: stat.betweenness || 0,
-      freshness_days: stat.freshness_days || 0,
+      pagerank: chunk.pageRankScore || chunk.page_rank_score || 0,
+      hits_authority: chunk.hitsAuthority || chunk.hits_authority || 0,
+      hits_hub: chunk.hitsHub || chunk.hits_hub || 0,
+      community: chunk.communityId || chunk.community_id || 0,
+      som_cluster: chunk.somCluster || chunk.som_cluster || 0,
+      som_cell_x: chunk.somCellX || chunk.som_cell_x || 0,
+      som_cell_y: chunk.somCellY || chunk.som_cell_y || 0,
+      cluster_degree: chunk.clusterDegree || chunk.cluster_degree || 0,
+      in_degree: chunk.inDegree || chunk.in_degree || 0,
+      out_degree: chunk.outDegree || chunk.out_degree || 0,
+      betweenness: chunk.betweenness || 0,
+      freshness_days: chunk.freshnessDays || chunk.freshness_days || 0,
 
       noun_terms: nounTerms,
       keywords: this.extractKeywords(chunk),
@@ -173,10 +218,10 @@ export class QdrantPayloadEnricher {
       error_patterns: this.extractErrorPatterns(chunk),
       semantic_tags: semanticTags,
 
-      chunk_summary: chunk.summary || '',
-      chunk_start_line: chunk.start_line || 0,
-      chunk_end_line: chunk.end_line || 0,
-      language: this.detectLanguage(chunk.source_ref),
+      chunk_summary: chunk.signature || chunk.summary || '',
+      chunk_start_line: chunk.lineStart || chunk.start_line || 0,
+      chunk_end_line: chunk.lineEnd || chunk.end_line || 0,
+      language: this.detectLanguage(sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? '')),
 
       enriched_at: new Date().toISOString(),
       enriched_version: '1.0'
@@ -206,13 +251,16 @@ export class QdrantPayloadEnricher {
     // Extract from noun_terms, summary, or content
     const keywords: Set<string> = new Set();
 
-    if (chunk.noun_terms) {
+    if (chunk.nounTerms) {
+      Object.keys(chunk.nounTerms).forEach(term => keywords.add(term));
+    } else if (chunk.noun_terms) {
       Object.keys(chunk.noun_terms).forEach(term => keywords.add(term));
     }
 
     // Extract from summary (simple noun extraction)
-    if (chunk.summary) {
-      const words = chunk.summary.toLowerCase().split(/\W+/);
+    const summary = chunk.signature || chunk.summary || '';
+    if (summary) {
+      const words = String(summary).toLowerCase().split(/\W+/);
       words.filter((w: string) => w.length > 3).forEach((w: string) => keywords.add(w));
     }
 
@@ -230,7 +278,9 @@ export class QdrantPayloadEnricher {
       });
     }
 
-    if (chunk.error_pattern) {
+    if (chunk.errorPattern) {
+      tags.add(`error:${chunk.errorPattern}`);
+    } else if (chunk.error_pattern) {
       tags.add(`error:${chunk.error_pattern}`);
     }
 
@@ -256,6 +306,8 @@ export class QdrantPayloadEnricher {
     // Add tags based on kind
     if (chunk.kind) {
       tags.add(`kind:${chunk.kind}`);
+    } else if (chunk.sourceKind) {
+      tags.add(`kind:${chunk.sourceKind}`);
     }
 
     // Add tags based on directory structure
@@ -267,7 +319,9 @@ export class QdrantPayloadEnricher {
     });
 
     // Add tags based on language
-    const lang = this.detectLanguage(chunk.source_ref);
+    const lang = this.detectLanguage(
+      String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? '')
+    );
     tags.add(`lang:${lang}`);
 
     // Add clustering tags
@@ -287,6 +341,7 @@ export class QdrantPayloadEnricher {
     // Use Qdrant client to upsert points with enriched payloads
     // Implementation depends on qdrant-js client API
     // This is a stub — actual implementation uses the Qdrant HTTP API
+    const qdrant = await getQdrant();
 
     for (const item of payloads) {
       await qdrant.upsert(this.qdrantCollection, {

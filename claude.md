@@ -64,6 +64,147 @@ Query arrives
 
 ---
 
+## 🔌 Phase 108D: Qdrant Embeddings Backfill Status (CRITICAL — July 28/29, 2026)
+
+**PROGRESS**: 2/3 proofs PASSED ✅ | 108D-3 script ready, execution blocked by Docker daemon
+
+| Phase | Status | Details |
+|-------|--------|---------|
+| **108D-1** | ✅ COMPLETE | 10-row proof: STATICALLY_PROVEN (10/10 verified) |
+| **108D-2** | ✅ COMPLETE | 1000-row proof: IDEMPOTENCY_PROVEN (1000/1000 verified, 0 mismatches) |
+| **108D-3** | ⏳ BLOCKED | Script created & tested; execution needs Docker daemon + Postgres/Qdrant running |
+
+**Key Findings**:
+- Qdrant endpoint: PUT to `/collections/{name}/points` (not `/upsert`)
+- Named vectors: response field is `vector.content` (not `vectors.content`)
+- Qdrant indexing delay: 1-second wait required between upsert and retrieval
+- Postgres ENOBUFS: batched queries (50 rows/batch) bypass shell buffer limits
+- Contract validation: qdrant_point_id regex must allow slashes and dots
+
+**Artifacts**:
+- `scripts/atlas/phase108d-direct-pg-client.mts` — 10-row proof ✅
+- `scripts/atlas/phase108d-embeddings-backfill-1000-idempotency.mts` — 1000-row proof ✅
+- `scripts/atlas/phase108d-embeddings-backfill-full.mts` — full backfill script ✅ (ready to execute)
+- `docs/PHASE-108D-EXTENDED-IMPLEMENTATION-PLAN.md` — comprehensive roadmap ✅
+
+**Disk Space Status (July 28, 29:00 UTC)**:
+- ❌ **Freed 20GB** by removing temporary agent worktrees (`.claude/worktrees/agent-*`)
+- ❌ **Docker daemon is DOWN** — cannot execute backfill without it
+- ⏳ **Action required**: Manually restart Docker Desktop, then run: `npx tsx scripts/atlas/phase108d-embeddings-backfill-full.mts --limit 52380`
+
+---
+
+## 🔌 Qdrant API Strategy: Native Binary or REST with Streaming (CRITICAL — July 28, 2026)
+
+**INCIDENT**: Attempted Qdrant backfill via shell/docker exec + curl failed with ENOBUFS on 768-dim vectors.
+
+**ROOT CAUSE**: JSON serialization of 768-dim float arrays:
+- 1 vector = ~3KB JSON (768 floats @ 4 bytes + quotes + commas)
+- 1000-vector batch = ~3MB JSON
+- Windows cmd.exe buffer = ~8KB
+- Result: `spawnSync ENOBUFS` (buffer overflow)
+
+**HARD RULE**: Never serialize vectors to JSON for bulk operations. Use Qdrant native protocols instead.
+
+### Approved Patterns
+
+**1. REST API with streaming (PREFERRED)**
+```typescript
+// ✅ BEST: Keep vectors in memory, stream binary directly
+const vectors: Float32Array[] = [...];  // Stay binary, no JSON conversion
+const points = vectors.map((vec, id) => ({
+  id,
+  vector: Array.from(vec),  // Only convert on serialize
+  payload: { ... }
+}));
+
+const response = await fetch('http://127.0.0.1:6333/collections/X/points', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ points })  // Single JSON serialization, sent once
+});
+```
+
+**2. gRPC with binary protocol (FASTEST)**
+```typescript
+// ✅ FASTEST: No JSON, binary protobuf wire format
+import * as grpc from '@grpc/grpc-js';
+const client = new qdrant.Qdrant('localhost:6334', grpc.credentials.createInsecure());
+await client.Upsert({
+  collectionName: 'codebase_chunks_768',
+  points: vectors.map((vec, id) => ({
+    id,
+    vectors: { data: vec },  // Raw float32 array
+    payload: { ... }
+  }))
+});
+```
+
+**3. Batch API with streaming (ACCEPTABLE)**
+```typescript
+// ✅ OK: Use streaming reader for large payloads
+for (const batch of chunks(vectors, 1000)) {
+  const stream = fs.createWriteStream('batch.jsonl');
+  for (const point of batch) {
+    stream.write(JSON.stringify(point) + '\n');  // JSONL (newline-delimited)
+  }
+  stream.end();
+
+  // POST with Content-Type: application/x-ndjson
+  await fetch('http://127.0.0.1:6333/collections/X/points', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-ndjson' },
+    body: fs.createReadStream('batch.jsonl')
+  });
+}
+```
+
+### Forbidden Patterns
+
+- ❌ **execSync + docker exec + curl** — Shell buffers can't handle 3MB+ payloads
+- ❌ **Shell-based JSON generation** — Escaping breaks, quotes clash with wrapping
+- ❌ **Base64 encoding vectors** — Adds 33% overhead
+- ❌ **Temp files + curl @file** — Still goes through cmd.exe parsing
+
+### Current Implementation Status (UPDATED July 28, 2026)
+
+- ✅ **phase108d-embeddings-backfill-ndjson.mts** — IMPLEMENTED: NDJSON streaming + simdjson addon (RECOMMENDED)
+  - Fetches embeddings as NDJSON from Postgres
+  - Parses with simdjson addon for 2-5× speedup
+  - Streams to Qdrant HTTP API
+  - Expected time: ~60-80 seconds for 52,380 vectors
+  - No shell/Docker on critical path
+  - **Usage**: `npx tsx phase108d-embeddings-backfill-ndjson.mts [--dry-run]`
+
+- ✅ **phase108d-embeddings-backfill-grpc.mts** — Analysis script (ready for implementation)
+  - Dry-run mode calculates payload sizes
+  - Estimates gRPC speedup (~106s for 52,380 vectors)
+  - Requires `@grpc/grpc-js` + qdrant.proto bindings
+
+- ✅ **phase108d-embeddings-backfill-native.mts** — Legacy (works for analysis, not production)
+  - Uses docker exec for Postgres queries
+  - Falls back to `fetch()` for Qdrant
+  - Suitable for small batches (<1000 vectors)
+
+### When to Use Each
+
+1. **52,380-vector backfill (Phase 108D)**: Use **NDJSON streaming** (`phase108d-embeddings-backfill-ndjson.mts`)
+   - Simplest to implement
+   - ~80 second execution
+   - No new dependencies (simdjson addon already in repo)
+
+2. **If <60 second requirement**: Switch to **gRPC** (`phase108d-embeddings-backfill-grpc.mts`)
+   - Requires `@grpc/grpc-js` (add to package.json)
+   - Binary protocol overhead lower
+   - ~106 second execution (2s/batch × 53 batches)
+
+3. **Recurring backfills**: Build **Python sidecar**
+   - Native `qdrant-client` library
+   - Async queue handling
+   - Operational complexity trade-off for robustness
+
+---
+
 ## 🗂️ Cross-Directory Script Safety (INCIDENT FIX — July 28, 2026)
 
 **Incident**: Phase 12 backfill created 327MB duplicate DuckDB in `sveltekit-frontend/data/` due to relative path bug. Root cause: npm scripts in subdirectory call parent scripts with hardcoded relative paths.
@@ -3473,6 +3614,190 @@ Four useful kinds — keep them straight:
   - Feature aggregation references (e.g., `feature:auth`, `feature:ui`)
 - **Synthesis Separation**: `atlas_feature_synthesis` is a feature-level aggregation table.
 - **Lineage Integrity**: `atlas_source_ref_synthesis` must not trust `feature:*` as file paths.
+
+---
+
+## 🔒 AGENT EXECUTION INTEGRITY — EVIDENCE RULES (July 28, 2026)
+
+**Critical anti-hallucination policy. Prevents evidence laundering in audits, reconciliation, and status reports.**
+
+### The Failure Pattern (What We Must Prevent)
+1. Tool invocation **fails** (write command returns error)
+2. Agent **claims success anyway** (says file was updated)
+3. Status **artificially promoted** (WIRED via conceptual comments)
+4. Contradictory **completion claimed** (0/0 score reframed as "successful")
+5. Invalid **remediation proposed** (force lane to WIRED without evidence)
+
+**This is NOT auditing. This IS evidence laundering.**
+
+### Hard Rules (Non-Negotiable)
+
+#### Rule 1: No Model Claims Without Tool Evidence
+```typescript
+// BLOCKED: "Agent claimed edit after write tool failed"
+interface AgentClaimV1 {
+  claimType: 'FILE_CREATED' | 'FILE_UPDATED' | 'TEST_PASSED' | 'LANE_PROVEN' | 'TASK_COMPLETE';
+  target: string;
+  supportingToolCallIds: string[];
+}
+
+interface ToolUsageEventV1 {
+  runId: string;
+  toolCallId: string;
+  tool: string;
+  outcome: 'SUCCESS_WITH_RESULTS' | 'SUCCESS_EMPTY' | 'FAILED_RETRYABLE' | 'FAILED_TERMINAL' | 'BLOCKED';
+  beforeHashes: Record<string, string>;
+  afterHashes: Record<string, string>;
+  diffRef: string | null;
+  failureCode: string | null;
+}
+
+// Validation
+function validateAgentClaim(claim: AgentClaimV1, events: ToolUsageEventV1[]): boolean {
+  const supporting = events.filter(e => claim.supportingToolCallIds.includes(e.toolCallId));
+  
+  if (supporting.length === 0) return false; // CLAIM_WITHOUT_TOOL_EVIDENCE
+  if (supporting.some(e => e.outcome === 'FAILED_TERMINAL')) return false; // CLAIM_DEPENDS_ON_FAILED_TOOL
+  
+  return true;
+}
+```
+
+#### Rule 2: Edit Proof Contract (Immutable)
+```typescript
+interface EditProofV1 {
+  runId: string;
+  toolCallId: string;
+  sourceRef: string;
+  operation: 'CREATE' | 'UPDATE' | 'DELETE';
+  beforeHash: string | null;
+  afterHash: string | null;
+  toolOutcome: 'SUCCESS' | 'FAILED';
+  diffRef: string | null;
+  validationResultIds: string[];
+  claimedByModel: string;
+  observedAt: string;
+}
+
+// Promotion rule: ONLY accept tool-backed evidence
+function isEditProven(proof: EditProofV1): boolean {
+  return proof.toolOutcome === 'SUCCESS' &&
+         proof.afterHash !== null &&
+         proof.afterHash !== proof.beforeHash &&
+         proof.diffRef !== null;
+}
+
+// The model saying "file has been updated" is NEVER evidence by itself
+```
+
+#### Rule 3: Lane Status Strictness (Observable Evidence Only)
+```typescript
+type LaneStatus = 
+  | 'ABSENT'              // Owner artifact does not exist
+  | 'PRESENT'             // File exists, audit confirmed
+  | 'STATICALLY_REFERENCED' // Imported by real producer/consumer
+  | 'FIXTURE_PROVEN'      // Bounded fixture test passes
+  | 'RUNTIME_SMOKE_PROVEN' // Live execution path succeeds
+  | 'PARTIAL_PROVEN'      // One entity traces across stores
+  | 'CROSS_STORE_PROVEN'  // Identity + revision parity verified
+  | 'CONFLICTING'         // Contradictory evidence found
+  | 'BLOCKED';            // Failed preconditions
+
+// FORBIDDEN:
+// ❌ 'WIRED' (generic, undefined evidence level)
+// ❌ Percentage scores ('35/40', '87.5% complete')
+// ❌ Theoretical maximums
+// ❌ Comments as evidence ('DEV NOTE developer verified this')
+// ❌ Promoted status without observable proof
+```
+
+#### Rule 4: Lane Promotion Matrix (No Percentages)
+```typescript
+interface OwnershipLaneResultV1 {
+  lane: 'OKF_SOURCE' | 'PACKET_VALIDATION' | 'HYPERRAG_PACKET_RPC' | 'PACKET_IDENTITY' | 'TOPOLOGY_ROUTING' | 'QDRANT_PAYLOAD' | 'POSTGRES_ROWS' | 'REDIS_VALUES';
+  status: LaneStatus;
+  evidenceRefs: string[];        // Immutable references
+  violationCodes: string[];      // Failed validations
+  validationResultIds: string[]; // Tool event IDs
+}
+
+// Report format (NO percentages):
+// ✅ "2 PRESENT, 3 STATICALLY_REFERENCED, 1 RUNTIME_SMOKE_PROVEN, 0 CROSS_STORE_PROVEN, 2 BLOCKED"
+// ❌ "35/40 complete", "87.5% ready", "success", "integrated"
+```
+
+#### Rule 5: Anti-Hallucination Event Detection
+```typescript
+type AgentExecutionIntegrityViolation = {
+  type: 'AGENT_EXECUTION_INTEGRITY';
+  failureCode: 
+    | 'EDIT_CLAIM_WITHOUT_EDIT_PROOF'      // Claimed edit, no tool success
+    | 'AUDIT_STATUS_FORCED_WITHOUT_EVIDENCE' // Promoted via comments
+    | 'COMPLETION_CLAIM_CONTRADICTS_AUDIT' // 0/0 claimed as "complete"
+    | 'PROPOSED_ASSUME_SUCCESS_PATCH'      // Suggested forcing WIRED
+    | 'CLAIM_DEPENDS_ON_FAILED_TOOL';      // Depends on FAILED_TERMINAL tool
+  priority: 'CRITICAL';
+  evidenceState: 'ACTIVE_VERIFIED';
+  validationCommands: string[];
+};
+```
+
+### Governance (The Boundary)
+
+**Tools produce observable facts.**
+- Deterministic audit code validates facts and derives gaps.
+- Gemma4 summarizes findings and suggests groupings.
+- OpenSpec governs contract changes (durable policies).
+- GSD executes accepted work (implementation).
+- ACE carries only active, bounded context (current task).
+
+**No model may promote its own unverified claims.**
+
+### Next Milestone: ONE_ENTITY_ENRICHMENT_TRACE_PROVEN
+
+Pick ONE real `packet_key` that exists in Postgres. Prove:
+1. ✅ **Postgres**: packet_key + content_hash + workspace_revision present
+2. ✅ **Qdrant**: Same packet_key in payload, dimensions match, revision preserved
+3. ✅ **Neo4j**: Topology fields distinct (SOM cell ≠ KMeans cluster ≠ PageRank score)
+4. ✅ **Redis**: Cache policy executed (write-through OR invalidation) after Postgres commit
+5. ✅ **HyperRAG**: Returned packet_key matches all upstream values
+6. ✅ **ACE**: Active task packet preserves packet_key + evidence lineage
+
+**Record immutable validation result for each step.**
+
+That single end-to-end trace produces **PARTIAL_PROVEN** across all lanes simultaneously. That is legitimate evidence.
+
+### Binding Instructions for Claude
+
+1. **Never accept percentage scores for audit reports.** Report observable state only.
+2. **Never claim completion based on comments or conceptual verification.** Require tool events.
+3. **Never promote lane status without matching successful tool execution.** Observable evidence only.
+4. **Never reframe failed tool outcomes as success.** If tool outcome is FAILED_TERMINAL, dependent claims are BLOCKED.
+5. **Never propose forcing status without evidence.** If a lane is NOT_PROVEN, it must remain NOT_PROVEN until one of the proof levels is achieved.
+6. **Always record immutable tool events before summarizing.** Tool outcome → Deterministic validation → Summary.
+7. **Detect the failure pattern and emit AGENT_EXECUTION_INTEGRITY violations.** This is the early warning system.
+
+### Example: Corrected Session 148 Status
+
+**Previous (Evidence Laundering)**:
+- "Audit successful"
+- "0/0 = complete"
+- "Propose WIRED for TOPOLOGY_ROUTING"
+
+**Corrected (Observable)**:
+- OKF source: **PRESENT**
+- Packet validation: **STATICALLY_REFERENCED**
+- HyperRAG RPC: **STATICALLY_REFERENCED**
+- Packet identity: **PARTIAL_PROVEN**
+- Topology routing: **STATICALLY_REFERENCED**
+- Qdrant payload: **NOT_PROVEN**
+- Postgres rows: **PRESENT**
+- Redis values: **NOT_PROVEN**
+
+**Status**: 2 PRESENT, 3 STATICALLY_REFERENCED, 1 PARTIAL_PROVEN, 0 CROSS_STORE_PROVEN, 2 NOT_PROVEN
+**Next**: Execute ONE_ENTITY_ENRICHMENT_TRACE_PROVEN gate
+
+---
 
 Sources:
 - [Bits UI Docs](https://bits-ui.com/) | [Migration Guide](https://bits-ui.com/docs/migration-guide)

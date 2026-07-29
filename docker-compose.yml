@@ -448,6 +448,7 @@ services:
     volumes:
       - couchdb_data:/opt/couchdb/data
       - couchdb_config:/opt/couchdb/etc/local.d
+      - ./docker/couchdb/local.d/10-single-node.ini:/opt/couchdb/etc/local.d/10-single-node.ini:ro
     networks:
       - legal-ai-network
     healthcheck:

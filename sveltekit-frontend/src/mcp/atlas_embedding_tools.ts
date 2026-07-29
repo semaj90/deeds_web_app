@@ -1,6 +1,23 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SOURCE_EMBEDDING_DIMENSION, SOURCE_QDRANT_COLLECTION } from "../lib/server/embedding/embedding-contract.js";
+import { getQdrantManager } from "../lib/server/vector/qdrant-manager.js";
+
+const SOURCE_PAYLOAD_FIELDS = [
+  'packet_key',
+  'source_ref',
+  'feature_id',
+  'content_hash',
+  'workspace_revision',
+  'representation_id',
+  'representation_name',
+  'dimensions',
+  'normalization',
+  'qdrant_point_id',
+  'qdrant_collection',
+  'cluster_id',
+  'tags',
+] as const;
 
 export function resolveRedisOverrides(redisUrl?: string) {
   if (!redisUrl) return {};
@@ -111,17 +128,17 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
               {
                 type: 'text',
                 text: JSON.stringify(
-                  {
-                    status: 'success',
-                    ...parsePacketIdentity({ packetKey, sourceRef }),
-                    keywords: topKeywords,
-                    total_centroids_checked: keywordKeys.length,
-                    embedding_dimension: embedding.length,
-                    vector_lane: 'dense_768',
-                  },
-                  null,
-                  2
-                ),
+                {
+                  status: 'success',
+                  ...parsePacketIdentity({ packetKey, sourceRef }),
+                  keywords: topKeywords,
+                  total_centroids_checked: keywordKeys.length,
+                  embedding_dimension: embedding.length,
+                  vector_lane: 'DENSE_768',
+                },
+                null,
+                2
+              ),
               },
             ],
           };
@@ -264,6 +281,17 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
     },
     async ({ packetKey, sourceRef, embedding, limit }) => {
       try {
+        const qdrant = getQdrantManager();
+        const searchResult = await qdrant.denseSearch({
+          query: sourceRef ?? packetKey,
+          collection: SOURCE_QDRANT_COLLECTION,
+          queryVector: embedding,
+          vectorName: 'content',
+          limit,
+          scoreThreshold: 0,
+        });
+        const hits = Array.isArray(searchResult?.results) ? searchResult.results : [];
+
         return {
           content: [
             {
@@ -273,14 +301,19 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
                   status: 'success',
                   ...parsePacketIdentity({ packetKey, sourceRef }),
                   neighbor_query: {
-                    method: 'qdrant_points_query',
+                    method: 'qdrant_dense_search',
                     collection: SOURCE_QDRANT_COLLECTION,
-                    vector: embedding,
-                    limit,
                     vectorName: 'content',
-                    withPayload: ['packet_key', 'cluster_id', 'tags'],
+                    limit,
+                    withPayload: SOURCE_PAYLOAD_FIELDS,
                   },
-                  note: 'This query structure should be passed to Qdrant named-vector query flow for neighbor retrieval',
+                  hits: hits.map((hit) => ({
+                    id: hit.id,
+                    score: Math.round(hit.score * 1000) / 1000,
+                    payload: hit.payload ?? null,
+                  })),
+                  total_hits: hits.length,
+                  metadata: searchResult?.metadata ?? null,
                 },
                 null,
                 2
@@ -345,6 +378,7 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
         const { createAtlasRedisClient, VECTOR_LANE_REGISTRY } = await import(
           '../../../scripts/atlas/lib/redis-client-factory.mjs'
         );
+        const qdrant = getQdrantManager();
 
         const redis = createAtlasRedisClient(redisOverrides);
         await redis.connect();
@@ -397,13 +431,21 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
 
           // Construct neighbor query
           const neighborsQuery = {
-            method: 'qdrant_search' as const,
+            method: 'qdrant_dense_search' as const,
             collection: SOURCE_QDRANT_COLLECTION,
-            vector: embedding,
             limit: neighborLimit,
             vectorName: 'content',
-            withPayload: ['packet_key', 'cluster_id', 'tags'],
+            withPayload: SOURCE_PAYLOAD_FIELDS,
           };
+          const neighborSearch = await qdrant.denseSearch({
+            query: sourceRef ?? packetKey,
+            collection: SOURCE_QDRANT_COLLECTION,
+            queryVector: embedding,
+            limit: neighborLimit,
+            vectorName: 'content',
+            scoreThreshold: 0,
+          });
+          const neighborHits = Array.isArray((neighborSearch as any)?.results) ? (neighborSearch as any).results : [];
 
           return {
             content: [
@@ -414,10 +456,16 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
                     status: 'success',
                     ...parsePacketIdentity({ packetKey, sourceRef }),
                     timestamp: new Date().toISOString(),
-                    vectorLane: VECTOR_LANE_REGISTRY?.DENSE_768?.role || 'DENSE_768',
+                    vectorLane: 'DENSE_768',
+                    vectorRole: VECTOR_LANE_REGISTRY?.DENSE_768?.role || 'CANONICAL_SEMANTIC',
                     keywords: topKeywords,
                     clusterTags: topTags,
                     neighborsQuery,
+                    neighborHits: neighborHits.map((hit) => ({
+                      id: hit.id,
+                      score: Math.round(hit.score * 1000) / 1000,
+                      payload: hit.payload ?? null,
+                    })),
                     metadata: {
                       keywordModel: 'karpathy-centroids',
                       clusterModel: 'som-20x20',

@@ -198,6 +198,19 @@ function parseTsvRows(text, columns) {
 
 let pool;
 
+class AtlasPostgresError extends Error {
+  constructor(message, code, severity, detail, hint, table, constraint) {
+    super(message);
+    this.name = 'AtlasPostgresError';
+    this.code = code;
+    this.severity = severity;
+    this.detail = detail;
+    this.hint = hint;
+    this.table = table;
+    this.constraint = constraint;
+  }
+}
+
 async function initPool() {
   if (pool) return pool;
   pool = new Pool({
@@ -225,8 +238,25 @@ async function runPsql(sql) {
     );
     return lines.join('\n');
   } catch (err) {
-    throw new Error(`psql failed: ${err.message}`);
+    throw new AtlasPostgresError(
+      `psql failed: ${err?.message || String(err)}`,
+      err?.code,
+      err?.severity,
+      err?.detail,
+      err?.hint,
+      err?.table,
+      err?.constraint,
+    );
   }
+}
+
+function classifyPostgresFailure(error) {
+  const message = String(error?.message || error || '');
+  if (/input\/output error/i.test(message) || /could not read block/i.test(message)) return 'STORAGE_IO_FAILURE';
+  if (error?.code === '42P01') return 'MISSING_RELATION';
+  if (error?.code === '42703') return 'SCHEMA_MISMATCH';
+  if (error?.code === '57014') return 'QUERY_TIMEOUT';
+  return 'UNKNOWN';
 }
 
 function loadJsonFile(filePath) {
@@ -1077,6 +1107,29 @@ async function main() {
 
 main().catch(async (error) => {
   if (pool) await pool.end();
+  const category = classifyPostgresFailure(error);
+  if (category === 'STORAGE_IO_FAILURE') {
+    const failureReport = {
+      generatedAt: new Date().toISOString(),
+      status: 'FAILED',
+      blocker: 'POSTGRES_STORAGE_IO_FAILURE',
+      message: error?.message || String(error),
+      graphifyPromotionAllowed: false,
+    };
+    await fsPromises.writeFile(REPORT_JSON, `${JSON.stringify(failureReport, null, 2)}\n`, 'utf8');
+    await fsPromises.writeFile(REPORT_MD, [
+      '# Packet Reader / Writer Audit',
+      '',
+      'Status: FAILED',
+      'Blocker: POSTGRES_STORAGE_IO_FAILURE',
+      '',
+      String(error?.message || error),
+      '',
+    ].join('\n'), 'utf8');
+    console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
+    process.exitCode = 10;
+    return;
+  }
   console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
   process.exit(1);
 });

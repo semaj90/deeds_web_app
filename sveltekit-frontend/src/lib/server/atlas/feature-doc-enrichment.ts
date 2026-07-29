@@ -5,7 +5,15 @@ import { tracedQuery } from '$lib/server/db/client.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 import { CLASSIFIER_VERSION } from '$lib/server/enrichment/domain-classifier.js';
 import { buildIndexedSourcePacket } from '$lib/server/ace/indexed-source-packet.js';
-import { OntologyLinkedTupleV1Schema, type OntologyLinkedTupleV1 } from './contracts/ontology-linked-tuple-v1.js';
+import {
+  OntologyLinkedTupleV1Schema,
+  buildOntologyLinkedTuplesFromFeatureRow,
+  type OntologyLinkedTupleV1,
+} from './contracts/ontology-linked-tuple-v1.js';
+import {
+  EnrichedTreeNodeSchema,
+  materializeLinkedTupleDraftsFromEnrichedTreeNode,
+} from './enriched-tree-node-contract.js';
 import { selectFeatureScopedRows } from './feature-scope-query.js';
 import {
   FeatureDocumentManifestSchema,
@@ -151,6 +159,7 @@ interface AtlasPacketRow {
   qdrant_point_id: string | null;
   document_id: string | null;
   domain_class: string | null;
+  source_hash: string | null;
 }
 
 function sha256Hex(input: string): string {
@@ -399,7 +408,8 @@ async function loadAtlasPacketRows(featureId: string, limit: number): Promise<At
             tree_node_id::text AS tree_node_id,
             qdrant_point_id,
             NULL::text AS document_id,
-            domain_class
+            domain_class,
+            source_hash::text AS source_hash
        FROM atlas_packets
       WHERE feature_id = $1
       ORDER BY updated_at DESC NULLS LAST, source_ref ASC
@@ -540,6 +550,40 @@ export async function materializeFeatureEvidenceTuples(
     const lexical = lexicalMap.get(packetKey);
     const structural = structuralMap.get(packetKey);
     const sourceRef = String(row.source_ref ?? '').trim();
+    const featureRow = {
+      identity: {
+        packet_key: packetKey,
+        source_ref: sourceRef,
+        file_path: String(row.source_ref ?? '').trim(),
+        function_symbol: null,
+        feature_id: plan.featureId,
+        title_id: null,
+        tree_node_id: row.tree_node_id ?? null,
+      },
+      lexical: {
+        method: 'bm25' as const,
+        term_count: (lexical?.lexicalFeatures ?? manifestOkf?.keywordCorpus.keywords ?? []).length,
+        top_terms: uniqueStable([
+          ...(lexical?.lexicalFeatures ?? []),
+          ...(manifestOkf?.keywordCorpus.keywords ?? []),
+        ])
+          .slice(0, 20)
+          .map((term, index): [string, number] => [term, Math.max(0.01, 1 - index * 0.03)]),
+        part_of_speech: null,
+        computed_at: new Date().toISOString(),
+      },
+      domain_class: row.domain_class || manifestOkf?.domainClassification.primaryDomain || null,
+      secondary_domains: manifestOkf?.domainClassification.secondaryDomains ?? [],
+      ontology_ids: uniqueStable([
+        ...(ontology?.ontologyIds ?? []),
+        ...(manifestOkf?.semanticOntology.ontologyIds ?? []),
+      ]).slice(0, 32),
+      concept_ids: uniqueStable([
+        ...(ontology?.conceptIds ?? []),
+        ...(manifestOkf?.semanticOntology.conceptIds ?? []),
+      ]).slice(0, 32),
+      evidence_state: plan.evidenceState,
+    };
     const ontologyIds = uniqueStable([
       ...(ontology?.ontologyIds ?? []),
       ...(manifestOkf?.semanticOntology.ontologyIds ?? []),
@@ -549,6 +593,61 @@ export async function materializeFeatureEvidenceTuples(
       ...(manifestOkf?.semanticOntology.conceptIds ?? []),
     ]).slice(0, 32);
     const primaryLabel = row.domain_class || manifestOkf?.domainClassification.primaryDomain || plan.featureId;
+    const sourceHash = String(row.source_hash ?? plan.manifestContentHash ?? sha256Hex(`${packetKey}:${sourceRef}`)).trim();
+    const enrichedNode = row.tree_node_id
+      ? EnrichedTreeNodeSchema.parse({
+          identity: {
+            tree_node_id: row.tree_node_id,
+            directory_path: sourceRef.includes('/') ? sourceRef.slice(0, sourceRef.lastIndexOf('/')) : '.',
+            source_ref: sourceRef,
+            file_path: sourceRef,
+            function_symbol: null,
+            node_type: 'function',
+            domain_class: row.domain_class || manifestOkf?.domainClassification.primaryDomain || null,
+            community_id: null,
+            kmeans_cluster_id: null,
+            feature_id: plan.featureId,
+            feature_label: primaryLabel,
+            source_hash: sourceHash,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            corpus_snapshot_id: packetKey,
+          },
+          ast: {
+            language: 'unknown',
+            node_kind: 'feature_row',
+            parent_tree_node_id: null,
+            symbol_path: [],
+            start_byte: 0,
+            end_byte: 0,
+          },
+          pos: lexical?.lexicalExtractorVersion ? [{ tag: 'NOUN', token: primaryLabel, start_byte: 0, end_byte: primaryLabel.length, source: 'merged' as const }] : [],
+          domains: [
+            {
+              domain_id: row.domain_class || manifestOkf?.domainClassification.primaryDomain || plan.featureId,
+              label: row.domain_class || manifestOkf?.domainClassification.primaryDomain || primaryLabel,
+              probability: 0.95,
+              classifier: plan.classifierPlan.classifierVersion ?? 'feature-row-bridge',
+              classifier_version: plan.classifierPlan.classifierVersion ?? 'feature-row-bridge',
+            },
+          ],
+          ontology_links: ontologyIds.map((ontologyId, index) => ({
+            ontology_id: ontologyId,
+            concept_id: conceptIds[index] ?? ontologyId,
+            relation: 'RELATED_TO' as const,
+            confidence: 0.85,
+            evidence_ref: `${packetKey}:${index}`,
+          })),
+          revisions: {
+            workspace_revision: process.env.WORKSPACE_REVISION ?? 'main',
+            source_hash: sourceHash,
+            embedding_revision: null,
+            graph_revision: null,
+            ontology_revision: ontology?.ontologyVersion ?? null,
+            classifier_revision: plan.classifierPlan.classifierVersion ?? null,
+          },
+        })
+      : null;
 
     return FeatureEvidenceTupleSchema.parse({
       tupleId: sha256Hex(
@@ -574,33 +673,12 @@ export async function materializeFeatureEvidenceTuples(
         ...(lexical?.lexicalFeatures ?? []),
         ...(manifestOkf?.keywordCorpus.keywords ?? []),
       ]).slice(0, 64),
-      ontologyLinkedTuples: [
-        {
-          tupleId: sha256Hex(
-            [
-              'ontology-linked-tuple.v1',
-              plan.featureId,
-              sourceRef,
-              packetKey,
-            ].join('\0')
-          ),
-          schemaVersion: 'ontology-linked-tuple.v1',
-          packetKey: packetKey || undefined,
-          sourceRef,
-          treeNodeId: row.tree_node_id || undefined,
-          documentId: row.document_id || documentIdMap.get(sourceRef) || undefined,
-          titleId: manifestOkf ? `okf:${plan.featureId}` : undefined,
-          surfaceText: primaryLabel,
-          tokenIndex: 0,
-          partOfSpeech: null,
-          label: primaryLabel,
-          labelKind: row.domain_class ? 'ontology' : 'tag',
-          labelSource: row.domain_class ? 'semantic_tagger' : 'manual',
-          ontologyIds,
-          conceptIds,
-          confidence: row.domain_class ? 0.86 : 0.62,
-          evidenceState: plan.evidenceState,
-          provenance: {
+      ontologyLinkedTuples: enrichedNode
+        ? materializeLinkedTupleDraftsFromEnrichedTreeNode({
+            node: enrichedNode,
+            packetKey,
+            sourceRef,
+            documentId: row.document_id || documentIdMap.get(sourceRef) || undefined,
             sourceTables: uniqueStable([
               'atlas_packets',
               ontology ? 'feature_ontology_tuples' : '',
@@ -611,10 +689,25 @@ export async function materializeFeatureEvidenceTuples(
             labelerVersion: plan.classifierPlan.classifierVersion ?? null,
             taggerVersion: lexical?.lexicalExtractorVersion ?? null,
             ontologyVersion: ontology?.ontologyVersion ?? null,
-            nlpVersion: manifestOkf?.nlp.langextract_version ?? null,
-          },
-        },
-      ],
+            nlpVersion: manifestOkf?.nlp.langextractVersion ?? null,
+          }).map((draft) => OntologyLinkedTupleV1Schema.parse(draft))
+        : buildOntologyLinkedTuplesFromFeatureRow({
+            featureRow,
+            packetKey,
+            sourceRef,
+            featureLabel: primaryLabel,
+            sourceTables: uniqueStable([
+              'atlas_packets',
+              ontology ? 'feature_ontology_tuples' : '',
+              lexical ? 'feature_lexical_facts' : '',
+              structural ? 'feature_structural_facts' : '',
+              manifestOkf ? 'feature_document_manifest.okf' : '',
+            ].filter(Boolean)).slice(0, 12),
+            labelerVersion: plan.classifierPlan.classifierVersion ?? null,
+            taggerVersion: lexical?.lexicalExtractorVersion ?? null,
+            ontologyVersion: ontology?.ontologyVersion ?? null,
+            nlpVersion: manifestOkf?.nlp.langextractVersion ?? null,
+          }),
       entities: lexical?.entities ?? [],
       evidenceState: plan.evidenceState,
       provenance: {
@@ -668,45 +761,45 @@ export async function materializeFeatureEvidenceTuples(
           conceptIds: manifestOkf?.semanticOntology.conceptIds ?? [],
           astSymbols: [],
           lexicalFeatures: manifestOkf?.keywordCorpus.keywords ?? [],
-          ontologyLinkedTuples: [
-            {
-              tupleId: sha256Hex(
-                [
-                  'ontology-linked-tuple.v1',
-                  plan.featureId,
-                  candidate.sourceRef,
-                  packet?.packet.packet_id ?? '',
-                ].join('\0')
-              ),
-              schemaVersion: 'ontology-linked-tuple.v1',
-              packetKey: packet?.packet.packet_id ?? undefined,
-              sourceRef: candidate.sourceRef,
-              treeNodeId: undefined,
-              documentId: documentIdMap.get(candidate.sourceRef) ?? undefined,
-              titleId: manifestOkf ? `okf:${plan.featureId}` : undefined,
-              surfaceText: manifestOkf?.domainClassification.primaryDomain ?? plan.featureId,
-              tokenIndex: 0,
-              partOfSpeech: null,
-              label: manifestOkf?.domainClassification.primaryDomain ?? plan.featureId,
-              labelKind: 'tag',
-              labelSource: 'manual',
-              ontologyIds: manifestOkf?.semanticOntology.ontologyIds ?? [],
-              conceptIds: manifestOkf?.semanticOntology.conceptIds ?? [],
-              confidence: 0.62,
-              evidenceState: plan.evidenceState,
-              provenance: {
-                sourceTables: uniqueStable([
-                  documentIdMap.has(candidate.sourceRef) ? 'library_documents' : '',
-                  'ace_packet_runtime',
-                  manifestOkf ? 'feature_document_manifest.okf' : '',
-                ].filter(Boolean)).slice(0, 12),
-                labelerVersion: plan.classifierPlan.classifierVersion ?? null,
-                taggerVersion: null,
-                ontologyVersion: null,
-                nlpVersion: manifestOkf?.nlp.langextract_version ?? null,
+          ontologyLinkedTuples: buildOntologyLinkedTuplesFromFeatureRow({
+            featureRow: {
+              identity: {
+                packet_key: packet?.packet.packet_id ?? '',
+                source_ref: candidate.sourceRef,
+                file_path: candidate.localPath ?? candidate.sourceRef,
+                function_symbol: null,
+                feature_id: plan.featureId,
+                title_id: null,
+                tree_node_id: undefined,
               },
+              lexical: {
+                method: 'bm25' as const,
+                term_count: manifestOkf?.keywordCorpus.keywords.length ?? 0,
+                top_terms: uniqueStable(manifestOkf?.keywordCorpus.keywords ?? [])
+                  .slice(0, 20)
+                  .map((term, index): [string, number] => [term, Math.max(0.01, 1 - index * 0.03)]),
+                part_of_speech: null,
+                computed_at: new Date().toISOString(),
+              },
+              domain_class: manifestOkf?.domainClassification.primaryDomain || null,
+              secondary_domains: manifestOkf?.domainClassification.secondaryDomains ?? [],
+              ontology_ids: manifestOkf?.semanticOntology.ontologyIds ?? [],
+              concept_ids: manifestOkf?.semanticOntology.conceptIds ?? [],
+              evidence_state: plan.evidenceState,
             },
-          ],
+            packetKey: packet?.packet.packet_id ?? '',
+            sourceRef: candidate.sourceRef,
+            featureLabel: manifestOkf?.domainClassification.primaryDomain ?? plan.featureId,
+            sourceTables: uniqueStable([
+              documentIdMap.has(candidate.sourceRef) ? 'library_documents' : '',
+              'ace_packet_runtime',
+              manifestOkf ? 'feature_document_manifest.okf' : '',
+            ].filter(Boolean)).slice(0, 12),
+            labelerVersion: plan.classifierPlan.classifierVersion ?? null,
+            taggerVersion: null,
+            ontologyVersion: null,
+            nlpVersion: manifestOkf?.nlp.langextractVersion ?? null,
+          }),
           entities: [],
           evidenceState: plan.evidenceState,
           provenance: {

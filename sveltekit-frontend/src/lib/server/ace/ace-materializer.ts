@@ -50,6 +50,13 @@ type MaterializerProofFields = {
   content_hash: string | null;
 };
 
+export function isValidMaterializerEmbedding(vector: unknown): vector is number[] {
+  return Array.isArray(vector)
+    && vector.length === VECTOR_DIM
+    && vector.every((value) => Number.isFinite(value))
+    && vector.some((value) => value !== 0);
+}
+
 function readText(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
@@ -204,18 +211,22 @@ export async function materializePacket(options: MaterializeOptions): Promise<Ma
     };
 
     // 4. Generate embedding vector from packet summary + title
-    // Uses 4-tier cache: Redis L3 → Postgres L4 → gRPC embedding → Ollama fallback
+    // Fail closed if no real embedding can be produced.
+    const embeddingText = `${pkt.featureLabel || ''} ${pkt.summary || ''}`.trim();
+    if (!embeddingText) {
+      throw new Error(`Embedding generation failed for ${options.packetKey}: no text to embed`);
+    }
+
     let vector: number[];
     try {
-      const embeddingText = `${pkt.featureLabel || ''} ${pkt.summary || ''}`.trim();
-      if (!embeddingText) {
-        throw new Error('No text to embed');
-      }
       vector = await embedText(embeddingText);
     } catch (err) {
       console.error(`Embedding generation failed for ${options.packetKey}:`, err);
-      // Fallback: use zero vector (will degrade search quality)
-      vector = new Array(VECTOR_DIM).fill(0);
+      throw new Error(`REAL_EMBEDDING_REQUIRED: ${options.packetKey}`);
+    }
+
+    if (!isValidMaterializerEmbedding(vector)) {
+      throw new Error(`REAL_EMBEDDING_REQUIRED: invalid embedding for ${options.packetKey}`);
     }
 
     // 5. Upsert to Qdrant (if not dry-run)
@@ -324,26 +335,26 @@ export async function getPacketMaterializationStatus(packetKey: string): Promise
   const redisKey = bifrostKey.packet(packetKey);
   const inRedis = await redis.exists(redisKey);
 
-  // Check Qdrant (search using zero vector as proxy for existence check)
-  let inQdrant = false;
-  try {
-    // Use a zero vector for existence check (faster than full embedding generation)
-    const results = await qdrant.search('codebase_chunks_768', {
-      vector: new Array(VECTOR_DIM).fill(0),
-      limit: 1,
-      filter: {
-        must: [
-          {
-            key: 'packet_key',
-            match: { value: packetKey }
-          }
-        ]
-      }
-    });
-    inQdrant = results.length > 0;
-  } catch (err) {
-    inQdrant = false;
-  }
+    // Check Qdrant by packet identity. Do not use a zero-vector proxy.
+    let inQdrant = false;
+    try {
+      const response = await qdrant.scroll('codebase_chunks_768', {
+        limit: 1,
+        with_payload: true,
+        with_vector: false,
+        filter: {
+          must: [
+            {
+              key: 'packet_key',
+              match: { value: packetKey }
+            }
+          ]
+        }
+      });
+      inQdrant = Array.isArray(response.points) && response.points.length > 0;
+    } catch (err) {
+      inQdrant = false;
+    }
 
   return {
     packet_key: packetKey,

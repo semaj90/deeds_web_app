@@ -26,6 +26,9 @@ describe('phase89 board workflow', () => {
 							script: 'node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage rank_signals',
 							gate: 'All ranking gates PASS',
 							blockedBy: ['index_bm25'],
+              recommendation_id: 'rec:rank-signals',
+              source_ref: 'sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts',
+              tree_node_id: 'tree:sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts:combineViaRRF',
 						},
 					],
 				},
@@ -39,6 +42,9 @@ describe('phase89 board workflow', () => {
 		});
 
 		expect(plan.taskId).toBe('rank_signals');
+		expect(plan.recommendationId).toBe('rec:rank-signals');
+		expect(plan.sourceRef).toBe('sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts');
+		expect(plan.treeNodeId).toContain('combineViaRRF');
 		expect(plan.validationRoutes).toContain('/admin/ai-dashboard');
 		expect(plan.validationRoutes).toContain('/admin/phase89');
 		expect(plan.validationQueueKeys).toContain('playwright-check:/admin/ai-dashboard');
@@ -93,5 +99,10 @@ describe('phase89 board workflow', () => {
 		expect(writes.some((entry) => entry.key.startsWith('phase89:workflow:'))).toBe(true);
 		expect(writes.filter((entry) => entry.key.startsWith('playwright-check:'))).toHaveLength(2);
 		expect(writes.every((entry) => entry.ttl > 0)).toBe(true);
+		expect(JSON.parse(writes[0]?.value ?? '{}')).toMatchObject({
+			recommendationId: null,
+			sourceRef: null,
+			treeNodeId: null,
+		});
 	});
 });

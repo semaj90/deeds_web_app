@@ -713,7 +713,17 @@ export class QdrantManager {
       limit: params.limit,
       scoreThreshold: params.scoreThreshold,
       skipCache: params.skipCache,
-    });
+      });
+  }
+
+  /**
+   * Public dense-only search wrapper.
+   *
+   * Keeps callers off the private _denseSearch implementation while preserving
+   * the exact dense lane contract and result shape.
+   */
+  async denseSearch(params: DenseSearchParams): Promise<QdrantSearchResult> {
+    return this._denseSearch(params);
   }
 
   /**
@@ -738,7 +748,17 @@ export class QdrantManager {
     const sparseAvailable = await this.getSparseSupport(params.collection, sparseVectorName).catch(() => false);
     if (!sparseAvailable) {
       this.noteDenseOnly(params.collection, sparseVectorName, 'no-sparse-index');
-      return { results: [], metadata: {} };
+      return {
+        results: [],
+        metadata: {
+          query: '',
+          collection: params.collection,
+          responseTime: 0,
+          total_results: 0,
+          cached: false,
+          searchType: 'sparse'
+        }
+      };
     }
 
     return traceVectorSearch(

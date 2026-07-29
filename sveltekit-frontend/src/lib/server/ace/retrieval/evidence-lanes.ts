@@ -8,6 +8,39 @@ export interface EvidenceLaneConfig {
   timeout: number;
 }
 
+export function extractWorkspaceRevisionFromMetadata(metadata: unknown): string | null {
+  const record = (metadata ?? {}) as Record<string, unknown>;
+  return typeof record.workspace_revision === 'string'
+    ? record.workspace_revision
+    : typeof record.workspaceRevision === 'string'
+      ? record.workspaceRevision
+      : typeof record.revision === 'string'
+        ? record.revision
+        : null;
+}
+
+export function normalizeQdrantPayloadIdentity(payload: Record<string, unknown> | null | undefined): {
+  packetKey: string | null;
+  sourceRef: string | null;
+  contentHash: string | null;
+  treeNodeId: string | null;
+  featureId: string | null;
+  featureLabel: string | null;
+  workspaceRevision: string | null;
+} {
+  return {
+    packetKey: payload?.packet_key as string | null ?? payload?.packetKey as string | null ?? null,
+    sourceRef: payload?.source_ref as string | null ?? payload?.sourceRef as string | null ?? null,
+    contentHash: payload?.content_hash as string | null ?? payload?.contentHash as string | null ?? null,
+    treeNodeId: payload?.tree_node_id as string | null ?? payload?.treeNodeId as string | null ?? null,
+    featureId: payload?.feature_id as string | null ?? payload?.featureId as string | null ?? null,
+    featureLabel: payload?.feature_label as string | null ?? payload?.featureLabel as string | null ?? null,
+    workspaceRevision: payload?.workspace_revision as string | null
+      ?? payload?.workspaceRevision as string | null
+      ?? extractWorkspaceRevisionFromMetadata(payload?.metadata),
+  };
+}
+
 export class RedisExactLane {
   async search(
     queryHash: string,
@@ -28,7 +61,15 @@ export class PostgresLexicalLane {
       SELECT
         packet_key,
         source_ref,
-        content_hash,
+        sha256 AS content_hash,
+        tree_node_id,
+        feature_id,
+        feature_label,
+        COALESCE(
+          metadata->>'workspace_revision',
+          metadata->>'workspaceRevision',
+          metadata->>'revision'
+        ) AS workspace_revision,
         ts_rank(fts_document, plainto_tsquery('english', ${query})) AS raw_score,
         snapshot_id
       FROM atlas_packets
@@ -41,6 +82,10 @@ export class PostgresLexicalLane {
       packetKey: row.packet_key,
       sourceRef: row.source_ref,
       contentHash: row.content_hash,
+      treeNodeId: row.tree_node_id ?? null,
+      featureId: row.feature_id ?? null,
+      featureLabel: row.feature_label ?? null,
+      workspaceRevision: row.workspace_revision ?? null,
       evidenceKind: 'lexical' as const,
       rawScore: row.raw_score,
       fusedScore: null,
@@ -72,9 +117,7 @@ export class QdrantDenseLane {
 
     const data = await response.json() as any;
     return data.result.map((point: any) => ({
-      packetKey: point.payload.packet_key,
-      sourceRef: point.payload.source_ref,
-      contentHash: point.payload.content_hash,
+      ...normalizeQdrantPayloadIdentity(point.payload),
       evidenceKind: 'semantic' as const,
       rawScore: point.score,
       fusedScore: null,

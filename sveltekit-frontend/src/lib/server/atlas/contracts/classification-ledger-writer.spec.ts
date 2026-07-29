@@ -4,6 +4,7 @@ import { FeatureMatrixRowV1Schema } from '$lib/server/atlas/feature-matrix-schem
 import { createValidationResultV1 } from './validation-result-v1.js';
 import { buildClassificationEnvelopeV1 } from './classification-envelope-v1.js';
 import { buildClassificationOutcomeLedgerEvent } from './classification-ledger-writer.js';
+import { buildOntologyLinkedTuplesFromClassification } from './ontology-linked-tuple-v1.js';
 
 describe('Classification ledger writer', () => {
   it('builds a ledger event that preserves the packet identity spine', () => {
@@ -70,6 +71,7 @@ describe('Classification ledger writer', () => {
       validation_errors: [],
       feature_labels: ['auth', 'sessions'],
       domain_class: 'infrastructure',
+      secondary_domains: ['platform', 'identity'],
       ontology_ids: ['ontology:auth'],
       concept_ids: ['concept:session'],
       runtime_evidence_refs: ['runtime:trace:1'],
@@ -188,10 +190,12 @@ describe('Classification ledger writer', () => {
         evidenceState: 'ACTIVE_VERIFIED',
         knowledgeResolution: 'RESOLVED',
         domainClass: 'infrastructure',
+        secondaryDomains: ['platform', 'identity'],
         ontologyIds: ['ontology:auth'],
         conceptIds: ['concept:session'],
         runtimeEvidenceRefs: ['runtime:trace:1'],
         testEvidenceRefs: ['test:spec:1'],
+        partOfSpeech: 'NOUN',
         pageRankScore: packet.page_rank_score,
         communityId: packet.community_id ?? null,
         kmeansCluster: packet.kmeans_cluster ?? null,
@@ -240,7 +244,22 @@ describe('Classification ledger writer', () => {
     expect(ledgerEvent.lane_status).toBe('ACTIVE');
     expect(ledgerEvent.evidence_state).toBe('ACTIVE_VERIFIED');
     expect(ledgerEvent.knowledge_resolution).toBe('RESOLVED');
+    expect(ledgerEvent.secondary_domains).toEqual(['platform', 'identity']);
+    expect(ledgerEvent.part_of_speech).toBe('NOUN');
     expect(ledgerEvent.validated_by).toBe('phase-108d-proof-matrix');
     expect(ledgerEvent.can_promotion).toBe('CROSS_STORE_PROVEN');
+
+    const tuples = buildOntologyLinkedTuplesFromClassification({
+      classification,
+      featureRow,
+      sourceTables: ['atlas_packets', 'atlas_feature_matrix_rows'],
+      labelerVersion: 'unit-test',
+      taggerVersion: 'unit-test',
+      ontologyVersion: 'ontology:v1',
+      nlpVersion: 'langextract:v1',
+    });
+
+    expect(tuples.some((tuple) => tuple.labelKind === 'pos' && tuple.partOfSpeech === 'NOUN')).toBe(true);
+    expect(tuples.some((tuple) => tuple.labelKind === 'ontology')).toBe(true);
   });
 });

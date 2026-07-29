@@ -470,6 +470,7 @@ export function createFeatureRowFromResearchPacket(
     lexical: {
       method: 'bm25' as const,
       term_count: packet.summary.split(/\s+/).length,
+      part_of_speech: null,
       top_terms: extractTopTerms(packet.summary, 10),
       computed_at: new Date().toISOString()
     },
@@ -503,6 +504,7 @@ export function createFeatureRowFromResearchPacket(
       ...(packet.okf?.semantic_ontology.ontology_ids ?? []),
     ],
     domain_class: packet.okf?.domain_classification.primary_domain ?? null,
+    secondary_domains: packet.okf?.domain_classification.secondary_domains ?? [],
     ontology_ids: packet.okf?.semantic_ontology.ontology_ids ?? [],
     concept_ids: packet.okf?.semantic_ontology.concept_ids ?? [],
     runtime_evidence_refs: packet.citations_resolved.map((citation) => citation.resolved_to ?? citation.text),

@@ -201,6 +201,20 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
 The live workstation flow is:
 `classify intent` -> `build bounded ACE context` -> `synthesize recommendation` -> `record outcome`.
 
+**Canonical end-to-end pipeline**
+- PostgreSQL 18 owns truth, packet identity, workflow state, and validation.
+- Qdrant, TurboVec, and DiskANN only retrieve candidates.
+- Neo4j and cuGraph project relationships and topology explanations.
+- Arrow IPC, mmap, JSON, MsgPack, and gRPC are transport layers only.
+- PyTorch and XGBoost are ranker / reranker layers only.
+- ACE packages are validated evidence bundles.
+- Gemma4 writes the recommendation from bounded evidence.
+- The task board stores proposed and verified outcomes, not canonical truth.
+
+**Current blocker**
+- `PACKET_IDENTITY`, `PACKET_VALIDATION`, `TOPOLOGY_ROUTING`, `QDRANT_PAYLOAD`, and `POSTGRES_ROWS` remain absent or conflicting in the reconciliation packet.
+- The recommendation loop may generate prose, but promotion must stay `PROMOTION_BLOCKED` until the reconciliation gates pass.
+
 **Live recommendation loop**
 - [x] `classify_intent` — live intent classification via `sveltekit-frontend/src/lib/server/mcp/atlas-tools-client.ts`
 - [x] `build_agentic_rag_context` — bounded ACE context assembly via the same client seam
@@ -795,6 +809,76 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - proof: `npx vitest run src/lib/server/retrieval/semantic-search-workflow.spec.ts` passed and confirmed report persistence + board loader consumption
   - [x] Align `atlas_embedding_tools.ts` to the shared source-lane embedding contract constants
     - `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`
+    - live neighbor search now runs through the named `content` dense lane via the public `QdrantManager.denseSearch`
+    - neighbor payloads now request lineage fields too: `content_hash`, `workspace_revision`, `representation_id`, `representation_name`, `dimensions`, and `normalization`
+    - direct harness passed with `embedding_keywords`, `embedding_cluster_tags`, `embedding_neighbors`, and `embedding_all_tags`
+  - [x] Map the live spec/taskboard surfaces that govern the Atlas lanes
+    - OpenSpec roadmap: `docs/openspec/STRUCTURAL-IDENTITY-BATCH-ROADMAP.md`
+    - parent atlas TOC: `docs/atlas/parent-atlas-table-of-contents.md`
+    - temporal taskboard: `docs/graph/kanban-board.json`
+    - single-packet proof gate: `scripts/atlas/phase108d-single-packet-proof.mts`
+    - optional HyperRAG probe: `scripts/atlas/probe-hyperrag-packet-rpc.mts`
+    - bounded ACE resume packet: `scripts/atlas/build-reconciliation-ace-packet.mts`
+    - live search wrapper: `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`
+    - Qdrant public dense wrapper: `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts`
+    - active context reader: `sveltekit-frontend/src/mcp/engram_tools.ts`
+    - current proof state: `codebase_chunks_384_hybrid` and `codebase_chunks_768` are reference-only diagnostics for this packet proof, and the HyperRAG exact-match path now resolves the same packet key instead of timing out
+  - [x] Carry the canonical packet identity spine through the ACE chunk resolver and Qdrant payload builder
+    - `sveltekit-frontend/src/lib/server/ace/indexed-source-packet.ts`
+    - `sveltekit-frontend/src/lib/server/ace/retrieval/evidence-lanes.ts`
+    - `sveltekit-frontend/src/lib/server/retrieval/qdrant-payload-enricher.ts`
+    - `sveltekit-frontend/src/lib/server/retrieval/service.ts`
+    - `sveltekit-frontend/src/lib/server/ace/identity-join.spec.ts`
+    - verification: `npx vitest run src/lib/server/ace/identity-join.spec.ts src/lib/server/ace/ace-materializer.spec.ts src/lib/server/ace/gemma4-codeintel.spec.ts`
+  - [x] Keep the merged RRF path on the same canonical identity fields so Qdrant results do not lose `tree_node_id`, `content_hash`, or `workspace_revision` during rank fusion
+    - `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
+    - verification: `npx tsx -e "import('./sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts').then(() => console.log('rrf-integration:ok'))"`
+  - [x] Compare the live MCP tool surface against the Codebase-Memory 14-tool reference and document the split ownership
+    - the example groups tools into indexing, query, analysis, and code surfaces; the repo currently splits those responsibilities across `sveltekit-frontend/src/mcp/codebase_tools.ts`, `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`, `sveltekit-frontend/src/mcp/engram_tools.ts`, `sveltekit-frontend/src/mcp/bifrost_tools.ts`, `sveltekit-frontend/src/mcp/topology_mgmt_tools.ts`, and `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
+    - closest live analogs today are `codebase.rg_search` / `codebase.awk_analyze` for code search, `atlas.embedding_*` for embedding-derived enrichment, `atlas_get_active_context` for bounded resume context, `trace.bifrost_dispatch` for inference routing, and the TRACE server tools for broader graph/runtime work
+    - the example’s single graph API surface includes `index_repository`, `index_status`, `list_projects`, `delete_project`, `search_graph`, `trace_call_path`, `query_graph`, `ingest_traces`, `detect_changes`, `get_graph_schema`, `get_architecture`, `get_code_snippet`, `search_code`, and `manage_adr`; these are not yet exposed as one unified interface here
+    - missing or unverified public equivalents should be added only after the live proof gate decides which owner should expose them, and only if they are needed beyond the existing split ownership model
+    - review finding: `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts` is an embedding-derived enrichment helper with Redis/Qdrant reads, not a knowledge-graph indexing/query/admin API
+    - review finding: `sveltekit-frontend/src/mcp/codebase_tools.ts` only exposes `codebase.rg_search` and `codebase.awk_analyze`, while `sveltekit-frontend/src/mcp/trace-mcp-server.ts` hosts the broader graph/KAG/ACE/ops/hypergraph surface
+    - review finding: TRACE itself is split by namespace, with graph/topology tools (`graph.*`, `topology.*`, `clusters.*`), retrieval/proof tools (`trace.kag_search`, `trace.explain_retrieval`, `trace.validate_ace_hit`), operator-gated repair tools (`ops.*`), hypergraph tools (`hypergraph.*`), and knowledge/legal helpers (`knowledge.*`, `legal.*`) rather than one monolithic graph API
+    - review finding: the Phase 89 workflow plan now carries `recommendationId`, `sourceRef`, and `treeNodeId` through the plan payload so the kanban projection stays attached to the selected recommendation/task provenance
+  - [x] Keep the Phase 89 workflow plan provenance-bound and verify it in spec coverage
+    - `sveltekit-frontend/src/lib/server/atlas/board/phase89-workflow.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/board/phase89-workflow.spec.ts`
+    - verification: `npx vitest run src/lib/server/atlas/board/phase89-workflow.spec.ts`
+    - mapping table:
+
+      | Example surface | Current repo owner | Live analog | Gap |
+      |---|---|---|---|
+      | `index_repository` | `trace-mcp-server.ts` / indexing lane | TRACE indexing tools and packet loaders | No single repo-wide indexer tool |
+      | `index_status` | `trace-mcp-server.ts` | trace health / status probes | No dedicated index-progress tool |
+      | `list_projects` | TRACE / admin tools | project and tool listing in TRACE-adjacent code | No project registry tool surfaced here |
+      | `delete_project` | TRACE / admin tools | none exposed as a safe public analog | Missing public delete tool |
+      | `search_graph` | `trace-mcp-server.ts` | `trace.kag_search` | Graph search exists under a different contract |
+      | `trace_call_path` | `trace-mcp-server.ts` | call-path / traversal helpers in TRACE server | No dedicated directional call-path tool surfaced |
+      | `query_graph` | `trace-mcp-server.ts` | KAG / graph query path in TRACE | No explicit Cypher-like public query tool |
+      | `ingest_traces` | TRACE ingestion lanes | trace ingestion code in TRACE server | No simple public ingest tool surfaced |
+      | `detect_changes` | codebase / replay tooling | diff / replay analysis lanes | No single change-detection MCP tool |
+      | `get_graph_schema` | TRACE / topology docs | schema/introspection helpers in TRACE | No unified schema tool surfaced |
+      | `get_architecture` | docs / topology notes | architecture summaries in docs | No runtime architecture tool surfaced |
+      | `get_code_snippet` | `codebase_tools.ts` / TRACE | `codebase.rg_search` plus file readers | No exact snippet tool surfaced |
+      | `search_code` | `codebase_tools.ts` | `codebase.rg_search` | Approximate match exists under a different name |
+      | `manage_adr` | docs / decision records | ADR docs and notes | No ADR mutation tool surfaced |
+      | `graph.*` | `trace-mcp-server.ts` | graph expansion / shortest path / community / PageRank | Graph tools are split by intent, not a single query endpoint |
+      | `topology.*` | `trace-mcp-server.ts` | SOM and manifold neighborhood search | Topology is a separate lane from graph traversal |
+      | `trace.kag_search` / `trace.explain_retrieval` / `trace.validate_ace_hit` | `trace-mcp-server.ts` | KAG retrieval and proof helpers | No unified KAG admin surface |
+      | `ops.*` | `trace-mcp-server.ts` | operator-gated repair/test/gate actions | Deliberately read-only preview plus controlled execution |
+      | `hypergraph.*` | `trace-mcp-server.ts` | hyperedge search / expansion / explanation | Hypergraph is projection and inspection, not authority |
+      | `knowledge.*` / `legal.*` | `trace-mcp-server.ts` | minified map and transcript helpers | Supporting lookup surfaces only |
+  - [ ] Align the LDR / HyperRAG / KAG pipeline to the current retrieval contract before expanding transport layers
+    - canonical truth stays in Postgres `atlas_packets` / packet-ledger rows, keyed by `packet_key`, `source_ref`, `feature_id`, `content_hash`, `workspace_revision`, and lineage fields
+    - Qdrant stores mirror candidates for dense ANN and neighbor search; Neo4j stores bounded topology / `k`-hop context; Redis/Valkey stores hot ACE packets and centroid caches; RRF remains the ranking authority
+    - the current retrieval contract already stages lexical `rg` search, AST / `ast-grep` signals, parallel Qdrant + BM25 + Neo4j candidates, and Gemma4 synthesis from top packets
+    - review finding: `searchResultToHyperRagResult()` now surfaces canonical packet identity fields on HyperRAG hits (`packetKey`, `sourceRef`, `contentHash`, `workspaceRevision`, `treeNodeId`, `featureId`, `featureLabel`) instead of hiding them only in the payload blob
+    - LDR ingestion should emit paired metadata and evidence payloads, not raw source blobs: JSON for structured metadata, MsgPack for small packet envelopes, Arrow IPC for columnar batches, and gRPC only for binary service boundaries that actually need streaming
+    - if tensor cache synthesis is needed, keep it behind the same packet identity contract and write only versioned projection artifacts; do not make PyTorch or GPU caching the source of truth
+    - TurvoVec / SIMD / DiskANN are candidate acceleration lanes only; they should compare against the existing Qdrant + RRF path, not replace the canonical retrieval contract
+    - the next recommendation prompt should consume sorted JSON results from the ranked packet set and attach `next_steps` / Kanban updates after the proof gate passes
   - [ ] Align the feature-matrix contract so the system is not framed as only `384` versus `768`, but as a versioned multi-lane matrix
     - Canonical dense semantic lane: `dense_768` / `embeddinggemma` full `768`
     - Decomposed dense lane(s): bounded projections such as `dense_384` or domain-specific subspaces when explicitly versioned
@@ -926,6 +1010,34 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
   - [ ] Treat Neo4j GDS PageRank as a current topology/authority signal, not as deprecated functionality and not as a domain/feature authority source
   - [ ] Ensure final retrieval and classification contracts use PageRank only as a bounded prior or rerank feature, never as the sole assignment authority for `domain_class`, `feature_id`, or `feature_label`
   - [ ] Audit existing contracts so `feature_label`, `domain_class`, `tree_node_id`, `community_id`, `kmeans_cluster`, and SOM fields are not collapsed into a single generic cluster/class field
+  - [x] Add a strict enriched tree-node bridge that requires `feature_id` and `feature_label` for authoritative rows, carries PageRank / graph revision lineage, and materializes ontology-linked tuples when `tree_node_id` is present
+    - `sveltekit-frontend/src/lib/schemas/tree_node_identity_schema.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/enriched-tree-node-contract.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/feature-doc-enrichment.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/enriched-tree-node-contract.spec.ts`
+    - verification: targeted Vitest passed on the new contract/spec plus the existing classification envelope and ledger writer specs
+  - [x] Route the strict enriched node through the projection bridge for Qdrant, HyperRAG, and Neo4j/ACE-facing envelope generation so those adapters share one authoritative identity shape
+    - `sveltekit-frontend/src/lib/server/atlas/enriched-tree-node-projections.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/projections/qdrant-packet-projection.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/projections/hyperrag-packet-projection.ts`
+    - `sveltekit-frontend/src/lib/server/atlas/enriched-tree-node-projections.spec.ts`
+    - verification: targeted Vitest passed on the projection bridge plus the earlier contract specs
+  - [x] Carry packet, tree-node, feature, and content-hash identity into the ACE retrieval prompt path so the datastore no longer collapses source chunks back to file path only
+    - `sveltekit-frontend/src/lib/server/ace/contracts/ace-context-packet.ts`
+    - `sveltekit-frontend/src/lib/server/ace/retrieval/evidence-lanes.ts`
+    - `sveltekit-frontend/src/lib/server/ace/codeintel-datastore.ts`
+    - `sveltekit-frontend/src/lib/server/ace/gemma4-codeintel.ts`
+    - `sveltekit-frontend/src/lib/server/ace/gemma4-codeintel.spec.ts`
+    - verification: targeted Vitest passed on the new prompt regression plus the strict tree-node bridge specs
+  - [x] Make the ACE prompt/datastore modules import-safe by lazy-loading runtime-only DB, retrieval, and hypergraph clients so prompt-only tests do not hold open startup handles
+    - `sveltekit-frontend/src/lib/server/ace/codeintel-datastore.ts`
+    - `sveltekit-frontend/src/lib/server/ace/gemma4-codeintel.ts`
+    - verification: direct `tsx` import probes now exit cleanly for both modules
+  - [x] Fail closed on ACE materialization when no real embedding is available, and use packet-key filtered Qdrant existence checks instead of zero-vector probes
+    - `sveltekit-frontend/src/lib/server/ace/ace-materializer.ts`
+    - `sveltekit-frontend/src/lib/server/ace/ace-materializer.spec.ts`
+    - verification: targeted Vitest passed on the embedding guard regression
   - [ ] Add or update proof gates for the existing lanes instead of reimplementing them:
     - focused tests for XGBoost lane classifier/reranker inputs and outputs
     - focused tests for tree-sitter/ast-grep chunking and structural fact extraction
@@ -953,12 +1065,54 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - [x] OpenCode ACE context bootstrap now emits explicit lane priorities for keyword, atlas, embedding, and centroid routing
       - `scripts/opencode/get-ace-context.mjs`
       - retrieval policy now prefers `codebase.rg_search` / `trace.kag_search` before raw file reads
-  - [x] Phase 108D single-packet proof captured with the live runner (`scripts/atlas/phase108d-single-packet-proof.mts`)
+    - [x] OpenCode dispatch now classifies lexical, structural, semantic, and plan intents deterministically before planner drift
+      - `sveltekit-frontend/src/lib/server/opencode/intent-router.ts`
+      - `sveltekit-frontend/src/routes/api/opencode-dispatch/+server.ts`
+      - `sveltekit-frontend/src/lib/server/opencode/intent-router.spec.ts`
+      - route hints now surface `codebase.rg_search`, `trace.kag_search`, `query_qdrant`, and centroid cache guidance
+  - [ ] Phase 108D single-packet proof still needs a live cross-store pass
     - Target packet: `packet:1f18437ee58f` (`sveltekit-frontend/src/routes/(app)/demos/+page.svelte`)
-    - Result: `PARTIAL_PROVEN`
-    - Postgres + HyperRAG exact match passed; `codebase_chunks_384_hybrid`, `codebase_chunks_384`, and `codebase_chunks_768` reported no indexed points for this packet-level proof
-    - Redis `bifrost:packet:*` / `ace:packet:*` cache entries were absent for this packet, and no ACE context packet was present
-    - `content_hash` remains null in Postgres for this packet, so freshness stays unproven
+    - Live result from `scripts/atlas/phase108d-single-packet-proof.mts`: `PARTIAL_PROVEN`
+    - Postgres and HyperRAG RPC are present, but Qdrant, Redis, and ACE are still missing for this packet
+    - `codebase_chunks_384_hybrid` remains reference-only and `codebase_chunks_384`/`codebase_chunks_768` do not yet provide the required packet-level parity
+    - the bounded reconciliation ACE packet is readable through `atlas_get_active_context`, but it is still a coordination packet, not cross-store proof
+    - `content_hash` / `workspace_revision` freshness and full cross-store lineage are still blocked until a packet with real Qdrant, Redis, and ACE presence is found
+  - [x] Build and store a bounded reconciliation ACE packet for the next turn (`scripts/atlas/build-reconciliation-ace-packet.mts`)
+    - Redis Valkey keys now exist for the temporary coordination packet and the latest pointer
+    - The packet is explicitly non-authoritative and cannot promote audit status
+    - `sveltekit-frontend/src/mcp/engram_tools.ts` now has `atlas_get_active_context` for bounded resume reads
+    - the live recommendation runner now consumes `atlas_get_active_context` before synthesis, so the ACE packet is injected into the Gemma4 recommendation path as bounded context
+    - the active-context packet now carries a compact `signalSummary` and `memorySwap` bundle so pagerank, summary, lexical, centroid, and reranker hints travel with the ACE packet instead of being re-derived ad hoc
+  - [x] Current next steps after Phase 108D
+    - prove one real production embedding lineage end-to-end for a packet with a live `content_hash`, `workspace_revision`, and `qdrant_point_id`
+    - keep the 768 and hybrid lanes reference-only until a real packet exists in those collections
+    - exercise the real Redis/ACE adapters and record the live packet as the context anchor for the next turn
+    - `scripts/atlas/agentic-recommendation-workflow.mjs` now reads `atlas_get_active_context` and the bounded ACE packet also resolves through `build_agentic_rag_context`
+    - the recommendation packet now preserves the cross-signal bundle in `evidence.signal_summary` so the prompt sees the same pagerank / summary / lexical / centroid / reranker hints as the cached ACE packet
+    - the remaining gap is the live cross-store proof, which still blocks centroid cache, KMeans/SOM, and XGBoost classifier work
+    - reconcile the live tree / summary / topology schema before any fresh backfill or plugin promotion
+    - keep refresh-manifest invalidation bound to atlas truth promotion
+    - keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
+    - expand `feature_id` placement coverage across the remaining cards
+    - increase replay export breadth so replay coverage rises above the current thin baseline
+    - finish AE/SOM provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
+    - keep glyph coverage separate from retrieval and SOM work
+    - finish provenance parity and quality review
+    - finish provenance UI and trust-tier editing
+    - finish feature registry reconciliation and command mapping
+    - run live-service env audit before qdrant backfill applies
+  - [x] Fix CouchDB single-node initialization path for system databases
+    - `docker/couchdb/local.d/10-single-node.ini`
+    - `docker-compose.yml`
+    - `sveltekit-frontend/docker-compose.full.yml`
+    - `sveltekit-frontend/scripts/phase88-couchdb-quickstart.ps1`
+    - the quickstart now creates `_users`, `_replicator`, and `_global_changes`
+    - live verification on `legal-ai-couchdb` passed; system databases already present and `_all_dbs` returned `_global_changes`, `_replicator`, `_users`, `graph_analysis_cache`, `inference_log`
+  - [x] Verify the live Go Retrieval and Neo4j blockers called out in the latest transcript
+    - `docker exec legal-ai-go-retrieval sh -lc "getent hosts postgres || nslookup postgres || true; nc -vz postgres 5432"` returned a live connection to `postgres:5432`
+    - `curl http://127.0.0.1:8100/health` returned `{"pgvectorConnected":true,"qdrantConnected":true,"redisConnected":true,"status":"healthy"}`
+    - `docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 "RETURN 1 AS ok"` returned `ok`
+    - `docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 "CALL dbms.components() YIELD name, versions RETURN name, versions LIMIT 1"` returned `Neo4j Kernel 5.26.27`
   - [ ] Add the `384` versus `768` parity benchmark gate before adding another ANN index
     - exact GPU brute-force top-k ground truth
     - Qdrant HNSW baseline
@@ -975,9 +1129,10 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - rotation before quantization = compression artifact, not semantic identity transform
   - [ ] Add a read-only semantic-contract reconciliation artifact pass before more lane expansion
     - `scripts/atlas/reconcile-semantic-contracts.mjs`
-    - `artifacts/semantic-contract-reconciliation.json`
-    - `artifacts/semantic-contract-conflicts.ndjson`
-    - `artifacts/semantic-contract-identity-map.parquet`
+    - `reports/semantic-contracts/semantic-contract-reconciliation.json`
+    - `reports/semantic-contracts/semantic-contract-conflicts.ndjson`
+    - `reports/semantic-contracts/semantic-contract-identity-map.json`
+    - status vocabulary is evidence-based now: `ABSENT`, `PRESENT`, `STATICALLY_REFERENCED`, `FIXTURE_PROVEN`, `RUNTIME_SMOKE_PROVEN`, `PARTIAL_PROVEN`, `CROSS_STORE_PROVEN`, `CONFLICTING`, `BLOCKED`
     - fail the gate on root-vs-runtime `.okf` drift, schema drift, identity drift, or cross-store packet mismatch
 
 - [ ] **Phase 20 — Colab/A6000 training lane**

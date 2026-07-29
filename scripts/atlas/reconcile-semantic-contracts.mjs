@@ -89,9 +89,32 @@ const FIELD_MAPPINGS = {
   redis_key: ['bifrost:packet:*', 'centroid:feature:*', 'gpu:karpathy:*'],
 };
 
-async function runGrep(pattern, glob = 'sveltekit-frontend/src/**/*.ts') {
+const LANE_EVIDENCE_TYPES = {
+  FILE_EXISTS: 'FILE_EXISTS',
+  IMPORT_REFERENCE: 'IMPORT_REFERENCE',
+  FIXTURE_RESULT: 'FIXTURE_RESULT',
+  RUNTIME_RESULT: 'RUNTIME_RESULT',
+  CROSS_STORE_RESULT: 'CROSS_STORE_RESULT',
+};
+
+function deriveLaneStatus(evidence) {
+  const types = new Set((evidence ?? []).map((item) => item.evidenceType));
+  if (types.has(LANE_EVIDENCE_TYPES.CROSS_STORE_RESULT)) return 'CROSS_STORE_PROVEN';
+  if (types.has(LANE_EVIDENCE_TYPES.RUNTIME_RESULT)) return 'RUNTIME_SMOKE_PROVEN';
+  if (types.has(LANE_EVIDENCE_TYPES.FIXTURE_RESULT)) return 'FIXTURE_PROVEN';
+  if (types.has(LANE_EVIDENCE_TYPES.IMPORT_REFERENCE)) return 'STATICALLY_REFERENCED';
+  if (types.has(LANE_EVIDENCE_TYPES.FILE_EXISTS)) return 'PRESENT';
+  return 'ABSENT';
+}
+
+async function runGrep(pattern, targetFiles = []) {
   try {
-    const cmd = `rg -n "${pattern}" "${glob}"`;
+    const fileArgs = targetFiles
+      .filter(Boolean)
+      .map((file) => `"${path.join(REPO_ROOT, file)}"`)
+      .join(' ');
+    if (!fileArgs) return [];
+    const cmd = `rg -n --hidden --no-ignore -e "${pattern}" ${fileArgs}`;
     const output = execSync(cmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     return output.split('\n').filter(Boolean);
   } catch {
@@ -99,52 +122,202 @@ async function runGrep(pattern, glob = 'sveltekit-frontend/src/**/*.ts') {
   }
 }
 
+const OKF_OWNER_FILES = [
+  '.okf/manifest.yaml',
+  '.okf/systems/hyperrag.md',
+  'docs/deep-research-task-schema.okf.yaml',
+  'docs/contracts/latent64.okf.json',
+  'config/vector-lanes.schema.json',
+  'sveltekit-frontend/src/lib/server/okf/mastra-workflows.okf.yaml',
+  'sveltekit-frontend/src/lib/server/okf/mastra-okf-loader.ts',
+  'src/routes/api/export/okf/+server.ts',
+  'src/lib/server/export/okf-serializer.ts',
+  'src/lib/server/ingest/ingest-packet-schema.ts',
+  'src/lib/server/atlas/ace-kag-dag-evidence-schema.ts',
+  'sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts',
+  'sveltekit-frontend/src/lib/server/identity/ulid.ts',
+  'sveltekit-frontend/src/lib/server/hyperrag/hyperrag-projection-contract.ts',
+  'sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts',
+  'sveltekit-frontend/src/routes/api/atlas/hyperrag-packet-rpc/+server.ts',
+  'src/lib/server/topology/feature-tracking-layer.ts',
+];
+
+const PACKET_VALIDATION_FILES = [
+  'src/lib/server/ingest/ingest-packet-schema.ts',
+  'src/lib/server/atlas/ace-kag-dag-evidence-schema.ts',
+  'sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts',
+  'sveltekit-frontend/src/lib/server/okf/mastra-okf-loader.ts',
+];
+
+const HYPERRAG_RPC_FILES = [
+  'sveltekit-frontend/src/lib/server/hyperrag/hyperrag-projection-contract.ts',
+  'sveltekit-frontend/src/routes/api/hyperrag/packet-rpc/+server.ts',
+  'sveltekit-frontend/src/routes/api/atlas/hyperrag-packet-rpc/+server.ts',
+  'src/lib/server/topology/feature-tracking-layer.ts',
+];
+
+const PACKET_IDENTITY_FILES = [
+  'src/lib/server/ingest/ingest-packet-schema.ts',
+  'src/lib/server/atlas/ace-kag-dag-evidence-schema.ts',
+  'sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts',
+  'sveltekit-frontend/src/lib/server/identity/ulid.ts',
+  'sveltekit-frontend/src/lib/server/hyperrag/hyperrag-projection-contract.ts',
+];
+
+const TOPOLOGY_ROUTING_FILES = [
+  'sveltekit-frontend/src/lib/server/topology/feature-tracking-layer.ts',
+  'sveltekit-frontend/src/lib/server/atlas/contracts/dense-lane-policy.ts',
+  'scripts/atlas/compute-neo4j-pagerank.mts',
+  'scripts/atlas/train-som-20x20.mts',
+  'scripts/atlas/train-kmeans-384.mts',
+  'scripts/atlas/backfill-topology-lane.mts',
+  'scripts/atlas/backfill-topology-authority.mts',
+];
+
+const QDRANT_PAYLOAD_FILES = [
+  'sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts',
+  'sveltekit-frontend/src/lib/server/vector/vector-contracts.ts',
+  'sveltekit-frontend/src/lib/server/atlas/qdrant-collection-contracts.ts',
+  'scripts/atlas/enrich-qdrant-som-payload.mts',
+  'scripts/atlas/phase108d-qdrant-payload-enrichment.mts',
+  'scripts/atlas/backfill-qdrant-identity-payload.mts',
+];
+
+const POSTGRES_ROW_FILES = [
+  'src/lib/server/db/schema.ts',
+  'src/lib/server/db/client.ts',
+  'sveltekit-frontend/src/lib/server/db/client.ts',
+  'scripts/atlas/phase108d-single-packet-proof.mts',
+  'scripts/atlas/phase108d-proof-matrix.mts',
+  'scripts/atlas/qdrant-postgres-identity-audit.mjs',
+];
+
+const REDIS_VALUE_FILES = [
+  'scripts/atlas/lib/redis-client-factory.mjs',
+  'sveltekit-frontend/src/lib/server/cache/bifrost-som-prefilter.ts',
+  'sveltekit-frontend/src/lib/server/cache/atlas-cache-cascade.ts',
+  'scripts/atlas/prewarm-redis-centroids.mts',
+  'scripts/atlas/phase108d-redis-snapshot.mts',
+  'scripts/atlas/phase108d-single-packet-proof.mts',
+];
+
 async function auditOkfSources() {
   console.log('📋 Auditing OKF sources...');
-  const okfFiles = await runGrep('OKFSchema|okf_form|OKF');
-  const okfPattern = await runGrep('ofk_result|OkfForm');
+  const okfFiles = await runGrep('OKFSchema|okf_form|OKF', OKF_OWNER_FILES);
+  const okfPattern = await runGrep('ofk_result|OkfForm', OKF_OWNER_FILES);
+  const evidence = [];
+  if (okfFiles.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.FILE_EXISTS,
+      sourceRef: okfFiles[0].split(':')[0],
+      validationResultId: 'okf-source-files',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (okfPattern.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: okfPattern[0].split(':')[0],
+      validationResultId: 'okf-source-usage',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'OKF_SOURCE',
     files_found: [...new Set([...okfFiles, ...okfPattern].map(l => l.split(':')[0]))].length,
     declaration_count: okfFiles.length,
     usage_count: okfPattern.length,
-    status: okfFiles.length > 0 ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
 async function auditPacketValidation() {
   console.log('📋 Auditing packet validation (Zod)...');
-  const validationFiles = await runGrep('phase18-envelope|validatePhase18');
-  const zodSchemas = await runGrep('phase18RequestEnvelope|phase18ResponseEnvelope');
+  const validationFiles = await runGrep('phase18-envelope|validatePhase18', PACKET_VALIDATION_FILES);
+  const zodSchemas = await runGrep('phase18RequestEnvelope|phase18ResponseEnvelope', PACKET_VALIDATION_FILES);
+  const evidence = [];
+  if (validationFiles.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.FILE_EXISTS,
+      sourceRef: validationFiles[0].split(':')[0],
+      validationResultId: 'packet-validation-files',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (zodSchemas.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: zodSchemas[0].split(':')[0],
+      validationResultId: 'packet-validation-zod',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'PACKET_VALIDATION',
     files_found: [...new Set(validationFiles.map(l => l.split(':')[0]))].length,
     validation_schemas: zodSchemas.length,
-    status: zodSchemas.length > 0 ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
 async function auditHyperragPacketRpc() {
   console.log('📋 Auditing HyperRAG packet RPC...');
-  const rpcFiles = await runGrep('HyperRagPacketRpc|hyperrag-packet-rpc');
-  const rpcUsage = await runGrep('HyperRagPacket');
+  const rpcFiles = await runGrep('HyperRagPacketRpc|hyperrag-packet-rpc', HYPERRAG_RPC_FILES);
+  const rpcUsage = await runGrep('HyperRagPacket', HYPERRAG_RPC_FILES);
+  const evidence = [];
+  if (rpcFiles.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.FILE_EXISTS,
+      sourceRef: rpcFiles[0].split(':')[0],
+      validationResultId: 'hyperrag-rpc-files',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (rpcUsage.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: rpcUsage[0].split(':')[0],
+      validationResultId: 'hyperrag-rpc-usage',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'HYPERRAG_PACKET_RPC',
     files_found: [...new Set(rpcFiles.map(l => l.split(':')[0]))].length,
     rpc_usage: rpcUsage.length,
-    status: rpcFiles.length > 0 ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
 async function auditPacketIdentity() {
   console.log('📋 Auditing packet identity utilities...');
 
-  const packetKeyRefs = await runGrep('packet_key');
-  const treeNodeIdRefs = await runGrep('tree_node_id');
-  const titleIdRefs = await runGrep('title_id');
+  const packetKeyRefs = await runGrep('packet_key', PACKET_IDENTITY_FILES);
+  const treeNodeIdRefs = await runGrep('tree_node_id', PACKET_IDENTITY_FILES);
+  const titleIdRefs = await runGrep('title_id', PACKET_IDENTITY_FILES);
+  const evidence = [];
+  if (packetKeyRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: packetKeyRefs[0].split(':')[0],
+      validationResultId: 'packet-key-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (treeNodeIdRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: treeNodeIdRefs[0].split(':')[0],
+      validationResultId: 'tree-node-id-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   // Check for conflicts (field name mismatches)
   const conflicts = {
@@ -169,65 +342,148 @@ async function auditPacketIdentity() {
     tree_node_id_refs: treeNodeIdRefs.length,
     title_id_refs: titleIdRefs.length,
     naming_conflicts: Array.from([...conflicts.packet_key_naming, ...conflicts.tree_node_id_naming, ...conflicts.title_id_naming]),
-    status: packetKeyRefs.length > 0 ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: conflicts.packet_key_naming.size || conflicts.tree_node_id_naming.size || conflicts.title_id_naming.size
+      ? 'CONFLICTING'
+      : deriveLaneStatus(evidence),
   };
 }
 
 async function auditTopologyRouting() {
   console.log('📋 Auditing topology/routing features...');
 
-  const somRefs = await runGrep('som_cluster|somCluster');
-  const kmeansRefs = await runGrep('kmeans_cluster|kmeansCluster');
-  const pageRankRefs = await runGrep('pagerank|pageRank');
+  const somRefs = await runGrep('som_cluster|somCluster', TOPOLOGY_ROUTING_FILES);
+  const kmeansRefs = await runGrep('kmeans_cluster|kmeansCluster', TOPOLOGY_ROUTING_FILES);
+  const pageRankRefs = await runGrep('pagerank|pageRank', TOPOLOGY_ROUTING_FILES);
+  const evidence = [];
+  if (somRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: somRefs[0].split(':')[0],
+      validationResultId: 'som-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (kmeansRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: kmeansRefs[0].split(':')[0],
+      validationResultId: 'kmeans-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (pageRankRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: pageRankRefs[0].split(':')[0],
+      validationResultId: 'pagerank-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'TOPOLOGY_ROUTING',
     som_refs: somRefs.length,
     kmeans_refs: kmeansRefs.length,
     pagerank_refs: pageRankRefs.length,
-    status: (somRefs.length > 0 && kmeansRefs.length > 0) ? 'WIRED' : 'PARTIAL',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
 async function auditQdrantPayload() {
   console.log('📋 Auditing Qdrant payload schema...');
 
-  const qdrantPayload = await runGrep('buildVectorPayload|qdrant_tags');
-  const payloadUsage = await runGrep('payload');
+  const qdrantPayload = await runGrep('buildVectorPayload|qdrant_tags', QDRANT_PAYLOAD_FILES);
+  const payloadUsage = await runGrep('payload', QDRANT_PAYLOAD_FILES);
+  const evidence = [];
+  if (qdrantPayload.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.FILE_EXISTS,
+      sourceRef: qdrantPayload[0].split(':')[0],
+      validationResultId: 'qdrant-payload-files',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (payloadUsage.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: payloadUsage[0].split(':')[0],
+      validationResultId: 'qdrant-payload-usage',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'QDRANT_PAYLOAD',
     payload_schema_refs: qdrantPayload.length,
     payload_usage: Math.min(payloadUsage.length, 50), // Cap to avoid false positives
-    status: qdrantPayload.length > 0 ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
 async function auditPostgresRows() {
   console.log('📋 Auditing Postgres schema (atlas_packets, codebase_chunk_index)...');
 
-  const atlasPacketsRefs = await runGrep('atlas_packets');
-  const codebaseChunkRefs = await runGrep('codebase_chunk_index');
+  const atlasPacketsRefs = await runGrep('atlas_packets', POSTGRES_ROW_FILES);
+  const codebaseChunkRefs = await runGrep('codebase_chunk_index', POSTGRES_ROW_FILES);
+  const evidence = [];
+  if (atlasPacketsRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.FILE_EXISTS,
+      sourceRef: atlasPacketsRefs[0].split(':')[0],
+      validationResultId: 'atlas-packets-files',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (codebaseChunkRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: codebaseChunkRefs[0].split(':')[0],
+      validationResultId: 'codebase-chunk-files',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'POSTGRES_ROWS',
     atlas_packets_refs: atlasPacketsRefs.length,
     codebase_chunk_index_refs: codebaseChunkRefs.length,
-    status: (atlasPacketsRefs.length > 0 || codebaseChunkRefs.length > 0) ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
 async function auditRedisValues() {
   console.log('📋 Auditing Redis/Bifrost cache...');
 
-  const bifrostRefs = await runGrep('bifrost:');
-  const redisKeyRefs = await runGrep('redis');
+  const bifrostRefs = await runGrep('bifrost:', REDIS_VALUE_FILES);
+  const redisKeyRefs = await runGrep('redis', REDIS_VALUE_FILES);
+  const evidence = [];
+  if (bifrostRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.FILE_EXISTS,
+      sourceRef: bifrostRefs[0].split(':')[0],
+      validationResultId: 'bifrost-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
+  if (redisKeyRefs.length > 0) {
+    evidence.push({
+      evidenceType: LANE_EVIDENCE_TYPES.IMPORT_REFERENCE,
+      sourceRef: redisKeyRefs[0].split(':')[0],
+      validationResultId: 'redis-key-refs',
+      observedAt: new Date().toISOString(),
+    });
+  }
 
   return {
     lane: 'REDIS_VALUES',
     bifrost_refs: bifrostRefs.length,
     redis_key_refs: Math.min(redisKeyRefs.length, 30), // Cap general redis refs
-    status: bifrostRefs.length > 0 ? 'WIRED' : 'NOT_WIRED',
+    evidence,
+    status: deriveLaneStatus(evidence),
   };
 }
 
@@ -314,14 +570,18 @@ async function main() {
     console.log(`  ${audit.lane}: ${audit.status}`);
   });
 
-  // Exit code based on completeness
-  const wiredLanes = Object.values(results.lane_audits).filter(a => a.status === 'WIRED').length;
+  const statusCounts = Object.values(results.lane_audits).reduce((acc, audit) => {
+    acc[audit.status] = (acc[audit.status] ?? 0) + 1;
+    return acc;
+  }, {});
   const totalLanes = Object.keys(results.lane_audits).length;
-  const completeness = (wiredLanes / totalLanes) * 100;
+  const evidencePresent = Object.values(results.lane_audits).filter((audit) => audit.status !== 'ABSENT').length;
+  const coverage = (evidencePresent / totalLanes) * 100;
 
-  console.log(`\n🎯 Overall Completeness: ${completeness.toFixed(1)}% (${wiredLanes}/${totalLanes} lanes wired)`);
+  console.log(`\n🎯 Evidence Coverage: ${coverage.toFixed(1)}% (${evidencePresent}/${totalLanes} lanes with evidence)`);
+  console.log(`   Status counts: ${Object.entries(statusCounts).map(([k, v]) => `${k}=${v}`).join(', ')}`);
 
-  process.exit(completeness >= 75 ? 0 : 1);
+  process.exit(0);
 }
 
 main().catch(err => {

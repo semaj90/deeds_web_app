@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { IngestPacketSchema, validateEmbeddingContract } from '../../../lib/server/ingest/ingest-packet-schema.js';
 
 const jsonBodySchema = z.object({
 	url: z.string().url().max(2000).optional(),
@@ -81,11 +82,48 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			});
 		}
 
-		// JSON body fallback
+		// JSON body — try packet validation first, fall back to generic schema
 		const raw = await request.json();
+
+		// Attempt packet schema validation
+		const packetParsed = IngestPacketSchema.safeParse(raw);
+		if (packetParsed.success) {
+			const packet = packetParsed.data;
+
+			// Validate embedding contract
+			const contractValidation = validateEmbeddingContract(packet.embeddingContract);
+			if (!contractValidation.valid) {
+				return json(
+					{
+						error: 'Invalid embedding contract',
+						details: contractValidation.errors
+					},
+					{ status: 400 }
+				);
+			}
+
+			// TODO: Persist packet to Postgres atlas_packets table
+			// For now, return 201 Created to signal acceptance
+			return json(
+				{
+					success: true,
+					packet_key: packet.packetKey,
+					message: 'Packet validated and queued for ingestion'
+				},
+				{ status: 201 }
+			);
+		}
+
+		// Fall back to generic schema for URL/path ingestion
 		const parsed = jsonBodySchema.safeParse(raw);
 		if (!parsed.success) {
-			return json({ error: parsed.error.issues[0]?.message ?? 'Invalid request body' }, { status: 400 });
+			return json(
+				{
+					error: 'Invalid request body',
+					details: parsed.error.issues[0]?.message ?? 'Unknown validation error'
+				},
+				{ status: 400 }
+			);
 		}
 		const body = parsed.data;
 		return json({

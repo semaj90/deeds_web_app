@@ -107,6 +107,26 @@ export const TreeNodeIdentitySchema = z.object({
 export type TreeNodeIdentity = z.infer<typeof TreeNodeIdentitySchema>;
 
 /**
+ * TreeNodeIdentityAuthoritySchema
+ *
+ * Strict variant used once a tree node has been reconciled into the canonical
+ * retrieval unit. This preserves the legacy nullable record for older rows
+ * while providing a non-null feature spine for downstream materializers.
+ */
+export const TreeNodeIdentityAuthoritySchema = TreeNodeIdentitySchema.extend({
+  feature_id: z
+    .string()
+    .min(1)
+    .describe('Canonical feature ID (required for enriched / authoritative tree nodes)'),
+  feature_label: z
+    .string()
+    .min(1)
+    .describe('Human-readable feature label for enriched / authoritative tree nodes'),
+});
+
+export type TreeNodeIdentityAuthority = z.infer<typeof TreeNodeIdentityAuthoritySchema>;
+
+/**
  * TreeNodeIdentitySet — A coherent set of tree nodes for cross-store verification
  */
 export const TreeNodeIdentitySetSchema = z.object({

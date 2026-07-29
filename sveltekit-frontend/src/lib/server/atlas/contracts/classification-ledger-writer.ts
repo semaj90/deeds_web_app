@@ -15,9 +15,11 @@ export type ClassificationOutcomeLedgerEvent = Record<string, unknown> & {
   feature_label: string;
   tree_node_id: string | null;
   domain_class: string | null;
+  secondary_domains: string[];
   lane_status: string;
   evidence_state: string;
   knowledge_resolution: string;
+  part_of_speech: string | null;
   ontology_ids: string[];
   concept_ids: string[];
   runtime_evidence_refs: string[];
@@ -50,15 +52,17 @@ export function buildClassificationOutcomeLedgerEvent(input: {
     feature_label: input.classification.identity.featureLabel,
     tree_node_id: input.classification.identity.treeNodeId ?? featureRow?.identity.tree_node_id ?? null,
     domain_class: input.classification.signals.domainClass ?? featureRow?.domain_class ?? null,
+    secondary_domains: [...(input.classification.signals.secondaryDomains ?? [])],
     lane_status: input.classification.signals.laneStatus,
     evidence_state: input.classification.signals.evidenceState,
     knowledge_resolution: input.classification.signals.knowledgeResolution,
+    part_of_speech: input.classification.signals.partOfSpeech ?? featureRow?.lexical?.part_of_speech ?? null,
     ontology_ids: [...input.classification.signals.ontologyIds],
     concept_ids: [...input.classification.signals.conceptIds],
     runtime_evidence_refs: [...input.classification.signals.runtimeEvidenceRefs],
     test_evidence_refs: [...input.classification.signals.testEvidenceRefs],
     validated_by: input.validation?.validatedBy ?? null,
-    validation_layer: input.validation?.layer ?? null,
+    validation_layer: input.validation?.projections?.postgres?.layer ?? null,
     can_promotion: input.validation?.canPromotion ?? null,
     is_valid: input.validation?.isValid ?? null,
     reward: input.reward ?? null,

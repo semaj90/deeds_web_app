@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
+const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
 
 const quiet = process.env.GRAPHIFY_QUIET === '1';
 const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
@@ -43,6 +44,20 @@ try {
   process.exit(0);
 } catch (err) {
   console.error(`ERROR: graphify:daily failed: ${err.message}`);
-  console.log('graphify:daily complete');
-  process.exit(1);
+  console.log('[graphify:daily] Falling back to startup pipeline...');
+
+  try {
+    execSync(FALLBACK_SCRIPT, {
+      cwd: FRONTEND,
+      stdio: 'inherit',
+      timeout: 10 * 60 * 1000,
+      shell: true,
+    });
+    console.log('[graphify:daily] fallback startup complete');
+    process.exit(0);
+  } catch (fallbackErr) {
+    console.error(`ERROR: graphify fallback failed: ${fallbackErr.message}`);
+    console.log('graphify:daily complete');
+    process.exit(1);
+  }
 }

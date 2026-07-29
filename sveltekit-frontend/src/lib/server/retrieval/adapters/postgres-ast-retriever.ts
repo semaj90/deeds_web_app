@@ -5,7 +5,6 @@
  * not by tree_node_id (which requires knowing the UUID upfront).
  */
 
-import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import type { Retriever, LaneCandidate, RetrievalInput } from '../lane-contracts.js';
 import { validateCandidate } from '../lane-contracts.js';
@@ -19,6 +18,11 @@ const AST_PACKET_KINDS = [
 function inferKindsFromQuery(query: string): string[] {
   const lower = query.toLowerCase();
   return AST_PACKET_KINDS.filter(k => lower.includes(k));
+}
+
+async function getDb() {
+  const mod = await import('$lib/server/db/client.js');
+  return mod.db;
 }
 
 export function createPostgresAstRetriever(): Retriever {
@@ -44,6 +48,7 @@ export function createPostgresAstRetriever(): Retriever {
           ? sql`AND ap.packet_type = ANY(${kinds})`
           : sql``;
 
+        const db = await getDb();
         const result = await db.execute(sql`
           SELECT
             ap.id,
@@ -51,6 +56,14 @@ export function createPostgresAstRetriever(): Retriever {
             ap.source_ref,
             ap.function_symbol,
             ap.packet_type,
+            ap.tree_node_id,
+            ap.sha256 AS content_hash,
+            ap.feature_label,
+            COALESCE(
+              ap.metadata->>'workspace_revision',
+              ap.metadata->>'workspaceRevision',
+              ap.metadata->>'revision'
+            ) AS workspace_revision,
             ap.summary,
             0.8 AS score
           FROM atlas_packets ap
@@ -67,6 +80,10 @@ export function createPostgresAstRetriever(): Retriever {
           source_ref: string;
           function_symbol: string | null;
           packet_type: string | null;
+          tree_node_id: string | null;
+          content_hash: string | null;
+          feature_label: string | null;
+          workspace_revision: string | null;
           summary: string | null;
           score: number;
         };
@@ -85,6 +102,10 @@ export function createPostgresAstRetriever(): Retriever {
             metadata: {
               function_symbol: row.function_symbol,
               packet_type: row.packet_type,
+              tree_node_id: row.tree_node_id,
+              content_hash: row.content_hash,
+              feature_label: row.feature_label,
+              workspace_revision: row.workspace_revision,
               summary: row.summary,
             },
           };

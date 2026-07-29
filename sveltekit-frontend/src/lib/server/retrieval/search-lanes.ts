@@ -144,6 +144,22 @@ function getQueryVectorForLane(
     ?? undefined;
 }
 
+function extractWorkspaceRevisionFromPayload(payload: Record<string, unknown> | undefined): string | null {
+  if (!payload) return null;
+  const metadata = payload.metadata as Record<string, unknown> | undefined;
+  return typeof payload.workspace_revision === 'string'
+    ? payload.workspace_revision
+    : typeof payload.workspaceRevision === 'string'
+      ? payload.workspaceRevision
+      : typeof metadata?.workspace_revision === 'string'
+        ? metadata.workspace_revision
+        : typeof metadata?.workspaceRevision === 'string'
+          ? metadata.workspaceRevision
+          : typeof metadata?.revision === 'string'
+            ? metadata.revision
+            : null;
+}
+
 // ── Interface ────────────────────────────────────────────────────────────────
 
 export interface ISearchLane {
@@ -356,6 +372,10 @@ export class QdrantLane extends SearchLaneBase {
             ? getVectorLaneMetadata('dense_768').laneId
             : getVectorLaneMetadata(this.embeddingLane).laneId,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
+      tree_node_id: (point.payload?.tree_node_id as string | null) ?? null,
+      content_hash: (point.payload?.content_hash as string | null) ?? null,
+      workspace_revision: extractWorkspaceRevisionFromPayload(point.payload),
+      feature_label: (point.payload?.feature_label as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
       file_path: (point.payload?.file_path as string | null) ?? null,
@@ -502,6 +522,10 @@ export class QdrantLane384 extends SearchLaneBase {
       source: 'qdrant-384' as const,
       lane_id: getVectorLaneMetadata('dense_384').laneId,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
+      tree_node_id: (point.payload?.tree_node_id as string | null) ?? null,
+      content_hash: (point.payload?.content_hash as string | null) ?? null,
+      workspace_revision: extractWorkspaceRevisionFromPayload(point.payload),
+      feature_label: (point.payload?.feature_label as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
       file_path: (point.payload?.file_path as string | null) ?? null,
@@ -597,6 +621,10 @@ export class LexicalLane extends SearchLaneBase {
         feature_id: string | null;
         file_path: string | null;
         summary: string | null;
+        tree_node_id: string | null;
+        content_hash: string | null;
+        workspace_revision: string | null;
+        feature_label: string | null;
         kmeans_cluster_id: number | null;
         som_row: number | null;
         som_col: number | null;
@@ -611,6 +639,10 @@ export class LexicalLane extends SearchLaneBase {
         confidence: 0.70,
         source: 'lexical' as const,
         packet_key: row.packet_key,
+        tree_node_id: row.tree_node_id,
+        content_hash: row.content_hash,
+        workspace_revision: row.workspace_revision,
+        feature_label: row.feature_label,
         source_ref: row.source_ref,
         feature_id: row.feature_id,
         file_path: row.file_path,

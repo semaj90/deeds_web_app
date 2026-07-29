@@ -256,9 +256,14 @@ function classifyIntent({ prompt, context = '' }) {
 
 function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
   const root = process.cwd();
-  const packetPath = path.join(root, '.opencode', 'ace-packet.json');
+  const packetCandidates = [
+    path.join(root, '.opencode', 'ace-packet.json'),
+    path.join(root, 'reports', 'semantic-contracts', 'reconciliation-ace-packet.json'),
+    path.join(root, 'docs', 'reports', 'semantic-contracts', 'reconciliation-ace-packet.json'),
+  ];
+  const packetPath = packetCandidates.find((candidate) => fs.existsSync(candidate));
 
-  if (!fs.existsSync(packetPath)) {
+  if (!packetPath) {
     return {
       ok: false,
       error: 'ACE packet not found. Run: npm run ingest:pipeline',
@@ -276,7 +281,95 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
     return { ok: false, error: `Failed to parse ACE packet: ${e.message}`, cards: [], promptPacket: '', sourceRefs: [] };
   }
 
-  let cards = (packet.cards ?? []).filter(c => c.score != null && isFinite(c.score));
+  const signalSummary = {
+    pagerank: packet.signalSummary?.pagerank ?? packet.pagerank ?? packet.pageRank ?? null,
+    summary: packet.signalSummary?.summary ?? packet.summary ?? packet.packetSummary ?? packet.retrievalSummary ?? null,
+    lexical: [
+      ...(Array.isArray(packet.signalSummary?.lexical) ? packet.signalSummary.lexical : []),
+      ...(Array.isArray(packet.lexical) ? packet.lexical : []),
+      ...(Array.isArray(packet.lexicalHints) ? packet.lexicalHints : []),
+      ...(Array.isArray(packet.lexicalSignals) ? packet.lexicalSignals : []),
+    ].filter((value) => typeof value === 'string' && value.trim()).slice(0, 12),
+    centroid: packet.signalSummary?.centroid ?? packet.centroid ?? packet.centroidId ?? packet.redisCentroid ?? null,
+    reranker: packet.signalSummary?.reranker ?? packet.reranker ?? packet.rerankerModel ?? packet.rerankModel ?? null,
+    langextract: packet.signalSummary?.langextract ?? packet.langextract ?? packet.langextractModel ?? null,
+    graph: {
+      communityId: packet.communityId ?? packet.community_id ?? null,
+      topology: packet.topology ?? null,
+    },
+  };
+
+  let cards = [];
+  if (Array.isArray(packet.cards)) {
+    cards = packet.cards.filter((c) => c && c.score != null && isFinite(c.score));
+  } else if (Array.isArray(packet.selectedEntities) || Array.isArray(packet.nextSteps)) {
+    const selectedEntityCards = (packet.selectedEntities ?? []).map((entity, index) => ({
+      title: `${entity.lane ?? 'lane'}: ${entity.status ?? 'unknown'}`,
+      summary: entity.summary ?? '',
+      sourceRef: entity.sourceRefs?.[0] ?? packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'retrieval',
+      score: entity.status === 'CONFLICTING' ? 1 : entity.status === 'ABSENT' ? 0.8 : 0.6,
+      kind: 'selectedEntity',
+      order: index,
+    }));
+
+    const nextStepCards = (packet.nextSteps ?? []).map((step, index) => ({
+      title: step.title ?? step.taskId ?? 'next-step',
+      summary: `priority=${step.priority ?? 'LOW'} blockedBy=${(step.blockedBy ?? []).join(', ')}`,
+      sourceRef: step.sourceRefs?.[0] ?? packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'planning',
+      score: step.priority === 'CRITICAL' ? 1 : step.priority === 'HIGH' ? 0.9 : 0.75,
+      kind: 'nextStep',
+      order: index,
+    }));
+
+    cards = [...selectedEntityCards, ...nextStepCards];
+  }
+
+  const signalCards = [
+    signalSummary.pagerank != null ? {
+      title: 'pagerank lens',
+      summary: `pagerank=${signalSummary.pagerank}`,
+      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'topology',
+      score: typeof signalSummary.pagerank === 'number' ? Math.min(1, Math.max(0, signalSummary.pagerank)) : 0.5,
+      kind: 'pagerankSignal',
+    } : null,
+    signalSummary.summary ? {
+      title: 'summary lens',
+      summary: String(signalSummary.summary),
+      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'summary',
+      score: 0.8,
+      kind: 'summarySignal',
+    } : null,
+    signalSummary.lexical.length ? {
+      title: 'lexical lens',
+      summary: signalSummary.lexical.join(', '),
+      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'lexical',
+      score: 0.7,
+      kind: 'lexicalSignal',
+    } : null,
+    signalSummary.centroid != null ? {
+      title: 'centroid lens',
+      summary: `centroid=${Array.isArray(signalSummary.centroid) ? '[vector]' : String(signalSummary.centroid)}`,
+      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'routing',
+      score: 0.65,
+      kind: 'centroidSignal',
+    } : null,
+    signalSummary.reranker ? {
+      title: 'reranker lens',
+      summary: `reranker=${signalSummary.reranker}${signalSummary.langextract ? ` langextract=${signalSummary.langextract}` : ''}`,
+      sourceRef: packet.sourceRefs?.[0] ?? packet.sourceArtifact?.sourceRef ?? '',
+      domain: 'ranking',
+      score: 0.75,
+      kind: 'rerankerSignal',
+    } : null,
+  ].filter(Boolean);
+
+  cards = [...cards, ...signalCards];
 
   if (domainFilter) {
     cards = cards.filter(c => c.domain === domainFilter);
@@ -313,8 +406,9 @@ function buildAgenticRagContext({ query, maxCards = 20, domainFilter }) {
     ok: true,
     query,
     totalCards: cards.length,
-    packetAge: packet.generatedAt
-      ? Math.round((Date.now() - new Date(packet.generatedAt).getTime()) / 60000) + 'min'
+    signalSummary,
+    packetAge: packet.generatedAt || packet.createdAt
+      ? Math.round((Date.now() - new Date(packet.generatedAt ?? packet.createdAt).getTime()) / 60000) + 'min'
       : 'unknown',
     cards,
     sourceRefs,

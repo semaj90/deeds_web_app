@@ -6,7 +6,6 @@
  * wildcard escaping — never raw query interpolation.
  */
 
-import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import type { Retriever, LaneCandidate, RetrievalInput } from '../lane-contracts.js';
 import { validateCandidate } from '../lane-contracts.js';
@@ -17,6 +16,11 @@ import { validateCandidate } from '../lane-contracts.js';
  */
 export function escapeLike(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
+async function getDb() {
+  const mod = await import('$lib/server/db/client.js');
+  return mod.db;
 }
 
 /**
@@ -83,12 +87,21 @@ export function createPostgresExactRetriever(): Retriever {
           )`;
         });
 
+        const db = await getDb();
         const result = await db.execute(sql`
           SELECT
             ap.id,
             ap.packet_key,
             ap.source_ref,
             ap.function_symbol,
+            ap.tree_node_id,
+            ap.sha256 AS content_hash,
+            ap.feature_label,
+            COALESCE(
+              ap.metadata->>'workspace_revision',
+              ap.metadata->>'workspaceRevision',
+              ap.metadata->>'revision'
+            ) AS workspace_revision,
             ap.summary,
             CASE
               WHEN ap.function_symbol = ${primary} THEN 1.0
@@ -107,6 +120,10 @@ export function createPostgresExactRetriever(): Retriever {
           packet_key: string;
           source_ref: string;
           function_symbol: string | null;
+          tree_node_id: string | null;
+          content_hash: string | null;
+          feature_label: string | null;
+          workspace_revision: string | null;
           summary: string | null;
           score: number;
         };
@@ -124,6 +141,10 @@ export function createPostgresExactRetriever(): Retriever {
             lane: 'exact',
             metadata: {
               function_symbol: row.function_symbol,
+              tree_node_id: row.tree_node_id,
+              content_hash: row.content_hash,
+              feature_label: row.feature_label,
+              workspace_revision: row.workspace_revision,
               summary: row.summary,
             },
           };

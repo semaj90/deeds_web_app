@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   ClassificationLedgerKindSchema,
+  ClassificationPartOfSpeechSchema,
   EvidenceStateSchema,
   KnowledgeResolutionSchema,
   RepresentationNameSchema,
@@ -36,10 +37,12 @@ export const ClassificationSignalsSchema = z.object({
   evidenceState: EvidenceStateSchema,
   knowledgeResolution: KnowledgeResolutionSchema,
   domainClass: z.string().min(1).nullable().optional(),
+  secondaryDomains: z.array(z.string().min(1)).max(8).optional(),
   ontologyIds: z.array(z.string().min(1)).default([]),
   conceptIds: z.array(z.string().min(1)).default([]),
   runtimeEvidenceRefs: z.array(z.string().min(1)).default([]),
   testEvidenceRefs: z.array(z.string().min(1)).default([]),
+  partOfSpeech: ClassificationPartOfSpeechSchema,
   pageRankScore: z.number().min(0).max(1).nullable().optional(),
   communityId: z.union([z.string(), z.number()]).nullable().optional(),
   kmeansCluster: z.number().int().nonnegative().nullable().optional(),

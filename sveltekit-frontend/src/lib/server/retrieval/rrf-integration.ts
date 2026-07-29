@@ -138,6 +138,27 @@ async function queryQdrantVectorSignal(
 ): Promise<Array<{ id: string; score: number; text?: string; metadata?: Record<string, unknown> }>> {
   if (!embedding) return [];
 
+  const normalizeQdrantMetadata = (payload: Record<string, unknown>, fallbackId: string) => ({
+    packet_key: String(payload.packet_key ?? payload.packetKey ?? fallbackId ?? '').trim() || null,
+    source_ref: String(
+      payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? ''
+    ).trim() || null,
+    content_hash: String(payload.content_hash ?? payload.contentHash ?? payload.sha256 ?? payload.source_hash ?? payload.sourceHash ?? '').trim() || null,
+    tree_node_id: String(payload.tree_node_id ?? payload.treeNodeId ?? payload.tree_node ?? '').trim() || null,
+    feature_id: payload.feature_id ?? payload.featureId ?? null,
+    feature_label: payload.feature_label ?? payload.featureLabel ?? null,
+    workspace_revision: String(payload.workspace_revision ?? payload.workspaceRevision ?? payload.revision ?? '').trim() || null,
+    file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
+    qdrant_point_id: fallbackId,
+    qdrant_collection: payload.qdrant_collection ?? payload.qdrantCollection ?? null,
+    som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
+    som_bmu_row: payload.som_bmu_row ?? null,
+    som_bmu_col: payload.som_bmu_col ?? null,
+    centroid_id: payload.centroid_id ?? null,
+    cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
+    community_id: payload.community_id ?? payload.communityId ?? null,
+  });
+
   try {
     const { buildVectorPayload } = await import('$lib/server/config/vector-config.js');
     const { searchCodebaseAnn } = await import('$lib/server/search/qdrant-search.js');
@@ -183,20 +204,7 @@ async function queryQdrantVectorSignal(
                 id: String(r.id),
                 score: Number(r.score ?? 0),
                 text: String(payload.content ?? payload.summary ?? ''),
-                metadata: {
-                  packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
-                  source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
-                  feature_id: payload.feature_id ?? payload.featureId ?? null,
-                  file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
-                  qdrant_point_id: String(r.id),
-                  qdrant_collection: collections[0],
-                  som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
-                  som_bmu_row: payload.som_bmu_row ?? null,
-                  som_bmu_col: payload.som_bmu_col ?? null,
-                  centroid_id: payload.centroid_id ?? null,
-                  cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
-                  community_id: payload.community_id ?? payload.communityId ?? null,
-                },
+                metadata: normalizeQdrantMetadata({ ...payload, qdrant_collection: collections[0] }, String(r.id)),
               };
             });
           }
@@ -229,20 +237,20 @@ async function queryQdrantVectorSignal(
           id,
           score: r.semantic_score,
           text: String(r.content ?? ''),
-          metadata: {
-            packet_key: String(r.packet_key ?? r.stable_key ?? r.qdrant_id ?? '').trim() || null,
-            source_ref: String(r.source_ref ?? r.file_path ?? '').trim() || null,
-            feature_id: r.feature_id ?? null,
-            file_path: String(r.file_path ?? '').trim() || null,
-            qdrant_point_id: String(r.qdrant_id ?? ''),
-            qdrant_collection: collection,
-            som_cluster: r.som_cluster ?? null,
-            som_bmu_row: r.som_bmu_row ?? null,
-            som_bmu_col: r.som_bmu_col ?? null,
-            centroid_id: r.centroid_id ?? null,
-            cluster_id: null,
-            community_id: null,
-          },
+          metadata: normalizeQdrantMetadata(
+            {
+              ...r,
+              packet_key: r.packet_key ?? r.stable_key,
+              source_ref: r.source_ref ?? r.file_path,
+              content_hash: r.content_hash ?? r.contentHash,
+              tree_node_id: r.tree_node_id ?? r.treeNodeId,
+              feature_id: r.feature_id ?? r.featureId,
+              feature_label: r.feature_label ?? r.featureLabel,
+              workspace_revision: r.workspace_revision ?? r.workspaceRevision,
+              qdrant_collection: collection,
+            },
+            String(r.qdrant_id ?? r.stable_key ?? r.file_path ?? '')
+          ),
         };
         if (!current || next.score > current.score) mergedResults.set(id, next);
       }
@@ -295,20 +303,7 @@ async function queryQdrantVectorSignal(
         id: String(r.id),
         score: Number(r.score ?? 0),
         text: String(payload.content ?? payload.summary ?? ''),
-        metadata: {
-          packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
-          source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
-          feature_id: payload.feature_id ?? payload.featureId ?? null,
-          file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
-          qdrant_point_id: String(r.id),
-          qdrant_collection: 'codebase_chunks_768',
-          som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
-          som_bmu_row: payload.som_bmu_row ?? null,
-          som_bmu_col: payload.som_bmu_col ?? null,
-          centroid_id: payload.centroid_id ?? null,
-          cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
-          community_id: payload.community_id ?? payload.communityId ?? null,
-        },
+        metadata: normalizeQdrantMetadata({ ...payload, qdrant_collection: 'codebase_chunks_768' }, String(r.id)),
       };
     });
   } catch (err) {
@@ -355,20 +350,7 @@ async function queryTopology64Signal(
       id: String(r.id),
       score: Number(r.score ?? 0),
       text: String(payload.content ?? payload.summary ?? ''),
-      metadata: {
-        packet_key: String(payload.packet_key ?? payload.packetKey ?? r.id ?? '').trim() || null,
-        source_ref: String(payload.source_ref ?? payload.sourceRef ?? payload.canonicalSourceRef ?? payload.file_path ?? payload.filePath ?? '').trim() || null,
-        feature_id: payload.feature_id ?? payload.featureId ?? null,
-        file_path: String(payload.file_path ?? payload.filePath ?? null) || null,
-        qdrant_point_id: String(r.id),
-        qdrant_collection: 'codebase_topology_64',
-        som_cluster: payload.som_cluster ?? payload.somCluster ?? null,
-        som_bmu_row: payload.som_bmu_row ?? null,
-        som_bmu_col: payload.som_bmu_col ?? null,
-        centroid_id: payload.centroid_id ?? null,
-        cluster_id: payload.cluster_id ?? payload.clusterId ?? null,
-        community_id: payload.community_id ?? payload.communityId ?? null,
-      },
+      metadata: normalizeQdrantMetadata({ ...payload, qdrant_collection: 'codebase_topology_64' }, String(r.id)),
     };
   });
 }
@@ -671,10 +653,16 @@ export async function multiLaneRetrievalWithRRF(
     // Extract candidate query packet for topology signal computation
     let queryPacket: Partial<Record<string, unknown>> | null = null;
     if (bm25Results.status === 'fulfilled' && bm25Results.value.length > 0) {
+      const firstBm25 = bm25Results.value[0] as Record<string, unknown> | undefined;
       queryPacket = extractCanonicalPacketFromMetadata({
-        packet_key: bm25Results.value[0]?.stable_key,
-        source_ref: bm25Results.value[0]?.file_path,
-        som_cluster: bm25Results.value[0]?.som_cluster,
+        packet_key: firstBm25?.stable_key,
+        source_ref: firstBm25?.file_path,
+        content_hash: firstBm25?.content_hash ?? firstBm25?.contentHash,
+        tree_node_id: firstBm25?.tree_node_id ?? firstBm25?.treeNodeId,
+        feature_id: firstBm25?.feature_id ?? firstBm25?.featureId,
+        feature_label: firstBm25?.feature_label ?? firstBm25?.featureLabel,
+        workspace_revision: firstBm25?.workspace_revision ?? firstBm25?.workspaceRevision,
+        som_cluster: firstBm25?.som_cluster,
       });
     }
 
@@ -691,6 +679,11 @@ export async function multiLaneRetrievalWithRRF(
               file_path: hit.file_path,
               source_ref: hit.file_path,
               packet_key: hit.stable_key,
+              content_hash: hit.content_hash ?? hit.contentHash ?? null,
+              tree_node_id: hit.tree_node_id ?? hit.treeNodeId ?? null,
+              feature_id: hit.feature_id ?? hit.featureId ?? null,
+              feature_label: hit.feature_label ?? hit.featureLabel ?? null,
+              workspace_revision: hit.workspace_revision ?? hit.workspaceRevision ?? null,
             },
           }))
         : [];

@@ -21,8 +21,15 @@ import {
   ollamaFetch,
 } from '../ollama.js';
 import { getOllamaEndpoint } from '../utils/ollama-endpoint.js';
-import * as Hypergraph from '../ai/hypergraph-store.js';
-import { retrievalClient } from '../grpc/retrieval-client.js';
+
+async function getHypergraphStore() {
+  return import('../ai/hypergraph-store.js');
+}
+
+async function getRetrievalClient() {
+  const mod = await import('../grpc/retrieval-client.js');
+  return mod.retrievalClient;
+}
 
 const RUNTIME_CONTEXT_SIZE = Number(
   process.env.LLM_CONTEXT_SIZE ??
@@ -137,7 +144,13 @@ export function buildGemma4AcePrompt(context: AceCodeIntelContext, task?: string
     const chunkLines = context.chunkContext.map((c) => {
       const meta = [c.kind, c.domain, c.language].filter(Boolean).join(' | ');
       const tags = c.semanticTags.slice(0, 4).join(', ');
+      const identityBits = [
+        c.packetKey ? `packet=${c.packetKey}` : null,
+        c.featureId ? `feature=${c.featureId}` : null,
+        c.treeNodeId ? `tree=${c.treeNodeId}` : null,
+      ].filter(Boolean).join(' | ');
       const parts = [`  ${c.relativePath ?? c.chunkId} [${meta}]`];
+      if (identityBits) parts.push(`  Identity: ${identityBits}`);
       if (tags) parts.push(`  Tags: ${tags}`);
       if (c.summary) parts.push(`  Summary: ${c.summary.slice(0, 300)}`);
       return parts.join('\n');
@@ -225,6 +238,7 @@ export async function callGemma4WithAceContext(
   const taskType = opts.taskType ?? 'streaming-chat';
 
   if (lane === 'interactive-agent') {
+    const Hypergraph = await getHypergraphStore();
     await Hypergraph.recordSessionStart({
       sessionId,
       lane: lane as any,
@@ -248,6 +262,7 @@ export async function callGemma4WithAceContext(
 
     // Link chunks for tool loop as well
     if (lane === 'interactive-agent') {
+      const Hypergraph = await getHypergraphStore();
       for (const chunk of context.chunkContext) {
         if (chunk.relativePath) {
           await Hypergraph.linkKnowledgeToSession(sessionId, chunk.relativePath, 1.0);
@@ -334,6 +349,7 @@ export async function callGemma4WithAceContext(
 
     // ── Link Consulted Chunks to Hypergraph ──
     if (lane === 'interactive-agent') {
+      const Hypergraph = await getHypergraphStore();
       for (const chunk of context.chunkContext) {
         if (chunk.relativePath) {
           await Hypergraph.linkKnowledgeToSession(sessionId, chunk.relativePath, 1.0);
@@ -441,6 +457,7 @@ export const ACE_TOOLS: Gemma4Tool[] = [
       required: ['query'],
     },
     execute: async (args) => {
+      const retrievalClient = await getRetrievalClient();
       const results = await retrievalClient.searchChunks(
         String(args.query),
         Number(args.limit ?? 5)
@@ -464,6 +481,7 @@ export const ACE_TOOLS: Gemma4Tool[] = [
       required: ['cluster_id'],
     },
     execute: async (args) => {
+      const retrievalClient = await getRetrievalClient();
       const result = await retrievalClient.getClusterSummary(
         Number(args.cluster_id),
         (args.cluster_type as any) ?? 'gpu'
@@ -482,6 +500,7 @@ export const ACE_TOOLS: Gemma4Tool[] = [
       },
     },
     execute: async (args) => {
+      const retrievalClient = await getRetrievalClient();
       const result = await retrievalClient.expandAstNeighbors(
         String(args.symbol ?? ''),
         String(args.file_path ?? '')
@@ -502,6 +521,7 @@ export const ACE_TOOLS: Gemma4Tool[] = [
       required: ['bmu_row', 'bmu_col'],
     },
     execute: async (args) => {
+      const retrievalClient = await getRetrievalClient();
       const result = await retrievalClient.getTopologyContext(
         Number(args.bmu_row),
         Number(args.bmu_col),

@@ -337,6 +337,13 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
               file_path,
               summary,
               packet_key,
+              tree_node_id,
+              sha256 AS content_hash,
+              COALESCE(
+                metadata->>'workspace_revision',
+                metadata->>'workspaceRevision',
+                metadata->>'revision'
+              ) AS workspace_revision,
               updated_at
             FROM atlas_packets
             WHERE source_ref = ANY(${sourceRefs384}::text[])
@@ -346,7 +353,16 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
     ]);
 
     type ChunkRow = { id: string; summary: string | null; source_ref: string | null; file_path: string | null; updated_at: Date };
-    type PacketRow = { source_ref: string; file_path: string | null; summary: string | null; packet_key: string | null; updated_at: Date };
+    type PacketRow = {
+      source_ref: string;
+      file_path: string | null;
+      summary: string | null;
+      packet_key: string | null;
+      tree_node_id: string | null;
+      content_hash: string | null;
+      workspace_revision: string | null;
+      updated_at: Date;
+    };
 
     const chunkMap = new Map(
       (chunkRows.rows as ChunkRow[]).map((p) => [p.id, p])
@@ -359,12 +375,25 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
       // Try chunk join (768-dim path)
       const chunk = chunkMap.get(r.metadata?.qdrant_point_id as string);
       if (chunk) {
+        const ref = chunk.source_ref || r.source_ref;
+        const packet = ref ? packetMap.get(ref) : undefined;
         return {
           ...r,
-          source_ref: chunk.source_ref || r.source_ref,
-          file_path: chunk.file_path || r.file_path,
-          summary: chunk.summary || r.summary,
-          metadata: { ...r.metadata, updated_at: chunk.updated_at },
+          source_ref: packet?.source_ref || chunk.source_ref || r.source_ref,
+          file_path: packet?.file_path || chunk.file_path || r.file_path,
+          summary: packet?.summary || chunk.summary || r.summary,
+          packet_key: packet?.packet_key || r.packet_key,
+          tree_node_id: packet?.tree_node_id || r.tree_node_id,
+          content_hash: packet?.content_hash || r.content_hash || r.metadata?.content_hash,
+          workspace_revision: packet?.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
+          metadata: {
+            ...r.metadata,
+            updated_at: chunk.updated_at,
+            packet_key: packet?.packet_key || r.packet_key,
+            tree_node_id: packet?.tree_node_id || r.tree_node_id,
+            content_hash: packet?.content_hash || r.content_hash || r.metadata?.content_hash,
+            workspace_revision: packet?.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
+          },
         };
       }
 
@@ -378,7 +407,17 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
           file_path: packet.file_path || r.file_path,
           summary: packet.summary || r.summary,
           packet_key: packet.packet_key || r.packet_key,
-          metadata: { ...r.metadata, updated_at: packet.updated_at },
+          tree_node_id: packet.tree_node_id || r.tree_node_id,
+          content_hash: packet.content_hash || r.content_hash || r.metadata?.content_hash,
+          workspace_revision: packet.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
+          metadata: {
+            ...r.metadata,
+            updated_at: packet.updated_at,
+            packet_key: packet.packet_key || r.packet_key,
+            tree_node_id: packet.tree_node_id || r.tree_node_id,
+            content_hash: packet.content_hash || r.content_hash || r.metadata?.content_hash,
+            workspace_revision: packet.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
+          },
         };
       }
 

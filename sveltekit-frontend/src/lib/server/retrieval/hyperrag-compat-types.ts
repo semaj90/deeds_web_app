@@ -5,6 +5,13 @@ export type HyperRagMode = 'codebase' | 'evidence' | 'legal' | 'docs' | 'program
 
 export type HyperRagHit = {
   id: string;
+  packetKey?: string;
+  sourceRef?: string;
+  contentHash?: string | null;
+  workspaceRevision?: string | null;
+  treeNodeId?: string | null;
+  featureId?: string | null;
+  featureLabel?: string | null;
   sourcePath?: string;
   title?: string;
   text?: string;

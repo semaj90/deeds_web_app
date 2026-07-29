@@ -200,13 +200,10 @@ async function callAtlasWorkflowTool(toolName, args = {}) {
       return result;
     }
   } catch (error) {
-    const message = String(error?.message ?? error);
-    if (!/not found|unknown tool|MCP .*error/i.test(message)) {
-      throw error;
-    }
     if (!['classify_intent', 'build_agentic_rag_context', 'build_recommendation', 'record_outcome'].includes(toolName)) {
       throw error;
     }
+    vlog(`${toolName} MCP fallback`, String(error?.message ?? error));
   }
   return callAtlasToolsLocal(toolName, args);
 }
@@ -238,6 +235,7 @@ function createWorkflowRun(query, normalizedQuery) {
     dag: [],
     state_history: [],
     intent: null,
+    active_context: null,
     ace_context: null,
     recommendation: null,
     outcome: null,
@@ -351,6 +349,27 @@ async function buildAceContextStage(query) {
     promptPacket: '',
     safeNextCommand: 'run local retrieval before synthesis',
     error: 'build_agentic_rag_context unavailable',
+  };
+}
+
+async function loadActiveContextStage() {
+  try {
+    const result = await callMcpTool('atlas_get_active_context', {});
+    if (result && typeof result === 'object' && (result.ok ?? true)) {
+      return result;
+    }
+  } catch (error) {
+    vlog('atlas_get_active_context fallback', String(error?.message ?? error));
+  }
+
+  return {
+    ok: false,
+    objective: null,
+    selectedEntities: [],
+    violations: [],
+    nextSteps: [],
+    sourceRefs: [],
+    tokenBudget: 0,
   };
 }
 
@@ -678,6 +697,20 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
   });
   console.log(identity.packet_key ? `FOUND: ${identity.packet_key}` : 'MISS (unregistered)');
 
+  // L2.25 — Load the active reconciliation packet for this turn
+  process.stdout.write('  [L2.25] atlas_get_active_context... ');
+  const activeContext = await loadActiveContextStage();
+  workflow.active_context = activeContext;
+  appendWorkflowStage(workflow, 'atlas_get_active_context', 'PLAN', {
+    dependsOn: ['canonical_identity'],
+    outputRef: 'workflow.active_context',
+    evidenceRefs: [
+      ...(activeContext.selectedEntities ?? []).flatMap((entity) => entity.sourceRefs ?? []),
+      ...(activeContext.nextSteps ?? []).flatMap((step) => step.sourceRefs ?? []),
+    ].filter(Boolean),
+  });
+  console.log(activeContext.ok ? `resume packet ready (${activeContext.selectedEntities?.length ?? 0} entities)` : 'unavailable');
+
   // L2.5 — Build bounded ACE context packet
   process.stdout.write('  [L2.5] build_agentic_rag_context... ');
   const aceContext = await buildAceContextStage(userQuery);
@@ -742,6 +775,14 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
       domain: intent.domain ?? 'general',
       errorSummary: gemma4.summary ?? userQuery,
       evidenceLines: [
+        ...(activeContext.selectedEntities ?? []).map((entity) => `${entity.lane}: ${entity.summary}`),
+        ...(activeContext.nextSteps ?? []).map((step) => `${step.taskId}: ${step.title}`),
+        activeContext.signalSummary?.summary ? `summary-lens: ${activeContext.signalSummary.summary}` : '',
+        activeContext.signalSummary?.pagerank != null ? `pagerank-lens: ${activeContext.signalSummary.pagerank}` : '',
+        ...(Array.isArray(activeContext.signalSummary?.lexical) ? activeContext.signalSummary.lexical.map((term) => `lexical-lens: ${term}`) : []),
+        aceContext.signalSummary?.summary ? `ace-summary-lens: ${aceContext.signalSummary.summary}` : '',
+        aceContext.signalSummary?.pagerank != null ? `ace-pagerank-lens: ${aceContext.signalSummary.pagerank}` : '',
+        aceContext.signalSummary?.reranker ? `reranker-lens: ${aceContext.signalSummary.reranker}` : '',
         ...rgMatches.slice(0, 10),
         ...(aceContext.cards ?? []).slice(0, 5).map((card) => `${card.title ?? 'ACE card'}${card.sourceRef ? ` :: ${card.sourceRef}` : ''}`),
         ...(rerankResult.ranked ?? []).slice(0, 5).map((hit) => hit.source_ref ?? hit.packet_key ?? hit.title ?? ''),
@@ -835,6 +876,11 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
       graph_hits: l4Evidence.graph_hit_count,
       cache_hits: l4Evidence.cache_hits,
       rerank_score: rerankResult.top_score,
+      signal_summary: {
+        active_context: activeContext.signalSummary ?? null,
+        ace_context: aceContext.signalSummary ?? null,
+        memory_swap: activeContext.memorySwap ?? null,
+      },
     },
     task_promotion: taskPromotion,
     kanban_recommendation: graphProofTask,
@@ -850,6 +896,7 @@ export async function runRecommendationWorkflow(userQuery, initialSourceRefs = [
     workflow_status: workflow.workflow_status,
     workflow_dag: workflow.dag,
     ace_context: aceContext,
+    active_context: activeContext,
     structured_recommendation: structuredRecommendation,
   };
 

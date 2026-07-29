@@ -2,6 +2,10 @@ export interface AceEvidence {
   packetKey: string;
   sourceRef: string | null;
   contentHash: string | null;
+  treeNodeId?: string | null;
+  featureId?: string | null;
+  featureLabel?: string | null;
+  workspaceRevision?: string | null;
   evidenceKind: 'lexical' | 'semantic' | 'topology' | 'playbook' | 'outcome' | 'tool';
   rawScore: number | null;
   fusedScore: number | null;

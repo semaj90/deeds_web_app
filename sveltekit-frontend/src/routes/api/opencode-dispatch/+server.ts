@@ -26,6 +26,11 @@ import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
 import { computeDispatchDecision, type DispatcherState } from '$lib/server/dispatch/dynamic-dispatcher.js';
 import { createValidationMiddleware } from '$lib/server/opencode/validation-schema.js';
+import {
+  classifyOpenCodeIntent,
+  chooseOpenCodeAction,
+  type OpenCodeRoutingDecision,
+} from '$lib/server/opencode/intent-router.js';
 
 // ============================================================================
 // VALIDATION SCHEMA & MIDDLEWARE
@@ -43,15 +48,21 @@ interface PlannerRequest {
 }
 
 interface PlannerResponse {
-  action: 'search_rg' | 'query_qdrant' | 'search_codebase' | 'auto' | 'plan';
+  action: OpenCodeRoutingDecision['action'];
   confidence: number;
   reason: string;
+  routeHints: string[];
 }
 
 async function invokeGemma4Planner(
   intent: string,
   context?: Record<string, unknown>
 ): Promise<PlannerResponse> {
+  const heuristic = classifyOpenCodeIntent(intent, context);
+  if (heuristic.action !== 'auto' && heuristic.confidence >= 0.85) {
+    return heuristic;
+  }
+
   const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
 
   const systemPrompt = `You are an OpenCode planner. Given a user intent, decide which action to execute:
@@ -61,7 +72,11 @@ async function invokeGemma4Planner(
 - auto: let dispatcher decide
 - plan: decompose into sub-tasks
 
-Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "..." }`;
+Prefer search_rg for keywords, grep, find, locate, read, and textual matches.
+Prefer search_codebase for AST, module, function, class, wiring, and implementation questions.
+Prefer query_qdrant for embedding, semantic, vector, centroid, cluster, ACE, KAG, DAG, and HyperRAG questions.
+
+Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "...", "routeHints": [] }`;
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -93,7 +108,8 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "..." }`;
       return {
         action: 'auto',
         confidence: 0.5,
-        reason: 'Planner returned empty response, defaulting to auto'
+        reason: 'Planner returned empty response, defaulting to auto',
+        routeHints: []
       };
     }
 
@@ -104,7 +120,8 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "..." }`;
       return {
         action: 'auto',
         confidence: 0.5,
-        reason: `Planner response malformed: ${content.slice(0, 100)}`
+        reason: `Planner response malformed: ${content.slice(0, 100)}`,
+        routeHints: []
       };
     }
 
@@ -118,7 +135,8 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "..." }`;
         return {
           action: 'auto',
           confidence: 0.5,
-          reason: `Planner JSON parse failed: ${String(parseErr)}`
+          reason: `Planner JSON parse failed: ${String(parseErr)}`,
+          routeHints: []
         };
       }
       try {
@@ -127,7 +145,8 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "..." }`;
         return {
           action: 'auto',
           confidence: 0.5,
-          reason: `Planner JSON invalid (greedy): ${String(parseErr)}`
+          reason: `Planner JSON invalid (greedy): ${String(parseErr)}`,
+          routeHints: []
         };
       }
     }
@@ -135,14 +154,18 @@ Respond with JSON: { "action": "...", "confidence": 0.0-1.0, "reason": "..." }`;
     return {
       action: (parsed.action as PlannerResponse['action']) || 'auto',
       confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
-      reason: parsed.reason || 'Parsed from Gemma4 response'
+      reason: parsed.reason || 'Parsed from Gemma4 response',
+      routeHints: Array.isArray((parsed as any).routeHints)
+        ? (parsed as any).routeHints.map((hint: unknown) => String(hint)).filter(Boolean)
+        : []
     };
   } catch (err) {
     console.error('[opencode-dispatch] Gemma4 planner error:', err);
     return {
       action: 'auto',
       confidence: 0.0,
-      reason: `Planner failed: ${err instanceof Error ? err.message : 'unknown'}`
+      reason: `Planner failed: ${err instanceof Error ? err.message : 'unknown'}`,
+      routeHints: []
     };
   }
 }
@@ -321,11 +344,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // 4. Invoke Gemma4 planner
     const plannerResult = await invokeGemma4Planner(intent, context);
+    const heuristicResult = classifyOpenCodeIntent(intent, context);
+    const selectedRoute = chooseOpenCodeAction(plannerResult, heuristicResult);
 
     // 5. Invoke LangGraph dispatcher
     const dispatcherResult = await invokeLangGraphDispatcher(
       intent,
-      plannerResult.action,
+      selectedRoute.action,
       toolName,
       context
     );
@@ -335,8 +360,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       timestamp: new Date().toISOString(),
       sessionId,
       intent,
-      action: plannerResult.action,
-      plannerConfidence: plannerResult.confidence,
+      action: selectedRoute.action,
+      plannerConfidence: selectedRoute.confidence,
       toolsExecuted: dispatcherResult.results.map(r => r.toolName),
       successCount: dispatcherResult.results.filter(r => r.resultType === 'success').length,
       failureCount: dispatcherResult.results.filter(r => r.resultType === 'error').length,
@@ -358,9 +383,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       telemetry: captureTelemtry ? telemetryEvent : null,
       proof: telemetryProof,
       metadata: {
-        plannerDecision: plannerResult.action,
-        plannerConfidence: plannerResult.confidence,
-        plannerReason: plannerResult.reason,
+        plannerDecision: selectedRoute.action,
+        plannerConfidence: selectedRoute.confidence,
+        plannerReason: selectedRoute.reason,
+        routeHints: selectedRoute.routeHints,
         sessionId,
         totalExecutionMs: Date.now() - startTime
       }

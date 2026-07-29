@@ -15,6 +15,8 @@
  * HyperRAG is a MIRROR only, never the source of truth.
  */
 
+import { toHyperRagRequestFromEnrichedTreeNode, type EnrichedTreeNodeProjectionSeed } from '../enriched-tree-node-projections.js';
+
 export interface HyperRagFactResponse {
   packet_key: unknown;
   source_ref: unknown;
@@ -277,6 +279,13 @@ export function toHyperRagRequest(packet: SemanticPacketDomainObject): Omit<
     content_hash: packet.contentHash,
     tree_node_id: packet.treeNodeId,
   };
+}
+
+export function toHyperRagRequestFromStrictTreeNode(seed: EnrichedTreeNodeProjectionSeed): Omit<
+  HyperRagFactResponse,
+  'n_ary_facts' | 'rpc_received_at' | 'rpc_version'
+> {
+  return toHyperRagRequestFromEnrichedTreeNode(seed);
 }
 
 /**

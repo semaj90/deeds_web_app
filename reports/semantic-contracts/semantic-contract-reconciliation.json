@@ -1,190 +1,265 @@
 {
-  "timestamp": "2026-07-26T23:16:32.862Z",
+  "timestamp": "2026-07-29T00:17:53.512Z",
   "repo_root": "C:\\Users\\james\\Videos\\deeds-web-app",
   "contract_shape": {
     "SemanticPacketV1": {
       "identity": [
-        "packet_key",
-        "tree_node_id",
-        "source_ref",
-        "title_id",
-        "content_hash"
+        "packetKey",
+        "workspaceId",
+        "sourceRef",
+        "semanticAnchor"
+      ],
+      "semantic": [
+        "featureId",
+        "featureLabel",
+        "titleId",
+        "domainClass"
+      ],
+      "lineage": [
+        "treeNodeId",
+        "qualifiedName",
+        "signatureHash",
+        "previousTreeNodeId",
+        "structuralRevision"
       ],
       "content": [
+        "contentHash",
         "summary",
-        "embedding",
-        "gemma4_summary",
-        "tags"
-      ],
-      "knowledge": [
-        "feature_id",
-        "feature_label",
-        "ontology_label",
-        "topology_label"
-      ],
-      "resolution": [
-        "status",
-        "confidence",
-        "verified_at",
-        "verification_command"
-      ],
-      "authority": [
-        "karpathy_blend_score",
-        "pagerank_score",
-        "authority_class"
+        "summaryModel"
       ],
       "representations": [
-        "qdrant_point_id",
-        "postgres_row_id",
-        "redis_key",
-        "cold_storage_uri"
+        "embedding.legacy_768",
+        "embedding.semantic_384",
+        "embedding.latent_64",
+        "embedding.topology_4d"
+      ],
+      "derived": [
+        "derivedParameters",
+        "rankFusion",
+        "identityLane",
+        "identityConfidence"
       ]
     },
     "HypergraphFactV1": {
       "identity": [
-        "fact_id",
-        "fact_ulid",
-        "packet_key"
+        "factId",
+        "packetKey",
+        "workspaceId",
+        "factVersion"
       ],
       "structure": [
-        "type",
+        "factType",
         "participants",
-        "properties"
+        "participantsByRole",
+        "relations"
       ],
       "evidence": [
-        "evidence_packet_ids",
+        "evidencePacketKeys",
+        "evidenceRefs",
         "confidence",
-        "disputed"
+        "authorityClass",
+        "resolutionState"
       ]
     },
     "FeatureMatrixRowV1": {
-      "routing": [
-        "som_cluster",
-        "kmeans_cluster",
-        "cluster_key"
+      "identity": [
+        "identity.packet_key",
+        "identity.source_ref",
+        "identity.file_path",
+        "identity.feature_id",
+        "identity.title_id",
+        "identity.tree_node_id"
       ],
-      "topology": [
-        "neo4j_neighbors",
-        "community_id",
-        "directory_path"
-      ],
-      "semantic": [
-        "embedding",
-        "dense_score",
-        "sparse_score"
+      "dense": [
+        "dense_768",
+        "dense_384",
+        "latent_64"
       ],
       "lexical": [
-        "trigram_score",
-        "fts_score"
+        "lexical",
+        "bm25",
+        "bm42"
       ],
-      "ontology": [
-        "ontology_label",
-        "domain_class"
+      "topology": [
+        "topology",
+        "pagerank_score",
+        "som_cell_row",
+        "som_cell_col",
+        "som_index",
+        "som_distance_to_centroid"
       ],
-      "classifier": [
-        "required_verification",
-        "priority_rank"
+      "classifiers": [
+        "classifiers",
+        "naive_bayes_class",
+        "naive_bayes_score",
+        "logistic_regression_score",
+        "xgboost_score"
+      ],
+      "provenance": [
+        "workspace_revision",
+        "schema_version",
+        "feature_labels",
+        "is_valid",
+        "validation_errors"
       ]
     },
     "ContractValidationResult": {
       "outcome": [
-        "is_valid",
-        "validation_errors"
+        "isValid",
+        "canPromotion",
+        "violations"
       ],
       "audit": [
-        "validated_at",
-        "validated_by",
-        "trace_id"
+        "validatedAt",
+        "validatedBy",
+        "phase",
+        "blockedLayers",
+        "warnLayers",
+        "passLayers"
+      ],
+      "snapshots": [
+        "projections"
       ]
     }
   },
   "ownership_lanes": {
-    "OKF_SOURCE": "declarative semantic source (root files)",
-    "PACKET_VALIDATION": "phase18-envelope-schema.ts + Zod",
-    "HYPERRAG_PACKET_RPC": "hyperrag-packet-rpc.ts response contract",
-    "PACKET_IDENTITY": "packet identity utilities (packet-key, tree-node-id)",
-    "TOPOLOGY_ROUTING": "SOM/KMeans/Neo4j projection",
-    "QDRANT_PAYLOAD": "Qdrant collection payload schema",
-    "POSTGRES_ROWS": "atlas_packets + codebase_chunk_index tables",
-    "REDIS_VALUES": "bifrost:packet:*, centroid:*, gpu:karpathy:scores"
+    "OKF_SOURCE": "declarative semantic source (.okf and docs contracts)",
+    "PACKET_VALIDATION": "validation-result-v1.ts + Zod runtime gates",
+    "HYPERRAG_PACKET_RPC": "hyperrag-projection-contract.ts + packet RPC routes",
+    "PACKET_IDENTITY": "semantic-packet-v1.ts + identity utilities",
+    "FEATURE_MATRIX": "feature-matrix-schema.ts + dense-lane-policy.ts + retrieval-candidate.ts",
+    "TOPOLOGY_ROUTING": "SOM/KMeans/Neo4j projection + latent_64 routing",
+    "QDRANT_PAYLOAD": "Qdrant collection payload schema and named vectors",
+    "POSTGRES_ROWS": "atlas_packets + feature-matrix rows + OKF provenance tables",
+    "REDIS_VALUES": "bifrost:packet:*, centroid:*, ace:packet:*"
   },
   "lane_audits": {
     "okf_sources": {
       "lane": "OKF_SOURCE",
-      "files_found": 0,
-      "declaration_count": 0,
+      "files_found": 1,
+      "declaration_count": 48,
       "usage_count": 0,
-      "status": "NOT_WIRED"
+      "evidence": [
+        {
+          "evidenceType": "FILE_EXISTS",
+          "sourceRef": "C",
+          "validationResultId": "okf-source-files",
+          "observedAt": "2026-07-29T00:17:53.936Z"
+        }
+      ],
+      "status": "PRESENT"
     },
     "packet_validation": {
       "lane": "PACKET_VALIDATION",
       "files_found": 0,
       "validation_schemas": 0,
-      "status": "NOT_WIRED"
+      "evidence": [],
+      "status": "ABSENT"
     },
     "hyperrag_packet_rpc": {
       "lane": "HYPERRAG_PACKET_RPC",
-      "files_found": 0,
-      "rpc_usage": 0,
-      "status": "NOT_WIRED"
+      "files_found": 1,
+      "rpc_usage": 11,
+      "evidence": [
+        {
+          "evidenceType": "FILE_EXISTS",
+          "sourceRef": "C",
+          "validationResultId": "hyperrag-rpc-files",
+          "observedAt": "2026-07-29T00:17:54.483Z"
+        },
+        {
+          "evidenceType": "IMPORT_REFERENCE",
+          "sourceRef": "C",
+          "validationResultId": "hyperrag-rpc-usage",
+          "observedAt": "2026-07-29T00:17:54.483Z"
+        }
+      ],
+      "status": "STATICALLY_REFERENCED"
     },
     "packet_identity": {
       "lane": "PACKET_IDENTITY",
-      "packet_key_refs": 0,
+      "packet_key_refs": 7,
       "tree_node_id_refs": 0,
       "title_id_refs": 0,
-      "naming_conflicts": [],
-      "status": "NOT_WIRED"
+      "naming_conflicts": [
+        "C: uses camelCase, should be snake_case"
+      ],
+      "evidence": [
+        {
+          "evidenceType": "IMPORT_REFERENCE",
+          "sourceRef": "C",
+          "validationResultId": "packet-key-refs",
+          "observedAt": "2026-07-29T00:17:54.839Z"
+        }
+      ],
+      "status": "CONFLICTING"
     },
     "topology_routing": {
       "lane": "TOPOLOGY_ROUTING",
       "som_refs": 0,
       "kmeans_refs": 0,
       "pagerank_refs": 0,
-      "status": "PARTIAL"
+      "evidence": [],
+      "status": "ABSENT"
     },
     "qdrant_payload": {
       "lane": "QDRANT_PAYLOAD",
       "payload_schema_refs": 0,
       "payload_usage": 0,
-      "status": "NOT_WIRED"
+      "evidence": [],
+      "status": "ABSENT"
     },
     "postgres_rows": {
       "lane": "POSTGRES_ROWS",
       "atlas_packets_refs": 0,
       "codebase_chunk_index_refs": 0,
-      "status": "PARTIAL"
+      "evidence": [],
+      "status": "ABSENT"
     },
     "redis_values": {
       "lane": "REDIS_VALUES",
-      "bifrost_refs": 0,
-      "redis_key_refs": 0,
-      "status": "NOT_WIRED"
+      "bifrost_refs": 6,
+      "redis_key_refs": 30,
+      "evidence": [
+        {
+          "evidenceType": "FILE_EXISTS",
+          "sourceRef": "C",
+          "validationResultId": "bifrost-refs",
+          "observedAt": "2026-07-29T00:17:56.155Z"
+        },
+        {
+          "evidenceType": "IMPORT_REFERENCE",
+          "sourceRef": "C",
+          "validationResultId": "redis-key-refs",
+          "observedAt": "2026-07-29T00:17:56.155Z"
+        }
+      ],
+      "status": "STATICALLY_REFERENCED"
     }
   },
   "identity_map": {
-    "canonical_identity": "packet_key (deterministic sha256 of source_ref + tree_node_id + title_id)",
+    "canonical_identity": "packetKey / packet_key (canonical identity; all mirrors must preserve it)",
     "derivation": {
-      "source_file": "source_ref (file path)",
-      "structural_identity": "tree_node_id (AST node identifier from tree-sitter)",
-      "grouping_identity": "title_id (semantic grouping key)",
-      "content_integrity": "content_hash (sha256 of content)"
+      "source_file": "sourceRef (file path / source provenance)",
+      "structural_identity": "treeNodeId / tree_node_id (AST identity)",
+      "grouping_identity": "titleId / title_id (semantic grouping key)",
+      "content_integrity": "contentHash / content_hash (sha256 of content)"
     },
     "immutability_rule": "packet_key MUST remain identical across all storage layers",
     "traversal_layers": {
-      "source": "Original file → source_ref extracted",
-      "validation": "Zod schema validation → packet_key computed",
+      "source": "Original file / OKF contract → sourceRef extracted",
+      "validation": "Zod / schema validation → packet identity admitted",
       "postgres": "atlas_packets.packet_key canonical row",
-      "qdrant": "codebase_chunks_768 payload.packet_key",
-      "redis": "bifrost:packet:{packet_key}",
-      "hyperrag": "HyperRagPacketRpcPacket.packet_key in response",
-      "agent": "ACE context packet.packet_key unchanged"
+      "qdrant": "codebase_chunks_768 and codebase_chunks_384 payload.packet_key",
+      "redis": "bifrost:packet:{packet_key} / ace:packet:{runId}",
+      "hyperrag": "HyperRagProjectionRequest + packet RPC response",
+      "agent": "ACE context packet keeps packet identity unchanged"
     },
     "evidence_gates": [
-      "packet_key immutability across storage (Postgres → Qdrant → Redis → HyperRAG → Agent)",
-      "content_hash matches original file (no mutation)",
+      "packet identity immutability across storage (Postgres → Qdrant → Redis → HyperRAG → Agent)",
+      "contentHash matches original file or canonical source materialization (no mutation)",
       "no unresolved state silently converted to RESOLVED",
-      "feature routing fields (som_cluster, kmeans_cluster) maintain routing/topology semantics only"
+      "feature routing fields (latent_64, SOM, PageRank, kmeans_cluster) keep routing/topology semantics only"
     ]
   }
 }

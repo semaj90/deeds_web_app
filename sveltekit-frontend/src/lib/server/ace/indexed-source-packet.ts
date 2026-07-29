@@ -22,9 +22,12 @@ export interface BuildIndexedSourcePacketResult {
   canonicalPacketKey: string | null;
   canonicalSourceRef: string | null;
   canonicalFeatureId: string | null;
+  canonicalTreeNodeId: string | null;
+  canonicalContentHash: string | null;
+  canonicalWorkspaceRevision: string | null;
 }
 
-function buildSourceRefCandidates(sourceRef: string): string[] {
+export function buildSourceRefCandidates(sourceRef: string): string[] {
   const base = sourceRef.trim().replace(/\\/g, '/');
   if (!base) return [];
 
@@ -37,6 +40,17 @@ function buildSourceRefCandidates(sourceRef: string): string[] {
   return [...variants];
 }
 
+export function extractWorkspaceRevisionFromMetadata(metadata: unknown): string | null {
+  const record = (metadata ?? {}) as Record<string, unknown>;
+  return typeof record.workspace_revision === 'string'
+    ? record.workspace_revision
+    : typeof record.workspaceRevision === 'string'
+      ? record.workspaceRevision
+      : typeof record.revision === 'string'
+        ? record.revision
+        : null;
+}
+
 async function resolveCanonicalAtlasIdentity(
   sourceRefs: string[],
   featureId?: string,
@@ -44,6 +58,9 @@ async function resolveCanonicalAtlasIdentity(
   canonicalPacketKey: string | null;
   canonicalSourceRef: string | null;
   canonicalFeatureId: string | null;
+  canonicalTreeNodeId: string | null;
+  canonicalContentHash: string | null;
+  canonicalWorkspaceRevision: string | null;
 }> {
   const refs = [...new Set(sourceRefs.flatMap(buildSourceRefCandidates).filter(Boolean))];
   if (refs.length === 0) {
@@ -51,6 +68,9 @@ async function resolveCanonicalAtlasIdentity(
       canonicalPacketKey: null,
       canonicalSourceRef: null,
       canonicalFeatureId: null,
+      canonicalTreeNodeId: null,
+      canonicalContentHash: null,
+      canonicalWorkspaceRevision: null,
     };
   }
 
@@ -66,6 +86,9 @@ async function resolveCanonicalAtlasIdentity(
       packetKey: atlasPackets.packetKey,
       sourceRef: atlasPackets.sourceRef,
       featureId: atlasPackets.featureId,
+      treeNodeId: atlasPackets.treeNodeId,
+      contentHash: atlasPackets.sha256,
+      metadata: atlasPackets.metadata,
     })
     .from(atlasPackets)
     .where(
@@ -81,6 +104,9 @@ async function resolveCanonicalAtlasIdentity(
     canonicalPacketKey: row?.packetKey ?? null,
     canonicalSourceRef: row?.sourceRef ?? null,
     canonicalFeatureId: row?.featureId ?? null,
+    canonicalTreeNodeId: row?.treeNodeId ? String(row.treeNodeId) : null,
+    canonicalContentHash: row?.contentHash ?? null,
+    canonicalWorkspaceRevision: extractWorkspaceRevisionFromMetadata(row?.metadata),
   };
 }
 
@@ -115,6 +141,9 @@ export async function buildIndexedSourcePacket(
       canonicalPacketKey: canonicalIdentity.canonicalPacketKey,
       canonicalSourceRef: canonicalIdentity.canonicalSourceRef,
       canonicalFeatureId: canonicalIdentity.canonicalFeatureId,
+      canonicalTreeNodeId: canonicalIdentity.canonicalTreeNodeId,
+      canonicalContentHash: canonicalIdentity.canonicalContentHash,
+      canonicalWorkspaceRevision: canonicalIdentity.canonicalWorkspaceRevision,
     };
   }
 
@@ -141,5 +170,8 @@ export async function buildIndexedSourcePacket(
     canonicalPacketKey: canonicalIdentity.canonicalPacketKey,
     canonicalSourceRef: canonicalIdentity.canonicalSourceRef,
     canonicalFeatureId: canonicalIdentity.canonicalFeatureId,
+    canonicalTreeNodeId: canonicalIdentity.canonicalTreeNodeId,
+    canonicalContentHash: canonicalIdentity.canonicalContentHash,
+    canonicalWorkspaceRevision: canonicalIdentity.canonicalWorkspaceRevision,
   };
 }

@@ -167,6 +167,20 @@ The next derived surfaces are compare-only until the live contract exists:
 - finish provenance UI and trust-tier editing
 - finish feature registry reconciliation and command mapping
 - run live-service env audit before qdrant backfill applies
+- keep the live tree / summary / topology schema aligned before any fresh backfill or plugin promotion
+- refresh-manifest invalidation stays bound to atlas truth promotion
+- OpenCode `/api/v1/chat/completions` delegates to the ACE facade; keep EmbeddingGemma, Qdrant packet retrieval, Valkey/Bitfrost reuse, and llama-server fallback wired end to end
+- reduce cold ACE synthesis latency while preserving the verified Redis repeat-hit path
+- stage packet reader / writer work in `scripts/atlas` and `.tmp`, then consolidate into `packages/parent-atlas`
+- keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
+- expand `feature_id` placement coverage across the remaining cards
+- increase replay export breadth so replay coverage rises above the current thin baseline
+- finish AE/SOM provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
+- keep glyph coverage separate from retrieval and SOM work
+- finish provenance parity and quality review
+- finish provenance UI and trust-tier editing
+- finish feature registry reconciliation and command mapping
+- run live-service env audit before qdrant backfill applies
 - keep offline mirrors downstream-only
 
 ### Lineage and Bitfrost findings

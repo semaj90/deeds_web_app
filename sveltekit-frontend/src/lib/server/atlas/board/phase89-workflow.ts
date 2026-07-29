@@ -24,6 +24,9 @@ export interface Phase89WorkflowPlan {
   taskId: string | null;
   taskLabel: string | null;
   taskPriority: string | null;
+  recommendationId: string | null;
+  sourceRef: string | null;
+  treeNodeId: string | null;
   validationRoutes: string[];
   validationQueueKeys: string[];
   warnings: string[];
@@ -128,6 +131,9 @@ export function buildPhase89WorkflowPlan(
     taskId: task?.id ?? null,
     taskLabel: task?.label ?? null,
     taskPriority: task?.priority ?? null,
+    recommendationId: task?.recommendation_id ?? null,
+    sourceRef: task?.source_ref ?? null,
+    treeNodeId: task?.tree_node_id ?? null,
     validationRoutes,
     validationQueueKeys,
     warnings: [...board.warnings],
@@ -165,6 +171,9 @@ export async function recordPhase89WorkflowPlan(
     workflowId: plan.workflowId,
     taskId: plan.taskId,
     taskLabel: plan.taskLabel,
+    recommendationId: plan.recommendationId,
+    sourceRef: plan.sourceRef,
+    treeNodeId: plan.treeNodeId,
     validationRoutes: plan.validationRoutes,
     warnings: plan.warnings,
     dryRun: plan.dryRun,

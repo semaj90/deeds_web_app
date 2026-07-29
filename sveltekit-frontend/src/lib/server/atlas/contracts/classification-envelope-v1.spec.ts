@@ -78,6 +78,7 @@ describe('Classification envelope alignment', () => {
       validation_errors: [],
       feature_labels: ['auth', 'sessions'],
       domain_class: 'infrastructure',
+      secondary_domains: ['platform', 'identity'],
       ontology_ids: ['ontology:auth'],
       concept_ids: ['concept:session'],
       runtime_evidence_refs: ['runtime:trace:1'],
@@ -196,10 +197,12 @@ describe('Classification envelope alignment', () => {
         evidenceState: 'ACTIVE_VERIFIED',
         knowledgeResolution: 'RESOLVED',
         domainClass: 'infrastructure',
+        secondaryDomains: ['platform', 'identity'],
         ontologyIds: ['ontology:auth'],
         conceptIds: ['concept:session'],
         runtimeEvidenceRefs: ['runtime:trace:1'],
         testEvidenceRefs: ['test:spec:1'],
+        partOfSpeech: 'NOUN',
         pageRankScore: packet.page_rank_score,
         communityId: packet.community_id ?? null,
         kmeansCluster: packet.kmeans_cluster ?? null,
@@ -295,6 +298,8 @@ describe('Classification envelope alignment', () => {
     expect(validation.canPromotion).toBe('CROSS_STORE_PROVEN');
     expect(lineage.aligned).toBe(true);
     expect(lineage.violations).toHaveLength(0);
+    expect(classification.signals.secondaryDomains).toEqual(['platform', 'identity']);
+    expect(classification.signals.partOfSpeech).toBe('NOUN');
   });
 
   it('flags a packet key drift as a hard gap', () => {
