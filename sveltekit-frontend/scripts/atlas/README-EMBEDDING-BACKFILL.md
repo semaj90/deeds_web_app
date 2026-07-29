@@ -9,7 +9,7 @@ This directory contains the production-ready embedding backfill pipeline for the
 ### 1. Main Script
 **File**: `backfill-codebase-chunk-embeddings.mjs` (390 lines)
 
-Backfills 384-dim embeddings (embeddinggemma:latest) for all chunks in `codebase_chunk_index` where `content_embedding IS NULL`.
+Backfills 768-dim embeddings (embeddinggemma:latest) for all chunks in `codebase_chunk_index` where `content_embedding IS NULL`.
 
 **Features**:
 - ✅ Batch HTTP embedding (Ollama /api/embed)
@@ -253,7 +253,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 - **Service**: Ollama
 - **Endpoint**: `POST /api/embed`
 - **Model**: `embeddinggemma:latest`
-- **Dimension**: 384-dim
+- **Dimension**: 768-dim
 
 ### Output
 - **Updated**: `codebase_chunk_index.content_embedding` (pgvector)

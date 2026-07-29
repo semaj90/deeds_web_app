@@ -12,17 +12,17 @@ function makeNormalizedVector(length: number): number[] {
 }
 
 describe('embedding-contract lineage', () => {
-  it('keeps native 768 and online 384 as separate named representations', () => {
-    expect(getEmbeddingRepresentation('semantic_384').lane_id).toBe('dense_384');
-    expect(getEmbeddingRepresentation('semantic_384').status).toBe('ACTIVE');
-    expect(getEmbeddingRepresentation('semantic_384').source_dimension).toBe(768);
+  it('keeps canonical 768 and legacy 384 as separate named representations', () => {
+    expect(getEmbeddingRepresentation('semantic_768').lane_id).toBe('dense_768');
+    expect(getEmbeddingRepresentation('semantic_768').status).toBe('ACTIVE');
+    expect(getEmbeddingRepresentation('semantic_768').source_dimension).toBe(768);
 
-    expect(getEmbeddingRepresentation('legacy_768').lane_id).toBe('dense_768');
-    expect(getEmbeddingRepresentation('legacy_768').status).toBe('REFERENCE_ONLY');
-    expect(getEmbeddingRepresentation('legacy_768').output_dimension).toBe(768);
+    expect(getEmbeddingRepresentation('semantic_384').lane_id).toBe('dense_384');
+    expect(getEmbeddingRepresentation('semantic_384').status).toBe('REFERENCE_ONLY');
+    expect(getEmbeddingRepresentation('semantic_384').output_dimension).toBe(384);
   });
 
-  it('accepts normalized embeddings from both retrieval and native lanes', () => {
+  it('accepts normalized embeddings from canonical and legacy lanes', () => {
     expect(isValidEmbedding(makeNormalizedVector(EMBEDDING_CONTRACT.retrieval_embedding_dimension))).toBe(true);
     expect(isValidEmbedding(makeNormalizedVector(EMBEDDING_CONTRACT.native_dimension))).toBe(true);
   });

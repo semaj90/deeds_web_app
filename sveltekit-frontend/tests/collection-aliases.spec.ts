@@ -81,22 +81,22 @@ describe('resolveCollectionViaAlias', () => {
   it('falls back to first existing collection when alias is absent', async () => {
     mockGetCollectionAliases.mockResolvedValue({ aliases: [] });
     mockGetCollections.mockResolvedValue(
-      collectionsResponse('codebase_chunks_384_hybrid', 'codebase_chunks_384'),
+      collectionsResponse('codebase_chunks_768_v2', 'codebase_chunks_384_hybrid', 'codebase_chunks_384'),
     );
 
     const result = await resolveCollectionViaAlias();
 
-    expect(result.collection).toBe('codebase_chunks_384_hybrid');
+    expect(result.collection).toBe('codebase_chunks_768_v2');
     expect(result.fromAlias).toBe(false);
   });
 
   it('falls back to second priority collection when first is absent', async () => {
     mockGetCollectionAliases.mockResolvedValue({ aliases: [] });
-    mockGetCollections.mockResolvedValue(collectionsResponse('codebase_chunks_384'));
+    mockGetCollections.mockResolvedValue(collectionsResponse('codebase_chunks_768'));
 
     const result = await resolveCollectionViaAlias();
 
-    expect(result.collection).toBe('codebase_chunks_384');
+    expect(result.collection).toBe('codebase_chunks_768');
     expect(result.fromAlias).toBe(false);
   });
 
@@ -118,6 +118,7 @@ describe('resolveCollectionViaAlias', () => {
     mockGetCollectionAliases.mockResolvedValue({ aliases: [] });
     mockGetCollections.mockResolvedValue(collectionsResponse('unrelated_collection'));
     delete process.env.CODEBASE_QDRANT_COLLECTION;
+    delete process.env.QDRANT_CODEBASE_COLLECTION;
 
     const result = await resolveCollectionViaAlias();
 
@@ -126,7 +127,7 @@ describe('resolveCollectionViaAlias', () => {
 
   it('caches alias resolution — second call does not hit Qdrant again', async () => {
     mockGetCollectionAliases.mockResolvedValue(
-      aliasResponse(CODEBASE_ALIAS, 'codebase_chunks_384_hybrid'),
+      aliasResponse(CODEBASE_ALIAS, 'codebase_chunks_768_v2'),
     );
 
     await resolveCollectionViaAlias();
@@ -138,7 +139,7 @@ describe('resolveCollectionViaAlias', () => {
 
   it('invalidateAliasCache forces fresh lookup on next resolve', async () => {
     mockGetCollectionAliases.mockResolvedValue(
-      aliasResponse(CODEBASE_ALIAS, 'codebase_chunks_384_hybrid'),
+      aliasResponse(CODEBASE_ALIAS, 'codebase_chunks_768_v2'),
     );
 
     await resolveCollectionViaAlias();
@@ -151,12 +152,12 @@ describe('resolveCollectionViaAlias', () => {
   it('falls back gracefully when Qdrant is unreachable', async () => {
     mockGetCollectionAliases.mockRejectedValue(new Error('connection refused'));
     mockGetCollections.mockResolvedValue(
-      collectionsResponse('codebase_chunks_384_hybrid'),
+      collectionsResponse('codebase_chunks_768_v2'),
     );
 
     const result = await resolveCollectionViaAlias();
 
-    expect(result.collection).toBe('codebase_chunks_384_hybrid');
+    expect(result.collection).toBe('codebase_chunks_768_v2');
     expect(result.fromAlias).toBe(false);
   });
 

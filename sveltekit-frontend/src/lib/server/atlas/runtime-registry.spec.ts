@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ATLAS_RUNTIME_REGISTRY,
   ATLAS_RUNTIME_REGISTRY_VERSION,
+  buildRuntimeRegistryRecommendationDrafts,
   getAtlasRuntimeRegistrySection,
   getAtlasRuntimeRegistrySnapshot,
 } from './runtime-registry.js';
@@ -91,5 +92,14 @@ describe('atlas runtime registry', () => {
 
     const again = getAtlasRuntimeRegistrySection('contract');
     expect(again?.items[0].title).toBe('Canonical packet envelope');
+  });
+
+  it('builds dry-run recommendation drafts from the registry', () => {
+    const drafts = buildRuntimeRegistryRecommendationDrafts('recommendation');
+
+    expect(drafts.length).toBeGreaterThan(0);
+    expect(drafts[0]?.dryRun).toBe(true);
+    expect(drafts[0]?.recommendation.identity_lane).toBe('recommendation');
+    expect(drafts.some((draft) => draft.status === 'ACTIVE_VERIFIED')).toBe(true);
   });
 });

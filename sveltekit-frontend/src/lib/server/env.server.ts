@@ -50,11 +50,19 @@ function normalizeRedisUrl(rawValue?: string): string {
 // Development defaults (loopback only — production uses explicit env vars)
 const DEV = {
   // Port 5434 = deeds-postgres-prod-proxy (alpine/socat) → legal-ai-postgres container.
-  // Port 5432 on the host is squatted by a native Windows Postgres install on this machine,
-  // so any client connecting to :5432 hits a different DB. Always route through the proxy.
+  // Port 5434 is for Windows-native processes only.
+  // Inside Docker, use postgres:5432 directly.
   DATABASE_URL: `postgresql://legal_admin:123456@${LOOPBACK_IP}:5434/legal_ai_db`,
   REDIS_URL: `redis://${LOOPBACK_IP}:6379`,
   QDRANT_URL: `http://${LOOPBACK_IP}:6333`,
+  EMBEDDING_BASE_URL: `http://${LOOPBACK_IP}:8097`,
+  EMBEDDING_REPRESENTATION: 'semantic_768',
+  EMBEDDING_DIMENSION: '768',
+  EMBEDDING_REQUIRE_GPU: 'true',
+  QDRANT_COLLECTION: 'codebase_chunks_768_v2',
+  QDRANT_CODEBASE_COLLECTION: 'codebase_chunks_768_v2',
+  QDRANT_VECTOR_NAME: 'semantic_768',
+  QDRANT_CONTENT_VECTOR_NAME: 'content',
   // RabbitMQ: Use legal_admin credentials (matches Docker container setup)
   RABBITMQ_URL: `amqp://legal_admin:secret123@${LOOPBACK_IP}:5672`,
   RABBITMQ_MGMT_USER: 'legal_admin',
@@ -122,6 +130,10 @@ export const ENV = {
   QDRANT_URL: privateEnv.QDRANT_URL ?? qdrantUrlFromParts() ?? DEV.QDRANT_URL,
   QDRANT_HOST: privateEnv.QDRANT_HOST ?? LOCALHOST,
   QDRANT_PORT: parseInt(privateEnv.QDRANT_PORT ?? '6333', 10),
+  QDRANT_COLLECTION: privateEnv.QDRANT_COLLECTION ?? privateEnv.QDRANT_CODEBASE_COLLECTION ?? DEV.QDRANT_COLLECTION,
+  QDRANT_CODEBASE_COLLECTION: privateEnv.QDRANT_CODEBASE_COLLECTION ?? privateEnv.QDRANT_COLLECTION ?? DEV.QDRANT_CODEBASE_COLLECTION,
+  QDRANT_VECTOR_NAME: privateEnv.QDRANT_VECTOR_NAME ?? DEV.QDRANT_VECTOR_NAME,
+  QDRANT_CONTENT_VECTOR_NAME: privateEnv.QDRANT_CONTENT_VECTOR_NAME ?? 'content',
 
   // Ollama
   OLLAMA_URL: privateEnv.OLLAMA_URL ?? DEV.OLLAMA_URL,
@@ -143,6 +155,9 @@ export const ENV = {
   // Embedding Service (optional)
   EMBEDDING_SERVICE_URL: embeddingServiceUrl(),
   EMBEDDING_BASE_URL: privateEnv.EMBEDDING_BASE_URL ?? embeddingServiceUrl(),
+  EMBEDDING_REPRESENTATION: privateEnv.EMBEDDING_REPRESENTATION ?? DEV.EMBEDDING_REPRESENTATION,
+  EMBEDDING_DIMENSION: parseInt(privateEnv.EMBEDDING_DIMENSION ?? DEV.EMBEDDING_DIMENSION, 10),
+  EMBEDDING_REQUIRE_GPU: privateEnv.EMBEDDING_REQUIRE_GPU === 'true' || DEV.EMBEDDING_REQUIRE_GPU === 'true',
   EMBEDDING_PROVIDER: privateEnv.EMBEDDING_PROVIDER,
   EMBEDDING_GRPC_ENABLED: privateEnv.EMBEDDING_GRPC_ENABLED === 'true',
   EMBEDDING_GRPC_URL: privateEnv.EMBEDDING_GRPC_URL,

@@ -426,12 +426,12 @@ export class QdrantLane768 extends QdrantLane {
   }
 }
 
-// ── Qdrant 384-dim lane (codebase_chunks_384_hybrid — canonical retrieval contract) ──
+// ── Qdrant 384-dim lane (codebase_chunks_384_hybrid — legacy retrieval contract) ──
 
 /**
- * Dense retrieval lane targeting the 384-dim canonical collection.
+ * Dense retrieval lane targeting the 384-dim legacy collection.
  * Uses named vector "content" which `codebase_chunks_384_hybrid` exposes.
- * This is the canonical retrieval contract for truncated-aware multi-hop traversal.
+ * This lane remains available for migration, but the canonical dense contract is 768.
  * Falls back gracefully if the collection has 0 indexed points (TurboVec not yet
  * retargeted) — returns empty slice rather than throwing.
  */
@@ -555,7 +555,7 @@ export class QdrantLane384 extends SearchLaneBase {
   }
 
   config(): SearchLaneConfig {
-    // Slightly higher weight than the 768-dim lane — 384-dim is the retrieval contract
+    // Slightly higher weight than the 768-dim lane when the legacy hybrid lane is selected
     return { enabled: true, priority: 1, weight: 0.38, fallback: 'bm25' };
   }
 }
@@ -752,12 +752,12 @@ export class SearchLaneRegistry {
     this.register(new QdrantLane768());
     // Backward-compatible alias used by older retrieval call sites.
     this.register(new QdrantLane());
-    // 384-dim lane: truncated-aware canonical retrieval contract, codebase_chunks_384_hybrid
+    // 384-dim lane: truncated-aware legacy retrieval contract, codebase_chunks_384_hybrid
     this.register(new QdrantLane384());
     this.register(new LexicalLane());
     this.register(new Bm25Lane());
     // Fallback chain for single-lane queries — prefers the explicit 768 source lane before legacy alias.
-    this.fallbackChain = ['gpu-cuvs', 'qdrant-384', 'qdrant-768', 'qdrant', 'lexical', 'bm25'];
+    this.fallbackChain = ['gpu-cuvs', 'qdrant-768', 'qdrant', 'qdrant-384', 'lexical', 'bm25'];
   }
 
   register(lane: ISearchLane): void {

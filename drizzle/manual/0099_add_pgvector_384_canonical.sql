@@ -1,12 +1,12 @@
--- MIGRATION: Add Postgres pgvector 384-dim canonical storage
+-- MIGRATION: Add Postgres pgvector 384-dim storage (historical)
 -- Date: 2026-06-28
--- Purpose: Establish 384-dim embeddinggemma as canonical vector storage
+-- Purpose: Historical 384-dim migration; superseded by the 768-dim canonical contract
 -- Compliance: Dimension Policy (June 28, 2026)
 
 -- Ensure pgvector extension exists
 CREATE EXTENSION IF NOT EXISTS vector;
 
--- Add 384-dim canonical embedding columns to codebase_chunk_index
+-- Add 384-dim embedding columns to codebase_chunk_index (historical; superseded by 768-dim canonical storage)
 ALTER TABLE codebase_chunk_index
   ADD COLUMN IF NOT EXISTS content_embedding_384 vector(384),
   ADD COLUMN IF NOT EXISTS summary_embedding_384 vector(384),

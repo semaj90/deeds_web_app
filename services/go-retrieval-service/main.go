@@ -17,25 +17,25 @@
 //
 // Enhancement overview:
 //
-//	GPU embedding   — direct Ollama :11434 (RTX 3060 Ti) with Redis embedding cache
-//	ONNX passthrough — pre-computed 768-dim client embeddings bypasses GPU call
+//	GPU embedding   — dedicated go-embedding :8097 (RTX 3060 Ti) with Redis embedding cache
+//	ONNX passthrough — pre-computed 768-dim client embeddings bypass the GPU call
 //	JSONB matching  — metadata @> filter for section_type / entity_type / tags
 //	Proto-binary cache — cache stores gob-encoded proto bytes (2-3× smaller than JSON)
 //
 // ENV:
 //
-//	DATABASE_URL        — PostgreSQL (default postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db for host runs; Docker compose overrides to postgres:5432)
+//	DATABASE_URL        — PostgreSQL (required; Docker compose uses postgres:5432, host-native tools should set 127.0.0.1:5434)
 //	QDRANT_URL          — Qdrant REST endpoint (default http://localhost:6333)
 //	QDRANT_GRPC_HOST    — Qdrant gRPC host (default localhost)
 //	QDRANT_GRPC_PORT    — Qdrant gRPC port (default 6334)
 //	REDIS_URL           — Redis (default redis://localhost:6379)
-//	EMBED_SERVICE_URL   — Go embedding service HTTP (default http://localhost:8097)
-//	OLLAMA_URL          — Ollama API GPU path (default http://localhost:11434)
+//	EMBEDDING_BASE_URL  — Go embedding service HTTP (default http://localhost:8097)
+//	OLLAMA_URL          — Ollama API GPU fallback (default http://localhost:11434)
 //	EMBED_MODEL         — Model name (default embeddinggemma:latest)
 //	GRPC_PORT           — gRPC port (default 50053)
 //	HTTP_PORT           — HTTP port (default 8100)
 //	RETRIEVAL_CACHE_TTL — Redis cache TTL seconds (default 300)
-//	GPU_EMBED_ENABLED   — "true" to prefer direct Ollama GPU over embed service (default true)
+//	GPU_EMBED_ENABLED   — "true" to permit Ollama fallback if embedding service is unavailable
 package main
 
 import (
@@ -49,6 +49,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -81,37 +82,51 @@ func init() {
 // ── Configuration ─────────────────────────────────────────────────────────
 
 type config struct {
-	DatabaseURL     string
-	QdrantURL       string
-	QdrantHost      string
-	QdrantPort      int
-	RedisURL        string
-	EmbedServiceURL string
-	OllamaURL       string
-	EmbedModel      string
-	GRPCPort        string
-	HTTPPort        string
-	CacheTTL        time.Duration
-	GPUEmbedEnabled bool
+	DatabaseURL              string
+	QdrantURL                string
+	QdrantHost               string
+	QdrantPort               int
+	QdrantCollection         string
+	QdrantVectorName         string
+	RedisURL                 string
+	EmbeddingBaseURL         string
+	EmbeddingRepresentation  string
+	EmbeddingDimension       int
+	EmbeddingRequireGPU      bool
+	EmbedServiceURL          string
+	OllamaURL                string
+	EmbedModel               string
+	GRPCPort                 string
+	HTTPPort                 string
+	CacheTTL                 time.Duration
+	GPUEmbedEnabled          bool
 }
 
 func loadConfig() config {
 	qdPort, _ := strconv.Atoi(envOr("QDRANT_GRPC_PORT", "6334"))
+	embedDim, _ := strconv.Atoi(envOr("EMBEDDING_DIMENSION", "768"))
 	cacheTTL, _ := strconv.Atoi(envOr("RETRIEVAL_CACHE_TTL", "300"))
 	gpuEnabled := envOr("GPU_EMBED_ENABLED", "true") == "true"
+	embeddingBaseURL := envOr("EMBEDDING_BASE_URL", "http://localhost:8097")
 	return config{
-		DatabaseURL:     envOr("DATABASE_URL", "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"),
-		QdrantURL:       envOr("QDRANT_URL", "http://localhost:6333"),
-		QdrantHost:      envOr("QDRANT_GRPC_HOST", "localhost"),
-		QdrantPort:      qdPort,
-		RedisURL:        envOr("REDIS_URL", "redis://localhost:6379"),
-		EmbedServiceURL: envOr("EMBED_SERVICE_URL", "http://localhost:8097"),
-		OllamaURL:       envOr("OLLAMA_URL", "http://localhost:11434"),
-		EmbedModel:      envOr("EMBED_MODEL", "embeddinggemma:latest"),
-		GRPCPort:        envOr("GRPC_PORT", "50053"),
-		HTTPPort:        envOr("HTTP_PORT", "8100"),
-		CacheTTL:        time.Duration(cacheTTL) * time.Second,
-		GPUEmbedEnabled: gpuEnabled,
+		DatabaseURL:             mustEnv("DATABASE_URL"),
+		QdrantURL:               envOr("QDRANT_URL", "http://localhost:6333"),
+		QdrantHost:              envOr("QDRANT_GRPC_HOST", "localhost"),
+		QdrantPort:              qdPort,
+		QdrantCollection:        envOr("QDRANT_COLLECTION", "codebase_chunks_768"),
+		QdrantVectorName:        envOr("QDRANT_VECTOR_NAME", "semantic_768"),
+		RedisURL:                envOr("REDIS_URL", "redis://localhost:6379"),
+		EmbeddingBaseURL:        embeddingBaseURL,
+		EmbeddingRepresentation:  envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
+		EmbeddingDimension:      embedDim,
+		EmbeddingRequireGPU:     envOr("EMBEDDING_REQUIRE_GPU", "true") == "true",
+		EmbedServiceURL:         embeddingBaseURL,
+		OllamaURL:               envOr("OLLAMA_URL", "http://localhost:11434"),
+		EmbedModel:              envOr("EMBED_MODEL", "embeddinggemma:latest"),
+		GRPCPort:                envOr("GRPC_PORT", "50053"),
+		HTTPPort:                envOr("HTTP_PORT", "8100"),
+		CacheTTL:                time.Duration(cacheTTL) * time.Second,
+		GPUEmbedEnabled:         gpuEnabled,
 	}
 }
 
@@ -120,6 +135,14 @@ func envOr(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func mustEnv(key string) string {
+	v := strings.TrimSpace(os.Getenv(key))
+	if v == "" {
+		log.Fatalf("%s is required; set Docker topology to postgres:5432 or host topology to 127.0.0.1:5434 explicitly", key)
+	}
+	return v
 }
 
 // ── Server ────────────────────────────────────────────────────────────────
@@ -152,10 +175,10 @@ const (
 // ── GPU / ONNX Embedding ───────────────────────────────────────────────────
 //
 // Priority order:
-//  1. Pre-computed client embedding (ONNX from browser): if query_embedding is 768-dim
-//  2. Direct Ollama GPU (:11434):   if GPU_EMBED_ENABLED=true (RTX 3060 Ti)
-//  3. Go embedding service (:8097): batched, Redis-cached
-//  4. Ollama HTTP fallback:         always available
+//  1. Pre-computed client embedding (ONNX from browser): if query_embedding matches the canonical dimension
+//  2. Go embedding service (:8097): batched, Redis-cached, canonical embedding authority
+//  3. Direct Ollama GPU (:11434): fallback only when explicitly allowed
+//  4. Ollama HTTP fallback:         last resort when GPU fallback is permitted
 //
 // Redis embed cache key: "rembed:<sha256(model:text)[:16]>"
 // TTL: 24h (embeddings are deterministic per model version)
@@ -165,13 +188,13 @@ const embedCacheTTL = 24 * time.Hour
 
 func (s *retrievalServer) embed(ctx context.Context, text string) ([]float32, error) {
 	if text == "" {
-		return make([]float32, 768), nil
+		return make([]float32, s.cfg.EmbeddingDimension), nil
 	}
 	ctx, cancel := context.WithTimeout(ctx, embedTimeout)
 	defer cancel()
 
 	// Check embed cache first
-	ck := embedCacheKey(s.cfg.EmbedModel, text)
+	ck := embedCacheKey(s.cfg.EmbeddingRepresentation, s.cfg.EmbeddingDimension, s.cfg.EmbedModel, text)
 	if cached := s.cachedEmbedding(ctx, ck); cached != nil {
 		return cached, nil
 	}
@@ -179,20 +202,21 @@ func (s *retrievalServer) embed(ctx context.Context, text string) ([]float32, er
 	var vec []float32
 	var err error
 
-	if s.cfg.GPUEmbedEnabled {
-		// Direct Ollama GPU (fastest — no HTTP hop to embedding service)
-		vec, err = s.embedGPU(ctx, text)
-	}
-	if vec == nil {
-		// Fallback: Go embedding service (batched, Redis-cached internally)
-		vec, err = s.embedViaService(ctx, text)
-	}
-	if vec == nil {
-		// Final fallback: Ollama HTTP (always available)
-		vec, err = s.embedOllama(ctx, text)
+	// Canonical path: the dedicated embedding service on :8097.
+	vec, err = s.embedViaService(ctx, text)
+	if vec == nil && !s.cfg.EmbeddingRequireGPU {
+		if s.cfg.GPUEmbedEnabled {
+			vec, err = s.embedGPU(ctx, text)
+		}
+		if vec == nil {
+			vec, err = s.embedOllama(ctx, text)
+		}
 	}
 	if err != nil || vec == nil {
 		return nil, fmt.Errorf("all embedding paths failed: %w", err)
+	}
+	if err := validateEmbeddingVector(vec, s.cfg.EmbeddingDimension); err != nil {
+		return nil, err
 	}
 
 	// Store in embed cache
@@ -200,10 +224,22 @@ func (s *retrievalServer) embed(ctx context.Context, text string) ([]float32, er
 	return vec, nil
 }
 
-func embedCacheKey(model, text string) string {
+func embedCacheKey(representation string, dimension int, model, text string) string {
 	h := sha256.New()
-	fmt.Fprintf(h, "%s:%s", model, text)
+	fmt.Fprintf(h, "%s:%d:%s:%s", representation, dimension, model, text)
 	return embedCachePrefix + hex.EncodeToString(h.Sum(nil))[:16]
+}
+
+func validateEmbeddingVector(vec []float32, expected int) error {
+	if len(vec) != expected {
+		return fmt.Errorf("embedding dimension mismatch: expected %d, got %d", expected, len(vec))
+	}
+	for i, value := range vec {
+		if math.IsNaN(float64(value)) || math.IsInf(float64(value), 0) {
+			return fmt.Errorf("embedding contains non-finite value at index %d", i)
+		}
+	}
+	return nil
 }
 
 func (s *retrievalServer) cachedEmbedding(ctx context.Context, key string) []float32 {
@@ -271,7 +307,7 @@ func (s *retrievalServer) embedViaService(ctx context.Context, text string) ([]f
 		"model": s.cfg.EmbedModel,
 	})
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
-		s.cfg.EmbedServiceURL+"/embed", bytes.NewReader(payload))
+		s.cfg.EmbeddingBaseURL+"/embed", bytes.NewReader(payload))
 	if err != nil {
 		return nil, err
 	}
@@ -548,13 +584,13 @@ func (s *retrievalServer) qdrantSearchEvidence(ctx context.Context, vec []float3
 }
 
 func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float32, kinds []string, pathPrefixes []string, extraFilters []*qdrantclient.Condition, limit int) ([]qdrantChunk, error) {
-	contentVec := "content"
+	contentVec := s.cfg.QdrantVectorName
 	sigVec := "signature"
 	prefetchLimit := uint64(limit * 3)
 	qlimit := uint64(limit)
 
 	queryReq := &qdrantclient.QueryPoints{
-		CollectionName: collectionCodebase,
+		CollectionName: s.cfg.QdrantCollection,
 		Prefetch: []*qdrantclient.PrefetchQuery{
 			{
 				Query: qdrantclient.NewQuery(vec...),
@@ -602,7 +638,7 @@ func (s *retrievalServer) qdrantSearchCodebase(ctx context.Context, vec []float3
 	points, err := s.qdrant.Query(ctx, queryReq)
 	if err != nil {
 		// REST fallback: single content vector
-		return s.qdrantSearchREST(ctx, collectionCodebase, "content", vec, "", limit)
+		return s.qdrantSearchREST(ctx, s.cfg.QdrantCollection, s.cfg.QdrantVectorName, vec, "", limit)
 	}
 
 	chunks := qdrantPointsToChunks(points, true)
@@ -1794,10 +1830,25 @@ func (s *retrievalServer) Health(ctx context.Context, _ *pb.HealthRequest) (*pb.
 		defer wg.Done()
 		ctx2, cancel := context.WithTimeout(ctx, 2*time.Second)
 		defer cancel()
-		r, err := http.NewRequestWithContext(ctx2, http.MethodGet, s.cfg.EmbedServiceURL+"/health", nil)
+		r, err := http.NewRequestWithContext(ctx2, http.MethodGet, s.cfg.EmbeddingBaseURL+"/ready", nil)
 		if err == nil {
 			if httpResp, err := s.httpClient.Do(r); err == nil {
 				resp.EmbeddingServiceUp = httpResp.StatusCode == http.StatusOK
+				if resp.EmbeddingServiceUp {
+					var ready struct {
+						Ready              bool    `json:"ready"`
+						EmbeddingDimension int     `json:"embedding_dimension"`
+						ModelID            string  `json:"model_id"`
+						BackendReachable   bool    `json:"backend_reachable"`
+						Normalized         bool    `json:"normalized"`
+						VectorNorm         float64 `json:"vector_norm"`
+					}
+					if err := json.NewDecoder(httpResp.Body).Decode(&ready); err == nil {
+						resp.EmbeddingServiceUp = ready.Ready && ready.EmbeddingDimension == s.cfg.EmbeddingDimension
+					} else {
+						resp.EmbeddingServiceUp = false
+					}
+				}
 				httpResp.Body.Close()
 			}
 		}
@@ -1807,7 +1858,9 @@ func (s *retrievalServer) Health(ctx context.Context, _ *pb.HealthRequest) (*pb.
 	switch {
 	case !resp.PgvectorConnected:
 		resp.Status = "unhealthy"
-	case !resp.QdrantConnected || !resp.RedisConnected:
+	case !resp.QdrantConnected || !resp.EmbeddingServiceUp:
+		resp.Status = "unhealthy"
+	case !resp.RedisConnected:
 		resp.Status = "degraded"
 	default:
 		resp.Status = "healthy"
@@ -1828,7 +1881,7 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 	// Default to codebase if not specified
 	collection := req.Collection
 	if collection == "" {
-		collection = collectionCodebase
+		collection = s.cfg.QdrantCollection
 	}
 
 	var extraFilters []*qdrantclient.Condition
@@ -2084,14 +2137,47 @@ func (s *retrievalServer) GetResearchContext(ctx context.Context, req *pb.Resear
 
 func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 	h, _ := s.Health(r.Context(), &pb.HealthRequest{})
+	readinessState := "READY_DEGRADED"
+	switch {
+	case !h.GetPgvectorConnected():
+		readinessState = "NOT_READY"
+	case !h.GetQdrantConnected():
+		readinessState = "NOT_READY"
+	case !h.GetEmbeddingServiceUp():
+		readinessState = "NOT_READY"
+	case !h.GetRedisConnected():
+		readinessState = "READY_DEGRADED"
+	default:
+		readinessState = "READY_FULL"
+	}
+
 	code := http.StatusOK
-	if h.GetStatus() == "unhealthy" {
+	if readinessState == "NOT_READY" {
 		code = http.StatusServiceUnavailable
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]any{
 		"status":             h.GetStatus(),
+		"readiness_state":    readinessState,
+		"dependencies": map[string]any{
+			"postgres": map[string]any{
+				"connected": h.GetPgvectorConnected(),
+				"required":  true,
+			},
+			"qdrant": map[string]any{
+				"connected": h.GetQdrantConnected(),
+				"required":  true,
+			},
+			"redis": map[string]any{
+				"connected": h.GetRedisConnected(),
+				"required":  false,
+			},
+			"embedding_service": map[string]any{
+				"connected": h.GetEmbeddingServiceUp(),
+				"required":  true,
+			},
+		},
 		"pgvectorConnected":  h.GetPgvectorConnected(),
 		"qdrantConnected":    h.GetQdrantConnected(),
 		"redisConnected":     h.GetRedisConnected(),
@@ -2192,10 +2278,12 @@ func main() {
 		log.Fatalf("[retrieval] pgxpool: %v", err)
 	}
 	defer pool.Close()
+	pgConnected := false
 	if err := pool.Ping(context.Background()); err != nil {
 		slog.Warn("[retrieval] pgvector degraded", "err", err)
 	} else {
 		slog.Info("[retrieval] pgvector OK")
+		pgConnected = true
 	}
 
 	// Redis
@@ -2205,20 +2293,32 @@ func main() {
 	}
 	rdb := redis.NewClient(rOpts)
 	defer rdb.Close()
+	redisConnected := false
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
 		slog.Warn("[retrieval] Redis degraded", "err", err)
 	} else {
 		slog.Info("[retrieval] Redis OK")
+		redisConnected = true
 	}
 
 	// Qdrant gRPC
 	var qdrant *qdrantclient.Client
+	qdrantConnected := false
 	if qc, err := qdrantclient.NewClient(&qdrantclient.Config{
 		Host: cfg.QdrantHost,
 		Port: cfg.QdrantPort,
 	}); err == nil {
-		qdrant = qc
-		slog.Info("[retrieval] Qdrant gRPC OK", "host", cfg.QdrantHost, "port", cfg.QdrantPort)
+		verifyCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		_, listErr := qc.ListCollections(verifyCtx)
+		cancel()
+		if listErr == nil {
+			qdrant = qc
+			qdrantConnected = true
+			slog.Info("[retrieval] Qdrant gRPC OK", "host", cfg.QdrantHost, "port", cfg.QdrantPort)
+		} else {
+			slog.Warn("[retrieval] Qdrant gRPC degraded (verification failed)", "err", listErr)
+			qdrant = qc
+		}
 	} else {
 		slog.Warn("[retrieval] Qdrant gRPC degraded (REST fallback)", "err", err)
 	}
@@ -2269,7 +2369,41 @@ func main() {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	slog.Info("[retrieval] ready",
+	startupStatus := "READY_DEGRADED"
+	embeddingConnected := false
+	embeddingCtx, cancelEmbedding := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancelEmbedding()
+	if req, err := http.NewRequestWithContext(embeddingCtx, http.MethodGet, cfg.EmbeddingBaseURL+"/ready", nil); err == nil {
+		if resp, err := httpClient.Do(req); err == nil {
+			func() {
+				defer resp.Body.Close()
+				if resp.StatusCode != http.StatusOK {
+					return
+				}
+				var stats struct {
+					Ready              bool `json:"ready"`
+					EmbeddingDimension int  `json:"embedding_dimension"`
+				}
+				if err := json.NewDecoder(resp.Body).Decode(&stats); err != nil {
+					return
+				}
+				embeddingConnected = stats.Ready && stats.EmbeddingDimension == cfg.EmbeddingDimension
+			}()
+		}
+	}
+
+	if pgConnected && redisConnected && qdrantConnected && embeddingConnected {
+		startupStatus = "READY_FULL"
+	} else if !pgConnected {
+		startupStatus = "NOT_READY"
+	}
+
+	slog.Info("[retrieval] startup",
+		"status", startupStatus,
+		"pgvector", pgConnected,
+		"redis", redisConnected,
+		"qdrant", qdrantConnected,
+		"embedding", embeddingConnected,
 		"grpc", cfg.GRPCPort,
 		"http", cfg.HTTPPort,
 		"gpu_embed", cfg.GPUEmbedEnabled,

@@ -89,7 +89,7 @@ OVERALL SMOKE: WARN (47/100)
    - Script: `npm run atlas:p1:embedding:audit --verbose`
 
 2. **Embed missing packets via Ollama** (1.5 hours)
-   - Use `embeddinggemma:latest` (canonical 384-dim)
+   - Use `embeddinggemma:latest` (canonical 768-dim)
    - Batch size: 50 packets/request (VRAM-safe)
    - Script: `npm run atlas:p1:embedding:backfill:dry --limit=500`
    - Expected: 44.44% → 75-85%
@@ -100,14 +100,14 @@ OVERALL SMOKE: WARN (47/100)
    - Script: `npm run atlas:qdrant:embedding-sync --dry-run`
 
 4. **Verify dimension alignment** (15 min)
-   - Postgres vector(384) ✓
-   - Qdrant 384-dim named vectors ✓
+   - Postgres vector(768) ✓
+   - Qdrant 768-dim named vectors ✓
    - No 768-dim or 64-dim contamination
    - Script: `npm run atlas:audit:embedding-dimensions`
 
 **Success Criteria**:
 - embedding coverage: 44.44% → 75-85% (target 80%+)
-- All embeddings are 384-dim
+- All embeddings are 768-dim
 - Qdrant mirror ≥ Postgres population
 - npm script: `npm run atlas:feature-set:embedding:coverage` returns ≥75%
 

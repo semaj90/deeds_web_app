@@ -1,10 +1,9 @@
 /**
  * Step 3: Embedding Contract
  *
- * This file keeps the canonical 384 retrieval lane explicit,
- * while also declaring the native or legacy 768 lane separately.
- * The retrieval stack must treat these as separate contracts rather than one
- * ambiguous canonical dimension.
+ * Canonical dense search is 768-dim.
+ * The 384 lane may exist as a legacy or experimental projection, but it is
+ * not the authority contract for current retrieval.
  */
 
 export const EMBEDDING_CONTRACT = {
@@ -25,12 +24,12 @@ export const EMBEDDING_CONTRACT = {
   variant: 'latest',
 
   /**
-   * Canonical online retrieval dimension.
+   * Canonical dense embedding dimension.
    */
-  embedding_dimension: 384,
+  embedding_dimension: 768,
 
   /**
-   * Native Ollama output dimension (before truncation).
+   * Native model output dimension.
    */
   native_dimension: 768,
 
@@ -38,11 +37,11 @@ export const EMBEDDING_CONTRACT = {
    * Explicit source/retrieval lane metadata for adaptive routing.
    */
   source_embedding_dimension: 768,
-  retrieval_embedding_dimension: 384,
+  retrieval_embedding_dimension: 768,
+  legacy_retrieval_embedding_dimension: 384,
 
   /**
-   * Truncation from 768 to 384 is applied by Ollama on this model config
-   * (not standard Matryoshka; custom for this project)
+   * Legacy experimental projection from 768 to 384.
    */
   truncation_method: 'direct_slice',
   truncation_position: 384,
@@ -72,10 +71,11 @@ export const EMBEDDING_CONTRACT = {
   /**
    * Qdrant collection names (must exist).
    * source: 768-dim lane
-   * retrieval: 384-dim hybrid lane
+   * retrieval: 768-dim canonical lane
    */
   qdrant_source_collection: 'codebase_chunks_768',
-  qdrant_collection: 'codebase_chunks_384_hybrid',
+  qdrant_collection: 'codebase_chunks_768',
+  qdrant_legacy_collection: 'codebase_chunks_384_hybrid',
 
   /**
    * TurboVec configuration
@@ -129,8 +129,8 @@ export const EMBEDDING_CONTRACT = {
   /**
    * Version identifier (for migrations + schema versioning)
    */
-  version: '1.0',
-  schema_version: '384-canonical-plus-768-legacy-v3',
+  version: '2.0',
+  schema_version: '768-canonical-plus-384-legacy-v4',
 
   /**
    * Explicit representation lineage contract.
@@ -138,25 +138,25 @@ export const EMBEDDING_CONTRACT = {
    * never by raw coordinate concatenation.
    */
   representations: {
+    semantic_768: {
+      lane_id: 'dense_768',
+      role: 'canonical_semantic_authority',
+      status: 'ACTIVE',
+      source_dimension: 768,
+      output_dimension: 768,
+      projection_method: 'none',
+      projection_version: 'embeddinggemma-native-768-v1',
+      normalization: 'L2',
+      collection: 'codebase_chunks_768',
+    },
     semantic_384: {
       lane_id: 'dense_384',
-      role: 'canonical_online_retrieval',
-      status: 'ACTIVE',
+      role: 'legacy_experimental_retrieval',
+      status: 'REFERENCE_ONLY',
       source_dimension: 768,
       output_dimension: 384,
       projection_method: 'direct_slice',
       projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
-      normalization: 'L2',
-      collection: 'codebase_chunks_384_hybrid',
-    },
-    legacy_768: {
-      lane_id: 'dense_768',
-      role: 'canonical_native_semantic',
-      status: 'REFERENCE_ONLY',
-      source_dimension: 768,
-      output_dimension: 768,
-      projection_method: 'none',
-      projection_version: 'embeddinggemma-full768-v1',
       normalization: 'L2',
       collection: 'codebase_chunks_768',
     },
@@ -182,8 +182,8 @@ export const EMBEDDING_CONTRACT = {
    * Description for documentation
    */
   description:
-    'Legal AI platform embedding contract. 384-dim is the canonical online semantic search lane; ' +
-    '768-dim remains the native or legacy recall lane when lineage is explicit. ' +
+    'Legal AI platform embedding contract. 768-dim is the canonical dense lane; ' +
+    '384-dim may exist only as a legacy or experimental projection with explicit lineage. ' +
     'L2-normalized. Used by Qdrant ANN search, TurboVec prefilter, GPU reranking, and ACE context assembly.',
 } as const;
 

@@ -19,6 +19,7 @@ const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip
 
 const quiet = process.env.GRAPHIFY_QUIET === '1';
 const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
+const allowFallback = process.env.GRAPHIFY_ALLOW_FALLBACK === '1';
 
 try {
   if (!quiet) console.log('[graphify:daily] Starting...');
@@ -45,6 +46,11 @@ try {
   process.exit(0);
 } catch (err) {
   console.error(`ERROR: graphify:daily failed: ${err.message}`);
+  if (!allowFallback) {
+    console.error('[graphify:daily] Fallback disabled; exiting with failure.');
+    process.exit(1);
+  }
+
   console.log('[graphify:daily] Falling back to startup pipeline...');
 
   try {

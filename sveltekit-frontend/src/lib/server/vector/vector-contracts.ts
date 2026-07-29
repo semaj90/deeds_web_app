@@ -2,7 +2,7 @@
  * Vector Naming & Dimension Contracts
  *
  * Separated concerns:
- * - semantic_embedding (384-dim): canonical content similarity
+ * - semantic_embedding (768-dim): canonical content similarity
  * - topology_embedding (128-dim): structural relationships
  * - latent_embedding (64-dim): routing and clustering
  *
@@ -16,7 +16,7 @@
  * These MUST match Qdrant collection named vector definitions exactly
  *
  * Live Qdrant uses the named 768 lane set ('content', 'error', 'signature').
- * Keep the canonical 384 retrieval lane and the 768 native/source lane
+ * Keep the canonical 768 source lane and the 384 legacy retrieval lane
  * separate, with explicit lineage and score fusion downstream.
  */
 export type CodebaseVectorName = 'semantic_embedding' | 'topology_embedding' | 'latent_embedding' | 'content' | 'error' | 'signature';
@@ -352,18 +352,18 @@ export const COLLECTION_CONTRACTS: Record<string, CollectionContract> = {
     sparseVectors: ['bm42'], // Canonical sparse vector name per qdrant-collection-contracts.ts
     primaryDenseVector: 'content',
     primaryDimension: 384,
-    description: 'Hybrid collection: dense content (384-dim) + BM42 sparse. Canonical retrieval target.',
+    description: 'Legacy hybrid collection: dense content (384-dim) + BM42 sparse. Retained for migration and experimental retrieval only.',
   },
   codebase_chunks_384: {
     contractVersion: 'atlas-qdrant-384-dense-v1',
     denseVectors: { content: 384 },
     primaryDenseVector: 'content',
     primaryDimension: 384,
-    description: 'Dense-only collection (transitional). Migrate reads to codebase_chunks_384_hybrid.',
+    description: 'Dense-only collection (transitional). Migrate reads to codebase_chunks_768.',
   },
 };
 
-/** Canonical hybrid collection — dense (384-dim content) + BM42 sparse. */
+/** Canonical source collection — dense (768-dim content). */
 export const CANONICAL_HYBRID_COLLECTION = 'codebase_chunks_384_hybrid' as const;
 
 /** Transitional dense-only collection — fallback when hybrid is not yet populated. */

@@ -19,6 +19,7 @@ describe('qdrant-summary-sync', () => {
   it('resolves the canonical hybrid collection and syncs all packet_key matches', async () => {
     getCollections.mockResolvedValue({
       collections: [
+        { name: 'codebase_chunks_768_v2' },
         { name: 'codebase_chunks_768' },
         { name: 'codebase_chunks_384_hybrid' },
       ],
@@ -39,13 +40,13 @@ describe('qdrant-summary-sync', () => {
       },
     });
 
-    expect(result.collection).toBe('codebase_chunks_384_hybrid');
+    expect(result.collection).toBe('codebase_chunks_768_v2');
     expect(result.updatedPoints).toBe(2);
     expect(scroll).toHaveBeenCalledTimes(1);
     expect(setPayload).toHaveBeenCalledTimes(2);
     expect(setPayload).toHaveBeenNthCalledWith(
       1,
-      'codebase_chunks_384_hybrid',
+      'codebase_chunks_768_v2',
       expect.objectContaining({
         points: ['point-1'],
         payload: expect.objectContaining({
@@ -59,25 +60,25 @@ describe('qdrant-summary-sync', () => {
   });
 
   it('uses the provided qdrantPointId without scrolling', async () => {
-    getCollections.mockResolvedValue({ collections: [{ name: 'codebase_chunks_384' }] });
+    getCollections.mockResolvedValue({ collections: [{ name: 'codebase_chunks_768_v2' }] });
     scroll.mockResolvedValue({ points: [] });
     setPayload.mockResolvedValue({});
 
     const result = await syncSummaryPayloadToQdrant({
       packetKey: 'packet:auth:002',
       qdrantPointId: 'point-abc',
-      collection: 'codebase_chunks_384',
+      collection: 'codebase_chunks_768_v2',
       payload: {
         summary: 'Point-specific update',
       },
     });
 
-    expect(result.collection).toBe('codebase_chunks_384');
+    expect(result.collection).toBe('codebase_chunks_768_v2');
     expect(result.updatedPoints).toBe(1);
     expect(scroll).not.toHaveBeenCalled();
     expect(setPayload).toHaveBeenCalledTimes(1);
     expect(setPayload).toHaveBeenCalledWith(
-      'codebase_chunks_384',
+      'codebase_chunks_768_v2',
       expect.objectContaining({
         points: ['point-abc'],
         payload: expect.objectContaining({

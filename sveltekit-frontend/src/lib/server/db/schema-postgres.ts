@@ -1654,9 +1654,9 @@ export const documentChunks = pgTable('document_chunks', {
   documentId: text('document_id').notNull(),
   chunkIndex: integer('chunk_index').notNull(),
   content: text('content').notNull(),
-  // Embedding column: optional 384-dim vector. Some deployments store document
+  // Embedding column: optional 768-dim vector. Some deployments store document
   // chunk embeddings here; keep it optional to match mixed-state DBs.
-  embedding: vector('embedding', { dimensions: 384 }),
+  embedding: vector('embedding', { dimensions: 768 }),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });

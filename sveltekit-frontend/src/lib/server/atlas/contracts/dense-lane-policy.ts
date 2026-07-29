@@ -8,8 +8,8 @@
  */
 
 export enum DenseRepresentationName {
-  SEMANTIC_768 = 'semantic_768',      // embeddinggemma:latest native 768-dim
-  SEMANTIC_384 = 'semantic_384',      // truncated to 384-dim for online retrieval
+  SEMANTIC_768 = 'semantic_768',      // canonical dense 768-dim semantic lane
+  SEMANTIC_384 = 'semantic_384',      // legacy / experimental 384-dim projection
   LATENT_64 = 'latent_64',            // autoencoder compression, routing only
 }
 
@@ -55,7 +55,7 @@ export const CANONICAL_DENSE_LANES: Record<DenseRepresentationName, DenseLanePol
   [DenseRepresentationName.SEMANTIC_384]: {
     representationName: DenseRepresentationName.SEMANTIC_384,
     role: DenseRole.ONLINE_RETRIEVAL,
-    lifecycle: DenseLifecycle.ACTIVE,
+    lifecycle: DenseLifecycle.REFERENCE_ONLY,
     nativeDimension: 384,
     producerModel: 'embeddinggemma:latest (truncated)',
     createdAt: '2026-07-15T00:00:00Z',
@@ -74,8 +74,8 @@ export const CANONICAL_DENSE_LANES: Record<DenseRepresentationName, DenseLanePol
 /**
  * Policy decision rule:
  * - Semantic search ranking (XGBoost features): Use SEMANTIC_AUTHORITY (semantic_768)
- * - Fast ANN prefilter (Qdrant HNSW): Use ONLINE_RETRIEVAL (semantic_384)
- * - Topology routing (SOM neighbors): Use ROUTING (latent_64 when available, else semantic_384)
+ * - Fast ANN prefilter (Qdrant HNSW): Prefer SEMANTIC_AUTHORITY (semantic_768)
+ * - Topology routing (SOM neighbors): Use ROUTING (latent_64 when available, else semantic_768)
  * - Historical analysis (why a lane existed): Use RECALL_REFERENCE
  *
  * Do NOT collapse both lanes into one "canonical embedding" — preserve both claims

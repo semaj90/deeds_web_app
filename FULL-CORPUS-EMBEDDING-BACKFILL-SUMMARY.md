@@ -13,7 +13,7 @@
 
 **Features**:
 - ✅ Full-corpus embedding backfill (40,754 chunks in codebase_chunk_index)
-- ✅ HTTP/Ollama batch embedding (embeddinggemma:latest, 384-dim)
+- ✅ HTTP/Ollama batch embedding (embeddinggemma:latest, 768-dim)
 - ✅ Postgres connection pooling (ioredis style: lazyConnect, maxRetries 1)
 - ✅ Batch processing: 32-64 chunks per request (optimal for RTX 3060 Ti)
 - ✅ Atomic Postgres transactions (all-or-nothing per batch)
@@ -119,7 +119,7 @@ Covers:
          ↓
 ┌─────────────────────────────────────────┐
 │ Validation                              │
-│ • Dimension check (384-dim exactly)     │
+│ • Dimension check (768-dim exactly)     │
 │ • Count check (1 per input)             │
 │ • Null-safety (skip invalid)            │
 └─────────────────────────────────────────┘
@@ -171,7 +171,7 @@ EXAMPLES:
 | **Graceful failure per-chunk** | Failed chunks don't block batch | Maximizes completion rate |
 | **Deterministic query order (ID ASC)** | Prevents re-processing on retry | Idempotent backfill |
 | **Connection pooling (max 10)** | Balances parallelism vs resource use | ~50% faster than serial |
-| **Dimension validation (384-dim)** | Matches project canonical | Prevents Qdrant index mismatches |
+| **Dimension validation (768-dim)** | Matches project canonical | Prevents Qdrant index mismatches |
 | **Progress logging (every 100)** | Balances visibility vs noise | Operator sees ETA without spam |
 
 ---
@@ -279,7 +279,7 @@ Expected performance:
 - **Database**: Postgres (connection via DATABASE_URL)
 
 ### Downstream
-- **Output**: `codebase_chunk_index.content_embedding` (384-dim pgvector)
+- **Output**: `codebase_chunk_index.content_embedding` (768-dim pgvector)
 - **Used By**: 
   - Qdrant mirror indexing (via `qdrant-manager.ts`)
   - Retrieval pipelines (unified-orchestrator.ts)
@@ -319,7 +319,7 @@ Expected performance:
 | **Dry-run mode** | Preview without writes (`--dry-run`) |
 | **Connection pooling** | 10 concurrent Postgres connections |
 | **Timeout handling** | 30s HTTP timeout (configurable) |
-| **Dimension validation** | Ensures 384-dim (project canonical) |
+| **Dimension validation** | Ensures 768-dim (project canonical) |
 | **Comprehensive logging** | Timestamps, levels (INFO/WARN/ERROR/VERBOSE) |
 
 ---

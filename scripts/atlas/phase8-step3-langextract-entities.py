@@ -241,18 +241,18 @@ def main():
     if args.apply:
         dry_run = False
 
-    print(f'[step3] Phase 8 Step 3 — LangExtract Entity Enrichment')
-    print(f'[step3] dry_run={dry_run}  limit={args.limit}  passes={args.passes}  model={args.model}')
-    print(f'[step3] Postgres:     {PG_USER}@{PG_HOST}:{PG_PORT}/{PG_DB}')
-    print(f'[step3] llama-server: {LLAMA_URL}')
+    print(f'[step3] Phase 8 Step 3 — LangExtract Entity Enrichment', flush=True)
+    print(f'[step3] dry_run={dry_run}  limit={args.limit}  passes={args.passes}  model={args.model}', flush=True)
+    print(f'[step3] Postgres:     {PG_USER}@{PG_HOST}:{PG_PORT}/{PG_DB}', flush=True)
+    print(f'[step3] llama-server: {LLAMA_URL}', flush=True)
 
     # ── Connect ────────────────────────────────────────────────────────────────
     try:
         conn = connect_pg()
         cur = conn.cursor()
-        print('[step3] Postgres connected')
+        print('[step3] Postgres connected', flush=True)
     except Exception as e:
-        print(f'[step3] FATAL: Cannot connect to Postgres: {e}')
+        print(f'[step3] FATAL: Cannot connect to Postgres: {e}', flush=True)
         sys.exit(1)
 
     # ── Load packets that have summaries but no langextract entities yet ───────
@@ -292,10 +292,10 @@ def main():
     """, (args.limit,))
 
     rows = cur.fetchall()
-    print(f'[step3] Loaded {len(rows)} packets with summaries (no langextract yet)')
+    print(f'[step3] Loaded {len(rows)} packets with summaries (no langextract yet)', flush=True)
 
     if not rows:
-        print('[step3] Nothing to do. All summaries already have langextract entities.')
+        print('[step3] Nothing to do. All summaries already have langextract entities.', flush=True)
         cur.close()
         conn.close()
         return
@@ -316,8 +316,9 @@ def main():
             skipped += 1
             continue
 
+        print(f'[step3] [{processed + skipped + 1}/{len(rows)}] extracting {packet_key}', flush=True)
         if args.verbose:
-            print(f'\n[step3] {packet_key} ({len(summary)} chars)')
+            print(f'[step3] {packet_key} ({len(summary)} chars)', flush=True)
 
         t0 = time.time()
         entities = run_langextract(
@@ -329,7 +330,7 @@ def main():
         elapsed = time.time() - t0
 
         if not args.verbose:
-            print(f'  {packet_key}: {len(entities)} entities in {elapsed:.1f}s')
+            print(f'[step3]   {packet_key}: {len(entities)} entities in {elapsed:.1f}s', flush=True)
 
         total_entities += len(entities)
         processed += 1
@@ -354,14 +355,14 @@ def main():
         _flush_batch(cur, conn, batch, errors)
 
     # ── Summary ────────────────────────────────────────────────────────────────
-    print(f'\n[step3] Done.')
-    print(f'[step3] Processed: {processed}  Skipped: {skipped}  Total entities: {total_entities}')
+    print(f'[step3] Done.', flush=True)
+    print(f'[step3] Processed: {processed}  Skipped: {skipped}  Total entities: {total_entities}', flush=True)
     if not dry_run:
-        print(f'[step3] Postgres updated: {processed - len(errors)}')
+        print(f'[step3] Postgres updated: {processed - len(errors)}', flush=True)
     if errors:
-        print(f'[step3] Errors ({len(errors)}):')
+        print(f'[step3] Errors ({len(errors)}):', flush=True)
         for e in errors[:5]:
-            print(f'  {e}')
+            print(f'[step3]   {e}', flush=True)
 
     cur.close()
     conn.close()

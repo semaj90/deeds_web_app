@@ -1,3 +1,5 @@
+import { buildSpecRecommendation, type SpecRecommendationDraft, type SpecRecommendationStatus } from './recommendations/spec-recommendation-bridge.js';
+
 export type AtlasRegistryStatus = 'active' | 'partial' | 'planned' | 'blocked';
 
 export type AtlasRuntimeRegistrySectionId =
@@ -193,7 +195,7 @@ export const ATLAS_RUNTIME_REGISTRY: AtlasRuntimeRegistrySection[] = [
         path: 'sveltekit-frontend/src/lib/server/embedding/embedding-contract.ts',
         owner: 'embedding',
         status: 'active',
-        notes: 'Canonical 384-dim retrieval projection lane used for Qdrant ANN and reranking.',
+        notes: 'Legacy 384-dim retrieval projection lane retained for experiments and migration only; canonical dense retrieval is 768-dim.',
       },
       {
         key: 'hforf-gguf',
@@ -458,6 +460,44 @@ export function getAtlasRuntimeRegistrySection(
     ...section,
     items: section.items.map((item) => ({ ...item })),
   };
+}
+
+function statusToSpecRecommendationStatus(status: AtlasRegistryStatus): SpecRecommendationStatus {
+  switch (status) {
+    case 'active':
+      return 'ACTIVE_VERIFIED';
+    case 'partial':
+      return 'ACTIVE_DEGRADED';
+    case 'planned':
+      return 'DESIGN_ONLY';
+    case 'blocked':
+      return 'BLOCKED';
+  }
+}
+
+function sectionRecommendationIdentity(section: AtlasRuntimeRegistrySection, item: AtlasRuntimeRegistryItem) {
+  return {
+    specId: `${section.id}:${item.key}`,
+    title: item.title,
+    status: statusToSpecRecommendationStatus(item.status),
+    sourceRef: item.path,
+    featureId: item.key,
+    featureLabel: item.title,
+    identityLane: section.id,
+    targetFiles: [item.path],
+    evidenceRefs: [section.owner, item.owner, section.id],
+    validationCommands: [`npm run atlas:registry:inspect -- --section=${section.id} --item=${item.key}`],
+    summary: item.notes,
+  } satisfies Parameters<typeof buildSpecRecommendation>[0];
+}
+
+export function buildRuntimeRegistryRecommendationDrafts(
+  sectionId?: AtlasRuntimeRegistrySectionId,
+): SpecRecommendationDraft[] {
+  const sections = sectionId ? [getAtlasRuntimeRegistrySection(sectionId)].filter(Boolean) as AtlasRuntimeRegistrySection[] : listAtlasRuntimeRegistrySections();
+  return sections.flatMap((section) =>
+    section.items.map((item) => buildSpecRecommendation(sectionRecommendationIdentity(section, item))),
+  );
 }
 
 export function getAtlasRuntimeRegistrySnapshot(): AtlasRuntimeRegistrySnapshot {

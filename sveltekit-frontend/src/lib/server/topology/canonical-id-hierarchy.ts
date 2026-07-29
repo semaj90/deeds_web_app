@@ -129,11 +129,11 @@ export interface PostgresEnvelope extends CanonicalEnvelope {
 export interface QdrantPayload extends CanonicalEnvelope {
   // Qdrant payload carries full canonical envelope + embeddings
   // Multi-vector metadata
-  content_embedding: number[]; // 384-dim (primary, semantic search)
-  summary_embedding: number[]; // 384-dim (concept-level retrieval)
-  title_embedding: number[]; // 384-dim (feature lookup)
-  signature_embedding: number[]; // 384-dim (function/API similarity)
-  feature_embedding?: number[]; // 384-dim (cross-cutting concerns, optional)
+  content_embedding: number[]; // 768-dim (primary, semantic search)
+  summary_embedding: number[]; // 768-dim (concept-level retrieval)
+  title_embedding: number[]; // 768-dim (feature lookup)
+  signature_embedding: number[]; // 768-dim (function/API similarity)
+  feature_embedding?: number[]; // 768-dim (cross-cutting concerns, optional)
   latent64?: number[]; // 64-dim (clustering only, NOT for retrieval)
 }
 

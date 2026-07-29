@@ -62,6 +62,7 @@ export const VECTOR_CONFIG = {
     legal_canon_chunks: 'legal_canon_chunks',
     fictional_case_chunks: 'fictional_case_chunks',
     codebase_chunks: 'codebase_chunks_768',
+    codebase_chunks_768_v2: 'codebase_chunks_768_v2',
     codebase_chunks_768: 'codebase_chunks_768',
     codebase_chunks_384_hybrid: 'codebase_chunks_384_hybrid',
     codebase_chunks_384: 'codebase_chunks_384',
@@ -99,6 +100,10 @@ export const VECTOR_CONFIG = {
     poi_profiles: { vectors: ['embedding'] },
     legal_canon_chunks: { vectors: ['content'], on_disk_payload: true },
     fictional_case_chunks: { vectors: ['content'], on_disk_payload: true },
+    codebase_chunks_768_v2: {
+      vectors: ['content'],
+      on_disk_payload: true,
+    },
     codebase_chunks_768: {
       vectors: ['content', 'signature', 'error'],
       on_disk_payload: true,
@@ -172,7 +177,7 @@ export const VECTOR_LANES = {
     dimension: 384,
     modelId: 'embeddinggemma-prefix384-v1',
     laneId: 'dense_384',
-    role: 'canonical_online_retrieval',
+    role: 'legacy_online_retrieval',
     status: 'ACTIVE',
     sourceDimension: 768,
     projectionMethod: 'direct_slice',
@@ -255,6 +260,7 @@ const COLLECTION_DIMENSIONS: Record<string, number> = {
   legal_canon_chunks: 768,
   fictional_case_chunks: 768,
   codebase_chunks_768: 768,
+  codebase_chunks_768_v2: 768,
   codebase_chunks_384_hybrid: 384,
   codebase_chunks_384: 384,
   codebase_topology_128: 128,
@@ -302,8 +308,9 @@ export function collectionForVector(vector: number[]): never {
 }
 
 export const CODEBASE_QDRANT_COLLECTION_PRIORITY = [
-  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
   VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
+  VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
   VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
 ] as const;
 
@@ -311,16 +318,19 @@ export type CodebaseQdrantCollectionName = (typeof CODEBASE_QDRANT_COLLECTION_PR
 
 export const CODEBASE_QDRANT_COLLECTIONS_BY_TIER: Record<SearchTier, readonly CodebaseQdrantCollectionName[]> = {
   hot: [
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
   ],
   warm: [
-    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,
   ],
   cold: [
+    VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384_hybrid,
     VECTOR_CONFIG.COLLECTIONS.codebase_chunks_384,

@@ -89,15 +89,14 @@ async function validateQdrantDimensions(): Promise<void> {
     if (!activeCollection) {
       console.warn(
         `[search-runtime] None of ${CODEBASE_QDRANT_COLLECTION_PRIORITY.join(', ')} found in Qdrant. ` +
-        'Dense retrieval will return empty results. Run `npm run atlas:qdrant:384:restore:apply`.'
+        'Dense retrieval will return empty results. Run the Qdrant collection reconciliation / rebuild gate.'
       );
       return;
     }
 
-    if (activeCollection === 'codebase_chunks_384') {
+    if (activeCollection !== 'codebase_chunks_768_v2') {
       console.warn(
-        '[search-runtime] codebase_chunks_384_hybrid not found. Using legacy dense-only codebase_chunks_384. ' +
-        'Run `npm run atlas:backfill:hybrid` to populate the canonical hybrid collection.'
+        `[search-runtime] canonical dense collection codebase_chunks_768_v2 is not active. Using ${activeCollection} as fallback until v2 is available.`
       );
     }
 
@@ -139,7 +138,7 @@ async function validateQdrantDimensions(): Promise<void> {
       console.warn(
         `[search-runtime] ${activeCollection}: 'content' vector has dimension ${actualDim}, ` +
         `expected ${expectedDim}. ` +
-        'Search scores will be wrong. Run `npm run atlas:qdrant:384:restore:apply` to rebuild.'
+        'Search scores will be wrong. Rebuild or reproject the active collection before trusting retrieval.'
       );
     }
     // Dimension matches — no warning needed

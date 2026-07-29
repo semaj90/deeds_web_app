@@ -32,6 +32,7 @@ import { TOOL_DISPATCH, type MCPToolResult } from './mcp-tool-dispatch.js';
 import { compressToHCACard, hcaCardToContextSnippet, type HCACard } from './hca-compressor.js';
 import { recordAgentAction } from '$lib/server/trace/trace-collector.js';
 import { callTraceMcpTool } from './mcp-tool-bridge.js';
+import { recordToolUsage } from './tool-selection.js';
 import { createHash } from 'crypto';
 import { db } from '$lib/server/db/client.js';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
@@ -44,6 +45,7 @@ export const ALLOWED_MCP_TOOLS = new Set([
   // trace-mcp-server.ts :8788 — graph / topology / cluster / trace tools
   'trace.kag_search',
   'trace.explain_retrieval',
+  'ops.search_tools',
   'graph.expand_neighborhood',
   'graph.shortest_path',
   'graph.community_for_node',
@@ -198,7 +200,10 @@ export async function dispatchToolCall(
 
   // Try HTTP server first
   const httpResult = await dispatchViaHTTP(toolName, args);
-  if (httpResult) return { result: httpResult, fromServer: true };
+  if (httpResult) {
+    recordToolUsage(toolName);
+    return { result: httpResult, fromServer: true };
+  }
 
   // In-process fallback
   const handler = TOOL_DISPATCH[toolName];
@@ -209,6 +214,7 @@ export async function dispatchToolCall(
     };
   }
   const result = await handler(args);
+  recordToolUsage(toolName);
   return { result, fromServer: false };
 }
 

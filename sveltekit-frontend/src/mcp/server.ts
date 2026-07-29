@@ -23,6 +23,7 @@ import { withToolCallRecord } from '$lib/server/telemetry/tool-call-recorder.js'
 import { LDR_RESEARCH_TOOL, executeLDRResearch, formatLDRResultForAgent, type LDRToolInput } from './tools/ldr-research.js';
 import { PHASE18_RERANKER_TOOL_SCHEMA, handlePhase18RerankerToolCall } from './tools/phase18-reranker-tool.js';
 import { ATLAS_IDENTITY_AUDIT_SCHEMA, ATLAS_CROSS_STORE_PROOF_SCHEMA, handleAtlasIdentityAudit, handleAtlasCrossStoreProof } from './atlas_identity_audit_tools.js';
+import { ATLAS_SEMANTIC_TOOL_DEFINITIONS, handleAtlasSemanticToolCall } from '$lib/server/atlas/atlas-semantic-tools.js';
 
 const SCHEMA_INDEXER_CONTRACT_CARDS_PATH = join(process.cwd(), 'memory', 'knowledge', 'schema-indexer-contract-cards.jsonl');
 
@@ -716,6 +717,7 @@ export function setupToolHandlers() {
           'gate sequence status, blockers, and next action. Pass criterion: ≥95% match.',
         inputSchema: ATLAS_CROSS_STORE_PROOF_SCHEMA.strict().passthrough() as any,
       },
+      ...ATLAS_SEMANTIC_TOOL_DEFINITIONS,
       {
         name: 'codebase:explain_cluster',
         description:
@@ -5352,6 +5354,21 @@ export function setupToolHandlers() {
         return {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
           isError: result.status === 'BLOCKED',
+        };
+      }
+      if (
+        name === 'atlas.discover' ||
+        name === 'atlas.retrieve' ||
+        name === 'atlas.build_context' ||
+        name === 'atlas.inspect_runtime' ||
+        name === 'atlas.apply_change' ||
+        name === 'atlas.validate_change' ||
+        name === 'atlas.delegate'
+      ) {
+        const result = await handleAtlasSemanticToolCall(name, args as Record<string, unknown>);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+          isError: !result.ok,
         };
       }
       return await handleToolCall(name, args as Record<string, any>);

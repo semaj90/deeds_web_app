@@ -44,12 +44,12 @@ function buildLaneFilter(
 function selectLaneNamesForTier(tier: 'hot' | 'warm' | 'cold'): SearchRequest['lanes'] {
   switch (tier) {
     case 'hot':
-      return ['lexical', 'qdrant-384', 'gpu-cuvs', 'qdrant-768'];
+      return ['lexical', 'qdrant-768', 'gpu-cuvs', 'bm25', 'qdrant-384'];
     case 'cold':
-      return ['lexical', 'qdrant-768', 'qdrant-384', 'bm25', 'gpu-cuvs'];
+      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs', 'qdrant-384'];
     case 'warm':
     default:
-      return ['lexical', 'qdrant-768', 'qdrant-384', 'bm25', 'gpu-cuvs'];
+      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs', 'qdrant-384'];
   }
 }
 
@@ -160,7 +160,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   const lanesFailed: string[] = [];
   let combinedResults: SearchResult[] = [];
 
-  // Default lane selection is tier-aware: hot favors exact/384, warm keeps both dense lanes, cold widens to 768.
+  // Default lane selection is tier-aware: 768 is canonical, 384 stays as a legacy fallback.
   const laneNames = normalizedRequest?.lanes ?? req.lanes ?? selectLaneNamesForTier(retrievalTier);
   const laneFilters = buildLaneFilter(req, normalizedRequest, perLaneLimit);
   const laneContext: SearchLaneContext = {
@@ -215,7 +215,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
 
   // Step 3: Join Postgres for canonical metadata
   // 768-dim: join when source_ref missing and qdrant_point_id present
-  // 384-dim: join when packet_key missing (need atlas_packets for packet_key even if source_ref known)
+  // 384-dim legacy: join when packet_key missing (need atlas_packets for packet_key even if source_ref known)
   const postgresStartTime = performance.now();
   const resultsNeedingJoin = combinedResults.filter(
     (r) =>
@@ -305,7 +305,7 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
       .map((r) => r.metadata?.qdrant_point_id)
       .filter((id): id is string => typeof id === 'string' && id.length > 0);
 
-    // --- 384-dim path: atlas_packets by source_ref ---
+    // --- 384-dim legacy path: atlas_packets by source_ref ---
     const sourceRefs384 = results
       .filter((r) =>
         r.source === 'qdrant-384' ||
@@ -397,7 +397,7 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
         };
       }
 
-      // Try packet join (384-dim path)
+      // Try packet join (384-dim legacy path)
       const ref = r.source_ref ?? (r.metadata?.payload as Record<string, unknown> | undefined)?.source_ref as string | undefined;
       const packet = ref ? packetMap.get(ref) : undefined;
       if (packet) {

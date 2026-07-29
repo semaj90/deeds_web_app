@@ -14,10 +14,15 @@ import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 const APP_ROOT = process.env.APP_REPO_ROOT || 'C:/Users/james/Videos/deeds-web-app';
+const argv = process.argv.slice(2);
 const POSTGRES_CONTAINER = process.env.PARENT_ATLAS_POSTGRES_CONTAINER || 'legal-ai-postgres';
 const POSTGRES_USER = process.env.PARENT_ATLAS_POSTGRES_USER || 'legal_admin';
 const POSTGRES_DB = process.env.PARENT_ATLAS_POSTGRES_DB || 'legal_ai_db';
 const POSTGRES_PASSWORD = process.env.PARENT_ATLAS_POSTGRES_PASSWORD || '123456';
+const PG_CONNECTION_TIMEOUT_MS = parseIntFlag(argv, '--pg-connection-timeout-ms', 5000);
+const PG_QUERY_TIMEOUT_MS = parseIntFlag(argv, '--pg-query-timeout-ms', 15000);
+const PG_IDLE_TIMEOUT_MS = parseIntFlag(argv, '--pg-idle-timeout-ms', 5000);
+const PG_POOL_MAX = parseIntFlag(argv, '--pg-pool-max', 1);
 
 const OUTPUT_NDJSON = path.join(REPO_ROOT, '.tmp', 'addressable-packets.ndjson');
 const OUTPUT_MANIFEST = path.join(REPO_ROOT, '.tmp', 'addressable-packets.manifest.json');
@@ -26,7 +31,6 @@ const OUTPUT_CHECKPOINT = path.join(REPO_ROOT, '.tmp', 'addressable-packets.chec
 const REPORT_JSON = path.join(REPO_ROOT, 'docs', 'reports', 'packet-reader-writer-audit.json');
 const REPORT_MD = path.join(REPO_ROOT, 'docs', 'reports', 'packet-reader-writer-audit.md');
 
-const argv = process.argv.slice(2);
 const APPLY_REQUESTED = argv.includes('--apply');
 const RESUME_REQUESTED = argv.includes('--resume');
 const LIMIT = parseIntFlag(argv, '--limit', 0);
@@ -219,6 +223,15 @@ async function initPool() {
     user: POSTGRES_USER,
     password: POSTGRES_PASSWORD,
     database: POSTGRES_DB,
+    max: PG_POOL_MAX,
+    connectionTimeoutMillis: PG_CONNECTION_TIMEOUT_MS,
+    idleTimeoutMillis: PG_IDLE_TIMEOUT_MS,
+    query_timeout: PG_QUERY_TIMEOUT_MS,
+    statement_timeout: PG_QUERY_TIMEOUT_MS,
+    allowExitOnIdle: true,
+  });
+  pool.on('error', (err) => {
+    console.error('[materialize-addressable-packets] pg pool error:', err?.message || err);
   });
   return pool;
 }
@@ -696,6 +709,18 @@ function normalizePacketRow(row, evidence) {
   };
 }
 
+function packetDedupKey(row) {
+  return [
+    normalizeText(row.packet_key),
+    normalizeText(row.canonical_source_ref),
+    normalizeText(row.feature_id),
+    normalizeText(row.qdrant_point_id),
+    normalizeText(row.tree_node_id),
+    normalizeText(row.content_hash),
+    normalizeText(row.source_table),
+  ].join('|');
+}
+
 function classCounts(rows) {
   const counts = new Map();
   for (const row of rows) {
@@ -911,7 +936,7 @@ async function main() {
     persistStage: APPLY_REQUESTED || RESUME_REQUESTED,
   });
   const ledgerRows = loaded.rows;
-  const packets = ledgerRows.map((row) => {
+  const normalizedPackets = ledgerRows.map((row) => {
     const matchedEvidence = firstEvidence(
       evidence.index,
       row.packet_key,
@@ -925,6 +950,19 @@ async function main() {
     );
     return normalizePacketRow({ ...row, source_table: sourceTable }, matchedEvidence);
   });
+
+  const seenPacketKeys = new Set();
+  const packets = [];
+  let duplicatePacketsSkipped = 0;
+  for (const row of normalizedPackets) {
+    const key = packetDedupKey(row);
+    if (seenPacketKeys.has(key)) {
+      duplicatePacketsSkipped += 1;
+      continue;
+    }
+    seenPacketKeys.add(key);
+    packets.push(row);
+  }
 
   packets.sort((a, b) => String(a.packet_key || '').localeCompare(String(b.packet_key || '')) || String(a.qdrant_point_id || '').localeCompare(String(b.qdrant_point_id || '')));
 
@@ -943,6 +981,7 @@ async function main() {
     missingCanonicalSourceRef: packets.filter((row) => !row.canonical_source_ref).length,
     missingQdrantPointId: packets.filter((row) => !row.qdrant_point_id).length,
     missingQdrantCollection: packets.filter((row) => !row.qdrant_collection).length,
+    duplicatePacketsSkipped,
     classCounts: classCounts(packets),
     evidenceFilesSeen: evidence.stats.filesSeen,
     evidenceFilesLoaded: evidence.stats.filesLoaded,
@@ -1040,6 +1079,7 @@ async function main() {
     `- missing canonical_source_ref: ${summary.missingCanonicalSourceRef}`,
     `- missing qdrant_point_id: ${summary.missingQdrantPointId}`,
     `- missing qdrant_collection: ${summary.missingQdrantCollection}`,
+    `- duplicate packets skipped: ${summary.duplicatePacketsSkipped}`,
     '',
     '## Proof',
     '',

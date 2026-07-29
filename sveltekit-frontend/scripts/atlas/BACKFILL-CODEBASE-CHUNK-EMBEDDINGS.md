@@ -1,6 +1,6 @@
 # Full-Corpus Embedding Backfill: `backfill-codebase-chunk-embeddings.mjs`
 
-**Purpose**: Backfill 384-dim embeddings (`content_embedding`) for all chunks in `codebase_chunk_index` that are missing embeddings (WHERE `content_embedding IS NULL`).
+**Purpose**: Backfill 768-dim embeddings (`content_embedding`) for all chunks in `codebase_chunk_index` that are missing embeddings (WHERE `content_embedding IS NULL`).
 
 **Status**: ✅ Production-ready. Handles 40K+ chunks with graceful failure recovery, atomic Postgres updates, and streaming progress logging.
 
@@ -37,14 +37,14 @@ npm run atlas:embed:full-corpus:apply:verbose    # Full corpus + detailed loggin
    - Parallel embedding via HTTP/Ollama reduces per-item overhead
    - Retry on timeout; individual failures don't block batch
 
-3. **Call EmbeddingGemma via HTTP** (embeddinggemma:latest, 384-dim)
+3. **Call EmbeddingGemma via HTTP** (embeddinggemma:latest, 768-dim)
    - Protocol: `POST /api/embed` to Ollama at :11434
    - Timeout: 30s per batch (configurable)
    - Fallback: Single-text sequential embedding on batch failure
-   - Dimension validation: All vectors must be exactly 384-dim
+   - Dimension validation: All vectors must be exactly 768-dim
 
 4. **Stream Results + Update Postgres** (atomic transaction per batch)
-   - Validates embedding dimension (384-dim)
+   - Validates embedding dimension (768-dim)
    - Atomic UPDATE: all-or-nothing per batch
    - Sets `updated_at = now()` for audit trail
    - Transactional rollback on any failure
@@ -126,7 +126,7 @@ POST /api/embed
 ```json
 {
   "embeddings": [
-    [0.123, 0.456, ..., 0.789],  // 384-dim vector
+    [0.123, 0.456, ..., 0.789],  // 768-dim vector
     ...
   ]
 }
@@ -134,7 +134,7 @@ POST /api/embed
 
 ### Validation Gates
 
-1. **Dimension check**: All vectors must be exactly 384-dim
+1. **Dimension check**: All vectors must be exactly 768-dim
 2. **Count check**: Response must include one embedding per input text
 3. **Null-safety**: Gracefully skips null or malformed vectors
 4. **Transaction atomicity**: Single invalid vector rolls back entire batch
@@ -163,7 +163,7 @@ POST /api/embed
 
 ## Performance Characteristics
 
-### Baseline (RTX 3060 Ti, 384-dim)
+### Baseline (RTX 3060 Ti, 768-dim)
 
 | Operation | Latency |
 |-----------|---------|
@@ -232,7 +232,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
 |--------|------|---------|
 | `id` | INT | Primary key |
 | `content` | TEXT | Source text (read only) |
-| `content_embedding` | `vector(384)` | pgvector column (write target) |
+| `content_embedding` | `vector(768)` | pgvector column (write target) |
 | `updated_at` | TIMESTAMP | Audit trail |
 
 ### Query Plan
@@ -278,7 +278,7 @@ docker restart legal-ai-ollama
 # Verify model in Ollama
 curl -s http://127.0.0.1:11434/api/embed \
   -d '{"model":"embeddinggemma:latest","input":"test"}' | jq '.embeddings[0] | length'
-# Expected: 384
+# Expected: 768
 ```
 
 ### Postgres Transaction Timeout

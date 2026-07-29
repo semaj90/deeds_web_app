@@ -2,14 +2,14 @@
  * Qdrant collection alias management + blue/green promotion.
  *
  * Why aliases?
- * - The retrieval adapters currently hard-code collection names ('codebase_chunks_384_hybrid',
- *   'codebase_chunks_384'). Re-indexing requires a code deployment to cut over.
+ * - The retrieval adapters currently hard-code collection names ('codebase_chunks_768_v2',
+ *   'codebase_chunks_384_hybrid', 'codebase_chunks_384'). Re-indexing requires a code deployment to cut over.
  * - Qdrant aliases are atomic name→collection mappings updated server-side in one API call.
  *   A blue/green swap is: build new collection → verify → call promoteCollectionAlias() → done.
  *   Zero downtime, no code change, instant rollback by re-promoting to the old collection.
  *
  * Alias naming convention:
- *   codebase_live   → whichever 384-dim hybrid collection is currently serving traffic
+ *   codebase_live   → whichever canonical codebase collection is currently serving traffic
  *
  * Resolution priority (fallback chain):
  *   1. Qdrant alias lookup (atomic, operator-controlled)
@@ -30,8 +30,9 @@ export const CODEBASE_ALIAS = 'codebase_live';
 
 /** Priority-ordered fallback collection names when the alias is absent. */
 export const CODEBASE_COLLECTION_PRIORITY = [
-  'codebase_chunks_384_hybrid',
+  'codebase_chunks_768_v2',
   'codebase_chunks_768',
+  'codebase_chunks_384_hybrid',
   'codebase_chunks_384',
 ] as const;
 
@@ -134,7 +135,8 @@ export async function resolveCollectionViaAlias(
   }
 
   // 4. Env var override
-  const envName = process.env.CODEBASE_QDRANT_COLLECTION?.trim();
+  const envName = process.env.QDRANT_CODEBASE_COLLECTION?.trim()
+    || process.env.CODEBASE_QDRANT_COLLECTION?.trim();
   if (envName) {
     return { collection: envName, fromAlias: false, aliasName };
   }

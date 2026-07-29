@@ -121,6 +121,7 @@ import { buildTaxonomyTopologyPacket } from '../lib/server/atlas/taxonomy-topolo
 import { getFeatureDocumentEvidence } from '../lib/server/atlas/feature-document-evidence.js';
 import { getParentAtlasWorkstationSnapshot } from '../lib/server/atlas/parent-atlas-workstation.js';
 import { createMiniforgeNlpSidecarClient } from '../lib/server/nlp/miniforge-nlp-sidecar.js';
+import { selectToolsForQuery } from '../lib/server/ai/tool-selection.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
@@ -6868,6 +6869,46 @@ const FALSE_COMPLETION_PHRASES = [
 ];
 
 // ── ops.inspect_tool_contract ─────────────────────────────────────────────────
+server.registerTool(
+  'ops.search_tools',
+  {
+    description:
+      'Search the bounded tool catalog and return a compact always-include + recent + ranked subset. Use this to avoid flooding the context window with every available tool.',
+    inputSchema: z.object({
+      query: z.string().min(1).max(4000),
+      top_k: z.number().int().min(1).max(30).optional().default(12),
+      domain: z.string().optional(),
+      bootstrap: z.boolean().optional().default(false),
+    }),
+  },
+  async ({ query, top_k, domain, bootstrap }) => {
+    const selection = await selectToolsForQuery({
+      query,
+      topK: top_k,
+      domain,
+      bootstrap,
+    });
+
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: JSON.stringify(
+            {
+              ok: true,
+              state: 'TOOLS_SELECTED',
+              ...selection,
+              next_allowed_tools: ['ops.search_tools'],
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
 server.registerTool(
   'ops.inspect_tool_contract',
   {

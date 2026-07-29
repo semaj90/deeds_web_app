@@ -54,6 +54,17 @@ export const VECTOR_INDEX_REGISTRY = {
     buildScript: 'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
     notes: 'Primary named-vector retrieval lane: dense 384 plus BM42 sparse; separate from the 768 native lane.',
   },
+  qdrantSource768V2: {
+    id: 'qdrant-codebase-chunks-768-v2',
+    name: 'Qdrant clean 768-dim semantic index',
+    backend: 'qdrant-hnsw',
+    contractVersion: EMBEDDINGGEMMA_FULL768_V1,
+    vectorContract: EMBEDDINGGEMMA_FULL768_CONTRACT,
+    collection: 'codebase_chunks_768_v2',
+    indexKind: 'dense',
+    buildScript: 'scripts/atlas/phase108e-semantic-search-proof.mjs',
+    notes: 'Clean UUID-point canonical dense lane for production retrieval proof and cutover validation.',
+  },
   qdrantSource768: {
     id: 'qdrant-codebase-chunks-768',
     name: 'Qdrant source 768-dim semantic index',

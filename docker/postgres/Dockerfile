@@ -1,18 +1,17 @@
-# PostgreSQL 17 + pgvector + pgvectorscale + pg_cron + pgai
+# PostgreSQL 18 + pgvector + pgvectorscale + pg_cron + pgai
 # Extends the pgvector image with:
 #   - pgvectorscale: StreamingDiskANN index + Statistical Binary Quantization
 #   - pg_cron: Scheduled maintenance jobs (VACUUM, REINDEX)
 #   - pgai: In-database AI via Ollama (embed, generate, chat_complete, vectorizer)
 #
-# PG17 benefits: 27% faster sequential scans, 20x lower vacuum memory,
-#                improved JSON_TABLE, incremental sorts, better IN-clause B-tree
-FROM pgvector/pgvector:pg17
+# PG18 benefits: AIO, bitmap heap scan, skip scan, uuidv7, retained stats
+FROM pgvector/pgvector:pg18
 
 # Install pg_cron + plpython3u (pgai) + Python deps
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        postgresql-17-cron \
-        postgresql-plpython3-17 \
+        postgresql-18-cron \
+        postgresql-plpython3-18 \
         python3-pip \
         python3-dev \
         git \
@@ -20,7 +19,7 @@ RUN apt-get update && \
         ca-certificates && \
     # Install pgvectorscale from prebuilt .deb (Ubuntu package works on Debian bookworm)
     curl -fsSL -o /tmp/pgvectorscale.deb \
-        "https://packagecloud.io/timescale/timescaledb/packages/ubuntu/noble/pgvectorscale-postgresql-17_0.5.1-Linux_amd64.deb/download.deb" && \
+        "https://packagecloud.io/timescale/timescaledb/packages/ubuntu/noble/pgvectorscale-postgresql-18_0.5.1-Linux_amd64.deb/download.deb" && \
     dpkg -i /tmp/pgvectorscale.deb || apt-get install -f -y && \
     rm /tmp/pgvectorscale.deb && \
     # Install pgai vectorizer infrastructure

@@ -60,19 +60,20 @@ export interface SemanticPacketV1 {
   // ── VECTOR REPRESENTATIONS (MULTI-LANE RETRIEVAL) ────────────────
   // Same packet can have multiple embeddings in different dimensions/models
   embedding?: {
-    semantic_384?: {
-      values: number[]; // 384-dim derived retrieval projection
-      modelVersion: string; // e.g., "embeddinggemma:384:v4"
+    semantic_768?: {
+      values: number[]; // 768-dim canonical dense semantic lane
+      modelVersion: string; // e.g., "embeddinggemma:768:v1"
       normalized: boolean; // L2-normalized
       qdrantPointId?: string | null;
-      collectionName?: string; // "codebase_chunks_384"
+      collectionName?: string; // "codebase_chunks_768"
+      status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED';
     };
-    legacy_768?: {
-      values?: number[] | null; // 768-dim primary codebase chunk lane (may be null)
+    semantic_384?: {
+      values?: number[] | null; // 384-dim legacy / experimental projection
       modelVersion?: string | null;
       normalized?: boolean;
       qdrantPointId?: string | null;
-      collectionName?: string; // "codebase_chunks_768"
+      collectionName?: string; // "codebase_chunks_384_hybrid"
       status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED';
     };
     latent_64?: {
@@ -97,8 +98,8 @@ export interface SemanticPacketV1 {
     globalPageRankPercentile?: number; // authority percentile [0, 100]
 
     // Query dynamic (per-query, short TTL)
-    cosine384?: number; // cosine similarity to query in 384-dim
     cosine768?: number; // cosine similarity to query in 768-dim
+    cosine384?: number; // cosine similarity to query in 384-dim legacy lane
     bm25Score?: number; // lexical BM25 score
     bm42Score?: number; // extended BM25 with field weighting
     centroidSimilarity?: number; // similarity to cluster centroid
@@ -117,8 +118,8 @@ export interface SemanticPacketV1 {
   rankFusion?: {
     rffScore?: number; // Reciprocal Rank Fusion: sum(1 / (k + rank_in_lane)) for k=60
     fusedRanks?: {
+      semantic_768?: number;
       semantic_384?: number;
-      legacy_768?: number;
       bm25?: number;
       graph?: number;
       routing?: number;

@@ -19,7 +19,7 @@ import type { Candidate } from './search-runtime.js';
 import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
 import { embedQueryForLane } from './embedding-service.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
-import { RETRIEVAL_LIMITS, identifierVariants, inferRetrievalTier, tokenizeKeywordSurface } from './search-contract.js';
+import { RETRIEVAL_LIMITS, identifierVariants, tokenizeKeywordSurface } from './search-contract.js';
 
 const BM25_LIMIT = RETRIEVAL_LIMITS.postgresFtsTopK;
 const QDRANT_LIMIT = RETRIEVAL_LIMITS.denseTopK;
@@ -258,42 +258,28 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 
 /**
  * Semantic retrieval via Qdrant ANN search
- * Primary: codebase_chunks_384_hybrid (dense 384-dim + BM42 sparse)
- * Secondary: codebase_chunks_768 (dense-only detail lane)
+ * Primary: codebase_chunks_768_v2 (clean dense 768-dim lane)
+ * Legacy hybrid/sparse lanes remain available via separate call sites.
  */
 export async function retrieveQdrant(query: string): Promise<Candidate[]> {
-  const [dense384, dense768] = await Promise.allSettled([
-    embedQueryForLane(query, 'dense_384'),
-    embedQueryForLane(query, 'dense_768'),
-  ]);
+  const dense768 = await embedQueryForLane(query, 'dense_768').catch(() => null);
   const queryVectors = {
-    dense384: dense384.status === 'fulfilled' ? dense384.value.vector : null,
-    dense768: dense768.status === 'fulfilled' ? dense768.value.vector : null,
+    dense768: dense768?.vector ?? null,
   };
-  const embedding = queryVectors.dense768 ?? queryVectors.dense384;
+  const embedding = queryVectors.dense768;
   if (!embedding) return [];
 
   const qdrant = await getQdrantManager();
-  const retrievalTier = inferRetrievalTier({ query });
-  const collections = retrievalTier === 'cold'
-    ? ['codebase_chunks_768', 'codebase_chunks_384_hybrid']
-    : ['codebase_chunks_384_hybrid', 'codebase_chunks_768'];
+  const collections = [VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection];
   const resultsByKey = new Map<string, Candidate>();
 
   try {
     for (const collection of collections) {
-      const queryEmbedding =
-        collection === 'codebase_chunks_384_hybrid'
-          ? queryVectors.dense384
-          : queryVectors.dense768;
-
-      if (!queryEmbedding) continue;
-
       try {
         const results = await qdrant.hybridSearch({
           collection,
           query,
-          queryEmbedding: Array.from(queryEmbedding),
+          queryEmbedding: Array.from(embedding),
           limit: QDRANT_LIMIT,
         });
 
@@ -305,14 +291,8 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
             summary: (hit.payload?.summary as string) || '',
             content: (hit.payload?.content as string) || '',
             score: hit.score,
-            scoreSource:
-              collection === 'codebase_chunks_384_hybrid'
-                ? 'qdrant_384'
-                : 'qdrant_768',
-            embeddingLane:
-              collection === 'codebase_chunks_384_hybrid'
-                ? 'dense_384'
-                : 'dense_768',
+            scoreSource: 'qdrant_768',
+            embeddingLane: 'dense_768',
           };
 
           const existing = resultsByKey.get(candidate.packetKey) ?? resultsByKey.get(candidate.id);
@@ -337,12 +317,12 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
     console.warn('[retrieveQdrant] adaptive hybrid search failed, falling back to dense-only:', (error as Error).message);
   }
 
-  // Fallback: dense-only 384-dim legacy collection (run npm run atlas:backfill:hybrid to populate hybrid)
+  // Fallback: dense-only v2 collection
   try {
     const results = await qdrant.hybridSearch({
-      collection: VECTOR_INDEX_REGISTRY.qdrantSource768.collection ?? 'codebase_chunks_768',
+      collection: VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection ?? 'codebase_chunks_768_v2',
       query,
-      queryEmbedding: Array.from(queryVectors.dense768 ?? queryVectors.dense384 ?? embedding),
+      queryEmbedding: Array.from(embedding),
       limit: QDRANT_LIMIT,
     });
 

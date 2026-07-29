@@ -37,6 +37,7 @@ describe('vector-index-registry', () => {
 
   it('registers the frozen 5k snapshot and retrieval lanes', () => {
     expect(VECTOR_INDEX_REGISTRY.vectorSnapshot5k.snapshotLimit).toBe(5000);
+    expect(VECTOR_INDEX_REGISTRY.qdrantSource768V2.collection).toBe('codebase_chunks_768_v2');
     expect(VECTOR_INDEX_REGISTRY.qdrantSource768.collection).toBe('codebase_chunks_768');
     expect(VECTOR_INDEX_REGISTRY.qdrantSource768.vectorContract?.dimension).toBe(768);
     expect(VECTOR_INDEX_REGISTRY.qdrantHybrid.collection).toBe('codebase_chunks_384_hybrid');
@@ -58,6 +59,7 @@ describe('vector-index-registry', () => {
     expect(getVectorLane('source768').dimension).toBe(768);
     expect(getVectorLane('source768').collection).toBe('codebase_chunks_768');
 
+    expect(getVectorLaneByCollection('codebase_chunks_768_v2')?.laneId).toBeUndefined();
     expect(getVectorLaneByCollection('codebase_chunks_768')?.laneId).toBe('embeddinggemma-768d');
     expect(getVectorLaneByCollection('codebase_chunks_384_hybrid')?.laneId).toBe('embeddinggemma-prefix384');
     expect(Object.keys(VECTOR_LANES)).toHaveLength(3);

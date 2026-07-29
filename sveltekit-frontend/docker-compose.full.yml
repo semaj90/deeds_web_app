@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   # ============================================================================
-  # PostgreSQL 17 + pgvector (Vector Database)
+  # PostgreSQL 18 + pgvector (Vector Database)
   # ============================================================================
   postgres:
-    image: pgvector/pgvector:pg17
+    image: pgvector/pgvector:pg18
     container_name: legal-ai-postgres
     environment:
       POSTGRES_DB: legal_ai_db
@@ -17,7 +17,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-    command: postgres -c shared_preload_libraries=vector
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=vector
+      - -c
+      - io_method=worker
+      - -c
+      - io_workers=4
+      - -c
+      - jit=off
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=1536MB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=256MB
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U legal_admin -d legal_ai_db"]
       interval: 30s
@@ -151,7 +168,7 @@ services:
       # Database
       DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
       # Redis
-      REDIS_URL: redis://:redis@redis:6379/0
+      REDIS_URL: redis://:redis@valkey:6379/0
       # MinIO
       MINIO_URL: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
@@ -173,7 +190,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      valkey:
         condition: service_healthy
       minio:
         condition: service_healthy
@@ -238,6 +255,7 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  valkey_data:
   minio_data:
   qdrant_data:
   ollama_data:

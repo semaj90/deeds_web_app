@@ -305,6 +305,7 @@ export const TRACE_TOOL_ALLOWLIST = [
 	// Dev context + search
 	'search.dev_context',
 	'trace.explain_retrieval',
+	'ops.search_tools',
 
 	// Context assembly (gating required)
 	'context.build_kv_packet',

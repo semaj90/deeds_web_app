@@ -52,21 +52,21 @@ async function isPortListening(port) {
 
 const checks = [
   {
-    name: 'Embedding Service (embeddinggemma @ :11434)',
-    port: 11434,
-    url: 'http://127.0.0.1:11434/api/tags',
-    schema: { service: 'ollama', model: 'embeddinggemma', dim: 768, critical: true },
+    name: 'Embedding Service (:8097)',
+    port: 8097,
+    url: 'http://127.0.0.1:8097/stats',
+    schema: { service: 'go-embedding', model: 'embeddinggemma', dim: 768, critical: true },
     validate: (data) => {
-      const modelRows = data.models || [];
-      const models = modelRows.map(m => m.name);
-      const embeddingModel = modelRows.find(m => String(m.name || '').includes('embedding'));
-      const embeddingLength = embeddingModel?.details?.embedding_length || 768;
-      const hasEmbedding = Boolean(embeddingModel);
+      const embeddingLength = Number(data.embedding_dimension ?? data.embeddingDimension ?? 0);
+      const modelName = data.model_name ?? data.modelName ?? 'embeddinggemma:latest';
+      const modelLoaded = data.is_loaded ?? data.isLoaded ?? false;
+      const gpuAvailable = data.gpu_available ?? data.gpuAvailable ?? false;
+      const hasEmbedding = modelLoaded && embeddingLength === 768;
       const dims = hasEmbedding ? `${embeddingLength}-dim` : 'unknown';
       return {
         ok: hasEmbedding,
-        msg: hasEmbedding ? `✓ Ready (${dims})` : '✗ No embedding models',
-        schema: { service: 'ollama', dim: embeddingLength, models }
+        msg: hasEmbedding ? `✓ Ready (${dims}, ${gpuAvailable ? 'GPU' : 'CPU'})` : `✗ Invalid embedding service (${modelName}, dim=${embeddingLength})`,
+        schema: { service: 'go-embedding', dim: embeddingLength, model: modelName, gpuAvailable }
       };
     }
   },
@@ -205,7 +205,7 @@ async function main() {
   console.log('🔌 Port Availability & Service Health\n');
 
   // Check critical ports first
-  const criticalPorts = [11434, 8090, 8100, 8791];
+  const criticalPorts = [8097, 8090, 8100, 8791];
   const portStatus = {};
   for (const port of criticalPorts) {
     const listening = await isPortListening(port);
@@ -214,7 +214,7 @@ async function main() {
 
   console.log('Port Status:');
   Object.entries(portStatus).forEach(([port, listening]) => {
-    const portMap = { 11434: 'Ollama Embed', 8090: 'Gemma4', 8100: 'Go Retrieval', 8791: 'TurboVec' };
+    const portMap = { 8097: 'Go Embedding', 8090: 'Gemma4', 8100: 'Go Retrieval', 8791: 'TurboVec' };
     console.log(`  ${listening ? '✓' : '✗'} :${port} (${portMap[port]})`);
   });
   console.log();
@@ -225,7 +225,7 @@ async function main() {
   const results = await Promise.all(checks.map(runCheck));
   
   const criticalServices = [
-    'Embedding Service (embeddinggemma @ :11434)',
+    'Embedding Service (:8097)',
     'Gemma4 Synthesis (:8090)',
     'Qdrant Vector DB (:6333)',
     'Postgres Truth Layer (port 5434)'

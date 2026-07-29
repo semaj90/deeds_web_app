@@ -70,6 +70,25 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
   {
     type: 'function',
     function: {
+      name: 'ops__search_tools',
+      description:
+        'Search the bounded tool catalog and return a compact always-include + recent + ranked subset. Use this to avoid flooding the context window with every available tool.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: 'What the current task needs from the tool catalog' },
+          top_k: { type: 'integer', description: 'Max ranked additions beyond always-include tools (default 12)' },
+          domain: { type: 'string', description: 'Optional domain hint such as code, graph, legal, cache' },
+          bootstrap: { type: 'boolean', description: 'Include the larger bootstrap tool set for the first turns' },
+        },
+        required: ['query'],
+      },
+    },
+  },
+
+  {
+    type: 'function',
+    function: {
       name: 'codebase__rg_search',
       description:
         'Controlled ripgrep search over the codebase. Returns line hits from relative repo paths and is safe for exact symbol or text lookup.',
@@ -419,6 +438,7 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
 // MCP uses dots.  Convert when dispatching.
 export const LLAMA_TO_MCP_NAME: Record<string, string> = {
   search__dev_context: 'search.dev_context',
+  ops__search_tools: 'ops.search_tools',
   codebase__rg_search: 'codebase.rg_search',
   graph__expand_neighborhood: 'graph.expand_neighborhood',
   graph__shortest_path: 'graph.shortest_path',

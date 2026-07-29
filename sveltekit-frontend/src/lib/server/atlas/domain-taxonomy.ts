@@ -45,6 +45,12 @@ export interface DomainEvidence {
 export interface DomainClassification {
   primary_domain: string | null;
   secondary_domains: string[];
+  labels: Array<{
+    label: CanonicalDomain | string;
+    score: number;
+    source: 'deterministic' | 'learned' | 'weak_label' | 'reviewed' | 'fallback';
+    evidence_kinds: string[];
+  }>;
   confidence: number;
   evidence: DomainEvidence[];
   fallback_label: 'general' | null;
@@ -259,10 +265,17 @@ export function classifyDomainTaxonomy(input: DomainTaxonomyInput): DomainClassi
   const bestScore = best?.[1] ?? 0;
   const primary_domain = best && confidence >= 0.55 && bestScore >= 1.5 ? best[0] : null;
   const secondary_domains = ranked.slice(1, 3).map(([domain]) => domain);
+  const labels = ranked.map(([domain, score]) => ({
+    label: domain,
+    score: Number(Math.min(1, score / Math.max(totalScore, 1)).toFixed(3)),
+    source: 'deterministic' as const,
+    evidence_kinds: evidence.map((item) => item.kind),
+  }));
 
   return {
     primary_domain,
     secondary_domains,
+    labels,
     confidence: Number(confidence.toFixed(3)),
     evidence,
     fallback_label: primary_domain ? null : 'general',

@@ -17,7 +17,7 @@ import type { PermissionManager } from '../topology/permission-manager.js';
 
 interface RetrievalRequest {
   query: string;
-  query_embedding: number[]; // 384-dim from EmbeddingGemma
+  query_embedding: number[]; // 768-dim canonical dense lane from EmbeddingGemma
   top_k: number; // Default: 100 for RRF, 20 for Gemma4
   file_id?: string; // Optional filtering
   feature_id?: string; // Optional filtering
@@ -49,10 +49,10 @@ interface RetrievalCandidate {
   combined_rrf_score: number; // Final RRF blend
 
   // For GPU reranking
-  content_embedding: number[]; // 384-dim
-  summary_embedding: number[]; // 384-dim
-  title_embedding: number[]; // 384-dim
-  signature_embedding: number[]; // 384-dim
+  content_embedding: number[]; // 768-dim
+  summary_embedding: number[]; // 768-dim
+  title_embedding: number[]; // 768-dim
+  signature_embedding: number[]; // 768-dim
   feature_embedding?: number[]; // Optional
 }
 
@@ -73,7 +73,7 @@ interface RetrievalCandidate extends CanonicalIDHierarchy {
   combined_rrf_score: number; // Final RRF blend
   retrieval_confidence: number; // For error detection
 
-  // For GPU reranking (stay at 384-dim)
+  // For GPU reranking (stay at 768-dim canonical)
   content_embedding: number[];
   summary_embedding: number[];
   title_embedding: number[];

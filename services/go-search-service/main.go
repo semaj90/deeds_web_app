@@ -78,7 +78,7 @@ type config struct {
 func loadConfig() config {
 	qdPort, _ := strconv.Atoi(envOr("QDRANT_GRPC_PORT", "6334"))
 	return config{
-		DatabaseURL: envOr("DATABASE_URL", "postgresql://legal_admin:123456@localhost:5432/legal_ai_db"),
+		DatabaseURL: envOr("DATABASE_URL", "postgresql://legal_admin:123456@localhost:5434/legal_ai_db"),
 		QdrantURL:   envOr("QDRANT_URL", "http://localhost:6333"),
 		QdrantHost:  envOr("QDRANT_GRPC_HOST", "localhost"),
 		QdrantPort:  qdPort,

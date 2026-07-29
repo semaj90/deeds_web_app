@@ -443,23 +443,19 @@ export class QdrantManager {
       { collection: this.collections.document_knowledge, field: 'chunkIds', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'clusterTags', schema: 'keyword' },
       { collection: this.collections.document_knowledge, field: 'topoClass', schema: 'keyword' },
-      // ── codebase_chunks_384 + codebase_chunks_384_hybrid — 384-dim retrieval lanes ──────
-      // These are NOT in VECTOR_CONFIG.COLLECTIONS (which maps codebase_chunks → _768).
-      // Listed explicitly for both the dense-only and hybrid targets so the same fields
-      // are indexed regardless of which collection the dense/BM42 adapters hit.
-      // Fields: identity keys used by adapters + fields used in downstream filter queries.
-      ...(['codebase_chunks_384', 'codebase_chunks_384_hybrid'] as const).flatMap((col) => [
-        { collection: col, field: 'packet_key', schema: 'keyword' as const },
+      // ── codebase_chunks_768_v2 canonical dense lane ──────────────────────────
+      // Index only the exact-match fields that are actually populated in the live
+      // v2 collection so deterministic filters remain cheap and stable.
+      ...(['codebase_chunks_768_v2'] as const).flatMap((col) => [
+        { collection: col, field: 'postgres_id', schema: 'keyword' as const },
+        { collection: col, field: 'qdrant_point_id', schema: 'keyword' as const },
         { collection: col, field: 'source_ref', schema: 'keyword' as const },
-        { collection: col, field: 'file_path', schema: 'keyword' as const },
-        { collection: col, field: 'feature_id', schema: 'keyword' as const },
         { collection: col, field: 'chunk_id', schema: 'keyword' as const },
-        { collection: col, field: 'kind', schema: 'keyword' as const },
-        { collection: col, field: 'language', schema: 'keyword' as const },
-        { collection: col, field: 'cluster_id', schema: 'keyword' as const },
-        { collection: col, field: 'tags', schema: 'keyword' as const },
-        { collection: col, field: 'topo_class', schema: 'keyword' as const },
-        { collection: col, field: 'som_cluster', schema: 'integer' as const },
+        { collection: col, field: 'content_hash', schema: 'keyword' as const },
+        { collection: col, field: 'representation_name', schema: 'keyword' as const },
+        { collection: col, field: 'embedding_model', schema: 'keyword' as const },
+        { collection: col, field: 'model_revision_state', schema: 'keyword' as const },
+        { collection: col, field: 'projection_revision', schema: 'keyword' as const },
       ]),
     ];
 

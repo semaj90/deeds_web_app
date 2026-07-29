@@ -40,6 +40,8 @@ describe('domain taxonomy', () => {
     expect(classification.fallback_label).toBeNull();
     expect(classification.confidence).toBeGreaterThan(0);
     expect(classification.evidence.length).toBeGreaterThan(0);
+    expect(classification.labels[0]?.label).toBe('retrieval');
+    expect(classification.labels[0]?.score).toBeGreaterThan(0);
   });
 
   it('falls back to general when evidence is weak', () => {

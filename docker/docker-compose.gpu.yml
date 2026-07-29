@@ -23,7 +23,7 @@ services:
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256,expandable_segments:True
       - CUDA_LAUNCH_BLOCKING=0
       # Application services
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/legal_ai
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/legal_ai_db
       - REDIS_URL=redis://redis:6379
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_GRPC_HOST=qdrant
@@ -61,25 +61,96 @@ services:
     restart: unless-stopped
 
   # ========================================================================
-  # PostgreSQL Database
+  # PostgreSQL 18 Database (pgvector + AIO optimizations)
   # ========================================================================
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg18
     container_name: legal-ai-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: legal_ai
+      POSTGRES_DB: legal_ai_db
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=1536MB
+      - -c
+      - jit=off
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=256MB
+      - -c
+      - io_method=worker
+      - -c
+      - io_workers=4
+      - -c
+      - effective_io_concurrency=200
+      - -c
+      - track_io_timing=on
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./sql/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
     ports:
-      - "5432:5432"
+      - "5434:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - legal-ai-network
+    restart: unless-stopped
+
+  # ========================================================================
+  # Go Retrieval Service (semantic_768 orchestrator + cache)
+  # Canonical embedding service is in docker-compose.yml (profile: gpu)
+  # ========================================================================
+  legal-ai-go-retrieval:
+    build:
+      context: ../services/go-retrieval-service
+      dockerfile: Dockerfile
+    image: legal-ai-go-retrieval:latest
+    container_name: legal-ai-go-retrieval
+    environment:
+      # Postgres (inside Docker network)
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/legal_ai_db
+      # Redis/Valkey cache
+      VALKEY_URL: redis://redis:6379
+      # Qdrant vector database
+      QDRANT_HTTP_URL: http://qdrant:6333
+      QDRANT_GRPC_HOST: qdrant
+      QDRANT_GRPC_PORT: "6334"
+      QDRANT_COLLECTION: codebase_chunks_768
+      QDRANT_VECTOR_NAME: semantic_768
+      # Embedding service (semantic_768 producer)
+      EMBEDDING_BASE_URL: http://legal-ai-go-embedding:8097
+      EMBEDDING_REPRESENTATION: semantic_768
+      EMBEDDING_DIMENSION: "768"
+      EMBEDDING_REQUIRE_GPU: "true"
+      # Service ports
+      HTTP_PORT: "8100"
+      GRPC_PORT: "50053"
+    ports:
+      - "8100:8100"
+      - "50053:50053"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
     networks:
       - legal-ai-network
     restart: unless-stopped

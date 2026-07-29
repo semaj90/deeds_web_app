@@ -25,6 +25,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"log"
 	"log/slog"
 	"net"
@@ -32,12 +33,14 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"syscall"
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -48,13 +51,13 @@ import (
 // ── Configuration ─────────────────────────────────────────────────────────
 
 type config struct {
-	OllamaURL    string
-	RedisURL     string
-	GRPCPort     string
-	HTTPPort     string
-	EmbedModel   string
-	BatchMax     int
-	CacheTTL     time.Duration
+	OllamaURL  string
+	RedisURL   string
+	GRPCPort   string
+	HTTPPort   string
+	EmbedModel string
+	BatchMax   int
+	CacheTTL   time.Duration
 }
 
 func loadConfig() config {
@@ -165,13 +168,13 @@ func acquireEmbedBatch(n int) *embedBatch {
 		n = 8
 	}
 	if cap(b.texts) < n {
-		b.texts    = make([]string, 0, n)
+		b.texts = make([]string, 0, n)
 		b.indexMap = make([]int, 0, n)
-		b.hashes   = make([]string, 0, n)
+		b.hashes = make([]string, 0, n)
 	} else {
-		b.texts    = b.texts[:0]
+		b.texts = b.texts[:0]
 		b.indexMap = b.indexMap[:0]
-		b.hashes   = b.hashes[:0]
+		b.hashes = b.hashes[:0]
 	}
 	return b
 }
@@ -186,10 +189,10 @@ type embeddingServer struct {
 	rdb   *redis.Client
 	mu    sync.RWMutex
 	stats struct {
-		totalRequests  atomic.Int64
-		totalTimeMs    atomic.Int64
-		cacheHits      atomic.Int64
-		cacheMisses    atomic.Int64
+		totalRequests atomic.Int64
+		totalTimeMs   atomic.Int64
+		cacheHits     atomic.Int64
+		cacheMisses   atomic.Int64
 	}
 	startTime time.Time
 }
@@ -241,7 +244,7 @@ func (s *embeddingServer) GenerateEmbeddings(ctx context.Context, req *pb.Embedd
 			}
 		}
 		s.stats.cacheMisses.Add(1)
-		b.texts    = append(b.texts, chunk.GetText())
+		b.texts = append(b.texts, chunk.GetText())
 		b.indexMap = append(b.indexMap, i)
 	}
 
@@ -290,8 +293,8 @@ func (s *embeddingServer) GenerateEmbeddings(ctx context.Context, req *pb.Embedd
 	s.stats.totalTimeMs.Add(int64(totalMs))
 
 	return &pb.EmbeddingResponse{
-		Embeddings:        embeddings,
-		TotalTimeMs:       totalMs,
+		Embeddings:         embeddings,
+		TotalTimeMs:        totalMs,
 		ModelName:          s.cfg.EmbedModel,
 		EmbeddingDimension: 768,
 		Status:             "success",
@@ -358,18 +361,106 @@ func (s *embeddingServer) GetStats(ctx context.Context, req *pb.StatsRequest) (*
 	}
 
 	return &pb.StatsResponse{
-		ModelName:          s.cfg.EmbedModel,
-		Device:             "ollama-gpu",
-		IsLoaded:           true,
-		EmbeddingDimension: 768,
-		BatchSize:          int32(s.cfg.BatchMax),
-		MaxLength:          512,
-		TotalRequests:      total,
+		ModelName:            s.cfg.EmbedModel,
+		Device:               "ollama-gpu",
+		IsLoaded:             true,
+		EmbeddingDimension:   768,
+		BatchSize:            int32(s.cfg.BatchMax),
+		MaxLength:            512,
+		TotalRequests:        total,
 		TotalProcessingTimeS: float32(totalTimeMs) / 1000.0,
 		AvgProcessingTimeMs:  avgMs,
-		GpuAvailable:        true,
-		UptimeSeconds:       int32(time.Since(s.startTime).Seconds()),
+		GpuAvailable:         true,
+		UptimeSeconds:        int32(time.Since(s.startTime).Seconds()),
 	}, nil
+}
+
+type readyProbeResult struct {
+	Ready               bool    `json:"ready"`
+	Status              string  `json:"status"`
+	Backend             string  `json:"backend"`
+	BackendURL          string  `json:"backend_url"`
+	ModelID             string  `json:"model_id"`
+	RepresentationID    string  `json:"representation_id"`
+	EmbeddingDimension  int     `json:"embedding_dimension"`
+	Normalized          bool    `json:"normalized"`
+	VectorNorm          float64 `json:"vector_norm"`
+	BackendReachable    bool    `json:"backend_reachable"`
+	ModelAvailable      bool    `json:"model_available"`
+	WarmupSucceeded     bool    `json:"warmup_succeeded"`
+	WarmupVectorLength  int     `json:"warmup_vector_length"`
+	RedisHealthy        bool    `json:"redis_healthy"`
+	Timestamp           int64   `json:"timestamp"`
+}
+
+func vectorNorm(vec []float32) float64 {
+	var sum float64
+	for _, v := range vec {
+		sum += float64(v) * float64(v)
+	}
+	return math.Sqrt(sum)
+}
+
+func (s *embeddingServer) probeReady(ctx context.Context) readyProbeResult {
+	result := readyProbeResult{
+		Status:             "not_ready",
+		Backend:            "ollama",
+		BackendURL:         s.cfg.OllamaURL,
+		ModelID:            s.cfg.EmbedModel,
+		RepresentationID:   "semantic_768",
+		EmbeddingDimension: 768,
+		Timestamp:          time.Now().Unix(),
+	}
+
+	// Redis is an optimization lane, not the authority for readiness.
+	if s.rdb != nil {
+		if err := s.rdb.Ping(ctx).Err(); err == nil {
+			result.RedisHealthy = true
+		}
+	}
+
+	tagsReq, err := http.NewRequestWithContext(ctx, http.MethodGet, s.cfg.OllamaURL+"/api/tags", nil)
+	if err == nil {
+		if resp, err := httpClient.Do(tagsReq); err == nil {
+			result.BackendReachable = resp.StatusCode == http.StatusOK
+			if result.BackendReachable {
+				var tags struct {
+					Models []struct {
+						Name string `json:"name"`
+					} `json:"models"`
+				}
+				if err := json.NewDecoder(resp.Body).Decode(&tags); err == nil {
+					for _, model := range tags.Models {
+						if model.Name == s.cfg.EmbedModel || strings.Contains(model.Name, s.cfg.EmbedModel) {
+							result.ModelAvailable = true
+							break
+						}
+					}
+				}
+			}
+			resp.Body.Close()
+		}
+	}
+
+	if !result.BackendReachable || !result.ModelAvailable {
+		result.Status = "not_ready"
+		return result
+	}
+
+	vectors, err := ollamaEmbed(ctx, s.cfg.OllamaURL, s.cfg.EmbedModel, []string{"embedding readiness probe"})
+	if err != nil || len(vectors) == 0 {
+		return result
+	}
+	vec := vectors[0]
+	result.WarmupSucceeded = true
+	result.WarmupVectorLength = len(vec)
+	result.VectorNorm = vectorNorm(vec)
+	if len(vec) == result.EmbeddingDimension {
+		result.Normalized = result.VectorNorm > 0.95 && result.VectorNorm < 1.05
+		result.Ready = true
+		result.Status = "ready"
+	}
+	return result
 }
 
 // ── HTTP health ───────────────────────────────────────────────────────────
@@ -379,6 +470,21 @@ func httpHealthHandler(srv *embeddingServer) http.HandlerFunc {
 		resp, _ := srv.Health(r.Context(), &pb.HealthRequest{})
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(resp)
+	}
+}
+
+func httpReadyHandler(srv *embeddingServer) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+		resp := srv.probeReady(ctx)
+		code := http.StatusOK
+		if !resp.Ready {
+			code = http.StatusServiceUnavailable
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(code)
+		_ = json.NewEncoder(w).Encode(resp)
 	}
 }
 
@@ -476,6 +582,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("redis URL: %v", err)
 	}
+	opts.MaintNotificationsConfig = &maintnotifications.Config{
+		Mode: maintnotifications.ModeDisabled,
+	}
 	rdb := redis.NewClient(opts)
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
 		slog.Warn("Redis unavailable, caching disabled", "error", err)
@@ -503,7 +612,7 @@ func main() {
 			Time:                  1 * time.Minute,
 			Timeout:               20 * time.Second,
 		}),
-		grpc.MaxRecvMsgSize(16 * 1024 * 1024), // 16MB for large batches
+		grpc.MaxRecvMsgSize(16*1024*1024), // 16MB for large batches
 	)
 	pb.RegisterEmbeddingServiceServer(grpcServer, srv)
 	reflection.Register(grpcServer)
@@ -511,6 +620,7 @@ func main() {
 	// HTTP server
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", httpHealthHandler(srv))
+	mux.HandleFunc("/ready", httpReadyHandler(srv))
 	mux.HandleFunc("/stats", httpStatsHandler(srv))
 	mux.HandleFunc("/embed", httpEmbedHandler(srv))
 	httpServer := &http.Server{Addr: ":" + cfg.HTTPPort, Handler: mux}

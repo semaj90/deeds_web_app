@@ -2103,7 +2103,11 @@ export async function runGemma4Agent(
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: query.slice(0, 800), top_k: 12 }),
+          body: JSON.stringify({
+            query: query.slice(0, 800),
+            top_k: 12,
+            bootstrap: messages.length <= 2,
+          }),
           signal: AbortSignal.timeout(8_000),
         }
       );

@@ -240,7 +240,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   LIMIT 5;
 "
 
-# Check for any NULL dimensions (should be 384)
+# Check for any NULL dimensions (should be 768)
 docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   SELECT
     array_length(content_embedding, 1) as dim,
@@ -250,7 +250,7 @@ docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c "
   GROUP BY dim
   ORDER BY dim DESC;
 "
-# Expected: Only one row with dim=384
+# Expected: Only one row with dim=768
 ```
 
 ---
@@ -286,13 +286,13 @@ curl -X POST http://127.0.0.1:11434/api/embed \
 docker restart legal-ai-ollama
 ```
 
-### Embedding Dimension Wrong (Not 384)
+### Embedding Dimension Wrong (Not 768)
 **Cause**: Wrong embedding model or model version mismatch
 ```bash
 # Verify
 curl -s http://127.0.0.1:11434/api/tags | jq '.models[] | select(.name | contains("embedding"))'
 
-# Expected: embeddinggemma:latest (384-dim)
+# Expected: embeddinggemma:latest (768-dim)
 ```
 
 ### Postgres Connection Refused

@@ -1,6 +1,8 @@
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 
 export const CANONICAL_CODEBASE_QDRANT_COLLECTIONS = [
+  'codebase_chunks_768_v2',
+  'codebase_chunks_768',
   'codebase_chunks_384_hybrid',
   'codebase_chunks_384',
 ] as const;
@@ -56,7 +58,7 @@ async function resolveCanonicalCodebaseCollection(): Promise<string> {
       }
     }
 
-    const envCollection = process.env.CODEBASE_QDRANT_COLLECTION?.trim();
+    const envCollection = process.env.QDRANT_CODEBASE_COLLECTION?.trim() || process.env.CODEBASE_QDRANT_COLLECTION?.trim();
     if (envCollection && names.includes(envCollection)) {
       return envCollection;
     }
@@ -64,7 +66,9 @@ async function resolveCanonicalCodebaseCollection(): Promise<string> {
     console.warn('[qdrant-sync] collection resolution failed:', (error as Error).message);
   }
 
-  return process.env.CODEBASE_QDRANT_COLLECTION?.trim() || CANONICAL_CODEBASE_QDRANT_COLLECTIONS[0];
+  return process.env.QDRANT_CODEBASE_COLLECTION?.trim()
+    || process.env.CODEBASE_QDRANT_COLLECTION?.trim()
+    || CANONICAL_CODEBASE_QDRANT_COLLECTIONS[0];
 }
 
 export async function syncSummaryPayloadToQdrant(
