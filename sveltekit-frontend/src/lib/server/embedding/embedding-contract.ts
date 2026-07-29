@@ -2,8 +2,8 @@
  * Step 3: Embedding Contract
  *
  * Canonical dense search is 768-dim.
- * The 384 lane may exist as a legacy or experimental projection, but it is
- * not the authority contract for current retrieval.
+ * The 384 lane remains a compatibility/reference projection because tests,
+ * fallback paths, and persisted deployment slots still consume it.
  */
 
 export const EMBEDDING_CONTRACT = {
@@ -69,9 +69,7 @@ export const EMBEDDING_CONTRACT = {
   ollama_endpoint: '/api/embeddings',
 
   /**
-   * Qdrant collection names (must exist).
-   * source: 768-dim lane
-   * retrieval: 768-dim canonical lane
+   * Deployment slots. These are not representation names.
    */
   qdrant_source_collection: 'codebase_chunks_768',
   qdrant_collection: 'codebase_chunks_768',
@@ -101,7 +99,7 @@ export const EMBEDDING_CONTRACT = {
   validation: {
     min_dimension: 384,
     max_dimension: 768,
-    min_norm_squared: 0.98, // 1.0 ± 0.02
+    min_norm_squared: 0.98, // 1.0 ±0.02
     max_norm_squared: 1.02,
     allow_denormalized: false, // Hard fail if not normalized
   },
@@ -130,7 +128,7 @@ export const EMBEDDING_CONTRACT = {
    * Version identifier (for migrations + schema versioning)
    */
   version: '2.0',
-  schema_version: '768-canonical-plus-384-legacy-v4',
+  schema_version: '768-canonical-plus-384-reference-v5',
 
   /**
    * Explicit representation lineage contract.
@@ -158,12 +156,12 @@ export const EMBEDDING_CONTRACT = {
       projection_method: 'direct_slice',
       projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
       normalization: 'L2',
-      collection: 'codebase_chunks_768',
+      collection: 'codebase_chunks_384_hybrid',
     },
     latent_64: {
       lane_id: 'latent_64',
       role: 'routing_only',
-      status: 'ACTIVE',
+      status: 'REFERENCE_ONLY',
       source_dimension: 384,
       output_dimension: 64,
       projection_method: 'autoencoder',
@@ -183,7 +181,7 @@ export const EMBEDDING_CONTRACT = {
    */
   description:
     'Legal AI platform embedding contract. 768-dim is the canonical dense lane; ' +
-    '384-dim may exist only as a legacy or experimental projection with explicit lineage. ' +
+    '384-dim remains a reference-only compatibility projection with explicit lineage. ' +
     'L2-normalized. Used by Qdrant ANN search, TurboVec prefilter, GPU reranking, and ACE context assembly.',
 } as const;
 
@@ -197,21 +195,7 @@ export function getEmbeddingRepresentation(name: EmbeddingRepresentationName) {
   return EMBEDDING_CONTRACT.representations[name];
 }
 
-/**
- * Type guard: verify embedding has correct dimension and normalization
- */
-export function isValidEmbedding(embedding: number[] | Float32Array): boolean {
-  if (!embedding) return false;
-
-  if (
-    embedding.length !== EMBEDDING_CONTRACT.embedding_dimension &&
-    embedding.length !== EMBEDDING_CONTRACT.retrieval_embedding_dimension &&
-    embedding.length !== EMBEDDING_CONTRACT.native_dimension
-  ) {
-    return false;
-  }
-
-  // Check L2 norm squared is ≈1.0 ±0.02
+function hasValidL2Norm(embedding: number[] | Float32Array): boolean {
   let normSq = 0;
   for (let i = 0; i < embedding.length; i++) {
     normSq += embedding[i] * embedding[i];
@@ -221,6 +205,40 @@ export function isValidEmbedding(embedding: number[] | Float32Array): boolean {
     normSq >= EMBEDDING_CONTRACT.validation.min_norm_squared &&
     normSq <= EMBEDDING_CONTRACT.validation.max_norm_squared
   );
+}
+
+/**
+ * Validate a vector against one explicit representation contract.
+ */
+export function isValidEmbeddingForRepresentation(
+  embedding: number[] | Float32Array,
+  representationName: EmbeddingRepresentationName,
+): boolean {
+  if (!embedding) return false;
+
+  const representation = getEmbeddingRepresentation(representationName);
+  if (embedding.length !== representation.output_dimension) return false;
+
+  return hasValidL2Norm(embedding);
+}
+
+/**
+ * Compatibility type guard for semantic embeddings.
+ *
+ * This accepts the ACTIVE semantic authority and the REFERENCE_ONLY 384 lane.
+ * Routing-only latent vectors must use isValidEmbeddingForRepresentation.
+ */
+export function isValidEmbedding(embedding: number[] | Float32Array): boolean {
+  if (!embedding) return false;
+
+  const validSemanticDimensions = new Set<number>([
+    EMBEDDING_CONTRACT.representations.semantic_768.output_dimension,
+    EMBEDDING_CONTRACT.representations.semantic_384.output_dimension,
+  ]);
+
+  if (!validSemanticDimensions.has(embedding.length)) return false;
+
+  return hasValidL2Norm(embedding);
 }
 
 /**
