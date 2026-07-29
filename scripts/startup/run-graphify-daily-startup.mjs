@@ -14,6 +14,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
+const DAILY_CHAIN_SCRIPT = 'npm run graphify:daily:chain';
 const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
 
 const quiet = process.env.GRAPHIFY_QUIET === '1';
@@ -23,7 +24,7 @@ try {
   if (!quiet) console.log('[graphify:daily] Starting...');
 
   // Run from sveltekit-frontend directory to resolve npm scripts
-  execSync('npm run graphify:daily', {
+  execSync(DAILY_CHAIN_SCRIPT, {
     cwd: FRONTEND,
     stdio: 'inherit',
     timeout: 5 * 60 * 1000 // 5 min timeout

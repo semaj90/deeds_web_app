@@ -1,37 +1,37 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-07-19T23:47:54.875Z",
-  "mode": "apply",
+  "generatedAt": "2026-07-29T05:52:32.147Z",
+  "mode": "dry-run",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
   "outputManifest": ".tmp/addressable-packets.manifest.json",
   "summary": {
     "sourceTable": "atlas_packets",
-    "tableRows": 58365,
-    "materializedRows": 58365,
-    "addressableRows": 58365,
-    "qdrantBackedRows": 4725,
-    "qdrantCollectionRows": 4627,
-    "conceptsRows": 58360,
-    "bm25Rows": 58365,
-    "embeddingRefRows": 4627,
-    "evidenceMatchedRows": 7690,
+    "tableRows": 1,
+    "materializedRows": 1,
+    "addressableRows": 1,
+    "qdrantBackedRows": 1,
+    "qdrantCollectionRows": 1,
+    "conceptsRows": 1,
+    "bm25Rows": 1,
+    "embeddingRefRows": 1,
+    "evidenceMatchedRows": 0,
     "missingFeatureId": 0,
     "missingCanonicalSourceRef": 0,
-    "missingQdrantPointId": 53640,
-    "missingQdrantCollection": 53738,
+    "missingQdrantPointId": 0,
+    "missingQdrantCollection": 0,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 4700
+        "count": 1
       },
       {
         "key": "schema_stub",
-        "count": 1061
+        "count": 0
       },
       {
         "key": "mcp_tool_stub",
-        "count": 691
+        "count": 0
       },
       {
         "key": "legacy_qdrant_only",
@@ -48,50 +48,43 @@
     "evidenceRecordsIndexed": 8358
   },
   "samplePacketKeys": [
-    "0ba2345cd9c542fa",
-    "0bffe0382a0d44bb",
-    "0ee918abc8c53e8d",
-    "1703d9c005252a62",
-    "175066b8a4ceee3c",
-    "17dc1fe9f5f8a021",
-    "1d5eba7211dea6f9",
-    "1dc5ac2b3cd9bfe8"
+    "0ba2345cd9c542fa"
   ],
-  "outputSha256": "bd3f1486aa405e26a0d9e7e45b3cfec5b91d5ec665832ff5ade35835e88bffcf",
+  "outputSha256": "82e5ac9a4c24df007331ce59a828b8e9f65e04efcf10168b23b64d6f96a23e39",
   "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
   "stagingPath": ".tmp/addressable-packets.ndjson.stage",
   "interrupted": false,
   "proof": {
     "batchingLogic": "PROVEN",
-    "fullMaterialization": "PROVEN",
-    "resumeSemantics": "PROVEN",
-    "atomicPublication": "PROVEN",
+    "fullMaterialization": "NOT_YET_PROVEN",
+    "resumeSemantics": "RESUME_SEMANTICS_NOT_YET_PROVEN",
+    "atomicPublication": "ATOMIC_PUBLICATION_NOT_YET_PROVEN",
     "qdrantMirror": "PROVEN",
-    "identityCoverage": "STILL_PARTIAL"
+    "identityCoverage": "COMPLETE"
   },
   "proofStates": [
     "BATCHING_LOGIC_PROVEN",
-    "FULL_MATERIALIZATION_PROVEN",
-    "RESUME_SEMANTICS_PROVEN",
-    "ATOMIC_PUBLICATION_PROVEN",
+    "FULL_MATERIALIZATION_NOT_YET_PROVEN",
+    "RESUME_SEMANTICS_NOT_YET_PROVEN",
+    "ATOMIC_PUBLICATION_NOT_YET_PROVEN",
     "QDRANT_MIRROR_PROVEN",
-    "IDENTITY_COVERAGE_STILL_PARTIAL"
+    "IDENTITY_COVERAGE_COMPLETE"
   ],
-  "status": "MATERIALIZED",
+  "status": "DRY_RUN_READY",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "checkpoint": {
     "schema": "addressable_packets_materialization_checkpoint.v1",
-    "generatedAt": "2026-07-19T23:47:53.780Z",
+    "generatedAt": "2026-07-29T05:52:32.145Z",
     "sourceTable": "atlas_packets",
-    "limit": 0,
-    "batchSize": 5000,
+    "limit": 1,
+    "batchSize": 1000,
     "orderHash": "50c933022b74ec7d46e859cdf73c346707f43f4bfbe34106a611b415a8d35571",
-    "rowsWritten": 58365,
-    "nextOffset": 55000,
-    "batchNumber": 12,
-    "rowsRead": 58365,
+    "rowsWritten": 1,
+    "nextOffset": 1,
+    "batchNumber": 1,
+    "rowsRead": 1,
     "interrupted": false,
-    "resumeFromCheckpoint": true
+    "resumeFromCheckpoint": false
   },
   "samples": [
     {
@@ -109,159 +102,6 @@
         "retrieval",
         "search",
         "vector"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "0bffe0382a0d44bb",
-      "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "6110266167187884000",
-      "bm25_text": "This group represents the execution of a batch of tool calls via a gRPC service. It is retrieved by specifying the batch execution endpoint. The operator should use this mechanism ",
-      "concepts": [
-        "agent",
-        "batch",
-        "stream",
-        "tool_calling"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "0ee918abc8c53e8d",
-      "source_ref": "proto:TurboVecCudaService.Transform",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "5039325894668581000",
-      "bm25_text": "This group summarizes the definition of a gRPC service defined in the proto:turboveccudaservice.transform file. It details the service methods, required messages, and underlying da",
-      "concepts": [
-        "cosine",
-        "cuda",
-        "gpu",
-        "grpc",
-        "turbovec",
-        "vector"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "1703d9c005252a62",
-      "source_ref": "proto:LibrarySearchService.Health",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "8043140365143042000",
-      "bm25_text": "This packet group summarizes the health status of the Library Search Service via gRPC. It should be retrieved by querying the service's health endpoint. Operators should review the",
-      "concepts": [
-        "grpc",
-        "health",
-        "library",
-        "retrieval",
-        "search"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "175066b8a4ceee3c",
-      "source_ref": "proto:TurboVecService.Transform",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "7602461015851946000",
-      "bm25_text": "This group summarizes the functionality of applying a stored orthogonal transformation to project vectors. Retrieval should focus on the 'transform' concept within the 'turbovec' d",
-      "concepts": [
-        "cosine",
-        "search",
-        "transform",
-        "turbovec",
-        "upsert",
-        "vector"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "17dc1fe9f5f8a021",
-      "source_ref": "proto:CodeIntelService.GetJobStatus",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "2247177181138465500",
-      "bm25_text": "This group documents the status checking mechanism for an enrichment job within the CodeIntel service. To retrieve the current status, the operator should use the gRPC client stub ",
-      "concepts": [
-        "cluster",
-        "codeintel",
-        "enrich",
-        "search"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "1d5eba7211dea6f9",
-      "source_ref": "proto:ChatAssistantService.SendMessage",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "2565377371098813400",
-      "bm25_text": "This group summarizes the functionality for sending messages via a gRPC service. It should be retrieved when the user intends to send a message and expects a complete response. The",
-      "concepts": [
-        "chat",
-        "grpc",
-        "inference",
-        "stream"
-      ],
-      "tags": [
-        "canonical",
-        "codebase_chunks_768",
-        "gRPC Proto Services",
-        "qdrant_chunk"
-      ]
-    },
-    {
-      "packet_key": "1dc5ac2b3cd9bfe8",
-      "source_ref": "proto:LibrarySearchService.StreamLibrary",
-      "feature_id": "grpc_service",
-      "packet_kind": "qdrant_chunk",
-      "qdrant_collection": "codebase_chunks_768",
-      "qdrant_point_id": "7101807950526120000",
-      "bm25_text": "This packet group summarizes the implementation of streaming capabilities within the library search service. It is retrieved by identifying the feature ID 'grpc_service' within the",
-      "concepts": [
-        "grpc",
-        "library",
-        "retrieval",
-        "search",
-        "stream"
       ],
       "tags": [
         "canonical",

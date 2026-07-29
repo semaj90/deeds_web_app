@@ -102,7 +102,7 @@ async function runPipeline() {
     // PHASE 1: Run Graphify Audit
     log('\n📊 PHASE 1: Running Graphify Audit');
     log('─────────────────────────────────────────────────────────────');
-    const auditScript = FULL_CODEBASE ? 'graphify:daily:full' : 'graphify:daily';
+    const auditScript = FULL_CODEBASE ? 'graphify:daily:full' : 'graphify:daily:chain';
     let auditOutcome = 'skipped';
     if (SKIP_AUDIT) {
       log('⚠️  Skipping audit phase via --skip-audit', 'warn');

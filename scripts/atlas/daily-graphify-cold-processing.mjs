@@ -123,6 +123,12 @@ async function auditPostgresLineage() {
         )
     `);
     const tables = new Set(tableRows.map((row) => row.table_name));
+    const legacyTables = {
+      parent_atlas_documents: tables.has('parent_atlas_documents'),
+      atlas_feature_map: tables.has('atlas_feature_map'),
+      atlas_feature_synthesis: tables.has('atlas_feature_synthesis'),
+      route_runtime_packets: tables.has('route_runtime_packets'),
+    };
 
     if (!tables.has('parent_atlas_documents') && tables.has('atlas_packets')) {
       const { rows: packetRows } = await pool.query(`
@@ -195,6 +201,34 @@ async function auditPostgresLineage() {
       return report;
     }
 
+    const featureMapRows = legacyTables.atlas_feature_map
+      ? await pool.query(`
+          SELECT
+            COUNT(*)                                              AS total,
+            COUNT(*) FILTER (WHERE source_ref IS NOT NULL)       AS has_source_ref,
+            COUNT(*) FILTER (WHERE feature_id IS NOT NULL)       AS has_feature_id,
+            COUNT(*) FILTER (WHERE som_cluster IS NOT NULL)      AS has_som_cluster,
+            COUNT(*) FILTER (WHERE centroid_id IS NOT NULL)      AS has_centroid_id,
+            COUNT(*) FILTER (WHERE qdrant_point_id IS NOT NULL)  AS has_qdrant_point_id,
+            COUNT(*) FILTER (WHERE source_ref LIKE 'feature:%')  AS feature_bucket_misuse,
+            COUNT(*) FILTER (
+              WHERE source_ref NOT LIKE 'feature:%'
+              AND source_ref NOT IN (SELECT source_ref FROM parent_atlas_documents WHERE source_ref IS NOT NULL)
+            ) AS not_in_parent_atlas_documents
+          FROM atlas_feature_map
+        `)
+      : { rows: [{ total: 0, has_source_ref: 0, has_feature_id: 0, has_som_cluster: 0, has_centroid_id: 0, has_qdrant_point_id: 0, feature_bucket_misuse: 0, not_in_parent_atlas_documents: 0 }] };
+
+    const afm = featureMapRows.rows[0];
+
+    const featureSynthesisRows = legacyTables.atlas_feature_synthesis
+      ? await pool.query(`SELECT COUNT(*) AS total FROM atlas_feature_synthesis`)
+      : { rows: [{ total: 0 }] };
+
+    const routeRuntimeRows = legacyTables.route_runtime_packets
+      ? await pool.query(`SELECT COUNT(*) AS total FROM route_runtime_packets`)
+      : { rows: [{ total: 0 }] };
+
     const { rows: padRows } = await pool.query(`
       SELECT
         COUNT(*)                                             AS total,
@@ -208,31 +242,6 @@ async function auditPostgresLineage() {
       FROM parent_atlas_documents
     `);
     const pad = padRows[0];
-
-    const { rows: afmRows } = await pool.query(`
-      SELECT
-        COUNT(*)                                              AS total,
-        COUNT(*) FILTER (WHERE source_ref IS NOT NULL)       AS has_source_ref,
-        COUNT(*) FILTER (WHERE feature_id IS NOT NULL)       AS has_feature_id,
-        COUNT(*) FILTER (WHERE som_cluster IS NOT NULL)      AS has_som_cluster,
-        COUNT(*) FILTER (WHERE centroid_id IS NOT NULL)      AS has_centroid_id,
-        COUNT(*) FILTER (WHERE qdrant_point_id IS NOT NULL)  AS has_qdrant_point_id,
-        COUNT(*) FILTER (WHERE source_ref LIKE 'feature:%')  AS feature_bucket_misuse,
-        COUNT(*) FILTER (
-          WHERE source_ref NOT LIKE 'feature:%'
-          AND source_ref NOT IN (SELECT source_ref FROM parent_atlas_documents WHERE source_ref IS NOT NULL)
-        ) AS not_in_parent_atlas_documents
-      FROM atlas_feature_map
-    `);
-    const afm = afmRows[0];
-
-    const { rows: afsRows } = await pool.query(
-      `SELECT COUNT(*) AS total FROM atlas_feature_synthesis`
-    );
-
-    const { rows: rrpRows } = await pool.query(
-      `SELECT COUNT(*) AS total FROM route_runtime_packets`
-    );
 
     const report = {
       parent_atlas_documents: {
@@ -255,8 +264,9 @@ async function auditPostgresLineage() {
         feature_bucket_misuse: Number(afm.feature_bucket_misuse),
         not_in_parent_atlas_documents: Number(afm.not_in_parent_atlas_documents),
       },
-      atlas_feature_synthesis: { total: Number(afsRows[0].total) },
-      route_runtime_packets: { total: Number(rrpRows[0].total) },
+      atlas_feature_synthesis: { total: Number(featureSynthesisRows.rows[0].total) },
+      route_runtime_packets: { total: Number(routeRuntimeRows.rows[0].total) },
+      legacy_tables: legacyTables,
       auditedAt: new Date().toISOString(),
     };
 
@@ -272,7 +282,7 @@ async function auditPostgresLineage() {
 
     logStep('postgres-lineage', {
       ok: Number(pad.feature_bucket_misuse) === 0,
-      message: `pad=${pad.total} rows, afm=${afm.total} rows, afs=${afsRows[0].total} features, rrp=${rrpRows[0].total} runtime packets, feature_misuse=${pad.feature_bucket_misuse}`,
+      message: `pad=${pad.total} rows, afm=${afm.total} rows, afs=${featureSynthesisRows.rows[0].total} features, rrp=${routeRuntimeRows.rows[0].total} runtime packets, feature_misuse=${pad.feature_bucket_misuse}`,
     });
     return report;
   } catch (err) {
@@ -343,6 +353,28 @@ function runDuckDBMapReduce() {
     results.summary.duckdbMapreduce = {
       skipped: true,
       reason: 'legacy_parent_atlas_documents_absent',
+      detail,
+    };
+    logStep('duckdb-mapreduce', { ok: true, message: `Skipped: ${detail}` });
+    return true;
+  }
+
+  const legacyTables = results.summary.postgresLineage?.legacy_tables || {};
+  if (
+    legacyTables.parent_atlas_documents === false ||
+    legacyTables.atlas_feature_map === false ||
+    legacyTables.atlas_feature_synthesis === false ||
+    legacyTables.route_runtime_packets === false
+  ) {
+    log('── Step 3: DuckDB offline synthesis (SKIPPED) ───────────────────────────');
+    const missing = Object.entries(legacyTables)
+      .filter(([, present]) => present === false)
+      .map(([name]) => name)
+      .join(', ') || 'legacy tables';
+    const detail = `Skipping DuckDB synthesis because required legacy tables are missing: ${missing}`;
+    results.summary.duckdbMapreduce = {
+      skipped: true,
+      reason: 'legacy_tables_missing',
       detail,
     };
     logStep('duckdb-mapreduce', { ok: true, message: `Skipped: ${detail}` });
