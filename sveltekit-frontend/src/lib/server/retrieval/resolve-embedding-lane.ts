@@ -15,76 +15,69 @@
 import { DenseRepresentationName } from '../atlas/contracts/dense-lane-policy';
 
 export enum EmbeddingLaneTelemetryReason {
-  EXPLICIT_FIELD = 'explicit_field',                // Lane from embedding_lane field
-  VECTOR_NAME = 'vector_name',                      // Lane from vector collection name
-  COLLECTION_CONTRACT = 'collection_contract',      // Lane from collection registry
-  NATIVE_DIMENSION_FALLBACK = 'native_dimension_fallback',  // Inferred from dimension
-  UNKNOWN = 'unknown',                              // Could not resolve
+  EXPLICIT_FIELD = 'explicit_field',
+  VECTOR_NAME = 'vector_name',
+  COLLECTION_CONTRACT = 'collection_contract',
+  NATIVE_DIMENSION_FALLBACK = 'native_dimension_fallback',
+  UNKNOWN = 'unknown',
 }
 
 export interface RawSearchHit {
-  // Explicit lane field (if present in Qdrant payload or search response)
   embedding_lane?: DenseRepresentationName;
-
-  // Vector name (from Qdrant collection name, e.g., "codebase_chunks_384" uses dense_384)
   vector_name?: string;
-
-  // Raw dimension from the vector
   embedding_dim?: number;
-
-  // Collection name (e.g., "codebase_chunks_768", "codebase_chunks_384")
   collection?: string;
-
-  // Projection metadata (if this vector was projected)
   projection?: {
     source_dimension: number;
     method: string;
     version: string;
   };
-
-  // Generic fallback dimension (should not be used if explicit fields present)
   dimension?: number;
 }
 
 export interface EmbeddingLaneResolution {
   lane: DenseRepresentationName | null;
   reason: EmbeddingLaneTelemetryReason;
-  fallbackChain?: string[];  // For debugging: which checks were tried
+  fallbackChain?: string[];
 }
 
 /**
- * Collection-to-lane mapping (canonical)
+ * Collection-to-lane mapping.
+ *
+ * Collection names are deployment slots, not representation identifiers. Keep
+ * persisted compatibility names here so old data can be read without making
+ * the 384 lane active or canonical.
  */
 const COLLECTION_LANE_REGISTRY: Record<string, DenseRepresentationName> = {
-  'codebase_chunks_768': DenseRepresentationName.SEMANTIC_768,
-  'codebase_chunks_384': DenseRepresentationName.SEMANTIC_384,
-  'codebase_chunks_latent64': DenseRepresentationName.LATENT_64,
-  'evidence_items_768': DenseRepresentationName.SEMANTIC_768,
-  'evidence_items_384': DenseRepresentationName.SEMANTIC_384,
+  codebase_chunks_768: DenseRepresentationName.SEMANTIC_768,
+  codebase_chunks_384: DenseRepresentationName.SEMANTIC_384,
+  codebase_chunks_384_hybrid: DenseRepresentationName.SEMANTIC_384,
+  codebase_chunks_latent64: DenseRepresentationName.LATENT_64,
+  codebase_topology_64: DenseRepresentationName.LATENT_64,
+  evidence_items_768: DenseRepresentationName.SEMANTIC_768,
+  evidence_items_384: DenseRepresentationName.SEMANTIC_384,
 };
 
 /**
- * Vector name to lane mapping (Qdrant vector field naming)
+ * Vector name to lane mapping (Qdrant vector field naming).
  */
 const VECTOR_NAME_LANE_REGISTRY: Record<string, DenseRepresentationName> = {
-  'dense_768': DenseRepresentationName.SEMANTIC_768,
-  'dense_384': DenseRepresentationName.SEMANTIC_384,
-  'latent_64': DenseRepresentationName.LATENT_64,
-  'semantic_768': DenseRepresentationName.SEMANTIC_768,
-  'semantic_384': DenseRepresentationName.SEMANTIC_384,
-  'routing_latent64': DenseRepresentationName.LATENT_64,
+  dense_768: DenseRepresentationName.SEMANTIC_768,
+  dense_384: DenseRepresentationName.SEMANTIC_384,
+  latent_64: DenseRepresentationName.LATENT_64,
+  semantic_768: DenseRepresentationName.SEMANTIC_768,
+  semantic_384: DenseRepresentationName.SEMANTIC_384,
+  routing_latent64: DenseRepresentationName.LATENT_64,
+  content: DenseRepresentationName.SEMANTIC_768,
 };
 
 /**
- * Resolve embedding lane from a raw search result
- * Follows strict precedence to prevent fallback-based lane drift
+ * Resolve embedding lane from a raw search result.
+ * Follows strict precedence to prevent fallback-based lane drift.
  */
-export function resolveEmbeddingLane(
-  hit: RawSearchHit
-): EmbeddingLaneResolution {
+export function resolveEmbeddingLane(hit: RawSearchHit): EmbeddingLaneResolution {
   const fallbackChain: string[] = [];
 
-  // Step 1: Explicit embedding_lane field (highest priority)
   if (hit.embedding_lane) {
     fallbackChain.push(`explicit_field=${hit.embedding_lane}`);
     return {
@@ -95,7 +88,6 @@ export function resolveEmbeddingLane(
   }
   fallbackChain.push('no_explicit_field');
 
-  // Step 2: Vector name from collection (e.g., "dense_384")
   if (hit.vector_name && VECTOR_NAME_LANE_REGISTRY[hit.vector_name]) {
     const lane = VECTOR_NAME_LANE_REGISTRY[hit.vector_name];
     fallbackChain.push(`vector_name=${hit.vector_name} → ${lane}`);
@@ -109,7 +101,6 @@ export function resolveEmbeddingLane(
     fallbackChain.push(`unknown_vector_name=${hit.vector_name}`);
   }
 
-  // Step 3: Collection contract (e.g., "codebase_chunks_384")
   if (hit.collection && COLLECTION_LANE_REGISTRY[hit.collection]) {
     const lane = COLLECTION_LANE_REGISTRY[hit.collection];
     fallbackChain.push(`collection_contract=${hit.collection} → ${lane}`);
@@ -123,8 +114,6 @@ export function resolveEmbeddingLane(
     fallbackChain.push(`unknown_collection=${hit.collection}`);
   }
 
-  // Step 4: Native dimension fallback
-  // CRITICAL: Only use this if NO explicit lineage available
   const dimToCheck = hit.embedding_dim ?? hit.dimension;
   if (dimToCheck === 768) {
     fallbackChain.push(`dimension=${dimToCheck} → dense_768 (fallback)`);
@@ -154,7 +143,6 @@ export function resolveEmbeddingLane(
     fallbackChain.push(`unknown_dimension=${dimToCheck}`);
   }
 
-  // Step 5: UNKNOWN (emit telemetry, gate the candidate)
   fallbackChain.push('UNKNOWN — unable to resolve lane');
   return {
     lane: null,
@@ -164,14 +152,14 @@ export function resolveEmbeddingLane(
 }
 
 /**
- * Emit telemetry event when lane resolution falls back or fails
+ * Emit telemetry when lane resolution falls back or fails.
  */
-export function emitEmbeddingLaneTelementry(
+export function emitEmbeddingLaneTelemetry(
   packetKey: string,
-  resolution: EmbeddingLaneResolution
+  resolution: EmbeddingLaneResolution,
 ): void {
   if (resolution.reason === EmbeddingLaneTelemetryReason.EXPLICIT_FIELD) {
-    return;  // No telemetry needed for explicit case
+    return;
   }
 
   console.warn('[embedding_lineage_fallback]', {
@@ -184,16 +172,22 @@ export function emitEmbeddingLaneTelementry(
 }
 
 /**
- * Gate: Reject candidates where lane resolution failed
+ * Compatibility alias. Keep existing imports working while new code uses the
+ * correctly spelled export.
+ */
+export const emitEmbeddingLaneTelementry = emitEmbeddingLaneTelemetry;
+
+/**
+ * Gate candidates where lane resolution failed.
  */
 export function gateEmbeddingLaneResolution(
   hit: RawSearchHit,
-  packetKey: string
+  packetKey: string,
 ): { gatePass: boolean; reason?: string } {
   const resolution = resolveEmbeddingLane(hit);
 
   if (resolution.lane === null) {
-    emitEmbeddingLaneTelementry(packetKey, resolution);
+    emitEmbeddingLaneTelemetry(packetKey, resolution);
     return {
       gatePass: false,
       reason: `lane_resolution_failed: ${resolution.fallbackChain?.join(' → ')}`,
