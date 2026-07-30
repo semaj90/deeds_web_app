@@ -1,23 +1,16 @@
 import Redis from 'ioredis';
-import dotenv from 'dotenv';
 import crypto from 'crypto';
-import { resolve } from 'path';
+import { loadRepoEnv, resolveRedisConfig } from '../atlas/connection-config.mjs';
 
-const ROOT = process.cwd();
+const ENV = loadRepoEnv(process.env);
+const REDIS_CONFIG = resolveRedisConfig(ENV);
 
-if (process.env.REDIS_ENABLED === 'false' || process.env.ENGRAM_ONLY === 'true') {
+if (ENV.REDIS_ENABLED === 'false' || ENV.ENGRAM_ONLY === 'true') {
   console.log('[bifrost-verify] REDIS_ENABLED=false — skipping (Engram-only mode)');
   process.exit(0);
 }
-dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
-dotenv.config({ path: resolve(ROOT, '.env'), override: false });
-dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env.local'), override: false });
-dotenv.config({ path: resolve(ROOT, 'sveltekit-frontend/.env'), override: false });
-
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || process.env.REDIS_PASS || undefined;
-const redis = new Redis(REDIS_URL, {
-  password: REDIS_PASSWORD,
+const redis = new Redis(REDIS_CONFIG.url, {
+  password: REDIS_CONFIG.password,
   lazyConnect: true,
   maxRetriesPerRequest: 1,
   enableOfflineQueue: false,

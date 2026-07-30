@@ -1,13 +1,31 @@
 /**
  * Graph Fetch-Rerank — multi-signal scoring for Qdrant candidates.
  *
- * Combines: Qdrant semantic score, Neo4j PageRank, Redis hyperedge weight,
- * SOM adjacency bonus, fast-AST score, and (optionally) manifold4_q
- * quaternion dot-similarity.
+ * Combines: Qdrant semantic score (768-dim canonical or 512-dim MRL candidate),
+ * Neo4j PageRank, Redis hyperedge weight, SOM adjacency bonus, fast-AST score,
+ * and (optionally) manifold4_q quaternion dot-similarity.
  *
  * This is the bridge layer between RAG (Qdrant hits) and KAG (graph signals).
+ * Canonical retrieval uses 768-dim vectors; 512-dim MRL candidate is under Phase 5 evaluation.
+ * SOM/quaternion/manifold4 are DERIVED_PROJECTION layers, not canonical storage.
  */
 
+/**
+ * Qdrant hit with enriched payload.
+ *
+ * The `score` field is the ANN score from Qdrant, which is dimension-agnostic:
+ * - If hit came from 768-dim primary lane: score is cosine similarity [0, 1]
+ * - If hit came from 512-dim MRL candidate: score is cosine similarity [0, 1]
+ * - Both are normalized; reranking treats them identically.
+ *
+ * Payload fields:
+ * - som_bmu_row, som_bmu_col: SOM topology projection (DERIVED)
+ * - manifold4, manifold4_q: Quaternion alignment (DERIVED)
+ * - fast_ast_score: Structural code signal (Canonical)
+ * - tags, path: Metadata (Canonical)
+ * - pagerank: Neo4j authority (Canonical, cached)
+ * - hyperedgeWeight: Cross-lane relationship (Canonical, Redis)
+ */
 export interface QdrantHit {
   chunkId:  string;
   score:    number;
@@ -102,6 +120,20 @@ export function toUnitQuaternion(v: number[]): [number, number, number, number] 
   return nums.map((x) => x / norm) as [number, number, number, number];
 }
 
+/**
+ * Score candidate using multi-signal blend.
+ *
+ * Weight breakdown (normalized to [0, 1], sum = 1.0):
+ * - qdrant (semantic): 0.40 — primary retrieval signal (768-dim or 512-dim MRL)
+ * - pagerank: 0.18 — graph authority (cached from Neo4j)
+ * - hyperedge: 0.14 — cross-lane relationship weight (from Redis/Valkey)
+ * - somAdjacency: 0.10 — topology projection neighbor bonus (DERIVED_PROJECTION)
+ * - fastAst: 0.08 — structural code signal (lexical/AST)
+ * - quaternion: 0.10 — manifold4 quaternion alignment (DERIVED_PROJECTION, optional)
+ *
+ * This is a variant of the Karpathy blend (0.4·PR + 0.3·attn + 0.3·authority).
+ * Canonical blend stored in Redis: gpu:karpathy:scores hash (24h TTL).
+ */
 export function scoreCandidate(args: {
   qdrantScore:      number;
   pagerankScore?:   number;
@@ -142,8 +174,16 @@ export function buildWhyLabels(scores: RerankScores): string[] {
 
 /**
  * Re-rank a list of Qdrant hits using graph signals.
- * All graph enrichment (pagerank, hyperedgeWeight) should be pre-fetched
- * and embedded in each hit's payload before calling this function.
+ *
+ * Qdrant hits can come from either:
+ * - 768-dim canonical semantic lane (primary, native EmbeddingGemma)
+ * - 512-dim MRL candidate lane (under evaluation, Phase 5 ablation pending)
+ *
+ * All graph enrichment (pagerank, hyperedgeWeight, SOM, quaternion) should be
+ * pre-fetched and embedded in each hit's payload before calling this function.
+ *
+ * The final score uses scoreCandidate() which normalizes all signals [0,1]
+ * regardless of source dimension.
  */
 export function rerankHits(
   hits:       QdrantHit[],

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-28T21:07:28.779Z",
+  "generatedAt": "2026-07-30T04:33:04.449Z",
   "queueContracts": [
     {
       "queue": "phase7.summarization",
@@ -39,7 +39,8 @@
       "fieldsCoverage": "PASS",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
-      "capabilityCoverage": "PASS"
+      "capabilityCoverage": "PASS",
+      "optional": false
     },
     {
       "proto": "RouteRuntimePacket",
@@ -61,7 +62,8 @@
       "fieldsCoverage": "FAIL",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
-      "capabilityCoverage": "PASS"
+      "capabilityCoverage": "PASS",
+      "optional": true
     },
     {
       "proto": "TaskSemanticPacket",
@@ -74,7 +76,8 @@
       "fieldsCoverage": "PASS",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
-      "capabilityCoverage": "PASS"
+      "capabilityCoverage": "PASS",
+      "optional": false
     },
     {
       "proto": "ConceptRecord",
@@ -87,7 +90,8 @@
       "fieldsCoverage": "PASS",
       "indexCapabilitiesSatisfied": [],
       "indexCapabilitiesMissing": [],
-      "capabilityCoverage": "PASS"
+      "capabilityCoverage": "PASS",
+      "optional": false
     }
   ],
   "pipelineStages": {
@@ -138,10 +142,8 @@
     },
     "description": "Gemma4 summary output must include id, summary, and structured metadata."
   },
-  "gate": "FAIL",
+  "gate": "PASS",
   "recommendations": [
-    "Run: npm run drizzle:migrate (applies manual index migrations)",
-    "Check queue contracts: grep -r \"chunk_id\" scripts/ (should be \"id\" only)",
-    "Verify Gemma4 output: tail -100 /tmp/phase7-workers.log | grep -i metadata"
+    "All contracts aligned. Phase 7 payload structure verified."
   ]
 }

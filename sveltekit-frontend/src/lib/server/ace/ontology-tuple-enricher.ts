@@ -117,8 +117,7 @@ export async function isContentBlocked(
     const data = JSON.parse(cached) as { blockedContentHashes?: string[] };
     if (!data.blockedContentHashes?.length) return false;
 
-    // Hash incoming content (SHA-256)
-    const crypto = await import('crypto');
+    // Hash incoming content (SHA-256) using already-imported crypto module
     const hash = crypto.createHash('sha256').update(content).digest('hex');
     return data.blockedContentHashes.includes(hash);
   } catch (err) {

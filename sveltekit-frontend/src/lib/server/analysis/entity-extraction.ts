@@ -3,7 +3,7 @@
  * Delegates to the unified entityExtractor in entity-extractor-unified.ts.
  */
 
-import { entityExtractor, type Entity as UnifiedEntity } from './entity-extractor-unified.js';
+import { entityExtractor } from './entity-extractor-unified.js';
 
 export interface Entity {
 	text: string;

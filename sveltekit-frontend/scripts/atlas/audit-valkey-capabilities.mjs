@@ -1,11 +1,21 @@
 #!/usr/bin/env node
 /**
- * Valkey Semantic Index Creation (Startup)
- * Creates or verifies the FT (full-text search) index in Valkey/Redis
- * for semantic cache prefix matching.
+ * Valkey Capability Audit
+ *
+ * Verifies operational health of Valkey/Redis for result caching.
+ *
+ * Checks:
+ * - connectivity and authentication
+ * - Search module availability (informational only)
+ * - bounded read/write latency
+ *
+ * Does NOT:
+ * - create a semantic vector index
+ * - populate corpus vectors
+ * - act as an ANN retrieval owner (Qdrant is sole ANN)
  *
  * Runs silently on startup (folderOpen event).
- * Status: WIRED for Phase 85 P5-P9 startup automation.
+ * Status: WIRED for operational diagnostics.
  */
 
 import Redis from 'ioredis';

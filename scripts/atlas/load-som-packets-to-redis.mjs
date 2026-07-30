@@ -21,6 +21,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFile, spawn } from 'node:child_process';
 import Redis from 'ioredis';
+import { loadRepoEnv, resolveRedisConfig } from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -44,10 +45,8 @@ function loadEnv() {
   return env;
 }
 
-const env = loadEnv();
-const REDIS_HOST = env.REDIS_HOST || 'localhost';
-const REDIS_PORT = parseInt(env.REDIS_PORT || '6379', 10);
-const REDIS_PASS = env.REDIS_PASSWORD || env.REDIS_PASS || '';
+const env = { ...loadEnv(), ...loadRepoEnv(process.env) };
+const REDIS_CONFIG = resolveRedisConfig(env);
 const DOCKER_CONTAINER = env.REDIS_CONTAINER || 'legal-ai-valkey';
 
 // ── NDJSON reader ────────────────────────────────────────────────────────────
@@ -75,7 +74,7 @@ function dockerExecRedis(...args) {
   return new Promise((resolve, reject) => {
     execFile('docker', [
       'exec', DOCKER_CONTAINER,
-      'redis-cli', ...(REDIS_PASS ? ['-a', REDIS_PASS, '--no-auth-warning'] : []),
+      'redis-cli', ...(REDIS_CONFIG.password ? ['-a', REDIS_CONFIG.password, '--no-auth-warning'] : []),
       ...args,
     ], { timeout: 5000 }, (err, stdout, stderr) => {
       if (err) reject(new Error(stderr.trim() || err.message));
@@ -139,8 +138,8 @@ async function main() {
   if (!useDocker) {
     try {
       redis = new Redis({
-        host: REDIS_HOST, port: REDIS_PORT,
-        password: REDIS_PASS || undefined,
+        host: REDIS_CONFIG.host, port: REDIS_CONFIG.port,
+        password: REDIS_CONFIG.password,
         family: 4, lazyConnect: true, maxRetriesPerRequest: 1,
         enableOfflineQueue: false, retryStrategy: () => null,
         connectTimeout: 2000,
@@ -148,7 +147,7 @@ async function main() {
       redis.on('error', () => {});
       await redis.connect();
       await redis.ping();
-      console.log(`  ✅ Redis direct (${REDIS_HOST}:${REDIS_PORT})\n`);
+      console.log(`  ✅ Redis direct (${REDIS_CONFIG.host}:${REDIS_CONFIG.port})\n`);
     } catch {
       console.log(`  ⚠️  Direct Redis unavailable → docker exec (${DOCKER_CONTAINER})\n`);
       useDocker = true;

@@ -13,7 +13,6 @@
  */
 
 import { createHash, randomUUID } from 'node:crypto';
-import { z } from 'zod';
 import type {
   PacketTopologyEnvelope,
   CanonicalPacketIdentity,
@@ -51,7 +50,12 @@ export function assemblePacketFromGrpcResponse(
   const identity = extractIdentity(toolResponse, metadata);
 
   // Extract semantics (optional but recommended)
-  const semantics = extractSemantics(toolResponse, metadata, identity.packet_key, identity.feature_id);
+  const semantics = extractSemantics(
+    toolResponse,
+    metadata,
+    identity.packet_key,
+    identity.feature_label
+  );
 
   // Extract topology (optional)
   const topology = extractTopology(toolResponse, metadata);
@@ -73,6 +77,7 @@ export function assemblePacketFromGrpcResponse(
     feature_id: identity.feature_id,
     feature_label: identity.feature_label,
     neo4j_neighbors: [],
+    semantic_tags: semantics?.semantic_tags ?? [],
     lexical_nouns: [],
     lexical_verbs: [],
     lexical_adverbs_ly: [],
@@ -83,7 +88,6 @@ export function assemblePacketFromGrpcResponse(
     // Semantics layer (optional)
     summary: semantics?.summary ?? null,
     domain_class: semantics?.domain_class ?? null,
-    semantic_tags: semantics?.semantic_tags ?? [],
 
     // Topology layer (optional)
     som_cluster: topology?.som_cluster ?? null,
@@ -101,6 +105,12 @@ export function assemblePacketFromGrpcResponse(
     neo4j_node_id: mirrors?.neo4j_node_id ?? null,
     neo4j_edges: mirrors?.neo4j_edges ?? [],
     cold_storage_uri: mirrors?.cold_storage_uri ?? null,
+
+    // OKF ontology fields (required)
+    ontology_ids: [],
+    concept_ids: [],
+    runtime_evidence_refs: [],
+    test_evidence_refs: [],
 
     // Metadata
     extracted_from_service: metadata.serviceId,
@@ -125,12 +135,19 @@ function extractIdentity(
   metadata: AssemblyMetadata
 ): CanonicalPacketIdentity {
   // Try to extract from response first
-  let packet_key = response.packet_key ?? response.id ?? response.key;
-  let source_ref = response.source_ref ?? response.sourceRef ?? response.file_path;
-  let file_path = response.file_path ?? response.filePath ?? source_ref;
-  let function_symbol = response.function_symbol ?? response.functionSymbol ?? null;
-  let feature_id = response.feature_id ?? response.featureId ?? null;
-  let feature_label = response.feature_label ?? response.featureLabel ?? null;
+  const extractedPacketKey = response.packet_key ?? response.id ?? response.key;
+  const extractedSourceRef = response.source_ref ?? response.sourceRef ?? response.file_path;
+  const extractedFilePath = response.file_path ?? response.filePath ?? extractedSourceRef;
+  const extractedFunctionSymbol = response.function_symbol ?? response.functionSymbol ?? null;
+  const extractedFeatureId = response.feature_id ?? response.featureId ?? null;
+  const extractedFeatureLabel = response.feature_label ?? response.featureLabel ?? null;
+
+  let packet_key = extractedPacketKey;
+  let source_ref = extractedSourceRef;
+  let file_path = extractedFilePath;
+  let function_symbol = extractedFunctionSymbol;
+  let feature_id = extractedFeatureId;
+  let feature_label = extractedFeatureLabel;
 
   // Generate packet_key if missing (deterministic from source_ref + symbol)
   if (!packet_key && source_ref) {
@@ -170,8 +187,8 @@ function extractIdentity(
 function extractSemantics(
   response: Record<string, any>,
   metadata: AssemblyMetadata,
-  packetKey?: string,
-  featureId?: string
+  packetKey: string,
+  _featureLabel: string
 ): Partial<PacketMetadata> | null {
   const summary = response.summary ?? null;
   const domain_class = response.domain_class ?? response.domainClass ?? null;
@@ -183,9 +200,7 @@ function extractSemantics(
 
   // Always regenerate title_id through the canonical generator — never forward gRPC passthrough values.
   // This ensures every packet written via ACP uses the same derivation as the promotion enrichment path.
-  const title_id = packetKey
-    ? generateTitleIdentity(packetKey, { featureLabel: featureId ?? undefined }).titleId
-    : null;
+  const title_id = generateTitleIdentity(packetKey, { featureLabel: _featureLabel }).titleId;
 
   return {
     title_id,
@@ -201,7 +216,7 @@ function extractSemantics(
  */
 function extractTopology(
   response: Record<string, any>,
-  metadata: AssemblyMetadata
+  _metadata: AssemblyMetadata
 ): Partial<PacketTopologyEnvelope> | null {
   const som_cluster = response.som_cluster ?? response.somCluster ?? null;
   const som_row = response.som_row ?? response.somRow ?? null;
@@ -240,7 +255,7 @@ function extractTopology(
  */
 function extractMirrors(
   response: Record<string, any>,
-  metadata: AssemblyMetadata
+  _metadata: AssemblyMetadata
 ): Partial<PacketTopologyEnvelope> | null {
   const qdrant_point_id = response.qdrant_point_id ?? response.qdrantPointId ?? null;
   const qdrant_collection =
@@ -323,10 +338,13 @@ export function assemblePacketsFromBatchGrpcResponse(
     throw new Error(`Cannot extract batch results from gRPC response`);
   }
 
-  return results.map((item, index) =>
-    assemblePacketFromGrpcResponse(item, {
+  return results.map((item, index) => {
+    const requestId = metadata.requestId
+      ? `${metadata.requestId}:${index}`
+      : undefined;
+    return assemblePacketFromGrpcResponse(item, {
       ...metadata,
-      requestId: metadata.requestId ? `${metadata.requestId}:${index}` : null,
-    })
-  );
+      requestId,
+    });
+  });
 }

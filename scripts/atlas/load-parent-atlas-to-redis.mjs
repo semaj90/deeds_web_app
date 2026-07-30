@@ -24,6 +24,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import Redis from 'ioredis';
+import { loadRepoEnv, resolveRedisConfig } from './connection-config.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '../..');
@@ -48,10 +49,8 @@ function loadEnv() {
   return env;
 }
 
-const env = loadEnv();
-const REDIS_HOST = env.REDIS_HOST || 'localhost';
-const REDIS_PORT = parseInt(env.REDIS_PORT || '6379', 10);
-const REDIS_PASS = env.REDIS_PASSWORD || env.REDIS_PASS || '';
+const env = { ...loadEnv(), ...loadRepoEnv(process.env) };
+const REDIS_CONFIG = resolveRedisConfig(env);
 
 // ─── Parquet Reader (file-based, Windows-safe) ───────────────────────────
 
@@ -73,7 +72,7 @@ function parquetToJSON(parquetPath) {
 
 async function main() {
   console.log('\n── Load Parent Atlas → Redis ──────────────────────────');
-  console.log(`  Redis: ${REDIS_HOST}:${REDIS_PORT}`);
+  console.log(`  Redis: ${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`);
   console.log(`  TTL:   ${TTL}s (${(TTL / 3600).toFixed(1)}h)`);
   console.log(`  Mode:  ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
 
@@ -88,9 +87,9 @@ async function main() {
 
   async function probeDirectRedis() {
     const r = new Redis({
-      host: REDIS_HOST,
-      port: REDIS_PORT,
-      password: REDIS_PASS || undefined,
+      host: REDIS_CONFIG.host,
+      port: REDIS_CONFIG.port,
+      password: REDIS_CONFIG.password,
       family: 4,
       lazyConnect: true,
       maxRetriesPerRequest: 1,
@@ -108,7 +107,7 @@ async function main() {
   if (!useDocker) {
     try {
       redis = await probeDirectRedis();
-      console.log(`  ✅ Redis connected directly (${REDIS_HOST}:${REDIS_PORT})\n`);
+      console.log(`  ✅ Redis connected directly (${REDIS_CONFIG.host}:${REDIS_CONFIG.port})\n`);
     } catch {
       console.log(`  ⚠️  Direct Redis unreachable — using docker exec proxy (container: ${DOCKER_CONTAINER})\n`);
       useDocker = true;

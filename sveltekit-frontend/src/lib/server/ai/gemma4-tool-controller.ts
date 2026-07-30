@@ -5,19 +5,24 @@
  * read-only graph/search/context operations. Falls back to in-process
  * dispatch when the standalone server is unavailable.
  *
+ * Semantic retrieval context:
+ *   - Primary lane: 768-dim canonical native vectors (EmbeddingGemma, Qdrant ANN)
+ *   - Secondary lane: 512-dim MRL candidate (under Phase 5 evaluation)
+ *   - All tools normalize results regardless of input vector dimension
+ *   - Prior answers compressed to HCA 128-token card before injection
+ *
  * Policy:
  *   - maxToolRounds:      3
  *   - maxToolResultChars: 12,000
  *   - Allowlisted tools only — no write/mutation tools exposed
  *   - Stops on repeated identical tool call (dedup guard)
  *   - Stops (records stuck) on 2× error from same tool
- *   - Prior answers compressed to HCA 128-token card before injection
  *
  * MCP tool surface (read-only):
  *   trace-mcp-server.ts :8788 — trace.kag_search, trace.explain_retrieval,
  *     graph.expand_neighborhood, graph.shortest_path, graph.community_for_node,
  *     graph.pagerank_top, topology.search_near, topology.same_som_cluster,
- *     clusters.get_members, clusters.get_summary_lenses
+ *     clusters.get_members, clusters.get_summary_lenses (Karpathy blend, Neo4j graphs)
  *   in-process fallback — search.hybrid, search.dev_context, search.postgres_fts,
  *     codebase.rg_search, search.qdrant_topology, topology.route_query,
  *     context.build_kv_packet, context.get_compressed_card,
@@ -36,8 +41,8 @@ import { recordToolUsage } from './tool-selection.js';
 import { createHash } from 'crypto';
 import { db } from '$lib/server/db/client.js';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
-import { ENV } from '$lib/server/env.server.js';
 import { classifyToolResult } from '$lib/server/router/viterbi-router.js';
+import type { ToolResult } from '$lib/server/router/router-types.js';
 
 // ── Allowlist ─────────────────────────────────────────────────────────────────
 
@@ -81,7 +86,6 @@ const BLOCKED_PATTERNS = [
 
 const MAX_TOOL_ROUNDS     = 3;
 const MAX_TOOL_RESULT_CHARS = 12_000;
-const MCP_SERVER_URL      = ENV.TRACE_MCP_URL;
 const MCP_TIMEOUT_MS      = 8_000;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -95,6 +99,15 @@ export interface ToolCallRecord {
   error?:     string;
 }
 
+/**
+ * Tool loop execution result.
+ *
+ * Canonical retrieval lane context:
+ *   - All tool results are normalized regardless of whether Qdrant queries used 768-dim or 512-dim vectors
+ *   - Karpathy blend (0.4·PR + 0.3·attn + 0.3·authority) applied by graph tools
+ *   - SOM/topology projections are DERIVED, not canonical
+ *   - Results suitable for both primary (768) and evaluation (512) lanes
+ */
 export interface ToolLoopOutput {
   answer:              string;
   toolsUsed:           string[];
@@ -178,7 +191,7 @@ async function dispatchViaHTTP(toolName: string, args: Record<string, unknown>):
       return null; // error response from MCP → fall through to in-process
     }
 
-    return result as MCPToolResult;
+    return result as unknown as MCPToolResult;
   } catch {
     return null; // server not running or timeout — fall through to in-process
   } finally {
@@ -186,6 +199,17 @@ async function dispatchViaHTTP(toolName: string, args: Record<string, unknown>):
   }
 }
 
+/**
+ * Dispatch tool call with dual fallback (HTTP :8788 → in-process).
+ *
+ * Tools are dimension-agnostic: they can accept results from either 768-dim
+ * (canonical) or 512-dim (MRL candidate) retrieval lanes and produce normalized
+ * results suitable for downstream consumption by Gemma4 or reranking.
+ *
+ * Returns { result, fromServer }:
+ *   - fromServer=true: result came from :8788 HTTP JSON-RPC
+ *   - fromServer=false: result came from in-process fallback handler
+ */
 export async function dispatchToolCall(
   toolName: string,
   args:     Record<string, unknown>,
@@ -193,7 +217,7 @@ export async function dispatchToolCall(
   const validation = validateToolName(toolName);
   if (!validation.valid) {
     return {
-      result:     { tool: toolName, success: false, data: null, error: validation.reason },
+      result:     { tool: toolName, success: false, data: null, error: validation.reason } satisfies MCPToolResult,
       fromServer: false,
     };
   }
@@ -209,7 +233,7 @@ export async function dispatchToolCall(
   const handler = TOOL_DISPATCH[toolName];
   if (!handler) {
     return {
-      result:     { tool: toolName, success: false, data: null, error: `No handler for ${toolName}` },
+      result:     { tool: toolName, success: false, data: null, error: `No handler for ${toolName}` } satisfies MCPToolResult,
       fromServer: false,
     };
   }
@@ -253,11 +277,12 @@ async function recordToolTimelineEvent(input: {
   resultText: string;
 }): Promise<void> {
   const executionId = toolExecutionId(input.sessionId, input.round, input.toolName, input.args);
-  const toolResult = {
+  const resultClass: ToolResult['resultClass'] = input.result.success ? 'candidates' : 'tool_error';
+  const toolResult: ToolResult = {
     toolName: input.toolName,
     executionId,
     success: input.result.success,
-    resultClass: input.result.success ? 'candidates' : 'tool_error',
+    resultClass,
     resultCount: Array.isArray(input.result.data) ? input.result.data.length : 0,
     sourceRefCount: Array.isArray(input.result.data)
       ? input.result.data.filter((item) => Boolean((item as Record<string, unknown>)?.source_ref)).length
@@ -308,6 +333,22 @@ export interface ToolLoopMessage {
   tool_calls?: Array<{ function: { name: string; arguments: Record<string, unknown> } }>;
 }
 
+/**
+ * Tool loop input specification.
+ *
+ * Message flow:
+ *   1. Input messages (typically from ACE context assembler)
+ *   2. Optional dev context summary injection (before last user message)
+ *   3. Optional prior-answer HCA card injection (compressed to 128 tokens)
+ *   4. Gemma4 receives augmented messages and generates tool_calls (if needed)
+ *   5. Each tool call dispatched to :8788 (or in-process fallback)
+ *   6. Results fed back to model in next round (max 3 rounds)
+ *
+ * Semantic context (vector dimension-agnostic):
+ *   - Tools receive context from either 768-dim or 512-dim retrieval lanes
+ *   - Tool results are normalized, suitable for both lanes
+ *   - Karpathy blend applies uniformly across lanes
+ */
 export interface RunToolLoopInput {
   messages:         ToolLoopMessage[];
   priorAnswerText?: string;   // raw prior-answer to compress to HCA card
@@ -323,6 +364,20 @@ export interface RunToolLoopInput {
   }>;
 }
 
+/**
+ * Main Gemma4 tool-call loop executor.
+ *
+ * Canonical flow:
+ *   1. ACE context assembler provides initial messages (potentially from 768-dim or 512-dim retrieval)
+ *   2. Dev context summary injected (if provided, Step 5B)
+ *   3. Prior answer HCA card injected (if provided, compressed to 128 tokens)
+ *   4. Gemma4 called up to MAX_TOOL_ROUNDS times (default 3)
+ *   5. Each tool call validated, dispatched to :8788 (or fallback), result fed back
+ *   6. Loop stops on: stuck tool (2+ errors or dedup), exhausted rounds, or prose answer
+ *   7. Final answer + tool usage metadata returned
+ *
+ * Vector dimension context is transparent: tools normalize results from both lanes.
+ */
 export async function runGemma4ToolLoop(input: RunToolLoopInput): Promise<ToolLoopOutput> {
   const {
     priorAnswerText,

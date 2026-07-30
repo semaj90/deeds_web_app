@@ -14,8 +14,9 @@ import { z } from 'zod';
 import { runSOMTopologyPipeline } from '$lib/server/graph/som-topology-pipeline.js';
 import { getRedis } from '$lib/server/redis.js';
 
-// Redis key prefix written by LangGraph app.py — must match REDIS_KAG_PREFIX
-const KAG_KEY_PREFIX = 'langgraph:kag:neighbors:';
+// Shared Parent Atlas KAG cache prefix.
+// Writers should append workspace / graph / policy revisions to the suffix.
+const KAG_KEY_PREFIX = 'atlas:kag:neighbors:v1:';
 
 const somTopologySchema = z.object({
 	maxFiles: z.number().int().min(1).max(5000).optional().default(2000),
@@ -62,7 +63,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const result = await runSOMTopologyPipeline({ maxFiles, gridW, gridH, iters });
 
 		// Invalidate stale KAG neighbor cache — topology changed, old neighbor sets are stale.
-		// LangGraph app.py uses REDIS_KAG_PREFIX = "langgraph:kag:neighbors:"
+		// Shared Atlas namespace: atlas:kag:neighbors:v1:<workspaceRevision>:<graphRevision>:<queryHash>
 		let kagKeysDeleted = 0;
 		try {
 			const redis = getRedis();
@@ -84,12 +85,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 export const GET: RequestHandler = async () => {
 	return json({
 		endpoint: 'POST /api/graph/som-topology',
-		description:
+			description:
 			'Trains a Kohonen Self-Organizing Map (SOM) over codebase embeddings from the ' +
 			'codebase_chunks_768 Qdrant collection. Deduplicates by file_path (one embedding per file), ' +
 			'runs GPU-accelerated SOM training, writes som_cluster back to Qdrant payloads, and creates ' +
 			'SIMILAR_TOPOLOGY edges in Neo4j between CodebaseFile nodes whose BMU neurons are within ' +
-			'Manhattan distance ≤ 1 on the SOM grid.',
+			'Manhattan distance ≤ 1 on the SOM grid. KAG neighbor caching uses the shared Atlas prefix.',
 		parameters: {
 			maxFiles: 'integer 1–5000 (default 2000) — max files to include in training',
 			gridW: 'integer 2–100 (optional) — SOM grid width; defaults to ceil(sqrt(sqrt(n)*5))',

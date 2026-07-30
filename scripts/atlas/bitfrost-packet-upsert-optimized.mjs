@@ -24,11 +24,13 @@ import { createReadStream } from 'fs';
 import { readFileSync } from 'fs';
 import readline from 'readline';
 import { execSync } from 'child_process';
+import { loadRepoEnv, resolveRedisConfig } from './connection-config.mjs';
+
+const ENV = loadRepoEnv(process.env);
+Object.assign(process.env, ENV);
 
 const BATCH_SIZE = 1000;
-const REDIS_HOST = process.env.REDIS_HOST || 'localhost';
-const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379');
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis';
+const REDIS_CONFIG = resolveRedisConfig(ENV);
 const TTL_SECONDS = 604800; // 7 days
 const DRY_RUN = process.argv.includes('--dry-run');
 const RESUME_FROM = process.argv.find(a => a.startsWith('--resume='))?.split('=')[1];
@@ -38,9 +40,9 @@ let redis;
 
 async function initRedis() {
   redis = new Redis({
-    host: REDIS_HOST,
-    port: REDIS_PORT,
-    password: REDIS_PASSWORD,
+    host: REDIS_CONFIG.host,
+    port: REDIS_CONFIG.port,
+    password: REDIS_CONFIG.password,
     lazyConnect: true,
     enableOfflineQueue: false,
     retryStrategy: () => null,
@@ -53,7 +55,7 @@ async function initRedis() {
   });
 
   await redis.connect();
-  console.log(`[Redis] Connected to ${REDIS_HOST}:${REDIS_PORT}`);
+  console.log(`[Redis] Connected to ${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`);
 
   // Verify connection
   try {

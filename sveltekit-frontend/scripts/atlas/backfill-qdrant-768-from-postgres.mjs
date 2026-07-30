@@ -45,7 +45,7 @@ const SKIP_VALIDATION = process.argv.includes('--skip-validation');
 
 const CANONICAL_DIMENSION = 768;
 const QDRANT_COLLECTION = 'codebase_chunks_768';
-const QDRANT_VECTOR_NAME = 'semantic_768';
+const QDRANT_VECTOR_NAME = 'content';  // Canonical vector slot (also aliased semantic_768 in payload lineage)
 const CHECKPOINT_KEY = 'backfill:qdrant:768:checkpoint';
 
 await loadAtlasEnv();

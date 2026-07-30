@@ -26,7 +26,7 @@ export function resolveTurboVec4BitConfig(env = process.env) {
     limit: Math.max(1, Number(env.TURBOVEC_BUILD_LIMIT ?? 1000)),
     buildUrl,
     buildPort: Math.max(1, Number(env.TURBOVEC_BUILD_PORT ?? parsePort(buildUrl, 8795))),
-    pythonExe: String(env.PYTHON_EXE ?? 'python'),
+    pythonExe: String(env.ATLAS_PYTHON_EXE ?? env.PYTHON_EXE ?? 'python'),
     pythonScript: path.resolve(__dirname, '../../turbovec-sidecar.py'),
   };
 }
@@ -308,4 +308,3 @@ export async function uploadTurboVecIndex({
 
   return parsed;
 }
-

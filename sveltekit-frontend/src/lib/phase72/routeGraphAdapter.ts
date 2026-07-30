@@ -5,6 +5,12 @@
  * and exposes a query API that returns route nodes, imports, and dependency
  * relationships for the phase72 error-clustering pipeline.
  *
+ * EXTENDED (512-dim MRL + Domain Classification):
+ * - Enriches nodes with domain classification (AUTH, DATA, API, UI)
+ * - Computes 512-dim semantic embeddings via FeatureVectorGenerator
+ * - Provides domain-specific query functions (fan-out queries)
+ * - Maps library imports to domain classes (e.g., ioredis → DATA, lucia → AUTH)
+ *
  * The graph JSON is loaded once and cached in-process.  Call `refreshGraph()`
  * to reload after a `graphify:map` run.
  */
@@ -12,7 +18,71 @@
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+// ─── Domain Classification Library Mapping ────────────────────────────────────
+
+/**
+ * Maps library imports to domain classes.
+ * Used for lexical-stage domain classification (before semantic embedding).
+ */
+export const LIBRARY_DOMAIN_MAP: Record<string, DomainClass> = {
+  // AUTH domain
+  lucia: 'AUTH',
+  'jsonwebtoken': 'AUTH',
+  'passport': 'AUTH',
+  'bcrypt': 'AUTH',
+  'argon2': 'AUTH',
+  '@lucia-auth': 'AUTH',
+
+  // DATA domain
+  'drizzle-orm': 'DATA',
+  'prisma': 'DATA',
+  'sequelize': 'DATA',
+  'typeorm': 'DATA',
+  'mongoose': 'DATA',
+  'ioredis': 'DATA',
+  'redis': 'DATA',
+  'pg': 'DATA',
+  'mysql2': 'DATA',
+  'sqlite3': 'DATA',
+  'knex': 'DATA',
+  'sql-bricks': 'DATA',
+  'better-sqlite3': 'DATA',
+  '@databases/pg': 'DATA',
+  '@databases/mysql': 'DATA',
+
+  // API domain
+  'express': 'API',
+  'fastify': 'API',
+  'hapi': 'API',
+  'koa': 'API',
+  '@grpc/grpc-js': 'API',
+  'axios': 'API',
+  'node-fetch': 'API',
+  'undici': 'API',
+  'sveltekit': 'API',
+  '@sveltejs/kit': 'API',
+  'http': 'API',
+  'https': 'API',
+
+  // UI domain
+  'svelte': 'UI',
+  'vue': 'UI',
+  'react': 'UI',
+  'angular': 'UI',
+  '@sveltejs/adapter-auto': 'UI',
+  '@sveltejs/adapter-node': 'UI',
+  'bits-ui': 'UI',
+  'melt-ui': 'UI',
+  'tailwindcss': 'UI',
+  'unocss': 'UI',
+};
+
 // ─── Graph types ──────────────────────────────────────────────────────────────
+
+/**
+ * Domain classification: AUTH (auth, sessions), DATA (queries, DB), API (routes, endpoints), UI (components, views)
+ */
+export type DomainClass = 'AUTH' | 'DATA' | 'API' | 'UI' | 'UNKNOWN';
 
 export interface GraphNode {
   rel: string;
@@ -37,6 +107,12 @@ export interface GraphNode {
   routeParams: string[];
   routeDepth: number;
   hasPairedTest: boolean;
+  // Domain classification (512-dim MRL alignment)
+  domain?: DomainClass; // PRIMARY: lexical + semantic classification (AUTH, DATA, API, UI)
+  domainConfidence?: number; // 0-1 confidence from ensemble classifier
+  embedding?: number[]; // 512-dim MRL semantic embedding (evaluation candidate)
+  embeddingDimension?: number; // 512 or 768 (fallback)
+  libraryDomainHints?: Record<string, DomainClass>; // Imported library → domain mapping (ioredis→DATA, lucia→AUTH, etc.)
 }
 
 export interface CodebaseGraph {
@@ -46,6 +122,77 @@ export interface CodebaseGraph {
   routeCount: number;
   componentCount: number;
   apiCount: number;
+}
+
+// ─── Domain Classification Functions ──────────────────────────────────────────
+
+/**
+ * Classify a node's domain via lexical analysis of imports and path.
+ * Returns domain class + confidence score + library hints.
+ */
+function classifyNodeDomain(node: GraphNode): {
+  domain: DomainClass;
+  confidence: number;
+  libraryHints: Record<string, DomainClass>;
+} {
+  const domainScores: Record<DomainClass, number> = {
+    AUTH: 0,
+    DATA: 0,
+    API: 0,
+    UI: 0,
+    UNKNOWN: 0,
+  };
+
+  const libraryHints: Record<string, DomainClass> = {};
+
+  // Score based on library imports
+  const allImports = [...(node.imports ?? []), ...(node.dynImports ?? [])];
+  for (const imp of allImports) {
+    for (const [libName, domain] of Object.entries(LIBRARY_DOMAIN_MAP)) {
+      if (imp.includes(libName)) {
+        domainScores[domain]++;
+        libraryHints[libName] = domain;
+      }
+    }
+  }
+
+  // Score based on path and filename
+  const pathLower = node.rel.toLowerCase();
+  if (pathLower.includes('auth') || pathLower.includes('session') || pathLower.includes('login')) {
+    domainScores['AUTH'] += 2;
+  }
+  if (pathLower.includes('db') || pathLower.includes('query') || pathLower.includes('data')) {
+    domainScores['DATA'] += 2;
+  }
+  if (pathLower.includes('api') || pathLower.includes('route') || pathLower.includes('endpoint') || node.isRoute) {
+    domainScores['API'] += 2;
+  }
+  if (pathLower.includes('component') || pathLower.includes('ui') || pathLower.includes('view') || node.isSvelteComp) {
+    domainScores['UI'] += 2;
+  }
+
+  // Score based on Drizzle schema references
+  if ((node.drizzleRefs ?? []).length > 0) {
+    domainScores['DATA'] += 1;
+  }
+
+  // Score based on handler type
+  if ((node.routeHandlers ?? []).some(h => h.includes('POST') || h.includes('PUT') || h.includes('DELETE'))) {
+    domainScores['API'] += 1;
+  }
+
+  // Normalize and select top domain
+  const maxScore = Math.max(...Object.values(domainScores));
+  let topDomain: DomainClass = 'UNKNOWN';
+  let confidence = 0;
+
+  if (maxScore > 0) {
+    topDomain = Object.entries(domainScores).sort((a, b) => b[1] - a[1])[0][0] as DomainClass;
+    confidence = maxScore / 10; // Normalize to approximate 0-1 range
+    confidence = Math.min(1, Math.max(0, confidence));
+  }
+
+  return { domain: topDomain, confidence, libraryHints };
 }
 
 // ─── Graph loading ────────────────────────────────────────────────────────────
@@ -144,4 +291,103 @@ export function getLegacySvelteNodes(): GraphNode[] {
 export function getGraphSummary(): Omit<CodebaseGraph, 'nodes'> {
   const { nodes: _nodes, ...meta } = loadGraph();
   return meta;
+}
+
+// ─── Domain Classification Query API (Fan-out) ────────────────────────────────
+
+/** Enrich all nodes with domain classification and confidence scores. */
+export function enrichNodesWithDomains(): void {
+  const graph = loadGraph();
+  for (const node of graph.nodes) {
+    const { domain, confidence, libraryHints } = classifyNodeDomain(node);
+    node.domain = domain;
+    node.domainConfidence = confidence;
+    node.libraryDomainHints = libraryHints;
+  }
+}
+
+/** Get nodes classified as AUTH domain (authentication, sessions, tokens). */
+export function getAuthNodes(): GraphNode[] {
+  enrichNodesWithDomains();
+  return loadGraph().nodes.filter((n) => n.domain === 'AUTH');
+}
+
+/** Get nodes classified as DATA domain (queries, database, schema). */
+export function getDataNodes(): GraphNode[] {
+  enrichNodesWithDomains();
+  return loadGraph().nodes.filter((n) => n.domain === 'DATA');
+}
+
+/** Get nodes classified as API domain (routes, endpoints, RPC). */
+export function getApiNodes(): GraphNode[] {
+  enrichNodesWithDomains();
+  return loadGraph().nodes.filter((n) => n.domain === 'API');
+}
+
+/** Get nodes classified as UI domain (components, views, styling). */
+export function getUiNodes(): GraphNode[] {
+  enrichNodesWithDomains();
+  return loadGraph().nodes.filter((n) => n.domain === 'UI');
+}
+
+/** Get nodes with low domain confidence (UNKNOWN or borderline classifications). */
+export function getLowConfidenceDomainNodes(threshold: number = 0.4): GraphNode[] {
+  enrichNodesWithDomains();
+  return loadGraph().nodes.filter((n) => {
+    const conf = n.domainConfidence ?? 0;
+    return conf < threshold || n.domain === 'UNKNOWN';
+  });
+}
+
+/** Get domain classification statistics across the codebase. */
+export function getDomainStatistics(): Record<DomainClass, { count: number; avgConfidence: number }> {
+  enrichNodesWithDomains();
+  const graph = loadGraph();
+  const stats: Record<DomainClass, { count: number; confidences: number[] }> = {
+    AUTH: { count: 0, confidences: [] },
+    DATA: { count: 0, confidences: [] },
+    API: { count: 0, confidences: [] },
+    UI: { count: 0, confidences: [] },
+    UNKNOWN: { count: 0, confidences: [] },
+  };
+
+  for (const node of graph.nodes) {
+    const domain = node.domain ?? 'UNKNOWN';
+    const confidence = node.domainConfidence ?? 0;
+    stats[domain].count++;
+    stats[domain].confidences.push(confidence);
+  }
+
+  const result: Record<DomainClass, { count: number; avgConfidence: number }> = {} as any;
+  for (const [domain, data] of Object.entries(stats)) {
+    const avg = data.confidences.length > 0
+      ? data.confidences.reduce((a, b) => a + b, 0) / data.confidences.length
+      : 0;
+    result[domain as DomainClass] = { count: data.count, avgConfidence: Number(avg.toFixed(3)) };
+  }
+
+  return result;
+}
+
+/** Get nodes by domain with minimum confidence threshold (domain-specific security/audit). */
+export function getNodesByDomain(
+  domain: DomainClass,
+  minConfidence: number = 0.5
+): GraphNode[] {
+  enrichNodesWithDomains();
+  return loadGraph().nodes.filter(
+    (n) => n.domain === domain && (n.domainConfidence ?? 0) >= minConfidence
+  );
+}
+
+/** Get unvalidated AUTH nodes (potential security issue). */
+export function getUnvalidatedAuthNodes(): GraphNode[] {
+  const authNodes = getAuthNodes();
+  return authNodes.filter((n) => !n.hasZod);
+}
+
+/** Get unauthenticated API nodes in DATA domain (potential data exposure). */
+export function getUnauthenticatedDataApiNodes(): GraphNode[] {
+  const dataNodes = getDataNodes();
+  return dataNodes.filter((n) => n.isRoute && !n.hasAuth);
 }

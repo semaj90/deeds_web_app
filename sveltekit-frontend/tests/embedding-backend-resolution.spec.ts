@@ -26,9 +26,9 @@ describe('embedding backend resolution', () => {
     ).toBe('SEQUENCE_EXCEEDS_PHYSICAL_BATCH');
   });
 
-  it('classifies the 384-vs-768 embedding mismatch as invalid dimensions', () => {
+  it('classifies the 512-vs-768 embedding mismatch as invalid dimensions', () => {
     expect(
-      classifyEmbeddingError('embeddinggemma returned 384 dims, expected 768'),
+      classifyEmbeddingError('embeddinggemma returned 512 dims, expected 768'),
     ).toBe('INVALID_DIMENSIONS');
   });
 });

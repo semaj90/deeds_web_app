@@ -500,10 +500,10 @@ function buildNotebook(errorCell?: string): object {
 		])
 	);
 
-	// Cell 11 — Pre-warm LangGraph KAG Redis cache
+	// Cell 11 — Pre-warm shared Atlas KAG Redis cache
 	// Reads SIMILAR_TOPOLOGY edges (written in Cell 10) and the Qdrant point IDs
 	// (available from Cell 4's all_points) to populate per-file neighbor lists in
-	// Redis under the key prefix that app.py's kag_neighbors() checks first.
+	// Redis under the shared Atlas key prefix that the KAG neighbor reader checks first.
 	//
 	// Key contract (must match app.py kag_neighbors exactly):
 	//   norm = "|".join(sorted(set(doc_ids)))
@@ -512,9 +512,9 @@ function buildNotebook(errorCell?: string): object {
 	// app.py reads v==1 versioned format; legacy plain-list format also accepted.
 	cells.push(
 		codeCell([
-			'# Cell 11 — Pre-warm LangGraph KAG Redis cache\n',
-			'# Maps Qdrant point IDs → top-K SIMILAR_TOPOLOGY neighbors so app.py\n',
-			'# skips Neo4j for files already analyzed by this notebook.\n',
+			'# Cell 11 — Pre-warm shared Atlas KAG Redis cache\n',
+			'# Maps Qdrant point IDs → top-K SIMILAR_TOPOLOGY neighbors so the\n',
+			'# shared Atlas KAG cache can skip repeated Neo4j expansion.\n',
 			'\n',
 			'import redis as sync_redis\n',
 			'import hashlib\n',
@@ -522,7 +522,7 @@ function buildNotebook(errorCell?: string): object {
 			'from collections import defaultdict\n',
 			'\n',
 			'REDIS_URL        = "redis://localhost:6379/0"   # Replace with your Redis URL\n',
-			'REDIS_KAG_PREFIX = "langgraph:kag:neighbors:"\n',
+			'REDIS_KAG_PREFIX = "atlas:kag:neighbors:v1:"\n',
 			'KAG_TTL          = 86_400  # 24 h — matches app.py REDIS_KAG_TTL\n',
 			'\n',
 			'r = sync_redis.from_url(REDIS_URL)\n',
@@ -596,7 +596,7 @@ function buildNotebook(errorCell?: string): object {
 			'pipe.execute()\n',
 			'r.close()\n',
 			'\n',
-			'print(f"Pre-warmed {written} LangGraph KAG cache entries in Redis")\n',
+			'print(f"Pre-warmed {written} Atlas KAG cache entries in Redis")\n',
 			'print(f"TTL: {KAG_TTL}s = {KAG_TTL // 3600}h")\n',
 			'print(f"Key prefix: {REDIS_KAG_PREFIX}")\n',
 			'print(f"Payload version: v=1, source=colab-prewarm")\n',

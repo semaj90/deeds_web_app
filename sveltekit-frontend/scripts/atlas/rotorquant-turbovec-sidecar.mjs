@@ -40,7 +40,7 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
 const PORT         = Number(process.env.TURBOVEC_PORT ?? 8792);
 const GRPC_PORT    = Number(process.env.TURBOVEC_GRPC_PORT ?? 50062);
 const REDIS_URL    = process.env.REDIS_URL            ?? 'redis://127.0.0.1:6379';
-const PYTHON_EXE   = process.env.PYTHON_EXE           ?? 'python';
+const PYTHON_EXE   = process.env.ATLAS_PYTHON_EXE ?? process.env.PYTHON_EXE ?? 'python';
 const PYTHON_SIDE  = new URL('../turbovec-sidecar.py', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
 const NO_PYTHON    = process.argv.includes('--no-python');
 const CENTROIDS_KEY = 'gpu:autoencoder:centroids_64';

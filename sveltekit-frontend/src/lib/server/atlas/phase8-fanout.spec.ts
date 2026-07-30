@@ -56,12 +56,12 @@ describe('phase8 progress tracker', () => {
     expect(weighted.percent).toBeGreaterThan(0);
     expect(weighted.description).toContain('Phase 8 1/9 langextract SUCCEEDED 1/1 100%');
 
-    const latest = JSON.parse(fs.readFileSync(path.join('.tmp', 'phase8-progress.json'), 'utf8'));
+    const latest = JSON.parse(fs.readFileSync(path.join('.tmp', 'phase8', 'progress.json'), 'utf8'));
     expect(latest.run_id).toBe('phase8-test');
     expect(latest.state).toBe('STARTING');
 
     const audit = fs
-      .readFileSync(path.join('.tmp', 'phase8-progress.jsonl'), 'utf8')
+      .readFileSync(path.join('.tmp', 'phase8', 'progress.jsonl'), 'utf8')
       .trim()
       .split(/\n+/)
       .map((line) => JSON.parse(line));
@@ -123,12 +123,12 @@ describe('phase8 fanout wrapper', () => {
     expect(spawned[0]?.command).toBe('npm');
     expect(spawned[0]?.args).toEqual(['run', 'atlas:phase8:step3:langextract:gate']);
 
-    const latest = JSON.parse(fs.readFileSync(path.join('.tmp', 'phase8-progress.json'), 'utf8'));
+    const latest = JSON.parse(fs.readFileSync(path.join('.tmp', 'phase8', 'progress.json'), 'utf8'));
     expect(latest.run_id).toBe('phase8-dry-run');
     expect(latest.state).toBe('SUCCEEDED');
 
     const audit = fs
-      .readFileSync(path.join('.tmp', 'phase8-progress.jsonl'), 'utf8')
+      .readFileSync(path.join('.tmp', 'phase8', 'progress.jsonl'), 'utf8')
       .trim()
       .split(/\n+/)
       .map((line) => JSON.parse(line));

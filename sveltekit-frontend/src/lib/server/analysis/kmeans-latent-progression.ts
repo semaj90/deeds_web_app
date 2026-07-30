@@ -2,7 +2,7 @@
  * KMeans Latent Space Progression Analysis
  *
  * Hierarchical vector reduction for semantic clustering:
- *   768-dim (full embedding) → 384-dim → 128-dim → 64-dim (hot memory)
+ *   768-dim (full embedding) → 512-dim (MRL candidate) → 128-dim → 64-dim (hot memory)
  *
  * Each layer trained on previous layer output via TurboVec sidecar GPU.
  * Results stored as bytea (compressed binary) in Postgres for audit trail.
@@ -26,25 +26,25 @@ export const LATENT_PROGRESSION: LatentLevel[] = [
     name: 'embedding_768',
     dimension: 768,
     storageFormat: 'vector',
-    description: 'Full EmbeddingGemma output (primary Qdrant ANN)'
+    description: 'Full EmbeddingGemma output (primary Qdrant ANN, canonical native)'
   },
   {
-    name: 'embedding_384',
-    dimension: 384,
+    name: 'embedding_512',
+    dimension: 512,
     storageFormat: 'vector',
-    description: 'First reduction (Qdrant named vector, pgvector mirror)'
+    description: 'MRL reduction candidate (Qdrant named vector, pgvector mirror, awaiting evaluation)'
   },
   {
     name: 'embedding_128',
     dimension: 128,
     storageFormat: 'bytea',
-    description: 'KMeans level 1 (semantic clustering, Louvain communities)'
+    description: 'KMeans level 1 (semantic clustering, Louvain communities, DERIVED_PROJECTION)'
   },
   {
     name: 'embedding_64',
     dimension: 64,
     storageFormat: 'bytea',
-    description: 'KMeans level 2 (hot memory, 20×20 SOM centroids)'
+    description: 'KMeans level 2 (hot memory, 20×20 SOM centroids, ROUTING_PROJECTION)'
   }
 ];
 
@@ -52,7 +52,7 @@ export const LATENT_PROGRESSION: LatentLevel[] = [
  * KMeans clustering result at each level
  */
 export interface KMeansLevel {
-  level: number; // 0=768, 1=384, 2=128, 3=64
+  level: number; // 0=768, 1=512, 2=128, 3=64
   input_dim: number;
   output_dim: number;
   k_clusters: number;
@@ -112,7 +112,7 @@ export interface KMeansProgressionPlan {
   feature_id: string;
   input_embedding: Float32Array; // 768-dim
   levels: {
-    level_384: { k: number; timeout_ms: number }; // Standard KMeans
+    level_512: { k: number; timeout_ms: number }; // MRL candidate reduction
     level_128: { k: number; timeout_ms: number };
     level_64: { k: number; timeout_ms: number };
   };
@@ -124,18 +124,18 @@ export interface KMeansProgressionPlan {
 export function buildKMeansProgressionPlan(
   featureId: string,
   embedding768: Float32Array,
-  options?: { k384?: number; k128?: number; k64?: number }
+  options?: { k512?: number; k128?: number; k64?: number }
 ): KMeansProgressionPlan {
   return {
     feature_id: featureId,
     input_embedding: embedding768,
     levels: {
-      level_384: {
-        k: options?.k384 ?? 100, // 768→384 reduces to 100 clusters
+      level_512: {
+        k: options?.k512 ?? 100, // 768→512 (MRL candidate) reduces to 100 clusters
         timeout_ms: 5000
       },
       level_128: {
-        k: options?.k128 ?? 64, // 384→128 reduces to 64 clusters
+        k: options?.k128 ?? 64, // 512→128 reduces to 64 clusters
         timeout_ms: 3000
       },
       level_64: {
@@ -155,7 +155,7 @@ export interface TurboVecKMeansJob {
   feature_id: string;
   status: 'queued' | 'running' | 'complete' | 'failed';
   results?: {
-    embedding_384: { vector: Float32Array; cluster: number };
+    embedding_512: { vector: Float32Array; cluster: number };
     embedding_128: { compressed: CompressedEmbedding; cluster: number };
     embedding_64: { compressed: CompressedEmbedding; cluster: number };
   };
@@ -186,7 +186,7 @@ export const SCHEMA_MIGRATION_SQL = `
 -- Add latent progression columns
 ALTER TABLE codebase_chunk_index
 ADD COLUMN IF NOT EXISTS embedding_768 vector(768),
-ADD COLUMN IF NOT EXISTS embedding_384 vector(384),
+ADD COLUMN IF NOT EXISTS embedding_512 vector(512),
 ADD COLUMN IF NOT EXISTS embedding_128 bytea,
 ADD COLUMN IF NOT EXISTS embedding_64 bytea,
 ADD COLUMN IF NOT EXISTS kmeans_cluster_64 integer,
@@ -202,13 +202,13 @@ CREATE INDEX IF NOT EXISTS idx_codebase_chunks_som_cell
 
 -- Comments
 COMMENT ON COLUMN codebase_chunk_index.embedding_768 IS
-  'Full 768-dim EmbeddingGemma vector (primary Qdrant ANN)';
-COMMENT ON COLUMN codebase_chunk_index.embedding_384 IS
-  'First reduction to 384-dim (Qdrant named vector, pgvector mirror)';
+  'Full 768-dim EmbeddingGemma vector (primary Qdrant ANN, canonical native)';
+COMMENT ON COLUMN codebase_chunk_index.embedding_512 IS
+  'MRL reduction candidate to 512-dim vector (Qdrant named vector, pgvector mirror, awaiting evaluation)';
 COMMENT ON COLUMN codebase_chunk_index.embedding_128 IS
-  'KMeans level 1 compressed to 128-dim bytea (semantic clustering)';
+  'KMeans level 1 compressed to 128-dim bytea (semantic clustering, DERIVED_PROJECTION)';
 COMMENT ON COLUMN codebase_chunk_index.embedding_64 IS
-  'KMeans level 2 compressed to 64-dim bytea (hot memory, SOM centroids)';
+  'KMeans level 2 compressed to 64-dim bytea (hot memory, SOM centroids, ROUTING_PROJECTION)';
 COMMENT ON COLUMN codebase_chunk_index.kmeans_cluster_64 IS
   'Cluster assignment at 64-dim level (0-19 for 20-cluster SOM)';
 COMMENT ON COLUMN codebase_chunk_index.kmeans_centroid_distance_64 IS
@@ -229,9 +229,9 @@ export interface HyperRAGPacket {
   title_id: string;
   source_ref: string;
   keyword_tokens: string[]; // From keyword extraction
-  semantic_similarity: number; // Cosine similarity via 64-dim
+  semantic_similarity: number; // Cosine similarity via 512-dim or 768-dim primary lane
   keyword_similarity: number; // BM25 or lexical match
-  rrf_fused_score: number; // All 6 signals merged
+  rrf_fused_score: number; // All 6 signals merged (Karpathy blend: 0.4·PR + 0.3·attn + 0.3·authority)
   rank: number;
 }
 

@@ -28,13 +28,14 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
 import Redis from 'ioredis';
-import { loadRepoEnv, REPO_ROOT } from './connection-config.mjs';
+import { loadRepoEnv, REPO_ROOT, resolveRedisConfig } from './connection-config.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ENV = loadRepoEnv(process.env);
 Object.assign(process.env, ENV);
+const REDIS_CONFIG = resolveRedisConfig(ENV);
 
 const DRY_RUN = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
@@ -61,9 +62,9 @@ function makePool() {
 
 function makeRedis() {
   return new Redis({
-    host:               process.env.REDIS_HOST     ?? '127.0.0.1',
-    port:               parseInt(process.env.REDIS_PORT     ?? '6379', 10),
-    password:           process.env.REDIS_PASSWORD ?? 'redis',
+    host:               REDIS_CONFIG.host,
+    port:               REDIS_CONFIG.port,
+    password:           REDIS_CONFIG.password,
     lazyConnect:        true,
     enableOfflineQueue: false,
     retryStrategy:      () => null,

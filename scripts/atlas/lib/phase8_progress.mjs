@@ -2,15 +2,15 @@
  * Phase 8 Progress Reporting
  * Structured progress events at three levels:
  * - Level 1: Python tqdm/Rich for live terminal progress
- * - Level 2: JSON events written to .tmp/phase8-progress.json + .jsonl
+ * - Level 2: JSON events written to .tmp/phase8/progress.json + .jsonl
  * - Level 3: Node wrapper reports pipeline-level progress with weighted steps
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-const PROGRESS_FILE_JSON = '.tmp/phase8-progress.json';
-const PROGRESS_FILE_JSONL = '.tmp/phase8-progress.jsonl';
+const PROGRESS_FILE_JSON = '.tmp/phase8/progress.json';
+const PROGRESS_FILE_JSONL = '.tmp/phase8/progress.jsonl';
 
 /**
  * @typedef {'PENDING' | 'STARTING' | 'RUNNING' | 'STALLED' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'TIMED_OUT'} Phase8ProgressState

@@ -15,7 +15,7 @@ test('normalizeConnectionHost keeps real hosts and rewrites 0.0.0.0', () => {
 });
 
 test('normalizeRedisUrl preserves host:port inputs but normalizes bare hosts', () => {
-  assert.equal(normalizeRedisUrl('localhost:6379'), 'redis://localhost:6379');
+  assert.equal(normalizeRedisUrl('localhost:6379'), 'redis://127.0.0.1:6379');
   assert.equal(normalizeRedisUrl('redis://127.0.0.1:6379'), 'redis://127.0.0.1:6379');
   assert.equal(normalizeRedisUrl('', '127.0.0.1', '6379'), 'redis://127.0.0.1:6379');
 });
@@ -32,6 +32,24 @@ test('resolveRedisConfig prefers env password and host normalization', () => {
   assert.equal(config.port, 6379);
   assert.equal(config.password, 'redis');
   assert.equal(config.url, 'redis://127.0.0.1:6379');
+});
+
+test('resolveRedisConfig prefers VALKEY_* over REDIS_* when both are present', () => {
+  const config = resolveRedisConfig({
+    REDIS_URL: 'redis://redis-alias:6379/0',
+    REDIS_HOST: 'redis-alias',
+    REDIS_PORT: '6379',
+    REDIS_PASSWORD: 'redis',
+    VALKEY_URL: 'redis://valkey-canonical:6380/1',
+    VALKEY_HOST: 'valkey-canonical',
+    VALKEY_PORT: '6380',
+    VALKEY_PASSWORD: 'valkey',
+  });
+
+  assert.equal(config.host, 'valkey-canonical');
+  assert.equal(config.port, 6380);
+  assert.equal(config.password, 'valkey');
+  assert.equal(config.url, 'redis://valkey-canonical:6380');
 });
 
 test('resolveRedisUrl merges REDIS_PASSWORD into a bare REDIS_URL', () => {

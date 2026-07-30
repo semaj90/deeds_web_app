@@ -1,6 +1,6 @@
 # Langfuse v3 — LLM Observability with ClickHouse
 # Integrates with: Neo4j (traceGraph), RabbitMQ (traceQueue), Ollama (traceLLM/traceEmbedding)
-# Reuses existing: deeds-postgres-prod, deeds-redis-prod, phase66-minio
+# Reuses existing: deeds-postgres-prod, legal-ai-valkey, phase66-minio
 # Only adds: ClickHouse + Langfuse Web + Langfuse Worker
 # Usage: docker compose -f docker/langfuse.yml up -d
 
@@ -73,11 +73,8 @@ services:
       LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
       LANGFUSE_USE_AZURE_BLOB: "false"
 
-      # Redis — reuses existing deeds-redis-prod (no auth)
-      REDIS_HOST: deeds-redis-prod
-      REDIS_PORT: "6379"
-      # REDIS_AUTH not set — deeds-redis-prod has no auth
-      REDIS_TLS_ENABLED: "false"
+      # Valkey wire protocol; reuses existing legal-ai-valkey (no auth)
+      REDIS_CONNECTION_STRING: redis://legal-ai-valkey:6379/0
 
       # Server
       NEXTAUTH_URL: http://localhost:3030
@@ -151,7 +148,7 @@ volumes:
 #   Langfuse Web (Port 3030) ──→ Langfuse Worker (async processing)
 #     ├── deeds-postgres-prod (metadata, langfuse DB)
 #     ├── langfuse-clickhouse (traces/observations/scores)
-#     ├── deeds-redis-prod (cache/queues, no auth)
+#     ├── legal-ai-valkey (cache/queues, no auth)
 #     └── phase66-minio (S3 event/media upload, langfuse bucket)
 #
 #   SDK Trace Wrappers (in SvelteKit — langfuse.ts):

@@ -1,0 +1,356 @@
+# OpenWiki Knowledge Format (OKF) v1.0.0 Schema
+# Google's machine-readable format for structured knowledge bases
+# Reference: https://github.com/google-ai-sb/okf-spec
+
+version: "1.0.0"
+spec_name: "OpenWiki Knowledge Format"
+description: "Unified semantic representation for code intelligence, domain classification, and architectural context"
+
+# ─── Top-level ontology structure ───────────────────────────────────────────
+
+root_schema:
+  type: object
+  required:
+    - id
+    - version
+    - kind
+    - metadata
+  properties:
+    id:
+      type: string
+      description: "Unique identifier (RFC 4122 UUID or path-based)"
+      pattern: "^[a-z0-9:/_-]+$"
+
+    version:
+      type: string
+      description: "Document version (semver)"
+      pattern: "^\\d+\\.\\d+\\.\\d+$"
+
+    kind:
+      type: string
+      enum: ["Agent", "Feature", "Domain", "Concept", "Responsibility", "Directory"]
+      description: "Entity kind for classification"
+
+    metadata:
+      type: object
+      required:
+        - created_at
+        - source
+      properties:
+        created_at:
+          type: string
+          format: "date-time"
+          description: "Creation timestamp (ISO 8601)"
+
+        updated_at:
+          type: string
+          format: "date-time"
+          description: "Last update timestamp"
+
+        source:
+          type: string
+          enum: ["ast_extraction", "semantic_analysis", "manual_curation", "ai_generated"]
+          description: "Origin of this entry"
+
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: "Confidence score [0-1]"
+
+        tags:
+          type: array
+          items:
+            type: string
+          description: "Free-form tags for discovery"
+
+    # ─── Semantic content ───────────────────────────────────────────────────
+
+    spec:
+      type: object
+      description: "Semantic content specification"
+      properties:
+        domain:
+          type: string
+          enum: ["AUTH", "DATA", "API", "UI", "SHARED", "UNKNOWN"]
+          description: "Primary domain class"
+
+        responsibility:
+          type: string
+          description: "What this entity is responsible for"
+
+        concepts:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+              - pattern
+            properties:
+              name:
+                type: string
+                description: "Concept identifier (e.g., authentication_check, database_query)"
+
+              pattern:
+                type: string
+                description: "AST-grep or regex pattern"
+
+              domain:
+                type: string
+                enum: ["AUTH", "DATA", "API", "UI", "SHARED"]
+
+              priority:
+                type: integer
+                minimum: 0
+                maximum: 10
+
+              confidence:
+                type: number
+                minimum: 0
+                maximum: 1
+
+        related_entities:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              relation:
+                type: string
+                enum: ["imports", "depends_on", "implements", "extends", "uses", "calls"]
+
+        topology:
+          type: object
+          description: "4D topology coordinates"
+          properties:
+            x:
+              type: number
+              description: "Temporal axis (git timestamp)"
+
+            y:
+              type: number
+              description: "Structural axis (nesting/call-graph depth)"
+
+            z:
+              type: number
+              description: "Semantic axis (embedding similarity to domain centroid)"
+
+            w:
+              type: number
+              description: "Authority axis (PageRank/influence score)"
+
+        embedding:
+          type: object
+          properties:
+            model:
+              type: string
+              enum: ["embeddinggemma:latest"]
+
+            dimension:
+              type: integer
+              enum: [512, 768, 384, 64]
+              description: "512-dim MRL (primary), 768-dim dense (fallback), 384-dim routing, 64-dim topology"
+
+            vector:
+              type: array
+              items:
+                type: number
+              minItems: 64
+              maxItems: 768
+              description: "Vector coefficients (typically omitted at rest, computed on-demand)"
+
+        audit:
+          type: object
+          description: "Audit trail and validation status"
+          properties:
+            status:
+              type: string
+              enum: ["CREATED", "WIRED", "DRY_RUN_PROVEN", "APPLY_PROVEN", "NOT_PROVEN"]
+
+            gates:
+              type: object
+              additionalProperties:
+                type: boolean
+              description: "Validation gates (G1-G47+)"
+
+            last_validated:
+              type: string
+              format: "date-time"
+
+            violations:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                  severity:
+                    type: string
+                    enum: ["INFO", "WARNING", "ERROR", "CRITICAL"]
+
+    # ─── Directory-specific extensions ───────────────────────────────────
+
+    directory_scope:
+      type: object
+      description: "Optional: for directory-level OKF entries"
+      properties:
+        path:
+          type: string
+          description: "Directory path (relative to repo root)"
+
+        summary:
+          type: string
+          description: "Directory purpose and scope"
+
+        feature_keys:
+          type: array
+          items:
+            type: string
+          description: "Features owned/implemented in this directory"
+
+        activity_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: "Recent activity indicator"
+
+        recommendations:
+          type: array
+          items:
+            type: string
+          description: "Next best actions for this area"
+
+# ─── Common patterns for concept extraction ────────────────────────────────
+
+concept_patterns:
+  authentication_check:
+    patterns:
+      - "lucia.validateSession"
+      - "getSession"
+      - "requireAuth"
+      - "checkAuth"
+      - "verifyToken"
+    domain: "AUTH"
+    priority: 8
+
+  database_query:
+    patterns:
+      - "db.select"
+      - "db.insert"
+      - "db.update"
+      - "db.delete"
+      - "query("
+      - "execute("
+    domain: "DATA"
+    priority: 8
+
+  api_route:
+    patterns:
+      - "+server.ts"
+      - "export async function GET"
+      - "export async function POST"
+      - "route("
+      - "endpoint("
+    domain: "API"
+    priority: 7
+
+  component_render:
+    patterns:
+      - "export default"
+      - "function render"
+      - "$state"
+      - "$derived"
+      - "svelte:self"
+    domain: "UI"
+    priority: 7
+
+  error_handling:
+    patterns:
+      - "try {"
+      - "catch ("
+      - "throw"
+      - "Promise.reject"
+    domain: "SHARED"
+    priority: 5
+
+  async_coordination:
+    patterns:
+      - "async function"
+      - "await"
+      - "Promise.all"
+      - "Promise.race"
+    domain: "SHARED"
+    priority: 6
+
+# ─── Validation gates (G1-G47+ corpus) ──────────────────────────────────
+
+validation_gates:
+  G1:
+    name: "Static ESM imports"
+    description: "Verify entry is imported by consumers"
+    severity: "ERROR"
+
+  G2:
+    name: "Dynamic ESM imports"
+    description: "Check for dynamic import() usage"
+    severity: "WARNING"
+
+  G3:
+    name: "Domain classification confidence"
+    description: "Ensure confidence >= 0.5 for primary domain"
+    severity: "WARNING"
+
+  G4:
+    name: "Concept coverage"
+    description: "At least one concept pattern should match"
+    severity: "INFO"
+
+  G5:
+    name: "Embedding dimension alignment"
+    description: "Verify embedding.dimension in [512, 768, 384, 64]"
+    severity: "ERROR"
+
+  G6:
+    name: "Topology coordinate validity"
+    description: "Check 4D coordinates are within expected ranges"
+    severity: "WARNING"
+
+  G7:
+    name: "Audit trail completeness"
+    description: "Ensure audit.status and audit.last_validated are set"
+    severity: "INFO"
+
+# ─── Storage strategy (Postgres + Qdrant + Redis) ───────────────────────────
+
+storage_mapping:
+  postgres:
+    table: "atlas_packets"
+    columns:
+      - id: "id (PK UUID)"
+      - spec: "spec (JSONB)"
+      - metadata: "metadata (JSONB)"
+      - embedding: "embedding (vector(512|768|384))"
+    purpose: "Canonical truth for all OKF entries"
+
+  qdrant:
+    collection: "code_intel_corpus"
+    vector_field: "content"
+    payload_fields:
+      - nodeId
+      - domain
+      - kind
+      - concepts
+      - topology_coords
+    purpose: "Fast semantic search via vector ANN"
+
+  redis:
+    hashes:
+      - "corpus:centroids" → "domain → 512-dim centroid vector"
+      - "corpus:concepts" → "feature:domain → OKFOntologyEntry JSON"
+    purpose: "Hot cache for domain classification + concept lookup"
+
+    keys:
+      - "okf:directory:{path}" → "DirectoryScopeEntry JSON (24h TTL)"
+      - "okf:concepts:index" → "concept name → pattern JSONB"
+    purpose: "Fast access to OKF directory and concept metadata"

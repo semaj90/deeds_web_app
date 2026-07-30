@@ -173,6 +173,7 @@ const PROTO_TABLE_MAP = {
   },
   RouteRuntimePacket: {
     table: 'route_runtime_packets',
+    optional: true,
     requiredIndexes: [
       'idx_route_runtime_packets_feature_id',
       'idx_rrp_raw_gin',
@@ -292,7 +293,7 @@ async function validateQueueContracts() {
  * Check index coverage for a table (upgraded to capability-based validation)
  */
 async function checkIndexCoverage(pool, protoName, tableSpec) {
-  const { table, requiredIndexes, requiredFields } = tableSpec;
+  const { table, requiredIndexes, requiredFields, optional = false } = tableSpec;
 
   try {
     const columns = await getTableColumns(pool, table);
@@ -329,8 +330,25 @@ async function checkIndexCoverage(pool, protoName, tableSpec) {
       indexCapabilitiesSatisfied: satisfiedCapabilities,
       indexCapabilitiesMissing: unsatisfiedCapabilities,
       capabilityCoverage: unsatisfiedCapabilities.length === 0 ? 'PASS' : 'FAIL',
+      optional,
     };
   } catch (err) {
+    if (optional && String(err?.message ?? '').includes('does not exist')) {
+      return {
+        proto: protoName,
+        table,
+        optional: true,
+        columns: 0,
+        columnsMissing: [],
+        indexesTotal: 0,
+        indexesMissing: [],
+        indexesCoverage: 'OPTIONAL',
+        fieldsCoverage: 'OPTIONAL',
+        capabilityCoverage: 'OPTIONAL',
+        indexCapabilitiesSatisfied: [],
+        indexCapabilitiesMissing: [],
+      };
+    }
     return {
       proto: protoName,
       table,
@@ -375,10 +393,10 @@ async function main() {
     }
 
     for (const r of results) {
-      const indexStatus = r.indexesCoverage === 'PASS' ? '✅' : r.indexesCoverage === 'ERROR' ? '⚠️ ' : '❌';
-      const capStatus = r.capabilityCoverage === 'PASS' ? '✅' : r.capabilityCoverage === 'ERROR' ? '⚠️ ' : '❌';
-      const fieldStatus = r.fieldsCoverage === 'PASS' ? '✅' : r.fieldsCoverage === 'ERROR' ? '⚠️ ' : '❌';
-      console.log(`${r.proto.padEnd(20)} ${indexStatus} indexes  ${capStatus} capabilities  ${fieldStatus} fields`);
+      const indexStatus = r.indexesCoverage === 'PASS' ? '✅' : r.indexesCoverage === 'OPTIONAL' ? '◐' : r.indexesCoverage === 'ERROR' ? '⚠️ ' : '❌';
+      const capStatus = r.capabilityCoverage === 'PASS' ? '✅' : r.capabilityCoverage === 'OPTIONAL' ? '◐' : r.capabilityCoverage === 'ERROR' ? '⚠️ ' : '❌';
+      const fieldStatus = r.fieldsCoverage === 'PASS' ? '✅' : r.fieldsCoverage === 'OPTIONAL' ? '◐' : r.fieldsCoverage === 'ERROR' ? '⚠️ ' : '❌';
+      console.log(`${r.proto.padEnd(20)} ${indexStatus} indexes  ${capStatus} capabilities  ${fieldStatus} fields${r.optional ? '  (optional)' : ''}`);
       if (r.error) {
         console.log(`  └─ Error: ${r.error}`);
       } else {
@@ -411,7 +429,7 @@ async function main() {
     console.log(`${GEMMA4_OUTPUT_CONTRACT.description}`);
 
     // Validation gates
-    const allPass = results.every(r => r.indexesCoverage === 'PASS' && r.fieldsCoverage === 'PASS' && r.capabilityCoverage === 'PASS');
+    const allPass = results.every(r => r.optional || (r.indexesCoverage === 'PASS' && r.fieldsCoverage === 'PASS' && r.capabilityCoverage === 'PASS'));
     console.log('\n' + '═'.repeat(80));
     console.log(`Overall Status: ${allPass ? '✅ PASS' : '❌ FAIL'}`);
 

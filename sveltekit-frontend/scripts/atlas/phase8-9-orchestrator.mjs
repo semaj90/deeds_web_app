@@ -1,10 +1,17 @@
 #!/usr/bin/env node
 /**
- * Phase 8-9 Orchestrator
+ * Phase 8-9 Orchestrator with Robust Subprocess Timeout Handling
  * Executes after Phase 7 completes:
  * 1. Cache SOM centroids to Redis (Phase 8)
  * 2. Enrich Qdrant payloads with som_cluster + topology (Phase 8)
  * 3. Populate BitFrost semantic cache (Phase 9)
+ *
+ * IMPROVEMENTS (Session 153):
+ * - Success marker detection for completion status
+ * - Cleanup grace period (15s) to allow process exit after work completes
+ * - Heartbeat-based stall detection (no progress in 5min = stall)
+ * - Timeout calculation from workload size + rates, not static wall clock
+ * - Classified failure states: WORK_COMPLETED_PROCESS_EXITED, WORK_COMPLETED_CLEANUP_HUNG, WORK_NOT_COMPLETED_TIMEOUT
  */
 
 import pg from 'pg';
@@ -13,9 +20,114 @@ import fetch from 'node-fetch';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { spawn } from 'child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPORTS_DIR = path.join(__dirname, '../../docs/reports');
+
+/**
+ * Run a subprocess with robust timeout handling and success marker detection
+ */
+async function runStepWithTimeout(command, args, options = {}) {
+  const {
+    estimatedPerItemMs = 15000,  // 15s per item
+    startupAllowanceMs = 120000, // 2min startup
+    cleanupAllowanceMs = 30000,  // 30s cleanup grace
+    maxIterations = 10,          // fallback iteration count
+    stallDetectMs = 300000,      // 5min stall detection
+    verbose = false
+  } = options;
+
+  const timeoutMs = (maxIterations * estimatedPerItemMs) + startupAllowanceMs + cleanupAllowanceMs;
+
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true
+    });
+
+    let settled = false;
+    let successMarkerSeen = false;
+    let lastProgressTime = Date.now();
+    let timeoutHandle;
+    let graceHandle;
+    let stallHandle;
+    let outputBuffer = '';
+
+    const settle = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeoutHandle);
+      clearTimeout(graceHandle);
+      clearTimeout(stallHandle);
+      fn(value);
+    };
+
+    child.stdout.on('data', (chunk) => {
+      const text = chunk.toString();
+      outputBuffer += text;
+      process.stdout.write(text);
+
+      // Update progress time for stall detection
+      lastProgressTime = Date.now();
+      if (verbose) console.error(`[${new Date().toISOString()}] stdout: ${text.trim()}`);
+
+      // Check for success markers
+      if (text.includes('phase8_step3_processing_complete') ||
+          text.includes('phase8_step3_cleanup_complete') ||
+          text.includes('✅') && text.includes('complete')) {
+        successMarkerSeen = true;
+        if (verbose) console.error(`[SUCCESS MARKER] Work completed at ${new Date().toISOString()}`);
+
+        // Work is done, allow cleanup grace period
+        clearTimeout(timeoutHandle);
+        graceHandle = setTimeout(() => {
+          child.kill('SIGTERM');
+          settle(reject, new Error(`Step completed work but failed to exit within ${cleanupAllowanceMs}ms (WORK_COMPLETED_CLEANUP_HUNG)`));
+        }, cleanupAllowanceMs);
+      }
+    });
+
+    child.stderr.on('data', (chunk) => {
+      const text = chunk.toString();
+      process.stderr.write(text);
+      if (verbose) console.error(`[${new Date().toISOString()}] stderr: ${text.trim()}`);
+    });
+
+    child.once('error', (error) => {
+      settle(reject, error);
+    });
+
+    child.once('close', (code, signal) => {
+      if (code === 0) {
+        settle(resolve, {
+          state: successMarkerSeen ? 'WORK_COMPLETED_PROCESS_EXITED' : 'PROCESS_EXITED_NO_MARKER',
+          code: 0,
+          signal: signal || 'none'
+        });
+        return;
+      }
+      settle(reject, new Error(`Step exited with code ${code} signal ${signal || 'none'} (PROCESS_FAILED)`));
+    });
+
+    // Main timeout (wall clock)
+    timeoutHandle = setTimeout(() => {
+      child.kill('SIGTERM');
+      const state = successMarkerSeen ? 'WORK_COMPLETED_CLEANUP_HUNG' : 'WORK_NOT_COMPLETED_TIMEOUT';
+      settle(reject, new Error(`Step timed out after ${timeoutMs}ms (${state})`));
+    }, timeoutMs);
+
+    // Stall detection (no progress in 5 minutes)
+    stallHandle = setInterval(() => {
+      const stallAge = Date.now() - lastProgressTime;
+      if (stallAge > stallDetectMs && !successMarkerSeen) {
+        clearInterval(stallHandle);
+        child.kill('SIGTERM');
+        settle(reject, new Error(`Step stalled: no output for ${stallDetectMs}ms (STALL_TIMEOUT)`));
+      }
+    }, 30000);  // Check every 30s
+  });
+}
 
 const DB_CONFIG = {
   host: process.env.DB_HOST || '127.0.0.1',

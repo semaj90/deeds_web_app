@@ -2,6 +2,15 @@
   "_comment": "Manual sidecar SQL migrations applied outside drizzle-kit _journal.json. Listed here so audit-contract-map.mjs treats them as documented_sidecar (WARN) rather than unknown_unjournaled_sql (FAIL).",
   "sidecars": [
     {
+      "file": "0999_fix-grpc-proto-alignment.sql",
+      "status": "manual_sidecar",
+      "reason": "Adds missing gRPC proto alignment indexes and metadata columns. The route_runtime_packets branch is guarded because the table is not present in the live schema.",
+      "appliedBy": "operator",
+      "appliedAt": "2026-07-30",
+      "requiresJournalEntry": false,
+      "validationCommand": "docker exec legal-ai-postgres psql -U legal_admin -d legal_ai_db -c \"SELECT indexname FROM pg_indexes WHERE indexname IN ('idx_packets_source_feature_multi_hop','atlas_packets_metadata_gin_idx','idx_atlas_packets_payload_path','idx_atlas_packets_feature_id_composite','idx_packets_centroid_cache','idx_task_semantic_packets_metadata_gin','idx_concept_records_feature_ids_gin','idx_concept_records_metadata_gin');\""
+    },
+    {
       "file": "0013_codeintel_indexes.sql",
       "status": "manual_sidecar",
       "reason": "Code-intelligence GIN/trgm and B-tree indexes. Drizzle ORM cannot express GIN trgm ops (USING gin(col gin_trgm_ops)) natively — must live outside the journal.",

@@ -25,13 +25,12 @@ import { createInterface } from 'node:readline';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 import Redis from 'ioredis';
-import dotenv from 'dotenv';
+import { loadRepoEnv, resolveRedisConfig } from '../atlas/connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '../..');
-
-dotenv.config({ path: resolve(ROOT, '.env.local'), override: false });
-dotenv.config({ path: resolve(ROOT, '.env'), override: false });
+const ENV = loadRepoEnv(process.env);
+const REDIS_CONFIG = resolveRedisConfig(ENV);
 
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes('--dry-run');
@@ -50,9 +49,9 @@ if (!fs.existsSync(CANDIDATES_PATH)) {
 }
 
 const redis = new Redis({
-  host: process.env.REDIS_HOST ?? '127.0.0.1',
-  port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
-  password: process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis',
+  host: REDIS_CONFIG.host,
+  port: REDIS_CONFIG.port,
+  password: REDIS_CONFIG.password,
   lazyConnect: true,
   maxRetriesPerRequest: 1,
   enableOfflineQueue: false,

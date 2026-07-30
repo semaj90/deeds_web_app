@@ -181,6 +181,14 @@ try {
 
 // Summary
 console.log(`\n${'='.repeat(60)}`);
+if (results.length === 0) {
+  results.push({
+    name: 'Suite execution',
+    passed: false,
+    details: 'No adversarial probes ran',
+  });
+}
+
 const passed = results.filter((r) => r.passed).length;
 const failed = results.filter((r) => !r.passed).length;
 console.log(`Tests: ${passed} passed, ${failed} failed out of ${results.length}`);
@@ -192,7 +200,7 @@ const report = {
   total_tests: results.length,
   passed,
   failed,
-  pass_rate: `${((passed / results.length) * 100).toFixed(1)}%`,
+  pass_rate: results.length > 0 ? `${((passed / results.length) * 100).toFixed(1)}%` : '0.0%',
   results,
 };
 
@@ -203,9 +211,9 @@ await fs.writeFile('.tmp/p7-gan-adversarial-test-results.json', JSON.stringify(r
 console.log(`✓ Report written: .tmp/p7-gan-adversarial-test-results.json\n`);
 
 // Final gate
-const gatePass = failed === 0;
+const gatePass = results.length > 0 && failed === 0;
 console.log(`╔════════════════════════════════════════════════════════╗`);
 console.log(`║ ${gatePass ? '✅ P7 GATE PASS' : '❌ P7 GATE FAIL'} — Adversarial validation${gatePass ? '     ' : '     '}║`);
 console.log(`╚════════════════════════════════════════════════════════╝\n`);
 
-process.exit(gatePass ? 0 : 1);
+process.exitCode = gatePass ? 0 : 1;

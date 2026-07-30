@@ -73,7 +73,7 @@ export function normalizeRedisUrl(rawValue, fallbackHost = DEFAULT_REDIS.host, f
 }
 
 export function resolveRedisConfig(env = process.env) {
-  const rawUrl = String(env.REDIS_URL ?? env.VALKEY_URL ?? '').trim();
+  const rawUrl = String(env.VALKEY_URL ?? env.REDIS_URL ?? '').trim();
   let urlHost = '';
   let urlPort = '';
   let urlPassword = '';
@@ -89,13 +89,13 @@ export function resolveRedisConfig(env = process.env) {
     }
   }
 
-  const host = normalizeConnectionHost(env.REDIS_HOST ?? env.VALKEY_HOST ?? urlHost ?? DEFAULT_REDIS.host, DEFAULT_REDIS.host);
-  const port = Number(env.REDIS_PORT ?? env.VALKEY_PORT ?? urlPort ?? DEFAULT_REDIS.port) || Number(DEFAULT_REDIS.port);
+  const host = normalizeConnectionHost(env.VALKEY_HOST ?? env.REDIS_HOST ?? urlHost ?? DEFAULT_REDIS.host, DEFAULT_REDIS.host);
+  const port = Number(env.VALKEY_PORT ?? env.REDIS_PORT ?? urlPort ?? DEFAULT_REDIS.port) || Number(DEFAULT_REDIS.port);
   const password = String(
-    env.REDIS_PASSWORD ??
-    env.REDIS_PASS ??
     env.VALKEY_PASSWORD ??
     env.VALKEY_PASS ??
+    env.REDIS_PASSWORD ??
+    env.REDIS_PASS ??
     urlPassword ??
     ''
   ).trim() || undefined;
@@ -109,7 +109,7 @@ export function resolveRedisConfig(env = process.env) {
 
 export function resolveRedisUrl(env = process.env, defaults = DEFAULT_REDIS) {
   const config = resolveRedisConfig(env);
-  const rawUrl = String(env.REDIS_URL ?? env.VALKEY_URL ?? '').trim();
+  const rawUrl = String(env.VALKEY_URL ?? env.REDIS_URL ?? '').trim();
 
   if (rawUrl) {
     try {

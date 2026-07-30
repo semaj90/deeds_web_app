@@ -1,5 +1,6 @@
 -- Fix gRPC Proto → Postgres Alignment Issues
--- Addresses missing indexes and columns identified by align-grpc-proto-to-postgres-indexes.mjs
+-- Manual sidecar migration for gRPC proto alignment.
+-- Addresses missing indexes and columns identified by align-grpc-proto-to-postgres-indexes.mjs.
 -- Generated: 2026-07-28T21:00:57.005Z
 
 -- ============================================================================
@@ -16,7 +17,7 @@ CREATE INDEX IF NOT EXISTS atlas_packets_metadata_gin_idx
 
 -- GIN index for payload JSONB (used in ACE packet assembly)
 CREATE INDEX IF NOT EXISTS idx_atlas_packets_payload_path
-  ON atlas_packets USING gin (payload_json);
+  ON atlas_packets USING gin (payload);
 
 -- Composite index for feature_id + feature_label (identity resolution)
 CREATE INDEX IF NOT EXISTS idx_atlas_packets_feature_id_composite
@@ -30,30 +31,25 @@ CREATE INDEX IF NOT EXISTS idx_packets_centroid_cache
 -- 2. ROUTE_RUNTIME_PACKETS: Add missing columns (proto → table mapping)
 -- ============================================================================
 
--- feature_id column for gRPC proto alignment
-ALTER TABLE route_runtime_packets
-  ADD COLUMN IF NOT EXISTS feature_id VARCHAR(512);
+DO $$
+BEGIN
+  IF to_regclass('public.route_runtime_packets') IS NOT NULL THEN
+    -- feature_id column for gRPC proto alignment
+    EXECUTE 'ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS feature_id VARCHAR(512)';
 
--- raw column for JSONB route state serialization
-ALTER TABLE route_runtime_packets
-  ADD COLUMN IF NOT EXISTS raw JSONB;
+    -- raw column for JSONB route state serialization
+    EXECUTE 'ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS raw JSONB';
 
--- route_state column for explicit async state tracking
-ALTER TABLE route_runtime_packets
-  ADD COLUMN IF NOT EXISTS route_state VARCHAR(50) DEFAULT 'PENDING';
+    -- route_state column for explicit async state tracking
+    EXECUTE 'ALTER TABLE route_runtime_packets ADD COLUMN IF NOT EXISTS route_state VARCHAR(50) DEFAULT ''PENDING''';
 
--- Indexes for new columns
-CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_feature_id
-  ON route_runtime_packets (feature_id);
-
-CREATE INDEX IF NOT EXISTS idx_rrp_raw_gin
-  ON route_runtime_packets USING gin (raw);
-
-CREATE INDEX IF NOT EXISTS idx_rrp_feature_cluster
-  ON route_runtime_packets (feature_id, route_state);
-
-CREATE INDEX IF NOT EXISTS idx_rrp_feature_ids_gin
-  ON route_runtime_packets USING gin (raw -> 'feature_ids');
+    -- Indexes for new columns
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_route_runtime_packets_feature_id ON route_runtime_packets (feature_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rrp_raw_gin ON route_runtime_packets USING gin (raw)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rrp_feature_cluster ON route_runtime_packets (feature_id, route_state)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_rrp_feature_ids_gin ON route_runtime_packets USING gin (raw -> ''feature_ids'')';
+  END IF;
+END $$;
 
 -- ============================================================================
 -- 3. TASK_SEMANTIC_PACKETS: Add missing metadata GIN index

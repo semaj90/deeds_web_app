@@ -5,8 +5,9 @@
  * Usage (from npm scripts):
  *   node ../scripts/atlas/run-venv-python.mjs <script.py> [args...]
  *
- * Resolves the repo-root .venv/Scripts/python.exe (Windows) or
- * .venv/bin/python (Unix) and spawns it with the given script + args.
+ * Resolves ATLAS_PYTHON_EXE/PYTHON_EXE first, then the repo-root .venv
+ * Python (Windows .venv/Scripts/python.exe or Unix .venv/bin/python), and
+ * spawns it with the given script + args.
  * Sets cwd to repo root so relative paths in the Python scripts work.
  */
 
@@ -18,14 +19,22 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
 
-// Resolve venv Python executable (Windows first, then Unix)
-const winPy  = path.join(REPO_ROOT, '.venv', 'Scripts', 'python.exe');
-const unixPy = path.join(REPO_ROOT, '.venv', 'bin', 'python');
-const python  = existsSync(winPy) ? winPy : existsSync(unixPy) ? unixPy : null;
+function resolvePythonExecutable() {
+  const explicit = process.env.ATLAS_PYTHON_EXE || process.env.PYTHON_EXE;
+  if (explicit && explicit.trim()) {
+    return explicit.trim();
+  }
+
+  const winPy = path.join(REPO_ROOT, '.venv', 'Scripts', 'python.exe');
+  const unixPy = path.join(REPO_ROOT, '.venv', 'bin', 'python');
+  return existsSync(winPy) ? winPy : existsSync(unixPy) ? unixPy : null;
+}
+
+const python = resolvePythonExecutable();
 
 if (!python) {
-  console.error('[run-venv-python] ERROR: .venv not found at', REPO_ROOT);
-  console.error('  Run: python -m venv .venv && .venv/Scripts/pip install langextract psycopg2-binary python-dotenv');
+  console.error('[run-venv-python] ERROR: no Python executable found');
+  console.error('  Set ATLAS_PYTHON_EXE or PYTHON_EXE, or create repo-root .venv');
   process.exit(1);
 }
 

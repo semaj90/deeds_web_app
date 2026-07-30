@@ -6,10 +6,8 @@
  * Exercises PING, SET/GET/DEL, XADD, and HSET/HGET on isolated
  * test:valkey:* keys (all expired within 60s, nothing touches app data).
  *
- * Reads config from (in priority order):
- *   1. REDIS_URL  env var
- *   2. .env.local → .env → root .env
- *   3. Defaults: redis://127.0.0.1:6379, password=redis
+ * Reads config from the shared repo resolver so Valkey and Redis aliases
+ * resolve the same endpoint everywhere.
  *
  * Output:
  *   .tmp/valkey-node-client-smoke.json
@@ -26,47 +24,27 @@ import { createRequire } from 'module';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { loadRepoEnv, resolveRedisConfig } from '../atlas/connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const require = createRequire(import.meta.url);
 
-// ── load .env files ───────────────────────────────────────────────────────────
-
-function loadDotenv(filePath) {
-  if (!existsSync(filePath)) return;
-  const lines = readFileSync(filePath, 'utf-8').split('\n');
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eq = trimmed.indexOf('=');
-    if (eq < 0) continue;
-    const key = trimmed.slice(0, eq).trim();
-    const val = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
-    if (!(key in process.env)) process.env[key] = val;
-  }
-}
-
-for (const f of ['.env.local', '.env']) {
-  loadDotenv(path.join(ROOT, 'sveltekit-frontend', f));
-  loadDotenv(path.join(ROOT, f));
-}
-
 // ── config ────────────────────────────────────────────────────────────────────
 
-const REDIS_URL      = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
-const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? 'redis';
+const ENV = loadRepoEnv(process.env);
+const REDIS_CONFIG = resolveRedisConfig(ENV);
 
-let parsedUrl = null;
-try { parsedUrl = new URL(REDIS_URL); } catch { /* fall through */ }
-
-const HOST = parsedUrl?.hostname ?? '127.0.0.1';
-const PORT = Number(parsedUrl?.port ?? 6379);
+const HOST = REDIS_CONFIG.host;
+const PORT = REDIS_CONFIG.port;
 
 // Auth source — never print the password
 let authSource = 'default:redis';
-if (process.env.REDIS_URL)                                 authSource = 'env:REDIS_URL';
-else if (process.env.REDIS_PASSWORD || process.env.REDIS_PASS) authSource = 'env:REDIS_PASSWORD';
+if (ENV.VALKEY_URL || ENV.VALKEY_HOST || ENV.VALKEY_PORT || ENV.VALKEY_PASSWORD || ENV.VALKEY_PASS) {
+  authSource = 'env:VALKEY_*';
+} else if (ENV.REDIS_URL || ENV.REDIS_HOST || ENV.REDIS_PORT || ENV.REDIS_PASSWORD || ENV.REDIS_PASS) {
+  authSource = 'env:REDIS_*';
+}
 
 // ── results struct ────────────────────────────────────────────────────────────
 
@@ -96,8 +74,8 @@ try {
 
 // ── connect ───────────────────────────────────────────────────────────────────
 
-const client = new Redis(REDIS_URL, {
-  password             : REDIS_PASSWORD || undefined,
+const client = new Redis(REDIS_CONFIG.url, {
+  password             : REDIS_CONFIG.password,
   family               : 4,
   lazyConnect          : true,
   maxRetriesPerRequest : 1,
@@ -116,7 +94,7 @@ try {
   result.connectError = e.message ?? String(e);
   result.summary = `FAIL — connect error: ${result.connectError}`;
   if (/ECONNREFUSED|ETIMEDOUT|ENOTFOUND/.test(result.connectError)) {
-    result.recommendation = `Check that the Valkey container is running: docker ps | grep legal-ai-valkey\nOr set REDIS_URL=redis://:redis@127.0.0.1:6379 in .env`;
+    result.recommendation = `Check that the Valkey container is running: docker ps | grep legal-ai-valkey\nOr set VALKEY_URL=redis://default:redis@127.0.0.1:6379 in .env`;
   }
   await client.disconnect();
   finish(2);

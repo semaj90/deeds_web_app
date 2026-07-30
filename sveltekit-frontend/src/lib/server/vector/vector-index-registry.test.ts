@@ -51,6 +51,10 @@ describe('vector-index-registry', () => {
   });
 
   it('exposes both EmbeddingGemma lanes in the lane registry', () => {
+    expect(getVectorLane('topology128').kind).toBe('topology');
+    expect(getVectorLane('topology128').dimension).toBe(128);
+    expect(getVectorLane('topology128').collection).toBe('codebase_topology_128');
+
     expect(getVectorLane('retrieval384').role).toBe('canonical');
     expect(getVectorLane('retrieval384').dimension).toBe(384);
     expect(getVectorLane('retrieval384').collection).toBe('codebase_chunks_384_hybrid');
@@ -61,7 +65,8 @@ describe('vector-index-registry', () => {
 
     expect(getVectorLaneByCollection('codebase_chunks_768_v2')?.laneId).toBeUndefined();
     expect(getVectorLaneByCollection('codebase_chunks_768')?.laneId).toBe('embeddinggemma-768d');
+    expect(getVectorLaneByCollection('codebase_topology_128')?.laneId).toBe('atlas-topology128');
     expect(getVectorLaneByCollection('codebase_chunks_384_hybrid')?.laneId).toBe('embeddinggemma-prefix384');
-    expect(Object.keys(VECTOR_LANES)).toHaveLength(3);
+    expect(Object.keys(VECTOR_LANES)).toHaveLength(4);
   });
 });

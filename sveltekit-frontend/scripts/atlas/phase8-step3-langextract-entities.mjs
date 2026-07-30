@@ -157,6 +157,7 @@ async function extractEntities() {
         });
         if (entities.length > 3) console.log(`    ... and ${entities.length - 3} more`);
       }
+      console.log('phase8_step3_processing_complete', true);
       return;
     }
 
@@ -217,19 +218,23 @@ async function extractEntities() {
       }
     }
 
-    console.log(`\n✅ Extraction complete:`);
-    console.log(`  Entities materialized: ${extracted}`);
+    console.log(`\n✅ Extraction complete:`, true);
+    console.log(`  Entities materialized: ${extracted}`, true);
     if (skipped > 0) {
-      console.log(`  Skipped (validation failures): ${skipped}`);
+      console.log(`  Skipped (validation failures): ${skipped}`, true);
     }
-    console.log(`  LangExtract failures (using regex): ${langExtractFails}`);
+    console.log(`  LangExtract failures (using regex): ${langExtractFails}`, true);
+    console.log('phase8_step3_processing_complete', true);
+    console.log('phase8_step3_closing_database', true);
   } finally {
-    await pgClient.end();
+    console.log('phase8_step3_closing_redis', true);
     await redis.quit();
+    console.log('phase8_step3_cleanup_complete', true);
+    await pgClient.end();
   }
 }
 
 extractEntities().catch((err) => {
-  console.error('❌ Error:', err.message);
+  console.error('❌ Error:', err.message, true);
   process.exit(1);
 });

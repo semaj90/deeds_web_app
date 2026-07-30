@@ -176,7 +176,7 @@ function extractTags(section: Section | null): string[] {
 
 function extractTitleAndSummary(preamble: string[]): { title?: string; summary: string } {
   let title: string | undefined;
-  let summaryLines: string[] = [];
+  const summaryLines: string[] = [];
   let pastTitle = false;
 
   for (const raw of preamble) {
