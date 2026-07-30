@@ -153,6 +153,58 @@ export class ACEContextAssembler {
     return packet;
   }
 
+  /**
+   * P3: Workspace-scoped cache key generation (Phase 110)
+   * Incorporates workspace_revision + source_revision to invalidate stale caches
+   */
+  generateWorkspaceScopedCacheKey(
+    packet_key: string,
+    source_ref: string,
+    workspace_revision: number
+  ): string {
+    const hashInput = `${source_ref}|workspace:${workspace_revision}`;
+    return `kv:card:${packet_key}:${crypto.createHash('sha256').update(hashInput).digest('hex').slice(0, 16)}`;
+  }
+
+  /**
+   * P4: Stale rejection logic (Phase 110)
+   * Validates cached packets against current workspace_revision and source_revision
+   * Returns null or stale marker if versions don't match
+   */
+  async validateCachedPacket(
+    packet: ACEPacket,
+    currentWorkspaceRevision: number,
+    currentSourceRevision?: number
+  ): Promise<ACEPacket | { text: string; proof_state: 'STALE' } | null> {
+    if (!packet.cached_at) {
+      return packet;
+    }
+
+    // Check if cached packet needs validation
+    const cachedRevision = (packet as any).workspace_revision;
+
+    // If workspace_revision doesn't match, packet is stale
+    if (cachedRevision !== undefined && cachedRevision !== currentWorkspaceRevision) {
+      return {
+        text: '[STALE: workspace revision mismatch]',
+        proof_state: 'STALE'
+      };
+    }
+
+    // If source_revision provided, validate it
+    if (currentSourceRevision !== undefined) {
+      const cachedSourceRevision = (packet as any).source_revision;
+      if (cachedSourceRevision !== undefined && cachedSourceRevision !== currentSourceRevision) {
+        return {
+          text: '[STALE: source revision mismatch]',
+          proof_state: 'STALE'
+        };
+      }
+    }
+
+    return packet;
+  }
+
   async cachePacket(packet: ACEPacket, ttl_seconds: number = 3600): Promise<void> {
     if (!packet.cache_key) {
       throw new Error('ACEPacket missing cache_key');

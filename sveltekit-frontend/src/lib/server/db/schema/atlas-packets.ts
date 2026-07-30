@@ -89,6 +89,19 @@ export const atlasPackets = pgTable('atlas_packets', {
   kmeansCluster: integer('kmeans_cluster'),
   latent64: bytea('latent_64'),
 
+  // Phase 110: Workspace-scoped caching + representation versioning
+  workspaceRevision: integer('workspace_revision').notNull().default(0),
+  // Incremented by operator when embedding model changes. Used in cache key.
+  // Cache stale rejection: if current workspace_revision > cached, skip cache.
+
+  representationRevision: integer('representation_revision').notNull().default(0),
+  // Tracks representation contract version (e.g., v1 = 384d, v2 = 768d).
+  // Prevents 384d vectors being re-used when schema upgrades to 768d.
+
+  embeddingDigest: text('embedding_digest'),
+  // SHA-256 of embedding vector (hex string). Immutable anchor.
+  // Computed once at insert; used for idempotency verification and cold-storage manifest.
+
   // Identity lane — which topology this packet belongs to
   // qdrant_chunk: vector-backed, qdrant_point_id is set
   // mcp_tool_stub: MCP tool registration, no vector
@@ -125,6 +138,9 @@ export const atlasPackets = pgTable('atlas_packets', {
   redisCentroidKeyIdx: index('idx_atlas_packets_redis_centroid_key').on(table.redisCentroidKey),
   rewardPriorIdx: index('idx_atlas_packets_reward_prior').on(sql`${table.rewardPrior} DESC`),
   communityConfIdx: index('idx_atlas_packets_community_confidence').on(sql`${table.communityConfidence} DESC`),
+  workspaceRevisionIdx: index('idx_atlas_packets_workspace_revision').on(table.workspaceRevision),
+  representationRevisionIdx: index('idx_atlas_packets_representation_revision').on(table.representationRevision),
+  embeddingDigestIdx: index('idx_atlas_packets_embedding_digest').on(table.embeddingDigest),
   updatedAtIdx: index('idx_atlas_packets_updated_at').on(sql`${table.updatedAt} DESC`),
   createdAtIdx: index('idx_atlas_packets_created_at').on(sql`${table.createdAt} DESC`),
 }));

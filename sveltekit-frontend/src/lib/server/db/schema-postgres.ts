@@ -29,6 +29,10 @@ import { relations } from 'drizzle-orm/relations';
 // Re-export chatMessages and toolTraces from schema-chat for broader availability
 export { chatMessages, toolTraces, type ChatMessage, type NewChatMessage, type ToolTrace, type NewToolTrace } from './schema-chat';
 
+// Re-export atlas schemas from separate files
+export { atlasPackets, type AtlasPacket, type NewAtlasPacket } from './schema/atlas-packets.js';
+export { atlasFacts, atlasFactArguments, type AtlasFact, type NewAtlasFact, type AtlasFactArgument, type NewAtlasFactArgument } from './schema/atlas-facts.js';
+
 // === ENUMS FOR LEGAL AI APPLICATION ===
 export const userRoleEnum = pgEnum('user_role', [
   'prosecutor',
