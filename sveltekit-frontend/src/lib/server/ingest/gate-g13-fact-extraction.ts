@@ -21,6 +21,55 @@ export interface GateG13Result {
 }
 
 /**
+ * Strip Gemma4 thinking tags from response
+ * Handles <|channel>thought...thought|> and <thinking>...</thinking> blocks
+ */
+function stripThinkingTags(text: string): string {
+  // Remove <|channel>thought...thought|> tags
+  let result = text.replace(/<\|channel>thought[\s\S]*?thought\|>/g, '');
+  // Remove <thinking>...</thinking> tags
+  result = result.replace(/<thinking>[\s\S]*?<\/thinking>/g, '');
+  // Clean up extra whitespace
+  result = result.trim();
+  return result;
+}
+
+/**
+ * Extract JSON array from text, handling markdown code blocks, whitespace, and thinking tags
+ * Aggressively searches for any valid JSON array in the text
+ */
+function extractJsonArray(text: string): unknown[] | null {
+  // First, strip all thinking tags more aggressively
+  let cleaned = text.replace(/<\|channel>[\s\S]*?<channel\|>/g, '');
+  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>/g, '');
+
+  // Remove markdown code fences
+  cleaned = cleaned.replace(/```(?:json)?\s*/g, '').replace(/```\s*/g, '');
+
+  cleaned = cleaned.trim();
+
+  // Find the first '[' and last ']' to extract potential JSON array
+  const startIdx = cleaned.indexOf('[');
+  const endIdx = cleaned.lastIndexOf(']');
+
+  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+    return null;
+  }
+
+  const jsonStr = cleaned.substring(startIdx, endIdx + 1);
+
+  try {
+    const parsed = JSON.parse(jsonStr);
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Extract facts from packet content using Gemma4
  * Returns validated ExtractedFact objects ready for persistence
  */
@@ -30,20 +79,38 @@ export async function extractFactsFromPacket(
   content: string,
   gemma4_url: string = 'http://127.0.0.1:8090'
 ): Promise<ExtractedFact[]> {
-  const prompt = `Extract structured facts from the following code or documentation:
+  const prompt = `TASK: Extract 3-5 key facts from the provided text.
 
+TEXT:
 ${content}
 
-Return a JSON array of facts where each fact has:
-- fact_text: single sentence describing the fact
-- confidence: 0.0-1.0 confidence in accuracy
-- reasoning_trace: brief explanation of extraction logic
-- arguments: array of {argument_index, argument_name, argument_value, argument_type}
+EXTRACT FACTS ABOUT: Authentication methods, security measures, system components, data flow, configuration details, or requirements.
 
-Valid argument_name values: subject, object, predicate, temporal_anchor, location, event, entity, other
-Valid argument_type values: entity, event, location, temporal, numeric, boolean, relation, other
+FOR EACH FACT, CREATE A JSON OBJECT:
+- fact_text: ONE declarative sentence describing the fact (max 120 characters)
+- confidence: 0.5 to 1.0 (how certain you are this fact is accurate)
+- reasoning_trace: brief explanation of WHERE this fact comes from in the text
+- arguments: array of 1-3 structured arguments from this fact:
+  * argument_index: 0, 1, 2, etc.
+  * argument_name: "subject" | "object" | "predicate" | "temporal_anchor" | "location" | "event" | "entity" | "other"
+  * argument_value: the actual value (string, max 255 chars)
+  * argument_type: "entity" | "event" | "location" | "temporal" | "numeric" | "boolean" | "relation" | "other"
 
-Respond with ONLY the JSON array, no markdown or extra text.`;
+EXAMPLE (do NOT copy this literally, GENERATE NEW FACTS):
+[
+  {
+    "fact_text": "Users are identified by UUID v4 format identifiers.",
+    "confidence": 0.95,
+    "reasoning_trace": "Stated directly in User Identification section",
+    "arguments": [
+      {"argument_index": 0, "argument_name": "subject", "argument_value": "Users", "argument_type": "entity"},
+      {"argument_index": 1, "argument_name": "predicate", "argument_value": "identified by", "argument_type": "relation"},
+      {"argument_index": 2, "argument_name": "object", "argument_value": "UUID v4 identifiers", "argument_type": "entity"}
+    ]
+  }
+]
+
+RESPOND WITH ONLY A VALID JSON ARRAY. NO PREAMBLE. NO THINKING. NO MARKDOWN.`;
 
   const response = await fetch(`${gemma4_url}/v1/chat/completions`, {
     method: 'POST',
@@ -62,34 +129,57 @@ Respond with ONLY the JSON array, no markdown or extra text.`;
   }
 
   const data = await response.json() as { choices: Array<{ message: { content: string } }> };
-  const extracted_text = data.choices[0]?.message.content || '[]';
+  let extracted_text = data.choices[0]?.message.content || '[]';
 
-  let facts: unknown[];
+  // Strip thinking tags
+  extracted_text = stripThinkingTags(extracted_text);
+
+  // Try to extract JSON array
+  let facts: unknown[] | null = null;
   try {
     facts = JSON.parse(extracted_text);
   } catch {
-    console.warn('[Gate G13] Failed to parse Gemma4 JSON response, returning empty array');
+    // If direct parse fails, try extracting array from text
+    facts = extractJsonArray(extracted_text);
+  }
+
+  if (!facts || !Array.isArray(facts)) {
+    console.warn('[Gate G13] No valid JSON array found in Gemma4 response');
+    console.warn('[Gate G13] Raw response:', extracted_text.substring(0, 200));
     return [];
   }
 
-  if (!Array.isArray(facts)) {
-    console.warn('[Gate G13] Gemma4 response was not an array, returning empty array');
+  if (facts.length === 0) {
+    console.warn('[Gate G13] Gemma4 returned empty array');
     return [];
   }
 
   const validated_facts: ExtractedFact[] = [];
-  for (const fact of facts) {
+  for (let i = 0; i < facts.length; i++) {
     try {
-      const validated = extractedFactSchema.parse({
+      const fact_with_meta = {
         packet_key,
         source_ref,
-        ...fact
-      });
+        ...facts[i]
+      };
+
+      const validated = extractedFactSchema.parse(fact_with_meta);
       validated_facts.push(validated);
     } catch (err) {
-      console.warn(`[Gate G13] Fact validation failed for packet ${packet_key}:`, err);
+      if (err instanceof Error) {
+        console.warn(`[Gate G13] Fact ${i} validation failed:`, {
+          raw_fact: JSON.stringify(facts[i]).substring(0, 200),
+          error: err.message
+        });
+      } else {
+        console.warn(`[Gate G13] Fact ${i} validation failed:`, err);
+      }
     }
   }
+
+  console.log(
+    `[Gate G13] Extracted ${validated_facts.length}/${facts.length} facts after Zod validation`
+  );
 
   return validated_facts;
 }
