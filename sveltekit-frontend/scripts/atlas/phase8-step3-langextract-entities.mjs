@@ -26,7 +26,7 @@ const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379');
 const REDIS_PASSWORD = process.env.REDIS_PASSWORD || 'redis';
 const LANGEXTRACT_URL = process.env.LANGEXTRACT_URL || 'http://127.0.0.1:8095';
 
-const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('dry');
+const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('dry') || (!process.argv.includes('--apply'));
 const isApply = process.argv.includes('--apply');
 const isFull = process.argv.includes('--full');
 const limitIdx = process.argv.indexOf('--limit');
@@ -165,6 +165,7 @@ async function extractEntities() {
     let extracted = 0;
     let skipped = 0;
     let langExtractFails = 0;
+    const startTime = Date.now();
 
     for (let i = 0; i < packets.length; i++) {
       const p = packets[i];
@@ -213,7 +214,18 @@ async function extractEntities() {
       }
 
       extracted++;
-      if ((i + 1) % 1000 === 0) {
+
+      // Progress indicator (tqdm-like bar)
+      const elapsed = (Date.now() - startTime) / 1000;
+      const rate = (i + 1) / elapsed;
+      const remaining = (packets.length - i - 1) / rate;
+      const pct = Math.round(((i + 1) / packets.length) * 100);
+      const bar = '█'.repeat(Math.floor(pct / 5)) + '░'.repeat(20 - Math.floor(pct / 5));
+
+      process.stderr.write(`\rextract: ${pct}%|${bar}| ${i + 1}/${packets.length} [${Math.floor(elapsed)}s<${Math.floor(remaining)}s, ${rate.toFixed(2)}/s]`);
+
+      if ((i + 1) === packets.length) {
+        console.error(''); // Newline at end
         console.log(`  ✅ Extracted entities from ${i + 1}/${packets.length} packets`);
       }
     }

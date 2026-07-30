@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-07-26T07:37:46.778Z",
-  "dry_run": false,
+  "timestamp": "2026-07-30T07:32:56.863Z",
+  "dry_run": true,
   "total_envelopes": 501,
   "total_jobs": 501,
   "tuples_to_summarize": 16910,

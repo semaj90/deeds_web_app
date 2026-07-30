@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-07-30T13:47:37.550Z",
+  "overall": "WARN",
+  "checks": [
+    {
+      "name": "summary_surface_verify",
+      "command": "npm run atlas:summary-surface:verify",
+      "ok": false,
+      "duration_ms": 588,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_32_473Z-debug-0.log"
+    },
+    {
+      "name": "summary_sanitizer_hardened",
+      "command": "npm run atlas:summary-sanitizer:hardened:test",
+      "ok": false,
+      "duration_ms": 510,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_32_984Z-debug-0.log"
+    },
+    {
+      "name": "summary_layer_clean_dry",
+      "command": "npm run atlas:summary-layer:clean:dry",
+      "ok": false,
+      "duration_ms": 529,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_33_523Z-debug-0.log"
+    },
+    {
+      "name": "phase8_step3_langextract_gate",
+      "command": "npm run atlas:phase8:step3:langextract:gate",
+      "ok": false,
+      "duration_ms": 544,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_34_060Z-debug-0.log"
+    },
+    {
+      "name": "bitfrost_semantic_cache_audit",
+      "command": "npm run atlas:bitfrost-semantic-cache:audit",
+      "ok": false,
+      "duration_ms": 435,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_34_520Z-debug-0.log"
+    },
+    {
+      "name": "tree_nodes_audit",
+      "command": "npm run atlas:tree-nodes:audit",
+      "ok": false,
+      "duration_ms": 448,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_34_928Z-debug-0.log"
+    },
+    {
+      "name": "ontology_kag_readiness",
+      "command": "npm run atlas:ontology-kag:readiness",
+      "ok": false,
+      "duration_ms": 475,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_35_439Z-debug-0.log"
+    },
+    {
+      "name": "ranker_envelope_readiness",
+      "command": "npm run atlas:ranker-envelope:readiness",
+      "ok": false,
+      "duration_ms": 392,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_35_840Z-debug-0.log"
+    },
+    {
+      "name": "acp_transport",
+      "command": "npm run verify:acp-transport",
+      "ok": false,
+      "duration_ms": 437,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_36_272Z-debug-0.log"
+    },
+    {
+      "name": "services_probe",
+      "command": "npm run atlas:services:probe",
+      "ok": false,
+      "duration_ms": 397,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_36_669Z-debug-0.log"
+    },
+    {
+      "name": "embedding_qdrant_turbovec",
+      "command": "npm run atlas:embedding-qdrant-turbovec:test",
+      "ok": false,
+      "duration_ms": 384,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_37_056Z-debug-0.log"
+    },
+    {
+      "name": "gpu_retrieval_summary_fanout",
+      "command": "npm run atlas:gpu-retrieval-summary-fanout:test",
+      "ok": false,
+      "duration_ms": 387,
+      "status": "FAIL",
+      "error": "",
+      "stdout": "",
+      "stderr": "npm error Cannot use --no-workspaces and --workspace at the same time\nnpm error A complete log of this run can be found in: C:\\Users\\james\\AppData\\Local\\npm-cache\\_logs\\2026-07-30T13_47_37_443Z-debug-0.log"
+    }
+  ]
+}

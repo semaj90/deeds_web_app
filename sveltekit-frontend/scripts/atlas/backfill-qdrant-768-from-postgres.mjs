@@ -31,6 +31,7 @@
 import { Pool } from 'pg';
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
+import { createHash } from 'crypto';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -126,6 +127,23 @@ function validateEmbedding(embedding, i) {
   return arr;
 }
 
+function assertLineage(row) {
+  const missing = [];
+  if (!row.relative_path) missing.push('relative_path');
+  // content_hash may be NULL, that's OK (will use id as fallback)
+
+  if (missing.length > 0) {
+    throw new Error(`Missing lineage for row ${row.id}: [${missing.join(', ')}]. Cannot derive packet_key.`);
+  }
+}
+
+function generatePacketKey(row) {
+  // Deterministic packet_key: use content_hash if available, fallback to id
+  const hashInput = row.content_hash || row.id;
+  const input = `${row.relative_path}:${hashInput}`;
+  return createHash('sha256').update(input).digest('hex').substring(0, 32);
+}
+
 function validateBatch(rows) {
   if (SKIP_VALIDATION) return;
 
@@ -135,6 +153,9 @@ function validateBatch(rows) {
 
     // Dimension & finite check + parse halfvec
     validateEmbedding(row.content_embedding, i);
+
+    // Canonical lineage gate (hard fail if missing)
+    assertLineage(row);
 
     // UUID uniqueness
     if (seenIds.has(row.id)) {
@@ -178,7 +199,7 @@ try {
   while (offset < LIMIT) {
     const batchLimit = Math.min(BATCH_SIZE, LIMIT - offset);
 
-    // Fetch batch from Postgres
+    // Fetch batch from Postgres (codebase_chunk_index is the canonical source)
     const query = `
       SELECT
         id,
@@ -189,7 +210,8 @@ try {
         summary,
         domain,
         metadata,
-        indexed_at
+        indexed_at,
+        content_hash
       FROM codebase_chunk_index
       WHERE content_embedding IS NOT NULL
       ORDER BY id
@@ -222,22 +244,25 @@ try {
       continue;
     }
 
-    // Build Qdrant points
+    // Build Qdrant points with canonical lineage (generated deterministically)
     const points = rows.map(row => {
       const embeddingArray = parseHalfvecString(row.content_embedding);
+      const packetKey = generatePacketKey(row);
       return {
         id: row.id.replace(/-/g, '').substring(0, 36), // UUID as point ID
         vector: {
           [QDRANT_VECTOR_NAME]: embeddingArray
         },
         payload: {
-          relative_path: row.relative_path,
+          packet_key: packetKey,
+          source_ref: row.relative_path,
+          content_hash: row.content_hash,
+          workspace_id: process.env.ATLAS_WORKSPACE_ID ?? 'phase108d-backfill',
+          representation_id: 'codebase_chunks_768',
           symbol: row.symbol,
-          kind: row.kind,
+          artifact_kind: row.kind,
           summary: row.summary,
-          domain: row.domain,
-          model_revision: '2026-07-29',
-          representation_id: 'semantic_768',
+          domain_class: row.domain,
           metadata: row.metadata,
           indexed_at: row.indexed_at.toISOString()
         }

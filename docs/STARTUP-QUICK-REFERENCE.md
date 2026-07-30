@@ -267,7 +267,8 @@ Down:   AST-only analysis (less comprehensive)
 - `npm run graphify:validate` — Service health check
 
 ### Valkey/Redis
-- `npm run valkey:index:create` — Create semantic index (graceful if offline)
+- `npm run valkey:hot-index:preflight` — Validate the bounded hot-vector cache contract
+- `npm run valkey:hot-index:apply` — Create the bounded hot-vector cache index explicitly
 - `npm run valkey:seed:rules:embed` — Seed OpenCode rules
 
 ---

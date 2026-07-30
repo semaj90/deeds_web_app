@@ -24,6 +24,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
+import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..');
@@ -44,8 +45,9 @@ const LOCK_FILE = path.join(REPO_ROOT, '.graphify-pipeline-lock');
 const LOCK_TIMEOUT_MS = 1200000; // 20 minutes max execution time
 
 // Service URLs
-const SVELTEKIT_URL = process.env.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
+const repoEnv = loadRepoEnv(process.env);
+const SVELTEKIT_URL = repoEnv.SVELTEKIT_URL ?? 'http://127.0.0.1:5173';
+const DATABASE_URL = resolveDatabaseUrl(repoEnv);
 const { Pool } = pg;
 const pool = new Pool({ connectionString: DATABASE_URL, max: 3 });
 
@@ -68,11 +70,33 @@ const report = {
 
 const startTime = Date.now();
 
+function describeDatabaseTarget(databaseUrl) {
+  try {
+    const parsed = new URL(databaseUrl);
+    return `${parsed.hostname}:${parsed.port || '5432'}/${parsed.pathname.replace(/^\/+/, '')}`;
+  } catch {
+    return 'unknown';
+  }
+}
+
+async function writeJsonAtomic(filePath, value) {
+  const dir = path.dirname(filePath);
+  const base = path.basename(filePath);
+  const tmpFile = path.join(dir, `.${base}.${process.pid}.tmp`);
+  await fs.mkdir(dir, { recursive: true });
+  await fs.writeFile(tmpFile, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  await fs.rename(tmpFile, filePath);
+}
+
 function resolveSpawnCommand(command) {
   if (process.platform !== 'win32') return command;
   if (command === 'npm') return 'npm.cmd';
   if (command === 'npx') return 'npx.cmd';
   return command;
+}
+
+function resolveSpawnShell(command) {
+  return process.platform === 'win32' && (command === 'npm' || command === 'npx');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -152,7 +176,7 @@ async function runPageRank() {
     const child = spawn(cmd, cmdArgs, {
       cwd: FRONTEND_ROOT,
       stdio: APPLY ? 'pipe' : 'inherit',
-      shell: false,
+      shell: resolveSpawnShell('npm'),
       windowsHide: true,
     });
 
@@ -216,7 +240,7 @@ async function runKanbanEmit() {
     const child = spawn(cmd, cmdArgs, {
       cwd: REPO_ROOT,
       stdio: APPLY ? 'pipe' : 'inherit',
-      shell: false,
+      shell: resolveSpawnShell('node'),
     });
 
     let output = '';
@@ -279,7 +303,7 @@ async function runTurboVecConsolidation() {
     const child = spawn(cmd, cmdArgs, {
       cwd: FRONTEND_ROOT,
       stdio: APPLY ? 'pipe' : 'inherit',
-      shell: false,
+      shell: resolveSpawnShell('npx'),
       windowsHide: true,
     });
 
@@ -443,7 +467,7 @@ async function main() {
   const startTime = Date.now();
   const overallTimeout = setTimeout(() => {
     err(`HARD TIMEOUT: Orchestrator exceeded ${LOCK_TIMEOUT_MS / 60000} minutes. Terminating.`);
-    process.exit(1);
+    process.exitCode = 1;
   }, LOCK_TIMEOUT_MS);
 
   try {
@@ -451,7 +475,7 @@ async function main() {
     await acquireLock();
 
     log(`Starting downstream pipeline orchestrator (${APPLY ? 'APPLY' : 'DRY-RUN'} mode)`);
-    log(`Services: SvelteKit=${SVELTEKIT_URL}, DB=${DATABASE_URL.split('@')[1] ?? '?'}`);
+    log(`Services: SvelteKit=${SVELTEKIT_URL}, DB=${describeDatabaseTarget(DATABASE_URL)}`);
 
     // Stage 1: Wait for graphify readiness (REQUIRED in APPLY mode)
     if (WAIT_READY || APPLY) {
@@ -529,7 +553,7 @@ async function main() {
     // Write report
     try {
       await fs.mkdir(REPORT_DIR, { recursive: true });
-      await fs.writeFile(REPORT_FILE, JSON.stringify(report, null, 2));
+      await writeJsonAtomic(REPORT_FILE, report);
       log(`Report written to ${path.relative(REPO_ROOT, REPORT_FILE)}`);
     } catch (e) {
       err(`Failed to write report: ${e.message}`);
@@ -539,7 +563,7 @@ async function main() {
     await releaseLock();
 
     await pool.end();
-    process.exit(report.summary.success ? 0 : 1);
+    process.exitCode = report.summary.success ? 0 : 1;
   }
 }
 

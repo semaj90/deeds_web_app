@@ -37,7 +37,9 @@ const require = createRequire(import.meta.url);
 
 const ADDON_PATH  = resolve(ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node');
 const MODEL_DIR   = resolve(ROOT, 'models/autoencoder');
+const FRONTEND_MODEL_DIR = resolve(ROOT, 'sveltekit-frontend/models/autoencoder');
 const LATENT_FILE = resolve(MODEL_DIR, 'autoencoder_latent_index.json');
+const FRONTEND_LATENT_FILE = resolve(FRONTEND_MODEL_DIR, 'autoencoder_latent_index.json');
 
 const QDRANT_URL  = (process.env.QDRANT_URL  || 'http://127.0.0.1:6333').replace(/\/$/, '');
 const COLLECTION  = process.env.AE_QDRANT_COLLECTION || 'codebase_chunks_768';
@@ -361,14 +363,22 @@ latentIndex[id] = {
   };
 
   if (DRY_RUN) {
-    console.log(`  🔍 DRY-RUN — would write ${Object.keys(latentIndex).length} entries to ${LATENT_FILE}`);
-    console.log('   Skipping artifact, Postgres, and Redis writes. Use --apply to persist.');
+    mkdirSync(MODEL_DIR, { recursive: true });
+    mkdirSync(FRONTEND_MODEL_DIR, { recursive: true });
+    writeFileSync(LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
+    writeFileSync(FRONTEND_LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
+    console.log(`  🔍 DRY-RUN — wrote ${Object.keys(latentIndex).length} entries to ${LATENT_FILE}`);
+    console.log(`   Mirror wrote to ${FRONTEND_LATENT_FILE}`);
+    console.log('   Skipping Postgres and Redis writes. Use --apply to persist database state.');
     return;
   }
 
   mkdirSync(MODEL_DIR, { recursive: true });
+  mkdirSync(FRONTEND_MODEL_DIR, { recursive: true });
   writeFileSync(LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
+  writeFileSync(FRONTEND_LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
   console.log(`  ✅ ${LATENT_FILE}  (${Object.keys(latentIndex).length} entries)\n`);
+  console.log(`  ✅ ${FRONTEND_LATENT_FILE}  (${Object.keys(latentIndex).length} entries)\n`);
 
   // ── Step 6: Write to Postgres atlas_packets ────────────────────────────────
   console.log('Step 6: Write latent_64 → Postgres atlas_packets');

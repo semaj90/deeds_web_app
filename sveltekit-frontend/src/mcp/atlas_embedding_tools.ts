@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SOURCE_EMBEDDING_DIMENSION, SOURCE_QDRANT_COLLECTION } from "../lib/server/embedding/embedding-contract.js";
 import { getQdrantManager } from "../lib/server/vector/qdrant-manager.js";
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 const SOURCE_PAYLOAD_FIELDS = [
   'packet_key',
@@ -61,10 +63,11 @@ export function parsePacketIdentity(input: { packetKey: string; sourceRef?: stri
  *   - atlas.embedding_all_tags — Comprehensive tag derivation (keywords + clusters + neighbors)
  */
 
-export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string) {
+export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string, dispatcherMiddleware?: DispatcherMiddleware) {
   const redisOverrides = resolveRedisOverrides(redisUrl);
 
   // Tool 1: Extract keywords from embedding
+  const sessionId_keywords = generateSessionId();
   server.registerTool(
     'atlas.embedding_keywords',
     {
@@ -86,7 +89,11 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Number of top keywords to return'),
       }),
     },
-    async ({ packetKey, sourceRef, embedding, topK }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.embedding_keywords',
+      sessionId_keywords,
+      async ({ packetKey, sourceRef, embedding, topK }) => {
       try {
         const { createAtlasRedisClient } = await import(
           '../../../scripts/atlas/lib/redis-client-factory.mjs'
@@ -158,10 +165,12 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           ],
         };
       }
-    }
+      }
+    )
   );
 
   // Tool 2: Assign cluster tags
+  const sessionId_cluster_tags = generateSessionId();
   server.registerTool(
     'atlas.embedding_cluster_tags',
     {
@@ -183,7 +192,11 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Number of top cluster tags to return'),
       }),
     },
-    async ({ packetKey, sourceRef, embedding, topClusters }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.embedding_cluster_tags',
+      sessionId_cluster_tags,
+      async ({ packetKey, sourceRef, embedding, topClusters }) => {
       try {
         const { createAtlasRedisClient } = await import(
           '../../../scripts/atlas/lib/redis-client-factory.mjs'
@@ -254,10 +267,12 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           ],
         };
       }
-    }
+      }
+    )
   );
 
   // Tool 3: Find semantic neighbors
+  const sessionId_neighbors = generateSessionId();
   server.registerTool(
     'atlas.embedding_neighbors',
     {
@@ -279,7 +294,11 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Maximum number of neighbors to find'),
       }),
     },
-    async ({ packetKey, sourceRef, embedding, limit }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.embedding_neighbors',
+      sessionId_neighbors,
+      async ({ packetKey, sourceRef, embedding, limit }) => {
       try {
         const qdrant = getQdrantManager();
         const searchResult = await qdrant.denseSearch({
@@ -334,10 +353,12 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           ],
         };
       }
-    }
+      }
+    )
   );
 
   // Tool 4: Comprehensive tag derivation
+  const sessionId_all_tags = generateSessionId();
   server.registerTool(
     'atlas.embedding_all_tags',
     {
@@ -373,7 +394,11 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           .describe('Maximum semantic neighbors to query'),
       }),
     },
-    async ({ embedding, packetKey, sourceRef, keywordTopK, clusterTopK, neighborLimit }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.embedding_all_tags',
+      sessionId_all_tags,
+      async ({ embedding, packetKey, sourceRef, keywordTopK, clusterTopK, neighborLimit }) => {
       try {
         const { createAtlasRedisClient, VECTOR_LANE_REGISTRY } = await import(
           '../../../scripts/atlas/lib/redis-client-factory.mjs'
@@ -497,7 +522,8 @@ export function registerAtlasEmbeddingTools(server: McpServer, redisUrl?: string
           ],
         };
       }
-    }
+      }
+    )
   );
 }
 

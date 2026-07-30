@@ -7,7 +7,7 @@
 //	GetDocumentToc   — document table-of-contents tree
 //	GetNodeContext   — node with children + chunks + breadcrumb
 //	ResolveCitation  — citation label lookup
-//	Health           — deep health check (pg + redis + qdrant + ollama)
+//	Health           — deep health check (pg + redis + qdrant + embedding)
 //
 // Also exposes HTTP on :8096 for SvelteKit direct calls:
 //
@@ -25,7 +25,8 @@
 //	QDRANT_GRPC_HOST   — Qdrant gRPC host (default localhost)
 //	QDRANT_GRPC_PORT   — Qdrant gRPC port (default 6334)
 //	REDIS_URL          — Redis connection string (default redis://localhost:6379)
-//	OLLAMA_URL         — Ollama API for query embedding (default http://localhost:11434)
+//	EMBEDDING_BASE_URL — Embedding service API for query embedding (default http://localhost:8097)
+//	EMBED_SERVICE_URL  — Embedding service alias (preferred runtime alias)
 //	GRPC_PORT          — gRPC listen port (default 50055)
 //	HTTP_PORT          — HTTP health port (default 8096)
 package main
@@ -70,7 +71,7 @@ type config struct {
 	QdrantHost   string // gRPC host
 	QdrantPort   int    // gRPC port
 	RedisURL     string
-	OllamaURL    string
+	EmbeddingURL string
 	GRPCPort     string
 	HTTPPort     string
 }
@@ -78,20 +79,33 @@ type config struct {
 func loadConfig() config {
 	qdPort, _ := strconv.Atoi(envOr("QDRANT_GRPC_PORT", "6334"))
 	return config{
-		DatabaseURL: envOr("DATABASE_URL", "postgresql://legal_admin:123456@localhost:5434/legal_ai_db"),
-		QdrantURL:   envOr("QDRANT_URL", "http://localhost:6333"),
-		QdrantHost:  envOr("QDRANT_GRPC_HOST", "localhost"),
-		QdrantPort:  qdPort,
-		RedisURL:    envOr("REDIS_URL", "redis://localhost:6379"),
-		OllamaURL:   envOr("OLLAMA_URL", "http://localhost:11434"),
-		GRPCPort:    envOr("GRPC_PORT", "50055"),
-		HTTPPort:    envOr("HTTP_PORT", "8096"),
+		DatabaseURL:  envOr("DATABASE_URL", "postgresql://legal_admin:123456@localhost:5434/legal_ai_db"),
+		QdrantURL:    envOr("QDRANT_URL", "http://localhost:6333"),
+		QdrantHost:   envOr("QDRANT_GRPC_HOST", "localhost"),
+		QdrantPort:   qdPort,
+		RedisURL:     envOr("REDIS_URL", "redis://localhost:6379"),
+		EmbeddingURL: envOrAny("EMBED_SERVICE_URL", "EMBEDDING_BASE_URL", "http://localhost:8097"),
+		GRPCPort:     envOr("GRPC_PORT", "50055"),
+		HTTPPort:     envOr("HTTP_PORT", "8096"),
 	}
 }
 
 func envOr(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
+	}
+	return fallback
+}
+
+func envOrAny(keys ...string) string {
+	if len(keys) == 0 {
+		return ""
+	}
+	fallback := keys[len(keys)-1]
+	for _, key := range keys[:len(keys)-1] {
+		if v := strings.TrimSpace(os.Getenv(key)); v != "" {
+			return v
+		}
 	}
 	return fallback
 }
@@ -104,7 +118,7 @@ type libraryServer struct {
 	pool       *pgxpool.Pool
 	rdb        *redis.Client
 	qdrant     *qdrantclient.Client // native gRPC client
-	httpClient *http.Client         // shared for Ollama + fallback
+	httpClient *http.Client         // shared for embedding service calls
 }
 
 // searchTimeout is the max time for a single search request's parallel fan-out.
@@ -434,10 +448,10 @@ func (s *libraryServer) Health(ctx context.Context, req *pb.HealthRequest) (*pb.
 		qdrantOk = err == nil
 	}
 
-	// Check Ollama
+	// Check embedding service
 	embeddingUp := false
-	olReq, _ := http.NewRequestWithContext(ctx, "GET", s.cfg.OllamaURL+"/api/tags", nil)
-	olResp, err := s.httpClient.Do(olReq)
+	embReq, _ := http.NewRequestWithContext(ctx, "GET", s.cfg.EmbeddingURL+"/health", nil)
+	olResp, err := s.httpClient.Do(embReq)
 	if err == nil {
 		embeddingUp = olResp.StatusCode == 200
 		olResp.Body.Close()
@@ -1140,8 +1154,8 @@ func (s *libraryServer) searchCodebaseChunksNative(ctx context.Context, embeddin
 // searchCodebaseChunksREST performs dense-only ANN search on codebase_chunks_768 via REST.
 func (s *libraryServer) searchCodebaseChunksREST(ctx context.Context, embedding []float32, req *searchRequest) []libraryHit {
 	type qdrantReq struct {
-		Vector      any `json:"vector"`
-		Limit       int `json:"limit"`
+		Vector      any  `json:"vector"`
+		Limit       int  `json:"limit"`
 		WithPayload bool `json:"with_payload"`
 	}
 
@@ -1448,38 +1462,41 @@ func (s *libraryServer) getQueryEmbedding(ctx context.Context, query string) ([]
 	}
 
 	body, _ := json.Marshal(map[string]any{
-		"model":  "embeddinggemma:latest",
-		"prompt": query,
+		"texts": []string{query},
+		"model": "embeddinggemma:latest",
 	})
 
-	req, _ := http.NewRequestWithContext(ctx, "POST", s.cfg.OllamaURL+"/api/embeddings",
+	req, _ := http.NewRequestWithContext(ctx, "POST", s.cfg.EmbeddingURL+"/embed",
 		strings.NewReader(string(body)))
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("ollama embed: %w", err)
+		return nil, fmt.Errorf("embedding service: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("ollama embed status %d", resp.StatusCode)
+		return nil, fmt.Errorf("embedding service status %d", resp.StatusCode)
 	}
 
 	var result struct {
-		Embedding []float32 `json:"embedding"`
+		Embeddings [][]float32 `json:"embeddings"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, err
 	}
+	if len(result.Embeddings) == 0 || len(result.Embeddings[0]) == 0 {
+		return nil, fmt.Errorf("empty embedding service response")
+	}
 
 	// Cache in Redis (24h TTL)
-	if s.rdb != nil && len(result.Embedding) > 0 {
-		data, _ := json.Marshal(result.Embedding)
+	if s.rdb != nil {
+		data, _ := json.Marshal(result.Embeddings[0])
 		s.rdb.Set(ctx, "embed:search:"+query, data, 24*time.Hour)
 	}
 
-	return result.Embedding, nil
+	return result.Embeddings[0], nil
 }
 
 // ── HTTP Handlers ─────────────────────────────────────────────────────────

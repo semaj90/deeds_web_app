@@ -1,6 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { ENV } from "../lib/server/env.server.js";
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 const OLLAMA_URL      = ENV.OLLAMA_BASE_URL;
 const RERANK_URL      = ENV.RERANK_URL;
@@ -9,7 +11,8 @@ const TURBOQUANT_URL  = ENV.TURBOQUANT_URL;
 /**
  * Unified inference routing (Bifrost Gateway).
  */
-export function registerBifrostTools(server: McpServer) {
+export function registerBifrostTools(server: McpServer, dispatcherMiddleware?: DispatcherMiddleware) {
+  const sessionId_bifrost = generateSessionId();
 
   server.registerTool(
     'trace.bifrost_dispatch',
@@ -20,7 +23,11 @@ export function registerBifrostTools(server: McpServer) {
         payload: z.record(z.string(), z.any()).describe('OpenAI-compatible payload or tool-specific JSON')
       })
     },
-    async ({ tier, payload }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'trace.bifrost_dispatch',
+      sessionId_bifrost,
+      async ({ tier, payload }) => {
       let targetUrl = '';
       let endpoint = '/v1/chat/completions';
 
@@ -59,6 +66,7 @@ export function registerBifrostTools(server: McpServer) {
       } catch (err: any) {
         return { content: [{ type: 'text', text: `Bifrost Dispatch failed [${tier}]: ${err.message}` }], isError: true };
       }
-    }
+      }
+    )
   );
 }

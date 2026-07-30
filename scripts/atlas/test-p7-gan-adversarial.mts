@@ -11,6 +11,14 @@ interface TestResult {
   details: string;
 }
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return String(error);
+}
+
 const results: TestResult[] = [];
 
 console.log('╔════════════════════════════════════════════════════════╗');
@@ -34,9 +42,10 @@ try {
     console.log(`❌ Expected ${expectedProbes} probes, got ${ADVERSARIAL_PROBES.length}`);
     results.push({ name: 'Probe inventory', passed: false, details: `Count mismatch` });
   }
-} catch (err: any) {
-  console.log(`❌ Inventory check failed: ${err.message}`);
-  results.push({ name: 'Probe inventory', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ Inventory check failed: ${message}`);
+  results.push({ name: 'Probe inventory', passed: false, details: message });
 }
 
 // Test 2: Run all probes
@@ -60,9 +69,10 @@ try {
     console.log(`❌ ${failedCount} probe(s) failed`);
     results.push({ name: 'Probe execution', passed: false, details: `${failedCount} failed` });
   }
-} catch (err: any) {
-  console.log(`❌ Probe execution failed: ${err.message}`);
-  results.push({ name: 'Probe execution', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ Probe execution failed: ${message}`);
+  results.push({ name: 'Probe execution', passed: false, details: message });
 }
 
 // Test 3: Missing packet_key probe (ADV001)
@@ -79,9 +89,10 @@ try {
     console.log('❌ ADV001 probe did not fail as expected');
     results.push({ name: 'ADV001 probe', passed: false, details: 'Should have failed' });
   }
-} catch (err: any) {
-  console.log(`❌ ADV001 test failed: ${err.message}`);
-  results.push({ name: 'ADV001 probe', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ ADV001 test failed: ${message}`);
+  results.push({ name: 'ADV001 probe', passed: false, details: message });
 }
 
 // Test 4: Invalid source_ref probe (ADV002)
@@ -98,9 +109,10 @@ try {
     console.log('❌ ADV002 probe did not fail as expected');
     results.push({ name: 'ADV002 probe', passed: false, details: 'Should have failed' });
   }
-} catch (err: any) {
-  console.log(`❌ ADV002 test failed: ${err.message}`);
-  results.push({ name: 'ADV002 probe', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ ADV002 test failed: ${message}`);
+  results.push({ name: 'ADV002 probe', passed: false, details: message });
 }
 
 // Test 5: Fake table probe (ADV003)
@@ -117,9 +129,10 @@ try {
     console.log('❌ ADV003 probe did not fail as expected');
     results.push({ name: 'ADV003 probe', passed: false, details: 'Should have failed' });
   }
-} catch (err: any) {
-  console.log(`❌ ADV003 test failed: ${err.message}`);
-  results.push({ name: 'ADV003 probe', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ ADV003 test failed: ${message}`);
+  results.push({ name: 'ADV003 probe', passed: false, details: message });
 }
 
 // Test 6: Placeholder terms probe (ADV004)
@@ -136,9 +149,10 @@ try {
     console.log('❌ ADV004 probe did not fail as expected');
     results.push({ name: 'ADV004 probe', passed: false, details: 'Should have failed' });
   }
-} catch (err: any) {
-  console.log(`❌ ADV004 test failed: ${err.message}`);
-  results.push({ name: 'ADV004 probe', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ ADV004 test failed: ${message}`);
+  results.push({ name: 'ADV004 probe', passed: false, details: message });
 }
 
 // Test 7: Write order violation probe (ADV005)
@@ -155,9 +169,10 @@ try {
     console.log('❌ ADV005 probe did not fail as expected');
     results.push({ name: 'ADV005 probe', passed: false, details: 'Should have failed' });
   }
-} catch (err: any) {
-  console.log(`❌ ADV005 test failed: ${err.message}`);
-  results.push({ name: 'ADV005 probe', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ ADV005 test failed: ${message}`);
+  results.push({ name: 'ADV005 probe', passed: false, details: message });
 }
 
 // Test 8: Event order violation probe (ADV006)
@@ -174,9 +189,10 @@ try {
     console.log('❌ ADV006 probe did not fail as expected');
     results.push({ name: 'ADV006 probe', passed: false, details: 'Should have failed' });
   }
-} catch (err: any) {
-  console.log(`❌ ADV006 test failed: ${err.message}`);
-  results.push({ name: 'ADV006 probe', passed: false, details: err.message });
+} catch (err: unknown) {
+  const message = getErrorMessage(err);
+  console.log(`❌ ADV006 test failed: ${message}`);
+  results.push({ name: 'ADV006 probe', passed: false, details: message });
 }
 
 // Summary

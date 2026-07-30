@@ -866,7 +866,7 @@ services:
       QDRANT_GRPC_HOST: qdrant
       QDRANT_GRPC_PORT: "6334"
       REDIS_URL: redis://:redis@valkey:6379
-      OLLAMA_URL: http://host.docker.internal:11434
+      EMBEDDING_BASE_URL: http://legal-ai-go-embedding:8097
       GRPC_PORT: "50055"
       HTTP_PORT: "8096"
     extra_hosts:
@@ -943,10 +943,8 @@ services:
       QDRANT_GRPC_HOST: qdrant
       QDRANT_GRPC_PORT: "6334"
       REDIS_URL: redis://:redis@valkey:6379
-      OLLAMA_URL: http://host.docker.internal:11434
       EMBEDDING_BASE_URL: http://legal-ai-go-embedding:8097
       EMBED_MODEL: "embeddinggemma:latest"
-      GPU_EMBED_ENABLED: "true"
       GRPC_PORT: "50053"
       HTTP_PORT: "8100"
     extra_hosts:

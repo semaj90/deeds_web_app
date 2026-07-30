@@ -1,12 +1,16 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import pg from 'pg';
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 /**
  * Topology Management Tools (Read-Only/Planning)
  * Aligned with the corrected topology model which forbids heuristic in-route writes.
  */
-export function registerTopologyMgmtTools(server: McpServer, pool: any) {
+export function registerTopologyMgmtTools(server: McpServer, pool: any, dispatcherMiddleware?: DispatcherMiddleware) {
+  const sessionId_hydration_status = generateSessionId();
+  const sessionId_recompute_manifold = generateSessionId();
   
   // == topology.hydration_status ==============================================
   /**
@@ -18,7 +22,11 @@ export function registerTopologyMgmtTools(server: McpServer, pool: any) {
       description: 'Returns a diagnostic overview of topological hydration coverage.',
       inputSchema: z.object({})
     },
-    async () => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'topology.hydration_status',
+      sessionId_hydration_status,
+      async () => {
       try {
         const stats = await pool.query(`
           SELECT 
@@ -51,7 +59,8 @@ export function registerTopologyMgmtTools(server: McpServer, pool: any) {
       } catch (err: any) {
         return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
       }
-    }
+      }
+    )
   );
 
   // == topology.recompute_manifold_plan =======================================
@@ -64,7 +73,11 @@ export function registerTopologyMgmtTools(server: McpServer, pool: any) {
       description: 'Provides a recommended plan for restoring topological hydration.',
       inputSchema: z.object({})
     },
-    async () => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'topology.recompute_manifold_plan',
+      sessionId_recompute_manifold,
+      async () => {
       try {
         const stats = await pool.query(`
           SELECT 
@@ -99,6 +112,7 @@ export function registerTopologyMgmtTools(server: McpServer, pool: any) {
       } catch (err: any) {
         return { content: [{ type: 'text', text: `Error: ${err.message}` }], isError: true };
       }
-    }
+      }
+    )
   );
 }

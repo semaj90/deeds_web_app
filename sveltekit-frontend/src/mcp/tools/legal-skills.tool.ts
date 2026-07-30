@@ -3,6 +3,44 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 
+const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
+const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
+
+async function callLlamaServer(prompt: string, format?: 'json' | 'text', timeoutMs = 90_000): Promise<string> {
+  for (const model of MODEL_PREFERENCE) {
+    try {
+      const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.3,
+          max_tokens: 2048,
+          stream: false,
+          ...(format === 'json' && { response_format: { type: 'json_object' } }),
+        }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (!res.ok) {
+        if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
+          throw new Error(`llama-server ${res.status}`);
+        }
+        continue;
+      }
+
+      const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+      return data.choices?.[0]?.message?.content ?? '{}';
+    } catch (err) {
+      if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
+        throw err;
+      }
+    }
+  }
+  throw new Error('No LLM models available');
+}
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
@@ -190,7 +228,6 @@ export function registerLegalSkillsTools(server: McpServer) {
       },
     },
     async ({ witnessName = 'Unknown Witness', witnessStatement = '', caseContext = '' }) => {
-      const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
       const prompt = `You are an experienced trial attorney preparing cross-examination questions.
 Witness: ${witnessName}
 Statement: ${witnessStatement.slice(0, 8000)}
@@ -204,19 +241,12 @@ Generate 5-8 strategic cross-examination questions. For each question include:
 
 Respond as JSON: { "witness": "${witnessName}", "questions": [...], "strategy": "..." }`;
 
-      const res = await fetch(`${ollamaUrl}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, format: 'json' }),
-        signal: AbortSignal.timeout(18_000),
-      });
-      if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
-      const data = await res.json() as { response?: string };
       try {
-        const parsed = JSON.parse(data.response ?? '{}');
+        const response = await callLlamaServer(prompt, 'json', 18_000);
+        const parsed = JSON.parse(response);
         return { content: [{ type: 'text', text: JSON.stringify(parsed) }] };
-      } catch {
-        return { content: [{ type: 'text', text: data.response ?? '{}' }] };
+      } catch (err) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }], isError: true };
       }
     },
   );
@@ -404,7 +434,6 @@ Respond as JSON: { "witness": "${witnessName}", "questions": [...], "strategy": 
           `[${r.id}] ${r.title ?? ''}: ${((r.extracted_text ?? r.description) ?? '').slice(0, 1200)}`
         ).join('\n\n');
 
-        const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
         const prompt = `You are a legal analyst extracting a timeline from case evidence.
 
 Evidence:
@@ -420,24 +449,17 @@ Extract up to ${maxEvents} chronological events. For each event return:
 
 Return ONLY valid JSON: { "events": [...] }`;
 
-        const res = await fetch(`${ollamaUrl}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, format: 'json' }),
-          signal: AbortSignal.timeout(90_000),
-        });
-        if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
-        const data = await res.json() as { response?: string };
         try {
-          const parsed = JSON.parse(data.response ?? '{}') as { events?: unknown[] };
+          const response = await callLlamaServer(prompt, 'json', 90_000);
+          const parsed = JSON.parse(response) as { events?: unknown[] };
           return {
             content: [{
               type: 'text',
               text: JSON.stringify({ caseId, evidenceCount: evRows.rowCount, ...parsed }),
             }],
           };
-        } catch {
-          return { content: [{ type: 'text', text: data.response ?? '{}' }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }], isError: true };
         }
       } finally {
         await pool.end();
@@ -535,7 +557,6 @@ Return ONLY valid JSON: { "events": [...] }`;
         const c = caseRow.rows[0];
         const ev = evRow.rows[0];
 
-        const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
         const prompt = `You are a senior prosecutor analyzing a case for legal issues.
 
 Case: ${c.title}
@@ -554,19 +575,12 @@ Return JSON with exactly these fields:
   "confidence": number
 }`;
 
-        const res = await fetch(`${ollamaUrl}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, format: 'json' }),
-          signal: AbortSignal.timeout(90_000),
-        });
-        if (!res.ok) return { content: [{ type: 'text', text: JSON.stringify({ error: `Ollama ${res.status}` }) }] };
-        const data = await res.json() as { response?: string };
         try {
-          const parsed = JSON.parse(data.response ?? '{}');
+          const response = await callLlamaServer(prompt, 'json', 90_000);
+          const parsed = JSON.parse(response);
           return { content: [{ type: 'text', text: JSON.stringify({ caseId, caseTitle: c.title, ...parsed }) }] };
-        } catch {
-          return { content: [{ type: 'text', text: data.response ?? '{}' }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: JSON.stringify({ error: err instanceof Error ? err.message : String(err) }) }], isError: true };
         }
       } finally {
         await pool.end();
@@ -774,22 +788,10 @@ Return JSON with exactly these fields:
     async ({ caseId, chargeDescription, defenseTheory }) => {
       const { Pool } = await import('pg');
       const pool = new Pool({ connectionString: ENV.DATABASE_URL, max: 2 });
-      const ollamaUrl = ENV.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 
-      async function callGemma(role: string, ctx: string, userPrompt: string): Promise<string> {
-        const res = await fetch(`${ollamaUrl}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'gemma4-rotorquant:latest',
-            prompt: `${ctx}\n\n${userPrompt}`,
-            stream: false,
-            format: 'json',
-          }),
-          signal: AbortSignal.timeout(60_000),
-        });
-        if (!res.ok) throw new Error(`Ollama ${res.status} for role=${role}`);
-        return ((await res.json() as { response?: string }).response) ?? '{}';
+      async function callGemmaMockTrial(role: string, ctx: string, userPrompt: string): Promise<string> {
+        const fullPrompt = `${ctx}\n\n${userPrompt}`;
+        return callLlamaServer(fullPrompt, 'json', 60_000);
       }
 
       try {
@@ -812,19 +814,19 @@ Return JSON with exactly these fields:
         const caseCtx = `Case: ${caseTitle}\nCharge: ${chargeDescription}\nEvidence:\n${evidenceSummary}`;
 
         const [prosecutionRaw, defenseRaw] = await Promise.all([
-          callGemma(
+          callGemmaMockTrial(
             'prosecution',
             'You are the prosecutor. Be assertive, fact-focused, and legally precise.',
             `${caseCtx}\n\nWrite an opening statement as JSON: { "opening": string, "keyArguments": string[], "evidenceHighlights": string[] }`,
           ),
-          callGemma(
+          callGemmaMockTrial(
             'defense',
             'You are the defense attorney. Challenge the prosecution\'s case and present your theory.',
             `${caseCtx}\n${defenseTheory ? `Defense theory: ${defenseTheory}\n` : ''}Write defense opening as JSON: { "opening": string, "challengePoints": string[], "alternativeNarrative": string }`,
           ),
         ]);
 
-        const judgeRaw = await callGemma(
+        const judgeRaw = await callGemmaMockTrial(
           'judge',
           'You are the presiding judge evaluating both sides objectively under the rules of evidence.',
           `${caseCtx}\nProsecution: ${prosecutionRaw.slice(0, 1500)}\nDefense: ${defenseRaw.slice(0, 1500)}\n\nProvide judicial assessment as JSON: { "admissibleEvidence": string[], "excludedEvidence": string[], "prosecutionStrengthScore": number, "defenseStrengthScore": number, "verdictProbability": { "guilty": number, "notGuilty": number }, "keyWeaknesses": string[], "judicialNotes": string }`,

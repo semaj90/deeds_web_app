@@ -25,6 +25,8 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 const STATEMENT_TIMEOUT_MS = 2000;
 
@@ -62,7 +64,9 @@ async function tableNotes(pool: any, tableName: string): Promise<string[]> {
   return notes;
 }
 
-export function registerDbInspectionTools(server: McpServer, pool: any) {
+export function registerDbInspectionTools(server: McpServer, pool: any, dispatcherMiddleware?: DispatcherMiddleware) {
+  const sessionId_schema_overview = generateSessionId();
+  const sessionId_table_inspect = generateSessionId();
 
   // == db.schema_overview =====================================================
   // Lists every table in the public schema with row estimate + structural flags.
@@ -79,7 +83,11 @@ export function registerDbInspectionTools(server: McpServer, pool: any) {
           .describe('Postgres schema to enumerate (default "public").'),
       })
     },
-    async ({ include_row_estimates, schema }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'db.schema_overview',
+      sessionId_schema_overview,
+      async ({ include_row_estimates, schema }) => {
       const client = await pool.connect();
       try {
         await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
@@ -141,7 +149,8 @@ export function registerDbInspectionTools(server: McpServer, pool: any) {
       } finally {
         client.release();
       }
-    }
+      }
+    )
   );
 
   // == db.table_inspect =======================================================
@@ -165,7 +174,11 @@ export function registerDbInspectionTools(server: McpServer, pool: any) {
           .describe('Include foreign-key references (default true).'),
       })
     },
-    async ({ table, schema, include_columns, include_indexes, include_foreign_keys }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'db.table_inspect',
+      sessionId_table_inspect,
+      async ({ table, schema, include_columns, include_indexes, include_foreign_keys }) => {
       const client = await pool.connect();
       try {
         await client.query(`SET LOCAL statement_timeout = ${STATEMENT_TIMEOUT_MS}`);
@@ -266,6 +279,7 @@ export function registerDbInspectionTools(server: McpServer, pool: any) {
       } finally {
         client.release();
       }
-    }
+      }
+    )
   );
 }

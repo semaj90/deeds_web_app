@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-11T00:46:53.329Z",
-  "mode": "apply",
+  "generatedAt": "2026-07-30T07:33:09.334Z",
+  "mode": "dry-run",
   "limit": 25,
   "source": {
     "table": "atlas_higher_hop_index",
@@ -11,10 +11,415 @@
     "packetKeysPlanned": 25,
     "featureKeysPlanned": 25,
     "aceKeysPlanned": 75,
-    "appliedWrites": 225,
+    "appliedWrites": 0,
     "failures": 0
   },
   "plans": [
+    {
+      "key": "bifrost:sem:packet:0ba2345cd9c542fa",
+      "ttl": 86400,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50954,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:feature:grpc_service",
+      "ttl": 86400,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50954,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:context:0ba2345cd9c542fa",
+      "ttl": 3600,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50954,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:feature:grpc_service",
+      "ttl": 3600,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50954,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:grpc_service",
+      "ttl": 7200,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:50954",
+      "ttl": 7200,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": "50954",
+      "som_cluster": null
+    },
+    {
+      "key": "ace:summary:0ba2345cd9c542fa",
+      "ttl": 3600,
+      "source_ref": "proto:retrievalservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:packet:0bffe0382a0d44bb",
+      "ttl": 86400,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50955,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:feature:grpc_service",
+      "ttl": 86400,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50955,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:context:0bffe0382a0d44bb",
+      "ttl": 3600,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50955,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:feature:grpc_service",
+      "ttl": 3600,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50955,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:infrastructure",
+      "ttl": 7200,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:grpc_service",
+      "ttl": 7200,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:50955",
+      "ttl": 7200,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": "50955",
+      "som_cluster": null
+    },
+    {
+      "key": "ace:summary:0bffe0382a0d44bb",
+      "ttl": 3600,
+      "source_ref": "proto:toolcallingservice.executetoolbatch",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:packet:0ee918abc8c53e8d",
+      "ttl": 86400,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50956,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:feature:grpc_service",
+      "ttl": 86400,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50956,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:context:0ee918abc8c53e8d",
+      "ttl": 3600,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50956,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:feature:grpc_service",
+      "ttl": 3600,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50956,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:grpc_service",
+      "ttl": 7200,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:50956",
+      "ttl": 7200,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": "50956",
+      "som_cluster": null
+    },
+    {
+      "key": "ace:summary:0ee918abc8c53e8d",
+      "ttl": 3600,
+      "source_ref": "proto:turboveccudaservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:packet:1703d9c005252a62",
+      "ttl": 86400,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50957,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:feature:grpc_service",
+      "ttl": 86400,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50957,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:context:1703d9c005252a62",
+      "ttl": 3600,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50957,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:feature:grpc_service",
+      "ttl": 3600,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50957,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:grpc_service",
+      "ttl": 7200,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:50957",
+      "ttl": 7200,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": "50957",
+      "som_cluster": null
+    },
+    {
+      "key": "ace:summary:1703d9c005252a62",
+      "ttl": 3600,
+      "source_ref": "proto:librarysearchservice.health",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:packet:175066b8a4ceee3c",
+      "ttl": 86400,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50958,
+      "som_cluster": null
+    },
+    {
+      "key": "bifrost:sem:feature:grpc_service",
+      "ttl": 86400,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50958,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:context:175066b8a4ceee3c",
+      "ttl": 3600,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50958,
+      "som_cluster": null
+    },
+    {
+      "key": "ace:feature:grpc_service",
+      "ttl": 3600,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": 50958,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:domain:retrieval",
+      "ttl": 7200,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:feature:grpc_service",
+      "ttl": 7200,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:kmeans:",
+      "ttl": 7200,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": null,
+      "som_cluster": null
+    },
+    {
+      "key": "atlas:centroid:community:50958",
+      "ttl": 7200,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": null,
+      "feature_label": null,
+      "community_id": "50958",
+      "som_cluster": null
+    },
+    {
+      "key": "ace:summary:175066b8a4ceee3c",
+      "ttl": 3600,
+      "source_ref": "proto:turbovecservice.transform",
+      "feature_id": "grpc_service",
+      "feature_label": "",
+      "community_id": null,
+      "som_cluster": null
+    },
     {
       "key": "bifrost:sem:packet:packet:0003260092b1",
       "ttl": 86400,
@@ -1634,413 +2039,7 @@
       "feature_label": "",
       "community_id": null,
       "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:packet:packet:0011a232d0b8",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:feature:sveltekit-frontend.npy_os",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:context:packet:0011a232d0b8",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:feature:sveltekit-frontend.npy_os",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:domain:retrieval",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:feature:sveltekit-frontend.npy_os",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:kmeans:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:community:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:summary:packet:0011a232d0b8",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/.venv_turbovec/Lib/site-packages/numpy/_core/include/numpy/npy_os.h",
-      "feature_id": "sveltekit-frontend.npy_os",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:packet:packet:001375b841d0",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:context:packet:001375b841d0",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:domain:documentation",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:kmeans:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:community:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:summary:packet:001375b841d0",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/tests__routes__auto__api__cases____id__connections.test.md",
-      "feature_id": "sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:packet:packet:0014d8ac7795",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:context:packet:0014d8ac7795",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:domain:documentation",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:kmeans:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:community:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:summary:packet:0014d8ac7795",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/src__routes__api__cases___id___persons___server.md",
-      "feature_id": "sveltekit-frontend.src__routes__api__cases___id___persons___server",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:packet:packet:0014edb0c6e4",
-      "ttl": 86400,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:feature:neschrom97.a45aa64da8f0240c",
-      "ttl": 86400,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:context:packet:0014edb0c6e4",
-      "ttl": 3600,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:feature:neschrom97.a45aa64da8f0240c",
-      "ttl": 3600,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:domain:infrastructure",
-      "ttl": 7200,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:feature:neschrom97.a45aa64da8f0240c",
-      "ttl": 7200,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:kmeans:",
-      "ttl": 7200,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:community:",
-      "ttl": 7200,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:summary:packet:0014edb0c6e4",
-      "ttl": 3600,
-      "source_ref": "neschrom97/cards/a45aa64da8f0240c.json",
-      "feature_id": "neschrom97.a45aa64da8f0240c",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:packet:packet:0015b28db252",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "bifrost:sem:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "ttl": 86400,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:context:packet:0015b28db252",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:domain:retrieval",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:kmeans:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "atlas:centroid:community:",
-      "ttl": 7200,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": null,
-      "feature_label": null,
-      "community_id": null,
-      "som_cluster": null
-    },
-    {
-      "key": "ace:summary:packet:0015b28db252",
-      "ttl": 3600,
-      "source_ref": "sveltekit-frontend/docs/obsidian-vault/Files/scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search.md",
-      "feature_id": "sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search",
-      "feature_label": "",
-      "community_id": null,
-      "som_cluster": null
     }
   ],
-  "nextSafeAction": "Hot cache families were warmed; rerun the Bitfrost audit to verify key counts and TTL samples.",
-  "failures": []
+  "nextSafeAction": "Review the dry-run plan, then rerun with --apply to materialize the hot Bitfrost families."
 }

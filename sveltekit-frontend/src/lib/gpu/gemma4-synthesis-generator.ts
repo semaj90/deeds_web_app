@@ -188,50 +188,55 @@ async function callTurboQuantSynthesis(
 }
 
 /**
- * Call Ollama at :11434
+ * Call llama-server at :8090 (fallback via MODEL_PREFERENCE)
  */
 async function callOllamaSynthesis(
   prompt: string,
   maxTokens: number,
   temperature: number
 ): Promise<SynthesisResponse | null> {
-  const OLLAMA_URL = (process.env.OLLAMA_HOST || 'http://127.0.0.1:11434').replace(
-    /^0\.0\.0\.0/,
-    '127.0.0.1'
-  );
+  const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
+  const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
 
-  try {
-    const response = await fetch(`${OLLAMA_URL}/api/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        messages: [
-          { role: 'system', content: 'You are a legal research synthesis assistant.' },
-          { role: 'user', content: prompt }
-        ],
-        stream: false,
-        think: false, // Don't use reasoning block
-        options: {
+  for (const model of MODEL_PREFERENCE) {
+    try {
+      const response = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: 'You are a legal research synthesis assistant.' },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: maxTokens,
           temperature,
-          num_predict: maxTokens
+          stream: false,
+          cache_prompt: true
+        }),
+        signal: AbortSignal.timeout(60_000)
+      });
+
+      if (!response.ok) {
+        if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
+          throw new Error(`llama-server HTTP ${response.status}`);
         }
-      }),
-      signal: AbortSignal.timeout(60_000)
-    });
+        continue;
+      }
 
-    if (!response.ok) {
-      throw new Error(`Ollama HTTP ${response.status}`);
+      const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+      const answerText = data.choices?.[0]?.message?.content?.trim() || '';
+
+      return parseAndCiteSynthesis(answerText);
+    } catch (err) {
+      if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
+        console.warn('[Synthesis] llama-server fallback chain exhausted:', err);
+        return null;
+      }
     }
-
-    const data = (await response.json()) as { message?: { content?: string } };
-    const answerText = data.message?.content?.trim() || '';
-
-    return parseAndCiteSynthesis(answerText);
-  } catch (err) {
-    console.warn('[Synthesis] Ollama call failed:', err);
-    return null;
   }
+
+  return null;
 }
 
 /**

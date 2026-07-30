@@ -8,10 +8,15 @@ import { archiveSynthesisMemory } from '../lib/server/indexer/synthesis-memory-a
 import { generateEmbedding } from '../lib/server/grpc/embedding-client.js';
 import { buildFeaturePrefetchContext } from './context-prefetch.js';
 import type { FeaturePrefetchContextResult } from './context-prefetch.js';
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 /**
  * Register new agentic tools for organizing messy text and advanced retrieval.
  * These tools leverage the native TS LangExtract + TurboQuant Reranker.
+ *
+ * All tool handlers are wrapped with the dispatcher middleware for automatic
+ * state tracking, audit logging, and agent learning integration.
  *
  * Canonical surface uses `kb.*` prefix plus the named tool `trace.kag_search`
  * (per §10 of the dev guide — registered unconditionally as a thin alias of
@@ -28,6 +33,7 @@ import type { FeaturePrefetchContextResult } from './context-prefetch.js';
 export function registerNewTools(
   server: McpServer,
   config: { rerankUrl: string },
+  dispatcherMiddleware: DispatcherMiddleware,
   enableLegacy = false
 ) {
   type AtlasChunkCard = {
@@ -170,6 +176,7 @@ export function registerNewTools(
 
   // == kb.organize_messy_text ==================================================
 
+  const sessionId_organize = generateSessionId();
   server.registerTool(
     'kb.organize_messy_text',
     {
@@ -179,7 +186,11 @@ export function registerNewTools(
         query: z.string().optional().describe('Relevance query (e.g. "key legal facts")'),
       }),
     },
-    async ({ text, query }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'kb.organize_messy_text',
+      sessionId_organize,
+      async ({ text, query }) => {
       try {
         // 1. Extract using the native TS heuristic (Regex + Entity detection)
         const doc = extractDocumentNative(text, 'mcp-organize-task');
@@ -218,11 +229,13 @@ export function registerNewTools(
           isError: true,
         };
       }
-    }
+      }
+    )
   );
 
   // == kb.extract_citations ===================================================
 
+  const sessionId_extract = generateSessionId();
   server.registerTool(
     'kb.extract_citations',
     {
@@ -231,13 +244,18 @@ export function registerNewTools(
         text: z.string().describe('Text to scan for legal citations'),
       }),
     },
-    async ({ text }) => {
-      const doc = extractDocumentNative(text, 'mcp-citation-task');
-      const citations = doc.entities.filter((e) => e.type === 'citation' || e.type === 'statute');
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(citations, null, 2) }],
-      };
-    }
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'kb.extract_citations',
+      sessionId_extract,
+      async ({ text }) => {
+        const doc = extractDocumentNative(text, 'mcp-citation-task');
+        const citations = doc.entities.filter((e) => e.type === 'citation' || e.type === 'statute');
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(citations, null, 2) }],
+        };
+      }
+    )
   );
 
   // == kb.trace_search ========================================================
@@ -287,6 +305,7 @@ export function registerNewTools(
     }
   }
 
+  const sessionId_trace = generateSessionId();
   server.registerTool(
     'kb.trace_search',
     {
@@ -301,9 +320,15 @@ export function registerNewTools(
           .describe('Lenses: purpose, risk, api_surface, dependencies, retrieval_role'),
       }),
     },
-    handleTraceSearch
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'kb.trace_search',
+      sessionId_trace,
+      handleTraceSearch
+    )
   );
 
+  const sessionId_atlas_query = generateSessionId();
   server.registerTool(
     'atlas.query',
     {
@@ -318,7 +343,12 @@ export function registerNewTools(
           .describe('Lenses: purpose, risk, api_surface, dependencies, retrieval_role'),
       }),
     },
-    handleTraceSearch
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.query',
+      sessionId_atlas_query,
+      handleTraceSearch
+    )
   );
 
   // `trace.kag_search` is registered in the standalone TRACE server with the
@@ -326,6 +356,7 @@ export function registerNewTools(
   // and the legacy aliases only.
 
   if (enableLegacy) {
+    const sessionId_trace_legacy = generateSessionId();
     server.registerTool(
       'trace_search',
       {
@@ -336,7 +367,12 @@ export function registerNewTools(
           intent: z.array(z.string()).optional(),
         }),
       },
-      handleTraceSearch
+      createToolWithDispatcher(
+        dispatcherMiddleware,
+        'trace_search',
+        sessionId_trace_legacy,
+        handleTraceSearch
+      )
     );
   }
 
@@ -356,6 +392,7 @@ export function registerNewTools(
     }
   }
 
+  const sessionId_wiki = generateSessionId();
   server.registerTool(
     'kb.wiki_note_lookup',
     {
@@ -365,10 +402,16 @@ export function registerNewTools(
         limit: z.number().int().min(1).max(20).default(5),
       }),
     },
-    handleWikiLookup
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'kb.wiki_note_lookup',
+      sessionId_wiki,
+      handleWikiLookup
+    )
   );
 
   if (enableLegacy) {
+    const sessionId_wiki_legacy = generateSessionId();
     server.registerTool(
       'wiki_note_lookup',
       {
@@ -379,12 +422,18 @@ export function registerNewTools(
           limit: z.number().int().min(1).max(20).default(5),
         }),
       },
-      handleWikiLookup
+      createToolWithDispatcher(
+        dispatcherMiddleware,
+        'wiki_note_lookup',
+        sessionId_wiki_legacy,
+        handleWikiLookup
+      )
     );
   }
 
   // == kb.archive_synthesis ===================================================
 
+  const sessionId_archive = generateSessionId();
   server.registerTool(
     'kb.archive_synthesis',
     {
@@ -396,23 +445,29 @@ export function registerNewTools(
         tags: z.array(z.string()).default([]).describe('Keywords for retrieval'),
       }),
     },
-    async ({ title, content, source, tags }) => {
-      try {
-        const res = await archiveSynthesisMemory({ title, content, source, tags });
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(res, null, 2) }],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text' as const, text: `Archiving failed: ${err}` }],
-          isError: true,
-        };
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'kb.archive_synthesis',
+      sessionId_archive,
+      async ({ title, content, source, tags }) => {
+        try {
+          const res = await archiveSynthesisMemory({ title, content, source, tags });
+          return {
+            content: [{ type: 'text' as const, text: JSON.stringify(res, null, 2) }],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text' as const, text: `Archiving failed: ${err}` }],
+            isError: true,
+          };
+        }
       }
-    }
+    )
   );
 
   // == context.prefetch_feature_context ======================================
 
+  const sessionId_prefetch = generateSessionId();
   server.registerTool(
     'context.prefetch_feature_context',
     {
@@ -437,52 +492,58 @@ export function registerNewTools(
         includeAgentsMd: z.boolean().default(true).describe('Include nearest AGENTS.md quick hits'),
       }),
     },
-    async ({
-      path,
-      query,
-      limit,
-      activityLimit,
-      includeCommunity,
-      includeNotecards,
-      includeAgentsMd,
-    }) => {
-      try {
-        if (!path && !query) {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'context.prefetch_feature_context',
+      sessionId_prefetch,
+      async ({
+        path,
+        query,
+        limit,
+        activityLimit,
+        includeCommunity,
+        includeNotecards,
+        includeAgentsMd,
+      }) => {
+        try {
+          if (!path && !query) {
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: 'context.prefetch_feature_context requires either path or query.',
+                },
+              ],
+              isError: true,
+            };
+          }
+
+          const packet = await buildFeaturePrefetchContext({
+            path,
+            query,
+            limit,
+            activityLimit,
+            includeCommunity,
+            includeNotecards,
+            includeAgentsMd,
+          });
+
+          return {
+            content: [{ type: 'text' as const, text: JSON.stringify(packet, null, 2) }],
+          };
+        } catch (err) {
           return {
             content: [
-              {
-                type: 'text' as const,
-                text: 'context.prefetch_feature_context requires either path or query.',
-              },
+              { type: 'text' as const, text: `context.prefetch_feature_context failed: ${err}` },
             ],
             isError: true,
           };
         }
-
-        const packet = await buildFeaturePrefetchContext({
-          path,
-          query,
-          limit,
-          activityLimit,
-          includeCommunity,
-          includeNotecards,
-          includeAgentsMd,
-        });
-
-        return {
-          content: [{ type: 'text' as const, text: JSON.stringify(packet, null, 2) }],
-        };
-      } catch (err) {
-        return {
-          content: [
-            { type: 'text' as const, text: `context.prefetch_feature_context failed: ${err}` },
-          ],
-          isError: true,
-        };
       }
-    }
+    )
   );
 
+  const sessionId_compact = generateSessionId();
   server.registerTool(
     'atlas.compact_context',
     {
@@ -490,132 +551,156 @@ export function registerNewTools(
         'Build a compact Atlas context packet with top chunks, sourceRefs, a compressed summary, confidence, and retrieval path.',
       inputSchema: atlasPrefetchInputSchema,
     },
-    async (options) => {
-      try {
-        const compact = await loadAtlasCompactContext(options);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(compact, null, 2),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text' as const, text: `atlas.compact_context failed: ${err}` }],
-          isError: true,
-        };
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.compact_context',
+      sessionId_compact,
+      async (options) => {
+        try {
+          const compact = await loadAtlasCompactContext(options);
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(compact, null, 2),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text' as const, text: `atlas.compact_context failed: ${err}` }],
+            isError: true,
+          };
+        }
       }
-    }
+    )
   );
 
+  const sessionId_source_refs = generateSessionId();
   server.registerTool(
     'atlas.source_refs',
     {
       description: 'Return the top sourceRefs from the compact Atlas packet.',
       inputSchema: atlasPrefetchInputSchema,
     },
-    async (options) => {
-      try {
-        const compact = await loadAtlasCompactContext(options);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(
-                {
-                  query: compact.query,
-                  sourceRefs: compact.sourceRefs,
-                  confidence: compact.confidence,
-                  retrieval_path: compact.retrieval_path,
-                },
-                null,
-                2
-              ),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text' as const, text: `atlas.source_refs failed: ${err}` }],
-          isError: true,
-        };
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.source_refs',
+      sessionId_source_refs,
+      async (options) => {
+        try {
+          const compact = await loadAtlasCompactContext(options);
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  {
+                    query: compact.query,
+                    sourceRefs: compact.sourceRefs,
+                    confidence: compact.confidence,
+                    retrieval_path: compact.retrieval_path,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text' as const, text: `atlas.source_refs failed: ${err}` }],
+            isError: true,
+          };
+        }
       }
-    }
+    )
   );
 
+  const sessionId_suggest_files = generateSessionId();
   server.registerTool(
     'atlas.suggest_files',
     {
       description: 'Return the top suggested files from the compact Atlas packet.',
       inputSchema: atlasPrefetchInputSchema,
     },
-    async (options) => {
-      try {
-        const compact = await loadAtlasCompactContext(options);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(
-                {
-                  query: compact.query,
-                  suggested_files: compact.suggested_files,
-                  confidence: compact.confidence,
-                  retrieval_path: compact.retrieval_path,
-                },
-                null,
-                2
-              ),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text' as const, text: `atlas.suggest_files failed: ${err}` }],
-          isError: true,
-        };
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.suggest_files',
+      sessionId_suggest_files,
+      async (options) => {
+        try {
+          const compact = await loadAtlasCompactContext(options);
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  {
+                    query: compact.query,
+                    suggested_files: compact.suggested_files,
+                    confidence: compact.confidence,
+                    retrieval_path: compact.retrieval_path,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text' as const, text: `atlas.suggest_files failed: ${err}` }],
+            isError: true,
+          };
+        }
       }
-    }
+    )
   );
 
+  const sessionId_explain_trace = generateSessionId();
   server.registerTool(
     'atlas.explain_trace',
     {
       description: 'Return the compact summary and retrieval path for the current Atlas packet.',
       inputSchema: atlasPrefetchInputSchema,
     },
-    async (options) => {
-      try {
-        const compact = await loadAtlasCompactContext(options);
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(
-                {
-                  query: compact.query,
-                  summary: compact.summary,
-                  confidence: compact.confidence,
-                  retrieval_path: compact.retrieval_path,
-                  tool_trace: compact.tool_trace,
-                },
-                null,
-                2
-              ),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text' as const, text: `atlas.explain_trace failed: ${err}` }],
-          isError: true,
-        };
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.explain_trace',
+      sessionId_explain_trace,
+      async (options) => {
+        try {
+          const compact = await loadAtlasCompactContext(options);
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  {
+                    query: compact.query,
+                    summary: compact.summary,
+                    confidence: compact.confidence,
+                    retrieval_path: compact.retrieval_path,
+                    tool_trace: compact.tool_trace,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text' as const, text: `atlas.explain_trace failed: ${err}` }],
+            isError: true,
+          };
+        }
       }
-    }
+    )
   );
 
+  const sessionId_get_chunk = generateSessionId();
   server.registerTool(
     'atlas.get_chunk',
     {
@@ -639,47 +724,52 @@ export function registerNewTools(
           .describe('Optional sourceRef to prioritize when selecting a chunk'),
       }),
     },
-    async ({ chunkId, chunkIndex, sourceRef, ...options }) => {
-      try {
-        const compact = await loadAtlasCompactContext(options);
-        const index = compact.chunk_index;
-        const prioritizedChunk = chunkId
-          ? index.find((chunk) => chunk.chunkId === chunkId)
-          : typeof chunkIndex === 'number'
-            ? (index[chunkIndex] ?? null)
-            : sourceRef
-              ? index.find((chunk) => chunk.sourceRef === sourceRef)
-              : (index[0] ?? null);
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas.get_chunk',
+      sessionId_get_chunk,
+      async ({ chunkId, chunkIndex, sourceRef, ...options }) => {
+        try {
+          const compact = await loadAtlasCompactContext(options);
+          const index = compact.chunk_index;
+          const prioritizedChunk = chunkId
+            ? index.find((chunk) => chunk.chunkId === chunkId)
+            : typeof chunkIndex === 'number'
+              ? (index[chunkIndex] ?? null)
+              : sourceRef
+                ? index.find((chunk) => chunk.sourceRef === sourceRef)
+                : (index[0] ?? null);
 
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(
-                {
-                  query: compact.query,
-                  chunkId: chunkId ?? null,
-                  chunkIndex: typeof chunkIndex === 'number' ? chunkIndex : null,
-                  sourceRef: sourceRef ?? null,
-                  chunk: prioritizedChunk ?? null,
-                  chunk_index: compact.chunk_index,
-                  top_chunks: compact.top_chunks.slice(0, 5),
-                  sourceRefs: compact.sourceRefs,
-                  confidence: compact.confidence,
-                  retrieval_path: compact.retrieval_path,
-                },
-                null,
-                2
-              ),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [{ type: 'text' as const, text: `atlas.get_chunk failed: ${err}` }],
-          isError: true,
-        };
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify(
+                  {
+                    query: compact.query,
+                    chunkId: chunkId ?? null,
+                    chunkIndex: typeof chunkIndex === 'number' ? chunkIndex : null,
+                    sourceRef: sourceRef ?? null,
+                    chunk: prioritizedChunk ?? null,
+                    chunk_index: compact.chunk_index,
+                    top_chunks: compact.top_chunks.slice(0, 5),
+                    sourceRefs: compact.sourceRefs,
+                    confidence: compact.confidence,
+                    retrieval_path: compact.retrieval_path,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [{ type: 'text' as const, text: `atlas.get_chunk failed: ${err}` }],
+            isError: true,
+          };
+        }
       }
-    }
+    )
   );
 }

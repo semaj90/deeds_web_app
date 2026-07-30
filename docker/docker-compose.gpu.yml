@@ -23,8 +23,8 @@ services:
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256,expandable_segments:True
       - CUDA_LAUNCH_BLOCKING=0
       # Application services
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/legal_ai_db
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://legal_admin:123456@postgres:5432/legal_ai_db
+      - REDIS_URL=redis://:redis@valkey:6379/0
       - QDRANT_URL=http://qdrant:6333
       - QDRANT_GRPC_HOST=qdrant
       - QDRANT_GRPC_PORT=6334
@@ -118,9 +118,9 @@ services:
     container_name: legal-ai-go-retrieval
     environment:
       # Postgres (inside Docker network)
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/legal_ai_db
+      DATABASE_URL: postgresql://legal_admin:123456@postgres:5432/legal_ai_db
       # Redis/Valkey cache
-      VALKEY_URL: redis://redis:6379
+      VALKEY_URL: redis://:redis@valkey:6379/0
       # Qdrant vector database
       QDRANT_HTTP_URL: http://qdrant:6333
       QDRANT_GRPC_HOST: qdrant

@@ -1,37 +1,9 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
-  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-  "default_agent": "ornith-trace-audit",
+  "model": "llama-server/hforf.gguf",
+  "small_model": "llama-server/hforf.gguf",
+  "default_agent": "hforf-trace-audit",
   "provider": {
-    "atomic": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Atomic Chat (Ornith :1337)",
-      "options": {
-        "baseURL": "http://127.0.0.1:1337/v1",
-        "apiKey": "local"
-      },
-      "models": {
-        "unsloth/Ornith-1_0-9B-Q4_K_S": {
-          "name": "Ornith 1.0 9B Q4_K_S (65K)",
-          "tools": true,
-          "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 3090
-          }
-        },
-        "ornith": {
-          "name": "Ornith 1.0 9B Q4_K_S (65K)",
-          "tools": true,
-          "reasoning": true,
-          "limit": {
-            "context": 65536,
-            "output": 3090
-          }
-        }
-      }
-    },
     "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "llama-server (:8090)",
@@ -40,8 +12,8 @@
         "apiKey": "local"
       },
       "models": {
-        "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal Direct 65K",
+        "hforf.gguf": {
+          "name": "hforf.gguf",
           "tools": true,
           "reasoning": false,
           "limit": {
@@ -49,13 +21,13 @@
             "output": 4096
           }
         },
-        "unsloth/Ornith-1_0-9B-Q4_K_S": {
-          "name": "Ornith 1.0 9B 65K",
+        "gemma4-legal-iq4xs-direct.gguf": {
+          "name": "Gemma4 Legal Direct 65K",
           "tools": true,
-          "reasoning": true,
+          "reasoning": false,
           "limit": {
             "context": 65536,
-            "output": 4090
+            "output": 4096
           }
         }
       }
@@ -85,17 +57,14 @@
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
-      "timeout": 60000,
-      "headers": {
-        "Accept": "application/json, text/event-stream"
-      }
+      "timeout": 60000
     }
   },
   "agent": {
-    "ornith-trace-audit": {
+    "hforf-trace-audit": {
       "mode": "primary",
-      "description": "Read-only repository auditor using native TRACE retrieval tools",
-      "model": "atomic/unsloth/Ornith-1_0-9B-Q4_K_S",
+      "description": "Read-only repository auditor using native TRACE retrieval tools on hforf.gguf",
+      "model": "llama-server/hforf.gguf",
       "temperature": 0.8,
       "steps": 10,
       "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
@@ -130,8 +99,8 @@
     },
     "gemma4-function-caller": {
       "mode": "subagent",
-      "description": "Gemma4 function calling auditor on port 8090",
-      "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
+      "description": "hforf.gguf function calling auditor on port 8090",
+      "model": "llama-server/hforf.gguf",
       "temperature": 0.8,
       "steps": 10,
       "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",

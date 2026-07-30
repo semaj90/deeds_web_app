@@ -67,6 +67,81 @@ await redis.quit();
 
 ---
 
+## 🔌 Ollama vs llama-server Boundary (July 30, 2026)
+
+**HARD RULE**: Ollama is ONLY for embeddings. All chat/synthesis goes through llama-server.exe.
+
+| Service | Port | Use Case | Models | Rule |
+|---------|------|----------|--------|------|
+| **Ollama** | 11434 | Embeddings ONLY | `embeddinggemma:latest` (768-dim) | ✅ Use for `/api/embeddings` and `/api/embed` |
+| **llama-server** | 8090 | Chat & synthesis | hforf, gemma4-legal-iq4xs-direct.gguf | ✅ Use for `/v1/chat/completions` |
+
+**No Ollama model pulls** (e.g., `ollama pull gemma4:e4b-it`, `ollama pull mistral`) — all chat models loaded via llama-server flags (`-m model.gguf`).
+
+**Model fallback pattern** (e.g., research_tools.ts):
+```typescript
+const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
+
+for (const model of MODEL_PREFERENCE) {
+  const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+    body: JSON.stringify({ model, messages: [...], stream: false }),
+  });
+  if (res.ok) return data;  // Model available, use it
+  // Otherwise try next model in preference list
+}
+```
+
+**Why**: Ollama is a model manager (downloads, caches, runs inference). llama-server.exe is a raw inference server (no model management, direct GGUF loading). Using Ollama for chat adds:
+- Unnecessary download bandwidth (Ollama uses quantized ~3.5GB models)
+- Dual inference infrastructure (Ollama + llama-server competing for VRAM)
+- No benefit over native llama-server.exe (same llama.cpp backend)
+
+**Apply this sweep**:
+- ✅ research_tools.ts — uses MODEL_PREFERENCE fallback, no Ollama (done)
+- 🔄 Scan all other tool registries and scripts for Ollama chat references
+- 🔄 Replace with llama-server `/v1/chat/completions` + MODEL_PREFERENCE
+
+**Files to update** (20 found with Ollama chat):
+- src/mcp/tools/legal-skills.tool.ts (3× `/api/generate`)
+- src/lib/gpu/gemma4-synthesis-generator.ts
+- src/lib/gpu/gemma4-decomposition-planner.ts
+- src/mcp/server.ts
+- src/lib/ai/emotion-context.ts
+- src/lib/server/analysis/holistic-synthesizer.ts
+- src/lib/server/analysis/vlm-evidence-analyzer.ts
+- src/lib/server/analysis/granite-docling.ts
+- src/lib/server/analysis/evidence-analysis-pipeline.ts
+- src/routes/(app)/chat/[id]/+page.server.ts
+- src/lib/server/audit/gemma-tool-router.ts
+- src/lib/machines/gpu-process-machine.ts
+- src/lib/server/adapters/service-integrations.ts
+- src/lib/server/ace/chat-memory.ts
+- src/lib/server/ace/ace-error-kag.ts
+- src/lib/server/atlas/route-feature-map.ts
+- src/lib/server/atlas/repository-provenance-workflow.ts
+- src/routes/api/codeintel/semantic-health/+server.ts
+- src/routes/api/whisper/transcribe/+server.ts
+- src/service-worker.ts
+
+**Replacement pattern**:
+```typescript
+// Before
+const res = await fetch(`${ollamaUrl}/api/generate`, {
+  body: JSON.stringify({ model: 'gemma3-legal', prompt, stream: false })
+});
+
+// After
+const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
+  body: JSON.stringify({
+    model: 'hforf',  // or gemma4-legal-iq4xs-direct.gguf as fallback
+    messages: [{ role: 'user', content: prompt }],
+    stream: false
+  })
+});
+```
+
+---
+
 ## 🔐 Data Persistence + Retrieval Contract (Session 89 Corrected)
 
 **Verified Architecture (June 28, 2026)**:
@@ -86,7 +161,7 @@ await redis.quit();
 1. Verify Docker volumes mounted (never assume safety)
 2. Verify Postgres counts (identity + chunks)
 3. Verify Qdrant collection counts
-4. Audit embedding dimensions (Ollama, Postgres, Qdrant must agree on 384)
+4. Audit embedding dimensions (Ollama, Postgres, Qdrant must agree on 768)
 5. Rebuild Qdrant from codebase_chunk_index if needed
 6. Rebuild Neo4j topology if needed
 7. Warm Redis/Bifrost from canonical sources
@@ -94,11 +169,11 @@ await redis.quit();
 9. Run final recovery gate (count validation + sanity checks)
 
 **Dimension Policy** (PROJECT CANONICAL):
-- PROJECT_CANONICAL_EMBED_DIM = 384 (project choice, not model universal)
-- codebase_chunk_index.content_embedding = vector(384)
-- Qdrant vectors = 384-dim
-- Hard stop: no mixing 384 + 768 in same operation
-- Hard stop: no AE 64-dim for search
+- PROJECT_CANONICAL_EMBED_DIM = 768 (embeddinggemma native output; 384-dim and 512-dim are projections only, not canonical)
+- codebase_chunk_index.content_embedding = vector(768)
+- Qdrant vectors = 768-dim
+- Hard stop: no mixing 768 with projection-dim (384 or 512) in search operations
+- Hard stop: no AE 64-dim for search (routing only)
 
 **Status Language** (Use only):
 - CREATED (file exists)

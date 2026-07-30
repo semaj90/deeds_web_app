@@ -29,7 +29,8 @@
 //	QDRANT_GRPC_HOST    — Qdrant gRPC host (default localhost)
 //	QDRANT_GRPC_PORT    — Qdrant gRPC port (default 6334)
 //	REDIS_URL           — Redis (default redis://localhost:6379)
-//	EMBEDDING_BASE_URL  — Go embedding service HTTP (default http://localhost:8097)
+//	EMBEDDING_BASE_URL  — Go embedding service HTTP (legacy alias; default http://localhost:8097)
+//	EMBED_SERVICE_URL   — Go embedding service HTTP (preferred runtime alias; default http://localhost:8097)
 //	OLLAMA_URL          — Ollama API GPU fallback (default http://localhost:11434)
 //	EMBED_MODEL         — Model name (default embeddinggemma:latest)
 //	GRPC_PORT           — gRPC port (default 50053)
@@ -107,7 +108,7 @@ func loadConfig() config {
 	embedDim, _ := strconv.Atoi(envOr("EMBEDDING_DIMENSION", "768"))
 	cacheTTL, _ := strconv.Atoi(envOr("RETRIEVAL_CACHE_TTL", "300"))
 	gpuEnabled := envOr("GPU_EMBED_ENABLED", "true") == "true"
-	embeddingBaseURL := envOr("EMBEDDING_BASE_URL", "http://localhost:8097")
+	embeddingBaseURL := envOrAny("EMBED_SERVICE_URL", "EMBEDDING_BASE_URL", "http://localhost:8097")
 	return config{
 		DatabaseURL:             mustEnv("DATABASE_URL"),
 		QdrantURL:               envOr("QDRANT_URL", "http://localhost:6333"),
@@ -115,7 +116,7 @@ func loadConfig() config {
 		QdrantPort:              qdPort,
 		QdrantCollection:        envOr("QDRANT_COLLECTION", "codebase_chunks_768"),
 		QdrantVectorName:        envOr("QDRANT_VECTOR_NAME", "semantic_768"),
-		RedisURL:                envOr("REDIS_URL", "redis://localhost:6379"),
+		RedisURL:                envOrAny("REDIS_URL", "VALKEY_URL", "redis://localhost:6379"),
 		EmbeddingBaseURL:        embeddingBaseURL,
 		EmbeddingRepresentation: envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
 		EmbeddingDimension:      embedDim,
@@ -133,6 +134,19 @@ func loadConfig() config {
 func envOr(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
+	}
+	return fallback
+}
+
+func envOrAny(keys ...string) string {
+	if len(keys) == 0 {
+		return ""
+	}
+	fallback := keys[len(keys)-1]
+	for _, key := range keys[:len(keys)-1] {
+		if v := strings.TrimSpace(os.Getenv(key)); v != "" {
+			return v
+		}
 	}
 	return fallback
 }

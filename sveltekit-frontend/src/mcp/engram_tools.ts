@@ -7,6 +7,8 @@ import {
   injectAcePacket,
   storeChatMemoryTurn,
 } from '../lib/server/ai/engram-registry.js';
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 let redisClient: Redis | null = null;
 let connecting: Promise<Redis> | null = null;
@@ -213,245 +215,269 @@ function deriveSignalSummary(packet: Record<string, unknown>) {
   };
 }
 
-export function registerEngramTools(server: McpServer, redisUrl: string): void {
+export function registerEngramTools(server: McpServer, redisUrl: string, dispatcherMiddleware: DispatcherMiddleware): void {
+  const sessionId_ace_inject = generateSessionId();
   server.registerTool(
     'engram.ace_packet_inject',
     {
       description: 'Write ACE context packet to Redis with 1h TTL: ace:packet:{runId}.',
       inputSchema: engramAcePacketInjectSchema,
     },
-    async (args) => {
-      const parsed = engramAcePacketInjectSchema.safeParse(args);
-      if (!parsed.success) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ ok: false, status: 'invalid-input', issues: parsed.error.issues }),
-            },
-          ],
-          isError: true,
-        };
-      }
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'engram.ace_packet_inject',
+      sessionId_ace_inject,
+      async (args) => {
+        const parsed = engramAcePacketInjectSchema.safeParse(args);
+        if (!parsed.success) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({ ok: false, status: 'invalid-input', issues: parsed.error.issues }),
+              },
+            ],
+            isError: true,
+          };
+        }
 
-      try {
-        const redis = await getRedis(redisUrl);
-        const result = await injectAcePacket(redis, parsed.data);
-        return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
-      } catch (err) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({
-                ok: false,
-                status: 'degraded',
-                error: err instanceof Error ? err.message : String(err),
-              }),
-            },
-          ],
-          isError: true,
-        };
+        try {
+          const redis = await getRedis(redisUrl);
+          const result = await injectAcePacket(redis, parsed.data);
+          return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
+        } catch (err) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({
+                  ok: false,
+                  status: 'degraded',
+                  error: err instanceof Error ? err.message : String(err),
+                }),
+              },
+            ],
+            isError: true,
+          };
+        }
       }
-    },
+    )
   );
 
+  const sessionId_get_context = generateSessionId();
   server.registerTool(
     'atlas_get_active_context',
     {
       description: 'Read the newest bounded ACE reconciliation packet from Redis Valkey, validate it, and return compact resume context.',
       inputSchema: z.object({}),
     },
-    async () => {
-      try {
-        const redis = await getRedis(redisUrl);
-        const latest = await readLatestActiveContextPacket(redis);
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'atlas_get_active_context',
+      sessionId_get_context,
+      async () => {
+        try {
+          const redis = await getRedis(redisUrl);
+          const latest = await readLatestActiveContextPacket(redis);
 
-        if (!latest) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify({
-                  ok: false,
-                  status: 'missing',
-                  error: 'No active reconciliation ACE packet found in Redis Valkey.',
-                }),
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        const parsed = ActiveContextPacketSchema.safeParse(JSON.parse(latest.raw));
-        if (!parsed.success) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify({
-                  ok: false,
-                  status: 'invalid',
-                  error: 'Stored ACE packet failed schema validation.',
-                  issues: parsed.error.issues,
-                }),
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        const packet = parsed.data;
-        const signalSummary = deriveSignalSummary(packet as Record<string, unknown>);
-        const currentRevision = process.env.WORKSPACE_REVISION;
-        if (currentRevision && packet.workspaceRevision !== currentRevision) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify({
-                  ok: false,
-                  status: 'stale',
-                  error: 'Stored ACE packet workspace revision does not match the current workspace revision.',
-                  packetKey: latest.packetKey,
-                }),
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        const ttl = await redis.ttl(latest.packetKey);
-        if (ttl <= 0) {
-          return {
-            content: [
-              {
-                type: 'text' as const,
-                text: JSON.stringify({
-                  ok: false,
-                  status: 'expired',
-                  error: 'Stored ACE packet is missing TTL or has expired.',
-                  packetKey: latest.packetKey,
-                }),
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({
-                ok: true,
-                objective: packet.objective,
-                selectedEntities: packet.selectedEntities,
-                violations: packet.violations,
-                nextSteps: packet.nextSteps,
-                sourceRefs: packet.sourceRefs,
-                tokenBudget: packet.tokenBudget,
-                signalSummary,
-                memorySwap: {
-                  cacheKey: latest.packetKey,
-                  packetId: packet.acePacketId ?? packet.runId ?? null,
-                  workspaceRevision: packet.workspaceRevision,
-                  expiresInSeconds: packet.expiresInSeconds,
-                  sourceRefs: packet.sourceRefs,
+          if (!latest) {
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: JSON.stringify({
+                    ok: false,
+                    status: 'missing',
+                    error: 'No active reconciliation ACE packet found in Redis Valkey.',
+                  }),
                 },
-              }),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({
-                ok: false,
-                status: 'degraded',
-                error: err instanceof Error ? err.message : String(err),
-              }),
-            },
-          ],
-          isError: true,
-        };
+              ],
+              isError: true,
+            };
+          }
+
+          const parsed = ActiveContextPacketSchema.safeParse(JSON.parse(latest.raw));
+          if (!parsed.success) {
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: JSON.stringify({
+                    ok: false,
+                    status: 'invalid',
+                    error: 'Stored ACE packet failed schema validation.',
+                    issues: parsed.error.issues,
+                  }),
+                },
+              ],
+              isError: true,
+            };
+          }
+
+          const packet = parsed.data;
+          const signalSummary = deriveSignalSummary(packet as Record<string, unknown>);
+          const currentRevision = process.env.WORKSPACE_REVISION;
+          if (currentRevision && packet.workspaceRevision !== currentRevision) {
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: JSON.stringify({
+                    ok: false,
+                    status: 'stale',
+                    error: 'Stored ACE packet workspace revision does not match the current workspace revision.',
+                    packetKey: latest.packetKey,
+                  }),
+                },
+              ],
+              isError: true,
+            };
+          }
+
+          const ttl = await redis.ttl(latest.packetKey);
+          if (ttl <= 0) {
+            return {
+              content: [
+                {
+                  type: 'text' as const,
+                  text: JSON.stringify({
+                    ok: false,
+                    status: 'expired',
+                    error: 'Stored ACE packet is missing TTL or has expired.',
+                    packetKey: latest.packetKey,
+                  }),
+                },
+              ],
+              isError: true,
+            };
+          }
+
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({
+                  ok: true,
+                  objective: packet.objective,
+                  selectedEntities: packet.selectedEntities,
+                  violations: packet.violations,
+                  nextSteps: packet.nextSteps,
+                  sourceRefs: packet.sourceRefs,
+                  tokenBudget: packet.tokenBudget,
+                  signalSummary,
+                  memorySwap: {
+                    cacheKey: latest.packetKey,
+                    packetId: packet.acePacketId ?? packet.runId ?? null,
+                    workspaceRevision: packet.workspaceRevision,
+                    expiresInSeconds: packet.expiresInSeconds,
+                    sourceRefs: packet.sourceRefs,
+                  },
+                }),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({
+                  ok: false,
+                  status: 'degraded',
+                  error: err instanceof Error ? err.message : String(err),
+                }),
+              },
+            ],
+            isError: true,
+          };
+        }
       }
-    },
+    )
   );
 
+  const sessionId_chat_memory = generateSessionId();
   server.registerTool(
     'engram.chat_memory_store',
     {
       description: 'Append a chat turn to user memory store (Redis sorted set + bounded trim).',
       inputSchema: engramChatMemoryStoreSchema,
     },
-    async (args) => {
-      const parsed = engramChatMemoryStoreSchema.safeParse(args);
-      if (!parsed.success) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ ok: false, status: 'invalid-input', issues: parsed.error.issues }),
-            },
-          ],
-          isError: true,
-        };
-      }
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'engram.chat_memory_store',
+      sessionId_chat_memory,
+      async (args) => {
+        const parsed = engramChatMemoryStoreSchema.safeParse(args);
+        if (!parsed.success) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({ ok: false, status: 'invalid-input', issues: parsed.error.issues }),
+              },
+            ],
+            isError: true,
+          };
+        }
 
-      try {
-        const redis = await getRedis(redisUrl);
-        const result = await storeChatMemoryTurn(redis, parsed.data);
-        return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
-      } catch (err) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({
-                ok: false,
-                status: 'degraded',
-                error: err instanceof Error ? err.message : String(err),
-              }),
-            },
-          ],
-          isError: true,
-        };
+        try {
+          const redis = await getRedis(redisUrl);
+          const result = await storeChatMemoryTurn(redis, parsed.data);
+          return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
+        } catch (err) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({
+                  ok: false,
+                  status: 'degraded',
+                  error: err instanceof Error ? err.message : String(err),
+                }),
+              },
+            ],
+            isError: true,
+          };
+        }
       }
-    },
+    )
   );
 
+  const sessionId_redis_health = generateSessionId();
   server.registerTool(
     'engram.redis_health',
     {
       description: 'Check Redis availability used by engram memory tools.',
       inputSchema: z.object({}),
     },
-    async () => {
-      try {
-        const redis = await getRedis(redisUrl);
-        const pong = await redis.ping();
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ ok: pong === 'PONG', pong }),
-            },
-          ],
-        };
-      } catch (err) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) }),
-            },
-          ],
-          isError: true,
-        };
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'engram.redis_health',
+      sessionId_redis_health,
+      async () => {
+        try {
+          const redis = await getRedis(redisUrl);
+          const pong = await redis.ping();
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({ ok: pong === 'PONG', pong }),
+              },
+            ],
+          };
+        } catch (err) {
+          return {
+            content: [
+              {
+                type: 'text' as const,
+                text: JSON.stringify({ ok: false, error: err instanceof Error ? err.message : String(err) }),
+              },
+            ],
+            isError: true,
+          };
+        }
       }
-    },
+    )
   );
 }

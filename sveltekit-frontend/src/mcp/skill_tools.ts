@@ -2,14 +2,17 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { SubagentOrchestrator } from "../lib/server/admin/subagent-orchestrator.js";
 import { SkillsService } from "../lib/server/admin/skills-service.js";
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 /**
  * Skill-based tools for Gemma 4.
  * Allows the AI to list and invoke specialized autonomous skills.
  */
-export function registerSkillTools(server: McpServer) {
+export function registerSkillTools(server: McpServer, dispatcherMiddleware: DispatcherMiddleware) {
 
   // == skills.list ============================================================
+  const sessionId_list = generateSessionId();
   server.registerTool(
     'skills.list',
     {
@@ -18,15 +21,21 @@ export function registerSkillTools(server: McpServer) {
         query: z.string().optional().describe('Filter skills by name or description')
       })
     },
-    async ({ query }) => {
-      const skills = await SkillsService.listSkills(query);
-      return {
-        content: [{ type: 'text', text: JSON.stringify(skills, null, 2) }]
-      };
-    }
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'skills.list',
+      sessionId_list,
+      async ({ query }) => {
+        const skills = await SkillsService.listSkills(query);
+        return {
+          content: [{ type: 'text', text: JSON.stringify(skills, null, 2) }]
+        };
+      }
+    )
   );
 
   // == skills.run_mission =====================================================
+  const sessionId_run_mission = generateSessionId();
   server.registerTool(
     'skills.run_mission',
     {
@@ -37,18 +46,23 @@ export function registerSkillTools(server: McpServer) {
         input: z.record(z.string(), z.any()).optional().describe('Input parameters for the skill')
       })
     },
-    async ({ skillName, mission, input }) => {
-      // Note: In a real MCP server, we might want to run this async or stream it.
-      // For now, we'll run it synchronously and return the result.
-      const result = await SubagentOrchestrator.runMission('system', {
-        skillName,
-        mission,
-        input
-      });
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'skills.run_mission',
+      sessionId_run_mission,
+      async ({ skillName, mission, input }) => {
+        // Note: In a real MCP server, we might want to run this async or stream it.
+        // For now, we'll run it synchronously and return the result.
+        const result = await SubagentOrchestrator.runMission('system', {
+          skillName,
+          mission,
+          input
+        });
 
-      return {
-        content: [{ type: 'text', text: `Mission ${result.runId} completed.\nResult: ${result.result}` }]
-      };
-    }
+        return {
+          content: [{ type: 'text', text: `Mission ${result.runId} completed.\nResult: ${result.result}` }]
+        };
+      }
+    )
   );
 }

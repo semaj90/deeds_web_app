@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
+import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 const execAsync = promisify(exec);
 
@@ -9,7 +11,9 @@ const execAsync = promisify(exec);
  * Advanced codebase analysis tools leveraging ripgrep (rg) and awk.
  * These tools allow the AI to perform deep logic searches across the repo.
  */
-export function registerCodebaseTools(server: McpServer) {
+export function registerCodebaseTools(server: McpServer, dispatcherMiddleware?: DispatcherMiddleware) {
+  const sessionId_rg_search = generateSessionId();
+  const sessionId_awk_analyze = generateSessionId();
 
   // == codebase.rg_search =====================================================
   server.registerTool(
@@ -22,7 +26,11 @@ export function registerCodebaseTools(server: McpServer) {
         contextLines: z.number().default(2).describe('Lines of context to show')
       })
     },
-    async ({ query, include, contextLines }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'codebase.rg_search',
+      sessionId_rg_search,
+      async ({ query, include, contextLines }) => {
       try {
         const includeFlag = include ? `-g "${include}"` : '';
         // Safety: Limit output and prevent command injection
@@ -37,12 +45,13 @@ export function registerCodebaseTools(server: McpServer) {
           content: [{ type: 'text', text: stdout || stderr || 'No matches found.' }]
         };
       } catch (err: any) {
-        return { 
+        return {
           content: [{ type: 'text', text: err.stdout || `Search failed: ${err.message}` }],
-          isError: !err.stdout 
+          isError: !err.stdout
         };
       }
-    }
+      }
+    )
   );
 
   // == codebase.awk_analyze ===================================================
@@ -56,7 +65,11 @@ export function registerCodebaseTools(server: McpServer) {
         logic: z.string().describe('AWK logic to apply (e.g. "{print $1}")')
       })
     },
-    async ({ filePath, pattern, logic }) => {
+    createToolWithDispatcher(
+      dispatcherMiddleware,
+      'codebase.awk_analyze',
+      sessionId_awk_analyze,
+      async ({ filePath, pattern, logic }) => {
       try {
         // Safety: Limit to current workspace
         if (filePath.includes('..')) throw new Error('Path traversal detected');
@@ -70,6 +83,7 @@ export function registerCodebaseTools(server: McpServer) {
       } catch (err: any) {
         return { content: [{ type: 'text', text: `AWK analysis failed: ${err.message}` }], isError: true };
       }
-    }
+      }
+    )
   );
 }

@@ -19,6 +19,14 @@
 import * as fs from 'fs';
 import { execSync } from 'child_process';
 
+function parseLimitArg(defaultValue: number): number {
+  const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
+  if (!limitArg) return defaultValue;
+
+  const value = Number.parseInt(limitArg.split('=', 2)[1] ?? '', 10);
+  return Number.isInteger(value) && value > 0 ? value : defaultValue;
+}
+
 function execSQL(sql: string): string {
   const tempFile = `/tmp/query_${Date.now()}_${Math.random().toString(36).slice(2)}.sql`;
   fs.writeFileSync(tempFile, sql);
@@ -56,6 +64,7 @@ interface FeatureEnvelope {
 async function main() {
   const dryRun = !process.argv.includes('--apply');
   const batchSize = 500;
+  const fetchLimit = parseLimitArg(dryRun ? 200 : 10_000);
 
   console.log('Phase 3: Materialize Feature Envelopes');
   console.log(`Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
@@ -86,7 +95,7 @@ async function main() {
         CASE WHEN metadata->>'access_count' IS NOT NULL THEN LEAST(1.0, (metadata->>'access_count')::float / 100.0) ELSE 0.5 END as telemetry_score
       FROM atlas_packets
       ORDER BY packet_id
-      LIMIT 10000;
+      LIMIT ${fetchLimit};
     `;
 
     const fetchResult = execSQL(fetchSQL);

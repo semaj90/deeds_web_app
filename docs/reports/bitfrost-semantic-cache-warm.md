@@ -1,7 +1,7 @@
 # Bitfrost Semantic Cache Warm Plan
 
-Generated: 2026-07-11T00:46:53.329Z
-Mode: apply
+Generated: 2026-07-30T07:33:09.334Z
+Mode: dry-run
 Limit: 25
 
 ## Summary
@@ -11,11 +11,56 @@ Limit: 25
 - packets planned: 25
 - feature keys planned: 25
 - ace keys planned: 75
-- writes applied: 225
+- writes applied: 0
 - failures: 0
 
 ## Planned Keys
 
+- bifrost:sem:packet:0ba2345cd9c542fa (86400s)
+- bifrost:sem:feature:grpc_service (86400s)
+- ace:context:0ba2345cd9c542fa (3600s)
+- ace:feature:grpc_service (3600s)
+- atlas:centroid:domain:retrieval (7200s)
+- atlas:centroid:feature:grpc_service (7200s)
+- atlas:centroid:kmeans: (7200s)
+- atlas:centroid:community:50954 (7200s)
+- ace:summary:0ba2345cd9c542fa (3600s)
+- bifrost:sem:packet:0bffe0382a0d44bb (86400s)
+- bifrost:sem:feature:grpc_service (86400s)
+- ace:context:0bffe0382a0d44bb (3600s)
+- ace:feature:grpc_service (3600s)
+- atlas:centroid:domain:infrastructure (7200s)
+- atlas:centroid:feature:grpc_service (7200s)
+- atlas:centroid:kmeans: (7200s)
+- atlas:centroid:community:50955 (7200s)
+- ace:summary:0bffe0382a0d44bb (3600s)
+- bifrost:sem:packet:0ee918abc8c53e8d (86400s)
+- bifrost:sem:feature:grpc_service (86400s)
+- ace:context:0ee918abc8c53e8d (3600s)
+- ace:feature:grpc_service (3600s)
+- atlas:centroid:domain:retrieval (7200s)
+- atlas:centroid:feature:grpc_service (7200s)
+- atlas:centroid:kmeans: (7200s)
+- atlas:centroid:community:50956 (7200s)
+- ace:summary:0ee918abc8c53e8d (3600s)
+- bifrost:sem:packet:1703d9c005252a62 (86400s)
+- bifrost:sem:feature:grpc_service (86400s)
+- ace:context:1703d9c005252a62 (3600s)
+- ace:feature:grpc_service (3600s)
+- atlas:centroid:domain:retrieval (7200s)
+- atlas:centroid:feature:grpc_service (7200s)
+- atlas:centroid:kmeans: (7200s)
+- atlas:centroid:community:50957 (7200s)
+- ace:summary:1703d9c005252a62 (3600s)
+- bifrost:sem:packet:175066b8a4ceee3c (86400s)
+- bifrost:sem:feature:grpc_service (86400s)
+- ace:context:175066b8a4ceee3c (3600s)
+- ace:feature:grpc_service (3600s)
+- atlas:centroid:domain:retrieval (7200s)
+- atlas:centroid:feature:grpc_service (7200s)
+- atlas:centroid:kmeans: (7200s)
+- atlas:centroid:community:50958 (7200s)
+- ace:summary:175066b8a4ceee3c (3600s)
 - bifrost:sem:packet:packet:0003260092b1 (86400s)
 - bifrost:sem:feature:sveltekit-frontend.llm_synthesis_mapping (86400s)
 - ace:context:packet:0003260092b1 (3600s)
@@ -196,52 +241,7 @@ Limit: 25
 - atlas:centroid:kmeans: (7200s)
 - atlas:centroid:community: (7200s)
 - ace:summary:packet:0011712c94d1 (3600s)
-- bifrost:sem:packet:packet:0011a232d0b8 (86400s)
-- bifrost:sem:feature:sveltekit-frontend.npy_os (86400s)
-- ace:context:packet:0011a232d0b8 (3600s)
-- ace:feature:sveltekit-frontend.npy_os (3600s)
-- atlas:centroid:domain:retrieval (7200s)
-- atlas:centroid:feature:sveltekit-frontend.npy_os (7200s)
-- atlas:centroid:kmeans: (7200s)
-- atlas:centroid:community: (7200s)
-- ace:summary:packet:0011a232d0b8 (3600s)
-- bifrost:sem:packet:packet:001375b841d0 (86400s)
-- bifrost:sem:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test (86400s)
-- ace:context:packet:001375b841d0 (3600s)
-- ace:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test (3600s)
-- atlas:centroid:domain:documentation (7200s)
-- atlas:centroid:feature:sveltekit-frontend.tests__routes__auto__api__cases____id__connections.test (7200s)
-- atlas:centroid:kmeans: (7200s)
-- atlas:centroid:community: (7200s)
-- ace:summary:packet:001375b841d0 (3600s)
-- bifrost:sem:packet:packet:0014d8ac7795 (86400s)
-- bifrost:sem:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server (86400s)
-- ace:context:packet:0014d8ac7795 (3600s)
-- ace:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server (3600s)
-- atlas:centroid:domain:documentation (7200s)
-- atlas:centroid:feature:sveltekit-frontend.src__routes__api__cases___id___persons___server (7200s)
-- atlas:centroid:kmeans: (7200s)
-- atlas:centroid:community: (7200s)
-- ace:summary:packet:0014d8ac7795 (3600s)
-- bifrost:sem:packet:packet:0014edb0c6e4 (86400s)
-- bifrost:sem:feature:neschrom97.a45aa64da8f0240c (86400s)
-- ace:context:packet:0014edb0c6e4 (3600s)
-- ace:feature:neschrom97.a45aa64da8f0240c (3600s)
-- atlas:centroid:domain:infrastructure (7200s)
-- atlas:centroid:feature:neschrom97.a45aa64da8f0240c (7200s)
-- atlas:centroid:kmeans: (7200s)
-- atlas:centroid:community: (7200s)
-- ace:summary:packet:0014edb0c6e4 (3600s)
-- bifrost:sem:packet:packet:0015b28db252 (86400s)
-- bifrost:sem:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search (86400s)
-- ace:context:packet:0015b28db252 (3600s)
-- ace:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search (3600s)
-- atlas:centroid:domain:retrieval (7200s)
-- atlas:centroid:feature:sveltekit-frontend.scripts__phase104-backups__src__lib__services__concurrent-indexeddb-search (7200s)
-- atlas:centroid:kmeans: (7200s)
-- atlas:centroid:community: (7200s)
-- ace:summary:packet:0015b28db252 (3600s)
 
 ## Next Safe Action
 
-Hot cache families were warmed; rerun the Bitfrost audit to verify key counts and TTL samples.
+Review the dry-run plan, then rerun with --apply to materialize the hot Bitfrost families.

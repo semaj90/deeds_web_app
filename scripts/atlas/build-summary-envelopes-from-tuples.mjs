@@ -476,7 +476,14 @@ async function writeOutput(envelopes, jobs) {
     if (envelope.rank <= 500) report.distribution.by_rank.top_500++;
   }
 
-  fs.writeFileSync('docs/reports/summary-envelope-build.json', JSON.stringify(report, null, 2) + '\n');
+  try {
+    fs.writeFileSync('docs/reports/summary-envelope-build.json', JSON.stringify(report, null, 2) + '\n');
+  } catch (error) {
+    log(`⚠️  Failed to write docs/reports/summary-envelope-build.json: ${error?.message ?? error}`);
+    if (!DRY_RUN) {
+      throw error;
+    }
+  }
 
   log('✅ Output written:');
   log(`  - .tmp/summary-envelopes.ndjson (${envelopes.length} envelopes)`);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 /**
  * trace-mcp-server.ts
@@ -3265,10 +3266,10 @@ server.registerTool(
       // keyed by file path (e.g. "src/lib/server/db/client.ts"), but candidate
       // stable_keys are often chunk-level ("file:src/.../client.ts:symbolName").
       // Extract the file portion so the blend lookup hits.
-      function extractFilePath(stableKey: string): string {
+      const extractFilePath = (stableKey: string): string => {
         const m = stableKey.match(/^file:(.+?)(?::[^:]+)?$/);
         return m ? m[1] : stableKey;
-      }
+      };
       const allKeys = [...merged.keys(), ...graphNeighbors.keys()];
       const filePathByKey = new Map<string, string>(allKeys.map((k) => [k, extractFilePath(k)]));
       const uniqueFilePaths = Array.from(new Set(filePathByKey.values()));
@@ -3285,11 +3286,15 @@ server.registerTool(
             if (raw[i]) {
               try {
                 karpathyByFile[fp] = JSON.parse(raw[i] as string);
-              } catch {}
-            }
-          });
+                } catch (err) {
+                  void err;
+                }
+              }
+            });
+          }
+        } catch (err) {
+          void err;
         }
-      } catch {}
       const karpathyScores: Record<
         string,
         { pr: number; attn: number; authority: number; blend: number }
@@ -8612,17 +8617,23 @@ async function handleMcp(req: http.IncomingMessage, res: http.ServerResponse) {
         })
       );
     } else {
-      try {
-        res.end();
-      } catch {}
+        try {
+          res.end();
+        } catch (err) {
+          void err;
+        }
     }
-  } finally {
-    try {
-      await server.close();
-    } catch {}
-    try {
-      await transport.close?.();
-    } catch {}
+    } finally {
+      try {
+        await server.close();
+      } catch (err) {
+        void err;
+      }
+      try {
+        await transport.close?.();
+      } catch (err) {
+        void err;
+      }
   }
 }
 
@@ -9139,7 +9150,7 @@ server.registerTool(
   async ({ source_ref, feature_id, concept_id, summary_query, limit = 20 }) => {
     try {
       // Canonical path normalization — matches any representation of the same file
-      function canonicalPath(input: string): string {
+      const canonicalPath = (input: string): string => {
         return input
           .replaceAll('\\', '/')
           .replace(/^file:\/+/i, '')
@@ -9148,7 +9159,7 @@ server.registerTool(
           .replace(/^deeds-web-app\//i, '')
           .replace(/^\.?\//, '')
           .toLowerCase();
-      }
+      };
 
       const conditions: string[] = [];
       const params: unknown[] = [];

@@ -1,7 +1,7 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-07-30T06:39:03.081Z
-Status: MATERIALIZED
+Generated: 2026-07-30T07:32:46.665Z
+Status: DRY_RUN_READY
 Source table: atlas_packets
 
 ## Summary
@@ -16,7 +16,7 @@ Source table: atlas_packets
 - embedding ref rows: 4726
 - evidence matches: 10474
 - load batches: 62
-- max page query ms: 1868
+- max page query ms: 152
 - max page parse ms: 0
 - max page raw bytes: 17603147
 - max page normalized bytes: 17603145
@@ -29,12 +29,12 @@ Source table: atlas_packets
 ## Proof
 
 - batching logic: PROVEN
-- full materialization: PROVEN
+- full materialization: NOT_YET_PROVEN
 - resume semantics: RESUME_SEMANTICS_NOT_YET_PROVEN
-- atomic publication: PROVEN
+- atomic publication: ATOMIC_PUBLICATION_NOT_YET_PROVEN
 - qdrant mirror: PROVEN
 - identity coverage: STILL_PARTIAL
-- proof states: BATCHING_LOGIC_PROVEN, FULL_MATERIALIZATION_PROVEN, RESUME_SEMANTICS_NOT_YET_PROVEN, ATOMIC_PUBLICATION_PROVEN, QDRANT_MIRROR_PROVEN, IDENTITY_COVERAGE_STILL_PARTIAL
+- proof states: BATCHING_LOGIC_PROVEN, FULL_MATERIALIZATION_NOT_YET_PROVEN, RESUME_SEMANTICS_NOT_YET_PROVEN, ATOMIC_PUBLICATION_NOT_YET_PROVEN, QDRANT_MIRROR_PROVEN, IDENTITY_COVERAGE_STILL_PARTIAL
 
 ## Packet Kind Counts
 
@@ -55,7 +55,7 @@ Source table: atlas_packets
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: b79c9a126f6371d68075b0a848ebf9ed13a2f68ccd40ed6f10879b252af4e647
+- sha256: 80e48140d7908af83635f248a978d205f785f2b2dfaa9928ccc94b116bbb6c60
 
 ## Samples
 
