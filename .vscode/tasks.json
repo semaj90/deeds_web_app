@@ -538,6 +538,25 @@
       "detail": "AUTO-STARTS on folder open — spawns npm run dev:gpu detached so VS Code returns immediately. Uses scripts/startup/run-detached.mjs and writes logs to logs/task-output/pipeline-test/dev-gpu.{out,err}.log."
     },
     {
+      "label": "🚀 LiteRT Dev Startup (GPU + LiteRT.js Mocap)",
+      "type": "shell",
+      "command": "node scripts/startup/litert-dev-startup.mjs",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "detail": "Orchestrates: (1) npm run dev:gpu with LiteRT-LM backend (:8070), (2) Opens LiteRT.js-Mocap workspace in new VS Code window. Run manually from Command Palette."
+    },
+    {
       "label": "🎯 EmbeddingGemma Summary Embeddings (startup bounded)",
       "type": "shell",
       "command": "node scripts/startup/run-detached.mjs worker:embedding:batch:startup",
@@ -1916,7 +1935,7 @@
     {
       "label": "🔑 Startup: Valkey Seed OpenCode Rules",
       "type": "shell",
-      "command": "npm run valkey:seed:rules:embed",
+      "command": "npm run _valkey:seed:rules:embed",
       "options": {
         "cwd": "${workspaceFolder}/sveltekit-frontend",
         "env": {
@@ -1958,7 +1977,7 @@
         "runOn": "folderOpen"
       },
       "isBackground": false,
-      "dependsOn": "🔑 Startup: Valkey Seed OpenCode Rules",
+      "dependsOn": "🔑 Startup: Valkey Semantic Index (create-index)",
       "group": "build",
       "problemMatcher": [],
       "presentation": {

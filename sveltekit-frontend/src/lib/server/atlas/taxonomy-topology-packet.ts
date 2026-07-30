@@ -3,6 +3,10 @@ import { writeAcePacket, makeQueryHash, type AceFullPacket } from '$lib/server/a
 import { pool } from '$lib/server/db/client.js';
 import { getRedis } from '$lib/server/redis.js';
 import { selectClassifierTier } from './atlas-knowledge-envelope.js';
+import {
+  buildOntologyLinkedTupleCachePlan,
+  writeOntologyLinkedTupleCachePlan,
+} from './ontology-linked-tuple-cache.js';
 
 export const TaxonomyTupleSchema = z.object({
   source: z.string().min(1),
@@ -418,6 +422,59 @@ export async function buildTaxonomyTopologyPacket(
     },
     { asLatest: input.asLatest ?? false, ttl: 3600 }
   );
+
+  const ontologyCachePlan = buildOntologyLinkedTupleCachePlan({
+    packetId: packet.packet_id,
+    packetRevision: packet.packet_ulid ?? packet.packet_id,
+    featureId,
+    sourceRef: `taxonomy:${summary.nodeKey}`,
+    tuples: summary.linkedTuples.map((tuple, index) => ({
+      tupleId: `${packet.packet_id}:${index}`,
+      schemaVersion: 'ontology-linked-tuple.v1',
+      packetKey: packet.packet_id,
+      sourceRef: `taxonomy:${summary.nodeKey}`,
+      surfaceText: tuple.target,
+      tokenIndex: index,
+      partOfSpeech: null,
+      label: tuple.target,
+      labelKind: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 'ontology' : 'tag',
+      labelSource: 'semantic_tagger',
+      ontologyIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+      conceptIds: tuple.relation === 'HAS_ONTOLOGY_TAG' ? [tuple.target] : [],
+      confidence: tuple.relation === 'HAS_ONTOLOGY_TAG' ? 0.85 : 0.7,
+      evidenceState: 'ACTIVE_VERIFIED',
+      provenance: {
+        sourceTables: ['taxonomy_nodes', 'taxonomy_edges', 'atlas_packets'],
+        labelerVersion: classifier.domainClassifierTier ?? null,
+        taggerVersion: classifier.evidenceSource ?? null,
+        ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
+        nlpVersion: null,
+      },
+    })),
+    centroid: {
+      domainClass: summary.classifier.domainClass ?? 'unknown',
+      domainCentroidKey: `atlas:centroid:domain:${summary.classifier.domainClass ?? 'unknown'}`,
+      featureCentroidKey: `atlas:centroid:feature:${featureId}`,
+      kmeansCentroidKey: summary.topology.kmeansClusters[0] !== undefined
+        ? `atlas:centroid:kmeans:${summary.topology.kmeansClusters[0]}`
+        : null,
+      somCentroidKey: summary.topology.somCluster ? `atlas:centroid:som:${summary.topology.somCluster}` : null,
+      communityCentroidKey: null,
+      somCluster: summary.topology.somCluster,
+      somRow: summary.topology.somRow,
+      somCol: summary.topology.somCol,
+      kmeansClusters: summary.topology.kmeansClusters,
+      ontologyTags: summary.topology.ontologyTags,
+    },
+    revisions: {
+      workspaceRevision: String(process.env.WORKSPACE_REVISION ?? process.env.REPOSITORY_REVISION ?? 'unknown'),
+      ontologyVersion: String(metadata.ontology_version ?? metadata.ontologyVersion ?? '').trim() || null,
+      centroidVersion: String(summary.centroid.redisCentroidTrainedAt ?? summary.centroid.redisCentroidCount ?? '').trim() || null,
+    },
+    blockedContentHashes: [],
+  });
+
+  await writeOntologyLinkedTupleCachePlan(ontologyCachePlan, 6 * 60 * 60).catch(() => {});
 
   return { summary, packet };
 }

@@ -21,12 +21,18 @@
 
 import pg from 'pg';
 import redis from 'ioredis';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from '../../sveltekit-frontend/scripts/atlas/lib/redis-valkey.mjs';
 
 const DB_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const REPO_ROOT = process.cwd();
+const HLL_KEY = 'bitfrost:agent:hll:keys';
 
 const pool = new pg.Pool({ connectionString: DB_URL });
-const cache = new redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
+let cache;
 
 const TTL = {
   CLAIMED: 24 * 60 * 60,      // 24h
@@ -42,7 +48,38 @@ function getTTL(status) {
 async function warmAgentCache() {
   console.log('🔥 Warming BitFrost Agent Cache...\n');
 
-  await cache.connect();
+  const { env, container, password } = await resolveAtlasRedisContext(REPO_ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+  const preferCli = shouldPreferValkeyCli(env, container);
+  cache = preferCli
+    ? {
+        async connect() {},
+        async ping() {
+          const result = runRedisCli(container, ['PING'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+          return result.stdout.trim();
+        },
+        async setex(key, ttl, value) {
+          const result = runRedisCli(container, ['SETEX', key, String(ttl), value], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SETEX failed');
+        },
+        async pfadd(key, ...members) {
+          const result = runRedisCli(container, ['PFADD', key, ...members], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+        },
+        async pfcount(key) {
+          const result = runRedisCli(container, ['PFCOUNT', key], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFCOUNT failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
+        },
+        async quit() {},
+      }
+    : new redis(redisUrl, { lazyConnect: true, maxRetriesPerRequest: 1 });
+
+  if (!preferCli) await cache.connect();
+  await cache.ping();
 
   try {
     const result = await pool.query(`
@@ -91,6 +128,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
+        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.task_id);
         warmed++;
       }
 
@@ -101,6 +139,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
+        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.story_id);
         warmed++;
       }
 
@@ -111,6 +150,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
+        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.packet_key);
         warmed++;
       }
 
@@ -121,6 +161,7 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
+        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.feature_id);
         warmed++;
       }
 
@@ -131,11 +172,15 @@ async function warmAgentCache() {
           ttl,
           JSON.stringify(entry)
         );
+        if (typeof cache.pfadd === 'function') await cache.pfadd(HLL_KEY, row.source_ref);
         warmed++;
       }
     }
 
     console.log(`\n✅ Warmed ${warmed} BitFrost cache entries\n`);
+    if (typeof cache.pfcount === 'function') {
+      console.log(`HyperLogLog summary: ${HLL_KEY} = ${await cache.pfcount(HLL_KEY)}`);
+    }
     console.log(`Cache Keys Pattern:`);
     console.log(`  bitfrost:agent:task:<task_id>`);
     console.log(`  bitfrost:agent:story:<story_id>`);

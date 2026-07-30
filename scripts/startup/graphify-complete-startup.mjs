@@ -99,6 +99,17 @@ async function runPipeline() {
 
     const startTime = Date.now();
 
+    // PHASE 0: Run repository provenance dry-run so the startup path exercises
+    // the canonical repository workflow before any service-gated steps.
+    log('\n🧭 PHASE 0: Running Repository Provenance Dry-Run');
+    log('─────────────────────────────────────────────────────────────');
+    try {
+      await runNpmScript('atlas:phase109b:workflow:dry');
+      log('✓ Repository provenance dry-run complete');
+    } catch (err) {
+      log(`⚠️  Repository provenance dry-run failed: ${err.message}`, 'warn');
+    }
+
     // PHASE 1: Run Graphify Audit
     log('\n📊 PHASE 1: Running Graphify Audit');
     log('─────────────────────────────────────────────────────────────');

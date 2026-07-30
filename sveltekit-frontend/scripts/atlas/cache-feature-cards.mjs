@@ -35,6 +35,11 @@ import path    from 'node:path';
 import crypto  from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import Redis   from 'ioredis';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from './lib/redis-valkey.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT  = path.resolve(__dir, '../..');
@@ -52,7 +57,8 @@ const INPUT_PATH = inputI  >= 0 ? argv[inputI + 1]  : null;
 const PREFIX     = prefixI >= 0 ? argv[prefixI + 1] : 'ace:feature';
 const TTL        = ttlI    >= 0 ? Number(argv[ttlI + 1]) : 86400;
 
-const REDIS_URL  = process.env.REDIS_URL ?? 'redis://localhost:6379';
+const HLL_FEATURE_KEY = 'ace:feature:hll:keys';
+const HLL_ERROR_KEY = 'ace:error:hll:keys';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function sha256short(s) { return crypto.createHash('sha256').update(s).digest('hex').slice(0, 12); }
@@ -196,13 +202,44 @@ async function main() {
   }
 
   // Connect to Redis
-  const redis = new Redis(REDIS_URL, {
-    lazyConnect: true,
-    maxRetriesPerRequest: 1,
-    enableOfflineQueue: false,
-    retryStrategy: () => null,
-  });
-  redis.on('error', () => {});
+  const { env, container, password } = await resolveAtlasRedisContext(ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || 'localhost';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+  const preferCli = shouldPreferValkeyCli(env, container);
+
+  const redis = preferCli
+    ? {
+        mode: 'cli',
+        async connect() {},
+        async ping() {
+          const result = runRedisCli(container, ['PING'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+          return result.stdout.trim();
+        },
+        async setex(key, ttlValue, value) {
+          const result = runRedisCli(container, ['SETEX', key, String(ttlValue), value], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SETEX failed');
+        },
+        async pfadd(key, ...members) {
+          const result = runRedisCli(container, ['PFADD', key, ...members], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+        },
+        async pfcount(key) {
+          const result = runRedisCli(container, ['PFCOUNT', key], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFCOUNT failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
+        },
+        async disconnect() {},
+      }
+    : new Redis(redisUrl, {
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        enableOfflineQueue: false,
+        retryStrategy: () => null,
+        password: env.REDIS_PASSWORD || env.VALKEY_PASSWORD || undefined,
+      });
+  if (!preferCli) redis.on('error', () => {});
 
   try {
     await redis.connect();
@@ -213,28 +250,32 @@ async function main() {
     process.exit(1);
   }
 
-  const pipe = redis.pipeline();
   let count = 0;
 
   for (const card of featureList) {
     const key = `${PREFIX}:${card.feature_key}`;
-    pipe.setex(key, TTL, JSON.stringify(card));
+    await redis.setex(key, TTL, JSON.stringify(card));
+    if (typeof redis.pfadd === 'function') await redis.pfadd(HLL_FEATURE_KEY, card.feature_key);
     if (VERBOSE) console.log(`  SET ${key}`);
     count++;
   }
 
   for (const card of errorList) {
     const key = `ace:error:${card.error_code}`;
-    pipe.setex(key, TTL, JSON.stringify(card));
+    await redis.setex(key, TTL, JSON.stringify(card));
+    if (typeof redis.pfadd === 'function') await redis.pfadd(HLL_ERROR_KEY, card.error_code);
     if (VERBOSE) console.log(`  SET ${key}`);
     count++;
   }
 
-  await pipe.exec();
   redis.disconnect();
 
   console.log(`[cache-cards] ✅ Wrote ${count} Redis keys (TTL ${TTL}s)`);
   console.log(`[cache-cards] Feature keys: ${featureList.map(c => `${PREFIX}:${c.feature_key}`).join(', ')}`);
+  if (typeof redis.pfcount === 'function') {
+    console.log(`[cache-cards] HLL feature estimate: ${await redis.pfcount(HLL_FEATURE_KEY)}`);
+    console.log(`[cache-cards] HLL error estimate: ${await redis.pfcount(HLL_ERROR_KEY)}`);
+  }
 }
 
 main().catch(err => {

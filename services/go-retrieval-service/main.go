@@ -82,24 +82,24 @@ func init() {
 // ── Configuration ─────────────────────────────────────────────────────────
 
 type config struct {
-	DatabaseURL              string
-	QdrantURL                string
-	QdrantHost               string
-	QdrantPort               int
-	QdrantCollection         string
-	QdrantVectorName         string
-	RedisURL                 string
-	EmbeddingBaseURL         string
-	EmbeddingRepresentation  string
-	EmbeddingDimension       int
-	EmbeddingRequireGPU      bool
-	EmbedServiceURL          string
-	OllamaURL                string
-	EmbedModel               string
-	GRPCPort                 string
-	HTTPPort                 string
-	CacheTTL                 time.Duration
-	GPUEmbedEnabled          bool
+	DatabaseURL             string
+	QdrantURL               string
+	QdrantHost              string
+	QdrantPort              int
+	QdrantCollection        string
+	QdrantVectorName        string
+	RedisURL                string
+	EmbeddingBaseURL        string
+	EmbeddingRepresentation string
+	EmbeddingDimension      int
+	EmbeddingRequireGPU     bool
+	EmbedServiceURL         string
+	OllamaURL               string
+	EmbedModel              string
+	GRPCPort                string
+	HTTPPort                string
+	CacheTTL                time.Duration
+	GPUEmbedEnabled         bool
 }
 
 func loadConfig() config {
@@ -117,7 +117,7 @@ func loadConfig() config {
 		QdrantVectorName:        envOr("QDRANT_VECTOR_NAME", "semantic_768"),
 		RedisURL:                envOr("REDIS_URL", "redis://localhost:6379"),
 		EmbeddingBaseURL:        embeddingBaseURL,
-		EmbeddingRepresentation:  envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
+		EmbeddingRepresentation: envOr("EMBEDDING_REPRESENTATION", "semantic_768"),
 		EmbeddingDimension:      embedDim,
 		EmbeddingRequireGPU:     envOr("EMBEDDING_REQUIRE_GPU", "true") == "true",
 		EmbedServiceURL:         embeddingBaseURL,
@@ -839,9 +839,9 @@ func buildCodebaseSearchChunkResult(chunk qdrantChunk) *pb.SearchChunkResult {
 			Score:         chunk.Score,
 			SemanticScore: chunk.Score,
 		},
-		FilePath:  chunk.FilePath,
-		StartLine: chunk.StartLine,
-		EndLine:   chunk.EndLine,
+		FilePath:        chunk.FilePath,
+		StartLine:       chunk.StartLine,
+		EndLine:         chunk.EndLine,
 		ClusterMetadata: clusterMetadata,
 	}
 }
@@ -949,30 +949,30 @@ func qdrantPointsToChunks(points []*qdrantclient.ScoredPoint, isCodebase bool) [
 			continue
 		}
 		if isCodebase {
-			c.FilePath   = qdrantStr(payload, "file_path")
+			c.FilePath = qdrantStr(payload, "file_path")
 			c.ChunkIndex = qdrantInt32(payload, "chunk_index")
 			c.ContentPreview = truncate(qdrantStr(payload, "content"), 500)
-			c.Kind       = qdrantStr(payload, "kind")
+			c.Kind = qdrantStr(payload, "kind")
 			c.HTTPMethod = qdrantStr(payload, "httpMethod")
-			c.RouteID    = qdrantStr(payload, "routeId")
-			c.Tags       = qdrantStrSlice(payload, "tags")
-			c.StartLine  = qdrantInt32(payload, "start_line")
-			c.EndLine    = qdrantInt32(payload, "end_line")
+			c.RouteID = qdrantStr(payload, "routeId")
+			c.Tags = qdrantStrSlice(payload, "tags")
+			c.StartLine = qdrantInt32(payload, "start_line")
+			c.EndLine = qdrantInt32(payload, "end_line")
 			c.GPUCluster = qdrantInt32Ptr(payload, "gpu_cluster")
 			c.SomCluster = qdrantInt32Ptr(payload, "som_cluster")
-			c.BmuRow     = qdrantInt32Ptr(payload, "som_bmu_row")
-			c.BmuCol     = qdrantInt32Ptr(payload, "som_bmu_col")
+			c.BmuRow = qdrantInt32Ptr(payload, "som_bmu_row")
+			c.BmuCol = qdrantInt32Ptr(payload, "som_bmu_col")
 		} else {
-			c.EvidenceID       = qdrantStr(payload, "evidence_id")
-			c.CaseID           = qdrantStr(payload, "case_id")
-			c.ChunkIndex       = qdrantInt32(payload, "chunk_index")
-			c.ContentPreview   = qdrantStr(payload, "content_preview")
-			c.FileName         = qdrantStr(payload, "file_name")
+			c.EvidenceID = qdrantStr(payload, "evidence_id")
+			c.CaseID = qdrantStr(payload, "case_id")
+			c.ChunkIndex = qdrantInt32(payload, "chunk_index")
+			c.ContentPreview = qdrantStr(payload, "content_preview")
+			c.FileName = qdrantStr(payload, "file_name")
 			c.ExtractionMethod = qdrantStr(payload, "extraction_method")
-			c.Heading          = qdrantStr(payload, "heading")
-			c.TokenCount       = qdrantInt32(payload, "token_count")
-			c.SectionPath      = qdrantStrSlice(payload, "section_path")
-			c.Citations        = qdrantStrSlice(payload, "citations")
+			c.Heading = qdrantStr(payload, "heading")
+			c.TokenCount = qdrantInt32(payload, "token_count")
+			c.SectionPath = qdrantStrSlice(payload, "section_path")
+			c.Citations = qdrantStrSlice(payload, "citations")
 		}
 		chunks = append(chunks, c)
 	}
@@ -1034,25 +1034,25 @@ func (s *retrievalServer) qdrantSearchREST(ctx context.Context, collection, vect
 		}
 		if p := r.Payload; p != nil {
 			if isCodebase {
-				c.FilePath       = anyStr(p["file_path"])
-				c.Kind           = anyStr(p["kind"])
-				c.HTTPMethod     = anyStr(p["httpMethod"])
+				c.FilePath = anyStr(p["file_path"])
+				c.Kind = anyStr(p["kind"])
+				c.HTTPMethod = anyStr(p["httpMethod"])
 				c.ContentPreview = truncate(anyStr(p["content"]), 500)
-				c.Tags           = anyStrSlice(p["tags"])
-				c.StartLine      = anyInt32(p["start_line"])
-				c.EndLine        = anyInt32(p["end_line"])
-				c.GPUCluster     = anyInt32Ptr(p["gpu_cluster"])
-				c.SomCluster     = anyInt32Ptr(p["som_cluster"])
-				c.BmuRow         = anyInt32Ptr(p["som_bmu_row"])
-				c.BmuCol         = anyInt32Ptr(p["som_bmu_col"])
+				c.Tags = anyStrSlice(p["tags"])
+				c.StartLine = anyInt32(p["start_line"])
+				c.EndLine = anyInt32(p["end_line"])
+				c.GPUCluster = anyInt32Ptr(p["gpu_cluster"])
+				c.SomCluster = anyInt32Ptr(p["som_cluster"])
+				c.BmuRow = anyInt32Ptr(p["som_bmu_row"])
+				c.BmuCol = anyInt32Ptr(p["som_bmu_col"])
 			} else {
-				c.EvidenceID       = anyStr(p["evidence_id"])
-				c.ContentPreview   = anyStr(p["content_preview"])
-				c.FileName         = anyStr(p["file_name"])
+				c.EvidenceID = anyStr(p["evidence_id"])
+				c.ContentPreview = anyStr(p["content_preview"])
+				c.FileName = anyStr(p["file_name"])
 				c.ExtractionMethod = anyStr(p["extraction_method"])
-				c.Heading          = anyStr(p["heading"])
-				c.SectionPath      = anyStrSlice(p["section_path"])
-				c.Citations        = anyStrSlice(p["citations"])
+				c.Heading = anyStr(p["heading"])
+				c.SectionPath = anyStrSlice(p["section_path"])
+				c.Citations = anyStrSlice(p["citations"])
 				if n, ok := p["chunk_index"].(float64); ok {
 					c.ChunkIndex = int32(n)
 				}
@@ -1262,12 +1262,12 @@ func (s *retrievalServer) expandSiblings(ctx context.Context, anchor rankedChunk
 	for _, r := range result.Result {
 		c := qdrantChunk{Score: r.Score}
 		if p := r.Payload; p != nil {
-			c.EvidenceID      = anyStr(p["evidence_id"])
-			c.ContentPreview  = anyStr(p["content_preview"])
-			c.FileName        = anyStr(p["file_name"])
-			c.Heading         = anyStr(p["heading"])
-			c.SectionPath     = anyStrSlice(p["section_path"])
-			c.Citations       = anyStrSlice(p["citations"])
+			c.EvidenceID = anyStr(p["evidence_id"])
+			c.ContentPreview = anyStr(p["content_preview"])
+			c.FileName = anyStr(p["file_name"])
+			c.Heading = anyStr(p["heading"])
+			c.SectionPath = anyStrSlice(p["section_path"])
+			c.Citations = anyStrSlice(p["citations"])
 			if n, ok := p["chunk_index"].(float64); ok {
 				c.ChunkIndex = int32(n)
 			}
@@ -1444,8 +1444,8 @@ func (s *retrievalServer) SearchEvidence(ctx context.Context, req *pb.EvidenceSe
 	// Step 2: Parallel dual search
 	t0 = time.Now()
 	type dualResult struct {
-		pg    []pgChunk
-		qd    []qdrantChunk
+		pg []pgChunk
+		qd []qdrantChunk
 	}
 	var dr dualResult
 	{
@@ -1545,7 +1545,7 @@ func (s *retrievalServer) SearchEvidence(ctx context.Context, req *pb.EvidenceSe
 		_ = g3.Wait()
 	}
 	timing.HopMs = float32(time.Since(t0).Milliseconds())
-	timing.KagMs = timing.HopMs  // overlapped — both measured in same interval
+	timing.KagMs = timing.HopMs // overlapped — both measured in same interval
 	timing.DagMs = timing.HopMs
 
 	// Build proto response
@@ -1830,26 +1830,45 @@ func (s *retrievalServer) Health(ctx context.Context, _ *pb.HealthRequest) (*pb.
 		defer wg.Done()
 		ctx2, cancel := context.WithTimeout(ctx, 2*time.Second)
 		defer cancel()
-		r, err := http.NewRequestWithContext(ctx2, http.MethodGet, s.cfg.EmbeddingBaseURL+"/ready", nil)
-		if err == nil {
-			if httpResp, err := s.httpClient.Do(r); err == nil {
-				resp.EmbeddingServiceUp = httpResp.StatusCode == http.StatusOK
-				if resp.EmbeddingServiceUp {
-					var ready struct {
-						Ready              bool    `json:"ready"`
-						EmbeddingDimension int     `json:"embedding_dimension"`
-						ModelID            string  `json:"model_id"`
-						BackendReachable   bool    `json:"backend_reachable"`
-						Normalized         bool    `json:"normalized"`
-						VectorNorm         float64 `json:"vector_norm"`
-					}
-					if err := json.NewDecoder(httpResp.Body).Decode(&ready); err == nil {
-						resp.EmbeddingServiceUp = ready.Ready && ready.EmbeddingDimension == s.cfg.EmbeddingDimension
-					} else {
-						resp.EmbeddingServiceUp = false
+		for _, healthPath := range []string{"/ready", "/health"} {
+			r, err := http.NewRequestWithContext(ctx2, http.MethodGet, s.cfg.EmbeddingBaseURL+healthPath, nil)
+			if err != nil {
+				continue
+			}
+			httpResp, err := s.httpClient.Do(r)
+			if err != nil {
+				continue
+			}
+			func() {
+				defer httpResp.Body.Close()
+				if httpResp.StatusCode != http.StatusOK {
+					return
+				}
+
+				var payload map[string]any
+				if err := json.NewDecoder(httpResp.Body).Decode(&payload); err != nil {
+					return
+				}
+
+				if ready, ok := payload["ready"].(bool); ok && ready {
+					if dim, ok := payload["embedding_dimension"].(float64); ok && int(dim) == s.cfg.EmbeddingDimension {
+						resp.EmbeddingServiceUp = true
+						return
 					}
 				}
-				httpResp.Body.Close()
+				if status, ok := payload["status"].(string); ok && strings.EqualFold(status, "healthy") {
+					resp.EmbeddingServiceUp = true
+					return
+				}
+				if loaded, ok := payload["model_loaded"].(string); ok && strings.EqualFold(loaded, "true") {
+					resp.EmbeddingServiceUp = true
+				}
+				if loaded, ok := payload["model_loaded"].(bool); ok && loaded {
+					resp.EmbeddingServiceUp = true
+				}
+			}()
+			if resp.EmbeddingServiceUp {
+				return
 			}
 		}
 	}()
@@ -1955,8 +1974,8 @@ func (s *retrievalServer) SearchChunks(ctx context.Context, req *pb.SearchChunks
 	}
 
 	return &pb.SearchChunksResponse{
-		Results:  results,
-		TotalMs:  float32(time.Since(start).Seconds() * 1000),
+		Results: results,
+		TotalMs: float32(time.Since(start).Seconds() * 1000),
 	}, nil
 }
 
@@ -2158,8 +2177,8 @@ func (s *retrievalServer) httpHealth(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(map[string]any{
-		"status":             h.GetStatus(),
-		"readiness_state":    readinessState,
+		"status":          h.GetStatus(),
+		"readiness_state": readinessState,
 		"dependencies": map[string]any{
 			"postgres": map[string]any{
 				"connected": h.GetPgvectorConnected(),
@@ -2192,11 +2211,11 @@ func (s *retrievalServer) httpSearchEvidence(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	var body struct {
-		Query        string         `json:"query"`
-		CaseID       string         `json:"case_id"`
-		Limit        int32          `json:"limit"`
-		Jurisdiction string         `json:"jurisdiction"`
-		JSONBFilter  *JSONBFilter   `json:"jsonb_filter,omitempty"`
+		Query        string       `json:"query"`
+		CaseID       string       `json:"case_id"`
+		Limit        int32        `json:"limit"`
+		Jurisdiction string       `json:"jurisdiction"`
+		JSONBFilter  *JSONBFilter `json:"jsonb_filter,omitempty"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
@@ -2223,11 +2242,11 @@ func (s *retrievalServer) httpSearchCodebase(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	var body struct {
-		Query       string   `json:"query"`
-		Limit       int32    `json:"limit"`
-		Kinds       []string `json:"kinds"`
+		Query        string   `json:"query"`
+		Limit        int32    `json:"limit"`
+		Kinds        []string `json:"kinds"`
 		PathPrefixes []string `json:"path_prefixes"`
-		HTTPMethod  string   `json:"http_method"`
+		HTTPMethod   string   `json:"http_method"`
 	}
 	if err := json.NewDecoder(io.LimitReader(r.Body, 1<<20)).Decode(&body); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)

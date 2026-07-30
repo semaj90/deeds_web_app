@@ -8,7 +8,10 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import pkg from 'pg';
 const { Pool } = pkg;
-import { deriveMaterializationProofDetail, deriveMaterializationProofStates } from './lib/materialization-proof-state.mjs';
+import {
+  deriveMaterializationProofDetail,
+  deriveMaterializationProofStates,
+} from './lib/materialization-proof-state.mjs';
 import { normalizeSourceRef } from './lib/lineage-field-aliases.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -20,7 +23,8 @@ const POSTGRES_USER = process.env.PARENT_ATLAS_POSTGRES_USER || 'legal_admin';
 const POSTGRES_DB = process.env.PARENT_ATLAS_POSTGRES_DB || 'legal_ai_db';
 const POSTGRES_PASSWORD = process.env.PARENT_ATLAS_POSTGRES_PASSWORD || '123456';
 const PG_CONNECTION_TIMEOUT_MS = parseIntFlag(argv, '--pg-connection-timeout-ms', 5000);
-const PG_QUERY_TIMEOUT_MS = parseIntFlag(argv, '--pg-query-timeout-ms', 15000);
+// Increased from 15s to 90s because JSON serialization of 58K rows takes ~25-60s on RTX 3060 Ti
+const PG_QUERY_TIMEOUT_MS = parseIntFlag(argv, '--pg-query-timeout-ms', 90000);
 const PG_IDLE_TIMEOUT_MS = parseIntFlag(argv, '--pg-idle-timeout-ms', 5000);
 const PG_POOL_MAX = parseIntFlag(argv, '--pg-pool-max', 1);
 
@@ -203,7 +207,7 @@ function parseTsvRows(text, columns) {
 let pool;
 
 class AtlasPostgresError extends Error {
-  constructor(message, code, severity, detail, hint, table, constraint) {
+  constructor(message, code, severity, detail, hint, table, constraint, cause) {
     super(message);
     this.name = 'AtlasPostgresError';
     this.code = code;
@@ -212,6 +216,7 @@ class AtlasPostgresError extends Error {
     this.hint = hint;
     this.table = table;
     this.constraint = constraint;
+    this.cause = cause;
   }
 }
 
@@ -236,18 +241,20 @@ async function initPool() {
   return pool;
 }
 
-async function runPsql(sql) {
+async function runPsql(sql, params = []) {
   const client = await initPool();
   try {
-    const result = await client.query(sql);
+    const result = await client.query(sql, params);
     // Convert result rows to TSV format to match the old spawnSync behavior
     if (result.rows.length === 0) return '';
     const headers = Object.keys(result.rows[0]);
     const lines = result.rows.map((row) =>
-      headers.map((h) => {
-        const val = row[h];
-        return val === null ? '' : String(val);
-      }).join('\t')
+      headers
+        .map((h) => {
+          const val = row[h];
+          return val === null ? '' : String(val);
+        })
+        .join('\t')
     );
     return lines.join('\n');
   } catch (err) {
@@ -259,13 +266,34 @@ async function runPsql(sql) {
       err?.hint,
       err?.table,
       err?.constraint,
+      err
+    );
+  }
+}
+
+async function runPsqlRows(sql, params = []) {
+  const client = await initPool();
+  try {
+    const result = await client.query(sql, params);
+    return result.rows ?? [];
+  } catch (err) {
+    throw new AtlasPostgresError(
+      `psql failed: ${err?.message || String(err)}`,
+      err?.code,
+      err?.severity,
+      err?.detail,
+      err?.hint,
+      err?.table,
+      err?.constraint,
+      err
     );
   }
 }
 
 function classifyPostgresFailure(error) {
   const message = String(error?.message || error || '');
-  if (/input\/output error/i.test(message) || /could not read block/i.test(message)) return 'STORAGE_IO_FAILURE';
+  if (/input\/output error/i.test(message) || /could not read block/i.test(message))
+    return 'STORAGE_IO_FAILURE';
   if (error?.code === '42P01') return 'MISSING_RELATION';
   if (error?.code === '42703') return 'SCHEMA_MISMATCH';
   if (error?.code === '57014') return 'QUERY_TIMEOUT';
@@ -332,7 +360,20 @@ function extractObjectsFromJson(parsed) {
   if (typeof parsed !== 'object') return [];
 
   const results = [parsed];
-  const arrayKeys = ['rows', 'items', 'packets', 'registry', 'results', 'details', 'samples', 'data', 'records', 'hits', 'events', 'entries'];
+  const arrayKeys = [
+    'rows',
+    'items',
+    'packets',
+    'registry',
+    'results',
+    'details',
+    'samples',
+    'data',
+    'records',
+    'hits',
+    'events',
+    'entries',
+  ];
   for (const key of arrayKeys) {
     if (Array.isArray(parsed[key])) {
       results.push(...parsed[key].filter((item) => item && typeof item === 'object'));
@@ -383,7 +424,15 @@ function collectCandidateFiles() {
 }
 
 function walkDir(dirPath) {
-  const EXCLUDES = new Set(['node_modules', '.git', '.svelte-kit', '.vite', 'dist', 'build', 'coverage']);
+  const EXCLUDES = new Set([
+    'node_modules',
+    '.git',
+    '.svelte-kit',
+    '.vite',
+    'dist',
+    'build',
+    'coverage',
+  ]);
   const results = [];
   if (!fs.existsSync(dirPath)) return results;
   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -436,7 +485,10 @@ function buildEvidenceIndex() {
         candidates = loadNdjsonFile(filePath);
       } else {
         const parsed = loadJsonFile(filePath);
-        candidates = [...extractObjectsFromJson(parsed), ...extractSyntheticObjects(filePath, parsed)];
+        candidates = [
+          ...extractObjectsFromJson(parsed),
+          ...extractSyntheticObjects(filePath, parsed),
+        ];
       }
 
       if (candidates.length === 0) continue;
@@ -445,24 +497,89 @@ function buildEvidenceIndex() {
       for (const candidate of candidates) {
         const record = {
           filePath,
-          sourceRef: normalizeKey(candidate.source_ref ?? candidate.sourceRef ?? candidate.canonical_source_ref ?? candidate.canonicalSourceRef ?? candidate.file_path ?? candidate.filePath ?? candidate.path ?? ''),
-          canonicalSourceRef: normalizeKey(candidate.canonical_source_ref ?? candidate.canonicalSourceRef ?? candidate.source_ref ?? candidate.sourceRef ?? candidate.file_path ?? candidate.filePath ?? candidate.path ?? ''),
+          sourceRef: normalizeKey(
+            candidate.source_ref ??
+              candidate.sourceRef ??
+              candidate.canonical_source_ref ??
+              candidate.canonicalSourceRef ??
+              candidate.file_path ??
+              candidate.filePath ??
+              candidate.path ??
+              ''
+          ),
+          canonicalSourceRef: normalizeKey(
+            candidate.canonical_source_ref ??
+              candidate.canonicalSourceRef ??
+              candidate.source_ref ??
+              candidate.sourceRef ??
+              candidate.file_path ??
+              candidate.filePath ??
+              candidate.path ??
+              ''
+          ),
           sourceRefKey: normalizeKey(candidate.source_ref_key ?? candidate.sourceRefKey ?? ''),
-          packetKey: normalizeText(candidate.packet_key ?? candidate.packetKey ?? candidate.packet_id ?? candidate.packetId ?? candidate.id ?? ''),
-          featureId: normalizeText(candidate.feature_id ?? candidate.featureId ?? candidate.feature ?? ''),
-          featureLabel: normalizeText(candidate.feature_label ?? candidate.featureLabel ?? candidate.label ?? candidate.title ?? ''),
-          qdrantPayloadKey: normalizeText(candidate.qdrant_payload_key ?? candidate.qdrantPayloadKey ?? ''),
-          qdrantPointId: normalizeText(candidate.qdrant_point_id ?? candidate.qdrantPointId ?? candidate.point_id ?? candidate.pointId ?? ''),
-          qdrantCollection: normalizeText(candidate.qdrant_collection ?? candidate.qdrantCollection ?? ''),
-          packetKind: normalizeText(candidate.packet_kind ?? candidate.packetKind ?? candidate.identity_lane ?? candidate.identityLane ?? ''),
+          packetKey: normalizeText(
+            candidate.packet_key ??
+              candidate.packetKey ??
+              candidate.packet_id ??
+              candidate.packetId ??
+              candidate.id ??
+              ''
+          ),
+          featureId: normalizeText(
+            candidate.feature_id ?? candidate.featureId ?? candidate.feature ?? ''
+          ),
+          featureLabel: normalizeText(
+            candidate.feature_label ??
+              candidate.featureLabel ??
+              candidate.label ??
+              candidate.title ??
+              ''
+          ),
+          qdrantPayloadKey: normalizeText(
+            candidate.qdrant_payload_key ?? candidate.qdrantPayloadKey ?? ''
+          ),
+          qdrantPointId: normalizeText(
+            candidate.qdrant_point_id ??
+              candidate.qdrantPointId ??
+              candidate.point_id ??
+              candidate.pointId ??
+              ''
+          ),
+          qdrantCollection: normalizeText(
+            candidate.qdrant_collection ?? candidate.qdrantCollection ?? ''
+          ),
+          packetKind: normalizeText(
+            candidate.packet_kind ??
+              candidate.packetKind ??
+              candidate.identity_lane ??
+              candidate.identityLane ??
+              ''
+          ),
           summary: collapseWhitespace(candidate.summary ?? candidate.text ?? ''),
           title: collapseWhitespace(candidate.title ?? ''),
-          concepts: toArray(candidate.concepts ?? candidate.concept_ids ?? candidate.selected_concepts ?? candidate.selectedConcepts),
+          concepts: toArray(
+            candidate.concepts ??
+              candidate.concept_ids ??
+              candidate.selected_concepts ??
+              candidate.selectedConcepts
+          ),
           tags: toArray(candidate.tags ?? candidate.lane_ids ?? candidate.laneIds),
-          embeddingRef: normalizeText(candidate.embedding_ref ?? candidate.embeddingRef ?? candidate.vector_ref ?? candidate.vectorRef ?? ''),
+          embeddingRef: normalizeText(
+            candidate.embedding_ref ??
+              candidate.embeddingRef ??
+              candidate.vector_ref ??
+              candidate.vectorRef ??
+              ''
+          ),
           embedding: Array.isArray(candidate.embedding) ? candidate.embedding : null,
           communityId: normalizeText(candidate.community_id ?? candidate.communityId ?? ''),
-          communityConf: candidate.community_conf ?? candidate.communityConf ?? candidate.community_confidence ?? candidate.communityConfidence ?? null,
+          communityConf:
+            candidate.community_conf ??
+            candidate.communityConf ??
+            candidate.community_confidence ??
+            candidate.communityConfidence ??
+            null,
           sourceTable: normalizeText(candidate.source_table ?? candidate.sourceTable ?? ''),
         };
 
@@ -516,48 +633,115 @@ function extractArrayFromObject(obj, keys) {
 }
 
 function buildText(parts, fallback = '') {
-  const text = parts.map((part) => collapseWhitespace(part)).filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+  const text = parts
+    .map((part) => collapseWhitespace(part))
+    .filter(Boolean)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (text) return text.slice(0, 4000);
   return collapseWhitespace(fallback).slice(0, 4000);
 }
 
 function classifyPacketKind(row, evidence) {
   const lane = normalizeText(row.identity_lane || evidence?.packetKind || '').toLowerCase();
-  const sourceRef = normalizeKey(row.source_ref || row.source_ref_key || row.file_path || evidence?.sourceRef || evidence?.canonicalSourceRef || '');
-  const featureLabel = normalizeText(row.feature_label || evidence?.featureLabel || '').toLowerCase();
+  const sourceRef = normalizeKey(
+    row.source_ref ||
+      row.source_ref_key ||
+      row.file_path ||
+      evidence?.sourceRef ||
+      evidence?.canonicalSourceRef ||
+      ''
+  );
+  const featureLabel = normalizeText(
+    row.feature_label || evidence?.featureLabel || ''
+  ).toLowerCase();
 
-  if (lane.includes('mcp') || sourceRef.includes('#') || featureLabel.includes('mcp')) return 'mcp_tool_stub';
-  if (lane.includes('schema') || sourceRef.includes('#chunk-') || sourceRef.startsWith('docs/reports/') || sourceRef.startsWith('reports/')) return 'schema_stub';
-  if (row.qdrant_point_id || row.qdrant_collection || evidence?.qdrantPointId || evidence?.qdrantCollection) return 'qdrant_chunk';
+  if (lane.includes('mcp') || sourceRef.includes('#') || featureLabel.includes('mcp'))
+    return 'mcp_tool_stub';
+  if (
+    lane.includes('schema') ||
+    sourceRef.includes('#chunk-') ||
+    sourceRef.startsWith('docs/reports/') ||
+    sourceRef.startsWith('reports/')
+  )
+    return 'schema_stub';
+  if (
+    row.qdrant_point_id ||
+    row.qdrant_collection ||
+    evidence?.qdrantPointId ||
+    evidence?.qdrantCollection
+  )
+    return 'qdrant_chunk';
   return lane || 'schema_stub';
 }
 
 function normalizePacketRow(row, evidence) {
   const metadata = row.metadata && typeof row.metadata === 'object' ? row.metadata : {};
   const canonicalSourceRef = normalizeSourceRef(
-    row.canonical_source_ref || row.canonicalSourceRef || evidence?.canonicalSourceRef || row.source_ref || row.sourceRef || row.file_path || row.filePath || row.source_ref_key || '',
+    row.canonical_source_ref ||
+      row.canonicalSourceRef ||
+      evidence?.canonicalSourceRef ||
+      row.source_ref ||
+      row.sourceRef ||
+      row.file_path ||
+      row.filePath ||
+      row.source_ref_key ||
+      ''
   );
   const sourceRef = normalizeSourceRef(
-    row.source_ref || row.sourceRef || evidence?.sourceRef || row.file_path || row.filePath || row.source_ref_key || canonicalSourceRef || '',
+    row.source_ref ||
+      row.sourceRef ||
+      evidence?.sourceRef ||
+      row.file_path ||
+      row.filePath ||
+      row.source_ref_key ||
+      canonicalSourceRef ||
+      ''
   );
-  const sourceRefKey = normalizeSourceRef(row.source_ref_key || row.sourceRefKey || evidence?.sourceRefKey || sourceRef);
+  const sourceRefKey = normalizeSourceRef(
+    row.source_ref_key || row.sourceRefKey || evidence?.sourceRefKey || sourceRef
+  );
   const packetKey = normalizeText(row.packet_key || row.packetKey || evidence?.packetKey || '');
   const featureId = normalizeText(row.feature_id || row.featureId || evidence?.featureId || '');
-  const featureLabel = normalizeText(row.feature_label || row.featureLabel || evidence?.featureLabel || '');
-  const qdrantPointId = normalizeText(row.qdrant_point_id || row.qdrantPointId || evidence?.qdrantPointId || '');
-  const qdrantCollection = normalizeText(row.qdrant_collection || row.qdrantCollection || evidence?.qdrantCollection || '');
-  const qdrantPayloadKey = normalizeText(row.qdrant_payload_key || row.qdrantPayloadKey || evidence?.qdrantPayloadKey || '');
+  const featureLabel = normalizeText(
+    row.feature_label || row.featureLabel || evidence?.featureLabel || ''
+  );
+  const qdrantPointId = normalizeText(
+    row.qdrant_point_id || row.qdrantPointId || evidence?.qdrantPointId || ''
+  );
+  const qdrantCollection = normalizeText(
+    row.qdrant_collection || row.qdrantCollection || evidence?.qdrantCollection || ''
+  );
+  const qdrantPayloadKey = normalizeText(
+    row.qdrant_payload_key || row.qdrantPayloadKey || evidence?.qdrantPayloadKey || ''
+  );
   const qdrantVectorDim = row.qdrant_vector_dim ?? row.qdrantVectorDim ?? null;
   const contentHash = normalizeText(row.content_hash || row.contentHash || '');
   const chunkId = normalizeText(row.chunk_id || row.chunkId || '');
   const treeNodeId = normalizeText(row.tree_node_id || row.treeNodeId || '');
   const glyphRecordId = normalizeText(row.glyph_record_id || row.glyphRecordId || '');
   const neo4jNodeId = normalizeText(row.neo4j_node_id || row.neo4jNodeId || '');
-  const identityLane = normalizeText(row.identity_lane || row.identityLane || evidence?.packetKind || '');
+  const identityLane = normalizeText(
+    row.identity_lane || row.identityLane || evidence?.packetKind || ''
+  );
   const packetKind = classifyPacketKind(row, evidence);
-  const communityId = row.community_id ?? row.communityId ?? metadata.community_id ?? metadata.communityId ?? null;
-  const communityConf = row.community_confidence ?? row.communityConfidence ?? metadata.community_confidence ?? metadata.communityConfidence ?? null;
-  const somCluster = row.som_cluster ?? row.somCluster ?? row.cluster_id ?? row.clusterId ?? metadata.som_cluster ?? metadata.somCluster ?? null;
+  const communityId =
+    row.community_id ?? row.communityId ?? metadata.community_id ?? metadata.communityId ?? null;
+  const communityConf =
+    row.community_confidence ??
+    row.communityConfidence ??
+    metadata.community_confidence ??
+    metadata.communityConfidence ??
+    null;
+  const somCluster =
+    row.som_cluster ??
+    row.somCluster ??
+    row.cluster_id ??
+    row.clusterId ??
+    metadata.som_cluster ??
+    metadata.somCluster ??
+    null;
   const tags = uniqueStrings([
     ...(Array.isArray(row.tags) ? row.tags : []),
     ...(Array.isArray(metadata.tags) ? metadata.tags : []),
@@ -597,15 +781,18 @@ function normalizePacketRow(row, evidence) {
     sourceRef,
   ]);
   const embeddingCandidate = row.embedding ?? metadata.embedding ?? evidence?.embedding ?? null;
-  const embedding = Array.isArray(embeddingCandidate) && embeddingCandidate.length > 0 && embeddingCandidate.length <= 8192
-    ? embeddingCandidate
-    : null;
+  const embedding =
+    Array.isArray(embeddingCandidate) &&
+    embeddingCandidate.length > 0 &&
+    embeddingCandidate.length <= 8192
+      ? embeddingCandidate
+      : null;
   const embeddingRef = normalizeText(
     row.embedding_ref ||
-    row.embeddingRef ||
-    evidence?.embeddingRef ||
-    (qdrantCollection && qdrantPointId ? `${qdrantCollection}:${qdrantPointId}` : '') ||
-    qdrantPayloadKey,
+      row.embeddingRef ||
+      evidence?.embeddingRef ||
+      (qdrantCollection && qdrantPointId ? `${qdrantCollection}:${qdrantPointId}` : '') ||
+      qdrantPayloadKey
   );
   const permissions = {
     visibility: row.permissions?.visibility || 'internal',
@@ -616,7 +803,9 @@ function normalizePacketRow(row, evidence) {
   };
 
   const filePathVal = normalizeText(row.file_path || row.filePath || '');
-  const dirPathVal = normalizeText(row.directory_path || row.directoryPath || (filePathVal ? path.dirname(filePathVal) : ''));
+  const dirPathVal = normalizeText(
+    row.directory_path || row.directoryPath || (filePathVal ? path.dirname(filePathVal) : '')
+  );
   const metadataEnv = {
     repo_root: 'deeds-web-app',
     app_root: 'sveltekit-frontend',
@@ -632,15 +821,35 @@ function normalizePacketRow(row, evidence) {
   const topology = {
     community_id: communityId === '' ? undefined : communityId,
     neo4j_node_id: neo4jNodeId || undefined,
-    pagerank: row.pagerank !== undefined && row.pagerank !== null ? Number(row.pagerank) : undefined,
-    betweenness: row.betweenness !== undefined && row.betweenness !== null ? Number(row.betweenness) : undefined,
-    eigenvector: row.eigenvector !== undefined && row.eigenvector !== null ? Number(row.eigenvector) : undefined,
+    pagerank:
+      row.pagerank !== undefined && row.pagerank !== null ? Number(row.pagerank) : undefined,
+    betweenness:
+      row.betweenness !== undefined && row.betweenness !== null
+        ? Number(row.betweenness)
+        : undefined,
+    eigenvector:
+      row.eigenvector !== undefined && row.eigenvector !== null
+        ? Number(row.eigenvector)
+        : undefined,
     som_cluster: somCluster ? String(somCluster) : undefined,
-    som_x: row.som_x !== undefined && row.som_x !== null ? Number(row.som_x) : (row.som_row !== undefined && row.som_row !== null ? Number(row.som_row) : undefined),
-    som_y: row.som_y !== undefined && row.som_y !== null ? Number(row.som_y) : (row.som_col !== undefined && row.som_col !== null ? Number(row.som_col) : undefined),
+    som_x:
+      row.som_x !== undefined && row.som_x !== null
+        ? Number(row.som_x)
+        : row.som_row !== undefined && row.som_row !== null
+          ? Number(row.som_row)
+          : undefined,
+    som_y:
+      row.som_y !== undefined && row.som_y !== null
+        ? Number(row.som_y)
+        : row.som_col !== undefined && row.som_col !== null
+          ? Number(row.som_col)
+          : undefined,
     centroid_id: row.centroid_id || row.centroidId || undefined,
     ae_latent64: row.ae_latent64 || undefined,
-    ae_distance: row.ae_distance !== undefined && row.ae_distance !== null ? Number(row.ae_distance) : undefined,
+    ae_distance:
+      row.ae_distance !== undefined && row.ae_distance !== null
+        ? Number(row.ae_distance)
+        : undefined,
     topology_version: row.topology_version || undefined,
     topology_updated_at: row.topology_updated_at || undefined,
   };
@@ -663,10 +872,14 @@ function normalizePacketRow(row, evidence) {
   };
 
   const addressable = Boolean(packetKey && canonicalSourceRef && featureId);
-  const evidenceSources = uniqueStrings([evidence?.filePath, evidence?.sourceTable, row.source_table, row.sourceTable].filter(Boolean));
+  const evidenceSources = uniqueStrings(
+    [evidence?.filePath, evidence?.sourceTable, row.source_table, row.sourceTable].filter(Boolean)
+  );
 
   return {
-    source_table: normalizeText(row.source_table || row.sourceTable || evidence?.sourceTable || 'atlas_higher_hop_index'),
+    source_table: normalizeText(
+      row.source_table || row.sourceTable || evidence?.sourceTable || 'atlas_higher_hop_index'
+    ),
     packet_key: packetKey,
     packet_type: row.packet_type || row.packetType || packetKind || 'atlas',
     source_ref: sourceRef,
@@ -677,7 +890,12 @@ function normalizePacketRow(row, evidence) {
     feature_label: featureLabel,
     identity_lane: identityLane || null,
     packet_kind: packetKind,
-    ledger_type: packetKind === 'legacy_qdrant_only' ? 'legacy_qdrant_only' : (qdrantPointId || qdrantCollection ? 'atlas_feature_packets' : 'atlas_packets'),
+    ledger_type:
+      packetKind === 'legacy_qdrant_only'
+        ? 'legacy_qdrant_only'
+        : qdrantPointId || qdrantCollection
+          ? 'atlas_feature_packets'
+          : 'atlas_packets',
     bm25_text: bm25Text,
     concepts,
     embedding,
@@ -686,7 +904,10 @@ function normalizePacketRow(row, evidence) {
     qdrant_point_id: qdrantPointId || null,
     qdrant_collection: qdrantCollection || null,
     qdrant_payload_key: qdrantPayloadKey || null,
-    qdrant_vector_dim: qdrantVectorDim === null || qdrantVectorDim === undefined || qdrantVectorDim === '' ? null : Number(qdrantVectorDim),
+    qdrant_vector_dim:
+      qdrantVectorDim === null || qdrantVectorDim === undefined || qdrantVectorDim === ''
+        ? null
+        : Number(qdrantVectorDim),
     lane_ids: laneIds,
     tags,
     community_id: communityId === '' ? null : communityId,
@@ -726,20 +947,18 @@ function classCounts(rows) {
   for (const row of rows) {
     counts.set(row.packet_kind, (counts.get(row.packet_kind) ?? 0) + 1);
   }
-  return [
-    'qdrant_chunk',
-    'schema_stub',
-    'mcp_tool_stub',
-    'legacy_qdrant_only',
-    'unknown',
-  ].map((key) => ({ key, count: counts.get(key) ?? 0 }));
+  return ['qdrant_chunk', 'schema_stub', 'mcp_tool_stub', 'legacy_qdrant_only', 'unknown'].map(
+    (key) => ({ key, count: counts.get(key) ?? 0 })
+  );
 }
 
 async function findTable() {
   for (const table of TABLE_CANDIDATES) {
     const rows = parseTsvRows(
-      await runPsql(`select case when to_regclass('public.${table}') is not null then 't' else 'f' end as exists;`),
-      ['exists'],
+      await runPsql(
+        `select case when to_regclass('public.${table}') is not null then 't' else 'f' end as exists;`
+      ),
+      ['exists']
     );
     if (rows[0]?.exists === 't') return table;
   }
@@ -753,6 +972,7 @@ function buildCheckpoint({
   orderHash,
   rowsWritten,
   nextOffset,
+  nextCursor = null,
   batchNumber,
   rowsRead,
   interrupted = false,
@@ -767,6 +987,7 @@ function buildCheckpoint({
     orderHash,
     rowsWritten,
     nextOffset,
+    nextCursor,
     batchNumber,
     rowsRead,
     interrupted,
@@ -779,9 +1000,19 @@ function validateCheckpoint(checkpoint, { sourceTable, limit, batchSize, orderHa
     throw new Error('Invalid or unsupported checkpoint schema');
   }
   if (checkpoint.sourceTable !== sourceTable) throw new Error('Checkpoint source table mismatch');
-  if (Number(checkpoint.limit || 0) !== Number(limit || 0)) throw new Error('Checkpoint limit mismatch');
-  if (Number(checkpoint.batchSize || 0) !== Number(batchSize || 0)) throw new Error('Checkpoint batch size mismatch');
+  if (Number(checkpoint.limit || 0) !== Number(limit || 0))
+    throw new Error('Checkpoint limit mismatch');
+  if (Number(checkpoint.batchSize || 0) !== Number(batchSize || 0))
+    throw new Error('Checkpoint batch size mismatch');
   if (checkpoint.orderHash !== orderHash) throw new Error('Checkpoint ordering mismatch');
+}
+
+function buildCursorState(row, cursorColumns) {
+  if (!row) return null;
+  return cursorColumns.flatMap((column) => {
+    const value = row[column];
+    return [value === null || value === undefined ? 1 : 0, value === null || value === undefined ? '' : String(value)];
+  });
 }
 
 function writeOutputsAtomically(rows, manifest) {
@@ -806,35 +1037,106 @@ async function loadRows(table, limit = 0, options = {}) {
         and table_name = '${table}'
       order by ordinal_position
     `),
-    ['column_name'],
+    ['column_name']
   ).map((row) => row.column_name);
 
-  const orderParts = [];
-  for (const candidate of ['packet_key', 'source_ref', 'feature_id', 'qdrant_point_id', 'ctid']) {
-    if (columns.includes(candidate)) orderParts.push(`${candidate} asc nulls last`);
-  }
-  if (orderParts.length === 0) orderParts.push('ctid asc');
+  const cursorColumn =
+    ['packet_key', 'packet_id', 'source_ref', 'feature_id', 'qdrant_point_id'].find((candidate) =>
+      columns.includes(candidate)
+    ) || 'ctid';
+  const preferredProjection = [
+    'packet_key',
+    'canonical_source_ref',
+    'source_ref',
+    'source_ref_key',
+    'file_path',
+    'feature_id',
+    'feature_label',
+    'identity_lane',
+    'qdrant_point_id',
+    'qdrant_collection',
+    'qdrant_payload_key',
+    'qdrant_vector_dim',
+    'content_hash',
+    'chunk_id',
+    'tree_node_id',
+    'glyph_record_id',
+    'neo4j_node_id',
+    'community_id',
+    'community_confidence',
+    'som_cluster',
+    'tags',
+    'bm25_text',
+    'summary',
+    'text',
+    'title',
+    'embedding',
+    'embedding_ref',
+    'permissions',
+    'directory_path',
+    'route_path',
+    'component_name',
+    'package_name',
+    'runtime_surface',
+    'metadata',
+    'pagerank',
+    'betweenness',
+    'eigenvector',
+    'som_x',
+    'som_y',
+    'centroid_id',
+    'ae_latent64',
+    'ae_distance',
+    'topology_version',
+    'topology_updated_at',
+    'qdrant_vectors',
+    'vector_source',
+    'embedding_384',
+    'latent_64',
+    'langextract_terms',
+    'top10_neighbors',
+    'summary_model',
+    'fusion_sources',
+    'source_table',
+    'packet_type',
+  ].filter((column) => columns.includes(column));
+  const selectList = preferredProjection.length > 0 ? preferredProjection : columns;
+  const selectSql = selectList.map((column) => `t.${column}`).join(', ');
 
   const rows = [];
+  const pageDiagnostics = [];
   const pageSize = Number.isFinite(BATCH_SIZE) && BATCH_SIZE > 0 ? BATCH_SIZE : 1000;
-  const orderHash = sha256(orderParts.join('|'));
+  const orderHash = sha256(cursorColumn);
   const checkpointPath = options.checkpointPath || CHECKPOINT_PATH;
   const stagingPath = options.stagingPath || OUTPUT_STAGE_NDJSON;
   const resumeRequested = options.resume === true;
-  const stopAfterBatches = Number.isFinite(options.stopAfterBatches) ? Number(options.stopAfterBatches) : 0;
+  const stopAfterBatches = Number.isFinite(options.stopAfterBatches)
+    ? Number(options.stopAfterBatches)
+    : 0;
   const resumeCheckpoint = resumeRequested ? readJsonFileSafe(checkpointPath) : null;
-  let offset = 0;
+  let cursorState = null;
   let batchNumber = 0;
 
   if (resumeRequested) {
-    if (!resumeCheckpoint) throw new Error(`Resume requested but checkpoint missing: ${checkpointPath}`);
-    validateCheckpoint(resumeCheckpoint, { sourceTable: table, limit, batchSize: pageSize, orderHash });
+    if (!resumeCheckpoint)
+      throw new Error(`Resume requested but checkpoint missing: ${checkpointPath}`);
+    validateCheckpoint(resumeCheckpoint, {
+      sourceTable: table,
+      limit,
+      batchSize: pageSize,
+      orderHash,
+    });
     const stagedRows = loadStageNdjsonFile(stagingPath);
     if (Number(resumeCheckpoint.rowsWritten || 0) !== stagedRows.length) {
-      throw new Error(`Resume staging mismatch: checkpoint rowsWritten=${resumeCheckpoint.rowsWritten} stagedRows=${stagedRows.length}`);
+      throw new Error(
+        `Resume staging mismatch: checkpoint rowsWritten=${resumeCheckpoint.rowsWritten} stagedRows=${stagedRows.length}`
+      );
     }
     rows.push(...stagedRows);
-    offset = Number(resumeCheckpoint.nextOffset || stagedRows.length || 0);
+    cursorState =
+      Array.isArray(resumeCheckpoint.nextCursor) && resumeCheckpoint.nextCursor.length
+        ? resumeCheckpoint.nextCursor
+        : buildCursorState(stagedRows[stagedRows.length - 1], [cursorColumn]);
     batchNumber = Number(resumeCheckpoint.batchNumber || 0);
   } else {
     cleanupPath(stagingPath);
@@ -846,28 +1148,47 @@ async function loadRows(table, limit = 0, options = {}) {
     const pageLimit = limit > 0 ? Math.min(pageSize, remaining) : pageSize;
     if (pageLimit <= 0) break;
 
+    const cursorClause = cursorState && Array.isArray(cursorState) && cursorState[1] !== undefined ? `where ${cursorColumn} > $1` : '';
     const sql = `
-      select to_jsonb(t)::text as row_json
+      select ${selectSql}
       from public.${table} t
-      order by ${orderParts.join(', ')}
+      ${cursorClause}
+      order by ${cursorColumn} asc
       limit ${pageLimit}
-      offset ${offset}
     `;
 
-    const pageRows = parseTsvRows(await runPsql(sql), ['row_json']).map((row) => {
-      try {
-        return JSON.parse(row.row_json);
-      } catch {
-        return null;
-      }
-    }).filter(Boolean);
+    const params = cursorClause ? [cursorState[1]] : [];
+    const pageQueryStartedAt = Date.now();
+    const pageRows = await runPsqlRows(sql, params);
+    const pageQueryElapsedMs = Date.now() - pageQueryStartedAt;
+    const pageParseStartedAt = Date.now();
+    const pageParseElapsedMs = Date.now() - pageParseStartedAt;
+    const pageRawBytes = Buffer.byteLength(JSON.stringify(pageRows), 'utf8');
+    const pageNormalizedBytes = Buffer.byteLength(
+      pageRows.map((row) => JSON.stringify(row)).join('\n'),
+      'utf8'
+    );
+    pageDiagnostics.push({
+      batchNumber: batchNumber + 1,
+      cursorColumn,
+      pageLimit,
+      rows: pageRows.length,
+      queryElapsedMs: pageQueryElapsedMs,
+      parseElapsedMs: pageParseElapsedMs,
+      rawBytes: pageRawBytes,
+      normalizedBytes: pageNormalizedBytes,
+    });
 
     rows.push(...pageRows);
     batchNumber += 1;
 
     if (options.persistStage === true) {
       ensureParentDir(stagingPath);
-      fs.appendFileSync(stagingPath, `${pageRows.map((row) => JSON.stringify(row)).join('\n')}${pageRows.length ? '\n' : ''}`, 'utf8');
+      fs.appendFileSync(
+        stagingPath,
+        `${pageRows.map((row) => JSON.stringify(row)).join('\n')}${pageRows.length ? '\n' : ''}`,
+        'utf8'
+      );
     }
 
     const checkpoint = buildCheckpoint({
@@ -876,7 +1197,8 @@ async function loadRows(table, limit = 0, options = {}) {
       batchSize: pageSize,
       orderHash,
       rowsWritten: rows.length,
-      nextOffset: offset + pageRows.length,
+      nextOffset: rows.length,
+      nextCursor: buildCursorState(pageRows[pageRows.length - 1], [cursorColumn]),
       batchNumber,
       rowsRead: rows.length,
       interrupted: false,
@@ -894,7 +1216,8 @@ async function loadRows(table, limit = 0, options = {}) {
           batchSize: pageSize,
           orderHash,
           rowsWritten: rows.length,
-          nextOffset: offset + pageRows.length,
+          nextOffset: rows.length,
+          nextCursor: buildCursorState(pageRows[pageRows.length - 1], [cursorColumn]),
           batchNumber,
           rowsRead: rows.length,
           interrupted: true,
@@ -904,19 +1227,21 @@ async function loadRows(table, limit = 0, options = {}) {
     }
 
     if (pageRows.length < pageLimit) break;
-    offset += pageRows.length;
+    cursorState = buildCursorState(pageRows[pageRows.length - 1], [cursorColumn]);
   }
 
   return {
     rows,
     interrupted: false,
+    pageDiagnostics,
     checkpoint: buildCheckpoint({
       sourceTable: table,
       limit,
       batchSize: pageSize,
       orderHash,
       rowsWritten: rows.length,
-      nextOffset: offset,
+      nextOffset: rows.length,
+      nextCursor: cursorState,
       batchNumber,
       rowsRead: rows.length,
       interrupted: false,
@@ -946,7 +1271,7 @@ async function main() {
       row.file_path,
       row.feature_id,
       row.qdrant_payload_key,
-      row.qdrant_point_id,
+      row.qdrant_point_id
     );
     return normalizePacketRow({ ...row, source_table: sourceTable }, matchedEvidence);
   });
@@ -964,7 +1289,11 @@ async function main() {
     packets.push(row);
   }
 
-  packets.sort((a, b) => String(a.packet_key || '').localeCompare(String(b.packet_key || '')) || String(a.qdrant_point_id || '').localeCompare(String(b.qdrant_point_id || '')));
+  packets.sort(
+    (a, b) =>
+      String(a.packet_key || '').localeCompare(String(b.packet_key || '')) ||
+      String(a.qdrant_point_id || '').localeCompare(String(b.qdrant_point_id || ''))
+  );
 
   const summary = {
     sourceTable,
@@ -973,7 +1302,8 @@ async function main() {
     addressableRows: packets.filter((row) => row.addressable).length,
     qdrantBackedRows: packets.filter((row) => Boolean(row.qdrant_point_id)).length,
     qdrantCollectionRows: packets.filter((row) => Boolean(row.qdrant_collection)).length,
-    conceptsRows: packets.filter((row) => Array.isArray(row.concepts) && row.concepts.length > 0).length,
+    conceptsRows: packets.filter((row) => Array.isArray(row.concepts) && row.concepts.length > 0)
+      .length,
     bm25Rows: packets.filter((row) => Boolean(row.bm25_text)).length,
     embeddingRefRows: packets.filter((row) => Boolean(row.embedding_ref)).length,
     evidenceMatchedRows: packets.filter((row) => row.source_evidence_hit).length,
@@ -988,6 +1318,28 @@ async function main() {
     evidenceFilesSkippedTooLarge: evidence.stats.filesSkippedTooLarge,
     evidenceRecordsIndexed: evidence.stats.recordsIndexed,
   };
+  const pageDiagnostics = loaded.pageDiagnostics ?? [];
+  const loadStats = pageDiagnostics.length
+    ? {
+        batches: pageDiagnostics.length,
+        rows: pageDiagnostics.reduce((sum, page) => sum + Number(page.rows || 0), 0),
+        totalQueryElapsedMs: pageDiagnostics.reduce((sum, page) => sum + Number(page.queryElapsedMs || 0), 0),
+        totalParseElapsedMs: pageDiagnostics.reduce((sum, page) => sum + Number(page.parseElapsedMs || 0), 0),
+        maxQueryElapsedMs: Math.max(...pageDiagnostics.map((page) => Number(page.queryElapsedMs || 0))),
+        maxParseElapsedMs: Math.max(...pageDiagnostics.map((page) => Number(page.parseElapsedMs || 0))),
+        maxRawBytes: Math.max(...pageDiagnostics.map((page) => Number(page.rawBytes || 0))),
+        maxNormalizedBytes: Math.max(...pageDiagnostics.map((page) => Number(page.normalizedBytes || 0))),
+      }
+    : {
+        batches: 0,
+        rows: 0,
+        totalQueryElapsedMs: 0,
+        totalParseElapsedMs: 0,
+        maxQueryElapsedMs: 0,
+        maxParseElapsedMs: 0,
+        maxRawBytes: 0,
+        maxNormalizedBytes: 0,
+      };
 
   const manifest = {
     schema: 'addressable_packets_materialization_manifest.v1',
@@ -1008,14 +1360,14 @@ async function main() {
   }
 
   fs.mkdirSync(path.dirname(REPORT_JSON), { recursive: true });
-  const mirrorReport = readJsonFileSafe(path.join(REPO_ROOT, 'docs', 'reports', 'qdrant-postgres-mirror-reconciliation.json'));
+  const mirrorReport = readJsonFileSafe(
+    path.join(REPO_ROOT, 'docs', 'reports', 'qdrant-postgres-mirror-reconciliation.json')
+  );
   const qdrantMirrorProven = Boolean(
     mirrorReport &&
-    (
-      mirrorReport.status === 'IN_SYNC' ||
-      mirrorReport.proof?.qdrantMirror === 'PROVEN' ||
-      mirrorReport.summary?.status === 'IN_SYNC'
-    )
+      (mirrorReport.status === 'IN_SYNC' ||
+        mirrorReport.proof?.qdrantMirror === 'PROVEN' ||
+        mirrorReport.summary?.status === 'IN_SYNC')
   );
   const fullMaterializationProven = Boolean(APPLY_REQUESTED && !loaded.interrupted && LIMIT <= 0);
   const proof = deriveMaterializationProofDetail(summary, {
@@ -1031,16 +1383,20 @@ async function main() {
     interrupted: loaded.interrupted,
     proof,
     proofStates: deriveMaterializationProofStates(proof),
+    loadStats,
     status: loaded.interrupted
       ? 'INTERRUPTED'
       : summary.addressableRows > 0
-        ? (APPLY_REQUESTED ? 'MATERIALIZED' : 'DRY_RUN_READY')
+        ? APPLY_REQUESTED
+          ? 'MATERIALIZED'
+          : 'DRY_RUN_READY'
         : 'NO_ADDRESSABLE_PACKETS',
-    nextSafeAction: summary.addressableRows > 0
-      ? (loaded.interrupted
-        ? `Resume with --resume --checkpoint-file=${path.relative(REPO_ROOT, CHECKPOINT_PATH).replace(/\\/g, '/')} to complete the remaining batches.`
-        : 'Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.')
-      : 'Investigate why the ledger has no addressable packets before rerunning atlas:pipeline.',
+    nextSafeAction:
+      summary.addressableRows > 0
+        ? loaded.interrupted
+          ? `Resume with --resume --checkpoint-file=${path.relative(REPO_ROOT, CHECKPOINT_PATH).replace(/\\/g, '/')} to complete the remaining batches.`
+          : 'Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.'
+        : 'Investigate why the ledger has no addressable packets before rerunning atlas:pipeline.',
     checkpoint: loaded.checkpoint,
     samples: packets.slice(0, SAMPLE).map((row) => ({
       packet_key: row.packet_key,
@@ -1075,6 +1431,11 @@ async function main() {
     `- concepts rows: ${summary.conceptsRows}`,
     `- embedding ref rows: ${summary.embeddingRefRows}`,
     `- evidence matches: ${summary.evidenceMatchedRows}`,
+    `- load batches: ${loadStats.batches}`,
+    `- max page query ms: ${loadStats.maxQueryElapsedMs}`,
+    `- max page parse ms: ${loadStats.maxParseElapsedMs}`,
+    `- max page raw bytes: ${loadStats.maxRawBytes}`,
+    `- max page normalized bytes: ${loadStats.maxNormalizedBytes}`,
     `- missing feature_id: ${summary.missingFeatureId}`,
     `- missing canonical_source_ref: ${summary.missingCanonicalSourceRef}`,
     `- missing qdrant_point_id: ${summary.missingQdrantPointId}`,
@@ -1110,7 +1471,10 @@ async function main() {
     '',
     '## Samples',
     '',
-    ...report.samples.map((row) => `- ${row.packet_key} | ${row.packet_kind} | ${row.feature_id || '(missing feature_id)'} | ${row.qdrant_collection || '(no qdrant collection)'}`),
+    ...report.samples.map(
+      (row) =>
+        `- ${row.packet_key} | ${row.packet_kind} | ${row.feature_id || '(missing feature_id)'} | ${row.qdrant_collection || '(no qdrant collection)'}`
+    ),
     '',
     '## Next Safe Action',
     '',
@@ -1131,15 +1495,21 @@ async function main() {
       console.log(`Wrote ${path.relative(REPO_ROOT, OUTPUT_MANIFEST)}`);
     }
   }
-  console.log(JSON.stringify({
-    status: report.status,
-    sourceTable,
-    addressableRows: summary.addressableRows,
-    qdrantBackedRows: summary.qdrantBackedRows,
-    evidenceMatchedRows: summary.evidenceMatchedRows,
-    missingQdrantPointId: summary.missingQdrantPointId,
-    interrupted: report.interrupted,
-  }, null, 2));
+  console.log(
+    JSON.stringify(
+      {
+        status: report.status,
+        sourceTable,
+        addressableRows: summary.addressableRows,
+        qdrantBackedRows: summary.qdrantBackedRows,
+        evidenceMatchedRows: summary.evidenceMatchedRows,
+        missingQdrantPointId: summary.missingQdrantPointId,
+        interrupted: report.interrupted,
+      },
+      null,
+      2
+    )
+  );
 
   if (pool) await pool.end();
   if (report.status === 'INTERRUPTED') process.exitCode = 2;
@@ -1154,22 +1524,40 @@ main().catch(async (error) => {
       status: 'FAILED',
       blocker: 'POSTGRES_STORAGE_IO_FAILURE',
       message: error?.message || String(error),
+      code: error?.code ?? null,
+      severity: error?.severity ?? null,
+      detail: error?.detail ?? null,
+      hint: error?.hint ?? null,
+      table: error?.table ?? null,
+      constraint: error?.constraint ?? null,
+      queryTimeoutMs: PG_QUERY_TIMEOUT_MS,
+      connectionTimeoutMs: PG_CONNECTION_TIMEOUT_MS,
       graphifyPromotionAllowed: false,
     };
     await fsPromises.writeFile(REPORT_JSON, `${JSON.stringify(failureReport, null, 2)}\n`, 'utf8');
-    await fsPromises.writeFile(REPORT_MD, [
-      '# Packet Reader / Writer Audit',
-      '',
-      'Status: FAILED',
-      'Blocker: POSTGRES_STORAGE_IO_FAILURE',
-      '',
-      String(error?.message || error),
-      '',
-    ].join('\n'), 'utf8');
-    console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
+    await fsPromises.writeFile(
+      REPORT_MD,
+      [
+        '# Packet Reader / Writer Audit',
+        '',
+        'Status: FAILED',
+        'Blocker: POSTGRES_STORAGE_IO_FAILURE',
+        '',
+        String(error?.message || error),
+        '',
+      ].join('\n'),
+      'utf8'
+    );
+    console.error(
+      '[materialize-addressable-packets] failed:',
+      error?.stack || error?.message || String(error)
+    );
     process.exitCode = 10;
     return;
   }
-  console.error('[materialize-addressable-packets] failed:', error?.stack || error?.message || String(error));
-  process.exit(1);
-});
+    console.error(
+      '[materialize-addressable-packets] failed:',
+      error?.stack || error?.message || String(error)
+    );
+    process.exitCode = 1;
+  });

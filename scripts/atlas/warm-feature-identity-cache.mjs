@@ -16,6 +16,11 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from '../../sveltekit-frontend/scripts/atlas/lib/redis-valkey.mjs';
 dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,6 +35,8 @@ const SCROLL_LIMIT = parseInt(args.find(a => a.startsWith('--limit='))?.split('=
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://127.0.0.1:6333';
 const COLLECTION = 'codebase_chunks_768';
 const TTL = 24 * 3600; // 24h
+const REPO_ROOT = resolve(__dirname, '../..');
+const HLL_PREFIX = 'feature-identity:hll';
 
 console.log(`[identity-warm] mode=${APPLY ? 'APPLY' : 'DRY-RUN'} limit=${SCROLL_LIMIT || 'none'}`);
 
@@ -37,16 +44,48 @@ console.log(`[identity-warm] mode=${APPLY ? 'APPLY' : 'DRY-RUN'} limit=${SCROLL_
 
 let redis;
 try {
-  redis = new Redis({
-    host: process.env.REDIS_HOST ?? '127.0.0.1',
-    port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
-    password: process.env.REDIS_PASSWORD ?? 'redis',
-    lazyConnect: true,
-    maxRetriesPerRequest: 1,
-    enableOfflineQueue: false,
-    retryStrategy: () => null,
-  });
-  redis.on('error', () => {});
+  const { env, container, password } = await resolveAtlasRedisContext(REPO_ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+  const preferCli = shouldPreferValkeyCli(env, container);
+  redis = preferCli
+    ? {
+        async connect() {},
+        async ping() {
+          const result = runRedisCli(container, ['PING'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+          return result.stdout.trim();
+        },
+        async setex(key, ttl, value) {
+          const result = runRedisCli(container, ['SETEX', key, String(ttl), value], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SETEX failed');
+        },
+        async sadd(key, ...members) {
+          const result = runRedisCli(container, ['SADD', key, ...members], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SADD failed');
+        },
+        async pfadd(key, ...members) {
+          const result = runRedisCli(container, ['PFADD', key, ...members], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+        },
+        async pfcount(key) {
+          const result = runRedisCli(container, ['PFCOUNT', key], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFCOUNT failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
+        },
+        async quit() {},
+      }
+    : new Redis({
+        host,
+        port,
+        password,
+        lazyConnect: true,
+        maxRetriesPerRequest: 1,
+        enableOfflineQueue: false,
+        retryStrategy: () => null,
+      });
+  if (!preferCli) redis.on('error', () => {});
   await redis.connect();
   await redis.ping();
 } catch (err) {
@@ -154,47 +193,45 @@ if (!APPLY) {
   console.log(`  feature:{id}:qdrantPoints — ${featureToPoints.size} keys`);
   console.log(`  sourceRef:{hash}:featureIds — ${hashToFeatures.size} keys`);
   console.log(`  sourceRef:{hash}:qdrantPoints — ${hashToPoints.size} keys`);
+  console.log(`  ${HLL_PREFIX}:featureIds`);
+  console.log(`  ${HLL_PREFIX}:sourceRefs`);
   console.log('[identity-warm] Re-run with --apply to populate Valkey.');
   await redis.quit().catch(() => {});
   process.exit(0);
 }
 
 let written = 0;
-const pipe = redis.pipeline();
 
 for (const [featureId, refs] of featureToRefs) {
   const key = `feature:${featureId}:sourceRefs`;
-  pipe.del(key);
-  for (const ref of refs) pipe.sadd(key, ref);
-  pipe.expire(key, TTL);
+  await redis.setex(key, TTL, JSON.stringify([...refs]));
+  if (typeof redis.pfadd === 'function') await redis.pfadd(`${HLL_PREFIX}:featureIds`, featureId);
   written++;
 }
 
 for (const [featureId, points] of featureToPoints) {
   const key = `feature:${featureId}:qdrantPoints`;
-  pipe.del(key);
-  for (const pt of points) pipe.sadd(key, pt);
-  pipe.expire(key, TTL);
+  await redis.setex(key, TTL, JSON.stringify([...points]));
   written++;
 }
 
 for (const [hash, featureIds] of hashToFeatures) {
   const key = `sourceRef:${hash}:featureIds`;
-  pipe.del(key);
-  for (const fid of featureIds) pipe.sadd(key, fid);
-  pipe.expire(key, TTL);
+  await redis.setex(key, TTL, JSON.stringify([...featureIds]));
+  if (typeof redis.pfadd === 'function') await redis.pfadd(`${HLL_PREFIX}:sourceRefs`, hash);
   written++;
 }
 
 for (const [hash, points] of hashToPoints) {
   const key = `sourceRef:${hash}:qdrantPoints`;
-  pipe.del(key);
-  for (const pt of points) pipe.sadd(key, pt);
-  pipe.expire(key, TTL);
+  await redis.setex(key, TTL, JSON.stringify([...points]));
   written++;
 }
 
-await pipe.exec();
+if (typeof redis.pfcount === 'function') {
+  console.log(`[identity-warm] HLL feature count: ${await redis.pfcount(`${HLL_PREFIX}:featureIds`)}`);
+  console.log(`[identity-warm] HLL sourceRef count: ${await redis.pfcount(`${HLL_PREFIX}:sourceRefs`)}`);
+}
 await redis.quit().catch(() => {});
 
 console.log(`\n[identity-warm] Wrote ${written} Valkey key groups`);

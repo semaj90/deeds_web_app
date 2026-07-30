@@ -1,6 +1,6 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-07-29T05:52:32.147Z
+Generated: 2026-07-30T03:50:04.712Z
 Status: DRY_RUN_READY
 Source table: atlas_packets
 
@@ -12,13 +12,19 @@ Source table: atlas_packets
 - qdrant-backed rows: 1
 - qdrant collection rows: 1
 - bm25 rows: 1
-- concepts rows: 1
+- concepts rows: 0
 - embedding ref rows: 1
 - evidence matches: 0
+- load batches: 1
+- max page query ms: 7
+- max page parse ms: 0
+- max page raw bytes: 13884
+- max page normalized bytes: 13882
 - missing feature_id: 0
 - missing canonical_source_ref: 0
 - missing qdrant_point_id: 0
 - missing qdrant_collection: 0
+- duplicate packets skipped: 0
 
 ## Proof
 
@@ -49,7 +55,7 @@ Source table: atlas_packets
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: 82e5ac9a4c24df007331ce59a828b8e9f65e04efcf10168b23b64d6f96a23e39
+- sha256: 9b244d13a3c8fc2bbfd4685faffae92fdc0b956e26e5a2842d4d5db8b6ff16d9
 
 ## Samples
 

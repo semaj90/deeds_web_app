@@ -289,6 +289,19 @@ export const aceTopologicalKagKey = {
     `ace:topo:kag:${hashStr16(query)}:${hashStr16(scope)}`,
 };
 
+export const ontologyKey = {
+  /** ace:ontology:tuple:{tupleId} — compact linked tuple projection */
+  tuple: (tupleId: string) => `ace:ontology:tuple:${tupleId}`,
+
+  /** ace:ontology:tokenmap:{featureId}:{sourceRefHash}:{packetId} — revisioned token remapping cache */
+  tokenMap: (featureId: string, sourceRefHash: string, packetId: string) =>
+    `ace:ontology:tokenmap:${featureId}:${sourceRefHash}:${packetId}`,
+
+  /** ace:ontology:blocked_content_hashes:{workspaceRevision} — audited blocklist for prompt-injection defense */
+  blockedContentHashes: (workspaceRevision: string) =>
+    `ace:ontology:blocked_content_hashes:${hashStr16(workspaceRevision)}`,
+};
+
 // ── ACE Token Budget Keys ─────────────────────────────────────────────────────
 
 export const aceTokenBudgetKey = {

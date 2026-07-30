@@ -25,6 +25,13 @@ function mergedEnv(extra = {}) {
     extra.DEV_GPU_ENABLE_MTP ?? envFromFiles.DEV_GPU_ENABLE_MTP ?? process.env.DEV_GPU_ENABLE_MTP ?? 'false',
   ).toLowerCase() === 'true';
 
+  const devGpuLlmBackend = String(
+    extra.DEV_GPU_LLM_BACKEND ?? envFromFiles.DEV_GPU_LLM_BACKEND ?? process.env.DEV_GPU_LLM_BACKEND ?? 'llama-server',
+  ).toLowerCase();
+
+  const isLiteRT = devGpuLlmBackend === 'litert';
+  const synthPort = isLiteRT ? '8070' : '8090';
+
   return {
     ...process.env,
     ...envFromFiles,
@@ -37,17 +44,19 @@ function mergedEnv(extra = {}) {
     EMBED_SERVER_PORT: envFromFiles.EMBED_SERVER_PORT ?? '8081',
     EMBED_MAX_BATCH: envFromFiles.EMBED_MAX_BATCH ?? '64',
     MINIFORGE_SIDECAR_URL: envFromFiles.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095',
-    LOCAL_OPENAI_BASE_URL: envFromFiles.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1',
+    DEV_GPU_LLM_BACKEND: devGpuLlmBackend,
+    LOCAL_OPENAI_BASE_URL: envFromFiles.LOCAL_OPENAI_BASE_URL ?? `http://127.0.0.1:${synthPort}/v1`,
     LOCAL_OPENAI_API_KEY: envFromFiles.LOCAL_OPENAI_API_KEY ?? 'local',
-    LOCAL_GEMMA_MODEL: envFromFiles.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
-    TURBO_PORT: envFromFiles.TURBO_PORT ?? '8090',
+    LOCAL_GEMMA_MODEL: envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : 'gemma4-legal-iq4xs-direct.gguf'),
+    TURBO_PORT: isLiteRT ? synthPort : (envFromFiles.TURBO_PORT ?? '8090'),
     TURBO_CTX: envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
     LLM_CONTEXT_SIZE: envFromFiles.LLM_CONTEXT_SIZE ?? envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
     TURBO_CTX_ALLOW_SHORT_CONTEXT: envFromFiles.TURBO_CTX_ALLOW_SHORT_CONTEXT ?? 'false',
     TURBO_PARALLEL: envFromFiles.TURBO_PARALLEL ?? '1',
     TURBO_BATCH_SIZE: envFromFiles.TURBO_BATCH_SIZE ?? '512',
     TURBO_UBATCH_SIZE: envFromFiles.TURBO_UBATCH_SIZE ?? '128',
-    // dev:gpu should boot the canonical 8090 synthesis lane reliably.
+    // dev:gpu should boot the canonical synthesis lane reliably.
+    // Backend (llama-server or LiteRT) runs on either :8090 or :8070.
     // Speculative draft decoding remains available through the dedicated
     // turbo:* launchers, but it is not part of the default dev startup path.
     ENABLE_MTP_DRAFTER: devGpuEnableMtp ? (envFromFiles.ENABLE_MTP_DRAFTER ?? 'true') : 'false',
@@ -144,30 +153,89 @@ async function findFreePort(startPort) {
 }
 
 async function main() {
-  // Launch TurboQuant llama-server (Gemma4 at :8090) unless already running
-  const turboPort = parseInt(process.env.TURBO_PORT ?? '8090');
-  if (await isLlamaServerRunning(turboPort)) {
-    console.log(`[dev:gpu] ✅ llama-server already running on :${turboPort} — skipping launch`);
+  // Determine LLM backend: llama-server (default) or litert
+  const llmBackend = String(process.env.DEV_GPU_LLM_BACKEND ?? 'llama-server').toLowerCase();
+  const isLiteRT = llmBackend === 'litert';
+
+  // Backend-specific ports and URLs
+  const synthPort = isLiteRT ? 8070 : 8090;
+  const llmUrl = isLiteRT ? 'http://127.0.0.1:8070/v1' : 'http://127.0.0.1:8090/v1';
+
+  // Launch LLM backend (LiteRT or TurboQuant llama-server) unless already running
+  if (await isLlamaServerRunning(synthPort)) {
+    console.log(`[dev:gpu] ✅ ${isLiteRT ? 'LiteRT' : 'llama-server'} already running on :${synthPort} — skipping launch`);
   } else {
-    if (String(process.env.DEV_GPU_ENABLE_MTP ?? 'false').toLowerCase() !== 'true') {
-      console.log('[dev:gpu] MTP speculative decoding is disabled for dev:gpu; use turbo:* launchers for the benchmark lane.');
+    if (isLiteRT) {
+      // Launch LiteRT via system Python
+      console.log('[dev:gpu] Launching LiteRT-LM (Gemma4) via system Python...');
+
+      try {
+        // Determine Python executable
+        const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+        const litertScript = path.resolve(REPO_ROOT, 'scripts', 'litert-serve.py');
+        const backend = String(process.env.CUDA_VISIBLE_DEVICES ?? '0') !== '' ? 'gpu' : 'cpu';
+
+        await runChecked(pythonCmd, [
+          litertScript,
+          '--port', String(synthPort),
+          '--backend', backend,
+          '--model', process.env.LOCAL_GEMMA_MODEL ?? 'gemma-4-E2B-it.litertlm',
+        ], {
+          cwd: REPO_ROOT,
+          env: mergedEnv({
+            PYTHONUNBUFFERED: '1',
+            CUDA_VISIBLE_DEVICES: process.env.CUDA_VISIBLE_DEVICES ?? '0',
+          }),
+        });
+
+        console.log(`[dev:gpu] ✅ LiteRT-LM (Gemma4) active on :${synthPort}`);
+      } catch (error) {
+        console.error(`[dev:gpu] ❌ LiteRT launch failed: ${error.message}`);
+        console.log('[dev:gpu] Falling back to llama-server (TurboQuant)...');
+
+        // Fallback to llama-server
+        if (String(process.env.DEV_GPU_ENABLE_MTP ?? 'false').toLowerCase() !== 'true') {
+          console.log('[dev:gpu] MTP speculative decoding is disabled for dev:gpu; use turbo:* launchers for the benchmark lane.');
+        }
+
+        const launcherEnv = mergedEnv();
+        const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-turboquant.ps1');
+
+        await runChecked('pwsh', [
+          '-NoProfile',
+          '-ExecutionPolicy',
+          'Bypass',
+          '-File',
+          launcherScript,
+          '-Detached',
+          '-TextOnly',
+        ], { cwd: REPO_ROOT, env: launcherEnv });
+
+        console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active on :8090');
+      }
+    } else {
+      // Launch TurboQuant llama-server (Gemma4 at :8090)
+      if (String(process.env.DEV_GPU_ENABLE_MTP ?? 'false').toLowerCase() !== 'true') {
+        console.log('[dev:gpu] MTP speculative decoding is disabled for dev:gpu; use turbo:* launchers for the benchmark lane.');
+      }
+
+      // Pass env vars directly through Node's env inheritance — PowerShell subprocess
+      // will see them as $env:TURBO_CTX etc. without needing inline assignment.
+      const launcherEnv = mergedEnv();
+      const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-turboquant.ps1');
+
+      await runChecked('pwsh', [
+        '-NoProfile',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        launcherScript,
+        '-Detached',
+        '-TextOnly',
+      ], { cwd: REPO_ROOT, env: launcherEnv });
+
+      console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active on :8090');
     }
-    // Pass env vars directly through Node's env inheritance — PowerShell subprocess
-    // will see them as $env:TURBO_CTX etc. without needing inline assignment.
-    const launcherEnv = mergedEnv();
-    const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-turboquant.ps1');
-
-    await runChecked('pwsh', [
-      '-NoProfile',
-      '-ExecutionPolicy',
-      'Bypass',
-      '-File',
-      launcherScript,
-      '-Detached',
-      '-TextOnly',
-    ], { cwd: REPO_ROOT, env: launcherEnv });
-
-    console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active');
   }
 
   // Start ONNX embedding server unless already running on :8081
@@ -208,7 +276,7 @@ async function main() {
   }
 
   console.log('[dev:gpu] --- GPU Runtime Ready ---');
-  console.log('[dev:gpu] LLM (synthesis):  http://127.0.0.1:8090/v1');
+  console.log(`[dev:gpu] LLM (synthesis):  ${llmUrl} (${isLiteRT ? 'LiteRT-LM' : 'TurboQuant llama-server'})`);
   console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX)');
   console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
   console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);

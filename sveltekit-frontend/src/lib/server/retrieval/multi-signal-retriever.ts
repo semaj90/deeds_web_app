@@ -124,9 +124,9 @@ export class MultiSignalRetriever {
       });
 
       return result.results.map((r, idx) => ({
-        packet_key: r.payload?.packet_key || 'unknown',
-        source_ref: r.payload?.source_ref || '',
-        feature_label: r.payload?.feature_label,
+        packet_key: String(r.payload?.packet_key ?? 'unknown'),
+        source_ref: String(r.payload?.source_ref ?? ''),
+        feature_label: r.payload?.feature_label != null ? String(r.payload.feature_label) : undefined,
         semantic_score: r.score,
         semantic_rank: idx,
         rrf_score: 0,
@@ -164,10 +164,10 @@ export class MultiSignalRetriever {
       const rows = ((results as { rows?: Array<Record<string, unknown>> }).rows ?? []);
 
       return rows.map((r, idx) => ({
-        packet_key: r.packet_key,
-        source_ref: r.source_ref,
-        feature_label: r.feature_label,
-        lexical_score: r.ts_score,
+        packet_key: String(r.packet_key ?? ''),
+        source_ref: String(r.source_ref ?? ''),
+        feature_label: r.feature_label != null ? String(r.feature_label) : undefined,
+        lexical_score: Number(r.ts_score ?? 0),
         lexical_rank: idx,
         rrf_score: 0,
         final_rank: 0,

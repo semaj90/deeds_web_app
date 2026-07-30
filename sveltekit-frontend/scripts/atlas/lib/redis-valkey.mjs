@@ -50,6 +50,46 @@ export function getRedisPassword(env = process.env) {
   return String(env.REDIS_PASSWORD || env.VALKEY_PASSWORD || 'redis').trim();
 }
 
+export function isLoopbackHost(hostname = '') {
+  const normalized = String(hostname).trim().toLowerCase();
+  return normalized === 'localhost' || normalized === '127.0.0.1' || normalized === '::1';
+}
+
+export function getRedisTarget(env = process.env) {
+  const rawUrl = String(env.VALKEY_URL || env.REDIS_URL || '').trim();
+  if (!rawUrl) {
+    return {
+      rawUrl: '',
+      host: String(env.VALKEY_HOST || env.REDIS_HOST || '').trim(),
+      port: String(env.VALKEY_PORT || env.REDIS_PORT || '').trim(),
+      loopback: isLoopbackHost(env.VALKEY_HOST || env.REDIS_HOST || ''),
+    };
+  }
+
+  try {
+    const parsed = new URL(rawUrl);
+    return {
+      rawUrl,
+      host: parsed.hostname,
+      port: parsed.port || (parsed.protocol === 'rediss:' ? '6380' : '6379'),
+      loopback: isLoopbackHost(parsed.hostname),
+    };
+  } catch {
+    return {
+      rawUrl,
+      host: String(env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1').trim(),
+      port: String(env.VALKEY_PORT || env.REDIS_PORT || '6379').trim(),
+      loopback: isLoopbackHost(env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1'),
+    };
+  }
+}
+
+export function shouldPreferValkeyCli(env = process.env, container = null) {
+  if (!container) return false;
+  const target = getRedisTarget(env);
+  return !target.rawUrl || target.loopback;
+}
+
 export function runDocker(args, input = null, options = {}) {
   const result = spawnSync('docker', args, {
     encoding: 'utf8',

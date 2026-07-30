@@ -20,9 +20,10 @@ Options:
   --verbose          Log each entity as it is extracted
 
 Requirements:
-  - Python 3.10+ in .venv (pip install langextract psycopg2-binary python-dotenv)
+  - Python 3.12+ in Miniforge WSL2 sidecar (pip install langextract psycopg2-binary python-dotenv tqdm)
   - Postgres running on port 5434 (docker start legal-ai-postgres)
-  - Ollama running on port 11434 with gemma4-rotorquant:latest
+  - llama-server (TurboQuant) running on port 8090 with gemma4-legal-iq4xs-direct.gguf
+  - (.tmp directory for JSON progress events)
 
 Postgres writes:
   - atlas_packets.metadata['langextract_entities'] = [{ class, text, attributes }, ...]
@@ -40,6 +41,7 @@ import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
+import threading
 
 # ── Dotenv (optional) ──────────────────────────────────────────────────────────
 try:
@@ -78,7 +80,7 @@ PG_DB       = os.getenv('PGDATABASE', 'legal_ai_db')
 PG_USER     = os.getenv('PGUSER',     'legal_admin')
 PG_PASS     = os.getenv('PGPASSWORD', os.getenv('DB_PASSWORD', '123456'))
 
-# llama-server OpenAI-compatible endpoint.
+# llama-server (TurboQuant) on port 8090 — NOT Ollama :11434
 # Default to the canonical 8090 summary lane.
 # Override only with LANGEXTRACT_GEMMA4_URL so shared GEMMA4_URL envs do not
 # accidentally redirect this step to the benchmark lane.

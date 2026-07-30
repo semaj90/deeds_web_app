@@ -9,10 +9,15 @@
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import Redis from 'ioredis';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from './lib/redis-valkey.mjs';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 const CLUSTERS_JSON = path.join(process.cwd(), 'docs/graph/hypergraph-clusters.json');
 const PREFIX = 'ace:cluster:';
+const HLL_KEY = 'ace:cluster:hll:ids';
 
 async function main() {
   console.log('🏛️  Atlas: Caching Hypergraph Cluster Cards');
@@ -23,16 +28,51 @@ async function main() {
     process.exit(1);
   }
 
-  const redis = new Redis(REDIS_URL);
+  const { env, container, password } = await resolveAtlasRedisContext(process.cwd());
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+  const preferCli = shouldPreferValkeyCli(env, container);
+
+  const redis = preferCli
+    ? {
+        mode: 'cli',
+        async connect() {},
+        async ping() {
+          const result = runRedisCli(container, ['PING'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+          return result.stdout.trim();
+        },
+        async set(key, value) {
+          const result = runRedisCli(container, ['SET', key, value], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SET failed');
+        },
+        async pfadd(key, ...members) {
+          const result = runRedisCli(container, ['PFADD', key, ...members], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+        },
+        async pfcount(key) {
+          const result = runRedisCli(container, ['PFCOUNT', key], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFCOUNT failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
+        },
+        async disconnect() {},
+      }
+    : new Redis(redisUrl);
   
   try {
+    if (!preferCli) {
+      await redis.connect();
+      await redis.ping();
+    } else {
+      await redis.connect();
+      await redis.ping();
+    }
     const data = JSON.parse(readFileSync(CLUSTERS_JSON, 'utf-8'));
     const clusters = data.clusters || [];
     
     console.log(`📦 Processing ${clusters.length} clusters...`);
-    
-    const pipeline = redis.pipeline();
-    
+
     for (const cluster of clusters) {
       const card = {
         clusterId: cluster.id,
@@ -47,18 +87,17 @@ async function main() {
         },
         updatedAt: new Date().toISOString()
       };
-      
-      pipeline.set(`${PREFIX}${cluster.id}`, JSON.stringify(card));
+
+      await redis.set(`${PREFIX}${cluster.id}`, JSON.stringify(card));
+      if (typeof redis.pfadd === 'function') {
+        await redis.pfadd(HLL_KEY, cluster.id);
+      }
     }
-    
-    const results = await pipeline.exec();
-    const errors = results.filter(([err]) => err);
-    
-    if (errors.length > 0) {
-      console.error(`⚠️  Encountered ${errors.length} errors during Redis sync.`);
-    }
-    
+
     console.log(`✅ Cached ${clusters.length} cluster cards in Redis.`);
+    if (typeof redis.pfcount === 'function') {
+      console.log(`🔢 HyperLogLog summary: ${HLL_KEY} = ${await redis.pfcount(HLL_KEY)}`);
+    }
     
   } catch (err) {
     console.error(`❌ Atlas Cache Error: ${err.message}`);

@@ -5,9 +5,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import crypto from 'crypto';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from './lib/redis-valkey.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '../..');
 const REPORTS_DIR = path.join(__dirname, '../../docs/reports');
+const HLL_KEY = 'bitfrost:rrf:hll:packet_ids';
 
 function hashQuery(query) {
   return crypto.createHash('sha256').update(query).digest('hex').slice(0, 8);
@@ -17,15 +24,46 @@ async function main() {
   const startTime = Date.now();
   console.log('\n💾 Phase 102 Step 6: Redis Cache Writer\n');
 
-  const redis = new Redis({
-    host: process.env.REDIS_HOST || '127.0.0.1',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    password: process.env.REDIS_PASSWORD || 'redis',
-    lazyConnect: true,
-    enableOfflineQueue: false,
-    retryStrategy: () => null,
-    maxRetriesPerRequest: 1
-  });
+  const { env, container, password } = await resolveAtlasRedisContext(REPO_ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+  const preferCli = shouldPreferValkeyCli(env, container);
+
+  const redis = preferCli
+    ? {
+        mode: 'cli',
+        async connect() {},
+        async ping() {
+          const result = runRedisCli(container, ['PING'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+          return result.stdout.trim();
+        },
+        async setex(key, ttl, value) {
+          const result = runRedisCli(container, ['SETEX', key, String(ttl), value], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SETEX failed');
+        },
+        async pfadd(key, ...members) {
+          const result = runRedisCli(container, ['PFADD', key, ...members], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PFADD failed');
+        },
+        async dbsize() {
+          const result = runRedisCli(container, ['DBSIZE'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli DBSIZE failed');
+          return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
+        },
+        async quit() {},
+      }
+    : new Redis({
+        host,
+        port,
+        password,
+        lazyConnect: true,
+        enableOfflineQueue: false,
+        retryStrategy: () => null,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 3000,
+      });
 
   const pgClient = new pg.Client({
     host: process.env.DB_HOST || 'localhost',
@@ -39,11 +77,15 @@ async function main() {
   try {
     // Try to connect to Redis
     try {
-      await redis.connect();
+      if (preferCli) {
+        await redis.connect();
+      } else {
+        await redis.connect();
+      }
       // Verify connection with PING
       await redis.ping();
       redisReady = true;
-      console.log('✅ Connected to Redis/Valkey\n');
+      console.log(`✅ Connected to ${preferCli ? 'Valkey CLI fallback' : 'Redis/Valkey'}\n`);
     } catch (e) {
       console.log(`⚠️  Redis/Valkey unavailable: ${e.message}\n`);
     }
@@ -83,15 +125,19 @@ async function main() {
           try {
             const cacheData = JSON.stringify(topResults);
             await redis.setex(cacheKey, 3600, cacheData);
+            if (typeof redis.pfadd === 'function') {
+              await redis.pfadd(HLL_KEY, ...topResults.map((row) => String(row.packet_id ?? row.packet_key ?? hashQuery(String(row.source_ref ?? '')))));
+            }
             console.log(`  ✅ Global top-10: Cached ${topResults.length} results`);
             console.log(`  📌 Cache key: ${cacheKey}`);
+            console.log(`  🔢 HyperLogLog summary: ${HLL_KEY}`);
             console.log(`  ⏳ Per-query keys (bitfrost:rrf:{query_hash}:top-10) deferred until scorer stores all query groups\n`);
             cachedCount = topResults.length;
           } catch (e) {
             console.log(`  ❌ Cache write failed: ${e.message}`);
           }
         } else {
-          console.log(`  ⚠️  Redis unavailable, skipped cache\n`);
+          console.log(`  ⚠️  Redis unavailable, skipped cache; HLL summary not updated\n`);
         }
       } else {
         console.log('  ⚠️  No RRF scores found in atlas_packets.metadata\n');

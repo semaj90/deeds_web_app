@@ -32,6 +32,8 @@
     "atlas:index:turbovec:build": "npx tsx scripts/atlas/turbovec-pipeline-validation.mjs --verbose",
     "atlas:index:turbovec:build:dry": "npx tsx scripts/atlas/test-embedding-qdrant-turbovec.mjs",
     "atlas:index:validate": "npx tsx scripts/atlas/validate-index-quality.mts --verbose",
+    "atlas:phase109b:workflow:dry": "npx tsx scripts/atlas/phase109b-repository-provenance-workflow.mts --repo-root=. --dry-run",
+    "atlas:phase109b:workflow:apply": "npx tsx scripts/atlas/phase109b-repository-provenance-workflow.mts --repo-root=. --apply",
     "atlas:phase2:clustering": "npm run atlas:cluster:kmeans:train && npm run atlas:cluster:som:train && npm run atlas:cluster:persist && npm run atlas:cache:aggressive:prewarm",
     "atlas:cluster:kmeans:train": "npx tsx scripts/atlas/validate-som-20x20-topology.mjs --verbose",
     "atlas:cluster:som:train": "npx tsx scripts/atlas/validate-som-20x20-topology.mjs --verbose",

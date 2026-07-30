@@ -354,7 +354,7 @@ export class QdrantLane extends SearchLaneBase {
       result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
     };
 
-    const results: SearchResult[] = (data.result ?? []).map((point, i) => ({
+    const results = (data.result ?? []).map((point, i) => ({
       ...(() => {
         const laneMetadata = this.embeddingLane === 'dense_384'
           ? VECTOR_CONFIG_LANES.dense_384
@@ -404,7 +404,7 @@ export class QdrantLane extends SearchLaneBase {
       },
         };
       })(),
-    }));
+    })) as SearchResult[];
 
     return this.applyPostFetchFilters(results, context.filters);
   }
@@ -512,7 +512,7 @@ export class QdrantLane384 extends SearchLaneBase {
       result: Array<{ id: string; score: number; payload: Record<string, unknown> }>;
     };
 
-    const results: SearchResult[] = (data.result ?? []).map((point, i) => ({
+    const results = (data.result ?? []).map((point, i) => ({
       ...(() => {
         const laneMetadata = getVectorLaneMetadata('dense_384');
         const dense384Metadata = VECTOR_CONFIG_LANES.dense_384;
@@ -552,7 +552,7 @@ export class QdrantLane384 extends SearchLaneBase {
       },
         };
       })(),
-    }));
+    })) as SearchResult[];
 
     return this.applyPostFetchFilters(results, context.filters);
   }

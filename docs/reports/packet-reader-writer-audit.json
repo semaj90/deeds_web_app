@@ -1,6 +1,6 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-07-29T05:52:32.147Z",
+  "generatedAt": "2026-07-30T03:50:04.712Z",
   "mode": "dry-run",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
@@ -12,7 +12,7 @@
     "addressableRows": 1,
     "qdrantBackedRows": 1,
     "qdrantCollectionRows": 1,
-    "conceptsRows": 1,
+    "conceptsRows": 0,
     "bm25Rows": 1,
     "embeddingRefRows": 1,
     "evidenceMatchedRows": 0,
@@ -20,6 +20,7 @@
     "missingCanonicalSourceRef": 0,
     "missingQdrantPointId": 0,
     "missingQdrantCollection": 0,
+    "duplicatePacketsSkipped": 0,
     "classCounts": [
       {
         "key": "qdrant_chunk",
@@ -50,7 +51,7 @@
   "samplePacketKeys": [
     "0ba2345cd9c542fa"
   ],
-  "outputSha256": "82e5ac9a4c24df007331ce59a828b8e9f65e04efcf10168b23b64d6f96a23e39",
+  "outputSha256": "9b244d13a3c8fc2bbfd4685faffae92fdc0b956e26e5a2842d4d5db8b6ff16d9",
   "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
   "stagingPath": ".tmp/addressable-packets.ndjson.stage",
   "interrupted": false,
@@ -70,17 +71,31 @@
     "QDRANT_MIRROR_PROVEN",
     "IDENTITY_COVERAGE_COMPLETE"
   ],
+  "loadStats": {
+    "batches": 1,
+    "rows": 1,
+    "totalQueryElapsedMs": 7,
+    "totalParseElapsedMs": 0,
+    "maxQueryElapsedMs": 7,
+    "maxParseElapsedMs": 0,
+    "maxRawBytes": 13884,
+    "maxNormalizedBytes": 13882
+  },
   "status": "DRY_RUN_READY",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "checkpoint": {
     "schema": "addressable_packets_materialization_checkpoint.v1",
-    "generatedAt": "2026-07-29T05:52:32.145Z",
+    "generatedAt": "2026-07-30T03:50:04.711Z",
     "sourceTable": "atlas_packets",
     "limit": 1,
-    "batchSize": 1000,
-    "orderHash": "50c933022b74ec7d46e859cdf73c346707f43f4bfbe34106a611b415a8d35571",
+    "batchSize": 1,
+    "orderHash": "dae4870f6c5e1a740137aa8d9521d12f99b0aae37664ce4c8f728048fc9a21ea",
     "rowsWritten": 1,
     "nextOffset": 1,
+    "nextCursor": [
+      0,
+      "0ba2345cd9c542fa"
+    ],
     "batchNumber": 1,
     "rowsRead": 1,
     "interrupted": false,
@@ -95,14 +110,7 @@
       "qdrant_collection": "codebase_chunks_768",
       "qdrant_point_id": "6154722635406530000",
       "bm25_text": "The primary goal is to provide a high-level operational summary. --- [START OF OUTPUT] [END OF OUTPUT] gRPC Proto Services proto:RetrievalService.Health proto:RetrievalService.Heal",
-      "concepts": [
-        "embedding",
-        "grpc",
-        "health",
-        "retrieval",
-        "search",
-        "vector"
-      ],
+      "concepts": [],
       "tags": [
         "canonical",
         "codebase_chunks_768",

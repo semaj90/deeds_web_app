@@ -248,7 +248,7 @@ Phase 85 (Previous Stages)
 - ✅ **atlas_packets**: Must be populated (P1)
 - ✅ **atlas_summary_layers**: Must have summaries (Phase 76 or later)
 - ✅ **llama-server**: Must be running with Gemma4 at :8090
-- ✅ **Python 3.8+**: With requests, json, pathlib modules
+- ✅ **Python 3.12+ (Miniforge WSL2)**: With requests, json, pathlib modules (free-threading on 3.14+)
 
 ### Verification Gates
 

@@ -11,23 +11,84 @@
 import Redis from 'ioredis';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from './lib/redis-valkey.mjs';
 
 const __dirname = resolve(fileURLToPath(import.meta.url), '..');
+const REPO_ROOT = resolve(__dirname, '../..');
 const isQuiet = process.env.REDIS_QUIET === '1' || process.env.GRAPHIFY_QUIET === '1';
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || 'redis',
-  lazyConnect: true,
-  enableOfflineQueue: false,
-  retryStrategy: () => null
-});
+async function createValkeyBackend() {
+  const { env, container, password } = await resolveAtlasRedisContext(REPO_ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+
+  if (shouldPreferValkeyCli(env, container)) {
+    return {
+      mode: 'cli',
+      async ping() {
+        const result = runRedisCli(container, ['PING'], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+        return result.stdout.trim();
+      },
+      async hlen(key) {
+        const result = runRedisCli(container, ['HLEN', key], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli HLEN failed');
+        return Number.parseInt(result.stdout.trim() || '0', 10) || 0;
+      },
+      async hset(key, ...args) {
+        const result = runRedisCli(container, ['HSET', key, ...args], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli HSET failed');
+      },
+      async hkeys(key) {
+        const result = runRedisCli(container, ['HKEYS', key], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli HKEYS failed');
+        return String(result.stdout ?? '')
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+      },
+      async quit() {},
+    };
+  }
+
+  const redis = new Redis(redisUrl, {
+    host,
+    port,
+    password,
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+    connectTimeout: 3000,
+    maxRetriesPerRequest: 1,
+  });
+  return {
+    mode: 'direct',
+    async ping() {
+      return redis.ping();
+    },
+    async hlen(key) {
+      return redis.hlen(key);
+    },
+    async hset(key, ...args) {
+      return redis.hset(key, ...args);
+    },
+    async hkeys(key) {
+      return redis.hkeys(key);
+    },
+    async quit() {
+      await redis.quit();
+    },
+  };
+}
 
 async function seedOpenCodeRules() {
+  const redis = await createValkeyBackend();
   try {
-    await redis.connect();
-
     const ping = await redis.ping();
     if (ping !== 'PONG') {
       if (!isQuiet) console.error('❌ Valkey PING failed');
@@ -70,7 +131,7 @@ async function seedOpenCodeRules() {
     }
     process.exit(1);
   } finally {
-    if (redis.isOpen) await redis.quit().catch(() => {});
+    await redis.quit().catch(() => {});
   }
 }
 

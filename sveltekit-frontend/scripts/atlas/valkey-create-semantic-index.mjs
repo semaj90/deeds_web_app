@@ -11,23 +11,81 @@
 import Redis from 'ioredis';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from './lib/redis-valkey.mjs';
 
 const __dirname = resolve(fileURLToPath(import.meta.url), '..');
+const REPO_ROOT = resolve(__dirname, '../..');
 const isQuiet = process.env.REDIS_QUIET === '1' || process.env.GRAPHIFY_QUIET === '1';
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST || '127.0.0.1',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || 'redis',
-  lazyConnect: true,
-  enableOfflineQueue: false,
-  retryStrategy: () => null
-});
+async function createValkeyBackend() {
+  const { env, container, password } = await resolveAtlasRedisContext(REPO_ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+
+  if (shouldPreferValkeyCli(env, container)) {
+    return {
+      mode: 'cli',
+      async ping() {
+        const result = runRedisCli(container, ['PING'], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+        return result.stdout.trim();
+      },
+      async call(...args) {
+        const result = runRedisCli(container, args, password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli call failed');
+        return result.stdout;
+      },
+      async set(key, value, ...rest) {
+        const result = runRedisCli(container, ['SET', key, value, ...rest], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SET failed');
+      },
+      async get(key) {
+        const result = runRedisCli(container, ['GET', key], password);
+        if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli GET failed');
+        return result.stdout.trim() || null;
+      },
+      async quit() {},
+    };
+  }
+
+  const redis = new Redis(redisUrl, {
+    host,
+    port,
+    password,
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+    connectTimeout: 3000,
+    maxRetriesPerRequest: 1,
+  });
+  return {
+    mode: 'direct',
+    async ping() {
+      return redis.ping();
+    },
+    async call(...args) {
+      return redis.call(...args);
+    },
+    async set(key, value, ...rest) {
+      await redis.set(key, value, ...rest);
+    },
+    async get(key) {
+      return redis.get(key);
+    },
+    async quit() {
+      await redis.quit();
+    },
+  };
+}
 
 async function createSemanticIndex() {
+  const redis = await createValkeyBackend();
   try {
-    await redis.connect();
-
     // Verify Valkey is responding
     const ping = await redis.ping();
     if (ping !== 'PONG') {
@@ -43,7 +101,7 @@ async function createSemanticIndex() {
       const info = await redis.call('INFO', 'modules');
       const hasSearch = info && info.toString().includes('search');
 
-      if (!hasQuiet) {
+      if (!isQuiet) {
         console.log(`✅ Valkey-search module: ${hasSearch ? 'AVAILABLE' : 'NOT AVAILABLE (using cache keys)'}`);
       }
     } catch (err) {
@@ -69,7 +127,7 @@ async function createSemanticIndex() {
     }
     process.exit(1);
   } finally {
-    if (redis.isOpen) await redis.quit().catch(() => {});
+    await redis.quit().catch(() => {});
   }
 }
 

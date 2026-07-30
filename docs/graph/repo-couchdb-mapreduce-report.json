@@ -1,16 +1,16 @@
 {
   "repo": "deeds-web-app",
-  "runId": "run_1785304886628",
-  "generatedAt": "2026-07-29T06:01:29.350Z",
+  "runId": "run_1785382717459",
+  "generatedAt": "2026-07-30T03:38:39.301Z",
   "dryRun": true,
   "workspace": "all",
-  "limit": 1,
-  "docs": 3,
+  "limit": 0,
+  "docs": 31657,
   "docCounts": {
-    "directory_wiki": 1,
+    "directory_wiki": 5497,
     "cluster_summary": 0,
     "feature_card": 1,
-    "source_card": 1,
+    "source_card": 26159,
     "engram_memory": 0
   },
   "views": [
@@ -45,58 +45,733 @@
       "summary": "",
       "clusters": [],
       "topFiles": [
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts",
+        "$lib/utils/file-reader.ts",
         "$lib/utils/file-reader.ts"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785304886628",
-      "updatedAt": "2026-07-29T06:01:29.349Z"
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.333Z"
     },
     {
-      "_id": "feature:feature.unknown",
-      "type": "feature_card",
-      "source_id": "feature:feature.unknown",
-      "source_ref": "feature:feature.unknown",
-      "source_kind": "feature",
+      "_id": "wiki:dir:.claude/hooks",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/hooks",
+      "source_ref": "dir:.claude/hooks",
+      "source_kind": "directory",
       "file_path": null,
-      "rel_path": null,
-      "feature_id": "feature.unknown",
+      "rel_path": ".claude/hooks",
+      "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
-      "featureKey": "feature.unknown",
+      "workspace": "repo-root",
+      "path": ".claude/hooks",
       "summary": "",
-      "routes": [],
-      "files": [
-        "$lib/utils/file-reader.ts"
-      ],
       "clusters": [],
-      "runId": "run_1785304886628"
+      "topFiles": [
+        ".claude/hooks/posttooluse-audit.mjs",
+        ".claude/hooks/pretooluse-deny.mjs"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
     },
     {
-      "_id": "source:$lib/utils/file-reader.ts",
-      "type": "source_card",
-      "source_id": "$lib/utils/file-reader.ts",
-      "source_ref": "$lib/utils/file-reader.ts",
-      "feature_id": "feature.unknown",
+      "_id": "wiki:dir:.claude",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude",
+      "source_ref": "dir:.claude",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude",
+      "feature_id": null,
       "related_feature_ids": [],
-      "rel_path": "$lib/utils/file-reader.ts",
-      "file_path": "$lib/utils/file-reader.ts",
-      "source_kind": "typescript",
-      "atlas_version": 1,
+      "atlas_version": "1",
       "cold_storage_ready": true,
-      "line_count": 0,
-      "has_zod": false,
-      "drizzle_refs": [],
-      "imports": [],
-      "exports": [],
-      "cluster_id": null,
-      "som_cluster": null,
-      "lane_ids": [],
-      "runId": "run_1785304886628",
-      "updatedAt": "2026-07-29T06:01:29.350Z"
+      "workspace": "repo-root",
+      "path": ".claude",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/mcp.json",
+        ".claude/settings.json",
+        ".claude/settings.local.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/.claude/hooks",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.claude/hooks",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/pretooluse-deny.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/pretooluse-deny.mjs",
+        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.claude",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.claude",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.claude",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/.claude",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.claude",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/.claude/mcp.json",
+        ".claude/worktrees/agent-a38668f2/.claude/settings.json",
+        ".claude/worktrees/agent-a38668f2/.claude/settings.local.json",
+        ".claude/worktrees/agent-a38668f2/.claude/mcp.json",
+        ".claude/worktrees/agent-a38668f2/.claude/settings.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.github/hooks",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.github/hooks",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.github/hooks",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/.github/hooks",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.github/hooks",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
+        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/.mcp.json",
+        ".claude/worktrees/agent-a38668f2/atlas.config.json",
+        ".claude/worktrees/agent-a38668f2/CMakePresets.json",
+        ".claude/worktrees/agent-a38668f2/ecosystem.config.cjs",
+        ".claude/worktrees/agent-a38668f2/ecosystem.dev.config.cjs"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.vscode",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/.vscode",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.vscode",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/.vscode",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/.vscode",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/.vscode/extensions.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/launch.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/tasks.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/extensions.json",
+        ".claude/worktrees/agent-a38668f2/.vscode/launch.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.335Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/audit",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/audit",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/audit",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/audit",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/audit",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
+        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.js",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/package.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.js"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/index.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/index.js",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/package.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/wrapper.d.ts",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/wrapper.js"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
+        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/data",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/data",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/data",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/data",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/data",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
+        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docker/bifrost",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docker/bifrost",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
+        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
+        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/ai-os",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/ai-os",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
+        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.336Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/atlas",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/atlas",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/atlas",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/atlas",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/atlas",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/atlas/cluster-cards.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/feature-registry.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/parent-atlas.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/retry-queries.json",
+        ".claude/worktrees/agent-a38668f2/docs/atlas/feature-registry.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/graph",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/graph",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/graph",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/graph",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/graph",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/graph/atlas-write-manifest.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/atlas-write-scale-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/batch-gpu-analysis-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/codebase-feature-map.json",
+        ".claude/worktrees/agent-a38668f2/docs/graph/codebase-graph.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/packets",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/packets",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/packets",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/packets",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/packets",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
+        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/phase100",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/phase100",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/phase100",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/phase100",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/phase100",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/phase100/consolidation-recommendations.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-graph-cycles.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-graph.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-recommendations.json",
+        ".claude/worktrees/agent-a38668f2/docs/phase100/file-consolidation-audit.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_plotly.min.js.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_widgetbundle.js.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_validators__validators.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_validators__validators.json.json",
+        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/next_steps_active_SCHEMA_MANIFEST.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/reports",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/reports",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/reports/ace-packet-smoke-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/active-topology-mirror-backfill-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/artifact-bloat-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas-drizzle-schema-map-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas-feature-map-duckdb-report.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-board-state.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-kanban-tasks.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-next-actions.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-risk-report.json",
+        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-board-state.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.337Z"
+    },
+    {
+      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "type": "directory_wiki",
+      "source_id": "dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "source_ref": "dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "source_kind": "directory",
+      "file_path": null,
+      "rel_path": ".claude/worktrees/agent-a38668f2/drizzle/meta",
+      "feature_id": null,
+      "related_feature_ids": [],
+      "atlas_version": "1",
+      "cold_storage_ready": true,
+      "workspace": "repo-root",
+      "path": ".claude/worktrees/agent-a38668f2/drizzle/meta",
+      "summary": "",
+      "clusters": [],
+      "topFiles": [
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/_journal.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/_journal.json",
+        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json"
+      ],
+      "tags": [
+        "feature.unknown"
+      ],
+      "pageRankAvg": 0,
+      "runId": "run_1785382717459",
+      "updatedAt": "2026-07-30T03:38:38.339Z"
     }
   ]
 }

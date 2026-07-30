@@ -20,9 +20,18 @@ const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip
 const quiet = process.env.GRAPHIFY_QUIET === '1';
 const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
 const allowFallback = process.env.GRAPHIFY_ALLOW_FALLBACK === '1';
+const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
 
 try {
   if (!quiet) console.log('[graphify:daily] Starting...');
+
+  if (!quiet) console.log('[graphify:daily] Running repository provenance dry-run...');
+  execSync(provenanceScript, {
+    cwd: FRONTEND,
+    stdio: 'inherit',
+    timeout: 10 * 60 * 1000
+  });
+  if (!quiet) console.log('[graphify:daily] Repository provenance dry-run complete');
 
   // Run from sveltekit-frontend directory to resolve npm scripts
   execSync(DAILY_CHAIN_SCRIPT, {

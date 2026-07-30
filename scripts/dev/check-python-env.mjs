@@ -78,7 +78,7 @@ function main() {
   const resolvedVscodePython = vscodePython.replace('${workspaceFolder}', repoRoot).replace(/\//g, path.sep);
   const resolvedVscodeExists = exists(resolvedVscodePython);
   const venvVersion = venvProbe[1] || '';
-  const shouldUseVenv = exists(venvPython) && venvVersion.startsWith('3.11');
+  const shouldUseVenv = exists(venvPython) && /^3\.(1[2-4]|14)/.test(venvVersion);
 
   const payload = {
     repoRoot,
@@ -91,7 +91,7 @@ function main() {
     resolvedVscodePython,
     resolvedVscodeExists,
     shouldUseVenv,
-    note: shouldUseVenv ? 'Workspace should use .venv' : 'Workspace venv missing or not Python 3.11.x',
+    note: shouldUseVenv ? 'Workspace should use .venv (Python 3.12+)' : 'Workspace venv missing or not Python 3.12+',
     timestamp: new Date().toISOString(),
   };
 

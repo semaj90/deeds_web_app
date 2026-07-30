@@ -18,6 +18,11 @@
 
 import pg from 'pg';
 import Redis from 'ioredis';
+import {
+  resolveAtlasRedisContext,
+  runRedisCli,
+  shouldPreferValkeyCli,
+} from '../../sveltekit-frontend/scripts/atlas/lib/redis-valkey.mjs';
 
 const { Pool } = pg;
 
@@ -33,15 +38,7 @@ const pool = new Pool({
   database: process.env.DB_NAME     || 'legal_ai_db',
   max: 3,
 });
-
-const redis = new Redis({
-  host:               process.env.REDIS_HOST     || '127.0.0.1',
-  port:               parseInt(process.env.REDIS_PORT || '6379'),
-  password:           process.env.REDIS_PASSWORD || 'redis',
-  lazyConnect:        true,
-  enableOfflineQueue: false,
-  retryStrategy:      () => null,
-});
+const REPO_ROOT = path.resolve(__dirname, '../..');
 
 async function main() {
   const startTime = Date.now();
@@ -49,10 +46,42 @@ async function main() {
   console.log(`Mode:  ${DRY_RUN ? 'DRY RUN' : 'APPLY'}`);
   console.log(`TTL:   ${TTL_SECONDS / 3600}h`);
 
-  // Connect Redis
-  await redis.connect();
+  const { env, container, password } = await resolveAtlasRedisContext(REPO_ROOT);
+  const host = env.VALKEY_HOST || env.REDIS_HOST || '127.0.0.1';
+  const port = parseInt(env.VALKEY_PORT || env.REDIS_PORT || '6379', 10);
+  const redisUrl = env.VALKEY_URL || env.REDIS_URL || `redis://${host}:${port}`;
+  const preferCli = shouldPreferValkeyCli(env, container);
+  const redis = preferCli
+    ? {
+        async connect() {},
+        async ping() {
+          const result = runRedisCli(container, ['PING'], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli PING failed');
+          return result.stdout.trim();
+        },
+        async setex(key, ttl, value) {
+          const result = runRedisCli(container, ['SETEX', key, String(ttl), value], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli SETEX failed');
+        },
+        async get(key) {
+          const result = runRedisCli(container, ['GET', key], password);
+          if (!result.ok) throw new Error(result.stderr || result.error || 'redis-cli GET failed');
+          return result.stdout.trim() || null;
+        },
+        async quit() {},
+      }
+    : new Redis({
+        host,
+        port,
+        password,
+        lazyConnect: true,
+        enableOfflineQueue: false,
+        retryStrategy: () => null,
+      });
+
+  if (!preferCli) await redis.connect();
   await redis.ping();
-  console.log('Redis: connected ✅');
+  console.log(`Redis: connected ${preferCli ? 'via Valkey CLI fallback' : '✅'}`);
 
   const client = await pool.connect();
   try {
@@ -108,9 +137,8 @@ async function main() {
       return;
     }
 
-    // 2. Write to Redis using pipeline for efficiency
+    // 2. Write to Redis
     console.log('\nWriting to Redis...');
-    const pipeline = redis.pipeline();
     const clusterIds = [];
 
     for (const c of centroids) {
@@ -125,7 +153,7 @@ async function main() {
         vec_members: c.vec_members,
         method: c.method,
       });
-      pipeline.setex(key, TTL_SECONDS, value);
+      await redis.setex(key, TTL_SECONDS, value);
       clusterIds.push(c.cluster_id);
 
       if (VERBOSE) {
@@ -134,22 +162,15 @@ async function main() {
     }
 
     // Index key — ordered list of all cluster_ids for fast scan
-    pipeline.setex('centroid:kmeans:index', TTL_SECONDS, JSON.stringify(clusterIds));
+    await redis.setex('centroid:kmeans:index', TTL_SECONDS, JSON.stringify(clusterIds));
 
     // Meta key
-    pipeline.setex('centroid:kmeans:meta', TTL_SECONDS, JSON.stringify({
+    await redis.setex('centroid:kmeans:meta', TTL_SECONDS, JSON.stringify({
       count: centroids.length,
       dim,
       method: 'kmeans_js',
       cached_at: new Date().toISOString(),
     }));
-
-    const results = await pipeline.exec();
-    const errors = results.filter(([err]) => err !== null);
-    if (errors.length > 0) {
-      console.error(`Pipeline errors: ${errors.length}`);
-      errors.slice(0, 3).forEach(([err]) => console.error(' ', err.message));
-    }
 
     // 3. Verify
     const meta = await redis.get('centroid:kmeans:meta');
@@ -179,7 +200,7 @@ async function main() {
   } finally {
     client.release();
     await pool.end();
-    if (redis.status === 'ready') await redis.quit();
+    await redis.quit();
   }
 }
 

@@ -345,6 +345,21 @@ export interface ACEContext {
   /** Budget-filtered ACE payloads built from kbChunks+caseChunks+ragChunks.
    *  Used by the prompt builder and by the reward-event recorder. */
   acePayloads?: AcePayload[];
+  /** Ontology-linked tuples for codebase context enrichment.
+   *  Each tuple contains semantic tags, taxonomy links, and evidence state.
+   *  Populated from Redis ace:ontology:tuple:* cache during retrieval. */
+  ontology?: Array<{
+    tupleId: string;
+    sourceRef: string;
+    featureId: string;
+    relation: string;
+    label: string;
+    labelKind: 'ontology' | 'pos' | 'tag';
+    ontologyIds: string[];
+    conceptIds: string[];
+    evidenceState: 'ACTIVE_VERIFIED' | 'CANDIDATE' | 'FAILED' | 'SUPERSEDED';
+    trustTier: 'canonical' | 'derived' | 'untrusted';
+  }> | null;
 }
 
 /**

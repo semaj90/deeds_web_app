@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { pgRows, db } from '$lib/server/db/client';
 import { syncTokenMap } from './packet-reward-writer.js';
 import { enrichRetrievalChunksPhase5 } from './phase-e-enrichment-bridge.js';
+import { enrichCodebaseContextBatch } from '../../../ace/ontology-tuple-enricher.js';
 /**
  * ACE Context Assembler — Central Orchestration Module
  *
@@ -1510,13 +1511,32 @@ export async function assembleACEContext(opts: {
       }).catch(() => {});
 
       // Map to codebase context items to populate prompt renderer
-      const codebaseContext: NonNullable<ACEContext['codebaseContext']> = packet.ranked_cards.map((c: any) => ({
+      let codebaseContext: NonNullable<ACEContext['codebaseContext']> = packet.ranked_cards.map((c: any) => ({
         filePath: String(c.source_ref ?? ''),
         content: String(c.snippet ?? ''),
         score: Number(c.score ?? 0),
         gpuCluster: packet.cluster_id ? parseInt(packet.cluster_id.split(':')[0], 10) : null,
         tags: [] as string[],
+        featureId: String(c.feature_id ?? ''),
       }));
+
+      // Enrich codebase context with ontology tuples before returning the ACE packet.
+      let ontologyTuples: NonNullable<ACEContext['ontology']> = null;
+      try {
+        const [{ getRedis }] = await Promise.all([import('$lib/server/redis.js')]);
+        const enriched = await enrichCodebaseContextBatch(codebaseContext as Record<string, unknown>[], {
+          redis: getRedis(),
+          parallelism: 4,
+        });
+        codebaseContext = enriched as typeof codebaseContext;
+        ontologyTuples = enriched.flatMap((item) =>
+          Array.isArray((item as Record<string, unknown>).ontologyTuples)
+            ? ((item as Record<string, unknown>).ontologyTuples as NonNullable<ACEContext['ontology']>)
+            : []
+        );
+      } catch {
+        ontologyTuples = null;
+      }
 
       const parentAtlasContext: ACEContext = {
         selectedRelationCards: '',
@@ -1589,6 +1609,7 @@ export async function assembleACEContext(opts: {
           contextMarkdown: packet.prompt_context,
           selectedSources: packet.source_refs,
         },
+        ontology: ontologyTuples,
       };
 
       // Fire-and-forget ACE telemetry → route_runtime_packets (non-blocking)

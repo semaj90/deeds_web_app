@@ -86,7 +86,7 @@
     },
     "atlas-tools": {
       "type": "local",
-      "command": ["npx", "tsx", "./sveltekit-frontend/src/mcp/server.ts"],
+      "command": ["npx", "tsx", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
       "enabled": true,
       "timeout": 120000,
       "env": {
@@ -97,7 +97,7 @@
     "turbovec": {
       "type": "remote",
       "url": "http://127.0.0.1:8791/mcp",
-      "enabled": true,
+      "enabled": false,
       "timeout": 30000
     },
     "engram-embed": {
