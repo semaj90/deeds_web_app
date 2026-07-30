@@ -25,6 +25,12 @@ Requirements:
   - llama-server (TurboQuant) running on port 8090 with gemma4-legal-iq4xs-direct.gguf
   - (.tmp directory for JSON progress events)
 
+Progress Reporting (Level 1 — Python tqdm):
+  - Terminal progress bar showing packet processing rate
+  - Real-time ETA and completion percentage
+  - Rate in items/sec
+  - Integration with Level 2 & Level 3 progress infrastructure
+
 Postgres writes:
   - atlas_packets.metadata['langextract_entities'] = [{ class, text, attributes }, ...]
   - atlas_packets.metadata['langextract_ran_at'] = ISO timestamp
@@ -72,6 +78,15 @@ try:
 except ImportError:
     print('[step3] ERROR: langextract not installed. Run: pip install langextract')
     sys.exit(1)
+
+# ── Progress Reporting (Level 1: Python tqdm) ──────────────────────────────────
+try:
+    from tqdm import tqdm
+except ImportError:
+    print('[step3] WARNING: tqdm not installed. Run: pip install tqdm')
+    # Define a no-op fallback
+    def tqdm(iterable, **kwargs):
+        return iterable
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 PG_HOST     = os.getenv('PGHOST',     '127.0.0.1')
@@ -309,7 +324,7 @@ def main():
     errors    = []
     batch     = []
 
-    for row in rows:
+    for row in tqdm(rows, desc='LangExtract', unit='packet'):
         packet_key  = row['packet_key']
         summary     = (row['summary'] or '').strip()
         metadata    = row['metadata'] or {}
@@ -318,7 +333,6 @@ def main():
             skipped += 1
             continue
 
-        print(f'[step3] [{processed + skipped + 1}/{len(rows)}] extracting {packet_key}', flush=True)
         if args.verbose:
             print(f'[step3] {packet_key} ({len(summary)} chars)', flush=True)
 
