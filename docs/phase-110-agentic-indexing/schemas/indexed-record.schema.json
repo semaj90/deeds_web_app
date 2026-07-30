@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "indexed-record.schema.json",
+  "title": "Indexed Projection Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "workspace_revision",
+    "content_hash",
+    "representation_id",
+    "representation_version",
+    "validation_state"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "indexed_record.v1"
+    },
+    "artifact_id": {
+      "type": "string"
+    },
+    "workspace_revision": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "representation_id": {
+      "type": "string"
+    },
+    "representation_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "embedding_model": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "embedding_revision": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dimensions": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "dense_point_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sparse_point_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "domain_labels": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "semantic_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cluster_run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cluster_id": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "som_x": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 19
+    },
+    "som_y": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 19
+    },
+    "validation_state": {
+      "enum": [
+        "ACTIVE_VERIFIED",
+        "ACTIVE_DEGRADED",
+        "GATED",
+        "REFERENCE_ONLY",
+        "SUPERSEDED",
+        "FAILED"
+      ]
+    }
+  }
+}

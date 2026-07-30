@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "code-artifact.schema.json",
+  "title": "Code Artifact",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "artifact_id",
+    "repository_id",
+    "workspace_revision",
+    "artifact_kind",
+    "file_path",
+    "source_ref",
+    "content_hash",
+    "parser_id",
+    "parser_version"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "code_artifact.v1"
+    },
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repository_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact_kind": {
+      "type": "string"
+    },
+    "language": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "qualified_name": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "file_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "line_start": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "line_end": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "parser_id": {
+      "type": "string"
+    },
+    "parser_version": {
+      "type": "string"
+    },
+    "is_generated": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_external": {
+      "type": "boolean",
+      "default": false
+    },
+    "provenance": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "pinned_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "upstream_commit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "release_date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "downloaded_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "source_ref_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uri"
+        }
+      }
+    }
+  }
+}
