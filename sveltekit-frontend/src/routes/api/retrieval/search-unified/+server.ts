@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       topK: Math.min(topK, 50),
       userId: locals.user?.id !== undefined ? String(locals.user.id) : undefined,
       includeWorkflowPreamble: false,
-      includeAcePacket: false,
+      includeAcePacket: true,
       compareRustShadow: false,
       withGraphExpansion: false,
       filters: {
@@ -69,7 +69,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       topK: body.topK ?? 20,
       userId: locals.user?.id !== undefined ? String(locals.user.id) : undefined,
       includeWorkflowPreamble: false,
-      includeAcePacket: false,
+      includeAcePacket: true,
       compareRustShadow: false,
       withGraphExpansion: Boolean(body.withGraphExpansion),
       caseId: body.caseId ?? undefined,
