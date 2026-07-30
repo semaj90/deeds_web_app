@@ -23,7 +23,7 @@ const { Pool } = pg;
 // CONFIG
 // ============================================================================
 
-const LDR_BASE_URL = process.env.LDR_BASE_URL || 'http://localhost:5000';
+const LDR_BASE_URL = process.env.LDR_BASE_URL || 'http://127.0.0.1:5000';
 const POSTGRES_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:legal_admin_pwd@127.0.0.1:5432/legal_ai_db';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://localhost:6333';
 

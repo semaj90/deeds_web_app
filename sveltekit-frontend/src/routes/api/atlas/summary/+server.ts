@@ -22,7 +22,11 @@ const summaryRequestSchema = z.object({
 
 const batchRequestSchema = z.array(summaryRequestSchema);
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 

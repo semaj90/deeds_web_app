@@ -28,7 +28,11 @@ type FeatureLabelRequest = {
  * POST /api/atlas/feature-labels
  * Extract feature labels from a single packet
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const payload = await request.json();
     const validated = extractSchema.parse(payload) as FeatureLabelRequest;

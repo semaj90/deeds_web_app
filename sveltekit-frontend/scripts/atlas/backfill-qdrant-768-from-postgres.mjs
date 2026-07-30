@@ -46,7 +46,8 @@ const SKIP_VALIDATION = process.argv.includes('--skip-validation');
 
 const CANONICAL_DIMENSION = 768;
 const QDRANT_COLLECTION = 'codebase_chunks_768';
-const QDRANT_VECTOR_NAME = 'content';  // Canonical vector slot (also aliased semantic_768 in payload lineage)
+const LOGICAL_VECTOR_NAME = 'dense_768';
+const QDRANT_VECTOR_NAME = 'content';
 const CHECKPOINT_KEY = 'backfill:qdrant:768:checkpoint';
 
 await loadAtlasEnv();
@@ -258,7 +259,9 @@ try {
           source_ref: row.relative_path,
           content_hash: row.content_hash,
           workspace_id: process.env.ATLAS_WORKSPACE_ID ?? 'phase108d-backfill',
-          representation_id: 'codebase_chunks_768',
+          representation_id: 'embeddinggemma_768_native_v1',
+          vector_name: LOGICAL_VECTOR_NAME,
+          projection_hash: createHash('sha256').update(`${row.content_hash || row.id}|${row.relative_path}|${row.id}|${QDRANT_VECTOR_NAME}`).digest('hex'),
           symbol: row.symbol,
           artifact_kind: row.kind,
           summary: row.summary,
@@ -269,11 +272,15 @@ try {
       };
     });
 
+    const samplePoint = points[0];
+
     // Upsert to Qdrant (or dry-run)
     if (DRY_RUN) {
       if (VERBOSE) {
         console.log(`   [DRY-RUN] Would upsert ${points.length} points at offset ${offset}`);
-      }
+        console.log(`   [DRY-RUN] Sample point id: ${samplePoint?.id}`);
+          console.log(`   [DRY-RUN] Sample projection hash: ${samplePoint?.payload?.projection_hash}`);
+        }
       totalUpserted += points.length;
     } else {
       try {
@@ -293,6 +300,9 @@ try {
 
         if (VERBOSE) {
           console.log(`   ✅ [${offset}–${offset + points.length}]: Upserted ${points.length} points`);
+          console.log(`   ✅ Sample point id: ${samplePoint?.id}`);
+          console.log(`   ✅ Sample projection hash: ${samplePoint?.payload?.projection_hash}`);
+          console.log(`   ✅ Logical vector name: ${LOGICAL_VECTOR_NAME}`);
         }
       } catch (err) {
         console.error(`❌ Batch [${offset}–${offset + points.length}]: Qdrant upsert failed: ${err.message}`);

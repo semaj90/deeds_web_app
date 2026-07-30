@@ -68,6 +68,8 @@
     "atlas:gate12:apply:verbose": "npx tsx scripts/atlas/gate-12-feature-extraction.mts --apply --verbose",
     "atlas:gate12:smoke": "npx tsx scripts/atlas/gate-12-feature-extraction.mts --dry-run --limit=1000 --verbose",
     "atlas:gate12:verify": "npx tsx scripts/atlas/gate-12-verify.mts",
+    "docs:okf:dev:crawl": "npx tsx scripts/docs-atlas/crawl-okf-dev-docs.mts",
+    "docs:okf:dev:crawl:dry": "npx tsx scripts/docs-atlas/crawl-okf-dev-docs.mts --dry-run",
     "atlas:gates:parallel:dry": "npx tsx scripts/atlas/parallel-gates-orchestrator.mts --dry-run",
     "atlas:gates:parallel:apply": "npx tsx scripts/atlas/parallel-gates-orchestrator.mts --apply",
     "atlas:gates:parallel:monitor": "npx tsx scripts/atlas/parallel-gates-orchestrator.mts --monitor",

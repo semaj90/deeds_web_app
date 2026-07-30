@@ -270,7 +270,11 @@ interface CanonicalPacket {
 
 // ── Route handler ──────────────────────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const tTotal = Date.now();
   const body   = await request.json().catch(() => null);
   const parsed = IndexDocSchema.safeParse(body);

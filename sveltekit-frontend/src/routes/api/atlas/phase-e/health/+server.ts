@@ -3,10 +3,14 @@
  * Returns Phase E enrichment status and metrics
  */
 
-import { json } from '@sveltejs/kit';
+import { json, type RequestHandler } from '@sveltejs/kit';
 import { checkPhase5EnrichmentHealth } from '$lib/server/ace/phase-e-enrichment-bridge.js';
 
-export async function GET() {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const health = await checkPhase5EnrichmentHealth();
 

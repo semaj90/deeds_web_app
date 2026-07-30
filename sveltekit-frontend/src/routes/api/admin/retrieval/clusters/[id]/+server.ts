@@ -34,7 +34,11 @@ export interface ClusterPacket {
   score: number;
 }
 
-export const GET: RequestHandler = async ({ params, url }) => {
+export const GET: RequestHandler = async ({ locals, params, url }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const clusterId = params.id;
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '50', 10), 200);
   const offset = Math.max(parseInt(url.searchParams.get('offset') ?? '0', 10), 0);

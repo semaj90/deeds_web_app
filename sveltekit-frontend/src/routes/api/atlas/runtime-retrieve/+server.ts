@@ -58,6 +58,13 @@ const RequestSchema = z.object({
 type AtlasRetrievalRequest = z.infer<typeof RequestSchema>;
 
 export const POST: RequestHandler = async ({ request, locals }) => {
+  if (!locals.user) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   const startTime = Date.now();
 
   try {

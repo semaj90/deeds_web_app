@@ -17,7 +17,11 @@ interface EmbedResponse {
 	duration: number;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
 	const startTime = Date.now();
 
 	try {

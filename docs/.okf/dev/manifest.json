@@ -1,0 +1,107 @@
+{
+  "schema_version": "okf.dev.manifest.v1",
+  "description": "Curated official docs pages for OKF dev corpus generation",
+  "sources": [
+    {
+      "source_id": "firecrawl",
+      "title": "Firecrawl Docs",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["llm_output", "taskboard", "agentic_error_fixing", "canonical_api_recommendations"],
+      "pages": [
+        "https://docs.firecrawl.dev/api-reference/introduction",
+        "https://docs.firecrawl.dev/api-reference/endpoint/crawl-post",
+        "https://docs.firecrawl.dev/api-reference/endpoint/crawl-get",
+        "https://docs.firecrawl.dev/api-reference/endpoint/scrape",
+        "https://docs.firecrawl.dev/api-reference/endpoint/search",
+        "https://docs.firecrawl.dev/features/parse",
+        "https://docs.firecrawl.dev/features/research",
+        "https://docs.firecrawl.dev/ai-onboarding"
+      ]
+    },
+    {
+      "source_id": "qdrant",
+      "title": "Qdrant Docs",
+      "kind": "official_docs",
+      "domain_class": "database",
+      "focus_tags": ["llm_synthesis", "llm_output", "canonical_api_recommendations"],
+      "pages": [
+        "https://qdrant.tech/documentation/manage-data/quantization/",
+        "https://qdrant.tech/course/essentials/day-4/rescoring-oversampling-indexing/",
+        "https://qdrant.tech/documentation/manage-data/points/",
+        "https://qdrant.tech/documentation/manage-data/vectors/",
+        "https://qdrant.tech/documentation/manage-data/collections/",
+        "https://qdrant.tech/documentation/search/hybrid-queries/",
+        "https://api.qdrant.tech/api-reference/search/query-points"
+      ]
+    },
+    {
+      "source_id": "mastra",
+      "title": "Mastra Docs",
+      "kind": "official_docs",
+      "domain_class": "workflow",
+      "focus_tags": ["llm_synthesis", "kanban", "taskboard", "agentic_error_fixing"],
+      "pages": [
+        "https://mastra.ai/docs/workflows/overview",
+        "https://mastra.ai/reference/workflows/workflow"
+      ]
+    },
+    {
+      "source_id": "trpc",
+      "title": "tRPC Docs",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["canonical_api_recommendations", "agentic_error_fixing"],
+      "pages": [
+        "https://trpc.io/docs/server/procedures",
+        "https://trpc.io/docs/server/validators"
+      ]
+    },
+    {
+      "source_id": "acp",
+      "title": "Agent Client Protocol",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["kanban", "taskboard", "agentic_error_fixing"],
+      "pages": [
+        "https://agentclientprotocol.com/get-started/introduction"
+      ]
+    },
+    {
+      "source_id": "a2a",
+      "title": "A2A Protocol",
+      "kind": "official_docs",
+      "domain_class": "agent",
+      "focus_tags": ["kanban", "taskboard", "agentic_error_fixing"],
+      "pages": [
+        "https://a2a-protocol.org/latest/specification/"
+      ]
+    },
+    {
+      "source_id": "opencode",
+      "title": "OpenCode Docs",
+      "kind": "official_docs",
+      "domain_class": "tool",
+      "focus_tags": ["llm_synthesis", "llm_output", "agentic_error_fixing", "canonical_api_recommendations"],
+      "pages": [
+        "https://opencode.ai/docs/",
+        "https://opencode.ai/docs/models/",
+        "https://opencode.ai/docs/providers/",
+        "https://opencode.ai/docs/tools/",
+        "https://opencode.ai/docs/config/"
+      ]
+    },
+    {
+      "source_id": "rapids",
+      "title": "RAPIDS cuVS + cuGraph",
+      "kind": "official_docs",
+      "domain_class": "gpu",
+      "focus_tags": ["canonical_api_recommendations", "llm_output"],
+      "pages": [
+        "https://docs.rapids.ai/api/cuvs/stable/",
+        "https://docs.rapids.ai/api/cuvs/stable/c_api/neighbors_cagra_c/",
+        "https://docs.rapids.ai/api/cugraph/stable/api_docs/api/cugraph/cugraph.pagerank/"
+      ]
+    }
+  ]
+}

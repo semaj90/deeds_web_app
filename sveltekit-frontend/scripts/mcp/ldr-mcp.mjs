@@ -28,9 +28,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// ── Load .env from sveltekit-frontend ────────────────────────────────────────
-const envPath = resolve(__dirname, '../../.env');
-if (existsSync(envPath)) {
+// ── Load .env.local first, then .env from sveltekit-frontend ────────────────
+for (const envPath of [resolve(__dirname, '../../.env.local'), resolve(__dirname, '../../.env')]) {
+  if (!existsSync(envPath)) continue;
   const raw = readFileSync(envPath, 'utf8');
   for (const line of raw.split('\n')) {
     const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)=(.*)$/);

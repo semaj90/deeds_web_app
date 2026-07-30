@@ -43,7 +43,11 @@ const SearchSchema = z.object({
 
 type SearchRequest = z.infer<typeof SearchSchema>;
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json().catch(() => null);
     const parsed = SearchSchema.safeParse(body);
@@ -86,7 +90,11 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 };
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   return json({
     info: 'Unified retrieval endpoint (Phase 3 Week 2-3)',
     endpoint: '/api/atlas/studio/search',

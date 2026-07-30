@@ -771,7 +771,11 @@ async function crossEncoderRerank(
 
 // ── Route handler ──────────────────────────────────────────────────────────────
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const body   = await request.json().catch(() => null);
   const parsed = SearchSchema.safeParse(body);
   if (!parsed.success) {

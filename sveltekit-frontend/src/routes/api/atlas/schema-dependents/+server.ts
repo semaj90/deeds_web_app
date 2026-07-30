@@ -31,7 +31,11 @@ const neoStub = {
 /**
  * GET handler: table name via query param
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ locals, url }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const tableName = url.searchParams.get('table');
 
   if (!tableName) {
@@ -67,7 +71,10 @@ export const GET: RequestHandler = async ({ url }) => {
 /**
  * POST handler: full request body
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
   if (request.headers.get('content-type') !== 'application/json') {
     return json({ error: 'content-type must be application/json' }, { status: 400 });
   }

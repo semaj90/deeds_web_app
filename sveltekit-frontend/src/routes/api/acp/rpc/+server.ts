@@ -22,9 +22,19 @@
 
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { runAcpRpcLoop } from '$lib/server/ai/acp-rpc-loop.js';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import { toolAuthorizationGuard, validateToolName, checkToolAccess } from '$lib/server/auth/tool-authorization';
+
+const acpRpcRequestSchema = z.object({
+  query: z.string().min(1).max(4000),
+  system_prompt: z.string().optional().default('You are a helpful assistant with access to tools.'),
+  tools: z.boolean().optional().default(true),
+  stream: z.boolean().optional().default(true),
+  use_kv_cache: z.boolean().optional().default(true),
+  max_tool_rounds: z.number().int().min(1).max(10).optional().default(3)
+});
 
 const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 
@@ -35,24 +45,21 @@ export const POST: RequestHandler = async (event) => {
   const permissionGrant = await toolAuthorizationGuard(event);
 
   try {
-    const body = await event.request.json();
+    const body = await event.request.json().catch(() => ({}));
+    const parsed = acpRpcRequestSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return error(400, `Invalid request: ${parsed.error.issues[0]?.message || 'validation failed'}`);
+    }
+
     const {
       query,
-      system_prompt = 'You are a helpful assistant with access to tools.',
-      tools = true,
-      stream = true,
-      use_kv_cache = true,
-      max_tool_rounds = 3,
-    } = body;
-
-    if (!query) {
-      return error(400, 'query is required');
-    }
-
-    // Phase 3: Validate tools parameter if present
-    if (tools && typeof tools !== 'boolean') {
-      return error(400, 'tools parameter must be a boolean');
-    }
+      system_prompt,
+      tools,
+      stream,
+      use_kv_cache,
+      max_tool_rounds,
+    } = parsed.data;
 
     const encoder = new TextEncoder();
 

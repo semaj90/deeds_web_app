@@ -20,7 +20,11 @@ const redis = new Redis({
   retryStrategy: () => null,
 });
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user) {
+    return json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     // Fetch Postgres metrics
     const pgResult = await pgPool.query(`

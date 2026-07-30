@@ -11,6 +11,10 @@ async function runPipeline() {
 
   const steps = [
     {
+      name: 'OKF Dev Corpus Crawl (Firecrawl)',
+      script: 'scripts/docs-atlas/crawl-okf-dev-docs.mts'
+    },
+    {
       name: 'Markdown Normalization',
       script: 'scripts/docs-atlas/normalize-doc-markdown.mjs'
     },

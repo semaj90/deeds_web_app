@@ -7,7 +7,11 @@ import { getTelemetryCollector } from '$lib/server/atlas/runtime-cache-telemetry
  *
  * Returns HELP + TYPE + value lines for Grafana scraping.
  */
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ locals }) => {
+  if (!locals.user) {
+    return new Response('Unauthorized', { status: 401, headers: { 'Content-Type': 'text/plain' } });
+  }
+
   try {
     const telemetry = getTelemetryCollector();
     const metrics = await telemetry.getMetrics();

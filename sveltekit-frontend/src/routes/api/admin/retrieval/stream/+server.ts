@@ -23,8 +23,15 @@
  */
 
 import type { RequestHandler } from '@sveltejs/kit';
+import { z } from 'zod';
 import { executeUnifiedRetrieval, executeUnifiedRetrievalWithSummarization } from '$lib/server/retrieval/unified-orchestrator.js';
 import { createSSEResponse } from '$lib/server/streaming/sse-contract.js';
+
+const streamRequestSchema = z.object({
+  query: z.string().min(1).max(4000),
+  limit: z.number().int().min(1).max(100).optional().default(10),
+  use_rg_pool: z.boolean().optional().default(true)
+});
 
 interface StreamEvent {
   stage?: string;
@@ -127,7 +134,14 @@ async function* generateStreamEvents(query: string, limit: number = 10, useRgPoo
   }
 }
 
-export const GET: RequestHandler = async ({ url, request }) => {
+export const GET: RequestHandler = async ({ locals, url, request }) => {
+  if (!locals.user) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   const query = url.searchParams.get('q');
   const limit = parseInt(url.searchParams.get('limit') ?? '10');
   const useRgPool = url.searchParams.get('use_rg_pool') !== 'false';
@@ -146,7 +160,14 @@ export const GET: RequestHandler = async ({ url, request }) => {
   });
 };
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ locals, request }) => {
+  if (!locals.user) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   if (request.headers.get('Content-Type') !== 'application/json') {
     return new Response(
       JSON.stringify({ error: 'Invalid content-type', code: 'INVALID_CONTENT_TYPE' }),
@@ -155,20 +176,17 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   try {
-    const body = await request.json() as {
-      query?: string;
-      limit?: number;
-      use_rg_pool?: boolean;
-    };
+    const body = await request.json().catch(() => ({}));
+    const parsed = streamRequestSchema.safeParse(body);
 
-    const { query, limit = 10, use_rg_pool = true } = body;
-
-    if (!query || query.length === 0) {
+    if (!parsed.success) {
       return new Response(
-        JSON.stringify({ error: 'Missing query field', code: 'INVALID_REQUEST' }),
+        JSON.stringify({ error: 'Invalid request', issues: parsed.error.issues }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    const { query, limit, use_rg_pool } = parsed.data;
 
     return createSSEResponse(generateStreamEvents(query, limit, use_rg_pool), {
       timeout: 60_000,

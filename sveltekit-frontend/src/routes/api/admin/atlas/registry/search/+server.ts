@@ -17,17 +17,20 @@ import { db } from '$lib/server/db/client.js';
 import { codeFeatures } from '$lib/server/db/schema-postgres.js';
 import { eq, like, gt, desc, sql, and } from 'drizzle-orm';
 import { requireAdmin } from '$lib/server/auth-utils.js';
+import { z } from 'zod';
 
-interface SearchRequest {
-  query: string;
-  limit?: number;
-  offset?: number;
-  filters?: {
-    domain_class?: string;
-    ontology_label?: string;
-    kind?: string;
-  };
-}
+const searchRequestSchema = z.object({
+  query: z.string().min(1).max(500),
+  limit: z.number().int().min(1).max(100).optional().default(10),
+  offset: z.number().int().min(0).optional().default(0),
+  filters: z.object({
+    domain_class: z.string().optional(),
+    ontology_label: z.string().optional(),
+    kind: z.string().optional()
+  }).optional()
+});
+
+type SearchRequest = z.infer<typeof searchRequestSchema>;
 
 interface SearchResult {
   feature_id: string;
@@ -193,12 +196,21 @@ export const GET: RequestHandler = async (event) => {
 export const POST: RequestHandler = async (event) => {
   requireAdmin(event);
   try {
-    const body = (await event.request.json()) as SearchRequest;
-    const { results, total } = await performSearch(body);
+    const body = await event.request.json().catch(() => ({}));
+    const parsed = searchRequestSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request', issues: parsed.error.issues }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { results, total } = await performSearch(parsed.data);
 
     const response: SearchResponse = {
       results,
-      page: { limit: body.limit || 10, offset: body.offset || 0, total },
+      page: { limit: parsed.data.limit, offset: parsed.data.offset, total },
       ranking: {
         bm25: 0.25,
         qdrant_semantic: 0.25,
