@@ -17,12 +17,12 @@ type CliOptions = {
   representationId: string | null;
 };
 
-function valueAfterEquals(arg: string): string | undefined {
+export function valueAfterEquals(arg: string): string | undefined {
   const separator = arg.indexOf('=');
   return separator > 0 ? arg.slice(separator + 1) : undefined;
 }
 
-function parsePositiveInteger(
+export function parsePositiveInteger(
   rawValue: string | undefined,
   optionName: string,
   fallback: number,
@@ -39,7 +39,7 @@ function parsePositiveInteger(
   return value;
 }
 
-function parseProfile(raw: string | undefined): WorkflowProfile {
+export function parseProfile(raw: string | undefined): WorkflowProfile {
   const profile = (raw ?? 'semantic-sample') as WorkflowProfile;
   switch (profile) {
     case 'structural':
@@ -52,7 +52,7 @@ function parseProfile(raw: string | undefined): WorkflowProfile {
   }
 }
 
-function parseArgs(argv: string[]): CliOptions {
+export function parseArgs(argv: string[]): CliOptions {
   const knownPrefixes = ['--repo-root=', '--root=', '--output-dir=', '--sample-limit=', '--lexical-token-limit=', '--query-corpus=', '--profile=', '--representation-id='];
 
   for (const arg of argv) {
@@ -100,7 +100,7 @@ function parseArgs(argv: string[]): CliOptions {
   };
 }
 
-function copyReport(source: string, destination: string): void {
+export function copyReport(source: string, destination: string): void {
   if (!fs.existsSync(source)) {
     throw new Error(`Expected report does not exist: ${source}`);
   }
@@ -110,6 +110,21 @@ function copyReport(source: string, destination: string): void {
   const temporaryPath = `${destination}.tmp`;
   fs.copyFileSync(source, temporaryPath);
   fs.renameSync(temporaryPath, destination);
+}
+
+export function evaluateWorkflowSuccess(
+  report: Awaited<ReturnType<typeof runRepositoryProvenanceWorkflow>>,
+  profile: WorkflowProfile,
+): boolean {
+  let success = report.stages.validation.pass;
+  if (profile === 'semantic-full' || profile === 'production-projection') {
+    success =
+      success &&
+      report.stages.semantic.status === 'PROVEN' &&
+      (report.stages.semantic.embeddedFiles ?? 0) > 0 &&
+      (report.stages.semantic.heuristicFiles ?? 0) === 0;
+  }
+  return success;
 }
 
 async function main(): Promise<void> {
@@ -146,15 +161,7 @@ async function main(): Promise<void> {
       );
     }
 
-    // Determine success based on profile and results
-    let success = report.stages.validation.pass;
-    if (options.profile === 'semantic-full' || options.profile === 'production-projection') {
-      success =
-        success &&
-        report.stages.semantic.status === 'PROVEN' &&
-        (report.stages.semantic.embeddedFiles ?? 0) > 0 &&
-        (report.stages.semantic.heuristicFiles ?? 0) === 0;
-    }
+    const success = evaluateWorkflowSuccess(report, options.profile);
 
     console.log(
       JSON.stringify(
