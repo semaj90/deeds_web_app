@@ -13,7 +13,7 @@
  *   discover changed files
  *   → normalize paths / source_ref
  *   → upsert codebase_chunk_index rows (AST optional enrichment)
- *   → embed changed chunks via Ollama (embeddinggemma, 384-dim)
+ *   → embed changed chunks via EmbeddingGemma (768-dim canonical)
  *   → assign existing cluster model (assign_only, no refit)
  *   → enqueue Qdrant projection jobs to atlas.qdrant.project
  *   → invalidate BitFrost/Valkey keys for changed packets
@@ -33,6 +33,28 @@ import { existsSync, statSync, readFileSync } from 'fs';
 import { resolve, relative } from 'path';
 import { createHash } from 'crypto';
 
+function stableProjectionFingerprint(row) {
+  return createHash('sha256').update(JSON.stringify({
+    packet_key: row.packet_key ?? row.chunk_id,
+    source_ref: row.source_ref ?? null,
+    postgres_id: row.chunk_id,
+    content_hash: row.content_hash ?? null,
+    contract_version: 'atlas-qdrant-projection-v1',
+    metadata_schema: 1,
+    metadata_version: 1,
+    language: row.language ?? null,
+    domain_class: row.domain_class ?? null,
+    packet_match_count: row.packet_match_count ?? null,
+    packet_match_state: row.packet_match_state ?? ((row.packet_match_count ?? 0) > 1 ? 'ambiguous' : 'resolved'),
+    kmeans_cluster: row.kmeans_cluster ?? null,
+    kmeans_model_version: row.kmeans_model_version ?? null,
+    kmeans_vector_contract: row.kmeans_vector_contract ?? null,
+    cluster_margin: row.cluster_margin ?? null,
+    embedding_model: 'embeddinggemma-300m',
+    embedding_dimension: 384,
+  })).digest('hex');
+}
+
 // ── CLI ───────────────────────────────────────────────────────────────────────
 const argv       = process.argv.slice(2);
 const DRY_RUN    = argv.includes('--dry-run');
@@ -47,8 +69,8 @@ const QDRANT_URL      = process.env.QDRANT_URL      ?? 'http://localhost:6333';
 const OLLAMA_URL      = (process.env.OLLAMA_HOST ?? 'http://127.0.0.1:11434')
                           .replace(/^0\.0\.0\.0/, '127.0.0.1');
 const EMBED_MODEL     = process.env.EMBED_MODEL     ?? 'embeddinggemma:latest';
-const EMBED_DIM       = 384;
-const COLLECTION      = 'codebase_chunks_384_hybrid';
+const EMBED_DIM       = 768;
+const COLLECTION      = 'codebase_chunks_768';
 const REPO_ROOT       = resolve(process.cwd(), '..');
 const RABBITMQ_HOST   = process.env.RABBITMQ_HOST   ?? 'localhost';
 const RABBITMQ_PORT   = parseInt(process.env.RABBITMQ_PORT ?? '5672');
@@ -318,7 +340,7 @@ if (!DRY_RUN && centroids && Array.isArray(centroids) && centroids.length > 0) {
             WHERE cci2.id = ANY($4::uuid[])
               AND cci2.content_embedding IS NOT NULL
           ) closest
-          WHERE cci.id = closest.id
+      WHERE cci.id = closest.id
         `, [ROUTING_MODEL, ROUTING_VECTOR_CONTRACT, JSON.stringify(centroids), slice]);
       } catch (err) {
         // Vector-based assignment is complex; fall back to noting assignment needed
@@ -360,19 +382,98 @@ try {
       cci.id::text AS qdrant_point_id,
       cci.source_ref,
       cci.content_hash,
+      cci.language,
       ap.packet_key,
-      ap.domain_class
+      ap.domain_class,
+      ap.packet_match_count,
+      CASE WHEN ap.packet_match_count > 1 THEN 'ambiguous' ELSE 'resolved' END AS packet_match_state
     FROM codebase_chunk_index cci
-    LEFT JOIN atlas_packets ap ON ap.source_ref = cci.source_ref
+    LEFT JOIN LATERAL (
+      SELECT
+        ap.packet_key,
+        ap.domain_class,
+        COUNT(*) OVER () AS packet_match_count
+      FROM atlas_packets ap
+      WHERE ap.source_ref = cci.source_ref
+         OR ap.canonical_source_ref = cci.source_ref
+         OR ap.source_ref = cci.relative_path
+         OR ap.canonical_source_ref = cci.relative_path
+      ORDER BY
+        (ap.source_ref = cci.source_ref) DESC,
+        (ap.canonical_source_ref = cci.source_ref) DESC,
+        (ap.source_ref = cci.relative_path) DESC,
+        (ap.canonical_source_ref = cci.relative_path) DESC,
+        ap.updated_at DESC NULLS LAST,
+        ap.created_at DESC NULLS LAST,
+        ap.packet_key ASC
+      LIMIT 1
+    ) ap ON TRUE
     WHERE cci.source_ref = ANY($1)
-      AND cci.content_embedding IS NOT NULL
+    AND cci.content_embedding IS NOT NULL
   `, [sourceRefs]);
   toProject = rows;
 } finally {
   upsertClient.release();
 }
 
+const uniqueProjectionRows = [];
+const seenChunkIds = new Set();
+for (const row of toProject) {
+  if (!row?.chunk_id || seenChunkIds.has(row.chunk_id)) continue;
+  seenChunkIds.add(row.chunk_id);
+  uniqueProjectionRows.push(row);
+}
+toProject = uniqueProjectionRows;
+
 console.log(`  ${toProject.length} chunks eligible for Qdrant projection`);
+
+const projectedIds = toProject.map((row) => row.chunk_id).filter(Boolean);
+const existingProjectionById = new Map();
+if (projectedIds.length > 0) {
+  const projectionClient = await pool.connect();
+  try {
+    const { rows } = await projectionClient.query(`
+      SELECT packet_id, payload_hash, qdrant_point_id, projection_status
+      FROM atlas_qdrant_projection_state
+      WHERE packet_id = ANY($1::text[])
+    `, [projectedIds]);
+    for (const row of rows) {
+      existingProjectionById.set(String(row.packet_id), row);
+    }
+  } finally {
+    projectionClient.release();
+  }
+}
+
+const filteredProjectionRows = [];
+let skippedAmbiguousCount = 0;
+let skippedDuplicateCount = 0;
+for (const row of toProject) {
+  if ((row.packet_match_count ?? 0) > 1) {
+    skippedAmbiguousCount++;
+    continue;
+  }
+  const stableHash = stableProjectionFingerprint(row);
+  const existing = existingProjectionById.get(String(row.chunk_id));
+  if (
+    existing &&
+    existing.projection_status === 'PROJECTED' &&
+    String(existing.payload_hash ?? '') === stableHash &&
+    String(existing.qdrant_point_id ?? '') === String(row.qdrant_point_id ?? row.chunk_id)
+  ) {
+    skippedDuplicateCount++;
+    continue;
+  }
+  filteredProjectionRows.push({ ...row, stable_payload_hash: stableHash });
+}
+toProject = filteredProjectionRows;
+
+if (skippedAmbiguousCount > 0) {
+  console.log(`  Skipped ${skippedAmbiguousCount} ambiguous packet matches`);
+}
+if (skippedDuplicateCount > 0) {
+  console.log(`  Skipped ${skippedDuplicateCount} already-projected chunks`);
+}
 
 let enqueuedCount = 0;
 if (!DRY_RUN && toProject.length > 0) {
@@ -407,6 +508,9 @@ if (!DRY_RUN && toProject.length > 0) {
         requested_version: 1,
         source_ref: row.source_ref,
         packet_key: row.packet_key,
+        packet_match_count: row.packet_match_count ?? null,
+        packet_match_state: row.packet_match_state ?? null,
+        stable_payload_hash: row.stable_payload_hash,
         enqueued_at: new Date().toISOString(),
       };
       rabbitCh.publish('atlas.projection', 'project',

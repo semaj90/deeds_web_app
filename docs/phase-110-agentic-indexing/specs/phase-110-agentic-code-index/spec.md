@@ -52,6 +52,52 @@ Postgres is canonical for:
 
 Qdrant, Redis, Neo4j, JSONL datasets, summaries, and ACE packets are projections.
 
+## External discovery and acquisition
+
+Discovery and acquisition are separate from canonical indexing.
+
+- SearXNG and OpenCode websearch are discovery lanes only.
+- Crawl4AI is the preferred local acquisition lane for rendered content.
+- Firecrawl is an optional acquisition fallback when explicitly configured.
+- Discovery results are observations until they pass canonical ingestion.
+- Acquired web content must enter the same provenance and validation path as repository sources.
+- Synthesis models must not receive raw discovery output as though it were authoritative Atlas evidence.
+
+## Runtime orchestration boundaries
+
+- Gemma4 / llama-server perform synthesis and bounded semantic proposals.
+- Bifrost is a routing and telemetry boundary, not a truth store.
+- Mastra orchestrates workflow state, retries, and review gates.
+- MCP exposes bounded local tools.
+- ACP and A2A are interoperability boundaries, not internal canonical stores.
+- Runtime service configuration must be validated against actual startup state before any proof claim.
+
+## Implementation-path correction
+
+Do not create a second ingestion architecture when a repository owner already exists.
+
+Existing owners to extend or reconcile first:
+
+- `src/lib/server/analytics/web-research-crawler.ts`
+- `src/lib/server/db/schema/ace-web-crawl.ts`
+- `src/lib/server/atlas/feature-doc-ingestion.ts`
+- `src/lib/server/atlas/feature-doc-local-ingestion.ts`
+- `src/lib/server/db/schema-ingestion.ts`
+- `src/lib/server/db/schema/ingestion-jobs.ts`
+- `src/lib/server/retrieval/web-ingest.ts`
+- `src/lib/server/ingest/postgres-ingest-boundary.ts`
+- `src/lib/server/ingest/crawl4ai-client.ts`
+- `src/lib/server/ingest/crawled-document.schema.ts`
+
+Corrections required before execution:
+
+- Use Zod for the TypeScript boundary schema; reserve Pydantic wording for an actual Python boundary.
+- Keep crawler input trustless; trusted server context injects `workspaceId`, `actorUserId`, and access scope.
+- Deduplication keys must include tenant scope and canonical source identity, not `content_hash` alone.
+- Ingestion and outbox writes must be transactional.
+- Gate states must be explicit: `PASS`, `FAIL`, `NOT_RUN`, `BLOCKED`, `GATED`, `SKIPPED`.
+- Claims of proof require readback, not function return values or scaffolded TODOs.
+
 ## Required source metadata
 
 Every indexed artifact must resolve to:

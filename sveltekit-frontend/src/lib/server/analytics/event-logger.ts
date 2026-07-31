@@ -17,7 +17,7 @@ const db = dbClient.db;
 import { sql } from 'drizzle-orm';
 import { createHash } from 'crypto';
 import { analyticsEvents } from '$lib/server/db/schema-postgres.js';
-import { emit, makeEvent } from './analytics-sink.js';
+import { emit, emitBatch, makeEvent } from './analytics-sink.js';
 
 // ── Event Types ──────────────────────────────────────────────────────────
 

@@ -252,9 +252,13 @@ export function formatOKFContext(entries: OKFDirectoryCard[]): string {
 		}
 
 		// Domain classification with confidence
-		if ('spec' in entry && entry.spec?.domain) {
-			const confidence = entry.spec.metadata?.confidence || entry.confidence || 0;
-			ctx += `**Domain:** ${entry.spec.domain} (confidence: ${(confidence * 100).toFixed(0)}%)\n`;
+		if ('spec' in entry && entry.spec && typeof entry.spec === 'object' && 'domain' in entry.spec) {
+			const spec = entry.spec as Record<string, unknown>;
+			const domain = spec.domain as string | undefined;
+			if (domain) {
+				const confidence = (spec.metadata as Record<string, unknown>)?.confidence as number || (entry as Record<string, unknown>).confidence as number || 0;
+				ctx += `**Domain:** ${domain} (confidence: ${(confidence * 100).toFixed(0)}%)\n`;
+			}
 		}
 
 		// Feature keys (responsibility ownership)

@@ -1,0 +1,20 @@
+{
+  "phase": "Phase 2",
+  "name": "Qdrant CPU Baseline",
+  "collection_name": "phase110_baseline_768",
+  "total_vectors": 2467,
+  "sample_size": 100,
+  "embedding_dimension": 768,
+  "similarity_metric": "cosine",
+  "recall_at_10": {
+    "mean": "946.25%",
+    "p50": "1000.00%",
+    "p95": "1000.00%"
+  },
+  "recall_at_50": {
+    "mean": "1608.00%",
+    "p50": "1600.00%",
+    "p95": "1666.67%"
+  },
+  "timestamp": "2026-07-30T22:22:43.101Z"
+}

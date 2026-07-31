@@ -22,7 +22,7 @@ export class DynamicPortManager {
             { name: 'redis', basePort: 6379, portRange: [6370, 6371, 6372, 6373, 6374, 6375, 6376, 6377, 6378, 6379] },
             { name: 'neo4j', basePort: 7687, portRange: [7680, 7681, 7682, 7683, 7684, 7685, 7686, 7687, 7688, 7689] },
             { name: 'legal-gateway', basePort: 8080, portRange: [8080, 8081, 8082, 8083, 8084, 8085, 8086, 8087, 8088, 8089] },
-            { name: 'evidence-processor', basePort: 8090, portRange: [8090, 8091, 8092, 8093, 8094, 8095, 8096, 8097, 8098, 8099] },
+            { name: 'evidence-processor', basePort: 8092, portRange: [8092, 8094, 8095, 8096, 8097, 8098, 8099] },
             { name: 'enhanced-rag', basePort: 8100, portRange: [8100, 8101, 8102, 8103, 8104, 8105, 8106, 8107, 8108, 8109] },
             { name: 'gpu-orchestrator', basePort: 8110, portRange: [8110, 8111, 8112, 8113, 8114, 8115, 8116, 8117, 8118, 8119] },
             { name: 'vector-consumer', basePort: 8120, portRange: [8120, 8121, 8122, 8123, 8124, 8125, 8126, 8127, 8128, 8129] },

@@ -1,0 +1,50 @@
+{
+  "run_id": "c87b2419-0255-454f-a7ff-2762e6b098cf",
+  "workspace_id": "3f211a53-ba6f-4f1b-9dea-b85f763f1541",
+  "url": "https://example.com/legal/authentication",
+  "user_id": "90fa8292-351b-41ca-a26b-9bc885998f74",
+  "gates": [
+    {
+      "gate_number": "G13",
+      "gate_name": "Fact Extraction",
+      "status": "FAIL",
+      "timestamp": "2026-07-30T23:34:49.593Z",
+      "metrics": {
+        "facts_extracted": 0,
+        "facts_failed": 0
+      }
+    },
+    {
+      "gate_number": "G14",
+      "gate_name": "Hypergraph Building",
+      "status": "SKIP",
+      "timestamp": "2026-07-30T23:34:49.593Z",
+      "metrics": {
+        "reason": "No facts from G13"
+      }
+    },
+    {
+      "gate_number": "G15",
+      "gate_name": "Graph Expansion",
+      "status": "SKIP",
+      "timestamp": "2026-07-30T23:34:49.593Z",
+      "metrics": {
+        "reason": "No facts from G13"
+      }
+    },
+    {
+      "gate_number": "G16",
+      "gate_name": "Gemma4 Synthesis",
+      "status": "PASS",
+      "timestamp": "2026-07-30T23:35:00.429Z",
+      "metrics": {
+        "facts_used": 0,
+        "answer_length": 3840,
+        "duration_ms": 10836
+      }
+    }
+  ],
+  "ace_packet": null,
+  "final_answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The goal is to answer the question: \"What are the authentication requirements for legal services?\" based *ONLY* on the provided facts and context. I must include evidence citations.\n\n2.  **Analyze the Provided Facts/Context:** The text describes an \"Authentication Service Module\" and details various components:\n    *   *Session Management:* (Lucia, unique ID, 30 days, HTTP-only cookies).\n    *   *User Identification:* (UUID v4, lowercase email, Argon2id).\n    *   *Authorization Levels:* (Admin, Lawyer, Client, Guest - defines *what* they can do, but also implies *who* needs specific access).\n    *   *Security Measures:* (CSRF, Rate limiting, MFA, Session validation).\n    *   *Integration Points:* (PostgreSQL, Redis, Neo4j).\n\n3.  **Define \"Authentication Requirements\":** Authentication refers to verifying *who* the user is. The provided context details several security measures and identification methods that contribute to a secure system, which are the \"requirements.\"\n\n4.  **Synthesize the Answer (Drafting based on evidence):**\n\n    *   *Core Identification:* Users must be identified using unique IDs (UUID v4) and credentials stored securely (Argon2id for hashes, PostgreSQL for storage).\n    *   *Session Handling:* Access requires managing sessions using a framework (Lucia) and storing tokens in secure cookies.\n    *   *Security Checks:* The system requires multiple layers of security:\n        *   Rate limiting on login attempts (5 attempts per 15 minutes).\n        *   Session validation on every protected route.\n        *   CSRF protection.\n        *   Multi-factor authentication (optional, but available for sensitive accounts).\n\n5.  **Review against Constraints:**\n    *   *Based ONLY on provided facts:* Yes.\n    *   *Include evidence citations:* Yes.\n\n6.  **Final Polish and Formatting.** (Structuring the answer clearly under the relevant security categories.)<channel|>The authentication requirements for legal services, according to the provided module, involve secure user identification, robust session management, and multiple layers of security protection.\n\n**Key Authentication Requirements:**\n\n*   **User Identification:**\n    *   User IDs must be in the UUID v4 format.\n    *   Credentials are secured using the Argon2id algorithm for password hashes and are stored in PostgreSQL.\n    *   Email addresses are normalized and stored in lowercase.\n\n*   **Session Management:**\n    *   Sessions are managed using the Lucia auth framework.\n    *   Sessions are secured by storing tokens in secure HTTP-only cookies and are valid for 30 days.\n    *   Active sessions are cached in Redis (with a 1-hour TTL) and require validation on every protected route.\n\n*   **Security Measures:**\n    *   **Rate Limiting:** Login attempts are restricted to 5 attempts within a 15-minute window.\n    *   **Cross-Site Request Forgery (CSRF):** Protection is implemented via SvelteKit cookies.\n    *   **Multi-Factor Authentication (MFA):** This is available for sensitive accounts.\n\n***\n\n**Evidence Citations:**\n\n*   **Session Management:** \"Sessions are created with Lucia auth framework,\" and \"Session tokens stored in secure HTTP-only cookies\" (Authentication Service Module, 1. Session Management).\n*   **User Identification:** \"User IDs are UUID v4 format,\" and \"Password hashes use Argon2id algorithm\" (Authentication Service Module, 2. User Identification).\n*   **Rate Limiting:** \"Rate limiting on login attempts (5 attempts per 15 minutes)\" (Authentication Service Module, 4. Security Measures).\n*   **Session Validation:** \"Session validation on every protected route\" (Authentication Service Module, 4. Security Measures).\n*   **CSRF Protection:** \"CSRF protection via SvelteKit cookies\" (Authentication Service Module, 4. Security Measures).",
+  "proof_state": "DEGRADED"
+}

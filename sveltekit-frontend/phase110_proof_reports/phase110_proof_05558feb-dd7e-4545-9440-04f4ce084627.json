@@ -1,0 +1,50 @@
+{
+  "run_id": "05558feb-dd7e-4545-9440-04f4ce084627",
+  "workspace_id": "899d5719-2054-4b24-bb7f-7070c5c1c0ba",
+  "url": "https://example.com/legal/authentication",
+  "user_id": "63814d66-1f41-48f5-a8f3-9799285ca203",
+  "gates": [
+    {
+      "gate_number": "G13",
+      "gate_name": "Fact Extraction",
+      "status": "PARTIAL",
+      "timestamp": "2026-07-30T23:42:20.723Z",
+      "metrics": {
+        "facts_extracted": 0,
+        "facts_failed": 3
+      }
+    },
+    {
+      "gate_number": "G14",
+      "gate_name": "Hypergraph Building",
+      "status": "SKIP",
+      "timestamp": "2026-07-30T23:42:20.723Z",
+      "metrics": {
+        "reason": "No facts from G13"
+      }
+    },
+    {
+      "gate_number": "G15",
+      "gate_name": "Graph Expansion",
+      "status": "SKIP",
+      "timestamp": "2026-07-30T23:42:20.723Z",
+      "metrics": {
+        "reason": "No facts from G13"
+      }
+    },
+    {
+      "gate_number": "G16",
+      "gate_name": "Gemma4 Synthesis",
+      "status": "PASS",
+      "timestamp": "2026-07-30T23:42:32.833Z",
+      "metrics": {
+        "facts_used": 0,
+        "answer_length": 3888,
+        "duration_ms": 12110
+      }
+    }
+  ],
+  "ace_packet": null,
+  "final_answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The goal is to answer the question: \"What are the authentication requirements for legal services?\" based *ONLY* on the provided \"Facts\" (which are empty) and \"Context\" (the detailed \"Authentication Service Module\" description). I must include evidence citations.\n\n2.  **Analyze the Provided Data (Context):** The context describes the technical implementation of an authentication system.\n\n    *   *1. Session Management:* Details how sessions work (Lucia, unique ID, 30-day expiration, HTTP-only cookies).\n    *   *2. User Identification:* Details data formats (UUID v4, lowercase email, Argon2id hashing).\n    *   *3. Authorization Levels:* Defines roles and associated permissions (Admin, Lawyer, Client, Guest).\n    *   *4. Security Measures:* Lists specific security protocols (CSRF, Rate limiting, MFA, Session validation).\n    *   *5. Integration Points:* Lists external systems used (PostgreSQL, Redis, Neo4j).\n\n3.  **Analyze the Question:** \"What are the authentication requirements for legal services?\"\n\n    *   *Self-Correction/Refinement:* The provided text describes *how* the system authenticates and *what* the roles are, but it doesn't list a single, consolidated \"requirement\" list. I must synthesize the answer by pulling together the core security and access controls defined in the text.\n\n4.  **Drafting the Answer (Focusing on Requirements):**\n\n    *   *Core Access Control:* The system uses role-based access control (RBAC) defined by specific roles (Lawyer, Client, etc.).\n    *   *Core Security:* The system requires strong session management, protection against common attacks, and secure credential handling.\n\n5.  **Structuring the Answer and Citing Evidence:**\n\n    *   **Authentication (Who you are):** Requires secure session handling and validated credentials.\n    *   **Authorization (What you can do):** Requires role-based access control.\n    *   **Security Measures (How it's protected):** Lists the specific technical safeguards.\n\n6.  **Final Review against Constraints:**\n    *   Answer based ONLY on provided facts/context? Yes.\n    *   Include evidence citations? Yes.\n\n7.  **Generating the Output.** (This leads to the final provided answer.)<channel|>The authentication requirements for legal services are managed through a combination of role-based access control, secure session management, and multiple layers of security measures.\n\n**Key Requirements:**\n\n*   **Role-Based Access:** Access is restricted based on the user's role, which dictates specific permissions:\n    *   **Lawyer:** Can access cases and client records (Authorization Levels).\n    *   **Client:** Can view only their own cases and communications (Authorization Levels).\n    *   **Admin:** Has full system access, including the ability to create users and modify policies (Authorization Levels).\n    *   **Guest:** Limited to read-only access to public legal documents (Authorization Levels).\n*   **Secure Session Management:** Sessions are managed using the Lucia auth framework, requiring a unique ID and being valid for 30 days. Session tokens are stored in secure HTTP-only cookies, and validation is required on every protected route (Session Management).\n*   **Credential Security:** User identification requires that email addresses are normalized and stored in lowercase, and password hashes must use the Argon2id algorithm (User Identification).\n*   **Mandatory Security Protocols:** The system enforces several security measures to protect users and data:\n    *   CSRF protection via SvelteKit cookies (Security Measures).\n    *   Rate limiting on login attempts (limited to 5 attempts per 15 minutes) (Security Measures).\n    *   Multi-factor authentication is available for sensitive accounts (Security Measures).\n    *   Session validation is required on every protected route (Security Measures).",
+  "proof_state": "DEGRADED"
+}

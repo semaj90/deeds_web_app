@@ -155,7 +155,7 @@ class MCPGPUOrchestrator {
 			name: 'nomic-embed-text, latest',
 			port: 11436,
 			capabilities: ['vector_embedding', 'similarity_search'],
-			dimensions: 384,
+			dimensions: 768,
 			memory_requirement: '274MB',
 			batch_size: 32
 		});

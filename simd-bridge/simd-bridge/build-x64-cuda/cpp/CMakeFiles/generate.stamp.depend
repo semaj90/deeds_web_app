@@ -1,0 +1,36 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-4.0/Modules/CMakeCUDAInformation.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/CMakeCommonLanguageInclude.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/CheckCXXCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/CheckCXXSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/CheckLanguage.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Compiler/CMakeCommonCompilerMacros.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Compiler/NVIDIA-CUDA.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Compiler/NVIDIA.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindCUDAToolkit.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindPython.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/FindPython/Support.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Internal/CheckCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Internal/CheckFlagCommonConfig.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Internal/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Platform/Windows-MSVC.cmake
+C:/Program Files/CMake/share/cmake-4.0/Modules/Platform/Windows-NVIDIA-CUDA.cmake
+C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/CMakeLists.txt
+C:/Users/james/Videos/deeds-web-app/simd-bridge/simd-bridge/build-x64-cuda/CMakeFiles/4.0.0/CMakeCUDACompiler.cmake
+C:/Users/james/Videos/deeds-web-app/simd-bridge/simd-bridge/build-x64-cuda/cpp/detect_cuda_version.cc
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Config.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Targets-release.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Caffe2Targets.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/FindCUDAToolkit.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Modules_CUDA_fix/FindCUDA.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/Modules_CUDA_fix/upstream/FindCUDA/select_compute_arch.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/cuda.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/mkl.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/mkldnn.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Caffe2/public/utils.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfig.cmake
+C:/libtorch-win-shared-with-deps-2.9.0+cu130/libtorch/share/cmake/Torch/TorchConfigVersion.cmake

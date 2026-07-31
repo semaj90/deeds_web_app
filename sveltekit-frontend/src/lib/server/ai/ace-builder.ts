@@ -1,10 +1,12 @@
 import { getValkeyClient } from '../cache/valkey-client.js';
-import { ENV } from '../env.server.js';
 import { tool_graph_expand_neighborhood, tool_search_hybrid } from './mcp-tool-dispatch.js';
+import { buildKvContextPacket, formatKvPacketForPrompt } from './kv-context-controller.js';
 
 const redis = getValkeyClient();
 
 export async function buildACEPacket(query: string, ctx: any) {
+  const taskId = ctx.taskId || ctx.runId || `ace-${Buffer.from(query).toString('base64').slice(0, 12)}`;
+
   // 1. Fetch Graph Traversal Data (Topology)
   const graphData = await tool_graph_expand_neighborhood({ maxHops: 1, limit: 10 });
 
@@ -35,6 +37,33 @@ export async function buildACEPacket(query: string, ctx: any) {
   // 2. Fetch Dense Qdrant Vector Hits
   const qdrantHits = await tool_search_hybrid({ query });
 
+  const hotFiles = Array.from(new Set([
+    ...(Array.isArray(ctx.hotFiles) ? ctx.hotFiles : []),
+    ...((Array.isArray((graphData.data as any)?.nodes) ? (graphData.data as any).nodes : [])
+      .map((node: any) => node?.path ?? node?.sourceRef ?? node?.source_ref)
+      .filter((value: unknown): value is string => typeof value === 'string')),
+    ...((Array.isArray((qdrantHits as any)?.data) ? (qdrantHits as any).data : [])
+      .map((hit: any) => hit?.path ?? hit?.sourceRef ?? hit?.source_ref)
+      .filter((value: unknown): value is string => typeof value === 'string')),
+  ])).slice(0, 8);
+
+  const hotSymbols = Array.from(new Set([
+    ...(Array.isArray(ctx.hotSymbols) ? ctx.hotSymbols : []),
+    ...((Array.isArray((graphData.data as any)?.nodes) ? (graphData.data as any).nodes : [])
+      .map((node: any) => node?.symbol ?? node?.label ?? node?.name)
+      .filter((value: unknown): value is string => typeof value === 'string')),
+  ])).slice(0, 12);
+
+  const blockedAreas = Array.isArray(ctx.blockedAreas) ? ctx.blockedAreas : [];
+  const kvPacket = await buildKvContextPacket({
+    taskId,
+    query,
+    hotFiles,
+    hotSymbols,
+    blockedAreas,
+  });
+  const kvContextBlock = formatKvPacketForPrompt(kvPacket);
+
   // 3. Extract recent Redis Failures for this execution trajectory
   const recentFailures = ctx.history ? ctx.history.slice(-3) : [];
 
@@ -46,7 +75,15 @@ export async function buildACEPacket(query: string, ctx: any) {
     },
     context: {
       query,
+      taskId,
       failures: recentFailures
+    },
+    kvContext: {
+      taskId: kvPacket.taskId,
+      stablePrefixHash: kvPacket.stablePrefixHash,
+      attentionToc: kvPacket.level3AttentionToc,
+      compressed: kvPacket.level2Compressed,
+      promptBlock: kvContextBlock,
     },
     graph: clusteredContext,
     vectors: qdrantHits.success ? qdrantHits.data : null

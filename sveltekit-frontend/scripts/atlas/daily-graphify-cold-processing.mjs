@@ -88,11 +88,20 @@ log(`   SKIP_REDIS=${SKIP_REDIS}`);
 
 const results = [];
 
-// Stage 1: Semantic indexing (embed summaries from Qdrant via Ollama)
-// Reads glyph_atlas or codebase_chunks_768; fetches embeddings via /api/embed (Redis L1 + Bifrost L2)
+// Stage 0: Changed-file incremental refresh
+// Rebuilds changed chunks, embeddings, projection jobs, and cache invalidations
+// before the broader daily semantic pass.
+results.push(run(
+  'Changed-file Incremental Refresh',
+  DRY_RUN ? 'graphify:incremental:dry' : 'graphify:incremental',
+  { required: false, supportsDry: true }
+));
+
+// Stage 1: Semantic indexing (EmbeddingGemma 768 canonical lane)
+// Reads glyph_atlas or codebase_chunks_768; uses the configured embedding lane
 // Writes 768-dim vectors to Qdrant payloads
 results.push(run(
-  'Semantic Indexing (embed via Ollama)',
+  'Semantic Indexing (EmbeddingGemma 768)',
   'graphify:semantic',
   { required: false, supportsDry: false }
 ));
@@ -118,7 +127,7 @@ if (!SKIP_REDIS) {
   ));
 }
 
-// Stage 4: Generate missing KAG notes (via llama-server)
+// Stage 4: Generate missing KAG notes (Gemma4 via llama-server)
 // Finds directories in Neo4j without DirectoryNotes in CouchDB
 // Generates summaries using Gemma4 and upserts them
 results.push(run(
@@ -127,10 +136,10 @@ results.push(run(
   { required: false, supportsDry: true }
 ));
 
-// Stage 5: Warm ACE compact cache (optional)
-// Pre-materializes ACE context for next retrieval pass
+// Stage 5: Warm the bounded ACE packet cache from the current graph snapshot
+// Builds one deduplicated packet per graph revision and stores it in Valkey.
 results.push(run(
-  'ACE Context Pre-Warm',
+  'ACE Context Packet Warm (Graphify)',
   DRY_RUN ? 'graphify:ace:warm' : 'graphify:ace:warm:apply',
   { required: false, supportsDry: true }
 ));

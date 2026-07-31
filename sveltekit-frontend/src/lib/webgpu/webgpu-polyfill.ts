@@ -160,7 +160,7 @@ export class WebGPUPolyfillService {
  }
 
  /** Embedding computation entry point — prefers GPU/WebGL but falls back to CPU. */
- async computeEmbedding(inputVector: number[], dimensions = 384): Promise<number[]> {
+ async computeEmbedding(inputVector: number[], dimensions = 768): Promise<number[]> {
  const startTime = typeof performance !== 'undefined' && typeof performance.now === 'function'
  ? performance.now()
  : Date.now();

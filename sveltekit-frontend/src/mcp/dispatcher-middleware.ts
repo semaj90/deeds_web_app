@@ -33,6 +33,36 @@ import type { EngramMemoryBridge } from './memory-bridge.js';
 import { extractKeywordsFromState } from './langgraph-bridge.js';
 
 /**
+ * No-op LangGraph bridge for when LangGraph is disabled.
+ * Allows dispatcher middleware to function without state machine routing.
+ */
+class NoOpLangGraphBridge implements Omit<LangGraphBridge, 'constructor'> {
+  getConfig() {
+    return { maxStateSize: 32_000, maxToolResultChars: 12_000, priorityLanes: [], memoryOverflowBehavior: 'truncate' as const };
+  }
+
+  applyHeadroom(state: DispatcherState): DispatcherState {
+    return state; // Passthrough, no constraints
+  }
+
+  async invokeTool(
+    toolName: string,
+    toolResult: Record<string, unknown>,
+    currentState: DispatcherState
+  ): Promise<{ result: unknown; updatedState: DispatcherState }> {
+    return { result: toolResult, updatedState: currentState }; // Passthrough
+  }
+
+  async persistStateToDB(state: DispatcherState, sessionId: string): Promise<void> {
+    // No-op: don't persist when LangGraph is disabled
+  }
+
+  async ensureSchema(): Promise<void> {
+    // No-op: no schema to ensure
+  }
+}
+
+/**
  * Tool execution metadata (captured before/after invocation)
  */
 export const ToolExecutionMetadataSchema = z.object({
@@ -56,13 +86,20 @@ export type ToolExecutionMetadata = z.infer<typeof ToolExecutionMetadataSchema>;
 export class DispatcherMiddleware {
   private pool: Pool | null;
   private engramBridge: EngramMemoryBridge | null;
-  private langgraphBridge: LangGraphBridge;
+  private langgraphBridge: LangGraphBridge | NoOpLangGraphBridge;
+  private langgraphEnabled: boolean;
   private callCounter = 0;
 
-  constructor(pool: Pool | null, engramBridge: EngramMemoryBridge | null, langgraphBridge: LangGraphBridge) {
+  constructor(
+    pool: Pool | null,
+    engramBridge: EngramMemoryBridge | null,
+    langgraphBridge: LangGraphBridge | NoOpLangGraphBridge | null,
+    langgraphEnabled: boolean = true
+  ) {
     this.pool = pool;
     this.engramBridge = engramBridge;
-    this.langgraphBridge = langgraphBridge;
+    this.langgraphBridge = langgraphBridge || new NoOpLangGraphBridge();
+    this.langgraphEnabled = langgraphEnabled && langgraphBridge !== null;
   }
 
   /**
@@ -101,37 +138,49 @@ export class DispatcherMiddleware {
       };
 
       try {
-        // Apply headroom constraints to input
-        const headroomed = this.langgraphBridge['applyHeadroom'](currentState);
+        // Apply headroom constraints to input (if LangGraph enabled)
+        const headroomed = this.langgraphEnabled
+          ? this.langgraphBridge.applyHeadroom(currentState)
+          : currentState;
 
         // Invoke the original tool handler
         const result = await handler(input);
 
-        // Capture result in state
+        // Capture result in state (if LangGraph enabled)
         const resultSize = JSON.stringify(result).length;
-        const { result: constrainedResult, updatedState } = await this.langgraphBridge.invokeTool(
-          toolName,
-          typeof result === 'object' ? (result as Record<string, unknown>) : { raw: String(result) },
-          headroomed
-        );
+        let constrainedResult = result;
 
-        currentState = { ...updatedState, action: 'complete' };
-
-        // Persist state to PostgreSQL
-        await this.persistExecution(
-          {
+        if (this.langgraphEnabled) {
+          const { result: cResult, updatedState } = await this.langgraphBridge.invokeTool(
             toolName,
-            sessionId,
-            toolCallId,
-            invokedAt,
-            completedAt: new Date().toISOString(),
-            inputSize: JSON.stringify(input).length,
-            resultSize,
-            resultTruncated: resultSize > this.langgraphBridge['config'].maxToolResultChars,
-            duration_ms: Date.now() - startTime,
-          },
-          currentState
-        );
+            typeof result === 'object' ? (result as Record<string, unknown>) : { raw: String(result) },
+            headroomed
+          );
+          constrainedResult = cResult;
+          currentState = { ...updatedState, action: 'complete' };
+        } else {
+          // Bypass LangGraph: return result directly with minimal state update
+          currentState = { ...currentState, action: 'complete' };
+        }
+
+        // Persist state to PostgreSQL (guarded by pool availability)
+        if (this.pool) {
+          const config = this.langgraphBridge.getConfig();
+          await this.persistExecution(
+            {
+              toolName,
+              sessionId,
+              toolCallId,
+              invokedAt,
+              completedAt: new Date().toISOString(),
+              inputSize: JSON.stringify(input).length,
+              resultSize,
+              resultTruncated: resultSize > config.maxToolResultChars,
+              duration_ms: Date.now() - startTime,
+            },
+            currentState
+          );
+        }
 
         // Record observation in Engram
         await this.recordObservation(toolName, sessionId, 'success', constrainedResult);

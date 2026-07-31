@@ -1,5 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "enabled_providers": [
+    "llama-server"
+  ],
   "model": "llama-server/hforf.gguf",
   "small_model": "llama-server/hforf.gguf",
   "default_agent": "hforf-trace-audit",
@@ -12,15 +15,6 @@
         "apiKey": "local"
       },
       "models": {
-        "hforf.gguf": {
-          "name": "hforf.gguf",
-          "tools": true,
-          "reasoning": false,
-          "limit": {
-            "context": 65536,
-            "output": 4096
-          }
-        },
         "gemma4-legal-iq4xs-direct.gguf": {
           "name": "Gemma4 Legal Direct 65K",
           "tools": true,

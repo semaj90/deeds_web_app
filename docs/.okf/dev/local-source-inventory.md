@@ -2,6 +2,24 @@
 
 This inventory captures repository-local material that can seed future dev coding agent corpora, QLoRA alignment sets, LangChain-style deep agent workflows, and OpenWiki-style integration work.
 
+## Repository-local OKF / agent alignment sources
+
+- `docs/.okf/dev/gsd.md`
+- `docs/.okf/dev/manifest.json`
+- `docs/phase-110-agentic-indexing/specs/phase-110-agentic-code-index/implementation-prompt.md`
+- `docs/phase-110-agentic-indexing/specs/phase-110-agentic-code-index/spec.md`
+- `docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md`
+- `docs/architecture/bounded-tool-gateway-implementation.md`
+- `docs/architecture/AGENTIC-ERROR-FIXING-ARCHITECTURE.md`
+- `docs/architecture/phase-3-gpu-graph-adaptive-architecture.md`
+- `docs/architecture/PARENT_ATLAS_RECOMMENDATION_AND_RETRIEVAL_POLICY.md`
+- `docs/ai-os/opencode-context-window.md`
+- `docs/ai-os/opencode-mcp-atlas.md`
+- `docs/ai-os/opencode-skill-routing.md`
+- `sveltekit-frontend/docs/agents_master_stack_checklist.md`
+- `sveltekit-frontend/docs/agents-md-howto.md`
+- `sveltekit-frontend/docs/bifrost-firecrawl-programming-reference.md`
+
 ## Dataset and training material
 
 - `scripts/unsloth-training/COLAB_PACKAGE/training-datasets/*.jsonl`
@@ -19,6 +37,14 @@ This inventory captures repository-local material that can seed future dev codin
 - `docs/reports/semantic-training-rows.md`
 - `docs/reports/pytorch-training-pipeline.json`
 - `docs/reports/pytorch-training-pipeline.md`
+- `docs/stage3/semantic_facts.ndjson`
+- `docs/stage3/topology_facts.ndjson`
+- `docs/stage3/karpathy_cards.ndjson`
+- `docs/phase-110-agentic-indexing/datasets/README.md`
+- `docs/phase-110-agentic-indexing/**/datasets/*.md`
+- `sveltekit-frontend/docs/audit/2026-05-14_sveltekit-route-gap-atlas.md`
+- `sveltekit-frontend/docs/CANONICAL-FEATURE-ENVELOPE-WIRED.md`
+- `sveltekit-frontend/docs/CANONICAL-PACKET-REGISTRY-DESIGN.md`
 
 ## Dev docs and agent docs
 
@@ -34,6 +60,13 @@ This inventory captures repository-local material that can seed future dev codin
 - `sveltekit-frontend/docs/reports/*.md`
 - `sveltekit-frontend/docs/reports/*.json`
 - `sveltekit-frontend/docs/obsidian-vault/**/*.md`
+- `docs/atlas-*.md`
+- `docs/*agentic*.md`
+- `docs/*kanban*.md`
+- `docs/*qlora*.md`
+- `docs/*openwiki*.md`
+- `docs/*langchain*.md`
+- `docs/*dataset*.md`
 
 ## Crawled or generated pages
 
@@ -41,6 +74,22 @@ This inventory captures repository-local material that can seed future dev codin
 - `docs/.okf/dev/corpus.jsonl`
 - `docs/.okf/dev/index.md`
 - `docs/.okf/dev/summary.json`
+- `docs/.okf/dev/*.jsonl`
+- `docs/.okf/dev/*.md`
+
+## Runtime acquisition and search boundaries
+
+- `sveltekit-frontend/src/lib/server/ldr/web-search-client.ts` supports SearXNG search and Firecrawl extraction when `FIRECRAWL_API_KEY` is present.
+- `sveltekit-frontend/src/lib/server/agent/tools/web-search.ts` uses `ENV.SEARXNG_URL` for live discovery and falls back to curated results.
+- `sveltekit-frontend/src/lib/server/indexer/web-search-indexer.ts` treats web search as an indexer input, not canonical truth.
+- `docker/langgraph-synthesis/app.py` currently uses SearXNG and DuckDuckGo-style fallback search, not Firecrawl.
+- `docs/.okf/dev` should remain a dev corpus export target only; it must not become the authority store.
+
+## Env wiring gap notes
+
+- `sveltekit-frontend/.env.example` documents `SEARXNG_URL` and `FIRECRAWL_API_KEY`.
+- `sveltekit-frontend/.env.local.example` documents `FIRECRAWL_API_KEY`.
+- The repo search confirmed Firecrawl support in code, but a committed runtime key was not confirmed in this pass.
 
 ## HTML scan result
 
@@ -55,4 +104,3 @@ This inventory captures repository-local material that can seed future dev codin
 - `taskboard`
 - `agentic_error_fixing`
 - `canonical_api_recommendations`
-

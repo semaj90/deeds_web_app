@@ -1,0 +1,50 @@
+{
+  "run_id": "5b6c503b-1cdd-499b-95d5-9aaec96be937",
+  "workspace_id": "ba14a9ad-b05f-42c2-adc2-fd7fa79fb819",
+  "url": "https://example.com/legal/authentication",
+  "user_id": "eb6309ac-5e87-4d07-bac3-496eb412d398",
+  "gates": [
+    {
+      "gate_number": "G13",
+      "gate_name": "Fact Extraction",
+      "status": "FAIL",
+      "timestamp": "2026-07-30T23:38:31.017Z",
+      "metrics": {
+        "facts_extracted": 0,
+        "facts_failed": 0
+      }
+    },
+    {
+      "gate_number": "G14",
+      "gate_name": "Hypergraph Building",
+      "status": "SKIP",
+      "timestamp": "2026-07-30T23:38:31.017Z",
+      "metrics": {
+        "reason": "No facts from G13"
+      }
+    },
+    {
+      "gate_number": "G15",
+      "gate_name": "Graph Expansion",
+      "status": "SKIP",
+      "timestamp": "2026-07-30T23:38:31.017Z",
+      "metrics": {
+        "reason": "No facts from G13"
+      }
+    },
+    {
+      "gate_number": "G16",
+      "gate_name": "Gemma4 Synthesis",
+      "status": "PASS",
+      "timestamp": "2026-07-30T23:39:00.857Z",
+      "metrics": {
+        "facts_used": 0,
+        "answer_length": 3526,
+        "duration_ms": 29840
+      }
+    }
+  ],
+  "ace_packet": null,
+  "final_answer": "<|channel>thought\nThinking Process:\n\n1.  **Analyze the Request:** The goal is to answer the question: \"What are the authentication requirements for legal services?\" based *only* on the provided \"Facts\" (which are empty) and \"Context\" (the detailed \"Authentication Service Module\" description). I must include evidence citations.\n\n2.  **Analyze the Provided Facts/Context:**\n    *   *Facts:* (None provided)\n    *   *Context:* (The detailed system description)\n\n3.  **Scan the Context for \"Authentication Requirements\":** Authentication refers to verifying *who* the user is.\n    *   *Section 1: Session Management:* Deals with maintaining the authenticated state.\n        *   *Requirement:* Unique session ID, expiration (30 days), secure storage (HTTP-only cookies).\n    *   *Section 2: User Identification:* Deals with the credentials and data used for identification.\n        *   *Requirement:* User IDs are UUID v4. Passwords use Argon2id. Email normalization.\n    *   *Section 3: Authorization Levels:* Deals with *what* the user can do *after* being authenticated (this is authorization, not authentication, but it defines the roles).\n    *   *Section 4: Security Measures:* Deals with protecting the authentication process.\n        *   *Requirement:* CSRF protection, Rate limiting (5 attempts per 15 minutes), MFA (optional), Session validation on every protected route.\n    *   *Section 5: Integration Points:* Deals with the technical infrastructure.\n\n4.  **Synthesize the Answer (Focusing on the \"How\" of Authentication):** The requirements cover session handling, credential storage, and protection mechanisms.\n\n5.  **Draft the Answer Structure and Citations:**\n\n    *   *Initial Authentication:* How the user proves identity (passwords, sessions).\n    *   *Security Measures:* How the system protects the login process.\n    *   *Session Handling:* How the system maintains the authenticated state.\n\n6.  **Review against Constraints:**\n    *   Answer based ONLY on provided facts/context: Yes.\n    *   Include evidence citations: Yes.\n\n7.  **Final Polish.** (This leads to the structured response provided below.)<channel|>The authentication requirements for the legal services system involve establishing a secure identity, managing the session, and implementing multiple layers of protection.\n\n**Key Authentication Requirements:**\n\n1.  **Credential Security and Identification:**\n    *   User passwords must be stored using the **Argon2id** algorithm for hashing (User Identification).\n    *   User identification relies on unique identifiers (UUID v4) and normalized email addresses (User Identification).\n    *   The system supports **Multi-factor authentication** for sensitive accounts (Security Measures).\n\n2.  **Session Management:**\n    *   Sessions are established using the Lucia auth framework (Session Management).\n    *   Sessions are maintained via unique IDs and are valid for a period of **30 days** (Session Management).\n    *   To maintain security, session validation must occur on every protected route (Security Measures).\n    *   Active sessions are cached in Redis with a 1-hour Time-To-Live (Session Management / Integration Points).\n\n3.  **Protection Mechanisms:**\n    *   The system implements **Rate limiting** on login attempts, restricting access to 5 attempts within a 15-minute window (Security Measures).\n    *   **CSRF protection** is enforced using SvelteKit cookies (Security Measures).\n    *   Session tokens must be stored in secure **HTTP-only cookies** (Session Management).",
+  "proof_state": "DEGRADED"
+}

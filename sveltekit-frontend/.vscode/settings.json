@@ -42,7 +42,7 @@
   "editor.renderWhitespace": "none",
 
   // Multi-Core TypeScript Server (12GB Memory + All Cores)
-  "typescript.tsserver.maxTsServerMemory": 12288,
+  "typescript.tsserver.maxTsServerMemory": 16288,
   "typescript.tsserver.useSeparateSyntaxServer": true,
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.suggest.autoImports": true,
@@ -92,10 +92,10 @@
   // ========================================
   // CUDA ACCELERATION SETTINGS
   // ========================================
-  "C_Cpp.default.compilerPath": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/bin/nvcc.exe",
+  "C_Cpp.default.compilerPath": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/bin/nvcc.exe",
   "C_Cpp.default.includePath": [
     "${workspaceFolder}/**",
-    "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.1/include"
+    "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v13.0/include"
   ],
   "typescript.inlayHints.variableTypes.enabled": true,
   // ========================================
@@ -113,7 +113,6 @@
   "files.autoSave": "afterDelay",
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
-  // ========================================
   // ADDITIONAL GIT SETTINGS TO DISABLE DIFF PROMPTS
   // ========================================
   "git.autofetch": false,

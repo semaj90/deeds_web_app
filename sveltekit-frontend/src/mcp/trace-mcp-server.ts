@@ -68,7 +68,8 @@ import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
 import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
-import { LangGraphBridge, extractKeywordsFromState } from './langgraph-bridge.js';
+import type { LangGraphBridge } from './langgraph-bridge.js';
+import { extractKeywordsFromState } from './langgraph-bridge.js';
 
 process.on('uncaughtException', (err) => {
   console.error('[mcp] UNCAUGHT EXCEPTION:', err);
@@ -93,6 +94,7 @@ const TRACE_URL = TRACE_ENV.TRACE_MCP_URL;
 const PORT      = TRACE_ENV.TRACE_MCP_PORT;
 const HOST      = TRACE_ENV.TRACE_MCP_HOST;
 
+import { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { registerNewTools } from './new_tools.js';
 import { registerAdminTools } from './admin_tools.js';
 import { registerSkillTools } from './skill_tools.js';
@@ -318,30 +320,21 @@ async function pumpServiceWorkers(): Promise<void> {
   }
 }
 
-// Two separate flags so unrelated things stop riding the same env var:
+// Feature flags for MCP server configuration:
 //   MCP_LEGACY_ALIASES       — bare-name back-compat aliases in new_tools.ts
 //                              (`trace_search`, `wiki_note_lookup`).
 //   MCP_OPTIONAL_REGISTRIES  — whole optional tool families (codebase, research,
 //                              bifrost). Default off — they expose extra
 //                              surface area we don't want unless explicitly opted in.
+//   TRACE_LANGGRAPH_ENABLED  — enable LangGraph state machine routing (default: true).
+//                              Set to false to disable state machine but keep tool execution.
 const ENABLE_LEGACY_ALIASES      = process.env.MCP_LEGACY_ALIASES === 'true';
 const ENABLE_OPTIONAL_REGISTRIES = process.env.MCP_OPTIONAL_REGISTRIES === 'true';
+const LANGGRAPH_ENABLED          = process.env.TRACE_LANGGRAPH_ENABLED !== 'false';
 
-registerNewTools(server, { rerankUrl: RERANK_URL }, ENABLE_LEGACY_ALIASES);
-registerAdminTools(server);
-registerSkillTools(server);
-registerLegalSkillsTools(server);
-registerEngramTools(server, REDIS_URL);
-registerAtlasEmbeddingTools(server, REDIS_URL);
-if (ENABLE_OPTIONAL_REGISTRIES) {
-  registerCodebaseTools(server);
-  registerResearchTools(server);
-  registerBifrostTools(server);
-  registerRgAtlasTools(server);
-}
-// NOTE: registerTopologyMgmtTools(server, pool) moved below `pool` declaration
-// at line 111 — it was hitting TDZ here and crashing MCP at startup with
-// "Cannot access 'pool' before initialization".
+// NOTE: Tool registration moved below `pool`, `engramBridge`, `langgraphBridge` declarations
+// to avoid TDZ crashes. DispatcherMiddleware requires all three dependencies initialized first.
+
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const path = await import('node:path');
@@ -370,20 +363,44 @@ pool.on('error', () => {});
 // Keep this lazy: Engram is hint-only and should not block MCP startup.
 const engramBridge = new EngramMemoryBridge(PG_URL);
 
-// Initialize LangGraph bridge (Netflix Headroom dispatcher)
-const langgraphBridge = new LangGraphBridge({ maxStateSize: 32_000, maxToolResultChars: 12_000 }, pool);
-await langgraphBridge.ensureSchema().catch((err) => {
-  console.warn('[mcp] LangGraph schema creation failed (non-fatal):', err);
-});
+// Initialize LangGraph bridge (Netflix Headroom dispatcher) — conditional on feature flag
+let langgraphBridge: LangGraphBridge | null = null;
+if (LANGGRAPH_ENABLED) {
+  const { LangGraphBridge: LGB } = await import('./langgraph-bridge.js');
+  langgraphBridge = new LGB({ maxStateSize: 32_000, maxToolResultChars: 12_000 }, pool);
+  await langgraphBridge.ensureSchema().catch((err) => {
+    console.warn('[mcp] LangGraph schema creation failed (non-fatal):', err);
+  });
+} else {
+  console.info('[mcp] LangGraph state machine disabled (TRACE_LANGGRAPH_ENABLED=false)');
+}
+
+// Initialize DispatcherMiddleware with all required dependencies
+// Pass langgraphBridge (may be null) and LANGGRAPH_ENABLED flag
+const dispatcherMiddleware = new DispatcherMiddleware(pool, engramBridge, langgraphBridge, LANGGRAPH_ENABLED);
+
+// Register core tools with dispatcher middleware
+registerNewTools(server, { rerankUrl: RERANK_URL }, dispatcherMiddleware, ENABLE_LEGACY_ALIASES);
+registerAdminTools(server, dispatcherMiddleware);
+registerSkillTools(server, dispatcherMiddleware);
+registerLegalSkillsTools(server);
+registerEngramTools(server, REDIS_URL, dispatcherMiddleware);
+registerAtlasEmbeddingTools(server, REDIS_URL, dispatcherMiddleware);
+if (ENABLE_OPTIONAL_REGISTRIES) {
+  registerCodebaseTools(server, dispatcherMiddleware);
+  registerResearchTools(server, dispatcherMiddleware);
+  registerBifrostTools(server, dispatcherMiddleware);
+  registerRgAtlasTools(server, dispatcherMiddleware);
+}
 
 // Register topology management tools — needs `pool`, so must be after declaration.
-registerTopologyMgmtTools(server, pool);
+registerTopologyMgmtTools(server, pool, dispatcherMiddleware);
 
 // Register read-only Drizzle/Postgres inspection tools (db.schema_overview,
 // db.table_inspect). Per docs/architecture/drizzle-inspection-mcp.md: no
 // write verbs, no raw SQL, statement_timeout=2s, forbidden columns scrubbed.
 // G33 validator gate enforces the no-write-verb rule statically.
-registerDbInspectionTools(server, pool);
+registerDbInspectionTools(server, pool, dispatcherMiddleware);
 
 // ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
 // search.hybrid + topology.search_near + search.dev_context all embed the same
@@ -8501,7 +8518,10 @@ const nodeServer = http.createServer(async (req, res) => {
       mcp: true,
       postgres: postgres.ok,
       redis: redis.ok,
+      langgraph: LANGGRAPH_ENABLED ? (langgraphBridge !== null ? 'enabled' : 'failed') : 'disabled',
     };
+    // Core TRACE health does NOT depend on LangGraph being enabled
+    // Only degrade if postgres or redis fail
     const degraded = !postgres.ok || !redis.ok;
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(
@@ -8511,6 +8531,10 @@ const nodeServer = http.createServer(async (req, res) => {
         version: '1.0.0',
         uptime: process.uptime(),
         dependencies,
+        features: {
+          langgraph_enabled: LANGGRAPH_ENABLED,
+          dispatcher_middleware: 'enabled',
+        },
         details: {
           postgres,
           redis,

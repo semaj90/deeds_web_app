@@ -16,6 +16,13 @@ domain, and emit a structured corpus that downstream tasks can use for:
 - `agentic_error_fixing`
 - `canonical_api_recommendations`
 
+This bundle is a dev corpus export target only.
+Discovery remains separate from acquisition:
+
+- `SearXNG` and OpenCode `websearch` are discovery lanes.
+- `Crawl4AI` and Firecrawl are acquisition lanes.
+- Graphify/Postgres remain canonical for code and runtime truth.
+
 ## Flow
 
 1. Read `docs/.okf/dev/manifest.json`.
@@ -30,6 +37,8 @@ domain, and emit a structured corpus that downstream tasks can use for:
 
 - Do not treat the corpus as canonical runtime state.
 - Do not write embeddings, Qdrant points, or agent state here.
+- Do not let discovery search results bypass canonical ingestion if they are
+  later promoted into code or docs evidence.
 - Do not widen the source manifest without adding a domain classification rule.
 - Do not promote heuristic summaries to authoritative output without review.
 
@@ -60,4 +69,3 @@ The output is meant to seed:
 - doc-backed API recommendations
 - error-fixing playbooks
 - taskboard generation
-

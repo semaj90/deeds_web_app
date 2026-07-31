@@ -105,11 +105,13 @@ services:
       - legal-ai-network
 
   # ============================================================================
-  # Ollama AI Service
+  # Ollama embeddings service (GPU-accelerated, optional profile)
   # ============================================================================
   ollama:
     image: ollama/ollama:latest
     container_name: legal-ai-ollama
+    profiles:
+      - embeddings
     environment:
       - OLLAMA_HOST=0.0.0.0
     ports:
@@ -175,9 +177,9 @@ services:
       MINIO_SECRET_KEY: minioadmin123
       # Qdrant
       QDRANT_URL: http://qdrant:6333
-      # Ollama
-      OLLAMA_URL: http://ollama:11434
-      OLLAMA_EMBED_ENDPOINT: http://ollama:11434/api/embed
+      # Ollama embeddings-only lane
+      OLLAMA_URL: http://host.docker.internal:11434
+      OLLAMA_EMBED_ENDPOINT: http://host.docker.internal:11434/api/embed
       # TensorRT-LLM
       TRT_LLM_ENDPOINT: http://tensorrt-llm:8000/api/infer
       # SIMD/Performance
@@ -195,8 +197,6 @@ services:
       minio:
         condition: service_healthy
       qdrant:
-        condition: service_healthy
-      ollama:
         condition: service_healthy
       tensorrt-llm:
         condition: service_healthy

@@ -61,6 +61,13 @@ export class LangGraphBridge {
   }
 
   /**
+   * Get the current Headroom configuration (read-only)
+   */
+  getConfig(): HeadroomConfig {
+    return { ...this.config };
+  }
+
+  /**
    * Process a tool call through the dispatcher state machine
    * with Netflix Headroom overflow protection
    */
@@ -112,7 +119,7 @@ export class LangGraphBridge {
    *   3. Summarize old history
    *   4. Truncate verbose trace fields
    */
-  private applyHeadroom(state: DispatcherState): DispatcherState {
+  applyHeadroom(state: DispatcherState): DispatcherState {
     const stateStr = JSON.stringify(state);
     if (stateStr.length <= this.config.maxStateSize) {
       return state; // No overflow

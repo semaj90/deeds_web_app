@@ -90,6 +90,11 @@ function canonicalHash(value) {
   return createHash('sha256').update(JSON.stringify(value)).digest('hex');
 }
 
+function stableProjectionFingerprint(payload) {
+  const { indexed_at, ...stable } = payload;
+  return canonicalHash(stable);
+}
+
 /**
  * Load the canonical projection data from Postgres for a chunk.
  * Joins codebase_chunk_index (embedding source) with atlas_packets (identity).
@@ -99,6 +104,7 @@ async function loadProjection(chunkId) {
     SELECT
       cci.id::text                     AS chunk_id,
       cci.source_ref,
+      cci.relative_path,
       cci.content_hash,
       cci.language,
       cci.domain_class,
@@ -108,14 +114,45 @@ async function loadProjection(chunkId) {
       cci.cluster_margin,
       ap.packet_key,
       ap.domain_class                  AS packet_domain_class,
-      ap.summary                       AS packet_summary
+      ap.summary                       AS packet_summary,
+      ap.packet_match_count
     FROM codebase_chunk_index cci
-    LEFT JOIN atlas_packets ap ON ap.source_ref = cci.source_ref
+    LEFT JOIN LATERAL (
+      SELECT
+        ap.packet_key,
+        ap.domain_class,
+        ap.summary,
+        COUNT(*) OVER () AS packet_match_count
+      FROM atlas_packets ap
+      WHERE ap.source_ref = cci.source_ref
+         OR ap.canonical_source_ref = cci.source_ref
+         OR ap.source_ref = cci.relative_path
+         OR ap.canonical_source_ref = cci.relative_path
+      ORDER BY
+        (ap.source_ref = cci.source_ref) DESC,
+        (ap.canonical_source_ref = cci.source_ref) DESC,
+        (ap.source_ref = cci.relative_path) DESC,
+        (ap.canonical_source_ref = cci.relative_path) DESC,
+        ap.updated_at DESC NULLS LAST,
+        ap.created_at DESC NULLS LAST,
+        ap.packet_key ASC
+      LIMIT 1
+    ) ap ON TRUE
     WHERE cci.id = $1::uuid
   `, [chunkId]);
 
   if (rows.length === 0) throw new Error(`Chunk not found: ${chunkId}`);
   return rows[0];
+}
+
+async function loadExistingProjectionState(packetId) {
+  const { rows } = await pool.query(`
+    SELECT packet_id, qdrant_point_id, payload_hash, projection_status, projected_at
+    FROM atlas_qdrant_projection_state
+    WHERE packet_id = $1
+    LIMIT 1
+  `, [packetId]);
+  return rows[0] ?? null;
 }
 
 function buildPayload(row, jobSourceRef, jobPacketKey) {
@@ -140,6 +177,8 @@ function buildPayload(row, jobSourceRef, jobPacketKey) {
     // Source metadata
     language:     row.language     ?? null,
     domain_class: row.packet_domain_class ?? row.domain_class ?? null,
+    packet_match_count: row.packet_match_count ?? null,
+    packet_match_state: (row.packet_match_count ?? 0) > 1 ? 'ambiguous' : 'resolved',
 
     // Cluster routing (768-dim model, labeled as experimental/analysis)
     kmeans_cluster:         row.kmeans_cluster         ?? null,
@@ -240,7 +279,23 @@ async function processMessage(msg, channel) {
   try {
     const row = await loadProjection(chunkId);
     const payload = buildPayload(row, job.source_ref, job.packet_key);
-    const payloadHash = canonicalHash(payload);
+    const payloadHash = typeof job.stable_payload_hash === 'string' && job.stable_payload_hash.length > 0
+      ? job.stable_payload_hash
+      : stableProjectionFingerprint(payload);
+    const existingState = await loadExistingProjectionState(chunkId);
+
+    if (
+      existingState &&
+      existingState.projection_status === 'PROJECTED' &&
+      existingState.payload_hash === payloadHash &&
+      String(existingState.qdrant_point_id ?? pointId) === String(pointId)
+    ) {
+      console.log(`\nJob ${chunkId} unchanged — skipping duplicate Qdrant write`);
+      await recordSuccess(job.id ?? chunkId, chunkId, pointId, CONTRACT_VERSION, payloadHash);
+      channel.ack(msg);
+      process.stdout.write('.');
+      return;
+    }
 
     if (operation === 'UPSERT_POINT') {
       // Would need vector — not available in payload-only path; treat as PATCH_PAYLOAD

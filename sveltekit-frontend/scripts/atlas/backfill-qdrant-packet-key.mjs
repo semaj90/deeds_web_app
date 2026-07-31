@@ -44,9 +44,29 @@ try {
       cci.id::text              AS chunk_id,
       cci.source_ref,
       COALESCE(ap.packet_key, 'chunk:' || cci.id::text) AS packet_key,
-      ap.domain_class
+      ap.domain_class,
+      ap.packet_match_count
     FROM codebase_chunk_index cci
-    LEFT JOIN atlas_packets ap ON ap.source_ref = cci.source_ref
+    LEFT JOIN LATERAL (
+      SELECT
+        ap.packet_key,
+        ap.domain_class,
+        COUNT(*) OVER () AS packet_match_count
+      FROM atlas_packets ap
+      WHERE ap.source_ref = cci.source_ref
+         OR ap.canonical_source_ref = cci.source_ref
+         OR ap.source_ref = cci.relative_path
+         OR ap.canonical_source_ref = cci.relative_path
+      ORDER BY
+        (ap.source_ref = cci.source_ref) DESC,
+        (ap.canonical_source_ref = cci.source_ref) DESC,
+        (ap.source_ref = cci.relative_path) DESC,
+        (ap.canonical_source_ref = cci.relative_path) DESC,
+        ap.updated_at DESC NULLS LAST,
+        ap.created_at DESC NULLS LAST,
+        ap.packet_key ASC
+      LIMIT 1
+    ) ap ON TRUE
     WHERE cci.content_embedding IS NOT NULL
     ORDER BY packet_key
   `);
@@ -55,23 +75,33 @@ try {
   // Group by packet_key → set same payload on all chunks of that packet
   const groups = new Map();
   for (const row of rows) {
+    if ((row.packet_match_count ?? 0) > 1) {
+      continue;
+    }
     if (!groups.has(row.packet_key)) {
       groups.set(row.packet_key, {
         payload: {
           packet_key:   row.packet_key,
           domain_class: row.domain_class ?? null,
+          packet_match_count: row.packet_match_count ?? null,
+          packet_match_state: (row.packet_match_count ?? 0) > 1 ? 'ambiguous' : 'resolved',
         },
         points: [],
       });
     }
-    groups.get(row.packet_key).points.push(row.chunk_id);
+    const group = groups.get(row.packet_key);
+    if (!group.points.includes(row.chunk_id)) {
+      group.points.push(row.chunk_id);
+    }
   }
   console.log(`Unique packet_key groups: ${groups.size.toLocaleString()}`);
 
   const withPacket  = [...groups.values()].filter(g => !g.payload.packet_key.startsWith('chunk:')).length;
   const withoutPacket = groups.size - withPacket;
+  const skippedAmbiguous = rows.filter((row) => (row.packet_match_count ?? 0) > 1).length;
   console.log(`  Linked to atlas_packets: ${withPacket.toLocaleString()}`);
   console.log(`  Fallback (chunk:id):     ${withoutPacket.toLocaleString()}`);
+  console.log(`  Skipped ambiguous rows:   ${skippedAmbiguous.toLocaleString()}`);
   console.log('');
 
   if (DRY_RUN) {

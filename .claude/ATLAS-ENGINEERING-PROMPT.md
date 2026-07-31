@@ -42,7 +42,7 @@ directory_path → source_ref → file_path → function_symbol
   "feature_label": "Authentication Sessions",
   "packet_key": "ace:packet:auth:001",
   "summary": "Handles Lucia session validation.",
-  "embedding": { "model": "embeddinggemma", "dim": 384, "qdrant_point_id": "qdrant:auth:001" },
+  "embedding": { "model": "embeddinggemma", "dim": 768, "qdrant_point_id": "qdrant:auth:001" },
   "cache": { "redis_key": "bifrost:packet:auth:001", "centroid_key": "centroid:feature:auth.sessions" },
   "cold_storage": { "manifest_id": "manifest:auth:001", "uri": null, "restore_verified": false }
 }
@@ -104,7 +104,7 @@ EMBED_MODEL                  = embeddinggemma:latest  (Ollama :11434)
 FULL_MODEL_DIM               = 768  (native, DO NOT write to 384 collections)
 AE_INPUT_DIM                 = 768  (AE trains on full-dim vectors from codebase_chunks_768)
 AE_LATENT_DIM                = 64   (routing-only — NOT for ANN search)
-SEARCH_DIM                   = 384  (codebase_chunks_768 named-vector "content")
+SEARCH_DIM                   = 768  (codebase_chunks_768 named-vector "content")
 ```
 
 - ❌ Do NOT write 384-dim vectors into 768-dim collections
@@ -135,7 +135,7 @@ Storage & Lineage (P0)
 
 **Critical ordering constraint:** Neo4j GDS PageRank MUST run after KMeans/SOM emit `community_id`. Sequence:
 ```
-graphify:daily → SocratiCode → OKF → domain_classifier → KMeans → SOM 20×20 → Neo4j GDS → ACE/KAG
+graphify:daily → SocratiCode/trace atlas-tools → OKF → domain_classifier → knn -> topk -> fanout -> KMeans → SOM 20×20 → Neo4j GDS → ACE/KAG
 ```
 
 ---

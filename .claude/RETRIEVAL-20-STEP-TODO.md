@@ -13,11 +13,11 @@
 - [ ] Filter to 5,000 × 384-dim vectors
 - [ ] Export to Parquet
 
-### Step 3: Define embeddinggemma-prefix384-v1 Contract (45min)
+### Step 3: Define embeddinggemma-prefix768/512-v1 Contract (45min)
 - [ ] Create `src/lib/server/embedding/embedding-contract.ts`
 - [ ] Define model, dimension, normalization, pooling
 
-### Step 4: Verify 384 Norms + Identity Parity (1h)
+### Step 4: Verify 768/512 Norms + Identity Parity (1h)
 - [ ] Create `src/lib/server/embedding/embedding-validator.ts`
 - [ ] Verify L2 norm = 1.0 ± 0.01 for all 5K vectors
 - [ ] Create validation script

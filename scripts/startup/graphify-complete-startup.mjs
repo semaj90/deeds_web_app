@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * Complete Graphify Startup Pipeline
+ * Revision-Aware Graphify Startup Pipeline
  *
  * Orchestrates the full graphify audit + consumer workflow:
  * 1. Run graphify:daily audit
  * 2. Start consumer daemon (listens for queue messages)
  * 3. Wait for ACE/cache/topology workers to complete
- * 4. Report completion
+ * 4. Report partial/provisional startup state
  *
- * This replaces the broken graphify:daily that had Valkey race conditions.
+ * This replaces the broken graphify:daily path that had Valkey race conditions.
  *
  * Usage:
  *   npm run startup:graphify-complete [--full] [--skip-consumer] [--dry-run]
@@ -90,7 +90,7 @@ async function runNpmScript(script, args = []) {
 async function runPipeline() {
   try {
     log('═════════════════════════════════════════════════════════════');
-    log('🚀 GRAPHIFY COMPLETE STARTUP PIPELINE');
+    log('🚀 GRAPHIFY STARTUP PIPELINE');
     log('═════════════════════════════════════════════════════════════');
     log(`Dry-run: ${DRY_RUN}`);
     log(`Full codebase: ${FULL_CODEBASE}`);
@@ -175,7 +175,7 @@ async function runPipeline() {
     }
 
     // PHASE 3: Verify Outputs
-    log('\n✅ PHASE 3: Verifying Outputs');
+    log('\n🧪 PHASE 3: Verifying Outputs');
     log('─────────────────────────────────────────────────────────────');
     const tmpDir = path.join(ROOT, '.tmp');
     const expectedFiles = [
@@ -207,7 +207,7 @@ async function runPipeline() {
     const elapsedSec = (elapsedMs / 1000).toFixed(1);
 
     log('\n═════════════════════════════════════════════════════════════');
-    log('✅ GRAPHIFY STARTUP COMPLETE');
+    log('⚠️  GRAPHIFY STARTUP PARTIAL');
     log('═════════════════════════════════════════════════════════════');
     log(`Duration: ${elapsedSec}s`);
     log(`Output directory: ${tmpDir}`);
@@ -221,11 +221,12 @@ async function runPipeline() {
     }
 
     log('\n✨ Ready for downstream processing (ACE warming, topology refresh)');
+    log('⚑ Startup claims remain PARTIAL_PROVEN until independent runtime proof passes.');
 
     return {
       success: true,
       duration: elapsedSec,
-      phase: 'complete',
+      phase: 'partial_proven',
       auditOutcome,
     };
   } catch (err) {

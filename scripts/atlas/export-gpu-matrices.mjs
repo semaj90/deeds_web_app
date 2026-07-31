@@ -107,11 +107,17 @@ async function populateVectorRegistry(pool) {
   // Get all packets with embeddings from codebase_chunk_index
   // Use source_ref as unique key (one row per chunk, not per packet)
   const r = await pool.query(`
-    SELECT cci.source_ref, ap.packet_key
+    SELECT DISTINCT ON (cci.source_ref)
+      cci.source_ref,
+      ap.packet_key
     FROM codebase_chunk_index cci
     LEFT JOIN atlas_packets ap ON ap.source_ref = cci.source_ref
     WHERE cci.content_embedding IS NOT NULL
-    ORDER BY cci.source_ref
+    ORDER BY
+      cci.source_ref,
+      ap.updated_at DESC NULLS LAST,
+      ap.created_at DESC NULLS LAST,
+      ap.packet_key ASC NULLS LAST
   `);
   log(`  Found ${r.rows.length} chunk_index rows with embeddings`);
 
@@ -124,18 +130,8 @@ async function populateVectorRegistry(pool) {
   let inserted = 0;
   for (let i = 0; i < r.rows.length; i += BATCH_SIZE) {
     const batch = r.rows.slice(i, i + BATCH_SIZE);
-    const sourceRefs = batch.map(row => row.source_ref);
-    const packetKeys = batch.map(row => row.packet_key ?? null);
-    // Deduplicate within batch to prevent "affects row a second time" errors
-    const seen = new Set();
-    const dedupRefs = [], dedupKeys = [];
-    for (let k = 0; k < sourceRefs.length; k++) {
-      if (!seen.has(sourceRefs[k])) {
-        seen.add(sourceRefs[k]);
-        dedupRefs.push(sourceRefs[k]);
-        dedupKeys.push(packetKeys[k]);
-      }
-    }
+    const dedupRefs = batch.map(row => row.source_ref);
+    const dedupKeys = batch.map(row => row.packet_key ?? null);
     await pool.query(`
       INSERT INTO atlas_vector_registry (source_ref, packet_key, vector_version)
       SELECT unnest($1::text[]), unnest($2::text[]), 1

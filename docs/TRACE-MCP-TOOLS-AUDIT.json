@@ -1,0 +1,656 @@
+{
+  "totalTools": 117,
+  "gemma4MaxTools": 3,
+  "toolSetCount": 39,
+  "namespaces": [
+    "file",
+    "wiki",
+    "graph",
+    "turbovec",
+    "engram",
+    "topology",
+    "kb",
+    "trace",
+    "search",
+    "hypergraph",
+    "clusters",
+    "context",
+    "kag",
+    "ops",
+    "taxonomy",
+    "LLMS",
+    "knowledge",
+    "tools",
+    "codebase",
+    "evidence",
+    "image",
+    "runtime",
+    "atlas",
+    "ace",
+    "karpathy",
+    "research",
+    "service_workers",
+    "miniforge",
+    "shell"
+  ],
+  "categories": {
+    "Retrieval & Search": [
+      "wiki.search",
+      "topology.search_near",
+      "topology.search_som_neighborhood",
+      "kb.hybrid_search",
+      "kb.search_pathways",
+      "kb.search_summary_tree",
+      "kb.search_notecards",
+      "search.rerank",
+      "topology.search_4d",
+      "search.postgres_fts",
+      "search.hybrid",
+      "trace.kag_search",
+      "trace.graphrag_search",
+      "search.go_hybrid",
+      "search.dev_context",
+      "kag.record_agent_run",
+      "kag.ingest_memory_directory",
+      "kag.ingest_error",
+      "kag.recall_similar_fix",
+      "kag.multi_lane_search",
+      "kag.web_search",
+      "kag.feature_lookup",
+      "kag.panel_context",
+      "hypergraph.search",
+      "ops.search_tools",
+      "evidence.search_by_image",
+      "image.search_by_text",
+      "ace.compact_search",
+      "atlas.packet_search",
+      "research.playbook_lookup_by_language"
+    ],
+    "Context & Schema": [
+      "kb.explain_context_pack",
+      "context.build_kv_packet",
+      "context.get_compressed_card",
+      "context.explain_compression",
+      "context.refresh_task_toc",
+      "search.dev_context",
+      "kag.panel_context",
+      "codebase.context_for_file",
+      "LLMS.md.context_for_file",
+      "ops.inspect_tool_contract",
+      "context.prefetch_feature_context",
+      "context.build_ace_packet",
+      "context.build_indexed_source_packet"
+    ],
+    "Graph & Topology": [
+      "graph.expand_neighborhood",
+      "graph.shortest_path",
+      "graph.semantic_path_synthesis",
+      "graph.community_for_node",
+      "graph.pagerank_top",
+      "topology.search_near",
+      "topology.same_som_cluster",
+      "topology.search_som_neighborhood",
+      "graph.materialize_pathway",
+      "kb.search_pathways",
+      "hypergraph.semantic_path_synthesis",
+      "topology.search_4d",
+      "trace.graphrag_search",
+      "taxonomy.path",
+      "hypergraph.search",
+      "hypergraph.get_edge",
+      "hypergraph.explain_activation",
+      "hypergraph.expand_members",
+      "evidence.link_image_graph",
+      "atlas.graph.pagerank",
+      "atlas.build_taxonomy_topology_packet",
+      "karpathy.attention_rank_files",
+      "karpathy.som_topology_stats",
+      "topology.language_distribution"
+    ],
+    "Clustering & Analysis": [
+      "topology.same_som_cluster",
+      "kb.search_summary_tree",
+      "clusters.get_members",
+      "clusters.get_summary_lenses",
+      "clusters.som_cell_lookup",
+      "clusters.kmeans_members",
+      "miniforge.analyze"
+    ],
+    "File & Code": [
+      "file.read_window",
+      "codebase.context_for_file",
+      "LLMS.md.context_for_file",
+      "ops.verify_write",
+      "karpathy.attention_rank_files"
+    ],
+    "Validation & Verification": [
+      "graph.shortest_path",
+      "ops.trust_audit",
+      "trace.validate_ace_hit",
+      "ops.run_targeted_test",
+      "ops.validate_tool_call",
+      "ops.audit_tool_result",
+      "ops.verify_write",
+      "ops.validate_claims"
+    ],
+    "Other": [
+      "wiki.status",
+      "wiki.refresh_directory",
+      "wiki.explain_page",
+      "turbovec.rank_chunks",
+      "engram.chat_memory_recent",
+      "trace.system_health",
+      "trace.explain_retrieval",
+      "taxonomy.children",
+      "LLMS.md.peers_via_relations",
+      "LLMS.md.coverage_chain",
+      "ops.propose_patch",
+      "ops.record_fix_attempt",
+      "ops.run_quality_gate",
+      "knowledge.get_minified_map",
+      "tools.batch_call",
+      "LLMS.md.peers_for_dir",
+      "LLMS.md.coverage",
+      "LLMS.md.shares_tags",
+      "LLMS.md.binding_chain",
+      "ops.update_LLMS.md",
+      "ops.fixer_semantic_recall",
+      "ops.fixer_pattern_store",
+      "evidence.image_feedback",
+      "image.caption",
+      "image.enrich_tags",
+      "ops.gpu_attention",
+      "ops.gpu_pagerank",
+      "ops.gpu_topk",
+      "ops.gpu_pipeline_stats",
+      "runtime.simdjson_status",
+      "runtime.sse_probe",
+      "runtime.quic_status",
+      "atlas.prefilter",
+      "atlas.coverage",
+      "atlas.workstation_status",
+      "atlas.feature_document_status",
+      "atlas.populate_feature_documents",
+      "atlas.feature_document_ingestion_plan",
+      "atlas.feature_document_enrichment_plan",
+      "atlas.materialize_feature_evidence_tuples",
+      "service_workers.status",
+      "service_workers.result",
+      "miniforge.health",
+      "miniforge.extract",
+      "shell.run"
+    ]
+  },
+  "allTools": [
+    "wiki.search",
+    "topology.search_near",
+    "topology.search_som_neighborhood",
+    "kb.hybrid_search",
+    "kb.search_pathways",
+    "kb.search_summary_tree",
+    "kb.search_notecards",
+    "search.rerank",
+    "topology.search_4d",
+    "search.postgres_fts",
+    "search.hybrid",
+    "trace.kag_search",
+    "trace.graphrag_search",
+    "search.go_hybrid",
+    "search.dev_context",
+    "kag.multi_lane_search",
+    "kag.web_search",
+    "hypergraph.search",
+    "ops.search_tools",
+    "evidence.search_by_image",
+    "image.search_by_text",
+    "ace.compact_search",
+    "atlas.packet_search",
+    "research.playbook_lookup_by_language",
+    "kb.explain_context_pack",
+    "context.build_kv_packet",
+    "context.get_compressed_card",
+    "context.explain_compression",
+    "context.refresh_task_toc",
+    "kag.panel_context",
+    "codebase.context_for_file",
+    "LLMS.md.context_for_file",
+    "ops.inspect_tool_contract",
+    "context.prefetch_feature_context",
+    "context.build_ace_packet",
+    "context.build_indexed_source_packet",
+    "graph.expand_neighborhood",
+    "graph.shortest_path",
+    "graph.semantic_path_synthesis",
+    "graph.community_for_node",
+    "graph.pagerank_top",
+    "topology.same_som_cluster",
+    "graph.materialize_pathway",
+    "hypergraph.semantic_path_synthesis",
+    "hypergraph.get_edge",
+    "hypergraph.explain_activation",
+    "hypergraph.expand_members",
+    "evidence.link_image_graph",
+    "atlas.graph.pagerank",
+    "atlas.build_taxonomy_topology_packet",
+    "karpathy.som_topology_stats",
+    "topology.language_distribution",
+    "file.read_window",
+    "wiki.status",
+    "wiki.refresh_directory",
+    "wiki.explain_page",
+    "turbovec.rank_chunks",
+    "engram.chat_memory_recent",
+    "trace.system_health",
+    "clusters.get_members",
+    "trace.explain_retrieval",
+    "kag.record_agent_run",
+    "kag.ingest_memory_directory",
+    "kag.ingest_error",
+    "kag.recall_similar_fix",
+    "kag.feature_lookup",
+    "ops.trust_audit",
+    "taxonomy.children",
+    "taxonomy.path",
+    "LLMS.md.peers_via_relations",
+    "LLMS.md.coverage_chain",
+    "clusters.get_summary_lenses",
+    "clusters.som_cell_lookup",
+    "clusters.kmeans_members",
+    "trace.validate_ace_hit",
+    "ops.propose_patch",
+    "ops.run_targeted_test",
+    "ops.record_fix_attempt",
+    "ops.run_quality_gate",
+    "knowledge.get_minified_map",
+    "tools.batch_call",
+    "LLMS.md.peers_for_dir",
+    "LLMS.md.coverage",
+    "LLMS.md.shares_tags",
+    "LLMS.md.binding_chain",
+    "ops.update_LLMS.md",
+    "ops.validate_tool_call",
+    "ops.audit_tool_result",
+    "ops.verify_write",
+    "ops.validate_claims",
+    "ops.fixer_semantic_recall",
+    "ops.fixer_pattern_store",
+    "evidence.image_feedback",
+    "image.caption",
+    "image.enrich_tags",
+    "ops.gpu_attention",
+    "ops.gpu_pagerank",
+    "ops.gpu_topk",
+    "ops.gpu_pipeline_stats",
+    "runtime.simdjson_status",
+    "runtime.sse_probe",
+    "runtime.quic_status",
+    "atlas.prefilter",
+    "atlas.coverage",
+    "atlas.workstation_status",
+    "atlas.feature_document_status",
+    "atlas.populate_feature_documents",
+    "atlas.feature_document_ingestion_plan",
+    "atlas.feature_document_enrichment_plan",
+    "atlas.materialize_feature_evidence_tuples",
+    "karpathy.attention_rank_files",
+    "service_workers.status",
+    "service_workers.result",
+    "miniforge.health",
+    "miniforge.analyze",
+    "miniforge.extract",
+    "shell.run"
+  ],
+  "toolSets": [
+    {
+      "set": "Set 1",
+      "tools": [
+        "wiki.search",
+        "topology.search_near",
+        "topology.search_som_neighborhood"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 2",
+      "tools": [
+        "kb.hybrid_search",
+        "kb.search_pathways",
+        "kb.search_summary_tree"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 3",
+      "tools": [
+        "kb.search_notecards",
+        "search.rerank",
+        "topology.search_4d"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 4",
+      "tools": [
+        "search.postgres_fts",
+        "search.hybrid",
+        "trace.kag_search"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 5",
+      "tools": [
+        "trace.graphrag_search",
+        "search.go_hybrid",
+        "search.dev_context"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 6",
+      "tools": [
+        "kag.multi_lane_search",
+        "kag.web_search",
+        "hypergraph.search"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 7",
+      "tools": [
+        "ops.search_tools",
+        "evidence.search_by_image",
+        "image.search_by_text"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 8",
+      "tools": [
+        "ace.compact_search",
+        "atlas.packet_search",
+        "research.playbook_lookup_by_language"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 9",
+      "tools": [
+        "kb.explain_context_pack",
+        "context.build_kv_packet",
+        "context.get_compressed_card"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 10",
+      "tools": [
+        "context.explain_compression",
+        "context.refresh_task_toc",
+        "kag.panel_context"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 11",
+      "tools": [
+        "codebase.context_for_file",
+        "LLMS.md.context_for_file",
+        "ops.inspect_tool_contract"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 12",
+      "tools": [
+        "context.prefetch_feature_context",
+        "context.build_ace_packet",
+        "context.build_indexed_source_packet"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 13",
+      "tools": [
+        "graph.expand_neighborhood",
+        "graph.shortest_path",
+        "graph.semantic_path_synthesis"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 14",
+      "tools": [
+        "graph.community_for_node",
+        "graph.pagerank_top",
+        "topology.same_som_cluster"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 15",
+      "tools": [
+        "graph.materialize_pathway",
+        "hypergraph.semantic_path_synthesis",
+        "hypergraph.get_edge"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 16",
+      "tools": [
+        "hypergraph.explain_activation",
+        "hypergraph.expand_members",
+        "evidence.link_image_graph"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 17",
+      "tools": [
+        "atlas.graph.pagerank",
+        "atlas.build_taxonomy_topology_packet",
+        "karpathy.som_topology_stats"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 18",
+      "tools": [
+        "topology.language_distribution",
+        "file.read_window",
+        "wiki.status"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 19",
+      "tools": [
+        "wiki.refresh_directory",
+        "wiki.explain_page",
+        "turbovec.rank_chunks"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 20",
+      "tools": [
+        "engram.chat_memory_recent",
+        "trace.system_health",
+        "clusters.get_members"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 21",
+      "tools": [
+        "trace.explain_retrieval",
+        "kag.record_agent_run",
+        "kag.ingest_memory_directory"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 22",
+      "tools": [
+        "kag.ingest_error",
+        "kag.recall_similar_fix",
+        "kag.feature_lookup"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 23",
+      "tools": [
+        "ops.trust_audit",
+        "taxonomy.children",
+        "taxonomy.path"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 24",
+      "tools": [
+        "LLMS.md.peers_via_relations",
+        "LLMS.md.coverage_chain",
+        "clusters.get_summary_lenses"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 25",
+      "tools": [
+        "clusters.som_cell_lookup",
+        "clusters.kmeans_members",
+        "trace.validate_ace_hit"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 26",
+      "tools": [
+        "ops.propose_patch",
+        "ops.run_targeted_test",
+        "ops.record_fix_attempt"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 27",
+      "tools": [
+        "ops.run_quality_gate",
+        "knowledge.get_minified_map",
+        "tools.batch_call"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 28",
+      "tools": [
+        "LLMS.md.peers_for_dir",
+        "LLMS.md.coverage",
+        "LLMS.md.shares_tags"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 29",
+      "tools": [
+        "LLMS.md.binding_chain",
+        "ops.update_LLMS.md",
+        "ops.validate_tool_call"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 30",
+      "tools": [
+        "ops.audit_tool_result",
+        "ops.verify_write",
+        "ops.validate_claims"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 31",
+      "tools": [
+        "ops.fixer_semantic_recall",
+        "ops.fixer_pattern_store",
+        "evidence.image_feedback"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 32",
+      "tools": [
+        "image.caption",
+        "image.enrich_tags",
+        "ops.gpu_attention"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 33",
+      "tools": [
+        "ops.gpu_pagerank",
+        "ops.gpu_topk",
+        "ops.gpu_pipeline_stats"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 34",
+      "tools": [
+        "runtime.simdjson_status",
+        "runtime.sse_probe",
+        "runtime.quic_status"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 35",
+      "tools": [
+        "atlas.prefilter",
+        "atlas.coverage",
+        "atlas.workstation_status"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 36",
+      "tools": [
+        "atlas.feature_document_status",
+        "atlas.populate_feature_documents",
+        "atlas.feature_document_ingestion_plan"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 37",
+      "tools": [
+        "atlas.feature_document_enrichment_plan",
+        "atlas.materialize_feature_evidence_tuples",
+        "karpathy.attention_rank_files"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 38",
+      "tools": [
+        "service_workers.status",
+        "service_workers.result",
+        "miniforge.health"
+      ],
+      "count": 3
+    },
+    {
+      "set": "Set 39",
+      "tools": [
+        "miniforge.analyze",
+        "miniforge.extract",
+        "shell.run"
+      ],
+      "count": 3
+    }
+  ]
+}

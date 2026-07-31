@@ -35,7 +35,9 @@ export const EngramObservationSchema = z.object({
   confidence: z.number().min(0).max(1).default(0.5),
   timestamp: z.string().datetime().optional(),
   bm25_tags: z.array(z.string().min(1)).default([]),
-  hnsw_embedding: z.array(z.number()).length(384).optional(),
+  hnsw_embedding: z.array(z.number()).length(768).optional(), // Primary: 768-dim embeddinggemma
+  hnsw_embedding_512: z.array(z.number()).length(512).optional(), // Fallback: 512-dim nomic
+  embedding_lane: z.enum(['primary-768d', 'fallback-512d', 'multimodal-clip-512d']).optional(),
   created_at: z.string().datetime().optional(),
 });
 
@@ -162,6 +164,7 @@ export class EngramMemoryBridge {
 
   /**
    * HNSW vector search: find semantically similar past observations
+   * Supports both 768-dim (primary) and 512-dim (fallback) embeddings
    * Used when BM25 is insufficient (open-ended reasoning)
    */
   async searchMemoryByHNSW(embedding: number[], limit = 10): Promise<EngramObservation[]> {
@@ -169,19 +172,28 @@ export class EngramMemoryBridge {
       await this.ensureSchema();
     }
 
-    if (!embedding || embedding.length !== 384) {
-      throw new Error('Embedding must be a 384-dimensional vector');
+    if (!embedding || embedding.length === 0) {
+      throw new Error('Embedding must be a non-empty vector');
     }
+
+    const dim = embedding.length;
+    if (dim !== 768 && dim !== 512) {
+      throw new Error(`Embedding must be 768-dim or 512-dim, got ${dim}-dim`);
+    }
+
+    const columnName = dim === 768 ? 'hnsw_embedding' : 'hnsw_embedding_512';
+    const vectorType = dim === 768 ? 'vector(768)' : 'vector(512)';
 
     const client = await this.pool.connect();
     try {
       const result = await client.query(
         `SELECT
            observation_id, agent_name, tool_name, input_hash, output_summary,
-           decision_context, confidence, bm25_tags, hnsw_embedding, created_at
+           decision_context, confidence, bm25_tags, hnsw_embedding, hnsw_embedding_512,
+           embedding_lane, created_at
          FROM ${this.tableName}
-         WHERE hnsw_embedding IS NOT NULL
-         ORDER BY hnsw_embedding <-> $1::vector(384)
+         WHERE ${columnName} IS NOT NULL
+         ORDER BY ${columnName} <-> $1::${vectorType}
          LIMIT $2`,
         [
           `[${embedding.join(',')}]`,
@@ -201,6 +213,10 @@ export class EngramMemoryBridge {
         hnsw_embedding: row.hnsw_embedding
           ? Array.from(new Float32Array(row.hnsw_embedding))
           : undefined,
+        hnsw_embedding_512: row.hnsw_embedding_512
+          ? Array.from(new Float32Array(row.hnsw_embedding_512))
+          : undefined,
+        embedding_lane: row.embedding_lane,
         created_at: row.created_at,
       }));
     } finally {
@@ -231,7 +247,9 @@ export class EngramMemoryBridge {
           decision_context JSONB NOT NULL DEFAULT '{}',
           confidence REAL NOT NULL DEFAULT 0.5,
           bm25_tags TEXT[] NOT NULL DEFAULT '{}',
-          hnsw_embedding vector(384),
+          hnsw_embedding vector(768),
+          hnsw_embedding_512 vector(512),
+          embedding_lane VARCHAR(50),
           created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 
           CONSTRAINT bm25_tags_not_empty CHECK (array_length(bm25_tags, 1) IS NULL OR array_length(bm25_tags, 1) > 0),
@@ -247,10 +265,17 @@ export class EngramMemoryBridge {
           ON ${this.tableName} USING GIN (bm25_tags);
       `);
 
-      // Create HNSW vector index (cosine distance)
+      // Create HNSW vector index for 768-dim (cosine distance)
       await client.query(`
-        CREATE INDEX IF NOT EXISTS idx_${this.tableName}_hnsw
+        CREATE INDEX IF NOT EXISTS idx_${this.tableName}_hnsw_768
           ON ${this.tableName} USING hnsw (hnsw_embedding vector_cosine_ops)
+          WITH (m = 16, ef_construction = 64);
+      `);
+
+      // Create HNSW vector index for 512-dim fallback (cosine distance)
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_${this.tableName}_hnsw_512
+          ON ${this.tableName} USING hnsw (hnsw_embedding_512 vector_cosine_ops)
           WITH (m = 16, ef_construction = 64);
       `);
 

@@ -8,7 +8,7 @@ import { archiveSynthesisMemory } from '../lib/server/indexer/synthesis-memory-a
 import { generateEmbedding } from '../lib/server/grpc/embedding-client.js';
 import { buildFeaturePrefetchContext } from './context-prefetch.js';
 import type { FeaturePrefetchContextResult } from './context-prefetch.js';
-import type { DispatcherMiddleware } from './dispatcher-middleware.js';
+import { DispatcherMiddleware } from './dispatcher-middleware.js';
 import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-integration.js';
 
 /**

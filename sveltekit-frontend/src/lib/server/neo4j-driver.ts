@@ -34,7 +34,7 @@ export async function getNeo4jHealth(): Promise<{
     try {
         const driver = getNeo4jDriver();
         const info = await driver.getServerInfo();
-        return { ok: true, serverVersion: info.protocolVersion };
+        return { ok: true, serverVersion: String(info.protocolVersion) };
     } catch (err) {
         return { ok: false, error: String(err) };
     }

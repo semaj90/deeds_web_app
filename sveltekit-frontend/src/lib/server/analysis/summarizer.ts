@@ -105,7 +105,7 @@ export async function summarizeDocument(text: string, maxWords: number = 150): P
 			const summary = await fetchGemma4Summary(systemPrompt, userPrompt);
 
 			if (summary) {
-				gen.end({ output: summary.slice(0, 1000), level: 'SUCCESS' });
+				gen.end({ output: summary.slice(0, 1000), level: 'DEFAULT' });
 				return summary;
 			}
 

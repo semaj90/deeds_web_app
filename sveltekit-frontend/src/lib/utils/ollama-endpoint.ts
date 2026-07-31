@@ -1,8 +1,8 @@
 /**
  * Canonical local model endpoint helpers.
  *
- * Chat/generation prefers llama-server/TurboQuant on 8090.
- * Embeddings prefer Ollama/embedding lane on 11434.
+ * Chat/generation is owned by llama-server/TurboQuant on 8090.
+ * Ollama is kept as an embeddings-only lane on 11434 unless explicitly overridden.
  */
 
 function readEnv(key: string): string | undefined {
@@ -25,7 +25,7 @@ function normalizeUrl(value: string | undefined, fallback: string): string {
 export function getOllamaEndpoint(): string {
   const chatPort = readEnv('TURBO_PORT') ?? readEnv('LLAMA_SERVER_PORT') ?? '8090';
   return normalizeUrl(
-    readEnv('VITE_TURBOQUANT_URL') ??
+      readEnv('VITE_TURBOQUANT_URL') ??
       readEnv('VITE_TURBOQUANT_BASE_URL') ??
       readEnv('VITE_LLAMA_SERVER_URL') ??
       readEnv('TURBOQUANT_URL') ??
@@ -47,8 +47,9 @@ export function getOllamaGenerationEndpoint(): string {
 
 export function getOllamaEmbeddingEndpoint(): string {
   return normalizeUrl(
-    readEnv('VITE_OLLAMA_EMBED_BASE_URL') ??
+      readEnv('VITE_OLLAMA_EMBED_BASE_URL') ??
       readEnv('VITE_OLLAMA_EMBEDDING_URL') ??
+      readEnv('OLLAMA_EMBED_ENDPOINT') ??
       readEnv('OLLAMA_EMBED_BASE_URL') ??
       readEnv('OLLAMA_EMBEDDING_URL') ??
       readEnv('OLLAMA_EMBED_BASEURL') ??

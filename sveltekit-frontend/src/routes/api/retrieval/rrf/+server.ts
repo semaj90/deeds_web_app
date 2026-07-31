@@ -14,6 +14,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
 import { fuseRetrievalLanes, type FusedCandidate } from '$lib/server/retrieval/rrf-fusion.js';
 import { computeTopologyBlendSignal, buildCommunityAuthorityMap } from '$lib/server/retrieval/signal-normalizer.js';
+import { buildFusionContext, emitRetrievalAnalytics } from '$lib/server/analytics/retrieval-analytics-integration.js';
 
 /**
  * Request schema: Multiple ranked candidate lists from different retrieval lanes
@@ -153,6 +154,48 @@ export const POST: RequestHandler = async ({ request }) => {
         total_ms: Date.now() - startTime
       }
     };
+
+    if (process.env.RETRIEVAL_ANALYTICS_EMIT === '1') {
+      const traceId = request.headers.get('x-trace-id') ?? request.headers.get('x-request-id') ?? `rrf:${startTime}`;
+      const sessionId = request.headers.get('x-session-id') ?? undefined;
+      const userIdHeader = request.headers.get('x-user-id');
+      const userId = userIdHeader ? Number(userIdHeader) : undefined;
+      const multiLaneOutput = {
+        lanes: Object.entries(parsed.lanes).map(([laneName, candidates]) => ({
+          lane: laneName,
+          degraded: false,
+          latencyMs: 0,
+          hits: candidates.map((candidate) => ({
+            id: candidate.candidate_id,
+            source: laneName,
+            filePath: candidate.source_ref,
+            text: candidate.content_hash,
+            score: candidate.score,
+          })),
+        })),
+        merged: enrichedCandidates.map((candidate) => ({
+          id: candidate.candidate_id,
+          source: candidate.winning_lane,
+          filePath: candidate.source_ref,
+          text: candidate.content_hash,
+          score: candidate.weighted_score,
+        })),
+        topFiles: enrichedCandidates.slice(0, 10).map((candidate) => candidate.source_ref),
+        topSymbols: [],
+        hotClusters: [],
+        totalHits: totalInputCandidates,
+        durationMs: response.timing.total_ms,
+      } as any;
+
+      const context = buildFusionContext(
+        multiLaneOutput,
+        traceId,
+        sessionId,
+        Number.isFinite(userId) ? userId : undefined,
+        request.headers.get('x-query') ?? 'retrieval-rrf',
+      );
+      emitRetrievalAnalytics(context);
+    }
 
     return json(response, { status: 200 });
   } catch (error) {

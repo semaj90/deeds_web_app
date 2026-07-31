@@ -1,7 +1,10 @@
 /**
  * Web Search Client for Local Deep Research
- * Integrates with SearXNG for autonomous research queries
+ * Integrates with the shared server env loader so local discovery and
+ * acquisition lanes read the same runtime values as the rest of the app.
  */
+
+import { ENV } from '$lib/server/env.server.js';
 
 export interface WebSearchResult {
   url: string;
@@ -19,8 +22,8 @@ export interface ExtractedDocument {
   wordCount: number;
 }
 
-const SEARXNG_URL = process.env.SEARXNG_URL || 'http://127.0.0.1:8888';
-const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY;
+const SEARXNG_URL = ENV.SEARXNG_URL || 'http://127.0.0.1:8888';
+const FIRECRAWL_API_KEY = ENV.FIRECRAWL_API_KEY;
 const WEB_SEARCH_TIMEOUT = 10000; // 10 seconds per search
 
 /**

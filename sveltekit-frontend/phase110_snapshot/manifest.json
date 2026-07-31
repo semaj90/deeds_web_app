@@ -1,0 +1,14 @@
+{
+  "schema_version": "atlas_snapshot_v1",
+  "timestamp": "2026-07-30T22:09:26.004Z",
+  "total_rows": 2467,
+  "total_rows_in_corpus": 52417,
+  "embedding_dimension": 768,
+  "embedding_model": "embeddinggemma:latest",
+  "representation_revision": "embeddinggemma:2026-07-30.1",
+  "feature_id_order_hash": "d928744312e7f659dd0aa1384726619330fe55107c003f9f31ac11fda110c59d",
+  "content_hash": "1c6120603c145fae9eac9c8964564084c7648856c9d41067735fb2591e1414d9",
+  "feature_ids_unique_count": 9,
+  "row_order": "deterministic by id (uuid)",
+  "vector_normalization": "l2 (embeddinggemma native)"
+}

@@ -2,7 +2,7 @@
  * Cache Layers Orchestrator — Layers 2-4 Integration
  *
  * Measures and coordinates three independent cache layers:
- * 1. Layer 2: OpenCode provider adapter (port 8091)
+ * 1. Layer 2: LangGraph synthesis adapter (port 8091 by default)
  * 2. Layer 3: BitFrost exact packet cache (Valkey key: bifrost:packet:{key})
  * 3. Layer 4: BitFrost semantic packet cache (Valkey key: ace:cache:{intentHash}:{hmmState})
  *
@@ -32,9 +32,17 @@ export interface CacheLayersOrchestrationResult {
 /**
  * Layer 2: OpenCode Adapter Cache
  *
- * Provider adapter at port 8091 wraps llama.cpp :8090 with tool-call support.
- * Measures whether adapter adds overhead and whether it inherits KV cache reuse.
+ * Provider adapter wraps the current Gemma4/TurboQuant synthesis lane on :8090.
+ * The adapter URL is env-resolved so this file does not hardcode a local host.
  */
+function getLayer2AdapterBaseUrl(): string {
+  return (
+    ENV.LANGGRAPH_URL ??
+    process.env.LANGGRAPH_URL ??
+    'http://127.0.0.1:8091'
+  );
+}
+
 async function measureLayer2Adapter(
   systemPrompt: string,
   userPrompt: string
@@ -53,7 +61,7 @@ async function measureLayer2Adapter(
       ]
     });
 
-    const response = await fetch('http://127.0.0.1:8091/v1/chat/completions', {
+    const response = await fetch(`${getLayer2AdapterBaseUrl()}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body
@@ -238,7 +246,7 @@ export async function checkCacheLayersHealth(): Promise<{
   layer4_valkey: boolean;
 }> {
   const [layer2, layer3, layer4] = await Promise.allSettled([
-    fetch('http://127.0.0.1:8091/v1/models', { signal: AbortSignal.timeout(1000) })
+    fetch(`${getLayer2AdapterBaseUrl()}/v1/models`, { signal: AbortSignal.timeout(1000) })
       .then((r) => r.ok)
       .catch(() => false),
     (async () => {

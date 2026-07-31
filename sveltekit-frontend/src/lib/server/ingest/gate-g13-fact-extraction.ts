@@ -22,50 +22,101 @@ export interface GateG13Result {
 
 /**
  * Strip Gemma4 thinking tags from response
- * Handles <|channel>thought...thought|> and <thinking>...</thinking> blocks
+ * Handles <|channel>thought...</channel|> and <thinking>...</thinking> blocks
+ * Uses case-insensitive matching for robustness
  */
 function stripThinkingTags(text: string): string {
-  // Remove <|channel>thought...thought|> tags
-  let result = text.replace(/<\|channel>thought[\s\S]*?thought\|>/g, '');
+  // Remove <|channel>...</channel|> tags (closing is </channel|> with forward slash)
+  let result = text.replace(/<\|channel>[\s\S]*?<\/channel\|>/gi, '');
   // Remove <thinking>...</thinking> tags
-  result = result.replace(/<thinking>[\s\S]*?<\/thinking>/g, '');
+  result = result.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '');
   // Clean up extra whitespace
   result = result.trim();
   return result;
 }
 
 /**
- * Extract JSON array from text, handling markdown code blocks, whitespace, and thinking tags
- * Aggressively searches for any valid JSON array in the text
+ * Extract JSON array from text with bracket depth tracking
+ * Avoids false positives from prose containing brackets
+ * Validates bracket nesting safety before parsing
  */
 function extractJsonArray(text: string): unknown[] | null {
-  // First, strip all thinking tags more aggressively
-  let cleaned = text.replace(/<\|channel>[\s\S]*?<channel\|>/g, '');
-  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>/g, '');
+  // First, strip all thinking tags
+  const cleaned = stripThinkingTags(text);
 
   // Remove markdown code fences
-  cleaned = cleaned.replace(/```(?:json)?\s*/g, '').replace(/```\s*/g, '');
+  let processed = cleaned.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/gi, '');
+  processed = processed.trim();
 
-  cleaned = cleaned.trim();
-
-  // Find the first '[' and last ']' to extract potential JSON array
-  const startIdx = cleaned.indexOf('[');
-  const endIdx = cleaned.lastIndexOf(']');
-
-  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
-    return null;
-  }
-
-  const jsonStr = cleaned.substring(startIdx, endIdx + 1);
-
-  try {
-    const parsed = JSON.parse(jsonStr);
-    if (Array.isArray(parsed)) {
-      return parsed;
+  // Try each '[' position, looking for a valid JSON array
+  let searchIdx = 0;
+  while (true) {
+    const startIdx = processed.indexOf('[', searchIdx);
+    if (startIdx === -1) {
+      return null;
     }
-    return null;
-  } catch {
-    return null;
+
+    // Track bracket depth to find matching ']'
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    let endIdx = -1;
+
+    for (let i = startIdx; i < processed.length; i++) {
+      const char = processed[i];
+
+      // Handle escape sequences in strings
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+
+      if (char === '\\' && inString) {
+        escaped = true;
+        continue;
+      }
+
+      // Handle string boundaries
+      if (char === '"') {
+        inString = !inString;
+        continue;
+      }
+
+      // Skip bracket counting if we're inside a string
+      if (inString) {
+        continue;
+      }
+
+      // Track bracket depth
+      if (char === '[') {
+        depth++;
+      } else if (char === ']') {
+        depth--;
+        // When depth reaches 0, we've found the matching bracket
+        if (depth === 0) {
+          endIdx = i;
+          break;
+        }
+      }
+    }
+
+    if (endIdx === -1 || endIdx <= startIdx) {
+      searchIdx = startIdx + 1;
+      continue;
+    }
+
+    const jsonStr = processed.substring(startIdx, endIdx + 1);
+
+    try {
+      const parsed = JSON.parse(jsonStr);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    } catch {
+      // This wasn't valid JSON, try the next bracket
+      searchIdx = startIdx + 1;
+      continue;
+    }
   }
 }
 
@@ -186,6 +237,8 @@ RESPOND WITH ONLY A VALID JSON ARRAY. NO PREAMBLE. NO THINKING. NO MARKDOWN.`;
 
 /**
  * Persist validated facts to atlas_facts and atlas_fact_arguments tables
+ * Uses atomic transactions per fact to ensure consistency
+ * Normalizes confidence to 0.0-1.0 range
  * Returns GateG13Result array with proof of persistence
  */
 export async function persistExtractedFacts(facts: ExtractedFact[]): Promise<GateG13Result[]> {
@@ -193,32 +246,54 @@ export async function persistExtractedFacts(facts: ExtractedFact[]): Promise<Gat
 
   for (const fact of facts) {
     try {
-      // Insert into atlas_facts
-      const inserted_fact = await db
-        .insert(atlasFacts)
-        .values({
-          packet_key: fact.packet_key,
-          source_ref: fact.source_ref,
-          fact_text: fact.fact_text,
-          confidence: fact.confidence,
-          reasoning_trace: fact.reasoning_trace
-        })
-        .returning({ id: atlasFacts.id });
+      // Normalize confidence to 0.0-1.0 range
+      const normalized_confidence = Math.max(0, Math.min(1, fact.confidence));
 
-      const fact_id = inserted_fact[0]?.id;
-      if (!fact_id) {
-        throw new Error('Failed to retrieve inserted fact ID');
-      }
+      // Insert within transaction for atomicity
+      const fact_id = await db.transaction(async (tx) => {
+        // Insert into atlas_facts
+        const inserted_fact = await tx
+          .insert(atlasFacts)
+          .values({
+            packet_key: fact.packet_key,
+            source_ref: fact.source_ref,
+            fact_text: fact.fact_text,
+            confidence: normalized_confidence,
+            reasoning_trace: fact.reasoning_trace
+          })
+          .returning({ id: atlasFacts.id });
 
-      // Insert arguments for this fact
-      for (const arg of fact.arguments) {
-        await db.insert(atlasFactArguments).values({
-          fact_id,
-          argument_index: arg.argument_index,
-          argument_name: arg.argument_name,
-          argument_value: arg.argument_value,
-          argument_type: arg.argument_type
-        });
+        const id = inserted_fact[0]?.id;
+        if (!id) {
+          throw new Error('FACT_INSERT_READBACK_MISSING');
+        }
+
+        // Insert arguments for this fact (within same transaction)
+        if (fact.arguments.length > 0) {
+          await tx.insert(atlasFactArguments).values(
+            fact.arguments.map((arg) => ({
+              fact_id: id,
+              argument_index: arg.argument_index,
+              argument_name: arg.argument_name,
+              argument_value: arg.argument_value,
+              argument_type: arg.argument_type
+            }))
+          );
+        }
+
+        return id;
+      });
+
+      // Verify readback (outside transaction, but validates persistence)
+      const readback = await db.query.atlasFacts.findFirst({
+        where: (facts_table, { eq }) => eq(facts_table.id, fact_id),
+        with: {
+          arguments: true
+        }
+      });
+
+      if (!readback) {
+        throw new Error('READBACK_FAILED');
       }
 
       results.push({
@@ -226,7 +301,7 @@ export async function persistExtractedFacts(facts: ExtractedFact[]): Promise<Gat
         packet_key: fact.packet_key,
         source_ref: fact.source_ref,
         fact_text: fact.fact_text,
-        confidence: fact.confidence,
+        confidence: normalized_confidence,
         reasoning_trace: fact.reasoning_trace,
         arguments_count: fact.arguments.length,
         validation_proof: 'PASS'

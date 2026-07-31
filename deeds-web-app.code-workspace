@@ -55,6 +55,10 @@
         "editor.codeActions.triggerOnFocusChange": true,
         "chat.mcp.assisted.nuget.enabled": false,
         "chat.tools.compressOutput.enabled": true,
-        "chat.byokUtilityModelDefault": "mainAgent"
+        "chat.byokUtilityModelDefault": "mainAgent",
+        "chat.tools.urls.autoApprove": {
+            "https://code.visualstudio.com": true,
+            "https://github.com/microsoft/vscode/wiki/*": true
+        }
     }
 }

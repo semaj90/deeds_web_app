@@ -124,6 +124,10 @@ export async function buildKvContextPacket(opts: {
     maxInputTokens = 12_000,
   } = opts;
 
+  const uniqueHotFiles = [...new Set(hotFiles.map((value) => String(value).trim()).filter(Boolean))].slice(0, 8);
+  const uniqueHotSymbols = [...new Set(hotSymbols.map((value) => String(value).trim()).filter(Boolean))].slice(0, 12);
+  const uniqueBlockedAreas = [...new Set(blockedAreas.map((value) => String(value).trim()).filter(Boolean))];
+
   // L1: try query-level cache (cheap hit for repeated identical queries)
   const queryHash     = sha256(query + taskId);
   const queryCacheKey = `kv:toc:query:${queryHash}`;
@@ -134,7 +138,7 @@ export async function buildKvContextPacket(opts: {
 
   // L2: build compressed file cards in parallel (bounded to 8 files)
   const fileCards = await Promise.all(
-    hotFiles.slice(0, 8).map(f => compressFileToCard(f).catch((): FileCard => ({
+    uniqueHotFiles.map(f => compressFileToCard(f).catch((): FileCard => ({
       stableKey: `file:${f}`, filePath: f, oneLineSummary: f,
       importantSymbols: [], knownRisks: [], recentTraceHits: [],
       retrievalReasons: [], score: 0,
@@ -142,7 +146,7 @@ export async function buildKvContextPacket(opts: {
   );
 
   // L3: build attention TOC
-  const toc = await buildAttentionToc(taskId, hotFiles, hotSymbols, blockedAreas);
+  const toc = await buildAttentionToc(taskId, uniqueHotFiles, uniqueHotSymbols, uniqueBlockedAreas);
 
   const stablePrefix       = getStableSystemPrefix();
   const stablePrefixHash   = sha256(stablePrefix);

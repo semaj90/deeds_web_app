@@ -1,15 +1,16 @@
 /**
  * Resolve Embedding Lane — Precedence-Based Explicit Lineage
  *
- * When a candidate has embedding dimension 768 but explicit lane=dense_384,
- * we trust the explicit lane field (it was projected). Do NOT infer lane from dimension alone.
+ * When a candidate has a legacy 384 lane, we trust explicit lineage only.
+ * Do NOT infer lane from dimension alone.
  *
  * Precedence:
  * 1. Explicit embedding_lane field in the search result
  * 2. Vector name from Qdrant collection (e.g., "dense_384", "dense_768")
  * 3. Collection contract (which lane does this collection represent?)
- * 4. Native dimension fallback (768 → dense_768, 384 → dense_384, 64 → latent_64)
- * 5. UNKNOWN (emit telemetry, gate the candidate)
+ * 4. Native dimension fallback (768 → dense_768, 64 → latent_64)
+ * 5. Legacy 384 requires explicit lineage and is never inferred from dimension
+ * 6. UNKNOWN (emit telemetry, gate the candidate)
  */
 
 import { DenseRepresentationName } from '../atlas/contracts/dense-lane-policy';
@@ -19,6 +20,7 @@ export enum EmbeddingLaneTelemetryReason {
   VECTOR_NAME = 'vector_name',                      // Lane from vector collection name
   COLLECTION_CONTRACT = 'collection_contract',      // Lane from collection registry
   NATIVE_DIMENSION_FALLBACK = 'native_dimension_fallback',  // Inferred from dimension
+  LEGACY_DIMENSION_EXPLICIT_ONLY = 'legacy_dimension_explicit_only',
   UNKNOWN = 'unknown',                              // Could not resolve
 }
 
@@ -124,7 +126,7 @@ export function resolveEmbeddingLane(
   }
 
   // Step 4: Native dimension fallback
-  // CRITICAL: Only use this if NO explicit lineage available
+  // CRITICAL: Only use this if NO explicit lineage available.
   const dimToCheck = hit.embedding_dim ?? hit.dimension;
   if (dimToCheck === 768) {
     fallbackChain.push(`dimension=${dimToCheck} → dense_768 (fallback)`);
@@ -135,10 +137,10 @@ export function resolveEmbeddingLane(
     };
   }
   if (dimToCheck === 384) {
-    fallbackChain.push(`dimension=${dimToCheck} → dense_384 (fallback)`);
+    fallbackChain.push(`dimension=${dimToCheck} → explicit lineage required (no fallback)`);
     return {
-      lane: DenseRepresentationName.SEMANTIC_384,
-      reason: EmbeddingLaneTelemetryReason.NATIVE_DIMENSION_FALLBACK,
+      lane: null,
+      reason: EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY,
       fallbackChain,
     };
   }
@@ -196,7 +198,7 @@ export function gateEmbeddingLaneResolution(
     emitEmbeddingLaneTelementry(packetKey, resolution);
     return {
       gatePass: false,
-      reason: `lane_resolution_failed: ${resolution.fallbackChain?.join(' → ')}`,
+      reason: `lane_resolution_failed:${resolution.reason}: ${resolution.fallbackChain?.join(' → ')}`,
     };
   }
 

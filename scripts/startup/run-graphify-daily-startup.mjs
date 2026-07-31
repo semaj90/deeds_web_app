@@ -4,7 +4,8 @@
  *
  * Wrapper for graphify:daily npm script.
  * Runs on VS Code folder open as background task.
- * Signals completion via "graphify:daily complete" pattern for problemMatcher.
+ * Signals partial/provisional progress via a stable "graphify:daily partial" pattern
+ * for problemMatcher.
  */
 
 import { execSync } from 'child_process';
@@ -40,7 +41,7 @@ try {
     timeout: 5 * 60 * 1000 // 5 min timeout
   });
 
-  console.log('graphify:daily complete');
+  console.log('graphify:daily partial');
 
   if (refreshFeatures) {
     if (!quiet) console.log('[graphify:daily] Refreshing feature recommendation index...');
@@ -69,11 +70,11 @@ try {
       timeout: 10 * 60 * 1000,
       shell: true,
     });
-    console.log('[graphify:daily] fallback startup complete');
+    console.log('[graphify:daily] fallback startup partial');
     process.exit(0);
   } catch (fallbackErr) {
     console.error(`ERROR: graphify fallback failed: ${fallbackErr.message}`);
-    console.log('graphify:daily complete');
+    console.log('graphify:daily partial');
     process.exit(1);
   }
 }

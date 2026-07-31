@@ -2,13 +2,13 @@
 /**
  * Full-Corpus Embedding Backfill for codebase_chunk_index
  *
- * Backfills content_embedding (384-dim, embeddinggemma:latest) for all 40,754 chunks
+ * Backfills content_embedding (768-dim, embeddinggemma:latest) for all codebase chunks
  * where content_embedding IS NULL.
  *
  * Pipeline:
  *   1. Fetch chunks from Postgres (batch-friendly select)
  *   2. Batch into groups of 32-64 per request (optimal for RTX 3060 Ti)
- *   3. Call EmbeddingGemma via HTTP fallback (Ollama /api/embed)
+ *   3. Call EmbeddingGemma via HTTP fallback (/api/embed)
  *   4. Stream results back and UPDATE codebase_chunk_index atomically
  *   5. Log progress every 100 chunks + handle failures gracefully
  *   6. Produce summary: total_chunks, successful, failed, duration_minutes
@@ -98,13 +98,15 @@ function formatDuration(ms) {
 }
 
 /**
- * Fetch chunks needing embeddings from Postgres
- * Selects chunks in deterministic order (id ASC) to avoid re-processing
+ * Fetch chunks needing embeddings from Postgres.
+ * Uses keyset pagination so row churn during the run cannot re-surface
+ * already processed chunks the way OFFSET paging can.
  */
-async function fetchChunksNeedingEmbeddings(offset = 0, limit = 0) {
+async function fetchChunksNeedingEmbeddings(afterId = null, limit = 0) {
   const client = await pool.connect();
   try {
     const limitClause = limit > 0 ? `LIMIT ${limit}` : '';
+    const cursorClause = afterId ? 'AND id > $1' : '';
     const res = await client.query(`
       SELECT
         id,
@@ -120,10 +122,10 @@ async function fetchChunksNeedingEmbeddings(offset = 0, limit = 0) {
       WHERE content_embedding IS NULL
         AND content IS NOT NULL
         AND LENGTH(TRIM(content)) > 0
+        ${cursorClause}
       ORDER BY id ASC
-      OFFSET ${offset}
       ${limitClause}
-    `);
+    `, afterId ? [afterId] : []);
     return res.rows;
   } finally {
     client.release();
@@ -131,8 +133,8 @@ async function fetchChunksNeedingEmbeddings(offset = 0, limit = 0) {
 }
 
 /**
- * Embed texts via HTTP/Ollama batch endpoint
- * Returns array of 384-dim embeddings (nullable on failure per-item)
+ * Embed texts via the EmbeddingGemma batch endpoint
+ * Returns array of 768-dim embeddings (nullable on failure per-item)
  */
 async function embedBatch(texts) {
   const startTime = performance.now();
@@ -184,10 +186,10 @@ async function embedBatch(texts) {
 }
 
 /**
- * Validate embedding dimension (384-dim expected)
+ * Validate embedding dimension (768-dim expected)
  */
 function isValidEmbedding(embedding) {
-  return embedding && embedding.length === 384;
+  return embedding && embedding.length === 768;
 }
 
 /**
@@ -270,15 +272,15 @@ async function backfillEmbeddings() {
     return stats;
   }
 
-  let offset = 0;
+  let lastId = null;
   const maxChunks = LIMIT > 0 ? LIMIT : coverage.missing;
 
   while (stats.chunksFetched < maxChunks) {
     // Fetch batch from Postgres
-    const chunks = await fetchChunksNeedingEmbeddings(offset, BATCH_SIZE);
+    const chunks = await fetchChunksNeedingEmbeddings(lastId, BATCH_SIZE);
     if (chunks.length === 0) break;
 
-    log('VERBOSE', `Fetched batch: ${chunks.length} chunks (offset ${offset})`);
+    log('VERBOSE', `Fetched batch: ${chunks.length} chunks (after ${lastId ?? 'start'})`);
     stats.chunksFetched += chunks.length;
 
     // Extract content for embedding
@@ -328,7 +330,7 @@ async function backfillEmbeddings() {
         `succeeded=${stats.chunksEmbedded}, failed=${stats.chunksFailed}, batches=${stats.batchesProcessed}`);
     }
 
-    offset += chunks.length;
+    lastId = chunks[chunks.length - 1]?.id ?? lastId;
     if (stats.chunksFetched >= maxChunks) break;
   }
 
