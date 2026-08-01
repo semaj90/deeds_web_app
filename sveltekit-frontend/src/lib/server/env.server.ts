@@ -1,42 +1,26 @@
 /**
- * @fileoverview
- * Runtime-safe server environment access for both:
- * - SvelteKit/Vite SSR
- * - standalone Node.js/tsx workers such as TRACE MCP
+ * Runtime-safe environment parsing.
  *
- * `vite dev` does NOT populate process.env from .env (this repo's
- * vite.config.ts explicitly opts out of loadEnv — see the comment at
- * "Don't load env vars with loadEnv - let SvelteKit handle it naturally").
- * SvelteKit's own $env/dynamic/private only reaches code that imports it;
- * this module and most of src/lib/server/**, src/mcp/**, and scripts/**
- * read raw process.env directly, so without an explicit load here every
- * process.env.* read below is silently undefined when started via plain
- * `vite dev` / `npm run dev` (verified 2026-08-01: REDIS_PASSWORD,
- * REDIS_URL, etc. all undefined in that process, causing every dependent
- * service probe in /api/health to report a false "Service unreachable").
- * Loading .env here — once, at import time — makes this module correct
- * regardless of how the process was started. dotenv never overwrites a
- * variable that's already set (e.g. by Docker/CI), so this is additive only.
+ * Standalone process entrypoints must load environment files before importing
+ * this module. SvelteKit server code should use the framework environment
+ * contract or values made available by its server runtime.
+ *
+ * This module intentionally does NOT probe filesystem paths or load .env
+ * itself — environment loading and environment parsing are separate
+ * concerns. See `src/lib/server/config/load-runtime-env.js` for the loader
+ * standalone entrypoints (TRACE MCP, graphify launcher, worker launcher,
+ * validation scripts) should call before importing this module.
+ *
+ * Optional service URLs below have NO hardcoded fallback — an unset value
+ * stays `undefined` rather than a guessed localhost URL or placeholder
+ * credential. Consumers (e.g. /api/health) must treat `undefined` as
+ * "not configured", not attempt a connection with an invented target.
  */
-import { config as loadDotenv } from 'dotenv';
-import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
-
-if (!process.env.__ENV_SERVER_DOTENV_LOADED__) {
-  const here = dirname(fileURLToPath(import.meta.url));
-  // src/lib/server/env.server.ts -> sveltekit-frontend/ is 3 levels up
-  const projectRoot = join(here, '..', '..', '..');
-  loadDotenv({ path: join(projectRoot, '.env') });
-  loadDotenv({ path: join(projectRoot, '.env.local'), override: true });
-  process.env.__ENV_SERVER_DOTENV_LOADED__ = '1';
-}
 
 const privateEnv: NodeJS.ProcessEnv = process.env;
 
 function parseBoolean(value: string | undefined, defaultValue = false): boolean {
-  if (value === undefined || value.trim() === '') {
-    return defaultValue;
-  }
+  if (!value?.trim()) return defaultValue;
 
   switch (value.trim().toLowerCase()) {
     case '1':
@@ -56,59 +40,72 @@ function parseBoolean(value: string | undefined, defaultValue = false): boolean 
   }
 }
 
-/**
- * Canonical, immutable runtime environment.
- *
- * Keep all existing ENV properties here. Do not declare a second ENV object
- * elsewhere in this file.
- */
+function parseInteger(value: string | undefined, fallback: number, name: string): number {
+  if (!value?.trim()) return fallback;
+
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${name} must be a non-negative integer`);
+  }
+
+  return parsed;
+}
+
 export const ENV = Object.freeze({
   NODE_ENV: privateEnv.NODE_ENV ?? 'development',
 
-  // Preserve your existing entries, for example:
   DATABASE_URL: privateEnv.DATABASE_URL,
-  REDIS_URL: privateEnv.REDIS_URL,
-  REDIS_HOST: privateEnv.REDIS_HOST,
-  REDIS_PORT: privateEnv.REDIS_PORT,
+
+  REDIS_URL: privateEnv.REDIS_URL ?? 'redis://127.0.0.1:6379/0',
+  REDIS_HOST: privateEnv.REDIS_HOST ?? '127.0.0.1',
+  REDIS_PORT: privateEnv.REDIS_PORT ?? '6379',
   REDIS_PASSWORD: privateEnv.REDIS_PASSWORD,
+  REDIS_DB: privateEnv.REDIS_DB ?? '0',
+
   QDRANT_URL: privateEnv.QDRANT_URL ?? 'http://127.0.0.1:6333',
 
-  // Feature flags should be booleans, not string literals.
-  ENABLE_LANGGRAPH: parseBoolean(
-    privateEnv.ENABLE_LANGGRAPH ?? privateEnv.LANGGRAPH_ENABLED ?? privateEnv.LANGGRAPH,
-    false
-  ),
-
-  // --- Service URLs used by /api/health and the embedding gRPC client ---
-  // Defaults mirror the canonical ports documented in CLAUDE.md / src/lib/config/env.server.ts.
-  TENSORRT_URL: privateEnv.TENSORRT_URL ?? 'http://127.0.0.1:8099',
-  TRITON_URL: privateEnv.TRITON_URL ?? 'http://127.0.0.1:8000',
-  LANGEXTRACT_URL:
-    privateEnv.LANGEXTRACT_URL ?? privateEnv.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095',
+  TENSORRT_URL: privateEnv.TENSORRT_URL,
+  TRITON_URL: privateEnv.TRITON_URL,
+  LANGEXTRACT_URL: privateEnv.LANGEXTRACT_URL ?? privateEnv.MINIFORGE_SIDECAR_URL,
   MINIFORGE_SIDECAR_URL: privateEnv.MINIFORGE_SIDECAR_URL,
-  SEAWEED_ENDPOINT: privateEnv.SEAWEED_ENDPOINT ?? privateEnv.MINIO_ENDPOINT ?? '127.0.0.1',
-  MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? privateEnv.SEAWEED_ENDPOINT ?? '127.0.0.1',
-  OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL ?? 'http://127.0.0.1:11434',
+
+  SEAWEED_ENDPOINT: privateEnv.SEAWEED_ENDPOINT ?? privateEnv.MINIO_ENDPOINT,
+  MINIO_ENDPOINT: privateEnv.MINIO_ENDPOINT ?? privateEnv.SEAWEED_ENDPOINT,
+
+  OLLAMA_BASE_URL: privateEnv.OLLAMA_BASE_URL ?? privateEnv.OLLAMA_URL,
   OLLAMA_EMBED_BASE_URL: privateEnv.OLLAMA_EMBED_BASE_URL,
-  QUIC_HEALTH_URL: privateEnv.QUIC_HEALTH_URL ?? 'http://127.0.0.1:4433/health',
-  GO_SEARCH_URL: privateEnv.GO_SEARCH_URL ?? 'http://127.0.0.1:8096',
-  GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL ?? '127.0.0.1:50055',
-  RABBITMQ_URL: privateEnv.RABBITMQ_URL ?? 'amqp://guest:guest@127.0.0.1:5672',
-  COUCHDB_URL: privateEnv.COUCHDB_URL ?? 'http://admin:password@127.0.0.1:5984',
-  NEO4J_URI: privateEnv.NEO4J_URI ?? 'bolt://127.0.0.1:7687',
-  NATS_URL: privateEnv.NATS_URL ?? '127.0.0.1:4222',
+
+  QUIC_HEALTH_URL: privateEnv.QUIC_HEALTH_URL,
+
+  GO_SEARCH_URL: privateEnv.GO_SEARCH_URL,
+  GO_SEARCH_GRPC_URL: privateEnv.GO_SEARCH_GRPC_URL,
+
+  RABBITMQ_URL: privateEnv.RABBITMQ_URL,
+  COUCHDB_URL: privateEnv.COUCHDB_URL,
+  NEO4J_URI: privateEnv.NEO4J_URI,
+  NATS_URL: privateEnv.NATS_URL,
 
   EMBEDDING_QUIC_ENABLED: parseBoolean(privateEnv.EMBEDDING_QUIC_ENABLED, false),
   EMBEDDING_GRPC_ENABLED: parseBoolean(privateEnv.EMBEDDING_GRPC_ENABLED, false),
   EMBEDDING_GRPC_URL: privateEnv.EMBEDDING_GRPC_URL ?? '127.0.0.1:50051',
-  ACE_EMBED_BATCH_TIMEOUT_MS: Number(privateEnv.ACE_EMBED_BATCH_TIMEOUT_MS ?? 15000),
 
-  // Add the remaining existing environment properties here.
+  ACE_EMBED_BATCH_TIMEOUT_MS: parseInteger(
+    privateEnv.ACE_EMBED_BATCH_TIMEOUT_MS,
+    15_000,
+    'ACE_EMBED_BATCH_TIMEOUT_MS'
+  ),
+
+  ENABLE_LANGGRAPH: parseBoolean(
+    privateEnv.ENABLE_LANGGRAPH ?? privateEnv.LANGGRAPH_ENABLED ?? privateEnv.LANGGRAPH,
+    false
+  ),
 });
 
 /** SeaweedFS master port (cluster status endpoint), used by /api/health. */
-export const SEAWEED_MASTER_PORT = Number(
-  privateEnv.SEAWEED_MASTER_PORT ?? privateEnv.SEAWEED_S3_PORT ?? 9333
+export const SEAWEED_MASTER_PORT = parseInteger(
+  privateEnv.SEAWEED_MASTER_PORT ?? privateEnv.SEAWEED_S3_PORT,
+  9333,
+  'SEAWEED_MASTER_PORT'
 );
 
 /**

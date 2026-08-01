@@ -4,6 +4,15 @@ import { createRequire } from 'module';
 import path from 'path';
 import UnoCSS from 'unocss/vite';
 import { defineConfig } from 'vite';
+import { loadRuntimeEnv } from './src/lib/server/config/load-runtime-env.js';
+
+// vite.config.ts is the actual Node.js entrypoint for `vite dev` / `npm run dev`.
+// It does NOT get .env populated into process.env automatically (Vite's own
+// loadEnv() only affects import.meta.env for client code, not process.env for
+// this config file or SvelteKit server modules that read process.env directly).
+// Load it here, once, before any server module that reads process.env import.
+loadRuntimeEnv();
+
 // vscodeErrorLogger was archived — stub it to no-op
 const vscodeErrorLogger = (_opts?: { enabled?: boolean }) => null;
 
