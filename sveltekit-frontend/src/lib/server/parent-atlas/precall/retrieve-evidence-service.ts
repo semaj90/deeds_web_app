@@ -68,16 +68,20 @@ export async function retrieveEvidence(rawInput: unknown): Promise<RetrieveEvide
   const input: RetrieveEvidenceInput = parsed.data;
   const requestedLanes = new Set(input.lanes);
 
-  const lanes: LaneStatus[] = [];
-
+  // Not-yet-implemented lanes are collected here without fallbackUsed set
+  // yet — that requires knowing whether any OTHER lane actually succeeded,
+  // which isn't known until after the orchestrator call below. Finalizing
+  // fallbackUsed too early here was a real bug (always false, even when a
+  // later lane clearly produced results) caught by this operation's own
+  // test suite before it shipped.
+  const notYetImplementedLanes: Array<Omit<LaneStatus, 'fallbackUsed'>> = [];
   for (const lane of NOT_YET_IMPLEMENTED_LANES) {
     if (requestedLanes.has(lane)) {
-      lanes.push({
+      notYetImplementedLanes.push({
         lane,
         status: 'not_configured',
         candidateCount: 0,
         reason: 'lane_not_yet_implemented',
-        fallbackUsed: false,
       });
     }
   }
@@ -113,23 +117,27 @@ export async function retrieveEvidence(rawInput: unknown): Promise<RetrieveEvide
 
   // --- FALLBACK_LANE_EXECUTED: true when at least one lane actually
   // produced results while another lane in the same request was
-  // not_configured/error. ---
-  const anyLaneSucceededWithResults = orchestratorResult.lanes.some(
-    (l) => l.status === 'success' && l.results.length > 0
-  );
+  // not_configured/error. Computed once, globally, and applied uniformly
+  // below to every lane entry (including the not-yet-implemented ones
+  // collected above) — not per-loop, so it can't drift between the two
+  // lane sources. ---
+  const anyLaneSucceededWithResults = orchestratorResult.results.length > 0;
 
-  for (const l of orchestratorResult.lanes) {
+  const orchestratorLanes: LaneStatus[] = orchestratorResult.lanes.map((l) => ({
     // --- CENTROID_NOT_CONFIGURED_REPORTED / TURBOVEC_NOT_CONFIGURED_REPORTED:
     // both flow through here unchanged from parallel-orchestrator.ts's own
-    // not_configured statuses — this loop does not upgrade or hide them. ---
-    lanes.push({
-      lane: ORCHESTRATOR_LANE_NAME[l.lane] ?? l.lane,
-      status: l.status,
-      candidateCount: l.results.length,
-      reason: l.reason ?? l.error,
-      fallbackUsed: l.status !== 'success' && anyLaneSucceededWithResults,
-    });
-  }
+    // not_configured statuses — this mapping does not upgrade or hide them. ---
+    lane: ORCHESTRATOR_LANE_NAME[l.lane] ?? l.lane,
+    status: l.status,
+    candidateCount: l.results.length,
+    reason: l.reason ?? l.error,
+    fallbackUsed: l.status !== 'success' && anyLaneSucceededWithResults,
+  }));
+
+  const lanes: LaneStatus[] = [
+    ...notYetImplementedLanes.map((l) => ({ ...l, fallbackUsed: anyLaneSucceededWithResults })),
+    ...orchestratorLanes,
+  ];
 
   const evidence = orchestratorResult.results.map((r) => ({
     packetKey: r.id,
