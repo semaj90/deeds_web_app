@@ -1,5 +1,12 @@
 [
   {
+    "path": "sveltekit-frontend/src/lib/server/mcp/server.ts",
+    "archive_path": "deeds_labs/archive/2026-08-01/lib-server-mcp-server.ts.bak",
+    "sha256": "e888c158f397d6e0db42bc62aca23c94e75b69d53896c9e0cb8c56e2e545f694",
+    "archived": "2026-08-01T22:40:00Z",
+    "reason": "Dead near-duplicate of the canonical stdio MCP server (sveltekit-frontend/src/mcp/server.ts). Identical 85 tool names in its tools:[] listing, and identical special-capability symbol counts (bootstrapACPRegistry, registerDispatcherToolsAsACP, phase109aTools, handleAtlasSemanticToolCall, LDR_RESEARCH_TOOL, handlePhase18RerankerToolCall all matched exactly, e.g. 6/6, 5/5, 2/2) — full functional parity, ~11336/11332 lines textually different (comment/formatting drift, not divergent logic). Confirmed via cross-check against both live MCP client configs: not referenced in .mcp.json (neither the \"trace\" nor \"atlas-tools\" entry), not referenced in .opencode/opencode.jsonc, not imported by src/routes/api/mcp/+server.ts (which imports the canonical src/mcp/server.ts via a relative path one directory shallower than this file's location). Zero live callers found. Part of Parent Atlas MCP registry parity audit, Phase 4 (docs/parent-atlas/MCP_TOOL_REGISTRY_AUDIT.md)."
+  },
+  {
     "path": "sveltekit-frontend/configs/templates/gemma4-opencode.jinja",
     "archive_path": "deeds_labs/archive/2026-07-25/sveltekit-gemma4-opencode.jinja.bak",
     "sha256": "12b59551490af791f50f4262fc3988768f048ea0db2be0f44e9ab91fbeb828b1",
