@@ -3,8 +3,28 @@
  * This is the integration layer between Mastra orchestration and the Go data plane.
  */
 
-import { createTool } from '@mastra/core';
 import { z } from 'zod';
+
+// @mastra/core is NOT installed in this repo (confirmed via package.json audit,
+// 2026-08-01/02 — no `mastra` or `@mastra/core` dependency exists). The
+// unconditional `import { createTool } from '@mastra/core'` this file used to
+// have crashed at module-load time on every request to /api/atlas/mastra-agent
+// with "Failed to resolve entry for package @mastra/core" (reproduced live).
+// This local shim preserves the exact call shape (id/description/inputSchema/
+// outputSchema/execute) so the 7 tool definitions below still type-check and
+// export real, callable objects — it does NOT provide Mastra's actual agent
+// runtime (tool selection, step orchestration, model loop). If/when the real
+// @mastra/core package is installed, delete this shim and restore the import.
+interface LocalToolShim<TInput, TOutput> {
+  id: string;
+  description: string;
+  inputSchema: unknown;
+  outputSchema: unknown;
+  execute: (input: TInput, context?: unknown) => Promise<TOutput>;
+}
+function createTool<TInput, TOutput>(config: LocalToolShim<TInput, TOutput>): LocalToolShim<TInput, TOutput> {
+  return config;
+}
 import {
   AtlasRuntimeContext,
   AtlasState,

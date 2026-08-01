@@ -3,7 +3,14 @@
  * Integrates FSM state transitions, HMM confidence estimation, and Go gRPC calls.
  */
 
-import { defineWorkflow } from '@mastra/core';
+// @mastra/core is NOT installed in this repo (see the matching shim + comment
+// in ./atlas-mastra-adapter.ts for the full explanation and live-reproduced
+// error). Passthrough shim preserving defineWorkflow's config-object shape —
+// not the real Mastra workflow runtime. Delete this and restore the real
+// import if/when @mastra/core is actually installed.
+function defineWorkflow<T>(config: T): T {
+  return config;
+}
 import {
   AtlasRuntimeContext,
   AtlasState,
