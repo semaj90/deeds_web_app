@@ -89,7 +89,7 @@ function queryHash(query: string, opts: HybridSearchOptions): string {
 async function tryRedisGet(key: string): Promise<string | null> {
   try {
     const { default: Redis } = await import('ioredis');
-    const r = new Redis(ENV.REDIS_URL);
+    const r = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
     const val = await r.get(key);
     await r.quit();
     return val;
@@ -99,7 +99,7 @@ async function tryRedisGet(key: string): Promise<string | null> {
 async function tryRedisSet(key: string, value: string, ttl = 300): Promise<void> {
   try {
     const { default: Redis } = await import('ioredis');
-    const r = new Redis(ENV.REDIS_URL);
+    const r = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
     await r.setex(key, ttl, value);
     await r.quit();
   } catch { /* non-fatal */ }

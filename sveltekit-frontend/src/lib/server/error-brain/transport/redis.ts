@@ -25,7 +25,7 @@ export class RedisTransport implements ErrorBrainTransport {
 	async subscribe(handler: (evt: ErrorBrainEvent) => void): Promise<() => void> {
 		// Subscriber needs a dedicated connection (ioredis cannot share pub/sub + commands)
 		const { default: Redis } = await import('ioredis');
-		const sub = new Redis(ENV.REDIS_URL);
+		const sub = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
 
 		await sub.subscribe(CHANNEL);
 		sub.on('message', (_ch: string, msg: string) => {

@@ -96,6 +96,7 @@ export function attachDispose<T extends { quit?: () => Promise<unknown>; disconn
 
 export function createDisposableRedis(url: string = ENV.REDIS_URL): DisposableRedis {
   const r = new Redis(url, {
+    password:             ENV.REDIS_PASSWORD,
     maxRetriesPerRequest: 1,
     connectTimeout:       3000,
     lazyConnect:          true,

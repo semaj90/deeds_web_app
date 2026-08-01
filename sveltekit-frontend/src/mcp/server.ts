@@ -2042,7 +2042,7 @@ export function setupToolHandlers() {
     try {
       const { default: Redis } = await import('ioredis');
       const url = ENV.REDIS_URL;
-      _mcpRedis = new Redis(url, { lazyConnect: false, maxRetriesPerRequest: 1, enableOfflineQueue: false, connectTimeout: 1000 });
+      _mcpRedis = new Redis(url, { password: ENV.REDIS_PASSWORD, lazyConnect: false, maxRetriesPerRequest: 1, enableOfflineQueue: false, connectTimeout: 1000 });
       _mcpRedis.on('error', () => { _mcpRedis = null; });
     } catch { _mcpRedis = null; }
     return _mcpRedis;

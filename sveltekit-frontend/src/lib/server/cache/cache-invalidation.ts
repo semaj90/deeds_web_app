@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 import { ENV } from '../env.server.js';
 
-const redis = new Redis(ENV.REDIS_URL);
+const redis = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
 
 /**
  * Compares old and new digests. If they differ, invalidates the specified Redis key patterns

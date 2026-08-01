@@ -4,7 +4,7 @@ import { ENV } from '../env.server.js';
 import { retrievalCacheTraces } from '$lib/server/db/schema/documents-atlas.js';
 
 // Use central ENV defaults for Redis
-const redis = new Redis(ENV.REDIS_URL);
+const redis = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
 
 export type CacheLayer =
   | 'redis_exact'

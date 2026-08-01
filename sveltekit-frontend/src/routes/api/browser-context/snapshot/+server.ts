@@ -33,6 +33,7 @@ async function tryRedis<T>(fn: (r: import('ioredis').default) => Promise<T>): Pr
   try {
     const { default: Redis } = await import('ioredis');
     const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      password: process.env.REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 1500,
       maxRetriesPerRequest: 1,
