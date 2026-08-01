@@ -620,9 +620,6 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -633,7 +630,7 @@
         "showReuseMessage": false,
         "clear": true
       },
-      "detail": "Spawn gemma4-legal-iq4xs-direct.gguf on :8090 in text-only mode. Speculative decoding is disabled, and the launcher writes a machine-readable status artifact for board evidence."
+      "detail": "MANUAL: spawn gemma4-legal-iq4xs-direct.gguf on :8090 in text-only mode. No longer runs on folderOpen — it raced against 'Dev Server (GPU, detached)' (also folderOpen, launches hforf.gguf via dev:gpu), causing two llama-server.exe processes to fight over :8090 and both stay resident in VRAM (7GB/8GB used) until manually killed. 'Dev Server (GPU, detached)' is now the single canonical folderOpen auto-starter. Run this manually when gemma4-legal-iq4xs-direct.gguf specifically is needed instead of hforf.gguf."
     },
     {
       "label": "Gemma4 Tool-Call Sanitizer (:8091)",
@@ -646,7 +643,6 @@
         "runOn": "folderOpen"
       },
       "isBackground": true,
-      "dependsOn": ["⚡ TurboQuant: Start (text-only, :8090)"],
       "group": "build",
       "problemMatcher": [],
       "presentation": {
@@ -657,7 +653,7 @@
         "showReuseMessage": false,
         "clear": false
       },
-      "detail": "HTTP proxy at :8091 that strips <start_of_turn>/<end_of_turn> contamination markers from Gemma4 responses before they reach OpenCode. OpenCode baseURL points to :8091/v1."
+      "detail": "HTTP proxy at :8091 that strips <start_of_turn>/<end_of_turn> contamination markers from Gemma4 responses before they reach OpenCode. OpenCode baseURL points to :8091/v1. dependsOn removed 2026-08-01 — it forced '⚡ TurboQuant: Start (text-only, :8090)' to fire on every folderOpen even after that task's own runOn:folderOpen was removed, racing against 'Dev Server (GPU, detached)' (the canonical llama-server auto-starter) and causing two llama-server.exe processes to fight over :8090. The proxy just forwards to :8090 whenever it comes up — it doesn't need to force-launch a second server."
     },
     {
       "label": "MCP TRACE Server (detached)",
@@ -7522,11 +7518,8 @@
           "LLAMA_SERVER_CTX": "65536"
         }
       },
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "group": "build",
-      "detail": "Auto-start TurboQuant on folder open using the detached launcher. If :8090 is already healthy it exits cleanly; otherwise it spawns llama-server, waits for /health, and returns.",
+      "detail": "MANUAL vision-mode TurboQuant start (spawns gemma4-legal-iq4xs-direct.gguf + mmproj on :8090). No longer runs on folderOpen — it raced against 'Dev Server (GPU, detached)' and 'TurboQuant: Start (text-only, :8090)' (both also folderOpen, both targeting :8090), leaving two llama-server.exe processes fighting over the port and both resident in VRAM (7GB/8GB used) until the loser was manually killed. 'Dev Server (GPU, detached)' is now the single canonical folderOpen auto-starter (launches hforf.gguf, the preferred text-only model). Run this task manually from the Command Palette when vision/mmproj is actually needed.",
       "presentation": {
         "echo": true,
         "reveal": "silent",
