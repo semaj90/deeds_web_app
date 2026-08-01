@@ -6,7 +6,11 @@
  * in atlas_packets and persist them to gpu_cluster_centroids.
  *
  * Uses the already-assigned topolog_cluster values in atlas_packets joined to
- * codebase_chunk_index.content_embedding (384-dim) as the vector source.
+ * codebase_chunk_index.content_embedding (halfvec(768), embeddinggemma canonical)
+ * as the vector source. Dimension is not hardcoded here — this script reads
+ * whatever the column reports, so it stays correct as long as the column is
+ * a valid embeddinggemma dimension (768 native, or a valid MRL truncation:
+ * 512/256/128 — never 384, which is not a trained MRL boundary).
  *
  * Centroid = mean of all member vectors in each cluster (L2-normalized).
  *
@@ -73,7 +77,7 @@ async function main() {
     let missingVecs = 0;
 
     for (const { cluster_id, member_count } of clusterRows) {
-      // Fetch all 384-dim vectors for packets in this cluster
+      // Fetch all content_embedding vectors (halfvec(768)) for packets in this cluster
       const vecRes = await client.query(`
         SELECT
           ci.content_embedding::text AS vec_text
