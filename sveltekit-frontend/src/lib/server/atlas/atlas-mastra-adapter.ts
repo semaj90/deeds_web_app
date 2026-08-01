@@ -134,7 +134,7 @@ export const atlasApplyChangeTool = createTool({
     change: z.record(z.unknown()),
   }),
   outputSchema: z.object({
-    success: boolean,
+    success: z.boolean(),
     rowsAffected: z.number(),
     newRevision: z.string(),
   }),
