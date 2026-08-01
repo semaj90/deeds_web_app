@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-08-02
+goal: Record TensorRT-LLM/Triton readiness as an independently-proven
+  serving track with explicit NOT_PROVEN gates, so it is never assumed
+  ready merely because embeddings/token-indexes/LibTorch already work.
+  No installation, conversion, or container work happens under this
+  change yet.

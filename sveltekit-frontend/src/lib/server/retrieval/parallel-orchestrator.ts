@@ -41,46 +41,66 @@ export interface ParallelSearchOptions {
 
 export interface LaneResult {
   lane: string;
-  status: 'success' | 'error' | 'timeout';
+  status: 'success' | 'error' | 'timeout' | 'not_configured';
   results: SearchResult[];
   error?: string;
   durationMs?: number;
+  reason?: string;
+}
+
+export interface ParallelRetrieveResult {
+  results: SearchResult[];
+  lanes: LaneResult[];
 }
 
 // Parallel orchestrator
+
+interface LaneOutcome {
+  results: SearchResult[];
+  status: 'success' | 'not_configured';
+  reason?: string;
+}
+
+async function asSuccessLane(promise: Promise<SearchResult[]>): Promise<LaneOutcome> {
+  const results = await promise;
+  return { results, status: 'success' };
+}
 
 export async function parallelRetrieve(
   query: string,
   queryVector: Float32Array, // 768-dim embedding
   options: ParallelSearchOptions = {}
-): Promise<SearchResult[]> {
+): Promise<ParallelRetrieveResult> {
   const topK = options.topK ?? 10;
   const timeout = options.timeout ?? 5000;
 
   // Fan out to 5 lanes in parallel
-  const results = await Promise.allSettled([
+  const results = await Promise.allSettled<LaneOutcome>([
     // Lane 1: Qdrant ANN (768-dim)
-    searchQdrant(queryVector, topK, timeout),
+    asSuccessLane(searchQdrant(queryVector, topK, timeout)),
 
-    // Lane 2: TurboVec sparse (384-dim, optional)
+    // Lane 2: TurboVec sparse (384-dim, optional) — not yet implemented, see
+    // searchTurboVec below; reports not_configured rather than a bare empty
+    // success so callers don't mistake "unimplemented" for "searched, found nothing"
     options.includeTurboVec !== false
       ? searchTurboVec(query, queryVector, topK, timeout)
-      : Promise.resolve([]),
+      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
 
-    // Lane 3: Redis centroids (optional)
+    // Lane 3: Redis centroids (optional) — reports not_configured when no
+    // centroid:feature:* keys exist at all, distinct from "searched, found nothing"
     options.includeRedis !== false
       ? searchRedisCentroids(queryVector, topK, timeout)
-      : Promise.resolve([]),
+      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
 
     // Lane 4: Postgres FTS (optional)
     options.includeFts !== false
-      ? searchPostgresFTS(query, topK, timeout)
-      : Promise.resolve([]),
+      ? asSuccessLane(searchPostgresFTS(query, topK, timeout))
+      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
 
     // Lane 5: Neo4j topology (optional)
     options.includeNeo4j !== false
-      ? searchNeo4jTopology(query, topK, timeout)
-      : Promise.resolve([]),
+      ? asSuccessLane(searchNeo4jTopology(query, topK, timeout))
+      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
   ]);
 
   // Collect results from all lanes (skip failures)
@@ -91,13 +111,14 @@ export async function parallelRetrieve(
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
     if (result.status === 'fulfilled') {
-      const laneResults = result.value;
-      allResults.push(...laneResults);
+      const outcome = result.value;
+      allResults.push(...outcome.results);
       lanes.push({
         lane: laneNames[i],
-        status: 'success',
-        results: laneResults,
+        status: outcome.status,
+        results: outcome.results,
         durationMs: 0,
+        reason: outcome.reason,
       });
     } else {
       lanes.push({
@@ -116,7 +137,8 @@ export async function parallelRetrieve(
   const blended = blendScores(deduped);
 
   // Sort by blended score, return top-K
-  return blended.sort((a, b) => b.score - a.score).slice(0, topK);
+  const topResults = blended.sort((a, b) => b.score - a.score).slice(0, topK);
+  return { results: topResults, lanes };
 }
 
 // Lane 1: Qdrant ANN
@@ -150,26 +172,36 @@ async function searchQdrant(
   }
 }
 
-// Lane 2: TurboVec sparse search (placeholder)
+// Lane 2: TurboVec sparse search (not yet implemented)
 
 async function searchTurboVec(
   query: string,
   vector: Float32Array,
   limit: number,
   timeout: number
-): Promise<SearchResult[]> {
-  // TurboVec gRPC call would go here (port 50055)
-  // For now, return empty (optional lane)
-  return [];
+): Promise<LaneOutcome> {
+  // TurboVec gRPC call would go here (port 50055) — not wired yet.
+  // not_configured (not "success" with an empty array) so callers can tell
+  // "this lane has no backend" apart from "this lane searched and found
+  // nothing" — see openspec/changes/parent-atlas-runtime-ownership-precall.
+  return { results: [], status: 'not_configured', reason: 'turbovec_grpc_not_wired' };
 }
 
 // Lane 3: Redis centroids
+//
+// audited 2026-08-02 (openspec/changes/session-159-followup-tasks.md, Phase
+// 11): live Redis currently has zero keys under any centroid:* naming
+// scheme, and this file's own historical `centroid:feature:*` pattern does
+// not match any of the 8 incompatible schemes found elsewhere in the repo.
+// Report not_configured whenever no candidate keys exist at all, instead of
+// silently returning an empty "success" result indistinguishable from a
+// real search that happened to match nothing.
 
 async function searchRedisCentroids(
   vector: Float32Array,
   limit: number,
   timeout: number
-): Promise<SearchResult[]> {
+): Promise<LaneOutcome> {
   try {
     const redis = new Redis({
       host: process.env.REDIS_HOST || '127.0.0.1',
@@ -181,6 +213,16 @@ async function searchRedisCentroids(
     // Look up cached centroids by approximate similarity
     // This is a simplified version; real implementation would do cosine similarity
     const keys = await redis.keys('centroid:feature:*');
+
+    if (keys.length === 0) {
+      await redis.quit();
+      return {
+        results: [],
+        status: 'not_configured',
+        reason: 'no_centroid_feature_keys_found',
+      };
+    }
+
     const results: SearchResult[] = [];
 
     for (const key of keys.slice(0, limit)) {
@@ -202,10 +244,13 @@ async function searchRedisCentroids(
     }
 
     await redis.quit();
-    return results;
+    return { results, status: 'success' };
   } catch (e) {
     console.error('Redis lane error:', e);
-    return [];
+    // Re-throw (not swallow-to-empty-array) so Promise.allSettled marks this
+    // lane 'rejected' -> aggregation loop reports status:'error', distinct
+    // from both 'success' (found results) and 'not_configured' (no backing).
+    throw e;
   }
 }
 

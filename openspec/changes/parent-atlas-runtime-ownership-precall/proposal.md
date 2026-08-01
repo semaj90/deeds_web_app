@@ -94,10 +94,55 @@ not proposed work); listed for completeness of the record.
 12. Output validation wired end-to-end for one real call path.
 13. Only then: evaluate ACP/A2A bridges.
 
+## Progress (2026-08-02, operator review + fixes)
+
+Steps 4, 8, and the beginning of the runtime-verification work are now
+done, per operator sign-off on the "Correct next TODO" list:
+
+- **Step 4 (degraded lane reporting) — DONE.** `parallel-orchestrator.ts`'s
+  `LaneResult.status` gained a `not_configured` variant; `searchTurboVec`
+  (explicit stub) and `searchRedisCentroids` (reports `not_configured`
+  when zero `centroid:feature:*` keys exist, distinct from "searched,
+  found nothing") both use it now, and the previously-discarded `lanes`
+  diagnostic array is now actually returned (`parallelRetrieve` return
+  type changed `SearchResult[]` → `{results, lanes}`; safe, zero external
+  callers confirmed via `rg` before the change).
+- **Step 8 (canonical Zod schema) — DONE, schema only, not wired.**
+  `src/lib/server/parent-atlas/precall/query-plan-schema.ts` and
+  `retrieve-evidence-schema.ts` created per `design.md`'s sketches. No
+  caller wiring yet — that's still steps 9+.
+- **tRPC/LangGraph/Mastra/Deep-Agents package verification — DONE**, see
+  the status table above; Deep Agents also confirmed absent from
+  `package.json` (not previously checked explicitly).
+- **Postgres centroid table inventory — DONE**, logged in
+  `openspec/changes/session-159-followup-tasks.md`'s Phase 11 addendum
+  rather than here (keeps that finding attached to the audit it corrects).
+  Short version: 2 real populated tables exist (`qdrant_centroid_clusters`,
+  202 rows; `gpu_cluster_centroids`, 64 rows), both stale (no active
+  writer), both using yet another naming scheme (`node:{row}:{col}`) on
+  top of the 8 already found in code — so "no canonical writer" was true
+  for Redis specifically, not for Postgres.
+- **Two of the six decomposed future changes now exist as scope-reserving
+  stubs** (design sketch / gate definitions only, nothing implemented):
+  `openspec/changes/parent-atlas-deep-research-ingestion/`,
+  `openspec/changes/parent-atlas-triton-trtllm-readiness/`. The remaining
+  four (`parent-atlas-centroid-projection-v1`,
+  `parent-atlas-code-intelligence-population`,
+  `parent-atlas-hypergraph-retrieval`, `parent-atlas-agent-runtime-evaluation`)
+  are not yet created — logged here as backlog, not scaffolded ahead of
+  need.
+- **Not done, explicitly deferred**: steps 5–7, 9–13 (dispatcher worker
+  entrypoint, wiring the new schemas to a real caller, bounded query
+  planning, proving one end-to-end LangGraph dispatcher run, SOM/KMeans
+  population coverage metrics). These need either a running-infra proof
+  (dispatcher, LangGraph) or meaningfully more design work (query
+  planning, coverage metrics) than a single bounded pass covers.
+
 ## Explicitly out of scope for this change
 
-- Migrating or renaming any of the 8 centroid Redis key schemes (needs its
-  own writer/reader inventory first — separate change).
+- Migrating or renaming any of the 8 (now 9, see Postgres inventory
+  above) centroid key schemes (needs its own writer/reader inventory
+  first — separate change).
 - The `bitfrost`/`bifrost` spelling question (legacy persisted prefix vs
   documented product name) — do not resolve by frequency; separate
   decision, not blocking.

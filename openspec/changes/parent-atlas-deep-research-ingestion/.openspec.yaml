@@ -1,0 +1,7 @@
+schema: spec-driven
+created: 2026-08-02
+goal: Canonical acquisition envelope + multi-representation extraction for
+  web/PDF/image/API ingestion, with source-span provenance on every
+  extracted claim so ACE can cite rather than synthesize from untraceable
+  summaries. Split out of parent-atlas-runtime-ownership-precall to keep
+  that change scoped to runtime ownership and pre-call validation only.
