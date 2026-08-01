@@ -431,22 +431,50 @@ async function writeKanbanTasksToDB() {
 // Lock file management (prevent concurrent execution)
 // ─────────────────────────────────────────────────────────────────────────────
 
+function isPidAlive(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    // signal 0 does not kill the process — it only checks whether the PID
+    // exists and is signalable. Throws ESRCH if no such process.
+    process.kill(pid, 0);
+    return true;
+  } catch (e) {
+    return e.code !== 'ESRCH';
+  }
+}
+
 async function acquireLock() {
   try {
-    // Check if lock file exists and is recent
+    // Check if lock file exists, belongs to a live process, and is recent.
+    // Previously this only checked file mtime age against LOCK_TIMEOUT_MS —
+    // a lock left behind by a crashed process (e.g. OOM-killed before its
+    // finally-block ran) stayed "valid" for the full 20-minute window even
+    // though nothing was actually running. Now the recorded PID must also
+    // still be alive for the lock to be treated as held.
     const stat = await fs.stat(LOCK_FILE).catch(() => null);
     if (stat) {
       const age = Date.now() - stat.mtime.getTime();
-      if (age < LOCK_TIMEOUT_MS) {
-        throw new Error(`Another orchestrator is running (lock age: ${Math.floor(age / 1000)}s). Wait for completion or delete ${LOCK_FILE}.`);
+      let recordedPid = null;
+      try {
+        const contents = JSON.parse(await fs.readFile(LOCK_FILE, 'utf8'));
+        recordedPid = Number.isInteger(contents.pid) ? contents.pid : null;
+      } catch {
+        // Unreadable/corrupt lock file — treat as stale below.
       }
-      // Lock is stale, remove and proceed
+
+      const holderAlive = recordedPid !== null && recordedPid !== process.pid && isPidAlive(recordedPid);
+      if (holderAlive && age < LOCK_TIMEOUT_MS) {
+        throw new Error(`Another orchestrator is running (pid ${recordedPid}, lock age: ${Math.floor(age / 1000)}s). Wait for completion or delete ${LOCK_FILE}.`);
+      }
+      // Lock is stale (holder PID gone, unreadable, or past the hard
+      // timeout even if the PID is somehow still alive) — remove and proceed.
       await fs.unlink(LOCK_FILE).catch(() => {});
     }
 
     // Create new lock file with timestamp
     await fs.writeFile(LOCK_FILE, JSON.stringify({ pid: process.pid, timestamp: new Date().toISOString() }), 'utf8');
     log(`✅ Lock acquired (${LOCK_FILE})`);
+    return true;
   } catch (e) {
     err(`Failed to acquire lock: ${e.message}`);
     throw e;
@@ -470,9 +498,11 @@ async function main() {
     process.exitCode = 1;
   }, LOCK_TIMEOUT_MS);
 
+  let lockAcquired = false;
   try {
     // Acquire lock to prevent concurrent execution
     await acquireLock();
+    lockAcquired = true;
 
     log(`Starting downstream pipeline orchestrator (${APPLY ? 'APPLY' : 'DRY-RUN'} mode)`);
     log(`Services: SvelteKit=${SVELTEKIT_URL}, DB=${describeDatabaseTarget(DATABASE_URL)}`);
@@ -559,8 +589,14 @@ async function main() {
       err(`Failed to write report: ${e.message}`);
     }
 
-    // Release lock
-    await releaseLock();
+    // Release lock — ONLY if this process actually acquired it. Previously
+    // this ran unconditionally, so a process that FAILED to acquire the
+    // lock (another orchestrator legitimately holds it) would still delete
+    // that other process's live lock file here, defeating mutual exclusion
+    // entirely regardless of the staleness check above.
+    if (lockAcquired) {
+      await releaseLock();
+    }
 
     await pool.end();
     process.exitCode = report.summary.success ? 0 : 1;
