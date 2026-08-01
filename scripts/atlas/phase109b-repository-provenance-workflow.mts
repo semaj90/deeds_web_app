@@ -40,7 +40,7 @@ export function parsePositiveInteger(
 }
 
 export function parseProfile(raw: string | undefined): WorkflowProfile {
-  const profile = (raw ?? 'semantic-full') as WorkflowProfile;
+  const profile = (raw ?? 'production-projection') as WorkflowProfile;
   switch (profile) {
     case 'structural':
     case 'semantic-sample':
