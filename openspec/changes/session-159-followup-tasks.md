@@ -15,18 +15,19 @@
 | 384-dim script sweep → 768/512 counterparts | `4e7da6c144`, `2b5ae4aa35` | `rebuild-gemma4-summaries-768.mjs` DRY_RUN_PROVEN against live Gemma4/Ollama; `create-qdrant-codebase-768.mjs` safety guard tested against live 105K-point collection |
 | llama-server duplicate-launch race (3 folderOpen tasks racing on :8090) | `0e84321503` | Cold-start proxy proof: 1 process, 1 listener, PID 40712, `hforf.gguf`, no `--mmproj`, VRAM 7531/8192 MiB (was 2 processes, 7007 MiB, near-OOM) |
 | Graphify pipeline lock: no PID-liveness check + unconditional release-on-failure (loser deletes winner's lock) | `43824e4fcf` | Syntax verified; not yet exercised under a real concurrent-run test |
+| `/api/health` TypeError crash (`ENV.COUCHDB_URL.replace` on undefined) + ~15 other missing ENV keys + `SEAWEED_MASTER_PORT` export | `45f58ee958` | Live: `GET /api/health` → `{"status":"healthy"}`, all checks `ok:true` (was uncaught 500) |
+| Root cause behind the above: `vite dev`/`npm run dev` never loads `.env` into `process.env` at all (vite.config.ts opts out of loadEnv, nothing calls dotenv.config()) — every `process.env.*` read across src/lib/server, src/mcp, scripts was silently `undefined` | `45f58ee958` | `env.server.ts` now self-loads `.env`/`.env.local` at import time (dotenv never overrides already-set vars). Verified: redis/postgres/couchdb/qdrant/ollama all flipped `ok:false → ok:true` after the fix, same running process, no other change |
+| Redis NOAUTH sweep, round 2 — 7 more unguarded `new Redis(...)` call sites in the live app (src/mcp/server.ts getMcpRedis — a *different* file from the one fixed in `4b6597bb7c`; error-brain/transport/redis.ts; redis-disposable.ts; observability/cache-logger.ts; cache/cache-invalidation.ts; search/hybrid-search.ts x2; browser-context/snapshot/+server.ts) | `924d6458b3` | Grep-verified all 26 files / 54 `new Redis(` call sites in `src/` now have a `password` field, either via explicit option or an already-guarded factory (valkey-client.ts, redis.ts, redis-cache-aggressive.ts, connection-pool.ts, dispatch/mcp-tool-implementations.ts, ace/*, retrieval/*, atlas/runtime-cache-telemetry.ts) |
 
 ## Open — next session, priority order
 
-### 1. `/api/health` route crash (found, not fixed)
-- **File**: `sveltekit-frontend/src/routes/api/health/+server.ts:161`
-- **Error**: `TypeError: Cannot read properties of undefined (reading 'replace')`
-- **Evidence**: captured live from standalone `npx vite dev` run, `/tmp/session-159/vite-standalone.log`
-- **Next step**: read line 161, identify the undefined value being `.replace()`'d (likely a version string, env var, or Redis response field)
+### 1. `scripts/**` still has ~219 unguarded `new Redis(...)` call sites (deliberately out of scope this pass)
+- Standalone CLI/backfill/smoke scripts under `sveltekit-frontend/scripts/` and `scripts/` — not the running server, so left untouched to keep the health-crash commits scoped.
+- **Next step**: `node -e "..."` scan pattern used this session (see session transcript) can be re-run to regenerate the list; most already read `REDIS_URL`/`redisOptions` from a shared helper (e.g. `redisOpts()`) so the real fix count is probably much smaller than 219 raw hits — many share one helper function. Worth auditing the *helpers* first (`redisOpts`, `REDIS_CONFIG`, `redisOptions` locals) rather than each call site individually.
 
-### 2. `/api/health`'s Redis client — same NOAUTH pattern as TRACE MCP, different file
-- **Evidence**: `[ioredis] Unhandled error event: ReplyError: NOAUTH Authentication required.` in the same log, immediately after the `/api/health` 500
-- **Next step**: `rg -n "new Redis\(" sveltekit-frontend/src/routes/api/health` and any modules it imports; apply the same `password` fix pattern as commit `4b6597bb7c`. Given this pattern has now appeared in 4+ independent files (trace-mcp-server.ts, engram_tools.ts, lib/server/mcp/server.ts, and now something feeding /api/health), consider a repo-wide sweep: `rg -n "new Redis\(" --type ts --type mjs -g '!node_modules'` and check every hit for a `password` field.
+### 2. RabbitMQ login failure surfaced by the dotenv fix (new finding, not investigated)
+- **Evidence**: after the `.env` loading fix, dev server log shows `❌ RabbitMQ initialization failed: ... 403 (ACCESS-REFUSED) ... Login was refused using authentication mechanism PLAIN` — this was previously masked because `process.env.RABBITMQ_URL` was undefined and whatever consumed it took a different (silently-broken) path.
+- **Next step**: check the real RabbitMQ credentials in `.env` against what the `legal-ai-rabbitmq` container actually expects; `/api/health`'s own rabbitmq check only does a raw TCP port probe (`probeTcpUrl`), so it reports `ok:true` regardless of auth — this failure only shows up in the "Loading services..." startup path, a different code path than the health route.
 
 ### 3. Chat template alignment for `hforf.gguf` — NOT_YET_PROVEN
 - **Concern**: `hforf.gguf` is launched with `--chat-template-file custom_pub_chat_template_gemma4.jinja` — a Gemma4-specific template applied regardless of model. Health-check passing only proves the model loaded and the HTTP endpoint responds; it does NOT prove chat formatting, tool-call syntax, or turn markers are correct for this specific model.
