@@ -64,6 +64,7 @@ async function getRedis(redisUrl: string): Promise<Redis> {
 
   connecting = (async () => {
     const client = new Redis(redisUrl, {
+      password: process.env.REDIS_PASSWORD,
       lazyConnect: true,
       maxRetriesPerRequest: 1,
       enableOfflineQueue: false,

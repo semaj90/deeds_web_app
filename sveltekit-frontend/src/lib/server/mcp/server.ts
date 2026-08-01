@@ -2226,6 +2226,7 @@ export async function setupToolHandlers(): Promise<void> {
       const { default: Redis } = await import('ioredis');
       const url = ENV.REDIS_URL;
       _mcpRedis = new Redis(url, {
+        password: ENV.REDIS_PASSWORD,
         lazyConnect: false,
         maxRetriesPerRequest: 1,
         enableOfflineQueue: false,

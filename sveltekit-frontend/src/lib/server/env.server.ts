@@ -45,6 +45,9 @@ export const ENV = Object.freeze({
   // Preserve your existing entries, for example:
   DATABASE_URL: privateEnv.DATABASE_URL,
   REDIS_URL: privateEnv.REDIS_URL,
+  REDIS_HOST: privateEnv.REDIS_HOST,
+  REDIS_PORT: privateEnv.REDIS_PORT,
+  REDIS_PASSWORD: privateEnv.REDIS_PASSWORD,
   QDRANT_URL: privateEnv.QDRANT_URL,
 
   // Feature flags should be booleans, not string literals.

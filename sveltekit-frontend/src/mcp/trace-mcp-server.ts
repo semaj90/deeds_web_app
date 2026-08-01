@@ -131,6 +131,7 @@ const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
 const NEO4J_USER        = ENV.NEO4J_USER;
 const NEO4J_PASS        = ENV.NEO4J_PASSWORD;
 const REDIS_URL         = ENV.REDIS_URL;
+const REDIS_PASSWORD    = ENV.REDIS_PASSWORD;
 const PG_URL            = ENV.DATABASE_URL;
 const TOPO_URL          = ENV.TOPOLOGY_SEARCH_URL;
 const GO_SEARCH_URL     = ENV.GO_SEARCH_URL;
@@ -419,7 +420,7 @@ async function getEmbedRedis() {
   if (_embedRedisConnecting) return _embedRedisConnecting;
   _embedRedisConnecting = (async () => {
     const { default: Redis } = await import('ioredis');
-    const r = new Redis(REDIS_URL, { lazyConnect: true, maxRetriesPerRequest: 1 });
+    const r = new Redis(REDIS_URL, { password: REDIS_PASSWORD, lazyConnect: true, maxRetriesPerRequest: 1 });
     r.on('error', () => {});
     await r.connect().catch(() => {});
     _embedRedis = r;
@@ -442,6 +443,7 @@ function makeRedis() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const Redis = require('ioredis');
   const r = new Redis(REDIS_URL, {
+    password: REDIS_PASSWORD,
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
@@ -4073,6 +4075,7 @@ server.registerTool(
       let redis: InstanceType<typeof Redis> | null = null;
       try {
         redis = new Redis(REDIS_URL_ENV, {
+          password: REDIS_PASSWORD,
           lazyConnect: true,
           connectTimeout: 4_000,
           commandTimeout: 4_000,
@@ -4415,6 +4418,7 @@ server.registerTool(
       const { storeErrorFingerprint } = await import('../lib/server/ace/error-fingerprint.js');
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -4468,6 +4472,7 @@ server.registerTool(
       );
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -4532,6 +4537,7 @@ server.registerTool(
       const { multiLaneSearch } = await import('../lib/server/ace/multi-lane-retrieval.js');
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -4841,6 +4847,7 @@ server.registerTool(
     try {
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -5219,6 +5226,7 @@ server.registerTool(
     try {
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -5422,6 +5430,7 @@ server.registerTool(
     try {
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -6318,6 +6327,7 @@ server.registerTool(
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
     const { default: Redis } = await import('ioredis');
     const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 3000,
       enableReadyCheck: false,
@@ -6353,6 +6363,7 @@ server.registerTool(
     const { contextForFile } = await import('../lib/server/atlas/context-for-file.js');
     const { default: Redis } = await import('ioredis');
     const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 3000,
       enableReadyCheck: false,
@@ -6401,6 +6412,7 @@ server.registerTool(
       .replace(/^src\//, '');
     const { default: Redis } = await import('ioredis');
     const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 3000,
       enableReadyCheck: false,
@@ -6696,6 +6708,7 @@ server.registerTool(
 
     const { default: Redis } = await import('ioredis');
     const redisClient = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
+      password: process.env.REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 3000,
       enableReadyCheck: false,
@@ -7506,6 +7519,7 @@ server.registerTool(
       const { recallFixerPattern } = await import('../lib/server/fixer/fixer-memory.js');
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -7580,6 +7594,7 @@ server.registerTool(
       );
       const Redis = (await import('ioredis')).default;
       const r = new Redis(REDIS_URL, {
+        password: REDIS_PASSWORD,
         lazyConnect: true,
         maxRetriesPerRequest: 1,
         connectTimeout: 2000,
@@ -7758,6 +7773,7 @@ server.registerTool(
       try {
         const { default: Redis } = await import('ioredis');
         const r = new Redis(REDIS_URL, {
+          password: REDIS_PASSWORD,
           lazyConnect: true,
           maxRetriesPerRequest: 1,
           enableOfflineQueue: false,
@@ -7961,6 +7977,7 @@ server.registerTool(
 
     const PROMOTE_THRESHOLD = 3;
     const redis = new Redis(REDIS_URL, {
+      password: REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 3000,
       enableReadyCheck: false,
