@@ -88,6 +88,10 @@ Scoped-down slice of the Phase 5 proposal per operator choice ("scope to one bou
 
 **Verdict on Phase 5's premise**: the proposal assumed a settled, single centroid key contract to build a pre-call hook and semantic-cache layer against. That contract does not exist — 8 divergent naming schemes exist instead, none currently warmed. Any pre-call/cache-key work from the Phase 5 proposal needs a **consolidation decision** (which scheme becomes canonical, migrate or archive the other 7) before it can be built on top of. Per this repo's Consolidation Sweep Rules (root CLAUDE.md), that consolidation itself requires an audit report + explicit sign-off before any patching — not folded into this pass.
 
+## Note (2026-08-01, later same day): possible stale `scripts/ingest/turbovec-sidecar.py` — not actioned
+
+Background diff surfaced a second sidecar file, `scripts/ingest/turbovec-sidecar.py` (repo root, "Phase 10B" header, port 8791, 2-bit, `/rerank+/build+/prefilter+/search`, last touched ~June 20–23), distinct from `sveltekit-frontend/scripts/turbovec-sidecar.py` (the one fixed this session for the duplicate-bind bug). Checked whether the earlier turbovec fix targeted the wrong file — it did not: `.vscode/tasks.json:1038` (the real live startup task) launches `sveltekit-frontend/scripts/turbovec-sidecar.py --port 8791 --collection codebase_chunks_768 --dim 64 --bits 4`, confirming that's the genuinely live sidecar. `scripts/ingest/turbovec-sidecar.py` is referenced only by `scripts/turbovec/verify-integration-status.mjs:104`'s `fileExists()` check (a stale status-checker pointing at `docs/reports/TURBOVEC-STATUS-SESSION-74.md`) and several packet-inventory/manifest data files that just mention its path as a string — no actual launcher or npm script runs it. Looks like dead code from a superseded prototype, never archived. Not touched — flagging only, since archival decisions for this repo require the same sign-off pattern used for `src/lib/server/mcp/server.ts` earlier this session, and this wasn't part of the bounded scope agreed for this pass.
+
 ## Resume here (next session / after compact)
 
 One open item, now better-scoped than before:
