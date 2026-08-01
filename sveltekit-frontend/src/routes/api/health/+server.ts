@@ -422,6 +422,7 @@ async function probeRedis(): Promise<CheckResult> {
   try {
     const { default: Redis } = await import('ioredis');
     const redis = new Redis(ENV.REDIS_URL, {
+      password: ENV.REDIS_PASSWORD,
       lazyConnect: true,
       connectTimeout: 3000,
       maxRetriesPerRequest: 0,
