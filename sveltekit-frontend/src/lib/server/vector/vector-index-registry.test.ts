@@ -55,7 +55,8 @@ describe('vector-index-registry', () => {
     expect(getVectorLane('topology128').dimension).toBe(128);
     expect(getVectorLane('topology128').collection).toBe('codebase_topology_128');
 
-    expect(getVectorLane('retrieval384').role).toBe('canonical');
+    expect(getVectorLane('retrieval384').role).toBe('legacy');
+    expect(getVectorLane('retrieval384').status).toBe('blocked');
     expect(getVectorLane('retrieval384').dimension).toBe(384);
     expect(getVectorLane('retrieval384').collection).toBe('codebase_chunks_384_hybrid');
 

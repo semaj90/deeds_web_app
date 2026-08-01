@@ -58,15 +58,15 @@ export const VECTOR_LANES = {
   retrieval384: {
     laneId: 'embeddinggemma-prefix384',
     kind: 'retrieval',
-    role: 'canonical',
+    role: 'legacy',
     modelId: 'embeddinggemma:latest',
     vectorName: 'content',
     collection: 'codebase_chunks_384_hybrid',
     dimension: 384,
     projection: 'direct_slice',
     normalization: 'l2',
-    status: 'active',
-    notes: 'Prefix-sliced canonical retrieval lane used for dense Qdrant search.',
+    status: 'blocked',
+    notes: 'BLOCKED: 384 is not a valid embeddinggemma Matryoshka truncation boundary (768/512/256/128 only). Raw slice(0,384) produces semantically invalid vectors. Backing collection is empty (0 points). Use source768 for canonical retrieval.',
   },
   latent64: {
     laneId: 'atlas-latent64',

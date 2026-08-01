@@ -558,8 +558,17 @@ export class QdrantLane384 extends SearchLaneBase {
   }
 
   config(): SearchLaneConfig {
-    // Slightly higher weight than the 768-dim lane when the legacy hybrid lane is selected
-    return { enabled: true, priority: 1, weight: 0.38, fallback: 'bm25' };
+    // DISABLED: embeddinggemma only supports valid Matryoshka truncation at
+    // 768/512/256/128. 384 is not a trained MRL boundary — this lane's
+    // "direct_slice" projection (raw vector.slice(0, 384)) produces
+    // semantically invalid vectors, not just lower-fidelity ones. The
+    // backing collection (codebase_chunks_384_hybrid) is also empty
+    // (0 points) in production. Previously enabled with priority:1,
+    // weight:0.38 — HIGHER than the 768-dim source lane — which would have
+    // let corrupted rankings dominate fusion the moment anyone repopulated
+    // the collection via the standalone atlas:qdrant:384:restore:apply
+    // script. Do not re-enable without a valid (768/512/256/128) projection.
+    return { enabled: false, priority: 1, weight: 0.38, fallback: 'bm25' };
   }
 }
 
