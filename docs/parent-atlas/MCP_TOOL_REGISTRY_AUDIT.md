@@ -23,6 +23,14 @@ evidence of a single canonical registry:
 | `sveltekit-frontend/src/mcp/server.ts` | array-literal + switch (89) + if-chain (18) | 85 | ~107 unique | PARTIAL_PROVEN |
 | `sveltekit-frontend/src/mcp/trace-mcp-server.ts` | `registerTool()` calls (SDK high-level API) | 117 (self-contained) | 117 | PARTIAL_PROVEN |
 
+**⚠️ Highest-severity finding (follow-up trace, see Finding 3 below)**:
+`POST /api/atlas/mastra-agent` is a **live, authenticated, publicly-reachable
+route** that imports 7 real Atlas tool functions and calls **none of them** —
+it returns a fabricated `{ success: true, ... }` response with hardcoded fake
+evidence. This is not dead code sitting unused; it is a route a real client
+can hit today and receive confident-looking fabricated data. Status: **STUB**,
+live.
+
 **PARTIAL_PROVEN**, not PROVEN, on all three: static structure is real and
 AST-confirmed (this is stronger than the previous "162 tools registered per
 `tools/list`" claim, which only proved registration, not handler-runtime-service
@@ -98,9 +106,74 @@ call, MCP `tools/call` without a prior `list`) can invoke them — this is
 either dead code (if nothing calls them) or a hidden/undocumented capability
 (if something does), and this pass did not determine which.
 
-- **Status**: NOT_PROVEN for "dead" vs. "hidden-but-live" — needs a caller
-  search (`rg` for each of these 21 names across `src/`) as the next step,
-  not done in this pass to stay within Phase 4's own scope.
+- **Status update (follow-up caller trace completed)**: none of the 22 are
+  simple dead code — every one traces to a real consuming or producing
+  module. The picture is more specific, and more concerning, than a
+  binary dead/hidden split:
+
+  **Group A — LangGraph dispatcher nodes (9 tools: `identity:quarantine`,
+  `identity:recover`, `envelope:validate`, `mirror:sync_qdrant`,
+  `mirror:sync_neo4j`, `graph:expand`, `retrieval:rerank`,
+  `answer:synthesize`, `escalation:route`)**. Real code exists at
+  `sveltekit-frontend/src/lib/server/langgraph/dispatcher-nodes/node-*.ts`
+  (one file per tool), each calling a genuine
+  `ctx.mcpClient.tools.call(toolName, params)` (confirmed by reading
+  `node-expand-topology.ts` and `node-helpers.ts` — not a mock, a real
+  MCP client abstraction). But the entrypoint chain that would ever
+  invoke these nodes —
+  `rabbitmq-identity-listener.ts` → `executeDispatcherOrchestration`
+  (`dispatcher-orchestrator.ts`) → `createDispatcherGraph`
+  (`dispatcher-graph.ts`) → the 9 node files — has **zero external
+  caller anywhere in the app**: not `hooks.server.ts`, not any
+  `src/routes/**/+server.ts`, not any startup script (confirmed via
+  repo-wide search for `executeDispatcherOrchestration` and
+  `rabbitmq-identity-listener` — only internal siblings in the same
+  subsystem, plus stale `.stage1/.stage2` audit-snapshot NDJSON files,
+  reference them). **Status: DEAD_OR_UNREFERENCED at the orchestration
+  entrypoint; PRESENT_UNPROVEN at the individual node level** — the
+  code is real and internally correct, but nothing in the running
+  system ever triggers it.
+
+  **Group B — `atlas.*` (7 tools)**. Two independent implementations
+  exist, and they diverge sharply:
+  - The real MCP-level dispatch (`handleAtlasSemanticToolCall` in
+    `src/lib/server/atlas/atlas-semantic-tools.ts:489`, called from the
+    MCP server's if-chain) delegates to genuine functions (`discover`,
+    `retrieve`, `buildContext`, etc.) that make real gRPC calls
+    (`searchEvidenceViaGrpc`, `checkRetrievalHealth`) with an explicit,
+    opt-in `mock` flag for testing (not a silent default). **Status:
+    PARTIAL_PROVEN.**
+  - A **separate, live, publicly-reachable route**,
+    `POST /api/atlas/mastra-agent` (`src/routes/api/atlas/mastra-agent/+server.ts`),
+    imports the same 7 tool functions from
+    `atlas-mastra-adapter.ts` (`atlasDiscoverTool`, `atlasRetrieveTool`,
+    `atlasValidateChangeTool`, `atlasBuildContextTool`,
+    `atlasInspectRuntimeTool`, `atlasApplyChangeTool`,
+    `atlasToolCallProcessor`) but **calls none of them**. The real
+    Mastra agent instantiation is commented out (line 105-119:
+    `// Stub: In production, instantiate actual Mastra agent here`),
+    replaced by a hardcoded fake evidence packet
+    (`packetKey: 'atlas:packet:evidence:001'`, hardcoded `denseScore: 0.92`)
+    and a canned response string. The route is authenticated
+    (`locals.user` check) and Zod-validated, and returns
+    `{ success: true, ... }` with fabricated data. **Status: STUB — and
+    live/reachable today**, which is a materially higher-risk finding
+    than an unreachable stub, since a real client hitting this endpoint
+    gets a confident-looking fabricated answer.
+
+  **Group C — `phase109a_*` (5 tools)**. Real structured-registry
+  dispatch: the if-chain looks up each tool in a `phase109aTools` array
+  (from `phase109a-mcp-tools.ts`), Zod-validates input
+  (`tool.inputSchema.parse(args)`), and invokes `tool.handler(input)`.
+  **Status: PARTIAL_PROVEN** (wiring confirmed real; handler-internal
+  business logic not traced this pass).
+
+  **Group D — `ldr_research` (1 tool)**. Real dispatch chain:
+  `executeLDRResearch` (`src/mcp/tools/ldr-research.ts:75`) calls
+  `runLocalDeepResearch` (a dedicated orchestrator module,
+  `src/lib/server/ldr/ldr-orchestrator.ts`), not a hardcoded response.
+  **Status: PARTIAL_PROVEN.**
+
 - **Note on `identity:*`, `envelope:validate`, `mirror:sync_*`**: these
   names correspond to imports already visible in the file header
   (`toolIdentityRecover`, `toolEnvelopeValidate`, `toolMirrorSyncQdrant`,
@@ -108,7 +181,9 @@ either dead code (if nothing calls them) or a hidden/undocumented capability
   per the file's own import block) — the import exists, the dispatch
   branch exists, but the listing doesn't. This is the exact
   "handler not exposed through MCP tools" failure mode named in the
-  originating audit spec.
+  originating audit spec — and per Group A above, the whole subsystem
+  these 4 belong to (LangGraph dispatcher) is unreachable at its entry
+  point regardless of the listing gap.
 
 ## Finding 4 — `trace-mcp-server.ts` structurally cannot have listing/handler gaps, but has its own risk class
 
@@ -147,7 +222,7 @@ across three servers.
 | MCP tool dispatch structure (all 3 servers) | PROVEN (AST-confirmed, not runtime) |
 | Any specific tool's runtime execution | NOT_PROVEN (zero tools invoked this pass) |
 | `src/lib/server/mcp/server.ts` vs `src/mcp/server.ts` — which is canonical | NOT_PROVEN |
-| 21-22 unlisted-but-dispatchable tools — dead or hidden | NOT_PROVEN |
+| 21-22 unlisted-but-dispatchable tools — dead or hidden | **RESOLVED**: none are dead code; see Finding 3 groups A-D. Group A (9 tools, LangGraph dispatcher) is DEAD_OR_UNREFERENCED at its entrypoint despite real node code. Group B's MCP-level dispatch (7 `atlas.*` tools) is PARTIAL_PROVEN, but the parallel `/api/atlas/mastra-agent` route is a live STUB. Groups C (5) and D (1) are PARTIAL_PROVEN. |
 | `trace-mcp-server.ts` batch_call shadow registry sync | PRESENT_UNPROVEN |
 | Repair tools (`handleRepairToolCall`) | Confirmed **commented out** at line 2300 (`// disabled: broken retrieval module deps`) — STUB, correctly hidden from dispatch (the line is a no-op comment, not reachable code) |
 | ACP registration (`bootstrapACPRegistry`, `registerDispatcherToolsAsACP`) | Confirmed called via `Promise.allSettled` at server startup (line 164-167) — registration call PROVEN, downstream consumer/task-round-trip NOT_PROVEN (Phase 6 of the full spec, not run this pass) |
