@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-08-01
+goal: Trace or build the first real consumer of the Valkey hot-vector cache
+  before extending its schema beyond the minimal proven contract
