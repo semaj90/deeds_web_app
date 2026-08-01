@@ -89,6 +89,18 @@ function sanitizeServiceUrl(value: string | undefined | null): URL | null {
   }
 }
 
+/**
+ * Strip embedded userinfo (username:password@) from a URL before it's ever
+ * used as a probe target or could end up in a log/response — CouchDB and
+ * RabbitMQ URLs commonly carry credentials inline.
+ */
+function stripUrlCredentials(url: URL): string {
+  const copy = new URL(url.toString());
+  if (copy.username) copy.username = '';
+  if (copy.password) copy.password = '';
+  return copy.toString();
+}
+
 function tryParseNeo4jHttpUrl(raw: string | undefined | null): URL | null {
   const normalized = String(raw ?? '').trim();
   if (!normalized) return null;
@@ -191,9 +203,10 @@ export const GET: RequestHandler = async ({ url, locals }) => {
     seaweedMasterUrl
       ? probe(seaweedMasterUrl, 2000)
       : Promise.resolve(notConfigured()),
-    ENV.COUCHDB_URL
-      ? probe(String(sanitizeServiceUrl(ENV.COUCHDB_URL)?.toString().replace(/\/\/.*@/, '//') ?? ''), 3000)
-      : Promise.resolve(notConfigured()),
+    (() => {
+      const couchdbUrl = sanitizeServiceUrl(ENV.COUCHDB_URL);
+      return couchdbUrl ? probe(stripUrlCredentials(couchdbUrl), 3000) : Promise.resolve(notConfigured());
+    })(),
     runtimeProfile.services.neo4j.state === 'disabled'
       ? Promise.resolve(disabledResult())
       : (() => {
@@ -430,8 +443,7 @@ async function handleServiceHealth(service: string) {
       if (!parsedUrl) {
         return json({ service: 'couchdb', ...notConfigured() }, { headers: cacheControl.short });
       }
-      const safeUrl = parsedUrl.toString().replace(/\/\/.*@/, '//');
-      const result = await probe(safeUrl, 3000);
+      const result = await probe(stripUrlCredentials(parsedUrl), 3000);
       return json({ service: 'couchdb', ...result }, { headers: cacheControl.short });
     }
     case 'neo4j': {
