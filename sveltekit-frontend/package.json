@@ -385,6 +385,7 @@
     "atlas:retrieval:promote:apply": "node ../scripts/atlas/promote-retrieval-winner.mjs --apply",
     "atlas:promotion:worker": "node ../scripts/atlas/promotion-worker.mjs",
     "atlas:promotion:worker:batch": "node ../scripts/atlas/promotion-worker.mjs --batch-size 25 --poll-interval 2000",
+    "atlas:audit:mcp-tool-parity": "node ../scripts/atlas/validate-mcp-tool-registry-parity.mjs",
     "atlas:audit:cache-promotion:dry": "node ../scripts/atlas/audit-cache-promotion-policy.mjs --dry-run --limit=100",
     "atlas:audit:cache-promotion:apply": "node ../scripts/atlas/audit-cache-promotion-policy.mjs --apply",
     "atlas:audit:api-audit-log-contract": "node scripts/tests/audit-api-audit-log-contract.mjs",
