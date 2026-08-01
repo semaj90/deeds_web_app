@@ -1,0 +1,6 @@
+schema: spec-driven
+created: 2026-08-02
+goal: Move from "MCP tool registry parity" to runtime ownership and pre-call
+  validation — stop fabricated success responses, name LangGraph as the
+  current orchestration owner, and build one canonical pre-call layer
+  instead of four hand-maintained schemas per operation.
