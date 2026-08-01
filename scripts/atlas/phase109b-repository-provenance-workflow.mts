@@ -118,9 +118,17 @@ export function evaluateWorkflowSuccess(
 ): boolean {
   let success = report.stages.validation.pass;
   if (profile === 'semantic-full' || profile === 'production-projection') {
+    // NOTE: the semantic stage can only ever report 'PARTIAL' or 'SKIPPED'
+    // (repository-provenance-workflow.ts marks it 'PARTIAL' whenever any
+    // entries were sampled, by design — semantic enrichment is inherently a
+    // bounded sample, unlike lexical/relationships/labeling which are
+    // exhaustive over all files and can report 'PROVEN'). Gating success on
+    // semantic.status === 'PROVEN' made semantic-full/production-projection
+    // fail unconditionally. Require 'PARTIAL' (i.e. not 'SKIPPED') plus the
+    // existing quality checks instead.
     success =
       success &&
-      report.stages.semantic.status === 'PROVEN' &&
+      report.stages.semantic.status === 'PARTIAL' &&
       (report.stages.semantic.embeddedFiles ?? 0) > 0 &&
       (report.stages.semantic.heuristicFiles ?? 0) === 0;
   }
