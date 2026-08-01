@@ -45,6 +45,29 @@ const COLLECTION_CONTRACTS = {
     recommendedVectors: ['error'],
     sparseVectorKey: 'bm42_sparse',
   },
+  // codebase_chunks_768_v2 ALREADY EXISTS in production (52,380 points,
+  // confirmed live 2026-08-01) with the same named-vector naming as the
+  // legacy codebase_chunks_768 collection above (content/signature/error,
+  // no sparse vectors) — NOT the _768-suffixed naming used by
+  // codebase_chunks_384_v2. Contract corrected to match the real live
+  // schema after an initial guess (mirroring 384_v2's naming pattern) was
+  // found to contradict it via qdrant-provision-768v2.mjs's preflight
+  // check. Do not "fix" this to suffixed names without confirming the live
+  // collection was actually migrated first.
+  codebase_chunks_768_v2: {
+    contractVersion: 'atlas-qdrant-768-v2',
+    legacy: false,
+    distance: 'Cosine',
+    namedVectors: {
+      content: 768,
+      signature: 768,
+      error: 768,
+    },
+    requiredVectors: ['content', 'signature'],
+    optionalVectors: ['error'],
+    recommendedVectors: ['error'],
+    sparseVectorKey: null,
+  },
 };
 
 function resolveSampleConfiguration(argv = process.argv, env = process.env) {
