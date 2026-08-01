@@ -247,16 +247,37 @@ class SidecarHandler(BaseHTTPRequestHandler):
         else:
             self.send_json(404, {"error": "not found"})
 
+# http.server.HTTPServer sets allow_reuse_address = True by class default
+# (a stdlib convenience for fast restarts, via socketserver.TCPServer). That
+# lets a second sidecar process silently bind alongside a still-running one
+# instead of failing with "address already in use" -- observed live 2026-08-01:
+# two independently-launched sidecar processes both held a LISTEN socket on
+# :8791 simultaneously, with requests nondeterministically routed to whichever
+# process's kernel accept queue got them (explains intermittent hangs/timeouts
+# against a supposedly single sidecar). Disabling reuse restores normal OS
+# duplicate-bind semantics, so a second launch attempt fails loudly and
+# immediately instead of creating a silent split-brain server pair.
+class SingleBindHTTPServer(HTTPServer):
+    allow_reuse_address = False
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 if __name__ == '__main__':
     print(f"[sidecar] TurboVec ANN sidecar starting on port {PORT}...")
     print(f"          Collection: {COLLECTION} | dim={DIM} | bits={BITS}")
     print(f"          TurboVec available: {TURBOVEC_OK}")
 
-    # Initial index load in background
+    try:
+        server = SingleBindHTTPServer(('127.0.0.1', PORT), SidecarHandler)
+    except OSError as e:
+        print(f"[sidecar] FATAL: could not bind 127.0.0.1:{PORT} -- {e}")
+        print(f"          Another sidecar process is almost certainly already running on this port.")
+        print(f"          Check: netstat -ano | findstr :{PORT}")
+        raise SystemExit(1)
+
+    # Initial index load in background (only after the bind succeeds, so a
+    # failed launch doesn't leave an orphaned indexing thread running)
     threading.Thread(target=load_from_qdrant, daemon=True).start()
 
-    server = HTTPServer(('127.0.0.1', PORT), SidecarHandler)
     print(f"[sidecar] Listening on http://127.0.0.1:{PORT}")
     print(f"          Health: GET /health | Search: POST /search | Reindex: GET /reindex")
     try:
