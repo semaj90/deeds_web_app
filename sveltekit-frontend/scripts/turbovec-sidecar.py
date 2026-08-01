@@ -182,7 +182,6 @@ class SidecarHandler(BaseHTTPRequestHandler):
                 k   = min(int(req.get("k", 10)), 1000)
 
                 with index_lock:
-                    print("ann_index exists?", 'ann_index' in globals(), type(globals().get('ann_index')))
                     if ann_index is None or not TURBOVEC_OK:
                         self.send_json(200, {"ids": [], "scores": [], "fallback": True})
                         return
