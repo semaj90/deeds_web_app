@@ -35,10 +35,19 @@ try {
   if (!quiet) console.log('[graphify:daily] Repository provenance dry-run complete');
 
   // Run from sveltekit-frontend directory to resolve npm scripts
+  //
+  // graphify:daily:chain runs 6 sequential steps (dedup-validation,
+  // materialize, cold-processing, phase8-fanout's own 9 sub-steps,
+  // qdrant tag-mirror, feature-map-sync) over the full production
+  // packet corpus (60K+ rows). A 5-minute timeout here silently killed
+  // the chain mid-run with ETIMEDOUT regardless of progress — phase8's
+  // own fanout orchestrator already grants itself a 2h overall-timeout
+  // (see run-atlas-phase8-fanout.mjs), so the outer wrapper must not be
+  // shorter than that. 3h gives headroom for the steps around it.
   execSync(DAILY_CHAIN_SCRIPT, {
     cwd: FRONTEND,
     stdio: 'inherit',
-    timeout: 5 * 60 * 1000 // 5 min timeout
+    timeout: 3 * 60 * 60 * 1000 // 3 hour timeout
   });
 
   console.log('graphify:daily partial');
