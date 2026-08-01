@@ -5,7 +5,7 @@ semantic ∩ topology ∩ runtime
 
 Semantic:
 - embedding_768
-- embedding_384
+- embedding_512
 - cosine
 
 Topology:

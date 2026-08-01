@@ -1,176 +1,142 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "shell": "pwsh",
-  "enabled_providers": ["llama-server"],
+  "model": "llama-server/hforf.gguf",
+  "small_model": "llama-server/hforf.gguf",
+  "default_agent": "hforf-trace-audit",
   "provider": {
     "llama-server": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Gemma4 Direct GGUF",
+      "name": "llama-server (:8090)",
       "options": {
         "baseURL": "http://127.0.0.1:8090/v1",
         "apiKey": "local",
-        "timeout": 600000,
-        "chunkTimeout": 60000
       },
       "models": {
+        "hforf.gguf": {
+          "name": "Ornith 1.0 9B",
+          "tools": true,
+          "reasoning": true,
+          "limit": {
+            "context": 32768,
+            "output": 4096,
+          },
+          "options": {
+            "temperature": 0.6,
+            "topP": 0.95,
+            "topK": 20,
+            "stream": true,
+            "maxTokens": 4096,
+          },
+        },
         "gemma4-legal-iq4xs-direct.gguf": {
-          "name": "Gemma4 Legal IQ4_XS Direct GGUF",
+          "name": "Gemma4 Legal Direct 65K",
           "tools": true,
           "reasoning": false,
           "limit": {
             "context": 65536,
-            "output": 8192
+            "output": 4096,
           },
-          "options": {
-            "temperature": 0,
-            "stream": true,
-            "maxTokens": 8192,
-            "stop": [
-              "Thinking:",
-              "Self-Correction",
-              "_gemma3",
-              "gemma3.5-27"
-            ]
-          }
         },
-        "hforf.gguf": {
-          "name": "HForF Qwen (Reasoning Model)",
+      },
+    },
+    "gemma4-adapter": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Gemma4 Adapter (:8091)",
+      "options": {
+        "baseURL": "http://127.0.0.1:8091/v1",
+        "apiKey": "local",
+      },
+      "models": {
+        "gemma4-legal-iq4xs-direct.gguf": {
+          "name": "Gemma4 Legal Direct 65K",
           "tools": true,
-          "reasoning": true,
+          "reasoning": false,
           "limit": {
-            "context": 8192,
-            "output": 4096
+            "context": 65536,
+            "output": 4096,
           },
-          "options": {
-            "temperature": 0.7,
-            "stream": true,
-            "maxTokens": 4096,
-            "stop": [
-              "Human:",
-              "Assistant:",
-              "<|im_end|>"
-            ]
-          }
-        }
-      }
-    }
-  },
-  "model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-  "small_model": "llama-server/gemma4-legal-iq4xs-direct.gguf",
-  "permission": {
-    "bash": "ask",
-    "read": "allow",
-    "grep": "allow",
-    "glob": "allow",
-    "lsp": "allow",
-    "todowrite": "allow",
-    "edit": "ask",
-    "write": "ask",
-    "webfetch": "allow",
-    "websearch": "allow",
-    "skill": "allow",
-    "trace_*": "allow",
-    "turbovec_*": "allow",
-    "engram_*": "allow",
-    "langextract_*": "allow"
+        },
+      },
+    },
   },
   "mcp": {
     "trace": {
       "type": "remote",
       "url": "http://127.0.0.1:8788/mcp",
       "enabled": true,
-      "timeout": 120000,
-      "headers": {
-        "Accept": "application/json, text/event-stream"
-      }
-    },
-    "atlas-tools": {
-      "type": "local",
-      "command": ["npx", "tsx", "./sveltekit-frontend/scripts/mcp/atlas-tools-mcp.mjs"],
-      "enabled": true,
-      "timeout": 120000,
-      "env": {
-        "NODE_ENV": "production",
-        "MCP_STDIO": "true"
-      }
-    },
-    "turbovec": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8791/mcp",
-      "enabled": false,
-      "timeout": 30000
-    },
-    "engram-embed": {
-      "type": "local",
-      "command": ["node", "./sveltekit-frontend/scripts/mcp/engram-embed-mcp.mjs", "--stdio"],
-      "enabled": true,
       "timeout": 60000,
-      "env": {
-        "ENGRAM_ONLY": "true",
-        "REDIS_ENABLED": "false"
-      }
     },
-    "gemma4-offload": {
-      "type": "local",
-      "command": ["node", "./sveltekit-frontend/scripts/mcp/gemma4-offload-mcp.mjs"],
-      "enabled": true,
-      "timeout": 30000,
-      "env": {
-        "ENGRAM_ONLY": "true"
-      }
-    }
   },
-  "instructions": [
-    ".opencode/system.md",
-    "sveltekit-frontend/.opencode/skills/no-placeholder-policy.md",
-    "AGENTS.md"
-  ],
-  "watcher": {
-    "ignore": [
-      "node_modules/",
-      "dist/",
-      ".git/",
-      ".svelte-kit/",
-      "memory/",
-      "tmp/",
-      ".opencode/cards/**",
-      ".opencode/cache/**",
-      ".opencode/ndjson/**",
-      ".opencode/embeddings/**",
-      ".opencode/ace-packet.json",
-      ".opencode/ace-packet-*.json",
-      ".opencode/ace-packets/**",
-      ".opencode/ace-packets_stale/**",
-      ".opencode/ace-context.json",
-      ".opencode/feature-files.json",
-      ".opencode/startup-context.json",
-      ".opencode/ace-seed-*.json",
-      ".opencode/patchcard-*.json",
-      ".opencode/ingest/**",
-      ".opencode/summaries/**",
-      ".opencode/jobs/**",
-      ".opencode/tasks/**",
-      ".opencode/commits/**",
-      ".opencode/fixes/**",
-      ".opencode/quarantine/**",
-      ".opencode/recommendations/**",
-      ".opencode/context/**",
-      ".opencode/agents/**",
-      ".opencode/kanban/**",
-      ".opencode/feature-map/**",
-      ".opencode/memory/**",
-      ".opencode/tools/**",
-      ".opencode/node_modules/**",
-      "neschrom97/**",
-      "sveltekit-frontend/node_modules/**",
-      "sveltekit-frontend/.svelte-kit/**",
-      "sveltekit-frontend/static/ort/**",
-      "sveltekit-frontend/static/gemma3_270m_onnx/**",
-      "sveltekit-frontend/static/embeddinggemma_300m_onnx/**",
-      "simd-bridge/cpp/build/**",
-      "granite-docling-258M/**",
-      "turbovec/**",
-      "models/**"
-    ]
-  }
+  "agent": {
+    "hforf-trace-audit": {
+      "mode": "primary",
+      "description": "Read-only repository auditor using native TRACE retrieval tools on hforf.gguf",
+      "model": "llama-server/hforf.gguf",
+      "temperature": 0.8,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. When a tool is needed, invoke the function directly via the runtime tool interface. Do not write pseudocode or narrate tool execution in text. Use exact TRACE tool names exposed by the connected MCP server (e.g. ace.compact_search, atlas.prefilter, kag.feature_lookup, codebase.context_for_file, trace.validate_ace_hit). Prefer compact, ranked evidence. Verify source paths before reporting them. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "Get-Location": "allow",
+        "git status": "allow",
+        "git diff": "allow",
+        "rg": "allow",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "taxonomy.*": "allow",
+        "clusters.*": "allow",
+        "hypergraph.*": "allow",
+        "knowledge.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "runtime.*": "allow",
+        "LLMS.md.*": "allow",
+        "evidence.*": "allow",
+        "image.*": "allow",
+        "shell.*": "allow",
+        "edit": "deny",
+      },
+    },
+    "gemma4-function-caller": {
+      "mode": "subagent",
+      "description": "hforf.gguf function calling auditor on port 8090",
+      "model": "llama-server/hforf.gguf",
+      "temperature": 0.8,
+      "steps": 10,
+      "prompt": "Tool calling rule: never emit XML tool tags such as <execute_bash>, <execute_tool>, or pseudo syntax such as <|tool_call>. Call runtime function tools directly. Do not narrate tool execution in text. Prefer TRACE MCP retrieval tools. Do not edit files.",
+      "permission": {
+        "*": "deny",
+        "read": "allow",
+        "grep": "allow",
+        "glob": "allow",
+        "lsp": "allow",
+        "bash": "ask",
+        "atlas.*": "allow",
+        "ace.*": "allow",
+        "trace.*": "allow",
+        "kag.*": "allow",
+        "codebase.*": "allow",
+        "ops.*": "allow",
+        "edit": "deny",
+      },
+    },
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 2,
+    "reserved": 3072,
+  },
+  "tool_output": {
+    "max_lines": 400,
+    "max_bytes": 18000,
+  },
+  "share": "disabled",
 }

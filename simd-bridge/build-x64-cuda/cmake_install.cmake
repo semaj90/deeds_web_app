@@ -1,8 +1,8 @@
-# Install script for directory: C:/Users/james/Videos/deeds-web-app/node_modules/nan
+# Install script for directory: C:/Users/james/Videos/deeds-web-app/simd-bridge
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Program Files/nan")
+  set(CMAKE_INSTALL_PREFIX "C:/Program Files/simd_bridge_all")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -30,6 +30,11 @@ endif()
 # Is this installation the result of a crosscompile?
 if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
+  include("C:/Users/james/Videos/deeds-web-app/simd-bridge/build-x64-cuda/cpp/cmake_install.cmake")
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT

@@ -15,8 +15,8 @@ paths:
 | Service | Port | Role |
 |---------|------|------|
 | llama-server (Gemma4) | :8090 | Generation only — `stream: true` in request body |
-| Ollama (embeddinggemma) | :11434 | Embeddings only — 384-dim output |
-| Qdrant | :6333 | ANN mirror — `codebase_chunks_384_hybrid` |
+| Ollama (embeddinggemma) | :11434 | Embeddings only — 768-dim output |
+| Qdrant | :6333 | ANN mirror — `codebase_chunks_768_hybrid` |
 | TurboVec | :8791 | CUDA prefilter (64-dim routing, not ANN search) |
 | Postgres | :5432 Docker / :5434 host | Canonical truth |
 | Valkey/Redis | :6379 | Cache — password from `REDIS_PASSWORD` env var |
@@ -27,13 +27,13 @@ paths:
 ```
 bifrost:* Redis exact (L1, <5ms)
 → Postgres packet_key/source_ref (canonical)
-→ Qdrant ANN 384-dim (mirror)
+→ Qdrant ANN 768-dim (mirror)
 → Neo4j k-hop bounded (topology only)
 → Gemma4 synthesis (last)
 ```
 
 ## Dimension policy
-- Canonical embeddings: **384-dim** (`embeddinggemma:latest` via Ollama)
+- Canonical embeddings: **768-dim** (`embeddinggemma:latest` via Ollama)
 - AE latent: 64-dim — routing cache only, never for ANN search
 - Never mix dimensions in the same Qdrant collection
 
@@ -70,7 +70,7 @@ Two distinct prefixes exist — do not confuse them:
 
 ## Centroid / routing distinction
 Centroids **narrow the search space** (route to likely semantic partitions).
-They do NOT replace 384-dim Qdrant candidate scoring.
+They do NOT replace 768-dim Qdrant candidate scoring.
 Pipeline: centroid routing → Qdrant ANN within partition → fusion → Postgres join
 
 ## TypeScript SearchRuntime owns fusion

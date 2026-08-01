@@ -10,7 +10,7 @@
 
 ### Step 2: Freeze 5K Vector Snapshot (30min)
 - [ ] Create `scripts/atlas/freeze-vector-snapshot-5k.mts`
-- [ ] Filter to 5,000 × 384-dim vectors
+- [ ] Filter to 5,000 × 768-dim vectors
 - [ ] Export to Parquet
 
 ### Step 3: Define embeddinggemma-prefix768/512-v1 Contract (45min)
@@ -32,7 +32,7 @@
 ## Phase 1: Index Construction (3h, parallel 6+7)
 
 ### Step 6: Build Qdrant HNSW Index (1.5h)
-- [ ] Create `scripts/atlas/build-qdrant-384-hnsw.mts`
+- [ ] Create `scripts/atlas/build-qdrant-768-hnsw.mts`
 - [ ] Create collection, configure HNSW (m=16, ef_construct=200)
 - [ ] Upsert 5K points with payload
 
@@ -48,8 +48,8 @@
 
 ## Phase 2: Clustering (2h)
 
-### Step 9: K-means on 384 Vectors (45min)
-- [ ] Create `scripts/atlas/train-kmeans-384.mts`
+### Step 9: K-means on 768/512 Vectors (45min)
+- [ ] Create `scripts/atlas/train-kmeans-768/512.mts`
 - [ ] Train K=32, store centroids to Redis
 
 ### Step 10: SOM 20×20 Assignment (45min)
