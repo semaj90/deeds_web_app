@@ -16,8 +16,8 @@
  * }
  */
 
-import * as fs from 'fs';
-import { execSync } from 'child_process';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 function parseLimitArg(defaultValue: number): number {
   const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
@@ -27,20 +27,24 @@ function parseLimitArg(defaultValue: number): number {
   return Number.isInteger(value) && value > 0 ? value : defaultValue;
 }
 
-function execSQL(sql: string): string {
-  const tempFile = `/tmp/query_${Date.now()}_${Math.random().toString(36).slice(2)}.sql`;
-  fs.writeFileSync(tempFile, sql);
-  try {
-    return execSync(
-      `docker exec -i legal-ai-postgres psql -U legal_admin -d legal_ai_db < ${tempFile}`,
-      { encoding: 'utf-8' }
-    );
-  } finally {
-    try {
-      fs.unlinkSync(tempFile);
-    } catch {}
-  }
-}
+// Direct pg.Pool connection — matches the canonical pattern used by
+// materialize-addressable-packets.mjs. execSync + `docker exec psql` was
+// replaced here because piping large result sets (tens of thousands of
+// rows) through Windows cmd.exe hits ENOBUFS (see CLAUDE.md "Qdrant API
+// Strategy" / "Docker: Use docker exec directly (NOT Node.js wrappers)").
+const pool = new Pool({
+  host: process.env.POSTGRES_HOST || 'localhost',
+  port: parseInt(process.env.POSTGRES_PORT || '5434'),
+  user: process.env.PARENT_ATLAS_POSTGRES_USER || 'legal_admin',
+  password: process.env.PARENT_ATLAS_POSTGRES_PASSWORD || '123456',
+  database: process.env.PARENT_ATLAS_POSTGRES_DB || 'legal_ai_db',
+  max: 1,
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 5000,
+  query_timeout: 90000,
+  statement_timeout: 90000,
+  allowExitOnIdle: true,
+});
 
 function normalizeScore(value: number | null | undefined): number {
   if (value === null || value === undefined) return 0.5;
@@ -61,6 +65,17 @@ interface FeatureEnvelope {
   recommendation: null;
 }
 
+interface PacketRow {
+  packet_id: string;
+  dense_score: number | null;
+  lexical_score: number | null;
+  ast_score: number | null;
+  graph_score: number | null;
+  pagerank_score: number | null;
+  ontology_score: number | null;
+  telemetry_score: number | null;
+}
+
 async function main() {
   const dryRun = !process.argv.includes('--apply');
   const batchSize = 500;
@@ -72,20 +87,17 @@ async function main() {
 
   try {
     console.log('[1/5] Counting atlas_packets...');
-    const countSQL = 'SELECT COUNT(*) as cnt FROM atlas_packets;';
-    const countResult = execSQL(countSQL);
-    const totalMatch = countResult.match(/\d+/);
-    const totalPackets = totalMatch ? parseInt(totalMatch[0]) : 0;
+    const countResult = await pool.query('SELECT COUNT(*)::int AS cnt FROM atlas_packets;');
+    const totalPackets = countResult.rows[0]?.cnt ?? 0;
 
     console.log(`  ✓ Total packets: ${totalPackets}`);
     console.log('');
 
     console.log('[2/5] Fetching packets with score components...');
-    const fetchSQL = `
+    const fetchResult = await pool.query<PacketRow>(
+      `
       SELECT
         packet_id,
-        packet_key,
-        source_ref,
         CASE WHEN embedding IS NOT NULL THEN 0.8 ELSE 0.5 END as dense_score,
         CASE WHEN array_length(concept_ids, 1) > 0 THEN LEAST(1.0, array_length(concept_ids, 1)::float / 10.0) ELSE 0.5 END as lexical_score,
         CASE WHEN payload->>'ast_symbols' IS NOT NULL THEN 0.85 ELSE 0.5 END as ast_score,
@@ -95,37 +107,14 @@ async function main() {
         CASE WHEN metadata->>'access_count' IS NOT NULL THEN LEAST(1.0, (metadata->>'access_count')::float / 100.0) ELSE 0.5 END as telemetry_score
       FROM atlas_packets
       ORDER BY packet_id
-      LIMIT ${fetchLimit};
-    `;
+      LIMIT $1;
+      `,
+      [fetchLimit]
+    );
 
-    const fetchResult = execSQL(fetchSQL);
-    const lines = fetchResult.split('\n').filter((l) => l.trim());
-
-    const packets: any[] = [];
-    for (const line of lines) {
-      const parts = line.split('|').map((p) => p.trim());
-      if (parts.length >= 10 && parts[0] !== 'packet_id') {
-        packets.push({
-          packet_id: parts[0],
-          dense_score: parseFloat(parts[3]) || 0.5,
-          lexical_score: parseFloat(parts[4]) || 0.5,
-          ast_score: parseFloat(parts[5]) || 0.5,
-          graph_score: parseFloat(parts[6]) || 0.5,
-          pagerank_score: parseFloat(parts[7]) || 0.5,
-          ontology_score: parseFloat(parts[8]) || 0.5,
-          telemetry_score: parseFloat(parts[9]) || 0.5,
-        });
-      }
-    }
-
-    console.log(`  ✓ Fetched ${packets.length} packets`);
-    console.log('');
-
-    console.log('[3/5] Building feature envelopes...');
-    const envelopes: Array<{ packet_id: string; envelope: FeatureEnvelope }> = [];
-
-    for (const packet of packets) {
-      const envelope: FeatureEnvelope = {
+    const envelopes: Array<{ packet_id: string; envelope: FeatureEnvelope }> = fetchResult.rows.map((packet) => ({
+      packet_id: packet.packet_id,
+      envelope: {
         dense: normalizeScore(packet.dense_score),
         lexical: normalizeScore(packet.lexical_score),
         ast: normalizeScore(packet.ast_score),
@@ -135,14 +124,13 @@ async function main() {
         telemetry: normalizeScore(packet.telemetry_score),
         reranker: null,
         recommendation: null,
-      };
+      },
+    }));
 
-      envelopes.push({
-        packet_id: packet.packet_id,
-        envelope,
-      });
-    }
+    console.log(`  ✓ Fetched ${envelopes.length} packets`);
+    console.log('');
 
+    console.log('[3/5] Building feature envelopes...');
     console.log(`  ✓ Built ${envelopes.length} envelopes`);
     console.log('');
 
@@ -163,28 +151,37 @@ async function main() {
       for (let i = 0; i < envelopes.length; i += batchSize) {
         const batch = envelopes.slice(i, i + batchSize);
 
-        const updates = batch
-          .map(
-            (e) => `UPDATE atlas_packets SET feature_envelope = '${JSON.stringify(e.envelope).replace(/'/g, "''")}' WHERE packet_id = '${e.packet_id}';`
-          )
-          .join('\n');
+        await pool.query('BEGIN');
+        try {
+          for (const e of batch) {
+            await pool.query(
+              `UPDATE atlas_packets SET feature_envelope = $1::jsonb WHERE packet_id = $2;`,
+              [JSON.stringify(e.envelope), e.packet_id]
+            );
+          }
+          await pool.query('COMMIT');
+        } catch (batchErr) {
+          await pool.query('ROLLBACK');
+          throw batchErr;
+        }
 
-        execSQL(updates);
         console.log(`  ✓ Applied batch ${Math.floor(i / batchSize) + 1} (${Math.min(i + batchSize, envelopes.length)}/${envelopes.length})`);
       }
 
       console.log('');
       console.log('[5/5] Verifying feature envelopes...');
-      const verifySQL = `SELECT COUNT(*) total, COUNT(CASE WHEN feature_envelope IS NOT NULL THEN 1 END) with_envelope FROM atlas_packets;`;
-
-      const verifyResult = execSQL(verifySQL);
-      console.log(verifyResult);
+      const verifyResult = await pool.query(
+        `SELECT COUNT(*)::int AS total, COUNT(CASE WHEN feature_envelope IS NOT NULL THEN 1 END)::int AS with_envelope FROM atlas_packets;`
+      );
+      console.log(verifyResult.rows[0]);
       console.log('');
       console.log('✅ FEATURE ENVELOPE MATERIALIZATION COMPLETE');
     }
   } catch (err) {
     console.error('Fatal error:', err);
-    process.exit(1);
+    process.exitCode = 1;
+  } finally {
+    await pool.end();
   }
 }
 
