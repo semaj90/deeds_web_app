@@ -52,6 +52,11 @@ export const LaneStatusSchema = z.object({
 export type LaneStatus = z.infer<typeof LaneStatusSchema>;
 
 export const RetrieveEvidenceOutputSchema = z.object({
+  // Echoed back unchanged from the request so a caller (and this schema's
+  // own test/proof harness) can observe workspace-revision was preserved
+  // through the whole call, not just trust that internal code didn't
+  // mutate it.
+  workspaceRevision: z.string(),
   evidence: z.array(
     z.object({
       packetKey: z.string(),

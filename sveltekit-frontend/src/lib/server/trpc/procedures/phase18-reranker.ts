@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { publicProcedure } from '../router.js';
+import { publicProcedure } from '../init.js';
 import {
   phase18RequestEnvelopeSchema,
   phase18ResponseEnvelopeSchema,

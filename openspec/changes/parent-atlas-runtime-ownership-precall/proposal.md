@@ -107,10 +107,43 @@ done, per operator sign-off on the "Correct next TODO" list:
   diagnostic array is now actually returned (`parallelRetrieve` return
   type changed `SearchResult[]` → `{results, lanes}`; safe, zero external
   callers confirmed via `rg` before the change).
-- **Step 8 (canonical Zod schema) — DONE, schema only, not wired.**
-  `src/lib/server/parent-atlas/precall/query-plan-schema.ts` and
-  `retrieve-evidence-schema.ts` created per `design.md`'s sketches. No
-  caller wiring yet — that's still steps 9+.
+- **Step 8 (canonical Zod schema) — DONE.** `query-plan-schema.ts` and
+  `retrieve-evidence-schema.ts` created per `design.md`'s sketches.
+- **Step 9 (one real wired path) — DONE, proven live, 2026-08-02.**
+  `src/lib/server/parent-atlas/precall/retrieve-evidence-service.ts`
+  wires `RetrieveEvidenceInputSchema`/`OutputSchema`/`LaneStatusSchema`
+  to a real `parallelRetrieve()` call; `src/lib/server/trpc/routers/atlas.ts`
+  (`atlas.retrieveEvidence`) is the first real MCP/tRPC consumer, wired
+  into `router.ts`. All 8 proof gates verified via live authenticated
+  HTTP requests against the running dev server (session via
+  `/api/auth/demo-login`, a real Lucia session — not a bypass):
+
+  | Gate | Evidence |
+  |---|---|
+  | `INVALID_INPUT_REJECTED` | `GET .../atlas.retrieveEvidence?input={"query":"test"}` (missing `workspaceRevision`) → `400 BAD_REQUEST`, structured Zod issues, via tRPC's own `.input()` validation |
+  | `DEFAULT_LANES_APPLIED` | Request omitted `lanes` entirely; response's lane list matches the schema default (`exact/lexical/semantic/ast`) plus the always-attempted `turbovec` and the always-reported-but-unrequested `centroid`/`graph` (both correctly `lane_disabled`) |
+  | `WORKSPACE_REVISION_PRESERVED` | Request `workspaceRevision:"rev-test-1"` → response echoes `"workspaceRevision":"rev-test-1"` unchanged (schema gained an explicit output field for this — it wasn't observable before) |
+  | `CENTROID_NOT_CONFIGURED_REPORTED` | `{"lane":"centroid","status":"not_configured","reason":"lane_disabled"}` |
+  | `TURBOVEC_NOT_CONFIGURED_REPORTED` | `{"lane":"turbovec","status":"not_configured","reason":"turbovec_grpc_not_wired"}` |
+  | `FALLBACK_LANE_EXECUTED` | `lexical` lane returned 18 real candidates (live Postgres FTS against `codebase_chunk_index`) while `semantic`/`turbovec`/`centroid`/`graph` were `not_configured`; each of those carries `"fallbackUsed":true` |
+  | `OUTPUT_SCHEMA_VALIDATED` | Response double-validated — once inside the service (`RetrieveEvidenceOutputSchema.parse`), once by tRPC's own `.output()` on the procedure |
+  | `MCP_OR_TRPC_CONSUMER_READS_RESULT` | Real HTTP GET through `/api/trpc/atlas.retrieveEvidence`, real 200 response read by the test client |
+
+  **Bonus finding, fixed along the way**: proving this required a real
+  authenticated session, which surfaced that the *entire* tRPC mount was
+  broken — `phase18-reranker.ts:2` imported `publicProcedure` from
+  `'../router.js'` (which doesn't export it) instead of `'../init.js'`,
+  a circular import that crashed `appRouter`'s construction at module-load
+  time for every procedure, not just the new one. Same failure shape as
+  the mastra-agent `ReferenceError` fixed earlier this session. Fixed;
+  confirmed via `analytics.events.list` (unrelated, untouched procedure)
+  going from a 500 crash to a clean `401` after the fix.
+
+  **Also found live**: the `semantic` lane reports
+  `not_configured`/`embedding_unavailable` — `tryEmbedCanonical()`
+  couldn't reach an embedding backend on this dev instance. Correct
+  degrade behavior, not a bug — logged here as a real infra observation,
+  not investigated further (out of this change's scope).
 - **tRPC/LangGraph/Mastra/Deep-Agents package verification — DONE**, see
   the status table above; Deep Agents also confirmed absent from
   `package.json` (not previously checked explicitly).

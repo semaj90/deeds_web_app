@@ -6,6 +6,7 @@
  *   agent.runs.get / cancel / list
  *   analytics.events.list
  *   analytics.recommendation.feedback
+ *   atlas.retrieveEvidence
  *
  * Export AppRouter type for the client-side caller.
  */
@@ -15,6 +16,7 @@ import { workflowRouter } from './routers/workflow.js';
 import { agentRouter } from './routers/agent.js';
 import { searchRouter } from './routers/search.js';
 import { analyticsRouter } from './routers/analytics.js';
+import { atlasRouter } from './routers/atlas.js';
 import { phase18RerankerProcedure, phase18RerankerMutationProcedure } from './procedures/phase18-reranker.js';
 
 export const appRouter = router({
@@ -22,6 +24,7 @@ export const appRouter = router({
   agent: agentRouter,
   search: searchRouter,
   analytics: analyticsRouter,
+  atlas: atlasRouter,
   phase18Reranker: phase18RerankerProcedure,
   phase18RerankerMutation: phase18RerankerMutationProcedure,
 });
