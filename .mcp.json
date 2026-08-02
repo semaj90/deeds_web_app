@@ -12,8 +12,8 @@
       "url": "http://127.0.0.1:8788/mcp"
     },
     "atlas-tools": {
-      "command": "node",
-      "args": ["./sveltekit-frontend/src/mcp/server.ts"],
+      "command": "npx",
+      "args": ["tsx", "./sveltekit-frontend/src/mcp/server.ts"],
       "env": {
         "NODE_ENV": "production",
         "DATABASE_URL": "postgresql://legal_admin:legal@127.0.0.1:5434/legal_ai_db",
