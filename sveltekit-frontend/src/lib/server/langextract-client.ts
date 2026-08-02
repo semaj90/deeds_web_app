@@ -55,12 +55,14 @@ export interface LangExtractResponse {
  * Supports both native TS route + sidecar route
  */
 export interface NlpSidecarCapabilities {
-  spacy: boolean;
-  langextract: boolean;
-  tree_sitter: boolean;
-  ast_grep: boolean;
-  torch: boolean;
+  spacy?: boolean;
+  langextract?: boolean;
+  tree_sitter?: boolean;
+  ast_grep?: boolean;
+  torch?: boolean;
   gpu?: boolean;
+  /** Set on the native-TS short-circuit path, which reports no sidecar capabilities. */
+  native?: boolean;
 }
 
 export interface LangExtractHealthStatus {
@@ -69,7 +71,7 @@ export interface LangExtractHealthStatus {
   services: NlpSidecarCapabilities;
   version: string;
   latencyMs: number;
-  source?: 'env' | 'discovery' | 'fallback' | 'native-ts';
+  source?: 'env' | 'discovery' | 'fallback' | 'loopback' | 'native-ts';
   resolvedUrl?: string;
   runtime?: 'native-ts' | 'miniforge-nlp-sidecar';
 }
@@ -246,14 +248,25 @@ export async function langextractFetch(path: string, init?: RequestInit): Promis
     }
   }
 
-  // Python FastAPI fallback (now opt-in)
-  if (!ENV.LANGEXTRACT_ENABLED) return null;
-  const healthy = await checkHealth();
-  if (!healthy) return null;
+  const isWebExtraction = path === '/extract/web';
+
+  // Python FastAPI fallback (now opt-in, except for web extraction where the
+  // caller is explicitly requesting HTML parsing from the sidecar)
+  if (!isWebExtraction && !ENV.LANGEXTRACT_ENABLED) return null;
+
+  if (!isWebExtraction) {
+    const healthy = await checkHealth();
+    if (!healthy) return null;
+  }
   const baseUrl = await getBaseUrl();
 
   // Fetch from Miniforge sidecar and inject routing witness header
-  const response = await fetch(`${baseUrl}${path}`, init);
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}${path}`, init);
+  } catch {
+    return null;
+  }
 
   // Clone response to add routing witness header (responses are immutable)
   const clonedResponse = response.clone();

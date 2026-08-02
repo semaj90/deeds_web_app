@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langextract"
+version = "0.1.0"
+description = "Local LangExtract-compatible package shim for the NLP sidecar"
+requires-python = ">=3.13"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["langextract*"]

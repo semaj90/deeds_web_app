@@ -13,6 +13,7 @@
  *   atlas enrich karpathy [--dirty] [--limit N]  Run Karpathy GPU enrichment
  *   atlas cache hydrate [ace|topo|karpathy|all]  Hydrate Redis/Valkey ACE cache
  *   atlas mapreduce [ndjson|duckdb|all]          Run MapReduce pipelines
+ *   atlas library registry-scan [--json <path>]  Scan npm+pip package identities
  *
  * Flags:
  *   --json          Output JSON only (no human-readable log)
@@ -28,6 +29,7 @@ import { runIngest } from './pipelines/ingest.js';
 import { runKarpathyEnrich } from './pipelines/enrich-karpathy.js';
 import { runHydrateCache } from './pipelines/hydrate-cache.js';
 import { runMapReduce } from './pipelines/mapreduce.js';
+import { runLibraryRegistryScan } from './pipelines/library-registry-scan.js';
 import type { GateReport } from './gates/types.js';
 
 const args = process.argv.slice(2);
@@ -50,6 +52,7 @@ Usage:
   atlas enrich karpathy [--dirty] [--limit <n>]
   atlas cache hydrate [ace|topo|karpathy|all]
   atlas mapreduce [ndjson|duckdb|all]
+  atlas library registry-scan [--json <path>]
 
 Flags:
   --json       Structured JSON output only
@@ -200,6 +203,21 @@ async function main(): Promise<void> {
     const job: MRJob = (validJobs.includes(rawJob as MRJob) ? rawJob : 'all') as MRJob;
     console.log(`[atlas mapreduce] Running… (job=${job})`);
     const result = runMapReduce({ job, dryRun, args: rest });
+    if (result.stdout) process.stdout.write(result.stdout);
+    if (result.stderr) process.stderr.write(result.stderr);
+    process.exit(result.exitCode);
+  }
+
+  // ── library ────────────────────────────────────────────────────────────────
+  if (cmd === 'library') {
+    if (sub !== 'registry-scan') {
+      console.error(`Unknown library command: ${sub}. Options: registry-scan`);
+      process.exit(1);
+    }
+    const jsonIdx = rest.indexOf('--json');
+    const jsonOutPath = jsonIdx >= 0 ? rest[jsonIdx + 1] : undefined;
+    console.log('[atlas library registry-scan] Running…');
+    const result = runLibraryRegistryScan({ jsonOutPath, dryRun });
     if (result.stdout) process.stdout.write(result.stdout);
     if (result.stderr) process.stderr.write(result.stderr);
     process.exit(result.exitCode);

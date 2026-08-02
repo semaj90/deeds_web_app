@@ -56,6 +56,7 @@ import { json }           from '@sveltejs/kit';
 import { z }              from 'zod';
 import { createHash }     from 'node:crypto';
 import { ENV }            from '$lib/server/env.server.js';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import type { RequestHandler } from './$types';
 
 // ── Request schema ─────────────────────────────────────────────────────────────
@@ -101,25 +102,13 @@ function deriveDirectoryPath(sourceRef: string): string {
   return sourceRef;
 }
 
-/** Embed text via Ollama with EmbeddingGemma → nomic-embed-text fallback. */
+/** Embed text via the canonical app embedding lane (EmbeddingGemma first). */
 async function embedText(text: string): Promise<number[] | null> {
-  const _raw = (process.env.OLLAMA_HOST ?? '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
-  const ollamaBase = _raw.startsWith('http') ? _raw : `http://${_raw.includes(':') ? _raw : `${_raw}:11434`}`;
-
-  for (const model of ['embeddinggemma:latest', 'nomic-embed-text:latest']) {
-    try {
-      const res = await fetch(`${ollamaBase}/api/embeddings`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ model, prompt: text.slice(0, 2048) }),
-        signal:  AbortSignal.timeout(20_000),
-      });
-      if (!res.ok) continue;
-      const d = await res.json() as { embedding?: number[] };
-      if (Array.isArray(d.embedding) && d.embedding.length === 768) return d.embedding;
-    } catch { /* try next model */ }
-  }
-  return null;
+  const embedded = await tryEmbedCanonical(text.slice(0, 2048), {
+    model: 'embeddinggemma:latest',
+    timeoutMs: 20_000,
+  }).catch(() => null);
+  return embedded?.embedding ?? null;
 }
 
 // ── Postgres writer ────────────────────────────────────────────────────────────

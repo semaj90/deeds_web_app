@@ -43,7 +43,7 @@ export async function autoTagDocument(opts: {
 
 		for (const label of uniqueLabels) {
 			try {
-				const res = await fetch('http://localhost:5173/api/embed', {
+				const res = await fetch(`${ENV.SELF_URL}/api/embed`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ text: label, model: 'embeddinggemma' })

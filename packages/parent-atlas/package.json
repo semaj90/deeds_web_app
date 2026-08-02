@@ -24,6 +24,7 @@
     "enrich:karpathy": "node --experimental-vm-modules dist/cli.js enrich karpathy",
     "cache:hydrate": "node --experimental-vm-modules dist/cli.js cache hydrate",
     "mapreduce": "node --experimental-vm-modules dist/cli.js mapreduce",
+    "library:registry-scan": "node --experimental-vm-modules dist/cli.js library registry-scan",
     "verify:boundaries": "node ../../scripts/atlas/verify-atlas-package-boundaries.mjs"
   },
   "dependencies": {

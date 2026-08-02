@@ -43,7 +43,7 @@ const searchCodebase: Gemma4Tool = {
 
     try {
       // Embed the query then hit Qdrant (via local /api/embed for caching)
-      const embedResp = await fetch(`http://localhost:5173/api/embed`, {
+      const embedResp = await fetch(`${ENV.SELF_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: query, model: 'embeddinggemma' }),
@@ -153,7 +153,7 @@ const lookupResearchSummary: Gemma4Tool = {
 
     try {
       const resp = await fetch(
-        `${ENV.PUBLIC_API_URL}/api/analytics/research-graph`,
+        `${ENV.SELF_URL}/api/analytics/research-graph`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -186,7 +186,7 @@ const getSystemHealth: Gemma4Tool = {
   },
   execute: async (_args) => {
     try {
-      const resp = await fetch(`${ENV.PUBLIC_API_URL}/api/infrastructure/status`, {
+      const resp = await fetch(`${ENV.SELF_URL}/api/infrastructure/status`, {
         signal: AbortSignal.timeout(8_000),
       });
       if (!resp.ok) throw new Error(`Health HTTP ${resp.status}`);
@@ -229,7 +229,7 @@ const webSearch: Gemma4Tool = {
 
     // Try live web search via the internal proxy
     try {
-      const resp = await fetch(`${ENV.PUBLIC_API_URL}/api/research/web-search`, {
+      const resp = await fetch(`${ENV.SELF_URL}/api/research/web-search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-dev-bypass-auth': 'true' },
         body: JSON.stringify({ query, limit: topK }),
@@ -248,7 +248,7 @@ const webSearch: Gemma4Tool = {
 
     // Fallback: semantic search in the web_research Qdrant collection
     try {
-      const embedResp = await fetch(`http://localhost:5173/api/embed`, {
+      const embedResp = await fetch(`${ENV.SELF_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: query, model: 'embeddinggemma' }),

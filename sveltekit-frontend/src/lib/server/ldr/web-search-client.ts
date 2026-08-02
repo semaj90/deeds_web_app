@@ -5,6 +5,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { extractWebDocument } from '$lib/server/web/web-crawl.js';
 
 export interface WebSearchResult {
   url: string;
@@ -77,6 +78,19 @@ export async function searchViaSearXNG(query: string, limit: number = 10): Promi
  * Falls back to simple text extraction if Firecrawl unavailable
  */
 export async function fetchAndExtractText(url: string): Promise<ExtractedDocument | null> {
+  try {
+    const doc = await extractWebDocument(url);
+    return {
+      url: doc.url,
+      title: doc.title || 'Untitled',
+      content: doc.text,
+      extractedAt: new Date(doc.extractedAt),
+      wordCount: doc.contentLength > 0 ? doc.text.split(/\s+/).filter(Boolean).length : 0,
+    };
+  } catch (err) {
+    console.warn(`Shared crawl extraction failed for ${url}:`, err instanceof Error ? err.message : String(err));
+  }
+
   // Try Firecrawl first (if available)
   if (FIRECRAWL_API_KEY) {
     try {

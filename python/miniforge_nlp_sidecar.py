@@ -18,10 +18,16 @@ cleanly when optional packages are missing.
 from __future__ import annotations
 
 import hashlib
+import importlib
+from importlib import metadata as importlib_metadata
 import os
 import re
+import sys
 import time
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Literal, Optional
 
 from fastapi import FastAPI, Request
@@ -39,6 +45,29 @@ try:
 except Exception:
     langextract = None  # type: ignore
     LANGEXTRACT_AVAILABLE = False
+
+try:
+    from bs4 import BeautifulSoup  # type: ignore
+    BEAUTIFULSOUP_AVAILABLE = True
+except Exception:
+    BeautifulSoup = None  # type: ignore
+    BEAUTIFULSOUP_AVAILABLE = False
+
+try:
+    TREESITTER_CHUNKER_MODULE_NAME = None
+    TREESITTER_CHUNKER_MODULE = None
+    for candidate in ("treesitter_chunker", "tree_sitter_chunker", "chunker"):
+        try:
+            TREESITTER_CHUNKER_MODULE = importlib.import_module(candidate)
+            TREESITTER_CHUNKER_MODULE_NAME = candidate
+            break
+        except Exception:
+            continue
+    TREESITTER_CHUNKER_AVAILABLE = TREESITTER_CHUNKER_MODULE is not None
+except Exception:
+    TREESITTER_CHUNKER_MODULE_NAME = None
+    TREESITTER_CHUNKER_MODULE = None  # type: ignore[assignment]
+    TREESITTER_CHUNKER_AVAILABLE = False
 
 try:
     import spacy  # type: ignore
@@ -185,8 +214,135 @@ def _capabilities() -> dict[str, bool]:
         "spacy": SPACY_AVAILABLE,
         "langextract": LANGEXTRACT_AVAILABLE,
         "tree_sitter": TREE_SITTER_AVAILABLE,
+        "treesitter_chunker": TREESITTER_CHUNKER_AVAILABLE,
         "ast_grep": AST_GREP_AVAILABLE,
         "torch": TORCH_AVAILABLE,
+    }
+
+
+def _package_version(*distribution_names: str) -> Optional[str]:
+    for dist_name in distribution_names:
+        try:
+            return importlib_metadata.version(dist_name)
+        except importlib_metadata.PackageNotFoundError:
+            continue
+        except Exception:
+            continue
+    return None
+
+
+def _module_path(module: Any) -> Optional[str]:
+    path = getattr(module, "__file__", None)
+    if not path:
+        return None
+    try:
+        return str(Path(path).resolve())
+    except Exception:
+        return str(path)
+
+
+def _editable_source(dist_name: str) -> Optional[str]:
+    try:
+        dist = importlib_metadata.distribution(dist_name)
+        raw = dist.read_text("direct_url.json")
+        return raw.strip() if raw else None
+    except Exception:
+        return None
+
+
+def _extract_html_text(html: str) -> dict[str, Any]:
+    if BEAUTIFULSOUP_AVAILABLE and BeautifulSoup is not None:
+        soup = BeautifulSoup(html, "html.parser")
+        for tag_name in ("script", "style", "noscript", "svg"):
+            for node in soup.find_all(tag_name):
+                node.decompose()
+
+        title = ""
+        if soup.title and soup.title.string:
+            title = soup.title.get_text(" ", strip=True)
+
+        text = soup.get_text(" ", strip=True)
+        return {
+            "title": title,
+            "text": text,
+            "content_length": len(text),
+            "source": "beautifulsoup",
+        }
+
+    title_match = re.search(r"<title[^>]*>(.*?)</title>", html, flags=re.IGNORECASE | re.DOTALL)
+    title = title_match.group(1).strip() if title_match else ""
+    text = re.sub(r"<script[^>]*>[\s\S]*?</script>", " ", html, flags=re.IGNORECASE)
+    text = re.sub(r"<style[^>]*>[\s\S]*?</style>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return {
+        "title": title,
+        "text": text,
+        "content_length": len(text),
+        "source": "regex",
+    }
+
+
+def _fetch_html(url: str) -> str:
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "DeedsAI/1.0 (legal research)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        charset = response.headers.get_content_charset() or "utf-8"
+        return response.read().decode(charset, errors="ignore")
+
+
+def _runtime_info() -> dict[str, Any]:
+    return {
+        "pythonExecutable": sys.executable,
+        "pythonVersion": sys.version.split()[0],
+        "environmentType": "system-python" if Path(sys.executable).name.lower().startswith("python") else "unknown",
+    }
+
+
+def _module_proof() -> dict[str, Any]:
+    langextract_module_path = _module_path(langextract) if LANGEXTRACT_AVAILABLE else None
+    langextract_version = _package_version("langextract")
+    tree_sitter_pack_version = _package_version("tree-sitter-language-pack", "tree_sitter_language_pack")
+    ast_grep_version = _package_version("ast-grep-py", "ast_grep_py")
+    treesitter_chunker_version = _package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker")
+
+    return {
+        "langextract": {
+            "available": LANGEXTRACT_AVAILABLE,
+            "version": langextract_version,
+            "modulePath": langextract_module_path,
+            "importVerified": LANGEXTRACT_AVAILABLE and bool(langextract_module_path),
+            "editableSource": _editable_source("langextract"),
+            "beautifulsoup4": {
+                "available": BEAUTIFULSOUP_AVAILABLE,
+                "version": _package_version("beautifulsoup4"),
+                "modulePath": _module_path(BeautifulSoup) if BEAUTIFULSOUP_AVAILABLE else None,
+                "importVerified": BEAUTIFULSOUP_AVAILABLE,
+            },
+        },
+        "treesitterChunker": {
+            "available": TREESITTER_CHUNKER_AVAILABLE,
+            "version": treesitter_chunker_version,
+            "modulePath": _module_path(TREESITTER_CHUNKER_MODULE) if TREESITTER_CHUNKER_AVAILABLE else None,
+            "moduleName": TREESITTER_CHUNKER_MODULE_NAME,
+            "importVerified": TREESITTER_CHUNKER_AVAILABLE,
+            "fixtureVerified": False,
+        },
+        "treeSitterLanguagePack": {
+            "available": TREE_SITTER_AVAILABLE,
+            "version": tree_sitter_pack_version,
+            "importVerified": TREE_SITTER_AVAILABLE,
+        },
+        "astGrepPy": {
+            "available": AST_GREP_AVAILABLE,
+            "version": ast_grep_version,
+            "importVerified": AST_GREP_AVAILABLE,
+        },
     }
 
 
@@ -640,7 +796,9 @@ def health() -> dict[str, Any]:
     return {
         "status": "ok",
         "model": os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
+        "runtime": _runtime_info(),
         "capabilities": _capabilities(),
+        "imports": _module_proof(),
         "timestamp": int(time.time() * 1000),
     }
 
@@ -660,6 +818,29 @@ def extract_file() -> dict[str, Any]:
     return {
         "status": "unsupported",
         "message": "file extraction is not implemented in the miniforge sidecar",
+    }
+
+
+@app.post("/extract/web")
+def extract_web(req: dict[str, Any]) -> dict[str, Any]:
+    url = str(req.get("url") or "").strip()
+    if not url:
+        raise HTTPException(400, "url is required")
+
+    try:
+        html = _fetch_html(url)
+    except urllib.error.HTTPError as exc:
+        raise HTTPException(exc.code, f"Failed to fetch URL: {exc.reason}") from exc
+    except urllib.error.URLError as exc:
+        raise HTTPException(502, f"Failed to fetch URL: {exc.reason}") from exc
+
+    parsed = _extract_html_text(html)
+    return {
+        "url": url,
+        "title": parsed["title"],
+        "text": parsed["text"],
+        "content_length": parsed["content_length"],
+        "source": parsed["source"],
     }
 
 

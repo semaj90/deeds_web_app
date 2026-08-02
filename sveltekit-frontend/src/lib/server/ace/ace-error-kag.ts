@@ -129,7 +129,7 @@ async function callGemma4ForErrorSummary(
 
 async function embedText(text: string): Promise<number[] | null> {
   try {
-    const resp = await fetch(`http://localhost:5173/api/embed`, {
+    const resp = await fetch(`${ENV.SELF_URL}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, model: 'embeddinggemma' }),

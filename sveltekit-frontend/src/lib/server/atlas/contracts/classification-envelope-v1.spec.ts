@@ -8,7 +8,7 @@ import {
 } from './classification-envelope-v1.js';
 
 describe('Classification envelope alignment', () => {
-  it('keeps packet, feature row, validation, and ledger identity aligned', () => {
+  it('keeps packet, feature row, validation, and ledger identity aligned for structural tree nodes', () => {
     const now = '2026-07-28T00:00:00.000Z';
 
     const packet = CanonicalAcePacketEnvelopeSchema.parse({
@@ -66,7 +66,7 @@ describe('Classification envelope alignment', () => {
         function_symbol: 'validateSession',
         feature_id: packet.feature_id ?? 'auth.sessions',
         title_id: packet.title_id ?? 'title:auth',
-        tree_node_id: packet.tree_node_id ?? 'tree:src/lib/server/auth.ts:validateSession',
+        tree_node_id: packet.tree_node_id ?? 'tree:structural:src/lib/server/auth.ts:validateSession',
       },
       dense_768: null,
       dense_384: null,

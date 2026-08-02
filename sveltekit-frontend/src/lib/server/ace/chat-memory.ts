@@ -298,7 +298,7 @@ export async function recordChatMessageForRecall(msg: {
   const qdrantId = typeof msg.id === 'number' ? msg.id : hashToQdrantId(String(msg.id));
 
   try {
-    const res = await fetch(`http://localhost:5173/api/embed`, {
+    const res = await fetch(`${ENV.SELF_URL}/api/embed`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: truncated, model: 'embeddinggemma' }),

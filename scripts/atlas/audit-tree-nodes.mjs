@@ -14,8 +14,15 @@
  */
 
 import pg from 'pg';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const { Pool } = pg;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: `${__dirname}/../../.env` });
 
 const args = process.argv.slice(2);
 const verbose = args.includes('--verbose');
@@ -57,26 +64,32 @@ async function auditTreeNodes(pool) {
 
     // Check 4: Orphan detection & max depth
     const orphanRes = await pool.query(`
-      SELECT COUNT(*) as orphan_count
+      SELECT 1
       FROM atlas_tree_nodes t
       WHERE t.parent_id IS NOT NULL
-      AND t.parent_id NOT IN (SELECT node_id FROM atlas_tree_nodes)
+        AND NOT EXISTS (
+          SELECT 1
+          FROM atlas_tree_nodes p
+          WHERE p.node_id = t.parent_id
+        )
+      LIMIT 1
     `);
-    const orphanCount = parseInt(orphanRes.rows[0].orphan_count);
+    const orphanCount = orphanRes.rows.length > 0 ? 1 : 0;
     checks.no_orphans = { pass: orphanCount === 0, count: orphanCount };
     console.log(`${orphanCount === 0 ? '✅' : '❌'} Orphan detection: ${orphanCount} orphans` + (orphanCount > 0 ? ' (FAIL)' : ''));
 
     // Check 5: Max depth
     const depthRes = await pool.query(`
       WITH RECURSIVE depth_calc AS (
-        SELECT node_id, parent_id, 1 as depth
+        SELECT node_id, parent_id, 1 as depth, ARRAY[node_id] AS path
         FROM atlas_tree_nodes
         WHERE parent_id IS NULL
         UNION ALL
-        SELECT t.node_id, t.parent_id, d.depth + 1
+        SELECT t.node_id, t.parent_id, d.depth + 1, d.path || t.node_id
         FROM atlas_tree_nodes t
         JOIN depth_calc d ON t.parent_id = d.node_id
         WHERE d.depth < 100
+          AND NOT t.node_id = ANY(d.path)
       )
       SELECT MAX(depth) as max_depth FROM depth_calc
     `);
@@ -122,7 +135,12 @@ async function auditTreeNodes(pool) {
 }
 
 async function main() {
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 1 });
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is required for audit-tree-nodes.mjs');
+  }
+
+  const pool = new Pool({ connectionString: databaseUrl, max: 1 });
 
   console.log('[phase-d-audit] Phase D: Tree Node Audit Gate\n');
 

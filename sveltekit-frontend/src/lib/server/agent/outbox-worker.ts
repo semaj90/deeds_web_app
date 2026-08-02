@@ -17,6 +17,7 @@ import { db } from '$lib/server/db/client.js';
 import { outboxEvents } from '$lib/server/db/schema-postgres.js';
 import { getRedis } from '$lib/server/redis.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import { publishAcquisitionRequested, ACQUISITION_STREAM } from '$lib/server/atlas/acquisition/acquisition-stream.js';
 import { and, isNull, lte, sql } from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------
@@ -115,11 +116,24 @@ async function handleQdrantUpsert(row: OutboxRow): Promise<void> {
     });
 }
 
+/**
+ * Publishes atlas.acquisition.requested.v1 events to the Valkey acquisition
+ * stream (see acquisition-stream.ts). Returns the stream entry ID so
+ * processRow can persist it — this handler must not be marked "handled" via
+ * the optimistic published_at UPDATE alone; on XADD failure it throws,
+ * which triggers unpublish() below, keeping the row recoverable per the
+ * "do not mark published until stream publication succeeds" rule.
+ */
+async function handleAcquisitionStreamPublish(row: OutboxRow): Promise<{ streamEntryId: string }> {
+    const streamEntryId = await publishAcquisitionRequested(row.payload);
+    return { streamEntryId };
+}
+
 // ---------------------------------------------------------------------------
 // Handler registry — maps event_type prefix → handlers
 // ---------------------------------------------------------------------------
 
-type Handler = (row: OutboxRow) => Promise<void>;
+type Handler = (row: OutboxRow) => Promise<void | { streamEntryId: string }>;
 
 const HANDLERS: Record<string, Handler[]> = {
     'assign.centroid.proposed':   [handleCentroidCache],
@@ -127,6 +141,7 @@ const HANDLERS: Record<string, Handler[]> = {
     'build.ace.proposed':         [handleAceCache],
     'build.ace.succeeded':        [handleAceCache],
     'encode.embedding.succeeded': [handleQdrantUpsert],
+    'atlas.acquisition.requested.v1': [handleAcquisitionStreamPublish],
     // Terminal states invalidate stale Redis entries
     'action.failed':              [],
     'action.denied':              [],
@@ -195,10 +210,12 @@ async function claimBatch(batchSize = 10): Promise<OutboxRow[]> {
  * If all handlers for a row fail, un-publish it so it can be retried.
  * This is a best-effort rollback — not transactional with the fanout itself.
  */
-async function unpublish(outboxId: string): Promise<void> {
+async function unpublish(outboxId: string, lastError?: string): Promise<void> {
     await db.execute(sql`
         UPDATE outbox_events
-        SET    published_at = NULL
+        SET    published_at = NULL,
+               publish_attempts = publish_attempts + 1,
+               last_publish_error = ${lastError ?? null}
         WHERE  outbox_id = ${outboxId}
     `);
 }
@@ -211,12 +228,14 @@ async function processRow(row: OutboxRow): Promise<FanoutResult> {
     const handlers    = resolveHandlers(row.eventType);
     const handlersRun: string[] = [];
     const errors: { handler: string; message: string }[] = [];
+    let streamEntryId: string | null = null;
 
     for (const handler of handlers) {
         const name = handler.name;
         try {
-            await handler(row);
+            const result = await handler(row);
             handlersRun.push(name);
+            if (result && 'streamEntryId' in result) streamEntryId = result.streamEntryId;
         } catch (err) {
             errors.push({
                 handler: name,
@@ -228,8 +247,21 @@ async function processRow(row: OutboxRow): Promise<FanoutResult> {
     // If every handler that ran failed and at least one was expected,
     // un-publish so the row is retried on the next poll.
     if (errors.length > 0 && handlersRun.length === 0 && handlers.length > 0) {
-        await unpublish(row.outboxId).catch(() => {});
+        await unpublish(row.outboxId, errors[0]?.message).catch(() => {});
         return { outboxId: row.outboxId, eventType: row.eventType, handlersRun, errors, publishedAt: null };
+    }
+
+    // Persist stream-publish metadata for handlers that reported it
+    // (e.g. handleAcquisitionStreamPublish) — published_at was already set
+    // by claimBatch's UPDATE, this only adds the delivery-tracking fields.
+    if (streamEntryId) {
+        await db.execute(sql`
+            UPDATE outbox_events
+            SET    stream_name = ${ACQUISITION_STREAM},
+                   stream_entry_id = ${streamEntryId},
+                   publish_attempts = publish_attempts + 1
+            WHERE  outbox_id = ${row.outboxId}
+        `).catch(() => {});
     }
 
     // published_at was already set by claimBatch UPDATE — nothing more to write.

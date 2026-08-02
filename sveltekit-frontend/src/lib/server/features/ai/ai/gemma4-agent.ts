@@ -2109,7 +2109,7 @@ export async function runGemma4Agent(
   if (isCodingPipeline && (options?.metadata?.use_mcp_selector !== false)) {
     try {
       const selRes = await fetch(
-        `${typeof process !== 'undefined' ? 'http://localhost:5173' : ''}/api/mcp/select-tools`,
+        `${typeof process !== 'undefined' ? ENV.SELF_URL : ''}/api/mcp/select-tools`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

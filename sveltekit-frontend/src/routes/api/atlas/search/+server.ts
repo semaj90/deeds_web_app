@@ -46,6 +46,7 @@ import { z }       from 'zod';
 import { createHash } from 'node:crypto';
 import pg from 'pg';
 import { ENV }     from '$lib/server/env.server.js';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { turbovecGrpcSearch } from '$lib/server/grpc/turbovec-cuda-client.js';
 import { batchCosineSimilarity, isCudaAvailable } from '$lib/server/gpu/libtorch-bridge.js';
 import {
@@ -215,23 +216,11 @@ function rrfScore(ranks: number[]): number {
 // ── Stage 0: Embed query ───────────────────────────────────────────────────────
 
 async function embedQuery(query: string): Promise<number[] | null> {
-  const _raw = (process.env.OLLAMA_HOST ?? '127.0.0.1:11434').replace(/^0\.0\.0\.0/, '127.0.0.1');
-  const ollamaBase = _raw.startsWith('http') ? _raw : `http://${_raw.includes(':') ? _raw : `${_raw}:11434`}`;
-
-  for (const model of ['embeddinggemma:latest', 'nomic-embed-text:latest']) {
-    try {
-      const res = await fetch(`${ollamaBase}/api/embeddings`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ model, prompt: query.slice(0, 1024) }),
-        signal:  AbortSignal.timeout(20_000),
-      });
-      if (!res.ok) continue;
-      const d = await res.json() as { embedding?: number[] };
-      if (Array.isArray(d.embedding) && d.embedding.length === 768) return d.embedding;
-    } catch { /* try next */ }
-  }
-  return null;
+  const embedded = await tryEmbedCanonical(query.slice(0, 1024), {
+    model: 'embeddinggemma:latest',
+    timeoutMs: 20_000,
+  }).catch(() => null);
+  return embedded?.embedding ?? null;
 }
 
 // ── Stage 1: Qdrant ANN with optional pre-filter ───────────────────────────────

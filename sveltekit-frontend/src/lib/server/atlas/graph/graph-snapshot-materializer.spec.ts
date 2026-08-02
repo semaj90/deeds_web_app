@@ -179,6 +179,8 @@ describe('graph snapshot materializer', () => {
     expect(left.graphSnapshotNodes.every((node) => node.snapshotId === snapshotId)).toBe(true);
     expect(left.graphSnapshotEdges.every((edge) => edge.snapshotId === snapshotId)).toBe(true);
     expect(left.graphSnapshotExclusions.every((exclusion) => exclusion.snapshotId === snapshotId)).toBe(true);
+    expect(left.graphSnapshotNodes.filter((node) => node.nodeType === 'packet').every((node) => node.treeNodeId === null)).toBe(true);
+    expect(left.graphSnapshotEdges.map((edge) => edge.edgeType)).toEqual(expect.arrayContaining(['CONTAINS', 'DERIVED_FROM']));
 
     expect(left.graphSnapshotManifest).toMatchObject({
       snapshotId,
@@ -204,6 +206,16 @@ describe('graph snapshot materializer', () => {
       unresolvedEndpointCount: 2,
       duplicateRelationCount: 0,
       selfLoopCount: 0
+    });
+    expect(
+      left.graphSnapshotEdges.find((edge) => edge.edgeType === 'DERIVED_FROM')
+    ).toMatchObject({
+      sourceNodeKey: 'packet:packet:alpha',
+      targetNodeKey: 'tree:22222222-2222-4222-8222-222222222222',
+      properties: {
+        packetKey: 'packet:alpha',
+        derivedFromTreeNodeId: '22222222-2222-4222-8222-222222222222'
+      }
     });
 
     expect(left.graphSnapshotExclusions.map((item) => item.exclusionReason)).toEqual(

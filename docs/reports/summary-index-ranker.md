@@ -1,6 +1,6 @@
 # Summary Index Ranker
 
-Generated: 2026-08-02T05:17:17.070Z
+Generated: 2026-08-02T19:16:18.326Z
 Mode: apply
 Source of truth: postgres.atlas_summary_layers + atlas_packets
 
@@ -8,8 +8,8 @@ Source of truth: postgres.atlas_summary_layers + atlas_packets
 
 - Total ranked: 5000
 - READY: 0
-- NEAR_READY: 2158
-- PARTIAL: 2733
+- NEAR_READY: 2156
+- PARTIAL: 2735
 - BLOCKED: 109
 - Average score: 55.48
 

@@ -17,6 +17,7 @@ export const atlasAstNodes = pgTable('atlas_ast_nodes', {
   treeNodeId:           text('tree_node_id').primaryKey(),               // sha256 hex 64 chars
   structuralKey:        text('structural_key').notNull().unique(),        // human-readable identity string
   repoId:               text('repo_id').notNull().default('deeds-web-app'),
+  workspaceId:          text('workspace_id'),                             // added 2026-08-02: distinct from repoId (multi-repo/workspace scoping)
   relativePath:         text('relative_path').notNull(),
   nodeKind:             text('node_kind').notNull(),                      // file|class|function|method|...
   qualifiedSymbol:      text('qualified_symbol').notNull().default(''),
@@ -38,9 +39,17 @@ export const atlasAstNodes = pgTable('atlas_ast_nodes', {
   normalizedNodeHash:   text('normalized_node_hash').notNull(),           // sha256 of normalized AST subtree JSON
   sourceContentHash:    text('source_content_hash').notNull(),            // sha256 of raw span bytes
 
+  // added 2026-08-02: without this, cross-revision symbol_id stability (does
+  // symbol_id stay the same across a body-only edit on a NEW revision?)
+  // cannot be tested — normalized_node_hash conflates content-identity with
+  // revision-identity. Nullable: existing 11,067 rows have no value until
+  // re-analyzed; NOT part of the tree_node_id identity hash itself.
+  sourceRevision:       text('source_revision'),
+
   // parser
   parserName:           text('parser_name').notNull().default('tree-sitter'),
   parserVersion:        text('parser_version'),
+  grammarVersion:       text('grammar_version'),                         // added 2026-08-02
 
   // supersession
   supersededBy:         text('superseded_by'),                           // FK → self (deferred in DB)

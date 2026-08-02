@@ -85,6 +85,8 @@ const mcp = spawn(tsRunner.command, [
     ...process.env,
     NODE_ENV: process.env.NODE_ENV || 'development',
     DOTENV_LOAD_MODE: process.env.DOTENV_LOAD_MODE || 'development',
+    OTEL_ENABLED: process.env.OTEL_ENABLED || 'true',
+    OTEL_SERVICE_NAME: process.env.OTEL_SERVICE_NAME || 'trace-mcp-server',
     TRACE_MCP_HOST: traceEnv.TRACE_MCP_HOST,
     TRACE_MCP_PORT: String(traceEnv.TRACE_MCP_PORT),
     TRACE_MCP_URL: traceEnv.TRACE_MCP_URL,

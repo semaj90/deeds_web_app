@@ -8,12 +8,16 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { getRecentDecisions, getAuditStats } from '$lib/server/dispatcher/dispatcher-audit-service.js';
+import { requireAdmin } from '$lib/server/auth-utils.js';
 
 /**
  * GET /api/dispatcher/audit
  * Query audit log entries
  */
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async (event) => {
+  requireAdmin(event);
+  const { url } = event;
+
   try {
     // Parse query parameters
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '100', 10), 1000);

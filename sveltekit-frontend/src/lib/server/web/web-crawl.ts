@@ -1,5 +1,4 @@
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { tryEmbedCanonical } from '$lib/server/embedding/canonical-embed.js';
 import { langextractFetch } from '$lib/server/langextract-client.js';
 import { validateExternalUrl } from '$lib/server/security/url-validator.js';
 
@@ -10,7 +9,7 @@ export interface CrawlResult {
   html?: string;
   extractedAt: string;
   contentLength: number;
-  source: 'langextract' | 'fallback';
+  source: 'langextract' | 'beautifulsoup' | 'fallback';
 }
 
 export async function crawlViaLangextract(url: string): Promise<CrawlResult> {
@@ -33,6 +32,29 @@ export async function crawlViaLangextract(url: string): Promise<CrawlResult> {
     extractedAt: new Date().toISOString(),
     contentLength: (data.text ?? data.content ?? '').length,
     source: 'langextract',
+  };
+}
+
+export async function crawlViaBeautifulSoup(url: string): Promise<CrawlResult> {
+  const res = await langextractFetch('/extract/web', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+    signal: AbortSignal.timeout(15_000),
+  });
+
+  if (!res?.ok) {
+    throw new Error(`beautifulsoup ${res?.status ?? 'unavailable'}`);
+  }
+
+  const data = await res.json();
+  return {
+    url,
+    title: data.title ?? '',
+    text: data.text ?? '',
+    extractedAt: new Date().toISOString(),
+    contentLength: (data.text ?? '').length,
+    source: 'beautifulsoup',
   };
 }
 
@@ -76,7 +98,11 @@ export async function extractWebDocument(url: string): Promise<CrawlResult> {
   try {
     return await crawlViaLangextract(url);
   } catch {
-    return crawlFallback(url);
+    try {
+      return await crawlViaBeautifulSoup(url);
+    } catch {
+      return crawlFallback(url);
+    }
   }
 }
 
@@ -84,18 +110,11 @@ export async function maybeGenerateWebEmbedding(text: string): Promise<number[] 
   if (!text.length) return null;
 
   try {
-    const embedRes = await ollamaFetch(`${ENV.OLLAMA_BASE_URL}/api/embeddings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'embeddinggemma:latest',
-        prompt: text.slice(0, 4000),
-      }),
-      signal: AbortSignal.timeout(10_000),
+    const embedded = await tryEmbedCanonical(text.slice(0, 4000), {
+      model: 'embeddinggemma:latest',
+      timeoutMs: 10_000,
     });
-    if (!embedRes.ok) return null;
-    const data = await embedRes.json();
-    return data.embedding ?? null;
+    return embedded?.embedding ?? null;
   } catch {
     return null;
   }

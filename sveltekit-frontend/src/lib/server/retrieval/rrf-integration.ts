@@ -14,6 +14,21 @@ import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName } from './rrf-combiner.js';
 import type { DispatcherOrchestrationResult } from '../dispatcher/dispatcher-orchestrator.js';
 import { RRF_DEFAULT_WEIGHTS } from './rrf-contract.js';
+import { fetchAuthorityScores } from '../search/neo4j-rerank.js';
+
+/**
+ * TODO: no prior implementation of this function was found anywhere in the
+ * repo (grepped repo-wide) — this is a minimal pass-through, not a restored
+ * original. It exists so the file type-checks; verify the intended
+ * normalization behavior (field stripping? id collision handling?) before
+ * relying on its output for ranking-affecting logic.
+ */
+function normalizeQdrantMetadata(
+  record: Record<string, unknown>,
+  id: string
+): Record<string, unknown> {
+  return { ...record, id };
+}
 
 function truncateEmbeddingForCollection(
   embedding: number[],
@@ -653,7 +668,7 @@ export async function multiLaneRetrievalWithRRF(
     // Extract candidate query packet for topology signal computation
     let queryPacket: Partial<Record<string, unknown>> | null = null;
     if (bm25Results.status === 'fulfilled' && bm25Results.value.length > 0) {
-      const firstBm25 = bm25Results.value[0] as Record<string, unknown> | undefined;
+      const firstBm25 = bm25Results.value[0];
       queryPacket = extractCanonicalPacketFromMetadata({
         packet_key: firstBm25?.stable_key,
         source_ref: firstBm25?.file_path,
@@ -739,7 +754,7 @@ export async function multiLaneRetrievalWithRRF(
               const candidatePacket = extractCanonicalPacketFromMetadata(hit.metadata ?? {});
               const clusterScore = computeTopologClusterMatchSignal(
                 candidatePacket as Parameters<typeof computeTopologClusterMatchSignal>[0],
-                queryPacket as Parameters<typeof computeTopologClusterMatchSignal>[1],
+                queryPacket as unknown as Parameters<typeof computeTopologClusterMatchSignal>[1],
                 0.5
               );
 

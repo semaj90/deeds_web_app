@@ -12,7 +12,7 @@
  * retrieval trace can skip Qdrant/Neo4j lookups on cache replay.
  */
 
-import { db } from '$lib/server/db/client';
+import { db, pgRows } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 
 export type ToolSource = 'mcp' | 'grpc' | 'opencode' | 'internal';
@@ -43,15 +43,15 @@ export async function recordToolCallBegin(opts: {
 
   let id: string;
   try {
-    const [row] = await db.execute<{ id: string }>(sql`
+    const rows = pgRows<{ id: string }>(await db.execute(sql`
       INSERT INTO tool_call_events
         (tool_name, tool_source, arguments, trace_id, session_id, called_at)
       VALUES
         (${toolName}, ${toolSource}, ${JSON.stringify(args)}::jsonb,
          ${traceId ?? null}::uuid, ${sessionId ?? null}, now())
       RETURNING id
-    `);
-    id = (row as { id: string }).id;
+    `));
+    id = rows[0]?.id ?? crypto.randomUUID();
   } catch {
     // Non-blocking — if the DB is unavailable, still return a handle that no-ops
     id = crypto.randomUUID();
@@ -120,7 +120,7 @@ export async function createAgentTask(opts: {
   priority?: number;
 }): Promise<string> {
   try {
-    const [row] = await db.execute<{ id: string }>(sql`
+    const rows = pgRows<{ id: string }>(await db.execute(sql`
       INSERT INTO agent_tasks
         (task_type, title, description, source_ref, packet_key, session_id, payload, priority)
       VALUES
@@ -128,8 +128,8 @@ export async function createAgentTask(opts: {
          ${opts.sourceRef ?? null}, ${opts.packetKey ?? null}, ${opts.sessionId ?? null},
          ${JSON.stringify(opts.payload ?? {})}::jsonb, ${opts.priority ?? 50})
       RETURNING id
-    `);
-    return (row as { id: string }).id;
+    `));
+    return rows[0]?.id ?? crypto.randomUUID();
   } catch {
     return crypto.randomUUID();
   }

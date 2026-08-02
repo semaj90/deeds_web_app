@@ -61,11 +61,15 @@
 
 import http from 'node:http';
 import { createHash } from 'node:crypto';
+import { trace } from '@opentelemetry/api';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
+import { ensureOpenTelemetry } from '../lib/server/observability/opentelemetry.js';
+import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.js';
+import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
 import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import type { LangGraphBridge } from './langgraph-bridge.js';
@@ -105,6 +109,8 @@ import { searchNotecards } from '../lib/server/kb/search-logic.js';
 import { registerBifrostTools } from './bifrost_tools.js';
 import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
+import { registerLibraryRegistryTools } from './library-registry-tools.js';
+import { registerLdrResearchTools } from './ldr-research-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
@@ -125,6 +131,13 @@ import { getFeatureDocumentEvidence } from '../lib/server/atlas/feature-document
 import { getParentAtlasWorkstationSnapshot } from '../lib/server/atlas/parent-atlas-workstation.js';
 import { createMiniforgeNlpSidecarClient } from '../lib/server/nlp/miniforge-nlp-sidecar.js';
 import { selectToolsForQuery } from '../lib/server/ai/tool-selection.js';
+import {
+  createTraceDynamicContext,
+  traceDynamicContextRequestSchema,
+  formatTraceDynamicContextReport,
+  inferTraceQuestionFamily,
+  type TraceDynamicContextRequest,
+} from '../../../packages/atlas-core/src/evidence/index.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
 const REDIS_URL         = ENV.REDIS_URL;
@@ -193,6 +206,166 @@ function getMiniforgeClient() {
   return createMiniforgeNlpSidecarClient(
     process.env.MINIFORGE_SIDECAR_URL ?? process.env.LANGEXTRACT_URL ?? ENV.MINIFORGE_SIDECAR_URL ?? ENV.LANGEXTRACT_URL,
   );
+}
+
+async function loadTraceDynamicContextSourceText(filePath: string | undefined): Promise<string | null> {
+  if (!filePath) return null;
+  try {
+    const { readFile } = await import('node:fs/promises');
+    const candidates = path.isAbsolute(filePath)
+      ? [filePath]
+      : [
+          path.resolve(process.cwd(), filePath),
+          path.resolve(process.cwd(), '..', filePath),
+          path.resolve(process.cwd(), '..', '..', filePath),
+          path.resolve(process.cwd(), '..', '..', '..', filePath),
+        ];
+
+    for (const candidate of [...new Set(candidates)]) {
+      try {
+        const text = await readFile(candidate, 'utf8');
+        if (text.length > 0) return text;
+      } catch {
+        // keep trying parent roots until one resolves
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function runTraceDynamicContextFirstSlice(input: TraceDynamicContextRequest) {
+  const context = createTraceDynamicContext({
+    firstSlice: {
+      staticDiscovery: {
+        filePath: input.target?.filePath,
+        sourceRevision: input.sourceRevision,
+        loadSourceText: loadTraceDynamicContextSourceText,
+      },
+      postgresJoinBack: {
+        query: (sql, params) => pool.query(sql, params as any[]),
+        packetKeys: input.target?.packetKey ? [input.target.packetKey] : [],
+        tableName: 'atlas_packets',
+        limit: input.limits.topK,
+      },
+    },
+  });
+
+  return context.run(input);
+}
+
+async function runTraceDynamicContextTool(input: TraceDynamicContextRequest) {
+  const toolCall = await recordToolCallBegin({
+    toolName: 'trace_dynamic_context',
+    toolSource: 'mcp',
+    arguments: {
+      workspaceId: input.workspaceId,
+      workspaceRevision: input.workspaceRevision,
+      sourceRevision: input.sourceRevision ?? null,
+      target: input.target ?? null,
+      lanes: input.lanes,
+      limits: input.limits,
+    },
+    traceId: asUuid(input.target?.traceId),
+  });
+
+  const otelState = await ensureOpenTelemetry();
+  const tracer = trace.getTracer('trace-mcp-server');
+
+  try {
+    return await tracer.startActiveSpan('trace_dynamic_context', async (span) => {
+      try {
+        span.setAttributes({
+          'tool.name': 'trace_dynamic_context',
+          'workspace.id': input.workspaceId,
+          'workspace.revision': input.workspaceRevision,
+          'trace.family': inferTraceQuestionFamily(input),
+        });
+
+        const result = await runTraceDynamicContextFirstSlice(input);
+        const family = inferTraceQuestionFamily(input);
+        const report = formatTraceDynamicContextReport(result, { family, maxItems: 6 });
+        const recommendation = buildTraceDynamicContextRecommendation(result, family);
+        const spanContext = span.spanContext();
+        const otelTraceId = spanContext?.traceId;
+        const otelSpanId = spanContext?.spanId;
+
+        span.setAttributes({
+          'trace.result.status': result.validation.status,
+          'trace.result.confidence': result.confidence,
+          'trace.result.evidence_count': result.evidence.length,
+        });
+
+        await toolCall.complete({
+          ok: true,
+          summary: JSON.stringify({
+            status: result.validation.status,
+            evidenceCount: result.evidence.length,
+            family,
+          }),
+          otelTraceId,
+          otelSpanId,
+        });
+
+        span.end();
+
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify(
+                {
+                  status: result.validation.status,
+                  family,
+                  traceId: result.traceId,
+                  workspaceRevision: result.workspaceRevision,
+                  targetResolution: result.targetResolution,
+                  sourceId: result.sourceId ?? null,
+                  sourceVersionId: result.sourceVersionId ?? null,
+                  symbolId: result.symbolId ?? null,
+                  symbolVersionId: result.symbolVersionId ?? null,
+                  parseNodeId: result.parseNodeId ?? null,
+                  packetKey: result.packetKey ?? null,
+                  confidence: result.confidence,
+                  evidenceCount: result.evidence.length,
+                  passedGates: result.validation.passedGates,
+                  failedGates: result.validation.failedGates,
+                  unresolvedClaims: result.validation.unresolvedClaims,
+                  recommendation,
+                  reportMarkdown: report,
+                  evidence: result.evidence,
+                  audit: {
+                    toolCallId: toolCall.id,
+                    otelEnabled: otelState.started,
+                    otelTraceId: otelTraceId ?? null,
+                    otelSpanId: otelSpanId ?? null,
+                  },
+                },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      } catch (err) {
+        const error = err instanceof Error ? err.message : String(err);
+        const spanContext = span.spanContext();
+        await toolCall.complete({
+          ok: false,
+          error,
+          otelTraceId: spanContext?.traceId,
+          otelSpanId: spanContext?.spanId,
+        });
+        span.recordException(err as Error);
+        span.setAttribute('error.message', error);
+        span.end();
+        throw err;
+      }
+    });
+  } catch (err) {
+    throw err;
+  }
 }
 
 function enqueueServiceWorker<T>(
@@ -399,6 +572,15 @@ registerTopologyMgmtTools(server, pool, dispatcherMiddleware);
 // write verbs, no raw SQL, statement_timeout=2s, forbidden columns scrubbed.
 // G33 validator gate enforces the no-write-verb rule statically.
 registerDbInspectionTools(server, pool, dispatcherMiddleware);
+
+// Register library registry tools (library.registry_lookup/search/fetch_tier/rescan)
+// over the library_identities table (npm + pip package identity registry).
+registerLibraryRegistryTools(server, pool);
+
+// Register LDR (Local Deep Research) on the canonical Streamable HTTP surface.
+// Reuses the existing stdio-server handler (tools/ldr-research.ts) — registration
+// only, no duplicated research logic. Acquisition adapter, not a second RAG platform.
+registerLdrResearchTools(server, pool);
 
 // ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
 // search.hybrid + topology.search_near + search.dev_context all embed the same
@@ -2908,6 +3090,32 @@ server.registerTool(
       };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
+    }
+  }
+);
+
+// ── trace_dynamic_context ───────────────────────────────────────────────────
+
+server.registerTool(
+  'trace_dynamic_context',
+  {
+    description:
+      'Build a bounded evidence bundle with the first trace_dynamic_context slice: ' +
+      'static discovery plus canonical Postgres join-back.',
+    inputSchema: traceDynamicContextRequestSchema,
+  },
+  async (input: TraceDynamicContextRequest) => {
+    try {
+      return await runTraceDynamicContextTool(input);
+    } catch (err) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text: JSON.stringify({ status: 'error', error: String(err) }, null, 2),
+          },
+        ],
+      };
     }
   }
 );
@@ -10369,6 +10577,7 @@ const isDirectRun =
   (process.argv[1].endsWith('trace-mcp-server.ts') || process.argv[1].endsWith('trace-mcp-server.js'));
 
 if (isDirectRun) {
+  void ensureOpenTelemetry().catch(() => { /* non-fatal startup warmup */ });
   // Pre-warm the Postgres pool so first FTS query doesn't eat into tool timeout
   pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
 

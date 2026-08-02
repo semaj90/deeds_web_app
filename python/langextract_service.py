@@ -11,9 +11,14 @@ Memory comparison:
 
 import os
 import json
+import sys
 import textwrap
+import urllib.error
+import urllib.request
 from pathlib import Path
+from importlib import metadata as importlib_metadata
 from typing import Optional
+from dataclasses import dataclass
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -22,10 +27,27 @@ import uvicorn
 # Google's official LangExtract library
 try:
     import langextract as lx  # type: ignore
-    from langextract.factory import ModelConfig  # type: ignore
     from langextract import data as lx_data  # type: ignore
+    try:
+        from langextract.factory import ModelConfig  # type: ignore
+        LANGEXTRACT_FACTORY_AVAILABLE = True
+    except Exception:
+        LANGEXTRACT_FACTORY_AVAILABLE = False
+
+        @dataclass(slots=True)
+        class ModelConfig:  # type: ignore[no-redef]
+            model_id: str
+            provider: str
+            provider_kwargs: dict[str, str]
 except ImportError:
     raise ImportError("Install langextract: pip install langextract")
+
+try:
+    from bs4 import BeautifulSoup  # type: ignore
+    BEAUTIFULSOUP_AVAILABLE = True
+except Exception:
+    BeautifulSoup = None  # type: ignore
+    BEAUTIFULSOUP_AVAILABLE = False
 
 # Configuration
 LANGEXTRACT_PROVIDER = os.getenv("LANGEXTRACT_PROVIDER", "openai")
@@ -58,6 +80,63 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+def _package_version(*distribution_names: str) -> Optional[str]:
+    for dist_name in distribution_names:
+        try:
+            return importlib_metadata.version(dist_name)
+        except importlib_metadata.PackageNotFoundError:
+            continue
+        except Exception:
+            continue
+    return None
+
+
+def _extract_html_text(html: str) -> dict[str, str | int]:
+    if BEAUTIFULSOUP_AVAILABLE and BeautifulSoup is not None:
+        soup = BeautifulSoup(html, "html.parser")
+        for tag_name in ("script", "style", "noscript", "svg"):
+            for node in soup.find_all(tag_name):
+                node.decompose()
+
+        title = ""
+        if soup.title and soup.title.string:
+            title = soup.title.get_text(" ", strip=True)
+
+        text = soup.get_text(" ", strip=True)
+        return {
+            "title": title,
+            "text": text,
+            "content_length": len(text),
+            "source": "beautifulsoup",
+        }
+
+    title_match = re.search(r"<title[^>]*>(.*?)</title>", html, flags=re.IGNORECASE | re.DOTALL)
+    title = title_match.group(1).strip() if title_match else ""
+    text = re.sub(r"<script[^>]*>[\s\S]*?</script>", " ", html, flags=re.IGNORECASE)
+    text = re.sub(r"<style[^>]*>[\s\S]*?</style>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return {
+        "title": title,
+        "text": text,
+        "content_length": len(text),
+        "source": "regex",
+    }
+
+
+def _fetch_html(url: str) -> str:
+    request = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "DeedsAI/1.0 (legal research)",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        },
+    )
+    with urllib.request.urlopen(request, timeout=10) as response:
+        charset = response.headers.get_content_charset() or "utf-8"
+        return response.read().decode(charset, errors="ignore")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -222,6 +301,18 @@ class FileExtractionRequest(BaseModel):
     extraction_passes: int = Field(default=2)
 
 
+class WebExtractionRequest(BaseModel):
+    url: str = Field(..., description="URL to fetch and parse")
+
+
+class WebExtractionResponse(BaseModel):
+    url: str
+    title: str
+    text: str
+    content_length: int
+    source: str
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Core Extraction Logic
 # ─────────────────────────────────────────────────────────────────────────────
@@ -308,6 +399,23 @@ async def health():
         "model": DEFAULT_MODEL,
         "llama_server_url": LANGEXTRACT_BASE_URL,
         "provider": LANGEXTRACT_PROVIDER,
+        "runtime": {
+            "pythonExecutable": sys.executable,
+            "pythonVersion": sys.version.split()[0],
+        },
+        "langextract": {
+            "available": True,
+            "factoryAvailable": LANGEXTRACT_FACTORY_AVAILABLE,
+            "version": _package_version("langextract"),
+            "modulePath": getattr(lx, "__file__", None),
+            "importVerified": True,
+            "beautifulsoup4": {
+                "available": BEAUTIFULSOUP_AVAILABLE,
+                "version": _package_version("beautifulsoup4"),
+                "modulePath": getattr(BeautifulSoup, "__module__", None) if BEAUTIFULSOUP_AVAILABLE else None,
+                "importVerified": BEAUTIFULSOUP_AVAILABLE,
+            },
+        },
     }
 
 
@@ -408,6 +516,27 @@ async def extract_file(request: FileExtractionRequest):
         "extractions": result["extractions"],
         "metadata": result["metadata"]
     }
+
+
+@app.post("/extract/web", response_model=WebExtractionResponse)
+async def extract_web(request: WebExtractionRequest):
+    """Fetch a web page and return BS4-backed title/text extraction."""
+
+    try:
+        html = _fetch_html(request.url)
+    except urllib.error.HTTPError as exc:
+        raise HTTPException(exc.code, f"Failed to fetch URL: {exc.reason}") from exc
+    except urllib.error.URLError as exc:
+        raise HTTPException(502, f"Failed to fetch URL: {exc.reason}") from exc
+
+    parsed = _extract_html_text(html)
+    return WebExtractionResponse(
+        url=request.url,
+        title=str(parsed["title"]),
+        text=str(parsed["text"]),
+        content_length=int(parsed["content_length"]),
+        source=str(parsed["source"]),
+    )
 
 
 @app.post("/extract/batch")

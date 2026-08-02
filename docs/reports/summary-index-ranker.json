@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T05:17:17.070Z",
+  "generated_at": "2026-08-02T19:16:18.326Z",
   "mode": "apply",
   "source_of_truth": "postgres.atlas_summary_layers + atlas_packets",
   "redis_index": {
@@ -10,8 +10,8 @@
   "stats": {
     "total": 5000,
     "ready": 0,
-    "near_ready": 2158,
-    "partial": 2733,
+    "near_ready": 2156,
+    "partial": 2735,
     "blocked": 109,
     "avg_score": 55.48,
     "with_title_id": 5000,

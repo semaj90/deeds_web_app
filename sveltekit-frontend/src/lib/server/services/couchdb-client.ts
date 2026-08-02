@@ -5,7 +5,8 @@ import { ollamaFetch } from '$lib/server/ollama.js';
  * CouchDB Client - Lightweight wrapper for ACE knowledge base
  */
 
-function stripCredentials(url: string): string {
+function stripCredentials(url?: string | null): string {
+  if (!url) return '';
   try {
     const parsed = new URL(url);
     parsed.username = '';
@@ -30,6 +31,10 @@ function authHeader(): string {
 }
 
 async function couchFetch(path: string, init?: RequestInit): Promise<Response> {
+  if (!COUCHDB_URL) {
+    throw new Error('CouchDB URL is not configured');
+  }
+
   const url = COUCHDB_URL + '/' + path.replace(/^\//, '');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

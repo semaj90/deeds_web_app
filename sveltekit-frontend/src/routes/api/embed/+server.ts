@@ -7,7 +7,6 @@ import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { logError, categorizeError, categorizeSeverity } from '$lib/server/error-logging.js';
 import {
@@ -24,7 +23,7 @@ const EMBEDDING_BACKEND = resolveEmbeddingBackend('embeddinggemma:latest', {
 
 const embedRequestSchema = z.object({
 	text: z.string().min(1, 'Text is required').max(50000),
-	model: z.enum(['embeddinggemma', 'nomic', 'mock']).optional().default('embeddinggemma'),
+	model: z.enum(['embeddinggemma', 'mock']).optional().default('embeddinggemma'),
 	dimensions: z.number().int().min(1).max(4096).optional()
 });
 
@@ -35,30 +34,6 @@ interface EmbedResponse {
 	model: string;
 	dimensions: number;
 	tokens?: number;
-}
-
-/**
- * Generate embedding via Ollama (embeddinggemma:latest primary, nomic-embed-text fallback)
- */
-async function getOllamaEmbedding(
-	text: string,
-	model: string = 'embeddinggemma:latest'
-): Promise<{ embedding: number[] }> {
-	return traceEmbedding(text, model, async () => {
-		const response = await ollamaFetch(`${OLLAMA_URL}/api/embeddings`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model, prompt: text }),
-			signal: AbortSignal.timeout(10_000),
-		});
-
-		if (!response.ok) {
-			throw new Error(`Ollama embedding error: ${response.status} ${response.statusText}`);
-		}
-
-		const data = await response.json();
-		return { embedding: Array.isArray(data.embedding) ? data.embedding : [] };
-	});
 }
 
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -87,9 +62,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 		const { text, model, dimensions } = parsed.data;
 
-		// Acquire GPU lease for Ollama embeddings (non-blocking)
+		// Acquire GPU lease for embedding generation (non-blocking)
 		if (model !== 'mock') {
-			await acquireGpuLease('ollama', 30).catch(() => null);
+			await acquireGpuLease('llama-server', 30).catch(() => null);
 		}
 
 		let result: EmbedResponse;
@@ -98,11 +73,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			case 'embeddinggemma': {
 				const embedding = await embedText(text);
 				result = { embedding, model: 'embeddinggemma:latest', dimensions: embedding.length };
-				break;
-			}
-			case 'nomic': {
-				const { embedding } = await getOllamaEmbedding(text, 'nomic-embed-text:latest');
-				result = { embedding, model: 'nomic-embed-text:latest', dimensions: embedding.length };
 				break;
 			}
 			case 'mock': {
@@ -152,10 +122,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 };
 
 export const GET: RequestHandler = async () => {
-	return apiResponses.ok({
-		message: 'Embedding API endpoint',
+		return apiResponses.ok({
+			message: 'Embedding API endpoint',
 			methods: ['POST'],
-			models: ['embeddinggemma', 'nomic', 'mock'],
+			models: ['embeddinggemma', 'mock'],
 			maxTextLength: 50000,
 			ollamaUrl: OLLAMA_URL,
 			embeddingBackend: EMBEDDING_BACKEND,

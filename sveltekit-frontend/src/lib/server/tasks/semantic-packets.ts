@@ -46,50 +46,50 @@ type TaskSummaryPlan = {
 };
 
 type TaskSemanticPacketCacheRecord = {
-  task_id: number;
-  packet_id: string;
-  queue_id: string | null;
-  qdrant_point_id: string;
-  workspace_id: string | null;
-  feature_id: string | null;
-  source_ref: string;
-  packet_key: string;
+  taskId: number;
+  packetId: string;
+  queueId: string | null;
+  qdrantPointId: string;
+  workspaceId: string | null;
+  featureId: string | null;
+  sourceRef: string;
+  packetKey?: string;
   summary: string;
-  next_action: string;
+  nextAction: string;
   confidence: number;
   status: TaskSemanticPacketBundle['status'];
-  related_feature_ids: string[];
-  related_task_ids: string[];
-  related_file_paths: string[];
-  cluster_id: string | null;
-  centroid_id: string | null;
-  parent_centroid_id: string | null;
-  agent_pickup_ready: boolean;
-  cached_at: string;
+  relatedFeatureIds: string[];
+  relatedTaskIds: string[];
+  relatedFilePaths: string[];
+  clusterId: string | null;
+  centroidId: string | null;
+  parentCentroidId: string | null;
+  agentPickupReady: boolean;
+  cachedAt: string;
 };
 
 export interface TaskSemanticPacketBundle {
-  queue_id?: string;
-  task_id: number;
-  packet_id: string;
-  packet_key: string;
-  qdrant_point_id: string;
-  workspace_id: string | null;
-  feature_id: string | null;
-  source_ref: string;
+  queueId?: string | null;
+  taskId: number;
+  packetId: string;
+  packetKey?: string;
+  qdrantPointId: string;
+  workspaceId: string | null;
+  featureId: string | null;
+  sourceRef?: string;
   summary: string;
-  next_action: string;
+  nextAction: string;
   confidence: number;
   status: 'todo' | 'doing' | 'blocked' | 'done';
-  related_feature_ids: string[];
-  related_task_ids: string[];
-  related_file_paths: string[];
-  cluster_id: string | null;
-  centroid_id: string | null;
-  packet_row?: Record<string, unknown>;
-  task_row?: Record<string, unknown>;
-  summary_hash?: string;
-  summary_model?: string;
+  relatedFeatureIds: string[];
+  relatedTaskIds: string[];
+  relatedFilePaths: string[];
+  clusterId: string | null;
+  centroidId: string | null;
+  packetRow?: Record<string, unknown>;
+  taskRow?: Record<string, unknown>;
+  summaryHash?: string;
+  summaryModel?: string;
 }
 
 function normalizeText(value: unknown): string {
@@ -239,13 +239,13 @@ async function generateTaskSummary(task: Record<string, unknown>): Promise<TaskS
   if (parsed) return parsed;
 
   return {
-    summary: `Task ${taskId}: ${title}`.trim(),
-    next_action: `Review task ${taskId} and identify the immediate code or documentation change.`,
+    summary: `Task ${task_id}: ${title}`.trim(),
+    next_action: `Review task ${task_id} and identify the immediate code or documentation change.`,
     confidence: 0.55,
     status: 'todo',
     semantic_path: [...TASK_PACKET_SEMANTIC_PATH],
-    related_feature_ids: featureId ? [featureId] : [],
-    related_task_ids: [String(taskId)],
+    related_feature_ids: feature_id ? [feature_id] : [],
+    related_task_ids: [String(task_id)],
     related_file_paths: [],
   };
 }

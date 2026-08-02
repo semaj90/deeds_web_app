@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import type Redis from 'ioredis';
+import { ENV } from '$lib/server/env.server.js';
 import {
   type SemanticPromptPacket,
   type RouterDecision,
@@ -26,7 +27,7 @@ import {
 // Uses the SvelteKit /api/embed endpoint (Redis L1 + Bifrost L2 cached).
 // Falls back to direct Ollama /api/embeddings when dev server is unavailable.
 
-const EMBED_URL   = 'http://127.0.0.1:5173/api/embed';
+const EMBED_URL   = `${ENV.SELF_URL}/api/embed`;
 const OLLAMA_URL  = 'http://127.0.0.1:11434';
 const EMBED_MODEL = 'embeddinggemma:latest';
 

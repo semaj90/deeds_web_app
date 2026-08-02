@@ -5409,6 +5409,12 @@ export const outboxEvents = pgTable('outbox_events', {
     eventType:     text('event_type').notNull(),
     payload:       jsonb('payload').notNull(),
     publishedAt:   timestamp('published_at', { withTimezone: true }),
+    // Generic stream-publish tracking (added 2026-08-02, nullable/additive —
+    // any outbox consumer may record which stream/entry it published to).
+    streamName:      text('stream_name'),
+    streamEntryId:   text('stream_entry_id'),
+    publishAttempts: integer('publish_attempts').notNull().default(0),
+    lastPublishError: text('last_publish_error'),
     createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 }, (t) => ({
     unpublishedIdx: index('idx_outbox_events_unpublished').on(t.createdAt)

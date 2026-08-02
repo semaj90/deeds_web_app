@@ -43,6 +43,7 @@ export const RecommendationSchema = z.object({
   packet_key: z.string().optional().nullable(),
   identity_lane: z.string().optional().nullable(),
   community_id: z.string().optional().nullable(),
+  // Structural parse-occurrence identifier only; not workflow or packet identity.
   tree_node_id: z.string().optional().nullable(),
   qdrant_point_id: z.union([z.string(), z.number()]).optional().nullable(),
   kanban_card_id: z.string().optional().nullable(),
@@ -65,7 +66,7 @@ const finiteProbability = z.number().finite().min(0).max(1);
 const nonEmptyStringArray = z.array(z.string().min(1));
 
 /**
- * Canonical recommendation tree-node identity.
+ * Structural recommendation tree-node identity.
  *
  * This is intentionally separate from packet identity and recommendation_id.
  * It identifies the parsed structural entity that may be referenced by many
@@ -193,6 +194,7 @@ export const RecommendationScoreSchema = z
     query_id: z.string().min(1),
     candidate_id: z.string().min(1),
     packet_key: z.string().min(1),
+    // Structural tree-node occurrence only; kept separate from packet identity.
     tree_node_id: z.string().min(1).nullable(),
     heuristic_relevance_score: z.number().finite().nullable(),
     ranker_score: z.number().finite().nullable(),
@@ -247,6 +249,7 @@ const ACPGraphPathSchema = z
 
 const ACPRecommendationCandidateSchema = z
   .object({
+    // Structural tree-node occurrence only; candidates are not workflow identities.
     tree_node_id: z.string().min(1),
     source_ref: z.string().min(1),
     relevance_probability: finiteProbability,

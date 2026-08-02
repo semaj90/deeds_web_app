@@ -29,7 +29,7 @@ function resolveProvider(
     return configured as EmbeddingProvider;
   }
 
-  return 'ollama';
+  return 'llama-server';
 }
 
 function resolveBaseUrl(
@@ -42,7 +42,7 @@ function resolveBaseUrl(
   if (!configured) {
     throw new Error(
       `No embedding base URL configured for provider ${provider}. ` +
-        `Set EMBEDDING_BASE_URL or OLLAMA_BASE_URL environment variables.`,
+        `Set EMBEDDING_BASE_URL or LLAMA_SERVER_URL environment variables.`,
     );
   }
 
@@ -105,10 +105,10 @@ function extractPortFromUrl(url: string): number | null {
 }
 
 function getExpectedPortForProvider(provider: EmbeddingProvider): number {
-  // llama-server.exe typically runs on 8081 (non-default Ollama port)
+  // llama-server.exe typically runs on 8090 in this workspace.
   // Ollama typically runs on 11434
   // These are conventions, not absolutes, but mismatches should warn
-  return provider === 'llama-server' ? 8081 : 11434;
+  return provider === 'llama-server' ? 8090 : 11434;
 }
 
 export async function fingerprintBackend(baseUrl: string): Promise<BackendFingerprint> {
@@ -215,9 +215,9 @@ export async function validateResolvedBackend(
   }
 
   // Check provider-URL mismatch (CRITICAL)
-  // llama-server should be on 8081 (or similar non-standard port)
+  // llama-server should be on 8090 (or similar non-standard port)
   // Ollama should be on 11434 (or similar standard port)
-  // Port 11434 is Ollama's default; port 8081 is common for llama-server
+  // Port 11434 is Ollama's default; port 8090 is common for llama-server
   const port = extractPortFromUrl(baseUrl);
   const expectedPort = getExpectedPortForProvider(provider);
 

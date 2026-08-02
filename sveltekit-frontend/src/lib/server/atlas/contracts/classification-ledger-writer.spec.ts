@@ -7,7 +7,7 @@ import { buildClassificationOutcomeLedgerEvent } from './classification-ledger-w
 import { buildOntologyLinkedTuplesFromClassification } from './ontology-linked-tuple-v1.js';
 
 describe('Classification ledger writer', () => {
-  it('builds a ledger event that preserves the packet identity spine', () => {
+  it('builds a ledger event that preserves the packet identity spine and structural tree node reference', () => {
     const now = '2026-07-28T00:00:00.000Z';
     const packet = CanonicalAcePacketEnvelopeSchema.parse({
       packet_key: 'pkt_0123456789abcdef0123456789abcdef',
@@ -59,7 +59,7 @@ describe('Classification ledger writer', () => {
         function_symbol: 'validateSession',
         feature_id: packet.feature_id ?? 'auth.sessions',
         title_id: packet.title_id ?? 'title:auth',
-        tree_node_id: 'tree:src/lib/server/auth.ts:validateSession',
+        tree_node_id: 'tree:structural:src/lib/server/auth.ts:validateSession',
       },
       dense_768: null,
       dense_384: null,

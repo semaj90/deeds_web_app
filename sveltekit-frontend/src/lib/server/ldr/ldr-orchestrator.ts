@@ -4,7 +4,23 @@
  */
 
 import { searchViaSearXNG, fetchAndExtractText, aggregateDocuments, type WebSearchResult, type ExtractedDocument } from './web-search-client';
-import { callGemma4Stream } from '../ollama';
+
+/**
+ * Strips leaked reasoning/thinking blocks from LLM output before it reaches
+ * callers. llama-server without --reasoning-format none (and some Ollama
+ * configs without think:false) emit reasoning inline in `content` using
+ * sentinel tags rather than a separate reasoning_content field — same class
+ * of contamination the Phase 7 summary sanitizer strips, extended to cover
+ * the <|think|> variant this endpoint actually emits.
+ */
+function stripReasoningTags(text: string): string {
+  return text
+    .replace(/<\|think\|>[\s\S]*?<\/think>/gi, '')
+    .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+    .replace(/<\|channel\|>[\s\S]*?<\|message\|>/gi, '')
+    .replace(/<end_of_turn>|<start_of_turn>|<\|endthinking\|>/gi, '')
+    .trim();
+}
 
 export interface LDRResult {
   synthesis: string;
@@ -185,7 +201,8 @@ async function callGemma4Synthesis(
       usage?: { completion_tokens?: number };
     };
 
-    const text = data.choices?.[0]?.message?.content || '';
+    const rawText = data.choices?.[0]?.message?.content || '';
+    const text = stripReasoningTags(rawText);
     const completionTokens = data.usage?.completion_tokens || 512;
 
     // Estimate confidence based on response quality
@@ -343,10 +360,12 @@ export async function streamLocalDeepResearchSynthesis(
       }
     }
 
+    const cleanText = stripReasoningTags(fullText);
+
     return {
-      synthesis: fullText,
+      synthesis: cleanText,
       sources: extractedDocs.map(d => ({ url: d.url, title: d.title })),
-      confidence: estimateConfidence(fullText, fullText.split(/\s+/).length),
+      confidence: estimateConfidence(cleanText, cleanText.split(/\s+/).length),
       durationMs: Date.now() - startTime,
       stage: 'synthesis'
     };

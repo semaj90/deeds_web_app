@@ -16,16 +16,28 @@
 
 import { execSync } from 'child_process';
 import pg from 'pg';
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 const { Pool } = pg;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+dotenv.config({ path: `${__dirname}/../../.env` });
 
 const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('--dry');
 const isApply = process.argv.includes('--apply');
 const confidence = parseFloat(process.argv.find(arg => arg.startsWith('--confidence='))?.split('=')[1] ?? '0.8');
 const limit = parseInt(process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] ?? '68181');
 
+const databaseUrl = process.env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL is required for phase1-tree-node-derivation.mjs');
+}
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:postgres@localhost:5434/legal_ai_db',
+  connectionString: databaseUrl,
   max: 10,
 });
 

@@ -6,7 +6,6 @@
  */
 
 
-import { couchdb } from '$lib/server/services/couchdb-client.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
@@ -38,6 +37,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
     }
     const body = parsed.data;
+    const { couchdb } = await import('$lib/server/services/couchdb-client.js');
 
     // Fetch selected chunks from Qdrant
     const selectedSources: ValidatedSource[] = [];
@@ -136,6 +136,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
   }
 
   try {
+    const { couchdb } = await import('$lib/server/services/couchdb-client.js');
     const result = await couchdb.allDocs('ace_validations', { include_docs: true, limit: 50 });
     const docs = result.rows
       .map(r => r.doc)

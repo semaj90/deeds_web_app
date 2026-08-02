@@ -29,6 +29,18 @@ export interface QdrantCodeResult {
   centroid_id?: string | number | null;
   semantic_score: number;
   qdrant_id: string;
+  // Optional dual-cased fields — some payload producers write snake_case,
+  // others camelCase; consumers (e.g. rrf-integration.ts) defensively read
+  // both via `?? `. Not every producer sets these.
+  content_hash?: string | null;
+  contentHash?: string | null;
+  tree_node_id?: string | null;
+  treeNodeId?: string | null;
+  featureId?: string | null;
+  feature_label?: string | null;
+  featureLabel?: string | null;
+  workspace_revision?: number | null;
+  workspaceRevision?: number | null;
 }
 
 class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {

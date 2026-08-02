@@ -63,5 +63,15 @@ export default {
     '!mapreduce_map_queue', '!mapreduce_reduce_results',
     // Added 2026-05-30 (Tier D): custom migrations journal (managed by db/migrate.ts, not drizzle-kit)
     '!migrations',
+
+    // Added 2026-08-02: library registry — manual sidecar migration
+    // (drizzle/manual/20260802_library_identities.sql) because generating
+    // against schema.ts also picked up unrelated pre-existing drift
+    // (recommendation_log, semantic_lifecycle_events, semantic_signals).
+    '!library_identities',
+    // Parent Atlas acquisition plane (drizzle/manual/20260802_atlas_acquisition.sql) —
+    // same reason as library_identities above: keep isolated from unrelated schema drift.
+    '!atlas_research_runs', '!atlas_fetches', '!atlas_fetch_attempts',
+    '!atlas_source_revisions', '!atlas_extractions',
   ],
 } satisfies Config;

@@ -17,6 +17,7 @@ export const ClassificationIdentitySchema = z.object({
   featureId: z.string().min(1),
   featureLabel: z.string().min(1),
   titleId: z.string().min(1).nullable().optional(),
+  // Structural parse-occurrence identifier only; not a workflow, source, or packet identity.
   treeNodeId: z.string().min(1).nullable().optional(),
   qdrantPointId: z.string().min(1).nullable().optional(),
 });
@@ -111,6 +112,7 @@ export const ClassificationLineageViolationCodeSchema = z.enum([
   'WORKSPACE_REVISION_MISMATCH',
   'FEATURE_ID_MISMATCH',
   'FEATURE_LABEL_MISMATCH',
+  // Structural tree-node mismatch, not a canonical identity collision.
   'TREE_NODE_ID_MISMATCH',
   'LANE_STATUS_MISMATCH',
   'EVIDENCE_STATE_MISMATCH',
@@ -135,6 +137,7 @@ export function validateClassificationLineage(input: {
       source_ref: string;
       feature_id: string;
       title_id?: string | null;
+      // Structural parse-occurrence identifier only.
       tree_node_id?: string | null;
     };
     lane_status?: ClassificationSignals['laneStatus'] | null;

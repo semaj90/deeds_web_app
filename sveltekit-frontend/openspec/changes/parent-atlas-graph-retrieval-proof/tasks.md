@@ -73,3 +73,49 @@
     - 20×20 SOM: no dedicated `som_x`/`som_y`-driven 20×20 grid pipeline found this pass beyond the existing `som_x`/`som_y` columns on `atlas_tree_nodes` (both 0% populated per above)
 - [ ] GS1.10 Per explicit user instruction: **do NOT** relax `atlas_graph_nodes_v2_tree_node_unique`, **do NOT** strip `treeNodeId` from packet nodes, **do NOT** re-attempt `--apply` until a separate identity-model design pass distinguishes `parse_node_id` (revision-bound occurrence) / `symbol_id` (stable cross-revision identity) / `chunk_id` / `packet_key` / `concept_id` / `graph_node_key` instead of overloading `tree_node_id` for all of them — NOT STARTED, blocked pending that design decision
 - [ ] GS1.11 Reclassify this artifact's status language: the current `--dry-run`/`--verify` PASS proves the materializer can deterministically produce a large structural artifact from `atlas_tree_nodes` + `atlas_packets` as they exist today — it does NOT prove `tree_node_id` is canonical symbol identity, that symbols reconcile across reparses, that domains/concepts are complete, or that KNN/KMeans/SOM/PageRank are current. Use `PROVISIONAL_STRUCTURAL_GRAPH_SNAPSHOT: DRY_RUN_PASS` / `CANONICAL_GRAPH_SNAPSHOT: NOT_PROVEN` / `GRAPH_SNAPSHOT_APPLY: ROLLED_BACK` / `TREE_NODE_UNIQUENESS_CHANGE: BLOCKED` rather than promoting `FULL_CORPUS_GRAPH_SNAPSHOT` to PASS
+- [ ] GS1.12 Design guidance captured for the GS1.10 identity-model pass (not yet implemented — design input only): use **lineage edges instead of ID reuse** to resolve the `tree_node_id` collision. Rather than a packet node and its tree/symbol node sharing one `tree_node_id` value (today's approach, which the DB constraint correctly rejected), give each layer its own identity and connect them with typed `DERIVED_FROM`/`REPRESENTS`/etc. edges:
+  ```
+  Packet v42 --DERIVED_FROM--> TreeNode 1234
+  Packet v43 --DERIVED_FROM--> TreeNode 8127
+  ```
+  This preserves history across re-parses (when a function body changes, its `tree_node_id`/`treeNodeVersionId` changes too — see GS1.9 — but the packet's logical identity doesn't have to) and avoids the current either-or choice between relaxing the DB constraint or discarding provenance. Proposed small, fixed lineage-edge vocabulary (avoids re-overloading a single relation type the way `tree_node_id` got overloaded):
+  | Edge | Meaning |
+  |---|---|
+  | `DERIVED_FROM` | Produced from another artifact (packet ← AST/tree node) |
+  | `REPRESENTS` | Semantic representation of an artifact (embedding → packet) |
+  | `PROJECTS_TO` | Materialized into another storage/index (graph projection → packet) |
+  | `SUMMARIZES` | Higher-level abstraction (summary → packet) |
+  | `REFERENCES` | Mentions/cites another artifact (recommendation → packet) |
+  | `SUPERSEDES` | Replaces an earlier revision |
+  | `GENERATED_BY` | Produced by a specific pipeline/tool run |
+  | `VALIDATED_BY` | Verified by a proof/audit step (observation → packet) |
+  Maps cleanly onto the layered identity chain from GS1.10 (`tree_node_id → packet_key → representation_id → embedding_revision`), with Postgres staying canonical truth and Neo4j/Qdrant/Redis as projections over it — consistent with the project's existing Postgres-truth/mirrors architecture rule. This is a proposal to fold into the GS1.10 design pass, not something to implement yet.
+
+## DEEP-AUDIT 1. Scoped code-quality gate sweep (this session's touched files)
+
+- [x] DA1.1 Ran `/deep-audit` scoped to the 7 files touched by GS1.x work (not full-repo — cached `codebase-graph.json` was ~29 days stale; user chose to regenerate it via `npm run graphify:daily` rather than audit on stale data or skip regen, regen ran independently/concurrently and is tracked separately, not gating this result)
+- [x] DA1.2 G1 (import consumers): `graph-snapshot.ts` has exactly 1 real consumer (`graph-snapshot-materializer.ts:11`, imports `topologyHash` + types) — no orphan risk from the `topologyHash` streaming rewrite
+- [x] DA1.3 G8 (TODO/FIXME markers): 0 across all 7 touched files
+- [x] DA1.4 G16 (test pairing): `graph-snapshot.ts`/`graph-snapshot-materializer.ts` both paired (`graph-snapshot-identity.spec.ts`, `graph-snapshot-materializer.spec.ts`, 9/9 passing); the 5 CLI driver scripts have no paired specs, consistent with existing repo convention for `scripts/atlas/*` operational scripts — not a gap introduced this session
+- [x] DA1.5 Structural check (duplicate JSDoc, unreachable code): 0 findings in the rewritten `topologyHash`/edited files
+- **Recap**: 7 files audited, 0 hard fails, 0 warnings — nothing new to remediate from GS1.x changes
+
+## Repository-first search inventory
+
+The following owner surfaces were located during the repo-first search pass. These are discovery results only; they do not prove runtime behavior.
+
+- [x] Diff context / patch context: `scripts/ace-diff-sniffer.mjs`, `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`, `sveltekit-frontend/src/mcp/trace-mcp-server.ts` — wrapper runtime proof added in `tests/routes/auto/api/ace/recommendations.test.ts`
+- [ ] Recommendation record / supersession: `sveltekit-frontend/src/lib/server/ace/recommendation-record.ts`, `sveltekit-frontend/src/lib/server/mcp/phase109a-mcp-tools.ts`, `sveltekit-frontend/src/lib/server/retrieval/feature-record.ts`, `sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.ts`
+- [ ] Validation receipts / proof gates: `sveltekit-frontend/src/lib/server/atlas/contracts/validation-result-v1.ts`, `sveltekit-frontend/src/lib/server/agent/execution-review.ts`, `scripts/opencode/validation-gate.mjs`
+- [ ] Hot / warm / cold storage: `sveltekit-frontend/src/mcp/engram_tools.ts`, `sveltekit-frontend/src/lib/server/cache/*`, `sveltekit-frontend/src/lib/server/retrieval/*`
+- [ ] Tensor / gRPC / protobuf: `sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts`, `sveltekit-frontend/src/mcp/server.ts`, `sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts`
+- [ ] SOM / KMeans / topology: `sveltekit-frontend/src/mcp/server.ts`, `sveltekit-frontend/src/lib/server/atlas/atlas_embedding_tools.ts`, `scripts/agents/som-cluster-cards.mjs`
+- [ ] NLP / LDR sidecar: `sveltekit-frontend/src/mcp/trace-mcp-server.ts`, `sveltekit-frontend/src/mcp/ldr-research-tools.ts`
+- [ ] Graph retrieval / projection: `sveltekit-frontend/src/lib/server/retrieval/*`, `sveltekit-frontend/src/lib/server/atlas/graph/*`, `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board.ts`
+
+### Next bounded search step
+
+- [ ] Reuse the located owner file for each surface instead of creating a parallel implementation.
+- [ ] Confirm the runtime entrypoint for each owner before any patch.
+- [ ] Add tests at the owner boundary before wiring new code paths.
+- [ ] Record runtime proof separately from static discovery.

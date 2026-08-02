@@ -7,7 +7,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { maybeGenerateWebEmbedding, extractWebDocument } from '$lib/server/web/web-crawl.js';
 
 const webCrawlSchema = z.object({
   url: z.string().min(1, 'url is required').max(2000).url('Invalid URL format'),
@@ -26,6 +25,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   const { url, generateEmbedding } = parsed.data;
 
   const start = performance.now();
+  const { maybeGenerateWebEmbedding, extractWebDocument } = await import('$lib/server/web/web-crawl.js');
 
   let result;
   try {

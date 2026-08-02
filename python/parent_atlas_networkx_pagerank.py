@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""NetworkX reference oracle for the Parent Atlas fixture-only authority gate."""
+"""NetworkX PageRank reference oracle for the Parent Atlas fixture-only authority gate.
+
+This is a graph analytics fixture only. It is unrelated to web fetching,
+crawling, or HTML extraction.
+"""
 
 from __future__ import annotations
 

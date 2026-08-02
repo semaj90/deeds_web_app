@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: langextract
+Version: 0.1.0
+Summary: Local LangExtract-compatible package shim for the NLP sidecar
+Requires-Python: >=3.13

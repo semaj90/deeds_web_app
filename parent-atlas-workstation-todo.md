@@ -1,6 +1,6 @@
 # Parent Atlas Workstation TODO
 
-**Status**: LAYER 1 ✅ COMPLETE (100% coverage) | EXPORT STACK ✅ READY | LANE ALIGNMENT ⏳ IN PROGRESS
+**Status**: LAYER 1 🟡 FIELDS POPULATED, IDENTITY MODEL NOT YET PROVEN (see corrected section below, 2026-08-02) | EXPORT STACK ✅ READY | LANE ALIGNMENT ⏳ IN PROGRESS
 
 ---
 
@@ -28,21 +28,105 @@ Current lane map:
 
 The gate model is executable state: task created -> PostgreSQL row written -> outbox event emitted -> RabbitMQ worker claimed -> gates evaluated -> task transitions READY / CLAIMED / RUNNING / AWAITING_GATE / COMPLETED / FAILED. LLMs may recommend the next transition, but smoke and authorization outcomes must be recorded by the worker and gate evaluator.
 
-## LAYER 1: Canonical Identity (✅ COMPLETE 100%)
+## LAYER 1A: Canonical Packet Identity (✅ COMPLETE, corrected 2026-08-02)
 
-| Field | Total | Complete | Status |
-|-------|-------|----------|--------|
-| packet_key | 58,365 | 58,365 | ✅ 100.0% |
-| source_ref | 58,365 | 58,365 | ✅ 100.0% |
-| feature_id | 58,365 | 58,365 | ✅ 100.0% |
-| domain_class | 58,365 | 58,365 | ✅ 100.0% |
-| tree_node_id | 58,365 | 58,365 | ✅ 100.0% |
-| title_id | 58,365 | 58,365 | ✅ 100.0% |
-| concept_ids | 58,365 | 58,360 | ✅ 99.99% |
-| canonical_source_ref | 58,365 | 58,365 | ✅ 100.0% |
-| qdrant_point_id | 58,365 | 4,273 | 🟠 7.32% (architectural ceiling) |
+**Current packet contract**
 
-**Keywords**: `packet_key` → `source_ref` → `feature_id` → `tree_node_id` → `domain_class`
+| Field | Status | Notes |
+|-------|--------|-------|
+| packet_key | PASS | canonical packet identifier |
+| source_ref | PASS | canonical source identity reference |
+| feature_id | PASS | canonical feature identifier |
+| domain_class | PASS | classification only, not identity |
+| title_id | PASS | stable packet metadata |
+| canonical_source_ref | PASS | canonical source reference alias |
+
+**Packet identity coverage**
+
+| Surface | Status | Notes |
+|---------|--------|-------|
+| packet identity coverage | PASS | packet_key, source_ref, feature_id, title_id, canonical_source_ref |
+| tree_node_id population | PASS | present on all packets, but provisional linkage only |
+| qdrant_point_id population | PARTIAL | mirror coverage, not canonical identity |
+| concept_ids population | PASS_WITH_GAPS | annotations present, provenance still incomplete |
+| domain_class lineage | NOT_PROVEN | classification lineage only, not identity |
+
+## LAYER 1B: Parse and Stable Symbol Identity (IN PROGRESS)
+
+> **Correction**: `tree_node_id` is present everywhere, but that does not make it canonical.
+> The live evidence says it is a provisional structural linkage, not a stable symbol identity.
+> See `openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md` (GS1.9–GS1.11) for the current
+> proof split:
+> - `atlas_tree_nodes.node_id` is populated as a content-version / parse-occurrence hash, not a stable symbol id.
+> - `scripts/atlas/phase1-tree-node-derivation.mjs` and `scripts/atlas/backfill-tree-nodes.mjs` still backfill
+>   `tree_node_id` via heuristics and write it back to packets.
+> - `graphify_symbols` is the better stable-symbol candidate, but it is not yet the live canonical owner.
+> - Do not relax `atlas_graph_nodes_v2_tree_node_unique` or promote graph persistence until separate
+>   `parse_node_id`, `symbol_id`, `symbol_version_id`, `chunk_id`, `packet_key`, and `graph_node_key`
+>   contracts are live.
+> - `concept_ids` are annotations, not identity links.
+
+**Provisional linkage coverage**
+
+| Surface | Status | Notes |
+|---------|--------|-------|
+| tree_node_id population | PASS | linkage exists on every packet |
+| tree_node_id stable identity | FAIL | not proven canonical |
+| symbol_id coverage | NOT_PROVEN | stable symbol contract not fully live |
+| parse_node_id contract | NOT_DEFINED | separate parse occurrence contract still missing |
+| concept_ids provenance | NOT_PROVEN | annotations present, provenance incomplete |
+| qdrant_point_id coverage | PARTIAL | mirror only, not canonical truth |
+
+**Current correction**
+
+Do not present the chain as `packet_key → source_ref → feature_id → tree_node_id → domain_class`.
+The safer chain is:
+
+`source_ref` → `source_revision` → `parse_node_id` → `symbol_id` → `symbol_version_id` → `chunk_id` → `packet_key` → `graph_node_key`
+
+`domain_class` and `concept_ids` are annotations, not identity links.
+
+**Identity surface inventory**
+
+| Entity | Current ID / Key | Derivation | Revision-bound | Current owner / role | Status |
+|--------|------------------|------------|----------------|----------------------|--------|
+| `graphify_files` | `file_id` | `workspace_id + source_ref` with revision-scoped versioning | Yes | source file identity candidate | PARTIAL |
+| `graphify_symbols` | `symbol_id`, `stable_symbol_key` | stable symbol candidate within file context | Yes | stable symbol candidate | PARTIAL |
+| `graphify_edges` | `edge_id` | `subject_symbol_id → object_symbol_id` | Yes | edge row identity / symbol relationship ledger | PASS |
+| `atlas_packets` | `packet_key` | canonical packet registry key | Yes | packet truth / canonical packet row | PASS |
+| `atlas_tree_nodes` | `node_id` | provisional parse-occurrence / structural node | Yes | provisional structural inventory | FAIL for canonical identity |
+| `codebase_chunk_index` | `id`, `chunk_id`, `source_ref` | chunk mirror keyed by source/span | Yes | retrieval chunk mirror | PARTIAL |
+| `atlas_packet_registry` | `packet_key` | packet registry backfill from canonical rows | Yes | hot packet registry / projection | PARTIAL |
+| `atlas_representation_records` | `packet_id`, `representation_id`, `representation_revision` | representation lineage record | Yes | representation lineage ledger | PARTIAL |
+| `atlas_topology_index` | `packet_key` | packet-level topology projection | Yes | topology / PageRank / SOM projection | PARTIAL |
+
+**Inventory notes**
+
+- `tree_node_id` is still a provisional linkage field, not the stable graph identity.
+- `graphify_files.file_id` is not yet proven to be a stable cross-revision file identity; treat it as a source identity candidate until the derivation is inspected.
+- `graphify_symbols.symbol_id` exists, but cross-revision stability and `stable_symbol_key` formula are not yet proven.
+- `graphify_edges` has valid row identity, but endpoint continuity still depends on the symbol identity proof.
+- `symbol_id` is the best stable-symbol candidate visible in the repo, but the `symbol_version_id` contract is still missing.
+- `concept_ids` are annotations attached to packets, not identity keys.
+- `atlas_packet_registry` and `atlas_topology_index` are projections or mirrors, not canonical truth.
+- `codebase_chunk_index` is the bridge surface for retrieval and backfill, not the canonical packet owner.
+
+**Identity status summary**
+
+| Gate | Status | Notes |
+|------|--------|-------|
+| `GRAPHIFY_FILE_IDENTITY` | PARTIAL | source identity candidate only |
+| `CROSS_REVISION_FILE_ID` | NOT_PROVEN | file identity across source revisions not yet proven |
+| `GRAPHIFY_SYMBOL_ID_EXISTS` | PASS | symbol rows and IDs exist |
+| `GRAPHIFY_SYMBOL_ID_CROSS_REVISION` | NOT_PROVEN | symbol identity stability across revisions not yet proven |
+| `STABLE_SYMBOL_KEY_FORMULA` | NOT_PROVEN | formula still needs audit |
+| `GRAPHIFY_EDGE_ROW_IDENTITY` | PASS | edge rows exist and are keyed |
+| `GRAPHIFY_EDGE_ENDPOINT_STABILITY` | NOT_PROVEN | continuity depends on symbol identity proof |
+| `TREE_NODE_VERSION_IDENTITY` | PROVEN | `tree_node_id` is revision-bound / occurrence-bound |
+| `PACKET_TREE_LINK_SEMANTICS` | PARTIAL_PROVEN | packet-to-tree linkage exists, meaning still provisional |
+| `IDENTITY_DERIVATION_PROOF` | IN_PROGRESS | read-only derivation audit not yet complete |
+| `IDENTITY_OWNER_ASSIGNMENT` | IN_PROGRESS | source/symbol owners still need confirmation |
+| `IDENTITY_SURFACE_INVENTORY` | PARTIAL | tables and roles inventoried, formulas still under audit |
 
 ---
 
@@ -139,6 +223,83 @@ The gate model is executable state: task created -> PostgreSQL row written -> ou
 - Embeddings: 99.7% ✅ READY
 - Topology: 21.6% (SOM 4.6%, PageRank 21.6%, community 21.6%)
 - Features: 0.9% (ast_symbols), 2.4% (lexical), 0% (entities)
+
+
+## Graph Identity Audit Next Steps
+
+**Status**: BLOCKED until the identity model is separated from the provisional structural snapshot.
+
+**Latest live audit (2026-08-02)**: `atlas_tree_nodes` row_count `263,263`; `node_id` duplicates `0`; `source_ref → packet_key` linkage `58,304/263,263` (`22%`); orphan count `0`; max depth `2`; gate result `FAIL` on linkage coverage.
+
+### Immediate Checklist
+
+- [ ] Inventory identity fields across `atlas_tree_nodes`, `atlas_packets`, `graphify_files`, `graphify_symbols`, `graphify_edges`, and the topology tables.
+- [ ] Define separate contracts for `parse_node_id`, `symbol_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
+- [ ] Split `tree_node_id` from stable symbol identity: add or confirm `symbol_version_id` for version-bound occurrences and keep `symbol_id` as the stable cross-revision key.
+- [ ] Inventory the parser manifest vs runtime implementation: declared `tree-sitter typescript v1` vs actual regex/heuristic extraction.
+- [ ] Reclassify the current graph artifact as a provisional structural snapshot until the enrichment chain is proven.
+- [ ] Keep `tree_node_id` uniqueness intact for now; do not relax or drop the constraint yet.
+- [ ] Confirm whether `tree_node_id` is being used as a catch-all identity in any remaining ETL or backfill script.
+- [ ] Prove the retrieval chain in order: `semantic_768` coverage, KNN top-k, KMeans, 20x20 SOM, then PageRank.
+- [ ] Revisit graph snapshot apply behavior only after the identity and enrichment gates pass.
+
+### Proof Gates
+
+| Gate | Target |
+|------|--------|
+| PARSE_NODE_IDENTITY | PARTIAL_PROVEN |
+| STABLE_SYMBOL_IDENTITY | NOT_PROVEN |
+| SYMBOL_VERSION_IDENTITY | NOT_PROVEN |
+| PACKET_TO_SYMBOL_LINEAGE | NOT_PROVEN |
+| DOMAIN_CLASSIFICATION | PARTIAL_PROVEN |
+| CONCEPT_EXTRACTION | PARTIAL_PROVEN |
+| PARSER_MANIFEST_ALIGNMENT | FAIL |
+| TREE_NODE_ID_STABILITY | FAIL |
+| SYMBOL_SEMANTIC_768 | NOT_PROVEN |
+| KNN_TOPK_RETRIEVAL | NOT_PROVEN |
+| KMEANS_ASSIGNMENTS | PARTIAL / STALE |
+| SOM_20X20_ASSIGNMENTS | PARTIAL / STALE |
+| PAGERANK_PERSISTENCE | NOT_PROVEN |
+| PROVISIONAL_STRUCTURAL_SNAPSHOT | DRY_RUN_PASS |
+| CANONICAL_GRAPH_SNAPSHOT | NOT_PROVEN |
+| GRAPH_SNAPSHOT_APPLY | ROLLED_BACK |
+| TREE_NODE_UNIQUENESS_CHANGE | BLOCKED |
+
+## Repository-First Search Checklist
+
+**Status**: PARTIAL - owner surfaces located; runtime proof still pending.
+
+The next bounded step is to reuse the existing owners instead of wiring a second implementation. Static search has already located several likely entrypoints, but that does not prove runtime behavior.
+
+| Surface | Current owner candidates found in repo | Evidence status |
+|---------|----------------------------------------|-----------------|
+| Diff context / patch context | `scripts/ace-diff-sniffer.mjs`, `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`, `sveltekit-frontend/src/mcp/trace-mcp-server.ts` | PARTIAL_PROVEN |
+| Recommendation record / supersession | `sveltekit-frontend/src/lib/server/ace/recommendation-record.ts`, `sveltekit-frontend/src/lib/server/mcp/phase109a-mcp-tools.ts`, `sveltekit-frontend/src/lib/server/retrieval/feature-record.ts`, `sveltekit-frontend/src/lib/server/retrieval/promote-results-outbox.ts` | PARTIAL |
+| Validation receipts / proof gates | `sveltekit-frontend/src/lib/server/atlas/contracts/validation-result-v1.ts`, `sveltekit-frontend/src/lib/server/agent/execution-review.ts`, `scripts/opencode/validation-gate.mjs` | PARTIAL |
+| Hot / warm / cold storage | `sveltekit-frontend/src/mcp/engram_tools.ts`, `sveltekit-frontend/src/lib/server/cache/*`, `sveltekit-frontend/src/lib/server/retrieval/*` | PARTIAL |
+| Tensor / gRPC / protobuf | `sveltekit-frontend/src/lib/server/atlas/go-retrieval-grpc-client.ts`, `sveltekit-frontend/src/mcp/server.ts`, `sveltekit-frontend/src/lib/server/atlas/atlas-semantic-tools.ts` | PARTIAL |
+| SOM / KMeans / topology | `sveltekit-frontend/src/mcp/server.ts`, `sveltekit-frontend/src/lib/server/atlas/atlas_embedding_tools.ts`, `scripts/agents/som-cluster-cards.mjs` | PARTIAL |
+| NLP / LDR sidecar | `sveltekit-frontend/src/mcp/trace-mcp-server.ts`, `sveltekit-frontend/src/mcp/ldr-research-tools.ts` | PARTIAL |
+| Graph retrieval / projection | `sveltekit-frontend/src/lib/server/retrieval/*`, `sveltekit-frontend/src/lib/server/atlas/graph/*`, `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board.ts` | PARTIAL |
+
+### Checklist to keep bounded
+
+- [ ] Reuse the existing diff-context owner instead of adding a second diff parser.
+- [ ] Reuse the existing recommendation/supersession path instead of inventing a new status ledger.
+- [ ] Reuse the existing validation receipt path instead of storing proof in logs only.
+- [ ] Reuse the existing storage tier split: hot cache, canonical Postgres, cold object storage.
+- [ ] Reuse the existing tensor/gRPC path instead of sending large tensors through ad hoc JSON.
+- [ ] Reuse the existing SOM/KMeans lane only after its runtime proof is explicit.
+- [ ] Reuse the existing NLP / LDR sidecar only after its runtime path is proven, not just referenced.
+- [ ] Reuse the existing graph retrieval path only after the owner, entrypoint, and tests are located.
+- [ ] Record runtime proof separately from static owner discovery.
+
+**Runtime proof captured**
+
+- `tests/routes/auto/api/ace/recommendations.test.ts` now proves the HTTP wrapper around `contextForFile()` returns the expected packet shape and stable unauthorized envelope.
+- The direct `contextForFile()` invocation still needs a lighter smoke path if we want proof of the heavy atlas-load branch specifically.
+
+**Do not** wire new implementations until the owner file, runtime entrypoint, and tests are all located.
 
 ### Phase 5: Go Sidecar (Optional)
 

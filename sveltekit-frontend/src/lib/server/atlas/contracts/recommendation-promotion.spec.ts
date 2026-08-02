@@ -49,7 +49,7 @@ describe('Atlas recommendation promotion', () => {
 
   it('keeps tree-node identity separate from packet and candidate identities', () => {
     const identity = RecommendationTreeNodeIdentitySchema.parse({
-      tree_node_id: 'tree:src/lib/server/retrieval/ranker.ts:rankCandidates',
+      tree_node_id: 'tree:structural:src/lib/server/retrieval/ranker.ts:rankCandidates',
       node_type: 'function',
       symbol_name: 'rankCandidates',
       source_ref: 'src/lib/server/retrieval/ranker.ts',
@@ -71,7 +71,7 @@ describe('Atlas recommendation promotion', () => {
       query_id: 'query:1',
       candidate_id: 'cand:1',
       packet_key: 'packet:1',
-      tree_node_id: 'tree:1',
+      tree_node_id: 'tree:structural:1',
       heuristic_relevance_score: 0.67,
       ranker_score: 0.92,
       usefulness_probability: 0.88,
@@ -94,7 +94,7 @@ describe('Atlas recommendation promotion', () => {
       contract: 'atlas.acp.recommendation.v1', query_id: 'query:1', intent: 'inspect', corpus_snapshot_id: 'snapshot:1',
       budget: { max_source_files: 1, max_raw_tokens: 100, max_tool_calls: 2, max_graph_hops: 2 },
       permissions: { mode: 'read_only', allowed_roots: ['src/lib'] },
-      candidates: [{ tree_node_id: 'tree:1', source_ref: 'src/lib/router.ts', relevance_probability: 0.8, reason_codes: ['EXACT_MATCH'], evidence_refs: ['evidence:1'], estimated_context_tokens: 101, graph_paths: [] }],
+      candidates: [{ tree_node_id: 'tree:structural:1', source_ref: 'src/lib/router.ts', relevance_probability: 0.8, reason_codes: ['EXACT_MATCH'], evidence_refs: ['evidence:1'], estimated_context_tokens: 101, graph_paths: [] }],
     })).toThrow(/token budget/i);
   });
 

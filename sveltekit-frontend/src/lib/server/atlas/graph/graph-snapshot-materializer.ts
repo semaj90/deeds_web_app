@@ -166,7 +166,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
   const edgeOrientationPolicy = input.edgeOrientationPolicy ?? 'parent_to_child';
   const duplicateEdgePolicy = input.duplicateEdgePolicy ?? 'dedupe_by_edge_key';
   const selfLoopPolicy = input.selfLoopPolicy ?? 'exclude';
-  const relationshipTypes = ['CONTAINS', 'MATERIALIZES'] as const;
+  const relationshipTypes = ['CONTAINS', 'DERIVED_FROM'] as const;
 
   const sortedTreeNodes = [...input.treeNodes].sort((left, right) => left.nodeId.localeCompare(right.nodeId));
   const sortedPackets = [...input.packets].sort((left, right) => left.packetKey.localeCompare(right.packetKey));
@@ -299,7 +299,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
         nodeKey,
         nodeType: 'packet',
         packetKey: packet.packetKey,
-        treeNodeId: packet.treeNodeId,
+        treeNodeId: null,
         sourceRef: packet.sourceRef,
         contentHash: packet.sha256 ?? hashStableRecord({
           packetKey: packet.packetKey,
@@ -320,7 +320,6 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           lineageVersion: packet.lineageVersion ?? null,
           ledgerType: packet.ledgerType ?? null,
           canonical: packet.canonical ?? null,
-          treeNodeId: packet.treeNodeId,
           qdrantCollection: packet.qdrantCollection ?? null,
           qdrantVectorDim: packet.qdrantVectorDim ?? null
         }),
@@ -345,7 +344,7 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           lineageVersion: packet.lineageVersion ?? null,
           ledgerType: packet.ledgerType ?? null,
           canonical: packet.canonical ?? null,
-          treeNodeId: packet.treeNodeId,
+          treeNodeId: null,
           qdrantCollection: packet.qdrantCollection ?? null,
           qdrantVectorDim: packet.qdrantVectorDim ?? null,
           topology: packet.topology ?? {},
@@ -410,16 +409,16 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     }
     addEdge(graphSnapshotEdges, seenEdgeKeys, graphSnapshotExclusions, snapshotId, {
       snapshotId,
-      edgeKey: `materializes:${owner.nodeId}:${packet.packetKey}`,
-      sourceNodeKey: `tree:${owner.nodeId}`,
-      targetNodeKey: `packet:${packet.packetKey}`,
-      edgeType: 'MATERIALIZES',
+      edgeKey: `derived_from:${packet.packetKey}:${owner.nodeId}`,
+      sourceNodeKey: `packet:${packet.packetKey}`,
+      targetNodeKey: `tree:${owner.nodeId}`,
+      edgeType: 'DERIVED_FROM',
       weight: 1,
       confidence: 1,
       provenance: 'atlas_packets',
       properties: {
         packetKey: packet.packetKey,
-        treeNodeId: packet.treeNodeId,
+        derivedFromTreeNodeId: owner.nodeId,
         featureId: packet.featureId,
         sourceRef: packet.sourceRef
       }
