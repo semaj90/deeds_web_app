@@ -5536,3 +5536,111 @@ export const unknownResolutionLedger = pgTable('unknown_resolution_ledger', {
 export type UnknownResolutionLedger    = typeof unknownResolutionLedger.$inferSelect;
 export type NewUnknownResolutionLedger = typeof unknownResolutionLedger.$inferInsert;
 
+// ─────────────────────────────────────────────────────────────────────────
+// Phase 109A semantic signal lifecycle — real live tables, previously
+// undeclared in Drizzle (2026-08-02 finding: src/lib/server/mcp/
+// phase109a-mcp-tools.ts imported semanticSignals/semanticLifecycleEvents/
+// recommendationLog from this file, none of which were exported, crashing
+// the whole atlas-tools MCP server's module load). Columns below match the
+// live `\d semantic_signals` / `\d semantic_lifecycle_events` /
+// `\d recommendation_log` output exactly — introspected, not invented.
+// ─────────────────────────────────────────────────────────────────────────
+
+export const signalTypeEnum = pgEnum('signal_type', [
+    'DOMAIN_CLASS', 'INTENT_TAG', 'RETRIEVAL_LANE', 'GRAPH_FACT', 'CLASSIFICATION',
+    'RECOMMENDATION', 'LEARNED_POS', 'LEARNED_ENTITY', 'AST_SYMBOL', 'EVIDENCE_REFERENCE',
+]);
+
+export const recommendationStatusEnum = pgEnum('recommendation_status', [
+    'PROPOSED', 'EVIDENCE_GATHERING', 'READY_FOR_REVIEW', 'APPROVED',
+    'IMPLEMENTED', 'VALIDATED', 'REJECTED', 'SUPERSEDED',
+]);
+
+export const semanticSignals = pgTable('semantic_signals', {
+    id:                     uuid('id').primaryKey().defaultRandom(),
+    workspaceId:            varchar('workspace_id', { length: 255 }).notNull(),
+    revisionId:             varchar('revision_id', { length: 255 }).notNull(),
+    workspaceRevision:      text('workspace_revision').notNull(),
+    subjectId:              varchar('subject_id', { length: 255 }).notNull(),
+    signalType:             signalTypeEnum('signal_type').notNull(),
+    producer:               varchar('producer', { length: 255 }).notNull(),
+    producerModelRevision:  varchar('producer_model_revision', { length: 255 }),
+    producerSchemaVersion:  varchar('producer_schema_version', { length: 255 }),
+    evidenceIds:            text('evidence_ids').array().notNull().default(sql`'{}'::text[]`),
+    evidenceConfidence:     real('evidence_confidence'),
+    createdAt:              timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt:              timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    createdBy:              varchar('created_by', { length: 255 }),
+    lifecycleState:         varchar('lifecycle_state', { length: 50 }).notNull().default('ACTIVE'),
+    stateReason:            text('state_reason'),
+    stateChangedAt:         timestamp('state_changed_at', { withTimezone: true }).notNull().defaultNow(),
+    stateChangedBy:         varchar('state_changed_by', { length: 255 }),
+    supersededBy:           uuid('superseded_by'),
+    retentionUntil:         timestamp('retention_until', { withTimezone: true }),
+}, (t) => ({
+    subjectTypeIdx:         index('idx_semantic_signals_subject_type').on(t.subjectId, t.signalType),
+    workspaceRevisionIdx:   index('idx_semantic_signals_workspace_revision').on(t.workspaceId, t.revisionId),
+    producerIdx:            index('idx_semantic_signals_producer').on(t.producer),
+}));
+
+export type SemanticSignal    = typeof semanticSignals.$inferSelect;
+export type NewSemanticSignal = typeof semanticSignals.$inferInsert;
+
+export const semanticLifecycleEvents = pgTable('semantic_lifecycle_events', {
+    id:                 uuid('id').primaryKey().defaultRandom(),
+    entityType:         varchar('entity_type', { length: 50 }).notNull(),
+    entityId:           uuid('entity_id').notNull(),
+    previousState:      varchar('previous_state', { length: 50 }).notNull(),
+    newState:           varchar('new_state', { length: 50 }).notNull(),
+    reason:             text('reason'),
+    actorType:          varchar('actor_type', { length: 50 }).notNull(),
+    actorId:            varchar('actor_id', { length: 255 }).notNull(),
+    runId:              uuid('run_id'),
+    proofManifestId:    uuid('proof_manifest_id'),
+    workspaceRevision:  text('workspace_revision').notNull(),
+    createdAt:          timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+    actorIdx:       index('idx_semantic_lifecycle_events_actor').on(t.actorId),
+    createdAtIdx:   index('idx_semantic_lifecycle_events_created_at').on(t.createdAt),
+    entityIdx:      index('idx_semantic_lifecycle_events_entity').on(t.entityId),
+}));
+
+export type SemanticLifecycleEvent    = typeof semanticLifecycleEvents.$inferSelect;
+export type NewSemanticLifecycleEvent = typeof semanticLifecycleEvents.$inferInsert;
+
+export const recommendationLog = pgTable('recommendation_log', {
+    id:                                 uuid('id').primaryKey().defaultRandom(),
+    workspaceId:                        varchar('workspace_id', { length: 255 }).notNull(),
+    revisionId:                         varchar('revision_id', { length: 255 }).notNull(),
+    subjectId:                          varchar('subject_id', { length: 255 }).notNull(),
+    proposedAction:                     text('proposed_action').notNull(),
+    inferenceExplanation:               text('inference_explanation').notNull(),
+    evidenceIds:                        text('evidence_ids').array().notNull().default(sql`'{}'::text[]`),
+    evidenceConfidence:                 real('evidence_confidence').notNull().default(0.5),
+    validationCriteria:                 text('validation_criteria').notNull(),
+    expectedImpact:                     text('expected_impact').notNull(),
+    rollbackPlan:                       text('rollback_plan').notNull(),
+    rollbackVerification:               text('rollback_verification').notNull(),
+    status:                             recommendationStatusEnum('status').notNull().default('PROPOSED'),
+    createdAt:                          timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    createdBy:                          varchar('created_by', { length: 255 }).notNull(),
+    approvedAt:                         timestamp('approved_at', { withTimezone: true }),
+    approvedBy:                         varchar('approved_by', { length: 255 }),
+    implementedAt:                      timestamp('implemented_at', { withTimezone: true }),
+    validatedAt:                        timestamp('validated_at', { withTimezone: true }),
+    validationError:                    text('validation_error'),
+    updatedAt:                          timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    lifecycleState:                     varchar('lifecycle_state', { length: 50 }).notNull().default('ACTIVE'),
+    stateChangedAt:                     timestamp('state_changed_at', { withTimezone: true }).notNull().defaultNow(),
+    stateChangedBy:                     varchar('state_changed_by', { length: 255 }),
+    approvedByDistinctFromCreatedBy:    boolean('approved_by_distinct_from_created_by').notNull().default(false),
+    proofManifestId:                    uuid('proof_manifest_id'),
+}, (t) => ({
+    createdByIdx:           index('idx_recommendation_log_created_by').on(t.createdBy),
+    statusIdx:              index('idx_recommendation_log_status').on(t.status),
+    subjectWorkspaceIdx:    index('idx_recommendation_log_subject_workspace').on(t.subjectId, t.workspaceId),
+}));
+
+export type RecommendationLogEntry    = typeof recommendationLog.$inferSelect;
+export type NewRecommendationLogEntry = typeof recommendationLog.$inferInsert;
+
