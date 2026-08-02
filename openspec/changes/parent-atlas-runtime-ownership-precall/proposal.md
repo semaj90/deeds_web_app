@@ -171,6 +171,70 @@ done, per operator sign-off on the "Correct next TODO" list:
   (dispatcher, LangGraph) or meaningfully more design work (query
   planning, coverage metrics) than a single bounded pass covers.
 
+## Step 5 (dispatcher worker entrypoint) — 2026-08-01, corrected status after operator review
+
+Building the worker surfaced 3 real, pre-existing bugs (dependency
+version mismatch, missing module, invalid Drizzle config) plus 2 design
+issues in the worker itself (env-load ordering fragility, signal handlers
+registered too late). All 5 are fixed — see commits `0202efaede`
+(dependency), `ef6b28a25b` (import-chain repairs), `2a56624c2d` (worker
+entrypoint). Split into 3 commits per operator instruction so a
+dependency-graph fix, an unrelated-file repair, and a new long-running
+process are independently revertable.
+
+**Corrected status** (operator's classification, verified against what was
+actually proven — not asserted from a single successful run):
+
+| Gate | Status | Evidence |
+|---|---|---|
+| `LANGGRAPH_PACKAGE_COMPATIBILITY` | `RUNTIME_PROVEN` | `node -e` against installed `package.json`s: langgraph 1.4.7 requires core `^1.1.48`, installed core is `1.2.4` |
+| `LANGGRAPH_IMPORT_COMPATIBILITY` | `RUNTIME_PROVEN` | `import('@langchain/core/language_models/stream')` (the exact originally-failing subpath) resolves cleanly |
+| `LANGGRAPH_MINIMAL_EXECUTION` | `RUNTIME_PROVEN` | Minimal `StateGraph` (one node, START→node→END) compiled and `invoke({value:1})` returned `{value:2}` |
+| `WORKER_STARTUP` | `RUNTIME_PROVEN` | `npm run atlas:dispatcher:worker:smoke` — full `starting→...→ready` progression, real Redis heartbeat with correct TTL |
+| `QUEUE_TOPOLOGY` / `CONSUMER_REGISTRATION` | `RUNTIME_PROVEN` | `queue_bound`, `consumer_registered` both logged; `validateListenerSetup()` declared exchange/queue/DLQ/binding for real |
+| `GRACEFUL_SHUTDOWN` | `RUNTIME_PROVEN` (via `--smoke`, not OS signals) | `shutdown_started→listener_stopped→redis_closed→lock_released→shutdown_complete`, exit 0, lock file and heartbeat key both confirmed removed. OS-level SIGTERM/SIGINT delivery could **not** be proven live in this Windows dev environment — confirmed both `Stop-Process` and `child.kill('SIGINT')` hard-terminate rather than deliver a catchable signal here. The code uses the standard `process.on('SIGTERM'/'SIGINT')` idiom and should be re-verified in a real Linux deployment; `--smoke` proves the identical shutdown code path deterministically in the meantime. |
+| `MESSAGE_DELIVERY` / `GRAPH_INVOCATION` / `NODE_EXECUTION` / `MESSAGE_ACK` | `NOT_PROVEN` | No fixture message has been published through this worker yet. `worker_ready` proves startup, not orchestration. |
+| `REDELIVERY_IDEMPOTENCY` / `RETRY_EXHAUSTION` / `DLQ_ROUTING` | `NOT_PROVEN` | Same — depends on the message-delivery proof above |
+| `POSTGRES_CHECKPOINTER` / `THREAD_ID_CONTRACT` / `CHECKPOINT_RESUME` | `NOT_PROVEN` | `createDispatcherGraph()` compiles but is invoked with no checkpointer — no durable execution, no resume-after-crash |
+| `PACKET_BITMAP_GATE_SEMANTICS` / `_WRITER` / `_REDIS_KEYS` / `_INVALIDATION` / `_PERFORMANCE` | `NOT_PROVEN` | `PACKET_BITMAP_IMPORT_BLOCKER: FIXED`, `SAFE_QUARANTINE_FALLBACK: PRESENT` — the capability itself remains unimplemented, now explicitly labeled as such rather than hidden behind zeroed data |
+
+**Next proof is not more startup work** — it's one controlled RabbitMQ
+message through a real LangGraph node: publish a fixture
+(`eventId`, `workspaceId`, `workspaceRevision`, `operation`, `payload`),
+prove `executeDispatcherOrchestration` is invoked, at least one real node
+executes, a durable audit row is written (`dispatcher_audit_log`, now
+that its schema import bug is fixed), and the message is acknowledged.
+Then malformed-input rejection, one transient-failure/retry proof, and
+DLQ-after-exhaustion. None of this is started.
+
+## Severity-ranked backlog (operator review, 2026-08-01) — not started, logged for future sessions
+
+Captured here rather than acted on now — each is real multi-session
+scope on its own:
+
+1. **Critical — dispatcher execution unproven.** Startup ≠ orchestration; see table above.
+2. **Critical — LangGraph used without durable execution.** No Postgres checkpointer, no stable `thread_id`/`run_id` contract, no pending-write recovery, no proof that a failed super-step doesn't repeat a sibling node's already-successful side effect.
+3. **High — import-time side effects are systemic, not isolated.** This session alone found 5 unrelated module-load crashes (phase18-reranker circular import, bare `boolean` in a Zod schema, langgraph/core version drift, missing packet-bitmap module, invalid `bigserial` config) plus the standalone-script env-loading gap. Desired rule: schema modules touch no network/DB/Redis/queue/filesystem; router modules declare procedures only; service construction is explicit dependency injection; only the entrypoint loads env, creates dependencies, and starts the runtime. Proposed gates: `IMPORT_ROOT_ROUTER_WITHOUT_INFRA`, `IMPORT_DISPATCHER_GRAPH_WITHOUT_BROKER`, `IMPORT_ZOD_SCHEMAS_WITHOUT_ENV`, `IMPORT_DRIZZLE_SCHEMA_WITHOUT_DATABASE` — each should complete quickly, no network access.
+4. **High — RabbitMQ reliability policy is incomplete.** Manual-vs-automatic ack, prefetch, queue type, publisher confirms, retry limit, DLX, poison-message policy, duplicate handling, and competing-vs-single-active-consumer are all still undecided for this worker. Recommended baseline: durable queue, manual ack, prefetch 1–8, idempotency by `event_id`, bounded attempts, DLX after exhaustion.
+5. **High — durable context continuity is architectural, not operational.** No transactional outbox, no CDC connector, no idempotent consumer, no proven compaction-restore. Best next infra slice: outbox insert in the same Postgres transaction as the canonical write → one CDC connector → one idempotent audit consumer → one compact context record → prove restore after a consumer failure.
+6. **High — PostgreSQL CDC/WAL operational safety unproven**, relevant only once/if item 5's CDC connector is built: `wal_level=logical`, replication slot monitoring, abandoned-slot disk-pressure risk. Do not enable before `WAL_LEVEL_LOGICAL`, `SLOT_ACTIVE`, `SLOT_LAG_REPORTED`, `SAFE_WAL_SIZE_REPORTED`, and outage alerts all exist.
+7. **High, for answer quality — retrieval is structurally wired but semantically incomplete.** The live `atlas.retrieveEvidence` proof (previous session pass) is closer to "validated lexical retrieval with transparent degradation" than full hybrid retrieval: `semantic` was `not_configured`/`embedding_unavailable` on that run (embedding backend down), `centroid`/`turbovec` structurally not_configured, `graph` never enabled in the wired path. Next retrieval proof should restore one canonical `semantic_768` embedding backend and prove embed→Qdrant top-K→revision-guard→merge-with-lexical, not add more lanes.
+8. **High — centroid ownership remains fragmented.** 8 incompatible Redis key schemes (prior audit) + a 9th Postgres naming scheme (`node:{row}:{col}`, this session) + 2 populated-but-stale Postgres tables + zero active Redis projection writer + no settled Qdrant payload contract. Not just naming drift — no live invariant connects canonical assignment → representation revision → member identity → Qdrant payload → Valkey projection → retrieval reader. Do not rename the 9 schemes without first tracing every writer/reader (some may represent genuinely different concepts: SOM cells, KMeans clusters, graph communities, query affinity).
+9. **Medium-high — graph freshness and runtime LangGraph evidence are conflated.** The stale-codebase-graph warning (Karpathy/KAG map) is a separate concern from whether the LangGraph *runtime* works — track `STATIC_CODEBASE_GRAPH_FRESH` and `LANGGRAPH_RUNTIME_EXECUTION_PROVEN` as two separate gates. `graphify:daily` should stay a scheduled projection, never worker-startup logic.
+10. **High, for long-term maintainability — state ownership is split across competing stores.** Confirmed conflicts: multiple MCP server registries (mostly resolved this session), `kanban_tasks` as its own planning DB (confirmed, not yet redesigned), OpenSpec/GSD/GitHub/Parent-Atlas state not linked by one `work_item_id`, multiple centroid schemas, `bitfrost`/`bifrost` spelling drift. Needed guards: one canonical writer per entity type, one immutable `work_item_id`, a representation registry, projection revision fields, stale-event rejection, a generated schema-ownership doc.
+11. **Medium-high — tests are strong locally, thin at process boundaries.** The 19 committed tests are good service/router coverage but don't cover child-process startup, real RabbitMQ delivery/ack/requeue, worker crash after a side effect but before ack, Redis reconnect, Postgres outage, checkpoint resume, or multi-process contention. Next test layer needs real containers/subprocesses, not more mocks.
+12. **Medium now, critical if production claims begin — GPU capability proof base is much narrower than the roadmap.** Keep `PACKAGE_INSTALLED`/`MODULE_IMPORTS`/`GPU_VISIBLE`/`KERNEL_EXECUTES`/`NUMERICAL_PARITY`/`PERFORMANCE_IMPROVEMENT`/`REAL_DATA_ACCURACY`/`PRODUCTION_INTEGRATION` as separate, non-implying stages — a successful import or CUDA allocation proves none of the later ones.
+13. Kanban-as-projection redesign (already logged as a separate decision needing operator sign-off before touching `kanban_tasks`) and Deep-research-ingestion/Triton-readiness stubs remain untouched, as intended.
+
+**Ranked remediation order** (operator's own sequencing, not re-derived):
+prove the dispatcher (one message → one node → durable audit → ack) →
+make LangGraph durable (checkpointer, `thread_id`, idempotent side
+effects, crash/resume proof) → restore hybrid retrieval (canonical
+embedding backend first, lanes after) → durable context (outbox → CDC →
+idempotent consumer → compaction restore) → ownership/projections
+(MCP registries done; Kanban, centroid, SOM/KMeans coverage remain) →
+GPU numerical validation gates.
+
 ## Explicitly out of scope for this change
 
 - Migrating or renaming any of the 8 (now 9, see Postgres inventory
