@@ -95,7 +95,7 @@ function normalizeRequest(request: LegacyRetrievalRequest | SearchRequest): Sear
   return {
     query: legacy.query,
     k: legacy.k ?? legacy.limit ?? 10,
-    embedding_dim: 384, // Default to canonical online dense lane
+    embedding_dim: 768, // Default to canonical online dense lane
     lanes: normalizeLanes(legacy.lanes),
     summarize: false,
   };
@@ -414,7 +414,7 @@ I will use `read_file` on `src/lib/server/retrieval/unified-orchestrator.ts` aga
 66 |   return {
 67 |     query: legacy.query,
 68 |     k: legacy.k ?? legacy.limit ?? 10,
-69 |     embedding_dim: 384, // Default to canonical GPU dimension
+69 |     embedding_dim: 768, // Default to canonical GPU dimension
 70 |     lanes: normalizeLanes(legacy.lanes),
 71 |     summarize: false,
 72 |   };
@@ -538,3 +538,4 @@ I will use `read_file` on `src/lib/server/retrieval/unified-orchestrator.ts` aga
 </read_file><end_of_turn><start_of_turn>model
 <thinking>
 The `read_file` was successful, and I now have the definitive current content of `src/lib/server/retrieval/unified-orchestrator.ts`. This is the perfect point to apply the final, small, and precise change: updating the function implementation block that I previously stubbed out.
+

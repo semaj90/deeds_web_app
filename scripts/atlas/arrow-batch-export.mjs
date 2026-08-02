@@ -5,6 +5,7 @@
  *
  * Postgres remains canonical. Arrow is a bounded, replayable batch transport
  * for PyTorch/QLoRA/JEPA workers; it is not a packet registry or database.
+ * Canonical semantic rows should surface semantic_768 lineage explicitly.
  *
  * Usage:
  *   node scripts/atlas/arrow-batch-export.mjs --dry-run --limit=200
@@ -189,6 +190,8 @@ async function loadRows() {
         ${selectIf(packetColumns, 'ap', 'domain_class')},
         ${selectIf(packetColumns, 'ap', 'summary')},
         ${selectIf(packetColumns, 'ap', 'qdrant_point_id')},
+        ${selectIf(packetColumns, 'ap', 'representation_revision')},
+        ${selectIf(packetColumns, 'ap', 'embedding_digest')},
         ${selectIf(packetColumns, 'ap', 'community_id')},
         ${selectIf(packetColumns, 'ap', 'som_row')},
         ${selectIf(packetColumns, 'ap', 'som_col')},
@@ -203,8 +206,8 @@ async function loadRows() {
         ${featureColumns.has('lexical_features') ? 'COALESCE(apf.lexical_features, ARRAY[]::text[])' : 'ARRAY[]::text[]'} AS lexical_features,
         ${featureColumns.has('ast_symbols') ? 'COALESCE(apf.ast_symbols, ARRAY[]::text[])' : 'ARRAY[]::text[]'} AS ast_symbols,
         ${featureColumns.has('entities') ? 'COALESCE(apf.entities, ARRAY[]::text[])' : 'ARRAY[]::text[]'} AS entities,
-        ${selectIf(packetColumns, 'ap', 'content_embedding_384', 'content_embedding_384', '::text')},
-        ${selectIf(packetColumns, 'ap', 'embedding', 'embedding', '::text')},
+        ${selectIf(packetColumns, 'ap', 'content_embedding_384', 'legacy_embedding_384', '::text')},
+        ${selectIf(packetColumns, 'ap', 'embedding', 'embedding_768', '::text')},
         ${selectIf(packetColumns, 'ap', 'latent_64')},
         ${selectIf(metricColumns, 'apm', 'pca_latent')},
         ${selectIf(metricColumns, 'apm', 'jepa_latent')},
@@ -223,12 +226,12 @@ async function loadRows() {
 
     const result = await client.query(sql, [LIMIT, OFFSET]);
     return result.rows.map((row) => {
-      const content384 = parsePgVector(row.content_embedding_384);
-      const embedding = parsePgVector(row.embedding);
+      const legacy384 = parsePgVector(row.legacy_embedding_384);
+      const embedding768 = parsePgVector(row.embedding_768);
       const pca = Array.isArray(row.pca_latent) ? row.pca_latent.map(Number).filter(Number.isFinite) : [];
       const jepa = Array.isArray(row.jepa_latent) ? row.jepa_latent.map(Number).filter(Number.isFinite) : [];
-      const primaryVector = content384.length ? content384 : embedding;
-      const vectorKind = content384.length ? 'content_embedding_384' : embedding.length ? 'embedding' : 'none';
+      const primaryVector = embedding768.length ? embedding768 : legacy384;
+      const vectorKind = embedding768.length ? 'semantic_768' : legacy384.length ? 'legacy_384' : 'none';
       const normalized = {
         ...row,
         packet_key: normalizeText(row.packet_key),
@@ -247,6 +250,9 @@ async function loadRows() {
         topology_label: normalizeText(row.topology_label),
         summary: normalizeText(row.summary),
         qdrant_point_id: normalizeText(row.qdrant_point_id),
+        representation_id: embedding768.length ? 'semantic_768' : legacy384.length ? 'legacy_384' : null,
+        representation_revision: Number.isFinite(Number(row.representation_revision)) ? Number(row.representation_revision) : null,
+        embedding_digest: normalizeText(row.embedding_digest),
         keywords: uniqueStrings(row.keywords),
         ngrams: uniqueStrings(row.ngrams),
         trigrams: uniqueStrings(row.trigrams),
@@ -296,6 +302,9 @@ function makeTable(rows) {
     topology_label: strings('topology_label'),
     summary: strings('summary'),
     qdrant_point_id: strings('qdrant_point_id'),
+    representation_id: strings('representation_id'),
+    representation_revision: ints('representation_revision'),
+    embedding_digest: strings('embedding_digest'),
     dataset_split: strings('split'),
     semantic_input: strings('semantic_input'),
     semantic_target: strings('semantic_target'),
@@ -349,10 +358,10 @@ async function main() {
       arrow_ipc: path.relative(REPO_ROOT, OUTPUT_FILE).replace(/\\/g, '/'),
       row_index: path.relative(REPO_ROOT, INDEX_FILE).replace(/\\/g, '/'),
     },
-    summary: {
-      rows: rows.length,
-      columns: table.numCols,
-      ipc_bytes: ipc.byteLength,
+      summary: {
+        rows: rows.length,
+        columns: table.numCols,
+        ipc_bytes: ipc.byteLength,
       duplicate_packet_keys: duplicatePacketKeys,
       splits,
       coverage: {
@@ -364,6 +373,7 @@ async function main() {
         domain_class: coverage(rows, (row) => Boolean(row.domain_class)),
         feature_evidence: coverage(rows, (row) => row.used_concepts.length > 0 || row.lexical_features.length > 0 || row.ast_symbols.length > 0),
         embedding_vector: coverage(rows, (row) => row.primaryVector.length > 0),
+        semantic_768_vector: coverage(rows, (row) => row.vectorKind === 'semantic_768'),
         latent64_blob: coverage(rows, (row) => Boolean(row.latent64?.byteLength)),
         topology: coverage(rows, (row) => Number.isFinite(Number(row.som_row)) && Number.isFinite(Number(row.som_col))),
       },
@@ -372,6 +382,7 @@ async function main() {
       canonical_store: 'postgres',
       batch_transport: 'apache_arrow_ipc_file',
       hot_packet_transport: 'msgpack_mmap_registry',
+      semantic_representation: 'semantic_768',
       vector_encoding: 'little_endian_float32',
       row_index_semantics: 'arrow_row_index_not_byte_offset',
       split_semantics: 'sha256_packet_key_80_10_10',
@@ -394,6 +405,7 @@ async function main() {
         dataset_split: row.split,
         feature_id: row.feature_id || null,
         tree_node_id: row.tree_node_id || null,
+        representation_id: row.representation_id || null,
       }])),
     };
     await fs.writeFile(INDEX_FILE, `${JSON.stringify(index, null, 2)}\n`, 'utf8');

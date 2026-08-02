@@ -127,9 +127,6 @@ import { createMiniforgeNlpSidecarClient } from '../lib/server/nlp/miniforge-nlp
 import { selectToolsForQuery } from '../lib/server/ai/tool-selection.js';
 
 const SVELTEKIT         = ENV.PUBLIC_API_URL;
-const NEO4J_HTTP        = ENV.NEO4J_HTTP_URL;
-const NEO4J_USER        = ENV.NEO4J_USER;
-const NEO4J_PASS        = ENV.NEO4J_PASSWORD;
 const REDIS_URL         = ENV.REDIS_URL;
 const REDIS_PASSWORD    = ENV.REDIS_PASSWORD;
 const PG_URL            = ENV.DATABASE_URL;
@@ -381,7 +378,7 @@ if (LANGGRAPH_ENABLED) {
 const dispatcherMiddleware = new DispatcherMiddleware(pool, engramBridge, langgraphBridge, LANGGRAPH_ENABLED);
 
 // Register core tools with dispatcher middleware
-registerNewTools(server, { rerankUrl: RERANK_URL }, dispatcherMiddleware, ENABLE_LEGACY_ALIASES);
+registerNewTools(server, { rerankUrl: RERANK_URL, pgPool: pool }, dispatcherMiddleware, ENABLE_LEGACY_ALIASES);
 registerAdminTools(server, dispatcherMiddleware);
 registerSkillTools(server, dispatcherMiddleware);
 registerLegalSkillsTools(server);
@@ -606,6 +603,23 @@ async function probePostgres() {
   }
 }
 
+async function probeNeo4j() {
+  const startedAt = Date.now();
+  try {
+    const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
+    await getNeo4jDriver().getServerInfo();
+    return { name: 'neo4j', ok: true, status: 'ok', latencyMs: Date.now() - startedAt };
+  } catch (error) {
+    return {
+      name: 'neo4j',
+      ok: false,
+      status: 'error',
+      latencyMs: Date.now() - startedAt,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 async function probeRedis() {
   const startedAt = Date.now();
   try {
@@ -744,25 +758,34 @@ function normalizeTopologyHits(
   return { ok: true, source: 'topology', hits, elapsedMs };
 }
 
-// ── Neo4j HTTP helper ─────────────────────────────────────────────────────────
+// ── Neo4j bolt-driver helper ──────────────────────────────────────────────────
+// Uses the canonical getNeo4jDriver() bolt connection (same as every other
+// Neo4j consumer in this codebase) instead of a raw HTTP transaction fetch —
+// the HTTP path depended on ENV.NEO4J_HTTP_URL, which was never defined,
+// making every neo4jQuery() call fail with "Failed to parse URL from undefined/...".
+// Returns the same `{ row: unknown[] }[]` shape the old HTTP transaction API
+// produced, so none of the call sites below need to change.
 
 async function neo4jQuery(cypher: string, params: Record<string, unknown> = {}) {
-  const res = await fetch(`${NEO4J_HTTP}/db/neo4j/tx/commit`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${Buffer.from(`${NEO4J_USER}:${NEO4J_PASS}`).toString('base64')}`,
-    },
-    body: JSON.stringify({ statements: [{ statement: cypher, parameters: params }] }),
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!res.ok) throw new Error(`Neo4j HTTP ${res.status}`);
-  const body = (await res.json()) as {
-    results?: { data?: { row?: unknown[] }[] }[];
-    errors?: { message?: string }[];
-  };
-  if (body.errors?.length) throw new Error(body.errors[0].message ?? 'Neo4j error');
-  return body.results?.[0]?.data ?? [];
+  const neo4j = (await import('neo4j-driver')).default;
+  const { getNeo4jDriver } = await import('../lib/server/neo4j-driver.js');
+  const session = getNeo4jDriver().session();
+  try {
+    // Cypher clauses like LIMIT/SKIP require a Neo4j Integer, not a JS float —
+    // the driver otherwise serializes `3` as `3.0` and Neo4j rejects it.
+    const intSafeParams = Object.fromEntries(
+      Object.entries(params).map(([key, value]) => [
+        key,
+        typeof value === 'number' && Number.isInteger(value) ? neo4j.int(value) : value,
+      ]),
+    );
+    const result = await session.run(cypher, intSafeParams);
+    return result.records.map((record) => ({
+      row: record.keys.map((key) => record.get(key)),
+    }));
+  } finally {
+    await session.close();
+  }
 }
 
 // ── SvelteKit proxy helper ────────────────────────────────────────────────────
@@ -1737,24 +1760,16 @@ server.registerTool(
       }
     }
 
-    // Property is `graphPageRank` (written by GDS pipeline), not `pageRankScore`.
-    // Use labels(n)[0] for the actual Neo4j label, not a `n.label` property.
-    // CodebaseFile nodes use `filePath` (camelCase), not `stableKey`. Coalesce to
-    // whichever identity property exists on the node so this works for non-CodebaseFile
-    // labels too.
-    const label = nodeType ? `:${nodeType}` : '';
-    const rows = await neo4jQuery(
-      `MATCH (n${label}) WHERE n.graphPageRank IS NOT NULL
-       RETURN coalesce(n.stableKey, n.filePath, n.relativePath, n.path) AS stableKey,
-              n.graphPageRank AS score,
-              labels(n)[0] AS label
-       ORDER BY score DESC LIMIT $limit`,
-      { limit }
-    );
-    const results = rows.map((d: { row?: unknown[] }) => ({
-      stableKey: d.row?.[0],
-      pageRank: d.row?.[1],
-      label: d.row?.[2],
+    // Routed through the canonical GraphAnalyticsPort (graph-retrieval-adapter.ts)
+    // instead of a duplicate inline Cypher query — same coalesce-to-identity
+    // logic (stableKey/filePath/relativePath/path), now shared with
+    // getTopAuthorityNodes() in neo4j-gds.ts.
+    const { getTopPageRankBounded } = await import('../lib/server/graph/graph-retrieval-adapter.js');
+    const nodes = await getTopPageRankBounded(limit, nodeType);
+    const results = nodes.map((n) => ({
+      stableKey: n.stableKey,
+      pageRank: n.graphPageRank,
+      label: n.labels?.[0],
     }));
     return { content: [{ type: 'text' as const, text: JSON.stringify(results, null, 2) }] };
   }
@@ -2592,15 +2607,7 @@ server.registerTool(
         })(),
         (async () => {
           console.log('[mcp] probe: neo4j');
-          const r = await probeUrl('neo4j', `${NEO4J_HTTP}/db/neo4j/tx/commit`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Basic ${Buffer.from(`${NEO4J_USER}:${NEO4J_PASS}`).toString('base64')}`,
-            },
-            body: JSON.stringify({ statements: [{ statement: 'RETURN 1' }] }),
-            signal: AbortSignal.timeout(5_000),
-          }).catch((err) => ({ name: 'neo4j', ok: false, error: String(err) }));
+          const r = await probeNeo4j();
           console.log('[mcp] probe: neo4j done');
           return r;
         })(),

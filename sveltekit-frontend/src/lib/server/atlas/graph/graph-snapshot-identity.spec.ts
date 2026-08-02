@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
 	GraphIdentityValidationError,
 	GraphNodeSchema,
+	topologyHash,
 	validateGraphSnapshotIdentity
 } from './graph-snapshot.js';
 
@@ -46,13 +48,63 @@ describe('Parent Atlas graph snapshot identity', () => {
 	});
 
 	it('preserves hyperedge participants only when relation and snapshot identities resolve', () => {
-		const topologyHash = validateGraphSnapshotIdentity({ snapshotId, nodes: baseNodes, edges: baseEdges });
+		const hash = validateGraphSnapshotIdentity({ snapshotId, nodes: baseNodes, edges: baseEdges });
 		expect(() => validateGraphSnapshotIdentity({
 			snapshotId,
 			nodes: baseNodes,
 			edges: baseEdges,
-			relationEvents: [{ snapshotId, relationId: 'call:1', relationType: 'FUNCTION_CALL', sourceRef: 'a.ts', evidenceSpan: 'a()', confidence: 1, topologyHash }],
+			relationEvents: [{ snapshotId, relationId: 'call:1', relationType: 'FUNCTION_CALL', sourceRef: 'a.ts', evidenceSpan: 'a()', confidence: 1, topologyHash: hash }],
 			relationParticipants: [{ snapshotId, relationId: 'call:1', nodeKey: 'missing', role: 'callee', ordinal: 0 }]
 		})).toThrow(/RELATION_PARTICIPANT_NODE_MISSING/);
+	});
+});
+
+describe('topologyHash streaming/legacy byte compatibility', () => {
+	// Reference implementation preserved verbatim from the pre-streaming
+	// topologyHash — the monolithic single-string version that broke at
+	// full-corpus scale (RangeError: Invalid string length). This exists
+	// ONLY to prove the streamed replacement is byte-identical on inputs
+	// small enough for the old implementation to run.
+	function legacyStableJson(value: unknown): string {
+		if (value === null || typeof value !== 'object') return JSON.stringify(value);
+		if (Array.isArray(value)) return `[${value.map(legacyStableJson).join(',')}]`;
+		const object = value as Record<string, unknown>;
+		return `{${Object.keys(object).sort().map((key) => `${JSON.stringify(key)}:${legacyStableJson(object[key])}`).join(',')}}`;
+	}
+
+	function legacyTopologyHash(nodes: readonly any[], edges: readonly any[]): string {
+		const normalized = {
+			nodes: nodes.map(({ snapshotId: _snapshotId, properties, ...node }) => ({ ...node, properties })).sort((a, b) => a.nodeKey.localeCompare(b.nodeKey)),
+			edges: edges.map(({ snapshotId: _snapshotId, properties, ...edge }) => ({ ...edge, properties })).sort((a, b) => a.edgeKey.localeCompare(b.edgeKey))
+		};
+		return createHash('sha256').update(legacyStableJson(normalized)).digest('hex');
+	}
+
+	const nodesFixture = [
+		{ snapshotId, nodeKey: 'packet:b', nodeType: 'packet', packetKey: 'packet:b', treeNodeId: null, sourceRef: 'b.ts', properties: { b: 2, a: 1 } },
+		{ snapshotId, nodeKey: 'file:a', nodeType: 'file', packetKey: null, treeNodeId: null, sourceRef: 'a.ts', properties: { z: 9 } }
+	];
+	const edgesFixture = [
+		{ snapshotId, edgeKey: 'edge:a', sourceNodeKey: 'file:a', targetNodeKey: 'packet:b', edgeType: 'MATERIALIZES', weight: 1, confidence: 1, provenance: 'test', properties: {} }
+	];
+
+	it('preserves the legacy topology hash byte contract on fixture data', () => {
+		const oldHash = legacyTopologyHash(nodesFixture, edgesFixture);
+		const streamedHash = topologyHash(nodesFixture as any, edgesFixture as any);
+		expect(streamedHash).toBe(oldHash);
+	});
+
+	it('is deterministic regardless of input ordering', () => {
+		expect(topologyHash(nodesFixture as any, edgesFixture as any)).toBe(
+			topologyHash([...nodesFixture].reverse() as any, [...edgesFixture].reverse() as any)
+		);
+	});
+
+	it('normalizes nested property key ordering', () => {
+		const first = structuredClone(nodesFixture);
+		const second = structuredClone(nodesFixture);
+		(first[0].properties as any) = { b: 2, a: 1 };
+		(second[0].properties as any) = { a: 1, b: 2 };
+		expect(topologyHash(first as any, edgesFixture as any)).toBe(topologyHash(second as any, edgesFixture as any));
 	});
 });

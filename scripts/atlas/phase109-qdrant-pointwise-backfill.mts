@@ -14,7 +14,7 @@
  * until the live schema and collection identity contract are both proven.
  */
 
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -250,6 +250,11 @@ export function vectorNorm(vector: number[]): number {
   return Math.sqrt(sum);
 }
 
+function computeEmbeddingDigest(vector: number[]): string {
+  const normalized = vector.map((value) => (Number.isFinite(value) ? value.toFixed(8) : 'NaN'));
+  return `sha256:${createHash('sha256').update(normalized.join(',')).digest('hex')}`;
+}
+
 export function isUuid(value: unknown): value is string {
   return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
 }
@@ -379,7 +384,10 @@ export function buildProjectionPayload(row: BackfillRow, vector: number[]): Json
     embedding_model: row.embeddingModel,
     embedding_normalized: Math.abs(vectorNorm(vector) - 1) <= 0.05,
     representation_id: 'semantic_768',
+    representation_revision: 0,
+    embedding_digest: computeEmbeddingDigest(vector),
     embedding_dimension: 768,
+    qdrant_vector_dim: 768,
     embedding_lane: 'dense_768',
     embedding_role: 'canonical_native_semantic',
     embedding_status: 'ACTIVE',

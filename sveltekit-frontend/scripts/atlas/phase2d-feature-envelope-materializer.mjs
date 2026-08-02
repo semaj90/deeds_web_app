@@ -86,6 +86,11 @@ function buildFeatureEnvelope(packet, astData, lexicalData) {
       signature_768_ref: 'embeddinggemma-768-v1',
     },
 
+    // Explicit feature contract metadata
+    semantic_feature_dim: 768,
+    total_feature_dim: 4, // AST, lexical, embedding references, topology
+    feature_schema_version: 'atlas.feature_envelope.v1',
+
     // Optional topology (filled in P2E+)
     topology: {
       som_index: packet.som_index || null,

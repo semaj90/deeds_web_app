@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build the 384-vector retrieval lanes from a frozen DuckDB snapshot.
+ * Build the canonical 768-vector retrieval lanes from a frozen DuckDB snapshot.
  *
  * Steps:
  *  1. Freeze a deterministic 5,000-packet vector snapshot
@@ -35,11 +35,11 @@ import {
 } from '../../../packages/atlas-duckdb/src/index.ts';
 import {
   COLLECTION_CONTRACTS,
-  validateQdrantPayload,
+  validateQdrantPayloadForCollection,
   hashQdrantPayload,
 } from '../../../sveltekit-frontend/src/lib/server/atlas/qdrant-collection-contracts.ts';
 import { generateSparseVector } from '../../../sveltekit-frontend/src/lib/server/vector/bm42-sparse.ts';
-import { EMBEDDINGGEMMA_PREFIX384_V1 } from '../../../sveltekit-frontend/src/lib/server/vector/embeddinggemma-prefix384.ts';
+import { EMBEDDINGGEMMA_FULL768_V1 } from '../../../sveltekit-frontend/src/lib/server/vector/embeddinggemma-prefix384.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '../..', '..');
@@ -60,9 +60,10 @@ function validateWorkingDirectory(): void {
 }
 const TURBOVEC_OUTPUT_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k-turbovec.ndjson');
 const REPORT_PATH = path.join(REPO_ROOT, 'docs', 'reports', 'vector-index-lanes.json');
-const QDRANT_COLLECTION = 'codebase_chunks_384_hybrid';
+const QDRANT_COLLECTION = 'codebase_chunks_768';
 const QDRANT_DENSE_VECTOR = 'content';
-const QDRANT_SUMMARY_VECTOR = 'summary';
+const QDRANT_SIGNATURE_VECTOR = 'signature';
+const QDRANT_ERROR_VECTOR = 'error';
 const QDRANT_SPARSE_VECTOR = 'bm42'; // Canonical sparse vector name per qdrant-collection-contracts.ts
 const TURBOVEC_SHADOW_LIMIT = 4096;
 
@@ -140,9 +141,9 @@ function makeQdrantPayload(row: {
   title_id?: string | null;
   summary?: string | null;
   normalized_domain?: string | null;
-  content_embedding_384: string | number[] | Float32Array;
+  semantic_embedding_768: string | number[] | Float32Array;
 }) {
-  const embedding = parsePgVector(row.content_embedding_384);
+  const embedding = parsePgVector(row.semantic_embedding_768);
   const contentHash = stableSha256({
     packet_key: row.packet_key,
     source_ref: row.source_ref,
@@ -172,13 +173,17 @@ function makeQdrantPayload(row: {
     ontology_version: '1.0', // Phase 12 uses v1.0 baseline (enriched post-backfill in Phases 15+)
     postgres_id: row.packet_key,
     content_hash: contentHash,
-    contract_version: COLLECTION_CONTRACTS.codebase_chunks_384_hybrid.contractVersion,
+    contract_version: COLLECTION_CONTRACTS.codebase_chunks_768.contractVersion,
     metadata_schema: 'atlas-semantic-metadata-v1',
     metadata_version: 1,
     file_path: row.source_ref,
     language: deriveLanguage(row.source_ref),
-    embedding_model: EMBEDDINGGEMMA_PREFIX384_V1,
-    embedding_dimension: 384,
+    embedding_model: EMBEDDINGGEMMA_FULL768_V1,
+    embedding_dimension: 768,
+    representation_id: row.representation_id ?? 'semantic_768',
+    representation_revision: 0,
+    embedding_digest: contentHash,
+    qdrant_vector_dim: 768,
     indexed_at: new Date().toISOString(),
     domain_class: row.normalized_domain ?? null,
     concepts: row.title_id ? [normalizeText(row.title_id)] : [],
@@ -189,12 +194,14 @@ function makeQdrantPayload(row: {
     sparse_terms: sparse.indices.length,
   };
 
-  validateQdrantPayload(payload as never);
+  validateQdrantPayloadForCollection('codebase_chunks_768', payload as never);
 
   return {
     id: deterministicUuid(row.packet_key),
     vector: {
       [QDRANT_DENSE_VECTOR]: embedding,
+      [QDRANT_SIGNATURE_VECTOR]: embedding,
+      [QDRANT_ERROR_VECTOR]: embedding,
       ...(sparse.indices.length > 0 ? { [QDRANT_SPARSE_VECTOR]: sparse } : {}),
     },
     payload,
@@ -226,8 +233,9 @@ async function ensureQdrantCollection() {
       method: 'PUT',
       body: JSON.stringify({
         vectors: {
-          [QDRANT_DENSE_VECTOR]: { size: 384, distance: 'Cosine' },
-          [QDRANT_SUMMARY_VECTOR]: { size: 384, distance: 'Cosine' },
+          [QDRANT_DENSE_VECTOR]: { size: 768, distance: 'Cosine' },
+          [QDRANT_SIGNATURE_VECTOR]: { size: 768, distance: 'Cosine' },
+          [QDRANT_ERROR_VECTOR]: { size: 768, distance: 'Cosine' },
         },
         sparse_vectors: {
           [QDRANT_SPARSE_VECTOR]: {},
@@ -328,7 +336,7 @@ function topKOverlap(expected: Array<{ packet_key: string }>, actual: Array<{ pa
 async function main() {
   validateWorkingDirectory();
 
-  console.log(`🔨 Building 384-vector index lanes from snapshot (limit=${limit})`);
+  console.log(`🔨 Building 768-vector index lanes from snapshot (limit=${limit})`);
   console.log(`Working directory: ${process.cwd()}`);
   console.log(`DuckDB threads: ${process.env.ATLAS_DUCKDB_THREADS || 'auto'}`);
 
@@ -342,16 +350,18 @@ async function main() {
     await buildVectorSnapshot(db.connection, pgAlias, {
       limit,
       outputTable: 'vector_snapshot_packets',
+      sourceColumn: 'embedding',
+      expectedDimension: 768,
     });
 
     const rawRows = await db.connection.query(`
-      SELECT packet_key, source_ref, feature_id, title_id, summary, normalized_domain, content_embedding_384
+      SELECT packet_key, source_ref, feature_id, title_id, summary, normalized_domain, semantic_embedding_768, representation_id
       FROM vector_snapshot_packets
       ORDER BY packet_key
     `);
 
     const rows = (rawRows as Array<Record<string, unknown>>).map((row) => {
-      const embedding = parsePgVector(row.content_embedding_384);
+      const embedding = parsePgVector(row.semantic_embedding_768);
       return {
         packet_key: String(row.packet_key ?? ''),
         source_ref: String(row.source_ref ?? ''),
@@ -359,10 +369,11 @@ async function main() {
         title_id: row.title_id ? String(row.title_id) : null,
         summary: row.summary ? String(row.summary) : null,
         normalized_domain: row.normalized_domain ? String(row.normalized_domain) : null,
+        representation_id: row.representation_id ? String(row.representation_id) : null,
         embedding,
         norm: vectorNorm(embedding),
       };
-    }).filter((row) => row.packet_key && row.source_ref && row.embedding.length === 384);
+    }).filter((row) => row.packet_key && row.source_ref && row.embedding.length === 768);
 
     const ndjson = rows.map((row) => JSON.stringify({
       id: deterministicUuid(row.packet_key),
@@ -372,6 +383,7 @@ async function main() {
       title_id: row.title_id,
       summary: row.summary,
       domain_class: row.normalized_domain,
+      representation_id: row.representation_id,
       embedding: row.embedding,
     })).join('\n') + '\n';
     await fs.writeFile(INPUT_PATH, ndjson, 'utf8');
@@ -385,6 +397,7 @@ async function main() {
       title_id: row.title_id,
       summary: row.summary,
       domain_class: row.normalized_domain,
+      representation_id: row.representation_id,
       embedding: row.embedding,
     })).join('\n') + '\n';
     await fs.writeFile(TURBOVEC_INPUT_PATH, shadowNdjson, 'utf8');
@@ -396,7 +409,7 @@ async function main() {
       title_id: row.title_id,
       summary: row.summary,
       normalized_domain: row.normalized_domain,
-      content_embedding_384: row.embedding,
+      semantic_embedding_768: row.embedding,
     }));
 
     if (apply) {
@@ -439,7 +452,7 @@ async function main() {
 
     const report = {
       generated_at: new Date().toISOString(),
-      contract_version: EMBEDDINGGEMMA_PREFIX384_V1,
+      contract_version: EMBEDDINGGEMMA_FULL768_V1,
       snapshot: {
         limit,
         selected_rows: rows.length,

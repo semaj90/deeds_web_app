@@ -6,7 +6,7 @@
  * L3: SOM centroid lookups (8ms, 24h TTL)
  * L4: Feature centroids (12ms, 7d TTL)
  *
- * Dimension: 768-dim primary, 384-dim fallback with catch block.
+ * Dimension: 768-dim primary.
  */
 
 import { Redis } from 'ioredis';
@@ -17,7 +17,7 @@ export interface CacheEntry<T> {
     tier: 'L1' | 'L2' | 'L3' | 'L4';
     timestamp: number;
     ttl_seconds: number;
-    embedding_dimension?: number; // 768 or 384
+    embedding_dimension?: number; // 768 only
   };
 }
 
@@ -29,15 +29,9 @@ export class AggressiveRedisCache {
     this.redis = redis;
 
     // Validate dimension
-    if (embedding_dimension && embedding_dimension !== 768 && embedding_dimension !== 384) {
+    if (embedding_dimension && embedding_dimension !== 768) {
       console.warn(`[AggressiveRedisCache] Invalid dimension: ${embedding_dimension}. Defaulting to 768-dim.`);
       this.embedding_dimension = 768;
-    } else if (embedding_dimension === 384) {
-      console.warn(
-        '[AggressiveRedisCache] Using legacy 384-dim embedding. ' +
-        'Recommend migration to 768-dim (production canonical).'
-      );
-      this.embedding_dimension = 384;
     } else if (embedding_dimension) {
       this.embedding_dimension = embedding_dimension;
     }
@@ -83,11 +77,8 @@ export class AggressiveRedisCache {
   ): Promise<void> {
     try {
       // Validate embedding dimension
-      if (queryEmbedding.length !== this.embedding_dimension && queryEmbedding.length !== 384) {
-        console.warn(
-          `[AggressiveRedisCache] L2 embedding dimension mismatch: expected ${this.embedding_dimension} or 384, got ${queryEmbedding.length}`
-        );
-        // Catch block: continue anyway
+      if (queryEmbedding.length !== this.embedding_dimension) {
+        console.warn(`[AggressiveRedisCache] L2 embedding dimension mismatch: expected ${this.embedding_dimension}, got ${queryEmbedding.length}`);
       }
 
       const embeddingHash = this.hashEmbedding(queryEmbedding);
@@ -129,11 +120,8 @@ export class AggressiveRedisCache {
   async setL3SOMCentroid(somCell: string, centroid: number[], ttl_seconds: number = 86400): Promise<void> {
     try {
       // Validate centroid dimension
-      if (centroid.length !== this.embedding_dimension && centroid.length !== 384) {
-        console.warn(
-          `[AggressiveRedisCache] L3 SOM centroid dimension mismatch: expected ${this.embedding_dimension} or 384, got ${centroid.length}`
-        );
-        // Catch block: continue anyway
+      if (centroid.length !== this.embedding_dimension) {
+        console.warn(`[AggressiveRedisCache] L3 SOM centroid dimension mismatch: expected ${this.embedding_dimension}, got ${centroid.length}`);
       }
 
       const entry: CacheEntry<number[]> = {
@@ -177,11 +165,8 @@ export class AggressiveRedisCache {
   ): Promise<void> {
     try {
       // Validate centroid dimension
-      if (centroid.length !== this.embedding_dimension && centroid.length !== 384) {
-        console.warn(
-          `[AggressiveRedisCache] L4 feature centroid dimension mismatch: expected ${this.embedding_dimension} or 384, got ${centroid.length}`
-        );
-        // Catch block: continue anyway
+      if (centroid.length !== this.embedding_dimension) {
+        console.warn(`[AggressiveRedisCache] L4 feature centroid dimension mismatch: expected ${this.embedding_dimension}, got ${centroid.length}`);
       }
 
       const entry: CacheEntry<number[]> = {

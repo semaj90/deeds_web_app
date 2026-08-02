@@ -19,7 +19,14 @@ interface FeatureEnvelope {
   ast_structure: number;
   graph_authority: number;
   telemetry_signal: number;
+  semantic_feature_dim?: number;
+  total_feature_dim?: number;
+  feature_schema_version?: string;
 }
+
+const SEMANTIC_FEATURE_DIM = 768;
+const TOTAL_FEATURE_DIM = 5;
+const FEATURE_SCHEMA_VERSION = 'atlas.ranker.features.v1';
 
 interface Candidate {
   features: number[];
@@ -68,6 +75,9 @@ async function main() {
 
     for (const row of packetsWithFeatures.rows) {
       const envelope = row.feature_envelope || {};
+      const semantic_feature_dim = envelope.semantic_feature_dim || SEMANTIC_FEATURE_DIM;
+      const total_feature_dim = envelope.total_feature_dim || TOTAL_FEATURE_DIM;
+      const feature_schema_version = envelope.feature_schema_version || FEATURE_SCHEMA_VERSION;
       const features = [
         envelope.dense_similarity || 0,
         envelope.lexical_score || 0,
@@ -108,7 +118,10 @@ async function main() {
     // For now, simulate training with basic metrics
     // In production, this would use xgboost library or call a Python worker
     console.log(`  Model: XGBoost (simulated baseline)`);
-    console.log(`  Features: 5 (dense, lexical, ast, graph, telemetry)`);
+    console.log(`  Semantic feature width: ${SEMANTIC_FEATURE_DIM} (semantic_768 slice)`);
+    console.log(`  Total feature width: ${TOTAL_FEATURE_DIM} (manifest-derived)`);
+    console.log(`  Feature schema: ${FEATURE_SCHEMA_VERSION}`);
+    console.log(`  Features: 5 scalar signals (dense, lexical, ast, graph, telemetry)`);
     console.log(`  Parameters:`);
     console.log(`    - max_depth: 6`);
     console.log(`    - learning_rate: 0.1`);
@@ -168,7 +181,7 @@ async function main() {
         gitCommit,
         'embeddinggemma:latest',
         'xgboost-baseline',
-        'feature-envelope-v1',
+        'atlas.ranker.features.v1',
         'xgboost-baseline-v1',
         timestamp,
         'Initial baseline on dataset_v1 (17.5K judgments, 137 queries)',

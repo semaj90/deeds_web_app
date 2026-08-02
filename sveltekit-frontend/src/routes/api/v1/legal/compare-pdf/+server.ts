@@ -64,9 +64,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           const contentType = res.headers.get('content-type') || '';
           if (contentType.includes('pdf')) {
             const buffer = Buffer.from(await res.arrayBuffer());
-            const pdfParse = (await import('pdf-parse')).default;
-            const parsed = await pdfParse(buffer);
-            compareText = parsed.text;
+            const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+            const pdfResult = await parsePdfBuffer(buffer);
+            compareText = pdfResult.text;
           } else {
             compareText = await res.text();
           }

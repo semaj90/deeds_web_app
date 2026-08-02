@@ -19,6 +19,7 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { createHash, randomUUID } from 'crypto';
 import { loadTrainingData } from './lib/classifier-data-loader.mts';
+import type { ClassifierFeatureManifest } from './lib/classifier-contracts.ts';
 
 interface TrainingRow {
   packet_key: string;
@@ -30,7 +31,9 @@ interface LogisticRegressionModel {
   weights: Record<string, number[]>; // domain → feature weights
   bias: Record<string, number>; // domain → bias term
   class_order: string[];
-  feature_dim: number;
+  semantic_feature_dim: number;
+  total_feature_dim: number;
+  feature_schema_version: string;
   regularization_strength: number;
   learning_rate: number;
   n_iterations: number;
@@ -82,12 +85,18 @@ interface EvaluationReport {
  */
 function trainLogisticRegression(
   trainingRows: TrainingRow[],
+  featureManifest: ClassifierFeatureManifest,
   regularization_strength = 0.01,
   learning_rate = 0.01,
   n_iterations = 1000
 ): LogisticRegressionModel {
   const domains = Array.from(new Set(trainingRows.map((r) => r.domain_class)));
+  const semantic_feature_dim = featureManifest.semantic.width;
+  const total_feature_dim = featureManifest.totalWidth;
   const feature_dim = trainingRows[0]?.feature_vector.length || 0;
+  if (feature_dim !== semantic_feature_dim) {
+    throw new Error(`Expected ${semantic_feature_dim}-dim semantic features, got ${feature_dim}`);
+  }
 
   // Initialize weights and bias for each domain
   const weights: Record<string, number[]> = {};
@@ -156,7 +165,9 @@ function trainLogisticRegression(
     weights,
     bias,
     class_order: domains,
-    feature_dim,
+    semantic_feature_dim,
+    total_feature_dim,
+    feature_schema_version: featureManifest.schemaVersion,
     regularization_strength,
     learning_rate,
     n_iterations,
@@ -376,7 +387,7 @@ async function main() {
 
   // Train model
   console.log('\n📊 Training logistic regression...');
-  const model = trainLogisticRegression(trainingRows);
+  const model = trainLogisticRegression(trainingRows, dataSplit.metadata.feature_manifest);
   console.log(`✓ Model trained (SHA256: ${model.model_sha256.slice(0, 12)}...)`);
 
   // Evaluate
@@ -390,6 +401,9 @@ async function main() {
   console.log(`  Weighted F1: ${evaluation.weighted_f1.toFixed(4)}`);
   console.log(`  Confidence (mean): ${evaluation.confidence_distribution.mean.toFixed(4)}`);
   console.log(`  Model hash: ${model.model_sha256}`);
+  console.log(`  Semantic feature width: ${model.semantic_feature_dim} (semantic_768 slice)`);
+  console.log(`  Total feature width: ${model.total_feature_dim} (manifest-derived)`);
+  console.log(`  Feature schema: ${model.feature_schema_version}`);
   console.log(`  Dataset hash: ${dataSplit.metadata.dataset_hash}`);
 
   console.log('\n📋 Per-domain metrics:');

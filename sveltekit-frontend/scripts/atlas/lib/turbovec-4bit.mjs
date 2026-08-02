@@ -238,6 +238,7 @@ export async function ensureTurboVecSidecar({
   dimension,
   bits,
   timeoutMs = 15_000,
+  logPrefix = '[turbovec-384-4bit]',
 } = {}) {
   const health = await probeTurboVecHealth(buildUrl).catch(() => null);
   if (health?.ok && Number(health.dim) === Number(dimension) && Number(health.bits) === Number(bits)) {
@@ -263,8 +264,8 @@ export async function ensureTurboVecSidecar({
     windowsHide: true,
   });
 
-  proc.stdout.on('data', (data) => process.stdout.write(`[turbovec-384-4bit] ${data}`));
-  proc.stderr.on('data', (data) => process.stderr.write(`[turbovec-384-4bit] ${data}`));
+  proc.stdout.on('data', (data) => process.stdout.write(`${logPrefix} ${data}`));
+  proc.stderr.on('data', (data) => process.stderr.write(`${logPrefix} ${data}`));
 
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
@@ -308,3 +309,7 @@ export async function uploadTurboVecIndex({
 
   return parsed;
 }
+
+
+
+

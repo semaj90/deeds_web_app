@@ -12,7 +12,7 @@ import { EmbeddingGemma } from 'some-other-service'; // Placeholder for the actu
 
 // --- 1. Type Definitions ---
 
-export type Lane = 'dense_384' | 'dense_768';
+export type Lane = 'dense_768';
 
 export interface QueryVectorBundle {
     /** A map of the requested lane to its corresponding query embedding vector. */
@@ -38,7 +38,7 @@ export interface EmbedQueryForLaneResult {
  * Generates and retrieves a query embedding vector from the embedding model,
  * handling caching and fallback logic based on the specified lane.
  * @param query The user's search query.
- * @param lane The required dimensionality (384 or 768).
+ * @param lane The required dimensionality (768).
  * @param runId The unique execution ID for lineage tracking.
  * @returns A promise resolving to the embedding vector for the given lane.
  */

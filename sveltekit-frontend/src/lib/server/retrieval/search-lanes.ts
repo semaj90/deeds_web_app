@@ -124,15 +124,10 @@ function buildChunkConditions(filters?: SearchFilter): SQL | undefined {
 
 function getQueryVectorForLane(
   context: SearchLaneContext,
-  lane: 'gpu-cuvs' | 'qdrant' | 'qdrant-768' | 'qdrant-384'
+  lane: 'gpu-cuvs' | 'qdrant' | 'qdrant-768'
 ): Float32Array | undefined {
   const toVector = (value: SearchLaneContext['queryVectorBundle'][keyof NonNullable<SearchLaneContext['queryVectorBundle']>] | Float32Array | undefined) =>
     value instanceof Float32Array ? value : value?.vector;
-
-  if (lane === 'qdrant-384') {
-    return toVector(context.queryVectorBundle?.dense384)
-      ?? undefined;
-  }
 
   if (lane === 'qdrant' || lane === 'qdrant-768') {
     return toVector(context.queryVectorBundle?.dense768)
@@ -449,9 +444,9 @@ export class QdrantLane384 extends SearchLaneBase {
 
   constructor(
     url = 'http://127.0.0.1:6333',
-    collection = VECTOR_LANES.retrieval384.collection,
-    namedVector = VECTOR_LANES.retrieval384.vectorName,
-    embeddingDimension = VECTOR_LANES.retrieval384.dimension,
+    collection = 'codebase_chunks_384_hybrid',
+    namedVector = 'content',
+    embeddingDimension = 384,
     timeout = 30000
   ) {
     super();
@@ -479,7 +474,7 @@ export class QdrantLane384 extends SearchLaneBase {
   async search(context: SearchLaneContext): Promise<SearchResult[]> {
     const healthy = await this.health();
     if (!healthy) return [];
-    const queryVector = getQueryVectorForLane(context, 'qdrant-384');
+    const queryVector = getQueryVectorForLane(context, 'qdrant-768');
     if (!queryVector || queryVector.length === 0) return [];
 
     const qdrantFilter = buildQdrantFilter(context.filters);
@@ -764,12 +759,11 @@ export class SearchLaneRegistry {
     this.register(new QdrantLane768());
     // Backward-compatible alias used by older retrieval call sites.
     this.register(new QdrantLane());
-    // 384-dim lane: truncated-aware legacy retrieval contract, codebase_chunks_384_hybrid
-    this.register(new QdrantLane384());
+    // Legacy 384 lane is not part of the active runtime registry.
     this.register(new LexicalLane());
     this.register(new Bm25Lane());
-    // Fallback chain for single-lane queries — prefers the explicit 768 source lane before legacy alias.
-    this.fallbackChain = ['gpu-cuvs', 'qdrant-768', 'qdrant', 'qdrant-384', 'lexical', 'bm25'];
+    // Fallback chain for single-lane queries — prefers the explicit 768 source lane before any legacy alias.
+    this.fallbackChain = ['gpu-cuvs', 'qdrant-768', 'qdrant', 'lexical', 'bm25'];
   }
 
   register(lane: ISearchLane): void {

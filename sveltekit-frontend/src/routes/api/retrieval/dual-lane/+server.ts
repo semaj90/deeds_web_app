@@ -1,7 +1,7 @@
 /**
  * Phase 109: Dual-Lane Retrieval with RRF Fusion
  *
- * Queries multiple vector lanes (content 768-dim + semantic 384-dim) and fuses results
+ * Queries multiple named vectors (content 768-dim + semantic 768-dim) and fuses results
  * using Reciprocal Rank Fusion (RRF). Uses Phase 110 registry to determine which
  * representations are ACTIVE and VERIFIED.
  *
@@ -12,6 +12,7 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { env } from '$env/dynamic/private';
+import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 interface QdrantResponse {
   result: Array<{
@@ -73,6 +74,12 @@ export const GET: RequestHandler = async ({ url }) => {
 
     const embedding = embedData.embedding;
 
+    // Fail-closed: codebase_chunks_768 stores 768-dim named vectors ("content",
+    // "semantic"). A truncated 384-dim vector must never be sent here — it would
+    // either be rejected by Qdrant's own dimension check or, worse, silently
+    // accepted and searched against the wrong geometry.
+    assertSemantic768(embedding);
+
     // Step 2: Query Qdrant with named vectors (content + semantic lanes)
     const qdrantHost = env.QDRANT_HOST || '127.0.0.1';
     const qdrantPort = parseInt(env.QDRANT_PORT || '6333');
@@ -87,7 +94,7 @@ export const GET: RequestHandler = async ({ url }) => {
         body: JSON.stringify({
           vector: {
             name: 'content',
-            data: embedding.length === 384 ? embedding : embedding.slice(0, 384),
+            data: embedding,
           },
           limit: limit * 2, // Fetch extra for better fusion
           with_payload: true,
@@ -102,7 +109,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
     const contentResult = (await contentResponse.json()) as QdrantResponse;
 
-    // Query semantic lane (384-dim, if available)
+    // Query semantic lane (768-dim, if available)
     let semanticResult: QdrantResponse = { result: [] };
     try {
       const semanticResponse = await fetch(
@@ -113,7 +120,7 @@ export const GET: RequestHandler = async ({ url }) => {
           body: JSON.stringify({
             vector: {
               name: 'semantic',
-              data: embedding.length === 384 ? embedding : embedding.slice(0, 384),
+              data: embedding,
             },
             limit: limit * 2,
             with_payload: true,

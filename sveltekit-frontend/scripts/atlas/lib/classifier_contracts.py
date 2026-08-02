@@ -7,18 +7,54 @@ These MUST align with TypeScript Zod validators in classifier-contracts.ts.
 """
 
 from typing import Dict, List, Literal, Optional
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from datetime import datetime
 import re
 
 
 class VectorManifest(BaseModel):
     """Vector metadata and provenance."""
-    vector_name: Literal['dense_768_legacy']
+    vector_name: Literal['semantic_768']
     embedding_model: Literal['embeddinggemma:latest']
     embedding_model_revision: str
     dimensions: Literal[768]
     distance_metric: Literal['cosine']
+
+
+class FeatureSegment(BaseModel):
+    """A contiguous feature block in a classifier manifest."""
+    offset: int = Field(ge=0)
+    width: int = Field(gt=0)
+    modelId: Optional[str] = None
+    modelRevision: Optional[str] = None
+    extractorRevision: Optional[str] = None
+    ontologyRevision: Optional[str] = None
+    graphRevision: Optional[str] = None
+    representationId: Optional[str] = None
+
+
+class ClassifierFeatureManifest(BaseModel):
+    """Versioned classifier feature layout."""
+    schemaVersion: Literal['atlas.classifier.features.v1']
+    semantic: FeatureSegment
+    lexical: Optional[FeatureSegment] = None
+    ast: Optional[FeatureSegment] = None
+    concepts: Optional[FeatureSegment] = None
+    graph: Optional[FeatureSegment] = None
+    topology: Optional[FeatureSegment] = None
+    totalWidth: int = Field(gt=0)
+
+    @model_validator(mode='after')
+    def validate_manifest(self):
+        if self.semantic.representationId not in (None, 'semantic_768'):
+            raise ValueError('semantic.representationId must be semantic_768')
+        if self.semantic.offset != 0:
+            raise ValueError('semantic.offset must be 0')
+        if self.semantic.width != 768:
+            raise ValueError('semantic.width must be 768')
+        if self.totalWidth < self.semantic.width:
+            raise ValueError('totalWidth must be >= semantic.width')
+        return self
 
 
 class ClassifierSplitManifest(BaseModel):
@@ -28,6 +64,7 @@ class ClassifierSplitManifest(BaseModel):
     split_hash: str = Field(regex=r'^[a-f0-9]{64}$')
     training_snapshot_sha256: str = Field(regex=r'^[a-f0-9]{64}$')
     vector_manifest: VectorManifest
+    feature_manifest: Optional[ClassifierFeatureManifest] = None
     label_map_version: Literal['1.0.0']
     train_size: int = Field(gt=0)
     val_size: int = Field(gt=0)
@@ -162,6 +199,9 @@ class RankerFeatureEnvelope(BaseModel):
     packet_key: str = Field(regex=r'^ace:packet:[a-z0-9_-]+$')
     relevance_label: int = Field(ge=0, le=3, description="0=irrelevant, 1=marginal, 2=relevant, 3=highly_relevant")
     features: RankerFeatures
+    semantic_feature_dim: int = Field(default=768, ge=1, description='Width of the canonical semantic_768 slice')
+    total_feature_dim: int = Field(default=6, ge=1, description='Derived total width of the ranker feature manifest')
+    feature_schema_version: str = Field(default='atlas.ranker.features.v1')
 
 
 def validate_split_manifest(data: dict) -> tuple[bool, Optional[ClassifierSplitManifest], Optional[str]]:

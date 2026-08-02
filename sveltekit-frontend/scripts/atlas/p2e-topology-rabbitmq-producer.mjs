@@ -89,7 +89,14 @@ async function produceTopologyBatch() {
           k: 10,
           max_iter: 50,
           random_seed: 42,
-          feature_schema_version: 'feature-envelope-v1'
+          feature_schema_version: 'atlas.feature_envelope.v1',
+          execution_model: 'mapreduce',
+          job_envelope_format: 'msgpack',
+          batch_data_format: 'arrow_ipc',
+          reduce_engine: 'duckdb',
+          output_data_format: 'parquet',
+          review_store: 'couchdb',
+          gpu_lane: 'compute_only'
         },
         requested_at: new Date().toISOString()
       },
@@ -101,7 +108,14 @@ async function produceTopologyBatch() {
           grid_size: 10,
           epochs: 20,
           random_seed: 42,
-          feature_schema_version: 'feature-envelope-v1'
+          feature_schema_version: 'atlas.feature_envelope.v1',
+          execution_model: 'mapreduce',
+          job_envelope_format: 'msgpack',
+          batch_data_format: 'arrow_ipc',
+          reduce_engine: 'duckdb',
+          output_data_format: 'parquet',
+          review_store: 'couchdb',
+          gpu_lane: 'compute_only'
         },
         requested_at: new Date().toISOString()
       },
@@ -113,7 +127,14 @@ async function produceTopologyBatch() {
           damping: 0.85,
           iterations: 30,
           random_seed: 42,
-          feature_schema_version: 'feature-envelope-v1'
+          feature_schema_version: 'atlas.feature_envelope.v1',
+          execution_model: 'mapreduce',
+          job_envelope_format: 'msgpack',
+          batch_data_format: 'arrow_ipc',
+          reduce_engine: 'duckdb',
+          output_data_format: 'parquet',
+          review_store: 'couchdb',
+          gpu_lane: 'compute_only'
         },
         requested_at: new Date().toISOString()
       }

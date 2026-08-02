@@ -5,8 +5,9 @@
  *  - Postgres JSONB owns the complete canonical semantic record.
  *  - Qdrant payload is a compact, validated projection for retrieval routing.
  *  - Named dense vectors, sparse vectors, and multivectors are separate lanes.
- *  - The 768-dim primary codebase chunk lane and the 384-dim derived retrieval lane may coexist
- *    only as explicitly named vector spaces with declared lineage.
+ *  - The 768-dim primary codebase chunk lane is canonical.
+ *  - The 384-dim derived retrieval lane is legacy/reference-only and must be
+ *    addressed explicitly, never inferred by default.
  *  - Only index fields that participate in filter or routing queries.
  *  - Do NOT index: summary, purpose, full source text, large ontology objects,
  *    complete AST JSON, large feature arrays — those live in Postgres.
@@ -40,8 +41,12 @@ const SHARED_NON_INDEXED_PAYLOAD_FIELDS = [
   'kmeans_model_version',
   'kmeans_vector_contract',
   'cluster_margin',
+  'representation_id',
+  'representation_revision',
+  'embedding_digest',
   'embedding_model',
   'embedding_dimension',
+  'qdrant_vector_dim',
   'embedding_lane',
   'embedding_role',
   'embedding_status',
@@ -156,13 +161,13 @@ export const COLLECTION_CONTRACTS = {
 } as const;
 
 export type CollectionName = keyof typeof COLLECTION_CONTRACTS;
-export type CollectionContract<N extends CollectionName = 'codebase_chunks_384_hybrid'> =
+export type CollectionContract<N extends CollectionName = 'codebase_chunks_768'> =
   typeof COLLECTION_CONTRACTS[N];
 
 // ── Payload type ──────────────────────────────────────────────────────────────
 
 /**
- * The validated Qdrant payload projection for codebase_chunks_384_hybrid.
+ * The validated Qdrant payload projection for codebase_chunks_768.
  *
  * This is a SUBSET of AtlasKnowledgeEnvelope — compact retrieval data only.
  * Postgres JSONB holds the full canonical record.
@@ -199,7 +204,11 @@ export interface QdrantChunkPayload {
 
   // Embedding provenance — not indexed
   embedding_model:     string;
+  representation_id?: 'semantic_768' | 'legacy_384' | 'semantic_512' | 'semantic_256' | 'semantic_128' | 'latent_64';
+  representation_revision?: number;
+  embedding_digest?: string;
   embedding_dimension: 64 | 384 | 768;
+  qdrant_vector_dim?: 64 | 384 | 768;
   embedding_lane?: 'dense_384' | 'dense_768' | 'latent_64';
   embedding_role?: 'canonical_online_retrieval' | 'canonical_native_semantic' | 'routing_only' | 'derived';
   embedding_status?: 'ACTIVE' | 'REFERENCE_ONLY' | 'MIGRATION_SOURCE' | 'SUPERSEDED';
@@ -309,12 +318,22 @@ export function validateQdrantPayloadForCollection(
       `768 native embeddings must use embedding_lane=dense_768 when lane lineage is declared`
     );
   }
+
+  if (payload.representation_id !== undefined) {
+    const expectedRepresentation = payload.embedding_dimension === 768 ? 'semantic_768' : 'legacy_384';
+    if (payload.representation_id !== expectedRepresentation) {
+      throw new PayloadValidationError(
+        'representation_id',
+        `Expected ${expectedRepresentation} for embedding_dimension=${payload.embedding_dimension}, got ${payload.representation_id}`
+      );
+    }
+  }
 }
 
 export function validateQdrantPayload(
   payload: Partial<QdrantChunkPayload>
 ): asserts payload is QdrantChunkPayload {
-  validateQdrantPayloadForCollection('codebase_chunks_384_hybrid', payload);
+  validateQdrantPayloadForCollection('codebase_chunks_768', payload);
 }
 
 // ── Qdrant index creation SQL helper ────────────────────────────────────────────
@@ -324,7 +343,7 @@ export function validateQdrantPayload(
  * Call POST /collections/{name}/index for each entry.
  */
 export function buildFieldIndexRequests(
-  collection: CollectionName = 'codebase_chunks_384_hybrid'
+  collection: CollectionName = 'codebase_chunks_768'
 ): Array<{ field_name: string; field_schema: string }> {
   const contract = COLLECTION_CONTRACTS[collection];
   return Object.entries(contract.indexedPayloadFields).map(([field, schema]) => ({

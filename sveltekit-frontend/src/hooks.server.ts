@@ -718,9 +718,18 @@ export const handle: Handle = async ({ event, resolve }) => {
     !event.url.pathname.startsWith('/api/health')
   ) {
     const forwarded = event.request.headers.get('x-forwarded-for');
-    const ip = forwarded
-      ? forwarded.split(',')[0].trim()
-      : (event.getClientAddress?.() ?? 'unknown');
+    let ip = 'unknown';
+    if (forwarded) {
+      ip = forwarded.split(',')[0].trim();
+    } else {
+      try {
+        ip = event.getClientAddress?.() ?? 'unknown';
+      } catch {
+        // Vite dev server can't resolve clientAddress for some internal/loopback
+        // connections (e.g. orchestrator polling scripts) — fall back gracefully.
+        ip = 'unknown';
+      }
+    }
     const rlResult = await checkHooksRateLimit(event.url.pathname, event.request.method, ip);
     if (rlResult && !rlResult.allowed) {
       return new Response(

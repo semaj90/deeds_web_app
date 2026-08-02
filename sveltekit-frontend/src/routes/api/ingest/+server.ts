@@ -34,8 +34,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 					if (file.name.endsWith('.pdf')) {
 						try {
-							const pdfParse = (await import('pdf-parse')).default;
-							const parsed = await pdfParse(buffer);
+							const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+							const parsed = await parsePdfBuffer(buffer);
 							textContent = parsed.text;
 						} catch {
 							textContent = `[PDF extraction failed for ${file.name}]`;

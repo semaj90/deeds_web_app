@@ -80,12 +80,12 @@ async function completeJob(jobId: string, metrics: Record<string, unknown>): Pro
 async function extractTextFromBuffer(buf: Buffer): Promise<{ text: string; pageCount: number; method: string }> {
 	// Try native PDF text extraction first
 	try {
-		const pdfParse = (await import('pdf-parse')).default;
-		const data = await pdfParse(buf, { max: 0 });
+		const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+		const data = await parsePdfBuffer(buf);
 		const textQuality = data.text.replace(/\s+/g, '').length;
 
 		if (textQuality > 200) {
-			return { text: data.text, pageCount: data.numpages, method: 'native' };
+			return { text: data.text, pageCount: data.pageCount, method: 'native' };
 		}
 		// Fall through to OCR if text quality is low
 	} catch {

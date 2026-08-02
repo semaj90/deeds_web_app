@@ -75,13 +75,13 @@ export interface CanonicalPacket {
   /** Native semantic embedding dimension for the packet contract */
   embedding_native_dim: number;
 
-  /** Optional truncated retrieval projection dimension such as 384 */
+  /** Optional retrieval projection dimension when explicitly declared */
   embedding_projection_dim?: number | null;
 
   /** Compatibility alias for older consumers that still expect one dimension field */
   embedding_dim: number;
 
-  /** Named representation lane, e.g. dense_384 or dense_768 */
+  /** Named representation lane, e.g. dense_768 */
   embedding_lane?: string;
 
   /** Representation status for parity and promotion decisions */
@@ -154,7 +154,7 @@ export interface FeatureTrackingRecord {
 
 const EMBEDDING_MODEL_ANCHOR = 'embeddinggemma:latest';
 const EMBEDDING_NATIVE_DIM = 768;
-const REPRESENTATION_POLICY = 'canonical_search_384_with_native_768_and_explicit_projection_lineage';
+const REPRESENTATION_POLICY = 'canonical_search_768_native';
 
 // ============================================================================
 // POSTGRES QUERIES (TRUTH LAYER)
@@ -182,13 +182,13 @@ export async function getCanonicalPacketFromPostgres(
         ap.created_at,
         '${EMBEDDING_MODEL_ANCHOR}' AS embedding_model,
         ${EMBEDDING_NATIVE_DIM} AS embedding_native_dim,
-        384 AS embedding_projection_dim,
-        384 AS embedding_dim,
-        'dense_384' AS embedding_lane,
+        ${EMBEDDING_NATIVE_DIM} AS embedding_projection_dim,
+        ${EMBEDDING_NATIVE_DIM} AS embedding_dim,
+        'dense_768' AS embedding_lane,
         'ACTIVE' AS embedding_status,
         ${EMBEDDING_NATIVE_DIM} AS projection_source_dimension,
-        'direct_slice' AS projection_method,
-        'atlas-embeddinggemma-direct-slice384-v1' AS projection_version,
+        'native' AS projection_method,
+        NULL AS projection_version,
         '${REPRESENTATION_POLICY}' AS representation_policy
       FROM atlas_packets ap
       WHERE ap.packet_key = $1
@@ -253,13 +253,13 @@ export async function getCanonicalPacketsFromPostgres(
         ap.created_at,
         '${EMBEDDING_MODEL_ANCHOR}' AS embedding_model,
         ${EMBEDDING_NATIVE_DIM} AS embedding_native_dim,
-        384 AS embedding_projection_dim,
-        384 AS embedding_dim,
-        'dense_384' AS embedding_lane,
+        ${EMBEDDING_NATIVE_DIM} AS embedding_projection_dim,
+        ${EMBEDDING_NATIVE_DIM} AS embedding_dim,
+        'dense_768' AS embedding_lane,
         'ACTIVE' AS embedding_status,
         ${EMBEDDING_NATIVE_DIM} AS projection_source_dimension,
-        'direct_slice' AS projection_method,
-        'atlas-embeddinggemma-direct-slice384-v1' AS projection_version,
+        'native' AS projection_method,
+        NULL AS projection_version,
         '${REPRESENTATION_POLICY}' AS representation_policy
       FROM atlas_packets ap
       WHERE ap.packet_key = ANY($1)

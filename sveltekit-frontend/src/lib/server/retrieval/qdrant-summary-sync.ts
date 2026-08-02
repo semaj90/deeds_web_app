@@ -3,8 +3,6 @@ import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 export const CANONICAL_CODEBASE_QDRANT_COLLECTIONS = [
   'codebase_chunks_768_v2',
   'codebase_chunks_768',
-  'codebase_chunks_384_hybrid',
-  'codebase_chunks_384',
 ] as const;
 
 export interface QdrantSummarySyncInput {

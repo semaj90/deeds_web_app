@@ -4,7 +4,7 @@
  * Executes Qdrant, TurboVec, Postgres FTS, and Neo4j graph searches in parallel.
  * No hard filter cutoffs — all lanes contribute to final candidate pool via RRF.
  *
- * Dimension: 768-dim primary, 384-dim fallback with catch block.
+ * Dimension: 768-dim primary.
  */
 
 export interface RetrievalCandidate {
@@ -34,7 +34,7 @@ export interface SoftRoutingConfig {
   neo4j_enabled: boolean;
   top_k: number;
   dedup_by: 'packet_key' | 'source_ref';
-  embedding_dimension?: number; // 768 (primary) or 384 (legacy fallback)
+  embedding_dimension?: number; // 768 (primary only)
 }
 
 export class SoftRoutingOrchestrator {
@@ -55,16 +55,9 @@ export class SoftRoutingOrchestrator {
 
     // Validate dimension
     const dim = this.config.embedding_dimension || 768;
-    if (dim !== 768 && dim !== 384) {
+    if (dim !== 768) {
       console.warn(`[SoftRoutingOrchestrator] Invalid dimension: ${dim}. Defaulting to 768-dim.`);
       this.config.embedding_dimension = 768;
-    }
-
-    if (dim === 384) {
-      console.warn(
-        '[SoftRoutingOrchestrator] Using legacy 384-dim embedding. ' +
-        'Recommend migration to 768-dim (production canonical).'
-      );
     }
   }
 
@@ -113,15 +106,10 @@ export class SoftRoutingOrchestrator {
   private validateQueryEmbedding(embedding: number[]): void {
     const expectedDim = this.config.embedding_dimension || 768;
 
-    if (embedding.length !== expectedDim && embedding.length !== 384) {
+    if (embedding.length !== expectedDim) {
       throw new Error(
-        `Query embedding dimension mismatch. Expected ${expectedDim} or 384 (fallback), got ${embedding.length}.`
+        `Query embedding dimension mismatch. Expected ${expectedDim}, got ${embedding.length}.`
       );
-    }
-
-    // If 384-dim was sent but we're expecting 768, log warning (catch block)
-    if (embedding.length === 384 && expectedDim === 768) {
-      console.warn('[SoftRoutingOrchestrator] Received 384-dim query but expecting 768-dim. Accepting for fallback.');
     }
 
     // Check L2 norm
@@ -143,7 +131,6 @@ export class SoftRoutingOrchestrator {
     try {
       // Placeholder: actual Qdrant call would use:
       // - codebase_chunks_768 for 768-dim queries
-      // - codebase_chunks_384 for 384-dim fallback (with warning)
       const ms = Date.now() - start;
 
       return [

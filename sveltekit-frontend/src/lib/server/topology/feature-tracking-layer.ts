@@ -8,6 +8,11 @@
 import { db } from '$lib/server/db/client';
 import { sql, eq, inArray } from 'drizzle-orm';
 import type { Pool } from 'pg';
+import {
+  SEMANTIC_REPRESENTATION_ID,
+  SEMANTIC_DIMENSION,
+  TOPOLOGY_REPRESENTATIONS,
+} from '$lib/server/embedding/embedding-contract-768.js';
 
 /**
  * The 11 canonical fields that must be present in every packet response.
@@ -36,6 +41,19 @@ export interface CanonicalPacket {
   // Tier 4: Retrieval (per-query hints, computed by orchestrator)
   qdrant_point_id: string | null;
   retrieval_strategy: string | null;
+
+  // Tier 5: Representation lineage (nullable until the embedding/topology
+  // pipeline tags a packet — never inferred or defaulted here). Distinguishes
+  // the source semantic embedding from its topology/routing projection so a
+  // latent vector is never mislabeled as a semantic one, or vice versa.
+  // Example: source_representation_id='semantic_768', source_dimension=768,
+  // projection_representation_id='latent_64', projection_dimension=64.
+  source_representation_id: string | null;
+  source_dimension: number | null;
+  projection_representation_id: string | null;
+  projection_dimension: number | null;
+  encoder_revision: string | null;
+  som_revision: string | null;
 }
 
 /**
@@ -62,6 +80,46 @@ export interface FeatureTrackingRecord {
 }
 
 /**
+ * Validate that a packet's representation-lineage fields are internally
+ * consistent — a source_representation_id of 'semantic_768' must carry
+ * dimension 768, and a projection_representation_id of 'latent_128'/'latent_64'
+ * must carry the matching topology dimension. Untagged (all-null) lineage is
+ * valid — it just means the packet hasn't been through the tagging pipeline
+ * yet. What's invalid is a MISMATCHED tag, e.g. 'semantic_768' with dimension
+ * 64 — that would mean a topology projection is being mislabeled as the
+ * canonical semantic embedding, or vice versa.
+ */
+export function assertValidRepresentationLineage(
+  packet: Pick<
+    CanonicalPacket,
+    'source_representation_id' | 'source_dimension' | 'projection_representation_id' | 'projection_dimension'
+  >,
+): void {
+  if (packet.source_representation_id !== null) {
+    if (
+      packet.source_representation_id !== SEMANTIC_REPRESENTATION_ID ||
+      packet.source_dimension !== SEMANTIC_DIMENSION
+    ) {
+      throw new Error(
+        `REPRESENTATION_LINEAGE_MISMATCH: source_representation_id=${packet.source_representation_id} ` +
+          `source_dimension=${packet.source_dimension} (expected ${SEMANTIC_REPRESENTATION_ID}/${SEMANTIC_DIMENSION})`,
+      );
+    }
+  }
+
+  if (packet.projection_representation_id !== null) {
+    const expectedDimension =
+      TOPOLOGY_REPRESENTATIONS[packet.projection_representation_id as keyof typeof TOPOLOGY_REPRESENTATIONS];
+    if (expectedDimension === undefined || packet.projection_dimension !== expectedDimension) {
+      throw new Error(
+        `REPRESENTATION_LINEAGE_MISMATCH: projection_representation_id=${packet.projection_representation_id} ` +
+          `projection_dimension=${packet.projection_dimension} (expected one of ${Object.keys(TOPOLOGY_REPRESENTATIONS).join(', ')})`,
+      );
+    }
+  }
+}
+
+/**
  * Get canonical packet from Postgres (source of truth).
  * Always returns all 11 fields with null where unavailable.
  */
@@ -84,7 +142,13 @@ export async function getCanonicalPacket(
         som_cluster_id,
         community_id,
         qdrant_point_id,
-        routing_hints as retrieval_strategy
+        routing_hints as retrieval_strategy,
+        source_representation_id,
+        source_dimension,
+        projection_representation_id,
+        projection_dimension,
+        encoder_revision,
+        som_revision
       FROM atlas_packets
       WHERE packet_key = $1
       LIMIT 1
@@ -98,6 +162,10 @@ export async function getCanonicalPacket(
     }
 
     let packet = result.rows[0] as CanonicalPacket;
+    // Fail-closed: a packet whose lineage tag doesn't match its dimension is
+    // corrupted data, not a valid (if incomplete) packet. Caught below and
+    // surfaced as "unavailable" rather than returned with a mislabeled tag.
+    assertValidRepresentationLineage(packet);
 
     // Optionally enrich from Qdrant payload
     if (options?.includeQdrant && packet.qdrant_point_id) {
@@ -144,7 +212,13 @@ export async function getCanonicalPacketsFromPostgres(
         som_cluster_id,
         community_id,
         qdrant_point_id,
-        routing_hints as retrieval_strategy
+        routing_hints as retrieval_strategy,
+        source_representation_id,
+        source_dimension,
+        projection_representation_id,
+        projection_dimension,
+        encoder_revision,
+        som_revision
       FROM atlas_packets
       WHERE packet_key IN (${placeholders})
       ${limit ? `LIMIT ${limit}` : ''}

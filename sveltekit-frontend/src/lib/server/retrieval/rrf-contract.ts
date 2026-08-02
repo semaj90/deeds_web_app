@@ -1,7 +1,7 @@
 export type RrfLaneName =
   | 'bm42'
   | 'rg'
-  | 'dense_384'
+  | 'dense_384' // legacy-only compatibility lane
   | 'dense_768'
   | 'turbovec'
   | 'topology'
@@ -34,7 +34,7 @@ export interface FusedHit {
 export const RRF_DEFAULT_WEIGHTS = {
   bm42: 1.0,
   rg: 1.0,
-  dense_384: 1.0,
+  dense_384: 1.0, // legacy-only compatibility lane
   dense_768: 1.0,
   turbovec: 0.9,
   topology: 0.8,

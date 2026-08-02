@@ -5,7 +5,7 @@ CREATE TABLE case_chunks (
     chunk_text TEXT NOT NULL,
     chunk_source TEXT NOT NULL,
     chunk_embedding_id INTEGER REFERENCES embeddings(id) ON DELETE CASCADE,
-    chunk_embedding VECTOR(384),
+    chunk_embedding VECTOR(768),
     chunk_metadata JSONB,
     UNIQUE (case_id, chunk_source)
 );

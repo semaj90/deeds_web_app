@@ -1,6 +1,6 @@
-# Phase 110: Semantic Contracts Authorization + Model Ladder — Complete
+# Phase 110: Semantic Contracts Authorization + Model Ladder — Implemented
 
-**Status**: ✅ **FULLY INTEGRATED & EXECUTABLE**  
+**Status**: `IMPLEMENTED`, but end-to-end runtime proof remains pending  
 **Date**: July 27, 2026  
 **Scope**: Lucia role integration, Postgres wiring, logistic regression persistence
 
@@ -8,7 +8,7 @@
 
 ## What's Complete
 
-### 1. Lucia Role Integration ✅
+### 1. Lucia Role Integration
 
 **Updated enum** (`src/lib/server/db/schema-postgres.ts`):
 ```
@@ -37,7 +37,7 @@ export function canApproveOntology(locals: Locals): boolean {
 
 ---
 
-### 2. Prediction Promotion API (Complete Postgres Wiring) ✅
+### 2. Prediction Promotion API (implemented Postgres wiring)
 
 **Route**: `POST /api/semantic-contracts/predictions/promote`
 
@@ -97,7 +97,7 @@ await redis.del(`centroid:packet:${packet_key}`);
 
 ---
 
-### 3. Ontology Proposal Approval API (Complete Postgres Wiring) ✅
+### 3. Ontology Proposal Approval API (implemented Postgres wiring)
 
 **Route**: `POST /api/semantic-contracts/proposals/approve`
 

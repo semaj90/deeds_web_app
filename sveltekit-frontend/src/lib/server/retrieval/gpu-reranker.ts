@@ -20,6 +20,7 @@ import {
 	isCudaAvailable,
 	getCudaMemoryInfo,
 } from '$lib/server/gpu/libtorch-bridge.js';
+import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 // Phase 2: Packet-centric telemetry (optional — reranker works without it)
 let recordPacketCentricTelemetry: ((event: any) => Promise<void>) | null = null;
@@ -86,6 +87,13 @@ export async function gpuRerank<T extends RerankableDoc>(
 	const cfg = { ...DEFAULT_CONFIG, ...config };
 	const start = performance.now();
 	const telemetryStart = Date.now();
+
+	// Fail-closed: the only valid non-empty query vector dimension is the
+	// canonical semantic_768 lane. An empty vector (no-vector passthrough) is
+	// a legitimate caller state; a wrong-dimension vector (e.g. legacy 384) is not.
+	if (queryVector.length > 0) {
+		assertSemantic768(queryVector);
+	}
 
 	// Not enough docs — plain sort is faster than GPU overhead
 	if (docs.length < cfg.minDocsForGpu || queryVector.length === 0) {
@@ -253,6 +261,10 @@ export async function gpuRerankQdrantResults(
 	const cfg = { ...DEFAULT_CONFIG, ...config };
 	const start = performance.now();
 	const telemetryStart = Date.now();
+
+	if (queryVector.length > 0) {
+		assertSemantic768(queryVector);
+	}
 
 	const withVectors = results.filter((r) => Array.isArray(r.vector) && r.vector.length === queryVector.length);
 

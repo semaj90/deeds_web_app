@@ -5,7 +5,7 @@
  * Accepts ACEPacket with embedded dimension info.
  * Handles timeouts with fallback to Ollama.
  *
- * Dimension: 768-dim primary, 384-dim fallback with logging.
+ * Dimension: 768-dim primary only; fallback path does not change the embedding contract.
  */
 
 export interface Gemma4InvocationConfig {

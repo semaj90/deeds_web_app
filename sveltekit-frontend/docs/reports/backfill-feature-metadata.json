@@ -1,23 +1,10 @@
 {
-  "timestamp": "2026-06-19T22:22:05.531Z",
+  "timestamp": "2026-08-02T11:07:49.436Z",
   "mode": "verify-only",
   "verification": [
     {
       "table": "atlas_packets",
-      "total": 17985,
-      "missing": {
-        "feature_id": 0,
-        "feature_label": 0,
-        "source_ref": 0,
-        "metadata": 0,
-        "file_path": null
-      },
-      "hasGinIndex": true,
-      "hasBtreeIndex": true
-    },
-    {
-      "table": "nes_chrom_packets",
-      "total": 14911,
+      "total": 61659,
       "missing": {
         "feature_id": 0,
         "feature_label": 0,
@@ -30,20 +17,20 @@
     },
     {
       "table": "glyph_records",
-      "total": 14515,
+      "total": 0,
       "missing": {
         "feature_id": null,
         "feature_label": null,
-        "source_ref": 14515,
+        "source_ref": 0,
         "metadata": 0,
         "file_path": null
       },
-      "hasGinIndex": true,
-      "hasBtreeIndex": true
+      "hasGinIndex": false,
+      "hasBtreeIndex": false
     },
     {
       "table": "codebase_chunk_index",
-      "total": 40754,
+      "total": 52417,
       "missing": {
         "feature_id": null,
         "feature_label": null,
@@ -57,8 +44,8 @@
   ],
   "backfill": null,
   "summary": {
-    "tablesChecked": 4,
-    "totalRows": 88165,
+    "tablesChecked": 3,
+    "totalRows": 114076,
     "totalMissingFeatureId": 0,
     "totalMissingMetadata": 0,
     "totalUpdated": 0,

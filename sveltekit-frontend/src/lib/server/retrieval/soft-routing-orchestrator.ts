@@ -5,7 +5,7 @@
  * Each lane produces independent ranked results; RRF fusion happens downstream.
  *
  * Lanes:
- * 1. Qdrant dense vector search (384-dim HNSW)
+ * 1. Qdrant dense vector search (768-dim canonical HNSW)
  * 2. TurboVec prefilter (4-bit quantized)
  * 3. Postgres full-text search (lexical)
  * 4. Neo4j graph neighbors (topology, optional K-hop expansion)
@@ -17,6 +17,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
 import pg from 'pg';
 import fetch from 'node-fetch';
+import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 export interface RetrievalCandidate {
   packet_key: string;
@@ -74,6 +75,12 @@ export class SoftRoutingOrchestrator {
    * Execute all 4 retrieval lanes in parallel
    */
   async route(request: SoftRoutingRequest): Promise<SoftRoutingResult> {
+    // Fail-closed: only the canonical semantic_768 lane may enter the qdrant/turbovec
+    // lanes below. A 384 (or any other length) vector is rejected here rather than
+    // silently sent to codebase_chunks_768 and either erroring downstream or, worse,
+    // being accepted by a lenient client.
+    assertSemantic768(request.query_embedding);
+
     const startTime = Date.now();
     const candidates: RetrievalCandidate[] = [];
     const timing = {
@@ -150,7 +157,7 @@ export class SoftRoutingOrchestrator {
   }
 
   /**
-   * Lane 1: Qdrant dense vector search (384-dim HNSW)
+   * Lane 1: Qdrant dense vector search (768-dim canonical HNSW)
    */
   private async qdrantLane(request: SoftRoutingRequest): Promise<{
     candidates: RetrievalCandidate[];
@@ -159,7 +166,7 @@ export class SoftRoutingOrchestrator {
     const startTime = Date.now();
 
     try {
-      const results = await this.qdrant.search('codebase_chunks_384', {
+      const results = await this.qdrant.search('codebase_chunks_768', {
         vector: request.query_embedding,
         limit: request.top_k * 2, // Over-fetch for deduplication
       });

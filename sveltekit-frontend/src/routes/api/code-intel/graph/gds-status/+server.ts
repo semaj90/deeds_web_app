@@ -11,7 +11,6 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { getRedis } from '$lib/server/redis.js';
 import {
   getGdsStatus,
   getGdsExtendedStats,
@@ -30,6 +29,11 @@ const EXTENDED_STATS_TTL = 60; // 60s — safe to cache, Neo4j counts are not re
 const RATE_LIMIT_KEY = (userId: string) => `gds:rebuild:rl:${userId}`;
 const RATE_LIMIT_TTL = 300; // 5 min
 
+async function getRedisClient() {
+  const { getRedis } = await import('$lib/server/redis.js');
+  return getRedis();
+}
+
 // 'd27' is read-only (getUnclassifiedFileCount), not rate-limited.
 const VALID_ACTIONS = ['project', 'pagerank', 'louvain', 'knn', 'authority', 'ontology', 'd27', 'full'] as const;
 type GdsAction = typeof VALID_ACTIONS[number];
@@ -46,7 +50,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
     }
 
     // Extended stats: try Redis cache first (60s TTL) then Neo4j + Qdrant probes
-    const redis = getRedis();
+    const redis = await getRedisClient();
     const cached = await redis.get(EXTENDED_STATS_CACHE_KEY).catch(() => null);
     if (cached) {
       return json({ ...JSON.parse(cached), cached: true });
@@ -73,7 +77,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   // Rate limit full rebuilds
   if (action === 'full') {
-    const redis = getRedis();
+    const redis = await getRedisClient();
     const key = RATE_LIMIT_KEY(locals.user.id ?? locals.user.email ?? 'anon');
     const existing = await redis.get(key).catch(() => null);
     if (existing) {

@@ -144,6 +144,20 @@ def load_split_manifest(limit_per_domain=500):
         'val_size': len(val_idx),
         'test_size': len(test_idx),
         'n_features': 768,
+        'semantic_feature_dim': 768,
+        'total_feature_dim': 768,
+        'feature_schema_version': 'atlas.classifier.features.v1',
+        'feature_manifest': {
+            'schemaVersion': 'atlas.classifier.features.v1',
+            'semantic': {
+                'representationId': 'semantic_768',
+                'offset': 0,
+                'width': 768,
+                'modelId': 'embeddinggemma:latest',
+                'modelRevision': 'unknown',
+            },
+            'totalWidth': 768,
+        },
         'n_classes': len(np.unique(domain_classes)),
         'split_hash': split_hash,
         'classes': sorted(np.unique(domain_classes).tolist()),
@@ -152,6 +166,9 @@ def load_split_manifest(limit_per_domain=500):
     print(f"[+] Training: {metadata['train_size']}")
     print(f"[+] Validation: {metadata['val_size']}")
     print(f"[+] Test: {metadata['test_size']}")
+    print(f"[+] Semantic feature width: {metadata['semantic_feature_dim']}")
+    print(f"[+] Total feature width: {metadata['total_feature_dim']}")
+    print(f"[+] Feature schema: {metadata['feature_schema_version']}")
     print(f"[+] Split hash: {split_hash}")
 
     cur.close()
@@ -163,6 +180,11 @@ def load_split_manifest(limit_per_domain=500):
 def train_logistic_regression(X_train, y_train, metadata):
     """Train logistic regression classifier."""
     print("\n[*] Training logistic regression...")
+
+    semantic_width = int(metadata.get('semantic_feature_dim', 768))
+    total_width = int(metadata.get('total_feature_dim', semantic_width))
+    if X_train.shape[1] != semantic_width:
+        raise ValueError(f"Expected semantic_feature_dim={semantic_width}, got {X_train.shape[1]}")
 
     clf = LogisticRegression(
         max_iter=1000,
@@ -185,6 +207,8 @@ def train_logistic_regression(X_train, y_train, metadata):
     ).hexdigest()
 
     print(f"[+] Model trained (SHA256: {model_sha256[:12]}...)")
+    print(f"[+] Semantic feature width: {semantic_width}")
+    print(f"[+] Total feature width: {total_width}")
 
     return clf, model_sha256
 

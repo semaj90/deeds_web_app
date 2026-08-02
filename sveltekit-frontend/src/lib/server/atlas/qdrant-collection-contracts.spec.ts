@@ -23,6 +23,10 @@ describe('qdrant collection contract lineage', () => {
         language: 'typescript',
         embedding_model: 'embeddinggemma:latest',
         embedding_dimension: 384,
+        representation_id: 'legacy_384',
+        representation_revision: 12,
+        embedding_digest: 'sha256:legacy-example',
+        qdrant_vector_dim: 384,
         embedding_lane: 'dense_384',
         embedding_role: 'canonical_online_retrieval',
         embedding_status: 'ACTIVE',
@@ -75,6 +79,10 @@ describe('qdrant collection contract lineage', () => {
         language: 'typescript',
         embedding_model: 'embeddinggemma:latest',
         embedding_dimension: 768,
+        representation_id: 'semantic_768',
+        representation_revision: 0,
+        embedding_digest: 'sha256:semantic-example',
+        qdrant_vector_dim: 768,
         embedding_lane: 'dense_768',
         embedding_role: 'canonical_native_semantic',
         embedding_status: 'REFERENCE_ONLY',
@@ -100,11 +108,40 @@ describe('qdrant collection contract lineage', () => {
         language: 'typescript',
         embedding_model: 'embeddinggemma:latest',
         embedding_dimension: 384,
+        representation_id: 'legacy_384',
         embedding_lane: 'dense_384',
         projection_method: 'direct_slice',
         projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
         normalization: 'L2',
         indexed_at: new Date('2026-07-27T00:00:00Z').toISOString(),
+      })
+    ).toThrow(PayloadValidationError);
+  });
+
+  it('rejects 768 payloads with mismatched representation lineage', () => {
+    expect(() =>
+      validateQdrantPayloadForCollection('codebase_chunks_768', {
+        packet_key: 'packet:4',
+        source_ref: 'src/lib/server/retrieval/hybrid-search.ts',
+        workspace_id: 'sveltekit-frontend',
+        ontology_version: 'v1.0',
+        postgres_id: '00000000-0000-0000-0000-000000000004',
+        content_hash: 'sha256:jkl',
+        contract_version: 'atlas-qdrant-768-source-v1',
+        metadata_schema: 'atlas-semantic-metadata-v1',
+        metadata_version: 1,
+        file_path: 'src/lib/server/retrieval/hybrid-search.ts',
+        language: 'typescript',
+        embedding_model: 'embeddinggemma:latest',
+        embedding_dimension: 768,
+        representation_id: 'legacy_384',
+        embedding_lane: 'dense_768',
+        embedding_role: 'canonical_native_semantic',
+        embedding_status: 'ACTIVE',
+        embedding_native_dimension: 768,
+        projection_method: 'none',
+        normalization: 'L2',
+        indexed_at: new Date('2026-07-26T00:00:00Z').toISOString(),
       })
     ).toThrow(PayloadValidationError);
   });

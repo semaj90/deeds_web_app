@@ -163,7 +163,7 @@ async function queryQdrantVectorSignal(
     const { buildVectorPayload } = await import('$lib/server/config/vector-config.js');
     const { searchCodebaseAnn } = await import('$lib/server/search/qdrant-search.js');
     const denseLimit = Math.max(topK * 2, topK);
-    const collections = ['codebase_chunks_384_hybrid', 'codebase_chunks_768'];
+    const collections = ['codebase_chunks_768', 'codebase_chunks_384_hybrid'];
 
     if (seedRefs.length > 0) {
       const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];

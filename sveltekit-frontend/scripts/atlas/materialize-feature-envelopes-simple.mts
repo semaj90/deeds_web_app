@@ -42,6 +42,9 @@ async function main() {
       console.log('  telemetry: scaled from metadata.access_count');
       console.log('  reranker: null (populated later)');
       console.log('  recommendation: null (populated later)');
+      console.log('  semantic_feature_dim: 768');
+      console.log('  total_feature_dim: 7 (dense + lexical + ast + graph + pagerank + ontology + telemetry)');
+      console.log("  feature_schema_version: 'atlas.feature_envelope.v1'");
       console.log('');
       console.log('To apply, run:');
       console.log('  npx tsx scripts/atlas/materialize-feature-envelopes-simple.mts --apply');
@@ -59,7 +62,10 @@ async function main() {
           'ontology', CASE WHEN array_length(concept_ids, 1) > 3 THEN 0.7 WHEN array_length(concept_ids, 1) > 0 THEN 0.5 ELSE 0.3 END,
           'telemetry', CASE WHEN (metadata->>'access_count')::float IS NOT NULL THEN LEAST(1.0, (metadata->>'access_count')::float / 100.0) ELSE 0.5 END,
           'reranker', NULL,
-          'recommendation', NULL
+          'recommendation', NULL,
+          'semantic_feature_dim', 768,
+          'total_feature_dim', 7,
+          'feature_schema_version', 'atlas.feature_envelope.v1'
         )
         WHERE feature_envelope IS NULL;
       `;

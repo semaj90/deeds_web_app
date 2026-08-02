@@ -1,4 +1,8 @@
-// [Assuming necessary imports for Pool, EngramBridge, LangGraphBridge, DispatcherMiddlewareDependencies, etc. are already present]
+import type { Pool } from 'pg';
+
+import type { EngramMemoryBridge } from '../mcp/memory-bridge.js';
+import type { LangGraphBridge } from '../mcp/langgraph-bridge.js';
+import type { DispatcherMiddlewareDependencies } from './DispatcherMiddlewareDependencies.js';
 
 /**
  * @fileoverview Core middleware responsible for dispatching all MCP tooling
@@ -9,18 +13,6 @@
 // --- Dependencies Interface ---
 
 /**
- * @interface DispatcherMiddlewareDependencies
- * Defines the required, concrete, and injectable dependencies for the middleware
- * to initialize. This enforces that we do not rely on global/ambient singletons
- * during construction, making the code testable and auditable.
- */
-export interface DispatcherMiddlewareDependencies {
-    pool: Pool;
-    engramBridge: EngramBridge;
-    langgraphBridge: LangGraphBridge;
-}
-
-/**
  * @class DispatcherMiddleware
  * The central middleware class managing all tool registrations and the startup
  * sequence. It enforces a strict, staged initialization process, allowing
@@ -29,7 +21,7 @@ export interface DispatcherMiddlewareDependencies {
  */
 export class DispatcherMiddleware {
     private readonly pool: Pool;
-    private readonly engramBridge: EngramBridge;
+    private readonly engramBridge: EngramMemoryBridge;
     private readonly langgraphBridge: LangGraphBridge;
 
     /**
@@ -72,7 +64,7 @@ export class DispatcherMiddleware {
 
         // 2. Validate Core Dependencies: Ensure all required components are available.
         if (!this.pool || !this.engramBridge || !this.langgraphBridge) {
-            throw new Error("CORE_DEP_FAIL: One or more critical dependencies (Pool, EngramBridge, LangGraphBridge) were not injected.");
+            throw new Error("CORE_DEP_FAIL: One or more critical dependencies (Pool, EngramMemoryBridge, LangGraphBridge) were not injected.");
         }
 
         // 3. Run Core Tools: This ensures mandatory tool registrations succeed.
@@ -156,7 +148,7 @@ export class DispatcherMiddleware {
      * @throws {TypeError} If the type validation fails.
      */
     public static assertDispatcherMiddleware(value: unknown): void {
-        if (!value || typeof value !== 'object' || !(value as any).constructor.name === 'DispatcherMiddleware') {
+        if (!value || typeof value !== 'object' || (value as any).constructor.name !== 'DispatcherMiddleware') {
             throw new TypeError("INVALID_DISPATCHER_MIDDLEWARE: Value provided is not a valid DispatcherMiddleware instance.");
         }
     }
@@ -168,4 +160,4 @@ export class DispatcherMiddleware {
     private registerEngramTools(server: any) { /* ... */ }
     private registerAtlasEmbeddingTools(server: any) { /* ... */ }
     private registerDbInspectionTools(server: any) { /* ... */ }
-    private registerLangGraphTools(server: any) { /* ... */ }
+}

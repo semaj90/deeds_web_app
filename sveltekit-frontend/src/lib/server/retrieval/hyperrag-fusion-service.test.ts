@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   loadAceContextPlannerHit: vi.fn(async () => ({ packet: { query: 'graph retrieval' } })),
   buildAceContextPlannerState: vi.fn(() => ({ query: 'graph retrieval' })),
   searchByCluster: vi.fn(async () => ([{ id: 'lens-1', title: 'Cluster Lens', summary: 'Cluster summary', relevanceScore: 0.9 }])),
+  coldStorageSearch: vi.fn(async () => []),
+  logAceRun: vi.fn(async () => undefined),
 }));
 
 vi.mock('$lib/server/env.server.js', () => ({
@@ -103,10 +105,27 @@ describe('HyperRagFusionService', () => {
     }));
 
     const { HyperRagFusionService } = await import('./hyperrag-fusion-service.js');
+    vi.spyOn(HyperRagFusionService.prototype as any, 'searchQdrantMulti').mockResolvedValue([
+      {
+        id: 'semantic-1',
+        score: 0.91,
+        lane: 'semantic',
+        payload: {
+          stable_key: 'semantic-1',
+          path: 'src/lib/server/retrieval/hyperrag-fusion-service.ts',
+          content: 'Semantic match body',
+          graph_authority_score: 0.82,
+          pageRank: 0.31,
+          gpuCluster: 7,
+        },
+        vector: Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0)),
+      },
+    ]);
     const result = await HyperRagFusionService.getInstance().search({ query: 'graph retrieval', mode: 'codebase' });
 
     expect(result.query).toBe('graph retrieval');
     expect(Array.isArray(result.hits)).toBe(true);
+    expect(result.hits.length).toBeGreaterThan(0);
     expect(Array.isArray(result.graphPaths)).toBe(true);
     expect(result.hits[0].reasons.length).toBeGreaterThan(0);
     expect(result.hits[0].signals).toEqual(expect.objectContaining({ dense: expect.any(Number), turbovec: expect.any(Number) }));
@@ -128,6 +147,7 @@ describe('HyperRagFusionService', () => {
     mocks.getTopAuthorityNodes.mockRejectedValueOnce(new Error('neo4j unavailable'));
     mocks.loadAceContextPlannerHit.mockResolvedValueOnce(null);
     mocks.searchByCluster.mockResolvedValueOnce([]);
+    mocks.coldStorageSearch.mockResolvedValueOnce([]);
 
     vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
       const url = String(input);
@@ -154,6 +174,22 @@ describe('HyperRagFusionService', () => {
     }));
 
     const { HyperRagFusionService } = await import('./hyperrag-fusion-service.js');
+    vi.spyOn(HyperRagFusionService.prototype as any, 'searchQdrantMulti').mockResolvedValue([
+      {
+        id: 'semantic-1',
+        score: 0.91,
+        lane: 'semantic',
+        payload: {
+          stable_key: 'semantic-1',
+          path: 'src/lib/server/retrieval/hyperrag-fusion-service.ts',
+          content: 'Semantic match body',
+          graph_authority_score: 0.82,
+          pageRank: 0.31,
+          gpuCluster: 7,
+        },
+        vector: Array.from({ length: 768 }, (_, i) => (i === 0 ? 1 : 0)),
+      },
+    ]);
     const result = await HyperRagFusionService.getInstance().search({ query: 'graph retrieval', mode: 'codebase' });
 
     expect(result.hits).toHaveLength(1);
@@ -161,3 +197,13 @@ describe('HyperRagFusionService', () => {
     expect(Array.isArray(result.graphPaths)).toBe(true);
   });
 });
+
+vi.mock('$lib/server/retrieval/cold-storage-retrieval-service.js', () => ({
+  ColdStorageRetrievalService: {
+    search: (...args: unknown[]) => mocks.coldStorageSearch(...args),
+  },
+}));
+
+vi.mock('$lib/server/retrieval/ace-retrieval-logger.js', () => ({
+  logAceRun: (...args: unknown[]) => mocks.logAceRun(...args),
+}));

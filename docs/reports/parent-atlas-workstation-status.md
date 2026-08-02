@@ -1,6 +1,6 @@
 # Parent Atlas Workstation Status
 
-Generated: 2026-07-28T17:01:38.154Z
+Generated: 2026-08-02T11:07:48.530Z
 
 ## Boundary
 
@@ -45,7 +45,7 @@ Legal-app runtime stores are mirrors/caches, not truth.
 |---|---:|
 | atlas_packets | 61659 |
 | atlas_packet_registry | 58324 |
-| atlas_summary_layers | 18423 |
+| atlas_summary_layers | 18437 |
 | atlas_artifacts | 58312 |
 | codebase_chunk_index | 52417 |
 | parent_atlas_documents | 61659 |
@@ -57,8 +57,8 @@ Legal-app runtime stores are mirrors/caches, not truth.
 
 | Metric | Value |
 |---|---:|
-| packet_summaries | 6883 |
-| summary_layers_populated | 7640 |
+| packet_summaries | 6885 |
+| summary_layers_populated | 7654 |
 | json_shaped_packet_summaries | 17 |
 | json_shaped_summary_layers | 17 |
 | missing_packet_registry_rows | 3335 |

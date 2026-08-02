@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-14T16:12:52.707Z",
+  "generated_at": "2026-08-02T11:07:48.886Z",
   "mode": "apply",
   "status": "PASS",
   "source_table": "codebase_chunk_index",
@@ -8,59 +8,59 @@
   "batch_size": 100,
   "counts": {
     "chunks_read": 100,
-    "usable_candidates": 99,
-    "skipped_leaky": 1,
+    "usable_candidates": 97,
+    "skipped_leaky": 3,
     "skipped_short": 0,
-    "skipped_no_packet_context": 32,
-    "packet_context_found": 67,
-    "summary_context_found": 67,
-    "title_id_enriched": 67,
-    "deduped_packet_rows": 6,
-    "upserted": 69
+    "skipped_no_packet_context": 79,
+    "packet_context_found": 18,
+    "summary_context_found": 18,
+    "title_id_enriched": 18,
+    "deduped_packet_rows": 0,
+    "upserted": 20
   },
   "coverage": {
-    "usable_candidate_pct": 99,
+    "usable_candidate_pct": 97,
     "packet_context_join_pct": 100,
     "summary_context_pct": 100
   },
   "sample": [
     {
-      "packet_key": "packet:ef36841a707e",
-      "source_ref": "sveltekit-frontend/src/lib/server/cache/report-template-cache.ts",
-      "title_id": "title:sveltekit-frontend-report-template-cache:569b23a8",
-      "summary_length": 797,
+      "packet_key": "packet:d1464e02f7c4",
+      "source_ref": "packages/parent-atlas/src/adapters/qdrant.ts",
+      "title_id": "title:packages-qdrant:12b35593",
+      "summary_length": 1118,
       "packet_context_found": true,
       "summary_changed": false
     },
     {
-      "packet_key": "packet:cd4c3cd32fd4",
-      "source_ref": "sveltekit-frontend/src/routes/(app)/legal-corpus/+page.svelte",
-      "title_id": "title:sveltekit-frontend-page:893c07c6",
-      "summary_length": 1009,
+      "packet_key": "packet:4bb01d486192",
+      "source_ref": "sveltekit-frontend/docs/documents-atlas-index.md",
+      "title_id": "title:sveltekit-frontend-documents-atlas-index:0a356b3b",
+      "summary_length": 1116,
       "packet_context_found": true,
       "summary_changed": false
     },
     {
-      "packet_key": "packet:225cff0e9939",
-      "source_ref": "sveltekit-frontend/src/routes/(app)/analytics/+page.svelte",
-      "title_id": "title:sveltekit-frontend-page:bc999d01",
-      "summary_length": 962,
+      "packet_key": "packet:7b8740287636",
+      "source_ref": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/document-drafting/+server.ts",
+      "title_id": "title:scripts-server:13888a1b",
+      "summary_length": 1011,
       "packet_context_found": true,
       "summary_changed": false
     },
     {
-      "packet_key": "packet:7d6672f7b2d2",
-      "source_ref": "sveltekit-frontend/src/service-worker.ts",
-      "title_id": "title:sveltekit-frontend-service-worker:f6a37cf8",
-      "summary_length": 961,
+      "packet_key": "ace:packet:41ae4f183768",
+      "source_ref": "scripts/agent/agent-orchestrator.mjs",
+      "title_id": "title:agent-orchestrator:75127b92",
+      "summary_length": 1086,
       "packet_context_found": true,
       "summary_changed": false
     },
     {
-      "packet_key": "packet:0b86927eecca",
-      "source_ref": "sveltekit-frontend/src/lib/server/integrations/obsidian-client.ts",
-      "title_id": "title:sveltekit-frontend-obsidian-client:6c516712",
-      "summary_length": 947,
+      "packet_key": "packet:f687fb79f3a0",
+      "source_ref": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts",
+      "title_id": "title:packages-gpu-job-queue:31348e07",
+      "summary_length": 1082,
       "packet_context_found": true,
       "summary_changed": false
     }
@@ -69,7 +69,7 @@
     "Promotes existing Gemma4 chunk summaries from codebase_chunk_index into atlas_summary_layers.",
     "Uses canonical packet_key from atlas_packets when present; rows without packet context are skipped to satisfy the foreign key on atlas_summary_layers.packet_key.",
     "atlas_packets is used for optional title_id / feature / topology enrichment; Postgres remains canonical truth.",
-    "Verification rows: 69 total, 69 with summary, 69 with metadata, 69 with summary_context.",
+    "Verification rows: 87 total, 87 with summary, 87 with metadata, 87 with summary_context.",
     "Run atlas:packet-summaries:backfill:apply and atlas:feature-envelope:backfill:apply after this script to complete the promotion chain."
   ]
 }

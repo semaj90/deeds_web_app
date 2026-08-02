@@ -82,10 +82,10 @@ export const RetrievalEventSchema = z.object({
 	// ========== QUERY INPUT ==========
 	query_text: z.string().min(1).describe('The query text'),
 	embedding_model: z.string().default('embeddinggemma:latest').describe('Model used for query embedding'),
-	query_embedding_dim: z.number().int().positive().default(384).describe('Default online query embedding dimensionality. Canonical search lane is 384; native or legacy 768 queries must be recorded explicitly.'),
-	query_embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42']).default('dense_384').describe('Named query lane used for the primary semantic retrieval path'),
+	query_embedding_dim: z.number().int().positive().default(768).describe('Default online query embedding dimensionality. Canonical search lane is 768; legacy 384 queries must be recorded explicitly.'),
+	query_embedding_lane: z.enum(['dense_384', 'dense_768', 'bm42']).default('dense_768').describe('Named query lane used for the primary semantic retrieval path'),
 	query_embedding_status: z.enum(['ACTIVE', 'REFERENCE_ONLY', 'MIGRATION_SOURCE', 'SUPERSEDED']).default('ACTIVE').describe('Lifecycle status of the primary query lane'),
-	query_projection_version: z.string().default('atlas-embeddinggemma-direct-slice384-v1').describe('Projection contract for the primary query lane'),
+	query_projection_version: z.string().default('embeddinggemma-full768-v1').describe('Projection contract for the primary query lane'),
 
 	// ========== VECTOR LANE ==========
 	vector_lane_latency_ms: z.number().nonnegative().describe('Time to embed query + search Qdrant'),
@@ -144,10 +144,10 @@ export function createRetrievalEvent(overrides: Partial<RetrievalEvent>): Retrie
 		timestamp: new Date(),
 		query_text: '',
 		embedding_model: 'embeddinggemma:latest',
-		query_embedding_dim: 384,
-		query_embedding_lane: 'dense_384',
+		query_embedding_dim: 768,
+		query_embedding_lane: 'dense_768',
 		query_embedding_status: 'ACTIVE',
-		query_projection_version: 'atlas-embeddinggemma-direct-slice384-v1',
+		query_projection_version: 'embeddinggemma-full768-v1',
 		vector_lane_latency_ms: 0,
 		vector_lane_top_k: 10,
 		vector_lane_results: [],

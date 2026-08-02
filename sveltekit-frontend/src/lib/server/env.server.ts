@@ -82,7 +82,14 @@ export const ENV = Object.freeze({
 
   RABBITMQ_URL: privateEnv.RABBITMQ_URL,
   COUCHDB_URL: privateEnv.COUCHDB_URL,
-  NEO4J_URI: privateEnv.NEO4J_URI,
+  // Host-dev default matches the docker-compose port mapping (7687 bolt,
+  // 7474 HTTP) exposed directly on the same port numbers. NEO4J_PASSWORD has
+  // no default — it's a credential and must come from .env.local; consumers
+  // that need it (getNeo4jDriver, TRACE MCP) must fail loudly, not silently
+  // connect with an empty/undefined auth token.
+  NEO4J_URI: privateEnv.NEO4J_URI ?? 'bolt://127.0.0.1:7687',
+  NEO4J_USER: privateEnv.NEO4J_USER ?? 'neo4j',
+  NEO4J_PASSWORD: privateEnv.NEO4J_PASSWORD,
   NATS_URL: privateEnv.NATS_URL,
 
   EMBEDDING_QUIC_ENABLED: parseBoolean(privateEnv.EMBEDDING_QUIC_ENABLED, false),

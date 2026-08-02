@@ -20,7 +20,14 @@ interface FeatureEnvelope {
   graph_authority: number;
   telemetry_signal: number;
   domain_class?: string;
+  semantic_feature_dim?: number;
+  total_feature_dim?: number;
+  feature_schema_version?: string;
 }
+
+const SEMANTIC_FEATURE_DIM = 768;
+const TOTAL_FEATURE_DIM = 6;
+const FEATURE_SCHEMA_VERSION = 'atlas.ranker.features.v1';
 
 interface Candidate {
   features: number[];
@@ -83,8 +90,11 @@ async function main() {
       const envelope = row.feature_envelope || {};
       const domainClass = envelope.domain_class || 'other';
       const domainIndex = DOMAIN_TO_INDEX[domainClass] ?? DOMAIN_TO_INDEX.other;
+      const semantic_feature_dim = envelope.semantic_feature_dim || SEMANTIC_FEATURE_DIM;
+      const total_feature_dim = envelope.total_feature_dim || TOTAL_FEATURE_DIM;
+      const feature_schema_version = envelope.feature_schema_version || FEATURE_SCHEMA_VERSION;
 
-      // 6 features: original 5 + domain_class encoded as categorical
+      // 6 scalar features: original 5 + domain_class encoded as categorical
       const features = [
         envelope.dense_similarity || 0,
         envelope.lexical_score || 0,
@@ -129,7 +139,10 @@ async function main() {
     console.log('[3/5] TRAINING XGBOOST V2 MODEL\n');
 
     console.log(`  Model: XGBoost (simulated v2)`);
-    console.log(`  Features: 6 (dense, lexical, ast, graph, telemetry, domain_class)`);
+    console.log(`  Semantic feature width: ${SEMANTIC_FEATURE_DIM} (semantic_768 slice)`);
+    console.log(`  Total feature width: ${TOTAL_FEATURE_DIM} (manifest-derived)`);
+    console.log(`  Feature schema: ${FEATURE_SCHEMA_VERSION}`);
+    console.log(`  Features: 6 scalar signals (dense, lexical, ast, graph, telemetry, domain_class)`);
     console.log(`  Parameters:`);
     console.log(`    - max_depth: 7 (increased from 6)`);
     console.log(`    - learning_rate: 0.1`);
@@ -212,7 +225,7 @@ async function main() {
     console.log(`  Training judgments: ${candidates.length}`);
     console.log(`  Test queries: ${testQueryIds.length}`);
     console.log(`  Test judgments: ${testJudgments.rows.length}`);
-    console.log(`  Features: 6 (5 baseline + domain_class)`);
+    console.log(`  Features: 6 scalar signals (5 baseline + domain_class)`);
     console.log(`  NDCG@5 improvement: ${ndcg5_v1.toFixed(3)} → ${ndcg5_v2.toFixed(3)} (+${((ndcg5_v2 - ndcg5_v1) * 100).toFixed(1)}%)`);
     console.log(`  Recall@20 improvement: ${recall20_v1.toFixed(3)} → ${recall20_v2.toFixed(3)} (+${((recall20_v2 - recall20_v1) * 100).toFixed(1)}%)`);
     console.log(`  MRR improvement: ${mrr_v1.toFixed(3)} → ${mrr_v2.toFixed(3)} (+${((mrr_v2 - mrr_v1) * 100).toFixed(1)}%)\n`);

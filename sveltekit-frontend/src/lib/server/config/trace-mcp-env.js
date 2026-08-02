@@ -17,7 +17,11 @@ export const traceMcpEnvSchema = z
     DATABASE_URL: optionalTrimmedString.pipe(z.string().url()),
     REDIS_URL: optionalTrimmedString.pipe(z.string().url()).optional(),
     QDRANT_URL: optionalTrimmedString.pipe(z.string().url()).optional(),
-    NEO4J_URI: optionalTrimmedString,
+    // A graph tool must never remain registered as healthy when its backend
+    // is unconfigured — fail at MCP startup, not deep inside a tool call.
+    NEO4J_URI: optionalTrimmedString.pipe(z.string().url()),
+    NEO4J_USER: optionalTrimmedString.pipe(z.string().min(1)),
+    NEO4J_PASSWORD: optionalTrimmedString.pipe(z.string().min(1)),
   })
   .passthrough();
 

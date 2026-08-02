@@ -1,6 +1,6 @@
 export const QDRANT_SOURCE_COLLECTION = 'codebase_chunks_768_v2' as const;
 export const QDRANT_HYBRID_COLLECTION = 'codebase_chunks_768_v2' as const;
-export const QDRANT_DENSE_FALLBACK_COLLECTION = 'codebase_chunks_384_hybrid' as const;
+export const QDRANT_DENSE_FALLBACK_COLLECTION = QDRANT_HYBRID_COLLECTION;
 
 export const QDRANT_SOURCE_EMBEDDING_DIMENSION = 768 as const;
 export const QDRANT_RETRIEVAL_EMBEDDING_DIMENSION = 768 as const;

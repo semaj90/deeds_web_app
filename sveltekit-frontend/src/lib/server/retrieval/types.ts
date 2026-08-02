@@ -10,7 +10,7 @@ import type { QueryVectorBundle } from './embedding-service.js';
 /**
  * Search lanes available in the retrieval pipeline
  */
-export type SearchLane = 'qdrant' | 'qdrant-768' | 'qdrant-384' | 'gpu-cuvs' | 'bm25' | 'lexical' | 'turbovec' | 'hybrid';
+export type SearchLane = 'qdrant' | 'qdrant-768' | 'qdrant-384' | 'gpu-cuvs' | 'bm25' | 'lexical' | 'turbovec' | 'hybrid'; // qdrant-384 remains legacy-only
 
 /**
  * RRF fusion weights by lane kind — mirrors LANE_REGISTRY roles.
@@ -109,7 +109,7 @@ export interface SearchResult {
     /** TurboVec rerank score if applicable */
     turbovec_score?: number;
 
-    /** Embedding dimension that produced this result (384 or 768) */
+    /** Embedding dimension that produced this result (768 or legacy 384) */
     embedding_dim?: number;
 
     /** Named representation lane that produced this result */
@@ -190,7 +190,7 @@ export interface SearchRequest {
   /** Adaptive retrieval tier inferred from query shape or explicitly requested. */
   retrievalTier?: SearchTier;
 
-  /** Embedding dimension override (default: 768 so 384 lanes can truncate safely). */
+  /** Embedding dimension override (default: 768 canonical). */
   embedding_dim?: number;
 
   /** Filter by packet_key if known */

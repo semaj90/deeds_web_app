@@ -8,7 +8,7 @@
  *   - various client-side embed services
  *
  * Provides:
- * - Model selection (384-dim for GPU, 768-dim for Qdrant)
+ * - Model selection (768-dim canonical, optional latent projections)
  * - Cache detection (Bifrost L1/L2)
  * - Fallback chain (gRPC → HTTP → Ollama)
  * - Zero-copy tensor handling
@@ -47,7 +47,7 @@ export interface EmbeddingServiceConfig {
   /** Optional explicit model for the 768-dim source lane. */
   embed_model_768?: string;
 
-  /** Optional explicit model for the 384-dim retrieval lane. */
+  /** Optional explicit model for the 384-dim legacy lane. */
   embed_model_384?: string;
 
   /** Ollama API URL (default: http://127.0.0.1:11434) */
@@ -56,7 +56,7 @@ export interface EmbeddingServiceConfig {
   /** Bifrost semantic cache URL (default: http://127.0.0.1:3040/v1) */
   bifrost_url?: string;
 
-  /** Target embedding dimension (default: 384 — canonical retrieval projection) */
+  /** Target embedding dimension (default: 768 — canonical native semantic lane) */
   target_dim?: number;
 
   /** Enable L1 Redis cache */

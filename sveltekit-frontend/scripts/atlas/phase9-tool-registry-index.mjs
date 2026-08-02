@@ -7,7 +7,7 @@
  * - JSON schema (input/output)
  * - Examples (domain usage patterns)
  * - Domains (auth, retrieval, graph, etc.)
- * - Embedding (384-dim, indexed in pgvector + Qdrant)
+ * - Embedding (768-dim, indexed in pgvector + Qdrant)
  * - Success telemetry (for HMM state validation)
  *
  * Enables: query intent → tool search → HMM gate → tool execution
@@ -91,7 +91,7 @@ const TOOLS = [
     name: 'Dense Vector Search',
     summary: 'Cosine similarity search in Qdrant HNSW for semantic matching',
     input_schema: {
-      query_embedding: { type: 'array', items: { type: 'number' }, minItems: 384, maxItems: 384 },
+      query_embedding: { type: 'array', items: { type: 'number' }, minItems: 768, maxItems: 768 },
       top_k: { type: 'integer', default: 10 },
       filter: { type: 'object' }
     },
@@ -196,7 +196,7 @@ async function main() {
         output_schema jsonb NOT NULL DEFAULT '{}'::jsonb,
         examples text[] NOT NULL DEFAULT '{}',
         domains text[] NOT NULL DEFAULT '{}',
-        embedding vector(384),
+        embedding vector(768),
         success_count int DEFAULT 0,
         failure_count int DEFAULT 0,
         avg_latency_ms real DEFAULT 0,
@@ -243,10 +243,10 @@ async function main() {
         continue;
       }
 
-      // Truncate embedding to 384-dim (canonical project dimension)
-      const embedding384 = embedding.slice(0, 384);
-      if (embedding384.length !== 384) {
-        console.log(`  ⚠️  Skipping ${tool.tool_id} (embedding dimension mismatch: got ${embedding.length}, expected >= 384)`);
+      // Truncate embedding to 768-dim (canonical project dimension)
+      const embedding768 = embedding.slice(0, 768);
+      if (embedding768.length !== 768) {
+        console.log(`  ⚠️  Skipping ${tool.tool_id} (embedding dimension mismatch: got ${embedding.length}, expected >= 768)`);
         continue;
       }
 
@@ -266,7 +266,7 @@ async function main() {
           JSON.stringify(tool.output_schema),
           tool.examples,
           tool.domains,
-          JSON.stringify(embedding384)
+          JSON.stringify(embedding768)
         ]
       );
 

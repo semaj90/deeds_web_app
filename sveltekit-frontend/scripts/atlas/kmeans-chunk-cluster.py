@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-K-means chunk clustering — targets codebase_chunk_index.content_embedding (halfvec(768))
+K-means chunk clustering - AST-aware semantic routing over codebase_chunk_index.content_embedding (halfvec(768))
 
-This is the ANALYSIS / OFFLINE model space (768-dim legacy embeddings).
-For the production 384-dim routing model see kmeans-chunk-cluster-384.py.
+This is the 768-dim semantic lane used for AST-aware, lexical, and langextract-aligned clustering.
+Legacy 384 routing remains in kmeans-chunk-cluster-384.py.
 
-Model naming convention (central function — do not duplicate):
-  mbk-spherical-content768-k{K}-v1
+Model naming convention (central function - do not duplicate):
+  mbk-spherical-semantic768-k{K}-v1
 
 Elbow matrix (all three runs must complete before selecting baseline):
   k=64   inertia=23927.1  EVALUATION_CANDIDATE
@@ -54,14 +54,14 @@ def make_model_version(
 
 def make_vector_contract(vector_dim: int) -> str:
     if vector_dim == 768:
-        return "legacy-content-768-v1"
+        return "semantic_768_ast_aware_v1"
     if vector_dim == 384:
         return "canonical-content384-v1"
     return f"content-{vector_dim}-v1"
 
 
 # ── CLI ──────────────────────────────────────────────────────────────────────
-parser = argparse.ArgumentParser(description="Spherical K-means for codebase_chunk_index (768-dim)")
+parser = argparse.ArgumentParser(description="Spherical K-means for codebase_chunk_index (768-dim semantic lane)")
 parser.add_argument("--dry-run",        action="store_true", help="Cluster only, no DB writes")
 parser.add_argument("--apply",          action="store_true", help="Write results to Postgres")
 parser.add_argument("--set-active",     action="store_true",
@@ -83,8 +83,17 @@ BATCH          = args.batch
 LIMIT          = args.limit
 VERBOSE        = args.verbose
 DIM            = 768
-MODEL_VER      = make_model_version(source_name="content", vector_dim=DIM, k=K)
+SOURCE_MODEL_PATH = os.environ.get("HFORF_MODEL_PATH", r"C:\Users\james\Videos\deeds-web-app\models\hfor\hforf.gguf")
+SEMANTIC_PROFILE = {
+    "lane": "semantic_768",
+    "mode": "ast-aware lexical langextract",
+    "source_model_path": SOURCE_MODEL_PATH,
+    "semantic_inputs": ["ast_symbols", "lexical_features", "used_concepts"],
+    "future_lanes": ["latent128", "latent64", "bytea"],
+}
+MODEL_VER      = make_model_version(source_name="semantic", vector_dim=DIM, k=K)
 VECTOR_CONTRACT = make_vector_contract(DIM)
+SEMANTIC_PROFILE_JSON = json.dumps(SEMANTIC_PROFILE)
 EPS            = 1e-9
 
 # ── Postgres ─────────────────────────────────────────────────────────────────
@@ -98,8 +107,10 @@ conn = psycopg2.connect(host=PG_HOST, port=PG_PORT, user=PG_USER,
                         password=PG_PASS, dbname=PG_DB)
 conn.autocommit = False
 
-print("=== K-means Chunk Clustering (768-dim Analysis/Routing Models) ===")
+print("=== K-means Chunk Clustering (768-dim semantic lane: AST-aware / lexical / langextract) ===")
 print(f"k={K}  batch={BATCH}  model_ver={MODEL_VER}  contract={VECTOR_CONTRACT}")
+print(f"source_model={SOURCE_MODEL_PATH}")
+print(f"semantic_profile={SEMANTIC_PROFILE['mode']}")
 print(f"mode={'DRY-RUN' if args.dry_run else 'APPLY'}"
       + ("  set-active" if args.set_active else ""))
 print()
@@ -115,6 +126,7 @@ with conn.cursor() as cur:
           ADD COLUMN IF NOT EXISTS cluster_margin       real,
           ADD COLUMN IF NOT EXISTS kmeans_model_version text,
           ADD COLUMN IF NOT EXISTS kmeans_vector_contract text,
+          ADD COLUMN IF NOT EXISTS metadata              jsonb NOT NULL DEFAULT '{}',
           ADD COLUMN IF NOT EXISTS kmeans_assigned_at   timestamptz
     """)
     cur.execute("""
@@ -155,7 +167,7 @@ with conn.cursor() as cur:
     """)
     conn.commit()
 
-print("Schema ready ✓")
+print("Schema ready OK")
 
 # ── Load embeddings (OFFSET pagination) ───────────────────────────────────────
 print(f"Loading embeddings from codebase_chunk_index ...")
@@ -208,7 +220,7 @@ while fetched < to_process:
 print(f"Loaded {len(embeddings):,} embeddings in {time.time()-t0:.1f}s")
 
 if len(embeddings) == 0:
-    print("No embeddings found — exiting")
+    print("No embeddings found - exiting")
     sys.exit(0)
 
 # ── L2-normalize (spherical K-means) ─────────────────────────────────────────
@@ -287,14 +299,21 @@ for start in range(0, N, SCORE_CHUNK):
     chunk = X_norm[start:end]
     sims  = chunk @ centroids.T
 
-    top2_idx = np.argsort(-sims, axis=1)[:, :2]
-    c1 = top2_idx[:, 0]
-    c2 = top2_idx[:, 1]
+    top_k = min(2, K)
+    top_idx = np.argsort(-sims, axis=1)[:, :top_k]
+    c1 = top_idx[:, 0]
     s1 = sims[np.arange(len(chunk)), c1]
-    s2 = sims[np.arange(len(chunk)), c2]
     d1 = 1.0 - s1
-    d2 = 1.0 - s2
-    margin = (d2 - d1) / np.maximum(d2, EPS)
+
+    if K > 1:
+        c2 = top_idx[:, 1]
+        s2 = sims[np.arange(len(chunk)), c2]
+        d2 = 1.0 - s2
+        margin = (d2 - d1) / np.maximum(d2, EPS)
+    else:
+        c2 = np.full(len(chunk), -1, dtype=np.int32)
+        d2 = np.full(len(chunk), np.inf, dtype=np.float32)
+        margin = np.zeros(len(chunk), dtype=np.float32)
 
     assignments[start:end] = c1
     d1_arr[start:end]      = d1
@@ -352,7 +371,7 @@ if args.dry_run:
     print()
     print(f"Model version  : {MODEL_VER}")
     print(f"Vector contract: {VECTOR_CONTRACT}")
-    print("DRY-RUN complete — no writes.")
+    print("DRY-RUN complete - no writes.")
     conn.close()
     sys.exit(0)
 
@@ -367,11 +386,11 @@ model_role    = "ROUTING_BASELINE" if K == 128 else "EVALUATION_CANDIDATE"
 with conn.cursor() as cur:
     cur.execute("""
         INSERT INTO atlas_cluster_models
-          (model_version, k, dim, n_chunks, centroids, inertia, language_stats,
+          (model_version, k, dim, n_chunks, centroids, inertia, language_stats, metadata,
            source_column, source_vector_dimension, source_embedding_model,
            normalization, algorithm, random_seed,
            vector_contract, model_role, is_assignment_active)
-        VALUES (%s, %s, %s, %s, %s::jsonb, %s, %s::jsonb,
+        VALUES (%s, %s, %s, %s, %s::jsonb, %s, %s::jsonb, %s::jsonb,
                 %s, %s, %s, %s, %s, %s,
                 %s, %s, %s)
         ON CONFLICT (model_version) DO UPDATE SET
@@ -381,6 +400,7 @@ with conn.cursor() as cur:
           centroids               = EXCLUDED.centroids,
           inertia                 = EXCLUDED.inertia,
           language_stats          = EXCLUDED.language_stats,
+          metadata                = EXCLUDED.metadata,
           source_column           = EXCLUDED.source_column,
           source_vector_dimension = EXCLUDED.source_vector_dimension,
           source_embedding_model  = EXCLUDED.source_embedding_model,
@@ -391,13 +411,13 @@ with conn.cursor() as cur:
           model_role              = EXCLUDED.model_role,
           created_at              = NOW()
     """, (MODEL_VER, K, DIM, N, centroid_json,
-          float(km.inertia_), json.dumps(lang_stats),
-          'codebase_chunk_index.content_embedding', DIM, 'embeddinggemma-300m',
+          float(km.inertia_), json.dumps(lang_stats), SEMANTIC_PROFILE_JSON,
+          'codebase_chunk_index.content_embedding', DIM, os.environ.get('EMBEDDING_MODEL', 'embeddinggemma:latest'),
           'l2', 'minibatch-spherical-kmeans', 42,
           VECTOR_CONTRACT, model_role, False))
     conn.commit()
 
-print("Centroid model saved ✓")
+print("Centroid model saved OK")
 
 # ── Write per-chunk assignments (atomic batch) ────────────────────────────────
 print(f"Writing {N:,} chunk assignments ...")
@@ -464,11 +484,11 @@ if args.set_active:
             WHERE model_version = %s
         """, (MODEL_VER,))
         conn.commit()
-    print(f"  Marked {MODEL_VER} as active assignment ✓")
+    print(f"  Marked {MODEL_VER} as active assignment OK")
 
 total_time = time.time() - t0
 print()
-print("─────────────────────────────────────────")
+print("-----------------------------------------")
 print("K-means Chunk Clustering complete")
 print(f"  Chunks clustered : {written:,}")
 print(f"  k                : {K}")
@@ -478,6 +498,10 @@ print(f"  inertia          : {km.inertia_:.4f}")
 print(f"  avg d1           : {d1_arr.mean():.4f}")
 print(f"  avg margin       : {margin_arr.mean():.4f}")
 print(f"  total time       : {total_time:.1f}s")
-print("─────────────────────────────────────────")
+print("-----------------------------------------")
 
 conn.close()
+
+
+
+

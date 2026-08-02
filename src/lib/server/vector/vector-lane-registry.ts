@@ -24,7 +24,6 @@ export const VectorLaneRoleSchema = z.enum([
 export const VectorDimensionSchema = z.union([
   z.literal(64),
   z.literal(128),
-  z.literal(384),
   z.literal(768)
 ]);
 

@@ -7,14 +7,34 @@
 
 import { ENV } from '$lib/server/env.server.js';
 
+/**
+ * cuVS operation type distinguishes semantic ANN (768-dim, canonical retrieval)
+ * from topology ANN (128/64-dim, SOM/KMeans routing) — these are different
+ * geometries and must never be mixed in one request shape.
+ */
+export type CuvsSemanticAnnRequest = {
+  operation: 'semantic_ann';
+  index: 'content768' | 'summary768';
+  dimension: 768;
+  vector: number[];
+  topK: number;
+  allowedRowIds?: number[];
+};
+
+export type CuvsTopologyAnnRequest = {
+  operation: 'topology_ann';
+  index: 'latent64';
+  dimension: 64;
+  vector: number[];
+  topK: number;
+  allowedRowIds?: number[];
+};
+
+export type CuvsSearchRequest = CuvsSemanticAnnRequest | CuvsTopologyAnnRequest;
+
 export interface CuvsSidecarClient {
   health(): Promise<{ ready: boolean; indexVersion?: string }>;
-  search(input: {
-    index: 'content384' | 'summary384' | 'latent64';
-    vector: number[];
-    topK: number;
-    allowedRowIds?: number[];
-  }): Promise<Array<{ packetKey: string; score: number }>>;
+  search(input: CuvsSearchRequest): Promise<Array<{ packetKey: string; score: number }>>;
 }
 
 const HEALTH_CACHE_TTL = 30_000;
@@ -60,17 +80,19 @@ export function createCuvsSidecarClient(baseUrl?: string): CuvsSidecarClient {
       }
     },
 
-    async search(input: {
-      index: 'content384' | 'summary384' | 'latent64';
-      vector: number[];
-      topK: number;
-      allowedRowIds?: number[];
-    }): Promise<Array<{ packetKey: string; score: number }>> {
+    async search(input: CuvsSearchRequest): Promise<Array<{ packetKey: string; score: number }>> {
+      if (input.vector.length !== input.dimension) {
+        throw new Error(
+          `CUVS_DIMENSION_MISMATCH: ${input.operation}/${input.index} expects ${input.dimension}-dim, received ${input.vector.length}`,
+        );
+      }
+
       try {
         const res = await fetch(`${url}/search`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            operation: input.operation,
             index: input.index,
             vector: input.vector,
             top_k: input.topK,

@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { JSDOM } from 'jsdom';
-import pdfParse from 'pdf-parse';
+import { parsePdfBuffer } from '$lib/server/pdf/pdf-parser.js';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
@@ -53,7 +53,7 @@ async function extractDocumentText(file: File): Promise<string> {
   const ext = file.name.split('.').pop()?.toLowerCase();
 
   if (ext === 'pdf') {
-    const pdf = await pdfParse(Buffer.from(buffer));
+    const pdf = await parsePdfBuffer(Buffer.from(buffer));
     return pdf.text;
   } else if (ext === 'txt') {
     return new TextDecoder().decode(buffer);

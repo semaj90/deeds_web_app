@@ -32,7 +32,7 @@ import { generateSessionId, createToolWithDispatcher } from './dispatcher-tool-i
  */
 export function registerNewTools(
   server: McpServer,
-  config: { rerankUrl: string },
+  config: { rerankUrl: string; pgPool?: import('pg').Pool },
   dispatcherMiddleware: DispatcherMiddleware,
   enableLegacy = false
 ) {
@@ -285,14 +285,51 @@ export function registerNewTools(
         intentOverride: intent,
       });
 
-      const results = hits.map((h) => ({
-        id: h.id,
-        score: h.score,
-        path: h.payload?.path,
-        content: (h.payload?.content ?? '').slice(0, 1000),
-        lenses: h.lenses,
-        tags: h.payload?.tags,
-      }));
+      // Canonical join-back: Qdrant payloads carry identity (source_ref) but
+      // never full content by design — Postgres is the truth source for text.
+      // Never return a Qdrant-only hit's payload.content (it's always empty/absent).
+      const paths = [
+        ...new Set(
+          hits
+            .map((h) => (h.payload?.source_ref ?? h.payload?.path) as string | undefined)
+            .filter((p): p is string => !!p),
+        ),
+      ];
+      const contentByPath = new Map<string, string>();
+      if (config.pgPool && paths.length > 0) {
+        const rows = await config.pgPool.query(
+          `SELECT relative_path, content FROM codebase_chunk_index WHERE relative_path = ANY($1::text[])`,
+          [paths],
+        );
+        for (const row of rows.rows) {
+          if (row.content) contentByPath.set(row.relative_path, row.content);
+        }
+      }
+
+      if (hits.length > 0 && paths.length > 0 && contentByPath.size === 0) {
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: `CANONICAL_JOIN_BACK_FAILED: ${hits.length} Qdrant candidates, 0 joined to Postgres content (paths: ${paths.slice(0, 5).join(', ')}${paths.length > 5 ? ', ...' : ''})`,
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      const results = hits.map((h) => {
+        const path = (h.payload?.source_ref ?? h.payload?.path) as string | undefined;
+        const content = (path && contentByPath.get(path)) ?? '';
+        return {
+          id: h.id,
+          score: h.score,
+          path,
+          content: content.slice(0, 1000),
+          lenses: h.lenses,
+          tags: h.payload?.tags,
+        };
+      });
 
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(results, null, 2) }],

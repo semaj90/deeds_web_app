@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS error_cluster (
   error_code text,
   category text,
   affected_routes jsonb,
-  embedding vector(384),
+  embedding vector(768),
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Freeze a deterministic 5,000-vector snapshot from PostgreSQL into DuckDB.
+ * Freeze a deterministic 5,000-vector 768 snapshot from PostgreSQL into DuckDB.
  * Variant: Uses a fixed 5,000-packet limit (vs. variable limit in freeze-vector-snapshot.mts).
  *
- * This is the reference snapshot used for Qdrant / TurboVec parity, brute-force
+ * This is the canonical snapshot used for Qdrant / TurboVec parity, brute-force
  * reference evaluation, and clustering lane setup.
  *
  * Usage:
@@ -27,7 +27,7 @@ import {
   parsePgVector,
   vectorNorm,
 } from '../../../packages/atlas-duckdb/src/index.ts';
-import { EMBEDDINGGEMMA_PREFIX384_V1 } from '../../../sveltekit-frontend/src/lib/server/embedding/knn-helper.ts';
+import { EMBEDDINGGEMMA_FULL768_V1 } from '../../../sveltekit-frontend/src/lib/server/vector/embeddinggemma-prefix384.ts';
 import { VECTOR_INDEX_REGISTRY } from '../../../sveltekit-frontend/src/lib/server/vector/vector-index-registry.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -66,7 +66,7 @@ async function main() {
 
   console.log(`🔨 Freezing ${limit}-packet vector snapshot (fixed 5K variant)...`);
   console.log(`Working directory: ${process.cwd()}`);
-  console.log(`Contract: ${EMBEDDINGGEMMA_PREFIX384_V1}`);
+  console.log(`Contract: ${EMBEDDINGGEMMA_FULL768_V1}`);
   console.log(`DuckDB output: ${path.relative(REPO_ROOT, PARQUET_PATH)}`);
   console.log(`Threads: ${process.env.ATLAS_DUCKDB_THREADS || 'auto'}`);
   console.log(`Memory limit: ${process.env.ATLAS_DUCKDB_MEMORY_LIMIT || '4GB'}`);
@@ -83,20 +83,25 @@ async function main() {
     const stats = await buildVectorSnapshot(db.connection, pgAlias, {
       limit,
       outputTable: 'vector_snapshot_packets_5k',
+      sourceColumn: 'embedding',
+      expectedDimension: 768,
     });
 
     const snapshotRows = await db.connection.query(`
       SELECT
         packet_key,
         source_ref,
-        content_embedding_384
+        semantic_embedding_768,
+        representation_id
       FROM vector_snapshot_packets_5k
       ORDER BY packet_key
     `);
 
     const validation = validateVectorSnapshotRows(snapshotRows, {
-      expectedDimension: 384,
+      expectedDimension: 768,
       limit,
+      embeddingColumn: 'semantic_embedding_768',
+      expectedRepresentationId: 'semantic_768',
     });
 
     if (apply) {
@@ -110,21 +115,22 @@ async function main() {
     const rows = snapshotRows as Array<{
       packet_key: string;
       source_ref: string;
-      content_embedding_384: unknown;
+      semantic_embedding_768: unknown;
+      representation_id: string | null;
     }>;
 
     const rowFingerprint = stableHash(
       rows.map((row) => ({
         packet_key: row.packet_key,
         source_ref: row.source_ref,
-        embedding_norm: vectorNorm(parsePgVector(row.content_embedding_384)),
+        embedding_norm: vectorNorm(parsePgVector(row.semantic_embedding_768)),
       })),
     );
 
     const manifest = {
-      contract_version: EMBEDDINGGEMMA_PREFIX384_V1,
+      contract_version: EMBEDDINGGEMMA_FULL768_V1,
       generated_at: new Date().toISOString(),
-      snapshot_kind: 'deterministic-5k-vector-freeze-fixed',
+      snapshot_kind: 'deterministic-5k-vector-freeze-fixed-768',
       registry: VECTOR_INDEX_REGISTRY.vectorSnapshot5k,
       snapshot: {
         duckdb_path: path.relative(REPO_ROOT, path.join(SNAPSHOT_DIR, 'atlas-vector-snapshot-5k.duckdb')),
@@ -150,7 +156,7 @@ async function main() {
     await fs.writeFile(MANIFEST_PATH, JSON.stringify(manifest, null, 2), 'utf8');
 
     console.log(`✓ Snapshot rows: ${validation.selectedRows}`);
-    console.log(`✓ Exact 384-dim rows: ${validation.rowsWithExactDimension}`);
+    console.log(`✓ Exact 768-dim rows: ${validation.rowsWithExactDimension}`);
     console.log(`✓ Positive norm rows: ${validation.rowsWithPositiveNorm}`);
     console.log(`✓ Unique packet keys: ${validation.uniquePacketKeys}`);
     console.log(`✓ Unique source refs: ${validation.uniqueSourceRefs}`);
@@ -171,7 +177,7 @@ async function main() {
       }
       const sample = rows[0];
       if (sample) {
-        const vector = parsePgVector(sample.content_embedding_384);
+        const vector = parsePgVector(sample.semantic_embedding_768);
         console.log(`✓ Sample packet_key: ${sample.packet_key}`);
         console.log(`✓ Sample vector length: ${vector.length}`);
       }

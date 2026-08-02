@@ -7,7 +7,6 @@
 import type { SearchRequest, SearchResponse, SearchResult } from './types.js';
 import { initEmbeddingService, getEmbeddingServiceConfig, type QueryVectorBundle } from './embedding-service.js';
 import { sql } from 'drizzle-orm';
-import { inArray } from 'drizzle-orm';
 import { getSearchLaneRegistry } from './search-lanes.js';
 import {
   RETRIEVAL_LIMITS,
@@ -41,15 +40,15 @@ function buildLaneFilter(
   };
 }
 
-function selectLaneNamesForTier(tier: 'hot' | 'warm' | 'cold'): SearchRequest['lanes'] {
+export function selectLaneNamesForTier(tier: 'hot' | 'warm' | 'cold'): SearchRequest['lanes'] {
   switch (tier) {
     case 'hot':
-      return ['lexical', 'qdrant-768', 'gpu-cuvs', 'bm25', 'qdrant-384'];
+      return ['lexical', 'qdrant-768', 'gpu-cuvs', 'bm25'];
     case 'cold':
-      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs', 'qdrant-384'];
+      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs'];
     case 'warm':
     default:
-      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs', 'qdrant-384'];
+      return ['lexical', 'qdrant-768', 'bm25', 'gpu-cuvs'];
   }
 }
 
@@ -124,18 +123,15 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   };
 
   if (typeof req.query === 'string') {
-    const [dense384, dense768] = await Promise.allSettled([
-      embedQueryForLane(req.query, 'dense_384'),
-      embedQueryForLane(req.query, 'dense_768'),
-    ]);
+    const dense768 = await embedQueryForLane(req.query, 'dense_768');
 
     queryVectorBundle = {
-      dense384: dense384.status === 'fulfilled' ? dense384.value : null,
-      dense768: dense768.status === 'fulfilled' ? dense768.value : null,
+      dense384: null,
+      dense768,
       latent64: null,
     };
 
-    const sourceVector = queryVectorBundle.dense768?.vector ?? queryVectorBundle.dense384?.vector;
+    const sourceVector = queryVectorBundle.dense768?.vector;
     if (!sourceVector) {
       throw new Error('Failed to generate a query vector bundle');
     }
@@ -144,7 +140,11 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   } else {
     // Pre-embedded vector
     queryEmbedding = req.query instanceof Float32Array ? req.query : new Float32Array(req.query);
-    queryVectorBundle = { dense384: null, dense768: { vector: queryEmbedding, model: 'pre-embedded', dimension: queryEmbedding.length, cached: false, exec_ms: 0 }, latent64: null };
+    queryVectorBundle = {
+      dense384: null,
+      dense768: { vector: queryEmbedding, model: 'pre-embedded', dimension: queryEmbedding.length, cached: false, exec_ms: 0 },
+      latent64: null,
+    };
     timing.embed_ms = performance.now() - embedStartTime;
   }
 
@@ -160,7 +160,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   const lanesFailed: string[] = [];
   let combinedResults: SearchResult[] = [];
 
-  // Default lane selection is tier-aware: 768 is canonical, 384 stays as a legacy fallback.
+  // Default lane selection is tier-aware: 768 is canonical.
   const laneNames = normalizedRequest?.lanes ?? req.lanes ?? selectLaneNamesForTier(retrievalTier);
   const laneFilters = buildLaneFilter(req, normalizedRequest, perLaneLimit);
   const laneContext: SearchLaneContext = {
@@ -218,9 +218,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
   // 384-dim legacy: join when packet_key missing (need atlas_packets for packet_key even if source_ref known)
   const postgresStartTime = performance.now();
   const resultsNeedingJoin = combinedResults.filter(
-    (r) =>
-      (!r.source_ref && r.metadata?.qdrant_point_id) ||   // 768-dim path
-      (r.source === 'qdrant-384' && !r.packet_key)         // 384-dim path
+    (r) => !r.source_ref && Boolean(r.metadata?.qdrant_point_id)
   );
 
   if (resultsNeedingJoin.length > 0) {
@@ -285,7 +283,7 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
  *
  * Two join paths:
  *   - dense_768 results: join codebase_chunk_index by UUID qdrant_point_id
- *   - dense_384 results: join atlas_packets by source_ref (payload always populated)
+ *   - legacy dense_384 results: join atlas_packets by source_ref (payload always populated)
  *
  * Both paths are tried; first match wins so cross-dim results merge cleanly into one set.
  */
@@ -499,15 +497,13 @@ let retrievalRuntimeInitialized = false;
  * once during app startup when they want embedding defaults to be applied.
  */
 export async function initializeRetrievalRuntime(config: {
-  embed_model_384?: string;
   embed_model_768?: string;
 } = {}): Promise<void> {
   if (retrievalRuntimeInitialized) return;
 
   const { initializeSearchRuntime } = await import('./search-runtime.js');
   initEmbeddingService({
-    embed_model: config.embed_model_768 ?? config.embed_model_384 ?? 'embeddinggemma:latest',
-    embed_model_384: config.embed_model_384,
+    embed_model: config.embed_model_768 ?? 'embeddinggemma:latest',
     embed_model_768: config.embed_model_768,
     target_dim: 768,
   });

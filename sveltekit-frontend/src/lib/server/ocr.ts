@@ -1,4 +1,4 @@
-import pdfParse from 'pdf-parse';
+import { parsePdfBuffer } from '$lib/server/pdf/pdf-parser.js';
 
 export class OCRService {
  async extractText(file: File) {
@@ -9,7 +9,7 @@ export class OCRService {
  }
 
  const buffer = Buffer.from(await file.arrayBuffer());
- const data = await pdfParse(buffer);
+ const data = await parsePdfBuffer(buffer);
  return data.text;
  } catch (error) {
  console.error('OCR extraction failed:', error);

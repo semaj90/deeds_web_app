@@ -26,10 +26,8 @@
  *   node scripts/smoke/embeddinggemma-smoke.mjs --strict
  *   node scripts/smoke/embeddinggemma-smoke.mjs --model nomic-embed-text   # fallback
  */
-
 import { parseArgs } from 'node:util';
 import { randomUUID } from 'node:crypto';
-
 const { values: flags } = parseArgs({
   options: {
     model:  { type: 'string',  default: process.env.EMBEDDING_MODEL ?? 'embeddinggemma:latest' },
@@ -37,37 +35,30 @@ const { values: flags } = parseArgs({
     /**
      * --lane controls which representation lane is under test.
      *   source768  — native EmbeddingGemma output (768-dim), upserts into codebase_chunks_768
-     *   retrieval384 — prefix-sliced retrieval projection (384-dim), upserts into codebase_chunks_384_hybrid
-     * Default: source768 (native lane, backward-compatible)
+     * Default: source768 (native lane only)
      */
     lane:   { type: 'string',  default: process.env.EMBEDDING_LANE ?? 'source768' },
   },
   strict: false,
 });
-
 const MODEL    = flags.model;
 const STRICT   = flags.strict;
 const LANE     = flags.lane;
-
 // Dimension and collection are derived from the lane under test — never from a bare --dim flag.
 const LANE_CONFIG = {
   source768:     { dim: 768, collection: 'codebase_chunks_768',         namedVector: 'content' },
-  retrieval384:  { dim: 384, collection: 'codebase_chunks_384_hybrid',  namedVector: 'content' },
 };
 if (!LANE_CONFIG[LANE]) {
-  console.error(`Unknown --lane "${LANE}". Valid: source768, retrieval384`);
+  console.error(`Unknown --lane "${LANE}". Valid: source768`);
   process.exit(1);
 }
 const { dim: EXPECT_DIM, collection: COLLECTION, namedVector: NAMED_VECTOR } = LANE_CONFIG[LANE];
-
 const OLLAMA_URL = process.env.OLLAMA_URL ?? 'http://localhost:11434';
 const QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const TEST_ID    = randomUUID();
 const TIMEOUT    = 30_000;
-
 const QUERY_PREFIX    = 'task: search result | query: ';
 const DOC_PREFIX_FN   = (title) => `title: ${title} | text: `;
-
 const c = {
   green:  s => `\x1b[32m${s}\x1b[0m`,
   red:    s => `\x1b[31m${s}\x1b[0m`,
@@ -75,9 +66,7 @@ const c = {
   dim:    s => `\x1b[2m${s}\x1b[0m`,
   bold:   s => `\x1b[1m${s}\x1b[0m`,
 };
-
 const results = [];
-
 async function gate(id, label, fn) {
   const t0 = Date.now();
   try {
@@ -97,7 +86,6 @@ async function gate(id, label, fn) {
     return { ok: false, msg };
   }
 }
-
 async function embed(text) {
   const res = await fetch(`${OLLAMA_URL}/api/embeddings`, {
     method: 'POST',
@@ -111,16 +99,13 @@ async function embed(text) {
   if (!Array.isArray(vec) || !vec.length) throw new Error('no embedding in response');
   return vec;
 }
-
 function cosineSim(a, b) {
   let dot = 0, na = 0, nb = 0;
   for (let i = 0; i < a.length; i++) { dot += a[i] * b[i]; na += a[i] ** 2; nb += b[i] ** 2; }
   return dot / (Math.sqrt(na) * Math.sqrt(nb));
 }
-
 console.log(`\n${c.bold(c.dim('smoke: EmbeddingGemma'))}`);
 console.log(c.dim(`  model: ${MODEL}  lane: ${LANE}  expected_dim: ${EXPECT_DIM}  collection: ${COLLECTION}\n`));
-
 try {
   // E1. Ollama reachable + model available
   await gate('E1', `Ollama: ${MODEL} available`, async () => {
@@ -132,10 +117,8 @@ try {
     if (!found) throw new Error(`WARN: ${MODEL} not in Ollama — run: ollama pull ${MODEL}`);
     return `${models.length} models, ${MODEL} found`;
   });
-
   // Project and normalize vector for the target lane dimension.
-  // EmbeddingGemma always outputs 768-dim; for retrieval384 lane we prefix-slice to 384
-  // and re-normalize (Matryoshka prefix projection preserves cosine ordering).
+  // EmbeddingGemma always outputs 768-dim; the smoke test uses the native lane only.
   function projectVec(vec) {
     if (vec.length <= EXPECT_DIM) return vec;
     const sliced = vec.slice(0, EXPECT_DIM);
@@ -144,7 +127,6 @@ try {
     norm = Math.sqrt(norm);
     return norm > 0 ? sliced.map(v => v / norm) : sliced;
   }
-
   // E2. Query embedding
   let queryVec = null;
   const e2 = await gate('E2', 'query embedding → correct dimension', async () => {
@@ -157,7 +139,6 @@ try {
     }
     return `raw=${raw.length}→projected=${queryVec.length}`;
   });
-
   // E3. Document embedding
   let docVec = null;
   const e3 = await gate('E3', 'document embedding → correct dimension', async () => {
@@ -170,7 +151,6 @@ try {
     }
     return `raw=${raw.length}→projected=${docVec.length}`;
   });
-
   // E4. Cosine similarity
   if (queryVec && docVec) {
     await gate('E4', 'query↔document cosine similarity > 0.3 (same topic)', async () => {
@@ -179,7 +159,6 @@ try {
       return `sim=${sim.toFixed(4)}`;
     });
   }
-
   // E5. Qdrant upsert
   if (e2.ok && queryVec) {
     const upsertVec = projectVec(queryVec);
@@ -206,7 +185,6 @@ try {
       if (data?.status !== 'ok') throw new Error(`Qdrant status: ${JSON.stringify(data?.status)}`);
       return `point ${TEST_ID.slice(0, 8)}… upserted (dim=${upsertVec.length}, vector=${NAMED_VECTOR})`;
     });
-
     // E6. Nearest-neighbor search
     await gate('E6', 'Qdrant nearest-neighbor returns test point', async () => {
       const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/search`, {
@@ -227,7 +205,6 @@ try {
       if (!found) throw new Error('test point not found in search results');
       return `found at score=${pts[0]?.score?.toFixed(4)}`;
     });
-
     // E7. Cleanup
     await gate('E7', 'Qdrant delete test point (cleanup)', async () => {
       const res = await fetch(`${QDRANT_URL}/collections/${COLLECTION}/points/delete`, {
@@ -240,21 +217,19 @@ try {
       return 'deleted';
     });
   }
-
   // ── Summary ──────────────────────────────────────────────────────────────────
-
   const pass = results.filter(r => r.status === 'PASS').length;
   const warn = results.filter(r => r.status === 'WARN').length;
   const fail = results.filter(r => r.status === 'FAIL').length;
-
   console.log('');
   const parts = [c.green(pass + ' PASS'), warn ? c.yellow(warn + ' WARN') : '', fail ? c.red(fail + ' FAIL') : ''];
   console.log(parts.filter(Boolean).join('  '));
   console.log('');
-
   if (STRICT && fail > 0) process.exit(1);
 } catch (err) {
   const message = err instanceof Error ? err.message : String(err);
   console.error(`\n${c.red('FATAL')} ${message}`);
   process.exit(1);
 }
+
+

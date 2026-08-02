@@ -38,6 +38,12 @@ const RESULT_RE = /<result>([\s\S]*?)<\/result>/g;
 //   <|tool_call>call:bash{command:<|"|>echo hello<|"|>,description:<|"|>run cmd<|"|>}<tool_call|>
 // Use greedy match up to the LAST }<tool_call|> so nested braces in args don't truncate the match.
 const NATIVE_TOOL_CALL_RE = /<\|tool_call>call:([a-zA-Z_][a-zA-Z0-9_:.-]*)\{([\s\S]*)\}<tool_call\|>/g;
+// Observed 2026-08-01 raw format from current chat template (custom_pub_chat_template_gemma4.jinja):
+//   <|tool>shell{command:<|"|>pwd<|"|>}}<tool|>
+// Note the doubled closing brace before <tool|> (model quirk — one closes args, the extra is stray).
+// Lazy body match so we grab only the FIRST tool call, not everything up to the model's
+// hallucinated follow-on turns (it tends to loop <|turn>user...<|turn>model... after this).
+const RAW_TOOL_RE = /<\|tool>([a-zA-Z_][a-zA-Z0-9_:.-]*)\{([\s\S]*?)\}\}?<tool\|>/g;
 // Thinking channel blocks:  <|channel>thought\n...\n<channel|>
 const THINKING_CHANNEL_RE = /<\|channel>[\s\S]*?<channel\|>/g;
 
@@ -198,6 +204,24 @@ function extractToolCalls(content) {
     }
   }
 
+  // Pattern 4: raw <|tool>name{...}}<tool|> (current chat-template output as of 2026-08-01).
+  // Only take the FIRST match — the model tends to hallucinate repeated turns after this,
+  // and we only want the real call, not its self-generated follow-ons.
+  if (toolCalls.length === 0 && content.includes('<|tool>')) {
+    RAW_TOOL_RE.lastIndex = 0;
+    const match = RAW_TOOL_RE.exec(content);
+    if (match) {
+      const name = match[1];
+      const args = parseNativeArgs(match[2]);
+      toolCalls.push({
+        id: `call_${Date.now()}_${toolCalls.length}`,
+        type: 'function',
+        function: { name, arguments: JSON.stringify(args) },
+      });
+      console.log(`[adapter] Parsed ${toolCalls.length} native Gemma4 tool call(s) via <|tool> raw format`);
+    }
+  }
+
   // Ensure bash tool calls have the required 'description' field (OpenCode v1.14.x schema)
   for (const tc of toolCalls) {
     if (tc.function.name === 'bash') {
@@ -255,6 +279,8 @@ function sanitizeContent(content) {
   s = s.replace(EXECUTE_TOOL_RE, '');
   // Remove native <|tool_call>...<tool_call|> blocks from visible content
   s = s.replace(NATIVE_TOOL_CALL_RE, '');
+  // Remove raw <|tool>...}}<tool|> blocks from visible content
+  s = s.replace(RAW_TOOL_RE, '');
   s = s.replace(/^_response\n/, '');
   s = s.trim();
 

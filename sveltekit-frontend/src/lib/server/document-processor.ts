@@ -77,8 +77,8 @@ function isAudio(mimeType: string): boolean {
 async function extractPdf(buffer: Buffer, fileName: string, mimeType: string) {
   // Try pdf-parse first (fast, text-only)
   try {
-    const { default: pdfParse } = await import('pdf-parse');
-    const result = await pdfParse(buffer);
+    const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+    const result = await parsePdfBuffer(buffer);
     if (result.text?.trim().length > 50) {
       return { text: result.text, method: 'pdf-parse', doclingBlocks: undefined };
     }

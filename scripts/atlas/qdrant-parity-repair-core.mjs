@@ -112,8 +112,8 @@ function resolveCollectionConfiguration(argv = process.argv, env = process.env) 
   const index = argv.findIndex((arg) => arg === '--collection' || arg.startsWith('--collection='));
   const requested = index >= 0
     ? (argv[index].includes('=') ? argv[index].split('=', 2)[1] : argv[index + 1])
-    : env.QDRANT_CANONICAL_COLLECTION || env.CODEBASE_QDRANT_COLLECTION || 'codebase_chunks_384';
-  const collection = String(requested || 'codebase_chunks_384').trim();
+    : env.QDRANT_CANONICAL_COLLECTION || env.CODEBASE_QDRANT_COLLECTION || 'codebase_chunks_768';
+  const collection = String(requested || 'codebase_chunks_768').trim();
   const contract = COLLECTION_CONTRACTS[collection] ?? null;
   return {
     requested: collection,

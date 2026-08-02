@@ -88,7 +88,7 @@ export interface SearchRequest {
   /** Number of results to return */
   k?: number;
 
-  /** Embedding dimension override (default: 384 for GPU, 768 for Qdrant) */
+  /** Embedding dimension override (default: 768) */
   embedding_dim?: number;
 
   /** Filter by packet_key if known */
@@ -230,3 +230,4 @@ export type RawCandidate = SearchResult & {
     fusion_score: number;
   };
 };
+

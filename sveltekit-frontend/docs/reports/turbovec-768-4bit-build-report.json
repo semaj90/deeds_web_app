@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "atlas.turbovec.index.v1",
+  "generatedAt": "2026-08-02T07:42:50.807Z",
+  "collection": "codebase_chunks_768",
+  "vectorName": "content",
+  "dimension": 768,
+  "bits": 4,
+  "semanticProfile": "ast-aware lexical langextract",
+  "sourceModelPath": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\hfor\\hforf.gguf",
+  "buildUrl": "http://127.0.0.1:8795",
+  "buildPort": 8795,
+  "pointsRequested": 1,
+  "pointsScrolled": 1,
+  "pointsAccepted": 1,
+  "pointsRejected": 0,
+  "rejectedSample": [],
+  "accepted": [
+    {
+      "id": "1",
+      "scale": 0.022199,
+      "maxAbs": 0.155395,
+      "packedBytes": 384,
+      "payload": {
+        "packet_key": null,
+        "source_ref": "src/AGENTS.md",
+        "title_id": null,
+        "feature_id": null
+      }
+    }
+  ],
+  "status": "DRY_RUN",
+  "durationMs": 14,
+  "upload": null,
+  "manifestFile": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\turbovec\\turbovec-768-4bit-index-manifest.json",
+  "reportFile": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\turbovec-768-4bit-build-report.json"
+}

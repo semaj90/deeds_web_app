@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS ace_chunks (
   doc_id UUID REFERENCES ace_docs(id) ON DELETE CASCADE,
   chunk_index INTEGER NOT NULL,
   text TEXT NOT NULL,
-  embedding VECTOR(384),
+  embedding VECTOR(768),
   metadata JSONB DEFAULT '{}'::jsonb
 );
 

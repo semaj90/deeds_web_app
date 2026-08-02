@@ -63,7 +63,14 @@ interface FeatureEnvelope {
   telemetry: number;
   reranker: null;
   recommendation: null;
+  semantic_feature_dim: number;
+  total_feature_dim: number;
+  feature_schema_version: string;
 }
+
+const SEMANTIC_FEATURE_DIM = 768;
+const TOTAL_FEATURE_DIM = 7;
+const FEATURE_SCHEMA_VERSION = 'atlas.feature_envelope.v1';
 
 interface PacketRow {
   packet_id: string;
@@ -124,6 +131,9 @@ async function main() {
         telemetry: normalizeScore(packet.telemetry_score),
         reranker: null,
         recommendation: null,
+        semantic_feature_dim: SEMANTIC_FEATURE_DIM,
+        total_feature_dim: TOTAL_FEATURE_DIM,
+        feature_schema_version: FEATURE_SCHEMA_VERSION,
       },
     }));
 

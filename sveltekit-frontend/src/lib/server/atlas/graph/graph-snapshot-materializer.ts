@@ -138,7 +138,16 @@ const TREE_NODE_TYPE_MAP: Record<string, GraphNode['nodeType']> = {
   package: 'package',
   directory: 'directory',
   file: 'file',
-  symbol: 'symbol'
+  symbol: 'symbol',
+  // AST-level tree-sitter node kinds materialized by the parser pipeline —
+  // all map to the existing 'symbol' node type (function/class/interface/
+  // type-alias/struct declarations, arrow functions are all symbol-level).
+  function_declaration: 'symbol',
+  arrow_function: 'symbol',
+  class_declaration: 'symbol',
+  interface_declaration: 'symbol',
+  type_alias: 'symbol',
+  struct_declaration: 'symbol'
 };
 
 export class GraphSnapshotMaterializerError extends Error {

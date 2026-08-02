@@ -32,6 +32,20 @@ interface ValidationResult {
     train_size: number;
     val_size: number;
     test_size: number;
+    semantic_feature_dim: number;
+    total_feature_dim: number;
+    feature_schema_version: string;
+    feature_manifest: {
+      schemaVersion: string;
+      semantic: {
+        representationId: 'semantic_768';
+        offset: number;
+        width: 768;
+        modelId: string;
+        modelRevision: string;
+      };
+      totalWidth: number;
+    };
     n_features: number;
     n_classes: number;
   };
@@ -268,6 +282,20 @@ async function runValidation(limitPerDomain: number = 500): Promise<ValidationRe
       train_size: data.train_keys.size,
       val_size: data.val_keys.size,
       test_size: data.test_keys.size,
+      semantic_feature_dim: 768,
+      total_feature_dim: 768,
+      feature_schema_version: 'atlas.classifier.features.v1',
+      feature_manifest: {
+        schemaVersion: 'atlas.classifier.features.v1',
+        semantic: {
+          representationId: 'semantic_768',
+          offset: 0,
+          width: 768,
+          modelId: 'embeddinggemma:latest',
+          modelRevision: 'unknown',
+        },
+        totalWidth: 768,
+      },
       n_features: 768,
       n_classes: data.classes.length,
     },

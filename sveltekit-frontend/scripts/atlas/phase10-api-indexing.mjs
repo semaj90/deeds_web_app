@@ -6,12 +6,12 @@
  * 1. Scan SvelteKit API routes (src/routes/api/**\/+server.ts)
  * 2. Extract handlers (GET, POST, etc.), Zod schemas, JSDoc
  * 3. Build tool packets with input_schema/output_schema JSONB
- * 4. Call legal-ai-go-embedding:8097 for 384-dim vectors
+ * 4. Call legal-ai-go-embedding:8097 for 768-dim vectors
  * 5. Insert into tool_registry with packet_type='api'
  * 6. Mirrors available to Qdrant + go-retrieval for search
  *
  * Truth layer: tool_registry (Postgres)
- * Embedding: legal-ai-go-embedding:8097 (embeddinggemma, 384-dim)
+ * Embedding: legal-ai-go-embedding:8097 (embeddinggemma, 768-dim)
  * Search: legal-ai-go-retrieval:8100 or legal-ai-go-search:8096
  * HMM selector: uses tool_registry for allow/block/recommend
  */
@@ -135,7 +135,7 @@ function estimateComplexity(content) {
 }
 
 /**
- * Call embedding service to generate 384-dim vector for tool summary
+ * Call embedding service to generate 768-dim vector for tool summary
  */
 async function generateEmbedding(summary) {
   try {
@@ -152,7 +152,7 @@ async function generateEmbedding(summary) {
     }
 
     const data = await response.json();
-    return data.embedding; // Should be float32[384]
+    return data.embedding; // Should be float32[768]
   } catch (error) {
     if (VERBOSE) console.error(`  [embedding error]:`, error.message);
     return null;
@@ -263,7 +263,7 @@ async function indexApis() {
         output_schema: api.output_schema
       },
       tool_tags: ['auto-indexed', api.complexity, ...api.handlers.map(h => h.toLowerCase())],
-      embedding: api.embedding || null, // 384-dim vector if embedded
+      embedding: api.embedding || null, // 768-dim vector if embedded
       indexed_at: new Date().toISOString()
     }));
 
@@ -280,7 +280,7 @@ async function indexApis() {
 
     console.log('📌 Next Steps:');
     console.log('  1. Wire Postgres INSERT into tool_registry');
-    console.log('  2. Mirror to Qdrant tool_registry collection (384-dim vectors)');
+    console.log('  2. Mirror to Qdrant tool_registry collection (768-dim vectors)');
     console.log('  3. Sync to go-retrieval for search + ranking');
     console.log('  4. Use packet_type="api" filter in HMM tool selector');
     console.log('');

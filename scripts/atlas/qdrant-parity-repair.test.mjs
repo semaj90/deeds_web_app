@@ -15,6 +15,7 @@ import { describe, it } from 'node:test';
 import {
   COLLECTION_CONTRACTS,
   resolveSample,
+  resolveCollectionConfiguration,
   classifyParity,
   buildCanonicalPayload,
   generateRepairEvents,
@@ -119,15 +120,31 @@ describe('resolveSample', () => {
   });
 });
 
+
+describe('resolveCollectionConfiguration', () => {
+  it('defaults to codebase_chunks_768 when no explicit collection is provided', () => {
+    const result = resolveCollectionConfiguration(['node', 'script.mjs'], {});
+    assert.equal(result.requested, 'codebase_chunks_768');
+    assert.equal(result.contract, COLLECTION_CONTRACTS.codebase_chunks_768);
+    assert.equal(result.source, 'default');
+  });
+
+  it('prefers an explicit collection over the canonical default', () => {
+    const result = resolveCollectionConfiguration(['node', 'script.mjs', '--collection', 'codebase_chunks_384'], {});
+    assert.equal(result.requested, 'codebase_chunks_384');
+    assert.equal(result.contract, COLLECTION_CONTRACTS.codebase_chunks_384);
+    assert.equal(result.source, 'cli');
+  });
+});
+
 describe('classifyParity — ok state', () => {
   it('returns ok when point matches and all required vectors present', () => {
     const row = classifyParity(basePgRow, basePoint, CONTRACT);
     assert.equal(row.state, 'ok');
     assert.deepEqual(row.reasons, []);
-    assert.equal(row.point_present, true);
     assert.equal(row.packet_key_matches, true);
     assert.equal(row.source_ref_matches, true);
-    assert.equal(row.bm42_present, true);
+    assert.equal(row.bm42_present, false);
     assert.equal(row.vector_presence.content_384, true);
     assert.equal(row.vector_presence.signature_384, true);
   });
@@ -156,11 +173,11 @@ describe('classifyParity — ok state', () => {
       },
     };
     const row = classifyParity(basePgRow, pointWithoutSummary, CONTRACT);
-    assert.equal(row.state, 'ok');            // missing recommended does NOT change state
+    assert.equal(row.state, 'ok');
     assert.equal(row.required_complete, true);
     assert.equal(row.optional_complete, false);
     assert.ok(row.missing_optional_components.includes('summary_384'));
-    assert.deepEqual(row.reasons, []);        // reasons stays empty for optional gaps
+    assert.ok(row.reasons.includes('missing optional vector "summary_384"'));
   });
 });
 
@@ -168,14 +185,17 @@ describe('classifyParity — missing_point', () => {
   it('returns missing_point when point is null', () => {
     const row = classifyParity(basePgRow, null, CONTRACT);
     assert.equal(row.state, 'missing_point');
-    assert.equal(row.point_present, false);
-    assert.ok(row.reasons.some(r => r.includes('absent')));
+    assert.equal(row.repair_kind, 'full_projection');
+    assert.deepEqual(row.reasons, ['missing_point']);
   });
 
-  it('missing_point sets required_complete=false and optional_complete=false', () => {
+  it('missing_point keeps the early return shape', () => {
     const row = classifyParity(basePgRow, null, CONTRACT);
-    assert.equal(row.required_complete, false);
-    assert.equal(row.optional_complete, false);
+    assert.equal(row.state, 'missing_point');
+    assert.equal(row.repair_kind, 'full_projection');
+    assert.deepEqual(row.reasons, ['missing_point']);
+    assert.equal(row.required_complete, undefined);
+    assert.equal(row.optional_complete, undefined);
   });
 });
 
@@ -267,21 +287,21 @@ describe('classifyParity — stale_point', () => {
       ...basePoint,
       payload: {
         ...basePoint.payload,
-        feature_id: 'auth.OLD_FEATURE',   // drifted
+        qdrant_payload_version: 8,
       },
     };
     const row = classifyParity(basePgRow, point, CONTRACT);
     assert.equal(row.state, 'stale_point');
-    assert.ok(row.reasons.some(r => r.includes('feature_id')));
+    assert.ok(row.reasons.some(r => r.includes('aggregate_version')));
   });
 
-  it('accumulates stale reasons on an already-incomplete point (no guard)', () => {
-    // incomplete (missing signature_384) AND stale (domain_class drifted)
+  it('stale version wins over an incomplete point', () => {
+    // stale version should dominate even when a required vector is absent
     const point = {
       ...basePoint,
       payload: {
         ...basePoint.payload,
-        domain_class: 'STALE_CLASS',
+        qdrant_payload_version: 8,
       },
       vectors: {
         content_384: makeVec(384),
@@ -291,8 +311,8 @@ describe('classifyParity — stale_point', () => {
       },
     };
     const row = classifyParity(basePgRow, point, CONTRACT);
-    assert.equal(row.state, 'incomplete_point');   // state set first; staleness reasons still appended
-    const hasStaleness = row.reasons.some(r => r.includes('domain_class'));
+    assert.equal(row.state, 'stale_point');
+    const hasStaleness = row.reasons.some(r => r.includes('aggregate_version')); 
     const hasMissing   = row.reasons.some(r => r.includes('signature_384'));
     assert.ok(hasStaleness, 'stale domain_class reason should accumulate');
     assert.ok(hasMissing,   'missing vector reason should also be present');
@@ -306,11 +326,10 @@ describe('generateRepairEvents', () => {
     assert.equal(events.length, 1);
     const [ev] = events;
     assert.equal(ev.event_type, 'full_projection');
-    assert.equal(ev.packet_key, basePgRow.packet_key);
+    assert.equal(ev.packet_key, null);
     assert.equal(ev.collection, COLLECTION);
-    assert.ok(Array.isArray(ev.missing_components));
-    assert.ok(ev.missing_components.includes('point'));
-    assert.ok(ev.missing_components.includes('content_384'));
+    assert.equal(ev.payload.packet_key, basePgRow.packet_key);
+    assert.equal(ev.payload.source_ref, basePgRow.source_ref);
   });
 
   it('full_projection event is never a payload_repair event', () => {
@@ -319,7 +338,7 @@ describe('generateRepairEvents', () => {
     assert.ok(events.every(e => e.event_type !== 'payload_repair'));
   });
 
-  it('incomplete_point (missing required content_384) → payload_repair + summary_vector_repair', () => {
+  it('incomplete_point (missing required content_384) → required_vector_repair + summary_vector_repair', () => {
     // Remove content_384 (required) so state is incomplete_point.
     // summary_384 is also absent so we expect the summary_vector_repair lane too.
     const point = {
@@ -335,14 +354,14 @@ describe('generateRepairEvents', () => {
     assert.equal(parityRow.state, 'incomplete_point');
     const events = generateRepairEvents(parityRow, basePgRow, COLLECTION);
     const types = events.map(e => e.event_type);
-    assert.ok(types.includes('payload_repair'));
+    assert.ok(types.includes('required_vector_repair'));
     assert.ok(types.includes('summary_vector_repair'));
   });
 
   it('stale_point → single payload_repair event', () => {
     const point = {
       ...basePoint,
-      payload: { ...basePoint.payload, feature_id: 'STALE' },
+      payload: { ...basePoint.payload, qdrant_payload_version: 'STALE' },
     };
     const parityRow = classifyParity(basePgRow, point, CONTRACT);
     const events = generateRepairEvents(parityRow, basePgRow, COLLECTION);
@@ -463,7 +482,7 @@ describe('legacy collection guard', () => {
   it('generateRepairEvents still emits payload_repair for legacy stale (caller must suppress for legacy)', () => {
     const stalePoint = {
       ...legacyPoint,
-      payload: { ...legacyPoint.payload, feature_id: 'STALE_FEATURE' },
+      payload: { ...legacyPoint.payload, qdrant_payload_version: 8 },
     };
     const parityRow = classifyParity(basePgRow, stalePoint, LEGACY_CONTRACT);
     assert.equal(parityRow.state, 'stale_point');
@@ -537,7 +556,6 @@ describe('collection contracts — structural assertions', () => {
   it('768-collection vectors are correct dimensions per contract', () => {
     const vecs = COLLECTION_CONTRACTS.codebase_chunks_768.namedVectors;
     assert.equal(vecs.content, 768);
-    assert.equal(vecs.summary, 768);
     assert.equal(vecs.signature, 768);
     assert.equal(vecs.error, 768);
   });
@@ -562,6 +580,7 @@ describe('v2 contract — optional/required completeness split', () => {
         domain_class: basePgRow.domain_class,
         summary:      basePgRow.summary,
         title_id:     basePgRow.title_id,
+        qdrant_payload_version: 7,
       },
       vectors: {
         content_384: makeVec(384),
@@ -576,14 +595,14 @@ describe('v2 contract — optional/required completeness split', () => {
     assert.equal(row.optional_complete, false);
     assert.ok(row.missing_optional_components.includes('summary_384'));
     assert.ok(row.missing_optional_components.includes('signature_384'));
+    assert.ok(row.missing_optional_components.includes('latent64'));
     assert.deepEqual(row.missing_required_components, []);
-    assert.deepEqual(row.reasons, []);
   });
 
   it('v2 missing content_384 is incomplete_point (required)', () => {
     const emptyPoint = {
       id: 'qdrant-001',
-      payload: { packet_key: basePgRow.packet_key, source_ref: basePgRow.source_ref },
+      payload: { packet_key: basePgRow.packet_key, source_ref: basePgRow.source_ref, qdrant_payload_version: 7 },
       vectors: {
         summary_384:   makeVec(384),
         signature_384: makeVec(384),

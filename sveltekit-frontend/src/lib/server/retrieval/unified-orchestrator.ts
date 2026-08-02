@@ -23,6 +23,11 @@ import type { SearchFilter, SearchLane } from './types.js';
 import type { SearchTier } from './search-contract.js';
 import { inferRetrievalTier } from './search-contract.js';
 import { embedQueryForLane, type QueryVectorBundle } from './embedding-service.js';
+import {
+  resolveSemanticLane,
+  assertSemantic768,
+  CANONICAL_QDRANT_COLLECTION,
+} from '$lib/server/embedding/embedding-contract-768.js';
 import { createCodebaseSearchBackendFromEnv, type SearchBackendResult } from '$lib/server/search/create-codebase-search-backend.js';
 import {
   resolveParentAtlasContext,
@@ -297,25 +302,19 @@ async function qdrantSearch(
   try {
     const filter = buildQdrantFilter(filters);
     const limit = filters?.per_lane_limit ?? 20;
-    const preferredCollection = retrievalTier === 'cold'
-      ? 'codebase_chunks_768'
-      : 'codebase_chunks_384_hybrid';
-    const secondaryCollection = preferredCollection === 'codebase_chunks_768'
-      ? 'codebase_chunks_384_hybrid'
-      : 'codebase_chunks_768';
-    const collections = [preferredCollection, secondaryCollection];
+    // Fail-closed: the semantic lane is 768-dim only. No legacy 384 collection fallback.
+    resolveSemanticLane();
+    const collections = [CANONICAL_QDRANT_COLLECTION];
 
     const denseHitsById = new Map<string, { id: string; score: number; payload: any }>();
 
     const collectionRuns = await Promise.allSettled(collections.map(async (collection) => {
-      const queryVector =
-        collection === 'codebase_chunks_384_hybrid'
-          ? queryVectors.dense384?.vector ?? queryVectors.dense384
-          : queryVectors.dense768?.vector ?? queryVectors.dense768;
+      const queryVector = queryVectors.dense768?.vector;
 
       if (!queryVector || queryVector.length === 0) {
         throw new Error(`Missing query vector for collection ${collection}`);
       }
+      assertSemantic768(Array.from(queryVector));
 
       const denseRes = await fetch(
         `http://${config.qdrant.host}:${config.qdrant.port}/collections/${collection}/points/search`,
@@ -633,20 +632,21 @@ export async function executeUnifiedRetrieval(
     });
 
   try {
-    // STAGE 1: Embedding
-    const [dense384, dense768] = await Promise.allSettled([
-      embedQueryForLane(request.query, 'dense_384'),
-      embedQueryForLane(request.query, 'dense_768'),
-    ]);
+    // STAGE 1: Embedding — fail-closed on the canonical semantic_768 lane only.
+    // No legacy 384 lane is ever requested or normalized to, regardless of
+    // what the caller passes in `request.lanes`.
+    resolveSemanticLane();
+    const dense768 = await embedQueryForLane(request.query, 'dense_768');
     const queryVectors: QueryVectorBundle = {
-      dense384: dense384.status === 'fulfilled' ? dense384.value : null,
-      dense768: dense768.status === 'fulfilled' ? dense768.value : null,
+      dense384: null,
+      dense768,
       latent64: null,
     };
-    const embedding = queryVectors.dense768?.vector ?? queryVectors.dense384?.vector;
+    const embedding = queryVectors.dense768?.vector;
     if (!embedding) {
       throw new Error('Failed to generate query vector bundle');
     }
+    assertSemantic768(Array.from(embedding));
     stages.push('embedding');
 
     // STAGE 1.5: Rust N-API (optional, fallback to Qdrant)

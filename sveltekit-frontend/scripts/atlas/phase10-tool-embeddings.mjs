@@ -6,7 +6,7 @@
  *                  Output schema: ${JSON.stringify(tool.output_schema)} Examples: ${tool.examples.join('; ')}
  *                  Domains: ${tool.domains.join(', ')} Limitations: ${tool.limitations || 'none'}
  *
- * Purpose: Build 384-dimensional embeddings for schema-aware tool discovery
+ * Purpose: Build 768-dimensional embeddings for schema-aware tool discovery
  * Coverage Target: All 6 canonical tools + any new tools added
  * Index: Qdrant 'tool_registry' named vector 'content'
  */
@@ -31,7 +31,7 @@ const LIMIT = parseInt(options.limit, 10);
 
 async function regenerateToolEmbeddings() {
   console.log('🔄 Phase 10: Regenerate tool embeddings with enriched context');
-  console.log('Target: 384-dimensional embeddings for schema-aware tool discovery');
+  console.log('Target: 768-dimensional embeddings for schema-aware tool discovery');
   console.log(DRY_RUN ? '(DRY RUN - no changes will be applied)' : '(APPLY mode)');
   console.log('');
 
@@ -92,7 +92,7 @@ async function regenerateToolEmbeddings() {
     }
 
     console.log('⏳ TODO: Wire embedding generation to embeddinggemma:latest service');
-    console.log('⏳ TODO: Update Qdrant tool_registry collection with 384-dim vectors');
+    console.log('⏳ TODO: Update Qdrant tool_registry collection with 768-dim vectors');
     console.log('⏳ TODO: Verify HNSW index recomputed');
     console.log('');
     console.log('✨ Phase 10 tool embeddings regeneration prepared (integration pending)');

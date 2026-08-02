@@ -5,9 +5,14 @@
  *
  * Tier 1 tables (required join key: source_ref or file_path):
  *   - atlas_packets
- *   - nes_chrom_packets
  *   - glyph_records
  *   - codebase_chunk_index
+ *
+ * nes_chrom_packets does not exist in the live schema (verified 2026-08-02:
+ * `SELECT table_name FROM information_schema.tables` has no such relation).
+ * Removed from TIER_1_TABLES rather than creating a placeholder table —
+ * see project CLAUDE.md precedent for atlas_higher_hop_index /
+ * atlas_codebase_packets / atlas_feature_packets (same failure class).
  *
  * Usage:
  *   npm run atlas:feature-metadata:verify
@@ -30,7 +35,6 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 
 const TIER_1_TABLES = [
   'atlas_packets',
-  'nes_chrom_packets',
   'glyph_records',
   'codebase_chunk_index',
 ];
@@ -194,7 +198,9 @@ const TABLE_COLUMN_MAP = {
     file_path: null,
     id: 'id',
   },
-  'glyph_records': { feature_id: null, source_ref: 'source_ref', metadata: 'record_json', file_path: null, id: 'id' },
+  // glyph_records has no source_ref/feature_id column — verified live schema
+  // (2026-08-02): identity column is `source_id`, no feature_id at all.
+  'glyph_records': { feature_id: null, source_ref: 'source_id', metadata: 'record_json', file_path: null, id: 'id' },
   // codebase_chunk_index has no feature_id/metadata — defer to Tier 2
   'codebase_chunk_index': { feature_id: null, source_ref: 'relative_path', metadata: 'cluster_summary', file_path: null, id: 'id' },
 };

@@ -683,8 +683,8 @@ async function extractUploadedFile(
     }
 
     try {
-      const pdfParse = (await import('pdf-parse')).default;
-      const parsed = await pdfParse(buffer);
+      const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+      const parsed = await parsePdfBuffer(buffer);
       const text = parsed.text?.trim() ?? '';
       if (text.length >= MIN_PDF_TEXT_LENGTH) {
         return { text, method: 'pdf-parse', documentType: 'pdf_ingest' };

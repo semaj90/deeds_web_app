@@ -8,7 +8,7 @@
 
 ## Core Principle
 
-**One canonical semantic packet envelope, multiple physical encodings. Parse, retrieval, graph, and GPU lanes are SEPARATED.**
+**One canonical semantic packet envelope, multiple physical encodings. Control, transport, batch analytics, review, and GPU lanes are SEPARATED and not interchangeable.**
 
 ```
 JSON / NDJSON input
@@ -16,17 +16,18 @@ JSON / NDJSON input
   → parse (simdjson native addon)
   → validate canonical envelope (Zod)
   → fingerprint packet_key (SHA256)
-  → DuckDB MapReduce joins (identity)
-  → write Postgres (canonical truth)
-  ├─ mirror to Qdrant (vector)
-  ├─ mirror to Neo4j (graph)
-  └─ mirror to Redis (cache)
-  → pack MsgPack envelope
-  → mmap columnar arrays (hot routing state)
-  → ACP worker loop consumes packet_key
+  → write Postgres (canonical control state)
+  → emit compact worker job (MsgPack)
+  → emit numeric batch (Arrow IPC / Parquet)
+  → DuckDB MapReduce joins + validation
+  ├─ mirror to Qdrant (vector projection)
+  ├─ mirror to Neo4j (graph projection)
+  ├─ mirror to Redis (hot cache / routing)
+  └─ mirror to CouchDB (replicated review docs / offline views)
+  → ACP worker loop consumes job envelope
   → HyperRAG RPC retrieves bounded set
   → ACE prompt assembly
-  → Gemma4/RotorQuant (inference only, NOT storage)
+  → GPU lane consumes numeric batches only
 ```
 
 **Hard rule**: packet_key and title_id are determined BEFORE any TurboVec/GPU/ANN work. Never let retrieval acceleration alter identity.
@@ -38,17 +39,32 @@ JSON / NDJSON input
 | Store | Role | Authority | Rebuild Path |
 |-------|------|-----------|--------------|
 | **Postgres** | Canonical packet registry + identity | ✅ TRUTH | N/A (source) |
-| **DuckDB** | Batch MapReduce joins (identity phase) | ✅ READ-ONLY JOINS | From Postgres |
-| **MsgPack** | Compact cache envelope (transport) | ❌ MIRROR | From Postgres |
+| **DuckDB** | Batch MapReduce joins, dedupe, validation, reduction | ✅ READ-ONLY REDUCE | From Arrow / Postgres exports |
+| **MsgPack** | Compact worker/job envelope (transport only) | ❌ TRANSPORT | From Postgres or planner output |
+| **Arrow IPC** | Active numeric batch plane | ❌ TRANSPORT | From Postgres / planners |
+| **Parquet** | Durable analytical output | ❌ ARCHIVE | From DuckDB reduction |
 | **mmap arrays** | Open-memory routing state (hot) | ❌ MIRROR | From Postgres |
 | **Protobuf/gRPC** | Typed transport boundary | ❌ TRANSPORT | From Postgres |
 | **Redis BitFrost** | Hot packet/title/community cache | ❌ CACHE | From Postgres |
-| **Qdrant** | Dense vector mirror (ANN acceleration) | ❌ MIRROR | From Postgres (rebuild via embeddings) |
+| **Qdrant** | Dense vector projection (ANN acceleration) | ❌ MIRROR | From Postgres (rebuild via embeddings) |
 | **Neo4j** | Graph/KAG/DAG projection (topology only) | ❌ MIRROR | From Postgres (rebuild via edges) |
+| **CouchDB** | Replicated review docs and offline views | ❌ REPLICA | From Postgres / approved review imports |
 | **ACP loop** | Async packet processing | ❌ CONTROLLER | Consumes packet_key from Postgres |
 | **RabbitMQ** | Work queue (async notifications) | ❌ EVENT STREAM | Non-blocking, no authority |
 | **SSE** | UI telemetry (browser push) | ❌ TELEMETRY | Non-blocking, no authority |
 | **OpenAI facade** | Compatible request/response shell | ❌ ADAPTER | Reads from Postgres + HyperRAG |
+
+### Concrete Code Owners
+
+These are the runtime wiring points that implement the split above:
+
+| Lane | Owner file | Responsibility |
+|------|------------|----------------|
+| MsgPack control envelopes | `scripts/atlas/msgpack-envelope-materialize.mjs` | Build compact worker envelopes and carry explicit representation lineage |
+| Arrow numeric batches | `scripts/atlas/arrow-batch-export.mjs` | Export semantic batches for GPU / analysis workers |
+| DuckDB reduction | `packages/atlas-duckdb/src/index.ts` and `sveltekit-frontend/src/lib/server/analysis/duckdb-registry.ts` | Read batch outputs, dedupe, validate, and reduce |
+| CouchDB review mirror | `sveltekit-frontend/src/lib/server/couchdb/changes-consumer.ts` | Mirror replicated review docs and offline notes |
+| GPU work queue | `sveltekit-frontend/src/lib/server/gpu/gpu-job-queue.ts` | Constrain GPU compute jobs to numeric/tensor lanes only |
 
 **Rule**: Postgres write succeeds → then cache invalidation → then mirrors rebuild → then events emit. Never write cache before Postgres.
 
@@ -181,6 +197,22 @@ JSON / NDJSON input
 **Lane D Input**: Canonical envelope from Postgres  
 **Lane D Output**: Redis cache keys (hot memory for millisecond retrieval)  
 **Hard rule**: Cache is optional. If miss, rebuild from Postgres. Never write cache before Postgres succeeds.
+
+---
+
+## 3. Execution and Data-Format Responsibilities
+
+| Layer | Responsibility | Not Responsible For |
+| --- | --- | --- |
+| Postgres | canonical state, workflow rows, accepted revisions, projection approvals | GPU batches, transient worker payloads, replay-only doc mirrors |
+| MsgPack | compact job envelopes, retry state, small candidate lists, cache metadata | tensors, full matrices, long-term analytics, authority |
+| Arrow IPC | active numeric batch transport, feature matrices, embedding batches | canonical mutation, review docs, queue control |
+| Parquet | durable analytical artifacts and batch outputs | live queueing, hot cache state, canonical writes |
+| DuckDB | bounded fan-out/fan-in reduction, dedupe, joins, validation | online truth, graph authority, cache ownership |
+| CouchDB | replicated review docs, notes, human edits, offline views | embeddings, KNN indexes, workflow authority |
+| GPU lane | numeric and tensor-heavy compute only | ULIDs, schema validation, canonical mutation, cache authority |
+
+**Rule**: MapReduce is a bounded execution pattern, not a storage layer. CouchDB is a replicated review/document layer, not a canonical store. MsgPack schedules work; Arrow carries the data; DuckDB proves the reduction; Postgres accepts the result.
 
 ---
 
@@ -864,4 +896,3 @@ Postgres write → Cache invalidation → Mirrors rebuild → Events emit
 ```
 
 **Result**: One canonical packet identity, multiple physical representations, strict lane separation. Parse is isolated from GPU work. Identity is locked before any retrieval. Graph is topology-only, never identity.
-

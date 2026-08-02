@@ -4,8 +4,8 @@
  *
  * PIPELINE:
  * 1. Extract lexical features (tokens, keywords, language-specific patterns) from ast_symbols
- * 2. Embed lexical vectors (384-dim via EmbeddingGemma)
- * 3. Compress to latent space (384 → 64-dim via autoencoder)
+ * 2. Embed lexical vectors (768-dim via EmbeddingGemma)
+ * 3. Compress to latent space (768 → 64-dim via autoencoder)
  * 4. Apply K-means clustering via tensorrt N-API bridge
  * 5. Write topology assignments to atlas_packets (topolog_cluster, topolog_confidence)
  *
@@ -90,7 +90,7 @@ function extractLexicalFeatures(astSymbols, featureLabel, metadataKeywords, tags
     });
   }
 
-  // 4. Extract from ast_symbols (code structure, 516 packets only)
+  // 4. Extract from ast_symbols (code structure, 768 semantic lane)
   if (astSymbols && astSymbols.length > 0) {
     astSymbols.forEach(symbol => {
       // Add symbol itself
@@ -423,3 +423,4 @@ async function main() {
 }
 
 main();
+

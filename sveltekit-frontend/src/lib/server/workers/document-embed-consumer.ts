@@ -34,10 +34,10 @@ async function extractText(filePath: string, mimeType: string): Promise<string> 
       return JSON.stringify(JSON.parse(content), null, 2);
     } else if (mimeType === 'application/pdf' || filePath.endsWith('.pdf')) {
       try {
-        const pdfParse = await import('pdf-parse/lib/pdf-parse.js');
+        const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
         const buffer = await readFile(filePath);
-        const data = await pdfParse.default(buffer);
-        return data.text;
+        const parsed = await parsePdfBuffer(buffer);
+        return parsed.text;
       } catch (err) {
         console.warn('[doc-embed] pdf-parse failed:', err);
         return '[PDF content extraction failed]';

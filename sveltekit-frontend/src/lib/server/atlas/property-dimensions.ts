@@ -25,12 +25,12 @@ export const DIMENSIONS = {
     linceage_key: 'embedding_768_native'
   } as const,
 
-  /** 384-dim: Online retrieval contract (Qdrant payload). */
-  DENSE_RETRIEVAL: {
+  /** 384-dim: Legacy retrieval projection, retained only for explicit lineage. */
+  DENSE_LEGACY_RETRIEVAL: {
     name: 'dense_384_retrieval',
     size: 384,
     model: 'embeddinggemma:latest:truncated',
-    role: 'online_retrieval',
+    role: 'reference_only',
     lineage_key: 'embedding_384_truncated'
   } as const,
 
@@ -73,8 +73,8 @@ export const QDRANT_COLLECTIONS = {
   /** Primary code/document index (768-dim native). */
   codebase_chunks_768: DIMENSIONS.DENSE_CANONICAL,
 
-  /** Secondary retrieval mirror (384-dim online contract). */
-  codebase_chunks_384: DIMENSIONS.DENSE_RETRIEVAL,
+  /** Secondary retrieval mirror is now canonical 768. */
+  codebase_chunks_384: DIMENSIONS.DENSE_LEGACY_RETRIEVAL,
 
   /** Evidence and research documents. */
   evidence_items: DIMENSIONS.DENSE_CANONICAL,
@@ -110,7 +110,7 @@ export const DEFAULT_QDRANT_COLLECTION = {
  */
 export const POSTGRES_VECTORS = {
   /** codebase_chunk_index.content_embedding */
-  content_embedding: DIMENSIONS.DENSE_RETRIEVAL,
+  content_embedding: DIMENSIONS.DENSE_CANONICAL,
 
   /** atlas_packets.embedding (deprecated, unused) */
   packet_embedding: DIMENSIONS.DENSE_CANONICAL,
@@ -119,7 +119,7 @@ export const POSTGRES_VECTORS = {
   feature_dense_768: DIMENSIONS.DENSE_CANONICAL,
 
   /** feature_matrix.dense_384 (retrieval projection) */
-  feature_dense_384: DIMENSIONS.DENSE_RETRIEVAL,
+  feature_dense_384: DIMENSIONS.DENSE_LEGACY_RETRIEVAL,
 
   /** feature_matrix.latent_64 (routing features) */
   feature_latent_64: DIMENSIONS.LATENT_ROUTING
@@ -163,7 +163,7 @@ export const DIMENSION_REDIS_KEYS = {
  */
 export const ALL_DIMENSIONS = [
   DIMENSIONS.DENSE_CANONICAL,
-  DIMENSIONS.DENSE_RETRIEVAL,
+  DIMENSIONS.DENSE_LEGACY_RETRIEVAL,
   DIMENSIONS.LATENT_ROUTING
 ] as const;
 

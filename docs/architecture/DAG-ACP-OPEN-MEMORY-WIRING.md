@@ -2,7 +2,7 @@
 
 **Date**: July 4, 2026  
 **Status**: CONCRETE IMPLEMENTATION SPEC  
-**Scope**: JSON → MsgPack → mmap → gRPC/Protobuf + CouchDB NDJSON mirror + Rust simdjson parse + semantic key RPC + HyperRAG/BitFrost joins for re-indexing
+**Scope**: JSON → MsgPack job envelopes → Arrow IPC numeric batches → mmap routing state + gRPC/Protobuf + CouchDB NDJSON review mirror + Rust simdjson parse + semantic key RPC + HyperRAG/BitFrost joins for re-indexing
 
 ---
 
@@ -14,7 +14,10 @@ Open Memory       = derived routing state (temporary, rebuildable)
 ACP               = control loop (orchestrates, does not own data)
 Manifold tuples   = search/routing metadata (not identity)
 Tricubic/SOM      = local expansion accelerator (not identity)
-CouchDB           = NDJSON document mirror + replay store (NOT canonical)
+CouchDB           = NDJSON document mirror + replay store for review/offline replication (NOT canonical)
+MsgPack           = compact job/event envelope only
+Arrow IPC         = numeric batch transport for analysis and GPU lanes
+DuckDB            = bounded reduce / join / validation engine
 ```
 
 **Stable join keys (use everywhere, nothing else):**
@@ -66,6 +69,29 @@ metadata        JSONB
 - Used for: NDJSON export, batch replay, DuckDB join input
 - Never used for: canonical reads, identity joins, cache invalidation
 
+### Compact Job Envelope — MsgPack (worker transport only)
+```
+job_id: 01K...
+workflow_id: 01K...
+operation: embed_batch | graph_reduce | knn_shard_search
+input_uri: runs/.../input-0001.arrow
+output_uri: runs/.../output-0001.parquet
+representation_id: semantic_768
+workspace_revision: git:abc123
+input_sha256: ...
+retry_count: 0
+```
+- Used for: worker control messages, retry state, small candidate lists, cache metadata
+- Never used for: tensors, full matrices, long-term analytical storage, canonical workflow state
+
+### Numeric Batch Plane — Arrow IPC / Parquet
+```
+Arrow IPC: active exchange between planner, worker, GPU, and reducer
+Parquet: durable analytical output and replay artifact
+```
+- Used for: embedding matrices, feature matrices, candidate batches, ontology tuples, cluster assignments
+- Never used for: control-plane decisions, queue routing, canonical acceptance
+
 ### Compact Cache — MsgPack (BitFrost / Redis)
 ```
 bifrost:packet:{packet_key}  → MsgPack bytes (~500-800 bytes)
@@ -74,6 +100,8 @@ bifrost:repair:{error_class}:{model_name} → MsgPack repair target
 ```
 Fields packed: identity + latent_64 + neighbors subset + som coords.  
 Null fields omitted. Fixed tag enum (0–31, 1-byte overhead).
+
+Hard rule: MsgPack is a small control envelope, not a tensor carrier. Large matrices belong in Arrow IPC or Parquet.
 
 ### Columnar Open Memory — mmap (local read-only)
 ```
@@ -140,7 +168,8 @@ DuckDB (batch joins, MapReduce grouping)
   ↓ JOIN error_cluster_groups ON packet_key
   ↓ AGGREGATE neighbors, latent_64
 Emit grouped envelopes
-  ├─ MsgPack blobs → Redis/BitFrost (hot envelopes)
+  ├─ MsgPack blobs → Redis/BitFrost (hot envelopes and queue payloads)
+  ├─ Arrow IPC / Parquet → DuckDB reduce and GPU batch lanes
   ├─ Protobuf bytes → gRPC / HyperRAG RPC
   ├─ NDJSON rows → CouchDB mirror (async replay store)
   ├─ mmap rebuild → columnar arrays (epoch bump on completion)

@@ -6,8 +6,8 @@
  *
  * Embedding contract:
  * - Semantic native: 768-dim (mandatory, canonical)
- * - Semantic retrieval: 768 native or explicit truncated EmbeddingGemma projections
- *   such as 384/256 when projection lineage is declared
+ * - Semantic retrieval: 768 native only for the active contract
+ * - Future projection lanes are deferred until explicitly reinstated
  * - Latent routing: 64-dim autoencoder (clustering/SOM only, never retrieval)
  *
  * No agent in the inner loop. Validation at boundaries only.
@@ -44,7 +44,7 @@ export const EmbeddingContractSchema = z.object({
   nativeDimensions: z.number().int().positive().describe('Model native output, e.g., 768 for EmbeddingGemma'),
 
   // STORED DIMENSION (what we persist)
-  storedDimensions: z.number().int().positive().describe('Persisted representation dimension. 768 is native; truncated projections such as 384/256 are valid when projection lineage is declared.'),
+  storedDimensions: z.number().int().positive().describe('Persisted representation dimension. 768 is native for the active contract.'),
 
   // TRANSFORMATION (if different from native)
   normalized: z.boolean().default(true).describe('L2 normalization applied'),
@@ -73,31 +73,9 @@ export const CANONICAL_EMBEDDING_CONTRACTS = {
     contractVersion: '1.0',
   } as const satisfies EmbeddingContract,
 
-  // Tier 2: Truncated 384 projection (allowed when lineage is explicit)
-  MRL_384: {
-    modelId: 'embeddinggemma',
-    modelRevision: '20260720',
-    nativeDimensions: 768,
-    storedDimensions: 384,
-    normalized: true,
-    pooling: 'mean',
-    projectionVersion: 'mrl-384-v1',
-    contractVersion: '1.0',
-  } as const satisfies EmbeddingContract,
 
-  // Tier 3: Matryoshka 256 (Phase 107+, requires evaluation pass)
-  MRL_256: {
-    modelId: 'embeddinggemma',
-    modelRevision: '20260720',
-    nativeDimensions: 768,
-    storedDimensions: 256,
-    normalized: true,
-    pooling: 'mean',
-    projectionVersion: 'mrl-256-v1',
-    contractVersion: '1.0',
-  } as const satisfies EmbeddingContract,
 
-  // Tier 4: Autoencoder latent (routing/clustering only)
+  // Tier 2: Autoencoder latent (routing/clustering only)
   LATENT_64: {
     modelId: 'autoencoder-768-to-64',
     modelRevision: '20260801',
@@ -195,7 +173,7 @@ export const EnrichedPacketSchema = IngestPacketSchema.extend({
   embeddingNative: z.array(z.number()).describe('768-dim L2-normalized vector from EmbeddingGemma'),
 
   // Optional: Matryoshka projection (after Phase 106 validation)
-  embeddingProjected: z.array(z.number()).optional().describe('256-dim MRL vector (optional, post-evaluation)'),
+  embeddingProjected: z.array(z.number()).optional().describe('Deferred MRL vector (optional, post-evaluation)'),
 
   // Optional: Autoencoder latent (routing/clustering only)
   embeddingLatent: z.array(z.number()).optional().describe('64-dim autoencoder output (routing/SOM/visualization only)'),
@@ -308,7 +286,7 @@ export const buildIngestionWorkerDispatch = (
     priority: 'high',
   });
 
-  // Optional: project native 768 embeddings into a declared truncated semantic lane
+  // Optional: project native 768 embeddings into a deferred semantic lane
   if (
     packet.embeddingContract.modelId === 'embeddinggemma' &&
     packet.embeddingContract.storedDimensions < packet.embeddingContract.nativeDimensions
@@ -340,3 +318,5 @@ export const buildIngestionWorkerDispatch = (
 
   return jobs;
 };
+
+

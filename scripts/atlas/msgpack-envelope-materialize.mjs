@@ -3,7 +3,8 @@
 /**
  * MsgPack Envelope Materialization
  *
- * Serialize validated atlas_packets to MsgPack binary format for hot cache layer
+ * Serialize validated atlas_packets to MsgPack binary format for the hot cache layer.
+ * MsgPack is transport only; canonical representation lineage stays explicit.
  *
  * Schema per packet:
  * {
@@ -22,7 +23,10 @@
  *   domain_class: string,
  *   tree_node_id: string,
  *   concept_ids: string[], (array of concept IDs)
- *   embedding_dim: uint16 (384),
+ *   representation_id: string|null (semantic_768 when embedding is present),
+ *   representation_revision: int32|null,
+ *   embedding_digest: string|null,
+ *   embedding_dim: uint16 (768 for canonical semantic embeddings),
  *   has_embedding: boolean,
  *   canonical: boolean (true if all required fields present)
  * }
@@ -36,9 +40,9 @@
  */
 
 import pg from 'pg';
-import msgpack from 'msgpack5';
 import { config } from 'dotenv';
 import { resolve } from 'path';
+import { createRequire } from 'module';
 import { writeFileSync, mkdirSync } from 'fs';
 import { loadRepoEnv, resolveDatabaseUrl } from './connection-config.mjs';
 
@@ -48,7 +52,8 @@ const env = loadRepoEnv(process.env);
 const POSTGRES_URL = resolveDatabaseUrl(env);
 const pgPool = new pg.Pool({ connectionString: POSTGRES_URL });
 
-const mp = msgpack();
+const require = createRequire(new URL('../../sveltekit-frontend/package.json', import.meta.url));
+const { encode } = require('@msgpack/msgpack');
 
 const APPLY = process.argv.includes('--apply');
 const DRY_RUN = !APPLY;
@@ -84,7 +89,10 @@ async function msgpackMaterialize() {
         ap.domain_class,
         ap.tree_node_id,
         ap.concept_ids,
-        CASE WHEN cci.content_embedding IS NOT NULL THEN 384 ELSE 0 END as embedding_dim,
+        ap.representation_revision,
+        ap.embedding_digest,
+        CASE WHEN cci.content_embedding IS NOT NULL THEN 'semantic_768' ELSE NULL END as representation_id,
+        CASE WHEN cci.content_embedding IS NOT NULL THEN 768 ELSE 0 END as embedding_dim,
         CASE WHEN cci.content_embedding IS NOT NULL THEN true ELSE false END as has_embedding,
         (ap.packet_key IS NOT NULL
           AND ap.feature_id IS NOT NULL
@@ -118,7 +126,10 @@ async function msgpackMaterialize() {
       console.log('  ├─ domain_class (string) — error/semantic class');
       console.log('  ├─ tree_node_id (string) — AST node identity');
       console.log('  ├─ concept_ids (string[]) — semantic concepts');
-      console.log('  ├─ embedding_dim (uint16) — 384 if has_embedding else 0');
+      console.log('  ├─ representation_id (string|null) — semantic_768 when present');
+      console.log('  ├─ representation_revision (int32|null) — canonical lineage');
+      console.log('  ├─ embedding_digest (string|null) — immutable embedding hash');
+      console.log('  ├─ embedding_dim (uint16) — 768 if has_embedding else 0');
       console.log('  ├─ has_embedding (bool) — indexed in Qdrant');
       console.log('  └─ canonical (bool) — all required fields present');
       console.log();
@@ -144,7 +155,7 @@ async function msgpackMaterialize() {
       console.log();
 
       // Estimate binary size
-      const sampleSize = mp.encode({
+      const sampleSize = encode({
         packet_key: 'ace:packet:example',
         title_id: 'Example Title',
         feature_id: 'auth.sessions',
@@ -160,7 +171,10 @@ async function msgpackMaterialize() {
         domain_class: 'Valid',
         tree_node_id: 'node:auth:001',
         concept_ids: ['auth', 'session', 'validation'],
-        embedding_dim: 384,
+        representation_id: 'semantic_768',
+        representation_revision: 0,
+        embedding_digest: 'sha256:example',
+        embedding_dim: 768,
         has_embedding: true,
         canonical: true,
       }).length;
@@ -207,6 +221,9 @@ async function msgpackMaterialize() {
             domain_class: row.domain_class,
             tree_node_id: row.tree_node_id,
             concept_ids: row.concept_ids || [],
+            representation_id: row.representation_id || null,
+            representation_revision: row.representation_revision || null,
+            embedding_digest: row.embedding_digest || null,
             embedding_dim: row.embedding_dim || 0,
             has_embedding: row.has_embedding || false,
             canonical: row.canonical,
@@ -214,7 +231,7 @@ async function msgpackMaterialize() {
         });
 
         // Encode to MsgPack
-        const encoded = Buffer.concat(batchEnvelopes.map(env => mp.encode(env)));
+        const encoded = Buffer.concat(batchEnvelopes.map(env => Buffer.from(encode(env))));
 
         writeFileSync(batchFile, encoded);
         console.log(`  ✅ Batch ${batchId}: ${batch.length} packets, ${(encoded.length / 1024).toFixed(2)} KB`);
@@ -247,6 +264,9 @@ async function msgpackMaterialize() {
           packet_key: 'string',
           title_id: 'string|null',
           feature_id: 'string',
+          representation_id: 'string|null',
+          representation_revision: 'int32|null',
+          embedding_digest: 'string|null',
           som_row: 'uint8|null',
           som_col: 'uint8|null',
           som_index: 'uint16|null',

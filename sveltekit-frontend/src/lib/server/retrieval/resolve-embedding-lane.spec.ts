@@ -12,18 +12,17 @@ describe('resolveEmbeddingLane', () => {
     expect(result.reason).toBe(EmbeddingLaneTelemetryReason.NATIVE_DIMENSION_FALLBACK);
   });
 
-  it('does not infer legacy 384 from dimension alone', () => {
-    const result = resolveEmbeddingLane({ embedding_dim: 384 });
+  it('blocks legacy 384 from runtime resolution', () => {
+    const byDim = resolveEmbeddingLane({ embedding_dim: 384 });
+    const byVector = resolveEmbeddingLane({ vector_name: 'dense_384' });
+    const byCollection = resolveEmbeddingLane({ collection: 'codebase_chunks_384_hybrid' });
 
-    expect(result.lane).toBeNull();
-    expect(result.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
-  });
-
-  it('still resolves 384 when lineage is explicit via vector name', () => {
-    const result = resolveEmbeddingLane({ vector_name: 'dense_384' });
-
-    expect(result.lane).toBe(DenseRepresentationName.SEMANTIC_384);
-    expect(result.reason).toBe(EmbeddingLaneTelemetryReason.VECTOR_NAME);
+    expect(byDim.lane).toBeNull();
+    expect(byVector.lane).toBeNull();
+    expect(byCollection.lane).toBeNull();
+    expect(byDim.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
+    expect(byVector.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
+    expect(byCollection.reason).toBe(EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY);
   });
 
   it('gates legacy 384 dimension-only hits', () => {

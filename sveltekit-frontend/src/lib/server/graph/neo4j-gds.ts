@@ -15,6 +15,8 @@
 
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getGraphAnalyticsService } from './graph-analytics-service.js';
+import { getTopPageRankBounded, expandGraphBounded } from './graph-retrieval-adapter.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -89,45 +91,12 @@ export interface LouvainResult {
   durationMs: number;
 }
 
+// Node labels / relationship types / schema loading for the codeTopology
+// projection now live in neo4j-gds-client.ts (used by ensureProjectionClient).
+// PROJECTION_NAME stays here — still referenced by runLouvainMutate,
+// runKnnMutate, and the impact-categorized queries below, none of which have
+// been migrated to the port yet.
 const PROJECTION_NAME = 'codeTopology';
-const PROJECTION_NODE_LABELS = [
-  'CodebaseFile',
-  'ParentAtlasSource',
-  'ParentAtlasFeature',
-  'Packet',
-  'SourceRef',
-  'Feature',
-  'Concept',
-  'Trace',
-  'Community',
-  'Centroid',
-  'Function',
-  'InteractiveSession',
-  'ToolDomain',
-  'Inference',
-  'Intent',
-  'Tool',
-] as const;
-
-const PROJECTION_RELATIONSHIP_TYPES = [
-  'IMPORTS',
-  'CALLS',
-  'CONTAINS',
-  'HAS_CHUNK',
-  'BELONGS_TO_CLUSTER',
-  'REFERENCES',
-  'SIMILAR_TOPOLOGY',
-  'HAS_CENTROID',
-  'BELONGS_TO_FEATURE',
-] as const;
-
-async function loadProjectionSchema(session: ReturnType<ReturnType<typeof getNeo4jDriver>['session']>) {
-  const labelsRes = await session.run(`CALL db.labels() YIELD label RETURN collect(label) AS labels`);
-  const relTypesRes = await session.run(`CALL db.relationshipTypes() YIELD relationshipType RETURN collect(relationshipType) AS relTypes`);
-  const labels = new Set<string>((labelsRes.records[0]?.get('labels') ?? []) as string[]);
-  const relTypes = new Set<string>((relTypesRes.records[0]?.get('relTypes') ?? []) as string[]);
-  return { labels, relTypes };
-}
 
 // ── Plugin availability ───────────────────────────────────────────────────────
 
@@ -257,89 +226,13 @@ export async function getGdsExtendedStats(
 /**
  * Create (or recreate) the codeTopology in-memory GDS projection.
  * Idempotent — drops existing projection first if present.
+ *
+ * @deprecated wrapper — canonical implementation lives in
+ * graph-analytics-service.ts / neo4j-gds-client.ts (GraphAnalyticsPort).
+ * Kept here so existing consumers of this exact signature keep working.
  */
 export async function ensureGdsProjection(force = false): Promise<{ created: boolean; nodeCount: number; relationshipCount: number }> {
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-
-  try {
-    // Drop if force-refreshing
-    if (force) {
-      try {
-        await session.run(`CALL gds.graph.drop($name, false) YIELD graphName`, { name: PROJECTION_NAME });
-      } catch { /* didn't exist, fine */ }
-    }
-
-    // Check if projection already exists
-    const existsResult = await session.run(
-      `CALL gds.graph.exists($name) YIELD exists RETURN exists`,
-      { name: PROJECTION_NAME }
-    );
-    const exists = existsResult.records[0]?.get('exists') ?? false;
-    if (exists && !force) {
-      const infoResult = await session.run(
-        `CALL gds.graph.list($name) YIELD nodeCount, relationshipCount RETURN nodeCount, relationshipCount`,
-        { name: PROJECTION_NAME }
-      );
-      const rec = infoResult.records[0];
-      return {
-        created: false,
-        nodeCount: rec?.get('nodeCount') ?? 0,
-        relationshipCount: rec?.get('relationshipCount') ?? 0,
-      };
-    }
-
-    // Create projection — costs must match COSTS table in sync-graph-truth-neo4j.mjs
-    const schema = await loadProjectionSchema(session);
-    const nodeLabels = PROJECTION_NODE_LABELS.filter((label) => schema.labels.has(label));
-    const relationshipTypes = PROJECTION_RELATIONSHIP_TYPES.filter((type) => schema.relTypes.has(type));
-    if (!nodeLabels.length) {
-      throw new Error(`No projection node labels exist in Neo4j. Expected one of: ${PROJECTION_NODE_LABELS.join(', ')}`);
-    }
-    if (!relationshipTypes.length) {
-      throw new Error(`No projection relationship types exist in Neo4j. Expected one of: ${PROJECTION_RELATIONSHIP_TYPES.join(', ')}`);
-    }
-
-    const relationshipProjection = relationshipTypes.map((type) => {
-      const orientation = type === 'BELONGS_TO_CLUSTER' || type === 'SIMILAR_TOPOLOGY' || type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
-        ? 'UNDIRECTED'
-        : 'NATURAL';
-      const cost = type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
-        ? 0.10
-        : type === 'CONTAINS'
-          ? 0.25
-          : type === 'HAS_CHUNK'
-            ? 0.20
-            : type === 'BELONGS_TO_CLUSTER'
-              ? 0.30
-              : type === 'REFERENCES'
-                ? 0.35
-                : type === 'SIMILAR_TOPOLOGY'
-                  ? 0.40
-                  : 0.15;
-      return `          ${type}: { orientation: '${orientation}', properties: { cost: { property: 'cost', defaultValue: ${cost} } } }`;
-    }).join(',\n');
-
-    const result = await session.run(`
-      CALL gds.graph.project(
-        $name,
-        ${JSON.stringify(nodeLabels)},
-        {
-${relationshipProjection}
-        }
-      )
-      YIELD nodeCount, relationshipCount
-    `, { name: PROJECTION_NAME });
-
-    const rec = result.records[0];
-    return {
-      created: true,
-      nodeCount: rec?.get('nodeCount') ?? 0,
-      relationshipCount: rec?.get('relationshipCount') ?? 0,
-    };
-  } finally {
-    await session.close();
-  }
+  return getGraphAnalyticsService().ensureProjection({ projectionName: PROJECTION_NAME, force });
 }
 
 // ── PageRank ──────────────────────────────────────────────────────────────────
@@ -347,34 +240,12 @@ ${relationshipProjection}
 /**
  * Run GDS PageRank and write scores back to nodes as `graphPageRank`.
  * Requires ensureGdsProjection() to have been called first.
+ *
+ * @deprecated wrapper — canonical implementation lives in
+ * graph-analytics-service.ts / neo4j-gds-client.ts (GraphAnalyticsPort).
  */
 export async function runPageRankMutate(): Promise<PageRankResult> {
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-  const t0 = Date.now();
-
-  try {
-    // Run PageRank and write into projection
-    await session.run(`
-      CALL gds.pageRank.mutate($name, {
-        maxIterations: 20,
-        dampingFactor: 0.85,
-        mutateProperty: 'graphPageRank'
-      })
-    `, { name: PROJECTION_NAME });
-
-    // Write scores back to actual graph nodes
-    const writeResult = await session.run(`
-      CALL gds.graph.nodeProperties.write($name, ['graphPageRank'])
-      YIELD propertiesWritten
-      RETURN propertiesWritten
-    `, { name: PROJECTION_NAME });
-
-    const nodesUpdated = writeResult.records[0]?.get('propertiesWritten') ?? 0;
-    return { nodesUpdated, durationMs: Date.now() - t0 };
-  } finally {
-    await session.close();
-  }
+  return getGraphAnalyticsService().runPageRank({ projectionName: PROJECTION_NAME });
 }
 
 // ── Louvain community detection ───────────────────────────────────────────────
@@ -421,79 +292,24 @@ export async function runLouvainMutate(): Promise<LouvainResult> {
  * Returns all reachable nodes within maxDepth hops, sorted by distance.
  *
  * Falls back to pure Cypher variable-length path if APOC is unavailable.
+ *
+ * @deprecated wrapper — canonical implementation lives in
+ * graph-analytics-service.ts / neo4j-gds-client.ts (GraphAnalyticsPort),
+ * exposed in bounded form via graph-retrieval-adapter.ts.
  */
 export async function getImpactNeighborhood(
   stableKey: string,
   maxDepth = 3,
   limit = 100,
 ): Promise<ImpactResult> {
-  const driver = getNeo4jDriver();
-  const session = driver.session();
   const t0 = Date.now();
-
-  try {
-    const status = await getGdsStatus();
-
-    let rows: Array<{ labels: string[]; stableKey: string; path?: string; distance: number }> = [];
-
-    if (status.apocAvailable) {
-      // APOC path expansion — richer, handles relationship direction
-      const result = await session.run(`
-        MATCH (start {stableKey: $stableKey})
-        CALL apoc.path.subgraphNodes(start, {
-          maxLevel: $maxDepth,
-          limit: $limit
-        })
-        YIELD node
-        WHERE node <> start AND node.stableKey IS NOT NULL
-        WITH node,
-             length(shortestPath((start)-[*]-(node))) AS distance
-        RETURN labels(node) AS labels,
-               node.stableKey   AS stableKey,
-               node.path        AS path,
-               distance
-        ORDER BY distance ASC
-        LIMIT $limit
-      `, { stableKey, maxDepth, limit });
-
-      rows = result.records.map(r => ({
-        labels:    r.get('labels') as string[],
-        stableKey: r.get('stableKey') as string,
-        path:      r.get('path') as string | undefined,
-        distance:  r.get('distance') as number,
-      }));
-    } else {
-      // Pure Cypher fallback — variable-length path
-      const result = await session.run(`
-        MATCH (start {stableKey: $stableKey})
-        MATCH p = (start)-[*1..$maxDepth]-(n)
-        WHERE n.stableKey IS NOT NULL AND n <> start
-        WITH n, min(length(p)) AS distance
-        RETURN labels(n) AS labels,
-               n.stableKey AS stableKey,
-               n.path      AS path,
-               distance
-        ORDER BY distance ASC
-        LIMIT $limit
-      `, { stableKey, maxDepth, limit });
-
-      rows = result.records.map(r => ({
-        labels:    r.get('labels') as string[],
-        stableKey: r.get('stableKey') as string,
-        path:      r.get('path') as string | undefined,
-        distance:  r.get('distance') as number,
-      }));
-    }
-
-    return {
-      stableKey,
-      affected: rows,
-      totalCount: rows.length,
-      durationMs: Date.now() - t0,
-    };
-  } finally {
-    await session.close();
-  }
+  const { nodes } = await expandGraphBounded(stableKey, maxDepth, limit);
+  return {
+    stableKey,
+    affected: nodes,
+    totalCount: nodes.length,
+    durationMs: Date.now() - t0,
+  };
 }
 
 // ── Manifold4 coordinate sync ─────────────────────────────────────────────────
@@ -599,33 +415,13 @@ export interface AuthorityNode {
   louvainCommunity?: number;
 }
 
+/**
+ * @deprecated wrapper — canonical implementation lives in
+ * graph-analytics-service.ts / neo4j-gds-client.ts (GraphAnalyticsPort),
+ * exposed in bounded form via graph-retrieval-adapter.ts.
+ */
 export async function getTopAuthorityNodes(limit = 25): Promise<AuthorityNode[]> {
-  const driver = getNeo4jDriver();
-  const session = driver.session();
-
-  try {
-    const result = await session.run(`
-      MATCH (n)
-      WHERE n.graphPageRank IS NOT NULL AND n.stableKey IS NOT NULL
-      RETURN labels(n)         AS labels,
-             n.stableKey       AS stableKey,
-             n.path            AS path,
-             n.graphPageRank   AS graphPageRank,
-             n.louvainCommunity AS louvainCommunity
-      ORDER BY n.graphPageRank DESC
-      LIMIT $limit
-    `, { limit });
-
-    return result.records.map(r => ({
-      labels:           r.get('labels') as string[],
-      stableKey:        r.get('stableKey') as string,
-      path:             r.get('path') as string | undefined,
-      graphPageRank:    r.get('graphPageRank') as number,
-      louvainCommunity: r.get('louvainCommunity') as number | undefined,
-    }));
-  } finally {
-    await session.close();
-  }
+  return getTopPageRankBounded(limit);
 }
 
 // ── GDS KNN ───────────────────────────────────────────────────────────────────

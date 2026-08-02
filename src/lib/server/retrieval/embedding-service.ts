@@ -8,7 +8,7 @@
  *   - various client-side embed services
  *
  * Provides:
- * - Model selection (384-dim for GPU, 768-dim for Qdrant)
+ * - Model selection (768-dim for Qdrant)
  * - Cache detection (Bifrost L1/L2)
  * - Fallback chain (gRPC → HTTP → Ollama)
  * - Zero-copy tensor handling

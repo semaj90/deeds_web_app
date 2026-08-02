@@ -98,7 +98,8 @@ async function main() {
       SELECT
         packet_key,
         source_ref,
-        content_embedding_384
+        semantic_embedding_768,
+        representation_id
       FROM vector_snapshot_packets_5k_768
       ORDER BY packet_key
     `);
@@ -106,6 +107,8 @@ async function main() {
     const validation = validateVectorSnapshotRows(snapshotRows, {
       expectedDimension: EXPECTED_DIMENSION,
       limit,
+      embeddingColumn: 'semantic_embedding_768',
+      expectedRepresentationId: 'semantic_768',
     });
 
     if (apply) {
@@ -119,14 +122,15 @@ async function main() {
     const rows = snapshotRows as Array<{
       packet_key: string;
       source_ref: string;
-      content_embedding_384: unknown;
+      semantic_embedding_768: unknown;
+      representation_id: string | null;
     }>;
 
     const rowFingerprint = stableHash(
       rows.map((row) => ({
         packet_key: row.packet_key,
         source_ref: row.source_ref,
-        embedding_norm: vectorNorm(parsePgVector(row.content_embedding_384)),
+        embedding_norm: vectorNorm(parsePgVector(row.semantic_embedding_768)),
       })),
     );
 
@@ -182,7 +186,7 @@ async function main() {
       }
       const sample = rows[0];
       if (sample) {
-        const vector = parsePgVector(sample.content_embedding_384);
+        const vector = parsePgVector(sample.semantic_embedding_768);
         console.log(`✓ Sample packet_key: ${sample.packet_key}`);
         console.log(`✓ Sample vector length: ${vector.length}`);
       }

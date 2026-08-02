@@ -23,6 +23,14 @@ function run(command, args, options = {}) {
   };
 }
 
+async function assertScriptExists(scriptPath) {
+  try {
+    await fs.access(scriptPath);
+  } catch {
+    throw new Error(`Feature metadata script not found: ${scriptPath}`);
+  }
+}
+
 async function readJsonIfExists(filePath) {
   try {
     const text = await fs.readFile(filePath, 'utf8');
@@ -70,10 +78,9 @@ async function main() {
   }
   report.lanes.summaryPromotion = 'PASS';
 
-  result = run(process.execPath, [
-    path.join(WORKSPACE, 'sveltekit-frontend', 'scripts', 'atlas', 'backfill-feature-metadata.mjs'),
-    '--verify',
-  ]);
+  const featureMetadataScript = path.join(WORKSPACE, 'scripts', 'atlas', 'backfill-feature-metadata.mjs');
+  await assertScriptExists(featureMetadataScript);
+  result = run(process.execPath, [featureMetadataScript, '--verify']);
   if (result.code !== 0) {
     report.lanes.featureMetadata = 'FAIL';
     report.notes.push('feature metadata verifier failed');
@@ -118,7 +125,7 @@ async function main() {
 
   result = run(process.execPath, [
     path.join(REPO_ROOT, 'scripts', 'atlas', 'qdrant-parity-repair.mjs'),
-    '--collection=codebase_chunks_384_v2',
+    '--collection=codebase_chunks_768',
   ]);
   if (result.code !== 0) {
     report.lanes.qdrantComponentParity = 'FAIL';

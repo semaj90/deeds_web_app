@@ -15,7 +15,7 @@ This audit checks the live contract seams behind the semantic-packet reframing:
 
 ## Executive Summary
 
-The repo already contains the main semantic infrastructure primitives, and the core embedding contract owners now align on native `768` plus accepted truncated `384` projection lineage. The remaining gaps are narrower legacy defaults and transport adapters rather than a total contract split.
+The repo already contains the main semantic infrastructure primitives, and the core embedding contract owners now align on native `768` plus an explicit legacy `384` projection lineage. The remaining gaps are narrower transport adapters, proof gates, and runtime parity rather than a total contract split.
 
 Current defensible state:
 
@@ -41,7 +41,7 @@ Current defensible state:
 - [src/lib/server/topology/feature-tracking-layer.ts](/C:/Users/james/Videos/deeds-web-app/src/lib/server/topology/feature-tracking-layer.ts:169) now carries `embedding_native_dim = 768`, optional `embedding_projection_dim`, and a `representation_policy` marker instead of hardcoding `384` as canonical truth.
 - [sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts](/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts:146) now accepts `384` or `768` vectors.
 - [sveltekit-frontend/src/lib/server/embedding/embedding-contract.ts](/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/embedding/embedding-contract.ts:29) now treats `768` as the native semantic representation and `384` as the explicit online retrieval projection.
-- [src/lib/server/retrieval/unified-orchestrator.ts](/C:/Users/james/Videos/deeds-web-app/src/lib/server/retrieval/unified-orchestrator.ts:98), [src/routes/api/retrieval/gpu-knn/+server.ts](/C:/Users/james/Videos/deeds-web-app/src/routes/api/retrieval/gpu-knn/+server.ts:88), and [sveltekit-frontend/src/lib/server/telemetry/retrieval-event-schema.ts](/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/telemetry/retrieval-event-schema.ts:141) now default to `384` as the canonical online lane while still reporting native `768` lineage.
+- [src/lib/server/retrieval/unified-orchestrator.ts](/C:/Users/james/Videos/deeds-web-app/src/lib/server/retrieval/unified-orchestrator.ts:98), [src/routes/api/retrieval/gpu-knn/+server.ts](/C:/Users/james/Videos/deeds-web-app/src/routes/api/retrieval/gpu-knn/+server.ts:88), and [sveltekit-frontend/src/lib/server/telemetry/retrieval-event-schema.ts](/C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/src/lib/server/telemetry/retrieval-event-schema.ts:141) should be read as legacy compatibility adapters, not as proof that `384` is the canonical online lane.
 
 Result: the contract owners now consistently separate native `768` from online `384`. The unresolved issue is no longer dimensional ambiguity inside these owners; it is proving parity, cleaning up remaining compatibility adapters, and verifying cross-store identity and retrieval behavior end to end.
 

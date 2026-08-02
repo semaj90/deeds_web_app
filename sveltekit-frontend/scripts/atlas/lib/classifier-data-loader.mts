@@ -8,6 +8,7 @@
 
 import { Pool } from 'pg';
 import { createHash } from 'crypto';
+import type { ClassifierFeatureManifest } from './classifier-contracts.ts';
 
 export interface TrainingRow {
   packet_key: string;
@@ -31,6 +32,7 @@ export interface SplitMetadata {
   validation_rows_per_class: Record<string, number>;
   test_rows_per_class: Record<string, number>;
   vector_manifest: VectorManifest;
+  feature_manifest: ClassifierFeatureManifest;
   split_seed: number;
   dataset_hash: string;
 }
@@ -180,12 +182,23 @@ export function stratifiedSplit(
           validation_rows_per_class: {},
           test_rows_per_class: {},
           vector_manifest: {
-            vector_name: 'dense_768_legacy',
+            vector_name: 'semantic_768',
             embedding_model: 'embeddinggemma:latest',
             embedding_model_revision: 'unknown',
             dimensions: 768,
             distance_metric: 'cosine',
             training_snapshot_sha256: '',
+          },
+          feature_manifest: {
+            schemaVersion: 'atlas.classifier.features.v1',
+            semantic: {
+              representationId: 'semantic_768',
+              offset: 0,
+              width: 768,
+              modelId: 'embeddinggemma:latest',
+              modelRevision: 'unknown',
+            },
+            totalWidth: 768,
           },
           split_seed: seed,
           dataset_hash: '',
@@ -259,12 +272,23 @@ export function stratifiedSplit(
       validation_rows_per_class,
       test_rows_per_class,
       vector_manifest: {
-        vector_name: 'dense_768_legacy',
+        vector_name: 'semantic_768',
         embedding_model: 'embeddinggemma:latest',
         embedding_model_revision: 'unknown',
         dimensions: 768,
         distance_metric: 'cosine',
         training_snapshot_sha256: datasetHash,
+      },
+      feature_manifest: {
+        schemaVersion: 'atlas.classifier.features.v1',
+        semantic: {
+          representationId: 'semantic_768',
+          offset: 0,
+          width: 768,
+          modelId: 'embeddinggemma:latest',
+          modelRevision: 'unknown',
+        },
+        totalWidth: 768,
       },
       split_seed: seed,
       dataset_hash: datasetHash,

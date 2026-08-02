@@ -62,6 +62,9 @@ interface FeatureEnvelope {
   som_cluster?: number;
   pagerank?: number;
   confidence: number;
+  semantic_feature_dim: number;
+  total_feature_dim: number;
+  feature_schema_version: string;
   provenance: {
     source: string;
     worker: string;
@@ -69,6 +72,10 @@ interface FeatureEnvelope {
   };
   identity_chain_complete: boolean;
 }
+
+const SEMANTIC_FEATURE_DIM = 768;
+const TOTAL_FEATURE_DIM = 8; // keywords, entities, ace tags, kag nodes, dag edges, som cluster, pagerank, confidence
+const FEATURE_SCHEMA_VERSION = 'atlas.feature_envelope.v1';
 
 async function fetchPacketsWithoutSummaries(pool: Pool, limit: number, offset: number): Promise<PacketRow[]> {
   const query = `
@@ -132,6 +139,9 @@ function buildFeatureEnvelope(packet: PacketRow): FeatureEnvelope {
     som_cluster: packet.som_cluster,
     pagerank: packet.pagerank,
     confidence,
+    semantic_feature_dim: SEMANTIC_FEATURE_DIM,
+    total_feature_dim: TOTAL_FEATURE_DIM,
+    feature_schema_version: FEATURE_SCHEMA_VERSION,
     provenance: {
       source: 'atlas_packets',
       worker: 'bulk-envelope-materialization',

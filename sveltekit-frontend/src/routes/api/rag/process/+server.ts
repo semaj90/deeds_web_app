@@ -68,8 +68,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				// Extract text based on file type
 				if (file.name.endsWith('.pdf')) {
 					try {
-						const pdfParse = (await import('pdf-parse')).default;
-						const parsed = await pdfParse(buffer);
+						const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+						const parsed = await parsePdfBuffer(buffer);
 						textContent = parsed.text;
 					} catch {
 						if (enableOCR) {

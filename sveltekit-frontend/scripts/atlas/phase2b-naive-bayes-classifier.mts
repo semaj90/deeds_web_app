@@ -114,6 +114,8 @@ function tokenizeCodeText(text: string): string[] {
 // MULTINOMIAL NAIVE BAYES
 // ============================================================================
 
+const NAIVE_BAYES_FEATURE_SCHEMA_VERSION = 'atlas.naive_bayes.features.v1';
+
 interface NaiveBayesState {
   model: NaiveBayesModel;
   classPriors: Map<string, number>;
@@ -207,7 +209,7 @@ function trainNaiveBayes(trainingRows: DomainTrainingRow[], alphaSmoothing: numb
     classifier_kind: 'naive_bayes',
     classifier_version: '1.0',
     model_sha256: modelSha256,
-    feature_schema_version: '1',
+    feature_schema_version: NAIVE_BAYES_FEATURE_SCHEMA_VERSION,
     training_split_name: 'train',
     total_training_docs: totalDocs,
     total_training_tokens: totalTrainingTokens,

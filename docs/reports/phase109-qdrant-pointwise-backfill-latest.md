@@ -1,13 +1,13 @@
 # Phase 109 Qdrant Pointwise Backfill
 
-- Run ID: `5faa3b1d-a55d-4e7c-8af9-5b5a78adb578`
-- Mode: `APPLY`
+- Run ID: `ac247807-607b-49a5-943b-2ac1e478e751`
+- Mode: `DRY_RUN`
 - Collection: `codebase_chunks_768`
 - Corpus revision: `unknown`
 - Proof state: `FAILED`
 
 ## Blockers
-- RECONCILIATION_NOT_SAFE
+- DATABASE_URL_REQUIRED
 
 ## Identity
 - not inspected

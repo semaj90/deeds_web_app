@@ -114,11 +114,38 @@ export function validateGraphSnapshotIdentity(input: {
 }
 
 export function topologyHash(nodes: readonly GraphNode[], edges: readonly GraphEdge[]): string {
-	const normalized = {
-		nodes: nodes.map(({ snapshotId: _snapshotId, properties, ...node }) => ({ ...node, properties })).sort((a, b) => a.nodeKey.localeCompare(b.nodeKey)),
-		edges: edges.map(({ snapshotId: _snapshotId, properties, ...edge }) => ({ ...edge, properties })).sort((a, b) => a.edgeKey.localeCompare(b.edgeKey))
-	};
-	return createHash('sha256').update(stableJson(normalized)).digest('hex');
+	// Streamed into the hash incrementally rather than materialized as one JS
+	// string: for full-corpus snapshots (hundreds of thousands of nodes/edges)
+	// building the whole normalized document as a single string via
+	// Array.join hits V8's max string length (RangeError: Invalid string
+	// length). Feeding sha256 the same byte sequence via update() calls
+	// produces an identical digest to the single-string version for any
+	// input that doesn't crash, since sha256 is a streaming hash.
+	const sortedNodes = nodes
+		.map(({ snapshotId: _snapshotId, properties, ...node }) => ({ ...node, properties }))
+		.sort((a, b) => a.nodeKey.localeCompare(b.nodeKey));
+	const sortedEdges = edges
+		.map(({ snapshotId: _snapshotId, properties, ...edge }) => ({ ...edge, properties }))
+		.sort((a, b) => a.edgeKey.localeCompare(b.edgeKey));
+
+	// stableJson sorts ALL object keys alphabetically, including this
+	// top-level envelope — "edges" < "nodes" — so the legacy monolithic
+	// implementation (stableJson({ nodes, edges })) emits edges first. The
+	// envelope below must match that exact key order or the digest diverges
+	// from stableJson's output even though each node/edge body is identical.
+	const hash = createHash('sha256');
+	hash.update('{"edges":[');
+	sortedEdges.forEach((edge, index) => {
+		if (index > 0) hash.update(',');
+		hash.update(stableJson(edge));
+	});
+	hash.update('],"nodes":[');
+	sortedNodes.forEach((node, index) => {
+		if (index > 0) hash.update(',');
+		hash.update(stableJson(node));
+	});
+	hash.update(']}');
+	return hash.digest('hex');
 }
 
 function stableJson(value: unknown): string {

@@ -72,10 +72,10 @@ describe('Ingestion Packet Schema Validation', () => {
         modelId: 'embeddinggemma',
         modelRevision: '20260720',
         nativeDimensions: 768,
-        storedDimensions: 384,
+        storedDimensions: 768,
         normalized: true,
         pooling: 'mean',
-        projectionVersion: 'mrl-384-v1',
+        projectionVersion: null,
         contractVersion: '1.0',
       };
       const result = EmbeddingContractSchema.safeParse(validContract);
@@ -86,7 +86,7 @@ describe('Ingestion Packet Schema Validation', () => {
       const invalidContract = {
         modelRevision: '20260720',
         nativeDimensions: 768,
-        storedDimensions: 384,
+        storedDimensions: 768,
         normalized: true,
         pooling: 'mean',
       };
@@ -99,7 +99,7 @@ describe('Ingestion Packet Schema Validation', () => {
         modelId: 'embeddinggemma',
         modelRevision: '20260720',
         nativeDimensions: 0,
-        storedDimensions: 384,
+        storedDimensions: 768,
         normalized: true,
         pooling: 'mean',
       };
@@ -117,12 +117,12 @@ describe('Ingestion Packet Schema Validation', () => {
       expect(contract.projectionVersion).toBeNull();
     });
 
-    it('should have MRL_384 contract configured', () => {
-      const contract = CANONICAL_EMBEDDING_CONTRACTS.MRL_384;
+    it('should have LATENT_64 contract configured', () => {
+      const contract = CANONICAL_EMBEDDING_CONTRACTS.LATENT_64;
       expect(contract).toBeDefined();
-      expect(contract.storedDimensions).toBe(384);
-      expect(contract.nativeDimensions).toBe(768);
-      expect(contract.projectionVersion).toBe('mrl-384-v1');
+      expect(contract.storedDimensions).toBe(64);
+      expect(contract.nativeDimensions).toBe(64);
+      expect(contract.projectionVersion).toBe('ae-v1');
     });
 
     it('should validate NATIVE_768 contract structure', () => {
@@ -131,8 +131,8 @@ describe('Ingestion Packet Schema Validation', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate MRL_384 contract structure', () => {
-      const contract = CANONICAL_EMBEDDING_CONTRACTS.MRL_384;
+    it('should validate LATENT_64 contract structure', () => {
+      const contract = CANONICAL_EMBEDDING_CONTRACTS.LATENT_64;
       const result = EmbeddingContractSchema.safeParse(contract);
       expect(result.success).toBe(true);
     });

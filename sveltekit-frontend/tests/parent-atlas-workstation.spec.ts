@@ -71,12 +71,17 @@ describe('parent atlas workstation wiring', () => {
 		expect(pkg.scripts?.['atlas:workstation:end-to-end']).toBe(
 			'node ../scripts/atlas/parent-atlas-workstation-end-to-end.mjs',
 		);
+		// Canonical dense lane is semantic_768 (codebase_chunks_768) — 384 is
+		// retired/legacy. These assert the live package.json value directly and
+		// guard against silently regressing back to a 384 collection name.
 		expect(pkg.scripts?.['atlas:qdrant:repair']).toBe(
-			'node ../scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_384',
+			'node ../scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_768',
 		);
+		expect(pkg.scripts?.['atlas:qdrant:repair']).not.toContain('384');
 		expect(pkg.scripts?.['atlas:qdrant:repair:preflight']).toBe(
-			'node ../scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_384 --preflight',
+			'node ../scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_768 --preflight',
 		);
+		expect(pkg.scripts?.['atlas:qdrant:repair:preflight']).not.toContain('384');
 		expect(pkg.scripts?.['atlas:qdrant:repair:legacy']).toBe(
 			'node ../scripts/atlas/qdrant-parity-repair.mjs --collection codebase_chunks_768 --sample 25',
 		);

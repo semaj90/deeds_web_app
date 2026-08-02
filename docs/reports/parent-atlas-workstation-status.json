@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T17:01:38.154Z",
+  "generated_at": "2026-08-02T11:07:48.530Z",
   "database": {
     "database": "legal_ai_db",
     "username": "legal_admin",
@@ -36,7 +36,7 @@
   "tables": {
     "atlas_packets": 61659,
     "atlas_packet_registry": 58324,
-    "atlas_summary_layers": 18423,
+    "atlas_summary_layers": 18437,
     "atlas_artifacts": 58312,
     "codebase_chunk_index": 52417,
     "parent_atlas_documents": 61659,
@@ -45,8 +45,8 @@
     "atlas_provenance_tree": null
   },
   "metrics": {
-    "packetSummaries": 6883,
-    "summaryLayersPopulated": 7640,
+    "packetSummaries": 6885,
+    "summaryLayersPopulated": 7654,
     "jsonShapedPacketSummaries": 17,
     "jsonShapedSummaryLayers": 17,
     "missingPacketRegistryRows": 3335

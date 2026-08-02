@@ -5,7 +5,7 @@
  * Compresses 18.8K tokens → 4.8K tokens (ACE context capping).
  * Caches to L1 Redis for subsequent queries.
  *
- * Dimension: 768-dim primary, 384-dim fallback with catch block.
+ * Dimension: 768-dim primary.
  */
 
 export interface ACEPacket {
@@ -42,15 +42,9 @@ export class ACEContextAssembler {
 
   constructor(embedding_dimension?: number) {
     // Validate dimension
-    if (embedding_dimension && embedding_dimension !== 768 && embedding_dimension !== 384) {
+    if (embedding_dimension && embedding_dimension !== 768) {
       console.warn(`[ACEContextAssembler] Invalid dimension: ${embedding_dimension}. Defaulting to 768-dim.`);
       this.embedding_dimension = 768;
-    } else if (embedding_dimension === 384) {
-      console.warn(
-        '[ACEContextAssembler] Using legacy 384-dim embedding. ' +
-        'Recommend migration to 768-dim (production canonical).'
-      );
-      this.embedding_dimension = 384;
     } else if (embedding_dimension) {
       this.embedding_dimension = embedding_dimension;
     }
@@ -194,16 +188,9 @@ export class ACEContextAssembler {
   }
 
   private validateQueryEmbedding(embedding: number[]): void {
-    if (embedding.length !== this.embedding_dimension && embedding.length !== 384) {
+    if (embedding.length !== this.embedding_dimension) {
       throw new Error(
-        `Query embedding dimension mismatch. Expected ${this.embedding_dimension} or 384 (fallback), got ${embedding.length}.`
-      );
-    }
-
-    // If 384-dim was sent but we're expecting 768, log warning (catch block)
-    if (embedding.length === 384 && this.embedding_dimension === 768) {
-      console.warn(
-        '[ACEContextAssembler] Received 384-dim query but expecting 768-dim. Accepting for fallback.'
+        `Query embedding dimension mismatch. Expected ${this.embedding_dimension}, got ${embedding.length}.`
       );
     }
 

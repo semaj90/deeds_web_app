@@ -1,39 +1,39 @@
 # Summary Layer Backfill From Chunks
 
-Generated: 2026-07-14T16:12:52.707Z
+Generated: 2026-08-02T11:07:48.886Z
 Mode: apply
 Status: PASS
 
 ## Counts
 
 - chunks read: 100
-- candidates with usable summaries: 99
-- leaky summaries skipped: 1
+- candidates with usable summaries: 97
+- leaky summaries skipped: 3
 - short summaries skipped: 0
-- rows without packet context skipped: 32
-- packet context joins found: 67
-- title_id enriched rows: 67
-- deduped packet rows: 6
-- rows upserted: 69
+- rows without packet context skipped: 79
+- packet context joins found: 18
+- title_id enriched rows: 18
+- deduped packet rows: 0
+- rows upserted: 20
 
 ## Coverage
 
-- usable candidate pct: 99%
+- usable candidate pct: 97%
 - packet context join pct: 100%
 - summary_context pct: 100%
 
 ## Sample
 
-- packet:ef36841a707e | sveltekit-frontend/src/lib/server/cache/report-template-cache.ts | 797 chars
-- packet:cd4c3cd32fd4 | sveltekit-frontend/src/routes/(app)/legal-corpus/+page.svelte | 1009 chars
-- packet:225cff0e9939 | sveltekit-frontend/src/routes/(app)/analytics/+page.svelte | 962 chars
-- packet:7d6672f7b2d2 | sveltekit-frontend/src/service-worker.ts | 961 chars
-- packet:0b86927eecca | sveltekit-frontend/src/lib/server/integrations/obsidian-client.ts | 947 chars
+- packet:d1464e02f7c4 | packages/parent-atlas/src/adapters/qdrant.ts | 1118 chars
+- packet:4bb01d486192 | sveltekit-frontend/docs/documents-atlas-index.md | 1116 chars
+- packet:7b8740287636 | scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/document-drafting/+server.ts | 1011 chars
+- ace:packet:41ae4f183768 | scripts/agent/agent-orchestrator.mjs | 1086 chars
+- packet:f687fb79f3a0 | packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts | 1082 chars
 
 ## Notes
 
 - Promotes existing Gemma4 chunk summaries from codebase_chunk_index into atlas_summary_layers.
 - Uses canonical packet_key from atlas_packets when present; rows without packet context are skipped to satisfy the foreign key on atlas_summary_layers.packet_key.
 - atlas_packets is used for optional title_id / feature / topology enrichment; Postgres remains canonical truth.
-- Verification rows: 69 total, 69 with summary, 69 with metadata, 69 with summary_context.
+- Verification rows: 87 total, 87 with summary, 87 with metadata, 87 with summary_context.
 - Run atlas:packet-summaries:backfill:apply and atlas:feature-envelope:backfill:apply after this script to complete the promotion chain.

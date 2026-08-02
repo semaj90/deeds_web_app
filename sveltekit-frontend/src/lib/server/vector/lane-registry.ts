@@ -1,3 +1,11 @@
+/**
+ * Semantic vectors and latent topology projections are different contracts.
+ * Never share one dimension union between them — a 128/64-dim topology
+ * projection is not a valid semantic embedding dimension and vice versa.
+ */
+export type SemanticDimension = 768;
+export type TopologyDimension = 128 | 64;
+
 export type LaneRegistryKind =
   | 'semantic'
   | 'retrieval'
@@ -21,7 +29,7 @@ export interface VectorLaneContract {
   modelId: string;
   vectorName: string;
   collection: string;
-  dimension: 384 | 768 | 64 | 128;
+  dimension: 768 | 64 | 128;
   projection: 'none' | 'direct_slice' | 'autoencoder' | 'latent';
   normalization: 'none' | 'l2';
   status: 'active' | 'partial' | 'legacy' | 'blocked';
@@ -55,19 +63,6 @@ export const VECTOR_LANES = {
     status: 'partial',
     notes: 'Topology/structural lane for graph and neighborhood features. Separate from semantic retrieval and latent 64 routing.',
   },
-  retrieval384: {
-    laneId: 'embeddinggemma-prefix384',
-    kind: 'retrieval',
-    role: 'legacy',
-    modelId: 'embeddinggemma:latest',
-    vectorName: 'content',
-    collection: 'codebase_chunks_384_hybrid',
-    dimension: 384,
-    projection: 'direct_slice',
-    normalization: 'l2',
-    status: 'blocked',
-    notes: 'BLOCKED: 384 is not a valid embeddinggemma Matryoshka truncation boundary (768/512/256/128 only). Raw slice(0,384) produces semantically invalid vectors. Backing collection is empty (0 points). Use source768 for canonical retrieval.',
-  },
   latent64: {
     laneId: 'atlas-latent64',
     kind: 'routing',
@@ -91,4 +86,18 @@ export function getVectorLane(laneId: VectorLaneId): VectorLaneContract {
 
 export function getVectorLaneByCollection(collection: string): VectorLaneContract | undefined {
   return Object.values(VECTOR_LANES).find((lane) => lane.collection === collection);
+}
+
+/**
+ * The single active semantic lane. Use this instead of indexing VECTOR_LANES
+ * directly when the caller needs the canonical semantic embedding contract —
+ * it fails loudly if the registry's active semantic lane ever changes shape
+ * instead of silently returning whatever is at `source768`.
+ */
+export function getActiveSemanticVectorLane(): VectorLaneContract & { dimension: SemanticDimension } {
+  const lane = VECTOR_LANES.source768;
+  if (lane.kind !== 'semantic' || lane.status !== 'active' || lane.dimension !== 768) {
+    throw new Error('SEMANTIC_768_LANE_INVARIANT_BROKEN: source768 is no longer the active 768-dim semantic lane');
+  }
+  return lane as VectorLaneContract & { dimension: SemanticDimension };
 }

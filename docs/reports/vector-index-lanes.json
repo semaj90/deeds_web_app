@@ -1,177 +1,402 @@
 {
-  "generated_at": "2026-07-28T16:25:10.526Z",
-  "contract_version": "atlas-embeddinggemma-direct-slice384-v1",
+  "generated_at": "2026-08-02T11:00:27.858Z",
+  "contract_version": "embeddinggemma-full768-v1",
   "snapshot": {
-    "limit": 10,
-    "selected_rows": 10,
+    "limit": 100,
+    "selected_rows": 100,
     "input_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k.ndjson",
     "turbovec_input_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
     "turbovec_output_path": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec.ndjson",
     "turbovec_shadow_limit": 4096,
-    "turbovec_shadow_rows": 10
+    "turbovec_shadow_rows": 100
   },
   "qdrant": {
-    "collection": "codebase_chunks_384_hybrid",
+    "collection": "codebase_chunks_768",
     "applied": false,
     "upserted_rows": 0,
     "sample_overlap_mean": null
   },
   "turbovec": {
     "shadow_built": true,
-    "shadow_rows": 10,
-    "sample_overlap_mean": 0.7999999999999999
+    "shadow_rows": 100,
+    "sample_overlap_mean": 0.8000000000000003
   },
   "reference": {
     "brute_force": true,
     "sample_rows": [
       {
+        "packet_key": "0ba2345cd9c542fa",
+        "topk": [
+          "0ba2345cd9c542fa",
+          "313d57f685058b60",
+          "6274b1cfbc90f2e1",
+          "64090fce409bb5c9",
+          "a318d009a88a31fb",
+          "1d5eba7211dea6f9",
+          "8d44b9719637706f",
+          "3edd306a02055c3a",
+          "28e942decdcdb342",
+          "9b11b6f522def1a1"
+        ]
+      },
+      {
+        "packet_key": "0bffe0382a0d44bb",
+        "topk": [
+          "0bffe0382a0d44bb",
+          "53f30b2bfd5e68b9",
+          "40ce2356b07edded",
+          "58e6adafde74465d",
+          "25c824811a2efd81",
+          "1d5eba7211dea6f9",
+          "368c71501e9385c5",
+          "35afe6ea3fdb17b8",
+          "271b5446f6a86a48",
+          "a318d009a88a31fb"
+        ]
+      },
+      {
         "packet_key": "0ee918abc8c53e8d",
         "topk": [
           "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
-          "1703d9c005252a62",
-          "271b5446f6a86a48",
-          "17dc1fe9f5f8a021",
-          "322b9cf893125f07",
-          "313d57f685058b60",
+          "613f572a65b1ffcc",
           "35afe6ea3fdb17b8",
-          "1dc5ac2b3cd9bfe8",
-          "175066b8a4ceee3c"
+          "32c7446a769f9c86",
+          "9b11b6f522def1a1",
+          "4439c492e016f9d3",
+          "1d5eba7211dea6f9",
+          "43f38d7b75868c7c",
+          "3d0da82598d9064a",
+          "322b9cf893125f07"
         ]
       },
       {
         "packet_key": "1703d9c005252a62",
         "topk": [
           "1703d9c005252a62",
-          "17dc1fe9f5f8a021",
-          "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
-          "271b5446f6a86a48",
-          "313d57f685058b60",
-          "35afe6ea3fdb17b8",
-          "322b9cf893125f07",
+          "54fb19b574528f1a",
           "1dc5ac2b3cd9bfe8",
-          "175066b8a4ceee3c"
+          "69af5ffe1b3af354",
+          "748e8cfa0abd4e6a",
+          "4d4c2e69d3f629ba",
+          "32c7446a769f9c86",
+          "3d0da82598d9064a",
+          "271b5446f6a86a48",
+          "6274b1cfbc90f2e1"
         ]
       },
       {
         "packet_key": "175066b8a4ceee3c",
         "topk": [
           "175066b8a4ceee3c",
-          "271b5446f6a86a48",
-          "322b9cf893125f07",
-          "1703d9c005252a62",
-          "1dc5ac2b3cd9bfe8",
-          "35afe6ea3fdb17b8",
-          "313d57f685058b60",
           "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
-          "17dc1fe9f5f8a021"
+          "482abc5766b6f8ed",
+          "613f572a65b1ffcc",
+          "885c6c04322f6095",
+          "35afe6ea3fdb17b8",
+          "43f38d7b75868c7c",
+          "aae4f83738c25068",
+          "69af5ffe1b3af354",
+          "271b5446f6a86a48"
         ]
       },
       {
         "packet_key": "17dc1fe9f5f8a021",
         "topk": [
           "17dc1fe9f5f8a021",
-          "1703d9c005252a62",
-          "271b5446f6a86a48",
-          "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
-          "322b9cf893125f07",
           "313d57f685058b60",
-          "1dc5ac2b3cd9bfe8",
-          "35afe6ea3fdb17b8",
-          "175066b8a4ceee3c"
+          "748e8cfa0abd4e6a",
+          "368c71501e9385c5",
+          "25c824811a2efd81",
+          "32c7446a769f9c86",
+          "28e942decdcdb342",
+          "613f572a65b1ffcc",
+          "4439c492e016f9d3",
+          "53f30b2bfd5e68b9"
+        ]
+      },
+      {
+        "packet_key": "1d5eba7211dea6f9",
+        "topk": [
+          "1d5eba7211dea6f9",
+          "6274b1cfbc90f2e1",
+          "a318d009a88a31fb",
+          "3edd306a02055c3a",
+          "0ee918abc8c53e8d",
+          "271b5446f6a86a48",
+          "43f38d7b75868c7c",
+          "4439c492e016f9d3",
+          "9b11b6f522def1a1",
+          "32c7446a769f9c86"
         ]
       },
       {
         "packet_key": "1dc5ac2b3cd9bfe8",
         "topk": [
           "1dc5ac2b3cd9bfe8",
-          "322b9cf893125f07",
-          "313d57f685058b60",
-          "271b5446f6a86a48",
-          "35afe6ea3fdb17b8",
-          "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
+          "69af5ffe1b3af354",
           "1703d9c005252a62",
-          "175066b8a4ceee3c",
-          "17dc1fe9f5f8a021"
+          "43f38d7b75868c7c",
+          "32c7446a769f9c86",
+          "3d0da82598d9064a",
+          "368c71501e9385c5",
+          "9b11b6f522def1a1",
+          "53f30b2bfd5e68b9",
+          "54fb19b574528f1a"
+        ]
+      },
+      {
+        "packet_key": "25c824811a2efd81",
+        "topk": [
+          "25c824811a2efd81",
+          "748e8cfa0abd4e6a",
+          "43f38d7b75868c7c",
+          "53f30b2bfd5e68b9",
+          "613f572a65b1ffcc",
+          "313d57f685058b60",
+          "6274b1cfbc90f2e1",
+          "35afe6ea3fdb17b8",
+          "32c7446a769f9c86",
+          "54fb19b574528f1a"
         ]
       },
       {
         "packet_key": "271b5446f6a86a48",
         "topk": [
           "271b5446f6a86a48",
-          "322b9cf893125f07",
-          "1703d9c005252a62",
-          "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
-          "17dc1fe9f5f8a021",
-          "1dc5ac2b3cd9bfe8",
-          "35afe6ea3fdb17b8",
+          "4439c492e016f9d3",
+          "6274b1cfbc90f2e1",
           "313d57f685058b60",
-          "175066b8a4ceee3c"
+          "64090fce409bb5c9",
+          "aae4f83738c25068",
+          "3d0da82598d9064a",
+          "322b9cf893125f07",
+          "1d5eba7211dea6f9",
+          "482abc5766b6f8ed"
+        ]
+      },
+      {
+        "packet_key": "28e942decdcdb342",
+        "topk": [
+          "28e942decdcdb342",
+          "313d57f685058b60",
+          "3d0da82598d9064a",
+          "32c7446a769f9c86",
+          "368c71501e9385c5",
+          "271b5446f6a86a48",
+          "a318d009a88a31fb",
+          "8d44b9719637706f",
+          "17dc1fe9f5f8a021",
+          "6274b1cfbc90f2e1"
         ]
       },
       {
         "packet_key": "313d57f685058b60",
         "topk": [
           "313d57f685058b60",
-          "322b9cf893125f07",
-          "1dc5ac2b3cd9bfe8",
+          "6274b1cfbc90f2e1",
           "271b5446f6a86a48",
-          "35afe6ea3fdb17b8",
-          "17dc1fe9f5f8a021",
-          "1703d9c005252a62",
-          "0ee918abc8c53e8d",
-          "3bf3bc0c64d433c0",
-          "175066b8a4ceee3c"
+          "64090fce409bb5c9",
+          "4439c492e016f9d3",
+          "53f30b2bfd5e68b9",
+          "25c824811a2efd81",
+          "54fb19b574528f1a",
+          "32c7446a769f9c86",
+          "8d44b9719637706f"
         ]
       },
       {
         "packet_key": "322b9cf893125f07",
         "topk": [
           "322b9cf893125f07",
-          "271b5446f6a86a48",
-          "313d57f685058b60",
-          "1dc5ac2b3cd9bfe8",
-          "17dc1fe9f5f8a021",
-          "0ee918abc8c53e8d",
           "3bf3bc0c64d433c0",
-          "175066b8a4ceee3c",
+          "a318d009a88a31fb",
+          "3d0da82598d9064a",
+          "9b11b6f522def1a1",
+          "38da098bc2c36c22",
+          "271b5446f6a86a48",
+          "0ee918abc8c53e8d",
+          "6274b1cfbc90f2e1",
+          "4439c492e016f9d3"
+        ]
+      },
+      {
+        "packet_key": "32c7446a769f9c86",
+        "topk": [
+          "32c7446a769f9c86",
+          "3d0da82598d9064a",
+          "38da098bc2c36c22",
+          "aae4f83738c25068",
+          "368c71501e9385c5",
+          "69af5ffe1b3af354",
+          "9b11b6f522def1a1",
           "35afe6ea3fdb17b8",
-          "1703d9c005252a62"
+          "0ee918abc8c53e8d",
+          "1dc5ac2b3cd9bfe8"
         ]
       },
       {
         "packet_key": "35afe6ea3fdb17b8",
         "topk": [
           "35afe6ea3fdb17b8",
-          "271b5446f6a86a48",
-          "313d57f685058b60",
-          "1dc5ac2b3cd9bfe8",
-          "322b9cf893125f07",
-          "1703d9c005252a62",
           "0ee918abc8c53e8d",
+          "32c7446a769f9c86",
+          "4439c492e016f9d3",
+          "613f572a65b1ffcc",
+          "3d0da82598d9064a",
+          "368c71501e9385c5",
+          "38da098bc2c36c22",
+          "25c824811a2efd81",
+          "aae4f83738c25068"
+        ]
+      },
+      {
+        "packet_key": "368c71501e9385c5",
+        "topk": [
+          "368c71501e9385c5",
+          "32c7446a769f9c86",
+          "53f30b2bfd5e68b9",
+          "35afe6ea3fdb17b8",
+          "4439c492e016f9d3",
+          "43f38d7b75868c7c",
+          "3d0da82598d9064a",
+          "1dc5ac2b3cd9bfe8",
+          "613f572a65b1ffcc",
+          "9b11b6f522def1a1"
+        ]
+      },
+      {
+        "packet_key": "38da098bc2c36c22",
+        "topk": [
+          "38da098bc2c36c22",
+          "3d0da82598d9064a",
+          "32c7446a769f9c86",
+          "aae4f83738c25068",
           "3bf3bc0c64d433c0",
-          "175066b8a4ceee3c",
-          "17dc1fe9f5f8a021"
+          "9b11b6f522def1a1",
+          "322b9cf893125f07",
+          "891b73e8db9c3bb7",
+          "35afe6ea3fdb17b8",
+          "368c71501e9385c5"
         ]
       },
       {
         "packet_key": "3bf3bc0c64d433c0",
         "topk": [
-          "0ee918abc8c53e8d",
           "3bf3bc0c64d433c0",
-          "1703d9c005252a62",
-          "271b5446f6a86a48",
-          "17dc1fe9f5f8a021",
+          "3d0da82598d9064a",
           "322b9cf893125f07",
-          "313d57f685058b60",
-          "35afe6ea3fdb17b8",
+          "38da098bc2c36c22",
+          "32c7446a769f9c86",
+          "0ee918abc8c53e8d",
+          "9b11b6f522def1a1",
+          "a318d009a88a31fb",
+          "69af5ffe1b3af354",
+          "35afe6ea3fdb17b8"
+        ]
+      },
+      {
+        "packet_key": "3d0da82598d9064a",
+        "topk": [
+          "3d0da82598d9064a",
+          "32c7446a769f9c86",
+          "38da098bc2c36c22",
+          "3bf3bc0c64d433c0",
+          "aae4f83738c25068",
+          "69af5ffe1b3af354",
+          "9b11b6f522def1a1",
+          "322b9cf893125f07",
+          "271b5446f6a86a48",
+          "35afe6ea3fdb17b8"
+        ]
+      },
+      {
+        "packet_key": "3edd306a02055c3a",
+        "topk": [
+          "3edd306a02055c3a",
+          "8d44b9719637706f",
+          "1d5eba7211dea6f9",
+          "9f4573e52fce4175",
+          "a318d009a88a31fb",
+          "4439c492e016f9d3",
+          "6274b1cfbc90f2e1",
+          "368c71501e9385c5",
+          "32c7446a769f9c86",
+          "9b11b6f522def1a1"
+        ]
+      },
+      {
+        "packet_key": "3f73ebb0336ae4f3",
+        "topk": [
+          "3f73ebb0336ae4f3",
+          "891b73e8db9c3bb7",
+          "9b11b6f522def1a1",
+          "6274b1cfbc90f2e1",
+          "3d0da82598d9064a",
+          "32c7446a769f9c86",
+          "38da098bc2c36c22",
+          "1d5eba7211dea6f9",
+          "4439c492e016f9d3",
+          "271b5446f6a86a48"
+        ]
+      },
+      {
+        "packet_key": "40ce2356b07edded",
+        "topk": [
+          "40ce2356b07edded",
+          "53f30b2bfd5e68b9",
+          "0bffe0382a0d44bb",
+          "43f38d7b75868c7c",
+          "54fb19b574528f1a",
+          "6274b1cfbc90f2e1",
+          "25c824811a2efd81",
+          "1d5eba7211dea6f9",
+          "322b9cf893125f07",
+          "9b11b6f522def1a1"
+        ]
+      },
+      {
+        "packet_key": "43f38d7b75868c7c",
+        "topk": [
+          "43f38d7b75868c7c",
+          "4439c492e016f9d3",
+          "613f572a65b1ffcc",
+          "54fb19b574528f1a",
+          "9b11b6f522def1a1",
           "1dc5ac2b3cd9bfe8",
-          "175066b8a4ceee3c"
+          "25c824811a2efd81",
+          "0ee918abc8c53e8d",
+          "1d5eba7211dea6f9",
+          "368c71501e9385c5"
+        ]
+      },
+      {
+        "packet_key": "4439c492e016f9d3",
+        "topk": [
+          "4439c492e016f9d3",
+          "271b5446f6a86a48",
+          "6274b1cfbc90f2e1",
+          "43f38d7b75868c7c",
+          "35afe6ea3fdb17b8",
+          "313d57f685058b60",
+          "0ee918abc8c53e8d",
+          "368c71501e9385c5",
+          "1d5eba7211dea6f9",
+          "9b11b6f522def1a1"
+        ]
+      },
+      {
+        "packet_key": "482abc5766b6f8ed",
+        "topk": [
+          "482abc5766b6f8ed",
+          "271b5446f6a86a48",
+          "35afe6ea3fdb17b8",
+          "64090fce409bb5c9",
+          "6274b1cfbc90f2e1",
+          "313d57f685058b60",
+          "aae4f83738c25068",
+          "4439c492e016f9d3",
+          "175066b8a4ceee3c",
+          "25c824811a2efd81"
         ]
       }
     ]
@@ -179,6 +404,14 @@
   "samples": {
     "qdrant": [
       {
+        "packet_key": "0ba2345cd9c542fa",
+        "overlap": null
+      },
+      {
+        "packet_key": "0bffe0382a0d44bb",
+        "overlap": null
+      },
+      {
         "packet_key": "0ee918abc8c53e8d",
         "overlap": null
       },
@@ -195,11 +428,23 @@
         "overlap": null
       },
       {
+        "packet_key": "1d5eba7211dea6f9",
+        "overlap": null
+      },
+      {
         "packet_key": "1dc5ac2b3cd9bfe8",
         "overlap": null
       },
       {
+        "packet_key": "25c824811a2efd81",
+        "overlap": null
+      },
+      {
         "packet_key": "271b5446f6a86a48",
+        "overlap": null
+      },
+      {
+        "packet_key": "28e942decdcdb342",
         "overlap": null
       },
       {
@@ -211,16 +456,64 @@
         "overlap": null
       },
       {
+        "packet_key": "32c7446a769f9c86",
+        "overlap": null
+      },
+      {
         "packet_key": "35afe6ea3fdb17b8",
         "overlap": null
       },
       {
+        "packet_key": "368c71501e9385c5",
+        "overlap": null
+      },
+      {
+        "packet_key": "38da098bc2c36c22",
+        "overlap": null
+      },
+      {
         "packet_key": "3bf3bc0c64d433c0",
+        "overlap": null
+      },
+      {
+        "packet_key": "3d0da82598d9064a",
+        "overlap": null
+      },
+      {
+        "packet_key": "3edd306a02055c3a",
+        "overlap": null
+      },
+      {
+        "packet_key": "3f73ebb0336ae4f3",
+        "overlap": null
+      },
+      {
+        "packet_key": "40ce2356b07edded",
+        "overlap": null
+      },
+      {
+        "packet_key": "43f38d7b75868c7c",
+        "overlap": null
+      },
+      {
+        "packet_key": "4439c492e016f9d3",
+        "overlap": null
+      },
+      {
+        "packet_key": "482abc5766b6f8ed",
         "overlap": null
       }
     ],
     "turbovec": [
       {
+        "packet_key": "0ba2345cd9c542fa",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "0bffe0382a0d44bb",
+        "overlap": 0.8
+      },
+      {
         "packet_key": "0ee918abc8c53e8d",
         "overlap": 0.8
       },
@@ -237,11 +530,23 @@
         "overlap": 0.8
       },
       {
+        "packet_key": "1d5eba7211dea6f9",
+        "overlap": 0.8
+      },
+      {
         "packet_key": "1dc5ac2b3cd9bfe8",
         "overlap": 0.8
       },
       {
+        "packet_key": "25c824811a2efd81",
+        "overlap": 0.8
+      },
+      {
         "packet_key": "271b5446f6a86a48",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "28e942decdcdb342",
         "overlap": 0.8
       },
       {
@@ -253,14 +558,54 @@
         "overlap": 0.8
       },
       {
+        "packet_key": "32c7446a769f9c86",
+        "overlap": 0.8
+      },
+      {
         "packet_key": "35afe6ea3fdb17b8",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "368c71501e9385c5",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "38da098bc2c36c22",
         "overlap": 0.8
       },
       {
         "packet_key": "3bf3bc0c64d433c0",
         "overlap": 0.8
+      },
+      {
+        "packet_key": "3d0da82598d9064a",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "3edd306a02055c3a",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "3f73ebb0336ae4f3",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "40ce2356b07edded",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "43f38d7b75868c7c",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "4439c492e016f9d3",
+        "overlap": 0.8
+      },
+      {
+        "packet_key": "482abc5766b6f8ed",
+        "overlap": 0.8
       }
     ]
   },
-  "duration_ms": 6304
+  "duration_ms": 3710
 }

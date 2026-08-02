@@ -56,8 +56,15 @@ async function publishJobs() {
           max_iter: 50,
           tol: 1e-4,
           random_seed: 42,
-          feature_schema_version: 'feature-envelope-v1',
-          model_version: 'topology-p2e-v1'
+          feature_schema_version: 'atlas.feature_envelope.v1',
+          model_version: 'topology-p2e-v1',
+          execution_model: 'mapreduce',
+          job_envelope_format: 'msgpack',
+          batch_data_format: 'arrow_ipc',
+          reduce_engine: 'duckdb',
+          output_data_format: 'parquet',
+          review_store: 'couchdb',
+          gpu_lane: 'compute_only'
         },
         requested_at: new Date().toISOString()
       },
@@ -70,8 +77,15 @@ async function publishJobs() {
           learning_rate: 0.5,
           epochs: 20,
           random_seed: 42,
-          feature_schema_version: 'feature-envelope-v1',
-          model_version: 'topology-p2e-v1'
+          feature_schema_version: 'atlas.feature_envelope.v1',
+          model_version: 'topology-p2e-v1',
+          execution_model: 'mapreduce',
+          job_envelope_format: 'msgpack',
+          batch_data_format: 'arrow_ipc',
+          reduce_engine: 'duckdb',
+          output_data_format: 'parquet',
+          review_store: 'couchdb',
+          gpu_lane: 'compute_only'
         },
         requested_at: new Date().toISOString()
       },
@@ -84,8 +98,15 @@ async function publishJobs() {
           iterations: 30,
           tol: 1e-4,
           random_seed: 42,
-          feature_schema_version: 'feature-envelope-v1',
-          model_version: 'topology-p2e-v1'
+          feature_schema_version: 'atlas.feature_envelope.v1',
+          model_version: 'topology-p2e-v1',
+          execution_model: 'mapreduce',
+          job_envelope_format: 'msgpack',
+          batch_data_format: 'arrow_ipc',
+          reduce_engine: 'duckdb',
+          output_data_format: 'parquet',
+          review_store: 'couchdb',
+          gpu_lane: 'compute_only'
         },
         requested_at: new Date().toISOString()
       }

@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import type { RedisOptions } from 'ioredis';
+import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 /**
  * Aggressive Bitfrost Redis cache with L1/L2/L3/L4 tiers.
@@ -103,7 +104,10 @@ export class AggressiveRedisCache {
     scores: number[],
     embedding: Float32Array
   ): Promise<void> {
-    const key = `l1:query:${queryHash}`;
+    // Fail-closed: L1 keys are representation-tagged so a 384/other-dim vector
+    // can never be cached under the same key namespace as a semantic_768 result.
+    assertSemantic768(embedding);
+    const key = `l1:query:semantic_768:${queryHash}`;
     const value = JSON.stringify({
       results,
       scores,
@@ -115,7 +119,7 @@ export class AggressiveRedisCache {
   }
 
   async getL1Query(queryHash: string): Promise<L1QueryCache | null> {
-    const key = `l1:query:${queryHash}`;
+    const key = `l1:query:semantic_768:${queryHash}`;
     const cached = await this.client.get(key);
 
     if (!cached) return null;
@@ -145,7 +149,7 @@ export class AggressiveRedisCache {
     scores: number[],
     threshold: number = 0.8
   ): Promise<void> {
-    const key = `l2:semantic:${queryHash}`;
+    const key = `l2:semantic:semantic_768:${queryHash}`;
     const value = JSON.stringify({
       results,
       scores,
@@ -157,7 +161,7 @@ export class AggressiveRedisCache {
   }
 
   async getL2Semantic(queryHash: string): Promise<L2SemanticCache | null> {
-    const key = `l2:semantic:${queryHash}`;
+    const key = `l2:semantic:semantic_768:${queryHash}`;
     const cached = await this.client.get(key);
 
     if (!cached) return null;
@@ -185,14 +189,17 @@ export class AggressiveRedisCache {
     clusterId: string,
     centroid: Float32Array
   ): Promise<void> {
-    const key = `l3:som:centroid:${clusterId}`;
+    // These SOM centroids are averages of semantic_768 vectors, not the
+    // latent_64 autoencoder projection — tag and validate them as such.
+    assertSemantic768(centroid);
+    const key = `l3:som:centroid:semantic_768:${clusterId}`;
     const value = Buffer.from(centroid.buffer);
 
     await this.client.setex(key, 86400, value);
   }
 
   async getL3SOMCentroid(clusterId: string): Promise<Float32Array | null> {
-    const key = `l3:som:centroid:${clusterId}`;
+    const key = `l3:som:centroid:semantic_768:${clusterId}`;
     const cached = await this.client.getBuffer(key);
 
     if (!cached) return null;
@@ -238,7 +245,8 @@ export class AggressiveRedisCache {
     centroid: Float32Array,
     packetCount: number
   ): Promise<void> {
-    const key = `l4:feature:centroid:${featureId}`;
+    assertSemantic768(centroid);
+    const key = `l4:feature:centroid:semantic_768:${featureId}`;
     const value = JSON.stringify({
       centroid: Array.from(centroid),
       packet_count: packetCount,
@@ -249,7 +257,7 @@ export class AggressiveRedisCache {
   }
 
   async getL4FeatureCentroid(featureId: string): Promise<L4FeatureCentroid | null> {
-    const key = `l4:feature:centroid:${featureId}`;
+    const key = `l4:feature:centroid:semantic_768:${featureId}`;
     const cached = await this.client.get(key);
 
     if (!cached) return null;

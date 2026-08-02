@@ -1,6 +1,9 @@
+import type { Pool } from 'pg';
+
+import type { EngramMemoryBridge } from '../mcp/memory-bridge.js';
+import type { LangGraphBridge } from '../mcp/langgraph-bridge.js';
+
 // Defines the concrete dependencies required by the DispatcherMiddleware.
-// NOTE: This definition uses mocked/assumed schemas based on the task description,
-// pending confirmation of the actual database schema for type safety.
 export interface DispatcherMiddlewareDependencies {
   /** The connection pool for the primary database. */
   pool: Pool;

@@ -33,7 +33,7 @@ export type VectorIndexRegistryEntry = {
 export const VECTOR_INDEX_REGISTRY = {
   vectorSnapshot5k: {
     id: 'vector-snapshot-5k',
-    name: 'Frozen 5k packet vector snapshot',
+    name: 'Frozen 5k legacy packet vector snapshot',
     backend: 'duckdb-snapshot',
     contractVersion: ATLAS_EMBEDDINGGEMMA_DIRECT_SLICE384_V1,
     vectorContract: EMBEDDINGGEMMA_PREFIX384_CONTRACT,
@@ -41,7 +41,7 @@ export const VECTOR_INDEX_REGISTRY = {
     collection: 'vector_snapshot_packets',
     indexKind: 'reference',
     buildScript: 'scripts/atlas/duckdb/freeze-vector-snapshot.mts',
-    notes: 'Deterministic 5,000-packet freeze for parity, brute-force reference, and downstream index builds.',
+    notes: 'Deterministic 5,000-packet freeze for legacy 384 replay only; canonical reduction uses codebase_chunks_768_v2.',
   },
   qdrantHybrid: {
     id: 'qdrant-codebase-chunks-384-hybrid',
@@ -85,7 +85,7 @@ export const VECTOR_INDEX_REGISTRY = {
     collection: 'codebase_chunks_384',
     indexKind: 'dense',
     buildScript: 'scripts/atlas/restore-qdrant-384-from-postgres.mjs',
-    notes: 'Transitional dense-only fallback. Do not treat as canonical.',
+    notes: 'Transitional dense-only fallback. Do not treat as canonical. Prefer codebase_chunks_768_v2 for active retrieval.',
   },
   turbovecShadow: {
     id: 'turbovec-shadow-384',
@@ -96,7 +96,7 @@ export const VECTOR_INDEX_REGISTRY = {
     collection: 'vector_snapshot_packets',
     indexKind: 'shadow',
     buildScript: 'scripts/atlas/turbovec-gpu-consolidate.mjs',
-    notes: 'Shadow ANN lane built from the same frozen snapshot as Qdrant.',
+    notes: 'Shadow ANN lane built from the same frozen snapshot as Qdrant. Legacy replay only.',
   },
   bruteforceReference: {
     id: 'bruteforce-reference-384',
@@ -106,11 +106,11 @@ export const VECTOR_INDEX_REGISTRY = {
     vectorContract: EMBEDDINGGEMMA_PREFIX384_CONTRACT,
     collection: 'vector_snapshot_packets',
     indexKind: 'reference',
-    notes: 'Used as the ground-truth comparator for Qdrant/TurboVec parity.',
+    notes: 'Used as the ground-truth comparator for Qdrant/TurboVec parity on legacy 384 replay.',
   },
   kmeans384: {
     id: 'kmeans-384',
-    name: 'K-means 384-vector clustering lane',
+    name: 'K-means 384-vector legacy clustering lane',
     backend: 'kmeans',
     contractVersion: ATLAS_EMBEDDINGGEMMA_DIRECT_SLICE384_V1,
     vectorContract: EMBEDDINGGEMMA_PREFIX384_CONTRACT,
@@ -120,7 +120,7 @@ export const VECTOR_INDEX_REGISTRY = {
   },
   som20x20: {
     id: 'som-20x20-384',
-    name: 'SOM 20x20 routing lane',
+    name: 'SOM 20x20 legacy routing lane',
     backend: 'som',
     contractVersion: ATLAS_EMBEDDINGGEMMA_DIRECT_SLICE384_V1,
     vectorContract: EMBEDDINGGEMMA_PREFIX384_CONTRACT,
@@ -140,6 +140,7 @@ export const VECTOR_INDEX_REGISTRY = {
       'scripts/atlas/warm-centroid-cache.mjs',
       'scripts/atlas/warm-turbovec-centroids-redis.mjs',
     ],
+    notes: 'Legacy 384 cache warmers only; do not use for canonical semantic_768 authority.',
   },
 } as const satisfies Record<string, VectorIndexRegistryEntry>;
 

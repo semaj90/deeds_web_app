@@ -58,6 +58,6 @@ export const chunks = pgTable('chunks', {
   text: text('text').notNull(),
   legalRelevance: real('legal_relevance'),
   position: integer('position'),
-  embedding: vector('embedding', { dimensions: 384 }), // Match embedding dimensions
+  embedding: vector('embedding', { dimensions: 768 }), // Match canonical embedding dimensions
   createdAt: timestamp('created_at').defaultNow(),
 });

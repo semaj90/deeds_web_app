@@ -7,11 +7,40 @@ import { z } from 'zod';
  */
 
 export const VectorManifestSchema = z.object({
-  vector_name: z.literal('dense_768_legacy'),
+  vector_name: z.literal('semantic_768'),
   embedding_model: z.literal('embeddinggemma:latest'),
   embedding_model_revision: z.string(),
   dimensions: z.literal(768),
   distance_metric: z.literal('cosine'),
+});
+
+
+export const ClassifierFeatureSegmentSchema = z.object({
+  offset: z.number().int().min(0),
+  width: z.number().int().positive(),
+  modelId: z.string().optional(),
+  modelRevision: z.string().optional(),
+  extractorRevision: z.string().optional(),
+  ontologyRevision: z.string().optional(),
+  graphRevision: z.string().optional(),
+  representationId: z.string().optional(),
+});
+
+export const ClassifierFeatureManifestSchema = z.object({
+  schemaVersion: z.literal('atlas.classifier.features.v1'),
+  semantic: ClassifierFeatureSegmentSchema.extend({
+    representationId: z.literal('semantic_768'),
+    offset: z.literal(0),
+    width: z.literal(768),
+    modelId: z.string(),
+    modelRevision: z.string(),
+  }),
+  lexical: ClassifierFeatureSegmentSchema.optional(),
+  ast: ClassifierFeatureSegmentSchema.optional(),
+  concepts: ClassifierFeatureSegmentSchema.optional(),
+  graph: ClassifierFeatureSegmentSchema.optional(),
+  topology: ClassifierFeatureSegmentSchema.optional(),
+  totalWidth: z.number().int().positive(),
 });
 
 export const ClassifierSplitManifestSchema = z.object({
@@ -20,6 +49,7 @@ export const ClassifierSplitManifestSchema = z.object({
   split_hash: z.string().regex(/^[a-f0-9]{64}$/),
   training_snapshot_sha256: z.string().regex(/^[a-f0-9]{64}$/),
   vector_manifest: VectorManifestSchema,
+  feature_manifest: ClassifierFeatureManifestSchema.optional(),
   label_map_version: z.literal('1.0.0'),
   train_size: z.number().int().positive(),
   val_size: z.number().int().positive(),
@@ -135,10 +165,15 @@ export const RankerFeatureEnvelopeSchema = z.object({
   packet_key: z.string().regex(/^ace:packet:[a-z0-9_-]+$/),
   relevance_label: z.number().int().min(0).max(3).describe('0=irrelevant, 1=marginal, 2=relevant, 3=highly_relevant'),
   features: RankerFeaturesSchema,
+  semantic_feature_dim: z.literal(768).default(768).describe('Width of the canonical semantic_768 slice'),
+  total_feature_dim: z.number().int().positive().default(6).describe('Derived total width of the ranker feature manifest'),
+  feature_schema_version: z.literal('atlas.ranker.features.v1').default('atlas.ranker.features.v1'),
 });
 
 // Type exports for TypeScript consumers
 export type VectorManifest = z.infer<typeof VectorManifestSchema>;
+export type ClassifierFeatureSegment = z.infer<typeof ClassifierFeatureSegmentSchema>;
+export type ClassifierFeatureManifest = z.infer<typeof ClassifierFeatureManifestSchema>;
 export type ClassifierSplitManifest = z.infer<typeof ClassifierSplitManifestSchema>;
 export type DomainFeaturePacket = z.infer<typeof DomainFeaturePacketSchema>;
 export type ModelRunManifest = z.infer<typeof ModelRunManifestSchema>;
@@ -148,6 +183,13 @@ export type DomainOntologyLabel = z.infer<typeof DomainOntologyLabelSchema>;
 export type LinkedSemanticTuple = z.infer<typeof LinkedSemanticTupleSchema>;
 export type RetrievalCandidate = z.infer<typeof RetrievalCandidateSchema>;
 export type RankerFeatureEnvelope = z.infer<typeof RankerFeatureEnvelopeSchema>;
+
+/**
+ * Validates a classifier feature manifest against the canonical schema.
+ */
+export function validateClassifierFeatureManifest(data: unknown): z.SafeParseReturnType<unknown, ClassifierFeatureManifest> {
+  return ClassifierFeatureManifestSchema.safeParse(data);
+}
 
 /**
  * Validates a split manifest against the canonical schema.

@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const bridge = require(path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node'));
 
 const GPU_REQUIRED = String(process.env.GPU_REQUIRED ?? '').toLowerCase() === 'true';
-const DIM = Number(process.env.EMBED_DIM ?? 384);
+const DIM = Number(process.env.EMBED_DIM ?? 768);
 const TOPK = Number(process.env.TOPK ?? 8);
 
 const input = process.argv[2] ?? '.tmp/ace-nes-packets.json';

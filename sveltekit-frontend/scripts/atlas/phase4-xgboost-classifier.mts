@@ -17,6 +17,7 @@
 
 import { createHash, randomUUID } from 'crypto';
 import { loadTrainingData } from './lib/classifier-data-loader.mts';
+import type { ClassifierFeatureManifest } from './lib/classifier-contracts.ts';
 
 interface TrainingRow {
   packet_key: string;
@@ -46,6 +47,9 @@ interface XGBoostModel {
   vocabulary_hash: string;
   model_sha256: string;
   training_timestamp: string;
+  semantic_feature_dim: number;
+  total_feature_dim: number;
+  feature_schema_version: string;
 }
 
 interface PredictionRecord {
@@ -92,6 +96,7 @@ interface EvaluationReport {
 function buildDecisionTree(
   trainingRows: TrainingRow[],
   domainToClassId: Record<string, number>,
+  semantic_feature_dim: number,
   max_depth: number,
   current_depth = 0
 ): XGBoostTree {
@@ -124,6 +129,9 @@ function buildDecisionTree(
   let best_gini = Infinity;
 
   const feature_dim = trainingRows[0]?.feature_vector.length || 0;
+  if (feature_dim !== semantic_feature_dim) {
+    throw new Error(`Expected ${semantic_feature_dim}-dim semantic features, got ${feature_dim}`);
+  }
 
   for (let f = 0; f < Math.min(feature_dim, 10); f++) {
     // Sample 10 features max to reduce computation
@@ -151,8 +159,8 @@ function buildDecisionTree(
   const left_rows = trainingRows.filter((r) => r.feature_vector[best_feature] <= best_threshold);
   const right_rows = trainingRows.filter((r) => r.feature_vector[best_feature] > best_threshold);
 
-  const left_child = buildDecisionTree(left_rows, domainToClassId, max_depth, current_depth + 1);
-  const right_child = buildDecisionTree(right_rows, domainToClassId, max_depth, current_depth + 1);
+  const left_child = buildDecisionTree(left_rows, domainToClassId, semantic_feature_dim, max_depth, current_depth + 1);
+  const right_child = buildDecisionTree(right_rows, domainToClassId, semantic_feature_dim, max_depth, current_depth + 1);
 
   return {
     node_id,
@@ -191,12 +199,15 @@ function computeGini(rows: TrainingRow[], domainToClassId: Record<string, number
  */
 function trainXGBoost(
   trainingRows: TrainingRow[],
+  featureManifest: ClassifierFeatureManifest,
   learning_rate = 0.1,
   max_depth = 6,
   n_estimators = 100
 ): XGBoostModel {
   const domains = Array.from(new Set(trainingRows.map((r) => r.domain_class)));
   const domainToClassId: Record<string, number> = {};
+  const semantic_feature_dim = featureManifest.semantic.width;
+  const total_feature_dim = featureManifest.totalWidth;
   domains.forEach((d, i) => {
     domainToClassId[d] = i;
   });
@@ -207,7 +218,7 @@ function trainXGBoost(
 
   for (let iter = 0; iter < n_estimators; iter++) {
     // Simplified: build one tree per iteration (real XGBoost builds one tree per class)
-    const tree = buildDecisionTree(trainingRows, domainToClassId, max_depth);
+    const tree = buildDecisionTree(trainingRows, domainToClassId, semantic_feature_dim, max_depth);
     trees.push([tree]);
 
     // Track feature importance
@@ -244,9 +255,7 @@ function trainXGBoost(
 
   return {
     trees,
-    feature_names: Array.from({ length: trainingRows[0]?.feature_vector.length || 0 }).map(
-      (_, i) => `feature_${i}`
-    ),
+    feature_names: Array.from({ length: semantic_feature_dim }).map((_, i) => `feature_${i}`),
     feature_importance,
     class_order: domains,
     learning_rate,
@@ -256,6 +265,9 @@ function trainXGBoost(
     vocabulary_hash,
     model_sha256,
     training_timestamp: new Date().toISOString(),
+    semantic_feature_dim,
+    total_feature_dim,
+    feature_schema_version: featureManifest.schemaVersion,
   };
 }
 
@@ -489,8 +501,11 @@ async function main() {
 
   // Train model
   console.log('\n📊 Training XGBoost ensemble...');
-  const model = trainXGBoost(trainingRows, 0.1, 6, 100);
+  const model = trainXGBoost(trainingRows, dataSplit.metadata.feature_manifest, 0.1, 6, 100);
   console.log(`✓ Model trained (100 trees, SHA256: ${model.model_sha256.slice(0, 12)}...)`);
+  console.log(`  Semantic feature width: ${model.semantic_feature_dim} (semantic_768 slice)`);
+  console.log(`  Total feature width: ${model.total_feature_dim} (manifest-derived)`);
+  console.log(`  Feature schema: ${model.feature_schema_version}`);
 
   // Evaluate
   console.log('\n📈 Evaluating on validation set...');
@@ -562,7 +577,7 @@ async function main() {
             'xgboost',
             '1.0',
             model.model_sha256,
-            '1',
+            model.feature_schema_version,
             'v2.1.0',
             'v2.1.0',
             confidence >= 0.5 ? 'ACCEPTED' : 'GATED_LOW_CONFIDENCE',

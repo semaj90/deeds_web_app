@@ -86,6 +86,9 @@ const ACEPacketSchema = z.object({
     created_at: z.string().datetime(),
     phase_version: z.string(),
     embedding_dim: z.number(),
+    semantic_feature_dim: z.number(),
+    total_feature_dim: z.number(),
+    feature_schema_version: z.string(),
     authority_blend: z.string(),
   }),
 });
@@ -113,7 +116,8 @@ const AssemblyAuditSchema = z.object({
 // ============================================================================
 
 const PHASE_VERSION = '7.0.0';
-const EMBEDDING_DIM = 768;
+const SEMANTIC_FEATURE_DIM = 768;
+const TOTAL_FEATURE_DIM = SEMANTIC_FEATURE_DIM;
 const AUTHORITY_BLEND_FORMULA = '0.6·cosine + 0.2·pagerank + 0.2·authority';
 
 // ============================================================================
@@ -278,7 +282,10 @@ async function main() {
           metadata: {
             created_at: new Date().toISOString(),
             phase_version: PHASE_VERSION,
-            embedding_dim: EMBEDDING_DIM,
+            embedding_dim: SEMANTIC_FEATURE_DIM,
+            semantic_feature_dim: SEMANTIC_FEATURE_DIM,
+            total_feature_dim: TOTAL_FEATURE_DIM,
+            feature_schema_version: 'atlas.ace.packet.v1',
             authority_blend: AUTHORITY_BLEND_FORMULA,
           },
         });
@@ -330,7 +337,9 @@ async function main() {
           (p) =>
             p.metadata.created_at &&
             p.metadata.phase_version === PHASE_VERSION &&
-            p.metadata.embedding_dim === EMBEDDING_DIM
+            p.metadata.embedding_dim === SEMANTIC_FEATURE_DIM &&
+            p.metadata.semantic_feature_dim === SEMANTIC_FEATURE_DIM &&
+            p.metadata.total_feature_dim === TOTAL_FEATURE_DIM
         ),
         message: `All packets have complete metadata`,
       },

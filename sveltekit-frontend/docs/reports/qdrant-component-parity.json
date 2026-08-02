@@ -1,6 +1,6 @@
 {
-  "collection": "codebase_chunks_384",
-  "contract_version": "atlas-qdrant-384-v1",
+  "collection": "codebase_chunks_384_v2",
+  "contract_version": "atlas-qdrant-384-v2",
   "legacy_collection": false,
   "status": "WARN",
   "sampled_packets": 50,
@@ -15,6 +15,7 @@
   },
   "optional_missing": {
     "summary_384": 0,
+    "signature_384": 0,
     "latent64": 0
   },
   "bm42_present": 0,

@@ -720,8 +720,8 @@ async function extractText(
     }
 
     try {
-      const pdfParse = (await import('pdf-parse')).default;
-      const parsed = await pdfParse(buffer);
+      const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+      const parsed = await parsePdfBuffer(buffer);
       const text = parsed.text ?? '';
 
       // If pdf-parse got enough text, use it

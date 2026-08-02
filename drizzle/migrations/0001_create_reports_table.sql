@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS reports (
   summary text,
   tags jsonb DEFAULT '[]'::jsonb,
   auto_keywords jsonb DEFAULT '[]'::jsonb,
-  -- NOTE: embedding dimension should match your embedding model. embeddinggemma:latest uses 384 dims.
-  embedding vector(384),
+  -- NOTE: embedding dimension should match your embedding model. embeddinggemma:latest uses 768 dims.
+  embedding vector(768),
   source_uri text,
   is_favorite boolean DEFAULT false,
   created_at timestamptz DEFAULT now(),

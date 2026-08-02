@@ -4,14 +4,13 @@ CREATE TABLE IF NOT EXISTS embeddings (
     task_id varchar(100),
     payload text,
     metadata jsonb,
-    embedding vector(384),
+    embedding vector(768),
     text_hash varchar(64),
     content text,
     model varchar(100) DEFAULT 'nomic-embed-text:latest',
     document_type varchar(50),
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(),
-    embedding_384 vector(384),
     CONSTRAINT embeddings_text_hash_unique UNIQUE(text_hash)
 );
 

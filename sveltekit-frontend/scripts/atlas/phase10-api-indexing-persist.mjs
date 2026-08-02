@@ -227,7 +227,7 @@ async function persistApis() {
           // Create Qdrant point with tool metadata as payload
           const qdrantPoint = {
             id: parseInt(packet.tool_id.replace(/\D/g, '')) || Math.floor(Math.random() * 1e9),
-            vector: new Array(384).fill(0), // Placeholder; would be populated by embedding service
+            vector: new Array(768).fill(0), // Placeholder; would be populated by embedding service
             payload: {
               tool_id: packet.tool_id,
               tool_name: packet.tool_name,

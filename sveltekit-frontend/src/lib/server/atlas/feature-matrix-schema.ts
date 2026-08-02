@@ -9,11 +9,12 @@
  *
  * Feature representations (separate, versioned):
  *   dense_768: Primary codebase chunk / native semantic reference lane
- *   dense_384: Derived online retrieval projection
+ *   dense_384: Legacy/reference-only retrieval projection
  *   latent_64: Routing/clustering only
  *   lexical: BM25 coefficients
  *   topology: PageRank + SOM cell
  *   classifiers: hybrid semantic classification scores
+ *   classifier manifests: explicit semantic slice width plus derived total width
  *
  * Usage:
  *   import { FeatureMatrixRowV1Schema, insertFeatureRow } from './feature-matrix-schema';
@@ -69,7 +70,7 @@ export const Dense768Schema = z
 export type Dense768 = z.infer<typeof Dense768Schema>;
 
 /**
- * Dense 384-dim retrieval projection (truncated or projected).
+ * Dense 384-dim legacy/reference-only retrieval projection (truncated or projected).
  */
 export const Dense384Schema = z
   .object({
@@ -146,6 +147,115 @@ export const ClassifiersSchema = z
   });
 
 export type Classifiers = z.infer<typeof ClassifiersSchema>;
+
+/**
+ * Classifier feature manifests keep the semantic slice width separate from the
+ * total model feature width.
+ *
+ * The semantic segment is fixed at 768 because it is sourced from the
+ * canonical semantic_768 lane. Downstream models may concatenate additional
+ * lexical, AST, concept, graph, or topology features, so the total width must
+ * be derived from the manifest rather than assumed to be 768.
+ */
+export const ClassifierSemanticSegmentSchema = z
+  .object({
+    representation_id: z.literal('semantic_768'),
+    offset: z.number().int().nonnegative(),
+    width: z.literal(768),
+    model_id: z.string().min(1),
+    model_revision: z.string().min(1),
+  })
+  .strict();
+
+export const ClassifierAuxSegmentSchema = z
+  .object({
+    offset: z.number().int().nonnegative(),
+    width: z.number().int().positive(),
+    revision: z.string().min(1),
+  })
+  .strict();
+
+export const ClassifierTopologySegmentSchema = z
+  .object({
+    offset: z.number().int().nonnegative(),
+    width: z.union([z.literal(64), z.literal(128)]),
+    representation_id: z.enum(['latent_64', 'latent_128']),
+    encoder_revision: z.string().min(1),
+  })
+  .strict();
+
+export const ClassifierFeatureManifestSchema = z
+  .object({
+    schema_version: z.literal('atlas.classifier.features.v1'),
+    semantic: ClassifierSemanticSegmentSchema,
+    lexical: ClassifierAuxSegmentSchema,
+    ast: ClassifierAuxSegmentSchema,
+    concepts: ClassifierAuxSegmentSchema.optional(),
+    graph: ClassifierAuxSegmentSchema.optional(),
+    topology: ClassifierTopologySegmentSchema.optional(),
+    total_width: z.number().int().positive(),
+  })
+  .strict()
+  .superRefine((manifest, ctx) => {
+    const segments = [
+      manifest.semantic,
+      manifest.lexical,
+      manifest.ast,
+      manifest.concepts,
+      manifest.graph,
+      manifest.topology,
+    ].filter(Boolean) as Array<
+      | z.infer<typeof ClassifierSemanticSegmentSchema>
+      | z.infer<typeof ClassifierAuxSegmentSchema>
+      | z.infer<typeof ClassifierTopologySegmentSchema>
+    >;
+
+    let end = 0;
+    for (const [index, segment] of segments
+      .slice()
+      .sort((left, right) => left.offset - right.offset)
+      .entries()) {
+      const segmentEnd = segment.offset + segment.width;
+      if (index > 0 && segment.offset < end) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['lexical'],
+          message:
+            'Classifier feature segments must not overlap and must be ordered by offset',
+        });
+        break;
+      }
+
+      end = Math.max(end, segmentEnd);
+    }
+
+    if (manifest.semantic.width !== 768) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['semantic', 'width'],
+        message: 'Semantic segment width must be exactly 768',
+      });
+    }
+
+    if (manifest.total_width !== end) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['total_width'],
+        message: `Classifier total width must equal the derived segment extent (${end})`,
+      });
+    }
+  });
+
+export type ClassifierSemanticSegment = z.infer<
+  typeof ClassifierSemanticSegmentSchema
+>;
+export type ClassifierAuxSegment = z.infer<typeof ClassifierAuxSegmentSchema>;
+export type ClassifierTopologySegment = z.infer<
+  typeof ClassifierTopologySegmentSchema
+>;
+export type ClassifierFeatureManifest = z.infer<
+  typeof ClassifierFeatureManifestSchema
+>;
 
 /**
  * Full Feature Matrix Row V1 schema.

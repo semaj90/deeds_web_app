@@ -80,7 +80,7 @@ export class CuVSClient {
   /**
    * Search GPU index for k nearest neighbors
    *
-   * @param query 384-dim query vector (Float32Array or number[])
+   * @param query 768-dim query vector (Float32Array or number[])
    * @returns CuVSResult with indices and distances
    * @throws Error if cuVS service is unavailable (caller must handle fallback)
    */
@@ -88,8 +88,8 @@ export class CuVSClient {
     // Ensure query is Float32Array
     const queryVec = query instanceof Float32Array ? query : new Float32Array(query);
 
-    if (queryVec.length !== 384) {
-      throw new Error(`Query dimension mismatch: expected 384, got ${queryVec.length}`);
+    if (queryVec.length !== 768) {
+      throw new Error(`Query dimension mismatch: expected 768, got ${queryVec.length}`);
     }
 
     try {

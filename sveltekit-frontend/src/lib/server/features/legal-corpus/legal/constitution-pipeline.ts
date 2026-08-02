@@ -311,8 +311,8 @@ export async function runConstitutionPipeline(
 			const pdfBuffer = await getFile(BUCKET, fetchResult.rawMinioKey);
 
 			try {
-				const pdfParse = (await import('pdf-parse')).default;
-				const data = await pdfParse(pdfBuffer);
+				const { parsePdfBuffer } = await import('$lib/server/pdf/pdf-parser.js');
+				const data = await parsePdfBuffer(pdfBuffer);
 				fullText = data.text;
 				normalizedResult = normalizePlainText(fullText);
 			} catch {
