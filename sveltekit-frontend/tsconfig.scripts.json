@@ -1,0 +1,21 @@
+{
+  "$comment": "Standalone Node/TypeScript scripts (scripts/atlas/**/*.mts, .ts) - deliberately NOT extending ./tsconfig.json. That config uses moduleResolution:bundler for SvelteKit; these scripts run standalone via tsx with NodeNext module resolution. Mixing the two resolution modes in one config is exactly the drift this file exists to avoid. Real finding while wiring this (2026-08-01): scripts/atlas genuinely imports $lib/server/* and reaches into src/lib/server/* directly (verified via a first, stricter version of this config that failed with TS2307/TS6059 across ~10+ files) - tsx resolves this fine at runtime via tsconfig path mapping, but a standalone tsc/tsgo check needs the same $lib mapping explicitly, and no rootDir restriction (these scripts are NOT a self-contained subtree - they depend on src/lib/server/*, which is real, existing architecture, not something to pretend away here).",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowJs": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "$lib/*": ["./src/lib/*"],
+      "$lib": ["./src/lib"]
+    }
+  },
+  "include": ["scripts/atlas/**/*.ts", "scripts/atlas/**/*.mts"],
+  "exclude": ["node_modules", ".svelte-kit", "build", "packages"]
+}

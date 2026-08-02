@@ -32,6 +32,8 @@
     "smoke:trace": "node ../scripts/atlas/mcp-opencode-health-probe.mjs",
     "smoke:trace:full": "node ../scripts/atlas/smoke-hyperrag-packet-rpc.mjs",
     "typecheck:native": "tsgo --noEmit",
+    "check:scripts:stable": "tsc -p tsconfig.scripts.json --noEmit",
+    "check:scripts:native": "tsgo -p tsconfig.scripts.json --noEmit",
     "typecheck:retrieval": "tsc --noEmit --skipLibCheck -p tsconfig.retrieval.json 2>&1 | grep 'retrieval/' || true",
     "lint": "eslint .",
     "turbo:start": "pwsh -NoProfile -ExecutionPolicy Bypass -File ../scripts/launch-turboquant.ps1",
