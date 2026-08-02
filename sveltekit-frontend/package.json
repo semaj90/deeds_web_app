@@ -568,6 +568,7 @@
     "atlas:phase13:acp:dry": "node ../scripts/atlas/phase13-acp-dispatcher.mjs --dry-run --limit=100",
     "atlas:phase13:acp:apply": "node ../scripts/atlas/phase13-acp-dispatcher.mjs --apply",
     "atlas:validate:langgraph-deps": "node ../scripts/atlas/validate-langgraph-dependencies.mjs",
+    "atlas:validate:script-runners": "node ../scripts/atlas/validate-script-runners.mjs",
     "atlas:dispatcher:worker": "tsx scripts/atlas/dispatcher-worker-bootstrap.mts",
     "atlas:dispatcher:worker:dry-run": "tsx scripts/atlas/dispatcher-worker-bootstrap.mts -- --dry-run",
     "atlas:dispatcher:worker:smoke": "tsx scripts/atlas/dispatcher-worker-bootstrap.mts -- --smoke",
