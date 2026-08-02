@@ -1,8 +1,15 @@
 // @ts-nocheck
 /**
  * Node: Bitmap Gate Scoring
- * Uses Redis/Valkey bitmaps for 500-2000× faster gate readiness scoring
- * Decision: Classify packet readiness via bit vector operations
+ * Decision: classify packet readiness via a bitmap gate-scoring provider.
+ *
+ * No real provider exists yet (see ../cache/packet-bitmap.ts) —
+ * getPacketBitmapProvider() currently always returns null, and this node
+ * reports an explicit not_configured/quarantine result for every
+ * candidate rather than fabricating a score. The previous docstring
+ * claimed "500-2000x faster gate readiness scoring"; that described a
+ * capability that was never implemented, so it's removed rather than
+ * carried forward unproven.
  */
 
 import type { DispatcherState, NodeContext } from './types.js';
@@ -13,8 +20,7 @@ import {
   nodeEntry,
   nodeExit,
 } from './node-helpers.js';
-import { PacketBitmapCache } from '../cache/packet-bitmap.js';
-import { getRedis } from '../../redis.js';
+import { getPacketBitmapProvider, bitmapGateNotConfigured } from '../cache/packet-bitmap.js';
 
 export async function nodeBitmapGateScoring(
   state: DispatcherState,
@@ -27,13 +33,28 @@ export async function nodeBitmapGateScoring(
   try {
     let current = updateSynthesisPath(state, nodeName);
 
-    const redis = getRedis();
-    const bitmap = new PacketBitmapCache(redis);
+    const bitmapProvider = getPacketBitmapProvider();
 
     const scoringResults = [];
 
     for (const candidate of state.candidates) {
-      const { gatesPass, ready } = await bitmap.getReadiness(candidate.packet_key);
+      if (!bitmapProvider) {
+        // Capability absent — explicit not_configured/quarantine, not a
+        // fabricated score. See ../cache/packet-bitmap.ts.
+        const notConfigured = bitmapGateNotConfigured();
+        scoringResults.push({
+          packet_key: candidate.packet_key,
+          gates_pass: 0,
+          ready: notConfigured.ready,
+          decision: 'quarantine' as const,
+          confidence: 0,
+          status: notConfigured.status,
+          reason: notConfigured.reason,
+        });
+        continue;
+      }
+
+      const { gatesPass, ready } = await bitmapProvider.getReadiness(candidate.packet_key);
 
       const decision =
         ready
@@ -50,6 +71,7 @@ export async function nodeBitmapGateScoring(
         ready,
         decision,
         confidence: gateConfidence,
+        status: 'success' as const,
       });
     }
 
@@ -83,7 +105,7 @@ export async function nodeBitmapGateScoring(
           bitmap_latency_ms: totalDuration,
           gates_pass: passCount,
           quarantined: quarantineCount,
-          validation_method: 'bitmap',
+          validation_method: bitmapProvider ? 'bitmap' : 'bitmap:not_configured',
         },
       };
     } else {
@@ -97,7 +119,7 @@ export async function nodeBitmapGateScoring(
           bitmap_latency_ms: totalDuration,
           gates_pass: passCount,
           quarantined: quarantineCount,
-          validation_method: 'bitmap',
+          validation_method: bitmapProvider ? 'bitmap' : 'bitmap:not_configured',
         },
       };
     }

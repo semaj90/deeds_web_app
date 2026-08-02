@@ -8,7 +8,7 @@ import { pgTable, bigserial, varchar, real, integer, jsonb, text, timestamp, ind
 export const dispatcherAuditLog = pgTable(
   'dispatcher_audit_log',
   {
-    id: bigserial('id').primaryKey(),
+    id: bigserial('id', { mode: 'number' }).primaryKey(),
 
     // Identity
     packet_key: varchar('packet_key', { length: 255 }).notNull(),
