@@ -408,7 +408,7 @@ try {
 
   if (!dryRun && chunksWithEmbeddings.length > 0) {
     // Convert chunks to Qdrant points
-    const points = chunksWithEmbeddings.map((chunk, idx) => ({
+    const points = chunksWithEmbeddings.map((chunk) => ({
       id: chunk.id,
       vector: {
         content: validateVector768(chunk._embedding_768),

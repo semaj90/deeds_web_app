@@ -1,7 +1,7 @@
 # Summary Index Ranker
 
-Generated: 2026-07-30T07:32:54.653Z
-Mode: dry-run
+Generated: 2026-08-01T19:14:34.664Z
+Mode: apply
 Source of truth: postgres.atlas_summary_layers + atlas_packets
 
 ## Stats
@@ -16,7 +16,7 @@ Source of truth: postgres.atlas_summary_layers + atlas_packets
 ## Redis index
 
 - Key: `bitfrost:summary:index:ranked:v1`
-- Applied: no
+- Applied: yes
 
 ## Top packets
 

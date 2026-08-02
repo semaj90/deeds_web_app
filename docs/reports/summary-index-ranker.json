@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-30T07:32:54.653Z",
-  "mode": "dry-run",
+  "generated_at": "2026-08-01T19:14:34.664Z",
+  "mode": "apply",
   "source_of_truth": "postgres.atlas_summary_layers + atlas_packets",
   "redis_index": {
-    "applied": false,
+    "applied": true,
     "key": "bitfrost:summary:index:ranked:v1",
     "count": 5000
   },

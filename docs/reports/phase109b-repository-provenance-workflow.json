@@ -1,43 +1,43 @@
 {
-  "runId": "5631fe81-aef4-486d-8e68-2043461f2560",
+  "runId": "080243db-79c1-4f60-9d2e-19515459dc48",
   "repoRoot": "C:/Users/james/Videos/deeds-web-app",
-  "repositoryRevision": "6c41beff705a8d6b0396838f834a1ce5c5f124f1",
-  "generatedAt": "2026-07-30T01:03:03.713Z",
+  "repositoryRevision": "992690a55cb50935ecf3d57bd5d2e7e64391920d",
+  "generatedAt": "2026-08-01T17:24:24.198Z",
   "stages": {
     "snapshot": {
       "status": "PROVEN",
-      "totalFiles": 28374,
-      "totalBytes": 288797722,
-      "currentRevision": "6c41beff705a8d6b0396838f834a1ce5c5f124f1",
-      "priorRevision": "6c41beff705a8d6b0396838f834a1ce5c5f124f1"
+      "totalFiles": 28549,
+      "totalBytes": 292178416,
+      "currentRevision": "992690a55cb50935ecf3d57bd5d2e7e64391920d",
+      "priorRevision": "4b6597bb7c3e2081c713f052a1147863a2d63576"
     },
     "inventory": {
       "status": "PROVEN",
-      "totalFiles": 28374,
-      "codeFiles": 13399,
-      "documentationFiles": 9107,
-      "configFiles": 1300,
-      "otherFiles": 4568,
+      "totalFiles": 28549,
+      "codeFiles": 13511,
+      "documentationFiles": 9149,
+      "configFiles": 1320,
+      "otherFiles": 4569,
       "topExtensions": [
         {
           "extension": ".md",
-          "count": 9087
+          "count": 9129
         },
         {
           "extension": ".ts",
-          "count": 7337
+          "count": 7407
         },
         {
           "extension": ".mjs",
-          "count": 2984
+          "count": 3010
         },
         {
           "extension": ".json",
-          "count": 1223
+          "count": 1242
         },
         {
           "extension": ".py",
-          "count": 1013
+          "count": 1015
         },
         {
           "extension": ".svelte",
@@ -53,11 +53,11 @@
         },
         {
           "extension": ".disabled",
-          "count": 786
+          "count": 787
         },
         {
           "extension": ".sql",
-          "count": 545
+          "count": 549
         },
         {
           "extension": ".batch1000-backup",
@@ -71,16 +71,16 @@
     },
     "structural": {
       "status": "PROVEN",
-      "filesProcessed": 28374,
-      "filesWithStructure": 9145,
-      "factCount": 76227,
-      "functionCount": 39495,
-      "classCount": 1796,
-      "interfaceCount": 1804,
-      "methodCount": 5734,
+      "filesProcessed": 28549,
+      "filesWithStructure": 9239,
+      "factCount": 77190,
+      "functionCount": 40063,
+      "classCount": 1817,
+      "interfaceCount": 1822,
+      "methodCount": 5809,
       "importCount": 0,
-      "constCount": 6075,
-      "arrowCount": 21323,
+      "constCount": 6125,
+      "arrowCount": 21554,
       "samples": [
         {
           "filePath": "__tests__/data-hashing.spec.ts",
@@ -286,97 +286,97 @@
     },
     "identity": {
       "status": "PROVEN",
-      "uniqueIds": 76227,
+      "uniqueIds": 77190,
       "duplicateIds": 0,
-      "reusedIds": 76227,
+      "reusedIds": 77190,
       "supersededIds": 0
     },
     "lexical": {
       "status": "PROVEN",
-      "filesProcessed": 28374,
-      "entries": 28374,
-      "totalTokens": 25828530,
-      "totalUniqueTokens": 7966352,
+      "filesProcessed": 28549,
+      "entries": 28549,
+      "totalTokens": 26087127,
+      "totalUniqueTokens": 8034207,
       "topGlobalTerms": [
         {
           "term": "id",
-          "weight": 225870
+          "weight": 236634
         },
         {
           "term": "if",
-          "weight": 183297
+          "weight": 184692
         },
         {
           "term": "//",
-          "weight": 177247
+          "weight": 178794
         },
         {
           "term": "name",
-          "weight": 161078
+          "weight": 166967
         },
         {
           "term": "api",
-          "weight": 157862
+          "weight": 158271
         },
         {
           "term": "pagerank",
-          "weight": 154576
+          "weight": 154637
         },
         {
           "term": "filepath",
-          "weight": 151313
+          "weight": 151555
         },
         {
           "term": "string",
-          "weight": 147204
+          "weight": 149321
         },
         {
           "term": "community",
-          "weight": 144390
+          "weight": 144483
         },
         {
           "term": "unclassified",
-          "weight": 141265
+          "weight": 141282
         },
         {
           "term": "topoclass",
-          "weight": 139505
+          "weight": 139510
         },
         {
           "term": "communityid",
-          "weight": 139380
+          "weight": 139381
         },
         {
           "term": "graphauthorityscore",
-          "weight": 139140
+          "weight": 139145
         },
         {
           "term": "error",
-          "weight": 133863
+          "weight": 134891
         },
         {
           "term": "routes",
-          "weight": 131291
+          "weight": 131502
         },
         {
           "term": "sveltekit",
-          "weight": 127795
+          "weight": 128098
         },
         {
           "term": "frontend",
-          "weight": 124760
+          "weight": 125075
         },
         {
           "term": "to",
-          "weight": 117952
-        },
-        {
-          "term": "app",
-          "weight": 91718
+          "weight": 118871
         },
         {
           "term": "text",
-          "weight": 91687
+          "weight": 94288
+        },
+        {
+          "term": "app",
+          "weight": 91705
         }
       ],
       "samples": [
@@ -1606,12 +1606,12 @@
         },
         {
           "filePath": ".claude/ATLAS-ENGINEERING-PROMPT.md",
-          "tokenCount": 3459,
-          "uniqueTokenCount": 1437,
+          "tokenCount": 3467,
+          "uniqueTokenCount": 1442,
           "topTerms": [
             {
               "term": "atlas",
-              "weight": 49
+              "weight": 50
             },
             {
               "term": "string",
@@ -1734,11 +1734,11 @@
               "weight": 13
             },
             {
-              "term": "branch",
+              "term": "768",
               "weight": 12
             }
           ],
-          "hash": "e203148cc6976e162517e2ec3ebb78167e4e31efd3d78373509438d81db68d9f"
+          "hash": "897b7ab2374dccd41973bd5e775bc234de0b022ff12706ee517743737a82d3f9"
         },
         {
           "filePath": ".claude/CLAUDE.md",
@@ -2139,10 +2139,10 @@
     },
     "relationships": {
       "status": "PROVEN",
-      "entries": 152454,
-      "containsEdges": 76227,
+      "entries": 154380,
+      "containsEdges": 77190,
       "importEdges": 0,
-      "declaresEdges": 76227,
+      "declaresEdges": 77190,
       "samples": [
         {
           "subjectId": "35000bc035cc20349f3415aa997469ea75b4256da31d0a23671a881753312c6c",
@@ -2348,38 +2348,38 @@
     },
     "labeling": {
       "status": "PROVEN",
-      "filesProcessed": 28374,
+      "filesProcessed": 28549,
       "domainCounts": {
-        "test": 457,
-        "feature": 3083,
-        "config": 1357,
-        "graph": 429,
-        "api": 6385,
-        "ai": 1095,
-        "ui": 6749,
+        "test": 460,
+        "feature": 3107,
+        "config": 1362,
+        "graph": 437,
+        "api": 6395,
+        "ai": 1099,
+        "ui": 6794,
         "gpu": 805,
-        "retrieval": 3191,
-        "indexer": 1287,
-        "cache": 2163,
-        "auth": 1354,
-        "vector": 19
+        "auth": 1369,
+        "retrieval": 3218,
+        "indexer": 1314,
+        "cache": 2168,
+        "vector": 21
       },
       "ontologyCounts": {
-        "utility": 22457,
-        "model": 1760,
-        "service": 1114,
-        "manager": 1845,
-        "adapter": 674,
+        "utility": 22591,
+        "model": 1777,
+        "adapter": 683,
+        "service": 1123,
+        "manager": 1851,
         "handler": 408,
         "client": 36,
         "bridge": 80
       },
       "tierCounts": {
-        "test": 1979,
-        "feature": 24115,
+        "test": 2008,
+        "feature": 24230,
         "internal": 254,
-        "middleware": 1764,
-        "core": 262
+        "middleware": 1791,
+        "core": 266
       },
       "sampleLabels": [
         {
@@ -2483,10 +2483,10 @@
     },
     "projection": {
       "status": "PROVEN",
-      "postgresCanonicalRecords": 28374,
+      "postgresCanonicalRecords": 28549,
       "qdrantProjectionRecords": 24,
-      "neo4jProjectionRecords": 152454,
-      "redisProjectionRecords": 28374,
+      "neo4jProjectionRecords": 154380,
+      "redisProjectionRecords": 28549,
       "representationName": "semantic_768",
       "denseVectorName": "content",
       "collectionName": "codebase_chunks_768_v2"
@@ -2495,7 +2495,7 @@
       "status": "PROVEN",
       "missingHashes": 0,
       "malformedHashes": 0,
-      "duplicateFileHashes": 1786,
+      "duplicateFileHashes": 1781,
       "missingStructuralIds": 0,
       "semanticDimensionMismatches": 0,
       "pass": true
@@ -2522,29 +2522,29 @@
     "incremental": {
       "status": "PROVEN",
       "priorReportFound": true,
-      "reusedFiles": 28374,
+      "reusedFiles": 28549,
       "invalidatedFiles": 0,
       "reusedRatio": 1
     }
   },
   "outputs": {
-    "outputDir": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b",
-    "latestReportPath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/latest.json",
-    "markdownReportPath": "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/latest.md",
+    "outputDir": "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b",
+    "latestReportPath": "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/latest.json",
+    "markdownReportPath": "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/latest.md",
     "stageArtifacts": [
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-0-snapshot.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-1-inventory.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-2-structural.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-3-identity.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-4-lexical.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-5-semantic.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-6-relationships.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-7-labeling.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-8-gpu.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-9-projection.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-10-validation.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-11-evaluation.json",
-      "C:/Users/james/Videos/deeds-web-app/sveltekit-frontend/.tmp/phase109b/stage-12-incremental.json"
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-0-snapshot.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-1-inventory.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-2-structural.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-3-identity.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-4-lexical.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-5-semantic.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-6-relationships.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-7-labeling.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-8-gpu.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-9-projection.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-10-validation.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-11-evaluation.json",
+      "C:/Users/james/Videos/deeds-web-app/.tmp/phase109b/stage-12-incremental.json"
     ]
   }
 }

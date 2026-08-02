@@ -1,38 +1,38 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-07-30T20:43:36.750Z",
+  "generatedAt": "2026-08-01T19:14:16.368Z",
   "mode": "apply",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
   "outputManifest": ".tmp/addressable-packets.manifest.json",
   "summary": {
     "sourceTable": "atlas_packets",
-    "tableRows": 5,
-    "materializedRows": 5,
-    "addressableRows": 5,
-    "qdrantBackedRows": 5,
-    "qdrantCollectionRows": 5,
+    "tableRows": 61659,
+    "materializedRows": 61659,
+    "addressableRows": 61658,
+    "qdrantBackedRows": 4824,
+    "qdrantCollectionRows": 4726,
     "conceptsRows": 0,
-    "bm25Rows": 5,
-    "embeddingRefRows": 5,
-    "evidenceMatchedRows": 0,
+    "bm25Rows": 61659,
+    "embeddingRefRows": 4726,
+    "evidenceMatchedRows": 10474,
     "missingFeatureId": 0,
-    "missingCanonicalSourceRef": 0,
-    "missingQdrantPointId": 0,
-    "missingQdrantCollection": 0,
+    "missingCanonicalSourceRef": 1,
+    "missingQdrantPointId": 56835,
+    "missingQdrantCollection": 56933,
     "duplicatePacketsSkipped": 0,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 5
+        "count": 7982
       },
       {
         "key": "schema_stub",
-        "count": 0
+        "count": 1061
       },
       {
         "key": "mcp_tool_stub",
-        "count": 0
+        "count": 703
       },
       {
         "key": "legacy_qdrant_only",
@@ -53,55 +53,58 @@
     "0bffe0382a0d44bb",
     "0ee918abc8c53e8d",
     "1703d9c005252a62",
-    "175066b8a4ceee3c"
+    "175066b8a4ceee3c",
+    "17dc1fe9f5f8a021",
+    "1d5eba7211dea6f9",
+    "1dc5ac2b3cd9bfe8"
   ],
-  "outputSha256": "7084bc8c473ec251ca9c291594e028738284de23609d0d0c78a2007efb06df3a",
+  "outputSha256": "736f4fce46e594b0a64fc02f14d76fc02f1727b4aa3fba2782ac3646a2b89d60",
   "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
   "stagingPath": ".tmp/addressable-packets.ndjson.stage",
   "interrupted": false,
   "proof": {
     "batchingLogic": "PROVEN",
-    "fullMaterialization": "NOT_YET_PROVEN",
+    "fullMaterialization": "PROVEN",
     "resumeSemantics": "RESUME_SEMANTICS_NOT_YET_PROVEN",
     "atomicPublication": "PROVEN",
     "qdrantMirror": "PROVEN",
-    "identityCoverage": "COMPLETE"
+    "identityCoverage": "STILL_PARTIAL"
   },
   "proofStates": [
     "BATCHING_LOGIC_PROVEN",
-    "FULL_MATERIALIZATION_NOT_YET_PROVEN",
+    "FULL_MATERIALIZATION_PROVEN",
     "RESUME_SEMANTICS_NOT_YET_PROVEN",
     "ATOMIC_PUBLICATION_PROVEN",
     "QDRANT_MIRROR_PROVEN",
-    "IDENTITY_COVERAGE_COMPLETE"
+    "IDENTITY_COVERAGE_STILL_PARTIAL"
   ],
   "loadStats": {
-    "batches": 1,
-    "rows": 5,
-    "totalQueryElapsedMs": 60,
+    "batches": 62,
+    "rows": 61659,
+    "totalQueryElapsedMs": 22812,
     "totalParseElapsedMs": 0,
-    "maxQueryElapsedMs": 60,
+    "maxQueryElapsedMs": 1880,
     "maxParseElapsedMs": 0,
-    "maxRawBytes": 71288,
-    "maxNormalizedBytes": 71286
+    "maxRawBytes": 17969144,
+    "maxNormalizedBytes": 17969142
   },
   "status": "MATERIALIZED",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "checkpoint": {
     "schema": "addressable_packets_materialization_checkpoint.v1",
-    "generatedAt": "2026-07-30T20:43:36.748Z",
+    "generatedAt": "2026-08-01T19:14:15.328Z",
     "sourceTable": "atlas_packets",
-    "limit": 5,
+    "limit": 0,
     "batchSize": 1000,
     "orderHash": "dae4870f6c5e1a740137aa8d9521d12f99b0aae37664ce4c8f728048fc9a21ea",
-    "rowsWritten": 5,
-    "nextOffset": 5,
+    "rowsWritten": 61659,
+    "nextOffset": 61659,
     "nextCursor": [
       0,
-      "175066b8a4ceee3c"
+      "packet:fd1254ef5d27"
     ],
-    "batchNumber": 1,
-    "rowsRead": 5,
+    "batchNumber": 62,
+    "rowsRead": 61659,
     "interrupted": false,
     "resumeFromCheckpoint": false
   },
@@ -178,6 +181,54 @@
       "qdrant_collection": "codebase_chunks_768",
       "qdrant_point_id": "7602461015851946000",
       "bm25_text": "This group summarizes the functionality of applying a stored orthogonal transformation to project vectors. Retrieval should focus on the 'transform' concept within the 'turbovec' d",
+      "concepts": [],
+      "tags": [
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
+        "qdrant_chunk"
+      ]
+    },
+    {
+      "packet_key": "17dc1fe9f5f8a021",
+      "source_ref": "proto:CodeIntelService.GetJobStatus",
+      "feature_id": "grpc_service",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "2247177181138465500",
+      "bm25_text": "This group documents the status checking mechanism for an enrichment job within the CodeIntel service. To retrieve the current status, the operator should use the gRPC client stub ",
+      "concepts": [],
+      "tags": [
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
+        "qdrant_chunk"
+      ]
+    },
+    {
+      "packet_key": "1d5eba7211dea6f9",
+      "source_ref": "proto:ChatAssistantService.SendMessage",
+      "feature_id": "grpc_service",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "2565377371098813400",
+      "bm25_text": "This group summarizes the functionality for sending messages via a gRPC service. It should be retrieved when the user intends to send a message and expects a complete response. The",
+      "concepts": [],
+      "tags": [
+        "canonical",
+        "codebase_chunks_768",
+        "gRPC Proto Services",
+        "qdrant_chunk"
+      ]
+    },
+    {
+      "packet_key": "1dc5ac2b3cd9bfe8",
+      "source_ref": "proto:LibrarySearchService.StreamLibrary",
+      "feature_id": "grpc_service",
+      "packet_kind": "qdrant_chunk",
+      "qdrant_collection": "codebase_chunks_768",
+      "qdrant_point_id": "7101807950526120000",
+      "bm25_text": "This packet group summarizes the implementation of streaming capabilities within the library search service. It is retrieved by identifying the feature ID 'grpc_service' within the",
       "concepts": [],
       "tags": [
         "canonical",

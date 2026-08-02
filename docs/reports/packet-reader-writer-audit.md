@@ -1,46 +1,46 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-07-30T20:43:36.750Z
+Generated: 2026-08-01T19:14:16.368Z
 Status: MATERIALIZED
 Source table: atlas_packets
 
 ## Summary
 
-- ledger rows: 5
-- materialized rows: 5
-- addressable rows: 5
-- qdrant-backed rows: 5
-- qdrant collection rows: 5
-- bm25 rows: 5
+- ledger rows: 61659
+- materialized rows: 61659
+- addressable rows: 61658
+- qdrant-backed rows: 4824
+- qdrant collection rows: 4726
+- bm25 rows: 61659
 - concepts rows: 0
-- embedding ref rows: 5
-- evidence matches: 0
-- load batches: 1
-- max page query ms: 60
+- embedding ref rows: 4726
+- evidence matches: 10474
+- load batches: 62
+- max page query ms: 1880
 - max page parse ms: 0
-- max page raw bytes: 71288
-- max page normalized bytes: 71286
+- max page raw bytes: 17969144
+- max page normalized bytes: 17969142
 - missing feature_id: 0
-- missing canonical_source_ref: 0
-- missing qdrant_point_id: 0
-- missing qdrant_collection: 0
+- missing canonical_source_ref: 1
+- missing qdrant_point_id: 56835
+- missing qdrant_collection: 56933
 - duplicate packets skipped: 0
 
 ## Proof
 
 - batching logic: PROVEN
-- full materialization: NOT_YET_PROVEN
+- full materialization: PROVEN
 - resume semantics: RESUME_SEMANTICS_NOT_YET_PROVEN
 - atomic publication: PROVEN
 - qdrant mirror: PROVEN
-- identity coverage: COMPLETE
-- proof states: BATCHING_LOGIC_PROVEN, FULL_MATERIALIZATION_NOT_YET_PROVEN, RESUME_SEMANTICS_NOT_YET_PROVEN, ATOMIC_PUBLICATION_PROVEN, QDRANT_MIRROR_PROVEN, IDENTITY_COVERAGE_COMPLETE
+- identity coverage: STILL_PARTIAL
+- proof states: BATCHING_LOGIC_PROVEN, FULL_MATERIALIZATION_PROVEN, RESUME_SEMANTICS_NOT_YET_PROVEN, ATOMIC_PUBLICATION_PROVEN, QDRANT_MIRROR_PROVEN, IDENTITY_COVERAGE_STILL_PARTIAL
 
 ## Packet Kind Counts
 
-- qdrant_chunk: 5
-- schema_stub: 0
-- mcp_tool_stub: 0
+- qdrant_chunk: 7982
+- schema_stub: 1061
+- mcp_tool_stub: 703
 - legacy_qdrant_only: 0
 - unknown: 0
 
@@ -55,7 +55,7 @@ Source table: atlas_packets
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: 7084bc8c473ec251ca9c291594e028738284de23609d0d0c78a2007efb06df3a
+- sha256: 736f4fce46e594b0a64fc02f14d76fc02f1727b4aa3fba2782ac3646a2b89d60
 
 ## Samples
 
@@ -64,6 +64,9 @@ Source table: atlas_packets
 - 0ee918abc8c53e8d | qdrant_chunk | grpc_service | codebase_chunks_768
 - 1703d9c005252a62 | qdrant_chunk | grpc_service | codebase_chunks_768
 - 175066b8a4ceee3c | qdrant_chunk | grpc_service | codebase_chunks_768
+- 17dc1fe9f5f8a021 | qdrant_chunk | grpc_service | codebase_chunks_768
+- 1d5eba7211dea6f9 | qdrant_chunk | grpc_service | codebase_chunks_768
+- 1dc5ac2b3cd9bfe8 | qdrant_chunk | grpc_service | codebase_chunks_768
 
 ## Next Safe Action
 

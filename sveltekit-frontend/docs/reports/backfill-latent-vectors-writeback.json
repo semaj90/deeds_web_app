@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-08-01T19:31:39.552Z",
+  "total_processed": 105761,
+  "postgres": {
+    "updated": 174621,
+    "notMatched": 0,
+    "matchRate": 165.11
+  },
+  "reasons": {
+    "qdrant_point_id": 2894,
+    "packet_key": 1,
+    "source_ref": 171726,
+    "jsonb_fallback": 0,
+    "skipped": 0
+  }
+}

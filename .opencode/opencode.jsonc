@@ -17,7 +17,7 @@
           "tools": true,
           "reasoning": true,
           "limit": {
-            "context": 32768,
+            "context": 65536,
             "output": 4096,
           },
           "options": {

@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-08-01T19:06:55.180Z",
+  "mode": "dry-run",
+  "dryRun": true,
+  "stages": {},
+  "errors": [
+    "Another orchestrator is running (lock age: 990s). Wait for completion or delete C:\\Users\\james\\Videos\\deeds-web-app\\.graphify-pipeline-lock."
+  ],
+  "summary": {
+    "success": false,
+    "message": "",
+    "elapsed_ms": 2
+  }
+}

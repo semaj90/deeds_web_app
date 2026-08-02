@@ -32,6 +32,7 @@ export interface SearchResult {
 
 export interface ParallelSearchOptions {
   topK?: number;
+  includeQdrant?: boolean;
   includeTurboVec?: boolean;
   includeRedis?: boolean;
   includeFts?: boolean;
@@ -68,7 +69,7 @@ async function asSuccessLane(promise: Promise<SearchResult[]>): Promise<LaneOutc
 
 export async function parallelRetrieve(
   query: string,
-  queryVector: Float32Array, // 768-dim embedding
+  queryVector: Float32Array | null, // 768-dim embedding; null when no embedding is available
   options: ParallelSearchOptions = {}
 ): Promise<ParallelRetrieveResult> {
   const topK = options.topK ?? 10;
@@ -76,8 +77,16 @@ export async function parallelRetrieve(
 
   // Fan out to 5 lanes in parallel
   const results = await Promise.allSettled<LaneOutcome>([
-    // Lane 1: Qdrant ANN (768-dim)
-    asSuccessLane(searchQdrant(queryVector, topK, timeout)),
+    // Lane 1: Qdrant ANN (768-dim) — not_configured (not a bare empty
+    // success) when disabled or when no query embedding was produced,
+    // same reasoning as the other optional lanes below.
+    options.includeQdrant !== false && queryVector
+      ? asSuccessLane(searchQdrant(queryVector, topK, timeout))
+      : Promise.resolve({
+          results: [],
+          status: 'not_configured',
+          reason: !queryVector ? 'embedding_unavailable' : 'lane_disabled',
+        } as const),
 
     // Lane 2: TurboVec sparse (384-dim, optional) — not yet implemented, see
     // searchTurboVec below; reports not_configured rather than a bare empty

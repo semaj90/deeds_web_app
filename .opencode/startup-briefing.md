@@ -56,7 +56,7 @@ Hello James.
 2. With the Qdrant tag mirror applied, move to the Neo4j / GDS PageRank pass until graph scores, community labels, and sourceRef projection are fully applied.
 3. The Neo4j sourceRef projection is now applied; move to SOM 20x20 / auto-clustering once the graph lane is stable.
 4. With Redis centroid and Bitfrost warm lanes applied, move retrieval work toward HyperRAG fusion rather than more cache mirroring.
-5. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before Gemma4 synthesis.
+5. Keep runtime evidence packetization on the admin-side path: turn Playwright, dev:gpu output, server logs, and cache events into chrom97 packets before ornith Gemma4 synthesis.
 
 ## Notes
 
