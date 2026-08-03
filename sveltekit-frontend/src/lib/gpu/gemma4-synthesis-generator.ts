@@ -9,6 +9,34 @@
 
 import type { DecomposedQuery } from './gemma4-policy-orchestrator';
 import type { ACEContext } from '../server/ace/types';
+import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
+import {
+  resolveLoadedLlamaModel,
+  LlamaServerUnreachableError,
+  LlamaServerNoModelError,
+  LlamaServerModelResponseInvalidError,
+} from '$lib/server/ai/llama-server-model-resolver.js';
+
+/**
+ * ACEContext has no `selectedPackets`/`evidence`/`contextWindow` fields —
+ * this file was written against a shape that never matched the real
+ * ACEContext (src/lib/server/ace/types.ts). The real evidence surface is
+ * the four chunk arrays below; merge them into one packet list.
+ */
+function collectEvidencePackets(aceContext: ACEContext): UnifiedRetrievalResult[] {
+  return [
+    ...aceContext.ragChunks,
+    ...aceContext.kbChunks,
+    ...aceContext.caseChunks,
+    ...aceContext.docChunks,
+  ];
+}
+
+/** Rough token estimate (chars/4) — ACEContext carries no token-budget field to read instead. */
+function estimateTokens(packets: UnifiedRetrievalResult[]): number {
+  const chars = packets.reduce((sum, p) => sum + (p.content?.length ?? 0), 0);
+  return Math.ceil(chars / 4);
+}
 
 interface SynthesisRequest {
   query: string;
@@ -59,19 +87,18 @@ Synthesize a comprehensive answer citing the evidence above.`;
 /**
  * Build evidence context string from ACE packets
  */
-function buildEvidenceContext(aceContext: ACEContext): string {
-  const packets = aceContext.selectedPackets.map((packet, idx) => {
-    const citation = aceContext.evidence[idx]?.citation || packet.sourceRef || 'unknown';
+function buildEvidenceContext(packets: UnifiedRetrievalResult[]): string {
+  const entries = packets.map((packet, idx) => {
+    const citation = packet.sourceRef || packet.packetKey || packet.id || 'unknown';
     return `
 [${idx + 1}] ${citation}
 Summary: ${packet.summary || 'No summary'}
-Type: ${aceContext.evidence[idx]?.type || 'unknown'}
-Score: ${(aceContext.evidence[idx]?.score || 0).toFixed(2)}
-Content: ${packet.metadata?.summary || packet.summary || '(no details)'}
+Kind: ${packet.kind}
+Content: ${packet.summary || packet.content || '(no details)'}
 `;
   });
 
-  return packets.join('\n---\n');
+  return entries.join('\n---\n');
 }
 
 /**
@@ -89,7 +116,8 @@ export async function synthesizeWithGemma4(
     temperature = 0.3
   } = request;
 
-  const evidenceContext = buildEvidenceContext(aceContext);
+  const packets = collectEvidencePackets(aceContext);
+  const evidenceContext = buildEvidenceContext(packets);
   const subgoalsText = decomposition.subgoals
     .map((sg) => `- ${sg.query} (priority: ${sg.priority})`)
     .join('\n');
@@ -98,8 +126,8 @@ export async function synthesizeWithGemma4(
     .replace('{QUERY}', query)
     .replace('{INTENT}', decomposition.intent)
     .replace('{SUBGOALS}', subgoalsText)
-    .replace('{PACKET_COUNT}', aceContext.selectedPackets.length.toString())
-    .replace('{TOKEN_COUNT}', aceContext.contextWindow.available.toString())
+    .replace('{PACKET_COUNT}', packets.length.toString())
+    .replace('{TOKEN_COUNT}', estimateTokens(packets).toString())
     .replace('{EVIDENCE}', evidenceContext);
 
   try {
@@ -137,7 +165,10 @@ export async function synthesizeWithGemma4(
 }
 
 /**
- * Call TurboQuant llama-server at :8090
+ * Call llama-server at :8090 (TurboQuant), streaming. Resolves the actually
+ * loaded model via GET /v1/models first — never assumes the configured
+ * model name is what's loaded, never sends a filesystem path hoping the
+ * server will load it.
  */
 async function callTurboQuantSynthesis(
   prompt: string,
@@ -145,9 +176,12 @@ async function callTurboQuantSynthesis(
   temperature: number
 ): Promise<SynthesisResponse | null> {
   const TURBO_QUANT_URL = process.env.TURBO_QUANT_URL || 'http://127.0.0.1:8090';
+  const configuredModel = process.env.GEMMA4_MODEL || 'gemma4-legal-iq4xs-direct.gguf';
   const timeout = 90_000; // 90s for thinking models
 
   try {
+    const { resolvedModel } = await resolveLoadedLlamaModel(TURBO_QUANT_URL, configuredModel);
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -155,7 +189,7 @@ async function callTurboQuantSynthesis(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-legal-iq4xs-direct.gguf',
+        model: resolvedModel,
         messages: [
           { role: 'system', content: 'You are a legal research synthesis assistant.' },
           { role: 'user', content: prompt }
@@ -178,7 +212,9 @@ async function callTurboQuantSynthesis(
     const answer = await parseStreamingResponse(response);
     return parseAndCiteSynthesis(answer);
   } catch (err) {
-    if (err instanceof Error && err.name === 'AbortError') {
+    if (err instanceof LlamaServerUnreachableError || err instanceof LlamaServerNoModelError || err instanceof LlamaServerModelResponseInvalidError) {
+      console.warn(`[Synthesis] ${err.code}:`, err.message);
+    } else if (err instanceof Error && err.name === 'AbortError') {
       console.warn('[Synthesis] TurboQuant timeout');
     } else {
       console.warn('[Synthesis] TurboQuant call failed:', err);
@@ -188,7 +224,10 @@ async function callTurboQuantSynthesis(
 }
 
 /**
- * Call llama-server at :8090 (fallback via MODEL_PREFERENCE)
+ * Non-streaming fallback call to the same llama-server at :8090. Also
+ * resolves the loaded model via GET /v1/models rather than the previous
+ * try-each-hardcoded-name loop (MODEL_PREFERENCE), which never checked
+ * what was actually loaded.
  */
 async function callOllamaSynthesis(
   prompt: string,
@@ -196,15 +235,17 @@ async function callOllamaSynthesis(
   temperature: number
 ): Promise<SynthesisResponse | null> {
   const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-  const MODEL_PREFERENCE = ['hforf', 'gemma4-legal-iq4xs-direct.gguf'];
+  const configuredModel = process.env.GEMMA4_MODEL || 'hforf';
 
-  for (const model of MODEL_PREFERENCE) {
+  try {
+    const { resolvedModel } = await resolveLoadedLlamaModel(LLAMA_SERVER_URL, configuredModel);
+
     try {
       const response = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model,
+          model: resolvedModel,
           messages: [
             { role: 'system', content: 'You are a legal research synthesis assistant.' },
             { role: 'user', content: prompt }
@@ -218,10 +259,7 @@ async function callOllamaSynthesis(
       });
 
       if (!response.ok) {
-        if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-          throw new Error(`llama-server HTTP ${response.status}`);
-        }
-        continue;
+        throw new Error(`llama-server HTTP ${response.status}`);
       }
 
       const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
@@ -229,14 +267,17 @@ async function callOllamaSynthesis(
 
       return parseAndCiteSynthesis(answerText);
     } catch (err) {
-      if (model === MODEL_PREFERENCE[MODEL_PREFERENCE.length - 1]) {
-        console.warn('[Synthesis] llama-server fallback chain exhausted:', err);
-        return null;
-      }
+      console.warn('[Synthesis] llama-server call failed:', err);
+      return null;
     }
+  } catch (err) {
+    if (err instanceof LlamaServerUnreachableError || err instanceof LlamaServerNoModelError || err instanceof LlamaServerModelResponseInvalidError) {
+      console.warn(`[Synthesis] ${err.code}:`, err.message);
+    } else {
+      console.warn('[Synthesis] llama-server model resolution failed:', err);
+    }
+    return null;
   }
-
-  return null;
 }
 
 /**
@@ -314,22 +355,23 @@ function parseAndCiteSynthesis(answerText: string): SynthesisResponse {
 /**
  * Fallback synthesis when LLM unavailable
  */
-function getFallbackSynthesis(query: string, aceContext: ACEContext): SynthesisResponse {
-  const summaries = aceContext.selectedPackets
-    .map((p, idx) => {
-      const citation = aceContext.evidence[idx]?.citation || 'unknown';
-      return `${p.summary} [${citation}]`;
+function getFallbackSynthesis(_query: string, aceContext: ACEContext): SynthesisResponse {
+  const packets = collectEvidencePackets(aceContext);
+  const summaries = packets
+    .map((p) => {
+      const citation = p.sourceRef || p.packetKey || p.id || 'unknown';
+      return `${p.summary || p.content || ''} [${citation}]`;
     })
-    .filter((s) => s.length > 0);
+    .filter((s: string) => s.length > 0);
 
   const answer = `Based on available evidence, ${summaries.join(' Additionally, ')}`;
 
   return {
     answer,
-    citations: aceContext.evidence.map((ev) => ({
-      packetId: ev.packetId,
-      sourceRef: ev.citation,
-      relevance: ev.score || 0.5
+    citations: packets.map((p) => ({
+      packetId: p.packetKey || p.id,
+      sourceRef: p.sourceRef || p.id,
+      relevance: 0.5
     })),
     confidence: 0.6, // Lower confidence for fallback
     reasoning: 'Fallback synthesis (LLM unavailable, combining evidence summaries)'

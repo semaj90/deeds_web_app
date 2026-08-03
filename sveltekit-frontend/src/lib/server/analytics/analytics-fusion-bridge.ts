@@ -248,8 +248,9 @@ export function emitFusionSummary(
   context: AnalyticsFusionContext,
 ): void {
   const topCandidate = context.fusedCandidates[0];
-  const bestLaneLatency = Array.from(context.lanes.values()).reduce((min, lane) =>
-    lane.latencyMs < min ? lane.latencyMs : min,
+  const bestLaneLatency = Array.from(context.lanes.values()).reduce(
+    (min, lane) => Math.min(min, lane.latencyMs),
+    Number.POSITIVE_INFINITY,
   );
   const avgLaneLatency = Array.from(context.lanes.values()).reduce((sum, lane) =>
     sum + lane.latencyMs,
@@ -341,5 +342,3 @@ export function emitRoundRobinContext(
 
   emitBatch([event]);
 }
-
-export type { AnalyticsFusionContext, LaneMetadata };

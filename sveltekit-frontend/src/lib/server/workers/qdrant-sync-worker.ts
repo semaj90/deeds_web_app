@@ -5,7 +5,7 @@
 import * as amqp from 'amqplib';
 import { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
-import { atlas_packets } from '$lib/server/db/schema-postgres.js';
+import { atlasPackets } from '$lib/server/db/schema-postgres.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-manager.js';
 import type { IdentityUpdatedEvent } from './mirror-sync-publisher.js';
 
@@ -56,8 +56,8 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
 
   const rows = await db
     .select()
-    .from(atlas_packets)
-    .where(eq(atlas_packets.packet_key, event.packet_key))
+    .from(atlasPackets)
+    .where(eq(atlasPackets.packetKey, event.packet_key))
     .limit(1);
 
   if (!rows || rows.length === 0) {
@@ -66,11 +66,13 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
 
   const packet = rows[0];
 
-  if (!packet.source_ref || !packet.feature_id) {
+  const p = packet as any;
+
+  if (!p.sourceRef || !p.featureId) {
     throw new Error(`Invalid identity: ${event.packet_key}`);
   }
 
-  if (!packet.qdrant_point_id) {
+  if (!p.qdrantPointId) {
     console.log('Packet not indexed in Qdrant:', { packet_key: event.packet_key });
     return;
   }
@@ -78,23 +80,23 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
   const qdrant = getQdrantClient();
 
   const payload: Record<string, unknown> = {
-    packet_key: packet.packet_key,
-    source_ref: packet.source_ref,
-    feature_id: packet.feature_id,
-    identity_lane: packet.identity_lane,
-    identity_confidence: packet.identity_confidence,
-    recovery_lane: packet.recovery_lane,
-    domain_class: packet.domain_class,
-    tree_node_id: packet.tree_node_id,
-    title_id: packet.title_id,
-    community_id: packet.community_id,
-    som_cluster: packet.som_cluster
+    packet_key: p.packetKey,
+    source_ref: p.sourceRef,
+    feature_id: p.featureId,
+    identity_lane: p.identityLane,
+    identity_confidence: p.identityConfidence,
+    recovery_lane: p.recoveryLane,
+    domain_class: p.domainClass,
+    tree_node_id: p.treeNodeId,
+    title_id: p.titleId,
+    community_id: p.communityId,
+    som_cluster: p.somCluster
   };
 
   await (qdrant as any).upsert('codebase_chunks_768', {
     points: [
       {
-        id: packet.qdrant_point_id,
+        id: p.qdrantPointId,
         payload
       }
     ]
@@ -102,7 +104,7 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
 
   console.log('Qdrant payload synced:', {
     packet_key: event.packet_key,
-    qdrant_point_id: packet.qdrant_point_id
+    qdrant_point_id: p.qdrantPointId
   });
 }
 

@@ -22,7 +22,7 @@ export interface AggregatedResult {
   file: string;
   line: number;
   column?: number;
-  content: string;
+  content?: string;
   match: string;
   rffScore: number; // Reciprocal Rank Fusion score
   sources: {
@@ -56,7 +56,7 @@ export interface AggregationOptions {
  * @returns Merged and ranked results
  */
 export async function aggregate(
-  results: Map<string, Array<{ file: string; line: number; score?: number }>>,
+  results: Map<string, Array<{ file: string; line: number; column?: number; content?: string; match?: string; score?: number }>>,
   options: AggregationOptions = {}
 ): Promise<AggregatedResult[]> {
   const {

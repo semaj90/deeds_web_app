@@ -1,113 +1,64 @@
-import { ENV } from '$lib/server/env.server.js';
+import {
+  requestLangExtractAnalyze,
+  requestLangExtractHealth,
+  type LangExtractAnalyzeRequest,
+  type LangExtractAnalyzeResponse,
+  type LangExtractHealthResponse,
+  type LangExtractSidecarRequestOptions,
+} from './langextract-transport.js';
 
-export interface LangExtractRequest {
-  text: string;
-  sourceRef?: string;
-  packetKey?: string;
-  extractionMode: 'entities' | 'relationships' | 'concepts' | 'full';
-}
-
-export interface ExtractedEntity {
-  type: string;
-  value: string;
-  confidence: number;
-  span?: [number, number];
-}
-
-export interface ExtractedRelationship {
-  subject: string;
-  predicate: string;
-  object: string;
-  confidence: number;
-}
-
-export interface LangExtractResponse {
-  entities: ExtractedEntity[];
-  relationships: ExtractedRelationship[];
-  concepts: string[];
-  provenance: {
-    model: string;
-    durationMs: number;
-    sourceRef?: string;
-  };
+export interface LangExtractHealthStatus extends LangExtractHealthResponse {
+  ready: boolean;
 }
 
 export interface LangExtractClient {
-  health(): Promise<{ ready: boolean; model?: string }>;
-  extract(req: LangExtractRequest): Promise<LangExtractResponse>;
+  health(): Promise<LangExtractHealthStatus>;
+  analyze(req: LangExtractAnalyzeRequest, options?: LangExtractSidecarRequestOptions): Promise<LangExtractAnalyzeResponse>;
+  extract(req: LangExtractAnalyzeRequest, options?: LangExtractSidecarRequestOptions): Promise<LangExtractAnalyzeResponse>;
 }
 
 const HEALTH_CACHE_TTL = 30_000;
 
-let _cachedHealthy: boolean | null = null;
-let _healthCacheTs = 0;
-
-function getBaseUrl(baseUrl?: string): string {
-  // Explicit arg wins; then ENV; then hard default matching LANGEXTRACT_URL default port
-  return baseUrl ?? (ENV.MINIFORGE_SIDECAR_URL || ENV.LANGEXTRACT_URL || 'http://127.0.0.1:8095');
+function toHealthStatus(payload: LangExtractHealthResponse): LangExtractHealthStatus {
+  const ready = payload.status === 'ok' || payload.status === 'healthy';
+  return { ...payload, ready };
 }
 
 export function createLangExtractClient(baseUrl?: string): LangExtractClient {
-  const url = getBaseUrl(baseUrl);
+  let cachedHealth: LangExtractHealthStatus | null = null;
+  let cachedHealthTs = 0;
 
   return {
-    async health(): Promise<{ ready: boolean; model?: string }> {
+    async health(): Promise<LangExtractHealthStatus> {
       const now = Date.now();
-      if (_cachedHealthy !== null && now - _healthCacheTs < HEALTH_CACHE_TTL) {
-        return { ready: _cachedHealthy };
+      if (cachedHealth && now - cachedHealthTs < HEALTH_CACHE_TTL) {
+        return cachedHealth;
       }
 
       try {
-        const res = await fetch(`${url}/health`, {
-          signal: AbortSignal.timeout(3000),
-        });
-        if (!res.ok) {
-          _cachedHealthy = false;
-          _healthCacheTs = now;
-          return { ready: false };
-        }
-        const data = (await res.json()) as { status?: string; model?: string };
-        _cachedHealthy = data.status === 'ok' || data.status === 'healthy';
-        _healthCacheTs = now;
-        return { ready: _cachedHealthy, model: data.model };
+        const payload = await requestLangExtractHealth({ baseUrl, timeoutMs: 3_000 });
+        cachedHealth = toHealthStatus(payload);
+        cachedHealthTs = now;
+        return cachedHealth;
       } catch {
-        _cachedHealthy = false;
-        _healthCacheTs = now;
-        return { ready: false };
+        cachedHealth = { ready: false };
+        cachedHealthTs = now;
+        return cachedHealth;
       }
     },
 
-    async extract(req: LangExtractRequest): Promise<LangExtractResponse> {
-      const start = Date.now();
-      const res = await fetch(`${url}/extract`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(req),
-        // Extraction can be slow for large documents; 30s matches typical NLP latency
-        signal: AbortSignal.timeout(30_000),
-      });
+    async analyze(
+      req: LangExtractAnalyzeRequest,
+      options: LangExtractSidecarRequestOptions = {}
+    ): Promise<LangExtractAnalyzeResponse> {
+      return requestLangExtractAnalyze(req, { baseUrl: options.baseUrl ?? baseUrl, timeoutMs: options.timeoutMs ?? 30_000 });
+    },
 
-      if (!res.ok) {
-        // Mark unhealthy so callers can skip subsequent calls in the same request lifecycle
-        _cachedHealthy = false;
-        _healthCacheTs = Date.now();
-        throw new Error(`[langextract-client] extract failed: ${res.status} ${res.statusText}`);
-      }
-
-      const data = (await res.json()) as Omit<LangExtractResponse, 'provenance'> & {
-        provenance?: Partial<LangExtractResponse['provenance']>;
-      };
-
-      return {
-        entities: data.entities ?? [],
-        relationships: data.relationships ?? [],
-        concepts: data.concepts ?? [],
-        provenance: {
-          model: data.provenance?.model ?? 'unknown',
-          durationMs: data.provenance?.durationMs ?? (Date.now() - start),
-          sourceRef: req.sourceRef,
-        },
-      };
+    async extract(
+      req: LangExtractAnalyzeRequest,
+      options: LangExtractSidecarRequestOptions = {}
+    ): Promise<LangExtractAnalyzeResponse> {
+      return requestLangExtractAnalyze(req, { baseUrl: options.baseUrl ?? baseUrl, timeoutMs: options.timeoutMs ?? 30_000 });
     },
   };
 }

@@ -13,8 +13,12 @@
 	} as const;
 
 	let { data } = $props();
-	
-	const { form: superFormData, errors, enhance, message, delayed } = superForm(data.form, {
+
+	function getInitialForm() {
+		return data.form;
+	}
+
+	const { form: superFormData, errors, enhance, message, delayed } = superForm(getInitialForm(), {
 		validators: zod(loginSchema),
 		onUpdated({ form }) {
 			if (form.valid) {

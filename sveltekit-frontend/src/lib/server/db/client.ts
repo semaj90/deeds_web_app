@@ -10,6 +10,19 @@ import { ENV } from '$lib/server/env.server.js';
 import { createDrizzleCache } from './drizzle-cache.js';
 import { traceDB } from '$lib/server/observability/langfuse.js';
 
+type LooseDb = {
+  query: any;
+  execute<T = unknown>(query: unknown): Promise<{ rows: T[] }>;
+  execute(query: unknown): Promise<{ rows: any[] }>;
+  select: any;
+  selectDistinct: any;
+  selectDistinctOn: any;
+  insert: any;
+  update: any;
+  delete: any;
+  transaction: any;
+};
+
 function getDatabaseUrl(): string {
  return ENV.DATABASE_URL;
 }
@@ -83,7 +96,7 @@ pool.on('connect', (client) => {
 	client.query('SET hnsw.iterative_scan = relaxed_order').catch(() => {});
 });
 
-export const db = drizzle(pool, { schema: mergedSchema, cache });
+export const db = drizzle(pool, { schema: mergedSchema, cache }) as unknown as LooseDb;
 
 const adminPool = new Pool({
 	connectionString: getAdminDatabaseUrl(),
@@ -100,7 +113,7 @@ adminPool.on('error', (err) => {
 // NOTE: Do NOT use casing: 'snake_case' — our schema uses explicit column names
 // (e.g. passwordHash: varchar('hashed_password')) and casing would override them
 // to password_hash, which doesn't exist in the DB.
-export const adminDb = drizzle(adminPool, { schema: mergedSchema });
+export const adminDb = drizzle(adminPool, { schema: mergedSchema }) as unknown as LooseDb;
 
 /**
  * Traced pool query — wraps pool.query with Langfuse tracing.

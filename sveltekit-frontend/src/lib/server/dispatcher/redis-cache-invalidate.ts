@@ -6,7 +6,7 @@
 
 import type Redis from 'ioredis';
 
-interface CacheInvalidationResult {
+export interface CacheInvalidationResult {
   invalidated: number;
   patterns: string[];
   key_count: number;

@@ -19,8 +19,8 @@
  *   }
  */
 
-import type { ComputeResult } from '../gpu/gpu-compute-pipeline.js';
-import { findBMU, getGridNeighbors, initializeCentroids, type BMUResult } from '$lib/gpu/som-clustering.js';
+import type { ComputeResult } from '../../gpu/gpu-compute-pipeline.js';
+import { findBMU, getGridNeighbors, initializeCentroids, type SOMClusterAssignment } from '$lib/gpu/som-clustering.js';
 
 export interface SOMPrefilterConfig {
 	radius?: number; // Neighborhood radius in grid cells (default: 2)
@@ -66,7 +66,7 @@ export async function somTopologyPrefilter(
 	}
 
 	// Step 1: Load or compute SOM centroids
-	let centroids: Float32Array[] | null = null;
+	let centroids: Float32Array | null = null;
 	let cacheHit = false;
 
 	if (enableCache) {
@@ -75,7 +75,7 @@ export async function somTopologyPrefilter(
 			const redis = getRedis();
 			const cached = await redis.get('som:centroids:20x20');
 			if (cached) {
-				centroids = JSON.parse(cached).map((arr: number[]) => new Float32Array(arr));
+				centroids = Float32Array.from(JSON.parse(cached) as number[]);
 				cacheHit = true;
 			}
 		} catch (err) {
@@ -95,7 +95,7 @@ export async function somTopologyPrefilter(
 				await redis.setex(
 					'som:centroids:20x20',
 					cacheTTL,
-					JSON.stringify(Array.from(centroids).map((c) => Array.from(c)))
+					JSON.stringify(Array.from(centroids))
 				).catch(() => {});
 			} catch {
 				// Non-blocking cache write failure
@@ -104,7 +104,7 @@ export async function somTopologyPrefilter(
 	}
 
 	// Step 2: Find Best Matching Unit (BMU)
-	const bmuResult: BMUResult = findBMU(queryEmbedding, centroids);
+  const bmuResult: SOMClusterAssignment = findBMU(queryEmbedding, centroids);
 	const { somRow, somCol, somCluster, distance: bmuDistance } = bmuResult;
 
 	// Step 3: Get neighborhood within radius

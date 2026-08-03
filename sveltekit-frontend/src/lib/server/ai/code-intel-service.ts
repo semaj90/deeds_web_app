@@ -399,6 +399,20 @@ const CONCEPT_PATTERNS: ConceptPattern[] = [
 
 export type CodeIntelDomainClass = 'AUTH' | 'DATA' | 'API' | 'UI' | 'UNKNOWN';
 
+interface DomainKeywordConfig {
+	keywords: string[];
+	weight: number;
+}
+
+type OKFConcept = {
+	concept: string;
+	domain: string;
+	line: number;
+	pattern: string;
+	confidence: number;
+	source?: 'ast_grep' | 'tree_sitter' | 'regex' | 'labeler';
+};
+
 export interface CodeIntelConcept {
 	concept: string;
 	domain: CodeIntelDomainClass | 'SHARED';
@@ -600,13 +614,7 @@ interface OKFOntologyEntry {
 }
 
 function indexKeyValuePairsForOKF(
-	concepts: Array<{
-		concept: string;
-		domain: string;
-		line: number;
-		pattern: string;
-		confidence: number;
-	}>,
+	concepts: OKFConcept[],
 	chunks: Array<{
 		startLine: number;
 		endLine: number;
@@ -710,7 +718,7 @@ export function classifyCodeIntelDomain(sourceCode: string, filePath: string, im
 
 export function buildConceptVector12(
 	domain: CodeIntelDomainClass,
-	concepts: CodeIntelConcept[],
+	concepts: OKFConcept[],
 	sourceCode: string,
 	filePath: string,
 	confidence: number
@@ -745,7 +753,7 @@ export function buildKeyValuePairs(entry: {
 	domain: CodeIntelDomainClass;
 	lineStart: number;
 	lineEnd: number;
-	concepts: CodeIntelConcept[];
+	concepts: OKFConcept[];
 	imports: string[];
 }): CodeIntelKeyValue[] {
 	const pairs: CodeIntelKeyValue[] = [

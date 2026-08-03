@@ -369,7 +369,7 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
       (packetRows.rows as PacketRow[]).map((p) => [p.source_ref, p])
     );
 
-    return results.map((r) => {
+    const joinedResults = results.map((r) => {
       // Try chunk join (768-dim path)
       const chunk = chunkMap.get(r.metadata?.qdrant_point_id as string);
       if (chunk) {
@@ -382,14 +382,14 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
           summary: packet?.summary || chunk.summary || r.summary,
           packet_key: packet?.packet_key || r.packet_key,
           tree_node_id: packet?.tree_node_id || r.tree_node_id,
-          content_hash: packet?.content_hash || r.content_hash || r.metadata?.content_hash,
+          content_hash: String(packet?.content_hash || r.content_hash || r.metadata?.content_hash || ''),
           workspace_revision: packet?.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
           metadata: {
             ...r.metadata,
             updated_at: chunk.updated_at,
             packet_key: packet?.packet_key || r.packet_key,
             tree_node_id: packet?.tree_node_id || r.tree_node_id,
-            content_hash: packet?.content_hash || r.content_hash || r.metadata?.content_hash,
+            content_hash: String(packet?.content_hash || r.content_hash || r.metadata?.content_hash || ''),
             workspace_revision: packet?.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
           },
         };
@@ -406,14 +406,14 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
           summary: packet.summary || r.summary,
           packet_key: packet.packet_key || r.packet_key,
           tree_node_id: packet.tree_node_id || r.tree_node_id,
-          content_hash: packet.content_hash || r.content_hash || r.metadata?.content_hash,
+          content_hash: String(packet.content_hash || r.content_hash || r.metadata?.content_hash || ''),
           workspace_revision: packet.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
           metadata: {
             ...r.metadata,
             updated_at: packet.updated_at,
             packet_key: packet.packet_key || r.packet_key,
             tree_node_id: packet.tree_node_id || r.tree_node_id,
-            content_hash: packet.content_hash || r.content_hash || r.metadata?.content_hash,
+            content_hash: String(packet.content_hash || r.content_hash || r.metadata?.content_hash || ''),
             workspace_revision: packet.workspace_revision || r.workspace_revision || r.metadata?.workspace_revision,
           },
         };
@@ -421,6 +421,8 @@ async function joinPostgres(results: SearchResult[]): Promise<SearchResult[]> {
 
       return r;
     });
+
+    return joinedResults as SearchResult[];
   } catch (err) {
     console.error('[UnifiedSearch] Postgres join failed:', err instanceof Error ? err.message : '');
     return results;

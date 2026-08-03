@@ -174,7 +174,11 @@ export async function ingestCrawledDocument(
         updatedAt: now,
       }).returning({ id: documentsAtlasEntries.id });
 
-      existing.push(inserted[0]!);
+      existing.push({
+        ...(inserted[0] as Record<string, unknown>),
+        metadata: payload,
+        chunkIds,
+      } as typeof existing[number]);
     }
 
     for (let i = 0; i < chunkTexts.length; i++) {

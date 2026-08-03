@@ -171,7 +171,8 @@ export class SoftRoutingOrchestrator {
         limit: request.top_k * 2, // Over-fetch for deduplication
       });
 
-      const candidates: RetrievalCandidate[] = (results.result || []).map((hit, rank) => ({
+      const rawResults = Array.isArray(results) ? results : ((results as { result?: any[] }).result ?? []);
+      const candidates: RetrievalCandidate[] = rawResults.map((hit, rank) => ({
         packet_key: hit.payload?.packet_key as string,
         source_ref: hit.payload?.source_ref as string,
         feature_id: hit.payload?.feature_id as string,

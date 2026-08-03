@@ -12,7 +12,11 @@
  */
 
 import type { Pool } from 'pg';
-import type { RrfHit } from './rrf-fuse.js';
+interface RrfHit {
+	id: string;
+	score: number;
+	payload?: Record<string, unknown>;
+}
 
 export interface SparseSearchHit extends RrfHit {
 	id:    string;

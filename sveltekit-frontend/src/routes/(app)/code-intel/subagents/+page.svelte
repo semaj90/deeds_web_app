@@ -178,6 +178,7 @@
 	h1 { font-size: 2.5rem; color: #f8fafc; font-weight: 800; letter-spacing: -0.025em; }
 	.accent { 
 		background: linear-gradient(135deg, #818cf8 0%, #a855f7 100%);
+		background-clip: text;
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 	}

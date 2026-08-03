@@ -172,14 +172,14 @@ export async function rerank(
 		.select({
 			packetKey: atlasPackets.packetKey,
 			sourceRef: atlasPackets.sourceRef,
-			title: atlasPackets.title,
+				title: (atlasPackets as any).titleId,
 			domainClass: atlasPackets.domainClass,
 			treeNodeId: atlasPackets.treeNodeId,
 			updatedAt: atlasPackets.updatedAt,
-			somCluster: atlasPackets.somCluster,
+				somCluster: (atlasPackets as any).somCluster,
 		})
 		.from(atlasPackets)
-		.where(inArray(atlasPackets.packetKey, packetKeys));
+		.where(inArray(atlasPackets.packetKey, packetKeys)) as any[];
 
 	const packetMap = new Map(packets.map((p) => [p.packetKey, p]));
 
@@ -188,7 +188,7 @@ export async function rerank(
 
 	for (const qResult of candidates) {
 		const packetKey = qResult.payload?.packet_key as string;
-		const packet = packetMap.get(packetKey);
+		const packet = packetMap.get(packetKey) as any;
 
 		if (!packet) {
 			console.warn(`[Reranker] Packet ${packetKey} not found in Postgres`);
@@ -263,7 +263,7 @@ export async function healthCheckReranker(): Promise<{
 		// Postgres: sample packet read
 		const sample = await db
 			.select({ packetKey: atlasPackets.packetKey })
-			.from(atlasPackets)
+			.from(atlasPackets as any)
 			.limit(1);
 		components.postgres = sample.length > 0;
 		if (!components.postgres) {
@@ -287,8 +287,8 @@ export async function healthCheckReranker(): Promise<{
 
 	try {
 		// Qdrant: collection exists
-		const collections = await qdrant.listCollections();
-		components.qdrant = collections.some((c) => c.name === 'codebase_chunks_768');
+		const collections = await qdrant.getCollections();
+		components.qdrant = collections.collections.some((c) => c.name === 'codebase_chunks_768');
 		if (!components.qdrant) {
 			diagnostics.push('Qdrant: codebase_chunks_768 collection not found');
 		}

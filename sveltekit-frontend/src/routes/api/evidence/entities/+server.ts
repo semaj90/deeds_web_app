@@ -74,7 +74,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 				ORDER BY ee.confidence DESC NULLS LAST, ee.created_at DESC
 				LIMIT ${limit}
 			`);
-			results.entities = entityResult.rows ?? [];
+			results.entities = (entityResult.rows as Record<string, unknown>[]) ?? [];
 		} catch (err) {
 			console.warn('[Entities API] Query failed:', err);
 			results.entities = [];
@@ -111,7 +111,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 					ef.created_at DESC
 				LIMIT ${limit}
 			`);
-			results.flags = flagResult.rows ?? [];
+			results.flags = (flagResult.rows as Record<string, unknown>[]) ?? [];
 		} catch (err) {
 			console.warn('[Entities API] Forensic flags query failed:', err);
 			results.flags = [];
@@ -127,7 +127,7 @@ export const GET: RequestHandler = async ({ url, locals, request }) => {
 				(SELECT COUNT(*) FROM evidence_forensic_flags) AS total_flags,
 				(SELECT COUNT(*) FROM evidence_forensic_flags WHERE severity = 'high') AS high_severity_flags
 		`);
-		results.counts = countResult.rows?.[0] ?? null;
+		results.counts = (countResult.rows?.[0] as Record<string, unknown> | undefined) ?? null;
 	} catch {
 		results.counts = null;
 	}

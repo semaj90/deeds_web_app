@@ -100,7 +100,7 @@
 
 	let categories = $derived.by((): string[] => {
 		const cats = new Set(data.fictionalCases.map((c: Record<string, any>) => String(c.category)));
-		return ['all', ...Array.from(cats).sort()];
+		return ['all', ...Array.from(cats).sort()] as string[];
 	});
 
 	let currentPhaseName = $derived(sessionData?.phases?.[sessionData?.currentPhase] ?? '');

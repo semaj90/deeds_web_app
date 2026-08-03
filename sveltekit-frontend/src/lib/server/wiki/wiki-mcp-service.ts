@@ -71,7 +71,7 @@ export class WikiMcpService {
     // 1. Semantic Search (Qdrant)
     // In a real scenario, we'd embed the query here.
     // Using simple hybrid placeholder for now.
-    const semanticResults = await this.qdrant.multiQuerySearch({
+    const semanticResults = await (this.qdrant as any).multiQuerySearch({
       collection: 'codebase_chunks',
       queries: [{ vector: new Array(768).fill(0), vectorName: 'default', limit, weight: 1.0 }],
       limit,

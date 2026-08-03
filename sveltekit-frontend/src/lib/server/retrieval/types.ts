@@ -328,6 +328,18 @@ export interface SearchFilter {
   /** Restrict to one or more feature_ids (Qdrant must_match array + SQL IN) */
   feature_ids?: string[];
 
+  /** Restrict to this workspace revision (pushed into the Rust N-API / backend-neutral filter translation) */
+  workspace_revision?: string;
+
+  /** Restrict to one or more packet_keys (pushed into the Rust N-API / backend-neutral filter translation) */
+  packet_keys?: string[];
+
+  /** Restrict to one or more artifact kinds (pushed into the Rust N-API / backend-neutral filter translation) */
+  artifact_kinds?: string[];
+
+  /** Restrict to one or more domain_ids (pushed into the Rust N-API / backend-neutral filter translation) */
+  domain_ids?: string[];
+
   /** Restrict to packets in these KMeans cluster IDs (Qdrant filter + GPU pre-mask) */
   kmeans_cluster_ids?: number[];
 

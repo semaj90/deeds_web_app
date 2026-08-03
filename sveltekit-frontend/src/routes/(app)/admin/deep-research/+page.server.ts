@@ -63,7 +63,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     .from(ldrResearchTasks);
 
   // Get status distribution
-  const [statusDistribution] = await db
+  const statusDistribution = await db
     .select({
       status: ldrResearchTasks.status,
       count: sql<number>`COUNT(*)`,

@@ -68,7 +68,7 @@ export function recordCacheDecision(
   // Fire-and-forget: don't await, don't block retrieval
   const metric: CacheDecisionMetric = {
     timestamp: Date.now(),
-    decision: result.decision,
+    decision: result.cache_decision,
     total_orchestration_ms: result.total_orchestration_ms,
     layer2_latency_ms: result.layer2_adapter?.latency_ms ?? 0,
     layer3_latency_ms: result.layer3_exact?.latency_ms ?? 0,
@@ -93,7 +93,7 @@ async function recordMetricAsync(metric: CacheDecisionMetric): Promise<void> {
   const redis = getRedisClient();
 
   try {
-    if (!redis.isOpen) {
+    if (redis.status !== 'ready') {
       await redis.connect();
     }
 
@@ -135,7 +135,7 @@ export async function getCacheMetricsForPrometheus(): Promise<CacheLayerMetrics>
   const redis = getRedisClient();
 
   try {
-    if (!redis.isOpen) {
+    if (redis.status !== 'ready') {
       await redis.connect();
     }
 
@@ -236,7 +236,7 @@ export async function getPrometheusMetrics(): Promise<string> {
  * Cleanup (call on app shutdown)
  */
 export async function closeTelemetry(): Promise<void> {
-  if (redisClient && redisClient.isOpen) {
+  if (redisClient && redisClient.status === 'ready') {
     await redisClient.quit();
     redisClient = null;
   }

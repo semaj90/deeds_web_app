@@ -312,7 +312,7 @@ async function embedViaOllama(
       model: modelOverride,
       prompt: query,
     }),
-    timeout: config.timeout_ms,
+    signal: AbortSignal.timeout(config.timeout_ms),
   });
 
   if (!res.ok) {

@@ -181,7 +181,7 @@ export async function searchGoService(req: GoSearchRequest): Promise<GoSearchRes
     hits: hits as GoSearchHit[],
     total,
     durationMs,
-    cacheSource: result.cacheSource as string | undefined
+    cacheSource: result.cacheSource as GoSearchResponse['cacheSource']
   };
 }
 
@@ -257,7 +257,7 @@ export async function getNodeGoService(nodeId: string): Promise<GoNodeResponse |
  */
 export async function resolveCitationGoService(req: GoCitationRequest): Promise<GoCitationResponse | null> {
   const startMs = performance.now();
-  const result = (await fetchGoSearch('/citation', 'POST', req)) as Record<string, unknown> | null;
+  const result = (await fetchGoSearch('/citation', 'POST', req as unknown as Record<string, unknown>)) as Record<string, unknown> | null;
   const durationMs = Math.round(performance.now() - startMs);
 
   if (!result) return null;

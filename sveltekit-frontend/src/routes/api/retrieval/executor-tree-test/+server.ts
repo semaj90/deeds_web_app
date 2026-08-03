@@ -17,7 +17,7 @@ import { z } from 'zod';
 
 const ExecutorTreeTestRequestSchema = z.object({
   mode: z.enum(['crossEncoder', 'langExtract', 'trace']),
-  input: z.record(z.unknown()).optional(),
+  input: z.record(z.string(), z.unknown()).optional(),
   simulateFailure: z.boolean().optional(),
   failureRetryable: z.boolean().optional(),
   delayMs: z.number().int().min(0).max(5000).optional(),

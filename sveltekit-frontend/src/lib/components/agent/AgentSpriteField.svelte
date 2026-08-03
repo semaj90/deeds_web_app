@@ -288,15 +288,16 @@ fn fs_main(in: VSOut) -> @location(0) vec4f {
 		}
 
 		const now = performance.now();
-		const instances = states.map((state) => ({
-			...state,
-			ageMs: Math.max(0, now - state.updatedAtMs),
-		}));
+		const instances = states.map((state) => {
+			const alpha = clamp01((now - state.updatedAtMs) / 220);
+			const previous = { ...state, x: state.previousX, y: state.previousY };
+			return interpolateAgentVisualState(previous, state, alpha);
+		});
 		const packed = packAgentVisualInstances(instances);
 		const instanceBuffer = ensureGpuBuffer(packed.byteLength);
 		if (!instanceBuffer) return;
 
-		gpuDevice.queue.writeBuffer(instanceBuffer, 0, packed);
+		gpuDevice.queue.writeBuffer(instanceBuffer, 0, packed.buffer as ArrayBuffer, packed.byteOffset, packed.byteLength);
 		gpuDevice.queue.writeBuffer(
 			gpuFrameBuffer,
 			0,
@@ -408,7 +409,7 @@ fn fs_main(in: VSOut) -> @location(0) vec4f {
 		);
 
 		gpuBindGroup = gpuDevice.createBindGroup({
-			layout: gpuPipeline.getBindGroupLayout(0),
+			layout: gpuPipeline.getBindGroupLayout(0) as unknown as GPUBindGroupLayout,
 			entries: [{ binding: 0, resource: { buffer: gpuFrameBuffer } }],
 		});
 

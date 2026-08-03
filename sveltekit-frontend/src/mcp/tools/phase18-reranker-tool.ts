@@ -93,7 +93,7 @@ export async function validatePhase18ToolInput(input: unknown): Promise<{
     return {
       valid: false,
       error: err instanceof z.ZodError
-        ? `Validation error: ${err.errors.map(e => e.message).join(', ')}`
+        ? `Validation error: ${err.issues.map(e => e.message).join(', ')}`
         : String(err)
     };
   }
@@ -223,7 +223,7 @@ export async function executePhase18Reranker(
       avgConfidence: sortedResults.length > 0
         ? sortedResults.reduce((sum, r) => sum + r.confidence, 0) / sortedResults.length
         : 0,
-      totalLatencyMs: sortedResults.reduce((sum, r) => sum + (r.latencyMs || 0), 0, 0)
+      totalLatencyMs: sortedResults.reduce((sum, r) => sum + (r.latencyMs || 0), 0)
     }
   };
 }

@@ -9,7 +9,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, cases } from '$lib/server/db/schema-postgres.js';
-import { casePersons } from '$lib/server/db/schema.js';
+import { casePersons } from '$lib/server/db/schema/persons.js';
 import { eq, and } from 'drizzle-orm';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';

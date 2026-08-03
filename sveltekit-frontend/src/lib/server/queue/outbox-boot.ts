@@ -21,7 +21,7 @@ export async function startOutboxPublisherWithRabbit(): Promise<void> {
 
   // Dynamically import amqplib to avoid breaking the module graph when
   // RabbitMQ is unavailable (amqplib is an optional peer dep).
-  const amqplib = await import('amqplib');
+  const amqplib = (await import('amqplib')) as any;
   const rabbitUrl = process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
   const conn = await amqplib.connect(rabbitUrl);
   const ch = await conn.createChannel();

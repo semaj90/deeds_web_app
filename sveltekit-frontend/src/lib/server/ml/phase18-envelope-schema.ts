@@ -167,7 +167,7 @@ export const phase18ResponseEnvelopeSchema = z.object({
   error: z.object({
     code: z.string(),
     message: z.string(),
-    details: z.record(z.unknown()).optional(),
+    details: z.record(z.string(), z.unknown()).optional(),
   }).optional(),
 
   /** Cache metadata for offline/service worker use */
@@ -239,7 +239,7 @@ export const offlineStorageEnvelopeSchema = z.object({
   payloadType: z.enum(['request', 'response', 'batch']),
 
   /** Compressed/serialized payload (JSON) */
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
 
   /** Storage timestamp */
   storedAt: z.string().datetime(),
@@ -356,7 +356,7 @@ export const databaseEnvelopeSchema = z.object({
   confidence: z.number().min(0).max(1).optional(),
 
   /** Feature metadata (JSONB) */
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 
   /** Validation status */
   validationStatus: z.enum(['valid', 'pending', 'invalid']).optional(),

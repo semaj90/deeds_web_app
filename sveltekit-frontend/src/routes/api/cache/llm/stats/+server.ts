@@ -5,18 +5,16 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
-		const qdrant = getQdrantClient();
-
 		// Get collection info
-		const collectionInfo = await qdrant.getCollection('llm_cache');
+		const collectionInfo = await qdrant.client.getCollection('llm_cache');
 
 		// Get sample of recent cache entries
-		const scrollRes = await qdrant.scroll('llm_cache', {
+		const scrollRes = await qdrant.client.scroll('llm_cache', {
 			limit: 10,
 			with_payload: true,
 			order_by: {
@@ -34,7 +32,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 		// Count expired entries
 		const now = new Date().toISOString();
-		const expiredRes = await qdrant.scroll('llm_cache', {
+		const expiredRes = await qdrant.client.scroll('llm_cache', {
 			limit: 1,
 			filter: {
 				must: [

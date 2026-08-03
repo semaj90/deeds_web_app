@@ -1,15 +1,15 @@
 <script lang="ts">
-  import type { FileLabel } from '$lib/server/atlas/contracts/file-understanding.js';
+  import type { FileUnderstanding } from '$lib/server/atlas/contracts/file-understanding.js';
 
   interface Props {
-    files: FileLabel[];
+    files: FileUnderstanding[];
     loading?: boolean;
-    onSelect?: (file: FileLabel) => void;
+    onSelect?: (file: FileUnderstanding) => void;
   }
 
   const { files = [], loading = false, onSelect }: Props = $props();
 
-  let sortBy = $state<keyof FileLabel>('app_criticality');
+  let sortBy = $state<keyof FileUnderstanding>('app_criticality');
   let sortDir = $state<'asc' | 'desc'>('desc');
   let filterPurpose = $state<string | null>(null);
   let filterCriticality = $state<string | null>(null);
@@ -54,7 +54,7 @@
     };
   });
 
-  function toggleSort(column: keyof FileLabel) {
+  function toggleSort(column: keyof FileUnderstanding) {
     if (sortBy === column) {
       sortDir = sortDir === 'asc' ? 'desc' : 'asc';
     } else {
@@ -76,6 +76,21 @@
   function getThoroughnessBar(level: number) {
     const filled = Math.min(level, 5);
     return '█'.repeat(filled) + '░'.repeat(5 - filled);
+  }
+
+  function getThoroughnessScore(level: FileUnderstanding['thoroughness']) {
+    switch (level) {
+      case 'stub':
+        return 1;
+      case 'outline':
+        return 2;
+      case 'partial':
+        return 3;
+      case 'feature_complete':
+        return 4;
+      case 'battle_tested':
+        return 5;
+    }
   }
 </script>
 
@@ -212,8 +227,8 @@
                 </span>
               </td>
               <td class="px-4 py-3 whitespace-nowrap font-mono text-xs">
-                {getThoroughnessBar(file.thoroughness)}
-                <span class="text-neutral-500 dark:text-neutral-400 ml-1">{file.thoroughness}/5</span>
+                {getThoroughnessBar(getThoroughnessScore(file.thoroughness))}
+                <span class="text-neutral-500 dark:text-neutral-400 ml-1">{getThoroughnessScore(file.thoroughness)}/5</span>
               </td>
               <td class="px-4 py-3 whitespace-nowrap">
                 <span class={`px-2 py-1 rounded text-xs font-medium ${getCriticalityColor(file.app_criticality)}`}>

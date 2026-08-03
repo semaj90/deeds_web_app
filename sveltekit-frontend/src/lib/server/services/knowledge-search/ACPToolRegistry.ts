@@ -691,6 +691,10 @@ const handlers: Record<string, HandlerFn> = {
         text: query.trim(),
         topK,
         caseId: mode === 'legal' ? 'legal' : undefined,
+        filters: {
+          includeGenerated: false,
+          includeLegacy: false,
+        },
       });
       const result = searchResultToHyperRagResult(searchResult, { query: query.trim() });
 

@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		`);
 
     // 5. gemma4-rotorquant:latest: Analyze file
-    const analysis = await analyzeFileWithLLM(filePath, content, comments, errors.rows || []);
+    const analysis = await analyzeFileWithLLM(filePath, content, comments, (errors.rows as Record<string, unknown>[]) || []);
 
     // 6. Generate enhanced Qdrant tag
     const qdrantTag = await generateEnhancedTag(filePath, analysis);

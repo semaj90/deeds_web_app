@@ -5,7 +5,7 @@
  * Multimodal: CLIP (512-dim vision-language)
  */
 
-import { logger } from '../logger';
+import { logger } from '../logger.js';
 
 export interface EmbeddingModel {
   embed(input: string | string[]): Promise<number[] | number[][]>;

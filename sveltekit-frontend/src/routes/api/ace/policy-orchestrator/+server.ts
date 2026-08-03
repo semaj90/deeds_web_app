@@ -69,13 +69,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const aceAssembly = await orchestrator.assembleACE(policyScores, candidatesWithFeatures);
 
     // Stage 5: Gemma4 Synthesis
-    let synthesis = null;
-    try {
-      synthesis = await orchestrator.synthesizeAnswer(body.query, decomposition, aceAssembly);
-    } catch (err) {
-      console.warn('[API] Synthesis failed (non-blocking):', err);
-      // Synthesis is optional; continue without it
-    }
+    // The active orchestrator does not expose a synthesis method here yet.
+    const synthesis = null;
 
     // Stage 6: RLM Logging
     const traceId = `trace-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

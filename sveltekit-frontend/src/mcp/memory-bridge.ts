@@ -31,7 +31,7 @@ export const EngramObservationSchema = z.object({
   tool_name: z.string().min(1).max(255),
   input_hash: z.string().length(64), // SHA256
   output_summary: z.string().max(2000),
-  decision_context: z.record(z.unknown()).default({}),
+  decision_context: z.record(z.string(), z.unknown()).default({}),
   confidence: z.number().min(0).max(1).default(0.5),
   timestamp: z.string().datetime().optional(),
   bm25_tags: z.array(z.string().min(1)).default([]),

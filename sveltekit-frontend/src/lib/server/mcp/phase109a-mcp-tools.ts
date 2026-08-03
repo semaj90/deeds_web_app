@@ -2,7 +2,7 @@
  * Phase 109A MCP Tool Definitions
  * Exposes semantic signal lifecycle management functions via MCP interface
  *
- * Tools: archive_signal, supersede_signal, promote_recommendation, query_signal_history, validate_state_transition
+ * Tools: archive_signal, supersede_signal, supersede_recommendation, promote_recommendation, query_signal_history, validate_state_transition
  * All tools use role-based access control (atlas_application or atlas_maintenance)
  * All operations create immutable audit events in semantic_lifecycle_events table
  */
@@ -24,6 +24,13 @@ const archiveSignalInputSchema = z.object({
 const supersedeSignalInputSchema = z.object({
   signal_id: z.string().uuid('Valid UUID required'),
   replacement_signal_id: z.string().uuid('Replacement must be valid UUID'),
+  actor_id: z.string().min(1, 'Actor ID required'),
+  reason: z.string().min(1, 'Reason required'),
+});
+
+const supersedeRecommendationInputSchema = z.object({
+  recommendation_id: z.string().uuid('Valid UUID required'),
+  replacement_recommendation_id: z.string().uuid('Replacement must be valid UUID'),
   actor_id: z.string().min(1, 'Actor ID required'),
   reason: z.string().min(1, 'Reason required'),
 });
@@ -50,6 +57,14 @@ const validateStateTransitionInputSchema = z.object({
 // Output schemas
 const stateChangeOutputSchema = z.object({
   signal_id: z.string().uuid(),
+  previous_state: z.string(),
+  new_state: z.string(),
+  event_id: z.string().uuid(),
+  timestamp: z.string().datetime(),
+});
+
+const recommendationStateChangeOutputSchema = z.object({
+  recommendation_id: z.string().uuid(),
   previous_state: z.string(),
   new_state: z.string(),
   event_id: z.string().uuid(),
@@ -142,6 +157,42 @@ export async function supersedeSignal(input: z.infer<typeof supersedeSignalInput
     };
   } catch (error) {
     throw new Error(`Failed to supersede signal: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
+/**
+ * Supersede a recommendation with a replacement: transitions ACTIVE (lifecycle_state)
+ * to SUPERSEDED. Revision-aware: rejects self-supersession, rejects a replacement
+ * targeting a different subject_id/workspace_id, and rejects a replacement that
+ * shares the same revision_id as the recommendation being superseded.
+ */
+export async function supersedeRecommendation(input: z.infer<typeof supersedeRecommendationInputSchema>) {
+  const validated = supersedeRecommendationInputSchema.parse(input);
+
+  try {
+    const result = await db.execute(
+      sql`SELECT * FROM supersede_recommendation(
+        ${validated.recommendation_id}::uuid,
+        ${validated.replacement_recommendation_id}::uuid,
+        ${validated.actor_id}::varchar,
+        ${validated.reason}::text
+      )`
+    );
+
+    if (result.rows.length === 0) {
+      throw new Error('Supersede operation returned no results');
+    }
+
+    const row = result.rows[0] as any;
+    return {
+      recommendation_id: row.recommendation_id,
+      previous_state: row.previous_state,
+      new_state: row.new_state,
+      event_id: row.event_id,
+      timestamp: new Date().toISOString(),
+    };
+  } catch (error) {
+    throw new Error(`Failed to supersede recommendation: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -275,6 +326,14 @@ export const phase109aTools = [
     handler: supersedeSignal,
   },
   {
+    name: 'phase109a_supersede_recommendation',
+    description:
+      'Supersede a recommendation with a replacement: transitions ACTIVE lifecycle_state to SUPERSEDED. Revision-aware — rejects self-supersession, cross-subject/cross-workspace replacements, and same-revision replacements. Sets superseded_by link and creates audit event.',
+    inputSchema: supersedeRecommendationInputSchema,
+    outputSchema: recommendationStateChangeOutputSchema,
+    handler: supersedeRecommendation,
+  },
+  {
     name: 'phase109a_promote_recommendation',
     description:
       'Promote a recommendation to APPROVED status. Enforces mutual approval safeguard (approver ≠ creator). Supports dry-run mode.',
@@ -313,6 +372,39 @@ export function getPhase109aToolDefinitions() {
   return phase109aTools.map((tool) => ({
     name: tool.name,
     description: tool.description,
-    inputSchema: tool.inputSchema.describe() as any,
+    inputSchema: tool.inputSchema.describe('') as any,
   }));
+}
+
+/**
+ * Register all phase109a tools (archive/supersede signal, supersede/promote
+ * recommendation, query history, validate transition) on the canonical
+ * Streamable-HTTP MCP server (trace-mcp-server.ts, :8788). Prior to this,
+ * phase109aTools was only dispatched from the older stdio server.ts via a
+ * manual per-name switch — this loop registers the same array generically,
+ * so a new entry (e.g. this session's phase109a_supersede_recommendation)
+ * is reachable from the canonical surface without a second hand-written
+ * dispatch case.
+ */
+export function registerPhase109aTools(server: { registerTool: (name: string, meta: unknown, handler: unknown) => void }) {
+  for (const tool of phase109aTools) {
+    server.registerTool(
+      tool.name,
+      {
+        description: tool.description,
+        inputSchema: tool.inputSchema as any,
+      },
+      async (input: unknown) => {
+        const result = await (tool.handler as (i: unknown) => Promise<unknown>)(input);
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+    );
+  }
 }

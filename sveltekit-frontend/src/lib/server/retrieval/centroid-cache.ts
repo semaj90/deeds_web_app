@@ -241,7 +241,7 @@ data = JSON.parse(raw);
         GROUP BY topo_class, topo_byte 
         ORDER BY cnt DESC LIMIT 1
       `);
-      const topoInfo = topoRows[0] || { topo_class: 'unclassified', topo_byte: 0 };
+      const topoInfo = (topoRows[0] as any) || { topo_class: 'unclassified', topo_byte: 0 };
 
       const centroidData = {
         vector: Array.from(sum),

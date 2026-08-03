@@ -27,6 +27,8 @@ export enum DenseLifecycle {
   SUPERSEDED = 'superseded',                      // No longer produced
 }
 
+type ISO8601 = string;
+
 export interface DenseLanePolicy {
   representationName: DenseRepresentationName;
   role: DenseRole;

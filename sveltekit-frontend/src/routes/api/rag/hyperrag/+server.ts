@@ -88,13 +88,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   }
 
   const { query, limit, lanes } = parsed.data;
-  const runtime = createSearchRuntime({ userId: locals.user.id });
+    const runtime = createSearchRuntime({ userId: locals.user.id });
 
-  try {
-    const result = await runtime.search({
-      text: query,
-      topK: limit,
-    });
+    try {
+      const result = await runtime.search({
+        text: query,
+        topK: limit,
+        filters: {
+          includeGenerated: false,
+          includeLegacy: false
+        }
+      });
 
     const packetResults = result.packets.map(toLegacyPacketResult);
     const packet = {

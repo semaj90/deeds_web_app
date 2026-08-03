@@ -1,0 +1,34 @@
+# Parent Atlas Symbol Identity + KNN Proof
+
+- Generated at: `2026-08-03T02:14:05.696119+00:00`
+- Status: `PARTIAL_PROVEN`
+- Parser: `{'typescript': 'PASS', 'python': 'PASS', 'go': 'PASS'}`
+- Torch: `PASS:cuda`
+- cuVS: `PASS:26.06.00 build_ms=70.183 search_ms=3.192`
+
+## Gates
+- `ID1_STABLE_SYMBOL_ID_DETERMINISTIC`: `PASS`
+- `ID2_BODY_EDIT_PRESERVES_STABLE_ID`: `PASS`
+- `ID3_BODY_EDIT_CHANGES_VERSION_ID`: `PASS`
+- `ID4_REAL_TREE_SITTER_EVIDENCE`: `PASS`
+- `ID5_HEURISTIC_PARSER_HONESTLY_LABELED`: `PASS`
+- `ID6_SOURCE_REVISION_PROPAGATED`: `PASS`
+- `GPU1_TORCH_CUDA_OPERATION`: `PASS`
+- `GPU2_CUPY_CUDA_OPERATION`: `PASS`
+- `GPU3_CUVS_EXACT_KNN`: `PASS`
+- `GPU4_CUVS_TORCH_TOPK_PARITY`: `PASS`
+- `GPU5_IDENTITY_PRESERVED_THROUGH_KNN`: `PASS`
+- `GPU6_STALE_SYMBOL_VERSION_REJECTED`: `PARTIAL_PROVEN`
+- `GRAPH1_GRAPH_REFRESH_NOT_PERFORMED`: `PASS`
+- `DB1_CONSTRAINT_UNCHANGED`: `PASS`
+- `DB2_TRANSACTION_REMAINS_ROLLED_BACK`: `PASS`
+
+## Identity
+- Parsed envelopes: `8`
+- Current corpus size: `8`
+- Stale envelopes excluded from KNN corpus: `8`
+
+## KNN
+- Torch top-k parity: `PASS`
+- cuVS top-k parity: `PASS`
+- Identity preserved through KNN: `PASS`

@@ -2,9 +2,9 @@
 	import Icon from '$lib/components/ui/Icon.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
-	let workflowBusy = false;
-	let workflowStatus = '';
+	let { data }: { data: PageData } = $props();
+	let workflowBusy = $state(false);
+	let workflowStatus = $state('');
 
 	const board = () => data.dailyGraphifyBoard;
 
@@ -140,7 +140,7 @@
 										<button
 											class="workflow-button"
 											type="button"
-											on:click={() => queueWorkflow(task.id)}
+											onclick={() => queueWorkflow(task.id)}
 											disabled={workflowBusy}
 										>
 											<Icon name="play" class="w-3.5 h-3.5" />

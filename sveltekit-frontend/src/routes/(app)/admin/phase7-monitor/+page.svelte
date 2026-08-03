@@ -15,10 +15,10 @@
     last_update: string;
   }
 
-  let metrics: Phase7Metrics | null = null;
+  let metrics = $state<Phase7Metrics | null>(null);
   let refreshInterval = 5000;
-  let autoRefresh = true;
-  let history: Array<{ time: string; rate: number }> = [];
+  let autoRefresh = $state(true);
+  let history = $state<Array<{ time: string; rate: number }>>([]);
 
   async function fetchMetrics() {
     try {
@@ -104,7 +104,7 @@
           <div
             class="bg-blue-500 h-2 rounded-full transition-all duration-500"
             style={`width: ${((metrics.total_summaries || 0) / 40754) * 100}%`}
-          />
+          ></div>
         </div>
       </div>
 
@@ -153,7 +153,7 @@
         <div class="flex items-center gap-3">
           <div
             class={`w-3 h-3 rounded-full ${metrics.postgres_status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}
-          />
+          ></div>
           <div>
             <div class="text-sm font-medium text-slate-900">Postgres</div>
             <div class={`text-xs font-medium ${getStatusColor(metrics.postgres_status)}`}>{metrics.postgres_status}</div>
@@ -163,7 +163,7 @@
         <div class="flex items-center gap-3">
           <div
             class={`w-3 h-3 rounded-full ${metrics.redis_status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}
-          />
+          ></div>
           <div>
             <div class="text-sm font-medium text-slate-900">Valkey</div>
             <div class={`text-xs font-medium ${getStatusColor(metrics.redis_status)}`}>{metrics.redis_status}</div>
@@ -173,7 +173,7 @@
         <div class="flex items-center gap-3">
           <div
             class={`w-3 h-3 rounded-full ${metrics.gemma4_status === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}
-          />
+          ></div>
           <div>
             <div class="text-sm font-medium text-slate-900">Gemma4</div>
             <div class={`text-xs font-medium ${getStatusColor(metrics.gemma4_status)}`}>{metrics.gemma4_status}</div>
@@ -181,7 +181,7 @@
         </div>
 
         <div class="flex items-center gap-3">
-          <div class="w-3 h-3 rounded-full bg-blue-500" />
+          <div class="w-3 h-3 rounded-full bg-blue-500"></div>
           <div>
             <div class="text-sm font-medium text-slate-900">Concurrency</div>
             <div class="text-xs font-medium text-blue-600">{metrics.llm_concurrency} / 2 active</div>
@@ -198,7 +198,7 @@
   {:else}
     <div class="flex justify-center items-center h-96">
       <div class="text-center">
-        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+        <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
         <p class="text-slate-600">Loading metrics...</p>
       </div>
     </div>

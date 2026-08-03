@@ -134,7 +134,7 @@ async function promoteSummariesToAtlas(
         summary_length = EXCLUDED.summary_length,
         updated_at = NOW()
       RETURNING packet_key
-    `, packetKeys);
+    `);
 
     const committed = (result.rows as Array<{ packet_key: string }>).length;
     return {
@@ -175,7 +175,7 @@ async function propagateToAtlasPackets(results: FeatureEnvelope[]): Promise<Prom
       WHERE ap.packet_key = asl.packet_key
         AND ap.packet_key = ANY($1::text[])
       RETURNING ap.packet_key
-    `, packetKeys);
+    `);
 
     const committed = (result.rows as Array<{ packet_key: string }>).length;
     return {
@@ -226,7 +226,7 @@ async function embedSummaries(results: FeatureEnvelope[]): Promise<PromotionResu
             summary_embedding_384 = $1::vector,
             updated_at = NOW()
           WHERE packet_key = $2
-        `, [embedding, result.packet_key]);
+        `);
 
         committed++;
       } catch (e) {
@@ -288,7 +288,7 @@ async function syncToQdrant(
       FROM atlas_packets
       WHERE packet_key = ANY($1::text[])
         AND summary_embedding_384 IS NOT NULL
-    `, packetKeys);
+    `);
 
     type SummaryRow = {
       packet_key: string;

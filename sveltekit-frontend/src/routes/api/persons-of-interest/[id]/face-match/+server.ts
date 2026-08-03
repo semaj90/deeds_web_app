@@ -172,7 +172,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
         // Get unique POI IDs (excluding self)
         const uniquePoiIds = [
           ...new Set(photoOwners.filter((p) => p.poiId !== poiId).map((p) => p.poiId)),
-        ];
+        ] as string[];
 
         if (uniquePoiIds.length > 0) {
           return json(
@@ -353,7 +353,7 @@ async function buildMatchResponse(
 
 	const matches = uniquePoiIds
 		.map((pid) => {
-			const poi = poiMap.get(pid);
+			const poi = poiMap.get(pid) as any;
 			const photos = photosByPoi.get(pid) ?? [];
 			const similarity = scoreByPoi.get(pid) ?? 0;
 			if (!poi) return null;

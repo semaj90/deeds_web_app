@@ -323,7 +323,10 @@ export async function mirrorIDHierarchyToQdrant(
 ): Promise<void> {
   const fullPayload: QdrantPayload = {
     ...ids,
+    provenance: payload.provenance ?? { truth: 'postgres', revision: 0, parity_status: 'unknown' },
     ...payload,
+    mirrors: payload.mirrors ?? {},
+    topology: payload.topology ?? {},
     source_ref: payload.source_ref || '',
     packet_type: payload.packet_type || '',
     content_embedding: payload.content_embedding || [],

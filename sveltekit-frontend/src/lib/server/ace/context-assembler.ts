@@ -126,9 +126,22 @@ export class ACEContextAssembler {
 
     // Store ACE cursor for session recovery (Phase B2 wiring)
     if (sessionId && packet.candidates.length > 0) {
+      const now = new Date().toISOString();
       const cursor: ACECursor = {
+        id: crypto.randomUUID(),
+        query_text: queryText,
+        query_hash: crypto.createHash('sha256').update(queryText).digest('hex'),
+        last_rank: 0,
+        last_score: packet.candidates[0].final_score ?? 0,
+        candidates_retrieved: packet.candidates.length,
+        lanes_completed: Array.from(lanesUsed) as ('qdrant' | 'turbovec' | 'postgres' | 'neo4j')[],
+        next_lane: undefined,
+        session_id: sessionId,
+        created_at: now,
+        last_accessed_at: now,
+        ttl_seconds: 3600,
         packet_key: packet.candidates[0].packet_key,
-        last_retrieved_at: new Date().toISOString(),
+        last_retrieved_at: now,
         validation_gates: {
           gate_1_deserialization: 'PASS',
           gate_2_contract_validation: 'PASS',

@@ -69,6 +69,7 @@ export const EMBEDDING_LANES: Record<EmbeddingLane, EmbeddingLaneConfig> = {
     model: 'clip-vit-base-patch32',
     dimension: 512,
     collections: {
+      primary: 'evidence_items_clip_512',
       multimodal: 'evidence_items_clip_512'
     },
     estimatedVramMb: 1536,
@@ -104,12 +105,12 @@ export function selectEmbeddingLane(
 
   // Auto-select based on available VRAM (tier selection)
   if (availableVramMb >= lanes['primary-768d'].minVramMb) {
-    return {
-      available_vram_mb: availableVramMb,
-      preferred_lane,
-      lanes,
-      selected_lane: 'primary-768d',
-      fallback_chain: buildFallbackChain('primary-768d', availableVramMb),
+      return {
+        available_vram_mb: availableVramMb,
+        preferred_lane: preferredLane,
+        lanes,
+        selected_lane: 'primary-768d',
+        fallback_chain: buildFallbackChain('primary-768d', availableVramMb),
       reasoning: `Auto-selected primary-768d (VRAM: ${availableVramMb}MB ≥ ${lanes['primary-768d'].minVramMb}MB, sufficient for embeddinggemma)`
     };
   }
@@ -117,7 +118,7 @@ export function selectEmbeddingLane(
   if (availableVramMb >= lanes['fallback-512d'].minVramMb) {
     return {
       available_vram_mb: availableVramMb,
-      preferred_lane,
+      preferred_lane: preferredLane,
       lanes,
       selected_lane: 'fallback-512d',
       fallback_chain: buildFallbackChain('fallback-512d', availableVramMb),
@@ -128,7 +129,7 @@ export function selectEmbeddingLane(
   // Multimodal as last resort (lowest VRAM requirement)
   return {
     available_vram_mb: availableVramMb,
-    preferred_lane,
+    preferred_lane: preferredLane,
     lanes,
     selected_lane: 'multimodal-clip-512d',
     fallback_chain: [],

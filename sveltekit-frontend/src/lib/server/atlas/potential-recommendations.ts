@@ -17,8 +17,6 @@
  */
 
 import { z } from 'zod';
-import type { Database } from 'drizzle-orm';
-import type { PgDatabase } from 'drizzle-orm/node-postgres';
 import { eq, and, gt, asc } from 'drizzle-orm';
 
 /**
@@ -53,7 +51,7 @@ export const RecommendationsTableSchema = z.object({
   total_available: z.number().int().min(0).describe('Total candidates (some in potential_recommendations)'),
   generated_at: z.string().datetime(),
   expires_at: z.string().datetime().describe('TTL for this recommendation set'),
-  metadata: z.record(z.any()).optional().nullable()
+  metadata: z.record(z.string(), z.any()).optional().nullable()
 });
 
 export type RecommendationsTable = z.infer<typeof RecommendationsTableSchema>;
@@ -90,10 +88,10 @@ export const RecommendationScoringTaskSchema = z.object({
     title: z.string(),
     description: z.string().optional().nullable(),
     packet_key: z.string().optional().nullable(),
-    source_lane: z.string()
+  source_lane: z.string()
   }),
   scoring_config: z.object({
-    weights: z.record(z.number()).describe('Lane weights for composite scoring'),
+    weights: z.record(z.string(), z.number()).describe('Lane weights for composite scoring'),
     timeout_ms: z.number().int().default(5000)
   }).optional(),
   created_at: z.string().datetime(),
@@ -110,7 +108,7 @@ export async function partitionRecommendations(
   queryKey: string,
   userId: string,
   workspaceId: string,
-  db: PgDatabase<any>
+  db: any
 ): Promise<{
   top4: RecommendationsTable;
   overflow: PotentialRecommendationsTable[];
@@ -190,7 +188,7 @@ export function createScoringTasks(
  * Fetch pending recommendations for scoring.
  */
 export async function getPendingRecommendations(
-  db: PgDatabase<any>,
+  db: any,
   queryKey: string,
   limit: number = 10
 ): Promise<PotentialRecommendationsTable[]> {
@@ -214,7 +212,7 @@ export async function getPendingRecommendations(
  * Update a potential recommendation with new score.
  */
 export async function updatePotentialRecommendationScore(
-  db: PgDatabase<any>,
+  db: any,
   potentialRecId: string,
   newScore: number,
   newStatus: 'scored' | 'archived' = 'scored'
@@ -238,7 +236,7 @@ export async function updatePotentialRecommendationScore(
  * Fetch top-4 recommendations for a query.
  */
 export async function getTopRecommendations(
-  db: PgDatabase<any>,
+  db: any,
   queryKey: string
 ): Promise<RecommendationsTable | null> {
   // Pseudo-code:

@@ -131,8 +131,9 @@ export async function loadContextPackets(
 
 		try {
 			const cachedJson = await valkey.get(cacheKey);
-			if (cachedJson) {
-				cached = JSON.parse(cachedJson);
+			if (typeof cachedJson === 'string' && cachedJson.length > 0) {
+				const parsed = JSON.parse(cachedJson) as unknown;
+				cached = Array.isArray(parsed) ? (parsed as ContextPacket[]) : null;
 			}
 		} catch {
 			// Cache miss or parse error, fall through to DB

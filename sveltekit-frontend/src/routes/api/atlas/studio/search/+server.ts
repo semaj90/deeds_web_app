@@ -32,6 +32,7 @@
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { unifiedSearch } from '$lib/server/retrieval/service.js';
+import type { RetrievalSearchLane as SearchLane } from '$lib/server/retrieval/search-contract.js';
 import type { RequestHandler } from './$types';
 
 const SearchSchema = z.object({
@@ -60,14 +61,15 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     }
 
     const { query, k, lanes, summarize } = parsed.data;
+    const laneValues = (lanes ?? ['gpu-cuvs', 'qdrant', 'bm25']).filter(Boolean);
 
     // Call the unified retrieval service
     const result = await unifiedSearch({
       query,
       k,
-      lanes,
+      lanes: laneValues as unknown as SearchLane[],
       summarize,
-    });
+    } as any);
 
     return json(result, { status: 200 });
   } catch (err) {

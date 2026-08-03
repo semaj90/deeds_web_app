@@ -21,7 +21,7 @@ export async function startRedisInvalidateWorker(): Promise<void> {
 
     redis = new Redis({
       host: ENV.REDIS_HOST || 'localhost',
-      port: ENV.REDIS_PORT || 6379,
+      port: Number(ENV.REDIS_PORT || 6379),
       password: ENV.REDIS_PASSWORD || 'redis',
       lazyConnect: true,
       enableOfflineQueue: false,

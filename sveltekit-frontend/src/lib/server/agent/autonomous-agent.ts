@@ -143,6 +143,10 @@ export class AutonomousAgent {
       const result = await runtime.search({
         text: query,
         topK: Math.max(1, Math.min(limit, 20)),
+        filters: {
+          includeGenerated: false,
+          includeLegacy: false,
+        },
       });
 
       return {

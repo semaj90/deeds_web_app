@@ -186,7 +186,7 @@ export async function dequeuePromotionJobs(batchSize: number = 10): Promise<Prom
       WHERE id IN (${sql.join(result.rows.map((r: any) => sql`${r.id}`), sql`, `)})
     `);
 
-    return result.rows as PromotionJob[];
+    return result.rows as unknown as PromotionJob[];
   } catch (error) {
     console.error('Failed to dequeue promotion jobs:', error);
     return [];

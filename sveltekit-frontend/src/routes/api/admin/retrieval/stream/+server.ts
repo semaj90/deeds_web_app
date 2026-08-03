@@ -52,7 +52,7 @@ async function* generateStreamEvents(query: string, limit: number = 10, useRgPoo
   const startTime = Date.now();
 
   try {
-    yield { stage: 'start', query, limit, time_ms: 0 };
+    yield { data: { stage: 'start', query, limit, time_ms: 0 } };
 
     // Execute unified retrieval with progress updates
     const retrievalStart = Date.now();
@@ -84,18 +84,14 @@ async function* generateStreamEvents(query: string, limit: number = 10, useRgPoo
 
     // Stream stage completions
     for (const stage of result.stages_completed) {
-      yield { stage, time_ms: retrievalTime };
+      yield { data: { stage, time_ms: retrievalTime } };
     }
 
     // Stream candidate count
-    yield {
-      stage: 'ranking',
-      candidates: result.candidates.length,
-      top_score: result.candidates[0]?.score || 0
-    };
+    yield { data: { stage: 'ranking', candidates: result.candidates.length, top_score: result.candidates[0]?.score || 0 } };
 
     // Stream fallback status
-    yield { fallback_used: result.fallback_used };
+    yield { data: { fallback_used: result.fallback_used } };
 
     // Optionally summarize top candidates
     if (result.candidates.length > 0) {
@@ -109,28 +105,16 @@ async function* generateStreamEvents(query: string, limit: number = 10, useRgPoo
       );
 
       if (summaryResult.summary) {
-        yield {
-          stage: 'gemma4_summary',
-          summary: summaryResult.summary.summary,
-          time_ms: Date.now() - summaryStart
-        };
+        yield { data: { stage: 'gemma4_summary', summary: summaryResult.summary.summary, time_ms: Date.now() - summaryStart } };
       }
     }
 
     // Stream completion
-    yield {
-      complete: true,
-      total_time_ms: Date.now() - startTime,
-      candidate_count: result.candidates.length,
-      fallback_used: result.fallback_used
-    };
+    yield { data: { complete: true, total_time_ms: Date.now() - startTime, candidate_count: result.candidates.length, fallback_used: result.fallback_used } };
   } catch (err) {
     const error = err instanceof Error ? err.message : String(err);
     console.error('[admin/retrieval/stream] Error:', error);
-    yield {
-      error,
-      code: 'RETRIEVAL_FAILED'
-    };
+    yield { data: { error, code: 'RETRIEVAL_FAILED' } };
   }
 }
 

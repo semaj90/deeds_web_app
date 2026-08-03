@@ -555,7 +555,7 @@ function addEdge(
   return true;
 }
 
-function parseGraphNode(node: NewGraphNodeV2Row): NewGraphNodeV2Row {
+function parseGraphNode(node: NewGraphNodeV2Row): GraphNode {
   return {
     snapshotId: z.string().uuid().parse(node.snapshotId),
     nodeKey: z.string().min(1).parse(node.nodeKey),
@@ -563,12 +563,11 @@ function parseGraphNode(node: NewGraphNodeV2Row): NewGraphNodeV2Row {
     packetKey: node.packetKey ?? null,
     treeNodeId: node.treeNodeId ?? null,
     sourceRef: node.sourceRef ?? null,
-    contentHash: node.contentHash ?? null,
-    properties: node.properties ?? {}
+    properties: (node.properties ?? {}) as Record<string, unknown>
   };
 }
 
-function parseGraphEdge(edge: NewGraphEdgeV2Row): NewGraphEdgeV2Row {
+function parseGraphEdge(edge: NewGraphEdgeV2Row): GraphEdge {
   return {
     snapshotId: z.string().uuid().parse(edge.snapshotId),
     edgeKey: z.string().min(1).parse(edge.edgeKey),
@@ -578,7 +577,7 @@ function parseGraphEdge(edge: NewGraphEdgeV2Row): NewGraphEdgeV2Row {
     weight: z.number().finite().nonnegative().parse(edge.weight),
     confidence: z.number().finite().min(0).max(1).parse(edge.confidence),
     provenance: z.string().min(1).parse(edge.provenance),
-    properties: edge.properties ?? {}
+    properties: (edge.properties ?? {}) as Record<string, unknown>
   };
 }
 

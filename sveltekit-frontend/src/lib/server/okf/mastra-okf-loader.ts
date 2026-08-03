@@ -24,12 +24,14 @@ import { z } from 'zod';
 // ============================================================================
 
 export interface OkfWorkflowSpec {
-  name: string;
-  description: string;
-  agent: string;
-  tags: string[];
-  criticality: 'low' | 'medium' | 'high' | 'critical';
-  estimated_duration_ms: number;
+  metadata: {
+    name: string;
+    description: string;
+    agent: string;
+    tags: string[];
+    criticality: 'low' | 'medium' | 'high' | 'critical';
+    estimated_duration_ms: number;
+  };
 
   spec: {
     input: Record<string, unknown>;
@@ -118,8 +120,8 @@ const OkfStepSchema = z.object({
   description: z.string(),
   timeout_ms: z.number().min(1000).max(300000),
   depends_on: z.array(z.string()).optional(),
-  input: z.record(z.unknown()),
-  output: z.record(z.unknown()),
+  input: z.record(z.string(), z.unknown()),
+  output: z.record(z.string(), z.unknown()),
   idempotency: z
     .object({
       enabled: z.boolean(),
@@ -160,8 +162,8 @@ const OkfWorkflowSpecSchema = z.object({
     estimated_duration_ms: z.number(),
   }),
   spec: z.object({
-    input: z.record(z.unknown()),
-    output: z.record(z.unknown()),
+    input: z.record(z.string(), z.unknown()),
+    output: z.record(z.string(), z.unknown()),
     steps: z.array(OkfStepSchema),
   }),
 });

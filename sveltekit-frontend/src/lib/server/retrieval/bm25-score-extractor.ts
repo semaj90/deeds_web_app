@@ -38,12 +38,12 @@ export async function extractBM25Scores(
 
   try {
     // Query: fetch lexical_features JSONB for all candidate packets
-    const rows = await sql`
+    const rows = await (db as any).execute(sql`
       SELECT packet_id, payload->'lexical_features' as features
       FROM atlas_packets
       WHERE packet_id = ANY(${packetIds})
         AND payload->>'lexical_features' IS NOT NULL
-    `.all();
+    `) as any[];
 
     const scores: BM25ScoreMap = {};
 

@@ -44,10 +44,13 @@ async function embedText(text: string): Promise<number[] | null> {
   try {
     const res = await ollamaFetch('/v1/embeddings', {
       method: 'POST',
-      body: {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         model: 'embeddinggemma:latest',
         input: text,
-      },
+      }),
     });
 
     if (!res.ok) return null;

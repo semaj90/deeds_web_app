@@ -46,4 +46,4 @@ export const EMBEDDING_CONFIG = {
  *     throw new Error('Invalid embedding dimension');
  *   }
  */
-export const EMBEDDING_DIMENSION = EMBEDDING_CONFIG.dimension as const; // = 768
+export const EMBEDDING_DIMENSION = EMBEDDING_CONFIG.dimension; // = 768

@@ -17,7 +17,7 @@ interface Neo4jSyncPacket {
   som_cluster_id?: number;
 }
 
-interface Neo4jSyncResult {
+export interface Neo4jSyncResult {
   nodes_created: number;
   nodes_updated: number;
   edges_created: number;

@@ -55,14 +55,14 @@ export const phase18RerankerProcedure = publicProcedure
         results: [],
         error: {
           code: 'VALIDATION_ERROR',
-          message: `Validation failed: ${validation.error?.errors?.[0]?.message || 'unknown error'}`,
+          message: `Validation failed: ${(validation.error as any)?.issues?.[0]?.message || 'unknown error'}`,
           details: { validationError: validation.error }
         }
       };
     }
 
     const validInput = validation.data as Phase18RequestEnvelope;
-    const { packets, params = {} } = validInput;
+    const { packets, params = {} as any } = validInput;
     const { topK = 10, returnReasons = false, returnLatency = false } = params;
 
     // Extract feature vectors and packet keys
@@ -225,7 +225,7 @@ export const phase18RerankerMutationProcedure = publicProcedure
 
     // Perform reranking (same as query procedure)
     const validInput = validation.data as Phase18RequestEnvelope;
-    const { packets, params = {} } = validInput;
+    const { packets, params = {} as any } = validInput;
     const { topK = 10, returnReasons = false } = params;
 
     const predictions = packets.map((packet) => {

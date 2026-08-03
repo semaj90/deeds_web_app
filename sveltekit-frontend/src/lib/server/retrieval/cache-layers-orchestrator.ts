@@ -11,6 +11,7 @@
  */
 
 import { createHash } from 'crypto';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface CacheLayerMetrics {
   layer: 'layer2_adapter' | 'layer3_exact' | 'layer4_semantic';

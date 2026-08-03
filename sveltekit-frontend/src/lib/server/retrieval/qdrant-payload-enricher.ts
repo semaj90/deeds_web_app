@@ -13,7 +13,7 @@
  */
 
 import { codebaseChunkIndex } from '../db/schema-postgres.js';
-import { sql } from 'drizzle-orm';
+import { inArray, sql } from 'drizzle-orm';
 
 async function getDb() {
   const mod = await import('../db/client.js');
@@ -94,7 +94,7 @@ export class QdrantPayloadEnricher {
         chunks = await db
           .select()
           .from(codebaseChunkIndex)
-          .where(/* WHERE id IN chunkIds */);
+          .where(inArray(codebaseChunkIndex.id as any, chunkIds as any));
       } else {
         // Enrich all chunks
         chunks = await db.select().from(codebaseChunkIndex);
@@ -105,7 +105,7 @@ export class QdrantPayloadEnricher {
       // Process in batches
       for (let i = 0; i < chunks.length; i += this.batchSize) {
         const batch = chunks.slice(i, i + this.batchSize);
-        const payloads: Record<string, any>[] = [];
+        const payloads: Array<{ id: string | number; payload: EnrichedPayload }> = [];
 
         for (const chunk of batch) {
           try {
@@ -344,14 +344,15 @@ export class QdrantPayloadEnricher {
     const qdrant = await getQdrant();
 
     for (const item of payloads) {
-      await qdrant.upsert(this.qdrantCollection, {
+      await qdrant.upsert({
+        collection: this.qdrantCollection,
         points: [
           {
             id: item.id as string | number,
             payload: item.payload
           }
         ]
-      });
+      } as any);
     }
   }
 }

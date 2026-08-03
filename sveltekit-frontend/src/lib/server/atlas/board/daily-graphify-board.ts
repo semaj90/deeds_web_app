@@ -46,6 +46,7 @@ const RawBoardSchema = z
     tasks: z.array(RawTaskSchema).optional(),
     columns: z
       .record(
+        z.string(),
         z
           .object({
             label: z.string().min(1).optional(),
@@ -248,7 +249,8 @@ function flattenBoardTasks(board: z.infer<typeof RawBoardSchema>, origin: string
   const columns = board.columns ?? {};
   const tasks: DailyGraphifyTask[] = [];
   for (const [columnId, column] of Object.entries(columns)) {
-    for (const [index, task] of (column.tasks ?? []).entries()) {
+    const normalizedColumn = column as { tasks?: z.infer<typeof RawTaskSchema>[] } | undefined;
+    for (const [index, task] of (normalizedColumn?.tasks ?? []).entries()) {
       tasks.push(normalizeTask(task, `${columnId}-${index + 1}`, origin));
     }
   }

@@ -1,5 +1,5 @@
 import { MultiQueryGenerator } from '$lib/server/ai/multi-query-generator';
-import { getQdrantClient } from '$lib/server/vector/qdrant-singleton';
+import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
 // embedding-client has the `(text: string) => number[] | null` shape callers expect
 // (handles gRPC → HTTP → inline cascade internally).
 import { generateEmbedding } from '$lib/server/grpc/embedding-client';
@@ -14,7 +14,7 @@ export interface AgenticSearchOptions {
 }
 
 export class AgenticSearchService {
-	private static qdrant = getQdrantClient();
+	private static qdrant = new QdrantManager();
 
 	/**
 	 * Performs an agentic multi-query semantic search with tag filtering.

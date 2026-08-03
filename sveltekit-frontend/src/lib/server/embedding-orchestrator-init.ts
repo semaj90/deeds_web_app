@@ -5,7 +5,7 @@
  */
 
 import { embeddingOrchestrator } from './retrieval/embedding-orchestrator';
-import { logger } from './logger';
+import { logger } from './logger.js';
 
 let initialized = false;
 

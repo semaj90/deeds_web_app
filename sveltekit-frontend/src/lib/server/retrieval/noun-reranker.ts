@@ -32,8 +32,6 @@
  *   - Domain-specific keywords (retrieval, reranking, SOM, PageRank, etc.)
  */
 
-import type { SelectSchema } from 'drizzle-orm';
-
 interface NounExtractionResult {
   nouns: string[];
   envKeys: string[];
@@ -74,7 +72,7 @@ export function extractNouns(query: string): NounExtractionResult {
 
   // Symbol pattern: camelCase or snake_case function/var names
   const symbolPattern = /\b[a-z_][a-zA-Z0-9_]*(?:\.(?:[a-z_][a-zA-Z0-9_]*)?)*\b/g;
-  const symbolMatches = query.match(symbolPattern) || [];
+  const symbolMatches: string[] = query.match(symbolPattern) || [];
   symbols.push(...new Set(symbolMatches.filter((s) => s.length > 2)));
 
   // Extract capitalized nouns (heuristic: words starting with capital after non-letters)

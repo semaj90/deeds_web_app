@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 
 import { db } from '../db/client.js';
 import { semanticCache as semanticCacheTable } from '../db/schema/schema-semantic-cache.js';
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { ENV } from '../env.server.js';
 import { getRedis } from '../redis.js';
 import {
@@ -227,9 +227,12 @@ export async function checkSemanticCache(
 ): Promise<SemanticCacheHit | null> {
 	const hash = crypto.createHash('sha256').update(prompt).digest('hex');
 
-	const exact = await db.query.semanticCache.findFirst({
-		where: (cache, { eq }) => eq(cache.promptHash, hash),
-	});
+	const exactRows = await db
+		.select()
+		.from(semanticCacheTable)
+		.where(eq(semanticCacheTable.promptHash, hash))
+		.limit(1);
+	const exact = exactRows[0] ?? null;
 	if (exact) {
 		const provenanceTuple =
 			(await getExactSemanticCacheTuple(getRedis(), hash, modelName)) ??

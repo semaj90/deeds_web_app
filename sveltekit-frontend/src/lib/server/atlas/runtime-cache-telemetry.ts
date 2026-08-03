@@ -49,7 +49,7 @@ class RuntimeCacheTelemetryCollector {
   }
 
   async initialize() {
-    if (!this.redis.isOpen) {
+    if (this.redis.status !== 'ready') {
       await this.redis.connect().catch(() => {});
     }
   }
@@ -192,7 +192,7 @@ class RuntimeCacheTelemetryCollector {
   }
 
   async shutdown() {
-    if (this.redis.isOpen) {
+    if (this.redis.status === 'ready') {
       await this.redis.quit().catch(() => {});
     }
   }

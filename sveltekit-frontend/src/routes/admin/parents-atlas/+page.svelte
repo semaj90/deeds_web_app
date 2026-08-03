@@ -29,12 +29,16 @@
 	// State Runes
 	let activeTab = $state<'pipeline' | 'hyperrag' | 'topology' | 'graphrag' | 'wiki'>('pipeline');
 	let isExecuting = $state(false);
-	let consoleLogs = $state<string[]>([
-		'[system] Parents Atlas Operational Console Initialized.',
-		'[system] Warm Cartridges Loaded: ' + data.cartridgeCount,
-		'[system] Active Index Chunks: ' + data.totalChunks,
-		'[system] Ready for action.'
-	]);
+	let consoleLogs = $state<string[]>([]);
+
+	$effect(() => {
+		consoleLogs = [
+			'[system] Parents Atlas Operational Console Initialized.',
+			'[system] Warm Cartridges Loaded: ' + data.cartridgeCount,
+			'[system] Active Index Chunks: ' + data.totalChunks,
+			'[system] Ready for action.'
+		];
+	});
 
 	// HyperRAG Expansion State
 	let expandQuery = $state('why drizzle migration fails user_id mismatch');
@@ -631,6 +635,7 @@
 		font-size: 1.5rem;
 		font-weight: 700;
 		background: linear-gradient(90deg, #f3e8ff, #a855f7);
+		background-clip: text;
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 		margin: 0;

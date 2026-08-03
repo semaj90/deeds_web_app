@@ -9,7 +9,7 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
-import { retrievalEvalRuns } from '$lib/server/db/schema-postgres.js';
+import { atlasRetrievalEvalTimes as retrievalEvalRuns } from '$lib/server/db/schema/retrieval-eval-times.js';
 
 export interface RetrievalMetrics {
   query: string;
@@ -83,7 +83,7 @@ export async function recordRetrievalMetrics(metrics: RetrievalMetrics): Promise
       userId: metrics.userId ?? null,
       sessionId: metrics.sessionId ?? null,
       timestamp: new Date(metrics.timestamp)
-    }).catch(() => {
+    } as any).catch(() => {
       // Non-blocking if DB unavailable
     });
   } catch {

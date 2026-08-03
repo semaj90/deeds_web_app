@@ -14,7 +14,7 @@
 
 import type { RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client.js';
-import { codeFeatures } from '$lib/server/db/schema-postgres.js';
+import { atlasFeatureMap as codeFeatures } from '$lib/server/db/schema/atlas-feature-map.js';
 import { eq, like, gt, desc, sql, and } from 'drizzle-orm';
 import { requireAdmin } from '$lib/server/auth-utils.js';
 import { z } from 'zod';
@@ -80,13 +80,13 @@ async function performSearch(req: SearchRequest): Promise<{ results: SearchResul
 
     // Filters
     if (req.filters?.domain_class) {
-      conditions.push(eq(codeFeatures.domainClass, req.filters.domain_class));
+      conditions.push(sql`COALESCE(${codeFeatures.metadata}->>'domain_class', '') = ${req.filters.domain_class}`);
     }
     if (req.filters?.ontology_label) {
-      conditions.push(eq(codeFeatures.ontologyLabel, req.filters.ontology_label));
+      conditions.push(sql`COALESCE(${codeFeatures.metadata}->>'ontology_label', '') = ${req.filters.ontology_label}`);
     }
     if (req.filters?.kind) {
-      conditions.push(eq(codeFeatures.kind, req.filters.kind));
+      conditions.push(sql`COALESCE(${codeFeatures.metadata}->>'kind', '') = ${req.filters.kind}`);
     }
 
     // Count total before limit/offset
@@ -102,21 +102,21 @@ async function performSearch(req: SearchRequest): Promise<{ results: SearchResul
       .select({
         feature_id: codeFeatures.featureId,
         source_ref: codeFeatures.sourceRef,
-        symbol: codeFeatures.symbol,
-        kind: codeFeatures.kind,
-        domain_class: codeFeatures.domainClass,
-        static_tags: codeFeatures.staticTags,
-        page_rank_score: codeFeatures.pageRankScore,
+        symbol: codeFeatures.featureLabel,
+        kind: sql<string>`COALESCE(${codeFeatures.metadata}->>'kind', 'feature')`.as('kind'),
+        domain_class: sql<string | undefined>`NULLIF(${codeFeatures.metadata}->>'domain_class', '')`.as('domain_class'),
+        static_tags: sql<string[]>`COALESCE(${codeFeatures.metadata}->'static_tags', '[]'::jsonb)::text[]`.as('static_tags'),
+        page_rank_score: sql<number>`COALESCE(NULLIF(${codeFeatures.pagerank}, '')::real, 0)`.as('page_rank_score'),
         summary: codeFeatures.summary,
-        created_at: codeFeatures.createdAt
+        created_at: codeFeatures.updatedAt
       })
       .from(codeFeatures)
       .where(conditions.length > 0 ? and(...conditions) : undefined)
       .orderBy(
         // Primary sort: page rank (authority)
-        desc(codeFeatures.pageRankScore),
+        desc(sql`COALESCE(NULLIF(${codeFeatures.pagerank}, '')::real, 0)`),
         // Secondary sort: freshness
-        desc(codeFeatures.createdAt)
+        desc(codeFeatures.updatedAt)
       )
       .limit(limit)
       .offset(offset);

@@ -7,6 +7,7 @@ import { db } from '$lib/server/db/client.js';
 import { atlasFacts, atlasFactArguments } from '$lib/server/db/schema/atlas-facts.js';
 import { extractedFactSchema, type ExtractedFact, type FactArgument } from './fact-extraction.schema.js';
 import crypto from 'crypto';
+import { eq } from 'drizzle-orm';
 
 export interface GateG13Result {
   fact_id: string;
@@ -209,9 +210,9 @@ RESPOND WITH ONLY A VALID JSON ARRAY. NO PREAMBLE. NO THINKING. NO MARKDOWN.`;
   for (let i = 0; i < facts.length; i++) {
     try {
       const fact_with_meta = {
-        packet_key,
-        source_ref,
-        ...facts[i]
+        packetKey: packet_key,
+        sourceRef: source_ref,
+        ...(facts[i] as Record<string, unknown>)
       };
 
       const validated = extractedFactSchema.parse(fact_with_meta);
@@ -255,11 +256,11 @@ export async function persistExtractedFacts(facts: ExtractedFact[]): Promise<Gat
         const inserted_fact = await tx
           .insert(atlasFacts)
           .values({
-            packet_key: fact.packet_key,
-            source_ref: fact.source_ref,
-            fact_text: fact.fact_text,
+            packetKey: fact.packet_key,
+            sourceRef: fact.source_ref,
+            factText: fact.fact_text,
             confidence: normalized_confidence,
-            reasoning_trace: fact.reasoning_trace
+            reasoningTrace: fact.reasoning_trace
           })
           .returning({ id: atlasFacts.id });
 
@@ -272,11 +273,11 @@ export async function persistExtractedFacts(facts: ExtractedFact[]): Promise<Gat
         if (fact.arguments.length > 0) {
           await tx.insert(atlasFactArguments).values(
             fact.arguments.map((arg) => ({
-              fact_id: id,
-              argument_index: arg.argument_index,
-              argument_name: arg.argument_name,
-              argument_value: arg.argument_value,
-              argument_type: arg.argument_type
+              factId: id,
+              argumentIndex: arg.argument_index,
+              argumentName: arg.argument_name,
+              argumentValue: arg.argument_value,
+              argumentType: arg.argument_type
             }))
           );
         }
@@ -285,12 +286,12 @@ export async function persistExtractedFacts(facts: ExtractedFact[]): Promise<Gat
       });
 
       // Verify readback (outside transaction, but validates persistence)
-      const readback = await db.query.atlasFacts.findFirst({
-        where: (facts_table, { eq }) => eq(facts_table.id, fact_id),
-        with: {
-          arguments: true
-        }
-      });
+      const readbackRows = await db
+        .select()
+        .from(atlasFacts)
+        .where(eq(atlasFacts.id, fact_id))
+        .limit(1);
+      const readback = readbackRows[0] ?? null;
 
       if (!readback) {
         throw new Error('READBACK_FAILED');

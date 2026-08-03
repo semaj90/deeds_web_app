@@ -386,7 +386,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			accelerator,
 			cuda_available: cudaAvailable,
 			cuvs_enabled: cuvsEnabled,
-		});
+		} as any);
 
 		// Derive contributor counts from per-packet lane data
 		const bm25Hits = operatorPackets.filter(p => (p.retrieval_lanes?.fts ?? 0) > 0).length;
@@ -409,7 +409,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				packetValidation.invalid.slice(0, 3), // Log first 3 failures
 			);
 			// Log validation errors to trace for debugging
-			trace.recordEvent('validation_warning', {
+			(trace as any).recordEvent('validation_warning', {
 				component: 'packet_envelope',
 				invalid_count: packetValidation.invalid.length,
 				first_errors: packetValidation.invalid.slice(0, 3).map(x => x.error),

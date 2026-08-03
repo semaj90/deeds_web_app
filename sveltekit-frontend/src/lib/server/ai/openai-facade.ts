@@ -1781,15 +1781,13 @@ export async function runChatCompletion(
 
     // Handle tool calls if present
     let finalContent = extractAssistantText(result);
-    if (
-      typeof result === 'object' &&
-      result !== null &&
-      'tool_calls' in result &&
-      Array.isArray((result as any).tool_calls) &&
-      ((result as any).tool_calls as any[]).length > 0
-    ) {
+    const toolCalls = result && typeof result === 'object'
+      ? (result as { tool_calls?: unknown }).tool_calls
+      : undefined;
+
+    if (Array.isArray(toolCalls) && toolCalls.length > 0) {
       try {
-        const toolResult = await executeToolLoop((result as any).tool_calls, {
+        const toolResult = await executeToolLoop(toolCalls as Array<{ id: string; type: 'function'; function: { name: string; arguments: string } }>, {
           model: internalModel,
           messages: messages,
           temperature: req.temperature,
@@ -2069,7 +2067,7 @@ export async function runChatCompletion(
         }
       : undefined,
     toolLoop: {
-      toolsUsed: toolsUsedInLoop,
+      toolsUsed: toolsUsedInLoop.map((tool) => tool.name),
       toolRounds: toolRoundsExecuted,
       toolResultChars: toolResultCharsAccumulated,
       priorAnswerKey,

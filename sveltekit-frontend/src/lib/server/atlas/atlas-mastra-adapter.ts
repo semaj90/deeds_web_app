@@ -109,7 +109,7 @@ export const atlasValidateChangeTool = createTool({
     'Validate a proposed change against Postgres canonical state, revision consistency, and payload schemas.',
   inputSchema: z.object({
     packetKey: z.string(),
-    proposedChange: z.record(z.unknown()),
+    proposedChange: z.record(z.string(), z.unknown()),
   }),
   outputSchema: z.object({
     valid: z.boolean(),
@@ -131,7 +131,7 @@ export const atlasApplyChangeTool = createTool({
   description: 'Apply a validated change to Postgres (write), invalidate Redis cache, emit events.',
   inputSchema: z.object({
     packetKey: z.string(),
-    change: z.record(z.unknown()),
+    change: z.record(z.string(), z.unknown()),
   }),
   outputSchema: z.object({
     success: z.boolean(),
@@ -163,11 +163,11 @@ export const atlasBuildContextTool = createTool({
   }),
   outputSchema: z.object({
     contextPacket: z.object({
-      prompt: z.string(),
-      evidence: z.array(z.record(z.unknown())),
-      metadata: z.record(z.unknown()),
-      tokenCount: z.number(),
-    }),
+    prompt: z.string(),
+    evidence: z.array(z.record(z.string(), z.unknown())),
+    metadata: z.record(z.string(), z.unknown()),
+    tokenCount: z.number(),
+  }),
   }),
   execute: async (input, context) => {
     // TODO: Call ACE context assembler, token counter
@@ -212,7 +212,7 @@ export const atlasInspectRuntimeTool = createTool({
     detail: z.enum(['summary', 'full']).default('summary'),
   }),
   outputSchema: z.object({
-    runtime: z.record(z.unknown()),
+    runtime: z.record(z.string(), z.unknown()),
   }),
   execute: async (input, context) => {
     const runtime = (context as any).atlasRuntime as AtlasRuntimeContext | undefined;

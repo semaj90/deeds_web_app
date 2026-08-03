@@ -334,29 +334,37 @@ export async function streamLocalDeepResearchSynthesis(
     let buf = '';
 
     if (res.body) {
-      for await (const chunk of res.body as AsyncIterable<Uint8Array>) {
-        buf += decoder.decode(chunk, { stream: true });
-        const lines = buf.split('\n');
-        buf = lines.pop() ?? '';
+      const reader = res.body.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith('data:')) continue;
+          buf += decoder.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop() ?? '';
 
-          const payload = trimmed.slice(5).trim();
-          if (payload === '[DONE]') break;
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
 
-          try {
-            const parsed = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              fullText += content;
-              onChunk(content);
+            const payload = trimmed.slice(5).trim();
+            if (payload === '[DONE]') break;
+
+            try {
+              const parsed = JSON.parse(payload) as { choices?: Array<{ delta?: { content?: string } }> };
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                fullText += content;
+                onChunk(content);
+              }
+            } catch {
+              // Skip malformed SSE lines
             }
-          } catch {
-            // Skip malformed SSE lines
           }
         }
+      } finally {
+        reader.releaseLock();
       }
     }
 

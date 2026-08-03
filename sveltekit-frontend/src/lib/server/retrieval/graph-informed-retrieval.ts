@@ -27,6 +27,14 @@ export interface ContextDoc {
 	documentId: string;
 	sourceId?: string;
 	model?: string;
+	title?: string;
+	__semanticDiagnostics?: {
+		somCluster?: number;
+		domainClass?: string;
+		treeNodeId?: string;
+		hasEmbedding: boolean;
+		hasSomCluster: boolean;
+	};
 }
 
 interface GraphExpansionConfig {

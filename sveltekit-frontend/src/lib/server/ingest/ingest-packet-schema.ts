@@ -182,7 +182,7 @@ export const IngestPacketSchema = z.object({
   embeddingContract: EmbeddingContractSchema,
 
   // Metadata (optional, preserved through pipeline)
-  metadata: z.record(z.unknown()).optional().describe('Arbitrary metadata: title, labels, tags, etc.'),
+  metadata: z.record(z.string(), z.unknown()).optional().describe('Arbitrary metadata: title, labels, tags, etc.'),
 });
 
 export type IngestPacket = z.infer<typeof IngestPacketSchema>;
@@ -307,6 +307,8 @@ export const buildIngestionWorkerDispatch = (
     jobType: 'embed_chunk',
     packet,
     priority: 'high',
+    retryCount: 0,
+    maxRetries: 3,
   });
 
   // Optional: project native 768 embeddings into a declared truncated semantic lane
@@ -318,6 +320,8 @@ export const buildIngestionWorkerDispatch = (
       jobType: 'project_mrl',
       packet,
       priority: 'normal',
+      retryCount: 0,
+      maxRetries: 3,
     });
   }
 
@@ -327,6 +331,8 @@ export const buildIngestionWorkerDispatch = (
       jobType: 'encode_latent',
       packet,
       priority: 'low', // async, non-blocking
+      retryCount: 0,
+      maxRetries: 3,
     });
   }
 
@@ -336,6 +342,8 @@ export const buildIngestionWorkerDispatch = (
       jobType: 'review_classification',
       packet,
       priority: 'high', // human review has priority
+      retryCount: 0,
+      maxRetries: 3,
     });
   }
 

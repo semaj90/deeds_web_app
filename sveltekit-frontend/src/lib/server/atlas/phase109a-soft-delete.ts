@@ -24,11 +24,12 @@ export async function softDeleteSemanticSignal(
       )
     `
   );
+  const rows = result as unknown as any[];
 
   return {
-    deleted_signal_count: result[0]?.[0] || 0,
-    deleted_envelope_count: result[0]?.[1] || 0,
-    audit_id: result[0]?.[2],
+    deleted_signal_count: rows[0]?.[0] || 0,
+    deleted_envelope_count: rows[0]?.[1] || 0,
+    audit_id: rows[0]?.[2],
   };
 }
 
@@ -48,11 +49,12 @@ export async function recoverSemanticSignal(
       )
     `
   );
+  const rows = result as unknown as any[];
 
   return {
-    recovered_signal_count: result[0]?.[0] || 0,
-    recovered_envelope_count: result[0]?.[1] || 0,
-    recovered_recommendation_count: result[0]?.[2] || 0,
+    recovered_signal_count: rows[0]?.[0] || 0,
+    recovered_envelope_count: rows[0]?.[1] || 0,
+    recovered_recommendation_count: rows[0]?.[2] || 0,
   };
 }
 
@@ -67,7 +69,7 @@ export async function getActiveSemanticSignals(limit = 100) {
       LIMIT ${limit}
     `
   );
-  return result as any[];
+  return result as unknown as any[];
 }
 
 /**
@@ -80,7 +82,7 @@ export async function getActiveClassificationEnvelopes(limit = 100) {
       LIMIT ${limit}
     `
   );
-  return result as any[];
+  return result as unknown as any[];
 }
 
 /**
@@ -93,7 +95,7 @@ export async function getActiveRecommendations(limit = 100) {
       LIMIT ${limit}
     `
   );
-  return result as any[];
+  return result as unknown as any[];
 }
 
 /**
@@ -108,7 +110,7 @@ export async function getDeletionHistory(signalId: string) {
       ORDER BY deleted_at DESC
     `
   );
-  return result as any[];
+  return result as unknown as any[];
 }
 
 /**
@@ -148,7 +150,7 @@ export async function findSignalsDeletedBy(
       LIMIT ${limit}
     `
   );
-  return result as any[];
+  return result as unknown as any[];
 }
 
 /**
@@ -168,9 +170,10 @@ export async function permanentlyPurgeOldDeletions(retentionDays: number = 90) {
       RETURNING id
     `
   );
+  const rows = result as unknown as any[];
 
   return {
-    permanently_deleted_count: result.length,
+    permanently_deleted_count: rows.length,
     purge_timestamp: new Date(),
   };
 }

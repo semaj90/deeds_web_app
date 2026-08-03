@@ -9,10 +9,12 @@ export type RouteFeatureMapEntry = {
   route: string;
   file: string;
   service: string;
+  description?: string;
   clusters: string[];
   qdrant_collections: string[];
   redis_keys: string[];
   env: string[];
+  tools?: string[];
 };
 
 export const ROUTE_FEATURE_MAP: Record<string, RouteFeatureMapEntry> = {

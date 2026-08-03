@@ -65,7 +65,13 @@ class Neo4jGraphAnalyticsService implements GraphAnalyticsPort {
   }
 
   async getTopPageRank(input: PageRankQuery): Promise<AuthorityNodeClient[]> {
-    return getTopPageRankClient(input.limit, input.nodeType, input.scoreProperty ?? 'graphPageRank');
+    // 'pageRankScore' (not 'graphPageRank') is the property ~15+ production
+    // consumers actually read (ACE context-assembler, mutation-gate,
+    // authority-scorer-unified, architectural-guard's live Cypher, etc.) —
+    // confirmed live, 59,692 real Packet nodes populated before this default
+    // was corrected (GS1.35). 'graphPageRank' was this module's own default,
+    // written by nothing else, read by nothing in production.
+    return getTopPageRankClient(input.limit, input.nodeType, input.scoreProperty ?? 'pageRankScore');
   }
 
   async expandGraph(

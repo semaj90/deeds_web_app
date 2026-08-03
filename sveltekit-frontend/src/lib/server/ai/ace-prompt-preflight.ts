@@ -863,11 +863,8 @@ export async function buildAcePromptPreflight(
     packet: packedCards[0]
       ? {
           source_ref: packedCards[0].sourceRefs?.[0],
-          packet_id: packedCards[0].packetId,
-          packet_ulid: packedCards[0].packetUlid,
-          title_id: packedCards[0].titleId,
-          feature_id: packedCards[0].featureLabels?.[0],
           packet_key: packedCards[0].cardId,
+          feature_id: packedCards[0].featureLabels?.[0],
         }
       : undefined,
   });

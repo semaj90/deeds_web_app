@@ -97,8 +97,27 @@ export interface PolicyScore {
  * No untrusted text enters prompts directly
  */
 
+/**
+ * Packet shape actually produced by assembleACE()'s greedy selection —
+ * distinct from ScoredCandidate (feature-engineering stage) and from the
+ * unrelated ACEPacket type in ace/context-assembler.ts (a different
+ * subsystem's query/candidates envelope, not this orchestrator's packet).
+ */
+export interface AssembledPacket {
+  id: string;
+  sourceRef: string;
+  summary: string;
+  evidence: unknown[];
+  score: number;
+  citation: string;
+  metadata: {
+    policyScore: number;
+    reasoning: string;
+  };
+}
+
 export interface ACEAssemblyPlan {
-  selectedPackets: ScoredCandidate[];
+  selectedPackets: AssembledPacket[];
   rerankerPolicySummary: {
     topK: number;
     threshold: number;
@@ -190,7 +209,7 @@ export class Gemma4PolicyOrchestrator {
         // mock query embedding
         ...Array(768).fill(0.1)
       ]),
-      corpus: [c.embedding],
+      corpus: c.embedding, // flat buffer, not an array — see GPUTask.corpus doc
       dim: 768,
       n: 1
     }));
@@ -315,7 +334,7 @@ export class Gemma4PolicyOrchestrator {
       .sort((a, b) => b.policyScore - a.policyScore);
 
     // Greedily select packets until token budget exhausted
-    const selectedPackets: ScoredCandidate[] = [];
+    const selectedPackets: AssembledPacket[] = [];
     let usedTokens = 0;
 
     for (const item of ranked) {
@@ -332,7 +351,7 @@ export class Gemma4PolicyOrchestrator {
             policyScore: item.policyScore,
             reasoning: item.reasoning
           }
-        } as ACEPacket);
+        });
         usedTokens += packetTokens;
       } else {
         break;

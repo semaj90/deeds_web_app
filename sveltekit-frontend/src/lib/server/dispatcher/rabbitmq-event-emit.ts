@@ -6,7 +6,7 @@
 
 import type { Channel } from 'amqplib';
 
-interface DispatcherEvent {
+export interface DispatcherEvent {
   event_type: 'identity.quarantine' | 'identity.updated' | 'operator.alert' | 'mirror.synced';
   packet_keys: string[];
   source_ref?: string;
@@ -18,7 +18,7 @@ interface DispatcherEvent {
   timestamp: string;
 }
 
-interface EventEmissionResult {
+export interface EventEmissionResult {
   emitted: number;
   failed: number;
   exchanges: string[];

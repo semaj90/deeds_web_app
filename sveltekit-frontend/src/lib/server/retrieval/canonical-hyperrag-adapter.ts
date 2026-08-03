@@ -54,7 +54,6 @@ export function searchResultToHyperRagResult(
   const retrievalSources = result.provenance.retrievalSources;
   const hasQdrant =
     retrievalSources.includes('qdrant') ||
-    retrievalSources.includes('qdrant_384') ||
     retrievalSources.includes('qdrant_768');
 
   return {

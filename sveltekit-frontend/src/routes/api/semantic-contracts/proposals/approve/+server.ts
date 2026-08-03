@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       LIMIT 1
     `);
 
-    const proposal = proposals.rows?.[0];
+    const proposal = proposals.rows?.[0] as any;
     if (!proposal) {
       return json({ error: 'Proposal not found' }, { status: 404 });
     }

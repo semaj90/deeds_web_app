@@ -16,7 +16,8 @@ import {
   type RetrievalQualityReport,
   type MetricsComparison
 } from './semantic-fusion-metrics.js';
-import { compareRRFvsWeightedSum, computeRRFScore, type HyperRagSignals } from './compute-rrf-score.js';
+import { compareRRFvsWeightedSum, computeRRFScore } from './compute-rrf-score.js';
+import type { HyperRagSignals } from './signal-grouping.js';
 
 /**
  * Reference query for testing
@@ -32,7 +33,7 @@ export interface ReferenceQuery {
 /**
  * Reference result with manual relevance judgment
  */
-export interface ReferencResult {
+export interface ReferenceResult {
   hitId: string;
   title: string;
   relevance: number; // 0=irrelevant, 1=relevant
@@ -142,7 +143,7 @@ export function createMockTestCase(
   query: ReferenceQuery,
   hitCount: number = 10
 ): ReferenceTestCase {
-  const results: ReferencResult[] = [];
+  const results: ReferenceResult[] = [];
 
   // Generate synthetic hits with varied signals
   for (let i = 0; i < hitCount; i++) {

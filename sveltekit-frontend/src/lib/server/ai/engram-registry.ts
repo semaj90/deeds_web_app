@@ -134,7 +134,7 @@ export async function recallEngramsForIntent(input: {
         ? await db
             .select()
             .from(engramCards)
-            .where(inArray(engramCards.memoryId, Array.from(boostedMemoryIds)))
+            .where(inArray(engramCards.memoryId, Array.from(boostedMemoryIds) as string[]))
             .limit(80)
         : await db.select().from(engramCards).limit(80);
 

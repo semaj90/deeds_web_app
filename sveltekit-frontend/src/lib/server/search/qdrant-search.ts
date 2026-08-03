@@ -8,7 +8,25 @@ import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
 import { getCodebaseAnnBackend } from './codebase-ann-backend.js';
 import { searchTurboVecCode } from './turbovec-search.js';
-import type { SearchBackend, SearchBackendRequest } from './search-backend.js';
+/**
+ * Local backend contract for this file's own createCodebaseSearchBackend()
+ * dispatch. NOT the same as SearchBackend/SearchBackendRequest in
+ * ./search-backend.js — that's a newer, non-generic, backend-neutral
+ * contract for a different consumer set (Rust N-API/TurboVec candidate
+ * generation with queryVector/vectorName/SearchBackendCandidate shape).
+ * QdrantSearchBackend/TurboVecSearchBackend below were mis-annotated
+ * against that import; this local type matches what they actually
+ * implement and what searchCodebaseAnn() actually calls.
+ */
+interface CodebaseSearchBackend<T> {
+  readonly name: string;
+  search(request: {
+    embedding: number[];
+    limit: number;
+    topoClass?: string;
+    collection?: string;
+  }): Promise<T[]>;
+}
 
 export interface QdrantCodeResult {
   stable_key: string;
@@ -43,10 +61,10 @@ export interface QdrantCodeResult {
   workspaceRevision?: number | null;
 }
 
-class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
+class QdrantSearchBackend implements CodebaseSearchBackend<QdrantCodeResult> {
   readonly name = 'qdrant' as const;
 
-  async search(request: SearchBackendRequest): Promise<QdrantCodeResult[]> {
+  async search(request: { embedding: number[]; limit?: number; topoClass?: string; collection?: string }): Promise<QdrantCodeResult[]> {
     const { embedding, limit = 30, topoClass, collection = 'codebase_chunks_768' } = request;
 
     try {
@@ -75,16 +93,14 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
         }
       }
 
-      const res = await mgr.search({
-        collection,
-        query: '',
-        queryEmbedding: embedding,
+      const res = await mgr.search(collection, {
+        vector: embedding,
         limit,
-        filters: Object.keys(filters).length > 0 ? filters : undefined,
-        scoreThreshold: 0.001,
+        filter: Object.keys(filters).length > 0 ? (filters as any) : undefined,
+        score_threshold: 0.001,
       });
 
-      return (res.results ?? []).map((r) => {
+      return (res ?? []).map((r) => {
         const p = r.payload ?? {};
         const somCluster = p.som_cluster ?? p.somCluster;
         const packetKey = String(p.packet_key ?? p.packetKey ?? '').trim() || null;
@@ -132,16 +148,16 @@ class QdrantSearchBackend implements SearchBackend<QdrantCodeResult> {
   }
 }
 
-class TurboVecSearchBackend implements SearchBackend<QdrantCodeResult> {
+class TurboVecSearchBackend implements CodebaseSearchBackend<QdrantCodeResult> {
   readonly name = 'turbovec' as const;
 
-  async search(request: SearchBackendRequest): Promise<QdrantCodeResult[]> {
+  async search(request: { embedding: number[]; limit?: number; topoClass?: string; collection?: string }): Promise<QdrantCodeResult[]> {
     const { embedding, limit = 30, topoClass, collection = 'codebase_chunks_768' } = request;
     return searchTurboVecCode(embedding, limit, topoClass, collection);
   }
 }
 
-function createCodebaseSearchBackend(backend: string): SearchBackend<QdrantCodeResult> {
+function createCodebaseSearchBackend(backend: string): CodebaseSearchBackend<QdrantCodeResult> {
   if (backend === 'turbovec') return new TurboVecSearchBackend();
   if (backend === 'cuvs') {
     console.warn('[searchCodebaseAnn] backend=cuvs not implemented yet; falling back to qdrant');

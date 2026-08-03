@@ -37,27 +37,31 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const { sections, keyInsights, sourceRefs, featureIds, intent, promptVersion, model } = parsed.data;
-		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
+		const { ollamaFetch } = await import('$lib/server/ollama.js');
 		const { ENV } = await import('$lib/server/env.server.js');
+		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
-		const result = await runPhase101SummaryCache(
-			{
-				documentId: parsed.data.documentId,
-				sections,
-				keyInsights,
-				sourceRefs,
-				featureIds,
-				intent,
-				promptVersion,
-				model
-			},
-			async (ctx): Promise<Phase101SummaryGeneration> => {
-				const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						model: ctx.model,
-						prompt: `Synthesize insights from the following legal document sections and key findings.
+		let result;
+		try {
+			result = await runPhase101SummaryCache(
+				{
+					documentId: parsed.data.documentId,
+					sections,
+					keyInsights,
+					sourceRefs,
+					featureIds,
+					semanticEmbedding: [0],
+					intent,
+					promptVersion,
+					model
+				},
+				async (ctx): Promise<Phase101SummaryGeneration> => {
+					const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							model: ctx.model,
+							prompt: `Synthesize insights from the following legal document sections and key findings.
 
 Document ID: ${parsed.data.documentId}
 SourceRefs: ${(ctx.sourceRefs ?? []).join(', ') || parsed.data.documentId}
@@ -77,21 +81,33 @@ Return JSON: {
 }`,
 						stream: false,
 						options: { temperature: 0.3 }
-					}),
-					signal: AbortSignal.timeout(90_000)
-				});
+						}),
+						signal: AbortSignal.timeout(90_000)
+					});
 
-				if (!res.ok) {
-					throw new Error(`Ollama generate failed: ${res.status} ${res.statusText}`);
-				}
+					if (!res.ok) {
+						throw new Error(`Ollama generate failed: ${res.status} ${res.statusText}`);
+					}
 
-				const data = await res.json();
-				try {
-					const parsedResponse = JSON.parse(data.response) as { synthesis?: Phase101SummarySynthesis };
-					return {
-						rawText: String(data.response ?? ''),
-						synthesis:
-							parsedResponse.synthesis ?? {
+					const data = await res.json();
+					try {
+						const parsedResponse = JSON.parse(data.response) as { synthesis?: Phase101SummarySynthesis };
+						return {
+							rawText: String(data.response ?? ''),
+							synthesis:
+								parsedResponse.synthesis ?? {
+									mainThemes: [String(data.response ?? '').slice(0, 500)],
+									supportingEvidence: [],
+									gaps: [],
+									contradictions: [],
+									legalImplications: [],
+									nextSteps: []
+								}
+						};
+					} catch {
+						return {
+							rawText: String(data.response ?? ''),
+							synthesis: {
 								mainThemes: [String(data.response ?? '').slice(0, 500)],
 								supportingEvidence: [],
 								gaps: [],
@@ -99,22 +115,22 @@ Return JSON: {
 								legalImplications: [],
 								nextSteps: []
 							}
-					};
-				} catch {
-					return {
-						rawText: String(data.response ?? ''),
-						synthesis: {
-							mainThemes: [String(data.response ?? '').slice(0, 500)],
-							supportingEvidence: [],
-							gaps: [],
-							contradictions: [],
-							legalImplications: [],
-							nextSteps: []
-						}
-					};
+						};
+					}
 				}
-			}
-		);
+			);
+		} catch (err) {
+			console.warn('[/api/summarize/synthesize] non-fatal generation failure:', err);
+			return json({
+				synthesis: null,
+				summaryPacket: null,
+				cache: {
+					state: 'miss',
+					exactCacheKey: '',
+					semanticCacheKey: null
+				}
+			});
+		}
 
 		return json({
 			synthesis: result.packet.synthesis,

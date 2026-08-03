@@ -176,7 +176,7 @@ async function fetchMcpToolList() {
 			return [];
 		}
 
-		const body = await readMcpJsonRpcResponse(res);
+		const body = await readMcpJsonRpcResponse(res) as { result?: { tools?: Array<{ name: string; description: string; inputSchema: Record<string, unknown> }> } } | null;
 		_toolListCache = body?.result?.tools ?? [];
 	} catch (e) {
 		console.warn(`[mcp-tool-bridge] tools/list failed: ${e}, using fallback`);

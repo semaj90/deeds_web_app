@@ -101,9 +101,13 @@ export function validateRawPageRank(
     negativeCount,
     converged: options.converged,
     actualIterations: options.actualIterations,
+    convergenceIteration: options.actualIterations,
+    maxIterationDelta: 0,
+    rawScoreSumInvariant: sum,
     rankCorrelationWithReference: null,
     topKOverlapWithReference: null,
     status: failures.length > 0 ? 'fail' : warnings.length > 0 ? 'pass-with-warnings' : 'pass',
+    messages: [...failures, ...warnings],
     failures,
     warnings,
   };

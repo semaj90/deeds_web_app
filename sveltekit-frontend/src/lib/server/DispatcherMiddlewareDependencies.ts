@@ -8,7 +8,7 @@ export interface DispatcherMiddlewareDependencies {
   /** The connection pool for the primary database. */
   pool: Pool;
   /** The primary engram storage service instance. */
-  engramBridge: EngramBridge;
+  engramBridge: EngramMemoryBridge;
   /** The LangChain graph orchestration service instance. */
   langgraphBridge: LangGraphBridge;
 }

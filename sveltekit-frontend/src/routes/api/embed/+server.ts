@@ -64,7 +64,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Acquire GPU lease for embedding generation (non-blocking)
 		if (model !== 'mock') {
-			await acquireGpuLease('llama-server', 30).catch(() => null);
+			await acquireGpuLease('ollama', 30).catch(() => null);
 		}
 
 		let result: EmbedResponse;

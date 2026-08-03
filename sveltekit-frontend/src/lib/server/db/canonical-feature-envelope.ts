@@ -224,7 +224,7 @@ export function validateCanonicalEnvelope(envelope: unknown): ValidationResult {
   } catch (err) {
     result.isValid = false;
     if (err instanceof z.ZodError) {
-      err.errors.forEach((e) => {
+      err.issues.forEach((e) => {
         const path = e.path.join('.');
         result.hardFailures.push(`${path}: ${e.message}`);
       });

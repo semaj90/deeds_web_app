@@ -47,6 +47,7 @@ const DispatcherStateAnnotation = Annotation.Root({
 
 export function createDispatcherGraph(ctx: NodeContext) {
   const graph = new StateGraph(DispatcherStateAnnotation);
+  const typedGraph = graph as any;
 
   // Add start node that initializes state
   graph.addNode('start', async (state: DispatcherState) => {
@@ -171,15 +172,15 @@ export function createDispatcherGraph(ctx: NodeContext) {
   });
 
   // Wire start to routing conditional
-  graph.addEdge(START, 'start');
-  graph.addConditionalEdges('start', routeByDispatch, DISPATCHER_NODES);
+  typedGraph.addEdge(START, 'start');
+  typedGraph.addConditionalEdges('start', routeByDispatch, DISPATCHER_NODES);
 
   // Wire all nodes to end (each node handles its own routing)
   for (const nodeId of Object.values(DISPATCHER_NODES)) {
-    graph.addEdge(nodeId, 'end');
+    typedGraph.addEdge(nodeId, 'end');
   }
 
-  graph.addEdge('end', END);
+  typedGraph.addEdge('end', END);
 
   return graph.compile();
 }

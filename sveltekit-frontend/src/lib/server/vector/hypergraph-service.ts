@@ -39,7 +39,7 @@ export class HypergraphService {
 
     // 1. Semantic Seed Search
     console.log(`🔍 [Hypergraph-Service] Finding semantic seeds for: "${params.query}"`);
-    const semanticResults = await this.qdrant.hybridSearch({
+    const semanticResults = await (this.qdrant as any).hybridSearch({
       query: params.query,
       queryEmbedding: params.queryEmbedding,
       collection: 'codebase_chunks',
@@ -86,7 +86,7 @@ export class HypergraphService {
     const limit = params.limit ?? 5;
 
     // Pillar 1: Semantic Seed
-    const semanticResults = await this.qdrant.hybridSearch({
+    const semanticResults = await (this.qdrant as any).hybridSearch({
       query: params.query,
       queryEmbedding: params.queryEmbedding,
       collection: 'codebase_chunks',

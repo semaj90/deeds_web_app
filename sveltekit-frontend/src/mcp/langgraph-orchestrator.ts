@@ -36,7 +36,7 @@ export const AgentActionSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('tool_call'),
     tool_name: z.string(),
-    tool_input: z.record(z.unknown()),
+    tool_input: z.record(z.string(), z.unknown()),
     reasoning: z.string().optional(),
   }),
   z.object({
@@ -59,8 +59,8 @@ export const AgentStepResultSchema = z.object({
   step_number: z.number().int().positive(),
   action: AgentActionSchema,
   result: z.unknown().optional(),
-  state_before: z.record(z.unknown()),
-  state_after: z.record(z.unknown()),
+  state_before: z.record(z.string(), z.unknown()),
+  state_after: z.record(z.string(), z.unknown()),
   execution_time_ms: z.number().int().positive(),
   success: z.boolean(),
   error: z.string().optional(),
@@ -74,8 +74,8 @@ export type AgentStepResult = z.infer<typeof AgentStepResultSchema>;
 export const AgentLoopRunSchema = z.object({
   session_id: z.string().uuid(),
   user_prompt: z.string(),
-  initial_state: z.record(z.unknown()),
-  final_state: z.record(z.unknown()),
+  initial_state: z.record(z.string(), z.unknown()),
+  final_state: z.record(z.string(), z.unknown()),
   steps: z.array(AgentStepResultSchema),
   final_response: z.string().optional(),
   total_time_ms: z.number().int().nonnegative(),
@@ -93,7 +93,7 @@ export const AgentLoopConfigSchema = z.object({
   timeoutMs: z.number().int().positive().default(300_000), // 5 minutes
   includeReasoning: z.boolean().default(true),
   persistToDb: z.boolean().default(true),
-  headroomConfig: z.record(z.unknown()).optional(),
+  headroomConfig: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type AgentLoopConfig = z.infer<typeof AgentLoopConfigSchema>;

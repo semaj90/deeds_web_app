@@ -74,12 +74,12 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			)
 		);
 
-	const rowMap = new Map(rows.map(r => [r.id, r]));
+	const rowMap = new Map(rows.map((r) => [r.id, r as any]));
 
 	// Process exports with bounded concurrency (cap=2 — avoids OOM on large HTML/markdown renders)
 	const EXPORT_CONCURRENCY = 2;
 	const results = await mapLimit(validIds, EXPORT_CONCURRENCY, async (id) => {
-		const report = rowMap.get(id);
+		const report = rowMap.get(id) as any;
 		if (!report) return { id, error: 'Not found', status: 404 };
 
 		try {

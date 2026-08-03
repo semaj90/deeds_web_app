@@ -92,7 +92,7 @@ export async function getRetrievalGrpcClient(): Promise<RetrievalServiceClient> 
     return globalClient;
   }
 
-  globalChannel = new Channel(url, ChannelCredentials.createInsecure());
+  globalChannel = new Channel(url, ChannelCredentials.createInsecure(), {});
   // TODO: Load the actual proto and create the client stub
   // globalClient = new RetrievalServiceClient(url, ChannelCredentials.createInsecure());
 
@@ -101,12 +101,7 @@ export async function getRetrievalGrpcClient(): Promise<RetrievalServiceClient> 
 
 export async function closeRetrievalGrpcClient(): Promise<void> {
   if (globalChannel) {
-    await new Promise<void>((resolve, reject) => {
-      globalChannel!.close((err: Error | null) => {
-        if (err) reject(err);
-        else resolve();
-      });
-    });
+    globalChannel.close();
     globalChannel = null;
     globalClient = null;
   }

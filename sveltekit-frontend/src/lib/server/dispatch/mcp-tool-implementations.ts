@@ -35,13 +35,13 @@ const IdentityRecoverInputSchema = z.object({
 
 const EnvelopeValidateInputSchema = z.object({
   packet_key: z.string().min(1),
-  envelope: z.record(z.unknown()),
+  envelope: z.record(z.string(), z.unknown()),
 });
 
 const MirrorSyncQdrantInputSchema = z.object({
   packet_key: z.string().min(1),
   identity_lane: z.enum(['canonical', 'recoverable', 'quarantine']),
-  payload: z.record(z.unknown()),
+  payload: z.record(z.string(), z.unknown()),
 });
 
 const MirrorSyncNeo4jInputSchema = z.object({

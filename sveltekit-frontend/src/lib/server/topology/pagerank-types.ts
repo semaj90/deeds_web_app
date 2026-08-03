@@ -6,6 +6,10 @@
  */
 
 export type AuthorityBand = 'none' | 'low' | 'medium' | 'high' | 'critical';
+export interface RawPageRankScore {
+  packetKey: string;
+  rawScore: number;
+}
 
 export type GraphAlgorithmStatus =
   | 'started'
@@ -27,7 +31,9 @@ export interface DerivedAuthorityScore {
 }
 
 export interface PageRankEvaluation {
-  status: 'pass' | 'fail';
+  [key: string]: unknown;
+  status: 'pass' | 'fail' | 'pass-with-warnings';
+  runId?: string;
   convergenceIteration: number;
   maxIterationDelta: number;
   rawScoreSumInvariant: number;

@@ -184,7 +184,7 @@ export class RustNapiSearchBackend implements SearchBackend {
       visitedCount: nativeResult.visitedCount ?? null,
       indexVersion: nativeResult.indexVersion ?? this.manifest.indexVersion,
       embeddingModelVersion:
-        candidates[0]?.payload?.embeddingModelVersion ??
+        (candidates[0]?.payload?.embeddingModelVersion as string | null | undefined) ??
         (this.manifest.rows[0]?.embeddingModelVersion || null),
       warnings,
     };

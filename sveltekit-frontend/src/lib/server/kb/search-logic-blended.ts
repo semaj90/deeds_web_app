@@ -26,11 +26,11 @@ export async function retrieveRankedEntities(vectorMatches: { id: string, score:
   .from(entities)
   .where(sql`${entities.id} IN ${ids}`);
 
-  const graphDataMap = new Map(rows.map(r => [r.id, r]));
+  const graphDataMap = new Map(rows.map((r) => [r.id, r as any]));
 
   // Combine Vector score (which is provided by Qdrant/pgvector input) with Graph + Recency
   const finalResults = vectorMatches.map(match => {
-    const graphData = graphDataMap.get(match.id);
+    const graphData = graphDataMap.get(match.id) as any;
     const graphScore = graphData ? graphData.blendedScore : 0;
     
     return {

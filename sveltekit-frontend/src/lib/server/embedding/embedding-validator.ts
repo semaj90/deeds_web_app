@@ -8,7 +8,6 @@
  * - Packet identity is stable (packet_key, source_ref, feature_id)
  */
 
-import type Database from 'duckdb-async';
 import { EMBEDDING_CONTRACT, isValidEmbedding } from './embedding-contract.js';
 
 export interface ValidationResult {
@@ -23,7 +22,7 @@ export interface ValidationResult {
 }
 
 export class EmbeddingValidator {
-  constructor(private db: Database) {}
+  constructor(private db: any) {}
 
   /**
    * Validate all vectors in the 5K snapshot

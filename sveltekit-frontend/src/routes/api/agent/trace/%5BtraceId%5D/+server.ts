@@ -27,7 +27,7 @@ const traceQuerySchema = z.object({
  */
 export const GET: RequestHandler = async ({ params, url }) => {
   try {
-    const traceId = params.traceId;
+    const traceId = (params as { traceId?: string }).traceId;
     const query = traceQuerySchema.parse(Object.fromEntries(url.searchParams));
 
     if (!traceId) {
@@ -158,7 +158,7 @@ export const GET: RequestHandler = async ({ params, url }) => {
  */
 export const DELETE: RequestHandler = async ({ params }) => {
   try {
-    const traceId = params.traceId;
+    const traceId = (params as { traceId?: string }).traceId;
 
     if (!traceId) {
       return json({ error: 'Missing traceId' }, { status: 400 });

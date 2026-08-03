@@ -85,7 +85,7 @@
     </div>
     <div class="header-actions">
       <Button
-        on:click={loadStatus}
+        onclick={loadStatus}
         variant="outline"
         size="sm"
       >
@@ -104,7 +104,7 @@
     <div class="error-state">
       <Icon name="alert-triangle" class="w-6 h-6" />
       <p>{error}</p>
-      <Button on:click={loadStatus} variant="outline" size="sm">Retry</Button>
+      <Button onclick={loadStatus} variant="outline" size="sm">Retry</Button>
     </div>
   {:else}
     <!-- Status Overview -->
@@ -228,7 +228,7 @@
                   <p>✓ All services ready</p>
                   <p class="action-note">Execute: <code>npm run graphify:daily</code></p>
                 </div>
-                <Button on:click={runGraphifyDaily} variant="primary">Run Now</Button>
+                <Button onclick={runGraphifyDaily} variant="primary">Run Now</Button>
               </div>
             {:else}
               <div class="action-blocked">

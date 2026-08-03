@@ -179,9 +179,10 @@ export function createWorktreeLeaseAdapter(database: PostgresJsDatabase<any>) {
     const metadata = input.metadata ?? {};
 
     return database.transaction(async (tx) => {
-      await assertExecutionRunExists(tx, input.agentRunId);
+      const txAny = tx as any;
+      await assertExecutionRunExists(txAny, input.agentRunId);
 
-      const existingLease = await tx.query.worktreeLeases.findFirst({
+      const existingLease = await txAny.query.worktreeLeases.findFirst({
         where: eq(worktreeLeases.leaseId, leaseId),
       });
 
@@ -205,7 +206,7 @@ export function createWorktreeLeaseAdapter(database: PostgresJsDatabase<any>) {
         return { lease: existingLease, journalStepId: journal.journalStepId, duplicate: true };
       }
 
-      const activeLease = await tx.query.worktreeLeases.findFirst({
+      const activeLease = await txAny.query.worktreeLeases.findFirst({
         where: activeLeaseWhere(input.repositoryRoot, input.worktreePath),
       });
 
@@ -257,9 +258,10 @@ export function createWorktreeLeaseAdapter(database: PostgresJsDatabase<any>) {
     const heartbeatAt = nowIso();
 
     return database.transaction(async (tx) => {
-      await assertExecutionRunExists(tx, input.agentRunId);
+      const txAny = tx as any;
+      await assertExecutionRunExists(txAny, input.agentRunId);
 
-      const existingLease = await tx.query.worktreeLeases.findFirst({
+      const existingLease = await txAny.query.worktreeLeases.findFirst({
         where: eq(worktreeLeases.leaseId, input.leaseId),
       });
 
@@ -305,9 +307,10 @@ export function createWorktreeLeaseAdapter(database: PostgresJsDatabase<any>) {
     const releasedAt = nowIso();
 
     return database.transaction(async (tx) => {
-      await assertExecutionRunExists(tx, input.agentRunId);
+      const txAny = tx as any;
+      await assertExecutionRunExists(txAny, input.agentRunId);
 
-      const existingLease = await tx.query.worktreeLeases.findFirst({
+      const existingLease = await txAny.query.worktreeLeases.findFirst({
         where: eq(worktreeLeases.leaseId, input.leaseId),
       });
 

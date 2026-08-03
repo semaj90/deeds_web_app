@@ -42,7 +42,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     // Wire atlas-core GAN audit (relative import from compiled dist)
     const { executeGanDeepAudit } = await import('../../../../../../../packages/atlas-core/dist/validation/gan-deep-audit.js');
-    const { goSearchBridge } = await import('$lib/server/retrieval/go-search-bridge.js');
+    const goSearchBridge = await import('$lib/server/retrieval/go-search-bridge.js');
 
     // Get service clients with graceful fallback
     let redis;
@@ -78,6 +78,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const auditConfig = {
       operation: config.operation,
       dryRun: config.dryRun,
+      verbose: config.verbose,
       batchSize: config.batchSize,
       includeTokenAnalysis: config.includeTokenAnalysis,
       includeFeatureRecommendations: config.includeFeatureRecommendations,

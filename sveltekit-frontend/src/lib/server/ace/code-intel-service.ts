@@ -14,8 +14,8 @@
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, relative, extname } from 'path';
 import Redis from 'ioredis';
-import { generateSingleEmbedding } from './grpc/embedding-client.js';
-import { ensureQdrantCollection, batchUpsertPoints } from './retrieval/qdrant-manager.js';
+import { generateSingleEmbedding } from '../grpc/embedding-client.js';
+import { ensureQdrantCollection, batchUpsertPoints } from '../vector/qdrant-manager.js';
 import { extractAstFeatures, extractDependencyFeatures } from '../analysis/ast-grep-extractor.js';
 import { LIBRARY_DOMAIN_MAP } from '../../phase72/routeGraphAdapter.js';
 
@@ -285,29 +285,38 @@ function buildConceptVector12(
   ];
 }
 
-function buildKeyValuePairs(
-  node: CodeIntelNode,
-  astNode: ASTNode,
-  concepts: CodeIntelConcept[],
-  astNodes: ASTNode[]
-): CodeIntelKeyValue[] {
+function buildKeyValuePairs(entry: {
+  filePath: string;
+  symbol: string;
+  kind: ASTNode['kind'];
+  domain: DomainClass;
+  lineStart: number;
+  lineEnd: number;
+  concepts: CodeIntelConcept[];
+  imports: string[];
+  topologyCoords?: { x: number; y: number; z: number; w: number };
+  tags?: string[];
+  summary?: string;
+  conceptEmbedding12?: number[];
+  conceptFeatures?: CodeIntelConcept[];
+  keyValuePairs?: CodeIntelKeyValue[];
+}): CodeIntelKeyValue[] {
   const pairs: CodeIntelKeyValue[] = [
-    { key: 'domain', value: node.domain, source: 'labeler' },
-    { key: 'kind', value: astNode.kind, source: 'tree_sitter' },
-    { key: 'symbol', value: node.symbol, source: 'tree_sitter' },
-    { key: 'file_path', value: node.filePath, source: 'regex' },
-    { key: 'line_start', value: String(node.lineStart), source: 'tree_sitter' },
-    { key: 'line_end', value: String(node.lineEnd), source: 'tree_sitter' },
-    { key: 'concept_count', value: String(concepts.length), source: 'regex' },
-    { key: 'ast_count', value: String(astNodes.length), source: 'tree_sitter' },
-    { key: 'import_count', value: String(node.imports?.length ?? 0), source: 'ast_grep' },
-    { key: 'has_auth', value: String(node.domain === 'AUTH'), source: 'labeler' },
-    { key: 'has_data', value: String(node.domain === 'DATA'), source: 'labeler' },
-    { key: 'has_api', value: String(node.domain === 'API'), source: 'labeler' },
-    { key: 'has_ui', value: String(node.domain === 'UI'), source: 'labeler' },
+    { key: 'domain', value: entry.domain, source: 'labeler' },
+    { key: 'kind', value: entry.kind, source: 'tree_sitter' },
+    { key: 'symbol', value: entry.symbol, source: 'tree_sitter' },
+    { key: 'file_path', value: entry.filePath, source: 'regex' },
+    { key: 'line_start', value: String(entry.lineStart), source: 'tree_sitter' },
+    { key: 'line_end', value: String(entry.lineEnd), source: 'tree_sitter' },
+    { key: 'concept_count', value: String(entry.concepts.length), source: 'regex' },
+    { key: 'import_count', value: String(entry.imports.length), source: 'ast_grep' },
+    { key: 'has_auth', value: String(entry.domain === 'AUTH'), source: 'labeler' },
+    { key: 'has_data', value: String(entry.domain === 'DATA'), source: 'labeler' },
+    { key: 'has_api', value: String(entry.domain === 'API'), source: 'labeler' },
+    { key: 'has_ui', value: String(entry.domain === 'UI'), source: 'labeler' },
   ];
 
-  for (const concept of concepts.slice(0, 12)) {
+  for (const concept of entry.concepts.slice(0, 12)) {
     pairs.push({
       key: `concept_${normalizeKey(concept.concept)}`,
       value: String(Math.round(concept.confidence * 1000) / 1000),
@@ -363,19 +372,18 @@ async function extractFileFacts(filePath: string, content: string): Promise<{
   const concepts = inferConceptsFromFile(filePath, content, astNodes, astGrepFeatures, dependencyFeatures, domain);
   const chunks = chunkSourceText(content);
   const keyValuePairs = buildKeyValuePairs({
-    id: '',
     filePath: relative(process.cwd(), filePath),
     symbol: pathBaseName(filePath),
     kind: 'function',
     domain,
-    domainConfidence: confidence,
     lineStart: 1,
     lineEnd: content.split(/\r?\n/).length,
     topologyCoords: { x: 0, y: 0, z: 0, w: 0 },
     tags: [],
     summary: '',
     imports: importNames,
-  }, concepts, astNodes);
+    concepts,
+  });
   const conceptVector12 = buildConceptVector12(domain, concepts, astNodes, filePath, content, confidence);
 
   return {
@@ -566,22 +574,21 @@ export async function rebuildCodeIntelCorpus(): Promise<{
             const nodeId = `${rel}:${astNode.name}:${astNode.lineStart}`;
             const conceptSlice = fileFacts.concepts.slice(0, 24);
             const kvPairs = buildKeyValuePairs({
-              id: nodeId,
               filePath: rel,
               symbol: astNode.name,
               kind: astNode.kind,
               domain: fileFacts.domain,
-              domainConfidence: fileFacts.domainConfidence,
               lineStart: astNode.lineStart,
               lineEnd: astNode.lineEnd,
               topologyCoords: assign4DCoordinates(nodes, rel),
               tags: [fileFacts.domain, astNode.kind, ...extractTags(astNode.name)],
               summary: `${astNode.kind} ${astNode.name} in ${rel}`,
               imports: astNode.imports,
+              concepts: conceptSlice,
               conceptEmbedding12: fileFacts.conceptVector12,
               conceptFeatures: conceptSlice,
               keyValuePairs: [],
-            }, astNode, conceptSlice, astNodes);
+            });
 
             const intelNode: CodeIntelNode = {
               id: nodeId,

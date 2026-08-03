@@ -58,7 +58,7 @@ const ValidateSignalInput = z.object({
 const PersistCheckpointInput = z.object({
   workspaceId: z.string().describe('Workspace ID'),
   revisionId: z.string().describe('Revision ID'),
-  checkpointData: z.record(z.unknown()).describe('Checkpoint state to persist'),
+  checkpointData: z.record(z.string(), z.unknown()).describe('Checkpoint state to persist'),
 });
 
 // ===== OUTPUT SCHEMAS (Zod) =====
@@ -67,7 +67,7 @@ const WriteSignalOutput = z.object({
   signalId: z.string().describe('Newly created signal ID'),
   status: z.enum(['SUCCESS', 'FAILED', 'CONFLICT_DETECTED']),
   message: z.string(),
-  conflictDetails: z.record(z.unknown()).optional(),
+  conflictDetails: z.record(z.string(), z.unknown()).optional(),
 });
 
 const ClassifyDomainOutput = z.object({
@@ -176,6 +176,7 @@ export async function classifyDomain(
 
     // Write classification envelope
     await db.insert(classificationEnvelope).values({
+      signalId: crypto.randomUUID(),
       subjectId: input.subjectId,
       workspaceId: input.workspaceId,
       status: 'COMPLETE',

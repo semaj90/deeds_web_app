@@ -193,7 +193,7 @@ export async function extractFeatures(input: unknown): Promise<Phase17Output> {
   // Step 1: Validate input
   const validation = await validatePhase17Input(input);
   if (!validation.valid) {
-    console.warn('[Phase17] Input validation failed:', validation.error);
+    console.warn('[Phase17] Input validation failed:', (validation as { error?: string }).error);
     return defaultFeatures(input);
   }
 

@@ -20,12 +20,14 @@ export class SubagentOrchestrator {
    * Runs a tool-calling loop (CoT) until completion or max steps.
    */
   static async runMission(userId: string, params: SubagentMission) {
-    const { skillName, mission, sessionId, input } = params;
+		const { skillName, mission, sessionId, input } = params;
 
-    // 1. Fetch Skill
-    const skill = await db.query.adminAiSkills.findFirst({
-      where: eq(adminAiSkills.name, skillName)
-    });
+		// 1. Fetch Skill
+		const [skill] = await db
+			.select()
+			.from(adminAiSkills)
+			.where(eq(adminAiSkills.name, skillName))
+			.limit(1);
 
     if (!skill) throw new Error(`Skill not found: ${skillName}`);
 

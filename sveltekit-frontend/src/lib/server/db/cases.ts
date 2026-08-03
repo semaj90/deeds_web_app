@@ -3,7 +3,7 @@
  * Auto-create cases for prosecutors
  */
 
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from './client.js';
 import { wardenCases } from './warden-schema.js';
 
@@ -26,33 +26,20 @@ export async function autoCreateCaseForProsecutor(prosecutorId: string): Promise
  * Get prosecutor's cases
  */
 export async function getProsecutorCases(prosecutorId: string) {
-    return db.query.wardenCases.findMany({
-        where: eq(wardenCases.prosecutorId, prosecutorId),
-        with: {
-	evidence: {
-                columns: {
-	id: true,
-                    status: true,
-                    documentType: true,
-                },
-	},
-	},
-	orderBy: (cases, { desc }) => [desc(cases.createdAt)],
-    });
+    return db
+        .select()
+        .from(wardenCases)
+        .where(eq(wardenCases.prosecutorId, prosecutorId));
 }
 
 /**
  * Get case with evidence
  */
 export async function getCaseWithEvidence(caseId: string, prosecutorId: string) {
-    return db.query.wardenCases.findFirst({
-        where: (cases, { eq, and }) => and(eq(cases.id, caseId), eq(cases.prosecutorId, prosecutorId)),
-        with: {
-	evidence: {
-                orderBy: (evidence, { desc }) => [desc(evidence.createdAt)],
-            },
-	},
-	});
+    return db
+        .select()
+        .from(wardenCases)
+        .where(and(eq(wardenCases.id, caseId), eq(wardenCases.prosecutorId, prosecutorId)));
 }
 
 /**

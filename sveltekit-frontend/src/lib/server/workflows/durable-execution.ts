@@ -81,7 +81,8 @@ export class DurableExecutor {
 
     try {
       // Check if already executed
-      const existing = await this.db.query.executionJournalSteps.findFirst({
+      const queryDb = this.db as any;
+      const existing = await queryDb.query.executionJournalSteps.findFirst({
         where: eq(executionJournalSteps.idempotencyKey, idempotencyKey),
       });
 
@@ -171,7 +172,8 @@ export class DurableExecutor {
     }
   ): Promise<void> {
     // Find the current step
-    const currentStep = await this.db.query.executionJournalSteps.findFirst({
+    const queryDb = this.db as any;
+    const currentStep = await queryDb.query.executionJournalSteps.findFirst({
       where: and(
         eq(executionJournalSteps.runId, this.runId),
         eq(executionJournalSteps.stepName, stepName),
@@ -204,14 +206,15 @@ export class DurableExecutor {
     toStepName: string,
     dependencyType: 'data_dependency' | 'control_flow' | 'temporal' = 'control_flow'
   ): Promise<void> {
-    const fromStep = await this.db.query.executionJournalSteps.findFirst({
+    const queryDb = this.db as any;
+    const fromStep = await queryDb.query.executionJournalSteps.findFirst({
       where: and(
         eq(executionJournalSteps.runId, this.runId),
         eq(executionJournalSteps.stepName, fromStepName)
       ),
     });
 
-    const toStep = await this.db.query.executionJournalSteps.findFirst({
+    const toStep = await queryDb.query.executionJournalSteps.findFirst({
       where: and(
         eq(executionJournalSteps.runId, this.runId),
         eq(executionJournalSteps.stepName, toStepName)
@@ -276,7 +279,8 @@ export class DurableExecutor {
    * Used to resume from a checkpoint.
    */
   async getRecoveryMap(): Promise<Record<string, unknown>> {
-    const steps = await this.db.query.executionJournalSteps.findMany({
+    const queryDb = this.db as any;
+    const steps = await queryDb.query.executionJournalSteps.findMany({
       where: and(
         eq(executionJournalSteps.runId, this.runId),
         eq(executionJournalSteps.status, 'SUCCESS')
@@ -297,7 +301,8 @@ export async function resumeExecution(
   runId: string,
   db: PostgresJsDatabase<any>
 ): Promise<{ executor: DurableExecutor; recoveryMap: Record<string, unknown> }> {
-  const run = await db.query.executionRuns.findFirst({
+  const queryDb = db as any;
+  const run = await queryDb.query.executionRuns.findFirst({
     where: eq(executionRuns.runId, runId),
   });
 
@@ -341,7 +346,8 @@ export async function idempotentWrite<T>(
   }
 ): Promise<{ alreadyWritten: boolean; result: T }> {
   // Check if we've already written this change
-  const existing = await db.query.executionSideEffects.findFirst({
+  const queryDb = db as any;
+  const existing = await queryDb.query.executionSideEffects.findFirst({
     where: and(
       eq(executionSideEffects.runId, args.runId),
       eq(executionSideEffects.resourceId, args.resourceId),
@@ -361,7 +367,7 @@ export async function idempotentWrite<T>(
   const result = await args.write();
 
   // Find the current step
-  const currentStep = await db.query.executionJournalSteps.findFirst({
+  const currentStep = await queryDb.query.executionJournalSteps.findFirst({
     where: and(
       eq(executionJournalSteps.runId, args.runId),
       eq(executionJournalSteps.stepName, args.stepName),

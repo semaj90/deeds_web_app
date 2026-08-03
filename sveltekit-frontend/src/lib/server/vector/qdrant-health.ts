@@ -173,7 +173,7 @@ export async function checkQdrantHealth(
         // Get vector count if requested
         let vectorCount = 0;
         if (includeVectorCounts) {
-          vectorCount = collectionInfo.vectors_count ?? 0;
+          vectorCount = collectionInfo.indexed_vectors_count ?? collectionInfo.points_count ?? 0;
           totalVectors += vectorCount;
         }
 

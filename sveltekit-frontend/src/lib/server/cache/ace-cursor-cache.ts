@@ -22,6 +22,19 @@ export const ACECursorSchema = z.object({
   created_at: z.string().datetime(),
   last_accessed_at: z.string().datetime(),
   ttl_seconds: z.number().int().min(60).max(86400).default(3600),
+  packet_key: z.string().optional(),
+  last_retrieved_at: z.string().datetime().optional(),
+  validation_gates: z.record(z.string(), z.enum(['PASS', 'FAIL', 'NOT_PROVEN', 'PARTIAL_PROVEN'])).optional(),
+  dimension_verified: z.number().int().optional(),
+  embedding_lane: z.enum(['dense_384', 'dense_768']).optional(),
+  projection_version: z.string().nullable().optional(),
+  retrieval_trace: z
+    .object({
+      qdrant_elapsed_ms: z.number().nonnegative(),
+      postgres_join_elapsed_ms: z.number().nonnegative(),
+      total_elapsed_ms: z.number().nonnegative(),
+    })
+    .optional(),
 });
 
 export type ACECursor = z.infer<typeof ACECursorSchema>;

@@ -194,7 +194,7 @@ async function invokeLangGraphDispatcher(
     const redis = getRedis();
 
     // Build DispatcherState from intent (Phase 1: direct dispatcher, no LangGraph yet)
-    const dispatcherState: DispatcherState = {
+    const dispatcherState = {
       identity_lane: 'canonical',
       zod_valid: true,
       parity_status: 'matched',
@@ -206,7 +206,7 @@ async function invokeLangGraphDispatcher(
       action,
       query: intent,
       reason: `OpenCode intent: ${intent}`,
-    };
+    } as DispatcherState & { dispatch_decision: string };
 
     // Compute dispatch decision (deterministic routing)
     const decision = computeDispatchDecision(dispatcherState);

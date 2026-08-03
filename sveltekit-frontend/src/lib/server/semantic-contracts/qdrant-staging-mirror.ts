@@ -34,6 +34,7 @@ export async function mirrorPredictionToQdrant(
   prediction: DomainPrediction,
   embeddingVector: number[] // 768-dim from embeddinggemma
 ): Promise<void> {
+  const p = prediction as any;
   const collectionName = `domain_predictions_${prediction.classificationRunId}`;
 
   // Ensure collection exists (768-dim vectors, cosine similarity)
@@ -55,17 +56,17 @@ export async function mirrorPredictionToQdrant(
         id: hashStringToNumber(prediction.prediction_id),
         vector: embeddingVector,
         payload: {
-          prediction_id: prediction.prediction_id,
-          packet_key: prediction.packet_key,
-          predicted_domain: prediction.predicted_domain,
-          raw_score: prediction.raw_score,
-          score_margin: prediction.score_margin,
-          calibrated_confidence: prediction.calibrated_confidence,
-          status: prediction.status,
-          gate_reason: prediction.gate_reason,
-          created_at: prediction.created_at,
-          classifier_kind: prediction.classifier_kind,
-          classifier_version: prediction.classifier_version,
+          prediction_id: p.prediction_id,
+          packet_key: p.packet_key,
+          predicted_domain: p.predicted_domain,
+          raw_score: p.raw_score,
+          score_margin: p.score_margin,
+          calibrated_confidence: p.calibrated_confidence,
+          status: p.status,
+          gate_reason: p.gate_reason,
+          created_at: p.created_at,
+          classifier_kind: p.classifier_kind,
+          classifier_version: p.classifier_version,
         },
       },
     ],
@@ -83,6 +84,7 @@ export async function mirrorProposalToQdrant(
   proposal: OntologyProposal,
   embeddingVector: number[] // 768-dim, semantic embedding of proposal content
 ): Promise<void> {
+  const p = proposal as any;
   const collectionName = 'ontology_proposals';
 
   // Ensure collection exists
@@ -101,19 +103,19 @@ export async function mirrorProposalToQdrant(
   await qdrant.upsert(collectionName, {
     points: [
       {
-        id: hashStringToNumber(proposal.proposal_id),
+        id: hashStringToNumber(p.proposal_id),
         vector: embeddingVector,
         payload: {
-          proposal_id: proposal.proposal_id,
-          subject_packet_key: proposal.subject_packet_key,
-          predicate: proposal.predicate,
-          object_packet_key: proposal.object_packet_key,
-          confidence: proposal.confidence,
-          evidence_ids: proposal.evidence_ids,
-          proposal_source: proposal.proposal_source,
-          status: proposal.status,
-          gate_reason: proposal.gate_reason,
-          created_at: proposal.created_at,
+          proposal_id: p.proposal_id,
+          subject_packet_key: p.subject_packet_key,
+          predicate: p.predicate,
+          object_packet_key: p.object_packet_key,
+          confidence: p.confidence,
+          evidence_ids: p.evidence_ids,
+          proposal_source: p.proposal_source,
+          status: p.status,
+          gate_reason: p.gate_reason,
+          created_at: p.created_at,
         },
       },
     ],

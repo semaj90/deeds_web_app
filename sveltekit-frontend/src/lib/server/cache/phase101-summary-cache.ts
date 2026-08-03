@@ -367,37 +367,95 @@ async function setSummaryPacketRecord(
 		hitCount: packet.hitCount,
 	};
 
-	const pipeline = redis.pipeline();
-	pipeline.set(exactKey, JSON.stringify(exactRecord), 'EX', ttl);
+	const pipeline = typeof redis.pipeline === 'function' ? redis.pipeline() : null;
+	if (pipeline && typeof pipeline.set === 'function' && typeof pipeline.exec === 'function') {
+		pipeline.set(exactKey, JSON.stringify(exactRecord), 'EX', ttl);
 
-	for (const sourceRef of packet.sourceRefs) {
-		pipeline.set(sourceRefIndexKey(sourceRef), exactKey, 'EX', ttl);
+		for (const sourceRef of packet.sourceRefs) {
+			pipeline.set(sourceRefIndexKey(sourceRef), exactKey, 'EX', ttl);
+		}
+
+		for (const featureId of packet.featureIds) {
+			const key = featureIndexKey(featureId);
+			pipeline.lpush?.(key, packet.packetId);
+			pipeline.ltrim?.(key, 0, 24);
+			pipeline.expire?.(key, ttl);
+		}
+
+		if (semanticEmbedding && semanticEmbedding.length > 0) {
+			const semanticKey = semanticIndexKey(packet.packetId);
+			pipeline.set(
+				semanticKey,
+				JSON.stringify({
+					...exactRecord,
+					semanticEmbedding,
+				}),
+				'EX',
+				ttl
+			);
+			pipeline.lpush?.(SEMANTIC_INDEX_KEY, semanticKey);
+			pipeline.ltrim?.(SEMANTIC_INDEX_KEY, 0, SEMANTIC_SCAN_LIMIT - 1);
+			pipeline.expire?.(SEMANTIC_INDEX_KEY, ttl);
+		}
+
+		await pipeline.exec();
+	} else {
+		try {
+			await redis.set(exactKey, JSON.stringify(exactRecord), 'EX', ttl);
+		} catch {}
+		for (const sourceRef of packet.sourceRefs) {
+			try {
+				await redis.set(sourceRefIndexKey(sourceRef), exactKey, 'EX', ttl);
+			} catch {}
+		}
+		for (const featureId of packet.featureIds) {
+			const key = featureIndexKey(featureId);
+			if (typeof redis.lpush === 'function') {
+				try {
+					await redis.lpush(key, packet.packetId);
+				} catch {}
+			}
+			if (typeof redis.ltrim === 'function') {
+				try {
+					await redis.ltrim(key, 0, 24);
+				} catch {}
+			}
+			if (typeof redis.expire === 'function') {
+				try {
+					await redis.expire(key, ttl);
+				} catch {}
+			}
+		}
+		if (semanticEmbedding && semanticEmbedding.length > 0) {
+			const semanticKey = semanticIndexKey(packet.packetId);
+			try {
+				await redis.set(
+					semanticKey,
+					JSON.stringify({
+						...exactRecord,
+						semanticEmbedding,
+					}),
+					'EX',
+					ttl
+				);
+			} catch {}
+			if (typeof redis.lpush === 'function') {
+				try {
+					await redis.lpush(SEMANTIC_INDEX_KEY, semanticKey);
+				} catch {}
+			}
+			if (typeof redis.ltrim === 'function') {
+				try {
+					await redis.ltrim(SEMANTIC_INDEX_KEY, 0, SEMANTIC_SCAN_LIMIT - 1);
+				} catch {}
+			}
+			if (typeof redis.expire === 'function') {
+				try {
+					await redis.expire(SEMANTIC_INDEX_KEY, ttl);
+				} catch {}
+			}
+		}
 	}
-
-	for (const featureId of packet.featureIds) {
-		const key = featureIndexKey(featureId);
-		pipeline.lpush(key, packet.packetId);
-		pipeline.ltrim(key, 0, 24);
-		pipeline.expire(key, ttl);
-	}
-
-	if (semanticEmbedding && semanticEmbedding.length > 0) {
-		const semanticKey = semanticIndexKey(packet.packetId);
-		pipeline.set(
-			semanticKey,
-			JSON.stringify({
-				...exactRecord,
-				semanticEmbedding,
-			}),
-			'EX',
-			ttl
-		);
-		pipeline.lpush(SEMANTIC_INDEX_KEY, semanticKey);
-		pipeline.ltrim(SEMANTIC_INDEX_KEY, 0, SEMANTIC_SCAN_LIMIT - 1);
-		pipeline.expire(SEMANTIC_INDEX_KEY, ttl);
-	}
-
-	await pipeline.exec();
 
 	await storeSemanticRecord(packet);
 }

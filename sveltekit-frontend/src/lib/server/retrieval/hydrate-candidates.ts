@@ -21,7 +21,7 @@ function asFiniteNumber(value: unknown, fallback = 0): number {
 }
 
 function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | null) {
-  if (candidate.embeddingLane !== 'dense_384' && candidate.embeddingLane !== 'dense_768') {
+  if (candidate.embeddingLane !== 'dense_768') {
     return undefined;
   }
 
@@ -32,11 +32,11 @@ function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | nul
     score,
     qdrant_point_id: qdrantPointId ?? candidate.packetKey,
     embedding_lane: candidate.embeddingLane,
-    embedding_status: candidate.embeddingLane === 'dense_384' ? 'ACTIVE' as const : 'REFERENCE_ONLY' as const,
+    embedding_status: 'ACTIVE' as const,
     embedding_native_dimension: 768,
-    projection_source_dimension: candidate.embeddingLane === 'dense_384' ? 768 : undefined,
-    projection_method: candidate.embeddingLane === 'dense_384' ? 'direct_slice' as const : 'none' as const,
-    projection_version: candidate.embeddingLane === 'dense_384' ? 'embeddinggemma-768-to-384-direct-slice-v1' : 'embeddinggemma-768-native-v1',
+    projection_source_dimension: undefined,
+    projection_method: 'none' as const,
+    projection_version: 'embeddinggemma-768-native-v1',
     metric: 'cosine' as const,
     confidence: score,
   };

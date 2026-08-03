@@ -1,0 +1,163 @@
+{
+  "comparison": {
+    "cugraph_order": [
+      "recommendation",
+      "synthesis",
+      "retrieval",
+      "chunker",
+      "parser",
+      "validation"
+    ],
+    "cugraph_order_match": true,
+    "cugraph_top": "recommendation",
+    "cugraph_top_match": true,
+    "max_abs_delta": 5.205507691563582e-09,
+    "neo4j_gds_order": [
+      "recommendation",
+      "synthesis",
+      "retrieval",
+      "chunker",
+      "parser",
+      "validation"
+    ],
+    "neo4j_gds_top": "recommendation",
+    "networkx_order": [
+      "recommendation",
+      "synthesis",
+      "retrieval",
+      "chunker",
+      "parser",
+      "validation"
+    ],
+    "networkx_top": "recommendation",
+    "rank_order_match": true,
+    "top_rank_match": true
+  },
+  "cugraph": {
+    "normalized": {
+      "chunker": 0.12424232136253005,
+      "parser": 0.06715801117971106,
+      "recommendation": 0.2975859632214078,
+      "retrieval": 0.17276398452654484,
+      "synthesis": 0.2710917085300952,
+      "validation": 0.06715801117971106
+    },
+    "params": {
+      "alpha": 0.85,
+      "max_iter": 100,
+      "tol": 1e-08
+    },
+    "ran": true,
+    "raw": {
+      "chunker": 0.12424232136253005,
+      "parser": 0.06715801117971106,
+      "recommendation": 0.2975859632214078,
+      "retrieval": 0.17276398452654484,
+      "synthesis": 0.2710917085300952,
+      "validation": 0.06715801117971106
+    }
+  },
+  "fixture": {
+    "edges": [
+      [
+        "parser",
+        "chunker",
+        1.0
+      ],
+      [
+        "chunker",
+        "retrieval",
+        1.0
+      ],
+      [
+        "retrieval",
+        "synthesis",
+        1.0
+      ],
+      [
+        "validation",
+        "synthesis",
+        2.0
+      ],
+      [
+        "synthesis",
+        "recommendation",
+        1.0
+      ]
+    ],
+    "nodes": [
+      "parser",
+      "chunker",
+      "retrieval",
+      "validation",
+      "synthesis",
+      "recommendation"
+    ]
+  },
+  "gates": {
+    "GRAPH_PAGERANK_CUGRAPH": "PASS",
+    "GRAPH_PAGERANK_NEO4J": "PASS",
+    "GRAPH_PAGERANK_NETWORKX": "PASS",
+    "GRAPH_REVISION_LINEAGE": "NOT_APPLICABLE_SYNTHETIC_FIXTURE",
+    "GRAPH_SCORE_PARITY": "PASS",
+    "GRAPH_VERTEX_IDENTITY_MAP": "PASS"
+  },
+  "generated_at": "2026-08-03T02:20:28.003462+00:00",
+  "neo4j_gds": {
+    "meta": {
+      "gdsVersion": "2.13.10",
+      "nodeCount": 6,
+      "relationshipCount": 5
+    },
+    "normalized": {
+      "chunker": 0.12424232121592939,
+      "parser": 0.06715801146806995,
+      "recommendation": 0.29758596330402304,
+      "retrieval": 0.1727639845016099,
+      "synthesis": 0.2710917080422978,
+      "validation": 0.06715801146806995
+    },
+    "params": {
+      "dampingFactor": 0.85,
+      "maxIterations": 100,
+      "tolerance": 1e-08
+    },
+    "raw": {
+      "chunker": 0.2775,
+      "parser": 0.15000000000000002,
+      "recommendation": 0.6646696875,
+      "retrieval": 0.385875,
+      "synthesis": 0.60549375,
+      "validation": 0.15000000000000002
+    }
+  },
+  "networkx": {
+    "normalized": {
+      "chunker": 0.12424231719442025,
+      "parser": 0.06715801144165764,
+      "recommendation": 0.2975859636247424,
+      "retrieval": 0.1727639897071176,
+      "synthesis": 0.2710917065904046,
+      "validation": 0.06715801144165764
+    },
+    "params": {
+      "alpha": 0.85,
+      "max_iter": 100,
+      "tol": 1e-08
+    },
+    "raw": {
+      "chunker": 0.12424231719442025,
+      "parser": 0.06715801144165764,
+      "recommendation": 0.2975859636247424,
+      "retrieval": 0.1727639897071176,
+      "synthesis": 0.2710917065904046,
+      "validation": 0.06715801144165764
+    }
+  },
+  "remarks": {
+    "cugraph": "ran (see cugraph block)",
+    "fixture_cleanup": "deleted after run"
+  },
+  "schema_version": 1,
+  "status": "PASS"
+}

@@ -114,7 +114,7 @@ export class FeatureExtractionOrchestrator {
           const content = pkt.summary || (pkt.payload as any)?.text || '';
 
           // Extract features (40-dim: 20 lexical + 10 structural + 10 semantic)
-          const featureVector = this.featureGen.generateFeatureVector(
+          const featureVector = await this.featureGen.generateFeatureVector(
             pkt.packetKey,
             pkt.sourceRef,
             content

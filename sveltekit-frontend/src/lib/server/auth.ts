@@ -492,10 +492,10 @@ export class AuthService {
   /**
    * Health check for auth service
    */
-  async health() {
-    try {
-      await db.query.users.findFirst();
-      return { status: 'healthy', timestamp: new Date() };
+	async health() {
+		try {
+			await db.select().from(schema.users).limit(1);
+			return { status: 'healthy', timestamp: new Date() };
     } catch (error) {
       console.error('Auth service health check failed:', error);
       return { status: 'unhealthy', error: String(error) };

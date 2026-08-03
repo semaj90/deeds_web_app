@@ -10,6 +10,8 @@
 import { z } from 'zod';
 import { DenseRepresentationName, DenseRole, DenseLifecycle } from './dense-lane-policy';
 
+type ISO8601 = string;
+
 /**
  * Where did this candidate score come from?
  * Critical: This enum is NOT the same as dense representation name.

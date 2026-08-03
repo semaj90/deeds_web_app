@@ -97,7 +97,7 @@ export async function executeDispatcherOrchestration(
       `[dispatcher-orchestrator] Executing LangGraph for decision: ${state.dispatch_decision}`
     );
 
-    const nodeContext: NodeContext = {
+    const nodeContext = {
       mcpClient: {
         callTool: async (name: string, args: any) => ({
           content: [{ type: 'text', text: JSON.stringify({ success: true }) }],
@@ -108,7 +108,7 @@ export async function executeDispatcherOrchestration(
       qdrant: null,
       neo4j: ctx.neo4jSession,
       logger,
-    };
+    } as NodeContext & { logger?: Console };
 
     const graph = createDispatcherGraph(nodeContext);
     const finalState = await graph.invoke(state);

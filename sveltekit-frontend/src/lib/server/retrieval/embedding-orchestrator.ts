@@ -17,7 +17,7 @@ import {
   QuantizedProjectionModel,
   CLIPModel
 } from './embedding-models';
-import { logger } from '../logger';
+import { logger } from '../logger.js';
 
 export interface EmbeddingRequest {
   text: string;

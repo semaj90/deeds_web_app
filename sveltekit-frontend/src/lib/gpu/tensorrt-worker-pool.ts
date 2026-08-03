@@ -22,11 +22,22 @@ export interface GPUTask {
 	taskId: string;
 	operation: 'findBMU' | 'attention' | 'autoencoder' | 'cosine' | 'kmeans' | 'pagerank';
 	embedding?: Float32Array;
+	/** findBMU only — one embedding per candidate, transferred per-element. */
 	embeddings?: Float32Array[];
+	/**
+	 * kmeans/pagerank only — a single flattened buffer (n*dim contiguous
+	 * floats for kmeans, an n*n adjacency matrix for pagerank), NOT an array
+	 * of embeddings. Kept as a distinct field from `embeddings` because the
+	 * worker (tensorrt-worker.js) and the native addon both read it as one
+	 * flat Float32Array, not per-element — reusing `embeddings` here was the
+	 * source of a real TS2740 type-vs-runtime-shape mismatch.
+	 */
+	flatEmbeddings?: Float32Array;
 	centroids?: Float32Array;
 	queryEmbedding?: Float32Array;
 	keys?: Float32Array;
-	corpus?: Float32Array[];
+	/** cosine only — a single flattened n*dim buffer, not an array of vectors. */
+	corpus?: Float32Array;
 	dim?: number;
 	n?: number;
 	k?: number;
@@ -156,6 +167,9 @@ class TensorRTWorkerPool {
 		}
 		if (task.corpus?.buffer) {
 			transfer.push(task.corpus.buffer as ArrayBuffer);
+		}
+		if (task.flatEmbeddings?.buffer) {
+			transfer.push(task.flatEmbeddings.buffer as ArrayBuffer);
 		}
 
 		try {
@@ -330,7 +344,7 @@ export async function gpuKmeansWithCentroids(
 	const result = await pool.submit({
 		taskId: `kmeans-${Date.now()}-${Math.random()}`,
 		operation: 'kmeans',
-		embeddings,
+		flatEmbeddings: embeddings,
 		n,
 		dim,
 		k,
@@ -365,7 +379,7 @@ export async function gpuPageRank(
 	const result = await pool.submit({
 		taskId: `pagerank-${Date.now()}-${Math.random()}`,
 		operation: 'pagerank',
-		embeddings: adjacencyMatrix, // reuse field name
+		flatEmbeddings: adjacencyMatrix,
 		n,
 		damping,
 		iters

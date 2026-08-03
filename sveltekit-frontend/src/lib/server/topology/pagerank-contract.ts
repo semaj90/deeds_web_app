@@ -253,7 +253,7 @@ export function buildPageRankAuthorityBatch(input: {
     }
 
     return {
-      contractVersion: PAGERANK_CONTRACT_VERSION as const,
+      contractVersion: PAGERANK_CONTRACT_VERSION,
       graphSnapshotId: input.graphSnapshotId,
       nodeKey: row.nodeKey,
       algorithm: {
@@ -298,4 +298,3 @@ export function buildPageRankAuthorityBatch(input: {
     records,
   });
 }
-

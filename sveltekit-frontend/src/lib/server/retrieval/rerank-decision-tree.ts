@@ -90,7 +90,10 @@ export async function combineRerankSignals(
 
 		const weights = loadWeights();
 		if (ENV.ACE_ENCODED_RERANK_ENABLED) {
-			weights.encoded = ENV.ACE_ENCODED_RERANK_WEIGHT;
+			const encodedWeight = Number(ENV.ACE_ENCODED_RERANK_WEIGHT);
+			if (Number.isFinite(encodedWeight)) {
+				weights.encoded = encodedWeight;
+			}
 		}
 
 		const finalScore =

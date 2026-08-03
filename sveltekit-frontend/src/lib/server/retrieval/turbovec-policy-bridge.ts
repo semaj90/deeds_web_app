@@ -9,8 +9,7 @@
  * Stage: ACE A2b (TurboVec rerank) → Feature Engineering (policy input)
  */
 
-import { recordRetrievalMetrics } from './retrieval-metrics.js';
-import type { RetrievalMetrics } from './retrieval-metrics.js';
+import { recordRetrievalMetrics, type RetrievalMetrics } from '../telemetry/retrieval-metrics.js';
 import { RETRIEVAL_LIMITS } from './search-contract.js';
 
 /**

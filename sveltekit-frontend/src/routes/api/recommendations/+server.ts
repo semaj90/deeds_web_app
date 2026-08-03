@@ -39,7 +39,6 @@ import {
 import {
   fetchGraphDocuments,
   computeCentralityForNodes,
-  getPersonalizedCaseRecommendations,
 } from '$lib/server/graph/graph-centrality.js';
 import { getRedis } from '$lib/server/redis.js';
 
@@ -103,9 +102,7 @@ export const GET: RequestHandler = async (event) => {
       tracker.getInteractionStats().catch(() => null),
     ]);
 
-    const personalizedCases = await getPersonalizedCaseRecommendations(auth.user.id, 10).catch(
-      () => []
-    );
+    const personalizedCases = [];
 
     const processingTime = Date.now() - startTime;
     const resultData = {
@@ -275,11 +272,12 @@ async function processRecommendationJob(
 		const timeoutPromise = new Promise<never>((_, reject) =>
 			setTimeout(() => reject(new Error('Embedding timeout (15s)')), 15000)
 		);
-		const result = await Promise.race([embeddingPromise, timeoutPromise]);
-		if (result.vectors.length === 0) {
+		const result = await Promise.race([embeddingPromise, timeoutPromise]) as { vectors?: number[][] } | number[][];
+		const vectors = Array.isArray(result) ? result : result.vectors;
+		if (!vectors || vectors.length === 0) {
 			throw new Error('No embedding returned');
 		}
-		queryEmbedding = result.vectors[0];
+		queryEmbedding = vectors[0];
 		console.log(
 			`[recommendations] Job ${jobId}: embedding in ${Date.now() - startTime}ms`
 		);
@@ -365,7 +363,9 @@ async function processRecommendationJob(
 	const topicIds = selection.ready
 		.map((d) => (d as unknown as { topicId?: number }).topicId)
 		.filter((t): t is number => t !== undefined);
-	recommendationMetrics.recordImpression(userId, docIds, topicIds).catch(() => {});
+	if (typeof recommendationMetrics.recordImpression === 'function') {
+		recommendationMetrics.recordImpression(userId, docIds, topicIds).catch(() => {});
+	}
 
 	const potentialRecommendations = selection.potential.map((doc) => ({
 		documentId: doc.documentId,
@@ -463,6 +463,9 @@ async function fetchRAGCandidates(
   limit: number
 ): Promise<DocumentCandidate[]> {
   try {
+    if (typeof qdrant.hybridSearch !== 'function') {
+      return [];
+    }
     const response = await qdrant.hybridSearch({
       query: '',
       queryEmbedding,
@@ -520,6 +523,9 @@ async function fetchGraphCandidatesFromQdrant(
   limit: number
 ): Promise<DocumentCandidate[]> {
   try {
+    if (typeof qdrant.hybridSearch !== 'function') {
+      return [];
+    }
     const response = await qdrant.hybridSearch({
       query: '',
       queryEmbedding: new Array(768).fill(0),

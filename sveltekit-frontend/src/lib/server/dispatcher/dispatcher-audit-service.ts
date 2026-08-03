@@ -3,7 +3,6 @@
  * Persists dispatcher decisions to Postgres audit log
  */
 
-import type { DrizzleORM } from 'drizzle-orm';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 import { dispatcherAuditLog, type DispatcherAuditLogInsert } from './dispatcher-audit-schema.js';
 import type { DispatcherOrchestrationResult } from './dispatcher-orchestrator.js';

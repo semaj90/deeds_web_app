@@ -400,7 +400,7 @@ export async function persistEvalToDb(
   const completedAt = new Date();
 
   // Insert evaluation_runs row
-  const [run] = await db.execute<{ id: string }>(sql`
+  const runResult = await db.execute<{ id: string }>(sql`
     INSERT INTO evaluation_runs (
       run_type, benchmark_name, dataset_version, implementation_version,
       config, status, passed, artifact_path, started_at, completed_at
@@ -427,7 +427,8 @@ export async function persistEvalToDb(
     RETURNING id
   `);
 
-  const runId = (run as unknown as { id: string }).id;
+  const run = (runResult as unknown as { rows?: Array<{ id: string }> }).rows?.[0];
+  const runId = run?.id ?? '';
 
   // Aggregate result row
   await db.execute(sql`

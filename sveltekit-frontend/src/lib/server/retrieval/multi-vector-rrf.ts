@@ -18,7 +18,10 @@
  *         + 0.15·noun_rrf + 0.12·authority_rrf + 0.08·topology_rrf
  */
 
-import type { Candidate, RankedCandidate } from './noun-reranker';
+interface Candidate {
+  feature_id: string;
+  rank: number | null;
+}
 
 interface VectorSearchResult {
   id: string;
@@ -99,6 +102,14 @@ export function mergeRRF(rankings: {
       noun_rank: null,
       authority_rank: null,
       topology_rank: null,
+      component_scores: {
+        semantic: 0,
+        lexical: 0,
+        noun_overlap: 0,
+        pagerank: 0,
+        topology: 0,
+        freshness: 0
+      },
       rrf_score: 0
     });
   }

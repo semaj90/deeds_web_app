@@ -1,0 +1,652 @@
+{
+  "envelopes": [
+    {
+      "contentHash": "16e3b1a56c7210b966fb2d4cd69b6d1db4b55d31beb7c7f5be00bc4aca28ceab",
+      "dimensions": 768,
+      "endByte": 77,
+      "endLine": 3,
+      "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+      "language": "typescript",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.ts",
+      "parserContractVersion": "typescript-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.ts",
+      "sourceRevision": "rev-ts-b",
+      "stableSymbolId": "f763c858-cb72-544e-9d56-257d813c40a9",
+      "startByte": 7,
+      "startLine": 1,
+      "symbolKind": "function",
+      "symbolName": "add",
+      "symbolPath": "add",
+      "symbolVersionId": "sha256:ab02b51e188d06bf7e4af1c48c25faeb6808c122ff6e38fb95336633e1b16097",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "9fe5c41978b9e527e16ad6255ae145257b112857ddcb5593079b9dc6dd822cf6",
+      "dimensions": 768,
+      "endByte": 163,
+      "endLine": 9,
+      "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+      "language": "typescript",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.ts",
+      "parserContractVersion": "typescript-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.ts",
+      "sourceRevision": "rev-ts-b",
+      "stableSymbolId": "479f9985-15ae-532a-9704-c0343c3aa629",
+      "startByte": 86,
+      "startLine": 5,
+      "symbolKind": "class",
+      "symbolName": "Calculator",
+      "symbolPath": "Calculator",
+      "symbolVersionId": "sha256:25fbef98a7dc8aae853aab56acd63aada9051f480498958856865f7f08841dc1",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "13d5d4ce702e540820ac7b203937c8a85b8bf93c4b708f6f7452e419fa544f69",
+      "dimensions": 768,
+      "endByte": 161,
+      "endLine": 8,
+      "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+      "language": "typescript",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.ts",
+      "parserContractVersion": "typescript-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.ts",
+      "sourceRevision": "rev-ts-b",
+      "stableSymbolId": "65027b9c-745c-56ab-ad6c-ac02f2a06d99",
+      "startByte": 107,
+      "startLine": 6,
+      "symbolKind": "method",
+      "symbolName": "multiply",
+      "symbolPath": "Calculator.multiply",
+      "symbolVersionId": "sha256:0baa506cf758419981a1e84538724326a77163abe23c835733adfea714b31cf9",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "b0b88b0723bf5acd6faf8a42e12573f1c3b474a49a96824905954469ac8c42d5",
+      "dimensions": 768,
+      "endByte": 41,
+      "endLine": 2,
+      "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+      "language": "python",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.py",
+      "parserContractVersion": "python-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.py",
+      "sourceRevision": "rev-py-b",
+      "stableSymbolId": "14e8146e-baec-568f-a088-662d5b3b4f82",
+      "startByte": 0,
+      "startLine": 1,
+      "symbolKind": "function",
+      "symbolName": "add",
+      "symbolPath": "add",
+      "symbolVersionId": "sha256:387051e091acf45bae914c9a8e4651d5f5956ebaf02881e3523145db12675369",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "394fd6bc1480a1140e704f20bb9eacf9f1fac21d41d08583b952c15ddccf84d3",
+      "dimensions": 768,
+      "endByte": 111,
+      "endLine": 6,
+      "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+      "language": "python",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.py",
+      "parserContractVersion": "python-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.py",
+      "sourceRevision": "rev-py-b",
+      "stableSymbolId": "3f3c4878-e527-56f5-a6fe-db22381926bf",
+      "startByte": 43,
+      "startLine": 4,
+      "symbolKind": "class",
+      "symbolName": "Calculator",
+      "symbolPath": "Calculator",
+      "symbolVersionId": "sha256:cd8ce75bff479e6b3462fe05fe47ddb9fa93edcecd4cee1ab7fd2d2f9604ce44",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "bf233e328661488b323b464151e6b24a8688cfb5dd290fbabc1aef325443a4b8",
+      "dimensions": 768,
+      "endByte": 111,
+      "endLine": 6,
+      "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+      "language": "python",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.py",
+      "parserContractVersion": "python-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.py",
+      "sourceRevision": "rev-py-b",
+      "stableSymbolId": "81f9e867-6ef3-56cf-bd73-096e3190f679",
+      "startByte": 65,
+      "startLine": 5,
+      "symbolKind": "function",
+      "symbolName": "multiply",
+      "symbolPath": "Calculator.multiply",
+      "symbolVersionId": "sha256:83ae86ab439b109b978cc2a1703d3e26d4ec16b286adfdbd78c6504023c57faa",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "fa115f791ac9b66f4a395c3f69fb2fe3ce9179e6ee6521dc2ec1c9f710b7c7fe",
+      "dimensions": 768,
+      "endByte": 73,
+      "endLine": 5,
+      "grammarDigest": "326ab061e88d01bbc961ac2e73b0133fa3b11c199921cd800ef217687c4c4291",
+      "language": "go",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.go",
+      "parserContractVersion": "go-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.go",
+      "sourceRevision": "rev-go-b",
+      "stableSymbolId": "02abdd8c-8634-5f3a-85ac-ada6a0c167b1",
+      "startByte": 16,
+      "startLine": 3,
+      "symbolKind": "function",
+      "symbolName": "Add",
+      "symbolPath": "Add",
+      "symbolVersionId": "sha256:de7de125dc3261296b931c6e1c53e9f19385a0bc3b40f9aa5f6875500beb9f16",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "5c90a9244e59b6e70d4d09aea6dd41030990c0005fd3386f2a6f79bd9de0ae27",
+      "dimensions": 768,
+      "endByte": 169,
+      "endLine": 11,
+      "grammarDigest": "326ab061e88d01bbc961ac2e73b0133fa3b11c199921cd800ef217687c4c4291",
+      "language": "go",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.go",
+      "parserContractVersion": "go-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.go",
+      "sourceRevision": "rev-go-b",
+      "stableSymbolId": "28dd38dd-62d3-5d95-82e2-8aceb6bf99d3",
+      "startByte": 102,
+      "startLine": 9,
+      "symbolKind": "function",
+      "symbolName": "Multiply",
+      "symbolPath": "Multiply",
+      "symbolVersionId": "sha256:3d9667d05b463eee9022e39248c53be5cc8dcca74b7a521538ec9c2dd28f1f0e",
+      "workspaceId": "deeds-web-app"
+    }
+  ],
+  "gates": {
+    "DB1_CONSTRAINT_UNCHANGED": "PASS",
+    "DB2_TRANSACTION_REMAINS_ROLLED_BACK": "PASS",
+    "GPU1_TORCH_CUDA_OPERATION": "PASS",
+    "GPU2_CUPY_CUDA_OPERATION": "PASS",
+    "GPU3_CUVS_EXACT_KNN": "PASS",
+    "GPU4_CUVS_TORCH_TOPK_PARITY": "PASS",
+    "GPU5_IDENTITY_PRESERVED_THROUGH_KNN": "PASS",
+    "GPU6_STALE_SYMBOL_VERSION_REJECTED": "PARTIAL_PROVEN",
+    "GRAPH1_GRAPH_REFRESH_NOT_PERFORMED": "PASS",
+    "ID1_STABLE_SYMBOL_ID_DETERMINISTIC": "PASS",
+    "ID2_BODY_EDIT_PRESERVES_STABLE_ID": "PASS",
+    "ID3_BODY_EDIT_CHANGES_VERSION_ID": "PASS",
+    "ID4_REAL_TREE_SITTER_EVIDENCE": "PASS",
+    "ID5_HEURISTIC_PARSER_HONESTLY_LABELED": "PASS",
+    "ID6_SOURCE_REVISION_PROPAGATED": "PASS"
+  },
+  "generated_at": "2026-08-03T02:14:05.696119+00:00",
+  "gpu": {
+    "cuvs_status": "PASS:26.06.00 build_ms=70.183 search_ms=3.192",
+    "torch_status": "PASS:cuda"
+  },
+  "knn": {
+    "current_corpus_size": 8,
+    "cuvsDistances": [
+      [
+        0.0,
+        1.9154013395309448,
+        1.9772146940231323
+      ],
+      [
+        0.0,
+        1.9184120893478394,
+        1.9620182514190674
+      ],
+      [
+        0.0,
+        1.8773741722106934,
+        1.9515044689178467
+      ],
+      [
+        0.0,
+        1.8670734167099,
+        2.004019021987915
+      ],
+      [
+        0.0,
+        1.8773741722106934,
+        1.9154013395309448
+      ],
+      [
+        -0.0,
+        1.9171854257583618,
+        1.9184120893478394
+      ],
+      [
+        -0.0,
+        1.8670734167099,
+        1.9534227848052979
+      ],
+      [
+        -0.0,
+        1.9171854257583618,
+        1.9515044689178467
+      ]
+    ],
+    "cuvsIds": [
+      [
+        0,
+        4,
+        5
+      ],
+      [
+        1,
+        5,
+        6
+      ],
+      [
+        2,
+        4,
+        7
+      ],
+      [
+        3,
+        6,
+        5
+      ],
+      [
+        4,
+        2,
+        0
+      ],
+      [
+        5,
+        7,
+        1
+      ],
+      [
+        6,
+        3,
+        7
+      ],
+      [
+        7,
+        5,
+        2
+      ]
+    ],
+    "cuvs_parity": "PASS",
+    "cuvs_status": "PASS:26.06.00 build_ms=70.183 search_ms=3.192",
+    "duplicateVersionIds": [],
+    "identity_preserved": "PASS",
+    "missingStableIds": [],
+    "queryStableSymbolId": "f763c858-cb72-544e-9d56-257d813c40a9",
+    "querySymbolVersionId": "sha256:ab02b51e188d06bf7e4af1c48c25faeb6808c122ff6e38fb95336633e1b16097",
+    "staleVersionHits": [
+      "sha256:efdff38c8ad0d5056759fd3ce50e13ae04ed0951f9e1e442c5cdf17ed07a69eb",
+      "sha256:bdd3b4ef9ffe04e2ed3eeada97c6b767837c1ec3ba882223c5c56d2c245c5b2e",
+      "sha256:0ad63a4cd318f0ab7efdc6e3b117506846077e662fb9447b76bc08e1c01b2df0",
+      "sha256:772ec526f355ed3bb6f30d16113826a4b5051dccf924ef01a0f2a96e3478de5f",
+      "sha256:5ab4c1c3efdb4c6fc00a96291bfb622fe614daa897b9785ebef1e0c6f4c4bf29",
+      "sha256:e513cb77fb1d56c9037d672d4005291efbf43461c2e45093aa6b25f61bad8ce7",
+      "sha256:7ed289b177f82052e25a5bd5634148af13b80202bdd64ba155f6cb17138131b1",
+      "sha256:e64b8a79e47a534669ba04f45849fdd652e1e1d7b5a162b74b745919b42335f0"
+    ],
+    "stale_envelopes": [
+      "sha256:efdff38c8ad0d5056759fd3ce50e13ae04ed0951f9e1e442c5cdf17ed07a69eb",
+      "sha256:bdd3b4ef9ffe04e2ed3eeada97c6b767837c1ec3ba882223c5c56d2c245c5b2e",
+      "sha256:0ad63a4cd318f0ab7efdc6e3b117506846077e662fb9447b76bc08e1c01b2df0",
+      "sha256:772ec526f355ed3bb6f30d16113826a4b5051dccf924ef01a0f2a96e3478de5f",
+      "sha256:5ab4c1c3efdb4c6fc00a96291bfb622fe614daa897b9785ebef1e0c6f4c4bf29",
+      "sha256:e513cb77fb1d56c9037d672d4005291efbf43461c2e45093aa6b25f61bad8ce7",
+      "sha256:7ed289b177f82052e25a5bd5634148af13b80202bdd64ba155f6cb17138131b1",
+      "sha256:e64b8a79e47a534669ba04f45849fdd652e1e1d7b5a162b74b745919b42335f0"
+    ],
+    "torchDistances": [
+      [
+        0.0,
+        1.9154014587402344,
+        1.9772145748138428
+      ],
+      [
+        0.0,
+        1.918412208557129,
+        1.9620181322097778
+      ],
+      [
+        0.0,
+        1.877374291419983,
+        1.9515045881271362
+      ],
+      [
+        0.0,
+        1.8670734167099,
+        2.0040194988250732
+      ],
+      [
+        0.0,
+        1.877374291419983,
+        1.9154014587402344
+      ],
+      [
+        0.0,
+        1.9171853065490723,
+        1.918412208557129
+      ],
+      [
+        0.0,
+        1.8670734167099,
+        1.9534229040145874
+      ],
+      [
+        0.0,
+        1.9171853065490723,
+        1.9515045881271362
+      ]
+    ],
+    "torchIds": [
+      [
+        0,
+        4,
+        5
+      ],
+      [
+        1,
+        5,
+        6
+      ],
+      [
+        2,
+        4,
+        7
+      ],
+      [
+        3,
+        6,
+        5
+      ],
+      [
+        4,
+        2,
+        0
+      ],
+      [
+        5,
+        7,
+        1
+      ],
+      [
+        6,
+        3,
+        7
+      ],
+      [
+        7,
+        5,
+        2
+      ]
+    ],
+    "torch_parity": "PASS",
+    "torch_status": "PASS:cuda"
+  },
+  "parser": {
+    "details": {
+      "go": {
+        "grammarDigest": "326ab061e88d01bbc961ac2e73b0133fa3b11c199921cd800ef217687c4c4291",
+        "parserContractVersion": "go-tree-sitter-v1",
+        "parserName": "tree-sitter",
+        "status": "PASS",
+        "symbolsCurrent": 2,
+        "symbolsStale": 2
+      },
+      "python": {
+        "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+        "parserContractVersion": "python-tree-sitter-v1",
+        "parserName": "tree-sitter",
+        "status": "PASS",
+        "symbolsCurrent": 3,
+        "symbolsStale": 3
+      },
+      "typescript": {
+        "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+        "parserContractVersion": "typescript-tree-sitter-v1",
+        "parserName": "tree-sitter",
+        "status": "PASS",
+        "symbolsCurrent": 3,
+        "symbolsStale": 3
+      }
+    },
+    "status": {
+      "go": "PASS",
+      "python": "PASS",
+      "typescript": "PASS"
+    }
+  },
+  "remarks": {
+    "db_constraint": "unchanged",
+    "graph_refresh": "not performed",
+    "transaction": "rolled_back"
+  },
+  "schema_version": 1,
+  "stale_envelopes": [
+    {
+      "contentHash": "7edc5a417cb5fbf1367ef7a1294ac1e83e1cd90e738acc59689d5a9b2ca65668",
+      "dimensions": 768,
+      "endByte": 61,
+      "endLine": 3,
+      "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+      "language": "typescript",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.ts",
+      "parserContractVersion": "typescript-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.ts",
+      "sourceRevision": "rev-ts-a",
+      "stableSymbolId": "f763c858-cb72-544e-9d56-257d813c40a9",
+      "startByte": 7,
+      "startLine": 1,
+      "symbolKind": "function",
+      "symbolName": "add",
+      "symbolPath": "add",
+      "symbolVersionId": "sha256:efdff38c8ad0d5056759fd3ce50e13ae04ed0951f9e1e442c5cdf17ed07a69eb",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "9fe5c41978b9e527e16ad6255ae145257b112857ddcb5593079b9dc6dd822cf6",
+      "dimensions": 768,
+      "endByte": 147,
+      "endLine": 9,
+      "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+      "language": "typescript",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.ts",
+      "parserContractVersion": "typescript-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.ts",
+      "sourceRevision": "rev-ts-a",
+      "stableSymbolId": "479f9985-15ae-532a-9704-c0343c3aa629",
+      "startByte": 70,
+      "startLine": 5,
+      "symbolKind": "class",
+      "symbolName": "Calculator",
+      "symbolPath": "Calculator",
+      "symbolVersionId": "sha256:bdd3b4ef9ffe04e2ed3eeada97c6b767837c1ec3ba882223c5c56d2c245c5b2e",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "13d5d4ce702e540820ac7b203937c8a85b8bf93c4b708f6f7452e419fa544f69",
+      "dimensions": 768,
+      "endByte": 145,
+      "endLine": 8,
+      "grammarDigest": "5acbced45cff065c8d87bd5a69a5df1e15be0b3f96592c7b9d46dbc93d210878",
+      "language": "typescript",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.ts",
+      "parserContractVersion": "typescript-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.ts",
+      "sourceRevision": "rev-ts-a",
+      "stableSymbolId": "65027b9c-745c-56ab-ad6c-ac02f2a06d99",
+      "startByte": 91,
+      "startLine": 6,
+      "symbolKind": "method",
+      "symbolName": "multiply",
+      "symbolPath": "Calculator.multiply",
+      "symbolVersionId": "sha256:0ad63a4cd318f0ab7efdc6e3b117506846077e662fb9447b76bc08e1c01b2df0",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "8f75a68646c879fd0cff5c02708c010fb1c01d67ef9930d4e419106feb7897aa",
+      "dimensions": 768,
+      "endByte": 31,
+      "endLine": 2,
+      "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+      "language": "python",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.py",
+      "parserContractVersion": "python-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.py",
+      "sourceRevision": "rev-py-a",
+      "stableSymbolId": "14e8146e-baec-568f-a088-662d5b3b4f82",
+      "startByte": 0,
+      "startLine": 1,
+      "symbolKind": "function",
+      "symbolName": "add",
+      "symbolPath": "add",
+      "symbolVersionId": "sha256:772ec526f355ed3bb6f30d16113826a4b5051dccf924ef01a0f2a96e3478de5f",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "394fd6bc1480a1140e704f20bb9eacf9f1fac21d41d08583b952c15ddccf84d3",
+      "dimensions": 768,
+      "endByte": 101,
+      "endLine": 6,
+      "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+      "language": "python",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.py",
+      "parserContractVersion": "python-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.py",
+      "sourceRevision": "rev-py-a",
+      "stableSymbolId": "3f3c4878-e527-56f5-a6fe-db22381926bf",
+      "startByte": 33,
+      "startLine": 4,
+      "symbolKind": "class",
+      "symbolName": "Calculator",
+      "symbolPath": "Calculator",
+      "symbolVersionId": "sha256:5ab4c1c3efdb4c6fc00a96291bfb622fe614daa897b9785ebef1e0c6f4c4bf29",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "bf233e328661488b323b464151e6b24a8688cfb5dd290fbabc1aef325443a4b8",
+      "dimensions": 768,
+      "endByte": 101,
+      "endLine": 6,
+      "grammarDigest": "761fbf1ab2bce870b466e5b729b7dfac19aa3071065046e5c1319bbf99fb8d84",
+      "language": "python",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.py",
+      "parserContractVersion": "python-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.py",
+      "sourceRevision": "rev-py-a",
+      "stableSymbolId": "81f9e867-6ef3-56cf-bd73-096e3190f679",
+      "startByte": 55,
+      "startLine": 5,
+      "symbolKind": "function",
+      "symbolName": "multiply",
+      "symbolPath": "Calculator.multiply",
+      "symbolVersionId": "sha256:e513cb77fb1d56c9037d672d4005291efbf43461c2e45093aa6b25f61bad8ce7",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "23664fd94b63e32ed8d4382148fc69ce34c5952dfb47dbe9c7cf9704c54e99b6",
+      "dimensions": 768,
+      "endByte": 63,
+      "endLine": 5,
+      "grammarDigest": "326ab061e88d01bbc961ac2e73b0133fa3b11c199921cd800ef217687c4c4291",
+      "language": "go",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.go",
+      "parserContractVersion": "go-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.go",
+      "sourceRevision": "rev-go-a",
+      "stableSymbolId": "02abdd8c-8634-5f3a-85ac-ada6a0c167b1",
+      "startByte": 16,
+      "startLine": 3,
+      "symbolKind": "function",
+      "symbolName": "Add",
+      "symbolPath": "Add",
+      "symbolVersionId": "sha256:7ed289b177f82052e25a5bd5634148af13b80202bdd64ba155f6cb17138131b1",
+      "workspaceId": "deeds-web-app"
+    },
+    {
+      "contentHash": "5c90a9244e59b6e70d4d09aea6dd41030990c0005fd3386f2a6f79bd9de0ae27",
+      "dimensions": 768,
+      "endByte": 159,
+      "endLine": 11,
+      "grammarDigest": "326ab061e88d01bbc961ac2e73b0133fa3b11c199921cd800ef217687c4c4291",
+      "language": "go",
+      "normalizedFilePath": "fixtures/symbol-identity/sample.go",
+      "parserContractVersion": "go-tree-sitter-v1",
+      "parserEvidence": "tree-sitter",
+      "parserName": "tree-sitter",
+      "representationId": "semantic_768",
+      "representationRevision": 1,
+      "sourceRef": "fixtures/symbol-identity/sample.go",
+      "sourceRevision": "rev-go-a",
+      "stableSymbolId": "28dd38dd-62d3-5d95-82e2-8aceb6bf99d3",
+      "startByte": 92,
+      "startLine": 9,
+      "symbolKind": "function",
+      "symbolName": "Multiply",
+      "symbolPath": "Multiply",
+      "symbolVersionId": "sha256:e64b8a79e47a534669ba04f45849fdd652e1e1d7b5a162b74b745919b42335f0",
+      "workspaceId": "deeds-web-app"
+    }
+  ],
+  "status": "PARTIAL_PROVEN"
+}

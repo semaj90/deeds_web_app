@@ -169,7 +169,7 @@ export class RoundRobinLaneSelector {
     emitRoundRobinContext(
       traceId,
       sessionId,
-      userId?.toString(),
+      userId,
       queryHash,
       selectedLane,
       candidateLanes.filter((l) => l !== selectedLane),

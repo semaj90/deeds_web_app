@@ -5,11 +5,19 @@
  * tensorrt_bridge.node N-API addon (CUDA kernels on RTX 3060 Ti).
  *
  * Message protocol:
- * IN:  { taskId, operation, embedding, embeddings, centroids, dim, n, k, maxIters, gridSize, damping, iters }
+ * IN:  { taskId, operation, embedding, embeddings, flatEmbeddings, centroids, corpus, dim, n, k, maxIters, gridSize, damping, iters }
+ *   embedding      — findBMU (addon path only; see known-bug note near the dispatch switch)
+ *   embeddings     — findBMU (array of per-candidate Float32Array, CPU-emulation path)
+ *   flatEmbeddings — kmeans / pagerank (single flattened Float32Array: n*dim floats for
+ *                    kmeans, an n*n adjacency matrix for pagerank) — NOT an array
+ *   corpus         — cosine (single flattened n*dim Float32Array, NOT an array)
  * OUT: { taskId, error?, data?, duration? }
  */
 
-const { parentPort, workerData } = require('worker_threads');
+import { createRequire } from 'node:module';
+import { parentPort, workerData } from 'node:worker_threads';
+
+const require = createRequire(import.meta.url);
 
 // Try to load the N-API addon (CUDA kernels)
 let addon = null;
@@ -24,7 +32,7 @@ try {
 
 // CPU emulation fallbacks (when CUDA unavailable)
 function emulateGpuOperation(task) {
-	const { operation, embedding, embeddings, centroids, queryEmbedding, keys, corpus, dim, n, k, maxIters, gridSize, damping, iters } = task;
+	const { operation, embedding, embeddings, flatEmbeddings, centroids, queryEmbedding, keys, corpus, dim, n, k, maxIters, gridSize, damping, iters } = task;
 
 	try {
 		switch (operation) {
@@ -105,13 +113,13 @@ function emulateGpuOperation(task) {
 
 			case 'kmeans': {
 				// CPU: simple k-means (k iterations)
-				if (!embeddings) throw new Error('Missing embeddings');
+				if (!flatEmbeddings) throw new Error('Missing flatEmbeddings');
 				const assignments = new Int32Array(n);
 				const newCentroids = new Float32Array(k * dim);
 
 				// Initialize centroids (first k embeddings)
 				for (let i = 0; i < k && i < n; i++) {
-					newCentroids.set(embeddings[i], i * dim);
+					newCentroids.set(flatEmbeddings.subarray(i * dim, (i + 1) * dim), i * dim);
 				}
 
 				// Iterate
@@ -123,7 +131,7 @@ function emulateGpuOperation(task) {
 						for (let c = 0; c < k; c++) {
 							let dist = 0;
 							for (let d = 0; d < dim; d++) {
-								const diff = embeddings[i * dim + d] - newCentroids[c * dim + d];
+								const diff = flatEmbeddings[i * dim + d] - newCentroids[c * dim + d];
 								dist += diff * diff;
 							}
 							if (dist < minDist) {
@@ -141,7 +149,7 @@ function emulateGpuOperation(task) {
 						const cluster = assignments[i];
 						counts[cluster]++;
 						for (let d = 0; d < dim; d++) {
-							newCentroids[cluster * dim + d] += embeddings[i * dim + d];
+							newCentroids[cluster * dim + d] += flatEmbeddings[i * dim + d];
 						}
 					}
 					for (let c = 0; c < k; c++) {
@@ -164,7 +172,7 @@ function emulateGpuOperation(task) {
 
 			case 'pagerank': {
 				// CPU: power iteration method
-				if (!embedding) throw new Error('Missing adjacency matrix');
+				if (!flatEmbeddings) throw new Error('Missing adjacency matrix (flatEmbeddings)');
 				const pr = new Float32Array(n);
 				pr.fill(1 / n);
 				const damping_factor = damping || 0.85;
@@ -174,10 +182,10 @@ function emulateGpuOperation(task) {
 					for (let i = 0; i < n; i++) {
 						new_pr[i] = (1 - damping_factor) / n;
 						for (let j = 0; j < n; j++) {
-							if (embedding[j * n + i] > 0) {
+							if (flatEmbeddings[j * n + i] > 0) {
 								let out_degree = 0;
 								for (let k = 0; k < n; k++) {
-									if (embedding[j * n + k] > 0) out_degree++;
+									if (flatEmbeddings[j * n + k] > 0) out_degree++;
 								}
 								if (out_degree > 0) {
 									new_pr[i] += damping_factor * (pr[j] / out_degree);
@@ -220,10 +228,10 @@ if (parentPort) {
 						data = await addon.batchCosineSimilarity(task.queryEmbedding, task.corpus, task.dim || 768);
 						break;
 					case 'kmeans':
-						data = await addon.kmeansWithCentroids(task.embeddings, task.n, task.dim || 768, task.k, task.maxIters || 10);
+						data = await addon.kmeansWithCentroids(task.flatEmbeddings, task.n, task.dim || 768, task.k, task.maxIters || 10);
 						break;
 					case 'pagerank':
-						data = await addon.pageRankGPU(task.embeddings, task.n, task.damping || 0.85, task.iters || 20);
+						data = await addon.pageRankGPU(task.flatEmbeddings, task.n, task.damping || 0.85, task.iters || 20);
 						break;
 					default:
 						throw new Error(`Unknown GPU operation: ${operation}`);

@@ -53,7 +53,7 @@ export interface RgPoolStats {
 
 class RgPool {
   private maxConcurrency = 5;
-  private activeProcesses = new Set<NodeJS.Process>();
+  private activeProcesses = new Set<ReturnType<typeof spawn>>();
   private queue: Array<{
     options: RgSearchOptions;
     resolve: (value: RgSearchResult[]) => void;

@@ -3,7 +3,7 @@
  * Find packets citing a given evidence ID via Neo4j topology
  */
 
-import { neo4j } from '../db/neo4j-client';
+import { neo4j_singleton as neo4j } from '../db/neo4j-client';
 
 interface EvidenceCitationResult {
   packetKey: string;

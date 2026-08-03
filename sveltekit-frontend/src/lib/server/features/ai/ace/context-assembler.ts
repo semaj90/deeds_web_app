@@ -6877,7 +6877,7 @@ export async function fetchCodebaseContext(
             ENV.ACE_ENCODED_RERANK_ENABLED &&
             _prefilterResult?.clusterIds.length
           ) {
-            const weight = ENV.ACE_ENCODED_RERANK_WEIGHT; // default 0.05, recommended 0.15
+            const weight = Number(ENV.ACE_ENCODED_RERANK_WEIGHT); // default 0.05, recommended 0.15
             const clusterSimMap = new Map(
               _prefilterResult.clusterIds.map((id, i) => [id, _prefilterResult!.scores[i]])
             );
@@ -6887,7 +6887,7 @@ export async function fetchCodebaseContext(
               const somCluster = c.somCluster != null ? Number(c.somCluster) : null;
               if (somCluster != null) {
                 const sim = clusterSimMap.get(somCluster);
-                if (sim != null) {
+                if (sim != null && Number.isFinite(weight)) {
                   c.score = ((c.score as number) ?? 0) + weight * sim;
                   c.clusterPriorScore = weight * sim;
                   boostApplied++;

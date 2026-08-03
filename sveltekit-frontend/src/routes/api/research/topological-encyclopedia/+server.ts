@@ -185,8 +185,8 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		}
 
 		const clusters = ranked.slice(0, topK).map(({ clusterId, score, source }) => {
-			const row = rowMap.get(clusterId);
-			const tagEntry = tagMap.get(clusterId);
+			const row = rowMap.get(clusterId) as any;
+			const tagEntry = tagMap.get(clusterId) as any;
 			const summary = row?.summary ?? tagEntry?.summary ?? '';
 			const purpose = row?.purpose ?? tagEntry?.purpose ?? null;
 			const label = purpose ?? tagEntry?.clusterSrc ?? `cluster:${clusterId}`;

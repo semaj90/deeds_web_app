@@ -9,7 +9,7 @@ import type { DispatcherState } from '../langgraph/dispatcher-nodes/types.js';
 import { executeDispatcherOrchestration } from './dispatcher-orchestrator.js';
 import type { DispatcherOrchestrationContext } from './dispatcher-orchestrator.js';
 
-interface DispatcherEvent {
+export interface DispatcherEvent {
   event_type: 'identity.updated' | 'identity.quarantine' | 'operator.alert' | 'mirror.synced';
   packet_keys: string[];
   source_ref?: string;
@@ -141,7 +141,7 @@ export async function startIdentityListener(
           summary: '',
         })) as any,
         identity_lane: 'canonical',
-        parity_status: 'in_sync',
+        parity_status: 'unknown',
         dispatch_decision: 'sync_qdrant', // Default decision for identity updates
         dispatch_node: undefined,
         dispatch_tool: undefined,
@@ -151,7 +151,7 @@ export async function startIdentityListener(
         errors: [],
         latency_ms: 0,
         start_time: undefined,
-        action: '',
+        action: 'success',
         reason: undefined,
         result: null,
       };

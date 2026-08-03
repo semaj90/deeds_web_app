@@ -129,7 +129,7 @@ async function generateClusterSummaries(clusters: Record<string, (string | numbe
 		`);
 
     // Analyze with gemma4-rotorquant:latest
-    const summary = await analyzeClusterWithLLM(parseInt(clusterId), errors.rows);
+    const summary = await analyzeClusterWithLLM(parseInt(clusterId), errors.rows as Record<string, unknown>[]);
 
     // Get enhanced tags from Qdrant
     const tags = await getClusterTags();

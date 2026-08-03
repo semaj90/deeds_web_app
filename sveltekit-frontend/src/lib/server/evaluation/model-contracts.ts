@@ -189,7 +189,9 @@ export async function checkModelHealth(model: ModelIdentifier, baseUrl: string):
 
   try {
     // Test 1: Model list endpoint
-    const modelsResponse = await fetch(`${baseUrl}/models`, { timeout: 5000 });
+    const modelsResponse = await fetch(`${baseUrl}/models`, {
+      signal: AbortSignal.timeout(5000),
+    });
     if (!modelsResponse.ok) {
       errors.push(`Models endpoint returned ${modelsResponse.status}`);
       healthy = false;
@@ -205,7 +207,7 @@ export async function checkModelHealth(model: ModelIdentifier, baseUrl: string):
         max_tokens: 10,
         stream: false,
       }),
-      timeout: 10000,
+      signal: AbortSignal.timeout(10000),
     });
 
     if (!completionResponse.ok) {

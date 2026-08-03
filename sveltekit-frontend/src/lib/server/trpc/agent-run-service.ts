@@ -45,7 +45,7 @@ import {
 // We use Parameters<typeof db.transaction>[0] to extract what Drizzle actually
 // passes into the callback, giving us the correct type without casting.
 type DrizzleTxCallback = Parameters<typeof db.transaction>[0];
-type DrizzleTx = Parameters<DrizzleTxCallback>[0];
+type DrizzleTx = DrizzleTxCallback extends (tx: infer Tx, ...args: any[]) => any ? Tx : never;
 
 // A DbExecutor is either the root db client or an active transaction handle.
 export type DbExecutor = typeof db | DrizzleTx;

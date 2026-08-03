@@ -135,7 +135,7 @@ async function loadAlignedFeatures(): Promise<FeatureRow[]> {
 		featureOntologyTuples,
 	} = await import('$lib/server/db/schema-postgres');
 
-	const [implRaw, edgeRaw, lexicalRaw, domainRaw, structuralRaw] = await Promise.all([
+	const [implRaw, edgeRaw, lexicalRaw, domainRaw, structuralRaw, ontologyRaw] = await Promise.all([
 		db.select({
 			featureKey: featureImplementations.featureKey,
 			featureName: featureImplementations.featureName,

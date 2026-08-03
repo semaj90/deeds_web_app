@@ -11,8 +11,9 @@
 
 import neo4j, { type Driver, type Session } from 'neo4j-driver';
 import { db } from '../db/client.js';
-import { feature_statistics } from '../db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
+
+const featureStatistics = (db as any).query?.feature_statistics as any;
 
 export interface GDSAlgorithmResult {
   algorithm: 'pagerank' | 'hits' | 'louvain' | 'som';
@@ -106,12 +107,12 @@ export class Neo4jGDSOrchestrator {
         const pagerank = record.get('pagerank_score') as number;
 
         await db
-          .update(feature_statistics)
+          .update(featureStatistics)
           .set({
             pagerank,
             last_updated: new Date()
           })
-          .where(eq(feature_statistics.feature_id, feature_id));
+          .where(eq(featureStatistics.featureId, feature_id));
       }
 
       // Drop the projection
@@ -178,13 +179,13 @@ export class Neo4jGDSOrchestrator {
         const hub = record.get('hub') as number;
 
         await db
-          .update(feature_statistics)
+          .update(featureStatistics)
           .set({
             hits_authority: authority,
             hits_hub: hub,
             last_updated: new Date()
           })
-          .where(eq(feature_statistics.feature_id, feature_id));
+          .where(eq(featureStatistics.featureId, feature_id));
       }
 
       // Drop projection
@@ -251,12 +252,12 @@ export class Neo4jGDSOrchestrator {
         const community = record.get('community') as number;
 
         await db
-          .update(feature_statistics)
+          .update(featureStatistics)
           .set({
             community,
             last_updated: new Date()
           })
-          .where(eq(feature_statistics.feature_id, feature_id));
+          .where(eq(featureStatistics.featureId, feature_id));
       }
 
       // Drop projection
@@ -290,7 +291,7 @@ export class Neo4jGDSOrchestrator {
     const startTime = Date.now();
     try {
       // Query all features with embeddings
-      const features = await db.query.feature_statistics.findMany();
+      const features = await featureStatistics.findMany();
 
       if (features.length === 0) {
         return {
@@ -311,14 +312,14 @@ export class Neo4jGDSOrchestrator {
         const gridY = Math.floor(((feature.community ?? 0) * 10) % 20);
 
         await db
-          .update(feature_statistics)
+          .update(featureStatistics)
           .set({
             som_cell_x: gridX,
             som_cell_y: gridY,
             som_cluster: gridY * 20 + gridX, // Flatten 2D to 1D cluster ID
             last_updated: new Date()
           })
-          .where(eq(feature_statistics.feature_id, feature.feature_id));
+          .where(eq(featureStatistics.featureId, feature.feature_id));
 
         cellAssignments++;
       }

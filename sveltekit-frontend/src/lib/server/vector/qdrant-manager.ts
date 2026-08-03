@@ -1958,6 +1958,24 @@ export const qdrant = new Proxy({} as QdrantManager, {
   }
 }) as QdrantManager;
 
+export async function ensureQdrantCollection(collectionName: keyof QdrantManager['collections'] | string, _dimension?: number): Promise<void> {
+  // The manager already owns canonical collection initialization.
+  // Keep this wrapper for legacy callers that still expect a named helper.
+  await getQdrantManager().initializeCollections();
+}
+
+export async function batchUpsertPoints(
+  collectionName: keyof QdrantManager['collections'] | string,
+  points: any[],
+  _wait = true,
+): Promise<unknown> {
+  return getQdrantManager().upsert({
+    collection: collectionName as any,
+    points,
+    wait: _wait,
+  });
+}
+
 
 
 

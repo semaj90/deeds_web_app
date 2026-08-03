@@ -23,7 +23,7 @@ interface QdrantPoint {
   payload: Record<string, unknown>;
 }
 
-interface QdrantSyncResult {
+export interface QdrantSyncResult {
   synced: number;
   failed: number;
   collection: string;

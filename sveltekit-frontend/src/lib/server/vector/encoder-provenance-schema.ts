@@ -85,7 +85,7 @@ export const EncoderProvenanceSchema = z.object({
 
   // Normalization
   normalization: z.enum(['l2', 'minmax', 'zscore', 'none']),
-  normalization_params: z.record(z.any()).optional().nullable(),
+  normalization_params: z.record(z.string(), z.any()).optional().nullable(),
 
   // Reconstruction accuracy
   reconstruction_mse: z.number().nonnegative(),
@@ -93,7 +93,7 @@ export const EncoderProvenanceSchema = z.object({
   reconstruction_percentile_95: z.number().nonnegative().optional().nullable(),
 
   // Validation gates
-  validation_gates: z.record(z.any()), // JSONB from DB
+  validation_gates: z.record(z.string(), z.any()), // JSONB from DB
   validation_passed: z.boolean(),
   validation_passed_at: z.coerce.date().optional().nullable(),
 

@@ -111,6 +111,7 @@ import { registerTopologyMgmtTools } from './topology_mgmt_tools.js';
 import { registerDbInspectionTools } from './db-inspection-tools.js';
 import { registerLibraryRegistryTools } from './library-registry-tools.js';
 import { registerLdrResearchTools } from './ldr-research-tools.js';
+import { registerPhase109aTools } from '$lib/server/mcp/phase109a-mcp-tools.js';
 import { registerRgAtlasTools } from './rg_atlas_tools.js';
 import { registerEngramTools } from './engram_tools.js';
 import { registerAtlasEmbeddingTools } from './atlas_embedding_tools.js';
@@ -581,6 +582,13 @@ registerLibraryRegistryTools(server, pool);
 // Reuses the existing stdio-server handler (tools/ldr-research.ts) — registration
 // only, no duplicated research logic. Acquisition adapter, not a second RAG platform.
 registerLdrResearchTools(server, pool);
+
+// Register phase109a recommendation/signal lifecycle tools (archive/supersede
+// signal, supersede/promote recommendation, query history, validate transition)
+// on the canonical surface. Previously only reachable from the older stdio
+// server.ts via a manual per-name dispatch switch. Registration only — reuses
+// the existing SQL-function-backed handlers, no duplicated lifecycle logic.
+registerPhase109aTools(server);
 
 // ── Shared embedding cache (Redis L1, 1h TTL) ────────────────────────────────
 // search.hybrid + topology.search_near + search.dev_context all embed the same

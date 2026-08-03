@@ -539,13 +539,14 @@ export async function executeUnifiedCrossRanking(
 
     // Stage 5: Blend scores
     stageStart = Date.now();
+    const blendWeights = (deps.blend_weights ?? DEFAULT_BLEND_WEIGHTS) as typeof DEFAULT_BLEND_WEIGHTS;
     const blended = blendScores(
       packet_keys,
       semantic_scores,
       bm25_scores,
       topology_scores,
       bayes_scores,
-      deps.blend_weights || DEFAULT_BLEND_WEIGHTS
+      blendWeights
     );
     stage_timings.blend = Date.now() - stageStart;
 
@@ -568,7 +569,7 @@ export async function executeUnifiedCrossRanking(
         ? `Ranked #${rank + 1} | Semantic: ${(blended_data.components.semantic * 100).toFixed(1)}% | Lexical: ${(blended_data.components.lexical * 100).toFixed(1)}% | Topology: ${(blended_data.components.topology * 100).toFixed(1)}%`
         : undefined,
       component_scores: blended_data.components,
-      blend_weights: deps.blend_weights || DEFAULT_BLEND_WEIGHTS,
+      blend_weights: blendWeights,
       metadata: metadata_map.get(packet_key) || {}
     }));
 

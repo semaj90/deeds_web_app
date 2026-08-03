@@ -21,6 +21,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { getServiceDiscovery } from '$lib/server/helpers/service-discovery.js';
+import { requestLangExtractHealth } from '$lib/server/atlas/ai/langextract-transport.js';
 import type { ServiceConfig } from '$lib/server/helpers/service-discovery.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -161,10 +162,8 @@ async function checkHealth(): Promise<boolean> {
 
   try {
     const baseUrl = await getBaseUrl();
-    const resp = await fetch(`${baseUrl}/health`, {
-      signal: AbortSignal.timeout(2000),
-    });
-    serviceHealthy = resp.ok;
+    const health = await requestLangExtractHealth({ baseUrl, timeoutMs: 2000 });
+    serviceHealthy = health.status === 'ok' || health.status === 'healthy';
   } catch {
     serviceHealthy = false;
   }

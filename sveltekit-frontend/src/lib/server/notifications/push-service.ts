@@ -1,4 +1,4 @@
-import { ENV } from '$lib/server/env.server';
+import { ENV } from '$lib/server/env.server.js';
 
 /**
  * Multi-channel notification service
@@ -108,15 +108,17 @@ let transporter: any = null;
 async function getTransporter() {
 	if (!transporter && ENV.SMTP_USER) {
 		const nodemailer = await import('nodemailer');
-		transporter = nodemailer.createTransport({
+		const smtpPort = Number(ENV.SMTP_PORT ?? 587);
+		const transportOptions = {
 			host: ENV.SMTP_HOST,
-			port: ENV.SMTP_PORT,
-			secure: ENV.SMTP_PORT === 465,
+			port: smtpPort,
+			secure: smtpPort === 465,
 			auth: {
 				user: ENV.SMTP_USER,
 				pass: ENV.SMTP_PASS,
 			},
-		});
+		} as Parameters<typeof nodemailer.createTransport>[0];
+		transporter = nodemailer.createTransport(transportOptions);
 	}
 	return transporter;
 }

@@ -6,6 +6,7 @@
   interface CacheStats {
     timestamp: string;
     status: string;
+    uptime?: number;
     kvCacheEnabled: boolean;
     stats: Array<{
       totalRequests: number;
@@ -38,9 +39,14 @@
   let validationError = $state('');
   let retryCount = $state(0);
   let lastToolCall = $state('');
-  let cacheStats = $state<CacheStats | null>(data?.cacheStats ?? null);
-  let cacheError = $state<string | null>(data?.error ?? null);
+  let cacheStats = $state<CacheStats | null>(null);
+  let cacheError = $state<string | null>(null);
   let refreshing = $state(false);
+
+  $effect(() => {
+    cacheStats = data?.cacheStats ?? null;
+    cacheError = data?.error ?? null;
+  });
 
   // --- Derived State ---
   const hasSources = $derived(sourceRefs.length > 0);

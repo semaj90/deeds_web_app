@@ -20,7 +20,7 @@ import { Pool } from 'pg';
  */
 export const DispatcherStateSchema = z.object({
   current_tool: z.string().optional(),
-  current_input: z.record(z.unknown()).optional(),
+  current_input: z.record(z.string(), z.unknown()).optional(),
   action: z.enum(['tool_call', 'step', 'complete', 'error']).optional(),
   candidates: z
     .array(
@@ -32,8 +32,8 @@ export const DispatcherStateSchema = z.object({
       })
     )
     .optional(),
-  history: z.array(z.record(z.unknown())).optional(),
-  trace: z.record(z.unknown()).optional(),
+  history: z.array(z.record(z.string(), z.unknown())).optional(),
+  trace: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type DispatcherState = z.infer<typeof DispatcherStateSchema>;

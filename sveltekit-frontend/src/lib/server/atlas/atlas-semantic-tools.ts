@@ -505,9 +505,9 @@ export async function handleAtlasSemanticToolCall(
     case 'atlas.apply_change':
       return applyChange(args as { target: string; patch?: unknown; runtime?: AtlasSemanticRuntimeInput; dryRun?: boolean });
     case 'atlas.validate_change':
-      return validateChange(args as AtlasSemanticValidateChangeInput);
+      return validateChange(args as unknown as AtlasSemanticValidateChangeInput);
     case 'atlas.delegate':
-      return delegate(args as AtlasSemanticDelegateInput);
+      return delegate(args as unknown as AtlasSemanticDelegateInput);
     default:
       throw new Error(`Unsupported atlas semantic tool: ${name}`);
   }

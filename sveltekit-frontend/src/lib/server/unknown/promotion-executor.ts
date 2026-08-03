@@ -415,20 +415,20 @@ export class PromotionExecutor {
 
     try {
       // Atomic transaction: verify validated status + promote to atlas + update status + ledger or all fail
-      await db.execute(db.sql`BEGIN`);
+      await db.execute(sql`BEGIN`);
 
       try {
         // Verify unknown_packets exists and is in VALIDATED status (hard stop if not)
         const validatedCheck = await db.execute(
-          db.sql`SELECT 1 FROM unknown_packets WHERE unknown_id = ${unknown_id} AND status = 'VALIDATED'`
+          sql`SELECT 1 FROM unknown_packets WHERE unknown_id = ${unknown_id} AND status = 'VALIDATED'`
         );
 
-        if (!(validatedCheck as any[]).length) {
+        if (!((validatedCheck as unknown as any[]) || []).length) {
           throw new Error(`Packet ${unknown_id} not in VALIDATED status`);
         }
 
         // Insert into atlas_packets (new packet from validated unknown)
-        await db.execute(db.sql`
+        await db.execute(sql`
           INSERT INTO atlas_packets (
             packet_key,
             source_ref,
@@ -456,7 +456,7 @@ export class PromotionExecutor {
         `);
 
         // Update unknown_packets status to PROMOTED
-        await db.execute(db.sql`
+        await db.execute(sql`
           UPDATE unknown_packets
           SET
             status = 'PROMOTED',
@@ -477,7 +477,7 @@ export class PromotionExecutor {
           promotion_timestamp: promotion_timestamp.toISOString(),
         };
 
-        await db.execute(db.sql`
+        await db.execute(sql`
           INSERT INTO unknown_resolution_ledger (
             ledger_id,
             unknown_id,
@@ -500,7 +500,7 @@ export class PromotionExecutor {
         `);
 
         // Commit transaction
-        await db.execute(db.sql`COMMIT`);
+        await db.execute(sql`COMMIT`);
 
         return {
           gate_name: 'PROMOTION_WRITE_ATLAS_PACKETS_SUCCESS',
@@ -510,7 +510,7 @@ export class PromotionExecutor {
         };
       } catch (innerErr) {
         // Rollback on inner error
-        await db.execute(db.sql`ROLLBACK`);
+        await db.execute(sql`ROLLBACK`);
         throw innerErr;
       }
     } catch (err) {

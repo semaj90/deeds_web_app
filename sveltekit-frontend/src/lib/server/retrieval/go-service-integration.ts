@@ -7,7 +7,7 @@
  * - Return candidates with all 8 IDs intact
  */
 
-import type { CanonicalIDHierarchy } from './canonical-id-hierarchy';
+import type { CanonicalIDHierarchy } from '../topology/canonical-id-hierarchy.js';
 
 export interface GoServiceConfig {
   grpcUrl: string; // e.g., localhost:50053

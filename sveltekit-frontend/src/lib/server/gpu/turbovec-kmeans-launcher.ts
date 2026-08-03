@@ -9,9 +9,9 @@
  */
 
 import fetch from 'node-fetch';
+import { sql, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
-import { codebase_chunk_index } from '../db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
+import { codebaseChunkIndex } from '../db/schema-postgres.js';
 
 export interface KMeansJob {
   job_id: string;
@@ -214,7 +214,7 @@ export class TurboVecKMeansLauncher {
       throw new Error(`No results in job ${job.job_id}`);
     }
 
-    const updates: Partial<typeof codebase_chunk_index> = {};
+    const updates: Record<string, unknown> = {};
 
     // Write 384-dim vector
     if (job.levels.embedding_384) {
@@ -238,8 +238,8 @@ export class TurboVecKMeansLauncher {
     // Update chunk
     const chunks = await db
       .select()
-      .from(codebase_chunk_index)
-      .where(eq(codebase_chunk_index.feature_id, featureId))
+      .from(codebaseChunkIndex)
+      .where(eq(codebaseChunkIndex.chunkId, featureId))
       .limit(1);
 
     if (chunks.length === 0) {
@@ -249,12 +249,12 @@ export class TurboVecKMeansLauncher {
     const chunk = chunks[0];
 
     await db
-      .update(codebase_chunk_index)
+      .update(codebaseChunkIndex)
       .set({
         ...updates,
-        enriched_at: new Date()
+        enrichedAt: new Date()
       })
-      .where(eq(codebase_chunk_index.id, chunk.id));
+      .where(eq(codebaseChunkIndex.id, chunk.id));
   }
 
   /**
@@ -272,16 +272,16 @@ export class TurboVecKMeansLauncher {
     // Load embeddings from Postgres
     const chunks = await db
       .select()
-      .from(codebase_chunk_index)
-      .where(/* WHERE embedding_768 IS NOT NULL AND (embedding_384 IS NULL OR embedding_128 IS NULL OR embedding_64 IS NULL) */)
+      .from(codebaseChunkIndex)
+      .where(sql`embedding_768 IS NOT NULL`)
       .limit(limit);
 
     const embeddings = new Map<string, number[]>();
 
     for (const chunk of chunks) {
-      if (!chunk.content_embedding) continue;
+      if (!chunk.contentEmbedding) continue;
 
-      embeddings.set(chunk.feature_id, chunk.content_embedding);
+      embeddings.set(chunk.chunkId, chunk.contentEmbedding as number[]);
     }
 
     console.log(`Loaded ${embeddings.size} embeddings`);

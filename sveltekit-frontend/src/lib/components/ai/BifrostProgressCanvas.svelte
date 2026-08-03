@@ -41,4 +41,4 @@
   });
 </script>
 
-<canvas bind:this={canvas} width="320" height="64" class="rounded border border-slate-700 shadow-lg" />
+<canvas bind:this={canvas} width="320" height="64" class="rounded border border-slate-700 shadow-lg"></canvas>

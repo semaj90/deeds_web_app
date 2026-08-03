@@ -29,7 +29,7 @@ export const HyperRAGCandidateSchema = z.object({
   score: z.number(),
   source: z.enum(['redis', 'postgres', 'turbovec', 'qdrant', 'neo4j']),
   confidence: z.number().min(0).max(1),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type HyperRAGCandidate = z.infer<typeof HyperRAGCandidateSchema>;

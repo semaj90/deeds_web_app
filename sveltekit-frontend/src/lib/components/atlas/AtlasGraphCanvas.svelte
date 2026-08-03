@@ -18,7 +18,7 @@
 	let ty = $state(0);
 	let k = $state(1);
 
-	let dragging = false;
+	let dragging = $state(false);
 	let dragOriginX = 0;
 	let dragOriginY = 0;
 	let dragTx = 0;

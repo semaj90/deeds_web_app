@@ -115,26 +115,42 @@ export async function ensureProjectionClient(
       throw new Error(`No projection relationship types exist in Neo4j. Expected one of: ${PROJECTION_RELATIONSHIP_TYPES.join(', ')}`);
     }
 
+    const costForType = (type: string): number =>
+      type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
+        ? 0.1
+        : type === 'CONTAINS'
+          ? 0.25
+          : type === 'HAS_CHUNK'
+            ? 0.2
+            : type === 'BELONGS_TO_CLUSTER'
+              ? 0.3
+              : type === 'REFERENCES'
+                ? 0.35
+                : type === 'SIMILAR_TOPOLOGY'
+                  ? 0.4
+                  : 0.15;
+
+    // gds.graph.project's native (non-Cypher) projection requires the named
+    // relationship property to actually exist on at least one relationship
+    // of that type — it fails with "Relationship properties not found"
+    // rather than silently applying `defaultValue` to every relationship
+    // when the property is entirely absent. Self-heal: backfill `cost` on
+    // any relationship that doesn't already carry one, idempotently
+    // (coalesce never overwrites a real, previously-set value).
+    for (const type of relationshipTypes) {
+      await session.run(
+        `MATCH ()-[r:${type}]->() WHERE r.cost IS NULL SET r.cost = $cost`,
+        { cost: costForType(type) },
+      );
+    }
+
     const relationshipProjection = relationshipTypes
       .map((type) => {
         const orientation =
           type === 'BELONGS_TO_CLUSTER' || type === 'SIMILAR_TOPOLOGY' || type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
             ? 'UNDIRECTED'
             : 'NATURAL';
-        const cost =
-          type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
-            ? 0.1
-            : type === 'CONTAINS'
-              ? 0.25
-              : type === 'HAS_CHUNK'
-                ? 0.2
-                : type === 'BELONGS_TO_CLUSTER'
-                  ? 0.3
-                  : type === 'REFERENCES'
-                    ? 0.35
-                    : type === 'SIMILAR_TOPOLOGY'
-                      ? 0.4
-                      : 0.15;
+        const cost = costForType(type);
         return `          ${type}: { orientation: '${orientation}', properties: { cost: { property: 'cost', defaultValue: ${cost} } } }`;
       })
       .join(',\n');
@@ -174,7 +190,9 @@ export async function runPageRankClient(
   projectionName: string,
   options: { maxIterations?: number; dampingFactor?: number; mutateProperty?: string } = {},
 ): Promise<PageRankMutateResult> {
-  const { maxIterations = 20, dampingFactor = 0.85, mutateProperty = 'graphPageRank' } = options;
+  // 'pageRankScore' is the property production code actually reads — see the
+  // matching comment in graph-analytics-service.ts's getTopPageRank() (GS1.35).
+  const { maxIterations = 20, dampingFactor = 0.85, mutateProperty = 'pageRankScore' } = options;
   const driver = getNeo4jDriver();
   const session = driver.session();
   const t0 = Date.now();
@@ -219,7 +237,7 @@ export interface AuthorityNodeClient {
 export async function getTopPageRankClient(
   limit: number,
   nodeType?: string,
-  scoreProperty = 'graphPageRank',
+  scoreProperty = 'pageRankScore',
 ): Promise<AuthorityNodeClient[]> {
   const driver = getNeo4jDriver();
   const session = driver.session();
@@ -231,7 +249,7 @@ export async function getTopPageRankClient(
       MATCH (n${label})
       WHERE n.${scoreProperty} IS NOT NULL
       RETURN labels(n) AS labels,
-             coalesce(n.stableKey, n.filePath, n.relativePath, n.path) AS stableKey,
+             coalesce(n.stableKey, n.filePath, n.relativePath, n.path, n.name) AS stableKey,
              n.path AS path,
              n.${scoreProperty} AS graphPageRank,
              n.louvainCommunity AS louvainCommunity

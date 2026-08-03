@@ -13,6 +13,8 @@ export interface RankedLaneHit {
   lane: RrfLaneName;
   rank: number;
   rawScore: number;
+  id?: string;
+  score?: number;
   sourceRef?: string;
   metadata?: Record<string, unknown>;
 }
@@ -29,6 +31,9 @@ export interface FusedHit {
   packetKey: string;
   fusionScore: number;
   sources: RankedLaneHit[];
+  id?: string;
+  rrfScore?: number;
+  provenance?: Record<string, { rank: number; contribution: number }>;
 }
 
 export const RRF_DEFAULT_WEIGHTS = {

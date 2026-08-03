@@ -286,7 +286,7 @@ export async function runSemanticSearchWorkflow(
     metadata: adapterResult.metadata as Record<string, unknown>,
     provenance: adapterResult.provenance as Record<string, unknown>,
     ace,
-    ...(adapterResult.graphExpanded ? { graphExpanded: adapterResult.graphExpanded as Array<Record<string, unknown>> } : {}),
+    ...(adapterResult.graphExpanded ? { graphExpanded: adapterResult.graphExpanded as unknown as Array<Record<string, unknown>> } : {}),
     shadow,
   });
 

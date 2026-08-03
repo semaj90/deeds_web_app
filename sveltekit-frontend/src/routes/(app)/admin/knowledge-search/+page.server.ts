@@ -51,7 +51,11 @@ export const actions: Actions = {
             const runtime = createSearchRuntime();
             const result = await runtime.search({
                 text: query,
-                topK: 10
+                topK: 10,
+                filters: {
+                    includeGenerated: false,
+                    includeLegacy: false
+                }
             });
 
             return {

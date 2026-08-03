@@ -1,4 +1,4 @@
-import { query as db } from '$lib/server/db';
+import db from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
 import type { PoolClient } from 'pg';
 

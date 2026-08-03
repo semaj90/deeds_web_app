@@ -2222,7 +2222,7 @@ export function setupToolHandlers() {
 
           const response = await findSchemaDependents(
             { table, includeAce },
-            { neo4j, postgres: { query: (sql: string, params: any) => db.execute(sql, params) } }
+            { neo4j, postgres: { query: (sql: string, params: any) => (db as any).execute(sql, params) } }
           );
 
           return {
@@ -5338,7 +5338,7 @@ export function setupToolHandlers() {
       if (name === 'poi:face_synth')
         return await handlePoiFaceSynth(args as Record<string, unknown>);
       if (name === LDR_RESEARCH_TOOL.name) {
-        const ldrInput = args as LDRToolInput;
+        const ldrInput = args as unknown as LDRToolInput;
         const ldrOutput = await executeLDRResearch(ldrInput);
         const formatted = formatLDRResultForAgent(ldrOutput);
         return {
@@ -5347,7 +5347,7 @@ export function setupToolHandlers() {
         };
       }
       if (name === 'phase18_reranker') {
-        return await handlePhase18RerankerToolCall(request);
+        return await handlePhase18RerankerToolCall(request as any);
       }
       if (name === 'atlas.identity_audit') {
         const input = ATLAS_IDENTITY_AUDIT_SCHEMA.parse(args);
@@ -5384,8 +5384,8 @@ export function setupToolHandlers() {
       if (name === 'phase109a_archive_signal') {
         const tool = phase109aTools.find(t => t.name === name);
         if (tool) {
-          const input = tool.inputSchema.parse(args);
-          const result = await tool.handler(input);
+          const input = tool.inputSchema.parse(args) as any;
+          const result = await (tool.handler as any)(input);
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
             isError: false,
@@ -5395,8 +5395,8 @@ export function setupToolHandlers() {
       if (name === 'phase109a_supersede_signal') {
         const tool = phase109aTools.find(t => t.name === name);
         if (tool) {
-          const input = tool.inputSchema.parse(args);
-          const result = await tool.handler(input);
+          const input = tool.inputSchema.parse(args) as any;
+          const result = await (tool.handler as any)(input);
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
             isError: false,
@@ -5406,8 +5406,8 @@ export function setupToolHandlers() {
       if (name === 'phase109a_promote_recommendation') {
         const tool = phase109aTools.find(t => t.name === name);
         if (tool) {
-          const input = tool.inputSchema.parse(args);
-          const result = await tool.handler(input);
+          const input = tool.inputSchema.parse(args) as any;
+          const result = await (tool.handler as any)(input);
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
             isError: false,
@@ -5417,8 +5417,8 @@ export function setupToolHandlers() {
       if (name === 'phase109a_query_signal_history') {
         const tool = phase109aTools.find(t => t.name === name);
         if (tool) {
-          const input = tool.inputSchema.parse(args);
-          const result = await tool.handler(input);
+          const input = tool.inputSchema.parse(args) as any;
+          const result = await (tool.handler as any)(input);
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
             isError: false,
@@ -5428,8 +5428,8 @@ export function setupToolHandlers() {
       if (name === 'phase109a_validate_state_transition') {
         const tool = phase109aTools.find(t => t.name === name);
         if (tool) {
-          const input = tool.inputSchema.parse(args);
-          const result = await tool.handler(input);
+          const input = tool.inputSchema.parse(args) as any;
+          const result = await (tool.handler as any)(input);
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
             isError: false,

@@ -1,22 +1,38 @@
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import type { FileLabel } from '$lib/server/atlas/contracts/file-understanding.js';
+  import type { FileUnderstanding } from '$lib/server/atlas/contracts/file-understanding.js';
   import { FilePurposeEnum, ThoroughnessEnum, AppCriticalityEnum } from '$lib/server/atlas/contracts/file-understanding.js';
   import Button from '$lib/components/ui/Button.svelte';
 
   interface Props {
-    file: FileLabel;
+    file: FileUnderstanding;
     open?: boolean;
   }
 
-  const {
+  let {
     file = $bindable(),
     open = $bindable(false),
   }: Props = $props();
 
   let editMode = $state(false);
-  let localFile = $state<FileLabel>({ ...file });
+  let localFile = $state<FileUnderstanding>({ ...file });
   let saveLoading = $state(false);
+
+  const THOROUGHNESS_ORDER = ['stub', 'outline', 'partial', 'feature_complete', 'battle_tested'] as const;
+  const THOROUGHNESS_LABELS: Record<(typeof THOROUGHNESS_ORDER)[number], string> = {
+    stub: 'Stub: Empty or <20 lines',
+    outline: 'Outline: Basic structure, <40% implemented',
+    partial: 'Partial: 40-80% complete, may have TODOs',
+    feature_complete: 'Feature Complete: >80%, ready for use',
+    battle_tested: 'Battle Tested: Production-hardened, >90%',
+  };
+  const THOROUGHNESS_SCORE: Record<(typeof THOROUGHNESS_ORDER)[number], number> = {
+    stub: 1,
+    outline: 2,
+    partial: 3,
+    feature_complete: 4,
+    battle_tested: 5,
+  };
 
   // Watch for external open changes
   $effect(() => {
@@ -59,10 +75,7 @@
 </script>
 
 <Dialog.Root bind:open>
-  {#snippet child({ props })}
-    <div {...props}>
-      <!-- Portal + Overlay for modal stacking -->
-      <Dialog.Portal>
+  <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
 
         <!-- Modal Content -->
@@ -121,7 +134,7 @@
                   <div>
                     <label class="block text-sm font-medium mb-2">Thoroughness (1-5)</label>
                     <div class="flex gap-2">
-                      {#each [1, 2, 3, 4, 5] as level}
+                      {#each ThoroughnessEnum.options as level}
                         <button
                           type="button"
                           class={`flex-1 py-2 rounded font-medium transition ${
@@ -131,16 +144,12 @@
                           }`}
                           onclick={() => (localFile.thoroughness = level)}
                         >
-                          {level}
+                          {THOROUGHNESS_SCORE[level]}/5
                         </button>
                       {/each}
                     </div>
                     <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                      {localFile.thoroughness === 1 && 'Stub: Empty or <20 lines'}
-                      {localFile.thoroughness === 2 && 'Outline: Basic structure, <40% implemented'}
-                      {localFile.thoroughness === 3 && 'Partial: 40-80% complete, may have TODOs'}
-                      {localFile.thoroughness === 4 && 'Feature Complete: >80%, ready for use'}
-                      {localFile.thoroughness === 5 && 'Battle Tested: Production-hardened, >90%'}
+                      {THOROUGHNESS_LABELS[localFile.thoroughness]}
                     </p>
                   </div>
 
@@ -184,14 +193,14 @@
                   <div class="flex justify-between items-center">
                     <span class="text-neutral-500 dark:text-neutral-400">Thoroughness</span>
                     <div class="flex gap-1">
-                      {#each [1, 2, 3, 4, 5] as level}
+                      {#each Array.from({ length: 5 }, (_, index) => index + 1) as level}
                         <div
                           class={`w-4 h-4 rounded ${
-                            level <= localFile.thoroughness
+                            level <= THOROUGHNESS_SCORE[localFile.thoroughness]
                               ? 'bg-yellow-500'
                               : 'bg-neutral-300 dark:bg-neutral-700'
                           }`}
-                        />
+                        ></div>
                       {/each}
                     </div>
                   </div>
@@ -241,9 +250,7 @@
             </div>
           </Dialog.Content>
         </div>
-      </Dialog.Portal>
-    </div>
-  {/snippet}
+  </Dialog.Portal>
 </Dialog.Root>
 
 <style>

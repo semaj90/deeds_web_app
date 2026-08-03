@@ -25,14 +25,14 @@ const LLAMA_BASE_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const body = await request.json();
-    const { model, messages, stream = true, temperature = 0.3, max_tokens = 2048, use_kv_cache = true } = body;
+    const { model, messages, stream: shouldStream = true, temperature = 0.3, max_tokens = 2048, use_kv_cache = true } = body;
 
     if (!model || !Array.isArray(messages) || messages.length === 0) {
       return error(400, 'Invalid request: model and messages required');
     }
 
     // Non-streaming response
-    if (!stream) {
+    if (!shouldStream) {
       const response = await fetch(`${LLAMA_BASE_URL}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +59,6 @@ export const POST: RequestHandler = async ({ request }) => {
           model,
           data.usage.prompt_tokens || 0,
           data.usage.prompt_tokens_cached || 0,
-          data.usage.prompt_tokens - (data.usage.prompt_tokens_cached || 0),
           data.usage.completion_tokens || 0
         );
       }
@@ -69,7 +68,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Streaming response with KV cache
     const encoder = new TextEncoder();
-    const stream = new ReadableStream<Uint8Array>({
+    const responseStream = new ReadableStream<Uint8Array>({
       async start(controller) {
         try {
           for await (const chunk of streamDirectToLlamaServer(
@@ -122,7 +121,7 @@ export const POST: RequestHandler = async ({ request }) => {
       },
     });
 
-    return new Response(stream, {
+    return new Response(responseStream, {
       headers: {
         'Content-Type': 'text/event-stream; charset=utf-8',
         'Cache-Control': 'no-cache, no-transform',

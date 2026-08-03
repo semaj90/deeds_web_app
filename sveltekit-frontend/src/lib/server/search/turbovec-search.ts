@@ -17,7 +17,7 @@
 import { createRequire } from 'node:module';
 import { existsSync } from 'node:fs';
 
-import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import { QdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { buildVectorPayload } from '$lib/server/config/vector-config.js';
 import { ENV } from '$lib/server/env.server.js';
 import { encodedClusterPrefilter } from '$lib/server/retrieval/encoded-cluster-prefilter.js';
@@ -354,7 +354,7 @@ async function searchQdrantDirect(
   topoClass?: string,
   collection = 'codebase_chunks_768'
 ): Promise<QdrantCodeResult[]> {
-  const mgr = getQdrantClient();
+  const mgr = new QdrantManager();
   const filter = await maybeApplyEncodedPrefilter(embedding, buildSearchFilter(topoClass));
 
   const res = await mgr.hybridSearch({

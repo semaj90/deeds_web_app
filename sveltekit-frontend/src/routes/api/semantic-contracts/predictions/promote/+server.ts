@@ -51,7 +51,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       LIMIT 1
     `);
 
-    const prediction = predictions.rows?.[0];
+    const prediction = predictions.rows?.[0] as any;
     if (!prediction) {
       return json({ error: 'Prediction not found' }, { status: 404 });
     }

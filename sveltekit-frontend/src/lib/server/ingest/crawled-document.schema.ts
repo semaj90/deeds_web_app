@@ -50,7 +50,7 @@ export const CrawledDocumentSchema = z.object({
     http_status: z.number().int().optional(),
     media_type: z.string().optional(),
     charset: z.string().optional(),
-    headers: z.record(z.string()).optional(),
+    headers: z.record(z.string(), z.string()).optional(),
   }).default({}),
   domain_class: z.string().array().default([]),
   access_scope: z.enum(['private', 'workspace', 'public']).default('private'),

@@ -15,7 +15,7 @@ const executeRequestSchema = z.object({
     name: z.string(),
     namespace: z.string()
   }),
-  arguments: z.record(z.unknown()).default({}),
+  arguments: z.record(z.string(), z.unknown()).default({}),
   dry_run: z.boolean().default(false)
 });
 

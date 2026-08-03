@@ -79,6 +79,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const result = await runtime.search({
       text: input.query,
       topK: input.topK ?? 15,
+      filters: {
+        includeGenerated: false,
+        includeLegacy: false,
+      },
     });
 
     let synthesis: string | null = null;

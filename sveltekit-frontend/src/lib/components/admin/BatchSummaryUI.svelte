@@ -11,13 +11,13 @@
     error?: string;
   }
 
-  let jobs: SummaryJob[] = [];
-  let selectedJob: SummaryJob | null = null;
-  let isProcessing = false;
-  let totalProcessed = 0;
-  let totalJobs = 0;
+  let jobs = $state<SummaryJob[]>([]);
+  let selectedJob = $state<SummaryJob | null>(null);
+  let isProcessing = $state(false);
+  let totalProcessed = $state(0);
+  let totalJobs = $state(0);
   let status = $state('Ready');
-  let startTime: number | null = null;
+  let startTime = $state<number | null>(null);
 
   onMount(async () => {
     // Load bounded summary job manifest
@@ -147,7 +147,7 @@
     </div>
 
     <button
-      on:click={processAllJobs}
+      onclick={processAllJobs}
       disabled={isProcessing}
       class="w-full rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:bg-gray-400"
     >
@@ -167,7 +167,7 @@
           <div
             class="h-full bg-blue-600 rounded transition-all"
             style="width: {selectedJob.progress}%"
-          />
+          ></div>
         </div>
       </div>
     </div>

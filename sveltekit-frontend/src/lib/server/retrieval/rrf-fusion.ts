@@ -12,7 +12,30 @@
  * Acceptance gate: Fusion score improvement > best single-lane NDCG@10 (≥3% absolute)
  */
 
-import type { PostgresPacket, RetrievalLaneResult, FusionCandidate, FusionConfig } from './retrieval-types.js';
+export interface PostgresPacket {
+  packetKey: string;
+  sourceRef?: string | null;
+  contentHash?: string | null;
+}
+
+export interface RetrievalLaneResult {
+  lane: string;
+  status: 'ok' | 'empty' | 'unavailable' | 'failed';
+  hits: Array<{
+    candidate_id: string;
+    rank: number;
+    score: number;
+    source_ref?: string | null;
+    content_hash: string;
+  }>;
+  latencyMs?: number;
+}
+
+export interface FusionConfig {
+  strategy: 'rrf' | 'weighted' | 'hybrid';
+  maxCandidates: number;
+  includeProvenance: boolean;
+}
 
 /**
  * RRF configuration and constants

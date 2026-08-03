@@ -8,11 +8,16 @@
 	const { data }: { data: PageData } = $props();
 
 	// ── Reactive state ─────────────────────────────────────────────────────────
-	let selectedId = $state<string | null>(data.selectedId);
-	let cards = $state<AtlasCardSummary[]>(data.cards);
+	let selectedId = $state<string | null>(null);
+	let cards = $state<AtlasCardSummary[]>([]);
 	let loading = $state(false);
 	let searchQuery = $state('');
 	let filterKind = $state<'all' | 'rag' | 'cluster'>('all');
+
+	$effect(() => {
+		selectedId = data.selectedId;
+		cards = data.cards;
+	});
 
 	// ── Derived / filtered cards ──────────────────────────────────────────────
 	const filteredCards = $derived(() => {

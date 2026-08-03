@@ -25,7 +25,7 @@ import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { generateEmbeddings } from '$lib/server/grpc/embedding-client';
 import { qdrant } from '$lib/server/vector/qdrant-manager';
-import { rrfFuseDenseSparse, type RrfHit } from '$lib/server/retrieval/rrf-fuse';
+import * as rrfFuse from '$lib/server/retrieval/rrf-fuse';
 import { sparseLegalSearch } from '$lib/server/retrieval/sparse-bm25';
 
 const bodySchema = z.object({
@@ -71,7 +71,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	// 2a. Dense lane (Qdrant) — skip gracefully if embedding failed.
 	const denseStart = Date.now();
-	let denseHits: RrfHit[] = [];
+	let denseHits: Array<any> = [];
 	let denseErr: string | null = null;
 	if (queryVector) {
 		try {
@@ -98,7 +98,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	// 2b. Sparse lane (Postgres tsvector + GIN) — independent of embeddings.
 	const sparseStart = Date.now();
-	let sparseHits: RrfHit[] = [];
+	let sparseHits: Array<{ id: string; score: number; payload?: Record<string, unknown> }> = [];
 	let sparseErr: string | null = null;
 	try {
 		const pool = (db as unknown as { $client?: unknown }).$client as
@@ -121,11 +121,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	const sparseMs = Date.now() - sparseStart;
 
 	// 3. RRF fusion.
-	const fused = rrfFuseDenseSparse(denseHits, sparseHits, {
-		topK:         limit,
-		denseWeight:  denseWeight  ?? 0.6,
-		sparseWeight: sparseWeight ?? 0.4,
-	});
+		const fused = rrfFuse.reciprocalRankFusion(
+			[
+				{ lane: 'dense', hits: denseHits },
+				{ lane: 'bm25', hits: sparseHits },
+			],
+			{ topK: limit, includeProvenance: true },
+			60,
+			limit
+		);
 
 	return json({
 		ok:      true,

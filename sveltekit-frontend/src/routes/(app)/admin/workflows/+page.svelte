@@ -4,7 +4,7 @@
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
-  let runs = $state(data.runs ?? []);
+  let runs = $state<PageData['runs']>([]);
   
   async function pollWorkflows() {
     try {
@@ -26,6 +26,7 @@
   }
 
   onMount(() => {
+    runs = data.runs ?? [];
     const interval = setInterval(pollWorkflows, 2000);
     return () => clearInterval(interval);
   });

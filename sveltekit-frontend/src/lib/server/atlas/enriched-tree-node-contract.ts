@@ -110,7 +110,7 @@ export function materializeLinkedTupleDraftsFromEnrichedTreeNode(input: {
 }): EnrichedTreeNodeLinkedTupleDraft[] {
   const sourceTables = uniqueStrings(input.sourceTables).slice(0, 12);
   const treeNodeId = input.node.identity.tree_node_id;
-  const titleId = input.node.identity.title_id ?? undefined;
+  const titleId: string | undefined = undefined;
   const featureLabel = input.node.identity.feature_label;
   const primaryDomain = input.node.domains[0] ?? null;
   const ontologyIds = uniqueStrings([

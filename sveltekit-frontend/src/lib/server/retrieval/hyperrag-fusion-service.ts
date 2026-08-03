@@ -400,7 +400,7 @@ export class HyperRagFusionService {
     const authorityMap = new Map(graphAuthority.map((n) => [n.stableKey, n]));
 
     // Build map of all hits grouped by lane (for RRF signal partitioning)
-    const allHitsInLanes = new Map<string, Array<{ id: string; signals: any }>>();
+    const allHitsInLanes = new Map<string, Array<{ id: string; score: number }>>();
 
     const scoreMap = new Map<string, HyperRagHit>();
 
@@ -620,11 +620,11 @@ export class HyperRagFusionService {
           .where(inArray(uploadedFiles.objectKey, objectKeys));
         const fileMap = new Map(files.map((f) => [f.objectKey, f]));
         ranked = ranked.map((r) => {
-          const file = fileMap.get(String(r.payload?.object_key ?? ''));
+          const file = fileMap.get(String(r.payload?.object_key ?? '')) as Record<string, unknown> | undefined;
           if (file) {
             return {
               ...r,
-              payload: { ...r.payload, ...file },
+              payload: { ...(r.payload as Record<string, unknown> ?? {}), ...file },
               signals: { ...r.signals, status: file.status },
             };
           }

@@ -241,7 +241,7 @@ export async function gemma4AnswerSynthesis(
       answer,
       sources: candidates
         .slice(0, 20)
-        .map(c => c.packet_key),
+        .map((c) => ({ packet_key: c.packet_key, confidence: 0.8 })),
       confidence: 0.8,
       execution_time_ms: Date.now() - startTime
     };
@@ -251,7 +251,7 @@ export async function gemma4AnswerSynthesis(
       answer: `Error synthesizing answer: ${err.message}`,
       sources: candidates
         .slice(0, 5)
-        .map(c => c.packet_key),
+        .map((c) => ({ packet_key: c.packet_key, confidence: 0 })),
       confidence: 0,
       execution_time_ms: Date.now() - startTime
     };

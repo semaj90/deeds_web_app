@@ -71,7 +71,7 @@ export async function rgKeywordSearch(
       timeout: 30000,
     });
 
-    if (result.error && result.error.code === 'ENOENT') {
+    if (result.error instanceof Error && (result.error as NodeJS.ErrnoException).code === 'ENOENT') {
       console.warn('⚠️  ripgrep not installed. Falling back to empty results.');
       return [];
     }

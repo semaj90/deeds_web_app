@@ -4,11 +4,15 @@
 
 	let { data }: { data: PageData } = $props();
 
-	let statusFilter = $state(data.status ?? '');
+	let statusFilter = $state('');
 	let currentPage = $state(0);
 
-	const pageSize = data.limit;
-	const totalPages = Math.ceil(data.totalCount / pageSize);
+	const pageSize = $derived(data.limit);
+	const totalPages = $derived(Math.ceil(data.totalCount / pageSize));
+
+	$effect(() => {
+		statusFilter = data.status ?? '';
+	});
 
 	function formatDate(date: string | Date): string {
 		return new Date(date).toLocaleString();

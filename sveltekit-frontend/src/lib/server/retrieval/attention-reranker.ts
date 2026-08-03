@@ -122,7 +122,7 @@ export async function rerankWithAttention<T extends RerankableDocWithAttention>(
 
 		// Batch attention scoring
 		const packetEmbeddings = docsWithEmbeddings.map(
-			(doc) => new Float32Array(doc.embedding as number[])
+			(doc) => new Float32Array(doc.embedding as unknown as number[])
 		);
 
 		const attentionConfig: AttentionConfig = {

@@ -38,7 +38,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		// 1. Search Qdrant for the query
-		const qdrantResults = await qdrant.search('codebase_chunks_768', query, topK, {
+		const qdrantResults = await (qdrant as any).search('codebase_chunks_768', query, topK, {
 			// optional filters or advanced params
 		});
 

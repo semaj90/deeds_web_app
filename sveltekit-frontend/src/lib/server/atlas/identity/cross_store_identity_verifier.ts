@@ -79,13 +79,13 @@ export async function verifyIdentityCrossStoreParitySchema(): Promise<CrossStore
     // Count 1: Total Postgres packets
     const postgresRows = await db
       .select({
-        packet_key: atlasPackets.packet_key,
-        source_ref: atlasPackets.source_ref,
-        feature_id: atlasPackets.feature_id,
+        packet_key: atlasPackets.packetKey,
+        source_ref: atlasPackets.sourceRef,
+        feature_id: atlasPackets.featureId,
         content_hash: sql<string>`encode(digest(${atlasPackets.summary}::text, 'sha256'), 'hex')`,
       })
       .from(atlasPackets)
-      .where(sql`${atlasPackets.packet_key} IS NOT NULL`)
+      .where(sql`${atlasPackets.packetKey} IS NOT NULL`)
       .limit(100000);
 
     result.parity_result.postgres_count = postgresRows.length;

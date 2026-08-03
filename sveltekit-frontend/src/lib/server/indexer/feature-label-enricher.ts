@@ -16,6 +16,8 @@ import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { sql } from 'drizzle-orm';
 
+const atlasPacketsQuery = (db as any).query?.atlasPackets as any;
+
 export interface FeatureLabel {
   domain: string; // 'auth', 'retrieval', 'gpu', 'cache', 'indexer', 'vector', 'api', 'ui', 'config', 'test'
   ontology: string; // 'service', 'utility', 'model', 'handler', 'adapter', 'client', 'bridge', 'manager'
@@ -321,7 +323,7 @@ export async function getFeatureLabelCoverage(): Promise<{
     const labeled = labeledRow?.count || 0;
 
     // Get distribution by domain
-    const domainRows = await db.query.atlasPackets.findMany({
+    const domainRows = await atlasPacketsQuery.findMany({
       where: sql`metadata->'feature_labels' IS NOT NULL`,
       columns: { metadata: true },
       limit: labeled > 0 ? labeled : 1,

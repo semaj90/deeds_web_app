@@ -28,7 +28,8 @@ import {
   assertSemantic768,
   CANONICAL_QDRANT_COLLECTION,
 } from '$lib/server/embedding/embedding-contract-768.js';
-import { createCodebaseSearchBackendFromEnv, type SearchBackendResult } from '$lib/server/search/create-codebase-search-backend.js';
+import { createCodebaseSearchBackendFromEnv } from '$lib/server/search/create-codebase-search-backend.js';
+import type { SearchBackendResult } from '$lib/server/search/search-backend.js';
 import {
   resolveParentAtlasContext,
   enrichFilterWithDomainTaxonomy,
@@ -235,7 +236,7 @@ async function generateEmbedding(query: string, config: RetrievalConfig): Promis
  * Tries native module search; falls back to Qdrant if unavailable or errored.
  */
 async function rustNapiSearch(
-  queryVector: number[],
+  queryVector: Float32Array,
   filters?: SearchFilter,
   limit: number = 20
 ): Promise<Array<{ id: string; score: number; payload: any }> | null> {
@@ -697,7 +698,7 @@ export async function executeUnifiedRetrieval(
     }
 
     // STAGE 3: TurboVec prefilter
-    const turboVecHits = await turboVecPrefilter(embedding, config, request.limit ?? 10, request.filters);
+    const turboVecHits = await turboVecPrefilter(Array.from(embedding), config, request.limit ?? 10, request.filters);
     stages.push('turbovec_prefilter');
 
     // STAGE 4: Postgres join
@@ -710,7 +711,10 @@ export async function executeUnifiedRetrieval(
       const sourceRefs = Array.from(
         new Set([
           ...qdrantHits.map(h => h.payload?.source_ref || h.id).filter(Boolean),
-          ...turboVecHits.map(h => h.payload?.source_ref).filter(Boolean),
+          // turboVecHits never carries a payload (TurboVec's /search response is
+          // {ids, scores} only, see turboVecPrefilter above) — this branch always
+          // evaluated to undefined and contributed nothing; removed rather than
+          // widening the type to falsely claim a field that never exists.
           ...rgLexicalHits.map(h => h.file).filter(Boolean)
         ])
       );

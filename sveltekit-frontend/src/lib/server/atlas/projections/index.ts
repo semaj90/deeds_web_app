@@ -18,6 +18,43 @@
  */
 
 export * from './postgres-packet-projection.js';
-export * from './qdrant-packet-projection.js';
-export * from './redis-packet-projection.js';
-export * from './hyperrag-packet-projection.js';
+export {
+  fromQdrantPayload,
+  toQdrantPayload,
+  toQdrantPayloadFromStrictTreeNode,
+  validateQdrantProjection,
+  verifyPacketKeyImmutabilityAcrossCollections,
+} from './qdrant-packet-projection.js';
+export type {
+  QdrantPayload,
+  SemanticPacketDomainObject as QdrantSemanticPacketDomainObject,
+  ProjectionViolation as QdrantProjectionViolation,
+} from './qdrant-packet-projection.js';
+export {
+  fromRedisValue,
+  toRedisValue,
+  validateRedisProjection,
+  isRedisPacketFresh,
+  verifyPacketKeyImmutability as verifyRedisPacketKeyImmutability,
+} from './redis-packet-projection.js';
+export type {
+  RedisPacketValue,
+  SemanticPacketDomainObject as RedisSemanticPacketDomainObject,
+  ProjectionViolation as RedisProjectionViolation,
+} from './redis-packet-projection.js';
+export {
+  fromHyperRagResponse,
+  fromHyperRagRpcPacket,
+  toHyperRagRequest,
+  toHyperRagRequestFromStrictTreeNode,
+  validateHyperRagProjection,
+  verifyPacketKeyImmutability as verifyHyperRagPacketKeyImmutability,
+  verifyPostgresHyperRagConsistency,
+} from './hyperrag-packet-projection.js';
+export type {
+  HyperRagFactResponse,
+  HyperRagProjection,
+  SemanticPacketDomainObject as HyperRagSemanticPacketDomainObject,
+  AdapterViolation,
+  AdapterResult,
+} from './hyperrag-packet-projection.js';

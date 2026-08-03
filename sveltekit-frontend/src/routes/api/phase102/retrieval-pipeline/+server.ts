@@ -123,7 +123,7 @@ export const GET: RequestHandler = async ({ url }) => {
     // 9. Optional Gemma4 synthesis
     if (explain && rankedCandidates.length > 0) {
       const topFeature = rankedCandidates[0];
-      response.synthesis = {
+      (response as any).synthesis = {
         feature_id: topFeature.feature_id,
         explanation:
           topFeature.topology_summary || 'Feature details not yet available for synthesis.',

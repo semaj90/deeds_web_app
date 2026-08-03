@@ -11,11 +11,12 @@ export const GET: RequestHandler = async ({ locals }) => {
 		const start = Date.now();
 		const result = await db.execute(sql`SELECT 1 AS ok, current_timestamp AS server_time`);
 		const latency = Date.now() - start;
+		const firstRow = result.rows?.[0] as { server_time?: string } | undefined;
 
 		return json({
 			status: 'healthy',
 			latency,
-			serverTime: result.rows?.[0]?.server_time ?? new Date().toISOString(),
+			serverTime: firstRow?.server_time ?? new Date().toISOString(),
 			timestamp: new Date().toISOString()
 		});
 	} catch (err) {

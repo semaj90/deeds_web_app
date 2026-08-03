@@ -154,7 +154,14 @@ export async function gatherAdminContext(query: string, currentPath?: string, us
 
     // 6. Agentic Multi-Query Retrieval
     intent === 'agentic_multiquery' || intent === 'general'
-      ? createSearchRuntime({ userId }).search({ text: query, topK: 10 }).then((result) => searchResultToHyperRagResult(result, { query })).catch(() => null)
+      ? createSearchRuntime({ userId }).search({
+          text: query,
+          topK: 10,
+          filters: {
+            includeGenerated: false,
+            includeLegacy: false,
+          },
+        }).then((result) => searchResultToHyperRagResult(result, { query })).catch(() => null)
       : Promise.resolve(null),
 
     // 7. Command Suggestions (Phase 76 MCP)

@@ -31,6 +31,8 @@ export const GET: RequestHandler = async ({ url, locals }) => {
       includeAcePacket: true,
       compareRustShadow: false,
       withGraphExpansion: false,
+      persistReport: false,
+      shadowTopK: 20,
       filters: {
         includeGenerated: false,
         includeLegacy: false,

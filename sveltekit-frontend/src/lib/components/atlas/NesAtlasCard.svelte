@@ -17,17 +17,13 @@
 	const displayTags = $derived(card.tags.slice(0, 3));
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<article
+<button
 	id="atlas-card-{card.id}"
 	class="nes-card"
 	class:nes-card--selected={selected}
+	type="button"
 	onclick={() => onclick?.(card)}
-	role="button"
-	tabindex="0"
 	aria-pressed={selected}
-	onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && onclick?.(card)}
 >
 	<header class="nes-card__header">
 		<span class="nes-card__kind" style="color: {kindColor}">[{kindLabel}]</span>
@@ -47,10 +43,13 @@
 			{/if}
 		</footer>
 	{/if}
-</article>
+</button>
 
 <style>
 	.nes-card {
+		display: block;
+		width: 100%;
+		text-align: left;
 		background: #1a1a2e;
 		border: 3px solid #4ade80;
 		box-shadow: 4px 4px 0 #166534, inset 0 0 0 1px #052e16;

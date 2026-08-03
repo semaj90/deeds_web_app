@@ -187,6 +187,10 @@ export async function searchAce(input: AceSearchInput, userId?: string): Promise
     topK: topK * 3,
     userId,
     caseId: undefined,
+    filters: {
+      includeGenerated: false,
+      includeLegacy: false,
+    },
   });
   const result = searchResultToHyperRagResult(searchResult, { query: input.query });
 

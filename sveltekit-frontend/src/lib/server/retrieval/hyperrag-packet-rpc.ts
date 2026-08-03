@@ -970,6 +970,10 @@ export async function hyperragPacketRpc(input: HyperRagPacketRpcInput): Promise<
   const runtimeResult = await runtime.search({
     text: canonicalQuery,
     topK: canonicalLimit,
+    filters: {
+      includeGenerated: false,
+      includeLegacy: false,
+    },
   });
 
   const canonicalPackets: HyperRagPacketRpcPacket[] = runtimeResult.packets.map((packet, index) => {

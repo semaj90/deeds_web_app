@@ -210,10 +210,16 @@ class HTTPPolicyReranker implements PolicyRerankerModel {
     const numSamples = features.length / 16;
 
     try {
+      // features.buffer is typed ArrayBufferLike (could be SharedArrayBuffer),
+      // which fetch's BodyInit doesn't accept — copy into a definite ArrayBuffer
+      // rather than casting.
+      const requestBody = new ArrayBuffer(features.byteLength);
+      new Float32Array(requestBody).set(features);
+
       const response = await fetch(`${this.baseUrl}/score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/octet-stream' },
-        body: features.buffer,
+        body: requestBody,
         signal: AbortSignal.timeout(this.config.timeout || 30000)
       });
 

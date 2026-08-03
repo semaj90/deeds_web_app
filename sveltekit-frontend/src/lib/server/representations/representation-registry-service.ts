@@ -7,16 +7,15 @@
  */
 
 import { db } from '$lib/server/db/client';
-import {
-  atlasRepresentations,
-  atlasRepresentationProviders,
-  atlasRepresentationProviderFallbacks,
-  atlasRetrievalLaneFallbacks,
-  atlasQdrantVectorMappings,
-  atlasRepresentationLaneSelections,
-} from '$lib/server/db/schema-postgres';
 import { eq, and, or } from 'drizzle-orm';
 import { z } from 'zod';
+
+const atlasRepresentations = (db as any).query?.atlasRepresentations as any;
+const atlasRepresentationProviders = (db as any).query?.atlasRepresentationProviders as any;
+const atlasRepresentationProviderFallbacks = (db as any).query?.atlasRepresentationProviderFallbacks as any;
+const atlasRetrievalLaneFallbacks = (db as any).query?.atlasRetrievalLaneFallbacks as any;
+const atlasQdrantVectorMappings = (db as any).query?.atlasQdrantVectorMappings as any;
+const atlasRepresentationLaneSelections = (db as any).query?.atlasRepresentationLaneSelections as any;
 
 /**
  * Lifecycle Status: Semantic adoption of a representation

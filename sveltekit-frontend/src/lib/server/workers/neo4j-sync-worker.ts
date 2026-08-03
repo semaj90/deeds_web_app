@@ -9,7 +9,7 @@
 import amqp from 'amqplib';
 import { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
-import { atlas_packets } from '$lib/server/db/schema-postgres.js';
+import { atlasPackets } from '$lib/server/db/schema-postgres.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { IdentityUpdatedEvent } from './mirror-sync-publisher.js';
 
@@ -55,8 +55,8 @@ async function processNeo4jSync(event: IdentityUpdatedEvent): Promise<void> {
   // Fetch from Postgres (canonical)
   const rows = await db
     .select()
-    .from(atlas_packets)
-    .where(eq(atlas_packets.packet_key, event.packet_key))
+    .from(atlasPackets)
+    .where(eq(atlasPackets.packetKey, event.packet_key))
     .limit(1);
 
   if (!rows || rows.length === 0) {
@@ -65,17 +65,19 @@ async function processNeo4jSync(event: IdentityUpdatedEvent): Promise<void> {
 
   const packet = rows[0];
 
-  if (!packet.source_ref || !packet.feature_id) {
+  const p = packet as any;
+
+  if (!p.sourceRef || !p.featureId) {
     throw new Error(`Invalid identity: ${event.packet_key}`);
   }
 
   // Note: Actual Neo4j sync would require neo4j-driver
   // This is a stub showing the pattern - implement with driver
   console.log('Neo4j sync would create/update packet node:', {
-    packet_key: packet.packet_key,
-    source_ref: packet.source_ref,
-    feature_id: packet.feature_id,
-    identity_lane: packet.identity_lane
+    packet_key: p.packetKey,
+    source_ref: p.sourceRef,
+    feature_id: p.featureId,
+    identity_lane: p.identityLane
   });
 
   // In production:

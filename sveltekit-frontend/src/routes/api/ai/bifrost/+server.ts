@@ -68,9 +68,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   for await (const event of result.fullStream) {
     if (event.type === 'text-delta') {
-      fullText += event.delta
+      fullText += event.text
     } else if (event.type === 'finish') {
-      usage = event.usage
+      const usageAny = event.totalUsage as any
+      usage = {
+        promptTokens: usageAny.inputTokens ?? usageAny.promptTokens ?? 0,
+        completionTokens: usageAny.outputTokens ?? usageAny.completionTokens ?? 0,
+        totalTokens: usageAny.totalTokens ?? ((usageAny.inputTokens ?? 0) + (usageAny.outputTokens ?? 0)),
+      }
     }
   }
 

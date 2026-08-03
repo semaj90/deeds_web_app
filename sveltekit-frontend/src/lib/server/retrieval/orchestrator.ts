@@ -529,15 +529,15 @@ export async function orchestrateRetrieval(req: RetrievalRequest): Promise<Retri
 							__semanticDiagnostics: candidate.diagnostics,
 						};
 					})
-					.filter((c): c is typeof chunks[number] => c !== null);
+					.filter((c) => c !== null) as typeof chunks;
 
 				const semanticLatency = Math.round(performance.now() - t27);
 				timings.semantic_rerank = semanticLatency;
 
 				// Log semantic reranking
 				logInference({
-					type: 'semantic_vector_rerank',
-					backend: 'postgres+redis',
+					type: 'turbovec_rerank',
+					backend: 'qdrant',
 					latencyMs: semanticLatency,
 					cacheHit: false,
 					resultCount: chunks.length,

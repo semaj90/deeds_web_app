@@ -9,7 +9,6 @@
  *   const promoted = authorizedPromotePrediction(prediction, locals.user.id.toString());
  */
 
-import type { Locals } from '$lib/types';
 import { json } from '@sveltejs/kit';
 
 export const PROMOTION_GATE_ROLE = 'PROMOTION_GATE';
@@ -18,7 +17,7 @@ export const ONTOLOGY_APPROVER_ROLE = 'ONTOLOGY_APPROVER';
 /**
  * Check if user has PROMOTION_GATE role (can promote domain predictions to canonical)
  */
-export function canPromotePredictions(locals: Locals): boolean {
+export function canPromotePredictions(locals: App.Locals): boolean {
   if (!locals.user) return false;
   return locals.user.role === PROMOTION_GATE_ROLE || locals.user.role === 'admin';
 }
@@ -26,7 +25,7 @@ export function canPromotePredictions(locals: Locals): boolean {
 /**
  * Check if user has ONTOLOGY_APPROVER role (can approve ontology proposals)
  */
-export function canApproveOntology(locals: Locals): boolean {
+export function canApproveOntology(locals: App.Locals): boolean {
   if (!locals.user) return false;
   return locals.user.role === ONTOLOGY_APPROVER_ROLE || locals.user.role === 'admin';
 }
@@ -34,21 +33,21 @@ export function canApproveOntology(locals: Locals): boolean {
 /**
  * Middleware guard: require PROMOTION_GATE role, return 403 if missing
  */
-export function requirePromotionGate(locals: Locals): boolean {
+export function requirePromotionGate(locals: App.Locals): boolean {
   return canPromotePredictions(locals);
 }
 
 /**
  * Middleware guard: require ONTOLOGY_APPROVER role, return 403 if missing
  */
-export function requireOntologyApprover(locals: Locals): boolean {
+export function requireOntologyApprover(locals: App.Locals): boolean {
   return canApproveOntology(locals);
 }
 
 /**
  * Format authorized user ID for canonical mutations
  */
-export function getAuthorizedBy(locals: Locals): string {
+export function getAuthorizedBy(locals: App.Locals): string {
   if (!locals.user?.id) throw new Error('User not authenticated');
   return `user:${locals.user.id}`;
 }
