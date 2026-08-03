@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const analysisSchema = z.object({
 	evidenceId: z.string().min(1),
@@ -42,8 +43,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const text = item.description || item.title || '';
 		const results: Record<string, unknown> = {};
 
-		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
-		const { ENV } = await import('$lib/server/env.server.js');
+		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
 		for (const type of analysisTypes) {
 			const systemPrompts: Record<string, string> = {
@@ -56,7 +57,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			};
 
 			try {
-				const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+				const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({

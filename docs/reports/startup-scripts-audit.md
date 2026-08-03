@@ -19,6 +19,27 @@ Scope: `C:\Users\james\Videos\deeds-web-app`
 
 ---
 
+## Layer Separation Update
+
+Treat startup helpers as lane-specific launchers, not as one blended runtime:
+
+| Lane | Canonical owner | Startup role |
+|------|-----------------|--------------|
+| Durable canonical state | PostgreSQL + Drizzle | Source of truth for packets, runs, receipts, and versioned state |
+| Retrieval / graph projections | Qdrant, Neo4j, Redis / Valkey | Mirrors, caches, and derived graph/index state only |
+| Classification / ranking | Logistic regression, XGBoost, SOM, KMeans | Derived scoring and routing features only |
+| Browser presentation | IndexedDB, WebGPU, LiteRT js | Local UI cache / preview / display only |
+| Experimental learning | DSPy, GEPA, JEPA, Mamba, Titans, PEFT, SISA | Research lanes only; not canonical startup truth |
+
+Startup helpers should preserve that split:
+
+- `scripts/startup/dev-gpu-runtime.mjs` boots helper services for synthesis, embeddings, and the NLP sidecar. It is not a truth store.
+- `scripts/startup/run-graphify-daily-startup.mjs` chains graphify maintenance and fallback startup. It should not be used to infer canonical packet ownership.
+- `sveltekit-frontend/scripts/start-phase89-server.ps1` starts the Phase 89 llama-server lane on `:8090` for synthesis only.
+- `sveltekit-frontend/scripts/opencode/bootstrap-workspace.mjs` refreshes task and recommendation state. It does not create canonical durable records.
+
+---
+
 ## Section 1 — Docker Compose Files
 
 | File | Profiles | Services | Use |

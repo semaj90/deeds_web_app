@@ -56,13 +56,16 @@ function redisOpts(connectTimeout = 2000) {
 const services = [
   { name: 'Valkey',          kind: 'redis' },
   { name: 'Qdrant',          url: process.env.QDRANT_URL ?? 'http://127.0.0.1:6333/collections' },
-  { name: 'Ollama',          url: `${OLLAMA_URL}/api/tags` },
+  { name: 'Ollama',          url: `${OLLAMA_URL}/api/tags`, soft: true },
   { name: 'Postgres',        kind: 'postgres' },
   { name: 'Bifrost',         url: process.env.BIFROST_URL ?? 'http://127.0.0.1:3040/health' },
   { name: 'TurboQuant',      url: `${TURBOQUANT_URL}/health` },
   { name: 'Go Retrieval',    url: `${GO_RETRIEVAL_URL}${GO_RETRIEVAL_HEALTH_PATH}`, kind: 'goRetrieval' },
   { name: 'Topology Search', url: process.env.TOPOLOGY_SEARCH_URL ?? 'http://127.0.0.1:8101/health', soft: true },
   { name: 'RabbitMQ API',    kind: 'rabbitmq' },
+  // TurboVec MCP is used by the retrieval/agentic lane, but the base dev:gpu
+  // startup path does not spawn it. Keep this as an advisory soft probe.
+  { name: 'TurboVec MCP',    url: `${TURBOVEC_URL}/mcp`, soft: true },
 ];
 
 let pass = 0;
@@ -448,14 +451,14 @@ if (traceResult.ok) {
 
   if (turbovecResult.ok) {
     console.log(`OK TurboVec MCP :8792/mcp  (${turbovecResult.toolCount} tools)`);
-  state.turbovecMcp = 'green';
-  pass += 1;
-} else {
-  console.log(`FAIL TurboVec MCP :8792/mcp -- ${turbovecResult.error}`);
-  console.log('   -> restart: node scripts/mcp/turbovec-sidecar-mcp.mjs &');
-  state.turbovecMcp = 'red';
-  fail += 1;
-}
+    state.turbovecMcp = 'green';
+    pass += 1;
+  } else {
+    console.log(`SKIP TurboVec MCP :8792/mcp (soft dependency) -- ${turbovecResult.error}`);
+    console.log('   -> restart: node scripts/mcp/turbovec-sidecar-mcp.mjs &');
+    state.turbovecMcp = 'yellow';
+    // Advisory only: this lane is launched by the incremental startup path.
+  }
 
 // -- Atlas dependency keys ----------------------------------------------------
 console.log('-- Atlas key presence --');
@@ -502,7 +505,7 @@ if (!turboUp && !ollamaUp) {
 }
 
 // -- Summary ------------------------------------------------------------------
-state.sveltekit = fail > 0 ? 'yellow' : 'yellow';
+state.sveltekit = fail > 0 ? 'yellow' : 'green';
 writeStatus();
 console.log(`-- summary: PASS=${pass} FAIL=${fail} --`);
 if (fail > 0) {

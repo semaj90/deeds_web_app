@@ -18,3 +18,16 @@ This change narrows the contract before any uniqueness relaxation or graph-snaps
 - `symbol_version_id` or equivalent must own version-bound symbol occurrences
 - parser manifest text and parser runtime implementation are separate proof claims
 - graph snapshot apply remains blocked until the identity model is split
+
+## Next bounded extension
+
+The next downstream seam owned by this change is a bounded patch tournament for a single existing compile error. It is intentionally narrower than a full agentic repair loop:
+- generate a small candidate set
+- keep each candidate isolated in its own worktree
+- run static and focused tests before any ranking
+- emit a deterministic comparison packet and Kanban card
+- require explicit approval before any patch is applied
+
+This remains under the same change because it consumes the evidence pipeline and produces a recommendation artifact, not canonical state.
+
+The live code paths that already sit closest to this seam are `scripts/atlas/agentic-recommendation-workflow.mjs`, `sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts`, `sveltekit-frontend/src/lib/server/ace/atlas-tool-registry.ts`, and `sveltekit-frontend/src/lib/server/agent/execution-review.ts`.

@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 const generateSchema = z.object({
   model: z.string().max(100).default('gemma4-rotorquant:latest'),
@@ -41,9 +41,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	// Normalize model name — append ':latest' if no tag
 	const model = body.model.includes(':') ? body.model : `${body.model}:latest`;
+	const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
 	try {
-		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

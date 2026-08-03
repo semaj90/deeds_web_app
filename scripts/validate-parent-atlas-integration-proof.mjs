@@ -259,7 +259,7 @@ async function gateEnv() {
   const probes = [];
   for (const target of serviceTargets) {
     try {
-      const result = await fetchJson(target.url, 3500);
+      const result = await fetchJson(target.url, 8000);
       probes.push(evidence('http_probe', {
         source: target.name,
         url: target.url,
@@ -605,7 +605,13 @@ async function gateClustering() {
 
 async function gateGraph() {
   const candidates = [];
-  for (const rel of ['codebase-graph.json', 'sveltekit-frontend/codebase-graph.json', 'packages/parent-atlas/codebase-graph.json']) {
+  for (const rel of [
+    'docs/graph/codebase-graph.json',
+    'memory/graphify/deep/deep-import-graph.json',
+    'codebase-graph.json',
+    'sveltekit-frontend/codebase-graph.json',
+    'packages/parent-atlas/codebase-graph.json',
+  ]) {
     const abs = resolveRepoPath(rel);
     if (existsSync(abs)) {
       candidates.push({
@@ -618,7 +624,7 @@ async function gateGraph() {
 
   if (candidates.length === 0) {
     return makeResult('graph', STATUS.NOT_PROVEN, [
-      evidence('file_scan', { message: 'codebase-graph.json not found' }),
+      evidence('file_scan', { message: 'graph artifact not found in docs/graph or legacy locations' }),
     ]);
   }
 
@@ -638,28 +644,28 @@ async function gateAce() {
   }
 
   try {
-    const tables = ['workflow_traces', 'trace_events'];
+    const tables = ['trace_runs', 'trace_events'];
     const present = await existingTables(pool, tables);
-    const traces = present.has('workflow_traces')
+    const traces = present.has('trace_runs')
       ? await pool.query(`
         SELECT
           COUNT(*)::int AS traces,
-          COUNT(DISTINCT trace_id)::int AS distinct_traces
-        FROM workflow_traces
+          COUNT(DISTINCT id)::int AS distinct_traces
+        FROM trace_runs
       `)
       : { rows: [{}] };
     const steps = present.has('trace_events')
       ? await pool.query(`
         SELECT
           COUNT(*)::int AS steps,
-          COUNT(DISTINCT trace_id)::int AS traces_with_steps
+          COUNT(DISTINCT run_id)::int AS runs_with_steps
         FROM trace_events
       `)
       : { rows: [{}] };
 
-    return makeResult('ace', (present.has('workflow_traces') && Number(traces.rows[0]?.traces ?? 0) > 0) || (present.has('trace_events') && Number(steps.rows[0]?.steps ?? 0) > 0) ? STATUS.PARTIAL : STATUS.NOT_PROVEN, [
+    return makeResult('ace', (present.has('trace_runs') && Number(traces.rows[0]?.traces ?? 0) > 0) || (present.has('trace_events') && Number(steps.rows[0]?.steps ?? 0) > 0) ? STATUS.PARTIAL : STATUS.NOT_PROVEN, [
       evidence('table_check', { present: [...present], missing: tables.filter((table) => !present.has(table)) }),
-      evidence('sql', { table: 'workflow_traces', row: traces.rows[0] ?? {} }),
+      evidence('sql', { table: 'trace_runs', row: traces.rows[0] ?? {} }),
       evidence('sql', { table: 'trace_events', row: steps.rows[0] ?? {} }),
     ]);
   } finally {

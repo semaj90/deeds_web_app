@@ -57,6 +57,7 @@ const limitArg = args.find(a => a.startsWith('--limit='));
 const LIMIT    = limitArg ? parseInt(limitArg.split('=')[1], 10) : Infinity;
 const batchArg = args.find(a => a.startsWith('--batch='));
 const BATCH_SZ = batchArg ? parseInt(batchArg.split('=')[1], 10) : 100;
+const FORCE_REFRESH = args.includes('--force-refresh');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,12 @@ function floatArrayToBuffer(fa) {
   const buf = Buffer.alloc(fa.length * 4);
   for (let i = 0; i < fa.length; i++) buf.writeFloatLE(fa[i], i * 4);
   return buf;
+}
+
+function bufferToFloatArray(buf) {
+  if (!buf || buf.byteLength % 4 !== 0) return [];
+  const view = new Float32Array(buf.buffer, buf.byteOffset, buf.byteLength / 4);
+  return Array.from(view);
 }
 
 /** Load a .npy file (simple 1-D / 2-D float32, no zip, no structured dtype). */
@@ -102,6 +109,57 @@ function isCanonicalPacketPayload(payload = {}) {
     payload.filePath ||
     payload.path
   );
+}
+
+async function loadCurrentLatentKeys(pool, currentEpoch) {
+  const result = await pool.query(
+    `
+    SELECT qdrant_point_id, packet_key, source_ref, latent_64
+    FROM atlas_packets
+    WHERE latent_64 IS NOT NULL
+      AND COALESCE((metadata->>'ae_epoch')::int, -1) = $1;
+    `,
+    [currentEpoch]
+  );
+
+  // Keyed by every candidate identity string -> already-decoded latent_64 array, so a
+  // skip can still populate the JSON latent-index file (consumed by train-som-20x20.mjs)
+  // instead of silently dropping the entry. Multiple keys may point at the same vector.
+  const byKey = new Map();
+
+  for (const row of result.rows) {
+    if (!row.latent_64) continue;
+    const vec = bufferToFloatArray(row.latent_64);
+    if (row.qdrant_point_id) byKey.set(String(row.qdrant_point_id), vec);
+    if (row.packet_key) byKey.set(String(row.packet_key), vec);
+    if (row.source_ref) byKey.set(String(row.source_ref), vec);
+  }
+
+  return {
+    count: result.rowCount ?? 0,
+    byKey,
+  };
+}
+
+/** Returns the existing latent_64 array if this entry is already current, else null. */
+function findExistingLatent(entry, qdrantId, currentLatentKeys) {
+  if (!currentLatentKeys) return null;
+
+  const candidateKeys = [
+    qdrantId,
+    entry.qdrant_point_id,
+    entry.packet_key,
+    entry.source_ref,
+    entry.canonical_source_ref,
+    ...(entry.candidate_keys || []),
+  ].filter(Boolean).map((value) => String(value));
+
+  for (const key of candidateKeys) {
+    const vec = currentLatentKeys.byKey.get(key);
+    if (vec) return vec;
+  }
+
+  return null;
 }
 
 /** Scroll all vectors from Qdrant, up to LIMIT. */
@@ -262,6 +320,8 @@ async function main() {
     process.exit(1);
   }
 
+  const pool = APPLY ? new pg.Pool({ connectionString: DATABASE_URL }) : null;
+
   // ── Step 3: Fetch embeddings from Qdrant ──────────────────────────────────
   console.log('Step 3: Fetch embeddings from Qdrant');
   console.log('─────────────────────────────────────');
@@ -282,6 +342,16 @@ async function main() {
     process.exit(2);
   }
 
+  const currentEpoch = Number(meta.epoch ?? 60);
+  const currentLatentKeys = APPLY && pool && !FORCE_REFRESH
+    ? await loadCurrentLatentKeys(pool, currentEpoch)
+    : null;
+  if (currentLatentKeys) {
+    console.log(`  Existing current latent rows: ${currentLatentKeys.count} (ae_epoch=${currentEpoch})\n`);
+  } else if (FORCE_REFRESH) {
+    console.log('  --force-refresh set: re-encoding all packets regardless of existing latent_64\n');
+  }
+
   // ── Step 4: Encode 768 → 128 → 64 in GPU batches ─────────────────────────
   console.log('Step 4: Encode via autoencoderEncodeGPU() (768→128→64)');
   console.log('──────────────────────────────────────────────────────');
@@ -294,6 +364,15 @@ async function main() {
   const latentIndex = {};   // qdrant_id → latent object
   let encoded_count = 0;
   let t_encode = 0;
+  // Declared here (not at first Step-6 use) — shouldSkipCurrentLatent below increments
+  // .skipped during Step 4, which runs before Step 6's write loop.
+  let pg_reasons = {
+    qdrant_point_id: 0,
+    packet_key: 0,
+    source_ref: 0,
+    jsonb_fallback: 0,
+    skipped: 0
+  };
 
   for (let start = 0; start < N; start += BATCH_SZ) {
     const end   = Math.min(start + BATCH_SZ, N);
@@ -316,6 +395,11 @@ async function main() {
     for (let i = 0; i < bSize; i++) {
       const id = String(ids[start + i]);
       const ptInfo = pointsMap[id] || {};
+      // Already current in Postgres for this ae_epoch: skip the write in Step 6, but
+      // still populate latentIndex from the freshly-encoded vector so downstream
+      // consumers (Step 5/6/7 and SOM training) keep receiving a full corpus index.
+      const isCurrent = findExistingLatent(ptInfo, id, currentLatentKeys) !== null;
+      if (isCurrent) pg_reasons.skipped++;
 latentIndex[id] = {
   primary_id: ptInfo.primary_id || id,
   qdrant_point_id: ptInfo.qdrant_point_id || '',
@@ -333,6 +417,9 @@ latentIndex[id] = {
   canonical: ptInfo.canonical ?? null,
   payload_unmatched: ptInfo.payload_unmatched ?? null,
 
+  // Skip re-writing Postgres/Redis for already-current entries in Step 6/7 below.
+  skip_write: isCurrent,
+
   latent_64: Array.from(
     lat64.subarray(
       i * LATENT_DIM,
@@ -344,8 +431,65 @@ latentIndex[id] = {
     encoded_count = end;
     process.stdout.write(`\r  Encoded ${encoded_count}/${N} (${(t_encode / encoded_count).toFixed(2)} ms/vec)...`);
   }
+
+  if (Object.keys(latentIndex).length === 0 && currentLatentKeys && currentLatentKeys.count > 0 && pool) {
+    console.log('\n  No refreshed latent rows were needed; hydrating the latent index from Postgres for downstream consumers...');
+    const currentRows = await pool.query(
+      `
+      SELECT
+        packet_id,
+        qdrant_point_id,
+        packet_key,
+        source_ref,
+        canonical_source_ref,
+        feature_id,
+        kind,
+        ledger_type,
+        canonical,
+        payload_unmatched,
+        latent_64
+      FROM atlas_packets
+      WHERE latent_64 IS NOT NULL
+        AND COALESCE((metadata->>'ae_epoch')::int, -1) = $1
+      ORDER BY packet_id;
+      `,
+      [currentEpoch]
+    );
+
+    for (const row of currentRows.rows) {
+      const key = String(row.qdrant_point_id || row.packet_id);
+      latentIndex[key] = {
+        primary_id: String(row.qdrant_point_id || row.packet_id),
+        qdrant_point_id: row.qdrant_point_id || key,
+        packet_key: row.packet_key || null,
+        source_ref: row.source_ref || null,
+        canonical_source_ref: row.canonical_source_ref || null,
+        feature_id: row.feature_id || null,
+        candidate_keys: [],
+        kind: row.kind ?? null,
+        ledger_type: row.ledger_type ?? null,
+        canonical: row.canonical ?? null,
+        payload_unmatched: row.payload_unmatched ?? null,
+        latent_64: bufferToFloatArray(row.latent_64),
+      };
+    }
+
+    console.log(`  ✅ Hydrated ${Object.keys(latentIndex).length} latent vectors from Postgres\n`);
+  }
+
   process.stdout.write('\n');
   console.log(`  ✅ ${encoded_count} latent vectors produced in ${t_encode} ms\n`);
+
+  // `vecs` and `pointsMap` are only needed inside the encode loop above — free
+  // them before building/serializing latentArtifact so the two large retained
+  // structures (raw 768-dim vectors for every point, plus point metadata) don't
+  // sit in memory alongside it. Live OOM crash (2026-08-03, ~106K packets,
+  // "JavaScript heap out of memory") — see OpenSpec parent-atlas-graph-retrieval-proof
+  // GS1.43 — happened here: latentArtifact + two independent JSON.stringify(...,
+  // null, 2) calls (pretty-printed, ~3x string size) each producing a full
+  // multi-hundred-MB string, on top of vecs/pointsMap still being retained.
+  vecs = null;
+  pointsMap = null;
 
   // ── Step 5: Write latent index file ───────────────────────────────────────
   console.log('Step 5: Save latent index (for train-som-20x20.mjs)');
@@ -362,11 +506,17 @@ latentIndex[id] = {
     candidates:  candidatesMap         // { qdrant_id: [candidates] }
   };
 
+  // Serialize once and reuse for both file writes — this was previously two
+  // independent JSON.stringify(..., null, 2) calls on the same large object,
+  // doubling peak string-allocation memory for no reason (both files are
+  // byte-identical mirrors).
+  const latentArtifactJson = JSON.stringify(latentArtifact, null, 2);
+
   if (DRY_RUN) {
     mkdirSync(MODEL_DIR, { recursive: true });
     mkdirSync(FRONTEND_MODEL_DIR, { recursive: true });
-    writeFileSync(LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
-    writeFileSync(FRONTEND_LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
+    writeFileSync(LATENT_FILE, latentArtifactJson);
+    writeFileSync(FRONTEND_LATENT_FILE, latentArtifactJson);
     console.log(`  🔍 DRY-RUN — wrote ${Object.keys(latentIndex).length} entries to ${LATENT_FILE}`);
     console.log(`   Mirror wrote to ${FRONTEND_LATENT_FILE}`);
     console.log('   Skipping Postgres and Redis writes. Use --apply to persist database state.');
@@ -375,8 +525,8 @@ latentIndex[id] = {
 
   mkdirSync(MODEL_DIR, { recursive: true });
   mkdirSync(FRONTEND_MODEL_DIR, { recursive: true });
-  writeFileSync(LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
-  writeFileSync(FRONTEND_LATENT_FILE, JSON.stringify(latentArtifact, null, 2));
+  writeFileSync(LATENT_FILE, latentArtifactJson);
+  writeFileSync(FRONTEND_LATENT_FILE, latentArtifactJson);
   console.log(`  ✅ ${LATENT_FILE}  (${Object.keys(latentIndex).length} entries)\n`);
   console.log(`  ✅ ${FRONTEND_LATENT_FILE}  (${Object.keys(latentIndex).length} entries)\n`);
 
@@ -384,14 +534,23 @@ latentIndex[id] = {
   console.log('Step 6: Write latent_64 → Postgres atlas_packets');
   console.log('──────────────────────────────────────────────────');
 
-  const pool = new pg.Pool({ connectionString: DATABASE_URL });
-  let pg_reasons = {
-    qdrant_point_id: 0,
-    packet_key: 0,
-    source_ref: 0,
-    jsonb_fallback: 0,
-    skipped: 0
-  };
+  // Shared advisory lock — same key as sveltekit-frontend/scripts/atlas/materialize-feature-envelopes.mts.
+  // A live 2026-08-03 incident deadlocked this script's latent_64/metadata UPDATEs
+  // against that script's feature_envelope UPDATEs (two independent bulk writers on
+  // atlas_packets, no shared coordination). Any script doing a bulk batch UPDATE
+  // against atlas_packets should acquire ATLAS_PACKETS_BULK_WRITER_LOCK_KEY before
+  // its write phase — see OpenSpec parent-atlas-graph-retrieval-proof GS1.43.
+  const ATLAS_PACKETS_BULK_WRITER_LOCK_KEY = 847_662_501;
+  if (APPLY) {
+    const lockResult = await pool.query('SELECT pg_try_advisory_lock($1) AS locked;', [ATLAS_PACKETS_BULK_WRITER_LOCK_KEY]);
+    if (!lockResult.rows[0]?.locked) {
+      console.error('Another atlas_packets bulk-writer script (materialize-feature-envelopes or backfill-latent-vectors) holds the shared lock. Exiting without writing.');
+      await pool.end();
+      process.exitCode = 1;
+      return;
+    }
+  }
+
   let pgUpdated = 0;
   let pgNotMatched = 0;
   let redisCached = 0;
@@ -406,6 +565,7 @@ let batchMatched = 0;
 let batchNotMatched = 0;
       for (const [qdrant_id, entry] of slice) {
         if (
+          entry.skip_write === true ||
           entry.kind === 'directory-cluster' ||
           entry.ledger_type === 'legacy_qdrant_only' ||
           entry.canonical === false ||
@@ -607,7 +767,7 @@ let batchNotMatched = 0;
     } catch (e) {
       await pool.query('ROLLBACK');
       console.error(`\n  ❌ Postgres batch failed at ${start}: ${e.message}`);
-      await pool.end();
+      if (pool) await pool.end();
       process.exit(3);
     }
     process.stdout.write(`\r  PG: ${pgUpdated} updated, ${pgNotMatched} not matched...`);
@@ -633,7 +793,7 @@ let batchNotMatched = 0;
   }, null, 2));
   console.log(`  ✅ Reasoned writeback report saved to ${writebackReportPath}\n`);
 
-  await pool.end();
+  if (pool) await pool.end();
 
   // ── Step 7: Cache in Redis ─────────────────────────────────────────────────
   console.log('Step 7: Cache latent_64 → Redis / Valkey');

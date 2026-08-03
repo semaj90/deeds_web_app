@@ -7,7 +7,7 @@
  */
 
 import { db } from '$lib/server/db/client.js';
-import { toolTraces } from '$lib/server/db/schema.js';
+import { toolTraces } from '$lib/server/db/schema-chat';
 
 export type ToolTraceStatus = 'ok' | 'error' | 'skipped';
 

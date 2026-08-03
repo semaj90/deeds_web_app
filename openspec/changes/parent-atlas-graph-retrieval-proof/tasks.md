@@ -751,9 +751,204 @@ New `python/atlas_rapids_sidecar.py` — FastAPI/uvicorn, matching the existing 
   - `wsl -d Ubuntu -e bash -lc "source ~/miniforge3/bin/activate atlas-rapids-cu13 && cd /mnt/c/Users/james/Videos/deeds-web-app && python python/atlas_rapids_sidecar.py"` (foreground, for manual testing)
   - `curl http://127.0.0.1:8098/health` / `curl http://127.0.0.1:8098/v1/capabilities`
 
+## GS1.39 - Patch Tournament spec received, NOT started (2026-08-02)
+
+Operator supplied a large, fully-specified "Generate-Test-Select" agentic error-fixing design: a best-of-N counterfactual patch tournament over a DAG (candidate generation via 6 strategies → identity/revision resolution → dedup → isolated-worktree static/focused/integration validation → fresh-replay → deterministic ranking → ACE comparison packet → Kanban → human approval), with an explicit non-GAN terminology correction, a 5-phase learning progression (deterministic tournament → learned reranker → QLoRA SFT → preference optimization → RL/bandit only after reward proof), full TS contracts for every stage (`PatchTournamentLimits`, `RepairQueryFeatures`, `PatchCandidate`, `CandidateDuplicateGroup`, `CandidateValidationResult`, `CandidateRankFeatures`, `TournamentAcePacket`, `AgenticWorkflowPolicy`, `RepairKnowledgeRecord`, `RepairTrainingExample`, `RepairReward`, `TournamentHyperparameters`), and 20 proof gates (`TOUR1`-`TOUR20`).
+
+**Not started this pass** — received with context at ~20% remaining, correctly too low to safely build and verify even the spec's own explicitly-scoped "initial slice" (§22: 3 candidates, 3 worktrees, static+focused tests on ≤2 survivors, deterministic ranking, one ACE packet, Kanban display, manual approval only, no training). Starting a multi-file, multi-schema, worktree-isolation-dependent system this late in a session risks leaving it half-built and unverified — worse than not starting.
+
+- [ ] **Exact next bounded seam** (the spec's own §25, and the correct entry point for a fresh session): "Implement a three candidate tournament for one existing compile error using isolated Git worktrees, exact symbol/revision guards, static and focused tests, deterministic ranking, an ACE comparison packet, and a Kanban result card. Do not apply the winner automatically and do not begin QLoRA training."
+- [ ] Prerequisite check for that seam, not yet done: locate whether a `PatchTournament`/candidate-repository Postgres schema already exists anywhere in this repo (given this session's repeated finding of pre-existing-but-undiscovered infrastructure — the RAPIDS environment in GS1.33, the `pageRankScore` consumers in GS1.35 — a repo-first search for `worktree`, `candidate`, `tournament`, `PatchCandidate` should run BEFORE writing any new schema, per this repo's own "search before creating" rule, which this spec's own §1-2 sections implicitly assume hasn't been done yet).
+- [ ] Full spec text is preserved in this session's transcript (not duplicated here in full — this entry is a pointer + the bounded next-seam extraction, matching this session's established compact-recording convention for large operator specs, e.g. GS1.24's PageRank/BM25/BM42 spec, GS1.37's sidecar sequencing).
+
+## GS1.40 - Deep-audit skill deferred: stale + oversized graph (2026-08-02)
+
+`/deep-audit` was invoked (default `all code report`). Declined to run against the cached graph as-is and declined to blind-regenerate given context constraints; operator then explicitly requested the regen. `npm run graphify:daily` launched in the background this pass (not awaited synchronously — long-running, output at the backgrounded task's log path, completion not yet confirmed in this entry).
+
+- [ ] **Blocker found, not yet resolved**: `sveltekit-frontend/docs/graph/codebase-graph.json` was **707 hours (~29.5 days) stale** at audit time (last built 2026-07-04), past the skill's own 24h freshness threshold, and **67MB** — reading it directly to run the gate table would have consumed most/all of the remaining context budget for this session, leaving nothing to act on findings. Matches this repo's own documented pattern: project CLAUDE.md already warns "Your graph snapshot has repeatedly been reported as stale — do not use the existing codebase graph.json as proof of current runtime topology until its producing job is refreshed and validated."
+- [ ] `npm run graphify:daily` launched in background this pass to refresh the Karpathy map + KAG notes. **Completion not confirmed in this entry** — check `docs/graph/codebase-graph.json`'s mtime and `docs/graph/codebase-map.md` before trusting the refresh landed.
+- [ ] **Next bounded step for a fresh session**: once the graph is confirmed fresh (<24h), run `/deep-audit` (default `all code report`, or scope to a specific directory first if the full 67MB read is still too large for comfortable budget — e.g. `/deep-audit src/lib/server/atlas code report` as a smaller first pass) and act on the G1-G26 findings per the skill's own remediation-priority format.
+- [ ] Do not treat a stale-graph "clean audit" as evidence of current code health — this session's own established discipline (GS1.13's evidence-type contract, this OpenSpec thread throughout) requires flagging exactly this kind of stale-cache trap rather than silently trusting it.
+
 ## Suggested execution order
 
 1. Run GS1.9 inventory and capture the current join/report shape.
 2. Confirm GS1.10 contract language in both the workstation todo and this OpenSpec change.
 3. Run GS1.11 parser/runtime audit and classify the executable as `REGEX_HEURISTIC` or better.
 4. Only then revisit snapshot promotion, uniqueness relaxation, or downstream enrichment work.
+
+## GS1.41 - Patch tournament seam: bounded generate-test-select loop (2026-08-03)
+
+The next bounded extension owned by this change is a three-candidate patch tournament for one existing compile error. This remains read-only until the tournament packet exists and the manual approval gate is defined.
+
+- [ ] Inventory the existing repair / recommendation / worktree owner code paths that can supply tournament candidates.
+- [ ] Add or wire `specs/agentic-patch-tournament/spec.md` as the authoritative spec delta for this bounded seam.
+- [ ] Implement the read-only tournament planner for one compile error and exactly three isolated candidate worktrees.
+- [ ] Run static checks and focused tests for each surviving candidate before ranking.
+- [ ] Emit a deterministic comparison packet with candidate metadata, validation evidence, and ranking features.
+- [ ] Emit a Kanban-ready result card that keeps manual approval separate from patch application.
+- [ ] Keep auto-apply, QLoRA / training, and reward optimization out of this slice.
+
+Acceptance criteria:
+- exactly one compile error is targeted
+- exactly three candidate worktrees are created
+- ranking is deterministic and evidence-backed
+- one ACE comparison packet is produced
+- one Kanban result card is produced
+- no patch is auto-applied
+- no training begins
+
+## GS1.42 - Layer separation directive: canonical/index/feature/presentation/experimental boundaries (2026-08-02)
+
+Recorded per operator directive. This is a **planning/status entry only** — no code was written or executed against it this session. It supersedes ad-hoc component framing ("is this Titans/Mamba/RL yet") with an explicit layer model and a component-status table, and it sets the near-term build order. Nothing below is claimed WIRED or PROVEN by virtue of being recorded here.
+
+### The layer model (hard separation, do not blur)
+
+1. **Canonical durable state** — Postgres (Drizzle-owned schema, SQLAlchemy maps the *same* schema for Python workers — never an independently-invented parallel packet shape). Durable agent execution needs explicit fields beyond what an ORM gives for free: `run_id, step_id, workspace_revision, input_hash, state_before, state_after, tool_call_id, retry_count, lease_owner, lease_expires_at, status, result_hash`. SQLAlchemy is a DB toolkit, not a durability mechanism — durable orchestration (checkpoint/replay/retry) has to be built explicitly around it, the way Microsoft's durable-agent pattern wraps orchestration around the agent rather than treating the ORM as the checkpoint store.
+2. **Retrieval / index projections** — Qdrant, Neo4j, Redis/Valkey centroids. Rebuildable mirrors of canonical state, never truth (consistent with this repo's existing hard rule, re-confirmed here — not a new rule).
+3. **Classification / ranking features** — the 4-lane × 6-feature (24-dim) matrix below; logistic regression / Naive Bayes baselines before XGBoost; XGBoost only promoted after a shadow-mode gate beats the frozen baseline.
+4. **Browser / GPU presentation** — WebGPU, LiteRT.js, IndexedDB. Local reranking of *already-bounded* candidates, display transforms, preview inference. Never canonical embeddings, never Qdrant mutation, never entity-identity decisions.
+5. **Experimental / research** — DSPy+GEPA (offline optimization loop only, never live hot path), JEPA, Mamba, Titans, SISA, full RL. Explicitly deferred; none are Parent Atlas integration priorities today.
+
+### Component status table (evidence-language, as given)
+
+| Capability | Status |
+|---|---|
+| PostgreSQL canonical packets | PARTIAL_PROVEN→PROVEN (strongest layer) |
+| Drizzle ORM (SvelteKit) | PRESENT |
+| SQLAlchemy (Python workers) | PRESENT, not canonical-ownership |
+| Durable agent checkpoints | NOT_PROVEN as a unified system |
+| Qdrant semantic retrieval | PARTIAL_PROVEN |
+| `latent_128` topology vectors | artifacts/indexes exist, canonical role unclear |
+| SOM 20×20 + KMeans | PARTIAL_PROVEN (partially populated) |
+| Redis/Valkey centroids | intended hot-routing layer, contract alignment incomplete |
+| ACE context assembly | PARTIAL_PROVEN (present in pieces) |
+| Bitfrost packet transport | EXPERIMENTAL, not retrieval authority |
+| POS tagging / formal NER | NOT_PROVEN production lane |
+| Naive Bayes / logistic classifier | NOT_PROVEN wired (appropriate next baseline) |
+| XGBoost ranking | prior eval artifacts exist, NOT unified with entity classification |
+| DSPy / GEPA | NOT production-wired |
+| JEPA / Mamba / Titans | research-lane only |
+| WebGPU / LiteRT.js inference | prototype, not canonical retrieval path |
+| IndexedDB browser cache | useful, not canonical durable storage |
+
+### Explicit ownership rules recorded
+
+- **Drizzle vs SQLAlchemy**: Drizzle owns migrations + TS application access; SQLAlchemy maps the *same* live schema for Python workers; Postgres owns durable truth; an outbox pattern carries durable transitions; Redis/Valkey owns leases + hot state + disposable caches only. Two independently-invented packet schemas (one per ORM) is the failure mode this rule prevents.
+- **IndexedDB**: browser-only. Good: recent packet cards, offline previews, cached embeddings for local UI experiments, WebGPU tensor buffers, pending annotations, local viewport state. Bad: canonical entity identities, agent checkpoints, source revisions, recommendation truth, validation receipts, cross-device durable memory. Every IndexedDB entry should carry `packetKey, workspaceRevision, representationId, representationRevision, schemaVersion, contentHash, expiresAt` so a stale offline browser packet can never silently outrank newer canonical state.
+- **Gemma4/Ornith vs headless UI**: Gemma4 must not directly drive DOM/WebGPU state. Flow: Gemma4/Ornith → structured tool result → SvelteKit server Zod validation → canonical UI command → Svelte store/state machine → Bits UI/canvas/WebGPU renderer. Bounded response shape: `AtlasUiRecommendation { recommendationId, packetKeys[], action: OPEN_EVIDENCE|COMPARE_SYMBOLS|SHOW_TOPOLOGY|PREPARE_PATCH, confidence, evidenceReceiptIds[], workspaceRevision }`. A headless browser may do acquisition/screenshot validation; it must never become the agent's long-term memory.
+- **LiteRT.js/WebGPU boundary**: server/GPU-worker owns authoritative embeddings, candidate retrieval, classifier versions, SOM/KMeans fitting. Browser/WebGPU owns display transforms, local reranking of already-bounded candidates, interaction heatmaps, preview inference. Reasonable browser tasks: small classifier inference, local token classification, embedding-projection UMAP/PCA-like viewport transforms, similarity highlighting, small matrix scoring, feature normalization. Avoid in-browser: full Gemma4 inference, canonical EmbeddingGemma writes, Qdrant collection mutation, SOM retraining, XGBoost training, entity-identity decisions.
+- **Token remapping**: must stay a presentation/transport optimization unless backed by a reversible contract — `TokenSpanMap { sourceStartByte, sourceEndByte, utf16Start, utf16End, modelTokenStart, modelTokenEnd }`. A 4-bit nibble representation must never replace the original text or offsets.
+
+### 4×6 feature-matrix contract (next concrete build target)
+
+24-dimensional ranking vector, 4 evidence lanes × 6 features each — recorded as `FeatureMatrix4x6`, NOT_PROVEN/NOT_BUILT yet:
+
+| Lane | 6 features |
+|---|---|
+| Lexical | BM25, exact identifier/alias match, token overlap, edit distance, POS/entity pattern, (6th slot open) |
+| Semantic | dense similarity, reranker score, query-document alignment, domain similarity, entity-link score, embedding confidence |
+| Structural | AST match, symbol-kind match, import/call relation, file proximity, definition/reference status, revision validity |
+| Topological | PageRank, graph distance, community match, SOM distance, centroid distance, neighborhood overlap |
+
+This is explicitly preferred over feeding raw latent vectors directly into ranking/decision logic — it's the intended input to the logistic-regression baselines below, later XGBoost.
+
+### Representation registry contract (next concrete build target)
+
+Every embedding/vector representation must carry an explicit `representationId` — never call all vector kinds "the embedding" interchangeably:
+- `semantic_768` — retrieval-meaning (EmbeddingGemma canonical, this repo's existing 768-dim policy)
+- `topology_128` — topology-routing representation (previously loosely called `latent_128`)
+- `latent_64` — SOM compact routing representation
+- `rff_128` — approximate-kernel (Random Fourier Features) fast-classifier/centroid-routing feature, NOT a retrieval embedding
+
+Recorded shape: `{ representationId, producer, modelVersion, sourceRevision, dimensions, normalization, contentHash }`. Postgres owns the representation registry + lineage; Qdrant may host any of these as named vectors, but Postgres is still the identity/lineage authority (consistent with this repo's existing Postgres-is-truth rule, applied here to a new registry rather than a new rule).
+
+### Classifier promotion order (recorded, not built)
+
+1. Naive Bayes / logistic regression baselines first (separate models per decision: `domain_classifier_lr`, `entity_linker_lr`, `edit_target_ranker_lr`, `evidence_acceptance_lr` — not one classifier for every decision).
+2. XGBoost only after a promotion gate: logistic baseline frozen → held-out judgments → XGBoost improves NDCG/MRR/calibration/latency/explanation receipts → passes shadow mode → controlled promotion. A higher XGBoost training score alone does not justify replacing the baseline.
+3. POS/NER stays scoped to prose (noun phrases, verb relations, temporal phrases) — it must not be used to identify authoritative code symbols; AST-derived symbol records remain the stronger source there.
+4. SOM/KMeans/centroid packets stay organizational/routing tools, never truth: good for corpus navigation, warm-bucket routing, diverse candidate sampling, outlier detection, domain-drift visualization, query fan-out reduction; bad for canonical entity identity, proof of semantic equivalence, automatic edit approval, source-authority decisions.
+5. Bitfrost is a transport/packing envelope, not a reasoning model — Redis/Valkey centroid packets store hot metadata (`centroidId, representationId, modelVersion, vectorHash, memberCount, topDomains[], warmPacketKeys[], sourceRevisionMax, expiresAt`), never the only copy of vectors/canonical assignments/source docs/entity identities/validation history.
+
+### Explicitly deferred (recorded as DEFERRED/RESEARCH, no work started)
+
+- **RL** — deferred until supervised signals (accepted/rejected/edited recommendations, retrieval misses, wrong-entity flags, stale-target flags, validation pass/fail, time-to-resolution) are collected and logistic/XGBoost/contextual-bandit-in-shadow-mode are exhausted first.
+- **DSPy/GEPA** — offline optimization/evaluation loop only (fixed extraction fixtures → DSPy program → metric → GEPA candidate → promotion gate), never the live request hot path.
+- **JEPA** — not a near-term dependency; would need large patch histories (before/after graphs, test results, stable state embeddings, negative examples) that don't exist yet.
+- **Mamba** — not an integration priority; current bounded-retrieval/ACE-compression/centroid-routing/revision-aware-cache stack comes first.
+- **SISA** — only relevant once Parent Atlas trains proprietary classifiers/adapters on user-workspace data and needs machine-unlearning guarantees; not required for ordinary packet deletion/reindex/invalidation/graph-rebuild.
+- **Titans** — a research label for model-internal learned memory; Parent Atlas's existing Postgres/Qdrant/Neo4j/Redis/ACE stack is external, inspectable, rebuildable memory — architecturally different, not the same thing under a new name. Do not design the roadmap around it.
+
+### Recommended phase order (recorded, not scheduled/assigned)
+
+**Now (deterministic foundations)**: 1 representation registry, 2 canonical entity mention/relation schemas, 3 the 4×6 feature-vector contract, 4 POS/lexical candidate extraction, 5 AST entity reconciliation, 6 logistic-regression baselines, 7 Qdrant candidate retrieval, 8 Mixedbread reranking, 9 Redis centroid-packet contract, 10 ACE evidence receipts.
+
+**Next (operational intelligence)**: 11 SQLAlchemy worker mapped onto Drizzle-owned schema, 12 durable agent run/step/checkpoint tables, 13 outbox-driven worker execution, 14 XGBoost shadow comparison, 15 DSPy evaluation programs, 16 GEPA offline prompt optimization, 17 WebGPU/LiteRT.js bounded preview inference.
+
+**Later (research)**: 18 contextual bandits, 19 PEFT adapters, 20 JEPA future-state prediction, 21 Mamba log-sequence experiments, 22 Titans-like neural-memory experiments, 23 SISA (only for trained-model unlearning), 24 full RL (only with safe rewards).
+
+### Bottom line (operator's own framing, recorded verbatim in intent)
+
+The highest-value next addition is **not** Titans/Mamba/RL — it's the versioned 4×6 feature matrix, a logistic-regression baseline, durable evidence labels, and a canonical centroid-packet schema. Those four foundations make every later XGBoost/DSPy/GEPA/PEFT/RL experiment measurable instead of speculative.
+
+- [ ] Not started this session — recorded as the next planning artifact. Building the representation registry (item 1 of "Now") is the smallest, most bounded first step and should be sequenced before the 4×6 feature matrix since the matrix's `semantic`/`structural`/`topology` lanes need `representationId`-tagged vectors to draw from.
+
+## GS1.43 - graphify:daily rerun FAILED: real Postgres deadlock in materialize-feature-envelopes (2026-08-02)
+
+`npm run graphify:daily` was relaunched this session (background) to refresh the stale `codebase-graph.json` (still Jul 4, ~29 days old at the time). It ran for real — progressed through provenance dry-run, summary-envelope build/queue stages — then **failed with a genuine error**, not a timeout or a stale-cache issue:
+
+```
+[phase8-fanout] [5/9] → atlas:materialize:feature-envelopes:apply
+Phase 3: Materialize Feature Envelopes — Mode: APPLY
+[1/5] Total packets: 61659
+[2/5] Fetched 10000 packets
+[3/5] Built 10000 envelopes
+[4/5] Applying feature envelopes to Postgres...
+  ✓ batch 1..7 (3500/10000)
+Fatal error: error: deadlock detected (code 40P01)
+  detail: "Process 16188 waits for ShareLock on transaction 5579736; blocked by process 15755.
+           Process 15755 waits for ShareLock on transaction 5579734; blocked by process 16188."
+  where: "while updating tuple (4550,5) in relation \"atlas_packets\""
+[phase8-fanout] ✗ atlas:materialize:feature-envelopes:apply exited with code 1 after 115.5s
+ERROR: graphify:daily failed: Command failed: npm run graphify:daily:chain
+[graphify:daily] Fallback disabled; exiting with failure.
+```
+
+- [x] Confirmed the pipeline actually terminated (not stalled) — no surviving `node` processes for any PID in the chain (`graphify:daily`, `graphify:daily:chain`, `run-atlas-phase8-fanout.mjs`) after the failure line.
+- [x] Root cause is a real two-transaction `ShareLock` cycle on `atlas_packets` row updates inside `scripts/atlas/materialize-feature-envelopes.mts --apply`'s batch-write loop (process 16188 ↔ process 15755) — classic lock-ordering deadlock between two concurrent batch writers on the same table, not a timeout/OOM/environment issue.
+- [ ] NOT investigated this session: whether the deadlock's second writer (process 15755 or 16188) was another concurrent invocation of the same script, a leftover process from earlier work this session (e.g. an overlapping `graphify:daily` attempt from before the `/compact` boundary that never actually died), or a genuinely concurrent internal batch-writer bug inside `materialize-feature-envelopes.mts` itself (e.g. two batches racing on the same connection pool without a consistent row-lock order).
+- [ ] `codebase-graph.json` remains stale (Jul 4) — this refresh attempt did not reach the graph-JSON-write stage (deadlock hit at stage 5/9, graph write is presumably later in the 9-stage `phase8-fanout` chain).
+- [ ] Next bounded step: before re-attempting `graphify:daily`, check for and kill any stray Node processes touching `atlas_packets`/`materialize-feature-envelopes` (`wmic process where "name='node.exe'" get ProcessId,CommandLine | grep -i materialize`), and/or read `scripts/atlas/materialize-feature-envelopes.mts`'s batch-write loop to confirm whether its own internal batching can self-deadlock (e.g. missing `ORDER BY` before row-level updates within one transaction, or multiple pooled connections issuing overlapping updates without a serializable/advisory-lock guard) before blindly retrying — a bare retry risks reproducing the same deadlock if the root cause is structural rather than a one-off collision with a stray process.
+
+**Follow-up (same session)**:
+- [x] Checked for stray processes at retry time — none found touching `materialize-feature-envelopes`/`atlas_packets` (`wmic ... | grep -i materialize` returned nothing).
+- [x] Read `materialize-feature-envelopes.mts`'s batch-write loop in full — confirmed it cannot self-deadlock: `pool = new Pool({ max: 1, ... })` is a single-connection pool, and the batch loop issues per-row `UPDATE atlas_packets ... WHERE packet_id = $2` sequentially inside one `BEGIN`/`COMMIT` per 500-row batch, ordered by the deterministic `SELECT ... ORDER BY packet_id LIMIT $1` fetch. One connection cannot deadlock against itself — the two Postgres backend PIDs in the original error (15755, 16188) must have been two *separate* concurrent invocations (most plausibly the pre-`/compact` `graphify:daily` run that never actually terminated, colliding with the relaunch), not an internal script bug.
+- [x] **Fixed** (not just diagnosed): added a `pg_try_advisory_lock` guard around the `--apply` path in `materialize-feature-envelopes.mts` — a second concurrent `--apply` invocation now exits cleanly with a clear message instead of racing into a deadlock. Lock is session-scoped and released automatically by the existing `finally { await pool.end() }`. Dry-run path is unaffected (verified live: `--limit=5` dry-run ran correctly after the edit, unrelated pg-connectivity blip on the first attempt confirmed transient via a standalone `SELECT 1` connectivity probe that succeeded).
+- [x] Relaunched `npm run graphify:daily` in the background with the fix in place — **failed again**, but with a *different* deadlock: `materialize-feature-envelopes.mts` (process 16692, `UPDATE atlas_packets SET feature_envelope = $1 WHERE packet_id = $2`) vs a completely separate script (process 15755, `UPDATE atlas_packets SET latent_64 = $1::bytea, metadata = jsonb_set(...) WHERE qdrant_point_id = $2` — identified as `scripts/atlas/backfill-latent-vectors.mjs`, an unrelated AE-training-pipeline step, not part of the `graphify:daily` chain at all). This confirms the single-script advisory lock added above was necessary but not sufficient — it only serializes `materialize-feature-envelopes.mts` against *itself*, not against other independent bulk writers on the same table.
+- [x] **Fixed properly**: changed the lock to a *shared* key (`ATLAS_PACKETS_BULK_WRITER_LOCK_KEY = 847_662_501`, same numeric value, now documented as shared) and added the identical `pg_try_advisory_lock` guard to `backfill-latent-vectors.mjs`'s `--apply` path (before its Postgres write phase, after `const pool = new pg.Pool(...)`). Verified `pool.end()` already runs on every exit path in that script (3 call sites: early-return, error, success) so the lock always releases. Convention documented in both files' comments: any future bulk batch-UPDATE writer against `atlas_packets` should acquire this same key.
+- [x] Relaunched `npm run graphify:daily` a third time with both fixes in place — outcome not yet confirmed at time of writing (check `codebase-graph.json` mtime and the new run's log for a clean pass through stage 5/9 this time).
+
+**Separate finding, same session — real missing-table bug, fixed**: operator surfaced live Postgres error logs showing `relation "atlas_feature_map_synthesized" does not exist` from a query in `sveltekit-frontend/src/routes/dev/file-card/[...sourceRef]/+page.server.ts` (joins `parent_atlas_documents` against `atlas_feature_map_synthesized` and `atlas_feature_synthesis`).
+
+- [x] Root cause: `drizzle.__drizzle_migrations` is **empty** (0 rows) — no migration has ever been tracked as applied against this live database via the Drizzle migration chain, confirming this repo's documented pattern of manual/ad-hoc schema application. `atlas_feature_map_synthesized`'s CREATE TABLE lives only in `drizzle/manual/20260603_atlas_synthesis_tables.sql` (explicitly a hand-apply-only sidecar per this repo's convention — never auto-run) and was never actually executed. `atlas_feature_synthesis`'s CREATE TABLE lives in numbered migration `drizzle/0030_atlas_synthesis_tables.sql`, also never applied.
+- [x] Verified both CREATE statements were safe to run standalone before applying: `atlas_feature_synthesis` is self-contained (no FKs). `atlas_feature_map_synthesized` has one FK (`tree_node_id → atlas_tree_nodes(node_id)`) — confirmed `atlas_tree_nodes` exists live first.
+- [x] Did **not** run migration `0030` in full — it bundles unrelated `ALTER TABLE "library_documents" ALTER COLUMN "uploaded_by" SET DATA TYPE integer` and two `ALTER TABLE "research_summaries" ADD COLUMN ...` statements against existing live tables, which is exactly the "review generated SQL before applying" risk this repo's Drizzle Safety Rule warns about. Extracted and ran only the isolated `CREATE TABLE "atlas_feature_synthesis"` block instead.
+- [x] Ran `drizzle/manual/20260603_atlas_synthesis_tables.sql` in full (`IF NOT EXISTS` throughout, explicitly designed for hand-application) — created `atlas_feature_map_synthesized` and `atlas_feature_map_history` successfully. One unrelated index (`idx_route_runtime_packets_feature_id_idx`, on a different table entirely — `route_runtime_packets` apparently lacks a `feature_id` column) errored mid-file; psql has no `ON_ERROR_STOP` set here so the rest of the file continued and both target tables + all their own indexes/comments landed cleanly. That one unrelated index failure is flagged, NOT fixed — separate table, separate concern, out of scope for this bounded fix.
+- [x] Verified live: all three tables now resolve via `to_regclass()`, and the exact failing query shape (3-way LEFT JOIN `parent_atlas_documents` × `atlas_feature_map_synthesized` × `atlas_feature_synthesis`) now runs without error (returned 3 rows, all-NULL feature columns as expected since the synthesis tables are freshly created and empty — populating them is a separate, un-scoped task for `scripts/atlas/build-synthesized-map.mjs`, per that table's own `COMMENT ON TABLE`).
+- [ ] NOT done this session: populating `atlas_feature_map_synthesized`/`atlas_feature_map_history`/`atlas_feature_synthesis` with real data (run `scripts/atlas/build-synthesized-map.mjs` and whatever populates `atlas_feature_synthesis`) — the tables exist and are join-safe now, but are empty.
+- [ ] NOT investigated: the `idx_route_runtime_packets_feature_id_idx` failure on `route_runtime_packets` — separate schema gap, flagged only.
+- [ ] NOT investigated: whether any *other* tables declared in never-applied migrations (given `__drizzle_migrations` is entirely empty, this could be a wider pattern beyond just the two tables found here) are silently missing and causing similar query failures elsewhere. A full audit (`drizzle-kit` schema diff against live DB) would be the bounded next step, not attempted this session given scope.
+
+**Live infra status recorded while investigating (2026-08-02/03)**: MCP (`:8788/mcp`) responds correctly to `tools/list`. `legal-ai-valkey` container up/healthy (all 22 containers up except `legal-ai-go-retrieval`, unhealthy — not investigated). The `sveltekit-frontend/CLAUDE.md` "Schema Mismatch: atlas_* Tables" section (dated June 28) claiming `atlas_higher_hop_index`, `atlas_codebase_packets`, `atlas_feature_packets` as missing is now stale for 2 of 3: `atlas_higher_hop_index` and `atlas_feature_packets` both exist live now; only `atlas_codebase_packets` is still genuinely absent. That doc was not updated this session (flagged, not fixed).
+
+## GS1.44 - Deadlock fix confirmed live-proven; two NEW independent bugs found and fixed (2026-08-03)
+
+Relaunched `graphify:daily` a third time with the GS1.43 shared-advisory-lock fix in place.
+
+- [x] **Deadlock fix PROVEN, not just diagnosed**: stage 5/9 (`materialize-feature-envelopes.mts --apply`) completed cleanly — `✅ FEATURE ENVELOPE MATERIALIZATION COMPLETE`, 178.4s, all 10,000 packets. Stage 6/9 (`backfill-latent-vectors.mjs --apply`, the other half of the shared lock) then progressed cleanly past 117,000+ sequential Postgres writes with zero deadlocks — the exact failure mode from GS1.43 is confirmed closed.
+- [x] **New bug #1 found and fixed — OOM in `backfill-latent-vectors.mjs`**: the run crashed with a genuine V8 `JavaScript heap out of memory` late in stage 6/9 (parent `phase8-fanout` orchestrator misreported this as a step timeout — 2040.7s — rather than surfacing the real crash; that reporting gap is flagged, not fixed). Root cause, confirmed by reading the code: after encoding ~106K latent vectors, the script (a) never released `vecs` (raw 768-dim Float32 vectors for every point) or `pointsMap` even though neither is referenced again past the encode loop, and (b) called `JSON.stringify(latentArtifact, null, 2)` **twice independently** on the same ~106K-entry object to write two byte-identical mirror files — doubling peak string-allocation memory for no reason, on top of the still-retained `vecs`/`pointsMap`. Default V8 heap limit here is already 8GB (Node auto-sizes against the machine's 32GB RAM), so this is a real memory-inefficiency bug, not an undersized limit. **Fixed**: set `vecs = null; pointsMap = null;` immediately after the encode loop (both were declared with `let`, safe to null), and stringify once into `latentArtifactJson`, reused for both `writeFileSync` calls. Verified with `node --check` (syntax) and a live `--dry-run` (500-vector sample) — ran cleanly, wrote both mirror files, no behavior change to output shape.
+- [x] **New bug #2 found and fixed — `dev:gpu`'s Vite instance 500'd on every page**: separately, launched `npm run dev:gpu` per operator request. Every page — including SvelteKit's own error page — returned 500 with `TypeError: css is not a function` at `@sveltejs/kit/runtime/server/page/render.js:286`. Root cause: `@sveltejs/vite-plugin-svelte@4.0.4` was installed, but its `peerDependencies` require `vite: ^5.0.0`; this project runs `vite@6.4.1`. Confirmed via `npm view <pkg>@<version> peerDependencies` across 4.0.4 (`^5.0.0`), 5.1.1 (`^6.0.0`, matches installed vite + svelte exactly), and 6.2.4 (`^6.3.0 || ^7.0.0`, too new). **Fixed**: bumped `package.json`'s declared range from `^4.0.0` to `^5.1.1`, ran `npm install`, cleared the stale `.svelte-kit` cache. Verified live: fresh `vite dev` instance now returns `GET / → HTTP 200` in ~180ms with real HTML, zero errors in the log since the fix landed (previously 500 on every single request). An initial "Pre-transform error: An impossible situation occurred" line appeared once during the very first cold request after the fix and did not recur or affect subsequent requests — treated as a one-off dev-server warm-up artifact, not a regression, since every request since has been clean 200s.
+- [ ] NOT re-run this session: a fourth full `graphify:daily` end-to-end pass with the OOM fix in place (only a bounded `--dry-run` of the specific fixed script was verified). Next bounded step for a fresh session: relaunch `npm run graphify:daily` in full and confirm `codebase-graph.json`'s mtime actually advances past `Jul 4` this time — that would be the first fully clean, uninterrupted run of this session across 4 attempts.
+- [ ] NOT investigated: the `phase8-fanout` orchestrator's timeout-vs-crash misreporting (a real crash was logged as "timed out" rather than "failed/crashed") — separate, smaller diagnostic-quality gap, flagged only.
+- [ ] NOT investigated: whether `dev:gpu`'s Ollama-embedding-timeout noise seen mid-investigation (`duration_ms=8000+, error=aborted due to timeout`, repeated) was caused by resource contention from the concurrently-running `graphify:daily`/`backfill-latent-vectors.mjs` GPU work, or is an independent, pre-existing issue — not reproduced/tested in isolation this session.

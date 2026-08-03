@@ -1,13 +1,13 @@
 # OpenCode Agent Environment
 
-Generated: 2026-07-13T02:44:08.023Z
+Generated: 2026-08-03T06:30:09.258Z
 
 ## Surface
 
 - detected surface: opencode
-- shell: powershell
+- shell: cmd
 - platform: win32/x64
-- cwd: C:\Users\james\Videos\deeds-web-app\sveltekit-frontend
+- cwd: C:\Users\james\Videos\deeds-web-app
 
 ## Workspace
 

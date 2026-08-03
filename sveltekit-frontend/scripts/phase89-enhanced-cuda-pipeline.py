@@ -10,7 +10,7 @@ Pipeline stages:
   3. DBSCAN clustering on GPU (torch, falls back to CPU k-means)
   4. Store cluster metadata in Redis + phase89_error_clusters table
   5. Upsert cluster vectors into Qdrant (phase89_error_chunks collection)
-  6. Generate LLM summaries → KB cards
+  6. Generate Gemma4 summaries via llama-server.exe (:8090 /v1/chat/completions, /v1/models) → KB cards
   7. Print stats for API to parse
 
 Usage:
@@ -39,16 +39,25 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma:latest")
-BIFROST_ENABLED=true
-BIFROST_URL=http://127.0.0.1:3040
-ROTORQUANT_MODEL_PATH="C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf"
-TURBO_NGL=99
-TURBOQUANT_ENABLED=true
-ROTORQUANT_KV_ENABLED=true
-MTP_ENABLED=false
-TENSORRT_LLM_ENABLED=false
-TURBOQUANT_BASE_URL=http://127.0.0.1:8090
-TURBOQUANT_URL=http://127.0.0.1:8090
+LLAMA_SERVER_URL = os.getenv("LLAMA_SERVER_URL", os.getenv("TURBOQUANT_URL", "http://127.0.0.1:8090"))
+LLAMA_SERVER_MODEL = os.getenv(
+    "LLAMA_SERVER_MODEL",
+    os.getenv("TURBOQUANT_MODEL", "hforf.gguf"),
+)
+LLAMA_SERVER_PERSONA = os.getenv("LLAMA_SERVER_PERSONA", "gemma4")
+BIFROST_ENABLED = os.getenv("BIFROST_ENABLED", "true").lower() in {"1", "true", "yes", "on"}
+BIFROST_URL = os.getenv("BIFROST_URL", "http://127.0.0.1:3040")
+ROTORQUANT_MODEL_PATH = os.getenv(
+    "ROTORQUANT_MODEL_PATH",
+    r"C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf",
+)
+TURBO_NGL = int(os.getenv("TURBO_NGL", "99"))
+TURBOQUANT_ENABLED = os.getenv("TURBOQUANT_ENABLED", "true").lower() in {"1", "true", "yes", "on"}
+ROTORQUANT_KV_ENABLED = os.getenv("ROTORQUANT_KV_ENABLED", "true").lower() in {"1", "true", "yes", "on"}
+MTP_ENABLED = os.getenv("MTP_ENABLED", "false").lower() in {"1", "true", "yes", "on"}
+TENSORRT_LLM_ENABLED = os.getenv("TENSORRT_LLM_ENABLED", "false").lower() in {"1", "true", "yes", "on"}
+TURBOQUANT_BASE_URL = LLAMA_SERVER_URL
+TURBOQUANT_URL = LLAMA_SERVER_URL
 # DRAFT_MODEL_PATH is deprecated and ignored by scripts/launch-turboquant.ps1.
 # Use ENABLE_MTP_DRAFTER=true and MTP_DRAFT_MODEL=<path> with a compatible small Gemma/Gemma4 GGUF.
 # DRAFT_MODEL_PATH=C:\Users\james\.ollama\models\blobs\sha256-735af2139dc652bf01112746474883d79a52fa1c19038265d363e3d42556f7a2
@@ -229,11 +238,25 @@ def llm_summarize(sample_messages: list[str]) -> str:
     )
     try:
         result = json_post(
-            f"{OLLAMA_URL}/api/generate",
-            {"model": CHAT_MODEL, "prompt": prompt, "stream": False, "options": {"num_predict": 150}},
+            f"{LLAMA_SERVER_URL}/v1/chat/completions",
+            {
+                "model": LLAMA_SERVER_MODEL,
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": f"You are {LLAMA_SERVER_PERSONA}. Summarize the failure pattern precisely and briefly.",
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0.2,
+                "max_tokens": 150,
+                "stream": False,
+            },
             timeout=60,
         )
-        return result.get("response", "").strip() or "Unable to summarize."
+        choices = result.get("choices") or []
+        message = choices[0].get("message", {}) if choices else {}
+        return str(message.get("content", "")).strip() or "Unable to summarize."
     except Exception as e:
         return f"LLM summary unavailable: {e}"
 

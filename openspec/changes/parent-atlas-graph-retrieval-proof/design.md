@@ -194,3 +194,24 @@ The first implementation slice should be small:
 `trace_dynamic_context` should be a single evidence pipeline that aggregates proof from adapters. It should not become a monolithic AI audit that invents conclusions without evidence. Static discovery is candidate generation only; proof comes from runtime, SQL, HTTP, graph, or end-to-end validation.
 
 The first adapter pair for that pipeline should stay narrow: static discovery plus Postgres join-back. Any evidence bundle should have a small formatter that can render route, symbol, packet, or runtime questions without collapsing them into one generic report.
+
+## Patch tournament seam
+
+This change also owns the next patch-selection step after evidence gathering: a bounded generate-test-select tournament for one existing compile error.
+
+Current owner code paths to extend:
+- `scripts/atlas/agentic-recommendation-workflow.mjs` for candidate generation and decisioning
+- `sveltekit-frontend/src/lib/server/ai/error-agent/workflow-loop.ts` for repair classification and logging
+- `sveltekit-frontend/src/lib/server/ace/atlas-tool-registry.ts` for patch proposal / patch apply tool contracts
+- `sveltekit-frontend/src/lib/server/agent/execution-review.ts` for proposal-vs-execution review and manual approval state
+
+Design constraints:
+- candidate generation stays separate from evidence assembly
+- each candidate runs in an isolated worktree or equivalent isolated checkout
+- static checks and focused tests run before ranking
+- ranking is deterministic and uses evidence-backed features only
+- output is a comparison packet plus a Kanban card
+- no candidate is auto-applied
+- no training or reward optimization begins in this slice
+
+The tournament should remain a recommendation artifact until manual approval promotes one candidate into the normal patch pipeline.

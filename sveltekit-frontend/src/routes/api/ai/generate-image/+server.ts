@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const imageGenSchema = z.object({
 	prompt: z.string().min(1).max(10000),
@@ -31,10 +32,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Generate a text-based visualization descriptor via LLM
 		// (No local image generation model available — return SVG placeholder)
-		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
-		const { ENV } = await import('$lib/server/env.server.js');
+		const { ollamaFetch } = await import('$lib/server/ollama.js');
+		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
-		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

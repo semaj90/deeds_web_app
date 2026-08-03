@@ -220,7 +220,7 @@ async function runPipeline() {
       log('  Stop daemon:   npm run daemon:graphify:stop');
     }
 
-    log('\n✨ Ready for downstream processing (ACE warming, topology refresh)');
+    log('\n✨ Partial startup complete for downstream processing (ACE warming, topology refresh)');
     log('⚑ Startup claims remain PARTIAL_PROVEN until independent runtime proof passes.');
 
     return {

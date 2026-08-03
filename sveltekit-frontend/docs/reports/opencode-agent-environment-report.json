@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-07-13T02:44:08.023Z",
+  "generatedAt": "2026-08-03T06:30:09.258Z",
   "surface": "opencode",
   "workspace": {
     "appRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
     "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
-    "cwd": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+    "cwd": "C:\\Users\\james\\Videos\\deeds-web-app",
     "platform": "win32",
     "arch": "x64",
     "hostname": "DESKTOP-Q18MPHM",
-    "shell": "powershell",
+    "shell": "cmd",
     "envFilesLoaded": [
       ".env",
       ".env.local",

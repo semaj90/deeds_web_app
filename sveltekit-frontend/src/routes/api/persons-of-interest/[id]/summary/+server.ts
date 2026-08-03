@@ -4,7 +4,7 @@ import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
@@ -116,9 +116,10 @@ Respond with ONLY a JSON object:
 
   let summary = '';
   let confidence = 0.7;
+  const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
   try {
-    const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+    const ollamaRes = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

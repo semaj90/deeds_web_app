@@ -42,11 +42,35 @@ check_service() {
   fi
 }
 
+check_redis() {
+  echo -n "  Redis (L1 Exact Match) (:6379)... "
+
+  if command -v redis-cli &> /dev/null; then
+    local response
+    response=$(redis-cli -h localhost -p 6379 ping 2>/dev/null || echo "000")
+    if [ "$response" = "PONG" ]; then
+      echo -e "${GREEN}✅ OK${NC} (PONG)"
+      return 0
+    else
+      echo -e "${RED}❌ DOWN${NC} (expected PONG, got ${response})"
+      return 1
+    fi
+  fi
+
+  if timeout 5 bash -c "echo >/dev/tcp/localhost/6379" 2>/dev/null; then
+    echo -e "${YELLOW}⚠️  Port open${NC} (redis-cli unavailable for PING)"
+    return 0
+  fi
+
+  echo -e "${RED}❌ DOWN${NC}"
+  return 1
+}
+
 # Track failures
 FAILED=0
 
 echo "📊 Cache & Persistence:"
-check_service "Redis (L1 Exact Match)" "6379" "/" "PONG" || ((FAILED++))
+check_redis || ((FAILED++))
 echo ""
 
 echo "🧠 Inference Engine:"

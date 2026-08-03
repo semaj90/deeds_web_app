@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-13T02:44:07.981Z",
+  "generatedAt": "2026-08-03T06:30:09.127Z",
   "repo": "sveltekit-frontend",
   "evidenceFirst": true,
   "roles": {
@@ -13,7 +13,7 @@
     "snapshotJson": ".opencode\\recommendations\\recommendations.json",
     "snapshotMd": ".opencode\\recommendations\\recommendations.md",
     "eventsJsonl": ".opencode\\recommendations\\recommendation-events.jsonl",
-    "currentCount": 314
+    "currentCount": 342
   },
   "tasks": {
     "stateJson": ".opencode\\tasks\\task-state.json",
@@ -26,7 +26,7 @@
     "taskId": "task_1_circular_dependency_chains_of_3_files",
     "title": "1 circular dependency chains of 3+ files",
     "priority": "HIGH",
-    "status": "TODO",
+    "status": "IN_PROGRESS",
     "command": null,
     "sourceRecommendationKey": "1_circular_dependency_chains_of_3_files"
   },
@@ -41,7 +41,7 @@
   "startupBriefing": {
     "path": "..\\.opencode\\startup-briefing.json",
     "nextLane": "Retrieval telemetry depth / replay breadth",
-    "tasksOpen": 0,
+    "tasksOpen": 2,
     "productionReadiness": "PASS 66 / WARN 0 / FAIL 0"
   }
 }

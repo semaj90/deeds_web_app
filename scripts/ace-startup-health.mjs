@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 const ROOT_DIR = process.cwd();
 const STATUS_PATH = path.resolve(ROOT_DIR, '.tmp/ace-startup-status.json');
@@ -67,6 +67,8 @@ async function main() {
   const warnings = [];
   let status = 0;
   let viteService = false;
+  let checks = {};
+  let healthPayload = null;
 
   // 1. Call local /api/health
   try {
@@ -75,6 +77,7 @@ async function main() {
     });
     status = response.status;
     viteService = true;
+    healthPayload = await response.json().catch(() => null);
     if (response.status === 200) {
       // 200 OK
     } else if (response.status === 403) {
@@ -117,14 +120,16 @@ async function main() {
 
   // 4. Sidecar stdout guard check
   let sidecarHealthy = true;
+  let sidecarOffline = [];
   try {
     const sidecarCheckScript = path.join(ROOT_DIR, 'scripts/health-check-sidecars.mjs');
     if (fs.existsSync(sidecarCheckScript)) {
-      // Execute and capture output / verify exit code
-      const stdout = execSync(`node "${sidecarCheckScript}"`, { encoding: 'utf8', stdio: 'pipe' });
-      // If we got "OFFLINE" or warnings about offline, or exit code != 0, consider it a failure
-      if (stdout.includes('OFFLINE') || stdout.includes('degraded')) {
-        warnings.push('sidecar_running_degraded');
+      const { checkSidecars } = await import(pathToFileURL(sidecarCheckScript).href);
+      const sidecarResult = await checkSidecars();
+      sidecarHealthy = Boolean(sidecarResult?.healthy);
+      sidecarOffline = Array.isArray(sidecarResult?.offline) ? sidecarResult.offline : [];
+      if (!sidecarHealthy && sidecarOffline.length > 0) {
+        warnings.push(`sidecar_running_degraded: ${sidecarOffline.join(', ')}`);
       }
     }
   } catch (e) {
@@ -133,9 +138,14 @@ async function main() {
     ok = false;
   }
 
+  checks = healthPayload?.checks && typeof healthPayload.checks === 'object'
+    ? healthPayload.checks
+    : {};
+
   const resultPayload = {
     status: ok ? 'ok' : 'degraded',
     ok,
+    checks,
     health: {
       ok: ok && status === 200,
       status,

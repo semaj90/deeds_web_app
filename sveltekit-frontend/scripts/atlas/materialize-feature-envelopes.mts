@@ -83,16 +83,71 @@ interface PacketRow {
   telemetry_score: number | null;
 }
 
+// Shared advisory-lock key — same key used by scripts/atlas/backfill-latent-vectors.mjs
+// (ATLAS_PACKETS_BULK_WRITER_LOCK_KEY there). Two separate incidents this session
+// (2026-08-02, 2026-08-03 — OpenSpec GS1.43) deadlocked bulk batch-UPDATE writers
+// against atlas_packets: first two concurrent invocations of this script, then this
+// script against backfill-latent-vectors.mjs's independent latent_64/metadata writes.
+// Neither script has internal concurrency (this one: pool max:1) — the only way to
+// deadlock is two separate bulk-writer processes running against atlas_packets at
+// once. Any future script doing a bulk batch UPDATE against atlas_packets should
+// acquire this same key before its write phase.
+const ADVISORY_LOCK_KEY = 847_662_501; // arbitrary, stable — hashtext('atlas:packets:bulk_writer') truncated to int4 range
+
+const RETRYABLE_PG_ERROR_CODES = new Set(['57P03', '57P01', '08006', '08003']);
+const RETRYABLE_PG_ERROR_PATTERNS = [
+  /database system is in recovery mode/i,
+  /the database system is starting up/i,
+  /terminating connection due to administrator command/i,
+  /connection terminated unexpectedly/i,
+];
+
+function isRetryablePgError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const error = err as Error & { code?: string };
+  return Boolean(error.code && RETRYABLE_PG_ERROR_CODES.has(error.code))
+    || RETRYABLE_PG_ERROR_PATTERNS.some((pattern) => pattern.test(error.message));
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function main() {
   const dryRun = !process.argv.includes('--apply');
   const batchSize = 500;
   const fetchLimit = parseLimitArg(dryRun ? 200 : 10_000);
+  const maxAttempts = dryRun ? 1 : 3;
+  const lockRetryDelayMs = 10_000;
+  const maxLockAttempts = dryRun ? 1 : 30;
 
   console.log('Phase 3: Materialize Feature Envelopes');
   console.log(`Mode: ${dryRun ? 'DRY-RUN' : 'APPLY'}`);
   console.log('');
 
-  try {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      if (!dryRun) {
+        let locked = false;
+        for (let lockAttempt = 1; lockAttempt <= maxLockAttempts; lockAttempt += 1) {
+          const lockResult = await pool.query('SELECT pg_try_advisory_lock($1) AS locked;', [ADVISORY_LOCK_KEY]);
+          locked = Boolean(lockResult.rows[0]?.locked);
+          if (locked) break;
+
+          if (lockAttempt < maxLockAttempts) {
+            console.warn(`Feature-envelope advisory lock is held by another writer (attempt ${lockAttempt}/${maxLockAttempts}); retrying in ${lockRetryDelayMs / 1000}s...`);
+            await sleep(lockRetryDelayMs);
+          }
+        }
+
+        if (!locked) {
+          console.error('Another materialize-feature-envelopes --apply run holds the advisory lock after waiting. Exiting without writing.');
+          await pool.end();
+          process.exitCode = 1;
+          return;
+        }
+      }
+
     console.log('[1/5] Counting atlas_packets...');
     const countResult = await pool.query('SELECT COUNT(*)::int AS cnt FROM atlas_packets;');
     const totalPackets = countResult.rows[0]?.cnt ?? 0;
@@ -100,6 +155,12 @@ async function main() {
     console.log(`  ✓ Total packets: ${totalPackets}`);
     console.log('');
 
+    // --apply only touches packets that don't have a feature_envelope yet, so repeat
+    // runs are incremental (new/backfilled packets) instead of re-walking the same
+    // first `fetchLimit` packet_ids every time and never reaching the rest of the
+    // corpus. --force-refresh opts back into the old unconditional-recompute behavior
+    // (e.g. after a FEATURE_SCHEMA_VERSION bump where existing envelopes are stale).
+    const forceRefresh = process.argv.includes('--force-refresh');
     console.log('[2/5] Fetching packets with score components...');
     const fetchResult = await pool.query<PacketRow>(
       `
@@ -113,10 +174,11 @@ async function main() {
         CASE WHEN array_length(concept_ids, 1) > 3 THEN 0.7 WHEN array_length(concept_ids, 1) > 0 THEN 0.5 ELSE 0.3 END as ontology_score,
         CASE WHEN metadata->>'access_count' IS NOT NULL THEN LEAST(1.0, (metadata->>'access_count')::float / 100.0) ELSE 0.5 END as telemetry_score
       FROM atlas_packets
+      ${forceRefresh ? '' : "WHERE feature_envelope IS NULL OR feature_envelope->>'feature_schema_version' IS DISTINCT FROM $2"}
       ORDER BY packet_id
       LIMIT $1;
       `,
-      [fetchLimit]
+      [fetchLimit, FEATURE_SCHEMA_VERSION]
     );
 
     const envelopes: Array<{ packet_id: string; envelope: FeatureEnvelope }> = fetchResult.rows.map((packet) => ({
@@ -137,8 +199,14 @@ async function main() {
       },
     }));
 
-    console.log(`  ✓ Fetched ${envelopes.length} packets`);
+    console.log(`  ✓ Fetched ${envelopes.length} packets needing refresh`);
     console.log('');
+
+    if (envelopes.length === 0) {
+      console.log('No packets require a feature-envelope refresh for the current schema version.');
+      await pool.end();
+      return;
+    }
 
     console.log('[3/5] Building feature envelopes...');
     console.log(`  ✓ Built ${envelopes.length} envelopes`);
@@ -187,11 +255,21 @@ async function main() {
       console.log('');
       console.log('✅ FEATURE ENVELOPE MATERIALIZATION COMPLETE');
     }
-  } catch (err) {
-    console.error('Fatal error:', err);
-    process.exitCode = 1;
-  } finally {
-    await pool.end();
+      await pool.end();
+      return;
+    } catch (err) {
+      if (!dryRun && attempt < maxAttempts && isRetryablePgError(err)) {
+        console.warn(`Transient Postgres recovery during feature-envelope materialization (attempt ${attempt}/${maxAttempts}): ${(err as Error).message}`);
+        try { await pool.end(); } catch {}
+        await sleep(5_000);
+        continue;
+      }
+
+      console.error('Fatal error:', err);
+      process.exitCode = 1;
+      try { await pool.end(); } catch {}
+      return;
+    }
   }
 }
 

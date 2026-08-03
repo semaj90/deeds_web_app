@@ -130,8 +130,7 @@ Write-Host "`n5️⃣  System Health" -ForegroundColor Yellow
 
 $services = @(
     @{Name="phase66-postgres"; Port=5434},
-    @{Name="phase66-redis"; Port=6379},
-    @{Name="ollama-gemma"; Port=11434}
+    @{Name="phase66-redis"; Port=6379}
 )
 
 foreach ($svc in $services) {
@@ -141,6 +140,15 @@ foreach ($svc in $services) {
     } else {
         Write-Host "   ❌ $($svc.Name.PadRight(20)) NOT RUNNING" -ForegroundColor Red
     }
+}
+
+Write-Host "`n6️⃣  Phase 89 llama-server" -ForegroundColor Yellow
+try {
+    $models = Invoke-RestMethod -Uri "http://127.0.0.1:8090/v1/models" -Method GET -TimeoutSec 3
+    $modelId = if ($models.data -and $models.data.Count -gt 0) { $models.data[0].id } else { '(no models reported)' }
+    Write-Host "   ✅ llama-server :8090 READY ($modelId)" -ForegroundColor Green
+} catch {
+    Write-Host "   ❌ llama-server :8090 NOT READY" -ForegroundColor Red
 }
 
 # ============================================================

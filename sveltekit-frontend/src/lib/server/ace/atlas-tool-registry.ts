@@ -100,6 +100,99 @@ export type PatchApplyOutput = z.infer<typeof PatchApplyOutputSchema>;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+const PatchTournamentCheckSchema = z.object({
+  name: z.string().min(1),
+  passed: z.boolean(),
+  command: z.string().optional(),
+  evidenceRef: z.string().optional(),
+});
+
+const PatchTournamentCandidateSchema = z.object({
+  candidateId: z.string().min(1),
+  branchName: z.string().min(1),
+  worktreePath: z.string().min(1),
+  patchSummary: z.string().min(1),
+  compileError: z.string().min(1),
+  touchedFiles: z.array(z.string().min(1)),
+  staticChecks: z.array(PatchTournamentCheckSchema),
+  focusedTests: z.array(PatchTournamentCheckSchema),
+  evidenceRefs: z.array(z.string().min(1)),
+  riskSignals: z.array(z.string().min(1)).optional(),
+});
+export type PatchTournamentCandidate = z.infer<typeof PatchTournamentCandidateSchema>;
+
+const PatchTournamentInputSchema = z.object({
+  objective: z.string().min(1).max(4000),
+  workspaceId: z.string().min(1),
+  workspaceRevision: z.string().min(1),
+  baseBranch: z.string().min(1),
+  compileError: z.string().min(1),
+  candidates: z.tuple([
+    PatchTournamentCandidateSchema,
+    PatchTournamentCandidateSchema,
+    PatchTournamentCandidateSchema,
+  ]),
+});
+export type PatchTournamentInput = z.infer<typeof PatchTournamentInputSchema>;
+
+const PatchTournamentOutputSchema = z.object({
+  tournamentId: z.string(),
+  objective: z.string(),
+  workspaceId: z.string(),
+  workspaceRevision: z.string(),
+  baseBranch: z.string(),
+  compileError: z.string(),
+  rankedCandidates: z.array(z.object({
+    candidateId: z.string(),
+    branchName: z.string(),
+    worktreePath: z.string(),
+    patchSummary: z.string(),
+    compileError: z.string(),
+    touchedFiles: z.array(z.string()),
+    staticChecks: z.array(PatchTournamentCheckSchema),
+    focusedTests: z.array(PatchTournamentCheckSchema),
+    evidenceRefs: z.array(z.string()),
+    riskSignals: z.array(z.string()).optional(),
+    rank: z.number().int().positive(),
+    score: z.number(),
+    reviewStatus: z.enum(['review_first', 'review_later', 'blocked']),
+    rationale: z.string(),
+  })),
+  acePacket: z.object({
+    schemaVersion: z.literal('atlas.ace.patch-tournament.v1'),
+    packetId: z.string(),
+    objective: z.string(),
+    workspaceRevision: z.string(),
+    compileErrorDigest: z.string(),
+    reviewOrder: z.array(z.object({
+      candidateId: z.string(),
+      rank: z.number().int().positive(),
+      score: z.number(),
+      reviewStatus: z.enum(['review_first', 'review_later', 'blocked']),
+      rationale: z.string(),
+      patchSummary: z.string(),
+      worktreePath: z.string(),
+      branchName: z.string(),
+      evidenceRefs: z.array(z.string()),
+    })),
+    constraints: z.array(z.string()),
+  }),
+  kanbanCard: z.object({
+    cardId: z.string(),
+    title: z.string(),
+    status: z.enum(['ready_for_human_review', 'needs_more_evidence']),
+    summary: z.string(),
+    topCandidateId: z.string().nullable(),
+    safeNextCommand: z.string(),
+  }),
+  noAutoApply: z.literal(true),
+  noTraining: z.literal(true),
+  safeNextCommand: z.string(),
+});
+export type PatchTournamentOutput = z.infer<typeof PatchTournamentOutputSchema>;
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 const PageRankInputSchema = z.object({
   limit: z.number().int().min(1).max(1000).default(100),
   offset: z.number().int().min(0).default(0),
@@ -169,6 +262,14 @@ async function proposePatch(input: PatchProposalInput, _grant: PermissionGrant):
   // Wire to agent/execution-review.ts or error-fixing loop
   void input;
   return { proposalId: crypto.randomUUID(), diff: '', riskScore: 0, requiresApproval: false };
+}
+
+async function runPatchTournament(
+  input: PatchTournamentInput,
+  _grant: PermissionGrant,
+): Promise<PatchTournamentOutput> {
+  const { buildPatchTournamentPlan } = await import('$lib/server/agent/patch-tournament.js');
+  return buildPatchTournamentPlan(input);
 }
 
 async function applyPatch(input: PatchApplyInput, _grant: PermissionGrant): Promise<PatchApplyOutput> {
@@ -244,6 +345,13 @@ export const atlasToolRegistry = {
     permission: 'code:propose' as AtlasToolPermission,
     execute: proposePatch,
   } satisfies AtlasToolDefinition<PatchProposalInput, PatchProposalOutput>,
+
+  'atlas.patch.tournament': {
+    inputSchema: PatchTournamentInputSchema,
+    outputSchema: PatchTournamentOutputSchema,
+    permission: 'code:propose' as AtlasToolPermission,
+    execute: runPatchTournament,
+  } satisfies AtlasToolDefinition<PatchTournamentInput, PatchTournamentOutput>,
 
   'atlas.patch.apply': {
     inputSchema: PatchApplyInputSchema,

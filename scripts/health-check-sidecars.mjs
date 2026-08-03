@@ -9,6 +9,7 @@ const execPromise = util.promisify(exec);
 export async function checkSidecars() {
   console.log('🩺 Running Health Check for Sidecars...');
   let allHealthy = true;
+  const offline = [];
 
   // 1. Check SIMD Bridge
   const simdPath = path.join(process.cwd(), '..', 'simd-bridge', 'cpp', 'build', 'Release', 'tensorrt_bridge.node');
@@ -17,6 +18,7 @@ export async function checkSidecars() {
   } else {
     console.log('⚠️ SIMD AVX2 Bridge: OFFLINE. (tensorrt_bridge.node not found)');
     allHealthy = false;
+    offline.push('simd-bridge');
   }
 
   // 2. Check MCP Servers (8791, 8792, 8793)
@@ -29,20 +31,30 @@ export async function checkSidecars() {
     } else {
       console.log(`⚠️ MCP Server (Port ${port}): OFFLINE`);
       mcpOffline = true;
+      offline.push(`mcp:${port}`);
     }
   }
 
   if (mcpOffline) {
     console.log('🔄 Attempting to start MCP Sidecars & Docker dependencies...');
     try {
-      // Assuming a generic docker compose or pm2 start command here
-      const executionCwd = fs.existsSync(path.join(process.cwd(), 'sveltekit-frontend')) 
-        ? path.join(process.cwd(), 'sveltekit-frontend') 
+      const executionCwd = fs.existsSync(path.join(process.cwd(), 'sveltekit-frontend'))
+        ? path.join(process.cwd(), 'sveltekit-frontend')
         : process.cwd();
-      exec('npm run mcp:opencode-sidecars', { cwd: executionCwd }, (err) => {
-         if (err) console.log(`[Diagnostic] mcp:opencode-sidecars script may not exist or failed: ${err.message}`);
-      });
-      console.log('✅ Sent startup signal to MCP sidecars.');
+      const packageJsonPath = path.join(executionCwd, 'package.json');
+      const hasRecoveryScript = fs.existsSync(packageJsonPath)
+        ? JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'))?.scripts?.['mcp:opencode-sidecars']
+        : false;
+
+      if (hasRecoveryScript) {
+        exec('npm run mcp:opencode-sidecars', { cwd: executionCwd }, (err) => {
+          if (err) console.log(`[Diagnostic] mcp:opencode-sidecars script failed: ${err.message}`);
+        });
+        console.log('✅ Sent startup signal to MCP sidecars.');
+      } else {
+        console.log('ℹ️  No mcp:opencode-sidecars npm script is defined; skipping auto-start.');
+      }
+      allHealthy = false;
     } catch (err) {
       console.error('❌ Failed to start MCP Sidecars:', err.message);
       allHealthy = false;
@@ -55,7 +67,10 @@ export async function checkSidecars() {
     console.log('✅ All Sidecars ONLINE.');
   }
   
-  return allHealthy;
+  return {
+    healthy: allHealthy,
+    offline,
+  };
 }
 
 function checkPort(port) {
@@ -79,5 +94,6 @@ const isDirectRun = process.argv[1] && (
 );
 
 if (isDirectRun) {
-  checkSidecars();
+  const result = await checkSidecars();
+  process.exit(result.healthy ? 0 : 1);
 }

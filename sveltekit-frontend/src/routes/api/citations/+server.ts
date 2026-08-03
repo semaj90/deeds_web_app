@@ -71,9 +71,12 @@ export const GET: RequestHandler = async ({ locals, url, request }) => {
   }
 
   try {
-    const query = db.select().from(citations).orderBy(desc(citations.createdAt)).limit(limit);
+    let query = db.select().from(citations).orderBy(desc(citations.createdAt));
+    if (caseId) {
+      query = query.where(eq(citations.caseId, caseId));
+    }
 
-    const results = caseId ? await query.where(eq(citations.caseId, caseId)) : await query;
+    const results = await query.limit(limit);
 
     // Cache results (5min TTL)
     setCache(cacheKey, results, 300_000);

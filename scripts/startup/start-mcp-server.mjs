@@ -97,28 +97,46 @@ const mcp = spawn(tsRunner.command, [
 });
 
 let serverReady = false;
+let readinessProbeActive = false;
+
+async function probeMcpHealth() {
+  if (readinessProbeActive || serverReady) return;
+  readinessProbeActive = true;
+  const healthUrl = `${traceEnv.TRACE_MCP_URL}/health`;
+  const startedAt = Date.now();
+
+  while (!serverReady && Date.now() - startedAt < 60_000) {
+    try {
+      const res = await fetch(healthUrl, { signal: AbortSignal.timeout(3000) });
+      if (res.ok) {
+        serverReady = true;
+        console.log('');
+        console.log('✅ MCP Server is ready!');
+        console.log('');
+        console.log('📌 MCP Endpoints:');
+        console.log(`   • TRACE health: ${traceEnv.TRACE_MCP_URL}/health`);
+        console.log(`   • TRACE MCP: POST ${traceEnv.TRACE_MCP_URL}/mcp`);
+        console.log('');
+        console.log('🔗 Integration points:');
+        console.log('   • SvelteKit /api/ai/agent routes');
+        console.log('   • VS Code Cursor/Cline IDE extensions');
+        console.log('');
+        console.log('💡 To debug: connect debugger to ws://127.0.0.1:9229');
+        console.log('');
+        return;
+      }
+    } catch {
+      // keep polling until the child is ready or the launcher times out
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+}
 
 // Monitor stdout for readiness signal
 mcp.stdout.on('data', (data) => {
   const output = data.toString().trim();
   console.log(`[MCP] ${output}`);
-
-  if (output.includes('listening') || output.includes('ready') || output.includes('Started')) {
-    serverReady = true;
-    console.log('');
-    console.log('✅ MCP Server is ready!');
-    console.log('');
-    console.log('📌 MCP Endpoints:');
-    console.log(`   • TRACE health: ${traceEnv.TRACE_MCP_URL}/health`);
-    console.log(`   • TRACE MCP: POST ${traceEnv.TRACE_MCP_URL}/mcp`);
-    console.log('');
-    console.log('🔗 Integration points:');
-    console.log('   • SvelteKit /api/ai/agent routes');
-    console.log('   • VS Code Cursor/Cline IDE extensions');
-    console.log('');
-    console.log('💡 To debug: connect debugger to ws://127.0.0.1:9229');
-    console.log('');
-  }
 });
 
 // Monitor stderr for errors
@@ -154,6 +172,8 @@ process.on('SIGINT', () => {
 console.log('⏳ Waiting for MCP Server to start...');
 console.log('   (This may take 10-20 seconds on first run)');
 console.log('');
+
+void probeMcpHealth();
 
 // Timeout if server doesn't start within 60 seconds
 setTimeout(() => {

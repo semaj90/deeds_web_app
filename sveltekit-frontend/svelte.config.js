@@ -21,10 +21,16 @@ const config = {
     compatibility: {
       componentApi: 4,
     },
-    warningFilter: (warning) => !suppressedWarnings.has(warning.code),
   },
   // Use svelte-preprocess for safe defaults (TypeScript, PostCSS, scss, etc.)
   preprocess: vitePreprocess(),
+
+  onwarn(warning, handler) {
+    if (suppressedWarnings.has(warning.code)) {
+      return;
+    }
+    handler(warning);
+  },
 
   vitePlugin: {
     inspector: false,

@@ -54,13 +54,15 @@ function loadStartupStatus() {
  * Identify which services are down
  */
 function analyzeFailures(status) {
+  const checks = status?.checks ?? {};
+  const readCheck = (key) => checks[key] ?? checks[key.toLowerCase()] ?? checks[key.toUpperCase()];
   const failures = {
-    redis: status?.checks?.Redis?.ok === false,
-    qdrant: status?.checks?.Qdrant?.ok === false,
-    postgres: status?.checks?.Postgres?.ok === false,
-    bifrost: status?.checks?.Bifrost?.ok === false,
-    goRetrieval: status?.checks?.GoRetrieval?.ok === false,
-    turbovec: status?.checks?.TurboVec?.ok === false,
+    redis: readCheck('redis')?.ok === false,
+    qdrant: readCheck('qdrant')?.ok === false,
+    postgres: readCheck('postgres')?.ok === false,
+    bifrost: readCheck('bifrost')?.ok === false,
+    goRetrieval: readCheck('goRetrieval')?.ok === false,
+    turbovec: readCheck('turboVec')?.ok === false,
   };
 
   const criticalDown = [

@@ -11,6 +11,7 @@
  * canonical packet/summary envelope.
  */
 import { spawn } from 'node:child_process';
+import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
@@ -131,13 +132,17 @@ async function isMiniforgeNlpRunning(port = 8095) {
 
 async function isTcpPortOpen(port) {
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 500);
-    const res = await fetch(`http://127.0.0.1:${port}`, {
-      signal: controller.signal,
-    }).catch(() => null);
-    clearTimeout(timeout);
-    return Boolean(res);
+    return await new Promise((resolve) => {
+      const socket = net.createConnection({ host: '127.0.0.1', port });
+      const finish = (value) => {
+        socket.removeAllListeners();
+        socket.destroy();
+        resolve(value);
+      };
+      socket.once('connect', () => finish(true));
+      socket.once('error', () => finish(false));
+      socket.setTimeout(500, () => finish(false));
+    });
   } catch {
     return false;
   }
@@ -281,10 +286,13 @@ async function main() {
   console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
   console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
 
+  const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
+  const vitePort = await findFreePort(desiredVitePort);
+
   // Check graphify readiness (advisory only, non-blocking)
   console.log('[dev:gpu] Checking graphify readiness...');
   try {
-    const graphifyCheck = await fetch('http://127.0.0.1:5173/api/graphify/status', {
+    const graphifyCheck = await fetch(`http://127.0.0.1:${vitePort}/api/graphify/status`, {
       signal: AbortSignal.timeout(3000),
     }).catch(() => null);
     if (graphifyCheck?.ok) {
@@ -293,7 +301,7 @@ async function main() {
       console.log(`[dev:gpu] ✅ Graphify core: ${coreStatus}`);
       if (coreStatus !== 'PASS') {
         console.log('[dev:gpu] ⚠️  Advisory: Some graphify lanes are degraded.');
-        console.log('[dev:gpu]    View: http://localhost:5173/admin/graphify-readiness');
+        console.log(`[dev:gpu]    View: http://localhost:${vitePort}/admin/graphify-readiness`);
       }
     } else {
       console.log('[dev:gpu] ℹ️  Graphify status check skipped (SvelteKit not yet up)');
@@ -316,8 +324,6 @@ async function main() {
     console.warn('[dev:gpu] ⚠️  TRACE MCP server error:', err.message);
   }
 
-  const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);
-  const vitePort = await findFreePort(desiredVitePort);
   if (vitePort !== desiredVitePort) {
     console.log(`[dev:gpu] :${desiredVitePort} is busy — starting Vite on :${vitePort}`);
   } else {
