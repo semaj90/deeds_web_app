@@ -639,9 +639,6 @@
       "options": {
         "cwd": "${workspaceFolder}"
       },
-      "runOptions": {
-        "runOn": "folderOpen"
-      },
       "isBackground": true,
       "group": "build",
       "problemMatcher": [],
@@ -2019,9 +2016,6 @@
         "env": {
           "GRAPHIFY_QUIET": "1"
         }
-      },
-      "runOptions": {
-        "runOn": "folderOpen"
       },
       "isBackground": true,
       "dependsOn": "🧪 Startup: Semantic Valkey Smoke",

@@ -1,7 +1,7 @@
 # ACP Telemetry + Daily Graphify: Canonical Task Pipeline
 
 **Date**: June 30, 2026  
-**Context**: Phase C Option B execution requires clean integration of agentic control plane (ACP) telemetry with daily background indexing (graphify).
+**Context**: Design note for integrating agentic control plane (ACP) telemetry with background graph indexing. This is a lane description, not a blocker or status record.
 
 ---
 
@@ -9,7 +9,7 @@
 
 Current state (scattered):
 - Telemetry writes to packet_centric_telemetry (optional)
-- Graphify runs daily but doesn't read telemetry
+- Graphify runs as a background lane and can consume telemetry for refresh decisions
 - ACP decisions aren't logged structurally
 - Daily indexing doesn't adjust weights based on retrieval signals
 - RL training data isn't collected
@@ -165,7 +165,7 @@ CREATE TABLE synthesis_traces (
 
 ## Daily Graphify: Reads Telemetry
 
-### Morning (6 AM UTC): Run daily graphify
+### Scheduled background graphify refresh
 
 ```bash
 npm run graphify:daily:from-telemetry

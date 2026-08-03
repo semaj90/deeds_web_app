@@ -53,11 +53,32 @@ const REDIS_TTL   = 7 * 24 * 3600; // 7 days
 const args     = process.argv.slice(2);
 const APPLY    = args.includes('--apply');
 const DRY_RUN  = !APPLY || args.includes('--dry-run');
+const RESUME   = args.includes('--resume');
 const limitArg = args.find(a => a.startsWith('--limit='));
-const LIMIT    = limitArg ? parseInt(limitArg.split('=')[1], 10) : Infinity;
+const LIMIT    = limitArg ? parseInt(limitArg.split('=')[1], 10) : Number(process.env.LATENT_DEFAULT_LIMIT || 5000);
 const batchArg = args.find(a => a.startsWith('--batch='));
 const BATCH_SZ = batchArg ? parseInt(batchArg.split('=')[1], 10) : 100;
 const FORCE_REFRESH = args.includes('--force-refresh');
+const MEM_DIAG = args.includes('--mem-diag');
+const CHECKPOINT_FILE = resolve(ROOT, '.tmp', 'backfill-latent-vectors.checkpoint.json');
+
+// ── Memory diagnostic (2026-08-03 OOM investigation) ────────────────────────
+// Bounded, operator-requested instrumentation: heap/RSS before Step 6, after
+// every write batch, and at exit. If heapUsed grows ~linearly with rows
+// processed instead of plateauing after each commit, the process is
+// retaining objects per-row and a larger --max-old-space-size only delays
+// the same failure — do not treat the heap bump alone as a fix.
+let memDiagPeakRss = 0;
+let memDiagPeakHeap = 0;
+function memDiagSnapshot(label) {
+  if (!MEM_DIAG) return null;
+  const mem = process.memoryUsage();
+  memDiagPeakRss = Math.max(memDiagPeakRss, mem.rss);
+  memDiagPeakHeap = Math.max(memDiagPeakHeap, mem.heapUsed);
+  const mb = (n) => (n / 1024 / 1024).toFixed(1);
+  console.log(`  [mem-diag] ${label}: heapUsed=${mb(mem.heapUsed)}MB rss=${mb(mem.rss)}MB external=${mb(mem.external)}MB (peakHeap=${mb(memDiagPeakHeap)}MB peakRss=${mb(memDiagPeakRss)}MB)`);
+  return mem;
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -111,6 +132,15 @@ function isCanonicalPacketPayload(payload = {}) {
   );
 }
 
+function extractQdrantVector(point) {
+  const raw = point?.vector ?? point?.vectors ?? null;
+  if (Array.isArray(raw)) return raw;
+  if (raw && Array.isArray(raw.content)) return raw.content;
+  if (raw && Array.isArray(raw.default)) return raw.default;
+  if (raw && Array.isArray(raw.vector)) return raw.vector;
+  return null;
+}
+
 async function loadCurrentLatentKeys(pool, currentEpoch) {
   const result = await pool.query(
     `
@@ -162,108 +192,45 @@ function findExistingLatent(entry, qdrantId, currentLatentKeys) {
   return null;
 }
 
-/** Scroll all vectors from Qdrant, up to LIMIT. */
-async function scrollQdrant(url, collection, limit) {
-  const vecs   = [];
-  const ids    = [];
-  const candidatesMap = {};
-  const pointsMap = {};
-  let   offset = null;
+/** Fetch a single page of vectors from Qdrant. */
+async function fetchQdrantPage(url, collection, limit, offset = null) {
+  const body = JSON.stringify({
+    limit,
+    with_payload: [
+      "packet_key", "packetKey", "chunk_id", "source_ref", "sourceRef",
+      "sourceRefs", "filePath", "canonical_source_ref", "path", "file_path",
+      "qdrant_point_id", "feature_id", "featureId", "kind", "ledger_type",
+      "canonical", "payload_unmatched"
+    ],
+    with_vector: true,
+    ...(offset ? { offset } : {})
+  });
+  const res = await fetch(`${url}/collections/${collection}/points/scroll`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body
+  });
+  if (!res.ok) throw new Error(`Qdrant scroll ${res.status}: ${await res.text()}`);
+  const json = await res.json();
+  return {
+    points: json.result?.points ?? [],
+    nextOffset: json.result?.next_page_offset ?? null,
+  };
+}
 
-  while (vecs.length < limit) {
-    const body = JSON.stringify({
-      limit: Math.min(250, limit - vecs.length),
-      with_payload: [
-        "packet_key", "packetKey", "chunk_id", "source_ref", "sourceRef",
-        "sourceRefs", "filePath", "canonical_source_ref", "path", "file_path",
-        "qdrant_point_id", "feature_id", "featureId", "kind", "ledger_type",
-        "canonical", "payload_unmatched"
-      ],
-      with_vector:  true,
-      ...(offset ? { offset } : {})
-    });
-    const res  = await fetch(`${url}/collections/${collection}/points/scroll`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body
-    });
-    if (!res.ok) throw new Error(`Qdrant scroll ${res.status}: ${await res.text()}`);
-    const json = await res.json();
-    const pts  = json.result?.points ?? [];
-    if (!pts.length) break;
-
-    for (const p of pts) {
-      let vec = p.vector;
-      if (vec && typeof vec === 'object' && !Array.isArray(vec)) vec = p.vector.content || Object.values(vec)[0];
-      if (
-        Array.isArray(vec) &&
-        vec.length === INPUT_DIM &&
-        isCanonicalPacketPayload(p.payload)
-      ) {
-        vecs.push(vec);
-
-        // Build candidate list
-        const candidates = new Set();
-        if (p.payload?.packetKey) candidates.add(String(p.payload.packetKey));
-        if (p.payload?.packet_key) candidates.add(String(p.payload.packet_key));
-        if (p.payload?.chunk_id) candidates.add(String(p.payload.chunk_id).replace(/^card:/, ""));
-        if (p.payload?.filePath) candidates.add(String(p.payload.filePath));
-        if (p.payload?.canonical_source_ref) candidates.add(String(p.payload.canonical_source_ref));
-        if (p.payload?.source_ref) candidates.add(String(p.payload.source_ref));
-        if (p.payload?.sourceRefs && p.payload.sourceRefs[0]) candidates.add(String(p.payload.sourceRefs[0]));
-        if (p.payload?.path) candidates.add(String(p.payload.path));
-        if (p.payload?.file_path) candidates.add(String(p.payload.file_path));
-        if (p.payload?.qdrant_point_id) candidates.add(String(p.payload.qdrant_point_id));
-        candidates.add(String(p.id));
-
-        // Use the first non-numeric candidate as the main ID if available, otherwise Qdrant point ID
-        let primaryId = String(p.id);
-        for (const cand of candidates) {
-          if (!/^\d+$/.test(cand)) {
-            primaryId = cand;
-            break;
-          }
-        }
-
-        const qdPointId = String(p.id);
-        const packet_key = p.payload?.packet_key ?? p.payload?.packetKey ?? p.payload?.chunk_id ?? null;
-        const source_ref = p.payload?.source_ref ?? p.payload?.sourceRef ?? p.payload?.filePath ?? p.payload?.path ?? p.payload?.file_path ?? null;
-        const canonical_source_ref = p.payload?.canonical_source_ref ?? p.payload?.canonicalSourceRef ?? null;
-        const file_path = p.payload?.file_path ?? p.payload?.filePath ?? null;
-        const feature_id = p.payload?.feature_id ?? p.payload?.featureId ?? null;
-
-        const candidate_keys = [
-          packet_key,
-          source_ref,
-          canonical_source_ref,
-          file_path,
-          p.payload?.source_ref,
-          p.payload?.metadata?.source_ref
-        ].filter(val => typeof val === 'string' && val.trim().length > 0);
-
-        ids.push(qdPointId);
-        candidatesMap[qdPointId] = Array.from(new Set([...candidates, ...candidate_keys]));
-        pointsMap[qdPointId] = {
-          primary_id: primaryId,
-          qdrant_point_id: qdPointId,
-          packet_key,
-          source_ref,
-          canonical_source_ref,
-          feature_id,
-          candidate_keys: Array.from(new Set(candidate_keys)),
-          kind: p.payload?.kind ?? null,
-          ledger_type: p.payload?.ledger_type ?? null,
-          canonical: p.payload?.canonical ?? null,
-          payload_unmatched: p.payload?.payload_unmatched ?? null
-        };
-      }
-    }
-    offset = json.result?.next_page_offset;
-    if (!offset) break;
-    process.stdout.write(`\r  [scroll] ${vecs.length} vectors fetched...`);
+function readCheckpoint() {
+  if (!RESUME || !existsSync(CHECKPOINT_FILE)) return null;
+  try {
+    return JSON.parse(readFileSync(CHECKPOINT_FILE, 'utf8'));
+  } catch (error) {
+    console.warn(`  ⚠️  Checkpoint unreadable at ${CHECKPOINT_FILE}: ${error.message}`);
+    return null;
   }
-  process.stdout.write('\n');
-  return { vecs, ids, candidatesMap, pointsMap };
+}
+
+function writeCheckpoint(checkpoint) {
+  mkdirSync(resolve(ROOT, '.tmp'), { recursive: true });
+  writeFileSync(CHECKPOINT_FILE, JSON.stringify(checkpoint, null, 2));
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
@@ -272,7 +239,7 @@ async function main() {
   console.log('\n╔══════════════════════════════════════════════════════════════════╗');
   console.log('║  backfill-latent-vectors.mjs — AE Encode: 768 → 128 → 64        ║');
   console.log(`╚══════════════════════════════════════════════════════════════════╝\n`);
-  console.log(`Mode: ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}  batch=${BATCH_SZ}  limit=${LIMIT === Infinity ? '∞' : LIMIT}\n`);
+  console.log(`Mode: ${DRY_RUN ? 'DRY-RUN' : 'APPLY'}  batch=${BATCH_SZ}  limit=${LIMIT}  resume=${RESUME ? 'yes' : 'no'}\n`);
 
   // ── Step 1: Load trained weights ──────────────────────────────────────────
   console.log('Step 1: Load trained weights');
@@ -288,6 +255,11 @@ async function main() {
   console.log(`  hidden_dim: ${meta.hidden_dim}`);
   console.log(`  latent_dim: ${meta.latent_dim}`);
   console.log(`  trained:    ${meta.timestamp}  val_loss=${meta.best_val_loss?.toFixed(6)}`);
+  const checkpoint = readCheckpoint();
+  if (checkpoint) {
+    console.log(`  checkpoint: ${CHECKPOINT_FILE}`);
+    console.log(`  resume_at:  ${checkpoint.nextOffset ?? 'start'}`);
+  }
 
   // Layer 1: 768 → 128
   const W1 = loadNpy(resolve(MODEL_DIR, 'W_enc_768_128.npy'));  // [128, 768]
@@ -321,26 +293,7 @@ async function main() {
   }
 
   const pool = APPLY ? new pg.Pool({ connectionString: DATABASE_URL }) : null;
-
-  // ── Step 3: Fetch embeddings from Qdrant ──────────────────────────────────
-  console.log('Step 3: Fetch embeddings from Qdrant');
-  console.log('─────────────────────────────────────');
-
-  let vecs, ids, candidatesMap, pointsMap;
-  try {
-    ({ vecs, ids, candidatesMap, pointsMap } = await scrollQdrant(QDRANT_URL, COLLECTION, LIMIT));
-  } catch (e) {
-    console.error(`❌ Qdrant scroll failed: ${e.message}`);
-    process.exit(2);
-  }
-
-  const N = vecs.length;
-  console.log(`  ${N} valid ${INPUT_DIM}-dim vectors from ${COLLECTION}\n`);
-
-  if (N === 0) {
-    console.error('❌ No vectors found — check QDRANT_URL and collection name');
-    process.exit(2);
-  }
+  memDiagSnapshot('after GPU addon load, before Qdrant fetch');
 
   const currentEpoch = Number(meta.epoch ?? 60);
   const currentLatentKeys = APPLY && pool && !FORCE_REFRESH
@@ -352,20 +305,18 @@ async function main() {
     console.log('  --force-refresh set: re-encoding all packets regardless of existing latent_64\n');
   }
 
-  // ── Step 4: Encode 768 → 128 → 64 in GPU batches ─────────────────────────
-  console.log('Step 4: Encode via autoencoderEncodeGPU() (768→128→64)');
-  console.log('──────────────────────────────────────────────────────');
-
   const W1f = W1.data;  // Float32Array [128*768]
   const b1f = b1.data;  // Float32Array [128]
   const W2f = W2.data;  // Float32Array [64*128]
   const b2f = b2.data;  // Float32Array [64]
 
+  // ── Step 3: Stream Qdrant pages and encode 768 → 128 → 64 ────────────────
+  console.log('Step 3: Stream Qdrant pages and encode via autoencoderEncodeGPU() (768→128→64)');
+  console.log('────────────────────────────────────────────────────────────────────────────');
+
   const latentIndex = {};   // qdrant_id → latent object
   let encoded_count = 0;
   let t_encode = 0;
-  // Declared here (not at first Step-6 use) — shouldSkipCurrentLatent below increments
-  // .skipped during Step 4, which runs before Step 6's write loop.
   let pg_reasons = {
     qdrant_point_id: 0,
     packet_key: 0,
@@ -374,63 +325,123 @@ async function main() {
     skipped: 0
   };
 
-  for (let start = 0; start < N; start += BATCH_SZ) {
-    const end   = Math.min(start + BATCH_SZ, N);
-    const bSize = end - start;
+  let pageCursor = checkpoint?.nextOffset ?? null;
+  let pageCount = 0;
+  let processedCount = 0;
+  let latestPointId = checkpoint?.lastPointId ?? null;
+  let maxObservedPage = 0;
+  let writeCheckpointPath = DRY_RUN ? null : CHECKPOINT_FILE;
+
+  while (processedCount < LIMIT) {
+    const remaining = LIMIT - processedCount;
+    const pageLimit = Math.min(BATCH_SZ, remaining);
+    let page;
+    try {
+      page = await fetchQdrantPage(QDRANT_URL, COLLECTION, pageLimit, pageCursor);
+    } catch (e) {
+      console.error(`❌ Qdrant page fetch failed: ${e.message}`);
+      process.exit(2);
+    }
+
+    const points = page.points ?? [];
+    if (points.length === 0) break;
+
+    pageCount++;
+    maxObservedPage = Math.max(maxObservedPage, points.length);
+
+    const pageVectors = [];
+    const pageIds = [];
+    const pageInfos = [];
+
+    for (const point of points) {
+      const vector = extractQdrantVector(point);
+      if (!vector || vector.length !== INPUT_DIM) continue;
+      pageVectors.push(vector);
+      pageIds.push(String(point.id));
+      pageInfos.push(point.payload ?? {});
+    }
+
+    if (pageVectors.length === 0) {
+      processedCount += points.length;
+      pageCursor = page.nextOffset ?? null;
+      if (pageCursor === null) break;
+      continue;
+    }
+
+    const bSize = pageVectors.length;
     const batch = new Float32Array(bSize * INPUT_DIM);
     for (let i = 0; i < bSize; i++) {
-      const v = vecs[start + i];
+      const v = pageVectors[i];
       for (let j = 0; j < INPUT_DIM; j++) batch[i * INPUT_DIM + j] = v[j];
     }
 
     const t0 = Date.now();
-
-    // Layer 1: batch[n×768] → h128[n×128]
     const h128 = addon.autoencoderEncode(batch, bSize, INPUT_DIM, W1f, b1f, HIDDEN_DIM);
-    // Layer 2: h128[n×128] → latent64[n×64]
     const lat64 = addon.autoencoderEncode(h128, bSize, HIDDEN_DIM, W2f, b2f, LATENT_DIM);
-
     t_encode += Date.now() - t0;
 
     for (let i = 0; i < bSize; i++) {
-      const id = String(ids[start + i]);
-      const ptInfo = pointsMap[id] || {};
-      // Already current in Postgres for this ae_epoch: skip the write in Step 6, but
-      // still populate latentIndex from the freshly-encoded vector so downstream
-      // consumers (Step 5/6/7 and SOM training) keep receiving a full corpus index.
+      const id = pageIds[i];
+      const ptInfo = pageInfos[i] || {};
+      latestPointId = id;
       const isCurrent = findExistingLatent(ptInfo, id, currentLatentKeys) !== null;
       if (isCurrent) pg_reasons.skipped++;
-latentIndex[id] = {
-  primary_id: ptInfo.primary_id || id,
-  qdrant_point_id: ptInfo.qdrant_point_id || '',
-  packet_key: ptInfo.packet_key || null,
-  source_ref: ptInfo.source_ref || null,
-  canonical_source_ref: ptInfo.canonical_source_ref || null,
-  feature_id: ptInfo.feature_id || null,
 
-  // NEW
-  candidate_keys: ptInfo.candidate_keys || [],
-
-  // preserve topology metadata
-  kind: ptInfo.kind ?? null,
-  ledger_type: ptInfo.ledger_type ?? null,
-  canonical: ptInfo.canonical ?? null,
-  payload_unmatched: ptInfo.payload_unmatched ?? null,
-
-  // Skip re-writing Postgres/Redis for already-current entries in Step 6/7 below.
-  skip_write: isCurrent,
-
-  latent_64: Array.from(
-    lat64.subarray(
-      i * LATENT_DIM,
-      (i + 1) * LATENT_DIM
-    )
-  )
-};
+      latentIndex[id] = {
+        primary_id: ptInfo.primary_id || id,
+        qdrant_point_id: ptInfo.qdrant_point_id || id,
+        packet_key: ptInfo.packet_key || null,
+        source_ref: ptInfo.source_ref || null,
+        canonical_source_ref: ptInfo.canonical_source_ref || null,
+        feature_id: ptInfo.feature_id || null,
+        candidate_keys: ptInfo.candidate_keys || [],
+        kind: ptInfo.kind ?? null,
+        ledger_type: ptInfo.ledger_type ?? null,
+        canonical: ptInfo.canonical ?? null,
+        payload_unmatched: ptInfo.payload_unmatched ?? null,
+        skip_write: isCurrent,
+        latent_64: Array.from(lat64.subarray(i * LATENT_DIM, (i + 1) * LATENT_DIM))
+      };
     }
-    encoded_count = end;
-    process.stdout.write(`\r  Encoded ${encoded_count}/${N} (${(t_encode / encoded_count).toFixed(2)} ms/vec)...`);
+
+    encoded_count += bSize;
+    processedCount += points.length;
+    process.stdout.write(`\r  Encoded ${encoded_count}/${LIMIT} (${(t_encode / Math.max(encoded_count, 1)).toFixed(2)} ms/vec)...`);
+
+    if (writeCheckpointPath) {
+      writeCheckpoint({
+        runId: `backfill-latent-vectors:${process.pid}`,
+        workspaceRevision: process.env.WORKSPACE_REVISION || 'unknown',
+        collection: COLLECTION,
+        representationId: 'latent_64',
+        representationRevision: Number(meta.epoch ?? 60),
+        nextOffset: page.nextOffset ?? null,
+        lastPointId: latestPointId,
+        processedCount,
+        persistedCount: 0,
+        datasetDigest: `collection:${COLLECTION};limit:${LIMIT};batch:${BATCH_SZ}`,
+        updatedAt: new Date().toISOString(),
+      });
+    }
+
+    memDiagSnapshot(`after page ${pageCount} (${bSize} encoded, processed=${processedCount}, maxPage=${maxObservedPage})`);
+
+    pageCursor = page.nextOffset ?? null;
+    if (pageCursor === null) break;
   }
+
+  if (encoded_count === 0) {
+    console.error('❌ No vectors found — check QDRANT_URL and collection name');
+    process.exit(2);
+  }
+
+  memDiagSnapshot(`after streaming encode (${encoded_count} vectors, ${pageCount} pages)`);
+
+  // ── Step 4: Persist the latent index ──────────────────────────────────────
+  console.log('\nStep 4: Persist the latent index and downstream projections');
+  console.log('────────────────────────────────────────────────────────────');
+
+  memDiagSnapshot(`before downstream writes (${Object.keys(latentIndex).length} latentIndex entries, ${pg_reasons.skipped} already-current)`);
 
   if (Object.keys(latentIndex).length === 0 && currentLatentKeys && currentLatentKeys.count > 0 && pool) {
     console.log('\n  No refreshed latent rows were needed; hydrating the latent index from Postgres for downstream consumers...');
@@ -480,16 +491,8 @@ latentIndex[id] = {
   process.stdout.write('\n');
   console.log(`  ✅ ${encoded_count} latent vectors produced in ${t_encode} ms\n`);
 
-  // `vecs` and `pointsMap` are only needed inside the encode loop above — free
-  // them before building/serializing latentArtifact so the two large retained
-  // structures (raw 768-dim vectors for every point, plus point metadata) don't
-  // sit in memory alongside it. Live OOM crash (2026-08-03, ~106K packets,
-  // "JavaScript heap out of memory") — see OpenSpec parent-atlas-graph-retrieval-proof
-  // GS1.43 — happened here: latentArtifact + two independent JSON.stringify(...,
-  // null, 2) calls (pretty-printed, ~3x string size) each producing a full
-  // multi-hundred-MB string, on top of vecs/pointsMap still being retained.
-  vecs = null;
-  pointsMap = null;
+  // Each Qdrant page is discarded after encoding. Only the bounded latent index
+  // and final reports remain in memory before serialization.
 
   // ── Step 5: Write latent index file ───────────────────────────────────────
   console.log('Step 5: Save latent index (for train-som-20x20.mjs)');
@@ -503,7 +506,6 @@ latentIndex[id] = {
     output_dim:  LATENT_DIM,
     packet_count: Object.keys(latentIndex).length,
     index:       latentIndex,          // { qdrant_id: latent object }
-    candidates:  candidatesMap         // { qdrant_id: [candidates] }
   };
 
   // Serialize once and reuse for both file writes — this was previously two
@@ -764,6 +766,9 @@ let batchNotMatched = 0;
       pgUpdated += Number(result?.rowCount ?? 0);
       const expected = slice.length;
       pgNotMatched += Math.max(0, expected - Number(result?.rowCount ?? 0));
+      if (MEM_DIAG && (start / BATCH_SZ) % 10 === 0) {
+        memDiagSnapshot(`Step 6 batch ${Math.floor(start / BATCH_SZ) + 1}/${Math.ceil(entries.length / BATCH_SZ)} (rows_written=${pgUpdated}, rows_not_matched=${pgNotMatched}, pool_total=${pool.totalCount}, pool_idle=${pool.idleCount}, pool_waiting=${pool.waitingCount})`);
+      }
     } catch (e) {
       await pool.query('ROLLBACK');
       console.error(`\n  ❌ Postgres batch failed at ${start}: ${e.message}`);
@@ -778,8 +783,28 @@ let batchNotMatched = 0;
   const writebackReportPath = resolve('.', 'docs/reports/backfill-latent-vectors-writeback.json');
   mkdirSync(resolve('.', 'docs/reports'), { recursive: true });
   const batchTotal = entries.length;
+  if (!DRY_RUN) {
+    writeCheckpoint({
+      runId: `backfill-latent-vectors:${process.pid}`,
+      workspaceRevision: process.env.WORKSPACE_REVISION || 'unknown',
+      collection: COLLECTION,
+      representationId: 'latent_64',
+      representationRevision: Number(meta.epoch ?? 60),
+      nextOffset: null,
+      lastPointId: latestPointId,
+      processedCount: batchTotal,
+      persistedCount: pgUpdated,
+      datasetDigest: `collection:${COLLECTION};limit:${LIMIT};batch:${BATCH_SZ}`,
+      updatedAt: new Date().toISOString(),
+    });
+  }
   writeFileSync(writebackReportPath, JSON.stringify({
     timestamp: new Date().toISOString(),
+    checkpoint: !DRY_RUN ? {
+      path: CHECKPOINT_FILE,
+      resume: RESUME,
+      datasetDigest: `collection:${COLLECTION};limit:${LIMIT};batch:${BATCH_SZ}`,
+    } : null,
     total_processed: batchTotal,
     postgres: {
       updated: pgUpdated,
@@ -857,6 +882,7 @@ let batchNotMatched = 0;
   console.log(`  Postgres updated: ${pgUpdated}`);
   console.log(`  Redis cached:     ${redis_ok ? Object.keys(latentIndex).length : 'skipped'}`);
   console.log(`  Latent index:     ${LATENT_FILE}`);
+  memDiagSnapshot('final, before exit');
   console.log(`\n→ Next: node scripts/atlas/train-som-20x20.mjs`);
 }
 

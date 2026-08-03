@@ -1,0 +1,13 @@
+{
+  "first_packet_id": "packet:cc69efabff82",
+  "last_packet_id": "packet:cc6bec979113",
+  "next_after_packet_id": "packet:cc6bec979113",
+  "selected": 5,
+  "updated": 5,
+  "remaining": 11654,
+  "force_refresh": false,
+  "dry_run": false,
+  "input_digest": "e5aecfafbecf9c2dbe00c031ae8c9e139444d1ba5dc250ad9f82554b141d5bf1",
+  "output_digest": "c7b7683a140929e328c09d87616e025d8e023688e494c9bba59fe97d660b4465",
+  "generated_at": "2026-08-03T11:53:34.903Z"
+}

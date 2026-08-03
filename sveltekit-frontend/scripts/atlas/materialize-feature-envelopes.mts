@@ -17,7 +17,14 @@
  */
 
 import pkg from 'pg';
+import { createHash } from 'crypto';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { resolve } from 'path';
 const { Pool } = pkg;
+
+function sha256Hex(input: string): string {
+  return createHash('sha256').update(input).digest('hex');
+}
 
 function parseLimitArg(defaultValue: number): number {
   const limitArg = process.argv.find((arg) => arg.startsWith('--limit='));
@@ -25,6 +32,38 @@ function parseLimitArg(defaultValue: number): number {
 
   const value = Number.parseInt(limitArg.split('=', 2)[1] ?? '', 10);
   return Number.isInteger(value) && value > 0 ? value : defaultValue;
+}
+
+function parseAfterArg(): string | null {
+  const afterArg = process.argv.find((arg) => arg.startsWith('--after='));
+  return afterArg ? afterArg.split('=', 2)[1] ?? null : null;
+}
+
+// Keyset-pagination cursor, persisted only for --force-refresh runs (normal mode
+// self-excludes already-materialized rows via the feature_envelope IS NULL filter,
+// so it doesn't need a persisted cursor to make forward progress). Without this,
+// --force-refresh repeatedly rewrote the same first `fetchLimit` packet_ids on every
+// invocation and never reached the rest of the corpus — the same bug class the
+// non-force-refresh path had before its own skip-guard fix.
+const FORCE_REFRESH_CURSOR_FILE = resolve('.tmp', 'materialize-feature-envelopes-force-refresh-cursor.json');
+
+function loadPersistedCursor(): string | null {
+  try {
+    if (!existsSync(FORCE_REFRESH_CURSOR_FILE)) return null;
+    const data = JSON.parse(readFileSync(FORCE_REFRESH_CURSOR_FILE, 'utf-8'));
+    return typeof data.next_after_packet_id === 'string' ? data.next_after_packet_id : null;
+  } catch {
+    return null;
+  }
+}
+
+function savePersistedCursor(nextAfterPacketId: string | null): void {
+  try {
+    mkdirSync(resolve('.tmp'), { recursive: true });
+    writeFileSync(FORCE_REFRESH_CURSOR_FILE, JSON.stringify({ next_after_packet_id: nextAfterPacketId, saved_at: new Date().toISOString() }, null, 2));
+  } catch {
+    // Non-fatal — worst case, the next force-refresh run restarts from the beginning.
+  }
 }
 
 // Direct pg.Pool connection — matches the canonical pattern used by
@@ -159,9 +198,14 @@ async function main() {
     // runs are incremental (new/backfilled packets) instead of re-walking the same
     // first `fetchLimit` packet_ids every time and never reaching the rest of the
     // corpus. --force-refresh opts back into the old unconditional-recompute behavior
-    // (e.g. after a FEATURE_SCHEMA_VERSION bump where existing envelopes are stale).
+    // (e.g. after a FEATURE_SCHEMA_VERSION bump where existing envelopes are stale) —
+    // but still keyset-paginates via packet_id, so successive force-refresh runs
+    // advance through the corpus rather than repeatedly rewriting the same rows.
     const forceRefresh = process.argv.includes('--force-refresh');
+    const explicitAfter = parseAfterArg();
+    const afterPacketId = explicitAfter ?? (forceRefresh ? loadPersistedCursor() : null) ?? '';
     console.log('[2/5] Fetching packets with score components...');
+    console.log(`  Keyset cursor: packet_id > '${afterPacketId || '(start)'}' LIMIT ${fetchLimit}`);
     const fetchResult = await pool.query<PacketRow>(
       `
       SELECT
@@ -174,11 +218,12 @@ async function main() {
         CASE WHEN array_length(concept_ids, 1) > 3 THEN 0.7 WHEN array_length(concept_ids, 1) > 0 THEN 0.5 ELSE 0.3 END as ontology_score,
         CASE WHEN metadata->>'access_count' IS NOT NULL THEN LEAST(1.0, (metadata->>'access_count')::float / 100.0) ELSE 0.5 END as telemetry_score
       FROM atlas_packets
-      ${forceRefresh ? '' : "WHERE feature_envelope IS NULL OR feature_envelope->>'feature_schema_version' IS DISTINCT FROM $2"}
+      WHERE packet_id > $3
+        AND ($4 OR feature_envelope IS NULL OR feature_envelope->>'feature_schema_version' IS DISTINCT FROM $2)
       ORDER BY packet_id
       LIMIT $1;
       `,
-      [fetchLimit, FEATURE_SCHEMA_VERSION]
+      [fetchLimit, FEATURE_SCHEMA_VERSION, afterPacketId, forceRefresh]
     );
 
     const envelopes: Array<{ packet_id: string; envelope: FeatureEnvelope }> = fetchResult.rows.map((packet) => ({
@@ -202,8 +247,63 @@ async function main() {
     console.log(`  ✓ Fetched ${envelopes.length} packets needing refresh`);
     console.log('');
 
+    // Digests requested by Phase 7 of the Graphify recovery proof ladder
+    // (openspec/changes/parent-atlas-graphify-recovery-proof-ladder/tasks.md) — computed over
+    // the already-deterministic packet_id-ordered result set, so identical input data always
+    // produces identical digests (no wall-clock/random content feeds into either hash).
+    const inputDigest = sha256Hex(
+      JSON.stringify(fetchResult.rows.map((r) => ({ packet_id: r.packet_id, dense_score: r.dense_score, lexical_score: r.lexical_score, ast_score: r.ast_score, graph_score: r.graph_score, pagerank_score: r.pagerank_score, ontology_score: r.ontology_score, telemetry_score: r.telemetry_score })))
+    );
+    const outputDigest = sha256Hex(
+      JSON.stringify(envelopes.map((e) => ({ packet_id: e.packet_id, envelope: e.envelope })))
+    );
+
+    const firstPacketId = envelopes[0]?.packet_id ?? null;
+    const lastPacketId = envelopes[envelopes.length - 1]?.packet_id ?? null;
+    // A short page (< fetchLimit) means this pass exhausted the eligible set from this
+    // cursor position — null signals "start over from the beginning next time", not
+    // "stop forever". A full page means there's more; resume from lastPacketId.
+    const nextAfterPacketId = envelopes.length === fetchLimit ? lastPacketId : null;
+
+    async function writeReceipt(updatedCount: number) {
+      let remaining = 0;
+      try {
+        const remainingResult = await pool.query(
+          `SELECT COUNT(*)::int AS cnt FROM atlas_packets
+           WHERE packet_id > $2
+             AND ($3 OR feature_envelope IS NULL OR feature_envelope->>'feature_schema_version' IS DISTINCT FROM $1);`,
+          [FEATURE_SCHEMA_VERSION, nextAfterPacketId ?? afterPacketId, forceRefresh],
+        );
+        remaining = remainingResult.rows[0]?.cnt ?? 0;
+      } catch {
+        // Non-fatal — remaining stays 0 (best-effort receipt field).
+      }
+      const receipt = {
+        first_packet_id: firstPacketId,
+        last_packet_id: lastPacketId,
+        next_after_packet_id: nextAfterPacketId,
+        selected: envelopes.length,
+        updated: updatedCount,
+        remaining,
+        force_refresh: forceRefresh,
+        dry_run: dryRun,
+        input_digest: inputDigest,
+        output_digest: outputDigest,
+        generated_at: new Date().toISOString(),
+      };
+      try {
+        mkdirSync(resolve('..', 'docs', 'reports'), { recursive: true });
+        writeFileSync(resolve('..', 'docs', 'reports', 'materialize-feature-envelopes-receipt.json'), JSON.stringify(receipt, null, 2));
+      } catch {
+        // Non-fatal.
+      }
+      if (forceRefresh) savePersistedCursor(nextAfterPacketId);
+      console.log('Receipt:', JSON.stringify(receipt, null, 2));
+    }
+
     if (envelopes.length === 0) {
       console.log('No packets require a feature-envelope refresh for the current schema version.');
+      await writeReceipt(0);
       await pool.end();
       return;
     }
@@ -223,20 +323,37 @@ async function main() {
       console.log('');
       console.log('To apply, run:');
       console.log(`  npx tsx scripts/atlas/materialize-feature-envelopes.mts --apply`);
+      await writeReceipt(0);
     } else {
       console.log('[4/5] Applying feature envelopes to Postgres...');
 
+      // Single UNNEST-based batch UPDATE per chunk instead of one round-trip UPDATE per row
+      // inside an open transaction — the exact anti-pattern the Graphify recovery proof
+      // ladder's Phase 6 calls out ("Avoid hundreds of independent row updates in an open
+      // transaction"). With batchSize=500 the old code issued 500 sequential round-trips per
+      // transaction; this issues one. Uses pool.query() for BEGIN/UPDATE/COMMIT rather than a
+      // checked-out client — correct only because this pool is max:1 (single connection), so
+      // every query in this process necessarily runs on the same connection. If max is ever
+      // raised above 1, this must switch to pool.connect() + client.query() or BEGIN/COMMIT
+      // could silently run on different connections and never actually be transactional.
       for (let i = 0; i < envelopes.length; i += batchSize) {
         const batch = envelopes.slice(i, i + batchSize);
+        const packetIds = batch.map((e) => e.packet_id);
+        const envelopeJson = batch.map((e) => JSON.stringify(e.envelope));
 
         await pool.query('BEGIN');
         try {
-          for (const e of batch) {
-            await pool.query(
-              `UPDATE atlas_packets SET feature_envelope = $1::jsonb WHERE packet_id = $2;`,
-              [JSON.stringify(e.envelope), e.packet_id]
-            );
-          }
+          await pool.query(
+            `
+            UPDATE atlas_packets AS packet
+            SET feature_envelope = incoming.feature_envelope
+            FROM (
+              SELECT * FROM UNNEST($1::text[], $2::jsonb[]) AS t(packet_id, feature_envelope)
+            ) AS incoming
+            WHERE packet.packet_id = incoming.packet_id;
+            `,
+            [packetIds, envelopeJson]
+          );
           await pool.query('COMMIT');
         } catch (batchErr) {
           await pool.query('ROLLBACK');
@@ -254,6 +371,7 @@ async function main() {
       console.log(verifyResult.rows[0]);
       console.log('');
       console.log('✅ FEATURE ENVELOPE MATERIALIZATION COMPLETE');
+      await writeReceipt(envelopes.length);
     }
       await pool.end();
       return;

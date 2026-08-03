@@ -3,7 +3,7 @@
  * run-graphify-daily-startup.mjs
  *
  * Wrapper for graphify:daily npm script.
- * Runs on VS Code folder open as background task.
+ * Safe background launcher when invoked manually or by a task.
  * Signals partial/provisional progress via a stable "graphify:daily partial" pattern
  * for problemMatcher.
  */
@@ -11,17 +11,35 @@
 import { execSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { acquireStartupLock, releaseStartupLock } from './lib/graphify-startup-lock.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
 const DAILY_CHAIN_SCRIPT = 'npm run graphify:daily:chain';
 const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
+const STARTUP_LOCK_FILE = path.resolve(ROOT, '.graphify-daily-start.lock');
 
 const quiet = process.env.GRAPHIFY_QUIET === '1';
 const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
 const allowFallback = process.env.GRAPHIFY_ALLOW_FALLBACK === '1';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
+
+if (!acquireStartupLock(STARTUP_LOCK_FILE, { script: 'run-graphify-daily-startup.mjs' })) {
+  if (!quiet) console.log('[graphify:daily] Another startup lock is active; backing off.');
+  console.log('graphify:daily complete');
+  process.exit(75);
+}
+
+process.on('exit', () => releaseStartupLock(STARTUP_LOCK_FILE));
+process.on('SIGINT', () => {
+  releaseStartupLock(STARTUP_LOCK_FILE);
+  process.exit(130);
+});
+process.on('SIGTERM', () => {
+  releaseStartupLock(STARTUP_LOCK_FILE);
+  process.exit(143);
+});
 
 try {
   if (!quiet) console.log('[graphify:daily] Starting...');
@@ -62,11 +80,22 @@ try {
     console.log('[graphify:daily] feature recommendations complete');
   }
 
+  // Terminal lifecycle marker for .vscode/tasks.json's background problemMatcher
+  // (endsPattern: "graphify:daily complete") — must be printed on every exit
+  // path (success, fallback-success, and failure), not just success. Before
+  // this fix the script never emitted this exact string anywhere, so the
+  // isBackground:true task's endsPattern could never match — VS Code had no
+  // reliable signal the task had finished, on success or failure alike. Do
+  // not confuse this with the "partial" markers above/below, which signal
+  // data-completeness (chain-progressed-but-not-all-substeps-verified), a
+  // separate concern from process-lifecycle termination.
+  console.log('graphify:daily complete');
   process.exit(0);
 } catch (err) {
   console.error(`ERROR: graphify:daily failed: ${err.message}`);
   if (!allowFallback) {
     console.error('[graphify:daily] Fallback disabled; exiting with failure.');
+    console.log('graphify:daily complete');
     process.exit(1);
   }
 
@@ -80,10 +109,12 @@ try {
       shell: true,
     });
     console.log('[graphify:daily] fallback startup partial');
+    console.log('graphify:daily complete');
     process.exit(0);
   } catch (fallbackErr) {
     console.error(`ERROR: graphify fallback failed: ${fallbackErr.message}`);
     console.log('graphify:daily partial');
+    console.log('graphify:daily complete');
     process.exit(1);
   }
 }

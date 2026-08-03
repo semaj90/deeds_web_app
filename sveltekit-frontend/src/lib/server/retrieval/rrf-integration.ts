@@ -15,6 +15,11 @@ import { combineViaRRF, type ContextHit, type RRFResult, type RetrievalLaneName 
 import type { DispatcherOrchestrationResult } from '../dispatcher/dispatcher-orchestrator.js';
 import { RRF_DEFAULT_WEIGHTS } from './rrf-contract.js';
 import { fetchAuthorityScores } from '../search/neo4j-rerank.js';
+import {
+  resolveEmbeddingLane,
+  EmbeddingLaneTelemetryReason,
+  emitEmbeddingLaneTelementry,
+} from './resolve-embedding-lane.js';
 
 /**
  * TODO: no prior implementation of this function was found anywhere in the
@@ -178,7 +183,15 @@ async function queryQdrantVectorSignal(
     const { buildVectorPayload } = await import('$lib/server/config/vector-config.js');
     const { searchCodebaseAnn } = await import('$lib/server/search/qdrant-search.js');
     const denseLimit = Math.max(topK * 2, topK);
-    const collections = ['codebase_chunks_768', 'codebase_chunks_384_hybrid'];
+    // Canonical semantic_768 lane only. `codebase_chunks_384_hybrid` was previously included
+    // here but (a) is empty in production (0 points, verified live), (b) requires a 384-dim
+    // query vector while `embedding` here is always the canonical 768-dim EmbeddingGemma
+    // output, so `truncateEmbeddingForCollection` threw synchronously inside `collections.map()`
+    // below whenever this path was reached — the exception propagated out of the try block and
+    // the catch handler returned `[]` for the WHOLE function, silently zeroing out the
+    // canonical 768 dense-vector lane too, not just the legacy collection. (c) legacy 384
+    // collections must never enter production RRF per the semantic_768 canonical contract.
+    const collections = ['codebase_chunks_768'];
 
     if (seedRefs.length > 0) {
       const cleanedSeeds = [...new Set(seedRefs.map((ref) => String(ref ?? '').trim()).filter(Boolean))];
@@ -712,15 +725,35 @@ export async function multiLaneRetrievalWithRRF(
           }))
         : [];
 
+    // Defense-in-depth: even though the collection query itself is now 768-only (see the
+    // codebase_chunks_384_hybrid crash-bug fix above), still gate each hit's own metadata
+    // through resolveEmbeddingLane() before it enters RRF — a lane resolver that exists in the
+    // repo but was previously wired into nothing (only its own spec test referenced it). Only
+    // drops hits explicitly identified as legacy-384 (LEGACY_DIMENSION_EXPLICIT_ONLY); does NOT
+    // drop hits with an UNKNOWN resolution, since this repo's collection/vector-name registries
+    // are not guaranteed exhaustive and an over-eager filter here would silently reduce recall.
     const qdrantHits: ContextHit[] =
       qdrantResults.status === 'fulfilled'
-        ? qdrantResults.value.map((hit) => ({
-            id: hit.id,
-            source: 'qdrant_vector' as const,
-            score: hit.score,
-            text: hit.text,
-            metadata: hit.metadata,
-          }))
+        ? qdrantResults.value
+            .filter((hit) => {
+              const m = hit.metadata ?? {};
+              const resolution = resolveEmbeddingLane({
+                collection: (m.qdrant_collection as string | undefined) ?? undefined,
+                embedding_dim: Array.isArray((m as any).vector) ? (m as any).vector.length : undefined,
+              });
+              if (resolution.reason === EmbeddingLaneTelemetryReason.LEGACY_DIMENSION_EXPLICIT_ONLY) {
+                emitEmbeddingLaneTelementry(String((m as any).packet_key ?? hit.id), resolution);
+                return false;
+              }
+              return true;
+            })
+            .map((hit) => ({
+              id: hit.id,
+              source: 'qdrant_vector' as const,
+              score: hit.score,
+              text: hit.text,
+              metadata: hit.metadata,
+            }))
         : [];
 
     const turbovecHits: ContextHit[] =

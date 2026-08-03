@@ -891,7 +891,7 @@
     "atlas:phase16:ae:dry": "npm --prefix sveltekit-frontend run ae:train:dry",
     "atlas:phase16:join:audit": "node ../scripts/atlas/audit-latent-som-join-keys.mjs",
     "atlas:phase16:latent:dry": "node ../scripts/atlas/backfill-latent-vectors.mjs --dry-run --limit=500",
-    "atlas:phase16:latent:apply": "node ../scripts/atlas/backfill-latent-vectors.mjs --apply",
+    "atlas:phase16:latent:apply": "node --max-old-space-size=12288 ../scripts/atlas/backfill-latent-vectors.mjs --apply",
     "atlas:phase16:som:dry": "node ../scripts/atlas/train-som-20x20.mjs --dry-run",
     "atlas:phase16:som:apply": "node ../scripts/atlas/train-som-20x20.mjs --apply",
     "atlas:populate:dry": "node ../scripts/atlas/population-runner.mjs --dry-run",

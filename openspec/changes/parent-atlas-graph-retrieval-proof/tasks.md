@@ -85,7 +85,7 @@
 ## GS1.14 - Central evidence pipeline
 
 - [ ] Define `trace_dynamic_context` as the single evidence assembly tool for bounded proof bundles.
-- [ ] Support static discovery lanes (`rg`, `ast-grep`, `ts-morph`, `Tree-sitter`) without treating them as proof by themselves.
+- [ ] Support static discovery lanes (`rg`, `ast-grep`, `ts-morph`, `Tree-sitter`) without treating them as proof by themselves. (dry-run only; completeness 20/100)
 - [ ] Support retrieval lanes (`Qdrant`, `TurboVec`, `cuVS`) only as projection evidence with canonical join-back.
 - [ ] Support runtime lanes (`HTTP`, `MCP`, `Playwright`, service health) as proof sources.
 - [ ] Keep patch generation and patch validation separate (`trace_prepare_patch`, `trace_validate_patch`, `trace_record_validation`).
@@ -446,22 +446,24 @@ Full per-group tables (10-column: Capability/Expected contract/Canonical owner/K
 
 ### PAW1-14 gate table
 
-| Gate | Status | Evidence | Missing |
-|---|---|---|---|
-| PAW1_ACTIVE_CONTEXT | PARTIAL_PROVEN | `atlas.build_context` real, dispatched from stdio server only | Canonical-name mismatch vs protocol vocabulary; not on `trace-mcp-server.ts` |
-| PAW2_GIT_DIFF_CONTEXT | PARTIAL_PROVEN | `ace-diff-sniffer.mjs`/`context-for-file.ts` cited, not re-verified this pass | Fresh confirmation needed |
-| PAW3_HOT_WARM_COLD_LOOKUP | PARTIAL_PROVEN | COLD+WARM real; HOT tier is Streams not TTL cache | No acquisition-scoped TTL cache exists |
-| PAW4_CANONICAL_ENVELOPE_IDENTITY | NOT_PROVEN | `atlas_ast_nodes` vs `atlas_tree_nodes` split — fix landed on the unused table | Needs a second pass targeting the table production code actually reads |
-| PAW5_GRPC_TENSOR_ALIGNMENT | NOT_PROVEN | No row→`symbol_version_id` map in any gRPC/tensor transport | Per protocol's own rule, disqualifying — this transport carries no canonical evidence |
-| PAW6_SEMANTIC_768_RETRIEVAL | INSTALLED_AND_USED (carried forward, not re-verified this pass) | Qdrant `codebase_chunks_768`, 10+ referencing files | Cross-store identity-parity proof deferred |
-| PAW7_SOM_ROUTING | INSTALLED_AND_USED | `som-topology-pipeline.ts`, 4 real callers | No paired test; downstream-read proof missing |
-| PAW8_POS_STRUCTURAL_FEATURES | INSTALLED_AND_USED | `miniforge_nlp_sidecar.py`, lazy-loaded, real spec file | Model-version reporting + DB-write path not traced end to end |
-| PAW9_DAG_KAG_HYPERGRAPH_SYNTHESIS | PARTIAL_PROVEN | DAG + HyperGraphRAG both real; KAG concept layer at 0 rows | KAG population unstarted; multihop traversal not MCP-exposed |
-| PAW10_RECOMMENDATION_GENERATION | PARTIAL_PROVEN → RUNTIME_SMOKE_PROVEN for the supersession slice (this pass) | See seam below | `promote_recommendation`'s real write path independently blocked (found this pass, not fixed) |
-| PAW11_SUPERSESSION_LOGIC | **RUNTIME_SMOKE_PROVEN** (this pass, recommendation-level only) | `supersede_recommendation()`, 3 live guards proven | `supersede_semantic_signal()` (pre-existing) still has no revision-order guard, only revision-presence |
-| PAW12_VALIDATION_FEEDBACK | NOT_PROVEN | `validation-result-v1.ts` scoped to identity-immutability only, not generic gate receipts | Field-shape mismatch vs protocol's assumed `gateId`/`exitCode` contract |
-| PAW13_END_TO_END_TRACE | NOT_PROVEN | No single trace was found connecting active-context → retrieval → recommendation → validation → promotion across real production code in one pass | Would require a dedicated E2E fixture, not attempted |
-| PAW14_CONCURRENCY_SAFETY | PASS (procedural) | Hash-before/hash-after followed for every file touched this pass; no concurrent-edit collisions detected | — |
+**Completeness scale**: `0` = blocked / not proven, `100` = proven end state.
+
+| Gate | Status | Completeness | Evidence | Missing |
+|---|---|---:|---|---|
+| PAW1_ACTIVE_CONTEXT | PARTIAL_PROVEN | 55 | `atlas.build_context` real, dispatched from stdio server only | Canonical-name mismatch vs protocol vocabulary; not on `trace-mcp-server.ts` |
+| PAW2_GIT_DIFF_CONTEXT | PARTIAL_PROVEN | 55 | `ace-diff-sniffer.mjs`/`context-for-file.ts` cited, not re-verified this pass | Fresh confirmation needed |
+| PAW3_HOT_WARM_COLD_LOOKUP | PARTIAL_PROVEN | 50 | COLD+WARM real; HOT tier is Streams not TTL cache | No acquisition-scoped TTL cache exists |
+| PAW4_CANONICAL_ENVELOPE_IDENTITY | NOT_PROVEN | 20 | `atlas_ast_nodes` vs `atlas_tree_nodes` split — fix landed on the unused table | Needs a second pass targeting the table production code actually reads |
+| PAW5_GRPC_TENSOR_ALIGNMENT | NOT_PROVEN | 0 | No row→`symbol_version_id` map in any gRPC/tensor transport | Per protocol's own rule, disqualifying — this transport carries no canonical evidence |
+| PAW6_SEMANTIC_768_RETRIEVAL | INSTALLED_AND_USED (carried forward, not re-verified this pass) | 70 | Qdrant `codebase_chunks_768`, 10+ referencing files | Cross-store identity-parity proof deferred |
+| PAW7_SOM_ROUTING | INSTALLED_AND_USED | 60 | `som-topology-pipeline.ts`, 4 real callers | No paired test; downstream-read proof missing |
+| PAW8_POS_STRUCTURAL_FEATURES | INSTALLED_AND_USED | 65 | `miniforge_nlp_sidecar.py`, lazy-loaded, real spec file | Model-version reporting + DB-write path not traced end to end |
+| PAW9_DAG_KAG_HYPERGRAPH_SYNTHESIS | PARTIAL_PROVEN | 40 | DAG + HyperGraphRAG both real; KAG concept layer at 0 rows | KAG population unstarted; multihop traversal not MCP-exposed |
+| PAW10_RECOMMENDATION_GENERATION | PARTIAL_PROVEN → RUNTIME_SMOKE_PROVEN for the supersession slice (this pass) | 75 | See seam below | `promote_recommendation`'s real write path independently blocked (found this pass, not fixed) |
+| PAW11_SUPERSESSION_LOGIC | **RUNTIME_SMOKE_PROVEN** (this pass, recommendation-level only) | 85 | `supersede_recommendation()`, 3 live guards proven | `supersede_semantic_signal()` (pre-existing) still has no revision-order guard, only revision-presence |
+| PAW12_VALIDATION_FEEDBACK | NOT_PROVEN | 10 | `validation-result-v1.ts` scoped to identity-immutability only, not generic gate receipts | Field-shape mismatch vs protocol's assumed `gateId`/`exitCode` contract |
+| PAW13_END_TO_END_TRACE | NOT_PROVEN | 0 | No single trace was found connecting active-context → retrieval → recommendation → validation → promotion across real production code in one pass | Would require a dedicated E2E fixture, not attempted |
+| PAW14_CONCURRENCY_SAFETY | PASS (procedural) | 100 | Hash-before/hash-after followed for every file touched this pass; no concurrent-edit collisions detected | — |
 
 A gate is PASS only with runtime evidence, per the protocol's own rule — none of the above are marked PASS except PAW14 (a procedural gate, not a capability gate).
 
@@ -654,14 +656,14 @@ Per operator's "8-10 then 1-3 then 4" sequencing. This is a targeted re-assessme
 
 | Gate | GS1.24 status | GS1.34 status | Why it changed |
 |---|---|---|---|
-| PAW4_CANONICAL_ENVELOPE_IDENTITY | NOT_PROVEN | **PARTIAL_PROVEN** | GS1.33 proved `GPU5_IDENTITY_PRESERVED_THROUGH_KNN: PASS` — stable/version symbol identity now survives a real cuVS exact-KNN round-trip on real Tree-sitter-parsed symbols, byte-identical to the PyTorch oracle. Still NOT fully PROVEN: the production `atlas_ast_nodes` vs `atlas_tree_nodes` table split (GS1.24 group E) is unreconciled — the identity *algorithm* is now proven correct through GPU retrieval, but production *storage* still has two disconnected tables. |
-| PAW6_SEMANTIC_768_RETRIEVAL | INSTALLED_AND_USED (not re-verified) | **unchanged** | Today's work proved cuVS/PageRank infrastructure, not the 768-dim Qdrant retrieval path specifically. No new evidence either way. |
-| PAW7_SOM_ROUTING | INSTALLED_AND_USED | **unchanged** | Not touched this pass — SOM is a different pipeline (`som-topology-pipeline.ts`) than the PageRank work done today. |
-| PAW9_DAG_KAG_HYPERGRAPH_SYNTHESIS | PARTIAL_PROVEN | **unchanged** | KAG concept-population layer still at 0 rows — not touched. DAG/HyperGraphRAG lanes not touched this pass. |
-| PAW11_SUPERSESSION_LOGIC | RUNTIME_SMOKE_PROVEN | unchanged, carried forward | (GS1.24's seam, still valid) |
-| PAW12_VALIDATION_FEEDBACK | NOT_PROVEN | **unchanged** | Not touched this pass. |
-| PAW13_END_TO_END_TRACE | NOT_PROVEN | **unchanged** | Still no single trace connecting active-context → retrieval → recommendation → validation → promotion in one proven pass. The PageRank/cuVS work strengthens two *individual* links (identity-preservation, graph authority) but doesn't itself constitute the end-to-end trace. |
-| PAW14_CONCURRENCY_SAFETY | PASS (procedural) | **PASS, re-confirmed** | Hash-before/hash-after followed for every file touched across GS1.32/1.33 (`prove-symbol-identity-knn.py`, `prove-pagerank-networkx-neo4j-parity.py`, `neo4j-gds-client.ts`) — zero concurrent-edit collisions this pass. |
+| PAW4_CANONICAL_ENVELOPE_IDENTITY | NOT_PROVEN | **35** | GS1.33 proved `GPU5_IDENTITY_PRESERVED_THROUGH_KNN: PASS` — stable/version symbol identity now survives a real cuVS exact-KNN round-trip on real Tree-sitter-parsed symbols, byte-identical to the PyTorch oracle. Still NOT fully PROVEN: the production `atlas_ast_nodes` vs `atlas_tree_nodes` table split (GS1.24 group E) is unreconciled — the identity *algorithm* is now proven correct through GPU retrieval, but production *storage* still has two disconnected tables. |
+| PAW6_SEMANTIC_768_RETRIEVAL | INSTALLED_AND_USED (not re-verified) | **70** | Today's work proved cuVS/PageRank infrastructure, not the 768-dim Qdrant retrieval path specifically. No new evidence either way. |
+| PAW7_SOM_ROUTING | INSTALLED_AND_USED | **60** | Not touched this pass — SOM is a different pipeline (`som-topology-pipeline.ts`) than the PageRank work done today. |
+| PAW9_DAG_KAG_HYPERGRAPH_SYNTHESIS | PARTIAL_PROVEN | **40** | KAG concept-population layer still at 0 rows — not touched. DAG/HyperGraphRAG lanes not touched this pass. |
+| PAW11_SUPERSESSION_LOGIC | RUNTIME_SMOKE_PROVEN | **85** | (GS1.24's seam, still valid) |
+| PAW12_VALIDATION_FEEDBACK | NOT_PROVEN | **10** | Not touched this pass. |
+| PAW13_END_TO_END_TRACE | NOT_PROVEN | **0** | Still no single trace connecting active-context → retrieval → recommendation → validation → promotion in one proven pass. The PageRank/cuVS work strengthens two *individual* links (identity-preservation, graph authority) but doesn't itself constitute the end-to-end trace. |
+| PAW14_CONCURRENCY_SAFETY | PASS (procedural) | **100** | Hash-before/hash-after followed for every file touched across GS1.32/1.33 (`prove-symbol-identity-knn.py`, `prove-pagerank-networkx-neo4j-parity.py`, `neo4j-gds-client.ts`) — zero concurrent-edit collisions this pass. |
 
 **New gate this pass, not in the original PAW1-14 set but directly evidenced**: real PageRank persistence + 3-way cross-implementation parity (NetworkX/Neo4j GDS/cuGraph) is now `PASS` (GS1.31 + GS1.33 combined) — this is effectively PAW6's graph-authority sibling capability, proven independently of the 768-dim semantic retrieval question PAW6 itself asks.
 
@@ -812,25 +814,27 @@ Recorded per operator directive. This is a **planning/status entry only** — no
 
 ### Component status table (evidence-language, as given)
 
-| Capability | Status |
-|---|---|
-| PostgreSQL canonical packets | PARTIAL_PROVEN→PROVEN (strongest layer) |
-| Drizzle ORM (SvelteKit) | PRESENT |
-| SQLAlchemy (Python workers) | PRESENT, not canonical-ownership |
-| Durable agent checkpoints | NOT_PROVEN as a unified system |
-| Qdrant semantic retrieval | PARTIAL_PROVEN |
-| `latent_128` topology vectors | artifacts/indexes exist, canonical role unclear |
-| SOM 20×20 + KMeans | PARTIAL_PROVEN (partially populated) |
-| Redis/Valkey centroids | intended hot-routing layer, contract alignment incomplete |
-| ACE context assembly | PARTIAL_PROVEN (present in pieces) |
-| Bitfrost packet transport | EXPERIMENTAL, not retrieval authority |
-| POS tagging / formal NER | NOT_PROVEN production lane |
-| Naive Bayes / logistic classifier | NOT_PROVEN wired (appropriate next baseline) |
-| XGBoost ranking | prior eval artifacts exist, NOT unified with entity classification |
-| DSPy / GEPA | NOT production-wired |
-| JEPA / Mamba / Titans | research-lane only |
-| WebGPU / LiteRT.js inference | prototype, not canonical retrieval path |
-| IndexedDB browser cache | useful, not canonical durable storage |
+**Completeness scale**: `0` = blocked / not proven, `100` = proven end state.
+
+| Capability | Status | Completeness | Notes |
+|---|---|---:|---|
+| PostgreSQL canonical packets | PARTIAL_PROVEN→PROVEN (strongest layer) | 95 | strongest canonical layer, but some adjacent lineage work remains unresolved |
+| Drizzle ORM (SvelteKit) | PRESENT | 100 | present and active for TS access/migrations |
+| SQLAlchemy (Python workers) | PRESENT, not canonical-ownership | 70 | present for worker access, not the authority boundary |
+| Durable agent checkpoints | NOT_PROVEN as a unified system | 10 | pieces exist, unified durable runtime not yet proven |
+| Qdrant semantic retrieval | PARTIAL_PROVEN | 70 | retrieval exists, canonical join-back and lane completeness still partial |
+| `latent_128` topology vectors | artifacts/indexes exist, canonical role unclear | 45 | artifacts exist, canonical role still unclear |
+| SOM 20×20 + KMeans | PARTIAL_PROVEN (partially populated) | 40 | populated in pieces, lineage/freshness incomplete |
+| Redis/Valkey centroids | intended hot-routing layer, contract alignment incomplete | 35 | routing role is intended but contract alignment remains incomplete |
+| ACE context assembly | PARTIAL_PROVEN (present in pieces) | 60 | present, but not yet a fully proven end-to-end contract |
+| Bitfrost packet transport | EXPERIMENTAL, not retrieval authority | 20 | transport exists, authority role is not proven |
+| POS tagging / formal NER | NOT_PROVEN production lane | 0 | no proven production lane |
+| Naive Bayes / logistic classifier | NOT_PROVEN wired (appropriate next baseline) | 5 | baseline direction exists, wiring not proven |
+| XGBoost ranking | prior eval artifacts exist, NOT unified with entity classification | 25 | artifacts exist, not unified into a canonical promotion path |
+| DSPy / GEPA | NOT production-wired | 0 | research-only |
+| JEPA / Mamba / Titans | research-lane only | 0 | research-only |
+| WebGPU / LiteRT.js inference | prototype, not canonical retrieval path | 15 | prototype-level only |
+| IndexedDB browser cache | useful, not canonical durable storage | 20 | useful cache, not durable authority |
 
 ### Explicit ownership rules recorded
 
@@ -896,7 +900,7 @@ The highest-value next addition is **not** Titans/Mamba/RL — it's the versione
 
 ## GS1.43 - graphify:daily rerun FAILED: real Postgres deadlock in materialize-feature-envelopes (2026-08-02)
 
-`npm run graphify:daily` was relaunched this session (background) to refresh the stale `codebase-graph.json` (still Jul 4, ~29 days old at the time). It ran for real — progressed through provenance dry-run, summary-envelope build/queue stages — then **failed with a genuine error**, not a timeout or a stale-cache issue:
+`npm run graphify:daily` was relaunched this session (background) to refresh the stale `codebase-graph.json` at the time of that run. It ran for real — progressed through provenance dry-run, summary-envelope build/queue stages — then **failed with a genuine error**, not a timeout or a stale-cache issue:
 
 ```
 [phase8-fanout] [5/9] → atlas:materialize:feature-envelopes:apply
@@ -949,6 +953,95 @@ Relaunched `graphify:daily` a third time with the GS1.43 shared-advisory-lock fi
 - [x] **Deadlock fix PROVEN, not just diagnosed**: stage 5/9 (`materialize-feature-envelopes.mts --apply`) completed cleanly — `✅ FEATURE ENVELOPE MATERIALIZATION COMPLETE`, 178.4s, all 10,000 packets. Stage 6/9 (`backfill-latent-vectors.mjs --apply`, the other half of the shared lock) then progressed cleanly past 117,000+ sequential Postgres writes with zero deadlocks — the exact failure mode from GS1.43 is confirmed closed.
 - [x] **New bug #1 found and fixed — OOM in `backfill-latent-vectors.mjs`**: the run crashed with a genuine V8 `JavaScript heap out of memory` late in stage 6/9 (parent `phase8-fanout` orchestrator misreported this as a step timeout — 2040.7s — rather than surfacing the real crash; that reporting gap is flagged, not fixed). Root cause, confirmed by reading the code: after encoding ~106K latent vectors, the script (a) never released `vecs` (raw 768-dim Float32 vectors for every point) or `pointsMap` even though neither is referenced again past the encode loop, and (b) called `JSON.stringify(latentArtifact, null, 2)` **twice independently** on the same ~106K-entry object to write two byte-identical mirror files — doubling peak string-allocation memory for no reason, on top of the still-retained `vecs`/`pointsMap`. Default V8 heap limit here is already 8GB (Node auto-sizes against the machine's 32GB RAM), so this is a real memory-inefficiency bug, not an undersized limit. **Fixed**: set `vecs = null; pointsMap = null;` immediately after the encode loop (both were declared with `let`, safe to null), and stringify once into `latentArtifactJson`, reused for both `writeFileSync` calls. Verified with `node --check` (syntax) and a live `--dry-run` (500-vector sample) — ran cleanly, wrote both mirror files, no behavior change to output shape.
 - [x] **New bug #2 found and fixed — `dev:gpu`'s Vite instance 500'd on every page**: separately, launched `npm run dev:gpu` per operator request. Every page — including SvelteKit's own error page — returned 500 with `TypeError: css is not a function` at `@sveltejs/kit/runtime/server/page/render.js:286`. Root cause: `@sveltejs/vite-plugin-svelte@4.0.4` was installed, but its `peerDependencies` require `vite: ^5.0.0`; this project runs `vite@6.4.1`. Confirmed via `npm view <pkg>@<version> peerDependencies` across 4.0.4 (`^5.0.0`), 5.1.1 (`^6.0.0`, matches installed vite + svelte exactly), and 6.2.4 (`^6.3.0 || ^7.0.0`, too new). **Fixed**: bumped `package.json`'s declared range from `^4.0.0` to `^5.1.1`, ran `npm install`, cleared the stale `.svelte-kit` cache. Verified live: fresh `vite dev` instance now returns `GET / → HTTP 200` in ~180ms with real HTML, zero errors in the log since the fix landed (previously 500 on every single request). An initial "Pre-transform error: An impossible situation occurred" line appeared once during the very first cold request after the fix and did not recur or affect subsequent requests — treated as a one-off dev-server warm-up artifact, not a regression, since every request since has been clean 200s.
-- [ ] NOT re-run this session: a fourth full `graphify:daily` end-to-end pass with the OOM fix in place (only a bounded `--dry-run` of the specific fixed script was verified). Next bounded step for a fresh session: relaunch `npm run graphify:daily` in full and confirm `codebase-graph.json`'s mtime actually advances past `Jul 4` this time — that would be the first fully clean, uninterrupted run of this session across 4 attempts.
+- [x] Re-run this session (next session, per GS1.45 below): `graphify:daily` was relaunched multiple times. Stage 5/9 (`materialize-feature-envelopes.mts`) is now proven clean and incremental. Stage 6/9 hit a **new, different** OOM — see GS1.45. `codebase-graph.json` has still NOT advanced past its stale mtime.
 - [ ] NOT investigated: the `phase8-fanout` orchestrator's timeout-vs-crash misreporting (a real crash was logged as "timed out" rather than "failed/crashed") — separate, smaller diagnostic-quality gap, flagged only.
 - [ ] NOT investigated: whether `dev:gpu`'s Ollama-embedding-timeout noise seen mid-investigation (`duration_ms=8000+, error=aborted due to timeout`, repeated) was caused by resource contention from the concurrently-running `graphify:daily`/`backfill-latent-vectors.mjs` GPU work, or is an independent, pre-existing issue — not reproduced/tested in isolation this session.
+
+## GS1.45 - Materialize-feature-envelopes made incremental; new Step-6 OOM found; latent backfill correctly BLOCKED on identity lineage; wrapper endsPattern bug fixed (2026-08-03)
+
+**Incremental skip-guards added** (operator: "if it's already indexed we don't need to reindex them"):
+- [x] `materialize-feature-envelopes.mts`: added `WHERE feature_envelope IS NULL OR feature_envelope->>'feature_schema_version' IS DISTINCT FROM $2` to the fetch query. Previously the script had **no** skip guard at all — `ORDER BY packet_id LIMIT 10000` with no `WHERE` meant every run reprocessed the exact same first 10,000 packets by ID order, forever, and the other ~51,000 packets never got an envelope in any prior run. Live-verified: a clean run now reports `Fetched 10000 packets needing refresh` and applies cleanly in ~93s.
+- [x] `backfill-latent-vectors.mjs`: found pre-existing, unwired `loadCurrentLatentKeys`/`shouldSkipCurrentLatent` helpers from an earlier session (epoch-aware, matched by `qdrant_point_id`/`packet_key`/`source_ref`). Fixed a real bug in the partial wiring — `pg_reasons.skipped++` was referenced (Step 4) before `pg_reasons` was declared (Step 6), a guaranteed TDZ crash the first time anything was actually skipped. Also found and fixed a second bug: entries matching `shouldSkipCurrentLatent` were skipped entirely (never added to `latentIndex`), so when everything is already current, the JSON latent-index file written for `train-som-20x20.mjs` ends up with **zero entries**, crashing that downstream stage (`Latent index contains no valid latent_64 vectors`). Fixed by always populating `latentIndex` (from a fresh encode) and using a separate `skip_write` flag to skip only the redundant Postgres UPDATE, not the index-file population.
+
+**Duplicate-process cleanup** (found live, not hypothetical): at one point 3 separate `graphify:daily` process trees and 3 separate `dev:gpu`/Vite instances (ports 5173/5174/5175) were running concurrently, racing for the same `atlas_packets` advisory lock — new instances kept spawning from `runOn: folderOpen` VS Code tasks re-triggering on new windows. All duplicates killed; single clean instances relaunched. Root-caused to GS1.45's wrapper endsPattern bug below.
+
+**New Step-6 OOM found (different from GS1.44's)**: GS1.44's OOM was proven fixed when the scenario is "almost everything already current" (0 real Postgres writes needed). A subsequent clean run needed genuine writes for ~98,000 of 105,761 packets (only 7,520 were already current) and crashed with `JavaScript heap out of memory` at 246.6s — much faster and under different conditions than the GS1.44 crash. Native stack trace only, no JS-level frame. `--max-old-space-size=12288` was applied to `atlas:phase16:latent:apply` as a quick mitigation (per operator decision), but **operator correctly overrode this before a 10K-write test ran**: raising the heap is a diagnostic mitigation, not a fix, and could just delay the same failure.
+
+**Memory instrumentation added and run** (`--mem-diag` flag, `scripts/atlas/backfill-latent-vectors.mjs`): heap/RSS snapshots before Qdrant fetch, after fetch, after encode, every 10th Step-6 batch, and at exit. Results, standalone (not inside the full chain):
+- 1,000 forced real writes (`--force-refresh`): heap flat ~26-36MB, RSS flat ~570-583MB. No growth.
+- 5,000 forced real writes: heap peaked 73.4MB then GC'd back to ~31.7MB and stayed flat through batch 41/50 (8,316 rows updated via multi-key fanout). No linear growth pattern.
+- **Conclusion**: this script does not show a leak at these scales in isolation. The ~98K-row OOM inside the full chain is more likely full-chain/system memory contention (concurrent `dev:gpu`, Vite, GPU LLM inference, embedding server all resident) than a per-row retention bug in this script — NOT_PROVEN either way, flagged for a future isolated 25K+ fixture run.
+- **Correction to an earlier in-session claim**: initially reported "8,316 new lineage-ambiguous rows are now live" — **wrong**. `atlas_packets` `latent_64`-populated row count is unchanged at 7,520 (identical to the pre-session baseline). The force-refresh writes overwrote already-populated rows (multi-matched via the packet_key/source_ref fallback chain, hence "rows updated" counters exceeding the actual distinct-row count), not new rows. Confirmed via `max(updated_at)` vs `now()` and a live count query.
+
+**Operator correction: production latent backfill is premature regardless of memory behavior.** Even a perfectly memory-bounded backfill would write 105,000 lineage-ambiguous vectors, because GS1.9-GS1.12's identity prerequisites are still `NOT_PROVEN`/`IN_PROGRESS`. New LAT-gate framework recorded (all currently unproven except where noted):
+- Identity gates: `LAT1_PACKET_KEY_CANONICAL` `LAT2_PACKET_SOURCE_VERSION_JOIN` `LAT3_SYMBOL_VERSION_IDENTITY` `LAT4_QDRANT_POINT_JOIN_BACK` `LAT5_STALE_SOURCE_REJECTION` `LAT6_WORKSPACE_REVISION_REJECTION`
+- Representation gates: `LAT7_REPRESENTATION_ID_DEFINED` .. `LAT13_IDEMPOTENT_SKIP_GUARD`
+- Parser/AST gates: `LAT14_PARSER_MANIFEST_ALIGNMENT` .. `LAT18_CHANGED_SYMBOL_INVALIDATION`
+- Operational gates: `LAT19_BOUNDED_BATCH_MEMORY` .. `LAT25_REAL_WRITE_FIXTURE_25K`
+- Current classification: `PRODUCTION_LATENT_BACKFILL_READINESS: BLOCKED`, `BOUNDED_DIAGNOSTIC_FIXTURE_READINESS: READY`.
+- `latent_64`/`latent_128` are NOT interchangeable representations and must not be treated as one — each needs its own `representationId` (`ae_latent_64`, `ae_latent_128`, `topology_128`, `rff_128`), producer/revision, dtype/dimensions/byte-order, and a canonical lineage record (`LatentRepresentationRecord`) — generic JSON `metadata` is not sufficient lineage. `atlas_packets.latent_64` should be a hot convenience field only; canonical lineage belongs in a dedicated `atlas_representation_records` table (not yet built).
+
+**Bounded, no-production-mutation fixture built and run twice** (`scripts/atlas/latent-identity-fixture.mjs`, new file): implements the operator's exact 10-step spec. Writes only to a dedicated scratch table `atlas_latent_fixture` (not Drizzle-tracked, never `atlas_packets`). Live results, 1,000 packets:
+- Run 1: `selected=1000 canonical_packet_count=1000 source_version_joined_count=0 symbol_version_joined_count=0 generated=1000 roundtrip_bytea=1000 digest_match=1000 second_run_skipped=0 peak_heap_mb=23.6`
+- Run 2 (idempotency proof): identical inputs → `second_run_skipped_count=1000 new_or_updated_this_run=0` — correct skip-on-unchanged-digest behavior proven.
+- **Honest finding**: `source_version_joined_count: 0` across all 1,000 packets — the only live source-revision proxy (`atlas_ast_nodes.source_revision`, joined via `source_ref_key`) matched **none** of them. This is real, reproduced evidence that GS1.10's `NOT_PROVEN` classification is correct, not overly cautious.
+- Confirmed live: `atlas_packets.embedding` is `vector(768)`, **61,659/61,659 rows non-null** — this contradicts a stale claim elsewhere in this repo's CLAUDE.md ("embedding column is vector(768), ALL NULL, deprecated, do not use"). Flagged as a doc-vs-reality gap, not fixed in this pass (out of scope — CLAUDE.md edits weren't requested).
+- `LATENT_64_RUNTIME_SMALL_FIXTURE`: upgraded from `PARTIAL_PROVEN` to `PROVEN` for the mechanical leg (encode/serialize/deserialize/digest/idempotent-skip) only. Identity leg (`LAT2`/`LAT3`) remains `NOT_PROVEN`.
+
+**G1 fixed: wrapper background-task endsPattern bug** (`scripts/startup/run-graphify-daily-startup.mjs`, `.vscode/tasks.json:2038`). The `isBackground:true`, `runOn:folderOpen` task's `problemMatcher.background.endsPattern` is `"graphify:daily complete"` — but the script only ever printed `"graphify:daily partial"`, **never** the literal string `"complete"`, on any of its 4 exit paths (success, fallback-success, no-fallback-failure, fallback-failure). VS Code's background-task matcher therefore could never detect real completion, on success or failure — a likely contributor to the duplicate-process problem found and killed earlier this session. **Fixed**: added `console.log('graphify:daily complete')` immediately before all 4 `process.exit()` calls. Syntax-verified (`node --check`); **not yet exercised end-to-end** (no fresh full chain run attempted after this fix, given how much production-write/pipeline-runtime risk this session already carried) — status `WIRED`, not `RUNTIME_SMOKE_PROVEN`.
+
+- [ ] NOT done: `atlas_representation_records` canonical lineage table (design only, referenced above).
+- [ ] NOT done: completing GS1.9-GS1.12's read-only identity audit (the actual gate blocking `PRODUCTION_LATENT_BACKFILL_READINESS`).
+- [ ] NOT done: 25,000-row real-write memory fixture (`LAT25`) — only 1K/5K standalone real-write memory tests were run; matches were force-refreshed, so genuinely new-row coverage vs. overwrite-only coverage at 25K is still unverified.
+- [ ] NOT done: end-to-end runtime proof of the G1 endsPattern fix (relaunch, confirm VS Code no longer shows the task as permanently "background-active").
+- [ ] NOT done: `CODEBASE_GRAPH_REFRESH` remains `NOT_PROVEN` — `codebase-graph.json` mtime has not advanced this session across 5+ `graphify:daily` attempts.
+- [ ] Terminology correction requested but not found to be an actual error: operator asked to correct any OpenSpec use of "RFF" that actually means "RRF" (Reciprocal Rank Fusion vs Random Fourier Features). Checked this session's 3 newly-written OpenSpec proposals (`parent-atlas-okf-knowledge-layers`, `parent-atlas-gpu-sidecar-patch-tournament`, `parent-atlas-kv-cache-adaptation-research`) and GS1.42 above — none misuse the terms; `rff_128` is already correctly scoped as an offline classifier-kernel experiment, distinct from Qdrant's RRF hybrid-fusion capability.
+
+## GS1.46 - Documentation-only pass: folded consolidated status doc into existing OpenSpec files (2026-08-03)
+
+Operator supplied a large consolidated "Parent Atlas Workstation TODO" (21 sections: representation contract, workstation validation gaps, graph freshness, canonical GDS architecture, snapshot materialization, named projection, BFS traversal, NetworkX/GDS parity, PageRank persistence, retrieval registry, reduce/synthesis/ranking pipelines, RTX acceleration plan, Qdrant mirror drift, MCP proof suite) plus corrections (RAPIDS proven, PageRank aligned+251,613 nodes, recommendation lifecycle fixed+new vocabulary bug found, RRF provenance fix, patch tournament GS1.41 accepted) plus a Kafka/SpecKit/GSD repository-layout proposal. Per operator's explicit choice, this pass was documentation-only — no new code.
+
+- [x] Folded the corrected RAPIDS/PageRank/patch-tournament status into `openspec/changes/parent-atlas-gpu-sidecar-patch-tournament/proposal.md` + `tasks.md` (substantial rewrite — that proposal was authored earlier this session before the fuller status was known, and its "still NOT_PROVEN" GPU-sidecar claims were already stale by the time this doc arrived).
+- [x] Added the required exact-KNN `ExactKnnRequest`/`ExactKnnResponse` contract and the RAPIDS-4..8 bounded next-slice ordering to that same proposal.
+- [x] Flagged (not fixed) the newly-found `promote_recommendation` state-vocabulary conflict (recommendation status vs. `semantic_lifecycle_events` lifecycle vocabulary) as needing its own future OpenSpec change.
+- [x] Created `openspec/changes/parent-atlas-kafka-projection-initiative/` as a minimal ownership-split stub (Spec Kit=intent, OpenSpec=bounded changes, GSD=execution, docs=evidence; shared `initiative_id: PA-KAFKA-001` identity fields) — explicitly not the full Kafka technical spec, which belongs in Spec Kit's `specs/` per the operator's own instruction not to duplicate the same content across all three tools.
+- [x] Checked the "token remapping" / "4×6 feature matrix" content in the consolidated doc against what's already recorded — no new information beyond what GS1.42 above already captures (`TokenSpanMap`, `FeatureMatrix4x6`); no edit needed there.
+- [ ] NOT done (out of scope for this pass, per operator's "documentation-only" choice): RAPIDS-4..8 exact-KNN implementation, GS1.41 seam expansion, the new recommendation-lifecycle-vocabulary OpenSpec change itself, any Spec Kit/GSD scaffolding for the Kafka initiative, relaunching `graphify:daily`.
+
+## GS1.47 - Read-only latent identity audit built and run; feature-envelope keyset pagination fixed (2026-08-03)
+
+Operator directive: do not patch or rerun the production latent writer. Build a strictly read-only identity/representation audit instead; the feature-envelope incrementality work may continue independently but needed keyset pagination.
+
+**`scripts/atlas/audit-latent-representation-identity.mjs` (new)** — implements the operator's full 10-section, 14-gate spec. Wraps every query in one `BEGIN TRANSACTION READ ONLY … ROLLBACK`; rejects any SQL containing `UPDATE|INSERT|DELETE|CREATE|ALTER|DROP|TRUNCATE|REFRESH|MERGE|CALL` before execution. Confirmed live: `atlas_representation_records`, `graphify_files`, `graphify_symbols` do NOT exist (verified via `information_schema`, not assumed). Run against a 1,000-row deterministic sample (`WHERE latent_64 IS NOT NULL ORDER BY packet_id LIMIT 1000`):
+
+- `LINEAGE_MISSING: 1000/1000` — every sampled row fails full lineage proof, exhaustively, not as a sampling artifact.
+- **New finding**: `atlas_packets.tree_node_id` (`text`) is NOT UUID-formatted in 661/1000 sampled rows (content-hash-shaped strings) while `atlas_tree_nodes.node_id` is a real `uuid` column — an unreconciled identity scheme distinct from GS1.10's already-known provisional-identity finding. The naive `::uuid[]` join throws `22P02`; fixed by casting the uuid side to text instead.
+- **New finding**: bounded Qdrant scroll (250 points, `codebase_chunks_768`) — **0/250 payloads carry `packet_key`** (all classified `MISSING_PACKET_KEY`), though 250/250 carry `source_ref` and `representation_id`. The writer's fallback match order (`qdrant_point_id` → `packet_key` → `source_ref` → JSONB containment) never requires or verifies `source_revision`/`workspace_revision`.
+- `source_version_joined_count: 0/1000` — reconfirms the 1,000-row identity fixture's earlier finding at 4x the sample size.
+- `bytea_contract`: 1000/1000 uniform 256-byte length (consistent with 64×float32), but explicitly `PARTIAL_PROVEN` not `PASS` — dtype/byte-order are asserted from reading the writer's source code, not derived from the bytes or any producer-revision metadata (none exists).
+- Reports: `docs/reports/latent-representation-identity-audit-2026-08-03.{json,md}`.
+- All 14 `LAT_AUDIT*` gates recorded; `LAT_AUDIT14_ZERO_PRODUCTION_MUTATIONS: PASS` (transaction rolled back, confirmed in output).
+
+**`materialize-feature-envelopes.mts` keyset pagination (fix)** — replaced the plain `feature_envelope IS NULL` filter with `WHERE packet_id > $after AND ($forceRefresh OR feature_envelope IS NULL OR schema_version mismatch)`, keyset-paginated by `packet_id` in both normal and `--force-refresh` modes. `--force-refresh` previously had no forward-progress mechanism at all — every invocation rewrote the same first `fetchLimit` rows forever. Now persists a cursor (`.tmp/materialize-feature-envelopes-force-refresh-cursor.json`) so successive force-refresh runs advance; exhaustion (a short page) resets the cursor to restart from the beginning next time rather than stopping forever. Receipt (`docs/reports/materialize-feature-envelopes-receipt.json`) now includes `first_packet_id`/`last_packet_id`/`next_after_packet_id`/`selected`/`updated`/`remaining`/`force_refresh`.
+- **Bug found and fixed during testing**: the first implementation conditionally omitted SQL text referencing `$2`/`$1` when `force_refresh` was true, leaving those params unreferenced in the query — Postgres error `42P18: could not determine data type of parameter`. Fixed by always referencing every parameter and short-circuiting via a `$N::boolean OR …` clause instead of conditionally interpolating SQL fragments.
+- Live-verified: normal dry-run receipt correct (`remaining: 11459`); force-refresh run 1 → cursor persisted; force-refresh run 2 → confirmed resumed from the persisted cursor (`packet_id > 'd8f05ace-...'`), not restarted from the beginning.
+- Checked for the "duplicated `FEATURE_SCHEMA_VERSION` comment line" the operator flagged — not present in current code (single instance at line ~73, one reference comment at ~162); already resolved by an earlier pass this session, no further action needed.
+
+- [x] All of the above — read-only audit built/run, keyset pagination fixed/live-tested, comment-duplication checked.
+- [ ] NOT done, explicitly held per operator's stop boundary: `graphify:daily`, `backfill-latent-vectors.mjs --apply`, `--force-refresh` on the latent writer, any further `atlas_packets.latent_64` writes, `atlas_representation_records` writes, deletion/rewrite of the existing 7,520 rows, `latent_128` production, Qdrant/Neo4j refresh.
+- [ ] NOT done: the 9-step post-audit execution order (stable identity contracts → `ae_latent_64` versioned representation → dtype/byte-order/serialization definition → producer lineage → canonical packet-revision writes replacing the source_ref/qdrant fallback chain → staleness guards → rollback-only 1K fixture → fixture-table idempotency → 1K/5K/10K/25K benchmarks) — all deferred pending operator review of this audit's findings.
+
+## GS1.48 - Workstation graph retrieval / synthesis / RTX status reconciliation (2026-08-03)
+
+Operator supplied the latest workstation TODO record for the graph retrieval lane. This pass is documentation-only: it records the new verified status and the next bounded ordering without reopening any of the completed RAPIDS/PageRank proofs.
+
+- [x] Representation and semantic contract are current: `REPRESENTATION_LINEAGE_COLUMNS`, `REPRESENTATION_READ_VALIDATION`, `SEMANTIC_768_ENDPOINT`, `SEMANTIC_768_REPAIR_ALIAS` all `PASS`; `LEGACY_384_ACTIVE_WRITES` is `REJECTED_OR_RETIRING`.
+- [x] Keep the six nullable representation lineage columns explicit: `source_representation_id`, `source_dimension`, `projection_representation_id`, `projection_dimension`, `encoder_revision`, `som_revision`.
+- [x] Keep analytical lineage separate from representation lineage: `graph_revision`, `pagerank_revision`, `pagerank_score`, `community_revision`, `community_id`, `kmeans_revision`, `kmeans_cluster_id`, `centroid_distance`.
+- [x] Canonical TRACE retrieval remains fail-loud on empty content: `KB_TRACE_SEARCH_ANN`, `KB_TRACE_SEARCH_CANONICAL_COLLECTION`, `KB_TRACE_SEARCH_CANONICAL_JOIN`, `KB_TRACE_SEARCH_NONEMPTY_CONTENT`, and `KB_TRACE_SEARCH_FAIL_LOUD` are all `PASS`.
+- [x] Neo4j wiring remains live: `NEO4J_URI_WIRING`, `NEO4J_USER_PASSWORD_WIRING`, `NEO4J_STARTUP_VALIDATION`, `NEO4J_BOLT_DRIVER`, `NEO4J_INTEGER_PARAMETER_FIX`, and `GRAPH_PAGERANK_TOP_BACKEND_CALL` are `PASS`.
+- [x] Workstation validation remains split correctly: `WORKSTATION_STATUS`, `SUMMARY_PROMOTION_BOUNDED`, and `WORKSTATION_SMOKE_FAIL_STALE_TEST_ONLY` remain distinct; `FEATURE_METADATA`, `QDRANT_PAYLOAD`, `QDRANT_COMPONENT_PARITY`, `BITFROST_SEMANTIC_CACHE`, and `CANONICAL_SPINE` still need repair or rebuild.
+- [x] Current counts to preserve in the board: `atlas_packets 61,659`, `atlas_packet_registry 58,324`, `atlas_summary_layers 18,423`, `packet summaries 6,885`, `populated summary layers 7,640`, `codebase_chunk_index 52,417`, `atlas_feature_envelopes 58,365`.
+- [x] `graphify:daily` remains not fully complete, but the fresh graph artifact is now proven: `GRAPHIFY_DAILY_STARTED: PARTIAL`, `GRAPHIFY_DAILY_COMPLETED: NOT_PROVEN`, `GRAPH_SNAPSHOT_FRESH: PASS`; `DEEP_AUDIT` remains `NOT_PROVEN` pending a full daily run.
+- [x] Latest OpenSpec update ordering now queued as: `PATCH_TOURNAMENT_SPEC RECEIVED_NOT_STARTED`, `PATCH_TOURNAMENT_BOUNDED_SEAM QUEUED`, `GRAPHIFY_RECOVERY_PROOF_LADDER PASS`, `GRAPH_SNAPSHOT_FRESH PASS`, `GRAPHIFY_DAILY_COMPLETED NOT_PROVEN`, `DEEP_AUDIT NOT_PROVEN`.
+- [ ] NOT done: changing the representation contract, dropping the dead columns, or treating the 67MB graph snapshot as current topology proof.

@@ -320,7 +320,7 @@ dependency graph, sourceRefs, startup context, package scripts.
   - Qdrant wiring claim was overstated for this route; payload fields were verified live in Qdrant, but this route is not yet doing live Qdrant search or reconciliation dispatch
 - [x] Thread `alias_id` through the prompt listener log entries as a stable cross-store alias field — `STATICALLY_PRESENT` only (updated July 26, 2026)
   - `src/lib/server/retrieval/prompt-listener.ts` accepts `aliasId` and threads it through trace/log output
-  - Live database evidence does not support `alias_id` as a durable cross-store identity today: `parent_atlas_documents` has no `alias_id` column in the running database, and `task_semantic_packets` is not present live
+  - Live database evidence on 2026-07-26 did not support `alias_id` as a durable cross-store identity at that time: `parent_atlas_documents` had no `alias_id` column in the running database, and `task_semantic_packets` was not present live
   - `aliasId` should be treated as request correlation only until the live identity contract exists end to end
 - [x] Add retrieval-loop sourceRef/feature_id/alias_id reconciliation into the prompt listener and recommendation score fusion path — `TEST_VERIFIED` / `RUNTIME_BLOCKED` (updated July 26, 2026)
   - `src/lib/server/retrieval/retrieval-loop-reconciliation.ts` was rewritten to emit explicit warning states instead of silently merging conflicts
@@ -333,10 +333,10 @@ dependency graph, sourceRefs, startup context, package scripts.
 - [x] Wire Redis packet cache with TTL 300s and key `ace:retrieval:packet:{queryHash}` ✅
 - [x] Wire Langfuse trace on rank + compress runs ✅
 - [x] Fuse `retrieval-pass` output into recommendation scoring — `detectImportErrors()` wired, 131 todo-queue items feed into recommendations ✅
-- [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required
-- [ ] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema
-- [ ] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema
-- [ ] Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`)
+- [ ] Optional mirror only: export aliases to `.opencode/recommendations.json` + `.opencode/recommendations-summary.md` if a flat compatibility surface is still required (completeness 10/100; compatibility only, not canonical)
+- [x] Upgrade Phase 17 PyTorch Feature Extractor script and Python implementation with robust fallbacks and correct schema (completeness 100/100; already recorded below as complete)
+- [x] Upgrade Phase 18 XGBoost Reranker script and Python implementation with robust fallbacks and correct schema (completeness 100/100; already recorded below as complete)
+- [x] Implement Phase 19 lane completion hook (`scripts/atlas/phase-lane-completion.mjs`) (completeness 100/100; already recorded below as complete)
 
 ---
 
@@ -346,24 +346,25 @@ dependency graph, sourceRefs, startup context, package scripts.
 **Scope**: full repo, not just `/src`; use `repo-root-atlas`, `docs/graph/`, `memory/exports/`, `scripts/`, `sveltekit-frontend/`, `docs/`, and the existing directory cards as analysis roots.
 **Hidden roots**: include gitignored workspace roots such as `.opencode/`, `.tmp/`, `.cache/`, `.svelte-kit/`, `.github/`, and `.vscode/` in the traversal surface.
 **Status**: dry-run analysis is ready; apply/archive stays blocked until the drift audits and archive reports agree.
+**Completeness**: dry-run analysis 25/100; apply/archive 0/100 until the drift audits agree.
 
 **Tasks**:
 
 **Dry-run analysis**
 - [x] Use `sveltekit-frontend/src/lib/server/indexer/ast-chunker.ts` as the primary structural chunking lane for file-role analysis.
 - [x] Use `sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts` as the LangExtract summary / rerank bridge for structural features.
-- [ ] Wire `ast-grep` into the directory analysis pipeline for codebase pruning.
+- [ ] Wire `ast-grep` into the directory analysis pipeline for codebase pruning. (completeness 20/100)
   - `sveltekit-frontend/scripts/tools/run-ast-grep.mjs`
   - `sveltekit-frontend/scripts/index/ast-grep-map.mjs`
   - `sveltekit-frontend/scripts/atlas/phase1-ast-grep-extraction.mjs`
   - `sveltekit-frontend/scripts/atlas/phase1.5-ast-grep-extraction.mjs`
   - `sveltekit-frontend/scripts/atlas/phase2a-ast-grep-synthetic-key-fix.mjs`
   - fallback-only: `src/lib/server/atlas/indexing/tree-sitter-chunker.ts`
-- [ ] Use directory-role analysis plus AST maps to separate missing features from redundant features.
-- [ ] Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.
-- [ ] Chunk the huge ripgrep search dumps (`docs/reports/rg_turbovec.txt`, `docs/reports/rg_napi.txt`) into parent-atlas-ready packets keyed by `title_id`, `feature_id`, and `sourceRef`; treat the raw `.txt` dumps as generated evidence, not source.
-- [ ] Use the Obsidian-vault mirror as a downstream indexing surface only: ingest source files first, then pull the minimum mirror summaries needed to advance `next_steps/active/` and the parent atlas.
-- [ ] Use LangExtract to summarize source files, parent-atlas packets, and selected Obsidian mirror summaries into completion notes before archiving any stale generated tree.
+- [ ] Use directory-role analysis plus AST maps to separate missing features from redundant features. (completeness 15/100)
+- [ ] Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically. (completeness 15/100)
+- [ ] Chunk the huge ripgrep search dumps (`docs/reports/rg_turbovec.txt`, `docs/reports/rg_napi.txt`) into parent-atlas-ready packets keyed by `title_id`, `feature_id`, and `sourceRef`; treat the raw `.txt` dumps as generated evidence, not source. (completeness 10/100)
+- [ ] Use the Obsidian-vault mirror as a downstream indexing surface only: ingest source files first, then pull the minimum mirror summaries needed to advance `next_steps/active/` and the parent atlas. (completeness 10/100)
+- [ ] Use LangExtract to summarize source files, parent-atlas packets, and selected Obsidian mirror summaries into completion notes before archiving any stale generated tree. (completeness 10/100)
 
 **Apply / archive gate**
 - [ ] Keep the repo minification split explicit: SeaweedFS (cold originals), Postgres/Qdrant/Neo4j/Redis (warm packets and indexes), and only completion notes plus active packet manifests in the repo.
@@ -412,7 +413,7 @@ dependency graph, sourceRefs, startup context, package scripts.
   - `path_map` (3270 rows, indexed by file_path/feature/directory/import_errors) ✅
   - `feature_todo_queue` (131 rows, indexed by status/priority/enqueued_at) ✅
 - [x] Keep the live `task_semantic_packets.alias_id` path aligned with `feature_id` and `sourceRef` provenance.
-  - `alias_id` column confirmed present in `task_semantic_packets` ✅
+  - Later schema check confirmed `alias_id` column present in `task_semantic_packets` ✅
 - [x] Wire DuckDB join outputs into Postgres mirror tables for atlas chunks, profile cards, and retrieval events.
   - `mapreduce-path-join.mjs` produces path-map.json + patches DuckDB card_enriched ✅
 - [x] Wire the NES packet writer through ACE assembly so provenance is cached and indexed as immutable packet tuples in Redis/Bitfrost before compression.
@@ -773,7 +774,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `scripts/atlas/compute-pagerank-neo4j.mjs`
     - `scripts/atlas/compute-pagerank-networkx.mjs`
     - `scripts/atlas/train-som-20x20.mjs`
-    - `scripts/atlas/train-kmeans-384.mts`
+    - `scripts/atlas/train-kmeans-384.mts` (legacy migration evidence only; not an active representation lane)
     - `scripts/atlas/sync-community-from-neo4j.mjs`
     - `sveltekit-frontend/src/lib/server/topology/pagerank-contract.ts`
   - [x] Confirm existing ontology / packet / HyperRAG seams already exist in-repo before adding new semantic execution layers:
@@ -822,7 +823,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - live search wrapper: `sveltekit-frontend/src/mcp/atlas_embedding_tools.ts`
     - Qdrant public dense wrapper: `sveltekit-frontend/src/lib/server/vector/qdrant-manager.ts`
     - active context reader: `sveltekit-frontend/src/mcp/engram_tools.ts`
-    - current proof state: `codebase_chunks_384_hybrid` and `codebase_chunks_768` are reference-only diagnostics for this packet proof, and the HyperRAG exact-match path now resolves the same packet key instead of timing out
+    - bounded proof state: `codebase_chunks_384_hybrid` and `codebase_chunks_768` are reference-only diagnostics for this packet proof, and the HyperRAG exact-match path now resolves the same packet key instead of timing out
   - [x] Carry the canonical packet identity spine through the ACE chunk resolver and Qdrant payload builder
     - `sveltekit-frontend/src/lib/server/ace/indexed-source-packet.ts`
     - `sveltekit-frontend/src/lib/server/ace/retrieval/evidence-lanes.ts`
@@ -879,9 +880,9 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - if tensor cache synthesis is needed, keep it behind the same packet identity contract and write only versioned projection artifacts; do not make PyTorch or GPU caching the source of truth
     - TurvoVec / SIMD / DiskANN are candidate acceleration lanes only; they should compare against the existing Qdrant + RRF path, not replace the canonical retrieval contract
     - the next recommendation prompt should consume sorted JSON results from the ranked packet set and attach `next_steps` / Kanban updates after the proof gate passes
-  - [ ] Align the feature-matrix contract so the system is not framed as only `384` versus `768`, but as a versioned multi-lane matrix
-    - Canonical dense semantic lane: `dense_768` / `embeddinggemma` full `768`
-    - Decomposed dense lane(s): bounded projections such as `dense_384` or domain-specific subspaces when explicitly versioned
+  - [ ] Align the feature-matrix contract around one active dense semantic lane and explicit non-semantic projections
+    - Canonical dense semantic lane: `semantic_768` / `embeddinggemma` full `768`
+    - Legacy dense lane(s): `dense_384` or other bounded projections only as migration-source evidence or explicitly versioned internal projections, never as active retrieval lanes
     - Latent routing lane: compressed `latent_64` for cuVS / centroid / SOM / prefilter work
     - Sparse lexical lanes: BM25 baseline and BM42 experimental lane
     - Structural feature lane: AST, tree-sitter, ast-grep, route/schema/import/call facts
@@ -967,14 +968,14 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `sveltekit-frontend/src/lib/server/ontology/packet-ontology.schema.ts`
     - HyperRAG packet route request/response schemas
   - [ ] Require feature-matrix decomposition and versioning to be explicit in contracts:
-    - `dense_768` = canonical native semantic representation, preserved for lineage, compatibility, and recall benchmarking
-    - `dense_384` = canonical online retrieval representation when projection lineage, normalization, and producer version are contractually defined
+    - `semantic_768` = canonical native semantic representation, preserved for lineage, compatibility, and exact-KNN benchmarking
+    - `dense_384` = legacy migration-source / superseded projection only; may exist for reconciliation and historical comparison, but not as an active retrieval representation
     - `latent_64` = routing / topology / clustering representation only
     - `topology_4` = reduced-space visualization or storage-order metadata only
     - token or view multivectors = bounded late-interaction rerank lane only
     - sparse vectors must remain named separately from dense vectors
     - topology metrics must never be stored as if they were semantic embeddings
-    - never concatenate `384` and `768` into a synthetic `1152`-dim semantic vector
+    - never concatenate legacy `384` migration vectors with `768` into a synthetic `1152`-dim semantic vector
     - fuse ranks or calibrated probabilities across lanes rather than raw coordinates across latent spaces
   - [ ] Define one bounded classifier matrix contract instead of ad hoc feature bags
     - path tokens
@@ -1043,7 +1044,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - focused tests for tree-sitter/ast-grep chunking and structural fact extraction
     - focused tests for SOM/KMeans/PageRank payload writeback and schema validation
     - runtime proof that topology/routing/classification signals remain distinct in ACE packets and retrieval payloads
-    - runtime proof that `dense_768`, any derived `dense_384`, `latent_64`, and sparse lanes are named, versioned, and consumed as separate representations rather than one ambiguous "AI index"
+    - runtime proof that `semantic_768`, any derived `latent_64`, sparse lanes, and legacy `384` migration artifacts are named, versioned, and consumed as separate representations rather than one ambiguous "AI index"
     - runtime proof that late-interaction multivectors remain bounded to reranking rather than replacing packet-level ANN
     - runtime proof that `.okf`, JSON Schema, and Zod validators agree on packet and fact admission rules
     - runtime proof that `title_id`, `tree_node_id`, `packet_key`, `uuid`, and `ulid` are generated and consumed consistently across TypeScript, Python, Postgres, Qdrant, and Neo4j
@@ -1074,7 +1075,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - Target packet: `packet:1f18437ee58f` (`sveltekit-frontend/src/routes/(app)/demos/+page.svelte`)
     - Live result from `scripts/atlas/phase108d-single-packet-proof.mts`: `PARTIAL_PROVEN`
     - Postgres and HyperRAG RPC are present, but Qdrant, Redis, and ACE are still missing for this packet
-    - `codebase_chunks_384_hybrid` remains reference-only and `codebase_chunks_384`/`codebase_chunks_768` do not yet provide the required packet-level parity
+    - `codebase_chunks_384_hybrid` remains reference-only migration evidence and `codebase_chunks_384` remains migration-source only; `codebase_chunks_768` does not yet provide the required packet-level parity
     - the bounded reconciliation ACE packet is readable through `atlas_get_active_context`, but it is still a coordination packet, not cross-store proof
     - `content_hash` / `workspace_revision` freshness and full cross-store lineage are still blocked until a packet with real Qdrant, Redis, and ACE presence is found
   - [x] Build and store a bounded reconciliation ACE packet for the next turn (`scripts/atlas/build-reconciliation-ace-packet.mts`)
@@ -1095,7 +1096,7 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - keep HyperRAG telemetry, replay traces, and health logging read-only and append-only
     - expand `feature_id` placement coverage across the remaining cards
     - increase replay export breadth so replay coverage rises above the current thin baseline
-    - finish AE/SOM provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
+    - finish legacy migration provenance wiring for `embedding_384 -> latent_128 -> latent_64 -> SOM 20x20`
     - keep glyph coverage separate from retrieval and SOM work
     - finish provenance parity and quality review
     - finish provenance UI and trust-tier editing
@@ -1113,14 +1114,14 @@ Use this file as the primary checklist. Reference-only notes may remain in suppo
     - `curl http://127.0.0.1:8100/health` returned `{"pgvectorConnected":true,"qdrantConnected":true,"redisConnected":true,"status":"healthy"}`
     - `docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 "RETURN 1 AS ok"` returned `ok`
     - `docker exec legal-ai-neo4j cypher-shell -u neo4j -p neo4j123 "CALL dbms.components() YIELD name, versions RETURN name, versions LIMIT 1"` returned `Neo4j Kernel 5.26.27`
-  - [ ] Add the `384` versus `768` parity benchmark gate before adding another ANN index
+  - [ ] Add the `semantic_768` exact-vs-approx parity benchmark gate before adding another ANN index
     - exact GPU brute-force top-k ground truth
     - Qdrant HNSW baseline
     - optional cuVS CAGRA benchmark
     - optional cuVS IVF Flat / IVF PQ benchmark
     - optional cuVS Vamana build benchmark for DiskANN-compatible artifacts
     - RRF versus calibrated score-fusion comparison
-    - explicit decision whether `dense_768` materially improves recall over `dense_384`
+    - explicit decision whether Qdrant HNSW meets recall and latency targets relative to the cuVS exact oracle over the same `semantic_768` corpus
   - [ ] Keep future acceleration lanes behind the same retrieval and identity contract
     - cuVS Vamana = build-time or benchmark lane
     - DiskANN = future SSD-scale artifact lane
@@ -1329,6 +1330,8 @@ User intent
 This section is the current gap list for the parent-atlas and codebase-indexing lane. It is intentionally separate from the completed phase summaries above so the remaining work stays visible.
 
 ### Open promotion work
+> Historical notes in this session report are not current proof unless they are restated in a later gate table or a fresh runtime audit.
+> The bullets below are the live promotion checklist; older status claims about sidecars or mirror schemas may be stale if they are not re-verified here.
 - [ ] Continue current-corpus offline ingest in bounded chunks until the full scan is promoted, not merely summarized.
   - Current scan scope is about 133k indexable files.
   - Promotion gates are green for bounded apply only.
@@ -1338,6 +1341,10 @@ This section is the current gap list for the parent-atlas and codebase-indexing 
     3. update promotion status
     4. widen only if reports remain green
   - Do not jump directly to broad/unbounded apply.
+- [x] Complete the bounded Graphify recovery proof ladder on the workstation path (completeness 100/100 for the bounded proof slice).
+  - `graphify_lock`, `feature_envelope`, `latent_diagnostic`, `latent_bounded`, `graph_artifact`, and `studio` now PASS in the proof runner
+  - the graph artifact mirror was refreshed through the fast indexer path
+  - `graphify:daily` remains intentionally not relaunched in the background
 - [ ] Keep `parent_atlas_documents` population separate from schema readiness.
   - Table and indexes exist.
   - Population must proceed through bounded promotion slices.
@@ -1354,9 +1361,9 @@ This section is the current gap list for the parent-atlas and codebase-indexing 
   - only persist fields the live table actually accepts
 - [ ] Recover or containerize the missing worker lanes required for the full offline path
   - RabbitMQ topology MCP
-  - TurboVec sidecar (transport fixed; all sidecars green on 2026-05-31)
-  - Engram embed sidecar (transport fixed; all sidecars green on 2026-05-31)
-  - LangExtract sidecar (transport fixed; all sidecars green on 2026-05-31)
+  - TurboVec sidecar (historical note: transport fixed in the 2026-05-31 report; re-verify before treating as current proof)
+  - Engram embed sidecar (historical note: transport fixed in the 2026-05-31 report; re-verify before treating as current proof)
+  - LangExtract sidecar (historical note: transport fixed in the 2026-05-31 report; re-verify before treating as current proof)
   - graphify / batch helpers that currently time out on large runs
 - [ ] Add a read/query path for NES chrom packets and recent hits by `sourceRef` / `featureId` / `queryHash`
   - keep the packet writer as-is

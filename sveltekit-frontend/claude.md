@@ -154,7 +154,7 @@ const res = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
 
 **Key Finding**: Schema is split:
 - `atlas_packets.embedding` → vector(768), ALL NULL (deprecated, ignore)
-- `codebase_chunk_index.content_embedding` → vector(384), 99.5% populated (use this)
+- `codebase_chunk_index.content_embedding` → vector(768), 99.5% populated (canonical)
 - Qdrant mirror size (40.5K) matches chunk_index populated (expected, not a gap)
 
 **Recovery Order**:

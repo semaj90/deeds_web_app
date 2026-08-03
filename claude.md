@@ -514,7 +514,7 @@ OpenCode
   - `docs/UNIFIED-RETRIEVAL-PIPELINE.md` (complete architecture reference)
   - `memory/unified-retrieval-wiring-complete.md` (session summary + checklist)
 - **Validation**: ✅ All 6 stages LIVE_PASS — test with `npm run retrieval:unified:validate`
-- **API**: GET/POST `/api/retrieval/unified?q=...&summarize=true` | Returns `{ candidates[], summary, timing, stages_completed[] }`
+- **API**: `/api/retrieval/unified?q=...` now 307-redirects to `/api/retrieval/search-unified?q=...&topK=...` (verified live 2026-08-03) — call `search-unified` directly. Live response shape is `{ query, topK, workflowState, workflowDag, preamble, topPacketKeys, packets, metadata, provenance, ace, shadow }`, not the `{ candidates[], summary, timing, stages_completed[] }` shape previously documented here. `provenance.retrievalSources` lists which lanes actually contributed (e.g. `postgres_trigram`, `qdrant_768`, `exact_symbol`) — useful for confirming the Qdrant lane is live.
 - **Next**: Wire Go Retrieval facade + implement RRF fusion (rg lexical + AST payload merge)
 
 ### 3. Canonical Evidence Ingestion Spine (End-to-End)
@@ -538,10 +538,10 @@ OpenCode
 **Before running `npm run graphify:daily`**, validate all services:
 
 ```bash
-# 1. Embedding Service (embeddinggemma:latest, 384-dim)
+# 1. Embedding Service (embeddinggemma:latest, 768-dim)
 curl -s http://127.0.0.1:11434/api/embeddings \
   -d '{"model":"embeddinggemma:latest","prompt":"test"}' | jq '.embedding | length'
-# Expected: 384
+# Expected: 768
 
 # 2. Synthesis Server (Gemma4 RotorQuant at :8090)
 curl -s http://127.0.0.1:8090/v1/models | jq '.data[0] | {id, context_length}'
@@ -573,8 +573,8 @@ docker exec legal-ai-redis redis-cli PING
 
 - ❌ **Do NOT use Ollama for synthesis.** Gemma4 RotorQuant at :8090 is canonical.
 - ✅ **Run graphify and DuckDB/RabbitMQ export scripts from the repo root** so spawned subprocesses and report paths resolve the same workspace. The scripts now align `cwd` internally and gzip large DuckDB exports automatically.
-- ✅ **Use `embeddinggemma:latest` for embeddings** (384-dim, Ollama :11434)
-- ✅ **All vectors must be 384-dim** (not 768, not 64-dim AE for ANN)
+- ✅ **Use `embeddinggemma:latest` for embeddings** (768-dim, Ollama :11434)
+- ✅ **All vectors must be 768-dim** (not 384, not 64-dim AE for ANN)
 - ✅ **Postgres is the truth** — all summaries and embeddings written to Postgres FIRST
 - ✅ **Redis invalidation AFTER Postgres** — never before
 - ❌ **Never call Gemma4 for embeddings** — only synthesis/summaries
@@ -693,13 +693,13 @@ docker system prune --volumes
 
 **atlas_packets** (58,304 rows)
 - Packet identity / metadata only
-- `embedding` column is vector(768), ALL NULL (deprecated, do not use)
+- `embedding` column is vector(768), legacy/non-canonical; do not use as the authoritative embedding source
 - Join key: `packet_key`, `source_ref`
 - Not the embedding source
 
 **codebase_chunk_index** (40,754 rows)
 - Canonical code chunks with embeddings
-- `content_embedding` column is vector(384), 99.5% populated (40,568 rows)
+- `content_embedding` column is vector(768), 99.5% populated (40,568 rows)
 - **This is the truth source for embeddings**
 - Mirrors to Qdrant `codebase_chunks_768` (40,568 points)
 
@@ -707,7 +707,7 @@ docker system prune --volumes
 - Mirror of codebase_chunk_index
 - Fast ANN search
 - Payload indexed by source_ref, feature_id, etc.
-- Rebuildable: `npm run atlas:qdrant:384:restore:apply`
+- Rebuildable: `npm run atlas:qdrant:768:restore:apply`
 
 **Why the gap?**
 - Atlas_packets = identity/metadata (58K)
@@ -718,30 +718,30 @@ docker system prune --volumes
 ### Dimension Policy (PROJECT CANONICAL)
 
 ```
-PROJECT_CANONICAL_EMBED_DIM = 384
+PROJECT_CANONICAL_EMBED_DIM = 768
 EMBED_MODEL                 = embeddinggemma:latest
-FULL_MODEL_DIM              = 768 (native, truncated to 384 for this project)
-INDEX_DIM_REQUIRED          = 384 (hard stop if different)
+FULL_MODEL_DIM              = 768 (native)
+INDEX_DIM_REQUIRED          = 768 (hard stop if different)
 ```
 
 **Hard stops:**
-- ❌ Do NOT write 384 vectors into 768 collection
-- ❌ Do NOT write 768 vectors into 384 collection
+- ❌ Do NOT write 384 vectors into the 768 canonical collection
+- ❌ Do NOT treat 384 as the canonical embedding dimension
 - ❌ Do NOT use AE 64-dim vectors for ANN search
-- ❌ Do NOT call 384 "EmbeddingGemma universal standard" (it's this project's choice)
+- ❌ Do NOT call 384 "EmbeddingGemma universal standard" (it is only a legacy routing lane)
 
 **Verify before any migration:**
 ```bash
 npm run atlas:audit:embeddings --verbose
 ```
 
-Must report Ollama, Postgres, Qdrant, Redis dimensions and agree on 384.
+Must report Ollama, Postgres, Qdrant, Redis dimensions and agree on 768.
 
 ### Query Flow (Canonical Order)
 
 ```
 user query
-  → embed query (embeddinggemma, 384-dim)
+  → embed query (embeddinggemma, 768-dim)
   → Redis exact/cache check
   → Qdrant ANN top-K
   → Postgres join by source_ref/source_id/chunk_id

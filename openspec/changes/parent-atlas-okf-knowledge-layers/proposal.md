@@ -1,31 +1,32 @@
 ## Why
 
 The repo has Parent Atlas (canonical evidence/lineage), OpenSpec (this
-tracking format), and now proposed OKF (portable knowledge bundles),
-OpenWiki (doc synthesis), and Deep Agents/LangGraph (agent runtime) all
-converging on the same problem: recording facts about the codebase. Left
-unbounded, each becomes another source of truth that drifts from Postgres
-— exactly the failure pattern already documented in this repo for Redis
-centroid keys (8 incompatible schemes, `session-159-followup-tasks.md`
-Phase 11) and MCP tool status vocabulary
-(`parent-atlas-runtime-ownership-precall`). This proposal fixes the
-layering *before* any of OKF/OpenWiki/Deep Agents is installed or wired.
+tracking format), proposed OKF (portable knowledge bundles), OpenWiki
+(doc synthesis), and Deep Agents/LangGraph (agent runtime) all converging
+on the same problem: recording facts about the codebase. Left unbounded,
+each becomes another source of truth that drifts from Postgres — exactly
+the failure pattern already documented in this repo for Redis centroid
+keys (8 incompatible schemes, `session-159-followup-tasks.md` Phase 11)
+and MCP tool status vocabulary (`parent-atlas-runtime-ownership-precall`).
+This proposal fixes the layering *before* any of OKF/OpenWiki/Deep Agents
+is installed or wired.
 
 ## Architecture — one owner per layer
 
 | Layer | Owner | Purpose |
 |---|---|---|
-| Canonical identity & proof | PostgreSQL 18 | Packets, revisions, sources, symbols, evidence, workflow runs |
+| Canonical evidence & lineage | Parent Atlas / PostgreSQL 18 | Packets, revisions, sources, symbols, evidence, workflow runs |
 | Knowledge interchange | OKF bundle (Markdown + YAML frontmatter) | Human-reviewable domain concepts, decisions, gaps, playbooks |
-| Documentation synthesis | OpenWiki | Builds/refreshes OKF pages from grounded Parent Atlas evidence — **read-only against canonical tables** |
+| Documentation synthesis | OpenWiki | Builds/refreshes OKF pages from grounded Parent Atlas evidence - **read-only against canonical tables** |
 | Agent runtime | Deep Agents / LangGraph | Plans, delegates, checkpoints, requests approval |
 | Workflow definitions | OKF extensions + OpenSpec | Constraints, required evidence gates, outputs |
-| Issue tracking | Parent Atlas issue ledger (Postgres) → Kanban UI | Missing library, mock, stale projection, unproven integration |
+| Issue tracking | Parent Atlas issue ledger (Postgres) -> Kanban UI | Missing library, mock, stale projection, unproven integration |
 | Recommendations | Parent Atlas recommendation ledger | Proposed action backed by evidence |
 | Execution | Mastra *or* LangGraph, never both per workflow | Deterministic DAG / agent steps |
 | Observability | OTel + Langfuse | Infra spans + LLM/agent traces |
 
 **Hard rule**: OpenWiki never writes directly into canonical packet, symbol, graph, vector, or clustering tables. It reads Parent Atlas evidence and writes only its own generated OKF pages.
+OKF itself remains an interchange format, not a database or runtime owner.
 
 ## Known repository gaps this knowledge layer must report honestly
 

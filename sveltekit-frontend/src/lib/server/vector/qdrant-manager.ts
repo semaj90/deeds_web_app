@@ -1161,20 +1161,33 @@ export class QdrantManager {
       }
     }
 
-    // Validate all vectors before performing any network upsert to avoid partial writes
+    // Validate all vectors before performing any network upsert to avoid partial writes.
+    // Per-collection dimension, NOT a hardcoded VECTOR_CONFIG.DIMENSIONS (768) — this manager
+    // serves 15+ collections at different native dimensions (768/384/128/64). The previous
+    // blanket-768 check would have rejected every legitimate write to a non-768 collection
+    // (e.g. codebase_topology_64) as "invalid", not just caught real legacy-dimension mistakes.
+    // Falls back to VECTOR_CONFIG.DIMENSIONS only for a collection with no known contract yet,
+    // to stay non-breaking for anything not covered by COLLECTION_DIMENSIONS.
+    const expectedDim = (() => {
+      try {
+        return getCollectionDimension(collectionName);
+      } catch {
+        return VECTOR_CONFIG.DIMENSIONS;
+      }
+    })();
     const invalids: Array<{ id: string | number; vectorName?: string; found?: string | number }> =
       [];
     for (const p of params.points) {
       const v = p.vector;
       if (Array.isArray(v)) {
-        if (v.length !== VECTOR_CONFIG.DIMENSIONS) {
+        if (v.length !== expectedDim) {
           invalids.push({ id: p.id, found: v.length });
         }
       } else if (v && typeof v === 'object') {
         // Named multi-vector or mapping
         for (const [name, val] of Object.entries(v)) {
           if (Array.isArray(val)) {
-            if (val.length !== VECTOR_CONFIG.DIMENSIONS) {
+            if (val.length !== expectedDim) {
               invalids.push({ id: p.id, vectorName: name, found: (val as any).length });
             }
           }
@@ -1193,8 +1206,9 @@ export class QdrantManager {
           JSON.stringify(
             {
               error: 'invalid_vector_dimensions',
+              collection: collectionName,
               details: invalids,
-              expected: VECTOR_CONFIG.DIMENSIONS,
+              expected: expectedDim,
               timestamp: new Date().toISOString(),
             },
             null,
@@ -1205,7 +1219,7 @@ export class QdrantManager {
         console.error('Failed to write qdrant upsert dim report:', e);
       }
       throw new Error(
-        `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${VECTOR_CONFIG.DIMENSIONS}). See .tmp/qdrant-upsert-dim-report.json`
+        `Aborting Qdrant upsert to ${collectionName}: found ${invalids.length} points with invalid vector dimensions (expected ${expectedDim}). See .tmp/qdrant-upsert-dim-report.json`
       );
     }
 
@@ -1364,16 +1378,23 @@ export class QdrantManager {
       }
     }
 
-    // Validate vector dimensions (same rules as batchUpsert)
+    // Validate vector dimensions — per-collection, same rules as batchUpsert (see comment there)
+    const expectedDim = (() => {
+      try {
+        return getCollectionDimension(resolvedCollectionName as string);
+      } catch {
+        return VECTOR_CONFIG.DIMENSIONS;
+      }
+    })();
     const invalids: Array<{ id: string | number; vectorName?: string; found?: string | number }> =
       [];
     for (const p of params.points) {
       const v = p.vector;
       if (Array.isArray(v)) {
-        if (v.length !== VECTOR_CONFIG.DIMENSIONS) invalids.push({ id: p.id, found: v.length });
+        if (v.length !== expectedDim) invalids.push({ id: p.id, found: v.length });
       } else if (v && typeof v === 'object') {
         for (const [name, val] of Object.entries(v)) {
-          if (Array.isArray(val) && (val as any).length !== VECTOR_CONFIG.DIMENSIONS) {
+          if (Array.isArray(val) && (val as any).length !== expectedDim) {
             invalids.push({ id: p.id, vectorName: name, found: (val as any).length });
           }
         }
@@ -1388,8 +1409,9 @@ export class QdrantManager {
           JSON.stringify(
             {
               error: 'invalid_vector_dimensions',
+              collection: resolvedCollectionName,
               details: invalids,
-              expected: VECTOR_CONFIG.DIMENSIONS,
+              expected: expectedDim,
               timestamp: new Date().toISOString(),
             },
             null,
@@ -1400,7 +1422,7 @@ export class QdrantManager {
         console.error('Failed to write qdrant upsert dim report (upsert):', e);
       }
       throw new Error(
-        `Aborting Qdrant upsert: found ${invalids.length} points with invalid vector dimensions (expected ${VECTOR_CONFIG.DIMENSIONS}). See .tmp/qdrant-upsert-dim-report.json`
+        `Aborting Qdrant upsert to ${resolvedCollectionName}: found ${invalids.length} points with invalid vector dimensions (expected ${expectedDim}). See .tmp/qdrant-upsert-dim-report.json`
       );
     }
 

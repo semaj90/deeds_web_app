@@ -107,6 +107,24 @@ const AgenticWorkflowReportSchema = z
   })
   .passthrough();
 
+const ProofReportSchema = z
+  .object({
+    generatedAt: z.string().datetime().optional(),
+    gate: z.string().min(1).optional(),
+    results: z
+      .array(
+        z
+          .object({
+            gate: z.string().min(1),
+            status: z.string().min(1),
+            notes: z.array(z.string().min(1)).default([]),
+          })
+          .passthrough(),
+      )
+      .default([]),
+  })
+  .passthrough();
+
 export interface DailyGraphifyTaskColumn {
   id: string;
   label: string;
@@ -297,14 +315,21 @@ function parseWorkflowReport(value: unknown): z.infer<typeof AgenticWorkflowRepo
   return parsed.success ? parsed.data : null;
 }
 
+function parseProofReport(value: unknown): z.infer<typeof ProofReportSchema> | null {
+  const parsed = ProofReportSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+}
+
 export function summarizeDailyGraphifyBoard(
   board: unknown,
   proposalLedger: unknown,
   workflowReport: unknown = null,
+  proofReport: unknown = null,
   sources: {
     boardSource?: string | null;
     recommendationSource?: string | null;
     temporalSource?: string | null;
+    proofReportSource?: string | null;
   } = {},
 ): DailyGraphifyBoardData {
   const warnings: string[] = [];
@@ -317,6 +342,15 @@ export function summarizeDailyGraphifyBoard(
 
   const parsedWorkflow = parseWorkflowReport(workflowReport);
   if (!parsedWorkflow) warnings.push('TEMPORAL_WORKFLOW_UNAVAILABLE');
+  const parsedProof = parseProofReport(proofReport);
+  if (parsedProof?.results?.length) {
+    const nonPassing = parsedProof.results
+      .filter((result) => !['PASS', 'PROVEN'].includes(result.status))
+      .map((result) => `${result.gate}=${result.status}`);
+    if (nonPassing.length > 0) {
+      warnings.push(`GRAPHIFY_RECOVERY:${nonPassing.join(',')}`);
+    }
+  }
 
   const boardTasks = parsedBoard ? flattenBoardTasks(parsedBoard, parsedBoard.generated ?? parsedBoard.generatedAt ?? 'graphify-board') : [];
   const columns = ['P0', 'P1', 'P2', 'P3'].map((priority) =>
@@ -393,9 +427,15 @@ export async function loadDailyGraphifyBoard(): Promise<DailyGraphifyBoardData> 
     path.join('docs', 'reports', 'atlas', 'agentic-recommendation-workflow.json'),
   ]);
 
-  return summarizeDailyGraphifyBoard(boardResult.value, proposalResult.value, workflowResult.value, {
+  const proofResult = await readFirstJson([
+    path.join('.tmp', 'reports', 'parent-atlas-integration-proof.json'),
+    path.join('docs', 'reports', 'parent-atlas-integration-proof.json'),
+  ]);
+
+  return summarizeDailyGraphifyBoard(boardResult.value, proposalResult.value, workflowResult.value, proofResult.value, {
     boardSource: boardResult.source,
     recommendationSource: proposalResult.source,
     temporalSource: workflowResult.source,
+    proofReportSource: proofResult.source,
   });
 }

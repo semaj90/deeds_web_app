@@ -138,4 +138,24 @@ describe('daily graphify board', () => {
     expect(summary.boardSource).toContain('docs/graph/kanban-board.json');
     expect(summary.recommendationSource).toBe('agentic-recommendation-workflow');
   });
+
+  it('surfaces graphify recovery proof warnings from the proof report feed', () => {
+    const board = {
+      generated: '2026-07-23T00:00:00.000Z',
+      collection: 'codebase_chunks_768',
+      tasks: [],
+    };
+
+    const proofReport = {
+      generatedAt: '2026-08-03T00:00:00.000Z',
+      results: [
+        { gate: 'graphify_lock', status: 'PASS', notes: [] },
+        { gate: 'latent_diagnostic', status: 'NOT_PROVEN', notes: [] },
+      ],
+    };
+
+    const summary = summarizeDailyGraphifyBoard(board, null, null, proofReport);
+
+    expect(summary.warnings).toContain('GRAPHIFY_RECOVERY:latent_diagnostic=NOT_PROVEN');
+  });
 });

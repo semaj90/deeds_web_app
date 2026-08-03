@@ -75,6 +75,16 @@ function dependencySatisfied(status) {
   return PROGRESS_STATUSES.has(status);
 }
 
+function readRepoTextIfExists(relPath) {
+  const abs = resolveRepoPath(relPath);
+  return existsSync(abs) ? readText(abs, '') : '';
+}
+
+function gateStatusFromEvidence(hasEvidence, hasProblem = false) {
+  if (hasProblem) return STATUS.NOT_PROVEN;
+  return hasEvidence ? STATUS.PASS : STATUS.NOT_PROVEN;
+}
+
 async function fetchJson(url, timeoutMs = 4000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(new Error(`timeout after ${timeoutMs}ms`)), timeoutMs);
@@ -637,6 +647,162 @@ async function gateGraph() {
   ]);
 }
 
+async function gateGraphifyLock() {
+  const startupWrapperRel = 'scripts/startup/run-graphify-daily-startup.mjs';
+  const taskFileRel = '.vscode/tasks.json';
+  const chainScriptRel = 'sveltekit-frontend/package.json';
+  const wrapperText = readRepoTextIfExists(startupWrapperRel);
+  const taskText = readRepoTextIfExists(taskFileRel);
+  const chainText = readRepoTextIfExists(chainScriptRel);
+  const lockFileMentioned = /graphify-daily-start\.lock|graphify-pipeline-lock/.test(wrapperText);
+  const releaseHookMentioned = /process\.on\(['"]exit['"]/.test(wrapperText) && /releaseStartupLock/.test(wrapperText);
+  const contentionBackoffMentioned = /process\.exit\(75\)|backing off/.test(wrapperText);
+  const taskBlockMatch = taskText.match(/"label"\s*:\s*"🗺️ Startup: Auto-Map Codebase \(graphify:daily\)"[\s\S]*?(?=\n\s*"\w+"\s*:\s*"[^"]+"|\n\s*},)/);
+  const folderOpenTaskPresent = taskBlockMatch ? /"runOn"\s*:\s*"folderOpen"/.test(taskBlockMatch[0]) : false;
+  const chainReferenced = /graphify:daily:chain/.test(chainText);
+
+  const status = gateStatusFromEvidence(
+    lockFileMentioned && releaseHookMentioned && contentionBackoffMentioned && chainReferenced,
+    folderOpenTaskPresent,
+  );
+
+  return makeResult('graphify_lock', status, [
+    evidence('file_scan', {
+      files: [
+        startupWrapperRel,
+        taskFileRel,
+        chainScriptRel,
+      ],
+    }),
+    evidence('text_scan', {
+      lockFileMentioned,
+      releaseHookMentioned,
+      contentionBackoffMentioned,
+      folderOpenTaskPresent,
+      chainReferenced,
+    }),
+  ], [
+    folderOpenTaskPresent ? 'graphify:daily still auto-runs on folder open' : 'graphify:daily startup is not auto-launched from the folder-open task',
+  ]);
+}
+
+async function gateFeatureEnvelope() {
+  const featureEnvelopeRel = 'sveltekit-frontend/scripts/atlas/materialize-feature-envelopes.mts';
+  const featureText = readRepoTextIfExists(featureEnvelopeRel);
+  const hasAdvisoryLock = /pg_try_advisory_lock/.test(featureText);
+  const hasIncrementalFilter = /feature_envelope\s+IS\s+NULL/i.test(featureText) || /feature_envelope->>'feature_schema_version'/.test(featureText);
+  const hasDeterministicOrder = /ORDER BY packet_id/i.test(featureText);
+  const hasReceipt = /materialize-feature-envelopes-receipt\.json/.test(featureText);
+  const hasApplyMode = /--apply/.test(featureText) && /--force-refresh/.test(featureText);
+  const status = gateStatusFromEvidence(hasAdvisoryLock && hasIncrementalFilter && hasDeterministicOrder && hasReceipt && hasApplyMode);
+
+  return makeResult('feature_envelope', status, [
+    evidence('file_scan', { files: [featureEnvelopeRel] }),
+    evidence('text_scan', {
+      hasAdvisoryLock,
+      hasIncrementalFilter,
+      hasDeterministicOrder,
+      hasReceipt,
+      hasApplyMode,
+    }),
+  ], [
+    hasAdvisoryLock && hasIncrementalFilter && hasDeterministicOrder
+      ? 'feature-envelope writer is incremental and lock-protected'
+      : 'feature-envelope writer still needs a bounded incremental proof',
+  ]);
+}
+
+async function gateLatentDiagnostic() {
+  const latentRel = 'scripts/atlas/backfill-latent-vectors.mjs';
+  const latentText = readRepoTextIfExists(latentRel);
+  const hasMemDiag = /--mem-diag/.test(latentText);
+  const hasBoundedLimit = /--limit=/.test(latentText) && /const LIMIT\s*=\s*limitArg\s*\?\s*parseInt/.test(latentText);
+  const hasInfinityDefault = /:\s*Infinity/.test(latentText);
+  const hasPageStreaming = /fetchQdrantPage\(/.test(latentText)
+    && /while\s*\(\s*processedCount\s*<\s*LIMIT\s*\)/.test(latentText)
+    && /pageCursor\s*=\s*page\.nextOffset/.test(latentText)
+    && /writeCheckpoint\(\{[\s\S]{0,500}nextOffset:\s*page\.nextOffset/.test(latentText);
+  const hasBatching = /--batch=/.test(latentText) && /BATCH_SZ/.test(latentText);
+  const status = hasMemDiag && hasBoundedLimit && !hasInfinityDefault && hasPageStreaming
+    ? STATUS.PASS
+    : (hasMemDiag ? STATUS.PARTIAL : STATUS.NOT_PROVEN);
+
+  return makeResult('latent_diagnostic', status, [
+    evidence('file_scan', { files: [latentRel] }),
+    evidence('text_scan', {
+      hasMemDiag,
+      hasBoundedLimit,
+      hasInfinityDefault,
+      hasPageStreaming,
+      hasBatching,
+    }),
+  ], [
+    status === STATUS.PASS
+      ? 'latent backfill now streams bounded pages with checkpointing and diagnostics'
+      : hasInfinityDefault || !hasPageStreaming
+        ? 'latent backfill diagnostic path still needs bounded page streaming proof'
+        : 'latent backfill diagnostic path exists but its memory profile was not verified here',
+  ].filter(Boolean));
+}
+
+async function gateLatentBounded() {
+  const latentRel = 'scripts/atlas/backfill-latent-vectors.mjs';
+  const latentText = readRepoTextIfExists(latentRel);
+  const hasResume = /--force-refresh|--limit=|--batch=/.test(latentText) && /checkpoint|resume/i.test(latentText);
+  const hasFiniteDefault = !/:\s*Infinity/.test(latentText);
+  const hasCheckpointContract = /checkpoint/i.test(latentText) && /datasetDigest/i.test(latentText);
+  const status = hasResume && hasFiniteDefault && hasCheckpointContract ? STATUS.PASS : STATUS.NOT_PROVEN;
+
+  return makeResult('latent_bounded', status, [
+    evidence('file_scan', { files: [latentRel] }),
+    evidence('text_scan', {
+      hasResume,
+      hasFiniteDefault,
+      hasCheckpointContract,
+    }),
+  ], [
+    status === STATUS.PASS ? 'latent backfill bounded resume contract is present' : 'bounded latent replay and checkpointing remain unproven',
+  ]);
+}
+
+async function gateGraphArtifact() {
+  const artifactRel = 'docs/graph/codebase-graph.json';
+  const artifactAbs = resolveRepoPath(artifactRel);
+  const candidateFiles = [];
+  if (existsSync(artifactAbs)) {
+    candidateFiles.push({
+      file: artifactRel,
+      ageMinutes: fileAgeMinutes(artifactAbs),
+      sizeBytes: statSync(artifactAbs).size,
+    });
+  }
+  const fresh = candidateFiles.length > 0 && candidateFiles[0].ageMinutes <= 60;
+  return makeResult('graph_artifact', fresh ? STATUS.PASS : STATUS.NOT_PROVEN, [
+    evidence('file', { candidates: candidateFiles }),
+  ], [
+    fresh ? 'graph artifact is fresh enough for review' : 'graph artifact remains stale or absent',
+  ]);
+}
+
+async function gateStudio() {
+  const boardRel = 'sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board.ts';
+  const phaseRel = 'sveltekit-frontend/src/lib/server/atlas/board/phase89-workflow.ts';
+  const boardText = readRepoTextIfExists(boardRel);
+  const phaseText = readRepoTextIfExists(phaseRel);
+  const proofReportMentioned = /parent-atlas-integration-proof|proof report|graphify recovery/i.test(boardText);
+  const warningPropagationMentioned = /warnings/.test(boardText) && /warnings/.test(phaseText);
+  const status = proofReportMentioned && warningPropagationMentioned ? STATUS.PASS : STATUS.NOT_PROVEN;
+
+  return makeResult('studio', status, [
+    evidence('file_scan', { files: [boardRel, phaseRel] }),
+    evidence('text_scan', { proofReportMentioned, warningPropagationMentioned }),
+  ], [
+    status === STATUS.PASS
+      ? 'Studio board consumes recovery proof signals and propagates warning state'
+      : 'Studio board still lacks a recovery proof feed',
+  ]);
+}
+
 async function gateAce() {
   const pool = await openDb();
   if (!pool) {
@@ -816,6 +982,12 @@ const gateDefinitions = [
   { name: 'ann', handler: gateAnn, deps: ['semantic'] },
   { name: 'clustering', handler: gateClustering, deps: ['semantic', 'ann'] },
   { name: 'graph', handler: gateGraph, deps: ['identity', 'semantic'] },
+  { name: 'graphify_lock', handler: gateGraphifyLock, deps: [] },
+  { name: 'feature_envelope', handler: gateFeatureEnvelope, deps: ['graphify_lock'] },
+  { name: 'latent_diagnostic', handler: gateLatentDiagnostic, deps: ['graphify_lock'] },
+  { name: 'latent_bounded', handler: gateLatentBounded, deps: ['latent_diagnostic'] },
+  { name: 'graph_artifact', handler: gateGraphArtifact, deps: ['graphify_lock', 'feature_envelope', 'latent_bounded'] },
+  { name: 'studio', handler: gateStudio, deps: ['graph_artifact'] },
   { name: 'ace', handler: gateAce, deps: ['graph'] },
   { name: 'mcp', handler: gateMcp, deps: ['env'] },
 ];

@@ -57,7 +57,17 @@ export const CANONICAL_DENSE_LANES: Record<DenseRepresentationName, DenseLanePol
   [DenseRepresentationName.SEMANTIC_384]: {
     representationName: DenseRepresentationName.SEMANTIC_384,
     role: DenseRole.RECALL_REFERENCE,
-    lifecycle: DenseLifecycle.REFERENCE_ONLY,
+    // Reclassified MIGRATION_SOURCE (was REFERENCE_ONLY): under REFERENCE_ONLY it was ambiguous
+    // whether callers could still treat this lane as admissible for current proof gates.
+    // `resolve-embedding-lane.ts` already blocks it at read time (LEGACY_DIMENSION_EXPLICIT_ONLY),
+    // and the live `codebase_chunks_384_hybrid` Qdrant collection was confirmed empty (0 points)
+    // and was, until this session, being queried by `rrf-integration.ts` in a way that crashed
+    // the canonical 768 lane's results too (fixed separately). MIGRATION_SOURCE (not SUPERSEDED)
+    // because scripts/atlas/{backfill-content-embedding-384,backfill-hybrid-collection,
+    // audit-embedding-provenance-384}.mjs still exist and target this dimension — treat new
+    // writes here as frozen, not the lane itself as fully retired, until those scripts are
+    // themselves reviewed/archived.
+    lifecycle: DenseLifecycle.MIGRATION_SOURCE,
     nativeDimension: 384,
     producerModel: 'embeddinggemma:latest (legacy projection)',
     createdAt: '2026-07-15T00:00:00Z',

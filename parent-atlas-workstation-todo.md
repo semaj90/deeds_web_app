@@ -15,9 +15,9 @@ Current lane map:
 - Neo4j: CPU/JVM topology lane for PageRank, graph expansion, and multi-hop context; not GPU-enabled by Docker passthrough.
 - Redis / BitFrost: hot packet cache, centroid routing, and short-lived replay state.
 - cuVS / GPU: ANN staging, rerank input, batch graph analysis, and benchmark lanes in a separate analytics service.
-- `embeddinggemma`: canonical embedding family at `768`, with truncated `512`, `256`, and `128` lanes via MRL; use task/query/document prompt variants for retrieval, classification, clustering, and code search.
+- `embeddinggemma`: canonical embedding family at `768`; any `384`-dimensional artifacts are migration evidence only, not an active retrieval lane.
 - `768`: main codebase chunk lane.
-- `384`: projection / routing lane only when explicitly defined.
+- `384`: legacy migration / projection evidence only; never an active retrieval lane.
 - `64`: routing / clustering lane only.
 - `okf` YAML: declarative contract lane for LDR, semantic labeling, and workflow metadata.
 - Firecrawl / Pydantic: research ingestion, validation, and schema-gated extraction lane.
@@ -224,6 +224,48 @@ The safer chain is:
 - Topology: 21.6% (SOM 4.6%, PageRank 21.6%, community 21.6%)
 - Features: 0.9% (ast_symbols), 2.4% (lexical), 0% (entities)
 
+## Graph Retrieval / RTX Status
+
+**Current verified status**
+
+- `REPRESENTATION_LINEAGE_COLUMNS`: `PASS`
+- `REPRESENTATION_READ_VALIDATION`: `PASS`
+- `SEMANTIC_768_ENDPOINT`: `PASS`
+- `SEMANTIC_768_REPAIR_ALIAS`: `PASS`
+- `LEGACY_384_ACTIVE_WRITES`: `MIGRATION_SOURCE_ONLY`
+
+**Keep separated**
+
+- Representation lineage columns: `source_representation_id`, `source_dimension`, `projection_representation_id`, `projection_dimension`, `encoder_revision`, `som_revision`
+- Analytical lineage: `graph_revision`, `pagerank_revision`, `pagerank_score`, `community_revision`, `community_id`, `kmeans_revision`, `kmeans_cluster_id`, `centroid_distance`
+
+**Counts to preserve**
+
+- `atlas_packets`: `61,659`
+- `atlas_packet_registry`: `58,324`
+- `atlas_summary_layers`: `18,423`
+- `packet summaries`: `6,885`
+- `populated summary layers`: `7,640`
+- `codebase_chunk_index`: `52,417`
+- `atlas_feature_envelopes`: `58,365`
+
+**Latest launch states**
+
+- `PATCH_TOURNAMENT_SPEC`: `RECEIVED_NOT_STARTED`
+- `PATCH_TOURNAMENT_BOUNDED_SEAM`: `QUEUED`
+- `GRAPHIFY_RECOVERY_PROOF_LADDER`: `PASS`
+- `GRAPHIFY_DAILY_STARTED`: `PARTIAL`
+- `GRAPHIFY_DAILY_COMPLETED`: `NOT_PROVEN`
+- `GRAPH_SNAPSHOT_FRESH`: `PASS`
+- `DEEP_AUDIT`: `NOT_PROVEN`
+
+**Rejected / retiring**
+
+- `content_embedding_768`: flagged dead
+- `error_embedding`: flagged dead
+- `REFERENCE_AUDIT`: not run
+- `DROP_APPROVAL`: blocked
+
 
 ## Graph Identity Audit Next Steps
 
@@ -245,25 +287,27 @@ The safer chain is:
 
 ### Proof Gates
 
-| Gate | Target |
-|------|--------|
-| PARSE_NODE_IDENTITY | PARTIAL_PROVEN |
-| STABLE_SYMBOL_IDENTITY | NOT_PROVEN |
-| SYMBOL_VERSION_IDENTITY | NOT_PROVEN |
-| PACKET_TO_SYMBOL_LINEAGE | NOT_PROVEN |
-| DOMAIN_CLASSIFICATION | PARTIAL_PROVEN |
-| CONCEPT_EXTRACTION | PARTIAL_PROVEN |
-| PARSER_MANIFEST_ALIGNMENT | FAIL |
-| TREE_NODE_ID_STABILITY | FAIL |
-| SYMBOL_SEMANTIC_768 | NOT_PROVEN |
-| KNN_TOPK_RETRIEVAL | NOT_PROVEN |
-| KMEANS_ASSIGNMENTS | PARTIAL / STALE |
-| SOM_20X20_ASSIGNMENTS | PARTIAL / STALE |
-| PAGERANK_PERSISTENCE | NOT_PROVEN |
-| PROVISIONAL_STRUCTURAL_SNAPSHOT | DRY_RUN_PASS |
-| CANONICAL_GRAPH_SNAPSHOT | NOT_PROVEN |
-| GRAPH_SNAPSHOT_APPLY | ROLLED_BACK |
-| TREE_NODE_UNIQUENESS_CHANGE | BLOCKED |
+**Completeness scale**: `0` = blocked / not proven, `100` = proven end state.
+
+| Gate | Status | Completeness | Notes |
+|------|--------|--------------|-------|
+| PARSE_NODE_IDENTITY | PARTIAL_PROVEN | 60 | parser-backed occurrence identity still needs the full live contract |
+| STABLE_SYMBOL_IDENTITY | NOT_PROVEN | 5 | stable cross-revision symbol identity not yet proven live |
+| SYMBOL_VERSION_IDENTITY | NOT_PROVEN | 0 | revision-bound symbol version contract still missing |
+| PACKET_TO_SYMBOL_LINEAGE | NOT_PROVEN | 15 | lineage exists in pieces, not as a complete contract |
+| DOMAIN_CLASSIFICATION | PARTIAL_PROVEN | 55 | current class population exists, lineage/proof ledger incomplete |
+| CONCEPT_EXTRACTION | PARTIAL_PROVEN | 50 | concept rows exist, provenance and edge ledger still incomplete |
+| PARSER_MANIFEST_ALIGNMENT | FAIL | 10 | runtime still mismatches the declared parser story |
+| TREE_NODE_ID_STABILITY | FAIL | 0 | tree node identity is still provisional |
+| SYMBOL_SEMANTIC_768 | NOT_PROVEN | 0 | symbol-version semantic lane not proven |
+| KNN_TOPK_RETRIEVAL | NOT_PROVEN | 0 | retrieval lane not yet proven against canonical identities |
+| KMEANS_ASSIGNMENTS | PARTIAL / STALE | 35 | assignments exist, run lineage and freshness are incomplete |
+| SOM_20X20_ASSIGNMENTS | PARTIAL / STALE | 30 | SOM coverage exists, current run lineage is incomplete |
+| PAGERANK_PERSISTENCE | NOT_PROVEN | 0 | graph authority persistence still blocked from canonical identity proof |
+| PROVISIONAL_STRUCTURAL_SNAPSHOT | DRY_RUN_PASS | 100 | provisional artifact materializes successfully in dry-run form |
+| CANONICAL_GRAPH_SNAPSHOT | NOT_PROVEN | 0 | canonical graph snapshot still gated on identity separation |
+| GRAPH_SNAPSHOT_APPLY | ROLLED_BACK | 0 | apply was correctly stopped |
+| TREE_NODE_UNIQUENESS_CHANGE | BLOCKED | 0 | uniqueness constraint remains intact |
 
 ## Repository-First Search Checklist
 

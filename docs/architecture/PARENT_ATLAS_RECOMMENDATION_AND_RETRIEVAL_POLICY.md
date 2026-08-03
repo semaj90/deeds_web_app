@@ -20,7 +20,7 @@ source of PageRank truth, or recommender training store.
 | Outcome-based learning | `NOT_RUN` | `outcome_ledger` has 0 rows. |
 | Dispatcher learning | `NOT_RUN` | Dispatcher telemetry logs to console and explicitly has a persistence TODO. |
 | K-means routing | `IMPLEMENTED` | Existing trainer uses a random 5k snapshot and Redis TTL centroids; no immutable cluster snapshot exists. |
-| TurboVec ANN | `BLOCKED` | Live health reports `indexed: 0`, `dim: 64`, and collection `codebase_chunks_768`; the runtime client requires 768 while the shadow builder produces 384. |
+| TurboVec ANN | `BLOCKED` | Live health reports `indexed: 0`, `dim: 64`, and collection `codebase_chunks_768`; the runtime client is 768-canonical and the legacy 384 shadow builder lane is retiring. |
 | LLM recommendations | `IMPLEMENTED` | Admin recommendation engine synthesizes actions, but its response is not a trained or validated probabilistic ranker. |
 
 ## Retrieval And Recommendation Separation

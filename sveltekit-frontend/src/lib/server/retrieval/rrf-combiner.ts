@@ -52,6 +52,27 @@ export interface RRFResult {
 }
 
 /**
+ * Merge every lane's metadata for a single deduplicated hit, key by key, keeping the first
+ * non-null/non-undefined value seen for each key across lanes (in their original order).
+ * Unlike picking one lane's whole object, this can't let an earlier lane's all-null identity
+ * fields shadow a later lane's real values for the same key.
+ */
+function mergeLaneMetadata(scores: RRFScore[]): Record<string, unknown> | undefined {
+  let merged: Record<string, unknown> | undefined;
+  for (const score of scores) {
+    if (!score.metadata) continue;
+    for (const [key, value] of Object.entries(score.metadata)) {
+      if (!merged) merged = {};
+      const existing = merged[key];
+      if (existing === undefined || existing === null) {
+        merged[key] = value;
+      }
+    }
+  }
+  return merged;
+}
+
+/**
  * Combine multiple ranked lists via Reciprocal Rank Fusion (RRF).
  *
  * Formula: RRF(d) = Σ_i (weight_i / (k + rank_i(d)))
@@ -101,8 +122,17 @@ export function combineViaRRF(
   const results: RRFResult[] = [];
   for (const [hitKey, scores] of hitScores) {
     const combinedScore = scores.reduce((sum, s) => sum + s.rrfComponent, 0);
-    const primaryHit = scores[0]; // Use metadata from first lane
-    const metadata = scores.find((score) => score.metadata && Object.keys(score.metadata).length > 0)?.metadata ?? primaryHit.metadata;
+    const primaryHit = scores[0]; // Use identity (id/source) from first lane
+    // Field-level metadata merge across every lane that reported this hit — NOT "first lane
+    // with a non-empty object". A lane's metadata object can carry a full identity-field shape
+    // (packet_key/source_ref/content_hash/tree_node_id/workspace_revision) with every value
+    // null (common for lexical-only lanes never joined to a chunk record). Picking by object
+    // presence alone let an earlier, all-null lane's object silently outrank a later lane's
+    // real values for the same field — e.g. a postgres_trigram null tree_node_id beating a
+    // qdrant_vector hit's real tree_node_id for the same deduplicated id. Merge key-by-key
+    // instead, keeping the first non-null/non-undefined value seen for each key across lanes
+    // in their original order.
+    const metadata = mergeLaneMetadata(scores) ?? primaryHit.metadata;
 
     results.push({
       id: primaryHit.hitId,
