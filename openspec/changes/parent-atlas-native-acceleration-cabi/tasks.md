@@ -46,3 +46,10 @@ No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS
 - [ ] P4.2 Unreal plugin contract: gRPC client of AtlasVectorService, Slate/UMG rendering, no store access (contract doc, no implementation)
 - [ ] P4.3 Native Dawn viewer as separate target spec (`atlas_dawn_viewer.exe` + `atlas_core.dll`); never linked into `tensorrt_bridge.node`
 - [ ] P4.4 MCP tools for Ornith/Gemma4: `atlas.backend_info`, `atlas.exact_topk_oracle` (fixture-bounded), `atlas.parity_report` — every result carries execution receipt; agents never touch gRPC/stores directly
+
+## P2b — Contract amendments (2026-08-04 review)
+
+- [ ] P2b.1 Explicit buffer ownership in `atlas_core.h`: allocator/deallocator pairs; every buffer freed by the allocating module; versioned structs (`struct_size` first member or version tag)
+- [ ] P2b.2 Representation contract binding: index build + compute requests carry representation_id, revision, dims, dtype, normalization, metric, model id+hash; mismatch (e.g. latent_64 query vs semantic_768 index) rejected pre-compute with receipt reason
+- [ ] P2b.3 Compute-only core audit: no PostgreSQL/Qdrant/Redis/Neo4j/Kafka/HTTP/store-filesystem dependency linked into atlas_core
+- [ ] P2b.4 Probe classes extended: NOT_IMPLEMENTED, LIBTORCH_CPU, NOT_PROVEN added; implementation-linked / symbol-loaded / binary-present / branch-executed tracked as separate claims

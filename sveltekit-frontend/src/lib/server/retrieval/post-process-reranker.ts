@@ -85,6 +85,29 @@ export interface PostProcessAdjustments {
   antiClusterApplied: boolean;
 }
 
+/**
+ * Auditable per-candidate decision record. Every input candidate produces
+ * exactly one decision so INPUT === KEEP + DROP and no reduction is
+ * unexplained.
+ */
+export interface PostProcessDecision {
+  requestId: string;
+  packetKey: string;
+  inputRank: number;
+  decision: 'KEEP' | 'DROP';
+  reason:
+    | 'TOP_K'
+    | 'DUPLICATE_IDENTITY'
+    | 'MISSING_CONTENT'
+    | 'BELOW_THRESHOLD'
+    | 'AUTH_SCOPE'
+    | 'SOURCE_DIVERSITY'
+    | 'INVALID_ENVELOPE'
+    | 'POLICY_FILTER'
+    | 'OTHER';
+  detail?: string;
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Extract the first N path segments of a sourceRef for prefix dedup. */
@@ -137,6 +160,7 @@ export function postProcessCandidates(
   config: Partial<PostProcessConfig> = {},
   updatedAtMap: ReadonlyMap<string, Date> = new Map(),
   clusterMap: ReadonlyMap<string, string> = new Map(),
+  audit?: { requestId: string; decisions: PostProcessDecision[] },
 ): PostProcessedCandidate[] {
   if (candidates.length === 0) return [];
 
@@ -220,6 +244,35 @@ export function postProcessCandidates(
   // Step 5: assign finalRank (anti-cluster outliers end up at the bottom)
   const antiCluster = final.filter(c => c.adjustments.antiClusterApplied);
   const primary     = final.filter(c => !c.adjustments.antiClusterApplied);
+
+  // Audit: one decision per input candidate — INPUT === KEEP + DROP.
+  if (audit) {
+    const inputRankByKey = new Map(candidates.map((c, i) => [c.packetKey, i + 1]));
+    for (const c of withAdj) {
+      const inputRank = inputRankByKey.get(c.packetKey) ?? -1;
+      if (c.adjustments.dedupRemoved) {
+        audit.decisions.push({
+          requestId: audit.requestId,
+          packetKey: c.packetKey,
+          inputRank,
+          decision: 'DROP',
+          reason: 'SOURCE_DIVERSITY',
+          detail: `dedupPrefixDepth=${cfg.dedupPrefixDepth} prefix=${sourcePrefix(c.sourceRef ?? '', cfg.dedupPrefixDepth)}`,
+        });
+      } else {
+        audit.decisions.push({
+          requestId: audit.requestId,
+          packetKey: c.packetKey,
+          inputRank,
+          decision: 'KEEP',
+          reason: c.adjustments.antiClusterApplied ? 'POLICY_FILTER' : 'TOP_K',
+          detail: c.adjustments.antiClusterApplied
+            ? `anti-cluster demoted to tail (maxPerCluster=${cfg.maxPerCluster})`
+            : undefined,
+        });
+      }
+    }
+  }
 
   return [...primary, ...antiCluster].map((c, i) => ({
     ...c,

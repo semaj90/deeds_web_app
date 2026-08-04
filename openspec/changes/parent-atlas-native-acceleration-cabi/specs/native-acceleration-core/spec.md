@@ -3,12 +3,28 @@
 ## ADDED Requirements
 
 ### Requirement: C ABI core with opaque handles
-The Parent Atlas native core SHALL expose a C ABI (`atlas_core.h`) using opaque handles (`atlas_context_t`, `atlas_cuvs_index_t`, `atlas_turbovec_index_t`), `atlas_status_t` error codes, and `atlas_execution_receipt_t` telemetry. The public header SHALL contain no Napi, torch, raft, nlohmann::json, grpc, or Unreal Engine types.
+The Parent Atlas native core SHALL expose a C ABI (`atlas_core.h`) using opaque handles (`atlas_context_t`, `atlas_cuvs_index_t`, `atlas_turbovec_index_t`), versioned structures, `atlas_status_t` error codes, explicit buffer ownership (allocator/deallocator pairs — every buffer freed by the module that allocated it), and `atlas_execution_receipt_t` telemetry. The public header SHALL contain no Napi, torch, raft, nlohmann::json, grpc, or Unreal Engine types.
 
 #### Scenario: Adapter isolation
 - **WHEN** the N-API adapter, gRPC adapter, or Unreal plugin is compiled
 - **THEN** each links against `atlas_core` as a consumer
 - **AND** `atlas_core` compiles standalone with none of those dependencies
+
+### Requirement: Compute-only core
+The native core SHALL perform computation only. It SHALL NOT connect to PostgreSQL, Qdrant, Redis, Neo4j, Kafka, HTTP services, or canonical filesystem stores. Application-owned adapters validate identity, invoke native computation, and persist results separately.
+
+#### Scenario: No store credentials in core
+- **WHEN** `atlas_core` is audited for linked dependencies and configuration surface
+- **THEN** it contains no database drivers, network clients, or store credentials
+- **AND** all identity resolution and persistence happens in the calling adapter
+
+### Requirement: Representation-bound indexes and requests
+Every native index build and compute request SHALL be bound to a named representation contract: representation ID, representation revision, dimensions, dtype, normalization, metric, and model ID + hash where applicable. The core SHALL reject searches across mismatched representations with `ATLAS_INVALID_ARGUMENT` (or a dedicated representation-mismatch status).
+
+#### Scenario: latent_64 query against semantic_768 index rejected
+- **WHEN** a query bound to `latent_64` is submitted against an index built for `semantic_768`
+- **THEN** the call fails with a representation-mismatch error before any computation
+- **AND** the execution receipt records the rejection reason
 
 #### Scenario: Every compute call returns a receipt
 - **WHEN** any `atlas_*` compute function completes (success or fallback)
@@ -31,7 +47,7 @@ The system SHALL provide `atlas_knn_exact` (query→corpus top-k, cuVS brute-for
 - **AND** a mismatch reports NUMERICAL_MISMATCH, not PASS
 
 ### Requirement: Proof-first liveness classification
-No native capability SHALL be reported live without (1) `getBackendInfo()` metadata, (2) native execution counters incremented inside the actual CUDA/LibTorch branch, and (3) numerical parity against an independent oracle. The startup probe SHALL classify each export as MISSING_EXPORT, NO_LIBTORCH_STUB, CPU_FALLBACK, CUDA_LIVE, CALL_FAILED, NUMERICAL_MISMATCH, or SKIPPED_EXTERNAL_PROOF.
+No native capability SHALL be reported live without (1) `getBackendInfo()` metadata, (2) native execution counters incremented inside the actual CUDA/LibTorch branch, and (3) numerical parity against an independent oracle. The startup probe SHALL classify each export as MISSING_EXPORT, NO_LIBTORCH_STUB, NOT_IMPLEMENTED, CPU_FALLBACK, LIBTORCH_CPU, CUDA_LIVE, CALL_FAILED, NUMERICAL_MISMATCH, SKIPPED_EXTERNAL_PROOF, or NOT_PROVEN. The probe SHALL record loaded addon path and SHA-256 as the identity source, and SHALL track "implementation linked", "symbol loaded", "binary present", and "branch executed" as separate proof claims.
 
 #### Scenario: Shape-only evidence rejected
 - **WHEN** an export returns an array of expected length but backend metadata or counters are absent

@@ -630,6 +630,7 @@ export class SearchRuntime {
       });
 
       const { postProcessCandidates } = await import('./post-process-reranker.js');
+      const ppAudit = { requestId: query.text.slice(0, 64), decisions: [] as import('./post-process-reranker.js').PostProcessDecision[] };
       const postProcessed = postProcessCandidates(
         rerankedAsScored,
         {
@@ -637,8 +638,23 @@ export class SearchRuntime {
           dislikedPacketKeys: this.dislikedPacketKeys,
         },
         this.updatedAtMap,
+        new Map(),
+        ppAudit,
       );
       stageTiming.postProcess = Date.now() - ppStart;
+
+      // DIAGNOSTIC: every input candidate must have an auditable KEEP/DROP decision
+      {
+        const kept = ppAudit.decisions.filter((d) => d.decision === 'KEEP').length;
+        const dropped = ppAudit.decisions.filter((d) => d.decision === 'DROP');
+        console.info('[stage:postprocess] decisions', {
+          input: rerankedAsScored.length,
+          output: postProcessed.length,
+          explainedDrops: dropped.length,
+          unexplainedDrops: rerankedAsScored.length - kept - dropped.length,
+          drops: dropped.map((d) => ({ packetKey: d.packetKey, reason: d.reason, detail: d.detail })),
+        });
+      }
 
       // Apply post-process ordering back to envelopes
       const envByKey = new Map(
