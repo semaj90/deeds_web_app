@@ -11,7 +11,7 @@ import { isUuid } from '$lib/server/validation.js';
 import {
   buildObjectStorageCompatibilityFields,
   resolveObjectStorageKey,
-} from '$lib/server/storage/object-storage-compat.js';
+} from '$lib/utils/object-storage-compat.js';
 
 const documentUpdateSchema = z.object({
 	title: z.string().max(500).optional(),

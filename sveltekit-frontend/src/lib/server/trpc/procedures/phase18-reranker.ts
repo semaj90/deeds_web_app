@@ -5,11 +5,11 @@ import {
   phase18ResponseEnvelopeSchema,
   trpcProcedureInputSchema,
   validatePhase18Request,
-} from '$lib/server/ml/phase18-envelope-schema.js';
+} from '$lib/schemas/phase18-envelope-schema.js';
 import type {
   Phase18RequestEnvelope,
   Phase18ResponseEnvelope,
-} from '$lib/server/ml/phase18-envelope-schema.js';
+} from '$lib/schemas/phase18-envelope-schema.js';
 import { randomUUID } from 'node:crypto';
 
 /**

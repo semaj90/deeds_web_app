@@ -4,7 +4,7 @@ import {
   buildObjectStorageCompatibilityFields,
   hasObjectStorageKeyConflict,
   resolveObjectStorageKey,
-} from './object-storage-compat.js';
+} from '$lib/utils/object-storage-compat.js';
 
 describe('object-storage-compat', () => {
   it('prefers canonical objectStorageKey over legacy minioKey', () => {

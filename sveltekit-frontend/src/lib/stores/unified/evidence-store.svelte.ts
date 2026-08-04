@@ -208,4 +208,4 @@ class EvidenceStore {
 }
 
 export const evidenceStore = new EvidenceStore();
-import { resolveObjectStorageKey } from '$lib/server/storage/object-storage-compat.js';
+import { resolveObjectStorageKey } from '$lib/utils/object-storage-compat.js';

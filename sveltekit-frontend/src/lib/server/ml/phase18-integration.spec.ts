@@ -14,7 +14,7 @@ import {
   type OfflineStorageEnvelope,
   type MCPToolInput,
   type MastraAgentMessage,
-} from './phase18-envelope-schema.js';
+} from '$lib/schemas/phase18-envelope-schema.js';
 import { randomUUID } from 'node:crypto';
 
 /**
@@ -437,7 +437,7 @@ describe('Phase 18 Envelope Schema Integration', () => {
       const validation = validatePhase18Request(invalidRequest);
       expect(validation.success).toBe(false);
       if (!validation.success && validation.error) {
-        expect(validation.error.errors.length).toBeGreaterThan(0);
+        expect(validation.error.issues.length).toBeGreaterThan(0);
       }
     });
 

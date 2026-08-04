@@ -16,7 +16,7 @@ import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 import {
   buildObjectStorageCompatibilityFields,
   resolveObjectStorageKey,
-} from '$lib/server/storage/object-storage-compat.js';
+} from '$lib/utils/object-storage-compat.js';
 
 export const GET: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });

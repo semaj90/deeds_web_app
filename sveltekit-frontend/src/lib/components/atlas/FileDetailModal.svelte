@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import type { FileUnderstanding } from '$lib/server/atlas/contracts/file-understanding.js';
-  import { FilePurposeEnum, ThoroughnessEnum, AppCriticalityEnum } from '$lib/server/atlas/contracts/file-understanding.js';
+  import type { FileUnderstanding } from '$lib/schemas/file-understanding.js';
+  import { FilePurposeEnum, ThoroughnessEnum, AppCriticalityEnum } from '$lib/schemas/file-understanding.js';
   import Button from '$lib/components/ui/Button.svelte';
 
   interface Props {

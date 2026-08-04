@@ -15,7 +15,7 @@ import { isUuid } from '$lib/server/validation.js';
 import {
   buildObjectStorageCompatibilityFields,
   resolveObjectStorageKey,
-} from '$lib/server/storage/object-storage-compat.js';
+} from '$lib/utils/object-storage-compat.js';
 
 const deletePhotoSchema = z.object({
   photoId: z.string().min(1, 'photoId required').max(500),

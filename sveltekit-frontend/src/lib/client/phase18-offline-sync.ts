@@ -5,8 +5,8 @@ import {
   type OfflineStorageEnvelope,
   type Phase18RequestEnvelope,
   type Phase18ResponseEnvelope,
-} from '$lib/server/ml/phase18-envelope-schema.js';
-import { randomUUID } from 'node:crypto';
+} from '$lib/schemas/phase18-envelope-schema.js';
+const randomUUID = () => crypto.randomUUID(); // Web Crypto — works in SW, browser, and Node 19+
 
 /**
  * Phase 18 Offline Storage & Sync Manager

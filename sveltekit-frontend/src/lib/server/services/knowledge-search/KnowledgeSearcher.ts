@@ -20,7 +20,7 @@ import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getSeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
 import { getRedisCacheService } from './RedisCacheService.js';
-import { buildObjectStorageCompatibilityFields, resolveObjectStorageKey } from '$lib/server/storage/object-storage-compat.js';
+import { buildObjectStorageCompatibilityFields, resolveObjectStorageKey } from '$lib/utils/object-storage-compat.js';
 
 export class KnowledgeSearcher {
   private qdrant = getQdrantKnowledgeStore();

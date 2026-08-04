@@ -1,0 +1,44 @@
+{
+  "audit": "vite-impossible-situation",
+  "date": "2026-08-04",
+  "session": 188,
+  "status": "APPLY_PROVEN",
+  "error_message": "An impossible situation occurred",
+  "throw_site": {
+    "package": "@sveltejs/kit",
+    "file": "src/exports/vite/index.js",
+    "line": 670,
+    "plugin": "vite-plugin-sveltekit-guard",
+    "hook": "load",
+    "graph": "client"
+  },
+  "first_failing_module": "src/lib/server/ml/phase18-envelope-schema.ts",
+  "importer_chain": [
+    "src/service-worker.ts",
+    "src/lib/client/phase18-offline-sync.ts",
+    "$lib/server/ml/phase18-envelope-schema.js"
+  ],
+  "why_impossible_branch": "service-worker.ts is not in manifest_data entrypoints (components/universal/hooks only), so the guard's importer-chain walk cannot reach an entrypoint and falls through to the bare throw instead of the friendly server-only import error",
+  "session_184_reranking_causality": "DISPROVEN",
+  "secondary_defects": [
+    {"file": "src/lib/client/phase18-offline-sync.ts", "issue": "node:crypto import in client/SW code", "fix": "crypto.randomUUID() (Web Crypto)"},
+    {"file": "src/lib/server/ml/phase18-integration.spec.ts", "issue": "zod v3 API error.errors on zod 4.4.3", "fix": "error.issues"}
+  ],
+  "fix": {
+    "schema_moved_to": "src/lib/schemas/phase18-envelope-schema.ts",
+    "imports_updated": [
+      "src/lib/client/phase18-offline-sync.ts",
+      "src/mcp/tools/phase18-reranker-tool.ts",
+      "src/lib/server/trpc/procedures/phase18-reranker.ts",
+      "src/lib/server/ml/phase18-integration.spec.ts"
+    ]
+  },
+  "verification": {
+    "client_transform_offline_sync": "PASS",
+    "client_transform_schema": "PASS",
+    "service_worker_transform": "PASS_200",
+    "phase18_integration_spec": "26/26 PASS",
+    "tsgo_new_errors_in_touched_files": 0,
+    "fresh_server_soak": "PASS — 0 occurrences (npm-dev-session-188-final.log: root 200, sw 200, 75s soak)"
+  }
+}

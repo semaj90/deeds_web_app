@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { FileUnderstanding } from '$lib/server/atlas/contracts/file-understanding.js';
+  import type { FileUnderstanding } from '$lib/schemas/file-understanding.js';
 
   interface Props {
     files: FileUnderstanding[];
