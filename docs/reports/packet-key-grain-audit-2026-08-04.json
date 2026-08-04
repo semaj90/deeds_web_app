@@ -1,0 +1,101 @@
+{
+  "report": "packet-key-grain-audit",
+  "date": "2026-08-04",
+  "read_only": true,
+  "mutation_performed": false,
+  "corpus": {
+    "total_rows": 52417,
+    "rows_with_packet_key": 14643,
+    "coverage_percent": 27.9,
+    "distinct_key_values": 14549
+  },
+  "lane_classification": {
+    "uuid_equals_qdrant_id_passthrough": 13251,
+    "uuid_equals_own_row_id": 0,
+    "sha256_content_hash_lane": 1392,
+    "other_unclassified_format": 0
+  },
+  "cross_reference": {
+    "matches_atlas_packets_packet_key": 0,
+    "matches_atlas_packets_packet_id": 0,
+    "matches_another_chunk_rows_id": 0
+  },
+  "collisions": {
+    "MULTI_ROW_SAME_KEY": 59,
+    "top_colliding_keys": [
+      {
+        "pk": "sha256:9444160a63cfb8a32b093533a709384dbc332345b9b9f2619949b9bfad42e9a1",
+        "n": 9
+      },
+      {
+        "pk": "sha256:b929e8afb044c1da3078b3751d55120bdc484129aad63d266c58b72724cf77d9",
+        "n": 6
+      },
+      {
+        "pk": "sha256:4d106b03ff28cc6e0857da930adcb10b67fd5cd3f91d6a5fea20036c89d2a7fd",
+        "n": 5
+      },
+      {
+        "pk": "sha256:a3cbe259640d62bb999f5f0934ba373cfc201351d0a7d7699d44f643e97890e9",
+        "n": 4
+      },
+      {
+        "pk": "sha256:00f9fc5bac9a10e00204f1c39ccf725878a95b4653182dea2fe94e7706570c9b",
+        "n": 4
+      },
+      {
+        "pk": "sha256:0f9c10fea66629061b9560d107e39e22d503f01f3b579a8eb4b3782b2eafbc7c",
+        "n": 4
+      },
+      {
+        "pk": "sha256:83beafadd8181d7a744e18b448e90bacc90d72fa823b9d4319f1c864c7156e5b",
+        "n": 4
+      },
+      {
+        "pk": "sha256:f41d21965650489b40e47047e198d5ee3168d5f7d8d0675b66ca4fb3d9d012d3",
+        "n": 4
+      },
+      {
+        "pk": "sha256:686d180b855e7f7c7e10790c696a61f981c5b21182fd32d20993650cc8637c7f",
+        "n": 4
+      },
+      {
+        "pk": "sha256:57cad3ca1cf7b22110f4c48554095c5e20ef8e2fc1c280798e18e294936886bc",
+        "n": 3
+      }
+    ],
+    "sha256_collision_sample_rows": [
+      {
+        "source_ref": "src/lib/server/db/schema-postgres.ts",
+        "content_hash": null
+      }
+    ]
+  },
+  "data_quality_context": {
+    "empty_content_hash_rows": 6945,
+    "empty_content_hash_percent": 13.2,
+    "note": "content_hash emptiness correlates with the duplicate-row re-indexing defect fixed in canonical-join-missing-root-cause-2026-08-04.md"
+  },
+  "metrics": {
+    "EXISTING_KEY_MATCH_RATE": "NOT_COMPUTABLE — the UUID lane (90.5% of populated keys) is a qdrant_id passthrough, not an independently-derived identity; there is no third-party ground truth to compare a new formula against for this lane",
+    "DERIVATION_COLLISIONS": "NOT_APPLICABLE — no derivation formula was run against the corpus (see recommendation)",
+    "MULTI_ROW_SAME_KEY": 59,
+    "MULTI_KEY_SAME_LOGICAL_PACKET": "NOT_PROVEN — cannot assess without a proven logical-packet definition",
+    "UNRESOLVED_INPUT_FIELDS": [
+      "repository_id (not present in schema)",
+      "workspace_revision (present but 0% populated on chunk rows per session-183/188)",
+      "chunk ordinal / exact span (not present as columns)"
+    ]
+  },
+  "promotion_gate": {
+    "collision_count_zero": false,
+    "non_deterministic_keys_zero": "NOT_PROVEN",
+    "grain_alignment": "FAIL",
+    "result": "FAIL — do not proceed to backfill"
+  },
+  "recommendation": [
+    "90.5% of existing packet_key values (13,251/14,643) are byte-identical to metadata->>'packet_key' = qdrant_id::text — this is NOT a derived canonical packet identity, it is qdrant_id copied into a differently-named field. It carries zero additional semantic grain (no file/chunk/symbol distinction) and does not match atlas_packets by packet_key, packet_id, or any other chunk row's id.",
+    "9.5% (1,392/14,643) are sha256:<hex> content-hash keys. These collide across up to 9 rows for the same key; the colliding rows share source_ref and have EMPTY content_hash — consistent with the same duplicate-row re-indexing defect just fixed in hydrate-candidates.ts, not a derivation bug. This lane is a plausible seed for a real content-addressed grain but is entangled with the duplicate-row problem and needs de-duplication upstream first.",
+    "CONCLUSION: the existing 14,643-key corpus cannot serve as a training/validation set for a new derivation formula as-is. Recommend: (1) do not backfill the missing 37,774 rows from either existing lane, (2) fix upstream duplicate-row insertion first (same root cause as canonical_join_missing), (3) then design the packet_key grain (file vs chunk vs symbol) as an explicit architectural decision — not inferable from this data — before any derivation or backfill proceeds."
+  ]
+}
