@@ -1008,3 +1008,5 @@ tools/agentic-research/node/
 
 # Large regeneratable report artifacts (deterministic from live DB/Qdrant state)
 docs/reports/atlas-vector-manifest-v1-*.json
+
+docs/reports/fixtures/vector-parity-fixture-*.json

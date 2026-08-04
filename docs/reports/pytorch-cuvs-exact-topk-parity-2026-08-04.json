@@ -1,0 +1,38 @@
+{
+  "report": "pytorch-cuvs-exact-topk-parity",
+  "date": "2026-08-04",
+  "read_only": true,
+  "fixture": {
+    "corpus_size": 2000,
+    "dimension": 768,
+    "num_queries": 20,
+    "k": 10,
+    "source": "codebase_chunks_768_v2:content"
+  },
+  "backends": {
+    "pytorch": {
+      "version": "2.13.0+cu130",
+      "device": "cuda",
+      "elapsed_ms": 1290.83
+    },
+    "cuvs": {
+      "elapsed_ms": 377.14
+    }
+  },
+  "metrics": {
+    "mean_topk_overlap": 1.0,
+    "min_topk_overlap": 1.0,
+    "rank1_index_match_rate": 1.0,
+    "identity_match_rate_via_qdrant_point_id": 1.0,
+    "max_top1_score_delta": 0.0,
+    "mean_top1_score_delta": 0.0,
+    "nan_or_inf_queries": 0
+  },
+  "gate": {
+    "mean_overlap_ge_0_95": true,
+    "rank1_match_ge_0_95": true,
+    "max_score_delta_lt_1e-3": true,
+    "no_nan_inf": true,
+    "RESULT": "PASS"
+  }
+}
