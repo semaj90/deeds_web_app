@@ -55,63 +55,75 @@ export interface IdentityWorkerResult {
  * Build canonical envelope from packet data
  * Uses Zod validation to ensure shape is correct
  */
+/**
+ * Input shape: a row selected via Drizzle `db.select().from(atlasPackets)`.
+ * Drizzle returns camelCase property names (per schema/atlas-packets.ts), NOT the
+ * raw snake_case Postgres column names. `repositoryId`/`directoryId`/`fileId`/
+ * `moduleId`/`symbolId`/`chunkId`/`userId`/`redisKey` are NOT modeled in the
+ * Drizzle schema at all (even though repository_id/directory_id/file_id/module_id/
+ * symbol_id/chunk_id exist as live raw columns — see S180-6C schema-gap audit).
+ * They will always be undefined here until the schema is extended; the `|| randomUUID()`
+ * fallback is therefore always taken for those five fields today.
+ */
 function buildCanonicalEnvelope(packet: {
-  packet_key: string;
-  source_ref: string;
-  feature_id?: string;
-  directory_path?: string;
+  packetKey: string;
+  sourceRef: string;
+  featureId?: string;
+  directoryPath?: string;
   [key: string]: any;
 }): CanonicalEnvelope | null {
   try {
-    const parts = (packet.source_ref || '').split('/');
+    const parts = (packet.sourceRef || '').split('/');
     const fileName = parts[parts.length - 1] || '';
     const dirPath = parts.slice(0, -1).join('/') || '';
     const moduleName = fileName.replace(/\.(ts|js|tsx|jsx)$/, '');
 
     const envelope: CanonicalEnvelope = {
       // Hierarchy (immutable identity chain)
-      repository_id: packet.repository_id || randomUUID(),
-      directory_id: packet.directory_id || randomUUID(),
-      file_id: packet.file_id || randomUUID(),
-      module_id: packet.module_id || randomUUID(),
-      symbol_id: packet.symbol_id || randomUUID(),
-      feature_id: packet.feature_id || `${dirPath}:${moduleName}`,
-      packet_key: packet.packet_key,
-      chunk_id: packet.chunk_id || randomUUID(),
+      // NOTE: repositoryId/directoryId/fileId/moduleId/symbolId/chunkId are not
+      // modeled in the Drizzle schema (schema-gap, S180-6C) — always regenerated.
+      repository_id: packet.repositoryId || randomUUID(),
+      directory_id: packet.directoryId || randomUUID(),
+      file_id: packet.fileId || randomUUID(),
+      module_id: packet.moduleId || randomUUID(),
+      symbol_id: packet.symbolId || randomUUID(),
+      feature_id: packet.featureId || `${dirPath}:${moduleName}`,
+      packet_key: packet.packetKey,
+      chunk_id: packet.chunkId || randomUUID(),
 
       // Mirrors (store-specific IDs)
-      qdrant_point_id: packet.qdrant_point_id || undefined,
-      neo4j_node_id: packet.neo4j_node_id || undefined,
-      redis_key: packet.redis_key || undefined,
+      qdrant_point_id: packet.qdrantPointId || undefined,
+      neo4j_node_id: packet.neo4jNodeId || undefined,
+      redis_key: packet.redisKey || undefined,
 
       // Topology (coordinates)
-      source_ref: packet.source_ref,
-      directory_path: packet.directory_path || dirPath,
-      feature_label: packet.feature_label || moduleName,
+      source_ref: packet.sourceRef,
+      directory_path: packet.directoryPath || dirPath,
+      feature_label: packet.featureLabel || moduleName,
 
       // Permissions (access control)
       permissions: {
-        owner: packet.user_id || 'system',
+        owner: packet.userId || 'system',
         scope: 'canonical',
         can_write: true,
         can_delete: true
       },
 
       // Provenance (tracking)
-      created_at: packet.created_at || new Date().toISOString(),
+      created_at: packet.createdAt || new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
 
     // Validate against Zod schema
     const validation = validateCanonicalEnvelope(envelope);
     if (!validation.valid) {
-      console.warn(`[identity-worker] Envelope validation failed for ${packet.packet_key}:`, validation.errors);
+      console.warn(`[identity-worker] Envelope validation failed for ${packet.packetKey}:`, validation.errors);
       return null;
     }
 
     return envelope;
   } catch (err) {
-    console.error(`[identity-worker] Failed to build envelope for ${packet.packet_key}:`, err);
+    console.error(`[identity-worker] Failed to build envelope for ${packet.packetKey}:`, err);
     return null;
   }
 }
@@ -134,7 +146,7 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
     const packet = await db
       .select()
       .from(atlasPackets)
-      .where(eq(atlasPackets.packet_key, packetKey))
+      .where(eq(atlasPackets.packetKey, packetKey))
       .limit(1);
 
     if (!packet || packet.length === 0) {
@@ -149,6 +161,21 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
       };
     }
 
+    if (packet.length > 1) {
+      // packet_key has a live UNIQUE constraint (atlas_packets_packet_key_key), so this
+      // should be unreachable in practice — fail closed rather than silently pick packet[0].
+      console.error(`[identity-worker] Duplicate packet_key rows for ${packetKey} (${packet.length} rows) — failing closed`);
+      return {
+        packet_key: packetKey,
+        source_ref: '(ambiguous)',
+        identity_lane: 'quarantine',
+        canonical_envelope: null,
+        validation_errors: [`duplicate packet_key: ${packet.length} rows matched`],
+        was_updated: false,
+        action: 'skipped'
+      };
+    }
+
     const packetRow = packet[0];
 
     // 2. Build canonical envelope
@@ -156,7 +183,7 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
     if (!envelope) {
       return {
         packet_key: packetKey,
-        source_ref: packetRow.source_ref || '(missing)',
+        source_ref: packetRow.sourceRef || '(missing)',
         identity_lane: 'quarantine',
         canonical_envelope: null,
         validation_errors: ['failed to build canonical envelope'],
@@ -174,7 +201,7 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
       );
       return {
         packet_key: packetKey,
-        source_ref: packetRow.source_ref || '(missing)',
+        source_ref: packetRow.sourceRef || '(missing)',
         identity_lane: laneOnFailure,
         canonical_envelope: null,
         validation_errors: validation.errors,
@@ -191,7 +218,7 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
     if (!permissionMgr.canWrite()) {
       return {
         packet_key: packetKey,
-        source_ref: packetRow.source_ref || '(missing)',
+        source_ref: packetRow.sourceRef || '(missing)',
         identity_lane: identityLane,
         canonical_envelope: null,
         validation_errors: ['insufficient permissions to write'],
@@ -201,24 +228,24 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
     }
 
     // Update packet with canonical identity
-    // Note: All 8 canonical ID fields + identity_lane + identity_confidence are persisted.
-    // Envelope data is preserved in these explicit columns; no separate JSONB storage needed.
+    // NOTE (S180-6C fix): only feature_id/identity_lane/identity_confidence/updated_at
+    // are actually modeled as Drizzle columns on atlasPackets (schema/atlas-packets.ts).
+    // repository_id/directory_id/file_id/module_id/symbol_id/chunk_id exist as raw
+    // Postgres columns but have NO Drizzle property — passing them here previously
+    // either silently dropped them or threw, and the `.where()` below used a
+    // nonexistent `packet_key` property (eq(undefined, packetKey)), so this UPDATE
+    // never reliably matched a row. Until the schema is extended to model those six
+    // uuid columns (tracked separately), they cannot be written through this path.
     try {
       await db
         .update(atlasPackets)
         .set({
-          repository_id: envelope.repository_id,
-          directory_id: envelope.directory_id,
-          file_id: envelope.file_id,
-          module_id: envelope.module_id,
-          symbol_id: envelope.symbol_id,
-          feature_id: envelope.feature_id,
-          chunk_id: envelope.chunk_id,
-          identity_lane: identityLane,
-          identity_confidence: validation.confidence ?? 0,
-          updated_at: new Date()
+          featureId: envelope.feature_id,
+          identityLane: identityLane,
+          identityConfidence: validation.confidence ?? 0,
+          updatedAt: new Date()
         })
-        .where(eq(atlasPackets.packet_key, packetKey));
+        .where(eq(atlasPackets.packetKey, packetKey));
 
       console.log(
         `[identity-worker] ✅ ${packetKey} → ${identityLane} (${Date.now() - startTime}ms)`
@@ -226,7 +253,7 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
 
       return {
         packet_key: packetKey,
-        source_ref: packetRow.source_ref || '(missing)',
+        source_ref: packetRow.sourceRef || '(missing)',
         identity_lane: identityLane,
         canonical_envelope: envelope,
         validation_errors: [],
@@ -237,7 +264,7 @@ export async function processPacketIdentity(packetKey: string): Promise<Identity
       console.error(`[identity-worker] Update failed for ${packetKey}:`, updateErr);
       return {
         packet_key: packetKey,
-        source_ref: packetRow.source_ref || '(missing)',
+        source_ref: packetRow.sourceRef || '(missing)',
         identity_lane: identityLane,
         canonical_envelope: envelope,
         validation_errors: ['Postgres update failed'],
