@@ -162,7 +162,7 @@ export async function executeMultiVectorRetrieval(
           qdrantPointId: String(point.id),
         };
       })
-      .filter((point): point is QdrantSearchResult => point !== null);
+      .filter((point): point is NonNullable<typeof point> => point !== null);
 
     summaryMs = performance.now() - summaryStart;
   } catch (err) {
@@ -202,7 +202,7 @@ export async function executeMultiVectorRetrieval(
           qdrantPointId: String(point.id),
         };
       })
-      .filter((point): point is QdrantSearchResult => point !== null);
+      .filter((point): point is NonNullable<typeof point> => point !== null);
 
     titleMs = performance.now() - titleStart;
   } catch (err) {

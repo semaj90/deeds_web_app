@@ -446,9 +446,12 @@ export async function buildAgenticFixProposal(
   ]);
 
   const rerankPayload = asJsonPayload(rerank);
+  const rerankedRows = Array.isArray(rerankPayload?.reranked)
+    ? (rerankPayload.reranked as Array<{ canonical_envelope?: ToolJson }>)
+    : [];
   const canonicalEnvelope =
     (rerankPayload?.canonical_envelope as ToolJson | undefined) ??
-    (Array.isArray(rerankPayload?.reranked) ? (rerankPayload.reranked[0] as { canonical_envelope?: ToolJson })?.canonical_envelope ?? null : null) ??
+    rerankedRows[0]?.canonical_envelope ??
     null;
 
   const hmmStates = asJsonPayload(hmm)?.states;
