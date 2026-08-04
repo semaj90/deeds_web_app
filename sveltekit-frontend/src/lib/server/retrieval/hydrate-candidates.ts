@@ -235,17 +235,23 @@ export async function hydrateCandidatesWithProof(
         chunk.output_meta
     `;
 
+    // Build a FRESH value list per predicate. Reusing one `SQL` fragment
+    // object across multiple positions in a single template relies on
+    // implicit re-parameterization behavior — do not depend on that even
+    // if the current Drizzle version happens to handle it; a fresh
+    // sql.join() per occurrence is unambiguous regardless of driver version.
+    const valueList = (values: string[]) => sql.join(values.map((value) => sql`${value}`), sql`, `);
+
     // Query 1 — exact identity match (id or metadata packet_key). Bounded by
     // the count of distinct requested identities; each id is a primary key,
     // so this cannot be starved by duplicate rows the way a source_ref match can.
-    const candidateIdList = sql.join(candidateIds.map((value) => sql`${value}`), sql`, `);
     const exactResult = candidateIds.length > 0
       ? await db.execute(sql`
           SELECT ${CHUNK_COLUMNS}
           FROM codebase_chunk_index chunk
-          WHERE chunk.id::text IN (${candidateIdList})
-             OR (chunk.metadata->>'packet_key') IN (${candidateIdList})
-             OR (chunk.output_meta->>'packet_key') IN (${candidateIdList})
+          WHERE chunk.id::text IN (${valueList(candidateIds)})
+             OR (chunk.metadata->>'packet_key') IN (${valueList(candidateIds)})
+             OR (chunk.output_meta->>'packet_key') IN (${valueList(candidateIds)})
           LIMIT ${candidateIds.length + 10}
         `)
       : { rows: [] as unknown[] };
@@ -253,25 +259,50 @@ export async function hydrateCandidatesWithProof(
     // Query 2 — source_ref fallback for candidates the exact query didn't
     // resolve. `codebase_chunk_index` can carry hundreds of duplicate rows
     // per source_ref (repeated re-indexing without cleanup — e.g.
-    // schema-postgres.ts has 369). Without DISTINCT ON + ORDER BY, an
-    // unbounded LIMIT can silently drop the row a candidate actually needs
-    // whenever duplicates from OTHER candidates in the same batch consume
-    // the limit budget first. DISTINCT ON deterministically picks the most
-    // recently updated row per source_ref and returns exactly one row per
-    // distinct source_ref — never starved by duplicates.
-    const sourceRefList = sql.join(sourceRefs.map((value) => sql`${value}`), sql`, `);
+    // schema-postgres.ts has 369). A DISTINCT ON "pick the newest" fallback
+    // is semantically UNSAFE: it deterministically picks A row, not
+    // necessarily the CORRECT row (multiple rows sharing a source_ref may
+    // be legitimately distinct chunks, not just re-index duplicates). So
+    // instead we count matches per source_ref via a window function and
+    // only auto-resolve source_refs with exactly one match; source_refs
+    // with more than one match are surfaced as AMBIGUOUS_SOURCE_REF rather
+    // than silently guessed.
     const fallbackResult = sourceRefs.length > 0
       ? await db.execute(sql`
-          SELECT DISTINCT ON (chunk.source_ref) ${CHUNK_COLUMNS}
-          FROM codebase_chunk_index chunk
-          WHERE chunk.source_ref IN (${sourceRefList})
-          ORDER BY chunk.source_ref, chunk.updated_at DESC
+          WITH ranked AS (
+            SELECT
+              id, qdrant_id, relative_path, source_ref, symbol, summary, content,
+              semantic_tags, metadata, domain, som_cluster, page_rank_score,
+              community_id, content_hash, updated_at, language, kind, output_meta,
+              COUNT(*) OVER (PARTITION BY source_ref) AS match_count,
+              ROW_NUMBER() OVER (PARTITION BY source_ref ORDER BY updated_at DESC) AS rn
+            FROM codebase_chunk_index
+            WHERE source_ref IN (${valueList(sourceRefs)})
+          )
+          SELECT
+            id, qdrant_id, relative_path, source_ref, symbol, summary, content,
+            semantic_tags, metadata, domain, som_cluster, page_rank_score,
+            community_id, content_hash, updated_at, language, kind, output_meta,
+            match_count
+          FROM ranked
+          WHERE rn = 1
         `)
       : { rows: [] as unknown[] };
 
+    const ambiguousSourceRefs = new Set<string>();
+    const unambiguousFallbackRows: unknown[] = [];
+    for (const row of fallbackResult.rows) {
+      const typed = row as { source_ref: string | null; match_count: string | number };
+      if (Number(typed.match_count) > 1) {
+        if (typed.source_ref) ambiguousSourceRefs.add(typed.source_ref);
+        continue; // do not use an unproven "newest wins" guess for identity resolution
+      }
+      unambiguousFallbackRows.push(row);
+    }
+
     const seenRowIds = new Set<string>();
     const mergedRows: unknown[] = [];
-    for (const row of [...exactResult.rows, ...fallbackResult.rows]) {
+    for (const row of [...exactResult.rows, ...unambiguousFallbackRows]) {
       const id = (row as { id: string }).id;
       if (seenRowIds.has(id)) continue;
       seenRowIds.add(id);
@@ -342,6 +373,19 @@ export async function hydrateCandidatesWithProof(
       const candidateKey = candidate.symbolVersionId || candidate.packetKey;
       const row = rowsByKey.get(candidate.sourceRef) || rowsByKey.get(candidateKey) || rowsByKey.get(candidate.packetKey);
       if (!row) {
+        if (candidate.sourceRef && ambiguousSourceRefs.has(candidate.sourceRef)) {
+          // More than one row shares this source_ref and no exact id/packet_key
+          // match resolved it. Do NOT guess — surface the ambiguity distinctly
+          // from a genuine missing-row case so it can be triaged separately
+          // (this is a data-quality symptom, not a hydration bug).
+          bumpReason('ambiguous_source_ref');
+          console.warn('[hydrate:ambiguous_source_ref]', {
+            sourceRef: candidate.sourceRef,
+            packetKey: candidate.packetKey,
+            scoreSource: candidate.scoreSource,
+          });
+          continue;
+        }
         proof.canonicalJoinMissingCount += 1;
         bumpReason('canonical_join_missing');
         // DIAGNOSTIC (session 188D): record exactly which candidate/predicate failed

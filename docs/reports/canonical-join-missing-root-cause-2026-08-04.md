@@ -41,7 +41,14 @@ Results merged, deduped by row id, in favor of the exact match. `sql.join()` use
 - `search-unified?q=test&topK=3` still returns packets (170 retrieved → 163 scored → 3 reranked → 1 post-processed → 1 packet)
 - tsgo: 0 errors; touched suites 14/14 pass
 
+## Correction (2026-08-04, same day): fallback safety hardened
+
+Review caught that the original `DISTINCT ON (source_ref) ORDER BY updated_at DESC` fallback was semantically unsafe — it deterministically picks *a* row, not necessarily the *correct* row, since multiple rows sharing a `source_ref` are not proven to be interchangeable duplicates (they could be legitimately distinct chunks). Replaced with a window-function CTE (`COUNT(*) OVER (PARTITION BY source_ref)`) that only auto-resolves `source_ref`s with exactly one match. Ambiguous `source_ref`s (verified live: `schema-postgres.ts` → 369 matches, `cache-smoke.test.ts` → 4 matches) are now classified as `ambiguous_source_ref` and left unresolved rather than guessed. Also fixed: each `IN (...)` predicate now gets a freshly-built `sql.join()` value list instead of reusing one `SQL` fragment object three times, removing reliance on implicit Drizzle re-parameterization behavior.
+
+Verified: CTE validated directly against Postgres (confirms both known-duplicate files report `match_count > 1`); 8/8 live requests still 200 with 0 `canonical_join_missing` and 0 `ambiguous_source_ref` (this dataset's candidates mostly resolve via exact id/packet_key — the ambiguity path is a safety net, not the common path); packets still flow (170→163→3→1→1); tsgo 0 errors; 14/14 touched tests pass.
+
 ## Not yet resolved (separate lane)
 
-- Why `codebase_chunk_index` has hundreds of duplicate rows per file (indexing pipeline dedup)
-- `packet_key` grain/derivation (task in progress)
+- Why `codebase_chunk_index` has hundreds of duplicate rows per file (indexing pipeline dedup) — the root defect behind both this fix and the packet_key grain audit
+- `packet_key` grain/derivation (blocked — see `packet-key-grain-audit-2026-08-04.md`)
+- Candidates that land in the now-safer `ambiguous_source_ref` state are currently dropped silently from the result set (same as any other unresolved candidate) — no dedicated remediation path yet
