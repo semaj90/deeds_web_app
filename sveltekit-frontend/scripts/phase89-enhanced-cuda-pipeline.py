@@ -49,7 +49,7 @@ BIFROST_ENABLED = os.getenv("BIFROST_ENABLED", "true").lower() in {"1", "true", 
 BIFROST_URL = os.getenv("BIFROST_URL", "http://127.0.0.1:3040")
 ROTORQUANT_MODEL_PATH = os.getenv(
     "ROTORQUANT_MODEL_PATH",
-    r"C:\Users\james\Videos\deeds-web-app\models\gemma4-legal-iq4xs-direct.gguf",
+    r"C:\Users\james\Videos\deeds-web-app\models\hfor\hforf.gguf",
 )
 TURBO_NGL = int(os.getenv("TURBO_NGL", "99"))
 TURBOQUANT_ENABLED = os.getenv("TURBOQUANT_ENABLED", "true").lower() in {"1", "true", "yes", "on"}

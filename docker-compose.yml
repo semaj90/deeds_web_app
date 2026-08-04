@@ -561,17 +561,26 @@ services:
   # Bifrost — Go AI gateway (replaces LiteLLM, 50x faster, built-in semantic cache)
   # OpenAI-compatible /v1/chat/completions → routes to native Ollama
   bifrost:
-    image: maximhq/bifrost:latest
+    build:
+      context: ./docker/bifrost
+      dockerfile: Dockerfile
+    image: legal-ai-bifrost:git
     container_name: legal-ai-bifrost
     restart: unless-stopped
     profiles: ["full"]
     deploy:
       resources:
         limits:
-          memory: 128M
+          # Was 128M — idle usage already sat at 97.7MB (76%) right after boot,
+          # before real request traffic or semantic-cache growth. That headroom
+          # was almost certainly why governance_startup_reset was taking 40s+
+          # to acquire its SQLite lock and MCP library sync was hitting
+          # "database is locked" — memory-starved goroutines hold locks longer,
+          # widening the collision window for concurrent startup writers.
+          memory: 512M
           cpus: '0.50'
         reservations:
-          memory: 32M
+          memory: 128M
           cpus: '0.25'
     logging:
       driver: json-file

@@ -24,10 +24,10 @@ export async function startOutboxPublisherWithRabbit(): Promise<void> {
   const amqplib = (await import('amqplib')) as any;
   const rabbitUrl = process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
   const conn = await amqplib.connect(rabbitUrl);
-  const ch = await conn.createChannel();
-
-  // Confirm mode: every publish gets an ack from the broker.
-  await ch.confirmSelect();
+  // Confirm mode: every publish gets an ack from the broker. The promise-API
+  // ChannelModel has no confirmSelect() on a plain channel — createConfirmChannel()
+  // is the only way to get a channel with waitForConfirms().
+  const ch = await conn.createConfirmChannel();
 
   async function publishFn(exchange: string, routingKey: string, payload: Buffer): Promise<void> {
     return new Promise((resolve, reject) => {

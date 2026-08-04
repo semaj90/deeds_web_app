@@ -33,14 +33,28 @@ function mergedEnv(extra = {}) {
   const isLiteRT = devGpuLlmBackend === 'litert';
   const synthPort = isLiteRT ? '8070' : '8090';
 
+  // Only point the app at the :8081 GGUF embed server when it's been opted
+  // into (DEV_GPU_EMBED_SERVER=onnx). Otherwise leave OLLAMA_EMBED_BASE_URL
+  // unset so embedding-client.ts's Tier-0 probe is skipped entirely (rather
+  // than dialing a dead :8081 on every embed call) and Ollama is used directly.
+  const wantOnnxEmbedServer = String(
+    extra.DEV_GPU_EMBED_SERVER ?? envFromFiles.DEV_GPU_EMBED_SERVER ?? process.env.DEV_GPU_EMBED_SERVER ?? 'ollama',
+  ).toLowerCase() === 'onnx';
+
   return {
     ...process.env,
     ...envFromFiles,
     GPU_ENABLED: 'true',
     VITE_GPU_ENABLED: 'true',
     CUDA_VISIBLE_DEVICES: envFromFiles.CUDA_VISIBLE_DEVICES ?? '0',
-    OLLAMA_EMBED_BASE_URL: envFromFiles.OLLAMA_EMBED_BASE_URL ?? envFromFiles.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081',
-    EMBED_SERVER_URL: envFromFiles.EMBED_SERVER_URL ?? envFromFiles.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081',
+    // Explicit undefined (not omission) so a leftover value from process.env
+    // or envFromFiles is actually cleared for the child process, not inherited.
+    OLLAMA_EMBED_BASE_URL: wantOnnxEmbedServer
+      ? (envFromFiles.OLLAMA_EMBED_BASE_URL ?? envFromFiles.EMBED_SERVER_URL ?? 'http://127.0.0.1:8081')
+      : undefined,
+    EMBED_SERVER_URL: wantOnnxEmbedServer
+      ? (envFromFiles.EMBED_SERVER_URL ?? envFromFiles.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081')
+      : undefined,
     EMBED_BACKEND: envFromFiles.EMBED_BACKEND ?? 'onnx',
     EMBED_SERVER_PORT: envFromFiles.EMBED_SERVER_PORT ?? '8081',
     EMBED_MAX_BATCH: envFromFiles.EMBED_MAX_BATCH ?? '64',
@@ -243,22 +257,33 @@ async function main() {
     }
   }
 
-  // Start ONNX embedding server unless already running on :8081
+  // The GGUF embed server on :8081 is opt-in only — it's a second GPU-resident
+  // model competing with the :8090 chat model for the same 8GB card. Ollama
+  // already serves embeddinggemma:latest on-demand (loads on first request,
+  // unloads after its idle keep-alive) so it's the right default for routine
+  // dev. Set DEV_GPU_EMBED_SERVER=onnx to eagerly start :8081 for sessions
+  // doing heavy bulk-embedding work (graphify backfills, batch indexing) that
+  // want its higher-throughput batch endpoint. embedding-client.ts's Tier-0
+  // probe already fails over to Ollama near-instantly when :8081 isn't up.
   const embedPort = parseInt(process.env.EMBED_SERVER_PORT ?? '8081');
+  const wantEmbedServer = String(process.env.DEV_GPU_EMBED_SERVER ?? 'ollama').toLowerCase() === 'onnx';
   if (await isLlamaServerRunning(embedPort)) {
-    console.log(`[dev:gpu] ✅ Embed server already running on :${embedPort} — skipping launch`);
-  } else {
+    console.log(`[dev:gpu] ✅ Embed server already running on :${embedPort} — leaving it up`);
+  } else if (wantEmbedServer) {
     const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
     try {
       await runChecked(npm, ['run', 'embed:onnx:start:detached'], {
         cwd: FRONTEND_ROOT,
         env: mergedEnv(),
       });
-      console.log('[dev:gpu] ✅ ONNX Embedding server started on :8081');
+      console.log('[dev:gpu] ✅ ONNX Embedding server started on :8081 (DEV_GPU_EMBED_SERVER=onnx)');
     } catch {
       console.log('[dev:gpu] ⚠️  ONNX Embedding server unavailable, using Ollama fallback');
       console.log('[dev:gpu] Will use Ollama embeddinggemma:latest at :11434/api');
     }
+  } else {
+    console.log('[dev:gpu] ℹ️  Skipping :8081 GGUF embed server (default) — using Ollama embeddinggemma:latest on-demand');
+    console.log('[dev:gpu]    Set DEV_GPU_EMBED_SERVER=onnx to eagerly start :8081 for bulk-embedding sessions');
   }
 
   // Start the NLP sidecar unless already running on :8095
@@ -282,8 +307,13 @@ async function main() {
 
   console.log('[dev:gpu] --- GPU Runtime Ready ---');
   console.log(`[dev:gpu] LLM (synthesis):  ${llmUrl} (${isLiteRT ? 'LiteRT-LM' : 'TurboQuant llama-server'})`);
-  console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX)');
-  console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma)');
+  if (wantEmbedServer) {
+    console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX, eager)');
+    console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma, fallback)');
+  } else {
+    console.log('[dev:gpu] Embeddings:       http://127.0.0.1:11434/api (Ollama embeddinggemma, on-demand)');
+    console.log('[dev:gpu]                   :8081 GGUF embed server not started — set DEV_GPU_EMBED_SERVER=onnx to enable');
+  }
   console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
 
   const desiredVitePort = parseInt(process.env.VITE_PORT ?? '5173', 10);

@@ -170,6 +170,9 @@ export async function purgeAllDAGCache(): Promise<{ deleted: number; error?: str
 export async function cleanupExpiredDAGCache(): Promise<{ deleted: number; error?: string }> {
 	try {
 		const { couchdb } = await import('$lib/server/services/couchdb-client.js');
+		// Database may not exist yet on first boot — create is idempotent (PUT returns
+		// 412 if it already exists, which createDb() treats as success).
+		await couchdb.createDb(DAG_CACHE_DB);
 		const allDocs = await couchdb.allDocs(DAG_CACHE_DB, { include_docs: true }) as {
 			rows: Array<{ id: string; doc?: Record<string, unknown> & { _rev?: string } }>
 		};
