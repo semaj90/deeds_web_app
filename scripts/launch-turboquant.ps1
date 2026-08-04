@@ -588,24 +588,32 @@ if (-not $StatusOnly) {
             # (OpenAI-style fences) instead of the native Gemma4 DSL template.
             $jinjaOk = $false
             $supportsTools = $false
+            $modelOk = $false
+            $runningModelAlias = $null
+            $targetModelAlias = Split-Path -Leaf $model
             try {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
                 $supportsTools = ($props.chat_template_caps.supports_tool_calls -eq $true) -or ($props.chat_template_caps.supports_tools -eq $true) -or ($props.supports_tool_calls -eq $true)
+                $runningModelAlias = $props.model_alias
+                if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
+                $modelOk = ($runningModelAlias -eq $targetModelAlias)
             } catch {
                 # /props unavailable on old builds — treat as unknown, require restart
                 $jinjaOk = $false
                 $supportsTools = $false
+                $modelOk = $false
             }
 
-            if ($ctxOk -and $jinjaOk -and $supportsTools) {
-                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK, tools=OK)" -ForegroundColor Yellow
+            if ($ctxOk -and $jinjaOk -and $supportsTools -and $modelOk) {
+                Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (ctx=$ctxLen, system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                 exit 0
             } else {
                 $reason = @()
                 if (-not $ctxOk)       { $reason += "ctx mismatch: running=$runningCtx target=$ctxLen" }
                 if (-not $jinjaOk)     { $reason += "supports_system_role:false (stale --chat-template or missing --jinja)" }
                 if (-not $supportsTools) { $reason += "supports_tools:false (wrong template — needs custom_pub_chat_template_gemma4.jinja)" }
+                if (-not $modelOk)     { $reason += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
                 Write-Host ("TurboQuant on :$port needs restart — $($reason -join '; ')") -ForegroundColor Cyan
                 $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                 if ($runningPids) {
@@ -620,13 +628,18 @@ if (-not $StatusOnly) {
                 $props = Invoke-RestMethod ("http://127.0.0.1:$port/props") -TimeoutSec 2 -ErrorAction Stop
                 $jinjaOk = ($props.chat_template_caps.supports_system_role -eq $true) -or ($props.system_prompt.supports_system_role -eq $true) -or ($props.supports_system_role -eq $true)
                 $supportsTools = ($props.chat_template_caps.supports_tool_calls -eq $true) -or ($props.chat_template_caps.supports_tools -eq $true) -or ($props.supports_tool_calls -eq $true)
-                if ($jinjaOk -and $supportsTools) {
-                    Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK, tools=OK)" -ForegroundColor Yellow
+                $targetModelAlias = Split-Path -Leaf $model
+                $runningModelAlias = $props.model_alias
+                if (-not $runningModelAlias -and $props.model_path) { $runningModelAlias = Split-Path -Leaf $props.model_path }
+                $modelOk = ($runningModelAlias -eq $targetModelAlias)
+                if ($jinjaOk -and $supportsTools -and $modelOk) {
+                    Write-Host "TurboQuant already healthy on http://127.0.0.1:$port (system_role=OK, tools=OK, model=$targetModelAlias)" -ForegroundColor Yellow
                     exit 0
                 } else {
                     $reason2 = @()
                     if (-not $jinjaOk)     { $reason2 += "supports_system_role:false" }
                     if (-not $supportsTools) { $reason2 += "supports_tools:false (needs custom_pub_chat_template_gemma4.jinja)" }
+                    if (-not $modelOk)     { $reason2 += "model mismatch: running=$runningModelAlias target=$targetModelAlias" }
                     Write-Host "TurboQuant on :$port needs restart — $($reason2 -join '; ')" -ForegroundColor Cyan
                     $runningPids = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
                     if ($runningPids) {
