@@ -60,3 +60,30 @@ No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS
 - [ ] P4b.2 Generator: raw evidence (logs, receipts, tool output) -> tuple, byte-offset addressed (not line numbers -- logs rotate/append)
 - [ ] P4b.3 KAG indexing of tuples with mandatory evidence-pointer resolution on retrieval
 - [ ] P4b.4 Document clearly: this layer is token-reduction/retrieval-indexing only, never conflated with RTK (shell-output compaction) or native GPU acceleration (this same OpenSpec's core subject)
+
+## P5 — Session 188 operational next steps (2026-08-04 handoff)
+
+Native/GPU startup reliability (adjacent to this spec's proof-gate discipline):
+- [x] launch-turboquant.ps1: model_alias verification in health check (87f4a96540)
+- [x] dev-gpu-runtime.mjs: always delegate to launcher, don't trust bare /health (58663ad3d1)
+- [x] dev-gpu-runtime.mjs: duplicate llama-server.exe process detection + VRAM advisory (246e06f011)
+- [ ] Deduplicate `isMiniforgeNlpRunning` (port 8095) — defined identically in both
+      `ace-incremental-startup.mjs` and `dev-gpu-runtime.mjs`; extract to a shared module
+- [ ] Full 47-gate deep audit (G1-G55 + backend infra 17-gate) — deferred this session for
+      context budget; graph index (`docs/graph/codebase-graph.json`) is stale, needs
+      `npm run graphify:daily` before a real run
+
+P0 blockers (unchanged from packet-key-grain-audit-2026-08-04.md — still need operator input):
+- [ ] Packet grain decision: CHUNK_OCCURRENCE recommended by operator (2026-08-04) —
+      not yet implemented as the discriminated identity contract (P0.1)
+- [ ] Trace `scripts/atlas/backfill-unified-id-hierarchy.mjs`'s `randomUUID()` chunk_id
+      into an actual call site/cron trigger — leading hypothesis for the duplicate-row
+      defect, not yet confirmed end-to-end (see duplicate-writer-inventory-2026-08-04.md)
+- [ ] True-duplicate classification: compare full occurrence tuple (source_ref +
+      source_revision + span + chunker_revision + content_hash), not just source_ref count
+
+GPU lane (unblocked, ready to run — PyTorch<->cuVS exact parity PASSED 2026-08-04):
+- [ ] Qdrant ANN recall vs the proven exact oracle (per-named-vector: content/error/signature)
+- [ ] CAGRA benchmark vs the same oracle, at 2k -> 10k -> 52,380 scale
+- [ ] Warmup-correct performance measurement (5 warmup + 20 measured, CUDA sync, separate
+      transfer vs compute time) — this session's timing numbers were not warmup-corrected
