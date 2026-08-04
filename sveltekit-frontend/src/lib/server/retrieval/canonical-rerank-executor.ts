@@ -583,12 +583,43 @@ async function runFallbackRerank(
     };
   }
 
-  const local = localFallbackRerank(candidates);
-  return {
-    modelVersion: local.modelVersion,
-    ranked: local.ranked,
-    fallbackReason: 'xgboost_sidecar_unavailable',
-  };
+  try {
+    const local = localFallbackRerank(candidates);
+    return {
+      modelVersion: local.modelVersion,
+      ranked: local.ranked,
+      fallbackReason: 'xgboost_sidecar_unavailable',
+    };
+  } catch (err) {
+    console.error('[runFallbackRerank] localFallbackRerank threw:', {
+      error: (err as Error)?.message,
+      candidatesCount: candidates.length,
+      firstCandidateSample: candidates[0] ? {
+        packetKey: candidates[0].packetKey,
+        sourceRef: candidates[0].sourceRef,
+        retrievedRank: candidates[0].retrievedRank,
+      } : null,
+    });
+    // FAIL-OPEN: Preserve retrieval order instead of returning empty array
+    return {
+      modelVersion: 'local-error',
+      ranked: candidates.map((candidate, index) => ({
+        ...candidate,
+        blendedScore: candidate.crossEncoderScore ?? candidate.denseScore ?? 0.5,
+        rankAfter: index + 1,
+        modelVersion: 'local-error-fallback',
+        blendWeights: DEFAULT_BLEND_WEIGHTS as any,
+        evidence: {
+          semanticLane: candidate.denseScore !== undefined
+            ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
+            : undefined,
+          lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
+          topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
+        },
+      })) satisfies RerankedCandidate[],
+      fallbackReason: 'localFallbackRerank_threw',
+    };
+  }
 }
 
 export function rerankedCandidateToCanonicalEnvelope(
@@ -705,7 +736,17 @@ export async function rerankCanonicalFeatureEnvelopes(
     const rerankOutput = await reranker.rerank({ requestId: primaryCacheKey, query, candidates, limit: topK, profile: 'crossencoder' });
     ranked = rerankOutput.ranked as any;
     crossEncoderUsed = true;
-  } catch {
+  } catch (err) {
+    console.error('[rerankCanonicalFeatureEnvelopes] reranker threw:', {
+      error: (err as Error)?.message,
+      candidatesCount: candidates.length,
+      firstCandidateSample: candidates[0] ? {
+        packetKey: candidates[0].packetKey,
+        sourceRef: candidates[0].sourceRef,
+        hasContent: 'content' in candidates[0],
+        hasRetrievedRank: 'retrievedRank' in candidates[0],
+      } : null,
+    });
     const fallbackCacheKey = buildCanonicalRerankCacheKey({
       query,
       candidates: fingerprints,

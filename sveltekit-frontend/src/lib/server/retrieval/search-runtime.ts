@@ -872,12 +872,38 @@ export class SearchRuntime {
     query: SearchQuery,
   ): Promise<Array<FeatureEnvelope & { model_version?: string; blended_score?: number }>> {
     const { rerankCanonicalFeatureEnvelopes } = await import('./canonical-rerank-executor.js');
+
+    // DIAGNOSTIC: Log input state
+    console.info('[stage:rerank] input', {
+      candidateCount: envelopes.length,
+      packetKeys: envelopes.slice(0, 5).map(e => e.packet_key),
+    });
+
     const result = await rerankCanonicalFeatureEnvelopes(query.text, envelopes as any, {
       authScope: query.userId ?? this.userId ?? 'public',
       rendererVersion: 'search-runtime-v1',
       maxLength: 4096,
       topK: Math.min(query.topK, envelopes.length || query.topK),
     });
+
+    // DIAGNOSTIC: Log output state
+    console.info('[stage:rerank] output', {
+      candidateCount: result.results.length,
+      packetKeys: result.results.slice(0, 5).map(r => r.packet_key),
+      modelVersion: result.provenance?.modelVersion,
+      fallbackReason: result.provenance?.fallbackReason,
+      cacheStatus: result.provenance?.cacheStatus,
+    });
+
+    // SAFETY: Preserve input if output is empty (fail-open)
+    if (result.results.length === 0 && envelopes.length > 0) {
+      console.warn('[stage:rerank] reranker returned 0 results for', envelopes.length, 'inputs. Preserving retrieval order.');
+      return envelopes.map((envelope, index) => ({
+        ...envelope,
+        model_version: 'retrieval_order_preserved',
+        blended_score: undefined,
+      }));
+    }
 
     return result.results;
   }
