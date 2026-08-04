@@ -85,3 +85,18 @@ Ornith/Gemma4 agent flows SHALL access native acceleration only through named TR
 #### Scenario: Evidence-backed agent claim
 - **WHEN** an agent claims a GPU-backed result
 - **THEN** the claim references a tool call whose receipt names the backend and counters
+
+### Requirement: Ontology-linked tuples for compressed evidence, never a raw-log replacement
+Any compressed/structured representation of tool output or execution evidence consumed by KAG/agent retrieval SHALL take the form of an ontology-linked tuple (`subject`, `predicate`, `object`, `evidence_ref`) and SHALL carry a pointer back to the exact raw evidence span it was derived from. A tuple SHALL NOT be treated as a substitute for the raw log/receipt it summarizes, and SHALL NOT be presented as a local-LLM acceleration mechanism (it reduces what an agent reads, not what a model computes).
+
+The envelope SHALL include at minimum: `event_id` (content-addressed, e.g. `sha256:...`), `subject`, `predicate`, `object`, `session_id`, `source_path`, `byte_start`, `byte_end`, `raw_sha256` (hash of the referenced byte span, for tamper/drift detection), `severity`.
+
+#### Scenario: Tuple traces back to raw evidence
+- **WHEN** an ontology tuple is retrieved via KAG search
+- **THEN** `source_path` + `byte_start`/`byte_end` resolve to the exact original log/receipt span
+- **AND** re-hashing that span matches `raw_sha256`
+
+#### Scenario: Tuple is not mistaken for acceleration
+- **WHEN** a tuple envelope is documented or referenced in tooling
+- **THEN** it is described as an evidence-compression / retrieval-indexing aid
+- **AND** it is never described as quantizing weights, compressing KV cache, or accelerating inference

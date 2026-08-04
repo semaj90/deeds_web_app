@@ -53,3 +53,10 @@ No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS
 - [ ] P2b.2 Representation contract binding: index build + compute requests carry representation_id, revision, dims, dtype, normalization, metric, model id+hash; mismatch (e.g. latent_64 query vs semantic_768 index) rejected pre-compute with receipt reason
 - [ ] P2b.3 Compute-only core audit: no PostgreSQL/Qdrant/Redis/Neo4j/Kafka/HTTP/store-filesystem dependency linked into atlas_core
 - [ ] P2b.4 Probe classes extended: NOT_IMPLEMENTED, LIBTORCH_CPU, NOT_PROVEN added; implementation-linked / symbol-loaded / binary-present / branch-executed tracked as separate claims
+
+## P4b — Ontology-linked tuple layer (2026-08-04 addition)
+
+- [ ] P4b.1 Define the tuple envelope type (event_id/subject/predicate/object/session_id/source_path/byte_start/byte_end/raw_sha256/severity) as a shared schema
+- [ ] P4b.2 Generator: raw evidence (logs, receipts, tool output) -> tuple, byte-offset addressed (not line numbers -- logs rotate/append)
+- [ ] P4b.3 KAG indexing of tuples with mandatory evidence-pointer resolution on retrieval
+- [ ] P4b.4 Document clearly: this layer is token-reduction/retrieval-indexing only, never conflated with RTK (shell-output compaction) or native GPU acceleration (this same OpenSpec's core subject)

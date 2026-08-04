@@ -128,3 +128,27 @@ Optional backend behind `atlas_turbovec_build/search` (bits_per_dimension, block
 ## RTX 3060 Ti envelope (from RESEARCH-GRPC-GPJSON-COUCHDB-CACHE-ARCHITECTURE.md)
 
 8 GB VRAM shared across llama-server + embeddings + this lane; 360 GB/s bandwidth bounds large batches; SM 8.6. Consequences: bounded scheduler with `memory_limit_bytes` is mandatory; `getCudaMemory` must be fixed (move `cudaMemGetInfo` to a `.cu` TU — currently `__CUDACC__`-guarded so MSVC C++ TUs report availability with zero memory values); dense pairwise graphs stay capped by `max_neighbors_per_row`.
+
+## Ontology-linked tuples (compressed evidence layer)
+
+A separate layer from execution receipts: receipts describe *what a native call did*; ontology tuples describe *what an agent should know without re-reading the raw log*. Both are evidence, neither replaces raw storage, and neither is a local-LLM acceleration mechanism — RTK-style shell-output compaction, ontology tuples, and native GPU acceleration are three unrelated axes and must not be conflated in documentation or agent-facing claims.
+
+```
+event_id     sha256:...                          content-addressed
+subject      hydrate_candidates
+predicate    sql_binding_failed
+object       "ANY() received tuple, not array literal"
+session_id   188b
+source_path  docs/reports/npm-dev-session-188b.log
+byte_start   1234567
+byte_end     1234920
+raw_sha256   sha256:...                          hash of the referenced span
+severity     error
+```
+
+Rules:
+- Tuples are generated FROM raw evidence (logs, receipts, tool output) after the fact — never the primary write target.
+- `source_path` + `byte_start`/`byte_end` MUST resolve to the exact original span; `raw_sha256` lets a reader detect drift if the source file rotates or truncates.
+- Byte offsets, not line numbers, are the addressing unit — line numbers shift under log rotation/HMR appends (learned the hard way this session: a `canonical_join_missing` line-number reference went stale within the same log file after later requests appended more lines).
+- KAG graph retrieval MAY index tuples for fast lookup; retrieval of a tuple MUST offer the evidence pointer, not just the compressed claim.
+- Never describe this layer as: quantizing Ornith, modifying KV cache, compressing GGUF weights, or accelerating llama-server inference. It is a token-reduction/retrieval-indexing aid at the tool-output boundary, the same conceptual layer as RTK's shell-output compaction — not a model or inference optimization.

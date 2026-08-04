@@ -1341,6 +1341,12 @@ function sanitizeModelOutput(text: string): string {
     .replace(/<\|endthinking\|>/g, '')
     .replace(/<thinking>/g, '')
     .replace(/<\/thinking>/g, '')
+    // <|think|> variant (unclosed leak observed via Cline/OpenCode PLAN MODE
+    // loop 2026-08-04 — 1,506 identical write_to_file rejections in 9 min
+    // traced to this tag never being stripped, corrupting the model's own
+    // view of tool-call state)
+    .replace(/<\|think\|>/g, '')
+    .replace(/<\|\/think\|>/g, '')
     // Channel/mode markers (both closed and open forms)
     .replace(/<\|channel>/g, '')
     .replace(/<\|channel>[\s\S]*?<\/channel>/g, '') // Remove full <|channel>...content...</channel>
