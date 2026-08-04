@@ -28,6 +28,20 @@
   Skip the Ollama keep_alive:0 pre-flight. Use when you've already managed
   VRAM yourself or Ollama isn't running.
 
+.PARAMETER StartupProfile
+  One of: gemma4-direct (default tool-calling profile), ornith (Ornith 9B,
+  embedded chat template, no override), gemma4-thinking (reasoning on,
+  budget 2048). Bundles model + chat-template-file + reasoning mode so you
+  pick ONE coherent config. When omitted (and -SelectProfile isn't passed
+  either), the launcher falls back to legacy env-var resolution
+  (ROTORQUANT_MODEL_PATH / TURBO_MODEL_PATH / auto-discovery) so automated
+  callers like dev-gpu-runtime.mjs are unaffected.
+
+.PARAMETER SelectProfile
+  Show an arrow-key picker (Up/Down + Enter, Esc cancels) over the three
+  named profiles. No-ops to the default profile in non-interactive sessions
+  (redirected stdin) instead of hanging.
+
 .ENV
   LLAMA_SERVER_PATH    default: bin\llama-server.exe, then vendor\llama-server\llama-server.exe, then system PATH
   TURBO_MODEL_PATH     default: %USERPROFILE%\.ollama\blobs\sha256-a79de882...
@@ -70,10 +84,115 @@ param(
   [switch] $Detached,
   [switch] $TextOnly,
   [switch] $NoEvict,
-  [switch] $StatusOnly
+  [switch] $StatusOnly,
+  [ValidateSet('gemma4-direct', 'ornith', 'gemma4-thinking')]
+  [string] $StartupProfile,
+  [switch] $SelectProfile
 )
 
 $ErrorActionPreference = 'Stop'
+
+# -- Startup profiles (arrow-key selectable) -------------------------------
+# Three named profiles bundle model + template + reasoning mode together so
+# the operator picks ONE coherent config instead of composing env vars by hand.
+# `--jinja` is the flag that enables llama.cpp's modern function-calling
+# handlers. A custom --chat-template-file is only appropriate when the GGUF's
+# embedded template is missing/stale/incompatible - otherwise llama.cpp can
+# use tokenizer.chat_template from model metadata directly (Ornith's case).
+# HARD RULE: never pass both --chat-template and --chat-template-file in the
+# same launch - pick one source of template truth.
+function Get-TurboRepoRoot { Resolve-Path (Join-Path $PSScriptRoot '..') }
+
+function Get-TurboStartupProfiles {
+  $repoRoot = Get-TurboRepoRoot
+  $modelRoot = Join-Path $repoRoot 'models'
+  $templateRoot = Join-Path $repoRoot 'configs\templates'
+  @(
+    [pscustomobject]@{
+      Id = 'gemma4-direct'
+      DisplayName = 'Gemma 4 Legal - Direct Tools'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      SpecType = 'none'
+    },
+    [pscustomobject]@{
+      Id = 'ornith'
+      DisplayName = 'Ornith 9B - Embedded Template'
+      Model = Join-Path $modelRoot 'hfor\hforf.gguf'
+      Alias = 'ornith-9b'
+      # Ornith's model card does not require a separate custom template file.
+      # Use its embedded tokenizer.chat_template unless a functional template
+      # test proves the Gemma4 override is actually compatible.
+      TemplateFile = $null
+      Reasoning = 'off'
+      ReasoningBudget = 0
+      SpecType = 'none'
+    },
+    [pscustomobject]@{
+      Id = 'gemma4-thinking'
+      DisplayName = 'Gemma 4 Legal - Thinking'
+      Model = Join-Path $modelRoot 'gemma4-legal-iq4xs-direct.gguf'
+      Alias = 'gemma4-legal-thinking'
+      TemplateFile = Join-Path $templateRoot 'custom_pub_chat_template_gemma4.jinja'
+      Reasoning = 'on'
+      ReasoningBudget = 2048
+      SpecType = 'none'
+    }
+  )
+}
+
+function Select-TurboStartupProfile {
+  param([Parameter(Mandatory)][array]$Profiles, [int]$DefaultIndex = 0)
+
+  if (-not $Host.UI.RawUI -or [Console]::IsInputRedirected) {
+    Write-Host "Non-interactive session - defaulting to profile '$($Profiles[$DefaultIndex].Id)'" -ForegroundColor DarkGray
+    return $Profiles[$DefaultIndex]
+  }
+
+  $selected = [Math]::Max(0, [Math]::Min($DefaultIndex, $Profiles.Count - 1))
+  $startTop = $Host.UI.RawUI.CursorPosition.Y
+  try {
+    [Console]::CursorVisible = $false
+    while ($true) {
+      $Host.UI.RawUI.CursorPosition = New-Object System.Management.Automation.Host.Coordinates(0, $startTop)
+      Write-Host "Select llama-server profile:" -ForegroundColor Cyan
+      Write-Host "  (Up/Down to move, Enter to confirm, Esc to cancel)" -ForegroundColor DarkGray
+      for ($i = 0; $i -lt $Profiles.Count; $i++) {
+        $p = $Profiles[$i]
+        $prefix = if ($i -eq $selected) { '>' } else { ' ' }
+        if ($i -eq $selected) {
+          Write-Host "  $prefix $($p.DisplayName)" -ForegroundColor Green
+        } else {
+          Write-Host "  $prefix $($p.DisplayName)"
+        }
+      }
+      $key = [Console]::ReadKey($true)
+      switch ($key.Key) {
+        'UpArrow'   { $selected = ($selected - 1 + $Profiles.Count) % $Profiles.Count }
+        'DownArrow' { $selected = ($selected + 1) % $Profiles.Count }
+        'Enter'     { return $Profiles[$selected] }
+        'Escape'    { throw 'Startup profile selection cancelled' }
+      }
+    }
+  } finally {
+    [Console]::CursorVisible = $true
+  }
+}
+
+$turboProfiles = Get-TurboStartupProfiles
+$activeTurboProfile = $null
+if ($StartupProfile) {
+  $activeTurboProfile = $turboProfiles | Where-Object { $_.Id -eq $StartupProfile } | Select-Object -First 1
+} elseif ($SelectProfile) {
+  $activeTurboProfile = Select-TurboStartupProfile -Profiles $turboProfiles -DefaultIndex 0
+}
+# When neither -Profile nor -SelectProfile is passed, $activeTurboProfile stays
+# $null and the launcher falls back to its legacy env-var-driven resolution
+# below (ROTORQUANT_MODEL_PATH / TURBO_MODEL_PATH / auto-discovery) so
+# dev-gpu-runtime.mjs's non-interactive automated calls are unaffected.
 
 # -- Probe helper: try --help then -h, return $true if flag is advertised -
 function Test-LlamaFlag {
@@ -202,7 +321,9 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
 # Model resolution: ROTORQUANT_MODEL_PATH > TURBO_MODEL_PATH > local GGUF search
 # > Ollama blob auto-discovery (scans manifests for gemma4/rotorquant GGUFs).
 # Ollama blobs are raw GGUF files — llama-server reads them directly without Ollama.
-$model = if ($env:ROTORQUANT_MODEL_PATH) {
+$model = if ($activeTurboProfile) {
+    $activeTurboProfile.Model
+} elseif ($env:ROTORQUANT_MODEL_PATH) {
     $env:ROTORQUANT_MODEL_PATH
 } elseif ($env:TURBO_MODEL_PATH) {
     $env:TURBO_MODEL_PATH
@@ -837,22 +958,45 @@ if ($kvProfile -eq 'atomicbot') {
 
 
 
-# -- Reasoning format: template-based reasoning for tool calling + analysis --
-# Reasoning is ENABLED via template + sanitizer combo (NOT via --reasoning-format flag).
-# Template instructs model to wrap reasoning in <reasoning>...</reasoning> tags.
-# Sanitizer preserves these tags while removing contamination markers.
-# Using 'none' here because Gemma4 doesn't support deepseek/think formats.
-# Reasoning happens in-template via the <reasoning> protocol.
-$reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT } else { 'none' }
+# -- Reasoning: --reasoning on/off (+ --reasoning-budget) and --reasoning-format --
+# reasoning-format deepseek instructs llama-server to place parsed reasoning in
+# reasoning_content rather than leaving it mixed into visible content when the
+# template/model emits compatible reasoning markers. reasoning off is the right
+# default for tool-loop reliability (hidden thinking is not wanted mid-loop);
+# the gemma4-thinking profile flips it on with a bounded budget.
+$reasoningMode = if ($activeTurboProfile) {
+    $activeTurboProfile.Reasoning
+} elseif ($env:TURBO_REASONING) {
+    $env:TURBO_REASONING
+} else {
+    'off'
+}
+$reasoningBudget = if ($activeTurboProfile) {
+    $activeTurboProfile.ReasoningBudget
+} elseif ($env:TURBO_REASONING_BUDGET) {
+    [int]$env:TURBO_REASONING_BUDGET
+} else {
+    0
+}
+$reasoningFormat = if ($env:TURBO_REASONING_FORMAT) { $env:TURBO_REASONING_FORMAT } else { 'deepseek' }
+
+if (Test-LlamaFlag $llama '--reasoning') {
+    $baseArgs = $baseArgs + @('--reasoning', $reasoningMode)
+    Write-Host "Reasoning: --reasoning $reasoningMode" -ForegroundColor Cyan
+    if ($reasoningMode -eq 'on' -and $reasoningBudget -gt 0 -and (Test-LlamaFlag $llama '--reasoning-budget')) {
+        $baseArgs = $baseArgs + @('--reasoning-budget', $reasoningBudget)
+        Write-Host "Reasoning budget: --reasoning-budget $reasoningBudget" -ForegroundColor Cyan
+    }
+} else {
+    Write-Host "Reasoning: --reasoning not supported by this binary - relying on template-based reasoning only" -ForegroundColor DarkYellow
+}
+
 if (Test-LlamaFlag $llama '--reasoning-format') {
     $baseArgs = $baseArgs + @('--reasoning-format', $reasoningFormat)
-    Write-Host "Reasoning format: --reasoning-format $reasoningFormat (enabled via template)" -ForegroundColor Cyan
+    Write-Host "Reasoning format: --reasoning-format $reasoningFormat" -ForegroundColor Cyan
 } else {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary (template-based reasoning active)" -ForegroundColor DarkYellow
 }
-# Keep the model output path unconstrained here.
-# The repo smoke gate expects the server to handle system prompts and tool calls
-# without forcing reasoning budget to zero.
 
 # -- Chat template: use custom_pub_chat_template_gemma4.jinja for OpenCode-compatible chat/tool calling --
 # DEFAULT: custom_pub_chat_template_gemma4.jinja — uses native Gemma 4 DSL (<|tool_call>, <|turn>),
@@ -861,7 +1005,13 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
 # HARD RULE: always pass --chat-template-file. Never use --chat-template <name>.
 # To use summary-only mode (no tools): set TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
 $defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\custom_pub_chat_template_gemma4.jinja"
-$chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
+$chatTemplateFile = if ($activeTurboProfile) {
+    # Profile owns the decision explicitly. $null (Ornith) means "use the
+    # GGUF's embedded tokenizer.chat_template" - do NOT fall back to the
+    # Gemma4 override, that's exactly the untested substitution the profile
+    # spec warns against.
+    $activeTurboProfile.TemplateFile
+} elseif ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
     $env:TURBO_CHAT_TEMPLATE_FILE
 } elseif (Test-Path $defaultTemplate) {
     $defaultTemplate
@@ -870,8 +1020,13 @@ $chatTemplateFile = if ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPL
 }
 
 if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
+    # HARD RULE: never pass both --chat-template and --chat-template-file.
+    # This launcher only ever emits --chat-template-file (or neither) - see
+    # the profile table comment above.
     $baseArgs = $baseArgs + @('--chat-template-file', $chatTemplateFile)
     Write-Host "Chat template: --chat-template-file $chatTemplateFile" -ForegroundColor Cyan
+} elseif ($activeTurboProfile -and -not $activeTurboProfile.TemplateFile) {
+    Write-Host "Chat template: profile '$($activeTurboProfile.Id)' uses the GGUF embedded template (tokenizer.chat_template)" -ForegroundColor Cyan
 } elseif ($env:TURBO_CHAT_TEMPLATE_FILE) {
     Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in" -ForegroundColor Yellow
 } else {

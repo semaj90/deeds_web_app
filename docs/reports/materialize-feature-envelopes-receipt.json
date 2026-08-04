@@ -1,13 +1,13 @@
 {
-  "first_packet_id": "packet:f89076253298",
-  "last_packet_id": "packet:ffffbd018392",
+  "first_packet_id": null,
+  "last_packet_id": null,
   "next_after_packet_id": null,
-  "selected": 1654,
-  "updated": 1654,
+  "selected": 0,
+  "updated": 0,
   "remaining": 0,
   "force_refresh": false,
   "dry_run": false,
-  "input_digest": "2a1fe02d977b7912f1a07c343ef89d6f0aaab6d621dfb7126c8c9c9fa4a101d0",
-  "output_digest": "43dba495cd67e2f3c0c4d559ac1d262140700f040d552b65ab2163813bbaed3a",
-  "generated_at": "2026-08-03T19:41:37.253Z"
+  "input_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "output_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "generated_at": "2026-08-04T21:46:13.602Z"
 }
