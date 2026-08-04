@@ -120,6 +120,31 @@ function spawnForeground(command, args, options = {}) {
   });
 }
 
+/**
+ * VRAM advisory check (not a hard gate). Warns when free VRAM looks too low
+ * for another ~6-8GB GGUF load, which is the signature of a second
+ * llama-server racing to start against an already-loaded one from a
+ * separate VS Code background task. launch-turboquant.ps1 kills the old
+ * process before respawning when IT detects a mismatch, so this check only
+ * catches the narrower cross-process race window before that happens.
+ */
+async function checkVramHeadroom(minFreeMb = 5000) {
+  try {
+    const { execFile } = await import('node:child_process');
+    const { promisify } = await import('node:util');
+    const execFileAsync = promisify(execFile);
+    const { stdout } = await execFileAsync('nvidia-smi', [
+      '--query-gpu=memory.free,memory.used', '--format=csv,noheader,nounits',
+    ], { timeout: 3000 });
+    const [freeMb, usedMb] = stdout.trim().split(',').map((v) => Number(v.trim()));
+    if (Number.isFinite(freeMb) && freeMb < minFreeMb) {
+      console.warn(`[dev:gpu] ⚠️  VRAM advisory: ${freeMb}MB free (${usedMb}MB used) — below ${minFreeMb}MB headroom. If launch-turboquant.ps1 is about to load a fresh model rather than reuse a healthy one, this may indicate a second process is already holding VRAM (duplicate-process risk). Proceeding — the launcher's own model-alias check will kill a stale process before respawning if needed.`);
+    }
+  } catch {
+    // nvidia-smi unavailable or timed out — advisory only, never block startup on this
+  }
+}
+
 async function isLlamaServerRunning(port = 8090) {
   try {
     const res = await fetch(`http://127.0.0.1:${port}/health`, {
@@ -180,9 +205,23 @@ async function main() {
   const synthPort = isLiteRT ? 8070 : 8090;
   const llmUrl = isLiteRT ? 'http://127.0.0.1:8070/v1' : 'http://127.0.0.1:8090/v1';
 
-  // Launch LLM backend (LiteRT or TurboQuant llama-server) unless already running
-  if (await isLlamaServerRunning(synthPort)) {
-    console.log(`[dev:gpu] ✅ ${isLiteRT ? 'LiteRT' : 'llama-server'} already running on :${synthPort} — skipping launch`);
+  // Launch LLM backend (LiteRT or TurboQuant llama-server).
+  //
+  // llama-server ALWAYS delegates to launch-turboquant.ps1, even when
+  // isLlamaServerRunning() sees a healthy /health response. That check only
+  // proves *something* is listening on :8090 — not that it's the right
+  // model. launch-turboquant.ps1's own health check verifies model_alias +
+  // chat template + tool support and exits fast (~2-3s) when already
+  // correct, or restarts when it isn't. Skipping that call on a crude
+  // /health 200 is exactly what let a stale wrong-model process (hforf.gguf
+  // running without the correct chat template) masquerade as "already
+  // running" and go unnoticed — see docs/reports/llama-server-restart-2026-08-04.log.
+  //
+  // LiteRT has no equivalent verification endpoint, so it keeps the
+  // cheaper /health-only skip.
+  const litertAlreadyRunning = isLiteRT && (await isLlamaServerRunning(synthPort));
+  if (litertAlreadyRunning) {
+    console.log(`[dev:gpu] ✅ LiteRT already running on :${synthPort} — skipping launch`);
   } else {
     if (isLiteRT) {
       // Launch LiteRT via system Python
@@ -243,6 +282,7 @@ async function main() {
       const launcherEnv = mergedEnv();
       const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-turboquant.ps1');
 
+      await checkVramHeadroom();
       await runChecked('pwsh', [
         '-NoProfile',
         '-ExecutionPolicy',
