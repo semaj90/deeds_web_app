@@ -145,6 +145,46 @@ async function checkVramHeadroom(minFreeMb = 5000) {
   }
 }
 
+/**
+ * Detect duplicate llama-server.exe processes (Windows only). Only one
+ * process can bind :8090, but a second/third instance can still be alive
+ * holding VRAM without ever binding a port (stale, crashed mid-load, or
+ * started against a different port) -- exactly the shape of process found
+ * live during this session's investigation (2 llama-server.exe: one ~1KB
+ * stub, one ~1GB resident). Log-only; does not kill anything here --
+ * launch-turboquant.ps1 owns the port-8090 process lifecycle.
+ */
+async function checkForDuplicateLlamaServerProcesses() {
+  if (process.platform !== 'win32') return;
+  try {
+    const { execFile } = await import('node:child_process');
+    const { promisify } = await import('node:util');
+    const execFileAsync = promisify(execFile);
+    const { stdout } = await execFileAsync('tasklist', [
+      '/FI', 'IMAGENAME eq llama-server.exe', '/FO', 'CSV', '/NH',
+    ], { timeout: 5000 });
+    const lines = stdout.trim().split('\n').filter((l) => l.includes('llama-server.exe'));
+    if (lines.length === 0) return;
+    const procs = lines.map((line) => {
+      const cols = line.split('","').map((c) => c.replace(/(^")|("$)/g, ''));
+      return { pid: cols[1], memUsage: cols[4] };
+    });
+    if (procs.length > 1) {
+      console.warn(
+        `[dev:gpu] ⚠️  ${procs.length} llama-server.exe processes found: ` +
+        procs.map((p) => `PID ${p.pid} (${p.memUsage})`).join(', ') +
+        ' — only one can bind :8090; the rest are dead weight on VRAM/RAM. ' +
+        'launch-turboquant.ps1 only manages the process bound to the target port; ' +
+        'kill orphans manually if this persists across restarts.',
+      );
+    } else {
+      console.log(`[dev:gpu] llama-server.exe already running (PID ${procs[0].pid}, ${procs[0].memUsage})`);
+    }
+  } catch {
+    // tasklist unavailable/failed — advisory only, never block startup on this
+  }
+}
+
 async function isLlamaServerRunning(port = 8090) {
   try {
     const res = await fetch(`http://127.0.0.1:${port}/health`, {
@@ -282,6 +322,7 @@ async function main() {
       const launcherEnv = mergedEnv();
       const launcherScript = path.win32.join(REPO_ROOT, 'scripts', 'launch-turboquant.ps1');
 
+      await checkForDuplicateLlamaServerProcesses();
       await checkVramHeadroom();
       await runChecked('pwsh', [
         '-NoProfile',
