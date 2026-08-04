@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"atlas.research-job.v1",
+  "type":"object",
+  "required":["schema_version","research_run_id","question","budgets"],
+  "properties":{
+    "schema_version":{"const":"atlas.research-job.v1"},
+    "research_run_id":{"type":"string","minLength":1},
+    "question":{"type":"string","minLength":1},
+    "budgets":{"type":"object","required":["iterations","questions_per_iteration","max_sources"],"properties":{
+      "iterations":{"type":"integer","minimum":1,"maximum":5},
+      "questions_per_iteration":{"type":"integer","minimum":1,"maximum":8},
+      "max_sources":{"type":"integer","minimum":1,"maximum":100}
+    }}
+  }
+}

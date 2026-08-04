@@ -1,0 +1,171 @@
+{
+  "generated_at": "2026-08-04T19:24:01.8144771Z",
+  "mode": "Smoke",
+  "safety": {
+    "postgres_mutations": false,
+    "valkey_mutations": false,
+    "graphify_run": false,
+    "destructive_commands_used": false,
+    "docker_volumes_modified": false,
+    "qdrant_mutations": false
+  },
+  "paths": {
+    "tool_root": "C:\\Users\\james\\Videos\\deeds-web-app\\tools\\agentic-research",
+    "okf_staging": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf\\staging"
+  },
+  "results": [
+    {
+      "check": "python.imports",
+      "status": "PASS",
+      "detail": "LDR/crawler/RAG/Qdrant/pgvector/graph/gRPC imports passed",
+      "data": {},
+      "timestamp": "2026-08-04T19:23:57.9212828Z"
+    },
+    {
+      "check": "ast-grep.cli",
+      "status": "PASS",
+      "detail": "ast-grep 0.45.0",
+      "data": {},
+      "timestamp": "2026-08-04T19:23:58.0698032Z"
+    },
+    {
+      "check": "llama.models",
+      "status": "PASS",
+      "detail": "hforf.gguf",
+      "data": {
+        "models": [
+          "hforf.gguf"
+        ]
+      },
+      "timestamp": "2026-08-04T19:23:58.0916884Z"
+    },
+    {
+      "check": "ollama.tags",
+      "status": "PASS",
+      "detail": "embeddinggemma:latest, ibm/granite-docling:258m, nomic-embed-text:latest",
+      "data": {},
+      "timestamp": "2026-08-04T19:23:58.1037972Z"
+    },
+    {
+      "check": "embeddinggemma.semantic_768",
+      "status": "PASS",
+      "detail": "dim=768 finite=True l2=1.00000009519478",
+      "data": {
+        "l2": 1.0000000951947816,
+        "dimension": 768
+      },
+      "timestamp": "2026-08-04T19:23:58.2922691Z"
+    },
+    {
+      "check": "qdrant.collection",
+      "status": "PASS",
+      "detail": "codebase_chunks_768_v2 points=52380 dim=768",
+      "data": {
+        "points": 52380,
+        "dimension": 768
+      },
+      "timestamp": "2026-08-04T19:23:58.3698594Z"
+    },
+    {
+      "check": "qdrant.payload.sample",
+      "status": "WARN",
+      "detail": "sample=10 packet_key=0 representation_id=10 representation_name=10",
+      "data": {
+        "fields": {
+          "postgres_id": 10,
+          "chunk_id": 10,
+          "representation_id": 10,
+          "model_revision_state": 10,
+          "projection_revision": 10,
+          "qdrant_point_id": 10,
+          "content_hash": 10,
+          "embedding_model": 10,
+          "source_ref": 10,
+          "representation_name": 10,
+          "model_revision": 10,
+          "indexed_at": 10
+        }
+      },
+      "timestamp": "2026-08-04T19:23:58.4520516Z"
+    },
+    {
+      "check": "qdrant.tag_filter",
+      "status": "PASS",
+      "detail": "field=representation_name value=semantic_768 results=5",
+      "data": {},
+      "timestamp": "2026-08-04T19:23:58.4706713Z"
+    },
+    {
+      "check": "valkey.ping",
+      "status": "PASS",
+      "detail": "PONG; no keys read or written",
+      "data": {},
+      "timestamp": "2026-08-04T19:23:58.5970575Z"
+    },
+    {
+      "check": "postgres.readonly",
+      "status": "PASS",
+      "detail": "Read-only transaction passed",
+      "data": {
+        "output": "BEGIN\r\nlegal_ai_db|18.4 (Debian 18.4-1.pgdg12+1)\r\nvector|0.8.3\r\ncodebase_chunk_index|atlas_packets\r\n52417\r\nROLLBACK"
+      },
+      "timestamp": "2026-08-04T19:23:58.8505309Z"
+    },
+    {
+      "check": "gpu.nvidia",
+      "status": "PASS",
+      "detail": "NVIDIA GeForce RTX 3060 Ti, 8192, 7814, 580.88",
+      "data": {},
+      "timestamp": "2026-08-04T19:23:58.9436631Z"
+    },
+    {
+      "check": "gpu.cuvs",
+      "status": "NOT_PROVEN",
+      "detail": "run: line 1: conda: command not found",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8021866Z"
+    },
+    {
+      "check": "retrieval.search_runtime",
+      "status": "PASS",
+      "detail": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\src\\lib\\server\\retrieval\\search-runtime.ts",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8085841Z"
+    },
+    {
+      "check": "ranking.rrf",
+      "status": "NOT_PROVEN",
+      "detail": "Use focused SearchRuntime tests; bootstrap does not invoke fusion",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8090864Z"
+    },
+    {
+      "check": "graph.pagerank",
+      "status": "NOT_PROVEN",
+      "detail": "Requires persisted-property/distribution proof",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8094923Z"
+    },
+    {
+      "check": "clustering.knn",
+      "status": "NOT_PROVEN",
+      "detail": "Requires immutable Postgres↔Qdrant manifest before GPU benchmark",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8098869Z"
+    },
+    {
+      "check": "firecrawl.runtime",
+      "status": "NOT_PROVEN",
+      "detail": "SDK installed; no server/API key called",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8103614Z"
+    },
+    {
+      "check": "ldr.runtime",
+      "status": "NOT_PROVEN",
+      "detail": "Import ready; MCP client-attached research remains separate",
+      "data": {},
+      "timestamp": "2026-08-04T19:24:01.8107487Z"
+    }
+  ]
+}

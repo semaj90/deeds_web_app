@@ -1,0 +1,5 @@
+syntax = "proto3";
+package parent_atlas.retrieval.v1;
+message SemanticSearchRequest { string query_id=1; repeated float query_vector=2; uint32 top_k=3; string representation_id=4; uint32 representation_revision=5; repeated string allowed_partition_ids=6; }
+message SemanticCandidate { string identity_key=1; float score=2; uint32 rank=3; }
+message SemanticSearchResponse { string query_id=1; repeated SemanticCandidate candidates=2; string index_revision=3; }
