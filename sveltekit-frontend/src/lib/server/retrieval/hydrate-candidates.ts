@@ -209,20 +209,12 @@ export async function hydrateCandidatesWithProof(
     // Extract unique lookups from candidates
     const sourceRefs = [...new Set(candidates.map(c => c.sourceRef).filter(Boolean))];
     const packetKeys = [...new Set(candidates.map(c => c.packetKey).filter(Boolean))];
+    const candidateIds = [...new Set([
+      ...packetKeys,
+      ...candidates.map(c => c.symbolVersionId).filter((v): v is string => Boolean(v)),
+    ])];
 
-    // Build WHERE clause: match by source_ref (primary) or packetKey (fallback)
-    const predicates: any[] = [
-      sourceRefs.length > 0 ? sql`chunk.source_ref IN (${sql.join(sourceRefs.map((value) => sql`${value}`), sql`, `)})` : null,
-      packetKeys.length > 0 ? sql`COALESCE(chunk.metadata->>'packet_key', chunk.id::text) IN (${sql.join(packetKeys.map((value) => sql`${value}`), sql`, `)})` : null,
-    ].filter(Boolean);
-
-    const whereCondition = predicates.length > 0
-      ? sql`WHERE (${sql.join(predicates, sql` OR `)})`
-      : sql`WHERE FALSE`; // No candidates to hydrate
-
-    // Primary query: fetch chunk data + optional atlas_packets join for packet identity
-    const result = await db.execute(sql`
-      SELECT
+    const CHUNK_COLUMNS = sql`
         chunk.id,
         chunk.qdrant_id,
         chunk.relative_path,
@@ -241,10 +233,51 @@ export async function hydrateCandidatesWithProof(
         chunk.language,
         chunk.kind,
         chunk.output_meta
-      FROM codebase_chunk_index chunk
-      ${whereCondition}
-      LIMIT ${Math.max(candidates.length, sourceRefs.length, packetKeys.length) + 10}
-    `);
+    `;
+
+    // Query 1 — exact identity match (id or metadata packet_key). Bounded by
+    // the count of distinct requested identities; each id is a primary key,
+    // so this cannot be starved by duplicate rows the way a source_ref match can.
+    const candidateIdList = sql.join(candidateIds.map((value) => sql`${value}`), sql`, `);
+    const exactResult = candidateIds.length > 0
+      ? await db.execute(sql`
+          SELECT ${CHUNK_COLUMNS}
+          FROM codebase_chunk_index chunk
+          WHERE chunk.id::text IN (${candidateIdList})
+             OR (chunk.metadata->>'packet_key') IN (${candidateIdList})
+             OR (chunk.output_meta->>'packet_key') IN (${candidateIdList})
+          LIMIT ${candidateIds.length + 10}
+        `)
+      : { rows: [] as unknown[] };
+
+    // Query 2 — source_ref fallback for candidates the exact query didn't
+    // resolve. `codebase_chunk_index` can carry hundreds of duplicate rows
+    // per source_ref (repeated re-indexing without cleanup — e.g.
+    // schema-postgres.ts has 369). Without DISTINCT ON + ORDER BY, an
+    // unbounded LIMIT can silently drop the row a candidate actually needs
+    // whenever duplicates from OTHER candidates in the same batch consume
+    // the limit budget first. DISTINCT ON deterministically picks the most
+    // recently updated row per source_ref and returns exactly one row per
+    // distinct source_ref — never starved by duplicates.
+    const sourceRefList = sql.join(sourceRefs.map((value) => sql`${value}`), sql`, `);
+    const fallbackResult = sourceRefs.length > 0
+      ? await db.execute(sql`
+          SELECT DISTINCT ON (chunk.source_ref) ${CHUNK_COLUMNS}
+          FROM codebase_chunk_index chunk
+          WHERE chunk.source_ref IN (${sourceRefList})
+          ORDER BY chunk.source_ref, chunk.updated_at DESC
+        `)
+      : { rows: [] as unknown[] };
+
+    const seenRowIds = new Set<string>();
+    const mergedRows: unknown[] = [];
+    for (const row of [...exactResult.rows, ...fallbackResult.rows]) {
+      const id = (row as { id: string }).id;
+      if (seenRowIds.has(id)) continue;
+      seenRowIds.add(id);
+      mergedRows.push(row);
+    }
+    const result = { rows: mergedRows };
 
     type ChunkRow = {
       id: string;
@@ -311,6 +344,18 @@ export async function hydrateCandidatesWithProof(
       if (!row) {
         proof.canonicalJoinMissingCount += 1;
         bumpReason('canonical_join_missing');
+        // DIAGNOSTIC (session 188D): record exactly which candidate/predicate failed
+        console.warn('[hydrate:canonical_join_missing]', {
+          sourceRef: candidate.sourceRef,
+          packetKey: candidate.packetKey,
+          symbolVersionId: candidate.symbolVersionId,
+          candidateKey,
+          scoreSource: candidate.scoreSource,
+          rowsByKeyHasSourceRef: rowsByKey.has(candidate.sourceRef),
+          rowsByKeyHasCandidateKey: rowsByKey.has(candidateKey),
+          rowsByKeyHasPacketKey: rowsByKey.has(candidate.packetKey),
+          totalRowsFetched: rows.length,
+        });
         continue;
       }
 
