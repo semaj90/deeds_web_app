@@ -1,0 +1,48 @@
+# Tasks — Parent Atlas Native Acceleration C ABI
+
+Statuses: PASS | FAIL | PARTIAL_PROVEN | FIXTURE_PROVEN | NOT_PROVEN | NOT_APPLICABLE.
+No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS from imports, exports, array shapes, or process exit alone.
+
+## P0 — Identity hydration (blocks everything downstream)
+
+- [ ] P0.1 Replace session-188 global-nullable hotfix with discriminated identity contract in `feature-envelope.ts`: `identity_kind: 'symbol'|'file'|'chunk'`; symbol ⇒ `stable_symbol_id`+`symbol_version_id` non-null; file/chunk ⇒ explicitly null + `stable_file_id` required
+- [ ] P0.2 Add canonical identity join in `hydrate-candidates.ts` (symbol-tree / atlas_packets source — current SQL selects only `codebase_chunk_index`; the "optional atlas_packets join" comment has no join)
+- [ ] P0.3 Replace `envelope_build_failed` with typed counters: `canonical_row_matched`, `canonical_identity_resolved`, `envelope_validated`, `missing_stable_symbol`, `missing_stable_file`, `schema_revision_rejected`, `representation_rejected`; increment row-match BEFORE envelope construction
+- [ ] P0.4 Prove `search-unified?q=test&topK=3` still returns hydrated packets under the discriminated contract (regression fixtures for symbol / file / chunk candidates)
+
+## P1 — Truthful probes + backend evidence
+
+- [ ] P1.1 Rewrite `scripts/startup-gpu-bridge-probe.mjs` classifications: MISSING_EXPORT / NO_LIBTORCH_STUB / CPU_FALLBACK / CUDA_LIVE / CALL_FAILED / NUMERICAL_MISMATCH / SKIPPED_EXTERNAL_PROOF; same addon resolver as `libtorch-bridge.ts`; record path + SHA-256 + mtime + build variant; missing exports counted explicitly; no "covered by smoke" promotion
+- [ ] P1.2 Add native `getBackendInfo()` (addon version, build commit/type, LibTorch ver, CUDA compile+runtime, device, compute capability, cuBLAS/cuDNN/TensorRT presence, per-export backend)
+- [ ] P1.3 Add native execution counters inside CUDA/LibTorch branches + `getExecutionCounters()` (cuda_execution / cpu_fallback / stub_invocation / cuda_error_fallback / oom_fallback)
+- [ ] P1.4 Create `scripts/gpu/prove-native-gpu-numerical-parity.mjs` — deterministic fixtures vs CPU/Python oracles for: batchCosineSimilarity, graphSimilarity(+Half), softmaxGPU, topKIndicesGPU, attentionScoreGPU, rewardScoreGPU, pageRankGPU, kmeansWithCentroids, pcaProject, autoencoderEncode/Decode, computeCaseEmbedding, trainSOM
+- [ ] P1.5 Mark `graphSimilarity` = CPU_FALLBACK explicitly in bridge + probe; prove `batchCosineSimilarity` CUDA/cuBLAS via counters + parity (not shape)
+- [ ] P1.6 Fix `getCudaMemory`: move `cudaMemGetInfo` into a `.cu` translation unit (currently `__CUDACC__`-guarded → zero values from MSVC C++ TU)
+- [ ] P1.7 Reports: `docs/reports/native-addon-contract-audit.{json,md}`, `docs/reports/native-gpu-numerical-parity.{json,md}`
+
+## P2 — C ABI core + adapter extraction
+
+- [ ] P2.1 Create `native/atlas_core/include/atlas_core.h` (opaque handles, status/backend/metric enums, context options, execution receipt; zero vendor types) + `atlas_core.cpp`
+- [ ] P2.2 Implement `atlas_similarity_graph_build` → CSR (`threshold`, `max_neighbors_per_row`; no dense n×n default) using normalize + `torch::mm`
+- [ ] P2.3 Implement `atlas_pagerank` on CSR with CPU reference; parity vs NetworkX AND Neo4j GDS on one shared fixture (dangling policy, normalization, orientation documented)
+- [ ] P2.4 Add `batchCosineTopK` N-API export (scores stay on device through top-k; returns indices + scores + backend)
+- [ ] P2.5 Refactor `simd-bridge/cpp` into an N-API adapter of `atlas_core` (typed-array validation + bounded scheduler + Promise only; no JSON in hot path)
+- [ ] P2.6 Execution receipt schema (versioned) + MessagePack encode/decode (`atlas_receipt_*_msgpack`, `atlas_buffer_t`); receipts stored separately from canonical envelopes
+- [ ] P2.7 FP16 lane proof: FP32↔FP16 top-k overlap, max score error, NaN/Inf-free, stable cutoff ordering (RTX 3060 Ti Tensor Cores)
+- [ ] P2.8 CUDA graph capture/replay limited to fixed-shape repeat workloads (1×768·768×4096 cosine pages); no multi-stream until single-stream contracts proven
+
+## P3 — cuVS / RAPIDS / remote boundary
+
+- [ ] P3.1 Implement `atlas_knn_exact` via cuVS brute_force (replace `cuvs_bridge.cc` stub) — exact oracle; validated vs NumPy oracle first
+- [ ] P3.2 Benchmark lanes vs the exact oracle: Qdrant HNSW recall, CAGRA (`atlas_cagra_build/search`), TurboVec (optional backend) — recall@k, rank overlap, distortion, memory, build/search latency, filter correctness
+- [ ] P3.3 Author `proto/parentatlas/acceleration/v1/atlas.proto` (Metric, TensorRef, SearchRequest with workspace/representation revisions, NeighborBatch packed, ExecutionReceipt, AtlasVectorService: ExactSearch/CagraSearch); gRPC C++ callback API, deadlines mandatory
+- [ ] P3.4 Offline projection jobs via Python worker (cuML KMeans/PCA/IncrementalPCA, cuGraph pagerank/louvain/leiden/wcc/k_core/jaccard) — consuming the `tools/agentic-research` WSL env; identity always joined back to Postgres
+- [ ] P3.5 GPU row manifest before any vector export: Qdrant point ID ↔ Postgres canonical identity ↔ content_hash ↔ representation_revision (immutable)
+- [ ] P3.6 Report: `docs/reports/parent-atlas-acceleration-integration.{json,md}`
+
+## P4 — Consumers (contracts only in this change)
+
+- [ ] P4.1 SvelteKit browser WebGPU visualization consumes projection endpoints only (layouts, heatmaps, PageRank exploration); document non-authority contract
+- [ ] P4.2 Unreal plugin contract: gRPC client of AtlasVectorService, Slate/UMG rendering, no store access (contract doc, no implementation)
+- [ ] P4.3 Native Dawn viewer as separate target spec (`atlas_dawn_viewer.exe` + `atlas_core.dll`); never linked into `tensorrt_bridge.node`
+- [ ] P4.4 MCP tools for Ornith/Gemma4: `atlas.backend_info`, `atlas.exact_topk_oracle` (fixture-bounded), `atlas.parity_report` — every result carries execution receipt; agents never touch gRPC/stores directly
