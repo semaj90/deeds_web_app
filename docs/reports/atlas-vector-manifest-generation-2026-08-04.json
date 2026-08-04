@@ -1,0 +1,38 @@
+{
+  "report": "atlas-vector-manifest-generation",
+  "date": "2026-08-04",
+  "read_only": true,
+  "mutation_performed": false,
+  "manifest_path": "C:/Users/james/Videos/deeds-web-app/docs/reports/atlas-vector-manifest-v1-2026-08-04.json",
+  "manifest_id": "sha256:3a2c10cfa4420cd7f00ec45b6a8a8560e47d8cd69597acae93754f11dd097540",
+  "row_count": 52380,
+  "declared_point_count": 52380,
+  "vector_schema": {
+    "content": {
+      "dimension": 768,
+      "distance": "Cosine"
+    },
+    "error": {
+      "dimension": 768,
+      "distance": "Cosine"
+    },
+    "signature": {
+      "dimension": 768,
+      "distance": "Cosine"
+    }
+  },
+  "gate": {
+    "declared_vs_fetched_count_match": true,
+    "missing_postgres_id": 0,
+    "id_field_mismatch": 0,
+    "missing_source_ref": 0,
+    "missing_content_hash": 6908,
+    "packet_key_collisions": 0,
+    "RESULT": "PASS"
+  },
+  "packet_key_status": "ALL_NULL_BY_DESIGN — pending grain decision, see packet-key-grain-audit-2026-08-04.md; do not backfill from the existing corpus (90.5% qdrant_id passthrough, 9.5% content-hash colliding with unresolved duplicate rows)",
+  "not_verified_exhaustively": [
+    "vector dimension/finiteness for all 52,380 rows (verified on 1,000-row sample only — see qdrant-postgres-identity-reconciliation-2026-08-04.json, PROMOTION_GATE PASS)",
+    "content_hash correctness against actual chunk content (structural presence checked, not recomputed)"
+  ]
+}

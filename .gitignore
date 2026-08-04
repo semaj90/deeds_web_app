@@ -1005,3 +1005,6 @@ docs/vector-governance/vector-governance-report.json
 tools/agentic-research/.venv/
 tools/agentic-research/src/
 tools/agentic-research/node/
+
+# Large regeneratable report artifacts (deterministic from live DB/Qdrant state)
+docs/reports/atlas-vector-manifest-v1-*.json
