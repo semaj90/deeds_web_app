@@ -616,6 +616,7 @@
   "enabledMcpjsonServers": [
     "playwright",
     "atlas-tools",
-    "socraticode"
+    "socraticode",
+    "trace"
   ]
 }

@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Qdrant Payload v2 Contract",
+  "version": "atlas-qdrant-payload-v2",
+  "description": "Canonical payload schema for codebase_chunks_768 collection",
+  "type": "object",
+  "required": [
+    "packet_key",
+    "workspace_id",
+    "workspace_revision",
+    "source_ref",
+    "source_revision",
+    "content_hash",
+    "schema_version"
+  ],
+  "properties": {
+    "packet_key": {
+      "type": "string",
+      "description": "Canonical packet identity (SHA-256 of normalized fields)",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "workspace_id": {
+      "type": "string",
+      "description": "Workspace scope identifier (multi-tenant boundary)"
+    },
+    "workspace_revision": {
+      "type": "integer",
+      "description": "Workspace version counter (for drift detection)"
+    },
+    "source_ref": {
+      "type": "string",
+      "description": "Source file reference (normalized path, required for Postgres join)"
+    },
+    "source_revision": {
+      "type": "integer",
+      "description": "Source file version counter"
+    },
+    "representation_id": {
+      "type": "string",
+      "description": "Representation variant identifier (chunk vs summarized vs indexed)"
+    },
+    "representation_revision": {
+      "type": "integer",
+      "description": "Representation version counter"
+    },
+    "content_hash": {
+      "type": "string",
+      "description": "SHA-256 of chunk content (for content validation)",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["atlas-qdrant-payload-v2"],
+      "description": "Canonical payload schema version (string, not integer)"
+    },
+    "feature_id": {
+      "type": "string",
+      "description": "Semantic feature category (optional enrichment)"
+    },
+    "feature_label": {
+      "type": "string",
+      "description": "Human-readable feature name (optional enrichment)"
+    },
+    "symbol_id": {
+      "type": "string",
+      "description": "AST symbol identifier (optional structural)"
+    },
+    "symbol_version_id": {
+      "type": "string",
+      "description": "Symbol version tag (optional structural)"
+    },
+    "tree_node_id": {
+      "type": "string",
+      "description": "AST tree node reference (optional structural)"
+    },
+    "chunk_id": {
+      "type": "string",
+      "description": "Sequential chunk identifier (optional)"
+    },
+    "start_byte": {
+      "type": "integer",
+      "description": "Byte offset start (optional structural)"
+    },
+    "end_byte": {
+      "type": "integer",
+      "description": "Byte offset end (optional structural)"
+    },
+    "pagerank": {
+      "type": "number",
+      "description": "PageRank score (enrichment only, never canonical)"
+    },
+    "pagerank_score": {
+      "type": "number",
+      "description": "Normalized PageRank (enrichment only)"
+    },
+    "som_cell": {
+      "type": "string",
+      "description": "SOM grid cell coordinate (enrichment only)"
+    },
+    "community_id": {
+      "type": "integer",
+      "description": "Graph community identifier (enrichment only)"
+    },
+    "authority_score": {
+      "type": "number",
+      "description": "Authority rank (enrichment only)"
+    },
+    "rerank_score": {
+      "type": "number",
+      "description": "Cross-encoder rerank score (enrichment only)"
+    },
+    "migration_id": {
+      "type": "string",
+      "description": "Batch migration identifier (mutable, never canonical)"
+    },
+    "migration_batch_id": {
+      "type": "string",
+      "description": "Backfill batch tag (mutable, never canonical)"
+    },
+    "migrated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Migration timestamp (mutable, never canonical)"
+    },
+    "migration_source": {
+      "type": "string",
+      "enum": ["legacy-v1", "postgres-backfill", "semantic-enrichment", "graph-expansion"],
+      "description": "Source of this payload version"
+    },
+    "rollback_identifier": {
+      "type": "string",
+      "description": "Rollback record reference (immutable audit trail)"
+    }
+  },
+  "additionalProperties": false
+}

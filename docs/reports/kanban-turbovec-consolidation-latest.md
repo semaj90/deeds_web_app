@@ -1,11 +1,11 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-08-03T23:30:05.407Z
+Generated: 2026-08-04T01:38:14.831Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
 Embedded records: 6725
-TurboVec backend mix: search-derived=7, offline=6718
+TurboVec backend mix: search-derived=6, offline=6719
 simdjson parses: 3957402 bytes
 
 ## Consolidation groups

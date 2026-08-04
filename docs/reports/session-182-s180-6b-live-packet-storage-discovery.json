@@ -1,0 +1,117 @@
+{
+  "generated_at": "2026-08-04T00:00:00Z",
+  "mode": "READ_ONLY_LIVE_DISCOVERY",
+  "database": "legal_ai_db",
+  "search_path_verified": {
+    "current_database": "legal_ai_db",
+    "current_schema": "public",
+    "search_path": "\"$user\", public"
+  },
+  "statuses": {
+    "LIVE_ATLAS_PACKETS_RELATION": "PRESENT",
+    "ATLAS_PACKETS_MIGRATION": "UNKNOWN",
+    "PACKET_QDRANT_BRIDGE_ROLE": "PROJECTION_BRIDGE",
+    "CANONICAL_PACKET_OWNER": "PROVEN",
+    "DRIZZLE_SCHEMA_ALIGNMENT": "DRIFT",
+    "ACTIVE_READER_ALIGNMENT": "PARTIAL",
+    "ACTIVE_WRITER_ALIGNMENT": "FAIL",
+    "S180_6_IDENTITY_AUDIT": "INVALIDATED_BY_LIVE_SCHEMA",
+    "S180_6_PRODUCTION_BACKFILL": "BLOCKED"
+  },
+  "evidence": {
+    "relation_check": {
+      "atlas_packets": { "schema": "public", "relkind": "r", "type": "table" },
+      "packet_qdrant_bridge": { "schema": "public", "relkind": "r", "type": "table" },
+      "to_regclass_unqualified_atlas_packets": "atlas_packets",
+      "to_regclass_public_atlas_packets": "atlas_packets"
+    },
+    "row_counts": {
+      "atlas_packets": 61659,
+      "packet_qdrant_bridge": 4725,
+      "codebase_chunk_index": 52417
+    },
+    "packet_like_tables_inventory": [
+      "ace_chunks", "ace_context_packets", "atlas_feature_packets", "atlas_packet_features",
+      "atlas_packet_metrics", "atlas_packet_registry", "atlas_packets", "atlas_packets_identity_conflicts",
+      "atlas_packets_materialization_queue", "atlas_qdrant_repair_log", "atlas_rpc_packets",
+      "canonical_chunks", "chrom97_packets", "chunk_hit_log", "code_retrieval_chunks",
+      "codebase_chunk_index", "codebase_chunk_index_backup", "codebase_chunk_index_stats",
+      "document_chunks", "feature_packet_bindings", "legal_chunks", "llm_output_chunks",
+      "packet_feature_keywords", "packet_features", "packet_qdrant_bridge", "packet_source_features",
+      "packet_vector_bundles", "qdrant_centroid_clusters", "qdrant_cluster_members",
+      "route_runtime_packets", "statute_chunks", "task_semantic_packets", "unknown_packets",
+      "v_atlas_packets_multi_domain (view)", "v_packet_cache_audit (view)", "v_packet_health_audit (view)",
+      "warden_chunks"
+    ],
+    "correction_note": "S180-6B Task-1 (session 181) claimed atlas_packets and codebase_chunk_index did not exist. Both claims are FALSE. That audit queried the Drizzle schema file only, never live Postgres, or was run against a different connection context. All conclusions dependent on 'atlas_packets is absent' are invalidated.",
+    "atlas_packets_constraints": [
+      "UNIQUE (packet_key) -- atlas_packets_packet_key_key",
+      "PRIMARY KEY (packet_id) -- atlas_packets_pkey",
+      "NOT NULL: packet_id, embedding_eligible, permissions, topology, vectors, workspace_revision, representation_revision",
+      "no FK constraints found on tree_node_id, symbol_id, chunk_id"
+    ],
+    "atlas_packets_coverage": {
+      "total": 61659,
+      "packet_key_present": 61659,
+      "packet_key_missing": 0,
+      "packet_key_distinct": 61659,
+      "packet_key_duplicates": 0,
+      "source_ref_present": 61659,
+      "qdrant_point_id_present": 4824,
+      "chunk_id_present": 58365,
+      "chunk_id_distinct": 58365,
+      "tree_node_id_present": 61659,
+      "tree_node_id_distinct": 61659,
+      "symbol_id_present": 58365,
+      "content_hash_present": 0,
+      "sha256_present": 4715,
+      "source_representation_id_present": 0,
+      "projection_representation_id_present": 0,
+      "workspace_id_present": 61659,
+      "workspace_id_semantics": "directory-path-like string (e.g. 'docs', 'sveltekit-frontend', 'src/lib/server'), NOT a tenant/workspace id, NOT the 'unknown' default in top values"
+    },
+    "chunk_id_join_test": {
+      "atlas_packets_chunk_id_populated": 58365,
+      "join_to_codebase_chunk_index.id (uuid)": 0,
+      "join_to_codebase_chunk_index.chunk_id (text, cast)": 0,
+      "conclusion": "atlas_packets.chunk_id values are self-generated/orphan UUIDs -- do NOT reference codebase_chunk_index.id or .chunk_id under any tested join key"
+    },
+    "source_ref_join_test": {
+      "atlas_packets JOIN codebase_chunk_index ON source_ref": 52417,
+      "conclusion": "real, working join path exists via source_ref (not chunk_id/symbol_id)"
+    },
+    "packet_qdrant_bridge_inspection": {
+      "row_count": 4725,
+      "primary_key": "packet_key",
+      "foreign_keys": "none",
+      "all_columns_not_null": true,
+      "matched_by_distribution": "100% 'source_ref_relative_path'",
+      "join_to_atlas_packets_by_packet_key": 4725,
+      "join_ratio": "4725/4725 = 100%",
+      "conclusion": "packet_qdrant_bridge.packet_key is a strict, fully-covered subset of atlas_packets.packet_key. Shape (sync bookkeeping fields only: qdrant_point_id, qdrant_collection, matched_by, confidence, relative_path, timestamps) plus zero FK plus zero content/provenance columns indicates PROJECTION_BRIDGE, not a second canonical source."
+    },
+    "migration_tracking": {
+      "drizzle.__drizzle_migrations_row_count": 0,
+      "public.migrations_row_count": 0,
+      "conclusion": "Both migration ledgers are empty. atlas_packets' 200+ column live shape (including workspace_revision, representation_revision, som_*, pagerank_*, embedding_eligible, etc.) was NOT applied through either tracked migration path. It was built out-of-band (manual SQL / ALTER scripts / drizzle-kit push without journal commit). ATLAS_PACKETS_MIGRATION cannot be classified APPLIED or UNAPPLIED -- classified UNKNOWN."
+    },
+    "active_code_consumers": {
+      "grep_scope": "*.ts, *.mts files only (excluding node_modules, .git, docs)",
+      "hit_count_files": "200+",
+      "sample_readers_writers": [
+        { "file": "src/lib/server/workers/qdrant-sync-worker.ts", "line": "60-61", "usage": "SELECT .from(atlasPackets).where(eq(atlasPackets.packetKey, ...))", "field_naming": "camelCase, MATCHES live Drizzle definition", "classification": "READS_CANONICAL_STATE -- ALIGNED" },
+        { "file": "src/lib/server/workers/identity-worker.ts", "line": "136-138", "usage": "SELECT .from(atlasPackets).where(eq(atlasPackets.packet_key, ...))", "field_naming": "snake_case, DOES NOT EXIST on Drizzle table object (schema defines packetKey)", "classification": "WRITES_CANONICAL_STATE -- BROKEN (property does not exist)" },
+        { "file": "src/lib/server/workers/identity-worker.ts", "line": "206-221", "usage": "UPDATE .set({ repository_id, directory_id, file_id, module_id, symbol_id, feature_id, chunk_id, ... }).where(eq(atlasPackets.packet_key, ...))", "field_naming": "snake_case .set() keys + snake_case .where() field, both mismatched vs camelCase schema", "classification": "WRITES_CANONICAL_STATE -- BROKEN" },
+        { "file": "src/lib/server/db/schema-postgres.ts", "line": "33, 5308", "usage": "export { atlasPackets, ... } from './schema/atlas-packets.js'; export * from './schema/atlas-packets.js';", "classification": "re-export only, single source of truth confirmed (no duplicate table definitions under same export name)" }
+      ],
+      "conclusion": "atlas_packets is heavily, actively wired (ace/, retrieval/, workers/, mcp/, routes/api/, tests/) -- this is NOT dead code or a stale table. But at least one live writer (identity-worker.ts) has a field-naming bug (snake_case vs camelCase) that would fail at the Drizzle query-builder level for any row matching, since eq(atlasPackets.packet_key, ...) resolves to eq(undefined, ...)."
+    }
+  },
+  "invalidated_prior_claims": [
+    "S180-6 Task 1 (session 181): 'atlas_packets table does NOT exist in live database' -- FALSE, table exists with 61,659 rows",
+    "S180-6 Task 1: 'codebase_chunk_index table does NOT exist' -- FALSE, table exists with 52,417 rows",
+    "S180-6 Task 1: 'tree_node_id -- PROVEN JOIN (FK constraint enforced)' -- FALSE, no FK constraint exists live; tree_node_id is TEXT with no foreign key at all",
+    "S180-6B (session 181, prior to this correction): 'PRODUCTION_BACKFILL: BLOCKED (atlas_packets structural mismatch must be resolved before writes)' framed as a missing-table problem -- WRONG framing. The table exists and is canonical; the actual blockers are field-mapping ambiguity (source_revision/representation_id) and a broken writer (identity-worker.ts)."
+  ],
+  "no_mutations_performed": true
+}

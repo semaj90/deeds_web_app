@@ -1,0 +1,295 @@
+{
+  "generated_at": "2026-08-04T04:36:07.086Z",
+  "mode": "READ_ONLY_SMOKE",
+  "collection": "codebase_chunks_768",
+  "statuses": {
+    "S180_2_MCP_REGISTRATION": "NOT_PROVEN",
+    "S180_3_QDRANT_INVENTORY": "PASS",
+    "S180_4_PAYLOAD_V2_CONTRACT_COVERAGE": "PARTIAL_PROVEN",
+    "POSTGRES_CANONICAL_PACKET_SAMPLE": "PASS",
+    "S180_5_DRY_RUN_RECONCILIATION": "BLOCKED",
+    "S180_5_READINESS": "BLOCKED",
+    "S180_6_BACKFILL_READINESS": "BLOCKED",
+    "REAL_RETRIEVAL_LANES": "NOT_PROVEN",
+    "PHASE_5A_READINESS": "BLOCKED",
+    "PRODUCTION_MUTATIONS_PERFORMED": "PASS"
+  },
+  "evidence": {
+    "S180_2_MCP_REGISTRATION": [
+      {
+        "endpoint": "GET /mcp/tools/list",
+        "error": "This operation was aborted"
+      },
+      {
+        "endpoint": "GET /tools/list",
+        "error": "This operation was aborted"
+      },
+      {
+        "endpoint": "JSON-RPC tools/list",
+        "error": "This operation was aborted"
+      }
+    ],
+    "S180_3_QDRANT_INVENTORY": {
+      "collection_status": "green",
+      "points_count": 105761,
+      "indexed_vectors_count": 105761,
+      "payload_schema": {
+        "cluster_key": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "tags": {
+          "data_type": "keyword",
+          "points": 1
+        },
+        "symbol_name": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "cluster_id": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "language": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "parent_centroid_id": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "file_path": {
+          "data_type": "keyword",
+          "points": 1
+        },
+        "workspace_id": {
+          "data_type": "keyword",
+          "points": 52381
+        },
+        "next_action": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "kind": {
+          "data_type": "keyword",
+          "points": 6907
+        },
+        "agent_pickup_ready": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "updated_at": {
+          "data_type": "integer",
+          "points": 0
+        },
+        "som_cluster": {
+          "data_type": "integer",
+          "points": 0
+        },
+        "repo": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "sourceRefs": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "workspace_task_id": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "source_ref": {
+          "data_type": "keyword",
+          "points": 105761
+        },
+        "centroid_id": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "point_kind": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "error_id": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "semantic_path": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "summary_hash": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "topo_class": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "status": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "feature_id": {
+          "data_type": "keyword",
+          "points": 1
+        },
+        "observed_at": {
+          "data_type": "keyword",
+          "points": 0
+        },
+        "path": {
+          "data_type": "keyword",
+          "points": 0
+        }
+      },
+      "sample_payloads": [
+        {
+          "id": 1,
+          "payload": {
+            "chunk_id": "card:src/AGENTS.md:0852bd8c141bccf6",
+            "source_ref": "src/AGENTS.md",
+            "content_hash": "0852bd8c141bccf6",
+            "representation_id": "1550075d-9042-4953-bc75-90b50a9a8c5c",
+            "packet_version": "qdrant-backfill-v1",
+            "qdrant_point_id": "card:src/AGENTS.md:0852bd8c141bccf6-0852bd8c"
+          }
+        },
+        {
+          "id": 2,
+          "payload": {
+            "chunk_id": "card:src/AGENTS.md:19cf4dd92a0829d1",
+            "source_ref": "src/AGENTS.md",
+            "content_hash": "19cf4dd92a0829d1",
+            "representation_id": "f0c422e6-9b5a-423e-a07f-555e94bcd16d",
+            "packet_version": "qdrant-backfill-v1",
+            "qdrant_point_id": "card:src/AGENTS.md:19cf4dd92a0829d1-19cf4dd9"
+          }
+        },
+        {
+          "id": 3,
+          "payload": {
+            "chunk_id": "card:src/AGENTS.md:7765ecd953daf907",
+            "source_ref": "src/AGENTS.md",
+            "content_hash": "7765ecd953daf907",
+            "representation_id": "6215cce4-9ca4-4658-8570-8d880b12162c",
+            "packet_version": "qdrant-backfill-v1",
+            "qdrant_point_id": "card:src/AGENTS.md:7765ecd953daf907-7765ecd9"
+          }
+        },
+        {
+          "id": 4,
+          "payload": {
+            "chunk_id": "card:src/AGENTS.md:b33a95adc12f82d6",
+            "source_ref": "src/AGENTS.md",
+            "content_hash": "b33a95adc12f82d6",
+            "representation_id": "6b72f3c5-f565-4abf-a58a-faae1e245126",
+            "packet_version": "qdrant-backfill-v1",
+            "qdrant_point_id": "card:src/AGENTS.md:b33a95adc12f82d6-b33a95ad"
+          }
+        },
+        {
+          "id": 5,
+          "payload": {
+            "chunk_id": "card:src/hooks.server.ts:1ad8934d9cefa0be",
+            "source_ref": "src/hooks.server.ts",
+            "content_hash": "1ad8934d9cefa0be",
+            "representation_id": "768abae8-d432-46aa-a6f0-9cd065ac169b",
+            "packet_version": "qdrant-backfill-v1",
+            "qdrant_point_id": "card:src/hooks.server.ts:1ad8934d9cefa0be-1ad8934d"
+          }
+        }
+      ]
+    },
+    "S180_4_PAYLOAD_V2_CONTRACT_COVERAGE": {
+      "expected_fields": [
+        "packet_key",
+        "workspace_id",
+        "source_ref",
+        "source_revision",
+        "feature_id",
+        "symbol_id",
+        "content_hash",
+        "tree_node_id"
+      ],
+      "present_fields": [
+        "workspace_id",
+        "source_ref",
+        "feature_id",
+        "content_hash"
+      ],
+      "missing_fields": [
+        "packet_key",
+        "source_revision",
+        "symbol_id",
+        "tree_node_id"
+      ]
+    },
+    "POSTGRES_CANONICAL_PACKET_SAMPLE": {
+      "selected_columns": [
+        "packet_key",
+        "workspace_id",
+        "source_ref",
+        "feature_id",
+        "symbol_id",
+        "content_hash",
+        "tree_node_id",
+        "representation_revision"
+      ],
+      "row_count": 10
+    },
+    "S180_5_DRY_RUN_RECONCILIATION": {
+      "reconciled": 0,
+      "total": 10,
+      "blockers": 10
+    },
+    "PHASE_5A_READINESS": {
+      "reason": "Real retrieval lanes remain NOT_PROVEN. This smoke test does not authorize Phase 5A or writes."
+    },
+    "PRODUCTION_MUTATIONS_PERFORMED": "None"
+  },
+  "blockers": [
+    "MCP registration for prepare-patch-context was not proven.",
+    "Qdrant payload-v2 coverage is incomplete: packet_key, source_revision, symbol_id, tree_node_id"
+  ],
+  "reconciliation": {
+    "sample_size": 10,
+    "reconcilable": [],
+    "ambiguous": [],
+    "missing_postgres_row": [],
+    "missing_qdrant_point": [
+      {
+        "packet_key": "ace:packet:007d98744901"
+      },
+      {
+        "packet_key": "ace:packet:00d3899bd8c2"
+      },
+      {
+        "packet_key": "ace:packet:0115f4c3a6be"
+      },
+      {
+        "packet_key": "ace:packet:110b1fdb24e3"
+      },
+      {
+        "packet_key": "ace:packet:11bd8c8b9114"
+      },
+      {
+        "packet_key": "ace:packet:121097482f77"
+      },
+      {
+        "packet_key": "ace:packet:16c3616f577f"
+      },
+      {
+        "packet_key": "ace:packet:17566f61a9f6"
+      },
+      {
+        "packet_key": "ace:packet:18675d3c54e9"
+      },
+      {
+        "packet_key": "ace:packet:1ca2cf00ee2d"
+      }
+    ],
+    "stale_revision": [],
+    "conflicting_identity": []
+  }
+}

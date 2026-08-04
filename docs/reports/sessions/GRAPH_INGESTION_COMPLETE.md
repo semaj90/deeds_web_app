@@ -1,6 +1,6 @@
 # Graph Ingestion Pipeline Status — Complete ✅
 
-**Date**: 2026-05-29 8:41 AM PDT  
+**Date**: 2026-05-29 8:41 AM PDT
 **Status**: Phase 17-19 Atlas lane + graph ingestion COMPLETE
 
 ---
@@ -26,8 +26,8 @@ All three data backend lanes (Neo4j, CouchDB, DuckDB) are operational and integr
 
 ### GDS (Graph Data Science) Pipeline
 
-**Status**: Script created, ready to wire  
-**Implementation**: `scripts/neo4j-graph-enrich.mjs` (new)  
+**Status**: Script created, ready to wire
+**Implementation**: `scripts/neo4j-graph-enrich.mjs` (new)
 **Package.json integration** (lines 307-310):
 ```
 graphify:gds              → node scripts/neo4j-graph-enrich.mjs
@@ -146,6 +146,19 @@ Pending (optional):
 - [ ] SHARES_CLUSTER edges
 - [ ] HIGH_AUTHORITY edges
 
+## 7. Recommendations & Next Steps
+
+### 7.1 Immediate (Session 77)
+
+1. **Resolve Port Collision**: Move `go-search-service` from port 50055 to 50058
+2. **Verify GpJSON Deferral**: Document in `docs/decisions/gpjson-deferred-rationale.md`
+3. **CouchDB Retrieval Pattern**: Create optional multi-hop join example (if Postgres read fails)
+
+### 7.2 Medium-Term (Sessions 77–80)
+
+1. **ACE Cache Performance Audit**: Measure L1/L2/L3 hit rates in production
+2. **RabbitMQ Queue Depth Monitoring**: Add dashboard for queue backpressure
+3. **GPU Memory Profiling**: Tool to predict OOM
 ---
 
 ## Quick Start
