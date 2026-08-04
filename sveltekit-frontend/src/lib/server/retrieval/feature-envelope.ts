@@ -186,12 +186,12 @@ export const FeatureEnvelopeSchema = z.object({
   retrieved_rank: z.number().int().positive().optional().describe('Rank before reranking if already known'),
   feature_id: z.string().optional().describe('Canonical feature identity if already assigned'),
   tree_node_id: z.string().optional().describe('Canonical topology node identity if already assigned'),
-  qdrant_point_id: z.string().optional().describe('Canonical dense retrieval point identity if already assigned'),
-  workspace_revision: z.string().optional().describe('Workspace revision attached by the authority join'),
-  source_revision: z.string().optional().describe('Source revision attached by the authority join'),
-  representation_id: z.string().optional().describe('Representation identity attached by the authority join'),
-  representation_revision: z.number().int().optional().describe('Representation revision attached by the authority join'),
-  stable_symbol_id: z.string().optional().describe('Stable symbol identity when available'),
+  qdrant_point_id: z.string().nullable().optional().describe('Canonical dense retrieval point identity if already assigned (null when the chunk has no Qdrant mirror)'),
+  workspace_revision: z.string().nullable().optional().describe('Workspace revision attached by the authority join (null until a writer populates it)'),
+  source_revision: z.string().nullable().optional().describe('Source revision attached by the authority join (null until a writer populates it)'),
+  representation_id: z.string().nullable().optional().describe('Representation identity attached by the authority join (null until a writer populates it)'),
+  representation_revision: z.number().int().nullable().optional().describe('Representation revision attached by the authority join (null until a writer populates it)'),
+  stable_symbol_id: z.string().nullable().optional().describe('Stable symbol identity when available (null until a writer populates it)'),
 
   // ─────────────────────────────────────────────────────────
   // Independent Signals (each computed separately)

@@ -1,0 +1,146 @@
+{
+  "report": "retrieval-rerank-ace-centroid-smoke",
+  "date": "2026-08-04",
+  "request_id": "smoke-msf17o6w",
+  "fixture": "C:/Users/james/Videos/deeds-web-app/docs/reports/fixtures/retrieval-search-unified-after-fix-run1.json",
+  "metadata": {
+    "query": "test",
+    "candidatesRetrieved": 170,
+    "candidatesFused": 163,
+    "candidatesScored": 163,
+    "candidatesReranked": 3,
+    "candidatesPostProcessed": 1,
+    "durationMs": 2639,
+    "stages": {
+      "retrieve": 2429,
+      "fuse": 1,
+      "score": 1,
+      "hydrate": 194,
+      "rerank": 8,
+      "postProcess": 1,
+      "promote": 0
+    }
+  },
+  "gates": {
+    "RETRIEVAL_INPUT": {
+      "status": "PASS",
+      "detail": "retrieved=170"
+    },
+    "LEXICAL_CANDIDATES": {
+      "status": "PASS",
+      "detail": "[\"postgres_trigram\",\"qdrant_768\",\"exact_symbol\"]"
+    },
+    "RERANK_OUTPUT": {
+      "status": "PASS",
+      "detail": "reranked=3"
+    },
+    "POST_PROCESS_OUTPUT": {
+      "status": "PASS",
+      "detail": "postProcessed=1"
+    },
+    "FINAL_PACKET_OUTPUT": {
+      "status": "PASS",
+      "detail": "packets=1"
+    },
+    "PACKET_IDENTITY_PRESERVED": {
+      "status": "PASS",
+      "detail": "keys=1/1"
+    },
+    "ACE_SMOKE_MATERIALIZATION": {
+      "status": "PASS",
+      "detail": "input=1 deduped=1 cards=1 tokens=83 undefinedContent=0"
+    },
+    "ACE_REDIS_TEMP_WRITE": {
+      "status": "PASS",
+      "detail": "ace:packet:smoke:smoke-msf17o6w ttl=300"
+    },
+    "ACE_REDIS_TEMP_READBACK": {
+      "status": "PASS",
+      "detail": "digest match=true"
+    },
+    "CENTROID_TEMP_WRITE": {
+      "status": "PASS",
+      "detail": "atlas:centroid:smoke:smoke-msf17o6w ttl=300"
+    },
+    "CENTROID_TEMP_READBACK": {
+      "status": "PASS",
+      "detail": "packet order explicit, identities match ACE cards, TTL bounded"
+    },
+    "KAG_PLAN": {
+      "status": "PASS",
+      "detail": "nodes=1, all carry packet_key, bounded 2-hop"
+    },
+    "DAG_PLAN": {
+      "status": "PASS",
+      "detail": "8 bounded stages"
+    },
+    "HYPERGRAPH_PLAN": {
+      "status": "PASS",
+      "detail": "1 relations, all reference packet_key"
+    },
+    "PRODUCTION_GRAPH_WRITES": {
+      "status": "PASS",
+      "detail": "none performed (planning only)"
+    },
+    "OVERALL_RESULT": {
+      "status": "PASS",
+      "detail": "fail=0 blocked=0"
+    }
+  },
+  "ace_cards": [
+    {
+      "packet_key": "083bf85a-22ea-4f5b-be74-c0f093c228d0",
+      "source_ref": "src/lib/server/db/schema-test-rag.ts",
+      "source_revision": null,
+      "evidence_hash": "863434119bce58ea7b8091dfb07a13401b6efa0425279f49774fa16163643945",
+      "token_estimate": 83,
+      "content_present": true
+    }
+  ],
+  "kag_plan": {
+    "request_id": "smoke-msf17o6w",
+    "nodes": [
+      {
+        "type": "Packet",
+        "packet_key": "083bf85a-22ea-4f5b-be74-c0f093c228d0",
+        "source_ref": "src/lib/server/db/schema-test-rag.ts",
+        "evidence_hash": "863434119bce58ea7b8091dfb07a13401b6efa0425279f49774fa16163643945"
+      }
+    ],
+    "bounded_hops": 2,
+    "writes": "none"
+  },
+  "dag_plan": {
+    "request_id": "smoke-msf17o6w",
+    "stages": [
+      "retrieve",
+      "fuse",
+      "score",
+      "hydrate",
+      "rerank",
+      "post_process",
+      "ace_materialize",
+      "centroid_manifest"
+    ],
+    "bounded": true,
+    "packet_keys": [
+      "083bf85a-22ea-4f5b-be74-c0f093c228d0"
+    ]
+  },
+  "hypergraph_plan": {
+    "request_id": "smoke-msf17o6w",
+    "relations": [
+      {
+        "relation": "EVIDENCE_FOR",
+        "head": {
+          "packet_key": "083bf85a-22ea-4f5b-be74-c0f093c228d0"
+        },
+        "tail": {
+          "request_id": "smoke-msf17o6w"
+        },
+        "provenance": "863434119bce58ea7b8091dfb07a13401b6efa0425279f49774fa16163643945"
+      }
+    ],
+    "writes": "none"
+  }
+}

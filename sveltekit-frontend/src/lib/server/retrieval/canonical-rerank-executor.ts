@@ -183,6 +183,8 @@ export function buildCanonicalRerankCacheKey(input: {
   topK: number;
 }): string {
   return [
+    'bitfrost',
+    'retrieval',
     'rerank',
     'v1',
     stableHash(input.modelVersion),
@@ -442,7 +444,7 @@ async function scoreWithXgboostSidecar(
         provenance_git_age: Math.min(1.0, ageDays / 365),
         packet_hit_count: 0,
         n_retrieved: candidates.length,
-        n_concepts: candidate.content.split(/\s+/).filter(Boolean).length,
+        n_concepts: (candidate.content || candidate.sourceRef || candidate.packetKey || '').split(/\s+/).filter(Boolean).length,
         trace_score: candidate.crossEncoderScore ?? candidate.denseScore ?? 0.5,
         query,
         rank_hint: index + 1,
@@ -567,18 +569,54 @@ function localFallbackRerank(candidates: RerankCandidate[]): { modelVersion: str
   return { modelVersion, ranked };
 }
 
+/**
+ * Last-resort fail-open ranking: preserves retrieval order so a reranker
+ * outage can never erase retrieval evidence.
+ * Invariant: candidates.length > 0 → ranked.length === candidates.length.
+ */
+function retrievalOrderFallback(
+  candidates: RerankCandidate[],
+  reason: string,
+): { modelVersion: string; ranked: RerankedCandidate[]; fallbackReason: string } {
+  const modelVersion = 'retrieval-order-fallback';
+  return {
+    modelVersion,
+    fallbackReason: reason,
+    ranked: candidates.map((candidate, index) => ({
+      ...candidate,
+      crossEncoderScore: candidate.crossEncoderScore ?? 0,
+      blendedScore:
+        candidate.crossEncoderScore ??
+        candidate.denseScore ??
+        candidate.bm25Score ??
+        candidate.astScore ??
+        candidate.graphScore ??
+        0,
+      rankAfter: index + 1,
+      modelVersion,
+      blendWeights: { ...DEFAULT_BLEND_WEIGHTS, crossEncoder: 0 } as any,
+      evidence: {
+        semanticLane: candidate.denseScore !== undefined
+          ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
+          : undefined,
+        lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
+        topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
+      },
+    }) satisfies RerankedCandidate),
+  };
+}
+
 async function runFallbackRerank(
   query: string,
   candidates: RerankCandidate[],
 ): Promise<{ modelVersion: string; ranked: RerankedCandidate[]; fallbackReason: string }> {
   const sidecar = await scoreWithXgboostSidecar(query, candidates);
   if (sidecar) {
+    // Retain the sidecar's real model identity so reports can distinguish
+    // true XGBoost scores from the local weighted fallback.
     return {
-      modelVersion: 'xgboost-fallback',
-      ranked: sidecar.ranked.map((candidate) => ({
-        ...candidate,
-        modelVersion: 'xgboost-fallback',
-      })),
+      modelVersion: sidecar.modelVersion,
+      ranked: sidecar.ranked,
       fallbackReason: 'crossencoder_unavailable',
     };
   }
@@ -600,25 +638,8 @@ async function runFallbackRerank(
         retrievedRank: candidates[0].retrievedRank,
       } : null,
     });
-    // FAIL-OPEN: Preserve retrieval order instead of returning empty array
-    return {
-      modelVersion: 'local-error',
-      ranked: candidates.map((candidate, index) => ({
-        ...candidate,
-        blendedScore: candidate.crossEncoderScore ?? candidate.denseScore ?? 0.5,
-        rankAfter: index + 1,
-        modelVersion: 'local-error-fallback',
-        blendWeights: DEFAULT_BLEND_WEIGHTS as any,
-        evidence: {
-          semanticLane: candidate.denseScore !== undefined
-            ? `${candidate.embeddingLane ?? 'dense'}=${candidate.denseScore.toFixed(2)}${candidate.projectionVersion ? `@${candidate.projectionVersion}` : ''}`
-            : undefined,
-          lexicalLane: candidate.bm25Score !== undefined ? `bm25=${candidate.bm25Score.toFixed(2)}` : undefined,
-          topologyLane: candidate.pagerankScore !== undefined ? `pr=${candidate.pagerankScore.toFixed(2)}` : undefined,
-        },
-      })) satisfies RerankedCandidate[],
-      fallbackReason: 'localFallbackRerank_threw',
-    };
+    // FAIL-OPEN: preserve retrieval order instead of returning an empty array
+    return retrievalOrderFallback(candidates, 'localFallbackRerank_threw');
   }
 }
 
@@ -733,8 +754,24 @@ export async function rerankCanonicalFeatureEnvelopes(
   let cacheKey = primaryCacheKey;
 
   try {
-    const rerankOutput = await reranker.rerank({ requestId: primaryCacheKey, query, candidates, limit: topK, profile: 'crossencoder' });
-    ranked = rerankOutput.ranked as any;
+    const rerankOutput = await reranker.rerank({ requestId: primaryCacheKey, query, candidates, limit: candidates.length, profile: 'crossencoder' });
+    const crossEncoderRanked = rerankOutput.ranked as RerankedCandidate[];
+
+    // Contract: empty or identity-invalid results are fallback conditions, not
+    // silently-accepted outputs. A reranker is an ordering enhancement — its
+    // failure must not erase retrieval evidence.
+    if (!crossEncoderRanked.length) {
+      throw new Error('CROSS_ENCODER_EMPTY_RESULT');
+    }
+    const inputKeys = new Set(candidates.map((candidate) => candidate.packetKey));
+    const returnedKeys = new Set(crossEncoderRanked.map((candidate) => candidate.packetKey));
+    const hasDuplicates = returnedKeys.size !== crossEncoderRanked.length;
+    const hasUnknown = crossEncoderRanked.some((candidate) => !inputKeys.has(candidate.packetKey));
+    if (hasDuplicates || hasUnknown) {
+      throw new Error('CROSS_ENCODER_INVALID_IDENTITY');
+    }
+
+    ranked = crossEncoderRanked;
     crossEncoderUsed = true;
   } catch (err) {
     console.error('[rerankCanonicalFeatureEnvelopes] reranker threw:', {
@@ -790,10 +827,20 @@ export async function rerankCanonicalFeatureEnvelopes(
     }
 
     const fallback = await runFallbackRerank(query, candidates);
-    ranked = fallback.ranked;
-    resultModelVersion = fallbackModelVersion;
+    if (fallback.ranked.length > 0) {
+      ranked = fallback.ranked;
+      resultModelVersion = fallback.modelVersion;
+      fallbackReason = fallback.fallbackReason;
+    } else {
+      // Final safety net — no ranking lane may convert non-empty retrieval
+      // into an empty result.
+      const finalFallback = retrievalOrderFallback(candidates, 'all_rerankers_unavailable');
+      ranked = finalFallback.ranked;
+      resultModelVersion = finalFallback.modelVersion;
+      fallbackReason = finalFallback.fallbackReason;
+    }
     fallbackUsed = true;
-    fallbackReason = fallback.fallbackReason;
+    crossEncoderUsed = false;
     cacheStatus = cachePolicy === 'disabled' ? 'bypass' : 'miss';
   }
 

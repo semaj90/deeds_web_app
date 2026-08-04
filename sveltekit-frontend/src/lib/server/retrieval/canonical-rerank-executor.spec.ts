@@ -362,8 +362,148 @@ describe('canonical rerank executor', () => {
     expect(ranked.provenance.crossEncoderUsed).toBe(false);
     expect(ranked.provenance.fallbackUsed).toBe(true);
     expect(ranked.provenance.fallbackReason).toBe('crossencoder_unavailable');
-    expect(ranked.results[0]?.model_version).toBe('xgboost-fallback');
+    // Sidecar's real model identity is retained so reports can distinguish
+    // true XGBoost scores from the local weighted fallback.
+    expect(ranked.results[0]?.model_version).toBe('xgboost-sidecar');
     expect(setex).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('rerank fail-open contract (Session 188)', () => {
+  const makeEnvelopes = (count: number): CanonicalRerankEnvelope[] =>
+    Array.from({ length: count }, (_, index) => ({
+      chunk_id: `chunk-${index + 1}`,
+      packet_key: `packet-${index + 1}`,
+      feature_id: `feature-${index + 1}`,
+      source_ref: `src/lib/mod-${index + 1}.ts`,
+      relative_path: `src/lib/mod-${index + 1}.ts`,
+      content: `content for module ${index + 1}`,
+      retrieved_rank: index + 1,
+      dense: {
+        name: 'dense' as const,
+        score: 0.9 - index * 0.01,
+        qdrant_point_id: `q-${index + 1}`,
+        metric: 'cosine' as const,
+        confidence: 0.8,
+      },
+    }));
+
+  beforeEach(() => {
+    mockRerankWithCrossEncoder.mockReset();
+    mockGetRedis.mockReset();
+    vi.unstubAllGlobals();
+    mockGetRedis.mockReturnValue({
+      get: vi.fn().mockResolvedValue(null),
+      setex: vi.fn().mockResolvedValue('OK'),
+      del: vi.fn().mockResolvedValue(1),
+    });
+    // XGBoost sidecar unavailable in every test here
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('ECONNREFUSED')));
+  });
+
+  it('never converts non-empty retrieval into an empty result (both rerankers unavailable)', async () => {
+    const input = makeEnvelopes(33);
+    mockRerankWithCrossEncoder.mockRejectedValue(new Error('unavailable'));
+
+    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+      cachePolicy: 'disabled',
+    });
+
+    expect(output.results).toHaveLength(33);
+    expect(output.results.every((row) => typeof row.rank_after === 'number')).toBe(true);
+    expect(output.provenance.crossEncoderUsed).toBe(false);
+    expect(output.provenance.fallbackUsed).toBe(true);
+  });
+
+  it('cross-encoder returning zero scored documents still yields the full ranked set', async () => {
+    const input = makeEnvelopes(33);
+    mockRerankWithCrossEncoder.mockResolvedValue({ results: [], stats: {} });
+
+    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+      cachePolicy: 'disabled',
+    });
+
+    expect(output.results).toHaveLength(33);
+    expect(output.results.every((row) => typeof row.rank_after === 'number')).toBe(true);
+  });
+
+  it('preserves all candidate identities during reranking (topK does not truncate)', async () => {
+    const input = makeEnvelopes(33);
+    mockRerankWithCrossEncoder.mockResolvedValue({
+      results: input.map((env, index) => ({
+        doc: { documentId: env.packet_key },
+        rerankScore: 0.9 - index * 0.01,
+        cached: false,
+      })),
+      stats: {},
+    });
+
+    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+      cachePolicy: 'disabled',
+      topK: 3,
+    });
+
+    expect(new Set(output.results.map((row) => row.packet_key))).toEqual(
+      new Set(input.map((row) => row.packet_key)),
+    );
+  });
+
+  it('rejects duplicate reranker identities and survives via fallback', async () => {
+    // Two envelopes with the same packet_key create duplicate identities in
+    // the cross-encoder output → CROSS_ENCODER_INVALID_IDENTITY → fallback.
+    const input = makeEnvelopes(2).map((env) => ({ ...env, packet_key: 'dup', feature_id: undefined }));
+    mockRerankWithCrossEncoder.mockResolvedValue({
+      results: [{ doc: { documentId: 'dup' }, rerankScore: 0.9, cached: false }],
+      stats: {},
+    });
+
+    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+      cachePolicy: 'disabled',
+    });
+
+    expect(output.results).toHaveLength(2);
+    expect(output.provenance.crossEncoderUsed).toBe(false);
+    expect(output.provenance.fallbackUsed).toBe(true);
+  });
+
+  it('fallback scores are finite and identities unchanged', async () => {
+    const input = makeEnvelopes(10);
+    mockRerankWithCrossEncoder.mockRejectedValue(new Error('unavailable'));
+
+    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+      cachePolicy: 'disabled',
+    });
+
+    expect(output.results).toHaveLength(10);
+    for (const row of output.results) {
+      expect(Number.isFinite(row.blended_score)).toBe(true);
+      expect(Number.isFinite(row.rank_after)).toBe(true);
+    }
+    expect(new Set(output.results.map((row) => row.packet_key))).toEqual(
+      new Set(input.map((row) => row.packet_key)),
+    );
+  });
+
+  it('missing content does not throw (n_concepts derives from sourceRef/packetKey)', async () => {
+    const input = makeEnvelopes(5).map((env) => ({ ...env, content: undefined }));
+    mockRerankWithCrossEncoder.mockRejectedValue(new Error('unavailable'));
+    // Sidecar reachable this time so the feature mapper actually runs
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(async (rawInput: any) => {
+      const url = String(rawInput);
+      if (url.endsWith('/health')) return new Response(JSON.stringify({ status: 'healthy' }), { status: 200 });
+      if (url.endsWith('/score')) {
+        return new Response(JSON.stringify({ scores: [0.9, 0.8, 0.7, 0.6, 0.5], model: 'xgboost-sidecar' }), { status: 200 });
+      }
+      return new Response('not found', { status: 404 });
+    }));
+
+    const output = await rerankCanonicalFeatureEnvelopes('test', input, {
+      cachePolicy: 'disabled',
+    });
+
+    expect(output.results).toHaveLength(5);
+    expect(output.provenance.fallbackUsed).toBe(true);
+    expect(output.provenance.modelVersion).toBe('xgboost-sidecar');
   });
 });

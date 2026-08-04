@@ -592,6 +592,18 @@ export class SearchRuntime {
       const envelopes = hydrated.envelopes;
       stageTiming.hydrate = Date.now() - hydrateStart;
 
+      // DIAGNOSTIC: hydration boundary — envelope count + typed reject reasons
+      console.info('[stage:hydrate] output', {
+        inputCount: Math.min(scoredSorted.length, query.topK),
+        envelopeCount: envelopes.length,
+        proof: hydrated.proof,
+        sampleCandidates: scoredSorted.slice(0, 3).map((sc) => ({
+          packetKey: sc.packetKey,
+          sourceRef: sc.sourceRef,
+          scoreSource: sc.scoreSource,
+        })),
+      });
+
       // Stage 4: Rerank with the canonical executor
       const rerankStart = Date.now();
       const reranked = await this.rerankCandidates(envelopes, query);
