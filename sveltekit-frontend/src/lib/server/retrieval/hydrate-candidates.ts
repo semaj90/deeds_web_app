@@ -20,6 +20,133 @@ function asFiniteNumber(value: unknown, fallback = 0): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+interface RowLike {
+  id: string;
+  page_rank_score: number | null;
+  metadata: Record<string, unknown> | null;
+  output_meta: Record<string, unknown> | null;
+}
+
+function pickString(...values: unknown[]): string | null {
+  for (const value of values) {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+  }
+  return null;
+}
+
+function pickNumber(...values: unknown[]): number | null {
+  for (const value of values) {
+    const parsed = typeof value === 'number' ? value : Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
+function extractRowIdentity(row: RowLike): {
+  workspaceId: string | null;
+  workspaceRevision: string | null;
+  sourceRevision: string | null;
+  representationId: string | null;
+  representationRevision: number | null;
+  symbolVersionId: string | null;
+  stableSymbolId: string | null;
+  treeNodeId: string | null;
+  pageRankScore: number | null;
+} {
+  const metadata = row.metadata ?? {};
+  const outputMeta = row.output_meta ?? {};
+  return {
+    workspaceId: pickString(metadata.workspace_id, metadata.workspaceId, outputMeta.workspace_id, outputMeta.workspaceId),
+    workspaceRevision: pickString(
+      metadata.workspace_revision,
+      metadata.workspaceRevision,
+      outputMeta.workspace_revision,
+      outputMeta.workspaceRevision,
+    ),
+    sourceRevision: pickString(
+      metadata.source_revision,
+      metadata.sourceRevision,
+      metadata.source_revision_id,
+      metadata.sourceRevisionId,
+      outputMeta.source_revision,
+      outputMeta.sourceRevision,
+      outputMeta.source_revision_id,
+      outputMeta.sourceRevisionId,
+    ),
+    representationId: pickString(
+      metadata.representation_id,
+      metadata.representationId,
+      outputMeta.representation_id,
+      outputMeta.representationId,
+    ),
+    representationRevision: pickNumber(
+      metadata.representation_revision,
+      metadata.representationRevision,
+      outputMeta.representation_revision,
+      outputMeta.representationRevision,
+    ),
+    symbolVersionId: pickString(
+      metadata.symbol_version_id,
+      metadata.symbolVersionId,
+      metadata.packet_key,
+      outputMeta.symbol_version_id,
+      outputMeta.symbolVersionId,
+      outputMeta.packet_key,
+      row.id,
+    ),
+    stableSymbolId: pickString(
+      metadata.stable_symbol_id,
+      metadata.stableSymbolId,
+      outputMeta.stable_symbol_id,
+      outputMeta.stableSymbolId,
+    ),
+    treeNodeId: pickString(
+      metadata.tree_node_id,
+      metadata.treeNodeId,
+      outputMeta.tree_node_id,
+      outputMeta.treeNodeId,
+    ),
+    pageRankScore: pickNumber(
+      row.page_rank_score,
+      metadata.page_rank_score,
+      metadata.pageRankScore,
+      outputMeta.page_rank_score,
+      outputMeta.pageRankScore,
+    ),
+  };
+}
+
+export interface HydrationProofContext {
+  workspaceId?: string | null;
+  workspaceRevision?: string | null;
+  sourceRevision?: string | null;
+  representationId?: string | null;
+  representationRevision?: number | null;
+}
+
+export interface HydrationProofSummary {
+  canonicalJoinedCount: number;
+  canonicalJoinMissingCount: number;
+  workspaceRejectedCount: number;
+  workspaceRevisionRejectedCount: number;
+  sourceRevisionRejectedCount: number;
+  representationRejectedCount: number;
+  representationRevisionRejectedCount: number;
+  graphScoreAttachedCount: number;
+  graphScoreMissingCount: number;
+  summaryResolvedCount: number;
+  summaryStaleRejectedCount: number;
+  validationReasons: Record<string, number>;
+}
+
+export interface HydratedCandidatesWithProof {
+  envelopes: FeatureEnvelope[];
+  proof: HydrationProofSummary;
+}
+
 function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | null) {
   if (candidate.embeddingLane !== 'dense_768') {
     return undefined;
@@ -50,7 +177,33 @@ function buildDenseSignal(candidate: FusedCandidate, qdrantPointId: string | nul
 export async function hydrateCandidates(
   candidates: FusedCandidate[],
 ): Promise<FeatureEnvelope[]> {
-  if (candidates.length === 0) return [];
+  const result = await hydrateCandidatesWithProof(candidates);
+  return result.envelopes;
+}
+
+export async function hydrateCandidatesWithProof(
+  candidates: FusedCandidate[],
+  expected?: HydrationProofContext,
+): Promise<HydratedCandidatesWithProof> {
+  if (candidates.length === 0) {
+    return {
+      envelopes: [],
+      proof: {
+        canonicalJoinedCount: 0,
+        canonicalJoinMissingCount: 0,
+        workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0,
+        sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 0,
+        graphScoreMissingCount: 0,
+        summaryResolvedCount: 0,
+        summaryStaleRejectedCount: 0,
+        validationReasons: {},
+      },
+    };
+  }
 
   try {
     // Extract unique lookups from candidates
@@ -131,31 +284,95 @@ export async function hydrateCandidates(
       }
     }
 
+    const proof: HydrationProofSummary = {
+      canonicalJoinedCount: 0,
+      canonicalJoinMissingCount: 0,
+      workspaceRejectedCount: 0,
+      workspaceRevisionRejectedCount: 0,
+      sourceRevisionRejectedCount: 0,
+      representationRejectedCount: 0,
+      representationRevisionRejectedCount: 0,
+      graphScoreAttachedCount: 0,
+      graphScoreMissingCount: 0,
+      summaryResolvedCount: 0,
+      summaryStaleRejectedCount: 0,
+      validationReasons: {},
+    };
+
+    const bumpReason = (reason: string) => {
+      proof.validationReasons[reason] = (proof.validationReasons[reason] ?? 0) + 1;
+    };
+
     // Map candidates to envelopes, preserving order
     const envelopes: FeatureEnvelope[] = [];
     for (const candidate of candidates) {
-      const row = rowsByKey.get(candidate.sourceRef) || rowsByKey.get(candidate.packetKey);
+      const candidateKey = candidate.symbolVersionId || candidate.packetKey;
+      const row = rowsByKey.get(candidate.sourceRef) || rowsByKey.get(candidateKey) || rowsByKey.get(candidate.packetKey);
       if (!row) {
-        console.warn(`Hydration: No row found for candidate ${candidate.packetKey}`);
+        proof.canonicalJoinMissingCount += 1;
+        bumpReason('canonical_join_missing');
         continue;
+      }
+
+      const rowIdentity = extractRowIdentity(row);
+
+      if (expected?.workspaceId && rowIdentity.workspaceId && rowIdentity.workspaceId !== expected.workspaceId) {
+        proof.workspaceRejectedCount += 1;
+        bumpReason('workspace_mismatch');
+        continue;
+      }
+      if (expected?.workspaceRevision && rowIdentity.workspaceRevision && rowIdentity.workspaceRevision !== expected.workspaceRevision) {
+        proof.workspaceRevisionRejectedCount += 1;
+        bumpReason('workspace_revision_stale');
+        continue;
+      }
+      if (expected?.sourceRevision && rowIdentity.sourceRevision && rowIdentity.sourceRevision !== expected.sourceRevision) {
+        proof.sourceRevisionRejectedCount += 1;
+        bumpReason('source_revision_stale');
+        continue;
+      }
+      if (expected?.representationId && rowIdentity.representationId && rowIdentity.representationId !== expected.representationId) {
+        proof.representationRejectedCount += 1;
+        bumpReason('representation_mismatch');
+        continue;
+      }
+      if (expected?.representationRevision !== undefined && expected.representationRevision !== null) {
+        if (rowIdentity.representationRevision !== null && rowIdentity.representationRevision !== expected.representationRevision) {
+          proof.representationRevisionRejectedCount += 1;
+          bumpReason('representation_revision_stale');
+          continue;
+        }
       }
 
       try {
         const envelope = buildFeatureEnvelope({
           candidate,
           row,
+          rowIdentity,
         });
 
         // Validate envelope shape
         FeatureEnvelopeSchema.parse(envelope);
         envelopes.push(envelope);
+        proof.canonicalJoinedCount += 1;
+        if (rowIdentity.pageRankScore !== null) {
+          proof.graphScoreAttachedCount += 1;
+        } else {
+          proof.graphScoreMissingCount += 1;
+        }
+        if (row.summary && row.summary.trim()) {
+          proof.summaryResolvedCount += 1;
+        } else if (candidate.scoreSource === 'rg_keyword' || candidate.scoreSource === 'postgres_trigram') {
+          proof.summaryStaleRejectedCount += 1;
+        }
       } catch (buildError) {
         console.warn(`Failed to build envelope for candidate ${candidate.packetKey}:`, buildError);
+        bumpReason('envelope_build_failed');
         continue;
       }
     }
 
-    return envelopes;
+    return { envelopes, proof };
   } catch (error) {
     console.error('Hydration failed:', error);
     throw error;
@@ -186,8 +403,19 @@ function buildFeatureEnvelope(input: {
     language: string | null;
     kind: string | null;
   };
+  rowIdentity: {
+    workspaceId: string | null;
+    workspaceRevision: string | null;
+    sourceRevision: string | null;
+    representationId: string | null;
+    representationRevision: number | null;
+    symbolVersionId: string | null;
+    stableSymbolId: string | null;
+    treeNodeId: string | null;
+    pageRankScore: number | null;
+  };
 }): FeatureEnvelope {
-  const { candidate, row } = input;
+  const { candidate, row, rowIdentity } = input;
   const dense = buildDenseSignal(candidate, row.qdrant_id);
   const normalizedDomainClass = normalizeDomainClass(row.domain);
   const retrievalScore = asFiniteNumber(candidate.score);
@@ -198,8 +426,14 @@ function buildFeatureEnvelope(input: {
     // Canonical identity (source_ref is the primary key from retrieval)
     chunk_id: row.id,
     packet_key: (row.metadata?.packet_key as string) || candidate.packetKey || row.id,
+    symbol_version_id: rowIdentity.symbolVersionId || candidate.symbolVersionId || candidate.packetKey || row.id,
     source_ref: row.source_ref || row.relative_path,
     content_hash: row.content_hash || '',
+    workspace_revision: rowIdentity.workspaceRevision || candidate.workspaceRevision || null,
+    source_revision: rowIdentity.sourceRevision || candidate.sourceRevision || null,
+    representation_id: rowIdentity.representationId || candidate.representationId || null,
+    representation_revision: rowIdentity.representationRevision ?? candidate.representationRevision ?? null,
+    stable_symbol_id: rowIdentity.stableSymbolId || candidate.stableSymbolId || null,
     title_id: generateTitleIdentity((row.metadata?.packet_key as string) || candidate.packetKey || row.id, {
       featureLabel: String((row.metadata?.feature_label ?? row.metadata?.feature_id ?? row.symbol ?? row.kind ?? 'packet')),
       symbolName: row.symbol || undefined,
@@ -225,7 +459,7 @@ function buildFeatureEnvelope(input: {
 
     // Topology
     som_cluster: row.som_cluster || null,
-    page_rank_score: row.page_rank_score || null,
+    page_rank_score: rowIdentity.pageRankScore ?? row.page_rank_score ?? null,
     community_id: row.community_id ? String(row.community_id) : null,
 
     // Retrieval metadata

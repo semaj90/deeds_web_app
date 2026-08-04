@@ -1,19 +1,20 @@
 {
-  "timestamp": "2026-08-03T08:24:24.285Z",
+  "timestamp": "2026-08-03T23:23:10.938Z",
   "mode": "dry-run",
   "dryRun": true,
   "stages": {
     "graphify_readiness_check": {
       "status": "timeout",
       "polls": 60,
-      "elapsed_ms": 168529,
+      "elapsed_ms": 233093,
       "coreStatus": "WARN"
     },
     "pagerank": {
       "status": "pass"
     },
     "kanban_emit": {
-      "status": "pass"
+      "status": "fail",
+      "error": "Exit code null"
     },
     "turbovec": {
       "status": "pass"
@@ -28,6 +29,6 @@
   "summary": {
     "success": true,
     "message": "Pipeline complete",
-    "elapsed_ms": 217334
+    "elapsed_ms": 416034
   }
 }

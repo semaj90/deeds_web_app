@@ -1042,6 +1042,26 @@ Operator supplied the latest workstation TODO record for the graph retrieval lan
 - [x] Neo4j wiring remains live: `NEO4J_URI_WIRING`, `NEO4J_USER_PASSWORD_WIRING`, `NEO4J_STARTUP_VALIDATION`, `NEO4J_BOLT_DRIVER`, `NEO4J_INTEGER_PARAMETER_FIX`, and `GRAPH_PAGERANK_TOP_BACKEND_CALL` are `PASS`.
 - [x] Workstation validation remains split correctly: `WORKSTATION_STATUS`, `SUMMARY_PROMOTION_BOUNDED`, and `WORKSTATION_SMOKE_FAIL_STALE_TEST_ONLY` remain distinct; `FEATURE_METADATA`, `QDRANT_PAYLOAD`, `QDRANT_COMPONENT_PARITY`, `BITFROST_SEMANTIC_CACHE`, and `CANONICAL_SPINE` still need repair or rebuild.
 - [x] Current counts to preserve in the board: `atlas_packets 61,659`, `atlas_packet_registry 58,324`, `atlas_summary_layers 18,423`, `packet summaries 6,885`, `populated summary layers 7,640`, `codebase_chunk_index 52,417`, `atlas_feature_envelopes 58,365`.
-- [x] `graphify:daily` remains not fully complete, but the fresh graph artifact is now proven: `GRAPHIFY_DAILY_STARTED: PARTIAL`, `GRAPHIFY_DAILY_COMPLETED: NOT_PROVEN`, `GRAPH_SNAPSHOT_FRESH: PASS`; `DEEP_AUDIT` remains `NOT_PROVEN` pending a full daily run.
+- [x] `graphify:daily` was re-run on 2026-08-03 and progressed through provenance dry-run, materialize, cold-processing, phase8 fanout, and latent backfill, but failed in `atlas:phase16:som:apply` (`Native trainSOM unavailable ... pass --allow-cpu for the bounded CPU fallback`; `relation "atlas_topology_eval_times" does not exist`). `docs/graph/codebase-graph.json` did not advance, so `GRAPHIFY_DAILY_STARTED: PARTIAL`, `GRAPHIFY_DAILY_COMPLETED: NOT_PROVEN`, `GRAPH_SNAPSHOT_FRESH: NOT_PROVEN`, `CODEBASE_GRAPH_REFRESH: NOT_PROVEN`.
+- [x] Qdrant identity evidence remains blocked at the payload layer: a live `points/scroll` sample from `codebase_chunks_768_v2` returned `null` for `packet_key`, `stable_symbol_id`, `symbol_version_id`, `tree_node_id`, `workspace_id`, `workspace_revision`, `source_revision`, `representation_id`, `representation_revision`, and `schema_version` on the first three points, so `QDRANT_PAYLOAD_IDENTITY_COMPLETE` stays `NOT_PROVEN` and `QDRANT_JOIN_BACK` stays downstream-only until the writer or rebuild supplies revision-qualified identity.
 - [x] Latest OpenSpec update ordering now queued as: `PATCH_TOURNAMENT_SPEC RECEIVED_NOT_STARTED`, `PATCH_TOURNAMENT_BOUNDED_SEAM QUEUED`, `GRAPHIFY_RECOVERY_PROOF_LADDER PASS`, `GRAPH_SNAPSHOT_FRESH PASS`, `GRAPHIFY_DAILY_COMPLETED NOT_PROVEN`, `DEEP_AUDIT NOT_PROVEN`.
+- [x] Retrieval slice evidence updated from code and bounded tests only, not production payload parity:
+  - `QDRANT_PAYLOAD_BUILDER_FIXTURE` `FIXTURE_PROVEN`
+  - `ACTIVE_QDRANT_WRITER_INTEGRATION` `NOT_PROVEN`
+  - `QDRANT_PACKET_READBACK` `FIXTURE_PROVEN`
+  - `QDRANT_PACKET_JOIN_BACK` `FIXTURE_PROVEN`
+  - `SEMANTIC_768_QDRANT_ANN` `STATIC_WIRING_PROVEN`
+  - `QDRANT_JOIN_BACK` `STATIC_WIRING_PROVEN`
+  - `RRF_MULTI_LANE_FUSION` `STATIC_WIRING_PROVEN`
+  - `PERSISTED_GRAPH_PAGERANK_READER` `STATIC_WIRING_PROVEN`
+  - `PACKET_LEVEL_FIXTURE` `FIXTURE_PROVEN`
+  - `WORKSPACE_REVISION_VALIDATION` `NOT_PROVEN`
+  - `SOURCE_REVISION_VALIDATION` `NOT_PROVEN`
+  - `REPRESENTATION_REVISION_VALIDATION` `NOT_PROVEN`
+  - `STALE_HIT_REJECTION` `NOT_PROVEN`
+  - `SYMBOL_VERSION_ID_DEDUP` `NOT_PROVEN`
+  - `SUMMARY_TO_CURRENT_SOURCE` `NOT_PROVEN`
+  - `SINGLE_ROUTE_END_TO_END_PROOF` `NOT_PROVEN`
+  - `PRODUCTION_PAYLOAD_IDENTITY` `FAIL_OR_PARTIAL`
+  - `PRODUCTION_MIGRATION` `BLOCKED`
 - [ ] NOT done: changing the representation contract, dropping the dead columns, or treating the 67MB graph snapshot as current topology proof.

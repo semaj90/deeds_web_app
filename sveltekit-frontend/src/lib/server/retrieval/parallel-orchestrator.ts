@@ -82,34 +82,34 @@ export async function parallelRetrieve(
     // same reasoning as the other optional lanes below.
     options.includeQdrant !== false && queryVector
       ? asSuccessLane(searchQdrant(queryVector, topK, timeout))
-      : Promise.resolve({
+      : Promise.resolve<LaneOutcome>({
           results: [],
           status: 'not_configured',
           reason: !queryVector ? 'embedding_unavailable' : 'lane_disabled',
-        } as const),
+        }),
 
     // Lane 2: TurboVec sparse (384-dim, optional) — not yet implemented, see
     // searchTurboVec below; reports not_configured rather than a bare empty
     // success so callers don't mistake "unimplemented" for "searched, found nothing"
     options.includeTurboVec !== false
       ? searchTurboVec(query, queryVector, topK, timeout)
-      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
+      : Promise.resolve<LaneOutcome>({ results: [], status: 'not_configured', reason: 'lane_disabled' }),
 
     // Lane 3: Redis centroids (optional) — reports not_configured when no
     // centroid:feature:* keys exist at all, distinct from "searched, found nothing"
     options.includeRedis !== false
       ? searchRedisCentroids(queryVector, topK, timeout)
-      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
+      : Promise.resolve<LaneOutcome>({ results: [], status: 'not_configured', reason: 'lane_disabled' }),
 
     // Lane 4: Postgres FTS (optional)
     options.includeFts !== false
       ? asSuccessLane(searchPostgresFTS(query, topK, timeout))
-      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
+      : Promise.resolve<LaneOutcome>({ results: [], status: 'not_configured', reason: 'lane_disabled' }),
 
     // Lane 5: Neo4j topology (optional)
     options.includeNeo4j !== false
       ? asSuccessLane(searchNeo4jTopology(query, topK, timeout))
-      : Promise.resolve({ results: [], status: 'not_configured', reason: 'lane_disabled' } as const),
+      : Promise.resolve<LaneOutcome>({ results: [], status: 'not_configured', reason: 'lane_disabled' }),
   ]);
 
   // Collect results from all lanes (skip failures)

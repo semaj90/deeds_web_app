@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-08-03T22:49:49.694Z",
+  "checks": [
+    {
+      "name": "Postgres atlas_packets",
+      "ok": true,
+      "count": 61659
+    },
+    {
+      "name": "Qdrant codebase_chunks_768",
+      "ok": false,
+      "count": 0
+    },
+    {
+      "name": "Postgres ↔ Qdrant alignment",
+      "ok": false,
+      "sample": ""
+    }
+  ],
+  "pass": false
+}

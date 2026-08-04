@@ -2,21 +2,27 @@ import type { SearchResult } from './search-runtime.js';
 import type { HyperRagHit, HyperRagResult } from './hyperrag-compat-types.js';
 import { resolvePageRankAuthority } from '$lib/server/topology/pagerank-authority.js';
 
-export function toCanonicalHyperRagHit(packet: SearchResult['packets'][number]): HyperRagHit {
+export function toCanonicalHyperRagHit(packet: SearchResult['packets'][number]): HyperRagHit | null {
   const enriched = packet as any;
   const pageRank = resolvePageRankAuthority(enriched);
-  const packetKey = String(enriched.packetKey ?? enriched.packet_key ?? enriched.chunk_id ?? enriched.sourceRef ?? enriched.source_ref ?? 'unknown');
+  const packetKey = String(enriched.packetKey ?? enriched.packet_key ?? enriched.symbolVersionId ?? enriched.symbol_version_id ?? '').trim();
+  const sourceRef = String(enriched.sourceRef ?? enriched.source_ref ?? '').trim();
+
+  if (!packetKey || !sourceRef) {
+    return null;
+  }
+
   return {
     id: packetKey,
     packetKey,
-    sourceRef: enriched.sourceRef ?? enriched.source_ref ?? enriched.filePath ?? enriched.relative_path ?? undefined,
+    sourceRef,
     contentHash: enriched.contentHash ?? enriched.content_hash ?? null,
     workspaceRevision: enriched.workspaceRevision ?? enriched.workspace_revision ?? null,
     treeNodeId: enriched.treeNodeId ?? enriched.tree_node_id ?? null,
     featureId: enriched.featureId ?? enriched.feature_id ?? null,
     featureLabel: enriched.featureLabel ?? enriched.feature_label ?? null,
-    sourcePath: enriched.sourceRef ?? enriched.source_ref ?? enriched.filePath ?? enriched.relative_path ?? undefined,
-    title: enriched.semanticTitle ?? enriched.semantic?.title ?? enriched.title ?? enriched.symbol ?? enriched.sourceRef ?? enriched.packetKey,
+    sourcePath: sourceRef,
+    title: enriched.semanticTitle ?? enriched.semantic?.title ?? enriched.title ?? enriched.symbol ?? sourceRef ?? packetKey,
     text: enriched.summary ?? enriched.content ?? '',
     score: Number(enriched.retrieval?.crossEncoderScore ?? enriched.retrieval?.xgboostScore ?? enriched.retrieval?.rrfScore ?? enriched.cross_encoder_score ?? enriched.blended_score ?? enriched.retrieval_score ?? 0),
     scoreWeightedSum: Number(enriched.retrieval?.xgboostScore ?? enriched.blended_score ?? enriched.retrieval_score ?? 0),
@@ -59,7 +65,7 @@ export function searchResultToHyperRagResult(
   return {
     query: options.query ?? result.metadata.query,
     variants: options.query ? [options.query] : [result.metadata.query],
-    hits: result.packets.map(toCanonicalHyperRagHit),
+    hits: result.packets.map(toCanonicalHyperRagHit).filter((hit): hit is HyperRagHit => hit !== null),
     graphPaths: [],
     contextPack: null,
     summaryLenses: [],

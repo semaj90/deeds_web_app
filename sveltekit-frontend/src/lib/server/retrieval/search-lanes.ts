@@ -149,11 +149,59 @@ function extractWorkspaceRevisionFromPayload(payload: Record<string, unknown> | 
       ? payload.workspaceRevision
       : typeof metadata?.workspace_revision === 'string'
         ? metadata.workspace_revision
-        : typeof metadata?.workspaceRevision === 'string'
+      : typeof metadata?.workspaceRevision === 'string'
           ? metadata.workspaceRevision
           : typeof metadata?.revision === 'string'
             ? metadata.revision
             : null;
+}
+
+function extractSourceRevisionFromPayload(payload: Record<string, unknown> | undefined): string | null {
+  if (!payload) return null;
+  const metadata = payload.metadata as Record<string, unknown> | undefined;
+  return typeof payload.source_revision === 'string'
+    ? payload.source_revision
+    : typeof payload.sourceRevision === 'string'
+      ? payload.sourceRevision
+      : typeof payload.source_revision_id === 'string'
+        ? payload.source_revision_id
+        : typeof payload.sourceRevisionId === 'string'
+          ? payload.sourceRevisionId
+          : typeof metadata?.source_revision === 'string'
+            ? metadata.source_revision
+            : typeof metadata?.sourceRevision === 'string'
+              ? metadata.sourceRevision
+              : typeof metadata?.source_revision_id === 'string'
+                ? metadata.source_revision_id
+                : typeof metadata?.sourceRevisionId === 'string'
+                  ? metadata.sourceRevisionId
+                  : null;
+}
+
+function extractRepresentationIdFromPayload(payload: Record<string, unknown> | undefined): string | null {
+  if (!payload) return null;
+  const metadata = payload.metadata as Record<string, unknown> | undefined;
+  return typeof payload.representation_id === 'string'
+    ? payload.representation_id
+    : typeof payload.representationId === 'string'
+      ? payload.representationId
+      : typeof metadata?.representation_id === 'string'
+        ? metadata.representation_id
+        : typeof metadata?.representationId === 'string'
+          ? metadata.representationId
+          : null;
+}
+
+function extractRepresentationRevisionFromPayload(payload: Record<string, unknown> | undefined): number | null {
+  if (!payload) return null;
+  const metadata = payload.metadata as Record<string, unknown> | undefined;
+  const value =
+    payload.representation_revision ??
+    payload.representationRevision ??
+    metadata?.representation_revision ??
+    metadata?.representationRevision;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 // ── Interface ────────────────────────────────────────────────────────────────
@@ -368,9 +416,13 @@ export class QdrantLane extends SearchLaneBase {
             ? getVectorLaneMetadata('dense_768').laneId
             : getVectorLaneMetadata(this.embeddingLane).laneId,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
+      symbol_version_id: (point.payload?.symbol_version_id as string | null) ?? (point.payload?.packet_key as string | null) ?? null,
       tree_node_id: (point.payload?.tree_node_id as string | null) ?? null,
       content_hash: (point.payload?.content_hash as string | null) ?? null,
       workspace_revision: extractWorkspaceRevisionFromPayload(point.payload),
+      source_revision: extractSourceRevisionFromPayload(point.payload),
+      representation_id: extractRepresentationIdFromPayload(point.payload),
+      representation_revision: extractRepresentationRevisionFromPayload(point.payload),
       feature_label: (point.payload?.feature_label as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,
@@ -520,9 +572,13 @@ export class QdrantLane384 extends SearchLaneBase {
       source: 'qdrant-384' as const,
       lane_id: getVectorLaneMetadata('dense_384').laneId,
       packet_key: (point.payload?.packet_key as string | null) ?? null,
+      symbol_version_id: (point.payload?.symbol_version_id as string | null) ?? (point.payload?.packet_key as string | null) ?? null,
       tree_node_id: (point.payload?.tree_node_id as string | null) ?? null,
       content_hash: (point.payload?.content_hash as string | null) ?? null,
       workspace_revision: extractWorkspaceRevisionFromPayload(point.payload),
+      source_revision: extractSourceRevisionFromPayload(point.payload),
+      representation_id: extractRepresentationIdFromPayload(point.payload),
+      representation_revision: extractRepresentationRevisionFromPayload(point.payload),
       feature_label: (point.payload?.feature_label as string | null) ?? null,
       source_ref: (point.payload?.source_ref as string | null) ?? null,
       feature_id: (point.payload?.feature_id as string | null) ?? null,

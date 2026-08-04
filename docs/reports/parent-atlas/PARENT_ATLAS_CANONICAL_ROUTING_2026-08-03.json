@@ -1,0 +1,2423 @@
+{
+  "generatedAt": "2026-08-03T22:29:59.653Z",
+  "overall": "BLOCKED",
+  "config": {
+    "databaseUrl": "[redacted]",
+    "qdrantUrl": "http://127.0.0.1:6333",
+    "qdrantCollection": "codebase_chunks_768",
+    "qdrantSampleSize": 200,
+    "xgboostUrl": "http://127.0.0.1:8765",
+    "llmUrl": "http://127.0.0.1:8090",
+    "langExtractUrl": "http://127.0.0.1:8095",
+    "reportDir": "docs\\reports\\parent-atlas",
+    "writeProof": false,
+    "proofCollection": "codebase_chunks_768_envelope_proof",
+    "fixtureLimit": 20,
+    "strict": false
+  },
+  "gates": [
+    {
+      "id": "PA-PG-ROUTE",
+      "title": "PostgreSQL 18 canonical source",
+      "status": "PARTIAL",
+      "summary": "Connected to legal_ai_db on port 5432, server 18.4 (Debian 18.4-1.pgdg12+1).",
+      "evidence": {
+        "connection": {
+          "database": "legal_ai_db",
+          "schema": "public",
+          "server_address": "172.18.0.23/32",
+          "server_port": 5432,
+          "server_version": "18.4 (Debian 18.4-1.pgdg12+1)",
+          "search_path": "\"$user\", public"
+        },
+        "columns": [
+          {
+            "column_name": "packet_id",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "column_default": null,
+            "ordinal_position": 1
+          },
+          {
+            "column_name": "artifact_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 2
+          },
+          {
+            "column_name": "packet_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 3
+          },
+          {
+            "column_name": "source_ref",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 4
+          },
+          {
+            "column_name": "source_ref_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 5
+          },
+          {
+            "column_name": "file_path",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 6
+          },
+          {
+            "column_name": "directory_path",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 7
+          },
+          {
+            "column_name": "feature_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 8
+          },
+          {
+            "column_name": "feature_label",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 9
+          },
+          {
+            "column_name": "community_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 10
+          },
+          {
+            "column_name": "concept_ids",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 11
+          },
+          {
+            "column_name": "cluster_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 12
+          },
+          {
+            "column_name": "embedding",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 13
+          },
+          {
+            "column_name": "payload",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 14
+          },
+          {
+            "column_name": "metadata",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 15
+          },
+          {
+            "column_name": "permissions",
+            "data_type": "jsonb",
+            "is_nullable": "NO",
+            "column_default": "'{\"source\": \"repo_index\", \"can_write\": false, \"can_export\": false, \"visibility\": \"internal\", \"can_execute\": false}'::jsonb",
+            "ordinal_position": 16
+          },
+          {
+            "column_name": "topology",
+            "data_type": "jsonb",
+            "is_nullable": "NO",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 17
+          },
+          {
+            "column_name": "vectors",
+            "data_type": "jsonb",
+            "is_nullable": "NO",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 18
+          },
+          {
+            "column_name": "summary",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 19
+          },
+          {
+            "column_name": "tags",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 20
+          },
+          {
+            "column_name": "byte_start",
+            "data_type": "bigint",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 21
+          },
+          {
+            "column_name": "byte_end",
+            "data_type": "bigint",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 22
+          },
+          {
+            "column_name": "sha256",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 23
+          },
+          {
+            "column_name": "source_kind",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 24
+          },
+          {
+            "column_name": "source_path",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 25
+          },
+          {
+            "column_name": "group_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 26
+          },
+          {
+            "column_name": "packet_universe",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'atlas'::text",
+            "ordinal_position": 27
+          },
+          {
+            "column_name": "qdrant_point_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 28
+          },
+          {
+            "column_name": "qdrant_collection",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 29
+          },
+          {
+            "column_name": "qdrant_vector_dim",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 30
+          },
+          {
+            "column_name": "identity_lane",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'qdrant_chunk'::text",
+            "ordinal_position": 31
+          },
+          {
+            "column_name": "identity_confidence",
+            "data_type": "double precision",
+            "is_nullable": "YES",
+            "column_default": "1.0",
+            "ordinal_position": 32
+          },
+          {
+            "column_name": "som_cluster",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 33
+          },
+          {
+            "column_name": "som_row",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 34
+          },
+          {
+            "column_name": "som_col",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 35
+          },
+          {
+            "column_name": "som_index",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 36
+          },
+          {
+            "column_name": "kmeans_cluster",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 37
+          },
+          {
+            "column_name": "pagerank",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 38
+          },
+          {
+            "column_name": "betweenness",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 39
+          },
+          {
+            "column_name": "eigenvector",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 40
+          },
+          {
+            "column_name": "neo4j_node_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 41
+          },
+          {
+            "column_name": "redis_centroid_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 42
+          },
+          {
+            "column_name": "latent_64",
+            "data_type": "bytea",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 43
+          },
+          {
+            "column_name": "reward_prior",
+            "data_type": "double precision",
+            "is_nullable": "YES",
+            "column_default": "0",
+            "ordinal_position": 44
+          },
+          {
+            "column_name": "created_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": "now()",
+            "ordinal_position": 45
+          },
+          {
+            "column_name": "updated_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": "now()",
+            "ordinal_position": 46
+          },
+          {
+            "column_name": "function_symbol",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 47
+          },
+          {
+            "column_name": "content_embedding_384",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 48
+          },
+          {
+            "column_name": "embedding_status",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'pending'::text",
+            "ordinal_position": 49
+          },
+          {
+            "column_name": "embedding_timestamp",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 50
+          },
+          {
+            "column_name": "extracted_entities",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'[]'::jsonb",
+            "ordinal_position": 51
+          },
+          {
+            "column_name": "keywords",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": "'{}'::text[]",
+            "ordinal_position": 52
+          },
+          {
+            "column_name": "error_pattern",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 53
+          },
+          {
+            "column_name": "feature_group_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 54
+          },
+          {
+            "column_name": "domain_class",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 55
+          },
+          {
+            "column_name": "taxonomy_level",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": "0",
+            "ordinal_position": 56
+          },
+          {
+            "column_name": "bm25_indexed_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 57
+          },
+          {
+            "column_name": "bm25_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 58
+          },
+          {
+            "column_name": "bm25_terms",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 59
+          },
+          {
+            "column_name": "packet_ulid",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 60
+          },
+          {
+            "column_name": "title_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 61
+          },
+          {
+            "column_name": "canonical_source_ref",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 62
+          },
+          {
+            "column_name": "page_rank_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 63
+          },
+          {
+            "column_name": "kmeans_cluster_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 64
+          },
+          {
+            "column_name": "tree_node_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 65
+          },
+          {
+            "column_name": "routing_hints",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 66
+          },
+          {
+            "column_name": "community_source",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 67
+          },
+          {
+            "column_name": "community_confidence",
+            "data_type": "numeric",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 68
+          },
+          {
+            "column_name": "lineage_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 69
+          },
+          {
+            "column_name": "ledger_type",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 70
+          },
+          {
+            "column_name": "canonical",
+            "data_type": "boolean",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 71
+          },
+          {
+            "column_name": "payload_backfilled_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 72
+          },
+          {
+            "column_name": "k_core",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 73
+          },
+          {
+            "column_name": "ngrams",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 74
+          },
+          {
+            "column_name": "trigrams",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 75
+          },
+          {
+            "column_name": "engrams",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 76
+          },
+          {
+            "column_name": "used_concepts",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 77
+          },
+          {
+            "column_name": "topolog_cluster",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 78
+          },
+          {
+            "column_name": "topolog_confidence",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.5",
+            "ordinal_position": 79
+          },
+          {
+            "column_name": "topolog_method",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'unassigned'::text",
+            "ordinal_position": 80
+          },
+          {
+            "column_name": "topolog_applied_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 81
+          },
+          {
+            "column_name": "repository_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 82
+          },
+          {
+            "column_name": "directory_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 83
+          },
+          {
+            "column_name": "file_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 84
+          },
+          {
+            "column_name": "module_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 85
+          },
+          {
+            "column_name": "symbol_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 86
+          },
+          {
+            "column_name": "chunk_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 87
+          },
+          {
+            "column_name": "recovery_lane",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'canonical'::text",
+            "ordinal_position": 88
+          },
+          {
+            "column_name": "som_cluster_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 89
+          },
+          {
+            "column_name": "ontology",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 90
+          },
+          {
+            "column_name": "packet_type_test",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 91
+          },
+          {
+            "column_name": "packet_type",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'code'::text",
+            "ordinal_position": 92
+          },
+          {
+            "column_name": "packet_ontology",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{\"tags\": [], \"examples\": {}, \"constraints\": {}, \"capabilities\": []}'::jsonb",
+            "ordinal_position": 93
+          },
+          {
+            "column_name": "parent_packet_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 94
+          },
+          {
+            "column_name": "related_packets",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": "'{}'::text[]",
+            "ordinal_position": 95
+          },
+          {
+            "column_name": "telemetry",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{\"failure_count\": 0, \"success_count\": 0, \"avg_latency_ms\": 0, \"execution_count\": 0}'::jsonb",
+            "ordinal_position": 96
+          },
+          {
+            "column_name": "embedding_eligible",
+            "data_type": "boolean",
+            "is_nullable": "NO",
+            "column_default": "false",
+            "ordinal_position": 97
+          },
+          {
+            "column_name": "summary_hash",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 98
+          },
+          {
+            "column_name": "embedding_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 99
+          },
+          {
+            "column_name": "embedding_claimed_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 100
+          },
+          {
+            "column_name": "embedding_claimed_by",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 101
+          },
+          {
+            "column_name": "feature_envelope",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 102
+          },
+          {
+            "column_name": "domain_confidence",
+            "data_type": "double precision",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 103
+          },
+          {
+            "column_name": "title_generator_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'v1'::text",
+            "ordinal_position": 104
+          },
+          {
+            "column_name": "file_purpose",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": "'other'::file_purpose_enum",
+            "ordinal_position": 105
+          },
+          {
+            "column_name": "thoroughness",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": "'stub'::thoroughness_enum",
+            "ordinal_position": 106
+          },
+          {
+            "column_name": "app_criticality",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": "'optional'::app_criticality_enum",
+            "ordinal_position": 107
+          },
+          {
+            "column_name": "test_coverage_pct",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": "0",
+            "ordinal_position": 108
+          },
+          {
+            "column_name": "file_understanding_computed_at",
+            "data_type": "timestamp without time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 109
+          },
+          {
+            "column_name": "file_understanding_method",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 110
+          },
+          {
+            "column_name": "openspec_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 111
+          },
+          {
+            "column_name": "gsd_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 112
+          },
+          {
+            "column_name": "enrichment_updated_at",
+            "data_type": "timestamp without time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 113
+          },
+          {
+            "column_name": "som_cell_x",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 114
+          },
+          {
+            "column_name": "som_cell_y",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 115
+          },
+          {
+            "column_name": "ast_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.0",
+            "ordinal_position": 116
+          },
+          {
+            "column_name": "community_boost",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "1.0",
+            "ordinal_position": 117
+          },
+          {
+            "column_name": "rerank_features",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 118
+          },
+          {
+            "column_name": "pagerank_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.0",
+            "ordinal_position": 119
+          },
+          {
+            "column_name": "som_distance",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.0",
+            "ordinal_position": 120
+          },
+          {
+            "column_name": "predicted_domain",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 121
+          },
+          {
+            "column_name": "classifier_kind",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 122
+          },
+          {
+            "column_name": "classifier_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 123
+          },
+          {
+            "column_name": "pagerank_raw",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 124
+          },
+          {
+            "column_name": "authority_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 125
+          },
+          {
+            "column_name": "workspace_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": "'unknown'::character varying",
+            "ordinal_position": 126
+          },
+          {
+            "column_name": "semantic_anchor",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": "'unknown'::character varying",
+            "ordinal_position": 127
+          },
+          {
+            "column_name": "ontology_version",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 128
+          },
+          {
+            "column_name": "content_hash",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 129
+          },
+          {
+            "column_name": "domain_memberships",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 130
+          },
+          {
+            "column_name": "primary_domain",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 131
+          },
+          {
+            "column_name": "workspace_revision",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "column_default": "0",
+            "ordinal_position": 132
+          },
+          {
+            "column_name": "representation_revision",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "column_default": "0",
+            "ordinal_position": 133
+          },
+          {
+            "column_name": "embedding_digest",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 134
+          },
+          {
+            "column_name": "source_representation_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 135
+          },
+          {
+            "column_name": "source_dimension",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 136
+          },
+          {
+            "column_name": "projection_representation_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 137
+          },
+          {
+            "column_name": "projection_dimension",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 138
+          },
+          {
+            "column_name": "encoder_revision",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 139
+          },
+          {
+            "column_name": "som_revision",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 140
+          }
+        ],
+        "missingForQuery": [],
+        "coverage": {
+          "total_rows": 61659,
+          "packet_key_present": 61659,
+          "source_ref_present": 61659,
+          "workspace_id_present": 61659,
+          "workspace_revision_present": 61659,
+          "representation_revision_present": 61659,
+          "source_representation_id_present": 0,
+          "projection_representation_id_present": 0,
+          "packet_key_missing": 0,
+          "workspace_id_missing": 0,
+          "representation_revision_zero": 61659
+        },
+        "candidates": [
+          {
+            "packet_key": "0ba2345cd9c542fa",
+            "source_ref": "proto:RetrievalService.Health",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "0bffe0382a0d44bb",
+            "source_ref": "proto:ToolCallingService.ExecuteToolBatch",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "0ee918abc8c53e8d",
+            "source_ref": "proto:TurboVecCudaService.Transform",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "1703d9c005252a62",
+            "source_ref": "proto:LibrarySearchService.Health",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "175066b8a4ceee3c",
+            "source_ref": "proto:TurboVecService.Transform",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "17dc1fe9f5f8a021",
+            "source_ref": "proto:CodeIntelService.GetJobStatus",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "1d5eba7211dea6f9",
+            "source_ref": "proto:ChatAssistantService.SendMessage",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "1dc5ac2b3cd9bfe8",
+            "source_ref": "proto:LibrarySearchService.StreamLibrary",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "25c824811a2efd81",
+            "source_ref": "proto:EmbeddingService.GenerateEmbeddings",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "271b5446f6a86a48",
+            "source_ref": "proto:CyberElephantService.GetClusters",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "28e942decdcdb342",
+            "source_ref": "proto:CodeIntelService.LookupChunk",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "313d57f685058b60",
+            "source_ref": "proto:CodeIntelService.SummarizeCluster",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "322b9cf893125f07",
+            "source_ref": "proto:RetrievalService.GetTopologyContext",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "32c7446a769f9c86",
+            "source_ref": "proto:RetrievalService.SearchCodebase",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "35afe6ea3fdb17b8",
+            "source_ref": "proto:TurboVecCudaService.Search",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "368c71501e9385c5",
+            "source_ref": "proto:RetrievalService.StreamCodebase",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "38da098bc2c36c22",
+            "source_ref": "proto:RetrievalService.SearchEvidence",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "3bf3bc0c64d433c0",
+            "source_ref": "proto:LibrarySearchService.GetDocumentToc",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "3d0da82598d9064a",
+            "source_ref": "proto:RetrievalService.SearchChunks",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "3edd306a02055c3a",
+            "source_ref": "proto:ChatAssistantService.CreateSession",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "3f73ebb0336ae4f3",
+            "source_ref": "proto:Chr97Agent.QueryTags",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "40ce2356b07edded",
+            "source_ref": "proto:ToolCallingService.ExecuteTool",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "43f38d7b75868c7c",
+            "source_ref": "proto:TurboVecService.Upsert",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "4439c492e016f9d3",
+            "source_ref": "proto:CyberElephantService.UpdateClusters",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "482abc5766b6f8ed",
+            "source_ref": "proto:GpuBridgeService.AssignSom",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "4d4c2e69d3f629ba",
+            "source_ref": "proto:ChatAssistantService.Health",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "53f30b2bfd5e68b9",
+            "source_ref": "proto:ToolCallingService.ExecuteToolStream",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "54fb19b574528f1a",
+            "source_ref": "proto:TurboVecService.Health",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "58e6adafde74465d",
+            "source_ref": "proto:EnrichmentService.BatchEnrich",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "613f572a65b1ffcc",
+            "source_ref": "proto:TurboVecCudaService.EncodeLatent",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "6274b1cfbc90f2e1",
+            "source_ref": "proto:CodeIntelService.ListClusterSummaries",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "64090fce409bb5c9",
+            "source_ref": "proto:CodeIntelService.GetClusterSummary",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "69af5ffe1b3af354",
+            "source_ref": "proto:LibrarySearchService.SearchLibrary",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "748e8cfa0abd4e6a",
+            "source_ref": "proto:EmbeddingService.Health",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "885c6c04322f6095",
+            "source_ref": "proto:CyberElephantService.ProcessDocuments",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "891b73e8db9c3bb7",
+            "source_ref": "proto:Chr97Agent.GetCartridge",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "8d44b9719637706f",
+            "source_ref": "proto:ChatAssistantService.GetHistory",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "9b11b6f522def1a1",
+            "source_ref": "proto:ChatAssistantService.RAGQuery",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "9f4573e52fce4175",
+            "source_ref": "proto:ChatAssistantService.StreamMessage",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "a318d009a88a31fb",
+            "source_ref": "proto:LibrarySearchService.GetNodeContext",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "aae4f83738c25068",
+            "source_ref": "proto:CyberElephantService.SearchSimilar",
+            "workspace_id": "proto/active",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:001be68ca4b0",
+            "source_ref": "src/routes/api/admin/inference-stats/+server.ts",
+            "workspace_id": "src/routes/api/admin/inference-stats",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0050126ac87d",
+            "source_ref": "src/lib/components/ui/MicroInteraction.svelte",
+            "workspace_id": "src/lib/components/ui",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0051e908c9be",
+            "source_ref": "docs/architecture/phase8-query-optimization-taxonomy.md",
+            "workspace_id": "docs/architecture",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:006566131ba9",
+            "source_ref": "src/lib/server/nlp/analyzer.ts",
+            "workspace_id": "src/lib/server/nlp",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:00735225f796",
+            "source_ref": "src/routes/(app)/admin/memory-inspector/+page.server.ts",
+            "workspace_id": "src/routes/(app)/admin/memory-inspector",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0079b248e86d",
+            "source_ref": "src/lib/components/ui/badge/index.ts",
+            "workspace_id": "src/lib/components/ui/badge",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:007d98744901",
+            "source_ref": "src/lib/components/poi/AddPoiModal.svelte",
+            "workspace_id": "src/lib/components/poi",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:00907d16462d",
+            "source_ref": "src/lib/components/PhaseStatusPills.svelte",
+            "workspace_id": "src/lib/components",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0098519ac98d",
+            "source_ref": "src/routes/api/health/database/+server.ts",
+            "workspace_id": "src/routes/api/health/database",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:00b551ec7011",
+            "source_ref": "src/lib/server/indexer/som-summary.ts",
+            "workspace_id": "src/lib/server/indexer",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:00d3899bd8c2",
+            "source_ref": "src/lib/components/ui/tabs/TabsList.svelte",
+            "workspace_id": "src/lib/components/ui/tabs",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:00d5d4f35ec0",
+            "source_ref": "src/lib/components/ui/AIDialog.svelte",
+            "workspace_id": "src/lib/components/ui",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:00f4c6d8216e",
+            "source_ref": "src/lib/server/audit/AGENTS.md",
+            "workspace_id": "src/lib/server/audit",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0115f4c3a6be",
+            "source_ref": "src/routes/(app)/chat/+page.server.ts",
+            "workspace_id": "src/routes/(app)/chat",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:01363c1a543e",
+            "source_ref": "src/routes/api/test/tiered-cache/+server.ts",
+            "workspace_id": "src/routes/api/test/tiered-cache",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:014b1c91aa72",
+            "source_ref": "scripts/agent/schema-agent-tracking.sql",
+            "workspace_id": "scripts/agent",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:015c150a062a",
+            "source_ref": "src/routes/(app)/citations/[...label]/AGENTS.md",
+            "workspace_id": "src/routes/(app)/citations/[...label]",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:01614dcf3f9d",
+            "source_ref": "src/routes/(app)/demos/detective-command/+page.ts",
+            "workspace_id": "src/routes/(app)/demos/detective-command",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:016bf9ff72aa",
+            "source_ref": "src/lib/server/messaging/rabbitmq.ts",
+            "workspace_id": "src/lib/server/messaging",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:017550de7b53",
+            "source_ref": "src/lib/server/db/connections.ts",
+            "workspace_id": "src/lib/server/db",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:01a191b9b329",
+            "source_ref": "src/routes/api/analytics/research-graph/+server.ts",
+            "workspace_id": "src/routes/api/analytics/research-graph",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:01a8d2ed31fe",
+            "source_ref": "src/routes/(app)/demos/document-summarizer/+page.svelte",
+            "workspace_id": "src/routes/(app)/demos/document-summarizer",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:01c8638ac259",
+            "source_ref": "src/lib/stores/app-store.svelte.ts",
+            "workspace_id": "src/lib/stores",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02311f54b7fc",
+            "source_ref": "src/lib/stores/admin-chat-assistant.svelte.ts",
+            "workspace_id": "src/lib/stores",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0235c44a7db5",
+            "source_ref": "src/routes/(app)/demos/celestial-icons/+page.ts",
+            "workspace_id": "src/routes/(app)/demos/celestial-icons",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0236cbc259b8",
+            "source_ref": "src/lib/components/analysis/AGENTS.md",
+            "workspace_id": "src/lib/components/analysis",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02393e710214",
+            "source_ref": "src/lib/types/qdrant.ts",
+            "workspace_id": "src/lib/types",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:024deb1c6154",
+            "source_ref": "src/types/third-party.d.ts",
+            "workspace_id": "src/types",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02972b121abf",
+            "source_ref": "src/lib/server/grpc/codeintel-client.ts",
+            "workspace_id": "src/lib/server/grpc",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0297d6b4f93e",
+            "source_ref": "src/routes/api/cache/llm/clean/+server.ts",
+            "workspace_id": "src/routes/api/cache/llm/clean",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02afc4892cf6",
+            "source_ref": "src/lib/server/indexer/pipeline/chunk-stream-pipeline.ts",
+            "workspace_id": "src/lib/server/indexer/pipeline",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02b21744c68f",
+            "source_ref": "src/lib/server/reconstruction/scene-compiler.ts",
+            "workspace_id": "src/lib/server/reconstruction",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02bb2e96914a",
+            "source_ref": "src/lib/components/yorha/PhoenixEventMonitor.svelte",
+            "workspace_id": "src/lib/components/yorha",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02c43ad3f561",
+            "source_ref": "src/lib/components/ui/gaming/16bit/SNES16BitButton.svelte",
+            "workspace_id": "src/lib/components/ui/gaming/16bit",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02c6c0bd37e6",
+            "source_ref": "src/lib/server/db/vector-schema.ts",
+            "workspace_id": "src/lib/server/db",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02dae66923a3",
+            "source_ref": "docs/LANGGRAPH-KANBAN-ERROR-FIXING-INTEGRATION.md",
+            "workspace_id": "docs",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02e9e4336c25",
+            "source_ref": "src/routes/(app)/admin/component-analysis/+page.svelte",
+            "workspace_id": "src/routes/(app)/admin/component-analysis",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:02f08b8b6dc2",
+            "source_ref": "src/routes/api/code-intel/neo4j/health/+server.ts",
+            "workspace_id": "src/routes/api/code-intel/neo4j/health",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:030a9fd7c224",
+            "source_ref": "src/lib/server/yolo.ts",
+            "workspace_id": "src/lib/server",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:031d6e5777ba",
+            "source_ref": "src/routes/api/auth/me/+server.ts",
+            "workspace_id": "src/routes/api/auth/me",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:032163f60003",
+            "source_ref": "src/lib/components/legal-ai/CitationList.svelte",
+            "workspace_id": "src/lib/components/legal-ai",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03348019329e",
+            "source_ref": "src/lib/components/legal-ai/LinkMetadataForm.svelte",
+            "workspace_id": "src/lib/components/legal-ai",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:035803affcc2",
+            "source_ref": "src/lib/server/error-brain/middleware.ts",
+            "workspace_id": "src/lib/server/error-brain",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03588659fa95",
+            "source_ref": "src/lib/components/yorha/dashboard/EvidenceStats.svelte",
+            "workspace_id": "src/lib/components/yorha/dashboard",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03b07e974787",
+            "source_ref": "src/lib/components/codebase/CategoryFilter.svelte",
+            "workspace_id": "src/lib/components/codebase",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03bb32d34276",
+            "source_ref": "src/routes/(app)/cases/new/schema.ts",
+            "workspace_id": "src/routes/(app)/cases/new",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03c70f525e95",
+            "source_ref": "src/routes/.well-known/appspecific/com.chrome.devtools.json/+server.ts",
+            "workspace_id": "src/routes/.well-known/appspecific/com.chrome.devtools.json",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03f2b4b2afa4",
+            "source_ref": "src/routes/api/pipeline/status/[jobId]/+server.ts",
+            "workspace_id": "src/routes/api/pipeline/status/[jobId]",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:03fc7c0c3f15",
+            "source_ref": "src/lib/components/ui/scrollarea/AGENTS.md",
+            "workspace_id": "src/lib/components/ui/scrollarea",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0404e2f016ee",
+            "source_ref": "src/routes/api/codebase-index/couchdb-pagerank/+server.ts",
+            "workspace_id": "src/routes/api/codebase-index/couchdb-pagerank",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:0425a4571aa4",
+            "source_ref": "src/lib/data/route-organization-report.json",
+            "workspace_id": "src/lib/data",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:042f19baa59a",
+            "source_ref": "src/lib/server/observability/inference-log.ts",
+            "workspace_id": "src/lib/server/observability",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:044c4b812fef",
+            "source_ref": "src/lib/server/db/query-utils.ts",
+            "workspace_id": "src/lib/server/db",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:04518e5714ed",
+            "source_ref": "docs/GEMMA4-POLICY-ORCHESTRATOR-ARCHITECTURE.md",
+            "workspace_id": "docs",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:04654bef50f4",
+            "source_ref": "src/routes/api/health/services/+server.ts",
+            "workspace_id": "src/routes/api/health/services",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:046ee690c72c",
+            "source_ref": "src/lib/components/ui/bits/Button.svelte",
+            "workspace_id": "src/lib/components/ui/bits",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:047c77e6863e",
+            "source_ref": "packages/atlas-core/src/smoke-test.ts",
+            "workspace_id": "packages/atlas-core/src",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:047e0222529e",
+            "source_ref": "src/routes/api/cartridge/search/+server.ts",
+            "workspace_id": "src/routes/api/cartridge/search",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          },
+          {
+            "packet_key": "ace:packet:048b0ddc3f69",
+            "source_ref": "src/routes/api/analytics/search-patterns/+server.ts",
+            "workspace_id": "src/routes/api/analytics/search-patterns",
+            "workspace_revision": 0,
+            "representation_revision": 0,
+            "source_representation_id": null,
+            "projection_representation_id": null
+          }
+        ]
+      },
+      "nextAction": "Confirm DATABASE_URL points to the intended PostgreSQL 18 instance on 5434."
+    },
+    {
+      "id": "PA-XGB-HEALTH",
+      "title": "XGBoost sidecar and feature contract",
+      "status": "PASS",
+      "summary": "XGBoost sidecar is reachable; model and scoring contract were probed.",
+      "evidence": {
+        "health": {
+          "ok": true,
+          "path": "/health",
+          "value": {
+            "status": "ok",
+            "model_loaded": true,
+            "model_type": "xgboost",
+            "features": [
+              "cosine_score",
+              "bm25_rank_norm",
+              "ann_turbovec_score",
+              "concept_overlap",
+              "same_feature",
+              "community_conf",
+              "reward_prior",
+              "domain_class_match",
+              "freshness_score",
+              "pagerank_score",
+              "som_cache_hit",
+              "provenance_git_age",
+              "packet_hit_count",
+              "n_retrieved",
+              "n_concepts",
+              "trace_score"
+            ]
+          }
+        },
+        "score": {
+          "ok": true,
+          "path": "/score",
+          "value": {
+            "scores": [
+              0.3357885777950287
+            ],
+            "model": "xgboost",
+            "rows": 1
+          },
+          "request": {
+            "rows": [
+              {
+                "trace_score": 0.82,
+                "freshness_score": 0.67,
+                "packet_hit_count": 3,
+                "reward_prior": 0.15,
+                "domain_class_match": 1,
+                "community_conf": 0.74,
+                "concept_overlap": 0.41
+              }
+            ]
+          }
+        },
+        "featureContract": {
+          "trace_score": 0.82,
+          "freshness_score": 0.67,
+          "packet_hit_count": 3,
+          "reward_prior": 0.15,
+          "domain_class_match": 1,
+          "community_conf": 0.74,
+          "concept_overlap": 0.41
+        },
+        "monotonicity": {
+          "scores": [
+            0.0077855209819972515,
+            0.9044507741928101
+          ],
+          "model": "xgboost",
+          "rows": 2
+        },
+        "duplicateCandidateHandling": {
+          "scores": [
+            0.3357885777950287,
+            0.3357885777950287
+          ],
+          "model": "xgboost",
+          "rows": 2
+        }
+      }
+    },
+    {
+      "id": "PA-LLM-MODELS",
+      "title": "LLM model discovery at 8090/v1/models",
+      "status": "PASS",
+      "summary": "The orchestration server exposes an OpenAI-compatible model list.",
+      "evidence": {
+        "ok": true,
+        "path": "/v1/models",
+        "value": {
+          "models": [
+            {
+              "name": "hforf.gguf",
+              "model": "hforf.gguf",
+              "modified_at": "",
+              "size": "",
+              "digest": "",
+              "type": "model",
+              "description": "",
+              "tags": [
+                ""
+              ],
+              "capabilities": [
+                "completion"
+              ],
+              "parameters": "",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "",
+                "families": [
+                  ""
+                ],
+                "parameter_size": "",
+                "quantization_level": ""
+              }
+            }
+          ],
+          "object": "list",
+          "data": [
+            {
+              "id": "hforf.gguf",
+              "aliases": [],
+              "tags": [],
+              "object": "model",
+              "created": 1785796200,
+              "owned_by": "llamacpp",
+              "meta": {
+                "vocab_type": 2,
+                "n_vocab": 248320,
+                "n_ctx_train": 262144,
+                "n_embd": 4096,
+                "n_params": 8953803264,
+                "size": 5899814912
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "PA-LANGEXTRACT",
+      "title": "LangExtract/NLP sidecar",
+      "status": "PASS",
+      "summary": "LangExtract/NLP sidecar is reachable.",
+      "evidence": {
+        "ok": true,
+        "path": "/health",
+        "value": {
+          "status": "ok",
+          "model": "gemma4-legal-iq4xs-direct.gguf",
+          "runtime": {
+            "pythonExecutable": "C:\\Python313\\python.exe",
+            "pythonVersion": "3.13.5",
+            "environmentType": "system-python"
+          },
+          "capabilities": {
+            "spacy": true,
+            "langextract": true,
+            "tree_sitter": true,
+            "treesitter_chunker": true,
+            "ast_grep": true,
+            "torch": true
+          },
+          "imports": {
+            "langextract": {
+              "available": true,
+              "version": "0.1.0",
+              "modulePath": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\langextract\\__init__.py",
+              "importVerified": true,
+              "editableSource": null,
+              "beautifulsoup4": {
+                "available": true,
+                "version": "4.13.4",
+                "modulePath": null,
+                "importVerified": true
+              }
+            },
+            "treesitterChunker": {
+              "available": true,
+              "version": "4.0.0",
+              "modulePath": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\chunker\\__init__.py",
+              "moduleName": "chunker",
+              "importVerified": true,
+              "fixtureVerified": false
+            },
+            "treeSitterLanguagePack": {
+              "available": true,
+              "version": "0.9.0",
+              "importVerified": true
+            },
+            "astGrepPy": {
+              "available": true,
+              "version": "0.44.1",
+              "importVerified": true
+            }
+          },
+          "timestamp": 1785796200957
+        }
+      }
+    },
+    {
+      "id": "PA-QDRANT-ENVELOPE",
+      "title": "Qdrant canonical payload envelope",
+      "status": "FAIL",
+      "summary": "Sampled 200 points from codebase_chunks_768.",
+      "evidence": {
+        "collectionNames": [
+          "BifrostSemanticCachePlugin",
+          "agent_memory_observations",
+          "audio_segments",
+          "case_chunks",
+          "chat_messages",
+          "chunks_web_search",
+          "code_llm_outputs",
+          "codebase_chunks_384",
+          "codebase_chunks_384_hybrid",
+          "codebase_chunks_512",
+          "codebase_chunks_768",
+          "codebase_chunks_768_v2",
+          "codebase_chunks_sparse_test_v1",
+          "codebase_topology_128",
+          "codebase_topology_64",
+          "court_opinions",
+          "diagnosis_embeddings",
+          "document_knowledge_768",
+          "document_tags",
+          "embedding_cache",
+          "error_embeddings",
+          "evidence_items",
+          "evidence_items_clip_512",
+          "evidence_vectors",
+          "external_programming_docs_768",
+          "feature_maps",
+          "fictional_case_chunks",
+          "knowledge_base",
+          "legal_canon_chunks",
+          "legal_cases",
+          "legal_documents",
+          "legal_glossary",
+          "llm_response_cache",
+          "phase110_baseline_768",
+          "poi_profiles",
+          "research_memory_768",
+          "sc_deedssocraticode_metadata",
+          "summary_lenses_768",
+          "synthesis_memory_768",
+          "topic_clusters"
+        ],
+        "info": {
+          "status": "green",
+          "optimizer_status": "ok",
+          "indexed_vectors_count": 105761,
+          "points_count": 105761,
+          "segments_count": 4,
+          "config": {
+            "params": {
+              "vectors": {
+                "content": {
+                  "size": 768,
+                  "distance": "Cosine"
+                },
+                "error": {
+                  "size": 768,
+                  "distance": "Cosine"
+                },
+                "signature": {
+                  "size": 768,
+                  "distance": "Cosine"
+                }
+              },
+              "shard_number": 1,
+              "replication_factor": 1,
+              "write_consistency_factor": 1,
+              "on_disk_payload": true
+            },
+            "hnsw_config": {
+              "m": 16,
+              "ef_construct": 200,
+              "full_scan_threshold": 10000,
+              "max_indexing_threads": 0,
+              "on_disk": false
+            },
+            "optimizer_config": {
+              "deleted_threshold": 0.2,
+              "vacuum_min_vector_number": 1000,
+              "default_segment_number": 0,
+              "max_segment_size": null,
+              "memmap_threshold": null,
+              "indexing_threshold": 10000,
+              "flush_interval_sec": 5,
+              "max_optimization_threads": null,
+              "prevent_unoptimized": null
+            },
+            "wal_config": {
+              "wal_capacity_mb": 32,
+              "wal_segments_ahead": 0,
+              "wal_retain_closed": 1
+            },
+            "quantization_config": {
+              "scalar": {
+                "type": "int8",
+                "quantile": 0.99,
+                "always_ram": false
+              }
+            }
+          },
+          "payload_schema": {
+            "som_cluster": {
+              "data_type": "integer",
+              "points": 0
+            },
+            "next_action": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "workspace_id": {
+              "data_type": "keyword",
+              "points": 52381
+            },
+            "sourceRefs": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "tags": {
+              "data_type": "keyword",
+              "points": 1
+            },
+            "agent_pickup_ready": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "status": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "feature_id": {
+              "data_type": "keyword",
+              "points": 1
+            },
+            "semantic_path": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "parent_centroid_id": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "centroid_id": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "language": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "file_path": {
+              "data_type": "keyword",
+              "points": 1
+            },
+            "path": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "updated_at": {
+              "data_type": "integer",
+              "points": 0
+            },
+            "workspace_task_id": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "source_ref": {
+              "data_type": "keyword",
+              "points": 105761
+            },
+            "kind": {
+              "data_type": "keyword",
+              "points": 6907
+            },
+            "topo_class": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "symbol_name": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "repo": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "point_kind": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "cluster_key": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "cluster_id": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "error_id": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "observed_at": {
+              "data_type": "keyword",
+              "points": 0
+            },
+            "summary_hash": {
+              "data_type": "keyword",
+              "points": 0
+            }
+          },
+          "update_queue": {
+            "length": 0
+          }
+        },
+        "sampled": 200,
+        "coverage": {
+          "packet_key": 0,
+          "source_ref": 200,
+          "workspace_id": 0,
+          "workspace_revision": 0,
+          "source_revision": 0,
+          "representation_id": 200,
+          "representation_revision": 0,
+          "schema_version": 0,
+          "stable_symbol_id": 0,
+          "symbol_version_id": 0,
+          "qdrant_point_id": 200
+        },
+        "signatures": {
+          "chunk_id,content_hash,packet_version,qdrant_point_id,representation_id,source_ref": 200
+        },
+        "duplicateEnvelopeCount": 0,
+        "deterministicPointIdMatches": 0
+      },
+      "nextAction": "Patch the active writer and repair/rebuild production payloads before trusting canonical hydration."
+    },
+    {
+      "id": "PA-ENVELOPE-PROOF",
+      "title": "Canonical envelope isolated upsert/readback/join",
+      "status": "SKIP",
+      "summary": "Write proof skipped; use --write-proof to execute only against a proof collection.",
+      "evidence": {
+        "status": "SKIP",
+        "reason": "--write-proof not supplied"
+      },
+      "nextAction": "Run with --write-proof after reviewing the proof collection name."
+    },
+    {
+      "id": "PA-ROUTING-READY",
+      "title": "Canonical routing readiness",
+      "status": "BLOCKED",
+      "summary": "Canonical routing requires complete Postgres identity, complete Qdrant envelopes, and a stable XGBoost score contract.",
+      "evidence": {
+        "postgresCoverage": {
+          "total_rows": 61659,
+          "packet_key_present": 61659,
+          "source_ref_present": 61659,
+          "workspace_id_present": 61659,
+          "workspace_revision_present": 61659,
+          "representation_revision_present": 61659,
+          "source_representation_id_present": 0,
+          "projection_representation_id_present": 0,
+          "packet_key_missing": 0,
+          "workspace_id_missing": 0,
+          "representation_revision_zero": 61659
+        },
+        "xgboost": "PASS",
+        "qdrant": "FAIL"
+      }
+    }
+  ],
+  "recommendations": [
+    "Keep XGBoost after canonical hydration and RRF, not before identity validation.",
+    "Deduplicate candidates by packet_key at packet level and symbol_version_id only when a canonical symbol-version owner is proven.",
+    "Use deterministic Qdrant point IDs derived from packet/workspace/representation/schema revisions so repeat upserts overwrite instead of duplicating.",
+    "Do not use trace_score dominance as proof that XGBoost adds value; run an ablation against trace_score-only and freshness-only baselines.",
+    "Keep mixedbread or other neural rerankers as a separately versioned fallback/second-stage lane; record rerank_source in the receipt.",
+    "Do not promote production Qdrant routing until envelope coverage and packet_key join-back are production-data proven."
+  ]
+}

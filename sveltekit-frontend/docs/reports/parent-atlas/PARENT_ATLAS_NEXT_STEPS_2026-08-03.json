@@ -1,0 +1,3516 @@
+{
+  "generatedAt": "2026-08-03T23:41:01.624Z",
+  "overall": "BLOCKED",
+  "config": {
+    "repoRoot": "C:\\Users\\james\\Videos\\deeds-web-app",
+    "appRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend",
+    "databaseUrl": "[redacted]",
+    "qdrantUrl": "http://127.0.0.1:6333",
+    "qdrantCollection": "codebase_chunks_768",
+    "llmUrl": "http://127.0.0.1:8090",
+    "embeddingUrl": "http://127.0.0.1:8081",
+    "langExtractUrl": "http://127.0.0.1:8095",
+    "xgboostUrl": "http://127.0.0.1:8765",
+    "rerankerUrl": "http://127.0.0.1:8099",
+    "nlpGpuUrl": "http://127.0.0.1:8095",
+    "otelCollectorHttpUrl": "http://127.0.0.1:4318",
+    "otelCollectorGrpcHost": "127.0.0.1",
+    "otelCollectorGrpcPort": 4317,
+    "qdrantGrpcHost": "127.0.0.1",
+    "qdrantGrpcPort": 6334,
+    "otelConfigPath": "C:\\Users\\james\\Videos\\deeds-web-app\\config\\otel-collector.yaml",
+    "dagLogDebounceMs": 250,
+    "dagLogMaxPending": 1000,
+    "okfRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf",
+    "openWikiRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\openwiki",
+    "reportDir": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\parent-atlas",
+    "graphFile": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\graph\\codebase-graph.json",
+    "strict": false,
+    "qdrantSampleSize": 200
+  },
+  "parametersResolved": {
+    "postgres": {
+      "database": "legal_ai_db",
+      "schema": "public",
+      "server_address": "172.18.0.23/32",
+      "server_port": 5432,
+      "server_version": "18.4 (Debian 18.4-1.pgdg12+1)",
+      "search_path": "\"$user\", public"
+    },
+    "qdrantCollection": "codebase_chunks_768",
+    "llmEndpoint": {
+      "ok": true,
+      "endpoint": "/v1/models",
+      "value": {
+        "models": [
+          {
+            "name": "hforf.gguf",
+            "model": "hforf.gguf",
+            "modified_at": "",
+            "size": "",
+            "digest": "",
+            "type": "model",
+            "description": "",
+            "tags": [
+              ""
+            ],
+            "capabilities": [
+              "completion"
+            ],
+            "parameters": "",
+            "details": {
+              "parent_model": "",
+              "format": "gguf",
+              "family": "",
+              "families": [
+                ""
+              ],
+              "parameter_size": "",
+              "quantization_level": ""
+            }
+          }
+        ],
+        "object": "list",
+        "data": [
+          {
+            "id": "hforf.gguf",
+            "aliases": [],
+            "tags": [],
+            "object": "model",
+            "created": 1785800485,
+            "owned_by": "llamacpp",
+            "meta": {
+              "vocab_type": 2,
+              "n_vocab": 248320,
+              "n_ctx_train": 262144,
+              "n_embd": 4096,
+              "n_params": 8953803264,
+              "size": 5899814912
+            }
+          }
+        ]
+      }
+    },
+    "embeddingEndpoint": {
+      "ok": true,
+      "endpoint": "/health",
+      "value": {
+        "status": "ok"
+      }
+    },
+    "langExtractEndpoint": {
+      "ok": true,
+      "endpoint": "/health",
+      "value": {
+        "status": "ok",
+        "model": "gemma4-legal-iq4xs-direct.gguf",
+        "runtime": {
+          "pythonExecutable": "C:\\Python313\\python.exe",
+          "pythonVersion": "3.13.5",
+          "environmentType": "system-python"
+        },
+        "capabilities": {
+          "spacy": true,
+          "langextract": true,
+          "tree_sitter": true,
+          "treesitter_chunker": true,
+          "ast_grep": true,
+          "torch": true
+        },
+        "imports": {
+          "langextract": {
+            "available": true,
+            "version": "0.1.0",
+            "modulePath": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\langextract\\__init__.py",
+            "importVerified": true,
+            "editableSource": null,
+            "beautifulsoup4": {
+              "available": true,
+              "version": "4.13.4",
+              "modulePath": null,
+              "importVerified": true
+            }
+          },
+          "treesitterChunker": {
+            "available": true,
+            "version": "4.0.0",
+            "modulePath": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\chunker\\__init__.py",
+            "moduleName": "chunker",
+            "importVerified": true,
+            "fixtureVerified": false
+          },
+          "treeSitterLanguagePack": {
+            "available": true,
+            "version": "0.9.0",
+            "importVerified": true
+          },
+          "astGrepPy": {
+            "available": true,
+            "version": "0.44.1",
+            "importVerified": true
+          }
+        },
+        "timestamp": 1785800486442
+      }
+    },
+    "xgboostEndpoint": {
+      "ok": true,
+      "endpoint": "/health",
+      "value": {
+        "status": "ok",
+        "model_loaded": true,
+        "model_type": "xgboost",
+        "features": [
+          "cosine_score",
+          "bm25_rank_norm",
+          "ann_turbovec_score",
+          "concept_overlap",
+          "same_feature",
+          "community_conf",
+          "reward_prior",
+          "domain_class_match",
+          "freshness_score",
+          "pagerank_score",
+          "som_cache_hit",
+          "provenance_git_age",
+          "packet_hit_count",
+          "n_retrieved",
+          "n_concepts",
+          "trace_score"
+        ]
+      }
+    },
+    "rerankerEndpoint": {
+      "ok": false,
+      "errors": [
+        "/health: fetch failed",
+        "/: fetch failed"
+      ]
+    },
+    "nlpGpuEndpoint": {
+      "ok": true,
+      "endpoint": "/health",
+      "value": {
+        "status": "ok",
+        "model": "gemma4-legal-iq4xs-direct.gguf",
+        "runtime": {
+          "pythonExecutable": "C:\\Python313\\python.exe",
+          "pythonVersion": "3.13.5",
+          "environmentType": "system-python"
+        },
+        "capabilities": {
+          "spacy": true,
+          "langextract": true,
+          "tree_sitter": true,
+          "treesitter_chunker": true,
+          "ast_grep": true,
+          "torch": true
+        },
+        "imports": {
+          "langextract": {
+            "available": true,
+            "version": "0.1.0",
+            "modulePath": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\langextract\\__init__.py",
+            "importVerified": true,
+            "editableSource": null,
+            "beautifulsoup4": {
+              "available": true,
+              "version": "4.13.4",
+              "modulePath": null,
+              "importVerified": true
+            }
+          },
+          "treesitterChunker": {
+            "available": true,
+            "version": "4.0.0",
+            "modulePath": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\chunker\\__init__.py",
+            "moduleName": "chunker",
+            "importVerified": true,
+            "fixtureVerified": false
+          },
+          "treeSitterLanguagePack": {
+            "available": true,
+            "version": "0.9.0",
+            "importVerified": true
+          },
+          "astGrepPy": {
+            "available": true,
+            "version": "0.44.1",
+            "importVerified": true
+          }
+        },
+        "timestamp": 1785800463560
+      }
+    },
+    "otelCollectorHttpUrl": "http://127.0.0.1:4318",
+    "otelCollectorGrpc": "127.0.0.1:4317",
+    "qdrantGrpc": "127.0.0.1:6334",
+    "otelConfigPath": "C:\\Users\\james\\Videos\\deeds-web-app\\config\\otel-collector.yaml",
+    "dagLogDebounceMs": 250,
+    "dagLogMaxPending": 1000,
+    "okfRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf",
+    "openWikiRoot": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\openwiki"
+  },
+  "gates": [
+    {
+      "id": "PA-ID-001",
+      "order": 1,
+      "area": "IDENTITY",
+      "title": "Canonical packet identity",
+      "status": "PASS",
+      "proof": "PRODUCTION_DATA_PROVEN",
+      "summary": "Canonical packet/source/workspace identity is complete in live Postgres.",
+      "evidence": {
+        "total_rows": 61659,
+        "packet_key_present": 61659,
+        "source_ref_present": 61659,
+        "workspace_id_present": 61659,
+        "workspace_revision_present": 61659,
+        "representation_revision_present": 61659,
+        "packet_key_missing": 0,
+        "source_ref_missing": 1,
+        "workspace_id_missing": 0,
+        "representation_revision_zero": 61659,
+        "source_representation_id_present": 0,
+        "projection_representation_id_present": 0,
+        "latent_64_present": 7520,
+        "latent_64_wrong_size": 0
+      },
+      "dependencies": [],
+      "definitionOfDone": [
+        "packet_key coverage equals total qualified rows",
+        "source_ref coverage equals total qualified rows",
+        "workspace_id coverage equals total qualified rows"
+      ],
+      "nextAction": "Repair or quarantine missing canonical identities before projection or edit recommendations.",
+      "prohibitedScope": [
+        "Do not derive packet identity from qdrant_point_id",
+        "Do not derive workspace_id from unrelated metadata"
+      ]
+    },
+    {
+      "id": "PA-SCHEMA-001",
+      "order": 2,
+      "area": "SCHEMA",
+      "title": "Live Postgres and application schema alignment",
+      "status": "PARTIAL",
+      "proof": "PRODUCTION_DATA_PROVEN",
+      "summary": "Live atlas_packets fields and indexes were inspected; application-schema parity still requires repository comparison.",
+      "evidence": {
+        "connection": {
+          "database": "legal_ai_db",
+          "schema": "public",
+          "server_address": "172.18.0.23/32",
+          "server_port": 5432,
+          "server_version": "18.4 (Debian 18.4-1.pgdg12+1)",
+          "search_path": "\"$user\", public"
+        },
+        "columns": [
+          {
+            "column_name": "packet_id",
+            "data_type": "text",
+            "is_nullable": "NO",
+            "column_default": null,
+            "ordinal_position": 1
+          },
+          {
+            "column_name": "artifact_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 2
+          },
+          {
+            "column_name": "packet_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 3
+          },
+          {
+            "column_name": "source_ref",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 4
+          },
+          {
+            "column_name": "source_ref_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 5
+          },
+          {
+            "column_name": "file_path",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 6
+          },
+          {
+            "column_name": "directory_path",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 7
+          },
+          {
+            "column_name": "feature_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 8
+          },
+          {
+            "column_name": "feature_label",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 9
+          },
+          {
+            "column_name": "community_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 10
+          },
+          {
+            "column_name": "concept_ids",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 11
+          },
+          {
+            "column_name": "cluster_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 12
+          },
+          {
+            "column_name": "embedding",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 13
+          },
+          {
+            "column_name": "payload",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 14
+          },
+          {
+            "column_name": "metadata",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 15
+          },
+          {
+            "column_name": "permissions",
+            "data_type": "jsonb",
+            "is_nullable": "NO",
+            "column_default": "'{\"source\": \"repo_index\", \"can_write\": false, \"can_export\": false, \"visibility\": \"internal\", \"can_execute\": false}'::jsonb",
+            "ordinal_position": 16
+          },
+          {
+            "column_name": "topology",
+            "data_type": "jsonb",
+            "is_nullable": "NO",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 17
+          },
+          {
+            "column_name": "vectors",
+            "data_type": "jsonb",
+            "is_nullable": "NO",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 18
+          },
+          {
+            "column_name": "summary",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 19
+          },
+          {
+            "column_name": "tags",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 20
+          },
+          {
+            "column_name": "byte_start",
+            "data_type": "bigint",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 21
+          },
+          {
+            "column_name": "byte_end",
+            "data_type": "bigint",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 22
+          },
+          {
+            "column_name": "sha256",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 23
+          },
+          {
+            "column_name": "source_kind",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 24
+          },
+          {
+            "column_name": "source_path",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 25
+          },
+          {
+            "column_name": "group_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 26
+          },
+          {
+            "column_name": "packet_universe",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'atlas'::text",
+            "ordinal_position": 27
+          },
+          {
+            "column_name": "qdrant_point_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 28
+          },
+          {
+            "column_name": "qdrant_collection",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 29
+          },
+          {
+            "column_name": "qdrant_vector_dim",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 30
+          },
+          {
+            "column_name": "identity_lane",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'qdrant_chunk'::text",
+            "ordinal_position": 31
+          },
+          {
+            "column_name": "identity_confidence",
+            "data_type": "double precision",
+            "is_nullable": "YES",
+            "column_default": "1.0",
+            "ordinal_position": 32
+          },
+          {
+            "column_name": "som_cluster",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 33
+          },
+          {
+            "column_name": "som_row",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 34
+          },
+          {
+            "column_name": "som_col",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 35
+          },
+          {
+            "column_name": "som_index",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 36
+          },
+          {
+            "column_name": "kmeans_cluster",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 37
+          },
+          {
+            "column_name": "pagerank",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 38
+          },
+          {
+            "column_name": "betweenness",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 39
+          },
+          {
+            "column_name": "eigenvector",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 40
+          },
+          {
+            "column_name": "neo4j_node_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 41
+          },
+          {
+            "column_name": "redis_centroid_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 42
+          },
+          {
+            "column_name": "latent_64",
+            "data_type": "bytea",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 43
+          },
+          {
+            "column_name": "reward_prior",
+            "data_type": "double precision",
+            "is_nullable": "YES",
+            "column_default": "0",
+            "ordinal_position": 44
+          },
+          {
+            "column_name": "created_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": "now()",
+            "ordinal_position": 45
+          },
+          {
+            "column_name": "updated_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": "now()",
+            "ordinal_position": 46
+          },
+          {
+            "column_name": "function_symbol",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 47
+          },
+          {
+            "column_name": "content_embedding_384",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 48
+          },
+          {
+            "column_name": "embedding_status",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'pending'::text",
+            "ordinal_position": 49
+          },
+          {
+            "column_name": "embedding_timestamp",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 50
+          },
+          {
+            "column_name": "extracted_entities",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'[]'::jsonb",
+            "ordinal_position": 51
+          },
+          {
+            "column_name": "keywords",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": "'{}'::text[]",
+            "ordinal_position": 52
+          },
+          {
+            "column_name": "error_pattern",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 53
+          },
+          {
+            "column_name": "feature_group_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 54
+          },
+          {
+            "column_name": "domain_class",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 55
+          },
+          {
+            "column_name": "taxonomy_level",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": "0",
+            "ordinal_position": 56
+          },
+          {
+            "column_name": "bm25_indexed_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 57
+          },
+          {
+            "column_name": "bm25_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 58
+          },
+          {
+            "column_name": "bm25_terms",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 59
+          },
+          {
+            "column_name": "packet_ulid",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 60
+          },
+          {
+            "column_name": "title_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 61
+          },
+          {
+            "column_name": "canonical_source_ref",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 62
+          },
+          {
+            "column_name": "page_rank_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 63
+          },
+          {
+            "column_name": "kmeans_cluster_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 64
+          },
+          {
+            "column_name": "tree_node_id",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 65
+          },
+          {
+            "column_name": "routing_hints",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 66
+          },
+          {
+            "column_name": "community_source",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 67
+          },
+          {
+            "column_name": "community_confidence",
+            "data_type": "numeric",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 68
+          },
+          {
+            "column_name": "lineage_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 69
+          },
+          {
+            "column_name": "ledger_type",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 70
+          },
+          {
+            "column_name": "canonical",
+            "data_type": "boolean",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 71
+          },
+          {
+            "column_name": "payload_backfilled_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 72
+          },
+          {
+            "column_name": "k_core",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 73
+          },
+          {
+            "column_name": "ngrams",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 74
+          },
+          {
+            "column_name": "trigrams",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 75
+          },
+          {
+            "column_name": "engrams",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 76
+          },
+          {
+            "column_name": "used_concepts",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 77
+          },
+          {
+            "column_name": "topolog_cluster",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 78
+          },
+          {
+            "column_name": "topolog_confidence",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.5",
+            "ordinal_position": 79
+          },
+          {
+            "column_name": "topolog_method",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'unassigned'::text",
+            "ordinal_position": 80
+          },
+          {
+            "column_name": "topolog_applied_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 81
+          },
+          {
+            "column_name": "repository_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 82
+          },
+          {
+            "column_name": "directory_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 83
+          },
+          {
+            "column_name": "file_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 84
+          },
+          {
+            "column_name": "module_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 85
+          },
+          {
+            "column_name": "symbol_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 86
+          },
+          {
+            "column_name": "chunk_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 87
+          },
+          {
+            "column_name": "recovery_lane",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'canonical'::text",
+            "ordinal_position": 88
+          },
+          {
+            "column_name": "som_cluster_id",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 89
+          },
+          {
+            "column_name": "ontology",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 90
+          },
+          {
+            "column_name": "packet_type_test",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 91
+          },
+          {
+            "column_name": "packet_type",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'code'::text",
+            "ordinal_position": 92
+          },
+          {
+            "column_name": "packet_ontology",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{\"tags\": [], \"examples\": {}, \"constraints\": {}, \"capabilities\": []}'::jsonb",
+            "ordinal_position": 93
+          },
+          {
+            "column_name": "parent_packet_key",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 94
+          },
+          {
+            "column_name": "related_packets",
+            "data_type": "ARRAY",
+            "is_nullable": "YES",
+            "column_default": "'{}'::text[]",
+            "ordinal_position": 95
+          },
+          {
+            "column_name": "telemetry",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{\"failure_count\": 0, \"success_count\": 0, \"avg_latency_ms\": 0, \"execution_count\": 0}'::jsonb",
+            "ordinal_position": 96
+          },
+          {
+            "column_name": "embedding_eligible",
+            "data_type": "boolean",
+            "is_nullable": "NO",
+            "column_default": "false",
+            "ordinal_position": 97
+          },
+          {
+            "column_name": "summary_hash",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 98
+          },
+          {
+            "column_name": "embedding_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 99
+          },
+          {
+            "column_name": "embedding_claimed_at",
+            "data_type": "timestamp with time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 100
+          },
+          {
+            "column_name": "embedding_claimed_by",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 101
+          },
+          {
+            "column_name": "feature_envelope",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 102
+          },
+          {
+            "column_name": "domain_confidence",
+            "data_type": "double precision",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 103
+          },
+          {
+            "column_name": "title_generator_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": "'v1'::text",
+            "ordinal_position": 104
+          },
+          {
+            "column_name": "file_purpose",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": "'other'::file_purpose_enum",
+            "ordinal_position": 105
+          },
+          {
+            "column_name": "thoroughness",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": "'stub'::thoroughness_enum",
+            "ordinal_position": 106
+          },
+          {
+            "column_name": "app_criticality",
+            "data_type": "USER-DEFINED",
+            "is_nullable": "YES",
+            "column_default": "'optional'::app_criticality_enum",
+            "ordinal_position": 107
+          },
+          {
+            "column_name": "test_coverage_pct",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": "0",
+            "ordinal_position": 108
+          },
+          {
+            "column_name": "file_understanding_computed_at",
+            "data_type": "timestamp without time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 109
+          },
+          {
+            "column_name": "file_understanding_method",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 110
+          },
+          {
+            "column_name": "openspec_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 111
+          },
+          {
+            "column_name": "gsd_id",
+            "data_type": "uuid",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 112
+          },
+          {
+            "column_name": "enrichment_updated_at",
+            "data_type": "timestamp without time zone",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 113
+          },
+          {
+            "column_name": "som_cell_x",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 114
+          },
+          {
+            "column_name": "som_cell_y",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 115
+          },
+          {
+            "column_name": "ast_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.0",
+            "ordinal_position": 116
+          },
+          {
+            "column_name": "community_boost",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "1.0",
+            "ordinal_position": 117
+          },
+          {
+            "column_name": "rerank_features",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": "'{}'::jsonb",
+            "ordinal_position": 118
+          },
+          {
+            "column_name": "pagerank_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.0",
+            "ordinal_position": 119
+          },
+          {
+            "column_name": "som_distance",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": "0.0",
+            "ordinal_position": 120
+          },
+          {
+            "column_name": "predicted_domain",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 121
+          },
+          {
+            "column_name": "classifier_kind",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 122
+          },
+          {
+            "column_name": "classifier_version",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 123
+          },
+          {
+            "column_name": "pagerank_raw",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 124
+          },
+          {
+            "column_name": "authority_score",
+            "data_type": "real",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 125
+          },
+          {
+            "column_name": "workspace_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": "'unknown'::character varying",
+            "ordinal_position": 126
+          },
+          {
+            "column_name": "semantic_anchor",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": "'unknown'::character varying",
+            "ordinal_position": 127
+          },
+          {
+            "column_name": "ontology_version",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 128
+          },
+          {
+            "column_name": "content_hash",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 129
+          },
+          {
+            "column_name": "domain_memberships",
+            "data_type": "jsonb",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 130
+          },
+          {
+            "column_name": "primary_domain",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 131
+          },
+          {
+            "column_name": "workspace_revision",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "column_default": "0",
+            "ordinal_position": 132
+          },
+          {
+            "column_name": "representation_revision",
+            "data_type": "integer",
+            "is_nullable": "NO",
+            "column_default": "0",
+            "ordinal_position": 133
+          },
+          {
+            "column_name": "embedding_digest",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 134
+          },
+          {
+            "column_name": "source_representation_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 135
+          },
+          {
+            "column_name": "source_dimension",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 136
+          },
+          {
+            "column_name": "projection_representation_id",
+            "data_type": "character varying",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 137
+          },
+          {
+            "column_name": "projection_dimension",
+            "data_type": "integer",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 138
+          },
+          {
+            "column_name": "encoder_revision",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 139
+          },
+          {
+            "column_name": "som_revision",
+            "data_type": "text",
+            "is_nullable": "YES",
+            "column_default": null,
+            "ordinal_position": 140
+          }
+        ],
+        "missingRequired": [],
+        "coverage": {
+          "total_rows": 61659,
+          "packet_key_present": 61659,
+          "source_ref_present": 61659,
+          "workspace_id_present": 61659,
+          "workspace_revision_present": 61659,
+          "representation_revision_present": 61659,
+          "packet_key_missing": 0,
+          "source_ref_missing": 1,
+          "workspace_id_missing": 0,
+          "representation_revision_zero": 61659,
+          "source_representation_id_present": 0,
+          "projection_representation_id_present": 0,
+          "latent_64_present": 7520,
+          "latent_64_wrong_size": 0
+        },
+        "indexes": [
+          {
+            "indexname": "atlas_packets_domain_unclassified_idx",
+            "indexdef": "CREATE INDEX atlas_packets_domain_unclassified_idx ON public.atlas_packets USING btree (packet_key) WHERE (domain_class IS NULL)"
+          },
+          {
+            "indexname": "atlas_packets_metadata_gin_idx",
+            "indexdef": "CREATE INDEX atlas_packets_metadata_gin_idx ON public.atlas_packets USING gin (metadata)"
+          },
+          {
+            "indexname": "atlas_packets_packet_key_key",
+            "indexdef": "CREATE UNIQUE INDEX atlas_packets_packet_key_key ON public.atlas_packets USING btree (packet_key)"
+          },
+          {
+            "indexname": "atlas_packets_pkey",
+            "indexdef": "CREATE UNIQUE INDEX atlas_packets_pkey ON public.atlas_packets USING btree (packet_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_ast_score",
+            "indexdef": "CREATE INDEX idx_atlas_packets_ast_score ON public.atlas_packets USING btree (ast_score)"
+          },
+          {
+            "indexname": "idx_atlas_packets_bm25_indexed_at",
+            "indexdef": "CREATE INDEX idx_atlas_packets_bm25_indexed_at ON public.atlas_packets USING btree (bm25_indexed_at DESC)"
+          },
+          {
+            "indexname": "idx_atlas_packets_bm25_terms",
+            "indexdef": "CREATE INDEX idx_atlas_packets_bm25_terms ON public.atlas_packets USING gin (bm25_terms)"
+          },
+          {
+            "indexname": "idx_atlas_packets_canonical_source_ref",
+            "indexdef": "CREATE INDEX idx_atlas_packets_canonical_source_ref ON public.atlas_packets USING btree (canonical_source_ref)"
+          },
+          {
+            "indexname": "idx_atlas_packets_chunk_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_chunk_id ON public.atlas_packets USING btree (chunk_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_community_boost",
+            "indexdef": "CREATE INDEX idx_atlas_packets_community_boost ON public.atlas_packets USING btree (community_boost)"
+          },
+          {
+            "indexname": "idx_atlas_packets_community_confidence_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_community_confidence_idx ON public.atlas_packets USING btree (community_confidence)"
+          },
+          {
+            "indexname": "idx_atlas_packets_community_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_community_id ON public.atlas_packets USING btree (community_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_community_id_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_community_id_idx ON public.atlas_packets USING btree (community_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_community_source_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_community_source_idx ON public.atlas_packets USING btree (community_source)"
+          },
+          {
+            "indexname": "idx_atlas_packets_concept_ids",
+            "indexdef": "CREATE INDEX idx_atlas_packets_concept_ids ON public.atlas_packets USING gin (concept_ids)"
+          },
+          {
+            "indexname": "idx_atlas_packets_directory_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_directory_id ON public.atlas_packets USING btree (directory_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_domain_class",
+            "indexdef": "CREATE INDEX idx_atlas_packets_domain_class ON public.atlas_packets USING btree (domain_class)"
+          },
+          {
+            "indexname": "idx_atlas_packets_domain_class_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_domain_class_idx ON public.atlas_packets USING btree (domain_class)"
+          },
+          {
+            "indexname": "idx_atlas_packets_domain_confidence",
+            "indexdef": "CREATE INDEX idx_atlas_packets_domain_confidence ON public.atlas_packets USING btree (domain_confidence) WHERE ((domain_confidence IS NOT NULL) AND (domain_confidence > (0.7)::double precision))"
+          },
+          {
+            "indexname": "idx_atlas_packets_domain_memberships",
+            "indexdef": "CREATE INDEX idx_atlas_packets_domain_memberships ON public.atlas_packets USING gin (domain_memberships)"
+          },
+          {
+            "indexname": "idx_atlas_packets_embedding_digest",
+            "indexdef": "CREATE INDEX idx_atlas_packets_embedding_digest ON public.atlas_packets USING btree (embedding_digest)"
+          },
+          {
+            "indexname": "idx_atlas_packets_embedding_status",
+            "indexdef": "CREATE INDEX idx_atlas_packets_embedding_status ON public.atlas_packets USING btree (embedding_status) WHERE (embedding_status = 'pending'::text)"
+          },
+          {
+            "indexname": "idx_atlas_packets_envelope_fts",
+            "indexdef": "CREATE INDEX idx_atlas_packets_envelope_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, ((((((COALESCE((payload ->> 'title'::text), ''::text) || ' '::text) || COALESCE(summary, ''::text)) || ' '::text) || COALESCE(feature_label, ''::text)) || ' '::text) || COALESCE(feature_id, ''::text))))"
+          },
+          {
+            "indexname": "idx_atlas_packets_error_pattern",
+            "indexdef": "CREATE INDEX idx_atlas_packets_error_pattern ON public.atlas_packets USING btree (error_pattern)"
+          },
+          {
+            "indexname": "idx_atlas_packets_extracted_entities",
+            "indexdef": "CREATE INDEX idx_atlas_packets_extracted_entities ON public.atlas_packets USING gin (extracted_entities)"
+          },
+          {
+            "indexname": "idx_atlas_packets_feature_group_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_feature_group_id ON public.atlas_packets USING btree (feature_group_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_feature_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_feature_id ON public.atlas_packets USING btree (feature_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_feature_id_composite",
+            "indexdef": "CREATE INDEX idx_atlas_packets_feature_id_composite ON public.atlas_packets USING btree (feature_id, feature_label)"
+          },
+          {
+            "indexname": "idx_atlas_packets_feature_id_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_feature_id_idx ON public.atlas_packets USING btree (feature_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_feature_label_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_feature_label_idx ON public.atlas_packets USING btree (feature_label)"
+          },
+          {
+            "indexname": "idx_atlas_packets_file_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_file_id ON public.atlas_packets USING btree (file_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_file_path",
+            "indexdef": "CREATE INDEX idx_atlas_packets_file_path ON public.atlas_packets USING btree (file_path)"
+          },
+          {
+            "indexname": "idx_atlas_packets_file_path_trgm",
+            "indexdef": "CREATE INDEX idx_atlas_packets_file_path_trgm ON public.atlas_packets USING gin (file_path gin_trgm_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_hierarchy",
+            "indexdef": "CREATE INDEX idx_atlas_packets_hierarchy ON public.atlas_packets USING btree (repository_id, directory_id, file_id, module_id, symbol_id, feature_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_identity_compound_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_identity_compound_idx ON public.atlas_packets USING btree (packet_key, source_ref, feature_id, title_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_identity_lane",
+            "indexdef": "CREATE INDEX idx_atlas_packets_identity_lane ON public.atlas_packets USING btree (identity_lane)"
+          },
+          {
+            "indexname": "idx_atlas_packets_keywords",
+            "indexdef": "CREATE INDEX idx_atlas_packets_keywords ON public.atlas_packets USING gin (keywords)"
+          },
+          {
+            "indexname": "idx_atlas_packets_kmeans_cluster_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_kmeans_cluster_id ON public.atlas_packets USING btree (kmeans_cluster_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_kmeans_cluster_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_kmeans_cluster_idx ON public.atlas_packets USING btree (kmeans_cluster)"
+          },
+          {
+            "indexname": "idx_atlas_packets_ledger_type_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_ledger_type_idx ON public.atlas_packets USING btree (ledger_type)"
+          },
+          {
+            "indexname": "idx_atlas_packets_lineage_version_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_lineage_version_idx ON public.atlas_packets USING btree (lineage_version)"
+          },
+          {
+            "indexname": "idx_atlas_packets_metadata_gin",
+            "indexdef": "CREATE INDEX idx_atlas_packets_metadata_gin ON public.atlas_packets USING gin (metadata)"
+          },
+          {
+            "indexname": "idx_atlas_packets_metadata_gin_pathops",
+            "indexdef": "CREATE INDEX idx_atlas_packets_metadata_gin_pathops ON public.atlas_packets USING gin (metadata jsonb_path_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_module_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_module_id ON public.atlas_packets USING btree (module_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_neo4j_node_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_neo4j_node_id ON public.atlas_packets USING btree (neo4j_node_id) WHERE (neo4j_node_id IS NOT NULL)"
+          },
+          {
+            "indexname": "idx_atlas_packets_ontology_gin",
+            "indexdef": "CREATE INDEX idx_atlas_packets_ontology_gin ON public.atlas_packets USING gin (packet_ontology)"
+          },
+          {
+            "indexname": "idx_atlas_packets_packet_key",
+            "indexdef": "CREATE INDEX idx_atlas_packets_packet_key ON public.atlas_packets USING btree (packet_key)"
+          },
+          {
+            "indexname": "idx_atlas_packets_packet_key_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_packet_key_idx ON public.atlas_packets USING btree (packet_key)"
+          },
+          {
+            "indexname": "idx_atlas_packets_packet_ulid",
+            "indexdef": "CREATE INDEX idx_atlas_packets_packet_ulid ON public.atlas_packets USING btree (packet_ulid)"
+          },
+          {
+            "indexname": "idx_atlas_packets_page_rank_score",
+            "indexdef": "CREATE INDEX idx_atlas_packets_page_rank_score ON public.atlas_packets USING btree (page_rank_score DESC NULLS LAST)"
+          },
+          {
+            "indexname": "idx_atlas_packets_pagerank_score",
+            "indexdef": "CREATE INDEX idx_atlas_packets_pagerank_score ON public.atlas_packets USING btree (pagerank_score)"
+          },
+          {
+            "indexname": "idx_atlas_packets_payload_gin",
+            "indexdef": "CREATE INDEX idx_atlas_packets_payload_gin ON public.atlas_packets USING gin (payload)"
+          },
+          {
+            "indexname": "idx_atlas_packets_payload_gin_pathops",
+            "indexdef": "CREATE INDEX idx_atlas_packets_payload_gin_pathops ON public.atlas_packets USING gin (payload jsonb_path_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_payload_path",
+            "indexdef": "CREATE INDEX idx_atlas_packets_payload_path ON public.atlas_packets USING gin (payload jsonb_path_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_permissions_gin_pathops",
+            "indexdef": "CREATE INDEX idx_atlas_packets_permissions_gin_pathops ON public.atlas_packets USING gin (permissions jsonb_path_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_primary_domain",
+            "indexdef": "CREATE INDEX idx_atlas_packets_primary_domain ON public.atlas_packets USING btree (primary_domain) WHERE (primary_domain IS NOT NULL)"
+          },
+          {
+            "indexname": "idx_atlas_packets_qdrant_point_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_qdrant_point_id ON public.atlas_packets USING btree (qdrant_point_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_redis_centroid_key",
+            "indexdef": "CREATE INDEX idx_atlas_packets_redis_centroid_key ON public.atlas_packets USING btree (redis_centroid_key) WHERE (redis_centroid_key IS NOT NULL)"
+          },
+          {
+            "indexname": "idx_atlas_packets_repository_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_repository_id ON public.atlas_packets USING btree (repository_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_representation_revision",
+            "indexdef": "CREATE INDEX idx_atlas_packets_representation_revision ON public.atlas_packets USING btree (representation_revision)"
+          },
+          {
+            "indexname": "idx_atlas_packets_rerank_features",
+            "indexdef": "CREATE INDEX idx_atlas_packets_rerank_features ON public.atlas_packets USING gin (rerank_features)"
+          },
+          {
+            "indexname": "idx_atlas_packets_routing_hints",
+            "indexdef": "CREATE INDEX idx_atlas_packets_routing_hints ON public.atlas_packets USING gin (routing_hints)"
+          },
+          {
+            "indexname": "idx_atlas_packets_som_cell",
+            "indexdef": "CREATE INDEX idx_atlas_packets_som_cell ON public.atlas_packets USING btree (som_cell_x, som_cell_y)"
+          },
+          {
+            "indexname": "idx_atlas_packets_som_cluster",
+            "indexdef": "CREATE INDEX idx_atlas_packets_som_cluster ON public.atlas_packets USING btree (som_cluster)"
+          },
+          {
+            "indexname": "idx_atlas_packets_som_distance",
+            "indexdef": "CREATE INDEX idx_atlas_packets_som_distance ON public.atlas_packets USING btree (som_distance)"
+          },
+          {
+            "indexname": "idx_atlas_packets_som_index",
+            "indexdef": "CREATE INDEX idx_atlas_packets_som_index ON public.atlas_packets USING btree (som_index)"
+          },
+          {
+            "indexname": "idx_atlas_packets_som_index_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_som_index_idx ON public.atlas_packets USING btree (som_index)"
+          },
+          {
+            "indexname": "idx_atlas_packets_source_feature",
+            "indexdef": "CREATE INDEX idx_atlas_packets_source_feature ON public.atlas_packets USING btree (source_ref, feature_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_source_kind",
+            "indexdef": "CREATE INDEX idx_atlas_packets_source_kind ON public.atlas_packets USING btree (source_kind)"
+          },
+          {
+            "indexname": "idx_atlas_packets_source_ref",
+            "indexdef": "CREATE INDEX idx_atlas_packets_source_ref ON public.atlas_packets USING btree (source_ref)"
+          },
+          {
+            "indexname": "idx_atlas_packets_source_ref_idx",
+            "indexdef": "CREATE INDEX idx_atlas_packets_source_ref_idx ON public.atlas_packets USING btree (source_ref)"
+          },
+          {
+            "indexname": "idx_atlas_packets_source_ref_key",
+            "indexdef": "CREATE INDEX idx_atlas_packets_source_ref_key ON public.atlas_packets USING btree (source_ref_key)"
+          },
+          {
+            "indexname": "idx_atlas_packets_summary_fts",
+            "indexdef": "CREATE INDEX idx_atlas_packets_summary_fts ON public.atlas_packets USING gin (to_tsvector('english'::regconfig, COALESCE(summary, ''::text)))"
+          },
+          {
+            "indexname": "idx_atlas_packets_symbol_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_symbol_id ON public.atlas_packets USING btree (symbol_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_tags",
+            "indexdef": "CREATE INDEX idx_atlas_packets_tags ON public.atlas_packets USING gin (tags)"
+          },
+          {
+            "indexname": "idx_atlas_packets_tags_gin",
+            "indexdef": "CREATE INDEX idx_atlas_packets_tags_gin ON public.atlas_packets USING gin (tags)"
+          },
+          {
+            "indexname": "idx_atlas_packets_taxonomy_level",
+            "indexdef": "CREATE INDEX idx_atlas_packets_taxonomy_level ON public.atlas_packets USING btree (taxonomy_level)"
+          },
+          {
+            "indexname": "idx_atlas_packets_title_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_title_id ON public.atlas_packets USING btree (title_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_topology_gin_pathops",
+            "indexdef": "CREATE INDEX idx_atlas_packets_topology_gin_pathops ON public.atlas_packets USING gin (topology jsonb_path_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_tree_node_id",
+            "indexdef": "CREATE INDEX idx_atlas_packets_tree_node_id ON public.atlas_packets USING btree (tree_node_id)"
+          },
+          {
+            "indexname": "idx_atlas_packets_type",
+            "indexdef": "CREATE INDEX idx_atlas_packets_type ON public.atlas_packets USING btree (packet_type)"
+          },
+          {
+            "indexname": "idx_atlas_packets_vectors_gin_pathops",
+            "indexdef": "CREATE INDEX idx_atlas_packets_vectors_gin_pathops ON public.atlas_packets USING gin (vectors jsonb_path_ops)"
+          },
+          {
+            "indexname": "idx_atlas_packets_workspace_revision",
+            "indexdef": "CREATE INDEX idx_atlas_packets_workspace_revision ON public.atlas_packets USING btree (workspace_revision)"
+          },
+          {
+            "indexname": "idx_latent_64_not_null",
+            "indexdef": "CREATE INDEX idx_latent_64_not_null ON public.atlas_packets USING hash (packet_id) WHERE (latent_64 IS NOT NULL)"
+          },
+          {
+            "indexname": "idx_packets_centroid_cache",
+            "indexdef": "CREATE INDEX idx_packets_centroid_cache ON public.atlas_packets USING btree (feature_id) WHERE (som_cluster_id IS NOT NULL)"
+          },
+          {
+            "indexname": "idx_packets_feature_envelope",
+            "indexdef": "CREATE INDEX idx_packets_feature_envelope ON public.atlas_packets USING gin (feature_envelope)"
+          },
+          {
+            "indexname": "idx_packets_source_feature_multi_hop",
+            "indexdef": "CREATE INDEX idx_packets_source_feature_multi_hop ON public.atlas_packets USING btree (source_ref, feature_id)"
+          },
+          {
+            "indexname": "idx_packets_used_concepts_gin",
+            "indexdef": "CREATE INDEX idx_packets_used_concepts_gin ON public.atlas_packets USING gin (used_concepts)"
+          }
+        ]
+      },
+      "dependencies": [
+        "PA-ID-001"
+      ],
+      "definitionOfDone": [
+        "complete live-vs-Drizzle diff",
+        "no unresolved type/nullability mismatch on active writer fields",
+        "active writer fields exposed in application schema"
+      ],
+      "nextAction": "Run the schema drift gates and classify each mismatch before altering tables.",
+      "prohibitedScope": [
+        "No ALTER TABLE during audit",
+        "No generic representation_id invention"
+      ]
+    },
+    {
+      "id": "PA-AST-001",
+      "order": 3,
+      "area": "AST",
+      "title": "AST-aware source understanding",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "No AST-aware implementation was located.",
+      "evidence": [],
+      "dependencies": [
+        "PA-ID-001",
+        "PA-SCHEMA-001"
+      ],
+      "definitionOfDone": [
+        "one real parser path proven for TS/JS",
+        "exact file/span output",
+        "symbol occurrence mapped to canonical packet/source",
+        "regex fallback clearly labeled"
+      ],
+      "nextAction": "Choose the real tree-sitter path as structural authority and reconcile its outputs to packet/source identity.",
+      "prohibitedScope": [
+        "Do not call regex extraction tree-sitter",
+        "Do not use tree_node_id as stable symbol identity"
+      ]
+    },
+    {
+      "id": "PA-EMB-001",
+      "order": 4,
+      "area": "SEMANTIC",
+      "title": "EmbeddingGemma semantic_768 contract",
+      "status": "FAIL",
+      "proof": "NOT_PROVEN",
+      "summary": "Embedding runtime or semantic_768 implementation is missing.",
+      "evidence": {
+        "service": {
+          "ok": true,
+          "endpoint": "/health",
+          "value": {
+            "status": "ok"
+          }
+        },
+        "hits": []
+      },
+      "dependencies": [
+        "PA-ID-001",
+        "PA-AST-001"
+      ],
+      "definitionOfDone": [
+        "output dimension exactly 768",
+        "model and revision recorded",
+        "normalization and pooling recorded",
+        "source text/hash recorded",
+        "packet_key manifest produced"
+      ],
+      "nextAction": "Run one bounded embedding manifest proof before ANN or reranker promotion.",
+      "prohibitedScope": [
+        "Do not use latent_64 for packet ANN",
+        "Do not mix PageRank or SOM coordinates into semantic_768"
+      ]
+    },
+    {
+      "id": "PA-CLS-001",
+      "order": 5,
+      "area": "CLASSIFICATION",
+      "title": "Domain classification lineage",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "Domain classification code/storage references exist, but producer, model revision, confidence, and active consumers require proof.",
+      "evidence": [],
+      "dependencies": [
+        "PA-AST-001",
+        "PA-EMB-001"
+      ],
+      "definitionOfDone": [
+        "classifier owner identified",
+        "input feature contract recorded",
+        "model/revision recorded",
+        "confidence stored",
+        "consumer purpose documented"
+      ],
+      "nextAction": "Trace domain_class from producer to retrieval/reranking consumers and add lineage receipts.",
+      "prohibitedScope": [
+        "Do not treat domain_class as canonical identity"
+      ]
+    },
+    {
+      "id": "PA-ONT-001",
+      "order": 6,
+      "area": "ONTOLOGY",
+      "title": "Ontology-linked tuples and concept edges",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "Concept/ontology/hyperedge code exists; canonical tuple identity, provenance, and retrieval use remain partially proven.",
+      "evidence": [],
+      "dependencies": [
+        "PA-AST-001",
+        "PA-CLS-001"
+      ],
+      "definitionOfDone": [
+        "tuple schema defined",
+        "source packet and exact span recorded",
+        "concept edge provenance recorded",
+        "duplicate tuple prevention defined"
+      ],
+      "nextAction": "Prove one ontology tuple from AST/source evidence through storage and retrieval.",
+      "prohibitedScope": [
+        "Do not synthesize ontology facts without source evidence"
+      ]
+    },
+    {
+      "id": "PA-PROJ-001",
+      "order": 7,
+      "area": "QDRANT",
+      "title": "Canonical Qdrant payload routing",
+      "status": "FAIL",
+      "proof": "PRODUCTION_DATA_PROVEN",
+      "summary": "Production payload identity remains incomplete or Qdrant is unavailable.",
+      "evidence": {
+        "pointsCount": 105761,
+        "sampled": 200,
+        "coverage": {
+          "packet_key": 0,
+          "source_ref": 200,
+          "workspace_id": 0,
+          "workspace_revision": 0,
+          "source_revision": 0,
+          "representation_id": 200,
+          "representation_revision": 0,
+          "schema_version": 0,
+          "stable_symbol_id": 0,
+          "symbol_version_id": 0,
+          "qdrant_point_id": 200
+        },
+        "signatures": {
+          "chunk_id,content_hash,packet_version,qdrant_point_id,representation_id,source_ref": 200
+        },
+        "collectionConfig": {
+          "params": {
+            "vectors": {
+              "content": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "error": {
+                "size": 768,
+                "distance": "Cosine"
+              },
+              "signature": {
+                "size": 768,
+                "distance": "Cosine"
+              }
+            },
+            "shard_number": 1,
+            "replication_factor": 1,
+            "write_consistency_factor": 1,
+            "on_disk_payload": true
+          },
+          "hnsw_config": {
+            "m": 16,
+            "ef_construct": 200,
+            "full_scan_threshold": 10000,
+            "max_indexing_threads": 0,
+            "on_disk": false
+          },
+          "optimizer_config": {
+            "deleted_threshold": 0.2,
+            "vacuum_min_vector_number": 1000,
+            "default_segment_number": 0,
+            "max_segment_size": null,
+            "memmap_threshold": null,
+            "indexing_threshold": 10000,
+            "flush_interval_sec": 5,
+            "max_optimization_threads": null,
+            "prevent_unoptimized": null
+          },
+          "wal_config": {
+            "wal_capacity_mb": 32,
+            "wal_segments_ahead": 0,
+            "wal_retain_closed": 1
+          },
+          "quantization_config": {
+            "scalar": {
+              "type": "int8",
+              "quantile": 0.99,
+              "always_ram": false
+            }
+          }
+        },
+        "vectorContracts": [
+          {
+            "name": "content",
+            "size": 768,
+            "distance": "Cosine"
+          },
+          {
+            "name": "error",
+            "size": 768,
+            "distance": "Cosine"
+          },
+          {
+            "name": "signature",
+            "size": 768,
+            "distance": "Cosine"
+          }
+        ]
+      },
+      "dependencies": [
+        "PA-ID-001",
+        "PA-EMB-001"
+      ],
+      "definitionOfDone": [
+        "active writer uses strict builder",
+        "production payload coverage is complete",
+        "repeated delivery does not create duplicates",
+        "packet_key join-back succeeds"
+      ],
+      "nextAction": "Prove the active writer seam, then produce a read-only production reconciliation plan.",
+      "prohibitedScope": [
+        "No production upsert during audit",
+        "No migration before rollback plan"
+      ]
+    },
+    {
+      "id": "PA-RET-001",
+      "order": 8,
+      "area": "RETRIEVAL",
+      "title": "Canonical retrieval and multi-hop route",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "HyperRAG/Go retrieval/RRF seams exist, but one canonical production route and bounded traversal receipt are not proven.",
+      "evidence": {
+        "hyperrag": [],
+        "rrf": []
+      },
+      "dependencies": [
+        "PA-PROJ-001",
+        "PA-ONT-001"
+      ],
+      "definitionOfDone": [
+        "one app-facing route selected",
+        "canonical Postgres hydration performed",
+        "stale revisions rejected",
+        "multi-hop traversal bounded",
+        "lane provenance preserved"
+      ],
+      "nextAction": "Select one production route and prove query → hydrate → expand → fuse → rerank → exact source.",
+      "prohibitedScope": [
+        "Do not keep duplicate TypeScript and Go orchestration owners"
+      ]
+    },
+    {
+      "id": "PA-GRAPH-001",
+      "order": 9,
+      "area": "GRAPH",
+      "title": "Persisted graph authority and PageRank",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "PageRank/GDS code exists; canonical property, snapshot lineage, and post-hydration attachment need runtime proof.",
+      "evidence": [],
+      "dependencies": [
+        "PA-RET-001"
+      ],
+      "definitionOfDone": [
+        "canonical PageRank property selected",
+        "graph snapshot ID recorded",
+        "PageRank attached after hydration",
+        "missing value handled nonfatally"
+      ],
+      "nextAction": "Prove persisted PageRank attachment on one canonical retrieval request.",
+      "prohibitedScope": [
+        "No per-request PageRank recomputation"
+      ]
+    },
+    {
+      "id": "PA-RERANK-001",
+      "order": 10,
+      "area": "RERANK",
+      "title": "XGBoost and neural reranker routing",
+      "status": "NOT_PROVEN",
+      "proof": "SOURCE_PRESENT",
+      "summary": "Reranker services/code exist; canonical post-hydration routing, feature schema, ablation, and identity preservation are not fully proven.",
+      "evidence": {
+        "xgboostService": {
+          "ok": true,
+          "endpoint": "/health",
+          "value": {
+            "status": "ok",
+            "model_loaded": true,
+            "model_type": "xgboost",
+            "features": [
+              "cosine_score",
+              "bm25_rank_norm",
+              "ann_turbovec_score",
+              "concept_overlap",
+              "same_feature",
+              "community_conf",
+              "reward_prior",
+              "domain_class_match",
+              "freshness_score",
+              "pagerank_score",
+              "som_cache_hit",
+              "provenance_git_age",
+              "packet_hit_count",
+              "n_retrieved",
+              "n_concepts",
+              "trace_score"
+            ]
+          }
+        },
+        "rerankerService": {
+          "ok": false,
+          "errors": [
+            "/health: fetch failed",
+            "/: fetch failed"
+          ]
+        },
+        "xgboostHits": [],
+        "rerankerHits": []
+      },
+      "dependencies": [
+        "PA-RET-001"
+      ],
+      "definitionOfDone": [
+        "packet-deduplicated inputs",
+        "feature order/version recorded",
+        "packet_key preserved",
+        "latency and fallback recorded",
+        "ablation beats simpler baseline"
+      ],
+      "nextAction": "Run trace_score-only, XGBoost, and neural-reranker ablations on canonically hydrated candidates.",
+      "prohibitedScope": [
+        "Do not score raw Qdrant points as authoritative candidates"
+      ]
+    },
+    {
+      "id": "PA-ACE-001",
+      "order": 11,
+      "area": "ACE",
+      "title": "Exact source and ACE provenance",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "Summary and ACE seams exist; exact current-source resolution and complete lane provenance remain unproven.",
+      "evidence": {
+        "summaries": [],
+        "ace": []
+      },
+      "dependencies": [
+        "PA-RERANK-001"
+      ],
+      "definitionOfDone": [
+        "every evidence item resolves to exact current source",
+        "stale summaries rejected",
+        "contributing lanes recorded",
+        "workspace/source revisions recorded where owned"
+      ],
+      "nextAction": "Prove one ACE packet from a canonical retrieval request with exact current source spans.",
+      "prohibitedScope": [
+        "Do not allow summary-only edit recommendations"
+      ]
+    },
+    {
+      "id": "PA-EDIT-001",
+      "order": 12,
+      "area": "EDIT",
+      "title": "Agentic file-edit recommendation readiness",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "Patch/error-fixing seams exist; exact target resolution, stale guards, and validation-plan completeness remain partial.",
+      "evidence": [],
+      "dependencies": [
+        "PA-ACE-001",
+        "PA-AST-001"
+      ],
+      "definitionOfDone": [
+        "file path and exact span resolved",
+        "source hash/revision recorded",
+        "symbol reconciled when available",
+        "retrieval/graph evidence recorded",
+        "validation commands identified",
+        "ambiguous targets rejected"
+      ],
+      "nextAction": "Build a read-only recommendation skill that outputs exact targets, evidence, confidence, and validation plan without editing.",
+      "prohibitedScope": [
+        "No file mutation",
+        "No summary-only target selection"
+      ]
+    },
+    {
+      "id": "PA-DAG-001",
+      "order": 13,
+      "area": "DAG",
+      "title": "Guarded mutation DAG",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "State-transition and artifact-lineage concepts exist; the complete validated mutation DAG is not proven.",
+      "evidence": [],
+      "dependencies": [
+        "PA-EDIT-001"
+      ],
+      "definitionOfDone": [
+        "read-only diagnosis state",
+        "validated plan state",
+        "dry-run state",
+        "stale revision gate",
+        "explicit approval boundary",
+        "post-mutation receipt"
+      ],
+      "nextAction": "Define and test state transitions before allowing any agentic write.",
+      "prohibitedScope": [
+        "No autonomous production mutation"
+      ]
+    },
+    {
+      "id": "PA-GPU-001",
+      "order": 14,
+      "area": "GPU",
+      "title": "cuVS exact oracle and CAGRA eligibility",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "GPU exact-search and CAGRA references were found; same-matrix parity and CAGRA eligibility remain gated.",
+      "evidence": [],
+      "dependencies": [
+        "PA-EMB-001",
+        "PA-PROJ-001"
+      ],
+      "definitionOfDone": [
+        "row-index manifest maps to packet_key",
+        "cuVS brute force matches PyTorch top-k",
+        "Qdrant HNSW recall measured on same matrix",
+        "VRAM fit documented"
+      ],
+      "nextAction": "Run exact semantic_768 parity before any CAGRA build.",
+      "prohibitedScope": [
+        "Do not run CAGRA before exact oracle parity"
+      ]
+    },
+    {
+      "id": "PA-OKF-001",
+      "order": 15,
+      "area": "KNOWLEDGE",
+      "title": "OKF knowledge bundle schema alignment",
+      "status": "PARTIAL",
+      "proof": "SOURCE_PRESENT",
+      "summary": "OKF staging is absent or contains frontmatter/schema gaps.",
+      "evidence": {
+        "exists": true,
+        "root": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\.okf",
+        "files": [
+          {
+            "path": "docs\\.okf\\IMPLEMENTATION_GUIDE.md",
+            "hasFrontmatter": false,
+            "sourceCount": 0,
+            "hasParentAtlasExtension": false,
+            "errors": [
+              "MISSING_FRONTMATTER",
+              "MISSING_TYPE",
+              "MISSING_TITLE"
+            ]
+          },
+          {
+            "path": "docs\\.okf\\dev\\local-source-inventory.md",
+            "hasFrontmatter": false,
+            "sourceCount": 0,
+            "hasParentAtlasExtension": false,
+            "errors": [
+              "MISSING_FRONTMATTER",
+              "MISSING_TYPE",
+              "MISSING_TITLE"
+            ]
+          },
+          {
+            "path": "docs\\.okf\\dev\\index.md",
+            "hasFrontmatter": false,
+            "sourceCount": 0,
+            "hasParentAtlasExtension": false,
+            "errors": [
+              "MISSING_FRONTMATTER",
+              "MISSING_TYPE",
+              "MISSING_TITLE"
+            ]
+          },
+          {
+            "path": "docs\\.okf\\dev\\gsd.md",
+            "hasFrontmatter": false,
+            "sourceCount": 0,
+            "hasParentAtlasExtension": false,
+            "errors": [
+              "MISSING_FRONTMATTER",
+              "MISSING_TYPE",
+              "MISSING_TITLE"
+            ]
+          }
+        ],
+        "validCount": 0,
+        "errorCount": 12
+      },
+      "dependencies": [
+        "PA-SCHEMA-001",
+        "PA-ONT-001"
+      ],
+      "definitionOfDone": [
+        "docs/.okf generated and canonical zones exist",
+        "every concept has type and title",
+        "Parent Atlas extension records gate/proof/workspace lineage",
+        "sources link to deterministic reports or canonical resources",
+        "generated documents are not treated as canonical facts"
+      ],
+      "nextAction": "Create a versioned Parent Atlas OKF profile and validate generated staging before promotion.",
+      "prohibitedScope": [
+        "Do not let OKF write directly to Postgres or Qdrant",
+        "Do not promote source-less generated claims"
+      ]
+    },
+    {
+      "id": "PA-OPENWIKI-001",
+      "order": 16,
+      "area": "KNOWLEDGE",
+      "title": "OpenWiki generated documentation integration",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "OpenWiki must consume promoted or validated OKF and write only to generated documentation staging.",
+      "evidence": {
+        "root": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\openwiki",
+        "rootExists": false,
+        "hits": [],
+        "generatedStagingPresent": false,
+        "canonicalPromotionPresent": false
+      },
+      "dependencies": [
+        "PA-OKF-001"
+      ],
+      "definitionOfDone": [
+        "OpenWiki input path is explicit",
+        "generated output path is isolated",
+        "OKF version/profile validation runs after generation",
+        "canonical promotion requires review"
+      ],
+      "nextAction": "Wire OpenWiki as a documentation consumer of validated OKF, not a canonical evidence writer.",
+      "prohibitedScope": [
+        "No direct writes to atlas_packets, graph tables, Qdrant, or Neo4j",
+        "No automatic canonical promotion"
+      ]
+    },
+    {
+      "id": "PA-NLP-001",
+      "order": 17,
+      "area": "NLP",
+      "title": "PyTorch GPU POS and token-classification sidecar",
+      "status": "PARTIAL",
+      "proof": "RUNTIME_SMOKE_PROVEN",
+      "summary": "The NLP sidecar is checked for PyTorch/CUDA and POS or token-classification capabilities.",
+      "evidence": {
+        "health": {
+          "ok": true,
+          "endpoint": "/health",
+          "value": {
+            "status": "ok",
+            "model": "gemma4-legal-iq4xs-direct.gguf",
+            "runtime": {
+              "pythonExecutable": "C:\\Python313\\python.exe",
+              "pythonVersion": "3.13.5",
+              "environmentType": "system-python"
+            },
+            "capabilities": {
+              "spacy": true,
+              "langextract": true,
+              "tree_sitter": true,
+              "treesitter_chunker": true,
+              "ast_grep": true,
+              "torch": true
+            },
+            "imports": {
+              "langextract": {
+                "available": true,
+                "version": "0.1.0",
+                "modulePath": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\langextract\\__init__.py",
+                "importVerified": true,
+                "editableSource": null,
+                "beautifulsoup4": {
+                  "available": true,
+                  "version": "4.13.4",
+                  "modulePath": null,
+                  "importVerified": true
+                }
+              },
+              "treesitterChunker": {
+                "available": true,
+                "version": "4.0.0",
+                "modulePath": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\chunker\\__init__.py",
+                "moduleName": "chunker",
+                "importVerified": true,
+                "fixtureVerified": false
+              },
+              "treeSitterLanguagePack": {
+                "available": true,
+                "version": "0.9.0",
+                "importVerified": true
+              },
+              "astGrepPy": {
+                "available": true,
+                "version": "0.44.1",
+                "importVerified": true
+              }
+            },
+            "timestamp": 1785800463560
+          }
+        },
+        "hits": [],
+        "torchReported": true,
+        "posReported": false
+      },
+      "dependencies": [
+        "PA-AST-001",
+        "PA-EMB-001"
+      ],
+      "definitionOfDone": [
+        "health reports model ID and revision",
+        "CUDA/device status reported",
+        "POS/token classification response schema versioned",
+        "output offsets map to exact source text",
+        "fallback lane clearly labeled"
+      ],
+      "nextAction": "Expose a typed capabilities endpoint and prove one GPU POS/tagging fixture with exact offsets.",
+      "prohibitedScope": [
+        "Do not replace tree-sitter structure with POS tags",
+        "Do not use NLP labels as canonical identity"
+      ]
+    },
+    {
+      "id": "PA-REP-001",
+      "order": 18,
+      "area": "SEMANTIC",
+      "title": "Representation and collection alignment",
+      "status": "PARTIAL",
+      "proof": "PRODUCTION_DATA_PROVEN",
+      "summary": "Semantic collection dimensions and latent storage lanes are checked independently.",
+      "evidence": {
+        "qdrantVectorContracts": [
+          {
+            "name": "content",
+            "size": 768,
+            "distance": "Cosine"
+          },
+          {
+            "name": "error",
+            "size": 768,
+            "distance": "Cosine"
+          },
+          {
+            "name": "signature",
+            "size": 768,
+            "distance": "Cosine"
+          }
+        ],
+        "latent64Stored": true,
+        "latent64Clean": true,
+        "latent128SourcePresent": false,
+        "latentHits": [],
+        "collectionHits": []
+      },
+      "dependencies": [
+        "PA-EMB-001",
+        "PA-PROJ-001"
+      ],
+      "definitionOfDone": [
+        "semantic_768 collection has a 768-dimensional vector contract",
+        "latent_64 rows are exactly 256 bytes when float32",
+        "latent_128 has an explicit schema before use",
+        "every representation has ID, dimension, and revision",
+        "readers consume only the intended representation lane"
+      ],
+      "nextAction": "Generate a representation registry and collection compatibility matrix before promoting latent or GPU lanes.",
+      "prohibitedScope": [
+        "Do not use latent_64 for packet ANN",
+        "Do not infer latent_128 storage from file names",
+        "Do not mix legacy 384 and canonical 768 collections"
+      ]
+    },
+    {
+      "id": "PA-OTEL-001",
+      "order": 19,
+      "area": "OBSERVABILITY",
+      "title": "OpenTelemetry SDK and Collector wiring",
+      "status": "NOT_PROVEN",
+      "proof": "SOURCE_PRESENT",
+      "summary": "Existing OTel SDK, OTLP endpoints, Collector configuration, and resource attributes were inventoried.",
+      "evidence": {
+        "repositoryHits": [],
+        "configPath": "C:\\Users\\james\\Videos\\deeds-web-app\\config\\otel-collector.yaml",
+        "configExists": false,
+        "httpHealth": {
+          "ok": false,
+          "errors": [
+            "/: fetch failed",
+            "/health: fetch failed",
+            "/healthz: fetch failed",
+            "/v1/traces: fetch failed"
+          ]
+        },
+        "grpc": {
+          "ok": false,
+          "host": "127.0.0.1",
+          "port": 4317,
+          "error": "connect ECONNREFUSED 127.0.0.1:4317"
+        },
+        "routingConnectorPresent": false,
+        "routingProcessorPresent": false,
+        "memoryLimiterPresent": false,
+        "batchPresent": false,
+        "redactionPresent": false,
+        "resourceKeyCoverage": {
+          "service.name": false,
+          "service.version": false,
+          "deployment.environment.name": false,
+          "parent_atlas.workspace_id": false,
+          "parent_atlas.workspace_revision": false,
+          "parent_atlas.lane": false,
+          "parent_atlas.component": false,
+          "parent_atlas.runtime": false,
+          "parent_atlas.instance_id": false
+        },
+        "laneCoverage": {
+          "graphify": false,
+          "semantic_retrieval": false,
+          "gpu_oracle": false,
+          "kafka_projection": false,
+          "agent_workflow": false
+        }
+      },
+      "dependencies": [],
+      "definitionOfDone": [
+        "OTLP gRPC ingress on 4317 reachable",
+        "OTLP HTTP ingress on 4318 configured or explicitly disabled",
+        "service.name and Parent Atlas resource schema emitted",
+        "memory limiter and batch processors configured",
+        "sensitive attributes redacted before export"
+      ],
+      "nextAction": "Normalize Parent Atlas resource attributes and prove one trace from each active runtime.",
+      "prohibitedScope": [
+        "Do not put packet_key, query text, or source content in stable resource attributes",
+        "Do not treat OTel as canonical business-event storage"
+      ]
+    },
+    {
+      "id": "PA-OTEL-002",
+      "order": 20,
+      "area": "OBSERVABILITY",
+      "title": "Routing connector and lane isolation",
+      "status": "NOT_PROVEN",
+      "proof": "NOT_PROVEN",
+      "summary": "Routing-connector availability, default routing, Parent Atlas lanes, batching, redaction, and memory controls were checked.",
+      "evidence": {
+        "routingConnectorPresent": false,
+        "deprecatedRoutingProcessorPresent": false,
+        "resourceKeyCoverage": {
+          "service.name": false,
+          "service.version": false,
+          "deployment.environment.name": false,
+          "parent_atlas.workspace_id": false,
+          "parent_atlas.workspace_revision": false,
+          "parent_atlas.lane": false,
+          "parent_atlas.component": false,
+          "parent_atlas.runtime": false,
+          "parent_atlas.instance_id": false
+        },
+        "laneCoverage": {
+          "graphify": false,
+          "semantic_retrieval": false,
+          "gpu_oracle": false,
+          "kafka_projection": false,
+          "agent_workflow": false
+        },
+        "memoryLimiterPresent": false,
+        "batchPresent": false,
+        "redactionPresent": false,
+        "resourceSchemaComplete": false
+      },
+      "dependencies": [
+        "PA-OTEL-001"
+      ],
+      "definitionOfDone": [
+        "routing connector used instead of routing processor",
+        "default route proven",
+        "graphify route proven",
+        "retrieval route proven",
+        "GPU route proven",
+        "agent route proven",
+        "projection route proven",
+        "no sensitive high-cardinality resource routing keys"
+      ],
+      "nextAction": "Add a Collector routing connector with graphify, retrieval, GPU, projection, agent, and default pipelines; then run a blackholed-exporter containment test.",
+      "prohibitedScope": [
+        "Do not claim complete fault isolation inside one Collector process",
+        "Do not route by packet_key, trace ID, span name, or query text"
+      ]
+    },
+    {
+      "id": "PA-QDRANT-TRANSPORT-001",
+      "order": 21,
+      "area": "QDRANT",
+      "title": "Qdrant HTTP and gRPC transport health",
+      "status": "PASS",
+      "proof": "RUNTIME_SMOKE_PROVEN",
+      "summary": "Qdrant REST health and gRPC TCP reachability were checked separately.",
+      "evidence": {
+        "http": {
+          "ok": true,
+          "endpoint": "/collections",
+          "value": {
+            "result": {
+              "collections": [
+                {
+                  "name": "BifrostSemanticCachePlugin"
+                },
+                {
+                  "name": "agent_memory_observations"
+                },
+                {
+                  "name": "audio_segments"
+                },
+                {
+                  "name": "case_chunks"
+                },
+                {
+                  "name": "chat_messages"
+                },
+                {
+                  "name": "chunks_web_search"
+                },
+                {
+                  "name": "code_llm_outputs"
+                },
+                {
+                  "name": "codebase_chunks_384"
+                },
+                {
+                  "name": "codebase_chunks_384_hybrid"
+                },
+                {
+                  "name": "codebase_chunks_512"
+                },
+                {
+                  "name": "codebase_chunks_768"
+                },
+                {
+                  "name": "codebase_chunks_768_v2"
+                },
+                {
+                  "name": "codebase_chunks_sparse_test_v1"
+                },
+                {
+                  "name": "codebase_topology_128"
+                },
+                {
+                  "name": "codebase_topology_64"
+                },
+                {
+                  "name": "court_opinions"
+                },
+                {
+                  "name": "diagnosis_embeddings"
+                },
+                {
+                  "name": "document_knowledge_768"
+                },
+                {
+                  "name": "document_tags"
+                },
+                {
+                  "name": "embedding_cache"
+                },
+                {
+                  "name": "error_embeddings"
+                },
+                {
+                  "name": "evidence_items"
+                },
+                {
+                  "name": "evidence_items_clip_512"
+                },
+                {
+                  "name": "evidence_vectors"
+                },
+                {
+                  "name": "external_programming_docs_768"
+                },
+                {
+                  "name": "feature_maps"
+                },
+                {
+                  "name": "fictional_case_chunks"
+                },
+                {
+                  "name": "knowledge_base"
+                },
+                {
+                  "name": "legal_canon_chunks"
+                },
+                {
+                  "name": "legal_cases"
+                },
+                {
+                  "name": "legal_documents"
+                },
+                {
+                  "name": "legal_glossary"
+                },
+                {
+                  "name": "llm_response_cache"
+                },
+                {
+                  "name": "phase110_baseline_768"
+                },
+                {
+                  "name": "poi_profiles"
+                },
+                {
+                  "name": "research_memory_768"
+                },
+                {
+                  "name": "sc_deedssocraticode_metadata"
+                },
+                {
+                  "name": "summary_lenses_768"
+                },
+                {
+                  "name": "synthesis_memory_768"
+                },
+                {
+                  "name": "topic_clusters"
+                }
+              ]
+            },
+            "status": "ok",
+            "time": 0.000932487
+          }
+        },
+        "grpc": {
+          "ok": true,
+          "host": "127.0.0.1",
+          "port": 6334
+        },
+        "repositoryHits": [],
+        "grpcClientReferences": [],
+        "httpClientReferences": []
+      },
+      "dependencies": [
+        "PA-PROJ-001"
+      ],
+      "definitionOfDone": [
+        "HTTP collections/health endpoint succeeds",
+        "gRPC port 6334 accepts connections",
+        "active client transport is documented",
+        "HTTP and gRPC target the same Qdrant instance",
+        "one bounded gRPC collection/read request is proven"
+      ],
+      "nextAction": "Add a real Qdrant gRPC health/list-collections smoke using the installed client, while retaining HTTP for inspection and administrative validation.",
+      "prohibitedScope": [
+        "Do not infer gRPC API correctness from TCP connectivity alone",
+        "Do not send production upserts during a transport smoke"
+      ]
+    },
+    {
+      "id": "PA-DAG-LOG-001",
+      "order": 22,
+      "area": "OBSERVABILITY",
+      "title": "Debounced DAG orchestration logger",
+      "status": "FAIL",
+      "proof": "NOT_PROVEN",
+      "summary": "The orchestration logger is checked for keyed debounce, immediate critical-event delivery, bounded pending state, shutdown flush, and OpenTelemetry integration.",
+      "evidence": {
+        "hits": [],
+        "debounceHits": [],
+        "otelHits": [],
+        "dagHits": [],
+        "lifecycleHits": [],
+        "criticalEventHits": [],
+        "config": {
+          "debounceMs": 250,
+          "maxPending": 1000
+        }
+      },
+      "dependencies": [
+        "PA-DAG-001",
+        "PA-OTEL-001"
+      ],
+      "definitionOfDone": [
+        "progress and heartbeat events coalesce by workflow/run/node/event key",
+        "errors, approvals, rejections, terminal transitions, rollback events, and receipts bypass debounce",
+        "canonical DAG state mutations are never debounced",
+        "pending keys are bounded and overflow is observable",
+        "flushAll runs on transition barriers and shutdown",
+        "OTel span start/end boundaries are not suppressed",
+        "debounced count and original time range are preserved",
+        "unit tests use fake timers and deterministic clocks"
+      ],
+      "nextAction": "Wire one reusable DebouncedDagLogger around noncanonical orchestration telemetry, then prove coalescing, critical bypass, bounded overflow, transition flush, and shutdown flush.",
+      "prohibitedScope": [
+        "Do not debounce Postgres state writes or mutation receipts",
+        "Do not debounce error/terminal/approval events",
+        "Do not use debounce as event deduplication or idempotency",
+        "Do not retain source content, prompts, packet_key, or symbol IDs as OTel resource attributes"
+      ]
+    },
+    {
+      "id": "PA-OPS-001",
+      "order": 23,
+      "area": "OPERATIONS",
+      "title": "Graphify freshness and stage isolation",
+      "status": "FAIL",
+      "proof": "PRODUCTION_DATA_PROVEN",
+      "summary": "Graph artifact is stale or missing.",
+      "evidence": {
+        "exists": true,
+        "ageMinutes": 753.1173984456381,
+        "size": 26984163,
+        "modifiedAt": "2026-08-03T11:07:56.506Z"
+      },
+      "dependencies": [],
+      "definitionOfDone": [
+        "graph artifact below freshness threshold",
+        "code graph can refresh without optional SOM/topology stages",
+        "stage receipts emitted"
+      ],
+      "nextAction": "Repair graph-only stage isolation; keep this separate from Qdrant writer work.",
+      "prohibitedScope": [
+        "No broad SOM retraining during graph-only repair"
+      ]
+    }
+  ],
+  "board": {
+    "BLOCKED": [
+      {
+        "taskId": "PA-AST-001",
+        "priority": "P0",
+        "column": "BLOCKED",
+        "area": "AST",
+        "title": "AST-aware source understanding",
+        "ownerComponent": "ast",
+        "exactFiles": [
+          "scripts/atlas/ast-treesitter-facts.mjs"
+        ],
+        "dependencies": [
+          "PA-ID-001",
+          "PA-SCHEMA-001"
+        ],
+        "definitionOfDone": [
+          "one real parser path proven for TS/JS",
+          "exact file/span output",
+          "symbol occurrence mapped to canonical packet/source",
+          "regex fallback clearly labeled"
+        ],
+        "validationCommands": [
+          "npm run batch:a:validate"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not call regex extraction tree-sitter",
+          "Do not use tree_node_id as stable symbol identity"
+        ],
+        "reason": "No AST-aware implementation was located."
+      },
+      {
+        "taskId": "PA-EMB-001",
+        "priority": "P0",
+        "column": "BLOCKED",
+        "area": "SEMANTIC",
+        "title": "EmbeddingGemma semantic_768 contract",
+        "ownerComponent": "semantic",
+        "exactFiles": [
+          "scripts/smoke/embeddinggemma-smoke.mjs",
+          "src/lib/server/ai/embedding*"
+        ],
+        "dependencies": [
+          "PA-ID-001",
+          "PA-AST-001"
+        ],
+        "definitionOfDone": [
+          "output dimension exactly 768",
+          "model and revision recorded",
+          "normalization and pooling recorded",
+          "source text/hash recorded",
+          "packet_key manifest produced"
+        ],
+        "validationCommands": [
+          "npm run smoke:embeddinggemma"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not use latent_64 for packet ANN",
+          "Do not mix PageRank or SOM coordinates into semantic_768"
+        ],
+        "reason": "Embedding runtime or semantic_768 implementation is missing."
+      },
+      {
+        "taskId": "PA-CLS-001",
+        "priority": "P1",
+        "column": "BLOCKED",
+        "area": "CLASSIFICATION",
+        "title": "Domain classification lineage",
+        "ownerComponent": "classification",
+        "exactFiles": [
+          "scripts/atlas/*classification*",
+          "src/lib/server/**/*classifier*"
+        ],
+        "dependencies": [
+          "PA-AST-001",
+          "PA-EMB-001"
+        ],
+        "definitionOfDone": [
+          "classifier owner identified",
+          "input feature contract recorded",
+          "model/revision recorded",
+          "confidence stored",
+          "consumer purpose documented"
+        ],
+        "validationCommands": [
+          "npm run batch:f:validate"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not treat domain_class as canonical identity"
+        ],
+        "reason": "Domain classification code/storage references exist, but producer, model revision, confidence, and active consumers require proof."
+      },
+      {
+        "taskId": "PA-ONT-001",
+        "priority": "P1",
+        "column": "BLOCKED",
+        "area": "ONTOLOGY",
+        "title": "Ontology-linked tuples and concept edges",
+        "ownerComponent": "ontology",
+        "exactFiles": [
+          "scripts/atlas/*concept*",
+          "scripts/atlas/*ontology*"
+        ],
+        "dependencies": [
+          "PA-AST-001",
+          "PA-CLS-001"
+        ],
+        "definitionOfDone": [
+          "tuple schema defined",
+          "source packet and exact span recorded",
+          "concept edge provenance recorded",
+          "duplicate tuple prevention defined"
+        ],
+        "validationCommands": [
+          "npm run batch:c:validate"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not synthesize ontology facts without source evidence"
+        ],
+        "reason": "Concept/ontology/hyperedge code exists; canonical tuple identity, provenance, and retrieval use remain partially proven."
+      },
+      {
+        "taskId": "PA-PROJ-001",
+        "priority": "P1",
+        "column": "BLOCKED",
+        "area": "QDRANT",
+        "title": "Canonical Qdrant payload routing",
+        "ownerComponent": "qdrant",
+        "exactFiles": [
+          "src/lib/server/retrieval/qdrant-sync-payload.ts",
+          "src/lib/server/workers/qdrant-sync-worker.ts",
+          "scripts/atlas/prove-qdrant-packet-joinback.mts"
+        ],
+        "dependencies": [
+          "PA-ID-001",
+          "PA-EMB-001"
+        ],
+        "definitionOfDone": [
+          "active writer uses strict builder",
+          "production payload coverage is complete",
+          "repeated delivery does not create duplicates",
+          "packet_key join-back succeeds"
+        ],
+        "validationCommands": [
+          "npx tsx scripts/atlas/prove-qdrant-packet-joinback.mts",
+          "npx tsx scripts/atlas/validate-parent-atlas-canonical-routing.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No production upsert during audit",
+          "No migration before rollback plan"
+        ],
+        "reason": "Production payload identity remains incomplete or Qdrant is unavailable."
+      },
+      {
+        "taskId": "PA-RET-001",
+        "priority": "P1",
+        "column": "BLOCKED",
+        "area": "RETRIEVAL",
+        "title": "Canonical retrieval and multi-hop route",
+        "ownerComponent": "retrieval",
+        "exactFiles": [
+          "src/lib/server/retrieval/canonical-hyperrag-adapter.ts",
+          "src/lib/server/retrieval/*orchestrator*"
+        ],
+        "dependencies": [
+          "PA-PROJ-001",
+          "PA-ONT-001"
+        ],
+        "definitionOfDone": [
+          "one app-facing route selected",
+          "canonical Postgres hydration performed",
+          "stale revisions rejected",
+          "multi-hop traversal bounded",
+          "lane provenance preserved"
+        ],
+        "validationCommands": [
+          "npm run smoke:retrieval:canonical-rerank"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not keep duplicate TypeScript and Go orchestration owners"
+        ],
+        "reason": "HyperRAG/Go retrieval/RRF seams exist, but one canonical production route and bounded traversal receipt are not proven."
+      },
+      {
+        "taskId": "PA-GRAPH-001",
+        "priority": "P1",
+        "column": "BLOCKED",
+        "area": "GRAPH",
+        "title": "Persisted graph authority and PageRank",
+        "ownerComponent": "graph",
+        "exactFiles": [
+          "src/lib/server/**/*pagerank*",
+          "src/lib/server/**/*neo4j-gds*"
+        ],
+        "dependencies": [
+          "PA-RET-001"
+        ],
+        "definitionOfDone": [
+          "canonical PageRank property selected",
+          "graph snapshot ID recorded",
+          "PageRank attached after hydration",
+          "missing value handled nonfatally"
+        ],
+        "validationCommands": [
+          "npm run atlas:som:audit"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No per-request PageRank recomputation"
+        ],
+        "reason": "PageRank/GDS code exists; canonical property, snapshot lineage, and post-hydration attachment need runtime proof."
+      },
+      {
+        "taskId": "PA-RERANK-001",
+        "priority": "P1",
+        "column": "BLOCKED",
+        "area": "RERANK",
+        "title": "XGBoost and neural reranker routing",
+        "ownerComponent": "rerank",
+        "exactFiles": [
+          "scripts/atlas/serve-xgboost-reranker.py",
+          "src/lib/server/retrieval/**/*rerank*"
+        ],
+        "dependencies": [
+          "PA-RET-001"
+        ],
+        "definitionOfDone": [
+          "packet-deduplicated inputs",
+          "feature order/version recorded",
+          "packet_key preserved",
+          "latency and fallback recorded",
+          "ablation beats simpler baseline"
+        ],
+        "validationCommands": [
+          "npm run reranker:health",
+          "npm run batch:g:validate"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not score raw Qdrant points as authoritative candidates"
+        ],
+        "reason": "Reranker services/code exist; canonical post-hydration routing, feature schema, ablation, and identity preservation are not fully proven."
+      },
+      {
+        "taskId": "PA-ACE-001",
+        "priority": "P2",
+        "column": "BLOCKED",
+        "area": "ACE",
+        "title": "Exact source and ACE provenance",
+        "ownerComponent": "ace",
+        "exactFiles": [
+          "src/lib/server/ace/ace-materializer.ts",
+          "src/lib/server/**/*summary*"
+        ],
+        "dependencies": [
+          "PA-RERANK-001"
+        ],
+        "definitionOfDone": [
+          "every evidence item resolves to exact current source",
+          "stale summaries rejected",
+          "contributing lanes recorded",
+          "workspace/source revisions recorded where owned"
+        ],
+        "validationCommands": [
+          "npm run test -- src/lib/server/ace/ace-materializer.spec.ts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not allow summary-only edit recommendations"
+        ],
+        "reason": "Summary and ACE seams exist; exact current-source resolution and complete lane provenance remain unproven."
+      },
+      {
+        "taskId": "PA-EDIT-001",
+        "priority": "P2",
+        "column": "BLOCKED",
+        "area": "EDIT",
+        "title": "Agentic file-edit recommendation readiness",
+        "ownerComponent": "edit",
+        "exactFiles": [
+          "src/lib/server/agent/**/*patch*",
+          "src/lib/server/mcp/**/*prepare*patch*"
+        ],
+        "dependencies": [
+          "PA-ACE-001",
+          "PA-AST-001"
+        ],
+        "definitionOfDone": [
+          "file path and exact span resolved",
+          "source hash/revision recorded",
+          "symbol reconciled when available",
+          "retrieval/graph evidence recorded",
+          "validation commands identified",
+          "ambiguous targets rejected"
+        ],
+        "validationCommands": [
+          "npm run test -- --run patch-tournament"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No file mutation",
+          "No summary-only target selection"
+        ],
+        "reason": "Patch/error-fixing seams exist; exact target resolution, stale guards, and validation-plan completeness remain partial."
+      },
+      {
+        "taskId": "PA-DAG-001",
+        "priority": "P2",
+        "column": "BLOCKED",
+        "area": "DAG",
+        "title": "Guarded mutation DAG",
+        "ownerComponent": "dag",
+        "exactFiles": [
+          "src/lib/server/**/*state-transition*",
+          "src/lib/server/**/*analysis*"
+        ],
+        "dependencies": [
+          "PA-EDIT-001"
+        ],
+        "definitionOfDone": [
+          "read-only diagnosis state",
+          "validated plan state",
+          "dry-run state",
+          "stale revision gate",
+          "explicit approval boundary",
+          "post-mutation receipt"
+        ],
+        "validationCommands": [
+          "npm run test -- --run state-transition"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No autonomous production mutation"
+        ],
+        "reason": "State-transition and artifact-lineage concepts exist; the complete validated mutation DAG is not proven."
+      },
+      {
+        "taskId": "PA-GPU-001",
+        "priority": "P2",
+        "column": "BLOCKED",
+        "area": "GPU",
+        "title": "cuVS exact oracle and CAGRA eligibility",
+        "ownerComponent": "gpu",
+        "exactFiles": [
+          "../scripts/atlas/gpu-knn-search.py",
+          "../scripts/atlas/**/*cuvs*"
+        ],
+        "dependencies": [
+          "PA-EMB-001",
+          "PA-PROJ-001"
+        ],
+        "definitionOfDone": [
+          "row-index manifest maps to packet_key",
+          "cuVS brute force matches PyTorch top-k",
+          "Qdrant HNSW recall measured on same matrix",
+          "VRAM fit documented"
+        ],
+        "validationCommands": [
+          "npm run atlas:gpu:knn:health",
+          "npm run atlas:phase3:smoke"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not run CAGRA before exact oracle parity"
+        ],
+        "reason": "GPU exact-search and CAGRA references were found; same-matrix parity and CAGRA eligibility remain gated."
+      },
+      {
+        "taskId": "PA-OPENWIKI-001",
+        "priority": "P3",
+        "column": "BLOCKED",
+        "area": "KNOWLEDGE",
+        "title": "OpenWiki generated documentation integration",
+        "ownerComponent": "knowledge",
+        "exactFiles": [
+          "../docs/openwiki/**/*",
+          "../scripts/**/*openwiki*"
+        ],
+        "dependencies": [
+          "PA-OKF-001"
+        ],
+        "definitionOfDone": [
+          "OpenWiki input path is explicit",
+          "generated output path is isolated",
+          "OKF version/profile validation runs after generation",
+          "canonical promotion requires review"
+        ],
+        "validationCommands": [
+          "npx tsx scripts/atlas/validate-openwiki-okf.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No direct writes to atlas_packets, graph tables, Qdrant, or Neo4j",
+          "No automatic canonical promotion"
+        ],
+        "reason": "OpenWiki must consume promoted or validated OKF and write only to generated documentation staging."
+      },
+      {
+        "taskId": "PA-OTEL-002",
+        "priority": "P3",
+        "column": "BLOCKED",
+        "area": "OBSERVABILITY",
+        "title": "Routing connector and lane isolation",
+        "ownerComponent": "observability",
+        "exactFiles": [
+          "../config/otel-collector.yaml",
+          "../scripts/atlas/**/*otel*"
+        ],
+        "dependencies": [
+          "PA-OTEL-001"
+        ],
+        "definitionOfDone": [
+          "routing connector used instead of routing processor",
+          "default route proven",
+          "graphify route proven",
+          "retrieval route proven",
+          "GPU route proven",
+          "agent route proven",
+          "projection route proven",
+          "no sensitive high-cardinality resource routing keys"
+        ],
+        "validationCommands": [
+          "npx tsx scripts/atlas/prove-otel-routing-isolation.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not claim complete fault isolation inside one Collector process",
+          "Do not route by packet_key, trace ID, span name, or query text"
+        ],
+        "reason": "Routing-connector availability, default routing, Parent Atlas lanes, batching, redaction, and memory controls were checked."
+      },
+      {
+        "taskId": "PA-DAG-LOG-001",
+        "priority": "P3",
+        "column": "BLOCKED",
+        "area": "OBSERVABILITY",
+        "title": "Debounced DAG orchestration logger",
+        "ownerComponent": "observability",
+        "exactFiles": [
+          "src/lib/server/observability/dag-debounced-logger.ts",
+          "src/lib/server/**/*orchestrat*",
+          "src/lib/server/**/*workflow*"
+        ],
+        "dependencies": [
+          "PA-DAG-001",
+          "PA-OTEL-001"
+        ],
+        "definitionOfDone": [
+          "progress and heartbeat events coalesce by workflow/run/node/event key",
+          "errors, approvals, rejections, terminal transitions, rollback events, and receipts bypass debounce",
+          "canonical DAG state mutations are never debounced",
+          "pending keys are bounded and overflow is observable",
+          "flushAll runs on transition barriers and shutdown",
+          "OTel span start/end boundaries are not suppressed",
+          "debounced count and original time range are preserved",
+          "unit tests use fake timers and deterministic clocks"
+        ],
+        "validationCommands": [
+          "npm run test -- --run src/lib/server/observability/dag-debounced-logger.spec.ts",
+          "npx tsx scripts/atlas/smoke-dag-logger-otel.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not debounce Postgres state writes or mutation receipts",
+          "Do not debounce error/terminal/approval events",
+          "Do not use debounce as event deduplication or idempotency",
+          "Do not retain source content, prompts, packet_key, or symbol IDs as OTel resource attributes"
+        ],
+        "reason": "The orchestration logger is checked for keyed debounce, immediate critical-event delivery, bounded pending state, shutdown flush, and OpenTelemetry integration."
+      },
+      {
+        "taskId": "PA-OPS-001",
+        "priority": "P3",
+        "column": "BLOCKED",
+        "area": "OPERATIONS",
+        "title": "Graphify freshness and stage isolation",
+        "ownerComponent": "operations",
+        "exactFiles": [
+          "scripts/graphify-daily.mjs",
+          "docs/graph/codebase-graph.json"
+        ],
+        "dependencies": [],
+        "definitionOfDone": [
+          "graph artifact below freshness threshold",
+          "code graph can refresh without optional SOM/topology stages",
+          "stage receipts emitted"
+        ],
+        "validationCommands": [
+          "npm run graphify:daily"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No broad SOM retraining during graph-only repair"
+        ],
+        "reason": "Graph artifact is stale or missing."
+      }
+    ],
+    "READY": [
+      {
+        "taskId": "PA-OTEL-001",
+        "priority": "P3",
+        "column": "READY",
+        "area": "OBSERVABILITY",
+        "title": "OpenTelemetry SDK and Collector wiring",
+        "ownerComponent": "observability",
+        "exactFiles": [
+          "../config/**/*otel*",
+          "src/**/*telemetry*",
+          "../scripts/**/*otel*"
+        ],
+        "dependencies": [],
+        "definitionOfDone": [
+          "OTLP gRPC ingress on 4317 reachable",
+          "OTLP HTTP ingress on 4318 configured or explicitly disabled",
+          "service.name and Parent Atlas resource schema emitted",
+          "memory limiter and batch processors configured",
+          "sensitive attributes redacted before export"
+        ],
+        "validationCommands": [
+          "npx tsx scripts/atlas/smoke-otel-parent-atlas.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not put packet_key, query text, or source content in stable resource attributes",
+          "Do not treat OTel as canonical business-event storage"
+        ],
+        "reason": "Existing OTel SDK, OTLP endpoints, Collector configuration, and resource attributes were inventoried."
+      }
+    ],
+    "IN_PROGRESS": [],
+    "VERIFY": [
+      {
+        "taskId": "PA-SCHEMA-001",
+        "priority": "P0",
+        "column": "VERIFY",
+        "area": "SCHEMA",
+        "title": "Live Postgres and application schema alignment",
+        "ownerComponent": "schema",
+        "exactFiles": [
+          "src/lib/server/db/schema/atlas-packets.ts",
+          "../scripts/atlas/schema/compare-schema-snapshots.mjs"
+        ],
+        "dependencies": [
+          "PA-ID-001"
+        ],
+        "definitionOfDone": [
+          "complete live-vs-Drizzle diff",
+          "no unresolved type/nullability mismatch on active writer fields",
+          "active writer fields exposed in application schema"
+        ],
+        "validationCommands": [
+          "npm run schema:ci:full"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No ALTER TABLE during audit",
+          "No generic representation_id invention"
+        ],
+        "reason": "Live atlas_packets fields and indexes were inspected; application-schema parity still requires repository comparison."
+      },
+      {
+        "taskId": "PA-OKF-001",
+        "priority": "P2",
+        "column": "VERIFY",
+        "area": "KNOWLEDGE",
+        "title": "OKF knowledge bundle schema alignment",
+        "ownerComponent": "knowledge",
+        "exactFiles": [
+          "../docs/.okf/**/*",
+          "../scripts/atlas/**/*okf*"
+        ],
+        "dependencies": [
+          "PA-SCHEMA-001",
+          "PA-ONT-001"
+        ],
+        "definitionOfDone": [
+          "docs/.okf generated and canonical zones exist",
+          "every concept has type and title",
+          "Parent Atlas extension records gate/proof/workspace lineage",
+          "sources link to deterministic reports or canonical resources",
+          "generated documents are not treated as canonical facts"
+        ],
+        "validationCommands": [
+          "npx tsx scripts/atlas/validate-okf-parent-atlas.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not let OKF write directly to Postgres or Qdrant",
+          "Do not promote source-less generated claims"
+        ],
+        "reason": "OKF staging is absent or contains frontmatter/schema gaps."
+      },
+      {
+        "taskId": "PA-NLP-001",
+        "priority": "P3",
+        "column": "VERIFY",
+        "area": "NLP",
+        "title": "PyTorch GPU POS and token-classification sidecar",
+        "ownerComponent": "nlp",
+        "exactFiles": [
+          "../scripts/launch-miniforge-nlp-sidecar.ps1",
+          "../scripts/**/*nlp*",
+          "../scripts/**/*pos*"
+        ],
+        "dependencies": [
+          "PA-AST-001",
+          "PA-EMB-001"
+        ],
+        "definitionOfDone": [
+          "health reports model ID and revision",
+          "CUDA/device status reported",
+          "POS/token classification response schema versioned",
+          "output offsets map to exact source text",
+          "fallback lane clearly labeled"
+        ],
+        "validationCommands": [
+          "npm run nlp:sidecar:health",
+          "npx tsx scripts/atlas/prove-nlp-pos-sidecar.mts"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not replace tree-sitter structure with POS tags",
+          "Do not use NLP labels as canonical identity"
+        ],
+        "reason": "The NLP sidecar is checked for PyTorch/CUDA and POS or token-classification capabilities."
+      },
+      {
+        "taskId": "PA-REP-001",
+        "priority": "P3",
+        "column": "VERIFY",
+        "area": "SEMANTIC",
+        "title": "Representation and collection alignment",
+        "ownerComponent": "semantic",
+        "exactFiles": [
+          "src/lib/server/db/schema/atlas-packets.ts",
+          "src/lib/server/retrieval/**/*qdrant*",
+          "../scripts/atlas/**/*latent*"
+        ],
+        "dependencies": [
+          "PA-EMB-001",
+          "PA-PROJ-001"
+        ],
+        "definitionOfDone": [
+          "semantic_768 collection has a 768-dimensional vector contract",
+          "latent_64 rows are exactly 256 bytes when float32",
+          "latent_128 has an explicit schema before use",
+          "every representation has ID, dimension, and revision",
+          "readers consume only the intended representation lane"
+        ],
+        "validationCommands": [
+          "npm run atlas:audit:embeddings -- --verbose",
+          "npm run atlas:som:audit"
+        ],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "Do not use latent_64 for packet ANN",
+          "Do not infer latent_128 storage from file names",
+          "Do not mix legacy 384 and canonical 768 collections"
+        ],
+        "reason": "Semantic collection dimensions and latent storage lanes are checked independently."
+      }
+    ],
+    "DONE": [
+      {
+        "taskId": "PA-ID-001",
+        "priority": "P0",
+        "column": "DONE",
+        "area": "IDENTITY",
+        "title": "Canonical packet identity",
+        "ownerComponent": "identity",
+        "exactFiles": [
+          "src/lib/server/db/schema/atlas-packets.ts"
+        ],
+        "dependencies": [],
+        "definitionOfDone": [
+          "packet_key coverage equals total qualified rows",
+          "source_ref coverage equals total qualified rows",
+          "workspace_id coverage equals total qualified rows"
+        ],
+        "validationCommands": [
+          "npm run schema:inspect",
+          "npm run schema:drift:check"
+        ],
+        "expectedProof": "PRODUCTION_DATA_PROVEN",
+        "prohibitedScope": [
+          "Do not derive packet identity from qdrant_point_id",
+          "Do not derive workspace_id from unrelated metadata"
+        ],
+        "reason": "Canonical packet/source/workspace identity is complete in live Postgres."
+      },
+      {
+        "taskId": "PA-QDRANT-TRANSPORT-001",
+        "priority": "P3",
+        "column": "DONE",
+        "area": "QDRANT",
+        "title": "Qdrant HTTP and gRPC transport health",
+        "ownerComponent": "qdrant",
+        "exactFiles": [
+          "src/lib/server/vector/**/*qdrant*",
+          "../scripts/atlas/**/*qdrant*"
+        ],
+        "dependencies": [
+          "PA-PROJ-001"
+        ],
+        "definitionOfDone": [
+          "HTTP collections/health endpoint succeeds",
+          "gRPC port 6334 accepts connections",
+          "active client transport is documented",
+          "HTTP and gRPC target the same Qdrant instance",
+          "one bounded gRPC collection/read request is proven"
+        ],
+        "validationCommands": [
+          "npx tsx scripts/atlas/smoke-qdrant-transports.mts"
+        ],
+        "expectedProof": "RUNTIME_SMOKE_PROVEN",
+        "prohibitedScope": [
+          "Do not infer gRPC API correctness from TCP connectivity alone",
+          "Do not send production upserts during a transport smoke"
+        ],
+        "reason": "Qdrant REST health and gRPC TCP reachability were checked separately."
+      }
+    ],
+    "DEFERRED": [
+      {
+        "taskId": "PA-GRAPH-099",
+        "priority": "P3",
+        "column": "DEFERRED",
+        "area": "GRAPH",
+        "title": "Derived graph enhancements",
+        "ownerComponent": "graph",
+        "exactFiles": [],
+        "dependencies": [
+          "PA-ID-001",
+          "PA-PROJ-001",
+          "PA-RET-001",
+          "PA-GRAPH-001"
+        ],
+        "definitionOfDone": [
+          "canonical graph snapshot proven",
+          "PageRank lineage proven",
+          "derived edge usefulness measured"
+        ],
+        "validationCommands": [],
+        "expectedProof": "FIXTURE_PROVEN",
+        "prohibitedScope": [
+          "No SHARES_CLUSTER or HIGH_AUTHORITY edges before prerequisites"
+        ],
+        "reason": "Derived graph enhancements are premature while canonical identity and retrieval remain incomplete."
+      }
+    ]
+  },
+  "recommendations": {
+    "today": {
+      "taskId": "PA-OTEL-001",
+      "title": "OpenTelemetry SDK and Collector wiring",
+      "action": "Existing OTel SDK, OTLP endpoints, Collector configuration, and resource attributes were inventoried.",
+      "definitionOfDone": [
+        "OTLP gRPC ingress on 4317 reachable",
+        "OTLP HTTP ingress on 4318 configured or explicitly disabled",
+        "service.name and Parent Atlas resource schema emitted",
+        "memory limiter and batch processors configured",
+        "sensitive attributes redacted before export"
+      ],
+      "validationCommands": [
+        "npx tsx scripts/atlas/smoke-otel-parent-atlas.mts"
+      ]
+    },
+    "dailyReadOnly": [
+      "Postgres identity coverage",
+      "Qdrant canonical payload sample",
+      "graph artifact freshness",
+      "model/sidecar health",
+      "git/workspace revision drift",
+      "OKF schema/profile validation",
+      "NLP GPU capability/model revision",
+      "OTLP gRPC/HTTP collector reachability",
+      "Qdrant HTTP/gRPC transport health",
+      "Collector dropped/refused/export-failure metrics",
+      "DAG logger pending-key count and coalesced-event count"
+    ],
+    "nightlyBounded": [
+      "isolated Qdrant worker fixture",
+      "EmbeddingGemma manifest proof",
+      "bounded canonical retrieval receipt",
+      "exact-source ACE sample",
+      "OKF generated-staging validation",
+      "POS/token-classification exact-offset fixture",
+      "OTel per-lane trace routing smoke",
+      "Qdrant gRPC list/read smoke",
+      "DAG logger coalescing and transition-barrier flush smoke"
+    ],
+    "weeklyManual": [
+      "cuVS exact vs Qdrant HNSW parity",
+      "XGBoost and neural reranker ablation",
+      "cuGraph/NetworkX parity",
+      "production projection reconciliation",
+      "agentic mutation DAG replay",
+      "OpenWiki generated-output review and OKF normalization",
+      "representation/collection compatibility audit",
+      "OTel exporter blackhole/backpressure containment experiment",
+      "Collector process split assessment for noisy lanes",
+      "DAG logger debounce tuning from measured event rates"
+    ]
+  }
+}

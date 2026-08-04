@@ -29,9 +29,11 @@ export type AtlasIdentityLane =
 
 export const atlasPackets = pgTable('atlas_packets', {
   // Primary identity spine (canonical — Postgres is truth)
-  packetId: uuid('packet_id').primaryKey().defaultRandom(),
+  packetId: text('packet_id').primaryKey(),
   packetUlid: text('packet_ulid'),
-  packetKey: text('packet_key').notNull(),
+  packetKey: text('packet_key'),
+  artifactId: text('artifact_id'),
+  // col 2: populated in 58,304/61,659 rows by ingest-qdrant-to-atlas-packets.mjs
   sourceRef: text('source_ref').notNull(),
   canonicalSourceRef: text('canonical_source_ref'),
   directoryPath: text('directory_path').notNull(),
@@ -90,6 +92,9 @@ export const atlasPackets = pgTable('atlas_packets', {
   latent64: bytea('latent_64'),
 
   // Phase 110: Workspace-scoped caching + representation versioning
+  workspaceId: text('workspace_id'),
+  // Workspace identity for cache scoping (can be null for legacy packets)
+
   workspaceRevision: integer('workspace_revision').notNull().default(0),
   // Incremented by operator when embedding model changes. Used in cache key.
   // Cache stale rejection: if current workspace_revision > cached, skip cache.
@@ -97,6 +102,17 @@ export const atlasPackets = pgTable('atlas_packets', {
   representationRevision: integer('representation_revision').notNull().default(0),
   // Tracks representation contract version (e.g., v1 = 384d, v2 = 768d).
   // Prevents 384d vectors being re-used when schema upgrades to 768d.
+
+  // Representation lineage (cols 135-140 in live DB)
+  // source_representation_id: lane constant for raw embedding (e.g. 'semantic_768')
+  // projection_representation_id: lane constant for compressed projection (e.g. 'latent_64')
+  // Actively read/written by feature-tracking-layer.ts and trace-reranker.ts.
+  sourceRepresentationId: text('source_representation_id'),
+  sourceDimension: integer('source_dimension'),
+  projectionRepresentationId: text('projection_representation_id'),
+  projectionDimension: integer('projection_dimension'),
+  encoderRevision: text('encoder_revision'),
+  somRevision: text('som_revision'),
 
   embeddingDigest: text('embedding_digest'),
   // SHA-256 of embedding vector (hex string). Immutable anchor.

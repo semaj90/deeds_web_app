@@ -35,6 +35,10 @@ export interface MultiVectorRequest {
 export interface MultiVectorResult {
   candidates: Array<{
     id: string;
+    packetKey?: string;
+    sourceRef?: string;
+    symbolVersionId?: string;
+    qdrantPointId?: string;
     score: number;
     normalized_score: number;
     content_score: number;
@@ -101,11 +105,24 @@ export async function executeMultiVectorRetrieval(
       score_threshold: 0.5,
     });
 
-    contentResults = contentResponse.map((point) => ({
-      id: String(point.id),
-      score: point.score,
-      payload: point.payload,
-    }));
+    contentResults = contentResponse
+      .map((point) => {
+        const payload = (point.payload ?? {}) as Record<string, any>;
+        const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
+        const sourceRef = payload['source_ref'];
+        if (typeof packetKey !== 'string' || packetKey.length === 0) return null;
+        if (typeof sourceRef !== 'string' || sourceRef.length === 0) return null;
+        return {
+          id: String(point.id),
+          score: point.score,
+          payload,
+          packetKey,
+          sourceRef,
+          symbolVersionId: typeof payload['symbol_version_id'] === 'string' ? payload['symbol_version_id'] : undefined,
+          qdrantPointId: String(point.id),
+        };
+      })
+      .filter((point): point is NonNullable<typeof point> => point !== null) as QdrantSearchResult[];
 
     contentMs = performance.now() - contentStart;
   } catch (err) {
@@ -128,11 +145,24 @@ export async function executeMultiVectorRetrieval(
       score_threshold: 0.5,
     });
 
-    summaryResults = summaryResponse.map((point) => ({
-      id: String(point.id),
-      score: point.score,
-      payload: point.payload,
-    }));
+    summaryResults = summaryResponse
+      .map((point) => {
+        const payload = (point.payload ?? {}) as Record<string, any>;
+        const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
+        const sourceRef = payload['source_ref'];
+        if (typeof packetKey !== 'string' || packetKey.length === 0) return null;
+        if (typeof sourceRef !== 'string' || sourceRef.length === 0) return null;
+        return {
+          id: String(point.id),
+          score: point.score,
+          payload,
+          packetKey,
+          sourceRef,
+          symbolVersionId: typeof payload['symbol_version_id'] === 'string' ? payload['symbol_version_id'] : undefined,
+          qdrantPointId: String(point.id),
+        };
+      })
+      .filter((point): point is QdrantSearchResult => point !== null);
 
     summaryMs = performance.now() - summaryStart;
   } catch (err) {
@@ -155,11 +185,24 @@ export async function executeMultiVectorRetrieval(
       score_threshold: 0.5,
     });
 
-    titleResults = titleResponse.map((point) => ({
-      id: String(point.id),
-      score: point.score,
-      payload: point.payload,
-    }));
+    titleResults = titleResponse
+      .map((point) => {
+        const payload = (point.payload ?? {}) as Record<string, any>;
+        const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
+        const sourceRef = payload['source_ref'];
+        if (typeof packetKey !== 'string' || packetKey.length === 0) return null;
+        if (typeof sourceRef !== 'string' || sourceRef.length === 0) return null;
+        return {
+          id: String(point.id),
+          score: point.score,
+          payload,
+          packetKey,
+          sourceRef,
+          symbolVersionId: typeof payload['symbol_version_id'] === 'string' ? payload['symbol_version_id'] : undefined,
+          qdrantPointId: String(point.id),
+        };
+      })
+      .filter((point): point is QdrantSearchResult => point !== null);
 
     titleMs = performance.now() - titleStart;
   } catch (err) {
@@ -183,11 +226,24 @@ export async function executeMultiVectorRetrieval(
         with_payload: true,
       });
 
-      keywordResults = keywordResponse.map((point: any) => ({
-        id: String(point.id),
-        score: point.score,
-        payload: point.payload,
-      }));
+        keywordResults = keywordResponse
+          .map((point: any) => {
+            const payload = (point.payload ?? {}) as Record<string, any>;
+            const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
+            const sourceRef = payload['source_ref'];
+            if (typeof packetKey !== 'string' || packetKey.length === 0) return null;
+            if (typeof sourceRef !== 'string' || sourceRef.length === 0) return null;
+            return {
+              id: String(point.id),
+              score: point.score,
+              payload,
+              packetKey,
+              sourceRef,
+              symbolVersionId: typeof payload['symbol_version_id'] === 'string' ? payload['symbol_version_id'] : undefined,
+              qdrantPointId: String(point.id),
+            };
+          })
+          .filter((point: QdrantSearchResult | null): point is QdrantSearchResult => point !== null);
     } catch {
       // Fallback: If BM25 not available, use empty results (non-blocking)
       keywordResults = [];
@@ -207,12 +263,16 @@ export async function executeMultiVectorRetrieval(
   const totalMs = performance.now() - startTime;
 
   // ── Build response ─────────────────────────────────────────────────────────
-  return {
-    candidates: fused.map((candidate) => ({
-      id: candidate.id,
-      score: candidate.rrf_score,
-      normalized_score: candidate.normalizedScore,
-      content_score: candidate.contentScore,
+    return {
+      candidates: fused.map((candidate) => ({
+        id: candidate.id,
+        packetKey: candidate.packetKey,
+        sourceRef: candidate.sourceRef,
+        symbolVersionId: candidate.symbolVersionId,
+        qdrantPointId: candidate.qdrantPointId,
+        score: candidate.rrf_score,
+        normalized_score: candidate.normalizedScore,
+        content_score: candidate.contentScore,
       summary_score: candidate.summaryScore,
       title_score: candidate.titleScore,
       keyword_score: candidate.keywordScore,

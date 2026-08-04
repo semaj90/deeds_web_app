@@ -30,6 +30,28 @@ const SPARSE_LIMIT = RETRIEVAL_LIMITS.sparseTopK;
 
 let sparseRetriever: ReturnType<typeof createBm42SparseRetriever> | null = null;
 
+function pickString(...values: unknown[]): string | null {
+  for (const value of values) {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+    }
+  }
+  return null;
+}
+
+function pickNullableString(...values: unknown[]): string | null {
+  return pickString(...values);
+}
+
+function pickNumber(...values: unknown[]): number | null {
+  for (const value of values) {
+    const parsed = typeof value === 'number' ? value : Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
 async function getDb() {
   const mod = await import('$lib/server/db/client.js');
   return mod.db;
@@ -109,12 +131,18 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
     return laneCandidates.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetKey,
       packetKey: lc.packetKey,
+      symbolVersionId: lc.symbolVersionId ?? lc.packetKey,
       sourceRef: lc.sourceRef,
       summary: (lc.metadata?.summary as string) || '',
       content: (lc.metadata?.content as string) || '',
       score: lc.score ?? 0,
       scoreSource: 'qdrant' as const,
       embeddingLane: 'bm42' as const, // Canonical sparse vector name per qdrant-collection-contracts.ts
+      workspaceRevision: pickString(lc.workspaceRevision, lc.metadata?.workspace_revision, lc.metadata?.workspaceRevision),
+      sourceRevision: pickNullableString(lc.sourceRevision, lc.metadata?.source_revision, lc.metadata?.sourceRevision),
+      representationId: pickNullableString(lc.representationId, lc.metadata?.representation_id, lc.metadata?.representationId),
+      representationRevision: pickNumber(lc.representationRevision, lc.metadata?.representation_revision, lc.metadata?.representationRevision),
+      qdrantPointId: lc.qdrantPointId ?? lc.packetKey,
     }));
   } catch {
     return [];
@@ -171,11 +199,16 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
       return (result.rows as BM25Row[]).map(row => ({
         id: row.id,
         packetKey: (row.metadata?.packet_key as string) || row.id,
+        symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
         sourceRef: row.source_ref || '',
         summary: row.summary || '',
         content: row.content || '',
         score: Math.max(0.5, Math.min(1.0, row.score)), // Normalize to 0.5-1.0 range
         scoreSource: 'postgres_trigram' as const,
+        workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
+        sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
+        representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
+        representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
       }));
     }
 
@@ -244,11 +277,16 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
     return (result.rows as TrigRamRow[]).map(row => ({
       id: row.id,
       packetKey: (row.metadata?.packet_key as string) || row.id,
+      symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
       sourceRef: row.source_ref || '',
       summary: row.summary || '',
       content: row.content || '',
       score: row.score,
       scoreSource: 'postgres_trigram' as const, // Explicitly named as fallback
+      workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
+      sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
+      representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
+      representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
     }));
   } catch (error) {
     console.warn('Lexical trigram fallback failed:', error);
@@ -287,12 +325,18 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
           const candidate: Candidate = {
             id: String(hit.id),
             packetKey: (hit.payload?.packet_key as string) || String(hit.id),
+            symbolVersionId: (hit.payload?.symbol_version_id as string) || (hit.payload?.packet_key as string) || String(hit.id),
             sourceRef: (hit.payload?.source_ref as string) || '',
             summary: (hit.payload?.summary as string) || '',
             content: (hit.payload?.content as string) || '',
             score: hit.score,
             scoreSource: 'qdrant_768',
             embeddingLane: 'dense_768',
+            workspaceRevision: pickString(hit.payload?.workspace_revision, hit.payload?.workspaceRevision),
+            sourceRevision: pickNullableString(hit.payload?.source_revision, hit.payload?.sourceRevision),
+            representationId: pickNullableString(hit.payload?.representation_id, hit.payload?.representationId),
+            representationRevision: pickNumber(hit.payload?.representation_revision, hit.payload?.representationRevision),
+            qdrantPointId: String(hit.id),
           };
 
           const existing = resultsByKey.get(candidate.packetKey) ?? resultsByKey.get(candidate.id);
@@ -329,12 +373,18 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
     return results.results.map(hit => ({
       id: String(hit.id),
       packetKey: (hit.payload?.packet_key as string) || String(hit.id),
+      symbolVersionId: (hit.payload?.symbol_version_id as string) || (hit.payload?.packet_key as string) || String(hit.id),
       sourceRef: (hit.payload?.source_ref as string) || '',
       summary: (hit.payload?.summary as string) || '',
       content: (hit.payload?.content as string) || '',
       score: hit.score * 0.95,
       scoreSource: 'qdrant_768' as const,
       embeddingLane: 'dense_768' as const,
+      workspaceRevision: pickString(hit.payload?.workspace_revision, hit.payload?.workspaceRevision),
+      sourceRevision: pickNullableString(hit.payload?.source_revision, hit.payload?.sourceRevision),
+      representationId: pickNullableString(hit.payload?.representation_id, hit.payload?.representationId),
+      representationRevision: pickNumber(hit.payload?.representation_revision, hit.payload?.representationRevision),
+      qdrantPointId: String(hit.id),
     }));
   } catch (fallbackError) {
     console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);
@@ -390,11 +440,16 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
     return (result.rows as ExactRow[]).map(row => ({
       id: row.id,
       packetKey: (row.metadata?.packet_key as string) || row.id,
+      symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
       sourceRef: row.source_ref,
       summary: row.summary || '',
       content: row.content || '',
       score: row.score,
       scoreSource: 'exact_symbol' as const,
+      workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
+      sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
+      representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
+      representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
     }));
   } catch (error) {
     console.warn('Exact match retrieval failed:', error);
@@ -450,11 +505,16 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
     return (result.rows as ASTRow[]).map(row => ({
       id: row.id,
       packetKey: (row.metadata?.packet_key as string) || (row.output_meta?.packet_key as string) || row.id,
+      symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.output_meta?.symbol_version_id as string) || (row.metadata?.packet_key as string) || (row.output_meta?.packet_key as string) || row.id,
       sourceRef: row.source_ref,
       summary: row.summary || '',
       content: row.content || '',
       score: row.score,
       scoreSource: 'ast_tree' as const,
+      workspaceRevision: pickString(row.metadata?.workspace_revision, row.output_meta?.workspace_revision, row.metadata?.workspaceRevision, row.output_meta?.workspaceRevision),
+      sourceRevision: pickNullableString(row.metadata?.source_revision, row.output_meta?.source_revision, row.metadata?.sourceRevision, row.output_meta?.sourceRevision),
+      representationId: pickNullableString(row.metadata?.representation_id, row.output_meta?.representation_id, row.metadata?.representationId, row.output_meta?.representationId),
+      representationRevision: pickNumber(row.metadata?.representation_revision, row.output_meta?.representation_revision, row.metadata?.representationRevision, row.output_meta?.representationRevision),
     }));
   } catch (error) {
     console.warn('AST match retrieval failed:', error);
@@ -567,11 +627,16 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
           candidates.push({
             id: row.id,
             packetKey: (row.metadata?.packet_key as string) || row.id,
+            symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
             sourceRef: row.source_ref || '',
             summary: row.summary || '',
             content: row.content || '',
             score: 0.7,
             scoreSource: 'rg_keyword' as const,
+            workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
+            sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
+            representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
+            representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
           });
         }
       } catch {

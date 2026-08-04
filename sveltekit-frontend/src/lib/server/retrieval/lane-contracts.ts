@@ -10,6 +10,12 @@ export interface LaneCandidate {
   packetKey: string;       // required — RRF dedup key
   packetId?: string;       // Postgres UUID
   qdrantPointId?: string;  // Qdrant point ID
+  symbolVersionId?: string; // exact version-bound symbol identity
+  workspaceId?: string;     // canonical workspace identity when available
+  workspaceRevision?: string | null;
+  sourceRevision?: string | null;
+  representationId?: string | null;
+  representationRevision?: number | null;
 
   sourceRef: string;       // required — identity anchor
   rank: number;            // 1-based position within lane

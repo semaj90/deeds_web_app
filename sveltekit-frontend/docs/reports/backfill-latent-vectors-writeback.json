@@ -1,9 +1,14 @@
 {
-  "timestamp": "2026-08-03T09:00:38.848Z",
-  "total_processed": 105761,
+  "timestamp": "2026-08-03T19:41:41.063Z",
+  "checkpoint": {
+    "path": "C:\\Users\\james\\Videos\\deeds-web-app\\.tmp\\backfill-latent-vectors.checkpoint.json",
+    "resume": false,
+    "datasetDigest": "collection:codebase_chunks_768;limit:5000;batch:100"
+  },
+  "total_processed": 5000,
   "postgres": {
     "updated": 0,
-    "notMatched": 105761,
+    "notMatched": 5000,
     "matchRate": 0
   },
   "reasons": {
@@ -11,6 +16,6 @@
     "packet_key": 0,
     "source_ref": 0,
     "jsonb_fallback": 0,
-    "skipped": 211522
+    "skipped": 10000
   }
 }

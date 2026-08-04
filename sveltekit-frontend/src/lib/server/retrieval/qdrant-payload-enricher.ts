@@ -25,17 +25,57 @@ async function getQdrant() {
   return mod.qdrant;
 }
 
+function pickString(...values: unknown[]): string | null {
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const trimmed = value.trim();
+    if (trimmed) return trimmed;
+  }
+  return null;
+}
+
+function pickTextOrNumber(...values: unknown[]): string | null {
+  for (const value of values) {
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (trimmed) return trimmed;
+      continue;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+  }
+  return null;
+}
+
+function pickNumber(...values: unknown[]): number | null {
+  for (const value of values) {
+    const parsed = typeof value === 'number' ? value : Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return null;
+}
+
 export interface EnrichedPayload {
   // Feature identity
   packet_key: string;
+  qdrant_point_id: string | null;
   feature_id: string;
   source_ref: string;
+  workspace_id: string;
   directory_path: string;
   symbol: string;
   kind: string;
   tree_node_id: string | null;
+  stable_symbol_id: string | null;
+  symbol_version_id: string | null;
   content_hash: string | null;
   workspace_revision: string | null;
+  source_revision: string | null;
+  representation_id: string | null;
+  representation_revision: number | null;
+  schema_version: string;
   feature_label: string | null;
 
   // Statistics (from feature_statistics)
@@ -75,6 +115,11 @@ export interface EnrichedPayload {
   // Audit
   enriched_at: string;
   enriched_version: string;
+}
+
+export interface QdrantPayloadLineageOverrides {
+  workspaceId?: string | null;
+  schemaVersion?: string | null;
 }
 
 export class QdrantPayloadEnricher {
@@ -155,7 +200,7 @@ export class QdrantPayloadEnricher {
 
     const packetRows = sourceRef
       ? await (await getDb()).execute(sql`
-      SELECT packet_key, tree_node_id, feature_label, sha256, metadata
+      SELECT packet_key, tree_node_id, feature_label, sha256, metadata, workspace_revision, representation_revision, qdrant_point_id
       FROM atlas_packets
       WHERE source_ref = ${sourceRef}
          OR canonical_source_ref = ${sourceRef}
@@ -166,68 +211,7 @@ export class QdrantPayloadEnricher {
     `)
       : { rows: [] as any[] };
     const packet = packetRows.rows[0] as any | undefined;
-    const packetMetadata = (packet?.metadata ?? {}) as Record<string, unknown>;
-    const workspaceRevision =
-      typeof packetMetadata.workspace_revision === 'string'
-        ? packetMetadata.workspace_revision
-        : typeof packetMetadata.workspaceRevision === 'string'
-          ? packetMetadata.workspaceRevision
-          : typeof packetMetadata.revision === 'string'
-            ? packetMetadata.revision
-            : null;
-
-    // Parse noun_terms from JSONB
-    const nounTerms = chunk.noun_terms
-      ? Object.keys(chunk.noun_terms as Record<string, any>)
-      : Array.isArray(chunk.semanticTags)
-        ? chunk.semanticTags.map((tag: unknown) => String(tag))
-        : [];
-
-    // Extract semantic tags from analysis
-    const semanticTags = this.extractSemanticTags(chunk);
-
-    // Build payload
-    const payload: EnrichedPayload = {
-      packet_key: packet?.packet_key ? String(packet.packet_key) : String(chunk.packet_key ?? chunk.id ?? chunk.qdrant_id ?? chunk.source_ref),
-      feature_id: String(chunk.featureId ?? chunk.feature_id ?? sourceRef ?? chunk.id ?? chunk.qdrantId ?? 'unknown'),
-      source_ref: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
-      directory_path: chunk.directoryPath || chunk.directory_path || this.extractDirectoryPath(sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? '')),
-      symbol: chunk.symbol || chunk.functionSymbol || '',
-      kind: chunk.kind || chunk.sourceKind || chunk.source_kind || '',
-      tree_node_id: packet?.tree_node_id ? String(packet.tree_node_id) : (chunk.tree_node_id ?? null),
-      content_hash: packet?.sha256 ? String(packet.sha256) : (chunk.contentHash ?? chunk.content_hash ?? null),
-      workspace_revision: workspaceRevision,
-      feature_label: packet?.feature_label ?? chunk.feature_label ?? null,
-
-      pagerank: chunk.pageRankScore || chunk.page_rank_score || 0,
-      hits_authority: chunk.hitsAuthority || chunk.hits_authority || 0,
-      hits_hub: chunk.hitsHub || chunk.hits_hub || 0,
-      community: chunk.communityId || chunk.community_id || 0,
-      som_cluster: chunk.somCluster || chunk.som_cluster || 0,
-      som_cell_x: chunk.somCellX || chunk.som_cell_x || 0,
-      som_cell_y: chunk.somCellY || chunk.som_cell_y || 0,
-      cluster_degree: chunk.clusterDegree || chunk.cluster_degree || 0,
-      in_degree: chunk.inDegree || chunk.in_degree || 0,
-      out_degree: chunk.outDegree || chunk.out_degree || 0,
-      betweenness: chunk.betweenness || 0,
-      freshness_days: chunk.freshnessDays || chunk.freshness_days || 0,
-
-      noun_terms: nounTerms,
-      keywords: this.extractKeywords(chunk),
-      entity_tags: this.extractEntityTags(chunk),
-      error_patterns: this.extractErrorPatterns(chunk),
-      semantic_tags: semanticTags,
-
-      chunk_summary: chunk.signature || chunk.summary || '',
-      chunk_start_line: chunk.lineStart || chunk.start_line || 0,
-      chunk_end_line: chunk.lineEnd || chunk.end_line || 0,
-      language: this.detectLanguage(sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? '')),
-
-      enriched_at: new Date().toISOString(),
-      enriched_version: '1.0'
-    };
-
-    return payload;
+    return buildEnrichedPayload(chunk, packet);
   }
 
   private extractDirectoryPath(sourceRef: string): string {
@@ -355,6 +339,194 @@ export class QdrantPayloadEnricher {
       } as any);
     }
   }
+}
+
+export function buildEnrichedPayload(
+  chunk: any,
+  packet: any = undefined,
+  overrides: QdrantPayloadLineageOverrides = {}
+): EnrichedPayload {
+  const sourceRef = String(
+    chunk.sourceRef ??
+    chunk.relativePath ??
+    chunk.source_ref ??
+    chunk.relative_path ??
+    ''
+  ).trim();
+  const packetMetadata = (packet?.metadata ?? {}) as Record<string, unknown>;
+  const chunkMetadata = (chunk?.metadata ?? {}) as Record<string, unknown>;
+  const workspaceId = pickString(
+    overrides.workspaceId,
+    packetMetadata.workspace_id,
+    packetMetadata.workspaceId,
+    chunkMetadata.workspace_id,
+    chunkMetadata.workspaceId,
+    chunk.workspace_id,
+    chunk.workspaceId
+  );
+  if (!workspaceId) {
+    throw new Error(`workspace_id is required for canonical Qdrant payloads (source_ref=${sourceRef || 'unknown'})`);
+  }
+  const schemaVersion =
+    pickString(
+      overrides.schemaVersion,
+      packetMetadata.schema_version,
+      packetMetadata.schemaVersion,
+      chunkMetadata.schema_version,
+      chunkMetadata.schemaVersion
+    ) ?? 'atlas.qdrant.payload.v1';
+  const workspaceRevision =
+    pickTextOrNumber(
+      packet?.workspace_revision,
+      packet?.workspaceRevision,
+      packetMetadata.workspace_revision,
+      packetMetadata.workspaceRevision,
+      chunkMetadata.workspace_revision,
+      chunkMetadata.workspaceRevision,
+      chunk.workspace_revision,
+      chunk.workspaceRevision,
+      packetMetadata.revision
+    );
+  const sourceRevision =
+    pickString(
+      packetMetadata.source_revision,
+      packetMetadata.sourceRevision,
+      packetMetadata.source_revision_id,
+      packetMetadata.sourceRevisionId,
+      chunkMetadata.source_revision,
+      chunkMetadata.sourceRevision,
+      chunkMetadata.source_revision_id,
+      chunkMetadata.sourceRevisionId,
+      chunk.source_revision,
+      chunk.sourceRevision,
+      chunk.source_revision_id,
+      chunk.sourceRevisionId
+    );
+  const stableSymbolId =
+    pickString(
+      packetMetadata.stable_symbol_id,
+      packetMetadata.stableSymbolId,
+      packetMetadata.symbol_id,
+      packetMetadata.symbolId,
+      chunkMetadata.stable_symbol_id,
+      chunkMetadata.stableSymbolId,
+      chunkMetadata.symbol_id,
+      chunkMetadata.symbolId,
+      chunk.stable_symbol_id,
+      chunk.stableSymbolId
+    );
+  const symbolVersionId =
+    pickString(
+      packetMetadata.symbol_version_id,
+      packetMetadata.symbolVersionId,
+      chunkMetadata.symbol_version_id,
+      chunkMetadata.symbolVersionId,
+      chunk.symbol_version_id,
+      chunk.symbolVersionId
+    );
+  const representationId =
+    pickString(
+      packet?.source_representation_id,
+      packet?.sourceRepresentationId,
+      packet?.projection_representation_id,
+      packet?.projectionRepresentationId,
+      packetMetadata.representation_id,
+      packetMetadata.representationId,
+      chunkMetadata.representation_id,
+      chunkMetadata.representationId,
+      chunk.representation_id,
+      chunk.representationId
+    ) ?? 'semantic_768';
+  const representationRevision =
+    pickNumber(
+      packet?.representation_revision,
+      packet?.representationRevision,
+      packetMetadata.representation_revision,
+      packetMetadata.representationRevision,
+      chunkMetadata.representation_revision,
+      chunkMetadata.representationRevision,
+      chunk.representation_revision,
+      chunk.representationRevision
+    );
+  const qdrantPointId =
+    typeof packet?.qdrant_point_id === 'string'
+      ? packet.qdrant_point_id
+      : typeof packet?.qdrantPointId === 'string'
+        ? packet.qdrantPointId
+        : String(chunk.qdrantId ?? chunk.qdrant_id ?? chunk.id ?? chunk.source_ref ?? '');
+
+  const nounTerms = chunk.noun_terms
+    ? Object.keys(chunk.noun_terms as Record<string, any>)
+    : Array.isArray(chunk.semanticTags)
+      ? chunk.semanticTags.map((tag: unknown) => String(tag))
+      : [];
+  const semanticTags = Array.isArray(chunk.semanticTags)
+    ? chunk.semanticTags.map((tag: unknown) => String(tag))
+    : [];
+
+  return {
+    packet_key: packet?.packet_key ? String(packet.packet_key) : String(chunk.packet_key ?? chunk.id ?? chunk.source_ref ?? ''),
+    qdrant_point_id: qdrantPointId || null,
+    feature_id: String(chunk.featureId ?? chunk.feature_id ?? sourceRef ?? chunk.id ?? chunk.qdrantId ?? 'unknown'),
+    source_ref: sourceRef || String(chunk.sourceRef ?? chunk.source_ref ?? chunk.relativePath ?? chunk.id ?? ''),
+    workspace_id: workspaceId,
+    directory_path: chunk.directoryPath || chunk.directory_path || sourceRef.split('/').slice(0, -1).join('/') || 'root',
+    symbol: chunk.symbol || chunk.functionSymbol || '',
+    kind: chunk.kind || chunk.sourceKind || chunk.source_kind || '',
+    tree_node_id: packet?.tree_node_id ? String(packet.tree_node_id) : (chunk.tree_node_id ?? null),
+    stable_symbol_id: stableSymbolId,
+    symbol_version_id: symbolVersionId,
+    content_hash: packet?.sha256 ? String(packet.sha256) : (chunk.contentHash ?? chunk.content_hash ?? null),
+    workspace_revision: workspaceRevision,
+    source_revision: sourceRevision,
+    representation_id: representationId,
+    representation_revision: representationRevision,
+    schema_version: schemaVersion,
+    feature_label: packet?.feature_label ?? chunk.feature_label ?? null,
+
+    pagerank: chunk.pageRankScore || chunk.page_rank_score || 0,
+    hits_authority: chunk.hitsAuthority || chunk.hits_authority || 0,
+    hits_hub: chunk.hitsHub || chunk.hits_hub || 0,
+    community: chunk.communityId || chunk.community_id || 0,
+    som_cluster: chunk.somCluster || chunk.som_cluster || 0,
+    som_cell_x: chunk.somCellX || chunk.som_cell_x || 0,
+    som_cell_y: chunk.somCellY || chunk.som_cell_y || 0,
+    cluster_degree: chunk.clusterDegree || chunk.cluster_degree || 0,
+    in_degree: chunk.inDegree || chunk.in_degree || 0,
+    out_degree: chunk.outDegree || chunk.out_degree || 0,
+    betweenness: chunk.betweenness || 0,
+    freshness_days: chunk.freshnessDays || chunk.freshness_days || 0,
+
+    noun_terms: nounTerms,
+    keywords: [],
+    entity_tags: [],
+    error_patterns: [],
+    semantic_tags: semanticTags,
+
+    chunk_summary: chunk.signature || chunk.summary || '',
+    chunk_start_line: chunk.lineStart || chunk.start_line || 0,
+    chunk_end_line: chunk.lineEnd || chunk.end_line || 0,
+    language: chunk.language || String(sourceRef).endsWith('.ts')
+      ? 'typescript'
+      : String(sourceRef).endsWith('.tsx')
+        ? 'typescript-react'
+        : String(sourceRef).endsWith('.js')
+          ? 'javascript'
+          : String(sourceRef).endsWith('.jsx')
+            ? 'javascript-react'
+            : String(sourceRef).endsWith('.py')
+              ? 'python'
+              : String(sourceRef).endsWith('.go')
+                ? 'go'
+                : String(sourceRef).endsWith('.sql')
+                  ? 'sql'
+                  : String(sourceRef).endsWith('.svelte')
+                    ? 'svelte'
+                    : 'unknown',
+
+    enriched_at: new Date().toISOString(),
+    enriched_version: '1.0'
+  };
 }
 
 /**

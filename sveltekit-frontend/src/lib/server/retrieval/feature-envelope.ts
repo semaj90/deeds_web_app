@@ -180,12 +180,18 @@ export const FeatureEnvelopeSchema = z.object({
   // ─────────────────────────────────────────────────────────
   chunk_id: z.string().describe('Foreign key to codebase_chunk_index.id'),
   packet_key: z.string().optional().describe('Canonical packet identity if already assigned'),
+  symbol_version_id: z.string().optional().describe('Exact version-bound symbol identity if already assigned'),
   content_hash: z.string().optional().describe('Immutable content revision identity for the hydrated packet'),
   query_id: z.string().optional().describe('Evaluation query ID if in test context'),
   retrieved_rank: z.number().int().positive().optional().describe('Rank before reranking if already known'),
   feature_id: z.string().optional().describe('Canonical feature identity if already assigned'),
   tree_node_id: z.string().optional().describe('Canonical topology node identity if already assigned'),
   qdrant_point_id: z.string().optional().describe('Canonical dense retrieval point identity if already assigned'),
+  workspace_revision: z.string().optional().describe('Workspace revision attached by the authority join'),
+  source_revision: z.string().optional().describe('Source revision attached by the authority join'),
+  representation_id: z.string().optional().describe('Representation identity attached by the authority join'),
+  representation_revision: z.number().int().optional().describe('Representation revision attached by the authority join'),
+  stable_symbol_id: z.string().optional().describe('Stable symbol identity when available'),
 
   // ─────────────────────────────────────────────────────────
   // Independent Signals (each computed separately)

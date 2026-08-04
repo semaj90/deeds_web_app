@@ -1,16 +1,16 @@
 {
   "repo": "deeds-web-app",
-  "runId": "run_1785747476402",
-  "generatedAt": "2026-08-03T08:57:57.865Z",
+  "runId": "run_1785786080562",
+  "generatedAt": "2026-08-03T19:41:21.074Z",
   "dryRun": true,
   "workspace": "all",
   "limit": 0,
-  "docs": 31657,
+  "docs": 30366,
   "docCounts": {
-    "directory_wiki": 5497,
+    "directory_wiki": 5367,
     "cluster_summary": 0,
     "feature_card": 1,
-    "source_card": 26159,
+    "source_card": 24998,
     "engram_memory": 0
   },
   "views": [
@@ -45,18 +45,14 @@
       "summary": "",
       "clusters": [],
       "topFiles": [
-        "$lib/utils/file-reader.ts",
-        "$lib/utils/file-reader.ts",
-        "$lib/utils/file-reader.ts",
-        "$lib/utils/file-reader.ts",
         "$lib/utils/file-reader.ts"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.434Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.887Z"
     },
     {
       "_id": "wiki:dir:.claude/hooks",
@@ -82,8 +78,8 @@
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.887Z"
     },
     {
       "_id": "wiki:dir:.claude",
@@ -110,668 +106,591 @@
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.887Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
+      "_id": "wiki:dir:.",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.claude/hooks",
+      "source_id": "dir:.",
+      "source_ref": "dir:.",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/.claude/hooks",
+      "rel_path": ".",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/.claude/hooks",
+      "path": ".",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs",
-        ".claude/worktrees/agent-a38668f2/.claude/hooks/pretooluse-deny.mjs",
-        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs",
-        ".claude/worktrees/agent-a38668f2/.claude/hooks/pretooluse-deny.mjs",
-        ".claude/worktrees/agent-a38668f2/.claude/hooks/posttooluse-audit.mjs"
+        ".cline-config.json",
+        ".eslintrc.cjs",
+        ".eslintrc.json",
+        ".gpu-rerank-11976-1782023627227.json",
+        ".gpu-rerank-44384-1782059518577.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.claude",
+      "_id": "wiki:dir:.gemini/antigravity/scratch",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/.claude",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.claude",
+      "source_id": "dir:.gemini/antigravity/scratch",
+      "source_ref": "dir:.gemini/antigravity/scratch",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/.claude",
+      "rel_path": ".gemini/antigravity/scratch",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/.claude",
+      "path": ".gemini/antigravity/scratch",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/.claude/mcp.json",
-        ".claude/worktrees/agent-a38668f2/.claude/settings.json",
-        ".claude/worktrees/agent-a38668f2/.claude/settings.local.json",
-        ".claude/worktrees/agent-a38668f2/.claude/mcp.json",
-        ".claude/worktrees/agent-a38668f2/.claude/settings.json"
+        ".gemini/antigravity/scratch/check_braces.js",
+        ".gemini/antigravity/scratch/find_returns.js",
+        ".gemini/antigravity/scratch/test_insert.js"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.github/hooks",
+      "_id": "wiki:dir:.proofs/four-lanes",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/.github/hooks",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.github/hooks",
+      "source_id": "dir:.proofs/four-lanes",
+      "source_ref": "dir:.proofs/four-lanes",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/.github/hooks",
+      "rel_path": ".proofs/four-lanes",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/.github/hooks",
+      "path": ".proofs/four-lanes",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
-        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
-        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
-        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json",
-        ".claude/worktrees/agent-a38668f2/.github/hooks/rg.json"
+        ".proofs/four-lanes/manifest-2026-06-25T23-09-33.json",
+        ".proofs/four-lanes/manifest-2026-06-25T23-15-27.json",
+        ".proofs/four-lanes/manifest-2026-06-25T23-20-01.json",
+        ".proofs/four-lanes/manifest-2026-06-25T23-38-25.json",
+        ".proofs/four-lanes/manifest-2026-06-26T00-22-57.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2",
+      "_id": "wiki:dir:.proofs/p4",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2",
+      "source_id": "dir:.proofs/p4",
+      "source_ref": "dir:.proofs/p4",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2",
+      "rel_path": ".proofs/p4",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2",
+      "path": ".proofs/p4",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/.mcp.json",
-        ".claude/worktrees/agent-a38668f2/atlas.config.json",
-        ".claude/worktrees/agent-a38668f2/CMakePresets.json",
-        ".claude/worktrees/agent-a38668f2/ecosystem.config.cjs",
-        ".claude/worktrees/agent-a38668f2/ecosystem.dev.config.cjs"
+        ".proofs/p4/manifest-2026-06-25T22-45-36.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/.vscode",
+      "_id": "wiki:dir:.python311/lib/python3.11/site-packages/pip-24.0.dist-info",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/.vscode",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/.vscode",
+      "source_id": "dir:.python311/lib/python3.11/site-packages/pip-24.0.dist-info",
+      "source_ref": "dir:.python311/lib/python3.11/site-packages/pip-24.0.dist-info",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/.vscode",
+      "rel_path": ".python311/lib/python3.11/site-packages/pip-24.0.dist-info",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/.vscode",
+      "path": ".python311/lib/python3.11/site-packages/pip-24.0.dist-info",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/.vscode/extensions.json",
-        ".claude/worktrees/agent-a38668f2/.vscode/launch.json",
-        ".claude/worktrees/agent-a38668f2/.vscode/tasks.json",
-        ".claude/worktrees/agent-a38668f2/.vscode/extensions.json",
-        ".claude/worktrees/agent-a38668f2/.vscode/launch.json"
+        ".python311/lib/python3.11/site-packages/pip-24.0.dist-info/direct_url.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/audit",
+      "_id": "wiki:dir:.python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/audit",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/audit",
+      "source_id": "dir:.python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
+      "source_ref": "dir:.python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/audit",
+      "rel_path": ".python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/audit",
+      "path": ".python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
-        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
-        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
-        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json",
-        ".claude/worktrees/agent-a38668f2/audit/public-route-allowlist.json"
+        ".python311/lib/python3.11/site-packages/setuptools-69.1.0.dist-info/direct_url.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "_id": "wiki:dir:.venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "source_id": "dir:.venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms",
+      "source_ref": "dir:.venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "rel_path": ".venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser",
+      "path": ".venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.d.ts",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.js",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/package.json",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.d.ts",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/index.js"
+        ".venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms/cryptography-rust.cyclonedx.json",
+        ".venv/Lib/site-packages/cryptography-49.0.0.dist-info/sboms/sbom.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "_id": "wiki:dir:.venv/Lib/site-packages/google/cloud/_storage_v2",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "source_id": "dir:.venv/Lib/site-packages/google/cloud/_storage_v2",
+      "source_ref": "dir:.venv/Lib/site-packages/google/cloud/_storage_v2",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "rel_path": ".venv/Lib/site-packages/google/cloud/_storage_v2",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target",
+      "path": ".venv/Lib/site-packages/google/cloud/_storage_v2",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/atlas_packet_parser/target/.rustc_info.json"
+        ".venv/Lib/site-packages/google/cloud/_storage_v2/gapic_metadata.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "_id": "wiki:dir:.venv/Lib/site-packages/hf_xet-1.5.1.dist-info/sboms",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "source_id": "dir:.venv/Lib/site-packages/hf_xet-1.5.1.dist-info/sboms",
+      "source_ref": "dir:.venv/Lib/site-packages/hf_xet-1.5.1.dist-info/sboms",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "rel_path": ".venv/Lib/site-packages/hf_xet-1.5.1.dist-info/sboms",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi",
+      "path": ".venv/Lib/site-packages/hf_xet-1.5.1.dist-info/sboms",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/index.d.ts",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/index.js",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/package.json",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/wrapper.d.ts",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/wrapper.js"
+        ".venv/Lib/site-packages/hf_xet-1.5.1.dist-info/sboms/hf_xet.cyclonedx.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.436Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_bvlc_alexnet",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_bvlc_alexnet",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_bvlc_alexnet",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_bvlc_alexnet",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_bvlc_alexnet",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json",
-        ".claude/worktrees/agent-a38668f2/crates/turbovec-napi/target/.rustc_info.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_bvlc_alexnet/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/data",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_densenet121",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/data",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/data",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_densenet121",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_densenet121",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/data",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_densenet121",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/data",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_densenet121",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
-        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
-        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
-        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json",
-        ".claude/worktrees/agent-a38668f2/data/couchdb-ingest-registry.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_densenet121/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v1",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docker/bifrost",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v1",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v1",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docker/bifrost",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v1",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docker/bifrost",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v1",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
-        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
-        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
-        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json",
-        ".claude/worktrees/agent-a38668f2/docker/bifrost/config.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v1/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v2",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v2",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v2",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v2",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docker/seaweedfs",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v2",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
-        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
-        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
-        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json",
-        ".claude/worktrees/agent-a38668f2/docker/seaweedfs/s3.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_inception_v2/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_resnet50",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/ai-os",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_resnet50",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_resnet50",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/ai-os",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_resnet50",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/ai-os",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_resnet50",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
-        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
-        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
-        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json",
-        ".claude/worktrees/agent-a38668f2/docs/ai-os/atlas-retry-index.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_resnet50/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/atlas",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_shufflenet",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/atlas",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/atlas",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_shufflenet",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_shufflenet",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/atlas",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_shufflenet",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/atlas",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_shufflenet",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/atlas/cluster-cards.json",
-        ".claude/worktrees/agent-a38668f2/docs/atlas/feature-registry.json",
-        ".claude/worktrees/agent-a38668f2/docs/atlas/parent-atlas.json",
-        ".claude/worktrees/agent-a38668f2/docs/atlas/retry-queries.json",
-        ".claude/worktrees/agent-a38668f2/docs/atlas/feature-registry.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_shufflenet/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/graph",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_squeezenet",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/graph",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/graph",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_squeezenet",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_squeezenet",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/graph",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_squeezenet",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/graph",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_squeezenet",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/graph/atlas-write-manifest.json",
-        ".claude/worktrees/agent-a38668f2/docs/graph/atlas-write-scale-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/graph/batch-gpu-analysis-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/graph/codebase-feature-map.json",
-        ".claude/worktrees/agent-a38668f2/docs/graph/codebase-graph.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_squeezenet/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/packets",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_vgg19",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/packets",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/packets",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_vgg19",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_vgg19",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/packets",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_vgg19",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/packets",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_vgg19",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
-        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
-        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
-        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json",
-        ".claude/worktrees/agent-a38668f2/docs/packets/rg-toc.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_vgg19/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/phase100",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_zfnet512",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/phase100",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/phase100",
+      "source_id": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_zfnet512",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx/backend/test/data/real/test_zfnet512",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/phase100",
+      "rel_path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_zfnet512",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/phase100",
+      "path": ".venv/Lib/site-packages/onnx/backend/test/data/real/test_zfnet512",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/phase100/consolidation-recommendations.json",
-        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-graph-cycles.json",
-        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-graph.json",
-        ".claude/worktrees/agent-a38668f2/docs/phase100/feature-recommendations.json",
-        ".claude/worktrees/agent-a38668f2/docs/phase100/file-consolidation-audit.json"
+        ".venv/Lib/site-packages/onnx/backend/test/data/real/test_zfnet512/data.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnx-1.22.0.dist-info/sboms",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "source_id": "dir:.venv/Lib/site-packages/onnx-1.22.0.dist-info/sboms",
+      "source_ref": "dir:.venv/Lib/site-packages/onnx-1.22.0.dist-info/sboms",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "rel_path": ".venv/Lib/site-packages/onnx-1.22.0.dist-info/sboms",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/profile-cards/data",
+      "path": ".venv/Lib/site-packages/onnx-1.22.0.dist-info/sboms",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_plotly.min.js.json",
-        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_package_data_widgetbundle.js.json",
-        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_validators__validators.json",
-        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/docker_langgraph-synthesis_.venv_Lib_site-packages_plotly_validators__validators.json.json",
-        ".claude/worktrees/agent-a38668f2/docs/profile-cards/data/next_steps_active_SCHEMA_MANIFEST.json"
+        ".venv/Lib/site-packages/onnx-1.22.0.dist-info/sboms/sbom.cdx.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.437Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "_id": "wiki:dir:.venv/Lib/site-packages/onnxmltools/utils",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/reports",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/reports",
+      "source_id": "dir:.venv/Lib/site-packages/onnxmltools/utils",
+      "source_ref": "dir:.venv/Lib/site-packages/onnxmltools/utils",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/reports",
+      "rel_path": ".venv/Lib/site-packages/onnxmltools/utils",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/reports",
+      "path": ".venv/Lib/site-packages/onnxmltools/utils",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/reports/ace-packet-smoke-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/active-topology-mirror-backfill-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/artifact-bloat-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas-drizzle-schema-map-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas-feature-map-duckdb-report.json"
+        ".venv/Lib/site-packages/onnxmltools/utils/dagre-d3.min.js"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.438Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "_id": "wiki:dir:.venv/Lib/site-packages/safetensors-0.8.0.dist-info/sboms",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "source_id": "dir:.venv/Lib/site-packages/safetensors-0.8.0.dist-info/sboms",
+      "source_ref": "dir:.venv/Lib/site-packages/safetensors-0.8.0.dist-info/sboms",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "rel_path": ".venv/Lib/site-packages/safetensors-0.8.0.dist-info/sboms",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/docs/reports/atlas",
+      "path": ".venv/Lib/site-packages/safetensors-0.8.0.dist-info/sboms",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-board-state.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-kanban-tasks.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-next-actions.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-risk-report.json",
-        ".claude/worktrees/agent-a38668f2/docs/reports/atlas/atlas-board-state.json"
+        ".venv/Lib/site-packages/safetensors-0.8.0.dist-info/sboms/safetensors-python.cyclonedx.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.438Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     },
     {
-      "_id": "wiki:dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "_id": "wiki:dir:.venv/Lib/site-packages/scipy/stats/tests/data",
       "type": "directory_wiki",
-      "source_id": "dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
-      "source_ref": "dir:.claude/worktrees/agent-a38668f2/drizzle/meta",
+      "source_id": "dir:.venv/Lib/site-packages/scipy/stats/tests/data",
+      "source_ref": "dir:.venv/Lib/site-packages/scipy/stats/tests/data",
       "source_kind": "directory",
       "file_path": null,
-      "rel_path": ".claude/worktrees/agent-a38668f2/drizzle/meta",
+      "rel_path": ".venv/Lib/site-packages/scipy/stats/tests/data",
       "feature_id": null,
       "related_feature_ids": [],
       "atlas_version": "1",
       "cold_storage_ready": true,
       "workspace": "repo-root",
-      "path": ".claude/worktrees/agent-a38668f2/drizzle/meta",
+      "path": ".venv/Lib/site-packages/scipy/stats/tests/data",
       "summary": "",
       "clusters": [],
       "topFiles": [
-        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json",
-        ".claude/worktrees/agent-a38668f2/drizzle/meta/_journal.json",
-        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json",
-        ".claude/worktrees/agent-a38668f2/drizzle/meta/_journal.json",
-        ".claude/worktrees/agent-a38668f2/drizzle/meta/0000_snapshot.json"
+        ".venv/Lib/site-packages/scipy/stats/tests/data/studentized_range_mpmath_ref.json"
       ],
       "tags": [
         "feature.unknown"
       ],
       "pageRankAvg": 0,
-      "runId": "run_1785747476402",
-      "updatedAt": "2026-08-03T08:57:57.439Z"
+      "runId": "run_1785786080562",
+      "updatedAt": "2026-08-03T19:41:20.888Z"
     }
   ]
 }

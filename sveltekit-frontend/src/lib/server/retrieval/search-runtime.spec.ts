@@ -12,6 +12,10 @@ const { mockHydrateCandidates } = vi.hoisted(() => ({
   mockHydrateCandidates: vi.fn(),
 }));
 
+const { mockHydrateCandidatesWithProof } = vi.hoisted(() => ({
+  mockHydrateCandidatesWithProof: vi.fn(),
+}));
+
 const { mockRecordPromotionIntent } = vi.hoisted(() => ({
   mockRecordPromotionIntent: vi.fn(),
 }));
@@ -26,6 +30,7 @@ vi.mock('./canonical-rerank-executor.js', () => ({
 
 vi.mock('./hydrate-candidates.js', () => ({
   hydrateCandidates: mockHydrateCandidates,
+  hydrateCandidatesWithProof: mockHydrateCandidatesWithProof,
 }));
 
 vi.mock('./promote-results-outbox.js', () => ({
@@ -43,6 +48,7 @@ describe('search runtime bridge', () => {
     mockRetrieveAllCandidates.mockReset();
     mockRerankCanonicalFeatureEnvelopes.mockReset();
     mockHydrateCandidates.mockReset();
+    mockHydrateCandidatesWithProof.mockReset();
     mockRecordPromotionIntent.mockReset();
   });
 
@@ -67,7 +73,7 @@ describe('search runtime bridge', () => {
         scoreSource: 'qdrant',
       },
     ]);
-    mockHydrateCandidates.mockResolvedValue([
+    const hydratedPackets = [
       {
         packet_key: 'packet-1',
         source_ref: 'src/lib/example.ts',
@@ -92,7 +98,25 @@ describe('search runtime bridge', () => {
         rank_after: 2,
         model_version: 'mixedbread-ai/mxbai-rerank-base-v2',
       },
-    ] as any);
+    ] as any;
+    mockHydrateCandidates.mockResolvedValue(hydratedPackets);
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes: hydratedPackets,
+      proof: {
+        canonicalJoinedCount: 2,
+        canonicalJoinMissingCount: 0,
+        workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0,
+        sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 1,
+        graphScoreMissingCount: 1,
+        summaryResolvedCount: 2,
+        summaryStaleRejectedCount: 0,
+        validationReasons: {},
+      },
+    });
     mockRerankCanonicalFeatureEnvelopes.mockResolvedValue({
       results: [
         {
@@ -151,10 +175,17 @@ describe('search runtime bridge', () => {
       { includeVectorLanes: true }
     );
     expect(mockRerankCanonicalFeatureEnvelopes).toHaveBeenCalledTimes(1);
-    expect(mockHydrateCandidates).toHaveBeenCalledTimes(1);
+    expect(mockHydrateCandidatesWithProof).toHaveBeenCalledTimes(1);
     expect(mockRecordPromotionIntent).toHaveBeenCalledTimes(1);
     expect(result.packets).toHaveLength(1);
     expect(result.packets[0]?.packet_key).toBe('packet-1');
+    expect(result.proof).toEqual(expect.objectContaining({
+      requestedTopK: 2,
+      rawQdrantCount: 1,
+      canonicalJoinedCount: 2,
+      duplicateSymbolVersionCount: 0,
+      finalContextCount: 1,
+    }));
     expect(result.provenance.rerankModel).toBe('mixedbread-ai/mxbai-rerank-base-v2');
     expect(result.provenance.rerankerUsed).toBe(true);
   });
@@ -171,7 +202,7 @@ describe('search runtime bridge', () => {
         scoreSource: 'postgres_trigram',
       },
     ]);
-    mockHydrateCandidates.mockResolvedValue([
+    const hostileHydrated = [
       {
         packet_key: 'packet-hostile',
         source_ref: 'src/lib/example.ts',
@@ -184,7 +215,25 @@ describe('search runtime bridge', () => {
         rank_after: 1,
         model_version: 'mixedbread-ai/mxbai-rerank-base-v2',
       },
-    ] as any);
+    ] as any;
+    mockHydrateCandidates.mockResolvedValue(hostileHydrated);
+    mockHydrateCandidatesWithProof.mockResolvedValue({
+      envelopes: hostileHydrated,
+      proof: {
+        canonicalJoinedCount: 1,
+        canonicalJoinMissingCount: 0,
+        workspaceRejectedCount: 0,
+        workspaceRevisionRejectedCount: 0,
+        sourceRevisionRejectedCount: 0,
+        representationRejectedCount: 0,
+        representationRevisionRejectedCount: 0,
+        graphScoreAttachedCount: 1,
+        graphScoreMissingCount: 0,
+        summaryResolvedCount: 1,
+        summaryStaleRejectedCount: 0,
+        validationReasons: {},
+      },
+    });
     mockRerankCanonicalFeatureEnvelopes.mockResolvedValue({
       results: [
         {

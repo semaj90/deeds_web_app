@@ -7,6 +7,11 @@ import { bifrostChat, VLM_MODELS } from '$lib/server/ollama.js';
 const requestSchema = z.object({
   query: z.string().trim().min(1, 'Query string is required').max(1024, 'Query string is too long'),
   mode: z.enum(['codebase', 'evidence', 'legal', 'docs']).default('codebase'),
+  workspaceId: z.string().trim().min(1).optional(),
+  workspaceRevision: z.string().trim().min(1).optional(),
+  sourceRevision: z.string().trim().min(1).optional(),
+  representationId: z.string().trim().min(1).optional(),
+  representationRevision: z.number().int().positive().optional(),
   topK: z.number().int().min(1).max(50).optional(),
   useTurboVec: z.boolean().optional(),
   useGraph: z.boolean().optional(),
@@ -22,6 +27,7 @@ function emptyResult(error: string, status: number) {
       hits: [],
       graphPaths: [],
       synthesis: null,
+      proof: null,
       error,
       provenance: { qdrant: false, turbovec: false, redis: false, neo4j: false, ace: false },
     },
@@ -79,6 +85,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const result = await runtime.search({
       text: input.query,
       topK: input.topK ?? 15,
+      workspaceId: input.workspaceId,
+      workspaceRevision: input.workspaceRevision,
+      sourceRevision: input.sourceRevision,
+      representationId: input.representationId,
+      representationRevision: input.representationRevision,
       filters: {
         includeGenerated: false,
         includeLegacy: false,
@@ -111,6 +122,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       hits: result.packets.map(toHyperRagHit),
       graphPaths: [],
       synthesis,
+      proof: result.proof ?? null,
       provenance: {
         qdrant: result.provenance.retrievalSources.includes('qdrant'),
         turbovec: false,

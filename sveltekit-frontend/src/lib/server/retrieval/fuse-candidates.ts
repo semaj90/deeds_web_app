@@ -16,6 +16,7 @@ export interface FusedCandidate extends Candidate {
   fusionScore: number;
   rankBefore: number;
   sourceCount: number;
+  contributingLanes?: Candidate['scoreSource'][];
 }
 
 const RRF_CONSTANT = 60;
@@ -31,13 +32,16 @@ export function fuseCandidates(candidates: Candidate[]): FusedCandidate[] {
     c.sourceRef && c.sourceRef.trim() !== ''
   );
 
+  const identityKey = (candidate: Candidate) => candidate.symbolVersionId?.trim() || candidate.packetKey;
+
   // Group candidates by packet_key to identify which sources mentioned each
   const groupedByKey = new Map<string, Candidate[]>();
   for (const candidate of valid) {
-    if (!groupedByKey.has(candidate.packetKey)) {
-      groupedByKey.set(candidate.packetKey, []);
+    const key = identityKey(candidate);
+    if (!groupedByKey.has(key)) {
+      groupedByKey.set(key, []);
     }
-    groupedByKey.get(candidate.packetKey)!.push(candidate);
+    groupedByKey.get(key)!.push(candidate);
   }
 
   // Get unique sources
@@ -51,10 +55,10 @@ export function fuseCandidates(candidates: Candidate[]): FusedCandidate[] {
   for (const source of sources) {
     const sourceCards = valid.filter(c => c.scoreSource === source);
     // Sort by original score (descending)
-    const sorted = [...sourceCards].sort((a, b) => b.score - a.score);
+    const sorted = [...sourceCards].sort((a, b) => b.score - a.score || identityKey(a).localeCompare(identityKey(b)));
     const ranks = new Map<string, number>();
     sorted.forEach((c, idx) => {
-      ranks.set(c.packetKey, idx + 1);
+      ranks.set(identityKey(c), idx + 1);
     });
     sourceRanks.set(source, ranks);
   }
@@ -85,11 +89,13 @@ export function fuseCandidates(candidates: Candidate[]): FusedCandidate[] {
     .map(([packetKey, cardsWithKey], rank) => {
       // Use first occurrence as base (they're all the same packet)
       const base = cardsWithKey[0]!;
+      const contributingLanes = Array.from(new Set(cardsWithKey.map((candidate) => candidate.scoreSource)));
       return {
         ...base,
         fusionScore: rrfScores.get(packetKey) ?? 0,
         rankBefore: rank + 1,
         sourceCount: cardsWithKey.length,
+        contributingLanes,
       };
     });
 
@@ -115,8 +121,9 @@ export function explainFusionScore(
 } {
   const contributors = [];
 
-  // Find all instances of this packet from different sources
-  const instances = allCandidates.filter(c => c.packetKey === candidate.packetKey);
+  const identityKey = (row: Candidate) => row.symbolVersionId?.trim() || row.packetKey;
+  // Find all instances of this symbol or packet from different sources
+  const instances = allCandidates.filter(c => identityKey(c) === identityKey(candidate));
 
   // Group by source and get ranking
   const sourceRanks = new Map<string, number>();
@@ -129,8 +136,8 @@ export function explainFusionScore(
   // Compute ranks for this candidate within each source
   for (const source of sources) {
     const sourceCards = allCandidates.filter(c => c.scoreSource === source);
-    const sorted = [...sourceCards].sort((a, b) => b.score - a.score);
-    const rankInSource = sorted.findIndex(c => c.packetKey === candidate.packetKey) + 1;
+    const sorted = [...sourceCards].sort((a, b) => b.score - a.score || identityKey(a).localeCompare(identityKey(b)));
+    const rankInSource = sorted.findIndex(c => identityKey(c) === identityKey(candidate)) + 1;
     if (rankInSource > 0) {
       sourceRanks.set(source, rankInSource);
     }

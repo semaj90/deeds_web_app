@@ -67,10 +67,13 @@ export function createQdrantBM42Retriever(config: QdrantBM42RetrieverConfig): Re
       for (let i = 0; i < points.length; i++) {
         const point = points[i];
         const payload = point.payload ?? {};
+        const packetKey = String(payload['packet_key'] ?? payload['symbol_version_id'] ?? '').trim();
+        const sourceRef = String(payload['source_ref'] ?? '').trim();
+        if (!packetKey || !sourceRef) continue;
         const candidate: LaneCandidate = {
-          packetKey: String(payload['packet_key'] ?? point.id),
+          packetKey,
           qdrantPointId: String(point.id),
-          sourceRef: String(payload['source_ref'] ?? ''),
+          sourceRef,
           rank: i + 1,
           score: point.score ?? null,
           lane: 'bm42',

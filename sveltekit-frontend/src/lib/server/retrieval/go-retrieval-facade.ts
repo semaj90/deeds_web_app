@@ -76,6 +76,10 @@ export interface GoRetrievalFacadeRequest {
 export interface GoRetrievalFacadeResponse {
   results: Array<{
     id: string;
+    packetKey?: string;
+    sourceRef?: string;
+    symbolVersionId?: string;
+    qdrantPointId?: string;
     score: number;
     file_path: string;
     relative_path: string;
@@ -289,27 +293,42 @@ async function executeGoRetrievalSearchMultiVector(
     // Validate each candidate and classify into recovery lanes
     const validated = result.candidates
       .map((c: any) => {
+        const packetKey = c.packetKey || c.symbolVersionId;
+        const sourceRef = c.sourceRef;
+
+        if (typeof packetKey !== 'string' || packetKey.length === 0) {
+          return null;
+        }
+
+        if (typeof sourceRef !== 'string' || sourceRef.length === 0) {
+          return null;
+        }
+
         // Build minimal CanonicalEnvelope from candidate
         const envelope: Partial<CanonicalEnvelope> = {
-          repository_id: c.id || '',
-          directory_id: c.id || '',
-          file_id: c.id || '',
-          module_id: c.id || '',
-          symbol_id: c.id || '',
-          feature_id: c.id || '',
-          packet_key: c.id || '',
-          chunk_id: c.id || '',
-          source_ref: c.id || ''
+          repository_id: sourceRef,
+          directory_id: sourceRef,
+          file_id: sourceRef,
+          module_id: packetKey,
+          symbol_id: packetKey,
+          feature_id: packetKey,
+          packet_key: packetKey,
+          chunk_id: c.qdrantPointId,
+          source_ref: sourceRef
         };
 
         const validation = validateCanonicalEnvelope(envelope as CanonicalEnvelope);
         return {
           id: c.id,
+          packetKey,
+          sourceRef,
+          symbolVersionId: c.symbolVersionId,
+          qdrantPointId: c.qdrantPointId || c.id,
           score: c.normalized_score,
           rrf_score: c.rrf_score,
           source_lanes: c.source_lanes,
-          path: c.id,
-          symbol: c.id,
+          path: sourceRef,
+          symbol: packetKey,
           kind: 'chunk',
           ranks: {
             content: c.content_score,
@@ -323,6 +342,7 @@ async function executeGoRetrievalSearchMultiVector(
           is_valid: validation.valid
         };
       })
+      .filter((c: any) => c !== null)
       .filter((c: any) => {
         // Only return canonical or recoverable lanes (no quarantine)
         if (c.identity_lane === 'canonical' || c.identity_lane === 'recoverable') {
@@ -346,6 +366,10 @@ async function executeGoRetrievalSearchMultiVector(
     return {
       results: validated.map((c: any) => ({
         id: c.id,
+        packetKey: c.packetKey,
+        sourceRef: c.sourceRef,
+        symbolVersionId: c.symbolVersionId,
+        qdrantPointId: c.qdrantPointId,
         score: c.score,
         file_path: c.path,
         relative_path: c.path,
@@ -554,27 +578,41 @@ export async function executeGoRetrievalSearch(
     // Validate each candidate and classify into recovery lanes
     const validated = result.candidates
       .map((c: any) => {
+        const packetKey = c.packetKey || c.symbolVersionId || c.id;
+        const sourceRef = c.sourceRef || c.path;
+
+        if (typeof packetKey !== 'string' || packetKey.length === 0) {
+          return null;
+        }
+
+        if (typeof sourceRef !== 'string' || sourceRef.length === 0) {
+          return null;
+        }
+
         // Build minimal CanonicalEnvelope from candidate
         const envelope: Partial<CanonicalEnvelope> = {
-          repository_id: c.id || '',
-          directory_id: c.path || '',
-          file_id: c.path || '',
-          module_id: c.symbol || '',
-          symbol_id: c.symbol || '',
-          feature_id: c.id || '',
-          packet_key: c.id || '',
-          chunk_id: c.id || '',
-          source_ref: c.path || ''
+          repository_id: sourceRef,
+          directory_id: c.path || sourceRef,
+          file_id: c.path || sourceRef,
+          module_id: c.symbol || packetKey,
+          symbol_id: c.symbol || packetKey,
+          feature_id: packetKey,
+          packet_key: packetKey,
+          chunk_id: c.qdrantPointId,
+          source_ref: sourceRef
         };
 
         const validation = validateCanonicalEnvelope(envelope as CanonicalEnvelope);
         return {
           ...c,
+          packetKey,
+          sourceRef,
           identity_lane: validation.recovery_lane,
           validation_errors: validation.errors,
           is_valid: validation.valid
         };
       })
+      .filter((c: any) => c !== null)
       .filter((c: any) => {
         // Only return canonical or recoverable lanes (no quarantine)
         if (c.identity_lane === 'canonical' || c.identity_lane === 'recoverable') {
@@ -616,6 +654,10 @@ export async function executeGoRetrievalSearch(
     const response = normalizeResponse(result, request.query, fallback);
     response.results = validated.map((c: any) => ({
       id: c.id,
+      packetKey: c.packetKey,
+      sourceRef: c.sourceRef,
+      symbolVersionId: c.symbolVersionId,
+      qdrantPointId: c.qdrantPointId,
       score: c.score,
       file_path: c.path,
       relative_path: c.path,

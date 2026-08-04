@@ -1,9 +1,9 @@
 # CouchDB MapReduce Ingestion — Parent Atlas Rollups
 
-- documents: 31657
+- documents: 30366
 - views: 11
 - stage: Ingestion
-- runId: run_1785747476402
+- runId: run_1785786080562
 
 ## Top Entries
 

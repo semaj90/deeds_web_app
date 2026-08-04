@@ -45,11 +45,22 @@ export function createBm42SparseRetriever(): Retriever {
       for (let i = 0; i < points.length; i++) {
         const point = points[i];
         const payload = point.payload ?? {};
+        const packetKey = payload['packet_key'] ?? payload['symbol_version_id'];
+        const sourceRef = payload['source_ref'];
+
+        if (typeof packetKey !== 'string' || packetKey.length === 0) {
+          continue;
+        }
+
+        if (typeof sourceRef !== 'string' || sourceRef.length === 0) {
+          continue;
+        }
+
         const candidate = validateCandidate({
-          packetKey: String(payload['packet_key'] ?? point.id),
+          packetKey,
           packetId: payload['chunk_id'] as string | undefined,
           qdrantPointId: String(point.id),
-          sourceRef: String(payload['source_ref'] ?? ''),
+          sourceRef,
           rank: i + 1,
           score: point.score ?? null,
           lane: 'sparse' as const,

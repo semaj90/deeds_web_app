@@ -236,11 +236,11 @@ export async function unifiedSearch(req: SearchRequest): Promise<SearchResponse>
     combinedResults = rrfFusion(combinedResults, lanesSucceeded);
   }
 
-  // Deduplicate by packet_key
+  // Deduplicate by symbol_version_id first, then packet_key as the fallback join key.
   const seen = new Set<string>();
   const deduped: SearchResult[] = [];
   for (const r of combinedResults) {
-    const key = r.packet_key ?? r.id;
+    const key = r.symbol_version_id ?? r.packet_key ?? r.id;
     if (!seen.has(key)) {
       seen.add(key);
       deduped.push(r);

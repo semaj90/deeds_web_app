@@ -21,10 +21,18 @@ export interface QdrantSearchResult {
   id: string;
   score: number;
   payload?: Record<string, any>;
+  packetKey?: string;
+  sourceRef?: string;
+  symbolVersionId?: string;
+  qdrantPointId?: string;
 }
 
 export interface RRFCandidate {
   id: string;
+  packetKey?: string;
+  sourceRef?: string;
+  symbolVersionId?: string;
+  qdrantPointId?: string;
   contentScore: number;
   summaryScore: number;
   titleScore: number;
@@ -115,32 +123,74 @@ export function fuseLanesViaRrf(
   // Build candidate map (unique by ID)
   const candidateMap = new Map<string, Partial<RRFCandidate>>();
 
+  const getCanonicalKey = (result: QdrantSearchResult): string | null => {
+    const key = result.packetKey || result.symbolVersionId || result.payload?.packet_key || result.payload?.symbol_version_id;
+    const sourceRef = result.sourceRef || result.payload?.source_ref;
+
+    if (typeof key !== 'string' || key.length === 0) return null;
+    if (typeof sourceRef !== 'string' || sourceRef.length === 0) return null;
+
+    return key;
+  };
+
   // Populate content lane
   for (const result of contentResults) {
-    const cand = candidateMap.get(result.id) || { id: result.id };
+    const canonicalKey = getCanonicalKey(result);
+    if (!canonicalKey) continue;
+    const cand: Partial<RRFCandidate> = candidateMap.get(canonicalKey) ?? {
+      id: canonicalKey,
+      packetKey: canonicalKey,
+      sourceRef: result.sourceRef || result.payload?.source_ref,
+      symbolVersionId: result.symbolVersionId || result.payload?.symbol_version_id,
+      qdrantPointId: result.qdrantPointId || result.id,
+    };
     cand.contentScore = result.score;
-    candidateMap.set(result.id, cand);
+    candidateMap.set(canonicalKey, cand);
   }
 
   // Populate summary lane
   for (const result of summaryResults) {
-    const cand = candidateMap.get(result.id) || { id: result.id };
+    const canonicalKey = getCanonicalKey(result);
+    if (!canonicalKey) continue;
+    const cand: Partial<RRFCandidate> = candidateMap.get(canonicalKey) ?? {
+      id: canonicalKey,
+      packetKey: canonicalKey,
+      sourceRef: result.sourceRef || result.payload?.source_ref,
+      symbolVersionId: result.symbolVersionId || result.payload?.symbol_version_id,
+      qdrantPointId: result.qdrantPointId || result.id,
+    };
     cand.summaryScore = result.score;
-    candidateMap.set(result.id, cand);
+    candidateMap.set(canonicalKey, cand);
   }
 
   // Populate title lane
   for (const result of titleResults) {
-    const cand = candidateMap.get(result.id) || { id: result.id };
+    const canonicalKey = getCanonicalKey(result);
+    if (!canonicalKey) continue;
+    const cand: Partial<RRFCandidate> = candidateMap.get(canonicalKey) ?? {
+      id: canonicalKey,
+      packetKey: canonicalKey,
+      sourceRef: result.sourceRef || result.payload?.source_ref,
+      symbolVersionId: result.symbolVersionId || result.payload?.symbol_version_id,
+      qdrantPointId: result.qdrantPointId || result.id,
+    };
     cand.titleScore = result.score;
-    candidateMap.set(result.id, cand);
+    candidateMap.set(canonicalKey, cand);
   }
 
   // Populate keywords lane
   for (const result of keywordResults) {
-    const cand = candidateMap.get(result.id) || { id: result.id };
+    const canonicalKey = getCanonicalKey(result);
+    if (!canonicalKey) continue;
+    const cand: Partial<RRFCandidate> = candidateMap.get(canonicalKey) ?? {
+      id: canonicalKey,
+      packetKey: canonicalKey,
+      sourceRef: result.sourceRef || result.payload?.source_ref,
+      symbolVersionId: result.symbolVersionId || result.payload?.symbol_version_id,
+      qdrantPointId: result.qdrantPointId || result.id,
+    };
     cand.keywordScore = result.score;
-    candidateMap.set(result.id, cand);
+    candidateMap.set(canonicalKey, cand);
   }
 
   // Calculate RRF scores and convert to result format

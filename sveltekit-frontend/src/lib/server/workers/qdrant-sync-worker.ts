@@ -6,6 +6,7 @@ import * as amqp from 'amqplib';
 import { db } from '$lib/server/db/client.js';
 import { eq } from 'drizzle-orm';
 import { atlasPackets } from '$lib/server/db/schema-postgres.js';
+import { buildQdrantSyncPayload } from '$lib/server/retrieval/qdrant-sync-payload.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-manager.js';
 import type { IdentityUpdatedEvent } from './mirror-sync-publisher.js';
 
@@ -68,7 +69,7 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
 
   const p = packet as any;
 
-  if (!p.sourceRef || !p.featureId) {
+  if (!p.packetKey || !p.sourceRef || !p.featureId || !p.workspaceId) {
     throw new Error(`Invalid identity: ${event.packet_key}`);
   }
 
@@ -79,19 +80,7 @@ async function processQdrantSync(event: IdentityUpdatedEvent): Promise<void> {
 
   const qdrant = getQdrantClient();
 
-  const payload: Record<string, unknown> = {
-    packet_key: p.packetKey,
-    source_ref: p.sourceRef,
-    feature_id: p.featureId,
-    identity_lane: p.identityLane,
-    identity_confidence: p.identityConfidence,
-    recovery_lane: p.recoveryLane,
-    domain_class: p.domainClass,
-    tree_node_id: p.treeNodeId,
-    title_id: p.titleId,
-    community_id: p.communityId,
-    som_cluster: p.somCluster
-  };
+  const payload: Record<string, unknown> = buildQdrantSyncPayload(p);
 
   await (qdrant as any).upsert('codebase_chunks_768', {
     points: [

@@ -54,6 +54,12 @@ export type CanonicalAcePacketEnvelope = {
   mmap_vector_refs?: string[];
   // Structural identity (AST-derived, not synthetic)
   tree_node_id?: string | null;
+  stable_symbol_id?: string | null;
+  symbol_version_id?: string | null;
+  source_revision?: string | null;
+  representation_id?: string | null;
+  representation_revision?: number | null;
+  schema_version?: string | null;
   // Qdrant mirror identity (set after upsert)
   qdrant_point_id?: string | null;
 };
@@ -136,6 +142,18 @@ export type CanonicalAcePacketEnvelopeRow = Partial<Record<
   | 'mmapVectorRefs'
   | 'tree_node_id'
   | 'treeNodeId'
+  | 'stable_symbol_id'
+  | 'stableSymbolId'
+  | 'symbol_version_id'
+  | 'symbolVersionId'
+  | 'source_revision'
+  | 'sourceRevision'
+  | 'representation_id'
+  | 'representationId'
+  | 'representation_revision'
+  | 'representationRevision'
+  | 'schema_version'
+  | 'schemaVersion'
   | 'qdrant_point_id'
   | 'qdrantPointId',
   unknown
@@ -206,6 +224,12 @@ export const CanonicalAcePacketEnvelopeSchema = z.object({
   columnar_tables: z.array(z.string().min(1)).default([]),
   mmap_vector_refs: z.array(z.string().min(1)).default([]),
   tree_node_id: z.string().min(1).nullable().optional(),
+  stable_symbol_id: z.string().min(1).nullable().optional(),
+  symbol_version_id: z.string().min(1).nullable().optional(),
+  source_revision: z.string().min(1).nullable().optional(),
+  representation_id: z.string().min(1).nullable().optional(),
+  representation_revision: z.number().int().nonnegative().nullable().optional(),
+  schema_version: z.string().min(1).nullable().optional(),
   qdrant_point_id: z.string().min(1).nullable().optional(),
 }).strict();
 
@@ -321,6 +345,12 @@ export function buildCanonicalAcePacketEnvelope(
   const packedArrays = normalizePackedArrays(row);
   const columnarTables = stringArray(row.columnar_tables, row.columnarTables);
   const mmapVectorRefs = stringArray(row.mmap_vector_refs, row.mmapVectorRefs);
+  const stableSymbolId = firstText((row as { stable_symbol_id?: unknown }).stable_symbol_id, (row as { stableSymbolId?: unknown }).stableSymbolId);
+  const symbolVersionId = firstText((row as { symbol_version_id?: unknown }).symbol_version_id, (row as { symbolVersionId?: unknown }).symbolVersionId);
+  const sourceRevision = firstText((row as { source_revision?: unknown }).source_revision, (row as { sourceRevision?: unknown }).sourceRevision);
+  const representationId = firstText((row as { representation_id?: unknown }).representation_id, (row as { representationId?: unknown }).representationId);
+  const representationRevision = numberOrNull((row as { representation_revision?: unknown }).representation_revision, (row as { representationRevision?: unknown }).representationRevision);
+  const schemaVersion = firstText((row as { schema_version?: unknown }).schema_version, (row as { schemaVersion?: unknown }).schemaVersion);
 
   const envelope = {
     packet_id: packetId,
@@ -365,6 +395,12 @@ export function buildCanonicalAcePacketEnvelope(
     columnar_tables: columnarTables,
     mmap_vector_refs: mmapVectorRefs,
     tree_node_id: (row.tree_node_id ?? row.treeNodeId ?? null) as string | null | undefined,
+    stable_symbol_id: stableSymbolId,
+    symbol_version_id: symbolVersionId,
+    source_revision: sourceRevision,
+    representation_id: representationId,
+    representation_revision: representationRevision,
+    schema_version: schemaVersion,
     qdrant_point_id: (row.qdrant_point_id ?? row.qdrantPointId ?? null) as string | null | undefined,
   };
 

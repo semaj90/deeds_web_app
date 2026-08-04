@@ -8,7 +8,7 @@
       }
     },
     "trace": {
-      "type": "remote",
+      "type": "http",
       "url": "http://127.0.0.1:8788/mcp"
     },
     "atlas-tools": {

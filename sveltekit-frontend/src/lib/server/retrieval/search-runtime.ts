@@ -19,6 +19,7 @@ import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/atlas/contracts/canonical-chunk-contract.js';
 import { ENV } from '$lib/server/env.server.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
+import type { HydrationProofContext, HydrationProofSummary, HydratedCandidatesWithProof } from './hydrate-candidates.js';
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
 
 let embeddingHealthCache:
@@ -173,6 +174,11 @@ export const SearchQuerySchema = z.object({
   text: z.string().min(1).max(1000),
   userId: z.string().min(1).optional(),
   caseId: z.string().optional(),
+  workspaceId: z.string().min(1).optional(),
+  workspaceRevision: z.string().min(1).optional(),
+  sourceRevision: z.string().min(1).optional(),
+  representationId: z.string().min(1).optional(),
+  representationRevision: z.number().int().positive().optional(),
   topK: z.number().int().min(1).max(100).default(20),
   threshold: z.number().min(0).max(1).optional(),
   filters: SearchMetadataFilterSchema.default({
@@ -193,6 +199,7 @@ export type SearchQuery = z.infer<typeof SearchQuerySchema>;
 export interface Candidate {
   id: string;
   packetKey: string;
+  symbolVersionId?: string | null;
   sourceRef: string;
   summary: string;
   content: string;
@@ -206,6 +213,15 @@ export interface Candidate {
     | 'schema'
     | 'rg_keyword';
   embeddingLane?: 'dense_768' | 'bm42'; // dense_768 is canonical dense lane
+  workspaceId?: string | null;
+  workspaceRevision?: string | null;
+  sourceRevision?: string | null;
+  representationId?: string | null;
+  representationRevision?: number | null;
+  qdrantPointId?: string | null;
+  treeNodeId?: string | null;
+  pageRankScore?: number | null;
+  stableSymbolId?: string | null;
 }
 
 /**
@@ -214,6 +230,35 @@ export interface Candidate {
 export interface FusedCandidate extends Candidate {
   fusionScore: number;
   rankBefore: number;
+  contributingLanes?: Candidate['scoreSource'][];
+}
+
+export interface RetrievalProofSummary {
+  requestedTopK: number;
+  oversampleFactor: number;
+  rawQdrantCount: number;
+  canonicalJoinedCount: number;
+  canonicalJoinMissingCount: number;
+  workspaceRejectedCount: number;
+  workspaceRevisionRejectedCount: number;
+  sourceRevisionRejectedCount: number;
+  representationRejectedCount: number;
+  representationRevisionRejectedCount: number;
+  duplicateSymbolVersionCount: number;
+  acceptedUniqueSymbolCount: number;
+  semanticLaneCount: number;
+  lexicalLaneCount: number;
+  graphLaneCount: number;
+  pagerankLaneCount: number;
+  summaryLaneCount: number;
+  graphScoreAttachedCount: number;
+  graphScoreMissingCount: number;
+  summaryResolvedCount: number;
+  summaryStaleRejectedCount: number;
+  rrfInputLaneCounts: Record<string, number>;
+  rrfOutputCount: number;
+  finalContextCount: number;
+  validationReasons: Record<string, number>;
 }
 
 /**
@@ -221,6 +266,7 @@ export interface FusedCandidate extends Candidate {
  */
 export interface SearchResult {
   packets: FeatureEnvelope[];
+  proof?: RetrievalProofSummary;
   metadata: {
     query: string;
     queryEmbedding?: number[];
@@ -362,6 +408,13 @@ export class SearchRuntime {
       // Validate query
       const query = SearchQuerySchema.parse(queryInput);
       const embeddingHealthy = await isEmbeddingHealthy();
+      const proofContext = {
+        workspaceId: query.workspaceId ?? null,
+        workspaceRevision: query.workspaceRevision ?? null,
+        sourceRevision: query.sourceRevision ?? null,
+        representationId: query.representationId ?? null,
+        representationRevision: query.representationRevision ?? null,
+      };
 
       // Stage 1: Retrieve candidates from multiple sources
       const retrieveStart = Date.now();
@@ -381,6 +434,28 @@ export class SearchRuntime {
             durationMs: Date.now() - startTime,
             stages: stageTiming,
           },
+          proof: this.buildRetrievalProof({
+            query,
+            rawCandidates: candidates,
+            fusedCandidates: [],
+            hydrationProof: {
+              canonicalJoinedCount: 0,
+              canonicalJoinMissingCount: 0,
+              workspaceRejectedCount: 0,
+              workspaceRevisionRejectedCount: 0,
+              sourceRevisionRejectedCount: 0,
+              representationRejectedCount: 0,
+              representationRevisionRejectedCount: 0,
+              graphScoreAttachedCount: 0,
+              graphScoreMissingCount: 0,
+              summaryResolvedCount: 0,
+              summaryStaleRejectedCount: 0,
+              validationReasons: {},
+            },
+            finalPackets: [],
+            postProcessedCount: 0,
+            rerankedCount: 0,
+          }),
           provenance: {
             retrievalSources: [],
             fusionMethod: 'rrf',
@@ -396,10 +471,11 @@ export class SearchRuntime {
       stageTiming.fuse = Date.now() - fuseStart;
 
       if (!embeddingHealthy) {
-        const topPackets = await this.hydrateCandidates(
+        const hydrated = await this.hydrateCandidatesWithProof(
           fused.slice(0, query.topK).map((candidate) => ({
             id: candidate.packetKey,
             packetKey: candidate.packetKey,
+            symbolVersionId: candidate.symbolVersionId,
             sourceRef: candidate.sourceRef,
             summary: '',
             content: '',
@@ -407,8 +483,19 @@ export class SearchRuntime {
             scoreSource: candidate.scoreSource,
             fusionScore: candidate.fusionScore,
             rankBefore: candidate.rankBefore,
+            qdrantPointId: candidate.qdrantPointId,
+            workspaceId: candidate.workspaceId,
+            workspaceRevision: candidate.workspaceRevision,
+            sourceRevision: candidate.sourceRevision,
+            representationId: candidate.representationId,
+            representationRevision: candidate.representationRevision,
+            treeNodeId: candidate.treeNodeId,
+            pageRankScore: candidate.pageRankScore,
+            stableSymbolId: candidate.stableSymbolId,
           })) as any,
+          proofContext,
         );
+        const topPackets = hydrated.envelopes;
 
         return {
           packets: topPackets,
@@ -428,6 +515,15 @@ export class SearchRuntime {
               postProcess: 0,
             },
           },
+          proof: this.buildRetrievalProof({
+            query,
+            rawCandidates: candidates,
+            fusedCandidates: fused,
+            hydrationProof: hydrated.proof,
+            finalPackets: topPackets,
+            postProcessedCount: topPackets.length,
+            rerankedCount: 0,
+          }),
           provenance: {
             retrievalSources: this.getRetrievalSources(candidates),
             fusionMethod: 'rrf',
@@ -453,7 +549,7 @@ export class SearchRuntime {
           scoreSource: c.scoreSource,
           qdrantPointId: (c as any).qdrantPointId,
           packetId: (c as any).packetId,
-        })),
+        })) as any,
         this.scorerOptions,
       );
       stageTiming.score = Date.now() - scoreStart;
@@ -465,19 +561,35 @@ export class SearchRuntime {
 
       // Stage 3: Hydrate candidates into feature envelopes (top-K by blended score)
       const hydrateStart = Date.now();
-      const envelopes = await this.hydrateCandidates(
-        scoredSorted.slice(0, query.topK).map(sc => ({
-          id: sc.packetKey,
-          packetKey: sc.packetKey,
-          sourceRef: sc.sourceRef,
-          summary: '',
-          content: '',
-          score: sc.blendedScore,
-          scoreSource: sc.scoreSource as FusedCandidate['scoreSource'],
-          fusionScore: sc.fusionScore,
-          rankBefore: sc.rankBefore,
-        })),
+      const hydrated = await this.hydrateCandidatesWithProof(
+        scoredSorted.slice(0, query.topK).map((sc) => {
+          const scoreCandidate = sc as any;
+          return {
+            id: sc.packetKey,
+            packetKey: sc.packetKey,
+            symbolVersionId: scoreCandidate.symbolVersionId ?? sc.packetKey,
+            sourceRef: sc.sourceRef,
+            summary: '',
+            content: '',
+            score: sc.blendedScore,
+            scoreSource: sc.scoreSource as FusedCandidate['scoreSource'],
+            fusionScore: sc.fusionScore,
+            rankBefore: sc.rankBefore,
+            qdrantPointId: scoreCandidate.qdrantPointId,
+            workspaceId: scoreCandidate.workspaceId,
+            workspaceRevision: scoreCandidate.workspaceRevision,
+            sourceRevision: scoreCandidate.sourceRevision,
+            representationId: scoreCandidate.representationId,
+            representationRevision: scoreCandidate.representationRevision,
+            treeNodeId: scoreCandidate.treeNodeId,
+            pageRankScore: scoreCandidate.pageRankScore,
+            stableSymbolId: scoreCandidate.stableSymbolId,
+            contributingLanes: scoreCandidate.contributingLanes ?? [scoreCandidate.scoreSource],
+          };
+        }) as any,
+        proofContext,
       );
+      const envelopes = hydrated.envelopes;
       stageTiming.hydrate = Date.now() - hydrateStart;
 
       // Stage 4: Rerank with the canonical executor
@@ -569,6 +681,15 @@ export class SearchRuntime {
           durationMs: Date.now() - startTime,
           stages: stageTiming,
         },
+        proof: this.buildRetrievalProof({
+          query,
+          rawCandidates: candidates,
+          fusedCandidates: fused,
+          hydrationProof: hydrated.proof,
+          finalPackets,
+          postProcessedCount: postProcessed.length,
+          rerankedCount: reranked.length,
+        }),
         provenance: {
           retrievalSources: this.getRetrievalSources(candidates),
           fusionMethod: 'rrf',
@@ -619,6 +740,7 @@ export class SearchRuntime {
     return applySearchMetadataFilter(stamped.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetId ?? lc.packetKey,
       packetKey: lc.packetKey,
+      symbolVersionId: lc.symbolVersionId ?? lc.packetKey ?? null,
       sourceRef: lc.sourceRef,
       summary: String(lc.metadata?.['summary'] ?? ''),
       content: String(lc.metadata?.['content'] ?? ''),
@@ -627,11 +749,20 @@ export class SearchRuntime {
         lc.lane === 'dense'
           ? 'qdrant_768'
           : lc.lane === 'exact'
-            ? 'exact_symbol'
-            : lc.lane === 'ast'
-              ? 'ast_tree'
-              : 'postgres_trigram'
+          ? 'exact_symbol'
+          : lc.lane === 'ast'
+            ? 'ast_tree'
+            : 'postgres_trigram'
       ) as Candidate['scoreSource'],
+      workspaceId: typeof lc.workspaceId === 'string' ? lc.workspaceId : undefined,
+      workspaceRevision: typeof lc.workspaceRevision === 'string' ? lc.workspaceRevision : undefined,
+      sourceRevision: typeof lc.sourceRevision === 'string' ? lc.sourceRevision : undefined,
+      representationId: typeof lc.representationId === 'string' ? lc.representationId : undefined,
+      representationRevision: typeof lc.representationRevision === 'number' ? lc.representationRevision : undefined,
+      qdrantPointId: typeof lc.qdrantPointId === 'string' ? lc.qdrantPointId : undefined,
+      treeNodeId: typeof lc.metadata?.['tree_node_id'] === 'string' ? String(lc.metadata['tree_node_id']) : undefined,
+      pageRankScore: typeof lc.metadata?.['page_rank_score'] === 'number' ? lc.metadata['page_rank_score'] as number : undefined,
+      stableSymbolId: typeof lc.metadata?.['stable_symbol_id'] === 'string' ? lc.metadata['stable_symbol_id'] as string : undefined,
       embeddingLane:
         lc.metadata?.['embedding_lane'] === 'dense_768'
           ? 'dense_768'
@@ -657,10 +788,10 @@ export class SearchRuntime {
     const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema', 'rg_keyword'] as const;
     for (const source of sources) {
       const sourceCards = valid.filter(c => c.scoreSource === source);
-      sourceCards.sort((a, b) => b.score - a.score || a.packetKey.localeCompare(b.packetKey));
+      sourceCards.sort((a, b) => b.score - a.score || this.getFusionIdentityKey(a).localeCompare(this.getFusionIdentityKey(b)));
       const ranked = new Map<string, number>();
       sourceCards.forEach((c, idx) => {
-        ranked.set(c.packetKey, idx + 1);
+        ranked.set(this.getFusionIdentityKey(c), idx + 1);
       });
       sourceRanks.set(source, ranked);
     }
@@ -668,7 +799,7 @@ export class SearchRuntime {
     // Apply RRF formula: score = Σ(1 / (k + rank)) for each source
     // k = 60 (standard RRF constant)
     const rrfScores = new Map<string, number>();
-    for (const [packetKey] of new Map(valid.map(c => [c.packetKey, c]))) {
+    for (const [packetKey] of new Map(valid.map(c => [this.getFusionIdentityKey(c), c]))) {
       let rrfScore = 0;
       for (const [source, ranks] of sourceRanks) {
         const rank = ranks.get(packetKey);
@@ -681,18 +812,29 @@ export class SearchRuntime {
 
     // Sort by RRF score and assign new ranks
     const sorted = Array.from(valid).sort((a, b) => {
-      const scoreA = rrfScores.get(a.packetKey) ?? 0;
-      const scoreB = rrfScores.get(b.packetKey) ?? 0;
+      const scoreA = rrfScores.get(this.getFusionIdentityKey(a)) ?? 0;
+      const scoreB = rrfScores.get(this.getFusionIdentityKey(b)) ?? 0;
       return scoreB - scoreA;
     });
 
     const unique = new Map<string, FusedCandidate>();
     for (const candidate of sorted) {
-      if (!unique.has(candidate.packetKey)) {
-        unique.set(candidate.packetKey, {
+      const key = this.getFusionIdentityKey(candidate);
+      if (!unique.has(key)) {
+        unique.set(key, {
           ...candidate,
-          fusionScore: rrfScores.get(candidate.packetKey) ?? 0,
+          packetKey: candidate.packetKey,
+          symbolVersionId: candidate.symbolVersionId ?? candidate.packetKey,
+          fusionScore: rrfScores.get(key) ?? 0,
           rankBefore: unique.size + 1,
+          contributingLanes: [candidate.scoreSource],
+        });
+      } else {
+        const existing = unique.get(key)!;
+        const contributingLanes = new Set([...(existing.contributingLanes ?? []), candidate.scoreSource]);
+        unique.set(key, {
+          ...existing,
+          contributingLanes: Array.from(contributingLanes),
         });
       }
     }
@@ -708,9 +850,15 @@ export class SearchRuntime {
    * Bulk fetch from Postgres to construct complete packet structures
    */
   private async hydrateCandidates(candidates: FusedCandidate[]): Promise<FeatureEnvelope[]> {
-    if (candidates.length === 0) return [];
-    const { hydrateCandidates: hydrateFromPostgres } = await import('./hydrate-candidates.js');
-    return hydrateFromPostgres(candidates as any);
+    return (await this.hydrateCandidatesWithProof(candidates)).envelopes;
+  }
+
+  private async hydrateCandidatesWithProof(
+    candidates: FusedCandidate[],
+    expected?: HydrationProofContext,
+  ): Promise<HydratedCandidatesWithProof> {
+    const { hydrateCandidatesWithProof } = await import('./hydrate-candidates.js');
+    return hydrateCandidatesWithProof(candidates as any, expected);
   }
 
   /**
@@ -745,6 +893,75 @@ export class SearchRuntime {
       }
     }
     return Array.from(sources);
+  }
+
+  private getFusionIdentityKey(candidate: Candidate): string {
+    return (
+      candidate.symbolVersionId?.trim() ||
+      candidate.packetKey?.trim() ||
+      candidate.id
+    );
+  }
+
+  private buildRetrievalProof(input: {
+    query: SearchQuery;
+    rawCandidates: Candidate[];
+    fusedCandidates: FusedCandidate[];
+    hydrationProof: HydrationProofSummary;
+    finalPackets: FeatureEnvelope[];
+    postProcessedCount: number;
+    rerankedCount: number;
+  }): RetrievalProofSummary {
+    const { query, rawCandidates, fusedCandidates, hydrationProof, finalPackets } = input;
+    const rawQdrantCount = rawCandidates.filter((candidate) => candidate.scoreSource === 'qdrant' || candidate.scoreSource === 'qdrant_768').length;
+    const semanticLaneCount = rawQdrantCount;
+    const lexicalLaneCount = rawCandidates.filter((candidate) => candidate.scoreSource === 'postgres_trigram').length;
+    const graphLaneCount = rawCandidates.filter((candidate) => candidate.scoreSource === 'ast_tree').length;
+    const pagerankLaneCount = finalPackets.filter((packet) => typeof packet.page_rank_score === 'number' && Number.isFinite(packet.page_rank_score)).length;
+    const summaryLaneCount = rawCandidates.filter((candidate) => candidate.scoreSource === 'rg_keyword').length;
+    const rrfInputLaneCounts = rawCandidates.reduce<Record<string, number>>((acc, candidate) => {
+      const key = candidate.scoreSource;
+      acc[key] = (acc[key] ?? 0) + 1;
+      return acc;
+    }, {});
+    const uniqueSymbolKeys = new Set<string>();
+    let duplicateSymbolVersionCount = 0;
+    for (const candidate of rawCandidates) {
+      const key = this.getFusionIdentityKey(candidate);
+      if (uniqueSymbolKeys.has(key)) {
+        duplicateSymbolVersionCount += 1;
+      } else {
+        uniqueSymbolKeys.add(key);
+      }
+    }
+
+    return {
+      requestedTopK: query.topK,
+      oversampleFactor: rawCandidates.length > 0 ? Math.max(1, Math.ceil(rawCandidates.length / Math.max(1, query.topK))) : 0,
+      rawQdrantCount,
+      canonicalJoinedCount: hydrationProof.canonicalJoinedCount,
+      canonicalJoinMissingCount: hydrationProof.canonicalJoinMissingCount,
+      workspaceRejectedCount: hydrationProof.workspaceRejectedCount,
+      workspaceRevisionRejectedCount: hydrationProof.workspaceRevisionRejectedCount,
+      sourceRevisionRejectedCount: hydrationProof.sourceRevisionRejectedCount,
+      representationRejectedCount: hydrationProof.representationRejectedCount,
+      representationRevisionRejectedCount: hydrationProof.representationRevisionRejectedCount,
+      duplicateSymbolVersionCount,
+      acceptedUniqueSymbolCount: fusedCandidates.length,
+      semanticLaneCount,
+      lexicalLaneCount,
+      graphLaneCount,
+      pagerankLaneCount,
+      summaryLaneCount,
+      graphScoreAttachedCount: hydrationProof.graphScoreAttachedCount,
+      graphScoreMissingCount: hydrationProof.graphScoreMissingCount,
+      summaryResolvedCount: hydrationProof.summaryResolvedCount,
+      summaryStaleRejectedCount: hydrationProof.summaryStaleRejectedCount,
+      rrfInputLaneCounts,
+      rrfOutputCount: fusedCandidates.length,
+      finalContextCount: finalPackets.length,
+      validationReasons: hydrationProof.validationReasons,
+    };
   }
 }
 

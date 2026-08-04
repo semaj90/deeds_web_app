@@ -65,6 +65,9 @@ export interface SearchResult {
   /** Canonical packet identity */
   packet_key: string | null;
 
+  /** Exact version-bound symbol identity when available */
+  symbol_version_id?: string | null;
+
   /** Canonical AST / structural identity when available */
   tree_node_id?: string | null;
 
@@ -73,6 +76,15 @@ export interface SearchResult {
 
   /** Workspace revision attached by the authority join when available */
   workspace_revision?: string | null;
+
+  /** Source revision attached by the authority join when available */
+  source_revision?: string | null;
+
+  /** Representation identity attached by the authority join when available */
+  representation_id?: string | null;
+
+  /** Representation revision attached by the authority join when available */
+  representation_revision?: number | null;
 
   /** Canonical feature label when the packet join resolves it */
   feature_label?: string | null;

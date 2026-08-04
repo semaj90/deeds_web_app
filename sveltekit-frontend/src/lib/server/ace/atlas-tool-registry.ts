@@ -269,7 +269,10 @@ async function runPatchTournament(
   _grant: PermissionGrant,
 ): Promise<PatchTournamentOutput> {
   const { buildPatchTournamentPlan } = await import('$lib/server/agent/patch-tournament.js');
-  return buildPatchTournamentPlan(input);
+  // PatchTournamentPlan and PatchTournamentOutput are structurally equivalent;
+  // the Zod-inferred type uses partial tuples while the agent type uses a 3-tuple.
+  // Cast through unknown to bridge the minor tuple arity difference.
+  return buildPatchTournamentPlan(input as Parameters<typeof buildPatchTournamentPlan>[0]) as unknown as PatchTournamentOutput;
 }
 
 async function applyPatch(input: PatchApplyInput, _grant: PermissionGrant): Promise<PatchApplyOutput> {

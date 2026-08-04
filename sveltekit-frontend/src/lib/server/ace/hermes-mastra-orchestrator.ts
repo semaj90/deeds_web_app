@@ -12,6 +12,7 @@
  */
 
 import { getRedis } from '$lib/server/redis.js';
+import { DebouncedDagLogger, type DagLogSink } from '$lib/server/observability/dag-debounced-logger.js';
 
 export interface HermesQuery {
   query: string;
@@ -48,6 +49,25 @@ export class HermesMastraOrchestrator {
   private static redis = getRedis();
   private static MASTRA_ENABLED = process.env.MASTRA_ENABLED === 'true';
   private static GEMMA4_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090/v1';
+
+  // Debounced DAG orchestration logger
+  private static dagSink: DagLogSink = {
+    async emit(event) {
+      console.log(`[DAG/${event.kind}] ${event.message}`, {
+        workflow: event.workflowId,
+        run: event.runId,
+        debounced: event.debounce?.coalescedCount || 1
+      });
+    }
+  };
+
+  private static dagLogger = new DebouncedDagLogger(
+    HermesMastraOrchestrator.dagSink,
+    {
+      debounceMs: Number(process.env.PARENT_ATLAS_DAG_LOG_DEBOUNCE_MS || 250),
+      maxPending: Number(process.env.PARENT_ATLAS_DAG_LOG_MAX_PENDING || 1000)
+    }
+  );
 
   /**
    * Main orchestration entry point
@@ -147,6 +167,21 @@ export class HermesMastraOrchestrator {
   private static async executeToolsViaMcp(decision: HermesDecision): Promise<any[]> {
     const results: any[] = [];
     const mcpServerUrl = process.env.TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
+    const workflowId = `hermes_${Date.now()}`;
+    const runId = `run_${Math.random().toString(36).slice(2, 9)}`;
+
+    // Log start of tool execution phase
+    await this.dagLogger.log({
+      workflowId,
+      runId,
+      kind: 'progress',
+      level: 'info',
+      message: `Executing ${decision.selectedTools.length} tool(s) via MCP`,
+      attributes: {
+        toolCount: decision.selectedTools.length,
+        tools: decision.selectedTools,
+      },
+    });
 
     for (let i = 0; i < decision.selectedTools.length; i++) {
       const toolName = decision.selectedTools[i];
@@ -173,6 +208,16 @@ export class HermesMastraOrchestrator {
         });
 
         if (!mcpRes.ok) {
+          await this.dagLogger.log({
+            workflowId,
+            runId,
+            nodeId: toolName,
+            kind: 'error',
+            level: 'error',
+            message: `MCP server returned ${mcpRes.status} for tool ${toolName}`,
+            attributes: { httpStatus: mcpRes.status, tool: toolName },
+          });
+
           results.push({
             tool: toolName,
             args,
@@ -191,6 +236,16 @@ export class HermesMastraOrchestrator {
           cached: false,
         });
       } catch (err) {
+        await this.dagLogger.log({
+          workflowId,
+          runId,
+          nodeId: toolName,
+          kind: 'error',
+          level: 'error',
+          message: `Tool execution failed: ${err instanceof Error ? err.message : 'unknown'}`,
+          attributes: { tool: toolName, errorType: err instanceof Error ? err.constructor.name : 'unknown' },
+        });
+
         results.push({
           tool: toolName,
           args,
@@ -199,6 +254,25 @@ export class HermesMastraOrchestrator {
         });
       }
     }
+
+    // Log completion of tool execution phase
+    const executedCount = results.filter(r => r.status === 'executed').length;
+    const errorCount = results.filter(r => r.status === 'error').length;
+
+    await this.dagLogger.log({
+      workflowId,
+      runId,
+      kind: 'state_transition',
+      level: 'info',
+      message: `Tool execution complete: ${executedCount} succeeded, ${errorCount} failed`,
+      attributes: {
+        from_state: 'planning',
+        to_state: 'tool_execution_complete',
+        executedCount,
+        errorCount,
+        totalTools: decision.selectedTools.length,
+      },
+    });
 
     return results;
   }
