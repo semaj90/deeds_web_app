@@ -7,7 +7,7 @@
  * - Qdrant vector search for semantic patch matching
  * - pg_vector for cluster embeddings
  * - embeddinggemma:latest via getOllamaEndpoint()
- * - Concurrent LLM (Gemma3 + Gemini)
+ * - Concurrent LLM (Gemma4 + Gemini)
  * - FastMCP tool calling
  * - RAG + KAG knowledge retrieval
  * - ripgrep for codebase search

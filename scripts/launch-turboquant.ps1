@@ -1053,16 +1053,9 @@ if (Test-LlamaFlag $llama '--jinja') {
 # -- Skip chat template parsing only when explicitly requested -----------------
 # The OpenCode template should validate cleanly on a healthy llama-server build.
 # If you need to bypass template validation for a local experiment, set
-# TURBO_SKIP_CHAT_PARSING=true.
-$skipChatParsing = $env:TURBO_SKIP_CHAT_PARSING -and ("$($env:TURBO_SKIP_CHAT_PARSING)" -match '^(1|true|yes|on)$')
-if ($skipChatParsing -and (Test-LlamaFlag $llama '--skip-chat-parsing')) {
-    Write-Host "Chat parsing: --skip-chat-parsing enabled (explicit override)" -ForegroundColor Cyan
-    $baseArgs = $baseArgs + @('--skip-chat-parsing')
-} elseif ($skipChatParsing) {
-    Write-Host "Chat parsing: requested but not supported by this binary - continuing without it" -ForegroundColor DarkYellow
-} else {
-    Write-Host "Chat parsing: using llama-server template validation" -ForegroundColor Cyan
-}
+# Chat parsing ALWAYS enabled (required for tool-call parsing).
+# Disabling chat parsing breaks Cline/OpenCode tool-call handling.
+Write-Host "Chat parsing: using llama-server template validation (NOT SKIPPED)" -ForegroundColor Green
 
 # -- KV prefix reuse: reduce prefill cost on repeated system prompts -------
 if (Test-LlamaFlag $llama '--cache-prompt') {
