@@ -26,7 +26,26 @@ import { createRequire } from 'module';
 import path from 'path';
 
 const require = createRequire(import.meta.url);
-const ADDON_PATH = path.resolve('simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+
+// Multi-fallback addon resolver (matches libtorch-bridge.ts logic)
+function resolveAddonPath() {
+  const envOverride = process.env.TENSORRT_BRIDGE_NODE_PATH?.trim();
+  const paths = [
+    envOverride,
+    path.resolve(process.cwd(), '../simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+    path.resolve(process.cwd(), '../simd-bridge/cpp/build/tensorrt_bridge.node'),
+    path.resolve(process.cwd(), '../simd-bridge/build/Release/tensorrt_bridge.node'),
+    path.resolve(process.cwd(), 'simd-bridge/cpp/build/Release/tensorrt_bridge.node'),
+    'C:/Users/james/Videos/deeds-web-app/simd-bridge/cpp/build/Release/tensorrt_bridge.node'
+  ].filter(Boolean);
+
+  for (const p of paths) {
+    if (existsSync(p)) return p;
+  }
+  return null;
+}
+
+const ADDON_PATH = resolveAddonPath();
 const OUT_FILE = '.tmp/gpu-bridge-probe.json';
 const LOG_FILE = path.resolve('logs/task-output/startup-gpu-bridge-probe.log');
 
