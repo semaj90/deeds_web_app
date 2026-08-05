@@ -1,5 +1,12 @@
 # Tasks — Parent Atlas Native Acceleration C ABI
 
+**Session 196 Handoff (2026-08-05)** — Critical corrections applied:
+- ✅ P1.1–P1.2 reverted from [x] to [ ] with honest classifications (0 CUDA_LIVE proven, 15 SHAPE_VALID, 1 SKIPPED_EXTERNAL_PROOF)
+- ✅ classifyOutcome() fixed in startup-gpu-bridge-probe.mjs (returns SHAPE_VALID not CUDA_LIVE)
+- ✅ Dual-track architecture declared (Track A: Windows addon P1.1–P1.10 independent of P0; Track B: WSL2 RAPIDS P3.1–P3.11 independent of P0)
+- ✅ getBackendInfo status: SOURCE_IMPLEMENTED, BUILD_NOT_PROVEN, EXPORT_NOT_PROVEN, RUNTIME_VALUES_NOT_VALIDATED
+- **Next session**: P1.3 (execution counters) → P1.4 (numerical parity) → final backend classification
+
 Statuses: PASS | FAIL | PARTIAL_PROVEN | FIXTURE_PROVEN | NOT_PROVEN | NOT_APPLICABLE.
 No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS from imports, exports, array shapes, or process exit alone.
 
