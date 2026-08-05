@@ -86,16 +86,25 @@ function resolveModelPath(modelId: string): string {
 
 /**
  * Get available execution providers in priority order.
- * CUDA (GPU) → CPU.
+ *
+ * DirectML (Windows, D3D12) → CUDA → CPU when EMBEDDING_BACKEND=onnx_directml —
+ * DirectML runs through a separate driver/allocator path from CUDA, so it
+ * doesn't compete with a llama.cpp CUDA context (e.g. TurboQuant on :8090)
+ * for the same VRAM heap. Otherwise: CUDA → CPU (legacy default).
  */
 function getServerProviders(): string[] {
 	const providers: string[] = [];
+
+	const wantDirectML = process.env.EMBEDDING_BACKEND === 'onnx_directml' && process.platform === 'win32';
+	if (wantDirectML) {
+		providers.push('dml');
+	}
 
 	// Check CUDA availability via environment hint
 	const hasCuda = process.env.CUDA_VISIBLE_DEVICES !== '-1' &&
 		(process.env.ONNX_USE_CUDA === '1' || process.env.CUDA_VISIBLE_DEVICES !== undefined);
 
-	if (hasCuda) {
+	if (hasCuda && !wantDirectML) {
 		providers.push('cuda');
 	}
 	providers.push('cpu');
@@ -149,7 +158,7 @@ async function _createServerSession(
 			);
 
 			const loadTimeMs = Math.round(performance.now() - startTime);
-			const label = ep === 'cuda' ? 'CUDA (GPU)' : ep.toUpperCase();
+			const label = ep === 'cuda' ? 'CUDA (GPU)' : ep === 'dml' ? 'DirectML (GPU)' : ep.toUpperCase();
 			console.info(`[ONNX-Server] ${modelId} loaded with ${label} in ${loadTimeMs}ms`);
 			console.info(`[ONNX-Server] Inputs: ${session.inputNames.join(', ')}`);
 			console.info(`[ONNX-Server] Outputs: ${session.outputNames.join(', ')}`);

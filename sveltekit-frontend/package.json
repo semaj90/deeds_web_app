@@ -1580,6 +1580,7 @@
     "nats": "2.29.3",
     "nes.css": "^2.3.0",
     "ollama": "^0.6.0",
+    "onnxruntime-node": "1.14.0",
     "pdf-parse": "2.4.5",
     "pg": "^8.0.0",
     "svelte-preprocess": "6.0.4",

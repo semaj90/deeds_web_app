@@ -26,6 +26,33 @@ import { taskTypeSchema, type TaskType, type WorkCommandBase } from './commands.
 import { EXCHANGES, ROUTING_KEYS } from './topology.js';
 
 // ---------------------------------------------------------------------------
+// Error details extractor — exposes PostgreSQL cause chain
+// ---------------------------------------------------------------------------
+
+function errorDetails(error: unknown): Record<string, unknown> {
+  if (!(error instanceof Error)) {
+    return { value: String(error) };
+  }
+  const cause = error.cause as Error | undefined;
+  return {
+    name: error.name,
+    message: error.message,
+    stack: error.stack,
+    cause: cause ? {
+      name: cause.name,
+      message: cause.message,
+      code: (cause as any).code,
+      detail: (cause as any).detail,
+      hint: (cause as any).hint,
+      table: (cause as any).table,
+      column: (cause as any).column,
+      constraint: (cause as any).constraint,
+      stack: cause.stack
+    } : undefined
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Outbox row shape
 // ---------------------------------------------------------------------------
 
@@ -197,7 +224,7 @@ export function startOutboxPublisher(opts: {
       try {
         await _publishBatch(publishFn, batchSize);
       } catch (err) {
-        console.warn('[outbox] publish batch error:', (err as Error).message);
+        console.error('[outbox] publish batch error:', JSON.stringify(errorDetails(err), null, 2));
       }
       await new Promise((r) => setTimeout(r, intervalMs));
     }

@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest", "--browser", "chromium"],
+      "command": "cmd",
+      "args": ["/c", "npx", "@playwright/mcp@0.0.78", "--browser", "chromium"],
       "env": {
         "PLAYWRIGHT_BASE_URL": "http://localhost:5173"
       }
@@ -12,8 +12,8 @@
       "url": "http://127.0.0.1:8788/mcp"
     },
     "atlas-tools": {
-      "command": "npx",
-      "args": ["tsx", "./sveltekit-frontend/src/mcp/server.ts"],
+      "command": "cmd",
+      "args": ["/c", "npx", "tsx", "./sveltekit-frontend/src/mcp/server.ts"],
       "env": {
         "NODE_ENV": "production",
         "DATABASE_URL": "postgresql://legal_admin:legal@127.0.0.1:5434/legal_ai_db",

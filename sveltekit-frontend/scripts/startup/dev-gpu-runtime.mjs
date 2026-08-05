@@ -14,12 +14,70 @@ import { spawn } from 'node:child_process';
 import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { loadRepoEnv } from '../../../scripts/atlas/connection-config.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(FRONTEND_ROOT, '..');
 const envFromFiles = loadRepoEnv(process.env);
+
+// ---------------------------------------------------------------------------
+// Embedding backend selector — explicit enum, not a vague on/off flag.
+//
+// 'ollama'         Ollama's own supervisor loads embeddinggemma:latest into a
+//                   private llama-server.exe runner on demand (ephemeral port),
+//                   proxied through :11434/api/embed. Default — no eager VRAM
+//                   reservation while the :8090 chat model already holds ~7.5GB
+//                   of an 8GB card.
+// 'llama_cpp_gguf'  A dedicated second llama-server.exe (GGUF, CUDA) started
+//                   eagerly on :8081 via launch-embed-server.ps1. Higher batch
+//                   throughput; costs ~600MB extra VRAM held the whole session.
+// 'onnx_directml'   In-process ONNX Runtime session inside the SvelteKit
+//                   server itself (onnx-server.ts), using the DirectML (D3D12)
+//                   execution provider. No separate port/process — the model
+//                   loads into the same Node process serving Vite. DirectML
+//                   runs through a driver/allocator path separate from CUDA,
+//                   so it doesn't compete with TurboQuant's CUDA context for
+//                   the same VRAM heap. Windows only; falls back to 'ollama'
+//                   elsewhere. Requires onnxruntime-node (package.json).
+//
+// DEV_GPU_EMBED_SERVER=onnx is a deprecated alias for 'llama_cpp_gguf' — it
+// never meant ONNX Runtime; it started the GGUF embed server. Kept only for
+// backward compatibility with existing .env files.
+// ---------------------------------------------------------------------------
+const EMBEDDING_BACKENDS = ['ollama', 'llama_cpp_gguf', 'onnx_directml'];
+
+function resolveEmbeddingBackend(extra = {}) {
+  const legacyOnnxFlag = String(
+    extra.DEV_GPU_EMBED_SERVER ?? envFromFiles.DEV_GPU_EMBED_SERVER ?? process.env.DEV_GPU_EMBED_SERVER ?? '',
+  ).toLowerCase() === 'onnx';
+
+  const raw = String(
+    extra.EMBEDDING_BACKEND ?? envFromFiles.EMBEDDING_BACKEND ?? process.env.EMBEDDING_BACKEND
+      ?? (legacyOnnxFlag ? 'llama_cpp_gguf' : 'ollama'),
+  ).toLowerCase();
+
+  if (legacyOnnxFlag && !envFromFiles.EMBEDDING_BACKEND && !process.env.EMBEDDING_BACKEND) {
+    console.warn(
+      '[dev:gpu] ⚠️  DEV_GPU_EMBED_SERVER=onnx is deprecated (it starts a GGUF llama.cpp server, not ONNX Runtime). ' +
+      'Set EMBEDDING_BACKEND=llama_cpp_gguf instead.',
+    );
+  }
+
+  if (!EMBEDDING_BACKENDS.includes(raw)) {
+    throw new Error(`Unsupported EMBEDDING_BACKEND: "${raw}" — expected one of ${EMBEDDING_BACKENDS.join(', ')}`);
+  }
+
+  if (raw === 'onnx_directml' && process.platform !== 'win32') {
+    console.warn(
+      '[dev:gpu] ⚠️  EMBEDDING_BACKEND=onnx_directml requires Windows (DirectML/D3D12). Falling back to "ollama".',
+    );
+    return 'ollama';
+  }
+
+  return raw;
+}
 
 function mergedEnv(extra = {}) {
   const devGpuEnableMtp = String(
@@ -34,12 +92,11 @@ function mergedEnv(extra = {}) {
   const synthPort = isLiteRT ? '8070' : '8090';
 
   // Only point the app at the :8081 GGUF embed server when it's been opted
-  // into (DEV_GPU_EMBED_SERVER=onnx). Otherwise leave OLLAMA_EMBED_BASE_URL
+  // into (EMBEDDING_BACKEND=llama_cpp_gguf). Otherwise leave OLLAMA_EMBED_BASE_URL
   // unset so embedding-client.ts's Tier-0 probe is skipped entirely (rather
   // than dialing a dead :8081 on every embed call) and Ollama is used directly.
-  const wantOnnxEmbedServer = String(
-    extra.DEV_GPU_EMBED_SERVER ?? envFromFiles.DEV_GPU_EMBED_SERVER ?? process.env.DEV_GPU_EMBED_SERVER ?? 'ollama',
-  ).toLowerCase() === 'onnx';
+  const embeddingBackend = resolveEmbeddingBackend(extra);
+  const wantOnnxEmbedServer = embeddingBackend === 'llama_cpp_gguf';
 
   return {
     ...process.env,
@@ -47,6 +104,7 @@ function mergedEnv(extra = {}) {
     GPU_ENABLED: 'true',
     VITE_GPU_ENABLED: 'true',
     CUDA_VISIBLE_DEVICES: envFromFiles.CUDA_VISIBLE_DEVICES ?? '0',
+    EMBEDDING_BACKEND: embeddingBackend,
     // Explicit undefined (not omission) so a leftover value from process.env
     // or envFromFiles is actually cleared for the child process, not inherited.
     OLLAMA_EMBED_BASE_URL: wantOnnxEmbedServer
@@ -55,7 +113,6 @@ function mergedEnv(extra = {}) {
     EMBED_SERVER_URL: wantOnnxEmbedServer
       ? (envFromFiles.EMBED_SERVER_URL ?? envFromFiles.OLLAMA_EMBED_BASE_URL ?? 'http://127.0.0.1:8081')
       : undefined,
-    EMBED_BACKEND: envFromFiles.EMBED_BACKEND ?? 'onnx',
     EMBED_SERVER_PORT: envFromFiles.EMBED_SERVER_PORT ?? '8081',
     EMBED_MAX_BATCH: envFromFiles.EMBED_MAX_BATCH ?? '64',
     MINIFORGE_SIDECAR_URL: envFromFiles.MINIFORGE_SIDECAR_URL ?? 'http://127.0.0.1:8095',
@@ -183,6 +240,104 @@ async function checkForDuplicateLlamaServerProcesses() {
   } catch {
     // tasklist unavailable/failed — advisory only, never block startup on this
   }
+}
+
+/**
+ * Bounded verification that :8090 is actually serving the TARGET model, not
+ * just that something responds. launch-turboquant.ps1 has its own
+ * model_alias check before it exits, but that only protects the "already
+ * healthy, skip restart" branch inside the PS1 — it does not guarantee the
+ * PS1 actually reached a healthy state at all (crash mid-load, wrong file,
+ * OOM, stale process holding the port that the PS1's own restart logic
+ * failed to kill). This is the dev:gpu-side backstop: poll /props a FIXED
+ * number of times (never infinite) and report ok/fail with the reason.
+ *
+ * llama-server-only by design — this project standardizes on llama-server
+ * as the sole GPU chat backend for dev:gpu (LiteRT is a separate opt-in
+ * backend with no /props-equivalent verification surface; see the isLiteRT
+ * branch in main()). This function does not attempt LiteRT verification and
+ * must not be reused for it.
+ */
+async function verifyLlamaServerModelLoaded(targetModelPath, port = 8090, opts = {}) {
+  const { maxAttempts = 10, intervalMs = 1500 } = opts;
+  const targetBasename = path.basename(targetModelPath);
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}/props`, {
+        signal: AbortSignal.timeout(3000),
+      });
+      if (res.ok) {
+        const props = await res.json();
+        const runningAlias = props.model_alias || (props.model_path ? path.basename(props.model_path) : null);
+        if (runningAlias === targetBasename) {
+          return { ok: true, attempt, targetBasename, runningAlias };
+        }
+        return {
+          ok: false,
+          attempt,
+          targetBasename,
+          runningAlias,
+          reason: `model mismatch: running="${runningAlias ?? 'unknown'}" target="${targetBasename}"`,
+        };
+      }
+    } catch {
+      // Not ready yet (still loading, or briefly down mid-restart) — keep polling.
+    }
+    if (attempt < maxAttempts) {
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
+  }
+
+  return {
+    ok: false,
+    attempt: maxAttempts,
+    targetBasename,
+    runningAlias: null,
+    reason: `:${port}/props unreachable after ${maxAttempts} attempts (~${Math.round((maxAttempts * intervalMs) / 1000)}s)`,
+  };
+}
+
+/**
+ * Write a plain-text diagnostic summary to openspec/changes/ on verification
+ * failure, then STOP (caller must exit — this function never retries or
+ * loops). Per-run file (timestamped), not an append-forever log, so each
+ * failure is independently readable and old ones don't need pruning.
+ */
+function writeStartupFailureReport(details) {
+  const dir = path.join(REPO_ROOT, 'openspec', 'changes');
+  mkdirSync(dir, { recursive: true });
+  const reportPath = path.join(dir, `gpu-startup-failure-${Date.now()}.txt`);
+
+  const lines = [
+    `dev:gpu startup verification FAILED`,
+    `timestamp: ${new Date().toISOString()}`,
+    `target model: ${details.targetBasename}`,
+    `running model: ${details.runningAlias ?? 'unknown/unreachable'}`,
+    `attempts: ${details.attempt}`,
+    `reason: ${details.reason}`,
+    ``,
+    `Suggested next steps:`,
+    `  1. Check for a stale/orphan llama-server.exe bypassing launch-turboquant.ps1:`,
+    `     tasklist /FI "IMAGENAME eq llama-server.exe"`,
+    `  2. If one is found, kill it and rerun:`,
+    `     taskkill /F /IM llama-server.exe`,
+    `     npm run dev:gpu`,
+    `  3. Check for a manual/raw launch task that bypasses the launcher's`,
+    `     model-alias safety check entirely (e.g. a .vscode/tasks.json entry`,
+    `     invoking llama-server.exe directly instead of launch-turboquant.ps1).`,
+    `  4. Check .env / .env.local for a TURBO_CHAT_TEMPLATE_FILE or`,
+    `     TURBO_PROFILE override that may be forcing an unintended pairing.`,
+    `  5. Inspect the launcher's own stderr log under logs/turboquant/ for`,
+    `     the most recent launch-*.err file (load crash, OOM, missing file).`,
+    ``,
+    `This run did NOT retry automatically — dev:gpu stops here rather than`,
+    `looping. Re-run npm run dev:gpu manually after addressing the cause.`,
+  ];
+
+  appendFileSync(reportPath, lines.join('\n') + '\n');
+  console.error(`[dev:gpu] ❌ Model verification failed — report written: ${reportPath}`);
+  for (const line of lines) console.error(`[dev:gpu]   ${line}`);
 }
 
 async function isLlamaServerRunning(port = 8090) {
@@ -334,7 +489,22 @@ async function main() {
         '-TextOnly',
       ], { cwd: REPO_ROOT, env: launcherEnv });
 
-      console.log('[dev:gpu] ✅ TurboQuant llama-server (Gemma4) active on :8090');
+      // Bounded verification gate — confirms the TARGET model is actually
+      // loaded on :8090, not just that launch-turboquant.ps1 exited 0 or
+      // that something responds. Fixed attempt count (never infinite). On
+      // failure: write the report and STOP dev:gpu here — do not retry, do
+      // not fall back to a different backend, do not proceed into Vite with
+      // an unverified/wrong LLM backend.
+      const targetModel = launcherEnv.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+      console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
+      const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);
+
+      if (!verification.ok) {
+        writeStartupFailureReport(verification);
+        process.exit(1);
+      }
+
+      console.log(`[dev:gpu] ✅ TurboQuant llama-server (${verification.runningAlias}) verified active on :8090 (attempt ${verification.attempt})`);
     }
   }
 
@@ -342,13 +512,18 @@ async function main() {
   // model competing with the :8090 chat model for the same 8GB card. Ollama
   // already serves embeddinggemma:latest on-demand (loads on first request,
   // unloads after its idle keep-alive) so it's the right default for routine
-  // dev. Set DEV_GPU_EMBED_SERVER=onnx to eagerly start :8081 for sessions
-  // doing heavy bulk-embedding work (graphify backfills, batch indexing) that
-  // want its higher-throughput batch endpoint. embedding-client.ts's Tier-0
-  // probe already fails over to Ollama near-instantly when :8081 isn't up.
+  // dev. Set EMBEDDING_BACKEND=llama_cpp_gguf to eagerly start :8081 for
+  // sessions doing heavy bulk-embedding work (graphify backfills, batch
+  // indexing) that want its higher-throughput batch endpoint.
+  // embedding-client.ts's Tier-0 probe already fails over to Ollama
+  // near-instantly when :8081 isn't up.
   const embedPort = parseInt(process.env.EMBED_SERVER_PORT ?? '8081');
-  const wantEmbedServer = String(process.env.DEV_GPU_EMBED_SERVER ?? 'ollama').toLowerCase() === 'onnx';
-  if (await isLlamaServerRunning(embedPort)) {
+  const embeddingBackend = resolveEmbeddingBackend();
+  const wantEmbedServer = embeddingBackend === 'llama_cpp_gguf';
+  if (embeddingBackend === 'onnx_directml') {
+    console.log('[dev:gpu] ✅ Embedding backend: onnx_directml — in-process ONNX Runtime session, no separate port');
+    console.log('[dev:gpu]    Model: embeddinggemma (static/embeddinggemma_300m_onnx/model.onnx), execution provider: DirectML (falls back to CPU if unavailable)');
+  } else if (await isLlamaServerRunning(embedPort)) {
     console.log(`[dev:gpu] ✅ Embed server already running on :${embedPort} — leaving it up`);
   } else if (wantEmbedServer) {
     const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -357,14 +532,14 @@ async function main() {
         cwd: FRONTEND_ROOT,
         env: mergedEnv(),
       });
-      console.log('[dev:gpu] ✅ ONNX Embedding server started on :8081 (DEV_GPU_EMBED_SERVER=onnx)');
+      console.log('[dev:gpu] ✅ Embedding backend: llama_cpp_gguf — GGUF/CUDA server on :8081 (EMBEDDING_BACKEND=llama_cpp_gguf)');
     } catch {
-      console.log('[dev:gpu] ⚠️  ONNX Embedding server unavailable, using Ollama fallback');
-      console.log('[dev:gpu] Will use Ollama embeddinggemma:latest at :11434/api');
+      console.log('[dev:gpu] ⚠️  llama_cpp_gguf embed server unavailable, using Ollama fallback');
+      console.log('[dev:gpu] Embedding backend: ollama — model embeddinggemma:latest, endpoint http://127.0.0.1:11434/api/embed, execution provider Ollama-managed');
     }
   } else {
-    console.log('[dev:gpu] ℹ️  Skipping :8081 GGUF embed server (default) — using Ollama embeddinggemma:latest on-demand');
-    console.log('[dev:gpu]    Set DEV_GPU_EMBED_SERVER=onnx to eagerly start :8081 for bulk-embedding sessions');
+    console.log('[dev:gpu] Embedding backend: ollama — model embeddinggemma:latest, endpoint http://127.0.0.1:11434/api/embed, execution provider Ollama-managed (on-demand)');
+    console.log('[dev:gpu]    Set EMBEDDING_BACKEND=llama_cpp_gguf to eagerly start a dedicated GGUF/CUDA embed server on :8081');
   }
 
   // Start the NLP sidecar unless already running on :8095
@@ -388,12 +563,23 @@ async function main() {
 
   console.log('[dev:gpu] --- GPU Runtime Ready ---');
   console.log(`[dev:gpu] LLM (synthesis):  ${llmUrl} (${isLiteRT ? 'LiteRT-LM' : 'TurboQuant llama-server'})`);
-  if (wantEmbedServer) {
-    console.log('[dev:gpu] Embeddings (L1):  http://127.0.0.1:8081/v1/embeddings (ONNX, eager)');
-    console.log('[dev:gpu] Embeddings (L2):  http://127.0.0.1:11434/api (Ollama embeddinggemma, fallback)');
+  if (embeddingBackend === 'onnx_directml') {
+    console.log('[dev:gpu] Embedding backend: onnx_directml');
+    console.log('[dev:gpu]   Model:              embeddinggemma (ONNX, static/embeddinggemma_300m_onnx/model.onnx)');
+    console.log('[dev:gpu]   Endpoint:           in-process (no port — session lives inside the SvelteKit server)');
+    console.log('[dev:gpu]   Execution provider: DirectML (D3D12) → CPU fallback');
+  } else if (wantEmbedServer) {
+    console.log('[dev:gpu] Embedding backend: llama_cpp_gguf');
+    console.log('[dev:gpu]   Model:              embeddinggemma (GGUF)');
+    console.log('[dev:gpu]   Endpoint (L1):      http://127.0.0.1:8081/v1/embeddings');
+    console.log('[dev:gpu]   Execution provider: llama.cpp CUDA (-ngl 99)');
+    console.log('[dev:gpu]   Fallback (L2):      http://127.0.0.1:11434/api/embed (Ollama-managed)');
   } else {
-    console.log('[dev:gpu] Embeddings:       http://127.0.0.1:11434/api (Ollama embeddinggemma, on-demand)');
-    console.log('[dev:gpu]                   :8081 GGUF embed server not started — set DEV_GPU_EMBED_SERVER=onnx to enable');
+    console.log('[dev:gpu] Embedding backend: ollama');
+    console.log('[dev:gpu]   Model:              embeddinggemma:latest');
+    console.log('[dev:gpu]   Endpoint:           http://127.0.0.1:11434/api/embed');
+    console.log('[dev:gpu]   Execution provider: Ollama-managed (on-demand runner, unloads on idle)');
+    console.log('[dev:gpu]                   Set EMBEDDING_BACKEND=llama_cpp_gguf to enable the dedicated :8081 server');
   }
   console.log(`[dev:gpu] NLP sidecar:     http://127.0.0.1:${nlpPort} (LangExtract + tree-sitter + ast-grep)`);
 

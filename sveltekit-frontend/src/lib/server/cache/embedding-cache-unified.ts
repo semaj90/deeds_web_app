@@ -44,37 +44,24 @@ async function fetchEmbedding(
   text: string,
   model: string = DEFAULT_MODEL
 ): Promise<Float32Array> {
-  try {
-    const response = await fetch('/api/embed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, model }),
-    });
+  // /api/embed's request schema only accepts model: 'embeddinggemma' | 'mock'.
+  // The `model` param here is a cache-key label (e.g. 'embeddinggemma:latest'),
+  // not a route selector — sending it verbatim always fails schema validation
+  // with a 400. embedText() on the server already does its own internal
+  // embeddinggemma -> nomic-embed-text fallback, so no client-side retry
+  // with a different model name is needed here.
+  const response = await fetch('/api/embed', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, model: 'embeddinggemma' }),
+  });
 
-    if (!response.ok) {
-      throw new Error(`Embed API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return new Float32Array(data.embedding);
-  } catch (err) {
-    if (model === DEFAULT_MODEL) {
-      console.warn('[EmbeddingCache] Fallback to nomic-embed-text:', err);
-      const response = await fetch('/api/embed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, model: 'nomic-embed-text' }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Embed fallback failed: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return new Float32Array(data.embedding);
-    }
-    throw err;
+  if (!response.ok) {
+    throw new Error(`Embed API error: ${response.status}`);
   }
+
+  const data = await response.json();
+  return new Float32Array(data.embedding);
 }
 
 /**

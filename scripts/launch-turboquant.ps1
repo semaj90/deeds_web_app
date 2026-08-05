@@ -92,6 +92,26 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# -- Pre-flight: Check if llama-server is already running on :8090 -----------
+function Test-LlamaServerHealth {
+  $port = $env:TURBO_PORT ?? 8090
+  $url = "http://127.0.0.1:${port}/health"
+
+  try {
+    $response = Invoke-WebRequest -Uri $url -Method Get -TimeoutSec 2 -ErrorAction SilentlyContinue
+    return $response.StatusCode -eq 200
+  } catch {
+    return $false
+  }
+}
+
+if (Test-LlamaServerHealth) {
+  Write-Host "✅ llama-server is already running on :8090" -ForegroundColor Green
+  Write-Host "   URL: http://127.0.0.1:8090"
+  Write-Host "   Skipping launch" -ForegroundColor Cyan
+  exit 0
+}
+
 # -- Startup profiles (arrow-key selectable) -------------------------------
 # Three named profiles bundle model + template + reasoning mode together so
 # the operator picks ONE coherent config instead of composing env vars by hand.

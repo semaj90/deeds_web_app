@@ -5,6 +5,7 @@ import { apiResponses } from '$lib/server/api/response-helper.js';
 import { embedRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { runEmbedding as runOnnxDirectMLEmbedding } from '$lib/server/ai/onnx-server.js';
 import { traceEmbedding } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
@@ -71,7 +72,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		switch (model) {
 			case 'embeddinggemma': {
-				const embedding = await embedText(text);
+				// EMBEDDING_BACKEND=onnx_directml: try the in-process ONNX/DirectML
+				// session first (no separate port, doesn't compete with TurboQuant's
+				// CUDA context for VRAM). Known limitation: runOnnxDirectMLEmbedding
+				// uses a codepoint-level fallback tokenizer, not the model's real
+				// SentencePiece tokenizer — embeddings from this path are not yet
+				// production-quality. Falls back to the standard embedText() cascade
+				// (gRPC -> Ollama/llama-server) on null or any other backend.
+				let embedding: number[] | null = null;
+				if (process.env.EMBEDDING_BACKEND === 'onnx_directml') {
+					embedding = await runOnnxDirectMLEmbedding(text);
+				}
+				if (!embedding) {
+					embedding = await embedText(text);
+				}
 				result = { embedding, model: 'embeddinggemma:latest', dimensions: embedding.length };
 				break;
 			}
