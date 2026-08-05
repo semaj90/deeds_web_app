@@ -21,9 +21,10 @@
  *   2  addon failed to load (DLL missing, wrong arch, etc.)
  */
 
-import { existsSync, writeFileSync, mkdirSync } from 'fs';
+import { existsSync, writeFileSync, mkdirSync, readFileSync, statSync } from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
+import { createHash } from 'crypto';
 
 const require = createRequire(import.meta.url);
 
@@ -45,7 +46,19 @@ function resolveAddonPath() {
   return null;
 }
 
+function getAddonMetadata(addonPath) {
+  if (!addonPath || !existsSync(addonPath)) return { sha256: null, mtime: null, buildVariant: 'MISSING' };
+  try {
+    const buf = readFileSync(addonPath);
+    const sha256 = createHash('sha256').update(buf).digest('hex');
+    const mtime = statSync(addonPath).mtime.toISOString();
+    const buildVariant = addonPath.includes('cuda-cublas') ? 'cuda-cublas' : addonPath.includes('cuda') ? 'cuda' : addonPath.includes('fallback') ? 'fallback' : 'stock';
+    return { sha256, mtime, buildVariant };
+  } catch { return { sha256: null, mtime: null, buildVariant: 'ERROR' }; }
+}
+
 const ADDON_PATH = resolveAddonPath();
+const ADDON_METADATA = ADDON_PATH ? getAddonMetadata(ADDON_PATH) : { sha256: null, mtime: null, buildVariant: 'MISSING' };
 const OUT_FILE = '.tmp/gpu-bridge-probe.json';
 const LOG_FILE = path.resolve('logs/task-output/startup-gpu-bridge-probe.log');
 
@@ -54,6 +67,7 @@ if (!existsSync('.tmp')) mkdirSync('.tmp', { recursive: true });
 const probe = {
   timestamp: new Date().toISOString(),
   addon_path: ADDON_PATH,
+  addon_metadata: ADDON_METADATA,
   addon_loaded: false,
   load_error: null,
   exports: [],
@@ -62,6 +76,7 @@ const probe = {
   cuda_memory_mb: null,
   stub_count: 0,
   live_count: 0,
+  missing_export_count: 0,
   summary: '',
 };
 
@@ -223,11 +238,56 @@ const PROBES = [
   },
 ];
 
+// Classification outcomes per P1.1 spec (CORRECTED Session 196)
+// CRITICAL: Shape validity does NOT prove GPU execution.
+// Until P1.3 (counters) and P1.4 (parity) are available, all results are NOT_PROVEN or SHAPE_VALID at best.
+const OUTCOME = Object.freeze({
+  MISSING_EXPORT: 'MISSING_EXPORT',
+  NO_LIBTORCH_STUB: 'NO_LIBTORCH_STUB',
+  NOT_IMPLEMENTED: 'NOT_IMPLEMENTED',
+  CALL_FAILED: 'CALL_FAILED',
+  SKIPPED_EXTERNAL_PROOF: 'SKIPPED_EXTERNAL_PROOF',
+  SHAPE_VALID: 'SHAPE_VALID',
+  NOT_PROVEN: 'NOT_PROVEN',
+});
+
+function classifyOutcome(exported, result, error, shapeValid, externalProof) {
+  // MISSING_EXPORT: function not in addon.exports
+  if (!exported) return OUTCOME.MISSING_EXPORT;
+
+  // Covered by smoke tests (not verified inline)
+  if (externalProof) return OUTCOME.SKIPPED_EXTERNAL_PROOF;
+
+  // Call failed with error
+  if (error) return OUTCOME.CALL_FAILED;
+
+  // Extract return code if result is numeric or has .rc property
+  const returnCode = (typeof result === 'number') ? result : (typeof result === 'object' && Number.isInteger(result?.rc)) ? result.rc : null;
+
+  // Stub invocation: returns -99 (NO_LIBTORCH stub)
+  if (returnCode === -99) return OUTCOME.NO_LIBTORCH_STUB;
+
+  // Error codes: 38, 95 reserved for NOT_IMPLEMENTED
+  if (returnCode === 38 || returnCode === 95) return OUTCOME.NOT_IMPLEMENTED;
+
+  // Shape validity only — does NOT prove backend (CPU or GPU)
+  // Multiple implementations can return identical shapes.
+  // Promotion to backend classification (CUDA_LIVE, LIBTORCH_CPU, etc.) requires P1.3+ counters.
+  if (shapeValid) return OUTCOME.SHAPE_VALID;
+
+  // No shape validity, no proof of execution
+  return OUTCOME.NOT_PROVEN;
+}
+
 for (const p of PROBES) {
-  let outcome;
+  let outcome, classification;
   try {
     const r = p.run();
-    const live = p.isLive(r);
+    const shapeValid = p.isLive(r);
+    const exported = addon[p.name] !== undefined;
+    const externalProof = r === 'covered-by-smoke';
+    classification = classifyOutcome(exported, r, null, shapeValid, externalProof);
+
     let raw;
     if (r instanceof Float32Array || r instanceof Int32Array) {
       raw = `${r.constructor.name}[${r.length}] ` + Array.from(r.slice(0, 3)).map(x => Number(x).toFixed(3)).join(',') + (r.length > 3 ? ',...' : '');
@@ -236,13 +296,14 @@ for (const p of PROBES) {
     } else {
       raw = String(r);
     }
-    outcome = { ok: live, raw };
-    if (live) probe.live_count++;
-    else if (r === -99 || r === null) probe.stub_count++;
-    console.log(`  ${live ? '✓' : '~'} ${p.name.padEnd(24)} → ${raw}`);
+    outcome = { ok: shapeValid, classification, raw };
+    if (shapeValid && classification !== 'SKIPPED_EXTERNAL_PROOF') probe.live_count++;
+    else if (r === -99) probe.stub_count++;
+    console.log(`  ${shapeValid && classification !== 'SKIPPED_EXTERNAL_PROOF' ? '✓' : '~'} ${p.name.padEnd(24)} → [${classification}] ${raw}`);
   } catch (e) {
-    outcome = { ok: false, error: e.message.slice(0, 80) };
-    console.log(`  ✗ ${p.name.padEnd(24)} → ${e.message.slice(0, 60)}`);
+    classification = classifyOutcome(addon[p.name] !== undefined, null, e, false, false);
+    outcome = { ok: false, classification, error: e.message.slice(0, 80) };
+    console.log(`  ✗ ${p.name.padEnd(24)} → [${classification}] ${e.message.slice(0, 60)}`);
   }
   probe.functions[p.name] = outcome;
 }

@@ -8,6 +8,9 @@
  * Dimension: 768-dim primary only; fallback path does not change the embedding contract.
  */
 
+import { compressACEContext } from './centroid-compression.js';
+import type { Redis } from 'ioredis';
+
 export interface Gemma4InvocationConfig {
   model: string;
   temperature: number;
@@ -40,8 +43,19 @@ export class Gemma4Invoker {
     }
   }
 
-  async invoke(systemPrompt: string, userPrompt: string): Promise<Gemma4Response> {
+  async invoke(systemPrompt: string, userPrompt: string, valkey?: Redis): Promise<Gemma4Response> {
     const start = Date.now();
+
+    // Apply centroid compression if valkey available
+    let finalUserPrompt = userPrompt;
+    if (valkey) {
+      try {
+        const { compressed } = await compressACEContext(userPrompt, valkey);
+        finalUserPrompt = compressed;
+      } catch (err) {
+        console.warn('[Gemma4Invoker] Centroid compression failed, using original', err instanceof Error ? err.message : '');
+      }
+    }
 
     try {
       const response = await fetch(`${this.config.base_url}/v1/chat/completions`, {
@@ -51,7 +65,7 @@ export class Gemma4Invoker {
           model: this.config.model,
           messages: [
             { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
+            { role: 'user', content: finalUserPrompt },
           ],
           temperature: this.config.temperature,
           max_tokens: this.config.max_tokens,

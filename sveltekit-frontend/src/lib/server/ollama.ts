@@ -653,6 +653,8 @@ type BifrostChatOptions = {
   tools?: ReadonlyArray<unknown>;
   toolChoice?: string | object;
   lane?: Hypergraph.AgentLane;
+  /** Valkey/Redis client for centroid compression (optional, graceful fallback if null) */
+  valkey?: any;
   taskType?: Hypergraph.TaskType;
   sessionId?: string;
 };
@@ -995,6 +997,24 @@ export async function bifrostChat(
   let hitType: string | undefined;
   let tool_calls: any[] | undefined;
 
+  // ── Centroid Compression (30-40% token reduction) ────────────────────────
+  let messagesForInference = normalizedMessages;
+  if (options?.valkey) {
+    try {
+      const { compressionPipeline } = await import('$lib/server/ace/centroid-compression.js');
+      const { messages: compressed, stats } = await compressionPipeline(
+        normalizedMessages,
+        options.valkey
+      );
+      messagesForInference = compressed;
+      if (stats.centroidsUsed > 0) {
+        console.log(`[bifrost] Centroid compression: ${stats.centroidsUsed} features, ${stats.outputTokens - stats.inputTokens} tokens saved`);
+      }
+    } catch (err) {
+      console.warn('[bifrost] Centroid compression failed, using original messages:', (err as Error).message);
+    }
+  }
+
   const callDirectOllamaFallback = async () => {
     // ── TurboQuant (llama-server :8090) Priority Gate ──────────────────────
     // Prefer TurboQuant for Gemma4 models if available (KV cache compression benefit)
@@ -1015,7 +1035,7 @@ export async function bifrostChat(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               model: model, // llama-server accepts both ollama model names and .gguf paths
-              messages: normalizedMessages,
+              messages: messagesForInference,
               temperature: options?.temperature ?? 0.7,
               max_tokens: options?.maxTokens ?? 2048,
               stream: false,
@@ -1047,7 +1067,7 @@ export async function bifrostChat(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: model, // use original model name (not bifrost prefixed)
-        messages: normalizedMessages,
+        messages: messagesForInference,
         stream: false,
         ...(options?.tools ? { tools: options.tools } : {}),
         options: {

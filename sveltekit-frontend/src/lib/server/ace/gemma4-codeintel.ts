@@ -21,6 +21,7 @@ import {
   ollamaFetch,
 } from '../ollama.js';
 import { getOllamaEndpoint } from '../utils/ollama-endpoint.js';
+import { getRedis } from '../redis.js';
 
 async function getHypergraphStore() {
   return import('../ai/hypergraph-store.js');
@@ -341,6 +342,7 @@ export async function callGemma4WithAceContext(
             taskType: taskType as any,
             sessionId,
             timeoutMs: requestTimeoutMs,
+            valkey: getRedis(),  // ── P1.2 Centroid compression (30-40% token reduction) ────
           }
         );
     const assistantDurationMs = Date.now() - assistantStartedAt;

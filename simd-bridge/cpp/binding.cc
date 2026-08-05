@@ -1244,6 +1244,80 @@ static napi_value CudaGraphCountWrapper(napi_env env, napi_callback_info info) {
   return result;
 }
 
+// ── Backend Info (P1.2) ─────────────────────────────────────────────
+// Returns: { addon_version, build_commit, libtorch_version, cuda_available, cuda_capability, libtorch_built, cublas_available }
+//
+static napi_value GetBackendInfoWrapper(napi_env env, napi_callback_info info) {
+  (void)info;
+
+  napi_value obj;
+  napi_create_object(env, &obj);
+
+  // Addon version
+  napi_value v_version;
+  napi_create_string_utf8(env, "1.0.0", NAPI_AUTO_LENGTH, &v_version);
+  napi_set_named_property(env, obj, "addon_version", v_version);
+
+  // Build commit (compile-time constant if available, else placeholder)
+#ifdef TENSORRT_BRIDGE_BUILD_COMMIT
+  napi_value v_commit;
+  napi_create_string_utf8(env, TENSORRT_BRIDGE_BUILD_COMMIT, NAPI_AUTO_LENGTH, &v_commit);
+  napi_set_named_property(env, obj, "build_commit", v_commit);
+#else
+  napi_value v_commit;
+  napi_create_string_utf8(env, "unknown", NAPI_AUTO_LENGTH, &v_commit);
+  napi_set_named_property(env, obj, "build_commit", v_commit);
+#endif
+
+  // LibTorch version
+#if defined(LIBTORCH_VERSION_MAJOR)
+  char version_str[64];
+  snprintf(version_str, sizeof(version_str), "%d.%d.%d",
+           LIBTORCH_VERSION_MAJOR, LIBTORCH_VERSION_MINOR, LIBTORCH_VERSION_PATCH);
+  napi_value v_libtorch_version;
+  napi_create_string_utf8(env, version_str, NAPI_AUTO_LENGTH, &v_libtorch_version);
+#else
+  napi_value v_libtorch_version;
+  napi_create_string_utf8(env, "not-linked", NAPI_AUTO_LENGTH, &v_libtorch_version);
+#endif
+  napi_set_named_property(env, obj, "libtorch_version", v_libtorch_version);
+
+  // CUDA available
+  int cuda_avail = checkCudaAvailable();
+  napi_value v_cuda_available;
+  napi_create_int32(env, cuda_avail, &v_cuda_available);
+  napi_set_named_property(env, obj, "cuda_available", v_cuda_available);
+
+  // CUDA capability (compute capability, e.g., 86 for Ampere)
+#ifdef __CUDA_ARCH__
+  napi_value v_cuda_cap;
+  napi_create_int32(env, __CUDA_ARCH__, &v_cuda_cap);
+  napi_set_named_property(env, obj, "cuda_compute_capability", v_cuda_cap);
+#endif
+
+  // LibTorch built flag
+#if defined(SIMD_HAVE_LIBTORCH) && SIMD_HAVE_LIBTORCH
+  napi_value v_libtorch_built;
+  napi_create_int32(env, 1, &v_libtorch_built);
+#else
+  napi_value v_libtorch_built;
+  napi_create_int32(env, 0, &v_libtorch_built);
+#endif
+  napi_set_named_property(env, obj, "libtorch_built", v_libtorch_built);
+
+  // cuBLAS availability (compile-time detection)
+#if defined(HAVE_CUBLAS)
+  napi_value v_cublas;
+  napi_create_int32(env, 1, &v_cublas);
+#else
+  napi_value v_cublas;
+  napi_create_int32(env, 0, &v_cublas);
+#endif
+  napi_set_named_property(env, obj, "cublas_available", v_cublas);
+
+  return obj;
+}
+
 // ── Module Init ──────────────────────────────────────────────────────
 
 static napi_value Init(napi_env env, napi_value exports) {
@@ -1278,6 +1352,8 @@ static napi_value Init(napi_env env, napi_value exports) {
   registerFn(env, exports, "pcaProject", PcaProjectWrapper);
   // ArrayBuffer pool telemetry
   registerFn(env, exports, "poolStats", PoolStatsWrapper);
+  // Backend metadata (P1.2)
+  registerFn(env, exports, "getBackendInfo", GetBackendInfoWrapper);
   // simdjson functions
   registerFn(env, exports, "simdJsonParse", RegisterSimdJsonParse);
   registerFn(env, exports, "simdJsonValidate", RegisterSimdJsonValidate);

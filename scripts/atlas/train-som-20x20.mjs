@@ -18,7 +18,8 @@
 
 import pg from 'pg';
 import { createRequire } from 'module';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import Redis from 'ioredis';
 import { loadAtlasEnv } from './load-atlas-env.mjs';
@@ -26,12 +27,17 @@ import { loadAtlasEnv } from './load-atlas-env.mjs';
 loadAtlasEnv();
 
 const require = createRequire(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const { Pool } = pg;
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
 });
 
-const MODEL_OUTPUT_DIR = resolve('.', 'models/som');
+// Resolve from repo root (scripts/ is at repo root, simd-bridge/ is sibling to sveltekit-frontend/)
+const REPO_ROOT = resolve(__dirname, '..');
+const MODEL_OUTPUT_DIR = resolve(REPO_ROOT, 'sveltekit-frontend/models/som');
 const SOM_CODEBOOK_PATH = resolve(MODEL_OUTPUT_DIR, 'som_20x20_codebook.json');
 const SOM_ASSIGNMENTS_PATH = resolve(MODEL_OUTPUT_DIR, 'som_assignments.json');
 
@@ -43,7 +49,7 @@ const LEARNING_RATE_INITIAL = 0.5;
 const LEARNING_RATE_FINAL = 0.01;
 const RADIUS_INITIAL = 10;
 const RADIUS_FINAL = 1;
-const ADDON_PATH = resolve('.', 'simd-bridge/cpp/build/Release/tensorrt_bridge.node');
+const ADDON_PATH = resolve(REPO_ROOT, 'simd-bridge/cpp/build/Release/tensorrt_bridge.node');
 
 function euclideanDistance(vector, weights, offset) {
   let distance = 0;

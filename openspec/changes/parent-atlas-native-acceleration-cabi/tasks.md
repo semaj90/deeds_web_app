@@ -10,10 +10,24 @@ No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS
 - [ ] P0.3 Replace `envelope_build_failed` with typed counters: `canonical_row_matched`, `canonical_identity_resolved`, `envelope_validated`, `missing_stable_symbol`, `missing_stable_file`, `schema_revision_rejected`, `representation_rejected`; increment row-match BEFORE envelope construction
 - [ ] P0.4 Prove `search-unified?q=test&topK=3` still returns hydrated packets under the discriminated contract (regression fixtures for symbol / file / chunk candidates)
 
-## P1 — Truthful probes + backend evidence
+## ARCHITECTURE: DUAL-TRACK PARALLELIZATION (Session 196 Correction)
 
-- [ ] P1.1 Rewrite `scripts/startup-gpu-bridge-probe.mjs` classifications: MISSING_EXPORT / NO_LIBTORCH_STUB / CPU_FALLBACK / CUDA_LIVE / CALL_FAILED / NUMERICAL_MISMATCH / SKIPPED_EXTERNAL_PROOF; same addon resolver as `libtorch-bridge.ts`; record path + SHA-256 + mtime + build variant; missing exports counted explicitly; no "covered by smoke" promotion
+**CRITICAL**: Do NOT put all of P0 ahead of every GPU task.
+
+**Track A (Windows N-API Addon Truth)**: P1.1–P1.10 — independent of P0
+**Track B (WSL2 RAPIDS Verification)**: P3.1–P3.11, P3a–P3c — independent of P0
+
+P0 (Identity hydration) blocks: lane-specific canonical proofs, production persistence.
+P0 does NOT block: backend benchmarking with frozen fixture, Windows addon classification, WSL2 RAPIDS verification.
+
+---
+
+## P1 — Windows N-API Addon Truth (TRUTHFUL CLASSIFICATION)
+
+- [ ] P1.1 Rewrite `scripts/startup-gpu-bridge-probe.mjs` classifications: MISSING_EXPORT / NO_LIBTORCH_STUB / CPU_FALLBACK / SHAPE_VALID / NOT_PROVEN / CALL_FAILED / NUMERICAL_MISMATCH / SKIPPED_EXTERNAL_PROOF; same addon resolver as `libtorch-bridge.ts`; record path + SHA-256 + mtime + build variant; missing exports counted explicitly; no "covered by smoke" promotion
+  - **Session 195 status**: ❌ CRITICAL CORRECTION. Shape-only classification is NOT truthful. isLive() proves SHAPE_VALID, NOT CUDA execution. Honest result: 15 CALL_OR_SHAPE_SUCCEEDED (classify as SHAPE_VALID or NOT_PROVEN until counters/parity available), 1 SKIPPED_EXTERNAL_PROOF, 0 CUDA_LIVE PROVEN. Probe output must distinguish shape validity from backend execution. Requires: branch execution counters (P1.3+), numerical parity fixtures (P1.4+) before CUDA_LIVE promotion.
 - [ ] P1.2 Add native `getBackendInfo()` (addon version, build commit/type, LibTorch ver, CUDA compile+runtime, device, compute capability, cuBLAS/cuDNN/TensorRT presence, per-export backend)
+  - **Session 195 status**: ⚠️ INCOMPLETE. GetBackendInfoWrapper() source added to binding.cc; NOT YET COMPILED OR TESTED. Missing: build type detection, CUDA runtime version (not __CUDA_ARCH__), device identity (cudaGetDevice), cuDNN/TensorRT presence detection, per-operation backend map. __CUDA_ARCH__ is compile-time constant (device SM architecture), NOT runtime device info. Needs proper .cu translation unit with cudaGetDeviceProperties, cudaMemGetInfo, cudaRuntimeGetVersion. Classification: SOURCE_IMPLEMENTED, BUILD_NOT_PROVEN, EXPORT_NOT_PROVEN, RUNTIME_VALUES_NOT_VALIDATED.
 - [ ] P1.3 Add native execution counters inside CUDA/LibTorch branches + `getExecutionCounters()` (cuda_execution / cpu_fallback / stub_invocation / cuda_error_fallback / oom_fallback)
 - [ ] P1.4 Create `scripts/gpu/prove-native-gpu-numerical-parity.mjs` — deterministic fixtures vs CPU/Python oracles for: batchCosineSimilarity, graphSimilarity(+Half), softmaxGPU, topKIndicesGPU, attentionScoreGPU, rewardScoreGPU, pageRankGPU, kmeansWithCentroids, pcaProject, autoencoderEncode/Decode, computeCaseEmbedding, trainSOM
 - [ ] P1.5 Mark `graphSimilarity` = CPU_FALLBACK explicitly in bridge + probe; prove `batchCosineSimilarity` CUDA/cuBLAS via counters + parity (not shape)
@@ -60,6 +74,61 @@ No CUDA/cuBLAS/cuDNN/TensorRT/cuVS/CAGRA/cuGraph capability may be reported PASS
 - [ ] P4b.2 Generator: raw evidence (logs, receipts, tool output) -> tuple, byte-offset addressed (not line numbers -- logs rotate/append)
 - [ ] P4b.3 KAG indexing of tuples with mandatory evidence-pointer resolution on retrieval
 - [ ] P4b.4 Document clearly: this layer is token-reduction/retrieval-indexing only, never conflated with RTK (shell-output compaction) or native GPU acceleration (this same OpenSpec's core subject)
+
+## P5b — Session 188C llama-server Startup Contract (FROZEN — 2026-08-04)
+
+**Status**: ✅ LOCKED | **Root Cause**: `--skip-chat-parsing` broke tool parsing | **Fix**: Deleted from launcher
+
+### Canonical State (Do Not Change)
+- [x] Model: `gemma4-legal-iq4xs-direct.gguf`
+- [x] Chat template: `configs/templates/custom_pub_chat_template_gemma4.jinja`
+- [x] Reasoning: off, format=deepseek, budget=0
+- [x] KV cache: q8_0/q8_0 (stock), no turbo* by default
+- [x] Chat parsing: **ALWAYS ON** (skip-chat-parsing conditional DELETED)
+- [x] 3-point validation: PASS (clean streaming, tool calls, model identity)
+
+### Launcher Change (COMMITTED)
+- File: `scripts/launch-turboquant.ps1` lines 1057-1065
+- Change: Deleted conditional `if ($skipChatParsing)...` block
+- Now: Hardcoded `Chat parsing: using llama-server template validation (NOT SKIPPED)`
+
+### Recovery Steps (If Broken)
+1. `taskkill /F /IM llama-server.exe`
+2. Grep: `rg "skip.chat.parsing"` (must return 0)
+3. Start: `npm run turbo:start`
+4. Validate: `docs/STARTUP-CONTRACT-LLAMA-RECOVERY.md` (3-point tests)
+
+### Documentation (FROZEN)
+- `docs/STARTUP-CONTRACT-LLAMA-RECOVERY.md` — full spec + validation tests
+- `docs/SESSION-188C-HANDOFF.md` — immediate next steps
+- `CLAUDE.md` — canonical startup contract (project + global)
+
+## P5c — Session 191 Centroid Compression Wiring (IMPLEMENTED — 2026-08-05)
+
+**Status**: ✅ CODE WRITTEN | Ready for Session 192 caller wiring + testing
+
+**Implementation**:
+- Created: `src/lib/server/ace/centroid-compression.ts` — extractFeatureIds, getCentroidCompression, compressContext, end-to-end pipeline
+- Modified: `src/lib/server/ace/gemma4-invocation-768.ts` — invoke() accepts Valkey, compresses before LLM
+- Memory: `SESSION-191-CENTROID-COMPRESSION-WIRED.md` (complete handoff)
+
+**What's Done**:
+- [x] Extract feature IDs from ACE context
+- [x] Fetch centroid summaries from Valkey (3 key patterns tried)
+- [x] Replace candidates with cached summaries
+- [x] Graceful fallback if Valkey unavailable
+- [x] Logging for compression monitoring
+
+**What's Pending (Session 192)**:
+- [ ] Find Gemma4Invoker callers (usage pattern unclear — singleton or method wrappers)
+- [ ] Wire Valkey instance from caller context
+- [ ] Test end-to-end, verify 30-40% token reduction
+
+**Expected Impact**: 4.8K → 3K-3.5K tokens (30-40% savings)
+
+**Note**: Valkey centroid keys don't exist yet (confirmed empty). Layer active when centroid cache is populated.
+
+---
 
 ## P5 — Session 188 operational next steps (2026-08-04 handoff)
 

@@ -1,5 +1,46 @@
 # Legal AI Platform — Claude Project Instructions
 
+## ❄️ CANONICAL LLAMA-SERVER STARTUP CONTRACT (FROZEN — Session 188C, Aug 4 2026)
+
+**Status**: ✅ VALIDATED | **Validation**: 3-point contract PASS | **Commit**: TBD
+
+### Root Cause Found & Fixed
+`--skip-chat-parsing` flag forced llama-server to bypass template validation, leaking reasoning/tool-call syntax (`<|think|>`, `<thinking>`, `<|channel>`) into ordinary content, breaking Cline/OpenCode tool parsing and causing 1,506 identical retry attempts. **Solution: Deleted conditional block from launcher.**
+
+### Canonical Gemma4 Direct Profile (FROZEN)
+```
+model: gemma4-legal-iq4xs-direct.gguf
+chat-template-file: configs/templates/custom_pub_chat_template_gemma4.jinja
+jinja: on
+reasoning: off
+reasoning-format: deepseek
+reasoning-budget: 0
+cache-prompt: on
+cache-reuse: 256
+cache-type-k: q8_0
+cache-type-v: q8_0
+❌ MUST NOT HAVE: --skip-chat-parsing (DELETED from launcher)
+```
+
+### 3-Point Validation Contract (PROVED Aug 4)
+1. **Clean streaming** ✅ — No control tokens in content (test 1 PASS)
+2. **Tool calls parsed** ✅ — Real `tool_calls` array, not textual (test 2 PASS)  
+3. **Model identity correct** ✅ — gemma4-legal-iq4xs-direct.gguf, context=131K (test 3 PASS)
+
+### Launcher Change (FROZEN)
+- **File**: `scripts/launch-turboquant.ps1`
+- **Change**: Lines 1057-1065 deleted (skip-chat-parsing conditional block)
+- **Replacement**: Chat parsing **ALWAYS ENABLED** (cannot be bypassed)
+- **Result**: No more raw template leaks into Cline/OpenCode tool parsing
+
+### Recovery if Issues Recur
+1. `taskkill /F /IM llama-server.exe`
+2. Verify: `rg "skip.chat.parsing"` (should return 0 hits)
+3. Start: `npm run turbo:start`
+4. Validate: See `docs/STARTUP-CONTRACT-LLAMA-RECOVERY.md` (3-point contract tests)
+
+---
+
 ## Archival Rules (NOT DELETION — July 23, 2026)
 
 **We do NOT delete. We archive.**

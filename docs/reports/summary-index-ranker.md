@@ -1,6 +1,6 @@
 # Summary Index Ranker
 
-Generated: 2026-08-04T21:46:05.711Z
+Generated: 2026-08-05T02:56:57.141Z
 Mode: apply
 Source of truth: postgres.atlas_summary_layers + atlas_packets
 
