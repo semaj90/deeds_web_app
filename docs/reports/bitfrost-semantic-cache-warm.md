@@ -1,7 +1,7 @@
 # Bitfrost Semantic Cache Warm Plan
 
-Generated: 2026-07-30T07:33:09.334Z
-Mode: dry-run
+Generated: 2026-08-06T03:00:46.205Z
+Mode: apply
 Limit: 25
 
 ## Summary
@@ -11,7 +11,7 @@ Limit: 25
 - packets planned: 25
 - feature keys planned: 25
 - ace keys planned: 75
-- writes applied: 0
+- writes applied: 225
 - failures: 0
 
 ## Planned Keys
@@ -244,4 +244,4 @@ Limit: 25
 
 ## Next Safe Action
 
-Review the dry-run plan, then rerun with --apply to materialize the hot Bitfrost families.
+Hot cache families were warmed; rerun the Bitfrost audit to verify key counts and TTL samples.

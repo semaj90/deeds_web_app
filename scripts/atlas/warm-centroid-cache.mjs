@@ -18,12 +18,15 @@
 
 import pg from 'pg';
 import Redis from 'ioredis';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   resolveAtlasRedisContext,
   runRedisCli,
   shouldPreferValkeyCli,
 } from '../../sveltekit-frontend/scripts/atlas/lib/redis-valkey.mjs';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { Pool } = pg;
 
 const DRY_RUN = process.argv.includes('--dry-run');

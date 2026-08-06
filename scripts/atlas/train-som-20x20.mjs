@@ -35,8 +35,8 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db'
 });
 
-// Resolve from repo root (scripts/ is at repo root, simd-bridge/ is sibling to sveltekit-frontend/)
-const REPO_ROOT = resolve(__dirname, '..');
+// Resolve from repo root (this file is at scripts/atlas/, repo root is two levels up)
+const REPO_ROOT = resolve(__dirname, '..', '..');
 const MODEL_OUTPUT_DIR = resolve(REPO_ROOT, 'sveltekit-frontend/models/som');
 const SOM_CODEBOOK_PATH = resolve(MODEL_OUTPUT_DIR, 'som_20x20_codebook.json');
 const SOM_ASSIGNMENTS_PATH = resolve(MODEL_OUTPUT_DIR, 'som_assignments.json');

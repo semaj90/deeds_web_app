@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-30T07:33:09.334Z",
-  "mode": "dry-run",
+  "generatedAt": "2026-08-06T03:00:46.205Z",
+  "mode": "apply",
   "limit": 25,
   "source": {
     "table": "atlas_higher_hop_index",
@@ -11,7 +11,7 @@
     "packetKeysPlanned": 25,
     "featureKeysPlanned": 25,
     "aceKeysPlanned": 75,
-    "appliedWrites": 0,
+    "appliedWrites": 225,
     "failures": 0
   },
   "plans": [
@@ -2041,5 +2041,6 @@
       "som_cluster": null
     }
   ],
-  "nextSafeAction": "Review the dry-run plan, then rerun with --apply to materialize the hot Bitfrost families."
+  "nextSafeAction": "Hot cache families were warmed; rerun the Bitfrost audit to verify key counts and TTL samples.",
+  "failures": []
 }

@@ -42,10 +42,12 @@ const CONFIG = {
   REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   REDIS_PASSWORD: process.env.REDIS_PASSWORD || 'redis',
 
-  // Ollama (embeddinggemma:latest, gemma3-legal:latest)
+  // Ollama — EMBEDDINGS ONLY (never chat, see project CLAUDE.md "Ollama vs llama-server Boundary")
   OLLAMA_URL: process.env.OLLAMA_URL || process.env.OLLAMA_BASE_URL || 'http://127.0.0.1:11434',
   EMBEDDING_MODEL: 'embeddinggemma:latest',
-  SUGGESTION_MODEL: 'gemma3-legal:latest',
+
+  // llama-server.exe — chat & synthesis (whatever model is currently loaded, discovered via /v1/models)
+  LLAMA_SERVER_URL: process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090',
 
   // Qdrant
   QDRANT_URL: process.env.QDRANT_URL || 'http://localhost:6333',
@@ -318,29 +320,81 @@ async function findRelatedFiles(errorCode: string, message: string): Promise<str
 
 interface LLMResponse {
   content: string;
-  provider: 'gemma3' | 'gemini';
+  provider: 'llama-server' | 'gemini';
   latencyMs: number;
 }
 
+// ─── llama-server.exe model discovery (whatever's currently loaded) ───────────
+let cachedLlamaModel: string | null = null;
+
+async function getLlamaServerModel(): Promise<string> {
+  if (cachedLlamaModel) return cachedLlamaModel;
+
+  const response = await fetch(`${CONFIG.LLAMA_SERVER_URL}/v1/models`);
+  if (!response.ok) {
+    throw new Error(`llama-server /v1/models failed: ${response.status}`);
+  }
+
+  const data = await response.json() as { data?: Array<{ id: string }> };
+  const modelId = data.data?.[0]?.id;
+  if (!modelId) {
+    throw new Error('llama-server /v1/models returned no loaded model');
+  }
+
+  cachedLlamaModel = modelId;
+  console.log(`   🧩 [llama-server] Using loaded model: ${modelId}`);
+  return modelId;
+}
+
+/**
+ * llama-server.exe chat completion — streaming is mandatory.
+ * With stream:false the Gemma4 reasoning block fills max_tokens before any
+ * content token appears, leaving content empty (finish_reason: "length").
+ * See project CLAUDE.md "Gemma4 LLM Call Rules".
+ */
 async function callGemma3(prompt: string): Promise<LLMResponse> {
   const start = Date.now();
-  const endpoint = await getOllamaEndpoint();
+  const model = await getLlamaServerModel();
 
-  const response = await fetch(`${endpoint}/api/generate`, {
+  const response = await fetch(`${CONFIG.LLAMA_SERVER_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: CONFIG.SUGGESTION_MODEL,
-      prompt,
-      stream: false,
-      options: { temperature: 0.1, num_predict: 1024 }
-    })
+      model,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 1024,
+      temperature: 0.1,
+      stream: true
+    }),
+    signal: AbortSignal.timeout(90_000)
   });
 
-  const data = await response.json() as { response?: string };
+  if (!response.ok || !response.body) {
+    throw new Error(`llama-server chat completion failed: ${response.status}`);
+  }
+
+  let assembled = '';
+  const decoder = new TextDecoder();
+  let buf = '';
+  for await (const chunk of response.body as any) {
+    buf += decoder.decode(chunk, { stream: true });
+    const lines = buf.split('\n');
+    buf = lines.pop() ?? '';
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data:')) continue;
+      const payload = trimmed.slice(5).trim();
+      if (payload === '[DONE]') break;
+      try {
+        const parsed = JSON.parse(payload);
+        assembled += parsed.choices?.[0]?.delta?.content ?? '';
+      } catch { /* skip malformed SSE line */ }
+    }
+  }
+
   return {
-    content: data.response || '',
-    provider: 'gemma3',
+    content: assembled.trim(),
+    provider: 'llama-server',
     latencyMs: Date.now() - start
   };
 }
@@ -371,12 +425,12 @@ async function callGemini(prompt: string): Promise<LLMResponse> {
 }
 
 async function concurrentLLM(prompt: string): Promise<LLMResponse> {
-  console.log(`   🤖 [Concurrent LLM] Racing Gemma3 vs Gemini...`);
+  console.log(`   🤖 [Concurrent LLM] Racing llama-server vs Gemini...`);
 
   try {
     // Race both LLMs - use first response
     const result = await Promise.race([
-      callGemma3(prompt).catch(e => ({ content: '', provider: 'gemma3' as const, latencyMs: 0, error: e })),
+      callGemma3(prompt).catch(e => ({ content: '', provider: 'llama-server' as const, latencyMs: 0, error: e })),
       callGemini(prompt).catch(e => ({ content: '', provider: 'gemini' as const, latencyMs: 0, error: e }))
     ]);
 
@@ -1083,7 +1137,7 @@ async function runAgent(maxIterations = 10) {
   console.log(`Mode: COGNITIVE (cache → RAG → ripgrep → smart LLM)`);
   console.log(`├─ Redis Cache: ${CONFIG.REDIS_URL}`);
   console.log(`├─ Qdrant RAG:  ${CONFIG.QDRANT_URL}`);
-  console.log(`├─ Local LLM:   ${CONFIG.SUGGESTION_MODEL}`);
+  console.log(`├─ Local LLM:   llama-server @ ${CONFIG.LLAMA_SERVER_URL} (model auto-discovered via /v1/models)`);
   console.log(`└─ Cloud LLM:   ${CONFIG.GEMINI_MODEL}`);
 
   let successCount = 0;

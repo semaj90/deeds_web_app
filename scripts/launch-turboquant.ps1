@@ -202,17 +202,52 @@ function Select-TurboStartupProfile {
   }
 }
 
+# Normalize a model identity down to "basename, lowercased" so comparisons
+# (profile selection, template gating, identity verification) are stable
+# regardless of full path, drive letter casing, or a trailing "llama-server"
+# artifact some callers append to loaded-model strings.
+function Get-NormalizedModelName {
+  param([Parameter(Mandatory)][string]$Value)
+  $normalized = $Value.Trim()
+  # Only strip a LEADING "llama-server" token (e.g. "llama-server hforf.gguf"
+  # -> "hforf.gguf"). A \b-anchored replace anywhere in the string would also
+  # corrupt a legitimate directory or alias containing "llama-server", e.g.
+  # "C:\builds\llama-server\hforf.gguf" or an alias like
+  # "llama-server-8090-hforf.gguf" - GetFileName() below already discards any
+  # directory component, so stripping mid-string is unnecessary and unsafe.
+  $normalized = $normalized -replace '(?i)^llama-server(\.exe)?\s+', ''
+  $normalized = $normalized.Trim()
+  return [System.IO.Path]::GetFileName($normalized).ToLowerInvariant()
+}
+
 $turboProfiles = Get-TurboStartupProfiles
 $activeTurboProfile = $null
 if ($StartupProfile) {
   $activeTurboProfile = $turboProfiles | Where-Object { $_.Id -eq $StartupProfile } | Select-Object -First 1
 } elseif ($SelectProfile) {
   $activeTurboProfile = Select-TurboStartupProfile -Profiles $turboProfiles -DefaultIndex 0
+} elseif ($env:TURBO_STARTUP_PROFILE) {
+  # Env-driven equivalent of -StartupProfile, so automated callers
+  # (dev-gpu-runtime.mjs) can select a named profile without a CLI switch.
+  $activeTurboProfile = $turboProfiles | Where-Object { $_.Id -eq $env:TURBO_STARTUP_PROFILE } | Select-Object -First 1
+  if (-not $activeTurboProfile) {
+    throw "Invalid TURBO_STARTUP_PROFILE '$($env:TURBO_STARTUP_PROFILE)' - choose one of: $($turboProfiles.Id -join ', ')"
+  }
 }
-# When neither -Profile nor -SelectProfile is passed, $activeTurboProfile stays
-# $null and the launcher falls back to its legacy env-var-driven resolution
-# below (ROTORQUANT_MODEL_PATH / TURBO_MODEL_PATH / auto-discovery) so
-# dev-gpu-runtime.mjs's non-interactive automated calls are unaffected.
+# Resolution precedence (authoritative - do not duplicate this comment
+# elsewhere; update here only):
+#   1. -StartupProfile <id>
+#   2. -SelectProfile (interactive picker)
+#   3. $env:TURBO_STARTUP_PROFILE
+#   4. Legacy model variables, in order: ROTORQUANT_MODEL_PATH >
+#      TURBO_MODEL_PATH > TURBO_MODEL > LOCAL_GEMMA_MODEL
+#   5. Auto-discovery (models/hfor/hforf.gguf > vendor/models/*.gguf >
+#      models/gemma4-legal-iq4xs-direct.gguf > Ollama blob store)
+# When none of 1-3 select a profile, $activeTurboProfile stays $null and
+# resolution falls through to tier 4/5 below. Whichever tier resolves $model,
+# the chat-template decision downstream is derived from the FINAL resolved
+# $model basename (Get-NormalizedModelName), never from which tier resolved
+# it - see $isOrnithModel below.
 
 # -- Probe helper: try --help then -h, return $true if flag is advertised -
 function Test-LlamaFlag {
@@ -338,15 +373,31 @@ $llama = if ($env:LLAMA_SERVER_PATH) {
 # via compute-glyph-rewards.mjs and gpu-full-pipeline.mjs. Adding --embeddings
 # here would OOM the 8GB GPU (5.3GB model + KV cache already fills ~7.5GB).
 
-# Model resolution: ROTORQUANT_MODEL_PATH > TURBO_MODEL_PATH > local GGUF search
-# > Ollama blob auto-discovery (scans manifests for gemma4/rotorquant GGUFs).
+# Model resolution: ROTORQUANT_MODEL_PATH > TURBO_MODEL_PATH > TURBO_MODEL >
+# LOCAL_GEMMA_MODEL > local GGUF search > Ollama blob auto-discovery (scans
+# manifests for gemma4/rotorquant GGUFs). TURBO_MODEL/LOCAL_GEMMA_MODEL accept
+# either a full path or a bare filename resolved against models/.
 # Ollama blobs are raw GGUF files — llama-server reads them directly without Ollama.
+function Resolve-TurboModelRef {
+    param([Parameter(Mandatory)][string]$Value)
+    if (Test-Path $Value) { return $Value }
+    $inModels = Join-Path $PSScriptRoot "..\models\$Value"
+    if (Test-Path $inModels) { return $inModels }
+    $inModelsHfor = Join-Path $PSScriptRoot "..\models\hfor\$Value"
+    if (Test-Path $inModelsHfor) { return $inModelsHfor }
+    return $Value
+}
+
 $model = if ($activeTurboProfile) {
     $activeTurboProfile.Model
 } elseif ($env:ROTORQUANT_MODEL_PATH) {
     $env:ROTORQUANT_MODEL_PATH
 } elseif ($env:TURBO_MODEL_PATH) {
     $env:TURBO_MODEL_PATH
+} elseif ($env:TURBO_MODEL) {
+    Resolve-TurboModelRef $env:TURBO_MODEL
+} elseif ($env:LOCAL_GEMMA_MODEL) {
+    Resolve-TurboModelRef $env:LOCAL_GEMMA_MODEL
 } else {
     $vendorModel  = Join-Path $PSScriptRoot "..\vendor\models\gemma4-legal.gguf"
     $vendorDirect = Join-Path $PSScriptRoot "..\vendor\models\gemma4-rotorquant.gguf"
@@ -388,6 +439,24 @@ $model = if ($activeTurboProfile) {
     elseif (Test-Path $localLegacy) { $localLegacy }
     elseif ($ollamaBlob) { $ollamaBlob }
     else { $null }
+}
+
+# Diagnostic receipt: which precedence tier actually resolved $model. Mirrors
+# the $model if/elseif chain above exactly - keep both in sync if the chain
+# changes. Printed later alongside NORMALIZED_MODEL / TEMPLATE_SOURCE so a
+# model/template mismatch is visible in the launch log, not just inferable.
+$modelResolutionSource = if ($activeTurboProfile) {
+    "StartupProfile:$($activeTurboProfile.Id)"
+} elseif ($env:ROTORQUANT_MODEL_PATH) {
+    'ROTORQUANT_MODEL_PATH'
+} elseif ($env:TURBO_MODEL_PATH) {
+    'TURBO_MODEL_PATH'
+} elseif ($env:TURBO_MODEL) {
+    'TURBO_MODEL'
+} elseif ($env:LOCAL_GEMMA_MODEL) {
+    'LOCAL_GEMMA_MODEL'
+} else {
+    'auto-discovery'
 }
 $mmproj = if ($env:TURBO_MMPROJ_PATH) {
     $env:TURBO_MMPROJ_PATH
@@ -1018,13 +1087,26 @@ if (Test-LlamaFlag $llama '--reasoning-format') {
     Write-Host "Reasoning format: --reasoning-format not supported by this binary (template-based reasoning active)" -ForegroundColor DarkYellow
 }
 
-# -- Chat template: use custom_pub_chat_template_gemma4.jinja for OpenCode-compatible chat/tool calling --
-# DEFAULT: custom_pub_chat_template_gemma4.jinja — uses native Gemma 4 DSL (<|tool_call>, <|turn>),
-# fixes 4 known bugs (null→"None", string args corruption, reasoning preservation, turn-tag asymmetry),
-# enables thinking by default (P2 patch improves tool-call accuracy per model card).
-# HARD RULE: always pass --chat-template-file. Never use --chat-template <name>.
-# To use summary-only mode (no tools): set TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
+# -- Chat template: custom_pub_chat_template_gemma4.jinja for Gemma4-family OpenCode-compatible chat/tool calling --
+# DEFAULT (Gemma4-family models only): custom_pub_chat_template_gemma4.jinja — uses native
+# Gemma 4 DSL (<|tool_call>, <|turn>), fixes 4 known bugs (null→"None", string args corruption,
+# reasoning preservation, turn-tag asymmetry), enables thinking by default (P2 patch improves
+# tool-call accuracy per model card).
+# HARD RULE (Gemma4-family only): when an external template applies at all, always pass
+# --chat-template-file. Never use --chat-template <name>. This rule does NOT apply to models
+# whose profile requires the embedded template (Ornith/hforf.gguf) - see $isOrnithModel below,
+# which must resolve to "no --chat-template-file flag at all", not an empty/default one.
+# To use summary-only mode (no tools) on a Gemma4-family model: set
+# TURBO_CHAT_TEMPLATE_FILE=<path to summary-clean.jinja>
 $defaultTemplate = Join-Path $PSScriptRoot "..\configs\templates\custom_pub_chat_template_gemma4.jinja"
+# Model-aware gate, not just profile-aware: hforf.gguf (Ornith) must never get
+# the Gemma4 override template, whether it was selected via -StartupProfile
+# ornith OR resolved through the legacy env-var path (ROTORQUANT_MODEL_PATH /
+# TURBO_MODEL_PATH / TURBO_MODEL / LOCAL_GEMMA_MODEL / auto-discovery). Before
+# this check existed, the legacy path fell through to $defaultTemplate
+# unconditionally whenever the file existed on disk, silently applying the
+# Gemma4 template to hforf.gguf.
+$isOrnithModel = (Get-NormalizedModelName $model) -eq 'hforf.gguf'
 $chatTemplateFile = if ($activeTurboProfile) {
     # Profile owns the decision explicitly. $null (Ornith) means "use the
     # GGUF's embedded tokenizer.chat_template" - do NOT fall back to the
@@ -1032,7 +1114,11 @@ $chatTemplateFile = if ($activeTurboProfile) {
     # spec warns against.
     $activeTurboProfile.TemplateFile
 } elseif ($env:TURBO_CHAT_TEMPLATE_FILE -and $env:TURBO_CHAT_TEMPLATE_FILE -ne 'none') {
+    # Explicit operator override wins even for hforf.gguf - this is intent,
+    # not an accidental default.
     $env:TURBO_CHAT_TEMPLATE_FILE
+} elseif ($isOrnithModel) {
+    $null
 } elseif (Test-Path $defaultTemplate) {
     $defaultTemplate
 } else {
@@ -1047,11 +1133,42 @@ if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
     Write-Host "Chat template: --chat-template-file $chatTemplateFile" -ForegroundColor Cyan
 } elseif ($activeTurboProfile -and -not $activeTurboProfile.TemplateFile) {
     Write-Host "Chat template: profile '$($activeTurboProfile.Id)' uses the GGUF embedded template (tokenizer.chat_template)" -ForegroundColor Cyan
+} elseif ($isOrnithModel) {
+    Write-Host "Chat template: hforf.gguf resolved outside a profile - using the GGUF embedded template (tokenizer.chat_template), not the Gemma4 override" -ForegroundColor Cyan
 } elseif ($env:TURBO_CHAT_TEMPLATE_FILE) {
     Write-Host "Chat template: TURBO_CHAT_TEMPLATE_FILE set but not found - will use GGUF built-in" -ForegroundColor Yellow
 } else {
     Write-Host "Chat template: $defaultTemplate not found - will use GGUF built-in (supports_tools may be false)" -ForegroundColor Yellow
 }
+
+# -- Model resolution receipt: makes the resolved-model/template decision
+#    visible in the launch log instead of only inferable from other lines.
+#    If this ever regresses (e.g. hforf.gguf resolved but an external
+#    template applied), the mismatch is immediately visible here.
+$normalizedModelName = Get-NormalizedModelName $model
+$templateSource = if ($chatTemplateFile -and (Test-Path $chatTemplateFile)) {
+    if ($activeTurboProfile) { "profile:$($activeTurboProfile.Id)" }
+    elseif ($env:TURBO_CHAT_TEMPLATE_FILE) { 'environment-override' }
+    else { 'default-gemma4' }
+} else {
+    'embedded'
+}
+# Distinguish WHY no external template is applied: Ornith requiring embedded
+# is a different condition than "nothing configured happened to resolve to
+# nothing" - collapsing both into one label (as an earlier revision did) was
+# misleading during regression triage.
+$externalTemplateStatus = if ($templateSource -ne 'embedded') {
+    'ENABLED'
+} elseif ($isOrnithModel) {
+    'DISABLED_ORNITH_REQUIRES_EMBEDDED'
+} else {
+    'NOT_CONFIGURED'
+}
+Write-Host "MODEL_RESOLUTION_SOURCE=$modelResolutionSource" -ForegroundColor DarkGray
+Write-Host "RESOLVED_MODEL_PATH=$model" -ForegroundColor DarkGray
+Write-Host "NORMALIZED_MODEL=$normalizedModelName" -ForegroundColor DarkGray
+Write-Host "TEMPLATE_SOURCE=$templateSource" -ForegroundColor DarkGray
+Write-Host "EXTERNAL_CHAT_TEMPLATE=$externalTemplateStatus" -ForegroundColor DarkGray
 
 # -- Stop sequences: prevent the model from emitting turn markers into the output.
 # custom_pub_chat_template_gemma4.jinja uses native Gemma 4 DSL tokens (<turn|>, <|turn>).

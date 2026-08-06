@@ -1,108 +1,142 @@
 {
-  "status": "WARN",
-  "mode": "dry-run",
+  "status": "PASS",
+  "mode": "apply",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-07-19T23:51:07.251Z",
-  "packets_loaded": 55042,
-  "all_packets_loaded": 58365,
-  "already_linked_seen": 0,
-  "no_postgres_join_seen": 100,
-  "qdrant_points_scanned": 100,
-  "matches": 0,
-  "updated": 0,
-  "skipped_duplicate_packet": 0,
-  "already_linked_samples": [],
-  "no_postgres_join_samples": [
+  "started_at": "2026-08-06T03:04:31.079Z",
+  "packets_loaded": 56933,
+  "all_packets_loaded": 61659,
+  "already_linked_seen": 991,
+  "no_postgres_join_seen": 0,
+  "qdrant_points_scanned": 5000,
+  "matches": 1636,
+  "updated": 1636,
+  "skipped_duplicate_packet": 2373,
+  "already_linked_samples": [
     {
-      "pointId": 990761,
-      "qdrantPayloadKeys": [
-        "990761",
-        "src/routes/(analysis)@"
-      ],
-      "relativePath": null,
-      "sourceRef": "sveltekit-frontend/src/routes/(analysis)@"
+      "pointId": 1006,
+      "packetKey": "packet:f687fb79f3a0",
+      "sourceRef": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts"
     },
     {
-      "pointId": 1167479,
-      "qdrantPayloadKeys": [
-        "1167479"
-      ],
-      "relativePath": null,
-      "sourceRef": null
+      "pointId": 1014,
+      "packetKey": "packet:d9e64f3ffe88",
+      "sourceRef": "packages/parent-atlas-retrieval/src/turbovec/authority-chain.ts"
     },
     {
-      "pointId": 1181912,
-      "qdrantPayloadKeys": [
-        "1181912"
-      ],
-      "relativePath": null,
-      "sourceRef": null
+      "pointId": 1018,
+      "packetKey": "ace:packet:e5c128787e15",
+      "sourceRef": "docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md"
     },
     {
-      "pointId": 1576768,
-      "qdrantPayloadKeys": [
-        "1576768",
-        "claude-mem/plugin/modes"
-      ],
-      "relativePath": null,
-      "sourceRef": "claude-mem/plugin/modes"
+      "pointId": 1023,
+      "packetKey": "packet:d2ff29a3744b",
+      "sourceRef": "simd-bridge/cpp/build-x64-cuda/CMakeFiles/4.0.0/CompilerIdCXX/CMakeCXXCompilerId.cpp"
     },
     {
-      "pointId": 1636755,
-      "qdrantPayloadKeys": [
-        "1636755"
-      ],
-      "relativePath": null,
-      "sourceRef": null
+      "pointId": 1028,
+      "packetKey": "packet:c1ad51edd3a9",
+      "sourceRef": "src/routes/api/chat/stream/+server.ts"
     },
     {
-      "pointId": 2021966,
-      "qdrantPayloadKeys": [
-        "2021966"
-      ],
-      "relativePath": null,
-      "sourceRef": null
+      "pointId": 1032,
+      "packetKey": "packet:ebb4a666c7d8",
+      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ast/analyze/+server.ts"
     },
     {
-      "pointId": 2434769,
-      "qdrantPayloadKeys": [
-        "2434769",
-        "scratch/index-checkpoints"
-      ],
-      "relativePath": null,
-      "sourceRef": "scratch/index-checkpoints"
+      "pointId": 1035,
+      "packetKey": "packet:9f38cd778699",
+      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat/+server.ts"
     },
     {
-      "pointId": 3085081,
-      "qdrantPayloadKeys": [
-        "3085081"
-      ],
-      "relativePath": null,
-      "sourceRef": null
+      "pointId": 1036,
+      "packetKey": "packet:b9e1c61fc9a3",
+      "sourceRef": "packages/parent-atlas-retrieval/tests/bifrost/bifrost-semantic-cache.spec.ts"
     },
     {
-      "pointId": 4006069,
-      "qdrantPayloadKeys": [
-        "4006069",
-        "memory/reconstruction"
-      ],
-      "relativePath": null,
-      "sourceRef": "sveltekit-frontend/memory/reconstruction"
+      "pointId": 1037,
+      "packetKey": "packet:0b490741e82a",
+      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/rerank/LLMS.md"
     },
     {
-      "pointId": 4180125,
-      "qdrantPayloadKeys": [
-        "4180125",
-        "claude-mem/tests/services/sqlite"
-      ],
-      "relativePath": null,
-      "sourceRef": "claude-mem/tests/services/sqlite"
+      "pointId": 1038,
+      "packetKey": "packet:f7bef1b68082",
+      "sourceRef": "docs/metadata-contract-schema.yaml"
     }
   ],
+  "no_postgres_join_samples": [],
   "unmatched_samples": [],
-  "matched_samples": [],
-  "errors": [
-    "Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads."
+  "matched_samples": [
+    {
+      "packetKey": "packet:6b86b273ff34",
+      "sourceRef": "1",
+      "pointId": 1,
+      "joinKey": "1",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRef": "src/AGENTS.md",
+      "pointId": 2,
+      "joinKey": "src/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts",
+      "pointId": 5,
+      "joinKey": "src/hooks.server.ts",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:83dc9fe1e87d",
+      "sourceRef": "src/lib/AGENTS.md",
+      "pointId": 13,
+      "joinKey": "src/lib/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:c113744e3e98",
+      "sourceRef": "src/lib/ai/AGENTS.md",
+      "pointId": 17,
+      "joinKey": "src/lib/ai/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:73c63464e142",
+      "sourceRef": "src/lib/ai/e2b/AGENTS.md",
+      "pointId": 23,
+      "joinKey": "src/lib/ai/e2b/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:b5295274e2b7",
+      "sourceRef": "src/lib/ai/onnx/AGENTS.md",
+      "pointId": 28,
+      "joinKey": "src/lib/ai/onnx/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:756ddd25ac36",
+      "sourceRef": "src/lib/cache/AGENTS.md",
+      "pointId": 32,
+      "joinKey": "src/lib/cache/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:6061bede0c9f",
+      "sourceRef": "src/lib/client/AGENTS.md",
+      "pointId": 38,
+      "joinKey": "src/lib/client/AGENTS.md",
+      "vectorDim": 768
+    },
+    {
+      "packetKey": "ace:packet:4758b464fae1",
+      "sourceRef": "src/lib/client/ui/AGENTS.md",
+      "pointId": 42,
+      "joinKey": "src/lib/client/ui/AGENTS.md",
+      "vectorDim": 768
+    }
   ],
-  "finished_at": "2026-07-19T23:51:10.229Z"
+  "errors": [],
+  "finished_at": "2026-08-06T03:05:08.206Z"
 }

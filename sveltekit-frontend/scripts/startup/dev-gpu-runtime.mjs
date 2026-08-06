@@ -119,7 +119,18 @@ function mergedEnv(extra = {}) {
     DEV_GPU_LLM_BACKEND: devGpuLlmBackend,
     LOCAL_OPENAI_BASE_URL: envFromFiles.LOCAL_OPENAI_BASE_URL ?? `http://127.0.0.1:${synthPort}/v1`,
     LOCAL_OPENAI_API_KEY: envFromFiles.LOCAL_OPENAI_API_KEY ?? 'local',
-    LOCAL_GEMMA_MODEL: envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : 'gemma4-legal-iq4xs-direct.gguf'),
+    // Ornith (hforf.gguf) is the current production target for the text-only
+    // TurboQuant lane; EXPECTED_LLAMA_MODEL/TURBO_MODEL/LOCAL_GEMMA_MODEL let an
+    // operator repoint this without editing code. See "verifyLlamaServerModelLoaded"
+    // below for the fail-closed identity check this default feeds.
+    //
+    // LOCAL_GEMMA_MODEL is a legacy env var name kept for backward
+    // compatibility with launch-turboquant.ps1 and existing .env files - it
+    // no longer implies the target is a Gemma model (hforf.gguf/Ornith is not
+    // Gemma). Treat it as "the resolved expected/target model", not literally
+    // "the Gemma model". Prefer EXPECTED_LLAMA_MODEL or TURBO_MODEL in new
+    // config; LOCAL_GEMMA_MODEL remains the lowest-priority explicit override.
+    LOCAL_GEMMA_MODEL: envFromFiles.EXPECTED_LLAMA_MODEL ?? envFromFiles.TURBO_MODEL ?? envFromFiles.LOCAL_GEMMA_MODEL ?? (isLiteRT ? 'gemma-4-E2B-it.litertlm' : 'hforf.gguf'),
     TURBO_PORT: isLiteRT ? synthPort : (envFromFiles.TURBO_PORT ?? '8090'),
     TURBO_CTX: envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
     LLM_CONTEXT_SIZE: envFromFiles.LLM_CONTEXT_SIZE ?? envFromFiles.TURBO_CTX ?? envFromFiles.LLAMA_SERVER_CTX ?? '65536',
@@ -495,7 +506,7 @@ async function main() {
       // failure: write the report and STOP dev:gpu here — do not retry, do
       // not fall back to a different backend, do not proceed into Vite with
       // an unverified/wrong LLM backend.
-      const targetModel = launcherEnv.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+      const targetModel = launcherEnv.EXPECTED_LLAMA_MODEL ?? launcherEnv.TURBO_MODEL ?? launcherEnv.LOCAL_GEMMA_MODEL ?? 'hforf.gguf';
       console.log(`[dev:gpu] Verifying :8090 is serving "${targetModel}"...`);
       const verification = await verifyLlamaServerModelLoaded(targetModel, synthPort);
 

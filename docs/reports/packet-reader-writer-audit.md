@@ -1,6 +1,6 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-08-05T02:56:27.065Z
+Generated: 2026-08-06T02:57:41.452Z
 Status: MATERIALIZED
 Source table: atlas_packets
 
@@ -16,10 +16,10 @@ Source table: atlas_packets
 - embedding ref rows: 4726
 - evidence matches: 10474
 - load batches: 62
-- max page query ms: 1406
+- max page query ms: 6374
 - max page parse ms: 0
-- max page raw bytes: 17968686
-- max page normalized bytes: 17968684
+- max page raw bytes: 17976430
+- max page normalized bytes: 17976428
 - missing feature_id: 0
 - missing canonical_source_ref: 1
 - missing qdrant_point_id: 56835
@@ -55,7 +55,7 @@ Source table: atlas_packets
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: 2c703754b14a60949d2626a179e13208b1cb536ef96a3c6261e7359477682709
+- sha256: d88b538fa9b348c2a1b134b558aac2feacbae4f565c4c074f41bc0c6136478c0
 
 ## Samples
 

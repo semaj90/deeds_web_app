@@ -23,6 +23,7 @@ dotenv.config({ path: path.join(ROOT, '.env.local'), override: false });
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const VERBOSE = process.argv.includes('--verbose');
+const APPLY_THROUGH = Number(process.argv.find((a) => a.startsWith('--apply-through='))?.split('=')[1] ?? 0);
 const STEP_TIMEOUT_MS = Number(process.env.GRAPHIFY_PHASE8_STEP_TIMEOUT_MS || 20 * 60 * 1000);
 const OVERALL_STEP_TIMEOUT_MS = Number(process.env.GRAPHIFY_PHASE8_OVERALL_TIMEOUT_MS || 120 * 60 * 1000);
 const HEARTBEAT_MS = Number(process.env.GRAPHIFY_PHASE8_HEARTBEAT_MS || 15_000);
@@ -31,30 +32,45 @@ function log(message) {
   console.log(`[phase8-fanout] ${message}`);
 }
 
-export function buildPhase8StepPlan(dryRun = false) {
-  return dryRun
-    ? [
-        ['atlas:phase8:step3:langextract:gate', 'gate'],
-        ['atlas:summary:index:rank', 'dry'],
-        ['atlas:summary:envelopes:build:dry', 'dry'],
-        ['atlas:summary:envelopes:queue:dry', 'dry'],
-        ['atlas:materialize:feature-envelopes:dry', 'dry'],
-        ['atlas:phase16:latent:dry', 'dry'],
-        ['atlas:phase16:som:dry', 'dry'],
-        ['atlas:phase16:gds:dry', 'dry'],
-        ['atlas:bitfrost-semantic-cache:warm', 'dry'],
-      ]
-    : [
-        ['atlas:phase8:step3:langextract:apply', 'apply'],
-        ['atlas:summary:index:rank:apply', 'apply'],
-        ['atlas:summary:envelopes:build:apply', 'apply'],
-        ['atlas:summary:envelopes:queue:apply', 'apply'],
-        ['atlas:materialize:feature-envelopes:apply', 'apply'],
-        ['atlas:phase16:latent:apply', 'apply'],
-        ['atlas:phase16:som:apply', 'apply'],
-        ['atlas:phase16:gds:apply', 'apply'],
-        ['atlas:bitfrost-semantic-cache:warm:apply', 'apply'],
-      ];
+const PHASE8_DRY_PLAN = [
+  ['atlas:phase8:step3:langextract:gate', 'gate'],
+  ['atlas:summary:index:rank', 'dry'],
+  ['atlas:summary:envelopes:build:dry', 'dry'],
+  ['atlas:summary:envelopes:queue:dry', 'dry'],
+  ['atlas:materialize:feature-envelopes:dry', 'dry'],
+  ['atlas:phase16:latent:dry', 'dry'],
+  ['atlas:phase16:som:dry', 'dry'],
+  ['atlas:phase16:gds:dry', 'dry'],
+  ['atlas:bitfrost-semantic-cache:warm', 'dry'],
+  ['atlas:centroids:cache:dry', 'dry'],
+  ['atlas:graphify-draft:dry', 'dry'],
+];
+
+const PHASE8_APPLY_PLAN = [
+  ['atlas:phase8:step3:langextract:apply', 'apply'],
+  ['atlas:summary:index:rank:apply', 'apply'],
+  ['atlas:summary:envelopes:build:apply', 'apply'],
+  ['atlas:summary:envelopes:queue:apply', 'apply'],
+  ['atlas:materialize:feature-envelopes:apply', 'apply'],
+  ['atlas:phase16:latent:apply', 'apply'],
+  ['atlas:phase16:som:apply', 'apply'],
+  ['atlas:phase16:gds:apply', 'apply'],
+  ['atlas:bitfrost-semantic-cache:warm:apply', 'apply'],
+  ['atlas:centroids:cache:warm', 'apply'],
+  ['atlas:graphify-draft:apply', 'apply'],
+];
+
+/**
+ * @param {boolean} dryRun
+ * @param {number} applyThrough - when dryRun=true, run steps 1..applyThrough
+ *   for real (apply) and leave the rest dry. 0 = fully dry. Ignored when
+ *   dryRun=false (everything is already apply). The two plans above are
+ *   index-aligned 1:1 so this is a straight per-index swap.
+ */
+export function buildPhase8StepPlan(dryRun = false, applyThrough = 0) {
+  if (!dryRun) return PHASE8_APPLY_PLAN;
+  if (applyThrough <= 0) return PHASE8_DRY_PLAN;
+  return PHASE8_DRY_PLAN.map((step, i) => (i < applyThrough ? PHASE8_APPLY_PLAN[i] : step));
 }
 
 function createStepSnapshot(tracker, runId, stepStates, stepIndex, stepCount, state, startedAt, phase, phaseDetail, lastArtifactId = null) {
@@ -162,6 +178,7 @@ async function runStep(script, stepStates, stepIndex, startedAt, phase, runId, t
 
 export async function runPhase8Fanout({
   dryRun = DRY_RUN,
+  applyThrough = APPLY_THROUGH,
   verbose = VERBOSE,
   stepTimeoutMs = STEP_TIMEOUT_MS,
   overallTimeoutMs = OVERALL_STEP_TIMEOUT_MS,
@@ -170,7 +187,7 @@ export async function runPhase8Fanout({
   spawnImpl = spawn,
   logger = log,
   tracker = new Phase8ProgressTracker(runId),
-  stepPlan = buildPhase8StepPlan(dryRun),
+  stepPlan = buildPhase8StepPlan(dryRun, applyThrough),
 } = {}) {
   const overallStartedAt = Date.now();
   const stepStates = stepPlan.map(([script], i) => ({
@@ -181,7 +198,7 @@ export async function runPhase8Fanout({
     total: 1,
   }));
 
-  logger(`starting [dry-run=${dryRun}] [step-timeout=${stepTimeoutMs}ms] [overall-timeout=${overallTimeoutMs}ms] [run-id=${runId}]`);
+  logger(`starting [dry-run=${dryRun}] [apply-through=${applyThrough}] [step-timeout=${stepTimeoutMs}ms] [overall-timeout=${overallTimeoutMs}ms] [run-id=${runId}]`);
   tracker.writeEvent(createStepSnapshot(tracker, runId, stepStates, 1, stepStates.length, 'STARTING', overallStartedAt, 'phase8', stepPlan[0]?.[0] ?? 'phase8'));
 
   for (let i = 0; i < stepPlan.length; i++) {
@@ -223,5 +240,5 @@ export async function runPhase8Fanout({
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isMain) {
-  await runPhase8Fanout({ dryRun: DRY_RUN, verbose: VERBOSE });
+  await runPhase8Fanout({ dryRun: DRY_RUN, applyThrough: APPLY_THROUGH, verbose: VERBOSE });
 }
