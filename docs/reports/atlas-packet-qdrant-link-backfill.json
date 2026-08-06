@@ -2,141 +2,92 @@
   "status": "PASS",
   "mode": "apply",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-08-06T03:04:31.079Z",
-  "packets_loaded": 56933,
+  "started_at": "2026-08-06T04:23:34.623Z",
+  "packets_loaded": 55297,
   "all_packets_loaded": 61659,
-  "already_linked_seen": 991,
+  "already_linked_seen": 4992,
   "no_postgres_join_seen": 0,
   "qdrant_points_scanned": 5000,
-  "matches": 1636,
-  "updated": 1636,
-  "skipped_duplicate_packet": 2373,
+  "matches": 3,
+  "updated": 3,
+  "skipped_duplicate_packet": 5,
   "already_linked_samples": [
     {
-      "pointId": 1006,
-      "packetKey": "packet:f687fb79f3a0",
-      "sourceRef": "packages/parent-atlas-retrieval/src/gpu/gpu-job-queue.ts"
+      "pointId": 1,
+      "packetKey": "packet:6b86b273ff34",
+      "sourceRef": "1"
     },
     {
-      "pointId": 1014,
-      "packetKey": "packet:d9e64f3ffe88",
-      "sourceRef": "packages/parent-atlas-retrieval/src/turbovec/authority-chain.ts"
+      "pointId": 2,
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRef": "src/AGENTS.md"
     },
     {
-      "pointId": 1018,
-      "packetKey": "ace:packet:e5c128787e15",
-      "sourceRef": "docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md"
+      "pointId": 3,
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRef": "src/AGENTS.md"
     },
     {
-      "pointId": 1023,
-      "packetKey": "packet:d2ff29a3744b",
-      "sourceRef": "simd-bridge/cpp/build-x64-cuda/CMakeFiles/4.0.0/CompilerIdCXX/CMakeCXXCompilerId.cpp"
+      "pointId": 4,
+      "packetKey": "ace:packet:3362030dfe23",
+      "sourceRef": "src/AGENTS.md"
     },
     {
-      "pointId": 1028,
-      "packetKey": "packet:c1ad51edd3a9",
-      "sourceRef": "src/routes/api/chat/stream/+server.ts"
+      "pointId": 5,
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts"
     },
     {
-      "pointId": 1032,
-      "packetKey": "packet:ebb4a666c7d8",
-      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ast/analyze/+server.ts"
+      "pointId": 6,
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts"
     },
     {
-      "pointId": 1035,
-      "packetKey": "packet:9f38cd778699",
-      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/chat/+server.ts"
+      "pointId": 7,
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts"
     },
     {
-      "pointId": 1036,
-      "packetKey": "packet:b9e1c61fc9a3",
-      "sourceRef": "packages/parent-atlas-retrieval/tests/bifrost/bifrost-semantic-cache.spec.ts"
+      "pointId": 8,
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts"
     },
     {
-      "pointId": 1037,
-      "packetKey": "packet:0b490741e82a",
-      "sourceRef": "scripts/api-cleanup/reports/backup-2025-12-14T20-51-26-276Z/ai/rerank/LLMS.md"
+      "pointId": 9,
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts"
     },
     {
-      "pointId": 1038,
-      "packetKey": "packet:f7bef1b68082",
-      "sourceRef": "docs/metadata-contract-schema.yaml"
+      "pointId": 10,
+      "packetKey": "ace:packet:b5aa13ce0a61",
+      "sourceRef": "src/hooks.server.ts"
     }
   ],
   "no_postgres_join_samples": [],
   "unmatched_samples": [],
   "matched_samples": [
     {
-      "packetKey": "packet:6b86b273ff34",
-      "sourceRef": "1",
-      "pointId": 1,
-      "joinKey": "1",
+      "packetKey": "ace:packet:cd6922aaf309",
+      "sourceRef": "src/lib/services/AGENTS.md",
+      "pointId": 2233,
+      "joinKey": "src/lib/server/services/AGENTS.md",
       "vectorDim": 768
     },
     {
-      "packetKey": "ace:packet:3362030dfe23",
-      "sourceRef": "src/AGENTS.md",
-      "pointId": 2,
-      "joinKey": "src/AGENTS.md",
+      "packetKey": "packet:4667d26f62f6",
+      "sourceRef": "turbovec/turbovec/src/lib.rs",
+      "pointId": 2443,
+      "joinKey": "src/lib.rs",
       "vectorDim": 768
     },
     {
-      "packetKey": "ace:packet:b5aa13ce0a61",
-      "sourceRef": "src/hooks.server.ts",
-      "pointId": 5,
-      "joinKey": "src/hooks.server.ts",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:83dc9fe1e87d",
-      "sourceRef": "src/lib/AGENTS.md",
-      "pointId": 13,
-      "joinKey": "src/lib/AGENTS.md",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:c113744e3e98",
-      "sourceRef": "src/lib/ai/AGENTS.md",
-      "pointId": 17,
-      "joinKey": "src/lib/ai/AGENTS.md",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:73c63464e142",
-      "sourceRef": "src/lib/ai/e2b/AGENTS.md",
-      "pointId": 23,
-      "joinKey": "src/lib/ai/e2b/AGENTS.md",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:b5295274e2b7",
-      "sourceRef": "src/lib/ai/onnx/AGENTS.md",
-      "pointId": 28,
-      "joinKey": "src/lib/ai/onnx/AGENTS.md",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:756ddd25ac36",
-      "sourceRef": "src/lib/cache/AGENTS.md",
-      "pointId": 32,
-      "joinKey": "src/lib/cache/AGENTS.md",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:6061bede0c9f",
-      "sourceRef": "src/lib/client/AGENTS.md",
-      "pointId": 38,
-      "joinKey": "src/lib/client/AGENTS.md",
-      "vectorDim": 768
-    },
-    {
-      "packetKey": "ace:packet:4758b464fae1",
-      "sourceRef": "src/lib/client/ui/AGENTS.md",
-      "pointId": 42,
-      "joinKey": "src/lib/client/ui/AGENTS.md",
+      "packetKey": "packet:09cea175fcb5",
+      "sourceRef": "sveltekit-frontend/src/mcp/server.ts",
+      "pointId": 4915,
+      "joinKey": "src/mcp/server.ts",
       "vectorDim": 768
     }
   ],
   "errors": [],
-  "finished_at": "2026-08-06T03:05:08.206Z"
+  "finished_at": "2026-08-06T04:23:58.996Z"
 }

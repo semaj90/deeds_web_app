@@ -1,16 +1,16 @@
 # Qdrant Tag Mirror Audit
 
-Generated: 2026-08-06T03:04:03.527Z
+Generated: 2026-08-06T04:22:41.575Z
 Status: APPLIED
 
 ## Summary
 
 - input rows: 61659
 - selected rows: 61659
-- eligible rows: 4726
-- patched rows: 4726
-- skipped no qdrant_point_id: 56835
-- skipped no qdrant_collection: 98
+- eligible rows: 6362
+- patched rows: 6362
+- skipped no qdrant_point_id: 55210
+- skipped no qdrant_collection: 87
 - skipped no changes: 0
 - failures: 0
 - patch rate: 100%

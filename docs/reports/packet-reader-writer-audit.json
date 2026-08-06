@@ -1,6 +1,6 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-08-06T02:57:41.452Z",
+  "generatedAt": "2026-08-06T04:16:37.914Z",
   "mode": "apply",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
@@ -10,21 +10,21 @@
     "tableRows": 61659,
     "materializedRows": 61659,
     "addressableRows": 61658,
-    "qdrantBackedRows": 4824,
-    "qdrantCollectionRows": 4726,
+    "qdrantBackedRows": 6449,
+    "qdrantCollectionRows": 6362,
     "conceptsRows": 0,
     "bm25Rows": 61659,
-    "embeddingRefRows": 4726,
+    "embeddingRefRows": 6362,
     "evidenceMatchedRows": 10474,
     "missingFeatureId": 0,
     "missingCanonicalSourceRef": 1,
-    "missingQdrantPointId": 56835,
-    "missingQdrantCollection": 56933,
+    "missingQdrantPointId": 55210,
+    "missingQdrantCollection": 55297,
     "duplicatePacketsSkipped": 0,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 7982
+        "count": 7984
       },
       {
         "key": "schema_stub",
@@ -58,7 +58,7 @@
     "1d5eba7211dea6f9",
     "1dc5ac2b3cd9bfe8"
   ],
-  "outputSha256": "d88b538fa9b348c2a1b134b558aac2feacbae4f565c4c074f41bc0c6136478c0",
+  "outputSha256": "dd9b2434a0ac861955ddc32174fa1b4954b6635b258c5ee496574a22f773caff",
   "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
   "stagingPath": ".tmp/addressable-packets.ndjson.stage",
   "interrupted": false,
@@ -81,18 +81,18 @@
   "loadStats": {
     "batches": 62,
     "rows": 61659,
-    "totalQueryElapsedMs": 60368,
+    "totalQueryElapsedMs": 64102,
     "totalParseElapsedMs": 0,
-    "maxQueryElapsedMs": 6374,
+    "maxQueryElapsedMs": 4790,
     "maxParseElapsedMs": 0,
-    "maxRawBytes": 17976430,
-    "maxNormalizedBytes": 17976428
+    "maxRawBytes": 17979474,
+    "maxNormalizedBytes": 17979472
   },
   "status": "MATERIALIZED",
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "checkpoint": {
     "schema": "addressable_packets_materialization_checkpoint.v1",
-    "generatedAt": "2026-08-06T02:57:40.273Z",
+    "generatedAt": "2026-08-06T04:16:36.908Z",
     "sourceTable": "atlas_packets",
     "limit": 0,
     "batchSize": 1000,
