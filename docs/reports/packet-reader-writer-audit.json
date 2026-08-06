@@ -1,6 +1,6 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-08-06T04:16:37.914Z",
+  "generatedAt": "2026-08-06T16:51:14.641Z",
   "mode": "apply",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
@@ -10,21 +10,21 @@
     "tableRows": 61659,
     "materializedRows": 61659,
     "addressableRows": 61658,
-    "qdrantBackedRows": 6449,
-    "qdrantCollectionRows": 6362,
+    "qdrantBackedRows": 6451,
+    "qdrantCollectionRows": 6365,
     "conceptsRows": 0,
     "bm25Rows": 61659,
-    "embeddingRefRows": 6362,
+    "embeddingRefRows": 6365,
     "evidenceMatchedRows": 10474,
     "missingFeatureId": 0,
     "missingCanonicalSourceRef": 1,
-    "missingQdrantPointId": 55210,
-    "missingQdrantCollection": 55297,
+    "missingQdrantPointId": 55208,
+    "missingQdrantCollection": 55294,
     "duplicatePacketsSkipped": 0,
     "classCounts": [
       {
         "key": "qdrant_chunk",
-        "count": 7984
+        "count": 7985
       },
       {
         "key": "schema_stub",
@@ -58,7 +58,7 @@
     "1d5eba7211dea6f9",
     "1dc5ac2b3cd9bfe8"
   ],
-  "outputSha256": "dd9b2434a0ac861955ddc32174fa1b4954b6635b258c5ee496574a22f773caff",
+  "outputSha256": "0f03105c114fd8b220fb0fccb6c80f85e0f713834464d6d5d7c72dce858afdbe",
   "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
   "stagingPath": ".tmp/addressable-packets.ndjson.stage",
   "interrupted": false,
@@ -81,9 +81,9 @@
   "loadStats": {
     "batches": 62,
     "rows": 61659,
-    "totalQueryElapsedMs": 64102,
+    "totalQueryElapsedMs": 9759,
     "totalParseElapsedMs": 0,
-    "maxQueryElapsedMs": 4790,
+    "maxQueryElapsedMs": 681,
     "maxParseElapsedMs": 0,
     "maxRawBytes": 17979474,
     "maxNormalizedBytes": 17979472
@@ -92,7 +92,7 @@
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "checkpoint": {
     "schema": "addressable_packets_materialization_checkpoint.v1",
-    "generatedAt": "2026-08-06T04:16:36.908Z",
+    "generatedAt": "2026-08-06T16:51:13.519Z",
     "sourceTable": "atlas_packets",
     "limit": 0,
     "batchSize": 1000,

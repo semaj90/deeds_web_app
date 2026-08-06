@@ -46,6 +46,17 @@ const NATIVE_TOOL_CALL_RE = /<\|tool_call>call:([a-zA-Z_][a-zA-Z0-9_:.-]*)\{([\s
 const RAW_TOOL_RE = /<\|tool>([a-zA-Z_][a-zA-Z0-9_:.-]*)\{([\s\S]*?)\}\}?<tool\|>/g;
 // Thinking channel blocks:  <|channel>thought\n...\n<channel|>
 const THINKING_CHANNEL_RE = /<\|channel>[\s\S]*?<channel\|>/g;
+// Hermes/Qwen-style XML tool calls (observed from Ornith 2026-08-06):
+//   <tool_call>
+//   <function=trace_kag_search>
+//   <parameter=query>
+//   openspec
+//   </parameter>
+//   </function>
+//   </tool_call>
+// Lazy match on function body so consecutive <tool_call> blocks in one turn don't merge.
+const HERMES_TOOL_CALL_RE = /<tool_call>\s*<function=([a-zA-Z_][a-zA-Z0-9_.:-]*)>([\s\S]*?)<\/function>\s*<\/tool_call>/g;
+const HERMES_PARAMETER_RE = /<parameter=([a-zA-Z_][a-zA-Z0-9_]*)>([\s\S]*?)<\/parameter>/g;
 
 /**
  * Parse a single <execute_tool> block into {name, arguments}.
@@ -140,6 +151,27 @@ function parseNativeArgs(body) {
 }
 
 /**
+ * Parse a Hermes-style <parameter=key>value</parameter> body into a plain object.
+ * Values are trimmed text by default; JSON.parse is attempted so numbers/booleans/
+ * arrays/objects round-trip correctly (e.g. <parameter=limit>10</parameter> -> 10).
+ */
+function parseHermesParameters(body) {
+  const result = {};
+  HERMES_PARAMETER_RE.lastIndex = 0;
+  let m;
+  while ((m = HERMES_PARAMETER_RE.exec(body)) !== null) {
+    const key = m[1];
+    const raw = m[2].trim();
+    try {
+      result[key] = JSON.parse(raw);
+    } catch {
+      result[key] = raw;
+    }
+  }
+  return result;
+}
+
+/**
  * Given a message content string that may contain <execute_tool> blocks,
  * bare JSON tool call lines, or Gemma4 native <|tool_call>call:name{...}<tool_call|> blocks,
  * extract all tool calls and return OpenAI tool_calls[] format.
@@ -148,6 +180,36 @@ function parseNativeArgs(body) {
 function extractToolCalls(content) {
   if (!content) return null;
   const toolCalls = [];
+
+  // Pattern 0: Hermes/Qwen-style <tool_call><function=name><parameter=k>v</parameter>...
+  // A 9B local model can plan several dependent calls in one turn (e.g. find_source_refs
+  // then grep the result). Only take the FIRST well-formed block — later calls likely
+  // depend on results the model doesn't have yet, and emitting them all invites OpenCode
+  // to try to fire tool calls whose inputs are guesses. The rest are stripped from
+  // content in sanitizeContent() so they never leak to the client as literal text.
+  if (content.includes('<tool_call>') && content.includes('<function=')) {
+    HERMES_TOOL_CALL_RE.lastIndex = 0;
+    const matches = [];
+    let match;
+    while ((match = HERMES_TOOL_CALL_RE.exec(content)) !== null) {
+      matches.push(match);
+    }
+    if (matches.length > 0) {
+      const first = matches[0];
+      const name = first[1];
+      const args = parseHermesParameters(first[2]);
+      toolCalls.push({
+        id: `call_${Date.now()}_${toolCalls.length}`,
+        type: 'function',
+        function: { name, arguments: JSON.stringify(args) },
+      });
+      if (matches.length > 1) {
+        console.log(`[adapter] Parsed 1 of ${matches.length} Hermes-style tool call(s) via <tool_call><function=> format (dropped ${matches.length - 1} dependent call(s) — will retry after this result)`);
+      } else {
+        console.log(`[adapter] Parsed 1 Hermes-style tool call via <tool_call><function=> format: ${name}`);
+      }
+    }
+  }
 
   // Pattern 1: <execute_tool> blocks (old template / fallback)
   if (content.includes('<execute_tool>')) {
@@ -281,6 +343,9 @@ function sanitizeContent(content) {
   s = s.replace(NATIVE_TOOL_CALL_RE, '');
   // Remove raw <|tool>...}}<tool|> blocks from visible content
   s = s.replace(RAW_TOOL_RE, '');
+  // Remove Hermes-style <tool_call><function=...>...</function></tool_call> blocks
+  // (including any beyond the first, which extractToolCalls() intentionally dropped)
+  s = s.replace(HERMES_TOOL_CALL_RE, '');
   s = s.replace(/^_response\n/, '');
   s = s.trim();
 

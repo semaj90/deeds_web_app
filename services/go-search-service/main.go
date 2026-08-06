@@ -56,6 +56,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	qdrantclient "github.com/qdrant/go-client/qdrant"
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/reflection"
@@ -1859,12 +1860,16 @@ func main() {
 	var rdb *redis.Client
 	opts, redisErr := redis.ParseURL(cfg.RedisURL)
 	if redisErr == nil {
+		opts.MaintNotificationsConfig = &maintnotifications.Config{
+			Mode: maintnotifications.ModeDisabled,
+		}
+
 		rdb = redis.NewClient(opts)
 		if rdb.Ping(ctx).Err() != nil {
-			slog.Warn("Redis not available, caching disabled")
+			slog.Warn("Valkey not available, caching disabled")
 			rdb = nil
 		} else {
-			slog.Info("Redis connected")
+			slog.Info("Valkey connected")
 		}
 	}
 

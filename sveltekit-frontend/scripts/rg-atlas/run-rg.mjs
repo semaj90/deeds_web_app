@@ -57,16 +57,21 @@ function parseRgOutput(output) {
  * Executes ripgrep and returns structured hits.
  * @param {string} query
  * @param {string[]} paths
+ * @param {{includeGitignored?: boolean}} [options]
  * @returns {RgHit[]}
  */
-export function runRg(query, paths = ['src']) {
+export function runRg(query, paths = ['src'], options = {}) {
   const searchPaths = buildSearchPaths(paths);
 
   if (searchPaths.length === 0) return [];
 
   try {
     // -n: line number, --column: column, --no-heading, --color never
-    const cmd = `rg -n --column --no-heading --color never "${query.replace(/"/g, '\\"')}" ${searchPaths.join(' ')}`;
+    // --no-ignore --hidden: reach gitignored/dotfile paths (e.g. .opencode/ndjson/*)
+    // when explicitly requested — off by default so callers don't accidentally sweep
+    // node_modules/.git/build output.
+    const ignoreFlags = options.includeGitignored ? '--no-ignore --hidden ' : '';
+    const cmd = `rg -n --column --no-heading --color never ${ignoreFlags}"${query.replace(/"/g, '\\"')}" ${searchPaths.join(' ')}`;
     const output = execSync(cmd, { encoding: 'utf8', maxBuffer: 1024 * 1024 * 10 });
 
     return parseRgOutput(output);
@@ -84,17 +89,19 @@ export function runRg(query, paths = ['src']) {
  * Async ripgrep variant for parallel retrieval lanes.
  * @param {string} query
  * @param {string[]} paths
+ * @param {{includeGitignored?: boolean}} [options]
  * @returns {Promise<RgHit[]>}
  */
-export async function runRgAsync(query, paths = ['src']) {
+export async function runRgAsync(query, paths = ['src'], options = {}) {
   const searchPaths = buildSearchPaths(paths);
 
   if (searchPaths.length === 0) return [];
 
   try {
+    const ignoreFlags = options.includeGitignored ? ['--no-ignore', '--hidden'] : [];
     const { stdout } = await execFileAsync(
       'rg',
-      ['-n', '--column', '--no-heading', '--color', 'never', query, ...searchPaths],
+      ['-n', '--column', '--no-heading', '--color', 'never', ...ignoreFlags, query, ...searchPaths],
       {
         encoding: 'utf8',
         maxBuffer: 1024 * 1024 * 10,

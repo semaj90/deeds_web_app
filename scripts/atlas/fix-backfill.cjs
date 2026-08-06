@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const content = fs.readFileSync('p1-embedding-backfill.mjs', 'utf8');
+const oldText = 'const embeddingStr = \[\\]\;';
+const vecLenGuard = 'const vecLen = embedding.length; if (vecLen !== 768) { failCount++; failures.push({ id: candidate.id, path: candidate.relative_path, reason: 'embedding_wrong_length: ' + vecLen + ' expected 768' }); continue; };';
+const newText = 'const embeddingStr = \[\\]\;' + vecLenGuard;
+if (!content.includes(oldText)) throw new Error('Target text not found: ' + oldText);
+content = content.replace(oldText, newText);
+fs.writeFileSync('p1-embedding-backfill.mjs', content);
+console.log('Patch applied');

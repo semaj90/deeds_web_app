@@ -1,6 +1,6 @@
 # Packet Reader / Writer Audit
 
-Generated: 2026-08-06T04:16:37.914Z
+Generated: 2026-08-06T16:51:14.641Z
 Status: MATERIALIZED
 Source table: atlas_packets
 
@@ -9,21 +9,21 @@ Source table: atlas_packets
 - ledger rows: 61659
 - materialized rows: 61659
 - addressable rows: 61658
-- qdrant-backed rows: 6449
-- qdrant collection rows: 6362
+- qdrant-backed rows: 6451
+- qdrant collection rows: 6365
 - bm25 rows: 61659
 - concepts rows: 0
-- embedding ref rows: 6362
+- embedding ref rows: 6365
 - evidence matches: 10474
 - load batches: 62
-- max page query ms: 4790
+- max page query ms: 681
 - max page parse ms: 0
 - max page raw bytes: 17979474
 - max page normalized bytes: 17979472
 - missing feature_id: 0
 - missing canonical_source_ref: 1
-- missing qdrant_point_id: 55210
-- missing qdrant_collection: 55297
+- missing qdrant_point_id: 55208
+- missing qdrant_collection: 55294
 - duplicate packets skipped: 0
 
 ## Proof
@@ -38,7 +38,7 @@ Source table: atlas_packets
 
 ## Packet Kind Counts
 
-- qdrant_chunk: 7984
+- qdrant_chunk: 7985
 - schema_stub: 1061
 - mcp_tool_stub: 703
 - legacy_qdrant_only: 0
@@ -55,7 +55,7 @@ Source table: atlas_packets
 
 - ndjson: .tmp/addressable-packets.ndjson
 - manifest: .tmp/addressable-packets.manifest.json
-- sha256: dd9b2434a0ac861955ddc32174fa1b4954b6635b258c5ee496574a22f773caff
+- sha256: 0f03105c114fd8b220fb0fccb6c80f85e0f713834464d6d5d7c72dce858afdbe
 
 ## Samples
 

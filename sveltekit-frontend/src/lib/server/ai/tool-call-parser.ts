@@ -81,7 +81,7 @@ function parseJsonToolCalls(content: string): {
       .map((tc: any) =>
         makeToolCall(tc?.function?.name ?? tc?.name ?? '', tc?.function?.arguments ?? tc?.arguments)
       )
-      .filter((item): item is ToolCall => Boolean(item));
+      .filter((item: ToolCall | null): item is ToolCall => Boolean(item));
 
     if (normalized.length > 0) {
       const responseText =
@@ -97,6 +97,30 @@ function parseJsonToolCalls(content: string): {
   return { toolCalls: [], responseText: content };
 }
 
+/**
+ * Parse a Hermes/Qwen-style <function=name><parameter=key>value</parameter>...</function>
+ * body into {name, arguments}. Observed from Ornith (9B, hforf.gguf) 2026-08-06.
+ */
+function parseHermesFunctionBlock(body: string): { name: string; arguments: Record<string, unknown> } | null {
+  const fnMatch = body.match(/^<function=([a-zA-Z_][a-zA-Z0-9_.:-]*)>([\s\S]*?)<\/function>$/);
+  if (!fnMatch) return null;
+
+  const name = fnMatch[1];
+  const paramBody = fnMatch[2];
+  const args: Record<string, unknown> = {};
+  const paramRe = /<parameter=([a-zA-Z_][a-zA-Z0-9_]*)>([\s\S]*?)<\/parameter>/g;
+  let pm: RegExpExecArray | null;
+  while ((pm = paramRe.exec(paramBody)) !== null) {
+    const raw = pm[2].trim();
+    try {
+      args[pm[1]] = JSON.parse(raw);
+    } catch {
+      args[pm[1]] = raw;
+    }
+  }
+  return { name, arguments: args };
+}
+
 export function parseToolCalls(content: string): ParsedToolCalls {
   const toolCalls: ToolCall[] = [];
   let reasoningText = '';
@@ -108,20 +132,40 @@ export function parseToolCalls(content: string): ParsedToolCalls {
     reasoningText = reasoningMatch[1].trim();
   }
 
-  // Extract all tool calls
+  // Extract all tool calls. Body may be a JSON object ({"name":...,"arguments":...})
+  // or Hermes/Qwen-style XML (<function=name><parameter=k>v</parameter></function>).
+  // Only the FIRST well-formed call is taken — a local model can plan several
+  // dependent calls in one turn, but later ones likely depend on results it doesn't
+  // have yet. The rest are stripped below along with this one so none leak as text.
   const toolCallRegex = /<tool_call>\s*([\s\S]*?)\s*<\/tool_call>/g;
-  let match;
+  let match: RegExpExecArray | null;
+  let took = false;
 
   while ((match = toolCallRegex.exec(content)) !== null) {
-    const jsonStr = match[1].trim();
+    if (took) continue;
+    const body = match[1].trim();
+
+    if (body.startsWith('<function=')) {
+      const parsed = parseHermesFunctionBlock(body);
+      const toolCall = parsed && makeToolCall(parsed.name, parsed.arguments);
+      if (toolCall) {
+        toolCalls.push(toolCall);
+        took = true;
+      } else {
+        console.warn('[Tool Call Parser] Failed to parse Hermes function block:', body);
+      }
+      continue;
+    }
+
     try {
-      const parsed = JSON.parse(jsonStr);
+      const parsed = JSON.parse(body);
       const toolCall = makeToolCall(parsed?.name, parsed?.arguments);
       if (toolCall) {
         toolCalls.push(toolCall);
+        took = true;
       }
     } catch (e) {
-      console.warn('[Tool Call Parser] Failed to parse JSON:', jsonStr, e);
+      console.warn('[Tool Call Parser] Failed to parse JSON:', body, e);
     }
   }
 

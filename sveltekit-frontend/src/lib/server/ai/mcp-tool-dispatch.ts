@@ -177,6 +177,7 @@ export async function tool_codebase_rg_search(args: {
   query: string;
   paths?: string[];
   limit?: number;
+  includeGitignored?: boolean;
 }): Promise<MCPToolResult> {
   const t0 = Date.now();
   try {
@@ -192,16 +193,16 @@ export async function tool_codebase_rg_search(args: {
           !/^[A-Za-z]:/.test(path)
       )
       .slice(0, 20);
-    const hits = runRg(args.query, searchPaths.length > 0 ? searchPaths : ['src']).slice(
-      0,
-      Math.min(args.limit ?? 40, 200)
-    );
+    const hits = runRg(args.query, searchPaths.length > 0 ? searchPaths : ['src'], {
+      includeGitignored: args.includeGitignored === true,
+    }).slice(0, Math.min(args.limit ?? 40, 200));
 
     return ok(
       'codebase.rg_search',
       {
         query: args.query,
         paths: searchPaths.length > 0 ? searchPaths : ['src'],
+        includeGitignored: args.includeGitignored === true,
         matchCount: hits.length,
         matches: hits,
       },

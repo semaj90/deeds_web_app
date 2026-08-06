@@ -1115,6 +1115,12 @@ export function setupToolHandlers() {
               description: 'Case-insensitive search (default: false)',
               default: false,
             },
+            includeGitignored: {
+              type: 'boolean',
+              description:
+                'Search gitignored/hidden paths too (e.g. .opencode/ndjson/*). Off by default to avoid sweeping node_modules/build output.',
+              default: false,
+            },
           },
           required: ['pattern'],
         },
@@ -4303,6 +4309,7 @@ export function setupToolHandlers() {
         const fileGlob = String(args.fileGlob ?? '*.{ts,svelte}');
         const maxRes = Math.min(200, Math.max(1, Number(args.maxResults ?? 40)));
         const noCase = Boolean(args.caseInsensitive ?? false);
+        const includeGitignored = Boolean(args.includeGitignored ?? false);
 
         if (!pattern) throw new Error('pattern is required');
 
@@ -4313,6 +4320,7 @@ export function setupToolHandlers() {
           '--glob',
           fileGlob,
           ...(noCase ? ['-i'] : []),
+          ...(includeGitignored ? ['--no-ignore', '--hidden'] : []),
           '--max-count',
           String(maxRes),
           pattern,

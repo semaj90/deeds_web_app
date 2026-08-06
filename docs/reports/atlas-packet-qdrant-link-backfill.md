@@ -1,22 +1,19 @@
 # Atlas Packet Qdrant Link Backfill
 
-- status: PASS
+- status: WARN
 - mode: apply
 - collection: codebase_chunks_768
-- packets_loaded: 55297
+- packets_loaded: 55294
 - all_packets_loaded: 61659
 - qdrant_points_scanned: 5000
-- matches: 3
-- updated: 3
-- skipped_duplicate_packet: 5
-- already_linked_seen: 4992
+- matches: 0
+- updated: 0
+- skipped_duplicate_packet: 0
+- already_linked_seen: 5000
 - no_postgres_join_seen: 0
 
 ## Matched Samples
 
-- ace:packet:cd6922aaf309 -> 2233 via src/lib/server/services/AGENTS.md (768d)
-- packet:4667d26f62f6 -> 2443 via src/lib.rs (768d)
-- packet:09cea175fcb5 -> 4915 via src/mcp/server.ts (768d)
 
 ## Already Linked Samples
 
@@ -36,4 +33,4 @@
 
 ## Errors
 
-- none
+- Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads.

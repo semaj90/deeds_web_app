@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
- * P1 Embedding Backfill: Canonical 384-dim embeddings for codebase_chunk_index
+ * P1 Embedding Backfill: Canonical 768-dim content_embedding halfvec for codebase_chunk_index
  *
- * Strategy:
+ * Strategy: 1. Identify chunks WITHOUT content_embedding (currently ~11,849 / 52,417 = 22.7%) 2. Categorize: missing source file? summary-only? valid code that needs re-embedding? 3. For valid candidates: call /api/embed (embeddinggemma:latest) to backfill 4. Validate: ≥95% coverage gate (≥49,796 / 52,417 chunks) 5. Distinguish "identified" vs "written" — 500 candidates identified ≠ 500 written. 6. Canonical gate uses content_embedding 768-dim halfvec, not legacy content_embedding.
  * 1. Identify chunks WITHOUT content_embedding (currently ~11,849 / 52,417 = 22.7%)
  * 2. Categorize: missing source file? summary-only? valid code that needs re-embedding?
  * 3. For valid candidates: call /api/embed (embeddinggemma:latest) to backfill
  * 4. Validate: ≥95% coverage gate (≥49,796 / 52,417 chunks)
  *
- * Acceptance criterion: coverage ≥95% OR detailed explanation of remaining gaps
+ * Acceptance criterion: coverage ≥95% OR detailed explanation of remaining gaps. Distinguish "identified" (candidates found) vs "written" (embeddings persisted).
  */
 
 import pg from 'pg';
@@ -192,6 +192,7 @@ async function main() {
 
         // Update database with embedding
         const embeddingStr = `[${embedding.join(',')}]`;
+        const vecLen = embedding.length; if (vecLen !== 768) { failCount++; failures.push({ id: candidate.id, path: candidate.relative_path, reason: "embedding_wrong_length: " + vecLen + " expected 768" }); continue; }
         await client.query(
           `UPDATE codebase_chunk_index SET content_embedding = $1::halfvec(768), embedding_model = $2, embedding_dimension = 768, updated_at = NOW()
            WHERE id = $3 AND content_embedding IS NULL`,
@@ -228,11 +229,14 @@ async function main() {
     }
 
     // Phase 6: Verify final coverage
+    // Phase 6: Verify final coverage (canonical 768-dim gate)
     const finalResult = await client.query(`
       SELECT
         COUNT(*) as total,
-        COUNT(content_embedding_384) FILTER (WHERE content_embedding_384 IS NOT NULL) as with_embedding,
-        ROUND(100.0 * COUNT(content_embedding_384) FILTER (WHERE content_embedding_384 IS NOT NULL) / COUNT(*), 2)::numeric as coverage_pct
+        COUNT(content_embedding) FILTER (WHERE content_embedding IS NOT NULL AND embedding_dimension = 768) as canonical_768,
+        COUNT(content_embedding) FILTER (WHERE content_embedding IS NOT NULL AND embedding_dimension IS DISTINCT FROM 768) as dimension_mismatch,
+        COUNT(content_embedding) FILTER (WHERE content_embedding IS NOT NULL) as all_with_embedding,
+        ROUND(100.0 * COUNT(content_embedding) FILTER (WHERE content_embedding IS NOT NULL AND embedding_dimension = 768) / NULLIF(COUNT(*), 0), 2)::numeric as coverage_pct
       FROM codebase_chunk_index
     `);
 
@@ -275,3 +279,12 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+
+
+
+
+
+
+
+

@@ -102,6 +102,12 @@ export const LLAMA_TOOL_DEFINITIONS: LlamaTool[] = [
             description: 'Optional relative repo paths to search (default: ["src"])',
           },
           limit: { type: 'integer', description: 'Max results (default 40, max 200)' },
+          includeGitignored: {
+            type: 'boolean',
+            description:
+              'Search gitignored/hidden paths too (e.g. .opencode/ndjson/*). Off by default.',
+            default: false,
+          },
         },
         required: ['query'],
       },
