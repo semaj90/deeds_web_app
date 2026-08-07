@@ -1,0 +1,535 @@
+# Parent Atlas Canonical Routing Validation
+
+- Generated: 2026-08-07T00:46:12.200Z
+- Overall: **BLOCKED**
+
+## Gates
+
+| ID | Gate | Status |
+|---|---|---|
+| PA-PG-ROUTE | PostgreSQL 18 canonical source | PARTIAL |
+| PA-XGB-HEALTH | XGBoost sidecar and feature contract | PASS |
+| PA-LLM-MODELS | LLM model discovery at 8090/v1/models | PASS |
+| PA-LANGEXTRACT | LangExtract/NLP sidecar | PASS |
+| PA-QDRANT-ENVELOPE | Qdrant canonical payload envelope | FAIL |
+| PA-ENVELOPE-PROOF | Canonical envelope isolated upsert/readback/join | SKIP |
+| PA-ROUTING-READY | Canonical routing readiness | BLOCKED |
+
+### PA-PG-ROUTE — PostgreSQL 18 canonical source
+
+Connected to legal_ai_db on port 5432, server 18.4.
+
+```json
+{
+  "connection": {
+    "database": "legal_ai_db",
+    "schema": "public",
+    "server_address": "127.0.0.1/32",
+    "server_port": 5432,
+    "server_version": "18.4",
+    "search_path": "\"$user\", public"
+  },
+  "columns": [],
+  "missingForQuery": [
+    "packet_key",
+    "source_ref",
+    "workspace_id",
+    "workspace_revision",
+    "representation_revision",
+    "source_representation_id",
+    "projection_representation_id"
+  ],
+  "coverage": null,
+  "candidates": []
+}
+```
+
+**Next action:** Confirm DATABASE_URL points to the intended PostgreSQL 18 instance on 5434.
+
+### PA-XGB-HEALTH — XGBoost sidecar and feature contract
+
+XGBoost sidecar is reachable; model and scoring contract were probed.
+
+```json
+{
+  "health": {
+    "ok": true,
+    "path": "/health",
+    "value": {
+      "status": "ok",
+      "model_loaded": true,
+      "model_type": "xgboost",
+      "features": [
+        "cosine_score",
+        "bm25_rank_norm",
+        "ann_turbovec_score",
+        "concept_overlap",
+        "same_feature",
+        "community_conf",
+        "reward_prior",
+        "domain_class_match",
+        "freshness_score",
+        "pagerank_score",
+        "som_cache_hit",
+        "provenance_git_age",
+        "packet_hit_count",
+        "n_retrieved",
+        "n_concepts",
+        "trace_score"
+      ]
+    }
+  },
+  "score": {
+    "ok": true,
+    "path": "/score",
+    "value": {
+      "scores": [
+        0.3357885777950287
+      ],
+      "model": "xgboost",
+      "rows": 1
+    },
+    "request": {
+      "rows": [
+        {
+          "trace_score": 0.82,
+          "freshness_score": 0.67,
+          "packet_hit_count": 3,
+          "reward_prior": 0.15,
+          "domain_class_match": 1,
+          "community_conf": 0.74,
+          "concept_overlap": 0.41
+        }
+      ]
+    }
+  },
+  "featureContract": {
+    "trace_score": 0.82,
+    "freshness_score": 0.67,
+    "packet_hit_count": 3,
+    "reward_prior": 0.15,
+    "domain_class_match": 1,
+    "community_conf": 0.74,
+    "concept_overlap": 0.41
+  },
+  "monotonicity": {
+    "scores": [
+      0.0077855209819972515,
+      0.9044507741928101
+    ],
+    "model": "xgboost",
+    "rows": 2
+  },
+  "duplicateCandidateHandling": {
+    "scores": [
+      0.3357885777950287,
+      0.3357885777950287
+    ],
+    "model": "xgboost",
+    "rows": 2
+  }
+}
+```
+
+### PA-LLM-MODELS — LLM model discovery at 8090/v1/models
+
+The orchestration server exposes an OpenAI-compatible model list.
+
+```json
+{
+  "ok": true,
+  "path": "/v1/models",
+  "value": {
+    "models": [
+      {
+        "name": "hforf.gguf",
+        "model": "hforf.gguf",
+        "modified_at": "",
+        "size": "",
+        "digest": "",
+        "type": "model",
+        "description": "",
+        "tags": [
+          ""
+        ],
+        "capabilities": [
+          "completion"
+        ],
+        "parameters": "",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "",
+          "families": [
+            ""
+          ],
+          "parameter_size": "",
+          "quantization_level": ""
+        }
+      }
+    ],
+    "object": "list",
+    "data": [
+      {
+        "id": "hforf.gguf",
+        "aliases": [],
+        "tags": [],
+        "object": "model",
+        "created": 1786063572,
+        "owned_by": "llamacpp",
+        "meta": {
+          "vocab_type": 2,
+          "n_vocab": 248320,
+          "n_ctx_train": 262144,
+          "n_embd": 4096,
+          "n_params": 8953803264,
+          "size": 5899814912
+        }
+      }
+    ]
+  }
+}
+```
+
+### PA-LANGEXTRACT — LangExtract/NLP sidecar
+
+LangExtract/NLP sidecar is reachable.
+
+```json
+{
+  "ok": true,
+  "path": "/health",
+  "value": {
+    "status": "ok",
+    "model": "gemma4-legal-iq4xs-direct.gguf",
+    "runtime": {
+      "pythonExecutable": "C:\\Python313\\python.exe",
+      "pythonVersion": "3.13.5",
+      "environmentType": "system-python"
+    },
+    "capabilities": {
+      "spacy": true,
+      "langextract": true,
+      "tree_sitter": true,
+      "treesitter_chunker": true,
+      "ast_grep": true,
+      "torch": true
+    },
+    "imports": {
+      "langextract": {
+        "available": true,
+        "version": "0.1.0",
+        "modulePath": "C:\\Users\\james\\Videos\\deeds-web-app\\python\\langextract\\__init__.py",
+        "importVerified": true,
+        "editableSource": null,
+        "beautifulsoup4": {
+          "available": true,
+          "version": "4.13.4",
+          "modulePath": null,
+          "importVerified": true
+        }
+      },
+      "treesitterChunker": {
+        "available": true,
+        "version": "4.0.0",
+        "modulePath": "C:\\Users\\james\\AppData\\Roaming\\Python\\Python313\\site-packages\\chunker\\__init__.py",
+        "moduleName": "chunker",
+        "importVerified": true,
+        "fixtureVerified": false
+      },
+      "treeSitterLanguagePack": {
+        "available": true,
+        "version": "0.9.0",
+        "importVerified": true
+      },
+      "astGrepPy": {
+        "available": true,
+        "version": "0.44.1",
+        "importVerified": true
+      }
+    },
+    "timestamp": 1786063572683
+  }
+}
+```
+
+### PA-QDRANT-ENVELOPE — Qdrant canonical payload envelope
+
+Sampled 200 points from codebase_chunks_768.
+
+```json
+{
+  "collectionNames": [
+    "BifrostSemanticCachePlugin",
+    "agent_memory_observations",
+    "audio_segments",
+    "case_chunks",
+    "chat_messages",
+    "chunks_web_search",
+    "code_llm_outputs",
+    "codebase_chunks_384",
+    "codebase_chunks_384_hybrid",
+    "codebase_chunks_512",
+    "codebase_chunks_768",
+    "codebase_chunks_768_v2",
+    "codebase_chunks_sparse_test_v1",
+    "codebase_topology_128",
+    "codebase_topology_64",
+    "court_opinions",
+    "diagnosis_embeddings",
+    "document_knowledge_768",
+    "document_tags",
+    "embedding_cache",
+    "error_embeddings",
+    "evidence_items",
+    "evidence_items_clip_512",
+    "evidence_vectors",
+    "external_programming_docs_768",
+    "feature_maps",
+    "fictional_case_chunks",
+    "knowledge_base",
+    "legal_canon_chunks",
+    "legal_cases",
+    "legal_documents",
+    "legal_glossary",
+    "llm_response_cache",
+    "phase110_baseline_768",
+    "poi_profiles",
+    "research_memory_768",
+    "sc_deedssocraticode_metadata",
+    "summary_lenses_768",
+    "synthesis_memory_768",
+    "topic_clusters"
+  ],
+  "info": {
+    "status": "green",
+    "optimizer_status": "ok",
+    "indexed_vectors_count": 109522,
+    "points_count": 105761,
+    "segments_count": 4,
+    "config": {
+      "params": {
+        "vectors": {
+          "content": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "error": {
+            "size": 768,
+            "distance": "Cosine"
+          },
+          "signature": {
+            "size": 768,
+            "distance": "Cosine"
+          }
+        },
+        "shard_number": 1,
+        "replication_factor": 1,
+        "write_consistency_factor": 1,
+        "on_disk_payload": true
+      },
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 200,
+        "full_scan_threshold": 10000,
+        "max_indexing_threads": 0,
+        "on_disk": false
+      },
+      "optimizer_config": {
+        "deleted_threshold": 0.2,
+        "vacuum_min_vector_number": 1000,
+        "default_segment_number": 0,
+        "max_segment_size": null,
+        "memmap_threshold": null,
+        "indexing_threshold": 10000,
+        "flush_interval_sec": 5,
+        "max_optimization_threads": null,
+        "prevent_unoptimized": null
+      },
+      "wal_config": {
+        "wal_capacity_mb": 32,
+        "wal_segments_ahead": 0,
+        "wal_retain_closed": 1
+      },
+      "quantization_config": {
+        "scalar": {
+          "type": "int8",
+          "quantile": 0.99,
+          "always_ram": false
+        }
+      }
+    },
+    "payload_schema": {
+      "summary_hash": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "path": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "kind": {
+        "data_type": "keyword",
+        "points": 6907
+      },
+      "agent_pickup_ready": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "error_id": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "tags": {
+        "data_type": "keyword",
+        "points": 4526
+      },
+      "workspace_task_id": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "symbol_name": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "next_action": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "updated_at": {
+        "data_type": "integer",
+        "points": 0
+      },
+      "cluster_key": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "status": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "repo": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "topo_class": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "som_cluster": {
+        "data_type": "integer",
+        "points": 0
+      },
+      "source_ref": {
+        "data_type": "keyword",
+        "points": 105761
+      },
+      "semantic_path": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "file_path": {
+        "data_type": "keyword",
+        "points": 1
+      },
+      "cluster_id": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "language": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "centroid_id": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "sourceRefs": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "point_kind": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "parent_centroid_id": {
+        "data_type": "keyword",
+        "points": 0
+      },
+      "workspace_id": {
+        "data_type": "keyword",
+        "points": 52381
+      },
+      "feature_id": {
+        "data_type": "keyword",
+        "points": 4526
+      },
+      "observed_at": {
+        "data_type": "keyword",
+        "points": 0
+      }
+    },
+    "update_queue": {
+      "length": 0
+    }
+  },
+  "sampled": 200,
+  "coverage": {
+    "packet_key": 29,
+    "source_ref": 200,
+    "workspace_id": 0,
+    "workspace_revision": 0,
+    "source_revision": 0,
+    "representation_id": 200,
+    "representation_revision": 0,
+    "schema_version": 0,
+    "stable_symbol_id": 0,
+    "symbol_version_id": 0,
+    "qdrant_point_id": 200
+  },
+  "signatures": {
+    "bm25_text,canonical_source_ref,chunk_id,community_conf,community_id,content_hash,embedding_ref,feature_id,feature_label,lane_ids,ledger_type,packet_key,packet_kind,packet_version,payload_backfilled_at,qdrant_point_id,qdrant_vector_dim,representation_id,source_ref,source_ref_key,tags,tree_node_id": 1,
+    "bm25_text,canonical_source_ref,chunk_id,community_id,content_hash,embedding_ref,feature_id,feature_label,lane_ids,ledger_type,packet_key,packet_kind,packet_version,payload_backfilled_at,qdrant_point_id,qdrant_vector_dim,representation_id,source_ref,source_ref_key,tags,tree_node_id": 28,
+    "chunk_id,content_hash,packet_version,qdrant_point_id,representation_id,source_ref": 171
+  },
+  "duplicateEnvelopeCount": 0,
+  "deterministicPointIdMatches": 0
+}
+```
+
+**Next action:** Patch the active writer and repair/rebuild production payloads before trusting canonical hydration.
+
+### PA-ENVELOPE-PROOF — Canonical envelope isolated upsert/readback/join
+
+Write proof skipped; use --write-proof to execute only against a proof collection.
+
+```json
+{
+  "status": "SKIP",
+  "reason": "--write-proof not supplied"
+}
+```
+
+**Next action:** Run with --write-proof after reviewing the proof collection name.
+
+### PA-ROUTING-READY — Canonical routing readiness
+
+Canonical routing requires complete Postgres identity, complete Qdrant envelopes, and a stable XGBoost score contract.
+
+```json
+{
+  "postgresCoverage": null,
+  "xgboost": "PASS",
+  "qdrant": "FAIL"
+}
+```
+
+## Recommendations
+
+- Keep XGBoost after canonical hydration and RRF, not before identity validation.
+- Deduplicate candidates by packet_key at packet level and symbol_version_id only when a canonical symbol-version owner is proven.
+- Use deterministic Qdrant point IDs derived from packet/workspace/representation/schema revisions so repeat upserts overwrite instead of duplicating.
+- Do not use trace_score dominance as proof that XGBoost adds value; run an ablation against trace_score-only and freshness-only baselines.
+- Keep mixedbread or other neural rerankers as a separately versioned fallback/second-stage lane; record rerank_source in the receipt.
+- Do not promote production Qdrant routing until envelope coverage and packet_key join-back are production-data proven.
+

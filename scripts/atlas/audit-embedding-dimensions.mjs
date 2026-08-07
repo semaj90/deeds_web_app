@@ -265,3 +265,4 @@ if (audit.status === 'FAIL') {
 }
 
 await pool.end();
+
