@@ -222,6 +222,15 @@ export interface Candidate {
   treeNodeId?: string | null;
   pageRankScore?: number | null;
   stableSymbolId?: string | null;
+
+  /**
+   * Which field `packetKey`/`symbolVersionId` actually resolved from, per
+   * `identity-resolution.ts::resolveCanonicalIdentity` — the shared precedence primitive also
+   * used by `rrf-integration.ts`. Absent on candidates constructed before this field existed;
+   * treat absence the same as `'canonical'` for backward compatibility, never as `'degraded'`.
+   */
+  identityStatus?: 'canonical' | 'degraded';
+  identitySource?: 'symbol_version_id' | 'packet_key' | 'content_hash' | 'source_ref' | 'lane_id_fallback';
 }
 
 /**
@@ -538,6 +547,11 @@ export class SearchRuntime {
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
       const scoreStart = Date.now();
       const { scoreCandidates } = await import('./candidate-scorer.js');
+      const { fetchAuthorityScores, resolveAuthorityScore } = await import('./feature-matrix.js');
+      const authorityScores = await fetchAuthorityScores({
+        packetKeys: fused.map(c => c.packetKey),
+        sourceRefs: fused.map(c => c.sourceRef),
+      });
       const scored = await scoreCandidates(
         query.text,
         fused.map(c => ({
@@ -549,6 +563,13 @@ export class SearchRuntime {
           scoreSource: c.scoreSource,
           qdrantPointId: (c as any).qdrantPointId,
           packetId: (c as any).packetId,
+          // Previously dropped here despite blendScores() having a live 0.1 weight for it —
+          // pagerank silently contributed zero to every ranked result. See
+          // openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy.
+          pagerankScore: c.pageRankScore ?? undefined,
+          // NEW: canonical Postgres authority (atlas_graph_authority_scores), previously
+          // never wired into this pipeline at all — graph's 0.05 weight was always dead.
+          graphScore: resolveAuthorityScore(authorityScores, c.packetKey, c.sourceRef),
         })) as any,
         this.scorerOptions,
       );
@@ -805,72 +826,11 @@ export class SearchRuntime {
    * Only one fusion implementation. No other score combiners exist.
    */
   private async fuseCandidates(candidates: Candidate[]): Promise<FusedCandidate[]> {
-    // Drop malformed candidates before grouping
-    const valid = candidates.filter(
-      c => c.packetKey && c.packetKey.trim() !== '' && c.sourceRef && c.sourceRef.trim() !== ''
-    );
+    return fuseSearchRuntimeCandidates(candidates);
+  }
 
-    // Group by source and get ranking within each
-    const sourceRanks = new Map<string, Map<string, number>>();
-
-    const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema', 'rg_keyword'] as const;
-    for (const source of sources) {
-      const sourceCards = valid.filter(c => c.scoreSource === source);
-      sourceCards.sort((a, b) => b.score - a.score || this.getFusionIdentityKey(a).localeCompare(this.getFusionIdentityKey(b)));
-      const ranked = new Map<string, number>();
-      sourceCards.forEach((c, idx) => {
-        ranked.set(this.getFusionIdentityKey(c), idx + 1);
-      });
-      sourceRanks.set(source, ranked);
-    }
-
-    // Apply RRF formula: score = Σ(1 / (k + rank)) for each source
-    // k = 60 (standard RRF constant)
-    const rrfScores = new Map<string, number>();
-    for (const [packetKey] of new Map(valid.map(c => [this.getFusionIdentityKey(c), c]))) {
-      let rrfScore = 0;
-      for (const [source, ranks] of sourceRanks) {
-        const rank = ranks.get(packetKey);
-        if (rank) {
-          rrfScore += 1 / (60 + rank);
-        }
-      }
-      rrfScores.set(packetKey, rrfScore);
-    }
-
-    // Sort by RRF score and assign new ranks
-    const sorted = Array.from(valid).sort((a, b) => {
-      const scoreA = rrfScores.get(this.getFusionIdentityKey(a)) ?? 0;
-      const scoreB = rrfScores.get(this.getFusionIdentityKey(b)) ?? 0;
-      return scoreB - scoreA;
-    });
-
-    const unique = new Map<string, FusedCandidate>();
-    for (const candidate of sorted) {
-      const key = this.getFusionIdentityKey(candidate);
-      if (!unique.has(key)) {
-        unique.set(key, {
-          ...candidate,
-          packetKey: candidate.packetKey,
-          symbolVersionId: candidate.symbolVersionId ?? candidate.packetKey,
-          fusionScore: rrfScores.get(key) ?? 0,
-          rankBefore: unique.size + 1,
-          contributingLanes: [candidate.scoreSource],
-        });
-      } else {
-        const existing = unique.get(key)!;
-        const contributingLanes = new Set([...(existing.contributingLanes ?? []), candidate.scoreSource]);
-        unique.set(key, {
-          ...existing,
-          contributingLanes: Array.from(contributingLanes),
-        });
-      }
-    }
-
-    return Array.from(unique.values()).map((c, idx) => ({
-      ...c,
-      rankBefore: idx + 1,
-    }));
+  private getFusionIdentityKey(candidate: Candidate): string {
+    return getFusionIdentityKey(candidate);
   }
 
   /**
@@ -949,14 +909,6 @@ export class SearchRuntime {
     return Array.from(sources);
   }
 
-  private getFusionIdentityKey(candidate: Candidate): string {
-    return (
-      candidate.symbolVersionId?.trim() ||
-      candidate.packetKey?.trim() ||
-      candidate.id
-    );
-  }
-
   private buildRetrievalProof(input: {
     query: SearchQuery;
     rawCandidates: Candidate[];
@@ -1017,6 +969,114 @@ export class SearchRuntime {
       validationReasons: hydrationProof.validationReasons,
     };
   }
+}
+
+/** Same precedence as `identity-resolution.ts`, kept here for exact backward-compatible ranking behavior. */
+export function getFusionIdentityKey(candidate: Candidate): string {
+  return (
+    candidate.symbolVersionId?.trim() ||
+    candidate.packetKey?.trim() ||
+    candidate.id
+  );
+}
+
+/**
+ * Stage 2 fusion core, extracted to a standalone module-level function so it's directly
+ * unit-testable without instantiating `SearchRuntime` (which requires live Postgres/Qdrant
+ * config). Behavior is unchanged from the original private-method implementation except for two
+ * fixes: (1) within-lane ranking now keeps the best rank on a duplicate identity instead of
+ * letting a later, worse-ranked duplicate silently overwrite it; (2) `identityStatus`/
+ * `identitySource` (from `retrieve-candidates.ts`'s `deriveIdentity` tagging) now propagate onto
+ * the fused output instead of being dropped.
+ */
+export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandidate[] {
+  // Drop malformed candidates before grouping
+  const valid = candidates.filter(
+    c => c.packetKey && c.packetKey.trim() !== '' && c.sourceRef && c.sourceRef.trim() !== ''
+  );
+
+  // Group by source and get ranking within each
+  const sourceRanks = new Map<string, Map<string, number>>();
+
+  const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema', 'rg_keyword'] as const;
+  for (const source of sources) {
+    const sourceCards = valid.filter(c => c.scoreSource === source);
+    sourceCards.sort((a, b) => b.score - a.score || getFusionIdentityKey(a).localeCompare(getFusionIdentityKey(b)));
+    const ranked = new Map<string, number>();
+    sourceCards.forEach((c, idx) => {
+      const key = getFusionIdentityKey(c);
+      // One canonical entity / one logical lane / one vote: `sourceCards` is sorted best-first,
+      // so the FIRST occurrence of a given identity within this lane is its best rank. A
+      // duplicate identity later in this same lane (e.g. two chunk projections of one symbol)
+      // must not overwrite that best rank with a worse one — `ranked.set` unconditionally here
+      // previously let the LAST-seen (worst-ranked) duplicate silently win instead.
+      if (!ranked.has(key)) {
+        ranked.set(key, idx + 1);
+      }
+    });
+    sourceRanks.set(source, ranked);
+  }
+
+  // Apply RRF formula: score = Σ(1 / (k + rank)) for each source
+  // k = 60 (standard RRF constant)
+  const rrfScores = new Map<string, number>();
+  for (const [packetKey] of new Map(valid.map(c => [getFusionIdentityKey(c), c]))) {
+    let rrfScore = 0;
+    for (const [, ranks] of sourceRanks) {
+      const rank = ranks.get(packetKey);
+      if (rank) {
+        rrfScore += 1 / (60 + rank);
+      }
+    }
+    rrfScores.set(packetKey, rrfScore);
+  }
+
+  // Sort by RRF score and assign new ranks
+  const sorted = Array.from(valid).sort((a, b) => {
+    const scoreA = rrfScores.get(getFusionIdentityKey(a)) ?? 0;
+    const scoreB = rrfScores.get(getFusionIdentityKey(b)) ?? 0;
+    return scoreB - scoreA;
+  });
+
+  const unique = new Map<string, FusedCandidate>();
+  for (const candidate of sorted) {
+    const key = getFusionIdentityKey(candidate);
+    if (!unique.has(key)) {
+      unique.set(key, {
+        ...candidate,
+        packetKey: candidate.packetKey,
+        symbolVersionId: candidate.symbolVersionId ?? candidate.packetKey,
+        fusionScore: rrfScores.get(key) ?? 0,
+        rankBefore: unique.size + 1,
+        contributingLanes: [candidate.scoreSource],
+        // Absent identityStatus predates this field — treat as canonical for backward compat,
+        // never as degraded (see the Candidate interface doc comment).
+        identityStatus: candidate.identityStatus ?? 'canonical',
+        identitySource: candidate.identitySource,
+      });
+    } else {
+      const existing = unique.get(key)!;
+      const contributingLanes = new Set([...(existing.contributingLanes ?? []), candidate.scoreSource]);
+      // If any contributing lane resolved a real canonical identity for this fused entity,
+      // the fused candidate is canonical overall — a degraded base occurrence (e.g. the
+      // highest-scoring lane's payload lacked packet_key) must not mask a later lane's proof
+      // that this entity does have a real canonical identity.
+      const candidateStatus = candidate.identityStatus ?? 'canonical';
+      const promoteToCanonical = existing.identityStatus === 'degraded' && candidateStatus === 'canonical';
+      unique.set(key, {
+        ...existing,
+        contributingLanes: Array.from(contributingLanes),
+        ...(promoteToCanonical
+          ? { identityStatus: 'canonical' as const, identitySource: candidate.identitySource }
+          : {}),
+      });
+    }
+  }
+
+  return Array.from(unique.values()).map((c, idx) => ({
+    ...c,
+    rankBefore: idx + 1,
+  }));
 }
 
 /**

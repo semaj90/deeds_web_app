@@ -20,6 +20,7 @@ import { createBm42SparseRetriever } from './adapters/bm42-sparse-retriever.js';
 import { embedQueryForLane } from './embedding-service.js';
 import { VECTOR_INDEX_REGISTRY } from '$lib/server/vector/vector-index-registry.js';
 import { RETRIEVAL_LIMITS, identifierVariants, tokenizeKeywordSurface } from './search-contract.js';
+import { resolveCanonicalIdentity } from './identity-resolution.js';
 
 const BM25_LIMIT = RETRIEVAL_LIMITS.postgresFtsTopK;
 const QDRANT_LIMIT = RETRIEVAL_LIMITS.denseTopK;
@@ -50,6 +51,41 @@ function pickNumber(...values: unknown[]): number | null {
     if (Number.isFinite(parsed)) return parsed;
   }
   return null;
+}
+
+/**
+ * Compute identity observability fields alongside (never in place of) the existing
+ * packetKey/symbolVersionId fallback chains at each candidate-construction site. Uses the same
+ * shared precedence as `rrf-integration.ts` (`identity-resolution.ts::resolveCanonicalIdentity`)
+ * so a candidate whose payload lacks packet_key/symbol_version_id is tagged `identityStatus:
+ * 'degraded'` instead of silently letting its raw backend-local id (Qdrant point id, etc.) pass
+ * as if it were canonical. Does not change `packetKey`/`symbolVersionId`'s own existing values —
+ * this is additive-only, by design, to keep the candidate-boundary fix isolated from any
+ * downstream behavior change until RF5's fusion-side consumption of it is proven.
+ */
+function deriveIdentity(input: {
+  symbolVersionId?: unknown;
+  packetKey?: unknown;
+  /**
+   * Chunk-unique fallback tier, checked before source_ref. Only wired for the Qdrant lane so
+   * far (2026-08-08) — that's the lane a live trace confirmed actually needs it: 23 distinct
+   * chunks of one file were found sharing a single `source_ref` in `codebase_chunks_768_v2`,
+   * which would make `source_ref` alone over-merge them. The Postgres lexical lanes
+   * (BM25/exact/AST/rg) don't currently SELECT `content_hash` in their queries; left as a
+   * tracked follow-up rather than widening every SQL statement in this pass.
+   */
+  contentHash?: unknown;
+  sourceRef?: unknown;
+  fallbackId: string;
+}): { identityStatus: 'canonical' | 'degraded'; identitySource: ReturnType<typeof resolveCanonicalIdentity>['source'] } {
+  const resolved = resolveCanonicalIdentity({
+    symbolVersionId: typeof input.symbolVersionId === 'string' ? input.symbolVersionId : undefined,
+    packetKey: typeof input.packetKey === 'string' ? input.packetKey : undefined,
+    contentHash: typeof input.contentHash === 'string' ? input.contentHash : undefined,
+    sourceRef: typeof input.sourceRef === 'string' ? input.sourceRef : undefined,
+    fallbackId: input.fallbackId,
+  });
+  return { identityStatus: resolved.status, identitySource: resolved.source };
 }
 
 async function getDb() {
@@ -143,6 +179,12 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
       representationId: pickNullableString(lc.representationId, lc.metadata?.representation_id, lc.metadata?.representationId),
       representationRevision: pickNumber(lc.representationRevision, lc.metadata?.representation_revision, lc.metadata?.representationRevision),
       qdrantPointId: lc.qdrantPointId ?? lc.packetKey,
+      ...deriveIdentity({
+        symbolVersionId: lc.symbolVersionId,
+        packetKey: lc.packetKey,
+        sourceRef: lc.sourceRef,
+        fallbackId: lc.qdrantPointId ?? lc.packetKey,
+      }),
     }));
   } catch {
     return [];
@@ -209,6 +251,12 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
         sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
         representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
         representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
+        ...deriveIdentity({
+          symbolVersionId: row.metadata?.symbol_version_id,
+          packetKey: row.metadata?.packet_key,
+          sourceRef: row.source_ref,
+          fallbackId: row.id,
+        }),
       }));
     }
 
@@ -287,6 +335,12 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
       sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
       representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
       representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
+      ...deriveIdentity({
+        symbolVersionId: row.metadata?.symbol_version_id,
+        packetKey: row.metadata?.packet_key,
+        sourceRef: row.source_ref,
+        fallbackId: row.id,
+      }),
     }));
   } catch (error) {
     console.warn('Lexical trigram fallback failed:', error);
@@ -337,6 +391,13 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
             representationId: pickNullableString(hit.payload?.representation_id, hit.payload?.representationId),
             representationRevision: pickNumber(hit.payload?.representation_revision, hit.payload?.representationRevision),
             qdrantPointId: String(hit.id),
+            ...deriveIdentity({
+              symbolVersionId: hit.payload?.symbol_version_id,
+              packetKey: hit.payload?.packet_key,
+              contentHash: hit.payload?.content_hash,
+              sourceRef: hit.payload?.source_ref,
+              fallbackId: String(hit.id),
+            }),
           };
 
           const existing = resultsByKey.get(candidate.packetKey) ?? resultsByKey.get(candidate.id);
@@ -385,6 +446,13 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
       representationId: pickNullableString(hit.payload?.representation_id, hit.payload?.representationId),
       representationRevision: pickNumber(hit.payload?.representation_revision, hit.payload?.representationRevision),
       qdrantPointId: String(hit.id),
+      ...deriveIdentity({
+        symbolVersionId: hit.payload?.symbol_version_id,
+        packetKey: hit.payload?.packet_key,
+        contentHash: hit.payload?.content_hash,
+        sourceRef: hit.payload?.source_ref,
+        fallbackId: String(hit.id),
+      }),
     }));
   } catch (fallbackError) {
     console.warn('[retrieveQdrant] dense-only fallback also failed:', (fallbackError as Error).message);
@@ -450,6 +518,12 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
       sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
       representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
       representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
+      ...deriveIdentity({
+        symbolVersionId: row.metadata?.symbol_version_id,
+        packetKey: row.metadata?.packet_key,
+        sourceRef: row.source_ref,
+        fallbackId: row.id,
+      }),
     }));
   } catch (error) {
     console.warn('Exact match retrieval failed:', error);
@@ -515,6 +589,12 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
       sourceRevision: pickNullableString(row.metadata?.source_revision, row.output_meta?.source_revision, row.metadata?.sourceRevision, row.output_meta?.sourceRevision),
       representationId: pickNullableString(row.metadata?.representation_id, row.output_meta?.representation_id, row.metadata?.representationId, row.output_meta?.representationId),
       representationRevision: pickNumber(row.metadata?.representation_revision, row.output_meta?.representation_revision, row.metadata?.representationRevision, row.output_meta?.representationRevision),
+      ...deriveIdentity({
+        symbolVersionId: row.metadata?.symbol_version_id ?? row.output_meta?.symbol_version_id,
+        packetKey: row.metadata?.packet_key ?? row.output_meta?.packet_key,
+        sourceRef: row.source_ref,
+        fallbackId: row.id,
+      }),
     }));
   } catch (error) {
     console.warn('AST match retrieval failed:', error);
@@ -637,6 +717,12 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
             sourceRevision: pickNullableString(row.metadata?.source_revision, row.metadata?.sourceRevision),
             representationId: pickNullableString(row.metadata?.representation_id, row.metadata?.representationId),
             representationRevision: pickNumber(row.metadata?.representation_revision, row.metadata?.representationRevision),
+            ...deriveIdentity({
+              symbolVersionId: row.metadata?.symbol_version_id,
+              packetKey: row.metadata?.packet_key,
+              sourceRef: row.source_ref,
+              fallbackId: row.id,
+            }),
           });
         }
       } catch {

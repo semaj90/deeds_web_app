@@ -20,6 +20,67 @@ import {
   EmbeddingLaneTelemetryReason,
   emitEmbeddingLaneTelementry,
 } from './resolve-embedding-lane.js';
+import { resolveCanonicalIdentity, type IdentityResolutionSource } from './identity-resolution.js';
+
+export type { IdentityResolutionSource };
+
+export interface ResolvedCandidateId {
+  id: string;
+  source: IdentityResolutionSource;
+}
+
+/**
+ * Resolve a lane hit's canonical dedup identity. Thin adapter over the shared
+ * `identity-resolution.ts::resolveCanonicalIdentity` primitive — same precedence
+ * (symbol_version_id -> packet_key -> source_ref -> lane-local fallback), just mapped from
+ * `ContextHit`'s nested `metadata` shape into the primitive's flat input shape.
+ *
+ * Without this, combineViaRRF's `deduplicateBy: 'id'` collapses candidates on
+ * whatever each lane happened to set as `id` — for the Qdrant lane that's
+ * `qdrant_id ?? stable_key ?? file_path`, for BM25/TurboVec it's a lane-local
+ * stable key. None of those are the canonical symbol identity, so a symbol
+ * with multiple projections (multiple Qdrant points, a BM25 row, a TurboVec
+ * candidate) can currently cast more than one independent RRF vote.
+ */
+export function resolveCanonicalCandidateId(hit: ContextHit): ResolvedCandidateId {
+  const metadata = (hit.metadata ?? {}) as Record<string, unknown>;
+  const resolved = resolveCanonicalIdentity({
+    symbolVersionId: (metadata.symbol_version_id ?? metadata.symbolVersionId) as string | undefined,
+    packetKey: (metadata.packet_key ?? metadata.packetKey) as string | undefined,
+    contentHash: (metadata.content_hash ?? metadata.contentHash) as string | undefined,
+    sourceRef: (metadata.source_ref ?? metadata.sourceRef) as string | undefined,
+    fallbackId: hit.id,
+  });
+  // `resolved.status === 'degraded'` corresponds exactly to `source === 'lane_id_fallback'` —
+  // callers here still key off `source` (pre-existing public shape); see
+  // CANONICAL_QDRANT_IDENTITY_PAYLOAD for why the fallback tier must stay observable, not silent.
+  return { id: resolved.canonicalId, source: resolved.source };
+}
+
+/**
+ * Rewrite every hit's `id` to its canonical dedup identity before fusion, and record
+ * `identity_resolution_source` on every hit so downstream smoke/observability can measure how
+ * often fusion is running on real canonical identity versus the degraded lane-id fallback.
+ * Lanes that carry no identity metadata (e.g. concept_overlap) still get tagged
+ * `lane_id_fallback` even though their `id` is left unchanged — this only tightens dedup where
+ * canonical fields are available, it never weakens it, but it never hides the fallback either.
+ * The lane-local id is preserved as `raw_lane_id` so per-lane provenance (e.g. which Qdrant
+ * point matched) survives even after the RRF-facing id has been normalized.
+ */
+export function normalizeCanonicalIdentity(hits: ContextHit[]): ContextHit[] {
+  return hits.map((hit) => {
+    const resolved = resolveCanonicalCandidateId(hit);
+    return {
+      ...hit,
+      id: resolved.id,
+      metadata: {
+        ...(hit.metadata ?? {}),
+        identity_resolution_source: resolved.source,
+        ...(resolved.id !== hit.id ? { raw_lane_id: hit.id } : {}),
+      },
+    };
+  });
+}
 
 /**
  * TODO: no prior implementation of this function was found anywhere in the
@@ -853,6 +914,9 @@ export async function multiLaneRetrievalWithRRF(
 
     const tRerankStart = performance.now();
     // Combine via RRF with topology signals (including dispatcher signals from Session 117)
+    // Every lane is normalized to its canonical dedup identity first (symbol_version_id ->
+    // packet_key -> source_ref -> lane id) so combineViaRRF's deduplicateBy:'id' collapses
+    // on the same symbol across lanes/projections instead of on lane-local point/stable keys.
     const lanes = [
       bm25Hits,
       conceptHits,
@@ -862,7 +926,7 @@ export async function multiLaneRetrievalWithRRF(
       topologyClusterHits,     // SOM topology signal lane
       communityAuthorityHits,  // Community authority signal lane
       dispatcherSignalHits,    // Session 117: Dispatcher topology signal lane
-    ];
+    ].map(normalizeCanonicalIdentity);
     const laneNames: RetrievalLaneName[] = [
       'postgres_trigram',
       'concept_overlap',
