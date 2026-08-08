@@ -12,13 +12,27 @@ function readNDJSON(file){
   if(!fs.existsSync(file)) return [];
   let s = fs.readFileSync(file,'utf8');
   // if file contains many null chars, try utf16le
-  const nulls = (s.match(/\u0000/g)||[]).length;
-  if(nulls>100){
-    try{ s = fs.readFileSync(file,'utf16le'); } catch (e){}
+  const nullCount = s.includes('\x00') ? s.split('\x00').length - 1 : 0;
+  if (nullCount > 100) {
+    try {
+      s = fs.readFileSync(file, 'utf16le');
+    } catch (_e) {
+      // fall back to utf8
+    }
   }
   // final cleanup: remove unexpected nulls
-  if(s.indexOf('\u0000')!==-1) s = s.replace(/\u0000/g,'');
-  return s.split('\n').filter(Boolean).map(l=>{ try { return JSON.parse(l); } catch (e) { return null } }).filter(Boolean);
+  if (s.includes('\x00')) s = s.split('\x00').join('');
+  return s
+    .split('\n')
+    .filter(Boolean)
+    .map((l) => {
+      try {
+        return JSON.parse(l);
+      } catch (_e) {
+        return null;
+      }
+    })
+    .filter(Boolean);
 }
 
 function toCsvRow(cols){ return cols.map(c=>{

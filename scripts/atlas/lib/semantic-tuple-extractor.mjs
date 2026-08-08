@@ -75,7 +75,7 @@ export function extractLexicalTuples(text) {
 
   const entityMatches = [
     ...(normalized.match(/[a-z]+[A-Z][a-zA-Z]*/g) || []),
-    ...(normalized.match(/[a-z_]+\/[a-z_\/]+/g) || []),
+    ...(normalized.match(/[a-z_]+\/[a-z]+/g) || []),
     ...(normalized.match(/[A-Z][a-z]+/g) || []),
     ...(normalized.match(/_[a-z_]+/g) || []),
   ];
