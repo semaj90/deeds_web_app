@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-17T06:17:52.600Z",
-  "mode": "dry-run",
+  "generatedAt": "2026-08-08T14:36:14.651Z",
+  "mode": "apply",
   "limit": 0,
   "backupPath": "docs\\reports\\concept-evidence-spine-backfill-backup.json",
   "totalRows": 0,

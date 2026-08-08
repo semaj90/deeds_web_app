@@ -14,6 +14,8 @@
  * - Zero-copy tensor handling
  */
 
+import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
+
 /**
  * Embedding result with provenance tracking
  */
@@ -206,7 +208,13 @@ export async function embedQueryForLane(
 
   if (lane === 'dense_768') {
     const model = config.embed_model_768 || config.embed_model;
-    return embedViaOllama(query, 768, model, start);
+    // requireExact768=true: fail closed if the model returns anything other than
+    // 768 raw dims. Without this, truncateVector() below would silently zero-pad
+    // a short vector (e.g. a misconfigured 384-dim model on this lane) up to 768,
+    // producing a dimensionally-valid but semantically-corrupted embedding that
+    // passes every downstream check (Qdrant's own vector-size validation included)
+    // while being cosine-scored against real 768-dim embeddings as if legitimate.
+    return embedViaOllama(query, 768, model, start, true);
   }
 
   if (lane === 'dense_384') {
@@ -216,7 +224,9 @@ export async function embedQueryForLane(
         '[EmbeddingService] dense_384 lane falling back to canonical embedding model with explicit 384-dim truncation',
       );
     }
-    return embedViaOllama(query, 384, model, start);
+    // requireExact768=false: this lane's whole purpose is truncating a 768-dim
+    // model output down to 384 — that is not corruption, do not reject it.
+    return embedViaOllama(query, 384, model, start, false);
   }
 
   throw new Error(`Unsupported embedding lane: ${lane}`);
@@ -301,7 +311,8 @@ async function embedViaOllama(
   query: string,
   dim: number,
   modelOverride = config.embed_model,
-  startTime = performance.now()
+  startTime = performance.now(),
+  requireExact768 = false,
 ): Promise<EmbeddingResult> {
   const url = `${config.ollama_url}/api/embeddings`;
 
@@ -324,6 +335,14 @@ async function embedViaOllama(
 
   if (!Array.isArray(embedding) || embedding.length === 0) {
     throw new Error('Ollama returned empty embedding');
+  }
+
+  // Fail closed BEFORE truncateVector can zero-pad a short vector into a
+  // dimensionally-valid-looking-but-corrupted 768-dim result. Must run on the
+  // raw model output, not the post-truncateVector output (which is always
+  // exactly `dim` long by construction, so checking after would never fire).
+  if (requireExact768) {
+    assertSemantic768(embedding);
   }
 
   const vec = truncateVector(new Float32Array(embedding), dim);

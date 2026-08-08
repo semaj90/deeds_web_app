@@ -547,11 +547,6 @@ export class SearchRuntime {
       // This stage does NOT reorder; it attaches blendedScore for downstream ranking.
       const scoreStart = Date.now();
       const { scoreCandidates } = await import('./candidate-scorer.js');
-      const { fetchAuthorityScores, resolveAuthorityScore } = await import('./feature-matrix.js');
-      const authorityScores = await fetchAuthorityScores({
-        packetKeys: fused.map(c => c.packetKey),
-        sourceRefs: fused.map(c => c.sourceRef),
-      });
       const scored = await scoreCandidates(
         query.text,
         fused.map(c => ({
@@ -566,10 +561,15 @@ export class SearchRuntime {
           // Previously dropped here despite blendScores() having a live 0.1 weight for it —
           // pagerank silently contributed zero to every ranked result. See
           // openspec/changes/parent-atlas-retrieval-lod-algorithm-taxonomy.
+          //
+          // graphScore (atlas_graph_authority_scores) deliberately NOT wired here yet —
+          // held pending an authority-provenance audit: atlas_graph_authority_scores also
+          // stores pagerank_raw/pagerank_l1 alongside authority_percentile, so it may be the
+          // SAME PageRank signal as pageRankScore under a different name. Wiring both would
+          // double-count one signal as 0.05·PR + 0.10·"authority" ≈ 0.15·PR. See the
+          // "2026-08-08 addendum" in the LOD taxonomy proposal.md — do not re-add graphScore
+          // here until that audit reaches a DISTINCT_SIGNAL verdict with evidence.
           pagerankScore: c.pageRankScore ?? undefined,
-          // NEW: canonical Postgres authority (atlas_graph_authority_scores), previously
-          // never wired into this pipeline at all — graph's 0.05 weight was always dead.
-          graphScore: resolveAuthorityScore(authorityScores, c.packetKey, c.sourceRef),
         })) as any,
         this.scorerOptions,
       );

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T17:09:13.209Z",
+  "generatedAt": "2026-08-08T14:05:29.725Z",
   "inputs": {
     "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
     "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
@@ -35,7 +35,7 @@
       "nativeParses": 1,
       "fallbackParses": 6625,
       "totalBytesParsed": 3957402,
-      "nativeTimeMs": 3.5286000000000968,
+      "nativeTimeMs": 2.3326999999999316,
       "cacheBytes": 7815662,
       "cacheSize": 6626
     },
