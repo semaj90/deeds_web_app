@@ -6,6 +6,8 @@
 import './tools/topology-status.tool';
 import './tools/packet-search.tool';
 import './tools/startup-briefing.tool';
+import './tools/learning-trainer.tool';
+import './tools/label-generator.tool';
 // Add more tool imports as they're implemented:
 // import './tools/concept-stats.tool';
 // import './tools/graph-nearest.tool';

@@ -38,7 +38,7 @@ function extractBriefing(text) {
   if (!value) return '';
   const markdownStart = value.search(/^#{1,3}\s+/m);
   if (markdownStart >= 0) return value.slice(markdownStart).trim();
-  const thoughtMarker = value.search(/<\|channel\>thought/i);
+  const thoughtMarker = value.search(/<|channel>thought/i);
   if (thoughtMarker >= 0) {
     const nextHeader = value.slice(thoughtMarker).search(/^#{1,3}\s+/m);
     if (nextHeader >= 0) {

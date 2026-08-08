@@ -23,10 +23,9 @@ import neo4j from 'neo4j-driver';
 import Redis from 'ioredis';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import fetch from 'node-fetch';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dir, '../..');
+const _ROOT = path.resolve(__dir, '../..');
 
 // CLI FLAGS
 const APPLY = process.argv.includes('--apply');
@@ -246,6 +245,7 @@ async function writeExtractionToPostgres(pool, extractions, dryRun = true) {
     // For now, just validate transaction support
     for (const extraction of extractions) {
       // Placeholder: confirm transaction succeeds
+      _ = extraction;
       writtenCount++;
     }
 
