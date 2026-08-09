@@ -1,0 +1,20 @@
+name: atlas-rapids-cu13
+channels:
+  - rapidsai
+  - conda-forge
+dependencies:
+  - python>=3.10,<3.14
+  - cuda-version>=13,<14
+  - cudf=26.06
+  - cugraph=26.06
+  - cuml=26.06
+  - cuvs=26.06
+  - nx-cugraph
+  - networkx>=3.4
+  - cupy
+  - pyarrow
+  - pandas
+  - numpy
+  - scipy
+  - scikit-learn
+  - duckdb

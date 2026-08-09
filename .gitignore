@@ -1023,3 +1023,24 @@ docs/reports/atlas-vector-manifest-v1-*.json
 
 docs/reports/fixtures/vector-parity-fixture-*.json
 .graphify-pipeline-lock
+
+# Graphify-generated report/writeback artifacts (2026-08-09) — regenerate every graphify:daily
+# run, pure noise in diffs. Kept in place (pipeline actively writes these paths) rather than
+# physically relocated into graphify/ -- do that once no pipeline run is active. Still
+# rg-searchable via .rgignore negation below.
+docs/graph/repo-couchdb-mapreduce-report.json
+docs/graph/repo-couchdb-mapreduce-report.md
+docs/reports/bitfrost-semantic-cache-warm.json
+docs/reports/bitfrost-semantic-cache-warm.md
+docs/reports/materialize-feature-envelopes-receipt.json
+docs/reports/packet-reader-writer-audit.json
+docs/reports/packet-reader-writer-audit.md
+docs/reports/qdrant-tag-mirror-audit.json
+docs/reports/qdrant-tag-mirror-audit.md
+docs/reports/summary-index-ranker.json
+docs/reports/summary-index-ranker.md
+sveltekit-frontend/docs/reports/backfill-latent-vectors-writeback.json
+sveltekit-frontend/docs/reports/summary-envelope-build.json
+sveltekit-frontend/docs/reports/train-som-20x20-writeback.json
+sveltekit-frontend/memory/graphify/gds/*.json
+openspec/drafts/*.md

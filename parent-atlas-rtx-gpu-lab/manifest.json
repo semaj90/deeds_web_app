@@ -1,0 +1,67 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "8a480293155397088974478741a2eee93722fc858c47b373eedfb73b3bb4f8df",
+    "bytes": 1027
+  },
+  {
+    "path": "arrow/export_edges_arrow.py",
+    "sha256": "04382561acc9d49144528481b056d16ed6a26a8b656a5c8f3d609e063258623f",
+    "bytes": 592
+  },
+  {
+    "path": "arrow/read_arrow_cudf.py",
+    "sha256": "094e2ffee7059e4cd19293f2712328342e0e9cf0c66cd358ab73bff40abf676b",
+    "bytes": 385
+  },
+  {
+    "path": "env/rapids-26.06-cu13.yml",
+    "sha256": "b9ff8d99aa527b3357c9128031999e2ac11a460518084b633164677a0ef3ed7e",
+    "bytes": 301
+  },
+  {
+    "path": "graph/compare_pagerank.py",
+    "sha256": "70ff683a774413982cac4a81a20a13a1faad6802c15277aebc64b8cdf89a9b79",
+    "bytes": 1135
+  },
+  {
+    "path": "graph/cugraph_native_bench.py",
+    "sha256": "2d086e0013da5a9026d71d8bb59f31c99566dacb5e6d2fc94d47280a7de12d02",
+    "bytes": 1278
+  },
+  {
+    "path": "graph/networkx_cpu_oracle.py",
+    "sha256": "79f51377cff74cfd041ddbb24790d7896873dea1abab8ef09258d67e1c8ccbc5",
+    "bytes": 1475
+  },
+  {
+    "path": "graph/networkx_gpu_dispatch.py",
+    "sha256": "bfd5528b39096173743e30847f3454c1f94a90aebb03f72332cb7b62edfee2ef",
+    "bytes": 2093
+  },
+  {
+    "path": "openspec/tasks.md",
+    "sha256": "de035c7356d7b62ef86ad7d66d2197dcff348e309273203bcb694290b334cd52",
+    "bytes": 1642
+  },
+  {
+    "path": "scripts/gpu_preflight.py",
+    "sha256": "42af86884724f11a5ee49a9296f5df01a07883cf24d737e2a64c09f86f4aceb5",
+    "bytes": 1012
+  },
+  {
+    "path": "scripts/install_or_verify_miniforge.sh",
+    "sha256": "db84d275f74c8691c410633dbd224c37a1d27ab8c137d8d7ae098d3d921e9ae6",
+    "bytes": 479
+  },
+  {
+    "path": "scripts/run_gpu_smoke.sh",
+    "sha256": "aea7d25d2a2112d789d62573dd6c81b61c8daaa98edbd6d2522d97267a3815f6",
+    "bytes": 171
+  },
+  {
+    "path": "vector/cuvs_vector_bench.py",
+    "sha256": "d494456484109060faa5bcd6b7fcae7c5891d14bcde845031846123b3109d919",
+    "bytes": 1868
+  }
+]

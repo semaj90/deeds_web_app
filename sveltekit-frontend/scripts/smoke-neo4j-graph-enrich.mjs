@@ -45,6 +45,7 @@ const NEO4J_PASS = process.env.NEO4J_PASSWORD ?? process.env.NEO4J_PASS ?? 'neo4
 
 const QDRANT_URL  = process.env.QDRANT_URL  ?? 'http://localhost:6333';
 const REDIS_URL   = process.env.REDIS_URL   ?? 'redis://127.0.0.1:6379';
+const REDIS_PASS  = process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? undefined;
 
 const COLLECTION  = 'codebase_chunks_768';
 const AUTHORITY_HASH = 'ace:authority:top';
@@ -204,7 +205,12 @@ await gate('GDS7', 'Qdrant payloads contain graphAuthorityScore', async () => {
 await gate('GDS8', 'Redis ace:authority:top HASH populated', async () => {
   let redis;
   try {
-    redis = new Redis(REDIS_URL, { lazyConnect: true, connectTimeout: 3000, enableReadyCheck: false });
+    redis = new Redis(REDIS_URL, {
+      password: REDIS_PASS,
+      lazyConnect: true,
+      connectTimeout: 3000,
+      enableReadyCheck: false,
+    });
     await redis.connect();
     const len = await redis.hlen(AUTHORITY_HASH);
     if (len === 0) throw new Error(`ace:authority:top is empty — run graphify:gds`);

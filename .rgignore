@@ -53,3 +53,16 @@
 !/sveltekit-frontend/.env.local
 !/sveltekit-frontend/.env.example
 !/sveltekit-frontend/.env.local.example
+
+# Graphify-generated report noise (2026-08-09) — gitignored, still rg-searchable.
+!docs/graph/repo-couchdb-mapreduce-report.*
+!docs/reports/bitfrost-semantic-cache-warm.*
+!docs/reports/materialize-feature-envelopes-receipt.json
+!docs/reports/packet-reader-writer-audit.*
+!docs/reports/qdrant-tag-mirror-audit.*
+!docs/reports/summary-index-ranker.*
+!sveltekit-frontend/docs/reports/backfill-latent-vectors-writeback.json
+!sveltekit-frontend/docs/reports/summary-envelope-build.json
+!sveltekit-frontend/docs/reports/train-som-20x20-writeback.json
+!sveltekit-frontend/memory/graphify/gds/*.json
+!openspec/drafts/*.md

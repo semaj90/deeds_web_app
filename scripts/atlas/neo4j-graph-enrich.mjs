@@ -333,6 +333,9 @@ function getPayloadPath(payload = {}) {
     payload.path ??
     payload.source_path ??
     payload.source ??
+    payload.source_ref ??
+    payload.source_ref_key ??
+    payload.canonical_source_ref ??
     payload.file ??
     payload.filepath ??
     payload.stable_key ??
@@ -367,6 +370,9 @@ function buildPayloadAliases(payload = {}) {
   return [
     path,
     norm,
+    payload.source_ref,
+    payload.source_ref_key,
+    payload.canonical_source_ref,
     payload.stableKey,
     payload.stable_key,
     payload.relativePath,
