@@ -120,6 +120,60 @@ rollout order" for the full sequence — each gate gets its own task entry here 
 picked up, not pre-written speculatively (status-language discipline: PRESENT /
 STATICALLY_REFERENCED / RUNTIME_SMOKE_PROVEN, not aspirational checklists mistaken for progress).
 
+## GR1 — DONE (2026-08-09), with one gap found
+
+`npm run graphify:daily` completed exit 0 (see `parent-atlas-workstation-todo.md` for the 5 SQL
+bugs fixed to get here, commits `293cf2e85e`/`115c25df8e`). **Gap found**: `graphify:daily:chain`
+does not call `sync-graph-truth-neo4j.mjs` — live Neo4j `CodebaseFile` (23,114) and `IMPORTS`
+(2,754) counts are unchanged from before this run. `neo4j-graph-enrich.mjs` (phase16:gds:apply)
+did run and populated 51,333 `SIMILAR_TOPOLOGY` edges, but still against the stale `codeGraph`
+projection (2,114 nodes, 0 rels). No single revision-stamp artifact (workspace/source/graph
+revision) is emitted by this pipeline today — that's a real gap, not withheld data.
+
+**Live GDS projections as of this run**: `codeGraph` (2,114 nodes, 0 rels, stale, used by
+`neo4j-graph-enrich.mjs`) and `codeTopology` (280,087 nodes, 185,095 rels — built during this
+session's GR2/GR3 testing via `ensureProjectionClient`'s create-if-absent, not by `graphify:daily`
+itself).
+
+**Next step (not yet done)**: run `node scripts/atlas/sync-graph-truth-neo4j.mjs --apply`
+(unbounded) to actually refresh Neo4j's structural graph before trusting GR2/GR3's PASS as
+current, or before any GR5 diagnostic treats `codeTopology`'s size as "the fresh graph."
+
+## GR5 — Leiden lane, status ladder (2026-08-09)
+
+Parallel work (outside this session's direct tool calls, reviewed and committed — see
+`scripts/atlas/compute-leiden-neo4j.mjs`, commit `3f8cf27748`) added a dedicated exact Leiden lane
+via Neo4j GDS, writing `leiden_community_id` (Neo4j node property, distinct from Louvain's
+`communityId`) plus a separate Postgres table — confirmed by inline review not to touch or
+overwrite Louvain's data.
+
+| Gate | Status |
+|---|---|
+| GR5.1 Louvain exact | PASS |
+| GR5.2 Leiden exact dry-run | PASS — projection 59,692 nodes / 102,666 relationships, 57,638 communities |
+| GR5.3 Leiden persistence (apply once, verify Postgres/Neo4j/Redis) | NEXT |
+| GR5.4 Leiden idempotency (apply twice, no duplicate rows, deterministic) | NEXT |
+| GR5.5 Louvain-vs-Leiden quality comparison | NEXT |
+| GR5.6 Taxonomy promotion | BLOCKED on GR5.3–GR5.5 |
+| GR5.7 Bounded taxonomy traversal | BLOCKED on GR5.6 |
+| GR6 PPR | BLOCKED on GR5 |
+
+**Central open diagnostic**: 57,638 communities against 59,692 nodes (near one-community-per-node)
+must be explained before any promotion — candidates are (a) a fragmented projection (many
+disconnected/small weakly-connected components), (b) relationship orientation, (c) missing/weak
+edge weights, (d) Leiden resolution/config, (e) projection sparsity, or (f) genuine code-graph
+structure. **Not yet measured**: weakly-connected component count, isolated node count,
+component-size p50/p95/max. Do not tune Leiden config blindly before this is measured — a fragmented
+projection would produce this exact symptom regardless of algorithm correctness.
+
+**Full verification prompt is written and ready to run** (not yet executed this session) — see the
+user's GR5.3–GR5.7 specification: record exact projection identity + Leiden config, measure
+fragmentation, measure Leiden and Louvain metrics on the identical projection snapshot before any
+apply, apply once and verify 3-store persistence, apply twice and prove idempotency, compare
+Louvain vs. Leiden on coverage/modularity/singleton-ratio/community-size distribution, and
+explicitly attribute the high community count to one of the 6 candidate causes above.
+**Apply-mode succeeding is not evidence of taxonomy usefulness — keep those two proofs separate.**
+
 ## Cross-references
 
 - `openspec/changes/parent-atlas-agentic-repair-bundle-integration/tasks.md` T22 (live graph state
