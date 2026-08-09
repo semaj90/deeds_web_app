@@ -487,3 +487,43 @@ blocking `git push` from an earlier commit — GitHub's 100MB hard limit) into
 script output paths into `graphify/` is a separate, audited sweep per this repo's own
 Consolidation Sweep Rules (CLAUDE.md) — canonical-vs-duplicate report first, then patch only the
 safe cases. Not started.
+
+## Next Steps (2026-08-09), priority order
+
+1. **Run the IMPORTS/DYNAMIC_IMPORTS apply for real** (T20 item 1's only remaining step — not an
+   investigation anymore, just an unrun command):
+   ```
+   node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=5000   # bounded first
+   # then verify: CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType
+   # should now include IMPORTS (and TEST_COVERS_FILE); confirm counts via
+   # MATCH ()-[r:IMPORTS]->() RETURN count(r)
+   node scripts/atlas/sync-graph-truth-neo4j.mjs --apply                # unbounded, once bounded run is clean
+   ```
+   Do this **before** trusting any PageRank/community-detection/GDS run downstream — until this
+   lands, GDS projections run on `SIMILAR_TOPOLOGY` alone (T19's finding), which is materially
+   weaker than the intended import-graph topology.
+
+2. **Re-run `neo4j-graph-enrich.mjs --apply`** after step 1 lands, to confirm GDS3/GDS4/GDS5 now
+   project a real `IMPORTS`-inclusive graph (not just the defensive fallback added in T19) and to
+   re-check the Qdrant payload-patch match rate now that `atlas_feature_map` is populated
+   (T20 item 2 fix) — expect a further improvement beyond the 1,128/2,114 already applied, since
+   more of the 61,659 `atlas_packets` rows should now resolve through the corrected feature-map
+   join.
+
+3. **Backfill `som_cluster` / `som_bmu_row` / `som_bmu_col` for `atlas_feature_map`**, or formally
+   drop the SOM-grid-based `SIMILAR_TOPOLOGY` cost calculation in `sync-graph-truth-neo4j.mjs` if
+   this data source is never going to carry SOM coordinates. Currently the dry-run reports
+   `Files with som_cluster : 0 / 4512 (0%)` and `Similar topology edges (bounded): 0` — the
+   IMPORTS/TEST_COVERS_FILE fix does not touch this gap. Decide: is `atlas_feature_map`'s SOM data
+   supposed to come from a different upstream table/script (e.g. `backfill-gds-som-topology.mjs`,
+   `materialize-som-topology.mts`, `create-som-topology-edges.mjs` — several exist, not yet audited
+   for which one is canonical), or was `SIMILAR_TOPOLOGY`-via-SOM-grid always meant to be optional?
+
+4. **RF6 canonical RRF ownership decision remains the standing blocker** for Phase 4/T4's
+   `rrf-oracle.ts` comparison run — unrelated to this session's fixes, still open from earlier in
+   this change.
+
+5. **Continue the deferred 280+ graphify-script migration into `graphify/` (T21) only as its own
+   audited sweep** — do not fold it into unrelated work. Start with a read-only inventory
+   (canonical artifact type → current path(s) → writer script → reader script(s)) before touching
+   anything, per CLAUDE.md's Consolidation Sweep Rules.
