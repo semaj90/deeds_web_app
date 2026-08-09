@@ -566,57 +566,18 @@ it turned out not to be a real gap.
    (canonical artifact type → current path(s) → writer script → reader script(s)) before touching
    anything, per CLAUDE.md's Consolidation Sweep Rules.
 
-## T23 — Neo4j algorithm-surface architecture (2026-08-09), captured not implemented
+## T23 — Neo4j algorithm-surface architecture — split into its own change
 
-External review (independently confirmed T22's dedup finding — "the earlier 2/3 endpoint-failure
-theory should be removed from the TODO... this now looks like expected deduplication, not missing
-endpoint resolution") also proposed a durable split of *which* Neo4j/graph tooling owns *which*
-job. Capturing the recommendation here for future phases; nothing below is implemented yet.
+Originally captured inline here; promoted to its own OpenSpec change since it's substantial enough
+to track independently and got a fully-specified 24-file bundle manifest + GR0–GR10 gate sequence
+from the user: **`openspec/changes/parent-atlas-graph-runtime-enhancement/`** (`README.md`,
+`proposal.md`, `tasks.md`).
 
-**Core principle: don't make the HTTP route own graph-algorithm semantics.** Route handlers should
-call a named traversal/algorithm, not hand-roll Cypher variable-length paths inline.
-
-**APOC Core vs GDS vs GPU sidecar — the proposed split:**
-| Layer | Owns | Examples |
-|---|---|---|
-| APOC Core (query-time) | Bounded, filtered neighborhood expansion | `apoc.path.expandConfig` — relationship-type filters, direction, min/max depth, uniqueness, termination/allow/deny lists. Replaces hardcoded `IMPORTS*1..3`-style Cypher scattered across scripts. |
-| GDS (analytics) | BFS, Dijkstra, PageRank, PPR, Louvain/Leiden, similarity, embeddings | `gds.bfs.stream` (target nodes, depth limit, relationship cost budget) instead of Cypher variable-length expansion doing double duty as BFS. |
-| RAPIDS/cuGraph sidecar (offline, GPU) | High-volume algorithm parity/acceleration | Kept as a **separate failure domain** from Neo4j — do not embed CUDA/cuVS/cuGraph inside a Neo4j Java plugin; a GPU crash must not be able to take Neo4j down. |
-
-**Explicit non-recommendation: don't use `gds.shortestPath.astar` for semantic code search.** GDS's
-built-in A* heuristic is Haversine (lat/lon) distance for geographic graphs, single-threaded — the
-right tool for "cheapest path between coordinates," the wrong tool for "most promising code path by
-semantic similarity + taxonomy distance + structural edge cost." Parent Atlas's own semantic
-best-first / weighted-A* (`f(n) = g(n) + h(n)`, `g` = typed edge cost, `h` = `1 - cos(θ)` between
-embedding and taxonomy/routing target) belongs **outside GDS**, as its own algorithm (TypeScript/
-Python first; a custom Neo4j Java procedure only if that prototype proves too slow — Neo4j does
-officially support custom Java procedures/functions, current docs target Java 21 + Neo4j 2026.06,
-but this is explicitly a "later" item, not now).
-
-**Plugin posture**: GDS + APOC Core, install now. APOC Extended: not yet (community-maintained, not
-officially supported — only add for a specific proven-needed capability). No GPU/JNI plugin, ever,
-per the failure-domain isolation above.
-
-**Caution carried over from APOC's own docs**: APOC procedure memory isn't fully tracked by
-Neo4j's normal memory tracker — unbounded `apoc.path.expand*` calls can cause JVM heap pressure.
-Always bound repair-traversal calls with depth limits + relationship filters, never an unbounded
-expand.
-
-**Recommended rollout order** (not started): now — APOC path expansion + GDS BFS/Dijkstra/
-PageRank/Louvain for repair-retrieval traversal policies (e.g. "repair callers" =
-`CALLS|REFERENCES`, "test neighborhood" = `TESTS|CALLS`, "dependency neighborhood" =
-`IMPORTS|REQUIRES`, "feature implementation" = `IMPLEMENTS|TESTS`). Next — Leiden, Personalized
-PageRank, weighted typed-edge paths. Later — semantic best-first, custom Java only if the
-TypeScript/Python prototype proves too slow. This reconciles with, and should inform, Phase 15's
-still-open custom-traversal design (HMM tool-selection) — do not design that phase's traversal
-logic without checking whether APOC `expandConfig` already covers the policy in question.
-
-**Immediate operational recommendation (not yet actioned)**: the live graph is confirmed stronger
-after T22 (23,114 `CodebaseFile`, 2,754 `IMPORTS`, 1,572 `TEST_COVERS_FILE`, 9,988
-`BELONGS_TO_FEATURE`, path index `ONLINE`) but still **stale relative to a full `graphify:daily`
-run** (this session's `--apply` only covered a 5,000-file bounded slice, not the full 61,659).
-Recommended next graph action: `cd sveltekit-frontend && npm run graphify:daily` to refresh fully,
-then freeze that revision before changing PageRank/community-detection outputs downstream. **Not
-run this session** — `graphify:daily` is a long-running, multi-stage, GPU-touching pipeline (this
-change's own T19 log shows it previously took long enough to trigger repeated context warnings);
-running it should be an explicit, separately-confirmed action, not bundled into this diagnosis.
+Summary for context (full detail lives in the new change): formalizes APOC Core (query-time
+bounded traversal) vs. Neo4j GDS (analytics: BFS/Dijkstra/PageRank/Louvain/Leiden) vs. RAPIDS/
+cuGraph sidecar (GPU, separate failure domain) vs. Parent Atlas's own semantic best-first/weighted-
+A* (explicitly not `gds.shortestPath.astar`, which is a Haversine lat/lon heuristic, wrong domain
+for code search). Reconciles with T22's live graph state (23,114 `CodebaseFile`, 2,754 `IMPORTS`,
+1,572 `TEST_COVERS_FILE`, path index `ONLINE`, but stale relative to a full `graphify:daily`
+refresh) and should inform Phase 15's still-open custom-traversal design — check whether APOC
+`expandConfig` already covers a policy before inventing new traversal code there.
