@@ -30,6 +30,11 @@
 !/graphify/
 !/graphify/**
 
+# Canonical neo4j/ output directory (2026-08-09) — gitignored, rg-searchable.
+# Infra only: no scripts write here yet. See neo4j/README.md.
+!/neo4j/
+!/neo4j/**
+
 # Python virtual environments — gitignored but searchable by rg
 !.venv-gemma4/
 !.venv-gemma4/**

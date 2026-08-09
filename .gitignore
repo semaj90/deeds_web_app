@@ -941,6 +941,10 @@ sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
 # in .rgignore, matching the .opencode/ndjson/ pattern.
 /graphify/*
 !/graphify/README.md
+
+# Canonical neo4j/ output directory (2026-08-09) — infra only, see neo4j/README.md.
+/neo4j/*
+!/neo4j/README.md
 /docs/documents-atlas-index.json
 /memory/atlas/documents-atlas.inverted.json
 /sveltekit-frontend/docs/documents-atlas-index.json
