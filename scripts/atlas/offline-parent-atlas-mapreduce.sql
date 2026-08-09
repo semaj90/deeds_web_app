@@ -213,20 +213,24 @@ SELECT 'candidates_with_centroid' AS label, COUNT(*) AS rows FROM cold_profile_c
 -- derive the same summary surface from the current columns instead of chasing a
 -- schema migration.
 
+-- 2026-08-09: rewritten to use the real route_runtime_packets schema directly (route, latency_ms,
+-- captured_at, source_refs, feature_ids, qdrant_hits, cache_hit, cache_tier) instead of remapping
+-- to a stale shape (route_path, method, packet_count, avg_latency_ms, error_count,
+-- p95_latency_ms) that never existed on this table. Root cause: this rollup was written for an
+-- older route_runtime_packets shape; canonical fix owner is this SQL file, not a schema migration
+-- (the real column names are correct, just weren't used here).
 CREATE OR REPLACE TABLE cold_hot_path_rollups AS
 SELECT
   rrp.id,
-  rrp.route AS route_path,
-  NULL AS method,
+  rrp.route,
+  rrp.latency_ms,
+  rrp.captured_at,
   rrp.source_refs,
   rrp.feature_ids,
-  1 AS packet_count,
-  COALESCE(rrp.latency_ms, 0)::double AS avg_latency_ms,
-  CASE WHEN COALESCE(rrp.cache_hit, false) THEN 0 ELSE 1 END AS error_count,
-  COALESCE(rrp.latency_ms, 0)::double AS p95_latency_ms,
-  rrp.captured_at AS last_seen_at,
-  rrp.captured_at AS created_at,
-  -- runtime hot-path score: higher latency + error rate = higher priority
+  rrp.qdrant_hits,
+  rrp.cache_hit,
+  rrp.cache_tier,
+  -- runtime hot-path score: higher latency + cache miss = higher priority
   COALESCE(rrp.latency_ms, 0) / 1000.0 +
     CASE WHEN COALESCE(rrp.cache_hit, false) THEN 0 ELSE 0.5 END AS runtime_hot_path_score
 FROM pg_db.route_runtime_packets rrp;
