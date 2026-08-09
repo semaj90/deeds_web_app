@@ -2,7 +2,7 @@
 /**
  * Stage 5: PageRank Authority Calculation + Independent Parity Validation
  *
- * Input: docs/reports/frozen-graph-snapshot-v2.json when available; falls
+ * Input: graphify/frozen-graph-snapshot-v2.json when available; falls
  * back to docs/stage4/topology_facts.ndjson (nodes + edges) for legacy runs.
  * Process:
  *   1. Build directed graph from topology facts
@@ -24,7 +24,7 @@ import pg from 'pg';
 const WORKSPACE_ID = 'legal-ai:deeds-web-app';
 const REPO_ROOT = process.cwd();
 const STAGE4_FILE = path.join(REPO_ROOT, 'docs', 'stage4', 'topology_facts.ndjson');
-const FROZEN_SNAPSHOT_FILE = path.join(REPO_ROOT, 'docs', 'reports', 'frozen-graph-snapshot-v2.json');
+const FROZEN_SNAPSHOT_FILE = path.join(REPO_ROOT, 'graphify', 'frozen-graph-snapshot-v2.json');
 const OUTPUT_DIR = path.join(REPO_ROOT, 'docs', 'stage5');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'pagerank_authority.ndjson');
 const VALIDATION_REPORT = path.join(OUTPUT_DIR, 'pagerank-validation-report.json');

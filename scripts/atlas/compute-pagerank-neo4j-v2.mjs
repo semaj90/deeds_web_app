@@ -15,7 +15,7 @@ import neo4j from 'neo4j-driver';
 import { parse as parseYaml } from 'yaml';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
-const frozenFixturePath = resolve(ROOT, 'docs/reports/frozen-graph-snapshot-v2.json');
+const frozenFixturePath = resolve(ROOT, 'graphify/frozen-graph-snapshot-v2.json');
 const defaultFixturePath = existsSync(frozenFixturePath)
   ? frozenFixturePath
   : resolve(ROOT, 'sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json');

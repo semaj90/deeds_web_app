@@ -11,7 +11,7 @@ function parseArg(name: string, fallback: string): string {
 }
 
 const root = resolve(import.meta.dirname, '..', '..');
-const outputJson = parseArg('--output-json', resolve(root, 'docs/reports/frozen-graph-snapshot-v2.json'));
+const outputJson = parseArg('--output-json', resolve(root, 'graphify/frozen-graph-snapshot-v2.json'));
 const workspaceId = parseArg('--workspace-id', process.env.PAGERANK_WORKSPACE_ID ?? 'workspace:parent-atlas');
 const snapshotId = parseArg('--snapshot-id', process.env.PAGERANK_SNAPSHOT_ID ?? randomUUID());
 const sourceInventorySnapshotId = parseArg('--source-inventory-snapshot-id', process.env.PAGERANK_SOURCE_INVENTORY_SNAPSHOT_ID ?? `inventory:${snapshotId}`);

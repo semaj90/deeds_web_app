@@ -26,7 +26,7 @@ except ImportError as error:  # Keep infrastructure status explicit for the call
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FIXTURE = ROOT / "sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json"
-DEFAULT_FROZEN_FIXTURE = ROOT / "docs/reports/frozen-graph-snapshot-v2.json"
+DEFAULT_FROZEN_FIXTURE = ROOT / "graphify/frozen-graph-snapshot-v2.json"
 DEFAULT_MANIFEST = ROOT / ".okf/manifest.yaml"
 
 
