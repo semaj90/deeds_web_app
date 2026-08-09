@@ -27,7 +27,9 @@ SELECT
   pad.feature_id,
   pad.related_feature_ids,
   pad.workspace_id,
-  pad.file_ext,
+  -- file_ext never existed on parent_atlas_documents/atlas_packets; derive from rel_path instead
+  -- of leaving it a phantom column (2026-08-09 fix).
+  regexp_extract(pad.rel_path, '\.[^./\\]+$') AS file_ext,
   pad.tags,
   pad.line_count,
   pad.is_route,
@@ -41,24 +43,32 @@ SELECT
   pad.cluster_id,
   pad.centroid_id,
   pad.qdrant_point_id,
-  pad.alias_id,
-  pad.ingest_source,
+  -- alias_id / ingest_source never existed on parent_atlas_documents/atlas_packets and have no
+  -- derivable source; keep the columns for downstream compatibility, values genuinely unknown
+  -- (2026-08-09 fix).
+  NULL AS alias_id,
+  NULL AS ingest_source,
   pad.created_at,
   pad.updated_at,
   -- enrichment from atlas_feature_map
   afm.som_cluster,
-  afm.neo4j_node_id,
-  afm.nes_card_id,
+  -- neo4j_node_id / nes_card_id / atlas_version never existed on atlas_feature_map (no writer
+  -- populates them anywhere in the repo) -- kept as NULL columns for downstream compatibility
+  -- rather than dropped, matching the fix pattern used for pad.alias_id/ingest_source above
+  -- (2026-08-09).
+  NULL AS neo4j_node_id,
+  NULL AS nes_card_id,
   afm.lane_ids,
-  afm.atlas_version,
+  NULL AS atlas_version,
   afm.indexed_at            AS afm_indexed_at,
-  -- source classification
+  -- source classification (pad.file_ext doesn't exist -- same derivation as the file_ext column
+  -- above, inlined since column aliases from this SELECT list aren't visible here; 2026-08-09)
   CASE
     WHEN pad.is_route        THEN 'route'
     WHEN pad.is_svelte_comp  THEN 'component'
-    WHEN pad.file_ext IN ('ts','js','mjs','cjs') THEN 'typescript'
-    WHEN pad.file_ext = 'sql' THEN 'schema'
-    ELSE COALESCE(pad.file_ext, 'file')
+    WHEN regexp_extract(pad.rel_path, '\.[^./\\]+$') IN ('.ts','.js','.mjs','.cjs') THEN 'typescript'
+    WHEN regexp_extract(pad.rel_path, '\.[^./\\]+$') = '.sql' THEN 'schema'
+    ELSE COALESCE(NULLIF(regexp_extract(pad.rel_path, '\.[^./\\]+$'), ''), 'file')
   END                       AS source_kind,
   true                      AS cold_storage_ready
 FROM pg_db.parent_atlas_documents pad
@@ -119,35 +129,24 @@ SELECT 'cold_feature_rollups' AS tbl, COUNT(*) AS rows FROM cold_feature_rollups
 
 -- ── 3. cold_source_ref_rollups ────────────────────────────────────────────────
 -- Per-source-ref synthesis rollup (karpathy blend + Qdrant + cluster).
+--
+-- 2026-08-09: this section originally selected from pg_db.atlas_source_ref_synthesis (a table
+-- that has never existed) with columns (source_kind, atlas_rank, atlas_authority, qdrant_point_ids,
+-- cluster_ids, som_cluster, synthesized_summary, synthesized_at) that don't exist anywhere in the
+-- schema -- not a rename, a reference to data that was never actually produced this way. Per
+-- explicit decision, gracefully degraded to only the real columns that exist on
+-- atlas_topology_features (source_ref, pagerank_score, karpathy_blend) plus a NULL
+-- attention_score placeholder, since those 3 are the only ones consumed downstream (§4). Not a
+-- full rewrite of the original intent -- if source_kind/atlas_rank/etc. are ever needed, that
+-- requires new source data, not a query fix.
 
 CREATE OR REPLACE TABLE cold_source_ref_rollups AS
 SELECT
-  asrs.source_ref,
-  asrs.source_kind,
-  asrs.feature_id,
-  asrs.atlas_rank,
-  asrs.atlas_authority,
-  asrs.karpathy_blend,
-  asrs.pagerank_score,
-  asrs.attention_score,
-  asrs.qdrant_point_ids,
-  asrs.cluster_ids,
-  asrs.som_cluster,
-  asrs.synthesized_summary,
-  asrs.synthesized_at,
-  asrs.updated_at,
-  -- join back to cold_parent_atlas_cards for enriched context
-  c.rel_path,
-  c.file_path,
-  c.centroid_id,
-  c.qdrant_point_id,
-  c.line_count,
-  c.is_route,
-  c.is_svelte_comp,
-  c.cold_storage_ready
-FROM pg_db.atlas_source_ref_synthesis asrs
-LEFT JOIN cold_parent_atlas_cards c ON c.source_ref = asrs.source_ref
-WHERE asrs.source_ref NOT LIKE 'feature:%';
+  atf.source_ref,
+  atf.pagerank_score,
+  atf.karpathy_blend,
+  NULL AS attention_score
+FROM pg_db.atlas_topology_features atf;
 
 SELECT 'cold_source_ref_rollups' AS tbl, COUNT(*) AS rows FROM cold_source_ref_rollups;
 
@@ -205,23 +204,31 @@ SELECT 'candidates_with_centroid' AS label, COUNT(*) AS rows FROM cold_profile_c
 -- Runtime hot-path telemetry joined with file lineage.
 -- route_runtime_packets is currently empty (0 rows) — this will populate once
 -- runtime telemetry is collected.
+--
+-- 2026-08-09: the live `route_runtime_packets` contract is row-level telemetry with
+-- `route`, `latency_ms`, `captured_at`, `source_refs`, `feature_ids`,
+-- `qdrant_hits`, `cache_hit`, `cache_tier`, etc. It does not expose the older
+-- `route_path`, `method`, `packet_count`, `avg_latency_ms`, `error_count`, or
+-- `p95_latency_ms` projection names this legacy rollup originally expected, so we
+-- derive the same summary surface from the current columns instead of chasing a
+-- schema migration.
 
 CREATE OR REPLACE TABLE cold_hot_path_rollups AS
 SELECT
   rrp.id,
-  rrp.route_path,
-  rrp.method,
+  rrp.route AS route_path,
+  NULL AS method,
   rrp.source_refs,
   rrp.feature_ids,
-  rrp.packet_count,
-  rrp.avg_latency_ms,
-  rrp.error_count,
-  rrp.p95_latency_ms,
-  rrp.last_seen_at,
-  rrp.created_at,
+  1 AS packet_count,
+  COALESCE(rrp.latency_ms, 0)::double AS avg_latency_ms,
+  CASE WHEN COALESCE(rrp.cache_hit, false) THEN 0 ELSE 1 END AS error_count,
+  COALESCE(rrp.latency_ms, 0)::double AS p95_latency_ms,
+  rrp.captured_at AS last_seen_at,
+  rrp.captured_at AS created_at,
   -- runtime hot-path score: higher latency + error rate = higher priority
-  COALESCE(rrp.avg_latency_ms, 0) / 1000.0 +
-    COALESCE(rrp.error_count, 0) * 0.5       AS runtime_hot_path_score
+  COALESCE(rrp.latency_ms, 0) / 1000.0 +
+    CASE WHEN COALESCE(rrp.cache_hit, false) THEN 0 ELSE 0.5 END AS runtime_hot_path_score
 FROM pg_db.route_runtime_packets rrp;
 
 SELECT 'cold_hot_path_rollups' AS tbl, COUNT(*) AS rows FROM cold_hot_path_rollups;
