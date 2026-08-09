@@ -1,17 +1,9 @@
-import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 export async function runCustomAnalysis(content: string, prompt: string): Promise<any> {
-    const ollamaUrl = ENV.OLLAMA_BASE_URL;
-    const res = await fetch(`${ollamaUrl}/api/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-	body: JSON.stringify({
-	model: "gemma4-rotorquant:latest",
-            prompt: `${prompt}\n\nDocument content:\n${content.substring(0, 4000)}`,
-            options: {
-	temperature: 0.2, num_predict: 2000 }
-        })
-    });
-    const data = await res.json();
-    return data.response;
+    return bifrostChat(
+        [{ role: 'user', content: `${prompt}\n\nDocument content:\n${content.substring(0, 4000)}` }],
+        'gemma4-legal-iq4xs-direct.gguf',
+        { temperature: 0.2, maxTokens: 2000 }
+    );
 }

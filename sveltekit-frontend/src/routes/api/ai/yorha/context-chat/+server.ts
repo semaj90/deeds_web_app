@@ -11,16 +11,14 @@ import { pgRows } from '$lib/server/db/client';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const yorhaChatSchema = z.object({
 	message: z.string().trim().min(1, 'Missing message').max(50000),
 	caseId: z.string().max(500).nullable().optional()
 });
 
-const OLLAMA_URL = getOllamaEndpoint();
-const MODEL = 'gemma4-rotorquant:latest';
+const MODEL = LOCAL_VLM_MODEL;
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -52,15 +50,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
-		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				model: MODEL,
-				prompt: message,
-				system: systemPrompt,
+				messages: [
+					{ role: 'system', content: systemPrompt },
+					{ role: 'user', content: message }
+				],
 				stream: false,
-				options: { temperature: 0.7, num_predict: 1024 }
+				temperature: 0.7,
+				max_tokens: 1024
 			}),
 			signal: AbortSignal.timeout(30000)
 		});
@@ -69,8 +70,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			return json({ response: 'AI service unavailable. Please try again.', context: {} }, { status: 503 });
 		}
 
-		const data = await res.json();
-		const responseText = String(data.response ?? '');
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const responseText = String(data.choices?.[0]?.message?.content ?? '');
 
 		// Extract basic context from the response
 		const keywords = extractKeywords(responseText);
@@ -89,7 +90,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	} catch (err) {
 		console.error('[YorHA Context Chat] Error:', err);
 		return json({
-			response: 'Connection to AI service timed out. Check that Ollama is running.',
+			response: 'Connection to AI service timed out. Check that the local llama-server is running.',
 			context: {}
 		}, { status: 503 });
 	}

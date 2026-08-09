@@ -16,6 +16,7 @@ import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import Redis from 'ioredis';
 import { withMcpToolTelemetry } from '$lib/server/telemetry/mcp-tool-telemetry.js';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import {
   computePacketKey,
@@ -170,10 +171,7 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
       .where(eq(atlas_packets.packet_key, input.packet_key));
 
     // Step 4: Invalidate Redis
-    redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    redis = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null,
@@ -272,10 +270,7 @@ async function toolEnvelopeValidateImpl(args: unknown): Promise<ToolResult> {
       .where(eq(atlas_packets.packet_key, input.packet_key));
 
     // Step 4: Invalidate Redis
-    redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    redis = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null,
@@ -372,10 +367,7 @@ async function toolMirrorSyncQdrantImpl(args: unknown): Promise<ToolResult> {
       .where(eq(atlas_packets.packet_key, input.packetKey));
 
     // Step 4: Invalidate Redis
-    redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    redis = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null,
@@ -471,10 +463,7 @@ async function toolMirrorSyncNeo4jImpl(args: unknown): Promise<ToolResult> {
       .where(eq(atlas_packets.packet_key, input.packetKey));
 
     // Step 4: Invalidate Redis
-    redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    redis = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null,
@@ -756,10 +745,7 @@ async function toolIdentityQuarantineImpl(args: unknown): Promise<ToolResult> {
       .where(eq(atlas_packets.packet_key, input.packetKey));
 
     // Step 4: Invalidate Redis
-    redis = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    redis = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null,

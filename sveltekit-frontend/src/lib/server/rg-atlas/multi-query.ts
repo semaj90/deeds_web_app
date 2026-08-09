@@ -3,7 +3,7 @@
  * Generates 3-5 query variants to improve retrieval recall.
  */
 
-import { ollamaCachedChat } from '$lib/server/ollama-cached.js';
+import { llamaServerCachedChat } from '$lib/server/ollama-cached.js';
 
 /**
  * Rewrites a single query into multiple variants using Gemma4.
@@ -21,7 +21,7 @@ Query: "${query}"
 `.trim();
 
     try {
-        const response = await ollamaCachedChat(
+        const response = await llamaServerCachedChat(
             [{ role: 'user', content: prompt }],
             'gemma4-rotorquant:latest-fast',
             { temperature: 0.1, maxTokens: 512 }

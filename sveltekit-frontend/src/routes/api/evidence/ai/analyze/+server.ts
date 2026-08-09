@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { rateLimitOrRespond, RateLimitPresets } from '$lib/server/middleware/rate-limit.js';
 import { generateCacheKey, getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const analyzeSchema = z.object({
 	node: z.object({
@@ -84,25 +85,29 @@ export const POST: RequestHandler = async (event) => {
 			console.warn('[Evidence AI] Cache lookup failed (non-fatal):', cacheErr);
 		}
 
-		// ── Ollama Inference (gemma3:270m = 4.5s, gemma4-rotorquant:latest = 25s) ──
-		const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
-		const { ENV } = await import('$lib/server/env.server.js');
-
+		// ── Local llama-server inference ──
 		const inferenceStart = performance.now();
-		const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model,
-				prompt: `Analyze this evidence item and provide: 1) A brief analysis of its legal significance, 2) Suggestions for further investigation.
+				model: model || LOCAL_VLM_MODEL,
+				messages: [
+					{ role: 'system', content: 'You analyze evidence and return valid JSON.' },
+					{
+						role: 'user',
+						content: `Analyze this evidence item and provide: 1) A brief analysis of its legal significance, 2) Suggestions for further investigation.
 
 Evidence type: ${node.type ?? 'unknown'}
 Title: ${node.title ?? 'untitled'}
 Description: ${text.slice(0, 5000)}
 
 Return JSON: { "analysis": "...", "suggestions": ["...", "..."] }`,
+					},
+				],
 				stream: false,
-				options: { temperature: 0.4, num_predict: 500 }
+				temperature: 0.4,
+				max_tokens: 500,
 			}),
 			signal: AbortSignal.timeout(60_000)
 		});
@@ -119,11 +124,12 @@ Return JSON: { "analysis": "...", "suggestions": ["...", "..."] }`,
 		let resultSuggestions: string[] = [];
 
 		try {
-			const parsedResponse = JSON.parse(data.response);
-			resultAnalysis = parsedResponse.analysis ?? data.response;
+			const responseText = data.choices?.[0]?.message?.content ?? '';
+			const parsedResponse = JSON.parse(responseText);
+			resultAnalysis = parsedResponse.analysis ?? responseText;
 			resultSuggestions = Array.isArray(parsedResponse.suggestions) ? parsedResponse.suggestions : [];
 		} catch {
-			resultAnalysis = data.response;
+			resultAnalysis = data.choices?.[0]?.message?.content ?? '';
 			resultSuggestions = [];
 		}
 

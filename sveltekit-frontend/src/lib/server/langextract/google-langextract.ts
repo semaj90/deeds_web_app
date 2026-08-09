@@ -2,9 +2,7 @@
 // The service runs on port 8095 and uses gemma4-rotorquant:latest via Ollama.
 import { langextractFetch } from '$lib/server/langextract-client.js';
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
-
-const OLLAMA_BASE_URL = getOllamaEndpoint();
+import { bifrostChat } from '$lib/server/ollama.js';
 
 /**
  * Extract keywords from text using the LangExtract service.
@@ -51,9 +49,6 @@ export async function extractKeywords(text: string): Promise<string[]> {
  * Used when LangExtract service is unavailable.
  */
 async function extractKeywordsLegacy(text: string): Promise<string[]> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
     try {
         const limitedText = text.slice(0, 8000);
         const prompt = `Extract the most important legal and factual keywords from this legal document.
@@ -63,26 +58,18 @@ Document:
 ${limitedText}
 Keywords:`;
 
-        const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: 'gemma3:270m',
-                prompt,
-                stream: false,
-                options: {
-	temperature: 0.3, num_predict: 200 }
-            }),
-            signal: controller.signal
+        const rawKeywords = await bifrostChat(
+            [{ role: 'user', content: prompt }],
+            'gemma4-legal-iq4xs-direct.gguf',
+            { temperature: 0.3, maxTokens: 200, timeoutMs: 5_000 }
+        ).catch((err) => {
+            console.warn('⚠️ llama-server error:', err);
+            return '';
         });
 
-        if (!response.ok) {
-            console.warn('⚠️ Ollama error:', response.statusText);
+        if (!rawKeywords) {
             return extractKeywordsFallback(text);
         }
-
-        const data: any = await response.json();
-        const rawKeywords = data?.response ?? '';
 
         const keywords = rawKeywords
             .split(',')
@@ -102,8 +89,6 @@ Keywords:`;
             console.warn('⚠️ Gemma keyword extraction failed:', error);
         }
         return extractKeywordsFallback(text);
-    } finally {
-        clearTimeout(timeoutId);
     }
 }
 

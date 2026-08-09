@@ -9,7 +9,7 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { langextractFetch } from '$lib/server/langextract-client.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { resizeForVLM } from '$lib/server/image/resize-for-vlm.js';
 import { isUuid } from '$lib/server/validation.js';
 import {
@@ -26,7 +26,7 @@ const THUMB_BUCKET = 'poi-photos';
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const VLM_MODEL = ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M';
+const VLM_MODEL = LOCAL_VLM_MODEL;
 const EMBED_MODEL = 'embeddinggemma:latest';
 const VLM_TIMEOUT = 60_000; // 60s for vision analysis
 
@@ -294,15 +294,18 @@ Return ONLY valid JSON.`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), VLM_TIMEOUT);
 
-    const vlmRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+    const vlmRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: VLM_MODEL,
-        prompt: vlmPrompt,
-        images: [base64Image],
+        messages: [
+          { role: 'system', content: 'You analyze photos for legal investigations and return JSON only.' },
+          { role: 'user', content: vlmPrompt, images: [base64Image] },
+        ],
         stream: false,
-        options: { temperature: 0.1, num_predict: 1024 },
+        temperature: 0.1,
+        max_tokens: 1024,
       }),
       signal: controller.signal,
     });
@@ -311,7 +314,7 @@ Return ONLY valid JSON.`;
 
     if (vlmRes.ok) {
       const vlmData = await vlmRes.json();
-      const responseText = vlmData.response ?? '';
+      const responseText = vlmData.choices?.[0]?.message?.content ?? '';
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
 
       if (jsonMatch) {

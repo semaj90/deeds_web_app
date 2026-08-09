@@ -1,5 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 /**
  * CouchDB Client - Lightweight wrapper for ACE knowledge base
@@ -110,26 +110,18 @@ export const couchdb = {
 };
 
 /**
- * ACE LLM helper - generates summaries via Ollama for CouchDB documents
+ * ACE LLM helper - generates summaries via llama-server :8090 for CouchDB documents.
+ * Chat/synthesis goes through bifrostChat (llama-server), never Ollama — Ollama is
+ * embeddings-only per the "Ollama vs llama-server Boundary" hard rule (CLAUDE.md).
  */
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-
 export const aceLLM = {
-  async summarize(text: string, model = 'gemma4-rotorquant:latest'): Promise<string> {
+  async summarize(text: string, model = 'gemma4-legal-iq4xs-direct.gguf'): Promise<string> {
     try {
-      const res = await ollamaFetch(OLLAMA_URL + '/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          prompt: 'Summarize the following content concisely:\n\n' + text.slice(0, 4000),
-          stream: false,
-          options: { temperature: 0.3, num_predict: 256 }
-        })
-      });
-      if (!res.ok) return '';
-      const data = await res.json() as { response?: string };
-      return data.response ?? '';
+      return await bifrostChat(
+        [{ role: 'user', content: 'Summarize the following content concisely:\n\n' + text.slice(0, 4000) }],
+        model,
+        { temperature: 0.3, maxTokens: 256 }
+      );
     } catch {
       return '';
     }

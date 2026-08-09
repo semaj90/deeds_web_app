@@ -3,9 +3,9 @@
  *
  * Providers:
  *   - tensorrt: TensorRT-LLM on GPU (primary, requires GPU arbiter lease)
- *   - ollama: Local Gemma4-legal model (fallback)
+ *   - llama-server: llama-server.exe :8090 (fallback; chat/synthesis lane, never Ollama)
  *
- * Auto-fallback: tensorrt → ollama
+ * Auto-fallback: tensorrt → llama-server
  *
  * Usage:
  *   const stream = await llmRouter.generateStream({ prompt, provider, model });
@@ -13,14 +13,13 @@
  */
 
 import { isLegalTask, getOptimalModel, OLLAMA_CONFIG } from '$lib/server/ai/ollama-config.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { ENV } from '$lib/server/env.server.js';
 
-const OLLAMA_URL = getOllamaEndpoint();
+const LLAMA_SERVER_URL = ENV.TURBOQUANT_BASE_URL ?? ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 
 interface StreamRequest {
   prompt: string;
-  provider?: 'ollama' | 'tensorrt';
+  provider?: 'llama-server' | 'tensorrt';
   model?: string;
   systemPrompt?: string;
   temperature?: number;
@@ -40,30 +39,38 @@ interface StreamChunk {
   };
 }
 
-async function* streamOllama(request: StreamRequest): AsyncGenerator<StreamChunk> {
-  // Dynamic model selection: use ollama-config registry if no explicit model
+async function* streamLlamaServer(request: StreamRequest): AsyncGenerator<StreamChunk> {
+  // Model label only — llama-server ignores the `model` field and serves whatever
+  // GGUF is currently loaded (verified live: hforf.gguf, an alias of
+  // gemma4-legal-iq4xs-direct.gguf). ollama-config registry still picks a sensible
+  // label for logging/metadata.
   const model = request.model ?? (
     isLegalTask(request.prompt)
       ? getOptimalModel('legal-analysis')[0]
       : getOptimalModel('generation')[0]
   ) ?? OLLAMA_CONFIG.defaultModel;
-  const response = await ollamaFetch(OLLAMA_URL + '/api/generate', {
+
+  const messages = request.systemPrompt
+    ? [{ role: 'system', content: request.systemPrompt }, { role: 'user', content: request.prompt }]
+    : [{ role: 'user', content: request.prompt }];
+
+  // stream: true is REQUIRED for llama-server :8090 — Gemma4 fills reasoning_content
+  // before content; a non-streaming call can exhaust max_tokens on thinking alone.
+  const response = await fetch(`${LLAMA_SERVER_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model,
-      prompt: request.prompt,
-      system: request.systemPrompt,
+      messages,
       stream: true,
-      options: {
-        temperature: request.temperature ?? 0.7,
-        num_predict: request.maxTokens ?? 2048
-      }
-    })
+      temperature: request.temperature ?? 0.7,
+      max_tokens: request.maxTokens ?? 2048
+    }),
+    signal: AbortSignal.timeout(90_000)
   });
 
   if (!response.ok || !response.body) {
-    throw new Error('Ollama error: ' + response.status);
+    throw new Error('llama-server error: ' + response.status);
   }
 
   const reader = response.body.getReader();
@@ -79,18 +86,26 @@ async function* streamOllama(request: StreamRequest): AsyncGenerator<StreamChunk
     buffer = lines.pop() ?? '';
 
     for (const line of lines) {
-      if (!line.trim()) continue;
+      const trimmed = line.trim();
+      if (!trimmed.startsWith('data:')) continue;
+      const payload = trimmed.slice(5).trim();
+      if (payload === '[DONE]') {
+        yield { content: '', text: '', done: true, metadata: { provider: 'llama-server', model } };
+        continue;
+      }
       try {
-        const json = JSON.parse(line);
-        const content = json.response ?? '';
+        const json = JSON.parse(payload);
+        const content = json.choices?.[0]?.delta?.content ?? '';
+        const finished = json.choices?.[0]?.finish_reason != null;
+        if (!content && !finished) continue;
         yield {
           content,
           text: content,
-          done: !!json.done,
-          metadata: { provider: 'ollama', model }
+          done: finished,
+          metadata: { provider: 'llama-server', model }
         };
       } catch {
-        // skip malformed JSON lines
+        // skip malformed SSE line
       }
     }
   }
@@ -130,10 +145,10 @@ async function* streamTensorRT(request: StreamRequest): AsyncGenerator<StreamChu
 
 export const llmRouter = {
   async *generateStream(request: StreamRequest): AsyncGenerator<StreamChunk> {
-    const provider = request.provider ?? 'ollama';
+    const provider = request.provider ?? 'llama-server';
 
     if (provider === 'tensorrt') {
-      // TensorRT with auto-fallback to Ollama
+      // TensorRT with auto-fallback to llama-server
       try {
         const { healthCheck } = await import('$lib/server/trt-llm.js');
         if (await healthCheck()) {
@@ -141,12 +156,12 @@ export const llmRouter = {
           return;
         }
       } catch {
-        // Fall through to Ollama
+        // Fall through to llama-server
       }
-      console.warn('[LLM Router] TensorRT unavailable, falling back to Ollama');
-      yield* streamOllama(request);
+      console.warn('[LLM Router] TensorRT unavailable, falling back to llama-server');
+      yield* streamLlamaServer(request);
     } else {
-      yield* streamOllama(request);
+      yield* streamLlamaServer(request);
     }
   },
 

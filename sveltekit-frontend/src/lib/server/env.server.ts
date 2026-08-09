@@ -56,6 +56,9 @@ export const ENV = Object.freeze({
 
   DATABASE_URL: privateEnv.DATABASE_URL,
 
+  VALKEY_URL: privateEnv.VALKEY_URL ?? privateEnv.REDIS_URL ?? 'redis://127.0.0.1:6379/0',
+  VALKEY_PASSWORD: privateEnv.VALKEY_PASSWORD ?? privateEnv.REDIS_PASSWORD,
+
   REDIS_URL: privateEnv.REDIS_URL ?? 'redis://127.0.0.1:6379/0',
   REDIS_HOST: privateEnv.REDIS_HOST ?? '127.0.0.1',
   REDIS_PORT: privateEnv.REDIS_PORT ?? '6379',
@@ -146,6 +149,7 @@ export const ENV = Object.freeze({
   CUDA_SERVICE_URL: privateEnv.CUDA_SERVICE_URL,
   CUVS_BENCH_URL: privateEnv.CUVS_BENCH_URL,
   ATLAS_RAPIDS_SIDECAR_URL: privateEnv.ATLAS_RAPIDS_SIDECAR_URL,
+  COMMUNITY_TAXONOMY_ALGORITHM: privateEnv.COMMUNITY_TAXONOMY_ALGORITHM,
   DEV_BYPASS_AUTH: parseBoolean(privateEnv.DEV_BYPASS_AUTH, false),
   DOCLING_SERVICE_URL: privateEnv.DOCLING_SERVICE_URL,
   EMBED_MODEL_PATH: privateEnv.EMBED_MODEL_PATH,

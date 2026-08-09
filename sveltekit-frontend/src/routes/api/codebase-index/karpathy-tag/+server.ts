@@ -30,9 +30,9 @@ import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { AI_CONFIG } from '$lib/server/config.js';
 import { chatCompletionViaOpenAICompat, extractMLMetadata } from '$lib/server/ai/lang-extract.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 const QDRANT_URL   = ENV.QDRANT_URL;
-const OLLAMA_URL   = ENV.OLLAMA_BASE_URL;
 const COLLECTION   = 'codebase_chunks_768';
 const OPENAI_TAG_MODEL = AI_CONFIG.openai.model;
 const OLLAMA_TAG_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
@@ -200,27 +200,19 @@ async function classifyChunks(chunks: ChunkPoint[]): Promise<Map<string | number
 				}
 			}
 
-			// Call Ollama directly (matches bifrostChat internal path)
-			// Using /api/generate for fast single-turn classification
-			const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-				method:  'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body:    JSON.stringify({
-					model: OLLAMA_TAG_MODEL,
-					prompt,
-					stream:   false,
-					options:  { temperature: 0, num_predict: 60 },
-				}),
-				signal: AbortSignal.timeout(30_000),
-			}).catch(() => null);
+			// Call llama-server (:8090) via bifrostChat — never Ollama for chat/synthesis
+			const content = await bifrostChat(
+				[{ role: 'user', content: prompt }],
+				OLLAMA_TAG_MODEL,
+				{ temperature: 0, maxTokens: 60, timeoutMs: 30_000 }
+			).catch(() => '');
 
-			if (!res?.ok) {
+			if (!content) {
 				result.set(chunk.id, []);
 				continue;
 			}
 
-			const data  = await res.json() as { response?: string };
-			const tags  = parseSemanticTags(data.response ?? '');
+			const tags = parseSemanticTags(content);
 
 			result.set(chunk.id, [...new Set(tags)]);
 		} catch {

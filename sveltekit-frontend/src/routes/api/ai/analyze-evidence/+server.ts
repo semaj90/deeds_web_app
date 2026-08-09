@@ -1,8 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const analyzeEvidenceSchema = z.object({
 	evidenceId: z.string().max(500).optional().default(''),
@@ -53,31 +52,35 @@ ${meta.mimeType ? `Type: ${meta.mimeType}` : ''}
 Text (first 4000 chars):
 ${text.slice(0, 4000)}`;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }
 				],
 				stream: false,
-				format: evidenceResponseJsonSchema,
-				options: { temperature: 0.3 }
+				response_format: {
+					type: 'json_schema',
+					json_schema: evidenceResponseJsonSchema,
+				},
+				temperature: 0.3,
+				max_tokens: 1024
 			}),
 			signal: AbortSignal.timeout(60_000)
 		});
 
 		if (!res.ok) return json({ error: `Ollama error: ${res.status}` }, { status: 502 });
 
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 		let analysis: Record<string, unknown>;
 		try {
-			analysis = JSON.parse(data.message?.content || data.response || '{}');
+			analysis = JSON.parse(data.choices?.[0]?.message?.content || '{}');
 		} catch {
 			analysis = {
-				summary: data.message?.content || data.response || '',
+				summary: data.choices?.[0]?.message?.content || '',
 				keyTerms: [],
 				sentiment: 0,
 				importance: 0.5,
@@ -94,7 +97,7 @@ ${text.slice(0, 4000)}`;
 			legalRelevance: analysis.legalRelevance || '',
 			suggestedTags: Array.isArray(analysis.suggestedTags) ? analysis.suggestedTags : [],
 			evidenceId,
-			model: 'gemma4-rotorquant:latest'
+			model: LOCAL_VLM_MODEL
 		});
 	} catch (err) {
 		console.error('[ai/analyze-evidence] Error:', err);

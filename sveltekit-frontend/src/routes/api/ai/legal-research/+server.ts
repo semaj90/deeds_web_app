@@ -1,10 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const legalResearchSchema = z.object({
 	topic: z.string().max(10000).optional().default(''),
@@ -31,29 +29,30 @@ Include: relevant statutes, case law references, legal principles, and practical
 Jurisdiction: ${jurisdiction}. Research depth: ${depth}.
 Format your response with clear sections: Summary, Key Legal Principles, Relevant Statutes, Case Law, and Practical Implications.`;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: topic }
 				],
 				stream: false,
-				options: { temperature: 0.4 }
+				temperature: 0.4,
+				max_tokens: 1536
 			}),
 			signal: AbortSignal.timeout(60_000)
 		});
 
 		if (!res.ok) return json({ error: `Ollama error: ${res.status}` }, { status: 502 });
 
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 		return json({
-			research: data.message?.content || data.response || '',
+			research: data.choices?.[0]?.message?.content || '',
 			topic,
 			jurisdiction,
-			model: data.model || 'gemma4-rotorquant:latest',
+			model: LOCAL_VLM_MODEL,
 		});
 	} catch (err) {
 		console.error('[ai/legal-research] Error:', err);

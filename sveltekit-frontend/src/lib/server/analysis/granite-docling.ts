@@ -14,8 +14,8 @@
  * then sends each page through Granite-Docling for structured extraction.
  */
 
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import type { DoclingBlock, DoclingResult } from '$lib/server/docling.js';
 
 const GRANITE_DOCLING_TIMEOUT = 120_000;
@@ -36,7 +36,7 @@ export async function isGraniteDoclingAvailable(): Promise<boolean> {
 	}
 
 	try {
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/tags`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL.replace(/\/v1\/?$/, '')}/v1/models`, {
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!res.ok) {
@@ -44,8 +44,8 @@ export async function isGraniteDoclingAvailable(): Promise<boolean> {
 			cacheTimestamp = now;
 			return false;
 		}
-		const data = await res.json();
-		const models: string[] = data.models?.map((m: any) => m.name) ?? [];
+		const data = await res.json() as { data?: Array<{ id?: string; name?: string }> };
+		const models: string[] = data.data?.map((m) => m.id ?? m.name ?? '') ?? [];
 		cachedAvailable = models.some(
 			(name) => name.includes('granite-docling') || name.includes('granite_docling')
 		);
@@ -196,7 +196,7 @@ async function getPdfPageCount(pdfBuffer: Buffer): Promise<number> {
 // ── Main Analysis Functions ─────────────────────────────────────────────
 
 /**
- * Analyze a document image using Granite-Docling-258M via Ollama.
+ * Analyze a document image using Granite-Docling-258M via local llama-server.
  *
  * Supported instructions:
  *   "Convert this page to docling."  — full page (default)
@@ -217,15 +217,23 @@ export async function analyzeImageWithGraniteDocling(
 	const base64Image = imageBuffer.toString('base64');
 	const model = ENV.GRANITE_DOCLING_MODEL;
 
-	const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+	const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			model,
-			prompt: instruction,
-			images: [base64Image],
+			messages: [
+				{
+					role: 'user',
+					content: [
+						{ type: 'text', text: instruction },
+						{ type: 'image_url', image_url: { url: `data:image/png;base64,${base64Image}` } },
+					],
+				},
+			],
 			stream: false,
-			options: { temperature: 0, num_predict: 8192 },
+			temperature: 0,
+			max_tokens: 8192,
 		}),
 		signal: AbortSignal.timeout(GRANITE_DOCLING_TIMEOUT),
 	});
@@ -235,8 +243,8 @@ export async function analyzeImageWithGraniteDocling(
 		throw new Error(`Granite-Docling Ollama error (${ollamaRes.status}): ${errText}`);
 	}
 
-	const data = await ollamaRes.json();
-	const rawResponse: string = data.response ?? '';
+	const data = await ollamaRes.json() as { choices?: Array<{ message?: { content?: string } }> };
+	const rawResponse: string = data.choices?.[0]?.message?.content ?? '';
 	const blocks = parseDocTags(rawResponse);
 	const fullText = blocks.map((b) => b.text).join('\n\n');
 
@@ -274,15 +282,23 @@ export async function analyzePdfWithGraniteDocling(
 			const pageImage = await renderPdfPageToImage(pdfBuffer, i);
 			const base64 = pageImage.toString('base64');
 
-			const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+			const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					model: ENV.GRANITE_DOCLING_MODEL,
-					prompt: 'Convert this page to docling.',
-					images: [base64],
+					messages: [
+						{
+							role: 'user',
+							content: [
+								{ type: 'text', text: 'Convert this page to docling.' },
+								{ type: 'image_url', image_url: { url: `data:image/png;base64,${base64}` } },
+							],
+						},
+					],
 					stream: false,
-					options: { temperature: 0, num_predict: 8192 },
+					temperature: 0,
+					max_tokens: 8192,
 				}),
 				signal: AbortSignal.timeout(GRANITE_DOCLING_TIMEOUT),
 			});
@@ -292,8 +308,8 @@ export async function analyzePdfWithGraniteDocling(
 				continue;
 			}
 
-			const data = await ollamaRes.json();
-			const rawResponse: string = data.response ?? '';
+			const data = await ollamaRes.json() as { choices?: Array<{ message?: { content?: string } }> };
+			const rawResponse: string = data.choices?.[0]?.message?.content ?? '';
 			const pageBlocks = parseDocTags(rawResponse, i);
 			allBlocks.push(...pageBlocks);
 

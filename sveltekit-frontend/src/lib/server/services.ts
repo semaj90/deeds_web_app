@@ -5,7 +5,7 @@
  * consumers — all service access goes through individual adapters:
  *   - Ollama: $lib/server/ollama.ts
  *   - Qdrant: $lib/server/vector/qdrant-manager.ts
- *   - Redis:  $lib/server/redis.ts
+ *   - Valkey/Redis:  $lib/server/cache/valkey-client.ts
  *   - DB:     $lib/server/db/client.ts
  *
  * The unified-legal-simd-pgvector-production module it referenced was archived.

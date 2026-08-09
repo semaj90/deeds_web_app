@@ -1,9 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const routeIntentSchema = z.object({
 	query: z.string().max(10000).optional().default(''),
@@ -41,23 +39,24 @@ application scope, relevant case law, and practical implications.`;
 
 		const userPrompt = `${userQuestion || query}\n\nStatute Reference: ${statuteRef}${statute.id ? `\nStatute ID: ${statute.id}` : ''}`;
 
-	const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+	const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }
 				],
 				stream: true,
-				options: { temperature: 0.4 }
+				temperature: 0.4,
+				max_tokens: 1536
 			}),
 			signal: AbortSignal.timeout(90_000)
 		});
 
 		if (!res.ok || !res.body) {
-			return new Response(`data: {"error":"Ollama error: ${res.status}"}\n\n`, {
+			return new Response(`data: {"error":"llama-server error: ${res.status}"}\n\n`, {
 				status: 502,
 				headers: { 'Content-Type': 'text/event-stream' }
 			});
@@ -78,8 +77,8 @@ application scope, relevant case law, and practical implications.`;
 				for (const line of text.split('\n')) {
 					if (!line.trim()) continue;
 					try {
-						const parsed = JSON.parse(line);
-						const chunk = parsed.message?.content || '';
+						const parsed = JSON.parse(line.replace(/^data:\s*/, ''));
+						const chunk = parsed.choices?.[0]?.delta?.content || parsed.choices?.[0]?.message?.content || '';
 						if (chunk) {
 							controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ chunk })}\n\n`));
 						}

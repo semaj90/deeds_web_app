@@ -9,6 +9,7 @@ import { db } from '$lib/server/db/client';
 import { clusterSummaries } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 const resummarizeSchema = z.object({
 	model: z.string().min(1).max(100).optional(),
@@ -16,7 +17,7 @@ const resummarizeSchema = z.object({
 });
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const DEFAULT_MODEL = 'gemma4-rotorquant:latest-fast:latest';
+const DEFAULT_MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 const EMBED_MODEL = 'embeddinggemma:latest';
 
 // ─── GET ─────────────────────────────────────────────────────────────────────
@@ -103,20 +104,18 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		return json({ ok: false, item: null, degraded: true, error: 'No code chunks found for this cluster.' }, { status: 207 });
 	}
 
-	// Call Ollama
+	// Call llama-server (:8090) for summarization — never Ollama for chat/synthesis
 	const prompt = buildPrompt(clusterId, snippets);
 	let summaryText: string;
 	try {
-		const resp = await fetch(`${OLLAMA_URL}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model, prompt, stream: false, options: { temperature: 0.3, num_predict: 512 } }),
-			signal: AbortSignal.timeout(120_000),
-		});
-		const data = await resp.json();
-		summaryText = (data.response as string).trim();
+		const content = await bifrostChat(
+			[{ role: 'user', content: prompt }],
+			model,
+			{ temperature: 0.3, maxTokens: 512, timeoutMs: 120_000 }
+		);
+		summaryText = content.trim();
 	} catch (e: unknown) {
-		console.error(`[codeintel] Ollama summarize cluster ${clusterId} failed:`, e instanceof Error ? e.message : String(e));
+		console.error(`[codeintel] summarize cluster ${clusterId} failed:`, e instanceof Error ? e.message : String(e));
 		return json({ ok: false, item: null, degraded: true, error: 'Cluster summarization unavailable.' }, { status: 207 });
 	}
 

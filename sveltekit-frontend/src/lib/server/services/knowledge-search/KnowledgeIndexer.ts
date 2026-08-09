@@ -12,6 +12,7 @@
 import type { CrawledDocument, IndexResult,
   ReindexStats } from './types.js';
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 export interface KnowledgeIndexerConfig {
   qdrantUrl: string;
@@ -245,24 +246,12 @@ ${content.slice(0, 4000)}
 
 Summary:`;
 
-      const response = await fetch(`${this.config.ollamaUrl}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-	body: JSON.stringify({
-	model: this.config.summaryModel,
-          prompt,
-          stream: false,
-          options: {
-	temperature: 0.3, num_predict: 200 },
-	})
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ollama summary failed, ${response.status}`);
-      }
-
-      const data = await response.json();
-      let summary = data.response?.trim() ?? '';
+      const raw = await bifrostChat(
+        [{ role: 'user', content: prompt }],
+        this.config.summaryModel,
+        { temperature: 0.3, maxTokens: 200 }
+      );
+      let summary = raw.trim();
 
       // Truncate if > 500 chars (Requirement 2.4)
       if (summary.length > 500) {

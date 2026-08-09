@@ -6,7 +6,7 @@
  *
  * Exports:
  *   buildGemma4AcePrompt(context, task?)  — deterministic prompt string
- *   callGemma4WithAceContext(...)         — calls Ollama, returns structured result
+ *   callGemma4WithAceContext(...)         — calls llama-server, returns structured result
  *   generateFixRecommendationsFromAce(...)— targeted repair plan for Claude Code
  */
 
@@ -14,13 +14,11 @@ import { ENV } from '$lib/server/env.server.js';
 import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
 import {
-  assertDirectOllamaAllowed,
   bifrostChat,
   getChatModelKeepAlive,
   getOllamaRequestTimeoutMs,
-  ollamaFetch,
 } from '../ollama.js';
-import { getOllamaEndpoint } from '../utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL } from '../ai/local-llama-provider.js';
 import { getRedis } from '../redis.js';
 
 async function getHypergraphStore() {
@@ -289,17 +287,12 @@ export async function callGemma4WithAceContext(
     };
   }
 
-  // ── Route through bifrostChat for Hypergraph & Lane Support ────────────────
+  // ── Route through llama-server / bifrostChat for Hypergraph & Lane Support ────────────────
   try {
     const assistantStartedAt = Date.now();
     const content = formatField
       ? await (async () => {
-          assertDirectOllamaAllowed(
-            'ace/gemma4-codeintel',
-            'json-schema',
-            'Structured JSON schema format is required for this lane.'
-          );
-          const response = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+          const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -309,25 +302,20 @@ export async function callGemma4WithAceContext(
                 { role: 'user', content: userPrompt },
               ],
               stream: false,
-              keep_alive: getChatModelKeepAlive(),
-              format: formatField,
-              options: {
-                temperature,
-                num_predict: maxTokens,
-                num_ctx: RUNTIME_CONTEXT_SIZE,
-                repeat_penalty: 1.05,
-              },
+              temperature,
+              max_tokens: maxTokens,
+              response_format: formatField,
             }),
             signal: AbortSignal.timeout(requestTimeoutMs),
           });
 
           if (!response.ok) {
             const errText = await response.text().catch(() => '');
-            throw new Error(`Ollama /api/chat failed: ${response.status} ${errText.slice(0, 200)}`);
+            throw new Error(`llama-server /v1/chat/completions failed: ${response.status} ${errText.slice(0, 200)}`);
           }
 
-          const data = (await response.json()) as { message?: { content?: string } };
-          return data.message?.content ?? '';
+          const data = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
+          return data.choices?.[0]?.message?.content ?? '';
         })()
       : await bifrostChat(
           [
@@ -408,7 +396,7 @@ export async function callGemma4WithAceContext(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Multi-step tool-calling loop  (uses /api/chat, NOT /api/generate)
+// Multi-step tool-calling loop  (uses llama-server chat/completions, not generate)
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -542,7 +530,7 @@ type OllamaMessage = {
 };
 
 /**
- * Multi-step Gemma 4 tool-calling loop via Ollama /api/chat.
+ * Multi-step Gemma 4 tool-calling loop via llama-server /v1/chat/completions.
  *
  * Loop:
  *   1. Send messages + tool definitions to Ollama.
@@ -569,7 +557,7 @@ export async function callGemma4WithTools(
   const startMs = Date.now();
   const keepAlive = getChatModelKeepAlive();
 
-  // Ollama tool definitions — executor stripped (local-only)
+  // Tool definitions — executor stripped (local-only)
   const ollamaTools = tools.map((t) => ({
     type: 'function' as const,
     function: { name: t.name, description: t.description, parameters: t.parameters },
@@ -589,13 +577,8 @@ export async function callGemma4WithTools(
 
   try {
     for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-      assertDirectOllamaAllowed(
-        'ace/gemma4-codeintel',
-        'tool-calls',
-        'Native tool-calling loop requires direct /api/chat tools payload.'
-      );
       const assistantStartedAt = Date.now();
-      const response = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+      const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -603,41 +586,39 @@ export async function callGemma4WithTools(
           messages,
           tools: ollamaTools,
           stream: false,
-          keep_alive: keepAlive,
-          options: {
-            temperature,
-            num_predict: maxTokens,
-            num_ctx: RUNTIME_CONTEXT_SIZE,
-            repeat_penalty: 1.05,
-          },
+          temperature,
+          max_tokens: maxTokens,
         }),
         signal: AbortSignal.timeout(requestTimeoutMs),
       });
 
       if (!response.ok) {
         const errText = await response.text().catch(() => '');
-        throw new Error(`Ollama /api/chat failed: ${response.status} ${errText.slice(0, 200)}`);
+        throw new Error(`llama-server /v1/chat/completions failed: ${response.status} ${errText.slice(0, 200)}`);
       }
 
       const data = (await response.json()) as {
-        message?: {
-          content?: string;
-          tool_calls?: Array<{ function: { name: string; arguments: Record<string, unknown> } }>;
-        };
+        choices?: Array<{
+          message?: {
+            content?: string;
+            tool_calls?: Array<{ function: { name: string; arguments: Record<string, unknown> } }>;
+          };
+        }>;
       };
       const assistantDurationMs = Date.now() - assistantStartedAt;
-      const emittedToolCalls = data.message?.tool_calls?.length ?? 0;
+      const assistantMessage = data.choices?.[0]?.message;
+      const emittedToolCalls = assistantMessage?.tool_calls?.length ?? 0;
       assistantTurns.push({
         round: round + 1,
         durationMs: assistantDurationMs,
         toolCalls: emittedToolCalls,
       });
 
-      const msg: OllamaMessage = data.message
+      const msg: OllamaMessage = assistantMessage
         ? {
             role: 'assistant',
-            content: data.message.content ?? '',
-            tool_calls: data.message.tool_calls,
+            content: assistantMessage.content ?? '',
+            tool_calls: assistantMessage.tool_calls,
           }
         : { role: 'assistant', content: '' };
 

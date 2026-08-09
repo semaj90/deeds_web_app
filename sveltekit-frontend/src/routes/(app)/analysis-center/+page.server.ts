@@ -4,7 +4,7 @@ import { zod4 as zod } from 'sveltekit-superforms/adapters';
 import { db } from '$lib/server/db/client';
 import { evidence, cases } from '$lib/server/db/schema-postgres.js';
 import { desc, eq, sql, count } from 'drizzle-orm';
-import { getOllamaUrl } from '$lib/config/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import type { Actions, PageServerLoad } from './$types.js';
 import { evidenceSearchSchema } from './schema.js';
 
@@ -113,7 +113,6 @@ export const actions: Actions = {
 		const { query, mode } = form.data;
 
 		try {
-			const ollamaUrl = getOllamaUrl();
 			const systemPrompts: Record<string, string> = {
 				pattern:
 					'Analyze the following legal evidence for patterns. Identify recurring themes, behavioral patterns, temporal sequences, and anomalies. Be specific and cite evidence types.',
@@ -125,24 +124,11 @@ export const actions: Actions = {
 
 			const prompt = `${systemPrompts[mode] ?? systemPrompts.pattern}\n\nQuery: ${query}\n\nProvide structured analysis in this format:\n1. Key Findings (bullet points)\n2. Confidence Level (high/medium/low with percentage)\n3. Recommended Actions\n4. Related Evidence Types to investigate`;
 
-			const res = await fetch(`${ollamaUrl}/api/generate`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
-					prompt,
-					stream: false,
-					options: { num_predict: 2048, temperature: 0.3 }
-				}),
-				signal: AbortSignal.timeout(30_000)
-			});
-
-			if (!res.ok) {
-				throw new Error(`Ollama error: ${res.status}`);
-			}
-
-			const result = (await res.json()) as { response?: string };
-			const analysisText = result.response ?? '';
+			const analysisText = await bifrostChat(
+				[{ role: 'user', content: prompt }],
+				'gemma4-legal-iq4xs-direct.gguf',
+				{ maxTokens: 2048, temperature: 0.3, timeoutMs: 30_000 }
+			);
 
 			// Extract confidence from response text
 			const confMatch = analysisText.match(/(\d{1,3})%/);

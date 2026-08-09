@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Pool } from 'pg';
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 const pgPool = new Pool({
   host: process.env.POSTGRES_HOST || 'localhost',
@@ -11,10 +11,7 @@ const pgPool = new Pool({
   password: process.env.POSTGRES_PASSWORD || '123456',
 });
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || 'redis',
+const redis = getValkeyClient().duplicate({
   lazyConnect: true,
   enableOfflineQueue: false,
   retryStrategy: () => null,

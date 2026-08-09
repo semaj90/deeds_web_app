@@ -3,8 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, evidence, cases } from '$lib/server/db/schema-postgres.js';
 import { and, eq, isNull, or, sql, arrayContains } from 'drizzle-orm';
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
@@ -128,7 +127,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 /**
  * POST /api/persons-of-interest/[id]/risk
- * Update the AI risk profile via Ollama analysis
+ * Update the AI risk profile via the local llama server
  */
 export const POST: RequestHandler = async ({ params, locals, request }) => {
   if (!locals.user) throw error(401, 'Unauthorized');
@@ -145,7 +144,7 @@ export const POST: RequestHandler = async ({ params, locals, request }) => {
 
   if (!poi) throw error(404, 'Person of interest not found');
 
-  // Generate AI risk assessment via Ollama
+  // Generate AI risk assessment via the local model server
   const prompt = `Analyze risk profile for person of interest:
 Name: ${poi.name}
 Threat Level: ${poi.threatLevel}
@@ -161,23 +160,33 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
     recommendations: [],
     lastUpdated: '',
   };
-  const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
   try {
-    const ollamaRes = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
+    const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.ROTORQUANT_CHAT_MODEL,
-        prompt,
-        format: riskResponseJsonSchema,
+        model: LOCAL_VLM_MODEL,
+        messages: [
+          { role: 'system', content: 'You assess POI risk profiles and return valid JSON.' },
+          { role: 'user', content: prompt },
+        ],
         stream: false,
+        temperature: 0.3,
+        max_tokens: 512,
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'poi_risk',
+            schema: riskResponseJsonSchema,
+          },
+        },
       }),
       signal: AbortSignal.timeout(30000),
     });
     if (ollamaRes.ok) {
       const data = await ollamaRes.json();
-      const parsed = JSON.parse(data.response);
+      const parsed = JSON.parse(data.choices?.[0]?.message?.content ?? '');
       aiProfile = {
         riskScore: Math.min(Math.max(Number(parsed.riskScore) || 0, 0), 100),
         patterns: Array.isArray(parsed.patterns) ? parsed.patterns.slice(0, 10) : [],
@@ -188,7 +197,7 @@ Provide a JSON object with: riskScore (0-100), patterns (string[]), recommendati
       };
     }
   } catch (e) {
-    console.warn('[POI Risk] Ollama unavailable, using existing profile:', (e as Error).message);
+    console.warn('[POI Risk] Local model unavailable, using existing profile:', (e as Error).message);
   }
 
   // Persist the updated profile

@@ -40,6 +40,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { classifyDocument } from '$lib/server/nlp/analyzer.js';
 import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
 
 import { insertEvidenceSchema } from '$lib/server/db/zod-schemas.js';
@@ -1149,21 +1150,31 @@ async function processAndEmbed(
         .map((b, i) => `${i + 1}. [${b.type}] ${b.text.slice(0, 150)}`)
         .join('\n');
 
-      const vlmRerankRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+      const vlmRerankRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: ENV.ROTORQUANT_CHAT_MODEL,
-          prompt: `You are a legal document analyst. Below are sections extracted from an evidence document via structural analysis.\n\nFor each section, assess its legal relevance. Output a JSON object with:\n- "quality": overall document structural quality score 0.0 to 1.0\n- "sections": array of detected legal section types from this list: FACTS, LEGAL_AUTHORITY, CLAIMS, PROCEDURAL_HISTORY, EVIDENCE, PRAYER_HOLDING, TESTIMONY, FINANCIAL, CONTRACT, CORRESPONDENCE, OTHER\n\nSections:\n${sectionSummary}\n\nRespond with ONLY the JSON object, no explanation.`,
+          model: LOCAL_VLM_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a legal document analyst. Return only valid JSON.',
+            },
+            {
+              role: 'user',
+              content: `You are a legal document analyst. Below are sections extracted from an evidence document via structural analysis.\n\nFor each section, assess its legal relevance. Output a JSON object with:\n- "quality": overall document structural quality score 0.0 to 1.0\n- "sections": array of detected legal section types from this list: FACTS, LEGAL_AUTHORITY, CLAIMS, PROCEDURAL_HISTORY, EVIDENCE, PRAYER_HOLDING, TESTIMONY, FINANCIAL, CONTRACT, CORRESPONDENCE, OTHER\n\nSections:\n${sectionSummary}\n\nRespond with ONLY the JSON object, no explanation.`,
+            },
+          ],
           stream: false,
-          options: { temperature: 0, num_predict: 512 },
+          temperature: 0,
+          max_tokens: 512,
         }),
         signal: AbortSignal.timeout(45_000),
       });
 
       if (vlmRerankRes.ok) {
         const vlmData = await vlmRerankRes.json();
-        const rawResponse: string = vlmData.response ?? '';
+        const rawResponse: string = vlmData.choices?.[0]?.message?.content ?? '';
         const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {

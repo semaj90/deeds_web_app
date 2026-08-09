@@ -118,7 +118,7 @@ export const COMMON_SERVICES: Record<string, ServiceConfig> = {
   redis: {
     envVar: 'REDIS_HOST',
     fallback: ENV.REDIS_URL,
-    containerName: 'redis',
+    containerName: 'legal-ai-valkey',
     port: 6379,
     verify: false,
   },

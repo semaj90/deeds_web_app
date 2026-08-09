@@ -611,6 +611,7 @@
     "atlas:louvain:apply": "node ../scripts/atlas/compute-louvain-neo4j.mjs --apply",
     "atlas:leiden:dry": "node ../scripts/atlas/compute-leiden-neo4j.mjs --dry-run",
     "atlas:leiden:apply": "node ../scripts/atlas/compute-leiden-neo4j.mjs --apply",
+    "atlas:community-taxonomy:smoke": "npx tsx ../scripts/atlas/smoke-community-taxonomy.mjs",
     "atlas:error:mapreduce:dry": "node ../scripts/atlas/agentic-error-mapreduce.mjs --dry-run --verbose",
     "atlas:error:mapreduce:apply": "node ../scripts/atlas/agentic-error-mapreduce.mjs --window-minutes 60",
     "atlas:summaries:topk:dry": "node ../scripts/atlas/cluster-summaries-topk.mjs --dry-run --verbose",

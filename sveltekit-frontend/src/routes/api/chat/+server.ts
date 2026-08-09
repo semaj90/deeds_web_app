@@ -80,8 +80,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       toolContext = { rgSearch, langExtract };
     }
 
-    // Acquire GPU lease for Ollama (non-blocking — continue even if lease fails)
-    const lease = await acquireGpuLease('ollama', 60).catch(() => null);
+    // Acquire GPU lease for llama-server (non-blocking — continue even if lease fails)
+    const lease = await acquireGpuLease('llama-server', 60).catch(() => null);
     const startMs = performance.now();
 
     const sourceRefBlock = toolContext
@@ -172,7 +172,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   } catch (err) {
     console.error('[/api/chat]', err);
     // Release lease on error so TRT-LLM can take over if needed
-    await releaseGpuLease('ollama').catch((e) =>
+    await releaseGpuLease('llama-server').catch((e) =>
       console.warn('[/api/chat] GPU lease release failed:', e)
     );
     return json({ message: 'Chat service error', response: '' }, { status: 503 });

@@ -40,6 +40,7 @@ import { rerank as semanticRerank, healthCheckReranker } from '$lib/server/retri
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { attentionScoreChunks } from '$lib/server/gpu/libtorch-bridge.js';
 import { getRedis } from '$lib/server/redis.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 
 // Re-export ContextDoc so callers don't need graph-informed-retrieval import
 export type { ContextDoc };
@@ -217,7 +218,7 @@ async function correctiveRetrieval(
 	if (topScore >= CORRECTIVE_RAG_THRESHOLD) return { docs, reformulated: false };
 
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
+		const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

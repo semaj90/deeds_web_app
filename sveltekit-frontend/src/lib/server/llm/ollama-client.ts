@@ -1,5 +1,5 @@
 /**
- * Ollama/Gemma4 LLM Client - Task 5.3
+ * Local llama-server/Gemma4 LLM Client - Task 5.3
  *
  * Provides a clean interface for LLM integration with the RAG system.
  * Supports both streaming and non-streaming responses.
@@ -7,17 +7,15 @@
  */
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { getChatModelKeepAlive, bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat, ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
-const DEFAULT_URL =
-  ENV.TURBOQUANT_URL ??
-  ENV.TURBOQUANT_BASE_URL ??
-  ENV.OLLAMA_BASE_URL;
+const DEFAULT_URL = LLAMA_SERVER_BASE_URL;
 const DEFAULT_MODEL =
-  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
+  process.env.OLLAMA_MODEL_CHAT ?? process.env.OLLAMA_MODEL ?? LOCAL_VLM_MODEL;
 
 // Canonical model parameters — mirrors gemma3Q4_K_M/Modelfile PARAMETER values.
-// All TS callers previously missed num_ctx and repeat_penalty, letting Ollama
+// All TS callers previously missed num_ctx and repeat_penalty, letting the local server
 // silently fall back to its own built-in defaults instead of the Modelfile values.
 const GEMMA3_DEFAULTS = {
   temperature: 0.1, // Modelfile: temperature 0.1  (legal precision, not creativity)
@@ -71,7 +69,7 @@ export interface LLMResponse {
 }
 
 /**
- * Generate a completion using Ollama (or Bifrost when enabled)
+ * Generate a completion using the local server (or Bifrost when enabled)
  */
 export async function generateCompletion(
   prompt: string,
@@ -93,23 +91,19 @@ export async function generateCompletion(
   }
 
   return traceLLM('generate-completion', { model, prompt: prompt.slice(0, 500) }, async (gen) => {
-    const response = await ollamaFetch(`${DEFAULT_URL}/api/generate`, {
+    const response = await fetch(`${DEFAULT_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
-        prompt,
+        messages: [{ role: 'user', content: prompt }],
         stream: false,
-        keep_alive: getChatModelKeepAlive(),
-        options: {
-          temperature: options.temperature ?? getModelDefaults(model).temperature,
-          num_predict: options.maxTokens ?? getModelDefaults(model).num_predict,
-          top_p: options.topP ?? getModelDefaults(model).top_p,
-          top_k: options.topK ?? getModelDefaults(model).top_k,
-          num_ctx: getModelDefaults(model).num_ctx,
-          repeat_penalty: getModelDefaults(model).repeat_penalty,
-        },
+        temperature: options.temperature ?? getModelDefaults(model).temperature,
+        max_tokens: options.maxTokens ?? getModelDefaults(model).num_predict,
+        top_p: options.topP ?? getModelDefaults(model).top_p,
+        top_k: options.topK ?? getModelDefaults(model).top_k,
       }),
+      signal: AbortSignal.timeout(120_000),
     });
 
     if (!response.ok) {
@@ -119,7 +113,7 @@ export async function generateCompletion(
 
     const data = await response.json();
     const result: LLMResponse = {
-      content: data.response,
+      content: data.choices?.[0]?.message?.content ?? '',
       model: data.model,
       totalDuration: data.total_duration,
       promptEvalCount: data.prompt_eval_count,
@@ -158,23 +152,19 @@ export async function chatCompletion(
   }
 
   return traceLLM('chat-completion', { model, messages: messages.slice(-3) }, async (gen) => {
-    const response = await ollamaFetch(`${DEFAULT_URL}/api/chat`, {
+    const response = await fetch(`${DEFAULT_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
         messages,
         stream: false,
-        keep_alive: getChatModelKeepAlive(),
-        options: {
-          temperature: options.temperature ?? getModelDefaults(model).temperature,
-          num_predict: options.maxTokens ?? getModelDefaults(model).num_predict,
-          top_p: options.topP ?? getModelDefaults(model).top_p,
-          top_k: options.topK ?? getModelDefaults(model).top_k,
-          num_ctx: getModelDefaults(model).num_ctx,
-          repeat_penalty: getModelDefaults(model).repeat_penalty,
-        },
+        temperature: options.temperature ?? getModelDefaults(model).temperature,
+        max_tokens: options.maxTokens ?? getModelDefaults(model).num_predict,
+        top_p: options.topP ?? getModelDefaults(model).top_p,
+        top_k: options.topK ?? getModelDefaults(model).top_k,
       }),
+      signal: AbortSignal.timeout(120_000),
     });
 
     if (!response.ok) {
@@ -184,7 +174,7 @@ export async function chatCompletion(
 
     const data = await response.json();
     const result: LLMResponse = {
-      content: data.message?.content ?? '',
+      content: data.choices?.[0]?.message?.content ?? '',
       model: data.model,
       totalDuration: data.total_duration,
       promptEvalCount: data.prompt_eval_count,
@@ -273,7 +263,7 @@ JSON:`;
 }
 
 /**
- * Check if Ollama is available (always checks Ollama directly, not Bifrost)
+ * Check if the local server is available (always checks it directly, not Bifrost)
  */
 export async function checkOllamaHealth(): Promise<{
 	available: boolean;

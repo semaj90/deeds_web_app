@@ -1,10 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const suggestFixSchema = z.object({
 	route: z.string().max(500).optional(),
@@ -20,8 +17,8 @@ const suggestFixSchema = z.object({
 
 /**
  * POST /api/phase72/suggest-fix
- * AI-powered fix suggestions using local Ollama (gemma4-rotorquant:latest).
- * Falls back to static suggestions if Ollama is unavailable.
+ * AI-powered fix suggestions using the local llama server.
+ * Falls back to static suggestions if the server is unavailable.
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -36,7 +33,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const errorMsg = payload.message ?? payload.errors?.[0]?.message ?? 'Unknown error';
 		const errorCode = payload.code ?? payload.errors?.[0]?.code ?? 'UNKNOWN';
 
-		// Try Ollama for AI-powered suggestions
+		// Try the local llama server for AI-powered suggestions
 		try {
 			const prompt = `You are a SvelteKit 2 + Svelte 5 expert. Analyze this route error and suggest fixes.
 
@@ -52,20 +49,25 @@ Provide:
 
 Respond in JSON: {"plan": "...", "suggestions": ["..."], "related_routes": ["..."]}`;
 
-			const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+			const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
-					prompt,
+					model: LOCAL_VLM_MODEL,
+					messages: [
+						{ role: 'system', content: 'You are a SvelteKit 2 + Svelte 5 expert. Always answer in valid JSON.' },
+						{ role: 'user', content: prompt },
+					],
 					stream: false,
-					options: { temperature: 0.2, num_predict: 512 },
+					temperature: 0.2,
+					max_tokens: 512,
 				}),
+				signal: AbortSignal.timeout(30_000),
 			});
 
 			if (res.ok) {
 				const data = await res.json();
-				const text = data.response ?? '';
+				const text = data.choices?.[0]?.message?.content ?? '';
 				const jsonMatch = text.match(/\{[\s\S]*\}/);
 				if (jsonMatch) {
 					const parsed = JSON.parse(jsonMatch[0]);
@@ -83,10 +85,10 @@ Respond in JSON: {"plan": "...", "suggestions": ["..."], "related_routes": ["...
 				});
 			}
 		} catch {
-			// Ollama unavailable — fall through to static suggestions
+			// Local model unavailable — fall through to static suggestions
 		}
 
-		// Static fallback when Ollama is not running
+		// Static fallback when the local model is not running
 		return json({
 			plan: `### Fix Suggestions for \`${route}\`\n\n1. **Run svelte-check** to identify type errors\n2. **Update route layout** if component props changed\n3. **Check imports** for missing or misnamed components\n4. **Verify Svelte 5 runes** — replace \`export let\` with \`$props()\``,
 			suggestions: [

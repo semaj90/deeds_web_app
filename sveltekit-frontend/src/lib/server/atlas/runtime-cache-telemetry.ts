@@ -6,6 +6,7 @@
  */
 
 import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 export interface CacheTelemetry {
   browser_cache_hits: number;
@@ -38,10 +39,7 @@ class RuntimeCacheTelemetryCollector {
   private metricsPrefix = 'runtime-cache:telemetry';
 
   constructor(redisClient?: Redis) {
-    this.redis = redisClient || new Redis({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    this.redis = redisClient || getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null

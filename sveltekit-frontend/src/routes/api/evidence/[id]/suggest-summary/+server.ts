@@ -3,12 +3,12 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq } from 'drizzle-orm';
-import { getChatModelKeepAlive } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 
 /**
  * POST /api/evidence/[id]/suggest-summary
- * Generate an AI-suggested summary for an evidence item using Ollama
+ * Generate an AI-suggested summary for an evidence item using the local llama server
  */
 export const POST: RequestHandler = async ({ params, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -37,23 +37,28 @@ export const POST: RequestHandler = async ({ params, locals }) => {
     let suggestedText = `Summary of "${item.title}": ${item.description ?? 'No description available.'}`;
 
     try {
-      const { ollamaFetch } = await import('$lib/server/ollama.js');
-      const ollamaRes = await ollamaFetch('/api/generate', {
+      const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
-          prompt: `Summarize this evidence item for a legal case review. Be concise (2-3 sentences).\n\nEvidence: ${context}`,
+          model: LOCAL_VLM_MODEL,
+          messages: [
+            { role: 'system', content: 'You summarize evidence for legal review. Be concise and direct.' },
+            { role: 'user', content: `Summarize this evidence item for a legal case review. Be concise (2-3 sentences).\n\nEvidence: ${context}` },
+          ],
           stream: false,
-          keep_alive: getChatModelKeepAlive(),
+          temperature: 0.2,
+          max_tokens: 256,
         }),
+        signal: AbortSignal.timeout(30_000),
       });
       if (ollamaRes.ok) {
         const data = await ollamaRes.json();
-        if (data.response) suggestedText = data.response.trim();
+        const content = data.choices?.[0]?.message?.content ?? '';
+        if (content) suggestedText = content.trim();
       }
     } catch {
-      // Ollama unavailable — use basic summary
+      // Local model unavailable — use basic summary
     }
 
     return json({

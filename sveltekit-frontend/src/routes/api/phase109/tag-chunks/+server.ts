@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { degradedJson } from '$lib/server/api-response.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 /**
  * Phase 109: Auto-tag Qdrant codebase chunks via LLM
@@ -25,11 +26,11 @@ const TAG_CATEGORIES = [
 ];
 
 /**
- * Classify a code chunk into categories via ollama
+ * Classify a code chunk into categories via llama-server (:8090) — never Ollama
+ * for chat/synthesis.
  */
 async function classifyChunk(content: string): Promise<string[]> {
-	const ollamaUrl = process.env.OLLAMA_URL ?? 'http://localhost:11434';
-	const model = process.env.ROTORQUANT_CHAT_MODEL ?? 'gemma3-legal:latest';
+	const model = process.env.ROTORQUANT_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
 
 	const prompt = `Classify this TypeScript/Svelte code chunk into 1-3 of these exact categories: ${TAG_CATEGORIES.join(', ')}.
 Respond ONLY with comma-separated category names from the list above. Nothing else.
@@ -38,16 +39,12 @@ Code:
 ${content.slice(0, 800)}`;
 
 	try {
-		const res = await fetch(`${ollamaUrl}/api/generate`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model, prompt, stream: false, options: { num_predict: 50 } }),
-			signal: AbortSignal.timeout(30000),
-		});
-		if (!res.ok) return [];
-		const data = await res.json() as { response?: string };
-		const raw = data.response?.trim() ?? '';
-		return raw.split(',').map((t) => t.trim().toLowerCase()).filter((t) => TAG_CATEGORIES.includes(t));
+		const raw = await bifrostChat(
+			[{ role: 'user', content: prompt }],
+			model,
+			{ maxTokens: 50, timeoutMs: 30_000 }
+		);
+		return raw.trim().split(',').map((t) => t.trim().toLowerCase()).filter((t) => TAG_CATEGORIES.includes(t));
 	} catch {
 		return [];
 	}

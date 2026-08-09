@@ -1,25 +1,23 @@
 /**
- * L1 Redis + Direct Ollama (Bifrost L2 bypassed)
+ * L1 Redis + Direct llama-server (Bifrost L2 bypassed)
  *
  * This is a simplified version of bifrostChat() that:
  * - Checks L1 Redis exact-match cache (5ms on hit)
- * - Falls back to direct Ollama (2.8s with gemma4-rotorquant:latest-fast)
+ * - Falls back to direct llama-server :8090 (chat/synthesis lane — never Ollama)
  * - Stores result in L1 for future hits
  * - SKIPS Bifrost L2 semantic cache (broken: base_url issue in v1.4.19)
  *
- * Use this for gemma4-rotorquant:latest-fast until Bifrost config is fixed.
- *
  * @example
- * const response = await ollamaCachedChat(
+ * const response = await llamaServerCachedChat(
  *   [{ role: 'user', content: 'What is hearsay?' }],
- *   'gemma4-rotorquant:latest-fast',
+ *   'gemma4-legal-iq4xs-direct.gguf',
  *   { temperature: 0.3, maxTokens: 200 }
  * );
  */
 
 import { ENV } from '$lib/server/env.server.js';
 
-export async function ollamaCachedChat(
+export async function llamaServerCachedChat(
   messages: Array<{ role: string; content: string }>,
   model: string,
   options?: { temperature?: number; maxTokens?: number; timeoutMs?: number }
@@ -45,38 +43,35 @@ export async function ollamaCachedChat(
     return exactMatch.content;
   }
 
-  console.log(`[ollama-cached] L1 MISS — calling Ollama directly`);
+  console.log(`[ollama-cached] L1 MISS — calling llama-server directly`);
 
-  // ── Direct Ollama Call (skip Bifrost L2) ──
-  const prompt = normalizedMessages.map((m) => `${m.role}: ${m.content}`).join('\n\n');
+  // ── Direct llama-server Call (skip Bifrost L2) ──
   const startTime = performance.now();
 
-  const ollamaUrl = ENV.OLLAMA_BASE_URL;
-  const response = await fetch(`${ollamaUrl}/api/generate`, {
+  const llamaServerUrl = ENV.TURBOQUANT_BASE_URL ?? ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
+  const response = await fetch(`${llamaServerUrl}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model,
-      prompt,
+      messages: normalizedMessages,
       stream: false,
-      options: {
-        temperature: options?.temperature ?? 0.7,
-        num_predict: options?.maxTokens ?? 2048,
-      },
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 2048,
     }),
     signal: AbortSignal.timeout(options?.timeoutMs ?? 60_000),
   });
 
   if (!response.ok) {
     const text = await response.text().catch(() => '');
-    throw new Error(`Ollama error: ${response.status} ${text.slice(0, 200)}`);
+    throw new Error(`llama-server error: ${response.status} ${text.slice(0, 200)}`);
   }
 
   const data = await response.json();
-  const content = data.response || '';
+  const content = data.choices?.[0]?.message?.content || '';
   const latencyMs = Math.round(performance.now() - startTime);
 
-  console.log(`[ollama-cached] Ollama responded in ${latencyMs}ms`);
+  console.log(`[ollama-cached] llama-server responded in ${latencyMs}ms`);
 
   // Store in L1 for instant future retrieval
   if (content) {
@@ -85,7 +80,7 @@ export async function ollamaCachedChat(
       await setExactMatchCache(cacheKey, {
         content,
         model,
-        backend: 'ollama-direct',
+        backend: 'llama-server-direct',
       });
       console.log(`[ollama-cached] ✓ Successfully cached in L1`);
     } catch (cacheErr) {

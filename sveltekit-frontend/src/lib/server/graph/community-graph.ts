@@ -81,6 +81,13 @@ export interface CommunityBuildResult {
   durationMs: number;
 }
 
+export type CommunityAlgorithm = 'louvain' | 'leiden';
+
+export interface CommunityContextOptions {
+  algorithm?: CommunityAlgorithm;
+  skipEmbedding?: boolean;
+}
+
 // ── Encoding log ──────────────────────────────────────────────────────────────
 
 async function logEncoding(entry: EncodingLogEntry): Promise<void> {
@@ -146,21 +153,22 @@ async function inferCommunity(system: string, user: string, communityId: number)
     } catch { turboAvail = false; }
   }
 
-  // Fallback: Ollama
-  const res2 = await fetch(`${OLLAMA_URL}/api/chat`, {
+  // Fallback: live llama-server lane
+  const res2 = await fetch(`${TURBOQUANT_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: CHAT_MODEL,
       messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
       stream: false,
-      options: { temperature: 0.15, num_predict: 400 },
+      temperature: 0.15,
+      max_tokens: 400,
     }),
     signal: AbortSignal.timeout(120_000),
   });
-  if (!res2.ok) throw new Error(`Ollama ${res2.status}`);
-  const data2 = await res2.json() as { message?: { content?: string } };
-  const text2 = (data2.message?.content ?? '').trim();
+  if (!res2.ok) throw new Error(`llama-server ${res2.status}`);
+  const data2 = await res2.json() as { choices?: Array<{ message?: { content?: string } }> };
+  const text2 = (data2.choices?.[0]?.message?.content ?? '').trim();
   void logEncoding({ ts: Date.now(), eventType: 'turbo_miss', communityId, latencyMs: Date.now() - t0, model: CHAT_MODEL });
   return text2;
 }
@@ -474,42 +482,118 @@ export async function buildCommunityGraph(opts: {
  */
 export async function getCommunityContext(
   query: string,
-  limit = 2
+  limit = 2,
+  opts: CommunityContextOptions = {}
 ): Promise<Array<{ id: number; purpose: string; summary: string; tags: string[]; similarity: number }>> {
   try {
+    const algorithm = (opts.algorithm ?? (ENV.COMMUNITY_TAXONOMY_ALGORITHM as CommunityAlgorithm | undefined) ?? 'louvain') === 'leiden'
+      ? 'leiden'
+      : 'louvain';
+
+    if (algorithm === 'leiden') {
+      const { rows } = await pool.query(`
+        SELECT community_id, purpose, summary, tags, cohesion_score
+        FROM community_reports_leiden
+        ORDER BY cohesion_score DESC, community_id ASC
+        LIMIT $1
+      `, [limit]).catch(() => ({ rows: [] as Record<string, unknown>[] }));
+
+      return rows.map((r: Record<string, unknown>) => ({
+        id: Number(r.community_id),
+        purpose: String(r.purpose ?? ''),
+        summary: String(r.summary ?? ''),
+        tags: Array.isArray(r.tags) ? r.tags.map((t) => String(t)) : [],
+        similarity: Number(r.cohesion_score ?? 0),
+      }));
+    }
+
     const redis = getRedis();
 
     // Read community IDs from ZSET (top by cohesion)
     const ids = await redis.zrange('hg:community:idx', 0, 19, 'REV');
-    if (ids.length === 0) return [];
+    const queryVec = opts.skipEmbedding ? null : await generateSingleEmbedding(query).catch(() => null);
+    let records: CommunityRecord[] = [];
 
-    // Embed query
-    const queryVec = await generateSingleEmbedding(query).catch(() => null);
+    const parseRecord = (raw: string): CommunityRecord | null => {
+      try { return JSON.parse(raw) as CommunityRecord; } catch { return null; }
+    };
 
-    // Load community records — single MGET round-trip (was N parallel gets)
-    const commKeys = ids.map((id) => `hg:community:${id}`);
-    const commRaws = await redis.mget(...commKeys).catch(() => [] as Array<string | null>);
+    if (ids.length > 0) {
+      // Load community records — single MGET round-trip (was N parallel gets)
+      const commKeys = ids.map((id) => `hg:community:${id}`);
+      const commRaws = await redis.mget(...commKeys).catch(() => [] as Array<string | null>);
 
-    // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Community records
-    // include rich metadata (member files, summary, tags, cohesion) — typical
-    // record is 2-8KB so 10+ communities easily clear the threshold.
-    const commTotal = commRaws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
-    let parseComm: (s: string) => CommunityRecord = (s) => JSON.parse(s) as CommunityRecord;
-    if (commRaws.length >= 10 && commTotal >= 5_000) {
-      try {
-        const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
-        if (isSimdJsonAvailable()) parseComm = fastJsonParse<CommunityRecord>;
-      } catch { /* addon unavailable — keep V8 */ }
+      // simdjson AVX2 fast-parse for ≥10/≥5KB aggregate. Community records
+      // include rich metadata (member files, summary, tags, cohesion) — typical
+      // record is 2-8KB so 10+ communities easily clear the threshold.
+      const commTotal = commRaws.reduce((sum, r) => sum + (r?.length ?? 0), 0);
+      let parseComm: (s: string) => CommunityRecord = (s) => JSON.parse(s) as CommunityRecord;
+      if (commRaws.length >= 10 && commTotal >= 5_000) {
+        try {
+          const { fastJsonParse, isSimdJsonAvailable } = await import('$lib/server/gpu/simdjson-bridge.js');
+          if (isSimdJsonAvailable()) parseComm = fastJsonParse<CommunityRecord>;
+        } catch { /* addon unavailable — keep V8 */ }
+      }
+
+      records = commRaws
+        .map((raw): CommunityRecord | null => {
+          if (!raw) return null;
+          try { return parseComm(raw); } catch { return null; }
+        })
+        .filter((r): r is CommunityRecord => r !== null);
     }
 
-    const records = commRaws
-      .map((raw): CommunityRecord | null => {
-        if (!raw) return null;
-        try { return parseComm(raw); } catch { return null; }
-      })
-      .filter((r): r is CommunityRecord => r !== null);
+    if (records.length === 0) {
+      const { rows } = await pool.query(`
+        SELECT community_id, purpose, summary, tags, cohesion_score, embedding
+        FROM community_reports
+        ORDER BY cohesion_score DESC, community_id ASC
+        LIMIT $1
+      `, [limit]).catch(() => ({ rows: [] as Record<string, unknown>[] }));
 
-    if (records.length === 0) return [];
+      if (rows.length === 0) return [];
+
+      const fallbackRecords = rows.map((r: Record<string, unknown>) => ({
+        id: Number(r.community_id),
+        purpose: String(r.purpose ?? ''),
+        summary: String(r.summary ?? ''),
+        tags: Array.isArray(r.tags) ? r.tags.map((t) => String(t)) : [],
+        cohesionScore: Number(r.cohesion_score ?? 0),
+        embedding: Array.isArray(r.embedding) ? (r.embedding as number[]) : null,
+        builtAt: '',
+        clusterIds: [],
+        memberCount: 0,
+      }));
+
+      if (!queryVec) {
+        return fallbackRecords.slice(0, limit).map((r) => ({
+          id: r.id, purpose: r.purpose, summary: r.summary, tags: r.tags, similarity: r.cohesionScore,
+        }));
+      }
+
+      const communityIds = fallbackRecords.map((r) => r.id);
+      const { rows: simRows } = await pool.query(`
+        SELECT community_id,
+               1 - (embedding <=> $1::vector) AS similarity
+        FROM community_reports
+        WHERE community_id = ANY($2::int[])
+          AND embedding IS NOT NULL
+        ORDER BY embedding <=> $1::vector
+        LIMIT $3
+      `, [JSON.stringify(Array.from(queryVec)), communityIds, limit]).catch(() => ({ rows: [] as Record<string, unknown>[] }));
+
+      const simMap = new Map<number, number>(
+        simRows.map((r: Record<string, unknown>) => [Number(r.community_id), Number(r.similarity)] as [number, number])
+      );
+
+      return fallbackRecords
+        .map((r) => ({ ...r, similarity: simMap.get(r.id) ?? r.cohesionScore }))
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, limit)
+        .map((r) => ({
+          id: r.id, purpose: r.purpose, summary: r.summary, tags: r.tags, similarity: r.similarity,
+        }));
+    }
 
     // If no query embedding, fall back to top by cohesion
     if (!queryVec) {

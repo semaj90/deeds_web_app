@@ -6,12 +6,12 @@
  */
 
 import amqp from 'amqplib';
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { IdentityUpdatedEvent } from './mirror-sync-publisher.js';
 
 let channel: any = null;
-let redis: Redis | null = null;
+let redis: ReturnType<typeof getValkeyClient> | null = null;
 const QUEUE_NAME = 'redis-invalidate-workers';
 
 export async function startRedisInvalidateWorker(): Promise<void> {
@@ -19,10 +19,7 @@ export async function startRedisInvalidateWorker(): Promise<void> {
     const connection = await (amqp as any).connect(ENV.RABBITMQ_URL);
     channel = await connection.createChannel();
 
-    redis = new Redis({
-      host: ENV.REDIS_HOST || 'localhost',
-      port: Number(ENV.REDIS_PORT || 6379),
-      password: ENV.REDIS_PASSWORD || 'redis',
+    redis = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null

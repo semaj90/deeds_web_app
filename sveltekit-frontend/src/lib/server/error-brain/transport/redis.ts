@@ -5,8 +5,7 @@
 
 import type { ErrorBrainEvent } from '../events.js';
 import type { ErrorBrainTransport } from './interface.js';
-import { getRedis } from '$lib/server/redis.js';
-import { ENV } from '$lib/server/env.server.js';
+import { getValkeyClient, getValkeySubscriber } from '$lib/server/cache/valkey-client.js';
 
 const CHANNEL = 'error-brain:events';
 
@@ -15,7 +14,7 @@ export class RedisTransport implements ErrorBrainTransport {
 
 	async publish(evt: ErrorBrainEvent): Promise<void> {
 		try {
-			const redis = getRedis();
+			const redis = getValkeyClient();
 			await redis.publish(CHANNEL, JSON.stringify(evt));
 		} catch (err) {
 			console.warn(`[error-brain:redis] publish failed for ${evt.type}:`, err);
@@ -24,8 +23,8 @@ export class RedisTransport implements ErrorBrainTransport {
 
 	async subscribe(handler: (evt: ErrorBrainEvent) => void): Promise<() => void> {
 		// Subscriber needs a dedicated connection (ioredis cannot share pub/sub + commands)
-		const { default: Redis } = await import('ioredis');
-		const sub = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
+		const sub = getValkeySubscriber();
+		if (sub.status === 'wait') await sub.connect();
 
 		await sub.subscribe(CHANNEL);
 		sub.on('message', (_ch: string, msg: string) => {

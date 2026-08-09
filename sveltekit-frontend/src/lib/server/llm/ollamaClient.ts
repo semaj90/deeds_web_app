@@ -3,7 +3,7 @@
  * Uses gemma4-rotorquant:latest for legal document analysis
  */
 
-import { getOllamaEndpoint } from '$lib/utils/ollama-endpoint';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 export interface OllamaChatOptions {
 	model: string;
@@ -13,7 +13,7 @@ export interface OllamaChatOptions {
 }
 
 /**
- * Send a chat request to Ollama
+ * Send a chat request via llama-server (:8090) — never Ollama for chat/synthesis
  */
 export async function ollamaChat({
 	model,
@@ -21,30 +21,14 @@ export async function ollamaChat({
 	prompt,
 	temperature = 0.7
 }: OllamaChatOptions): Promise<string> {
-	const base = getOllamaEndpoint();
-
-	const response = await fetch(`${base}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    signal: AbortSignal.timeout(120_000),
-    body: JSON.stringify({
-      model,
-      stream: false,
-      options: { temperature },
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: prompt },
-      ],
-    }),
-  });
-
-	if (!response.ok) {
-		const text = await response.text().catch(() => '');
-		throw new Error(`Ollama chat failed: ${response.status} ${text}`);
-	}
-
-	const data = await response.json();
-	return data?.message?.content ?? '';
+	return bifrostChat(
+		[
+			{ role: 'system', content: system },
+			{ role: 'user', content: prompt },
+		],
+		model,
+		{ temperature, timeoutMs: 120_000 }
+	);
 }
 
 /**

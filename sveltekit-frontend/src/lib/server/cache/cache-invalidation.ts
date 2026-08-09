@@ -1,7 +1,6 @@
-import Redis from 'ioredis';
-import { ENV } from '../env.server.js';
+import { getValkeyClient } from './valkey-client.js';
 
-const redis = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
+const redis = getValkeyClient();
 
 /**
  * Compares old and new digests. If they differ, invalidates the specified Redis key patterns

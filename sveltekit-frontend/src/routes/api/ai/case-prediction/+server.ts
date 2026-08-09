@@ -2,8 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const casePredictionSchema = z.object({
 	caseId: z.string().min(1, 'caseId required').max(500)
@@ -38,30 +37,31 @@ Description: ${caseRow.description || 'No description'}
 
 Provide: 1) Likelihood of favorable outcome (0-100%), 2) Key risk factors, 3) Recommended next steps. Be concise.`;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: 'You are a legal case outcome analyst. Provide data-driven predictions.' },
 					{ role: 'user', content: prompt }
 				],
 				stream: false,
-				options: { temperature: 0.3 }
+				temperature: 0.3,
+				max_tokens: 1024
 			}),
 			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) return json({ error: 'AI service unavailable' }, { status: 502 });
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 
 		return json({
-			prediction: data.message?.content || '',
+			prediction: data.choices?.[0]?.message?.content || '',
 			caseId,
 			caseTitle: caseRow.title,
 			evidenceCount: evidenceCount?.count || 0,
-			model: 'gemma4-rotorquant:latest'
+			model: LOCAL_VLM_MODEL
 		});
 	} catch (err) {
 		console.error('[/api/ai/case-prediction]', err);

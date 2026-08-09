@@ -1,5 +1,4 @@
-import { ENV } from '../env.server.js';
-import { getOllamaEndpoint } from '../ollama.js';
+import { bifrostChat } from '../ollama.js';
 
 export async function suggestFix(query: string, atlasCards: any[]) {
   const relevant = atlasCards.slice(0, 3);
@@ -13,22 +12,9 @@ User encountered: ${query}
 Suggest a fix based on the known failures above.
 `;
 
-  const ollamaUrl = getOllamaEndpoint();
-
-  const res = await fetch(`${ollamaUrl}/api/generate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'gemma4-rotorquant:latest',
-      prompt: prompt,
-      stream: false
-    })
-  });
-
-  if (!res.ok) {
-    return "Could not generate fix from Ollama.";
-  }
-
-  const json = await res.json();
-  return json.response;
+  return bifrostChat(
+    [{ role: 'user', content: prompt }],
+    'gemma4-legal-iq4xs-direct.gguf',
+    { temperature: 0.2, maxTokens: 512, timeoutMs: 30_000 }
+  ).catch(() => "Could not generate fix from llama-server.");
 }

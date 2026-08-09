@@ -3,7 +3,7 @@
  *
  * Takes raw error context (compiler output, runtime logs, test failures)
  * and:
- *   1. Calls Gemma 4 to produce a structured error summary (via /api/chat)
+ *   1. Calls Gemma 4 via llama-server to produce a structured error summary
  *   2. Persists the summary to Postgres research_summaries
  *   3. Embeds the summary and upserts it to Qdrant (research_summaries collection)
  *   4. Tags the Qdrant point with error_type, affected_files, fix_hint
@@ -20,8 +20,7 @@
 import { ENV } from '$lib/server/env.server.js';
 import { db, qdrant } from '$lib/server/db/unified-client.js';
 import { sql } from 'drizzle-orm';
-import { assertDirectOllamaAllowed, ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -58,7 +57,7 @@ export interface ErrorKagResult {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LLM error summarization (uses /api/chat for tool compatibility)
+// LLM error summarization (uses llama-server /v1/chat/completions for tool compatibility)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ERROR_SYSTEM = `You are a TypeScript/SvelteKit error analyst.
@@ -78,19 +77,15 @@ async function callGemma4ForErrorSummary(
   model: string
 ): Promise<ErrorSummary | null> {
   try {
-    assertDirectOllamaAllowed(
-      'ace/ace-error-kag',
-      'error-summary',
-      'Schema-constrained error object extraction currently uses direct /api/chat format.'
-    );
-    const resp = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+    const resp = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
         stream: false,
-        options: { temperature: 0.1, num_predict: 512 },
-        format: {
+        temperature: 0.1,
+        max_tokens: 512,
+        response_format: {
           type: 'json_schema',
           json_schema: {
             name: 'error_summary',
@@ -115,9 +110,10 @@ async function callGemma4ForErrorSummary(
       }),
       signal: AbortSignal.timeout(60_000),
     });
-    if (!resp.ok) throw new Error(`Ollama HTTP ${resp.status}`);
-    const data = (await resp.json()) as { message: { content: string } };
-    return JSON.parse(data.message.content) as ErrorSummary;
+    if (!resp.ok) throw new Error(`llama-server HTTP ${resp.status}`);
+    const data = (await resp.json()) as { choices?: Array<{ message?: { content?: string } }> };
+    const content = data.choices?.[0]?.message?.content ?? '';
+    return JSON.parse(content) as ErrorSummary;
   } catch {
     return null;
   }
@@ -149,7 +145,7 @@ async function embedText(text: string): Promise<number[] | null> {
 
 export async function summarizeErrorToKag(input: ErrorKagInput): Promise<ErrorKagResult> {
   const start   = Date.now();
-  const model   = ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4-rotorquant:latest-fast:latest';
+  const model   = LOCAL_VLM_MODEL;
   const source  = input.source ?? 'unknown';
 
   // ── 1. LLM summarization ────────────────────────────────────────────────

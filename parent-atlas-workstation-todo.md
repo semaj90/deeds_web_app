@@ -200,6 +200,23 @@ The safer chain is:
 - **Rules**: ACE packets consume canonical and validated evidence; they do not establish source identity by themselves. A packet must reference authoritative packet keys, source refs, content hashes, and revision lineage before synthesis.
 - **Keywords**: `ace_materializer` → `packet_store` → `packet_persistence` → `synthesis_output`
 
+**Packet Wiring Audit**
+- **Assembler / packetize**: `sveltekit-frontend/src/lib/server/ace/context-assembler.ts` and `sveltekit-frontend/src/lib/server/ace/parent-atlas-packet-assembler.ts` are wired into live ACE routes; `sveltekit-frontend/src/lib/server/features/ai/ace/context-assembler.ts` is the bridge that pulls the packet assembler into the larger feature path.
+- **Validator**: `sveltekit-frontend/src/lib/server/acp/packet-assembler.ts` and `sveltekit-frontend/src/lib/server/acp/packet-envelope-validator.ts` are live ACP validation paths.
+- **Materializer**: `sveltekit-frontend/src/lib/server/ace/ace-materializer.ts`, `sveltekit-frontend/src/lib/server/atlas/packet-parser.ts`, and `sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts` are defined, but their full runtime caller chain still needs one last proof pass before treating them as fully wired.
+- **Audit rule**: do not promote packet materialization as complete until the caller trace is confirmed end to end.
+
+| File | Status | Phase / lane | Evidence |
+| --- | --- | --- | --- |
+| `sveltekit-frontend/src/lib/server/ace/context-assembler.ts` | LIVE | ACE Packet Assembly Lane / Phase 4D | Imported by live query, synthesis, agent, and router paths. |
+| `sveltekit-frontend/src/lib/server/ace/parent-atlas-packet-assembler.ts` | LIVE BRIDGE | ACE Packet Assembly Lane / Phase 4D | Imported by `indexed-source-packet.ts` and dynamically by the larger ACE feature assembler. |
+| `sveltekit-frontend/src/lib/server/acp/packet-assembler.ts` | LIVE | ACP packet assembly / validation lane | Self-validates envelopes before return; used as an ACP packet assembly path. |
+| `sveltekit-frontend/src/lib/server/acp/packet-envelope-validator.ts` | LIVE | ACP validation lane / Phase 4A adjacent | Used by ACP validation helpers and hyperRAG packet RPC validation. |
+| `sveltekit-frontend/src/lib/server/ace/ace-materializer.ts` | TESTED / NO LIVE CALLER FOUND | ACE materializer lane | Imported by tests; no runtime importer found in the current scan. |
+| `sveltekit-frontend/src/lib/server/atlas/packet-parser.ts` | DEFINES MATERIALIZE API / NO LIVE CALLER FOUND | Atlas packet parsing / materialization lane | Exports `profileArtifact` and `materializePackets`; no runtime importer found in the current scan. |
+| `sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts` | DEFINED / REGISTRY-REFERENCED | HyperRAG packet pipeline lane | Present in runtime registry; no source import caller found in the current scan. |
+| `sveltekit-frontend/src/lib/server/acp/packet-materializer-pipeline.ts` | ORPHAN UNTIL PROVEN | ACP materializer pipeline | No runtime importer found in the current scan. |
+
 **Semantic Labeling / Recommendation Lane**
 - **Purpose**: Turn validated packets into semantic labels, recommendation logs, and bounded candidate sets.
 - **Stack**: PageRank + Neo4j projection updates + Qdrant RRF + PyTorch/TorchInductor rerank.
@@ -466,6 +483,7 @@ The next bounded step is to reuse the existing owners instead of wiring a second
 - [ ] Copy the bundle into a temporary integration area.
 - [ ] Select one known failing test and capture the failure fingerprint.
 - [ ] Wire the minimal repair loop: `observe error` → `repair state` → `localize symbols` → `bounded context` → `surgical patch` → `verify repair` → `record repair episode`.
+- [ ] Audit the packetizer / assembler / validator caller chain and classify each file as live, bridge, or orphan before promoting packet materialization.
 - [ ] Verify the loop on one real failure before expanding scope.
 
 ### Step 2: Replace JSON-only context with Parent Atlas evidence

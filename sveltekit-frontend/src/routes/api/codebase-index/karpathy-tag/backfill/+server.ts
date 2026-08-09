@@ -20,9 +20,9 @@
  */
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 const QDRANT_URL  = ENV.QDRANT_URL;
-const OLLAMA_URL  = ENV.OLLAMA_BASE_URL;
 const COLLECTION  = 'codebase_chunks_768';
 
 const SEMANTIC_TAGS = [
@@ -123,21 +123,11 @@ async function classifyOne(chunk: ChunkPoint, model: string): Promise<string[]> 
 	].join('\n');
 
 	try {
-		const res = await fetch(`${OLLAMA_URL}/api/generate`, {
-			method:  'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body:    JSON.stringify({
-				model,
-				prompt,
-				stream:  false,
-				options: { temperature: 0, num_predict: 60 },
-			}),
-			signal: AbortSignal.timeout(30_000),
-		}).catch(() => null);
-
-		if (!res?.ok) return [];
-		const data = await res.json() as { response?: string };
-		const raw  = (data.response ?? '').replace(/\n/g, ' ').trim();
+		const raw = (await bifrostChat(
+			[{ role: 'user', content: prompt }],
+			model,
+			{ temperature: 0, maxTokens: 60, timeoutMs: 30_000 }
+		).catch(() => '')).replace(/\n/g, ' ').trim();
 
 		return [...new Set(
 			raw.split(/[,\s]+/)

@@ -22,9 +22,17 @@ function resolveUrl(): string {
     // dynamic require keeps Vite happy (tree-shaken in client bundles)
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { ENV } = require('$lib/server/env.server.js');
-    if (ENV?.REDIS_URL) {
-      const raw = String(ENV.REDIS_URL).trim();
-      const password = String(ENV?.REDIS_PASSWORD ?? process.env.REDIS_PASSWORD ?? process.env.REDIS_PASS ?? '').trim();
+    const rawEnvUrl = String(ENV?.VALKEY_URL ?? ENV?.REDIS_URL ?? '').trim();
+    if (rawEnvUrl) {
+      const password = String(
+        ENV?.VALKEY_PASSWORD ??
+          ENV?.REDIS_PASSWORD ??
+          process.env.VALKEY_PASSWORD ??
+          process.env.REDIS_PASSWORD ??
+          process.env.REDIS_PASS ??
+          ''
+      ).trim();
+      const raw = rawEnvUrl;
       if (raw && password) {
         try {
           const parsed = new URL(raw);
@@ -36,23 +44,28 @@ function resolveUrl(): string {
           // fall through
         }
       }
-      return ENV.REDIS_URL;
+      return raw;
     }
   } catch {
     // not in SvelteKit context — fall through to process.env
   }
-  return mergePasswordIntoUrl(process.env.REDIS_URL ?? buildUrlFromParts(), resolvePassword());
+  return mergePasswordIntoUrl(
+    process.env.VALKEY_URL ?? process.env.REDIS_URL ?? buildUrlFromParts(),
+    resolvePassword()
+  );
 }
 
 function resolvePassword(): string {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { ENV } = require('$lib/server/env.server.js');
+    if (ENV?.VALKEY_PASSWORD !== undefined) return ENV.VALKEY_PASSWORD;
     if (ENV?.REDIS_PASSWORD !== undefined) return ENV.REDIS_PASSWORD;
   } catch {
     // standalone
   }
   return (
+    process.env.VALKEY_PASSWORD ??
     process.env.REDIS_PASSWORD ??
     process.env.REDIS_PASS ??
     'redis'
@@ -146,6 +159,30 @@ export function getValkeyClient(): Redis {
   return _client;
 }
 
+/**
+ * Returns a duplicated client for blocking pub/sub-style consumers.
+ * Keeps the shared URL/password/retry policy while allowing a dedicated socket.
+ */
+export function getValkeySubscriber(): Redis {
+  return getValkeyClient().duplicate({
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    maxRetriesPerRequest: 1,
+  });
+}
+
+/**
+ * Returns a duplicated client for publisher-style consumers that should
+ * keep the same shared configuration but not share command state.
+ */
+export function getValkeyPublisher(): Redis {
+  return getValkeyClient().duplicate({
+    lazyConnect: true,
+    enableOfflineQueue: false,
+    maxRetriesPerRequest: 1,
+  });
+}
+
 let _lastError = '';
 
 /**
@@ -196,9 +233,10 @@ export async function getValkeyDiagnostics(): Promise<{
 
   // Determine auth source without printing the password
   let authSource = 'none';
-  if (process.env.REDIS_URL)      authSource = 'env:REDIS_URL';
-  else if (process.env.REDIS_PASSWORD || process.env.REDIS_PASS) authSource = 'env:REDIS_PASSWORD';
-  else                            authSource = 'default:redis';
+  if (process.env.VALKEY_URL)      authSource = 'env:VALKEY_URL';
+  else if (process.env.REDIS_URL)  authSource = 'env:REDIS_URL';
+  else if (process.env.VALKEY_PASSWORD || process.env.REDIS_PASSWORD || process.env.REDIS_PASS) authSource = 'env:VALKEY_PASSWORD';
+  else                             authSource = 'default:redis';
 
   const client = getValkeyClient();
   const status = client.status;

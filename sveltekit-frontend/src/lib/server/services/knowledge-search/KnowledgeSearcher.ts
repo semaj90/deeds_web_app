@@ -15,7 +15,7 @@ import type { SearchOptions, SearchResult,
   FullDocument, CollectionStats } from './types.js';
 import { ENV } from '$lib/server/env.server.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { getQdrantKnowledgeStore } from './QdrantKnowledgeStore.js';
 import { getTfIdfRanker } from './TfIdfRanker.js';
 import { getSeaweedKnowledgeStore } from './SeaweedKnowledgeStore.js';
@@ -271,29 +271,13 @@ Answer:`;
    */
   private async callOllama(prompt: string): Promise<string> {
     try {
-      const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
-          prompt,
-          stream: false,
-          options: {
-            temperature: 0.7,
-            top_p: 0.9,
-            num_predict: 500,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data?.response ?? 'No response generated';
+      return await bifrostChat(
+        [{ role: 'user', content: prompt }],
+        'gemma4-legal-iq4xs-direct.gguf',
+        { temperature: 0.7, maxTokens: 500 }
+      );
     } catch (error) {
-      console.error('Ollama API error:', error);
+      console.error('llama-server API error:', error);
       throw error;
     }
   }

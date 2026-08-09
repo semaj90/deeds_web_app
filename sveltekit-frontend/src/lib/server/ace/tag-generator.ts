@@ -9,10 +9,9 @@
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { ENV } from '$lib/server/env.server.js';
 import type { GeneratedTag } from './types.js';
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
-const OLLAMA_URL = getOllamaEndpoint();
-const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const MODEL = LOCAL_VLM_MODEL;
 
 interface TagResult {
 	legal: { statutes: string[]; cases: string[]; codes: string[] };
@@ -117,14 +116,15 @@ Categories must be from: criminal, civil-litigation, corporate, employment, inte
 
 Text: ${text}`;
 
-	const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+	const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			model: MODEL,
-			prompt,
+			messages: [{ role: 'user', content: prompt }],
 			stream: false,
-			options: { temperature: 0.1, num_predict: 512 }
+			temperature: 0.1,
+			max_tokens: 512
 		}),
 		signal: AbortSignal.timeout(15000)
 	});
@@ -132,7 +132,7 @@ Text: ${text}`;
 	if (!res.ok) throw new Error(`Ollama returned ${res.status}`);
 
 	const data = await res.json();
-	const responseText = String(data.response ?? '');
+	const responseText = String(data.choices?.[0]?.message?.content ?? '');
 
 	// Extract JSON from response (may be wrapped in markdown code blocks)
 	const jsonMatch = responseText.match(/\{[\s\S]*\}/);

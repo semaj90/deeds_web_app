@@ -12,6 +12,7 @@
  */
 
 import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import type { CacheLayersOrchestrationResult } from './cache-layers-orchestrator.js';
 
 interface CacheDecisionMetric {
@@ -45,10 +46,7 @@ let redisClient: Redis | null = null;
 
 function getRedisClient(): Redis {
   if (!redisClient) {
-    redisClient = new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD || 'redis',
+    redisClient = getValkeyClient().duplicate({
       lazyConnect: true,
       enableOfflineQueue: false,
       retryStrategy: () => null

@@ -17,8 +17,8 @@ import { getQdrantClient } from '../vector/qdrant-singleton.js';
 import type { QdrantClient } from '@qdrant/js-client-rest';
 import Redis from 'ioredis';
 import neo4j, { type Driver } from 'neo4j-driver';
-import { VECTOR_CONFIG } from '../config/vector-config.js';
 import { ENV } from '$lib/server/env.server.js';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 // Local amqplib types (named imports fail with moduleResolution: "bundler")
 type AmqpConnection = { createChannel(): Promise<AmqpChannel>; close(): Promise<void> };
@@ -47,31 +47,19 @@ export async function ensureRedisInstance(): Promise<Redis> {
 		throw new Error('Redis: Max connection attempts reached');
 	}
 
-	try {
-		redisConnectionAttempts++;
-		const redisUrl = process.env?.REDIS_URL || VECTOR_CONFIG.DOCKER_SERVICES.REDIS_URL;
-		const redisPassword = process.env.REDIS_PASSWORD;
-
-		const redisConfig: any = {
-			retryStrategy: (times: number) => {
-				if (times > 3) return null; // Stop retrying
-				return Math.min(times * 50, 2000); // Exponential backoff
+		try {
+			redisConnectionAttempts++;
+			const redisConfig: any = {
+				retryStrategy: (times: number) => {
+					if (times > 3) return null; // Stop retrying
+					return Math.min(times * 50, 2000); // Exponential backoff
 			},
 			maxRetriesPerRequest: 3,
 			enableReadyCheck: true,
 			lazyConnect: false // Explicitly connect manually to handle errors
 		};
 
-		// Only add password if explicitly set
-		if (redisPassword) {
-			redisConfig.password = redisPassword;
-		}
-
-		if (redisUrl.startsWith('redis://') || redisUrl.startsWith('rediss://')) {
-			redisInstance = new Redis(redisUrl, redisConfig);
-		} else {
-			redisInstance = new Redis(redisConfig);
-		}
+			redisInstance = getValkeyClient().duplicate(redisConfig);
 
 		// Wait for ready state
 		await new Promise<void>((resolve, reject) => {

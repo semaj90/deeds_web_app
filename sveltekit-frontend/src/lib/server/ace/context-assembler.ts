@@ -12,7 +12,7 @@
 
 import crypto from 'crypto';
 import pg from 'pg';
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { setACECursor, type ACECursor } from '$lib/server/cache/ace-cursor-cache.js';
 export {
   assembleACEContext,
@@ -57,14 +57,14 @@ export interface ACEPacket {
 
 export class ACEContextAssembler {
   private pgPool: pg.Pool;
-  private redis: Redis;
+  private redis: ReturnType<typeof getValkeyClient>;
 
   constructor(pgUrl?: string, redisHost?: string, redisPort?: number, redisPassword?: string) {
     this.pgPool = new pg.Pool({
       connectionString: pgUrl || process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
     });
 
-    this.redis = new Redis({
+    this.redis = getValkeyClient().duplicate({
       host: redisHost || process.env.REDIS_HOST || '127.0.0.1',
       port: redisPort || parseInt(process.env.REDIS_PORT || '6379'),
       password: redisPassword || process.env.REDIS_PASSWORD || 'redis',

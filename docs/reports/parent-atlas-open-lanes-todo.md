@@ -59,6 +59,30 @@ This ladder aligns the remaining feature work without turning it on in productio
 
 ---
 
+## Current proof state update
+
+The phase history above is the original plan. The live proof state is now:
+
+- GR1 DuckDB / graphify:daily — PASS
+  - offline-parent-atlas-mapreduce.sql now uses the live `route_runtime_packets` shape only
+- GR2 / GR3 graph runtime — PASS
+  - fresh projection smoke and graph enrichment both pass
+- GR4 PageRank promotion gate — PASS
+  - live promoted run verified successfully
+- GR5 Louvain / Leiden taxonomy — PARTIAL
+  - Louvain is wired in existing scripts
+  - Leiden now has an exact GDS lane in `scripts/atlas/compute-leiden-neo4j.mjs` and passes dry-run
+  - apply-mode persistence and downstream selector choice remain open
+
+Remaining open taxonomy work:
+
+- exact Leiden lane apply/persistence and downstream selector choice
+- canonical community taxonomy records
+- taxonomy-aware traversal with bounded fanout
+- replay corpus before any learned promotion
+
+---
+
 ## PHASE 1: Complete P3g Qdrant Backfill (45 min)
 
 **Current State**: 4,500/13,545 packets embedded (33.2%)  

@@ -1,10 +1,10 @@
 /**
  * POST /api/v1/agentic/tool-loop
  *
- * Demo endpoint showing the explicit multi-step Gemma 4 + Ollama tool-calling loop:
+ * Demo endpoint showing the explicit multi-step Gemma 4 + local server tool-calling loop:
  *
  *   1. Define tools (JSON Schema function defs)
- *   2. Send user query + tools → Ollama /api/chat
+ *   2. Send user query + tools → the local chat endpoint
  *   3. Model emits tool_calls[] — execute each via local handlers
  *   4. Feed tool results back as role:"tool" messages
  *   5. Model generates final natural-language answer
@@ -42,6 +42,7 @@ import {
   type OllamaToolDef,
   type ToolHandler,
 } from '$lib/server/llm/gemma4-tool-loop.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 // ── Request schema ──────────────────────────────────────────────────────
 const bodySchema = z.object({
@@ -204,7 +205,6 @@ async function handleFixRecommend(args: Record<string, unknown>): Promise<unknow
 
   // Search for similar errors in the error brain
   try {
-    const { ollamaFetch, getOllamaGenerationEndpoint } = await import('$lib/server/ollama.js');
     const { ENV } = await import('$lib/server/env.server.js');
 
     const prompt = `Analyze this error and suggest fixes.
@@ -214,15 +214,18 @@ ${codeSnippet ? `Code:\n${codeSnippet.slice(0, 1000)}` : ''}
 
 Return JSON: { "suggestions": [{ "fix": "...", "confidence": 0.0-1.0, "explanation": "..." }] }`;
 
-    const res = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        prompt,
+        model: LOCAL_VLM_MODEL,
+        messages: [
+          { role: 'system', content: 'You analyze code errors and return valid JSON suggestions.' },
+          { role: 'user', content: prompt },
+        ],
         stream: false,
-        format: 'json',
-        options: { temperature: 0.2, num_predict: 512 },
+        temperature: 0.2,
+        max_tokens: 512,
       }),
       signal: AbortSignal.timeout(30_000),
     });
@@ -231,11 +234,12 @@ Return JSON: { "suggestions": [{ "fix": "...", "confidence": 0.0-1.0, "explanati
       return { suggestions: [], error: `Fix generation failed: ${res.status}` };
     }
 
-    const data = (await res.json()) as { response: string };
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
     try {
-      return JSON.parse(data.response);
+      return JSON.parse(data.choices?.[0]?.message?.content ?? '');
     } catch {
-      return { suggestions: [{ fix: data.response, confidence: 0.5, explanation: 'Raw LLM output' }] };
+      const content = data.choices?.[0]?.message?.content ?? '';
+      return { suggestions: [{ fix: content, confidence: 0.5, explanation: 'Raw LLM output' }] };
     }
   } catch (err) {
     return { suggestions: [], error: `Fix recommend failed: ${(err as Error).message}` };
@@ -399,7 +403,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     loopDiagram: [
       '1. Client sends { query, tools[] }',
       '2. Server builds messages[system, user] + tool definitions',
-      '3. POST /api/chat → Ollama responds with tool_calls[]',
+      '3. POST /chat/completions → the server responds with tool_calls[]',
       '4. Server executes each tool_call via handler Map',
       '5. Server appends { role:"tool", content, tool_name } to messages',
       '6. Loop back to step 3 (model sees results, may call more tools)',

@@ -30,47 +30,55 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	const trtAvailable = await trtHealthCheck();
 	if (!trtAvailable) {
-		// Fallback to Ollama SSE streaming
-		const ollamaUrl = ENV.OLLAMA_BASE_URL;
+		// Fallback to llama-server (:8090) SSE streaming — never Ollama for chat/synthesis
+		const llamaServerUrl = ENV.TURBOQUANT_BASE_URL ?? ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 		try {
-			const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
+			const llamaRes = await fetch(`${llamaServerUrl}/v1/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
-					prompt,
+					model: 'gemma4-legal-iq4xs-direct.gguf',
+					messages: [{ role: 'user', content: prompt }],
 					stream: true,
-					options: {
-						temperature: temperature ?? 0.7,
-						num_predict: maxTokens ?? 2048
-					}
+					temperature: temperature ?? 0.7,
+					max_tokens: maxTokens ?? 2048
 				}),
 				signal: AbortSignal.timeout(120000)
 			});
 
-			if (ollamaRes.ok && ollamaRes.body) {
-				const reader = ollamaRes.body.getReader();
+			if (llamaRes.ok && llamaRes.body) {
+				const reader = llamaRes.body.getReader();
 				const encoder = new TextEncoder();
 				const decoder = new TextDecoder();
+				let buffer = '';
 
 				const stream = new ReadableStream({
 					async pull(controller) {
 						const { done, value } = await reader.read();
 						if (done) {
-							controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: '', done: true, backend: 'ollama' })}\n\n`));
+							controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: '', done: true, backend: 'llama-server' })}\n\n`));
 							controller.close();
 							return;
 						}
-						const text = decoder.decode(value, { stream: true });
-						for (const line of text.split('\n').filter(Boolean)) {
+						buffer += decoder.decode(value, { stream: true });
+						const lines = buffer.split('\n');
+						buffer = lines.pop() ?? '';
+						for (const line of lines) {
+							const trimmed = line.trim();
+							if (!trimmed.startsWith('data:')) continue;
+							const payload = trimmed.slice(5).trim();
+							if (payload === '[DONE]') continue;
 							try {
-								const parsed = JSON.parse(line);
+								const parsed = JSON.parse(payload);
+								const delta = parsed.choices?.[0]?.delta?.content ?? '';
+								const finished = parsed.choices?.[0]?.finish_reason != null;
+								if (!delta && !finished) continue;
 								controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-									content: parsed.response ?? '',
-									done: parsed.done ?? false,
-									backend: 'ollama'
+									content: delta,
+									done: finished,
+									backend: 'llama-server'
 								})}\n\n`));
-							} catch { /* skip malformed lines */ }
+							} catch { /* skip malformed SSE line */ }
 						}
 					},
 					cancel() {
@@ -86,9 +94,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					}
 				});
 			}
-		} catch { /* Ollama also unavailable */ }
+		} catch { /* llama-server also unavailable */ }
 
-		return new Response(JSON.stringify({ error: 'TensorRT-LLM and Ollama both unavailable' }), {
+		return new Response(JSON.stringify({ error: 'TensorRT-LLM and llama-server both unavailable' }), {
 			status: 503,
 			headers: { 'Content-Type': 'application/json' }
 		});

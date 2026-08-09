@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { assembleACEContext, buildACEPromptCached } from '$lib/server/ace/context-assembler.js';
 import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const aceSummarizeSchema = z.object({
 	evidenceId: z.string().uuid().optional(),
@@ -64,29 +64,33 @@ Format as JSON:
 
 		const acePrompt = await buildACEPromptCached(context, summaryPrompt);
 
-		// Call Ollama with ACE-enhanced prompt + Zod-derived structured output
-		const response = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		// Call local llama-server with ACE-enhanced prompt + Zod-derived structured output
+		const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
-				prompt: `${acePrompt.systemPrompt}\n\n${summaryPrompt}`,
+				model: LOCAL_VLM_MODEL,
+				messages: [
+					{ role: 'system', content: acePrompt.systemPrompt },
+					{ role: 'user', content: summaryPrompt },
+				],
 				stream: false,
-				format: summaryJsonSchema,
-				options: {
-					temperature: 0.3,
-					num_predict: 512
-				}
+				response_format: {
+					type: 'json_schema',
+					json_schema: summaryJsonSchema,
+				},
+				temperature: 0.3,
+				max_tokens: 512,
 			}),
 			signal: AbortSignal.timeout(30000)
 		});
 
 		if (!response.ok) {
-			throw new Error('Ollama request failed');
+			throw new Error('llama-server request failed');
 		}
 
-		const data = await response.json();
-		const rawResponse = data.response || '';
+		const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const rawResponse = data.choices?.[0]?.message?.content || '';
 
 		// Parse structured output with Zod validation
 		let parsedSummary: { summary: string; keyInsights: string[]; confidence: number };

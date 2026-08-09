@@ -15,11 +15,10 @@
 
 import crypto from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { resizeForVLM, GEMMA4_VLM_MAX_EDGE } from '$lib/server/image/resize-for-vlm.js';
 import { getVLMCache, setVLMCache } from '$lib/server/vector-cache.js';
 import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -169,7 +168,7 @@ async function inferTritonVLM(
 	}
 }
 
-// ── Ollama VLM Path ────────────────────────────────────────────────────────
+// ── Local llama-server VLM Path ────────────────────────────────────────────
 
 async function inferOllamaVLM(
 	base64Image: string,
@@ -177,22 +176,30 @@ async function inferOllamaVLM(
 	maxTokens: number
 ): Promise<string | null> {
 	try {
-		const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+		const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M',
-        prompt,
-        images: [base64Image],
+        model: LOCAL_VLM_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'image_url', image_url: { url: `data:image/png;base64,${base64Image}` } },
+              { type: 'text', text: prompt },
+            ],
+          },
+        ],
         stream: false,
-        options: { temperature: 0.1, num_predict: maxTokens },
+        temperature: 0.1,
+        max_tokens: maxTokens,
       }),
       signal: AbortSignal.timeout(OLLAMA_TIMEOUT),
     });
 
 		if (!ollamaRes.ok) return null;
 		const data = await ollamaRes.json();
-		return data.response ?? null;
+		return data.choices?.[0]?.message?.content ?? null;
 	} catch {
 		return null;
 	}

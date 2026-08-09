@@ -1,9 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { recordSearchQuery } from '$lib/server/features/observability/index.js';
 import { parseToolCalls } from '$lib/server/ai/tool-shim.js';
 
@@ -14,7 +13,7 @@ const agentChatSchema = z.object({
 	message: 'Either prompt or message is required'
 });
 
-/** Ollama tool definitions — ordered by lookup priority: glossary → rag → web → ripgrep */
+/** Tool definitions — ordered by lookup priority: glossary → rag → web → ripgrep */
 const AGENT_TOOLS = [
 	{
 		type: 'function' as const,
@@ -178,7 +177,7 @@ async function executeTool(name: string, args: Record<string, unknown>): Promise
 	}
 }
 
-/** POST /api/agents/chat — Agent chat with Ollama native tool calling (web search + ripgrep + RAG) */
+/** POST /api/agents/chat — Agent chat with llama-server tool calling (web search + ripgrep + RAG) */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
@@ -219,15 +218,18 @@ Rules:
 
 		// Iterative tool calling loop
 		while (toolRounds < MAX_TOOL_ROUNDS) {
-			const chatRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+			const chatRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
+					model: LOCAL_VLM_MODEL,
 					messages,
 					stream: false,
 					tools: AGENT_TOOLS,
-					options: { temperature: 0.1, top_k: 20, top_p: 0.8, num_ctx: 8192, repeat_penalty: 1.05 }
+					temperature: 0.1,
+					top_k: 20,
+					top_p: 0.8,
+					max_tokens: 1024,
 				}),
 				signal: AbortSignal.timeout(60_000)
 			});
@@ -236,12 +238,15 @@ Rules:
 				return json({ error: 'Agent service unavailable' }, { status: 502 });
 			}
 
-			const data = await chatRes.json();
+			const data = await chatRes.json() as {
+				choices?: Array<{ message?: { content?: string; tool_calls?: Array<{ function?: { name?: string; arguments?: unknown } }> } }>;
+			};
+			const assistantMessage = data.choices?.[0]?.message ?? {};
 
 			// Check if LLM wants to call tools
-			let toolCalls = data.message?.tool_calls;
-			if ((!toolCalls || toolCalls.length === 0) && typeof data.message?.content === 'string') {
-				const parsed = parseToolCalls(data.message.content);
+			let toolCalls = assistantMessage.tool_calls;
+			if ((!toolCalls || toolCalls.length === 0) && typeof assistantMessage.content === 'string') {
+				const parsed = parseToolCalls(assistantMessage.content);
 				if (parsed.length > 0) {
 					toolCalls = parsed.map((tc, index) => ({
 						id: `toolcall-${toolRounds + 1}-${index + 1}`,
@@ -256,15 +261,15 @@ Rules:
 			if (!toolCalls || toolCalls.length === 0) {
 				// No tool calls — return final response with trace
 				return json({
-					response: data.message?.content || '',
+					response: assistantMessage.content || '',
 					toolResults,
-					model: 'gemma4-rotorquant:latest',
+					model: LOCAL_VLM_MODEL,
 					_trace: { toolRounds, totalToolCalls, toolLatencyMs: toolResults.reduce((s, r) => s + r.durationMs, 0) }
 				});
 			}
 
 			// Execute all tool calls (respecting hard cap)
-			messages.push({ role: 'assistant', content: data.message?.content || '' });
+			messages.push({ role: 'assistant', content: assistantMessage.content || '' });
 
 			for (const tc of toolCalls) {
 				if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;
@@ -283,23 +288,26 @@ Rules:
 		}
 
 		// Exhausted tool rounds — get final response with trace
-		const finalRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const finalRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages,
 				stream: false,
-				options: { temperature: 0.1, top_k: 20, top_p: 0.8, num_ctx: 8192, repeat_penalty: 1.05 }
+				temperature: 0.1,
+				top_k: 20,
+				top_p: 0.8,
+				max_tokens: 1024
 			}),
 			signal: AbortSignal.timeout(30_000)
 		});
 
 		const finalData = finalRes.ok ? await finalRes.json() : null;
 		return json({
-			response: finalData?.message?.content || 'Agent completed tool calls but could not generate a final response.',
+			response: finalData?.choices?.[0]?.message?.content || 'Agent completed tool calls but could not generate a final response.',
 			toolResults,
-			model: 'gemma4-rotorquant:latest',
+			model: LOCAL_VLM_MODEL,
 			_trace: { toolRounds, totalToolCalls, toolLatencyMs: toolResults.reduce((s, r) => s + r.durationMs, 0) }
 		});
 	} catch (err) {

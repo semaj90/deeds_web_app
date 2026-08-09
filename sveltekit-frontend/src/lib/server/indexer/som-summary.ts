@@ -22,6 +22,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 import { TTL } from '$lib/server/cache-keys.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 export interface SomCellSummary {
   x: number;
@@ -140,17 +141,11 @@ Focus on structural patterns and data-flow, not individual files.`;
       } catch { /* TurboQuant unavailable */ }
 
       if (!llmText) {
-        const ollamaUrl = ENV.OLLAMA_BASE_URL;
-        const r = await fetch(`${ollamaUrl}/api/generate`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: false, options: { temperature: 0.2, num_predict: 180 } }),
-          signal:  AbortSignal.timeout(60_000),
-        });
-        if (r.ok) {
-          const d = (await r.json()) as { response?: string };
-          llmText = d.response?.trim() ?? '';
-        }
+        llmText = (await bifrostChat(
+          [{ role: 'user', content: prompt }],
+          'gemma4-legal-iq4xs-direct.gguf',
+          { temperature: 0.2, maxTokens: 180, timeoutMs: 60_000 }
+        ).catch(() => '')).trim();
       }
 
       if (llmText) summaryText = llmText;

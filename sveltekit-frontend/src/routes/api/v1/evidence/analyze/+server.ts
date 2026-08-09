@@ -1,16 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
-import { getOllamaChatEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-const safeJsonPost = (await import('$lib/server/utils/safe-json-post.js')).default as unknown as <
-  T,
->(
-  url: string,
-  payload: unknown,
-  opts?: { timeoutMs?: number; maxResponseBytes?: number; fallback?: T }
-) => Promise<T | undefined>;
 
 const evidenceAnalyzeSchema = z
   .object({
@@ -22,7 +13,7 @@ const evidenceAnalyzeSchema = z
     message: 'content or evidenceId required',
   });
 
-/** POST /api/v1/evidence/analyze — Proxy to /api/evidence/analysis + Ollama */
+/** POST /api/v1/evidence/analyze — Proxy to /api/evidence/analysis + local llama server */
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
@@ -35,7 +26,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const textToAnalyze = content || '';
 
-    // Run entity extraction + forensics via Ollama
+    // Run entity extraction + forensics via the local model server
     const prompt = `Analyze this legal evidence and extract:
 1. Key entities (persons, organizations, dates, amounts)
 2. Legal relevance (high/medium/low)
@@ -46,10 +37,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 Evidence text:
 ${textToAnalyze.slice(0, 2000)}`;
 
-    const data = await safeJsonPost<any>(
-      `${getOllamaChatEndpoint()}/api/chat`,
-      {
-        model: 'gemma4-rotorquant:latest',
+    const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: LOCAL_VLM_MODEL,
         messages: [
           {
             role: 'system',
@@ -58,19 +50,21 @@ ${textToAnalyze.slice(0, 2000)}`;
           { role: 'user', content: prompt },
         ],
         stream: false,
-        options: { temperature: 0.2 },
-      },
-      { timeoutMs: 30_000, maxResponseBytes: 1_000_000 }
-    );
+        temperature: 0.2,
+        max_tokens: 1024,
+      }),
+      signal: AbortSignal.timeout(30_000),
+    });
 
-    if (!data) {
+    if (!response.ok) {
       return json({ error: 'AI analysis unavailable' }, { status: 502 });
     }
+    const data = await response.json();
     return json({
-      analysis: data.message?.content || '',
+      analysis: data.choices?.[0]?.message?.content || '',
       evidenceId: evidenceId || null,
       type: type || 'unknown',
-      model: 'gemma4-rotorquant:latest',
+      model: LOCAL_VLM_MODEL,
       timestamp: new Date().toISOString(),
     });
   } catch (err) {

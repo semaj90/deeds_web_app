@@ -74,6 +74,26 @@ section for the full item-by-item mapping before acting on the list below.
 11. Defer cuGraph / cuVS promotion until parity and value are proven.
 12. Close the repair loop only after repeated real failures validate the spine.
 
+## Current proof state update
+
+- GR1 DuckDB / graphify:daily — PASS
+  - offline-parent-atlas-mapreduce.sql now targets live columns only
+- GR2 / GR3 graph runtime — PASS
+  - fresh projection smoke and graph enrichment both pass
+- GR4 PageRank promotion gate — PASS
+  - live promoted run verified successfully
+- GR5 Louvain / Leiden taxonomy — PARTIAL
+  - Louvain is wired
+  - Leiden now has an exact GDS lane in `scripts/atlas/compute-leiden-neo4j.mjs` and passes dry-run
+  - apply-mode persistence and downstream selector choice remain open
+
+Remaining open taxonomy work:
+
+- exact Leiden lane apply/persistence and downstream selector choice
+- canonical community taxonomy records
+- taxonomy-aware traversal with bounded fanout
+- replay corpus before any learned promotion
+
 **Relevant files**
 
 - `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`

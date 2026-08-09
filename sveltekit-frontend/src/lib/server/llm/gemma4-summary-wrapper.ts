@@ -5,7 +5,7 @@
  * - Streaming summarization requests to llama-server :8090
  * - Stripping <|channel>thought blocks from output
  * - Timeout handling (30s per request)
- * - Graceful fallback to Ollama
+ * - Graceful fallback to the live llama-server lane
  */
 
 interface SummarizeRequest {
@@ -24,7 +24,7 @@ interface SummarizeResponse {
 }
 
 const LLAMA_SERVER_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
-const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
+const LLAMA_SERVER_FALLBACK_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const SUMMARY_PROMPT_TEMPLATE_VERSION = 'phase7-v2';
 
 function buildStableSummaryPrompt(prompt: string): string {
@@ -113,25 +113,25 @@ export async function summarizeWithGemma4(req: SummarizeRequest): Promise<Summar
     if ((error as any).name === 'AbortError') {
       throw new Error('Gemma4 summarization timed out');
     }
-    // Fall through to Ollama fallback
+    // Fall through to a second llama-server pass with a lighter prompt
     console.warn('Gemma4 summarization failed:', error);
-    return summarizeWithOllama(req);
+    return summarizeWithLlamaServerFallback(req);
   } finally {
     clearTimeout(timeoutId);
   }
 }
 
 /**
- * Fallback summarization via Ollama
+ * Fallback summarization via llama-server
  */
-async function summarizeWithOllama(req: SummarizeRequest): Promise<SummarizeResponse> {
+async function summarizeWithLlamaServerFallback(req: SummarizeRequest): Promise<SummarizeResponse> {
   const { prompt, maxTokens = 512, temperature = 0.3 } = req;
 
-  const response = await fetch(`${OLLAMA_URL}/api/chat`, {
+  const response = await fetch(`${LLAMA_SERVER_FALLBACK_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      model: 'gemma3-legal:latest',
+      model: 'hforf.gguf',
       messages: [
         {
           role: 'system',
@@ -140,22 +140,20 @@ async function summarizeWithOllama(req: SummarizeRequest): Promise<SummarizeResp
         { role: 'user', content: prompt }
       ],
       stream: false,
-      options: {
-        temperature,
-        num_predict: maxTokens
-      }
+      temperature,
+      max_tokens: maxTokens
     })
   });
 
   if (!response.ok) {
-    throw new Error(`Ollama error: ${response.status}`);
+    throw new Error(`llama-server error: ${response.status}`);
   }
 
   const data = (await response.json()) as any;
   return {
-    summary: data.message?.content || '',
-    model: 'gemma3-legal:latest',
-    totalTokens: data.prompt_eval_count + data.eval_count
+    summary: data.choices?.[0]?.message?.content || '',
+    model: 'hforf.gguf',
+    totalTokens: data.usage?.prompt_tokens + data.usage?.completion_tokens
   };
 }
 

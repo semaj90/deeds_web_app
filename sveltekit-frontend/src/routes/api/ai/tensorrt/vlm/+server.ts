@@ -145,27 +145,27 @@ export const POST: RequestHandler = async ({ request, locals }) => {
   // Check Triton health — fall back to Ollama VLM cascade if unavailable
   const tritonReady = await checkTritonHealth();
   if (!tritonReady) {
-    // Fast path: try direct Ollama VLM first (works when VRAM is free)
+    // Fast path: try direct local llama-server VLM first (works when VRAM is free)
     try {
-      const ollamaUrl = ENV.OLLAMA_BASE_URL;
+      const llamaUrl = ENV.TURBOQUANT_BASE_URL ?? ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
       const vlmModel = ENV.OLLAMA_VLM_MODEL ?? 'gemma4:e4b-it-q4_K_M';
-      const ollamaRes = await ollamaFetch(`${ollamaUrl}/api/chat`, {
+      const ollamaRes = await fetch(`${llamaUrl}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: vlmModel,
           messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
           stream: false,
-          keep_alive: '24h',
-          options: { temperature, num_predict: maxTokens },
+          temperature,
+          max_tokens: maxTokens,
         }),
         signal: AbortSignal.timeout(120000),
       });
       if (ollamaRes.ok) {
         const rawText = await ollamaRes.text();
-        const ollamaData = fastJsonParse<{ message?: { content?: string } }>(rawText);
+        const ollamaData = fastJsonParse<{ choices?: Array<{ message?: { content?: string } }> }>(rawText);
         return json({
-          text: ollamaData.message?.content ?? '',
+          text: ollamaData.choices?.[0]?.message?.content ?? '',
           model: `${vlmModel} (ollama fallback)`,
           pipeline: ['ollama-multimodal'],
           tritonAvailable: false,
@@ -189,9 +189,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     return json(
       {
-        error: 'Triton and Ollama VLM both unavailable',
+        error: 'Triton and local llama-server VLM both unavailable',
         fallback: 'inference-router',
-        hint: 'Start Ollama with gemma4 VLM model or start Triton container',
+        hint: 'Start local llama-server with gemma4 VLM model or start Triton container',
       },
       { status: 503 }
     );

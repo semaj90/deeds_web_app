@@ -1,10 +1,8 @@
 import { json } from '@sveltejs/kit';
-import { ollamaFetch } from '$lib/server/ollama.js';
-
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const analyzeSchema = z.object({
 	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
@@ -78,13 +76,12 @@ Provide your analysis in this JSON structure:
   "confidence": 0.85
 }`;
 
-		// Call Ollama for analysis
-		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL;
-		const ollamaRes = await ollamaFetch(`${ollamaBaseUrl}/api/chat`, {
+		// Call the local model server for analysis
+		const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model,
+				model: model || LOCAL_VLM_MODEL,
 				messages: [
 					{
 						role: 'system',
@@ -93,16 +90,18 @@ Provide your analysis in this JSON structure:
 					{ role: 'user', content: prompt }
 				],
 				stream: false,
-				options: { temperature: 0.3 }
-			})
+				temperature: 0.3,
+				max_tokens: 1024,
+			}),
+			signal: AbortSignal.timeout(60_000),
 		});
 
 		if (!ollamaRes.ok) {
-			throw new Error(`Ollama request failed: ${ollamaRes.status}`);
+			throw new Error(`llama-server request failed: ${ollamaRes.status}`);
 		}
 
 		const ollamaData = await ollamaRes.json();
-		const content = ollamaData.message?.content ?? '';
+		const content = ollamaData.choices?.[0]?.message?.content ?? '';
 
 		// Try to parse JSON from response
 		let analysis: Record<string, any> | null = null;

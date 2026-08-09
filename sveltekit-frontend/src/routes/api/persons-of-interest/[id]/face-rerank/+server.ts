@@ -4,7 +4,7 @@
  * GRPO-style multi-pass face reranker for POI identity matching.
  *
  * Pass 1 — embedding cosine similarity (768-dim face vectors from pgvector)
- * Pass 2 — VLM visual reasoning (gemma4-rotorquant:latest / gemma3 via Ollama):
+ * Pass 2 — VLM visual reasoning (gemma4-rotorquant:latest / gemma3 via the local server):
  *           "Do these photos show the same person?"  → confidence 0–100
  * Pass 3 — GRPO reward: 0.35 * pass1 + 0.65 * pass2  (preference-weighted)
  *
@@ -17,8 +17,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres.js';
 import { and, eq, inArray, ne, sql, isNull, or, desc } from 'drizzle-orm';
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 
@@ -63,9 +62,6 @@ async function vlmFaceScore(
   refName: string,
   candName: string
 ): Promise<{ confidence: number; reasoning: string }> {
-  const OLLAMA_BASE = ENV.OLLAMA_BASE_URL.replace(/\/$/, '');
-  const model = ENV.OLLAMA_VLM_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
-
   const prompt =
     `You are a forensic facial recognition assistant. ` +
     `Compare the two photos provided (reference: ${refName}, candidate: ${candName}). ` +
@@ -73,12 +69,16 @@ async function vlmFaceScore(
     `Reply ONLY with valid JSON: {"match": true|false, "confidence": 0-100, "reasoning": "<1-2 sentences>"}`;
 
   try {
-    const res = await ollamaFetch(`${OLLAMA_BASE}/api/chat`, {
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model,
+        model: LOCAL_VLM_MODEL,
         messages: [
+          {
+            role: 'system',
+            content: 'You are a forensic facial recognition assistant. Return only valid JSON.',
+          },
           {
             role: 'user',
             content: prompt,
@@ -86,14 +86,15 @@ async function vlmFaceScore(
           },
         ],
         stream: false,
-        options: { temperature: 0.1, num_predict: 200 },
+        temperature: 0.1,
+        max_tokens: 200,
       }),
       signal: AbortSignal.timeout(60_000),
     });
 
     if (!res.ok) return { confidence: 0, reasoning: 'VLM unavailable' };
     const data = await res.json();
-    const text: string = data?.message?.content ?? '';
+    const text: string = data?.choices?.[0]?.message?.content ?? '';
 
     // Extract JSON from model output (may include markdown fences)
     const match = text.match(/\{[\s\S]*?\}/);

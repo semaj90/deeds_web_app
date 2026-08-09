@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq } from 'drizzle-orm';
-import { getChatModelKeepAlive } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
 
@@ -33,20 +33,28 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     let aiSummary = item.summary ?? '';
     if (!aiSummary) {
       try {
-        const { ollamaFetch } = await import('$lib/server/ollama.js');
-        const ollamaRes = await ollamaFetch('/api/generate', {
+        const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-rotorquant:latest',
-            prompt: `Write a brief forensic analysis report (3-4 sentences) for this evidence item:\nTitle: ${item.title}\nType: ${item.type ?? item.evidenceType ?? 'unknown'}\nDescription: ${item.description ?? 'N/A'}\nSource: ${item.source ?? 'N/A'}`,
+            model: LOCAL_VLM_MODEL,
+            messages: [
+              { role: 'system', content: 'You write brief forensic analysis reports for evidence items.' },
+              {
+                role: 'user',
+                content: `Write a brief forensic analysis report (3-4 sentences) for this evidence item:\nTitle: ${item.title}\nType: ${item.type ?? item.evidenceType ?? 'unknown'}\nDescription: ${item.description ?? 'N/A'}\nSource: ${item.source ?? 'N/A'}`,
+              },
+            ],
             stream: false,
-            keep_alive: getChatModelKeepAlive(),
+            temperature: 0.2,
+            max_tokens: 256,
           }),
+          signal: AbortSignal.timeout(30_000),
         });
         if (ollamaRes.ok) {
           const data = await ollamaRes.json();
-          if (data.response) aiSummary = data.response.trim();
+          const content = data.choices?.[0]?.message?.content ?? '';
+          if (content) aiSummary = content.trim();
         }
       } catch {
         aiSummary = `Evidence item "${item.title}" — ${item.type ?? 'unclassified'} evidence collected ${item.collectedAt ? `on ${new Date(item.collectedAt).toLocaleDateString()}` : 'at unknown date'}.`;

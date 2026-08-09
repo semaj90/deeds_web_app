@@ -146,8 +146,8 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 
 				const responseStream = llmRouter.generateStream({
 					prompt,
-					provider: 'ollama',
-					model: 'gemma4-rotorquant:latest',
+					provider: 'llama-server',
+					model: 'gemma4-legal-iq4xs-direct.gguf',
 					temperature: 0.4,
 					maxTokens: 4096
 				});

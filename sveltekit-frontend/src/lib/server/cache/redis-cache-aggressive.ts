@@ -1,5 +1,6 @@
 import Redis from 'ioredis';
 import type { RedisOptions } from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 /**
@@ -72,7 +73,7 @@ export class AggressiveRedisCache {
       retryStrategy: () => null,
     };
 
-    this.client = new Redis({ ...defaults, ...options });
+    this.client = getValkeyClient().duplicate({ ...defaults, ...options });
 
     this.client.on('error', (err) => {
       console.error('[RedisCache] Connection error:', err.message);

@@ -2,9 +2,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 
 const phase72SimilarSchema = z.object({
 	error_hash: z.string().max(500).optional(),
@@ -102,7 +101,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 /**
  * POST /api/phase72/similar
- * Stream AI fix suggestion via Ollama for a given error + similar errors context.
+ * Stream AI fix suggestion via the local llama server for a given error + similar errors context.
  * Returns SSE stream with { text } chunks.
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
@@ -142,45 +141,37 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	prompt += 'Provide a brief analysis and actionable fix. Use markdown formatting.';
 
-	// Stream from Ollama
+	// Stream from the local model server
 	try {
-		const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'gemma4-rotorquant:latest', prompt, stream: true }),
+			body: JSON.stringify({
+				model: LOCAL_VLM_MODEL,
+				messages: [
+					{ role: 'system', content: 'You are a TypeScript/Svelte expert. Give a concise fix analysis.' },
+					{ role: 'user', content: prompt },
+				],
+				stream: false,
+				temperature: 0.2,
+				max_tokens: 512,
+			}),
 			signal: AbortSignal.timeout(30_000),
 		});
 
-		if (!ollamaRes.ok || !ollamaRes.body) {
+		if (!ollamaRes.ok) {
 			return new Response(
-				`data: ${JSON.stringify({ text: 'Ollama unavailable. Check that gemma4-rotorquant:latest is running.' })}\n\n`,
+				`data: ${JSON.stringify({ text: 'llama-server unavailable. Check that the local server is running.' })}\n\n`,
 				{ headers: { 'Content-Type': 'text/event-stream' } }
 			);
 		}
 
-		const reader = ollamaRes.body.getReader();
-		const decoder = new TextDecoder();
-
+		const data = await ollamaRes.json();
+		const text = data.choices?.[0]?.message?.content ?? '';
 		const stream = new ReadableStream({
-			async pull(controller) {
-				const { done, value } = await reader.read();
-				if (done) { controller.close(); return; }
-
-				const text = decoder.decode(value);
-				for (const line of text.split('\n')) {
-					if (!line.trim()) continue;
-					try {
-						const parsed = JSON.parse(line);
-						if (parsed.response) {
-							controller.enqueue(
-								new TextEncoder().encode(`data: ${JSON.stringify({ text: parsed.response })}\n\n`)
-							);
-						}
-					} catch { /* skip malformed */ }
-				}
-			},
-			cancel() {
-				reader.cancel();
+			start(controller) {
+				controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ text })}\n\n`));
+				controller.close();
 			},
 		});
 

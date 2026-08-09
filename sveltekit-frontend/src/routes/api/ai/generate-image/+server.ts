@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const imageGenSchema = z.object({
 	prompt: z.string().min(1).max(10000),
@@ -32,17 +32,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		// Generate a text-based visualization descriptor via LLM
 		// (No local image generation model available — return SVG placeholder)
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
-		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-
-		const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
-				prompt: `Describe a visual representation for: "${prompt.slice(0, 500)}". Style: ${style}. Return JSON: { "description": "...", "dominantColors": ["#hex"], "elements": ["..."], "mood": "..." }`,
+				model: LOCAL_VLM_MODEL,
+				messages: [
+					{ role: 'system', content: 'Describe a visual representation and return strict JSON with description, dominantColors, elements, and mood.' },
+					{ role: 'user', content: `Describe a visual representation for: "${prompt.slice(0, 500)}". Style: ${style}. Return JSON: { "description": "...", "dominantColors": ["#hex"], "elements": ["..."], "mood": "..." }` }
+				],
 				stream: false,
-				options: { temperature: 0.7 }
+				temperature: 0.7,
+				max_tokens: 512
 			}),
 			signal: AbortSignal.timeout(30_000)
 		});
@@ -56,12 +57,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			});
 		}
 
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 		let metadata: Record<string, unknown> = {};
 		try {
-			metadata = JSON.parse(data.response);
+			metadata = JSON.parse(data.choices?.[0]?.message?.content || '{}');
 		} catch {
-			metadata = { description: data.response };
+			metadata = { description: data.choices?.[0]?.message?.content || '' };
 		}
 
 		return json({

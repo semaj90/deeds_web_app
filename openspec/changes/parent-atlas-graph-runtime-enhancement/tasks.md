@@ -139,6 +139,43 @@ itself).
 (unbounded) to actually refresh Neo4j's structural graph before trusting GR2/GR3's PASS as
 current, or before any GR5 diagnostic treats `codeTopology`'s size as "the fresh graph."
 
+## GR1 sync executed (2026-08-09) — partial success, one unresolved anomaly
+
+Ran `node scripts/atlas/sync-graph-truth-neo4j.mjs --dry-run` then `--apply` (unbounded, exit 0).
+Independently re-verified live via direct Cypher over the HTTP endpoint (not trusting the script's
+own success banner):
+
+| Type | Script attempted | Live before | Live after | Verdict |
+|---|---|---|---|---|
+| `CodebaseFile` | 65,342 | 23,114 | 67,456 | Applied — see inflation note below |
+| `ParentAtlasFeature` | 39,481 | — | 39,485 | Applied |
+| `BELONGS_TO_FEATURE` | 58,556 | 9,988 | 58,843 | Applied, matches claim |
+| `IMPORTS` | 9,175 | 2,754 | 3,452 | Applied, but far short of attempted |
+| `TEST_COVERS_FILE` | 8,875 | 1,572 | **1,572 (zero net change)** | **Anomaly — not root-caused** |
+
+**TEST_COVERS_FILE anomaly**: confirmed via `r.updatedAt` that all 1,572 relationships carry a
+timestamp from this exact run — the write step executed and touched them — but the total count
+did not move despite 8,875 candidate edges being attempted. Cypher's `MATCH (c1:CodebaseFile
+{path: row.from}) MATCH (c2:CodebaseFile {path: row.to})` silently yields zero rows (no error) when
+either path doesn't match an existing node, so ~7,300 attempted `MERGE` calls this run produced
+nothing, with no error surfaced anywhere in the script's output.
+
+Partial explanation found, not conclusive: sampled `deep-import-edges.jsonl`'s `test_covers_file`
+rows and found several referencing `.claude/worktrees/agent-a38668f2/...` — a temporary agent
+worktree already known to have been deleted from disk in a past session (see root `CLAUDE.md`,
+"Freed 20GB by removing temporary agent worktrees"). This explains the `CodebaseFile` node-count
+inflation (67,456 vs. the clean 61,659 `parent_atlas_documents` count — stale worktree paths still
+present in `deep-import-edges.jsonl` get merged as phantom nodes) but does **not** fully explain why
+`TEST_COVERS_FILE` specifically nets zero new edges while `IMPORTS` at least partially succeeded
+(2,754→3,452). Stopped digging further here rather than open-ended root-causing in this pass —
+flagging as NOT_PROVEN / open, not claiming the sync fully succeeded.
+
+**Not yet done**: identify why `TEST_COVERS_FILE` MERGE targets miss at a much higher rate than
+`IMPORTS` targets from the same filtered/normalized path space; consider whether stale
+`deep-import-edges.jsonl` / `parent_atlas_documents` rows referencing deleted worktrees should be
+purged before the next sync run (would fix the node-count inflation at the source rather than
+tolerating phantom `CodebaseFile` nodes).
+
 ## GR5 — Leiden lane, status ladder (2026-08-09)
 
 Parallel work (outside this session's direct tool calls, reviewed and committed — see

@@ -11,6 +11,7 @@ import { pgRows } from '$lib/server/db/client';
 import crypto from 'crypto';
 import { sql } from 'drizzle-orm';
 import type { YOLOResult } from '$lib/server/yolo.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -277,20 +278,24 @@ Respond with ONLY valid JSON (no markdown):
 }`;
 
   try {
-    const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        prompt,
+        model: LOCAL_VLM_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a legal evidence analyst. Analyze the document and return strict JSON.' },
+          { role: 'user', content: prompt }
+        ],
         stream: false,
-        options: { temperature: 0.3, num_predict: 800 },
+        temperature: 0.3,
+        max_tokens: 800,
       }),
     });
 
     if (!res.ok) return null;
     const data = await res.json();
-    const responseText = data.response?.trim();
+    const responseText = data.choices?.[0]?.message?.content?.trim();
     if (!responseText) return null;
 
     // Parse JSON from response (handle markdown code blocks)

@@ -1,10 +1,9 @@
-import { Redis } from 'ioredis';
 import { db } from '$lib/server/db/client.js';
-import { ENV } from '../env.server.js';
 import { retrievalCacheTraces } from '$lib/server/db/schema/documents-atlas.js';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
-// Use central ENV defaults for Redis
-const redis = new Redis(ENV.REDIS_URL, { password: ENV.REDIS_PASSWORD });
+// Use the shared Valkey client singleton.
+const redis = getValkeyClient();
 
 export type CacheLayer =
   | 'redis_exact'

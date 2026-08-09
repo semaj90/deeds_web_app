@@ -13,7 +13,7 @@
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, relative, extname } from 'path';
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { generateSingleEmbedding } from '../grpc/embedding-client.js';
 import { ensureQdrantCollection, batchUpsertPoints } from '../vector/qdrant-manager.js';
 import { extractAstFeatures, extractDependencyFeatures } from '../analysis/ast-grep-extractor.js';
@@ -532,10 +532,7 @@ export async function rebuildCodeIntelCorpus(): Promise<{
   let errors = 0;
   let facts = 0;
   const nodes: CodeIntelNode[] = [];
-  const redis = new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    password: process.env.REDIS_PASSWORD || 'redis',
+  const redis = getValkeyClient().duplicate({
     lazyConnect: true,
     enableOfflineQueue: false,
     retryStrategy: () => null

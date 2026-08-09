@@ -4,17 +4,13 @@
  */
 
 import Redis from 'ioredis';
-import { ENV } from './env.server.js';
-
-const REDIS_URL = ENV.REDIS_URL;
-const REDIS_PASSWORD = ENV.REDIS_PASSWORD;
+import { closeValkeyClient, getValkeyClient, pingValkey } from './cache/valkey-client.js';
 
 /**
  * Redis Connection Pool
  * Creates and manages a pool of Redis connections to prevent exhaustion
  */
 class RedisConnectionPool {
-	private static globalErrorLogged = false;
 	private pool: Redis[] = [];
 	private maxConnections = 10;
 	private currentIndex = 0;
@@ -33,71 +29,27 @@ class RedisConnectionPool {
 		if (this.isShuttingDown) {
 			throw new Error('Redis pool is shutting down');
 		}
-
-		// Helper to create a new client with proper error handling
-		const createNewClient = (): Redis => {
-			const client = new Redis(REDIS_URL, {
-				password: REDIS_PASSWORD || undefined,
-				maxRetriesPerRequest: 1,
-				enableReadyCheck: false,
-				connectTimeout: 3000,
-				commandTimeout: 3000,
-				retryStrategy: (times: number) => {
-					if (times > 2) return null; // Stop after 2 attempts
-					return Math.min(times * 100, 500);
-				},
-				lazyConnect: false // Auto-connect on creation
-			});
-
-			// Attach error handler IMMEDIATELY so the first connection failure
-			// (which fires synchronously after construction when Redis is offline)
-			// has a listener and doesn't surface as "Unhandled error event".
-			//
-			// Global throttle: only log the first connection error across all slots
-			// to keep the console clean during tests or outages.
-			client.on('error', (err) => {
-				if (RedisConnectionPool.globalErrorLogged) return;
-				RedisConnectionPool.globalErrorLogged = true;
-				const msg = err?.message ?? String(err);
-				console.error(`[Redis Pool] Connection error (systemic): ${msg} — further pool errors suppressed.`);
-			});
-
-			return client;
-		};
-
-		// Create new connection if pool not at capacity
-		if (this.pool.length < this.maxConnections) {
-			this.pool.push(createNewClient());
-			return this.pool[this.pool.length - 1];
+		if (this.pool.length === 0) {
+			this.pool.push(getValkeyClient());
 		}
-
-		// Round-robin existing connections
-		let connection = this.pool[this.currentIndex];
-		this.currentIndex = (this.currentIndex + 1) % this.pool.length;
-
-		// Health check: if client is closed, recreate it
-		if (connection.status === 'close' || connection.status === 'end') {
-			connection.quit().catch(() => {}); // Try to clean up quietly
-			connection = createNewClient();
-			this.pool[this.currentIndex - 1] = connection; // Replace in pool
-		}
-
-		return connection;
+		return this.pool[0];
 	}
 
 	/**
 	 * Get current pool statistics
 	 */
 	getStats() {
+		const client = this.pool[0] ?? getValkeyClient();
 		return {
-			totalConnections: this.pool.length,
+			totalConnections: 1,
 			maxConnections: this.maxConnections,
 			currentIndex: this.currentIndex,
 			isShuttingDown: this.isShuttingDown,
 			statuses: this.pool.map((client, i) => ({
 				index: i,
 				status: client.status
-			}))
+			})),
+			sharedStatus: client.status
 		};
 	}
 
@@ -107,20 +59,16 @@ class RedisConnectionPool {
 	 */
 	async closeAll() {
 		this.isShuttingDown = true;
-		await Promise.all(
-			this.pool.map((client) =>
-				client.quit().catch((err) => {
-					console.error('[Redis Pool] Error closing connection:', err);
-				})
-			)
-		);
+		await closeValkeyClient().catch((err) => {
+			console.error('[Redis Pool] Error closing shared Valkey client:', err);
+		});
 		this.pool = [];
 		this.currentIndex = 0;
 	}
 }
 
-// Global pool instance
-export const redisPool = new RedisConnectionPool(10);
+// Global pool instance (Valkey-backed singleton compatibility layer)
+export const redisPool = new RedisConnectionPool(1);
 
 /**
  * Get a Redis connection from the pool
@@ -147,8 +95,7 @@ export default function createRedisInstance(options: Record<string, unknown>): R
  * Use sparingly - prefer getRedis() for pooled connections
  */
 export function createRedisConnection() {
-	return new Redis(REDIS_URL, {
-		password: REDIS_PASSWORD || undefined,
+	return getValkeyClient().duplicate({
 		maxRetriesPerRequest: 1,
 		enableReadyCheck: false,
 		connectTimeout: 3000,
@@ -161,24 +108,9 @@ export function createRedisConnection() {
  * For pooled connections, checks the first connection in the pool
  */
 export async function ensureRedis() {
-	const client = getRedis();
-	if (client.status === 'ready') return;
-
-	await new Promise<void>((resolve, reject) => {
-		const timeout = setTimeout(() => reject(new Error('Redis connection timeout')), 3000);
-		const onReady = () => {
-			clearTimeout(timeout);
-			client.off('error', onError);
-			resolve();
-		};
-		const onError = (err: Error) => {
-			clearTimeout(timeout);
-			client.off('ready', onReady);
-			reject(err);
-		};
-		client.on('ready', onReady);
-		client.on('error', onError);
-	});
+	if (!(await pingValkey())) {
+		throw new Error('Redis connection timeout');
+	}
 }
 
 // =============================================================================

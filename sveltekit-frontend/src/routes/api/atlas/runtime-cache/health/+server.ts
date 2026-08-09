@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 export const HEAD: RequestHandler = async ({ locals }) => {
   if (!locals.user) {
@@ -8,10 +8,7 @@ export const HEAD: RequestHandler = async ({ locals }) => {
   }
 
   try {
-    const redis = new Redis({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    const redis = getValkeyClient().duplicate({
       connectTimeout: 2000,
       maxRetriesPerRequest: 1,
       retryStrategy: () => null,
@@ -37,10 +34,7 @@ export const HEAD: RequestHandler = async ({ locals }) => {
 
 export const GET: RequestHandler = async () => {
   try {
-    const redis = new Redis({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD,
+    const redis = getValkeyClient().duplicate({
       connectTimeout: 2000,
       maxRetriesPerRequest: 1,
       retryStrategy: () => null,

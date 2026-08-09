@@ -8,6 +8,7 @@
  */
 
 import type { DecomposedQuery, Subgoal } from './gemma4-policy-orchestrator';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 const DECOMPOSITION_PROMPT = `You are an expert research assistant breaking down complex questions into focused search tasks.
 
@@ -215,49 +216,32 @@ function extractKeywordsNaive(query: string): string[] {
 }
 
 /**
- * Fallback: try Ollama if TurboQuant fails
- * (slower, but more likely to work if Ollama is available)
+ * Fallback: retry via bifrostChat's cascade (Bifrost L2 semantic cache, then
+ * llama-server) if the first decomposeQueryWithGemma4 attempt fails.
  */
-export async function decomposeQueryWithOllama(
+export async function decomposeQueryFallback(
   request: GemmaDecompositionRequest
 ): Promise<DecomposedQuery> {
   const { originalQuery } = request;
 
   try {
-    const response = await fetch('http://127.0.0.1:11434/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are an expert research assistant. Respond with ONLY valid JSON, no markdown.'
-          },
-          {
-            role: 'user',
-            content: `${DECOMPOSITION_PROMPT}\n\nUser Question: ${originalQuery}\n\nRespond with ONLY valid JSON.`
-          }
-        ],
-        stream: false,
-        options: {
-          temperature: 0.3,
-          num_predict: 1024
+    const content = await bifrostChat(
+      [
+        {
+          role: 'system',
+          content: 'You are an expert research assistant. Respond with ONLY valid JSON, no markdown.'
+        },
+        {
+          role: 'user',
+          content: `${DECOMPOSITION_PROMPT}\n\nUser Question: ${originalQuery}\n\nRespond with ONLY valid JSON.`
         }
-      }),
-      signal: AbortSignal.timeout(60_000)
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ollama HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.message?.content;
+      ],
+      'gemma4-legal-iq4xs-direct.gguf',
+      { temperature: 0.3, maxTokens: 1024 }
+    );
 
     if (!content) {
-      throw new Error('No content from Ollama');
+      throw new Error('No content from llama-server');
     }
 
     const parsed = JSON.parse(content) as GemmaDecompositionRaw;
@@ -272,10 +256,10 @@ export async function decomposeQueryWithOllama(
         priority: sg.priority ?? 1.0,
         expectedResults: Math.ceil(100 * (sg.priority ?? 1.0))
       })),
-      reasoning: `Ollama decomposition: ${parsed.reasoning}`
+      reasoning: `Fallback decomposition: ${parsed.reasoning}`
     };
   } catch (err) {
-    console.warn('[Decomposition] Ollama also unavailable, using fallback:', err);
+    console.warn('[Decomposition] Fallback also unavailable, using naive extraction:', err);
     // Already implemented fallback in main function
     throw err;
   }
@@ -292,7 +276,7 @@ export async function planQuery(request: GemmaDecompositionRequest): Promise<Dec
     console.warn('[Decomposition] TurboQuant failed, trying Ollama:', err);
     try {
       // Try Ollama as fallback
-      return await decomposeQueryWithOllama(request);
+      return await decomposeQueryFallback(request);
     } catch (ollErr) {
       console.warn('[Decomposition] Both LLM services failed, using naive fallback:', ollErr);
       // Return naive fallback

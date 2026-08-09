@@ -24,6 +24,7 @@
  */
 
 import { Redis } from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getRedis } from './redis.js';
 import { ENV } from './env.server.js';
 
@@ -95,11 +96,10 @@ export function attachDispose<T extends { quit?: () => Promise<unknown>; disconn
 }
 
 export function createDisposableRedis(url: string = ENV.REDIS_URL): DisposableRedis {
-  const r = new Redis(url, {
-    password:             ENV.REDIS_PASSWORD,
+  const r = getValkeyClient().duplicate({
+    lazyConnect: true,
     maxRetriesPerRequest: 1,
-    connectTimeout:       3000,
-    lazyConnect:          true,
+    connectTimeout: 3000,
   }) as DisposableRedis;
   Object.defineProperty(r, Symbol.asyncDispose, {
     value: async () => {

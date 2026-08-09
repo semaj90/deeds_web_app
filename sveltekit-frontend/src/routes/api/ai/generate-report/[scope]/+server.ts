@@ -1,9 +1,8 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { TIMEOUTS } from '$lib/server/timeouts.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 
 const VALID_SCOPES = ['case', 'evidence', 'poi'] as const;
 
@@ -64,17 +63,18 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 		const systemPrompt = SCOPE_PROMPTS[scope] || SCOPE_PROMPTS.case;
 		const userMessage = `Generate a comprehensive ${scope} report.${contextStr}`;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userMessage }
 				],
 				stream: false,
-				options: { temperature: 0.3 }
+				temperature: 0.3,
+				max_tokens: 1536
 			}),
 			signal: AbortSignal.timeout(TIMEOUTS.USER_FACING)
 		});
@@ -83,13 +83,13 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			return json({ report: null, error: 'AI service unavailable' }, { status: 503 });
 		}
 
-		const data = await res.json();
-		const content = data.message?.content || '';
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const content = data.choices?.[0]?.message?.content || '';
 
 		return json({
 			report: content,
 			scope,
-			model: data.model || 'gemma4-rotorquant:latest',
+			model: LOCAL_VLM_MODEL,
 			generatedAt: new Date().toISOString()
 		});
 	} catch (err) {

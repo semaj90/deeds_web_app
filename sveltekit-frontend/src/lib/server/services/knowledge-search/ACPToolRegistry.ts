@@ -10,6 +10,7 @@ import { pgRows } from '$lib/server/db/client';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { redis } from '$lib/server/redis.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
@@ -365,19 +366,11 @@ const handlers: Record<string, HandlerFn> = {
     }
 
     try {
-      const response = await fetch(`${CONFIG.endpoints.ollama}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, prompt, stream: false })
-      });
-      if (!response.ok) {
-        throw new Error(`Ollama returned ${response.status}: ${response.statusText}`);
-      }
-      const data = await response.json();
+      const text = await bifrostChat([{ role: 'user', content: prompt }], model, {});
       return {
         success: true,
         kind: 'result',
-        data: { text: data.response },
+        data: { text },
         duration: Date.now() - startTime
       };
     } catch (error: any) {

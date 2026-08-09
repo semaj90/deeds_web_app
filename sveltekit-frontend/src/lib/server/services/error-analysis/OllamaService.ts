@@ -4,6 +4,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import type { ErrorReport } from './types.js';
 
 export interface OllamaConfig {
@@ -198,36 +199,17 @@ export class OllamaService {
 
 		for (let attempt = 0; attempt < this.config.maxRetries; attempt++) {
 			try {
-				const controller = new AbortController();
-				const timeoutId = setTimeout(() => controller.abort(), this.config.timeout * 2);
+				const messages = system
+					? [{ role: 'system' as const, content: system }, { role: 'user' as const, content: prompt }]
+					: [{ role: 'user' as const, content: prompt }];
 
-				const body: any = {
-					model: this.config.generationModel,
-					prompt: prompt,
-					stream: false
-				};
-				if (system) {
-					body.system = system;
-				}
-
-				const response = await fetch(this.config.url + '/api/generate', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify(body),
-					signal: controller.signal
+				const content = await bifrostChat(messages, this.config.generationModel, {
+					timeoutMs: this.config.timeout * 2,
 				});
 
-				clearTimeout(timeoutId);
-
-				if (!response.ok) {
-					throw new Error('HTTP ' + response.status + ': ' + (await response.text()));
-				}
-
-				const data = await response.json();
-
-				if (data.response) {
+				if (content) {
 					this.stats.generationSuccesses++;
-					return data.response;
+					return content;
 				}
 
 				throw new Error('Invalid generation response');

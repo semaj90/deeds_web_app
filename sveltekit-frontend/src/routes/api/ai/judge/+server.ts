@@ -1,9 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 /** GBNF-constrained response schema for judicial analysis */
 const judgeResponseSchema = z.object({
@@ -130,32 +128,36 @@ ${evidenceList}
 
 Your Honor, please evaluate this case. Rule on evidence admissibility, assess probable cause, score the case strength for both prosecution and defense, and provide your judicial recommendations.`;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }
 				],
 				stream: false,
-				format: judgeResponseJsonSchema,
-				options: { temperature: 0.5, num_predict: 4096 }
+				response_format: {
+					type: 'json_schema',
+					json_schema: judgeResponseJsonSchema,
+				},
+				temperature: 0.5,
+				max_tokens: 4096
 			}),
 			signal: AbortSignal.timeout(120_000)
 		});
 
-		if (!res.ok) return json({ error: `Ollama error: ${res.status}` }, { status: 502 });
+		if (!res.ok) return json({ error: `llama-server error: ${res.status}` }, { status: 502 });
 
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 		let result: Record<string, unknown>;
 
 		try {
-			result = JSON.parse(data.message?.content || data.response || '{}');
+			result = JSON.parse(data.choices?.[0]?.message?.content || '{}');
 		} catch {
 			// LLM returned non-JSON — construct minimal analysis
-			const rawText = data.message?.content || data.response || '';
+			const rawText = data.choices?.[0]?.message?.content || '';
 			result = {
 				analysis: {
 					id: `analysis-${Date.now()}`,

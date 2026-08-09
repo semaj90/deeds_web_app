@@ -1,6 +1,5 @@
 
-
-import { createRedisConnection } from '$lib/server/redis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { attachDispose } from '$lib/server/redis-disposable.js';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
@@ -31,7 +30,7 @@ export const GET: RequestHandler = async ({ locals }) => {
    // replacing the previous `let client = null; ... finally { if (client) client.quit() }`
    // pattern. The dispose hook swallows quit errors so already-closed
    // clients don't double-throw.
-   await using client = attachDispose(createRedisConnection());
+   await using client = attachDispose(getValkeyClient().duplicate({ lazyConnect: true }));
 
    // Ping using the short-lived client
    if (client && typeof client.ping === 'function') {

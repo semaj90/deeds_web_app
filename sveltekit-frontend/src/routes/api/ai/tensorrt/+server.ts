@@ -9,9 +9,8 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { acquireGpuLease, releaseGpuLease } from '$lib/server/inference/gpu-arbiter.js';
 import { inferLLM, healthCheck as trtHealthCheck } from '$lib/server/trt-llm.js';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 
 const tensorrtSchema = z.object({
 	prompt: z.string().min(1, 'prompt is required').max(10000),
@@ -34,34 +33,20 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!trtAvailable) {
 		if (fallbackToOllama) {
 			try {
-				const ollamaUrl = ENV.OLLAMA_BASE_URL;
-				const ollamaRes = await fetch(`${ollamaUrl}/api/generate`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						model: 'gemma4-rotorquant:latest',
-						prompt,
-						stream: false,
-						options: {
-							temperature: temperature ?? 0.7,
-							num_predict: maxTokens ?? 2048
-						}
-					}),
-					signal: AbortSignal.timeout(120000)
+				const text = await bifrostChat(
+					[{ role: 'user', content: prompt }],
+					'gemma4-legal-iq4xs-direct.gguf',
+					{ temperature: temperature ?? 0.7, maxTokens: maxTokens ?? 2048, timeoutMs: 120_000 }
+				);
+				return json({
+					text,
+					model: 'gemma4-legal-iq4xs-direct.gguf',
+					backend: 'llama-server',
+					trtAvailable: false
 				});
-				if (ollamaRes.ok) {
-					const rawText = await ollamaRes.text();
-					const ollamaData = fastJsonParse<{ response?: string }>(rawText);
-					return json({
-						text: ollamaData.response ?? '',
-						model: 'ollama',
-						backend: 'ollama',
-						trtAvailable: false
-					});
-				}
-			} catch { /* Ollama also unavailable */ }
+			} catch { /* llama-server also unavailable */ }
 		}
-		return json({ error: 'TensorRT-LLM and Ollama both unavailable' }, { status: 503 });
+		return json({ error: 'TensorRT-LLM and llama-server both unavailable' }, { status: 503 });
 	}
 
 	// Acquire GPU lease for TensorRT

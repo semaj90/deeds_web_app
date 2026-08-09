@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 /**
  * Emotion Context Module
@@ -197,7 +198,7 @@ export function updateBehavior(metrics: Parameters<typeof detectBehavioralSignal
 }
 
 /**
- * Analyze a webcam frame via the Ollama VLM endpoint (Gemma 3 SigLIP).
+ * Analyze a webcam frame via the local llama-server VLM endpoint.
  * Sends a base64 image to the multimodal model, parses the emotion label,
  * and calls updateFaceEmotion() to update the composite state.
  *
@@ -222,11 +223,11 @@ export async function analyzeWebcamFrame(
 	};
 
 	try {
-		const res = await fetch(`${ollamaUrl}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{
 						role: 'user',
@@ -235,13 +236,14 @@ export async function analyzeWebcamFrame(
 					},
 				],
 				stream: false,
+				max_tokens: 32,
 			}),
 		});
 
 		if (!res.ok) return null;
 
-		const data = await res.json();
-		const responseText = (data?.message?.content ?? '').toLowerCase().trim();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const responseText = (data?.choices?.[0]?.message?.content ?? '').toLowerCase().trim();
 
 		// Parse emotion from VLM response
 		let detectedEmotion: FaceEmotion = 'neutral';

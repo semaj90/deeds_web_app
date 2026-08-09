@@ -3,9 +3,8 @@ import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq, sql } from 'drizzle-orm';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
-import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { isUuid } from '$lib/server/validation.js';
 
 /** GBNF-constrained response schema for evidence key points */
@@ -56,7 +55,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 
 /**
  * POST /api/evidence/[id]/key-points
- * Generate 1-3 key point bullets via Ollama and store in evidence.aiAnalysis
+ * Generate 1-3 key point bullets via the local llama server and store in evidence.aiAnalysis
  */
 export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -114,15 +113,25 @@ Respond with ONLY a JSON object:
 	let confidence = 0.7;
 
 	try {
-		const ollamaRes = await ollamaFetch(`${getOllamaGenerationEndpoint()}/api/generate`, {
+		const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
-				prompt,
-				format: evidenceKeyPointsJsonSchema,
+				model: LOCAL_VLM_MODEL,
+				messages: [
+					{ role: 'system', content: 'You extract concise legal evidence key points as JSON.' },
+					{ role: 'user', content: prompt },
+				],
 				stream: false,
-				options: { temperature: 0.3, num_predict: 512 }
+				temperature: 0.3,
+				max_tokens: 512,
+				response_format: {
+					type: 'json_schema',
+					json_schema: {
+						name: 'evidence_key_points',
+						schema: evidenceKeyPointsJsonSchema,
+					},
+				},
 			}),
 			signal: AbortSignal.timeout(45000)
 		});
@@ -132,7 +141,8 @@ Respond with ONLY a JSON object:
 		}
 
 		const data = await ollamaRes.json();
-		const result = JSON.parse(data.response);
+		const content = data.choices?.[0]?.message?.content ?? '';
+		const result = JSON.parse(content);
 
 		if (Array.isArray(result.keyPoints) && result.keyPoints.length > 0) {
 			keyPoints = result.keyPoints.slice(0, 3).map((p: unknown) => String(p).trim());

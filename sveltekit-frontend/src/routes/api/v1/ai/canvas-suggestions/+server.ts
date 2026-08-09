@@ -1,9 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
-import { getOllamaChatEndpoint } from '$lib/server/utils/ollama-endpoint.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { TIMEOUTS } from '$lib/server/timeouts.js';
 
 const suggestionsSchema = z.object({
@@ -24,17 +22,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const prompt = `Given evidence data for a legal case, suggest how to organize and group related evidence items on an investigation board. Respond with a JSON array of suggestions, each with: { "type": "group"|"link"|"highlight", "description": string, "targetIds": string[] }`;
 
-		const res = await ollamaFetch(`${getOllamaChatEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: prompt },
 					{ role: 'user', content: JSON.stringify(parsed.data.evidenceData ?? {}).slice(0, 5000) }
 				],
 				stream: false,
-				options: { temperature: 0.4 }
+				temperature: 0.4,
+				max_tokens: 512,
 			}),
 			signal: AbortSignal.timeout(TIMEOUTS.USER_FACING)
 		});
@@ -44,7 +43,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		}
 
 		const data = await res.json();
-		const content = data.message?.content || '[]';
+		const content = data.choices?.[0]?.message?.content || '[]';
 
 		// Try to parse as JSON array, fallback to text suggestion
 		let suggestions: unknown[];

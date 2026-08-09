@@ -1,14 +1,14 @@
 /**
  * POST /api/test/ollama-cached
  *
- * Test endpoint for ollamaCachedChat() (L1 Redis + Direct Ollama)
+ * Test endpoint for llamaServerCachedChat() (L1 Redis + Direct llama-server)
  * NO AUTH REQUIRED - for testing only
  */
 
 import { json } from '@sveltejs/kit';
 import { dev } from '$app/environment';
 import type { RequestHandler } from './$types';
-import { ollamaCachedChat } from '$lib/server/ollama-cached.js';
+import { llamaServerCachedChat } from '$lib/server/ollama-cached.js';
 import { z } from 'zod';
 
 const ollamaCachedSchema = z.object({
@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     const { query, model, temperature, maxTokens } = parsed.data;
 
-    const content = await ollamaCachedChat([{ role: 'user', content: query }], model, {
+    const content = await llamaServerCachedChat([{ role: 'user', content: query }], model, {
       temperature,
       maxTokens,
       timeoutMs: 60_000,

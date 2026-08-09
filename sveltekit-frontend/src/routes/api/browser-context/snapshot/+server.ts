@@ -7,6 +7,7 @@ import {
 } from '$lib/server/admin/browser-context-sanitizer.js';
 import type { SanitizedBrowserContext } from '$lib/types/browser-context.js';
 import { BROWSER_CONTEXT_CAPS } from '$lib/types/browser-context.js';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 /**
  * POST /api/browser-context/snapshot
@@ -31,9 +32,7 @@ const inProcessStore = new Map<string, SanitizedBrowserContext>();
 
 async function tryRedis<T>(fn: (r: import('ioredis').default) => Promise<T>): Promise<T | null> {
   try {
-    const { default: Redis } = await import('ioredis');
-    const r = new Redis(process.env.REDIS_URL ?? 'redis://127.0.0.1:6379', {
-      password: process.env.REDIS_PASSWORD,
+    const r = getValkeyClient().duplicate({
       lazyConnect: true,
       connectTimeout: 1500,
       maxRetriesPerRequest: 1,

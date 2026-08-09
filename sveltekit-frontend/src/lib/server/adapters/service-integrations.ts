@@ -17,6 +17,7 @@ const privateEnv: Record<string, string | undefined> = process.env;
 import { ENV } from '$lib/server/env.server.js';
 import { VECTOR_CONFIG } from '$lib/server/config/vector-config.js';
 import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { ollamaFetch } from '$lib/server/ollama.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import type {
 	MinIOClient,
@@ -192,7 +193,7 @@ export class OllamaAdapter implements OllamaClient {
   ): Promise<string> {
     const model = opts?.model || this.config.chatModel;
     const url = this.config.baseUrl + '/api/generate';
-    const response = await fetch(url, {
+    const response = await ollamaFetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -217,7 +218,7 @@ export class OllamaAdapter implements OllamaClient {
   ): Promise<string | AsyncIterable<string>> {
     const model = opts?.model || this.config.chatModel;
     const url = this.config.baseUrl + '/api/chat';
-    const response = await fetch(url, {
+    const response = await ollamaFetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

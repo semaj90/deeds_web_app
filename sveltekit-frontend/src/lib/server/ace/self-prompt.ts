@@ -10,18 +10,15 @@
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import {
-  getChatModelKeepAlive,
-  getOllamaEndpoint,
   bifrostChat,
-  ollamaFetch,
 } from '$lib/server/ollama.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import type { ACEContext, SelfEvaluation } from './types.js';
 
-const OLLAMA_URL = getOllamaEndpoint();
-const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const MODEL = LOCAL_VLM_MODEL;
 const EVAL_CACHE_TTL = 3600; // 1 hour
 const QUALITY_THRESHOLD = 0.6;
 
@@ -65,24 +62,24 @@ export async function evaluateResponse(opts: {
           return text;
         }
 
-        const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+        const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: MODEL,
-            prompt: evalPrompt,
+            model: LOCAL_VLM_MODEL,
+            messages: [{ role: 'user', content: evalPrompt }],
             stream: false,
-            format: EVAL_FORMAT,
-            keep_alive: getChatModelKeepAlive(),
-            options: { temperature: 0.1, num_predict: 256 },
+            response_format: EVAL_FORMAT,
+            temperature: 0.1,
+            max_tokens: 256,
           }),
           signal: AbortSignal.timeout(15_000),
         });
 
-        if (!res.ok) throw new Error(`Ollama ${res.status}`);
+        if (!res.ok) throw new Error(`llama-server ${res.status}`);
 
         const data = await res.json();
-        const text = String(data.response ?? '');
+        const text = String(data.choices?.[0]?.message?.content ?? '');
         gen.end({ output: text.slice(0, 500) });
         return text;
       }

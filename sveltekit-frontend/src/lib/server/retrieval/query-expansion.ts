@@ -2,14 +2,14 @@
  * Query Expansion — Legal Synonym + LLM-Based Term Expansion
  *
  * Expands search queries with legal synonyms and related terms
- * to improve retrieval recall. Optional LLM-based expansion via Ollama.
+ * to improve retrieval recall. Optional LLM-based expansion via the local llama-server.
  *
  * Usage:
  *   const expanded = expandQuery('defendant negligence tort');
  *   // { original: '...', expanded: '... accused carelessness civil wrong', synonyms: [...] }
  */
 
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 export interface ExpandedQuery {
 	original: string;
@@ -130,24 +130,33 @@ export function expandQuery(query: string): ExpandedQuery {
 }
 
 /**
- * Expand query using Ollama LLM for deeper semantic expansion.
- * Falls back to dictionary-only if Ollama is unavailable.
+ * Expand query using the local llama-server for deeper semantic expansion.
+ * Falls back to dictionary-only if the model is unavailable.
  */
 export async function expandWithOllama(query: string): Promise<ExpandedQuery> {
 	const dictResult = expandQuery(query);
 
 	try {
-		const ollamaUrl = ENV.OLLAMA_BASE_URL;
-		if (!ollamaUrl) return dictResult;
+		if (!LLAMA_SERVER_BASE_URL) return dictResult;
 
-		const res = await fetch(`${ollamaUrl}/api/generate`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
-				prompt: `List 3-5 synonyms or related legal terms for this query. Return ONLY the terms separated by commas, nothing else.\n\nQuery: "${query}"`,
+				model: LOCAL_VLM_MODEL,
+				messages: [
+					{
+						role: 'system',
+						content: 'You expand legal search queries by returning only concise synonym and related-term suggestions.',
+					},
+					{
+						role: 'user',
+						content: `List 3-5 synonyms or related legal terms for this query. Return ONLY the terms separated by commas, nothing else.\n\nQuery: "${query}"`,
+					},
+				],
 				stream: false,
-				options: { temperature: 0.3, num_predict: 50 }
+				temperature: 0.3,
+				max_tokens: 50
 			}),
 			signal: AbortSignal.timeout(5000)
 		});
@@ -155,7 +164,7 @@ export async function expandWithOllama(query: string): Promise<ExpandedQuery> {
 		if (!res.ok) return dictResult;
 
 		const data = await res.json();
-		const llmTerms = (data.response ?? '')
+		const llmTerms = ((data.choices?.[0]?.message?.content ?? '') as string)
 			.split(',')
 			.map((t: string) => t.trim().toLowerCase())
 			.filter((t: string) => t.length > 2 && t.length < 50)

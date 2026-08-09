@@ -1,14 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
-const safeJsonPost = (await import('$lib/server/utils/safe-json-post.js')).default as unknown as <
-  T,
->(
-  url: string,
-  payload: unknown,
-  opts?: { timeoutMs?: number; maxResponseBytes?: number; fallback?: T }
-) => Promise<T | undefined>;
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const summarizeSchema = z.object({
   content: z.string().min(1).max(200000),
@@ -48,21 +41,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     (async () => {
       try {
-        const { ENV } = await import('$lib/server/env.server.js');
-
-        const data = await safeJsonPost<any>(
-          `${getOllamaGenerationEndpoint()}/api/generate`,
-          {
-            model: 'gemma4-rotorquant:latest',
-            prompt: `Summarize the following legal text concisely. Focus on key facts, legal issues, and conclusions.\n\nText:\n${content.slice(0, 50000)}`,
+        const data = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: LOCAL_VLM_MODEL,
+            messages: [
+              { role: 'system', content: 'Summarize legal text concisely and accurately.' },
+              {
+                role: 'user',
+                content: `Summarize the following legal text concisely. Focus on key facts, legal issues, and conclusions.\n\nText:\n${content.slice(0, 50000)}`,
+              },
+            ],
             stream: false,
-            options: { temperature: 0.3 },
-          },
-          { timeoutMs: 120_000, maxResponseBytes: 2_000_000 }
-        );
+            temperature: 0.3,
+            max_tokens: 1024,
+          }),
+          signal: AbortSignal.timeout(120_000),
+        });
 
-        if (data && (data.response || data.result)) {
-          const result = { summary: data.response ?? data.result };
+        if (data.ok) {
+          const payload = await data.json();
+          const result = { summary: payload.choices?.[0]?.message?.content ?? '' };
           await redis.set(`summary:${textHash}`, JSON.stringify(result), 'EX', 86400);
           await redis.set(
             `job:${jobId}`,

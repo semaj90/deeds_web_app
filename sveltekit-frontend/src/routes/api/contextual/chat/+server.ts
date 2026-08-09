@@ -3,8 +3,7 @@ import { json } from '@sveltejs/kit';
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
 import type { OllamaResponse } from '$lib/server/ollama.js';
-import { getChatModelKeepAlive, ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { getRedis } from '$lib/server/redis.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
@@ -215,30 +214,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const ollamaCallDiagnostics: OllamaCallDiagnostic[] = [];
 
     if (enableFunctions) {
-      // Agentic mode: Ollama native tool calling with iterative loop
+      // Agentic mode: local llama-server tool calling with iterative loop
       const MAX_TOOL_ROUNDS = 1;
       const MAX_TOTAL_TOOL_CALLS = 3;
       let toolRounds = 0;
       let totalToolCalls = 0;
 
       while (toolRounds < MAX_TOOL_ROUNDS) {
-        const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+        const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-rotorquant:latest',
+            model: LOCAL_VLM_MODEL,
             messages,
             stream: false,
-            keep_alive: getChatModelKeepAlive(),
             tools: CONTEXTUAL_TOOLS,
-            options: {
-              temperature: 0.1,
-              top_k: 20,
-              top_p: 0.8,
-              num_ctx: TOOL_NUM_CTX,
-              num_predict: TOOL_NUM_PREDICT,
-              repeat_penalty: 1.05,
-            },
+            temperature: 0.1,
+            top_k: 20,
+            top_p: 0.8,
+            max_tokens: TOOL_NUM_PREDICT,
           }),
           signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
         });
@@ -250,18 +244,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           );
         }
 
-        const data = await res.json();
+        const data = await res.json() as { choices?: Array<{ message?: { content?: string; tool_calls?: Array<{ function?: { name?: string; arguments?: string } }> } }> };
         ollamaCallDiagnostics.push(collectOllamaDiagnostic('tool-round', data));
-        const toolCalls = data.message?.tool_calls;
+        const toolCalls = data.choices?.[0]?.message?.tool_calls;
 
         if (!toolCalls || toolCalls.length === 0) {
           // No tool calls — this is the final response
-          responseText = data.message?.content || '';
+          responseText = data.choices?.[0]?.message?.content || '';
           break;
         }
 
         // Execute each tool call (respecting hard total cap)
-        messages.push({ role: 'assistant', content: data.message?.content || '' });
+        messages.push({ role: 'assistant', content: data.choices?.[0]?.message?.content || '' });
 
         for (const tc of toolCalls) {
           if (totalToolCalls >= MAX_TOTAL_TOOL_CALLS) break;
@@ -284,22 +278,17 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
       // If we exhausted rounds without a final text response, request one
       if (!responseText) {
-        const finalRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+        const finalRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            model: 'gemma4-rotorquant:latest',
+            model: LOCAL_VLM_MODEL,
             messages,
             stream: false,
-            keep_alive: getChatModelKeepAlive(),
-            options: {
-              temperature: 0.1,
-              top_k: 20,
-              top_p: 0.8,
-              num_ctx: TOOL_NUM_CTX,
-              num_predict: TOOL_NUM_PREDICT,
-              repeat_penalty: 1.05,
-            },
+            temperature: 0.1,
+            top_k: 20,
+            top_p: 0.8,
+            max_tokens: TOOL_NUM_PREDICT,
           }),
           signal: AbortSignal.timeout(TOOL_TIMEOUT_MS),
         });
@@ -308,27 +297,22 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           ollamaCallDiagnostics.push(collectOllamaDiagnostic('tool-final', finalData));
         }
         responseText =
-          finalData?.message?.content ||
+          finalData?.choices?.[0]?.message?.content ||
           'Tool calls completed but could not generate a final response.';
       }
     } else {
-      // Simple mode: no tools, single Ollama call
-      const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+      // Simple mode: no tools, single llama-server call
+      const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma4-rotorquant:latest',
+          model: LOCAL_VLM_MODEL,
           messages,
           stream: false,
-          keep_alive: getChatModelKeepAlive(),
-          options: {
-            temperature: 0.1,
-            top_k: 20,
-            top_p: 0.8,
-            num_ctx: SIMPLE_NUM_CTX,
-            num_predict: SIMPLE_NUM_PREDICT,
-            repeat_penalty: 1.05,
-          },
+          temperature: 0.1,
+          top_k: 20,
+          top_p: 0.8,
+          max_tokens: SIMPLE_NUM_PREDICT,
         }),
         signal: AbortSignal.timeout(SIMPLE_TIMEOUT_MS),
       });
@@ -340,9 +324,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         );
       }
 
-      const data = await res.json();
+      const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
       ollamaCallDiagnostics.push(collectOllamaDiagnostic('simple', data));
-      responseText = data.message?.content || '';
+      responseText = data.choices?.[0]?.message?.content || '';
     }
 
     const ollamaDiagnostics = summarizeOllamaDiagnostics(ollamaCallDiagnostics);

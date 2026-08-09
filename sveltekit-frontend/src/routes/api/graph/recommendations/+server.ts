@@ -1,6 +1,6 @@
 /**
  * POST /api/graph/recommendations
- * Generate case investigation recommendations using vector search + LLM.
+ * Generate case investigation recommendations using vector search + the local model server.
  *
  * Body: { query: string, caseId?: string }
  * Returns: { success, summary, recommendations, didYouMean, predictiveSignals }
@@ -11,8 +11,7 @@ import { z } from 'zod';
 
 import { embedText } from '$lib/server/embedding/embed.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 /** GBNF-constrained response schema for recommendations */
 const recommendationsResponseSchema = z.object({
@@ -63,10 +62,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			})
 			.join('\n');
 
-		// 2. Generate recommendations via Ollama
-		const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-		const MODEL = 'gemma4-rotorquant:latest';
-
+		// 2. Generate recommendations via the local model server
 		const prompt = `You are a legal case analyst. Based on the query and evidence context below, provide investigation recommendations.
 
 Query: ${query}
@@ -85,25 +81,35 @@ Respond in valid JSON with this exact structure:
 
 Provide 3-5 recommendations, 2-3 alternative queries, and 2-4 predictive signals. Return ONLY the JSON object.`;
 
-		const ollamaRes = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+		const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: MODEL,
-				prompt,
+				model: LOCAL_VLM_MODEL,
+				messages: [
+					{ role: 'system', content: 'You are a legal case analyst. Return only valid JSON.' },
+					{ role: 'user', content: prompt },
+				],
 				stream: false,
-				format: recommendationsJsonSchema,
-				options: { temperature: 0.4, num_predict: 1024 }
+				temperature: 0.4,
+				max_tokens: 1024,
+				response_format: {
+					type: 'json_schema',
+					json_schema: {
+						name: 'recommendations',
+						schema: recommendationsJsonSchema,
+					},
+				},
 			}),
 			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!ollamaRes.ok) {
-			throw new Error(`Ollama returned ${ollamaRes.status}`);
+			throw new Error(`Local model server returned ${ollamaRes.status}`);
 		}
 
 		const ollamaData = await ollamaRes.json();
-		const responseText = ollamaData.response ?? '';
+		const responseText = ollamaData.choices?.[0]?.message?.content ?? '';
 
 		// 3. Parse LLM JSON response
 		let llmResult: Record<string, unknown>;

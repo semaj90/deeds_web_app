@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const analysisSchema = z.object({
 	evidenceId: z.string().min(1),
@@ -9,7 +9,7 @@ const analysisSchema = z.object({
 	caseId: z.string().optional()
 });
 
-/** POST /api/v1/evidence/advanced-analysis — Multi-type LLM analysis of evidence */
+/** POST /api/v1/evidence/advanced-analysis — Multi-type analysis of evidence via the local model server */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });
 	try {
@@ -43,9 +43,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const text = item.description || item.title || '';
 		const results: Record<string, unknown> = {};
 
-		const { ollamaFetch } = await import('$lib/server/ollama.js');
-		const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
-
 		for (const type of analysisTypes) {
 			const systemPrompts: Record<string, string> = {
 				summary:
@@ -57,14 +54,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			};
 
 			try {
-				const res = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
+				const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: 'gemma4-rotorquant:latest',
-						prompt: `${systemPrompts[type]}\n\nEvidence text:\n${text.slice(0, 8000)}`,
+						model: LOCAL_VLM_MODEL,
+						messages: [
+							{ role: 'system', content: systemPrompts[type] },
+							{ role: 'user', content: `Evidence text:\n${text.slice(0, 8000)}` },
+						],
 						stream: false,
-						options: { temperature: 0.3 }
+						temperature: 0.3,
+						max_tokens: 1024,
 					}),
 					signal: AbortSignal.timeout(60_000)
 				});
@@ -72,9 +73,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				if (res.ok) {
 					const data = await res.json();
 					try {
-						results[type] = JSON.parse(data.response);
+						results[type] = JSON.parse(data.choices?.[0]?.message?.content ?? '');
 					} catch {
-						results[type] = { raw: data.response };
+						results[type] = { raw: data.choices?.[0]?.message?.content ?? '' };
 					}
 				} else {
 					results[type] = { error: `LLM returned ${res.status}` };

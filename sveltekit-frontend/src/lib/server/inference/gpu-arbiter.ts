@@ -17,7 +17,7 @@ import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
 
-export type InferenceBackend = 'ollama' | 'tensorrt';
+export type InferenceBackend = 'ollama' | 'llama-server' | 'tensorrt';
 
 interface GpuLease {
 	backend: InferenceBackend;

@@ -17,7 +17,7 @@ import { readFile, unlink } from 'fs/promises';
 import { join } from 'path';
 import type { Redis } from 'ioredis';
 import { ENV } from '$lib/server/env.server';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, bifrostChat } from '$lib/server/ollama.js';
 
 export interface AudioJob {
   evidenceId: string;
@@ -323,27 +323,14 @@ Respond in JSON format:
   "tags": ["tag1", "tag2", "tag3"]
 }`;
 
-      const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'gemma3-legal:latest',
-          prompt: `${systemPrompt}\n\nTranscription:\n${text}`,
-          format: 'json',
-          stream: false,
-          options: {
-            temperature: 0.3,
-            num_predict: 512,
-          },
-        }),
-      });
+      const raw = await bifrostChat(
+        [{ role: 'user', content: `${systemPrompt}\n\nTranscription:\n${text}` }],
+        'gemma4-legal-iq4xs-direct.gguf',
+        { temperature: 0.3, maxTokens: 512 }
+      );
 
-      if (!response.ok) {
-        throw new Error(`Ollama ACE analysis failed: ${response.status}`);
-      }
-
-      const result = await response.json();
-      const analysis = JSON.parse(result.response);
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      const analysis = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
 
       return {
         summary: analysis.summary || '',

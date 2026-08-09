@@ -1,11 +1,11 @@
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { bifrostChat, getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 export type ReportTemplate = 'charging_memo' | 'intake_summary';
 
-const OLLAMA_URL = getOllamaEndpoint();
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
+const OLLAMA_MODEL = LOCAL_VLM_MODEL;
 
 export async function generateReportWithGemma(opts: {
 	caseTitle: string;
@@ -90,22 +90,29 @@ Requirements:
             return content;
         }
 
-        const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+        const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
 	    body: JSON.stringify({
 	        model: OLLAMA_MODEL,
-                prompt,
-                stream: false
+                messages: [
+                    { role: 'system', content: 'You write prosecutorial report templates in HTML.' },
+                    { role: 'user', content: prompt },
+                ],
+                stream: false,
+                temperature: 0.2,
+                max_tokens: 2048,
             }),
+            signal: AbortSignal.timeout(60_000),
         });
 
         if (!res.ok) {
             throw new Error(`Gemma4 request failed: ${res.status} ${res.statusText}`);
         }
 
-        const data = (await res.json()) as { response: string };
-        gen.end({ output: data.response.slice(0, 1000) });
-        return data.response;
+        const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+        const content = data.choices?.[0]?.message?.content ?? '';
+        gen.end({ output: content.slice(0, 1000) });
+        return content;
     });
 }

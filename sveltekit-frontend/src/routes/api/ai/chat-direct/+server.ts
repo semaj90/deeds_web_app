@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { generateCacheKey, getExactMatchCache, setExactMatchCache } from '$lib/server/cache/redis-exact-match.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 
 const chatMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
@@ -20,7 +20,7 @@ const directChatSchema = z
   })
   .refine((d) => d.message?.trim() || d.prompt?.trim(), { message: 'Message is required' });
 
-/** POST /api/ai/chat-direct — Direct Ollama endpoint for load testing (bypasses inference router, uses fast model) */
+/** POST /api/ai/chat-direct — Direct llama-server endpoint for load testing (bypasses inference router, uses the live loaded model) */
 export const POST: RequestHandler = async ({ request, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
   try {
@@ -61,31 +61,29 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     const start = performance.now();
 
-    // Direct Ollama call (bypasses router)
-    const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
+    // Direct llama-server call (bypasses router)
+    const response = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
-        prompt: message,
+        messages: [{ role: 'user', content: message }],
         stream: false,
-        options: {
-          temperature,
-          num_predict: 200,
-        },
+        temperature,
+        max_tokens: 200,
       }),
       signal: AbortSignal.timeout(30000),
     });
 
-    const result = await response.json();
+    const result = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
     const latencyMs = Math.round(performance.now() - start);
-    const responseText = result.response || '';
+    const responseText = result.choices?.[0]?.message?.content || '';
 
     // ── Store in L1 Redis Cache (1hr TTL) ──
     setExactMatchCache(cacheKey, {
       content: responseText,
       model,
-      backend: 'ollama',
+      backend: 'llama-server',
     }).catch((err) => {
       console.warn('[chat-direct] Cache storage failed:', err);
     });
@@ -95,7 +93,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({
       response: responseText,
       model,
-      backend: 'ollama-direct',
+      backend: 'llama-server-direct',
       cached: false,
       performance: { latencyMs },
     });

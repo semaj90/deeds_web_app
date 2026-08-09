@@ -22,6 +22,26 @@ Generated from the current workstation evidence. This is the production-readines
 - `docs/reports/parent-atlas-training-readiness.json`
 - `docs/reports/parent-atlas-open-lanes-todo.md`
 
+## Current proof state update
+
+- GR1 DuckDB / graphify:daily — PASS
+  - offline-parent-atlas-mapreduce.sql now targets live columns only
+- GR2 / GR3 graph runtime — PASS
+  - fresh projection smoke and graph enrichment both pass
+- GR4 PageRank promotion gate — PASS
+  - live promoted run verified successfully
+- GR5 Louvain / Leiden taxonomy — PARTIAL
+  - Louvain is wired
+  - Leiden now has an exact GDS lane in `scripts/atlas/compute-leiden-neo4j.mjs` and passes dry-run
+  - apply-mode persistence and downstream selector choice remain open
+
+Remaining open taxonomy work:
+
+- exact Leiden implementation or a formal approximation contract
+- canonical community taxonomy records
+- taxonomy-aware traversal with bounded fanout
+- replay corpus before any learned promotion
+
 
 ## 2026-06-12 Update — Automation Intelligence / LangGraph / Bitfrost / Tool Manifests
 

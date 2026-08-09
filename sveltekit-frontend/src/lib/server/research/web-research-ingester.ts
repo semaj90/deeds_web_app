@@ -13,7 +13,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { bifrostChat } from '$lib/server/ollama.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { chunkText, truncateForEmbed } from './research-utils.js';
@@ -122,21 +122,14 @@ Content: ${chunk.body.slice(0, 500)}
 
 Tags:`;
 
-    const res = await fetch(`${getOllamaEndpoint()}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: ENV.ROTORQUANT_CHAT_MODEL,
-        prompt,
-        stream: false,
-        options: { temperature: 0.1, num_predict: 80 },
-      }),
-      signal: AbortSignal.timeout(20_000),
-    });
+    const content = await bifrostChat(
+      [{ role: 'user', content: prompt }],
+      ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf',
+      { temperature: 0.1, maxTokens: 80, timeoutMs: 20_000 }
+    ).catch(() => '');
 
-    if (!res.ok) return [];
-    const data = (await res.json()) as { response: string };
-    const match = data.response.match(/\[.*?\]/s);
+    if (!content) return [];
+    const match = content.match(/\[.*?\]/s);
     if (!match) return [];
     const tags = JSON.parse(match[0]) as string[];
     return Array.isArray(tags) ? tags.slice(0, 8) : [];

@@ -3,8 +3,7 @@ import { json } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest } from '$lib/server/db/schema-postgres.js';
 import { and, eq, isNull, or, sql } from 'drizzle-orm';
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
@@ -68,7 +67,7 @@ export const GET: RequestHandler = async ({ params, locals, request }) => {
 
 /**
  * POST /api/persons-of-interest/[id]/summary
- * Generate AI summary for a POI via Ollama and store in aiProfile
+ * Generate AI summary for a POI via the local llama server and store in aiProfile
  */
 export const POST: RequestHandler = async ({ params, locals }) => {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -116,18 +115,27 @@ Respond with ONLY a JSON object:
 
   let summary = '';
   let confidence = 0.7;
-  const ollamaBaseUrl = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 
   try {
-    const ollamaRes = await ollamaFetch(`${ollamaBaseUrl}/api/generate`, {
+    const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: ENV.ROTORQUANT_CHAT_MODEL,
-        prompt,
-        format: poiSummaryResponseJsonSchema,
+        model: LOCAL_VLM_MODEL,
+        messages: [
+          { role: 'system', content: 'You summarize people of interest for investigative context. Return valid JSON.' },
+          { role: 'user', content: prompt },
+        ],
         stream: false,
-        options: { temperature: 0.3, num_predict: 512 },
+        temperature: 0.3,
+        max_tokens: 512,
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: 'poi_summary',
+            schema: poiSummaryResponseJsonSchema,
+          },
+        },
       }),
       signal: AbortSignal.timeout(30000),
     });
@@ -137,7 +145,7 @@ Respond with ONLY a JSON object:
     }
 
     const data = await ollamaRes.json();
-    const result = JSON.parse(data.response);
+    const result = JSON.parse(data.choices?.[0]?.message?.content ?? '');
 
     summary = String(result.summary || '').trim();
     confidence = Math.min(Math.max(Number(result.confidence) || 0.7, 0), 1);

@@ -127,7 +127,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
 				let fullText = '';
 				const responseStream = await llmRouter.generateStream({
 					prompt,
-					provider: 'ollama',
+					provider: 'llama-server',
 					model: MODEL,
 				});
 

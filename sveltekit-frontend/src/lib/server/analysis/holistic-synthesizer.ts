@@ -7,8 +7,7 @@
 
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
 
 const RUNTIME_CONTEXT_SIZE = Number(
@@ -93,24 +92,28 @@ ${input}`;
       });
 
       if (!res.ok) {
-        console.warn('[HolisticSynthesizer] TurboQuant failed, falling back to Ollama');
-        const ollamaRes = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+        console.warn('[HolisticSynthesizer] TurboQuant failed, falling back to local llama-server');
+        const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             model: MODEL,
-            prompt,
+            messages: [{ role: 'user', content: prompt }],
             stream: false,
-            format: synthesisJsonSchema,
-            options: { num_ctx: RUNTIME_CONTEXT_SIZE, temperature: 0.1 }
+            response_format: {
+              type: 'json_schema',
+              json_schema: synthesisJsonSchema,
+            },
+            temperature: 0.1,
+            max_tokens: 4096
           }),
           signal: AbortSignal.timeout(180_000),
         });
 
         if (!ollamaRes.ok) throw new Error('Both synthesis backends failed');
         const data = await ollamaRes.json();
-        const result = typeof data.response === 'string' ? JSON.parse(data.response) : data.response;
-        gen.end({ output: 'Ollama fallback success' });
+        const result = JSON.parse(String(data.choices?.[0]?.message?.content ?? '').replace(/^```json?\n?|\n?```$/g, '').trim());
+        gen.end({ output: 'local llama-server fallback success' });
         return result as HolisticSynthesisResult;
       }
 

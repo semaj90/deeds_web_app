@@ -15,7 +15,7 @@
  */
 
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import pg from 'pg';
 import type { QueryResult } from 'pg';
 
@@ -212,12 +212,12 @@ async function searchRedisCentroids(
   timeout: number
 ): Promise<LaneOutcome> {
   try {
-    const redis = new Redis({
-      host: process.env.REDIS_HOST || '127.0.0.1',
-      port: parseInt(process.env.REDIS_PORT || '6379', 10),
-      password: process.env.REDIS_PASSWORD,
+    const redis = getValkeyClient().duplicate({
       connectTimeout: timeout,
+      lazyConnect: true,
+      enableOfflineQueue: false,
     });
+    if (redis.status === 'wait') await redis.connect();
 
     // Look up cached centroids by approximate similarity
     // This is a simplified version; real implementation would do cosine similarity

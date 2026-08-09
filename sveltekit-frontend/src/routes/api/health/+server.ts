@@ -23,6 +23,7 @@ import { getInFlightCount } from '$lib/server/embedding/embed.js';
 import { checkGrpcHealth } from '$lib/server/grpc/embedding-client.js';
 import { ENV, SEAWEED_MASTER_PORT } from '$lib/server/env.server.js';
 import { getParentAtlasRuntimeProfileManifest } from '$lib/server/runtime-profile.js';
+import { pingValkey } from '$lib/server/cache/valkey-client.js';
 
 import { cacheMetrics } from '$lib/server/cache-metrics.js';
 import { cacheControl } from '$lib/server/middleware/cache-headers.js';
@@ -487,26 +488,10 @@ async function probeTcp(host: string, port: number, required = false): Promise<C
 async function probeRedis(required = false): Promise<CheckResult> {
   const start = performance.now();
   try {
-    const { default: Redis } = await import('ioredis');
-    const redis = new Redis(ENV.REDIS_URL, {
-      password: ENV.REDIS_PASSWORD,
-      lazyConnect: true,
-      connectTimeout: 3000,
-      maxRetriesPerRequest: 0,
-      retryStrategy: () => null,
-      enableOfflineQueue: false,
-    });
-
-    try {
-      await redis.connect();
-      const pong = await redis.ping();
-      if (String(pong).toUpperCase() === 'PONG') {
-        return okResult(Math.round(performance.now() - start), required);
-      }
-      return errorResult(Math.round(performance.now() - start), 'Service unreachable', required);
-    } finally {
-      await redis.quit().catch(() => {});
-    }
+    const ok = await pingValkey();
+    return ok
+      ? okResult(Math.round(performance.now() - start), required)
+      : errorResult(Math.round(performance.now() - start), 'Service unreachable', required);
   } catch {
     return errorResult(Math.round(performance.now() - start), 'Service unreachable', required);
   }

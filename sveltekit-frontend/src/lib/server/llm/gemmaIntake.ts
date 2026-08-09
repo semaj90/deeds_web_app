@@ -1,6 +1,5 @@
-import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
-import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 export type ExtractedPerson = {
  fullName: string;
@@ -72,24 +71,31 @@ NARRATIVE:
 ${narrative}
 `;
 
- const data = await traceLLM('gemma-intake', { model: 'gemma4-rotorquant:latest', prompt: narrative.slice(0, 500) }, async (gen) => {
-	const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+ const data = await traceLLM('gemma-intake', { model: LOCAL_VLM_MODEL, prompt: narrative.slice(0, 500) }, async (gen) => {
+	const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'gemma4-rotorquant:latest',
-			prompt,
+			model: LOCAL_VLM_MODEL,
+			messages: [
+				{ role: 'system', content: 'You extract legal intake structure as strict JSON.' },
+				{ role: 'user', content: prompt },
+			],
 			stream: false,
+			temperature: 0.2,
+			max_tokens: 2048,
 		}),
+		signal: AbortSignal.timeout(60_000),
 	});
 
 	if (!res.ok) {
 		throw new Error(`Gemma4 intake extraction failed: ${res.status} ${res.statusText}`);
 	}
 
-	const d = (await res.json()) as { response: string };
-	gen.end({ output: d.response.slice(0, 1000) });
-	return d;
+	const d = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+	const content = d.choices?.[0]?.message?.content ?? '';
+	gen.end({ output: content.slice(0, 1000) });
+	return { response: content };
  });
 
  let parsed: IntakeExtractionResult;

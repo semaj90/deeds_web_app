@@ -1,9 +1,9 @@
 /**
- * Gemma 4 + Ollama Multi-Step Tool-Calling Loop
+ * Gemma 4 + local llama-server Multi-Step Tool-Calling Loop
  *
  * Implements the explicit agentic cycle:
  *   1. Define tools (JSON Schema function definitions)
- *   2. Send user query + tools to Ollama /api/chat
+ *   2. Send user query + tools to the local chat endpoint
  *   3. Model emits tool_calls[] — execute each one locally
  *   4. Feed tool results back as role:"tool" messages
  *   5. Model generates final natural-language answer
@@ -15,35 +15,25 @@
  *   - System prompt override for ACE/wiki/fix_recommend contexts
  *   - Configurable max iterations to prevent infinite loops
  *
- * Ollama API shape (POST /api/chat):
- *   Request:  { model, messages, tools, stream, format?, options?, keep_alive? }
- *   Response: { message: { role, content, tool_calls? }, done }
+ * Local OpenAI-compatible API shape (POST /chat/completions):
+ *   Request:  { model, messages, tools, stream, response_format?, temperature?, max_tokens? }
+ *   Response: { choices: [{ message: { role, content, tool_calls? } }] }
  *   Tool result: { role: "tool", content: "<json>", tool_name: "<name>" }
  */
 
-import { ollamaFetch, getChatModelKeepAlive, VLM_MODELS } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { VLM_MODELS } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { logToolTrace, type ToolTraceStatus } from '$lib/server/observability/tool-trace.js';
 import { parseToolCalls as parseToolCallsFromText } from '$lib/server/ai/tool-shim.js';
-
-const RUNTIME_CONTEXT_SIZE = Number(
-  process.env.LLM_CONTEXT_SIZE ??
-    process.env.TURBO_CTX_SIZE ??
-    process.env.LLAMA_CTX_SIZE ??
-    process.env.TURBO_CTX ??
-    process.env.LLAMA_SERVER_CTX ??
-    process.env.OLLAMA_CONTEXT_LENGTH ??
-    65536
-);
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Types
 // ═══════════════════════════════════════════════════════════════════════════
 
-/** JSON Schema parameter definition for an Ollama tool */
+/** JSON Schema parameter definition for a tool */
 export interface ToolParameterSchema {
   type: 'object';
   properties: Record<
@@ -58,7 +48,7 @@ export interface ToolParameterSchema {
   required?: string[];
 }
 
-/** A single tool definition in the Ollama /api/chat tools[] array */
+/** A single tool definition in the tools array */
 export interface OllamaToolDef {
   type: 'function';
   function: {
@@ -76,7 +66,7 @@ export interface OllamaToolCall {
   };
 }
 
-/** A message in the Ollama chat history */
+/** A message in the chat history */
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant' | 'tool';
   content: string;
@@ -85,7 +75,7 @@ export interface ChatMessage {
   images?: string[];
 }
 
-/** The raw response object from Ollama /api/chat (non-streaming) */
+/** The raw response object from the local chat endpoint */
 export interface OllamaChatResponse {
   model: string;
   created_at: string;
@@ -109,7 +99,7 @@ export type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 
 /** Configuration for callGemma4WithTools */
 export interface Gemma4ToolLoopOpts {
-  /** Ollama model name (default: ENV.GEMMA4_MODEL / gemma4-rotorquant:latest) */
+  /** Model name (default: ENV.GEMMA4_MODEL / gemma4-rotorquant:latest) */
   model?: string;
   /** Temperature (default: 0.1 for tool precision) */
   temperature?: number;
@@ -117,11 +107,11 @@ export interface Gemma4ToolLoopOpts {
   maxTokens?: number;
   /** System prompt override — replaces the default legal-assistant system prompt */
   systemPromptOverride?: string;
-  /** JSON schema for structured final output (Ollama `format` field) */
+  /** JSON schema for structured final output (OpenAI-compatible `response_format`) */
   responseSchema?: Record<string, unknown>;
   /** Maximum tool-call loop iterations before forcing a text answer (default: 5) */
   maxIterations?: number;
-  /** Ollama keep_alive (default: from getChatModelKeepAlive()) */
+  /** keep_alive (reserved for compatibility) */
   keepAlive?: string;
   /** Request timeout in ms (default: 120_000) */
   timeoutMs?: number;
@@ -168,7 +158,7 @@ Be precise, accurate, and grounded in the tool output.`;
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Execute the full Gemma 4 + Ollama agentic tool-calling loop.
+ * Execute the full Gemma 4 + local server agentic tool-calling loop.
  *
  * ```
  *  ┌──────────────────────────────────────────────────────┐
@@ -185,7 +175,7 @@ Be precise, accurate, and grounded in the tool output.`;
  *                     │
  *  ┌──────────────────▼───────────────────────────────────┐
  *  │  STEP 2: POST /api/chat { messages, tools, … }       │
- *  │    Ollama returns { message.tool_calls? }             │
+ *  │    Server returns { choices[0].message.tool_calls? }  │
  *  └──────────────────┬───────────────────────────────────┘
  *                     │
  *          ┌──────────▼──────────┐
@@ -209,10 +199,9 @@ export async function callGemma4WithTools(
   handlers: Map<string, ToolHandler>,
   opts: Gemma4ToolLoopOpts = {}
 ): Promise<Gemma4ToolLoopResult> {
-  const model = opts.model ?? VLM_MODELS.gemma4;
+  const model = opts.model ?? LOCAL_VLM_MODEL ?? VLM_MODELS.gemma4;
   const maxIter = opts.maxIterations ?? 5;
   const timeout = opts.timeoutMs ?? 120_000;
-  const keepAlive = opts.keepAlive ?? getChatModelKeepAlive();
   const loopStart = performance.now();
 
   // ── Step 1: Build initial messages ──────────────────────────────────────
@@ -237,12 +226,8 @@ export async function callGemma4WithTools(
       messages,
       tools: tools.length > 0 ? tools : undefined,
       stream: false,
-      keep_alive: keepAlive,
-      options: {
-        temperature: opts.temperature ?? 0.1,
-        num_predict: opts.maxTokens ?? 4096,
-        num_ctx: RUNTIME_CONTEXT_SIZE,
-      },
+      temperature: opts.temperature ?? 0.1,
+      max_tokens: opts.maxTokens ?? 4096,
       ...(opts.responseSchema ? { format: opts.responseSchema } : {}),
     };
 
@@ -251,12 +236,12 @@ export async function callGemma4WithTools(
         `${messages.length} messages, ${tools.length} tools`
     );
 
-    // ── POST /api/chat ──────────────────────────────────────────────────
+    // ── POST /chat/completions ──────────────────────────────────────────
     const chatResponse = await traceLLM(
       'gemma4-tool-loop',
       { model, prompt: query.slice(0, 500), iteration: i + 1 },
       async (gen) => {
-        const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+        const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(ollamaBody),
@@ -265,18 +250,38 @@ export async function callGemma4WithTools(
 
         if (!res.ok) {
           const errText = await res.text().catch(() => '');
-          throw new Error(`Ollama /api/chat failed: ${res.status} ${errText.slice(0, 200)}`);
+          throw new Error(`llama-server /chat/completions failed: ${res.status} ${errText.slice(0, 200)}`);
         }
 
-        const data = (await res.json()) as OllamaChatResponse;
+        const data = (await res.json()) as {
+          choices?: Array<{ message?: { content?: string; tool_calls?: OllamaToolCall[] } }>;
+          model?: string;
+          created_at?: string;
+          total_duration?: number;
+          prompt_eval_count?: number;
+          eval_count?: number;
+        };
+        const message = data.choices?.[0]?.message ?? {};
         gen.end({
-          output: (data.message?.content ?? '').slice(0, 1000),
+          output: (message.content ?? '').slice(0, 1000),
           usage: {
             promptTokens: data.prompt_eval_count,
             completionTokens: data.eval_count,
           },
         });
-        return data;
+        return {
+          model: data.model ?? model,
+          created_at: data.created_at ?? new Date().toISOString(),
+          message: {
+            role: 'assistant' as const,
+            content: message.content ?? '',
+            tool_calls: message.tool_calls,
+          },
+          done: true,
+          total_duration: data.total_duration,
+          prompt_eval_count: data.prompt_eval_count,
+          eval_count: data.eval_count,
+        } satisfies OllamaChatResponse;
       }
     );
 
@@ -432,25 +437,22 @@ export async function callGemma4WithTools(
       },
     ],
     stream: false,
-    keep_alive: keepAlive,
-    options: {
-      temperature: opts.temperature ?? 0.1,
-      num_predict: opts.maxTokens ?? 4096,
-      num_ctx: RUNTIME_CONTEXT_SIZE,
-      repeat_penalty: 1.05,
-    },
+    temperature: opts.temperature ?? 0.1,
+    max_tokens: opts.maxTokens ?? 4096,
     ...(opts.responseSchema ? { format: opts.responseSchema } : {}),
   };
 
-  const finalRes = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+  const finalRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(finalBody),
     signal: AbortSignal.timeout(timeout),
   });
 
-  const finalData = (await finalRes.json()) as OllamaChatResponse;
-  const finalAnswer = finalData.message?.content ?? '';
+  const finalData = (await finalRes.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const finalAnswer = finalData.choices?.[0]?.message?.content ?? '';
 
   messages.push({ role: 'assistant', content: finalAnswer });
 
@@ -465,11 +467,11 @@ export async function callGemma4WithTools(
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Helper: Build an OllamaToolDef from a simple description
+// Helper: Build a tool definition from a simple description
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Convenience builder — creates an OllamaToolDef without manually
+ * Convenience builder — creates a tool definition without manually
  * writing the full JSON Schema wrapper.
  *
  * ```ts

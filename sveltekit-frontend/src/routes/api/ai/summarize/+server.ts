@@ -1,9 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const aiSummarizeSchema = z.object({
 	text: z.string().max(50000).optional(),
@@ -25,27 +23,28 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const text = parsed.data.text || parsed.data.content || '';
 		const maxLength = parsed.data.maxLength;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: `Summarize the following legal text in ${maxLength} words or fewer. Focus on key facts, legal issues, and conclusions.` },
 					{ role: 'user', content: text.slice(0, 15_000) }
 				],
 				stream: false,
-				options: { temperature: 0.3 }
+				temperature: 0.3,
+				max_tokens: Math.min(2048, Math.max(128, maxLength * 2))
 			}),
 			signal: AbortSignal.timeout(30_000)
 		});
 
 		if (!res.ok) return json({ error: `Ollama error: ${res.status}` }, { status: 502 });
 
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 		return json({
-			summary: data.message?.content || data.response || '',
-			model: data.model || 'gemma4-rotorquant:latest',
+			summary: data.choices?.[0]?.message?.content || '',
+			model: LOCAL_VLM_MODEL,
 		});
 	} catch (err) {
 		console.error('[ai/summarize] Error:', err);

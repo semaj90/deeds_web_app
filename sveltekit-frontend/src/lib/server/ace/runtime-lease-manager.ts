@@ -7,7 +7,7 @@
  * - Cleanup: Garbage collection, periodic purge
  */
 
-import Redis from 'ioredis';
+import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 
 export interface RuntimeLease {
   lease_id: string;
@@ -20,12 +20,12 @@ export interface RuntimeLease {
 }
 
 export class RuntimeLeaseManager {
-  private redis: Redis;
+  private redis: ReturnType<typeof getValkeyClient>;
   private maxConcurrentLeases = 100;
   private defaultTtlSeconds = 300; // 5 minutes
 
   constructor(redisHost?: string, redisPort?: number, redisPassword?: string) {
-    this.redis = new Redis({
+    this.redis = getValkeyClient().duplicate({
       host: redisHost || process.env.REDIS_HOST || '127.0.0.1',
       port: redisPort || parseInt(process.env.REDIS_PORT || '6379'),
       password: redisPassword || process.env.REDIS_PASSWORD || 'redis',

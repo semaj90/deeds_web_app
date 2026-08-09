@@ -1,9 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import { ENV } from '$lib/server/env.server.js';
 import { z } from 'zod';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 /** GBNF-constrained response schema for cross-examination */
 const crossExamResponseSchema = z.object({
@@ -67,34 +65,38 @@ ${caseContext ? `Case Context: ${caseContext}` : ''}
 
 Generate 5-8 strategic cross-examination questions.`;
 
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LOCAL_VLM_MODEL,
 				messages: [
 					{ role: 'system', content: systemPrompt },
 					{ role: 'user', content: userPrompt }
 				],
 				stream: false,
-				format: crossExamResponseJsonSchema,
-				options: { temperature: 0.5 }
+				response_format: {
+					type: 'json_schema',
+					json_schema: crossExamResponseJsonSchema,
+				},
+				temperature: 0.5,
+				max_tokens: 2048
 			}),
 			signal: AbortSignal.timeout(60_000)
 		});
 
-		if (!res.ok) return json({ error: `Ollama error: ${res.status}` }, { status: 502 });
+		if (!res.ok) return json({ error: `llama-server error: ${res.status}` }, { status: 502 });
 
-		const data = await res.json();
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
 		let parsed: Record<string, unknown>;
 		try {
-			parsed = JSON.parse(data.message?.content || data.response || '{}');
+			parsed = JSON.parse(data.choices?.[0]?.message?.content || '{}');
 		} catch {
 			parsed = {
 				session: {
 					id: crypto.randomUUID(),
 					witness: { name: witnessName },
-					questions: [{ text: data.message?.content || data.response || '', purpose: 'Raw response', expectedAnswer: '', followUp: '' }],
+					questions: [{ text: data.choices?.[0]?.message?.content || '', purpose: 'Raw response', expectedAnswer: '', followUp: '' }],
 					strategy: 'Generated from raw LLM output',
 					generatedAt: new Date().toISOString()
 				}

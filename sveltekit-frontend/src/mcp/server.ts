@@ -3314,29 +3314,21 @@ export function setupToolHandlers() {
           });
           return { content: [{ type: 'text', text: JSON.stringify(result) }] };
         } catch {
-          // Direct Ollama fallback
-          const { ollamaFetch } = await import('../lib/server/ollama.js');
-          const ollamaUrl = ENV.OLLAMA_BASE_URL;
-          const res = await ollamaFetch(`${ollamaUrl}/api/generate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: model ?? 'gemma4-rotorquant:latest',
-              prompt,
-              stream: false,
-              options: { num_predict: maxTokens ?? 2048, temperature: temperature ?? 0.3 },
-            }),
-          });
-          const data = await res.json();
+          // Direct llama-server fallback (never Ollama — chat/synthesis lane is :8090)
+          const { bifrostChat } = await import('../lib/server/ollama.js');
+          const content = await bifrostChat(
+            [{ role: 'user', content: prompt }],
+            model ?? 'gemma4-legal-iq4xs-direct.gguf',
+            { maxTokens: maxTokens ?? 2048, temperature: temperature ?? 0.3 }
+          );
           return {
             content: [
               {
                 type: 'text',
                 text: JSON.stringify({
-                  response: data.response ?? '',
-                  model: data.model,
-                  backend: 'ollama-direct-fallback',
-                  evalCount: data.eval_count,
+                  response: content,
+                  model: model ?? 'gemma4-legal-iq4xs-direct.gguf',
+                  backend: 'llama-server-direct-fallback',
                 }),
               },
             ],
@@ -3443,7 +3435,7 @@ export function setupToolHandlers() {
         const { assembleACEContext, buildACEPromptCached } = await import(
           '../lib/server/ace/context-assembler.js'
         );
-        const { ollamaFetch } = await import('../lib/server/ollama.js');
+        const { bifrostChat } = await import('../lib/server/ollama.js');
 
         const context = await assembleACEContext({
           query: aceQuery,
@@ -3458,19 +3450,14 @@ export function setupToolHandlers() {
         });
         const acePrompt = await buildACEPromptCached(context, aceQuery);
 
-        const ollamaUrl = ENV.OLLAMA_BASE_URL;
-        const llmRes = await ollamaFetch(`${ollamaUrl}/api/generate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: process.env.LLM_MODEL || 'gemma4-rotorquant:latest',
-            prompt: aceQuery,
-            system: acePrompt.systemPrompt,
-            stream: false,
-            options: { num_predict: aceMaxTokens ?? 2048, temperature: 0.4 },
-          }),
-        });
-        const llmData = await llmRes.json();
+        const answer = await bifrostChat(
+          [
+            { role: 'system', content: acePrompt.systemPrompt },
+            { role: 'user', content: aceQuery },
+          ],
+          process.env.LLM_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
+          { maxTokens: aceMaxTokens ?? 2048, temperature: 0.4 }
+        );
 
         return {
           content: [
@@ -3478,7 +3465,7 @@ export function setupToolHandlers() {
               type: 'text',
               text: JSON.stringify({
                 query: aceQuery,
-                answer: llmData.response ?? '',
+                answer,
                 confidenceFactors: acePrompt.confidenceFactors,
                 contextSources: {
                   ragChunks: context.ragChunks.length,
@@ -3490,8 +3477,7 @@ export function setupToolHandlers() {
                   hasCaseContext: !!context.caseContext,
                   hasResearch: !!context.webSearchContext?.includes('Deep Research'),
                 },
-                model: llmData.model,
-                tokensUsed: llmData.prompt_eval_count + (llmData.eval_count ?? 0),
+                model: process.env.LLM_MODEL || 'gemma4-legal-iq4xs-direct.gguf',
               }),
             },
           ],

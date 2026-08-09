@@ -213,6 +213,54 @@ npm run smoke:agent-workflow
 
 ---
 
+## 7.5 Deferred Integration Notes
+
+Keep these for later integration work; do not reintroduce them into the active GR1 path unless the upstream source contract changes again.
+
+```txt
+SIMD JSON
+  canonical owner: src/lib/server/gpu/simdjson-bridge.ts
+  compatibility shim: src/lib/server/utils/json-fast.ts
+  legacy/non-authority: src/lib/utils/simd-json-parser.ts
+  oracle/bench only: scripts/simd/* and parent-atlas-graph-runtime-enhancement/native/simdjson_edge_scan.cpp
+
+GR1 DuckDB / graphify:daily
+  offline-parent-atlas-mapreduce.sql was downgraded to live columns that actually exist now
+  removed stale assumptions: route_path, method, packet_count, avg_latency_ms, error_count, p95_latency_ms
+  current live route_runtime_packets shape uses route, latency_ms, captured_at, source_refs, feature_ids, qdrant_hits, cache_hit, cache_tier
+  do not restore the removed fields unless a real upstream migration adds them back
+```
+
+## 7.6 Current graph proof state
+
+Current status after the latest round of proof work:
+
+```txt
+GR1 DuckDB / graphify:daily
+  PASS — offline-parent-atlas-mapreduce.sql now targets live columns only
+  verified via node scripts/atlas/daily-graphify-cold-processing.mjs --skip-couchdb --skip-profile-cards
+
+GR2 / GR3 graph runtime
+  PASS — graphify:gds and the graph-enrichment smoke both pass on the fresh projection
+  Qdrant payload patching now recognizes source_ref / source_ref_key / canonical_source_ref
+
+GR4 PageRank promotion gate
+  PASS — scripts/atlas/verify-pagerank-promotion-gate.mts passes against the live 40,754-node promoted run
+
+GR5 Louvain / Leiden taxonomy
+  PARTIAL — Louvain remains wired in compute-louvain-neo4j.mjs and neo4j-gds-orchestrator.ts
+  Leiden now has an exact GDS lane in compute-leiden-neo4j.mjs and passes dry-run
+  apply-mode persistence and downstream selector choice remain open
+
+Next missing taxonomy work
+  exact Leiden implementation or a named approximation contract
+  canonical community taxonomy records
+  taxonomy-aware traversal with bounded fanout
+  replay corpus before any learned promotion
+```
+
+---
+
 ## 7. How to Check Docker and Runtime
 
 Run from:

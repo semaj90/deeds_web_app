@@ -11,7 +11,7 @@ import { randomUUID } from 'crypto';
 import { db } from '$lib/server/db/client';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server';
-import { getOllamaEndpoint } from '$lib/server/ollama.js';
+import { getOllamaEndpoint, bifrostChat } from '$lib/server/ollama.js';
 
 interface VideoVLMJob {
 	evidenceId: string;
@@ -234,7 +234,11 @@ export class VideoVLMProcessor {
 			const imageBuffer = await fs.readFile(imagePath);
 			const base64Image = imageBuffer.toString('base64');
 
-			// Call Ollama VLM endpoint
+			// Call Ollama VLM endpoint. NOTE: deliberately NOT routed through llama-server —
+			// the `images` field is Ollama-native multimodal format, and the live :8090
+			// launch config has no --mmproj flag (VLM mode is a separate launch profile
+			// per CLAUDE.md). Converting this to bifrostChat would silently drop vision
+			// input. Leave as Ollama until VLM-on-llama-server is confirmed operational.
 			const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -392,18 +396,11 @@ export class VideoVLMProcessor {
 		const summaryPrompt = `Based on video analysis with ${frameAnalysis.length} frames across ${sceneDetection.length} scenes, generate a concise summary. Key objects: ${[...allObjects].join(', ')}. Key tags: ${[...allTags].join(', ')}. Provide: overall summary (2-3 sentences), key objects list, activities observed, and setting description.`;
 
 		try {
-			const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					model: 'gemma4:e4b-it-q4_K_M',
-					prompt: summaryPrompt,
-					stream: false
-				})
-			});
-
-			const data = await response.json();
-			const summaryText = data.response || 'Video analysis summary unavailable';
+			const summaryText = await bifrostChat(
+				[{ role: 'user', content: summaryPrompt }],
+				'gemma4-legal-iq4xs-direct.gguf',
+				{}
+			).catch(() => 'Video analysis summary unavailable');
 
 			return {
 				summary: summaryText,
