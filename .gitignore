@@ -1011,3 +1011,4 @@ docs/reports/atlas-vector-manifest-v1-*.json
 
 docs/reports/fixtures/vector-parity-fixture-*.json
 docs/reports/frozen-graph-snapshot-v2.json
+.graphify-pipeline-lock
