@@ -660,6 +660,64 @@ npm run atlas:phase1.5:lexical:dry
 
 ---
 
+## SIMD JSON Parser Ownership (FROZEN, 2026-08-09) — for later integration
+
+**Status**: closed for now. Do not spend another session on parser architecture; this is
+non-blocking hardening only until explicitly revisited.
+
+| Role | File |
+|------|------|
+| CANONICAL | `sveltekit-frontend/src/lib/server/gpu/simdjson-bridge.ts` |
+| COMPATIBILITY | `sveltekit-frontend/src/lib/utils/json-fast.ts` |
+| LEGACY / NON-AUTHORITY | `sveltekit-frontend/src/lib/utils/simd-json-parser.ts` |
+| ACTIVE CONSUMERS | `qdrant-parser.ts`, `tool-call-parser.ts` |
+| GATE | `scripts/atlas/check-simd-json-runtime.mjs` |
+| ORACLE / BENCH | `scripts/simd/*`, `parent-atlas-graph-runtime-enhancement/native/simdjson_edge_scan.cpp`, `avx2-simdjson-bridge.mjs` |
+
+**Remaining non-blocking hardening** (do later, not now): parity corpus across the canonical vs.
+legacy parsers, a consolidated smoke invocation covering all of the above, and eventual deletion
+of `simd-json-parser.ts` only after proving no dynamic callers remain (do not delete on the
+strength of static grep alone — check dynamic `import()` call sites too).
+
+**Do not**: modify any of these parser files without a specific proven need; do not merge
+CANONICAL and COMPATIBILITY into one file "for simplicity"; do not treat ORACLE/BENCH files as
+production code paths.
+
+## GR1 DuckDB Schema Drift — RESOLVED (2026-08-09)
+
+`graphify:daily`'s offline DuckDB MapReduce stage (`scripts/atlas/offline-parent-atlas-mapreduce.sql`)
+was failing every run. Root cause was schema drift, not a stale mirror or wrong DuckDB file — the
+SQL referenced columns and a table that never existed in the live Postgres schema:
+
+- `pad.workspace_id` / `pad.updated_at` — real columns on `atlas_packets`, never exposed by the
+  `parent_atlas_documents` view. Fixed by widening the view (new tracked migration:
+  `sveltekit-frontend/drizzle/manual/parent_atlas_documents_view_widen.sql` — no tracked source
+  existed for this view before; it had been created ad hoc in an earlier session).
+- `pad.file_ext` / `pad.alias_id` / `pad.ingest_source` — never existed anywhere. `file_ext` now
+  derived from `rel_path`; the other two are explicit `NULL` placeholders.
+- `afm.neo4j_node_id` / `afm.nes_card_id` / `afm.atlas_version` — never existed on
+  `atlas_feature_map` (no writer anywhere populates them). Same `NULL` placeholder treatment.
+- `pg_db.atlas_source_ref_synthesis` (aliased `asrs`) — never existed at all, not a rename.
+  Degraded `cold_source_ref_rollups` to source from the real `atlas_topology_features` table,
+  keeping only the 3 columns actually consumed downstream (`source_ref`, `pagerank_score`,
+  `karpathy_blend`).
+- `cold_hot_path_rollups` — was remapping real `route_runtime_packets` columns (`route`,
+  `latency_ms`, `captured_at`, `source_refs`, `feature_ids`, `cache_hit`) to a stale output shape
+  (`route_path`, `method`, `packet_count`, `avg_latency_ms`, `error_count`, `p95_latency_ms`) and
+  omitting `qdrant_hits`/`cache_tier`. Rewritten to use the real column names directly.
+
+Verified live end-to-end: all 5 tables build clean (`cold_parent_atlas_cards`: 8,019 rows;
+`cold_source_ref_rollups`: 61,659; `cold_profile_card_candidates`: 8,019;
+`cold_feature_rollups`/`cold_hot_path_rollups`: 0 rows each, both pre-existing empty-source
+tables, not new bugs). Commits: `293cf2e85e`, `115c25df8e`.
+
+**Not yet done**: a full `npm run graphify:daily` run through to completion with this fix in
+place (only the DuckDB SQL stage was verified in isolation). Also see
+`openspec/changes/parent-atlas-graph-runtime-enhancement/` for the GR0-GR10 graph-runtime ladder
+this unblocks (GR1: fresh graph + revision freeze).
+
+---
+
 **Date Updated**: August 9, 2026
 **Session**: 109+ (Continuation Final)
 **Last Verified**: Live database analysis complete
