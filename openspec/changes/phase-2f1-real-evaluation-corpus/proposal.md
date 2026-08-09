@@ -79,3 +79,11 @@ This change pivots from synthetic ground-truth to a **real evaluation corpus** g
    - Store results in `phase2f_evaluation_results` with ablation_id and lane_name
 6. ✅ All 7 ablation runs execute successfully with valid metrics (no NaN/Inf)
 7. ✅ Results show clear differentiation between lanes (not all ~0.67)
+
+## Related change
+
+`openspec/changes/parent-atlas-agentic-repair-bundle-integration` Phase 9 (Domain 10 evaluation
+gatekeeper) needs exactly this real, non-circular evaluation corpus to ablate RRF vs. RFF vs.
+PageRank contributions before either enters production ranking. Check this change's
+`evaluation_queries`/`evaluation_relevance` tables and `FeatureEnvelope` interface for reuse before
+building a second evaluation corpus from scratch.

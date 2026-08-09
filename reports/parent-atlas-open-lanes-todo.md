@@ -48,7 +48,53 @@ No production implementation lane remains open on the current task board.
 AE/SOM experimentation, PPO/adapters, TensorRT expansion, custom CUDA kernels,
 and broader model research remain deferred behind measurable evaluation gains.
 
-## Post-Frozen Phase 17-21 Audit - 2026-06-20
+## Controlled Integration Ladder — Deferred Addendum
+
+This ladder is the aligned feature-to-do sequence for the remaining open research
+and repair work. It is not a runtime enablement plan.
+
+**Superseded by `openspec/changes/parent-atlas-agentic-repair-bundle-integration/proposal.md`
+(2026-08-08)** — that document is the fuller, corrected version (16 phases including two this
+ladder omits: an evaluation gatekeeper for judging whether RFF/RRF changes actually help, and a
+`latent_128` byte-contract proof step). It also fixes a sequencing bug in this ladder: item 9
+(PageRank) must come *before* item 6 (`FeatureRowV1`), not after — a feature row can't include a
+field before the thing that populates it exists. Read the linked proposal's "Ladder reconciliation"
+section for the full item-by-item mapping before acting on the list below.
+
+1. Stage a bundle copy in a temporary integration area only.
+2. Prove one real failing-test repair loop end to end.
+3. Replace JSON-only localization inputs with `trace_dynamic_context`.
+4. Keep semantic `768` canonical; treat `384` as legacy evidence only.
+5. Decide one canonical owner for RRF fusion before wiring anything else.
+6. Establish `FeatureRowV1` with a small, explicit field set.
+7. Add RFF only as an experimental projection with deterministic seed/revision.
+8. Keep RRF candidate fusion separate from RFF-derived geometry.
+9. Use PageRank authority as one normalized field with provenance.
+10. Run oracle parity in order: NetworkX → Neo4j GDS → cuGraph → cuVS.
+11. Defer cuGraph / cuVS promotion until parity and value are proven.
+12. Close the repair loop only after repeated real failures validate the spine.
+
+**Relevant files**
+
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.schema.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts`
+- `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`
+- `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
+- `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
+- `sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts`
+- `sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts`
+- `docs/atlas/phase-20-training-readiness.md`
+- `packages/parent-atlas/docs/atlas/phase-20-training-readiness.md`
+- `docs/atlas/xgboost-reranker-contract.md`
+- `packages/parent-atlas/docs/atlas/xgboost-reranker-contract.md`
+- `docs/reports/parent-atlas-training-readiness.md`
+- `docs/reports/parent-atlas-training-readiness.json`
+- `docs/reports/parent-atlas-open-lanes-todo.md`
+
+## Post-Frozen Phase 17-21 Audit - 2026-08-09
 
 Evidence: `docs/reports/phase17-21-workstation-audit.md`
 
@@ -830,14 +876,28 @@ Return a bounded packet response with query, strategy, ranked packets, Qdrant ta
 - Active proto files: `chat_assistant, chr97_agent, codeintel, codeintel_enrichment, embedding, evidence_metadata, gpu_bridge, library_search, retrieval, tool_calling, turbovec, vectors`
 - Compatibility: `turbovec_cuda.proto`
 - Archived: `ai-service, analytics-service, auth, case_scoring, chat, cuda, embed`
+- **Correction (2026-08-08, verified by reading the script and its output, not assumed)**: the
+  first three checkboxes below were stale — all three are already done.
 - Finish line:
-  - [ ] `audit-proto-registry.mjs` — inventory active proto files, extract service + RPC method names
-  - [ ] packetize gRPC services → `atlas_packets` with `feature_id=grpc_service`
-  - [ ] packetize RPC methods → sub-packets with `source_ref=proto:ServiceName.MethodName`
-  - [ ] embed tool manifests into Qdrant with `domain_class=mcp_agents`
-  - [ ] wire Qdrant RPC retrieval → MCP runtime selection (Gemma4 gets top-K tools, not all 300+)
-  - [ ] wire Neo4j RPC graph → tool dependency edges
-- OWNER: `scripts/atlas/audit-proto-registry.mjs` (to be created)
+  - [x] `audit-proto-registry.mjs` — **exists**, 699 lines, real dry-run/apply implementation with
+        a documented lineage contract; inventories active proto files, extracts service + RPC
+        method names via regex (no protobuf parser dependency)
+  - [x] packetize gRPC services → `atlas_packets` with `feature_id=grpc_service` — **done**, see
+        `docs/reports/proto-registry-audit.json` (`mode: "apply"`, 2026-07-04: 13 proto files
+        scanned, 12 services, 61 RPC methods)
+  - [x] packetize RPC methods → sub-packets with `source_ref=proto:ServiceName.MethodName` —
+        **done**, same apply run, 61/61 packets carry this `source_ref` shape
+  - [x] embed tool manifests into Qdrant with `domain_class=mcp_agents` — **done**, 61 rows written
+        to Qdrant with `qdrant_point_id`s in the same run
+  - [ ] wire Qdrant RPC retrieval → MCP runtime selection (Gemma4 gets top-K tools, not all 300+) —
+        **confirmed still open** (grepped `router/` and `mcp/`, zero hits)
+  - [ ] wire Neo4j RPC graph → tool dependency edges — **confirmed still open**
+- OWNER: `scripts/atlas/audit-proto-registry.mjs` — already exists; the original
+  "(to be created)" note here was stale
+- See also: `openspec/changes/parent-atlas-agentic-repair-bundle-integration` Phase 16/T16 picks up
+  the two remaining checkboxes above as a concrete task, feeding the router's
+  `RouterObservation.availableTools`; also flags the same neutral-stub pattern in
+  `authority-ranking-bridge.ts::scoreTopologyAuthority()`.
 
 ### 8. Phase 3F trace population
 - Status: complete

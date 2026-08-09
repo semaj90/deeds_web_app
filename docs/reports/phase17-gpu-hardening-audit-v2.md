@@ -1,6 +1,6 @@
 # Phase 17 GPU Acceleration Hardening Audit (v2)
 
-Generated: 2026-06-25T01:38:05.790Z
+Generated: 2026-08-09T00:00:00.000Z
 Status: ⚠️ WARN
 
 ## Summary

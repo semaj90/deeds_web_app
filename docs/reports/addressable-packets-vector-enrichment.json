@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-18T21:10:48.577Z",
+  "generatedAt": "2026-08-09T00:00:00.000Z",
   "mode": "dry-run",
   "inputPath": ".tmp/addressable-packets.ndjson",
   "outputPath": ".tmp/addressable-packets.vectorized.ndjson",

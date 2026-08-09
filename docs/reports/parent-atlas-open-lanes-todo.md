@@ -20,6 +20,45 @@
 
 ---
 
+## Controlled Integration Ladder — Deferred Addendum
+
+This ladder aligns the remaining feature work without turning it on in production.
+
+1. Stage a bundle copy in a temporary integration area only.
+2. Prove one real failing-test repair loop end to end.
+3. Replace JSON-only localization inputs with `trace_dynamic_context`.
+4. Keep semantic `768` canonical; treat `384` as legacy evidence only.
+5. Decide one canonical owner for RRF fusion before wiring anything else.
+6. Establish `FeatureRowV1` with a small, explicit field set.
+7. Add RFF only as an experimental projection with deterministic seed/revision.
+8. Keep RRF candidate fusion separate from RFF-derived geometry.
+9. Use PageRank authority as one normalized field with provenance.
+10. Run oracle parity in order: NetworkX → Neo4j GDS → cuGraph → cuVS.
+11. Defer cuGraph / cuVS promotion until parity and value are proven.
+12. Close the repair loop only after repeated real failures validate the spine.
+
+**Relevant files**
+
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.schema.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts`
+- `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`
+- `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
+- `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
+- `sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts`
+- `sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts`
+- `docs/atlas/phase-20-training-readiness.md`
+- `packages/parent-atlas/docs/atlas/phase-20-training-readiness.md`
+- `docs/atlas/xgboost-reranker-contract.md`
+- `packages/parent-atlas/docs/atlas/xgboost-reranker-contract.md`
+- `docs/reports/parent-atlas-training-readiness.md`
+- `docs/reports/parent-atlas-training-readiness.json`
+- `docs/reports/parent-atlas-open-lanes-todo.md`
+
+---
+
 ## PHASE 1: Complete P3g Qdrant Backfill (45 min)
 
 **Current State**: 4,500/13,545 packets embedded (33.2%)  

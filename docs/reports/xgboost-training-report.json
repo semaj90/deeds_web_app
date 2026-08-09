@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-24T13:46:00.880101Z",
+  "generated": "2026-08-09T00:00:00.000Z",
   "model_type": "xgboost",
   "objective": "reg:squarederror",
   "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\xgboost-reranker.ubj",

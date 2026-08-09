@@ -111,7 +111,8 @@ duplicating it; `feature-matrix.ts` was narrowed to just the piece that was genu
 authority signal input). This is a *smaller* diff than what was approved, in the same direction.
 
 **Two real, previously-undetected bugs closed by this work** (not hypothetical — confirmed via
-live Postgres query + before/after test evidence):
+live Postgres query + before/after test evidence). **⚠️ Item 1's production-impact claim was
+overstated — see the 2026-08-08-later correction below before trusting this paragraph on its own**:
 1. `pageRankScore` was already being populated on candidates (`search-runtime.ts:801`, from lexical
    lane metadata) but silently dropped before reaching `blendScores()` — its 0.1 weight always saw
    `undefined` and no-opped.
@@ -136,3 +137,70 @@ files: `learning-trainer.tool.ts`, `label-generator.ts`, `policy-trainer.ts`) an
 `executor-tree-test.server.test.ts` ×2, `promote-results.spec.ts` ×1, plus 2 more in the same
 files) confirmed identical on the unmodified baseline via `git stash` + rerun, none newly
 introduced.
+
+## 2026-08-08, later same day: user-caught corrections — `graphScore` reverted, real embedding bug found
+
+The user reviewed the addendum above and correctly flagged two problems before the work could be
+considered done. Both were investigated via two parallel read-only fork agents (not assumed) and
+acted on.
+
+**1. Double-counting risk — `graphScore` reverted.** `atlas_graph_authority_scores` (the table
+`feature-matrix.ts::fetchAuthorityScores()` reads) stores `pagerank_raw` and `pagerank_l1` columns
+*alongside* `authority_percentile` — per its own DDL header comment, it "separates raw PageRank
+from L1-normalized authority scores." Wiring both `pagerankScore` (weight 0.05) and `graphScore`
+(weight 0.10, sourced from this table) into the same blend risked double-counting one underlying
+PageRank signal as ~0.15 combined weight under two names. **Action taken**: the `graphScore` wiring
+in `search-runtime.ts`'s Score-stage mapping was reverted (the `fetchAuthorityScores` call and its
+result are no longer invoked there); `feature-matrix.ts` and its 8 tests remain in the tree as
+correct, reusable infrastructure, just not wired in yet.
+
+Audit verdict (fork investigation): **SAME_SIGNAL FAMILY**, with a repo-native confirmation —
+`src/lib/server/topology/pagerank-authority.ts` already exists and defines a `PageRankAuthorityLike`
+interface grouping `pagerank_raw`/`pagerank_l1`/`authority_percentile` alongside a `legacy`-tier
+`page_rank_score`/`pagerank`/`authority_score` fallback, resolved by `pickPageRankAuthorityScore()`
+as **one** signal (`l1 ?? raw ?? legacy`), not two independent features. This utility is not
+currently used by either candidate-construction path — using it (instead of the two-field design
+originally proposed) is the correct next step, but is deliberately **not implemented in this pass**
+per the user's own explicit sequencing (stop after the pass-through fix + audit; feature-matrix
+design work is a later numbered step).
+
+**Correction to the "15%" claim above**: the audit additionally found that `retrieve-candidates.ts`
+— the actual default production candidate-construction path — **never sets `pageRankScore` at
+all**. It's only populated via `search-runtime.ts`'s alt/injected-retriever path (used by
+tests/experiments, not the default flow) and via `hydrate-candidates.ts`'s separate raw-SQL read of
+`codebase_chunk_index.page_rank_score` — which runs *after* the Score stage in execution order, so
+even when populated it can't currently reach `blendScores()` through this fix. Live query also
+confirms `codebase_chunk_index.page_rank_score` has **0 non-null rows** right now. Net effect: the
+`pagerankScore` pass-through fix is mechanically correct and harmless to keep (forward-compatible
+for whenever this gets wired end-to-end), but has **no observable effect on current production
+ranking** — unlike the `graph` slot's 0.05 weight, which genuinely was and remains dead for every
+query (that half of the original "15% inert" claim holds; the pagerank half does not, yet).
+
+**2. Real embedding-dimension corruption bug found and fixed (unprompted by the original ask, but
+directly responsive to the user's "prove SearchRuntime dense lane is 768" requirement).**
+`embedding-service.ts::embedViaOllama()` unconditionally ran every embedding through
+`truncateVector()`, which **zero-pads** short vectors instead of erroring. If the `dense_768` lane
+ever received a non-768-dim vector (wrong model loaded, misconfigured `embed_model_768`, model
+swap mid-session), the result was a dimensionally-valid-looking 768-length vector that is really
+384 (or however many) real values plus zero-padding — passing Qdrant's own vector-size validation
+and getting cosine-scored against real embeddings as if legitimate, with no error anywhere in the
+chain. Fixed by calling the repo's existing fail-closed `assertSemantic768()` guard (from
+`embedding-contract-768.ts`, already existed, was simply never wired into this call path) on the
+raw model output for the `dense_768` lane specifically — before `truncateVector` can mask a
+mismatch. The `dense_384` lane is untouched (its whole purpose is intentional truncation, not
+corruption). 3 new tests in `__tests__/embedding-service.test.ts`.
+
+Also added: `__tests__/embedding-dimension-gate.test.ts` — static contract proof that
+`VECTOR_INDEX_REGISTRY.qdrantSource768V2` (the entry `retrieveQdrant()` hardcodes at
+`retrieve-candidates.ts:365,428`) really does declare a 768-dim canonical contract, and that the
+384-dim legacy entry is explicitly marked non-canonical.
+
+**Updated verification**: `npx tsgo --noEmit` still 0 new errors (5 pre-existing, unchanged, same
+3 unrelated files). 13 new tests total across 2 new test files (`embedding-service.test.ts` ×3,
+`embedding-dimension-gate.test.ts` ×2) plus the 8 already-passing `feature-matrix.test.ts` tests
+(kept — the module is correct, just not wired into scoring yet).
+
+**Remaining before Domain 5's authority signal can be safely re-added**: implement the
+`pickPageRankAuthorityScore()`-based single-signal resolver (primary: `atlas_graph_authority_scores`,
+fallback: legacy `page_rank_score`) under ONE weight key, not two — this is next-session work, not
+started here.

@@ -1,6 +1,6 @@
 {
   "schema": "addressable_packets_materialization_manifest.v1",
-  "generatedAt": "2026-08-06T16:51:14.641Z",
+  "generatedAt": "2026-08-09T02:50:06.105Z",
   "mode": "apply",
   "sourceTable": "atlas_packets",
   "outputNdjson": ".tmp/addressable-packets.ndjson",
@@ -58,7 +58,7 @@
     "1d5eba7211dea6f9",
     "1dc5ac2b3cd9bfe8"
   ],
-  "outputSha256": "0f03105c114fd8b220fb0fccb6c80f85e0f713834464d6d5d7c72dce858afdbe",
+  "outputSha256": "e37c231318105aea1a707c965d8d997688625edc76a651d64079e772e62f6c80",
   "checkpointPath": ".tmp/addressable-packets.checkpoint.json",
   "stagingPath": ".tmp/addressable-packets.ndjson.stage",
   "interrupted": false,
@@ -81,9 +81,9 @@
   "loadStats": {
     "batches": 62,
     "rows": 61659,
-    "totalQueryElapsedMs": 9759,
+    "totalQueryElapsedMs": 16399,
     "totalParseElapsedMs": 0,
-    "maxQueryElapsedMs": 681,
+    "maxQueryElapsedMs": 1594,
     "maxParseElapsedMs": 0,
     "maxRawBytes": 17979474,
     "maxNormalizedBytes": 17979472
@@ -92,7 +92,7 @@
   "nextSafeAction": "Run qdrant-tag-mirror next, then resume the retrieval pipeline after the materialized packet count is positive.",
   "checkpoint": {
     "schema": "addressable_packets_materialization_checkpoint.v1",
-    "generatedAt": "2026-08-06T16:51:13.519Z",
+    "generatedAt": "2026-08-09T02:50:05.041Z",
     "sourceTable": "atlas_packets",
     "limit": 0,
     "batchSize": 1000,

@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import subprocess
 import sys
 import uuid
 from pathlib import Path
@@ -24,6 +26,7 @@ except ImportError as error:  # Keep infrastructure status explicit for the call
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_FIXTURE = ROOT / "sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json"
+DEFAULT_FROZEN_FIXTURE = ROOT / "docs/reports/frozen-graph-snapshot-v2.json"
 DEFAULT_MANIFEST = ROOT / ".okf/manifest.yaml"
 
 
@@ -100,10 +103,38 @@ def run(fixture_path: Path, manifest_path: Path) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fixture", type=Path, default=DEFAULT_FIXTURE)
+    parser.add_argument("--fixture", type=Path, default=DEFAULT_FROZEN_FIXTURE if DEFAULT_FROZEN_FIXTURE.exists() else DEFAULT_FIXTURE)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument("--build-fixture", action="store_true", help="Materialize the frozen snapshot fixture from Postgres before running")
+    parser.add_argument("--workspace-id", default=os.environ.get("PAGERANK_WORKSPACE_ID", "workspace:parent-atlas"))
+    parser.add_argument("--snapshot-id", default=os.environ.get("PAGERANK_SNAPSHOT_ID", ""))
+    parser.add_argument("--source-inventory-snapshot-id", default=os.environ.get("PAGERANK_SOURCE_INVENTORY_SNAPSHOT_ID", ""))
     args = parser.parse_args()
-    print(json.dumps(run(args.fixture, args.manifest), sort_keys=True))
+
+    fixture_path = args.fixture
+    if args.build_fixture or not fixture_path.exists():
+        exporter = ROOT / "scripts/atlas/export-graph-snapshot-v2.mts"
+        snapshot_id = args.snapshot_id or str(uuid.uuid4())
+        source_inventory_snapshot_id = args.source_inventory_snapshot_id or f"inventory:{snapshot_id}"
+        subprocess.run(
+            [
+                "npx",
+                "tsx",
+                str(exporter),
+                "--output-json",
+                str(fixture_path),
+                "--workspace-id",
+                args.workspace_id,
+                "--snapshot-id",
+                snapshot_id,
+                "--source-inventory-snapshot-id",
+                source_inventory_snapshot_id,
+            ],
+            cwd=ROOT,
+            check=True,
+        )
+
+    print(json.dumps(run(fixture_path, args.manifest), sort_keys=True))
     return 0
 
 

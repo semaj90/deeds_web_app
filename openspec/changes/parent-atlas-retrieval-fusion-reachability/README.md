@@ -66,3 +66,8 @@ and fixes a real bug where `pageRankScore` was silently dropped before reaching 
 This did **not** touch RF6's scope (the other 4 fusion owners) or `combineViaRRF`'s same-lane bug
 — both remain exactly as described above. Full writeup:
 `parent-atlas-retrieval-lod-algorithm-taxonomy/proposal.md` "2026-08-08 addendum" section.
+
+**See also**: `parent-atlas-agentic-repair-bundle-integration` Phase 4 restates the RF6
+canonical-fusion-owner decision (Option A: Qdrant-owns-fusion vs. Option B:
+Parent-Atlas-owns-fusion) and blocks its bundle-supplied `rrf.ts` oracle on whichever option RF6
+picks — that change does not make the RF6 decision itself.

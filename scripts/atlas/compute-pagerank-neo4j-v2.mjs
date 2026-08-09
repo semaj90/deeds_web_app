@@ -8,15 +8,20 @@
  */
 
 import crypto from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import neo4j from 'neo4j-driver';
 import { parse as parseYaml } from 'yaml';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
+const frozenFixturePath = resolve(ROOT, 'docs/reports/frozen-graph-snapshot-v2.json');
+const defaultFixturePath = existsSync(frozenFixturePath)
+  ? frozenFixturePath
+  : resolve(ROOT, 'sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json');
 const fixturePath = process.argv.includes('--fixture')
   ? resolve(process.argv[process.argv.indexOf('--fixture') + 1])
-  : resolve(ROOT, 'sveltekit-frontend/src/lib/server/atlas/graph/fixtures/pagerank-parity-graph.json');
+  : defaultFixturePath;
 const manifestPath = process.argv.includes('--manifest')
   ? resolve(process.argv[process.argv.indexOf('--manifest') + 1])
   : resolve(ROOT, '.okf/manifest.yaml');

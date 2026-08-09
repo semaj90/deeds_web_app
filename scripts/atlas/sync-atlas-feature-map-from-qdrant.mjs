@@ -93,9 +93,14 @@ while (guard < 600) {
     scanned++;
     const p = point.payload ?? {};
 
-    // Normalize source ref: strip #chunk-N suffix, use file_path
-    const filePath = p.file_path ?? p.sourceRef?.replace(/#chunk-\d+$/, '') ?? null;
-    if (!filePath) continue;
+    // Normalize source ref: strip #chunk-N suffix. Payload field is snake_case
+    // `source_ref` (confirmed live, 2026-08-09) -- `p.file_path`/`p.sourceRef` never
+    // existed on this collection's payloads, so this lookup previously matched almost
+    // nothing (105,761 points collapsed to 1 "unique file").
+    const rawRef = p.source_ref ?? p.canonical_source_ref ?? null;
+    const filePath = rawRef ? String(rawRef).replace(/#chunk-\d+$/, '') : null;
+    // Skip placeholder/corrupted refs that aren't real paths (e.g. "1", "-128").
+    if (!filePath || !/[./]/.test(filePath)) continue;
 
     // Skip .venv and third-party noise
     if (filePath.startsWith('.venv/') || filePath.startsWith('node_modules/') ||
@@ -268,5 +273,9 @@ console.log(`  Scanned points   : ${scanned}`);
 console.log(`  Unique files     : ${fileMap.size}`);
 console.log(`  Upserted         : ${upserted}`);
 console.log(`  Failed           : ${failed}`);
-console.log(`\n  ✓ atlas_feature_map is now the source-of-truth lineage table.`);
+if (failed === 0) {
+  console.log(`\n  ✓ atlas_feature_map is now the source-of-truth lineage table.`);
+} else {
+  console.log(`\n  ✗ ${failed} row(s) failed to upsert -- atlas_feature_map is NOT fully synced.`);
+}
 console.log(`  Verify: SELECT COUNT(*) FROM atlas_feature_map WHERE som_cluster IS NOT NULL;`);

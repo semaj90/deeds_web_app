@@ -1,0 +1,174 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "ecosystem": "npm",
+      "module_name": "tree-sitter",
+      "package_id": "tree-sitter",
+      "source_url": "https://www.npmjs.com/package/tree-sitter",
+      "source_type": "npm_registry",
+      "declared_version": "0.25.0",
+      "notes": "core parser dependency"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "ts-morph",
+      "package_id": "ts-morph",
+      "source_url": "https://www.npmjs.com/package/ts-morph",
+      "source_type": "npm_registry",
+      "declared_version": "27.0.2",
+      "notes": "AST/type system tooling"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "openwiki",
+      "package_id": "openwiki",
+      "source_url": "https://www.npmjs.com/package/openwiki",
+      "source_type": "npm_registry",
+      "notes": "OpenWiki integration audit target"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "@opentelemetry/api",
+      "package_id": "@opentelemetry/api",
+      "source_url": "https://www.npmjs.com/package/@opentelemetry/api",
+      "source_type": "npm_registry",
+      "declared_version": "1.9.0",
+      "notes": "telemetry contract"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "langchain",
+      "package_id": "langchain",
+      "source_url": "https://www.npmjs.com/package/langchain",
+      "source_type": "npm_registry",
+      "declared_version": "^1.0.0",
+      "notes": "agent orchestration"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "mastra",
+      "package_id": "mastra",
+      "source_url": "https://www.npmjs.com/package/mastra",
+      "source_type": "npm_registry",
+      "notes": "workflow orchestration"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "@qdrant/js-client-rest",
+      "package_id": "@qdrant/js-client-rest",
+      "source_url": "https://www.npmjs.com/package/@qdrant/js-client-rest",
+      "source_type": "npm_registry",
+      "declared_version": "1.15.1",
+      "notes": "vector store client"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "neo4j-driver",
+      "package_id": "neo4j-driver",
+      "source_url": "https://www.npmjs.com/package/neo4j-driver",
+      "source_type": "npm_registry",
+      "notes": "graph database client"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "kafkajs",
+      "package_id": "kafkajs",
+      "source_url": "https://www.npmjs.com/package/kafkajs",
+      "source_type": "npm_registry",
+      "notes": "message bus probe"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "ast-grep-py",
+      "package_id": "ast-grep-py",
+      "source_url": "https://pypi.org/project/ast-grep-py/",
+      "source_type": "pypi_json",
+      "notes": "AST search tooling"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "langextract",
+      "package_id": "langextract",
+      "source_url": "https://pypi.org/project/langextract/",
+      "source_type": "pypi_json",
+      "notes": "document extraction"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "torch",
+      "package_id": "torch",
+      "source_url": "https://pypi.org/project/torch/",
+      "source_type": "pypi_json",
+      "notes": "GPU runtime"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "cupy",
+      "package_id": "cupy",
+      "source_url": "https://pypi.org/project/cupy/",
+      "source_type": "pypi_json",
+      "notes": "GPU array compute"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "cuvs",
+      "package_id": "cuvs",
+      "source_url": "https://pypi.org/project/cuvs/",
+      "source_type": "pypi_json",
+      "notes": "GPU vector search"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "cugraph",
+      "package_id": "cugraph",
+      "source_url": "https://pypi.org/project/cugraph/",
+      "source_type": "pypi_json",
+      "notes": "GPU graph analytics"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "spacy",
+      "package_id": "spacy",
+      "source_url": "https://pypi.org/project/spacy/",
+      "source_type": "pypi_json",
+      "notes": "nlp tooling"
+    },
+    {
+      "ecosystem": "global",
+      "module_name": "rg",
+      "package_id": "ripgrep",
+      "source_url": "https://github.com/BurntSushi/ripgrep",
+      "release_url": "https://api.github.com/repos/BurntSushi/ripgrep/releases/latest",
+      "source_type": "github_release",
+      "notes": "ripgrep CLI"
+    },
+    {
+      "ecosystem": "global",
+      "module_name": "jq",
+      "package_id": "jq",
+      "source_url": "https://github.com/jqlang/jq",
+      "release_url": "https://api.github.com/repos/jqlang/jq/releases/latest",
+      "source_type": "github_release",
+      "notes": "jq CLI"
+    },
+    {
+      "ecosystem": "global",
+      "module_name": "ast-grep",
+      "package_id": "ast-grep",
+      "source_url": "https://github.com/ast-grep/ast-grep",
+      "release_url": "https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+      "source_type": "github_release",
+      "notes": "AST-grep CLI"
+    },
+    {
+      "ecosystem": "openwiki",
+      "module_name": "docs/openwiki",
+      "package_id": "docs/openwiki",
+      "source_url": "file://docs/openwiki",
+      "source_type": "local_openwiki",
+      "notes": "local OpenWiki source lane"
+    }
+  ]
+}
+

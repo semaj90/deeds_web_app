@@ -31,3 +31,12 @@ GPU/CAGRA/cuGraph/CUDA-GEMM/quantized-LOD work stays **deferred** until the iden
 foundation in `parent-atlas-retrieval-fusion-reachability` (RF4–RF6) is proven. This document
 exists so that when that foundation lands, the next architectural step is a classified plan instead
 of an ad-hoc rediscovery — it is not a green light to start GPU work now.
+
+## Related change
+
+- **`parent-atlas-agentic-repair-bundle-integration`** instantiates this taxonomy's Domain 4
+  (feature matrix) and Domain 5 (ranking/scoring) as a staged `FeatureRowV1`/`V2`/`V3` rollout, and
+  its Phase 9 evaluation gate is this taxonomy's Domain 10. It also carries the concrete RRF-vs-RFF
+  distinction and a 14-phase controlled integration ladder for an external repair-toolkit reference
+  bundle — read it before doing further Domain 1/4/5 design work here, so the two documents don't
+  drift into separate, competing feature-row shapes.

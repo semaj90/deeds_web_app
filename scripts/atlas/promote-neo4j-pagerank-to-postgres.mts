@@ -33,6 +33,7 @@ const CONTRACT_VERSION = 'atlas.pagerank-authority.v1';
 const DAMPING_FACTOR = 0.85;
 const MAX_ITERATIONS = 20; // typical Neo4j GDS default
 const TOLERANCE = 1e-7;
+const L1_SUM_TOLERANCE = 1e-6; // matches this script's own docstring ("L1-sum ≈ 1 ± 1e-6")
 const DID_CONVERGE = true;
 
 function authorityBand(percentile: number): string {
@@ -91,7 +92,7 @@ async function main() {
     const l1Sum = normed.reduce((s, r) => s + r.pagerank_l1, 0);
     const l1Diff = Math.abs(l1Sum - 1.0);
     log(`L1 sum = ${l1Sum.toFixed(10)} (diff = ${l1Diff.toExponential(3)})`);
-    if (l1Diff > 1e-6) throw new Error(`L1-sum validation FAILED: diff = ${l1Diff}`);
+    if (l1Diff > L1_SUM_TOLERANCE) throw new Error(`L1-sum validation FAILED: diff = ${l1Diff}`);
     log('✅ L1-sum validation PASS');
 
     // ── 3. Percentile + Band ─────────────────────────────────────────────
@@ -136,7 +137,7 @@ async function main() {
            did_converge, ran_iterations, node_count, status, created_at)
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
       `, [runId, GRAPH_SNAPSHOT_ID, 'pagerank', 'L1Norm',
-          1.0, l1Sum, l1Diff,
+          1.0, l1Sum, L1_SUM_TOLERANCE,
           DID_CONVERGE, MAX_ITERATIONS, rows.length, 'building']);
 
       log(`Created run ${runId}`);

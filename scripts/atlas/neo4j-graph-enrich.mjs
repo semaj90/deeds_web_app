@@ -123,20 +123,38 @@ async function ensureProjection() {
     await neo4j(`CALL gds.graph.drop('${GRAPH_NAME}', false) YIELD graphName RETURN graphName`).catch(() => {});
   }
 
-  // Create projection
+  // Create projection — gds.graph.project rejects relationship types that don't exist
+  // anywhere in the graph at all (confirmed live, 2026-08-09: IMPORTS/DYNAMIC_IMPORTS were
+  // never written to Neo4j, only SIMILAR_TOPOLOGY exists, causing every apply run to fail
+  // with "Invalid relationship projection, one or more relationship types not found").
+  // Filter the desired projection down to types that actually exist before calling project.
+  const DESIRED_REL_TYPES = {
+    IMPORTS:           { orientation: 'NATURAL' },
+    DYNAMIC_IMPORTS:   { orientation: 'NATURAL' },
+    SIMILAR_TOPOLOGY:  { orientation: 'UNDIRECTED' }
+  };
+  const existingTypeRows = await neo4j(`CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType`).catch(() => []);
+  const existingTypes = new Set(neo4jRows(existingTypeRows).map(r => r.relationshipType));
+  const availableRelTypes = Object.fromEntries(
+    Object.entries(DESIRED_REL_TYPES).filter(([type]) => existingTypes.has(type))
+  );
+  const missingRelTypes = Object.keys(DESIRED_REL_TYPES).filter(type => !existingTypes.has(type));
+  if (missingRelTypes.length > 0) {
+    console.warn(`   ⚠ GDS3 skipping missing relationship type(s) in projection: ${missingRelTypes.join(', ')}`);
+  }
+  if (Object.keys(availableRelTypes).length === 0) {
+    throw new Error(`No projectable relationship types exist in Neo4j (wanted: ${Object.keys(DESIRED_REL_TYPES).join(', ')})`);
+  }
+
   const projRows = await neo4j(`
     CALL gds.graph.project(
       '${GRAPH_NAME}',
       ['CodebaseFile'],
-      {
-        IMPORTS:           { orientation: 'NATURAL' },
-        DYNAMIC_IMPORTS:   { orientation: 'NATURAL' },
-        SIMILAR_TOPOLOGY:  { orientation: 'UNDIRECTED' }
-      }
+      $relTypes
     )
     YIELD graphName, nodeCount, relationshipCount
     RETURN graphName, nodeCount, relationshipCount
-  `);
+  `, { relTypes: availableRelTypes });
 
   const created = neo4jRows(projRows)[0];
   const nodeCount = created?.nodeCount ?? 0;
@@ -593,8 +611,8 @@ async function main() {
       }
     } catch (e) {
       gdsOk = false;
-      summary.gates.GDS3 = `FAIL: ${e.message.slice(0, 80)}`;
-      console.warn(`   ✗ GDS3 projection failed: ${e.message.slice(0, 80)}`);
+      summary.gates.GDS3 = `FAIL: ${e.message}`;
+      console.warn(`   ✗ GDS3 projection failed: ${e.message}`);
     }
   } else {
     summary.gates.GDS3 = 'SKIP (GDS unavailable)';

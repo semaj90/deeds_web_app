@@ -2,6 +2,26 @@
 
 Generated from the current workstation evidence. This is the production-readiness board for the remaining open lanes, not a runtime plan.
 
+## Relevant Files
+
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.schema.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts`
+- `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`
+- `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
+- `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
+- `sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts`
+- `sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts`
+- `docs/atlas/phase-20-training-readiness.md`
+- `packages/parent-atlas/docs/atlas/phase-20-training-readiness.md`
+- `docs/atlas/xgboost-reranker-contract.md`
+- `packages/parent-atlas/docs/atlas/xgboost-reranker-contract.md`
+- `docs/reports/parent-atlas-training-readiness.md`
+- `docs/reports/parent-atlas-training-readiness.json`
+- `docs/reports/parent-atlas-open-lanes-todo.md`
+
 
 ## 2026-06-12 Update — Automation Intelligence / LangGraph / Bitfrost / Tool Manifests
 

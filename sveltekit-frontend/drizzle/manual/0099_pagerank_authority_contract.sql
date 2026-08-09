@@ -44,12 +44,12 @@ CREATE TABLE IF NOT EXISTS atlas_graph_authority_scores (
   source_ref text,
   pagerank_raw double precision NOT NULL
     CHECK (
-      isfinite(pagerank_raw)
+      pagerank_raw NOT IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
       AND pagerank_raw >= 0
     ),
   pagerank_l1 double precision NOT NULL
     CHECK (
-      isfinite(pagerank_l1)
+      pagerank_l1 NOT IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
       AND pagerank_l1 >= 0
       AND pagerank_l1 <= 1
     ),

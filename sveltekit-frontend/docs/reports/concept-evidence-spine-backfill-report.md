@@ -1,10 +1,10 @@
 # Concept Evidence Spine Backfill
 
-Generated: 2026-07-17T06:17:52.600Z
+Generated: 2026-08-08T14:36:14.651Z
 
 ## Summary
 
-- mode: dry-run
+- mode: apply
 - limit: all
 - totalRows: 0
 - eligibleRows: 0

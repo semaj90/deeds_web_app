@@ -7,3 +7,8 @@ The companion workstation board now carries an explicit `0-100` completeness vie
 **See also**: `parent-atlas-retrieval-lod-algorithm-taxonomy` domains 2–3 (graph traversal, graph
 structural features) are explicitly blocked on this change's identity split landing — do not design
 those domains' APIs against `tree_node_id` before that proof completes.
+
+**Also see also**: `parent-atlas-agentic-repair-bundle-integration` Phase 5 (PageRank into the
+feature row) and Phase 11 (NetworkX ↔ Neo4j GDS parity) are both blocked on this change's identity
+split landing too — do not promote a `pagerankAuthority` feature signal, or run parity checks,
+against an unpromoted/provisional graph snapshot.

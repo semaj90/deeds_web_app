@@ -1787,6 +1787,58 @@ PostgreSQL 18 is NOT the bottleneck. Query design is.
 
 ---
 
+## PostgreSQL 18 vs 17 — removed function overloads (found August 8, 2026)
+
+**`isfinite(double precision)` / `isfinite(real)` no longer exist in PostgreSQL 18.4.** Confirmed
+live via `pg_proc`:
+
+```sql
+SELECT proname, pronamespace::regnamespace, proargtypes::regtype[] FROM pg_proc WHERE proname = 'isfinite';
+--  isfinite | pg_catalog | {date}
+--  isfinite | pg_catalog | {"timestamp without time zone"}
+--  isfinite | pg_catalog | {"timestamp with time zone"}
+--  isfinite | pg_catalog | {interval}
+```
+
+Only the `date`/`timestamp`/`timestamptz`/`interval` overloads remain — the float8/real overloads
+were dropped (PostgreSQL 17 introduced the standard SQL `IS NAN`/`IS INFINITE` predicates and the
+old float `isfinite()` builtin was removed as part of that cleanup). Any SQL written against
+PG16-or-earlier assuming `isfinite(some_double_precision_column)` works will fail at execution
+time on this project's PG18.4 with `function isfinite(double precision) does not exist`.
+
+**Fix pattern (already used correctly elsewhere in this repo, e.g.
+`drizzle/0112_parent_atlas_graph_v2.sql`)**:
+
+```sql
+-- ❌ BROKEN on PG18+
+CHECK (isfinite(pagerank_raw) AND pagerank_raw >= 0)
+WHERE NOT isfinite(x)
+
+-- ✅ WORKS on PG17+ and PG18
+CHECK (pagerank_raw >= 0 AND pagerank_raw NOT IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8))
+WHERE x IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)
+```
+
+**Fixed 2026-08-08**: `sveltekit-frontend/drizzle/manual/0099_pagerank_authority_contract.sql` —
+its `CREATE TABLE` `CHECK` constraints for `atlas_graph_authority_scores` used
+`isfinite(pagerank_raw)` / `isfinite(pagerank_l1)`. Before editing, confirmed via `\d
+atlas_graph_authority_scores` that the live table (50,164 rows) does **not** actually have these
+specific constraints attached — only `authority_band`/`contract_version`/`normalization_method`
+checks exist live — so this was a fresh-deploy/replay risk, not an active production landmine,
+and safe to patch in place (no Drizzle Safety Rule conflict: nothing live needed altering). Patched
+to the `NOT IN ('NaN'::float8, 'Infinity'::float8, '-Infinity'::float8)` form and re-ran the whole
+file directly against the live DB to confirm it now executes cleanly end to end (every statement a
+safe no-op via `IF NOT EXISTS`, zero errors). Also fixed in application code: `sveltekit-frontend/
+src/lib/server/graph/pagerank-promotion-gate.ts` (see
+`openspec/changes/parent-atlas-agentic-repair-bundle-integration`
+T0a for the full bug writeup — this was one of three real bugs found while wiring that file live).
+
+**Before writing new PG18 SQL that checks for NaN/Infinity**: grep for `isfinite(` (case-sensitive
+— `isFinite`/`Number.isFinite` in TypeScript are unrelated, real, and fine) before assuming the
+Postgres builtin still works.
+
+---
+
 ## UI bugs are HOT — never deferred (May 11, 2026)
 
 The "do not touch" lists below (Drizzle Safety Rule § 1-4, identity strategy, hypergraph write fire, CUDA Graphs, cuVS, new LangGraph workers) cover **infrastructure/data-layer changes** that need operator review. They do **NOT** cover broken UI affordances. **UI bugs jump the queue.**

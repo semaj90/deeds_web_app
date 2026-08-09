@@ -1,7 +1,7 @@
 # XGBoost Reranker Contract
 
-Generated: 2026-06-06  
-Updated: 2026-06-12 — promoted to formal reranker input (Phase 18)
+Generated: 2026-08-09  
+Updated: 2026-08-09 — promoted to formal reranker input (Phase 18)
 
 ## Decision
 

@@ -78,14 +78,14 @@ async function main() {
     const limitClause = LIMIT ? `LIMIT ${LIMIT}` : '';
     console.log('⏳ Querying parent_atlas_documents...');
     const padRes = await pool.query(
-      `SELECT source_ref, rel_path, feature_id, summary, tags FROM parent_atlas_documents WHERE source_ref IS NOT NULL ${limitClause}`
+      `SELECT source_ref, rel_path, feature_id, tags FROM parent_atlas_documents WHERE source_ref IS NOT NULL ${limitClause}`
     );
     padRows = padRes.rows;
     console.log(`  ✓ Loaded ${padRows.length} files from parent_atlas_documents`);
 
     console.log('⏳ Querying atlas_feature_map...');
     const afmRes = await pool.query(
-      `SELECT source_ref, feature_id, som_cluster, centroid_id, cluster_id, som_bmu_row, som_bmu_col FROM atlas_feature_map`
+      `SELECT source_ref, feature_id, som_cluster, centroid_id, cluster_id FROM atlas_feature_map`
     );
     afmRows = afmRes.rows;
     console.log(`  ✓ Loaded ${afmRows.length} mappings from atlas_feature_map`);
@@ -252,7 +252,7 @@ async function main() {
     return {
       path: normPath,
       sourceRef: docRow?.source_ref ?? normPath,
-      summary: docRow?.summary || '',
+      summary: '',
       tags: docRow?.tags || [],
       featureId: docRow?.feature_id || '',
       communityId: afmRow?.community_id ?? null,

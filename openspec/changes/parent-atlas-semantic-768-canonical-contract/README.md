@@ -17,3 +17,7 @@ in the live repo (`dense-lane-policy.ts`'s `SEMANTIC_384` lifecycle) and the sma
   this contract too)
 - `openspec/changes/parent-atlas-graph-retrieval-proof/` — GS1.45–1.47 identity/lineage audit
   work this contract's §16/§17 build on
+- `openspec/changes/parent-atlas-agentic-repair-bundle-integration/` — Phase 3 treats this
+  contract's outstanding drift item as a go/no-go gate: no RFF work (that change's Phase 7+)
+  starts until this contract is closed, including L1/L2 cache dimension validation, not just a
+  cold Ollama health probe.

@@ -1,0 +1,402 @@
+{
+  "schema_version": "okf.library-module-index.v1",
+  "generated_at": "2026-08-09T02:08:46.125Z",
+  "repo_root": "C:\\Users\\james\\Videos\\deeds-web-app",
+  "source_count": 20,
+  "row_count": 20,
+  "status_counts": {
+    "verified": 13,
+    "stale": 5,
+    "partial": 1,
+    "missing": 1,
+    "conflict": 0
+  },
+  "rows": [
+    {
+      "ecosystem": "npm",
+      "module_name": "tree-sitter",
+      "package_id": "tree-sitter",
+      "declared_version": "0.25.0",
+      "latest_version": "0.25.1",
+      "source_url": "https://www.npmjs.com/package/tree-sitter",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:43.956Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "stale",
+      "notes": [
+        "core parser dependency",
+        "registry=https://registry.npmjs.org/tree-sitter/latest",
+        "homepage=https://github.com/tree-sitter/node-tree-sitter#readme",
+        "repository=git+ssh://git@github.com/tree-sitter/node-tree-sitter.git"
+      ],
+      "evidence_hash": "5be5d014499542c5dacc1c962d746888346af4e4fa31233a009c32217892f0e2"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "ts-morph",
+      "package_id": "ts-morph",
+      "declared_version": "27.0.2",
+      "latest_version": "28.0.0",
+      "source_url": "https://www.npmjs.com/package/ts-morph",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.055Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "stale",
+      "notes": [
+        "AST/type system tooling",
+        "registry=https://registry.npmjs.org/ts-morph/latest",
+        "homepage=https://github.com/dsherret/ts-morph#readme",
+        "repository=git+https://github.com/dsherret/ts-morph.git"
+      ],
+      "evidence_hash": "069d25beee088709c0402978829286bdefe5848c086909bf780bc6dce7f8775b"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "openwiki",
+      "package_id": "openwiki",
+      "declared_version": null,
+      "latest_version": "0.3.1",
+      "source_url": "https://www.npmjs.com/package/openwiki",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.140Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "OpenWiki integration audit target",
+        "registry=https://registry.npmjs.org/openwiki/latest",
+        "homepage=https://github.com/langchain-ai/openwiki#readme",
+        "repository=git+https://github.com/langchain-ai/openwiki.git"
+      ],
+      "evidence_hash": "6d74ee02b0cc5e66c3cc81ff414fc57e05291166e24fdd42f7171b2a0a7033e0"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "@opentelemetry/api",
+      "package_id": "@opentelemetry/api",
+      "declared_version": "1.9.0",
+      "latest_version": "1.9.1",
+      "source_url": "https://www.npmjs.com/package/@opentelemetry/api",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.221Z",
+      "license": "Apache-2.0",
+      "confidence": 0.98,
+      "status": "stale",
+      "notes": [
+        "telemetry contract",
+        "registry=https://registry.npmjs.org/%40opentelemetry%2Fapi/latest",
+        "homepage=https://github.com/open-telemetry/opentelemetry-js/tree/main/api",
+        "repository=git+https://github.com/open-telemetry/opentelemetry-js.git"
+      ],
+      "evidence_hash": "1aed0938a6a46ace25ee9e60d16a907bf6e9af6af833fe24544b03cda58c7522"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "langchain",
+      "package_id": "langchain",
+      "declared_version": "^1.0.0",
+      "latest_version": "1.5.5",
+      "source_url": "https://www.npmjs.com/package/langchain",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.304Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "stale",
+      "notes": [
+        "agent orchestration",
+        "registry=https://registry.npmjs.org/langchain/latest",
+        "homepage=https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain/",
+        "repository=git+ssh://git@github.com/langchain-ai/langchainjs.git"
+      ],
+      "evidence_hash": "80f363644f6bc5751b615a76e35ab08ae0dcff430b2f46ce1538ab1c97b4e052"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "mastra",
+      "package_id": "mastra",
+      "declared_version": null,
+      "latest_version": "1.23.0",
+      "source_url": "https://www.npmjs.com/package/mastra",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.393Z",
+      "license": "Apache-2.0",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "workflow orchestration",
+        "registry=https://registry.npmjs.org/mastra/latest",
+        "homepage=https://mastra.ai",
+        "repository=git+https://github.com/mastra-ai/mastra.git"
+      ],
+      "evidence_hash": "339154daf24a542ca63c31e00294f77a925272e84f732409602df5a4158078c2"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "@qdrant/js-client-rest",
+      "package_id": "@qdrant/js-client-rest",
+      "declared_version": "1.15.1",
+      "latest_version": "1.19.0",
+      "source_url": "https://www.npmjs.com/package/@qdrant/js-client-rest",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.494Z",
+      "license": "Apache-2.0",
+      "confidence": 0.98,
+      "status": "stale",
+      "notes": [
+        "vector store client",
+        "registry=https://registry.npmjs.org/%40qdrant%2Fjs-client-rest/latest",
+        "homepage=https://github.com/qdrant/qdrant-js#readme",
+        "repository=https://github.com/qdrant/qdrant-js.git"
+      ],
+      "evidence_hash": "b1c0247e386a683d5bc27205f1252debff291c08063b610f0bb25e7611880aee"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "neo4j-driver",
+      "package_id": "neo4j-driver",
+      "declared_version": null,
+      "latest_version": "6.2.0",
+      "source_url": "https://www.npmjs.com/package/neo4j-driver",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.617Z",
+      "license": "Apache-2.0",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "graph database client",
+        "registry=https://registry.npmjs.org/neo4j-driver/latest",
+        "homepage=https://github.com/neo4j/neo4j-javascript-driver#readme",
+        "repository=git://github.com/neo4j/neo4j-javascript-driver.git"
+      ],
+      "evidence_hash": "d7d8c8306744d060ad4385285dcfced5bcac34b252cec9cfd36b0ca7ba9c46a8"
+    },
+    {
+      "ecosystem": "npm",
+      "module_name": "kafkajs",
+      "package_id": "kafkajs",
+      "declared_version": null,
+      "latest_version": "2.2.4",
+      "source_url": "https://www.npmjs.com/package/kafkajs",
+      "source_type": "npm_registry",
+      "retrieved_at": "2026-08-09T02:08:44.714Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "message bus probe",
+        "registry=https://registry.npmjs.org/kafkajs/latest",
+        "homepage=https://kafka.js.org",
+        "repository=git+https://github.com/tulios/kafkajs.git"
+      ],
+      "evidence_hash": "98aafaf45ecefae1fbaf339f108b4c95c37ed6c05767cd1cf283c5631722eba3"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "ast-grep-py",
+      "package_id": "ast-grep-py",
+      "declared_version": null,
+      "latest_version": "0.45.1",
+      "source_url": "https://pypi.org/project/ast-grep-py/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:44.918Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "AST search tooling",
+        "pypi=https://pypi.org/pypi/ast-grep-py/json",
+        "summary=Structural Search and Rewrite code at large scale using precise AST pattern."
+      ],
+      "evidence_hash": "4462fb20398d94575d8b837dc257712a57fa53df0b9f52f66cc490848d643360"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "langextract",
+      "package_id": "langextract",
+      "declared_version": null,
+      "latest_version": "1.6.0",
+      "source_url": "https://pypi.org/project/langextract/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:45.001Z",
+      "license": "Apache-2.0",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "document extraction",
+        "pypi=https://pypi.org/pypi/langextract/json",
+        "summary=LangExtract: A library for extracting structured data from language models"
+      ],
+      "evidence_hash": "31cff39c9ee6547b33f5a610a31e3c735baff7341b108d80e3dcbefee479238b"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "torch",
+      "package_id": "torch",
+      "declared_version": null,
+      "latest_version": "2.13.0",
+      "source_url": "https://pypi.org/project/torch/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:45.028Z",
+      "license": "Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-2-Clause AND BSD-3-Clause AND BSL-1.0 AND MIT",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "GPU runtime",
+        "pypi=https://pypi.org/pypi/torch/json",
+        "summary=Tensors and Dynamic neural networks in Python with strong GPU acceleration"
+      ],
+      "evidence_hash": "d9d68849817dcffc051a0bfd92ca4194145130c67e9f4fa8e8eb186b3178dc08"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "cupy",
+      "package_id": "cupy",
+      "declared_version": null,
+      "latest_version": "14.1.1",
+      "source_url": "https://pypi.org/project/cupy/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:45.110Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "GPU array compute",
+        "pypi=https://pypi.org/pypi/cupy/json",
+        "summary=CuPy: NumPy & SciPy for GPU"
+      ],
+      "evidence_hash": "86f483f08c6994a1f2e48e6365b5d5a06a03653ecc42e2ddbdfb3c53dfcad70f"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "cuvs",
+      "package_id": "cuvs",
+      "declared_version": null,
+      "latest_version": null,
+      "source_url": "https://pypi.org/project/cuvs/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:45.292Z",
+      "license": null,
+      "confidence": 0.2,
+      "status": "partial",
+      "notes": [
+        "GPU vector search",
+        "pypi_error=http_404"
+      ],
+      "evidence_hash": "9be135d276af0db382a8ce8ead4611734a671cccdbf10272986e53a9c730ce7d"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "cugraph",
+      "package_id": "cugraph",
+      "declared_version": null,
+      "latest_version": "0.6.1.post1",
+      "source_url": "https://pypi.org/project/cugraph/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:45.412Z",
+      "license": "Apache 2.0",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "GPU graph analytics",
+        "pypi=https://pypi.org/pypi/cugraph/json"
+      ],
+      "evidence_hash": "a04c4e0b16382169cf1828f1c337045c5eadf704f4992756d2f644df7c0387df"
+    },
+    {
+      "ecosystem": "pip",
+      "module_name": "spacy",
+      "package_id": "spacy",
+      "declared_version": null,
+      "latest_version": "3.8.15",
+      "source_url": "https://pypi.org/project/spacy/",
+      "source_type": "pypi_json",
+      "retrieved_at": "2026-08-09T02:08:45.453Z",
+      "license": "MIT",
+      "confidence": 0.98,
+      "status": "verified",
+      "notes": [
+        "nlp tooling",
+        "pypi=https://pypi.org/pypi/spacy/json",
+        "summary=Industrial-strength Natural Language Processing (NLP) in Python"
+      ],
+      "evidence_hash": "1dd245f6a8776f865078727d9b423653e7371be5958aee3450700c9730d26cf7"
+    },
+    {
+      "ecosystem": "global",
+      "module_name": "rg",
+      "package_id": "ripgrep",
+      "declared_version": null,
+      "latest_version": "15.2.0",
+      "source_url": "https://github.com/BurntSushi/ripgrep",
+      "source_type": "github_release",
+      "retrieved_at": "2026-08-09T02:08:45.734Z",
+      "license": null,
+      "confidence": 0.95,
+      "status": "verified",
+      "notes": [
+        "ripgrep CLI",
+        "release=https://api.github.com/repos/BurntSushi/ripgrep/releases/latest",
+        "release_name=15.2.0"
+      ],
+      "evidence_hash": "326a65572c0f2a79c3d9314e0a103273a5d61cbc3b77ad79c9229535ac41bbb2"
+    },
+    {
+      "ecosystem": "global",
+      "module_name": "jq",
+      "package_id": "jq",
+      "declared_version": null,
+      "latest_version": "jq-1.8.2",
+      "source_url": "https://github.com/jqlang/jq",
+      "source_type": "github_release",
+      "retrieved_at": "2026-08-09T02:08:45.942Z",
+      "license": null,
+      "confidence": 0.95,
+      "status": "verified",
+      "notes": [
+        "jq CLI",
+        "release=https://api.github.com/repos/jqlang/jq/releases/latest",
+        "release_name=jq 1.8.2"
+      ],
+      "evidence_hash": "d72018e9092650111bed6dc02911a4ebe091107d96c8a72f670615a97ec77879"
+    },
+    {
+      "ecosystem": "global",
+      "module_name": "ast-grep",
+      "package_id": "ast-grep",
+      "declared_version": null,
+      "latest_version": "0.45.1",
+      "source_url": "https://github.com/ast-grep/ast-grep",
+      "source_type": "github_release",
+      "retrieved_at": "2026-08-09T02:08:46.124Z",
+      "license": null,
+      "confidence": 0.95,
+      "status": "verified",
+      "notes": [
+        "AST-grep CLI",
+        "release=https://api.github.com/repos/ast-grep/ast-grep/releases/latest",
+        "release_name=0.45.1"
+      ],
+      "evidence_hash": "ec359d96db21e64b0da779f45dd0e8d8eb70ea52683d042343ac4ddc8519bdd3"
+    },
+    {
+      "ecosystem": "openwiki",
+      "module_name": "docs/openwiki",
+      "package_id": "docs/openwiki",
+      "declared_version": null,
+      "latest_version": null,
+      "source_url": "file://docs/openwiki",
+      "source_type": "local_openwiki",
+      "retrieved_at": "2026-08-09T02:08:46.124Z",
+      "license": null,
+      "confidence": 0.1,
+      "status": "missing",
+      "notes": [
+        "local OpenWiki source lane",
+        "openwiki_root_missing"
+      ],
+      "evidence_hash": "65673179a282495fb720eb5e265462ddf8067bc84e255aa6210505e9e8dc2fde"
+    }
+  ]
+}

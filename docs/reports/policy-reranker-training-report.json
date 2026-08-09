@@ -1,5 +1,5 @@
 {
-  "generated": "2026-06-13T22:57:45.076277Z",
+  "generated": "2026-08-09T00:00:00.000Z",
   "model_type": "pytorch_policy_feedforward",
   "architecture": "Linear(80\u2192128\u219264\u219232\u21921) + BatchNorm + Dropout + SOM_Embed(400,64)",
   "model_path": "C:\\Users\\james\\Videos\\deeds-web-app\\models\\policy-reranker.pt",

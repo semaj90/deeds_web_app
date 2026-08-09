@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-07T17:09:13.209Z",
+  "generatedAt": "2026-08-09T00:40:06.373Z",
   "inputs": {
     "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
     "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
@@ -35,7 +35,7 @@
       "nativeParses": 1,
       "fallbackParses": 6625,
       "totalBytesParsed": 3957402,
-      "nativeTimeMs": 3.5286000000000968,
+      "nativeTimeMs": 2.562599999999975,
       "cacheBytes": 7815662,
       "cacheSize": 6626
     },
@@ -480,7 +480,7 @@
         "lib › icons",
         "lib › shims",
         "lib › agent",
-        "lib › schemas"
+        "lib › shared"
       ],
       "topFeatureIds": [],
       "topSourceRefs": [
@@ -499,7 +499,7 @@
       "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.002,
+        "cohesion": 0.0111,
         "pairCount": 6
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."

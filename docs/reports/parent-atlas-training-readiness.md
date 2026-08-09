@@ -1,6 +1,6 @@
 # Parent Atlas Training Readiness
 
-Generated: 2026-07-11T07:16:12.700Z
+Generated: 2026-08-09T00:00:00.000Z
 Overall: READY_WITH_BLOCKERS
 
 ## Promotion Decisions
@@ -51,4 +51,3 @@ Overall: READY_WITH_BLOCKERS
 5. Widen Qdrant and Neo4j tree-node mirrors in bounded batches until full parity gates pass.
 6. Install CUDA-enabled PyTorch in the dedicated training environment; keep RAPIDS/cuVS in WSL2.
 7. Re-run JEPA on the same deterministic split and promote only if both MRR and NDCG@10 beat baseline.
-

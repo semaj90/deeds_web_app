@@ -428,6 +428,198 @@ The next bounded step is to reuse the existing owners instead of wiring a second
 
 ---
 
+## MASTER FEATURE TODO: Controlled Integration Ladder
+
+**Purpose**: Integrate the repair and ranking bundle as a staged proof ladder. Do not turn on all lanes at once. Prove each lane separately before it can influence production ranking or canonical truth.
+
+**Hard constraints**
+
+- Keep canonical Parent Atlas ownership of identity, evidence, and retrieval policy.
+- Copy any external bundle into a temporary integration area first; do not overwrite canonical files directly.
+- Use `trace_dynamic_context` as the evidence layer, not a second context engine.
+- Keep semantic `768` canonical and treat `384` as legacy / migration evidence only.
+- Treat RRF candidate fusion and RFF-derived geometric features as separate lanes with separate evaluation gates.
+- Do not enable cuVS, cuGraph, new graph traversal, or production fusion until the prior proof gate passes.
+
+**Relevant files**
+
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.schema.ts`
+- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts`
+- `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`
+- `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
+- `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts`
+- `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
+- `sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts`
+- `sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts`
+- `docs/atlas/phase-20-training-readiness.md`
+- `packages/parent-atlas/docs/atlas/phase-20-training-readiness.md`
+- `docs/atlas/xgboost-reranker-contract.md`
+- `packages/parent-atlas/docs/atlas/xgboost-reranker-contract.md`
+- `docs/reports/parent-atlas-training-readiness.md`
+- `docs/reports/parent-atlas-training-readiness.json`
+- `docs/reports/parent-atlas-open-lanes-todo.md`
+
+### Step 1: Bundle staging and repair spine proof
+
+- [ ] Copy the bundle into a temporary integration area.
+- [ ] Select one known failing test and capture the failure fingerprint.
+- [ ] Wire the minimal repair loop: `observe error` → `repair state` → `localize symbols` → `bounded context` → `surgical patch` → `verify repair` → `record repair episode`.
+- [ ] Verify the loop on one real failure before expanding scope.
+
+### Step 2: Replace JSON-only context with Parent Atlas evidence
+
+- [ ] Replace simple JSON localization inputs with `trace_dynamic_context`.
+- [ ] Keep the localizer bounded to real Parent Atlas evidence: symbol IDs, packet keys, file paths, callers, tests, and retrieval scores.
+- [ ] Ensure `localize symbols` only ranks candidates supplied by the evidence layer.
+
+### Step 3: Close the semantic 768 invariant
+
+- [ ] Confirm raw embedding length is 768 for the active semantic lane.
+- [ ] Confirm `codebase_chunks_768` remains the canonical Qdrant collection.
+- [ ] Remove any runtime dependency on `384` for active retrieval.
+- [ ] Protect precomputed vectors and caches from silent dimension drift.
+
+### Step 4: Make RRF ownership explicit
+
+- [ ] Decide one canonical owner for fusion: Qdrant-side fusion or Parent Atlas-side fusion.
+- [ ] Use the bundle's RRF implementation as an oracle reference first, not a production owner.
+- [ ] Compare frozen lane rankings between the canonical implementation and the oracle reference.
+- [ ] Require mathematical agreement before changing runtime ownership.
+
+### Step 5: Restore PageRank authority as one field
+
+- [ ] Keep PageRank authority as a single field, not overlapping aliases.
+- [ ] Resolve `pickPageRankAuthorityScore()` into the canonical authority row.
+- [ ] Preserve provenance: raw, normalized, and revision metadata must stay explicit.
+
+### Step 6: Establish FeatureRowV1
+
+- [ ] Define `FeatureRowV1` as the first convergence point.
+- [ ] Start with `packetKey`, `dense`, `sparse`, `rrf`, `ast`, `pagerankAuthority`, `freshness`, `crossEncoder`, `featureRevision`, and `graphRevision`.
+- [ ] Defer `rffSimilarity` and `latent128Similarity` to later versions.
+
+### Step 7: Introduce RFF as an experimental projection
+
+- [ ] Define a deterministic representation contract for RFF.
+- [ ] Fix the source representation to `semantic_768`.
+- [ ] Fix the output projection to a stable RFF dimension and seed.
+- [ ] Evaluate RFF only on the final candidate set before adding any index or collection.
+
+### Step 8: Keep RFF out of Qdrant until it proves value
+
+- [ ] Compute RFF only on the final candidate shortlist.
+- [ ] Measure whether RFF improves reranking discrimination rather than candidate recall.
+- [ ] Do not create a new Qdrant collection for RFF until the ablation result justifies it.
+
+### Step 9: Make Domain 10 the gatekeeper
+
+- [ ] Promote the evaluation scripts into real ablation inputs.
+- [ ] Run baseline, RRF, RFF, and combined variants on frozen lane rankings.
+- [ ] Measure retrieval and repair metrics separately.
+
+### Step 10: Defer latent128 until its BYTEA contract is proven
+
+- [ ] Define exactly what the latent128 bytes encode.
+- [ ] Add a decoder contract before any feature uses the bytes as an input.
+- [ ] Treat latent128 as derived representation, not opaque truth.
+
+### Step 11: Use NetworkX as the graph oracle
+
+- [ ] Compare NetworkX PageRank against Neo4j GDS on a frozen snapshot.
+- [ ] Measure overlap, rank correlation, and maximum difference.
+- [ ] Prove the graph interpretation before GPU promotion.
+
+### Step 12: Add cuGraph only after parity
+
+- [ ] Use cuGraph as the GPU candidate after NetworkX and Neo4j parity are proven.
+- [ ] Require same snapshot, same damping, same convergence policy.
+- [ ] Promote only if runtime improvement is material.
+
+### Step 13: Add cuVS only for vectors
+
+- [ ] Use cuVS exact KNN as the semantic oracle.
+- [ ] Compare Qdrant ANN against exact KNN before introducing CAGRA.
+- [ ] Keep semantic localization separate from repair localization.
+
+### Step 14: Close the loop on real failures
+
+- [ ] Run the repair loop on actual failing tests.
+- [ ] Record episode state, hypothesis, patch, verification, and outcome.
+- [ ] Only then treat the repair spine as real production infrastructure.
+
+### Step 15: Add community taxonomy only after the graph oracle ladder
+
+- [ ] Keep Louvain live and Leiden experimental until taxonomy coherence is proven.
+- [ ] Materialize community taxonomy records only from the chosen clustering lane.
+- [ ] Treat community IDs as taxonomy metadata, not canonical identity.
+
+### Step 16: Keep traversal and ranking variants explicitly separate
+
+- [ ] Treat personalized PageRank as distinct from global PageRank.
+- [ ] Keep weighted Dijkstra as the shortest-path baseline.
+- [ ] Use semantic best-first search only as a later experiment, not a replacement.
+- [ ] Keep external MoE routing as a later sparse-router layer.
+
+### Step 17: Build a frozen repair replay corpus
+
+- [ ] Record deterministic repair episodes with error fingerprint, beliefs, patch, verification, and outcome.
+- [ ] Freeze the replay corpus before any learned promotion.
+- [ ] Use the corpus for later evaluation of routing, ranking, and repair policies.
+
+### Step 18: Block learned promotion until the replay corpus exists
+
+- [ ] Do not allow learned policies to redefine canonical truth.
+- [ ] Keep learned promotion blocked until the replay corpus and evaluation gates exist.
+- [ ] Promote only after the replay corpus demonstrates value on frozen evidence.
+
+### Step 19: Record the missing items audit
+
+- [x] Canonical immutable graph snapshot materializer now has a Postgres-backed loader and focused tests; the frozen production parity run is still pending.
+- [x] Frozen-snapshot NetworkX/GDS parity runner is wired to load loader-emitted frozen snapshot JSON; the recorded parity report is still pending.
+- [ ] Snapshot-aware bounded traversal contract remains unproven.
+- [ ] Closed error-resolution loop remains partial.
+- [ ] Frozen repair replay corpus remains absent.
+- [ ] `latent_128` byte-contract proof remains absent.
+- [ ] OpenWiki source lane is empty and needs content.
+- [ ] Library-module source auto-discovery remains manual.
+- [ ] DB-backed canonical registry for the library-module index does not exist yet.
+- [ ] Conflict review queue for stale/partial library rows is missing.
+- [ ] Shared PATH-based global tool resolver for `rg` / `jq` / other binaries is missing.
+- [ ] `cuvs` authoritative source mapping is unresolved.
+
+**Execution order**
+
+1. Bundle copy into temporary area
+2. Semantic `768` invariant
+3. One real repair-loop proof
+4. `trace_dynamic_context` integration
+5. RRF ownership decision
+6. `FeatureRowV1`
+7. RFF projection
+8. PageRank authority normalization
+9. Domain 10 baseline and ablations
+10. NetworkX parity
+11. cuGraph parity
+12. cuVS parity
+13. Community taxonomy proof
+14. Traversal variant separation
+15. Closed-loop repair replay corpus
+16. Learned promotion block
+17. Missing items audit
+
+**Do not**
+
+- Do not turn on every lane at once.
+- Do not make RFF the production fusion owner by accident.
+- Do not add new graph traversal into production before the proof ladder is complete.
+- Do not treat bundle-provided code as canonical without a Parent Atlas proof gate.
+- Do not treat community clustering output as identity.
+- Do not allow learned promotion before the frozen replay corpus exists.
+
+---
+
 ## Export Stack Verification Checklist
 
 - [ ] Phase 1: Arrow export 10K sample → verify offsets work
@@ -468,6 +660,6 @@ npm run atlas:phase1.5:lexical:dry
 
 ---
 
-**Date Updated**: July 6, 2026
+**Date Updated**: August 9, 2026
 **Session**: 109+ (Continuation Final)
 **Last Verified**: Live database analysis complete

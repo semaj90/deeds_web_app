@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-08-06T16:54:22.768Z",
+  "generatedAt": "2026-08-09T03:29:30.266Z",
   "mode": "apply",
   "inputPath": ".tmp/addressable-packets.ndjson",
   "summary": {
     "inputRows": 61659,
-    "selectedRows": 61659,
-    "eligibleRows": 6365,
-    "patchedRows": 6365,
-    "skippedNoQdrantPointId": 55208,
-    "skippedNoQdrantCollection": 86,
+    "selectedRows": 2114,
+    "eligibleRows": 1128,
+    "patchedRows": 1128,
+    "skippedNoQdrantPointId": 986,
+    "skippedNoQdrantCollection": 0,
     "skippedNoChanges": 0,
     "failures": 0,
-    "qdrantReachable": false,
+    "qdrantReachable": true,
     "patchRatePct": 100
   },
   "samples": [

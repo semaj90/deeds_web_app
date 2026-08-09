@@ -54,30 +54,31 @@ function pickNumber(...values: unknown[]): number | null {
 }
 
 /**
- * Compute identity observability fields alongside (never in place of) the existing
- * packetKey/symbolVersionId fallback chains at each candidate-construction site. Uses the same
- * shared precedence as `rrf-integration.ts` (`identity-resolution.ts::resolveCanonicalIdentity`)
- * so a candidate whose payload lacks packet_key/symbol_version_id is tagged `identityStatus:
- * 'degraded'` instead of silently letting its raw backend-local id (Qdrant point id, etc.) pass
- * as if it were canonical. Does not change `packetKey`/`symbolVersionId`'s own existing values —
- * this is additive-only, by design, to keep the candidate-boundary fix isolated from any
- * downstream behavior change until RF5's fusion-side consumption of it is proven.
+ * Compute canonical identity plus observability fields for a candidate.
+ *
+ * `packetKey` and `symbolVersionId` are normalized to the resolved canonical identity key so the
+ * search runtime deduplicates on the shared precedence chain. The original raw fields are carried
+ * separately as snake_case metadata so degraded fallback cases stay visible instead of silently
+ * masquerading as canonical.
  */
-function deriveIdentity(input: {
+export function deriveIdentity(input: {
   symbolVersionId?: unknown;
   packetKey?: unknown;
-  /**
-   * Chunk-unique fallback tier, checked before source_ref. Only wired for the Qdrant lane so
-   * far (2026-08-08) — that's the lane a live trace confirmed actually needs it: 23 distinct
-   * chunks of one file were found sharing a single `source_ref` in `codebase_chunks_768_v2`,
-   * which would make `source_ref` alone over-merge them. The Postgres lexical lanes
-   * (BM25/exact/AST/rg) don't currently SELECT `content_hash` in their queries; left as a
-   * tracked follow-up rather than widening every SQL statement in this pass.
-   */
+  /** Optional chunk-unique fallback tier, checked before source_ref. */
   contentHash?: unknown;
   sourceRef?: unknown;
   fallbackId: string;
-}): { identityStatus: 'canonical' | 'degraded'; identitySource: ReturnType<typeof resolveCanonicalIdentity>['source'] } {
+}): {
+  packetKey: string;
+  symbolVersionId: string;
+  symbol_version_id: string | null;
+  packet_key: string | null;
+  source_ref: string | null;
+  content_hash: string | null;
+  fallback_id: string;
+  identityStatus: 'canonical' | 'degraded';
+  identitySource: ReturnType<typeof resolveCanonicalIdentity>['source'];
+} {
   const resolved = resolveCanonicalIdentity({
     symbolVersionId: typeof input.symbolVersionId === 'string' ? input.symbolVersionId : undefined,
     packetKey: typeof input.packetKey === 'string' ? input.packetKey : undefined,
@@ -85,7 +86,17 @@ function deriveIdentity(input: {
     sourceRef: typeof input.sourceRef === 'string' ? input.sourceRef : undefined,
     fallbackId: input.fallbackId,
   });
-  return { identityStatus: resolved.status, identitySource: resolved.source };
+  return {
+    packetKey: resolved.canonicalId,
+    symbolVersionId: resolved.canonicalId,
+    symbol_version_id: pickString(input.symbolVersionId),
+    packet_key: pickString(input.packetKey),
+    source_ref: pickString(input.sourceRef),
+    content_hash: pickString(input.contentHash),
+    fallback_id: input.fallbackId,
+    identityStatus: resolved.status,
+    identitySource: resolved.source,
+  };
 }
 
 async function getDb() {
@@ -166,8 +177,6 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
     const laneCandidates = await getSparseRetriever().retrieve({ query, limit: SPARSE_LIMIT });
     return laneCandidates.map(lc => ({
       id: lc.qdrantPointId ?? lc.packetKey,
-      packetKey: lc.packetKey,
-      symbolVersionId: lc.symbolVersionId ?? lc.packetKey,
       sourceRef: lc.sourceRef,
       summary: (lc.metadata?.summary as string) || '',
       content: (lc.metadata?.content as string) || '',
@@ -182,6 +191,7 @@ async function retrieveBM42Sparse(query: string): Promise<Candidate[]> {
       ...deriveIdentity({
         symbolVersionId: lc.symbolVersionId,
         packetKey: lc.packetKey,
+        contentHash: lc.metadata?.content_hash ?? lc.metadata?.contentHash,
         sourceRef: lc.sourceRef,
         fallbackId: lc.qdrantPointId ?? lc.packetKey,
       }),
@@ -238,13 +248,11 @@ export async function retrieveBM25(query: string): Promise<Candidate[]> {
         score: number;
       };
 
-      return (result.rows as BM25Row[]).map(row => ({
-        id: row.id,
-        packetKey: (row.metadata?.packet_key as string) || row.id,
-        symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
-        sourceRef: row.source_ref || '',
-        summary: row.summary || '',
-        content: row.content || '',
+    return (result.rows as BM25Row[]).map(row => ({
+      id: row.id,
+      sourceRef: row.source_ref || '',
+      summary: row.summary || '',
+      content: row.content || '',
         score: Math.max(0.5, Math.min(1.0, row.score)), // Normalize to 0.5-1.0 range
         scoreSource: 'postgres_trigram' as const,
         workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
@@ -324,8 +332,6 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
 
     return (result.rows as TrigRamRow[]).map(row => ({
       id: row.id,
-      packetKey: (row.metadata?.packet_key as string) || row.id,
-      symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
       sourceRef: row.source_ref || '',
       summary: row.summary || '',
       content: row.content || '',
@@ -338,6 +344,7 @@ async function retrieveBM25Trigram(query: string): Promise<Candidate[]> {
       ...deriveIdentity({
         symbolVersionId: row.metadata?.symbol_version_id,
         packetKey: row.metadata?.packet_key,
+        contentHash: row.metadata?.content_hash ?? row.metadata?.contentHash,
         sourceRef: row.source_ref,
         fallbackId: row.id,
       }),
@@ -378,8 +385,6 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
         for (const hit of results.results) {
           const candidate: Candidate = {
             id: String(hit.id),
-            packetKey: (hit.payload?.packet_key as string) || String(hit.id),
-            symbolVersionId: (hit.payload?.symbol_version_id as string) || (hit.payload?.packet_key as string) || String(hit.id),
             sourceRef: (hit.payload?.source_ref as string) || '',
             summary: (hit.payload?.summary as string) || '',
             content: (hit.payload?.content as string) || '',
@@ -433,8 +438,6 @@ export async function retrieveQdrant(query: string): Promise<Candidate[]> {
 
     return results.results.map(hit => ({
       id: String(hit.id),
-      packetKey: (hit.payload?.packet_key as string) || String(hit.id),
-      symbolVersionId: (hit.payload?.symbol_version_id as string) || (hit.payload?.packet_key as string) || String(hit.id),
       sourceRef: (hit.payload?.source_ref as string) || '',
       summary: (hit.payload?.summary as string) || '',
       content: (hit.payload?.content as string) || '',
@@ -507,8 +510,6 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
 
     return (result.rows as ExactRow[]).map(row => ({
       id: row.id,
-      packetKey: (row.metadata?.packet_key as string) || row.id,
-      symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
       sourceRef: row.source_ref,
       summary: row.summary || '',
       content: row.content || '',
@@ -521,6 +522,7 @@ export async function retrieveExactMatches(query: string): Promise<Candidate[]> 
       ...deriveIdentity({
         symbolVersionId: row.metadata?.symbol_version_id,
         packetKey: row.metadata?.packet_key,
+        contentHash: row.metadata?.content_hash ?? row.metadata?.contentHash,
         sourceRef: row.source_ref,
         fallbackId: row.id,
       }),
@@ -578,8 +580,6 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
 
     return (result.rows as ASTRow[]).map(row => ({
       id: row.id,
-      packetKey: (row.metadata?.packet_key as string) || (row.output_meta?.packet_key as string) || row.id,
-      symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.output_meta?.symbol_version_id as string) || (row.metadata?.packet_key as string) || (row.output_meta?.packet_key as string) || row.id,
       sourceRef: row.source_ref,
       summary: row.summary || '',
       content: row.content || '',
@@ -592,6 +592,7 @@ export async function retrieveASTMatches(query: string): Promise<Candidate[]> {
       ...deriveIdentity({
         symbolVersionId: row.metadata?.symbol_version_id ?? row.output_meta?.symbol_version_id,
         packetKey: row.metadata?.packet_key ?? row.output_meta?.packet_key,
+        contentHash: row.metadata?.content_hash ?? row.output_meta?.content_hash ?? row.metadata?.contentHash ?? row.output_meta?.contentHash,
         sourceRef: row.source_ref,
         fallbackId: row.id,
       }),
@@ -704,13 +705,11 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
         };
 
         for (const row of result.rows as RgRow[]) {
-          candidates.push({
-            id: row.id,
-            packetKey: (row.metadata?.packet_key as string) || row.id,
-            symbolVersionId: (row.metadata?.symbol_version_id as string) || (row.metadata?.packet_key as string) || row.id,
-            sourceRef: row.source_ref || '',
-            summary: row.summary || '',
-            content: row.content || '',
+        candidates.push({
+          id: row.id,
+          sourceRef: row.source_ref || '',
+          summary: row.summary || '',
+          content: row.content || '',
             score: 0.7,
             scoreSource: 'rg_keyword' as const,
             workspaceRevision: pickString(row.metadata?.workspace_revision, row.metadata?.workspaceRevision),
@@ -720,6 +719,7 @@ export async function retrieveRipgrep(query: string): Promise<Candidate[]> {
             ...deriveIdentity({
               symbolVersionId: row.metadata?.symbol_version_id,
               packetKey: row.metadata?.packet_key,
+              contentHash: row.metadata?.content_hash ?? row.metadata?.contentHash,
               sourceRef: row.source_ref,
               fallbackId: row.id,
             }),

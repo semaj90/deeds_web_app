@@ -1,6 +1,6 @@
 # XGBoost Reranker Contract
 
-Date: 2026-06-12
+Date: 2026-08-09
 
 ## Decision
 
