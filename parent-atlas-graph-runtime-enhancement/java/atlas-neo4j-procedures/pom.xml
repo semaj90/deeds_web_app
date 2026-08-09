@@ -1,0 +1,10 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.parentatlas</groupId>
+  <artifactId>atlas-neo4j-procedures</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <properties><maven.compiler.release>21</maven.compiler.release><neo4j.version>2026.06.0</neo4j.version></properties>
+  <dependencies>
+    <dependency><groupId>org.neo4j</groupId><artifactId>neo4j</artifactId><version>${neo4j.version}</version><scope>provided</scope></dependency>
+  </dependencies>
+</project>

@@ -54,14 +54,71 @@ Not resolved yet. Three options, not mutually exclusive across gates:
 - [ ] Freeze the resulting revision (per the plan's `Run-Graphify-Then-Freeze.ps1` concept) before
       any PageRank/community-detection output changes downstream.
 
-## GR2–GR10
+## GR2/GR3 — PROVEN 2026-08-09 (live, implemented)
 
-Not started. See `proposal.md`'s "Gated rollout order" for the full sequence and dependencies.
-Each gate should get its own task entry here, expanded at the point it's actually picked up —
-not pre-written speculatively, to avoid this document drifting from what's actually built (the
-same anti-pattern flagged repeatedly elsewhere in this repo's CLAUDE.md around status-language
-discipline: PRESENT / STATICALLY_REFERENCED / RUNTIME_SMOKE_PROVEN, not aspirational checklists
-mistaken for progress).
+Implemented and smoke-tested per the user's minimal GR2/GR3 prompt (not the fuller GR2-GR10
+speculative sequence below — those remain not-started). Full detail: see the sibling change
+`parent-atlas-agentic-repair-bundle-integration` T22 for the original bug-fix writeup. Summary:
+
+- **GR2 APOC bounded traversal — PASS.** `apoc.path.expandConfig`, 2 consecutive runs, no
+  regressions.
+- **GR3 GDS BFS — PASS**, with one correction along the way: `gds.bfs.stream` returns one row
+  with `nodeIds` (the full reachable set) + a single synthetic `path` chaining them — NOT one row
+  per node with individual hop-depth. A first-draft query read `length(path)` as per-node depth
+  and got `depth=37` against `maxDepth=3` on a real seed, which is what caught the bug. Fixed by
+  using `size(nodeIds)` and proving `maxDepth`'s effect via monotonicity (result size at
+  `maxDepth=1` ≤ result size at `maxDepth=3`) instead.
+  - **Per-node BFS hop distance (a hypothetical future `bfsHops` FeatureRow column) is
+    NOT_PROVEN** by this or any corrected version of this query — `gds.bfs.stream`'s output shape
+    doesn't carry it. If ever needed, use a traversal that explicitly emits distance/level per
+    node (frontier-by-frontier BFS, or a suitably weighted `gds.allShortestPaths`), not this
+    procedure.
+- **GR3 Dijkstra — PASS.** Exercised the pre-existing, non-deprecated canonical owner
+  (`runDijkstraContext()` in `sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts`) — no new
+  implementation, per instruction.
+- **GR3 PageRank — PASS, with a real bug found and fixed.** `gds.pageRank.mutate` throws on a
+  second consecutive call against the same long-lived projection (`mutateProperty` already
+  exists — it mutates new properties, doesn't overwrite). Fixed in the canonical owner
+  (`runPageRankClient()`, `sveltekit-frontend/src/lib/server/graph/neo4j-gds-client.ts`) with a
+  `gds.graph.nodeProperties.drop` self-heal before mutate — matches this file's existing self-heal
+  pattern for relationship `cost`. Verified via 2 consecutive full runs of the smoke script: both
+  PASS, same graph revision, finite scores, no drift.
+  - **PageRank concurrency risk — PROVEN REACHABLE, not fixed (reported per instruction).** The
+    self-heal sequence is `DROP mutateProperty` → `MUTATE mutateProperty`, with an `await` boundary
+    between them where Node's event loop can interleave another request. Checked all real callers:
+    `POST /api/code-intel/graph/gds-status` (`sveltekit-frontend/src/routes/api/code-intel/graph/gds-status/+server.ts:97`)
+    calls this path via `runPageRankMutate()` for `action: 'pagerank'` **with no rate limit at
+    all** — the 5-minute Redis rate limit at that route only applies to `action: 'full'` (line
+    ~79-87). Any two authenticated users (or one user double-submitting) hitting that endpoint
+    with `{action: "pagerank"}` concurrently can race the drop→mutate window. `runPageRankMutate`
+    → `runPageRankClient` has no lock. **Not fixed here, per explicit instruction** — if this ever
+    needs hardening, the fix is a projection+mutateProperty-scoped mutex/singleflight around
+    drop+mutate, not more exception handling.
+
+**Files changed this reconciliation pass** (canonical runtime — see repo root `neo4j/`,
+`sveltekit-frontend/src/lib/server/graph/`, `scripts/atlas/smoke-gr2-gr3-graph-runtime.mts` for the
+actual implementation; not duplicated here).
+
+**Bundle reconciliation**: the untracked `parent-atlas-graph-runtime-enhancement/` directory at
+repo root (the real 24-file bundle, discovered mid-session — see T22 in the sibling change for how)
+had its own `neo4j/03-gds-bfs.cypher` with the identical `length(path)`-as-depth bug, unpatched.
+Fixed in place, `manifest.json` hashes regenerated for the 2 changed bundle files
+(`neo4j/03-gds-bfs.cypher`, `openspec/tasks.md`), bundle's own `README.md` given an explicit
+CANONICAL-vs-REFERENCE table so a future session doesn't copy bundle files over the proven runtime
+files. Direction of truth: live-tested repo code → bundle, never reversed. No bundle files were
+copied over canonical runtime implementations.
+
+## GR1, GR4–GR10
+
+Not started. GR1 (fresh `graphify:daily` + revision freeze) is next, explicitly not run in this
+reconciliation pass per instruction — bundle reconciliation and the first fresh graph rebuild are
+deliberately kept as separate commits/sessions. GR4 is now narrower than originally scoped: PageRank
+*implementation* is already proven (GR3) — GR4 means running it against a **frozen** revision and
+recording provenance (one `pagerankAuthority` row, promoted, idempotent on repeat), not building
+anything new. GR5–GR10 remain blocked in sequence behind GR1→GR4. See `proposal.md`'s "Gated
+rollout order" for the full sequence — each gate gets its own task entry here only when actually
+picked up, not pre-written speculatively (status-language discipline: PRESENT /
+STATICALLY_REFERENCED / RUNTIME_SMOKE_PROVEN, not aspirational checklists mistaken for progress).
 
 ## Cross-references
 

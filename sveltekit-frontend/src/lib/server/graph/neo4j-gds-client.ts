@@ -198,6 +198,17 @@ export async function runPageRankClient(
   const t0 = Date.now();
 
   try {
+    // gds.pageRank.mutate throws IllegalArgumentException if mutateProperty already exists on
+    // the in-memory graph (confirmed live, 2026-08-09) — it mutates new properties, it doesn't
+    // overwrite. Since this projection is long-lived (ensureProjectionClient reuses it across
+    // calls rather than recreating it), a second PageRank run on the same process/projection
+    // lifetime would otherwise always fail. Self-heal: drop the property first if present,
+    // idempotently, matching this file's existing self-heal pattern for relationship `cost`.
+    await session.run(
+      `CALL gds.graph.nodeProperties.drop($name, [$mutateProperty]) YIELD propertiesRemoved RETURN propertiesRemoved`,
+      { name: projectionName, mutateProperty },
+    ).catch(() => { /* property didn't exist yet — fine */ });
+
     await session.run(
       `
       CALL gds.pageRank.mutate($name, {

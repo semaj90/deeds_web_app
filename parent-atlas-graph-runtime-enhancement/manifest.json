@@ -1,0 +1,119 @@
+[
+  {
+    "path": "README.md",
+    "sha256": "cc269cea87774016b122453a383eea0596731383858ed74c6b4242ab568ea8fa",
+    "bytes": 1203
+  },
+  {
+    "path": "java/atlas-neo4j-procedures/pom.xml",
+    "sha256": "fa6303b38bf6adca7a985ccecf2fab8124e97dcaa5fd225cf308af4e8519ea93",
+    "bytes": 523
+  },
+  {
+    "path": "java/atlas-neo4j-procedures/src/main/java/com/parentatlas/neo4j/SemanticBestFirstProcedure.java",
+    "sha256": "5b3c12c9d9432da2ea4b1720854d5cb606187278b85a6c0fe681e749586ca6de",
+    "bytes": 608
+  },
+  {
+    "path": "native/simdjson_edge_scan.cpp",
+    "sha256": "d666ad45b824e52750d7d187412e42f979281db968fea58b05bd231b017634ca",
+    "bytes": 1215
+  },
+  {
+    "path": "neo4j/00-capability-preflight.cypher",
+    "sha256": "75a1c5ddd4ead5332e6e28a50837b4b98fec22fb56f7c604c977a1051760d3f5",
+    "bytes": 346
+  },
+  {
+    "path": "neo4j/01-required-indexes.cypher",
+    "sha256": "a109d453b202e9934775440df586d5576319db178a238bc6c827443eddea0b7f",
+    "bytes": 258
+  },
+  {
+    "path": "neo4j/02-apoc-bounded-neighborhood.cypher",
+    "sha256": "6808999b9ce0fcb9a9c22ec62e69dee1aee8dc3d2d757b7210388f5b13b080e6",
+    "bytes": 505
+  },
+  {
+    "path": "neo4j/03-gds-bfs.cypher",
+    "sha256": "a0263094a5bf39b37c01799f10db02d8d08588ae4099670f13e3801e2a25f382",
+    "bytes": 2296,
+    "corrected": "2026-08-09: original read length(path) as per-node hop depth; gds.bfs.stream actually returns nodeIds (full reachable set) + one synthetic path chaining them, not per-node distance. See openspec/tasks.md GR3."
+  },
+  {
+    "path": "neo4j/04-gds-page-rank.cypher",
+    "sha256": "0de8472b6e372ad61645037500257df609362770c56bee567638ef6cc3f422a5",
+    "bytes": 265
+  },
+  {
+    "path": "neo4j/05-gds-ppr.cypher",
+    "sha256": "d15874325639716a39f133aef54d5393b34c5ce0b5f805361a5b876b9d4350fc",
+    "bytes": 389
+  },
+  {
+    "path": "neo4j/06-gds-louvain.cypher",
+    "sha256": "f5282447b150a3bfe82c702f73a41398ddbba3b4c403e7f45b4f8773046e24fd",
+    "bytes": 278
+  },
+  {
+    "path": "neo4j/07-gds-leiden.cypher",
+    "sha256": "fc9c461913a10eb84b9bb49507a80fada84dbeeb12ab3afdf607532ade09e126",
+    "bytes": 277
+  },
+  {
+    "path": "neo4j/08-gds-dijkstra.cypher",
+    "sha256": "4101369b526ebeeeba767f9c5a32aa41a57ad5e0615ca224967ae38e079879b9",
+    "bytes": 381
+  },
+  {
+    "path": "openspec/tasks.md",
+    "sha256": "ca936718bace5608d7a4f838c56ddbf23db233031c53b06bf27622875e8a3d83",
+    "bytes": 7006,
+    "updated": "2026-08-09: GR0/GR2/GR3 marked PROVEN with live evidence; GR1/GR4-GR10 statuses reconciled against openspec/changes/parent-atlas-graph-runtime-enhancement/tasks.md."
+  },
+  {
+    "path": "python/rabbitmq_graph_worker.py",
+    "sha256": "c07f6432a6901c189bb5ad9c0ff488ab37d0a769ee9cfca2005ad9bf07316012",
+    "bytes": 1252
+  },
+  {
+    "path": "python/rapids_graph_worker.py",
+    "sha256": "4a6d6597e72e88a8e747039de72983084fbcdcb89dd5888b46da5724078216f2",
+    "bytes": 1356
+  },
+  {
+    "path": "scripts/Run-Graphify-Then-Freeze.ps1",
+    "sha256": "6726effe7e4e315823c7a1cbb63d262ab8b9d6bb96fb7ddd4c3542f46c5c7184",
+    "bytes": 373
+  },
+  {
+    "path": "scripts/Test-ParentAtlasGraphRuntime.ps1",
+    "sha256": "7e303ec46045122df899d9c098c7fd9a1e22ebbef000419f1946cc4520bf2c89",
+    "bytes": 1320
+  },
+  {
+    "path": "src/cache/graph-cache-keys.ts",
+    "sha256": "06fceeb6fe464be4f36e99e31c08a6bce83cde96ec3113be51e155cb4a31652c",
+    "bytes": 329
+  },
+  {
+    "path": "src/events/rabbitmq-contract.ts",
+    "sha256": "4beaf28cab34573df89965896a67b7f082d068c9b592a9c3f46b0c9240b1b4bc",
+    "bytes": 812
+  },
+  {
+    "path": "src/graph/graph-taxonomy.ts",
+    "sha256": "74c0f7691f2fd446d3981c7c212289c2fe288c2a5971a38c8e8e9b27f53aae44",
+    "bytes": 614
+  },
+  {
+    "path": "src/graph/semantic-best-first.ts",
+    "sha256": "116f5115860e2cae85bb2d80acc6e52f3110e68058d0cab365d513eb5ace6641",
+    "bytes": 1361
+  },
+  {
+    "path": "src/graph/traversal-policy.ts",
+    "sha256": "71e54c154063e4d80b3321d2a5f484a98eca62573bc7d459bd5970c80dd132a3",
+    "bytes": 543
+  }
+]
