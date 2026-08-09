@@ -180,6 +180,7 @@ export const SearchQuerySchema = z.object({
   representationId: z.string().min(1).optional(),
   representationRevision: z.number().int().positive().optional(),
   topK: z.number().int().min(1).max(100).default(20),
+  rerankTier: z.enum(['deep', 'fast']).optional(),
   threshold: z.number().min(0).max(1).optional(),
   filters: SearchMetadataFilterSchema.default({
     includeGenerated: false,
@@ -877,6 +878,7 @@ export class SearchRuntime {
       rendererVersion: 'search-runtime-v1',
       maxLength: 4096,
       topK: Math.min(query.topK, envelopes.length || query.topK),
+      rerankTier: query.rerankTier,
     });
 
     // DIAGNOSTIC: Log output state

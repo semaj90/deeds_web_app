@@ -690,6 +690,67 @@ drift. Historical references remain reference-only.
 
 ---
 
+## 🚫 Duplication Prevention — Audit Before You Build (HARD RULE, Aug 9 2026)
+
+**The recurring failure mode**: a new capability gets implemented without first checking
+whether one already exists, producing N silently-competing owners where only one (or zero)
+is actually live. This happened **four separate times in one session** (Aug 9 2026):
+
+1. **5 competing PageRank implementations** — `atlas_graph_authority_runs` (v1, dead, zero
+   callers), `atlas_graph_authority_runs_v2` (writer functions exist, zero callers, one
+   fixture-oracle row inserted ad hoc), `graphify-authority.mjs` (Neo4j-property path),
+   `run-pagerank.ts` (CouchDB+GPU path), and `neo4j-gds-client.ts::runPageRankClient` (the
+   only one with a live runtime proof). Two of the five had **zero callers anywhere in the
+   repo** — dead code sitting in production tables looking live.
+2. **4 nonexistent relationship types silently accepted** — `NAMED_PROJECTION_CANDIDATES`
+   referenced `REQUIRES`/`RETURNS`/`PARAMETER_OF`/`IMPLEMENTS_REQUIREMENT`/`EXTENDS`; none
+   exist in the live Neo4j graph (`CALL db.relationshipTypes()` returned zero matches). A
+   "named projection" silently resolved to the same graph as no filter at all.
+3. **14 reranker files** in `sveltekit-frontend/src/lib/server/retrieval/` (`*reranker*` +
+   `canonical-rerank-executor.ts`) — only one (`canonical-rerank-executor.ts`) is confirmed
+   canonical by its own docstring and by importing `blendScores`/`RuntimeReranker` from
+   `runtime-reranker.ts`; the other 13 are unclassified.
+4. **A live Docker NLP sidecar with zero ACP registrations** — `miniforge_nlp_sidecar.py`
+   has real capabilities (structural/linguistic/rerank passes) but `ACPToolRegistry.ts` has
+   no reference to it, so agents can't discover it through `GET /api/acp/tools` and would be
+   tempted to hand-roll a second integration path instead of using tool discovery that
+   already exists.
+
+**Hard rule — before implementing any new owner of a capability** (a ranking algorithm, a
+retrieval lane, an identity join, a background job, a cache key pattern, anything with a
+plausible "the codebase probably already does this somewhere" smell):
+
+1. **Grep first.** Search for the capability by name/purpose across `src/`, `scripts/`,
+   `python/` before writing new code. If something matches, read it before deciding it's
+   dead — check for actual callers (`grep -rl "functionName("`), not just file existence.
+2. **A file existing is not evidence it's live.** Check for callers. Check whether the
+   Postgres/Redis/Neo4j data it reads/writes is fresh or stale. A table having rows doesn't
+   mean the writer that produced them still runs — verify against `git log`/call-site greps,
+   not against "there's data in the table."
+3. **A config value existing is not evidence it's correct.** If a projection/allowlist/enum
+   references named entities (relationship types, table names, service endpoints), verify
+   each one actually exists in the live system before trusting the config — `grep`-checking
+   the *reference* is not the same as checking the *referent*.
+4. **Layered ownership, not competing owners.** When multiple tools plausibly overlap (e.g.
+   a parser engine vs. the chunking application built on it vs. a structural query/rewrite
+   tool vs. the canonical data contract they all feed), name each one's distinct layer
+   instead of picking one as "the" owner and treating the others as redundant. Canonical
+   contracts stay stable; producers underneath them can be swapped later.
+5. **New agent-facing capabilities register in ACP, not just HTTP.** If a new service or
+   pass is meant to be callable by an agent (Ornith, MCP tool loops, etc.), register it in
+   `ACPToolRegistry.ts` (`GET /api/acp/tools`) so it's discoverable — don't leave it as a
+   side-channel HTTP contract known only to hand-written TypeScript client code.
+6. **Record what you found, even when you don't fix it.** If an audit turns up dead code or
+   unclear ownership that's out of scope to resolve immediately, write it into the relevant
+   `openspec/changes/*/tasks.md` or this file — a flagged-but-unfixed duplicate is still
+   strictly better than an unflagged one nobody knows to distrust.
+
+**Where this is being actively tracked**: `openspec/changes/parent-atlas-graph-analysis-contract/`
+(PageRank/projection findings above), `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/`
+(reranker audit + ACP registration, tasks.md sections 6 and 11).
+
+---
+
 ## 🔐 Atlas Data Persistence + Retrieval Contract (HARD RULES)
 
 **Core Principle**: Postgres is truth; Qdrant is fast ANN mirror; Redis is ephemeral cache; Neo4j is topology mirror.

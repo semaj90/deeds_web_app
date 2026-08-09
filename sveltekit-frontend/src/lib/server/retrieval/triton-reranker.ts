@@ -10,8 +10,11 @@ import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
  */
 
 const getEndpoint = () => ENV.TRITON_URL;
-const getModel = () =>
-  ENV.CROSS_ENCODER_MODEL || ENV.TRITON_RERANKER_MODEL || 'mixedbread-ai/mxbai-rerank-base-v2';
+const getModel = (modelOverride?: string) =>
+  modelOverride?.trim() ||
+  ENV.CROSS_ENCODER_MODEL ||
+  ENV.TRITON_RERANKER_MODEL ||
+  'mixedbread-ai/mxbai-rerank-base-v2';
 const withBasePath = (path: string) => `${getEndpoint().replace(/\/$/, '')}${path}`;
 
 export interface TritonRerankResult {
@@ -29,7 +32,8 @@ export interface TritonRerankResult {
  */
 export async function scoreBatchCrossEncoder(
     query: string,
-    candidates: string[]
+    candidates: string[],
+    modelOverride?: string
 ): Promise<number[]> {
     if (candidates.length === 0) return [];
 
@@ -72,7 +76,7 @@ export async function scoreBatchCrossEncoder(
             outputs: [{ name: 'SCORE' }]
         };
 
-        const response = await fetch(withBasePath(`/v2/models/${encodeURIComponent(getModel())}/infer`), {
+        const response = await fetch(withBasePath(`/v2/models/${encodeURIComponent(getModel(modelOverride))}/infer`), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -108,9 +112,9 @@ export async function scoreBatchCrossEncoder(
 /**
  * Readiness check for the reranker model.
  */
-export async function isRerankerReady(): Promise<boolean> {
+export async function isRerankerReady(modelOverride?: string): Promise<boolean> {
   try {
-    const response = await fetch(withBasePath(`/v2/models/${encodeURIComponent(getModel())}/ready`), {
+    const response = await fetch(withBasePath(`/v2/models/${encodeURIComponent(getModel(modelOverride))}/ready`), {
       signal: AbortSignal.timeout(2000)
     });
     return response.ok;

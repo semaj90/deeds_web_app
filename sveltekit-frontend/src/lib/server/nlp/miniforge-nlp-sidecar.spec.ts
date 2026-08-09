@@ -25,6 +25,9 @@ describe('miniforge-nlp-sidecar', () => {
         return new Response(JSON.stringify({ status: 'ok', model: 'miniforge-nlp-sidecar', capabilities: { spacy: true } }), { status: 200 });
       }
       if (url.endsWith('/analyze')) {
+        const body = JSON.parse(String(init?.body ?? '{}'));
+        expect(body.passes).toEqual(['structural', 'semantic', 'sequence']);
+        expect(body.grounded_extraction_required).toBe(true);
         return new Response(JSON.stringify({
           document_id: 'doc-1',
           source_type: 'codebase',
@@ -36,6 +39,9 @@ describe('miniforge-nlp-sidecar', () => {
           features: [],
           metadata: {},
           capabilities: { spacy: true, langextract: true, tree_sitter: true, ast_grep: true, torch: false },
+          pass_results: [],
+          control5: null,
+          experiment_feature_matrix: null,
           processing_time_ms: 5,
         }), { status: 200 });
       }
@@ -53,6 +59,8 @@ describe('miniforge-nlp-sidecar', () => {
       sourceType: 'codebase',
       extractionMode: 'full',
       documentId: 'doc-1',
+      passes: ['structural', 'semantic', 'sequence'],
+      groundedExtractionRequired: true,
     });
 
     expect(analysis.document_id).toBe('doc-1');

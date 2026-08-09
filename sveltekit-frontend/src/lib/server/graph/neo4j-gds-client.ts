@@ -70,10 +70,39 @@ export interface ProjectionResult {
   relationshipCount: number;
 }
 
-/** Idempotent named-graph projection lifecycle (create-if-absent, or force-refresh). */
+/**
+ * Idempotent named-graph projection lifecycle (create-if-absent, or force-refresh).
+ *
+ * `relationshipTypeOverride`: without it, always builds from the module-level
+ * `PROJECTION_RELATIONSHIP_TYPES` regardless of `projectionName` — confirmed live
+ * 2026-08-09 as a real gap (see
+ * openspec/changes/parent-atlas-graph-analysis-contract/tasks.md's "Patch E
+ * pre-flight audit"): calling this with e.g. `'atlas_dependency_v1'` produced a
+ * full duplicate of the default `'codeTopology'` projection under a different
+ * Neo4j graph name, not an actually-filtered dependency-only projection. Pass an
+ * explicit list (e.g. `NAMED_PROJECTION_CANDIDATES.atlas_dependency_v1` from
+ * `graph-projection-manifest.ts`) to build a projection that differs by
+ * relationship semantics, as README.md point 10 requires for meaningful
+ * Louvain/Leiden community-quality comparison.
+ */
 export async function ensureProjectionClient(
   projectionName: string,
   force = false,
+  relationshipTypeOverride?: readonly string[],
+  /**
+   * CheiRank(A, B) = PageRank(B, A) — i.e. PageRank on the reversed graph
+   * (see openspec/changes/parent-atlas-graph-analysis-contract README.md
+   * point 6). Pass 'REVERSE' to flip every NATURAL-orientation relationship
+   * type to REVERSE when building this projection. UNDIRECTED types
+   * (BELONGS_TO_CLUSTER, SIMILAR_TOPOLOGY, HAS_CENTROID, BELONGS_TO_FEATURE)
+   * are left UNDIRECTED — an undirected edge has no direction to reverse,
+   * and GDS rejects REVERSE on a relationship type projected UNDIRECTED
+   * elsewhere in the same graph name only if inconsistent, but semantically
+   * there is nothing to flip. Must be paired with a distinct `projectionName`
+   * from the NATURAL version — GDS named graphs are immutable once created,
+   * a reversed variant is a separate named projection, not an in-place flip.
+   */
+  orientationOverride?: 'REVERSE',
 ): Promise<ProjectionResult> {
   const driver = getNeo4jDriver();
   const session = driver.session();
@@ -107,12 +136,13 @@ export async function ensureProjectionClient(
 
     const schema = await loadProjectionSchema(session);
     const nodeLabels = PROJECTION_NODE_LABELS.filter((label) => schema.labels.has(label));
-    const relationshipTypes = PROJECTION_RELATIONSHIP_TYPES.filter((type) => schema.relTypes.has(type));
+    const requestedRelationshipTypes = relationshipTypeOverride ?? PROJECTION_RELATIONSHIP_TYPES;
+    const relationshipTypes = requestedRelationshipTypes.filter((type) => schema.relTypes.has(type));
     if (!nodeLabels.length) {
       throw new Error(`No projection node labels exist in Neo4j. Expected one of: ${PROJECTION_NODE_LABELS.join(', ')}`);
     }
     if (!relationshipTypes.length) {
-      throw new Error(`No projection relationship types exist in Neo4j. Expected one of: ${PROJECTION_RELATIONSHIP_TYPES.join(', ')}`);
+      throw new Error(`No projection relationship types exist in Neo4j. Expected one of: ${requestedRelationshipTypes.join(', ')}`);
     }
 
     const costForType = (type: string): number =>
@@ -146,10 +176,9 @@ export async function ensureProjectionClient(
 
     const relationshipProjection = relationshipTypes
       .map((type) => {
-        const orientation =
-          type === 'BELONGS_TO_CLUSTER' || type === 'SIMILAR_TOPOLOGY' || type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE'
-            ? 'UNDIRECTED'
-            : 'NATURAL';
+        const isUndirected =
+          type === 'BELONGS_TO_CLUSTER' || type === 'SIMILAR_TOPOLOGY' || type === 'HAS_CENTROID' || type === 'BELONGS_TO_FEATURE';
+        const orientation = isUndirected ? 'UNDIRECTED' : (orientationOverride ?? 'NATURAL');
         const cost = costForType(type);
         return `          ${type}: { orientation: '${orientation}', properties: { cost: { property: 'cost', defaultValue: ${cost} } } }`;
       })

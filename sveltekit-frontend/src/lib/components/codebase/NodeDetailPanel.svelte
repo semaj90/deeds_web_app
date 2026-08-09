@@ -29,6 +29,24 @@
     healthGrade?: string;
   }
 
+  interface StructuredAnalysis {
+    document_id?: string;
+    pass_results?: Array<Record<string, unknown>>;
+    control5?: {
+      sourceRef?: string;
+      structural?: boolean;
+      lexical?: boolean;
+      linguistic?: boolean;
+      semantic?: boolean;
+      grounded?: boolean;
+    } | null;
+    experiment_feature_matrix?: {
+      featureRevision?: string;
+      graphRevision?: string;
+      candidateCount?: number;
+    } | null;
+  }
+
   interface Props {
     node: GraphNode | null;
     onClose?: () => void;
@@ -45,6 +63,7 @@
 
   // AI Analysis state
   let aiAnalysis = $state<AiAnalysis | null>(null);
+  let structuredAnalysis = $state<StructuredAnalysis | null>(null);
   let aiLoading = $state(false);
   let aiError = $state('');
   let analysisExpanded = $state(false);
@@ -102,6 +121,7 @@
     aiLoading = true;
     aiError = '';
     aiAnalysis = null;
+    structuredAnalysis = null;
 
     try {
       const res = await fetch('/api/codebase-index/analyze', {
@@ -115,10 +135,12 @@
         aiError = data.error ?? `HTTP ${res.status}`;
         // Still use the analysis if provided (503 fallback)
         if (data.analysis) aiAnalysis = data.analysis;
+        if (data.structured) structuredAnalysis = data.structured;
         return;
       }
 
       aiAnalysis = data.analysis;
+      structuredAnalysis = data.structured ?? null;
       analysisExpanded = true;
     } catch (e) {
       aiError = 'Network error — is the dev server running?';
@@ -364,6 +386,31 @@
                     <span>{sug}</span>
                   </div>
                 {/each}
+              </div>
+            {/if}
+
+            <!-- Structured compiler output -->
+            {#if structuredAnalysis}
+              <div class="ai-section">
+                <span class="ai-section-label">Structured Compiler</span>
+                <div class="ai-summary">
+                  <div>Pass results: {structuredAnalysis.pass_results?.length ?? 0}</div>
+                  {#if structuredAnalysis.control5}
+                    <div>
+                      Control5:
+                      {structuredAnalysis.control5.structural ? ' structural' : ''}
+                      {structuredAnalysis.control5.lexical ? ' lexical' : ''}
+                      {structuredAnalysis.control5.linguistic ? ' linguistic' : ''}
+                      {structuredAnalysis.control5.semantic ? ' semantic' : ''}
+                      {structuredAnalysis.control5.grounded ? ' grounded' : ''}
+                    </div>
+                  {/if}
+                  {#if structuredAnalysis.experiment_feature_matrix?.featureRevision}
+                    <div>
+                      Feature revision: {structuredAnalysis.experiment_feature_matrix.featureRevision}
+                    </div>
+                  {/if}
+                </div>
               </div>
             {/if}
 

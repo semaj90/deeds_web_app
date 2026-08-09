@@ -26,7 +26,83 @@ const ingestSchema = z.object({
   reward:      z.number().optional(),
   feature_id:  z.string().optional(),
   som_cluster: z.string().optional(),
+  structured_analysis: z.object({
+    document_id: z.string().optional(),
+    pass_results: z.array(z.unknown()).optional(),
+    control5: z.record(z.string(), z.unknown()).optional().nullable(),
+    experiment_feature_matrix: z.record(z.string(), z.unknown()).optional().nullable(),
+  }).optional(),
 }).passthrough();
+
+function structuredAnalysisToFacts(structured: {
+  document_id?: string;
+  pass_results?: unknown[];
+  control5?: Record<string, unknown> | null;
+  experiment_feature_matrix?: Record<string, unknown> | null;
+} | undefined): Array<{
+  fact_type: string;
+  fact_key: string;
+  fact_value?: string;
+  score?: number;
+  metadata?: Record<string, unknown>;
+}> {
+  if (!structured) return [];
+
+  const facts: Array<{
+    fact_type: string;
+    fact_key: string;
+    fact_value?: string;
+    score?: number;
+    metadata?: Record<string, unknown>;
+  }> = [];
+
+  if (structured.document_id) {
+    facts.push({
+      fact_type: 'structured_analysis',
+      fact_key: 'document_id',
+      fact_value: structured.document_id,
+      score: 1,
+      metadata: { source: 'nlp-sidecar' },
+    });
+  }
+
+  if (Array.isArray(structured.pass_results) && structured.pass_results.length > 0) {
+    facts.push({
+      fact_type: 'structured_analysis',
+      fact_key: 'pass_results_count',
+      fact_value: String(structured.pass_results.length),
+      score: 1,
+      metadata: { source: 'nlp-sidecar' },
+    });
+  }
+
+  if (structured.control5) {
+    facts.push({
+      fact_type: 'structured_analysis',
+      fact_key: 'control5',
+      fact_value: JSON.stringify(structured.control5),
+      score: 1,
+      metadata: { source: 'nlp-sidecar' },
+    });
+  }
+
+  const featureRevision = structured.experiment_feature_matrix?.featureRevision;
+  if (typeof featureRevision === 'string' && featureRevision.length > 0) {
+    facts.push({
+      fact_type: 'structured_analysis',
+      fact_key: 'feature_revision',
+      fact_value: featureRevision,
+      score: 1,
+      metadata: {
+        source: 'nlp-sidecar',
+        graphRevision: structured.experiment_feature_matrix?.graphRevision ?? null,
+        candidateCount: structured.experiment_feature_matrix?.candidateCount ?? null,
+      },
+    });
+  }
+
+  return facts;
+}
 
 export async function POST({ request, locals }) {
   if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
@@ -74,8 +150,17 @@ export async function POST({ request, locals }) {
     console.warn('[ace/packets] Gemma4 compiler error:', (e as Error).message);
   }
 
+  const structuredFacts = structuredAnalysisToFacts(
+    packet.structured_analysis as {
+      document_id?: string;
+      pass_results?: unknown[];
+      control5?: Record<string, unknown> | null;
+      experiment_feature_matrix?: Record<string, unknown> | null;
+    } | undefined,
+  );
+
   // 3. Insert facts
-  for (const fact of (compiled.facts as Array<Record<string, unknown>>)) {
+  for (const fact of [...structuredFacts, ...(compiled.facts as Array<Record<string, unknown>>)]) {
     await db.execute(sql`
       INSERT INTO route_packet_facts
         (packet_uuid, fact_type, fact_key, fact_value, score, metadata)
@@ -107,15 +192,26 @@ export async function POST({ request, locals }) {
   }
 
   // 5. Insert state snapshot
-  const state = (compiled.state ?? {}) as Record<string, unknown>;
+  const state = {
+    ...(compiled.state ?? {}),
+    structured_analysis: packet.structured_analysis ?? null,
+    structured_analysis_fact_count: structuredFacts.length,
+  } as Record<string, unknown>;
   await db.execute(sql`
     INSERT INTO route_state_snapshots
       (packet_uuid, state_key, compressed_state, token_map)
     VALUES (
       ${packetUuid}::uuid,
-      ${String(state.next_route_recommendation ?? 'default')},
+      ${String(
+        state.next_route_recommendation ??
+        packet.structured_analysis?.experiment_feature_matrix?.featureRevision ??
+        'default'
+      )},
       ${JSON.stringify(state)}::jsonb,
-      ${JSON.stringify({ token_hints: Array.isArray(state.token_hints) ? state.token_hints : [] })}::jsonb
+      ${JSON.stringify({
+        token_hints: Array.isArray(state.token_hints) ? state.token_hints : [],
+        structured_feature_revision: packet.structured_analysis?.experiment_feature_matrix?.featureRevision ?? null,
+      })}::jsonb
     )
   `);
 
@@ -124,7 +220,8 @@ export async function POST({ request, locals }) {
     packetUuid,
     rowId: row.id,
     featureId: row.feature_id,
-    factsWritten: (compiled.facts as unknown[]).length,
+    factsWritten: structuredFacts.length + (compiled.facts as unknown[]).length,
+    structuredFactsWritten: structuredFacts.length,
     edgesWritten: (compiled.edges as unknown[]).length,
     compiled,
   });

@@ -26,6 +26,7 @@ import {
   type RuntimeReranker,
   DEFAULT_BLEND_WEIGHTS,
 } from './runtime-reranker.js';
+import type { CanonicalRerankTier } from './cross-encoder-reranker.js';
 
 interface CrossEncoderInputCandidate {
   documentId: string;
@@ -108,6 +109,7 @@ export interface CanonicalRerankOptions {
   topK?: number;
   cacheTtlSeconds?: number;
   cachePolicy?: 'enabled' | 'disabled';
+  rerankTier?: CanonicalRerankTier;
 }
 
 export const DEFAULT_CANONICAL_RERANK_WEIGHTS = {
@@ -309,10 +311,19 @@ export function canonicalEnvelopeToRerankCandidate(
 
 export class MixedbreadCanonicalReranker implements RuntimeReranker {
   private readonly blendWeights: Record<string, number>;
-  private readonly version = 'mixedbread-ai/mxbai-rerank-base-v2';
+  private readonly tier: CanonicalRerankTier;
+  private readonly version: string;
 
-  constructor(weights: Record<string, number> = DEFAULT_CANONICAL_RERANK_WEIGHTS) {
+  constructor(
+    weights: Record<string, number> = DEFAULT_CANONICAL_RERANK_WEIGHTS,
+    tier: CanonicalRerankTier = 'deep',
+  ) {
     this.blendWeights = BlendWeightsSchema.parse(weights);
+    this.tier = tier;
+    this.version =
+      tier === 'fast'
+        ? 'cross-encoder/ms-marco-MiniLM-L6-v2'
+        : 'mixedbread-ai/mxbai-rerank-base-v2';
   }
 
   async rerank(input: RerankContext): Promise<RerankOutput> {
@@ -345,6 +356,8 @@ export class MixedbreadCanonicalReranker implements RuntimeReranker {
         topN: limit,
         returnTopK: limit,
         noFallback: true,
+        rerankTier: this.tier,
+        modelVersion: this.version,
       }
     );
 
@@ -678,7 +691,7 @@ export async function rerankCanonicalFeatureEnvelopes(
   const topK = options.topK ?? Math.min(20, envelopes.length || 20);
   const cachePolicy = options.cachePolicy ?? 'enabled';
   const cacheTtlSeconds = options.cacheTtlSeconds ?? DEFAULT_CACHE_TTL_SECONDS;
-  const reranker = new MixedbreadCanonicalReranker(options.weights);
+  const reranker = new MixedbreadCanonicalReranker(options.weights, options.rerankTier ?? 'deep');
   const modelVersion = reranker.modelVersion();
   const fallbackModelVersion = 'xgboost-fallback';
   const candidates = envelopes.map((envelope, index) =>

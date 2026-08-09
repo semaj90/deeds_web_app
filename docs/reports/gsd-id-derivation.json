@@ -1,7 +1,7 @@
 {
-  "status": "APPLY_COMPLETE",
-  "mode": "apply",
-  "startedAt": "2026-07-19T19:51:22.093Z",
+  "status": "DRY_RUN_COMPLETE",
+  "mode": "dry-run",
+  "startedAt": "2026-08-09T16:38:12.401Z",
   "pairCounts": {
     "other:optional": 58365
   },
@@ -10,14 +10,14 @@
   },
   "stats": {
     "filesProcessed": 58366,
-    "filesWithGsdId": 58365,
+    "filesWithGsdId": 0,
     "filesAlreadyHaveId": 0,
     "filesNewlyAssigned": 58365,
     "filesSkipped": 0,
     "errors": []
   },
   "timing": {
-    "elapsedMs": 441504
+    "elapsedMs": 275
   },
-  "completedAt": "2026-07-19T19:58:43.597Z"
+  "completedAt": "2026-08-09T16:38:12.676Z"
 }

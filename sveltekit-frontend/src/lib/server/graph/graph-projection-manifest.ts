@@ -39,17 +39,29 @@ export type GraphProjectionManifest = z.infer<typeof GraphProjectionManifestSche
 /**
  * Named projection candidates from README.md point 10, to compare community
  * quality by relationship semantics rather than tuning Leiden's resolution
- * parameter on the undifferentiated combined graph. Not yet wired to any
- * live projection — reference only until Patch D/E picks this up.
+ * parameter on the undifferentiated combined graph.
+ *
+ * Corrected 2026-08-09 (Patch E pre-flight audit, see
+ * openspec/changes/parent-atlas-graph-analysis-contract/tasks.md) — the original
+ * set (`REQUIRES`, `RETURNS`, `PARAMETER_OF`, `IMPLEMENTS_REQUIREMENT`, `EXTENDS`)
+ * doesn't exist anywhere in the live graph (confirmed via
+ * `CALL db.relationshipTypes()` + per-type counts). Replaced with the actual live
+ * relationship types, chosen for the same semantic split README point 10 intends
+ * (dependency vs. execution vs. feature/topology vs. test), not a 1:1 rename —
+ * `atlas_dependency_v1` is thinner than originally envisioned (`IMPORTS` only,
+ * 3,452 edges live) because no live equivalent of REQUIRES/IMPLEMENTS/EXTENDS
+ * exists yet. `atlas_test_v1` is new, shared with the sibling
+ * `parent-atlas-gpu-graph-vector-substrate` change's `TEST_IMPACT` topology
+ * program (defined once here to avoid two possibly-inconsistent definitions).
  */
 export const NAMED_PROJECTION_CANDIDATES = {
-	atlas_dependency_v1: ['IMPORTS', 'REQUIRES', 'IMPLEMENTS', 'EXTENDS'],
-	atlas_execution_v1: ['CALLS', 'RETURNS', 'PARAMETER_OF'],
-	atlas_feature_v1: ['IMPLEMENTS_REQUIREMENT', 'BELONGS_TO_FEATURE', 'SIMILAR_TOPOLOGY'],
+	atlas_dependency_v1: ['IMPORTS'],
+	atlas_execution_v1: ['CALLS'],
+	atlas_feature_v1: ['BELONGS_TO_FEATURE', 'SIMILAR_TOPOLOGY'],
+	atlas_test_v1: ['TEST_COVERS_FILE'],
 	atlas_combined_v1: [
-		'IMPORTS', 'REQUIRES', 'IMPLEMENTS', 'EXTENDS',
-		'CALLS', 'RETURNS', 'PARAMETER_OF',
-		'IMPLEMENTS_REQUIREMENT', 'BELONGS_TO_FEATURE', 'SIMILAR_TOPOLOGY',
+		'IMPORTS', 'CALLS', 'BELONGS_TO_FEATURE', 'SIMILAR_TOPOLOGY',
+		'TEST_COVERS_FILE', 'BELONGS_TO_CLUSTER',
 	],
 } as const satisfies Record<string, readonly string[]>;
 export type NamedProjectionCandidate = keyof typeof NAMED_PROJECTION_CANDIDATES;

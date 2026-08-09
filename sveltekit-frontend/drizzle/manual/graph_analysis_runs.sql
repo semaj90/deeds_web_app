@@ -10,17 +10,29 @@ CREATE TABLE IF NOT EXISTS graph_analysis_runs (
   parameter_revision text NOT NULL,
   workspace_revision text NOT NULL,
   source_revision text NOT NULL,
-  graph_revision text NOT NULL,
-  projection_revision text NOT NULL,
-  projection_name text NOT NULL,
-  node_count bigint NOT NULL,
-  relationship_count bigint NOT NULL,
   started_at timestamptz NOT NULL,
   completed_at timestamptz,
   status text NOT NULL,
   parameters jsonb NOT NULL DEFAULT '{}'::jsonb,
-  metrics jsonb NOT NULL DEFAULT '{}'::jsonb
+  metrics jsonb NOT NULL DEFAULT '{}'::jsonb,
+  graph_revision text NOT NULL,
+  projection_revision text NOT NULL,
+  projection_name text NOT NULL,
+  node_count bigint NOT NULL,
+  relationship_count bigint NOT NULL
 );
+
+-- Patch C (2026-08-09): AnalysisRunEnvelope fields added after Patch B's
+-- table was already live. CREATE TABLE IF NOT EXISTS above is a no-op on an
+-- existing table, so these need their own ALTER statements — matching this
+-- repo's Drizzle Safety Rule ("manual SQL for simple changes: ALTER TABLE
+-- ... ADD COLUMN IF NOT EXISTS"), not a second CREATE.
+ALTER TABLE graph_analysis_runs ADD COLUMN IF NOT EXISTS backend_preference text NOT NULL DEFAULT 'offline';
+ALTER TABLE graph_analysis_runs ADD COLUMN IF NOT EXISTS backend_actual text NOT NULL DEFAULT 'offline';
+ALTER TABLE graph_analysis_runs ADD COLUMN IF NOT EXISTS gpu_accelerated boolean NOT NULL DEFAULT false;
+ALTER TABLE graph_analysis_runs ADD COLUMN IF NOT EXISTS sidecar_url text;
+ALTER TABLE graph_analysis_runs ADD COLUMN IF NOT EXISTS input_hash text;
+ALTER TABLE graph_analysis_runs ADD COLUMN IF NOT EXISTS output_hash text;
 
 CREATE INDEX IF NOT EXISTS graph_analysis_runs_algorithm_idx ON graph_analysis_runs (algorithm, started_at);
 CREATE INDEX IF NOT EXISTS graph_analysis_runs_graph_revision_idx ON graph_analysis_runs (graph_revision);

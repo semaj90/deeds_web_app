@@ -71,13 +71,23 @@ const REDIS_PREFIX = 'rr';
 const REDIS_LIST_PREFIX = 'rr:list';
 
 /** Model short tag embedded in list cache key (avoids cross-model collisions) */
-const MODEL_TAG = 'mxbai'; // mixedbread-ai/mxbai-rerank-base-v2
-
-/** Canonical cross-encoder model used by the batch backend */
-const CROSS_ENCODER_MODEL =
+const DEEP_CROSS_ENCODER_MODEL =
   process.env.CROSS_ENCODER_MODEL ??
   ENV.CROSS_ENCODER_MODEL ??
   'mixedbread-ai/mxbai-rerank-base-v2';
+const FAST_CROSS_ENCODER_MODEL =
+  process.env.MINILM_CROSS_ENCODER_MODEL ??
+  'cross-encoder/ms-marco-MiniLM-L6-v2';
+
+export type CanonicalRerankTier = 'deep' | 'fast';
+
+function resolveCrossEncoderModel(tier: CanonicalRerankTier = 'deep', override?: string): string {
+  return override?.trim() || (tier === 'fast' ? FAST_CROSS_ENCODER_MODEL : DEEP_CROSS_ENCODER_MODEL);
+}
+
+function modelTagFor(modelVersion: string): string {
+  return createHash('sha256').update(modelVersion).digest('hex').slice(0, 8);
+}
 
 /** Legacy generative rerank model used only for prompt-scoring fallback */
 const LEGACY_RERANK_MODEL =
@@ -121,6 +131,10 @@ export interface RerankOptions {
   minScore?: number;
   /** Optional user ID for Langfuse analytics */
   userId?: string;
+  /** Canonical rerank tier: deep (MixedBread default) or fast (MiniLM) */
+  rerankTier?: CanonicalRerankTier;
+  /** Explicit model version override for the cross-encoder backend */
+  modelVersion?: string;
 }
 
 /** Per-call cache statistics returned alongside rerank results */
@@ -177,8 +191,8 @@ function _candidateSetHash(candidates: RerankCandidate[]): string {
   return createHash('sha256').update(parts.join('|')).digest('hex').slice(0, 16);
 }
 
-function _listKey(qHash: string, setHash: string, topK: number): string {
-  return `${REDIS_LIST_PREFIX}:${MODEL_TAG}:${qHash}:${setHash}:${topK}`;
+function _listKeyForModel(modelVersion: string, qHash: string, setHash: string, topK: number): string {
+  return `${REDIS_LIST_PREFIX}:${modelTagFor(modelVersion)}:${qHash}:${setHash}:${topK}`;
 }
 
 // ── L0 Result-set list cache ──────────────────────────────────────────────────
@@ -512,7 +526,8 @@ async function scoreWithBackendFallback(query: string, doc: RerankCandidate): Pr
  */
 async function scoreBatchWithBackendFallback(
   query: string,
-  candidates: RerankCandidate[]
+  candidates: RerankCandidate[],
+  modelVersion: string
 ): Promise<Map<string, number>> {
   const scores = new Map<string, number>();
   if (candidates.length === 0) return scores;
@@ -525,7 +540,7 @@ async function scoreBatchWithBackendFallback(
   if (useTritonBatch) {
     try {
         const docTexts = candidates.map(c => c.content.slice(0, SCORE_MAX_CHARS));
-        const batchScores = await scoreBatchCrossEncoder(query, docTexts);
+        const batchScores = await scoreBatchCrossEncoder(query, docTexts, modelVersion);
 
         if (batchScores.length === candidates.length) {
             tritonHealth.ok = true;
@@ -610,6 +625,8 @@ export async function rerankWithCrossEncoder<T extends RerankCandidate>(
   const topN = opts.topN ?? 40;
   const returnTopK = opts.returnTopK ?? 8;
   const minScore = opts.minScore ?? 0;
+  const rerankTier = opts.rerankTier ?? 'deep';
+  const modelVersion = resolveCrossEncoderModel(rerankTier, opts.modelVersion);
 
   if (candidates.length === 0) {
     return { results: [], stats: { l0Hit: false, l1Hits: 0, l1Misses: 0, freshScored: 0 } };
@@ -622,7 +639,7 @@ export async function rerankWithCrossEncoder<T extends RerankCandidate>(
       const pool = candidates.slice(0, topN);
       const qHash = _queryHash(query);
       const setHash = _candidateSetHash(pool);
-      const listKey = _listKey(qHash, setHash, returnTopK);
+      const listKey = _listKeyForModel(modelVersion, qHash, setHash, returnTopK);
 
       // ── L0: Result-set list cache ──────────────────────────────────────
       // Exact hit means same query + same candidate set + same topK — skip all scoring
@@ -669,7 +686,7 @@ export async function rerankWithCrossEncoder<T extends RerankCandidate>(
       const toWrite: Array<{ doc: T; score: number }> = [];
 
       // ── Cross-encoder scoring for uncached pairs (batch preferred) ────────
-      const freshScores = await scoreBatchWithBackendFallback(query, uncached);
+      const freshScores = await scoreBatchWithBackendFallback(query, uncached, modelVersion);
       for (const [docId, score] of freshScores.entries()) {
         const doc = uncached.find(d => d.documentId === docId);
         if (doc) toWrite.push({ doc, score });
@@ -701,7 +718,7 @@ export async function rerankWithCrossEncoder<T extends RerankCandidate>(
           const webUncached = webCandidates.filter(d => !webCached.has(d.documentId));
           const webToWrite: Array<{ doc: T; score: number }> = [];
 
-          const webScores = await scoreBatchWithBackendFallback(query, webUncached);
+          const webScores = await scoreBatchWithBackendFallback(query, webUncached, modelVersion);
           for (const [docId, score] of webScores.entries()) {
             const doc = webUncached.find(d => d.documentId === docId);
             if (doc) {
@@ -778,8 +795,9 @@ export function getRerankStatus(): {
   listCacheTtlS: number;
   scoreCacheTtlS: number;
 } {
+  const model = resolveCrossEncoderModel('deep');
   return {
-    model: CROSS_ENCODER_MODEL,
+    model,
     cacheBackend: 'redis',
     fallback: 'web-search',
     listCacheTtlS: LIST_TTL_S,

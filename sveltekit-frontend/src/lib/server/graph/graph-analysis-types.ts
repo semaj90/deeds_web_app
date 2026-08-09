@@ -22,6 +22,10 @@
  */
 
 import { z } from 'zod';
+import {
+	AnalysisRunEnvelopeSchema,
+	type AnalysisRunEnvelope,
+} from '$lib/server/analysis/analysis-run-envelope.js';
 
 export const GraphAlgorithmSchema = z.enum([
 	'pagerank',
@@ -34,33 +38,22 @@ export const GraphAlgorithmSchema = z.enum([
 ]);
 export type GraphAlgorithm = z.infer<typeof GraphAlgorithmSchema>;
 
-export const GraphAnalysisRunStatusSchema = z.enum(['running', 'succeeded', 'failed']);
-export type GraphAnalysisRunStatus = z.infer<typeof GraphAnalysisRunStatusSchema>;
+export const GraphAnalysisRunStatusSchema = AnalysisRunEnvelopeSchema.shape.status;
+export type GraphAnalysisRunStatus = AnalysisRunEnvelope['status'];
 
 /**
  * One row per algorithm execution. Individual metric/community results
  * reference `runId` — never write algorithm-specific columns onto
  * atlas_packets.
  */
-export const GraphAnalysisRunSchema = z
-	.object({
-		runId: z.string().min(1),
-		algorithm: GraphAlgorithmSchema,
-		algorithmRevision: z.string().min(1),
-		parameterRevision: z.string().min(1),
-		workspaceRevision: z.string().min(1),
-		sourceRevision: z.string().min(1),
-		graphRevision: z.string().min(1),
-		projectionRevision: z.string().min(1),
-		projectionName: z.string().min(1),
-		nodeCount: z.number().int().nonnegative(),
-		relationshipCount: z.number().int().nonnegative(),
-		startedAt: z.string().datetime(),
-		completedAt: z.string().datetime().nullable(),
-		status: GraphAnalysisRunStatusSchema,
-		parameters: z.record(z.string(), z.unknown()).default({}),
-		metrics: z.record(z.string(), z.unknown()).default({}),
-	})
+export const GraphAnalysisRunSchema = AnalysisRunEnvelopeSchema.extend({
+	algorithm: GraphAlgorithmSchema,
+	graphRevision: z.string().min(1),
+	projectionRevision: z.string().min(1),
+	projectionName: z.string().min(1),
+	nodeCount: z.number().int().nonnegative(),
+	relationshipCount: z.number().int().nonnegative(),
+})
 	.strict();
 export type GraphAnalysisRun = z.infer<typeof GraphAnalysisRunSchema>;
 

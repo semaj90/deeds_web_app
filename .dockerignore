@@ -4,6 +4,7 @@
 # Include only what's needed for builds
 !sveltekit-frontend/**
 !python-services/**
+!python/**
 !tensor_services/**
 !engine-builder/**
 !training/**

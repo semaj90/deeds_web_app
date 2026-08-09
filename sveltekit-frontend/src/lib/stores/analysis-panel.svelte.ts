@@ -35,6 +35,24 @@ interface AiAnalysis {
 	healthGrade?: string;
 }
 
+interface StructuredAnalysis {
+	document_id?: string;
+	pass_results?: unknown[];
+	control5?: {
+		sourceRef?: string;
+		structural?: boolean;
+		lexical?: boolean;
+		linguistic?: boolean;
+		semantic?: boolean;
+		grounded?: boolean;
+	} | null;
+	experiment_feature_matrix?: {
+		featureRevision?: string;
+		graphRevision?: string;
+		candidateCount?: number;
+	} | null;
+}
+
 interface RelatedFile {
 	filePath: string;
 	score: number;
@@ -223,6 +241,7 @@ class AnalysisPanelStore {
 	errorClusters = $state<ErrorCluster[]>([]);
 	relatedFiles = $state<RelatedFile[]>([]);
 	analysisResult = $state<AiAnalysis | null>(null);
+	structuredAnalysis = $state<StructuredAnalysis | null>(null);
 	analysisFilePath = $state('');
 	gpuStatus = $state<GpuStatus>({ available: false, queueLength: 0, lastCheckMs: 0 });
 	gpuDeviceInfo = $state<GpuDeviceInfo | null>(null);
@@ -395,6 +414,7 @@ class AnalysisPanelStore {
 		this.analysisLoading = true;
 		this.analysisError = '';
 		this.analysisResult = null;
+		this.structuredAnalysis = null;
 		this.analysisFilePath = filePath;
 		this.relatedFiles = [];
 		const t0 = performance.now();
@@ -417,6 +437,7 @@ class AnalysisPanelStore {
 				return;
 			}
 			this.analysisResult = data.analysis;
+			this.structuredAnalysis = data.structured ?? null;
 			this.lastPerfMeta = data._perf ?? { totalMs: ms };
 			if (!res.ok) this.analysisError = data.error ?? '';
 			this.log('analyzeFile', `${filePath} → ${data.analysis?.healthGrade ?? '?'}`, data._perf?.totalMs ?? ms, data._perf?.parser);

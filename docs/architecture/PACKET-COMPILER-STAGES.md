@@ -10,7 +10,15 @@
 Repository (Code Files)
         │
         ▼
-Stage 1: AST-Grep (Structural Extraction)
+Stage 1: TreeSitter Chunker (Structural Extraction)
+        |
+        ├→ TreeSitter chunker: parallel structural extraction with 36 languages, 100 grammars, streaming spans
+        |
+        ├→ Boundary IR: AstUnit facts → atlas_ast_nodes (packet_key null, structural_revision)
+        |
+        ├→ Boundary IR: symbols imports exports calls parser name version (NOT competing chunk owner)
+        |
+        ├→ Boundary IR: structural query matching + rewrite rules + validation (NOT competing chunk owner)
         │
         ├─→ ast_symbols[] (deterministic symbols)
         │   Example: [grpc_service, HealthCheck, Request, Response]
@@ -22,7 +30,7 @@ Stage 2: Lexical Pass (n-grams & identifiers)
         │   Example: [grpc, proto, service, health, check]
         │
         ▼
-Stage 3: LangExtract (Semantic Concepts)
+Stage 3: LangExtract Sidecar (Semantic Concepts)
         │
         ├─→ used_concepts[] (meaning, not syntax)
         │   Example: [rpc, streaming, distributed-system, authentication]

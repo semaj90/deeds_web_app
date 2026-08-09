@@ -12,6 +12,10 @@ vi.mock('$lib/server/retrieval/cross-encoder-reranker.js', () => ({
   rerankWithCrossEncoder: mockRerankWithCrossEncoder,
 }));
 
+vi.mock('./cross-encoder-reranker.js', () => ({
+  rerankWithCrossEncoder: mockRerankWithCrossEncoder,
+}));
+
 vi.mock('$lib/server/redis.js', () => ({
   getRedis: mockGetRedis,
 }));
@@ -132,6 +136,56 @@ describe('canonical rerank executor', () => {
     expect(ranked.results[0]?.model_version).toBe('mixedbread-ai/mxbai-rerank-base-v2');
     expect(ranked.results[1]?.packet_key).toBe('packet-2');
     expect(ranked.results[1]?.rank_after).toBe(2);
+  });
+
+  it('routes the fast tier through MiniLM without changing the canonical executor owner', async () => {
+    const get = vi.fn().mockResolvedValue(null);
+    const setex = vi.fn().mockResolvedValue('OK');
+    const del = vi.fn().mockResolvedValue(1);
+    mockGetRedis.mockReturnValue({ get, setex, del });
+
+    mockRerankWithCrossEncoder.mockResolvedValue({
+      results: [
+        {
+          doc: { documentId: 'packet-1' },
+          rerankScore: 0.77,
+          cached: false,
+        },
+        {
+          doc: { documentId: 'packet-2' },
+          rerankScore: 0.66,
+          cached: false,
+        },
+      ],
+      stats: {
+        l0Hit: false,
+        l1Hits: 0,
+        l1Misses: 2,
+        freshScored: 2,
+      },
+    });
+
+    const ranked = await rerankCanonicalFeatureEnvelopes('find canonical rerank', [...envelopes], {
+      authScope: 'scope-a',
+      rendererVersion: 'renderer-v1',
+      maxLength: 256,
+      topK: 20,
+      rerankTier: 'fast',
+    });
+
+    expect(mockRerankWithCrossEncoder).toHaveBeenCalledTimes(1);
+    expect(mockRerankWithCrossEncoder).toHaveBeenCalledWith(
+      'find canonical rerank',
+      expect.any(Array),
+      expect.objectContaining({
+        noFallback: true,
+        rerankTier: 'fast',
+        modelVersion: 'cross-encoder/ms-marco-MiniLM-L6-v2',
+      }),
+    );
+    expect(ranked.provenance.modelVersion).toBe('cross-encoder/ms-marco-MiniLM-L6-v2');
+    expect(ranked.results[0]?.packet_key).toBe('packet-1');
+    expect(ranked.results[0]?.model_version).toBe('cross-encoder/ms-marco-MiniLM-L6-v2');
   });
 
   it('returns a cached canonical rerank response without recomputing', async () => {

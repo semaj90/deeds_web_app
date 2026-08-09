@@ -10,6 +10,11 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import type {
+  AnalysisPassResult,
+  Control5,
+  ExperimentFeatureMatrix,
+} from '$lib/server/analysis/nlp-feature-compiler.js';
 
 export type NlpSourceType =
   | 'plain_text'
@@ -68,6 +73,8 @@ export interface NlpAnalyzeRequest {
   language?: string;
   modelId?: string;
   maxChars?: number;
+  passes?: Array<'structural' | 'lexical' | 'linguistic' | 'semantic' | 'sequence' | 'rerank' | 'grounded'>;
+  groundedExtractionRequired?: boolean;
 }
 
 export interface NlpAnalyzeResponse {
@@ -87,6 +94,9 @@ export interface NlpAnalyzeResponse {
     ast_grep: boolean;
     torch: boolean;
   };
+  pass_results?: AnalysisPassResult[];
+  control5?: Control5 | null;
+  experiment_feature_matrix?: ExperimentFeatureMatrix | null;
   processing_time_ms: number;
 }
 
@@ -192,6 +202,8 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           language: req.language,
           model_id: req.modelId,
           max_chars: req.maxChars ?? 50_000,
+          passes: req.passes ?? [],
+          grounded_extraction_required: req.groundedExtractionRequired ?? false,
         }),
         signal: AbortSignal.timeout(30_000),
       });
@@ -223,6 +235,9 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           ast_grep: Boolean(raw.capabilities?.ast_grep),
           torch: Boolean(raw.capabilities?.torch),
         },
+        pass_results: Array.isArray(raw.pass_results) ? raw.pass_results : [],
+        control5: (raw.control5 ?? null) as Control5 | null,
+        experiment_feature_matrix: (raw.experiment_feature_matrix ?? null) as ExperimentFeatureMatrix | null,
         processing_time_ms: Number(raw.processing_time_ms ?? Date.now() - start),
       };
     },
@@ -241,6 +256,8 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           language: req.language,
           model_id: req.modelId,
           max_chars: req.maxChars ?? 50_000,
+          passes: req.passes ?? [],
+          grounded_extraction_required: req.groundedExtractionRequired ?? false,
         }),
         signal: AbortSignal.timeout(30_000),
       });

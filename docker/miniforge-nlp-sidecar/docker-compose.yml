@@ -1,0 +1,29 @@
+services:
+  miniforge-nlp-sidecar:
+    build:
+      context: ../..
+      dockerfile: docker/miniforge-nlp-sidecar/Dockerfile
+    image: deeds-miniforge-nlp-sidecar:latest
+    container_name: miniforge-nlp-sidecar
+    ports:
+      - "8095:8095"
+    environment:
+      MINIFORGE_SIDECAR_HOST: 0.0.0.0
+      MINIFORGE_SIDECAR_PORT: 8095
+      LANGEXTRACT_URL: http://127.0.0.1:8095
+      MINIFORGE_SIDECAR_URL: http://127.0.0.1:8095
+      NLP_SIDECAR_URL: http://127.0.0.1:8095
+      UVICORN_LOG_LEVEL: info
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import sys, urllib.request, json; r = urllib.request.urlopen('http://localhost:8095/health', timeout=5); payload = json.loads(r.read().decode('utf-8')); sys.exit(0 if r.status == 200 and payload.get('status') == 'ok' else 1)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped

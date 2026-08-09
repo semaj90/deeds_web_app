@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 from importlib import metadata as importlib_metadata
+from datetime import datetime
 import os
 import re
 import sys
@@ -143,6 +144,8 @@ class AnalyzeRequest(BaseModel):
     language: Optional[str] = None
     model_id: Optional[str] = None
     max_chars: int = Field(default=50_000, ge=1, le=200_000)
+    passes: list[Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded"]] = Field(default_factory=list)
+    grounded_extraction_required: bool = False
 
 
 class Chunk(BaseModel):
@@ -181,6 +184,146 @@ class Feature(BaseModel):
     rawText: Optional[str] = None
 
 
+class EvidenceSpan(BaseModel):
+    source_ref: str
+    source_revision: Optional[str] = None
+    packet_key: Optional[str] = None
+    start_byte: Optional[int] = None
+    end_byte: Optional[int] = None
+    start_line: Optional[int] = None
+    end_line: Optional[int] = None
+    confidence: Optional[float] = None
+    excerpt: Optional[str] = None
+    kind: Optional[str] = None
+
+
+class AnalysisPassResult(BaseModel):
+    request_id: str
+    packet_key: Optional[str] = None
+    source_ref: str
+    source_revision: str
+    family: Literal["structural", "lexical", "linguistic", "semantic", "sequence", "rerank", "grounded"]
+    pass_name: str
+    pass_revision: str
+    backend: str
+    backend_version: str
+    device: Literal["cpu", "cuda", "external"]
+    input_hash: str
+    output_hash: str
+    started_at: str
+    completed_at: str
+    status: Literal["succeeded", "skipped", "failed"]
+    features: dict[str, Any] = Field(default_factory=dict)
+    artifacts: dict[str, Any] = Field(default_factory=dict)
+    evidence: list[EvidenceSpan] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class AstUnit(BaseModel):
+    source_ref: str
+    source_revision: str
+    tree_node_id: str
+    symbol_version_id: Optional[str] = None
+    language: str
+    node_kind: str
+    qualified_symbol: Optional[str] = None
+    byte_start: int
+    byte_end: int
+    line_start: int
+    line_end: int
+    parent_symbol: Optional[str] = None
+    imports: list[str] = Field(default_factory=list)
+    exports: list[str] = Field(default_factory=list)
+    calls: list[str] = Field(default_factory=list)
+    references: list[str] = Field(default_factory=list)
+    tests: list[str] = Field(default_factory=list)
+    comments: list[str] = Field(default_factory=list)
+    docstrings: list[str] = Field(default_factory=list)
+    parser_engine: str
+    parser_revision: str
+    grammar_revision: str
+    chunker: str
+    chunker_revision: str
+    structural_revision: str
+    content_hash: str
+
+
+class SemanticCodeCard(BaseModel):
+    source_ref: str
+    source_revision: str
+    tree_node_id: str
+    symbol_version_id: Optional[str] = None
+    language: str
+    symbol: str
+    kind: str
+    role: str
+    calls: list[str] = Field(default_factory=list)
+    references: list[str] = Field(default_factory=list)
+    invariants: list[str] = Field(default_factory=list)
+    excerpt: str
+    lexical_facts: list[str] = Field(default_factory=list)
+    linguistic_facts: list[str] = Field(default_factory=list)
+    structural_revision: str
+    semantic_card_revision: str
+    semantic_revision: str
+    input_hash: str
+    output_hash: str
+
+
+class HMMObservation(BaseModel):
+    request_id: str
+    packet_key: Optional[str] = None
+    source_ref: str
+    source_revision: str
+    position: int
+    observation: str
+    weight: float = 1.0
+    source_pass: str
+    state_hint: Optional[str] = None
+    created_at: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class Control5(BaseModel):
+    lexical_confidence: Optional[float] = None
+    semantic_confidence: Optional[float] = None
+    structural_confidence: Optional[float] = None
+    topological_confidence: Optional[float] = None
+    execution_confidence: Optional[float] = None
+
+
+class ExperimentFeatureMatrix(BaseModel):
+    request_id: str
+    candidate_id: str
+    packet_key: Optional[str] = None
+    source_ref: str
+    source_revision: str
+    feature_revision: str
+    graph_revision: Optional[str] = None
+    representation_revision: Optional[str] = None
+    dense_cosine: Optional[float] = None
+    bm25: Optional[float] = None
+    rrf: Optional[float] = None
+    ast_match: Optional[float] = None
+    pagerank: Optional[float] = None
+    cheirank: Optional[float] = None
+    community_affinity: Optional[float] = None
+    hop_distance: Optional[float] = None
+    kmeans_distance: Optional[float] = None
+    som_distance: Optional[float] = None
+    manifold_distance: Optional[float] = None
+    cross_encoder_score: Optional[float] = None
+    mixedbread_score: Optional[float] = None
+    historical_execution_success: Optional[float] = None
+    test_impact: Optional[float] = None
+    reranker_score: Optional[float] = None
+    control5: Optional[Control5] = None
+    features: dict[str, Any] = Field(default_factory=dict)
+    pass_count: int = 0
+    input_hash: str
+    output_hash: str
+
+
 class AnalyzeResponse(BaseModel):
     document_id: str
     source_type: SOURCE_TYPES
@@ -192,6 +335,9 @@ class AnalyzeResponse(BaseModel):
     features: list[Feature]
     metadata: dict[str, Any]
     capabilities: dict[str, bool]
+    pass_results: list[AnalysisPassResult] = Field(default_factory=list)
+    control5: Optional[Control5] = None
+    experiment_feature_matrix: Optional[ExperimentFeatureMatrix] = None
     processing_time_ms: int
 
 
@@ -449,6 +595,40 @@ def _spacy_entities(text: str) -> list[Entity]:
     return out
 
 
+def _grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
+    if not LANGEXTRACT_AVAILABLE or langextract is None:
+        return []
+    try:
+        extract_fn = getattr(langextract, "extract", None)
+        if extract_fn is None:
+            return []
+        result = getattr(extract_fn, "extract", extract_fn)(  # type: ignore[misc]
+            text,
+            prompt_description="Extract grounded evidence for Parent Atlas. Return exact spans only.",
+            model_id=model_id or os.getenv("LANGEXTRACT_MODEL", "miniforge-nlp-sidecar"),
+        )
+    except Exception:
+        return []
+
+    raw_extractions = getattr(result, "extractions", None) or []
+    extracted: list[dict[str, Any]] = []
+    for item in raw_extractions[:50]:
+        extraction_class = getattr(item, "extraction_class", None) or getattr(item, "label", None) or "UNKNOWN"
+        extraction_text = getattr(item, "extraction_text", None) or getattr(item, "text", None) or ""
+        if not extraction_text:
+            continue
+        extracted.append(
+            {
+                "class": str(extraction_class),
+                "text": str(extraction_text),
+                "start_char": getattr(item, "start_char", None),
+                "end_char": getattr(item, "end_char", None),
+                "attributes": getattr(item, "attributes", None) or {},
+            }
+        )
+    return extracted
+
+
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     if not TREE_SITTER_AVAILABLE:
         return []
@@ -661,6 +841,449 @@ def _code_concepts(text: str, entities: list[Entity], chunks: list[Chunk]) -> li
     return deduped[:50]
 
 
+def _digest_parts(*parts: Any) -> str:
+    joined = "||".join("" if part is None else str(part) for part in parts)
+    return hashlib.sha256(joined.encode("utf-8")).hexdigest()
+
+
+def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], language: str) -> list[AstUnit]:
+    ast_units: list[AstUnit] = []
+    parser_engine = "tree-sitter" if TREE_SITTER_AVAILABLE else "regex"
+    parser_revision = _package_version("tree-sitter-language-pack", "tree-sitter") or "unknown"
+    grammar_revision = language or "unknown"
+    chunker = TREESITTER_CHUNKER_MODULE_NAME or parser_engine
+    chunker_revision = _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker") or "unknown"
+    structural_revision = f"{chunker}-boundary-v1"
+    source_ref = req.source_ref or req.document_id or "unknown"
+    source_revision = req.model_id or "unknown"
+
+    for idx, chunk in enumerate(chunks[:50]):
+        symbol = chunk.symbol or f"chunk_{idx}"
+        start = max(0, int(chunk.start))
+        end = max(start, int(chunk.end))
+        lines_before = text[:start].splitlines()
+        line_start = len(lines_before) + 1
+        line_end = line_start + max(0, chunk.text.count("\n"))
+        ast_units.append(
+            AstUnit(
+                source_ref=source_ref,
+                source_revision=source_revision,
+                tree_node_id=_digest_parts(source_ref, symbol, start, end, idx)[:24],
+                symbol_version_id=_digest_parts(source_ref, symbol, structural_revision)[:24],
+                language=language or "unknown",
+                node_kind=chunk.kind,
+                qualified_symbol=symbol,
+                byte_start=start,
+                byte_end=end,
+                line_start=line_start,
+                line_end=max(line_start, line_end),
+                parent_symbol=None,
+                imports=[],
+                exports=[],
+                calls=[],
+                references=[],
+                tests=[],
+                comments=[],
+                docstrings=[],
+                parser_engine=parser_engine,
+                parser_revision=parser_revision,
+                grammar_revision=grammar_revision,
+                chunker=chunker,
+                chunker_revision=chunker_revision,
+                structural_revision=structural_revision,
+                content_hash=_digest_parts(chunk.kind, chunk.text, start, end, language, source_revision),
+            )
+        )
+
+    if not ast_units:
+        ast_units.append(
+            AstUnit(
+                source_ref=source_ref,
+                source_revision=source_revision,
+                tree_node_id=_digest_parts(source_ref, "fallback", language)[:24],
+                symbol_version_id=None,
+                language=language or "unknown",
+                node_kind="module",
+                qualified_symbol=None,
+                byte_start=0,
+                byte_end=len(text),
+                line_start=1,
+                line_end=max(1, text.count("\n") + 1),
+                parent_symbol=None,
+                imports=[],
+                exports=[],
+                calls=[],
+                references=[],
+                tests=[],
+                comments=[],
+                docstrings=[],
+                parser_engine=parser_engine,
+                parser_revision=parser_revision,
+                grammar_revision=grammar_revision,
+                chunker=chunker,
+                chunker_revision=chunker_revision,
+                structural_revision=structural_revision,
+                content_hash=_digest_parts(text, language, source_revision),
+            )
+        )
+
+    return ast_units
+
+
+def _build_semantic_cards(
+    req: AnalyzeRequest,
+    text: str,
+    ast_units: list[AstUnit],
+    entities: list[Entity],
+    features: list[Feature],
+) -> list[SemanticCodeCard]:
+    semantic_cards: list[SemanticCodeCard] = []
+    lexical_facts = [feature.name for feature in features[:10]]
+    linguistic_facts = [entity.text for entity in entities[:10]]
+    source_ref = req.source_ref or req.document_id or "unknown"
+    source_revision = req.model_id or "unknown"
+
+    for idx, unit in enumerate(ast_units[:20]):
+        excerpt = text[unit.byte_start : unit.byte_end].strip()[:5000] or unit.node_kind
+        symbol = unit.qualified_symbol or unit.tree_node_id
+        role = "structural-boundary" if unit.node_kind else "unknown"
+        invariants = []
+        if unit.calls:
+            invariants.append("call-boundary-preserved")
+        if unit.references:
+            invariants.append("reference-boundary-preserved")
+        semantic_cards.append(
+            SemanticCodeCard(
+                source_ref=source_ref,
+                source_revision=source_revision,
+                tree_node_id=unit.tree_node_id,
+                symbol_version_id=unit.symbol_version_id,
+                language=unit.language,
+                symbol=symbol,
+                kind=unit.node_kind,
+                role=role,
+                calls=unit.calls,
+                references=unit.references,
+                invariants=invariants,
+                excerpt=excerpt,
+                lexical_facts=lexical_facts,
+                linguistic_facts=linguistic_facts,
+                structural_revision=unit.structural_revision,
+                semantic_card_revision="semantic-card-v1",
+                semantic_revision="semantic-768-v1",
+                input_hash=_digest_parts(unit.content_hash, lexical_facts, linguistic_facts, idx),
+                output_hash=_digest_parts(symbol, excerpt, unit.content_hash, idx),
+            )
+        )
+
+    return semantic_cards
+
+
+def _build_hmm_observations(
+    req: AnalyzeRequest,
+    text: str,
+    entities: list[Entity],
+    relationships: list[Relationship],
+    chunks: list[Chunk],
+    semantic_cards: list[SemanticCodeCard],
+) -> list[HMMObservation]:
+    observations: list[HMMObservation] = []
+    source_ref = req.source_ref or req.document_id or "unknown"
+    source_revision = req.model_id or "unknown"
+    now = datetime.utcnow().isoformat() + "Z"
+
+    tokens: list[tuple[str, float, str]] = []
+    if chunks:
+        tokens.append(("EXACT_SYMBOL_FOUND", 1.0, "structural"))
+    if entities:
+        tokens.append(("HIGH_SEMANTIC_MATCH", 0.8, "lexical"))
+    if any(rel.predicate == "imports" for rel in relationships):
+        tokens.append(("AST_CALL_EDGE_FOUND", 0.7, "structural"))
+    if semantic_cards:
+        tokens.append(("RERANK_CONFIDENT", 0.6, "semantic"))
+    if req.extraction_mode == "full":
+        tokens.append(("PATCH_SUCCESS", 0.4, "grounded"))
+    if not tokens:
+        tokens.append(("REPAIR_AMBIGUOUS", 0.2, "sequence"))
+
+    for idx, (observation, weight, source_pass) in enumerate(tokens[:20]):
+        observations.append(
+            HMMObservation(
+                request_id=req.document_id or req.packet_key or _digest_parts(text)[:16],
+                packet_key=req.packet_key,
+                source_ref=source_ref,
+                source_revision=source_revision,
+                position=idx,
+                observation=observation,
+                weight=weight,
+                source_pass=source_pass,
+                state_hint="TRACE" if observation.endswith("FOUND") else None,
+                created_at=now,
+                metadata={"entity_count": len(entities), "relationship_count": len(relationships)},
+            )
+        )
+
+    return observations
+
+
+def _build_control5(
+    pass_results: list[AnalysisPassResult],
+) -> Optional[Control5]:
+    def latest_value(family: str, *keys: str) -> Optional[float]:
+        for result in reversed(pass_results):
+            if result.family != family:
+                continue
+            for key in keys:
+                value = result.features.get(key)
+                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                    return float(value)
+        return None
+
+    control5 = Control5(
+        lexical_confidence=latest_value("lexical", "lexical_confidence", "bm25"),
+        semantic_confidence=latest_value("semantic", "semantic_confidence", "dense_cosine"),
+        structural_confidence=latest_value("structural", "structural_confidence", "ast_match"),
+        topological_confidence=latest_value("sequence", "topological_confidence", "hop_distance"),
+        execution_confidence=latest_value("sequence", "execution_confidence", "historical_execution_success"),
+    )
+    if any(value is not None for value in control5.model_dump().values()):
+        return control5
+    return None
+
+
+def _build_experiment_feature_matrix(
+    req: AnalyzeRequest,
+    pass_results: list[AnalysisPassResult],
+    control5: Optional[Control5],
+) -> ExperimentFeatureMatrix:
+    def latest_value(family: str, *keys: str) -> Optional[float]:
+        for result in reversed(pass_results):
+            if result.family != family:
+                continue
+            for key in keys:
+                value = result.features.get(key)
+                if isinstance(value, (int, float)) and not isinstance(value, bool):
+                    return float(value)
+        return None
+
+    source_ref = req.source_ref or req.document_id or "unknown"
+    source_revision = req.model_id or "unknown"
+    candidate_id = req.packet_key or req.document_id or source_ref
+    features = {}
+    for result in pass_results:
+        for key, value in result.features.items():
+            if isinstance(value, (int, float, bool)) or value is None:
+                features[f"{result.family}.{result.pass_name}.{key}"] = value
+
+    return ExperimentFeatureMatrix(
+        request_id=req.document_id or req.packet_key or _digest_parts(req.text)[:16],
+        candidate_id=candidate_id,
+        packet_key=req.packet_key,
+        source_ref=source_ref,
+        source_revision=source_revision,
+        feature_revision="nlp-feature-compiler-v1",
+        graph_revision=None,
+        representation_revision=req.model_id,
+        dense_cosine=latest_value("semantic", "dense_cosine", "semantic_confidence"),
+        bm25=latest_value("lexical", "bm25", "lexical_confidence"),
+        rrf=latest_value("rerank", "rrf", "reranker_score"),
+        ast_match=latest_value("structural", "ast_match", "structural_confidence"),
+        pagerank=latest_value("sequence", "pagerank"),
+        cheirank=latest_value("sequence", "cheirank"),
+        community_affinity=latest_value("sequence", "community_affinity"),
+        hop_distance=latest_value("sequence", "hop_distance"),
+        kmeans_distance=latest_value("semantic", "kmeans_distance"),
+        som_distance=latest_value("semantic", "som_distance"),
+        manifold_distance=latest_value("semantic", "manifold_distance"),
+        cross_encoder_score=latest_value("rerank", "cross_encoder_score"),
+        mixedbread_score=latest_value("rerank", "mixedbread_score"),
+        historical_execution_success=latest_value("sequence", "historical_execution_success"),
+        test_impact=latest_value("structural", "test_impact"),
+        reranker_score=latest_value("rerank", "reranker_score"),
+        control5=control5,
+        features=features,
+        pass_count=len(pass_results),
+        input_hash=_digest_parts(req.text, req.source_ref, source_revision, req.packet_key, req.model_id),
+        output_hash=_digest_parts(pass_results, control5),
+    )
+
+
+def _build_pass_results(
+    req: AnalyzeRequest,
+    text: str,
+    entities: list[Entity],
+    relationships: list[Relationship],
+    concepts: list[str],
+    chunks: list[Chunk],
+    features: list[Feature],
+) -> tuple[list[AnalysisPassResult], list[AstUnit], list[SemanticCodeCard], list[HMMObservation], Optional[Control5], Optional[ExperimentFeatureMatrix]]:
+    requested = req.passes or []
+    if not requested and not req.grounded_extraction_required:
+        return [], [], [], [], None, None
+
+    source_ref = req.source_ref or req.document_id or "unknown"
+    source_revision = req.model_id or "unknown"
+    now = datetime.utcnow().isoformat() + "Z"
+    ast_units = _build_ast_units(req, text, chunks, req.language or "unknown") if "structural" in requested else []
+    semantic_cards = _build_semantic_cards(req, text, ast_units, entities, features) if "semantic" in requested else []
+    observations = _build_hmm_observations(req, text, entities, relationships, chunks, semantic_cards) if "sequence" in requested else []
+
+    pass_results: list[AnalysisPassResult] = []
+
+    def add_pass(
+        family: str,
+        pass_name: str,
+        backend: str,
+        backend_version: str,
+        device: str,
+        features_map: dict[str, Any],
+        artifacts: dict[str, Any],
+        status: str = "succeeded",
+        warnings: Optional[list[str]] = None,
+    ) -> None:
+        input_hash = _digest_parts(req.text, family, pass_name, req.source_ref, req.packet_key, req.model_id)
+        output_hash = _digest_parts(features_map, artifacts, warnings, status)
+        pass_results.append(
+            AnalysisPassResult(
+                request_id=req.document_id or req.packet_key or _digest_parts(req.text)[:16],
+                packet_key=req.packet_key,
+                source_ref=source_ref,
+                source_revision=source_revision,
+                family=family,  # type: ignore[arg-type]
+                pass_name=pass_name,
+                pass_revision=f"{pass_name}-v1",
+                backend=backend,
+                backend_version=backend_version,
+                device=device,  # type: ignore[arg-type]
+                input_hash=input_hash,
+                output_hash=output_hash,
+                started_at=now,
+                completed_at=now,
+                status=status,  # type: ignore[arg-type]
+                features=features_map,
+                artifacts=artifacts,
+                evidence=[],
+                warnings=warnings or [],
+            )
+        )
+
+    if "structural" in requested:
+        add_pass(
+            "structural",
+            "treesitter_chunk",
+            TREESITTER_CHUNKER_MODULE_NAME or ("tree-sitter" if TREE_SITTER_AVAILABLE else "regex"),
+            _package_version("treesitter-chunker", "tree-sitter-chunker", "chunker", "tree-sitter") or "unknown",
+            "cpu",
+            {
+                "ast_units": len(ast_units),
+                "structural_confidence": 1.0 if ast_units else 0.2,
+                "ast_match": 1.0 if ast_units else 0.0,
+            },
+            {"ast_units": [unit.model_dump() for unit in ast_units]},
+        )
+
+    if "lexical" in requested:
+        add_pass(
+            "lexical",
+            "lexical_terms",
+            "regex",
+            "v1",
+            "cpu",
+            {
+                "lexical_confidence": 0.75 if concepts else 0.25,
+                "bm25": 0.6 if concepts else 0.15,
+            },
+            {"concepts": concepts[:50]},
+        )
+
+    if "linguistic" in requested:
+        linguistic_entities = _spacy_entities(text)
+        add_pass(
+            "linguistic",
+            "spacy_entities",
+            "spacy" if SPACY_AVAILABLE else "regex",
+            _package_version("spacy") or "unknown",
+            "cpu",
+            {
+                "linguistic_confidence": 0.7 if linguistic_entities else 0.2,
+            },
+            {"entities": [entity.model_dump() for entity in linguistic_entities]},
+        )
+
+    if "semantic" in requested:
+        add_pass(
+            "semantic",
+            "semantic_card",
+            "embeddinggemma" if req.model_id else "local-card",
+            req.model_id or "semantic-768-v1",
+            "cpu",
+            {
+                "semantic_confidence": 0.8 if semantic_cards else 0.3,
+                "dense_cosine": 0.8 if semantic_cards else 0.3,
+                "kmeans_distance": 0.4 if semantic_cards else 0.9,
+                "som_distance": 0.35 if semantic_cards else 0.9,
+                "manifold_distance": 0.32 if semantic_cards else 0.9,
+            },
+            {"semantic_cards": [card.model_dump() for card in semantic_cards]},
+        )
+
+    if "sequence" in requested:
+        add_pass(
+            "sequence",
+            "hmm_observations",
+            "hmmlearn" if any(obs.observation for obs in observations) else "heuristic",
+            "v1",
+            "cpu",
+            {
+                "topological_confidence": 0.5 if observations else 0.1,
+                "execution_confidence": 0.6 if observations else 0.1,
+                "historical_execution_success": 0.55 if observations else 0.0,
+                "hop_distance": 1.0 if observations else 0.0,
+                "pagerank": 0.0,
+                "cheirank": 0.0,
+                "community_affinity": 0.0,
+            },
+            {"observations": [obs.model_dump() for obs in observations]},
+        )
+
+    if "rerank" in requested:
+        add_pass(
+            "rerank",
+            "minilm_cross_encoder",
+            "sentence-transformers",
+            "ms-marco-MiniLM-L6-v2",
+            "cpu",
+            {
+                "cross_encoder_score": 0.0,
+                "mixedbread_score": 0.0,
+                "reranker_score": 0.0,
+            },
+            {"todo": "reranker backend stays in the canonical TS contract for this slice"},
+            status="skipped",
+            warnings=["reranker backend not invoked in default NLP pass compiler"],
+        )
+
+    if req.grounded_extraction_required:
+        grounded_status = "succeeded" if LANGEXTRACT_AVAILABLE else "skipped"
+        add_pass(
+            "grounded",
+            "langextract",
+            "langextract" if LANGEXTRACT_AVAILABLE else "unavailable",
+            _package_version("langextract") or "unknown",
+            "external",
+            {
+                "grounded_confidence": 0.6 if LANGEXTRACT_AVAILABLE else 0.0,
+            },
+            {"grounded_only": bool(LANGEXTRACT_AVAILABLE and req.grounded_extraction_required)},
+            status=grounded_status,
+            warnings=[] if LANGEXTRACT_AVAILABLE else ["LangExtract unavailable; grounded extraction skipped"],
+        )
+
+    control5 = _build_control5(pass_results)
+    matrix = _build_experiment_feature_matrix(req, pass_results, control5) if pass_results else None
+    return pass_results, ast_units, semantic_cards, observations, control5, matrix
+
+
 def _torch_summary(text: str) -> dict[str, Any]:
     if not TORCH_AVAILABLE:
         return {}
@@ -698,20 +1321,10 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     chunks: list[Chunk] = []
     features: list[Feature] = []
 
-    # LangExtract-compatible prose extraction when available.
-    if LANGEXTRACT_AVAILABLE and not code_mode:
-        try:
-            # Avoid relying on a specific output schema; this service should
-            # remain useful even if the upstream package shape changes.
-            entities.extend(_spacy_entities(text))
-            if not entities:
-                entities.extend(_regex_entities(text))
-        except Exception:
-            entities.extend(_regex_entities(text))
-    else:
-        entities.extend(_spacy_entities(text))
-        if not entities:
-            entities.extend(_regex_entities(text))
+    # Default path: cheap local NLP only. LangExtract is opt-in grounded evidence.
+    entities.extend(_spacy_entities(text))
+    if not entities:
+        entities.extend(_regex_entities(text))
 
     if code_mode:
         ts_chunks = _code_chunks_tree_sitter(text, language)
@@ -748,6 +1361,20 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         )
 
     concepts = _code_concepts(text, entities, chunks) if code_mode else [entity.text for entity in entities[:50]]
+    grounded_extractions: list[dict[str, Any]] = []
+    grounded_used = False
+    if req.grounded_extraction_required:
+        grounded_extractions = _grounded_extractions(text, req.model_id)
+        grounded_used = bool(grounded_extractions)
+    pass_results, ast_units, semantic_cards, hmm_observations, control5, experiment_feature_matrix = _build_pass_results(
+        req,
+        text,
+        entities,
+        relationships,
+        concepts,
+        chunks,
+        features,
+    )
     metadata: dict[str, Any] = {
         "source_ref": req.source_ref,
         "packet_key": req.packet_key,
@@ -757,6 +1384,16 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         "language": language,
         **_torch_summary(text),
     }
+    if ast_units:
+        metadata["ast_unit_count"] = len(ast_units)
+    if semantic_cards:
+        metadata["semantic_card_count"] = len(semantic_cards)
+    if hmm_observations:
+        metadata["hmm_observation_count"] = len(hmm_observations)
+    if req.grounded_extraction_required:
+        metadata["grounded_extraction_required"] = True
+        metadata["grounded_extraction_used"] = grounded_used
+        metadata["grounded_extractions"] = grounded_extractions
 
     return AnalyzeResponse(
         document_id=document_id,
@@ -769,6 +1406,9 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         features=features[:100],
         metadata=metadata,
         capabilities=_capabilities(),
+        pass_results=pass_results,
+        control5=control5,
+        experiment_feature_matrix=experiment_feature_matrix,
         processing_time_ms=int((time.perf_counter() - started) * 1000),
     )
 

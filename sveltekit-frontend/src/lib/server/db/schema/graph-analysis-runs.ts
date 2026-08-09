@@ -17,6 +17,7 @@
 
 import { sql } from 'drizzle-orm';
 import { bigint, doublePrecision, index, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { createAnalysisRunBaseColumns } from './analysis-runs-v2.js';
 
 export const graphAlgorithmValues = [
   'pagerank',
@@ -38,22 +39,12 @@ export type GraphAnalysisRunStatusValue = (typeof graphAnalysisRunStatusValues)[
  * own run-tracking table.
  */
 export const graphAnalysisRuns = pgTable('graph_analysis_runs', {
-  runId: uuid('run_id').defaultRandom().primaryKey().notNull(),
-  algorithm: text('algorithm').notNull(),
-  algorithmRevision: text('algorithm_revision').notNull(),
-  parameterRevision: text('parameter_revision').notNull(),
-  workspaceRevision: text('workspace_revision').notNull(),
-  sourceRevision: text('source_revision').notNull(),
+  ...createAnalysisRunBaseColumns(),
   graphRevision: text('graph_revision').notNull(),
   projectionRevision: text('projection_revision').notNull(),
   projectionName: text('projection_name').notNull(),
   nodeCount: bigint('node_count', { mode: 'number' }).notNull(),
   relationshipCount: bigint('relationship_count', { mode: 'number' }).notNull(),
-  startedAt: timestamp('started_at', { withTimezone: true, mode: 'string' }).notNull(),
-  completedAt: timestamp('completed_at', { withTimezone: true, mode: 'string' }),
-  status: text('status').notNull(),
-  parameters: jsonb('parameters').default(sql`'{}'::jsonb`).notNull(),
-  metrics: jsonb('metrics').default(sql`'{}'::jsonb`).notNull(),
 }, (table) => ({
   algorithmIdx: index('graph_analysis_runs_algorithm_idx').on(table.algorithm, table.startedAt),
   graphRevisionIdx: index('graph_analysis_runs_graph_revision_idx').on(table.graphRevision),

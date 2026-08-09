@@ -1,0 +1,43 @@
+{
+  "rerank": {
+    "backends": [
+      "cross-encoder",
+      "minilm",
+      "mixedbread",
+      "triton"
+    ],
+    "owner": "canonical-rerank-executor.ts",
+    "contract": "RerankResult"
+  },
+  "graph_analysis": {
+    "backends": [
+      "neo4j_gds",
+      "cugraph"
+    ],
+    "oracles": [
+      "networkx"
+    ],
+    "owner": "graph-analysis-runner.ts"
+  },
+  "lexical_exact": {
+    "backends": [
+      "ripgrep"
+    ],
+    "owner": "router-matrix.ts"
+  },
+  "structural_extraction": {
+    "backends": [
+      "treesitter-chunker"
+    ],
+    "primitives": [
+      "tree-sitter",
+      "ast-grep"
+    ],
+    "contract": "AstUnit",
+    "owner": "python/miniforge_nlp_sidecar.py"
+  },
+  "semantic_768": {
+    "representation_id": "semantic_768",
+    "owner": "canonical embedding service"
+  }
+}

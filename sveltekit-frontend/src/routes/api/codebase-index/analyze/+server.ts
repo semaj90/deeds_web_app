@@ -22,6 +22,7 @@ import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bri
 import { z } from 'zod';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
 
@@ -173,12 +174,41 @@ ${contentForLLM}
 			fileStats,
 			truncated,
 			analysis,
+			structured: null as null | {
+				document_id: string;
+				pass_results: unknown[];
+				control5: unknown;
+				experiment_feature_matrix: unknown;
+			},
 			analyzedAt: new Date().toISOString(),
 			_perf: {
 				totalMs: Math.round(performance.now() - requestStart),
 				parser: isSimdJsonAvailable() ? 'simdjson' : 'v8',
 			},
 		};
+
+		try {
+			const sidecar = createMiniforgeNlpSidecarClient();
+			const structured = await sidecar.analyze({
+				text: contentForLLM,
+				sourceType: 'codebase',
+				extractionMode: 'full',
+				documentId: relPath,
+				sourceRef: relPath,
+				packetKey: relPath,
+				passes: ['structural', 'lexical', 'linguistic', 'semantic', 'sequence'],
+				groundedExtractionRequired: false,
+			});
+
+			result.structured = {
+				document_id: structured.document_id,
+				pass_results: structured.pass_results ?? [],
+				control5: structured.control5 ?? null,
+				experiment_feature_matrix: structured.experiment_feature_matrix ?? null,
+			};
+		} catch (structuredErr) {
+			console.warn('[codebase-index/analyze] structured sidecar unavailable:', structuredErr);
+		}
 
 		// Store in cache
 		await setCache(cacheKey, result, ANALYZE_CACHE_TTL_MS);
@@ -199,6 +229,7 @@ ${contentForLLM}
 					complexityScore: -1,
 					healthGrade: '?',
 				},
+				structured: null,
 				error: 'LLM service unavailable',
 			},
 			{ status: 503 }

@@ -21,6 +21,7 @@ const CanonicalRerankRequestSchema = z.object({
   rendererVersion: z.string().min(1).optional(),
   maxLength: z.number().int().positive().max(64_000).optional(),
   topK: z.number().int().positive().max(200).optional(),
+  rerankTier: z.enum(['deep', 'fast']).optional(),
   cachePolicy: z.enum(['enabled', 'disabled']).optional(),
 });
 
@@ -44,6 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
     rendererVersion,
     maxLength,
     topK,
+    rerankTier,
     cachePolicy,
   } = parsed.data;
 
@@ -56,6 +58,7 @@ export const POST: RequestHandler = async ({ request }) => {
       rendererVersion: rendererVersion ?? 'canonical-envelope-v1',
       maxLength,
       topK,
+      rerankTier,
       cachePolicy,
     },
   );

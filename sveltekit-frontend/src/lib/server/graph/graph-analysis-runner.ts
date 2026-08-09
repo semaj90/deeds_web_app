@@ -1,0 +1,424 @@
+import { createHash, randomUUID } from 'node:crypto';
+import type { Pool } from 'pg';
+import { GraphAnalysisRunSchema, CommunityAssignmentSchema, CommunityTaxonomyRecordSchema, type GraphAnalysisRun, type GraphAlgorithm } from './graph-analysis-types.js';
+import { ensureProjectionClient, PROJECTION_NAME } from './neo4j-gds-client.js';
+import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
+import { resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { NAMED_PROJECTION_CANDIDATES, type NamedProjectionCandidate } from './graph-projection-manifest.js';
+
+const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
+const ALGORITHM_REVISION_PREFIX = {
+  pagerank: 'neo4j-gds-pagerank-mutate-v1',
+  louvain: 'neo4j-gds-louvain-mutate-v1',
+  leiden: 'neo4j-gds-leiden-mutate-v1',
+  cheirank: 'todo-cheirank-v1',
+  kcore: 'todo-kcore-v1',
+  betweenness: 'todo-betweenness-v1',
+} as const;
+
+export interface GraphAnalysisRequest {
+  algorithm: GraphAlgorithm;
+  /**
+   * Use a named, relationship-filtered projection (see
+   * NAMED_PROJECTION_CANDIDATES in graph-projection-manifest.ts) instead of
+   * the default full 'codeTopology' projection. Only meaningful for
+   * community algorithms (louvain/leiden) today — this is Patch E's
+   * mechanism for comparing community quality by relationship semantics per
+   * README point 10, rather than tuning resolution on the combined graph.
+   * Takes precedence over `projectionName` if both are set.
+   */
+  namedProjection?: NamedProjectionCandidate;
+  projectionName?: string;
+  maxIterations?: number;
+  dampingFactor?: number;
+  limit?: number;
+  sidecarUrl?: string | null;
+}
+
+export interface GraphAnalysisExecutionResult {
+  run: GraphAnalysisRun;
+  metricsWritten: number;
+  communitiesWritten: number;
+  unresolvedPacketKeys: number;
+  skippedReason?: string;
+}
+
+function buildRunBase(params: {
+  algorithm: GraphAlgorithm;
+  projectionName: string;
+  nodeCount: number;
+  relationshipCount: number;
+  graphRevision: string;
+  startedAt: string;
+  completedAt: string | null;
+  parameters: Record<string, unknown>;
+  metrics: Record<string, unknown>;
+  backendPreference: 'native-ts' | 'python-sidecar' | 'gpu-sidecar' | 'offline';
+  backendActual: 'native-ts' | 'python-sidecar' | 'gpu-sidecar' | 'offline';
+  gpuAccelerated: boolean;
+  sidecarUrl: string | null;
+  inputHash: string | null;
+  outputHash: string | null;
+  parameterRevision: string;
+}): GraphAnalysisRun {
+  return GraphAnalysisRunSchema.parse({
+    runId: randomUUID(),
+    algorithm: params.algorithm,
+    algorithmRevision: ALGORITHM_REVISION_PREFIX[params.algorithm as keyof typeof ALGORITHM_REVISION_PREFIX] ?? 'todo-v1',
+    parameterRevision: params.parameterRevision,
+    workspaceRevision: DEFAULT_WORKSPACE_REVISION,
+    sourceRevision: params.graphRevision,
+    backendPreference: params.backendPreference,
+    backendActual: params.backendActual,
+    gpuAccelerated: params.gpuAccelerated,
+    sidecarUrl: params.sidecarUrl,
+    inputHash: params.inputHash,
+    outputHash: params.outputHash,
+    graphRevision: params.graphRevision,
+    projectionRevision: params.graphRevision,
+    projectionName: params.projectionName,
+    nodeCount: params.nodeCount,
+    relationshipCount: params.relationshipCount,
+    startedAt: params.startedAt,
+    completedAt: params.completedAt,
+    status: params.completedAt ? 'succeeded' : 'running',
+    parameters: params.parameters,
+    metrics: params.metrics,
+  });
+}
+
+async function resolveGraphRevision(projectionName: string, nodeCount: number, relationshipCount: number): Promise<string> {
+  return createHash('sha256').update(`${projectionName}:${nodeCount}:${relationshipCount}`).digest('hex');
+}
+
+async function runSkippedAnalysis(
+  algorithm: GraphAnalysisRequest['algorithm'],
+  projectionName: string,
+  nodeCount: number,
+  relationshipCount: number,
+  reason: string,
+): Promise<GraphAnalysisExecutionResult> {
+  const startedAt = new Date().toISOString();
+  const graphRevision = await resolveGraphRevision(projectionName, nodeCount, relationshipCount);
+  const run = buildRunBase({
+    algorithm,
+    projectionName,
+    nodeCount,
+    relationshipCount,
+    graphRevision,
+    startedAt,
+    completedAt: new Date().toISOString(),
+    parameters: { reason },
+    metrics: { skipped: true, reason },
+    backendPreference: 'offline',
+    backendActual: 'offline',
+    gpuAccelerated: false,
+    sidecarUrl: null,
+    inputHash: null,
+    outputHash: null,
+    parameterRevision: `skipped-${algorithm}-v1`,
+  });
+
+  return { run, metricsWritten: 0, communitiesWritten: 0, unresolvedPacketKeys: 0, skippedReason: reason };
+}
+
+const COMMUNITY_MUTATE_PROPERTY: Record<'louvain' | 'leiden', string> = {
+  louvain: 'louvainCommunity',
+  leiden: 'leidenCommunity',
+};
+
+/**
+ * Shared Louvain/Leiden runner — both algorithms emit the same
+ * CommunityAssignment/CommunityTaxonomyRecord shape via one contract (per
+ * README.md's Patch D description), kept as separate `gds.<algo>.mutate`
+ * calls, not a merged code path. Generalized 2026-08-09 (Patch E) from a
+ * Louvain-only implementation to also parameterize by projection +
+ * relationship-type list, so different named projections (dependency vs.
+ * execution vs. feature/topology — see `NAMED_PROJECTION_CANDIDATES` in
+ * graph-projection-manifest.ts) can be compared, per README point 10.
+ */
+async function runCommunityAnalysis(
+  algorithm: 'louvain' | 'leiden',
+  db: Pool,
+  projectionName: string,
+  relationshipTypes?: readonly string[],
+): Promise<GraphAnalysisExecutionResult> {
+  const mutateProperty = COMMUNITY_MUTATE_PROPERTY[algorithm];
+  const projection = await ensureProjectionClient(projectionName, false, relationshipTypes);
+  const startedAt = new Date().toISOString();
+  const graphRevision = await resolveGraphRevision(projectionName, projection.nodeCount, projection.relationshipCount);
+  const neo4jSession = getNeo4jDriver().session();
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
+
+    // gds.<algo>.mutate throws IllegalArgumentException if mutateProperty
+    // already exists on the in-memory graph — confirmed live 2026-08-09 on a
+    // second Louvain run against the long-lived 'codeTopology' projection
+    // (same class of bug neo4j-gds-client.ts's runPageRankClient already
+    // self-heals for 'pageRankScore'). Self-heal: drop the property first,
+    // idempotently, for both algorithms.
+    await neo4jSession
+      .run(`CALL gds.graph.nodeProperties.drop($name, [$prop]) YIELD propertiesRemoved RETURN propertiesRemoved`, {
+        name: projectionName,
+        prop: mutateProperty,
+      })
+      .catch(() => { /* property didn't exist yet — fine */ });
+
+    // gds.<algo>.mutate YIELDs 'modularity' directly (confirmed live
+    // 2026-08-09 via a manual probe on atlas_feature_v1: modularity
+    // 0.9735...) — capture it here rather than defaulting to a fabricated
+    // placeholder in community-taxonomy-policy.ts's evaluator.
+    const mutateResult = await neo4jSession.run(
+      `CALL gds.${algorithm}.mutate($name, { mutateProperty: $prop }) YIELD modularity RETURN modularity`,
+      { name: projectionName, prop: mutateProperty },
+    );
+    const modularity = Number(mutateResult.records[0]?.get('modularity') ?? 0);
+    await neo4jSession.run(
+      `CALL gds.graph.nodeProperties.write($name, [$prop]) YIELD propertiesWritten RETURN propertiesWritten`,
+      { name: projectionName, prop: mutateProperty },
+    );
+
+    // Filter to CodebaseFile explicitly and resolve packet_key through
+    // atlas_packets, matching pagerank-analysis-adapter.ts's discipline.
+    // The coalesced n.stableKey (n.stableKey || n.filePath || n.path || n.name)
+    // this used to write directly as packet_key is a Neo4j-only convenience
+    // field, never validated against Postgres identity — root CLAUDE.md's
+    // "Forbidden Identity Sources" bans stable_key-style pseudo-refs for
+    // exactly this reason, and leaving nodeType unfiltered previously risked
+    // the same duplicate-key collisions found and fixed in the PageRank
+    // adapter (non-CodebaseFile nodes sharing a containing file's path).
+    const nodesResult = await neo4jSession.run(
+      `
+      MATCH (n:CodebaseFile)
+      WHERE n[$prop] IS NOT NULL AND n.path IS NOT NULL
+      RETURN n.path AS path, toString(n[$prop]) AS community_id
+      `,
+      { prop: mutateProperty },
+    );
+    const rawNodes = nodesResult.records
+      .map((record) => ({
+        path: String(record.get('path') ?? ''),
+        community_id: String(record.get('community_id') ?? ''),
+      }))
+      .filter((row) => row.path.length > 0 && row.community_id.length > 0);
+
+    const resolvedPacketKeys = await resolveCodebaseFilePacketKeys(db, rawNodes.map((r) => r.path));
+    const seenPacketKeys = new Set<string>();
+    const nodes: Array<{ packet_key: string; community_id: string }> = [];
+    let unresolvedPacketKeys = 0;
+    for (const row of rawNodes) {
+      const packetKey = lookupPacketKey(resolvedPacketKeys, row.path);
+      if (!packetKey) {
+        unresolvedPacketKeys++;
+        continue;
+      }
+      // First-seen wins on a duplicate packet_key (community assignment is
+      // categorical, not numeric — unlike PageRank's max-score dedupe there's
+      // no principled "better" value to prefer between two assignments).
+      if (seenPacketKeys.has(packetKey)) continue;
+      seenPacketKeys.add(packetKey);
+      nodes.push({ packet_key: packetKey, community_id: row.community_id });
+    }
+
+    const completedAt = new Date().toISOString();
+    const outputHash = createHash('sha256')
+      .update(JSON.stringify(nodes.map((r) => ({ packetKey: r.packet_key, communityId: r.community_id }))))
+      .digest('hex');
+
+    const run = buildRunBase({
+      algorithm,
+      projectionName,
+      nodeCount: projection.nodeCount,
+      relationshipCount: projection.relationshipCount,
+      graphRevision,
+      startedAt,
+      completedAt,
+      parameters: { mutateProperty, relationshipTypes: relationshipTypes ?? null },
+      // unresolvedPacketKeys and modularity must be persisted here, not just
+      // returned/discarded — community-taxonomy-policy.ts (Patch E) computes
+      // coverage and reads modularity from stored graph_analysis_runs.metrics.
+      // unresolvedPacketKeys was previously only on the in-process return
+      // value, unrecoverable after the fact — same class of "value computed
+      // but lost at the return boundary" issue as this session's other fixes.
+      metrics: { assignments: nodes.length, unresolvedPacketKeys, modularity },
+      backendPreference: 'offline',
+      backendActual: 'offline',
+      gpuAccelerated: false,
+      sidecarUrl: null,
+      inputHash: createHash('sha256').update(JSON.stringify({ algorithm, projectionName, relationshipTypes: relationshipTypes ?? null })).digest('hex'),
+      outputHash,
+      parameterRevision: `${algorithm}-mutate-v1`,
+    });
+
+    await client.query(
+      `INSERT INTO graph_analysis_runs (
+        run_id, algorithm, algorithm_revision, parameter_revision, workspace_revision,
+        source_revision, started_at, completed_at, status, parameters, metrics,
+        backend_preference, backend_actual, gpu_accelerated, sidecar_url,
+        input_hash, output_hash, graph_revision, projection_revision, projection_name,
+        node_count, relationship_count
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22)`,
+      [
+        run.runId,
+        run.algorithm,
+        run.algorithmRevision,
+        run.parameterRevision,
+        run.workspaceRevision,
+        run.sourceRevision,
+        run.startedAt,
+        run.completedAt,
+        run.status,
+        JSON.stringify(run.parameters),
+        JSON.stringify(run.metrics),
+        run.backendPreference,
+        run.backendActual,
+        run.gpuAccelerated,
+        run.sidecarUrl,
+        run.inputHash,
+        run.outputHash,
+        run.graphRevision,
+        run.projectionRevision,
+        run.projectionName,
+        run.nodeCount,
+        run.relationshipCount,
+      ],
+    );
+
+    const assignmentRows = nodes.map((row) =>
+      CommunityAssignmentSchema.parse({
+        runId: run.runId,
+        packetKey: row.packet_key,
+        algorithm,
+        communityId: row.community_id,
+        level: 0,
+        graphRevision,
+        createdAt: completedAt,
+      }),
+    );
+
+    const communities = new Map<string, { members: string[] }>();
+    for (const row of assignmentRows) {
+      const current = communities.get(row.communityId) ?? { members: [] };
+      current.members.push(row.packetKey);
+      communities.set(row.communityId, current);
+    }
+
+    for (const row of assignmentRows) {
+      await client.query(
+        `INSERT INTO graph_community_assignments
+          (run_id, packet_key, algorithm, community_id, level, graph_revision, created_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
+         ON CONFLICT (run_id, packet_key) DO UPDATE SET
+           community_id = EXCLUDED.community_id,
+           level = EXCLUDED.level,
+           graph_revision = EXCLUDED.graph_revision,
+           created_at = EXCLUDED.created_at`,
+        [row.runId, row.packetKey, row.algorithm, row.communityId, row.level, row.graphRevision, row.createdAt],
+      );
+    }
+
+    for (const [communityId, data] of communities) {
+      const community = CommunityTaxonomyRecordSchema.parse({
+        runId: run.runId,
+        algorithm,
+        communityId,
+        parentCommunityId: null,
+        memberCount: data.members.length,
+        representativePacketKeys: data.members.slice(0, 5),
+        representativeSymbols: [],
+        label: null,
+        purity: null,
+        modularityContribution: null,
+        metadata: { source: 'neo4j-gds', projectionName, relationshipTypes: relationshipTypes ?? null },
+      });
+      await client.query(
+        `INSERT INTO graph_communities
+          (run_id, algorithm, community_id, parent_community_id, member_count,
+           representative_packet_keys, representative_symbols, label, purity,
+           modularity_contribution, metadata)
+         VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8,$9,$10,$11::jsonb)
+         ON CONFLICT (run_id, algorithm, community_id) DO UPDATE SET
+           parent_community_id = EXCLUDED.parent_community_id,
+           member_count = EXCLUDED.member_count,
+           representative_packet_keys = EXCLUDED.representative_packet_keys,
+           representative_symbols = EXCLUDED.representative_symbols,
+           label = EXCLUDED.label,
+           purity = EXCLUDED.purity,
+           modularity_contribution = EXCLUDED.modularity_contribution,
+           metadata = EXCLUDED.metadata`,
+        [
+          community.runId,
+          community.algorithm,
+          community.communityId,
+          community.parentCommunityId,
+          community.memberCount,
+          JSON.stringify(community.representativePacketKeys),
+          JSON.stringify(community.representativeSymbols),
+          community.label,
+          community.purity,
+          community.modularityContribution,
+          JSON.stringify(community.metadata),
+        ],
+      );
+    }
+
+    await client.query('COMMIT');
+    return {
+      run,
+      metricsWritten: 0,
+      communitiesWritten: communities.size,
+      unresolvedPacketKeys,
+    };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    await neo4jSession.close().catch(() => {});
+    client.release();
+  }
+}
+
+export async function runGraphAnalysis(
+  db: Pool,
+  request: GraphAnalysisRequest,
+): Promise<GraphAnalysisExecutionResult> {
+  const namedProjection = request.namedProjection;
+  const projectionName = namedProjection ?? request.projectionName ?? PROJECTION_NAME;
+  const relationshipTypes = namedProjection ? NAMED_PROJECTION_CANDIDATES[namedProjection] : undefined;
+
+  if (request.algorithm === 'pagerank') {
+    const result = await (await import('./pagerank-analysis-adapter.js')).runPageRankAnalysis(db, {
+      maxIterations: request.maxIterations,
+      dampingFactor: request.dampingFactor,
+      limit: request.limit,
+    });
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+  }
+
+  if (request.algorithm === 'louvain') {
+    return runCommunityAnalysis('louvain', db, projectionName, relationshipTypes);
+  }
+
+  if (request.algorithm === 'leiden') {
+    return runCommunityAnalysis('leiden', db, projectionName, relationshipTypes);
+  }
+
+  if (request.algorithm === 'cheirank') {
+    const result = await (await import('./cheirank-analysis-adapter.js')).runCheiRankAnalysis(db, {
+      maxIterations: request.maxIterations,
+      dampingFactor: request.dampingFactor,
+      limit: request.limit,
+    });
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+  }
+
+  if (request.algorithm === 'kcore') {
+    const result = await (await import('./kcore-analysis-adapter.js')).runKCoreAnalysis(db, {
+      limit: request.limit,
+    });
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+  }
+
+  return runSkippedAnalysis('betweenness', projectionName, 0, 0, 'Betweenness is analysis-only until the graph baseline and promotion gate are frozen.');
+}
