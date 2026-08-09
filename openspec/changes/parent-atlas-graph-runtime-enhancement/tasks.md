@@ -25,26 +25,26 @@ Not resolved yet. Three options, not mutually exclusive across gates:
 - [ ] **(b) Scaffold stub files matching the manifest**, each clearly marked not-implemented
       (mirroring the plan's own stated intent for the Java procedure —
       `EXPERIMENTAL_NOT_IMPLEMENTED`). Gives the directory shape without claiming working code.
-- [ ] **(c) Actually implement GR0–GR3** (capability preflight, indexes, APOC bounded traversal,
-      GDS BFS/Dijkstra) since those don't require new plugin installation if APOC/GDS are already
-      present — needs a live check first (see GR0 below) to know if this is even true yet.
+- [ ] **(c) Actually implement GR0–GR3.** GR0 (below) confirms this is now technically unblocked —
+      both plugins already installed, no jar placement or Neo4j restart needed. Still an open
+      choice, not a decision made unilaterally: recommend proceeding gate-by-gate with each gate's
+      result reported before starting the next, not a silent bulk implementation, per repair-bundle
+      T0's precedent for external-plan caution.
 
-**GR0 has not been run** — it is not yet known whether APOC Core and GDS are actually installed on
-the live Neo4j instance. `CALL gds.list()` / `CALL apoc.help('path')` (or equivalent) should be run
-before choosing between (b) and (c) above — if GDS/APOC aren't installed, (c) is blocked on a real
-infrastructure change (placing plugin jars, restarting Neo4j), which is exactly the kind of action
-that needs explicit operator confirmation per this repo's own risk-tiering rules, not something to
-do unprompted mid-diagnosis.
+## GR0 — Capability index proof — **DONE, confirmed live 2026-08-09**
 
-## GR0 — Capability index proof
-
-- [ ] Run `CALL gds.list()` and `CALL apoc.help('path')` (or equivalent) against the live Neo4j
-      instance to confirm APOC Core and GDS are actually installed and which versions.
-- [ ] If either is missing: this becomes its own confirmed infrastructure task (plugin jar
-      placement + Neo4j restart), not silently bundled into a later gate.
-- [ ] Formalize the already-live `codebase_file_path` index into
+- [x] Ran `CALL gds.list() YIELD name RETURN count(name)` and
+      `CALL apoc.help("path") YIELD name RETURN count(name)` against the live Neo4j instance
+      (bolt://127.0.0.1:7687, same instance as T22's edge-materialization work):
+      - **GDS: 446 procedures registered** — installed and callable.
+      - **APOC Core: 18 `path`-related procedures** (includes `apoc.path.expandConfig`) —
+        installed and callable.
+      - **Neo4j Kernel 5.26.27** (`CALL dbms.components()`).
+- [x] Neither plugin is missing — GR0's infrastructure-risk branch does not apply. No jar
+      placement, no Neo4j restart needed for GR2/GR3.
+- [ ] Formalize the already-live `codebase_file_path` index (created ad hoc in T22) into
       `neo4j/01-required-indexes.cypher` (declarative, idempotent `CREATE INDEX ... IF NOT
-      EXISTS`) once GR0 confirms the environment.
+      EXISTS`) — still not done, small follow-up.
 
 ## GR1 — Fresh, frozen graphify revision
 
