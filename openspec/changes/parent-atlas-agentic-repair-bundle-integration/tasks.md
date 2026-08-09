@@ -488,20 +488,46 @@ script output paths into `graphify/` is a separate, audited sweep per this repo'
 Consolidation Sweep Rules (CLAUDE.md) — canonical-vs-duplicate report first, then patch only the
 safe cases. Not started.
 
+## T22 — IMPORTS apply run executed (2026-08-09) — real edges exist, but with a new gap
+
+Ran `node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=5000` for real (bounded, per
+Next Steps item 1 below — now historical). Confirmed live via `CALL db.relationshipTypes()` and
+direct counts:
+
+- `IMPORTS` and `TEST_COVERS_FILE` now exist as real Neo4j relationship types (previously absent
+  entirely — T19/T20's original finding).
+- Live counts: **2,754 `IMPORTS`**, **1,572 `TEST_COVERS_FILE`**, **23,114 `CodebaseFile`** nodes,
+  **9,988 `BELONGS_TO_FEATURE`**.
+- Also found and fixed a real, separate performance bug while this was running: Neo4j had **no
+  property index on `CodebaseFile.path`** — only the default token-lookup indexes existed. Every
+  `MATCH (c:CodebaseFile {path: ...})` in this script (and likely others) was doing a full label
+  scan across all `CodebaseFile` nodes. Created `CREATE INDEX codebase_file_path FOR
+  (c:CodebaseFile) ON (c.path)` mid-run (safe, additive, non-blocking); confirmed `ONLINE` at
+  100% population. Future graph-sync runs touching `CodebaseFile` by path should be dramatically
+  faster.
+
+**New gap found, not yet investigated**: the script's own progress log reported *attempting*
+8,487 `IMPORTS` and 8,875 `TEST_COVERS_FILE` relationships, but only 2,754 / 1,572 actually
+persisted (~32% / ~18%). The write pattern is `MATCH (c1)... MATCH (c2)... MERGE
+(c1)-[:IMPORTS]->(c2)` — a `MATCH` that finds no matching node silently drops that row instead of
+erroring, so roughly two-thirds of candidate edges are failing to resolve one of their two
+endpoint `CodebaseFile` nodes. Likely a path-normalization mismatch between how nodes get created
+(from `graphFilesSet`, seeded by `parent_atlas_documents` + edges) and how edges reference their
+`from`/`to` paths — same *class* of bug as T20's `source_ref`/`sourceRef` mismatch, but not yet
+root-caused. **Next step**: sample a handful of dropped edges (`from`/`to` pairs from
+`importsToSync` that don't appear in the final `IMPORTS` count) and check whether their paths
+actually exist as `CodebaseFile` nodes — this will show whether it's a casing issue, a
+`sveltekit-frontend/` prefix-stripping edge case, or something else.
+
+Unbounded run (`--apply` with no `--limit`) not yet attempted — do that only after the above
+match-rate gap is understood, since running unbounded won't fix the underlying drop rate, just
+scale it up.
+
 ## Next Steps (2026-08-09), priority order
 
-1. **Run the IMPORTS/DYNAMIC_IMPORTS apply for real** (T20 item 1's only remaining step — not an
-   investigation anymore, just an unrun command):
-   ```
-   node scripts/atlas/sync-graph-truth-neo4j.mjs --apply --limit=5000   # bounded first
-   # then verify: CALL db.relationshipTypes() YIELD relationshipType RETURN relationshipType
-   # should now include IMPORTS (and TEST_COVERS_FILE); confirm counts via
-   # MATCH ()-[r:IMPORTS]->() RETURN count(r)
-   node scripts/atlas/sync-graph-truth-neo4j.mjs --apply                # unbounded, once bounded run is clean
-   ```
-   Do this **before** trusting any PageRank/community-detection/GDS run downstream — until this
-   lands, GDS projections run on `SIMILAR_TOPOLOGY` alone (T19's finding), which is materially
-   weaker than the intended import-graph topology.
+1. ~~Run the IMPORTS/DYNAMIC_IMPORTS apply for real~~ — **done, see T22 above.** Remaining from
+   this item: run unbounded once the match-rate gap (T22) is understood, and re-verify via
+   `CALL db.relationshipTypes()` / `MATCH ()-[r:IMPORTS]->() RETURN count(r)`.
 
 2. **Re-run `neo4j-graph-enrich.mjs --apply`** after step 1 lands, to confirm GDS3/GDS4/GDS5 now
    project a real `IMPORTS`-inclusive graph (not just the defensive fallback added in T19) and to
