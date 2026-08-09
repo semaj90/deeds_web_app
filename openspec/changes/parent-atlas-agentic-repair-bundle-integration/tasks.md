@@ -437,26 +437,53 @@ T19 closed 4 of its original 5 findings this session (`atlas_feature_map` table,
 version, the false-alarm log lines, and — the deepest one — GDS3's real root cause). These two
 items are what's left, both requiring real investigation rather than a quick fix:
 
-- [ ] **Restore or explain the missing `IMPORTS` / `DYNAMIC_IMPORTS` Neo4j edges.** Confirmed live
-      (2026-08-09, `CALL db.relationshipTypes()`) that these two relationship types don't exist
-      anywhere in the Neo4j instance — only `SIMILAR_TOPOLOGY` plus 22 unrelated types do. This
-      session's GDS3 fix (T19 above) makes `neo4j-graph-enrich.mjs` resilient to their absence, but
-      does **not** restore them — that's a separate ingestion gap. Find whichever script is
-      supposed to write these edges (likely something in the Neo4j-enrichment family adjacent to
-      `neo4j-graph-enrich.mjs`, or a dedicated import-graph builder — not identified yet), run it,
-      and confirm real `IMPORTS`/`DYNAMIC_IMPORTS` edges land. Until this is done, the GDS
-      projection silently runs on `SIMILAR_TOPOLOGY` alone, which is a materially weaker graph than
-      intended for PageRank/community detection.
-- [ ] **Qdrant payload patch: 0/2114 files matched (0%), plus the `qdrantReachable: false` false
-      alarm** — both from the same `neo4j-graph-enrich.mjs` / `qdrant-tag-mirror.mjs` runs, likely
-      related to each other (a bad reachability check could plausibly cascade into a 0-match patch
-      step, or both could share one root cause in how paths/connectivity are probed). Investigate
-      together:
-      - Check `qdrant-tag-mirror.mjs`'s Qdrant health-check/probe logic first — it reported
-        unreachable while a sibling script in the same run successfully scrolled 105,761 points
-        seconds later, so the probe itself is the more likely bug, not real connectivity.
-      - Then check whether the "0 unique paths" in `neo4j-graph-enrich.mjs`'s path→point-id index
-        is a path-normalization mismatch (sample misses were all `src/lib/server/ai/hermes/
-        test-dispatcher.ts`-style paths) or the index-building step failing outright before any
-        normalization even runs — 0 unique paths from 2,114 candidates rules out "most paths just
-        don't match," it means the index is empty.
+- [x] **Found the writer, fixed 2 real bugs, dry-run proven — `--apply` to Neo4j still not run.**
+      The writer is `scripts/atlas/sync-graph-truth-neo4j.mjs` (reads
+      `sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl` +
+      `sveltekit-frontend/memory/index/ast-relations.jsonl`, `MERGE`s `IMPORTS`/`TEST_COVERS_FILE`
+      into Neo4j with `--apply`). It was never producing edges because it hard-crashed on query 1,
+      every run, before ever reaching Neo4j: `SELECT ... summary ... FROM parent_atlas_documents`
+      referenced a column that view doesn't have, and the `atlas_feature_map` query selected
+      `som_bmu_row`/`som_bmu_col`, columns that never existed in that table's real schema. Fixed
+      both queries to match live schema (commit `5312a12a82`). Verified live: dry-run on a
+      2,000-row slice now computes 8,479 `IMPORTS` + 8,875 `TEST_COVERS_FILE` edges (previously 0,
+      every time). **Not yet done**: nobody has actually run
+      `node scripts/atlas/sync-graph-truth-neo4j.mjs --apply` for real — the one attempt this
+      session was interrupted by a user redirect before it could execute. This is no longer an
+      investigation, just an unrun command — next session should run it (start bounded, e.g.
+      `--limit=5000`, confirm via `CALL db.relationshipTypes()` that `IMPORTS` now appears, then
+      run unbounded) before trusting any PageRank/community-detection run downstream.
+- [x] **Qdrant payload patch — root cause found, fixed, applied for real.** Same root cause as the
+      IMPORTS fix above, one layer upstream: `scripts/atlas/sync-atlas-feature-map-from-qdrant.mjs`
+      read `p.file_path ?? p.sourceRef` from Qdrant payloads, but `codebase_chunks_768` payloads use
+      snake_case `source_ref` (confirmed live via a direct payload dump) — `p.sourceRef`/`p.file_path`
+      never existed, so 105,761 points collapsed to 1 "unique file" on every run, which is what
+      starved `atlas_feature_map` (0 rows) and cascaded into the "0/2114 matched" figure downstream.
+      Fixed the field lookup + added a placeholder-value filter (commit `5312a12a82`); re-ran for
+      real: `atlas_feature_map` now has 4,512 rows, 0 failures. Re-ran `qdrant-tag-mirror.mjs
+      --verify --apply`: 1,128/2,114 eligible (up from 0), 1,128 patched, 0 failures. Also confirmed
+      the `qdrantReachable: false` reading was a false alarm by design, not a real outage —
+      `qdrant-tag-mirror.mjs` only sets that field when `--verify` is passed; without the flag it
+      just defaults to `false`. With `--verify` it correctly reports `true`.
+
+## T21 — New canonical `graphify/` output directory (2026-08-09), infra only
+
+Standing up a single gitignored-but-`rg`-searchable location for graphify pipeline output
+(`graphify/`, see `graphify/README.md`), replacing the current sprawl across `.tmp/`,
+`docs/reports/`, `docs/graph/`, and `sveltekit-frontend/memory/graphify/` (280+ hardcoded output
+paths across `scripts/atlas/*.mjs`, many cross-referencing each other's exact paths — e.g. the two
+scripts fixed in T20 above read `sveltekit-frontend/memory/graphify/deep/deep-import-edges.jsonl`
+and `.tmp/addressable-packets.ndjson` directly). Added `/graphify/*` to `.gitignore` (with
+`!/graphify/README.md` kept tracked) and `!/graphify/` to `.rgignore`, matching the existing
+`.opencode/ndjson/` pattern.
+
+Also moved `docs/reports/frozen-graph-snapshot-v2.json` (464MB, was gitignored in place, was
+blocking `git push` from an earlier commit — GitHub's 100MB hard limit) into
+`graphify/frozen-graph-snapshot-v2.json`, and updated its 4 real consumers:
+`scripts/atlas/stage5-pagerank-authority-validated.mjs`, `scripts/atlas/export-graph-snapshot-v2.mts`,
+`scripts/atlas/compute-pagerank-neo4j-v2.mjs`, `python/parent_atlas_networkx_pagerank.py`.
+
+**Deliberately infra-only, by explicit user decision**: migrating the other 280+ existing graphify
+script output paths into `graphify/` is a separate, audited sweep per this repo's own
+Consolidation Sweep Rules (CLAUDE.md) — canonical-vs-duplicate report first, then patch only the
+safe cases. Not started.
