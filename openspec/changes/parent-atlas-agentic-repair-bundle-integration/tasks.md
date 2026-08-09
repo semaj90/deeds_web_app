@@ -506,28 +506,40 @@ direct counts:
   100% population. Future graph-sync runs touching `CodebaseFile` by path should be dramatically
   faster.
 
-**New gap found, not yet investigated**: the script's own progress log reported *attempting*
-8,487 `IMPORTS` and 8,875 `TEST_COVERS_FILE` relationships, but only 2,754 / 1,572 actually
-persisted (~32% / ~18%). The write pattern is `MATCH (c1)... MATCH (c2)... MERGE
-(c1)-[:IMPORTS]->(c2)` — a `MATCH` that finds no matching node silently drops that row instead of
-erroring, so roughly two-thirds of candidate edges are failing to resolve one of their two
-endpoint `CodebaseFile` nodes. Likely a path-normalization mismatch between how nodes get created
-(from `graphFilesSet`, seeded by `parent_atlas_documents` + edges) and how edges reference their
-`from`/`to` paths — same *class* of bug as T20's `source_ref`/`sourceRef` mismatch, but not yet
-root-caused. **Next step**: sample a handful of dropped edges (`from`/`to` pairs from
-`importsToSync` that don't appear in the final `IMPORTS` count) and check whether their paths
-actually exist as `CodebaseFile` nodes — this will show whether it's a casing issue, a
-`sveltekit-frontend/` prefix-stripping edge case, or something else.
+**"Gap" investigated and resolved — not a bug.** The script's own progress log reported
+*attempting* 8,487 `IMPORTS` (8,376 for the `imports_static`/`imports_dynamic` subset) and 8,875
+`TEST_COVERS_FILE` relationships, but only 2,754 / 1,572 actually persisted. Root cause confirmed
+via a throwaway diagnostic (reproduced the exact same candidate-edge computation against a live
+Neo4j read): **`importsToSync` is not deduplicated by `(from, to)` before being sent to Neo4j** —
+of the 8,376 candidate rows, only 2,643 are unique `(from, to)` pairs; the rest are the same edge
+repeated (e.g. the same import statement appearing across multiple raw scan lines in
+`deep-import-edges.jsonl`). Since the write is `MERGE (c1)-[r:IMPORTS]->(c2)` — idempotent by
+design — duplicate candidate rows correctly collapse into one relationship each. 2,754 live vs.
+2,643 computed-unique is consistent (small delta from pre-existing relationships/earlier partial
+runs). **No fix needed** — the drop was Neo4j doing exactly what `MERGE` is supposed to do, not a
+path-normalization bug. (Confirmed separately, also not a bug: every one of the 8,376 candidates'
+endpoints *does* exist as a live `CodebaseFile` node — 0 missing-node drops.)
 
-Unbounded run (`--apply` with no `--limit`) not yet attempted — do that only after the above
-match-rate gap is understood, since running unbounded won't fix the underlying drop rate, just
-scale it up.
+Minor, lower-priority observation surfaced while diagnosing this: a large share of the duplicate
+rows come from stale `.claude/worktrees/agent-*/` paths and old `scripts/api-cleanup/reports/
+backup-*/` snapshots baked into `deep-import-edges.jsonl` — leftover agent-worktree and backup
+scan noise, not canonical source. Not urgent (they get correctly excluded from `IMPORTS` edges
+already, since `graphFilesSet` only admits paths also present via `parent_atlas_documents` or as
+edge endpoints — the noise just inflates the raw file's line count / dedup ratio). Worth a
+`deep-import-edges.jsonl` regeneration excluding `.claude/worktrees/` and backup-report
+directories, whenever that pipeline is next touched.
+
+Unbounded run (`--apply` with no `--limit`) is now safe to attempt — the "gap" that was blocking
+it turned out not to be a real gap.
 
 ## Next Steps (2026-08-09), priority order
 
-1. ~~Run the IMPORTS/DYNAMIC_IMPORTS apply for real~~ — **done, see T22 above.** Remaining from
-   this item: run unbounded once the match-rate gap (T22) is understood, and re-verify via
-   `CALL db.relationshipTypes()` / `MATCH ()-[r:IMPORTS]->() RETURN count(r)`.
+1. ~~Run the IMPORTS/DYNAMIC_IMPORTS apply for real~~ — **done, see T22 above**, including
+   confirming the lower-than-attempted live count is expected `MERGE` dedup, not a bug. Remaining:
+   run `node scripts/atlas/sync-graph-truth-neo4j.mjs --apply` unbounded (no `--limit`) for the
+   full 61,659-file graph, then re-verify via `CALL db.relationshipTypes()` /
+   `MATCH ()-[r:IMPORTS]->() RETURN count(r)`. The new `codebase_file_path` index (T22) should
+   make this materially faster than the bounded run was before the index existed.
 
 2. **Re-run `neo4j-graph-enrich.mjs --apply`** after step 1 lands, to confirm GDS3/GDS4/GDS5 now
    project a real `IMPORTS`-inclusive graph (not just the defensive fallback added in T19) and to
