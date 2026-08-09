@@ -25,6 +25,11 @@
 # Codebase graph — large gitignored JSON, but searchable for offline analytics
 !sveltekit-frontend/docs/graph/codebase-graph.json
 
+# Canonical graphify/ output directory (2026-08-09) — gitignored, rg-searchable.
+# Infra only: no graphify scripts write here yet. See graphify/README.md.
+!/graphify/
+!/graphify/**
+
 # Python virtual environments — gitignored but searchable by rg
 !.venv-gemma4/
 !.venv-gemma4/**

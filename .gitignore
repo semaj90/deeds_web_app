@@ -935,6 +935,12 @@ docs/graph/repo-root-atlas.json
 
 # Deep graphify artifacts >10MB (gitignored — pre-commit hook rejects them)
 sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
+
+# Canonical graphify/ output directory (2026-08-09) — infra only, see graphify/README.md.
+# Gitignored (regenerable artifacts) but kept rg-searchable via the !graphify/ negation
+# in .rgignore, matching the .opencode/ndjson/ pattern.
+/graphify/*
+!/graphify/README.md
 /docs/documents-atlas-index.json
 /memory/atlas/documents-atlas.inverted.json
 /sveltekit-frontend/docs/documents-atlas-index.json
