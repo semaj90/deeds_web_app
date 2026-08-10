@@ -1,8 +1,9 @@
 import { json, error, type RequestHandler } from '@sveltejs/kit';
 import { createHash } from 'node:crypto';
 import { requireAdmin } from '$lib/server/auth-utils.js';
-import { analyzePdfWithGraniteDocling } from '$lib/server/analysis/granite-docling.js';
+import { analyzePdfWithGraniteDocling, isGraniteDoclingAvailable } from '$lib/server/analysis/granite-docling.js';
 import { compareFees, createManifest, parsePublishedFeesFromText, summarize } from '$lib/server/fee-sync/compare.js';
+import { extractPdfText } from '$lib/server/fee-sync/pdf.js';
 import { queryActiveMasterFees, salesforceConfigured, salesforceWritesEnabled, updateMasterFees, verifyMasterFeeValues } from '$lib/server/fee-sync/salesforce.js';
 import type { FeeComparisonRow, FeeSyncManifest } from '$lib/server/fee-sync/types.js';
 
@@ -26,14 +27,25 @@ export const POST: RequestHandler = async (event) => {
 		if (pdf.type !== 'application/pdf' && !pdf.name.toLowerCase().endsWith('.pdf')) throw error(400, 'Only PDF uploads are supported');
 		const buffer = Buffer.from(await pdf.arrayBuffer());
 		const sourceSha256 = createHash('sha256').update(buffer).digest('hex');
-		const doc = await analyzePdfWithGraniteDocling(buffer, Number(process.env.FEE_SYNC_PDF_MAX_PAGES ?? 40));
-		const published = parsePublishedFeesFromText(doc.fullText);
+		const maxPages = Number(process.env.FEE_SYNC_PDF_MAX_PAGES ?? 80);
+		let extractionMode: 'pdf-text' | 'granite-docling' = 'pdf-text';
+		let doc = await extractPdfText(buffer, maxPages);
+		let published = parsePublishedFeesFromText(doc.text);
+
+		if (published.length === 0 && await isGraniteDoclingAvailable()) {
+			const fallback = await analyzePdfWithGraniteDocling(buffer, Math.min(maxPages, 40));
+			doc = { text: fallback.fullText, pageCount: fallback.pageCount };
+			published = parsePublishedFeesFromText(doc.text);
+			extractionMode = 'granite-docling';
+		}
+
 		const salesforce = salesforceConfigured() ? await queryActiveMasterFees() : [];
 		const rows = salesforce.length ? compareFees(salesforce, published) : [];
 		return json({
 			sourceName: pdf.name,
 			sourceSha256,
 			pageCount: doc.pageCount,
+			extractionMode,
 			publishedCount: published.length,
 			salesforceCount: salesforce.length,
 			rows,
@@ -51,6 +63,7 @@ export const POST: RequestHandler = async (event) => {
 		if (rows.some((row) => row.status.startsWith('DUPLICATE'))) throw error(409, 'Cannot approve while duplicate identities exist');
 		const approvedRows = rows.filter((row) => row.approved && row.changeRequired);
 		if (approvedRows.length === 0) throw error(400, 'No changed rows were approved');
+		if (approvedRows.some((row) => row.status !== 'CHANGED_FLAT')) throw error(400, 'V1 approval supports flat-fee changes only');
 		const manifest = createManifest({
 			fiscalYear: String(form.get('fiscalYear') ?? ''),
 			sourceName: String(form.get('sourceName') ?? ''),
