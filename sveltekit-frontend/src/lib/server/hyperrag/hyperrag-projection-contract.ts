@@ -11,10 +11,13 @@ export interface HyperRagProjectionRequest {
   directoryPath: string;
   featureId: string;
 
-  /** Embedding payload — only 384-dim canonical vectors */
+  /** Embedding payload — only 768-dim canonical vectors (semantic_768 lane).
+   * Corrected 2026-08-09 from a stale 384-dim declaration — this type has
+   * zero live callers (verified via repo-wide grep), so this is a type-only
+   * fix with no runtime behavior change. */
   embeddingValues: number[];
   embeddingModel: string;
-  embeddingDim: 384;
+  embeddingDim: 768;
 
   /** Qdrant target collection */
   qdrantCollection: string;

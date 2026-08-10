@@ -11,15 +11,21 @@
  */
 
 import { z } from 'zod';
+import { createHash } from 'node:crypto';
 import type { FeatureEnvelope } from './feature-envelope.js';
 import type { ScorerOptions } from './candidate-scorer.js';
 import type { PostProcessConfig } from './post-process-reranker.js';
 import type { Retriever, Reranker } from './lane-contracts.js';
-import type { DenseEmbedding } from '$lib/server/vector/vector-contracts.js';
-import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/atlas/contracts/canonical-chunk-contract.js';
-import { ENV } from '$lib/server/env.server.js';
+import type { DenseEmbedding } from '../vector/vector-contracts.js';
+import { ENV } from '../env.server.js';
 import { SearchMetadataFilterSchema, type SearchMetadataFilter } from './search-contract.js';
 import type { HydrationProofContext, HydrationProofSummary, HydratedCandidatesWithProof } from './hydrate-candidates.js';
+import { buildPolicyStateFromRerankSignals } from '../analysis/hmm-policy-bridge.js';
+import { buildPolicyStateVector } from '../atlas/policy/policy-state.js';
+import { budgetFor } from '../atlas/policy/execution-budget.js';
+import { routePolicy } from '../atlas/policy/policy-router.js';
+import { appendSearchRuntimeTrainingRow } from '../atlas/policy/policy-training.js';
+import { CANONICAL_EMBEDDING_DIMENSION } from '../vector/embedding-dimension-guard.js';
 const EMBEDDING_HEALTH_CACHE_MS = 60_000;
 
 let embeddingHealthCache:
@@ -866,19 +872,49 @@ export class SearchRuntime {
     query: SearchQuery,
   ): Promise<Array<FeatureEnvelope & { model_version?: string; blended_score?: number }>> {
     const { rerankCanonicalFeatureEnvelopes } = await import('./canonical-rerank-executor.js');
+    const policyInput = buildPolicyStateFromRerankSignals({
+      query: query.text,
+      signals: envelopes.map((envelope) => ({
+        denseScore: envelope.dense?.score ?? null,
+        lexicalScore: envelope.lexical?.score ?? null,
+        astScore: envelope.ast?.score ?? null,
+        pageRankScore: envelope.authority?.page_rank ?? envelope.authority?.score ?? null,
+        communityScore: envelope.authority?.score ?? null,
+        exactPathScore: envelope.ast?.score ?? envelope.metadata?.score ?? null,
+      })),
+      vramPressure: 0.25,
+      contextPressure: Math.min(1, Math.max(0.05, envelopes.length / 24)),
+      latencyPressure: query.rerankTier === 'deep' ? 0.55 : 0.25,
+      cacheHitRatio: 0.5,
+    });
+    const policyState = buildPolicyStateVector(policyInput);
+    const policyDecision = routePolicy(policyState);
+    const executionBudget = budgetFor(policyDecision.budget, policyDecision.stateHint);
 
     // DIAGNOSTIC: Log input state
     console.info('[stage:rerank] input', {
       candidateCount: envelopes.length,
       packetKeys: envelopes.slice(0, 5).map(e => e.packet_key),
+      policyAction: policyDecision.action,
+      policyBudget: policyDecision.budget,
+      policyStateHint: policyDecision.stateHint,
     });
 
     const result = await rerankCanonicalFeatureEnvelopes(query.text, envelopes as any, {
       authScope: query.userId ?? this.userId ?? 'public',
       rendererVersion: 'search-runtime-v1',
-      maxLength: 4096,
-      topK: Math.min(query.topK, envelopes.length || query.topK),
-      rerankTier: query.rerankTier,
+      maxLength: executionBudget.maxContextTokens,
+      topK: Math.min(
+        query.topK,
+        envelopes.length || query.topK,
+        policyDecision.action === 'FAST_RERANK'
+          ? executionBudget.maxFastRerankCandidates
+          : (executionBudget.maxDeepRerankCandidates || executionBudget.maxFastRerankCandidates),
+      ),
+      rerankTier: query.rerankTier ?? (policyDecision.action === 'FAST_RERANK' ? 'fast' : 'deep'),
+      policyDecision,
+      policyState,
+      executionBudget,
     });
 
     // DIAGNOSTIC: Log output state
@@ -888,6 +924,9 @@ export class SearchRuntime {
       modelVersion: result.provenance?.modelVersion,
       fallbackReason: result.provenance?.fallbackReason,
       cacheStatus: result.provenance?.cacheStatus,
+      policyAction: result.provenance?.policyAction,
+      policyBudget: result.provenance?.policyBudget,
+      policyStateHint: result.provenance?.policyStateHint,
     });
 
     // SAFETY: Preserve input if output is empty (fail-open)
@@ -899,6 +938,52 @@ export class SearchRuntime {
         blended_score: undefined,
       }));
     }
+
+    void appendSearchRuntimeTrainingRow({
+      traceId: query.spanContext?.traceId ?? createHash('sha256').update(query.text).digest('hex').slice(0, 16),
+      query: query.text,
+      queryHash: createHash('sha256').update(query.text.toLowerCase()).digest('hex').slice(0, 16),
+      policyState,
+      policyDecision,
+      rerankProvenance: result.provenance,
+      revisions: {
+        workspaceRevision: query.workspaceRevision ?? 'unknown',
+        sourceRevision: query.sourceRevision ?? 'unknown',
+        representationRevision: String(query.representationRevision ?? 'unknown'),
+        featureRevision: policyState.featureRevision,
+      },
+      labelProvenance: {
+        source: result.provenance.crossEncoderUsed ? 'EXECUTION' : 'REPLAY',
+        sourceRevision: result.provenance.modelVersion,
+        sourceRefs: result.results.slice(0, 3).map((entry) => String(
+          (entry as any).source_ref ??
+          (entry as any).sourceRef ??
+          (entry as any).packet_key ??
+          (entry as any).packetKey ??
+          (entry as any).feature_id ??
+          (entry as any).featureId ??
+          ''
+        )).filter((value) => value.length > 0),
+      },
+      candidatePacketKeys: result.results.slice(0, 10).map((entry) => String(
+        (entry as any).packet_key ??
+        (entry as any).packetKey ??
+        (entry as any).feature_id ??
+        (entry as any).featureId ??
+        ''
+      )).filter((value) => value.length > 0),
+      sourceRefs: result.results.slice(0, 5).map((entry) => String(
+        (entry as any).source_ref ??
+        (entry as any).sourceRef ??
+        (entry as any).packet_key ??
+        (entry as any).packetKey ??
+        ''
+      )).filter((value) => value.length > 0),
+      executionId: result.provenance.cacheKey ?? undefined,
+      labelConfidence: result.results.length > 0 ? 1 : 0.5,
+    }).catch((error) => {
+      console.warn('[stage:rerank] policy training export skipped:', error);
+    });
 
     return result.results;
   }

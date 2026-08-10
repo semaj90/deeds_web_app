@@ -126,19 +126,77 @@ export function detectTreeNodeChange(
 }
 
 /**
- * Stub: Integration point for tree-sitter or TypeScript AST parser.
+ * Minimal structural fallback until the canonical tree-sitter/TS-AST path
+ * is wired end-to-end.
  *
- * TODO: Wire to actual AST extraction (tree-sitter for code, TypeScript Compiler API for .ts/.tsx).
+ * This is intentionally shallow: it emits stable structural locations for
+ * obvious top-level declarations, rather than pretending to be a full AST.
+ * It is better than an empty stub because downstream lineage code can at
+ * least join on real spans while the canonical parser is being wired.
  */
 export async function extractTreeNodeIdFromAST(
-  _file_content: string,
-  _file_path: string
+  file_content: string,
+  file_path: string
 ): Promise<TreeNodeLocation[]> {
-  // Placeholder: return empty array
-  // Real implementation would:
-  // 1. Parse file_content with tree-sitter
-  // 2. Extract all function/class/interface definitions
-  // 3. Compute tree_node_id for each
-  // 4. Return array of TreeNodeLocations
-  return [];
+  const locations: TreeNodeLocation[] = [];
+  const lines = file_content.split(/\r?\n/);
+
+  const pushMatch = (lineIndex: number, node_type: TreeNodeLocation['node_type'], startCol: number) => {
+    locations.push({
+      file_path,
+      start_line: lineIndex + 1,
+      start_col: startCol + 1,
+      end_line: lineIndex + 1,
+      end_col: Math.max(startCol + 1, lines[lineIndex]?.length ?? startCol + 1),
+      node_type,
+    });
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    const functionMatch = /^\s*(export\s+)?(default\s+)?(async\s+)?function\s+[A-Za-z0-9_$]+/.exec(line);
+    if (functionMatch) {
+      pushMatch(i, 'function', functionMatch.index ?? 0);
+      continue;
+    }
+
+    const classMatch = /^\s*(export\s+)?(default\s+)?class\s+[A-Za-z0-9_$]+/.exec(line);
+    if (classMatch) {
+      pushMatch(i, 'class', classMatch.index ?? 0);
+      continue;
+    }
+
+    const interfaceMatch = /^\s*(export\s+)?interface\s+[A-Za-z0-9_$]+/.exec(line);
+    if (interfaceMatch) {
+      pushMatch(i, 'interface', interfaceMatch.index ?? 0);
+      continue;
+    }
+
+    const importMatch = /^\s*import\s+/.exec(line);
+    if (importMatch) {
+      pushMatch(i, 'import', importMatch.index ?? 0);
+      continue;
+    }
+
+    const exportMatch = /^\s*export\s+/.exec(line);
+    if (exportMatch) {
+      const kindMatch =
+        /^\s*export\s+(const|let|var)\s+[A-Za-z0-9_$]+/.exec(line) ||
+        /^\s*export\s+default\s+/.exec(line);
+      if (kindMatch) {
+        pushMatch(i, 'export', exportMatch.index ?? 0);
+        continue;
+      }
+    }
+
+    const variableMatch = /^\s*(const|let|var)\s+[A-Za-z0-9_$]+/.exec(line);
+    if (variableMatch) {
+      pushMatch(i, 'variable', variableMatch.index ?? 0);
+    }
+  }
+
+  return locations;
 }

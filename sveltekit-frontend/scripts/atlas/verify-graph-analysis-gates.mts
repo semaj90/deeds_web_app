@@ -153,6 +153,7 @@ async function main() {
     verifyCommunityAlgorithm('leiden'),
     verifyMetricAlgorithm('cheirank', 'cheirank'),
     verifyMetricAlgorithm('kcore', 'kcore'),
+    verifyMetricAlgorithm('betweenness', 'betweenness'),
     verifyAtlasPacketsUnchanged(),
   ]);
 

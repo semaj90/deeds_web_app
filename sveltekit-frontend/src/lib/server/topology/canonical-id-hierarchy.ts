@@ -70,6 +70,12 @@ export interface CanonicalIDHierarchy {
   feature_id: string; // STRING: auth:session-validation
   packet_key: string; // STRING: ace:packet:auth:001
   chunk_id: string; // UUID/SERIAL: codebase_chunk_index row
+  representation_id?: string; // Canonical representation lane (frozen, not latest)
+  representation_revision?: number; // Frozen representation contract revision
+  source_representation_id?: string | null; // Raw embedding lane for lineage
+  source_dimension?: number | null; // Source embedding dimensionality
+  projection_representation_id?: string | null; // Derived projection lane for lineage
+  projection_dimension?: number | null; // Projection dimensionality
 }
 
 export interface MirrorHandles {
@@ -162,7 +168,18 @@ export interface RedisKey {
  * Generate UUIDs for each level
  * Call once during ingestion, store in all mirrors
  */
-export function generateIDHierarchy(sourceRef: string): CanonicalIDHierarchy {
+export function generateIDHierarchy(
+  sourceRef: string,
+  lineage?: Partial<Pick<
+    CanonicalIDHierarchy,
+    | 'representation_id'
+    | 'representation_revision'
+    | 'source_representation_id'
+    | 'source_dimension'
+    | 'projection_representation_id'
+    | 'projection_dimension'
+  >>
+): CanonicalIDHierarchy {
   // Parse source_ref to infer hierarchy
   // src/lib/server/auth.ts → directory/file/module context
   const parts = sourceRef.split('/');
@@ -177,7 +194,13 @@ export function generateIDHierarchy(sourceRef: string): CanonicalIDHierarchy {
     symbol_id: randomUUID(),
     feature_id: deriveFeatureID(sourceRef, fileName),
     packet_key: derivePacketKey(sourceRef),
-    chunk_id: randomUUID()
+    chunk_id: randomUUID(),
+    representation_id: lineage?.representation_id ?? 'semantic_768',
+    representation_revision: lineage?.representation_revision ?? 0,
+    source_representation_id: lineage?.source_representation_id ?? 'semantic_768',
+    source_dimension: lineage?.source_dimension ?? 768,
+    projection_representation_id: lineage?.projection_representation_id ?? null,
+    projection_dimension: lineage?.projection_dimension ?? null
   };
 }
 
@@ -290,11 +313,16 @@ export async function persistIDHierarchyToPostgres(
       feature_id,
       packet_key,
       chunk_id,
+      representation_revision,
+      source_representation_id,
+      source_dimension,
+      projection_representation_id,
+      projection_dimension,
       source_ref,
       packet_type,
       created_at,
       updated_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, NOW(), NOW())
     ON CONFLICT (packet_key) DO UPDATE SET updated_at = NOW()
   `;
 
@@ -307,6 +335,11 @@ export async function persistIDHierarchyToPostgres(
     ids.feature_id,
     ids.packet_key,
     ids.chunk_id,
+    ids.representation_revision ?? 0,
+    ids.source_representation_id ?? ids.representation_id ?? 'semantic_768',
+    ids.source_dimension ?? 768,
+    ids.projection_representation_id ?? null,
+    ids.projection_dimension ?? null,
     envelope.source_ref,
     envelope.packet_type
   ]);
@@ -592,7 +625,13 @@ export const CanonicalIDHierarchySchema = z.object({
   symbol_id: z.string().uuid(),
   feature_id: z.string(),
   packet_key: z.string(),
-  chunk_id: z.string()
+  chunk_id: z.string(),
+  representation_id: z.string().optional(),
+  representation_revision: z.number().int().nonnegative().optional(),
+  source_representation_id: z.string().nullable().optional(),
+  source_dimension: z.number().int().nonnegative().nullable().optional(),
+  projection_representation_id: z.string().nullable().optional(),
+  projection_dimension: z.number().int().nonnegative().nullable().optional()
 });
 
 export const MirrorHandlesSchema = z.object({

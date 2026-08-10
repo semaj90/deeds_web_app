@@ -27,6 +27,27 @@ Qdrant payload + Valkey hot cache
 
 **Never use u64 for vector math. Never use SOM for quantization.**
 
+## Bounded routing / geometry contracts
+
+Treat routing, geometry, and policy as separate contracts:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, rerank batch
+  size, GPU bytes, and latency for one task.
+- `GeometryExperimentManifest` records projection experiments, source/target
+  spaces, and diagnostics only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal under budget.
+
+Recommended load cap:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
+
+Keep `semantic_768` as the canonical vector space. Use Jacobian/SVD only as a
+distortion diagnostic, not as an ownership boundary or truth lane.
+
 ## Layer Responsibilities
 
 ### Rust N-API (`crates/turbovec-napi`)
@@ -64,6 +85,9 @@ Qdrant payload + Valkey hot cache
 - SOM training on latent64
 - Produces `latent_hash` (u64) per node
 - Output stored in Qdrant payload + `gpu:karpathy:encoded` Redis hash
+
+This lane is for representation compression and routing support only. It does
+not own canonical truth, graph lineage, or feature promotion.
 
 ### LangGraph (`langgraph-client.ts`)
 - Orchestration only — never writes to DB directly
@@ -131,3 +155,6 @@ Qdrant payload:
 Primary: **TurboVec int8 latent64** (this crate)  
 Future benchmark: RotorQuant  
 **Pick one primary quantizer. Do not run TurboVec + RotorQuant + SOM as competing quantizers.**
+
+Keep quantizer choice separate from routing policy. The geometry contract is
+diagnostic and experimental; it does not promote itself into `FeatureRowV1`.

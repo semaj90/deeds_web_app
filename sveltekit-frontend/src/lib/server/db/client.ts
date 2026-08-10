@@ -6,9 +6,9 @@ import { canvasAutosaves } from './schema-canvas-autosaves.js';
 // Temporary workaround: just pass schema tables without relations for now.
 // TODO: Restructure schema-postgres.ts so all table definitions come before relations.
 import * as schema from './schema.js';
-import { ENV } from '$lib/server/env.server.js';
+import { ENV } from '../env.server.js';
 import { createDrizzleCache } from './drizzle-cache.js';
-import { traceDB } from '$lib/server/observability/langfuse.js';
+import { traceDB } from '../observability/langfuse.js';
 
 type LooseDb = {
   query: any;

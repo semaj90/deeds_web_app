@@ -18,11 +18,11 @@ import type {
 import { RETRIEVAL_LIMITS } from './search-contract.js';
 import { VECTOR_LANES } from '../vector/lane-registry.js';
 import { VECTOR_LANES as VECTOR_CONFIG_LANES, getVectorLaneMetadata } from '../config/vector-config.js';
-import { CANONICAL_EMBEDDING_DIMENSION } from '$lib/server/atlas/contracts/canonical-chunk-contract.js';
+import { CANONICAL_EMBEDDING_DIMENSION } from '../atlas/contracts/canonical-chunk-contract.js';
 import { sql, type SQL } from 'drizzle-orm';
 
 async function getDb() {
-  const mod = await import('$lib/server/db/client.js');
+  const mod = await import('../db/client.js');
   return mod.db;
 }
 

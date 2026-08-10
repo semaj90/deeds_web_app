@@ -3,6 +3,9 @@
 Miniforge NLP sidecar.
 
 This is the Python process behind the Atlas NLP middleware lane.
+It is currently Docker-hosted in a Python 3.13 slim container, even though
+the service name retains the historical "miniforge" label.
+
 It keeps the hot TypeScript path thin while handling:
 
 - LangExtract-compatible text extraction
@@ -11,8 +14,9 @@ It keeps the hot TypeScript path thin while handling:
 - ast-grep structural features when available
 - optional PyTorch feature summaries
 
-The service is designed to run inside a Miniforge environment, but it degrades
-cleanly when optional packages are missing.
+The service degrades cleanly when optional packages are missing. A future
+GPU-sidecar may add CUDA/PyTorch explicitly, but that is not part of the
+current checked-in runtime.
 """
 
 from __future__ import annotations

@@ -420,5 +420,12 @@ export async function runGraphAnalysis(
     return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
   }
 
-  return runSkippedAnalysis('betweenness', projectionName, 0, 0, 'Betweenness is analysis-only until the graph baseline and promotion gate are frozen.');
+  if (request.algorithm === 'betweenness') {
+    const result = await (await import('./betweenness-analysis-adapter.js')).runBetweennessAnalysis(db, {
+      limit: request.limit,
+    });
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+  }
+
+  return runSkippedAnalysis(request.algorithm, projectionName, 0, 0, `Unsupported graph algorithm: ${request.algorithm}`);
 }

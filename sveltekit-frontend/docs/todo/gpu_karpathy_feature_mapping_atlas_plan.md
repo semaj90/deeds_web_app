@@ -700,6 +700,21 @@ PRODUCED_BY:
 ## 6. Hyper-Dense HMM / KAG Search Upgrade
 
 Interpret "HMM" here as hidden state routing, not a full probabilistic model at first.
+Keep the routing layer budgeted and separate from geometry/math:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, candidate count,
+  GPU bytes, and latency.
+- `GeometryExperimentManifest` records projection experiments and diagnostics
+  only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal under budget.
+
+Preferred load policy:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
 
 ### Query hidden states
 
@@ -727,6 +742,10 @@ query
   → choose budget
   → choose tool policy
 ```
+
+Do not let one query open all lanes. Treat SOM / QLoRA / HMM as routing aids,
+not ownership boundaries, and keep `semantic_768` as the canonical vector
+space while Jacobian/SVD stay diagnostic.
 
 ### State output
 

@@ -27,6 +27,8 @@ import {
   DEFAULT_BLEND_WEIGHTS,
 } from './runtime-reranker.js';
 import type { CanonicalRerankTier } from './cross-encoder-reranker.js';
+import type { ExecutionBudget } from '$lib/server/atlas/policy/execution-budget.js';
+import type { PolicyDecision, PolicyStateVector } from '$lib/server/atlas/policy/policy-types.js';
 
 interface CrossEncoderInputCandidate {
   documentId: string;
@@ -94,6 +96,9 @@ export type CanonicalRerankProvenance = {
   fallbackUsed: boolean;
   fallbackReason?: string;
   latencyMs?: number;
+  policyAction?: PolicyDecision['action'];
+  policyBudget?: PolicyDecision['budget'];
+  policyStateHint?: PolicyDecision['stateHint'];
 };
 
 export type CanonicalRerankResult = {
@@ -110,6 +115,9 @@ export interface CanonicalRerankOptions {
   cacheTtlSeconds?: number;
   cachePolicy?: 'enabled' | 'disabled';
   rerankTier?: CanonicalRerankTier;
+  policyDecision?: PolicyDecision;
+  policyState?: PolicyStateVector;
+  executionBudget?: ExecutionBudget;
 }
 
 export const DEFAULT_CANONICAL_RERANK_WEIGHTS = {
@@ -687,11 +695,21 @@ export async function rerankCanonicalFeatureEnvelopes(
   const startedAt = Date.now();
   const authScope = normalizeAuthScope(options.authScope);
   const rendererVersion = options.rendererVersion?.trim() || DEFAULT_RENDERER_VERSION;
-  const maxLength = options.maxLength ?? DEFAULT_MAX_LENGTH;
-  const topK = options.topK ?? Math.min(20, envelopes.length || 20);
+  const maxLength = Math.min(
+    options.maxLength ?? DEFAULT_MAX_LENGTH,
+    options.executionBudget?.maxContextTokens ?? DEFAULT_MAX_LENGTH,
+  );
+  const budgetCap = options.rerankTier === 'fast'
+    ? options.executionBudget?.maxFastRerankCandidates
+    : options.executionBudget?.maxDeepRerankCandidates;
+  const topK = Math.min(
+    options.topK ?? Math.min(20, envelopes.length || 20),
+    typeof budgetCap === 'number' && budgetCap > 0 ? budgetCap : Number.POSITIVE_INFINITY,
+  );
   const cachePolicy = options.cachePolicy ?? 'enabled';
   const cacheTtlSeconds = options.cacheTtlSeconds ?? DEFAULT_CACHE_TTL_SECONDS;
-  const reranker = new MixedbreadCanonicalReranker(options.weights, options.rerankTier ?? 'deep');
+  const rerankTier = options.rerankTier ?? (options.policyDecision?.action === 'FAST_RERANK' ? 'fast' : 'deep');
+  const reranker = new MixedbreadCanonicalReranker(options.weights, rerankTier);
   const modelVersion = reranker.modelVersion();
   const fallbackModelVersion = 'xgboost-fallback';
   const candidates = envelopes.map((envelope, index) =>
@@ -724,6 +742,9 @@ export async function rerankCanonicalFeatureEnvelopes(
         fallbackUsed: false,
         fallbackReason: 'empty_input',
         latencyMs: Date.now() - startedAt,
+        policyAction: options.policyDecision?.action,
+        policyBudget: options.policyDecision?.budget,
+        policyStateHint: options.policyDecision?.stateHint,
       },
     };
   }
@@ -747,13 +768,16 @@ export async function rerankCanonicalFeatureEnvelopes(
             authScope: cached.authScope,
             topK: cached.topK,
             maxLength: cached.maxLength,
-            crossEncoderAttempted: false,
-            crossEncoderUsed: false,
-            fallbackUsed: false,
-            latencyMs: Date.now() - startedAt,
-          },
-        };
-      }
+          crossEncoderAttempted: false,
+          crossEncoderUsed: false,
+          fallbackUsed: false,
+          latencyMs: Date.now() - startedAt,
+          policyAction: options.policyDecision?.action,
+          policyBudget: options.policyDecision?.budget,
+          policyStateHint: options.policyDecision?.stateHint,
+        },
+      };
+    }
       await deleteRerankCache(primaryCacheKey);
     }
   }
@@ -832,6 +856,9 @@ export async function rerankCanonicalFeatureEnvelopes(
               fallbackUsed: true,
               fallbackReason: 'crossencoder_unavailable',
               latencyMs: Date.now() - startedAt,
+              policyAction: options.policyDecision?.action,
+              policyBudget: options.policyDecision?.budget,
+              policyStateHint: options.policyDecision?.stateHint,
             },
           };
         }
@@ -852,10 +879,10 @@ export async function rerankCanonicalFeatureEnvelopes(
       resultModelVersion = finalFallback.modelVersion;
       fallbackReason = finalFallback.fallbackReason;
     }
-    fallbackUsed = true;
-    crossEncoderUsed = false;
-    cacheStatus = cachePolicy === 'disabled' ? 'bypass' : 'miss';
-  }
+      fallbackUsed = true;
+      crossEncoderUsed = false;
+      cacheStatus = cachePolicy === 'disabled' ? 'bypass' : 'miss';
+    }
 
   const rankedByPacket = new Map(ranked.map((candidate) => [candidate.packetKey, candidate]));
   const results = envelopes
@@ -922,6 +949,9 @@ export async function rerankCanonicalFeatureEnvelopes(
       fallbackUsed,
       fallbackReason,
       latencyMs: Date.now() - startedAt,
+      policyAction: options.policyDecision?.action,
+      policyBudget: options.policyDecision?.budget,
+      policyStateHint: options.policyDecision?.stateHint,
     },
   };
 }

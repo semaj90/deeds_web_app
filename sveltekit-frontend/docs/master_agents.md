@@ -55,6 +55,25 @@ Query: `SELECT feature_key, feature_name, status FROM feature_implementations OR
 | `hypergraph.4d` | 4D hypergraph (SOM + k-means + Neo4j + Qdrant) | `scripts/run-hypergraph.ts` |
 | `synth.loop` | Gemma4 synthesis pipeline (MCP tool-calling loop) | `src/mcp/trace-mcp-server.ts` |
 
+### Bounded Load / Routing Contracts
+
+These are the current pipeline guardrails for routing, geometry, and concurrency.
+
+| Contract | Use it for | Not for |
+|----------|------------|---------|
+| `RetrievalExecutionBudget` | Cap active lanes, graph depth, candidate count, GPU bytes, and latency for one task | Truth ownership or unbounded fan-out |
+| `GeometryExperimentManifest` | Record geometry experiments, source/target spaces, projection algorithm, and diagnostics | Runtime policy or canonical embedding identity |
+| `RoutingPolicy` | Choose between HMM, logistic routing, rerank, or graph traversal under budget | Geometry math or feature promotion |
+
+Recommended load policy:
+
+- 1 graph job
+- 1 deep rerank job
+- 1 structural/NLP job
+- all other work queued async
+
+Geometry diagnostics stay experimental until GA8 selects survivors. Keep `semantic_768` as the canonical vector space; use Jacobian/SVD only to measure distortion of projections, not as a second owner.
+
 ---
 
 ## 3. Key Directory Map
@@ -1366,6 +1385,8 @@ ingest (rg + OCR + SearXNG + Hermes)
 8. ⏳ Adaptive TODO generation from signal fusion
 9. ⏳ tmux QLoRA + GRPO log ingestion scripts
 10. ⏳ CUDA Graph capture (`captureAEGraph()`, batch=64)
+
+**Routing note**: if the task mixes geometry, HMM, rerank, and graph analysis, route it through the budget contract first; do not let one lane open all of them at once.
 
 ---
 

@@ -155,9 +155,31 @@ Use `worker_threads` for CPU-intensive non-LLM work:
 
 Bounded queues + batch writers. Keep Gemma4 **out** of the worker pool except for selective summary tasks.
 
+### Bounded routing / geometry contracts
+
+Treat routing, geometry, and policy as separate contracts:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, rerank batch
+  size, GPU bytes, and latency for one task.
+- `GeometryExperimentManifest` records projection experiments, source/target
+  spaces, and diagnostics only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal under budget.
+
+Recommended load cap:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
+
+Keep `semantic_768` as the canonical vector space. Use Jacobian/SVD only as a
+distortion diagnostic, not as an ownership boundary or truth lane.
+
 ## 12. GPU Rules
 
 GPU only for dense math and bounded reranking/clustering (LibTorch/CUDA via N-API).
+The GPU lane is a backend under budget, not a catch-all owner.
 
 | Allowed on GPU | Forbidden on GPU |
 |---|---|
@@ -168,6 +190,10 @@ GPU only for dense math and bounded reranking/clustering (LibTorch/CUDA via N-AP
 | INT4/INT8 inference (TensorRT) | Inline LLM token generation* |
 
 *Gemma4 inference goes through llama-server / Ollama, not a direct GPU bridge.
+
+The K-means / SOM / BMU path here is routing support and diagnostics, not a
+second truth owner. It should feed the budgeted policy layer rather than
+replace it.
 
 ## 13. Gemma4 Rules
 
@@ -435,6 +461,9 @@ Before a feature ships, every box must be checked:
 ## 24. KAGINTEL Local Subagents + LangGraph Boundary
 
 Use LangGraph only for the HMM/error workflow loop and local subagent orchestration, not as the full app framework.
+The HMM state is a routing hint, not canonical truth; pair it with
+`RoutingPolicy` and `RetrievalExecutionBudget`, and keep it separate from
+`semantic_768` ownership or feature promotion.
 
 Implemented baseline modules:
 

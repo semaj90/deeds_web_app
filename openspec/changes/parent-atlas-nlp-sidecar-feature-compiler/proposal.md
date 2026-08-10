@@ -100,6 +100,14 @@ change captures that correction as a concrete implementation plan.
 - `acp-sidecar-tool-registration`: coarse-grained ACP tool registration for
   the sidecar's pass registry, so agents discover its capabilities through
   `GET /api/acp/tools` instead of needing raw HTTP client knowledge.
+- `runtime-owner-deduplication`: cross-cutting governance — the "one
+  canonical owner per capability" classification vocabulary, a
+  machine-readable registry (`docs/architecture/runtime-ownership-registry.json`),
+  a baseline-aware audit script (`npm run atlas:audit:ownership`), and the
+  requirement that new sidecar passes/backends land only after this audit
+  passes (Gate 0). **This capability landed 2026-08-09, ahead of the rest of
+  this change's implementation work** — governance-only, no sidecar code
+  touched; see tasks.md's Gate 0 for the acceptance record.
 
 ### Modified Capabilities
 (none — no existing `openspec/specs/*` capability has a requirements change)

@@ -13,7 +13,7 @@
  *
  * Model: embeddinggemma:latest (768 dimensions native)
  */
-import { ENV } from '$lib/server/env.server.js';
+import { ENV } from '../env.server.js';
 import type { SearchTier } from '$lib/server/retrieval/search-contract.js';
 
 /** Per-collection search config — tells callers how to build Qdrant queries */

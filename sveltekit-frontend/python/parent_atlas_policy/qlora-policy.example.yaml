@@ -1,0 +1,24 @@
+revision: parent-atlas.qlora-policy.v1
+purpose: constrained-tool-routing
+base_model: REPLACE_WITH_NON_QUANTIZED_CHECKPOINT
+tokenizer_revision: REQUIRED
+training_dataset: route-trace-policy-sft.jsonl
+
+lora:
+  rank: 8
+  alpha: 16
+  dropout: 0.05
+  target_module_patterns: []
+  require_module_discovery_before_training: true
+
+constraints:
+  preserve_hmm_state_contract: true
+  preserve_allowed_action_mask: true
+  max_parallel_tool_calls: 3
+  train_repository_knowledge_into_model: false
+
+evaluation:
+  require_held_out_route_accuracy: true
+  require_compile_test_success_comparison: true
+  require_invalid_action_rate: true
+  require_latency_token_comparison: true

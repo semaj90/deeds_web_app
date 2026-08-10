@@ -100,6 +100,7 @@
     "schema:post-apply:verbose": "node ../scripts/atlas/schema/post-apply-attest.mjs --verbose",
     "schema:ci": "npm run schema:exports:audit && npm run schema:migrations:check && npm run schema:migration:lint",
     "schema:ci:full": "npm run schema:exports:audit && npm run schema:migrations:check && npm run schema:inspect && npm run schema:drift:check && npm run schema:migration:lint",
+    "atlas:audit:ownership": "node ../scripts/atlas/audit-runtime-ownership.mjs",
     "atlas:smoke:packet-contract": "ts-node --project tsconfig.json scripts/atlas/validate-packet-contract.mjs",
     "atlas:smoke:completeness": "node ../scripts/atlas/smoke-completeness-validation.mjs",
     "atlas:smoke:completeness:watch": "node ../scripts/atlas/smoke-completeness-validation.mjs --watch",

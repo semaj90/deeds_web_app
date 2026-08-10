@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "atlas.feature-matrix-5.v1",
+  "features": [
+    {
+      "name": "entropy_norm",
+      "dtype": "float32",
+      "range": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "ast_signal",
+      "dtype": "float32",
+      "range": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "domain_fit",
+      "dtype": "float32",
+      "range": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "authority_norm",
+      "dtype": "float32",
+      "range": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "execution_utility",
+      "dtype": "float32",
+      "range": [
+        0,
+        1
+      ]
+    }
+  ],
+  "topology4": [
+    "som_x",
+    "som_y",
+    "authority_norm",
+    "entropy_utility_norm"
+  ]
+}

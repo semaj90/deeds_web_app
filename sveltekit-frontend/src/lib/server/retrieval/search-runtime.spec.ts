@@ -175,6 +175,20 @@ describe('search runtime bridge', () => {
       { includeVectorLanes: true }
     );
     expect(mockRerankCanonicalFeatureEnvelopes).toHaveBeenCalledTimes(1);
+    expect(mockRerankCanonicalFeatureEnvelopes.mock.calls[0]?.[2]).toEqual(
+      expect.objectContaining({
+        rerankTier: 'deep',
+        policyDecision: expect.objectContaining({
+          action: expect.any(String),
+          budget: expect.any(String),
+          stateHint: expect.any(String),
+        }),
+        executionBudget: expect.objectContaining({
+          maxParallelToolCalls: expect.any(Number),
+          maxContextTokens: expect.any(Number),
+        }),
+      }),
+    );
     expect(mockHydrateCandidatesWithProof).toHaveBeenCalledTimes(1);
     expect(mockRecordPromotionIntent).toHaveBeenCalledTimes(1);
     expect(result.packets).toHaveLength(1);

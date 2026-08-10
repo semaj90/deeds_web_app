@@ -733,6 +733,25 @@ query embedding
   → cluster/graph boost
 ```
 
+Keep the retrieval stack budgeted:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, rerank batch,
+  GPU bytes, and latency.
+- `GeometryExperimentManifest` records projection experiments and
+  diagnostics only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal after the budget check.
+
+Recommended load cap:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
+
+Treat `semantic_768` as the canonical vector space. Use Jacobian/SVD only as
+distortion diagnostics, not as ownership boundaries.
+
 ---
 
 ## 13. One-to-Many Triggers

@@ -81,6 +81,27 @@ NVMe / BitFrost-style cache:
 - Do not serialize raw llama-server KV cache.
 - Do not claim unverified native HMM/Rust bridge shipped unless artifacts exist.
 
+### Bounded routing / geometry contracts
+
+Treat routing and geometry as separate contracts:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, rerank batch size,
+  GPU bytes, and latency for one task.
+- `GeometryExperimentManifest` records projection experiments, source/target
+  spaces, and diagnostics only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal under budget.
+
+Recommended load cap:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
+
+Keep `semantic_768` as the canonical vector space. Use Jacobian/SVD only as a
+diagnostic for distortion, not as a second ownership boundary.
+
 ---
 
 ## 2. What official docs imply
@@ -214,6 +235,10 @@ else:
   state = GENERAL_RESEARCH
   prefer lanes = [wiki.search, qdrant_docs, FeatureMap summaries]
 ```
+
+The HMM state is a routing hint, not the source of truth. Candidate scoring
+still comes from vector/covector math, graph evidence, and rerankers; policy
+selection happens after the budget check.
 
 Then the agentic workflow becomes:
 

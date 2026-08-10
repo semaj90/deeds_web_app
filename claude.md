@@ -7,9 +7,10 @@
 ### Root Cause Found & Fixed
 `--skip-chat-parsing` flag forced llama-server to bypass template validation, leaking reasoning/tool-call syntax (`<|think|>`, `<thinking>`, `<|channel>`) into ordinary content, breaking Cline/OpenCode tool parsing and causing 1,506 identical retry attempts. **Solution: Deleted conditional block from launcher.**
 
-### Canonical Gemma4 Direct Profile (FROZEN)
+### Canonical llama-server Direct Profile (FROZEN)
 ```
-model: gemma4-legal-iq4xs-direct.gguf
+model: hforf.gguf
+alias: gemma4-legal-iq4xs-direct.gguf
 chat-template-file: configs/templates/custom_pub_chat_template_gemma4.jinja
 jinja: on
 reasoning: off
@@ -25,7 +26,7 @@ cache-type-v: q8_0
 ### 3-Point Validation Contract (PROVED Aug 4)
 1. **Clean streaming** ✅ — No control tokens in content (test 1 PASS)
 2. **Tool calls parsed** ✅ — Real `tool_calls` array, not textual (test 2 PASS)  
-3. **Model identity correct** ✅ — gemma4-legal-iq4xs-direct.gguf, context=131K (test 3 PASS)
+3. **Model identity correct** ✅ — hforf.gguf (alias: gemma4-legal-iq4xs-direct.gguf), context=65536 (live /slots)
 
 ### Launcher Change (FROZEN)
 - **File**: `scripts/launch-turboquant.ps1`
@@ -332,7 +333,7 @@ function validateWorkingDirectory(): void {
 ---
 
 ## Last Updated: July 28, 2026 (Cross-Directory Script Safety + Qdrant workspace_id Convention)
-## Status: All services UP ✅ | Gemma4 :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
+## Status: All services UP ✅ | llama-server hforf.gguf :8090 ✅ | Qdrant :6333 ✅ | TurboVec :8791 ✅ | Postgres ✅ | Valkey ✅ | BitFrost 155K keys ✅ | OpenCode agents bash FIXED ✅
 ## Pipeline Status: Phase 7 producing clean summaries (93% quality) → BitFrost cache warming (155,162 keys) → Summary indexing next → ACE packets deferred
 
 ---
@@ -472,7 +473,7 @@ OpenCode
 | Component | Status | Metric |
 |-----------|--------|--------|
 | **Workers** | ✅ LIVE (6 active) | 6 workers consuming from `summaries.worker.1-6` queues |
-| **Gemma4 Server** | ✅ LIVE | :8090 with clean Jinja template override |
+| **llama-server** | ✅ LIVE | :8090 with clean Jinja template override (hforf.gguf alias) |
 | **Summary Quality** | ✅ 100% CLEAN | 12,707 summaries written, 0 contaminated |
 | **Progress** | ✅ 31.2% COMPLETE | 12,707 / 40,754 chunks summarized |
 | **Throughput** | ✅ ~40 summaries/min | ETA 12 hours to completion |
@@ -525,10 +526,10 @@ OpenCode
 
 **All infrastructure services are operational. Two areas remain:**
 
-### 1. Feature Extraction → Gemma4 :8090 Synthesis ✅ WIRED
-- **Status**: ✅ COMPLETE (Session 99+ Continuation)
-- **What**: Entity extraction (LangExtract), pattern detection (forensic flags), AST code structure all routed through Gemma4 for unified NLP reranking
-- **Implementation**: Three new modules (`gemma4-nlp-reranker.ts`, `ast-langextract-bridge.ts`, `ast-grep-extractor.ts`) integrate with worker.ts
+### 1. Feature Extraction → Gemma4 :8090 Synthesis (LEGACY / REFERENCE ONLY)
+- **Status**: Historical wiring; do not treat as the current owner
+- **What**: This was the earlier unified rerank path that mixed LangExtract, AST structure, and forensic flags through Gemma4. Current ownership is split: Tree-sitter + ast-grep produce structural facts, LangExtract is optional, and llama-server/Gemma4 is a downstream consumer only.
+- **Implementation**: Historical modules (`gemma4-nlp-reranker.ts`, `ast-langextract-bridge.ts`, `ast-grep-extractor.ts`) are compatibility/reference only unless a current code path explicitly depends on them
 - **Key Files**:
   - `src/lib/server/analysis/gemma4-nlp-reranker.ts` (core unified reranker)
   - `src/lib/server/analysis/ast-langextract-bridge.ts` (orchestrates AST + LangExtract)
@@ -544,8 +545,8 @@ OpenCode
   - **Qdrant** (GPU vector index): named-vector "content" search (768-dim HNSW)
   - **TurboVec** (CUDA prefilter): 768→64 transform + RAM ANN (4-bit quantized)
   - **Go Retrieval** (facade): planned HTTP orchestration `/search` endpoint
-  - **Gemma4** (synthesis): structured feature extraction + bounded summaries
-- **Pipeline**: Query (768d) → embed → Qdrant ANN (20) → TurboVec prefilter (10) → Postgres join → unified rank (6-signal blend) → Gemma4 summary
+  - **Gemma4** (synthesis): structured feature extraction + bounded summaries (legacy label; current runtime is llama-server hforf.gguf)
+- **Pipeline**: Query (768d) → embed → Qdrant ANN (20) → TurboVec prefilter (10) → Postgres join → unified rank (6-signal blend) → llama-server summary
 - **Ranking Formula** (modular, independently tunable):
   - `0.30·qdrant_dense + 0.20·turbovec + 0.20·rg_lexical + 0.15·ast + 0.10·postgres + 0.05·freshness`
 - **Key Files**:
@@ -560,7 +561,7 @@ OpenCode
 
 ### 3. Canonical Evidence Ingestion Spine (End-to-End)
 - **Status**: ⏳ PARTIAL (Postgres + SeaweedFS + Qdrant UP, final synthesis not proven)
-- **What**: Evidence upload → Postgres row → SeaweedFS blob → Qdrant embedding → Neo4j topology → Redis cache → Gemma4 summary
+- **What**: Evidence upload → Postgres row → SeaweedFS blob → Qdrant embedding → Neo4j topology → Redis cache → llama-server summary
 - **Action**: Validate full chain from evidence upload to cached summary
 - **Key Files**:
   - `src/routes/api/evidence/upload/+server.ts` (intake)
@@ -584,9 +585,9 @@ curl -s http://127.0.0.1:11434/api/embeddings \
   -d '{"model":"embeddinggemma:latest","prompt":"test"}' | jq '.embedding | length'
 # Expected: 768
 
-# 2. Synthesis Server (Gemma4 RotorQuant at :8090)
+# 2. Synthesis Server (llama-server at :8090)
 curl -s http://127.0.0.1:8090/v1/models | jq '.data[0] | {id, context_length}'
-# Expected: id = "gemma4-legal-iq4xs-direct.gguf"
+# Expected: id = "hforf.gguf" (alias for gemma4-legal-iq4xs-direct.gguf)
 
 # 3. Go Retrieval (embedding sidecar + search)
 curl -s http://127.0.0.1:8100/health | jq '{embeddingServiceUp, pgvectorConnected, qdrantConnected}'
@@ -612,7 +613,7 @@ docker exec legal-ai-redis redis-cli PING
 
 ### Hard Rules for Graphify Startup
 
-- ❌ **Do NOT use Ollama for synthesis.** Gemma4 RotorQuant at :8090 is canonical.
+- ❌ **Do NOT use Ollama for synthesis.** llama-server at :8090 is canonical.
 - ✅ **Run graphify and DuckDB/RabbitMQ export scripts from the repo root** so spawned subprocesses and report paths resolve the same workspace. The scripts now align `cwd` internally and gzip large DuckDB exports automatically.
 - ✅ **Use `embeddinggemma:latest` for embeddings** (768-dim, Ollama :11434)
 - ✅ **All vectors must be 768-dim** (not 384, not 64-dim AE for ANN)
@@ -626,7 +627,7 @@ docker exec legal-ai-redis redis-cli PING
 
 **Checks 7 critical services**:
 1. Embedding Service (embeddinggemma @ :11434) — ✅
-2. Gemma4 Synthesis (:8090) — ✅
+2. llama-server synthesis (:8090) — ✅
 3. Go Retrieval (:8100) — ✅
 4. TurboVec ANN (:8791) — ✅
 5. Qdrant Vector DB (:6333) — ✅
@@ -748,6 +749,59 @@ plausible "the codebase probably already does this somewhere" smell):
 **Where this is being actively tracked**: `openspec/changes/parent-atlas-graph-analysis-contract/`
 (PageRank/projection findings above), `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/`
 (reranker audit + ACP registration, tasks.md sections 6 and 11).
+
+### One Canonical Runtime Owner Per Capability (governance layer, Aug 9 2026)
+
+The 6 rules above are the discipline an agent follows in the moment. This section is the
+**institutionalized** version — a durable classification vocabulary plus a machine-readable
+registry (`docs/architecture/runtime-ownership-registry.json`) and an audit script
+(`npm run atlas:audit:ownership`, `scripts/atlas/audit-runtime-ownership.mjs`) so the check
+doesn't depend on an agent remembering to grep first.
+
+**Invariant**: ONE logical capability → ONE canonical runtime owner → MANY backends/adapters/
+experiments allowed → ZERO uncoordinated peer owners.
+
+**Classification vocabulary** — every implementation of a capability gets exactly one label:
+
+| Label | Meaning |
+|---|---|
+| `CANONICAL_OWNER` | The one contract other code depends on. Exactly one per capability. |
+| `BACKEND` | A swappable implementation behind the canonical owner (e.g. MiniLM vs. Mixedbread behind `canonical-rerank-executor.ts`). |
+| `ADAPTER` | Wraps an external tool/library to conform to the canonical contract (e.g. a `treesitter-chunker`-backed producer of `AstUnit`). An adapter is never the source of truth and must not become a second owner. |
+| `EXPERIMENT` | Explicitly non-production, evaluated but not wired into the canonical path. |
+| `COMPATIBILITY` | Kept only so an old caller doesn't break; not for new use. |
+| `FIXTURE_ONLY` | Test/proof-of-concept data, never touches production tables for real traffic. |
+| `DEAD` | Confirmed zero callers — flagged for archival, not deleted (see Archival Rules). |
+
+**Before adding any new retrieval lane, reranker, graph algorithm, representation, sidecar
+service, ACP/MCP tool, persistence writer, cache, feature producer, or chunking
+implementation**: search existing implementations, identify their callers/contract/persistence
+boundary, classify each one found, and extend the `CANONICAL_OWNER` rather than create a peer
+owner. **If ownership can't be established, stop and record the ambiguity in an OpenSpec
+change — don't implement past that point.**
+
+**Explicitly prohibited without an explicit classification decision first**: a second
+independently-selectable production RRF vote for one logical retrieval lane; a second
+canonical persistence writer for one capability; a second canonical `representation_id` for
+what's conceptually the same semantic representation (though same vector *dimension* — e.g.
+`semantic_768` vs. a future `codebert_768` — never implies representation identity on its own,
+they can legitimately coexist as distinct representations); a second graph-algorithm
+dispatcher; a second reranker external contract; a second ACP/MCP tool exposing the same
+capability; a second AST identity authority; a new sidecar service created only because a
+library happens to expose a convenient API.
+
+**Baseline vs. new violations**: `docs/architecture/runtime-ownership-baseline.json` records
+already-known duplication (the 13 unclassified reranker files, the dead/fixture-only PageRank
+paths, etc.) so the audit script doesn't fail on debt that predates it. The rule is **existing
+debt is a documented, tolerated warning; a *new* uncoordinated peer owner introduced by a
+current diff is a failure.** Do not let a governance audit turn into a mandate to refactor
+everything it finds — inventory first, remediate later, as its own explicit task.
+
+**See**: `docs/architecture/runtime-ownership-registry.json` (the data),
+`docs/architecture/runtime-ownership-baseline.json` (tolerated existing debt),
+`scripts/atlas/audit-runtime-ownership.mjs` (the mechanical check),
+`openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/specs/runtime-owner-deduplication/`
+(the spec-level requirements this governance layer enforces).
 
 ---
 
@@ -972,7 +1026,7 @@ For modules in `packages/atlas-core/src/` that need to read real Postgres/Redis:
 
 **Document**: `docs/architecture/ACP-GEMMA4-MEMORY-HIERARCHY.md`
 
-**Core Principle**: Gemma4 is the LAST stage of a 6-stage pipeline, not the memory system.
+**Core Principle**: Gemma4 is the LAST stage of a 6-stage pipeline, not the memory system. This is historical guidance; the live synthesis owner is `llama-server` on `:8090`.
 
 The ACP (Agent Control Plane) handles all memory, search, caching, and packet compaction. Gemma4 receives only a compact, tokenized, validated bundle and performs attention/synthesis.
 
@@ -982,7 +1036,7 @@ The ACP (Agent Control Plane) handles all memory, search, caching, and packet co
 3. BitFrost cache (Redis L1 memory, 5–20ms lookup)
 4. Cache miss → Search pipeline (rg → Postgres → Qdrant → Neo4j → ...)
 5. Packet compaction (4,800 tokens instead of 18,800)
-6. Gemma4 synthesis (only now, with compact bundle)
+6. Gemma4 synthesis (only now, with compact bundle; historical label for the live llama-server synthesis stage)
 
 **Memory Hierarchy** (like CPU caches):
 - Gemma4 ← L1 BitFrost Redis ← L2 Postgres JSONB ← L3 Qdrant ← L4 Neo4j ← L5 Filesystem ← L6 Internet
@@ -1188,7 +1242,7 @@ Redis BitFrost exact (L1)
 → Postgres FTS/trigram (fallback)
 → Neo4j bounded k-hop neighbors (topology only)
 → DuckDB offline reports (analytics only)
-→ Gemma4 synthesis (last resort)
+→ llama-server synthesis (last resort)
 ```
 
 ### Storage Mirrors (All Synchronized)
@@ -3253,13 +3307,13 @@ See `sveltekit-frontend/scripts/docs/compiler-stack-explainer.md` for complete r
 
 ---
 
-## Graphify/Karpathy Stack (May 4, 2026)
+## Graphify/Karpathy Stack (LEGACY / REFERENCE ONLY — May 4, 2026)
 
 3-layer codebase intelligence with `graphify:*` npm aliases over existing scripts:
 
 | Layer | Command | Output | Cost |
 |-------|---------|--------|------|
-| 1 — Map | `graphify:daily` / `graphify:map` | `docs/graph/codebase-graph.json` + `codebase-map.md` + Redis `code:index:*` + `wiki:note:dir:*` | ~3-5s, no GPU |
+| 1 — Map | `graphify:daily` / `graphify:map` *(legacy alias; real writer is `scripts/index-codebase-fast.mjs`)* | `docs/graph/codebase-graph.json` + `codebase-map.md` + Redis `code:index:*` + `wiki:note:dir:*` | ~3-5s, no GPU |
 | 2 — Semantic | `graphify:semantic` / `graphify:topology` | Qdrant `codebase_chunks_768` + hypergraph + Qdrant tags | ~30-60s |
 | 3 — Full GPU | `graphify:full` / `graphify:gpu:turbo` | SOM + hypergraph + PageRank + Neo4j + cluster synthesis + ACE plans | ~5-10 min |
 
@@ -3277,9 +3331,9 @@ VS Code tasks: `🗺️ Graphify: Daily Map`, `🔎 Graphify: Semantic Index`, `
 
 ---
 
-## Karpathy GPU Authority Blend + Redis ACE Cache (May 8, 2026)
+## Karpathy GPU Authority Blend + Redis ACE Cache (LEGACY / REFERENCE ONLY — May 8, 2026)
 
-Single-pipeline composite score for "where to focus" agent recommendations. Combines Neo4j PageRank, GPU semantic attention, and graph authority into one Redis-cached blend that ACE/MCP/synthesis tools read in O(1).
+Single-pipeline composite score for "where to focus" agent recommendations. Historical blend only; current Parent Atlas retrieval ownership is elsewhere. This combines Neo4j PageRank, GPU semantic attention, and graph authority into one Redis-cached blend that ACE/MCP/synthesis tools read in O(1).
 
 ### Pipeline (`scripts/karpathy-gpu-enrich.mjs`)
 ```
@@ -3578,7 +3632,7 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 - `docs/architecture/phase-101-completion-plan.md` — **Phase 101 completion plan** (2026-06-02): 7-block, 8-10h plan — git-diff cold archive, promotion boundary, schema migrations, Gemma4 task summaries, Valkey swap, Omni-Worker scaffold, OpenCode Kanban. Run order and verification gates included.
 - `docs/ai-os/opencode-context-window.md` — OpenCode context window config (2026-06-02): two-cap problem (server `-c` + client `contextLength`), `/slots` endpoint explained, `ROTORQUANT_KV_ENABLED` is a dead var, model path fix in `.env`.
 - `docs/architecture/retrieval-layer-separation.md` — **Three-layer retrieval separation** (2026-06-02): Orchestrator → Search Contract → Backend Implementation. Hard rule: callers never call QdrantManager directly; all ANN retrieval enters through `retrieval/orchestrator.ts` or `search/qdrant-search.ts:searchCodebaseAnn()`. TurboVec is additive (rerank + prefilter), not a Qdrant replacement. cuVS/IVF seam is ready in Layer 3.
-- `sveltekit-frontend/docs/architecture/trace-runtime-split.md` — TRACE/Karpathy runtime boundary rule (Gemma4 → MCP only, never raw infra)
+- `sveltekit-frontend/docs/architecture/trace-runtime-split.md` — TRACE/Karpathy runtime boundary rule (llama-server/Gemma4 → MCP only, never raw infra)
 - `sveltekit-frontend/docs/architecture/trace-kag-web-development-guide.md` — 23-section practical guide (route contract, retrieval lane decision tree, Admin Copilot safety, browser context lane, RabbitMQ/sidecar rules, production safety gates)
 - `sveltekit-frontend/docs/architecture/hermes-agent-windows-gemma4-guide.md` — Hermes Agent + WSL2 + local Gemma4 integration (allowlist/blocklist of TRACE tools, port reconciliation, TurboQuant Gemma4 binary caveat)
 - `sveltekit-frontend/memory/architecture/mcp-mount-smoke-2026-05-09.md` — post-restart MCP mount + smoke verification log (live `tools/list`: 42 tools after the per-request transport fix; 5 registries silent-failing — adminTools/skillTools/codebaseTools/bifrostTools/topologyMgmtTools; G33/G34/G37 green; G38 referenced in trace-runtime-split rule #8; Phase D hooks deferred)
@@ -3596,11 +3650,11 @@ See `memory/reconstruction-3-tracks.md` for full SceneIntent schema, RabbitMQ qu
 
 ## OpenCode + llama-server Config — Validated Shape (June 2026)
 
-### Root cause: embedded GGUF template drops system role
+### Root cause: historical template mismatch, now fixed in the live launch config
 
-The embedded `gemma` chat template in `gemma4-legal-iq4xs-direct.gguf` predates system-role support. Without overriding it, `/props` shows `supports_system_role: false` and the system prompt is silently dropped.
+The older embedded `gemma` chat template path was the source of the earlier system-role drop. The live server on `:8090` now reports `supports_system_role: true` and `supports_tool_calls: true`, which means the current launch path is using the corrected chat-template wiring.
 
-**Fix (wired in `launch-turboquant.ps1`)**: pass `--chat-template-file configs/templates/gemma4-opencode.jinja` before `--jinja`. The jinja template in this repo handles system role (injected as `user/Understood` pair) and tool calls (`tool_call` fenced blocks).
+**Current rule**: keep the `--chat-template-file configs/templates/gemma4-opencode.jinja` override in the launcher so the runtime stays on the validated template path.
 
 ```
 llama-server.exe -m model.gguf
@@ -3614,7 +3668,7 @@ llama-server.exe -m model.gguf
 
 Do NOT pass: `--chat-template gemma`, `--chat-template gemma3`, `--reasoning auto`, `--reasoning-budget 0` — older named templates cause `supports_system_role: false` on this build.
 
-After restart with `--chat-template-file`, `/props` shows `supports_system_role: true, supports_tool_calls: true`.
+After restart, `/props` should still show `supports_system_role: true, supports_tool_calls: true`.
 
 **Sanity check** (run after any llama-server restart):
 ```powershell

@@ -12,7 +12,7 @@
  *
  * When LANGFUSE_ENABLED=false (default), all trace functions are no-ops — zero overhead.
  */
-import { ENV } from '$lib/server/env.server.js';
+import { ENV } from '../env.server.js';
 
 // Lazy singleton — only created when LANGFUSE_ENABLED=true
 let _langfuse: any = null;

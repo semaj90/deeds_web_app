@@ -1,43 +1,97 @@
 {
-  "rerank": {
-    "backends": [
-      "cross-encoder",
-      "minilm",
-      "mixedbread",
-      "triton"
-    ],
-    "owner": "canonical-rerank-executor.ts",
-    "contract": "RerankResult"
-  },
-  "graph_analysis": {
-    "backends": [
-      "neo4j_gds",
-      "cugraph"
-    ],
-    "oracles": [
-      "networkx"
-    ],
-    "owner": "graph-analysis-runner.ts"
-  },
-  "lexical_exact": {
-    "backends": [
-      "ripgrep"
-    ],
-    "owner": "router-matrix.ts"
-  },
-  "structural_extraction": {
-    "backends": [
-      "treesitter-chunker"
-    ],
-    "primitives": [
-      "tree-sitter",
-      "ast-grep"
-    ],
-    "contract": "AstUnit",
-    "owner": "python/miniforge_nlp_sidecar.py"
-  },
-  "semantic_768": {
-    "representation_id": "semantic_768",
-    "owner": "canonical embedding service"
+  "schema_version": "atlas.runtime-ownership.v1",
+  "generated": "2026-08-09",
+  "note": "Populated only from repository evidence gathered live this session (grep for callers, live DB/Neo4j checks). Entries marked \"unproven\": true are named but their live wiring was not independently confirmed — do not treat them as verified facts.",
+  "capabilities": {
+    "graph_analysis": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts",
+        "export": "runGraphAnalysis",
+        "evidence": "Dispatches pagerank/louvain/leiden/cheirank/kcore/betweenness; all live-verified 2026-08-09 (see openspec/changes/parent-atlas-graph-analysis-contract/tasks.md)."
+      },
+      "backends": [
+        { "name": "neo4j-gds-pagerank", "path": "sveltekit-frontend/src/lib/server/graph/pagerank-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
+        { "name": "neo4j-gds-louvain-leiden", "path": "sveltekit-frontend/src/lib/server/graph/graph-analysis-runner.ts::runCommunityAnalysis", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
+        { "name": "neo4j-gds-cheirank", "path": "sveltekit-frontend/src/lib/server/graph/cheirank-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" },
+        { "name": "neo4j-gds-kcore", "path": "sveltekit-frontend/src/lib/server/graph/kcore-analysis-adapter.ts", "classification": "BACKEND", "status": "RUNTIME_SMOKE_PROVEN" }
+      ],
+      "persistence_targets": ["graph_analysis_runs", "graph_node_metrics", "graph_community_assignments", "graph_communities"],
+      "known_existing_duplication": [
+        { "path": "atlas_graph_authority_runs (Postgres table, v1)", "classification": "DEAD", "evidence": "Zero callers of PageRankPromotionGate anywhere in repo; one stale 2026-07-22 row." },
+        { "path": "atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2 (Postgres tables)", "classification": "FIXTURE_ONLY", "evidence": "Writer functions (persistGraphAuthorityRunV2 etc.) have zero callers; the one live row came from python/parent_atlas_networkx_pagerank.py, which only prints JSON to stdout and never calls the writer." },
+        { "path": "scripts/graphify-authority.mjs", "classification": "COMPATIBILITY", "evidence": "Separate Neo4j-property + Redis + Qdrant write path, untouched by this session's work; not confirmed dead, not folded into the canonical owner either." },
+        { "path": "scripts/run-pagerank.ts", "classification": "COMPATIBILITY", "evidence": "Separate CouchDB + GPU path (couchdb:pagerank_scores Redis cache); untouched, not confirmed dead." }
+      ]
+    },
+    "rerank": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/retrieval/canonical-rerank-executor.ts",
+        "evidence": "Docstring self-identifies as canonical; imports blendScores/RuntimeReranker from runtime-reranker.ts."
+      },
+      "backends": [
+        { "name": "cross-encoder (via runtime-reranker.ts blendScores)", "classification": "BACKEND", "unproven": false },
+        { "name": "xgboost-fallback", "classification": "BACKEND", "evidence": "Named in canonical-rerank-executor.ts's own docstring as the fallback path." }
+      ],
+      "known_existing_duplication": [
+        { "note": "13 other files matching *reranker* in sveltekit-frontend/src/lib/server/retrieval/ (attention-reranker.ts, boosted-reranker.ts, cluster-aware-reranker.ts, cross-encoder-reranker.ts, cuda-rnn-reranker.ts, gpu-reranker.ts, langextract-reranker.ts, noun-reranker.ts, post-process-reranker.ts, reranker-blend.ts, runtime-reranker.ts, semantic-vector-reranker.ts, triton-reranker.ts, turbovec-rerank.ts) are UNCLASSIFIED — found live 2026-08-09, not yet audited for caller status.", "classification": "UNCLASSIFIED" }
+      ]
+    },
+    "structural_extraction": {
+      "canonical_data_contract": {
+        "classification": "CANONICAL_OWNER",
+        "name": "AstUnit / Boundary IR",
+        "persistence_target": "atlas_ast_nodes",
+        "evidence": "Live Postgres schema confirmed 2026-08-09 via \\d atlas_ast_nodes: tree_node_id, qualified_symbol, parser_name, parser_version, grammar_version present; no packet_key column, confirming identity-agnostic design."
+      },
+      "current_producer": {
+        "classification": "ADAPTER",
+        "name": "treesitter-chunker",
+        "evidence": "Listed as a pip dependency in docker/miniforge-nlp-sidecar/Dockerfile; TREESITTER_CHUNKER_AVAILABLE probed live in python/miniforge_nlp_sidecar.py. Container rebuild + live /health check not yet independently re-verified this session."
+      },
+      "parser_engine": { "name": "tree-sitter / tree-sitter-language-pack", "classification": "BACKEND" },
+      "structural_query_rewrite": { "name": "ast-grep-py", "classification": "ADAPTER", "note": "Separate layer from the chunking application — not a competing structural owner." }
+    },
+    "semantic_768": {
+      "owner": {
+        "classification": "UNKNOWN",
+        "unproven": true,
+        "note": "Which service actually generates semantic_768 in production was not independently confirmed this session — openspec/changes/parent-atlas-semantic-768-canonical-contract/ should be read before recording an owner here. Do not guess."
+      }
+    },
+    "lexical_exact": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/retrieval/router-matrix.ts",
+        "evidence": "Declares 'lexical_exact' as one of 8 SignalType values in its 4x4 query router; query-router-4x4.ts also references it. Whether rg/ripgrep is the underlying implementation mechanism was not independently confirmed."
+      },
+      "unproven_note": "The exact implementation mechanism behind lexical_exact (rg, Postgres FTS, or something else) is not confirmed — only that router-matrix.ts owns the signal type."
+    },
+    "acp_sidecar_tools": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+        "evidence": "Confirmed live 2026-08-09: zero existing references to 'miniforge', 'rg_search', or 'ripgrep' — the NLP sidecar's capabilities are not yet registered here at all (a gap, not a duplication — tracked in parent-atlas-nlp-sidecar-feature-compiler)."
+      }
+    },
+    "atlas_envelope_validation": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/atlas/envelope-validator.ts",
+        "export": "validateAtlasEnvelope",
+        "evidence": "CREATED + unit-proven in isolation 2026-08-09 (7/7 tests, tests/atlas/envelope-validator.spec.ts, incl. shuffled-delivery replay proof). NOT yet wired into any live producer — see openspec/changes/parent-atlas-unordered-execution-contract/tasks.md Phase 10. Distinct capability from packet_envelope_validation below (pass-result validation vs. at-rest packet-shape validation) — do not merge."
+      },
+      "known_existing_duplication": []
+    },
+    "packet_envelope_validation": {
+      "owner": {
+        "classification": "CANONICAL_OWNER",
+        "path": "sveltekit-frontend/src/lib/server/db/packet-topology-envelope.ts",
+        "export": "validatePacketEnvelope",
+        "evidence": "Validates PacketTopologyEnvelope at-rest shape across Postgres/Qdrant/Redis/Neo4j/ACP-RPC handoffs. Confirmed live 2026-08-09 via full read; re-exported by src/lib/server/hyperrag/packet-topology-envelope.ts and consumed by src/lib/server/acp/packet-envelope-validator.ts."
+      },
+      "known_existing_duplication": []
+    }
   }
 }

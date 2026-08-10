@@ -1353,6 +1353,27 @@ Do not do yet:
 - [ ] do not run full 10M TurboVec ingest
 - [ ] do not scale before cache tests are green
 
+### Bounded routing / geometry contracts
+
+Treat routing, geometry, and policy as separate contracts:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, rerank batch
+  size, GPU bytes, and latency for one task.
+- `GeometryExperimentManifest` records projection experiments, source/target
+  spaces, and diagnostics only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal under budget.
+
+Recommended load cap:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
+
+Keep `semantic_768` as the canonical vector space. Use Jacobian/SVD only as a
+distortion diagnostic, not as an ownership boundary or new truth lane.
+
 ---
 
 ## 15. Final Mental Model

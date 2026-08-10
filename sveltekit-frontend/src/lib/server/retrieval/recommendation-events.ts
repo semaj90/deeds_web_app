@@ -14,7 +14,7 @@
  *     after logging.  The retrieval hot path must never block on analytics.
  */
 
-import { db } from '$lib/server/db/client.js';
+import { db } from '../db/client.js';
 import { sql } from 'drizzle-orm';
 import { createHash } from 'node:crypto';
 

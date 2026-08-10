@@ -6,9 +6,103 @@ code, live-verify before calling anything done, record findings in this
 file as they're discovered). Nothing past task 0.1 is implied to start just
 because an earlier task finished.
 
+## OD. Runtime ownership governance (2026-08-09) — DONE, before any pass-registry code
+
+Governance-only slice, landed ahead of the rest of this change's tasks per
+explicit user direction: "the ownership governance should happen BEFORE new
+sidecar passes/backends are added." No sidecar code touched by this section.
+
+- [x] OD0 Audited before editing: read `CLAUDE.md`'s existing "Duplication
+      Prevention" section, this change's own proposal/design, this change's
+      `acp-sidecar-tool-registration` spec, `canonical-rerank-executor.ts`,
+      `graph-analysis-runner.ts`, `router-matrix.ts`/`query-router-4x4.ts`,
+      `ACPToolRegistry.ts` — all already confirmed live earlier this session,
+      reused rather than re-verified to conserve context budget.
+- [x] OD1 Extended `CLAUDE.md`'s existing "Duplication Prevention" section
+      with a new "One Canonical Runtime Owner Per Capability" subsection —
+      the classification vocabulary (`CANONICAL_OWNER`/`BACKEND`/`ADAPTER`/
+      `EXPERIMENT`/`COMPATIBILITY`/`FIXTURE_ONLY`/`DEAD`), the "search →
+      classify → extend, don't create a peer owner" rule, explicit
+      prohibitions (duplicate RRF votes, duplicate canonical writers,
+      duplicate `representation_id`s, duplicate dispatchers, duplicate ACP
+      tools, duplicate AST identity authorities, sidecars created just
+      because a library exposes an API), and the baseline/new-violation
+      distinction. Extended the existing section rather than creating a
+      parallel one — same governance topic.
+- [x] OD2 Added the `runtime-owner-deduplication` OpenSpec capability
+      (`specs/runtime-owner-deduplication/spec.md`, 5 requirements) to this
+      change — cross-cutting, not an NLP implementation detail, per explicit
+      direction.
+- [x] OD3 Created `docs/architecture/runtime-ownership-registry.json`
+      (schema `atlas.runtime-ownership.v1`). Populated **only** from
+      repository evidence already gathered live this session — `graph_analysis`
+      (owner: `graph-analysis-runner.ts::runGraphAnalysis`, 4 proven
+      backends, 4 known-duplicate entries classified DEAD/FIXTURE_ONLY/
+      COMPATIBILITY), `rerank` (owner: `canonical-rerank-executor.ts`, 13
+      unclassified peer files listed, not silently assumed safe), `structural_extraction`
+      (canonical contract `AstUnit`/`atlas_ast_nodes` vs. current producer
+      `treesitter-chunker` kept distinct), `lexical_exact` (owner:
+      `router-matrix.ts`), `acp_sidecar_tools` (owner: `ACPToolRegistry.ts`).
+      `semantic_768`'s owner recorded as `UNKNOWN`/`unproven: true` —
+      **not guessed**, per explicit instruction, since this session never
+      independently confirmed which service generates it in production.
+- [x] OD3b Created `docs/architecture/runtime-ownership-baseline.json` — the
+      baseline/new-violation distinction the user identified as the critical
+      missing piece ("without it the first ownership CI run will discover
+      all the architectural debt you already know exists and either fail
+      forever or tempt the agent into a giant cleanup"). Lists the 13
+      unclassified reranker files and 4 graph_analysis duplicates as
+      `tolerated` — known debt, not failures.
+- [x] OD4 Created `scripts/atlas/audit-runtime-ownership.mjs` — mechanical
+      checks only (schema version recognized, no duplicate capability IDs,
+      no entry double-classified as both `CANONICAL_OWNER` and a
+      backend/duplicate, baseline-aware new-vs-known-existing distinction).
+      Does not attempt the more ambitious checks from the original brief
+      (ACP tool name uniqueness, `FeatureRegistry` ID uniqueness, RRF
+      fusion-vote counting) — those require registries/integrations not yet
+      proven to exist this session; building checks against unconfirmed
+      systems would itself violate this governance layer's own "don't guess"
+      rule. Extending the script once those systems are confirmed is a
+      follow-up task, not done here.
+- [x] OD5 Audit output format implemented per spec:
+      `schema_version, status, capabilities_checked, violations, warnings,
+      known_existing, not_proven`.
+- [x] OD6 Added `npm run atlas:audit:ownership` (points to
+      `node ../scripts/atlas/audit-runtime-ownership.mjs` from
+      `sveltekit-frontend/`, matching this repo's existing `atlas:*` script
+      naming convention).
+- [x] OD7 `scripts/atlas/audit-runtime-ownership.test.mjs` — runnable-script
+      convention (matching `qdrant-parity-repair.test.mjs`), not vitest,
+      since `scripts/atlas/*.mjs` in this repo run standalone. Covers the 4
+      required minimum cases (one owner + backends passes; two
+      `CANONICAL_OWNER` entries for one capability fails; a baseline-listed
+      item is `known_existing` not a violation; an item not in the baseline
+      is a new violation) via a pure reimplementation of the audit's core
+      check, plus a 5th cross-check that runs the real script against the
+      real live repo registry to catch drift between the test's
+      reimplementation and the actual logic. **Live run 2026-08-09: 6/6
+      cases PASS.**
+- [x] OD8 This section itself is the OpenSpec task checkpoint requested —
+      placed before section 0 (pre-flight) rather than after, so it's
+      structurally impossible to reach the sidecar-implementation gates
+      without this section already being visible as done-or-not.
+
+**OD-Result (2026-08-09, live)**: `npm run atlas:audit:ownership` from
+`sveltekit-frontend/` → `status: 'PASS'`, `capabilities_checked: 6`,
+`violations: []`, 1 `known_existing` entry (the 13 unclassified reranker
+files, correctly recognized as baseline debt not a new violation), 1
+`not_proven` entry (`semantic_768`, correctly flagged rather than guessed).
+
+**Explicitly not done in this slice** (per hard scope): no reranker files
+consolidated or deleted, no PageRank code modified, no graph algorithm
+behavior changed, no retrieval scoring/RRF/Qdrant/AST-identity changes, no
+sidecar migration, no promotion of CheiRank/k-core/betweenness. Graph status
+unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
+`RUNTIME_SMOKE_PROVEN`, not re-evaluated or promoted by this governance work.
+
 ## 0. Pre-flight (do this before any pass-registry code)
 
-- [ ] 0.1 Rebuild `docker/miniforge-nlp-sidecar` and hit its `/health`
+- [x] 0.1 Rebuild `docker/miniforge-nlp-sidecar` and hit its `/health`
       endpoint live — confirm `treesitterChunker.available: true` (the
       Dockerfile already lists `treesitter-chunker` as a pip dependency and
       the source already probes for it, but this has not been verified live
@@ -29,7 +123,7 @@ because an earlier task finished.
       in full — confirms which service actually owns `semantic_768`
       generation before this change's semantic-card work assumes it can call
       it directly.
-- [ ] 0.5 Add a read-only bind mount to
+- [x] 0.5 Add a read-only bind mount to
       `docker/miniforge-nlp-sidecar/docker-compose.yml`
       (`../..:/workspace:ro` or equivalent — confirmed live 2026-08-09 that
       none currently exists). Required before any structural pass that reads

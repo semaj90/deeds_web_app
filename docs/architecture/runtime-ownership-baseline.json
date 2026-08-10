@@ -1,0 +1,27 @@
+{
+  "schema_version": "atlas.runtime-ownership-baseline.v1",
+  "generated": "2026-08-09",
+  "purpose": "Snapshot of already-known duplication/ambiguity so the ownership audit distinguishes pre-existing architectural debt (tolerated, warning-only) from NEW duplication introduced by a current diff (failure). Do not let a governance audit become a mandate to fix everything it finds — this file is what makes 'inventory now, remediate later as its own task' actually enforceable.",
+  "tolerated": [
+    { "capability": "graph_analysis", "item": "atlas_graph_authority_runs (v1)", "classification": "DEAD" },
+    { "capability": "graph_analysis", "item": "atlas_graph_authority_runs_v2 / atlas_graph_authority_scores_v2", "classification": "FIXTURE_ONLY" },
+    { "capability": "graph_analysis", "item": "scripts/graphify-authority.mjs", "classification": "COMPATIBILITY" },
+    { "capability": "graph_analysis", "item": "scripts/run-pagerank.ts", "classification": "COMPATIBILITY" },
+    { "capability": "rerank", "item": "attention-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "boosted-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "cluster-aware-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "cross-encoder-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "cuda-rnn-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "gpu-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "langextract-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "noun-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "post-process-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "reranker-blend.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "runtime-reranker.ts", "classification": "UNCLASSIFIED (though imported by the canonical owner — likely BACKEND, not yet formally classified)" },
+    { "capability": "rerank", "item": "semantic-vector-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "triton-reranker.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "rerank", "item": "turbovec-rerank.ts", "classification": "UNCLASSIFIED" },
+    { "capability": "acp_sidecar_tools", "item": "miniforge_nlp_sidecar.py capabilities not registered in ACPToolRegistry.ts", "classification": "GAP (not a duplication — tracked as new work in parent-atlas-nlp-sidecar-feature-compiler, not baseline debt)" }
+  ],
+  "rule": "A capability's audit result is PASS if every violation found is already listed in `tolerated` above (by capability + item). A violation NOT in this list is a NEW violation and fails the audit. Update this file only as a deliberate, reviewed action when debt is intentionally accepted — not automatically by the audit script itself."
+}

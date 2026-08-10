@@ -28,6 +28,27 @@ TRACE/Karpathy uses this runtime division:
 - **MCP** = safe model-facing tool surface, primarily `trace-mcp-server.ts` on port `8788`
 - **gRPC** = typed worker/service boundary underneath MCP, not directly exposed to the LLM
 
+## Bounded routing / geometry contracts
+
+Use these as the guardrails for mixed retrieval / routing tasks:
+
+- `RetrievalExecutionBudget` caps active lanes, graph depth, rerank batch
+  size, GPU bytes, and latency for one task.
+- `GeometryExperimentManifest` records projection experiments, source/target
+  spaces, and diagnostics only.
+- `RoutingPolicy` chooses between HMM, logistic gating, rerank, and graph
+  traversal under budget.
+
+Recommended load cap:
+
+1 graph job
+1 deep rerank job
+1 structural/NLP job
+everything else queued async
+
+Keep `semantic_768` as the canonical vector space. Use Jacobian/SVD only as a
+distortion diagnostic, not as a second ownership boundary.
+
 ## Boundary Rule (load-bearing)
 
 Gemma4 must NOT call raw DB, raw search, raw Qdrant, raw Neo4j, or raw gRPC directly.

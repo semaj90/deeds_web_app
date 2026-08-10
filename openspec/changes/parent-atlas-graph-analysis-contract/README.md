@@ -277,3 +277,11 @@ None of GA1–GA9 are started. This change implements **GA0 only** (Patch A).
   existing raw-vs-promoted PageRank pattern this change generalizes
 - `sveltekit-frontend/src/lib/server/graph/pagerank-promotion-gate.ts` —
   existing promotion gate implementation
+- `openspec/changes/parent-atlas-unordered-execution-contract/` (2026-08-09)
+  — sequences this change's remaining work (Patch H, GA8/GA9) as Phase 1/4/5
+  of a 10-phase repo-wide plan; also owns the `AtlasEnvelopeV1` identity/
+  revision/idempotency contract (QUIC-inspired: unordered arrival is fine,
+  ambiguous identity/order is not) and the found-but-unwired
+  `codebase-graph.json` writer (`scripts/index-codebase-fast.mjs`) follow-up;
+  the earlier `graphify:map` reference is a stale doc alias, not a live
+  script

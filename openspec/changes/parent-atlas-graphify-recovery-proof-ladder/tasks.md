@@ -355,6 +355,138 @@ report existing baseline failures separately.
   new directory instead, per the source spec's own instruction not to append to either
   conflicting `parent-atlas-graph-retrieval-proof/tasks.md`.
 
+## Scoped codebase-graph.json refresh — stall diagnosed and fixed (2026-08-09)
+
+Separate from the 18-phase Graphify pipeline above: `scripts/index-codebase-fast.mjs` — the
+"20-Gate Deep Audit" fast AST indexer that produces `docs/graph/codebase-graph.json` — is the
+prerequisite freshness gate for `parent-atlas-graph-analysis-contract` Patch H (betweenness),
+not part of Graphify itself, but tracked here since this file owns "stage profiling,
+deterministic publication, and graph provenance" for this artifact per the addendum ownership
+note in `parent-atlas-semantic-768-canonical-contract`.
+
+**Root cause (CONFIRMED, not just "strong candidate")**: the G13 dead-export cross-file pass
+(lines ~665-670 pre-fix) was `for (const f of files) { for (const name of Object.keys(
+exportImportCounts)) { if (srcKey.includes(name)) ... } }` — O(files × distinct_export_names)
+with a `.includes()` substring scan per pair, and **zero progress output** inside the loop. For
+a full/scoped run with tens of thousands of files/exports this could run for a very long time
+at ~98% CPU with no output — exactly what was observed (frozen file-count checkpoint, process
+alive, no crash). Confirmed by direct code reading, not inferred from timing alone.
+
+**Also found while confirming**: the check was checking the wrong thing besides being slow — it
+tested whether an export name appeared as a *substring of concatenated import module paths*
+(e.g. `'user'` matching inside `'./lib/user-service'`), not whether the symbol was actually
+imported anywhere. And its output (`exportImportCounts`) was **never read again anywhere in the
+file** (confirmed via full-file grep) — the entire pass computed a value that fed nothing
+downstream (not the manifest, not `gateStats`, not `dirRows`, not the graph JSON). So the fix
+below has zero behavioral effect on the tool's actual outputs; it only removes a pointless,
+extremely slow computation.
+
+**Fixed**: replaced with a real imported-symbol extraction (`RE_NAMED_IMPORT_BLOCK` /
+`RE_DEFAULT_IMPORT_NAME`, new `importedSymbols` field per file, threaded through the Redis
+cache-serialization round-trip, `META_CACHE_VERSION` bumped v23→v24 to invalidate stale cached
+metadata lacking the field) and a single global `Set` built once — O(files × imports_per_file)
+— with `.has()` lookups replacing the substring scan. Known accepted limitation: namespace
+imports (`import * as X`) aren't resolved to individual symbol names, which can only produce
+false "unused" flags, never hide a real dead export (same direction of imprecision the old
+substring check also had) — consistent with G13 being a heuristic audit signal, not a
+guarantee, per this script's own header comment.
+
+**Separately fixed, unrelated to the stall**: `EXCLUDE_DIRS` didn't cover three large non-source
+top-level directories that were being fully walked on every run: `docker/` (48.5K files, build
+context), `sites/` (18.9K files, untracked mirror), `neschrom97/cards/` (8.2K files, NES/CHR97
+packet/card data). Added all three to `EXCLUDE_DIRS`; also removed `docker` from
+`EXTRA_INDEX_DIRS` (it was force-walked there even though also present in `EXCLUDE_DIRS`, which
+only suppresses recursive-child exclusion, not a directly-named top-level walk target — the two
+lists were contradicting each other for `docker`). This was found and fixed *before* the G13
+root cause was confirmed, and made the earlier symptom look like cumulative volume rather than
+an actual algorithmic hang — worth recording so a future reader doesn't re-derive the same
+false lead.
+
+**CORRECTION (2026-08-09, same day, later)**: the G13 fix above was necessary but **not
+sufficient** — it was not the actual cause of the multi-minute stalls observed across several
+runs. Root cause found via targeted slow-file instrumentation (per-file `extractMeta()` timing,
+warn if >1000ms): a 313KB minified third-party JS bundle vendored inside a Python virtualenv's
+`site-packages` (`tools/agentic-research/.venv/.../patchright/driver/package/lib/vite/recorder/
+assets/codeMirrorModule-*.js` — a Playwright/Patchright browser-recorder UI asset) took **18.1
+seconds** for this script's ~20 regexes to process. `.venv`/`site-packages` directories were
+never in `EXCLUDE_DIRS` (only `node_modules` was excluded by name) — likely several such
+vendored bundles exist across the repo's multiple venvs (root `.venv`, `.venv-cu130`,
+`.venv-gemma4`, plus nested ones), which fully explains the repeated stalls at the same
+file-count checkpoint independent of the G13 loop shape. Added `.venv`, `venv`,
+`.venv-cu130`, `.venv-gemma4`, `site-packages` to `EXCLUDE_DIRS`.
+
+**Also discovered and fixed while confirming the above**: my own G13 rewrite had a bug —
+default imports were tracked by adding the literal string `'default'` to the imported-symbols
+set instead of the actual bound local name, which would never match any real export name (no
+export is literally named `"default"`). Caught by cross-referencing an independently-produced
+fix for the same bug (a user-supplied bundle proposing the identical `Set`-based approach);
+fixed to use the captured local name.
+
+**Live-verified, both fixes together** (`--src src`, probe mode, not yet a canonical run):
+9,697 files in 84.0 seconds total, cross-file passes G13/G19/G16 all <0.2s combined (down from
+multi-minute/indefinite). `SCOPED_REFRESH_STALL_CAUSE: CONFIRMED_VENV_SITE_PACKAGES_REGEX_COST`
+(supersedes the earlier `CONFIRMED_POST_SCAN_QUADRATIC_G13_PASS` — that diagnosis was real but
+incomplete, not wrong).
+
+**Publication safety also implemented this pass** (addendum items H4-H11), ahead of the
+originally-planned order, because a concrete incident during this session's own diagnostic
+work proved the danger is real and not hypothetical: an orphaned probe process (started via a
+Git-Bash `timeout`-wrapped command that did **not** actually kill the underlying Node process
+on this machine, confirmed independently three separate times this session) silently completed
+in the background and overwrote the canonical `docs/graph/codebase-graph.json` with a **13-file
+result**, mid-session, without any error or notification. Implemented:
+- `--publish-canonical` flag, only honored when scope is genuinely full-repo (no `--src`, no
+  `--no-extra-index-dirs`) — a scoped/probe run cannot write the canonical file even if the
+  flag is passed.
+- Default (no flag) output goes to `docs/reports/graph-probes/codebase-graph.<runId>.json` —
+  canonical file is never opened for writing on a probe run.
+- Single-writer lock (`docs/graph/.codebase-graph.lock`, PID + runId + scope + command),
+  exclusive-create (`wx` flag), stale-lock recovery via `process.kill(pid, 0)` liveness check.
+- Canonical publish path: write to `docs/graph/.build/codebase-graph.<runId>.tmp.json` →
+  round-trip parse + fileCount-match validation → write a receipt →
+  `fs.renameSync()` to the real path (atomic on the same filesystem). A throw or `process.exit`
+  anywhere before the rename leaves the previous canonical artifact completely untouched.
+- SHA-256 topology hash (of sorted file rel-paths) recorded in `provenance` on every run.
+
+**Live-verified**: ran a scoped probe with the new flags — canonical file's mtime confirmed
+byte-for-byte unchanged (`stat` before/after), output correctly landed in
+`docs/reports/graph-probes/`, no lock file created (lock is only acquired on
+`--publish-canonical` runs). Proves H5 (scoped probe cannot publish canonical) live, not just
+by code inspection.
+
+**Status, corrected against the addendum's H1–H14 ladder**:
+- H1 (quadratic loop removed): **PROVEN** — <0.2s G13 on ~10K files.
+- H2 (semantic import bindings, not path substrings): **PROVEN** — real named/default import
+  extraction, `Set.has()` lookups.
+- H3 (scan stage progress visible): **PARTIAL** — added `[SCAN_FILES] N files... last: <path>`
+  live progress + slow-file (>1s) warnings with byte size; did NOT build the full
+  `CodebaseGraphStageReceipt` structured-JSON format from the addendum's B1.
+- H4 (run ID unique): **PROVEN** — `RUN_ID` embeds ISO timestamp + PID.
+- H5 (scoped probe cannot publish canonical): **PROVEN LIVE** (see above).
+- H6 (single canonical writer lock): **IMPLEMENTED, not yet exercised under real contention**
+  (no second concurrent canonical run was attempted against it).
+- H7 (temp artifact validated before publish): **IMPLEMENTED, not yet exercised on a real
+  canonical run** — the validation branch has only run inside probe mode's code path
+  structurally shared with canonical mode, never via an actual `--publish-canonical` invocation.
+- H8 (topology hash recorded): **IMPLEMENTED, not yet exercised on a canonical run.**
+- H9 (atomic publish only after pass): **IMPLEMENTED, not yet exercised on a canonical run.**
+- H10/H11 (interrupted/orphan run preserves previous graph): **NOT exercised** — no failure
+  was deliberately induced against the new canonical path yet.
+- H12 (clean src-scoped refresh pass): **PROVEN LIVE** — 84.0s, 9,697 files, 0 errors.
+- H13 (clean full canonical refresh pass): **NOT RUN.** Every run this session used `--src src`
+  (scoped/probe). No `--publish-canonical` invocation has happened.
+- H14 (graph revision proven): **NOT RUN** — depends on H13.
+
+**Known outstanding risk, not yet remediated**: the canonical `docs/graph/codebase-graph.json`
+on disk right now is still the bad **13-file artifact** from the orphaned-probe incident
+described above (confirmed via direct `fileCount` read of the live file). The new publication
+safety prevents *future* accidental overwrites but does not retroactively repair the already-
+corrupted canonical file — that requires an actual H13 canonical run, not yet performed.
+
+**Not done** (per the addendum's B1/B3/B4, explicitly out of scope for this pass): the full
+`CodebaseGraphStageReceipt` structured JSON format (only inline console timing was added), no
+correction of any stale `npm run graphify:daily` documentation claims.
+
 ## Stop boundary (unchanged)
 
 Stop after: proof-ladder runner, global Graphify lock, feature-envelope lock/concurrency proof,

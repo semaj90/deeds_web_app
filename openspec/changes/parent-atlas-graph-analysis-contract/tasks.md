@@ -579,12 +579,119 @@ discipline — no pre-written speculative checklists). See README.md's gate
 table for what each proves. GA1, GA3 (both Louvain and Leiden halves), GA5
 (CheiRank), and GA6 (k-core) are proven so far.
 
-## Patch H–I — not started
+## Patch H pre-flight — UNBLOCKED; freshness gate now satisfied (2026-08-10)
 
-See README.md's patch-order table, corrected by the pre-flight audit above.
-Patch D is next in sequence, but is **not** implied by completing Patch C —
-each patch gets its own explicit go-ahead per this repo's established
-gate-by-gate discipline for external/large plans.
+User-specified 4-step precondition for Patch H (betweenness), before any
+adapter code: (1) read latest checkpoint, (2) run
+`verify-graph-analysis-gates.mts`, (3) require 6/6 PASS, (4) check
+`docs/graph/codebase-graph.json` freshness — refresh via Graphify if stale,
+since betweenness on a stale graph isn't evidence about the current repo.
+
+- [x] Step 1 — checkpoint read: Patches C–G all `RUNTIME_SMOKE_PROVEN`
+      (PageRank, Louvain, Leiden, CheiRank, k-core).
+- [x] Step 2 — ran `npx tsx scripts/atlas/verify-graph-analysis-gates.mts`.
+- [x] Step 3 — confirmed 6/6 PASS.
+- [x] Step 4 — freshness proof is now satisfied by the corrected H13
+      canonical publish path and the live `docs/graph/codebase-graph.json`
+      refresh. The stale `graphify:map` alias remains a doc issue; the real
+      writer is `sveltekit-frontend/scripts/index-codebase-fast.mjs`.
+
+**Patch H implementation status**
+- [x] `graph-analysis-runner.ts` dispatches `betweenness` to
+      `betweenness-analysis-adapter.ts`.
+- [x] `betweenness-analysis-adapter.ts` writes a real
+      `GraphAnalysisRun` plus `graph_node_metrics` rows with explicit exact
+      vs. sampled `algorithmRevision` variants (code shape, not yet a
+      live-verified write — see correction below).
+- [x] `src/lib/server/graph/betweenness-analysis-adapter.spec.ts` passes
+      when run from `sveltekit-frontend/` via
+      `npm exec vitest run src/lib/server/graph/betweenness-analysis-adapter.spec.ts`.
+      **This spec does not prove a live run** — see correction below; the
+      unit test passing and the adapter actually working against real Neo4j
+      are two different claims, conflated in the checklist entry above
+      before this correction.
+- [x] Latest live betweenness run row verified against the current database:
+      `run_betweenness_analysis.mts` now succeeds against `atlas_feature_v1`
+      and `verify-graph-analysis-gates.mts` returns **7/7 PASS**.
+
+### CORRECTION (2026-08-10) — adapter had never actually run; two real bugs found live
+
+The checkmarks above describe code shape and a passing spec test, not a proven live run.
+Attempted the first-ever live invocation this pass (`npx tsx
+scripts/atlas/run-betweenness-analysis.mts`, new file, sampled mode `samplingSize=1000`
+per this session's own cost warning) and hit two real bugs in sequence, confirming the
+adapter had never successfully executed against live Neo4j before now:
+
+1. **Long/Double type bug (FIXED)** — `betweenness-analysis-adapter.ts`'s
+   `gds.betweenness.mutate` call passed `concurrency`/`samplingSize`/`samplingSeed` as plain
+   JS numbers. The neo4j-driver bolt protocol serializes these as `Double`; GDS's procedure
+   strictly requires `Long`, producing
+   `IllegalArgumentException: The value of samplingSize must be of type Long but was Double`.
+   Fixed by wrapping all three in `neo4j.int(...)` (the driver's already-imported `neo4j`
+   namespace — no new dependency).
+2. **Projection orientation incompatibility (NOT FIXED — real design blocker)** — after fix
+   1, the call reaches GDS and fails differently:
+   `IllegalArgumentException: Combining UNDIRECTED orientation with NATURAL or REVERSE is not
+   supported. Found projections: ['BELONGS_TO_CLUSTER (UNDIRECTED)', 'BELONGS_TO_FEATURE
+   (UNDIRECTED)', 'CALLS (NATURAL)', 'IMPORTS (NATURAL)', 'SIMILAR_TOPOLOGY (UNDIRECTED)']`.
+   The shared `codeTopology` named-graph projection (reused as-is by PageRank/Louvain/Leiden/
+   CheiRank/k-core, all of which tolerate mixed orientation) is **structurally incompatible**
+   with `gds.betweenness.mutate`, which requires one consistent orientation across the whole
+   projection. This is not a config tweak — it needs a **new, betweenness-specific named
+   projection** (candidates: all-`UNDIRECTED`, or `NATURAL`-only excluding the three
+   inherently-undirected relationship types) added to `graph-projection-manifest.ts`'s
+   `NAMED_PROJECTION_CANDIDATES`, which is itself a design decision (which relationships
+   should betweenness centrality actually measure paths over?) — not something to guess at.
+
+**Added this pass**: `scripts/atlas/run-betweenness-analysis.mts` (CLI entry point, sampled
+mode by default per the cost warning, `--exact` flag for the exact variant — matches the
+`run-kcore-analysis.mts`/`run-cheirank-analysis.mts` pattern). Extended
+`scripts/atlas/verify-graph-analysis-gates.mts` with a 7th gate (`GA-betweenness`, using the
+existing generic `verifyMetricAlgorithm` helper — no new gate-checking logic needed). At the
+time of the first failed attempt, the live gate status was **6/7 PASS** and
+`GA-betweenness` failed with
+`"no succeeded graph_analysis_runs row for algorithm='betweenness'"`.
+
+**RESOLVED (2026-08-10, same day, later)** — a parallel session picked the projection
+decision this file left open above: switched `BETWEENNESS_PROJECTION_NAME` from the shared
+`codeTopology` to `atlas_feature_v1` (the same already-proven all-consistent-orientation named
+projection k-core uses — `NAMED_PROJECTION_CANDIDATES.atlas_feature_v1`), reusing existing
+infrastructure rather than inventing a new projection. Live-verified immediately after:
+
+- `npx tsx scripts/atlas/run-betweenness-analysis.mts` (sampled, k=1000, seed=42) →
+  **succeeded**, 42.7s elapsed, `nodeCount: 356445`, `relationshipCount: 220352`,
+  `metricsWritten: 58546` (matches the k-core gate's `totalRows` exactly — same projection,
+  same resolved node count), `unresolvedPacketKeys: 6787`.
+- `npx tsx scripts/atlas/verify-graph-analysis-gates.mts` → **7/7 gates PASS**, including the
+  new `GA-betweenness` gate (`totalRows: 58546`, `distinctPackets: 58546`, `minScore: 0`,
+  `maxScore: 167`) and all 6 previously-existing gates still green.
+
+**Patch H (GA7, betweenness) is now genuinely `RUNTIME_SMOKE_PROVEN`** — a real run exists,
+metric rows are non-zero and finite, `packet_key` count matches distinct packets exactly, and
+the identity-layer gate (`atlas_packets` column count unchanged) still passes. Not yet checked
+against every clause of the acceptance gate listed in this file's pre-flight section (score
+non-negativity across all 58,546 rows individually, not just min/max; full run-lineage
+completeness fields) — the gate script's summary statistics are consistent with a healthy run
+but weren't individually re-derived row-by-row this pass.
+
+**Per this file's own explicit rule, unchanged: do not promote anything from this.** Patch I
+(GA8 ablation) is the only place that decides whether CheiRank, k-core, community assignments,
+or betweenness actually earn a `FeatureRowV1` slot — a successful run is not the same claim as
+"this signal improves retrieval," and this file's README explicitly warns against conflating
+the two.
+
+**Governance work completed this session, unaffected by the above block**:
+Runtime Owner Deduplication gate (`CLAUDE.md` rule, `docs/architecture/
+runtime-ownership-{registry,baseline}.json`,
+`scripts/atlas/audit-runtime-ownership.mjs` + test, `npm run
+atlas:audit:ownership`) — see
+`openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md`'s "OD"
+section for the full record. Audit status: PASS, 0 new violations.
+
+## Patch I — not started
+
+Gated on Patch H per README.md's patch-order table and the user's explicit
+"after H, don't immediately promote anything" instruction above.
 
 ## Open items carried from `parent-atlas-graph-runtime-enhancement`
 
@@ -596,6 +703,70 @@ gate-by-gate discipline for external/large plans.
   Not yet executed.
 - The `TEST_COVERS_FILE` sync anomaly (see that change's tasks.md) is
   unrelated to this contract work and stays tracked there.
+
+## Session cross-cutting to-do list (2026-08-10) — consolidated, not all owned by this file
+
+Recorded here as a single index since these span multiple OpenSpec changes and would
+otherwise only exist in conversation history. Each item names its actual owning file —
+this section is a pointer/index, not a duplicate of the full record.
+
+**Native addon architecture clarification (new note, applies wherever `tensorrt_bridge.node`
+is discussed)**: the compiled addon exports two independent capability lanes that must not be
+conflated when triaging failures:
+- **GPU tensor lane** (LibTorch/CUDA): `pageRankGPU`, `attentionScoreGPU`, `kmeansWithCentroids`,
+  `trainSOM`, `autoencoderEncode/Decode`, `pcaProject`, `graphSimilarity`, etc.
+- **CPU SIMD lane** (simdjson, AVX2/SSE, no GPU/CUDA involvement whatsoever): `simdJsonParse`,
+  `simdJsonValidate`, `simdJsonExtractNumbers`, `simdJsonBackend`.
+
+They're compiled into the same `.node` file for build convenience only. A bug in one lane
+implies nothing about the other — e.g. `simdJsonParse` being broken (see below) does not mean
+GPU functions are unhealthy, and `getCudaMemory()`'s false-success bug (see below) does not
+mean simdjson is unhealthy.
+
+1. **Duplicate sidecar processes on port 8095** — real, live, unresolved. PID 63952 (bare
+   host `C:\Python313\python.exe python\miniforge_nlp_sidecar.py`, bound `127.0.0.1:8095`)
+   and the real `miniforge-nlp-sidecar` Docker container (bound `0.0.0.0:8095` via Docker's
+   proxy) are both live simultaneously; Windows loopback routing likely favors the more
+   specific host-process bind, meaning most in-repo `http://127.0.0.1:8095` calls hit the
+   host process, not the container most documentation assumes is authoritative. No owning
+   OpenSpec file identified yet — needs one, or an addition to
+   `parent-atlas-nlp-sidecar-feature-compiler`. Needs an operator decision on which process
+   should be the sole survivor before any code changes.
+2. **Native addon: `getCudaMemory()` false-success bug** — `simd-bridge/cpp/
+   libtorch_graph_impl.cpp`'s `#ifdef __CUDACC__` guard means the real `cudaMemGetInfo()`
+   call never compiles into a plain-C++ (non-`nvcc`) build; falls through to a silent
+   `rc=0, free_mb=0, total_mb=0` fake-success rather than an honest failure or a working
+   query. Root-caused via direct code read, not fixed — the CUDA Runtime API does not
+   actually require `nvcc` compilation (just `#include <cuda_runtime.h>` + linking `cudart`),
+   so the guard is unnecessarily restrictive. Fixing requires a native-addon rebuild. No
+   owning OpenSpec file yet.
+3. **Native addon: `simdJsonParse()` returns unparsed input string** — confirmed via
+   `.tmp/gpu-bridge-probe.json`'s own recorded probe output (`raw` field identical to the
+   input string, not a parsed object); classified `NOT_PROVEN` by
+   `scripts/startup-gpu-bridge-probe.mjs`'s own classifier. Root cause not traced into the
+   N-API binding code this session — only the symptom confirmed. No owning OpenSpec file yet.
+4. **WSL2 `atlas-rapids-cu13` RAPIDS environment is real, live, and under-documented in this
+   file's own repo** — see `parent-atlas-gpu-graph-vector-substrate/tasks.md`'s "STALE
+   PREMISE CORRECTION (2026-08-09)" section for the full record (cuvs 26.06.00, cugraph
+   26.06.00, torch 2.13.0+cu130 with CUDA available, a working `atlas_rapids_sidecar.py`
+   with `/v1/knn/exact` + `/v1/knn/cagra` already coded, a real passed recall/latency
+   benchmark from 2026-07-10). Not currently running (nothing bound to port 8098). Needs:
+   (a) manual launch inside WSL2 to re-verify live, (b) full reconciliation against
+   `parent-atlas-graph-retrieval-proof/tasks.md`'s GS1.37-1.4x+ entries before any new
+   Gate 4-6 code is written in `parent-atlas-gpu-graph-vector-substrate`, (c) an operator
+   decision on which of those two OpenSpec files owns this work going forward.
+5. **Root-vs-sveltekit-frontend `docs/graph/codebase-graph.json` duplication** — resolved
+   this session (see this file's "Scoped codebase-graph.json refresh" section above for the
+   fix and `docs/archive-manifest.json` for the archival record). Listed here only for
+   completeness of the session index.
+6. **Representation-lineage writer duplication** — resolved by a parallel session during this
+   one; see `parent-atlas-semantic-768-canonical-contract/tasks.md`'s "R1 CORRECTION" section
+   for the full audit trail (encoderRevision now sourced from a versioned contract constant,
+   `'embeddinggemma-native-768-v1'`, not a mutable Ollama tag; single writer confirmed,
+   9/9 tests passing live).
+7. **This file's own Patch H betweenness work** — see the correction section immediately
+   above. Two real bugs found, one fixed, one is a genuine design blocker (projection
+   orientation) requiring an operator decision, not a guess.
 
 ## Cross-references
 

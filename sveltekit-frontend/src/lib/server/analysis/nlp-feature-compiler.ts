@@ -141,6 +141,43 @@ export const HMMObservationSchema = z
 	.strict();
 export type HMMObservation = z.infer<typeof HMMObservationSchema>;
 
+export function buildHMMObservationFromOkfFit(input: {
+	requestId?: string;
+	packetKey?: string | null;
+	sourceRef: string;
+	sourceRevision: string;
+	position?: number;
+	fitDecision: 'ACCEPT' | 'REVIEW' | 'ABSTAIN';
+	logisticRegressionScore: number;
+	naiveBayesScore: number;
+	fitMargin: number;
+	evidenceCount?: number;
+}): HMMObservation {
+	const stateHint =
+		input.fitDecision === 'ACCEPT' ? 'VALIDATE'
+		: input.fitDecision === 'REVIEW' ? 'DIAGNOSE'
+		: 'RECOVER';
+
+	return HMMObservationSchema.parse({
+		requestId: input.requestId ?? randomUUID(),
+		packetKey: input.packetKey ?? null,
+		sourceRef: input.sourceRef,
+		sourceRevision: input.sourceRevision,
+		position: input.position ?? 0,
+		observation: `OKF_FIT_${input.fitDecision}`,
+		weight: Math.max(0, Math.min(1, input.logisticRegressionScore)),
+		sourcePass: 'okf_fit',
+		stateHint,
+		createdAt: new Date().toISOString(),
+		metadata: {
+			logistic_regression_score: input.logisticRegressionScore,
+			naive_bayes_score: input.naiveBayesScore,
+			fit_margin: input.fitMargin,
+			evidence_count: input.evidenceCount ?? 0,
+		},
+	});
+}
+
 export const Control5Schema = z
 	.object({
 		lexical_confidence: z.number().finite().min(0).max(1).nullable().default(null),
@@ -153,6 +190,39 @@ export const Control5Schema = z
 export type Control5 = z.infer<typeof Control5Schema>;
 
 const FeatureValueSchema = z.union([z.number().finite(), z.boolean(), z.null()]);
+
+function passIdentityKey(passResult: AnalysisPassResult): string {
+	return [
+		passResult.requestId,
+		passResult.packetKey ?? '-',
+		passResult.sourceRef,
+		passResult.sourceRevision,
+		passResult.family,
+		passResult.passName,
+		passResult.passRevision,
+		passResult.inputHash,
+		passResult.outputHash,
+	].join('|');
+}
+
+function canonicalPassResults(passResults: AnalysisPassResult[]): AnalysisPassResult[] {
+	const sorted = [...passResults].sort((a, b) => {
+		const left = passIdentityKey(a);
+		const right = passIdentityKey(b);
+		return left.localeCompare(right) || a.startedAt.localeCompare(b.startedAt) || a.completedAt.localeCompare(b.completedAt);
+	});
+
+	const seen = new Set<string>();
+	for (const passResult of sorted) {
+		const key = passIdentityKey(passResult);
+		if (seen.has(key)) {
+			throw new Error(`Duplicate analysis pass result for ${key}`);
+		}
+		seen.add(key);
+	}
+
+	return sorted;
+}
 
 export const ExperimentFeatureMatrixSchema = z
 	.object({
@@ -205,7 +275,7 @@ function latestPass(
 	family: AnalysisPassFamily,
 	passName?: string,
 ): AnalysisPassResult | undefined {
-	return [...passResults]
+	return canonicalPassResults(passResults)
 		.reverse()
 		.find((passResult) => passResult.family === family && (passName ? passResult.passName === passName : true));
 }
@@ -253,12 +323,13 @@ export function compileExperimentFeatureMatrix(
 	input: CompileExperimentFeatureMatrixInput,
 ): { matrix: ExperimentFeatureMatrix; control5: Control5 } {
 	const requestId = input.requestId ?? randomUUID();
-	const structural = latestPass(input.passResults, 'structural');
-	const lexical = latestPass(input.passResults, 'lexical');
-	const semantic = latestPass(input.passResults, 'semantic');
-	const sequence = latestPass(input.passResults, 'sequence');
-	const rerank = latestPass(input.passResults, 'rerank');
-	const grounded = latestPass(input.passResults, 'grounded');
+	const canonicalPassResultsSet = canonicalPassResults(input.passResults);
+	const structural = latestPass(canonicalPassResultsSet, 'structural');
+	const lexical = latestPass(canonicalPassResultsSet, 'lexical');
+	const semantic = latestPass(canonicalPassResultsSet, 'semantic');
+	const sequence = latestPass(canonicalPassResultsSet, 'sequence');
+	const rerank = latestPass(canonicalPassResultsSet, 'rerank');
+	const grounded = latestPass(canonicalPassResultsSet, 'grounded');
 
 	const control5 = deriveControl5(input.passResults);
 	const sourceRef = input.sourceRef;
@@ -300,9 +371,9 @@ export function compileExperimentFeatureMatrix(
 			...(rerank?.features ?? {}),
 			...(grounded?.features ?? {}),
 		},
-		passCount: input.passResults.length,
-		inputHash: input.passResults.map((passResult) => passResult.inputHash).join(':'),
-		outputHash: input.passResults.map((passResult) => passResult.outputHash).join(':'),
+		passCount: canonicalPassResultsSet.length,
+		inputHash: canonicalPassResultsSet.map((passResult) => passResult.inputHash).join(':'),
+		outputHash: canonicalPassResultsSet.map((passResult) => passResult.outputHash).join(':'),
 	});
 
 	return { matrix, control5 };

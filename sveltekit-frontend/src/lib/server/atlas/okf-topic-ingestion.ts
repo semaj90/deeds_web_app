@@ -17,7 +17,8 @@
 
 import { z } from 'zod';
 import { createHash } from 'crypto';
-import { classifyDomain, CLASSIFIER_VERSION } from '../enrichment/domain-classifier.js';
+import { classifyOkfFit, OKF_FIT_VERSION } from './okf-fit.js';
+import { buildHMMObservationFromOkfFit, HMMObservationSchema } from '../analysis/nlp-feature-compiler.js';
 import type { FeatureMatrixRowV1 } from './feature-matrix-schema';
 
 /**
@@ -53,6 +54,10 @@ export const OKFDomainClassificationSchema = z.object({
   confidence: z.number().min(0).max(1),
   classifier_version: z.string().min(1),
   evidence_terms: z.array(z.string().min(1)).max(32).default([]),
+  naive_bayes_score: z.number().min(0).max(1).default(0),
+  logistic_regression_score: z.number().min(0).max(1).default(0),
+  fit_margin: z.number().finite().default(0),
+  fit_decision: z.enum(['ACCEPT', 'REVIEW', 'ABSTAIN']).default('ABSTAIN'),
 });
 
 export type OKFDomainClassification = z.infer<typeof OKFDomainClassificationSchema>;
@@ -72,6 +77,7 @@ export const OKFNlpProvenanceSchema = z.object({
   mixedbread_model: z.string().min(1).nullable(),
   middleware: z.array(z.string().min(1)).max(16),
   source_engines: z.array(z.string().min(1)).max(16).default([]),
+  hmm_observation: HMMObservationSchema.optional().nullable().default(null),
 });
 
 export type OKFNlpProvenance = z.infer<typeof OKFNlpProvenanceSchema>;
@@ -249,7 +255,17 @@ export function buildOkfTopicAnalysis(input: {
     ...(input.sourceUrls ?? []),
   ]);
 
-  const classified = classifyDomain([input.featureId, input.title, input.query, input.summary, ...(input.sourceTitles ?? []), ...(input.sourceSnippets ?? [])].join(' '));
+  const classified = classifyOkfFit({
+    topicId: input.topicId,
+    featureId: input.featureId,
+    title: input.title,
+    query: input.query,
+    summary: input.summary,
+    sourceTitles: input.sourceTitles,
+    sourceSnippets: input.sourceSnippets,
+    sourceUrls: input.sourceUrls,
+    sourceEngine: input.sourceEngine,
+  });
   const primaryDomain = classified.primary_domain ?? 'general';
   const secondaryDomains = classified.secondary_domains.slice(0, 4);
   const ontologyIds = [
@@ -279,8 +295,12 @@ export function buildOkfTopicAnalysis(input: {
       primary_domain: classified.primary_domain,
       secondary_domains: secondaryDomains,
       confidence: classified.confidence,
-      classifier_version: CLASSIFIER_VERSION,
+      classifier_version: OKF_FIT_VERSION,
       evidence_terms: classified.evidence.map((evidence) => evidence.value).slice(0, 16),
+      naive_bayes_score: classified.naive_bayes_score,
+      logistic_regression_score: classified.logistic_regression_score,
+      fit_margin: classified.fit_margin,
+      fit_decision: classified.fit_decision,
     },
     semantic_ontology: {
       ontology_version: 'okf-ontology-v1',
@@ -294,6 +314,17 @@ export function buildOkfTopicAnalysis(input: {
       mixedbread_model: DEFAULT_MIXEDBREAD_MODEL,
       middleware: ['ldr', 'langextract', 'mixedbread'],
       source_engines: input.sourceEngine ? [input.sourceEngine] : ['searxng', 'wikipedia'],
+      hmm_observation: buildHMMObservationFromOkfFit({
+        requestId: input.topicId ?? input.title,
+        packetKey: `ace:packet:research:okf:${input.topicId}`,
+        sourceRef: `docs:okf:topic:${input.topicId}`,
+        sourceRevision: OKF_FIT_VERSION,
+        fitDecision: classified.fit_decision,
+        logisticRegressionScore: classified.logistic_regression_score,
+        naiveBayesScore: classified.naive_bayes_score,
+        fitMargin: classified.fit_margin,
+        evidenceCount: classified.evidence.length,
+      }),
     },
   };
 }
@@ -484,11 +515,11 @@ export function createFeatureRowFromResearchPacket(
       neighbors_k_hop: [],
       computed_at: new Date().toISOString()
     },
-    classifiers: packet.okf
+      classifiers: packet.okf
       ? {
           naive_bayes_class: packet.okf.domain_classification.primary_domain ?? null,
-          naive_bayes_score: packet.okf.domain_classification.confidence ?? null,
-          logistic_regression_score: packet.okf.domain_classification.confidence ?? null,
+          naive_bayes_score: packet.okf.domain_classification.naive_bayes_score ?? null,
+          logistic_regression_score: packet.okf.domain_classification.logistic_regression_score ?? null,
           xgboost_score: null,
           computed_at: new Date().toISOString(),
         }
@@ -513,10 +544,15 @@ export function createFeatureRowFromResearchPacket(
 }
 
 /**
- * Extract top terms from text (simple TF-IDF stub).
+ * Extract top terms from text (simple lexical fallback).
+ *
+ * This is intentionally lightweight until the sidecar grows a real
+ * corpus-level TF-IDF/embedding index. It still returns a deterministic,
+ * ranked term list rather than a mocked placeholder.
  */
 function extractTopTerms(text: string, limit: number): Array<[string, number]> {
   const words = text.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+  if (words.length === 0 || limit <= 0) return [];
   const freq = new Map<string, number>();
 
   for (const word of words) {

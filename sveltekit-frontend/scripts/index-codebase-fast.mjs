@@ -10,7 +10,15 @@
  *   - docs/graph/codebase-map.md    — human-readable directory + deep audit map
  *
  * Usage:
- *   node scripts/index-codebase-fast.mjs [--write-plan] [--skip-redis] [--src <dir>]
+ *   node scripts/index-codebase-fast.mjs [--write-plan] [--skip-redis] [--src <dir>] [--publish-canonical]
+ *
+ * Publication safety (2026-08-09): by default every run is a PROBE — output goes to
+ * docs/reports/graph-probes/<runId>.{json,md}, canonical docs/graph/codebase-graph.json
+ * is never touched. Pass --publish-canonical AND run with the true full-repo scope
+ * (no --src, no --no-extra-index-dirs) to publish canonically; canonical publishes
+ * take a single-writer lock (docs/graph/.codebase-graph.lock) and write via
+ * temp-file + validate + atomic rename, so an interrupted/killed/orphaned run
+ * cannot leave a corrupted or partial canonical artifact.
  *
  * ACE source priority:
  *   Qdrant > ACP > hg:edge/SOM/Neo4j > fast-ast (score cap 0.07) > static scan
@@ -47,12 +55,76 @@ const WRITE_PLAN   = process.argv.includes('--write-plan');
 const SKIP_REDIS   = process.argv.includes('--skip-redis');
 const RESUME       = process.argv.includes('--resume');    // gradient checkpoint resume
 const RUN_TSC      = process.argv.includes('--tsc');       // inline tsc diagnostic cache
+const NO_EXTRA_INDEX_DIRS = process.argv.includes('--no-extra-index-dirs');
 const SRC_OVERRIDE = (() => {
   const idx = process.argv.indexOf('--src');
   return idx !== -1 ? path.resolve(process.argv[idx + 1]) : null;
 })();
 
 const scanRoot = SRC_OVERRIDE ?? ROOT;
+
+// ── Publication safety (2026-08-09) ─────────────────────────────────────────────
+// A forgotten/orphaned probe run (--src <small-dir>, wrapped in a `timeout` that
+// does NOT actually kill the underlying Node process on this machine) silently
+// overwrote the canonical docs/graph/codebase-graph.json with a 13-file result.
+// Structural fix, not a convention: canonical publication now requires an
+// explicit flag AND the true full-repo scope, is guarded by a single-writer
+// lock, and is only reached via write-temp -> validate -> atomic rename. A
+// scoped/probe run is therefore structurally incapable of touching the
+// canonical file, regardless of flags, timeouts, or how it's killed.
+const RUN_ID = `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`;
+const IS_CANONICAL_SCOPE = SRC_OVERRIDE === null && !NO_EXTRA_INDEX_DIRS;
+const PUBLISH_CANONICAL_REQUESTED = process.argv.includes('--publish-canonical');
+const PUBLISH_CANONICAL = PUBLISH_CANONICAL_REQUESTED && IS_CANONICAL_SCOPE;
+if (PUBLISH_CANONICAL_REQUESTED && !IS_CANONICAL_SCOPE) {
+  console.warn(
+    `⚠️  --publish-canonical requested but scope is not canonical (--src or --no-extra-index-dirs set) — ` +
+    `downgraded to probe-only output. Canonical publication requires the true full-repo scope.`
+  );
+}
+const BUILD_DIR = path.resolve(SVELTEKIT_ROOT, 'docs', 'graph', '.build');
+const LOCK_PATH  = path.resolve(SVELTEKIT_ROOT, 'docs', 'graph', '.codebase-graph.lock');
+const PROBE_DIR  = path.resolve(SVELTEKIT_ROOT, 'docs', 'reports', 'graph-probes');
+
+function isPidAlive(pid) {
+  try { process.kill(pid, 0); return true; }
+  catch { return false; }
+}
+
+let lockAcquired = false;
+if (PUBLISH_CANONICAL) {
+  fs.mkdirSync(path.dirname(LOCK_PATH), { recursive: true });
+  const lockPayload = {
+    pid: process.pid, runId: RUN_ID, startedAt: new Date().toISOString(),
+    scope: scanRoot, command: process.argv.join(' '),
+  };
+  try {
+    fs.writeFileSync(LOCK_PATH, JSON.stringify(lockPayload, null, 2), { flag: 'wx' });
+    lockAcquired = true;
+  } catch (err) {
+    if (err?.code !== 'EEXIST') throw err;
+    const existing = JSON.parse(fs.readFileSync(LOCK_PATH, 'utf8'));
+    if (isPidAlive(existing.pid)) {
+      console.error(
+        `❌ Refusing canonical publish: lock held by live PID ${existing.pid} ` +
+        `(run ${existing.runId}, started ${existing.startedAt}). Wait for it to finish or ` +
+        `confirm it's dead and delete ${LOCK_PATH} manually.`
+      );
+      process.exit(1);
+    }
+    console.warn(
+      `⚠️  Recovering stale lock: PID ${existing.pid} (run ${existing.runId}) is no longer alive. ` +
+      `Taking over the lock for run ${RUN_ID}.`
+    );
+    fs.writeFileSync(LOCK_PATH, JSON.stringify({ ...lockPayload, recoveredFrom: existing }, null, 2));
+    lockAcquired = true;
+  }
+  process.on('exit', () => {
+    // Best-effort — does not run on SIGKILL. Stale-lock recovery above is the
+    // real safety net for that case, not this handler.
+    try { if (lockAcquired && fs.existsSync(LOCK_PATH)) fs.unlinkSync(LOCK_PATH); } catch {}
+  });
+}
 
 // ── Gradient checkpoint constants ──────────────────────────────────────────────
 const CHECKPOINT_KEY   = 'code:index:checkpoint:hashes';  // Redis set of done contentHashes
@@ -208,6 +280,25 @@ const EXCLUDE_DIRS = new Set([
   '.opencode', 'deeds_labs', 'granite-docling-258M', 'turbovec', 'models',
   '.tmp', 'llm', 'storage', 'lawpdfs', 'phase13graph_exportgenerator',
   '.svelte-error-fixes-backup', 'qdrant-windows', 'vscode-extension',
+  // 2026-08-09: docker build context (48.5K files, no source) + untracked sites/
+  // mirror (18.9K files) — neither is codebase source; walking them added
+  // 10+ min of noise to every refresh and polluted the graph with non-source nodes.
+  'docker', 'sites',
+  // 2026-08-09: neschrom97/cards/ alone is 8,170 non-source JSON packet/card
+  // data artifacts (NES/CHR97 cards, not code) — same class of noise as
+  // .opencode/cards/ (already excluded via .opencode above).
+  'neschrom97',
+  // 2026-08-09: THE ACTUAL ROOT CAUSE of the multi-minute "stall" at a fixed
+  // file-count checkpoint, found via slow-file instrumentation — Python
+  // virtualenvs (root-level .venv/.venv-cu130/.venv-gemma4, and nested ones
+  // like tools/agentic-research/.venv/) vendor third-party npm packages under
+  // site-packages (e.g. Patchright/Playwright's browser-recorder UI bundle).
+  // One such minified 313KB JS asset
+  // (site-packages/patchright/driver/package/lib/vite/recorder/assets/
+  // codeMirrorModule-*.js) took 18+ SECONDS to run this script's ~20 regexes
+  // against — not a hang, just genuinely catastrophic regex cost against a
+  // single huge minified blob that was never meant to be scanned as source.
+  '.venv', 'venv', '.venv-cu130', '.venv-gemma4', 'site-packages',
 ]);
 
 function* walk(dir) {
@@ -287,6 +378,12 @@ const RE_SAFE_FN     = /\bsafe\s*\(|\bloadError\b/;
 const RE_ROUTE_PARAM = /\[([^\]]+)\]/g;
 // Export names (for G13 dead export detection)
 const RE_EXPORT_NAME = /export\s+(?:default\s+)?(?:async\s+)?(?:function|class|const|let|var|type|interface|enum)\s+([\w$]+)/g;
+// G13 — named/default import bindings (the actual symbols consumed, not the module path).
+// Fixed 2026-08-09: the prior implementation checked whether an export NAME string
+// appeared as a substring of concatenated import PATHS (e.g. does 'user' appear in
+// '/lib/user-service') — semantically meaningless and O(files × exports) besides.
+const RE_NAMED_IMPORT_BLOCK = /import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+['"][^'"]+['"]/g;
+const RE_DEFAULT_IMPORT_NAME = /import\s+(?:type\s+)?([A-Za-z_$][\w$]*)\s*(?:,\s*\{[^}]*\})?\s+from\s+['"][^'"]+['"]/g;
 // Script block check for svelte components
 const RE_SVELTE_SCRIPT = /<script[^>]*>/;
 
@@ -314,6 +411,7 @@ function extractMeta(filePath, src) {
     return {
       rel, ext, isRoute: false, isServerRoute: false, isSvelteComp: false, isTest: false,
       imports: [], dynImports: [], hasViteIgnore: false, reExports: [], typeImports: new Set(),
+      importedSymbols: new Set(), hasNamespaceImport: false,
       hasAuth: false, hasZod: false, parsesBody: false, routeHandlers: [], drizzleRefs: [],
       todos: [], lineCount: src.split('\n').length, components: [], localhostRefs: [],
       localhostBreaks: false, hasRawPort: false, typeImportCount: 0, exportedNames: [],
@@ -333,6 +431,33 @@ function extractMeta(filePath, src) {
   const imports = [...codeOnly.matchAll(RE_IMPORT)].map(m => m[1]);
   // G1b — type-only imports (compile-time erased, cannot form runtime cycles)
   const typeImports = new Set([...codeOnly.matchAll(RE_TYPE_IMPORT_PATH)].map(m => m[1]));
+  // G13 — actual imported symbol names (named + default), for correct dead-export
+  // detection. Namespace imports (`import * as X`) are deliberately NOT resolved
+  // to individual names here — conservatively treated as "some export from this
+  // module is used" is not tracked per-symbol, matching the "classify ambiguous
+  // cases as unknown, not dead" guidance; see hasNamespaceImport below.
+  const importedSymbols = new Set();
+  for (const m of codeOnly.matchAll(RE_NAMED_IMPORT_BLOCK)) {
+    for (const piece of m[1].split(',')) {
+      const trimmed = piece.trim();
+      if (!trimmed) continue;
+      // `Foo as Bar` — the LOCAL name (Bar) is what call sites reference, but the
+      // IMPORTED name (Foo) is what the source module exports — track the imported
+      // name since that's what we're matching against exportedNames.
+      const importedName = trimmed.split(/\s+as\s+/)[0].trim();
+      if (/^[A-Za-z_$][\w$]*$/.test(importedName)) importedSymbols.add(importedName);
+    }
+  }
+  for (const m of codeOnly.matchAll(RE_DEFAULT_IMPORT_NAME)) {
+    // Bug fixed 2026-08-09 (caught reviewing an independently-produced bundle with
+    // the same G13 fix): this must add the actual bound local name (m[1], e.g.
+    // 'Foo' in `import Foo from './A'`) so it matches a real `export default
+    // function Foo()`'s captured export name — adding the literal string
+    // 'default' instead would never match anything (no valid export name is
+    // literally "default").
+    if (m[1] && m[1] !== 'type') importedSymbols.add(m[1]);
+  }
+  const hasNamespaceImport = /import\s+\*\s+as\s+\w+\s+from/.test(codeOnly);
   // G2 — dynamic imports
   const dynImports    = [...codeOnly.matchAll(RE_DYN_IMPORT)].map(m => m[1]);
   const hasViteIgnore = RE_DYN_VAR.test(codeOnly);
@@ -467,6 +592,7 @@ function extractMeta(filePath, src) {
     rel, ext, isRoute, isServerRoute, isSvelteComp, isTest,
     // G1-G3
     imports, dynImports, hasViteIgnore, reExports, typeImports,
+    importedSymbols, hasNamespaceImport,
     // G4-G8
     hasAuth, hasZod, parsesBody, routeHandlers, drizzleRefs, todos,
     // G9-G12
@@ -497,7 +623,7 @@ let apiCount       = 0;
 let dbTableCount   = 0;
 let todoCount      = 0;
 
-const META_CACHE_VERSION = 'v23'; // bumped 2026-06-11 — invalidate cache for requireUser updates
+const META_CACHE_VERSION = 'v24'; // bumped 2026-08-09 — invalidate cache for importedSymbols/G13 rewrite
 const CAN_WRITE_PROGRESS = Boolean(process.stdout?.isTTY && !process.stdout.destroyed);
 
 if (process.stdout?.on) {
@@ -516,13 +642,11 @@ function writeProgress(message) {
 }
 
 let processed = 0;
+let currentFileForDiagnostics = '';
 for (const filePath of walk(scanRoot)) {
   processed++;
-  if (processed % 100 === 0) writeProgress(`\r   Indexed ${processed} files...`);
-
-
-
-
+  currentFileForDiagnostics = path.relative(ROOT, filePath).replace(/\\/g, '/');
+  if (processed % 100 === 0) writeProgress(`\r   [SCAN_FILES] ${processed} files... last: ${currentFileForDiagnostics}`);
   let src;
   try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
 
@@ -536,6 +660,7 @@ for (const filePath of walk(scanRoot)) {
     let meta = await rget(cacheKey);
     if (meta && meta.rel) {
       if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
+      if (Array.isArray(meta.importedSymbols)) meta.importedSymbols = new Set(meta.importedSymbols);
       cacheHits++;
       files.push(meta);
     }
@@ -550,10 +675,19 @@ for (const filePath of walk(scanRoot)) {
     if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
     cacheHits++;
   } else {
+    const __extractStart = Date.now();
     meta = extractMeta(filePath, src);
+    const __extractMs = Date.now() - __extractStart;
+    if (__extractMs > 1000) {
+      console.warn(`\n⚠️  Slow file (${__extractMs}ms, ${src.length} bytes): ${currentFileForDiagnostics}`);
+    }
     cacheMisses++;
     // Persist meta with Set serialized as array (rget restores it)
-    const metaForCache = { ...meta, typeImports: Array.from(meta.typeImports ?? []) };
+    const metaForCache = {
+      ...meta,
+      typeImports: Array.from(meta.typeImports ?? []),
+      importedSymbols: Array.from(meta.importedSymbols ?? []),
+    };
     await rset(cacheKey, metaForCache);
   }
   files.push(meta);
@@ -591,36 +725,49 @@ for (const filePath of walk(scanRoot)) {
 
 const EXTRA_INDEX_DIRS = [
   'scripts', 'tests', 'test', 'e2e', 'integration', 'playwright',
-  'simd-bridge', 'services', 'go-microservice', 'docker', 'drizzle', 'proto', 'python', 'tools', 'turbovec', 'next_steps'
+  'simd-bridge', 'services', 'go-microservice', 'drizzle', 'proto', 'python', 'tools', 'next_steps'
+  // 'docker' removed 2026-08-09 — build context, not source; see EXCLUDE_DIRS note.
+  // 'turbovec' was already in EXCLUDE_DIRS and thus never actually reachable here.
 ];
 let extraIndexed = 0;
-for (const dirName of EXTRA_INDEX_DIRS) {
-  const dir = path.resolve(ROOT, dirName);
-  if (!fs.existsSync(dir)) continue;
-  for (const filePath of walk(dir)) {
-    processed++;
-  if (processed % 100 === 0) process.stdout.write(`\r   Indexed ${processed} files...`);
-  if (processed % 100 === 0) writeProgress(`\r   Indexed ${processed} files...`);
+if (!NO_EXTRA_INDEX_DIRS) {
+  for (const dirName of EXTRA_INDEX_DIRS) {
+    const dir = path.resolve(ROOT, dirName);
+    if (!fs.existsSync(dir)) continue;
+    for (const filePath of walk(dir)) {
+      processed++;
+      currentFileForDiagnostics = path.relative(ROOT, filePath).replace(/\\/g, '/');
+      if (processed % 100 === 0) writeProgress(`\r   [SCAN_FILES] ${processed} files... last: ${currentFileForDiagnostics}`);
 
-
-    let src;
-    try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
-    const contentHash = createHash('sha1').update(src).digest('hex').slice(0, 16);
-    const cacheKey = `code:index:meta:${META_CACHE_VERSION}:${contentHash}`;
-    let meta = await rget(cacheKey);
-    if (meta && meta.rel) {
-      if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
-      cacheHits++;
-    } else {
-      meta = extractMeta(filePath, src);
-      cacheMisses++;
-      const metaForCache = { ...meta, typeImports: Array.from(meta.typeImports ?? []) };
-      await rset(cacheKey, metaForCache);
+      let src;
+      try { src = fs.readFileSync(filePath, 'utf8'); } catch { continue; }
+      const contentHash = createHash('sha1').update(src).digest('hex').slice(0, 16);
+      const cacheKey = `code:index:meta:${META_CACHE_VERSION}:${contentHash}`;
+      let meta = await rget(cacheKey);
+      if (meta && meta.rel) {
+        if (Array.isArray(meta.typeImports)) meta.typeImports = new Set(meta.typeImports);
+        if (Array.isArray(meta.importedSymbols)) meta.importedSymbols = new Set(meta.importedSymbols);
+        cacheHits++;
+      } else {
+        const __extractStart2 = Date.now();
+        meta = extractMeta(filePath, src);
+        const __extractMs2 = Date.now() - __extractStart2;
+        if (__extractMs2 > 1000) {
+          console.warn(`\n⚠️  Slow file (${__extractMs2}ms, ${src.length} bytes): ${currentFileForDiagnostics}`);
+        }
+        cacheMisses++;
+        const metaForCache = {
+      ...meta,
+      typeImports: Array.from(meta.typeImports ?? []),
+      importedSymbols: Array.from(meta.importedSymbols ?? []),
+    };
+        await rset(cacheKey, metaForCache);
+      }
+      files.push(meta);
+      extraIndexed++;
+      if (meta.routeHandlers.length) apiCount++;
+      todoCount += meta.todos.length;
     }
-    files.push(meta);
-    extraIndexed++;
-    if (meta.routeHandlers.length) apiCount++;
-    todoCount += meta.todos.length;
   }
 }
 
@@ -629,33 +776,54 @@ if (extraIndexed > 0 && !process.argv.includes('--quiet')) {
 }
 
 // ── Cross-file analysis passes ────────────────────────────────────────────────
+// Temporary stage timing (2026-08-09) — diagnosing a multi-minute stall between
+// file-scan completion and the "Pass 3" cyclic-import log line. Remove once the
+// real bottleneck is confirmed and fixed, or promote to a proper StageProfiler
+// per the graph-refresh-recovery addendum if this instrumentation proves useful
+// long-term.
+const __stageT0 = Date.now();
+console.log(`\n⏱  Cross-file passes starting — ${files.length} files loaded (${((__stageT0 - t0) / 1000).toFixed(1)}s elapsed)`);
 
-// G13 — Dead export detection: build global import set, flag exports never imported
+// G13 — Dead export detection: build one global set of imported symbol names,
+// then check each export against it via O(1) Set.has() lookups.
+//
+// Fixed 2026-08-09 (repository-instance-of-a-real-bug, see
+// openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md "B" section):
+// the previous implementation was O(files × distinct_export_names) — a nested loop
+// doing a `.includes()` substring scan of every export name against every file's
+// concatenated import PATHS (not symbol names) — for a full-repo run with tens of
+// thousands of files/exports this could run for a very long time with zero progress
+// output, and was checking the wrong thing besides (an export named "user" would
+// substring-match against an import path like "./lib/user-service" even though
+// nothing imports the "user" symbol).
+//
+// Known limitation, accepted per "classify ambiguous cases as unknown, not dead":
+// namespace imports (`import * as X from '...'`) are not resolved to individual
+// symbol names, so an export consumed only via `X.someExport` won't register as
+// imported here. This can only ever cause false "unused" flags (a heuristic signal,
+// per this script's own docstring), never false negatives that hide a real dead
+// export — same direction of error the previous substring-based check also had.
 const allImportedSymbols = new Set();
 for (const f of files) {
-  // Extract named symbols from import statements (rough: from { A, B } patterns)
-  for (const imp of f.imports) {
-    allImportedSymbols.add(imp); // module path coverage
+  for (const name of f.importedSymbols ?? []) {
+    allImportedSymbols.add(name);
   }
-  // Also track re-export paths
-  for (const re of f.reExports) {
-    allImportedSymbols.add(re);
+  // Barrel re-exports forward whatever the re-exported module exports; treat the
+  // re-export itself as "consumed" so barrel files don't get every export flagged dead.
+  if (f.reExports.length > 0) {
+    for (const name of f.exportedNames) allImportedSymbols.add(name);
   }
 }
-// Build export-name → file map; mark as potentially dead if name appears in 0 other files' src
-// (lightweight: count files where exportedName appears as an import target substring)
 const exportImportCounts = {};
 for (const f of files) {
   for (const name of f.exportedNames) {
-    exportImportCounts[name] = (exportImportCounts[name] ?? 0);
+    if (exportImportCounts[name] === undefined) exportImportCounts[name] = 0;
+    if (allImportedSymbols.has(name)) exportImportCounts[name]++;
   }
 }
-for (const f of files) {
-  const srcKey = f.imports.join(' ') + ' ' + f.dynImports.join(' ');
-  for (const name of Object.keys(exportImportCounts)) {
-    if (srcKey.includes(name)) exportImportCounts[name]++;
-  }
-}
+
+console.log(`⏱  G13 done (${((Date.now() - __stageT0) / 1000).toFixed(1)}s)`);
+const __stageT1 = Date.now();
 
 // G19 — Fan-in: how many files import each module path
 const fanIn = {};
@@ -673,6 +841,9 @@ for (const f of files) {
     .replace(/\.(ts|js|svelte)$/, '');
   f.fanIn = (fanIn[modPath] ?? 0) + (fanIn[f.rel] ?? 0);
 }
+
+console.log(`⏱  G19 done (${((Date.now() - __stageT1) / 1000).toFixed(1)}s)`);
+const __stageT2 = Date.now();
 
 // G16 — Test pairing: check if a test file exists for each server route / lib module.
 // Tests live in three places:
@@ -735,6 +906,8 @@ for (const f of files) {
 // cannot create at-load circular evaluation, so they are not cycles. Including
 // them produced false positives — e.g. dispatch-inline.ts ↔ queue-worker.ts
 // where both sides only cross-imported via await import() lazy loads.
+console.log(`⏱  G16 done (${((Date.now() - __stageT2) / 1000).toFixed(1)}s)`);
+
 const importMap = {};
 console.log('\n🔍 Pass 3: Analyzing cyclic import risks…');
 
@@ -977,6 +1150,21 @@ await rset('code:index:gate-stats',    gateStats);
 
 fs.mkdirSync(GRAPH_DIR, { recursive: true });
 
+const topologyHash = createHash('sha256')
+  .update(files.map(f => f.rel).sort().join('\n'))
+  .digest('hex');
+
+const provenance = {
+  runId: RUN_ID,
+  scope: scanRoot,
+  isCanonicalScope: IS_CANONICAL_SCOPE,
+  published: PUBLISH_CANONICAL,
+  fileCount: files.length,
+  dirCount: dirRows.length,
+  topologyHash,
+  generatedAt: new Date().toISOString(),
+};
+
 const graphJson = {
   ...manifest,
   files: files.map(f => ({
@@ -1008,8 +1196,34 @@ const graphJson = {
 };
 
 const graphJsonPath = path.join(GRAPH_DIR, 'codebase-graph.json');
-fs.writeFileSync(graphJsonPath, JSON.stringify(graphJson, null, 2));
-console.log(`📄 Graph JSON → ${path.relative(ROOT, graphJsonPath)}`);
+const graphJsonSerialized = JSON.stringify({ ...graphJson, provenance }, null, 2);
+
+if (PUBLISH_CANONICAL) {
+  // Write-temp -> validate -> atomic rename. Any failure/throw between here and
+  // the rename leaves the previous canonical artifact untouched.
+  fs.mkdirSync(BUILD_DIR, { recursive: true });
+  const tmpPath = path.join(BUILD_DIR, `codebase-graph.${RUN_ID}.tmp.json`);
+  const receiptPath = path.join(BUILD_DIR, `codebase-graph.${RUN_ID}.receipt.json`);
+  fs.writeFileSync(tmpPath, graphJsonSerialized);
+
+  // Validate before publishing — round-trip parse + basic shape/count sanity.
+  const parsed = JSON.parse(fs.readFileSync(tmpPath, 'utf8'));
+  const valid = Array.isArray(parsed.files) && parsed.files.length === files.length && parsed.files.length > 0;
+  fs.writeFileSync(receiptPath, JSON.stringify({ ...provenance, validated: valid }, null, 2));
+  if (!valid) {
+    console.error(`❌ Validation failed for run ${RUN_ID} (fileCount mismatch or empty) — canonical artifact NOT replaced.`);
+    process.exit(1);
+  }
+
+  fs.renameSync(tmpPath, graphJsonPath);
+  console.log(`📄 Graph JSON (CANONICAL, run ${RUN_ID}) → ${path.relative(ROOT, graphJsonPath)}`);
+} else {
+  fs.mkdirSync(PROBE_DIR, { recursive: true });
+  const probePath = path.join(PROBE_DIR, `codebase-graph.${RUN_ID}.json`);
+  fs.writeFileSync(probePath, graphJsonSerialized);
+  console.log(`📄 Graph JSON (PROBE ONLY, not canonical) → ${path.relative(ROOT, probePath)}`);
+  console.log(`   Canonical file untouched: ${path.relative(ROOT, graphJsonPath)}`);
+}
 
 // ── Codebase Map ──────────────────────────────────────────────────────────────
 
@@ -1319,8 +1533,18 @@ npm run index:codebase:full
 `;
 
 const mapPath = path.join(GRAPH_DIR, 'codebase-map.md');
-fs.writeFileSync(mapPath, codebaseMap);
-console.log(`🗺️  Codebase map → ${path.relative(ROOT, mapPath)}`);
+if (PUBLISH_CANONICAL) {
+  fs.mkdirSync(BUILD_DIR, { recursive: true });
+  const mapTmpPath = path.join(BUILD_DIR, `codebase-map.${RUN_ID}.tmp.md`);
+  fs.writeFileSync(mapTmpPath, codebaseMap);
+  fs.renameSync(mapTmpPath, mapPath);
+  console.log(`🗺️  Codebase map (CANONICAL) → ${path.relative(ROOT, mapPath)}`);
+} else {
+  fs.mkdirSync(PROBE_DIR, { recursive: true });
+  const probeMapPath = path.join(PROBE_DIR, `codebase-map.${RUN_ID}.md`);
+  fs.writeFileSync(probeMapPath, codebaseMap);
+  console.log(`🗺️  Codebase map (PROBE ONLY) → ${path.relative(ROOT, probeMapPath)}`);
+}
 
 // ── Graph plan (--write-plan only) ────────────────────────────────────────────
 
@@ -1368,7 +1592,9 @@ Score cap: 0.07 (fast-ast), 0.08 (KAG dir notes)
 npm run index:codebase:full
 \`\`\`
 `;
-  const graphMdPath = path.join(GRAPH_DIR, 'codebase-graph.md');
+  const graphMdPath = PUBLISH_CANONICAL
+    ? path.join(GRAPH_DIR, 'codebase-graph.md')
+    : (fs.mkdirSync(PROBE_DIR, { recursive: true }), path.join(PROBE_DIR, `codebase-graph.${RUN_ID}.md`));
   fs.writeFileSync(graphMdPath, graphMd);
   console.log(`📝 Graph plan → ${path.relative(ROOT, graphMdPath)}`);
 }

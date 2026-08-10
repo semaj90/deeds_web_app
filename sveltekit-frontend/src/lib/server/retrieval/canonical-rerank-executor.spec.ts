@@ -560,4 +560,37 @@ describe('rerank fail-open contract (Session 188)', () => {
     expect(output.provenance.fallbackUsed).toBe(true);
     expect(output.provenance.modelVersion).toBe('xgboost-sidecar');
   });
+
+  it('threads policy provenance through the empty-input fast path', async () => {
+    const output = await rerankCanonicalFeatureEnvelopes('test', [], {
+      policyDecision: {
+        revision: 'parent-atlas.policy-decision.v1',
+        action: 'INSPECT_SOURCE',
+        model: 'NO_LLM',
+        budget: 'SMALL',
+        maxParallelToolCalls: 3,
+        rankedActions: [{ action: 'INSPECT_SOURCE', score: 1 }],
+        stateHint: 'UNDERSTAND',
+      },
+      executionBudget: {
+        tier: 'SMALL',
+        maxParallelToolCalls: 3,
+        maxActiveLanes: 3,
+        maxInitialCandidates: 80,
+        maxGraphSeeds: 8,
+        maxGraphDepth: 1,
+        maxGraphNodes: 40,
+        maxFastRerankCandidates: 24,
+        maxDeepRerankCandidates: 0,
+        maxContextTokens: 3000,
+        maxGpuBytes: 0,
+        maxPinnedHostBytes: 0,
+        maxLatencyMs: 1500,
+      },
+    });
+
+    expect(output.provenance.policyAction).toBe('INSPECT_SOURCE');
+    expect(output.provenance.policyBudget).toBe('SMALL');
+    expect(output.provenance.policyStateHint).toBe('UNDERSTAND');
+  });
 });

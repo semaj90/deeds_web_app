@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "parent-atlas.bundle-checks.v1",
+  "pythonCompile": "PASS",
+  "typescriptCoreNoEmit": "PASS",
+  "typescriptCoreFileCount": 21,
+  "notRun": [
+    "Vitest: bundle is outside the user repository and has no local vitest dependency context",
+    "Postgres migration: no user database connection is available in this environment",
+    "PyArrow/RAPIDS runtime smoke: target WSL2 RAPIDS environment is on the user workstation, not mounted here",
+    "cpu-worker-pool.ts repository typecheck: requires the repository Node type definitions"
+  ],
+  "safety": [
+    "PowerShell apply script refuses to overwrite collisions",
+    "No existing canonical retrieval or graph owner is modified by the bundle",
+    "CAGRA remains gated behind same-matrix exact parity"
+  ]
+}

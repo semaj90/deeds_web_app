@@ -1,10 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
-import { db } from '$lib/server/db/client.js';
-import { atlasPackets } from '$lib/server/db/schema-postgres.js';
-import { eq } from 'drizzle-orm';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { persistCanonicalSemanticPacketEmbedding } from '$lib/server/embedding/semantic-packet-writer.js';
 
 interface EmbedRequest {
 	packetKey: string;
@@ -55,14 +53,21 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		}
 
 		// 2. Embed via canonical Ollama embeddinggemma (via embedText service)
-		// embedText handles L3 Redis cache, L4 Postgres persistence, circuit breaker + retry
+		// embedText is pure computation — it does NOT persist to Postgres or Redis
+		// itself (verified 2026-08-09); this endpoint owns both cache and canonical
+		// persistence below.
 		// Falls back: gRPC → QUIC → HTTP → local fallback
+		let isRealSemanticEmbedding = true;
 		try {
 			embedding = await embedText(text.trim());
 		} catch (err) {
 			console.error(`Failed to embed packet ${packetKey}:`, err);
-			// Fallback: generate deterministic stub on error
+			// Fallback: deterministic stub, NOT a real semantic_768 embedding.
+			// Same dimension (768) as the real thing, so it must never be tagged
+			// with the semantic_768 representation_id — dimension alone cannot
+			// prove provenance (see representation-lineage audit, 2026-08-09).
 			embedding = generateFallbackEmbedding(text);
+			isRealSemanticEmbedding = false;
 		}
 
 		const duration = Date.now() - startTime;
@@ -75,15 +80,21 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			console.warn(`Failed to cache embedding for ${packetKey}:`, e);
 		}
 
-		// 4. Update Postgres packet metadata (non-blocking)
-		try {
-			await db
-				.update(atlasPackets)
-				.set({ updatedAt: new Date() })
-				.where(eq(atlasPackets.packetKey, packetKey));
-		} catch (e) {
-			// Non-blocking: cache write succeeded even if Postgres fails
-			console.warn(`Failed to update packet ${packetKey}:`, e);
+		// 4. Persist canonical lineage in Postgres only for real semantic embeddings.
+		// Deterministic fallback vectors stay cache-only and must not become
+		// authoritative semantic lineage.
+		if (isRealSemanticEmbedding) {
+			try {
+				await persistCanonicalSemanticPacketEmbedding({
+					packetKey,
+					sourceRef: packetKey,
+					sourcePath: packetKey,
+					vector: embedding,
+				});
+			} catch (e) {
+				// Non-blocking: cache write succeeded even if Postgres fails
+				console.warn(`Failed to persist packet ${packetKey}:`, e);
+			}
 		}
 
 		return json({ embedding, cacheHit, duration });

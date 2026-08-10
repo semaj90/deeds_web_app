@@ -1,0 +1,59 @@
+schema_version: 1
+registry_id: okf-contract-registry
+description: >
+  Entry-point registry for OKF-related contracts and schema artifacts.
+  This registry points at the live owners without moving or duplicating them.
+rules:
+  - Do not relocate live artifacts just to satisfy directory layout.
+  - Treat this registry as the navigation layer for OKF contracts.
+  - Prefer the live owner in the referenced path over any copied summary.
+contracts:
+  - name: metadata-contract-schema
+    owner: docs/metadata-contract-schema.yaml
+    role: indexed-field and mirror contract source of truth
+    notes:
+      - packet_key
+      - som_cluster
+      - community_id
+      - retrieval_strategy
+  - name: okf-v1-source
+    owner: docs/okf-v1-source.okf
+    role: source OKF artifact
+  - name: feature-envelope-v3
+    owner: sveltekit-frontend/schemas/atlas/feature-envelope/feature-envelope.v3.okf
+    role: declarative feature-envelope schema
+    notes:
+      - tree_node_id
+      - som_cluster
+      - community_id
+  - name: feature-matrix-schema
+    owner: sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts
+    role: runtime FeatureMatrixRow schema
+    notes:
+      - packet_key
+      - tree_node_id
+      - naive_bayes_score
+      - logistic_regression_score
+  - name: okf-topic-ingestion
+    owner: sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts
+    role: OKF packetization and domain classification wiring
+    notes:
+      - domain_classification
+      - naive_bayes_score
+      - logistic_regression_score
+      - ontology_ids
+      - concept_ids
+      - packet_key
+  - name: ontology-linked-tuple-v1
+    owner: sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts
+    role: tuple bridge between ontology and structural identity
+    notes:
+      - ontology-linked-tuple.v1
+      - treeNodeId
+      - tree_node_id
+  - name: mastra-workflows-okf
+    owner: sveltekit-frontend/src/lib/server/okf/mastra-workflows.okf.yaml
+    role: workflow contract and orchestration metadata
+notes:
+  - The repository currently stores live contracts in multiple places.
+  - This registry is the directory entry point, not a migration target.

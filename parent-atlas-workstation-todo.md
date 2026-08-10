@@ -15,6 +15,12 @@ Current lane map:
 - Neo4j: CPU/JVM topology lane for PageRank, graph expansion, and multi-hop context; not GPU-enabled by Docker passthrough.
 - Redis / BitFrost: hot packet cache, centroid routing, and short-lived replay state.
 - cuVS / GPU: ANN staging, rerank input, batch graph analysis, and benchmark lanes in a separate analytics service.
+- Token cache: exact model-state reuse only; key on model/tokenizer/prefix/config revisions, not on query similarity.
+- Inference: embeddings and generation compute only; do not let it decide identity or promotion.
+- Retrieval: candidate gathering and reranking only; no canonical truth or schema ownership.
+- Feature / geometry: numeric evidence, routing scores, and 4D metric-tensor diagnostics only.
+- Graph: PageRank / communities / k-core / betweenness / bounded traversal evidence.
+- Hypergraph: n-ary relation and event structure lane for joint facts, not a second retrieval owner.
 - `embeddinggemma`: canonical embedding family at `768`; any `384`-dimensional artifacts are migration evidence only, not an active retrieval lane.
 - `768`: main codebase chunk lane.
 - `384`: legacy migration / projection evidence only; never an active retrieval lane.
@@ -25,6 +31,84 @@ Current lane map:
 - atlas-tools: query-context preamble lane for intent, retrieval hints, and compact RAG injection.
 - ACE packet: assembly / materialization lane for compact synthesis output and packet persistence.
 - ACE packet: compact synthesis and semantic labeling output, not raw corpus state.
+- TileKey / LOD memory hierarchy: design-only memory management model; 4D coordinates map to logical TileKey, never a GPU pointer directly.
+
+## Sequencing and Gate Order
+
+### P2 transport and ingestion gates
+
+1. Finish the MCP / `/mcp` / `/sse` diagnostics.
+2. Keep TRACE core enabled and optional sidecars opt-in until transport matches are confirmed.
+3. Resolve Claude-Mem export path alignment before any importer run.
+4. Keep the persistent Engram ingestion lane deferred until the transport and importer path are stable.
+5. Keep Redis 8 isolated as an eval lane and compare it only after the current ACE context cache lane is stable.
+
+### P2 registry and retrieval policy
+
+1. Replace the bootstrap feature-gap registry with a live app workspace scan when the mounted codebase is available.
+2. Ingest the current feature inventory into the registry and mark each lane as implemented, partial, missing, or eval-only.
+3. Keep the retrieval policy explicit: exact cache first, then semantic cache, then retrieval, then packet assembly.
+4. Keep single-fact lookups on vector search, code navigation on agentic search, and graph-heavy data on graph lanes.
+
+### P3 storage, cards, and synthesis
+
+1. Build ClusterCard flow from reviewed sourceRefs and table contracts.
+2. Keep the semantic cache policy split between Redis exact-card lookup and Qdrant dense retrieval.
+3. Add graph refresh manifest discipline with version/hash and promotion state.
+4. Wire synthesis consumers only after the packet/version contract stays stable.
+
+### P3 validation and structural promotion
+
+1. Stabilize the 768d -> 64d latent -> cluster -> JSON graph path.
+2. Define the canonical ClusterCard -> GlyphRecord -> CHR97 mapping.
+3. Keep manifold4 as a later analytical lane, not a correctness gate.
+4. Treat the ACE Context Pack Cache / NES Cartridge Cache as Redis-hot-pointer plus Postgres-durable storage only; large snapshot storage stays open.
+
+### P4 semantic memory and checklist mining
+
+1. Keep the semantic indexer as a first-class lane.
+2. Keep its outputs consumable by the feature-gap registry without rereading whole corpora.
+3. Keep the semantic lane aligned with the ACE/NES packet contract and version field.
+4. Add smoke/report outputs to registry rows for retrieval lanes and feature-map lanes.
+5. Use LangChain later only as an optional organizer for messy `.md` / `.json` after LangExtract.
+
+### Optional downstream phases
+
+1. Phase 10B TurboVec + Qdrant optimization.
+2. Phase 11 cuVS / CUDA sidecar benchmark.
+3. Phase 12 CUDA streams / tensor bridge / RNN experiments.
+4. Phase 13 graph synthesis + feature MapReduce.
+5. Phase 14 DuckDB + LangGraph + Langfuse.
+6. Phase 15 feature labeling + pruning.
+7. Phase 16 implement missing features.
+8. Phase 17 optional LangChain organizer after LangExtract.
+9. Phase 18 WebGPU TypeScript MapReduce matrix and CUDA/libtorch experiments.
+10. Phase 19 XGBoost / gradient boosting / reinforcement-learning experiments.
+
+### Conservative phase-status snapshot
+
+| Phase | Status |
+|---|---|
+| Phase 11 Engram/Gemma4 memory wiring | partial |
+| Phase 12 Parent Atlas codebase index | partial |
+| Phase 13 feature-gap registry completion | partial |
+| Phase 14 Redis exact-card cache policy | implemented |
+| Phase 15 Qdrant semantic lane | implemented |
+| Phase 16 Graph/KAG/DAG refresh manifest | partial |
+| Phase 17 PyTorch feature extraction lane | partial |
+| Phase 18 XGBoost / gradient tree boosting reranker | partial |
+| Phase 19 reinforcement-learning experiments | eval-only / not yet graded |
+
+### Evidence artifacts
+
+- `.tmp/parent-atlas-workstation-todo.json`
+- `reports/parent-atlas-workstation-todo.md`
+- `docs/reports/parent-atlas-workstation-status.md`
+- `docs/reports/parent-atlas-workstation-status.json`
+- `docs/reports/parent-atlas-workstation-openspec-task-board.md`
+- `docs/reports/parent-atlas-workstation-openspec-task-board.json`
+- `reports/parent-atlas-open-lanes-todo.md`
+- `docs/reports/parent-atlas-open-lanes-todo.md`
 
 The gate model is executable state: task created -> PostgreSQL row written -> outbox event emitted -> RabbitMQ worker claimed -> gates evaluated -> task transitions READY / CLAIMED / RUNNING / AWAITING_GATE / COMPLETED / FAILED. LLMs may recommend the next transition, but smoke and authorization outcomes must be recorded by the worker and gate evaluator.
 
@@ -367,6 +451,141 @@ The next bounded step is to reuse the existing owners instead of wiring a second
 **Purpose**: Standalone search service (no Python dependency)
 - Status: Not yet integrated
 - Keywords: `search_query` → `go_retrieval` → `ranked_packets` → `union_blend`
+
+### Phase 23: QUIC / UDP / gRPC Transport Validation
+
+**Purpose**: Validate unordered UDP datagrams through QUIC packet-number / AEAD checks, then
+reassemble per-stream results for typed gRPC/HTTP3 fixtures. This is a proof lane, not a new
+transport owner.
+- Status: not started
+- Status: wired in code; proof in progress
+- Keywords: `udp_datagram` → `packet_number` → `aead_tag` → `stream_reassembly` → `grpc_http3`
+- Do not globally sort transport packets; validate and reassemble by QUIC connection / stream.
+- Keep the canonical tensor / gRPC / protobuf path as the app-side typed transport boundary.
+- Validate duplicate / replay / malformed-packet rejection before any RPC smoke is promoted.
+
+### Phase 24: RTX Embeddings + Vector LOD Ladder
+
+**Purpose**: Use RTX for embeddings and matrix scoring, then split vector search into exact,
+hot ANN, and cold ANN tiers with clear ownership. Valkey stays cache / lightweight lookup only;
+it does not own Vamana or RTX search.
+- Status: not started
+- Keywords: `semantic_768` → `PyTorch` → `cuBLAS` / `cuBLASLt` → `cuVS brute_force`
+  → `cuVS CAGRA` → `cuVS Vamana` → `DiskANN`
+- Embeddings: PyTorch / TorchInductor on RTX, with cuBLAS / cuBLASLt underneath for GEMM-heavy
+  work.
+- Exact oracle: cuVS brute_force.
+- Hot ANN: cuVS CAGRA on the active RTX working set.
+- Cold ANN build: cuVS Vamana serialization into DiskANN-compatible files; CPU DiskANN serves
+  queries.
+- Optional cache lane: Valkey / RedisVL vector lookup may be used as a hot cache / lightweight
+  retrieval helper, but it is not the ANN owner.
+- Smallest concrete proof: Arrow mmap → pinned batch → async H2D → GPU tile → exact GEMM →
+  top-k → compare against the already-proven exact-KNN oracle, with per-stage timing captured
+  before expanding the ladder.
+- Keep Hilbert-space / manifold math as representation geometry only, not identity or transport.
+- Keep the 20×20 SOM as a routing surface only; 4D topology / metric-tensor diagnostics stay
+  experiment-only and do not redefine semantic truth.
+- The full tile-cache / LOD hierarchy is design-only until the simpler vector proof is live.
+
+### Phase 27: OKF Fit + HMM Router + Provenance Ladder
+
+**Purpose**: Route between domain categories and agent states using a calibrated logistic fit
+classifier plus HMM/Viterbi state decoding, while keeping rerankers, validators, and cache
+residency separate from canonical truth.
+- Status: not started
+- Keywords: `NaiveBayes` → `LogisticRegression` → `HMM` / `Viterbi` → `Merkle`
+  → `Arrow mmap` → `Valkey residency` → `TaskSignature`
+- Naive Bayes: lexical-only baseline, not the canonical router.
+- Logistic regression: canonical soft-fit classifier for OKF / domain routing.
+- HMM / Viterbi: temporal state decoder over pass observations.
+- MiniLM / MixedBread: reranker only, never the router.
+- Deterministic validation: schema validity remains a validator, not a learned model.
+- Evidence identity: use UUIDv7 for run/task/evidence IDs and SHA-256 / Merkle roots for bundle
+  deduplication.
+- Large tensors and replay artifacts: Arrow IPC / mmap, not Postgres or Valkey blobs.
+- Cache ownership: Valkey stores hot metadata, leases, and residency state only.
+- Keep coarse agent tools only (`classify_request`, `search_candidates`, `analyze_structure`,
+  `traverse_graph`, `compile_evidence`, `synthesize_recommendation`, `execute_validation`).
+- Current proof: `okf-fit` now computes separate naive Bayes and logistic scores inside the OKF
+  packetizer path; focused vitest coverage is green and the packetizer runtime smoke resolves the
+  new scores end to end; the packetizer now also emits a derived HMM observation/state hint in the
+  NLP provenance blob. Broader workspace typecheck still needs a rerun before treating the lane as
+  fully proven.
+
+### Phase 28: Graph Hierarchy + Projection Distortion
+
+**Purpose**: Keep graph hierarchy, geometric distortion, and routing surfaces separate so Louvain,
+SOM, and projection-quality metrics do not collapse into one owner.
+- Status: wired in code; proven by unit tests
+- Keywords: `Louvain` → `community_level` → `hierarchy` → `Jacobian` → `singular_values`
+  → `projection_distortion`
+- Louvain / community hierarchy: graph structure and coarse topology only.
+- Jacobian / singular values: local distortion / expansion of a learned projection.
+- Matrix RTX math: fast projection, centroid scoring, and routing-measure computation.
+- 2D SOM: routing surface / locality map only, not identity.
+- Do not use cross-product magnitude as a routing scalar.
+- 4D manifold / metric-tensor calculations remain diagnostic only; they can inform routing, but
+  they do not become a canonical ownership layer.
+- Contracts: `sveltekit-frontend/src/lib/server/atlas/graph/routing-manifest.ts`
+
+### Phase 29: Routing Map + Distortion Metrics
+
+**Purpose**: Emit typed routing manifests for graph hierarchy, SOM routing, and projection quality
+so the workspace can compare locality experiments without changing canonical truth.
+- Status: wired in code; proven by unit tests
+- Keywords: `RoutingMapManifest` → `GraphHierarchyManifest` → `ProjectionDistortionStats`
+  → `neighborhood_preservation`
+- Graph hierarchy manifest: community level, community id, parent community, member count.
+- Routing map manifest: SOM row/col, cluster id, route neighborhood, active revision.
+- Distortion stats: Jacobian norm, singular value spread, neighborhood preservation score.
+- All outputs are experimental projections until evaluated against replay / ablation.
+- Contracts: `sveltekit-frontend/src/lib/server/atlas/graph/routing-manifest.ts`
+
+### Phase 30: Hypergraph / Multi-hop Traversal Experiment
+
+**Purpose**: Keep n-ary evidence and multi-hop traversal separate from the canonical retrieval
+lane until the live API shape is inspected and the simpler vector / graph lanes are proven.
+- Status: design-only
+- Keywords: `hyperedge` → `ontology_tuple` → `multi_hop` → `HNSW` → `TileKey`
+  → `IndexDB` → `shader_cache`
+- Hypergraph facts: joint events, linked ontology tuples, and repair/evidence bundles only.
+- Traversal facts: bounded multi-hop graph programs only; never expose raw endless traversal.
+- Memory facts: TileKeys and LOD swaps remain a logical cache model, not a GPU pointer layout.
+- 20×20 SOM and 4D manifold diagnostics can feed this lane later, but they are not the owner.
+- Do not start hypergraph-RAG until the API inspection, backend classification, kmeans wiring,
+  and live sidecar blockers are resolved.
+
+**Minimal schema sketch**
+
+```ts
+type GraphHierarchyManifest = {
+  graphRevision: string;
+  projectionRevision: string;
+  communityLevel: number;
+  communityId: string;
+  parentCommunityId: string | null;
+  memberCount: number;
+};
+
+type RoutingMapManifest = {
+  graphRevision: string;
+  projectionRevision: string;
+  somRevision: string;
+  somRow: number;
+  somCol: number;
+  clusterId: string | null;
+  routeNeighborhood: string[];
+};
+
+type ProjectionDistortionStats = {
+  graphRevision: string;
+  projectionRevision: string;
+  jacobianNorm: number | null;
+  singularValues: number[];
+  neighborhoodPreservation: number | null;
+};
+```
 
 ---
 

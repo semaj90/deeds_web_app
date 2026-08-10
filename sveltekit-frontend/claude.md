@@ -202,10 +202,14 @@ Never claim "production-ready" from dry-run evidence.
 
 ---
 
-## 🐰 RabbitMQ Background Job Architecture
+## 🐰 RabbitMQ Background Job Architecture (LEGACY / EXAMPLE ONLY)
 
 ### Why We Need It
 JavaScript is single-threaded → Can't handle heavy tasks (AI analysis, OCR, case clustering) during HTTP requests → Queue jobs via RabbitMQ → Workers process asynchronously
+
+This is a historical queueing example, not the current analysis owner.
+
+This section is a queueing example, not the current analysis owner. Do not use it to recreate an alternate AI-analysis pipeline.
 
 ### Integration Pattern
 
@@ -246,7 +250,7 @@ channel.consume('task_queue', async (msg) => {
   const job = JSON.parse(msg.content.toString());
 
   try {
-    // Process job (case creation, AI analysis, etc.)
+    // Process job (case creation, AI analysis, etc. — historical example only)
     const result = await processJob(job);
 
     // Store results in Neo4j/MinIO/PostgreSQL
@@ -280,7 +284,7 @@ channel.consume('task_queue', async (msg) => {
   - `loadCase`: Fetch case + evidence
   - `createCase`: Submit new case
   - `addEvidence`: Upload attachments
-  - `startAIAnalysis`: Queue AI analysis job
+  - `startAIAnalysis`: Queue AI analysis job (historical example only)
 - Integration: All results flow through RabbitMQ
 
 ### Message Durability
@@ -342,7 +346,7 @@ async function ragQuery(query: string) {
 }
 ```
 
-### KAG (Knowledge-Augmented Generation)
+### KAG (Knowledge-Augmented Generation) (LEGACY / EXAMPLE ONLY)
 **Pattern:** Structured knowledge (Neo4j graph) + LLM reasoning
 
 ```typescript
@@ -359,7 +363,7 @@ async function kagAnalysis(caseId: string) {
   // 2. Convert graph to text
   const knowledge = formatGraphAsContext(graph);
 
-  // 3. LLM analysis
+  // 3. LLM analysis (historical example only; not the current analysis owner)
   const analysis = await ollama.generate({
     model: 'gemma3-legal:latest',
     prompt: `Analyze this case structure:\n${knowledge}`
@@ -524,7 +528,7 @@ async function chunkWithEmbeddings(document: string) {
 
 ### 1. XState v5 Case Machine Rebuild
 - **case-creation-machine.ts**: Clean fromPromise generics, validation, retry
-- **enhanced-legal-case-machine.ts**: Full CRUD + AI analysis
+- **enhanced-legal-case-machine.ts**: Full CRUD + AI analysis (historical example only)
 - **Integration**: Both ready to queue via idle-detection machine
 
 ### 2. RabbitMQ Documentation Integration
@@ -898,7 +902,7 @@ npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
 - Fixed `src/lib/types/chat.ts` RAGContext typing and added `recommendations`/`did_you_mean`.
 - Fixed `src/lib/stores/chat-store.svelte.ts` errorHistory type annotation.
 - Post-fix `svelte-check`: 50,782 errors / 100 warnings (1445 files).
-- Rebuilt `src/lib/services/ai-service.ts` with clean async flow, optional DB writes, and Ollama-based analysis.
+- Rebuilt `src/lib/services/ai-service.ts` with clean async flow, optional DB writes, and Ollama-based analysis (historical example only; not the current owner).
 
 ---
 
@@ -934,7 +938,7 @@ npx svelte-check --threshold error 2>&1 | Select-String "found \d+ error"
 
 ---
 
-## TRACE/Karpathy Performance Lane
+## TRACE/Karpathy Performance Lane (LEGACY / REFERENCE ONLY)
 
 **Last Updated: May 6, 2026**
 
@@ -975,7 +979,7 @@ Use this execution order for GPU, indexing, cache, and agentic tool-call work:
 ### MCP Tool Surface (model-facing only, no raw DB access)
 
 ```
-Gemma4 / Claude
+Gemma4 / Claude (legacy model-facing example)
   ↓
 MCP tool call
   ↓
@@ -989,7 +993,7 @@ Go/TS retrieval, embedding, indexer service
 **Named tools**: `trace.kag_search`, `topology.search_near`, `graph.expand_neighborhood`,
 `graph.shortest_path`, `clusters.get_summary_lenses`, `trace.explain_retrieval`
 
-**Rule**: Gemma4 MUST call named MCP tools. It does NOT talk to gRPC, Qdrant, Neo4j, or Postgres directly.
+**Rule**: Gemma4 MUST call named MCP tools. It does NOT talk to gRPC, Qdrant, Neo4j, or Postgres directly. This is legacy model-facing guidance, not current ownership.
 
 ### TypeScript 7 Native Audit Lane
 - `tsgo` runs as a fast parallel type audit (10× faster than tsc)
@@ -999,9 +1003,9 @@ Go/TS retrieval, embedding, indexer service
 
 ---
 
-## Retrieval Lanes — Vector vs Hyper-Graph-RAG (May 9, 2026)
+## Retrieval Lanes — Vector vs Hyper-Graph-RAG (LEGACY / REFERENCE ONLY — May 9, 2026)
 
-**Rule**: vector RAG and hyper-graph-RAG are **complementary, not competing**. Pick the lane by the question shape, not by preference. The Karpathy Authority Blend (`0.4·PageRank + 0.3·attention + 0.3·authority`) is the canonical hybrid.
+**Rule**: vector RAG and hyper-graph-RAG are **complementary, not competing**. This is historical guidance only; do not treat it as the current Parent Atlas ownership model. The Karpathy Authority Blend (`0.4·PageRank + 0.3·attention + 0.3·authority`) is the canonical hybrid in this legacy lane.
 
 | Lane | Strength | Backing store | Use when |
 |---|---|---|---|
@@ -1043,8 +1047,8 @@ Two hard rules added to `docs/architecture/trace-runtime-split.md` Hard Rules af
 - `memory/hypergraph-4-lanes-vault.md` — 4-lane edge inventory + smoke gate
 - `next_steps/active/2026-05-09_karpathy-chr97-wiring.md` — design doc for the cartridge layer that ties vector + graph retrieval into a single ACE Stage A0 cache slice
 - `next_steps/active/2026-05-09_agents-md-incremental-pipeline.md` — sister design doc; AGENTS.md updates feed the `agents_context` hyperedge lane
-- §"Karpathy GPU Authority Blend + Redis ACE Cache" (project-root CLAUDE.md) — full blend pipeline reference
-- `docs/architecture/trace-kag-web-development-guide.md` — canonical 20-section TRACE/Karpathy web-development guide (route execution contract, retrieval lane decision tree, production safety gates, Browser Context Lane policy at §17)
+- §"Karpathy GPU Authority Blend + Redis ACE Cache" (project-root CLAUDE.md) — legacy blend pipeline reference
+- `docs/architecture/trace-kag-web-development-guide.md` — legacy TRACE/Karpathy web-development guide (route execution contract, retrieval lane decision tree, production safety gates, Browser Context Lane policy at §17)
 - `docs/architecture/agent-surface-decision-matrix.md` — Cline vs OpenCode vs Hermes vs Codex vs Claude Code comparison + operating model. Settles "agent-surface choice is now ergonomics, not capability". Supersedes earlier "Cline wins / Hermes is a TUI toy / OpenCode is CLI-only" framing.
 - `docs/architecture/trace-runtime-split.md` — Gemma4 → MCP runtime boundary rule
 - `memory/architecture/browser-context-lane.md` — sanitizer + storage + worker contract for the optional browser snapshot
