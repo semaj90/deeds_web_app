@@ -20,6 +20,7 @@ import { createHash } from 'crypto';
 import { classifyOkfFit, OKF_FIT_VERSION } from './okf-fit.js';
 import { buildHMMObservationFromOkfFit, HMMObservationSchema } from '../analysis/nlp-feature-compiler.js';
 import type { FeatureMatrixRowV1 } from './feature-matrix-schema';
+import { FeatureSourceManifestSchema, buildFeatureSourceManifest } from './tensors/feature-matrix-contract.js';
 
 /**
  * OKF (Open Knowledge Format) topic metadata.
@@ -87,6 +88,7 @@ export const OKFTopicAnalysisSchema = z.object({
   domain_classification: OKFDomainClassificationSchema,
   semantic_ontology: OKFSemanticOntologySchema,
   nlp: OKFNlpProvenanceSchema,
+  feature_source_manifest: FeatureSourceManifestSchema.optional().nullable().default(null),
 });
 
 export type OKFTopicAnalysis = z.infer<typeof OKFTopicAnalysisSchema>;
@@ -326,6 +328,12 @@ export function buildOkfTopicAnalysis(input: {
         evidenceCount: classified.evidence.length,
       }),
     },
+    feature_source_manifest: buildFeatureSourceManifest({
+      workspaceRevision: 'main',
+      featureRevision: 'feature-matrix-5-t2-lineage-v1',
+      packetKey: `ace:packet:research:okf:${input.topicId}`,
+      sourceRef: `docs:okf:topic:${input.topicId}`,
+    }),
   };
 }
 

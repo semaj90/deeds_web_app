@@ -1,0 +1,30 @@
+{
+  "distribution": {
+    "min": 1.2483104937529532,
+    "max": 3.517972346347794,
+    "p05": 2.0366966421760884,
+    "p25": 2.154565397595747,
+    "median": 2.24380273253877,
+    "p75": 2.3720123464331366,
+    "p95": 2.654120818689248,
+    "p99": 2.8540440078613964,
+    "mean": 2.2833211007680014,
+    "stdev": 0.1971580117425999
+  },
+  "coverage": {
+    "sourceRows": 4480,
+    "eligibleRows": 4046,
+    "producedRows": 4046,
+    "coverageRatio": 0.9031,
+    "missingPolicy": "MISSING",
+    "producerRevision": "mapreduce-engram-byte3-v1",
+    "normalizationRevision": "robust-mad-tanh-v1",
+    "excludedByReason": {
+      "excluded_path:reports/backup-": 426,
+      "excluded_path:.min.js": 1,
+      "excluded_path:package-lock.json": 3,
+      "excluded_path:build": 2,
+      "excluded_path:vendor": 2
+    }
+  }
+}

@@ -55,5 +55,14 @@ describe('okf fit classifier', () => {
     expect(okf.nlp.hmm_observation?.observation).toMatch(/^OKF_FIT_/);
     expect(okf.nlp.hmm_observation?.stateHint).toBeDefined();
     expect(okf.nlp.hmm_observation?.metadata).toHaveProperty('logistic_regression_score');
+    expect(okf.feature_source_manifest?.provenCount).toBe(3);
+    expect(okf.feature_source_manifest?.readyForFeatureMatrix).toBe(false);
+    expect(okf.feature_source_manifest?.fields.map((field) => field.name)).toEqual([
+      'authority_norm',
+      'domain_fit',
+      'ast_signal',
+      'entropy_norm',
+      'execution_utility',
+    ]);
   });
 });

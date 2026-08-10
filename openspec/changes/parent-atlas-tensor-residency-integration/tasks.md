@@ -16,15 +16,65 @@
       with fabricated/zero-filled values for any unproven field.** This gate exists precisely to
       make "5/5 proven" an explicit, checkable precondition rather than an assumption.
 
-      **Status: 3/5 proven, 2/5 genuinely blocked (2026-08-10, all coverage numbers verified
+      **Status: 4/5 proven, 1/5 genuinely blocked (2026-08-10, all coverage numbers verified
       live against Postgres, not estimated):**
       | Field | Status | Source | Live coverage |
       |---|---|---|---|
       | `authority_norm` | PROVEN | `graph_node_metrics.pagerank` (`packet_key` join) | 58,546 / 61,659 = 94.9% |
       | `domain_fit` | PROVEN | `atlas_packets.domain_confidence` | 4,412 / 61,659 = 7.2% |
-      | `ast_signal` | **PROVEN 2026-08-10** | `codebase_chunk_index.ast_symbols` JSONB (written by `ast-treesitter-facts.mjs`, real `web-tree-sitter` parser — confirmed live, not a stub) | 2,903 / 52,417 = 5.5% |
-      | `entropy_norm` | NOT PROVEN | No live Engram byte/n-gram statistics table exists yet; the tensor-residency bundle's `mapreduce_engram.py` has never been run against real source text | — |
-      | `execution_utility` | NOT PROVEN | Checked `trace_runs` as the candidate RouteTrace source: real live table, 15 rows, but **no `packet_key` column at all** — it records run-level status/exit_code/pass_count, not per-packet outcomes. Not usable as-is; would need either a schema addition or a different join path. | — |
+      | `ast_signal` | PROVEN 2026-08-10 | `codebase_chunk_index.ast_symbols` JSONB (written by `ast-treesitter-facts.mjs`, real `web-tree-sitter` parser — confirmed live, not a stub) | 2,903 / 52,417 = 5.5% |
+      | `entropy_norm` | **PROVEN 2026-08-10** | byte-trigram Engram (`mapreduce_engram.py`) over real `codebase_chunk_index.content`, concatenated per packet in `line_start` order | 4,046 / 4,480 = 90.3% (of the distinct-packet-with-content universe; see full breakdown below) |
+      | `execution_utility` | NOT PROVEN | Checked `trace_runs` as the candidate RouteTrace source: real live table, 15 rows, but **no `packet_key` column at all** — it records run-level status/exit_code/pass_count, not per-packet outcomes. Not usable as-is; needs the n-ary `trace_packet_events` table design below before this can close. | — |
+
+      **`entropy_norm` — full run record (T2_ENTROPY_COMPLETE checklist, all items satisfied):**
+      - Real source corpus: 4,480 distinct `(packet_key, relative_path)` rows, real
+        `codebase_chunk_index.content` concatenated per packet in `line_start` order (same join
+        as T2b/T6c: `atlas_packets.source_ref = codebase_chunk_index.relative_path`).
+        `source_revision` = sha256 of the concatenated per-packet UTF-8 text, computed in SQL,
+        carried through per row — reruns against unchanged content reproduce the identical hash.
+      - Frozen input contract (recorded, not assumed): UTF-8 (re-encoded with
+        `errors="replace"`), raw line endings (not canonicalized — CRLF treated as real
+        byte-level signal), context width 3 bytes, packet attribution = one row per packet_key.
+        **Exclude policy** (found live, not guessed): `node_modules/`, `.venv/`, `vendor/`,
+        `dist/`, `build/`, `package-lock.json`, `pnpm-lock.yaml`, `.min.js`, and
+        `/reports/backup-*` (426 of 434 total exclusions — stale duplicate snapshot dirs found
+        live in the export; excluding them was the right call, not an afterthought).
+      - `mapreduce_engram.py`'s existing `map_counts`/`reduce_counts` reused unchanged (no
+        redesign) to build a global byte-trigram → next-byte-distribution table across all 4,046
+        eligible packets: 488,862 distinct `(context,next)` events, 116,092 distinct 3-byte
+        contexts, each context's Laplace-smoothed (α=0.1) Shannon entropy `H(context)` computed
+        once. Per-packet `raw_packet_entropy` = mean of `H(context)` over every trigram position
+        in that packet's own byte sequence (DeepSeek-Engram-style: global deterministic memory
+        table, looked up per occurrence, not a per-packet model).
+      - **Raw distribution reported before choosing normalization** (not assumed): min 1.2483,
+        p05 2.0367, p25 2.1546, median 2.2438, p75 2.372, p95 2.6541, p99 2.854, max 3.518, mean
+        2.2833, stdev 0.1972.
+      - Normalization chosen *from* that distribution, not an arbitrary denominator: robust
+        z-score using median/MAD (`MAD_scaled = MAD × 1.4826 = 0.1505`), squashed via
+        `entropy_norm = (tanh(z) + 1) / 2` — median maps to exactly 0.5 by construction, min/max
+        map to 0.0000/1.0000. Revisioned as `normalization_revision = "robust-mad-tanh-v1"`
+        (distinct from `ast_signal`'s unrelated `tanh(x/5)` formula — no shared denominator was
+        assumed across features).
+      - **Coverage recorded with full accounting** (per the `FeatureCoverage` contract:
+        sourceRows/eligibleRows/producedRows/coverageRatio/missingPolicy/producerRevision, not
+        just a bare percentage): `sourceRows=4480, eligibleRows=4046, producedRows=4046,
+        coverageRatio=0.9031, missingPolicy="MISSING", producerRevision=
+        "mapreduce-engram-byte3-v1", excludedByReason={reports/backup-: 426, .min.js: 1,
+        package-lock.json: 3, build: 2, vendor: 2}`. All 434 excluded/too-short rows have
+        `entropy_norm=null` — **never zero-filled**.
+      - **Deterministic rerun checked live**: ran the full pipeline twice; byte-identical output
+        (`diff` clean) on the second run.
+      - Persisted: `data/atlas-tensor-proof/entropy_norm_r1.jsonl` (4,480 rows: packet_key,
+        source_revision, engram_context_width, entropy_raw, entropy_norm, observed_contexts,
+        eligible, coverage_reason, producer_revision, normalization_revision) and
+        `entropy_norm_coverage_r1.json` (distribution + coverage manifest).
+
+      **STOP per explicit instruction — T2-lineage is now 4/5, entropy_norm closed. Did not
+      start `execution_utility` in this same gate.** The next dedicated gate is the
+      packet-grained execution-event model (`trace_packet_events`: run_id, packet_key,
+      event_type, selected, evidence_used, compile_pass, test_pass, repair_success,
+      validation_pass, source_revision, representation_revision) — a real schema-design task,
+      not a verification pass, intentionally not started here.
 
       **`ast_signal` formula** (defined and distribution-checked live, not yet written to any
       table): `ast_signal = tanh(symbol_count / 5)` where `symbol_count =
@@ -40,13 +90,34 @@
       missing, never silently zero-filled, regardless of which of the 3 proven fields is sparse
       for a given packet.
 
-      **Remaining to close this gate**: build a real `entropy_norm` producer (byte/n-gram
-      entropy over `codebase_chunk_index.content`, using the already-designed but unrun
-      `mapreduce_engram.py` MAP/REDUCE/NORMALIZE pipeline from the tensor-residency bundle), and
-      resolve `execution_utility`'s missing packet-level join (either add a `packet_key` column
-      to `trace_runs`/a new per-packet execution-outcomes table, or find a different real
-      source). Neither attempted this pass — both are genuinely new implementation work, not a
-      verification pass like `ast_signal` was.
+      **`execution_utility` schema now exists live (2026-08-10) — but this does NOT close the
+      gate.** Before writing any schema, checked whether real historical data could bootstrap
+      this: `trace_runs` (15 rows) has no `packet_key`; `trace_events` (45 rows) has a
+      `file_path` column that looked promising but **joins to zero rows** in
+      `atlas_packets.source_ref` (checked live), and its event types
+      (`tool_call`/`span`/`cache_hit`/`cache_miss`) are infrastructure telemetry, not
+      compile/test/repair outcomes. **There is no real per-packet execution-outcome data
+      anywhere in this system to backfill from — none, checked, not assumed.**
+
+      Applied `migrations/20260810b_trace_packet_events.sql` (additive-only, matches T1's
+      pattern, zero conflict with any existing table): `trace_packet_events` (the n-ary child
+      relation — `run_id, packet_key, event_type, retrieval_rank, selected, evidence_used,
+      compile_pass, test_pass, repair_success, validation_pass, latency_ms, token_cost,
+      tool_cost, source_revision, representation_revision` — deliberately NOT a `packet_key`
+      column bolted onto `trace_runs`, since one run touches many packets and that would encode
+      a false 1:1 relationship) and `atlas_execution_utility` (the packet-level aggregation
+      target: `execution_utility_raw`, `execution_utility`, plus the five named component rates
+      — `selected_rate`, `targeted_test_success_rate`, `repair_success_rate`,
+      `execution_validation_rate`, `false_edit_penalty` — matching the fixed-weight formula
+      `U = wₛS + wₜT + wᵣR + wₑE + w_fF`, not RL, per design intent). Both confirmed live via
+      `\dt`, both confirmed **empty (0 rows)** — this is expected and correct, not a bug.
+
+      **`execution_utility` remains NOT_PROVEN.** Schema existing is not the same claim as data
+      existing — this only creates the persistence shape for real events to accumulate into as
+      the system runs going forward; nothing can be computed or backfilled today. T2-lineage
+      stays at **4/5**, not 5/5, until `trace_packet_events` has real rows and a rollup job has
+      actually populated `atlas_execution_utility` with a reportable coverage number, the same
+      standard applied to every other field in this table.
 
       **Adjacent naming hazard, found via a stray grep result (2026-08-10)**: don't confuse
       `ast_signal`'s real source (`ast-treesitter-facts.mjs`, real `web-tree-sitter`) with
