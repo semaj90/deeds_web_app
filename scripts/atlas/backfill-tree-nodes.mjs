@@ -23,6 +23,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
@@ -59,6 +60,13 @@ const log = {
  */
 function safeSlug(str) {
   return str.replace(/[^a-zA-Z0-9-]/g, '-').replace(/-+/g, '-').toLowerCase();
+}
+
+function canonicalPathSlug(str) {
+  const raw = String(str ?? '');
+  const base = safeSlug(raw) || 'root';
+  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 10);
+  return `${base}-${hash}`;
 }
 
 async function detectPacketTable(client) {
@@ -167,7 +175,7 @@ async function backfill() {
       const sourceRef = file.source_ref;
       const filePath = file.file_path || sourceRef;
       const title = sourceRef.split(/[\\/]/).pop() || sourceRef;
-      const pageIndexPath = `doc:${safeSlug(sourceRef)}`;
+      const pageIndexPath = `doc:${canonicalPathSlug(sourceRef)}`;
 
       // Get packets for this file
       const packetsResult = await client.query(
@@ -230,7 +238,7 @@ async function backfill() {
 
       // 2. Create chunk (leaf) nodes for each packet
       for (const packet of packets) {
-        const chunkPageIndexPath = `${pageIndexPath}/chunk:${safeSlug(packet.packet_key)}`;
+        const chunkPageIndexPath = `${pageIndexPath}/chunk:${canonicalPathSlug(packet.packet_key)}`;
         let chunkNodeId = await findExistingTreeNodeId(client, {
           sourceRef,
           packetKey: packet.packet_key,

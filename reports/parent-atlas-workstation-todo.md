@@ -58,7 +58,7 @@ replace any existing transport, resource, or packet contracts.
 3. Add packet-centric provenance fields to every trace event.
 4. Keep proof separate from promotion; telemetry presence does not imply a new owner.
 
-## Current Control-Plane Override — 2026-08-09
+## Current Proven Stop State — 2026-08-10
 
 Patch H 7/7 proven
 ↓
@@ -121,6 +121,35 @@ unstarted). The `docs/graph/codebase-graph.json` canonical refresh was also comp
 this machine (Windows `EPERM` file-lock on an unrelated Phase-8 RabbitMQ chain); use
 `node scripts/index-codebase-fast.mjs --publish-canonical` directly instead.
 
+## P1 tree lineage — PROVEN (2026-08-10, canonical packets only)
+
+- `atlas_packets`: 61,659 packets
+- `atlas_packets → atlas_tree_nodes`: 61,659 / 61,659 packet links
+- canonical `source_ref` uniqueness: PASS
+- canonical `page_index_path` uniqueness: PASS
+- path reconciliation: APPLIED
+- row deletion: 0
+
+This proof is intentionally separate from the topology lane. `atlas_topology_index` still contains
+extra synthetic rows, but the canonical packet→tree lineage is now complete and idempotent.
+
+## Summary layers — storage proven, content partial (2026-08-10)
+
+- `atlas_summary_layers`: 18,437 rows
+- non-empty `summary`: 7,061 rows
+- non-empty `summary_text`: 1,128 rows
+- any non-empty content: 7,654 rows
+- placeholder-like content: 254 rows
+- empty rows: 10,783 rows
+- worker split: `embeddinggemma-batch-worker` 14,721; `backfill-summary-layers-from-chunks` 87; legacy `"<none>"` 3,629
+- nested `metadata.summary_context`: 470 rows
+- `identity_required_complete` inside nested summary context: 406 / 470
+- `identity_chain_complete` inside nested summary context: 0 / 470
+- `source_revision` / `representation_revision` are absent from nested summary context
+
+This lane is live and partly real, but it still contains a large empty/legacy tail and multiple peer writers.
+Do not treat row existence as proof of canonical summary quality.
+
 ## T2-lineage — 3/5 proven (2026-08-10, new since this report was generated)
 
 | Field | Status | Source | Live coverage |
@@ -138,14 +167,38 @@ never zero-filled. `feature_tensor_4x6_r1.arrow`/`feature_matrix_5.arrow` remain
 no AST parsing despite its name (plain fixed-window text splitter) — has real live callers, so
 not dead code, just don't mistake it for a second `ast_signal` source.
 
-## T6c lineage stop (original plan, pre-execution — see RESULT above for what actually ran)
+Wiring update: `feature_source_manifest` now flows through
+`sveltekit-frontend/src/lib/server/atlas/okf-topic-ingestion.ts`, so the live 3/5 state is
+carried in OKF packets instead of existing only as an OpenSpec note. The artifact gate remains
+blocked until 5/5.
 
-1. Freeze the `semantic_768` corpus revision before running KMeans.
-2. Persist centroid and membership artifacts for `K ∈ {64, 128, 256}` with lineage metadata.
-3. Compare candidate reduction and recall@10 against the already-proven T3a exact oracle.
-4. Keep SOM cache-hint-only until it proves it does not hurt recall.
-5. Refresh Graphify only after T6c is persisted and evaluated.
-6. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
+## T6c current proven stop state (2026-08-10)
+
+T6c is complete as an experiment and must not be reopened as if KMeans still needs first proof.
+
+1. Canonical source representation is frozen `semantic_768`.
+2. KMeans artifacts were produced for `K ∈ {64, 128, 256}` with centroid, membership, and provenance artifacts persisted.
+3. Each clustering configuration was evaluated against the already-proven T3a exact cosine oracle.
+4. KMeans achieved useful corpus reduction but did not preserve perfect Recall@10, so it is `KMEANS_ROUTING_EXPERIMENT_PROVEN` and `CACHE_HINT_ONLY`.
+5. SOM remains a separate 20×20, 400-cell topology experiment and must be evaluated with the same exact-oracle methodology before any promotion.
+6. Do not rerun T6c to increase coverage, and do not use KMeans membership as canonical packet identity.
+7. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
+8. Do not silently substitute 384-dimensional vectors; future compressed latents must be separately revisioned experiments.
+
+## Phase 3 canonical 768-dim note
+
+Phase 3 uses the frozen `semantic_768` representation everywhere in the live path.
+`384`-dim references are legacy or derived lanes only; they do not become canonical writers,
+canonical retrieval truth, or new owner boundaries.
+
+- Stage 3B: community_id propagation and AST symbol extraction.
+- Stage 3C: SOM 20×20 as a separate 400-cell topology experiment over `semantic_768`.
+- Stage 3D: reranker feature preparation from packet evidence.
+
+`latent_64` is legacy routing compatibility only. Any future latent compression work should be a
+separately revisioned experiment, with `latent_128` the more plausible candidate if one is needed.
+The phrase `kmeans 20x20` is not the correct terminology; KMeans uses `K ∈ {64, 128, 256}` and SOM
+is the separate 20×20 topology experiment.
 
 ## Separate lane: Kafka / CDC / Rust sidecar analysis
 

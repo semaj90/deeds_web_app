@@ -1001,6 +1001,29 @@ async function sveltePost(path: string, body: unknown) {
 type ToolHandler = (args: Record<string, unknown>) => Promise<unknown>;
 const toolRegistry = new Map<string, ToolHandler>();
 
+// Several handlers in this file return a bare object (e.g. `{ status: 'success', workstation }`)
+// instead of the MCP SDK's required `{ content: [{ type: 'text', text }] }` tool-result shape.
+// The SDK can't serialize a non-conforming return value into a content block, so those calls
+// complete with no visible output at all — not an error, just silently empty. Normalize every
+// handler's return value here rather than fixing each of the 17+ call sites individually.
+function normalizeToolResult(result: unknown): { content: Array<{ type: 'text'; text: string }>; isError?: boolean } {
+  if (
+    result &&
+    typeof result === 'object' &&
+    Array.isArray((result as { content?: unknown }).content)
+  ) {
+    return result as { content: Array<{ type: 'text'; text: string }>; isError?: boolean };
+  }
+  return {
+    content: [
+      {
+        type: 'text',
+        text: typeof result === 'string' ? result : JSON.stringify(result, null, 2),
+      },
+    ],
+  };
+}
+
 // Monkey-patch both registerTool and tool so they populate the batch_call registry
 // AND record tool invocations to Engram memory (PostgreSQL + BM25/HNSW)
 const _origRegister = server.registerTool.bind(server);
@@ -1033,7 +1056,7 @@ const _origRegister = server.registerTool.bind(server);
         })
         .catch((err) => console.warn(`[mcp] Engram record failed for ${name}:`, err));
 
-      return result;
+      return normalizeToolResult(result);
     } catch (err) {
       console.error(`[mcp] ERROR in tool ${name}:`, err);
 
@@ -9906,7 +9929,7 @@ server.registerTool(
       const includeScores = Boolean(input.include_scores);
 
       // Fetch Karpathy scores from Redis (24h TTL)
-      const karpathyData = await embedRedis.hgetall('gpu:karpathy:scores');
+      const karpathyData = await (await getEmbedRedis()).hgetall('gpu:karpathy:scores');
       if (Object.keys(karpathyData).length === 0) {
         return {
           status: 'no_karpathy_data',
@@ -9977,7 +10000,7 @@ server.registerTool(
       const metric = String(input.metric ?? 'all');
 
       // Fetch SOM cluster assignments from Redis
-      const somCells = await embedRedis.hgetall('gpu:karpathy:som:cells');
+      const somCells = await (await getEmbedRedis()).hgetall('gpu:karpathy:som:cells');
       if (Object.keys(somCells).length === 0) {
         return {
           status: 'no_som_data',
@@ -10010,7 +10033,7 @@ server.registerTool(
       };
 
       // Centroid stats (fetch from Redis cached centroids)
-      const centroidStats = await embedRedis.hgetall('gpu:karpathy:encoded');
+      const centroidStats = await (await getEmbedRedis()).hgetall('gpu:karpathy:encoded');
       const centroidCount = Object.keys(centroidStats).length;
 
       return {
@@ -10143,8 +10166,9 @@ server.registerTool(
       }
 
       // Fetch Karpathy authority scores (files ranked by authority)
-      const karpathyScores = await embedRedis.hgetall('gpu:karpathy:scores');
-      const karpathyEncodings = await embedRedis.hgetall('gpu:karpathy:encoded');
+      const embedRedisClient = await getEmbedRedis();
+      const karpathyScores = await embedRedisClient.hgetall('gpu:karpathy:scores');
+      const karpathyEncodings = await embedRedisClient.hgetall('gpu:karpathy:encoded');
 
       // Filter by language tag from Qdrant (simplified: assume file path pattern)
       const langFileMap: Record<string, number> = {};

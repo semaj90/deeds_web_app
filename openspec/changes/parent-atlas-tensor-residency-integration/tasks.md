@@ -435,6 +435,10 @@ concrete, load-bearing decisions extracted from it:
   INT4 token-ID remapping, 4D metric-tensor/Riemannian geometry, quaternion rotations, DLSS-style
   subsampling, QLoRA memory swaps, BVH/meshnet. None of these are prerequisites for T1–T10.
 
+**Canonical semantic representation is 768-dim everywhere in this phase.** Any 384-dim
+references elsewhere in the repo are legacy or derived lanes only; this phase does not silently
+change any other stage assumptions, counts, or ownership boundaries.
+
 **No code changed this turn.** The next concrete action remains exactly what the "Live
 verification" section above and the user's closing paragraph both already name: T1 (Postgres
 migration apply) then T3 (one Arrow tile → pinned host → exact GPU top-k → packet-key recovery),
@@ -480,6 +484,139 @@ sequence + same policy revision + same memory budget ⇒ same eviction sequence,
 `atlas:tile:*` (artifact_id, batch/range, state, bytes, utility), `atlas:centroid:*` (tile
 hints), `atlas:query:*` (shortlist), `atlas:residency:*` (metadata). Every key must carry
 enough revision identity that stale data can never be confused with current data.
+
+## T6c current proven stop state (2026-08-10)
+
+T6c is complete as an experiment and must not be reopened as if KMeans still needs first proof.
+
+1. Canonical source representation is frozen `semantic_768`.
+2. KMeans artifacts were produced for `K ∈ {64, 128, 256}` with centroid, membership, and provenance artifacts persisted.
+3. Each clustering configuration was evaluated against the already-proven T3a exact cosine oracle.
+4. KMeans achieved useful corpus reduction but did not preserve perfect Recall@10, so it is `KMEANS_ROUTING_EXPERIMENT_PROVEN` and `CACHE_HINT_ONLY`.
+5. SOM remains a separate 20×20, 400-cell topology experiment and must be evaluated with the same exact-oracle methodology before any promotion.
+6. Do not rerun T6c to increase coverage, and do not use KMeans membership as canonical packet identity.
+7. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
+8. Do not silently substitute 384-dimensional vectors; future compressed latents must be separately revisioned experiments.
+
+## Phase 3 canonical 768-dim note
+
+Phase 3 uses the frozen `semantic_768` representation everywhere in the live path.
+`384`-dim references are legacy or derived lanes only; they do not become canonical writers,
+canonical retrieval truth, or new owner boundaries.
+
+- Stage 3B: community_id propagation and AST symbol extraction.
+- Stage 3C: SOM 20×20 as a separate 400-cell topology experiment over `semantic_768`.
+- Stage 3D: reranker feature preparation from packet evidence.
+
+`latent_64` is legacy routing compatibility only. Any future latent compression work should be a
+separately revisioned experiment, with `latent_128` the more plausible candidate if one is needed.
+The phrase `kmeans 20x20` is not the correct terminology; KMeans uses `K ∈ {64, 128, 256}` and SOM
+is the separate 20×20 topology experiment.
+
+## Separate lane: Kafka / CDC / Rust sidecar analysis
+
+This workstream is design-only until explicitly opened as its own task.
+
+- Kafka / CDC is not part of the current T6c or Graphify sequence.
+- PostgreSQL 18 specifics are not a canonical owner here; they are an integration target only if a
+  separate ingestion lane proves they matter.
+- Rust sidecar analysis is a separate infrastructure lane, not a replacement for the current
+  Python / SvelteKit / GPU split.
+- Do not let bitmap / aio / CDC ideas redefine the `semantic_768` routing proof.
+- If this lane is ever opened, it should start from evidence of a real producer / consumer gap,
+  not from the KMeans or SOM evaluation path.
+
+## Sequencing and Gate Order
+
+### P2 transport and ingestion gates
+
+1. Finish the MCP / `/mcp` / `/sse` diagnostics.
+2. Keep TRACE core enabled and optional sidecars opt-in until transport matches are confirmed.
+3. Resolve Claude-Mem export path alignment before any importer run.
+4. Keep the persistent Engram ingestion lane deferred until the transport and importer path are stable.
+5. Keep Redis 8 isolated as an eval lane and compare it only after the current ACE context cache lane is stable.
+
+### P2 registry and retrieval policy
+
+1. Replace the bootstrap feature-gap registry with a live app workspace scan when the mounted codebase is available.
+2. Ingest the current feature inventory into the registry and mark each lane as implemented, partial, missing, or eval-only.
+3. Keep the retrieval policy explicit: exact cache first, then semantic cache, then retrieval, then packet assembly.
+4. Keep single-fact lookups on vector search, code navigation on agentic search, and graph-heavy data on graph lanes.
+
+### P3 storage, cards, and synthesis
+
+1. Build ClusterCard flow from reviewed sourceRefs and table contracts.
+2. Keep the semantic cache policy split between Redis exact-card lookup and Qdrant dense retrieval.
+3. Add graph refresh manifest discipline with version/hash and promotion state.
+4. Wire synthesis consumers only after the packet/version contract stays stable.
+
+### P3 validation and structural promotion
+
+1. Stabilize the 768d -> 64d latent -> cluster -> JSON graph path.
+2. Define the canonical ClusterCard -> GlyphRecord -> CHR97 mapping.
+3. Keep manifold4 as a later analytical lane, not a correctness gate.
+4. Treat the ACE Context Pack Cache / NES Cartridge Cache as Redis-hot-pointer plus Postgres-durable storage only; large snapshot storage stays open.
+
+### P4 semantic memory and checklist mining
+
+1. Keep the semantic indexer as a first-class lane.
+2. Keep its outputs consumable by the feature-gap registry without rereading whole corpora.
+3. Keep the semantic lane aligned with the ACE/NES packet contract and version field.
+4. Add smoke/report outputs to registry rows for retrieval lanes and feature-map lanes.
+5. Use LangChain later only as an optional organizer for messy `.md` / `.json` after LangExtract.
+
+### Token remapping and geometry lanes
+
+1. `autoencoder`: default lane for token remapping, latent projection, and route compression.
+2. `decoder-upscale`: optional reconstruction / upscaling lane; do not make it the identity owner.
+3. `bvh-geometry`: spatial traversal and visualization lane only.
+4. `riemannian-geometry`: metric-tensor and distortion diagnostics lane only.
+5. `kmeans-64-128-256`: centroid routing topology lane; do not label it `kmeans-20x20`.
+6. `som-20x20`: separate 400-cell cache-hint topology experiment, not KMeans.
+7. `glyph-animation`: NES / CHR97 / sprite visualization lane; never the canonical retrieval lane.
+
+### Optional downstream phases
+
+1. Phase 10B TurboVec + Qdrant optimization.
+2. Phase 11 cuVS / CUDA sidecar benchmark.
+3. Phase 12 CUDA streams / tensor bridge / RNN experiments.
+4. Phase 13 graph synthesis + feature MapReduce.
+5. Phase 14 DuckDB + LangGraph + Langfuse.
+6. Phase 15 feature labeling + pruning.
+7. Phase 16 implement missing features.
+8. Phase 17 optional LangChain organizer after LangExtract.
+9. Phase 18 WebGPU TypeScript MapReduce matrix and CUDA/libtorch experiments.
+10. Phase 19 deterministic HMM + linear policy baseline.
+11. Phase 20 DSPy program contract for Atlas agent programs.
+12. Phase 21 GEPA reflective prompt/program optimization on RouteTrace and eval traces.
+13. Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments.
+14. Phase 23 QLoRA / SFT.
+15. Phase 24 DPO.
+16. Phase 25 PPO only if still justified.
+
+Phase 18 and Phase 22 overlap conceptually for boosting-based work; treat Phase 18 as the current
+evaluation surface and Phase 22 as any later learned-policy experimentation, or you create two
+owners for the same capability.
+
+### Conservative phase-status snapshot
+
+| Phase | Status |
+|---|---|
+| Phase 11 Engram/Gemma4 memory wiring | partial |
+| Phase 12 Parent Atlas codebase index | partial |
+| Phase 13 feature-gap registry completion | partial |
+| Phase 14 Redis exact-card cache policy | implemented |
+| Phase 15 Qdrant semantic lane | implemented |
+| Phase 16 Graph/KAG/DAG refresh manifest | partial |
+| Phase 17 PyTorch feature extraction lane | partial |
+| Phase 18 XGBoost / gradient tree boosting reranker | partial / evaluation surface |
+| Phase 19 deterministic HMM + linear policy baseline | partial |
+| Phase 20 DSPy program contract | planned |
+| Phase 21 GEPA reflective program optimization | planned |
+| Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments | later experimental lane |
+| Phase 23 QLoRA / SFT | eval-only |
+| Phase 24 DPO | eval-only |
+| Phase 25 PPO | eval-only / not yet graded |
 
 ## Two independent programs — do not merge yet
 

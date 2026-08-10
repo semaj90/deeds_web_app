@@ -288,11 +288,11 @@ async function getPageRank(input: PageRankInput, _grant: PermissionGrant): Promi
     SELECT
       packet_key,
       source_ref,
-      COALESCE(pagerank_score, authority_score, 0) AS pagerank_score,
+      pagerank_score,
       COUNT(*) OVER() AS total_count
     FROM atlas_packets
-    WHERE COALESCE(pagerank_score, authority_score, 0) > 0
-    ORDER BY COALESCE(pagerank_score, authority_score, 0) DESC, packet_key ASC
+    WHERE pagerank_score IS NOT NULL AND pagerank_score > 0
+    ORDER BY pagerank_score DESC, packet_key ASC
     LIMIT ${input.limit}
     OFFSET ${input.offset}
   `);

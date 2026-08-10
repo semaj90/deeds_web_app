@@ -1041,7 +1041,12 @@ Operator supplied the latest workstation TODO record for the graph retrieval lan
 - [x] Canonical TRACE retrieval remains fail-loud on empty content: `KB_TRACE_SEARCH_ANN`, `KB_TRACE_SEARCH_CANONICAL_COLLECTION`, `KB_TRACE_SEARCH_CANONICAL_JOIN`, `KB_TRACE_SEARCH_NONEMPTY_CONTENT`, and `KB_TRACE_SEARCH_FAIL_LOUD` are all `PASS`.
 - [x] Neo4j wiring remains live: `NEO4J_URI_WIRING`, `NEO4J_USER_PASSWORD_WIRING`, `NEO4J_STARTUP_VALIDATION`, `NEO4J_BOLT_DRIVER`, `NEO4J_INTEGER_PARAMETER_FIX`, and `GRAPH_PAGERANK_TOP_BACKEND_CALL` are `PASS`.
 - [x] Workstation validation remains split correctly: `WORKSTATION_STATUS`, `SUMMARY_PROMOTION_BOUNDED`, and `WORKSTATION_SMOKE_FAIL_STALE_TEST_ONLY` remain distinct; `FEATURE_METADATA`, `QDRANT_PAYLOAD`, `QDRANT_COMPONENT_PARITY`, `BITFROST_SEMANTIC_CACHE`, and `CANONICAL_SPINE` still need repair or rebuild.
-- [x] Current counts to preserve in the board: `atlas_packets 61,659`, `atlas_packet_registry 58,324`, `atlas_summary_layers 18,423`, `packet summaries 6,885`, `populated summary layers 7,640`, `codebase_chunk_index 52,417`, `atlas_feature_envelopes 58,365`.
+- [x] Current counts to preserve in the board: `atlas_packets 61,659`, `atlas_packet_registry 58,324`, `atlas_summary_layers 18,437`, `packet summaries 7,061`, `populated summary layers 7,061`, `codebase_chunk_index 52,417`, `atlas_feature_envelopes 58,365`.
+- [x] Summary-layer provenance audit (2026-08-10): `atlas_summary_layers` exists and is live; `summary` non-empty rows `7,061`, `summary_text` non-empty rows `1,128`, any non-empty content rows `7,654`, placeholder-like rows `254`, empty rows `10,783`; provenance split is mostly `embeddinggemma-batch-worker` (`14,721` rows), `backfill-summary-layers-from-chunks` (`87` rows), and a `"<none>"` legacy tail (`3,629` rows). `summary_context` exists only inside `metadata` on `470` rows and has no `source_revision` or `representation_revision` fields; `identity_required_complete` is true on `406/470` but `identity_chain_complete` is still `0/470`. This means the lane is live and partially real, but not canonical/proven across all rows; multiple peer writers still exist and the legacy empty/stub tail remains active correctness risk.
+- [x] Summary producer ownership next gate is now explicit: the app-side promotion path that still talks about `summary_embedding_384` is not allowed to survive as a canonical writer. Canonical summary embeddings must either use `semantic_768` / `dimension=768` with full provenance or be labeled legacy/derived-only. Live schema check confirms `atlas_packets` has no summary-embedding column at all, so the remaining 384 summary path is a legacy app-side concern, not a canonical packet truth field.
+- [x] `sveltekit-frontend/src/lib/server/retrieval/promote-results.ts` is now an explicit compatibility shim: the legacy 384 embedding/sync stages are no-ops, so no live call path can still try to write `summary_embedding_384` as if it were canonical. The canonical 768 contract remains owned elsewhere.
+- [x] Live cluster-summary producer remains active at `sveltekit-frontend/src/lib/server/features/codebase-intel/indexer/cluster-summary.ts` (called from `/api/codebase-index/cluster-summary`, `index-stream`, `gpu-pipeline`, and ACE paths). It writes the cluster narrative projection (`codebase_chunk_index.cluster_summary`, Redis cache, and Qdrant payload), not the retired packet-level 384 embedding shim. The producer is 768-dim in practice (`codebase_chunks_768`, `codebase_chunk_index.summary_embedding` schema lane), but its provenance is still incomplete: the live payload records `model`, `pipeline`, and `generatedAt`, while `source_revision` / `representation_revision` are still not carried as first-class fields in this summary contract.
+- [x] The same writer’s durable storage path is still structurally projection-shaped: it persists `cluster_summary` and `output_meta` JSONB, and only mirrors `summary_embedding` where the schema permits it. That is enough for cluster context, not enough for canonical summary provenance; no first-class `source_revision` / `representation_revision` columns were found in this path during the audit.
 - [x] `graphify:daily` was re-run on 2026-08-03 and progressed through provenance dry-run, materialize, cold-processing, phase8 fanout, and latent backfill, but failed in `atlas:phase16:som:apply` (`Native trainSOM unavailable ... pass --allow-cpu for the bounded CPU fallback`; `relation "atlas_topology_eval_times" does not exist`). `docs/graph/codebase-graph.json` did not advance, so `GRAPHIFY_DAILY_STARTED: PARTIAL`, `GRAPHIFY_DAILY_COMPLETED: NOT_PROVEN`, `GRAPH_SNAPSHOT_FRESH: NOT_PROVEN`, `CODEBASE_GRAPH_REFRESH: NOT_PROVEN`.
 - [x] Qdrant identity evidence remains blocked at the payload layer: a live `points/scroll` sample from `codebase_chunks_768_v2` returned `null` for `packet_key`, `stable_symbol_id`, `symbol_version_id`, `tree_node_id`, `workspace_id`, `workspace_revision`, `source_revision`, `representation_id`, `representation_revision`, and `schema_version` on the first three points, so `QDRANT_PAYLOAD_IDENTITY_COMPLETE` stays `NOT_PROVEN` and `QDRANT_JOIN_BACK` stays downstream-only until the writer or rebuild supplies revision-qualified identity.
 - [x] Latest OpenSpec update ordering now queued as: `PATCH_TOURNAMENT_SPEC RECEIVED_NOT_STARTED`, `PATCH_TOURNAMENT_BOUNDED_SEAM QUEUED`, `GRAPHIFY_RECOVERY_PROOF_LADDER PASS`, `GRAPH_SNAPSHOT_FRESH PASS`, `GRAPHIFY_DAILY_COMPLETED NOT_PROVEN`, `DEEP_AUDIT NOT_PROVEN`.
@@ -1110,4 +1115,471 @@ Bounded follow-up to GS1.49's `IDENTITY_WORKER_PACKET_KEY_WRITE: BROKEN` finding
 1. Fix `createPermissionManager`/`canWrite()` mismatch in `permission-manager.ts` or `identity-worker.ts` — either add a synchronous `canWrite()` to `PermissionManager`, swap in `checkAccess()` with correct params, or remove the gate if not yet load-bearing.
 2. Re-run `identity-worker.spec.ts` against the real (unmocked) permission path plus a live-Postgres fixture (isolated test row, not production `atlas_packets` rows) to move `IDENTITY_WORKER_FIXTURE_WRITE` from mocked-PASS to a true live round-trip proof.
 3. Run the `source_ref` fan-out SQL (read-only) to determine whether `source_ref` needs `content_hash`/span/`feature_id` to disambiguate before any structural (`chunk_id`/`symbol_id`) reconciliation design begins.
+
+## TOPOLOGY-GATE (2026-08-10) — canonical tree linkage proven, idempotent; NOT 4D/SOM/Qdrant
+
+Filed here (not under `GS1.x`, and not as a new file) per GS1.23's own note above: this OpenSpec
+change collides across two roots (this file at repo root vs. the sibling under
+`sveltekit-frontend/openspec/changes/parent-atlas-graph-retrieval-proof/`, tracking separate,
+non-overlapping proof work under independently-incrementing `GS1.x` numbers). This entry targets
+`scripts/atlas/backfill-topology-index.mjs` and `atlas_topology_index`, which this file already
+references (line 21, GS1.10). A one-line cross-reference was added to the sveltekit-frontend
+sibling instead of duplicating this record there.
+
+**Scope**: prove canonical packet→chunk→topology tree linkage is complete and the backfill is
+idempotent. Explicitly did NOT touch: summary layers, Qdrant 4D enrichment, SOM, Neo4j GDS,
+PageRank/Betweenness/CheiRank/k-core, or the quarantined Batch A heuristic AST rows (see
+sveltekit-frontend sibling's HARDENING PASS section — unrelated to this gate, already closed).
+
+**Live before-state** (`SELECT COUNT(*) ... FROM atlas_topology_index`):
+```
+topology_total=67189  with_packet_key=67189  with_tree_node_id=61659  missing=5530
+```
+
+**Root cause of the 5,530 "missing" rows — not a backfill gap.** All 5,530 have `packet_key`
+values that do not exist in `atlas_packets` at all (`missing_with_valid_packet=0`,
+`missing_but_linkable=0`). Sampling them shows they are not identifiers: `"# ..."`, `"("`, `"*"`,
+`"---"`, `` "```" ``, and full sentences (`"* $effect: Implements a debounced search
+mechanism..."`) — raw text-fragment content, not packet keys. All 5,530 share
+`relation_type='summary-authority'` and were written in a single 3-minute burst
+(`2026-07-19 01:58:58` → `02:01:40`), sandwiched inside the legitimate backfill's much broader
+write window (`2026-07-18 20:03` → `2026-07-20 17:31`). The writer responsible has **zero
+references anywhere in the current `scripts/`, `sveltekit-frontend/src/`, or `packages/` trees**
+— untraceable, one-off, not a repeatable pipeline. Classification: `MALFORMED`, permanently
+ineligible for tree linkage, not counted in the eligible denominator. Not deleted or repaired
+this pass (out of scope; a cleanup decision, not a linkage-proof blocker).
+
+**Script audit** (`scripts/atlas/backfill-topology-index.mjs`) — confirmed: reads the live
+canonical `atlas_packets` ledger (already prioritized correctly, per the caller's note that this
+was fixed in an earlier pass); joins strictly `t.node_type='chunk' AND t.ledger_type='canonical'`
+by `packet_key` (never `page_index_path`, never the heuristic AST rows — Batch A rows always
+carry `packet_key=NULL`); does not mutate packet or tree-node identity; `ON CONFLICT ... WHERE
+... IS DISTINCT FROM` guard already made repeat runs no-op on unchanged rows.
+`atlas_packets.tree_node_id` (preferred over the joined value when present) verified to match the
+joined canonical chunk in all 61,659 cases live — 0 stale/mismatched. `WHERE p.som_cluster IS NOT
+NULL` filter verified to exclude 0 packets that actually have a canonical chunk (i.e., it isn't
+silently dropping eligible rows).
+
+**Real bug found running it live (not previously known)**: 4,000 packets carry
+`som_cluster = 'som20x20'` (a literal sentinel string, not a cluster index) in `atlas_packets`.
+Writing this into `atlas_topology_index.z_som` (`integer`) threw `invalid input syntax for type
+integer`, aborting the **entire row's INSERT** — including the otherwise-valid `tree_node_id` —
+silently, every run, for those 4,000 packets (6.5% of the canonical set), surfaced only as a
+scrolling `⏳ Skipped ...` log line with no gate or count calling it out. Live check confirmed all
+4,000 were already linked from a prior successful run (before `som_cluster` was corrupted to the
+sentinel) — so current coverage was not actually affected — but the bug meant re-verification of
+those rows silently no-op'd via failure, not via genuine stability. **Fixed**: guard `z_som` to
+`NULL` when `som_cluster` isn't a plain integer string, and changed the `ON CONFLICT` UPDATE to
+`z_som = COALESCE(EXCLUDED.z_som, atlas_topology_index.z_som)` — a null from bad source data no
+longer clobbers an already-correct stored value (first-draft fix caught this in review before
+running: writing unconditional `NULL` would have regressed those 4,000 rows' real `z_som` values,
+0–9+ confirmed live, on the very first post-fix run).
+
+**First run (post-fix), live** (`node scripts/atlas/backfill-topology-index.mjs`):
+```
+Found 61659 packets with SOM cluster
+Affected 839, skipped 0
+```
+Zero skips (bug fixed). Post-run state unchanged at the row-count level (`with_tree_node_id`
+stayed 61659 — those packets were already linked before this run; the 839 affected are
+`community_id`/`z_som` corrections, not new linkage) — confirmed via direct SQL, not inferred.
+
+**Second run, live, identical input** (mandatory idempotency proof):
+```
+Found 61659 packets with SOM cluster
+Affected 0, skipped 0
+```
+`TOPOLOGY_BACKFILL_IDEMPOTENT: YES` — proven by execution, not asserted.
+
+**Post-run verification** (direct SQL + `scripts/atlas/verify-p1-lineage.mjs`, extended this pass
+with an eligibility-aware topology section — see below):
+- Canonical packet spine unchanged: `atlas_packets` = 61,659 (matches pre-gate baseline).
+- Canonical document source uniqueness: PASS. Canonical `page_index_path` uniqueness: PASS.
+- `TOPOLOGY_PACKET_RESOLUTION`: eligible=61,659, excluded=5,530 (=67,189 total).
+- `TOPOLOGY_CANONICAL_CHUNK_ONLY` / `TOPOLOGY_NO_HEURISTIC_AST_LINKS` / `TOPOLOGY_NO_NONCANONICAL_LINKS`: PASS, 0 rows point at a non-canonical or non-chunk tree node.
+- `TOPOLOGY_TREE_LINK_COVERAGE`: linked=61,659/61,659 **eligible** rows (100.00%), unresolved=0.
+- `TOPOLOGY_IDENTITY_UNIQUE`: PASS (`packet_key` is the table's primary key).
+- `TOPOLOGY_BACKFILL_IDEMPOTENT`: not re-asserted by the (read-only) verifier itself — points at this dated two-run proof instead.
+
+**Verifier change**: `scripts/atlas/verify-p1-lineage.mjs` previously only reported raw
+`with_tree_link/total` (61,659/67,189 ≈ 91.8%), which looks like an incomplete backfill without
+the eligibility context above — exactly the "force the denominator to reach 100%" trap this gate
+was scoped to avoid. Added a read-only "Topology canonical tree-link gates" section computing the
+eligible-vs-excluded split and the five gates above. Verifier makes no repairs; noted `document
+(file roots): 61658` vs `chunk (packets): 61659` — a pre-existing 1-row discrepancy surfaced by
+the same run, **not investigated or reopened this pass** (out of scope per explicit instruction:
+document dedupe stays closed unless a live query proves regression; this is a 1-row gap in an
+unrelated denominator and does not affect the chunk-based topology proof above). Also noted:
+`atlas_tree_nodes` total grew from 263,263 (earlier same-day session) to 269,972 — something is
+still writing to the table in the background; canonical `chunk` count is unaffected (still
+61,659), so not investigated further here.
+
+**Status**:
+```
+TREE_PACKET_LINEAGE: 61,659/61,659 PASS
+TOPOLOGY_TREE_LINK_BACKFILL_PROVEN: YES
+TOPOLOGY_BACKFILL_IDEMPOTENT: YES
+TOPOLOGY_ELIGIBLE_TREE_COVERAGE: 100% (61,659/61,659 eligible; 5,530 MALFORMED rows excluded,
+  not linkable, not counted toward coverage, not deleted)
+TOPOLOGY_ELIGIBILITY_CLASSIFICATION: single-reason this pass (MALFORMED, one dated writer burst)
+  — the fuller multi-reason taxonomy (NO_SOURCE_REF / SYNTHETIC_TOKEN / SYNTHETIC_AGGREGATE /
+  NON_PACKET_ENTITY / LEGACY_ROW / MISSING_CANONICAL_PACKET / MISSING_CANONICAL_CHUNK /
+  REVISION_MISMATCH / MALFORMED / UNKNOWN) was not needed because 100% of the 5,530 excluded rows
+  landed in one reason with hard evidence (no matching packet_key, one writer, one 3-minute
+  window) — not forced into a single bucket for convenience.
+4D_TOPOLOGY_PROVEN / SOM_PROVEN / QDRANT_4D_PROVEN: NOT ASSERTED — out of scope this pass,
+  x_cosine/y_graph/w_authority remain entirely NULL (unchanged), no work done on them.
+```
+
+**STOP.** Per gate scope, did not proceed to summary-layer stub inventory, Qdrant, or SOM work.
+Files changed: `scripts/atlas/backfill-topology-index.mjs` (som_cluster type-cast guard +
+COALESCE-safe UPDATE), `scripts/atlas/verify-p1-lineage.mjs` (eligibility-aware topology gate
+section, read-only). Next recommended gate: summary-layer stub/provenance inventory (not
+executed this session).
 4. Only after 1-3: resume S180-6E (structural-orphan repair design) → S180-6F (Qdrant reconciliation classifier, read-only) → S180-6G (10-point fixture migration, rollback-manifest-gated) in that order. Do not skip ahead to Qdrant writes.
+
+## SUMMARY-GATE (2026-08-10) — producer ownership OPEN, 768-dim contract clean, NOT backfilled
+
+Scope: resolve who is allowed to write `atlas_summary_layers` truth. Explicitly did NOT
+backfill the 10,783 empty rows, generate new summaries, clean/delete the 254 stub-like rows,
+touch Qdrant, or touch ACE/BitFrost. Filed here per the same two-OpenSpec-root convention as the
+TOPOLOGY-GATE section above (no duplicate status doc in the sveltekit-frontend sibling).
+
+**Live writer inventory** — grepped all `INSERT INTO atlas_summary_layers` / `UPDATE atlas_summary_layers`
+/ Drizzle `.insert(atlasSummaryLayers)` (case-insensitive; an initial case-sensitive pass missed 3
+lowercase `update` writers) across `scripts/`, `sveltekit-frontend/`, `packages/`. Confirmed 16
+distinct write call sites across ~13 files (one duplicated into `packages/parent-atlas/dist/`).
+Only 8 have any `package.json` script wiring at all (`atlas:workstation:summaries:100`,
+`worker:gemma4:summary*`, etc.) — all **manual** npm scripts; **zero** are wired into
+`daily-graphify-cold-processing.mjs`, cron, or any automatic pipeline. The other ~8 (including
+`import-gemma4-summaries.mjs`, `offline-summary-pipeline.mjs`, `backfill-summary-stubs.mjs`,
+`bulk-envelope-materialization.mts`, `backfill-summary-context.mjs`) have no npm script at all —
+callable only by direct `node`/`tsx` invocation, not part of any current runtime chain.
+
+**Live provenance breakdown** (`metadata->>'worker'|'source'|'producer'`, exact, re-verified live
+— sums to 18,437 total): `embeddinggemma-batch-worker`=14,721, `codebase_chunk_index`=2,788,
+`(none)`=656, `gemma4-parent-atlas-summaries`=185, `backfill-summary-layers-from-chunks`=87.
+
+**Reader trust boundary**: live consumers of `cluster_summary` are projection readers, not
+canonical truth owners. The main readers found in this pass are `fix-recommender.ts`
+(cluster narrative fallback), `token-aware-context-packer.ts` (ACE context packing),
+`ace-agent.ts` / `gemma4-codeintel.ts` (cluster-summary tool exposure), and the codebase-index
+routes that trigger or surface the cluster narrative. They use the summary as context/evidence
+for cluster-level operations, not as packet identity. No reader found in this pass resolves
+`cluster_summary` into `source_revision` / `representation_revision`; that provenance gap remains
+on the writer side.
+
+**Correction to the app-side 384-dim finding as originally framed.** The suspected writer,
+`sveltekit-frontend/src/lib/server/retrieval/promote-results.ts`'s `promoteResults()`, has **zero
+real callers anywhere in `src/`** — only its own `promote-results.spec.ts`, which mocks
+`db.execute` entirely (so its SQL has never run against a real schema). The actual live app-side
+promotion path is a *different* module, `promote-results-outbox.ts`
+(`recordPromotionIntent`, called from `search-runtime.ts:706`), which writes only to
+`atlas_packets` directly and **never touches `atlas_summary_layers` or any embedding at all**.
+Two parallel promotion systems evolved from what was probably one earlier design; only the outbox
+one ever went live. This is contained dead code, not an active correctness incident — but the
+requirement stands regardless of liveness. Also found live: `atlas_packets.summary_embedding_384`
+— the column `promote-results.ts` Stage 3 targeted — **does not exist** in the live schema
+(`ERROR: column "summary_embedding_384" does not exist`), so that stage was structurally
+incapable of succeeding even if it had been wired live.
+
+**Fixed**: `promote-results.ts` header now carries an explicit `DEAD / COMPATIBILITY_LEGACY_384`
+classification with the full evidence above. Stage 3 (`embedSummaries`) and Stage 4
+(`syncToQdrant`) are now disabled no-op compatibility shims — they return
+`success: true, recordsCommitted: 0` with an explicit message that the legacy 384 path is
+disabled and canonical summary embeddings must use `semantic_768` elsewhere; the dead SQL
+referencing the nonexistent column and the unused `embedText`/`syncSummaryPayloadToQdrant`
+imports were removed. Stage 1/2 (summary-text promotion to `atlas_summary_layers`/`atlas_packets`)
+are left intact as historical/reference code, still not wired to any live caller. Typecheck clean.
+
+**The table's own canonical embedding column is already correct** — `atlas_summary_layers.embedding`
+is `vector(768)`, with column defaults `embedding_model='embeddinggemma:latest'`, `vector_dim=768`.
+No live writer was found emitting 384-dim vectors into it. The largest single producer by row
+count, `embeddinggemma-batch-worker.mts` (14,721/18,437 rows, 80%), is a clean, correctly-scoped
+768-dim **embedding enricher**: `EXPECTED_DIM = Number(repoEnv.EMBEDDING_DIM || 768)` with a
+runtime assertion that throws on any dimension mismatch, targets rows by physical `ctid` (not
+`packet_key`, so no cross-row collision risk), and only ever touches
+`embedding`/`embedding_model`/`vector_dim`/`metadata` — never `summary`/`summary_text`. This
+satisfies Step 8's separation cleanly: text-producer and embedding-adapter are already distinct
+concerns in practice, even though nothing enforces that boundary structurally yet.
+`SUMMARY_768_REPRESENTATION_CONTRACT_PROVEN: YES` — clean, zero 384-dim canonical paths found live.
+
+**Text-producer ownership disqualification, with evidence.** Per explicit instruction not to
+blindly designate `backfill-summary-layers-from-chunks.mjs` canonical just because it looks
+closest — audited its actual UPDATE and found two disqualifying defects:
+1. Its `UPDATE atlas_summary_layers AS target ... FROM input WHERE target.packet_key = input.packet_key`
+   joins on **`packet_key` alone**, omitting `layer_type` — but the table demonstrably holds
+   multiple distinct logical layers per `packet_key` live (confirmed: 763 packets have rows
+   spanning more than one `layer_type`). A single input row would update every row sharing that
+   `packet_key` regardless of layer, collapsing distinct logical layers into one on write.
+2. Its `SET summary = input.summary, summary_text = input.summary_text, layer_type = input.layer_type, ...`
+   has **no overwrite-trust check at all** — it unconditionally replaces existing content for any
+   matching row, with no comparison of incoming vs. existing quality/provenance.
+
+**Duplicate-write audit, live**: 763 packets hold rows across multiple distinct `layer_type`
+values (structurally legitimate — multiple logical layers, not inherently a bug). But **1,545
+packets hold multiple rows within the exact same `layer_type`** — genuine identity collisions
+even under a corrected `(packet_key, layer_type)` join. This means `(packet_key, layer_type)`
+alone is *not* proven sufficient as the summary identity key either; a revision or producer
+disambiguator is needed and was not designed this pass (would require the same kind of scoped
+design decision this session already deferred once for `atlas_tree_nodes` document/chunk
+uniqueness — not repeatable unilaterally here).
+
+**Logical summary layers identified, live** (`layer_type` / `summary_level` / count / has_summary
+/ has_embedding): `(NULL, NULL)`=10,659/32/32 (the empty/near-empty tail — matches the cited
+~10,783 missing figure); `gemma4_offline/packet`=3,890/3,738/3,738 (most complete real-content
+population); `chunk_projection/file`=2,788/2,788/0 (real text, never embedded — a genuinely
+distinct layer, not a defect); `(NULL, gemma4_packet_summary)`=593/0/593 (embeddings present with
+**no summary text** — a live anomaly worth a future audit, not investigated further this pass);
+`file/file`=420/416/416; `gemma4_offline/chunk`=87/87/8. Confirms Step 3's premise: this is
+genuinely multiple logical layers, not one table one owner — `ONE LOGICAL SUMMARY LAYER, ONE
+CANONICAL MATERIALIZER` was correctly not collapsed into `ONE SCRIPT FOR THE WHOLE TABLE`.
+
+**Canonical owner decision: `NO_CURRENT_CANONICAL_OWNER`**, recorded explicitly rather than
+forced. No existing writer satisfies the identity contract (packet_key+layer_type alone already
+proven insufficient by the 1,545-group collision above) with a real overwrite-trust policy. Did
+NOT invent a new `SummaryLayerMaterializer` module this pass — Step 10 only authorizes that once
+the audit proves no adequate owner exists, and building new production code exceeds this gate's
+scope (determine ownership, not implement it).
+
+**Identity contract**: `NOT_PROVEN`. Candidate shape `(packet_key, layer_type, revision-or-producer-TBD)`
+— the third component is required by live evidence (1,545 same-`(packet_key, layer_type)` groups)
+but its exact shape (summary_revision? producer_id? content_hash?) was not designed this pass.
+
+**Overwrite trust policy**: not enforced anywhere in code today (confirmed — the leading
+candidate writer has none). Target precedence recorded as a requirement, not implemented:
+real generated content with full provenance must outrank legacy/unknown-provenance content;
+unknown provenance must never be treated as higher-trust merely for being older, matching the
+explicit instruction. No enum vocabulary was invented — deferred to whoever designs the
+identity-contract fix, per Step 11's own instruction to derive names from existing project
+vocabulary rather than invent one now.
+
+**Idempotency**: `SUMMARY_IDEMPOTENCY_NOT_PROVEN` — no canonical writer was nominated, so there is
+nothing to run twice. Per Step 15's explicit fallback, recorded rather than forced.
+
+**Reader trust boundary**: not audited this pass beyond the ownership/dimension questions above —
+out of scope given time already spent on the higher-priority producer-ownership and 384-dim
+questions; flagged as unstarted, not silently skipped.
+
+**Status**:
+```
+SUMMARY_PRODUCER_INVENTORY_PROVEN: YES (16 write call sites, 8 manually-wired, 0 automatic)
+SUMMARY_IDENTITY_CONTRACT_PROVEN: NO — packet_key+layer_type proven insufficient (1,545 collisions)
+SUMMARY_768_REPRESENTATION_CONTRACT_PROVEN: YES — 0 live 384-dim canonical paths;
+  promote-results.ts Stage 3/4 disabled (dead code, now inert even if ever wired)
+SUMMARY_PRODUCER_OWNERSHIP_PROVEN: NO — NO_CURRENT_CANONICAL_OWNER, recorded not forced
+SUMMARY_IDEMPOTENCY_PROVEN: NO — no nominated writer to test
+```
+
+**STOP.** Per gate scope, did not backfill, generate, quarantine stubs, or touch Qdrant/ACE.
+Files changed: `sveltekit-frontend/src/lib/server/retrieval/promote-results.ts` only. Two things
+carried forward from the topology gate, per explicit instruction not to lose them: the 5,530
+topology rows remain a distinct excluded `MALFORMED` population, not a backfill target; and
+`atlas_tree_nodes`'s 263,263→269,972 growth during this session remains an open, separately-owned
+writer-liveness question, unrelated to summary work. Next recommended gate: one of
+`SUMMARY_STUB_QUARANTINE`, `SUMMARY_REVISION_PROVENANCE_REPAIR`, `SUMMARY_REAL_BACKFILL` — choice
+deferred, not auto-executed.
+
+## SUMMARY-GATE CORRECTION (2026-08-10, same day) — sharper duplicate breakdown, packet-canonical.ts traced
+
+Per follow-up review of the SUMMARY-GATE section above: two corrections and one completed trace.
+
+**Duplicate `(packet_key, layer_type)` breakdown, live** (the query the prior pass deferred):
+```
+duplicate_logical_layer_groups: 1,545
+  differing_content_groups:      54   (competing truth — same identity, different summary text)
+  differing_producer_groups:     65   (duplicate-writer evidence — overlaps with content group)
+```
+~96% of the 1,545 groups (1,491) are exact duplicates — same content, same producer, most likely
+re-run artifacts rather than governance failures. The real risk is concentrated in the 54+65
+groups, not the full 1,545. `SUMMARY_LOGICAL_IDENTITY = (packet_key, layer_type)` is confirmed as
+the correct **base** key by this data; a revision/producer disambiguator is still needed to
+resolve the 54/65 overlap groups specifically, not the whole table.
+
+**`promote-results.ts` — record as two separate findings, not one, per explicit correction**:
+(1) `LIVE_CALLERS: 0`, `REAL_DB_COMPATIBILITY: FAIL` (`summary_embedding_384` column does not
+exist) — the runtime-liveness finding. (2) `384_EMBEDDING_PATH: LEGACY_INVALID`,
+`CANONICAL_SUMMARY_OWNER: NO`, classification `DEAD_HISTORICAL_COMPATIBILITY` — the
+representation-contract finding. Both hold independently; conflating them as one "the 384 path
+was fixed" statement would understate that this was never a live correctness incident to begin
+with. **Not fixed to 768 and rewired** — doing so would resurrect a dead architecture the live
+system doesn't use; the disabled no-op shim from the prior pass is the correct terminal state,
+not a stepping stone back to life.
+
+**`sveltekit-frontend/src/lib/schemas/packet-canonical.ts` traced, NOT edited** (its hardcoded
+`dimension: z.literal(384)` is a materially different risk class than `promote-results.ts` — a
+schema named "canonical" asserting the wrong dimension is worse than dead code, if it were live).
+Confirmed via import search: **zero importers anywhere in `src/`, `scripts/`, or `packages/`.**
+Classification: **(A) dead legacy contract** — not (C) validating live canonical vectors, not (D)
+a shared schema active 768 paths depend on. No representation-contract bug exists today because
+nothing reads this file. Left untouched, per instruction — demotion/rename is a future, separate,
+low-urgency cleanup (dead code carrying a wrong "canonical" label is a documentation hazard for
+whoever finds it next, not an active bug).
+
+**`backfill-summary-layers-from-chunks.mjs` — formal classification, per Step 5's vocabulary**:
+`CANONICAL_OWNER: NO`. Reasons: `packet_key`-only UPDATE join (omits `layer_type`, would
+collapse the 763 multi-layer-type packets on write), no trust/quality precedence check, no
+revision/provenance comparison, unconditional content mutation on any match. Classified
+`BACKFILL` / `LEGACY_WRITER` (real, live-callable, manually-wired — not dead — but structurally
+unsafe to promote as-is). **Not patched this pass** — per explicit instruction, changing only the
+join predicate (`AND layer_type = ...`) without also adding the overwrite-trust policy would
+leave the second defect live (a low-trust backfill could still silently clobber real generated
+content); identity and overwrite policy must ship together, not sequentially patched apart.
+
+**Reaffirmed, with sharper evidence**: `SUMMARY_CANONICAL_OWNER: NONE_PROVEN`. Two candidates now
+formally disqualified for two independent reasons — `promote-results.ts` (dead, schema-incompatible,
+would-be-384-dim) and `backfill-summary-layers-from-chunks.mjs` (live, but identity- and
+overwrite-unsafe). This is the intended output of an ownership gate — surfacing that no one
+currently qualifies is more valuable than defaulting to whichever file looked most canonical by
+name.
+
+**Proposed (design-only, not implemented) shared-owner shape**, recorded for whoever picks this
+back up: a `SummaryLayerMaterializer` with one write API —
+`writeSummary({packetKey, layerType, content, trust, sourceRevision, representationId, representationRevision, producerId, producerRevision, inputContentHash})`
+— making overwrite decisions centrally against a trust ladder (`EMPTY/PLACEHOLDER` →
+`LEGACY_REAL_UNKNOWN_PROVENANCE` → `REAL_GENERATED_WITH_PROVENANCE` → `VALIDATED`) with explicit
+rules: incoming-trust < existing-trust → no write; same identity + same content → idempotent
+no-op; same identity + different content → an explicit versioned-row policy decision, not a
+silent overwrite; unknown layer → fail closed. Also recorded: summary **text** ownership
+(`SummaryLayerMaterializer`) should stay structurally separate from summary **embedding**
+projection (already effectively true in practice — `embeddinggemma-batch-worker.mts` never
+touches text, only `embedding`/`embedding_model`/`vector_dim`) — this separation should be made
+explicit/structural rather than incidental, so no future writer repeats `promote-results.ts`'s
+mistake of bundling text authorship + 384-dim embedding + Qdrant sync into one module. **Not
+built this pass** — Step 9/10 only authorize this once ownership is proven absent (now true) and
+still caution against implementing it inline; recorded as the next gate's likely starting point,
+not started.
+
+**STOP, still.** No backfill, no stub cleanup, no generation, no Qdrant/ACE work. Updated status:
+```
+SUMMARY_PRODUCER_OWNERSHIP_PROVEN: NO — NONE_PROVEN, two candidates disqualified with evidence
+  (not merely "unresolved" — actively ruled out, for stated, checkable reasons)
+SUMMARY_IDENTITY_CONTRACT: base key (packet_key, layer_type) confirmed; disambiguator for the
+  54 content-conflict / 65 producer-conflict groups still undesigned
+```
+
+---
+
+## Reference: operator-authored control-plane sequencing draft (received 2026-08-10, NOT independently verified this session)
+
+The block below was supplied by the operator as a proposed durable sequencing/status document for
+tensor-residency (T6c/KMeans/SOM), storage-lane architecture, and phase ordering. **Recording it
+here, dated, exactly as the operator flagged it should be treated**: as an authored planning
+artifact to date-stamp before treating as durable, not as claims this session verified live. None
+of its specific factual assertions (T6c KMeans K=64/128/256 proof, the K128/C8 ≈88.5% Recall@10 /
+K256/C8 ≈86% Recall@10 operating points, SOM 2020 status, the Phase 18/22 XGBoost-overlap note,
+etc.) were checked against live data, code, or prior session records by this pass — they are
+carried verbatim as the operator's own status claims, separate from this file's own live-verified
+`GS1.x`/`TOPOLOGY-GATE`/`SUMMARY-GATE` findings above. Do not cite this section as independently
+proven; if a future gate depends on any claim in it, re-verify that specific claim live first,
+the same way every other section in this file does.
+
+> Tensor Residency T6c — Current Proven Stop State: T6c is complete as an experiment and MUST NOT
+> be reopened as if KMeans still needs first proof. Canonical source representation is frozen
+> `semantic_768`. KMeans artifacts were produced for K=64, K=128, K=256; centroid membership and
+> provenance artifacts were persisted; each configuration was evaluated against the T3a exact
+> cosine oracle; candidate reduction vs. Recall@10 was measured. KMeans achieved useful corpus
+> reduction but did not preserve perfect Recall@10 — classified `KMEANS_ROUTING_EXPERIMENT_PROVEN`,
+> runtime role `CACHE_HINT_ONLY`, MUST NOT be used as a hard retrieval candidate filter. Example
+> proven operating points: K=128/C=8 ≈88.5% Recall@10 touching ≈8.2% of corpus; K=256/C=8 ≈86%
+> Recall@10 touching ≈4.25% of corpus. No canonical K/C operating point promoted.
+>
+> T6c stop rules: do not rerun T6c merely to increase coverage; do not convert KMeans routing into
+> retrieval truth; do not use KMeans membership as canonical packet identity; do not start
+> AE/RRF/Neo4j-projection/GA8/GA9 promotion from this lane; do not silently substitute 384-dim
+> vectors. All future KMeans/SOM experiments consume canonical `semantic_768` unless they
+> explicitly declare a separate derived representation revision.
+>
+> SOM is NOT KMeans — a separate future 20×20 (400-cell) topology experiment, initial role
+> `CACHE_HINT_ONLY`, same methodology as T6c (semantic_768 → coarse locality hint → compare
+> against T3a exact oracle → must measure Recall@10 and candidate reduction before promotion). SOM
+> coordinates never become semantic identity or retrieval truth. "kmeans 20x20" is flagged as
+> incorrect terminology — KMeans uses K=64/128/256; SOM is the separate 20×20/400-cell lane.
+>
+> Kafka CDC / Rust sidecar remains design-only, not opened as its own gate; not part of
+> T6c/SOM/Graphify/semantic-routing proof. PostgreSQL 18 remains the canonical relational
+> integration surface; AIO/logical-decoding/CDC/replication are not semantic-routing owners. A
+> Rust sidecar (if ever opened) is optional infrastructure for bounded tasks (validation, hashing,
+> framing, Engram lookup, bit-packing, queue processing, CDC outbox consumption) — does not
+> replace TypeScript orchestration, Python/RAPIDS GPU execution, Postgres canonical state, or
+> Qdrant semantic retrieval.
+>
+> Sequencing/gate order (P2 transport+ingestion → P2 registry+retrieval-policy → P3 storage
+> cards+synthesis → P3 validation+structural-promotion → P4 semantic-memory+checklist-mining →
+> token-remapping/geometry lanes → optional downstream phases 10B–25): full detail as supplied,
+> condensed here for record-keeping — canonical semantic representation stays `semantic_768`;
+> `latent_64` and any 384-dim representation are explicitly legacy/compatibility-only, never
+> canonical validation paths; any future compressed latent must be separately revisioned (e.g.
+> `latent_128`) and evaluated against the `semantic_768` oracle before promotion; `packet_key`
+> stays canonical identity; SOM/KMeans/Hilbert coordinates never become identity; ClusterCard/Glyph
+> visualization stays a derived presentation cache, never replacing packet identity/semantic
+> vectors/source evidence; promotion discipline is `EXECUTED → LINEAGE_PROVEN → PARITY_PROVEN →
+> EVALUATED → PROMOTED` (presence in a store, a completed dry-run, a GPU execution, a clustering
+> result, or an existing summary do NOT individually imply promotion). Near-term order per the
+> operator: finish summary producer ownership (this file, above) → quarantine/repair stub summary
+> populations → populate real `trace_packet_events` → derive `execution_utility` → reach T2
+> lineage 5/5 → `feature_matrix_5` with explicit presence mask → missingness-aware logistic
+> baseline → XGBoost only if labels/provenance sufficient → GA8 with independent trustworthy
+> labels → GA9 only evidence-backed → RRF ownership audit before new fusion lanes → persistent
+> CAGRA benchmarked separately → SOM 2020 as cache-hint only → Kafka/Rust/AE/QLoRA/DPO/PPO stay
+> separate downstream lanes. One naming note carried forward: treat Phase 18 (XGBoost
+> implementation/evaluation) and Phase 22 (later learned-policy XGBoost/RL experimentation) as two
+> stages of one capability, not two competing owners.
+
+## NEXT STEPS (recorded 2026-08-10, none started this session)
+
+Consolidated from the TOPOLOGY-GATE and SUMMARY-GATE sections above, plus items the operator's
+control-plane draft names as near-term. Ordered by dependency, not by section. Nothing below has
+been executed — this is a punch list for the next session(s), not a plan already in motion.
+
+**Summary producer ownership (blocks everything downstream of it):**
+1. Design the identity disambiguator beyond `(packet_key, layer_type)` — only needed to resolve
+   the 54 differing-content / 65 differing-producer groups found live, not the full 1,545 (~96%
+   of which are exact-duplicate re-run artifacts, lower priority).
+2. Design and freeze the overwrite trust policy (`EMPTY/PLACEHOLDER → LEGACY_REAL_UNKNOWN_PROVENANCE
+   → REAL_GENERATED_WITH_PROVENANCE → VALIDATED`, or the project's existing equivalent vocabulary
+   if one is found — do not invent a second one).
+3. Only after 1-2: build the `SummaryLayerMaterializer` shared-owner module (design recorded
+   above, not built) and migrate `backfill-summary-layers-from-chunks.mjs` to delegate to it
+   rather than patching its unsafe UPDATE in place.
+4. Investigate the 593-row `(NULL, gemma4_packet_summary)` anomaly — embeddings present with zero
+   summary text. Not triaged this session; unknown whether it's a live bug or an intentional
+   embedding-only layer.
+5. Reader trust boundary audit (Step 13 of the original gate prompt, never executed) — check
+   whether `ace-packet-swap.ts`, `parent-atlas-workstation.ts`, `summary-index-ranker.mjs`,
+   `index-summaries-qdrant.mjs`, `build-gpu-feature-kanban-ranking.mjs`, and
+   `materialize-addressable-packets.mjs` currently consume empty/stub/unknown-provenance rows
+   without guarding on them.
+6. Only after 1-5: `SUMMARY_STUB_QUARANTINE` (define REAL/STUB/EMPTY/LEGACY/UNKNOWN classification
+   for readers, do not backfill or delete the 254 stub-like rows yet) or
+   `SUMMARY_REVISION_PROVENANCE_REPAIR` — choose based on which is actually blocking a real
+   consumer, not by default ordering.
+
+**Topology (linkage itself is proven closed — these are the loose ends around it):**
+7. Decide what to do with the 5,530 `MALFORMED` `atlas_topology_index` rows (delete? archive per
+   this repo's Archival Rules? leave as a documented-excluded population indefinitely?) — a
+   cleanup decision, not a linkage-proof blocker, deliberately left open.
+8. `atlas_tree_nodes` writer-liveness audit — table grew 263,263→269,972 during this session's
+   topology gate; something still writes to it in the background, never identified. Separate from,
+   and does not block, the now-proven 61,659 canonical chunk links.
+9. GS1.10's `tree_node_id` identity-model design pass (parse_node_id / symbol_id / chunk_id /
+   packet_key / concept_id / graph_node_key disambiguation) — still the explicit blocker on ever
+   re-running `materialize-full-corpus-graph-snapshot.mts --apply`. Unrelated to the trust-boundary
+   fix already applied to that materializer this session; both must hold before a fresh snapshot
+   is legitimate.
+
+**Governance (low urgency, high leverage if left to compound further):**
+10. The two colliding OpenSpec roots for this change slug (`openspec/changes/...` at repo root vs.
+    `sveltekit-frontend/openspec/changes/...`) remain unresolved — flagged by a prior session
+    (`GS1.23`) and again by this one. Not fixed by either session. Whoever picks this up next
+    should decide: merge, rename one, or formally partition scope between them.
+11. `packet-canonical.ts`'s hardcoded `dimension: z.literal(384)` under a name containing
+    "canonical" — currently dead (zero importers) so not urgent, but worth a rename/demotion or
+    deletion so a future session doesn't mistake it for live when searching by name.
+
+**Per the operator's control-plane draft (see the dated, unverified reference section above) —
+carried forward as their stated near-term order, not independently re-derived here**: after
+summary ownership closes, the next lanes are populating real `trace_packet_events`, deriving
+`execution_utility`, reaching T2 lineage 5/5, then `feature_matrix_5` with an explicit presence
+mask — all gated behind summary ownership per their own stated sequencing, not behind the
+topology work (which is already closed).

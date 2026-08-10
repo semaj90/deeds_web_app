@@ -16,7 +16,7 @@ Chunk extraction
   ↓
 Gemma4 summarization (39,151 complete)
   ↓
-Content embeddings (384-dim, 99.5% complete)
+Content embeddings (semantic_768, 99.5% complete)
   ↓
 Graph/topology construction
   ↓
@@ -60,8 +60,8 @@ Stage 1: Migrate to atlas_summary_layers
 Stage 2: Propagate to atlas_packets
   └─ Copy summaries to canonical packet table
   ↓
-Stage 3: Embed summaries (384-dim)
-  └─ Store in atlas_packets.summary_embedding_384
+Stage 3: Embed summaries (semantic_768)
+  └─ Store in atlas_packets.summary_embedding_768
   ↓
 Stage 4: Sync to Qdrant
   └─ Update summary_384 payload/vector
@@ -136,7 +136,7 @@ All four fused with RRF before reranking.
 ```
 1. Retrieve (parallel):
    - BM25: Find "validate" + "session" in tsvector → 50 results
-   - Qdrant: Embed query (384-dim), search ANN → 100 results
+   - Qdrant: Embed query (semantic_768), search ANN → 100 results
    - Exact: Find "validateSession" function → 5 results
    - AST: Find tree nodes matching pattern → 30 results
    → Total: ~185 candidates (deduplicated to ~120)
@@ -161,7 +161,7 @@ All four fused with RRF before reranking.
 5. Promote (async):
    - Copy summary to atlas_summary_layers
    - Propagate to atlas_packets
-   - Embed summary (384-dim)
+   - Embed summary (semantic_768)
    - Sync to Qdrant
 
 6. Return:

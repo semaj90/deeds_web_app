@@ -38,6 +38,7 @@ interface TreeNode {
   tree_depth: number;
   metadata: Record<string, any>;
   lineage_version: string;
+  ledger_type: string;
 }
 
 interface TreeEdge {
@@ -239,8 +240,29 @@ function extractNodesHeuristic(
           end_byte: endIdx,
           start_line: lineStart,
           end_line: lineEnd,
+          // Explicit self-declaration of what this row actually is, so a consumer
+          // never has to infer trustworthiness from ledger_type alone (ledger_type
+          // is a broad trust tier; these fields are the specific, checkable claim).
+          // graph-snapshot-materializer.ts's classifyCanonicalGraphEligibility()
+          // reads producerId/extractionMethod/structuralTruth directly — this is
+          // not decorative, it is the eligibility contract's input.
+          producerId: 'batch-a-structural-materializer',
+          producerRevision: PARSER_VERSION,
+          extractionMethod: 'regex_heuristic',
+          structuralTruth: false,
+          boundaryPrecision: 'approximate',
+          hierarchyProven: false,
         },
         lineage_version: 'tree-nodes-v1',
+        // Regex + fixed-window heuristic, not real tree-sitter AST boundaries (see
+        // module docstring). Must never inherit the 'canonical' column default —
+        // this previously let 146,655 approximate rows into atlas_tree_nodes at
+        // full trust, which graph-snapshot-materializer.ts then absorbed into the
+        // canonical graph snapshot. 'synthetic' matches the ledger_type this
+        // table's own Drizzle schema documents for non-authoritative derivations.
+        // Do not rely on ledger_type alone going forward — see the metadata
+        // provenance fields above, which is what the eligibility check now uses.
+        ledger_type: 'synthetic',
       };
 
       nodes.push(treeNode);
@@ -264,13 +286,13 @@ async function writeNodesToDatabase(nodes: TreeNode[]) {
     const query = `
       INSERT INTO atlas_tree_nodes (
         node_id, root_id, parent_id, packet_key, feature_id, feature_label,
-        source_ref, file_path, node_type, tree_depth, metadata, lineage_version
+        source_ref, file_path, node_type, tree_depth, metadata, lineage_version, ledger_type
       ) VALUES ${batch
         .map(
           (_, idx) =>
-            `($${idx * 12 + 1}, $${idx * 12 + 2}, $${idx * 12 + 3}, $${idx * 12 + 4}, $${idx * 12 + 5}, ` +
-            `$${idx * 12 + 6}, $${idx * 12 + 7}, $${idx * 12 + 8}, $${idx * 12 + 9}, ` +
-            `$${idx * 12 + 10}, $${idx * 12 + 11}, $${idx * 12 + 12})`
+            `($${idx * 13 + 1}, $${idx * 13 + 2}, $${idx * 13 + 3}, $${idx * 13 + 4}, $${idx * 13 + 5}, ` +
+            `$${idx * 13 + 6}, $${idx * 13 + 7}, $${idx * 13 + 8}, $${idx * 13 + 9}, ` +
+            `$${idx * 13 + 10}, $${idx * 13 + 11}, $${idx * 13 + 12}, $${idx * 13 + 13})`
         )
         .join(', ')}
       ON CONFLICT (node_id) DO NOTHING;
@@ -289,6 +311,7 @@ async function writeNodesToDatabase(nodes: TreeNode[]) {
       node.tree_depth,
       JSON.stringify(node.metadata),
       node.lineage_version,
+      node.ledger_type,
     ]);
 
     if (!DRY_RUN) {

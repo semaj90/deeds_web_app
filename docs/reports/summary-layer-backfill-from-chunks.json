@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-08-02T11:07:48.886Z",
-  "mode": "apply",
-  "status": "PASS",
+  "generated_at": "2026-08-10T18:36:17.051Z",
+  "mode": "dry-run",
+  "status": "DRY_RUN",
   "source_table": "codebase_chunk_index",
   "target_table": "atlas_summary_layers",
-  "limit": 100,
-  "batch_size": 100,
+  "limit": 200,
+  "batch_size": 500,
   "counts": {
-    "chunks_read": 100,
-    "usable_candidates": 97,
-    "skipped_leaky": 3,
+    "chunks_read": 200,
+    "usable_candidates": 192,
+    "skipped_leaky": 8,
     "skipped_short": 0,
-    "skipped_no_packet_context": 79,
-    "packet_context_found": 18,
-    "summary_context_found": 18,
-    "title_id_enriched": 18,
-    "deduped_packet_rows": 0,
-    "upserted": 20
+    "skipped_no_packet_context": 147,
+    "packet_context_found": 45,
+    "summary_context_found": 45,
+    "title_id_enriched": 45,
+    "deduped_packet_rows": 3,
+    "upserted": 0
   },
   "coverage": {
-    "usable_candidate_pct": 97,
+    "usable_candidate_pct": 96,
     "packet_context_join_pct": 100,
     "summary_context_pct": 100
   },
@@ -36,7 +36,7 @@
       "packet_key": "packet:4bb01d486192",
       "source_ref": "sveltekit-frontend/docs/documents-atlas-index.md",
       "title_id": "title:sveltekit-frontend-documents-atlas-index:0a356b3b",
-      "summary_length": 1116,
+      "summary_length": 1021,
       "packet_context_found": true,
       "summary_changed": false
     },
@@ -52,7 +52,7 @@
       "packet_key": "ace:packet:41ae4f183768",
       "source_ref": "scripts/agent/agent-orchestrator.mjs",
       "title_id": "title:agent-orchestrator:75127b92",
-      "summary_length": 1086,
+      "summary_length": 1023,
       "packet_context_found": true,
       "summary_changed": false
     },

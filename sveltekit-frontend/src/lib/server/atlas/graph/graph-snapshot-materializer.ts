@@ -41,6 +41,11 @@ export interface GraphSnapshotManifest {
 
 export interface GraphSnapshotProof {
   snapshotId: string;
+  /** Every node_materialization exclusionReason mapped to its count for this run.
+   *  Makes contamination visible instead of invisible: after the heuristic-AST
+   *  fix, 146,655 rows show up here as rejectionCounts.HEURISTIC_AST_PROJECTION
+   *  rather than silently disappearing from nodeCount with no trace. */
+  rejectionCounts: Record<string, number>;
   sourceInventoryHash: string;
   policyHash: string;
   topologyHash: string;
@@ -128,6 +133,13 @@ export interface GraphSnapshotMaterializerInput {
   selfLoopPolicy?: string;
 }
 
+// TREE_NODE_TYPE_MAP answers ONE question: "what graph node kind would this tree
+// node become if admitted?" It carries no trust semantics — membership here is
+// necessary but never sufficient for inclusion. Trust is decided separately by
+// classifyCanonicalGraphEligibility() below. Conflating the two (recognized
+// nodeType == trustworthy) is exactly what let 146,655 heuristic regex-derived
+// rows into the canonical graph snapshot at full trust (GS1.5's "extend the map
+// so more rows survive" fix widened recognition without adding a trust check).
 const TREE_NODE_TYPE_MAP: Record<string, GraphNode['nodeType']> = {
   document: 'repository',
   page: 'package',
@@ -142,6 +154,8 @@ const TREE_NODE_TYPE_MAP: Record<string, GraphNode['nodeType']> = {
   // AST-level tree-sitter node kinds materialized by the parser pipeline —
   // all map to the existing 'symbol' node type (function/class/interface/
   // type-alias/struct declarations, arrow functions are all symbol-level).
+  // Representation only — see classifyCanonicalGraphEligibility for the actual
+  // admission decision on 'symbol'-mapped nodes.
   function_declaration: 'symbol',
   arrow_function: 'symbol',
   class_declaration: 'symbol',
@@ -149,6 +163,72 @@ const TREE_NODE_TYPE_MAP: Record<string, GraphNode['nodeType']> = {
   type_alias: 'symbol',
   struct_declaration: 'symbol'
 };
+
+/** Node kinds that represent the packet/document/chunk hierarchy (everything
+ *  TREE_NODE_TYPE_MAP maps to besides 'symbol'). Distinct family from AST symbols
+ *  because the two have entirely different provenance requirements. */
+const PACKET_HIERARCHY_NODE_KINDS = new Set<GraphNode['nodeType']>(['repository', 'package', 'directory', 'file', 'chunk']);
+
+type TreeNodeEligibilityInput = {
+  ledgerType: string | null;
+  metadata: Record<string, unknown> | null;
+};
+
+type TreeNodeEligibilityResult =
+  | { eligible: true; family: 'packet_hierarchy' | 'ast_symbol' }
+  | { eligible: false; reason: string };
+
+/**
+ * Positive admission contract for canonical graph snapshot inclusion. A tree
+ * node must PROVE it belongs to a trusted family; recognizing its nodeType is
+ * not proof. Each family has its own provenance requirement:
+ *
+ *   packet_hierarchy (document/page/section/subsection/chunk): must be
+ *     ledger_type='canonical' AND metadata.source === 'atlas_packets' — the
+ *     only writer with a proven, packet-linked identity chain.
+ *
+ *   ast_symbol (function/class/interface/type-alias/struct/arrow_function):
+ *     must be ledger_type='canonical' AND metadata.extractionMethod ===
+ *     'tree_sitter' AND metadata.structuralTruth === true, and must NOT be
+ *     produced by the known heuristic writer (metadata.producerId ===
+ *     'batch-a-structural-materializer'). Any symbol node missing this
+ *     provenance — including ones with no metadata at all — is rejected.
+ *     Unknown provenance is never interpreted as trustworthy provenance.
+ */
+function classifyCanonicalGraphEligibility(
+  treeNode: TreeNodeEligibilityInput,
+  mappedNodeType: GraphNode['nodeType']
+): TreeNodeEligibilityResult {
+  if (treeNode.ledgerType !== 'canonical') {
+    return { eligible: false, reason: 'NON_CANONICAL_LEDGER_TYPE' };
+  }
+
+  const metadata = treeNode.metadata ?? {};
+
+  if (PACKET_HIERARCHY_NODE_KINDS.has(mappedNodeType)) {
+    if (metadata.source !== 'atlas_packets') {
+      return { eligible: false, reason: 'UNTRUSTED_PACKET_HIERARCHY_SOURCE' };
+    }
+    return { eligible: true, family: 'packet_hierarchy' };
+  }
+
+  if (mappedNodeType === 'symbol') {
+    if (metadata.producerId === 'batch-a-structural-materializer') {
+      return { eligible: false, reason: 'HEURISTIC_AST_PROJECTION' };
+    }
+    if (metadata.structuralTruth !== true) {
+      return { eligible: false, reason: 'STRUCTURAL_TRUTH_NOT_PROVEN' };
+    }
+    if (metadata.extractionMethod !== 'tree_sitter') {
+      // Fail closed: covers missing extractionMethod, unrecognized values, and
+      // any future producer that doesn't explicitly declare tree_sitter.
+      return { eligible: false, reason: 'NON_TREE_SITTER_SYMBOL' };
+    }
+    return { eligible: true, family: 'ast_symbol' };
+  }
+
+  return { eligible: false, reason: 'UNRECOGNIZED_NODE_FAMILY' };
+}
 
 export class GraphSnapshotMaterializerError extends Error {
   constructor(readonly evidence: Record<string, unknown>) {
@@ -215,6 +295,30 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
       continue;
     }
 
+    // Recognizing the nodeType is not the same claim as trusting the row (see
+    // classifyCanonicalGraphEligibility docstring above). Prior to this check,
+    // any ledgerType survived as long as its nodeType key was in
+    // TREE_NODE_TYPE_MAP, which let 146,655 heuristic regex-derived 'symbol'
+    // nodes (batch-a-structural-materializer.mts, approximate byte spans, zero
+    // real parent/child edges) into the graph snapshot at full trust.
+    const eligibility = classifyCanonicalGraphEligibility(
+      { ledgerType: treeNode.ledgerType, metadata: (treeNode.metadata ?? null) as Record<string, unknown> | null },
+      nodeType
+    );
+    if (eligibility.eligible === false) {
+      graphSnapshotExclusions.push(buildExclusion(snapshotId, 'node_materialization', eligibility.reason, {
+        candidateKey: treeNode.nodeId,
+        sourceRef: treeNode.sourceRef,
+        evidence: {
+          nodeType: treeNode.nodeType,
+          ledgerType: treeNode.ledgerType,
+          producerId: (treeNode.metadata as Record<string, unknown> | null | undefined)?.producerId ?? null,
+          extractionMethod: (treeNode.metadata as Record<string, unknown> | null | undefined)?.extractionMethod ?? null
+        }
+      }));
+      continue;
+    }
+
     const nodeKey = `tree:${treeNode.nodeId}`;
     graphSnapshotNodes.push(
       parseGraphNode({
@@ -263,6 +367,10 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
           communityId: treeNode.communityId ?? null,
           ledgerType: treeNode.ledgerType ?? null,
           lineageVersion: treeNode.lineageVersion ?? null,
+          // Which admission family this node proved membership in — makes the
+          // eligibility decision inspectable on the persisted node itself, not
+          // just derivable by re-reading classifyCanonicalGraphEligibility.
+          eligibilityFamily: eligibility.family,
           metadata: treeNode.metadata ?? {}
         }
       })
@@ -504,11 +612,32 @@ export function materializeGraphSnapshot(input: GraphSnapshotMaterializerInput):
     sourceHash: sourceInventoryHash,
     topologyHash: includedTopologyHash,
     policyHash,
-    eligibilityPredicate: 'canonical tree_node_id + packet_key resolution with explicit exclusion ledger'
+    // Structured, checkable contract — matches classifyCanonicalGraphEligibility
+    // exactly, so a future audit can compare this string against the executable
+    // predicate without re-reading the implementation. The prior string ("canonical
+    // tree_node_id + packet_key resolution with explicit exclusion ledger") made
+    // an enforcement claim that was not actually true when it was written.
+    eligibilityPredicate: JSON.stringify({
+      packet_hierarchy: { ledger_type: 'canonical', 'metadata.source': 'atlas_packets' },
+      ast_symbol: {
+        ledger_type: 'canonical',
+        'metadata.extractionMethod': 'tree_sitter',
+        'metadata.structuralTruth': true,
+        'metadata.producerId_excludes': ['batch-a-structural-materializer']
+      },
+      default: 'reject'
+    })
   };
+
+  const rejectionCounts: Record<string, number> = {};
+  for (const exclusion of graphSnapshotExclusions) {
+    if (exclusion.exclusionStage !== 'node_materialization') continue;
+    rejectionCounts[exclusion.exclusionReason] = (rejectionCounts[exclusion.exclusionReason] ?? 0) + 1;
+  }
 
   const graphSnapshotProof: GraphSnapshotProof = {
     snapshotId,
+    rejectionCounts,
     sourceInventoryHash,
     policyHash,
     topologyHash: includedTopologyHash,

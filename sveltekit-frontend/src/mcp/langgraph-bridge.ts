@@ -94,14 +94,39 @@ export class LangGraphBridge {
     let result: unknown = toolInput;
     if (typeof toolInput === 'string' && toolInput.length > this.config.maxToolResultChars) {
       result = toolInput.slice(0, this.config.maxToolResultChars) + '\n[... truncated ...]';
-    } else if (typeof toolInput === 'object') {
-      try {
-        const truncated = JSON.parse(
-          JSON.stringify(toolInput).slice(0, this.config.maxToolResultChars)
-        );
-        result = truncated;
-      } catch {
-        result = { _error: 'Result too large or malformed' };
+    } else if (typeof toolInput === 'object' && toolInput !== null) {
+      const asRecord = toolInput as Record<string, unknown>;
+      if (Array.isArray(asRecord.content)) {
+        // MCP tool-result shape (`{ content: [{ type: 'text', text }] }`). Truncate the
+        // text block(s) in place instead of slicing the serialized JSON string below —
+        // slicing mid-structure corrupted the JSON, threw on re-parse, and fell back to
+        // a bare `{ _error }` object that ALSO isn't valid MCP shape, so oversized
+        // results (e.g. db.table_inspect on a 140-column table) silently vanished
+        // client-side instead of returning a truncated-but-valid result.
+        const serializedFull = JSON.stringify(asRecord);
+        if (serializedFull.length <= this.config.maxToolResultChars) {
+          result = toolInput;
+        } else {
+          const blocks = asRecord.content as Array<Record<string, unknown>>;
+          const budgetPerBlock = Math.max(200, Math.floor(this.config.maxToolResultChars / Math.max(1, blocks.length)));
+          result = {
+            ...asRecord,
+            content: blocks.map((block) =>
+              block?.type === 'text' && typeof block.text === 'string' && block.text.length > budgetPerBlock
+                ? { ...block, text: block.text.slice(0, budgetPerBlock) + '\n[... truncated ...]' }
+                : block
+            ),
+          };
+        }
+      } else {
+        try {
+          const truncated = JSON.parse(
+            JSON.stringify(toolInput).slice(0, this.config.maxToolResultChars)
+          );
+          result = truncated;
+        } catch {
+          result = { _error: 'Result too large or malformed' };
+        }
       }
     }
 

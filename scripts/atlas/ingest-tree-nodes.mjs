@@ -26,6 +26,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 import path from 'path';
 import fs from 'fs';
 
@@ -55,6 +56,13 @@ function slug(value) {
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '')
     .toLowerCase();
+}
+
+function canonicalPathSlug(value) {
+  const raw = String(value ?? '');
+  const base = slug(raw) || 'root';
+  const hash = createHash('sha256').update(raw).digest('hex').slice(0, 10);
+  return `${base}-${hash}`;
 }
 
 function shortText(value, max = 500) {
@@ -100,21 +108,37 @@ async function detectPacketTable(client) {
   };
 }
 
-async function getExistingNodeId(client, pageIndexPath, nodeType) {
+async function getExistingNodeId(client, { sourceRef, packetKey, nodeType }) {
+  const conditions = ['node_type = $1'];
+  const params = [nodeType];
+
+  if (sourceRef) {
+    conditions.push(`source_ref = $${params.length + 1}`);
+    params.push(sourceRef);
+  }
+
+  if (packetKey) {
+    conditions.push(`packet_key = $${params.length + 1}`);
+    params.push(packetKey);
+  }
+
   const res = await client.query(
     `SELECT node_id
        FROM atlas_tree_nodes
-      WHERE page_index_path = $1
-        AND node_type = $2
+      WHERE ${conditions.join(' AND ')}
       ORDER BY created_at ASC NULLS LAST, updated_at ASC NULLS LAST
       LIMIT 1`,
-    [pageIndexPath, nodeType]
+    params
   );
   return res.rows[0]?.node_id ?? null;
 }
 
 async function ensureTreeNode(client, payload, options = {}) {
-  const existingId = await getExistingNodeId(client, payload.page_index_path, payload.node_type);
+  const existingId = await getExistingNodeId(client, {
+    sourceRef: payload.source_ref,
+    packetKey: payload.packet_key,
+    nodeType: payload.node_type,
+  });
   const nodeId = existingId || randomUUID();
   const rootId = payload.root_id ?? nodeId;
   const shouldInsert = !existingId || refresh;
@@ -269,7 +293,7 @@ async function main() {
       if (packets.length === 0) continue;
       stats.filesProcessed += 1;
 
-      const rootPageIndexPath = `doc:${slug(sourceRef)}`;
+      const rootPageIndexPath = `doc:${canonicalPathSlug(sourceRef)}`;
       const rootTitle = path.basename(String(file.file_path ?? sourceRef)) || sourceRef;
       const rootMetadata = {
         source: packetLedger.tableName,
@@ -314,7 +338,7 @@ async function main() {
       }
 
       for (const packet of packets) {
-        const pageIndexPath = `${rootPageIndexPath}/chunk:${slug(packet.packet_key)}`;
+        const pageIndexPath = `${rootPageIndexPath}/chunk:${canonicalPathSlug(packet.packet_key)}`;
         pageIndexPaths.push(pageIndexPath);
         const title = packet.feature_label || packet.packet_key;
         const contentPreview = shortText(packet.summary, 500);

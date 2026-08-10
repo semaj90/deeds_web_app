@@ -219,7 +219,10 @@ export const ENV = Object.freeze({
   POSTGRES_PASSWORD: privateEnv.POSTGRES_PASSWORD,
   POSTGRES_PORT: privateEnv.POSTGRES_PORT,
   POSTGRES_USER: privateEnv.POSTGRES_USER,
-  PUBLIC_API_URL: privateEnv.PUBLIC_API_URL,
+  // Dev default matches `npm run dev`'s Vite port — same rationale as SELF_URL above.
+  // Without this fallback, MCP tool handlers that build `${ENV.PUBLIC_API_URL}/api/...`
+  // silently produce the literal string "undefined/api/..." when unset.
+  PUBLIC_API_URL: privateEnv.PUBLIC_API_URL ?? privateEnv.ORIGIN ?? 'http://127.0.0.1:5173',
   PUBLIC_APP_URL: privateEnv.PUBLIC_APP_URL,
   PYTHON_PATH: privateEnv.PYTHON_PATH,
   QDRANT_API_KEY: privateEnv.QDRANT_API_KEY,

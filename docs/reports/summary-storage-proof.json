@@ -1,21 +1,21 @@
 {
-  "generated_at": "2026-07-02T23:22:48.384Z",
+  "generated_at": "2026-08-10T18:35:58.558Z",
   "status": "PASS",
   "tables": {
     "atlas_packets": {
       "exists": true,
-      "rows": 58304
+      "rows": 61659
     },
     "atlas_summary_layers": {
       "exists": true,
-      "rows": 12004
+      "rows": 18437
     }
   },
   "coverage": {
     "atlas_packets_metadata_pct": 100,
-    "atlas_packets_topology_pct": 0,
-    "atlas_packets_vectors_pct": 5.3,
-    "atlas_summary_layers_metadata_pct": 99.72
+    "atlas_packets_topology_pct": 97.29,
+    "atlas_packets_vectors_pct": 100,
+    "atlas_summary_layers_metadata_pct": 100
   },
   "proof": {
     "summary_rows": true,
@@ -24,37 +24,194 @@
   },
   "sample": {
     "atlas_packets": {
-      "packet_key": "packet:5a6bc565606c",
-      "source_ref": "logs/turboquant/launch-2026-05-28T16-59-48.out",
-      "feature_id": "logs.launch-2026-05-28T16-59-48",
+      "packet_key": "packet:23f3f6d80684",
+      "source_ref": "neschrom97/cards/27b5bab401d053c3.json",
+      "feature_id": "neschrom97.27b5bab401d053c3",
       "metadata": {
+        "hash": "6d4830aa87c9ce5b",
+        "path": "neschrom97/cards",
         "identity": {
           "source": "filesystem",
           "version": 1,
-          "created_at": "2026-06-28T08:36:31.584Z",
+          "created_at": "2026-06-28T08:36:33.841Z",
           "created_by": "phase-d:whole-codebase-scan"
         },
         "workspace": {
           "domain": "codebase",
           "universe": "atlas",
           "text_safe": true,
-          "size_bytes": 0
+          "size_bytes": 540
+        },
+        "backfilled_at": "2026-07-05T00:36:54.050Z",
+        "used_concepts": [],
+        "feature_envelope": {
+          "ace_tags": [
+            "codebase",
+            "artifact",
+            "codebase_layer",
+            "json",
+            "feature-envelope"
+          ],
+          "entities": [],
+          "keywords": [
+            "codebase",
+            "artifact",
+            "codebase_layer",
+            "27b5bab401d053c3.json",
+            "neschrom97.27b5bab401d053c3"
+          ],
+          "dag_edges": [
+            {
+              "to": "neschrom97.27b5bab401d053c3",
+              "from": "neschrom97/cards/27b5bab401d053c3.json",
+              "relation": "DESCRIBES"
+            },
+            {
+              "to": "codebase",
+              "from": "neschrom97.27b5bab401d053c3",
+              "relation": "IN_DOMAIN"
+            },
+            {
+              "to": "artifact",
+              "from": "neschrom97.27b5bab401d053c3",
+              "relation": "HAS_ONTOLOGY"
+            },
+            {
+              "to": "codebase_layer",
+              "from": "neschrom97.27b5bab401d053c3",
+              "relation": "IN_TOPOLOGY"
+            }
+          ],
+          "kag_nodes": [
+            "neschrom97.27b5bab401d053c3",
+            "27b5bab401d053c3.json",
+            "codebase",
+            "artifact",
+            "codebase_layer",
+            "codebase:codebase_layer"
+          ],
+          "confidence": 0.5,
+          "feature_id": "neschrom97.27b5bab401d053c3",
+          "packet_key": "packet:23f3f6d80684",
+          "provenance": {
+            "source": "atlas_summary_layers",
+            "worker": "backfill-feature-envelopes",
+            "generated_at": "2026-07-04T01:39:20.831Z",
+            "summary_packet_key": "packet:23f3f6d80684:summary"
+          },
+          "source_ref": "neschrom97/cards/27b5bab401d053c3.json",
+          "domain_class": "codebase",
+          "feature_label": "27b5bab401d053c3.json",
+          "ontology_label": "artifact",
+          "source_ref_key": "neschrom97/cards/27b5bab401d053c3.json",
+          "topology_label": "codebase_layer",
+          "summary_packet_key": "packet:23f3f6d80684:summary"
         }
       },
-      "topology": {},
-      "vectors": {}
+      "topology": {
+        "som_x": null,
+        "som_y": null,
+        "degree": null,
+        "pagerank": null,
+        "som_index": null,
+        "ae_distance": null,
+        "betweenness": null,
+        "centroid_id": "14",
+        "eigenvector": null,
+        "som_cluster": null,
+        "community_id": null,
+        "tree_node_id": "7023e5c4-f55d-4db1-bb48-399000477805",
+        "neo4j_node_id": null,
+        "topology_version": "2026-06-18",
+        "nearest_neighbors": [],
+        "topology_updated_at": "2026-07-04T06:20:41.848Z"
+      },
+      "vectors": {
+        "vector_dim": 768,
+        "vector_source": "gemma4_summary",
+        "qdrant_point_id": "packet:23f3f6d80684",
+        "qdrant_collection": "codebase_chunks_768",
+        "embedding_768_idempotency": "cdb5887d95bab750f973c0b7100a5cc15df2459a23aecb0b1db0ee3070e2f87e"
+      }
     },
     "atlas_summary_layers": {
-      "packet_key": "packet:0057df284547",
+      "packet_key": "packet:0087974842c4",
       "summary_level": "gemma4_packet_summary",
-      "summary_text": "This packet group validates the wiring and connectivity within the NATS messaging system for the P4 implementation. Retrieval should use the feature ID: scripts.test-p4-nats-wiring. The operator should execute this test suite to confirm that all necessary NATS endpoints and message paths are correctly established before proceeding with integration testing. --- End of Summary ---",
+      "summary_text": "This group summarizes the execution results for the sveltekit-frontend startup process on 2026-06-01. The data is available in the provided JSON file, which should be analyzed for success/failure status. The operator should review the summary to confirm the frontend initialization completed as expected before proceeding to integration testing. --- END OF PACKET ---",
       "metadata": {
-        "worker": "embeddinggemma-batch-worker",
-        "batch_index": 0,
-        "embedded_at": "2026-06-30T05:26:32.318Z",
-        "embedding_source": "ollama_batch",
-        "ollama_duration_ns": 1514993200,
-        "embedding_batch_size": 20
+        "tags": [],
+        "concepts": [],
+        "evidence": [
+          {
+            "feature_id": "sveltekit-frontend.startup-2026-06-01T19-35-32-523Z",
+            "packet_key": "packet:0087974842c4",
+            "source_ref": "logs/task-output/pipeline-test/startup-2026-06-01t19-35-32-523z.json",
+            "packet_kind": "summary_backlog_packet",
+            "feature_label": "startup-2026-06-01T19-35-32-523Z.json",
+            "qdrant_point_id": null,
+            "qdrant_collection": null
+          }
+        ],
+        "group_by": "source_ref",
+        "feature_id": "sveltekit-frontend.startup-2026-06-01T19-35-32-523Z",
+        "source_ref": "logs/task-output/pipeline-test/startup-2026-06-01t19-35-32-523z.json",
+        "summary_id": "a8ea1b87-efc7-4769-0697-a9a7e085be60",
+        "embedded_at": "2026-07-04T19:40:28.642Z",
+        "packet_keys": [
+          "packet:0087974842c4"
+        ],
+        "packet_kind": "summary_packet",
+        "packet_type": "chrom97",
+        "source_refs": [
+          "logs/task-output/pipeline-test/startup-2026-06-01t19-35-32-523z.json",
+          "sveltekit-frontend/logs/task-output/pipeline-test/startup-2026-06-01T19-35-32-523Z.json"
+        ],
+        "generated_at": "2026-07-04T19:35:50.303Z",
+        "packet_count": 1,
+        "embedding_dim": 768,
+        "feature_label": "startup-2026-06-01T19-35-32-523Z.json",
+        "summary_model": "gemma4-legal-iq4xs-direct.gguf",
+        "source_ref_key": "logs/task-output/pipeline-test/startup-2026-06-01t19-35-32-523z.json",
+        "summary_source": "gemma4",
+        "embedding_model": "embeddinggemma:latest",
+        "storage_targets": {
+          "redis": "warm-ready",
+          "qdrant": "mirror-ready",
+          "postgres": "apply-ready",
+          "seaweedfs": "cold-metadata-only"
+        },
+        "cache_namespaces": [
+          "ace:packet",
+          "ace:summary",
+          "bifrost:sem:feature",
+          "bifrost:sem:packet"
+        ],
+        "embedding_source": "ollama_embeddinggemma",
+        "feature_envelope": {
+          "summary": "This group summarizes the execution results for the sveltekit-frontend startup process on 2026-06-01. The data is available in the provided JSON file, which should be analyzed for success/failure status. The operator should review the summary to confirm the frontend initialization completed as expected before proceeding to integration testing. --- END OF PACKET ---",
+          "keywords": [],
+          "title_id": "title:e9f361631c1911eb",
+          "packet_id": "packet:0087974842c4",
+          "feature_id": null,
+          "packet_key": "packet:0087974842c4",
+          "source_ref": null,
+          "domain_class": "unknown",
+          "embedding_dim": 384,
+          "feature_label": "startup-2026-06-01T19-35-32-523Z.json",
+          "quality_score": 1,
+          "summary_length": 367,
+          "topology_label": "root",
+          "identity_chain_complete": false
+        },
+        "packet_group_key": "logs/task-output/pipeline-test/startup-2026-06-01t19-35-32-523z.json",
+        "qdrant_point_ids": [],
+        "langextract_labels": [
+          "startup 2026 06 01T19 35",
+          "summary backlog packet"
+        ],
+        "qdrant_collections": [],
+        "summary_packet_key": "summary:de4d37282d388358",
+        "canonical_source_ref": "logs/task-output/pipeline-test/startup-2026-06-01t19-35-32-523z.json"
       }
     }
   }

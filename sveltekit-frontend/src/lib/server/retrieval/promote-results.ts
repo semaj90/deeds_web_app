@@ -1,4 +1,30 @@
 /**
+ * CLASSIFICATION (2026-08-10 summary-producer-ownership audit): DEAD / COMPATIBILITY_LEGACY_384.
+ * NOT a canonical writer — do not treat this module as live or as an owner of
+ * atlas_summary_layers.
+ *
+ * `promoteResults()` below has zero callers anywhere in `src/` outside its own
+ * `promote-results.spec.ts` (which mocks `db.execute` entirely, so the SQL
+ * below has never actually run against a real schema). The live, actually-
+ * wired app-side promotion path is a *different* module —
+ * `promote-results-outbox.ts` (`recordPromotionIntent`, called from
+ * `search-runtime.ts`) — which writes only to `atlas_packets` directly and
+ * does not touch `atlas_summary_layers` or any embedding at all. Two parallel
+ * promotion systems evolved; only the outbox one ever went live.
+ *
+ * Stage 3 (`embedSummaries`) and Stage 4 (`syncToQdrant`) are now explicit
+ * no-op compatibility shims. The earlier 384-dim summary path referenced a
+ * nonexistent `atlas_packets.summary_embedding_384` column and therefore
+ * cannot be a canonical writer. Per the current summary-producer ownership
+ * contract, canonical summary embeddings must use `semantic_768` / 768 with
+ * full provenance elsewhere; this module is retained only because Stage 1
+ * and Stage 2 still model the summary promotion flow and the spec references
+ * them. Do not treat this module as an owner of summary embedding truth.
+ *
+ * ---
+ *
+ * Original docstring (historical, describes intended-but-never-live design):
+ *
  * Stage 5: Promotion & Persistence
  *
  * Takes accepted results and writes them back through the canonical layers:
@@ -24,9 +50,7 @@
 
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
-import { embedText as embedEmbeddingGemmaText } from '$lib/server/embedding/embed.js';
 import type { FeatureEnvelope } from './feature-envelope.js';
-import { syncSummaryPayloadToQdrant } from './qdrant-summary-sync.js';
 
 /**
  * Promotion result tracking
@@ -200,157 +224,38 @@ async function propagateToAtlasPackets(results: FeatureEnvelope[]): Promise<Prom
 }
 
 /**
- * Stage 3: Embed summaries (384-dim) and store in atlas_packets
- * Uses existing embedding infrastructure
+ * Stage 3: Legacy compatibility shim for the retired 384-dim summary path.
+ * Canonical summary embeddings are owned elsewhere; this stage is intentionally
+ * disabled and performs no writes.
  */
 async function embedSummaries(results: FeatureEnvelope[]): Promise<PromotionResult> {
-  try {
-    let committed = 0;
-    let failed = 0;
-
-    for (const result of results) {
-      try {
-        if (!result.summary) continue;
-
-        // TODO: Embed via EmbeddingGemma (384-dim)
-        const embedding = await embedText(result.summary);
-        if (!embedding) {
-          failed++;
-          continue;
-        }
-
-        // Store in atlas_packets.summary_embedding_384
-        await db.execute(sql`
-          UPDATE atlas_packets
-          SET
-            summary_embedding_384 = $1::vector,
-            updated_at = NOW()
-          WHERE packet_key = $2
-        `);
-
-        committed++;
-      } catch (e) {
-        console.warn(`Failed to embed summary for ${result.packet_key}:`, e);
-        failed++;
-      }
-    }
-
-    return {
-      success: true,
-      stage: 'summary_embeddings',
-      recordsProcessed: results.length,
-      recordsCommitted: committed,
-      recordsFailed: failed,
-      message: `Embedded ${committed}/${results.length} summaries (384-dim)`,
-    };
-  } catch (error) {
-    console.error('Stage 3 failed:', error);
-    return {
-      success: false,
-      stage: 'summary_embeddings',
-      recordsProcessed: results.length,
-      recordsCommitted: 0,
-      recordsFailed: results.length,
-      message: `Failed to embed summaries: ${String(error)}`,
-    };
-  }
+  return {
+    success: true,
+    stage: 'summary_embeddings',
+    recordsProcessed: results.length,
+    recordsCommitted: 0,
+    recordsFailed: 0,
+    message: 'Legacy 384 summary embedding path disabled; canonical summary embeddings must use semantic_768 elsewhere.',
+  };
 }
 
 /**
- * Stage 4: Sync summary embeddings to Qdrant
- * Adds or updates payload in the canonical codebase_chunks_384 hybrid/dense collection.
+ * Stage 4: Legacy compatibility shim for the retired summary embedding sync.
+ * Canonical summary embeddings are owned elsewhere; this stage is intentionally
+ * disabled and performs no writes.
  */
 async function syncToQdrant(
   results: FeatureEnvelope[],
   embeddedCount: number,
 ): Promise<PromotionResult> {
-  try {
-    if (embeddedCount === 0) {
-      return {
-        success: true,
-        stage: 'qdrant_sync',
-        recordsProcessed: results.length,
-        recordsCommitted: 0,
-        recordsFailed: 0,
-        message: 'No embeddings to sync',
-      };
-    }
-
-    // Fetch updated summaries from Postgres
-    const packetKeys = results.map(r => r.packet_key);
-    const summaries = await db.execute(sql`
-      SELECT
-        packet_key,
-        source_ref,
-        summary,
-        summary_embedding_384,
-        qdrant_point_id
-      FROM atlas_packets
-      WHERE packet_key = ANY($1::text[])
-        AND summary_embedding_384 IS NOT NULL
-    `);
-
-    type SummaryRow = {
-      packet_key: string;
-      source_ref: string | null;
-      summary: string;
-      summary_embedding_384: number[];
-      qdrant_point_id?: string | null;
-    };
-
-    const rows = summaries.rows as SummaryRow[];
-    let updatedPoints = 0;
-    let failedPoints = 0;
-    for (const row of rows) {
-      try {
-        const syncResult = await syncSummaryPayloadToQdrant({
-          packetKey: row.packet_key,
-          qdrantPointId: row.qdrant_point_id ?? null,
-          payload: {
-            source_ref: row.source_ref,
-            summary: row.summary,
-            summary_embedding_384: row.summary_embedding_384,
-            summary_synced_at: new Date().toISOString(),
-          },
-        });
-        updatedPoints += syncResult.updatedPoints;
-      } catch (e) {
-        console.warn(`Failed to sync ${row.packet_key} to Qdrant:`, e);
-        failedPoints += 1;
-      }
-    }
-
-    return {
-      success: true,
-      stage: 'qdrant_sync',
-      recordsProcessed: embeddedCount,
-      recordsCommitted: updatedPoints,
-      recordsFailed: failedPoints,
-      message: `Synced ${updatedPoints}/${rows.length} summaries to Qdrant`,
-    };
-  } catch (error) {
-    console.error('Stage 4 failed:', error);
-    return {
-      success: false,
-      stage: 'qdrant_sync',
-      recordsProcessed: results.length,
-      recordsCommitted: 0,
-      recordsFailed: results.length,
-      message: `Failed to sync to Qdrant: ${String(error)}`,
-    };
-  }
-}
-
-/**
- * Helper: Embed text using EmbeddingGemma (384-dim)
- * TODO: Wire to actual embedding service
- */
-async function embedText(text: string): Promise<number[] | null> {
-  try {
-    if (!text) return null;
-    return await embedEmbeddingGemmaText(text.slice(0, 2000));
-  } catch (error) {
-    console.warn('Embedding failed:', error);
-    return null;
-  }
+  return {
+    success: true,
+    stage: 'qdrant_sync',
+    recordsProcessed: results.length,
+    recordsCommitted: 0,
+    recordsFailed: 0,
+    message: embeddedCount === 0
+      ? 'No embeddings to sync'
+      : 'Legacy summary embedding sync disabled; no canonical 384 summary writer exists.',
+  };
 }

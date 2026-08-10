@@ -1,3 +1,10 @@
+> **Cross-reference (2026-08-10)**: the canonical packet→chunk→topology tree-link gate
+> (`atlas_topology_index`, `scripts/atlas/backfill-topology-index.mjs`, idempotency proof) is
+> tracked in the **root** `openspec/changes/parent-atlas-graph-retrieval-proof/tasks.md`'s
+> `TOPOLOGY-GATE (2026-08-10)` section, not here — this repo has two separate OpenSpec roots with
+> a same-named change folder (see the root file's own `GS1.23` finding, which documents this
+> exact collision). Not duplicated here to avoid deepening that ambiguity.
+
 ## 1. Canonical trace_search join-back
 
 - [x] 1.1 Read the active vector lane from the registry instead of hardcoding a legacy collection
@@ -99,6 +106,140 @@
 - [x] DA1.4 G16 (test pairing): `graph-snapshot.ts`/`graph-snapshot-materializer.ts` both paired (`graph-snapshot-identity.spec.ts`, `graph-snapshot-materializer.spec.ts`, 9/9 passing); the 5 CLI driver scripts have no paired specs, consistent with existing repo convention for `scripts/atlas/*` operational scripts — not a gap introduced this session
 - [x] DA1.5 Structural check (duplicate JSDoc, unreachable code): 0 findings in the rewritten `topologyHash`/edited files
 - **Recap**: 7 files audited, 0 hard fails, 0 warnings — nothing new to remediate from GS1.x changes
+
+## CORRECTION (2026-08-10) — both `--apply` snapshots existed live, contradicting GS1.8/GS1.10/GS1.11
+
+GS1.8 above records "`--apply` attempted twice; BOTH rolled back cleanly, nothing persisted
+(confirmed via `SELECT count(*) FROM atlas_graph_snapshots_v2` = 0 after each attempt)", and
+GS1.10/GS1.11 explicitly block re-attempting `--apply` pending the `tree_node_id` identity-model
+redesign. A separate session (tracked in `parent-atlas-graph-analysis-contract/tasks.md`'s deep
+tree-lineage audit) found **two `VALIDATED` rows already live** in `atlas_graph_snapshots_v2`
+(`58d9da79...`, 2026-08-02, 321,567 nodes; `382c8dc6...`, 2026-08-09, 162,234 nodes) — postdating
+this file's own "blocked, do not re-attempt" instruction. Not resolved here whether that was an
+unauthorized/unaware re-run or this file's GS1.8 entry was simply never updated after a later
+successful attempt — flagged for whoever picks up GS1.10, not investigated further this pass.
+
+**Separately, and more urgently**: both live snapshots were built while
+`graph-snapshot-materializer.ts` had a real gap — `TREE_NODE_TYPE_MAP` (widened at GS1.5)
+determined node *inclusion* by `nodeType` membership alone; `ledgerType` was threaded into node
+properties but never actually gated inclusion, despite the manifest's own
+`eligibility_predicate` field claiming *"canonical tree_node_id + packet_key resolution"*. This
+let 146,655 rows from `scripts/atlas/batch-a-structural-materializer.mts` — a regex/heuristic
+extractor with approximate 100-char-window boundaries, zero real parent/child edges, that omitted
+`ledger_type` from its INSERT and so silently inherited the column default `'canonical'` — into
+both snapshots as `'symbol'` nodes, at full canonical trust.
+
+**Fixed this pass** (live-verified):
+1. `graph-snapshot-materializer.ts` — added an explicit `ledgerType !== 'canonical'` exclusion
+   gate (`NON_CANONICAL_LEDGER_TYPE` reason) immediately after the existing `nodeType` check, so
+   the eligibility predicate's own claim is now actually enforced.
+2. `batch-a-structural-materializer.mts` — now writes `ledger_type: 'synthetic'` explicitly
+   instead of omitting the column.
+3. Live `atlas_tree_nodes` data corrected: `UPDATE ... SET ledger_type = 'synthetic' WHERE
+   node_type IN (arrow_function, class_declaration, function_declaration,
+   interface_declaration, struct_declaration, type_alias) AND ledger_type = 'canonical'` —
+   exactly 146,655 rows updated, verified before/after; `document`/`chunk` rows (58,304 each)
+   confirmed untouched.
+4. Both existing `atlas_graph_snapshots_v2` rows flipped `VALIDATED` → `SUPERSEDED` (status
+   column already supports this per its check constraint) — they were built before the fix above
+   and still contain the 146,655 contaminated `'symbol'` nodes baked in; their `VALIDATED` status
+   and `eligibility_predicate` claim were both false relative to what actually ran.
+
+**Not done, deliberately**: no `--apply` re-run to produce a fresh, clean snapshot. GS1.10's
+`tree_node_id` collision blocker is independent of the contamination fixed here and remains
+unresolved — regenerating now would still hit that same open design question. No downstream
+consumer of `atlas_graph_nodes_v2`/`atlas_graph_edges_v2` was found this pass (searched
+`src/`, `scripts/`, `packages/` for readers beyond the writer itself and its own Drizzle schema
+declaration), so there is no urgency forcing a fresh snapshot before GS1.10 resumes. When GS1.10
+is picked up, regenerate a snapshot as part of that work rather than treating this fix as
+sufficient on its own — the identity-model gap and the trust-tier gap are two separate problems
+that happened to compound in the same two rows.
+
+## HARDENING PASS (2026-08-10, same day, later) — provenance-aware admission, not just a ledger check
+
+Per explicit downstream-consumer-audit-first direction: confirmed before touching anything that
+no live reader exists for `atlas_graph_nodes_v2`/`atlas_graph_edges_v2` (application routes: 0;
+the one candidate consumer, `graph-snapshot-postgres.ts`, has 0 callers outside its own spec;
+Batch B/C/D pipeline scripts structurally exclude the heuristic rows via an unrelated
+`feature_id IS NOT NULL` filter, not by design). Classified as `ORPHANED_EXPERIMENTAL_PROJECTION`
+sitting at `MISLABELED_CANONICAL` trust, not an active retrieval/ranking incident — but the
+original same-day fix (a bare `ledgerType !== 'canonical'` check) was flagged as trap-prone: it
+depends entirely on every future writer remembering to set `ledger_type` correctly, with no
+independent, checkable signal if one doesn't. Hardened to a positive, provenance-aware admission
+contract instead of a single-flag gate:
+
+1. **`batch-a-structural-materializer.mts` self-declares what it actually is**, in `metadata`
+   rather than relying on `ledger_type` alone: `producerId: 'batch-a-structural-materializer'`,
+   `producerRevision` (parser version), `extractionMethod: 'regex_heuristic'`,
+   `structuralTruth: false`, `boundaryPrecision: 'approximate'`, `hierarchyProven: false`. No new
+   trust vocabulary invented — `ledger_type` stays `'synthetic'` (already-registered value; see
+   prior correction section).
+2. **`graph-snapshot-materializer.ts`** — added `classifyCanonicalGraphEligibility()`, a positive
+   admission contract with two proven families instead of one flag check:
+   - `packet_hierarchy` (document/page/section/subsection/chunk): requires
+     `ledger_type='canonical'` AND `metadata.source === 'atlas_packets'`.
+   - `ast_symbol` (function/class/interface/type-alias/struct/arrow_function): requires
+     `ledger_type='canonical'` AND `metadata.extractionMethod === 'tree_sitter'` AND
+     `metadata.structuralTruth === true`, AND explicitly rejects
+     `metadata.producerId === 'batch-a-structural-materializer'` even if some future bug lets it
+     through with `ledger_type='canonical'` again. Anything not proving membership in either
+     family is rejected — unknown provenance is never interpreted as trustworthy provenance
+     (verified by a dedicated regression test: a symbol node with empty `metadata` is rejected
+     `STRUCTURAL_TRUTH_NOT_PROVEN`, not silently admitted).
+3. **`TREE_NODE_TYPE_MAP` demoted to representation-only** (comment added) — it answers "what
+   graph node kind would this become," never "is this trustworthy." This is the direct fix for
+   the GS1.5 failure mode ("extend the map so more rows survive" widened recognition without
+   adding a trust check).
+4. **`eligibility_predicate` column now holds the real, executable contract** (JSON-stringified:
+   the two families' exact requirements + `default: 'reject'`) instead of a prose claim
+   ("canonical tree_node_id + packet_key resolution") that wasn't enforced when it was written.
+5. **Rejection telemetry added**: `GraphSnapshotProof.rejectionCounts` — every
+   `node_materialization` exclusion reason mapped to its count for the run, so contamination is
+   visible as a number instead of disappearing from `nodeCount` with no trace.
+6. **6-case regression matrix added** to `graph-snapshot-materializer.spec.ts` (16/16 tests
+   passing, live-run): canonical packet document → ADMIT; canonical packet chunk → ADMIT;
+   canonical real tree-sitter symbol with `structuralTruth: true` → ADMIT; Batch A heuristic
+   symbol even with `ledger_type='canonical'` → REJECT `HEURISTIC_AST_PROJECTION` (proves the
+   producerId check catches it independently of the ledger flag); Batch A symbol correctly tagged
+   `synthetic` → REJECT `NON_CANONICAL_LEDGER_TYPE`; symbol with empty/unknown metadata → REJECT
+   `STRUCTURAL_TRUTH_NOT_PROVEN` (fail-closed on unknown provenance); untrusted
+   packet-hierarchy source (`metadata.source` not `'atlas_packets'`) even with canonical ledger →
+   REJECT `UNTRUSTED_PACKET_HIERARCHY_SOURCE`.
+7. **Live dry-run against the full corpus, post-fix** (`npx tsx
+   scripts/atlas/materialize-full-corpus-graph-snapshot.mts --dry-run`, no apply):
+   `rejectionCounts: { NON_CANONICAL_LEDGER_TYPE: 146655 }` — exactly the corrected row count from
+   the earlier pass, all caught (via `ledger_type`, since those live rows were already corrected
+   to `'synthetic'` earlier the same day; the independent `producerId`/`structuralTruth` checks in
+   `classifyCanonicalGraphEligibility` are the defense against this regressing silently in the
+   future). `persistedNodeCount: 184976` (down from `eligibleNodeCount: 331631` pre-filter, i.e.
+   down from the old contaminated ~331K), `edgeCount: 123318`, `replayMatches: true` (determinism
+   holds under the new logic). **No `--apply` run** — dry-run only, nothing persisted, consistent
+   with GS1.10 remaining the open blocker for producing a fresh canonical snapshot.
+8. **The two existing `atlas_graph_snapshots_v2` rows were left as `SUPERSEDED`** (set in the
+   prior same-day pass, using the table's own pre-existing `status` check-constraint value — not
+   an invented trust label, and not a delete). Preserved as forensic evidence of what the
+   contaminated state looked like, per explicit instruction not to destructively rewrite them
+   without a documented status mechanism.
+
+**Three distinct failures, not one**, per explicit classification:
+- **Producer classification failure**: `batch-a-structural-materializer.mts` is a regex/heuristic
+  experiment that was never classified as such in its own output — it self-identified as
+  indistinguishable from canonical data.
+- **Trust-boundary conflation failure**: `graph-snapshot-materializer.ts`'s `TREE_NODE_TYPE_MAP`
+  widening (GS1.5) let "recognized node type" stand in for "trustworthy node," with the
+  eligibility predicate advertising an enforcement that didn't exist.
+- **Process/governance failure**: two `--apply` runs persisted live snapshots after this file's
+  own GS1.10/GS1.11 explicitly recorded the apply path as blocked pending an unresolved
+  identity-model design pass — a documented block that live state did not honor, for reasons not
+  established this pass.
+
+**GS1 LIVE STATE CORRECTION (2026-08-10)**: `FULL_CORPUS_GRAPH_SNAPSHOT: EXISTS,
+NOT_PROMOTED, PROVENANCE_INVALIDATED` — an applied artifact existing does not override the
+earlier promotion block (GS1.11's `CANONICAL_GRAPH_SNAPSHOT: NOT_PROVEN` stands). No downstream
+Neo4j/GDS/retrieval consumer has been found as of this audit. The trust-boundary and producer-
+classification failures above are now closed (positive admission contract, tested, dry-run
+proven). The process/governance failure and GS1.10's identity-model design gap remain open and
+unrelated to this pass's fix — do not treat this hardening as clearing GS1.10.
 
 ## Repository-first search inventory
 

@@ -608,7 +608,15 @@
       "Bash(.venv/Scripts/python -c \"import xgboost as xgb; print\\(f'XGBoost {xgb.__version__} ✓'\\); import sklearn; print\\(f'scikit-learn {sklearn.__version__} ✓'\\)\")",
       "Bash(git stash *)",
       "Bash(FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch --index-filter 'git rm --cached --ignore-unmatch \"data/atlas-ml/atlas-analytics.duckdb\" \"sveltekit-frontend/data/atlas-ml/atlas-analytics.duckdb\"' -- 41679af192..HEAD)",
-      "Bash(/c/Python313/python.exe -c ' *)"
+      "Bash(/c/Python313/python.exe -c ' *)",
+      "mcp__trace__atlas_graph_pagerank",
+      "mcp__trace__db_table_inspect",
+      "mcp__trace__atlas_workstation_status",
+      "mcp__trace__engram_redis_health",
+      "mcp__atlas-tools__codebase_export_bundle",
+      "mcp__atlas-tools__memory_prior_answer_lookup",
+      "mcp__trace__ace_compact_search",
+      "mcp__trace__karpathy_attention_rank_files"
     ],
     "deny": [],
     "ask": []

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, text, uuid, integer, jsonb, timestamp, index, unique } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, integer, jsonb, timestamp, index, unique, uniqueIndex } from 'drizzle-orm/pg-core';
 
 /**
  * atlas_tree_nodes
@@ -57,6 +57,14 @@ export const atlasTreeNodes = pgTable('atlas_tree_nodes', {
   sourceRefIdx: index('idx_atlas_tree_nodes_source_ref').on(table.sourceRef),
   packetKeyIdx: index('idx_atlas_tree_nodes_packet_key').on(table.packetKey),
   featureIdIdx: index('idx_atlas_tree_nodes_feature_id').on(table.featureId),
+
+  // Canonical identity invariants: one document root per source_ref and one chunk per packet_key
+  canonicalDocumentUq: uniqueIndex('uq_atlas_tree_nodes_canonical_document')
+    .on(table.sourceRef, table.lineageVersion)
+    .where(sql`${table.nodeType} = 'document' AND ${table.ledgerType} = 'canonical' AND ${table.sourceRef} IS NOT NULL`),
+  canonicalChunkUq: uniqueIndex('uq_atlas_tree_nodes_canonical_chunk')
+    .on(table.packetKey, table.lineageVersion)
+    .where(sql`${table.nodeType} = 'chunk' AND ${table.ledgerType} = 'canonical' AND ${table.packetKey} IS NOT NULL`),
 
   // Tree navigation indexes
   parentIdIdx: index('idx_atlas_tree_nodes_parent_id').on(table.parentId),

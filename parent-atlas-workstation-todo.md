@@ -45,17 +45,16 @@ Current lane map:
 | OKF / taxonomy / ontology / linked tuples | created + wired; schema and navigation live | `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`, `docs/.okf/README.md`, `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`, `sveltekit-frontend/src/lib/server/ontology/ontology-extractor.ts`, `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts` | `schema.yaml` is the schema source of truth, `registry.yaml` is the navigation layer, and the live runtime contracts stay in their existing owners; use this lane for codebase topology classification, domain classification, and ontology linking, but not semantic truth or identity ownership. |
 | ClusterCard / GlyphRecord / CHR97 | created; mapping pending | `sveltekit-frontend/src/lib/server/retrieval/cluster-card-contract.ts`, `sveltekit-frontend/src/lib/server/cartridge/glyph-record.ts`, `sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts` | Keep this downstream of transport proof and registry proof. |
 
-### Current Control-Plane Override — 2026-08-09
+### Current Proven Stop State — 2026-08-10
 
-Patch H 7/7 proven
+This is the durable sequencing record. T6c is complete as an experiment and must not be reopened
+as if KMeans still needs first proof.
+
+T6c proven
 ↓
-sidecar/native-addon cleanup
+KMeans routing experiment stays CACHE_HINT_ONLY
 ↓
-WSL2 RAPIDS reconciliation
-↓
-/v1/vector/kmeans (T6c: centroid + membership lineage)
-↓
-20×20 SOM
+SOM 20×20 remains a separate cache-hint experiment
 ↓
 Arrow mmap → pinned host → exact GPU tile
 ↓
@@ -81,14 +80,31 @@ DPO
 ↓
 PPO only if still justified
 
-## T6c lineage stop
+## T6c current proven stop state
 
-1. Freeze the `semantic_768` corpus revision before running KMeans.
-2. Persist centroid and membership artifacts for `K ∈ {64, 128, 256}` with lineage metadata.
-3. Compare candidate reduction and recall@10 against the already-proven T3a exact oracle.
-4. Keep SOM cache-hint-only until it proves it does not hurt recall.
-5. Refresh Graphify only after T6c is persisted and evaluated.
-6. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
+1. Canonical source representation is frozen `semantic_768`.
+2. KMeans artifacts were produced for `K ∈ {64, 128, 256}` with centroid, membership, and provenance artifacts persisted.
+3. Each clustering configuration was evaluated against the already-proven T3a exact cosine oracle.
+4. KMeans achieved useful corpus reduction but did not preserve perfect Recall@10, so it is `KMEANS_ROUTING_EXPERIMENT_PROVEN` and `CACHE_HINT_ONLY`.
+5. SOM remains a separate 20×20, 400-cell topology experiment and must be evaluated with the same exact-oracle methodology before any promotion.
+6. Do not rerun T6c to increase coverage, and do not use KMeans membership as canonical packet identity.
+7. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
+8. Do not silently substitute 384-dimensional vectors; future compressed latents must be separately revisioned experiments.
+
+## Phase 3 canonical 768-dim note
+
+Phase 3 uses the frozen `semantic_768` representation everywhere in the live path.
+`384`-dim references are legacy or derived lanes only; they do not become canonical writers,
+canonical retrieval truth, or new owner boundaries.
+
+- Stage 3B: community_id propagation and AST symbol extraction.
+- Stage 3C: SOM 20×20 as a separate 400-cell topology experiment over `semantic_768`.
+- Stage 3D: reranker feature preparation from packet evidence.
+
+`latent_64` is legacy routing compatibility only. Any future latent compression work should be a
+separately revisioned experiment, with `latent_128` the more plausible candidate if one is needed.
+The phrase `kmeans 20x20` is not the correct terminology; KMeans uses `K ∈ {64, 128, 256}` and SOM
+is the separate 20×20 topology experiment.
 
 ## Separate lane: Kafka / CDC / Rust sidecar analysis
 
@@ -148,8 +164,9 @@ This workstream is design-only until explicitly opened as its own task.
 2. `decoder-upscale`: optional reconstruction / upscaling lane; do not make it the identity owner.
 3. `bvh-geometry`: spatial traversal and visualization lane only.
 4. `riemannian-geometry`: metric-tensor and distortion diagnostics lane only.
-5. `kmeans-20x20`: centroid routing topology lane; keep it separate from semantic truth.
-6. `glyph-animation`: NES / CHR97 / sprite visualization lane; never the canonical retrieval lane.
+5. `kmeans-64-128-256`: centroid routing topology lane; do not label it `kmeans-20x20`.
+6. `som-20x20`: separate 400-cell cache-hint topology experiment, not KMeans.
+7. `glyph-animation`: NES / CHR97 / sprite visualization lane; never the canonical retrieval lane.
 
 ### Optional downstream phases
 
@@ -170,6 +187,10 @@ This workstream is design-only until explicitly opened as its own task.
 15. Phase 24 DPO.
 16. Phase 25 PPO only if still justified.
 
+Phase 18 and Phase 22 overlap conceptually for boosting-based work; treat Phase 18 as the current
+evaluation surface and Phase 22 as any later learned-policy experimentation, or you create two
+owners for the same capability.
+
 ### Conservative phase-status snapshot
 
 | Phase | Status |
@@ -181,11 +202,11 @@ This workstream is design-only until explicitly opened as its own task.
 | Phase 15 Qdrant semantic lane | implemented |
 | Phase 16 Graph/KAG/DAG refresh manifest | partial |
 | Phase 17 PyTorch feature extraction lane | partial |
-| Phase 18 XGBoost / gradient tree boosting reranker | partial |
+| Phase 18 XGBoost / gradient tree boosting reranker | partial / evaluation surface |
 | Phase 19 deterministic HMM + linear policy baseline | partial |
 | Phase 20 DSPy program contract | planned |
 | Phase 21 GEPA reflective program optimization | planned |
-| Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments | partial |
+| Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments | later experimental lane |
 | Phase 23 QLoRA / SFT | eval-only |
 | Phase 24 DPO | eval-only |
 | Phase 25 PPO | eval-only / not yet graded |
@@ -269,21 +290,21 @@ The safer chain is:
 | `graphify_symbols` | `symbol_id`, `stable_symbol_key` | stable symbol candidate within file context | Yes | stable symbol candidate | PARTIAL |
 | `graphify_edges` | `edge_id` | `subject_symbol_id → object_symbol_id` | Yes | edge row identity / symbol relationship ledger | PASS |
 | `atlas_packets` | `packet_key` | canonical packet registry key | Yes | packet truth / canonical packet row | PASS |
-| `atlas_tree_nodes` | `node_id` | provisional parse-occurrence / structural node | Yes | provisional structural inventory | FAIL for canonical identity |
+| `atlas_tree_nodes` | `node_id` | canonical document/chunk tree identity | Yes | canonical tree lineage / structural inventory | PROVEN for canonical tree lineage |
 | `codebase_chunk_index` | `id`, `chunk_id`, `source_ref` | chunk mirror keyed by source/span | Yes | retrieval chunk mirror | PARTIAL |
 | `atlas_packet_registry` | `packet_key` | packet registry backfill from canonical rows | Yes | hot packet registry / projection | PARTIAL |
 | `atlas_representation_records` | `packet_id`, `representation_id`, `representation_revision` | representation lineage record | Yes | representation lineage ledger | PARTIAL |
-| `atlas_topology_index` | `packet_key` | packet-level topology projection | Yes | topology / PageRank / SOM projection | PARTIAL |
+| `atlas_topology_index` | `packet_key` | packet-level topology projection | Yes | topology / PageRank / SOM projection | PARTIAL (canonical packet coverage proven; synthetic rows remain) |
 
 **Inventory notes**
 
-- `tree_node_id` is still a provisional linkage field, not the stable graph identity.
+- `tree_node_id` is now proven for the canonical packet→tree lineage path, but still acts as a linkage field rather than the stable graph identity.
 - `graphify_files.file_id` is not yet proven to be a stable cross-revision file identity; treat it as a source identity candidate until the derivation is inspected.
 - `graphify_symbols.symbol_id` exists, but cross-revision stability and `stable_symbol_key` formula are not yet proven.
 - `graphify_edges` has valid row identity, but endpoint continuity still depends on the symbol identity proof.
 - `symbol_id` is the best stable-symbol candidate visible in the repo, but the `symbol_version_id` contract is still missing.
 - `concept_ids` are annotations attached to packets, not identity keys.
-- `atlas_packet_registry` and `atlas_topology_index` are projections or mirrors, not canonical truth.
+- `atlas_packet_registry` and `atlas_topology_index` are projections or mirrors, not canonical truth. Canonical packet coverage in `atlas_topology_index` is now proven; extra synthetic rows remain noncanonical.
 - `codebase_chunk_index` is the bridge surface for retrieval and backfill, not the canonical packet owner.
 
 **Identity status summary**
@@ -298,7 +319,7 @@ The safer chain is:
 | `GRAPHIFY_EDGE_ROW_IDENTITY` | PASS | edge rows exist and are keyed |
 | `GRAPHIFY_EDGE_ENDPOINT_STABILITY` | NOT_PROVEN | continuity depends on symbol identity proof |
 | `TREE_NODE_VERSION_IDENTITY` | PROVEN | `tree_node_id` is revision-bound / occurrence-bound |
-| `PACKET_TREE_LINK_SEMANTICS` | PARTIAL_PROVEN | packet-to-tree linkage exists, meaning still provisional |
+| `PACKET_TREE_LINK_SEMANTICS` | PROVEN | packet-to-tree linkage exists for all canonical packets |
 | `IDENTITY_DERIVATION_PROOF` | IN_PROGRESS | read-only derivation audit not yet complete |
 | `IDENTITY_OWNER_ASSIGNMENT` | IN_PROGRESS | source/symbol owners still need confirmation |
 | `IDENTITY_SURFACE_INVENTORY` | PARTIAL | tables and roles inventoried, formulas still under audit |
@@ -435,11 +456,14 @@ The safer chain is:
 
 - `atlas_packets`: `61,659`
 - `atlas_packet_registry`: `58,324`
-- `atlas_summary_layers`: `18,423`
-- `packet summaries`: `6,885`
-- `populated summary layers`: `7,640`
+- `atlas_summary_layers`: `18,437`
+- `packet summaries`: `7,061`
+- `populated summary layers`: `7,061`
 - `codebase_chunk_index`: `52,417`
 - `atlas_feature_envelopes`: `58,365`
+
+- Summary storage proof is live and PASS; chunk-to-summary promotion is wired, but only rows with packet context are promotable.
+- Next summary gate is producer ownership: the app-side `summary_embedding_384` path must be treated as legacy-only, not a canonical writer. Canonical summary embeddings must use `semantic_768` / `dimension=768` with provenance, or be explicitly labeled derived/compatibility.
 
 **Latest launch states**
 
@@ -463,17 +487,19 @@ The safer chain is:
 
 **Status**: BLOCKED until the identity model is separated from the provisional structural snapshot.
 
-**Latest live audit (2026-08-02)**: `atlas_tree_nodes` row_count `263,263`; `node_id` duplicates `0`; `source_ref → packet_key` linkage `58,304/263,263` (`22%`); orphan count `0`; max depth `2`; gate result `FAIL` on linkage coverage.
+**Latest live audit (2026-08-10)**: `atlas_tree_nodes` row_count `269,972`; canonical document rows `61,658`; canonical chunk rows `61,659`; canonical `source_ref` uniqueness `PASS`; canonical `page_index_path` uniqueness `PASS`; `atlas_packets → atlas_tree_nodes` packet linking `61,659/61,659`; orphan count `0`; max depth `2`; gate result `PACKET_TREE_LINEAGE_PROVEN`.
 
 ### Immediate Checklist
 
 - [ ] Inventory identity fields across `atlas_tree_nodes`, `atlas_packets`, `graphify_files`, `graphify_symbols`, `graphify_edges`, and the topology tables.
+- [x] Eliminate the 125 canonical `page_index_path` collisions by making the path stable-hash based on canonical `source_ref` rather than lossy slug text.
+- [ ] Add or confirm canonical uniqueness invariants for document roots by `source_ref` and packet chunks by `packet_key` before any topology-ranking work consumes tree lineage.
 - [ ] Define separate contracts for `parse_node_id`, `symbol_id`, `chunk_id`, `packet_key`, `concept_id`, and `graph_node_key`.
 - [ ] Split `tree_node_id` from stable symbol identity: add or confirm `symbol_version_id` for version-bound occurrences and keep `symbol_id` as the stable cross-revision key.
 - [ ] Inventory the parser manifest vs runtime implementation: declared `tree-sitter typescript v1` vs actual regex/heuristic extraction.
-- [ ] Reclassify the current graph artifact as a provisional structural snapshot until the enrichment chain is proven.
+- [ ] Reclassify the current graph artifact as a provisional structural snapshot until the enrichment chain is proven. Canonical tree lineage is now proven; topology and summary projections remain separate.
 - [ ] Keep `tree_node_id` uniqueness intact for now; do not relax or drop the constraint yet.
-- [ ] Confirm whether `tree_node_id` is being used as a catch-all identity in any remaining ETL or backfill script.
+- [ ] Confirm whether `page_index_path` is still being used as a catch-all identity in any remaining ETL or backfill script.
 - [ ] Prove the retrieval chain in order: `semantic_768` coverage, KNN top-k, KMeans, 20x20 SOM, then PageRank.
 - [ ] Revisit graph snapshot apply behavior only after the identity and enrichment gates pass.
 
@@ -483,10 +509,10 @@ The safer chain is:
 
 | Gate | Status | Completeness | Notes |
 |------|--------|--------------|-------|
-| PARSE_NODE_IDENTITY | PARTIAL_PROVEN | 60 | parser-backed occurrence identity still needs the full live contract |
+| PARSE_NODE_IDENTITY | PARTIAL_PROVEN | 60 | parser-backed occurrence identity is live, but page-index collisions still need cleanup |
 | STABLE_SYMBOL_IDENTITY | NOT_PROVEN | 5 | stable cross-revision symbol identity not yet proven live |
 | SYMBOL_VERSION_IDENTITY | NOT_PROVEN | 0 | revision-bound symbol version contract still missing |
-| PACKET_TO_SYMBOL_LINEAGE | NOT_PROVEN | 15 | lineage exists in pieces, not as a complete contract |
+| PACKET_TO_SYMBOL_LINEAGE | PARTIAL_PROVEN | 20 | packets link to canonical tree nodes, but not all packets have tree coverage yet |
 | DOMAIN_CLASSIFICATION | PARTIAL_PROVEN | 55 | current class population exists, lineage/proof ledger incomplete |
 | CONCEPT_EXTRACTION | PARTIAL_PROVEN | 50 | concept rows exist, provenance and edge ledger still incomplete |
 | PARSER_MANIFEST_ALIGNMENT | FAIL | 10 | runtime still mismatches the declared parser story |
@@ -1213,6 +1239,8 @@ a summary only:
 - `FeatureVector5`/`FeatureTensor` (T2-lineage): BLOCKED — 2 of 5 sources have live data
   (`authority_norm`≈pagerank, `domain_fit`≈domain_confidence); `entropy_norm`/`ast_signal`/
   `execution_utility` still need real producers before any artifact is built
+- OKF ingestion now threads a `feature_source_manifest` through `okf-topic-ingestion.ts`, so the
+  live 3/5 state is carried with packets instead of staying only in the task note.
 - Kafka/CDC tensor event path, Rust tensor-analysis sidecar, cuTile kernels, 4D Riemannian
   metric: architecture/idea only, not proven live anywhere in this repo
 

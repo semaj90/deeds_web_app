@@ -205,7 +205,7 @@ Example: "Where is the search subsystem?"
 - `codebase_chunk_index_bm25_brin` — Range filtering on BM25 scores
 
 **Key collections** (existing):
-- `codebase_chunks_768` — Qdrant ANN search (40.5K points, 384-dim)
+- `codebase_chunks_768` — Qdrant ANN search (40.5K points, semantic_768 / 768-dim)
 
 **Key routes** (RRF wiring targets):
 - `/api/retrieval/unified` — Unified orchestrator (Phase 1B + Phase 103 consumer)
@@ -214,4 +214,3 @@ Example: "Where is the search subsystem?"
 ---
 
 **Status**: ✅ All three maps linked and cross-referenced. Use this document to navigate the codebase for Phase 1B + v3.0.0 work.
-

@@ -61,13 +61,13 @@ The canonical feature envelope retrofit enables four independent indexing lanes,
 
 ### Lane 3: Semantic Indexing (Embeddings → Qdrant + PCA/AE → Latent)
 
-**Canonical source**: `atlas_packets.content_embedding` (384-dim via embeddinggemma)  
+**Canonical source**: `atlas_packets.content_embedding` (semantic_768 via embeddinggemma)  
 **Operation**: Dense vector → dimensionality reduction → clustering  
 **Throughput**: O(n) parallel embedding, O(n·k) matrix math for PCA/AE  
 **Storage**: `embedding vector(768)`, `latent_64 vector(64)`, Qdrant `codebase_chunks_768`
 
 **Components**:
-- **Embedding**: embeddinggemma:latest (384-dim, Ollama :11434) → `content_embedding`
+- **Embedding**: embeddinggemma:latest (768-dim, Ollama :11434) → `content_embedding`
 - **Dimensionality reduction**:
   - **PCA (fast, linear)**: 768 → 64 via GEMM + SVD
   - **Autoencoder (nonlinear)**: 768 → latent_128 → 64 (trained via gradient descent)
@@ -75,7 +75,7 @@ The canonical feature envelope retrofit enables four independent indexing lanes,
 - **Vector index**: Qdrant `codebase_chunks_768` for ANN search
 
 **Current implementation**:
-- ✅ Embeddings computed (embeddinggemma 384-dim)
+- ✅ Embeddings computed (embeddinggemma 768-dim)
 - ✅ Qdrant collection populated (40.5K vectors, 768-dim)
 - ⏳ PCA 768→64 (not yet done — use cuML.decomposition.PCA)
 - ⏳ Autoencoder training (deferred, use LibTorch/PyTorch)
@@ -440,4 +440,3 @@ export const atlasPackets = pgTable('atlas_packets', {
 - [Neo4j Graphify Writer](../scripts/atlas/graphify-packet-contract.mjs) (Structural lane)
 - [Qdrant Vector Indexing](../retrieval-layer-separation.md) (Semantic lane)
 - [SOM Topology Training](../scripts/atlas/train-som-20x20.mjs) (Topology lane)
-

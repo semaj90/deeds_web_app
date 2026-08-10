@@ -27,7 +27,7 @@ const baseInput = {
       domain: 'docs',
       somCluster: 1,
       communityId: 1,
-      metadata: { lane: 'root' },
+      metadata: { lane: 'root', source: 'atlas_packets' },
       ledgerType: 'canonical',
       lineageVersion: 'tree-v1'
     },
@@ -48,7 +48,7 @@ const baseInput = {
       domain: 'docs',
       somCluster: 2,
       communityId: 1,
-      metadata: { lane: 'page' },
+      metadata: { lane: 'page', source: 'atlas_packets' },
       ledgerType: 'canonical',
       lineageVersion: 'tree-v1'
     },
@@ -69,7 +69,7 @@ const baseInput = {
       domain: 'docs',
       somCluster: 3,
       communityId: 1,
-      metadata: { lane: 'orphan' },
+      metadata: { lane: 'orphan', source: 'atlas_packets' },
       ledgerType: 'canonical',
       lineageVersion: 'tree-v1'
     }
@@ -246,7 +246,7 @@ describe('graph snapshot materializer', () => {
           domain: 'docs',
           somCluster: 4,
           communityId: 1,
-          metadata: { lane: 'self' },
+          metadata: { lane: 'self', source: 'atlas_packets' },
           ledgerType: 'canonical',
           lineageVersion: 'tree-v1'
         },
@@ -267,7 +267,7 @@ describe('graph snapshot materializer', () => {
           domain: 'docs',
           somCluster: 4,
           communityId: 1,
-          metadata: { lane: 'self-duplicate' },
+          metadata: { lane: 'self-duplicate', source: 'atlas_packets' },
           ledgerType: 'canonical',
           lineageVersion: 'tree-v1'
         }
@@ -286,5 +286,128 @@ describe('graph snapshot materializer', () => {
     expect(result.graphSnapshotExclusions.map((item) => item.exclusionReason)).toEqual(
       expect.arrayContaining(['TREE_SELF_LOOP', 'DUPLICATE_TREE_NODE_ID', 'DUPLICATE_PACKET_KEY'])
     );
+  });
+});
+
+describe('canonical graph eligibility (provenance-aware admission)', () => {
+  const eligibilitySnapshotId = '55555555-5555-4555-8555-555555555555';
+  const rootId = '66666666-6666-4666-8666-666666666666';
+
+  function treeNode(overrides: {
+    nodeId: string;
+    nodeType: string;
+    ledgerType: string | null;
+    metadata: Record<string, unknown>;
+  }) {
+    return {
+      nodeId: overrides.nodeId,
+      parentId: null,
+      rootId,
+      pageIndexPath: `doc:${overrides.nodeId}`,
+      nodeType: overrides.nodeType,
+      treeDepth: overrides.nodeType === 'chunk' ? 1 : 0,
+      sourceRef: 'src/eligibility.ts',
+      filePath: 'src/eligibility.ts',
+      packetKey: overrides.nodeType === 'chunk' ? `packet:${overrides.nodeId}` : null,
+      featureId: null,
+      title: null,
+      summary: null,
+      contentPreview: null,
+      domain: null,
+      somCluster: null,
+      communityId: null,
+      metadata: overrides.metadata,
+      ledgerType: overrides.ledgerType,
+      lineageVersion: 'tree-nodes-v1'
+    };
+  }
+
+  function materialize(nodes: ReturnType<typeof treeNode>[]) {
+    return materializeGraphSnapshot({
+      snapshotId: eligibilitySnapshotId,
+      workspaceId: 'workspace:parent-atlas',
+      sourceInventorySnapshotId: 'inventory:eligibility',
+      identityContractVersion: 'identity-contract-v1',
+      parserContractVersion: 'tree-sitter-typescript-v1',
+      generatedAt: '2026-08-10T00:00:00.000Z',
+      treeNodes: nodes,
+      packets: []
+    });
+  }
+
+  it('admits a canonical atlas_packets document node', () => {
+    const result = materialize([
+      treeNode({ nodeId: '10000000-0000-4000-8000-000000000001', nodeType: 'document', ledgerType: 'canonical', metadata: { source: 'atlas_packets' } })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(1);
+    expect(result.graphSnapshotNodes[0].properties).toMatchObject({ eligibilityFamily: 'packet_hierarchy' });
+    expect(result.graphSnapshotProof.rejectionCounts).toEqual({});
+  });
+
+  it('admits a canonical atlas_packets chunk node', () => {
+    const result = materialize([
+      treeNode({ nodeId: '10000000-0000-4000-8000-000000000002', nodeType: 'chunk', ledgerType: 'canonical', metadata: { source: 'atlas_packets' } })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(1);
+    expect(result.graphSnapshotNodes[0].properties).toMatchObject({ eligibilityFamily: 'packet_hierarchy' });
+  });
+
+  it('admits a canonical real tree-sitter AST symbol with structuralTruth proven', () => {
+    const result = materialize([
+      treeNode({
+        nodeId: '10000000-0000-4000-8000-000000000003',
+        nodeType: 'function_declaration',
+        ledgerType: 'canonical',
+        metadata: { extractionMethod: 'tree_sitter', structuralTruth: true, producerId: 'ast-treesitter-facts' }
+      })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(1);
+    expect(result.graphSnapshotNodes[0].properties).toMatchObject({ eligibilityFamily: 'ast_symbol' });
+  });
+
+  it('rejects a Batch A heuristic symbol as HEURISTIC_AST_PROJECTION even when ledger_type is canonical', () => {
+    const result = materialize([
+      treeNode({
+        nodeId: '10000000-0000-4000-8000-000000000004',
+        nodeType: 'arrow_function',
+        ledgerType: 'canonical',
+        metadata: { extractionMethod: 'regex_heuristic', structuralTruth: false, producerId: 'batch-a-structural-materializer' }
+      })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(0);
+    expect(result.graphSnapshotExclusions[0].exclusionReason).toBe('HEURISTIC_AST_PROJECTION');
+    expect(result.graphSnapshotProof.rejectionCounts).toMatchObject({ HEURISTIC_AST_PROJECTION: 1 });
+  });
+
+  it('rejects a Batch A symbol correctly tagged non-canonical as NON_CANONICAL_LEDGER_TYPE', () => {
+    const result = materialize([
+      treeNode({
+        nodeId: '10000000-0000-4000-8000-000000000005',
+        nodeType: 'class_declaration',
+        ledgerType: 'synthetic',
+        metadata: { extractionMethod: 'regex_heuristic', structuralTruth: false, producerId: 'batch-a-structural-materializer' }
+      })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(0);
+    expect(result.graphSnapshotExclusions[0].exclusionReason).toBe('NON_CANONICAL_LEDGER_TYPE');
+    expect(result.graphSnapshotProof.rejectionCounts).toMatchObject({ NON_CANONICAL_LEDGER_TYPE: 1 });
+  });
+
+  it('fails closed on a symbol with unknown/missing provenance instead of trusting it', () => {
+    const result = materialize([
+      treeNode({ nodeId: '10000000-0000-4000-8000-000000000006', nodeType: 'interface_declaration', ledgerType: 'canonical', metadata: {} })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(0);
+    // Missing structuralTruth is the first provenance gap an unknown producer trips —
+    // the important assertion is REJECT, not which specific reason fires first.
+    expect(result.graphSnapshotExclusions[0].exclusionReason).toBe('STRUCTURAL_TRUTH_NOT_PROVEN');
+  });
+
+  it('rejects an untrusted packet-hierarchy source even when ledger_type is canonical', () => {
+    const result = materialize([
+      treeNode({ nodeId: '10000000-0000-4000-8000-000000000007', nodeType: 'document', ledgerType: 'canonical', metadata: { source: 'some-other-writer' } })
+    ]);
+    expect(result.graphSnapshotNodes).toHaveLength(0);
+    expect(result.graphSnapshotExclusions[0].exclusionReason).toBe('UNTRUSTED_PACKET_HIERARCHY_SOURCE');
   });
 });

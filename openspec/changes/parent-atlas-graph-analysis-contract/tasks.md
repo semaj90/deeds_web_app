@@ -109,6 +109,88 @@ verifying which path is actually live. It is not what the README assumed:
   one-off row). The other four are either dead code, fixture-only, or
   write to a different store with no relational lineage row at all.
 
+**CORRECTION (2026-08-10) — a 6th path found live, via MCP tool output, not code-reading
+alone.** Called `mcp__trace__atlas_graph_pagerank` (the agent-facing MCP tool backing
+`atlas.graph.pagerank`) and paged through its full result set (rank 1 and rank 58,361–58,365
+of 58,365 total). **Every row, first to last, returns `pageRankScore: 0.5`** — not a
+distribution, a flat constant across the entire corpus. Traced into
+`sveltekit-frontend/src/lib/server/ace/atlas-tool-registry.ts:284-319` (`getPageRank`):
+
+```sql
+SELECT packet_key, source_ref,
+  COALESCE(pagerank_score, authority_score, 0) AS pagerank_score, ...
+FROM atlas_packets
+WHERE COALESCE(pagerank_score, authority_score, 0) > 0
+ORDER BY COALESCE(pagerank_score, authority_score, 0) DESC, packet_key ASC
+```
+
+`atlas_packets.pagerank_score` (`schema-atlas-registry.ts:60`, nullable, no writer — consistent
+with the finding above that nothing writes PageRank into `atlas_packets`) is NULL for every row,
+so every result falls through to `atlas_packets.authority_score` — a column not declared in any
+schema file checked this session (present live only; the two `authority_score` columns that do
+exist in `schema-postgres.ts`, on `centroid_registry` and `cluster_cards`, are unrelated tables).
+That live `authority_score` column returns a uniform `0.5` for all 58,365 rows that have it set
+(NULL for the other 61,659 − 58,365 = 3,294 packets, filtered out by the `> 0` clause) — an
+untouched default, not a computed authority signal.
+
+**Status update for GA8 projection quality**: the MCP-facing `atlas.graph.pagerank` tool output is
+now **CONTRADICTED** as a meaningful PageRank distribution, even though the underlying
+Neo4j/GDS PageRank runs remain separately **PROVEN**. These are different claims:
+
+- `neo4j-gds-client.ts::runPageRankClient` and the GA1 run lineage still prove PageRank can be
+  computed on the graph projection.
+- `atlas_packets.pagerank_score` has no proven writer yet, so the packet-facing projection is
+  still unproven.
+- `atlas.graph.pagerank` currently returns the uniform `authority_score` fallback, so the tool
+  surface is not exposing a live PageRank distribution at all.
+
+Required correction before GA8 uses PageRank:
+
+1. Do not use `atlas.graph.pagerank` output as a PageRank evaluation feature while the fallback
+   remains indistinguishable from true PageRank.
+2. Identify the canonical producer for packet-level PageRank authority.
+3. Decide whether packet-facing PageRank should join the promoted
+   `atlas_graph_authority_scores` at query time or materialize a revisioned projection into
+   `atlas_packets.pagerank_score`.
+4. If materialized, record `graph_revision`, `algorithm_revision`, `normalization_revision`, and
+   source authority-run lineage with the projection.
+5. Remove or explicitly label the `authority_score` fallback so a uniform legacy/default value
+   cannot masquerade as PageRank.
+6. Add a distribution sanity gate before promotion: finite values only, non-zero variance, more
+   than one distinct score, valid normalization/provenance, and canonical identity join coverage.
+7. Add an MCP regression test proving `atlas.graph.pagerank` returns the promoted PageRank
+   distribution rather than a constant fallback.
+
+**New promotion invariant**: `distinct(score) > 1` and `variance(score) > ε`.
+
+**Code-level remediation applied in this checkout**: `sveltekit-frontend/src/lib/server/ace/atlas-tool-registry.ts`
+now queries and sorts on `pagerank_score` only; `authority_score` is no longer part of the
+tool-facing PageRank SQL. A regression test at
+`sveltekit-frontend/tests/atlas/atlas-tool-registry.test.ts` asserts that the emitted SQL does
+not mention `authority_score` and that row mapping still works against a pagerank-only result.
+Live MCP verification is still required to re-check the surfaced `atlas.graph.pagerank` tool.
+
+**GA8 sequencing refinement**:
+
+- GA8.0 fresh structural edges / current identity
+- GA8.1 canonical PageRank projection owner
+- GA8.2 MCP PageRank distribution sanity
+- GA8.3 freeze structural proxy labels
+- GA8.4 FeatureRow graph ablation
+- GA8.5 GA9 promotion decision
+
+**This is a 6th PageRank-adjacent path**, beyond the five already catalogued above, and the
+only one directly exposed through an agent-facing MCP tool: any agent calling
+`atlas.graph.pagerank` today receives a plausible-looking, fully-ranked, entirely fake result
+list (`metadata.source: "postgres:atlas_packets.pagerank_score"` reports success with no signal
+that every score is a default). Not fixed this pass — recorded per this file's own
+AGENT EXECUTION INTEGRITY discipline (observed live via tool call, not inferred) and because it
+directly bears on Patch I/GA8: any future ablation or retrieval-ranking work that queries
+authority via this MCP tool, rather than the one runtime-proven Neo4j GDS path
+(`neo4j-gds-client.ts::runPageRankClient`), would silently rank against noise. No owning
+OpenSpec file identified for `atlas-tool-registry.ts`'s `getPageRank` specifically — flagged
+here since it's a direct extension of this section's audit, not assigned elsewhere.
+
 **Consequence for Patch C's scope**: README.md's plan — "PageRank adapter
 emits `GraphAnalysisRun` + `graph_node_metrics(pagerank)`; existing
 `pagerankAuthority` promotion path unchanged" — assumed a live promotion
@@ -688,10 +770,86 @@ atlas:audit:ownership`) — see
 `openspec/changes/parent-atlas-nlp-sidecar-feature-compiler/tasks.md`'s "OD"
 section for the full record. Audit status: PASS, 0 new violations.
 
-## Patch I — not started
+## Patch I — pre-flight audit (2026-08-10) — REAL BLOCKER FOUND, not started
 
 Gated on Patch H per README.md's patch-order table and the user's explicit
-"after H, don't immediately promote anything" instruction above.
+"after H, don't immediately promote anything" instruction above. Patch H is done (7/7),
+the graph is freshly refreshed (see `parent-atlas-tensor-residency-integration/tasks.md`'s
+graph-refresh record), so this patch is procedurally unblocked — but a pre-flight check
+before writing any ablation code found a real, foundational gap.
+
+**GA8 ("per-feature ablation — individual analytical feature's retrieval value measured")
+has no ground truth to measure against.** Checked the two most plausible existing candidates
+for a labeled retrieval-quality eval set:
+- `tests/exact-retriever-recall-baseline.spec.ts` — tests `escapeLike`/`extractQuerySignals`
+  signal-extraction logic only, no database, no labeled query→packet ground truth.
+- `tests/retrieval-quality-regression.spec.ts` — fully mocked unit test (fetch/db/redis all
+  `vi.mock`'d), tests domain-routing/fallback logic shape, not real retrieval quality against
+  real data.
+
+**Neither is a golden set.** There is no existing "for query X, packets {A,B,C} are the
+correct answer" data anywhere found in this repo. Without that, GA8 cannot honestly produce a
+real "adding PageRank/CheiRank/k-core/betweenness improves recall by N%" result — any such
+number would have to be either fabricated or measured against an ad-hoc invented ground truth,
+both of which violate this session's own evidence discipline (see the AGENT EXECUTION
+INTEGRITY rules — no promoted claims without observable, non-fabricated proof).
+
+**This is a genuine design decision, not a research task solvable by more grepping.** Real
+candidate approaches for constructing ground truth on Atlas's actual codebase corpus (none
+attempted yet — recorded as options, not a decision made unilaterally):
+1. **Structural proxy labels** — for a sample of functions/files, treat their *actual real
+   importers/callers* (from the already-live `IMPORTS`/`CALLS` Neo4j edges) as "relevant"
+   packets for a query built from that function's own docstring/summary. Cheap, derivable from
+   data that already exists, but conflates "structurally related" with "actually what a human
+   would want retrieved" — a real methodology risk, not a free lunch.
+2. **Operator-authored small golden set** — a human (the repo's own maintainer) hand-labels a
+   few dozen real queries against this actual codebase with known-correct packet_keys. Most
+   defensible ground truth, but requires operator time and doesn't scale to a large ablation
+   sweep without more labeling effort.
+3. **Historical repair/retrieval traces as weak labels** — if/when `trace_packet_events` (the
+   table just built for `execution_utility`, still empty) ever accumulates real
+   `selected`/`evidence_used`/`test_pass` events, those could retroactively double as weak
+   retrieval-relevance labels. Not usable today — same "schema exists, data doesn't" gap as
+   `execution_utility` itself.
+
+**STOP — did not pick a methodology or build any ablation code.** This decision changes what
+GA8 actually measures and is not mine to make unilaterally. Recorded here so it's visible
+before any future session (or this one, if directed) commits to one approach. Until a ground
+truth methodology is chosen, GA8/GA9 remain **NOT_STARTED**, not merely "not started because no
+one got to it" — they're blocked on a real, named methodological gap.
+
+**Operator selected option 1 (structural proxy labels from real graph edges), 2026-08-10.**
+Attempted to build it immediately; found a second, deeper real blocker before writing any
+golden-set data — recorded here rather than pushed past:
+
+- `CALLS` edges (59,699 live) connect `CodebaseFile → Function`, but `Function.name` values are
+  frequently generic/library calls (e.g. `$state`) rather than meaningful queryable symbols —
+  a poor source for "query built from a function's own docstring."
+- `IMPORTS` edges (3,452 live) are file→file, structurally the right shape, but **every single
+  node's `.path` property on both sides points into `.claude/worktrees/agent-a38668f2/...`** —
+  a temporary agent worktree, the same class this session's own memory already records as
+  freed/deleted (20GB of `.claude/worktrees/agent-*` cleaned up earlier in the project's
+  history). Confirmed live via direct query (`MATCH (a:CodebaseFile)-[:IMPORTS]->(b:CodebaseFile)
+  RETURN a, b` — sample paths shown, not inferred). **None of these paths match
+  `atlas_packets.source_ref`'s current live repo-relative paths** (`src/lib/...` style) — the
+  entire `IMPORTS` edge set in Neo4j is stale relative to the actual current repository tree.
+- By contrast, the `atlas_feature_v1` projection (`BELONGS_TO_FEATURE`/`SIMILAR_TOPOLOGY`
+  relationships) that Patch H's betweenness work ran against **does** use live, current-tree
+  paths — confirming Neo4j holds a **mix of live and stale data written at different times**,
+  not a uniformly fresh graph. This is itself worth flagging as a governance/data-quality
+  concern independent of GA8, not something to silently work around inside this gate.
+
+**Net effect**: building the structural-proxy golden set as scoped requires either (a)
+re-deriving `IMPORTS`-equivalent structural relationships from a source that's confirmed live
+and current-tree (e.g., re-run the same live-tree AST/import-facts pipeline that populated
+`atlas_feature_v1`'s relationships, or query Postgres directly if any table holds real current
+import/dependency facts — not checked yet), or (b) accepting `CALLS`→`Function` despite its
+generic-symbol noise and filtering to only meaningful (non-builtin) callee names. **Neither
+attempted — this is a second real design/data-quality decision, not resolvable by more
+querying alone**, and stacking a second unilateral choice on top of the first (which
+methodology) risks building a golden set on a foundation nobody signed off on. Stopped here;
+did not fabricate a golden set from the stale worktree paths or silently substitute a different
+relationship type without flagging it.
 
 ## Open items carried from `parent-atlas-graph-runtime-enhancement`
 
@@ -823,6 +981,21 @@ mean simdjson is unhealthy.
    diffing the tsgo output, not just eyeballing "PASS"); re-ran
    `verify-graph-analysis-gates.mts` and got **7/7 PASS again**, including `GA-betweenness`
    — this was a pure schema-expressiveness addition, zero behavior change to any adapter.
+8. **T2-lineage (FeatureVector5 source provenance) is at 4/5, proven with real live data —
+   owned by `parent-atlas-tensor-residency-integration/tasks.md`, not this file.** Summary only:
+   `authority_norm` (pagerank, 94.9% coverage), `domain_fit` (domain_confidence, 7.2%),
+   `ast_signal` (real `web-tree-sitter` AST facts, `tanh(symbol_count/5)`, 5.5%), and
+   `entropy_norm` (byte-trigram Engram, robust-MAD-tanh normalization, 90.3% of a
+   4,480-row corpus) are all proven with real coverage numbers, none fabricated or
+   zero-filled for missing rows. `execution_utility` has a real, live, additive schema now
+   (`trace_packet_events` n-ary table + `atlas_execution_utility` rollup target,
+   `migrations/20260810b_trace_packet_events.sql`) but **zero real rows** — checked and
+   confirmed no existing telemetry (`trace_runs`, `trace_events`) can backfill it, so this
+   stays explicitly `NOT_PROVEN` until real system traffic populates it. `feature_matrix_5`
+   remains blocked on 5/5. This item exists here only as a pointer since GA8/GA9 (this
+   file's own next patch) will eventually want real, non-fabricated features to ablate
+   against — the two programs (graph-ranking vs. feature/tensor) stay independent until
+   GA8 explicitly combines them, per that file's own recorded design principle.
 
 ## Cross-references
 
