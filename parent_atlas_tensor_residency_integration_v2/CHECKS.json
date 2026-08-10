@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "parent-atlas.bundle-checks.v2",
+  "pythonCompile": "PASS",
+  "pythonCpuSmoke": "PASS",
+  "typescriptCoreNoEmit": "PASS (28/29 tensor TS modules; cpu-worker-pool.ts excluded because this container lacks repository @types/node)",
+  "typescriptTensorFileCount": 29,
+  "bundleFileCount": 90,
+  "userReportedLiveBaseline": {
+    "vitest": "7/7 PASS on the earlier integrated bundle, as reported by the user",
+    "migration": "confirmed unapplied, as intended at that checkpoint"
+  },
+  "notRun": [
+    "Postgres migration",
+    "WSL2 RAPIDS GPU smoke",
+    "CAGRA parity",
+    "live repository import wiring for v2 helpers",
+    "v2 Vitest in the user repository"
+  ],
+  "safety": [
+    "PowerShell apply script refuses overwrite collisions",
+    "VAE marked research-only",
+    "TopologyTileTree cannot replace ANN owner by contract",
+    "RuntimePolicyManifest owns hyperparameters",
+    "One-active + one-prefetch initial GPU proof"
+  ]
+}

@@ -1,0 +1,452 @@
+{
+  "schemaVersion": "parent-atlas.tensor-residency-bundle.v2",
+  "fileCount": 90,
+  "generatedAt": "2026-08-09T23:49:00-07:00",
+  "files": [
+    {
+      "path": "CHECKS.json",
+      "bytes": 960,
+      "sha256": "12ad3c2773e468c7320999d8b27cc04a6ed804e44e3b1f8ebe7eb58beff6f563"
+    },
+    {
+      "path": "IMPORT_STATUS.md",
+      "bytes": 517,
+      "sha256": "09405373a9249452a996eda257f49eda513de0f1c855cd3f98302444c8934523"
+    },
+    {
+      "path": "INTEGRATION_ORDER.md",
+      "bytes": 3221,
+      "sha256": "eef2093fa498e09e5aab43faba104ca2ca7641ec45ba8e94e900e3649b8ad19c"
+    },
+    {
+      "path": "PACKAGE_JSON_COMMANDS.md",
+      "bytes": 659,
+      "sha256": "ee5be9ff51378ede9eb0cb9ebed328356988941472aeda91c3a0b70f7969f7f1"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3068,
+      "sha256": "9ccd49cbf7e93d0eb1079521572282098f9bde6db765893fab8b9458b28daeb2"
+    },
+    {
+      "path": "SOURCES.md",
+      "bytes": 1370,
+      "sha256": "5664c1885f1eafbdd34cd90685f50ed4e4c5d16eed94c1562af978126dd609ee"
+    },
+    {
+      "path": "apply-parent-atlas-tensor-residency.ps1",
+      "bytes": 1123,
+      "sha256": "b68b7b64f5ce67f2c4b4624add1c48b5f1abe591133c09a5983ed6ab281d9ced"
+    },
+    {
+      "path": "examples/artifact-manifest.json",
+      "bytes": 648,
+      "sha256": "104f635d1ecb3a07903f6e1ec0b6228d5bed27ae2cbd5a31f254aa70a1138d9e"
+    },
+    {
+      "path": "examples/feature-schema.json",
+      "bytes": 745,
+      "sha256": "6ebb58d9bf67b0eb903a5c4e167e1da95d08a4c3230eac039b595bdb05512c2b"
+    },
+    {
+      "path": "examples/runtime-policy-manifest.json",
+      "bytes": 446,
+      "sha256": "8bb6d3f70e927c1744bc8eb5b63fd712928b1c4c201ad69ab4f4c3353097b662"
+    },
+    {
+      "path": "examples/tile-directory.json",
+      "bytes": 319,
+      "sha256": "996d7a66d3bd796012fd098e64b6945f3aa3fffc0dd0604ebcb92105ddce8777"
+    },
+    {
+      "path": "examples/valkey-keys.md",
+      "bytes": 523,
+      "sha256": "bf55d8635f9a3b54c0da7266bb36eb260de37896343e5a06a1d2709bcf35025a"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-tensor-residency-integration/proposal.md",
+      "bytes": 961,
+      "sha256": "e10e231d3bcfae95cf273056e16968f9c2b70dd0a89d4507f8067f1642f4412c"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-tensor-residency-integration/specs/packet-assembly/spec.md",
+      "bytes": 1048,
+      "sha256": "a7f2470e50142e8bf8df5378cd19d7fddcb2be85fc116f828ece9b1a57888a86"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-tensor-residency-integration/specs/tensor-residency/spec.md",
+      "bytes": 1416,
+      "sha256": "52c316272cf8673a33f9d8aedac6171ee2bf7b8297a4427ba70911d2059b862a"
+    },
+    {
+      "path": "openspec/changes/parent-atlas-tensor-residency-integration/tasks.md",
+      "bytes": 2643,
+      "sha256": "04a4f35daf08534235af40a2f21870f219511b6edaa57f7a146cdbd36385139f"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/ACE_NEURAL_LOD.md",
+      "bytes": 1147,
+      "sha256": "110a0c7684ddf3facda31b07ab680a65b2b7a2aced3ba192cfdb0ca4cb2c66ef"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/INDEXING_AND_RETRIEVAL.md",
+      "bytes": 1054,
+      "sha256": "4e60049b3fbcf42d4b2a696501ed4554dfcc032caec32b8caedcd6f4f9bb8d75"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/NARY_RAPIDS_METRICS.md",
+      "bytes": 600,
+      "sha256": "7b95580846741d2359bf02dc79c1d1e87bac9d77d17294f07156810d2dd84d64"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/NES_PS2_LOD_VISUALIZATION.md",
+      "bytes": 626,
+      "sha256": "0557bf447d84dccfdddb65358043bec6c05ebdc3d41dcea49b7a4a8113c9b7d5"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/SERIALIZATION_AND_RPC.md",
+      "bytes": 939,
+      "sha256": "d2959c84ae4a32e9615e65b48e97c54871e99e251bb20845b7d9545838c86d69"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/TENSOR_RESIDENCY_PIPELINE.md",
+      "bytes": 1228,
+      "sha256": "9a3dc49f5f926ef5a8cda8e66dfec50c5d84f2c34d633c3ca59616cebf2d1e8d"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/THREE_PLANE_RUNTIME.md",
+      "bytes": 520,
+      "sha256": "efcb8db59c9d40170b74d3c59737ab4618c9e9cdc535074b8aa53f7175dbd4b3"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/TOKEN_REMAP_LATENT_PROJECTION.md",
+      "bytes": 625,
+      "sha256": "7ba2ceceaccb688088d84b7021c1e32bb5dd7a0aab24b0d3d29de9ee2a85aace"
+    },
+    {
+      "path": "sveltekit-frontend/docs/architecture/TOPOLOGY_TILE_TREE.md",
+      "bytes": 557,
+      "sha256": "bce2da0dc612eb656b2c0a258a89a150379675294c222ba462116a130cc9a1b2"
+    },
+    {
+      "path": "sveltekit-frontend/migrations/20260810_parent_atlas_tensor_artifacts.rollback.sql",
+      "bytes": 201,
+      "sha256": "c2814271d4f11680a663c5d8aabf78188a68b32ec8f7b538290df0343080d256"
+    },
+    {
+      "path": "sveltekit-frontend/migrations/20260810_parent_atlas_tensor_artifacts.sql",
+      "bytes": 2801,
+      "sha256": "ba71ca6b58535f4d5c5093bca29b996943e7aea5c76432a75648b86c8178736c"
+    },
+    {
+      "path": "sveltekit-frontend/proto/atlas_tensor.proto",
+      "bytes": 757,
+      "sha256": "8d58c95fe12f9df22e771c857656b410635aba5ff98876ef931fa6e882156527"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/__init__.py",
+      "bytes": 116,
+      "sha256": "253da1514cd98fff5ed678c1ecd8601ae4b831f1cc42a880031fcec873f91697"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/arrow_ipc.py",
+      "bytes": 3062,
+      "sha256": "0d9bfaa2291c127678316e5f0db50d75b5a8b61fd731c2fb3044e97aa03ae4c3"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/cagra_adapter.py",
+      "bytes": 550,
+      "sha256": "34b96cc26411276c04416426bdb36c2dd63a5b77dbbd214d178819dfc949ff45"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/cli.py",
+      "bytes": 1110,
+      "sha256": "65da758b113cc2a0af3c525361f3297d1895090b6f96e967315bc83ea4fe5b32"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/cuvs_exact.py",
+      "bytes": 496,
+      "sha256": "f168715833b6eee47e5b321f0dc7e6d3fd8705652a586925b0b234e5cbd58f9a"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/deterministic_autoencoder.py",
+      "bytes": 1685,
+      "sha256": "8222a328edf54d23265ee425b57317f3d8ddd5f28a50591c04da4a2bb4ff6785"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/feature_matrix.py",
+      "bytes": 997,
+      "sha256": "a71e3d492de0717cc44fabcc3d87ff2ba5e68f045b69267a0bbc637792541f13"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/gpu_tile_cache.py",
+      "bytes": 2721,
+      "sha256": "10fc04eb0081514447a2631c168a17566a20fb6e885db1d4a0c99272e5669779"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/kmeans_rapids.py",
+      "bytes": 687,
+      "sha256": "b4441cf70015c76dffb27ede216bd66cf3536bc246e714c3021d7931ad72cd18"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/lod_promoter.py",
+      "bytes": 874,
+      "sha256": "0467d183f69b9de8846ae5da898c1f4b19fcd8af5b583bfd16b0d3f27d184b82"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/low_rank_projection.py",
+      "bytes": 627,
+      "sha256": "f45e8327b8d12aa3d29d2ca9f5f8d159b70193d3e9532ec9bf430f0a929d061b"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/mapreduce_engram.py",
+      "bytes": 1495,
+      "sha256": "7c4b02fef1249a0a2764a99b72b18c5c078a4716dccf46e4384991364769f60f"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/nary_incidence.py",
+      "bytes": 755,
+      "sha256": "832d4133a53fc02d1e350509b5f8d0f8c29cc40f36d0d935e4d8915eb281d476"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/pytorch_gpu_helpers.py",
+      "bytes": 2534,
+      "sha256": "adec673f74469da1e17f60881925b6ed5e7f676b6619e0d25f1d52c97977e57c"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/requirements-parent-atlas-tensor.txt",
+      "bytes": 173,
+      "sha256": "7f9a42b329638df9feb3abe90a423e03a411b9863d39e6c55ab0345e45a0e802"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/reranker_gpu_cache.py",
+      "bytes": 1191,
+      "sha256": "9201bf811e4fcbeac7608f8f34b829c2ce2fb12b1f05261be8d2571582b1efad"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/topology4.py",
+      "bytes": 536,
+      "sha256": "32ea3c3c253b23a2830d62cc89e7ba029074b573876266a05da74153d35dda7a"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/topology_tile_tree.py",
+      "bytes": 776,
+      "sha256": "5768a80641c186c16e805eb873944d845949247dc971e290576792f37c0aea8c"
+    },
+    {
+      "path": "sveltekit-frontend/python/parent_atlas_tensor/vae_research.py",
+      "bytes": 1090,
+      "sha256": "0d2010dbde2a4a4cadf813900c77793faafecac6233665ee25d681ead369e037"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/build-arrow-feature-matrix.mts",
+      "bytes": 412,
+      "sha256": "c388d3c3f44fdc0e8135658f518ffbb58968329e597522ccdd71103cb58891a5"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/index-arrow-artifacts.mts",
+      "bytes": 1196,
+      "sha256": "a922a5fcfe0065723a60f0fdae5e70c558838d79d17ac3d2ef979b730dcd14dc"
+    },
+    {
+      "path": "sveltekit-frontend/scripts/atlas/verify-tensor-residency.mts",
+      "bytes": 1014,
+      "sha256": "2731ca3421129b092b1ee685d979edbcd2a8a5eee647e482921c278a241bb95d"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/client/atlas/visualization/lod-glyph-contract.ts",
+      "bytes": 367,
+      "sha256": "39390f747f35030884cae4e924bb9e0bb57918f9868d0db386ce75620f53d57b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/client/atlas/visualization/topology-sprite.wgsl",
+      "bytes": 922,
+      "sha256": "d8dcad0fd94e961c7254eb648de782146127001a4304dd282cbfeb8a3f0d61b3"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/ace-lod-promoter.ts",
+      "bytes": 1467,
+      "sha256": "a6ef4da67b4e6a0e7fdfee46d87fa9a163c5f5d13d47be0954f0970d7854297c"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/ace-residency-policy.ts",
+      "bytes": 1365,
+      "sha256": "4bd62630cb725678f466dafd832ed252d42091ed05cf6d75ca85475c7fe9ed5b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/ann-route-cache.ts",
+      "bytes": 561,
+      "sha256": "02cad1176b22050c7cebe13c6f72562586d6fc19fd47e49644a18639bd02f826"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/bitfrost-valkey-contract.ts",
+      "bytes": 758,
+      "sha256": "8907fcce0a947fba8cb182535e2e200a149b307caffa54b44944565759afe21a"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/cache-tier-contract.ts",
+      "bytes": 596,
+      "sha256": "853f72db288c277ce6fa13367d210129826d0ebce59bab97a2734cc4e30ced85"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/control-json-parser.ts",
+      "bytes": 476,
+      "sha256": "687b7b6660ea83306879b716cc3fa96a820887e3938bff9bcb39188f64d38c45"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/cpu-worker-pool.ts",
+      "bytes": 1378,
+      "sha256": "f319579484b7d531a65942a3b49e915b86431fdd118ba7e23e63f7f4c701ce1e"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/feature-matrix-contract.ts",
+      "bytes": 1055,
+      "sha256": "6895889dcfe31bd6145f0e5abc518c31d6cc0a0fb6ed9edf3e376f22e700a91b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/gpu-backend-contract.ts",
+      "bytes": 587,
+      "sha256": "722c68e0156d5bb9e4d398571ab02b5ea5815561ef129fd281e6644887f5d692"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/latent-lod-contract.ts",
+      "bytes": 871,
+      "sha256": "c2a9857a1589fe12265d7d5071fc2021ced567b711900d2f2d13defab2f75f0d"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/metrics-registry.ts",
+      "bytes": 1107,
+      "sha256": "39a0fc5e908a8b4ab0975566109200e4c6b291e93ad229cabc0351b2053df4de"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/nary-hypergraph-contract.ts",
+      "bytes": 612,
+      "sha256": "49b2eee2352cd943924005a47171981ec93522b9f198a5269d0e800a2629b962"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/packet-assembler.ts",
+      "bytes": 998,
+      "sha256": "becb5f31e99e13f115508e28b0f5d7e7cb53696f7e5fa79e7e91179404acd1a1"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/packet-reader.ts",
+      "bytes": 569,
+      "sha256": "93c3da6fe7dab0d66f096e9b37417bb1314051e5be2c8dceec891bc1b2266662"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/packet-summary-tile.ts",
+      "bytes": 775,
+      "sha256": "e442b76657d001e28129794c6a00e7e05fc220ce04e126c708fd42bbb369478d"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/packet-validator.ts",
+      "bytes": 1453,
+      "sha256": "7c7d48c1f2c0ddfd45c97b5abd562e67076583bc82669fc6296556c7b8ee343d"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/reranker-cache.ts",
+      "bytes": 833,
+      "sha256": "1422397ebe7e43492c04873f8745b26e315ad8339b5b23a26eb46e30e1a133df"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/runtime-policy-manifest.ts",
+      "bytes": 984,
+      "sha256": "e7c258701c275243eea9ef68750f9ab9eb0bf9ca1a6c4ee9dd9e976b3e0cb705"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/serialization-policy.ts",
+      "bytes": 1129,
+      "sha256": "1cc53d2cb99e1ba08ea5f55558ea5737f5856ab851f06a76b646d76975004e40"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/shared-worker-protocol.ts",
+      "bytes": 560,
+      "sha256": "5c017e1d8e151f346ed205c1a03a3649aa14649d48ebd28f8c2226afb42a0ad5"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-artifact-contract.ts",
+      "bytes": 1434,
+      "sha256": "8a56ed626218bcef475af27f4c4216fbfe6edf775b03ba157f8a5acde6e679cb"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/tensor-runtime.ts",
+      "bytes": 853,
+      "sha256": "aad10d53a4b3fadb19c4d348fd33aa70ec8e871a6983ee037a9cc6c222f3d1d6"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/tile-directory.ts",
+      "bytes": 800,
+      "sha256": "8250909a43543ea79d312dddfdfaafba43e9c8f05ded1160b4b12a3a2c8c2d5c"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/tile-key.ts",
+      "bytes": 1127,
+      "sha256": "a1c77a1772656c576e112679ca7801fdb92c65203ba5828cd3a8fa0cfa247141"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/tile-planner.ts",
+      "bytes": 1133,
+      "sha256": "36e1ce24dac171fd6d3beeb35262068625bf3a2fdf245c074febc1c885f61b39"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/token-feature-map.ts",
+      "bytes": 1234,
+      "sha256": "06fcb256dd90442ff78f79884b9a16cbe2b7d9502d5578acd25e49b626b476fd"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/topology-coordinate4.ts",
+      "bytes": 980,
+      "sha256": "e2dbfea0dc65b32c5d9ddcbf44a90296a5d201d3c9dfb1aa9e8c50ab6730b91b"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/topology-tile-tree.ts",
+      "bytes": 1089,
+      "sha256": "01e343af1fcd32b6c7849cf76de406d8b5f347499743a22787a846c14584e316"
+    },
+    {
+      "path": "sveltekit-frontend/src/lib/server/atlas/tensors/unordered-chunk-assembler.ts",
+      "bytes": 1063,
+      "sha256": "b690d1bf5259882fdc28c158a4c78805cd3c42840e7290ec37c3df4298d2d0d9"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/ace-residency-policy.spec.ts",
+      "bytes": 1138,
+      "sha256": "be2c565e62513e5ef93eaed2211074036a2b6d7ea9c64fccb19e8c15af9f5d6c"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/packet-assembler.spec.ts",
+      "bytes": 850,
+      "sha256": "dfa3eb4d26187e60cc3809b7ba452859b8b22c0f573e552a68c78d76c7234cd6"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/reranker-cache.spec.ts",
+      "bytes": 608,
+      "sha256": "b51335a4173e9136a5bfe36de318e4818d16ded1a03c376809cbe5c33f0796d2"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/runtime-policy-manifest.spec.ts",
+      "bytes": 648,
+      "sha256": "ecac3e7b816c5e27982d9190164727d96b54fc4b8bad12a0c4f4ccc35f32f10a"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/serialization-policy.spec.ts",
+      "bytes": 465,
+      "sha256": "980392545f4d5209b491ad0e6df0e7bd3fe8e4349b2ae2e2dc8723be50df8c16"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/tile-key.spec.ts",
+      "bytes": 571,
+      "sha256": "b33a3ad8c93a9fc09c7721a1ef3378614cc7832fb56258a15bcdcec70d7ecee4"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/token-feature-map.spec.ts",
+      "bytes": 548,
+      "sha256": "2d13879f97cfb4e359949cf86da7c6baa386cc2aa4e11da2013c4af8a5d47164"
+    },
+    {
+      "path": "sveltekit-frontend/tests/atlas/tensor-residency/topology-tile-tree.spec.ts",
+      "bytes": 778,
+      "sha256": "0c6829eee8bd311baece10ec1ad99e85a1f488e3ece55f5305c1306d8054c5b5"
+    }
+  ]
+}

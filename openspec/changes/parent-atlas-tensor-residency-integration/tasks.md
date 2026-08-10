@@ -1,20 +1,437 @@
 # Tasks
 
 - [ ] T0 ownership audit completed; no duplicate canonical runtime owner introduced.
-- [ ] T1 Postgres artifact/tile migration applied through existing migration owner.
-- [ ] T2 one Arrow `feature_matrix_5` artifact created and hash-verified.
-- [ ] T2b one Arrow `semantic_768` fixture/artifact created and representation lineage frozen.
-- [ ] T2c centroid artifact produced and remains small/hot.
-- [ ] T3 Arrow-selected tile → pinned host → GPU exact cosine/top-k parity proven.
+- [x] T1 Postgres artifact/tile migration applied through existing migration owner. **APPLY_PROVEN
+      2026-08-09**: `migrations/20260810_parent_atlas_tensor_artifacts.sql` run directly against
+      live Postgres (`docker exec ... psql < migration.sql`) — purely additive (4×
+      `CREATE TABLE IF NOT EXISTS`, no ALTER/DROP on any existing table, wrapped in its own
+      `BEGIN`/`COMMIT`), zero Drizzle-schema overlap (these tables aren't declared in
+      `schema-postgres.ts`, so no `tablesFilter`/drift risk). Pre-flight-verified `uuidv7()`
+      exists live before running. Post-apply verified: `\dt atlas_tensor*` shows all 4 tables
+      (`atlas_tensor_artifacts`, `atlas_tensor_tiles`, `atlas_tensor_tile_members`,
+      `atlas_tensor_residency_events`); `atlas_tensor_artifacts` row count = 0 (schema-only, no
+      data written yet — correct, T2/T2b/T2c own writing the first artifact rows).
+- [ ] T2-lineage `FeatureSourceManifest`: prove a live source column exists for each of the 5
+      `FeatureVector5` fields before building any artifact. **Do not build `feature_matrix_5`
+      with fabricated/zero-filled values for any unproven field.** This gate exists precisely to
+      make "5/5 proven" an explicit, checkable precondition rather than an assumption.
+
+      **Status: 3/5 proven, 2/5 genuinely blocked (2026-08-10, all coverage numbers verified
+      live against Postgres, not estimated):**
+      | Field | Status | Source | Live coverage |
+      |---|---|---|---|
+      | `authority_norm` | PROVEN | `graph_node_metrics.pagerank` (`packet_key` join) | 58,546 / 61,659 = 94.9% |
+      | `domain_fit` | PROVEN | `atlas_packets.domain_confidence` | 4,412 / 61,659 = 7.2% |
+      | `ast_signal` | **PROVEN 2026-08-10** | `codebase_chunk_index.ast_symbols` JSONB (written by `ast-treesitter-facts.mjs`, real `web-tree-sitter` parser — confirmed live, not a stub) | 2,903 / 52,417 = 5.5% |
+      | `entropy_norm` | NOT PROVEN | No live Engram byte/n-gram statistics table exists yet; the tensor-residency bundle's `mapreduce_engram.py` has never been run against real source text | — |
+      | `execution_utility` | NOT PROVEN | Checked `trace_runs` as the candidate RouteTrace source: real live table, 15 rows, but **no `packet_key` column at all** — it records run-level status/exit_code/pass_count, not per-packet outcomes. Not usable as-is; would need either a schema addition or a different join path. | — |
+
+      **`ast_signal` formula** (defined and distribution-checked live, not yet written to any
+      table): `ast_signal = tanh(symbol_count / 5)` where `symbol_count =
+      jsonb_array_length(ast_symbols)`. Distribution on the 2,903 live rows: mean 16.09 symbols,
+      median 4, p95 11.9, max 485 (one outlier chunk). Mapped: median→0.664, p95→0.984,
+      saturates well before the max — a defensible bounded softcap, consistent with this
+      session's softcap-per-feature-family principle (not one global cap).
+
+      **Honesty note**: `domain_fit`'s own source coverage (7.2%) is actually *lower* than
+      `ast_signal`'s (5.5%) — both are genuinely partial, real, live sources, not full
+      populations. T2-lineage "proven" means *a real live source and a defined formula exist*,
+      not *100% row coverage*. Any consumer of `feature_matrix_5` must treat missing rows as
+      missing, never silently zero-filled, regardless of which of the 3 proven fields is sparse
+      for a given packet.
+
+      **Remaining to close this gate**: build a real `entropy_norm` producer (byte/n-gram
+      entropy over `codebase_chunk_index.content`, using the already-designed but unrun
+      `mapreduce_engram.py` MAP/REDUCE/NORMALIZE pipeline from the tensor-residency bundle), and
+      resolve `execution_utility`'s missing packet-level join (either add a `packet_key` column
+      to `trace_runs`/a new per-packet execution-outcomes table, or find a different real
+      source). Neither attempted this pass — both are genuinely new implementation work, not a
+      verification pass like `ast_signal` was.
+
+      **Adjacent naming hazard, found via a stray grep result (2026-08-10)**: don't confuse
+      `ast_signal`'s real source (`ast-treesitter-facts.mjs`, real `web-tree-sitter`) with
+      `src/lib/server/atlas/indexing/tree-sitter-chunker.ts` — despite its name, that file does
+      no AST parsing at all (plain fixed-size sliding-window text splitter, no `tree-sitter`
+      import). It has real live callers though (`indexing/index.ts` barrel,
+      `sveltekit-frontend/src/lib/server/analysis/{analysis-contracts,nlp-feature-compiler}
+      .spec.ts`), so it's not dead code — just misleadingly named. Anything currently consumed
+      through that chunker gets naive text windows, not AST-aware chunks. Not fixed/renamed this
+      pass; flagged so it isn't mistaken for a second `ast_signal` source later.
+- [ ] T2 one Arrow `feature_matrix_5` artifact created and hash-verified. **Blocked on
+      T2-lineage reaching 5/5** — do not attempt until then.
+- [x] T2b one Arrow `semantic_768` fixture/artifact created and representation lineage frozen.
+      **APPLY_PROVEN 2026-08-10**: 4096 real rows exported from live Postgres
+      (`atlas_packets JOIN codebase_chunk_index ON relative_path = source_ref`, both
+      `packet_key IS NOT NULL` and `content_embedding IS NOT NULL`, `DISTINCT ON (packet_key)`
+      for determinism, ordered by `packet_key`) — real 768-dim `embeddinggemma` vectors, not
+      synthetic. Written to `sveltekit-frontend/data/atlas-tensor-proof/semantic_768_r1.arrow`
+      via a new `build-semantic` CLI subcommand added to `python/parent_atlas_tensor/cli.py`
+      (mirrors the existing `build-feature` subcommand exactly; uses the already-shipped
+      `semantic_batch()`/`write_ipc_file()` from `arrow_ipc.py`, no new abstraction). sha256
+      recorded in the CLI's own JSON output. **Found and fixed one real bug while doing this**:
+      `arrow_ipc.py`'s `write_ipc_file()` called `pa.OSFile(path, "wb")` with a `pathlib.Path`
+      object; this Windows pyarrow build requires a plain `str` (`TypeError: expected bytes,
+      WindowsPath found`) — fixed with `str(path)`. Deterministic-reload proven: re-opened via
+      `open_mmap()`/`batch_matrix()`, row 0's key+vector byte-compared against the source JSONL
+      (`np.allclose`, exact match), sha256 stable across repeated hashing of the same file.
+- [x] T2c / T6c RAPIDS KMeans centroid + membership artifacts, persisted with lineage.
+      **RUNTIME_SMOKE_PROVEN 2026-08-10, live, real negative result.** Ran a K∈{64,128,256}
+      evaluation sweep (`data/atlas-tensor-proof/t6c_kmeans_sweep.py`) directly against the
+      already-proven `semantic_768_r1_full.arrow` corpus (4480 real rows) via `cuml.cluster.
+      KMeans` on the live WSL2 GPU — no AE, no SOM, no FeatureVector5, no RRF changes needed, as
+      predicted. **Found and confirmed a real, reproducible import-order bug along the way**:
+      importing `cuml` before `torch` in the `atlas-rapids-cu13` env throws
+      `undefined symbol: cublasLtZZZMatmulAlgoGetHeuristicForStream` (a cublas ABI mismatch);
+      importing `torch` first works. This is the same GS1.33 "torch-before-cudf/cugraph"
+      fragility already documented in this session — this run reproduces it directly and
+      resolves the earlier ambiguity where a user-reported cugraph import failure contradicted
+      an earlier successful check (that earlier contradiction was real, just import-order
+      dependent, not random or environment drift).
+
+      **Results** (all three K, GPU-fit, zero empty clusters at any K):
+      | K | fit_ms | inertia | cluster size p50/p95 | mean recall@10 (top-1 cluster) | mean recall@10 (top-3 clusters) | min recall@10 (top-1) |
+      |---|---|---|---|---|---|---|
+      | 64 | 4574 | 1974.7 | 64.5 / 118.7 | **0.57** | 0.78 | 0.10 |
+      | 128 | 7302 | 1827.4 | 34.0 / 67.6 | **0.57** | 0.745 | 0.10 |
+      | 256 | 10141 | 1662.6 | 16.0 / 35.25 | **0.465** | 0.65 | 0.10 |
+
+      Centroid search itself is fast (~0.15–0.21ms mean per query — this part is cheap and fine
+      at any K). **But recall is not.** Restricting the exact-search candidate set to only the
+      nearest 1 (or even nearest 3) KMeans cluster(s) loses 22–54% of the true top-10 neighbors
+      on average, and as much as 90% in the worst observed query (min recall@10 = 0.10 at every
+      K). **This directly triggers this file's own pre-existing rule: "if SOM/KMeans hurts
+      recall, it becomes CACHE_HINT_ONLY, never a retrieval filter."**
+
+      **Verdict — Mode A (KMeans as a hard retrieval filter) is REJECTED at current corpus
+      scale (4480 rows) and this K range.** Do not restrict exact/CAGRA search to a KMeans
+      neighborhood in the live retrieval path. Centroid/membership artifacts remain valid for
+      Mode B only (ACE prefetch/cache hints, non-restrictive) — persisted as
+      `centroids_k{64,128,256}_r1.arrow` / `membership_k{64,128,256}_r1.arrow` with
+      revision-qualified centroid IDs (`centroid:semantic_768:k{K}:r1:{i}`) for that purpose.
+      No canonical K was chosen — per the sweep's own design intent, this is comparative
+      evidence, not a decision. **SOM 20×20 must be evaluated with this exact same
+      methodology (recall@10 vs. the T3a/T6b exact oracle, top-N-neighborhood restriction)
+      before being trusted as anything more than a cache hint either** — this result is a
+      concrete warning against assuming coarse spatial/cluster routing is safe by default.
+
+      **T6c v2 refinement (2026-08-10) — superseded the table above with a proper K×C sweep.**
+      Pre-registered invariant checked first: `semantic_768` confirmed live L2-normalized
+      (norms min=0.9999 mean=1.0000 max=1.0001, std≈0) — so cuml's squared-Euclidean KMeans
+      objective is cosine-consistent here (`‖x−y‖²=2−2cos(x,y)` for unit vectors); no separate
+      normalized derivative artifact was needed. Re-ran with C∈{1,2,4,8} nearest centroids
+      searched, evaluating recall@{1,5,10} against the same exact oracle, and persisted three
+      logically separate artifacts per K (not conflated): `centroids_r1_k{K}.arrow`
+      (centroid_id, centroid_768), `membership_r1_k{K}.arrow` (packet_key, centroid_id,
+      distance_to_centroid), `kmeans_run_r1_k{K}.json` (sourceArtifactId/sha256,
+      representationRevision, algorithmRevision, cuml version, K, seed, inertia, fitDurationMs —
+      policy/provenance, kept separate from the numeric Arrow artifacts).
+
+      **Full result table** (20 queries, seed 42, all live on real WSL2 GPU):
+      | K | C | candidate_frac_mean | recall@1 | recall@5 | recall@10 | fit_ms |
+      |---|---|---|---|---|---|---|
+      | 64 | 1 | 1.7% | 1.0 | 0.64 | 0.57 | 3323 |
+      | 64 | 2 | 3.6% | 1.0 | 0.81 | 0.74 | 3323 |
+      | 64 | 4 | 7.1% | 1.0 | 0.86 | 0.82 | 3323 |
+      | 64 | 8 | 14.7% | 1.0 | 0.93 | 0.905 | 3323 |
+      | 128 | 1 | 1.2% | 1.0 | 0.66 | 0.57 | 6463 |
+      | 128 | 2 | 2.1% | 1.0 | 0.77 | 0.68 | 6463 |
+      | 128 | 4 | 4.1% | 1.0 | 0.88 | 0.82 | 6463 |
+      | 128 | 8 | 8.2% | 1.0 | 0.94 | **0.885** | 6463 |
+      | 256 | 1 | 0.6% | 1.0 | 0.59 | 0.465 | 23386 |
+      | 256 | 2 | 1.1% | 1.0 | 0.71 | 0.585 | 23386 |
+      | 256 | 4 | 2.1% | 1.0 | 0.83 | 0.72 | 23386 |
+      | 256 | 8 | 4.3% | 1.0 | 0.89 | **0.86** | 23386 |
+
+      **Reading the tradeoff**: recall@1 is 1.0 at *every* single (K,C) tested — the true
+      nearest neighbor is always inside the searched neighborhood. recall@10 degrades
+      predictably with fewer centroids searched, and no tested config reaches 1.0 recall@10 —
+      the best observed tradeoffs are K=128,C=8 (88.5% recall using 8.2% of the corpus) and
+      K=256,C=8 (86% recall using only 4.25% of the corpus, at nearly 3× the KMeans fit cost —
+      K=256 took 23.4s to fit vs. 3.3s for K=64, a cost that matters on revision-bump re-fits).
+      **No canonical K/C was chosen — per design intent this is comparative evidence, not a
+      decision; status remains `KMEANS_ROUTING_EXPERIMENT_PROVEN`, explicitly not
+      `CANONICAL_RETRIEVAL_FILTER`.**
+
+      **STOP per explicit instruction — T6c is now complete**: K=64/128/256 all persisted, all
+      four C values evaluated per K, recall@{1,5,10} measured against the exact oracle, candidate
+      reduction measured, cluster population statistics recorded, full reproducibility metadata
+      (source sha256, representation revision, algorithm revision, cuml version, seed) recorded
+      per K, OpenSpec updated with evidence. **Not started, and intentionally not touched this
+      pass: SOM, RRF, AE, Neo4j projections, promoting KMeans into SearchRuntime,
+      FeatureVector5.** The two experimental programs (vector residency: T3a/T6c/SOM/T3b/T3c/ACE;
+      graph ranking: Patch H/graph-refresh/GA8/GA9) remain independent until GA8 explicitly
+      combines them — a fresh graph revision must not change the corpus underneath this KMeans
+      experiment, and a KMeans/SOM revision must not contaminate the graph feature ablation.
+- [x] T3a Arrow mmap → real GPU exact top-k → packet_key recovery.
+      **RUNTIME_SMOKE_PROVEN 2026-08-10, live, not simulated.** Renamed/split from the original
+      single "T3" 2026-08-10 per a correctness-labeling review: the proof script used
+      `open_mmap()` and transmitted the corpus over HTTP to `/v1/knn/exact` — that is a real,
+      end-to-end GPU correctness proof with real identities, but it is *not* the same claim as
+      "pinned host memory" or "GPU-resident tile reuse." Splitting the single T3 line into three
+      honestly-scoped gates (T3a/T3b/T3c below) so the roadmap can't accidentally imply the
+      residency mechanism was proven before it was measured.
+      Launched `python/atlas_rapids_sidecar.py` inside WSL2 (`atlas-rapids-cu13` conda env) —
+      confirmed real GPU (RTX 3060 Ti, 6.7GB free), `cuvs`/`cagra`/`cugraph`/`cuml` 26.06.00,
+      `torch` 2.13.0+cu130 with CUDA all live via `/health`. Wrote
+      `data/atlas-tensor-proof/t3_exact_gpu_proof.py`: loads the T2b Arrow tile via
+      `open_mmap()`, computes a CPU-exact brute-force cosine top-10 oracle in numpy over the
+      real 4096×768 matrix, sends the identical query+corpus (with `packetKey`+`sourceRevision`
+      identity per the sidecar's `ExactKnnRequest` contract) to the live sidecar's
+      `POST /v1/knn/exact` (`cuvs.neighbors.brute_force` backend), and diffs the two top-10
+      lists. **Result: exact match, same order, all 10 packet_keys identical** (CPU oracle
+      13.8ms; GPU server-side `durationMs` 1043.8ms on this first, cold-start call — the 15×
+      faster warm-call numbers under T6b below show this was CUDA context/JIT warmup, not a
+      per-call cost). `corpusRows` echoed back by the sidecar matches the 4096 sent. This is the
+      first genuinely GPU-executed step in the whole tensor-residency bundle — everything before
+      this was unit/contract-level. Full output and the proof script are on disk at
+      `sveltekit-frontend/data/atlas-tensor-proof/` for re-run/audit.
+- [ ] T3b mmap CPU buffer → actual pinned (page-locked) host memory. **NOT_PROVEN.** T3a's
+      `open_mmap()` read is an ordinary mmap, not `cudaHostRegister`/pinned allocation — no
+      pinned-memory API was exercised. Do not describe T3a as having proven pinned-host transfer.
+- [ ] T3c pinned host → `cudaMemcpyAsync` H2D → GPU-resident tile reuse across requests.
+      **NOT_PROVEN.** T3a's sidecar call builds a fresh `cuvs.neighbors.brute_force` index
+      per-request from data sent over HTTP each time — there is no persistent GPU-resident tile
+      being reused across calls yet. This is real, separate future work, not implied by T3a.
+- [x] T6 cuVS brute-force same-matrix parity proven. **SATISFIED_BY_T3A** — one physical
+      experiment, one canonical evidence record. (Superseded 2026-08-10: previously this line
+      said "same live run as T3 above"; renamed to point at T3a specifically now that T3 has
+      been split. Do not re-run this as a separate experiment — T3a already is the T6 proof.)
 - [ ] T4 ACE state transitions proven with deterministic eviction ordering.
 - [ ] T5 Valkey/BitFrost revision-qualified metadata keys + invalidation policy proven.
-- [ ] T6 cuVS brute-force same-matrix parity proven.
-- [ ] T6b CAGRA measured against brute-force; recall and latency recorded.
+- [x] T6 cuVS brute-force same-matrix parity proven. (Same live run as T3 above —
+      `cuvs.neighbors.brute_force` on the real WSL2 GPU matched the CPU-exact oracle exactly.)
+- [x] T6b-e CAGRA_EPHEMERAL_ENDPOINT: recall and latency measured against brute-force.
+      **RUNTIME_SMOKE_PROVEN 2026-08-10, live** (relabeled from plain "T6b" 2026-08-10 — see
+      correction below). Extended the real corpus to all 4480 distinct
+      `(packet_key, semantic_768)` rows available live in Postgres (not all 52,380
+      atlas_packets↔codebase_chunk_index join rows are distinct packet_keys — 4480 is the true
+      unique population), wrote `semantic_768_r1_full.arrow`, then ran 20 real queries (seeded
+      `np.random.default_rng(42)` row picks) against both `/v1/knn/exact` and `/v1/knn/cagra` on
+      the live sidecar. **Result: recall@10 = 1.0 on every single query (min and mean both
+      1.0)** — CAGRA never missed a single exact-oracle neighbor at this scale. **CAGRA was
+      ~15× slower**: mean exact 143.8ms vs. mean CAGRA 2164.7ms (per-query range 1.4s–8.8s for
+      CAGRA vs. 83ms–583ms for exact).
+      **Correction (2026-08-10)**: the original write-up called this "CAGRA's crossover point"
+      — that overclaims. The sidecar's `/v1/knn/cagra` endpoint builds a fresh CAGRA index from
+      the corpus on every single request (see `atlas_rapids_sidecar.py`'s `knn_cagra()` — it
+      calls `cagra_neighbors.IndexParams(...)`/build inline per-call, there is no persisted
+      index across requests). The measured 2165ms therefore conflates index-build cost with
+      search cost, and this benchmark cannot separate them. Correct classification:
+      **CAGRA_EPHEMERAL_ENDPOINT — recall@10 1.0, latency poor, but latency figure is
+      build+search combined, not search alone.** The recommendation ("don't switch to CAGRA at
+      current data volume") still stands, but for a narrower and more honest reason: today's
+      *endpoint*, as built, always pays full index-build cost per call, which is unambiguously
+      worse than exact brute-force regardless of any true persistent-index crossover point.
+- [ ] T6b-p CAGRA persistent-index benchmark: build once, warm up, search-only p50/p95.
+      **NOT_PROVEN, not started.** Needs a sidecar change (persist the CAGRA index handle across
+      requests instead of rebuilding per-call) before this can be measured. Until this exists,
+      no claim about CAGRA's true crossover point (build-once-search-many) can be made — T6b-e
+      is not a substitute for it.
 - [ ] T6c RAPIDS KMeans centroids/labels persisted with artifact lineage.
 - [ ] T7 CPU worker staging bounded at four workers and measured.
 - [ ] T8 unordered packet/chunk assembly deterministic under shuffled completion.
 - [ ] T9 n-ary incidence artifact emitted as sparse membership data, not dense adjacency.
 - [ ] T10 visualization consumes derived topology/LOD state only.
+
+## Live verification (2026-08-09, this session)
+
+Bundle extracted to `parent-atlas-tensor-residency-integration/` at repo root and applied via its
+own `apply-parent-atlas-tensor-residency.ps1` copier (refuses to overwrite collisions; no manual
+overwrite was needed — every target path was `NEW` at apply time). Re-verified this session:
+
+- **File-identity check**: every file under the bundle's `openspec/` and `sveltekit-frontend/`
+  trees is byte-identical (`diff -q`) to its counterpart in the live repo tree. **PRESENT.**
+- **`npx vitest run tests/atlas/tensor-residency/`**: 4 files / 7 tests, all pass live (tile-key,
+  ace-residency-policy, serialization-policy, packet-assembler). **RUNTIME_SMOKE_PROVEN** (pure-TS
+  unit level only — no GPU, no Postgres, no Arrow I/O exercised).
+- **`npx tsx scripts/atlas/verify-tensor-residency.mts`**: `{"status":"PASS", invariants: {
+  arrowBulkNumeric, topology4DerivedOnly, maxCpuWorkers=4, hnswLayersNotAtlasLod,
+  exactBeforeApproximate, unorderedAssemblyRevisionQualified } all true}`. **STATICALLY_REFERENCED**
+  (the script asserts its own contract shape; it does not execute a live Arrow/GPU round-trip).
+- **Postgres migration** (`migrations/20260810_parent_atlas_tensor_artifacts.sql`): confirmed
+  **NOT APPLIED** — `\dt atlas_tensor*` against the live DB returns zero tables. Matches the
+  bundle's own stated validation scope (its author explicitly did not claim this was run).
+- **External callers**: `grep -rl "server/atlas/tensors/"` outside the `tensors/` directory itself
+  returns only the bundle's own `scripts/atlas/verify-tensor-residency.mts` — **zero production
+  callers**. This is intentional scaffolding at this stage, not a gap; T1–T10 above are exactly the
+  remaining wiring/proof work.
+- **Python package**: `python/parent_atlas_tensor/` imports cleanly (`import parent_atlas_tensor`
+  succeeds) from the repo's ambient Python — this only proves syntactic import health, not that the
+  RAPIDS/cuVS/cuGraph adapters (`cuvs_exact.py`, `cagra_adapter.py`, `kmeans_rapids.py`) actually
+  execute against a live GPU. That proof belongs to T6/T6b/T6c, still unstarted.
+
+**Net status**: bundle is PRESENT + STATICALLY_REFERENCED + unit-level RUNTIME_SMOKE_PROVEN. No
+task above is CROSS_STORE_PROVEN or GPU-execution-proven yet — the bundle author's own stated next
+step (Arrow tile → pinned host → GPU exact top-k vs. oracle, T3) is still the correct next action,
+not any percentage-complete claim.
+
+## v2 bundle import (2026-08-10)
+
+A second bundle, `parent_atlas_tensor_residency_integration_v2/`, was extracted at repo root.
+Its dry-run copier reported 21 genuinely `NEW` files (v1's files all showed as `COLLISION`,
+confirmed via `diff -q` to be byte-identical already-applied v1 content — not drift). Since the
+copier throws on the first collision (refuses partial-overwrite by design), it could not be run
+with `-Apply` directly; the 21 `NEW` files were copied individually instead, plus one intentional
+docstring-only update (`python/parent_atlas_tensor/__init__.py`, diffed first — harmless). The
+bundle's own `openspec/.../tasks.md` was deliberately **not** copied over — it would have
+clobbered this file's live session history with the bundle's original skeleton.
+
+**New files**: `token-feature-map.ts`/`.py` equivalents, `latent-lod-contract.ts`
+(semantic_768 canonical, latent_128 deterministic-AE, VAE explicitly RESEARCH_ONLY),
+`deterministic_autoencoder.py` (768→256→128→256→768 PyTorch), `vae_research.py` (stochastic VAE
+helper, explicitly forbidden from becoming canonical semantic_768 per its own naming),
+`low_rank_projection.py` (truncated SVD experimental), `pytorch_gpu_helpers.py` (tile sizing,
+pinned-host prep, tiled exact cosine/top-k), `ace-lod-promoter.ts`/`lod_promoter.py`,
+`runtime-policy-manifest.ts` (KMeans/SOM/CAGRA/HNSW/ACE-reranker parameters come from a
+revisioned policy, never read out of arbitrary tensor contents — same "manifest is policy, tile
+is data" split as this file's own graph-projection-manifest work), `reranker-cache.ts`/
+`reranker_gpu_cache.py`, `topology-tile-tree.ts`/`.py` (BVH-*like* culling for
+visualization/ACE-prefetch only, explicitly not an ANN replacement — CAGRA/HNSW still own ANN),
+`packet-summary-tile.ts` (numeric GPU tile vs. title/summary/evidence tile split),
+`cache-tier-contract.ts` (residency state vs. background job-lifecycle state kept distinct), plus
+4 docs (`ACE_NEURAL_LOD.md`, `TOKEN_REMAP_LATENT_PROJECTION.md`, `TOPOLOGY_TILE_TREE.md`,
+`THREE_PLANE_RUNTIME.md`) and 4 new Vitest specs.
+
+**Live verification — found and fixed one real bug in the bundle itself**:
+`tests/atlas/tensor-residency/topology-tile-tree.spec.ts` shipped with an object-literal
+`TopologyCoordinate4` (`{somX, somY, authority, entropyUtility}`), but the canonical type
+(`topology-coordinate4.ts`, live since v1, unchanged) is a **readonly tuple**
+`[somX, somY, authorityNorm, entropyUtilityNorm]`. `contains()` in `topology-tile-tree.ts`
+correctly indexes it as a tuple (`p[0]..p[3]`) — the implementation was right, the test was
+wrong: indexing a plain object with `[0]`/`[1]`/etc. reads `undefined`, so every comparison
+silently evaluated false. First test run: 1/8 spec files failed
+(`expected [] to deeply equal ['t0','t1']`). Fixed by rewriting the test's coordinates as tuples
+(`[.25, .25, .5, .5]` / `[2, 2, .5, .5]`) with a comment recording why. Re-ran: **8/8 spec files,
+11/11 tests pass live.** `npx tsgo --noEmit` shows zero new errors from any v2 file. Python:
+`py_compile` on all `python/parent_atlas_tensor/*.py` exits 0; `import parent_atlas_tensor`
+succeeds. External-caller grep unchanged — still only the bundle's own
+`scripts/atlas/verify-tensor-residency.mts`, confirming v2 is additive scaffolding, not wired
+into any live retrieval path yet, same as v1.
+
+Net effect: this is the same "unit/contract-level proven, zero production integration" status as
+v1's initial import, now with a materially richer LOD/token-remap/policy vocabulary — and one
+real (if trivial) bug caught by actually running the tests rather than trusting the bundle
+author's own "TypeScript tsc --noEmit PASS" claim, which evidently didn't include a live Vitest
+run against the real `TopologyCoordinate4` type.
+
+## Design refinement (2026-08-09, user brainstorm — recorded, not implemented)
+
+Answering directly: yes, the bundle is imported — see "Live verification" above (byte-identical
+apply, 7/7 unit tests, migration confirmed unapplied, zero production callers). Nothing new was
+implemented this turn; the message was a large speculative brainstorm (VAE, DLSS, BVH/meshnet,
+Riemannian 4D manifold, quaternion rotations, INT4 token remap, MessagePack/CouchDB/DuckDB storage
+options) that the user's own closing paragraph explicitly scoped down from. Recording only the
+concrete, load-bearing decisions extracted from it:
+
+- **No VAE for Ornith token remapping.** Ornith keeps its native tokenizer/vocabulary untouched
+  end-to-end; Atlas builds a **parallel** `TokenFeatureMap` (nativeTokenId, byteStart/End,
+  engramKey, astKind, ontologyId, featureId, packetKey, entropy, surprisal) rather than replacing
+  or aliasing the model-facing token ID. A plain deterministic autoencoder (768→128, no
+  reparameterization/stochastic sampling) is the right tool for routing/compression; VAE is
+  explicitly RESEARCH_ONLY, no current runtime need — reparameterized/pathwise-gradient latent
+  sampling machinery solves a generative-modeling problem Atlas doesn't have.
+- **KMeans, SOM, and CAGRA are three distinct stages, not interchangeable.** KMeans = coarse
+  corpus partition (centroids+labels), SOM 20×20 = derived 2D locality/topology for cache
+  routing, CAGRA = ANN search. Chaining `query → nearest centroid → SOM neighborhood → ACE tile
+  prediction → CAGRA/exact ANN` is a cache-locality prefilter, not a retrieval-correctness step —
+  if it measurably hurts recall against the exact-oracle baseline, it must demote to "cache hint
+  only," never a silent retrieval filter. This must be benchmarked, not assumed either way.
+  Restates the same exact-before-approximate invariant this file's T6/T6b already require.
+  **Do not let CAGRA get compared against itself** — the proof ladder is always
+  brute-force-exact → oracle, then CAGRA-ANN → recall-against-that-oracle.
+  **Do not confuse the four distinct "graphs" in this stack** — Neo4j/GDS (identity-layer
+  topology), cuGraph (GPU graph algorithms), CUDA Graph (kernel-launch capture/replay), and HNSW
+  (Qdrant's ANN index structure) share a name and nothing else; a "graph" fix/tune in one has no
+  bearing on the others.
+- **Separate Arrow artifacts per representation**, not one combined blob:
+  `semantic-768-r{rev}.arrow`, `latent-128-r{rev}.arrow`, `topology4-r{rev}.arrow`,
+  `token-feature-map-r{rev}.arrow`, `centroids-r{rev}.arrow` — each independently revisioned,
+  keyed by `packet_key`/`source_ref`, consistent with this file's existing per-artifact hashing
+  (T2/T2b/T2c already imply this split; this just names the token-feature-map artifact
+  explicitly, which was previously undernamed in the bundle's own README).
+- **Numeric tile vs. evidence tile split reaffirmed**: GPU search operates only on the numeric
+  tile (packet_key + semantic_768 + feature5 + topology4 + authority + centroid); summaries,
+  source spans, and OKF concepts load only after top-k narrows the candidate set via
+  `PacketReader`. This is restating T3/T4 in the vocabulary the user used ("NES cartridge
+  analogy") — no new task, no schema change.
+- **ACP/A2A tool surface stays capability-level** (`vector.search`, `graph.trace`, `packet.read`,
+  `packet.assemble`, `validation.run`), never infrastructure-level (`cudaMemcpy`,
+  `arrow_get_batch`, `redis_get`, `cagra_search_raw`). Matches this repo's existing ACP tool
+  registry pattern (root CLAUDE.md's "new agent-facing capabilities register in ACP" rule) —
+  no new work implied, just confirms the tensor-residency bundle must not add raw-infra MCP tools
+  when it eventually gets wired into ACP.
+- **Explicitly deferred past this narrowed proof** (user's own final paragraph, agreed): VAE,
+  INT4 token-ID remapping, 4D metric-tensor/Riemannian geometry, quaternion rotations, DLSS-style
+  subsampling, QLoRA memory swaps, BVH/meshnet. None of these are prerequisites for T1–T10.
+
+**No code changed this turn.** The next concrete action remains exactly what the "Live
+verification" section above and the user's closing paragraph both already name: T1 (Postgres
+migration apply) then T3 (one Arrow tile → pinned host → exact GPU top-k → packet-key recovery),
+in that order, before any KMeans/SOM/ACE-residency work.
+
+## Tightened execution order (2026-08-10, supersedes earlier "T1 then T3" note above)
+
+With T3a/T6/T6b-e now proven, a design review produced this tighter ordering — separates
+correctness, persistent GPU indexing, coarse routing, and actual memory residency into distinct
+gates instead of letting them blur together:
+
+```
+T1 (done) → T2b (done) → T3a (done) → T6 satisfied-by-T3a (done) → T6b-e (done)
+  → T6b-p (persistent CAGRA build-once-search-many benchmark)
+  → T6c (v1/vector/kmeans centroid + membership artifacts, persisted with lineage)
+  → T2-lineage (prove all 5 FeatureVector5 sources) → T2 (artifact, only once 5/5)
+  → SOM 20×20 (cache-routing experiment, cache-hint-only unless proven to help recall)
+  → T3b (pinned host allocation proof) → T3c (async H2D resident-tile reuse)
+  → T4 (deterministic ACE residency eviction) → T5 (Valkey revision-qualified invalidation)
+  → GA8 (feature-routing ablation) → GA9 (promotion decision)
+```
+
+**Why KMeans (T6c) moves up**: it can run directly against the already-proven `semantic_768`
+Arrow corpus with zero new dependencies — no AE, no SOM, no FeatureVector5, no RRF changes.
+Recommended sweep: K ∈ {64, 128, 256} evaluated (not pre-decided) on inertia, cluster
+population p50/p95, empty-cluster count, centroid-search latency, and candidate recall@10
+against the T3a exact oracle.
+
+**Why SOM stays cache-only until proven otherwise**: once KMeans is persistent, test two modes —
+(A) retrieval filter: restrict exact search to the query's SOM neighborhood: (B) ACE hint: SOM
+only predicts prefetch tiles, exact/CAGRA candidate retrieval stays unrestricted. This file's own
+existing rule already covers the outcome: if SOM measurably hurts recall, it becomes
+`CACHE_HINT_ONLY` — fix it by changing modes, never by raising its weight in a scoring formula.
+
+**T4 becomes concrete only once centroids (T6c) exist** — before that, there's nothing for ACE
+to make eviction decisions about. Implement T4 around
+`COLD → MMAPPED → PINNED → GPU_RESIDENT → IN_USE → GPU_RESIDENT → DEMOTED` with deterministic
+tie-breaking (`utility DESC, last_used ASC, tile_key ASC`), logging every transition to
+`atlas_tensor_residency_events` (already live per T1). The determinism gate: same request
+sequence + same policy revision + same memory budget ⇒ same eviction sequence, every time.
+
+**T5 (Valkey) follows T4 immediately** — cache pointers only, never the corpus itself:
+`atlas:tile:*` (artifact_id, batch/range, state, bytes, utility), `atlas:centroid:*` (tile
+hints), `atlas:query:*` (shortlist), `atlas:residency:*` (metadata). Every key must carry
+enough revision identity that stale data can never be confused with current data.
+
+## Two independent programs — do not merge yet
+
+The broader `SearchRuntime`/RRF/domain-classification/title-generation/Neo4j-promotion
+inventory (see other OpenSpec changes and `RELEVANT-FILES-INVENTORY.md`) is a **separate
+program** from this tensor-residency work, and should stay separate for several more gates:
+
+```
+RETRIEVAL PROGRAM:        BM25 / Qdrant / AST / exact → RRF → FeatureRow → rerank
+TENSOR RESIDENCY PROGRAM: Arrow → exact GPU → KMeans → SOM → ACE residency
+```
+
+Join them only after centroid/SOM routing and ACE residency show *measured* value (via GA8/GA9
+ablation against the T3a exact oracle) — not before. Merging early means any observed ranking
+change becomes impossible to attribute to retrieval policy vs. memory routing. This also means:
+**do not add `latent_64`/`latent_128` as a 5th independent RRF lane** — content/summary/title/
+signature/latent all describe the same packet corpus, and letting all five vote independently in
+RRF can manufacture vote multiplicity. Latent/topology/graph signals belong in the post-fusion
+`FeatureRow` (as scoring inputs to the tabular/neural reranker), not as independent RRF
+candidate-generators — this is a correction to a *different*, larger retrieval subsystem than
+the one this file owns, recorded here only because it directly bears on why the two programs
+must stay separate; see `docs/architecture/runtime-ownership-baseline.json`'s newly-added
+`rrf_fusion` entries for the actual ownership-audit flag on that subsystem.
 
 ## Stop conditions
 

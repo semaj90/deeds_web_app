@@ -765,8 +765,64 @@ mean simdjson is unhealthy.
    `'embeddinggemma-native-768-v1'`, not a mutable Ollama tag; single writer confirmed,
    9/9 tests passing live).
 7. **This file's own Patch H betweenness work** — see the correction section immediately
-   above. Two real bugs found, one fixed, one is a genuine design blocker (projection
-   orientation) requiring an operator decision, not a guess.
+   above. Two real bugs found, one fixed (Long-vs-Double `neo4j.int()` wrapping), one
+   resolved by a parallel session (switched `BETWEENNESS_PROJECTION_NAME` from the shared
+   mixed-orientation `codeTopology` to the already-proven, uniformly-`UNDIRECTED`
+   `atlas_feature_v1`). Live-reverified this session: 42.7s run, `nodeCount: 356445`,
+   `metricsWritten: 58546`, `unresolvedPacketKeys: 6787`; full 7/7-gate
+   `verify-graph-analysis-gates.mts` run confirms `GA-betweenness` PASS alongside the other
+   six algorithms and the `atlas_packets`-identity-layer-unchanged gate.
+
+   **Deeper schema finding (not yet acted on)**, surfaced by user critique this session: the
+   fix above sidesteps rather than closes the underlying gap. `neo4j-gds-client.ts`'s
+   `ensureProjectionClient()` already builds **per-relationship-type** orientation correctly
+   (`isUndirected` check per type at line ~179 — `BELONGS_TO_CLUSTER`/`SIMILAR_TOPOLOGY`/
+   `HAS_CENTROID`/`BELONGS_TO_FEATURE` forced `UNDIRECTED`, everything else `NATURAL` or the
+   `orientationOverride`). But `graph-projection-manifest.ts`'s `GraphProjectionManifestSchema`
+   records only a single `orientation: 'NATURAL'|'REVERSE'|'UNDIRECTED'` field for the whole
+   projection — it cannot truthfully describe a mixed-orientation graph like
+   `atlas_combined_v1` (which mixes `IMPORTS`/`CALLS` NATURAL with `BELONGS_TO_FEATURE`/
+   `SIMILAR_TOPOLOGY`/`BELONGS_TO_CLUSTER` UNDIRECTED — the exact same mixed shape that broke
+   betweenness on `codeTopology`). Confirmed **currently latent, not an active bug**: grepped
+   `GraphProjectionManifestSchema` — it is only re-exported by `graph-analysis-contract.ts`,
+   never `.parse()`'d or persisted by any live adapter (pagerank/leiden/louvain/cheirank/
+   kcore/betweenness all build their `GraphAnalysisRun` directly with a single
+   `projectionRevision` hash, no `orientation` field). So today's 7/7 gate pass is not at
+   risk. **Recommendation**: before ever running an algorithm against `atlas_combined_v1` (or
+   any future mixed-orientation projection) and recording it via `GraphProjectionManifestSchema`,
+   change `orientation` from a single enum field to a per-relationship-type map
+   (`Record<string, ProjectionOrientation>`), keyed the same way `ensureProjectionClient()`
+   already computes it internally — otherwise the manifest will silently misdescribe the graph
+   it ran against, which is exactly the reproducibility failure this schema exists to prevent.
+   **Update: fixed this session (CONTRACT_EXPRESSIVENESS_HARDENING, not a Patch H reopen).**
+   `graph-projection-manifest.ts` rewritten to V2: `relationships: Record<string,
+   GraphRelationshipProjection>` (per-type `sourceType`/`projectedType`/`orientation`/
+   `properties`/`aggregation`) replaces the single global `orientation` field;
+   `computeRelationshipProjectionHash()` canonicalizes+sorts by `projectedType` before
+   sha256 (order-independent, sensitive to orientation/aggregation/properties/inclusion
+   changes); `expandLegacyOrientation()` added as an explicitly-`@deprecated`,
+   fail-closed (throws on empty input) reconstruction path for the old shape — not needed
+   for any live caller (confirmed zero persisters again post-rewrite), included because it
+   was cheap and documents the old→new mapping precisely. All prior exports
+   (`NAMED_PROJECTION_CANDIDATES`, `NamedProjectionCandidate`, `ProjectionOrientationSchema`,
+   `ProjectionOrientation`, `GraphProjectionManifestSchema`, `GraphProjectionManifest`) kept
+   stable — the only consumers of this module (`betweenness-analysis-adapter.ts`,
+   `kcore-analysis-adapter.ts`, `graph-analysis-runner.ts`, `graph-analysis-contract.ts`'s
+   re-export) only ever used `NAMED_PROJECTION_CANDIDATES`, confirmed via grep before and
+   after.
+
+   Added `tests/atlas/graph/graph-projection-manifest.spec.ts` (4/4 pass live): (1)
+   homogeneous all-NATURAL projection validates, (2) heterogeneous mixed NATURAL/UNDIRECTED
+   projection validates — the direct regression test for the gap Patch H exposed, (3) hash
+   differs when only orientation changes, (4) hash is stable under relationship-map key
+   reordering.
+
+   Verified post-rewrite, live: `npx tsgo --noEmit -p tsconfig.json` shows zero new errors
+   in `graph-projection-manifest.ts` or any of its four consumers (pre-existing unrelated
+   baseline errors in three unrelated route files are unchanged before/after — confirmed by
+   diffing the tsgo output, not just eyeballing "PASS"); re-ran
+   `verify-graph-analysis-gates.mts` and got **7/7 PASS again**, including `GA-betweenness`
+   — this was a pure schema-expressiveness addition, zero behavior change to any adapter.
 
 ## Cross-references
 

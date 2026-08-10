@@ -1,0 +1,22 @@
+{
+  "artifactId": "00000000-0000-7000-8000-000000000001",
+  "artifactType": "semantic_768",
+  "workspaceRevision": "example-workspace-r1",
+  "sourceRevision": "example-source-r1",
+  "representationId": "semantic_768",
+  "representationRevision": "example-semantic-r1",
+  "schemaVersion": "atlas.tensor-artifact.v1",
+  "dtype": "float32",
+  "shape": [
+    4096,
+    768
+  ],
+  "arrowPath": "atlas-cache/semantic/example-semantic-r1.arrow",
+  "batchCount": 1,
+  "compression": "none",
+  "contentHash": "sha256:REPLACE",
+  "byteLength": 12582912,
+  "producer": "parent-atlas-tensor",
+  "producerRevision": "v1",
+  "createdAt": "2026-08-10T00:00:00Z"
+}

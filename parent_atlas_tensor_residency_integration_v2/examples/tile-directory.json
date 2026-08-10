@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "atlas.tile-directory.v1",
+  "tiles": [
+    {
+      "tileKey": "example-semantic-r1:h123:a5:e2",
+      "recordBatchIndex": 0,
+      "rowCount": 4096,
+      "somX": 7,
+      "somY": 13,
+      "authorityBin": 5,
+      "entropyBin": 2,
+      "gpuState": "ABSENT",
+      "hostState": "COLD"
+    }
+  ]
+}

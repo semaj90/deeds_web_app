@@ -1,0 +1,21 @@
+{
+  "sourceArtifactId": "semantic_768_r1_full.arrow",
+  "sourceSha256": "56d3aa08f1d7e4367b2d4d571bdbe8cb5520c9afb7bc85c8a72520ae57164bd7",
+  "representationRevision": "semantic_768:r1_full",
+  "algorithmRevision": "cuml.KMeans-v1",
+  "rapidsCumlVersion": "26.06.00",
+  "K": 256,
+  "seed": 42,
+  "nInit": 10,
+  "inertia": 1662.6424560546875,
+  "fitDurationMs": 23385.5,
+  "centroidArtifact": {
+    "path": "../data/atlas-tensor-proof/centroids_r1_k256.arrow",
+    "sha256": "c7f12fff639e1574fc41c44e85eb351352cad129e162b35d2c62f55acb257086"
+  },
+  "membershipArtifact": {
+    "path": "../data/atlas-tensor-proof/membership_r1_k256.arrow",
+    "sha256": "5236d070ff4a196a2be886e4a52163b8f1a6ae2702b9754f291b36ce6df4a7dc"
+  },
+  "semanticVectorsConfirmedL2Normalized": true
+}

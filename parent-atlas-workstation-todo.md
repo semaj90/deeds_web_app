@@ -33,6 +33,76 @@ Current lane map:
 - ACE packet: compact synthesis and semantic labeling output, not raw corpus state.
 - TileKey / LOD memory hierarchy: design-only memory management model; 4D coordinates map to logical TileKey, never a GPU pointer directly.
 
+### Current live owners discovered in this review
+
+| Lane | Status | Owner files | Notes |
+|---|---|---|---|
+| MCP transport / `/mcp` / `/sse` | created + wired; proof pending | `sveltekit-frontend/src/routes/api/mcp/+server.ts`, `sveltekit-frontend/src/routes/api/sse/chat/+server.ts`, `sveltekit-frontend/src/lib/server/mcp/trace-http.ts` | The route handlers and HTTP client exist; keep TRACE core enabled and sidecars opt-in until transport matches are confirmed live. |
+| Claude-Mem export/import | created + wired; export-path alignment pending | `sveltekit-frontend/src/lib/server/memory/claude-mem.ts`, `sveltekit-frontend/src/lib/server/memory/claude-mem-ingest.ts` | Dynamic import plus ingest pipeline exist; importer runs stay blocked until the export path is aligned. |
+| Engram ingestion | created + wired; deferred | `sveltekit-frontend/src/lib/server/ai/engram-memory.ts`, `sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts` | The memory lane is present, but the persistent ingestion lane stays deferred until transport and importer paths are stable. |
+| Redis 8 eval cache | created + wired; eval-only | `sveltekit-frontend/src/lib/server/cache/*`, `sveltekit-frontend/src/lib/server/ace/ace-context-pack-cache.ts` | Keep Redis 8 isolated as an eval lane and compare it only after the current ACE context cache lane is stable. |
+| Feature-gap registry | created + wired; live scan pending | `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`, `sveltekit-frontend/src/lib/server/atlas/route-feature-map.ts`, `sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts` | Current inventory exists, but the bootstrap registry still needs a live app workspace scan. |
+| OKF / taxonomy / ontology / linked tuples | created + wired; schema and navigation live | `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`, `docs/.okf/README.md`, `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`, `sveltekit-frontend/src/lib/server/ontology/ontology-extractor.ts`, `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts` | `schema.yaml` is the schema source of truth, `registry.yaml` is the navigation layer, and the live runtime contracts stay in their existing owners; use this lane for codebase topology classification, domain classification, and ontology linking, but not semantic truth or identity ownership. |
+| ClusterCard / GlyphRecord / CHR97 | created; mapping pending | `sveltekit-frontend/src/lib/server/retrieval/cluster-card-contract.ts`, `sveltekit-frontend/src/lib/server/cartridge/glyph-record.ts`, `sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts` | Keep this downstream of transport proof and registry proof. |
+
+### Current Control-Plane Override — 2026-08-09
+
+Patch H 7/7 proven
+↓
+sidecar/native-addon cleanup
+↓
+WSL2 RAPIDS reconciliation
+↓
+/v1/vector/kmeans (T6c: centroid + membership lineage)
+↓
+20×20 SOM
+↓
+Arrow mmap → pinned host → exact GPU tile
+↓
+ACE / BitFrost / Valkey residency
+↓
+GA8 wide ablation
+↓
+GA9 feature promotion
+↓
+deterministic HMM + linear policy baseline
+↓
+DSPy program contract
+↓
+GEPA reflective optimization
+↓
+4D geometry / Jacobian experiments
+↓
+HyperGraphRAG GPU experiments
+↓
+QLoRA / SFT
+↓
+DPO
+↓
+PPO only if still justified
+
+## T6c lineage stop
+
+1. Freeze the `semantic_768` corpus revision before running KMeans.
+2. Persist centroid and membership artifacts for `K ∈ {64, 128, 256}` with lineage metadata.
+3. Compare candidate reduction and recall@10 against the already-proven T3a exact oracle.
+4. Keep SOM cache-hint-only until it proves it does not hurt recall.
+5. Refresh Graphify only after T6c is persisted and evaluated.
+6. Do not start AE, RRF, Neo4j projection, or GA8/GA9 promotion from this lane.
+
+## Separate lane: Kafka / CDC / Rust sidecar analysis
+
+This workstream is design-only until explicitly opened as its own task.
+
+- Kafka / CDC is not part of the current T6c or Graphify sequence.
+- PostgreSQL 18 specifics are not a canonical owner here; they are an integration target only if a
+  separate ingestion lane proves they matter.
+- Rust sidecar analysis is a separate infrastructure lane, not a replacement for the current
+  Python / SvelteKit / GPU split.
+- Do not let bitmap / aio / CDC ideas redefine the `semantic_768` routing proof.
+- If this lane is ever opened, it should start from evidence of a real producer / consumer gap,
+  not from the KMeans or SOM evaluation path.
+
 ## Sequencing and Gate Order
 
 ### P2 transport and ingestion gates
@@ -72,6 +142,15 @@ Current lane map:
 4. Add smoke/report outputs to registry rows for retrieval lanes and feature-map lanes.
 5. Use LangChain later only as an optional organizer for messy `.md` / `.json` after LangExtract.
 
+### Token remapping and geometry lanes
+
+1. `autoencoder`: default lane for token remapping, latent projection, and route compression.
+2. `decoder-upscale`: optional reconstruction / upscaling lane; do not make it the identity owner.
+3. `bvh-geometry`: spatial traversal and visualization lane only.
+4. `riemannian-geometry`: metric-tensor and distortion diagnostics lane only.
+5. `kmeans-20x20`: centroid routing topology lane; keep it separate from semantic truth.
+6. `glyph-animation`: NES / CHR97 / sprite visualization lane; never the canonical retrieval lane.
+
 ### Optional downstream phases
 
 1. Phase 10B TurboVec + Qdrant optimization.
@@ -83,7 +162,13 @@ Current lane map:
 7. Phase 16 implement missing features.
 8. Phase 17 optional LangChain organizer after LangExtract.
 9. Phase 18 WebGPU TypeScript MapReduce matrix and CUDA/libtorch experiments.
-10. Phase 19 XGBoost / gradient boosting / reinforcement-learning experiments.
+10. Phase 19 deterministic HMM + linear policy baseline.
+11. Phase 20 DSPy program contract for Atlas agent programs.
+12. Phase 21 GEPA reflective prompt/program optimization on RouteTrace and eval traces.
+13. Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments.
+14. Phase 23 QLoRA / SFT.
+15. Phase 24 DPO.
+16. Phase 25 PPO only if still justified.
 
 ### Conservative phase-status snapshot
 
@@ -97,7 +182,13 @@ Current lane map:
 | Phase 16 Graph/KAG/DAG refresh manifest | partial |
 | Phase 17 PyTorch feature extraction lane | partial |
 | Phase 18 XGBoost / gradient tree boosting reranker | partial |
-| Phase 19 reinforcement-learning experiments | eval-only / not yet graded |
+| Phase 19 deterministic HMM + linear policy baseline | partial |
+| Phase 20 DSPy program contract | planned |
+| Phase 21 GEPA reflective program optimization | planned |
+| Phase 22 XGBoost / gradient boosting / reinforcement-learning experiments | partial |
+| Phase 23 QLoRA / SFT | eval-only |
+| Phase 24 DPO | eval-only |
+| Phase 25 PPO | eval-only / not yet graded |
 
 ### Evidence artifacts
 
@@ -446,6 +537,48 @@ The next bounded step is to reuse the existing owners instead of wiring a second
 
 **Do not** wire new implementations until the owner file, runtime entrypoint, and tests are all located.
 
+## Telemetry and packet provenance ladder
+
+This section records the remaining measurement gaps only. It does not create new owners or
+replace any existing transport, resource, or packet contracts.
+
+### Layer 2: RPC / Transport telemetry
+
+**Status**: PARTIAL
+
+- gRPC clients already exist; HTTP fallbacks are already wired.
+- Remaining telemetry must measure protobuf encode latency, protobuf decode latency, JSON
+  stringify overhead, and JSON parse overhead.
+- Transport provenance must record the live protocol version used for each trace event
+  (`grpc` vs `http`).
+- Keep transport validation separate from the canonical tensor / gRPC / protobuf boundary.
+
+### Layer 3: Resource telemetry
+
+**Status**: PARTIAL
+
+- GPU work already exists; the missing piece is per-operation timing and kernel identity.
+- Record per-kernel telemetry for embedding, GEMM, cosine similarity, top-k, cross-encoder,
+  autoencoder, and SOM lookup.
+- Record Redis, Qdrant, and Neo4j operation telemetry separately instead of folding them into
+  parent tool timing.
+
+### Layer 4: Packet-centric provenance
+
+**Status**: NOT YET
+
+- Add `packet_id`, `feature_id`, `source_ref`, and `som_cell` to every trace event.
+- Track `schema_version`, `embedding_version`, `tool_version`, `gpu_kernel_version`, and
+  `rpc_transport` on every packet-producing or packet-consuming event.
+- Keep the provenance trail complete from ACP decision to final result; do not rely on logs only.
+
+### Session 84 / 85 work order
+
+1. Wire transport telemetry first: encode, decode, JSON stringify / parse, protocol version.
+2. Wire resource telemetry next: GPU kernels, Redis, Qdrant, Neo4j.
+3. Add packet-centric provenance fields to every trace event.
+4. Keep proof separate from promotion; the presence of telemetry does not imply a new owner.
+
 ### Phase 5: Go Sidecar (Optional)
 
 **Purpose**: Standalone search service (no Python dependency)
@@ -483,6 +616,9 @@ it does not own Vamana or RTX search.
 - Smallest concrete proof: Arrow mmap → pinned batch → async H2D → GPU tile → exact GEMM →
   top-k → compare against the already-proven exact-KNN oracle, with per-stage timing captured
   before expanding the ladder.
+- DLSS-like reconstruction, if used at all, belongs after the exact GPU tile proof as an optional
+  decoder-upscale consumer of the routed tile; it does not replace the Arrow → pinned host → GPU
+  tile path and does not own representation identity.
 - Keep Hilbert-space / manifold math as representation geometry only, not identity or transport.
 - Keep the 20×20 SOM as a routing surface only; 4D topology / metric-tensor diagnostics stay
   experiment-only and do not redefine semantic truth.
@@ -955,6 +1091,138 @@ this unblocks (GR1: fresh graph + revision freeze).
 
 ---
 
-**Date Updated**: August 9, 2026
+## Lane ownership — tightened phrasing (2026-08-10)
+
+Consolidates the tensor-residency / geometry brainstorm threads (see
+`openspec/changes/parent-atlas-tensor-residency-integration/tasks.md` for the live-verified
+implementation status) into one canonical "use it for / not for" reference. This is vocabulary,
+not new architecture — every row restates a boundary already enforced elsewhere in this file or
+in the tensor-residency OpenSpec change.
+
+| Thing | Use it for | Not for |
+|---|---|---|
+| `topology4` (4D routing coordinate: som_x, som_y, authority, entropy_utility) | routing coordinates, residency hints | identity |
+| covector / scoring head (`wᵀx`) | scoring, policy head | storage |
+| Jacobian / metric tensor | local distortion, expansion/compression diagnostics | truth — never decides what a packet means |
+| quaternion rotation | 3D orientation, animation only | similarity scoring, routing truth |
+| cosine similarity | ranking, nearest-neighbor score | geometry ownership |
+| low-rank sampling / Ewin-Tang-style sketching | offline sketching, compression, candidate reduction | canonical retrieval |
+| DLSS-like decoder-upscale lane | optional reconstruction, strictly *after* exact tile selection | identity, never before exact proof |
+| KMeans 20×20 / SOM | coarse routing, centroid map | final answer truth |
+| multi-hop graph/hypergraph traversal | evidence expansion | dense embedding ownership |
+| packet validator | schema + order + provenance gate | ranking |
+| packet assembler | deterministic merge/materialization | semantic truth |
+| packet materializer | emit the final ACE packet / selected context | retrieval ownership |
+| Naive Bayes | cheap "did you mean" / lexical prior | canonical router |
+| UUID / ULID | stable event, packet, artifact IDs (labels) | latent coordinates — never put an ID in latent space |
+| latent space (`latent_128`) | compressed continuous representation | provenance |
+| hypergraph coordinates | n-ary evidence layout / joint relations | raw ANN ownership (CAGRA/HNSW still own ANN) |
+| feature-matrix distance tensor (RTX) | scoring, ranking, centroid routing, top-k | semantic ownership |
+| rotation animation / RenderMan-like tracing | view-layer motion, scene rendering, debugging | canonical identity, retrieval truth |
+
+**Router/ranker ladder** (cheapest → most expensive, each stage only invoked if the cheaper one
+is insufficient): exact identity + packet validation → feature matrix → Naive Bayes (cheap prior)
+→ logistic regression (first real router) → XGBoost/gradient boosting (stronger tabular ranker)
+→ KMeans/SOM (coarse routing) → graph/hypergraph traversal (multi-hop evidence) → exact GPU tile
+proof → optional DLSS-like reconstruction lane → only then AE/RL/GEPA/QLoRA-style experiments.
+
+**Three corrections worth re-stating plainly**: quaternions are for 3D rotation, never routing
+truth; Jacobian/metric-tensor diagnostics describe local distortion, never packet meaning; DLSS
+is a reconstruction/upscale analogy that belongs strictly after exact tile selection, never
+before it or as a substitute for it.
+
+---
+
+## Layered architecture (L0–L10) + terminology corrections (2026-08-10)
+
+Consolidates the Kimi K3 / DeepSeek Engram comparison thread. **Not implemented** — a naming
+and organizing scheme recorded so the actual implementation work (tensor-residency bundle,
+graph-analysis-contract) has consistent vocabulary to grow into, not a new build.
+
+```
+L0  EXACT MEMORY      — DeepSeek-Engram-style: byte/AST/ontology n-gram exact lookup
+L1  FEATURE TENSOR     — FeatureTensor[4,6], softcapped metrics (see below)
+L2  TABULAR ROUTER     — logistic → XGBoost
+L3  SEMANTIC           — semantic_768, Qdrant, cuVS
+L4  STRUCTURAL         — Tree-sitter, Graphify
+L5  GRAPH              — PageRank/HITS/communities: NetworkX oracle, Neo4j GDS operational,
+                          cuGraph backend
+L6  CACHE ROUTING      — KMeans centroid hints, SOM 20x20, Topology4, Hilbert2D (locality only)
+L7  ACE                — prefetch / pin / resident / evict
+L8  GPU                — PyTorch, cuVS, cuML, cuGraph, cuTile only where benchmarked
+L9  EVIDENCE           — ontology-linked n-ary tuples
+L10 AGENT              — HMM, DSPy/GEPA, Ornith/Gemma
+```
+
+**Terminology corrections** (apply wherever these terms appear in future design docs):
+- The 6 scoring dimensions (relevance, confidence, authority, entropy/novelty, execution
+  utility, memory/transfer cost) are **"six policy axes,"** not "six degrees of freedom" — 6DoF
+  (x/y/z + pitch/yaw/roll) is a visualization-only concept and must not be conflated with the
+  retrieval policy's scoring dimensions.
+- **`semantic_768`'s "768" is a representation dimension, not an attention-head count.**
+  Do not derive Atlas's embedding width from any model's internal architecture (Kimi K3's
+  hidden width 7168 / 96 heads / head-dim 128 / LatentMoE dim 3584, or Gemma 4's internal
+  widths, etc.) — `semantic_768` is a retrieval-representation contract independent of whatever
+  LLM backend is in use.
+- Quaternions remain visualization-only (camera/glyph/node rotation) — reaffirms the earlier
+  correction, not a new rule.
+- KMeans (K=64/128/256, discrete centroids) and SOM (20×20 grid cells) are **two separate
+  concepts** — do not call the SOM "KMeans." Per T6c's live negative result (see
+  `parent-atlas-tensor-residency-integration/tasks.md`), both remain non-restrictive cache/
+  locality hints, never hard retrieval filters, until proven otherwise by the same recall
+  methodology T6c already established.
+- Hilbert curve locality applies only to the 2D SOM (`som_x, som_y`) — not a 4D Hilbert curve
+  over the full Topology4. Carry `authority_bin`/`entropy_bin` as separate bins alongside the
+  2D Hilbert cell key, e.g. `semantic:r42:h217:a5:e3`.
+- `Topology4` remains a routing/cache/visualization coordinate, not a Riemannian manifold, until
+  a decoder-induced local metric `g(z) = J(z)ᵀJ(z)` is actually built and evaluated (research-only
+  for now, unchanged from the earlier correction).
+
+**Latest slotting note from the vocabulary review** — keep these terms in the same L0–L10 ladder,
+not as new owners:
+
+| Term | Slot | Note |
+|---|---|---|
+| nibble / INT4 / INT8 packing | L8 cache tier | Quantized cache fidelity only; never encode packet_key / feature_id as the canonical identity. |
+| tensor analysis / RTX matrix ops | L8 GPU | PyTorch / cuVS-style computation lane. |
+| cuVS / RAPIDS | L3 / L8 | cuVS exact stays the oracle; RAPIDS KMeans belongs in L6. |
+| HNSW | L3 (Qdrant only) | Qdrant ANN structure, not an Atlas implementation target. |
+| 4D linked topology coordinates | L6 | Topology4 routing / cache coordinates only. |
+| Hilbert (constrained dimensionality) | L6 | 2D SOM locality only, never a 4D curve over the whole topology. |
+| ae:train | L1 / L8, gated | Deterministic AE only, blocked behind KMeans/SOM evidence. |
+| KMeans 20×20 | no merge | KMeans and SOM are separate; do not conflate them. |
+| domain classification | L1 (`domain_fit`) | Proven source, partial coverage only. |
+| hyper-dimensional fanout | L9 | N-ary / hypergraph evidence lane. |
+| simdjson-like GPU memory swapping | none | Category error; GPU tile swapping is L7 ACE, not simdjson. |
+| Redis centroid caching | L7 / T5 | Pointers only; never raw tensors. |
+| indexing already-computed tensor for RTX analysis | L7 / T3c | GPU-resident tile reuse, not proven live yet. |
+| gradient checkpointing / N64-style memory | not applicable yet | Only relevant if L10-adjacent training work begins. |
+
+**Consolidated live-status snapshot (2026-08-10)** — cross-check against
+`openspec/changes/parent-atlas-tensor-residency-integration/tasks.md` for full evidence, this is
+a summary only:
+- Postgres 18 canonical storage, tensor-residency tables (T1): LIVE
+- `semantic_768` Arrow artifact + deterministic mmap reload (T2b): PROVEN
+- WSL2 RAPIDS Python sidecar (`atlas_rapids_sidecar.py`): LIVE
+- cuVS exact top-k, real GPU, packet_key round-trip (T3a/T6): PROVEN
+- KMeans K∈{64,128,256} coarse-routing sweep (T6c): EXPERIMENT_PROVEN as cache hint;
+  **hard-filter use REJECTED** by live recall data
+- CAGRA ephemeral endpoint (T6b-e): TESTED (recall 1.0, latency conflates build+search cost)
+- Persistent CAGRA (T6b-p), pinned host transfer (T3b), GPU-resident tile reuse (T3c), ACE
+  eviction (T4), Valkey residency metadata (T5), SOM 20×20: NOT_PROVEN / not started
+- `FeatureVector5`/`FeatureTensor` (T2-lineage): BLOCKED — 2 of 5 sources have live data
+  (`authority_norm`≈pagerank, `domain_fit`≈domain_confidence); `entropy_norm`/`ast_signal`/
+  `execution_utility` still need real producers before any artifact is built
+- Kafka/CDC tensor event path, Rust tensor-analysis sidecar, cuTile kernels, 4D Riemannian
+  metric: architecture/idea only, not proven live anywhere in this repo
+
+**Next mathematical artifact, per this thread's own explicit gating**: `feature_tensor_4x6_r1.
+arrow` + `ace_policy_r1.json` (six softcaps + weights) — **gated on T2-lineage reaching 5/5
+proven sources first.** T2-lineage remains the actual next actionable gate; it was not
+advanced this pass.
+
+---
+
+**Date Updated**: August 10, 2026
 **Session**: 109+ (Continuation Final)
 **Last Verified**: Live database analysis complete

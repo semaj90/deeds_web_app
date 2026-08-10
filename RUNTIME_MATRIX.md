@@ -47,8 +47,7 @@ curl http://localhost:8070/health
 **Purpose**: Primary server-side LLM inference with GPU acceleration
 **Technology Stack**:
 - **Runtime**: Ollama v0.5.2 (native binary)
-- **Acceleration**: CUDA 12.1 (RTX 3060 Ti, 8GB VRAM)
-- **Model**: `gemma4-rotorquant:latest` (Gemma 4 E4B 11.8B Q4_K_M, 7.3GB)
+- **Acceleration**: CUDA 12.1 (RTX 3060 Ti, 8GB VRAM)Model
 - **Embeddings**: `embeddinggemma:latest` (307M BF16, 768-dim, 622MB)
 - **KV Cache**: Q8_0 quantized (50% memory vs FP16)
 - **Flash Attention**: Enabled (2× context capacity)
@@ -67,7 +66,6 @@ PROTOCOL: HTTP/1.1 (Ollama native API + OpenAI-compatible)
 **Models**:
 | Model | Size | Purpose | VRAM |
 |-------|------|---------|------|
-| `gemma4-rotorquant:latest` | 7.3GB | Legal reasoning, synthesis | 5.8GB |
 | `embeddinggemma:latest` | 622MB | 768-dim embeddings | 800MB |
 | `gemma3:12b-vlm` | 8.2GB | Vision + text multimodal | 6.5GB |
 | `llama3.2:latest` | 2.0GB | Lightweight fallback | 2.5GB |
@@ -653,7 +651,7 @@ curl http://localhost:8090/health  # TurboQuant
 - Increase prefetch: `RABBITMQ_PREFETCH=20` (default 10)
 
 ## Architecture Diagram
-│                         CLIENT (Browser)                             
+│                         CLIENT (Browser)
 │  │ Unified Generation Client (unified-generation.ts)               │ │
 │  │  ├─ Bifrost L2 Check (500ms timeout)                            │ │
 │  │  ├─ E2B WebGPU (Gemma 4 E2B 2.3B Q4F16) — 1-2s                 │ │

@@ -1,0 +1,19 @@
+{
+  "policyRevision": "tensor-policy-v1",
+  "kmeansRevision": "kmeans-r1",
+  "somRevision": "som20-r1",
+  "annRevision": "ann-r1",
+  "aceRevision": "ace-r1",
+  "rerankerRevision": "rerank-r1",
+  "kmeansK": 128,
+  "somWidth": 20,
+  "somHeight": 20,
+  "topCentroids": 3,
+  "annTopK": 100,
+  "exactParityTopK": 100,
+  "maxResidentTileBytes": 6291456,
+  "maxResidentTiles": 8,
+  "activeComputeTiles": 1,
+  "prefetchTiles": 1,
+  "graphHopBudget": 2
+}

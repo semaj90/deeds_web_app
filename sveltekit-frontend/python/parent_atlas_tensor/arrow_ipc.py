@@ -49,7 +49,7 @@ def write_ipc_file(path: str | Path, batches: Sequence[pa.RecordBatch], compress
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     options = ipc.IpcWriteOptions(compression=compression) if compression else ipc.IpcWriteOptions()
-    with pa.OSFile(path, "wb") as sink:
+    with pa.OSFile(str(path), "wb") as sink:
         with ipc.new_file(sink, batches[0].schema, options=options) as writer:
             for batch in batches:
                 if batch.schema != batches[0].schema:
