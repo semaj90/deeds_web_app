@@ -9,11 +9,18 @@ export async function extractPdfText(pdfBuffer: Buffer, maxPages = 80): Promise<
 		for (let pageNo = 1; pageNo <= limit; pageNo++) {
 			const page = await pdf.getPage(pageNo);
 			const content = await page.getTextContent();
-			const text = content.items
-				.map((item: any) => typeof item?.str === 'string' ? item.str : '')
-				.filter(Boolean)
-				.join(' ');
-			pages.push(text);
+			const lines: string[] = [];
+			let current = '';
+			for (const item of content.items as any[]) {
+				if (typeof item?.str !== 'string' || !item.str) continue;
+				current += `${current ? ' ' : ''}${item.str}`;
+				if (item.hasEOL) {
+					lines.push(current.trim());
+					current = '';
+				}
+			}
+			if (current.trim()) lines.push(current.trim());
+			pages.push(lines.join('\n'));
 			page.cleanup();
 		}
 		return { text: pages.join('\n'), pageCount };
