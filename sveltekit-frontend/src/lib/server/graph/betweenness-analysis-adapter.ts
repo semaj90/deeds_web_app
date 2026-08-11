@@ -24,7 +24,7 @@ import {
 	type GraphAnalysisRun,
 	type GraphMetricResult,
 } from './graph-analysis-types.js';
-import { resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
 
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
 const MUTATE_PROPERTY = 'betweennessScore';
@@ -45,6 +45,7 @@ export interface BetweennessAnalysisResult {
 	run: GraphAnalysisRun;
 	metricsWritten: number;
 	unresolvedPacketKeys: number;
+	excludedPacketKeys: number;
 }
 
 function buildAlgorithmRevision(options: BetweennessAnalysisOptions): string {
@@ -191,7 +192,13 @@ export async function runBetweennessAnalysis(
 	const createdAt = new Date().toISOString();
 	const byPacketKey = new Map<string, { score: number }>();
 	let unresolved = 0;
+	let excluded = 0;
 	for (const node of topNodes) {
+		const classification = classifyGraphPacketPath(node.path ?? '');
+		if (classification.kind === 'excluded') {
+			excluded++;
+			continue;
+		}
 		const packetKey = lookupPacketKey(resolved, node.path);
 		if (!packetKey) {
 			unresolved++;
@@ -283,5 +290,5 @@ export async function runBetweennessAnalysis(
 		client.release();
 	}
 
-	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved };
+	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved, excludedPacketKeys: excluded };
 }

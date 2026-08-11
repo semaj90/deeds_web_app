@@ -29,12 +29,41 @@ function normalizeAtlasPath(path: string): string {
 		.replace(/^src\//, '');
 }
 
+export type GraphPacketResolutionKind = 'canonical' | 'excluded' | 'unresolved';
+
+export interface GraphPacketPathResolution {
+	kind: GraphPacketResolutionKind;
+	normalizedPath: string;
+	reason?: string;
+}
+
+function isGraphPacketPathExcluded(path: string): string | null {
+	const normalized = normalizeAtlasPath(path);
+	if (!normalized) return 'empty-path';
+	if (/^(?:.*\/)?(?:AGENTS|LLMS)\.md$/i.test(normalized)) return 'policy-document';
+	if (/\.(?:bak|backup)$/i.test(normalized)) return 'shadow-backup';
+	if (/^\.claude\/worktrees\/[^/]+\//.test(String(path).replace(/\\/g, '/'))) return 'worktree-shadow';
+	return null;
+}
+
 function pathVariants(path: string): string[] {
 	const normalized = normalizeAtlasPath(path);
 	const srcPrefixed = `src/${normalized}`;
 	const frontendPrefixed = `sveltekit-frontend/${normalized}`;
 	const worktreePrefixed = `.claude/worktrees/current/${normalized}`;
 	return [...new Set([path, normalized, srcPrefixed, frontendPrefixed, worktreePrefixed].map((value) => String(value).replace(/\\/g, '/').replace(/^\.?\//, ''))) ];
+}
+
+export function classifyGraphPacketPath(path: string): GraphPacketPathResolution {
+	const normalizedPath = normalizeAtlasPath(path);
+	const exclusionReason = isGraphPacketPathExcluded(path);
+	if (exclusionReason) {
+		return { kind: 'excluded', normalizedPath, reason: exclusionReason };
+	}
+	if (!normalizedPath) {
+		return { kind: 'unresolved', normalizedPath, reason: 'empty-path' };
+	}
+	return { kind: 'canonical', normalizedPath };
 }
 
 export async function resolveCodebaseFilePacketKeys(

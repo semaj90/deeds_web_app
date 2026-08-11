@@ -42,7 +42,7 @@ import {
 	type GraphAnalysisRun,
 	type GraphMetricResult,
 } from './graph-analysis-types.js';
-import { resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
 
 const ALGORITHM_REVISION = 'neo4j-gds-pagerank-mutate-v1';
 const PARAMETER_REVISION_PREFIX = 'maxIter-damping';
@@ -59,6 +59,7 @@ export interface PageRankAnalysisResult {
 	run: GraphAnalysisRun;
 	metricsWritten: number;
 	unresolvedPacketKeys: number;
+	excludedPacketKeys: number;
 }
 
 export async function runPageRankAnalysis(
@@ -149,7 +150,13 @@ export async function runPageRankAnalysis(
 	// of the two nodes.
 	const byPacketKey = new Map<string, { score: number }>();
 	let unresolved = 0;
+	let excluded = 0;
 	for (const node of topNodes) {
+		const classification = classifyGraphPacketPath(node.path ?? '');
+		if (classification.kind === 'excluded') {
+			excluded++;
+			continue;
+		}
 		const packetKey = lookupPacketKey(resolved, node.path);
 		if (!packetKey) {
 			unresolved++;
@@ -259,5 +266,5 @@ export async function runPageRankAnalysis(
 		client.release();
 	}
 
-	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved };
+	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved, excludedPacketKeys: excluded };
 }

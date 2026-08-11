@@ -4,7 +4,7 @@ import { GraphAnalysisRunSchema, CommunityAssignmentSchema, CommunityTaxonomyRec
 import { getGraphDispatcherRegistryEntry } from './graph-dispatcher-registry.js';
 import { ensureProjectionClient, PROJECTION_NAME } from './neo4j-gds-client.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
-import { resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
 import { NAMED_PROJECTION_CANDIDATES, type NamedProjectionCandidate } from './graph-projection-manifest.js';
 
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
@@ -41,6 +41,7 @@ export interface GraphAnalysisExecutionResult {
   metricsWritten: number;
   communitiesWritten: number;
   unresolvedPacketKeys: number;
+  excludedPacketKeys: number;
   skippedReason?: string;
 }
 
@@ -120,7 +121,7 @@ async function runSkippedAnalysis(
     parameterRevision: `skipped-${algorithm}-v1`,
   });
 
-  return { run, metricsWritten: 0, communitiesWritten: 0, unresolvedPacketKeys: 0, skippedReason: reason };
+  return { run, metricsWritten: 0, communitiesWritten: 0, unresolvedPacketKeys: 0, excludedPacketKeys: 0, skippedReason: reason };
 }
 
 const COMMUNITY_MUTATE_PROPERTY: Record<'louvain' | 'leiden', string> = {
@@ -208,7 +209,13 @@ async function runCommunityAnalysis(
     const seenPacketKeys = new Set<string>();
     const nodes: Array<{ packet_key: string; community_id: string }> = [];
     let unresolvedPacketKeys = 0;
+    let excludedPacketKeys = 0;
     for (const row of rawNodes) {
+      const classification = classifyGraphPacketPath(row.path);
+      if (classification.kind === 'excluded') {
+        excludedPacketKeys++;
+        continue;
+      }
       const packetKey = lookupPacketKey(resolvedPacketKeys, row.path);
       if (!packetKey) {
         unresolvedPacketKeys++;
@@ -242,7 +249,7 @@ async function runCommunityAnalysis(
       // unresolvedPacketKeys was previously only on the in-process return
       // value, unrecoverable after the fact — same class of "value computed
       // but lost at the return boundary" issue as this session's other fixes.
-      metrics: { assignments: nodes.length, unresolvedPacketKeys, modularity },
+      metrics: { assignments: nodes.length, unresolvedPacketKeys, excludedPacketKeys, modularity },
       backendPreference: 'offline',
       backendActual: 'offline',
       gpuAccelerated: false,
@@ -370,6 +377,7 @@ async function runCommunityAnalysis(
       metricsWritten: 0,
       communitiesWritten: communities.size,
       unresolvedPacketKeys,
+      excludedPacketKeys,
     };
   } catch (error) {
     await client.query('ROLLBACK');
@@ -405,7 +413,7 @@ export async function runGraphAnalysis(
       dampingFactor: request.dampingFactor,
       limit: request.limit,
     });
-    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys, excludedPacketKeys: result.excludedPacketKeys };
   }
 
   if (request.algorithm === 'louvain') {
@@ -422,21 +430,21 @@ export async function runGraphAnalysis(
       dampingFactor: request.dampingFactor,
       limit: request.limit,
     });
-    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys, excludedPacketKeys: result.excludedPacketKeys };
   }
 
   if (request.algorithm === 'kcore') {
     const result = await (await import('./kcore-analysis-adapter.js')).runKCoreAnalysis(db, {
       limit: request.limit,
     });
-    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys, excludedPacketKeys: result.excludedPacketKeys };
   }
 
   if (request.algorithm === 'betweenness') {
     const result = await (await import('./betweenness-analysis-adapter.js')).runBetweennessAnalysis(db, {
       limit: request.limit,
     });
-    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys };
+    return { run: result.run, metricsWritten: result.metricsWritten, communitiesWritten: 0, unresolvedPacketKeys: result.unresolvedPacketKeys, excludedPacketKeys: result.excludedPacketKeys };
   }
 
   return runSkippedAnalysis(request.algorithm, projectionName, 0, 0, `Unsupported graph algorithm: ${request.algorithm}`);

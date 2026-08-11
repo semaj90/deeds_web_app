@@ -18,6 +18,7 @@ describe('graph-analysis-runner betweenness routing', () => {
       run: { runId: 'betweenness-run' },
       metricsWritten: 11,
       unresolvedPacketKeys: 0,
+      excludedPacketKeys: 0,
     });
 
     const result = await runGraphAnalysis({} as any, {
@@ -30,5 +31,6 @@ describe('graph-analysis-runner betweenness routing', () => {
     expect(result.metricsWritten).toBe(11);
     expect(result.communitiesWritten).toBe(0);
     expect(result.unresolvedPacketKeys).toBe(0);
+    expect(result.excludedPacketKeys).toBe(0);
   });
 });

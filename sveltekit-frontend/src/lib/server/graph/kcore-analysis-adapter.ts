@@ -34,7 +34,7 @@ import {
 	type GraphAnalysisRun,
 	type GraphMetricResult,
 } from './graph-analysis-types.js';
-import { resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
 import { NAMED_PROJECTION_CANDIDATES } from './graph-projection-manifest.js';
 
 const ALGORITHM_REVISION = 'neo4j-gds-kcore-mutate-v1';
@@ -55,6 +55,7 @@ export interface KCoreAnalysisResult {
 	run: GraphAnalysisRun;
 	metricsWritten: number;
 	unresolvedPacketKeys: number;
+	excludedPacketKeys: number;
 }
 
 export async function runKCoreAnalysis(
@@ -150,7 +151,13 @@ export async function runKCoreAnalysis(
 	const createdAt = new Date().toISOString();
 	const byPacketKey = new Map<string, { score: number }>();
 	let unresolved = 0;
+	let excluded = 0;
 	for (const node of topNodes) {
+		const classification = classifyGraphPacketPath(node.path ?? '');
+		if (classification.kind === 'excluded') {
+			excluded++;
+			continue;
+		}
 		const packetKey = lookupPacketKey(resolved, node.path);
 		if (!packetKey) {
 			unresolved++;
@@ -226,5 +233,5 @@ export async function runKCoreAnalysis(
 		client.release();
 	}
 
-	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved };
+	return { run, metricsWritten: metricRows.length, unresolvedPacketKeys: unresolved, excludedPacketKeys: excluded };
 }

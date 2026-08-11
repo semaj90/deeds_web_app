@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   getNeo4jDriver: vi.fn(),
   resolveCodebaseFilePacketKeys: vi.fn(),
   lookupPacketKey: vi.fn(),
+  classifyGraphPacketPath: vi.fn(),
 }));
 
 vi.mock('./neo4j-gds-client.js', () => ({
@@ -18,6 +19,7 @@ vi.mock('$lib/server/neo4j-driver.js', () => ({
 }));
 
 vi.mock('./graph-packet-key-resolver.js', () => ({
+  classifyGraphPacketPath: mocks.classifyGraphPacketPath,
   resolveCodebaseFilePacketKeys: mocks.resolveCodebaseFilePacketKeys,
   lookupPacketKey: mocks.lookupPacketKey,
 }));
@@ -69,6 +71,7 @@ describe('betweenness-analysis-adapter', () => {
     mocks.lookupPacketKey.mockImplementation((resolved: Array<{ path: string; packetKey: string }>, path: string) => {
       return resolved.find((row) => row.path === path)?.packetKey ?? null;
     });
+    mocks.classifyGraphPacketPath.mockReturnValue({ kind: 'canonical', normalizedPath: 'src/lib/server/auth.ts' });
     const pool = {
       connect: vi.fn().mockResolvedValue({
         query: clientQuery,
@@ -85,6 +88,7 @@ describe('betweenness-analysis-adapter', () => {
     expect(sessionRun).toHaveBeenCalled();
     expect(result.metricsWritten).toBe(1);
     expect(result.unresolvedPacketKeys).toBe(0);
+    expect(result.excludedPacketKeys).toBe(0);
     expect(result.run.algorithm).toBe('betweenness');
     expect(result.run.algorithmRevision).toBe('neo4j-gds-betweenness-exact-v1');
     expect(result.run.projectionName).toBe('atlas_feature_v1');

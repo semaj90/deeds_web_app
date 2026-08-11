@@ -16,6 +16,7 @@ export interface LouvainPersistenceReceipt {
 	membershipReconciled: boolean;
 	latestRunAssignments: number | null;
 	latestRunUnresolvedPacketKeys: number | null;
+	latestRunExcludedPacketKeys: number | null;
 	atlasPacketsMutated: false;
 	replaySafe: boolean;
 	createdAt: string;
@@ -42,6 +43,7 @@ const LouvainPersistenceReceiptSchema = z
 		membershipReconciled: z.boolean(),
 		latestRunAssignments: z.number().int().nonnegative().nullable(),
 		latestRunUnresolvedPacketKeys: z.number().int().nonnegative().nullable(),
+		latestRunExcludedPacketKeys: z.number().int().nonnegative().nullable(),
 		atlasPacketsMutated: z.literal(false),
 		replaySafe: z.boolean(),
 		createdAt: z.string().datetime(),
@@ -53,7 +55,7 @@ export async function buildLouvainPersistenceReceipt(db: Pool): Promise<LouvainP
 		run_id: string;
 		projection_name: string;
 		graph_revision: string;
-		metrics: { assignments?: number; unresolvedPacketKeys?: number } | null;
+		metrics: { assignments?: number; unresolvedPacketKeys?: number; excludedPacketKeys?: number } | null;
 	}>(`
 		SELECT run_id, projection_name, graph_revision, metrics
 		FROM graph_analysis_runs
@@ -93,6 +95,7 @@ export async function buildLouvainPersistenceReceipt(db: Pool): Promise<LouvainP
 	const duplicateAssignments = Math.max(0, assignmentCount - distinctPackets);
 	const latestRunAssignments = Number(run.metrics?.assignments ?? null);
 	const latestRunUnresolvedPacketKeys = Number(run.metrics?.unresolvedPacketKeys ?? null);
+	const latestRunExcludedPacketKeys = Number(run.metrics?.excludedPacketKeys ?? null);
 	const membershipReconciled = communityCount > 0 && assignmentCount === memberCount && duplicateAssignments === 0;
 	const replaySafe = membershipReconciled && latestRunUnresolvedPacketKeys === 0;
 	const receiptSeed = {
@@ -106,6 +109,7 @@ export async function buildLouvainPersistenceReceipt(db: Pool): Promise<LouvainP
 		membershipReconciled,
 		latestRunAssignments,
 		latestRunUnresolvedPacketKeys,
+		latestRunExcludedPacketKeys,
 		atlasPacketsMutated: false as const,
 		replaySafe,
 	};
