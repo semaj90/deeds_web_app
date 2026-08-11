@@ -79,8 +79,34 @@ export const getRedis = (): Redis => redisPool.getConnection();
 /**
  * Legacy export: Single shared client (backwards compatibility)
  * DEPRECATED: Use getRedis() instead to leverage connection pooling
+ *
+ * ROUTE_IMPORT_INFRA_ISOLATION gate: this must NOT connect at module-evaluation
+ * time. It previously called `redisPool.getConnection()` eagerly here, which
+ * opened a real Valkey/Redis socket the instant any file imported `redis`
+ * (even transitively) — the confirmed root cause of route-handler test hangs
+ * that import this module without ever calling a Redis method (see
+ * openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md,
+ * "Follow-up investigation" section, for the discovery trail).
+ *
+ * Lazy Proxy: connection is deferred until the first property access (i.e.
+ * the first `redis.get(...)` / `redis.set(...)` call site), matching the
+ * existing precedent in vector/qdrant-manager.ts (`export const qdrant = new
+ * Proxy(...)`). All 9 known callers (as of 2026-08-11) use `redis` purely as
+ * a runtime method-call target — no `instanceof`, no destructuring, no
+ * module-init-time access — so this is a behavior-preserving swap for every
+ * confirmed caller pattern.
  */
-export const redis = redisPool.getConnection();
+export const redis: Redis = new Proxy({} as Redis, {
+	get(_target, prop, _receiver) {
+		const client = redisPool.getConnection();
+		const value = Reflect.get(client, prop, client);
+		return typeof value === 'function' ? value.bind(client) : value;
+	},
+	set(_target, prop, value) {
+		const client = redisPool.getConnection();
+		return Reflect.set(client, prop, value, client);
+	},
+});
 
 /**
  * Factory for creating specialized Redis instances with custom config
