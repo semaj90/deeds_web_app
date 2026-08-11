@@ -933,6 +933,12 @@ sveltekit-frontend/docs/graph/codebase-graph.json
 sveltekit-frontend/docs/graph/sveltekit-route-map.md
 docs/graph/repo-root-atlas.json
 
+# index-codebase-fast.mjs probe runs (non --publish-canonical): timestamped receipt +
+# graph/map copies, one per run. Same >10MB-per-file class as codebase-graph.json above —
+# gitignored, but see .rgignore for the rg-searchable override.
+sveltekit-frontend/docs/graph/.build/
+sveltekit-frontend/docs/reports/graph-probes/
+
 # Deep graphify artifacts >10MB (gitignored — pre-commit hook rejects them)
 sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
 

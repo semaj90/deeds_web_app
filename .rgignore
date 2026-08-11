@@ -25,6 +25,13 @@
 # Codebase graph — large gitignored JSON, but searchable for offline analytics
 !sveltekit-frontend/docs/graph/codebase-graph.json
 
+# index-codebase-fast.mjs probe runs (2026-08-11) — timestamped receipt + graph/map copies
+# per non --publish-canonical run, gitignored but rg-searchable for offline diffing.
+!sveltekit-frontend/docs/graph/.build/
+!sveltekit-frontend/docs/graph/.build/**
+!sveltekit-frontend/docs/reports/graph-probes/
+!sveltekit-frontend/docs/reports/graph-probes/**
+
 # Canonical graphify/ output directory (2026-08-09) — gitignored, rg-searchable.
 # Infra only: no graphify scripts write here yet. See graphify/README.md.
 !/graphify/
