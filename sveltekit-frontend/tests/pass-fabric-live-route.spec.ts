@@ -1,6 +1,16 @@
+// @vitest-environment node
+/**
+ * Route: src/routes/api/admin/atlas/pass-fabric/live/+server.ts
+ *
+ * Relocated from the colocated `+server.test.ts` (2026-08-11) — SvelteKit's
+ * Vite plugin reserves the `+`-prefixed filename under src/routes/, so it
+ * never actually ran ("Files prefixed with + are reserved"). Flat tests/
+ * location matches the working tests/ace-status-route.spec.ts convention.
+ */
+
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../../../../lib/server/analysis/analysis-pass-results.js', () => ({
+vi.mock('../src/lib/server/analysis/analysis-pass-results.js', () => ({
 	buildAnalysisPassLedgerProofSnapshot: vi.fn(async () => ({
 		generatedAt: '2026-08-11T00:00:00.000Z',
 		totalRows: 11076,
@@ -31,10 +41,9 @@ vi.mock('../../../../../../lib/server/analysis/analysis-pass-results.js', () => 
 	})),
 }));
 
-import { GET } from './+server.js';
-
 describe('GET /api/admin/atlas/pass-fabric/live', () => {
 	it('rejects unauthenticated requests', async () => {
+		const { GET } = await import('../src/routes/api/admin/atlas/pass-fabric/live/+server.js');
 		const response = await GET({ locals: {} } as never);
 
 		expect(response.status).toBe(401);
@@ -42,6 +51,7 @@ describe('GET /api/admin/atlas/pass-fabric/live', () => {
 	});
 
 	it('returns the live PF4A snapshot when authenticated', async () => {
+		const { GET } = await import('../src/routes/api/admin/atlas/pass-fabric/live/+server.js');
 		const response = await GET({ locals: { user: { id: 'tester' } } } as never);
 		const body = await response.json();
 

@@ -1,69 +1,93 @@
 #!/usr/bin/env node
 /**
- * ROUTE_IMPORT_INFRA_ISOLATION_PROVEN — gates G1/G2.
+ * ROUTE_IMPORT_INFRA_ISOLATION_PROVEN
  *
- * Proves that importing src/lib/server/redis.ts, and importing each of its
- * known callers of the legacy `redis` export, performs ZERO real network
- * connection during module evaluation.
+ * The invariant under test is IMPORT MODULE => ZERO SOCKET OPEN ATTEMPTS, not
+ * "ioredis's Redis.prototype.connect wasn't called" — a narrower check that
+ * misses any other client library (RabbitMQ/amqplib, pg, neo4j-driver,
+ * @qdrant/js-client-rest, plain fetch-over-TCP, ...) doing the same eager
+ * thing. This intercepts at the actual Node networking choke point instead:
+ * net.Socket.prototype.connect, net.createConnection, and tls.connect.
  *
- * Deterministic, not timing-based: monkey-patches ioredis's Redis.prototype
- * .connect (the single choke point every connection path — lazyConnect or
- * not — must go through before opening a socket) to count invocations, then
- * imports each target and checks whether the counter moved. A module that
- * merely *defines* a lazy client/Proxy without touching it passes with
- * connectCallCount === 0; a module with a genuine eager top-level connect
- * (like the old `export const redis = redisPool.getConnection()`) fails
- * with connectCallCount > 0.
+ * Each check runs in its OWN fresh child process. This is not optional
+ * ceremony: redis.ts's `redisPool` is a module-level singleton, and every
+ * one of the 7 callers under test imports it, so running all checks in one
+ * shared process means an early failed connection attempt (retries
+ * exhausted, client marked dead) silently suppresses later checks — a false
+ * PASS, not a true one. A fresh process per check has no prior state to
+ * pollute it.
+ *
+ * Gates:
+ *   G1 — importing redis.ts performs zero socket attempts
+ *   G2 — importing each of its known legacy-`redis`-export callers performs
+ *        zero socket attempts
+ *   G3 — calling getRedis() and using it DOES trigger a connection attempt
+ *        (proves the lazy path still connects when actually used)
+ *   G4 — first real use of the legacy `redis` export triggers a connection
+ *        attempt through the same lifecycle owner as getRedis()
  *
  * Usage: node scripts/smoke-redis-import-isolation.mjs
  */
 
-import Redis from 'ioredis';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 
-let connectCallCount = 0;
-Redis.prototype.connect = function patchedConnect() {
-  connectCallCount += 1;
-  // Never let it actually complete a real socket attempt in this smoke run —
-  // return a rejected promise immediately so nothing hangs waiting on I/O.
-  return Promise.reject(new Error('smoke-redis-import-isolation: connect() blocked by design'));
-};
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const WORKER_PATH = path.join(__dirname, '_smoke-redis-worker.mjs');
 
-const TARGETS = [
-  { label: 'redis.ts (G1)', path: '../src/lib/server/redis.js' },
-  { label: 'chrrom/predictor.ts', path: '../src/lib/server/chrrom/predictor.js' },
-  { label: 'redis-service.ts', path: '../src/lib/server/redis-service.js' },
-  { label: 'rg-atlas/karpathy-blend.ts', path: '../src/lib/server/rg-atlas/karpathy-blend.js' },
-  { label: 'search/semantic-cache.ts', path: '../src/lib/server/search/semantic-cache.js' },
-  { label: 'knowledge-search/ACPToolRegistry.ts', path: '../src/lib/server/services/knowledge-search/ACPToolRegistry.js' },
-  { label: 'knowledge-search/RedisCacheService.ts', path: '../src/lib/server/services/knowledge-search/RedisCacheService.js' },
+const CHECKS = [
+	{ label: 'redis.ts (G1)', mode: 'import', path: '../src/lib/server/redis.js' },
+	{ label: 'chrrom/predictor.ts', mode: 'import', path: '../src/lib/server/chrrom/predictor.js' },
+	{ label: 'redis-service.ts', mode: 'import', path: '../src/lib/server/redis-service.js' },
+	{ label: 'rg-atlas/karpathy-blend.ts', mode: 'import', path: '../src/lib/server/rg-atlas/karpathy-blend.js' },
+	{ label: 'search/semantic-cache.ts', mode: 'import', path: '../src/lib/server/search/semantic-cache.js' },
+	{ label: 'knowledge-search/ACPToolRegistry.ts', mode: 'import', path: '../src/lib/server/services/knowledge-search/ACPToolRegistry.js' },
+	{ label: 'knowledge-search/RedisCacheService.ts', mode: 'import', path: '../src/lib/server/services/knowledge-search/RedisCacheService.js' },
+	{ label: 'G3 getRedis() explicit use', mode: 'getRedis-use' },
+	{ label: 'G4 legacy redis export explicit use', mode: 'redis-use' },
 ];
 
-const results = [];
-for (const target of TARGETS) {
-  const before = connectCallCount;
-  let imported = false;
-  let importError = null;
-  try {
-    await import(target.path);
-    imported = true;
-  } catch (err) {
-    importError = err;
-  }
-  const connectAttemptsDuringImport = connectCallCount - before;
-  results.push({ ...target, imported, importError, connectAttemptsDuringImport });
+function runCheck(check) {
+	const result = spawnSync(
+		process.execPath,
+		['--import', 'tsx/esm', WORKER_PATH, check.mode, check.path ?? ''],
+		{ cwd: __dirname, encoding: 'utf-8', timeout: 20_000 },
+	);
+	let parsed = null;
+	try {
+		const lastLine = result.stdout.trim().split('\n').filter(Boolean).pop();
+		parsed = lastLine ? JSON.parse(lastLine) : null;
+	} catch {
+		// worker crashed before emitting JSON — treat as a hard failure below
+	}
+	return { check, parsed, stderr: result.stderr, status: result.status };
 }
 
-console.log('ROUTE_IMPORT_INFRA_ISOLATION_PROVEN — import-time network isolation check (deterministic, connect()-call-counted)\n');
+console.log('ROUTE_IMPORT_INFRA_ISOLATION_PROVEN — socket-level import isolation check (isolated subprocess per check)\n');
 
 let allPass = true;
-for (const r of results) {
-  const status = r.imported && r.connectAttemptsDuringImport === 0 ? 'PASS' : 'FAIL';
-  if (status === 'FAIL') allPass = false;
-  console.log(
-    `[${status}] ${r.label} — imported=${r.imported} connectAttemptsDuringImport=${r.connectAttemptsDuringImport}` +
-      (r.importError ? ` error=${r.importError.message}` : ''),
-  );
+const results = CHECKS.map(runCheck);
+
+console.log('-- G1/G2: import-time socket attempts (expect 0 for all) --');
+for (const { check, parsed, status } of results.filter((r) => r.check.mode === 'import')) {
+	const ok = parsed?.imported && parsed.socketAttempts === 0;
+	if (!ok) allPass = false;
+	console.log(`[${ok ? 'PASS' : 'FAIL'}] ${check.label} — imported=${parsed?.imported} socketAttempts=${parsed?.socketAttempts} (exit ${status})`);
+	for (const o of parsed?.owners ?? []) {
+		console.log(`         owner=${o.owner} host=${o.host}:${o.port} firstFrame=${o.firstFrame}`);
+	}
+	if (!parsed) console.log('         worker produced no parseable output — see stderr');
 }
 
-console.log(`\n${allPass ? 'ALL PASS' : 'FAILURES PRESENT'} — ${results.filter((r) => r.imported && r.connectAttemptsDuringImport === 0).length}/${results.length} modules import with zero real connect() calls`);
+console.log('\n-- G3/G4: explicit-use behavior (expect socketAttempts >= 1 for both) --');
+for (const { check, parsed, status } of results.filter((r) => r.check.mode !== 'import')) {
+	const ok = (parsed?.socketAttempts ?? 0) >= 1;
+	if (!ok) allPass = false;
+	console.log(`[${ok ? 'PASS' : 'FAIL'}] ${check.label} — socketAttempts=${parsed?.socketAttempts} sameOwner=${parsed?.sameOwner} (exit ${status})`);
+}
+
+const importChecks = results.filter((r) => r.check.mode === 'import');
+const passCount = importChecks.filter((r) => r.parsed?.imported && r.parsed.socketAttempts === 0).length;
+console.log(`\n${allPass ? 'ALL PASS' : 'FAILURES PRESENT'} — ${passCount}/${importChecks.length} modules import with zero socket attempts`);
 process.exit(allPass ? 0 : 1);

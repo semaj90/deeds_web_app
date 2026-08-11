@@ -99,5 +99,40 @@
     "sha256": "fac89383c051726d1905613939311a28ec2cf5bb27cff2a5bc1b40f2121d422d",
     "archived": "2026-08-11T00:00:00Z",
     "reason": "First-attempt replacement for the archived +server.test.ts above, written to match the tests/routes/auto/** G26 stub convention. Discovered on run that the entire tests/routes/auto/** tree shares the same root cause -- Vite's SvelteKit plugin refuses to resolve ANY relative import ending in +server.js/+server.ts, not just refusing to collect +-prefixed filenames -- so the dynamic import in beforeEach() fails at runtime ('Cannot find module ... +server.js'). Confirmed this is a pre-existing, repo-wide issue (not introduced this session): the working sibling tests/routes/auto/.../query.test.ts fails with the identical error when run directly, and vitest also flagged a second, unrelated colocated +server.test.ts elsewhere in the tree (pass-fabric/proof/+server.test.ts) during this same run. Out of scope to fix the whole tests/routes/auto/** tree in this pass -- superseded by tests/phase-lanes-route.spec.ts (flat tests/ location, matches the proven-working tests/ace-status-route.spec.ts pattern), which passes for real."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/api/admin/atlas/pass-fabric/boundary/+server.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/pass-fabric-boundary-server-test.ts.bak",
+    "sha256": "75cfc7212edafddf227663b566da4421664da23fc262f20e0a54805c3426ec79",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Same reserved-+-prefixed-filename bug as the phase-lanes/+server.test.ts entry above -- discovered live in a concurrent session's application logs repeatedly emitting 'Files prefixed with + are reserved' warnings for this and 4 sibling files under pass-fabric/**. Never actually collected by vitest. Real assertions relocated to sveltekit-frontend/tests/pass-fabric-boundary-route.spec.ts (flat tests/ location, registered in vitest.config.ts), confirmed passing."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/api/admin/atlas/pass-fabric/current/+server.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/pass-fabric-current-server-test.ts.bak",
+    "sha256": "ddece35677de7c36e5fc0a3e02f4501494161af236b3334a7dc43be1bed63312",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Same reserved-+-prefixed-filename bug as the pass-fabric-boundary entry above. Real assertions relocated to sveltekit-frontend/tests/pass-fabric-current-route.spec.ts, confirmed passing."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/api/admin/atlas/pass-fabric/live/+server.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/pass-fabric-live-server-test.ts.bak",
+    "sha256": "4bcfe6081b98a0d45376c7d8794e28fa835fb5c89c5771f92c7ae31246061664",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Same reserved-+-prefixed-filename bug as the pass-fabric-boundary entry above; this one also had a vi.mock() with a relative path that needed recomputing for the new location. Real assertions (including the mock) relocated to sveltekit-frontend/tests/pass-fabric-live-route.spec.ts, confirmed passing."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/api/admin/atlas/pass-fabric/proof/+server.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/pass-fabric-proof-server-test.ts.bak",
+    "sha256": "ac371fa9b68200174e57f69fd1711d3a05f813b076c715458253308aaa39797b",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "The specific file flagged during the original phase-lanes/+server.test.ts investigation as 'a second, unrelated colocated +server.test.ts elsewhere in the tree'. Same reserved-+-prefixed-filename bug. Real assertions relocated to sveltekit-frontend/tests/pass-fabric-proof-route.spec.ts, confirmed passing."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/api/admin/atlas/phase-lanes/proof/+server.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/phase-lanes-proof-server-test.ts.bak",
+    "sha256": "cefebc83418c6bc6ccc0f4f2cfcd345d4a78b742c5d4286212eef6fea9374169",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "A second +server.test.ts created under phase-lanes/ (sibling to the original phase-lanes/+server.test.ts entry, added later by concurrent work on the PF4/phase-15 proof receipt endpoint). Same reserved-+-prefixed-filename bug. Real assertions relocated to sveltekit-frontend/tests/phase-lanes-proof-route.spec.ts, confirmed passing."
   }
 ]

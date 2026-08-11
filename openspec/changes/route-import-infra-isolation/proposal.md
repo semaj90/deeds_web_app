@@ -1,9 +1,11 @@
 # Route Import Infra Isolation — ROUTE_IMPORT_INFRA_ISOLATION_PROVEN
 
-**Status**: PARTIAL — first root cause (redis.ts eager export) fixed and proven; remainder not
-yet classified. Not a semantic_768 concern — moved out of
-`parent-atlas-semantic-768-canonical-contract` deliberately (see that change's tasks.md
-"Follow-up investigation" section for the discovery trail that led here).
+**Status**: PARTIAL — first root cause (redis.ts eager export) fixed and rigorously proven via
+socket-level, process-isolated gates; a second, separate eager-connection owner found (not fixed,
+operator decision needed); remainder not yet classified, and run-to-run variance suggests at
+least one more contention source (RabbitMQ suspected, not confirmed). Not a semantic_768 concern
+— moved out of `parent-atlas-semantic-768-canonical-contract` deliberately (see that change's
+tasks.md "Follow-up investigation" section for the discovery trail that led here).
 
 ## TL;DR
 
@@ -52,15 +54,33 @@ method-call target (`.get`/`.set`/`.del`/`.keys`/`.setex`/`.hmget`, one referenc
 `instanceof`, no destructuring, no module-init-time access. This is exactly the caller shape a
 lazy Proxy preserves behaviorally.
 
-**Acceptance gates** (behavioral, not "Proxy implemented" — see tasks.md for full results):
-- G1: importing `redis.ts` performs zero real `connect()` calls — **PASS**
-- G2: importing 6/7 directly-testable callers performs zero real `connect()` calls during import — **6 PASS, 1 FAIL** (see Root cause 2 below — that failure is NOT from this fix)
-- G3: `getRedis()` still connects on explicit use — unchanged, not touched by this fix
-- G4: legacy `redis` export still behaves equivalently for all existing caller patterns — **PASS** (pre-existing `redis-disposable.spec.ts` failures identical with/without the fix, confirmed via `git stash`)
-- G5: production Redis-focused tests pass (no new failures) — **PASS**
-- G6: 137-file route subtree rerun in isolation — **128 pass / 9 fail** (was 123/14)
-- G7: previously Redis-induced timeout files stop timing out — **5 of 14 confirmed resolved**
+**Acceptance gates — final, rigorous, socket-level + process-isolated proof** (superseding the
+first-pass ioredis-`connect()`-patch version, which had two methodological flaws found and fixed
+mid-investigation — see "Methodology corrections" below):
+- G1: importing `redis.ts` performs zero real socket-connect attempts — **PASS** (0 attempts)
+- G2: importing each of the 7 directly-testable callers performs zero socket attempts during import — **6 PASS, 1 FAIL** (`chrrom/predictor.ts` — see Root Cause 2)
+- G3: `getRedis()` + explicit use DOES trigger a connection attempt — **PASS** (2 attempts recorded)
+- G4: legacy `redis` export first use triggers a connection attempt through the *same* lifecycle owner as `getRedis()` — **PASS** (2 attempts, `sameOwner=true`)
+- G5: production Redis-focused tests pass (no new failures) — **PASS** (`redis-disposable.spec.ts` identical pass/fail with and without the fix, confirmed via `git stash`)
+- G6: 137-file route subtree rerun in isolation — **volatile across runs**: one run showed 128 pass / 9 fail (was 123/14 baseline), a repeat run showed 115 pass / 22 fail. See "Run-to-run variance" below.
+- G7: previously Redis-induced timeout files — confirmed resolved in at least one run (5 of the original 14); not stably reproducible run-to-run, consistent with a second, unquantified contention source
 - G8: remaining failures reclassified by actual independent import side-effect owner — **not done, deliberately** (see "Deliberately not done" below)
+
+**Methodology corrections made mid-investigation** (both caught by rigor, not assumed clean):
+1. First proof attempt patched only `ioredis`'s `Redis.prototype.connect` — too narrow, since the
+   real invariant is "zero socket-open attempts," not "ioredis specifically wasn't called."
+   Rewritten to intercept `net.Socket.prototype.connect`, `net.createConnection`, and
+   `tls.connect` — the actual Node networking choke points any client library must go through.
+2. All 7 callers share the same `redisPool` singleton (defined in `redis.ts`). Running all checks
+   sequentially in one process meant an early exhausted-retry connection could silently suppress
+   later checks — a **false PASS**, not a true one. Confirmed this actually happened: a
+   shared-process run showed `chrrom/predictor.ts` passing with 0 attempts; an isolated-subprocess
+   rerun (fresh process per check, via `scripts/_smoke-redis-worker.mjs` + `spawnSync`) showed it
+   correctly failing with 1 attempt. Rewrote the whole gate to run every check in its own fresh
+   child process. A third correction (a 200ms drain delay after import) was needed on top of
+   process isolation, because `predictor.ts`'s eager connect happens via a fire-and-forget
+   `this.initializeRedis()` call in its constructor — `await import(...)` resolving only proves
+   synchronous module evaluation finished, not that queued microtasks from such a call have run.
 
 ## Root cause 2 — FOUND, NOT FIXED: `chrrom/predictor.ts` module-level eager singleton
 
@@ -72,6 +92,20 @@ above. Confirmed via the same connect()-call-counting smoke gate
 directly-testable modules that still shows `connectAttemptsDuringImport > 0` after the redis.ts
 fix. Not fixed in this pass — a different pattern (module-level class instantiation with an eager
 async initializer) than the one this proposal scoped to.
+
+## Run-to-run variance — a second contention source is likely, not yet confirmed
+
+Two G6 reruns of the identical 137-file subtree, no code changes between them, gave materially
+different results: 128 pass/9 fail, then 115 pass/22 fail. This means Redis was never the only
+contention source — fixing it improved one run's numbers but didn't stabilize the metric. RabbitMQ
+is suspected (a concurrent session's application logs show a real RabbitMQ reconnect backoff
+sequence — `ECONNRESET`, retries at 5s/10s/20s/40s/60s, ~135s of scheduled delay) but **not
+confirmed** as import-triggered — it may simply be an already-running dev-server process reacting
+to a real broker disconnect, unrelated to these tests. Whether `initializeRabbitMQ`-style code
+runs at module-import time (bad, same class of bug as `redis.ts`) or only at explicit
+application/worker startup (fine) has not been checked. **Do not assume RabbitMQ is the cause
+without checking its import ownership first** — same discipline that caught the two Redis-adjacent
+false starts above.
 
 ## Deliberately not done in this pass
 
