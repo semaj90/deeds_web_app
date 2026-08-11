@@ -133,6 +133,53 @@ the same way redis.ts and predictor.ts were found, before assuming mocking is th
 - `sveltekit-frontend/src/lib/server/redis.ts` — the fix (lazy Proxy)
 - `sveltekit-frontend/scripts/smoke-redis-import-isolation.mjs` — deterministic G1/G2 gate (monkey-patches `ioredis`'s `Redis.prototype.connect` to count real connection attempts; not timing-based, which proved unreliable — first-import compile overhead swamps a naive wall-clock threshold)
 
+## SESSION HANDOFF (2026-08-11, end of session)
+
+**All work in this change is committed and pushed to `origin/main`** (in sync, verified via
+`git log --oneline origin/main -1`). Commits, newest first:
+
+```
+b719733045 Record graph validation fabric guidance (GRAPH_SNAPSHOT_PARITY) as OpenSpec proposal
+6e5bb70974 Partial RabbitMQ import-ownership check: outbox-boot.ts cleared, 8 candidates remain
+74e6d19293 Rigorous socket-level ROUTE_IMPORT_INFRA_ISOLATION_PROVEN proof; fix 5 more reserved +server.test.ts files
+6ab5bc3d40 Fix redis.ts eager connection via lazy Proxy (ROUTE_IMPORT_INFRA_ISOLATION_PROVEN)
+6f300b96f8 Document stub-test hang root cause: redis.ts eager connection, not 117 independent bugs
+5d5834fa9c Fix semantic_768 canonical-constant duplication across 36 files; audit and repair Parent Atlas phase-lane mock system
+```
+
+**What a fresh session picking this up should know:**
+
+1. **Done, proven, safe to build on**: `redis.ts`'s eager `redis` export is now a lazy Proxy
+   (G1-G5 all pass via `scripts/smoke-redis-import-isolation.mjs` — socket-level interception,
+   one fresh subprocess per check, no flaky timing assumptions). 0 regressions. 6 reserved-`+`
+   route-test files fixed (`RESERVED_ROUTE_FILE_WARNINGS` = 0 repo-wide).
+2. **Found, not fixed, needs an operator decision**: `chrrom/predictor.ts` has its own separate
+   eager Redis connection (module-level singleton constructor calling `ensureRedisReady()`
+   without awaiting it). Confirmed via the same smoke gate. Not touched — different pattern than
+   the fix above, and whether it's intentional warm-start behavior is a product call, not mine.
+3. **Confirmed but NOT explained**: rerunning the identical 137-file `tests/routes/auto/**`
+   subtree twice, no code changes between runs, gave materially different results (128 pass/9
+   fail, then 115 pass/22 fail). Redis was never the sole contention source. RabbitMQ is
+   suspected — 1 of 10 candidate files checked (`outbox-boot.ts`, cleared, genuinely lazy), 8
+   remain (listed above, in "Root cause 2" section... see the earlier "8 candidates still
+   unchecked" list). **Do not resurrect a "mock N failing files" plan** — the evidence base for
+   that framing (the original 791-file/117-fail run) is explicitly documented as stale/misleading
+   in the superseded-observation table above.
+4. **A separate, concurrent session was active in this same repo throughout**, working a
+   different lane entirely: Louvain graph-community reconciliation and packet-identity work
+   (commits `aa181e8db3`, `6971b8362f`, and ongoing — visible as `sveltekit-frontend/graph/*`
+   files and `openspec/changes/parent-atlas-graph-validation-fabric/` in this repo). That work is
+   **not part of this change** and was deliberately not touched or investigated here — see that
+   directory and `parent-atlas-semantic-768-canonical-contract/tasks.md` for what little context
+   was captured about it. As of session end, that lane reported `replaySafe: false` with 5
+   `PROVENANCE_INSUFFICIENT` rows still needing an explicit classification decision — unrelated
+   to anything in this change, flagged here only so a fresh session doesn't conflate the two
+   lanes' git history.
+5. **No uncommitted work was left behind** in this change's scope. `git status` at session end
+   shows only unrelated concurrent-session files and a few untouched nested-repo submodules
+   (`claude-mem`, `granite-docling-258M`, `models/embeddinggemma_300m`, `turbovec`) that were
+   deliberately never staged all session (pre-existing repo hygiene debt, out of scope).
+
 ## Next steps (future session)
 
 1. Fix or leave `chrrom/predictor.ts`'s eager singleton (operator decision — module-level
