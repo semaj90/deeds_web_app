@@ -5,6 +5,10 @@
 CREATE TABLE IF NOT EXISTS analysis_pass_results (
   id bigserial PRIMARY KEY,
   pass_key text NOT NULL,
+  -- Logical pass identity (packetKey+sourceRevision+passName+passRevision+
+  -- inputHash), deliberately excludes analysisJobId/evidenceId unlike
+  -- pass_key. See PF4C in openspec/changes/parent-atlas-pass-fabric/tasks.md.
+  pass_identity_hash text,
   packet_key text NOT NULL,
   source_ref text,
   feature_id text,
@@ -27,6 +31,9 @@ CREATE TABLE IF NOT EXISTS analysis_pass_results (
 
 CREATE INDEX IF NOT EXISTS analysis_pass_results_pass_key_idx
   ON analysis_pass_results (pass_key);
+
+CREATE INDEX IF NOT EXISTS analysis_pass_results_pass_identity_hash_idx
+  ON analysis_pass_results (pass_identity_hash);
 
 CREATE INDEX IF NOT EXISTS analysis_pass_results_packet_idx
   ON analysis_pass_results (packet_key);

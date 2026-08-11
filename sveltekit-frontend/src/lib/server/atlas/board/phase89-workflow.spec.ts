@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildBoardFabricLaneManifest } from './fabric-lane-manifest.js';
 import {
 	buildPhase89WorkflowPlan,
 	recordPhase89WorkflowPlan,
@@ -103,6 +104,79 @@ describe('phase89 board workflow', () => {
 			recommendationId: null,
 			sourceRef: null,
 			treeNodeId: null,
+		});
+	});
+
+	it('persists an attached fabric lane manifest when provided', async () => {
+		const writes: Array<{ key: string; value: string; ttl: number }> = [];
+		const redis = {
+			async set(key: string, value: string, _mode: string, ttl: number) {
+				writes.push({ key, value, ttl });
+				return 'OK';
+			},
+		};
+
+		const plan = buildPhase89WorkflowPlan(
+			{
+				generated: '2026-07-23T00:00:00.000Z',
+				collection: 'codebase_chunks_384_hybrid',
+				recommendationPromotion: {
+					proposalCount: 1,
+					promotedCount: 1,
+					reviewRequiredCount: 0,
+				},
+				columns: [
+					{
+						id: 'P1',
+						label: 'Priority 1',
+						tasks: [
+							{
+								id: 'rank_signals',
+								priority: 'P1',
+								label: 'Audit and persist RRF ranking signal coverage',
+								script: 'node scripts/atlas/graphify-langgraph-pipeline.mjs --apply --stage rank_signals',
+								gate: 'All ranking gates PASS',
+								recommendation_id: 'rec:rank-signals',
+								source_ref: 'sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts',
+								tree_node_id: 'tree:rrf:combineViaRRF',
+							},
+						],
+					},
+				],
+				warnings: [],
+			},
+			{ taskId: 'rank_signals', dryRun: false },
+		);
+
+		const fabricLaneManifest = buildBoardFabricLaneManifest({
+			context: {
+				workflowId: plan.workflowId,
+				collection: 'codebase_chunks_384_hybrid',
+				taskId: plan.taskId,
+				taskLabel: plan.taskLabel,
+				recommendationId: plan.recommendationId,
+				sourceRef: plan.sourceRef,
+				treeNodeId: plan.treeNodeId,
+			},
+			packetKey: 'packet:rrf-rank-signals',
+			sourceRevision: 'source@rev-1',
+			representationRevision: 'semantic@rev-7',
+			producerId: 'atlas-phase89',
+			producerRevision: 'phase89@rev-2',
+			laneKinds: ['kanban_task_board', 'recommendation_policy', 'exact_knn_retrieval'],
+			evidenceRefs: ['evidence:rrf'],
+		});
+
+		const result = await recordPhase89WorkflowPlan(plan, redis as any, fabricLaneManifest);
+
+		expect(result.workflowId).toContain('phase89-board-workflow:rank_signals:');
+		expect(writes.some((entry) => entry.key.startsWith('phase89:workflow:'))).toBe(true);
+		expect(JSON.parse(writes[0]?.value ?? '{}')).toMatchObject({
+			fabricLaneManifest: {
+				packetKey: 'packet:rrf-rank-signals',
+				representationId: 'semantic_768',
+				kanbanTaskBoard: 'codebase_chunks_384_hybrid',
+			},
 		});
 	});
 });

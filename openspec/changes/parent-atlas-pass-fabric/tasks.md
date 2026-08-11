@@ -156,6 +156,69 @@ that's the root cause requiring the two-hash split above, not a bug to
 patch in place). `PASS_IDENTITY_PROVEN` remains `false` until the
 `passIdentityHash` field is added and threaded through eligibility queries.
 
+## STEPS 2-3 APPLIED (2026-08-11, same day): executionSemantics wired
+
+- `src/lib/server/db/schema/analysis-pass-results.ts`: added
+  `passIdentityHash` column (additive, nullable) + `buildAnalysisPassIdentityHash()`
+  (logical fields only, no job/evidence identity) + `PassExecutionSemantics`
+  type + `KNOWN_PASS_EXECUTION_SEMANTICS` registry
+  (`ast_symbols`/`pos_tagging`/`pos-concept-tagging-lane.v1` = deterministic,
+  `summarization`/`entity_extraction`/`forensics` = stochastic, unlisted
+  defaults to `observed_event` — the safe default, never silently
+  short-circuits a real execution) + `resolveExecutionSemantics()`. Wired
+  into `normalizeAnalysisPassLedgerInput()` so every new row gets both hashes.
+- **Live DB**: `ALTER TABLE analysis_pass_results ADD COLUMN IF NOT EXISTS
+  pass_identity_hash TEXT` + matching index — applied, additive, verified
+  via `\d analysis_pass_results`.
+- `src/lib/server/analysis/analysis-pass-results.ts`'s
+  `recordAnalysisPassResult()`: now actually consults
+  `resolveExecutionSemantics(input.passName)` before inserting. For
+  `deterministic_idempotent` passes, checks for an existing row by
+  `passIdentityHash` and reuses it (`inserted: false`) instead of inserting.
+  For `stochastic_history`/`observed_event`, always inserts a new row
+  (previous behavior, now correctly the explicit default rather than the
+  only behavior).
+- Typecheck: zero new errors (one pre-existing `TS2352` at a shifted line
+  number, confirmed identical to the pre-session baseline).
+- **Manual migration file** (`drizzle/manual/analysis_pass_results.sql`,
+  the "mirrors live DB shape" contract) updated to match.
+
+**Not yet done**: `KNOWN_PASS_EXECUTION_SEMANTICS` is a small hardcoded
+registry, not yet the full `AtlasPassDefinition` (owner/truthClass/
+executionClass/requires/invalidatesOn) design from earlier session-198
+memory files — this is intentionally the minimal slice needed to unblock
+correct replay behavior now; the fuller registry is still PF5/step-9+ work.
+
+## STEP 4 APPLIED (2026-08-11, same day): partial UNIQUE index dropped
+
+**Decision**: `DROP INDEX analysis_pass_results_identity_uq`. Reasoning:
+- It enforced uniqueness on `(packet_key, source_revision, pass_type,
+  pass_revision, input_hash)` — the wrong key composition (predates
+  `passIdentityHash`, uses `pass_type` not `passName`/`passRevision`
+  consistently) and the wrong surface (the append-only history table,
+  not a materialization).
+- It would have silently started rejecting legitimate stochastic
+  re-executions the moment the live worker began populating
+  `source_revision`/`pass_revision` broadly (currently only 3 rows had
+  both populated — checked live before dropping, confirmed minimal blast
+  radius).
+- A blind DB `UNIQUE` constraint structurally cannot be execution-semantics
+  aware (deterministic vs. stochastic vs. observed-event) — that logic now
+  correctly lives in `recordAnalysisPassResult()`'s application-level check
+  (step 2-3, applied above), not in a constraint.
+
+**Verified live**: `\d analysis_pass_results` — index absent, zero errors.
+Uniqueness enforcement now correctly deferred to step 5
+(`analysis_pass_current` materialization), which can consult
+`resolveExecutionSemantics()` when deciding what counts as "the current
+eligible row" per logical `passIdentityHash` — something a DB constraint
+alone cannot express.
+
+**Remaining in the corrected order**: steps 5-9 — `analysis_pass_current`
+materialization view, HLL/event-hypergraph boundary fix (Correction 3),
+live Valkey HLL materializer, exact baseline receipt, recommendation
+promotion guard.
+
 ## PF0: Audit Current Worker Behavior (30m) — ✅ DONE
 
 **Findings** (worker.ts:176-234, analysis-jobs.ts:171-240):

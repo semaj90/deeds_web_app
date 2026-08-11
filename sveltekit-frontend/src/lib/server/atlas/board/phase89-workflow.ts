@@ -31,6 +31,7 @@ export interface Phase89WorkflowPlan {
   validationQueueKeys: string[];
   warnings: string[];
   dryRun: boolean;
+  fabricLaneManifest?: unknown;
   steps: Array<{
     action: 'queue:workflow' | 'queue:playwright-check' | 'acp:phase89';
     target: string;
@@ -163,6 +164,7 @@ export function buildPhase89WorkflowPlan(
 export async function recordPhase89WorkflowPlan(
   plan: Phase89WorkflowPlan,
   redisClient = getRedis(),
+  fabricLaneManifest?: unknown,
 ): Promise<{
   workflowId: string;
   queuedRoutes: string[];
@@ -177,6 +179,7 @@ export async function recordPhase89WorkflowPlan(
     validationRoutes: plan.validationRoutes,
     warnings: plan.warnings,
     dryRun: plan.dryRun,
+    fabricLaneManifest: fabricLaneManifest ?? plan.fabricLaneManifest ?? null,
     queuedAt: new Date().toISOString(),
     source: 'daily-graphify-board',
   });

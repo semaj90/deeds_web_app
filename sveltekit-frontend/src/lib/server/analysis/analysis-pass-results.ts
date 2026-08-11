@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { db } from '$lib/server/db/client.js';
 import {
 	analysisPassResults,
+	resolveExecutionSemantics,
 	type AnalysisPassLedgerInput,
 	type AnalysisPassPersistResult,
 	type AnalysisPassResultRow,
@@ -102,8 +103,36 @@ export async function recordAnalysisPassResult(
 	if (analysisPassResultsTableMissing) return null;
 
 	const row = normalizeAnalysisPassLedgerInput(input);
+	const semantics = resolveExecutionSemantics(input.passName);
 
 	try {
+		// deterministic_idempotent: reuse an existing execution for the same
+		// logical pass identity instead of inserting a new row. Anything else
+		// (stochastic_history, observed_event) always inserts — see PF4C,
+		// openspec/changes/parent-atlas-pass-fabric/tasks.md, for why: a
+		// deterministic pass computing the same identity twice should produce
+		// the same output, so re-running it is pure waste; a stochastic pass
+		// computing the same identity twice legitimately produces different
+		// outputs (confirmed this session: summarization, 5 distinct outputs
+		// from identical input), so short-circuiting it would silently return
+		// stale/wrong data.
+		if (semantics === 'deterministic_idempotent' && row.passIdentityHash) {
+			const [existing] = await db
+				.select()
+				.from(analysisPassResults)
+				.where(eq(analysisPassResults.passIdentityHash, row.passIdentityHash))
+				.orderBy(sql`created_at DESC, id DESC`)
+				.limit(1);
+
+			if (existing) {
+				return {
+					inserted: false,
+					idempotencyKey: row.passKey,
+					row: existing,
+				};
+			}
+		}
+
 		const [fresh] = await db
 			.insert(analysisPassResults)
 			.values(row)

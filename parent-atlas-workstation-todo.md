@@ -21,6 +21,13 @@ Current lane map:
 - Feature / geometry: numeric evidence, routing scores, and 4D metric-tensor diagnostics only.
 - Graph: PageRank / communities / k-core / betweenness / bounded traversal evidence.
 - Hypergraph: n-ary relation and event structure lane for joint facts, not a second retrieval owner.
+- GNN / graph-message passing: graph evidence and neighborhood expansion for recommendation inputs, not truth.
+- exact kNN: canonical `semantic_768` nearest-neighbor retrieval and replay proof.
+- KMeans / SOM: coarse cache-hint routing only; never canonical truth.
+- Ewin Tang / low-rank: approximation and shadow-reduction lane only.
+- HyperLogLog: breadth telemetry projection only; never policy or identity.
+- Kanban task board: execution receipts and next-action surface, not a canonical owner of truth.
+- Recommendation: deterministic baseline + exact oracle + shadow promotion, with outputs attached to the task board.
 - `embeddinggemma`: canonical embedding family at `768`; any `384`-dimensional artifacts are migration evidence only, not an active retrieval lane.
 - `768`: main codebase chunk lane.
 - `384`: legacy migration / projection evidence only; never an active retrieval lane.
@@ -946,6 +953,7 @@ This is the short execution list extracted from the current compiler / topology 
 - GPU concurrency stays bounded and sidecar-owned.
 - Valkey is hot coordination cache only.
 - Read-side query fanout is a fork-join executor capped at three independent read tools.
+- Shared lane manifest: `sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.ts` for GNN, exact kNN, KMeans routing hints, Ewin Tang low-rank, HyperLogLog telemetry, Kanban, and recommendation policy receipts.
 
 ### Pass Fabric steps
 
@@ -960,6 +968,7 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Keep NLP sidecar / GPU passes bounded and batched instead of launching one request per packet.
 - [ ] Add Valkey batch helpers for hot metadata, result hints, and cache receipts only.
 - [ ] Add `executeToolBatch` with `maxParallel = 3` for independent read-only tools; keep dependent or mutating calls sequential.
+- [ ] Wire the fabric lane manifest into the recommendation / task-board flow and keep `semantic_768` explicit in every lane receipt.
 - [ ] Build incremental eligibility so only changed packets / stale revisions re-run.
 - [ ] Add crash-restart replay tests: duplicate enqueue, worker crash, unchanged revision rerun, changed source rerun.
 

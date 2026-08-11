@@ -32,3 +32,11 @@ export {
   buildSpecRecommendation,
   buildSpecRecommendations,
 } from './recommendations/spec-recommendation-bridge';
+
+export {
+  FabricLaneKindSchema,
+  FabricLaneManifestSchema,
+  buildFabricLaneManifest,
+} from './contracts/fabric-lanes';
+
+export { buildBoardFabricLaneManifest } from './board/fabric-lane-manifest';
