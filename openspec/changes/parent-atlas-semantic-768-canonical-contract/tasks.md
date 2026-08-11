@@ -1,5 +1,45 @@
 # Tasks — Semantic 768 Canonical Contract
 
+## Follow-up investigation: the 117-failure count was contention, not 117 distinct bugs
+(2026-08-11, later same session, after the git commit + push)
+
+Re-ran the 137-file fixed subtree **in isolation** (not alongside the other 654 always-passing
+files) and got **14 failed / 123 passed**, not 117 failed. Running the narrower set alone reduces
+concurrent-connection-attempt contention across vitest's worker pool — most of the earlier 117
+"Hook timed out" failures were the SAME small number of real root causes compounding under load,
+not 117 independent bugs. This is a much more tractable number.
+
+**Root-caused one real, systemic issue**: `src/lib/server/redis.ts:83` —
+`export const redis = redisPool.getConnection();` connects **eagerly at module-import time**,
+unlike its sibling `getRedis()` (lazy, connects only when called — the function CLAUDE.md
+documents as "canonical"). Any file that imports the named `redis` export (not `getRedis`)
+transitively triggers a real Redis connection attempt the instant it's imported, which hangs for
+~10s against a Valkey-less test environment. Confirmed via `redisPool.getConnection()` →
+`getValkeyClient()` call chain, and confirmed the eager export has 9 real callers outside test
+scope (`chrrom/predictor.ts`, `redis-service.ts`, `rg-atlas/karpathy-blend.ts`,
+`search/semantic-cache.ts`, `services/knowledge-search/ACPToolRegistry.ts`,
+`services/knowledge-search/RedisCacheService.ts`, plus 3 route files).
+
+**Not yet root-caused**: several of the 14 failing files (`local-llama-provider.ts`,
+`feature-label-extractor.ts`, `KnowledgeSearcher.ts`, `trpc/router.ts`/`trpc/init.ts`) do **not**
+import `redis.ts` directly or transitively via the paths checked — something else in their import
+chains hangs too. Not yet isolated.
+
+**Deliberately stopped here** (user chose "stop, write up findings" over "fix redis.ts now" or
+"trace all 14 individually") — fixing `redis.ts`'s eager-export pattern touches a widely-imported
+core infra file outside this document's DRY-sweep scope, and deserves a dedicated session rather
+than a tail-end add-on. **Next session, if picking this up**:
+1. Convert `redis.ts`'s `export const redis = ...` to a lazy Proxy (same non-breaking pattern as
+   `qdrant-manager.ts`'s `export const qdrant = new Proxy(...)`) so property access, not import,
+   triggers the connection. Verify all 9 callers still work identically.
+2. Re-run the 137-file subtree, expect several of the 14 to flip to passing.
+3. For whichever still fail, trace their import chains individually (start with
+   `local-llama-provider.ts` and `trpc/router.ts` — the latter likely aggregates many sub-routers,
+   plausible high-value target).
+4. Consider whether a per-test `vi.mock()` for `ioredis`/`pg` (matching the existing
+   `tests/__mocks__/onnxruntime-web.ts` / `huggingface-transformers.ts` alias pattern already in
+   `vitest.config.ts`) is a more robust long-term fix than chasing every eager-connection call site.
+
 ## Adjacent finding: tests/routes/auto/** G16 stub-test path bug (2026-08-11, same session)
 
 While investigating the wider `tests/routes/auto/**` import-resolution breakage flagged in the
