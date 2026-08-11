@@ -10,6 +10,47 @@ recommendation engine, or Deep Agents integration under this task list.
 - [ ] Write 6 OKF gap concept files, one per known repo gap (domain lineage, concept edge ledger, representation fragmentation, topology schema drift, cluster run lineage, SOM run lineage), each evidence-linked to a real file/table/line, `status: NOT_PROVEN`, no fabricated claims.
 - [ ] Validation: OKF validator run against the 6 new files reports 0 schema errors.
 
+### OKF / telemetry / ontology-linked tuple boundary
+
+This is a contract note for Slice 1. It does not create a new owner.
+
+- `timestamp`: provenance only.
+- `HyperLogLog`: telemetry only. Use it for approximate breadth counts such as distinct workflows,
+  symbols, users, packets, and retrieval neighborhoods. Do not use it to decide eviction or
+  canonical cache truth.
+- `OntologyLinkedTuple`: evidence layer only. Keep it as `subject / predicate / object / evidenceRef`
+  with explicit `sourceRevision`, `representationRevision`, and producer revision fields. It is a
+  linked evidence record, not semantic truth.
+- `DomainClassification`: OKF / taxonomy lane. Use it for domain labels and ontology navigation.
+- `Low-rank sampling`: retrieval / approximation experiment only. Keep Tang-style sketching with the
+  retrieval LOD / algorithm taxonomy lane, not the ontology lane.
+
+Suggested field list:
+
+```ts
+type OntologyLinkedTuple = {
+  subject: string;
+  predicate: string;
+  object: string;
+  evidenceRef: string;
+  timestamp: string;
+  sourceRevision: string;
+  representationRevision: string;
+  producerId: string;
+  producerRevision: string;
+  domainClass?: string;
+};
+
+type TelemetryBreadth = {
+  packetKey: string;
+  workflowHllKey?: string;
+  symbolHllKey?: string;
+  userHllKey?: string;
+  neighborhoodHllKey?: string;
+  countedAt: string;
+};
+```
+
 ## Slice 2 — Library integration scanner (read-only)
 
 - [ ] Build a script that walks package manifests + lockfiles + source imports for a fixed candidate list (tree-sitter, ast-grep, ts-morph, LangExtract, Deep Agents, LangChain, LangGraph, OpenWiki, KafkaJS, Debezium, Neo4j GDS, cuGraph, cuVS, TurboVec, Langfuse, OpenTelemetry, Mastra).

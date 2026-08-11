@@ -1,5 +1,49 @@
 [
   {
+    "path": "sveltekit-frontend/src/mcp/server_mcp_todo.ts.20260731-154126.disabled",
+    "archive_path": "deeds_labs/archive/2026-08-11/server_mcp_todo.ts.20260731-154126.disabled.bak",
+    "sha256": "6ff869d7d619d3d11ab24fb672727d8e94da7ec953bcbb402d8d9462ed4f6332",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Already self-marked disabled via filename suffix (.disabled, timestamped 2026-07-31) — inert since a bundler/TS compiler cannot resolve a non-.ts extension, so nothing could import it even before archival. 5,856 lines of dead weight sitting live in src/mcp/ instead of cold storage. Found during rg/MCP/ACE/BitFrost/Redis-Valkey archivability sweep."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/ai/phase101-parent-atlas-packetizer.js",
+    "archive_path": "deeds_labs/archive/2026-08-11/phase101-parent-atlas-packetizer.js.bak",
+    "sha256": "22aa96d5cabd58ea6b84a8a26214b1bd52d756f0c6a0b80d1849d56c93d87638",
+    "archived": "2026-08-11T00:00:00Z",
+    "restored": "2026-08-11T00:10:00Z",
+    "reason": "MISTAKEN ARCHIVAL, RESTORED SAME SESSION. Original reasoning (zero live callers in src/) was correct as a fact but wrong as a conclusion: docs/atlas/parent-atlas-table-of-contents.md:115 explicitly lists \"Phase 101 parent-atlas packetizer (dry-run first)\" as an active, tracked, unfinished Parent Atlas roadmap item. Zero callers here means 'not yet wired' (the same WIP pattern found repeatedly this session for atlas_packets writer / analysis_pass_results writer — designed but not yet connected), not 'dead code.' User caught the error immediately (\"we're using materializer? we haven't finished parent atlas!\"). File restored to original location same session, content unchanged (SHA-256 above still matches current file). Kept as a manifest entry rather than deleted, per this repo's own discipline: a caught mistake is worth recording, not erasing. Lesson: 'zero callers' is necessary but not sufficient for archival — must also check whether the target repo doc/roadmap tracks the file as active-but-unwired vs. actually superseded/dead."
+  },
+  {
+    "path": "sveltekit-frontend/src/lib/server/atlas/phase101-parent-atlas-packetizer.mjs",
+    "archive_path": "deeds_labs/archive/2026-08-11/phase101-parent-atlas-packetizer.mjs.bak",
+    "sha256": "aa9c4802c16aa58e1cc7704f42496923a2d29256361f96b45f04bcd30f66f1a9",
+    "archived": "2026-08-11T00:00:00Z",
+    "restored": "2026-08-11T00:10:00Z",
+    "reason": "MISTAKEN ARCHIVAL, RESTORED SAME SESSION. Sibling of ai/phase101-parent-atlas-packetizer.js above — see that entry for full rationale. Also restored to original location, content unchanged."
+  },
+  {
+    "path": "scripts/atlas/train-som-384.mts",
+    "archive_path": "deeds_labs/archive/2026-08-11/train-som-384.mts.bak",
+    "sha256": "94596d7f319bea09a2a75bb6e5171872249b199aeae85d62e44d090a654b4ba8",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Orphaned Phase-2-Step-10 SOM trainer, hardcoded to a legacy data/atlas-ml/snapshot_5k_384dim.parquet input. Zero callers found (grep across package.json and all scripts). Superseded by the live, npm-wired train-som-20x20.mjs (atlas:som:train, atlas:phase16:som:{dry,apply}), which was fixed to --dim 768 in the same session per the 768-dim canonical migration (parent-atlas-768-dim-migration). Part of that migration's orphaned-script cleanup."
+  },
+  {
+    "path": "scripts/atlas/train-kmeans-384.mts",
+    "archive_path": "deeds_labs/archive/2026-08-11/train-kmeans-384.mts.bak",
+    "sha256": "088631b2100e6b3f898b2645be37e8f5a4f7d2d40981015359ae521d00a96654",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Orphaned 384-dim K-means trainer, explicitly documented by its own 768-dim sibling's docstring as superseded (\"384 is not a valid embeddinggemma Matryoshka truncation boundary\"). Zero npm-script callers. Live KMeans clustering is owned by kmeans-chunk-cluster.py (GPU/RAPIDS, wired via atlas:kmeans:{dry,apply,apply:k64,apply:k256} etc.) — this JS CPU K=32 implementation was never the canonical path. Part of the 768-dim canonical migration's orphaned-script cleanup."
+  },
+  {
+    "path": "scripts/atlas/train-kmeans-768.mts",
+    "archive_path": "deeds_labs/archive/2026-08-11/train-kmeans-768.mts.bak",
+    "sha256": "5a65d7c9ebe02255753988e9c3606d811b43133c806ada38595904a12f622b75",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "768-dim CPU K=32 K-means trainer, self-documented as the correct successor to train-kmeans-384.mts, but never wired into package.json. Not archived for being wrong — archived because the live canonical KMeans path is kmeans-chunk-cluster.py (GPU/RAPIDS, k=64/128/256, with centroid writeback + Qdrant payload backfill + summary enrichment already live). Wiring this file in addition would create a second competing KMeans owner, which root CLAUDE.md's Duplication Prevention rule (Aug 9 2026) explicitly prohibits without an explicit classification decision. If the CPU-only path is ever needed (no GPU available), recover from archive and register it as an explicit BACKEND under the canonical KMeans owner, not a peer implementation."
+  },
+  {
     "path": "sveltekit-frontend/src/lib/server/mcp/server.ts",
     "archive_path": "deeds_labs/archive/2026-08-01/lib-server-mcp-server.ts.bak",
     "sha256": "e888c158f397d6e0db42bc62aca23c94e75b69d53896c9e0cb8c56e2e545f694",

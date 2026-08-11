@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib
+import json
 from importlib import metadata as importlib_metadata
 from datetime import datetime
 import os
@@ -328,6 +329,15 @@ class ExperimentFeatureMatrix(BaseModel):
     output_hash: str
 
 
+class EventHypergraphPayload(BaseModel):
+    events: list[dict[str, Any]] = Field(default_factory=list)
+    ontology_event_tuples: list[dict[str, Any]] = Field(default_factory=list)
+    event_breadth_features: Optional[dict[str, Any]] = None
+    recommendation_feature_rows: list[dict[str, Any]] = Field(default_factory=list)
+    recommendation_judgment: Optional[dict[str, Any]] = None
+    event_sort_revision: str = "atlas.event.sort.v1"
+
+
 class AnalyzeResponse(BaseModel):
     document_id: str
     source_type: SOURCE_TYPES
@@ -342,6 +352,7 @@ class AnalyzeResponse(BaseModel):
     pass_results: list[AnalysisPassResult] = Field(default_factory=list)
     control5: Optional[Control5] = None
     experiment_feature_matrix: Optional[ExperimentFeatureMatrix] = None
+    event_hypergraph: Optional[EventHypergraphPayload] = None
     processing_time_ms: int
 
 
@@ -850,6 +861,18 @@ def _digest_parts(*parts: Any) -> str:
     return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
+def _unique_nonempty(values: list[Any]) -> list[str]:
+    return list(dict.fromkeys(str(value).strip() for value in values if str(value).strip()))
+
+
+def _stable_json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str)
+
+
+def _event_hash(payload: dict[str, Any]) -> str:
+    return f"evt:{hashlib.sha256(_stable_json(payload).encode('utf-8')).hexdigest()[:24]}"
+
+
 def _build_ast_units(req: AnalyzeRequest, text: str, chunks: list[Chunk], language: str) -> list[AstUnit]:
     ast_units: list[AstUnit] = []
     parser_engine = "tree-sitter" if TREE_SITTER_AVAILABLE else "regex"
@@ -1109,6 +1132,250 @@ def _build_experiment_feature_matrix(
         pass_count=len(pass_results),
         input_hash=_digest_parts(req.text, req.source_ref, source_revision, req.packet_key, req.model_id),
         output_hash=_digest_parts(pass_results, control5),
+    )
+
+
+def _build_event_hypergraph(
+    req: AnalyzeRequest,
+    text: str,
+    entities: list[Entity],
+    relationships: list[Relationship],
+    chunks: list[Chunk],
+    ast_units: list[AstUnit],
+    semantic_cards: list[SemanticCodeCard],
+    observations: list[HMMObservation],
+    pass_results: list[AnalysisPassResult],
+    control5: Optional[Control5],
+    experiment_feature_matrix: Optional[ExperimentFeatureMatrix],
+) -> EventHypergraphPayload:
+    source_ref = req.source_ref or req.document_id or "unknown"
+    source_revision = req.model_id or "unknown"
+    workspace_revision = req.model_id or req.document_id or "unknown"
+    observed_at = datetime.utcnow().isoformat() + "Z"
+    packet_key = req.packet_key or req.document_id or source_ref
+
+    events: list[dict[str, Any]] = []
+
+    def add_event(
+        event_type: str,
+        participants: list[dict[str, str]],
+        evidence_refs: list[str],
+        metadata: dict[str, Any],
+    ) -> None:
+        canonical_participants = sorted(
+            participants,
+            key=lambda item: (item.get("role", ""), item.get("entity_kind", ""), item.get("entity_id", "")),
+        )
+        canonical_evidence = _unique_nonempty(evidence_refs)
+        payload = {
+            "schema_version": "atlas.event.hypergraph.v1",
+            "event_type": event_type,
+            "source_ref": source_ref,
+            "packet_key": packet_key,
+            "tree_node_id": metadata.get("tree_node_id"),
+            "workspace_revision": workspace_revision,
+            "source_revision": source_revision,
+            "representation_revision": req.model_id or "semantic-768-v1",
+            "producer_id": "miniforge-nlp-sidecar",
+            "producer_revision": _package_version("langextract") or "sidecar-v1",
+            "canonicalizer_revision": "event-canonicalizer-v1",
+            "compiler_revision": "event-hypergraph-v1",
+            "observed_at": observed_at,
+            "evidence_refs": canonical_evidence,
+            "participants": canonical_participants,
+            "metadata": metadata,
+        }
+        events.append({**payload, "event_id": _event_hash(payload)})
+
+    for idx, unit in enumerate(ast_units[:20]):
+        participants: list[dict[str, str]] = [
+            {
+                "entity_id": unit.qualified_symbol or unit.tree_node_id,
+                "entity_kind": "symbol" if unit.qualified_symbol else "tree_node",
+                "role": "actor",
+            },
+            {"entity_id": packet_key, "entity_kind": "packet", "role": "packet"},
+            {"entity_id": unit.parser_engine, "entity_kind": "parser", "role": "tool"},
+        ]
+        if unit.calls:
+            participants.append({"entity_id": unit.calls[0], "entity_kind": "symbol", "role": "target"})
+        if unit.references:
+            participants.append({"entity_id": unit.references[0], "entity_kind": "symbol", "role": "evidence"})
+        add_event(
+            "call_execution" if unit.calls else "reference_link" if unit.references else "semantic_annotation",
+            participants,
+            [f"{unit.source_ref}#tree-node:{unit.tree_node_id}", unit.content_hash],
+            {"index": idx, "tree_node_id": unit.tree_node_id, "symbol_version_id": unit.symbol_version_id},
+        )
+
+    for idx, card in enumerate(semantic_cards[:20]):
+        add_event(
+            "semantic_annotation",
+            [
+                {"entity_id": card.symbol, "entity_kind": "symbol", "role": "actor"},
+                {"entity_id": packet_key, "entity_kind": "packet", "role": "packet"},
+                {"entity_id": card.semantic_revision, "entity_kind": "representation", "role": "context"},
+            ],
+            [card.input_hash, card.output_hash],
+            {"index": idx, "tree_node_id": card.tree_node_id, "symbol_version_id": card.symbol_version_id},
+        )
+
+    for idx, obs in enumerate(observations[:20]):
+        add_event(
+            "workflow_transition",
+            [
+                {"entity_id": obs.observation, "entity_kind": "observation", "role": "actor"},
+                {"entity_id": packet_key, "entity_kind": "packet", "role": "packet"},
+                {"entity_id": obs.source_pass, "entity_kind": "pass", "role": "trigger"},
+            ],
+            [obs.request_id, obs.source_ref],
+            {"index": idx, "position": obs.position, "state_hint": obs.state_hint},
+        )
+
+    for idx, rel in enumerate(relationships[:20]):
+        add_event(
+            "tool_call" if rel.predicate == "calls" else "import_resolution" if rel.predicate == "imports" else "reference_link",
+            [
+                {"entity_id": rel.subject, "entity_kind": "symbol", "role": "actor"},
+                {"entity_id": rel.object, "entity_kind": "symbol", "role": "target"},
+                {"entity_id": packet_key, "entity_kind": "packet", "role": "packet"},
+            ],
+            [rel.source_ref, rel.subject, rel.object],
+            {"index": idx, "predicate": rel.predicate, "confidence": rel.confidence},
+        )
+
+    if not events:
+        add_event(
+            "semantic_annotation",
+            [
+                {"entity_id": source_ref, "entity_kind": "source_ref", "role": "actor"},
+                {"entity_id": packet_key, "entity_kind": "packet", "role": "packet"},
+            ],
+            [source_ref],
+            {"fallback": True},
+        )
+
+    ontology_event_tuples: list[dict[str, Any]] = []
+    for event in events:
+        for idx, participant in enumerate(event["participants"]):
+            ontology_event_tuples.append(
+                {
+                    "tuple_id": _event_hash({"event_id": event["event_id"], "participant": participant, "index": idx}),
+                    "event_id": event["event_id"],
+                    "subject_id": event["event_id"],
+                    "predicate": f"participant:{participant['role']}",
+                    "object_id": participant["entity_id"],
+                    "participant_role": participant["role"],
+                    "evidence_ref": event["evidence_refs"][0] if event["evidence_refs"] else source_ref,
+                    "domain_class": participant["entity_kind"],
+                    "source_revision": source_revision,
+                    "representation_revision": event["representation_revision"],
+                    "previous_revision_id": None,
+                    "supersedes_revision_id": None,
+                    "generated_at": observed_at,
+                }
+            )
+
+    event_types = _unique_nonempty([event["event_type"] for event in events])
+    workflow_breadth = len(_unique_nonempty([packet_key, source_ref] + [event["event_id"] for event in events]))
+    task_breadth = len(_unique_nonempty([result.pass_name for result in pass_results]))
+    symbol_breadth = len(_unique_nonempty([unit.qualified_symbol or unit.tree_node_id for unit in ast_units] + [card.symbol for card in semantic_cards]))
+    neighborhood_breadth = len(_unique_nonempty([relationship.subject for relationship in relationships] + [relationship.object for relationship in relationships]))
+
+    event_breadth_features = {
+        "packet_key": packet_key,
+        "workflow_breadth": workflow_breadth,
+        "task_breadth": task_breadth,
+        "symbol_breadth": symbol_breadth,
+        "event_type_breadth": len(event_types),
+        "neighborhood_breadth": neighborhood_breadth,
+        "telemetry_revision": "event-breadth-v1",
+    }
+
+    semantic_score = float((experiment_feature_matrix.dense_cosine if experiment_feature_matrix else None) or control5.semantic_confidence or 0.5)
+    structural_score = float((experiment_feature_matrix.ast_match if experiment_feature_matrix else None) or control5.structural_confidence or 0.5)
+    graph_score = float(
+        (experiment_feature_matrix.pagerank if experiment_feature_matrix else None)
+        or (experiment_feature_matrix.cheirank if experiment_feature_matrix else None)
+        or (experiment_feature_matrix.community_affinity if experiment_feature_matrix else None)
+        or 0.0
+    )
+    workflow_score = min(1.0, workflow_breadth / max(1, len(events)))
+    breadth_score = min(1.0, len(event_types) / 10.0)
+
+    recommendation_feature_rows: list[dict[str, Any]] = []
+    for event in events[:8]:
+        recommendation_feature_rows.append(
+            {
+                "event_id": event["event_id"],
+                "candidate_key": event["event_id"],
+                "packet_key": packet_key,
+                "semantic_score": semantic_score,
+                "structural_score": structural_score,
+                "graph_score": graph_score,
+                "workflow_score": workflow_score,
+                "breadth_score": breadth_score,
+                "approximation_score": 0.0,
+                "utility_bias": 0.0,
+                "token_cost": min(1000, len(text)),
+                "latency_ms": 0.0,
+                "evidence_coverage": min(1.0, len(event["evidence_refs"]) / 3.0),
+                "freshness_score": 1.0,
+                "feature_revision": experiment_feature_matrix.feature_revision if experiment_feature_matrix else "event-recommendation-v1",
+                "graph_revision": experiment_feature_matrix.graph_revision if experiment_feature_matrix else None,
+                "event_revision": "event-hypergraph-v1",
+            }
+        )
+
+    recommendation_judgment: Optional[dict[str, Any]] = None
+    if recommendation_feature_rows:
+        row = recommendation_feature_rows[0]
+        raw_score = (
+            ((row["semantic_score"] + row["structural_score"] + row["graph_score"]) / 3.0) * 0.45
+            + ((row["workflow_score"] + row["breadth_score"] + row["freshness_score"]) / 3.0) * 0.35
+            + row["evidence_coverage"] * 0.1
+            - row["approximation_score"] * 0.2
+            - min(1.0, (row["token_cost"] / 10000.0) + (row["latency_ms"] / 1000.0) * 0.15)
+        )
+        score = max(0.0, min(1.0, round(raw_score, 6)))
+        action = "skip"
+        if score >= 0.82:
+            action = "inspect"
+        elif score >= 0.7:
+            action = "test"
+        elif score >= 0.58:
+            action = "prefetch"
+        elif score >= 0.45:
+            action = "graph_expand"
+        elif score >= 0.3:
+            action = "document"
+        recommendation_judgment = {
+            "candidate_key": row["candidate_key"],
+            "action": action,
+            "score": score,
+            "reasons": _unique_nonempty(
+                [
+                    "semantic evidence strong" if row["semantic_score"] >= 0.7 else None,
+                    "structural evidence strong" if row["structural_score"] >= 0.7 else None,
+                    "graph evidence strong" if row["graph_score"] >= 0.7 else None,
+                    "workflow evidence present" if row["workflow_score"] >= 0.5 else None,
+                    "evidence coverage sufficient" if row["evidence_coverage"] >= 0.5 else None,
+                ]
+            ),
+            "policy_revision": "recommendation-policy-v1",
+            "feature_revision": row["feature_revision"],
+            "event_revision": row["event_revision"],
+            "exact_oracle_delta": None,
+            "oracle_validated": False,
+            "generated_at": observed_at,
+        }
+
+    return EventHypergraphPayload(
+        events=events,
+        ontology_event_tuples=ontology_event_tuples,
+        event_breadth_features=event_breadth_features,
+        recommendation_feature_rows=recommendation_feature_rows,
+        recommendation_judgment=recommendation_judgment,
     )
 
 
@@ -1379,6 +1646,19 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         chunks,
         features,
     )
+    event_hypergraph = _build_event_hypergraph(
+        req,
+        text,
+        entities,
+        relationships,
+        chunks,
+        ast_units,
+        semantic_cards,
+        hmm_observations,
+        pass_results,
+        control5,
+        experiment_feature_matrix,
+    )
     metadata: dict[str, Any] = {
         "source_ref": req.source_ref,
         "packet_key": req.packet_key,
@@ -1413,6 +1693,7 @@ def _analyze(req: AnalyzeRequest) -> AnalyzeResponse:
         pass_results=pass_results,
         control5=control5,
         experiment_feature_matrix=experiment_feature_matrix,
+        event_hypergraph=event_hypergraph,
         processing_time_ms=int((time.perf_counter() - started) * 1000),
     )
 

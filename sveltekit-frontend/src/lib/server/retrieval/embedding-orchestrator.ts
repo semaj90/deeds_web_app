@@ -18,6 +18,7 @@ import {
   CLIPModel
 } from './embedding-models';
 import { logger } from '../logger.js';
+import { ENV } from '$lib/server/env.server.js';
 
 export interface EmbeddingRequest {
   text: string;
@@ -52,12 +53,12 @@ class EmbeddingOrchestrator {
     ollamaUrl?: string
   ): Promise<void> {
     this.laneSelector = selectEmbeddingLane(availableVramMb, preferredLane);
-    this.models = createEmbeddingModels(ollamaUrl || 'http://127.0.0.1:11434');
+    this.models = createEmbeddingModels(ollamaUrl || ENV.OLLAMA_BASE_URL || 'http://127.0.0.1:11434');
     logger.info('[EmbeddingOrchestrator] Initialized', {
       selected_lane: this.laneSelector.selected_lane,
       fallback_chain: this.laneSelector.fallback_chain,
       reasoning: this.laneSelector.reasoning,
-      ollama_url: ollamaUrl || 'http://127.0.0.1:11434'
+      ollama_url: ollamaUrl || ENV.OLLAMA_BASE_URL || 'http://127.0.0.1:11434'
     });
   }
 

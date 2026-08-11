@@ -21,6 +21,7 @@ import { VECTOR_LANES as VECTOR_CONFIG_LANES, getVectorLaneMetadata } from '../c
 import { CANONICAL_EMBEDDING_DIMENSION } from '../atlas/contracts/canonical-chunk-contract.js';
 import { sql, type SQL } from 'drizzle-orm';
 
+import { ENV } from '$lib/server/env.server.js';
 async function getDb() {
   const mod = await import('../db/client.js');
   return mod.db;
@@ -247,7 +248,7 @@ export class GpuCuvSLane extends SearchLaneBase {
   private url: string;
   private timeout: number;
 
-  constructor(url = 'http://127.0.0.1:8791', timeout = 30000) {
+  constructor(url = ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791', timeout = 30000) {
     super();
     this.url = url;
     this.timeout = timeout;
@@ -341,7 +342,7 @@ export class QdrantLane extends SearchLaneBase {
   private timeout: number;
 
   constructor(
-    url = 'http://127.0.0.1:6333',
+    url = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333',
     collection = VECTOR_LANES.source768.collection,
     embeddingDimension = VECTOR_LANES.source768.dimension,
     embeddingLane: 'dense_384' | 'dense_768' = 'dense_768',
@@ -467,7 +468,7 @@ export class QdrantLane768 extends QdrantLane {
   name = 'qdrant-768' as const;
 
   constructor(
-    url = 'http://127.0.0.1:6333',
+    url = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333',
     collection = VECTOR_LANES.source768.collection,
     embeddingDimension = VECTOR_LANES.source768.dimension,
     timeout = 30000
@@ -495,7 +496,7 @@ export class QdrantLane384 extends SearchLaneBase {
   private timeout: number;
 
   constructor(
-    url = 'http://127.0.0.1:6333',
+    url = ENV.QDRANT_URL ?? 'http://127.0.0.1:6333',
     collection = 'codebase_chunks_384_hybrid',
     namedVector = 'content',
     embeddingDimension = 384,

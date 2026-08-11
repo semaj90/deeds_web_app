@@ -13,6 +13,7 @@ import { sql, eq } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { codebaseChunkIndex } from '../db/schema-postgres.js';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface KMeansJob {
   job_id: string;
   feature_id: string;
@@ -36,7 +37,7 @@ export interface KMeansProgressionPlan {
 }
 
 export class TurboVecKMeansLauncher {
-  private turbovecUrl = 'http://127.0.0.1:8791';
+  private turbovecUrl = ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791';
   private pollIntervalMs = 1000;
   private maxWaitTimeMs = 300000; // 5 minutes
 

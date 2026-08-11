@@ -9,15 +9,17 @@
  */
 
 import {
-	claimNextJob,
+	claimBatch,
 	updateAnalysisJob,
 	completeAnalysisJob,
 	failAnalysisJob,
 	resetStaleJobs,
+	ANALYSIS_JOBS_NOTIFY_CHANNEL,
 	type JobType,
 } from './analysis-jobs.js';
+import { recordAnalysisPassResult } from './analysis-pass-results.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, getGateStats } from './concurrency-gate.js';
-import { Pool } from 'pg';
+import { Client, Pool } from 'pg';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -149,21 +151,85 @@ async function runSummarization(_evidenceId: string, meta: Record<string, unknow
 
 // --- Gate + executor mapping ---
 
-const stageConfig: Record<string, {
+const ANALYSIS_WORKER_REVISION = 'analysis-worker-v1';
+const ANALYSIS_WORKER_PRODUCER_ID = 'parent-atlas-analysis-worker';
+
+type AnalysisStageConfig = {
 	gate: ReturnType<typeof import('p-limit').default>;
+	concurrency: number;
+	family: 'structural' | 'lexical' | 'linguistic' | 'semantic' | 'sequence' | 'rerank' | 'grounded';
+	passName: string;
+	passRevision: string;
+	backend: 'native-ts' | 'rust' | 'python-sidecar' | 'gpu-sidecar' | 'offline';
+	backendVersion: string;
+	device: 'cpu' | 'cuda' | 'external';
 	run: (evidenceId: string, meta: Record<string, unknown>) => Promise<Record<string, unknown>>;
-}> = {
-	entity_extraction: { gate: entityGate, run: runEntityExtraction },
-	code_feature_registry: { gate: entityGate, run: runCodeFeatureRegistry }, // Canonical order: after LangExtract
-	forensics: { gate: forensicsGate, run: runForensics },
-	summarization: { gate: summarizeGate, run: runSummarization },
+};
+
+const stageConfig: Record<string, AnalysisStageConfig> = {
+	upload_pipeline: {
+		gate: entityGate,
+		concurrency: 1,
+		family: 'structural',
+		passName: 'upload_pipeline',
+		passRevision: 'upload-pipeline-v1',
+		backend: 'native-ts',
+		backendVersion: ANALYSIS_WORKER_REVISION,
+		device: 'cpu',
+		run: async () => ({ skipped: true, reason: 'upload_pipeline handled upstream' }),
+	},
+	entity_extraction: {
+		gate: entityGate,
+		concurrency: 2,
+		family: 'linguistic',
+		passName: 'entity_extraction',
+		passRevision: 'entity-extraction-v1',
+		backend: 'native-ts',
+		backendVersion: ANALYSIS_WORKER_REVISION,
+		device: 'cpu',
+		run: runEntityExtraction,
+	},
+	forensics: {
+		gate: forensicsGate,
+		concurrency: 4,
+		family: 'grounded',
+		passName: 'forensics',
+		passRevision: 'forensics-v1',
+		backend: 'native-ts',
+		backendVersion: ANALYSIS_WORKER_REVISION,
+		device: 'cpu',
+		run: runForensics,
+	},
+	summarization: {
+		gate: summarizeGate,
+		concurrency: 1,
+		family: 'semantic',
+		passName: 'summarization',
+		passRevision: 'summarization-v1',
+		backend: 'native-ts',
+		backendVersion: ANALYSIS_WORKER_REVISION,
+		device: 'cpu',
+		run: runSummarization,
+	},
+	code_feature_registry: {
+		gate: entityGate,
+		concurrency: 2,
+		family: 'structural',
+		passName: 'code_feature_registry',
+		passRevision: 'ast-grep-feature-registry-v1',
+		backend: 'native-ts',
+		backendVersion: ANALYSIS_WORKER_REVISION,
+		device: 'cpu',
+		run: runCodeFeatureRegistry, // Canonical order: after LangExtract
+	},
 };
 
 // --- Worker loop ---
 
 let workerInterval: ReturnType<typeof setInterval> | null = null;
+let notificationClient: Client | null = null;
 let polling = false;
-const POLL_MS = 3_000;
+const POLL_MS = 30_000;
 
 // Error tracking for exponential backoff
 let consecutiveDbErrors = 0;
@@ -179,28 +245,70 @@ async function pollOnce(): Promise<void> {
 			const cfg = stageConfig[jobType];
 			if (!cfg) continue;
 
-			// Skip if gate is at capacity
-			if (cfg.gate.activeCount >= (cfg.gate as any).concurrency) continue;
+			const freeSlots = Math.max(0, cfg.concurrency - cfg.gate.activeCount - cfg.gate.pendingCount);
+			if (freeSlots <= 0) continue;
 
-			const job = await claimNextJob(jobType);
-			if (!job) continue;
+			const jobs = await claimBatch(jobType, freeSlots);
+			if (jobs.length === 0) continue;
 
 			// Reset backoff on successful claim
 			consecutiveDbErrors = 0;
 
-			// Run inside concurrency gate (non-blocking)
-			gated(cfg.gate, async () => {
-				const t0 = Date.now();
-				try {
-					await updateAnalysisJob(job.id, { progress: '10' });
-					const result = await cfg.run(job.evidenceId, job.result);
-					await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
-					console.log(`[Worker] ${jobType}/${job.id} done in ${Date.now() - t0}ms`);
-				} catch (err) {
-					console.error(`[Worker] ${jobType}/${job.id} failed:`, err);
-					await failAnalysisJob(job.id, String(err)).catch(() => {});
-				}
-			}).catch(() => {});
+			for (const job of jobs) {
+				// Run inside concurrency gate (non-blocking)
+				gated(cfg.gate, async () => {
+					const t0 = Date.now();
+					const startedAt = new Date(t0).toISOString();
+					try {
+						await updateAnalysisJob(job.id, { progress: '10' });
+						const jobResult = job.result as Record<string, unknown>;
+						const result = await cfg.run(job.evidenceId, job.result);
+						const passResult = result as Record<string, unknown>;
+						const finishedAt = new Date();
+						const ledgerInput = {
+							analysisJobId: job.id,
+							evidenceId: job.evidenceId,
+							caseId: job.caseId,
+							jobType,
+							packetKey: (jobResult.packetKey as string | null | undefined) ?? null,
+							sourceRef: (jobResult.sourceRef as string | null | undefined) ?? job.evidenceId,
+							sourceRevision: (jobResult.sourceRevision as string | null | undefined) ?? null,
+							workspaceRevision: (jobResult.workspaceRevision as string | null | undefined) ?? null,
+							representationRevision: (jobResult.representationRevision as string | null | undefined) ?? null,
+							family: cfg.family,
+							passName: cfg.passName,
+							passRevision: cfg.passRevision,
+							producerId: ANALYSIS_WORKER_PRODUCER_ID,
+							producerRevision: ANALYSIS_WORKER_REVISION,
+							backend: cfg.backend,
+							backendVersion: cfg.backendVersion,
+							device: cfg.device,
+							status: 'succeeded' as const,
+							startedAt,
+							completedAt: finishedAt.toISOString(),
+							durationMs: Date.now() - t0,
+							payload: result,
+							features: (passResult.features && typeof passResult.features === 'object' && !Array.isArray(passResult.features)) ? (passResult.features as Record<string, unknown>) : {},
+							artifacts: (passResult.artifacts && typeof passResult.artifacts === 'object' && !Array.isArray(passResult.artifacts)) ? (passResult.artifacts as Record<string, unknown>) : {},
+							evidence: Array.isArray(passResult.evidence) ? (passResult.evidence as Array<Record<string, unknown>>) : [],
+							warnings: Array.isArray(passResult.warnings) ? passResult.warnings.map((warning) => String(warning)) : [],
+							modelId: typeof passResult.modelId === 'string' ? passResult.modelId : null,
+							modelRevision: typeof passResult.modelRevision === 'string' ? passResult.modelRevision : null,
+						};
+
+						const persisted = await recordAnalysisPassResult(ledgerInput);
+						if (persisted === null) {
+							console.warn(`[Worker] ${jobType}/${job.id} pass ledger unavailable; continuing without persistence`);
+						}
+
+						await completeAnalysisJob(job.id, { ...result, durationMs: Date.now() - t0 });
+						console.log(`[Worker] ${jobType}/${job.id} done in ${Date.now() - t0}ms`);
+					} catch (err) {
+						console.error(`[Worker] ${jobType}/${job.id} failed:`, err);
+						await failAnalysisJob(job.id, String(err)).catch(() => {});
+					}
+				}).catch(() => {});
+			}
 		}
 	} catch (err: any) {
 		consecutiveDbErrors++;
@@ -228,6 +336,36 @@ async function pollOnce(): Promise<void> {
 	}
 }
 
+async function startNotificationListener(): Promise<void> {
+	const databaseUrl = process.env.DATABASE_URL;
+	if (!databaseUrl || notificationClient) return;
+
+	try {
+		const client = new Client({
+			connectionString: databaseUrl,
+			application_name: 'parent-atlas-analysis-worker-listener',
+			connectionTimeoutMillis: 3000,
+		});
+		await client.connect();
+		await client.query(`LISTEN ${ANALYSIS_JOBS_NOTIFY_CHANNEL}`);
+		client.on('notification', () => {
+			void pollOnce();
+		});
+		client.on('error', (err) => {
+			console.warn('[Worker] analysis notify listener error:', err);
+		});
+		client.on('end', () => {
+			if (notificationClient === client) {
+				notificationClient = null;
+			}
+		});
+		notificationClient = client;
+		console.log(`[Worker] Listening on ${ANALYSIS_JOBS_NOTIFY_CHANNEL}`);
+	} catch (err) {
+		console.warn('[Worker] analysis notify listener unavailable; using fallback polling only:', err);
+	}
+}
+
 /**
  * Start the analysis worker. Idempotent — safe to call multiple times.
  * Call from hooks.server.ts or a layout server load.
@@ -240,8 +378,9 @@ export function startWorker(): void {
 		if (n > 0) console.log(`[Worker] Reset ${n} stale jobs to queued`);
 	}).catch(() => {});
 
+	void startNotificationListener();
 	workerInterval = setInterval(pollOnce, POLL_MS);
-	console.log('[Worker] Analysis worker started (poll every 3s)');
+	console.log('[Worker] Analysis worker started (poll every 30s, notification wake enabled when available)');
 	pollOnce();
 }
 
@@ -250,8 +389,12 @@ export function stopWorker(): void {
 	if (workerInterval) {
 		clearInterval(workerInterval);
 		workerInterval = null;
-		console.log('[Worker] Analysis worker stopped');
 	}
+	if (notificationClient) {
+		void notificationClient.end().catch(() => {});
+		notificationClient = null;
+	}
+	console.log('[Worker] Analysis worker stopped');
 }
 
 /** Health check stats. */

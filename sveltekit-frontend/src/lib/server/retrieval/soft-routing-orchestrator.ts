@@ -19,6 +19,7 @@ import pg from 'pg';
 import fetch from 'node-fetch';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface RetrievalCandidate {
   packet_key: string;
   source_ref: string;
@@ -68,7 +69,7 @@ export class SoftRoutingOrchestrator {
       connectionString: pgUrl || process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db',
     });
 
-    this.turboVecUrl = turboVecUrl || 'http://127.0.0.1:8791';
+    this.turboVecUrl = turboVecUrl || ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791';
   }
 
   /**

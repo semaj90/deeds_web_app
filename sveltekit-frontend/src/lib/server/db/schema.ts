@@ -160,6 +160,7 @@ export * from './schema/topology';
 export * from './schema/graph-authority-v2';
 export * from './schema/graph-analysis-runs';
 export * from './schema/analysis-runs-v2';
+export * from './schema/analysis-pass-results';
 export * from './schema/model-analysis-runs';
 export * from './schema/experiment-analysis-runs';
 export * from './schema/graph-pathway-cards';

@@ -12,6 +12,7 @@ import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { db } from '$lib/server/db/client';
 import { env } from '$env/dynamic/private';
+import { ENV } from '$lib/server/env.server.js';
 import { assertSemantic768 } from '$lib/server/embedding/embedding-contract-768.js';
 
 interface QdrantResponse {
@@ -53,7 +54,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
   try {
     // Step 1: Embed query (using Ollama embeddinggemma)
-    const embedResponse = await fetch(`${env.OLLAMA_HOST || 'http://127.0.0.1:11434'}/api/embeddings`, {
+    const embedResponse = await fetch(`${env.OLLAMA_HOST || ENV.OLLAMA_BASE_URL || 'http://127.0.0.1:11434'}/api/embeddings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

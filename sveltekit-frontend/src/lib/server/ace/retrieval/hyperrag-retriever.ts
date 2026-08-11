@@ -13,6 +13,7 @@ import {
 import type { AceEvidence } from '../contracts/ace-context-packet.js';
 import { LlamaTokenizerClient } from '../tokenizer/llama-tokenizer-client.js';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface HyperRagRetrieverConfig {
   workspaceRevision: string;
   specificationRevision: string;
@@ -40,7 +41,7 @@ export class HyperRagRetriever {
     this.config = config;
     this.cache = new RevisionAwareCache();
     this.tokenizer = new LlamaTokenizerClient({
-      baseUrl: 'http://127.0.0.1:8090',
+      baseUrl: ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090',
       model: 'gemma4-legal-iq4xs-direct.gguf'
     });
 

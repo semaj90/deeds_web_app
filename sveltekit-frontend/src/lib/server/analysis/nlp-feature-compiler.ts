@@ -11,6 +11,18 @@
 
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import {
+	buildAtlasEvent,
+	buildEventBreadthFeatures,
+	buildEventRecommendationFeatureRow,
+	compileOntologyEventTuples,
+	judgeRecommendation,
+	type AtlasEvent,
+	type EventBreadthFeatures,
+	type EventRecommendationFeatureRow,
+	type OntologyEventTuple,
+	type RecommendationJudgment,
+} from './event-hypergraph-contract.js';
 
 const EvidenceSpanSchema = z
 	.object({
@@ -259,6 +271,25 @@ export const ExperimentFeatureMatrixSchema = z
 	.strict();
 export type ExperimentFeatureMatrix = z.infer<typeof ExperimentFeatureMatrixSchema>;
 
+export interface EventHypergraphBundle {
+	events: AtlasEvent[];
+	ontologyEventTuples: OntologyEventTuple[];
+	eventBreadthFeatures: EventBreadthFeatures | null;
+	recommendationFeatureRows: EventRecommendationFeatureRow[];
+	recommendationJudgment: RecommendationJudgment | null;
+}
+
+export interface CompileEventHypergraphBundleInput {
+	requestId: string;
+	packetKey?: string | null;
+	sourceRef: string;
+	sourceRevision: string;
+	workspaceRevision?: string | null;
+	passResults: AnalysisPassResult[];
+	control5?: Control5 | null;
+	experimentFeatureMatrix?: ExperimentFeatureMatrix | null;
+}
+
 export interface CompileExperimentFeatureMatrixInput {
 	requestId?: string;
 	packetKey?: string | null;
@@ -377,4 +408,181 @@ export function compileExperimentFeatureMatrix(
 	});
 
 	return { matrix, control5 };
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+	return value as Record<string, unknown>;
+}
+
+function asStringArray(value: unknown): string[] {
+	return Array.isArray(value) ? value.map((item) => String(item ?? '').trim()).filter(Boolean) : [];
+}
+
+function firstNonEmpty(...values: Array<string | null | undefined>): string {
+	for (const value of values) {
+		const text = String(value ?? '').trim();
+		if (text) return text;
+	}
+	return 'unknown';
+}
+
+export function compileEventHypergraphBundle(input: CompileEventHypergraphBundleInput): EventHypergraphBundle {
+	const packetKey = input.packetKey ?? input.requestId;
+	const sourceRevision = input.sourceRevision;
+	const workspaceRevision = input.workspaceRevision ?? sourceRevision;
+	const observedAt = new Date().toISOString();
+	const events: AtlasEvent[] = [];
+
+	for (const [index, passResult] of input.passResults.entries()) {
+		const passArtifacts = asRecord(passResult.artifacts);
+		const astUnits = asStringArray(passArtifacts?.ast_units as unknown);
+		const semanticCards = asStringArray(passArtifacts?.semantic_cards as unknown);
+		const observations = asStringArray(passArtifacts?.observations as unknown);
+		const eventType =
+			passResult.family === 'structural' ? 'call_execution'
+			: passResult.family === 'semantic' ? 'semantic_annotation'
+			: passResult.family === 'sequence' ? 'workflow_transition'
+			: passResult.family === 'rerank' ? 'rerank_decision'
+			: passResult.family === 'grounded' ? 'ontology_link'
+			: 'reference_link';
+
+		const primaryEntity = firstNonEmpty(
+			passResult.packetKey,
+			passArtifacts?.tree_node_id as string | undefined,
+			passArtifacts?.symbol as string | undefined,
+			passResult.sourceRef,
+		);
+		const participants = [
+			{ entityId: firstNonEmpty(passResult.sourceRef), entityKind: 'source_ref', role: 'actor' as const },
+			{ entityId: packetKey, entityKind: 'packet', role: 'packet' as const },
+			{ entityId: passResult.passName, entityKind: 'pass', role: 'tool' as const },
+			{ entityId: primaryEntity, entityKind: passResult.family === 'semantic' ? 'symbol' : 'artifact', role: 'target' as const },
+		];
+		if (astUnits.length > 0) {
+			participants.push({ entityId: astUnits[0]!, entityKind: 'ast_unit', role: 'evidence' as const });
+		}
+		if (semanticCards.length > 0) {
+			participants.push({ entityId: semanticCards[0]!, entityKind: 'semantic_card', role: 'context' as const });
+		}
+		if (observations.length > 0) {
+			participants.push({ entityId: observations[0]!, entityKind: 'observation', role: 'trigger' as const });
+		}
+
+		events.push(
+			buildAtlasEvent({
+				schemaVersion: 'atlas.event.hypergraph.v1',
+				eventType,
+				sourceRef: passResult.sourceRef,
+				packetKey: passResult.packetKey ?? packetKey,
+				treeNodeId: (passArtifacts?.tree_node_id as string | undefined) ?? null,
+				workspaceRevision,
+				sourceRevision,
+				representationRevision: input.experimentFeatureMatrix?.representationRevision ?? sourceRevision,
+				producerId: 'nlp-feature-compiler',
+				producerRevision: 'event-hypergraph-v1',
+				canonicalizerRevision: 'event-canonicalizer-v1',
+				compilerRevision: 'nlp-feature-compiler-v1',
+				observedAt,
+				evidenceRefs: [passResult.inputHash, passResult.outputHash].filter(Boolean),
+				participants,
+				metadata: {
+					passName: passResult.passName,
+					passRevision: passResult.passRevision,
+					passFamily: passResult.family,
+					passIndex: index,
+					featureKeys: Object.keys(passResult.features ?? {}),
+				},
+			}),
+		);
+	}
+
+	if (events.length === 0) {
+		events.push(
+			buildAtlasEvent({
+				schemaVersion: 'atlas.event.hypergraph.v1',
+				eventType: 'semantic_annotation',
+				sourceRef: input.sourceRef,
+				packetKey,
+				treeNodeId: null,
+				workspaceRevision,
+				sourceRevision,
+				representationRevision: input.experimentFeatureMatrix?.representationRevision ?? sourceRevision,
+				producerId: 'nlp-feature-compiler',
+				producerRevision: 'event-hypergraph-v1',
+				canonicalizerRevision: 'event-canonicalizer-v1',
+				compilerRevision: 'nlp-feature-compiler-v1',
+				observedAt,
+				evidenceRefs: [input.requestId],
+				participants: [
+					{ entityId: input.sourceRef, entityKind: 'source_ref', role: 'actor' },
+					{ entityId: packetKey, entityKind: 'packet', role: 'packet' },
+				],
+				metadata: { fallback: true },
+			}),
+		);
+	}
+
+	const ontologyEventTuples = events.flatMap((event) => compileOntologyEventTuples(event));
+	const passNames = input.passResults.map((result) => result.passName);
+	const eventTypes = events.map((event) => event.eventType);
+	const eventBreadthFeatures = buildEventBreadthFeatures({
+		packetKey,
+		workflowIds: [packetKey, input.sourceRef, workspaceRevision, ...passNames],
+		taskIds: passNames,
+		symbolIds: input.passResults.flatMap((result) =>
+			Object.values(asRecord(result.artifacts) ?? {}).flatMap((artifact) => asStringArray(artifact as unknown)),
+		),
+		eventTypes,
+		neighborhoodIds: events.flatMap((event) => event.participants.map((participant) => participant.entityId)),
+		telemetryRevision: 'event-breadth-v1',
+	});
+
+	const semanticScore = input.experimentFeatureMatrix?.dense_cosine ?? input.control5?.semantic_confidence ?? 0.5;
+	const structuralScore = input.experimentFeatureMatrix?.ast_match ?? input.control5?.structural_confidence ?? 0.5;
+	const graphScore =
+		input.experimentFeatureMatrix?.pagerank ??
+		input.experimentFeatureMatrix?.cheirank ??
+		input.experimentFeatureMatrix?.community_affinity ??
+		0;
+	const workflowScore = Math.min(1, eventBreadthFeatures.workflowBreadth / Math.max(1, events.length));
+	const breadthScore = Math.min(1, eventBreadthFeatures.eventTypeBreadth / 10);
+	const eventRevision = input.experimentFeatureMatrix?.representationRevision ?? sourceRevision;
+
+	const recommendationFeatureRows = events.slice(0, 8).map((event) =>
+		buildEventRecommendationFeatureRow({
+			eventId: event.eventId,
+			candidateKey: event.eventId,
+			packetKey,
+			semanticScore,
+			structuralScore,
+			graphScore,
+			workflowScore,
+			breadthScore,
+			approximationScore: 0,
+			utilityBias: 0,
+			tokenCost: Math.min(1000, input.requestId.length + input.sourceRef.length),
+			latencyMs: 0,
+			evidenceCoverage: Math.min(1, event.evidenceRefs.length / 3),
+			freshnessScore: 1,
+			featureRevision: input.experimentFeatureMatrix?.featureRevision ?? 'event-recommendation-v1',
+			graphRevision: input.experimentFeatureMatrix?.graphRevision ?? null,
+			eventRevision,
+		}),
+	);
+
+	const recommendationJudgment = recommendationFeatureRows[0]
+		? judgeRecommendation({
+				...recommendationFeatureRows[0],
+				policyRevision: 'recommendation-policy-v1',
+			})
+		: null;
+
+	return {
+		events,
+		ontologyEventTuples,
+		eventBreadthFeatures,
+		recommendationFeatureRows,
+		recommendationJudgment,
+	};
 }

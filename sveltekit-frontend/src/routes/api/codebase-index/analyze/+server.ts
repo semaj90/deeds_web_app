@@ -22,6 +22,7 @@ import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bri
 import { z } from 'zod';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { compileEventHypergraphBundle } from '$lib/server/analysis/nlp-feature-compiler.js';
 import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 
 const SRC_ROOT = resolve(process.cwd(), 'src');
@@ -179,6 +180,7 @@ ${contentForLLM}
 				pass_results: unknown[];
 				control5: unknown;
 				experiment_feature_matrix: unknown;
+				event_hypergraph: unknown;
 			},
 			analyzedAt: new Date().toISOString(),
 			_perf: {
@@ -199,12 +201,25 @@ ${contentForLLM}
 				passes: ['structural', 'lexical', 'linguistic', 'semantic', 'sequence'],
 				groundedExtractionRequired: false,
 			});
+			const eventHypergraph =
+				structured.event_hypergraph ??
+				compileEventHypergraphBundle({
+					requestId: structured.document_id,
+					packetKey: relPath,
+					sourceRef: relPath,
+					sourceRevision: relPath,
+					workspaceRevision: relPath,
+					passResults: structured.pass_results ?? [],
+					control5: structured.control5 ?? null,
+					experimentFeatureMatrix: structured.experiment_feature_matrix ?? null,
+				});
 
 			result.structured = {
 				document_id: structured.document_id,
 				pass_results: structured.pass_results ?? [],
 				control5: structured.control5 ?? null,
 				experiment_feature_matrix: structured.experiment_feature_matrix ?? null,
+				event_hypergraph: eventHypergraph,
 			};
 		} catch (structuredErr) {
 			console.warn('[codebase-index/analyze] structured sidecar unavailable:', structuredErr);

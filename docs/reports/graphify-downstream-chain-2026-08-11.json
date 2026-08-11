@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-08-11T02:33:35.633Z",
+  "mode": "dry-run",
+  "dryRun": true,
+  "stages": {
+    "graphify_readiness_check": {
+      "status": "timeout",
+      "polls": 60,
+      "elapsed_ms": 169071,
+      "coreStatus": "WARN"
+    },
+    "pagerank": {
+      "status": "pass"
+    },
+    "kanban_emit": {
+      "status": "pass"
+    },
+    "turbovec": {
+      "status": "pass"
+    },
+    "kanban_db_write": {
+      "status": "pass",
+      "tasks_found": 3313,
+      "note": "dry-run mode, no writes"
+    }
+  },
+  "errors": [],
+  "summary": {
+    "success": true,
+    "message": "Pipeline complete",
+    "elapsed_ms": 197509
+  }
+}

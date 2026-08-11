@@ -127,6 +127,10 @@ import {
   buildFeatureDocumentEnrichmentPlan,
   materializeFeatureEvidenceTuples,
 } from '../lib/server/atlas/feature-doc-enrichment.js';
+import {
+  buildPosConceptTaggingPacket,
+  PosConceptTaggingRequestSchema,
+} from '../lib/server/atlas/pos-concept-tagging-lane.js';
 import { buildTaxonomyTopologyPacket } from '../lib/server/atlas/taxonomy-topology-packet.js';
 import { getFeatureDocumentEvidence } from '../lib/server/atlas/feature-document-evidence.js';
 import { getParentAtlasWorkstationSnapshot } from '../lib/server/atlas/parent-atlas-workstation.js';
@@ -9851,6 +9855,66 @@ server.registerTool(
         tuple_count: result.tuples.length,
         tuples: result.tuples,
         warnings: result.plan.warnings,
+      };
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      return { status: 'error', error: errorMsg.slice(0, 500) };
+    }
+  }
+);
+
+server.registerTool(
+  'atlas.pos_concept_tagging',
+  {
+    description:
+      'Build a deterministic POS/concept tagging packet from AST, semantic, topology, ranking, citation, screenshot, and MCP tool-call evidence. ' +
+      'Returns versioned ontology-linked tuples and the packet envelope without writing canonical truth.',
+    inputSchema: PosConceptTaggingRequestSchema,
+  },
+  async (input: Record<string, unknown>) => {
+    try {
+      const packet = buildPosConceptTaggingPacket({
+        schemaVersion: 'pos-concept-tagging-lane.v1',
+        packetKey: String(input.packetKey ?? ''),
+        sourceRef: String(input.sourceRef ?? ''),
+        sourceRevision: String(input.sourceRevision ?? ''),
+        featureId: String(input.featureId ?? ''),
+        featureLabel: String(input.featureLabel ?? ''),
+        treeNodeId: typeof input.treeNodeId === 'string' ? input.treeNodeId : input.treeNodeId == null ? null : String(input.treeNodeId),
+        titleId: typeof input.titleId === 'string' ? input.titleId : input.titleId == null ? null : String(input.titleId),
+        representationId: 'semantic_768',
+        representationRevision: String(input.representationRevision ?? ''),
+        producerId: String(input.producerId ?? 'pos-concept-tagging-lane'),
+        producerRevision: String(input.producerRevision ?? ''),
+        featureRevision: String(input.featureRevision ?? ''),
+        graphRevision: typeof input.graphRevision === 'string' ? input.graphRevision : input.graphRevision == null ? null : String(input.graphRevision),
+        ontologyRevision: typeof input.ontologyRevision === 'string' ? input.ontologyRevision : input.ontologyRevision == null ? null : String(input.ontologyRevision),
+        modelRevision: typeof input.modelRevision === 'string' ? input.modelRevision : input.modelRevision == null ? null : String(input.modelRevision),
+        partOfSpeech: typeof input.partOfSpeech === 'string' ? input.partOfSpeech : input.partOfSpeech == null ? null : String(input.partOfSpeech),
+        astSymbols: Array.isArray(input.astSymbols) ? input.astSymbols.map((value) => String(value)) : [],
+        semanticConceptIds: Array.isArray(input.semanticConceptIds) ? input.semanticConceptIds.map((value) => String(value)) : [],
+        ontologyIds: Array.isArray(input.ontologyIds) ? input.ontologyIds.map((value) => String(value)) : [],
+        citations: Array.isArray(input.citations) ? input.citations : [],
+        screenshots: Array.isArray(input.screenshots) ? input.screenshots : [],
+        policySummary: typeof input.policySummary === 'string' ? input.policySummary : input.policySummary == null ? null : String(input.policySummary),
+        mcpToolCalls: Array.isArray(input.mcpToolCalls) ? input.mcpToolCalls : [],
+        rankingSignals: typeof input.rankingSignals === 'object' && input.rankingSignals ? input.rankingSignals : {},
+        participants: Array.isArray(input.participants) ? input.participants : [],
+        concepts: Array.isArray(input.concepts) ? input.concepts : [],
+        sourceTables: Array.isArray(input.sourceTables) ? input.sourceTables.map((value) => String(value)) : [],
+        inputDigest: typeof input.inputDigest === 'string' ? input.inputDigest : input.inputDigest == null ? null : String(input.inputDigest),
+        lastVerifiedAt: typeof input.lastVerifiedAt === 'string' ? input.lastVerifiedAt : input.lastVerifiedAt == null ? null : String(input.lastVerifiedAt),
+      });
+
+      return {
+        status: 'success',
+        schema_version: packet.schemaVersion,
+        packet,
+        tuple_count: packet.ontologyLinkedTuples.length,
+        tuple_ids: packet.ontologyLinkedTuples.map((tuple) => tuple.tupleId),
+        tuples: packet.ontologyLinkedTuples,
+        evidence_state: packet.evidenceState,
+        ranking_signals: packet.rankingSignals,
       };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);

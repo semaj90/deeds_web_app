@@ -25,6 +25,7 @@ import { codebase_chunk_index, feature_statistics } from '../db/schema-postgres.
 import { mergeRRF, type RRFResult } from './multi-vector-rrf.js';
 import { getSourceRef, parseFeatureId } from './feature-identity.js';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface RetrievalQuery {
   q: string;
   topK?: number;
@@ -65,9 +66,9 @@ export interface RetrievalResult {
 }
 
 export class GoRetrievalOrchestrator {
-  private goRetrievalUrl = 'http://127.0.0.1:8100';
-  private turbovecUrl = 'http://127.0.0.1:8791';
-  private gemma4Url = 'http://127.0.0.1:8090';
+  private goRetrievalUrl = ENV.GO_RETRIEVAL_HTTP_URL ?? 'http://127.0.0.1:8100';
+  private turbovecUrl = ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791';
+  private gemma4Url = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090';
 
   constructor(urls?: { goRetrieval?: string; turbovec?: string; gemma4?: string }) {
     if (urls?.goRetrieval) this.goRetrievalUrl = urls.goRetrieval;

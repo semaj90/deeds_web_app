@@ -42,6 +42,13 @@ describe('miniforge-nlp-sidecar', () => {
           pass_results: [],
           control5: null,
           experiment_feature_matrix: null,
+          event_hypergraph: {
+            events: [],
+            ontology_event_tuples: [],
+            event_breadth_features: null,
+            recommendation_feature_rows: [],
+            recommendation_judgment: null,
+          },
           processing_time_ms: 5,
         }), { status: 200 });
       }
@@ -65,6 +72,8 @@ describe('miniforge-nlp-sidecar', () => {
 
     expect(analysis.document_id).toBe('doc-1');
     expect(Array.isArray(analysis.entities)).toBe(true);
+    expect(analysis.event_hypergraph?.events).toEqual([]);
+    expect(analysis.event_hypergraph?.recommendation_feature_rows).toEqual([]);
     expect(fetchSpy).toHaveBeenCalled();
   });
 });

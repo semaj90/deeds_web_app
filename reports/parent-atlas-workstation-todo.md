@@ -13,9 +13,45 @@ statuses; it does not promote any lane.
 | Claude-Mem export/import | created + wired; export-path alignment pending | `sveltekit-frontend/src/lib/server/memory/claude-mem.ts`, `sveltekit-frontend/src/lib/server/memory/claude-mem-ingest.ts` | Dynamic import plus ingest pipeline exist; importer runs stay blocked until the export path is aligned. |
 | Engram ingestion | created + wired; deferred | `sveltekit-frontend/src/lib/server/ai/engram-memory.ts`, `sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts` | The memory lane is present, but the persistent ingestion lane stays deferred until transport and importer paths are stable. |
 | Redis 8 eval cache | created + wired; eval-only | `sveltekit-frontend/src/lib/server/cache/*`, `sveltekit-frontend/src/lib/server/ace/ace-context-pack-cache.ts` | Keep Redis 8 isolated as an eval lane and compare it only after the current ACE context cache lane is stable. |
+| Parent Atlas Pass Fabric | durable queue + bounded execution; append-only pass history / duplicate classification pending | `analysis_jobs` / `worker.ts` / NLP sidecar / GPU lane / Valkey hot cache / read-tool executor | Keep Postgres as the canonical queue and pass history, classify duplicate pass results before any uniqueness enforcement, run CPU passes on multi-core workers, keep NLP/GPU passes bounded, keep Valkey as hot coordination cache only, and cap the read-tool fork/join executor at three independent reads. |
 | Feature-gap registry | created + wired; live scan pending | `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`, `sveltekit-frontend/src/lib/server/atlas/route-feature-map.ts`, `sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts` | Current inventory exists, but the bootstrap registry still needs a live app workspace scan. |
-| OKF / taxonomy / ontology / linked tuples | created + wired; schema and navigation live | `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`, `docs/.okf/README.md`, `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`, `sveltekit-frontend/src/lib/server/ontology/ontology-extractor.ts`, `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts` | `schema.yaml` is the schema source of truth, `registry.yaml` is the navigation layer, and the live runtime contracts stay in their existing owners; use this lane for codebase topology classification, domain classification, and ontology linking, but not semantic truth or identity ownership. |
+| OKF / taxonomy / ontology / linked tuples | created + wired; schema and navigation live | `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`, `docs/.okf/README.md`, `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`, `sveltekit-frontend/src/lib/server/ontology/ontology-extractor.ts`, `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts`, `sveltekit-frontend/src/lib/server/atlas/pos-concept-tagging-lane.ts` | `schema.yaml` is the schema source of truth, `registry.yaml` is the navigation layer, and the live runtime contracts stay in their existing owners; use this lane for codebase topology classification, domain classification, POS / concept tagging, and ontology linking, but not semantic truth or identity ownership. |
 | ClusterCard / GlyphRecord / CHR97 | created; mapping pending | `sveltekit-frontend/src/lib/server/retrieval/cluster-card-contract.ts`, `sveltekit-frontend/src/lib/server/cartridge/glyph-record.ts`, `sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts` | Keep this downstream of transport proof and registry proof. |
+
+### OKF / telemetry / ontology-linked tuple boundary
+
+- `timestamp`: provenance only.
+- `HyperLogLog`: telemetry only; use it for approximate breadth counts, not eviction or truth.
+- `OntologyLinkedTuple`: evidence layer only; keep `subject / predicate / object / evidenceRef`
+  with explicit revision fields.
+- `DomainClassification`: OKF / taxonomy lane.
+- `Low-rank sampling`: retrieval / approximation experiment only.
+
+Suggested field list:
+
+```ts
+type OntologyLinkedTuple = {
+  subject: string;
+  predicate: string;
+  object: string;
+  evidenceRef: string;
+  timestamp: string;
+  sourceRevision: string;
+  representationRevision: string;
+  producerId: string;
+  producerRevision: string;
+  domainClass?: string;
+};
+
+type TelemetryBreadth = {
+  packetKey: string;
+  workflowHllKey?: string;
+  symbolHllKey?: string;
+  userHllKey?: string;
+  neighborhoodHllKey?: string;
+  countedAt: string;
+};
+```
 
 ## Telemetry and packet provenance ladder
 
@@ -226,8 +262,11 @@ This is vocabulary and sequencing only. It does not add a new implementation own
 - L6 cache routing: KMeans centroid hints, SOM 20×20, `Topology4`, Hilbert2D.
 - L7 ACE: prefetch / pin / resident / evict.
 - L8 GPU: PyTorch, cuVS, cuML, cuGraph, cuTile only where benchmarked.
-- L9 evidence: ontology-linked n-ary tuples.
-- L10 agent: HMM, DSPy / GEPA, Ornith / Gemma.
+- L9 evidence: ontology-linked n-ary tuples and POS / concept-tagging packets.
+- L10 agent: HMM, DSPy / GEPA, Ornith / Gemma, event hypergraph recommendation runtime.
+  Packet-level NLP can proceed now; document-root / tree-dependent promotion
+  stays blocked until duplicate-root / idempotency closure in the tree
+  lineage work.
 
 Current gate:
 

@@ -139,13 +139,20 @@ unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
       `supportsDryRun`) before designing the coarse-grained sidecar tool
       wrappers (design.md D8).
 
-## 1. AnalysisPassResult envelope + pass registry (NLP1)
+**Sequencing boundary (2026-08-11)**: packet-level NLP can start once the
+preflight contract audit is complete. Document-root / tree-dependent
+promotion stays blocked until the duplicate-root / idempotency issue in the
+tree-lineage work is closed.
 
-- [ ] 1.1 Define `AnalysisPassResult` (Python + a matching TypeScript type)
-      per design.md D1. Add it as an additive extension to the existing
+## 1. AnalysisPassResult envelope + pass registry wiring (NLP1)
+
+- [ ] 1.1 Wire `AnalysisPassResult` (Python + the existing TypeScript type)
+      per design.md D1. Keep it as an additive extension to the existing
       `/analyze` endpoint (optional `passes` request field, optional
       `passResults` response field) — verified against task 0.2's findings,
-      not assumed compatible.
+      not assumed compatible. The shape already exists in
+      `sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts`;
+      this task is about aligning the sidecar and client wiring to it.
 - [ ] 1.2 Live-verify: send a request with the existing `extractionMode`-only
       shape (no `passes` field) and confirm byte-identical behavior to
       pre-change — this is the backward-compatibility proof, not optional.
@@ -170,10 +177,13 @@ unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
       chunks / dependency edges come back sensible (not garbage on code
       tokens that slipped through the exclusion).
 
-## 4. AST-conditioned semantic card (NLP3)
+## 4. AST-conditioned semantic card wiring (NLP3)
 
-- [ ] 4.1 Build the `SemanticCodeCard` assembler (`AstUnit` + linguistic
-      facts → bounded card text) per design.md's example shape.
+- [ ] 4.1 Wire the `SemanticCodeCard` assembler (`AstUnit` + linguistic
+      facts → bounded card text) per design.md's example shape. The schema
+      already exists in `sveltekit-frontend/src/lib/server/analysis/nlp-feature-compiler.ts`;
+      this task is to connect the producer and consumers, not invent a new
+      representation.
 - [ ] 4.2 Confirm the card is sent as embedding *input* to whatever service
       task 0.4 identified as the canonical `semantic_768` owner — do not
       re-implement embedding generation in this sidecar.
@@ -224,13 +234,14 @@ unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
       k-core/betweenness parity). Do not duplicate; extend if a BFS/SSSP
       parity fixture doesn't already exist there.
 
-## 9. FeatureCompiler: pass results → ExperimentFeatureMatrix + control5 (NLP7)
+## 9. FeatureCompiler: pass results → ExperimentFeatureMatrix + control5 wiring (NLP7)
 
-- [ ] 9.1 Build the compiler that takes a set of `AnalysisPassResult`s for
+- [ ] 9.1 Wire the compiler that takes a set of `AnalysisPassResult`s for
       one candidate and produces one `ExperimentFeatureMatrix` row +
       optional `control5` summary, per design.md D6. Coordinate with
       `parent-atlas-retrieval-lod-algorithm-taxonomy` for the canonical
-      column set — don't invent a second one.
+      column set — don't invent a second one. The TS contract already exists;
+      this task is to complete the producer/consumer path around it.
 
 ## 10. LangExtract gating (NLP8)
 
@@ -258,6 +269,25 @@ unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
       already derives its capability list from `ACPToolRegistry` (in which
       case 11.1 covers this automatically) or needs a separate edit.
 
+## 12. POS / concept tagging lane (NLP9)
+
+- [x] 12.1 Add the deterministic POS / concept-tagging packet contract with
+      explicit lineage fields (`packet_key`, `source_ref`, `source_revision`,
+      `representation_id`, `representation_revision`, `producer_id`,
+      `producer_revision`, `feature_revision`, and optional
+      graph / ontology / model provenance).
+- [x] 12.2 Wire the packet builder into the app route and MCP tool surface so
+      the lane can be invoked from the runtime without becoming a second
+      truth owner.
+- [x] 12.3 Preserve ontology-linked tuple identity under participant reorder
+      and keep ranking signals as evidence, not canonical identity.
+- [x] 12.4 Cap MCP tool fanout at 3 for this lane and reject missing revision
+      lineage.
+- [x] 12.5 Live-verify the lane against real packet evidence and record the
+      provenance / revision receipt before promoting it beyond test coverage.
+      Proof report: `docs/reports/pos-concept-tagging-lane-proof.json`
+      built from a live `atlas_packets` row plus its local source file.
+
 ## 12. Docs correction
 
 - [ ] 12.1 Fix `docs/architecture/PACKET-COMPILER-STAGES.md`'s Stage 1
@@ -276,3 +306,7 @@ unchanged: PageRank/Louvain/Leiden/CheiRank/k-core remain exactly
       `groundedExtractionRequired: true` and confirm LangExtract only adds
       grounded evidence — it must not change any structural identity or
       `AstUnit` field from the first run.
+
+      Packet-level NLP work can be accepted independently of the
+      document-root/tree-dependent promotion gate. Do not treat this fixture
+      as closing duplicate-root / idempotency issues in the tree lineage work.

@@ -28,7 +28,7 @@ import {
 // Falls back to direct Ollama /api/embeddings when dev server is unavailable.
 
 const EMBED_URL   = `${ENV.SELF_URL}/api/embed`;
-const OLLAMA_URL  = 'http://127.0.0.1:11434';
+const OLLAMA_URL  = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434';
 const EMBED_MODEL = 'embeddinggemma:latest';
 
 async function embed(text: string): Promise<Float32Array | null> {

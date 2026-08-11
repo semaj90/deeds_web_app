@@ -1427,6 +1427,7 @@
     "graphify:pass:phase-b": "node ../scripts/atlas/graphify-phase-b-additions.mjs",
     "graphify:pass:phase-b:dry": "node ../scripts/atlas/graphify-phase-b-additions.mjs --dry-run",
     "atlas:summary-surface:verify": "node ../scripts/atlas/verify-summary-surface.mjs",
+    "atlas:pos-concept-tagging:prove": "npx tsx ../scripts/atlas/prove-pos-concept-tagging-lane.mts --report=../docs/reports/pos-concept-tagging-lane-proof.json",
     "atlas:summary-envelope:multihop:audit": "node ../scripts/atlas/audit-summary-envelope-multihop.mjs",
     "manifold:hilbert:sort:57k": "node ../scripts/phase85/manifold-hilbert-sort.mjs",
     "manifold:hilbert:sort:dry": "node ../scripts/phase85/manifold-hilbert-sort.mjs --dry-run",

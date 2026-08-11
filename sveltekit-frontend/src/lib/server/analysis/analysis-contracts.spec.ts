@@ -14,6 +14,7 @@ import {
   SemanticCodeCardSchema,
   HMMObservationSchema,
   ExperimentFeatureMatrixSchema,
+  compileEventHypergraphBundle,
   compileExperimentFeatureMatrix,
 } from './nlp-feature-compiler.js';
 import { createModelAnalysisSidecarClient } from './model-analysis-sidecar.js';
@@ -465,6 +466,21 @@ describe('analysis contracts', () => {
         outputHash: 'output-b',
       }),
     ).toMatchObject({ candidateId: 'packet:1' });
+
+    const eventBundle = compileEventHypergraphBundle({
+      requestId: 'req:1',
+      packetKey: 'packet:1',
+      sourceRef: 'src/lib/server/retrieval/canonical-rerank-executor.ts',
+      sourceRevision: 'source-v1',
+      workspaceRevision: 'workspace-v1',
+      passResults,
+      control5: compiled.control5,
+      experimentFeatureMatrix: compiled.matrix,
+    });
+
+    expect(eventBundle.events.length).toBeGreaterThan(0);
+    expect(eventBundle.ontologyEventTuples.length).toBeGreaterThan(0);
+    expect(eventBundle.recommendationJudgment?.candidateKey).toBeTruthy();
   });
 
   it('falls back to the local model path when the sidecar is unavailable', async () => {

@@ -11,6 +11,7 @@
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
+import { compileEventHypergraphBundle } from '$lib/server/analysis/nlp-feature-compiler.js';
 import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 
 const AnalyzeRequestSchema = z.object({
@@ -44,6 +45,18 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
   const client = createMiniforgeNlpSidecarClient();
   const analysis = await client.analyze(parsed.data);
+  const eventHypergraph =
+    analysis.event_hypergraph ??
+    compileEventHypergraphBundle({
+      requestId: analysis.document_id,
+      packetKey: parsed.data.packetKey ?? analysis.document_id,
+      sourceRef: parsed.data.sourceRef ?? parsed.data.documentId ?? analysis.document_id,
+      sourceRevision: parsed.data.modelId ?? parsed.data.documentId ?? analysis.document_id,
+      workspaceRevision: parsed.data.modelId ?? parsed.data.documentId ?? analysis.document_id,
+      passResults: analysis.pass_results ?? [],
+      control5: analysis.control5 ?? null,
+      experimentFeatureMatrix: analysis.experiment_feature_matrix ?? null,
+    });
 
   return json({
     ...analysis,
@@ -51,6 +64,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       pass_results: analysis.pass_results ?? [],
       control5: analysis.control5 ?? null,
       experiment_feature_matrix: analysis.experiment_feature_matrix ?? null,
+      event_hypergraph: eventHypergraph,
     },
   });
 };

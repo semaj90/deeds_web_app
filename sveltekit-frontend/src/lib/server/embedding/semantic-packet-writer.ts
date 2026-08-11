@@ -1,17 +1,19 @@
 import path from 'node:path';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
+import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import {
 	CANONICAL_SEMANTIC_ENCODER_REVISION,
 	buildCanonicalSemanticLineage,
 	type CanonicalSemanticLineage,
 } from '$lib/server/embedding/semantic-lineage.js';
-import { makePacketUlid } from '$lib/server/identity/ulid.js';
 
 export interface PersistCanonicalSemanticPacketEmbeddingInput {
 	packetId?: string;
 	packetKey: string;
 	sourceRef: string;
+	treeNodeId?: string | null;
+	titleId?: string | null;
 	vector: readonly number[] | Float32Array;
 	encoderRevision?: string;
 	representationRevision?: number;
@@ -39,12 +41,38 @@ type AtlasPacketWriter = {
 	insert: typeof db.insert;
 };
 
+function resolveCanonicalPacketKey(input: PersistCanonicalSemanticPacketEmbeddingInput): string {
+	const providedPacketKey = input.packetKey.trim();
+	const sourceRef = input.sourceRef.trim();
+	const treeNodeId = input.treeNodeId?.trim() || '';
+	const titleId = input.titleId?.trim() || '';
+
+	const structuredKey = sourceRef && treeNodeId && titleId
+		? computeCanonicalPacketKey(sourceRef, treeNodeId, titleId)
+		: '';
+
+	if (providedPacketKey) {
+		if (structuredKey && providedPacketKey !== structuredKey) {
+			throw new Error(
+				`PACKET_KEY_MISMATCH_CANONICAL_RESOLUTION expected=${structuredKey} provided=${providedPacketKey}`
+			);
+		}
+		return providedPacketKey;
+	}
+
+	if (structuredKey) {
+		return structuredKey;
+	}
+
+	throw new Error('PACKET_KEY_REQUIRED_OR_CANONICAL_SOURCE_FIELDS_REQUIRED');
+}
+
 export async function persistCanonicalSemanticPacketEmbedding(
 	input: PersistCanonicalSemanticPacketEmbeddingInput,
 	database: AtlasPacketWriter = db,
 ): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
-	const packetId = input.packetId?.trim() || input.packetKey.trim() || makePacketUlid();
-	const packetKey = input.packetKey.trim() || packetId;
+	const packetKey = resolveCanonicalPacketKey(input);
+	const packetId = input.packetId?.trim() || packetKey;
 	const sourceRef = input.sourceRef.trim() || packetKey;
 	const encoderRevision =
 		input.encoderRevision === undefined

@@ -115,6 +115,12 @@ describe('/api/codebase-index/analyze', () => {
           grounded: false,
         },
       },
+      event_hypergraph: {
+        events: [{ event_id: 'evt:1', event_type: 'call_execution' }],
+        ontology_event_tuples: [{ tuple_id: 'tuple:1' }],
+        recommendation_feature_rows: [{ candidate_key: 'evt:1' }],
+        recommendation_judgment: { candidate_key: 'evt:1', action: 'inspect' },
+      },
       processing_time_ms: 4,
     });
     mocks.createClient.mockReturnValue({ analyze: mocks.analyze });
@@ -146,5 +152,6 @@ describe('/api/codebase-index/analyze', () => {
     expect(body.structured.pass_results).toHaveLength(1);
     expect(body.structured.control5.structural).toBe(true);
     expect(body.structured.experiment_feature_matrix.featureRevision).toBe('nlp-feature-compiler-v1');
+    expect(body.structured.event_hypergraph.events).toHaveLength(1);
   });
 });

@@ -15,3 +15,4 @@ export * from './model-analysis-service.js';
 export * from './experiment-analysis-sidecar.js';
 export * from './experiment-analysis-service.js';
 export * from './representation-analysis-service.js';
+export * from './event-hypergraph-contract.js';

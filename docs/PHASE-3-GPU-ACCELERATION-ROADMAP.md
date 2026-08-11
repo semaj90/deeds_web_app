@@ -4,15 +4,22 @@
 **Date**: 2026-07-19  
 **Predecessor**: Phase 2 Embedding Truncation (✅ COMPLETE)  
 
+**⚠️ DIMENSION POLICY UPDATE (2026-08-11)**: This doc predates the canonical
+768-dim embedding policy established 2026-07-27 (see root CLAUDE.md
+"Embedding Dimensions Policy"). All "384-dim" references below have been
+updated to 768-dim (`embeddinggemma:latest`, canonical). 384-dim is now
+policy-defined as legacy/optional-routing-lane only, never primary — do not
+revert these edits without re-reading that policy section first.
+
 ---
 
 ## Executive Summary
 
-Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval. The canonical 384-dim embeddings from Phase 2 feed into GPU k-NN search via cuVS, DiskANN, or RAPIDS, enabling fast approximate nearest neighbor queries on 40K+ points with <10ms latency.
+Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval. The canonical 768-dim embeddings feed into GPU k-NN search via cuVS, DiskANN, or RAPIDS, enabling fast approximate nearest neighbor queries on 40K+ points with <10ms latency.
 
 **Key Dependencies Met**:
 - ✅ Dual-path embedding system (ONNX primary, Ollama fallback)
-- ✅ Canonical 384-dim truncation (50% storage savings)
+- ✅ Canonical 768-dim embeddings (embeddinggemma:latest — 384-dim truncation is legacy/optional routing lane only, per 2026-07-27 policy)
 - ✅ Topology authority backfill (58,365 packets with community_confidence)
 - ✅ Feature-set alignment (83/100 with embedding lane at 99.6%)
 - ✅ Smoke test suite (5/5 gates passing)
@@ -23,7 +30,7 @@ Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval. 
 
 ### Stage 3A: GPU k-NN Search Infrastructure (2-3 days)
 
-**Objective**: Add GPU-accelerated approximate nearest neighbor search for 384-dim vectors.
+**Objective**: Add GPU-accelerated approximate nearest neighbor search for 768-dim vectors.
 
 #### 3A.1 cuVS Integration (RAPIDS)
 
@@ -32,7 +39,7 @@ Phase 3 adds GPU-accelerated vector operations to unlock large-scale retrieval. 
 cd sveltekit-frontend
 wsl -d Ubuntu -- /home/james/miniforge3/envs/atlas-rapids-cu13/bin/python \
   scripts/atlas/gpu-knn-search.py \
-  --query-dim 384 \
+  --query-dim 768 \
   --k 100 \
   --index-type ivfflat  # or cagra for better quality
 
@@ -50,12 +57,12 @@ curl http://127.0.0.1:8791/health
 
 #### 3A.2 DiskANN (Optional, if cuVS insufficient)
 
-DiskANN is a hybrid CPU/GPU index for vectors larger than GPU memory. Useful if 384-dim × 100K embeddings exceed VRAM.
+DiskANN is a hybrid CPU/GPU index for vectors larger than GPU memory. Useful if 768-dim × 100K embeddings exceed VRAM.
 
 ```bash
 # Build DiskANN index from Postgres
 node scripts/atlas/build-diskann-index.mjs \
-  --dimension 384 \
+  --dimension 768 \
   --vector-file /tmp/embeddings.float32 \
   --index-path /data/diskann/index
 
@@ -105,14 +112,14 @@ npm run atlas:extract-symbols:audit
 
 ### Stage 3C: SOM & KMeans Topology (2-3 days)
 
-**Objective**: Build 20×20 Self-Organizing Map and k-means clustering on 384-dim embeddings.
+**Objective**: Build 20×20 Self-Organizing Map and k-means clustering on 768-dim embeddings (canonical `embeddinggemma:latest` dimension — see root CLAUDE.md "Embedding Dimensions Policy"; 384-dim is legacy/projection only, never primary).
 
 #### 3C.1 SOM 20×20 Training
 
 ```bash
-# Train SOM on canonical 384-dim embeddings
+# Train SOM on canonical 768-dim embeddings
 wsl -d Ubuntu -- python3 scripts/atlas/train-som-topology.py \
-  --dim 384 \
+  --dim 768 \
   --grid 20 20 \
   --epochs 50 \
   --learning-rate 0.1
@@ -129,7 +136,7 @@ npm run atlas:som:audit
 #### 3C.2 KMeans Clustering
 
 ```bash
-# Train k-means on 384-dim embeddings (k=64, 128, or 256)
+# Train k-means on 768-dim embeddings (k=64, 128, or 256)
 npm run atlas:kmeans:apply --k 128
 
 # Write centroids to Postgres
@@ -197,7 +204,7 @@ npm run atlas:reranker:training-data:export
 ```json
 {
   "atlas:gpu:knn:health": "curl http://127.0.0.1:8791/health | jq .",
-  "atlas:som:train": "wsl -d Ubuntu -- python3 scripts/atlas/train-som-topology.py --dim 384 --grid 20 20",
+  "atlas:som:train": "wsl -d Ubuntu -- python3 scripts/atlas/train-som-topology.py --dim 768 --grid 20 20",
   "atlas:som:assign": "node scripts/atlas/som-assign-packets.mjs --apply",
   "atlas:reranker:features:extract": "node scripts/atlas/extract-reranker-features.mjs --dry-run",
   "atlas:reranker:features:apply": "node scripts/atlas/extract-reranker-features.mjs --apply",

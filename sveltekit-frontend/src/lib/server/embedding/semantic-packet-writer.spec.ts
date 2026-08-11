@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
+import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import { persistCanonicalSemanticPacketEmbedding } from './semantic-packet-writer.js';
 import { CANONICAL_SEMANTIC_ENCODER_REVISION } from './semantic-lineage.js';
 
@@ -61,5 +62,32 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 		expect(result.packetId).toBe('packet:semantic:2');
 		expect(values.mock.calls[0]?.[0].packetUlid).toBe('packet:semantic:2');
 		expect(values.mock.calls[0]?.[0].directoryPath).toBe('src/lib/server');
+	});
+
+	it('derives the packet key from canonical structural fields when packetKey is omitted', async () => {
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, (_, index) => (index % 2 === 0 ? 0.25 : -0.25));
+		const sourceRef = 'src/lib/server/example-3.ts';
+		const treeNodeId = 'src/lib/server/example-3.ts:12:4:function';
+		const titleId = 'example-3';
+		const expectedPacketKey = computeCanonicalPacketKey(sourceRef, treeNodeId, titleId);
+
+		const result = await persistCanonicalSemanticPacketEmbedding(
+			{
+				packetKey: '',
+				sourceRef,
+				treeNodeId,
+				titleId,
+				vector,
+			},
+			database,
+		);
+
+		expect(result.packetKey).toBe(expectedPacketKey);
+		expect(result.packetId).toBe(expectedPacketKey);
+		expect(values.mock.calls[0]?.[0].packetKey).toBe(expectedPacketKey);
+		expect(values.mock.calls[0]?.[0].packetId).toBe(expectedPacketKey);
 	});
 });

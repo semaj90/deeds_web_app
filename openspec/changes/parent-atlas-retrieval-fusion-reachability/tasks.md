@@ -238,6 +238,11 @@ fix-in-place-independently / mark-explicitly-legacy-and-schedule-retirement. Do 
 "leave as-is silently" for any of them — each carries a live, unaddressed identity or dedup gap
 per RF1/RF2's findings.
 
+The latest proof-spine review also keeps two sequencing gates open here:
+one-vote-per-lane still needs a live replay receipt, and the frozen replay
+gate should not close until the live fusion-owner matrix is recorded against
+that same receipt.
+
 - [ ] `rrf-integration.ts`/`rrf-combiner.ts` (`/api/search/rrf`) — already has the correct
       identity precedence; missing only the one-vote-per-lane enforcement from RF5. Lowest-risk
       of the four to fix in place.

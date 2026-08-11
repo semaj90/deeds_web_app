@@ -1,12 +1,12 @@
 /**
  * POST /api/tools/batch
  *
- * Execute up to 10 tool calls in a single request via gRPC
+ * Execute up to 3 independent read tool calls in a single request via gRPC
  * ToolCallingService.ExecuteToolBatch.  Set parallel=true to run all calls
  * concurrently (default false = sequential).
  *
  * Body: {
- *   calls:    ToolCallRequest[]  — 1-10 items
+ *   calls:    ToolCallRequest[]  — 1-3 items
  *   parallel: boolean            — default false
  *   timeoutMs?: number           — default 60 000
  * }
@@ -33,7 +33,7 @@ const callSchema = z.object({
 });
 
 const schema = z.object({
-	calls:     z.array(callSchema).min(1).max(10),
+	calls:     z.array(callSchema).min(1).max(3),
 	parallel:  z.boolean().default(false),
 	timeoutMs: z.number().int().min(1000).max(300_000).optional(),
 });

@@ -16,6 +16,8 @@ import { eq, sql } from 'drizzle-orm';
 export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
 
+export const ANALYSIS_JOBS_NOTIFY_CHANNEL = 'atlas_analysis_jobs';
+
 let analysisJobsTableMissing = false;
 let loggedMissingAnalysisJobsTable = false;
 
@@ -74,6 +76,21 @@ function markAnalysisJobsUnavailable(): void {
   );
 }
 
+async function notifyAnalysisJobs(payload: Record<string, unknown>): Promise<void> {
+  if (analysisJobsTableMissing) return;
+
+  try {
+    await db.execute(sql`
+      SELECT pg_notify(
+        ${ANALYSIS_JOBS_NOTIFY_CHANNEL},
+        ${JSON.stringify(payload)}
+      )
+    `);
+  } catch (err) {
+    console.warn('[AnalysisJobs] job wake notification failed (non-fatal):', err);
+  }
+}
+
 /**
  * Enqueue a new job with status='queued' (not running).
  * The worker loop will claim it via claimNextJob().
@@ -95,6 +112,13 @@ export async function enqueueJob(params: {
       result: normalizeAnalysisJobPayload(params.result, params.jobType),
     })
     .returning({ id: analysisJobs.id });
+
+  void notifyAnalysisJobs({
+    event: 'enqueued',
+    jobId: row.id,
+    evidenceId: params.evidenceId,
+    jobType: params.jobType,
+  });
   return row.id;
 }
 
@@ -136,25 +160,46 @@ export async function claimNextJob(jobType?: JobType): Promise<{
   jobType: string;
   result: PersistedEnvelope;
 } | null> {
+  const jobs = await claimBatch(jobType, 1);
+  return jobs[0] ?? null;
+}
+
+/**
+ * Claim up to `limit` queued jobs of a given type using FOR UPDATE SKIP LOCKED.
+ * This is the batch version of the DB-backed concurrency gate.
+ */
+export async function claimBatch(
+  jobType: JobType | undefined,
+  limit: number
+): Promise<Array<{
+  id: string;
+  evidenceId: string;
+  caseId: string | null;
+  jobType: string;
+  result: PersistedEnvelope;
+}>> {
   if (analysisJobsTableMissing) {
-    return null;
+    return [];
   }
 
   try {
     const typeFilter = jobType ? sql`AND job_type = ${jobType}` : sql``;
 
     const rows = await db.execute(sql`
-			UPDATE analysis_jobs
-			SET status = 'running', started_at = NOW(), updated_at = NOW()
-			WHERE id = (
-				SELECT id FROM analysis_jobs
-				WHERE status = 'queued' ${typeFilter}
-				ORDER BY created_at ASC
-				LIMIT 1
-				FOR UPDATE SKIP LOCKED
-			)
-			RETURNING id, evidence_id, case_id, job_type, result
-		`);
+      WITH picked AS (
+        SELECT id
+        FROM analysis_jobs
+        WHERE status = 'queued' ${typeFilter}
+        ORDER BY created_at ASC
+        LIMIT ${Math.max(1, Math.floor(limit))}
+        FOR UPDATE SKIP LOCKED
+      )
+      UPDATE analysis_jobs AS j
+      SET status = 'running', started_at = NOW(), updated_at = NOW()
+      FROM picked
+      WHERE j.id = picked.id
+      RETURNING j.id, j.evidence_id, j.case_id, j.job_type, j.result
+    `);
 
     type JobRow = {
       id: string;
@@ -163,16 +208,16 @@ export async function claimNextJob(jobType?: JobType): Promise<{
       job_type: string;
       result: Record<string, unknown> | null;
     };
-    const row = pgRows<JobRow>(rows)?.[0];
-    if (!row) return null;
+    const batch = pgRows<JobRow>(rows);
+    if (batch.length === 0) return [];
 
-    return {
-      id: row.id,
-      evidenceId: row.evidence_id,
-      caseId: row.case_id,
-      jobType: row.job_type,
-      result: normalizeAnalysisJobPayload(row.result ?? {}, row.job_type),
-    };
+    return batch.map((item) => ({
+      id: item.id,
+      evidenceId: item.evidence_id,
+      caseId: item.case_id,
+      jobType: item.job_type,
+      result: normalizeAnalysisJobPayload(item.result ?? {}, item.job_type),
+    }));
   } catch (err: any) {
     // Throw specific errors for backoff logic in worker.ts
     if (
@@ -185,12 +230,12 @@ export async function claimNextJob(jobType?: JobType): Promise<{
 
     if (isMissingAnalysisJobsTableError(err)) {
       markAnalysisJobsUnavailable();
-      return null;
+      return [];
     }
 
     // Other errors: log once and return empty
     console.error('[AnalysisJobs] Unexpected DB error:', err.message);
-    return null;
+    return [];
   }
 }
 

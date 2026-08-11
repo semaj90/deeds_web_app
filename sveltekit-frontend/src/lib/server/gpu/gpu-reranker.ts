@@ -14,6 +14,7 @@
 
 import fetch from 'node-fetch';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface RRFCandidate {
   packet_key: string;
   source_ref: string;
@@ -43,7 +44,7 @@ export class GPUReranker {
   private semantic_weight = 0.6;
   private rrf_weight = 0.4;
 
-  constructor(tensorBridgeUrl: string = 'http://127.0.0.1:8090') {
+  constructor(tensorBridgeUrl: string = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090') {
     this.tensorBridgeUrl = tensorBridgeUrl;
   }
 

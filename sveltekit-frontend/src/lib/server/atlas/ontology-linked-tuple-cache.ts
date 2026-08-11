@@ -6,6 +6,8 @@ import {
   OntologyLinkedTupleEvidenceStateSchema,
   OntologyLinkedTupleLabelKindSchema,
   OntologyLinkedTupleLabelSourceSchema,
+  OntologyLinkedTupleParticipantSchema,
+  OntologyLinkedTupleProvenanceSchema,
   type OntologyLinkedTupleV1,
 } from './contracts/ontology-linked-tuple-v1.js';
 
@@ -27,7 +29,10 @@ export const OntologyLinkedTupleCacheRecordSchema = z
     labelSource: OntologyLinkedTupleLabelSourceSchema,
     ontologyIds: z.array(z.string().min(1)).max(32),
     conceptIds: z.array(z.string().min(1)).max(32),
+    participants: z.array(OntologyLinkedTupleParticipantSchema).max(16),
+    evidenceRefs: z.array(z.string().min(1)).max(32),
     evidenceState: OntologyLinkedTupleEvidenceStateSchema,
+    provenance: OntologyLinkedTupleProvenanceSchema,
     trustTier: OntologyTupleTrustTierSchema,
     blockedContentHashes: z.array(z.string().regex(/^[a-f0-9]{64}$/i)).max(32),
     centroid: z.object({
@@ -168,9 +173,12 @@ export function buildOntologyLinkedTupleCachePlan(input: {
       labelSource: tuple.labelSource,
       ontologyIds: tuple.ontologyIds,
       conceptIds: tuple.conceptIds,
+      participants: tuple.participants ?? [],
+      evidenceRefs: tuple.evidenceRefs ?? [],
       evidenceState: tuple.evidenceState,
       trustTier,
       blockedContentHashes,
+      provenance: OntologyLinkedTupleProvenanceSchema.parse(tuple.provenance),
       centroid: {
         domainClass: input.centroid.domainClass,
         domainCentroidKey: input.centroid.domainCentroidKey,

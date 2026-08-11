@@ -7,6 +7,7 @@
 
 import { logger } from '../logger.js';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface EmbeddingModel {
   embed(input: string | string[]): Promise<number[] | number[][]>;
   dimension: number;
@@ -22,7 +23,7 @@ export class EmbeddingGemmaModel implements EmbeddingModel {
   name = 'embeddinggemma:latest';
   private ollamaUrl: string;
 
-  constructor(ollamaUrl: string = 'http://127.0.0.1:11434') {
+  constructor(ollamaUrl: string = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434') {
     this.ollamaUrl = ollamaUrl;
   }
 
@@ -159,7 +160,7 @@ export class CLIPModel implements EmbeddingModel {
   private ollamaUrl: string;
   private useLocalModel: boolean;
 
-  constructor(ollamaUrl: string = 'http://127.0.0.1:11434', useLocalModel: boolean = true) {
+  constructor(ollamaUrl: string = ENV.OLLAMA_BASE_URL ?? 'http://127.0.0.1:11434', useLocalModel: boolean = true) {
     this.ollamaUrl = ollamaUrl;
     this.useLocalModel = useLocalModel;
   }

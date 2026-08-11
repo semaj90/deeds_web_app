@@ -3,9 +3,13 @@ import type { RequestHandler } from './$types';
 import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { persistCanonicalSemanticPacketEmbedding } from '$lib/server/embedding/semantic-packet-writer.js';
+import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 
 interface EmbedRequest {
-	packetKey: string;
+	packetKey?: string;
+	sourceRef?: string;
+	treeNodeId?: string;
+	titleId?: string;
 	text: string;
 }
 
@@ -24,17 +28,23 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	try {
 		const body = (await request.json()) as EmbedRequest;
-		const { packetKey, text } = body;
+		const packetKey = body.packetKey?.trim() ?? '';
+		const sourceRef = body.sourceRef?.trim() ?? '';
+		const treeNodeId = body.treeNodeId?.trim() ?? '';
+		const titleId = body.titleId?.trim() ?? '';
+		const resolvedPacketKey =
+			packetKey || (sourceRef && treeNodeId && titleId ? computeCanonicalPacketKey(sourceRef, treeNodeId, titleId) : '');
+		const { text } = body;
 
-		if (!packetKey || !text) {
+		if ((!packetKey && !sourceRef) || !resolvedPacketKey || !text) {
 			return json(
-				{ embedding: [], cacheHit: false, duration: 0, error: 'Missing packetKey or text' },
+				{ embedding: [], cacheHit: false, duration: 0, error: 'Missing packetKey or sourceRef/treeNodeId/titleId or text' },
 				{ status: 400 }
 			);
 		}
 
 		// 1. Check Bitfrost L1 cache (Redis exact-match via bifrost:packet key)
-		const bifrostKey = `bifrost:packet:${packetKey}`;
+		const bifrostKey = `bifrost:packet:${resolvedPacketKey}`;
 		const redis = getRedis();
 
 		let cacheHit = false;
@@ -61,7 +71,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		try {
 			embedding = await embedText(text.trim());
 		} catch (err) {
-			console.error(`Failed to embed packet ${packetKey}:`, err);
+			console.error(`Failed to embed packet ${resolvedPacketKey}:`, err);
 			// Fallback: deterministic stub, NOT a real semantic_768 embedding.
 			// Same dimension (768) as the real thing, so it must never be tagged
 			// with the semantic_768 representation_id — dimension alone cannot
@@ -77,7 +87,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			await redis.setex(bifrostKey, 3600, JSON.stringify(embedding));
 		} catch (e) {
 			// Non-blocking: embed succeeded even if Bitfrost cache fails
-			console.warn(`Failed to cache embedding for ${packetKey}:`, e);
+			console.warn(`Failed to cache embedding for ${resolvedPacketKey}:`, e);
 		}
 
 		// 4. Persist canonical lineage in Postgres only for real semantic embeddings.
@@ -86,14 +96,16 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		if (isRealSemanticEmbedding) {
 			try {
 				await persistCanonicalSemanticPacketEmbedding({
-					packetKey,
-					sourceRef: packetKey,
-					sourcePath: packetKey,
+					packetKey: resolvedPacketKey,
+					sourceRef: sourceRef || resolvedPacketKey,
+					treeNodeId: treeNodeId || null,
+					titleId: titleId || null,
+					sourcePath: sourceRef || resolvedPacketKey,
 					vector: embedding,
 				});
 			} catch (e) {
 				// Non-blocking: cache write succeeded even if Postgres fails
-				console.warn(`Failed to persist packet ${packetKey}:`, e);
+				console.warn(`Failed to persist packet ${resolvedPacketKey}:`, e);
 			}
 		}
 

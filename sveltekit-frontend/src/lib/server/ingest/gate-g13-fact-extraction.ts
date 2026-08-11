@@ -9,6 +9,7 @@ import { extractedFactSchema, type ExtractedFact, type FactArgument } from './fa
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 
+import { ENV } from '$lib/server/env.server.js';
 export interface GateG13Result {
   fact_id: string;
   packet_key: string;
@@ -129,7 +130,7 @@ export async function extractFactsFromPacket(
   packet_key: string,
   source_ref: string,
   content: string,
-  gemma4_url: string = 'http://127.0.0.1:8090'
+  gemma4_url: string = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'
 ): Promise<ExtractedFact[]> {
   const prompt = `TASK: Extract 3-5 key facts from the provided text.
 

@@ -997,6 +997,56 @@ mean simdjson is unhealthy.
    against — the two programs (graph-ranking vs. feature/tensor) stay independent until
    GA8 explicitly combines them, per that file's own recorded design principle.
 
+## Patch (pending) — Topology Propagation, Symbol Extraction, SOM/KMeans (2026-08-11, NOT_PROVEN)
+
+Source: `docs/PHASE-3-GPU-ACCELERATION-ROADMAP.md` Stage 3B/3C, flagged by the
+user for OpenSpec inclusion. **Not yet cross-checked against this file's own
+findings** (e.g. Patch C found `atlas_graph_authority_runs` has no live
+writer, `codeTopology` singleton-ratio issues, `community_id` provenance is
+partially untraceable) — before running any command below, re-verify against
+this file's own community/topology findings above; do not assume the roadmap
+doc's npm scripts are wired just because they're named.
+
+**Stage 3B — Topology Propagation & Symbol Extraction (2-3 days, per roadmap doc)**
+- [ ] 3B.1 `community_id` backfill: `npm run atlas:backfill:community-id[:analyze|:verify]`
+      — target >95% coverage on `glyph_records`. **Verify these npm scripts
+      exist and are wired before running** — this file's Patch C already
+      found evidence of untraceable/orphaned community-id provenance; check
+      whether this backfill script is the intended source of truth or
+      another parallel path.
+- [ ] 3B.2 Symbol extraction (ATLAS-3A): `drizzle/manual/atlas-3a-symbol-map.sql`
+      → `npm run atlas:extract-symbols[:dry|:audit]` → `atlas_symbol_map`
+      table (40K+ symbols linked to packets + topology). Check for overlap
+      with `parent-atlas-pass-fabric`'s PF-G0 (canonical packet identity
+      writer) — symbol extraction that links to `packet_key` inherits that
+      same "is the writer proven" question.
+
+**Stage 3C — SOM & KMeans Topology (2-3 days, per roadmap doc)**
+- [ ] 3C.1 SOM 20×20 training on 768-dim embeddings via
+      `scripts/atlas/train-som-topology.py` (WSL/Python) →
+      `npm run atlas:som:assign-packets` → `atlas_packets.som_cell_x/y`.
+      **Dimension flag RESOLVED (2026-08-11)**: `docs/PHASE-3-GPU-ACCELERATION-ROADMAP.md`
+      predated the 768-dim canonical policy (doc dated 2026-07-19, policy
+      established 2026-07-27) — updated all 384→768 references in that doc
+      (CLI flags, npm script, executive summary). Confirmed no other 384
+      references remain in that file. **Still unverified**: whether
+      `scripts/atlas/train-som-topology.py` itself exists and actually reads
+      a `--dim` flag correctly — the doc edit doesn't prove the script does
+      the right thing, only that the doc no longer tells you the wrong thing.
+- [ ] 3C.2 KMeans (k=64/128/256) → `atlas_packets.kmeans_cluster_id` +
+      Redis `centroid:kmeans:*`. Same 768-dim fix applied to the doc.
+
+**Recommendation for whoever picks this up**: the doc-level 384-vs-768
+conflict is fixed, but verify the actual Python script
+(`scripts/atlas/train-som-topology.py`) exists and behaves as documented
+before running training — doc correctness and code correctness are two
+different claims.
+
 ## Cross-references
 
 - See README.md for the full architecture, gate table, and patch order.
+- `docs/PHASE-3-GPU-ACCELERATION-ROADMAP.md` — source for the pending
+  Topology/SOM/KMeans patch above (unverified against this file's findings).
+- `openspec/changes/parent-atlas-pass-fabric/` — PF-G0 (canonical packet
+  identity writer) is a shared prerequisite with Stage 3B.2 symbol extraction
+  above; do not resolve independently in both places.

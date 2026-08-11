@@ -1,13 +1,19 @@
 /**
  * Packet Key Builder — Deterministic, Immutable Identity
  *
- * packetKey is the stable logical identity across Postgres, Qdrant, Redis, HyperRAG, and ACE.
+ * Compatibility / scoped-address helper for workspace-scoped packet identities.
+ * The canonical logical packet key now lives in `packet-key-builder.ts`.
+ * This helper remains available for legacy workspace-address flows that still
+ * serialize `workspaceId` into the key format.
  * It must be:
  * 1. Deterministic (same input → same output every time)
  * 2. Immutable (no backfill changes, no renames)
  * 3. Collision-free (no two packets share one key)
  *
  * Built from: workspaceId + sourceRef + semanticAnchor
+ *
+ * Canonical logical packet identity should use `packet-key-builder.ts`
+ * instead; this helper is only for compatibility / scoped-address flows.
  * Format: pkt:<workspaceId>:<sha256_hex_first_32>
  */
 

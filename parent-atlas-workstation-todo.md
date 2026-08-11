@@ -42,8 +42,56 @@ Current lane map:
 | Engram ingestion | created + wired; deferred | `sveltekit-frontend/src/lib/server/ai/engram-memory.ts`, `sveltekit-frontend/src/lib/server/memory/local-engram-memory-adapter.ts` | The memory lane is present, but the persistent ingestion lane stays deferred until transport and importer paths are stable. |
 | Redis 8 eval cache | created + wired; eval-only | `sveltekit-frontend/src/lib/server/cache/*`, `sveltekit-frontend/src/lib/server/ace/ace-context-pack-cache.ts` | Keep Redis 8 isolated as an eval lane and compare it only after the current ACE context cache lane is stable. |
 | Feature-gap registry | created + wired; live scan pending | `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`, `sveltekit-frontend/src/lib/server/atlas/route-feature-map.ts`, `sveltekit-frontend/src/lib/server/atlas/runtime-registry.ts` | Current inventory exists, but the bootstrap registry still needs a live app workspace scan. |
-| OKF / taxonomy / ontology / linked tuples | created + wired; schema and navigation live | `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`, `docs/.okf/README.md`, `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`, `sveltekit-frontend/src/lib/server/ontology/ontology-extractor.ts`, `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts` | `schema.yaml` is the schema source of truth, `registry.yaml` is the navigation layer, and the live runtime contracts stay in their existing owners; use this lane for codebase topology classification, domain classification, and ontology linking, but not semantic truth or identity ownership. |
+| OKF / taxonomy / ontology / linked tuples | created + wired; schema and navigation live | `docs/.okf/schema.yaml`, `docs/.okf/registry.yaml`, `docs/.okf/README.md`, `sveltekit-frontend/src/lib/server/atlas/domain-taxonomy.ts`, `sveltekit-frontend/src/lib/server/ontology/ontology-extractor.ts`, `sveltekit-frontend/src/lib/server/atlas/contracts/ontology-linked-tuple-v1.ts`, `sveltekit-frontend/src/lib/server/atlas/pos-concept-tagging-lane.ts` | `schema.yaml` is the schema source of truth, `registry.yaml` is the navigation layer, and the live runtime contracts stay in their existing owners; use this lane for codebase topology classification, domain classification, POS / concept tagging, and ontology linking, but not semantic truth or identity ownership. |
 | ClusterCard / GlyphRecord / CHR97 | created; mapping pending | `sveltekit-frontend/src/lib/server/retrieval/cluster-card-contract.ts`, `sveltekit-frontend/src/lib/server/cartridge/glyph-record.ts`, `sveltekit-frontend/src/lib/server/cartridge/chr97-builder.ts` | Keep this downstream of transport proof and registry proof. |
+
+### OKF / telemetry / ontology-linked tuple boundary
+
+This is a contract block, not a new owner.
+
+- `timestamp`: provenance only. Use it to order or compare events, not to define identity.
+- `HyperLogLog`: telemetry only. Use it for approximate breadth counts such as distinct workflows,
+  symbols, users, packets, and retrieval neighborhoods. Do not use it to decide eviction or
+  canonical cache truth.
+- `OntologyLinkedTuple`: evidence layer only. Keep it as `subject / predicate / object / evidenceRef`
+  with explicit `sourceRevision`, `representationRevision`, and producer revision fields. It is a
+  linked evidence record, not semantic truth.
+- `DomainClassification`: OKF / taxonomy lane. Use it for domain labels and ontology navigation.
+- `Low-rank sampling`: retrieval / approximation experiment only. Keep Tang-style sketching with the
+  retrieval LOD / algorithm taxonomy lane, not the ontology lane.
+
+Suggested field list:
+
+```ts
+type OntologyLinkedTuple = {
+  subject: string;
+  predicate: string;
+  object: string;
+  evidenceRef: string;
+  timestamp: string;
+  sourceRevision: string;
+  representationRevision: string;
+  producerId: string;
+  producerRevision: string;
+  domainClass?: string;
+};
+
+type TelemetryBreadth = {
+  packetKey: string;
+  workflowHllKey?: string;
+  symbolHllKey?: string;
+  userHllKey?: string;
+  neighborhoodHllKey?: string;
+  countedAt: string;
+};
+```
+
+Ownership boundaries:
+
+- OKF / ontology owns classification and linked-evidence navigation.
+- Workstation telemetry owns HyperLogLog breadth counters.
+- Retrieval / approximation owns low-rank sampling experiments.
+- Neither HyperLogLog nor low-rank sampling may rewrite canonical packet identity or semantic truth.
 
 ### Current Proven Stop State — 2026-08-10
 
@@ -756,9 +804,9 @@ type ProjectionDistortionStats = {
 **Current State**: ast_symbols 0.9%, lexical_features 2.4%, entities 0%, used_concepts 100%
 
 **Phase 2A: Fix ast-grep Integration** (1-2h, BLOCKING)
-- **Issue**: phase1-ast-grep writes synthetic packet_keys; needs to write to real `atlas_packets`
-- **Action**: `npm run atlas:phase1:ast-grep:dry` → verify output → `--apply`
-- **Keywords**: `ast_symbols` → `tree_sitter` → `packet_key` mapping
+- **Issue**: phase1-ast-grep still resolves synthetic packet_keys; it needs the canonical packet identity join before it can write into real `atlas_packets`
+- **Action**: `npm run atlas:phase1:ast-grep:dry` → verify canonical packet_key readback → `--apply`
+- **Keywords**: `ast_symbols` → `tree_sitter` → canonical `packet_key` join
 
 **Phase 2B: Lexical Feature Extraction** (2-3h)
 - **Script**: `npm run atlas:phase1.5:lexical:dry`
@@ -823,6 +871,119 @@ type ProjectionDistortionStats = {
 **Phase 4H: Multivector Retrieval**
 - **Keywords**: `dense_vector` → `sparse_vector` → `late_interaction` → `named_vector` → `rrf`
 - **Output**: hybrid candidate sets, per-lane scores, and packet-level semantic explanations.
+
+---
+
+## Review-derived missing items (2026-08-11)
+
+This is the short execution list extracted from the current compiler / topology / runtime review. It stays aligned with the longer proof ladder below.
+
+### Sequencing correction from the latest proof-spine review
+
+- P0 canonical packet identity join remains the front-door blocker: do not advance PF4, graph dispatch, or runtime training on divergent packet keys.
+- `packet-key-builder.ts` is now the canonical logical packet identity minting authority; `compute-packet-key.ts` is demoted to a compatibility / scoped-address helper.
+- PF4A duplicate classification is sufficient to keep `analysis_pass_results` as append-only execution history; do **not** add hard uniqueness yet.
+- Graph dispatcher / Louvain / PageRank paths exist, but the live proof gap is the dispatcher registry plus the replayable Louvain persistence receipt.
+- Retrieval fusion still needs the live one-vote-per-lane receipt and the live fusion-owner matrix before frozen replay can close.
+- Rust structural worker promotion stays descriptive only until parity, idempotency, and replay receipts exist.
+
+### Current source map
+
+- `sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts` currently emits real AST features, but the packet identity mapping still needs proof on the write path.
+- `sveltekit-frontend/src/lib/server/atlas/feature-doc-enrichment.ts` is the live reader for `feature_structural_facts`, `feature_lexical_facts`, and ontology tuples; its upstream writers must be proven against real packet keys.
+- `sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts` and `sveltekit-frontend/src/lib/server/services/langextract-service.ts` are the likely entity-extraction path for the missing `entities` lane.
+- `sveltekit-frontend/src/lib/server/retrieval/unified-orchestrator.ts` still carries LangExtract TODOs, so the retrieval-side consumer is not yet fully wired to the new compiler outputs.
+
+### Layer 2: Compiler output expansion
+
+- [ ] Fix `ast-grep` integration so `ast_symbols` write to real `atlas_packets` identities, not synthetic `packet_keys`.
+- [ ] Trace the current `ast-grep` caller chain from `analysis/worker.ts` through the writer that persists `feature_structural_facts` and verify the live `packet_key` join.
+- [ ] Finish lexical feature extraction so `lexical_features` moves past the current partial coverage.
+- [ ] Verify `feature_lexical_facts` is populated from a live extractor, not only from fallback keywords / identifiers / symbols on the read side.
+- [ ] Wire entity extraction through LangExtract so `entities` are no longer empty.
+- [ ] Prove the `entities` lane on a real `LangExtract` response path, not only via the bridge fallback.
+- [ ] Wire the remaining extractors for `imports`, `exports`, `functions`, `classes`, `routes`, and `permissions`.
+- [ ] Decide whether `routes` and `permissions` belong in the AST lane or in a separate policy-enrichment lane.
+- [ ] Verify all nine compiler-output fields against live packet evidence before any promotion.
+
+### Layer 3: Metrics and topology
+
+- [ ] Close the SOM 20×20 gate on latent vectors and record `som_row`, `som_col`, `som_cluster`, and `routing_locality`.
+- [ ] Normalize PageRank authority into one canonical field before downstream use.
+- [ ] Keep `community_id`, `k_core`, and centrality proofs on frozen snapshots before any GPU promotion.
+- [ ] Keep NetworkX, Neo4j GDS, and cuGraph parity checks separate instead of merging them into one lane.
+- [ ] Add the graph-dispatcher registry and the Louvain persistence receipt to the proof ladder before treating any dispatcher claim as closed.
+
+### Layer 4: Runtime and training
+
+- [ ] Gate Pydantic / OKF validation on explicit schema evidence.
+- [ ] Add Firecrawl ingestion only as a bounded evidence lane.
+- [ ] Wire the TorchInductor reranker as a separate compiled inference path.
+- [ ] Add ACE packet semantic labeling and HMM error recovery as explicit runtime gates.
+- [ ] Add GPU graph analysis export with parity reports rather than treating it as a default writer.
+- [ ] Keep `recommendation_log` and `semantic_label` as derived runtime artifacts, not source truth.
+- [ ] Keep research-lane integration and multivector retrieval as later proofs, not current owners.
+- [ ] Keep the Rust structural worker as a reference implementation until parity and replay receipts exist.
+
+---
+
+## Parent Atlas Pass Fabric (durable execution lane)
+
+**Goal**: turn the current analysis queue into a durable, bounded, fork-join service fabric.
+
+**Current fit**
+
+- `analysis_jobs` is already the durable queue.
+- `FOR UPDATE SKIP LOCKED` is already the right crash-recovery primitive.
+- `worker.ts` already has stage-specific concurrency gates.
+- `AnalysisPassResult` and `ExperimentFeatureMatrix` already carry the idempotency / provenance fields needed for unordered completion.
+
+**Contract**
+
+- Postgres is the canonical queue and pass ledger.
+- CPU structural / lexical passes run on multi-core workers.
+- NLP sidecar passes are bounded and optional.
+- GPU concurrency stays bounded and sidecar-owned.
+- Valkey is hot coordination cache only.
+- Read-side query fanout is a fork-join executor capped at three independent read tools.
+
+### Pass Fabric steps
+
+- [ ] Prove the current worker behavior with one real poll cycle and one real claimed batch.
+- [ ] Replace single-job claims with `claimBatch(jobType, freeSlots)` so gates fill immediately.
+- [ ] Add `pg_notify` wakeups on enqueue and keep a slow fallback poll.
+- [ ] Add durable `AnalysisPassResult` persistence as append-only execution history.
+- [ ] Classify the existing duplicate population before adding any uniqueness constraint.
+- [ ] Prove whether `pass_key` / `pass_revision` semantics are logical identity or execution metadata.
+- [ ] Decide whether the history table needs a separate current-materialization view before any DB uniqueness enforcement.
+- [ ] Add a CPU worker pool for structural, lexical, entropy, and normalization passes.
+- [ ] Keep NLP sidecar / GPU passes bounded and batched instead of launching one request per packet.
+- [ ] Add Valkey batch helpers for hot metadata, result hints, and cache receipts only.
+- [ ] Add `executeToolBatch` with `maxParallel = 3` for independent read-only tools; keep dependent or mutating calls sequential.
+- [ ] Build incremental eligibility so only changed packets / stale revisions re-run.
+- [ ] Add crash-restart replay tests: duplicate enqueue, worker crash, unchanged revision rerun, changed source rerun.
+
+### PF4A duplicate classification gate
+
+- [ ] Group duplicate `analysis_pass_results` rows by `packet_key`, `pass_name` / pass type, and `input_hash`.
+- [ ] Compare `output_hash` multiplicity per duplicate group.
+- [ ] Compare `producer_id`, `producer_revision`, `backend_version`, and `model_revision` multiplicity per duplicate group.
+- [ ] Separate identical retries from distinct execution history before any deduplication or uniqueness rule.
+- [ ] Keep nullable `source_revision` / `pass_revision` explicit until provenance can be reconstructed.
+
+**Execution order**
+
+1. Fix worker claim underfill
+2. Add queue wakeup notifications
+3. Add durable pass ledger / append-only history
+4. Classify duplicate history groups
+5. Prove pass identity semantics
+6. Add CPU worker pool
+7. Bound NLP sidecar / GPU lane concurrency
+8. Add Valkey batching helpers
+9. Add max-3 read-tool fork-join executor
+10. Add incremental eligibility
+11. Add crash / replay validation
 
 ---
 
@@ -1133,6 +1294,7 @@ in the tensor-residency OpenSpec change.
 | quaternion rotation | 3D orientation, animation only | similarity scoring, routing truth |
 | cosine similarity | ranking, nearest-neighbor score | geometry ownership |
 | low-rank sampling / Ewin-Tang-style sketching | offline sketching, compression, candidate reduction | canonical retrieval |
+| event hypergraph | n-ary symbolic events, evidence relations, participant roles | AST truth, canonical identity |
 | DLSS-like decoder-upscale lane | optional reconstruction, strictly *after* exact tile selection | identity, never before exact proof |
 | KMeans 20×20 / SOM | coarse routing, centroid map | final answer truth |
 | multi-hop graph/hypergraph traversal | evidence expansion | dense embedding ownership |
@@ -1177,7 +1339,10 @@ L6  CACHE ROUTING      — KMeans centroid hints, SOM 20x20, Topology4, Hilbert2
 L7  ACE                — prefetch / pin / resident / evict
 L8  GPU                — PyTorch, cuVS, cuML, cuGraph, cuTile only where benchmarked
 L9  EVIDENCE           — ontology-linked n-ary tuples
-L10 AGENT              — HMM, DSPy/GEPA, Ornith/Gemma
+L10 AGENT              — HMM, DSPy/GEPA, Ornith/Gemma, event hypergraph recommendation runtime
+                         packet-level NLP can proceed now; document-root /
+                         tree-dependent promotion waits for duplicate-root /
+                         idempotency closure in tree lineage work
 ```
 
 **Terminology corrections** (apply wherever these terms appear in future design docs):
@@ -1251,6 +1416,312 @@ advanced this pass.
 
 ---
 
-**Date Updated**: August 10, 2026
-**Session**: 109+ (Continuation Final)
-**Last Verified**: Live database analysis complete
+---
+
+**Session 2026-08-11 — Pass Fabric ledger reconciliation + archival sweep**
+
+- `openspec/changes/parent-atlas-pass-fabric/` created: PF0-3 (queue/worker
+  concurrency) confirmed already correctly implemented in
+  `sveltekit-frontend/src/lib/server/analysis/{worker.ts,analysis-jobs.ts}`
+  — no re-implementation needed. PF4 found `analysis_pass_results` live
+  (11,076 rows) but **orphaned** (zero code callers) and holding real
+  non-deterministic execution history (1,272 duplicate groups, 97% = repeated
+  LLM summarization samples, not bugs — not deleted). Added
+  `source_revision`/`pass_revision` columns + partial unique index (safe,
+  additive) and `analysis_pass_current` view (PF4B — most-recent-wins
+  materialization, flagged NOT_PROVEN as a semantic choice, not yet
+  validated as "recent = correct" for non-deterministic outputs). PF4C-H
+  (pass_key semantics, dependency DAG, invalidation engine, eligibility
+  gate) remain undone — need a fresh session with full context.
+- **PF-G0 confirmed as the real blocker**: no proven writer for
+  `atlas_packets.packet_key` — reads exist everywhere, zero INSERT/UPSERT
+  found. Converged independently from two separate audits (direct grep
+  session 197, architecture review session 198) — high confidence this is
+  the actual root gate ahead of any Pass Fabric scaling work.
+- `docs/PHASE-3-GPU-ACCELERATION-ROADMAP.md`: fixed 7 stale 384-dim
+  references (doc predated the 2026-07-27 canonical 768-dim policy by 8
+  days). `openspec/changes/parent-atlas-768-dim-migration/` created as an
+  inventory (90+ candidate files across `scripts/atlas/` and
+  `sveltekit-frontend/src/lib/server/`, mostly unclassified — do NOT bulk
+  edit, many are the legitimate secondary 384 routing lane per policy).
+- Archival sweep (root CLAUDE.md Archival Rules — copy + manifest + remove,
+  never delete): `train-som-384.mts`, `train-kmeans-384.mts` (explicitly
+  confirmed legacy via `MASTER-FEATURE-TODO-2026-05-20.md:777` — "legacy
+  migration evidence only; not an active representation lane"),
+  `train-kmeans-768.mts` (superseded by live GPU `kmeans-chunk-cluster.py`
+  pipeline, would've been a duplicate KMeans owner if wired), and a
+  5,856-line self-marked-`.disabled` MCP server file. **One archival was a
+  mistake and got reverted same session**: `phase101-parent-atlas-packetizer
+  .{js,mjs}` — zero code callers, but `docs/atlas/parent-atlas-table-of-
+  contents.md:115` lists "Phase 101 parent-atlas packetizer (dry-run
+  first)" as active tracked work, not dead code. Restored to original
+  location, manifest entry kept with `restored:` timestamp and the lesson
+  recorded rather than erased. **Open follow-up**: this packetizer doesn't
+  directly reference `atlas_packets`/`packet_key` in a quick grep — worth
+  checking in a fresh session whether it's a *precursor* to the still-missing
+  PF-G0 writer, since "Phase 101" + "packetizer" + "dry-run first" is
+  suggestively close to what PF-G0 needs.
+
+**Follow-up resolved same session**: checked
+`phase101-parent-atlas-packetizer.js` exports (`packetizePhase101`,
+`storeEngramPacket`, `buildContextPack`, `recommendNextOpenCodeTask`) — zero
+Postgres calls, zero `atlas_packets` INSERT/UPSERT anywhere in the file. It's
+an OpenCode task-recommendation/context-assembly tool that stores to the
+Engram memory cache, unrelated to canonical packet identity despite the
+name overlap. Restoring it was still correct (it's real active work), but
+it does **not** answer PF-G0 — that gap remains genuinely open.
+
+**MAJOR CORRECTION (same session)**: PF-G0's "zero writer" finding was
+**wrong**. All prior audits (session 197 direct grep, session 198
+architecture review) searched for literal SQL text (`"INSERT INTO
+atlas_packets"`, `.insert\(atlasPackets\)` as a plain grep) but the actual
+writer uses Drizzle ORM's query-builder syntax which those greps handled
+inconsistently. Correct search — `\.insert\(atlasPackets\)` scoped to
+`sveltekit-frontend/src` — finds:
+
+- `sveltekit-frontend/src/lib/server/embedding/semantic-packet-writer.ts`
+  — `persistCanonicalSemanticPacketEmbedding()`, does
+  `db.insert(atlasPackets).values({ packetKey, ... })`. Has a real live
+  caller: `src/routes/api/admin/batch-embeddings/embed/+server.ts` (an
+  actual API route), plus its own `.spec.ts` test file.
+- `sveltekit-frontend/src/lib/server/hyperrag/hyperrag-packet-pipeline.ts`
+  — also does `.insert(atlasPackets)`, not yet checked for live callers.
+
+**PF-G0 status revised**: from "NOT_PROVEN, no writer found" to "a writer
+exists and has a live API route caller — needs verification, not
+construction from scratch." Next session should: (1) read
+`semantic-packet-writer.ts` in full to confirm it does deterministic
+`packet_key` generation from `AstUnit`/source identity (not just accepting
+whatever `packetKey` the caller passes in — that distinction matters for
+whether this actually satisfies PF-G0's requirement), (2) check whether
+`/api/admin/batch-embeddings/embed` is actually invoked in production or
+is an admin-only manual trigger (changes how "proven" this is), (3) check
+`hyperrag-packet-pipeline.ts` for a second, possibly competing writer path
+(would need Duplication Prevention triage per root CLAUDE.md if so).
+
+**Lesson**: this session repeatedly found that "zero callers via grep" is a
+claim about the *grep*, not about the code, unless the grep pattern is
+verified to catch all real invocation syntaxes (raw SQL text, ORM builder
+calls, dynamic imports). Re-verify any "NOT_PROVEN — no writer found" claim
+in this codebase's history with an ORM-aware search before trusting it.
+
+**Verification complete, same session**: read `semantic-packet-writer.ts`
+in full. `persistCanonicalSemanticPacketEmbedding()` does a real
+`db.insert(atlasPackets).values({...}).onConflictDoUpdate(...)` — genuine
+upsert, correctly wired. **But it does not derive `packetKey`
+deterministically** — line 46-47 accepts `input.packetKey` as-is, falling
+back to a **random ULID** (`makePacketUlid()`) only if the caller sends
+nothing. Traced the one live caller
+(`/api/admin/batch-embeddings/embed/+server.ts`, line 27): `packetKey`
+comes straight from the **HTTP request body** — no source-derived identity
+logic anywhere in this path. It's a generic "persist whatever embedding
++ key you give me" admin endpoint, not the deterministic
+`AstUnit + source span → packet_key` resolver PF-G0 actually requires.
+
+**PF-G0 status, final for this session**: a *storage* writer exists and
+works. The *identity resolution* layer that should feed it deterministic
+keys does not — or does, somewhere else not yet found. This is a narrower,
+more precise gap than "no writer exists" (session 197's original framing)
+or "a writer exists, done" (this session's over-correction 10 minutes ago).
+Both were wrong in different directions. The real open question: **does
+anything in this codebase deterministically compute `packet_key` from
+`(source_ref, byte_span, symbol_kind)` or equivalent, and if so, does it
+call this writer** — or does every current caller (like the batch-embed
+route) supply keys some other, possibly non-deterministic way?
+
+**PF-G0 fully resolved, same session — found both halves, they're just not
+connected**:
+
+- Deterministic resolver **exists and is correct**:
+  `sveltekit-frontend/src/lib/server/atlas/identity/compute-packet-key.ts`
+  — `computePacketKey({ workspaceId, sourceRef, semanticAnchor })` →
+  `pkt:<workspaceId>:<sha256_first_32_hex>`. Well-documented (deterministic,
+  immutable, collision-free by design), has input validation, a matching
+  `validatePacketKey()` verifier, and a sibling `packet-key-builder.ts` not
+  yet read. Called by `dispatch/mcp-tool-implementations.ts` and
+  `tasks/semantic-packets.ts`.
+- Working writer **exists and is correct**: `semantic-packet-writer.ts`'s
+  `persistCanonicalSemanticPacketEmbedding()` (verified above). Called by
+  `/api/admin/batch-embeddings/embed/+server.ts`.
+- **Neither calls the other.** The resolver's two callers don't write to
+  `atlas_packets`; the writer's one caller takes `packetKey` from an HTTP
+  request body instead of calling the resolver. Two independently correct
+  pieces, never joined — this IS this session's own "Duplication Prevention
+  / layered ownership" pattern, just inverted: not two competing owners,
+  but two halves of one owner that never got wired to each other.
+
+**This is almost certainly why every prior session concluded "no packet
+writer" or "packet identity unproven"** — grepping for either piece alone
+(without knowing the other existed) looks exactly like a missing writer if
+you only check call sites of the resolver, or exactly like a missing
+resolver if you only check the writer's caller.
+
+**Next actionable gate, singular**: wire them together. Either (a) modify
+`/api/admin/batch-embeddings/embed/+server.ts` (or a new canonical ingest
+path) to call `computePacketKey()` and pass the result as `packetKey` into
+`persistCanonicalSemanticPacketEmbedding()`, or (b) modify
+`semantic-packet-writer.ts` itself to call `computePacketKey()` internally
+when `input.packetKey` is absent, instead of falling back to a random ULID.
+(b) is probably safer — it fixes the gap at the writer level for ALL
+current and future callers, not just one route. Read `packet-key-builder.ts`
+first (not yet read this session) in case it's a third, possibly
+higher-level wrapper that already does this join and was simply never
+switched on.
+
+**REVISED, same session — this is bigger than "wire them together"**: read
+`packet-key-builder.ts`. It exports a function with the **identical name**
+`computePacketKey` but an **incompatible signature and algorithm**:
+
+| | `compute-packet-key.ts` | `packet-key-builder.ts` |
+|---|---|---|
+| Signature | `({workspaceId, sourceRef, semanticAnchor})` | `(source_ref, tree_node_id, title_id)` |
+| Formula | `sha256("pkt:v1:{ws}:{sourceRef}:{anchor}")`, 32-hex | `sha256("{source_ref}\|{tree_node_id}\|{title_id}")`, 64-hex |
+| Output shape | `pkt:<workspaceId>:<32hex>` | raw 64-hex, no prefix |
+
+**These produce different, incompatible keys for the same logical packet.**
+Neither the earlier "resolver exists, just disconnected from writer"
+framing nor the AGENT_TASK's "compare, define canonical, wire into both
+writers" framing were wrong — but the comparison step surfaced that this is
+an identity-contract collision (two independently-designed canonical
+schemes), not just a missing connection. This is precisely what root
+CLAUDE.md's Aug 9 2026 Duplication Prevention rule was written to catch:
+"a second canonical `representation_id`... never implies... they can
+legitimately coexist" — except here nothing suggests these are meant to
+coexist as distinct representations; they're both trying to be *the*
+canonical `packet_key`.
+
+`packet-key-builder.ts` is also more architecturally complete — it ships
+`validatePacketKeyImmutability()` and `validatePacketKeyLineageChain()`
+(5-layer Postgres→Qdrant→Redis→RPC→ACE consistency check), which
+`compute-packet-key.ts` lacks entirely. That's a point in favor of
+`packet-key-builder.ts`'s scheme, but not proof — `compute-packet-key.ts`
+has workspace-scoping (`workspaceId`) which the other lacks, and
+multi-tenant workspace isolation may be a harder requirement to drop than
+lineage-validation helpers are to port over.
+
+**This decision needs a human call, not an agent pick** — which of
+`sourceRef+semanticAnchor+workspaceId` vs `sourceRef+tree_node_id+title_id`
+is the actually-correct identity basis is a domain question (does
+Parent Atlas need multi-workspace isolation in the key itself, or is a
+single global key with workspace as separate metadata sufficient? does
+AST tree_node_id survive re-parses the way a semantic anchor name would?).
+
+**Next session, in order**: (1) get the human decision on which scheme
+wins — or whether a new `PacketIdentityV1` type supersedes both by taking
+the best of each (workspace scoping + tree_node_id + validation helpers),
+(2) find every current caller of both `computePacketKey` variants (4 files
+total per this session's grep) and migrate them to the chosen canonical
+version, (3) wire the winning resolver into `semantic-packet-writer.ts` so
+it stops accepting arbitrary caller-supplied `packetKey` / random-ULID
+fallback, (4) THEN PF4C-H (pass_key semantics, dependency DAG,
+invalidation, eligibility) — those were always downstream of PF-G0 landing
+correctly, and landing it on the wrong identity scheme would make PF4's
+work need redoing.
+
+---
+
+## Session 2026-08-11 (continued) — Parallel work discovered, cross-lane gap analysis, workstation completion plan
+
+**Discovery**: mid-session, extensive real infrastructure appeared via
+`git status` that this session did not create — a concurrent agent/process
+implemented substantial Parent Atlas pieces while this session ran. Verified
+by reading the actual code (not assumed):
+
+### What's REAL and LIVE (verified by reading code, not docs)
+
+- **PF4 pass ledger** (`analysis-pass-results.ts`): genuinely wired.
+  `recordAnalysisPassResult()` is called live in `worker.ts:299`, inside the
+  real job-completion path. Deterministic input-hash idempotency
+  (`buildAnalysisPassInputHash`), graceful degradation if table missing.
+  `findAnalysisPassDuplicateGroups()` is the exact duplicate-classification
+  query this session ran manually earlier — now a reusable function.
+- **G11 hardcoded-localhost fix**: 14 files fixed this session via a
+  reviewed, twice-corrected codemod (`scripts/fix-g11-hardcoded-localhost.mjs`)
+  — caught 2 real syntax-error classes before applying (mixed `??`/`||`
+  operators from blind literal replacement) via dry-run + typecheck
+  verification. `gemma4-invocation.ts` additionally fixed to resolve model
+  dynamically from `/v1/models` instead of a hardcoded model id, and to use
+  `stream: true` per root CLAUDE.md's own documented hard rule (was hitting
+  the exact "thinking eats token budget" bug that rule warns about).
+- **G16 test stubs**: 64 real stubs generated via the pre-existing
+  `scripts/generate-route-test-stubs.mjs` tool (found — not built this
+  session, another case of "infrastructure exists, wasn't being used").
+- **POS/n-ary-concept/ontology-tuple builder** (`pos-concept-tagging-lane.ts`):
+  real, well-designed pure function (`buildPosConceptTaggingPacket`).
+  Deterministic tuple-ID hashing, canonicalized participant ordering
+  (order-independent per the 43-section spec's requirement), citations/
+  screenshots/MCP-tool-calls/ranking-signals (bm25/bm42/pagerank/manifold/
+  som/kmeans/community) all present as designed. Has a **real PASS proof
+  run** (`docs/reports/pos-concept-tagging-lane-proof.json`,
+  2026-08-11T04:31Z) showing correct idempotency behavior (`inserted: false,
+  rowId: 11118` — detected existing row).
+- **Event hypergraph contract** (`event-hypergraph-contract.ts`): matches
+  the 43-section spec's `AtlasEvent`/participant-role/order-independent-
+  identity design.
+- **New OpenSpec**: `parent-atlas-telemetry-lowrank-recommendation-okf-integration/`
+  already has real `design.md`/`proposal.md`/`README.md`/`tasks.md` content
+  (not just stubs) — the 4-lane telemetry/approximation/compute/policy
+  separation from this session's earlier review is being tracked there.
+
+### The one gap that shows up in EVERY lane above: P0 identity, worse than thought
+
+Found while checking the POS-tagging proof: `packetKey:
+"ace:packet:c115e487d04d"` — **a THIRD packet_key format**, distinct from
+both `pkt:<workspace>:<32hex>` (orphaned `compute-packet-key.ts`) and raw
+`<64hex>` (live `packet-key-builder.ts`). A quick grep found `ace:packet:`
+used across 10+ files in the ACE subsystem — likely the highest-volume
+format by usage, and the one the real POS-tagging proof run actually
+emitted. Full writeup + next steps:
+`openspec/changes/parent-atlas-pass-fabric/tasks.md` (§"P0 UPDATE").
+
+**This is now confirmed, with evidence, as the single blocking gap across
+every lane**: Pass Fabric (PF4's ledger has a real writer but no canonical
+identity feeding it), Graph (dispatcher exists, packet-keyed metrics need
+stable identity to attach to), Retrieval (canonical identity normalization
+"mostly implemented" per external review — same root cause), POS/Ontology/
+N-ary (the new, real, well-built lane emits its own third identity format).
+**No lane can be marked complete until this is resolved**, because every
+lane's output is keyed by `packet_key`, and there is currently no single
+authoritative answer to "what is packet_key for this source."
+
+### Workstation completion plan — all lanes, next steps
+
+Per the external architectural review (saved in full at
+`memory/SESSION-198-CONFIRMED-STATE-AND-CANONICAL-BUILD-ORDER.md`), the
+frozen build order is:
+
+```
+P0  → resolve the 3-way packet_key format collision (NEW, sharper framing)
+PF1-8 → pass identity, dependency DAG, invalidation, eligibility, replay
+G1-2  → graph dispatcher registry completeness, Louvain persistence proof
+G3-4  → retrieval: one-vote-per-lane RRF, frozen golden replay
+R1-3  → Rust structural worker: parity vs TS/Python reference, then promote
+N1-9  → lexical→POS→AST/POS-join→mentions→concepts→ontology→conflicts→
+         n-ary events→hypergraph (AST-first proof, then reuse pattern —
+         do NOT fan out simultaneously; POS/ontology lane already has real
+         code, but needs P0 fixed before its output can be trusted as
+         correctly identified)
+S1-3  → semantic_768, exact kNN oracle, topology/manifold
+F1-8  → BM25, BM42, dense, AST, graph, event lanes → normalized fusion → FeatureRow
+E1-6  → grounded summaries, citations, screenshots, MCP receipts, tool DAG,
+         ContextManifest identity
+P1-4  → deterministic policy baseline → recommendation snapshot → oracle → shadow
+A1-5  → Packet LUT, HLL telemetry, ACE reward labels, LOD hysteresis, cost model
+D1-4  → frozen retrieval/repair replay corpora, negative examples, drift baseline
+X1-4  → RFF/Ewin-Tang/XGBoost/GPU-policy — SHADOW ONLY until oracle-compared
+FINAL → full-system golden replay (Kanban task through ACE telemetry,
+         deterministic replay of every non-generative boundary)
+```
+
+**Immediate next session action**: `grep -rn "'ace:packet:'" src/lib/server`
+to find the actual construction site(s) for the third identity format, then
+make the P0 canonical-format decision (see pass-fabric tasks.md for the
+3-way comparison table and decision criteria). This is a genuine
+architecture call needing full context — do not rush it.
+
+---
+
+**Date Updated**: August 11, 2026
+**Session**: 198 (continued — parallel-work discovery + cross-lane gap analysis)
+**Last Verified**: Live code read (analysis-pass-results.ts, pos-concept-tagging-lane.ts,
+event-hypergraph-contract.ts, worker.ts, docs/reports/pos-concept-tagging-lane-proof.json)

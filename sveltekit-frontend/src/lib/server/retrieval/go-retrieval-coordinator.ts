@@ -15,6 +15,7 @@
 import type { CanonicalIDHierarchy } from '../topology/canonical-id-hierarchy.js';
 import type { PermissionManager } from '../topology/permission-manager.js';
 
+import { ENV } from '$lib/server/env.server.js';
 interface RetrievalRequest {
   query: string;
   query_embedding: number[]; // 768-dim canonical dense lane from EmbeddingGemma
@@ -185,7 +186,7 @@ export async function gpuReranker(
 export async function gemma4AnswerSynthesis(
   candidates: RetrievalCandidate[],
   query: string,
-  llmUrl: string = 'http://localhost:8090'
+  llmUrl: string = ENV.LLAMA_SERVER_URL ?? 'http://localhost:8090'
 ): Promise<GemmaAnswer> {
   if (candidates.length === 0) {
     return {
@@ -268,9 +269,9 @@ export async function gemma4AnswerSynthesis(
 export async function endToEndRetrieval(
   query: string,
   queryEmbedding: number[],
-  goServiceUrl: string = 'http://localhost:8100',
+  goServiceUrl: string = ENV.GO_RETRIEVAL_HTTP_URL ?? 'http://localhost:8100',
   tensorrtUrl: string = 'http://localhost:8765',
-  gemma4Url: string = 'http://localhost:8090'
+  gemma4Url: string = ENV.LLAMA_SERVER_URL ?? 'http://localhost:8090'
 ): Promise<{
   answer: GemmaAnswer;
   candidates: RetrievalCandidate[];

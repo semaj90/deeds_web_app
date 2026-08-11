@@ -114,7 +114,7 @@ async function gateG16Gemma4Synthesis(
   facts: string[],
   context: string,
   query: string,
-  gemma4_url: string = 'http://127.0.0.1:8090'
+  gemma4_url: string = ENV.LLAMA_SERVER_URL ?? 'http://127.0.0.1:8090'
 ): Promise<Phase110ProofGate & { answer: string | null }> {
   const start_time = Date.now();
 
@@ -311,3 +311,5 @@ export async function executePhase110EndToEnd(
 
 // Import at module level to avoid circular deps
 import crypto from 'crypto';
+
+import { ENV } from '$lib/server/env.server.js';

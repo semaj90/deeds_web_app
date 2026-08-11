@@ -27,12 +27,76 @@ export const OntologyLinkedTupleLabelSourceSchema = z.enum([
   'manual',
 ]);
 
+export const OntologyLinkedTupleParticipantRoleSchema = z.enum([
+  'actor',
+  'target',
+  'input',
+  'output',
+  'tool',
+  'packet',
+  'symbol',
+  'task',
+  'workflow',
+  'evidence',
+  'cause',
+  'effect',
+  'citation',
+  'screenshot',
+  'summary',
+  'policy',
+  'source',
+  'topology',
+  'manifold',
+  'context',
+]);
+
+export const OntologyLinkedTupleParticipantKindSchema = z.enum([
+  'packet',
+  'source_ref',
+  'tree_node',
+  'ast_symbol',
+  'semantic_concept',
+  'concept',
+  'topic',
+  'citation',
+  'screenshot',
+  'policy_summary',
+  'tool_call',
+  'topology_node',
+  'manifold_point',
+  'page_rank',
+  'bm25',
+  'bm42',
+  'mcp_tool_call',
+  'summary',
+]);
+
+export const OntologyLinkedTupleParticipantSchema = z.object({
+  entityId: z.string().min(1),
+  entityKind: OntologyLinkedTupleParticipantKindSchema,
+  role: OntologyLinkedTupleParticipantRoleSchema,
+  label: z.string().min(1).nullable().optional(),
+});
+
 export const OntologyLinkedTupleProvenanceSchema = z.object({
   sourceTables: z.array(z.string().min(1)).max(12),
   labelerVersion: z.string().min(1).nullable(),
   taggerVersion: z.string().min(1).nullable(),
   ontologyVersion: z.string().min(1).nullable(),
   nlpVersion: z.string().min(1).nullable(),
+  sourceRevision: z.string().min(1).nullable().optional(),
+  representationId: z.string().min(1).nullable().optional(),
+  representationRevision: z.string().min(1).nullable().optional(),
+  producerId: z.string().min(1).nullable().optional(),
+  producerRevision: z.string().min(1).nullable().optional(),
+  featureRevision: z.string().min(1).nullable().optional(),
+  graphRevision: z.string().min(1).nullable().optional(),
+  ontologyRevision: z.string().min(1).nullable().optional(),
+  modelRevision: z.string().min(1).nullable().optional(),
+  inputDigest: z.string().min(1).nullable().optional(),
+  outputDigest: z.string().min(1).nullable().optional(),
+  generatedAt: z.string().datetime().nullable().optional(),
+  lastVerifiedAt: z.string().datetime().nullable().optional(),
 });
 
 export const OntologyLinkedTupleV1Schema = z.object({
@@ -51,15 +115,22 @@ export const OntologyLinkedTupleV1Schema = z.object({
   labelSource: OntologyLinkedTupleLabelSourceSchema,
   ontologyIds: z.array(z.string().min(1)).max(32),
   conceptIds: z.array(z.string().min(1)).max(32),
+  participants: z.array(OntologyLinkedTupleParticipantSchema).max(16).default([]),
+  evidenceRefs: z.array(z.string().min(1)).max(32).default([]),
   confidence: z.number().min(0).max(1),
   evidenceState: OntologyLinkedTupleEvidenceStateSchema,
   provenance: OntologyLinkedTupleProvenanceSchema,
 });
 
 export type OntologyLinkedTupleV1 = z.infer<typeof OntologyLinkedTupleV1Schema>;
+export type OntologyLinkedTupleParticipant = z.infer<typeof OntologyLinkedTupleParticipantSchema>;
 
 function hashTupleId(parts: string[]): string {
   return createHash('sha256').update(parts.join('\0')).digest('hex');
+}
+
+export function buildOntologyLinkedTupleId(parts: string[]): string {
+  return hashTupleId(parts);
 }
 
 function normalizeSourceTables(sourceTables: string[]): string[] {
@@ -74,6 +145,21 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
   taggerVersion?: string | null;
   ontologyVersion?: string | null;
   nlpVersion?: string | null;
+  sourceRevision?: string | null;
+  representationId?: string | null;
+  representationRevision?: string | null;
+  producerId?: string | null;
+  producerRevision?: string | null;
+  featureRevision?: string | null;
+  graphRevision?: string | null;
+  ontologyRevision?: string | null;
+  modelRevision?: string | null;
+  inputDigest?: string | null;
+  outputDigest?: string | null;
+  generatedAt?: string | null;
+  lastVerifiedAt?: string | null;
+  participants?: OntologyLinkedTupleParticipant[] | null;
+  evidenceRefs?: string[] | null;
 }): OntologyLinkedTupleV1[] {
   const sourceTables = normalizeSourceTables(input.sourceTables);
   const treeNodeId = input.classification.identity.treeNodeId ?? input.featureRow?.identity.tree_node_id ?? undefined;
@@ -90,6 +176,19 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
     : input.featureRow?.secondary_domains ?? [];
   const partOfSpeech = input.classification.signals.partOfSpeech ?? input.featureRow?.lexical?.part_of_speech ?? null;
   const evidenceState = input.classification.signals.evidenceState;
+  const participants = Array.from(
+    new Map(
+      (input.participants ?? []).map((participant) => [
+        [participant.entityKind, participant.role, participant.entityId, participant.label ?? ''].join('|'),
+        OntologyLinkedTupleParticipantSchema.parse(participant),
+      ])
+    ).values()
+  ).sort((left, right) => {
+    const leftKey = [left.entityKind, left.role, left.entityId, left.label ?? ''].join('|');
+    const rightKey = [right.entityKind, right.role, right.entityId, right.label ?? ''].join('|');
+    return leftKey.localeCompare(rightKey);
+  });
+  const evidenceRefs = Array.from(new Set((input.evidenceRefs ?? []).map((ref) => ref.trim()).filter(Boolean)));
 
   const tuples: OntologyLinkedTupleV1[] = [];
 
@@ -116,6 +215,8 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
     labelSource: 'semantic_tagger',
     ontologyIds,
     conceptIds,
+    participants,
+    evidenceRefs,
     confidence: evidenceState === 'ACTIVE_VERIFIED' ? 0.95 : 0.72,
     evidenceState,
     provenance: {
@@ -124,6 +225,19 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
       taggerVersion: input.taggerVersion ?? null,
       ontologyVersion: input.ontologyVersion ?? null,
       nlpVersion: input.nlpVersion ?? null,
+      sourceRevision: input.sourceRevision ?? null,
+      representationId: input.representationId ?? null,
+      representationRevision: input.representationRevision ?? null,
+      producerId: input.producerId ?? null,
+      producerRevision: input.producerRevision ?? null,
+      featureRevision: input.featureRevision ?? null,
+      graphRevision: input.graphRevision ?? null,
+      ontologyRevision: input.ontologyRevision ?? null,
+      modelRevision: input.modelRevision ?? null,
+      inputDigest: input.inputDigest ?? null,
+      outputDigest: input.outputDigest ?? null,
+      generatedAt: input.generatedAt ?? null,
+      lastVerifiedAt: input.lastVerifiedAt ?? null,
     },
   }));
 
@@ -151,6 +265,8 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
       labelSource: 'semantic_tagger',
       ontologyIds: [],
       conceptIds: [],
+      participants,
+      evidenceRefs,
       confidence: 0.7,
       evidenceState,
       provenance: {
@@ -159,6 +275,19 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
         taggerVersion: input.taggerVersion ?? null,
         ontologyVersion: input.ontologyVersion ?? null,
         nlpVersion: input.nlpVersion ?? null,
+        sourceRevision: input.sourceRevision ?? null,
+        representationId: input.representationId ?? null,
+        representationRevision: input.representationRevision ?? null,
+        producerId: input.producerId ?? null,
+        producerRevision: input.producerRevision ?? null,
+        featureRevision: input.featureRevision ?? null,
+        graphRevision: input.graphRevision ?? null,
+        ontologyRevision: input.ontologyRevision ?? null,
+        modelRevision: input.modelRevision ?? null,
+        inputDigest: input.inputDigest ?? null,
+        outputDigest: input.outputDigest ?? null,
+        generatedAt: input.generatedAt ?? null,
+        lastVerifiedAt: input.lastVerifiedAt ?? null,
       },
     }));
   }
@@ -187,6 +316,8 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
       labelSource: 'pos_tagger',
       ontologyIds: [],
       conceptIds: [],
+      participants,
+      evidenceRefs,
       confidence: 0.9,
       evidenceState,
       provenance: {
@@ -195,6 +326,19 @@ export function buildOntologyLinkedTuplesFromClassification(input: {
         taggerVersion: input.taggerVersion ?? null,
         ontologyVersion: input.ontologyVersion ?? null,
         nlpVersion: input.nlpVersion ?? null,
+        sourceRevision: input.sourceRevision ?? null,
+        representationId: input.representationId ?? null,
+        representationRevision: input.representationRevision ?? null,
+        producerId: input.producerId ?? null,
+        producerRevision: input.producerRevision ?? null,
+        featureRevision: input.featureRevision ?? null,
+        graphRevision: input.graphRevision ?? null,
+        ontologyRevision: input.ontologyRevision ?? null,
+        modelRevision: input.modelRevision ?? null,
+        inputDigest: input.inputDigest ?? null,
+        outputDigest: input.outputDigest ?? null,
+        generatedAt: input.generatedAt ?? null,
+        lastVerifiedAt: input.lastVerifiedAt ?? null,
       },
     }));
   }
@@ -212,6 +356,21 @@ export function buildOntologyLinkedTuplesFromFeatureRow(input: {
   taggerVersion?: string | null;
   ontologyVersion?: string | null;
   nlpVersion?: string | null;
+  sourceRevision?: string | null;
+  representationId?: string | null;
+  representationRevision?: string | null;
+  producerId?: string | null;
+  producerRevision?: string | null;
+  featureRevision?: string | null;
+  graphRevision?: string | null;
+  ontologyRevision?: string | null;
+  modelRevision?: string | null;
+  inputDigest?: string | null;
+  outputDigest?: string | null;
+  generatedAt?: string | null;
+  lastVerifiedAt?: string | null;
+  participants?: OntologyLinkedTupleParticipant[] | null;
+  evidenceRefs?: string[] | null;
 }): OntologyLinkedTupleV1[] {
   return buildOntologyLinkedTuplesFromClassification({
     classification: {
@@ -266,5 +425,20 @@ export function buildOntologyLinkedTuplesFromFeatureRow(input: {
     taggerVersion: input.taggerVersion,
     ontologyVersion: input.ontologyVersion,
     nlpVersion: input.nlpVersion,
+    sourceRevision: input.sourceRevision,
+    representationId: input.representationId,
+    representationRevision: input.representationRevision,
+    producerId: input.producerId,
+    producerRevision: input.producerRevision,
+    featureRevision: input.featureRevision,
+    graphRevision: input.graphRevision,
+    ontologyRevision: input.ontologyRevision,
+    modelRevision: input.modelRevision,
+    inputDigest: input.inputDigest,
+    outputDigest: input.outputDigest,
+    generatedAt: input.generatedAt,
+    lastVerifiedAt: input.lastVerifiedAt,
+    participants: input.participants,
+    evidenceRefs: input.evidenceRefs,
   });
 }

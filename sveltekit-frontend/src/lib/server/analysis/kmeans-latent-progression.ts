@@ -1,3 +1,4 @@
+import { ENV } from '$lib/server/env.server.js';
 /**
  * KMeans Latent Space Progression Analysis
  *
@@ -166,7 +167,7 @@ export interface TurboVecKMeansJob {
  */
 export async function queryTurboVecKMeansJob(
   jobId: string,
-  turboVecUrl: string = 'http://127.0.0.1:8791'
+  turboVecUrl: string = ENV.TURBOVEC_SIDECAR ?? 'http://127.0.0.1:8791'
 ): Promise<TurboVecKMeansJob | null> {
   try {
     const response = await fetch(`${turboVecUrl}/jobs/${jobId}`);
