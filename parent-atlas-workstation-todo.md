@@ -904,7 +904,7 @@ This is the short execution list extracted from the current compiler / topology 
 - PF4C semantics are now confirmed from the live writer path: `pass_key` is execution metadata / idempotency key, while `pass_identity_hash` is the logical pass identity used for deterministic reuse.
 - PF4G duplicate-delivery idempotency on deterministic writes is proven by focused unit test; repeat delivery reuses the existing deterministic receipt and does not insert a duplicate row.
 - PF4H live boundary receipt is now captured from the real ledger: `analysis_pass_current` is view-only, `analysis_pass_results` remains the append-only history table, and there is no unique constraint on the current-materialization boundary.
-- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The remaining live gap is the replayable Louvain persistence receipt: the latest receipt is captured, but `unresolvedPacketKeys=6786` keeps `replaySafe=false`.
+- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The Louvain identity seam now classifies policy docs, backups, and worktree shadows as exclusions rather than unresolved identities, but the latest persisted receipt is still stale and `replaySafe=false` until a fresh live rerun lands with the new counters.
 - Retrieval fusion now has the one-vote-per-lane proof route and regression test wired. The live fusion-owner matrix is still open before frozen replay can close.
 - Rust structural worker promotion stays descriptive only until parity, idempotency, and replay receipts exist.
 
@@ -1608,8 +1608,8 @@ path) to call `computePacketKey()` and pass the result as `packetKey` into
 `persistCanonicalSemanticPacketEmbedding()`, or (b) modify
 `semantic-packet-writer.ts` itself to call `computePacketKey()` internally
 when `input.packetKey` is absent, instead of falling back to a random ULID.
-(b) is probably safer — it fixes the gap at the writer level for ALL
-current and future callers, not just one route. Read `packet-key-builder.ts`
+(b) is still the safer writer-level fix for existing callers, but only after
+the canonical packet identity basis is frozen. Read `packet-key-builder.ts`
 first (not yet read this session) in case it's a third, possibly
 higher-level wrapper that already does this join and was simply never
 switched on.
@@ -1645,12 +1645,67 @@ has workspace-scoping (`workspaceId`) which the other lacks, and
 multi-tenant workspace isolation may be a harder requirement to drop than
 lineage-validation helpers are to port over.
 
-**This decision needs a human call, not an agent pick** — which of
-`sourceRef+semanticAnchor+workspaceId` vs `sourceRef+tree_node_id+title_id`
-is the actually-correct identity basis is a domain question (does
-Parent Atlas need multi-workspace isolation in the key itself, or is a
-single global key with workspace as separate metadata sufficient? does
-AST tree_node_id survive re-parses the way a semantic anchor name would?).
+**Current decision**: `packet-key-builder.ts` remains a grain-unproven V2
+candidate and must not become write authority yet.
+
+- `compute-packet-key.ts` stays scoped as a compatibility helper.
+- `packet-key-builder.ts` stays provisional until the structural-grain
+  question is proven live.
+- `semantic-packet-writer.ts` must not invent packet keys or silently swap
+  identity families.
+
+The unresolved domain question is still whether the canonical packet basis is
+`sourceRef + semanticAnchor + workspaceId` or
+`sourceRef + tree_node_id + title_id`, and whether `tree_node_id` is stable
+enough across re-parses to serve as canonical structural identity. That
+question stays open until the source-revision audit below closes.
+
+### GS1_12 — Source revision index safety
+
+**Goal**: prove which indexed surfaces are safe to keep, which are resolvable,
+which need migration, and which should be historical rebuilds only.
+
+**Audit surfaces**
+
+- `codebase_chunk_index`
+- `atlas_tree_nodes`
+- `graphify_symbols`
+- `atlas_graph_nodes_v2`
+- Qdrant `semantic_768` payloads
+- Neo4j graph projection state
+- packet vector bundle tables
+- feature index rows currently keyed by `tree_node_id`
+
+**Per-surface receipt**
+
+- `rows_total`
+- `source_ref_present`
+- `source_revision_present`
+- `tree_node_id_present`
+- `parse_node_id_present`
+- `symbol_id_present`
+- `symbol_version_id_present`
+- `chunk_id_present`
+- `revision_resolvable`
+- `revision_ambiguous`
+- `revision_missing`
+- `classification` = `SAFE` / `RESOLVABLE` / `MIGRATION_REQUIRED` /
+  `HISTORICAL_REBUILD` / `NOT_VERSIONED`
+- `reason`
+
+**Rules**
+
+- Do not migrate row-by-row if the source can be rebuilt from canonical
+  source revision.
+- Do not relax `atlas_graph_nodes_v2_tree_node_unique` during the audit.
+- Do not treat `tree_node_id` as stable symbol identity.
+- Keep packet identity alias replay separate from source-revision index safety.
+
+**Acceptance**
+
+- `SOURCE_REVISION_INDEX_SAFETY_PROVEN` is only true after the audit receipt
+  exists for every listed surface and the rebuild vs migration decision is
+  explicit.
 
 **Next session, in order**: (1) get the human decision on which scheme
 wins — or whether a new `PacketIdentityV1` type supersedes both by taking
