@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { tracedQuery } from '$lib/server/db/client.js';
+import { getParentAtlasPhaseLaneSnapshot } from './phase-lane-registry.js';
 
 export interface ParentAtlasWorkstationSnapshot {
   generatedAt: string;
@@ -23,6 +24,7 @@ export interface ParentAtlasWorkstationSnapshot {
     seedsExist: boolean | null;
     seedsStale: boolean | null;
   };
+  phaseLanes: ReturnType<typeof getParentAtlasPhaseLaneSnapshot>;
   nextCommands: string[];
   nextActions: string[];
 }
@@ -103,6 +105,9 @@ function buildNextActions(snapshot: Omit<ParentAtlasWorkstationSnapshot, 'nextCo
     actions.push('Generate cartridge seeds before expecting seed-driven recommendation tools to return useful dense context.');
   } else if (snapshot.laneHealth.seedsStale) {
     actions.push('Regenerate stale cartridge seeds so workstation-backed recommendations reflect the current corpus.');
+  }
+  if (snapshot.phaseLanes.summary.partial > 0 || snapshot.phaseLanes.summary.planned > 0 || snapshot.phaseLanes.summary.evalOnly > 0) {
+    actions.push('Use the phase-lane mock ladder as the canonical open-gaps queue for phases 11-25.');
   }
 
   return actions;
@@ -204,6 +209,7 @@ export async function getParentAtlasWorkstationSnapshot(): Promise<ParentAtlasWo
         ? Boolean((laneHealthJson.seeds as Record<string, unknown>).stale)
         : null,
   };
+  const phaseLanes = getParentAtlasPhaseLaneSnapshot();
 
   const baseSnapshot = {
     generatedAt: new Date().toISOString(),
@@ -211,6 +217,7 @@ export async function getParentAtlasWorkstationSnapshot(): Promise<ParentAtlasWo
     metrics,
     status,
     laneHealth,
+    phaseLanes,
   };
 
   return {

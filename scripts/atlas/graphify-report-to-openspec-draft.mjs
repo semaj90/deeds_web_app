@@ -182,21 +182,47 @@ async function discoverReportFiles() {
   return found.slice(0, LIMIT);
 }
 
+/**
+ * If this report carries rows with feature_label_derived/feature_label_status
+ * (the additive fields wired in by feature-label-semantic-derivation Phase 2/3),
+ * surface the first high-signal one as a hint for the LLM prompt instead of
+ * letting it re-derive a topic label from scratch. Duck-typed against any
+ * report shape — not tied to a specific report filename.
+ */
+function findKnownFunctionalLabel(parsed) {
+  const rows = Array.isArray(parsed?.top) ? parsed.top : Array.isArray(parsed) ? parsed : [];
+  const eligible = new Set(['DERIVED_HIGH_CONFIDENCE', 'GENERIC_REPLACEMENT_RECOMMENDED']);
+  for (const row of rows) {
+    const status = row?.feature_label_status ?? row?.metadata?.feature_label_status;
+    const label = row?.feature_label_derived ?? row?.metadata?.feature_label_derived;
+    if (label && eligible.has(status)) return { label, status };
+  }
+  return null;
+}
+
 async function digestReport(filePath) {
   const raw = await fs.readFile(filePath, 'utf-8');
   let parsed;
   try {
     parsed = JSON.parse(raw);
   } catch {
-    return { relPath: path.relative(REPO_ROOT, filePath), digest: raw.slice(0, 1200) };
+    return { relPath: path.relative(REPO_ROOT, filePath), digest: raw.slice(0, 1200), knownFunctionalLabel: null };
   }
   const digest = JSON.stringify(parsed, null, 2).slice(0, 1800);
-  return { relPath: path.relative(REPO_ROOT, filePath).replace(/\\/g, '/'), digest };
+  return {
+    relPath: path.relative(REPO_ROOT, filePath).replace(/\\/g, '/'),
+    digest,
+    knownFunctionalLabel: findKnownFunctionalLabel(parsed),
+  };
 }
 
 // ─── LLM draft generation ──────────────────────────────────────────────────────
 
-function buildPrompt(relPath, digest) {
+function buildPrompt(relPath, digest, knownFunctionalLabel) {
+  const hint = knownFunctionalLabel
+    ? `\nKnown functional label (already derived from this report's data, status=${knownFunctionalLabel.status}): "${knownFunctionalLabel.label}"\nPrefer this label — or a close variant of it — as the semantic basis for "topic_slug" instead of re-deriving one from scratch.\n`
+    : '';
+
   return `You are drafting an UNREVIEWED change recommendation from a codebase report. Output STRICT JSON only, no markdown fences, no commentary, matching exactly this shape:
 
 {
@@ -211,7 +237,7 @@ function buildPrompt(relPath, digest) {
 }
 
 If the report shows a clean/healthy/no-action-needed state, still fill every field but set "proposed_action" to "No action recommended" and "confidence" to a low value (e.g. 0.2).
-
+${hint}
 REPORT FILE: ${relPath}
 REPORT CONTENT:
 ${digest}
@@ -338,12 +364,12 @@ async function main() {
   const dateStr = new Date().toISOString().split('T')[0];
 
   for (const { filePath } of files) {
-    const { relPath, digest } = await digestReport(filePath);
-    log(`→ ${relPath}`);
+    const { relPath, digest, knownFunctionalLabel } = await digestReport(filePath);
+    log(`→ ${relPath}${knownFunctionalLabel ? ` (known functional label: "${knownFunctionalLabel.label}")` : ''}`);
 
     let rec;
     try {
-      const raw = await callLlamaServer(buildPrompt(relPath, digest));
+      const raw = await callLlamaServer(buildPrompt(relPath, digest, knownFunctionalLabel));
       rec = extractJson(raw);
       if (!rec || !rec.proposed_action) {
         log(`  ⚠️ llama-server returned no usable JSON for ${relPath}, skipping.`);

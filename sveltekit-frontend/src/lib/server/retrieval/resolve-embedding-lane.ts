@@ -15,6 +15,7 @@
  */
 
 import { DenseRepresentationName } from '../atlas/contracts/dense-lane-policy';
+import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 export enum EmbeddingLaneTelemetryReason {
   EXPLICIT_FIELD = 'explicit_field',
@@ -53,7 +54,7 @@ const COLLECTION_LANE_REGISTRY: Record<string, DenseRepresentationName> = {
 const VECTOR_NAME_LANE_REGISTRY: Record<string, DenseRepresentationName> = {
   'dense_768': DenseRepresentationName.SEMANTIC_768,
   'latent_64': DenseRepresentationName.LATENT_64,
-  'semantic_768': DenseRepresentationName.SEMANTIC_768,
+  [SEMANTIC_REPRESENTATION_ID]: DenseRepresentationName.SEMANTIC_768,
   'routing_latent64': DenseRepresentationName.LATENT_64,
 };
 

@@ -20,21 +20,52 @@
 
 import type { Pool } from 'pg';
 
+function normalizeAtlasPath(path: string): string {
+	return String(path)
+		.replace(/\\/g, '/')
+		.replace(/^\.?\//, '')
+		.replace(/^\.claude\/worktrees\/[^/]+\//, '')
+		.replace(/^sveltekit-frontend\//, '')
+		.replace(/^src\//, '');
+}
+
+function pathVariants(path: string): string[] {
+	const normalized = normalizeAtlasPath(path);
+	const srcPrefixed = `src/${normalized}`;
+	const frontendPrefixed = `sveltekit-frontend/${normalized}`;
+	const worktreePrefixed = `.claude/worktrees/current/${normalized}`;
+	return [...new Set([path, normalized, srcPrefixed, frontendPrefixed, worktreePrefixed].map((value) => String(value).replace(/\\/g, '/').replace(/^\.?\//, ''))) ];
+}
+
 export async function resolveCodebaseFilePacketKeys(
 	db: Pool,
 	paths: readonly string[],
 ): Promise<Map<string, string>> {
-	const uniquePaths = [...new Set(paths)];
+	const uniquePaths = [...new Set(paths.flatMap((path) => pathVariants(path)))];
 	const resolved = new Map<string, string>();
 	if (uniquePaths.length === 0) return resolved;
 
-	const prefixedPaths = uniquePaths.map((p) => `sveltekit-frontend/${p}`);
 	const { rows } = await db.query<{ source_ref: string; packet_key: string }>(
-		`SELECT source_ref, packet_key FROM atlas_packets WHERE source_ref = ANY($1) OR source_ref = ANY($2)`,
-		[uniquePaths, prefixedPaths],
+		`SELECT source_ref, canonical_source_ref, file_path, source_path, source_ref_key, packet_key
+		 FROM atlas_packets
+		 WHERE source_ref = ANY($1)
+		    OR canonical_source_ref = ANY($1)
+		    OR file_path = ANY($1)
+		    OR source_path = ANY($1)
+		    OR source_ref_key = ANY($1)
+		`,
+		[uniquePaths],
 	);
 	for (const row of rows) {
-		resolved.set(row.source_ref, row.packet_key);
+		for (const key of [
+			row.source_ref,
+			row.canonical_source_ref,
+			row.file_path,
+			row.source_path,
+			row.source_ref_key,
+		]) {
+			if (key) resolved.set(normalizeAtlasPath(key), row.packet_key);
+		}
 	}
 	return resolved;
 }
@@ -42,5 +73,10 @@ export async function resolveCodebaseFilePacketKeys(
 /** Look up a single path's packet_key from a resolver map, trying the exact then prefixed form. */
 export function lookupPacketKey(resolved: Map<string, string>, path: string | null | undefined): string | undefined {
 	if (!path) return undefined;
-	return resolved.get(path) ?? resolved.get(`sveltekit-frontend/${path}`);
+	const variants = pathVariants(path);
+	for (const variant of variants) {
+		const packetKey = resolved.get(normalizeAtlasPath(variant));
+		if (packetKey) return packetKey;
+	}
+	return undefined;
 }

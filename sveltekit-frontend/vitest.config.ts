@@ -33,6 +33,7 @@ export default defineConfig({
       'tests/ace-context-glossary.spec.ts',
       'tests/ace-ingest-route.spec.ts',
       'tests/ace-status-route.spec.ts',
+      'tests/phase-lanes-route.spec.ts',
       'tests/ace-summarize-route.spec.ts',
       'tests/chat-session-attachment-handoff.spec.ts',
       'tests/evidence-detail-route.test.ts',

@@ -1,5 +1,7 @@
+import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
+
 export const TURBOVEC_EMBEDDING_MODEL = 'embeddinggemma:latest';
-export const TURBOVEC_EMBEDDING_DIMENSION = 768;
+export const TURBOVEC_EMBEDDING_DIMENSION = SEMANTIC_DIMENSION;
 export const TURBOVEC_QUANTIZER = 'turbovec-4bit';
 export const TURBOVEC_ROTATION_SEED = 'rotorquant-v1';
 

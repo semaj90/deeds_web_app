@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
 
 export const TELEMETRY_BREADTH_SCHEMA_VERSION = 'atlas.telemetry-breadth.v1' as const;
 
@@ -28,7 +29,7 @@ export const TelemetryBreadthEstimatesSchema = z
 export const TelemetryBreadthProvenanceSchema = z
   .object({
     sourceRevision: z.string().min(1),
-    representationId: z.literal('semantic_768'),
+    representationId: z.literal(SEMANTIC_REPRESENTATION_ID),
     representationRevision: z.string().min(1),
     producerId: z.string().min(1),
     producerRevision: z.string().min(1),
@@ -48,7 +49,7 @@ export const TelemetryBreadthV1Schema = z
     packetKey: z.string().min(1),
     sourceRef: z.string().min(1),
     sourceRevision: z.string().min(1),
-    representationId: z.literal('semantic_768'),
+    representationId: z.literal(SEMANTIC_REPRESENTATION_ID),
     representationRevision: z.string().min(1),
     producerId: z.string().min(1),
     producerRevision: z.string().min(1),
@@ -129,7 +130,7 @@ export function buildTelemetryBreadthV1(input: {
     packetKey: input.packetKey,
     sourceRef: input.sourceRef,
     sourceRevision: input.sourceRevision,
-    representationId: 'semantic_768',
+    representationId: SEMANTIC_REPRESENTATION_ID,
     representationRevision: input.representationRevision,
     producerId: input.producerId,
     producerRevision: input.producerRevision,
@@ -143,7 +144,7 @@ export function buildTelemetryBreadthV1(input: {
     estimates: input.estimates,
     provenance: {
       sourceRevision: input.sourceRevision,
-      representationId: 'semantic_768',
+      representationId: SEMANTIC_REPRESENTATION_ID,
       representationRevision: input.representationRevision,
       producerId: input.producerId,
       producerRevision: input.producerRevision,

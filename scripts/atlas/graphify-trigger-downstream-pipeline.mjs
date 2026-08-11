@@ -20,7 +20,7 @@
  */
 
 import { spawn } from 'node:child_process';
-import { promises as fs } from 'node:fs';
+import { existsSync, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import pg from 'pg';
@@ -217,7 +217,7 @@ async function runPageRank() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Stage 3: LangGraph kanban task emission
+// Stage 3: LangGraph task-candidate emission
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function runKanbanEmit() {
@@ -352,8 +352,14 @@ async function writeKanbanTasksToDB() {
   report.stages[stage] = { status: 'running' };
 
   try {
-    // Read .tmp/kanban_tasks.jsonl if it exists
-    const kanbanPath = path.join(FRONTEND_ROOT, '.tmp/kanban_tasks.jsonl');
+    // Read the newest graphify task-candidate file if it exists, otherwise
+    // fall back to the legacy kanban task JSONL.
+    const candidatePaths = [
+      path.join(REPO_ROOT, 'docs', 'reports', 'atlas-graphify-task-candidates.jsonl'),
+      path.join(FRONTEND_ROOT, '.tmp', 'graphify-task-candidates.jsonl'),
+      path.join(FRONTEND_ROOT, '.tmp', 'kanban_tasks.jsonl'),
+    ];
+    const kanbanPath = candidatePaths.find((candidate) => existsSync(candidate)) ?? candidatePaths[0];
     let taskCount = 0;
 
     try {
@@ -370,6 +376,20 @@ async function writeKanbanTasksToDB() {
 
           for (const line of lines) {
             const task = JSON.parse(line);
+            const taskId = task.task_id || task.taskId || task.id || `task:${Date.now()}:${Math.random()}`;
+            const featureId = task.feature_id || task.featureId || 'unknown';
+            const featureLabel = task.feature_label || task.featureLabel || task.task_label || task.label || 'Unnamed task';
+            const sourceRefs = Array.isArray(task.source_refs)
+              ? task.source_refs
+              : Array.isArray(task.sourceRefs)
+                ? task.sourceRefs
+                : task.source_ref
+                  ? [task.source_ref]
+                  : task.sourceRef
+                    ? [task.sourceRef]
+                    : [];
+            const lane = task.lane || task.target_lane || (task.kind === 'recommendation_review' ? 'review' : 'todo');
+            const status = task.status || task.task_status || 'pending';
             await client.query(
               `INSERT INTO kanban_tasks (task_id, feature_id, feature_label, source_refs, lane, status)
                VALUES ($1, $2, $3, $4, $5, $6)
@@ -378,12 +398,12 @@ async function writeKanbanTasksToDB() {
                  status = EXCLUDED.status,
                  updated_at = NOW()`,
               [
-                task.taskId || `task:${Date.now()}:${Math.random()}`,
-                task.featureId || 'unknown',
-                task.featureLabel || 'Unnamed task',
-                JSON.stringify(task.sourceRefs || []),
-                task.lane || 'todo',
-                task.status || 'pending'
+                taskId,
+                featureId,
+                featureLabel,
+                JSON.stringify(sourceRefs),
+                lane,
+                status
               ]
             );
           }
@@ -413,8 +433,8 @@ async function writeKanbanTasksToDB() {
     } catch (e) {
       if (e.code === 'ENOENT') {
         report.stages[stage].status = 'warn';
-        report.stages[stage].warning = 'kanban_tasks.jsonl not found';
-        log(`⚠️  No kanban tasks file found (expected if kanban_emit skipped or failed)`);
+      report.stages[stage].warning = 'graphify-task-candidates.jsonl not found';
+        log(`⚠️  No task candidate file found (expected if kanban_emit skipped or failed)`);
         return true;
       }
       throw e;

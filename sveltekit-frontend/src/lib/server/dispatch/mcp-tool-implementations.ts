@@ -19,10 +19,10 @@ import { withMcpToolTelemetry } from '$lib/server/telemetry/mcp-tool-telemetry.j
 import { getValkeyClient } from '$lib/server/cache/valkey-client.js';
 import { getRedis } from '$lib/server/redis.js';
 import {
-  computePacketKey,
   validatePacketKeyImmutability,
   validatePacketKeyLineageChain,
 } from '$lib/server/atlas/identity/packet-key-builder.js';
+import { resolveCanonicalPacketKey } from '$lib/server/atlas/identity/packet-identity-resolver.js';
 
 // ──────────────────────────────────────────────────────────────────────
 // Zod Schemas (5-Step Gate 2: Validation) — SNAKE_CASE CANONICAL
@@ -133,10 +133,11 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
   try {
     // Step 1: Read from Postgres
     const input = IdentityRecoverInputSchema.parse(args);
+    const resolved_packet_key = await resolveCanonicalPacketKey(input.packet_key);
     const packets = await db
       .select()
-      .from(atlas_packets)
-      .where(eq(atlas_packets.packet_key, input.packet_key))
+      .from(atlasPackets)
+      .where(eq(atlasPackets.packetKey, resolved_packet_key))
       .limit(1);
 
     if (packets.length === 0) {
@@ -153,22 +154,22 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
       };
     }
 
-    // Step 2: Validate envelope via canonical identity builder
+    // Step 2: Resolve any legacy alias before validating the live packet row.
     const packet = packets[0];
-    const canonical_packet_key = computePacketKey(input.source_ref, packet.tree_node_id, packet.title_id);
-    const validation = validatePacketKeyImmutability(input.packet_key, canonical_packet_key);
+    const canonical_packet_key = resolved_packet_key;
+    const validation = validatePacketKeyImmutability(canonical_packet_key, packet.packetKey);
     const identityLane = validation.is_valid ? 'canonical' : 'recoverable';
     const confidence = validation.is_valid ? 1.0 : 0.85;
 
     // Step 3: Write to Postgres
     const updated = await db
-      .update(atlas_packets)
+      .update(atlasPackets)
       .set({
         identity_lane: identityLane,
         identity_confidence: confidence,
         updated_at: new Date(),
       })
-      .where(eq(atlas_packets.packet_key, input.packet_key));
+      .where(eq(atlasPackets.packetKey, canonical_packet_key));
 
     // Step 4: Invalidate Redis
     redis = getValkeyClient().duplicate({
@@ -181,7 +182,7 @@ async function toolIdentityRecoverImpl(args: unknown): Promise<ToolResult> {
 
     // Step 5: Emit Events (non-blocking)
     publishMirrorSyncEvent({
-      packet_key: input.packet_key,
+      packet_key: canonical_packet_key,
       source_ref: input.source_ref,
       identity_lane: identityLane,
       action: 'identity_recovered',

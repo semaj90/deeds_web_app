@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
 
 export const FabricLaneKindSchema = z.enum([
 	'gnn_graph_evidence',
@@ -21,7 +22,7 @@ export const FabricLaneManifestSchema = z
 		packetKey: z.string().min(1),
 		sourceRef: z.string().min(1),
 		sourceRevision: RevisionStringSchema,
-		representationId: z.literal('semantic_768'),
+		representationId: z.literal(SEMANTIC_REPRESENTATION_ID),
 		representationRevision: RevisionStringSchema,
 		producerId: z.string().min(1),
 		producerRevision: RevisionStringSchema,

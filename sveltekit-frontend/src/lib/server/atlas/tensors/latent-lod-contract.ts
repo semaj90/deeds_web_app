@@ -1,5 +1,9 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import {
+  SEMANTIC_REPRESENTATION_ID,
+  SEMANTIC_DIMENSION,
+} from '../../embedding/embedding-contract-768.js';
 
 export const LATENT_KINDS = ['DETERMINISTIC_AE', 'LOW_RANK', 'VAE_RESEARCH'] as const;
 export type LatentKind = (typeof LATENT_KINDS)[number];
@@ -19,8 +23,8 @@ export const LatentRepresentationManifestSchema = z
   .object({
     representationId: z.string().min(1),
     representationRevision: z.string().min(1),
-    sourceRepresentationId: z.literal('semantic_768'),
-    sourceDimension: z.literal(768),
+    sourceRepresentationId: z.literal(SEMANTIC_REPRESENTATION_ID),
+    sourceDimension: z.literal(SEMANTIC_DIMENSION),
     latentDimension: z.number().int().positive(),
     kind: z.enum(LATENT_KINDS),
     fidelity: z.enum(FIDELITIES),
@@ -50,7 +54,7 @@ export const LowRankFeatureBlockV1Schema = z
     packetKey: z.string().min(1),
     sourceRef: z.string().min(1),
     sourceRevision: z.string().min(1),
-    sourceRepresentationId: z.literal('semantic_768'),
+    sourceRepresentationId: z.literal(SEMANTIC_REPRESENTATION_ID),
     sourceRepresentationRevision: z.string().min(1),
     latentManifest: LatentRepresentationManifestSchema,
     approximationMethod: LowRankApproximationMethodSchema,
@@ -99,8 +103,8 @@ export function buildLatentRepresentationManifest(input: {
   checkpointHash: string;
 }): LatentRepresentationManifest {
   return LatentRepresentationManifestSchema.parse({
-    sourceRepresentationId: 'semantic_768',
-    sourceDimension: 768,
+    sourceRepresentationId: SEMANTIC_REPRESENTATION_ID,
+    sourceDimension: SEMANTIC_DIMENSION,
     ...input,
   });
 }
@@ -108,7 +112,7 @@ export function buildLatentRepresentationManifest(input: {
 export function assertProductionLatent(m: LatentRepresentationManifest): void {
   if (m.kind === 'VAE_RESEARCH') throw new Error('VAE_RESEARCH cannot be promoted as deterministic routing truth');
   if (!m.deterministic) throw new Error('production latent must be deterministic');
-  if (m.sourceRepresentationId !== 'semantic_768' || m.sourceDimension !== 768) throw new Error('source representation mismatch');
+  if (m.sourceRepresentationId !== SEMANTIC_REPRESENTATION_ID || m.sourceDimension !== SEMANTIC_DIMENSION) throw new Error('source representation mismatch');
 }
 
 export function buildLowRankFeatureBlock(input: {
@@ -155,7 +159,7 @@ export function buildLowRankFeatureBlock(input: {
     packetKey: input.packetKey,
     sourceRef: input.sourceRef,
     sourceRevision: input.sourceRevision,
-    sourceRepresentationId: 'semantic_768',
+    sourceRepresentationId: SEMANTIC_REPRESENTATION_ID,
     sourceRepresentationRevision: input.sourceRepresentationRevision,
     latentManifest: input.latentManifest,
     approximationMethod: input.approximationMethod,

@@ -13,6 +13,7 @@
  */
 
 import { z } from 'zod';
+import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
 
 export const QueryPlanSchema = z.object({
   intent: z.enum([
@@ -27,7 +28,7 @@ export const QueryPlanSchema = z.object({
   lexicalQueries: z.array(z.string()).max(6),
   symbolHints: z.array(z.string()).max(20),
   retrievalLanes: z.array(
-    z.enum(['exact', 'rg', 'bm25', 'semantic_768', 'ast', 'schema', 'graph', 'centroid'])
+    z.enum(['exact', 'rg', 'bm25', SEMANTIC_REPRESENTATION_ID, 'ast', 'schema', 'graph', 'centroid'])
   ),
   topK: z.number().int().min(1).max(100),
   graphHops: z.number().int().min(0).max(3),

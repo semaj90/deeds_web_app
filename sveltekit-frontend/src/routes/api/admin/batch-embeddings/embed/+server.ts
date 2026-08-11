@@ -4,6 +4,7 @@ import { getRedis } from '$lib/server/redis.js';
 import { embedText } from '$lib/server/embedding/embed.js';
 import { persistCanonicalSemanticPacketEmbedding } from '$lib/server/embedding/semantic-packet-writer.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
+import { resolveCanonicalPacketKey } from '$lib/server/atlas/identity/packet-identity-resolver.js';
 
 interface EmbedRequest {
 	packetKey?: string;
@@ -32,14 +33,30 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		const sourceRef = body.sourceRef?.trim() ?? '';
 		const treeNodeId = body.treeNodeId?.trim() ?? '';
 		const titleId = body.titleId?.trim() ?? '';
-		const resolvedPacketKey =
-			packetKey || (sourceRef && treeNodeId && titleId ? computeCanonicalPacketKey(sourceRef, treeNodeId, titleId) : '');
+		const structuredPacketKey = sourceRef && treeNodeId && titleId
+			? computeCanonicalPacketKey(sourceRef, treeNodeId, titleId)
+			: '';
+		const resolvedPacketKey = packetKey
+			? await resolveCanonicalPacketKey(packetKey)
+			: structuredPacketKey;
 		const { text } = body;
 
 		if ((!packetKey && !sourceRef) || !resolvedPacketKey || !text) {
 			return json(
 				{ embedding: [], cacheHit: false, duration: 0, error: 'Missing packetKey or sourceRef/treeNodeId/titleId or text' },
 				{ status: 400 }
+			);
+		}
+
+		if (structuredPacketKey && packetKey && resolvedPacketKey !== structuredPacketKey) {
+			return json(
+				{
+					embedding: [],
+					cacheHit: false,
+					duration: 0,
+					error: 'Packet key alias does not resolve to the supplied structural identity',
+				},
+				{ status: 409 }
 			);
 		}
 

@@ -11,8 +11,8 @@ vi.mock('$lib/server/env.server.js', () => ({
   },
 }));
 
-describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => {
-  describe('POST /sveltekit-frontend/src/routes/api/mcp/select-tools', () => {
+describe('src/routes/api/mcp/select-tools/+server.ts', () => {
+  describe('POST /src/routes/api/mcp/select-tools', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => 
 
     function makeReq(body?: unknown) {
       return new Request(
-        'http://localhost/sveltekit-frontend/src/routes/api/mcp/select-tools',
+        'http://localhost/src/routes/api/mcp/select-tools',
         body !== undefined
           ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
           : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }
@@ -35,7 +35,7 @@ describe('sveltekit-frontend/src/routes/api/mcp/select-tools/+server.ts', () => 
     }
 
     function makeUrl() {
-      return new URL('http://localhost/sveltekit-frontend/src/routes/api/mcp/select-tools');
+      return new URL('http://localhost/src/routes/api/mcp/select-tools');
     }
 
     it('400 — rejects invalid input shape', async () => {

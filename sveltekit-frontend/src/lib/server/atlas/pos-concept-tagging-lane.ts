@@ -1,5 +1,20 @@
 import { z } from 'zod';
 import {
+  FEATURE_EXTRACTION_SCHEMA_VERSION,
+  CANONICAL_SEMANTIC_REPRESENTATION_ID,
+  CANONICAL_SEMANTIC_DIMENSION,
+  buildFeatureVector5StaticRow,
+  FeatureMatrixSetupV1Schema,
+  JsonlParsedEvidenceV1Schema,
+  PosCandidateLabelSchema,
+  PosTaggerOutputV1Schema,
+  type FeatureMatrixSetupV1,
+  type JsonlParsedEvidenceV1,
+  type PosCandidateLabel,
+  type PosTaggerOutputV1,
+} from './contracts/feature-extraction-v1.js';
+import { DomainClassificationV1Schema, type DomainClassificationV1 } from './contracts/semantic-signal-v1.js';
+import {
   OntologyLinkedTupleEvidenceStateSchema,
   OntologyLinkedTupleLabelKindSchema,
   OntologyLinkedTupleLabelSourceSchema,
@@ -86,11 +101,16 @@ export const PosConceptTaggingRequestSchema = z
     packetKey: z.string().min(1),
     sourceRef: z.string().min(1),
     sourceRevision: z.string().min(1),
+    workspaceRevision: z.string().min(1).nullable().optional(),
     featureId: z.string().min(1),
     featureLabel: z.string().min(1),
     treeNodeId: z.string().min(1).nullable().optional(),
     titleId: z.string().min(1).nullable().optional(),
-    representationId: z.literal('semantic_768').default('semantic_768'),
+    jsonlSourceDigest: z.string().min(1).nullable().optional(),
+    jsonlRecordIndex: z.number().int().nonnegative().nullable().optional(),
+    jsonlLineNumber: z.number().int().nonnegative().nullable().optional(),
+    jsonlParserRevision: z.string().min(1).nullable().optional(),
+    representationId: z.literal(CANONICAL_SEMANTIC_REPRESENTATION_ID).default(CANONICAL_SEMANTIC_REPRESENTATION_ID),
     representationRevision: z.string().min(1),
     producerId: z.string().min(1).default('pos-concept-tagging-lane'),
     producerRevision: z.string().min(1),
@@ -102,6 +122,7 @@ export const PosConceptTaggingRequestSchema = z
     astSymbols: z.array(z.string().min(1)).max(64).default([]),
     semanticConceptIds: z.array(z.string().min(1)).max(32).default([]),
     ontologyIds: z.array(z.string().min(1)).max(32).default([]),
+    posCandidateLabels: z.array(PosCandidateLabelSchema).max(8).default([]),
     citations: z.array(PosConceptEvidenceCitationSchema).max(16).default([]),
     screenshots: z.array(PosConceptScreenshotSchema).max(16).default([]),
     policySummary: z.string().min(1).nullable().optional(),
@@ -123,11 +144,16 @@ export const PosConceptTaggingPacketSchema = z
     packetKey: z.string().min(1),
     sourceRef: z.string().min(1),
     sourceRevision: z.string().min(1),
+    workspaceRevision: z.string().min(1).nullable().optional(),
     featureId: z.string().min(1),
     featureLabel: z.string().min(1),
     treeNodeId: z.string().min(1).nullable().optional(),
     titleId: z.string().min(1).nullable().optional(),
-    representationId: z.literal('semantic_768'),
+    jsonlSourceDigest: z.string().min(1).nullable().optional(),
+    jsonlRecordIndex: z.number().int().nonnegative().nullable().optional(),
+    jsonlLineNumber: z.number().int().nonnegative().nullable().optional(),
+    jsonlParserRevision: z.string().min(1).nullable().optional(),
+    representationId: z.literal(CANONICAL_SEMANTIC_REPRESENTATION_ID),
     representationRevision: z.string().min(1),
     producerId: z.string().min(1),
     producerRevision: z.string().min(1),
@@ -139,6 +165,7 @@ export const PosConceptTaggingPacketSchema = z
     astSymbols: z.array(z.string().min(1)).max(64),
     semanticConceptIds: z.array(z.string().min(1)).max(32),
     ontologyIds: z.array(z.string().min(1)).max(32),
+    posCandidateLabels: z.array(PosCandidateLabelSchema).max(8),
     citations: z.array(PosConceptEvidenceCitationSchema).max(16),
     screenshots: z.array(PosConceptScreenshotSchema).max(16),
     policySummary: z.string().min(1).nullable().optional(),
@@ -156,7 +183,7 @@ export const PosConceptTaggingPacketSchema = z
     provenance: z
       .object({
         sourceRevision: z.string().min(1),
-        representationId: z.literal('semantic_768'),
+        representationId: z.literal(CANONICAL_SEMANTIC_REPRESENTATION_ID),
         representationRevision: z.string().min(1),
         producerId: z.string().min(1),
         producerRevision: z.string().min(1),
@@ -166,10 +193,31 @@ export const PosConceptTaggingPacketSchema = z
         modelRevision: z.string().min(1).nullable().optional(),
       })
       .strict(),
+    jsonlParsedEvidence: JsonlParsedEvidenceV1Schema,
+    posTaggerOutput: PosTaggerOutputV1Schema,
+    domainClassification: DomainClassificationV1Schema.nullable(),
+    featureMatrixSetup: FeatureMatrixSetupV1Schema,
+    featureVector5Static: z.object({ schema_version: z.literal(FEATURE_EXTRACTION_SCHEMA_VERSION), kind: z.literal('feature_matrix_5') }).passthrough(),
+    featureBundle: z
+      .object({
+        jsonlParsedEvidence: JsonlParsedEvidenceV1Schema,
+        posTaggerOutput: PosTaggerOutputV1Schema,
+        domainClassification: DomainClassificationV1Schema.nullable(),
+        featureMatrixSetup: FeatureMatrixSetupV1Schema,
+        featureVector5Static: z.object({ schema_version: z.literal(FEATURE_EXTRACTION_SCHEMA_VERSION), kind: z.literal('feature_matrix_5') }).passthrough(),
+      })
+      .strict(),
   })
   .strict();
 
 export type PosConceptTaggingPacket = z.infer<typeof PosConceptTaggingPacketSchema>;
+export type PosConceptTaggingFeatureBundle = {
+  jsonlParsedEvidence: JsonlParsedEvidenceV1;
+  posTaggerOutput: PosTaggerOutputV1;
+  domainClassification: DomainClassificationV1 | null;
+  featureMatrixSetup: FeatureMatrixSetupV1;
+  featureVector5Static: unknown;
+};
 
 function stableStringify(value: unknown): string {
   if (value === null || typeof value !== 'object') {
@@ -206,6 +254,248 @@ function canonicalizeStrings(values: Array<string | null | undefined>): string[]
   return Array.from(new Set(values.map((value) => String(value ?? '').trim()).filter(Boolean))).sort((left, right) =>
     left.localeCompare(right)
   );
+}
+
+function buildJsonlParsedEvidence(input: PosConceptTaggingRequest, createdAt: string): JsonlParsedEvidenceV1 {
+  return JsonlParsedEvidenceV1Schema.parse({
+    schema_version: FEATURE_EXTRACTION_SCHEMA_VERSION,
+    kind: 'jsonl_parsed_evidence',
+    packet_key: input.packetKey,
+    source_ref: input.sourceRef,
+    source_revision: input.sourceRevision,
+    workspace_revision: input.producerRevision,
+    parser_revision: input.jsonlParserRevision ?? input.producerRevision,
+    record_index: input.jsonlRecordIndex ?? 0,
+    line_number: input.jsonlLineNumber ?? 0,
+    raw_json: {
+      packetKey: input.packetKey,
+      sourceRef: input.sourceRef,
+      treeNodeId: input.treeNodeId ?? null,
+      titleId: input.titleId ?? null,
+      featureId: input.featureId,
+      featureLabel: input.featureLabel,
+      partOfSpeech: input.partOfSpeech ?? null,
+      sourceTables: canonicalizeStrings(input.sourceTables),
+    },
+    content_hash: input.inputDigest ?? input.featureRevision,
+    created_at: createdAt,
+  });
+}
+
+function buildPosTaggerOutput(
+  input: PosConceptTaggingRequest,
+  topLabels: PosCandidateLabel[],
+  createdAt: string
+): PosTaggerOutputV1 {
+  const pos = input.partOfSpeech ?? 'UNKNOWN';
+
+  return PosTaggerOutputV1Schema.parse({
+    schema_version: FEATURE_EXTRACTION_SCHEMA_VERSION,
+    kind: 'pos_tagger_output',
+    packet_key: input.packetKey,
+    source_ref: input.sourceRef,
+    source_revision: input.sourceRevision,
+    tree_node_id: input.treeNodeId ?? null,
+    title_id: input.titleId ?? null,
+    representation_id: input.representationId,
+    representation_revision: input.representationRevision,
+    producer_id: input.producerId,
+    producer_revision: input.producerRevision,
+    model_revision: input.modelRevision ?? null,
+    head_type: 'pytorch',
+    token_index: 0,
+    surface: input.featureLabel,
+    part_of_speech: pos,
+    confidence: topLabels[0]?.score ?? 0.5,
+    top_k_labels: topLabels.slice(0, 8),
+    evidence_refs: buildEvidenceRefs(input),
+    created_at: createdAt,
+  });
+}
+
+function buildFeatureMatrixSetup(
+  input: PosConceptTaggingRequest,
+  parserRevision: string,
+  createdAt: string
+): FeatureMatrixSetupV1 {
+  return FeatureMatrixSetupV1Schema.parse({
+    schema_version: FEATURE_EXTRACTION_SCHEMA_VERSION,
+    kind: 'feature_matrix_setup',
+    packet_key: input.packetKey,
+    source_ref: input.sourceRef,
+    source_revision: input.sourceRevision,
+    workspace_revision: input.workspaceRevision ?? input.graphRevision ?? input.sourceRevision,
+    tree_node_id: input.treeNodeId ?? null,
+    title_id: input.titleId ?? null,
+    representation_id: input.representationId,
+    representation_revision: input.representationRevision,
+    semantic_dimension: CANONICAL_SEMANTIC_DIMENSION,
+    feature_revision: input.featureRevision,
+    producer_id: input.producerId,
+    producer_revision: input.producerRevision,
+    parser_revision: parserRevision,
+    extractor_revision: input.featureRevision,
+    pos_tagger_revision: input.modelRevision ?? input.producerRevision,
+    domain_classifier_revision: input.modelRevision ?? input.producerRevision,
+    graph_revision: input.graphRevision ?? null,
+    jsonl_source_digest: input.inputDigest ?? input.featureRevision,
+    feature_tiers: {
+      static_packet: {
+        enabled: true,
+        tensor_name: 'feature_matrix_5',
+        representation_id: 'feature_matrix_5',
+        width: 5,
+        column_names: [
+          'authority_norm',
+          'domain_fit_base',
+          'ast_signal',
+          'entropy_norm',
+          'execution_utility',
+        ],
+        storage_format: 'feature_matrix_5.arrow',
+        presence_mask_required: true,
+        source_provenance: {
+          workspace_revision: input.workspaceRevision ?? input.graphRevision ?? input.sourceRevision,
+          source_revision: input.sourceRevision,
+          feature_revision: input.featureRevision,
+        },
+      },
+      candidate_query: {
+        enabled: true,
+        tensor_name: 'candidate_feature_matrix',
+        width: 25,
+        column_names: [
+          'semantic_similarity_768',
+          'lexical_score',
+          'exact_symbol_match',
+          'ast_signal',
+          'authority_norm',
+          'community_fit',
+          'domain_fit_query',
+          'concept_fit',
+          'nary_relation_fit',
+          'kmeans_centroid_similarity',
+          'kmeans_cluster_rank',
+          'som_distance',
+          'som_neighbor_radius',
+          'hilbert_locality',
+          'summary_quality',
+          'summary_provenance',
+          'recency',
+          'retrieval_frequency',
+          'execution_utility',
+          'graph_distance',
+          'process_fit',
+          'dependency_fanout',
+          'feature_label_confidence',
+          'source_revision_match',
+          'representation_revision_match',
+        ],
+        ranking_role: 'query_time_rerank',
+        top_cluster_soft_cap: 8,
+        kmeans_candidates: [64, 128, 256],
+        som_grid: [20, 20],
+        hilbert_soft_cap: 8,
+        exact_knn_top_k: 100,
+        rerank_top_k: 64,
+      },
+      semantic: {
+        enabled: true,
+        tensor_name: CANONICAL_SEMANTIC_REPRESENTATION_ID,
+        representation_id: CANONICAL_SEMANTIC_REPRESENTATION_ID,
+        width: CANONICAL_SEMANTIC_DIMENSION,
+        source_role: 'canonical_semantic_geometry',
+        storage_format: 'semantic_768.arrow',
+      },
+    },
+    derived_heads: {
+      pos: {
+        enabled: true,
+        head_type: 'pytorch',
+        max_labels: 8,
+      },
+      domain: {
+        enabled: true,
+        head_type: 'pytorch',
+        max_labels: 8,
+      },
+    },
+    created_at: createdAt,
+  });
+}
+
+function buildDomainClassification(input: PosConceptTaggingRequest, evidenceRefs: string[], createdAt: string): DomainClassificationV1 | null {
+  const haystack = [
+    input.featureLabel,
+    input.featureId,
+    input.sourceRef,
+    input.treeNodeId ?? '',
+    input.titleId ?? '',
+    ...input.astSymbols,
+    ...input.semanticConceptIds,
+    ...input.ontologyIds,
+    ...input.sourceTables,
+  ]
+    .join(' ')
+    .toLowerCase();
+
+  const labels: Array<{ label: string; score: number; source: 'deterministic' | 'fallback'; evidence_kinds: string[] }> = [];
+  const push = (label: string, score: number, evidenceKinds: string[]) => {
+    if (labels.some((entry) => entry.label === label)) return;
+    labels.push({ label, score, source: 'deterministic', evidence_kinds: evidenceKinds });
+  };
+
+  if (/\b(route|router|endpoint|api)\b/.test(haystack)) push('routing', 0.96, ['source_ref', 'ast_symbol']);
+  if (/\b(test|spec|fixture)\b/.test(haystack)) push('testing', 0.94, ['source_ref', 'ast_symbol']);
+  if (/\b(class|type|interface|schema)\b/.test(haystack)) push('types', 0.92, ['ast_symbol']);
+  if (/\b(function|method|call|invoke)\b/.test(haystack)) push('code-execution', 0.9, ['ast_symbol']);
+  if (input.partOfSpeech) push('pos-tagging', 0.89, ['part_of_speech']);
+  if (input.ontologyIds.length > 0) push('ontology', 0.88, ['ontology_id']);
+  if (input.semanticConceptIds.length > 0) push('semantic', 0.86, ['semantic_concept']);
+  if (input.rankingSignals.pageRank != null || input.graphRevision) push('graph', 0.84, ['ranking_signal', 'graph_revision']);
+  if (input.rankingSignals.kmeansCluster != null || input.rankingSignals.somCell) push('topology', 0.82, ['ranking_signal']);
+  if (input.rankingSignals.bm25 != null || input.rankingSignals.bm42 != null) push('lexical', 0.8, ['ranking_signal']);
+
+  if (labels.length === 0) {
+    labels.push({
+      label: 'semantic',
+      score: 0.75,
+      source: 'fallback',
+      evidence_kinds: evidenceRefs.length > 0 ? ['evidence_ref'] : [],
+    });
+  }
+
+  const limitedLabels = labels.slice(0, 8);
+  const primary_label = limitedLabels[0]?.label ?? null;
+  const secondary_labels = limitedLabels.slice(1).map((entry) => entry.label);
+  const workspaceRevision = input.workspaceRevision ?? input.graphRevision ?? input.sourceRevision;
+  const evidencePayload = canonicalizeStrings([...evidenceRefs, input.sourceRef, input.packetKey])
+    .slice(0, 16)
+    .map((source_ref, index) => ({
+      source_ref,
+      evidence_kind: index === 0 ? 'primary' : 'supporting',
+      content_hash: null,
+      packet_key: input.packetKey,
+      tree_node_id: input.treeNodeId ?? null,
+      note: null,
+    }));
+
+  return DomainClassificationV1Schema.parse({
+    schema_version: 'atlas.semantic_signal.v1',
+    signal_type: 'domain_classification',
+    subject_id: input.packetKey,
+    workspace_revision: workspaceRevision ?? input.sourceRevision,
+    producer: input.producerId,
+    producer_revision: input.producerRevision,
+    evidence_refs: evidencePayload,
+    labels: limitedLabels,
+    primary_label,
+    secondary_labels,
+    confidence: limitedLabels[0]?.score ?? 0.75,
+    ood_score: null,
+    model_revision_state: input.modelRevision ? 'PROVEN' : 'NOT_PROVEN',
+    created_at: createdAt,
+  });
 }
 
 function buildEvidenceRefs(input: PosConceptTaggingRequest): string[] {
@@ -415,11 +705,52 @@ export function buildPosConceptTaggingPacket(input: PosConceptTaggingRequest): P
   const nAryConcepts = buildPrimaryConcepts(request, participants, evidenceRefs);
   const generatedAt = new Date().toISOString();
   const rankingSignalRefs = buildRankingSignalRefs(request);
+  const jsonlParsedEvidence = buildJsonlParsedEvidence(request, generatedAt);
+  const candidateLabels = request.posCandidateLabels.length > 0
+    ? request.posCandidateLabels
+    : [
+        {
+          label: request.partOfSpeech ?? 'UNKNOWN',
+          score: request.partOfSpeech ? 0.94 : 0.5,
+        },
+        ...canonicalizeStrings([request.semanticConceptIds[0] ?? null, request.ontologyIds[0] ?? null])
+          .slice(0, 7)
+          .map((label, index) => ({
+            label,
+            score: Math.max(0.1, 0.85 - index * 0.05),
+          })),
+      ];
+  const posTaggerOutput = buildPosTaggerOutput(
+    request,
+    candidateLabels,
+    generatedAt
+  );
+  const domainClassification = buildDomainClassification(request, evidenceRefs, generatedAt);
+  const featureMatrixSetup = buildFeatureMatrixSetup(request, jsonlParsedEvidence.parser_revision, generatedAt);
+  const featureVector5Static = buildFeatureVector5StaticRow({
+    packetKey: request.packetKey,
+    sourceRef: request.sourceRef,
+    sourceRevision: request.sourceRevision,
+    workspaceRevision: request.workspaceRevision ?? request.graphRevision ?? request.sourceRevision,
+    representationRevision: request.representationRevision,
+    featureRevision: request.featureRevision,
+    authorityNorm: request.rankingSignals.pageRank ?? null,
+    domainFitBase: domainClassification?.confidence ?? null,
+    astSignal: canonicalizeStrings(request.astSymbols).length > 0 ? Math.min(1, canonicalizeStrings(request.astSymbols).length / 12) : null,
+    entropyNorm: null,
+    executionUtility: null,
+    createdAt: generatedAt,
+  });
   const inputDigest = request.inputDigest ?? sha256Hex(stableStringify({
     schemaVersion: request.schemaVersion,
     packetKey: request.packetKey,
     sourceRef: request.sourceRef,
     sourceRevision: request.sourceRevision,
+    workspaceRevision: request.workspaceRevision ?? null,
+    jsonlSourceDigest: request.jsonlSourceDigest ?? null,
+    jsonlRecordIndex: request.jsonlRecordIndex ?? null,
+    jsonlLineNumber: request.jsonlLineNumber ?? null,
+    jsonlParserRevision: request.jsonlParserRevision ?? null,
     featureId: request.featureId,
     featureLabel: request.featureLabel,
     treeNodeId: request.treeNodeId ?? null,
@@ -436,6 +767,7 @@ export function buildPosConceptTaggingPacket(input: PosConceptTaggingRequest): P
     astSymbols: request.astSymbols,
     semanticConceptIds: request.semanticConceptIds,
     ontologyIds: request.ontologyIds,
+    posCandidateLabels: request.posCandidateLabels,
     citations: request.citations,
     screenshots: request.screenshots,
     policySummary: request.policySummary ?? null,
@@ -453,6 +785,11 @@ export function buildPosConceptTaggingPacket(input: PosConceptTaggingRequest): P
       sourceRevision: request.sourceRevision,
       featureId: request.featureId,
       featureLabel: request.featureLabel,
+      workspaceRevision: request.workspaceRevision ?? null,
+      jsonlSourceDigest: request.jsonlSourceDigest ?? null,
+      jsonlRecordIndex: request.jsonlRecordIndex ?? null,
+      jsonlLineNumber: request.jsonlLineNumber ?? null,
+      jsonlParserRevision: request.jsonlParserRevision ?? null,
       representationId: request.representationId,
       representationRevision: request.representationRevision,
       producerId: request.producerId,
@@ -464,9 +801,10 @@ export function buildPosConceptTaggingPacket(input: PosConceptTaggingRequest): P
       partOfSpeech: request.partOfSpeech ?? null,
       astSymbols: request.astSymbols,
       semanticConceptIds: request.semanticConceptIds,
-      ontologyIds: request.ontologyIds,
-      citations: request.citations,
-      screenshots: request.screenshots,
+    ontologyIds: request.ontologyIds,
+    posCandidateLabels: candidateLabels,
+    citations: request.citations,
+    screenshots: request.screenshots,
       policySummary: request.policySummary ?? null,
       mcpToolCalls: request.mcpToolCalls,
       rankingSignals: request.rankingSignals,
@@ -553,6 +891,7 @@ export function buildPosConceptTaggingPacket(input: PosConceptTaggingRequest): P
     astSymbols: canonicalizeStrings(request.astSymbols).slice(0, 64),
     semanticConceptIds: canonicalizeStrings(request.semanticConceptIds).slice(0, 32),
     ontologyIds: canonicalizeStrings(request.ontologyIds).slice(0, 32),
+    posCandidateLabels: candidateLabels,
     citations: request.citations.map((citation) => PosConceptEvidenceCitationSchema.parse(citation)),
     screenshots: request.screenshots.map((screenshot) => PosConceptScreenshotSchema.parse(screenshot)),
     policySummary: request.policySummary ?? null,
@@ -570,5 +909,17 @@ export function buildPosConceptTaggingPacket(input: PosConceptTaggingRequest): P
     generatedAt,
     lastVerifiedAt: request.lastVerifiedAt ?? generatedAt,
     provenance: buildPacketProvenance(request),
+    jsonlParsedEvidence,
+    posTaggerOutput,
+    featureMatrixSetup,
+    domainClassification,
+    featureVector5Static,
+    featureBundle: {
+      jsonlParsedEvidence,
+      posTaggerOutput,
+      domainClassification,
+      featureMatrixSetup,
+      featureVector5Static,
+    },
   });
 }

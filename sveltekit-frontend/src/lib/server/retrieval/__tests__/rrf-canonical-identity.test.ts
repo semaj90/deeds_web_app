@@ -122,24 +122,16 @@ describe('canonical identity closes the multi-projection double-vote bug', () =>
     const withNormalization = combineViaRRF(normalizedLanes, laneNames, {
       deduplicateBy: 'id',
     });
-    // After the fix: all three hits share packet_key -> one fused candidate with 3 lane votes.
+    // After the fix: all three hits share packet_key -> one fused candidate with one vote per lane.
     expect(withNormalization).toHaveLength(1);
     expect(withNormalization[0]!.id).toBe('pkt:shared');
-    expect(withNormalization[0]!.breakdown).toHaveLength(3);
+    expect(withNormalization[0]!.breakdown).toHaveLength(2);
     // Negative assertion: the fused candidate's id must never equal either raw Qdrant point id.
     expect(withNormalization[0]!.id).not.toBe('qdrant-point-1');
     expect(withNormalization[0]!.id).not.toBe('qdrant-point-2');
   });
 
-  it('documents current behavior when ONE lane produces two votes for the same identity', () => {
-    // Distinct from the multi-lane case above: this is a single lane (qdrant_vector) returning
-    // two hits that normalize to the same canonical id (e.g. two chunk projections of one
-    // symbol surfaced by the same ANN query). normalizeCanonicalIdentity collapses their id,
-    // but combineViaRRF still records two separate breakdown entries and sums both
-    // rrfComponents into one lane's contribution — i.e. today, a single lane CAN inflate a
-    // candidate's combined score by contributing more than once. `sources` (a Set) hides this
-    // by reporting only one distinct lane name, so a naive "how many lanes voted" check would
-    // miss it; `breakdown.length` is the only place this is currently visible.
+  it('deduplicates repeated hits from one lane into one vote', () => {
     const qdrantLane: ContextHit[] = [
       { id: 'qdrant-point-1', source: 'qdrant_vector', score: 0.95, metadata: { packet_key: 'pkt:shared' } },
       { id: 'qdrant-point-2', source: 'qdrant_vector', score: 0.80, metadata: { packet_key: 'pkt:shared' } },
@@ -151,8 +143,8 @@ describe('canonical identity closes the multi-projection double-vote bug', () =>
 
     expect(result).toHaveLength(1);
     expect(result[0]!.sources).toEqual(['qdrant_vector']); // looks like exactly one lane voted
-    expect(result[0]!.breakdown).toHaveLength(2); // but it actually cast two votes
-    const expectedScore = 1 / (60 + 1) + 1 / (60 + 2); // both ranks summed, uncapped per lane
+    expect(result[0]!.breakdown).toHaveLength(1);
+    const expectedScore = 1 / (60 + 1);
     expect(result[0]!.combinedScore).toBeCloseTo(expectedScore, 10);
   });
 });

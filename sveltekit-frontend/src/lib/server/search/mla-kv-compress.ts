@@ -22,11 +22,12 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { createHash } from 'crypto';
+import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
 export const MLA_RANK = 128;
-export const MLA_DIM  = 768;
+export const MLA_DIM  = SEMANTIC_DIMENSION;
 
 const PROJ_KEY    = `mla:proj:W_down:r${MLA_RANK}:d${MLA_DIM}`;
 const PROJ_TTL    = 60 * 60 * 24;   // 24h — frozen weight matrix

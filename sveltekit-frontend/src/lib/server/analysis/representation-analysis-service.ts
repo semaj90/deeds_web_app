@@ -13,6 +13,7 @@ import {
 	type RepresentationExperimentRun,
 	type RepresentationExperimentResult,
 } from './representation-experiment-contract.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 export interface CompareRepresentationInput {
 	workspaceRevision: string;
@@ -38,7 +39,7 @@ function localSummary(input: CompareRepresentationInput): Record<string, unknown
 	return {
 		todo: 'wire persisted representation evaluation before promotion',
 		experimentKind: input.experimentKind ?? 'retrieval_ablation',
-		baselineRepresentation: 'semantic_768',
+		baselineRepresentation: SEMANTIC_REPRESENTATION_ID,
 		candidateRepresentation: input.candidateRepresentation,
 		metricNames: input.metricNames,
 	};
@@ -72,7 +73,7 @@ export function getRepresentationAnalysisService(): RepresentationAnalysisServic
 				inputHash: null,
 				outputHash: null,
 				experimentKind: RepresentationExperimentKindSchema.parse(input.experimentKind ?? 'retrieval_ablation'),
-				baselineRepresentation: 'semantic_768',
+				baselineRepresentation: SEMANTIC_REPRESENTATION_ID,
 				candidateRepresentation: input.candidateRepresentation,
 				sourceDimension: input.sourceDimension,
 				targetDimension: input.targetDimension,
@@ -91,7 +92,7 @@ export function getRepresentationAnalysisService(): RepresentationAnalysisServic
 				reason: 'TODO: representation evaluator not yet wired',
 				createdAt: now,
 				metadata: {
-					baselineRepresentation: 'semantic_768',
+					baselineRepresentation: SEMANTIC_REPRESENTATION_ID,
 					candidateRepresentation: input.candidateRepresentation,
 				},
 			}));

@@ -1,0 +1,55 @@
+{
+  "receipt_id": "receipt:identity_alias_replay:1786471894409",
+  "receipt_kind": "PACKET_IDENTITY_ALIAS_REPLAY_PROVEN",
+  "producer_id": "smoke-identity-alias-replay.mjs",
+  "producer_revision": "2026-08-11.v1",
+  "started_at": "2026-08-11T18:11:34.189Z",
+  "completed_at": "2026-08-11T18:11:34.409Z",
+  "input_hash": "bae730af8ec7bbf61882694cd2ea06252ee248990593bd0ea518f33aab5edca2",
+  "output_hash": "ba6e9e20128d0efae1e2f055216b8086ce5f8f6dad4f8531c7c9bc6d30521939",
+  "workspace_revision": null,
+  "source_revision": null,
+  "graph_revision": null,
+  "representation_revision": null,
+  "status": "PROVEN",
+  "data": {
+    "replay_results": [
+      {
+        "input_key": "packet:03e3bacd7a74",
+        "resolved_canonical_key": "packet:03e3bacd7a74",
+        "deterministic": true,
+        "write_guard_matched": true
+      },
+      {
+        "input_key": "packet:41ae4f183768",
+        "resolved_canonical_key": "ace:packet:41ae4f183768",
+        "deterministic": true,
+        "write_guard_matched": true
+      }
+    ],
+    "fail_closed_passed": true,
+    "containment_passed": true,
+    "legacy_accounting": {
+      "population_kind": "LEGACY_RAW16",
+      "total_count": 61,
+      "resolution_classes": {
+        "ALIASABLE_UNIQUE_TARGET": {
+          "count": 14,
+          "description": "Legacy raw 16-hex keys mapping to single distinct canonical atlas_packets row",
+          "seeded_in_aliases": true
+        },
+        "DIFFERENT_GRAIN": {
+          "count": 32,
+          "description": "Node-scoped AST structural keys representing multi-symbol sub-file grains",
+          "seeded_in_aliases": false
+        },
+        "UNRESOLVED_QUARANTINED": {
+          "count": 15,
+          "description": "Historical test fixture artifacts without canonical provenance",
+          "seeded_in_aliases": false
+        }
+      }
+    },
+    "database_fks_untouched": true
+  }
+}

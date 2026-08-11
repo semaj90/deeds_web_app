@@ -2,7 +2,10 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { loadDailyGraphifyBoard } from '$lib/server/atlas/board/daily-graphify-board.js';
 import {
+	buildPhase89FabricLaneManifest,
+	buildPhase89GpuBenchmarkReceipt,
 	buildPhase89WorkflowPlan,
+	publishBoardGpuBenchmarkReceipt,
 	recordPhase89WorkflowPlan,
 	Phase89WorkflowRequestSchema,
 } from '$lib/server/atlas/board/phase89-workflow.js';
@@ -22,9 +25,19 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 		const board = await loadDailyGraphifyBoard();
 		const plan = buildPhase89WorkflowPlan(board, parsed.data);
+		const fabricLaneManifest = buildPhase89FabricLaneManifest(board, plan);
+		const gpuBenchmarkReceipt = buildPhase89GpuBenchmarkReceipt(board, plan);
 
 		if (!parsed.data.dryRun) {
-			await recordPhase89WorkflowPlan(plan);
+			await recordPhase89WorkflowPlan(
+				plan,
+				undefined,
+				fabricLaneManifest ?? undefined,
+				gpuBenchmarkReceipt ?? undefined,
+			);
+			if (gpuBenchmarkReceipt) {
+				await publishBoardGpuBenchmarkReceipt(gpuBenchmarkReceipt);
+			}
 		}
 
 		return json({

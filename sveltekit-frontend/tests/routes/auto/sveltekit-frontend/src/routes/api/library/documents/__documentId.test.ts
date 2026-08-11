@@ -2,13 +2,13 @@
 /**
  * AUTO-GENERATED TEST STUB — do not edit boilerplate, fill in it.todo() blocks.
  *
- * Route: sveltekit-frontend/src/routes/api/library/documents/[documentId]/+server.ts
+ * Route: src/routes/api/library/documents/[documentId]/+server.ts
  * Handlers: GET, PUT, DELETE
  *
  * G26 pattern: node env, vi.hoisted mocks (add as needed), lazy import in
  * beforeEach, 4 baseline cases per handler.
  *
- * Run:  npm run test -- sveltekit-frontend/src/routes/api/library/documents/__documentId
+ * Run:  npm run test -- src/routes/api/library/documents/__documentId
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -17,20 +17,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
 // vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
 
-describe('sveltekit-frontend/src/routes/api/library/documents/[documentId]/+server.ts', () => {
-  describe('GET /sveltekit-frontend/src/routes/api/library/documents/:documentId', () => {
+describe('src/routes/api/library/documents/[documentId]/+server.ts', () => {
+  describe('GET /src/routes/api/library/documents/:documentId', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../../sveltekit-frontend/src/routes/api/library/documents/[documentId]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../../src/routes/api/library/documents/[documentId]/+server.js') as Record<string, unknown>;
       handler = mod.GET as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/library/documents/:documentId', { method: 'GET' });
+      return new Request('http://localhost/src/routes/api/library/documents/:documentId', { method: 'GET' });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/library/documents/:documentId'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/library/documents/:documentId'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
@@ -54,19 +54,19 @@ describe('sveltekit-frontend/src/routes/api/library/documents/[documentId]/+serv
   });
 
 
-  describe('PUT /sveltekit-frontend/src/routes/api/library/documents/:documentId', () => {
+  describe('PUT /src/routes/api/library/documents/:documentId', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../../sveltekit-frontend/src/routes/api/library/documents/[documentId]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../../src/routes/api/library/documents/[documentId]/+server.js') as Record<string, unknown>;
       handler = mod.PUT as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/library/documents/:documentId', body !== undefined ? { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request('http://localhost/src/routes/api/library/documents/:documentId', body !== undefined ? { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/library/documents/:documentId'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/library/documents/:documentId'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
@@ -90,19 +90,19 @@ describe('sveltekit-frontend/src/routes/api/library/documents/[documentId]/+serv
   });
 
 
-  describe('DELETE /sveltekit-frontend/src/routes/api/library/documents/:documentId', () => {
+  describe('DELETE /src/routes/api/library/documents/:documentId', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../../sveltekit-frontend/src/routes/api/library/documents/[documentId]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../../src/routes/api/library/documents/[documentId]/+server.js') as Record<string, unknown>;
       handler = mod.DELETE as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/library/documents/:documentId', body !== undefined ? { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request('http://localhost/src/routes/api/library/documents/:documentId', body !== undefined ? { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/library/documents/:documentId'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/library/documents/:documentId'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.

@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { Pool } from 'pg';
 import { GraphAnalysisRunSchema, CommunityAssignmentSchema, CommunityTaxonomyRecordSchema, type GraphAnalysisRun, type GraphAlgorithm } from './graph-analysis-types.js';
+import { getGraphDispatcherRegistryEntry } from './graph-dispatcher-registry.js';
 import { ensureProjectionClient, PROJECTION_NAME } from './neo4j-gds-client.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
 import { resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
@@ -383,9 +384,20 @@ export async function runGraphAnalysis(
   db: Pool,
   request: GraphAnalysisRequest,
 ): Promise<GraphAnalysisExecutionResult> {
+  const registryEntry = getGraphDispatcherRegistryEntry(request.algorithm);
   const namedProjection = request.namedProjection;
   const projectionName = namedProjection ?? request.projectionName ?? PROJECTION_NAME;
   const relationshipTypes = namedProjection ? NAMED_PROJECTION_CANDIDATES[namedProjection] : undefined;
+
+  if (registryEntry.dispatchKind === 'fail-closed') {
+    return runSkippedAnalysis(
+      request.algorithm,
+      projectionName,
+      0,
+      0,
+      registryEntry.skipReason ?? `Unsupported graph algorithm: ${request.algorithm}`,
+    );
+  }
 
   if (request.algorithm === 'pagerank') {
     const result = await (await import('./pagerank-analysis-adapter.js')).runPageRankAnalysis(db, {

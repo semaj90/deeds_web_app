@@ -1,0 +1,25 @@
+{
+  "receipt_id": "receipt:feature_extraction_ingest:1786472130699",
+  "receipt_kind": "GRAPHIFY_FEATURE_EXTRACTION_INGEST_PROVEN",
+  "producer_id": "smoke-feature-extraction-ingest.mjs",
+  "producer_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "started_at": "2026-08-11T18:15:29.520Z",
+  "completed_at": "2026-08-11T18:15:30.699Z",
+  "input_hash": "d5553010853a595daf810f01e593c447b25eff309e53de73e720ab69dfef72ec",
+  "output_hash": "9475a65f816c40a73573bd929573d09aeb228d6d2d11effaf445189c1623de16",
+  "workspace_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "source_revision": "sha256:rev_a_1234567890abcdef",
+  "graph_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "representation_revision": null,
+  "status": "PROVEN",
+  "data": {
+    "lines_scanned": 81136,
+    "zod_validation_passed": true,
+    "determinism_assertion_passed": true,
+    "revision_freshness_assertion_passed": true,
+    "malformed_line_rejection_passed": true,
+    "pos_domain_concepts_evidence_only": true,
+    "sample_payload_hash_a": "99761c8f4a6e912adbdcb3cc8ab5e09c911e0904c9b1223bb1b181bf93b2073c",
+    "sample_payload_hash_b": "a7f5940f855f2b761d851340fae13bfc6757357d3dbc6bb8a1ce4d2c60399b0a"
+  }
+}

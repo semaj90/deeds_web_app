@@ -5,6 +5,7 @@ import path from 'node:path';
 import { TreeNodeExtractor } from '../ace/features/tree-node-extractor.js';
 import { extractAstFeatures, extractDependencyFeatures } from '../analysis/ast-grep-extractor.js';
 import { CANONICAL_EMBEDDING_DIMENSION } from './contracts/canonical-chunk-contract.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 export type WorkflowStageStatus = 'PROVEN' | 'PARTIAL' | 'SKIPPED' | 'FAILED';
 
@@ -67,7 +68,7 @@ export type SemanticEnrichmentEntry = {
   filePath: string;
   sourceRef: string;
   contentHash: string;
-  representationName: 'semantic_768';
+  representationName: typeof SEMANTIC_REPRESENTATION_ID;
   dimension: number;
   model: string | null;
   source: string;
@@ -186,7 +187,7 @@ export type RepositoryProvenanceWorkflowReport = {
       qdrantProjectionRecords: number;
       neo4jProjectionRecords: number;
       redisProjectionRecords: number;
-      representationName: 'semantic_768';
+      representationName: typeof SEMANTIC_REPRESENTATION_ID;
       denseVectorName: 'content';
       collectionName: string;
     };
@@ -809,7 +810,7 @@ async function enrichSemanticsForFile(
     filePath: file.relativePath,
     sourceRef: file.relativePath,
     contentHash: file.sha256,
-    representationName: 'semantic_768',
+    representationName: SEMANTIC_REPRESENTATION_ID,
     dimension: CANONICAL_EMBEDDING_DIMENSION,
     model: result?.model ?? null,
     source: result?.source ?? 'unavailable',
@@ -1020,7 +1021,7 @@ export async function runRepositoryProvenanceWorkflow(
           filePath: entry.relativePath,
           sourceRef: entry.relativePath,
           contentHash: entry.sha256,
-          representationName: 'semantic_768',
+          representationName: SEMANTIC_REPRESENTATION_ID,
           dimension: CANONICAL_EMBEDDING_DIMENSION,
           model: null,
           source: 'unavailable',
@@ -1163,7 +1164,7 @@ export async function runRepositoryProvenanceWorkflow(
         qdrantProjectionRecords: semanticEntries.filter((entry) => entry.status === 'EMBEDDED').length,
         neo4jProjectionRecords: relationshipEntries.length,
         redisProjectionRecords: lexicalEntries.length,
-        representationName: 'semantic_768',
+        representationName: SEMANTIC_REPRESENTATION_ID,
         denseVectorName: 'content',
         collectionName: 'codebase_chunks_768_v2',
       },

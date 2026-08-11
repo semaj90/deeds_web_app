@@ -71,6 +71,7 @@ import { ensureOpenTelemetry } from '../lib/server/observability/opentelemetry.j
 import { recordToolCallBegin } from '../lib/server/telemetry/tool-call-recorder.js';
 import { asUuid, buildTraceDynamicContextRecommendation } from '../lib/server/mcp/trace-dynamic-context-audit.js';
 import { parseTraceMcpEnv } from '../lib/server/config/trace-mcp-env.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../lib/server/embedding/embedding-contract-768.js';
 import { EngramMemoryBridge } from './memory-bridge.js';
 import type { LangGraphBridge } from './langgraph-bridge.js';
 import { extractKeywordsFromState } from './langgraph-bridge.js';
@@ -9882,7 +9883,7 @@ server.registerTool(
         featureLabel: String(input.featureLabel ?? ''),
         treeNodeId: typeof input.treeNodeId === 'string' ? input.treeNodeId : input.treeNodeId == null ? null : String(input.treeNodeId),
         titleId: typeof input.titleId === 'string' ? input.titleId : input.titleId == null ? null : String(input.titleId),
-        representationId: 'semantic_768',
+        representationId: SEMANTIC_REPRESENTATION_ID,
         representationRevision: String(input.representationRevision ?? ''),
         producerId: String(input.producerId ?? 'pos-concept-tagging-lane'),
         producerRevision: String(input.producerRevision ?? ''),

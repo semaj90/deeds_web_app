@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
+import { computePacketKey } from '../identity/packet-key-builder.js';
 import { getRedis } from '../../redis.js';
+import { buildBoardFabricLaneManifest } from './fabric-lane-manifest.js';
+import { buildBoardGpuBenchmarkReceipt, publishBoardGpuBenchmarkReceipt as _publishBoardGpuBenchmarkReceipt } from './fabric-gpu-benchmark.js';
+export { _publishBoardGpuBenchmarkReceipt as publishBoardGpuBenchmarkReceipt };
 import type { DailyGraphifyBoardData } from './daily-graphify-board.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
 
 export type DailyGraphifyBoardTask = {
   id: string;
@@ -14,7 +19,9 @@ export type DailyGraphifyBoardTask = {
   origin?: string;
   recommendation_id?: string;
   source_ref?: string | null;
+  title_id?: string | null;
   tree_node_id?: string | null;
+  packet_key?: string | null;
   evidence_refs?: string[];
   reason_codes?: string[];
 };
@@ -26,12 +33,15 @@ export interface Phase89WorkflowPlan {
   taskPriority: string | null;
   recommendationId: string | null;
   sourceRef: string | null;
+  titleId: string | null;
   treeNodeId: string | null;
+  packetKey: string | null;
   validationRoutes: string[];
   validationQueueKeys: string[];
   warnings: string[];
   dryRun: boolean;
   fabricLaneManifest?: unknown;
+  gpuBenchmarkReceipt?: unknown;
   steps: Array<{
     action: 'queue:workflow' | 'queue:playwright-check' | 'acp:phase89';
     target: string;
@@ -134,7 +144,9 @@ export function buildPhase89WorkflowPlan(
     taskPriority: task?.priority ?? null,
     recommendationId: task?.recommendation_id ?? null,
     sourceRef: task?.source_ref ?? null,
+    titleId: task?.title_id ?? task?.id ?? null,
     treeNodeId: task?.tree_node_id ?? null,
+    packetKey: task?.packet_key ?? null,
     validationRoutes,
     validationQueueKeys,
     warnings: [...board.warnings],
@@ -161,10 +173,52 @@ export function buildPhase89WorkflowPlan(
   };
 }
 
+export function buildPhase89FabricLaneManifest(board: DailyGraphifyBoardData, plan: Phase89WorkflowPlan) {
+  if (!plan.sourceRef || !plan.treeNodeId || !plan.titleId) return null;
+
+  const task = selectDailyGraphifyBoardTask(board, plan.taskId ?? undefined);
+  const packetKey = plan.packetKey ?? computePacketKey(plan.sourceRef, plan.treeNodeId, plan.titleId);
+  const evidenceRefs = Array.from(new Set([...(task?.evidence_refs ?? []), ...(task?.reason_codes ?? [])])).sort();
+
+  return buildBoardFabricLaneManifest({
+    context: {
+      workflowId: plan.workflowId,
+      collection: board.collection,
+      taskId: plan.taskId,
+      taskLabel: plan.taskLabel,
+      recommendationId: plan.recommendationId,
+      sourceRef: plan.sourceRef,
+      treeNodeId: plan.treeNodeId,
+    },
+    packetKey,
+    sourceRevision: task?.origin ?? board.generated,
+    representationRevision: SEMANTIC_REPRESENTATION_ID,
+    producerId: 'atlas-phase89-board-workflow',
+    producerRevision: board.generated,
+    laneKinds: ['kanban_task_board', 'recommendation_policy', 'exact_knn_retrieval'],
+    evidenceRefs,
+    graphRevision: board.generated,
+    telemetryRevision: board.generated,
+    notes: `${board.collection} / ${plan.taskLabel ?? plan.taskId ?? 'board-task'}`,
+  });
+}
+
+export function buildPhase89GpuBenchmarkReceipt(board: DailyGraphifyBoardData, plan: Phase89WorkflowPlan) {
+  if (!plan.sourceRef || !plan.treeNodeId || !plan.titleId || !plan.packetKey) return null;
+  const fabricLaneManifest = buildPhase89FabricLaneManifest(board, plan);
+  if (!fabricLaneManifest) return null;
+  return buildBoardGpuBenchmarkReceipt({
+    board,
+    plan,
+    fabricLaneManifest,
+  });
+}
+
 export async function recordPhase89WorkflowPlan(
   plan: Phase89WorkflowPlan,
   redisClient = getRedis(),
   fabricLaneManifest?: unknown,
+  gpuBenchmarkReceipt?: unknown,
 ): Promise<{
   workflowId: string;
   queuedRoutes: string[];
@@ -180,6 +234,7 @@ export async function recordPhase89WorkflowPlan(
     warnings: plan.warnings,
     dryRun: plan.dryRun,
     fabricLaneManifest: fabricLaneManifest ?? plan.fabricLaneManifest ?? null,
+    gpuBenchmarkReceipt: gpuBenchmarkReceipt ?? plan.gpuBenchmarkReceipt ?? null,
     queuedAt: new Date().toISOString(),
     source: 'daily-graphify-board',
   });

@@ -6,6 +6,7 @@
  * Pass 1 — embedding cosine similarity (768-dim face vectors from pgvector)
  * Pass 2 — VLM visual reasoning (gemma4-rotorquant:latest / gemma3 via the local server):
  *           "Do these photos show the same person?"  → confidence 0–100
+ *           "Do these photos show the same person?"  → confidence 0–100
  * Pass 3 — GRPO reward: 0.35 * pass1 + 0.65 * pass2  (preference-weighted)
  *
  * Body: { candidateIds?: string[], limit?: number, passes?: 1 | 2 | 3 }
@@ -20,6 +21,7 @@ import { and, eq, inArray, ne, sql, isNull, or, desc } from 'drizzle-orm';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
+import { ENV } from '$lib/server/env.server.js';
 
 const bodySchema = z.object({
   candidateIds: z.array(z.string().max(500)).max(50).optional(),

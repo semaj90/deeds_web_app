@@ -1,4 +1,5 @@
 import type { VectorContract } from '$lib/server/embedding/knn-helper.js';
+import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
 
 export interface EmbeddingGemmaProjectionContract extends VectorContract {
   sourceDimension: number;
@@ -18,9 +19,9 @@ export const EMBEDDINGGEMMA_PREFIX384_V1 = ATLAS_EMBEDDINGGEMMA_DIRECT_SLICE384_
 export const EMBEDDINGGEMMA_FULL768_CONTRACT: EmbeddingGemmaProjectionContract = {
   modelId: EMBEDDINGGEMMA_FULL768_V1,
   modelVersion: '2026-07-21',
-  sourceDimension: 768,
-  outputDimension: 768,
-  dimension: 768,
+  sourceDimension: SEMANTIC_DIMENSION,
+  outputDimension: SEMANTIC_DIMENSION,
+  dimension: SEMANTIC_DIMENSION,
   normalization: 'l2',
   metric: 'cosine',
   vectorPurpose: 'content-semantic',
@@ -31,7 +32,7 @@ export const EMBEDDINGGEMMA_FULL768_CONTRACT: EmbeddingGemmaProjectionContract =
 export const EMBEDDINGGEMMA_PREFIX384_CONTRACT: EmbeddingGemmaProjectionContract = {
   modelId: EMBEDDINGGEMMA_PREFIX384_V1,
   modelVersion: '2026-07-21',
-  sourceDimension: 768,
+  sourceDimension: SEMANTIC_DIMENSION,
   outputDimension: 384,
   dimension: 384,
   normalization: 'l2',

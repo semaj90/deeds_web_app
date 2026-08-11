@@ -40,3 +40,25 @@ export {
 } from './contracts/fabric-lanes';
 
 export { buildBoardFabricLaneManifest } from './board/fabric-lane-manifest';
+export { buildBoardGpuBenchmarkReceipt } from './board/fabric-gpu-benchmark';
+export { buildDailyGraphifyTaskCandidates } from './board/graphify-task-candidates';
+export {
+  buildParentAtlasPhaseLaneProofReport,
+  getParentAtlasPhaseLaneProofSnapshot,
+} from './phase-lane-proof';
+export {
+  buildParentAtlasPhaseLaneReport,
+  getParentAtlasPhaseLane,
+  getParentAtlasPhaseLaneSnapshot,
+  listParentAtlasPhaseLanes,
+} from './phase-lane-registry';
+export {
+  buildParentAtlasPassFabricProofReport,
+  getParentAtlasPassFabricProofSnapshot,
+} from './pass-fabric-proof';
+export {
+  buildAnalysisPassCurrentProofSnapshot,
+} from '../analysis/analysis-pass-current';
+export {
+  buildAnalysisPassBoundaryProofSnapshot,
+} from '../analysis/analysis-pass-boundary';

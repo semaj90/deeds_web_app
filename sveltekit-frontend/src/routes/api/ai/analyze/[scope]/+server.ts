@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 			return json({ analysis: null, error: 'AI service unavailable' }, { status: 503 });
 		}
 
-		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+		const data = await res.json() as { choices?: Array<{ message?: { content?: string } }>; total_duration?: number; eval_count?: number };
 		const content = data.choices?.[0]?.message?.content || '';
 
 		return json({

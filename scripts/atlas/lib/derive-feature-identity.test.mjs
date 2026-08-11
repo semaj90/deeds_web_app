@@ -1,266 +1,113 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
+import { test } from 'node:test';
+import assert from 'node:assert';
+import { deriveFeatureIdentity, titleCase } from './derive-feature-identity.mjs';
 
-import {
-  deriveFeatureIdentity,
-  normalizeSection,
-  normalizeSource,
-  normalizeTitle,
-} from './derive-feature-identity.mjs';
+test('Case 1: Case Scoring Dashboard page', () => {
+  const row = {
+    title_id: 'title.sveltekit.frontend.page.74bfb5ad',
+    feature_id: 'sveltekit-frontend.+page',
+    feature_label: '+page.svelte',
+    summary: 'This component renders a "Case Scoring Dashboard," providing an interface for AI-driven risk assessment that visualizes case data using dynamic factors and confidence metrics.',
+    canonical_source_ref: 'src/routes/(app)/demos/case-scoring/+page.svelte',
+    file_path: 'src/routes/(app)/demos/case-scoring/+page.svelte'
+  };
 
-const SOURCE = '../MASTER-FEATURE-TODO-2026-05-20.md';
+  const result = deriveFeatureIdentity(row);
 
-const SOURCE_REF_313 =
-  'todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:313';
-
-const SOURCE_REF_314 =
-  'todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:314';
-
-const SECTION = 'Phase 101A — Directory Analysis & Codebase Pruning';
-
-const TODO_313 = {
-  source: SOURCE,
-  source_ref: SOURCE_REF_313,
-  sourceRefs: [SOURCE_REF_313],
-
-  section: SECTION,
-
-  title:
-    'Use directory-role analysis plus AST maps to separate missing features from redundant features.',
-
-  description:
-    'Use directory-role analysis plus AST maps to separate missing features from redundant features.',
-
-  line_number: 313,
-};
-
-const TODO_314 = {
-  source: SOURCE,
-  source_ref: SOURCE_REF_314,
-  sourceRefs: [SOURCE_REF_314],
-
-  section: SECTION,
-
-  title:
-    'Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.',
-
-  description:
-    'Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.',
-
-  line_number: 314,
-};
-
-test('normalizes source document independently of absolute path and line number', () => {
-  assert.equal(normalizeSource(SOURCE_REF_313), 'todo:master-feature-todo-2026-05-20');
-
-  assert.equal(
-    normalizeSource('todo:C:\\another\\checkout\\MASTER-FEATURE-TODO-2026-05-20.md#line:999'),
-    'todo:master-feature-todo-2026-05-20'
-  );
+  assert.strictEqual(result.featureLabel, 'Case Scoring Dashboard', 'Should derive "Case Scoring Dashboard"');
+  assert.strictEqual(result.featureLabel, 'Case Scoring Dashboard', 'Should strip trailing comma from quoted phrase');
+  assert.strictEqual(result.featureLabelSource, 'summary', 'Source should be summary');
+  assert.strictEqual(result.featureLabelConfidence, 0.95, 'Confidence should be 0.95 for summary');
+  assert.strictEqual(result.featureId, 'sveltekit-frontend.case-scoring-dashboard', 'Feature ID should be slugified');
+  assert.strictEqual(result.sourceBasename, '+page.svelte', 'Source basename should be +page.svelte');
 });
 
-test('normalizes numbered phase headings to stable phase identity', () => {
-  assert.equal(
-    normalizeSection('Phase 101A — Directory Analysis & Codebase Pruning'),
-    'phase-101a'
-  );
+test('Case 2: Cache events handler', () => {
+  const row = {
+    title_id: 'title.sveltekit.frontend.server.cache.events.a2f91b33',
+    feature_id: 'sveltekit-frontend.cache-events.ts',
+    feature_label: 'cache-events.ts',
+    summary: 'Cache event management and invalidation. Handles storage event propagation and cache lifecycle notifications.',
+    canonical_source_ref: 'src/lib/server/cache/cache-events.ts',
+    file_path: 'src/lib/server/cache/cache-events.ts'
+  };
 
-  assert.equal(normalizeSection('Phase 101A — Updated Human Description'), 'phase-101a');
+  const result = deriveFeatureIdentity(row);
+
+  assert.strictEqual(result.featureLabel, 'Cache Event Management', 'Should derive "Cache Event Management"');
+  assert.strictEqual(result.featureLabelSource, 'summary', 'Source should be summary');
+  assert.strictEqual(result.featureLabelConfidence, 0.95, 'Confidence should be 0.95 for summary');
+  assert.strictEqual(result.featureId, 'sveltekit-frontend.cache-event-management', 'Feature ID should be slugified');
+  assert.strictEqual(result.sourceBasename, 'cache-events.ts', 'Source basename should be cache-events.ts');
 });
 
-test('normalizes title deterministically', () => {
-  assert.equal(normalizeTitle('  Use   directory-role analysis.  '), 'use directory-role analysis');
+test('Canonical label (non-generic) passes through unchanged', () => {
+  const row = {
+    title_id: 'title.sveltekit.frontend.page.xyz',
+    feature_id: 'sveltekit-frontend.my-feature',
+    feature_label: 'My Custom Feature Name',
+    summary: 'Some other summary',
+    canonical_source_ref: 'src/routes/some/path/+page.svelte',
+    file_path: 'src/routes/some/path/+page.svelte'
+  };
+
+  const result = deriveFeatureIdentity(row);
+
+  assert.strictEqual(result.featureLabel, 'My Custom Feature Name', 'Should pass through non-generic label');
+  assert.strictEqual(result.featureLabelSource, 'canonical', 'Source should be canonical');
+  assert.strictEqual(result.featureLabelConfidence, 1.0, 'Confidence should be 1.0');
 });
 
-test('different TODOs in same document get different feature identities', () => {
-  const first = deriveFeatureIdentity(TODO_313);
+test('Fallback to path derivation when summary has no pattern', () => {
+  const row = {
+    title_id: 'title.sveltekit.frontend.page.xyz',
+    feature_id: 'sveltekit-frontend.+page',
+    feature_label: '+page.svelte',
+    summary: 'This is a generic summary with no meaningful pattern',
+    canonical_source_ref: 'src/routes/user-profile/+page.svelte',
+    file_path: 'src/routes/user-profile/+page.svelte'
+  };
 
-  const second = deriveFeatureIdentity(TODO_314);
+  const result = deriveFeatureIdentity(row);
 
-  assert.equal(first.sourceKey, second.sourceKey);
-
-  assert.equal(first.sourceKey, 'todo:master-feature-todo-2026-05-20');
-
-  assert.notEqual(first.featureId, second.featureId);
-
-  assert.notEqual(first.featureKey, second.featureKey);
-
-  assert.match(first.featureId, /^feature:todo:[0-9a-f]{24}$/);
-
-  assert.match(second.featureId, /^feature:todo:[0-9a-f]{24}$/);
+  assert.strictEqual(result.featureLabel, 'User Profile', 'Should derive from path');
+  assert.strictEqual(result.featureLabelSource, 'path', 'Source should be path');
+  assert.strictEqual(result.featureLabelConfidence, 0.7, 'Confidence should be 0.7');
 });
 
-test('moving TODO from line 313 to 400 does not change featureId', () => {
-  const original = deriveFeatureIdentity(TODO_313);
+test('Fallback to title_id when summary and path fail', () => {
+  const row = {
+    title_id: 'title.sveltekit.frontend.admin.user-management.settings.abc123de',
+    feature_id: 'sveltekit-frontend.+page',
+    feature_label: '+server.ts',
+    summary: 'Generic handler',
+    canonical_source_ref: 'src/routes/+server.ts',
+    file_path: 'src/routes/+server.ts'
+  };
 
-  const moved = deriveFeatureIdentity({
-    ...TODO_313,
+  const result = deriveFeatureIdentity(row);
 
-    source_ref:
-      'todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:400',
-
-    sourceRefs: [
-      'todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:400',
-    ],
-
-    line_number: 400,
-  });
-
-  assert.equal(moved.featureId, original.featureId);
-
-  assert.equal(moved.featureKey, original.featureKey);
-
-  assert.equal(moved.sourceKey, original.sourceKey);
-
-  // Provenance SHOULD change.
-  assert.notEqual(moved.sourceRef, original.sourceRef);
+  assert.strictEqual(result.featureLabel, 'Admin User Management Settings', 'Should derive from title_id');
+  assert.strictEqual(result.featureLabelSource, 'title_id', 'Source should be title_id');
+  assert.strictEqual(result.featureLabelConfidence, 0.5, 'Confidence should be 0.5');
 });
 
-test('material title change changes feature identity', () => {
-  const original = deriveFeatureIdentity(TODO_313);
+test('Fallback to basename when all else fails', () => {
+  const row = {
+    title_id: '',
+    feature_id: 'sveltekit-frontend.+page',
+    feature_label: '+page.svelte',
+    summary: '',
+    canonical_source_ref: 'src/+page.svelte',
+    file_path: 'src/+page.svelte'
+  };
 
-  const changed = deriveFeatureIdentity({
-    ...TODO_313,
+  const result = deriveFeatureIdentity(row);
 
-    title: 'Archive redundant directory features automatically.',
-
-    description: 'Archive redundant directory features automatically.',
-  });
-
-  assert.notEqual(changed.featureId, original.featureId);
-
-  assert.notEqual(changed.featureKey, original.featureKey);
-
-  assert.equal(changed.sourceKey, original.sourceKey);
-});
-
-test('adding additional sourceRefs does not change canonical feature identity', () => {
-  const original = deriveFeatureIdentity(TODO_313);
-
-  const enriched = deriveFeatureIdentity({
-    ...TODO_313,
-
-    sourceRefs: [
-      SOURCE_REF_313,
-
-      'openspec:changes/feature-label-semantic-derivation/spec.md#requirement:stable-feature-identity',
-
-      'code:scripts/atlas/lib/derive-feature-identity.mjs#symbol:deriveFeatureIdentity',
-    ],
-  });
-
-  assert.equal(enriched.featureId, original.featureId);
-
-  assert.equal(enriched.featureKey, original.featureKey);
-
-  assert.equal(enriched.sourceKey, original.sourceKey);
-
-  assert.equal(enriched.sourceRefs.length, 3);
-});
-
-test('feature identity does not depend on status or Kanban projection fields', () => {
-  const original = deriveFeatureIdentity(TODO_313);
-
-  const projected = deriveFeatureIdentity({
-    ...TODO_313,
-
-    status: 'done',
-
-    task_id: 'kanban-123456789abc',
-
-    packet_key: 'packet:temporary-runtime-value',
-
-    score: 0.999,
-  });
-
-  assert.equal(projected.featureId, original.featureId);
-});
-
-test('known colliding TODO records produce unique identities', () => {
-  const records = [
-    {
-      line: 313,
-      title:
-        'Use directory-role analysis plus AST maps to separate missing features from redundant features.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 314,
-      title:
-        'Keep pruning outputs compact and JSON-backed so the lane can be re-run deterministically.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 315,
-      title:
-        'Rebuild the parent atlas from the production-ready feature list after archive decisions land.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 316,
-      title: 'Keep the pruning lane offline-only; it should not become a startup dependency.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 317,
-      title:
-        'Audit PostgreSQL 17.6 vs 18 table/index drift and use the result to label canonical production tables vs experimental / archive-only tables.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 318,
-      title:
-        'Keep research_summaries as the live canonical research table and finish the additive provenance/index migration before any dump/restore promotion to Postgres 18.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 319,
-      title:
-        'Use the repo consolidation feature map to label ship-path, planned production, experimental, and archive-only files before trimming the repo to source, schemas, scripts, and docs.',
-      section: 'Phase 101A — Directory Analysis & Codebase Pruning',
-    },
-    {
-      line: 354,
-      title: 'Warm Redis / Bitfrost caches from sourceRef-backed ClusterCards and hot atlas joins.',
-      section: 'NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)',
-    },
-    {
-      line: 355,
-      title:
-        'Expand Neo4j context trees from KAG / DAG hits so multi-hop traversals can reuse the same sourceRef spine.',
-      section: 'NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)',
-    },
-    {
-      line: 381,
-      title:
-        'Formalize the later compute lanes for PyTorch XGBoost reranking, SOM clustering collection, and Neo4j hypergraph merges against the same sourceRef + feature_id spine.',
-      section: 'NES/Glyph Architecture Notes (SourceRef-First Atlas Join & Cards)',
-    },
-  ];
-
-  const identities = records.map(({ line, title, section }) =>
-    deriveFeatureIdentity({
-      source: SOURCE,
-
-      source_ref: `todo:C:\\Users\\james\\Videos\\deeds-web-app\\MASTER-FEATURE-TODO-2026-05-20.md#line:${line}`,
-
-      section,
-      title,
-      line_number: line,
-    })
-  );
-
-  const sourceKeys = new Set(identities.map((identity) => identity.sourceKey));
-
-  const featureIds = new Set(identities.map((identity) => identity.featureId));
-
-  const featureKeys = new Set(identities.map((identity) => identity.featureKey));
-
-  // All ten originate from the same source document.
-  assert.equal(sourceKeys.size, 1);
-
-  // All ten are logically distinct features.
-  assert.equal(featureIds.size, records.length);
-
-  assert.equal(featureKeys.size, records.length);
+  assert.strictEqual(result.featureLabel, '+Page', 'Should fallback to title-cased basename');
+  assert.strictEqual(result.featureLabelSource, 'basename', 'Source should be basename');
+  assert.strictEqual(result.featureLabelConfidence, 0.3, 'Confidence should be 0.3');
+  assert.strictEqual(titleCase('page'), 'Page');
+  assert.strictEqual(titleCase('_page'), '_Page');
+  assert.strictEqual(titleCase('page route'), 'Page Route');
 });

@@ -12,10 +12,15 @@ describe('/api/atlas/concept-tagging', () => {
           packetKey: 'packet:pos-2',
           sourceRef: 'src/lib/server/example.ts',
           sourceRevision: 'source:rev-2',
+          workspaceRevision: 'workspace:main',
           featureId: 'feature:example',
           featureLabel: 'Example concept',
           treeNodeId: 'tree:node:2',
           titleId: 'title:example',
+          jsonlSourceDigest: 'sha256:jsonl',
+          jsonlRecordIndex: 0,
+          jsonlLineNumber: 7,
+          jsonlParserRevision: 'jsonl-parser@1',
           representationId: 'semantic_768',
           representationRevision: 'semantic_768@2026-08-11',
           producerId: 'pos-concept-tagging-lane',
@@ -49,6 +54,11 @@ describe('/api/atlas/concept-tagging', () => {
     expect(body.tupleCount).toBeGreaterThan(0);
     expect(body.packet.packetKey).toBe('packet:pos-2');
     expect(body.packet.ontologyLinkedTuples[0]?.provenance.sourceRevision).toBe('source:rev-2');
+    expect(body.packet.featureMatrixSetup.semantic_dimension).toBe(768);
+    expect(body.packet.featureMatrixSetup.feature_tiers.static_packet.width).toBe(5);
+    expect(body.packet.featureMatrixSetup.feature_tiers.candidate_query.som_grid).toEqual([20, 20]);
+    expect(body.packet.featureVector5Static.presence_mask).toEqual([1, 1, 1, 0, 0]);
+    expect(body.packet.domainClassification.labels.length).toBeLessThanOrEqual(8);
   });
 
   it('keeps the top-level envelope stable on validation failure', async () => {

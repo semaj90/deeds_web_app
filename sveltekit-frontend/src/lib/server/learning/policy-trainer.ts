@@ -230,10 +230,10 @@ export function generateTrainingExamples(
             tc.tool_name === 'trace_kag_search' || tc.tool_name === 'trace_kag_multi_lane_search'
           )
           .map(tc => ({
-            packet_key: tc.arguments.packet_key,
-            source_ref: tc.arguments.source_ref,
-            score: tc.arguments.score,
-            retrieval_strategy: tc.arguments.retrieval_strategy,
+            packet_key: tc.arguments.packet_key as string,
+            source_ref: tc.arguments.source_ref as string,
+            score: tc.arguments.score as number,
+            retrieval_strategy: tc.arguments.retrieval_strategy as string,
           })),
         trace_state: {
           agent_run_id: run.run_id,

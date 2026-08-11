@@ -4,6 +4,14 @@ import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas
 import { persistCanonicalSemanticPacketEmbedding } from './semantic-packet-writer.js';
 import { CANONICAL_SEMANTIC_ENCODER_REVISION } from './semantic-lineage.js';
 
+const { mockResolveCanonicalPacketKey } = vi.hoisted(() => ({
+	mockResolveCanonicalPacketKey: vi.fn(async (inputKey: string) => inputKey),
+}));
+
+vi.mock('$lib/server/atlas/identity/packet-identity-resolver.js', () => ({
+	resolveCanonicalPacketKey: mockResolveCanonicalPacketKey,
+}));
+
 describe('persistCanonicalSemanticPacketEmbedding', () => {
 	it('writes canonical semantic lineage into atlas_packets', async () => {
 		const values = vi.fn().mockReturnValue({ onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) });
@@ -89,5 +97,35 @@ describe('persistCanonicalSemanticPacketEmbedding', () => {
 		expect(result.packetId).toBe(expectedPacketKey);
 		expect(values.mock.calls[0]?.[0].packetKey).toBe(expectedPacketKey);
 		expect(values.mock.calls[0]?.[0].packetId).toBe(expectedPacketKey);
+	});
+
+	it('resolves an alias packetKey before persisting canonical semantic lineage', async () => {
+		const values = vi.fn().mockReturnValue({ onConflictDoUpdate: vi.fn().mockResolvedValue(undefined) });
+		const insert = vi.fn().mockReturnValue({ values });
+		const database = { insert } as any;
+		const vector = Array.from({ length: 768 }, (_, index) => (index % 3 === 0 ? 0.1 : -0.1));
+		const sourceRef = 'src/lib/server/example-4.ts';
+		const treeNodeId = 'src/lib/server/example-4.ts:4:1:function';
+		const titleId = 'example-4';
+		const canonicalPacketKey = computeCanonicalPacketKey(sourceRef, treeNodeId, titleId);
+
+		mockResolveCanonicalPacketKey.mockImplementationOnce(async (inputKey: string) =>
+			inputKey === 'packet:legacy:alias' ? canonicalPacketKey : inputKey
+		);
+
+		const result = await persistCanonicalSemanticPacketEmbedding(
+			{
+				packetKey: 'packet:legacy:alias',
+				sourceRef,
+				treeNodeId,
+				titleId,
+				vector,
+			},
+			database,
+		);
+
+		expect(result.packetKey).toBe(canonicalPacketKey);
+		expect(values.mock.calls[0]?.[0].packetKey).toBe(canonicalPacketKey);
+		expect(mockResolveCanonicalPacketKey).toHaveBeenCalledWith('packet:legacy:alias');
 	});
 });

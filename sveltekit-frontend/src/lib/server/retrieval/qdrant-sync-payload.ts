@@ -1,4 +1,5 @@
 import { buildEnrichedPayload } from './qdrant-payload-enricher.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 export function buildQdrantSyncPayload(packet: Record<string, unknown>): Record<string, unknown> {
   const p = packet as any;
@@ -16,7 +17,7 @@ export function buildQdrantSyncPayload(packet: Record<string, unknown>): Record<
     source_ref: String(p.sourceRef),
     workspace_id: String(p.workspaceId),
     workspace_revision: Number(p.workspaceRevision || 0),
-    representation_id: String(p.representationId || 'semantic_768'),
+    representation_id: String(p.representationId || SEMANTIC_REPRESENTATION_ID),
     representation_revision: Number(p.representationRevision || 0),
     schema_version: 'atlas.qdrant.payload.v1',
     source_revision: p.sourceRevision ? String(p.sourceRevision) : null,

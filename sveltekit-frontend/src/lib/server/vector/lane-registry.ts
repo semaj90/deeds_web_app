@@ -1,9 +1,11 @@
+import { SEMANTIC_DIMENSION } from '../embedding/embedding-contract-768.js';
+
 /**
  * Semantic vectors and latent topology projections are different contracts.
  * Never share one dimension union between them — a 128/64-dim topology
  * projection is not a valid semantic embedding dimension and vice versa.
  */
-export type SemanticDimension = 768;
+export type SemanticDimension = typeof SEMANTIC_DIMENSION;
 export type TopologyDimension = 128 | 64;
 
 export type LaneRegistryKind =
@@ -29,7 +31,7 @@ export interface VectorLaneContract {
   modelId: string;
   vectorName: string;
   collection: string;
-  dimension: 768 | 64 | 128;
+  dimension: SemanticDimension | 64 | 128;
   projection: 'none' | 'direct_slice' | 'autoencoder' | 'latent';
   normalization: 'none' | 'l2';
   status: 'active' | 'partial' | 'legacy' | 'blocked';
@@ -44,7 +46,7 @@ export const VECTOR_LANES = {
     modelId: 'embeddinggemma:latest',
     vectorName: 'content',
     collection: 'codebase_chunks_768',
-    dimension: 768,
+    dimension: SEMANTIC_DIMENSION,
     projection: 'none',
     normalization: 'l2',
     status: 'active',

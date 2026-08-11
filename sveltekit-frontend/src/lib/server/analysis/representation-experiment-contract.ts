@@ -8,9 +8,10 @@
 
 import { z } from 'zod';
 import { AnalysisRunEnvelopeSchema } from './analysis-run-envelope.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 export const RepresentationFamilySchema = z.enum([
-	'semantic_768',
+	SEMANTIC_REPRESENTATION_ID,
 	'codebert_768',
 	'graphcodebert_768',
 ]);
@@ -28,7 +29,7 @@ export type RepresentationExperimentKind = z.infer<typeof RepresentationExperime
 export const RepresentationExperimentRunSchema = AnalysisRunEnvelopeSchema.extend({
 	algorithm: z.literal('representation_experiment'),
 	experimentKind: RepresentationExperimentKindSchema,
-	baselineRepresentation: z.literal('semantic_768'),
+	baselineRepresentation: z.literal(SEMANTIC_REPRESENTATION_ID),
 	candidateRepresentation: z.enum(['codebert_768', 'graphcodebert_768']),
 	sourceDimension: z.number().int().positive(),
 	targetDimension: z.number().int().positive(),

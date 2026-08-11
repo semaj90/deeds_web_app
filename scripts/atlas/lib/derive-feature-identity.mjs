@@ -1,312 +1,240 @@
-import { createHash } from 'node:crypto';
-import path from 'node:path';
-
-const IDENTITY_SEPARATOR = '\x1f';
-const FEATURE_HASH_LENGTH = 24;
-
 /**
- * Normalize arbitrary text for canonical identity hashing.
- *
- * Important:
- * - NFKC removes equivalent Unicode representations.
- * - Case is intentionally ignored.
- * - Whitespace is canonicalized.
- * - Human punctuation differences at the edges do not create new identities.
- *
- * This is NOT the same as the human-readable slug.
+ * Pure function to derive feature labels from row metadata.
+ * No side effects, no DB access, deterministic.
  */
-function normalizeIdentityText(value) {
-  return String(value ?? '')
-    .normalize('NFKC')
-    .replace(/\r\n?/g, '\n')
+
+const GENERIC_BASENAMES = new Set([
+  '+page.svelte',
+  '+server.ts',
+  '+layout.svelte',
+  '+layout.server.ts',
+  'index.ts',
+  'index.js'
+]);
+
+function slugify(text) {
+  return text
+    .toLowerCase()
     .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/[.。]+$/u, '')
-    .toLowerCase();
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+export function titleCase(text) {
+  return String(text ?? '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => {
+      const match = word.match(/^([^A-Za-z0-9]*)([A-Za-z0-9].*)$/);
+      if (!match) return word;
+      const [, prefix, body] = match;
+      const parts = body
+        .split(/[-_]+/)
+        .filter(Boolean)
+        .map((segment) =>
+          segment.replace(/[A-Za-z0-9]+/g, (chunk) => {
+            if (/^[A-Z0-9]+$/.test(chunk)) return chunk;
+            if (chunk.length === 1) return chunk.toUpperCase();
+            return chunk[0].toUpperCase() + chunk.slice(1).toLowerCase();
+          }),
+        );
+      return `${prefix}${parts.join(' ')}`;
+    })
+    .join(' ');
 }
 
 /**
- * Convert a canonical string into a deterministic readable slug.
+ * Title-case a multi-word phrase while preserving all-caps acronyms
+ * (e.g. "AI", "API") instead of lowercasing them.
  */
-function slugify(value) {
-  return normalizeIdentityText(value)
-    .replace(/[`'"“”‘’]/g, '')
-    .replace(/&/g, ' and ')
-    .replace(/\bversus\b/g, ' vs ')
-    .replace(/\bvs\.\b/g, ' vs ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .replace(/-{2,}/g, '-');
+function capitalizeWords(text) {
+  return text
+    .split(/\s+/)
+    .map(word => {
+      if (/^[A-Z0-9]+$/.test(word)) return word; // preserve acronyms as-is
+      const match = word.match(/^([^A-Za-z]*)([A-Za-z])(.*)$/);
+      if (!match) return word;
+      const [, prefix, firstLetter, rest] = match;
+      return prefix + firstLetter.toUpperCase() + rest.toLowerCase();
+    })
+    .join(' ');
+}
+
+function getSourceBasename(canonical_source_ref, file_path) {
+  const path = canonical_source_ref || file_path || '';
+  return path.split('/').pop() || '';
+}
+
+function isFilenameDerivedLabel(label, sourceBasename) {
+  if (!label || !sourceBasename) return false;
+  const normalizedLabel = label.toLowerCase().trim();
+  const normalizedBase = String(sourceBasename).toLowerCase().trim();
+  const strippedBase = normalizedBase.replace(/\.[^.]+$/, '');
+  if (!normalizedLabel || !strippedBase) return false;
+  if (normalizedLabel === normalizedBase) return true;
+  if (normalizedLabel === strippedBase) return true;
+  if (normalizedLabel === strippedBase.replace(/[-_]+/g, ' ')) return true;
+  return false;
 }
 
 /**
- * Extract the canonical source kind.
- *
- * Examples:
- *   todo:C:\repo\MASTER-FEATURE-TODO.md#line:313 -> todo
- *   openspec:changes/foo/spec.md                 -> openspec
- *   ../MASTER-FEATURE-TODO.md                    -> fallbackKind
+ * Extract a functional noun phrase from summary text.
+ * Looks for patterns like:
+ *   - "renders/provides/defines/implements [a/an/the] PHRASE"
+ *   - "responsible for X"
+ *   - "utilities for X"
+ *   - "interface for X"
+ *   - "endpoint/handler for X"
  */
-function extractSourceKind(value, fallbackKind = 'todo') {
-  const source = String(value ?? '').trim();
+function extractFunctionalNounPhrase(summary) {
+  if (!summary) return null;
 
-  const match = source.match(/^([a-z][a-z0-9+.-]*):/i);
-
-  // Do not accidentally interpret C:\... as scheme "c".
-  if (match && match[1].length > 1) {
-    return match[1].toLowerCase();
+  // Pattern 1: renders/provides/defines/implements [article] PHRASE (stops at period, 'for', 'with', 'and')
+  let match = summary.match(/(?:renders|provides|defines|implements)\s+(?:a|an|the)?\s*([A-Z][A-Za-z\s]+?)(?:\s+(?:for|with|and)|\.|\s{2,}|$)/i);
+  if (match) {
+    const phrase = capitalizeWords(match[1].trim());
+    if (phrase.length > 2) return phrase;
   }
 
-  return fallbackKind;
+  // Pattern 2: starts with noun phrase followed by period, "and", "or"
+  // e.g. "Cache event management and invalidation"
+  match = summary.match(/^([A-Z][A-Za-z\s]+?)(?:\.|,|\s+(?:and|or)\s)/i);
+  if (match) {
+    const phrase = capitalizeWords(match[1].trim());
+    if (phrase.length > 2) return phrase;
+  }
+
+  // Pattern 3: quoted phrases
+  match = summary.match(/"([^"]+)"/);
+  if (match) {
+    const phrase = match[1].trim().replace(/[,;:.]+$/, '');
+    if (phrase.length > 2) return phrase;
+  }
+
+  return null;
 }
 
 /**
- * Remove provenance-only location information.
- *
- * The line fragment is NEVER part of canonical identity.
+ * Derive label from canonical path.
+ * Strip src/routes/lib/components/server/api scaffolding, title-case remainder.
+ * Only use the directory path component, not the filename (unless filename is meaningful).
  */
-function stripSourceLocation(value) {
-  let source = String(value ?? '').trim();
+function deriveLabelFromPath(canonical_source_ref) {
+  if (!canonical_source_ref) return null;
 
-  source = source.replace(/#line:\d+$/i, '');
-  source = source.replace(/#L\d+(?:-L?\d+)?$/i, '');
+  const SCAFFOLD = new Set(['src', 'routes', 'lib', 'components', 'server', 'api']);
 
-  const schemeMatch = source.match(/^([a-z][a-z0-9+.-]*):(.*)$/i);
+  const parts = canonical_source_ref.split('/');
 
-  // Avoid treating Windows C:\ as a semantic scheme.
-  if (schemeMatch && schemeMatch[1].length > 1) {
-    source = schemeMatch[2];
-  }
+  // Extract meaningful directory components (skip scaffolding)
+  const meaningful = parts.slice(0, -1)  // Exclude the filename
+    .filter(seg => !SCAFFOLD.has(seg) && seg.length > 0);
 
-  return source;
+  if (meaningful.length === 0) return null;
+
+  // Take the last meaningful directory component
+  const dirName = meaningful[meaningful.length - 1];
+  return titleCase(dirName.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' '));
 }
 
 /**
- * Produce the stable source-document identity.
- *
- * Examples:
- *
- * todo:C:\...\MASTER-FEATURE-TODO-2026-05-20.md#line:313
- *
- * becomes:
- *
- * todo:master-feature-todo-2026-05-20
- *
- * Line numbers and absolute repository paths intentionally disappear.
+ * Derive label from title_id.
+ * Strip tokens like "title", "sveltekit", "frontend" and trailing hex, title-case remainder.
  */
-export function normalizeSource(value, options = {}) {
-  const { sourceKind, fallbackKind = 'todo' } = options;
+function deriveLabelFromTitleId(title_id) {
+  if (!title_id) return null;
 
-  const kind = sourceKind ?? extractSourceKind(value, fallbackKind);
+  const tokens = title_id.split('.')
+    .filter(t => !['title', 'sveltekit', 'frontend', 'backend', 'server', 'client'].includes(t.toLowerCase()))
+    .map(t => t.replace(/[0-9a-f]{8}$/, '').trim())
+    .filter(t => t.length > 0);
 
-  const withoutLocation = stripSourceLocation(value);
+  if (tokens.length === 0) return null;
 
-  const normalizedPath = withoutLocation.replace(/\\/g, '/');
-
-  const basename = path.posix.basename(normalizedPath) || normalizedPath;
-
-  const withoutExtension = basename.replace(/\.(md|markdown|mdx|txt|json|jsonl|ya?ml)$/i, '');
-
-  const documentKey = slugify(withoutExtension);
-
-  if (!documentKey) {
-    throw new Error(`Cannot derive sourceKey from source: ${JSON.stringify(value)}`);
-  }
-
-  return `${kind}:${documentKey}`;
+  return titleCase(tokens.join(' ').replace(/[-_]+/g, ' '));
 }
 
 /**
- * Canonicalize section identity.
+ * Derive feature identity from a row of metadata.
  *
- * Phase headings intentionally collapse to their stable phase number:
- *
- * "Phase 101A — Directory Analysis & Codebase Pruning"
- * ->
- * "phase-101a"
- *
- * This prevents harmless edits to a phase's descriptive heading from changing
- * every feature beneath that phase.
- *
- * Non-phase sections retain their full canonicalized heading.
+ * @param {Object} row - { title_id, feature_id, feature_label, summary, canonical_source_ref, file_path }
+ * @returns {Object} { featureId, featureLabel, featureLabelSource, featureLabelConfidence, sourceBasename }
  */
-export function normalizeSection(value) {
-  const normalized = normalizeIdentityText(value);
+export function deriveFeatureIdentity(row) {
+  const {
+    title_id,
+    feature_id: existing_feature_id,
+    feature_label: existing_label,
+    summary,
+    canonical_source_ref,
+    file_path
+  } = row;
 
-  if (!normalized) {
-    return 'unsectioned';
-  }
+  const sourceBasename = getSourceBasename(canonical_source_ref, file_path);
 
-  const phaseMatch = normalized.match(/^phase\s+([0-9]+[a-z0-9.-]*)\b/i);
-
-  if (phaseMatch) {
-    return `phase-${slugify(phaseMatch[1])}`;
-  }
-
-  return slugify(normalized) || 'unsectioned';
-}
-
-/**
- * Canonical title used for hashing.
- *
- * Keep this conservative.
- *
- * We deliberately do NOT use LLM summarization, embeddings, stemming, or
- * semantic rewriting here. Identity derivation must produce exactly the same
- * answer offline on every machine.
- */
-export function normalizeTitle(value) {
-  const normalized = normalizeIdentityText(value);
-
-  if (!normalized) {
-    throw new Error('Cannot derive feature identity without a title');
-  }
-
-  return normalized;
-}
-
-/**
- * Human-readable title slug.
- *
- * This is presentation/debug identity, not the cryptographic identity input.
- */
-export function normalizeTitleSlug(value) {
-  const normalized = normalizeTitle(value);
-
-  return slugify(normalized);
-}
-
-/**
- * Choose exactly one canonical source from the record.
- *
- * Priority:
- *
- * 1. record.source_ref / record.sourceRef
- * 2. record.source
- * 3. first sourceRefs entry
- *
- * Additional sourceRefs are provenance only and MUST NOT modify featureId.
- */
-function resolveCanonicalSource(record) {
-  const sourceRef = record?.source_ref ?? record?.sourceRef ?? null;
-
-  if (sourceRef) {
-    return sourceRef;
-  }
-
-  if (record?.source) {
-    return record.source;
-  }
-
-  if (Array.isArray(record?.sourceRefs) && record.sourceRefs.length > 0) {
-    return record.sourceRefs[0];
-  }
-
-  throw new Error(
-    'Cannot derive feature identity without source_ref, sourceRef, source, or sourceRefs[0]'
+  // A label is "generic" (non-meaningful) if it's a known scaffold basename,
+  // or an echo of the file's own basename. Those should not block summary derivation.
+  const isGenericLabel = Boolean(
+    existing_label &&
+    (GENERIC_BASENAMES.has(existing_label) || isFilenameDerivedLabel(existing_label, sourceBasename))
   );
-}
 
-/**
- * Keep exact source provenance without allowing it into the identity hash.
- */
-function resolveSourceRefs(record, canonicalSource) {
-  const refs = [];
-
-  const primary = record?.source_ref ?? record?.sourceRef ?? null;
-
-  if (primary) {
-    refs.push(String(primary));
+  // If existing label is NOT generic, treat as canonical.
+  if (existing_label && !isGenericLabel) {
+    return {
+      featureId: existing_feature_id || `sveltekit-frontend.${slugify(existing_label)}`,
+      featureLabel: existing_label,
+      featureLabelSource: 'canonical',
+      featureLabelConfidence: 1.0,
+      sourceBasename
+    };
   }
 
-  if (Array.isArray(record?.sourceRefs)) {
-    for (const ref of record.sourceRefs) {
-      if (ref != null && String(ref).trim()) {
-        refs.push(String(ref));
-      }
-    }
+  // Try derivation strategies in order
+  let derivedLabel = extractFunctionalNounPhrase(summary);
+  let source = 'summary';
+  let confidence = 0.95;
+
+  if (!derivedLabel) {
+    derivedLabel = deriveLabelFromPath(canonical_source_ref);
+    source = 'path';
+    confidence = 0.7;
   }
 
-  if (refs.length === 0 && canonicalSource) {
-    refs.push(String(canonicalSource));
+  if (!derivedLabel) {
+    derivedLabel = deriveLabelFromTitleId(title_id);
+    source = 'title_id';
+    confidence = 0.5;
   }
 
-  return [...new Set(refs)];
-}
-
-/**
- * Stable canonical feature identity.
- *
- * Canonical identity input:
- *
- * sourceKey
- *   \x1f
- * normalized section
- *   \x1f
- * normalized title
- *
- * SHA-256 -> first 24 hex characters.
- *
- * Example:
- *
- * feature:todo:0123456789abcdef01234567
- */
-export function deriveFeatureIdentity(record) {
-  if (!record || typeof record !== 'object') {
-    throw new TypeError('deriveFeatureIdentity(record) requires an object');
+  if (!derivedLabel) {
+    // Fallback: title-case basename without extension
+    const cleanBasename = sourceBasename.replace(/\.[^.]+$/, '');
+    derivedLabel = titleCase(cleanBasename);
+    source = 'basename';
+    confidence = 0.3;
   }
-
-  const canonicalSource = resolveCanonicalSource(record);
-
-  const sourceKind = extractSourceKind(canonicalSource, 'todo');
-
-  const sourceKey = normalizeSource(canonicalSource, {
-    sourceKind,
-  });
-
-  const canonicalSection = normalizeSection(record.section);
-
-  const canonicalTitle = normalizeTitle(record.title ?? record.description);
-
-  const titleSlug = normalizeTitleSlug(record.title ?? record.description);
-
-  const identityInput = [sourceKey, canonicalSection, canonicalTitle].join(IDENTITY_SEPARATOR);
-
-  const digest = createHash('sha256')
-    .update(identityInput, 'utf8')
-    .digest('hex')
-    .slice(0, FEATURE_HASH_LENGTH);
-
-  const featureId = `feature:${sourceKind}:${digest}`;
-
-  const featureKey = `${canonicalSection}:${titleSlug}`;
-
-  const sourceRefs = resolveSourceRefs(record, canonicalSource);
-
-  const sourceRef = record.source_ref ?? record.sourceRef ?? sourceRefs[0] ?? null;
 
   return {
-    featureId,
-    feature_id: featureId,
-
-    featureKey,
-
-    sourceKey,
-
-    sourceRef,
-    source_ref: sourceRef,
-    sourceRefs,
-
-    normalizedSection: canonicalSection,
-    normalizedTitle: canonicalTitle,
-
-    /**
-     * Useful for audit/debug/replay.
-     *
-     * Do not persist this if you consider canonical TODO title text sensitive.
-     */
-    identityInput,
-
-    identityVersion: 'atlas.feature-identity.v1',
+    featureId: `sveltekit-frontend.${slugify(derivedLabel)}`,
+    featureLabel: derivedLabel,
+    featureLabelSource: source,
+    featureLabelConfidence: confidence,
+    sourceBasename
   };
+}
+
+/**
+ * Classify a deriveFeatureIdentity() result into a report-friendly status bucket.
+ * Shared by every consumer (summary-index-ranker, envelope builder, ...) so the
+ * bucket boundaries live in exactly one place.
+ */
+export function classifyFeatureLabelStatus(identity) {
+  if (identity.featureLabelSource === 'canonical') return 'CANONICAL';
+  if (identity.featureLabelConfidence >= 0.9) return 'DERIVED_HIGH_CONFIDENCE';
+  if (identity.featureLabelConfidence >= 0.5) return 'DERIVED_PATH_FALLBACK';
+  return 'GENERIC_REPLACEMENT_RECOMMENDED';
 }

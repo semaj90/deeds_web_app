@@ -15,6 +15,7 @@
  */
 import { ENV } from '../env.server.js';
 import type { SearchTier } from '$lib/server/retrieval/search-contract.js';
+import { SEMANTIC_DIMENSION } from '../embedding/embedding-contract-768.js';
 
 /** Per-collection search config — tells callers how to build Qdrant queries */
 export interface VectorSearchConfig {
@@ -188,7 +189,7 @@ export const VECTOR_LANES = {
   },
   dense_768: {
     kind: 'dense',
-    dimension: 768,
+    dimension: SEMANTIC_DIMENSION,
     modelId: 'embeddinggemma:latest',
     laneId: 'dense_768',
     role: 'canonical_native_semantic',

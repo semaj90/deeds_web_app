@@ -9,10 +9,15 @@ const baseRequest = {
   packetKey: 'packet:pos-1',
   sourceRef: 'src/lib/server/example.ts',
   sourceRevision: 'source:rev-1',
+  workspaceRevision: 'workspace:main',
   featureId: 'feature:example',
   featureLabel: 'Example concept',
   treeNodeId: 'tree:node:1',
   titleId: 'title:example',
+  jsonlSourceDigest: 'sha256:jsonl',
+  jsonlRecordIndex: 0,
+  jsonlLineNumber: 12,
+  jsonlParserRevision: 'jsonl-parser@1',
   representationId: 'semantic_768' as const,
   representationRevision: 'semantic_768@2026-08-11',
   producerId: 'pos-concept-tagging-lane',
@@ -25,6 +30,10 @@ const baseRequest = {
   astSymbols: ['validateSession', 'session'],
   semanticConceptIds: ['concept:session', 'concept:auth'],
   ontologyIds: ['ontology:auth.sessions'],
+  posCandidateLabels: [
+    { label: 'NOUN', score: 0.91 },
+    { label: 'PROPN', score: 0.08 },
+  ],
   citations: [{ citationText: 'Miranda v. Arizona', sourceRef: 'citation:miranda' }],
   screenshots: [{ path: 'screenshots/session.png', caption: 'session diagram' }],
   policySummary: 'Prefer canonical evidence-backed concepts.',
@@ -59,6 +68,16 @@ describe('pos-concept-tagging-lane', () => {
 
     expect(packetA.packetKey).toBe(baseRequest.packetKey);
     expect(packetA.sourceRef).toBe(baseRequest.sourceRef);
+    expect(packetA.featureMatrixSetup.semantic_dimension).toBe(768);
+    expect(packetA.featureMatrixSetup.feature_tiers.static_packet.width).toBe(5);
+    expect(packetA.featureMatrixSetup.feature_tiers.candidate_query.kmeans_candidates).toEqual([64, 128, 256]);
+    expect(packetA.featureMatrixSetup.feature_tiers.candidate_query.som_grid).toEqual([20, 20]);
+    expect(packetA.featureMatrixSetup.feature_tiers.candidate_query.top_cluster_soft_cap).toBe(8);
+    expect(packetA.featureVector5Static.features).toHaveLength(5);
+    expect(packetA.featureVector5Static.presence_mask).toEqual([1, 1, 1, 0, 0]);
+    expect(packetA.posTaggerOutput.top_k_labels).toHaveLength(2);
+    expect(packetA.jsonlParsedEvidence.source_ref).toBe(baseRequest.sourceRef);
+    expect(packetA.domainClassification?.labels.length).toBeLessThanOrEqual(8);
     expect(packetA.ontologyLinkedTuples.map((tuple) => tuple.tupleId)).toEqual(
       packetB.ontologyLinkedTuples.map((tuple) => tuple.tupleId)
     );
@@ -81,6 +100,7 @@ describe('pos-concept-tagging-lane', () => {
     );
     expect(packetA.packetKey).toBe(packetB.packetKey);
     expect(packetA.sourceRevision).toBe(packetB.sourceRevision);
+    expect(packetA.domainClassification?.primary_label).toBeTruthy();
   });
 
   it('requires explicit revision lineage and caps MCP fanout at 3', () => {

@@ -5,6 +5,7 @@ import { ENV } from '../env.server.js';
 import { getRedis } from '../redis.js';
 import { storeChatMemoryTurn, injectAcePacket } from './engram-registry.js';
 import { turbovecPrefilter, turbovecSearch } from '../retrieval/turbovec-prefilter.js';
+import { BoardGpuBenchmarkReceiptSchema } from '../atlas/board/fabric-gpu-benchmark.js';
 
 const CUVS_BENCH_URL = ENV.CUVS_BENCH_URL;
 
@@ -176,6 +177,84 @@ export async function startDistributedWorker() {
             );
           }
           console.error('[Worker] cuVS search request failed:', err);
+        }
+      }
+    })().catch(console.error);
+
+    // @ts-expect-error TODO(TS-103): nc implicitly unknown
+    const boardGpuBenchmarkSub = nc.subscribe('atlas.board.fabric.gpu-benchmark', { queue: 'gpu.cuvs' });
+    console.log(`[Worker] Listening for board GPU benchmark requests on 'atlas.board.fabric.gpu-benchmark'`);
+
+    (async () => {
+      for await (const msg of boardGpuBenchmarkSub) {
+        try {
+          const payload = JSON.parse(sc.decode(msg.data));
+          const receipt = BoardGpuBenchmarkReceiptSchema.parse(payload.receipt ?? payload);
+
+          if (!ENV.ENABLE_CUVS_SEARCH) {
+            if (msg.reply) {
+              msg.respond(
+                sc.encode(
+                  JSON.stringify({
+                    ok: true,
+                    enabled: false,
+                    subject: 'atlas.board.fabric.gpu-benchmark',
+                    backend: 'offline',
+                    receipt,
+                    notes: ['ENABLE_CUVS_SEARCH=false'],
+                  })
+                )
+              );
+            }
+            continue;
+          }
+
+          const resp = await fetch(`${CUVS_BENCH_URL}/benchmark`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: `${receipt.workflowId}:${receipt.collection}`,
+              topK: receipt.cuvsRequest.k,
+              jsonRows: receipt.jsonRows,
+              jsonl: receipt.jsonl,
+              matrix: receipt.matrix,
+              packetKeys: receipt.cuvsRequest.packetKeys,
+              representationId: receipt.cuvsRequest.representationId,
+              representationRevision: receipt.cuvsRequest.representationRevision,
+              fabricLaneManifest: receipt.fabricLaneManifest,
+              lowRankFeatureBlock: receipt.lowRankFeatureBlock,
+            }),
+            signal: AbortSignal.timeout(
+              Number.isFinite(Number(payload.timeoutMs)) ? Number(payload.timeoutMs) : 5000
+            ),
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (msg.reply) {
+            msg.respond(
+              sc.encode(
+                JSON.stringify({
+                  ok: resp.ok,
+                  subject: 'atlas.board.fabric.gpu-benchmark',
+                  backend: data.backend ?? 'cuvs',
+                  result: data,
+                  receipt,
+                })
+              )
+            );
+          }
+        } catch (err) {
+          if (msg.reply) {
+            msg.respond(
+              sc.encode(
+                JSON.stringify({
+                  ok: false,
+                  subject: 'atlas.board.fabric.gpu-benchmark',
+                  error: err instanceof Error ? err.message : String(err),
+                })
+              )
+            );
+          }
+          console.error('[Worker] board GPU benchmark request failed:', err);
         }
       }
     })().catch(console.error);

@@ -5,18 +5,20 @@
  * All embedding dimensions are 768-dim (no truncation pipeline exists)
  */
 
+import { SEMANTIC_DIMENSION } from '../embedding/embedding-contract-768.js';
+
 export const EMBEDDING_CONFIG = {
   /** Ollama embedding model — produces 768-dimensional vectors */
   model: 'embeddinggemma:latest',
 
   /** Canonical embedding dimension — verified by live audit */
-  dimension: 768,
+  dimension: SEMANTIC_DIMENSION,
 
   /** Postgres pgvector column type — must match dimension */
   postgresType: 'vector(768)',
 
   /** Qdrant collection vector size — must match dimension */
-  qdrantVectorSize: 768,
+  qdrantVectorSize: SEMANTIC_DIMENSION,
 
   /** Qdrant collection name for code embeddings */
   qdrantCollection: 'codebase_chunks_768',

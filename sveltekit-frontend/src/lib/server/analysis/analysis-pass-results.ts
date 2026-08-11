@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { db } from '$lib/server/db/client.js';
+import { db, pgRows } from '$lib/server/db/client.js';
 import {
 	analysisPassResults,
 	resolveExecutionSemantics,
@@ -59,6 +59,69 @@ function stableStringify(value: unknown): string {
 
 function sha256Hex(value: string): string {
 	return createHash('sha256').update(value).digest('hex');
+}
+
+export type AnalysisPassDuplicateClassification =
+	| 'identical_retry'
+	| 'stochastic_history'
+	| 'revision_mixed'
+	| 'ambiguous';
+
+export interface AnalysisPassDuplicateGroup {
+	passKey: string | null;
+	packetKey: string | null;
+	passType: string | null;
+	inputHash: string | null;
+	copies: number;
+	firstSeen: string | null;
+	lastSeen: string | null;
+	outputVersions: number;
+	provenanceVersions: number;
+	sourceRevisionVersions: number;
+	passRevisionVersions: number;
+	classification: AnalysisPassDuplicateClassification;
+	classificationReason: string;
+}
+
+export interface AnalysisPassLedgerProofSnapshot {
+	generatedAt: string;
+	totalRows: number;
+	duplicateGroupCount: number;
+	classificationCounts: Record<AnalysisPassDuplicateClassification, number>;
+	duplicateGroups: AnalysisPassDuplicateGroup[];
+}
+
+export function classifyAnalysisPassDuplicateGroup(input: {
+	outputVersions: number;
+	provenanceVersions: number;
+	sourceRevisionVersions: number;
+	passRevisionVersions: number;
+}): Pick<AnalysisPassDuplicateGroup, 'classification' | 'classificationReason'> {
+	if (input.outputVersions > 1) {
+		return {
+			classification: 'stochastic_history',
+			classificationReason: 'multiple output versions observed for the same logical duplicate group',
+		};
+	}
+
+	if (input.sourceRevisionVersions > 1 || input.passRevisionVersions > 1) {
+		return {
+			classification: 'revision_mixed',
+			classificationReason: 'duplicate group mixes more than one source or pass revision',
+		};
+	}
+
+	if (input.provenanceVersions <= 1) {
+		return {
+			classification: 'identical_retry',
+			classificationReason: 'same provenance observed with no output divergence',
+		};
+	}
+
+	return {
+		classification: 'ambiguous',
+		classificationReason: 'duplicate group has multiple provenance values but no output divergence',
+	};
 }
 
 export function buildAnalysisPassInputHash(input: AnalysisPassLedgerInput): string {
@@ -197,7 +260,7 @@ export async function findAnalysisPassDuplicateGroups(limit = 100) {
 	if (analysisPassResultsTableMissing) return [];
 
 	try {
-		const rows = await db.execute(sql`
+		const rows = pgRows<Record<string, unknown>>(await db.execute(sql`
 			SELECT
 				pass_key,
 				packet_key,
@@ -215,7 +278,7 @@ export async function findAnalysisPassDuplicateGroups(limit = 100) {
 			HAVING COUNT(*) > 1
 			ORDER BY copies DESC, last_seen DESC
 			LIMIT ${Math.max(1, Math.floor(limit))}
-		`);
+		`));
 
 		return (rows as Array<Record<string, unknown>>).map((row) => ({
 			passKey: row.pass_key ?? null,
@@ -229,11 +292,54 @@ export async function findAnalysisPassDuplicateGroups(limit = 100) {
 			provenanceVersions: Number(row.provenance_versions ?? 0),
 			sourceRevisionVersions: Number(row.source_revision_versions ?? 0),
 			passRevisionVersions: Number(row.pass_revision_versions ?? 0),
+			...classifyAnalysisPassDuplicateGroup({
+				outputVersions: Number(row.output_versions ?? 0),
+				provenanceVersions: Number(row.provenance_versions ?? 0),
+				sourceRevisionVersions: Number(row.source_revision_versions ?? 0),
+				passRevisionVersions: Number(row.pass_revision_versions ?? 0),
+			}),
 		}));
 	} catch (err) {
 		if (isMissingAnalysisPassResultsTableError(err)) {
 			markAnalysisPassResultsUnavailable();
 			return [];
+		}
+		throw err;
+	}
+}
+
+export async function buildAnalysisPassLedgerProofSnapshot(limit = 5000): Promise<AnalysisPassLedgerProofSnapshot | null> {
+	if (analysisPassResultsTableMissing) return null;
+
+	try {
+		const totalRowsResult = pgRows<{ total_rows: string | number }>(await db.execute(sql`
+			SELECT COUNT(*)::bigint AS total_rows
+			FROM analysis_pass_results
+		`));
+		const totalRows = Number(totalRowsResult[0]?.total_rows ?? 0);
+		const duplicateGroups = (await findAnalysisPassDuplicateGroups(limit)) as AnalysisPassDuplicateGroup[];
+		const classificationCounts: Record<AnalysisPassDuplicateClassification, number> = {
+			identical_retry: 0,
+			stochastic_history: 0,
+			revision_mixed: 0,
+			ambiguous: 0,
+		};
+
+		for (const group of duplicateGroups) {
+			classificationCounts[group.classification] += 1;
+		}
+
+		return {
+			generatedAt: new Date().toISOString(),
+			totalRows,
+			duplicateGroupCount: duplicateGroups.length,
+			classificationCounts,
+			duplicateGroups,
+		};
+	} catch (err) {
+		if (isMissingAnalysisPassResultsTableError(err)) {
+			markAnalysisPassResultsUnavailable();
+			return null;
 		}
 		throw err;
 	}

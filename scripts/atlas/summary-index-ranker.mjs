@@ -31,6 +31,7 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import { fileURLToPath } from 'node:url';
 import { loadRepoEnv, resolveDatabaseUrl, resolveRedisUrl } from './connection-config.mjs';
+import { deriveFeatureIdentity, classifyFeatureLabelStatus } from './lib/derive-feature-identity.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dir, '../..');
@@ -138,7 +139,9 @@ function slugifyTitleId(value) {
     .replace(/^\.|\.$/g, '');
 }
 
-function deriveTitleId(row) {
+// Ranking-only title_id derivation. This is metadata for ordering/reporting,
+// not canonical feature identity ownership.
+function deriveRankingTitleId(row) {
   const direct =
     row.title_id ??
     row.metadata?.title_id ??
@@ -245,7 +248,7 @@ function scoreSummary(row) {
   return {
     score,
     status: readinessStatus(score),
-    title_id: deriveTitleId(row),
+    title_id: deriveRankingTitleId(row),
     title_id_source: row.title_id ? 'canonical' : 'derived',
     leakage,
     placeholder,
@@ -262,6 +265,15 @@ function rankRows(rows) {
     .map((row) => {
       const scored = scoreSummary(row);
       const titleId = scored.title_id;
+      const featureLabelCurrent = cleanText(row.feature_label ?? row.packet_feature_id ?? row.feature_id);
+      const identity = deriveFeatureIdentity({
+        title_id: row.title_id,
+        feature_id: row.feature_id ?? row.packet_feature_id,
+        feature_label: row.feature_label ?? row.packet_feature_id ?? row.feature_id,
+        summary: row.summary ?? row.summary_text,
+        canonical_source_ref: row.canonical_source_ref ?? row.source_ref,
+        file_path: row.file_path,
+      });
       return {
         packet_id: row.packet_id ?? null,
         packet_ulid: row.packet_ulid ?? null,
@@ -271,7 +283,12 @@ function rankRows(rows) {
         file_path: cleanText(row.file_path),
         canonical_source_ref: cleanText(row.canonical_source_ref ?? row.source_ref),
         feature_id: cleanText(row.feature_id ?? row.packet_feature_id),
-        feature_label: cleanText(row.feature_label ?? row.packet_feature_id ?? row.feature_id),
+        feature_label: featureLabelCurrent,
+        feature_label_current: featureLabelCurrent,
+        feature_label_derived: identity.featureLabel,
+        feature_label_source: identity.featureLabelSource,
+        feature_label_confidence: identity.featureLabelConfidence,
+        feature_label_status: classifyFeatureLabelStatus(identity),
         title_id: titleId,
         title_id_source: scored.title_id_source,
         domain_class: cleanText(row.domain_class),
@@ -528,6 +545,11 @@ async function main() {
           title_id_source: row.title_id_source,
           feature_id: row.feature_id,
           feature_label: row.feature_label,
+          feature_label_current: row.feature_label_current,
+          feature_label_derived: row.feature_label_derived,
+          feature_label_source: row.feature_label_source,
+          feature_label_confidence: row.feature_label_confidence,
+          feature_label_status: row.feature_label_status,
           domain_class: row.domain_class,
           pagerank: row.pagerank,
           som_cluster: row.som_cluster,

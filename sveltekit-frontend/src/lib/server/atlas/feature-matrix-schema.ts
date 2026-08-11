@@ -25,6 +25,10 @@
 import { z } from 'zod';
 import { DIMENSIONS } from './property-dimensions';
 import {
+  SEMANTIC_REPRESENTATION_ID,
+  SEMANTIC_DIMENSION,
+} from '../embedding/embedding-contract-768.js';
+import {
   EvidenceStateSchema,
   KnowledgeResolutionSchema,
   ClassificationPartOfSpeechSchema,
@@ -159,9 +163,9 @@ export type Classifiers = z.infer<typeof ClassifiersSchema>;
  */
 export const ClassifierSemanticSegmentSchema = z
   .object({
-    representation_id: z.literal('semantic_768'),
+    representation_id: z.literal(SEMANTIC_REPRESENTATION_ID),
     offset: z.number().int().nonnegative(),
-    width: z.literal(768),
+    width: z.literal(SEMANTIC_DIMENSION),
     model_id: z.string().min(1),
     model_revision: z.string().min(1),
   })

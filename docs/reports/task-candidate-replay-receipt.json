@@ -1,0 +1,27 @@
+{
+  "receipt_id": "receipt:task_candidate_replay:1786472194475",
+  "receipt_kind": "TASK_CANDIDATE_LIVE_INGEST_REPLAY",
+  "producer_id": "smoke-task-candidate-replay.mjs",
+  "producer_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "started_at": "2026-08-11T18:16:34.410Z",
+  "completed_at": "2026-08-11T18:16:34.475Z",
+  "input_hash": "95cb9b4f84ceff132cc7a875d8c192bf4997016a939ee64141c1fd628c0e8738",
+  "output_hash": "764b0b8e7eb3cc3fddb97c4440006ef529843422855d402278d480d76006f85a",
+  "workspace_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "source_revision": "rev_v1_initial",
+  "graph_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "representation_revision": null,
+  "status": "PROVEN",
+  "data": {
+    "total_candidates_built": 2,
+    "pass1_task_count": 2,
+    "pass2_task_count": 2,
+    "pass3_task_count": 2,
+    "idempotent_replay_passed": true,
+    "deterministic_update_reconciliation_passed": true,
+    "kanban_lifecycle_status_ownership_preserved": true,
+    "pass1_hash": "616bf4f620c6c6362c572b61486b719909d017fd1443393646f51355846d3843",
+    "pass2_hash": "616bf4f620c6c6362c572b61486b719909d017fd1443393646f51355846d3843",
+    "pass3_hash": "7080ea3d8e8bfca7729d1ea7947c8ddc788dbdb21f087c98ea613b697a3e213d"
+  }
+}

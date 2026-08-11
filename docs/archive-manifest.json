@@ -85,5 +85,19 @@
     "sha256": "bf9d22022a227e68a934ede3fcce118c877e784be67784bee7a99ed8578867ca",
     "archived": "2026-08-10T04:38:24.146Z",
     "reason": "Same root-vs-sveltekit-frontend duplication as docs/graph/codebase-graph.json (see that manifest entry) -- stale sibling output (2026-08-03) of the same orphaned root docs/graph/ directory. Canonical copy is sveltekit-frontend/docs/graph/codebase-map.md, written by the same script run."
+  },
+  {
+    "path": "sveltekit-frontend/src/routes/api/admin/atlas/phase-lanes/+server.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/phase-lanes-server-test.ts.bak",
+    "sha256": "52cf85c27c391a85056396e71f786a99ff025d2cf5d8dce0a7218095cac7aebf",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "Colocated test for the phase-lane-registry mock/stub endpoint (GET /api/admin/atlas/phase-lanes). SvelteKit's Vite plugin reserves any '+'-prefixed filename under src/routes/, so vitest's collector silently skipped this file every run ('Files prefixed with + are reserved') -- it never actually executed despite passing when run standalone via `import(...)`. Found while auditing the end-to-end phase-lane mock ladder (Phase 11-25) requested by the user. Real assertions preserved and relocated to sveltekit-frontend/tests/phase-lanes-route.spec.ts (registered in vitest.config.ts test.include), matching the working tests/ace-status-route.spec.ts convention. Confirmed passing (2/2) at the new location."
+  },
+  {
+    "path": "sveltekit-frontend/tests/routes/auto/sveltekit-frontend/src/routes/api/admin/atlas/phase-lanes.test.ts",
+    "archive_path": "deeds_labs/archive/2026-08-11/phase-lanes-auto-stub-unreachable.test.ts.bak",
+    "sha256": "fac89383c051726d1905613939311a28ec2cf5bb27cff2a5bc1b40f2121d422d",
+    "archived": "2026-08-11T00:00:00Z",
+    "reason": "First-attempt replacement for the archived +server.test.ts above, written to match the tests/routes/auto/** G26 stub convention. Discovered on run that the entire tests/routes/auto/** tree shares the same root cause -- Vite's SvelteKit plugin refuses to resolve ANY relative import ending in +server.js/+server.ts, not just refusing to collect +-prefixed filenames -- so the dynamic import in beforeEach() fails at runtime ('Cannot find module ... +server.js'). Confirmed this is a pre-existing, repo-wide issue (not introduced this session): the working sibling tests/routes/auto/.../query.test.ts fails with the identical error when run directly, and vitest also flagged a second, unrelated colocated +server.test.ts elsewhere in the tree (pass-fabric/proof/+server.test.ts) during this same run. Out of scope to fix the whole tests/routes/auto/** tree in this pass -- superseded by tests/phase-lanes-route.spec.ts (flat tests/ location, matches the proven-working tests/ace-status-route.spec.ts pattern), which passes for real."
   }
 ]

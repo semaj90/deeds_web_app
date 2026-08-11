@@ -50,7 +50,9 @@ export function generateLabelsFromHypergraph(
   evidence: LabelEvidence[]
 ): GeneratedLabel[] {
   return evidence.map(evidence => {
-    const { co_success, co_retrieved_count, successful_runs, failed_runs } = evidence;
+    const { co_success, co_retrieved_count } = evidence;
+    const successful_runs = evidence.packet_a.successful_runs + evidence.packet_b.successful_runs;
+    const failed_runs = evidence.packet_a.failed_runs + evidence.packet_b.failed_runs;
 
     // Calculate confidence based on co-retrieved count
     const confidence = co_retrieved_count > 0 ? co_success : 0;

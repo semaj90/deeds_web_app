@@ -5,6 +5,7 @@
  */
 
 import { z } from 'zod';
+import { SEMANTIC_DIMENSION } from '../server/embedding/embedding-contract-768.js';
 
 export const EmbeddingLaneSchema = z.enum([
   'primary-768d',
@@ -43,7 +44,7 @@ export interface EmbeddingLaneSelector {
 export const EMBEDDING_LANES: Record<EmbeddingLane, EmbeddingLaneConfig> = {
   'primary-768d': {
     model: 'embeddinggemma:latest',
-    dimension: 768,
+    dimension: SEMANTIC_DIMENSION,
     collections: {
       primary: 'codebase_chunks_768',
       fallback: 'evidence_items_768'

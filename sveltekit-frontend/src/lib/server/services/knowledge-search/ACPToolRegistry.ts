@@ -18,9 +18,12 @@ import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
 import { loadDailyGraphifyBoard } from '$lib/server/atlas/board/daily-graphify-board.js';
 import {
-  buildPhase89WorkflowPlan,
-  recordPhase89WorkflowPlan,
-  Phase89WorkflowRequestSchema,
+	buildPhase89WorkflowPlan,
+	buildPhase89FabricLaneManifest,
+	buildPhase89GpuBenchmarkReceipt,
+	publishBoardGpuBenchmarkReceipt,
+	recordPhase89WorkflowPlan,
+	Phase89WorkflowRequestSchema,
 } from '$lib/server/atlas/board/phase89-workflow.js';
 import type { ACPTool, ToolResult, ToolPlanStep } from './types.js';
 
@@ -716,12 +719,22 @@ const handlers: Record<string, HandlerFn> = {
     try {
       const board = await loadDailyGraphifyBoard();
       const plan = buildPhase89WorkflowPlan(board, parsed.data);
+      const fabricLaneManifest = buildPhase89FabricLaneManifest(board, plan);
+      const gpuBenchmarkReceipt = buildPhase89GpuBenchmarkReceipt(board, plan);
 
       if (parsed.data.dryRun || options?.dryRun) {
         return planResult(plan.steps as ToolPlanStep[], startTime);
       }
 
-      const queued = await recordPhase89WorkflowPlan(plan);
+      const queued = await recordPhase89WorkflowPlan(
+        plan,
+        undefined,
+        fabricLaneManifest ?? undefined,
+        gpuBenchmarkReceipt ?? undefined,
+      );
+      if (gpuBenchmarkReceipt) {
+        await publishBoardGpuBenchmarkReceipt(gpuBenchmarkReceipt);
+      }
 
       return {
         success: true,

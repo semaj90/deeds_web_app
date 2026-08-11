@@ -91,8 +91,11 @@ export function combineViaRRF(
 ): RRFResult[] {
   const { k = 60, weights = {}, deduplicateBy = 'id' } = options;
 
-  // Map: hitId → { laneRank, laneScore, laneName }[]
-  const hitScores = new Map<string, RRFScore[]>();
+  // Map: hitKey → laneName → best score from that lane.
+  // A lane may surface the same canonical id multiple times (e.g. two Qdrant
+  // projections of the same packet). Those repeated projections must not
+  // cast multiple independent votes for the same candidate.
+  const hitScores = new Map<string, Map<RetrievalLaneName, RRFScore>>();
 
   // Populate scores from each lane
   lanes.forEach((hits, laneIndex) => {
@@ -104,23 +107,29 @@ export function combineViaRRF(
       const rrfComponent = laneWeight / (k + (rank + 1)); // 1-indexed
 
       if (!hitScores.has(hitKey)) {
-        hitScores.set(hitKey, []);
+        hitScores.set(hitKey, new Map());
       }
 
-      hitScores.get(hitKey)!.push({
+      const perLane = hitScores.get(hitKey)!;
+      const existing = perLane.get(laneName);
+      const candidateScore: RRFScore = {
         hitId: hit.id,
         laneName,
         laneRank: rank + 1,
         laneScore: hit.score,
         rrfComponent,
         metadata: hit.metadata,
-      });
+      };
+      if (!existing || candidateScore.rrfComponent > existing.rrfComponent) {
+        perLane.set(laneName, candidateScore);
+      }
     });
   });
 
   // Combine scores and sort
   const results: RRFResult[] = [];
-  for (const [hitKey, scores] of hitScores) {
+  for (const [hitKey, perLane] of hitScores) {
+    const scores = [...perLane.values()];
     const combinedScore = scores.reduce((sum, s) => sum + s.rrfComponent, 0);
     const primaryHit = scores[0]; // Use identity (id/source) from first lane
     // Field-level metadata merge across every lane that reported this hit — NOT "first lane

@@ -1,9 +1,11 @@
+import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
+
 export const QDRANT_SOURCE_COLLECTION = 'codebase_chunks_768_v2' as const;
 export const QDRANT_HYBRID_COLLECTION = 'codebase_chunks_768_v2' as const;
 export const QDRANT_DENSE_FALLBACK_COLLECTION = QDRANT_HYBRID_COLLECTION;
 
-export const QDRANT_SOURCE_EMBEDDING_DIMENSION = 768 as const;
-export const QDRANT_RETRIEVAL_EMBEDDING_DIMENSION = 768 as const;
+export const QDRANT_SOURCE_EMBEDDING_DIMENSION = SEMANTIC_DIMENSION;
+export const QDRANT_RETRIEVAL_EMBEDDING_DIMENSION = SEMANTIC_DIMENSION;
 
 export const QDRANT_DENSE_VECTOR_NAME = 'content' as const;
 // Canonical sparse vector name per qdrant-collection-contracts.ts

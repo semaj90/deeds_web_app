@@ -77,6 +77,12 @@ export const CLIENT_LLM_QUANTIZED_PATH = '/gemma3_270m_onnx/gemma3_client_quanti
 /** 300M embeddinggemma — QInt8 ONNX for client-side embeddings */
 export const CLIENT_EMBEDDING_MODEL = 'embeddinggemma-onnx';
 export const CLIENT_EMBEDDING_ONNX_PATH = '/embeddinggemma_300m_onnx/model.onnx';
+// Deliberate duplicate of embedding-contract-768.ts's SEMANTIC_DIMENSION, not
+// carelessness: this file is imported by client-side .svelte components
+// (Gemma270MWebAssembly.svelte, ClientGemmaInference.svelte), and
+// embedding-contract-768.ts lives under $lib/server/ — importing it here
+// would break the SvelteKit client/server boundary. See
+// openspec/changes/parent-atlas-semantic-768-canonical-contract/tasks.md.
 export const CLIENT_EMBEDDING_DIMS = 768;
 
 /** Tokenizer paths (shared between LLM and embedding models) */
@@ -93,6 +99,9 @@ export const SERVER_GEMMA4_MODEL = 'gemma4:e4b-it-q4_K_M';
 
 /** embeddinggemma:latest — 768-dim server embeddings via the embedding lane */
 export const SERVER_EMBEDDING_MODEL = 'embeddinggemma:latest';
+// Same deliberate-duplicate rationale as CLIENT_EMBEDDING_DIMS above — this
+// whole file is bundled client-side, so it can't import $lib/server modules
+// even for a "server" constant declared in it.
 export const SERVER_EMBEDDING_DIMS = 768;
 
 /** Fallback embedding model (if embeddinggemma unavailable) */

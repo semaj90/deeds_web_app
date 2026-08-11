@@ -6,6 +6,7 @@
 //     offline benchmarking or explicit large-batch prefilter passes only
 
 import { ENV } from '$lib/server/env.server.js';
+import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
 
 /**
  * cuVS operation type distinguishes semantic ANN (768-dim, canonical retrieval)
@@ -15,7 +16,7 @@ import { ENV } from '$lib/server/env.server.js';
 export type CuvsSemanticAnnRequest = {
   operation: 'semantic_ann';
   index: 'content768' | 'summary768';
-  dimension: 768;
+  dimension: typeof SEMANTIC_DIMENSION;
   vector: number[];
   topK: number;
   allowedRowIds?: number[];

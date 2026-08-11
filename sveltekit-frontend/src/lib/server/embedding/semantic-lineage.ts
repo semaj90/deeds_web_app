@@ -70,10 +70,7 @@ export function buildCanonicalSemanticLineage(
 
 	return {
 		representationId: CANONICAL_SEMANTIC_REPRESENTATION_ID,
-		representationRevision:
-			Number.isInteger(input.representationRevision) && (input.representationRevision ?? 0) >= 0
-				? (input.representationRevision as number)
-				: CANONICAL_SEMANTIC_REPRESENTATION_REVISION,
+		representationRevision: CANONICAL_SEMANTIC_REPRESENTATION_REVISION,
 		dimension: CANONICAL_SEMANTIC_DIMENSION,
 		encoderRevision,
 		embeddingDigest: digestSemanticEmbedding(input.vector),

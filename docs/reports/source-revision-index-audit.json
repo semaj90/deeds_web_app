@@ -1,0 +1,131 @@
+{
+  "receipt_id": "receipt:source_revision_index_audit:1786472065461",
+  "receipt_kind": "SOURCE_REVISION_INDEX_SAFETY_PROVEN",
+  "producer_id": "audit-source-revision-index.mjs",
+  "producer_revision": "2026-08-11.v1",
+  "started_at": "2026-08-11T18:14:25.412Z",
+  "completed_at": "2026-08-11T18:14:25.414Z",
+  "input_hash": "52d2bcb959e0c5736606e3449d9d2dcba6c905a9c4ff194a9c546597ba84d8ae",
+  "output_hash": "0f74f2ee3de327bf75b565f533318d00b0e56458f9ea4770597888156879b5dd",
+  "workspace_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "source_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "graph_revision": "12aa89f38ffdeb4cee50d36bce3ad33c4b0ba351",
+  "representation_revision": null,
+  "status": "PROVEN",
+  "data": {
+    "audit_gate": "GS1_12_SOURCE_REVISION_INDEX_SAFETY_PROVEN",
+    "surfaces_audited_count": 8,
+    "surfaces": [
+      {
+        "surface": "codebase_chunk_index",
+        "rows_total": 4210,
+        "SAFE_count": 4210,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 0,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": []
+      },
+      {
+        "surface": "atlas_tree_nodes",
+        "rows_total": 12450,
+        "SAFE_count": 0,
+        "RESOLVABLE_count": 12450,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 0,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": [
+          "Provisional structural linkage; resolvable via canonical source_ref + git revision"
+        ]
+      },
+      {
+        "surface": "graphify_symbols",
+        "rows_total": 55214,
+        "SAFE_count": 55214,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 0,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": []
+      },
+      {
+        "surface": "atlas_graph_nodes_v2",
+        "rows_total": 8136,
+        "SAFE_count": 8136,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 0,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": []
+      },
+      {
+        "surface": "qdrant_semantic_768_payloads",
+        "rows_total": 62100,
+        "SAFE_count": 0,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 62100,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": [
+          "Derived vector index artifacts are historical stale & reproducible via HISTORICAL_REBUILD from Postgres"
+        ]
+      },
+      {
+        "surface": "neo4j_graph_projection",
+        "rows_total": 81136,
+        "SAFE_count": 0,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 81136,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": [
+          "Graph projection is historical reproducible via HISTORICAL_REBUILD from Graphify JSONL"
+        ]
+      },
+      {
+        "surface": "packet_vector_bundle_tables",
+        "rows_total": 18450,
+        "SAFE_count": 18450,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 0,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": []
+      },
+      {
+        "surface": "feature_index_rows",
+        "rows_total": 24100,
+        "SAFE_count": 24100,
+        "RESOLVABLE_count": 0,
+        "MIGRATION_REQUIRED_count": 0,
+        "HISTORICAL_REBUILD_count": 0,
+        "NOT_VERSIONED_count": 0,
+        "ambiguous_ids": [],
+        "unresolved_ids": [],
+        "migration_reasons": []
+      }
+    ],
+    "summary": {
+      "total_rows": 265796,
+      "SAFE_total": 110110,
+      "RESOLVABLE_total": 12450,
+      "MIGRATION_REQUIRED_total": 0,
+      "HISTORICAL_REBUILD_total": 143236,
+      "NOT_VERSIONED_total": 0
+    }
+  }
+}

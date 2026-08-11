@@ -2,6 +2,7 @@ import path from 'node:path';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
 import { computePacketKey as computeCanonicalPacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
+import { resolveCanonicalPacketKey } from '$lib/server/atlas/identity/packet-identity-resolver.js';
 import {
 	CANONICAL_SEMANTIC_ENCODER_REVISION,
 	buildCanonicalSemanticLineage,
@@ -41,7 +42,9 @@ type AtlasPacketWriter = {
 	insert: typeof db.insert;
 };
 
-function resolveCanonicalPacketKey(input: PersistCanonicalSemanticPacketEmbeddingInput): string {
+async function resolvePersistedPacketKey(
+	input: PersistCanonicalSemanticPacketEmbeddingInput
+): Promise<string> {
 	const providedPacketKey = input.packetKey.trim();
 	const sourceRef = input.sourceRef.trim();
 	const treeNodeId = input.treeNodeId?.trim() || '';
@@ -52,12 +55,13 @@ function resolveCanonicalPacketKey(input: PersistCanonicalSemanticPacketEmbeddin
 		: '';
 
 	if (providedPacketKey) {
-		if (structuredKey && providedPacketKey !== structuredKey) {
+		const resolvedPacketKey = await resolveCanonicalPacketKey(providedPacketKey);
+		if (structuredKey && resolvedPacketKey !== structuredKey) {
 			throw new Error(
-				`PACKET_KEY_MISMATCH_CANONICAL_RESOLUTION expected=${structuredKey} provided=${providedPacketKey}`
+				`PACKET_KEY_MISMATCH_CANONICAL_RESOLUTION expected=${structuredKey} provided=${resolvedPacketKey}`
 			);
 		}
-		return providedPacketKey;
+		return resolvedPacketKey;
 	}
 
 	if (structuredKey) {
@@ -71,7 +75,7 @@ export async function persistCanonicalSemanticPacketEmbedding(
 	input: PersistCanonicalSemanticPacketEmbeddingInput,
 	database: AtlasPacketWriter = db,
 ): Promise<PersistCanonicalSemanticPacketEmbeddingResult> {
-	const packetKey = resolveCanonicalPacketKey(input);
+	const packetKey = await resolvePersistedPacketKey(input);
 	const packetId = input.packetId?.trim() || packetKey;
 	const sourceRef = input.sourceRef.trim() || packetKey;
 	const encoderRevision =

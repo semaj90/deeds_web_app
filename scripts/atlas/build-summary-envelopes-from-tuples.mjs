@@ -29,6 +29,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { z } from 'zod';
 import { buildCanonicalFeatureEnvelope, reportValidation } from './lib/envelope-builder.mjs';
+import { deriveFeatureIdentity, classifyFeatureLabelStatus } from './lib/derive-feature-identity.mjs';
 
 const { Pool } = pg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -93,6 +94,12 @@ const SummaryEnvelopeSchema = z.object({
   community_id: z.union([z.string(), z.number()]).nullable().optional(),
   som_row: z.number().int().nonnegative().nullable().optional(),
   som_col: z.number().int().nonnegative().nullable().optional(),
+  metadata: z.object({
+    feature_label_derived: z.string().nullable().optional(),
+    feature_label_source: z.string().nullable().optional(),
+    feature_label_confidence: z.number().nullable().optional(),
+    feature_label_status: z.string().nullable().optional(),
+  }).optional(),
 }).strict();
 
 const pool = new Pool({
@@ -176,6 +183,23 @@ async function readTuples() {
       used_concepts: Array.isArray(row.used_concepts) ? row.used_concepts : [],
     };
     const { envelope, validation } = buildCanonicalFeatureEnvelope(packet);
+
+    // Additive feature-label derivation (report-only; never overrides the
+    // canonical envelope.feature_label field computed above).
+    const featureLabelIdentity = deriveFeatureIdentity({
+      title_id: row.title_id,
+      feature_id: row.feature_id,
+      feature_label: row.feature_label,
+      summary: row.summary,
+      canonical_source_ref: row.source_ref,
+      file_path: row.file_path,
+    });
+    const featureLabelFields = {
+      feature_label_derived: featureLabelIdentity.featureLabel,
+      feature_label_source: featureLabelIdentity.featureLabelSource,
+      feature_label_confidence: featureLabelIdentity.featureLabelConfidence,
+      feature_label_status: classifyFeatureLabelStatus(featureLabelIdentity),
+    };
     if (validation.softWarnings.length > 0 && VERBOSE) {
       console.warn(`[${row.packet_key}] soft warnings:`, validation.softWarnings);
     }
@@ -190,7 +214,7 @@ async function readTuples() {
           if (VERBOSE) {
             console.log(`[${row.packet_key}] Enrichment proof found in feature_ontology_tuples, validating`);
           }
-          validated.push({ ...row, ...envelope });
+          validated.push({ ...row, ...envelope, ...featureLabelFields });
           continue;
         }
       }
@@ -222,7 +246,7 @@ async function readTuples() {
     if (envelope.source_kind === 'generated_declaration') {
       stats.generated++;
     }
-    validated.push({ ...row, ...envelope });
+    validated.push({ ...row, ...envelope, ...featureLabelFields });
   }
 
   if (quarantine.length > 0) {
@@ -256,6 +280,10 @@ function groupTuples(tuples) {
       rank: tuple.tuple_rank,
       som_cluster: tuple.som_cluster,
       summary: tuple.summary,
+      feature_label_derived: tuple.feature_label_derived ?? null,
+      feature_label_source: tuple.feature_label_source ?? null,
+      feature_label_confidence: tuple.feature_label_confidence ?? null,
+      feature_label_status: tuple.feature_label_status ?? null,
     });
 
     // Extract symbols from labels
@@ -326,6 +354,14 @@ function rankGroups(groups) {
 
     const score = tupleScore + symbolScore + somScore + summaryScore;
 
+    // Representative feature-label derivation for the group: the tuple with the
+    // highest derivation confidence. Report-only — does not affect `feature_label`.
+    const representative = group.tuples.reduce((best, t) => {
+      if (t.feature_label_confidence == null) return best;
+      if (!best || t.feature_label_confidence > best.feature_label_confidence) return t;
+      return best;
+    }, null);
+
     ranked.push({
       feature_id: featureId,
       score,
@@ -336,6 +372,10 @@ function rankGroups(groups) {
       source_ref: group.source_ref,
       domain_class: group.domain_class,
       feature_label: group.feature_label,
+      feature_label_derived: representative?.feature_label_derived ?? null,
+      feature_label_source: representative?.feature_label_source ?? null,
+      feature_label_confidence: representative?.feature_label_confidence ?? null,
+      feature_label_status: representative?.feature_label_status ?? null,
       top_symbols: Array.from(group.symbols).slice(0, 5),
       tuples: group.tuples,
     });
@@ -402,6 +442,12 @@ function buildEnvelopes(rankedGroups, topK) {
         },
         columnar_tables: ['atlas_packets', 'atlas_feature_envelopes'],
         mmap_vector_refs: [],
+        metadata: {
+          feature_label_derived: group.feature_label_derived ?? null,
+          feature_label_source: group.feature_label_source ?? null,
+          feature_label_confidence: group.feature_label_confidence ?? null,
+          feature_label_status: group.feature_label_status ?? null,
+        },
         ...topology,
       };
       const validated = SummaryEnvelopeSchema.parse(envelope);

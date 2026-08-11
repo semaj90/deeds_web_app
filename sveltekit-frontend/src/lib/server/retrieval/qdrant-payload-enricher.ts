@@ -14,6 +14,7 @@
 
 import { codebaseChunkIndex } from '../db/schema-postgres.js';
 import { inArray, sql } from 'drizzle-orm';
+import { SEMANTIC_REPRESENTATION_ID } from '../embedding/embedding-contract-768.js';
 
 async function getDb() {
   const mod = await import('../db/client.js');
@@ -436,7 +437,7 @@ export function buildEnrichedPayload(
       chunkMetadata.representationId,
       chunk.representation_id,
       chunk.representationId
-    ) ?? 'semantic_768';
+    ) ?? SEMANTIC_REPRESENTATION_ID;
   const representationRevision =
     pickNumber(
       packet?.representation_revision,

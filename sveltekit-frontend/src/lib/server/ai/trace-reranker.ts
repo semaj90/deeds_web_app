@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import { db } from '$lib/server/db/client.js';
 import { getQdrantManager } from '$lib/server/vector/qdrant-manager.js';
 import { getActiveSemanticVectorLane } from '$lib/server/vector/lane-registry.js';
+import { SEMANTIC_REPRESENTATION_ID, SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
 
 export type TraceRerankResult = {
 	id: string | number;
@@ -148,8 +149,8 @@ export async function traceRerank(params: {
 				representation_revision: canonicalRow.representation_revision,
 				source_revision: canonicalRow.source_revision,
 				pagerank_score: canonicalRow.pagerank_score,
-				source_representation_id: 'semantic_768',
-				source_dimension: 768,
+				source_representation_id: SEMANTIC_REPRESENTATION_ID,
+				source_dimension: SEMANTIC_DIMENSION,
 				canonical_join_status: 'joined',
 				canonical_join_coverage: joinCoverage,
 			},

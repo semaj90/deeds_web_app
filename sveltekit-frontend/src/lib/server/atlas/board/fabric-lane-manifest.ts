@@ -1,4 +1,5 @@
 import { buildFabricLaneManifest, type FabricLaneKind, type FabricLaneManifest } from '../contracts/fabric-lanes.js';
+import { SEMANTIC_REPRESENTATION_ID } from '../../embedding/embedding-contract-768.js';
 
 export interface BoardFabricLaneContext {
 	workflowId: string;
@@ -33,7 +34,7 @@ export function buildBoardFabricLaneManifest(input: BoardFabricLaneManifestInput
 		packetKey: input.packetKey,
 		sourceRef: input.context.sourceRef ?? input.context.collection,
 		sourceRevision: input.sourceRevision,
-		representationId: 'semantic_768',
+		representationId: SEMANTIC_REPRESENTATION_ID,
 		representationRevision: input.representationRevision,
 		producerId: input.producerId,
 		producerRevision: input.producerRevision,

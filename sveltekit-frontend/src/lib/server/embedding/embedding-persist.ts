@@ -17,6 +17,7 @@ import { embeddingCache } from '$lib/server/db/schema-postgres.js';
 import { eq, sql } from 'drizzle-orm';
 import { createHash } from 'crypto';
 import { assertCanonicalSemanticEmbedding } from '$lib/server/embedding/semantic-lineage.js';
+import { CANONICAL_EMBEDDING_DIM } from '$lib/server/embedding/embedding-contract.js';
 
 const DEFAULT_MODEL = 'embeddinggemma:latest';
 
@@ -52,7 +53,7 @@ export async function getPersistedEmbedding(
 
 		if (!result.rows[0]?.embedding) return null;
 		const vector: number[] = JSON.parse(result.rows[0].embedding);
-		if (vector.length !== EMBEDDING_DIM) {
+		if (vector.length !== CANONICAL_EMBEDDING_DIM) {
 			console.warn('embedding-persist: invalid vector dimension', { hash, length: vector.length });
 			return null;
 		}
@@ -133,7 +134,7 @@ export async function batchGetPersistedEmbeddings(
 		for (const row of result.rows) {
 			if (row.embedding) {
 				const vector: number[] = JSON.parse(row.embedding);
-				if (vector.length === EMBEDDING_DIM) {
+				if (vector.length === CANONICAL_EMBEDDING_DIM) {
 					hashMap.set(row.text_hash, vector);
 				}
 			}

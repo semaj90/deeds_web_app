@@ -85,10 +85,11 @@ function extractFeatureId(sourceRef) {
 
 /**
  * Generate stable packet_key from source_ref.
- * Uses sha256 hash to ensure same source_ref always produces same key.
+ * Uses the stable legacy `packet:<12hex>` form so the writer stays aligned
+ * with the live atlas_packets row family already in the database.
  */
 function generatePacketKey(sourceRef) {
-  return 'ace:packet:' + createHash('sha256').update(sourceRef).digest('hex').slice(0, 12);
+  return 'packet:' + createHash('sha256').update(sourceRef).digest('hex').slice(0, 12);
 }
 
 /**

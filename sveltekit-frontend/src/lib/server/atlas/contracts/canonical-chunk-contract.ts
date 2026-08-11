@@ -1,9 +1,13 @@
 import { z } from 'zod';
+import {
+  SEMANTIC_DIMENSION,
+  SEMANTIC_REPRESENTATION_ID,
+} from '../../embedding/embedding-contract-768.js';
 
-export const CANONICAL_EMBEDDING_DIMENSION = 768;
+export const CANONICAL_EMBEDDING_DIMENSION = SEMANTIC_DIMENSION;
 
 export const CanonicalRepresentationNameSchema = z.enum([
-  'semantic_768',
+  SEMANTIC_REPRESENTATION_ID,
   'semantic_128',
   'latent_64',
   'lexical_v1',
@@ -31,7 +35,7 @@ export type CanonicalRepresentationRegistryEntry = {
 
 export const CANONICAL_REPRESENTATIONS = {
   semantic_768: {
-    persistedName: 'semantic_768',
+    persistedName: SEMANTIC_REPRESENTATION_ID,
     dimension: 768,
     status: 'ACTIVE',
     aliases: ['semantic768', 'dense_768', 'dense768'],

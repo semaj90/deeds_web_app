@@ -888,10 +888,24 @@ This is the short execution list extracted from the current compiler / topology 
 ### Sequencing correction from the latest proof-spine review
 
 - P0 canonical packet identity join remains the front-door blocker: do not advance PF4, graph dispatch, or runtime training on divergent packet keys.
-- `packet-key-builder.ts` is now the canonical logical packet identity minting authority; `compute-packet-key.ts` is demoted to a compatibility / scoped-address helper.
+- `packet-key-builder.ts` is still a grain-unproven V2 candidate; do not promote it to canonical identity until the source-ref grain test is explicit.
+- `compute-packet-key.ts` remains a compatibility / scoped-address helper.
+- `atlas_packet_identity_aliases` is the repair seam for legacy packet keys; resolve aliases first, do not rewrite historical PKs in place.
+- Open gaps remain narrow and intentional:
+  - historical PK migration stays deferred;
+  - the live alias map is validated, not rewritten in place;
+  - `packet-key-builder.ts` remains grain-unproven as a V2 candidate;
+  - the broader `trace-mcp` runtime remains untouched beyond the export-shape fix that resolved the import/syntax failure.
+- Feature Label Phase 1 is now proven at the unit level (`deriveFeatureIdentity` + punctuation-safe `titleCase`); keep ranker wiring additive and avoid introducing a second label owner.
 - PF4A duplicate classification is sufficient to keep `analysis_pass_results` as append-only execution history; do **not** add hard uniqueness yet.
-- Graph dispatcher / Louvain / PageRank paths exist, but the live proof gap is the dispatcher registry plus the replayable Louvain persistence receipt.
-- Retrieval fusion still needs the live one-vote-per-lane receipt and the live fusion-owner matrix before frozen replay can close.
+- PF4 proof surface is now wired as a guarded admin snapshot; the lane remains wired-not-proven until a live duplicate-classification receipt is added.
+- PF4A live duplicate-classification receipt is now captured from the real ledger: 11,079 total rows, 1,272 duplicate groups, classified as `stochastic_history` 1,234 / `identical_retry` 20 / `ambiguous` 18 / `revision_mixed` 0.
+- PF4B live current-materialization receipt is now captured from the real ledger: 11,079 raw rows, 6,903 current rows, 4,176 rows collapsed into `analysis_pass_current` by the live view.
+- PF4C semantics are now confirmed from the live writer path: `pass_key` is execution metadata / idempotency key, while `pass_identity_hash` is the logical pass identity used for deterministic reuse.
+- PF4G duplicate-delivery idempotency on deterministic writes is proven by focused unit test; repeat delivery reuses the existing deterministic receipt and does not insert a duplicate row.
+- PF4H live boundary receipt is now captured from the real ledger: `analysis_pass_current` is view-only, `analysis_pass_results` remains the append-only history table, and there is no unique constraint on the current-materialization boundary.
+- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The remaining live gap is the replayable Louvain persistence receipt: the latest receipt is captured, but `unresolvedPacketKeys=6786` keeps `replaySafe=false`.
+- Retrieval fusion now has the one-vote-per-lane proof route and regression test wired. The live fusion-owner matrix is still open before frozen replay can close.
 - Rust structural worker promotion stays descriptive only until parity, idempotency, and replay receipts exist.
 
 ### Current source map
@@ -919,7 +933,7 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Normalize PageRank authority into one canonical field before downstream use.
 - [ ] Keep `community_id`, `k_core`, and centrality proofs on frozen snapshots before any GPU promotion.
 - [ ] Keep NetworkX, Neo4j GDS, and cuGraph parity checks separate instead of merging them into one lane.
-- [ ] Add the graph-dispatcher registry and the Louvain persistence receipt to the proof ladder before treating any dispatcher claim as closed.
+- [x] Add the graph-dispatcher registry and the Louvain persistence receipt to the proof ladder before treating any dispatcher claim as closed. Registry exact-match proof is live; Louvain replay safety still needs packet-key reconciliation.
 
 ### Layer 4: Runtime and training
 
@@ -954,6 +968,11 @@ This is the short execution list extracted from the current compiler / topology 
 - Valkey is hot coordination cache only.
 - Read-side query fanout is a fork-join executor capped at three independent read tools.
 - Shared lane manifest: `sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.ts` for GNN, exact kNN, KMeans routing hints, Ewin Tang low-rank, HyperLogLog telemetry, Kanban, and recommendation policy receipts.
+- Feature matrix setup stays three-tier: static packet `feature_matrix_5`, query-time `candidate_feature_matrix`, and canonical `semantic_768`; JSONL evidence, POS tagger output, and domain classification are derived contracts; the live POS/concept lane now materializes `feature_matrix_5` as the first wired writer, while KMeans 64/128/256 plus SOM 20x20 remain routing hints only and the setup lives in `sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.ts`.
+- Daily Graphify is the evidence producer for TaskCandidate rows; Kanban remains the canonical task-state owner.
+- `scripts/atlas/graphify-langgraph-pipeline.mjs` now emits `graphify-task-candidates.jsonl` for the Kanban importer bridge; this is evidence, not task-state truth.
+- `T6c` KMeans remains `CACHE_HINT_ONLY` and does not block daily Graphify resumption.
+- Tang-style low-rank sampling is experimental routing only; exact cuVS / ANN ranking remains the final candidate oracle.
 
 ### Pass Fabric steps
 
@@ -964,11 +983,20 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Classify the existing duplicate population before adding any uniqueness constraint.
 - [ ] Prove whether `pass_key` / `pass_revision` semantics are logical identity or execution metadata.
 - [ ] Decide whether the history table needs a separate current-materialization view before any DB uniqueness enforcement.
+- [ ] Capture a live PF4 duplicate-classification receipt from the real `analysis_pass_results` population.
+- [ ] Keep the PF4 proof route wired for workstation review without claiming the ledger is fully proven.
+- [ ] Decide whether PF4B should materialize a `analysis_pass_current` view or stay append-only history plus explicit replay selection, using the live PF4A counts as the baseline.
+- [ ] Use the live PF4B materialization receipt to decide whether PF4C should formalize pass-key semantics or simply keep current-eligible replay selection on the view boundary.
+- [ ] PF4H is now closed: no further uniqueness enforcement is needed on the current-materialization boundary beyond the view and application-level reuse path.
 - [ ] Add a CPU worker pool for structural, lexical, entropy, and normalization passes.
 - [ ] Keep NLP sidecar / GPU passes bounded and batched instead of launching one request per packet.
 - [ ] Add Valkey batch helpers for hot metadata, result hints, and cache receipts only.
 - [ ] Add `executeToolBatch` with `maxParallel = 3` for independent read-only tools; keep dependent or mutating calls sequential.
 - [ ] Wire the fabric lane manifest into the recommendation / task-board flow and keep `semantic_768` explicit in every lane receipt.
+- [ ] Wire daily Graphify to emit typed TaskCandidate JSONL and keep Kanban importer state separate from evidence production.
+- [ ] Add a TaskCandidate contract for graphify evidence with explicit provenance, source_ref, and dedup_key fields.
+- [ ] Keep recommendation routing and candidate sampling separate from canonical graph truth.
+- [ ] Refresh the daily Graphify proof artifact before any GPU worker sequence and record the new graph revision / workspace revision / task count / manifest hash.
 - [ ] Build incremental eligibility so only changed packets / stale revisions re-run.
 - [ ] Add crash-restart replay tests: duplicate enqueue, worker crash, unchanged revision rerun, changed source rerun.
 
@@ -979,6 +1007,15 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Compare `producer_id`, `producer_revision`, `backend_version`, and `model_revision` multiplicity per duplicate group.
 - [ ] Separate identical retries from distinct execution history before any deduplication or uniqueness rule.
 - [ ] Keep nullable `source_revision` / `pass_revision` explicit until provenance can be reconstructed.
+
+### PF0 packet identity alias reconciliation
+
+- [ ] Freeze the live identity family as the de facto `packet:<12hex>` / `ace:packet:<12hex>` compatibility boundary until the grain test proves otherwise.
+- [ ] Keep `packet-key-builder.ts` quarantined as a provisional V2 builder; do not use it to mutate historical PKs in place.
+- [ ] Create `atlas_packet_identity_aliases` as the canonical repair seam for legacy packet keys.
+- [ ] Wire packet-key consumers to resolve aliases before validation or persistence.
+- [ ] Stop any writer from minting a new legacy packet prefix when a canonical key or alias resolution already exists.
+- [ ] Prove replay-safe resolution without mutating `atlas_packets.packet_key` PK values.
 
 **Execution order**
 
@@ -1631,106 +1668,50 @@ work need redoing.
 
 ## Session 2026-08-11 (continued) — Parallel work discovered, cross-lane gap analysis, workstation completion plan
 
-**Discovery**: mid-session, extensive real infrastructure appeared via
-`git status` that this session did not create — a concurrent agent/process
-implemented substantial Parent Atlas pieces while this session ran. Verified
-by reading the actual code (not assumed):
+### Open gaps only
 
-### What's REAL and LIVE (verified by reading code, not docs)
+- P0 alias replay
+  - historical PK migration stays deferred
+  - resolve through the live alias seam
+  - prove two identical replays return the same canonical packet key
 
-- **PF4 pass ledger** (`analysis-pass-results.ts`): genuinely wired.
-  `recordAnalysisPassResult()` is called live in `worker.ts:299`, inside the
-  real job-completion path. Deterministic input-hash idempotency
-  (`buildAnalysisPassInputHash`), graceful degradation if table missing.
-  `findAnalysisPassDuplicateGroups()` is the exact duplicate-classification
-  query this session ran manually earlier — now a reusable function.
-- **G11 hardcoded-localhost fix**: 14 files fixed this session via a
-  reviewed, twice-corrected codemod (`scripts/fix-g11-hardcoded-localhost.mjs`)
-  — caught 2 real syntax-error classes before applying (mixed `??`/`||`
-  operators from blind literal replacement) via dry-run + typecheck
-  verification. `gemma4-invocation.ts` additionally fixed to resolve model
-  dynamically from `/v1/models` instead of a hardcoded model id, and to use
-  `stream: true` per root CLAUDE.md's own documented hard rule (was hitting
-  the exact "thinking eats token budget" bug that rule warns about).
-- **G16 test stubs**: 64 real stubs generated via the pre-existing
-  `scripts/generate-route-test-stubs.mjs` tool (found — not built this
-  session, another case of "infrastructure exists, wasn't being used").
-- **POS/n-ary-concept/ontology-tuple builder** (`pos-concept-tagging-lane.ts`):
-  real, well-designed pure function (`buildPosConceptTaggingPacket`).
-  Deterministic tuple-ID hashing, canonicalized participant ordering
-  (order-independent per the 43-section spec's requirement), citations/
-  screenshots/MCP-tool-calls/ranking-signals (bm25/bm42/pagerank/manifold/
-  som/kmeans/community) all present as designed. Has a **real PASS proof
-  run** (`docs/reports/pos-concept-tagging-lane-proof.json`,
-  2026-08-11T04:31Z) showing correct idempotency behavior (`inserted: false,
-  rowId: 11118` — detected existing row).
-- **Event hypergraph contract** (`event-hypergraph-contract.ts`): matches
-  the 43-section spec's `AtlasEvent`/participant-role/order-independent-
-  identity design.
-- **New OpenSpec**: `parent-atlas-telemetry-lowrank-recommendation-okf-integration/`
-  already has real `design.md`/`proposal.md`/`README.md`/`tasks.md` content
-  (not just stubs) — the 4-lane telemetry/approximation/compute/policy
-  separation from this session's earlier review is being tracked there.
+- PF4 pass fabric
+  - keep execution history append-only
+  - close the current-materialization / replay receipt seam
 
-### The one gap that shows up in EVERY lane above: P0 identity, worse than thought
+- Graph lane
+  - dispatcher registry completeness (proven live)
+  - Louvain persistence receipt (captured live; replaySafe still false due unresolved packet keys)
 
-Found while checking the POS-tagging proof: `packetKey:
-"ace:packet:c115e487d04d"` — **a THIRD packet_key format**, distinct from
-both `pkt:<workspace>:<32hex>` (orphaned `compute-packet-key.ts`) and raw
-`<64hex>` (live `packet-key-builder.ts`). A quick grep found `ace:packet:`
-used across 10+ files in the ACE subsystem — likely the highest-volume
-format by usage, and the one the real POS-tagging proof run actually
-emitted. Full writeup + next steps:
-`openspec/changes/parent-atlas-pass-fabric/tasks.md` (§"P0 UPDATE").
+- Retrieval lane
+  - one-vote-per-lane receipt
+  - live fusion-owner matrix
+  - frozen replay
 
-**This is now confirmed, with evidence, as the single blocking gap across
-every lane**: Pass Fabric (PF4's ledger has a real writer but no canonical
-identity feeding it), Graph (dispatcher exists, packet-keyed metrics need
-stable identity to attach to), Retrieval (canonical identity normalization
-"mostly implemented" per external review — same root cause), POS/Ontology/
-N-ary (the new, real, well-built lane emits its own third identity format).
-**No lane can be marked complete until this is resolved**, because every
-lane's output is keyed by `packet_key`, and there is currently no single
-authoritative answer to "what is packet_key for this source."
+- Rust worker
+  - parity
+  - idempotency
+  - replay receipts
 
-### Workstation completion plan — all lanes, next steps
+- Daily Graphify / Kanban
+  - emit TaskCandidate JSONL
+  - keep importer state separate
+  - refresh the proof artifact before GPU work
 
-Per the external architectural review (saved in full at
-`memory/SESSION-198-CONFIRMED-STATE-AND-CANONICAL-BUILD-ORDER.md`), the
-frozen build order is:
+- Layer 2 compiler output
+  - ast-grep canonical join
+  - lexical writer
+  - entity writer
+  - remaining extractor coverage
 
-```
-P0  → resolve the 3-way packet_key format collision (NEW, sharper framing)
-PF1-8 → pass identity, dependency DAG, invalidation, eligibility, replay
-G1-2  → graph dispatcher registry completeness, Louvain persistence proof
-G3-4  → retrieval: one-vote-per-lane RRF, frozen golden replay
-R1-3  → Rust structural worker: parity vs TS/Python reference, then promote
-N1-9  → lexical→POS→AST/POS-join→mentions→concepts→ontology→conflicts→
-         n-ary events→hypergraph (AST-first proof, then reuse pattern —
-         do NOT fan out simultaneously; POS/ontology lane already has real
-         code, but needs P0 fixed before its output can be trusted as
-         correctly identified)
-S1-3  → semantic_768, exact kNN oracle, topology/manifold
-F1-8  → BM25, BM42, dense, AST, graph, event lanes → normalized fusion → FeatureRow
-E1-6  → grounded summaries, citations, screenshots, MCP receipts, tool DAG,
-         ContextManifest identity
-P1-4  → deterministic policy baseline → recommendation snapshot → oracle → shadow
-A1-5  → Packet LUT, HLL telemetry, ACE reward labels, LOD hysteresis, cost model
-D1-4  → frozen retrieval/repair replay corpora, negative examples, drift baseline
-X1-4  → RFF/Ewin-Tang/XGBoost/GPU-policy — SHADOW ONLY until oracle-compared
-FINAL → full-system golden replay (Kanban task through ACE telemetry,
-         deterministic replay of every non-generative boundary)
-```
+- Layer 3 metrics / topology
+  - immutable graph snapshot proof
+  - bounded traversal proof
+  - PageRank / Louvain / KMeans receipts
 
-**Immediate next session action**: `grep -rn "'ace:packet:'" src/lib/server`
-to find the actual construction site(s) for the third identity format, then
-make the P0 canonical-format decision (see pass-fabric tasks.md for the
-3-way comparison table and decision criteria). This is a genuine
-architecture call needing full context — do not rush it.
+- Layer 4 runtime / training
+  - feature-row convergence
+  - ranker shadow gates
+  - replay corpus proof
 
----
-
-**Date Updated**: August 11, 2026
-**Session**: 198 (continued — parallel-work discovery + cross-lane gap analysis)
-**Last Verified**: Live code read (analysis-pass-results.ts, pos-concept-tagging-lane.ts,
-event-hypergraph-contract.ts, worker.ts, docs/reports/pos-concept-tagging-lane-proof.json)
+**Immediate next session action**: prove alias replay on one live writer and record the receipt.

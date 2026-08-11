@@ -2,13 +2,13 @@
 /**
  * AUTO-GENERATED TEST STUB — do not edit boilerplate, fill in it.todo() blocks.
  *
- * Route: sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts
+ * Route: src/routes/api/cases/[id]/notes/[noteId]/+server.ts
  * Handlers: GET, PATCH, DELETE
  *
  * G26 pattern: node env, vi.hoisted mocks (add as needed), lazy import in
  * beforeEach, 4 baseline cases per handler.
  *
- * Run:  npm run test -- sveltekit-frontend/src/routes/api/cases/__id/notes/__noteId
+ * Run:  npm run test -- src/routes/api/cases/__id/notes/__noteId
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -17,20 +17,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
 // vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
 
-describe('sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts', () => {
-  describe('GET /sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId', () => {
+describe('src/routes/api/cases/[id]/notes/[noteId]/+server.ts', () => {
+  describe('GET /src/routes/api/cases/:id/notes/:noteId', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../../../sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../../../src/routes/api/cases/[id]/notes/[noteId]/+server.js') as Record<string, unknown>;
       handler = mod.GET as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId', { method: 'GET' });
+      return new Request('http://localhost/src/routes/api/cases/:id/notes/:noteId', { method: 'GET' });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/cases/:id/notes/:noteId'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
@@ -54,19 +54,19 @@ describe('sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts
   });
 
 
-  describe('PATCH /sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId', () => {
+  describe('PATCH /src/routes/api/cases/:id/notes/:noteId', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../../../sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../../../src/routes/api/cases/[id]/notes/[noteId]/+server.js') as Record<string, unknown>;
       handler = mod.PATCH as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId', body !== undefined ? { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request('http://localhost/src/routes/api/cases/:id/notes/:noteId', body !== undefined ? { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/cases/:id/notes/:noteId'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
@@ -90,19 +90,19 @@ describe('sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.ts
   });
 
 
-  describe('DELETE /sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId', () => {
+  describe('DELETE /src/routes/api/cases/:id/notes/:noteId', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../../../sveltekit-frontend/src/routes/api/cases/[id]/notes/[noteId]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../../../src/routes/api/cases/[id]/notes/[noteId]/+server.js') as Record<string, unknown>;
       handler = mod.DELETE as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId', body !== undefined ? { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request('http://localhost/src/routes/api/cases/:id/notes/:noteId', body !== undefined ? { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/cases/:id/notes/:noteId'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/cases/:id/notes/:noteId'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.

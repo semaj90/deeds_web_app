@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { SEMANTIC_DIMENSION } from '$lib/server/embedding/embedding-contract-768.js';
 /**
  * KMeans Latent Space Progression Analysis
  *
@@ -25,7 +26,7 @@ export interface LatentLevel {
 export const LATENT_PROGRESSION: LatentLevel[] = [
   {
     name: 'embedding_768',
-    dimension: 768,
+    dimension: SEMANTIC_DIMENSION,
     storageFormat: 'vector',
     description: 'Full EmbeddingGemma output (primary Qdrant ANN, canonical native)'
   },

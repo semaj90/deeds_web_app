@@ -345,7 +345,12 @@ async function main() {
         packet.feature_id = inferFeatureIdFromPath(packet.source_ref);
       }
       if (!packet.packet_key) {
-        packet.packet_key = `ace:packet:${generatePacketKey(packet.source_ref, packet.feature_id)}`;
+        // PACKET_IDENTITY_ALIAS_AND_WRITER_CONVERGENCE (P0-1): was 'ace:packet:' —
+        // divergent from the dominant atlas_packets.packet_key scheme (`packet:`).
+        // This function's hash formula (source_ref+featureId+version, 16hex) also
+        // differs from the dominant scheme's (source_ref-only, 12hex) — flagged as
+        // a separate open question, not fixed silently here. Prefix corrected only.
+        packet.packet_key = `packet:${generatePacketKey(packet.source_ref, packet.feature_id)}`;
       }
       enrichedPackets.push(packet);
 

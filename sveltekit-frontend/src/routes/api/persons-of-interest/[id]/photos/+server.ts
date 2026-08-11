@@ -378,7 +378,7 @@ Return ONLY valid JSON.`;
 
   if (textToEmbed.length > 20) {
     try {
-      const embedRes = await ollamaFetch(`${OLLAMA_URL}/api/embed`, {
+      const embedRes = await fetch(`${OLLAMA_URL}/api/embed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: EMBED_MODEL, input: textToEmbed }),

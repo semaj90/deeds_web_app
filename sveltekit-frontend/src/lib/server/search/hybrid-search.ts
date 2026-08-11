@@ -147,7 +147,7 @@ export async function hybridSearch(
           fusionScore: parsed.results[0]?.final_score,
           cacheHit: true,
           surface: 'hybrid-search',
-          environment: ENV.NODE_ENV ?? 'development',
+          environment: process.env.NODE_ENV ?? 'development',
           retrievalStrategy: parsed.mode as any ?? 'fusion',
           hitsPayload: {
             hits,
@@ -352,7 +352,7 @@ export async function hybridSearch(
     fusionScore: results[0]?.final_score,
     cacheHit: false,
     surface: 'hybrid-search',
-    environment: ENV.NODE_ENV ?? 'development',
+    environment: process.env.NODE_ENV ?? 'development',
     retrievalStrategy,
     hitsPayload: {
       hits,

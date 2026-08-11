@@ -143,9 +143,12 @@ export interface DailyGraphifyTask {
   origin?: string;
   recommendation_id?: string;
   source_ref?: string | null;
+  title_id?: string | null;
   tree_node_id?: string | null;
+  packet_key?: string | null;
   evidence_refs?: string[];
   reason_codes?: string[];
+  confidence?: number | null;
 }
 
 export interface DailyGraphifyTemporalRecommendation {
@@ -253,13 +256,16 @@ function normalizeTask(task: z.infer<typeof RawTaskSchema>, fallbackId: string, 
     origin: task.origin ?? origin,
     recommendation_id: task.recommendation_id,
     source_ref: task.source_ref ?? task.sourceRef ?? null,
+    title_id: task.title_id ?? task.titleId ?? null,
     tree_node_id: task.tree_node_id ?? task.treeNodeId ?? null,
+    packet_key: task.packet_key ?? task.packetKey ?? null,
     evidence_refs: task.evidence_refs ?? [],
     reason_codes: task.reason_codes ?? [],
+    confidence: task.confidence ?? null,
   };
 }
 
-function flattenBoardTasks(board: z.infer<typeof RawBoardSchema>, origin: string): DailyGraphifyTask[] {
+export function flattenBoardTasks(board: z.infer<typeof RawBoardSchema>, origin: string): DailyGraphifyTask[] {
   if (Array.isArray(board.tasks) && board.tasks.length > 0) {
     return board.tasks.map((task, index) => normalizeTask(task, `task-${index + 1}`, origin));
   }

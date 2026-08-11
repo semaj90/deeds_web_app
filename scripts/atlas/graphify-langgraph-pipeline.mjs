@@ -7,7 +7,7 @@
  * Nodes (run in order, each restartable via --stage):
  *   audit_coverage   → compute signal-density gaps (BM25, concept_ids, community_conf, Qdrant)
  *   feature_extract  → assign feature_id to packets missing it (path heuristic + domain label)
- *   kanban_task      → emit prioritised task list as JSON (what needs enrichment, in what order)
+ *   kanban_task      → emit prioritised task evidence + TaskCandidate JSONL (what needs enrichment, in what order)
  *   embed_missing    → embed packets missing Qdrant vectors (nomic-embed-text → embeddinggemma fallback)
  *   index_bm25       → backfill bm25_text in payload for packets that lack it
  *   rank_signals     → compute + persist RRF ranking signal coverage report
@@ -26,6 +26,7 @@
 
 import pg             from 'pg';
 import { createHash } from 'node:crypto';
+import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -55,6 +56,18 @@ const OLLAMA_URL   = _ollamaRaw.startsWith('http') ? _ollamaRaw : `http://${_oll
 // it produces a lane-specific query/vector contract.
 const COLLECTION   = process.env.ATLAS_QDRANT_GRAPHIFY_COLLECTION || 'codebase_chunks_768';
 const RECOMMENDATION_PROPOSALS_PATH = join(REPORT, 'atlas-recommendation-proposals.json');
+const GRAPHIFY_TASK_CANDIDATES_JSONL = join(REPORT, 'atlas-graphify-task-candidates.jsonl');
+const GRAPHIFY_TASK_CANDIDATES_TMP = join(ROOT, '.tmp', 'graphify-task-candidates.jsonl');
+const GRAPHIFY_TASK_PRODUCER_ID = 'graphify-langgraph-pipeline:kanban_task';
+const WORKSPACE_REVISION = process.env.WORKSPACE_REVISION || process.env.REPOSITORY_REVISION || 'main';
+const PRODUCER_REVISION = (() => {
+  try {
+    return execSync('git rev-parse --short HEAD', { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return 'unknown';
+  }
+})();
+const GRAPHIFY_REPRESENTATION_REVISION = 'semantic_768';
 
 function readRecommendationProposals() {
   if (!existsSync(RECOMMENDATION_PROPOSALS_PATH)) return [];
@@ -65,6 +78,90 @@ function readRecommendationProposals() {
     log(`  warning: recommendation proposal ledger ignored: ${error.message}`);
     return [];
   }
+}
+
+function uniqStrings(values) {
+  return [...new Set(values.filter((value) => typeof value === 'string' && value.trim().length > 0).map((value) => value.trim()))].sort();
+}
+
+function writeJsonl(filePath, rows) {
+  mkdirSync(dirname(filePath), { recursive: true });
+  const body = rows.map((row) => JSON.stringify(row)).join('\n');
+  writeFileSync(filePath, `${body}${rows.length > 0 ? '\n' : ''}`, 'utf8');
+}
+
+function buildTaskCandidate(task, generatedAt) {
+  const sourceRefs = uniqStrings([
+    task.source_ref ?? null,
+    ...((task.evidence_refs ?? []) || []),
+    ...((task.reason_codes ?? []) || []),
+  ]);
+  const packetKeys = uniqStrings(task.packet_key ? [task.packet_key] : []);
+  const featureIds = uniqStrings(task.feature_ids ?? []);
+  const symbols = uniqStrings(task.symbols ?? []);
+  const files = uniqStrings(task.files ?? []);
+  const requiredGates = uniqStrings(task.gate ? [task.gate] : []);
+  const blockedBy = uniqStrings(task.blockedBy ?? []);
+  const base = {
+    task_id: String(task.id ?? task.taskId ?? `task:${generatedAt}`),
+    producer_id: GRAPHIFY_TASK_PRODUCER_ID,
+    producer_revision: PRODUCER_REVISION,
+    workspace_revision: WORKSPACE_REVISION,
+    source_revision: generatedAt,
+    graph_revision: generatedAt,
+    representation_id: GRAPHIFY_REPRESENTATION_REVISION,
+    representation_revision: GRAPHIFY_REPRESENTATION_REVISION,
+    kind: task.origin === 'atlas_recommendation' ? 'recommendation_review' : 'graphify_evidence',
+    priority: task.priority,
+    confidence: Number.isFinite(Number(task.confidence)) ? Number(task.confidence) : null,
+    packet_keys: packetKeys,
+    feature_ids: featureIds,
+    symbols,
+    files,
+    evidence_refs: uniqStrings([...(task.evidence_refs ?? []), ...(task.reason_codes ?? [])]),
+    required_gates: requiredGates,
+    blocked_by: blockedBy,
+    source_ref: task.source_ref ?? null,
+    source_refs: sourceRefs,
+    tree_node_id: task.tree_node_id ?? null,
+    title_id: task.title_id ?? null,
+    task_label: task.label ?? null,
+    script: task.script ?? null,
+    generated_at: generatedAt,
+    notes: [task.status, task.origin].filter(Boolean).join(' | ') || null,
+  };
+
+  return {
+    ...base,
+    dedup_key: createHash('sha256')
+      .update(JSON.stringify({
+        task_id: base.task_id,
+        producer_id: base.producer_id,
+        producer_revision: base.producer_revision,
+        workspace_revision: base.workspace_revision,
+        source_revision: base.source_revision,
+        graph_revision: base.graph_revision,
+        representation_id: base.representation_id,
+        representation_revision: base.representation_revision,
+        kind: base.kind,
+        priority: base.priority,
+        packet_keys: base.packet_keys,
+        feature_ids: base.feature_ids,
+        symbols: base.symbols,
+        files: base.files,
+        evidence_refs: base.evidence_refs,
+        required_gates: base.required_gates,
+        blocked_by: base.blocked_by,
+        source_ref: base.source_ref,
+        source_refs: base.source_refs,
+        tree_node_id: base.tree_node_id,
+        title_id: base.title_id,
+        task_label: base.task_label,
+        script: base.script,
+        notes: base.notes,
+      }))
+      .digest('hex'),
+  };
 }
 
 // ── Lightweight StateGraph shim ───────────────────────────────────────────────
@@ -490,6 +587,7 @@ async function kanbanTask(state) {
 
   mkdirSync(REPORT, { recursive: true });
   if (APPLY) {
+    const candidateRows = tasks.map((task) => buildTaskCandidate(task, now));
     writeFileSync(join(REPORT, 'atlas-kanban-tasks.json'),
       JSON.stringify({
         generated: now,
@@ -501,7 +599,11 @@ async function kanbanTask(state) {
         },
         tasks,
       }, null, 2));
+    writeJsonl(GRAPHIFY_TASK_CANDIDATES_JSONL, candidateRows);
+    writeJsonl(GRAPHIFY_TASK_CANDIDATES_TMP, candidateRows);
     log('  wrote docs/reports/atlas-kanban-tasks.json');
+    log('  wrote docs/reports/atlas-graphify-task-candidates.jsonl');
+    log('  wrote .tmp/graphify-task-candidates.jsonl');
   }
 
   return { tasks };

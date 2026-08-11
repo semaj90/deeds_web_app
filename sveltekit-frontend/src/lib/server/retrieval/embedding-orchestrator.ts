@@ -18,6 +18,7 @@ import {
   CLIPModel
 } from './embedding-models';
 import { logger } from '../logger.js';
+import { SEMANTIC_DIMENSION } from '../embedding/embedding-contract-768.js';
 import { ENV } from '$lib/server/env.server.js';
 
 export interface EmbeddingRequest {
@@ -154,7 +155,7 @@ class EmbeddingOrchestrator {
 
     return {
       embedding,
-      dimension: 768,
+      dimension: SEMANTIC_DIMENSION,
       lane: 'primary-768d',
       model: 'embeddinggemma:latest',
       confidence: 0.95,

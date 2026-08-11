@@ -2,13 +2,13 @@
 /**
  * AUTO-GENERATED TEST STUB — do not edit boilerplate, fill in it.todo() blocks.
  *
- * Route: sveltekit-frontend/src/routes/api/conversations/[id]/+server.ts
+ * Route: src/routes/api/conversations/[id]/+server.ts
  * Handlers: PUT, DELETE
  *
  * G26 pattern: node env, vi.hoisted mocks (add as needed), lazy import in
  * beforeEach, 4 baseline cases per handler.
  *
- * Run:  npm run test -- sveltekit-frontend/src/routes/api/conversations/__id
+ * Run:  npm run test -- src/routes/api/conversations/__id
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -17,20 +17,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 // const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
 // vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
 
-describe('sveltekit-frontend/src/routes/api/conversations/[id]/+server.ts', () => {
-  describe('PUT /sveltekit-frontend/src/routes/api/conversations/:id', () => {
+describe('src/routes/api/conversations/[id]/+server.ts', () => {
+  describe('PUT /src/routes/api/conversations/:id', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../sveltekit-frontend/src/routes/api/conversations/[id]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../src/routes/api/conversations/[id]/+server.js') as Record<string, unknown>;
       handler = mod.PUT as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/conversations/:id', body !== undefined ? { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request('http://localhost/src/routes/api/conversations/:id', body !== undefined ? { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/conversations/:id'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/conversations/:id'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
@@ -54,19 +54,19 @@ describe('sveltekit-frontend/src/routes/api/conversations/[id]/+server.ts', () =
   });
 
 
-  describe('DELETE /sveltekit-frontend/src/routes/api/conversations/:id', () => {
+  describe('DELETE /src/routes/api/conversations/:id', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;
 
     beforeEach(async () => {
       vi.resetAllMocks();
-      const mod = await import('../../../../../../../../sveltekit-frontend/src/routes/api/conversations/[id]/+server.js') as Record<string, unknown>;
+      const mod = await import('../../../../../../../../src/routes/api/conversations/[id]/+server.js') as Record<string, unknown>;
       handler = mod.DELETE as typeof handler;
     });
 
     function makeReq(body?: unknown) {
-      return new Request('http://localhost/sveltekit-frontend/src/routes/api/conversations/:id', body !== undefined ? { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      return new Request('http://localhost/src/routes/api/conversations/:id', body !== undefined ? { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
-    function makeUrl() { return new URL('http://localhost/sveltekit-frontend/src/routes/api/conversations/:id'); }
+    function makeUrl() { return new URL('http://localhost/src/routes/api/conversations/:id'); }
 
     it('401 — returns Unauthorized when locals.user is missing', async () => {
       // Some routes throw error(4xx) instead of returning a Response — catch HttpError too.
