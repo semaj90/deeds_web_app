@@ -107,6 +107,18 @@ application/worker startup (fine) has not been checked. **Do not assume RabbitMQ
 without checking its import ownership first** — same discipline that caught the two Redis-adjacent
 false starts above.
 
+**Partial check done (2026-08-11, context-bounded)**: 10 candidate files found via
+`grep -rl "initializeRabbitMQ\|new amqp\|amqplib"`. Checked 2: `queue/outbox-boot.ts` is
+genuinely lazy — `startOutboxPublisherWithRabbit()` is an exported function, not invoked at
+module scope, and its own doc comment confirms it's meant to be wired explicitly into
+`hooks.server.ts` after RabbitMQ is confirmed active. Not the bug. **8 candidates still
+unchecked**: `connections/connection-pool.ts`, `dispatcher/dispatcher-orchestrator.ts`,
+`dispatcher/rabbitmq-event-emit.ts`, `dispatcher/rabbitmq-identity-listener.ts`,
+`evidence/rabbitmq.ts`, `indexer/workspace-metadata-extractor.ts`,
+`ml/topic-clustering-worker.ts`, `pgai/summarize.ts`, `adapters/service-integrations.ts`. Next
+session: check each for a module-scope (not function-body) call to `.connect()`, same pattern as
+the `outbox-boot.ts` check above.
+
 ## Deliberately not done in this pass
 
 Per explicit operator instruction: **do not trace the remaining 9 failing files' import chains
