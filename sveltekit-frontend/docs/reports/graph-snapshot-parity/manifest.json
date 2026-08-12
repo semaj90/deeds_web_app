@@ -1,0 +1,10 @@
+{
+  "graphRevision": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+  "nodeCount": 162234,
+  "edgeCount": 108156,
+  "producerRevision": "identity-contract-v1+tree-sitter-typescript-v1",
+  "nodeTableHash": "e68fe788fd4f408267b8932fc8da29ba5a7baadd07dbbe272b5fe7c93fbe378e",
+  "edgeTableHash": "f1145664774c77184ab8f9a5d23b1468adfa3688011b46297691eac4c6e9eb10",
+  "identityContractVersion": "identity-contract-v1",
+  "projectionRevision": "graph-snapshot-parity-v1"
+}

@@ -939,6 +939,16 @@ docs/graph/repo-root-atlas.json
 sveltekit-frontend/docs/graph/.build/
 sveltekit-frontend/docs/reports/graph-probes/
 
+# GRAPH_SNAPSHOT_PARITY frozen artifacts (2026-08-12): nodes.parquet/edges.parquet
+# (~6MB) and networkx-scores.ndjson/cugraph-scores.ndjson (~10MB each, per-node
+# PageRank dumps) are regenerable in ~30-90s via
+# `npm run atlas:graph-snapshot-parity:export` / `:validate` — gitignored so they
+# don't bloat history. manifest.json/receipt.json/ENVIRONMENT-AND-FILE-MAP.md in
+# the same directory stay tracked (small, human-readable evidence). See .rgignore
+# for the rg-searchable override.
+sveltekit-frontend/docs/reports/graph-snapshot-parity/*.parquet
+sveltekit-frontend/docs/reports/graph-snapshot-parity/*.ndjson
+
 # Deep graphify artifacts >10MB (gitignored — pre-commit hook rejects them)
 sveltekit-frontend/memory/graphify/deep/deep-import-graph.json
 

@@ -1,0 +1,43 @@
+{
+  "graphRevision": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+  "artifactPaths": {
+    "nodesParquet": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\graph-snapshot-parity\\nodes.parquet",
+    "edgesParquet": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\graph-snapshot-parity\\edges.parquet",
+    "manifestJson": "docs/reports/graph-snapshot-parity/manifest.json"
+  },
+  "manifest": {
+    "graphRevision": "dff9006fef66e63fb55b98de3feaeb0409ef940cfdc7903bfd69b0f11e075ae2",
+    "nodeCount": 162234,
+    "edgeCount": 108156,
+    "producerRevision": "identity-contract-v1+tree-sitter-typescript-v1",
+    "nodeTableHash": "e68fe788fd4f408267b8932fc8da29ba5a7baadd07dbbe272b5fe7c93fbe378e",
+    "edgeTableHash": "f1145664774c77184ab8f9a5d23b1468adfa3688011b46297691eac4c6e9eb10",
+    "identityContractVersion": "identity-contract-v1",
+    "projectionRevision": "graph-snapshot-parity-v1"
+  },
+  "networkx": {
+    "backend": "networkx",
+    "status": "PROVEN",
+    "nodeCount": 162234,
+    "edgeCount": 108156,
+    "componentCount": 54078
+  },
+  "cugraph": {
+    "backend": "cugraph",
+    "status": "PROVEN",
+    "nodeCount": 162234,
+    "edgeCount": 108156,
+    "componentCount": 54078
+  },
+  "componentCount": 54078,
+  "pagerankTopKOverlap": 1,
+  "pagerankCorrelation": 1,
+  "pagerankMaxDelta": 4.888482368391661e-9,
+  "louvainCommunityAgreement": 0,
+  "excludedNodeCount": 0,
+  "excludedEdgeCount": 0,
+  "unresolvedCount": 0,
+  "status": "PARTIAL",
+  "generatedAt": "2026-08-12T00:46:00.678Z",
+  "notes": "Both backends proven live from the frozen parquet artifact. componentCount agreement: exact match (networkx=54078, cugraph=54078). pagerank top-50 overlap/correlation/maxDelta computed from real per-node scores from both backends. louvainCommunityAgreement is NOT computed by this run (component count is connectivity, not community partitioning) — left at 0, not fabricated."
+}
