@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-12T00:53:05.460Z",
+  "receiptKind": "PHASE2D_FEATURE_LAYER_BACKFILL_PROOF",
+  "status": "PROVEN",
+  "command": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --apply --limit=1000",
+  "dryRunCommand": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --dry-run --limit=1000",
+  "summary": {
+    "rowsSelected": 1000,
+    "joinMethods": {
+      "exact": 1000,
+      "inferred": 0,
+      "unresolved": 0
+    },
+    "featureKeyRows": 1000,
+    "sourceRefRows": 1000,
+    "lexicalCandidates": 1000,
+    "domainCandidates": 1000,
+    "structuralCandidates": 1000,
+    "ontologyCandidates": 1000
+  },
+  "schemaAuditAfterApply": {
+    "feature_implementations": 843,
+    "feature_file_edges": 1034,
+    "feature_lexical_facts": 6000,
+    "feature_domain_facts": 62659,
+    "feature_structural_facts": 6000,
+    "feature_ontology_tuples": 3287,
+    "featureJoinReady": true
+  },
+  "proofNotes": [
+    "The stable_key generated-column error remained fixed in the backfill path.",
+    "The widened bounded apply preserved exact joins only.",
+    "This is broader bounded proof, not a full-corpus claim."
+  ]
+}

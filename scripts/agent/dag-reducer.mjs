@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { fileURLToPath } from 'node:url';
 /**
  * DAG Reducer — Collapse Event Graph into Current Blockers
  *
@@ -100,7 +101,7 @@ export class DagReducer {
 /**
  * Example usage
  */
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const reducer = new DagReducer();
 
   // Add example events

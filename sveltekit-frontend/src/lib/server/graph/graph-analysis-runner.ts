@@ -4,7 +4,7 @@ import { GraphAnalysisRunSchema, CommunityAssignmentSchema, CommunityTaxonomyRec
 import { getGraphDispatcherRegistryEntry } from './graph-dispatcher-registry.js';
 import { ensureProjectionClient, PROJECTION_NAME } from './neo4j-gds-client.js';
 import { getNeo4jDriver } from '$lib/server/neo4j-driver.js';
-import { classifyGraphPacketPath, resolveCodebaseFilePacketKeys, lookupPacketKey } from './graph-packet-key-resolver.js';
+import { prepareLouvainResolutionSeeds } from './louvain-resolution-seeder.js';
 import { NAMED_PROJECTION_CANDIDATES, type NamedProjectionCandidate } from './graph-projection-manifest.js';
 
 const DEFAULT_WORKSPACE_REVISION = 'workspace:parent-atlas';
@@ -205,31 +205,19 @@ async function runCommunityAnalysis(
       }))
       .filter((row) => row.path.length > 0 && row.community_id.length > 0);
 
-    const resolvedPacketKeys = await resolveCodebaseFilePacketKeys(db, rawNodes.map((r) => r.path));
-    const seenPacketKeys = new Set<string>();
-    const nodes: Array<{ packet_key: string; community_id: string }> = [];
-    let unresolvedPacketKeys = 0;
-    let excludedPacketKeys = 0;
-    for (const row of rawNodes) {
-      const classification = classifyGraphPacketPath(row.path);
-      if (classification.kind === 'excluded') {
-        excludedPacketKeys++;
-        continue;
-      }
-      const packetKey = lookupPacketKey(resolvedPacketKeys, row.path);
-      if (!packetKey) {
-        unresolvedPacketKeys++;
-        continue;
-      }
-      // First-seen wins on a duplicate packet_key (community assignment is
-      // categorical, not numeric — unlike PageRank's max-score dedupe there's
-      // no principled "better" value to prefer between two assignments).
-      if (seenPacketKeys.has(packetKey)) continue;
-      seenPacketKeys.add(packetKey);
-      nodes.push({ packet_key: packetKey, community_id: row.community_id });
-    }
-
     const completedAt = new Date().toISOString();
+    const seedPlan = await prepareLouvainResolutionSeeds(
+      db,
+      rawNodes.map((row) => ({
+        graphNodeKey: row.path,
+        rawPath: row.path,
+        communityId: row.community_id,
+      })),
+      graphRevision,
+    );
+    const nodes = seedPlan.assignmentRows;
+    const unresolvedPacketKeys = seedPlan.unresolvedRows;
+    const excludedPacketKeys = seedPlan.excludedRows;
     const outputHash = createHash('sha256')
       .update(JSON.stringify(nodes.map((r) => ({ packetKey: r.packet_key, communityId: r.community_id }))))
       .digest('hex');
@@ -292,6 +280,36 @@ async function runCommunityAnalysis(
         run.relationshipCount,
       ],
     );
+
+    if (seedPlan.unresolvedSeeds.length > 0) {
+      const seedValues: string[] = [];
+      const seedParams: unknown[] = [];
+      seedPlan.unresolvedSeeds.forEach((seed, index) => {
+        const base = index * 7;
+        seedValues.push(`($${base + 1}::uuid, $${base + 2}::text, $${base + 3}::text, $${base + 4}::text, $${base + 5}::text, $${base + 6}::text, $${base + 7}::text)`);
+        seedParams.push(
+          run.runId,
+          algorithm,
+          seed.graphNodeKey,
+          seed.rawPath,
+          seed.normalizedPath,
+          seed.communityId,
+          seed.graphRevision,
+        );
+      });
+      await client.query(
+        `INSERT INTO graph_community_resolution_seeds
+          (run_id, algorithm, graph_node_key, raw_path, normalized_path, community_id, graph_revision)
+         VALUES ${seedValues.join(',\n')}
+         ON CONFLICT (run_id, graph_node_key) DO UPDATE SET
+           raw_path = EXCLUDED.raw_path,
+           normalized_path = EXCLUDED.normalized_path,
+           community_id = EXCLUDED.community_id,
+           graph_revision = EXCLUDED.graph_revision,
+            created_at = now()`,
+        seedParams,
+      );
+    }
 
     const assignmentRows = nodes.map((row) =>
       CommunityAssignmentSchema.parse({

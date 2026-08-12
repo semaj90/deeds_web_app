@@ -6,6 +6,7 @@
 
 import fetch from 'node-fetch';
 import { RabbitMQIngestHelper } from './rabbitmq-ingest.js';
+import { fileURLToPath } from 'node:url';
 
 async function testWebCrawlService() {
   console.log('🧪 Testing FastAPI Web Crawl Service...');
@@ -232,7 +233,7 @@ async function runFullPipelineTest() {
 }
 
 // CLI interface
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runFullPipelineTest()
     .then(success => {
       process.exit(success ? 0 : 1);

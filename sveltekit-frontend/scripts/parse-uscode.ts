@@ -7,6 +7,7 @@ import AdmZip from 'adm-zip';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { parseStringPromise } from 'xml2js';
+import { fileURLToPath } from 'node:url';
 
 const ZIP_PATH = '/tmp/uscxml.zip';
 const EXTRACT_DIR = '/tmp/uscode-extracted';
@@ -165,7 +166,7 @@ async function main(): Promise<void> {
 }
 
 // Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }
 

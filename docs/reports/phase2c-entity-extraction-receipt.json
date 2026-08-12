@@ -1,0 +1,19 @@
+{
+  "receiptKind": "PHASE2C_ENTITY_EXTRACTION_PROVEN",
+  "status": "PROVEN",
+  "startedAt": "2026-08-11T23:39:00.474Z",
+  "sampleTextLength": 187,
+  "entityCount": 5,
+  "entityTypes": [
+    "EMAIL",
+    "PHONE",
+    "DATE",
+    "STATUTE",
+    "DOCKET"
+  ],
+  "extractorUsed": "regex",
+  "notes": [
+    "This proves the live entity extraction lane returns non-empty entities on a deterministic sample.",
+    "The worker path imports this extractor directly; the proof is about runtime wiring, not corpus completeness."
+  ]
+}

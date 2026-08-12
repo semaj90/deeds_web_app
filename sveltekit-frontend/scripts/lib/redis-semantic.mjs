@@ -16,6 +16,7 @@ import Redis from 'ioredis';
 import crypto from 'crypto';
 import { pipeline } from 'node:stream/promises';
 import { Transform } from 'node:stream';
+import { fileURLToPath } from 'node:url';
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
 const OLLAMA_URL = process.env.OLLAMA_API_URL || 'http://localhost:11434';
@@ -334,7 +335,7 @@ export async function semanticCacheMain() {
 }
 
 // Run if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   semanticCacheMain().catch((err) => {
     console.error('[FATAL]', err.message);
     process.exit(1);

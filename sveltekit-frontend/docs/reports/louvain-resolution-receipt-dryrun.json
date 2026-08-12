@@ -1,0 +1,7 @@
+{
+  "receiptKind": "LOUVAIN_UNRESOLVED_KEY_CLASSIFICATION_PROVEN",
+  "status": "BLOCKED",
+  "notes": "Dry-run template; no database connection attempted.",
+  "reportPath": "docs/reports/louvain-resolution-receipt-dryrun.json",
+  "generatedAt": "2026-08-11T20:53:44.874Z"
+}

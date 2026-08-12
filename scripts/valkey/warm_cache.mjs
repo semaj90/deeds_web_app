@@ -2,6 +2,7 @@ import Redis from 'ioredis';
 import process from 'process';
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 const VALKEY_URL = process.env.VALKEY_URL || 'redis://127.0.0.1:6379';
 const client = new Redis(VALKEY_URL);
@@ -96,6 +97,6 @@ async function main() {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }

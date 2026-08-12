@@ -7,7 +7,8 @@ import { z } from 'zod';
 const evidenceAnalysisSchema = z.object({
 	evidenceId: z.string().min(1, 'Missing evidenceId').max(500),
 	caseId: z.string().max(500).nullable().optional(),
-	stages: z.array(z.enum(['entity_extraction', 'forensics', 'summarization'])).optional(),
+	stages: z.array(z.enum(['entity_extraction', 'forensics', 'summarization', 'code_feature_registry'])).optional(),
+	payload: z.record(z.string(), z.unknown()).optional(),
 });
 
 /**
@@ -48,7 +49,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
 /**
  * POST /api/evidence/analysis
  * Enqueue re-analysis jobs for an evidence item.
- * Body: { evidenceId, caseId?, stages?: ('entity_extraction' | 'forensics' | 'summarization')[] }
+ * Body: { evidenceId, caseId?, stages?: ('entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry')[], payload?: Record<string, unknown> }
  *
  * If stages is omitted, enqueues all three.
  */
@@ -64,7 +65,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 	}
 
 	try {
-		const validStages: JobType[] = ['entity_extraction', 'forensics', 'summarization'];
+		const validStages: JobType[] = ['entity_extraction', 'forensics', 'summarization', 'code_feature_registry'];
 		const requested: JobType[] = parsed.data.stages?.length
 			? parsed.data.stages
 			: validStages;
@@ -75,6 +76,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				evidenceId: parsed.data.evidenceId,
 				caseId: parsed.data.caseId ?? null,
 				jobType: stage,
+				result: parsed.data.payload ?? undefined,
 			});
 			enqueued.push({ jobType: stage, jobId });
 		}

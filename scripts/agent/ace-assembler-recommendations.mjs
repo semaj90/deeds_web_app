@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { fileURLToPath } from 'node:url';
 /**
  * ACE Assembler — Recommendations
  *
@@ -121,7 +122,7 @@ export class ACEAssemblerRecommendations {
 /**
  * Example usage
  */
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const ace = new ACEAssemblerRecommendations();
 
   // Simulate policy model output

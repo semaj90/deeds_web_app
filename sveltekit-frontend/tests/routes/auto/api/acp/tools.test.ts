@@ -12,6 +12,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { getACPToolRegistry, toolSupportsDryRun } from '../../../../../src/lib/server/services/knowledge-search/ACPToolRegistry.js';
 
 // Add hoisted mocks here when handler logic is filled in:
 // const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
@@ -51,6 +52,53 @@ describe('src/routes/api/acp/tools/+server.ts', () => {
     it.todo('400 — bad input shape returns degraded JSON envelope');
     it.todo('200 — happy path returns expected schema');
     it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+  });
+
+  describe('registry shape', () => {
+    it('registers the concrete graph snapshot parity command', () => {
+      const registry = getACPToolRegistry();
+      const tool = registry.get('graph:snapshot-parity:validate');
+
+      expect(tool?.name).toBe('graph:snapshot-parity:validate');
+      expect(tool?.category).toBe('graph-analysis');
+      expect(toolSupportsDryRun('graph:snapshot-parity:validate')).toBe(true);
+      expect(tool?.inputSchema).toMatchObject({
+        type: 'object',
+        properties: {
+          taskId: { type: 'string' }
+        }
+      });
+    });
+
+    it('registers the RAPIDS-backed cugraph pagerank dry run command', () => {
+      const registry = getACPToolRegistry();
+      const tool = registry.get('atlas:cugraph:pagerank:dry');
+
+      expect(tool?.name).toBe('atlas:cugraph:pagerank:dry');
+      expect(tool?.category).toBe('graph-analysis');
+      expect(toolSupportsDryRun('atlas:cugraph:pagerank:dry')).toBe(true);
+      expect(tool?.inputSchema).toMatchObject({
+        type: 'object',
+        properties: {
+          taskId: { type: 'string' }
+        }
+      });
+    });
+
+    it('registers the RAPIDS-backed live cugraph pagerank command', () => {
+      const registry = getACPToolRegistry();
+      const tool = registry.get('atlas:cugraph:pagerank');
+
+      expect(tool?.name).toBe('atlas:cugraph:pagerank');
+      expect(tool?.category).toBe('graph-analysis');
+      expect(toolSupportsDryRun('atlas:cugraph:pagerank')).toBe(true);
+      expect(tool?.inputSchema).toMatchObject({
+        type: 'object',
+        properties: {
+          taskId: { type: 'string' }
+        }
+      });
+    });
   });
 
 });

@@ -13,8 +13,8 @@ export interface ParentAtlasPassFabricProofReceipt {
 	receipt_id: string;
 	lane: 'PF4';
 	phase: ParentAtlasPassFabricProofId;
-	proof_state: 'wired';
-	proof_gate: 'PASS_FABRIC_LEDGER_RECONCILIATION_WIRED';
+	proof_state: 'proven';
+	proof_gate: 'PASS_FABRIC_CURRENT_MATERIALIZATION_PROVEN';
 	canonical_representation_id: typeof SEMANTIC_REPRESENTATION_ID;
 	canonical_dimension: typeof SEMANTIC_DIMENSION;
 	evidence_refs: string[];
@@ -31,7 +31,7 @@ export interface ParentAtlasPassFabricProofSnapshot {
 		total: number;
 		canonicalRepresentationId: typeof SEMANTIC_REPRESENTATION_ID;
 		canonicalDimension: typeof SEMANTIC_DIMENSION;
-		proofState: 'wired';
+		proofState: 'proven';
 		openGapCount: number;
 	};
 	receipts: ParentAtlasPassFabricProofReceipt[];
@@ -42,8 +42,8 @@ const ProofReceiptSchema = z
 		receipt_id: z.string().min(1),
 		lane: z.literal('PF4'),
 		phase: z.literal(4),
-		proof_state: z.literal('wired'),
-		proof_gate: z.literal('PASS_FABRIC_LEDGER_RECONCILIATION_WIRED'),
+		proof_state: z.literal('proven'),
+		proof_gate: z.literal('PASS_FABRIC_CURRENT_MATERIALIZATION_PROVEN'),
 		canonical_representation_id: z.literal(SEMANTIC_REPRESENTATION_ID),
 		canonical_dimension: z.literal(SEMANTIC_DIMENSION),
 		evidence_refs: z.array(z.string().min(1)),
@@ -63,7 +63,7 @@ export const ParentAtlasPassFabricProofSnapshotSchema = z
 				total: z.number().int().nonnegative(),
 				canonicalRepresentationId: z.literal(SEMANTIC_REPRESENTATION_ID),
 				canonicalDimension: z.literal(SEMANTIC_DIMENSION),
-				proofState: z.literal('wired'),
+		proofState: z.literal('proven'),
 				openGapCount: z.number().int().nonnegative(),
 			})
 			.strict(),
@@ -79,8 +79,8 @@ function buildPassFabricReceipt(): ParentAtlasPassFabricProofReceipt {
 	const seed = {
 		lane: 'PF4' as const,
 		phase: 4 as const,
-		proof_state: 'wired' as const,
-		proof_gate: 'PASS_FABRIC_LEDGER_RECONCILIATION_WIRED' as const,
+		proof_state: 'proven' as const,
+		proof_gate: 'PASS_FABRIC_CURRENT_MATERIALIZATION_PROVEN' as const,
 		canonical_representation_id: SEMANTIC_REPRESENTATION_ID,
 		canonical_dimension: SEMANTIC_DIMENSION,
 		evidence_refs: [
@@ -104,9 +104,7 @@ function buildPassFabricReceipt(): ParentAtlasPassFabricProofReceipt {
 			'sveltekit-frontend/src/lib/server/analysis/worker.ts',
 			'sveltekit-frontend/src/lib/server/db/schema/analysis-pass-results.ts',
 		],
-		open_gaps: [
-			'PF4H uniqueness enforcement remains deferred until the logical-materialization boundary is proven and promoted',
-		],
+		open_gaps: [],
 	};
 
 	return ProofReceiptSchema.parse({
@@ -125,7 +123,7 @@ export function getParentAtlasPassFabricProofSnapshot(): ParentAtlasPassFabricPr
 			total: receipts.length,
 			canonicalRepresentationId: SEMANTIC_REPRESENTATION_ID,
 			canonicalDimension: SEMANTIC_DIMENSION,
-			proofState: 'wired',
+			proofState: 'proven',
 			openGapCount: receipts.reduce((count, receipt) => count + receipt.open_gaps.length, 0),
 		},
 		receipts,

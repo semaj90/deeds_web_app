@@ -41,6 +41,9 @@ function isGraphPacketPathExcluded(path: string): string | null {
 	const normalized = normalizeAtlasPath(path);
 	if (!normalized) return 'empty-path';
 	if (/^(?:.*\/)?(?:AGENTS|LLMS)\.md$/i.test(normalized)) return 'policy-document';
+	if (/^\.claude\/hooks\//.test(String(path).replace(/\\/g, '/'))) return 'tooling-hook';
+	if (/^docker\/[^/]+\/\.venv\//.test(normalized)) return 'vendored-env';
+	if (/^docs\/(?:P0-SCHEMA-VALIDATION-CHECKPOINT|SESSION-\d+-ARTIFACTS)\.md$/i.test(normalized)) return 'session-artifact';
 	if (/\.(?:bak|backup)$/i.test(normalized)) return 'shadow-backup';
 	if (/^\.claude\/worktrees\/[^/]+\//.test(String(path).replace(/\\/g, '/'))) return 'worktree-shadow';
 	return null;
@@ -74,26 +77,37 @@ export async function resolveCodebaseFilePacketKeys(
 	const resolved = new Map<string, string>();
 	if (uniquePaths.length === 0) return resolved;
 
-	const { rows } = await db.query<{ source_ref: string; packet_key: string }>(
-		`SELECT source_ref, canonical_source_ref, file_path, source_path, source_ref_key, packet_key
-		 FROM atlas_packets
-		 WHERE source_ref = ANY($1)
-		    OR canonical_source_ref = ANY($1)
-		    OR file_path = ANY($1)
-		    OR source_path = ANY($1)
-		    OR source_ref_key = ANY($1)
-		`,
-		[uniquePaths],
-	);
-	for (const row of rows) {
-		for (const key of [
-			row.source_ref,
-			row.canonical_source_ref,
-			row.file_path,
-			row.source_path,
-			row.source_ref_key,
-		]) {
-			if (key) resolved.set(normalizeAtlasPath(key), row.packet_key);
+	const CHUNK_SIZE = 500;
+	for (let index = 0; index < uniquePaths.length; index += CHUNK_SIZE) {
+		const chunk = uniquePaths.slice(index, index + CHUNK_SIZE);
+		const { rows } = await db.query<{
+			source_ref: string;
+			canonical_source_ref: string | null;
+			file_path: string | null;
+			source_path: string | null;
+			source_ref_key: string | null;
+			packet_key: string;
+		}>(
+			`SELECT source_ref, canonical_source_ref, file_path, source_path, source_ref_key, packet_key
+			 FROM atlas_packets
+			 WHERE source_ref = ANY($1)
+			    OR canonical_source_ref = ANY($1)
+			    OR file_path = ANY($1)
+			    OR source_path = ANY($1)
+			    OR source_ref_key = ANY($1)
+			`,
+			[chunk],
+		);
+		for (const row of rows) {
+			for (const key of [
+				row.source_ref,
+				row.canonical_source_ref,
+				row.file_path,
+				row.source_path,
+				row.source_ref_key,
+			]) {
+				if (key) resolved.set(normalizeAtlasPath(key), row.packet_key);
+			}
 		}
 	}
 	return resolved;

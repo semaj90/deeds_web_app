@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-12T01:07:49.307Z",
+  "receiptKind": "PHASE2D_FEATURE_LAYER_BACKFILL_PROOF",
+  "status": "PROVEN",
+  "command": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --apply --limit=10000 --offset=20000",
+  "dryRunCommand": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --dry-run --limit=10000 --offset=20000",
+  "summary": {
+    "rowsSelected": 10000,
+    "joinMethods": {
+      "exact": 10000,
+      "inferred": 0,
+      "unresolved": 0
+    },
+    "featureKeyRows": 10000,
+    "sourceRefRows": 10000,
+    "lexicalCandidates": 10000,
+    "domainCandidates": 10000,
+    "structuralCandidates": 10000,
+    "ontologyCandidates": 10000
+  },
+  "schemaAuditAfterApply": {
+    "feature_implementations": 20288,
+    "feature_file_edges": 37690,
+    "feature_lexical_facts": 34999,
+    "feature_domain_facts": 91658,
+    "feature_structural_facts": 34999,
+    "feature_ontology_tuples": 90600,
+    "featureJoinReady": true
+  },
+  "proofNotes": [
+    "The next 10k slice remained exact end-to-end with no inferred or unresolved joins.",
+    "Feature-layer widening continued to preserve featureJoinReady=true after apply.",
+    "This is widened bounded proof, not a full-corpus claim."
+  ]
+}

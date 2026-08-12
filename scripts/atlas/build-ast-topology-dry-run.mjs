@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(process.cwd());
 const OUT_DIR = path.join(ROOT, '.tmp');
@@ -390,7 +391,7 @@ if (process.argv.includes('--resolve-imports')) {
   })().catch(err=>{ console.error(err); process.exit(1); });
 }
 
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1].endsWith('build-ast-topology-dry-run.mjs')) {
+if (process.argv[1] === fileURLToPath(import.meta.url) || process.argv[1].endsWith('build-ast-topology-dry-run.mjs')) {
   if (!process.argv.includes('--resolve-imports')) {
     main().catch(err => { console.error(err); process.exit(1); });
   }

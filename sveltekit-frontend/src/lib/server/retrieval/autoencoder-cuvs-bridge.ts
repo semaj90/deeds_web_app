@@ -1,14 +1,24 @@
 /**
  * autoencoder-cuvs-bridge.ts — Stage 3 GPU orchestrator
  *
- * Pipeline: query embedding (768d) → autoencoder encode (768→64) → cuVS ANN prefilter
+ * NOTE (2026-08-12 audit correction): despite the filename and the naming
+ * below (kept for now — this file has zero callers anywhere in the repo,
+ * confirmed via `rg -rln autoencoder-cuvs-bridge src/`, so it is dead/
+ * routing-only code, not a live retrieval lane), this does NOT use cuVS or
+ * RAPIDS. It calls the TurboVec gRPC service (`turbovec-cuda-client.js`), a
+ * separate real CUDA prefilter. cuVS itself is not installed on this project
+ * — see docs/architecture/CUVS-INSTALLATION-WINDOWS-RESEARCH.md. If this
+ * file is ever wired to a real caller, rename `CuvSConfig`/
+ * `searchCuvSPrefilter` to reflect the actual TurboVec backend first.
+ *
+ * Pipeline: query embedding (768d) → autoencoder encode (768→64) → TurboVec ANN prefilter
  * → top-K candidates for Stage 4 (k-means reranking)
  *
  * Purpose: Reduce search space from 40K candidates → 100-500 before expensive GPU reranking.
- * Strategy: 64-dim encoded vectors fit in 4MB cache; cuVS IVFFLAT on RTX 3060Ti is sub-millisecond.
+ * Strategy: 64-dim encoded vectors fit in 4MB cache; TurboVec ANN on RTX 3060Ti is sub-millisecond.
  *
  * Hard constraints:
- * - No softmax/tanh on cuVS output (raw distances only)
+ * - No softmax/tanh on TurboVec output (raw distances only)
  * - Batch size ≤ 256 queries (OOM at 512+)
  * - Preserve packet_key → latent_64 row mapping (lossy encoding, need original IDs for dedup)
  * - Fanout=0 in caller (this stage does NOT expand; k-means does)
@@ -18,6 +28,7 @@ import { encode as autoencoderEncode } from '../gpu/autoencoder-bridge.js';
 import { turbovecGrpcHealth, turbovecGrpcSearch } from '../grpc/turbovec-cuda-client.js';
 import { getRedisClient } from '$lib/server/cache.js';
 
+/** @deprecated name kept for now (zero callers, see file header) — this configures the TurboVec search, not cuVS. */
 interface CuvSConfig {
 	nProbes: number; // ∈ [1, 32], default 32 (max recall)
 	nNeighbors: number; // top-K to fetch, ∈ [1, 65535]
@@ -117,7 +128,7 @@ async function searchCuvSPrefilter(
 		return candidates;
 	} catch (err) {
 		const msg = err instanceof Error ? err.message : String(err);
-		console.error(`[Stage3B] cuVS search failed: ${msg}`);
+		console.error(`[Stage3B] TurboVec search failed: ${msg}`);
 		throw err;
 	}
 }
@@ -167,7 +178,7 @@ export async function runStage3Prefilter(
 }
 
 /**
- * Health check: verify cuVS index is loaded and queryable
+ * Health check: verify TurboVec index is loaded and queryable
  */
 export async function healthCheckStage3(): Promise<{
 	healthy: boolean;

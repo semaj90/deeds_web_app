@@ -188,7 +188,7 @@ export function patchToUnifiedDiff(patch) {
 /**
  * Example usage / CLI entry point
  */
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [,, beforeFile, afterFile, outputPath] = process.argv;
 
   if (!beforeFile || !afterFile) {

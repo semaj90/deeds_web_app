@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import Counter
 from pathlib import Path
 
 try:
@@ -26,6 +27,24 @@ try:
 except ImportError as error:
     print(json.dumps({"status": "UNAVAILABLE", "reason": str(error)}))
     raise SystemExit(2)
+
+
+def compute_edge_projection_diagnostics(edges_table) -> dict:
+    """Measure whether the frozen projection has ambiguous duplicate/reciprocal
+    undirected edge pairs before Louvain comparison."""
+    if len(edges_table) == 0:
+        return {"orderedDuplicateEdges": 0, "reciprocalEdgePairs": 0, "duplicateUnorderedPairs": 0}
+    ordered_pairs = [(edge["src_gpu_node_id"], edge["dst_gpu_node_id"]) for edge in edges_table]
+    ordered_set = set(ordered_pairs)
+    ordered_duplicate_edges = len(ordered_pairs) - len(ordered_set)
+    reciprocal_edge_pairs = sum(1 for (a, b) in ordered_set if a != b and (b, a) in ordered_set) // 2
+    unordered_counter = Counter((min(a, b), max(a, b)) for (a, b) in ordered_pairs)
+    duplicate_unordered_pairs = sum(1 for count in unordered_counter.values() if count > 1)
+    return {
+        "orderedDuplicateEdges": ordered_duplicate_edges,
+        "reciprocalEdgePairs": reciprocal_edge_pairs,
+        "duplicateUnorderedPairs": duplicate_unordered_pairs,
+    }
 
 
 def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out: Path | None) -> dict:
@@ -84,6 +103,7 @@ def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out
                 for community_id, members in enumerate(communities):
                     for node_id in sorted(members):
                         handle.write(json.dumps({"gpuNodeId": node_id, "communityId": community_id}) + "\n")
+    edge_projection_diagnostics = compute_edge_projection_diagnostics(edges_table)
 
     return {
         "backend": "networkx",
@@ -98,6 +118,7 @@ def run(nodes_path: Path, edges_path: Path, scores_out: Path | None, louvain_out
         "louvainModularity": modularity,
         "louvainCommunityCount": community_count,
         "louvainProjection": "LOUVAIN_PARITY_PROJECTION_V1",
+        "edgeProjectionDiagnostics": edge_projection_diagnostics,
     }
 
 

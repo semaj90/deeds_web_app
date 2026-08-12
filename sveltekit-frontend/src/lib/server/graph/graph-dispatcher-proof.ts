@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import type { Pool } from 'pg';
 import { z } from 'zod';
 import { buildGraphDispatcherRegistrySnapshot } from './graph-dispatcher-registry.js';
+import { buildLatestLouvainResolutionReceipt, type LouvainResolutionReceipt } from './louvain-resolution-receipt.js';
 
 export interface LouvainPersistenceReceipt {
 	receiptId: string;
@@ -26,6 +27,7 @@ export interface GraphDispatcherProofSnapshot {
 	generatedAt: string;
 	registry: ReturnType<typeof buildGraphDispatcherRegistrySnapshot>;
 	louvainReceipt: LouvainPersistenceReceipt | null;
+	louvainResolutionReceipt: LouvainResolutionReceipt | null;
 	openGaps: string[];
 }
 
@@ -125,15 +127,19 @@ export async function buildLouvainPersistenceReceipt(db: Pool): Promise<LouvainP
 export async function buildGraphDispatcherProofSnapshot(db: Pool): Promise<GraphDispatcherProofSnapshot> {
 	const registry = buildGraphDispatcherRegistrySnapshot();
 	const louvainReceipt = await buildLouvainPersistenceReceipt(db);
+	const louvainResolutionReceipt = await buildLatestLouvainResolutionReceipt(db);
 	const openGaps: string[] = [];
 	if (!registry.completeness.exactMatch) openGaps.push('dispatcher registry incompleteness');
 	if (!louvainReceipt) openGaps.push('no succeeded Louvain run found');
-	else if (!louvainReceipt.replaySafe) openGaps.push('Louvain persistence receipt not replay-safe');
+	else if (!(louvainReceipt.replaySafe || louvainResolutionReceipt?.replaySafe)) openGaps.push('Louvain persistence receipt not replay-safe');
+	if (!louvainResolutionReceipt) openGaps.push('no Louvain resolution receipt found');
+	else if (!louvainResolutionReceipt.replaySafe) openGaps.push('Louvain resolution receipt not replay-safe');
 
 	return {
 		generatedAt: new Date(0).toISOString(),
 		registry,
 		louvainReceipt,
+		louvainResolutionReceipt,
 		openGaps,
 	};
 }

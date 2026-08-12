@@ -78,6 +78,11 @@ type OracleResult = {
 	componentCount: number;
 	louvainModularity: number | null;
 	louvainCommunityCount: number | null;
+	edgeProjectionDiagnostics?: {
+		orderedDuplicateEdges: number;
+		reciprocalEdgePairs: number;
+		duplicateUnorderedPairs: number;
+	};
 };
 
 function toWslPath(windowsPath: string): string {
@@ -332,7 +337,8 @@ async function main(): Promise<void> {
 			status: oracle.status === 'EXECUTED' ? 'PROVEN' : oracle.status === 'SKIP' ? 'SKIP' : 'FAILED',
 			nodeCount: oracle.nodeCount,
 			edgeCount: oracle.edgeCount,
-			componentCount: oracle.componentCount
+			componentCount: oracle.componentCount,
+			edgeProjectionDiagnostics: oracle.edgeProjectionDiagnostics
 		});
 		networkxLouvain = { modularity: oracle.louvainModularity, communityCount: oracle.louvainCommunityCount };
 	}
@@ -343,7 +349,8 @@ async function main(): Promise<void> {
 			status: oracle.status === 'EXECUTED' ? 'PROVEN' : oracle.status === 'SKIP' ? 'SKIP' : 'FAILED',
 			nodeCount: oracle.nodeCount,
 			edgeCount: oracle.edgeCount,
-			componentCount: oracle.componentCount
+			componentCount: oracle.componentCount,
+			edgeProjectionDiagnostics: oracle.edgeProjectionDiagnostics
 		});
 		cugraphLouvain = { modularity: oracle.louvainModularity, communityCount: oracle.louvainCommunityCount };
 	}
@@ -406,6 +413,7 @@ async function main(): Promise<void> {
 	}
 
 	const componentCount = networkxSummary.componentCount ?? cugraphSummary.componentCount ?? 0;
+	const edgeProjectionDiagnostics = networkxSummary.edgeProjectionDiagnostics ?? cugraphSummary.edgeProjectionDiagnostics;
 
 	const receipt = buildGraphSnapshotParityReceipt({
 		graphRevision: manifest.graphRevision,
@@ -414,6 +422,7 @@ async function main(): Promise<void> {
 		networkx: networkxSummary,
 		cugraph: cugraphSummary,
 		componentCount,
+		edgeProjectionDiagnostics,
 		pagerankTopKOverlap,
 		pagerankCorrelation,
 		pagerankMaxDelta,

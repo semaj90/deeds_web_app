@@ -1,0 +1,17 @@
+{
+  "receiptKind": "PHASE2B_LEXICAL_EXTRACTION_PROVEN",
+  "status": "PROVEN",
+  "command": "npm run --prefix sveltekit-frontend atlas:phase2b:lexical-kmeans:apply",
+  "sampleSize": 10000,
+  "extractedPackets": 9994,
+  "astSymbolsPackets": 2605,
+  "metadataPackets": 7389,
+  "updatedRows": 0,
+  "insertedRows": 9994,
+  "coveragePct": 100.0,
+  "notes": [
+    "Lexical features now write through the live packet-key join.",
+    "The KMeans/topology step is still separate and not exercised by this proof.",
+    "Phase 2C can now consume lexical_features."
+  ]
+}

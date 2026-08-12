@@ -215,7 +215,7 @@ export function generateReport(patches, applyResults = null) {
 /**
  * CLI entry point for testing
  */
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log('Report infrastructure ready');
   console.log(`Patches directory: ${patchesDir}`);
 

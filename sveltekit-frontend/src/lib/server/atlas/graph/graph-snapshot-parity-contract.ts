@@ -35,6 +35,13 @@ export const GraphSnapshotParityBackendSummarySchema = z
 		nodeCount: z.number().int().nonnegative(),
 		edgeCount: z.number().int().nonnegative(),
 		componentCount: z.number().int().nonnegative().optional(),
+		edgeProjectionDiagnostics: z
+			.object({
+				orderedDuplicateEdges: z.number().int().nonnegative(),
+				reciprocalEdgePairs: z.number().int().nonnegative(),
+				duplicateUnorderedPairs: z.number().int().nonnegative()
+			})
+			.optional(),
 		pagerankTopKOverlap: z.number().min(0).max(1).optional(),
 		pagerankCorrelation: z.number().min(-1).max(1).optional(),
 		pagerankMaxDelta: z.number().nonnegative().optional(),
@@ -71,6 +78,11 @@ export function deriveGraphSnapshotParityStatus(input: {
 	networkx: GraphSnapshotParityBackendSummary;
 	cugraph: GraphSnapshotParityBackendSummary;
 	unresolvedCount: number;
+	edgeProjectionDiagnostics?: {
+		orderedDuplicateEdges: number;
+		reciprocalEdgePairs: number;
+		duplicateUnorderedPairs: number;
+	};
 	pagerankTopKOverlap: number;
 	pagerankCorrelation: number;
 	pagerankMaxDelta: number;
@@ -85,6 +97,14 @@ export function deriveGraphSnapshotParityStatus(input: {
 	}
 
 	if (input.unresolvedCount > 0) {
+		return 'PARTIAL';
+	}
+
+	const diagnostics = input.edgeProjectionDiagnostics;
+	if (
+		diagnostics &&
+		(diagnostics.orderedDuplicateEdges > 0 || diagnostics.reciprocalEdgePairs > 0 || diagnostics.duplicateUnorderedPairs > 0)
+	) {
 		return 'PARTIAL';
 	}
 
@@ -107,6 +127,11 @@ export function buildGraphSnapshotParityReceipt(input: {
 	networkx: GraphSnapshotParityBackendSummary;
 	cugraph: GraphSnapshotParityBackendSummary;
 	componentCount: number;
+	edgeProjectionDiagnostics?: {
+		orderedDuplicateEdges: number;
+		reciprocalEdgePairs: number;
+		duplicateUnorderedPairs: number;
+	};
 	pagerankTopKOverlap: number;
 	pagerankCorrelation: number;
 	pagerankMaxDelta: number;
@@ -124,6 +149,7 @@ export function buildGraphSnapshotParityReceipt(input: {
 			networkx: input.networkx,
 			cugraph: input.cugraph,
 			unresolvedCount: input.unresolvedCount,
+			edgeProjectionDiagnostics: input.edgeProjectionDiagnostics,
 			pagerankTopKOverlap: input.pagerankTopKOverlap,
 			pagerankCorrelation: input.pagerankCorrelation,
 			pagerankMaxDelta: input.pagerankMaxDelta,

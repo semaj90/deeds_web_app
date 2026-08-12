@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
+import { fileURLToPath } from 'node:url';
 
 export async function queryProgress(query) {
     const logPath = path.resolve('docs/ai-os/agentic-progress-log.ndjson');
@@ -20,7 +21,7 @@ export async function queryProgress(query) {
     return results;
 }
 
-if (process.argv[1] === import.meta.url.replace('file://', '')) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const query = process.argv[2] || '';
     queryProgress(query).then(res => console.log(JSON.stringify(res, null, 2)));
 }

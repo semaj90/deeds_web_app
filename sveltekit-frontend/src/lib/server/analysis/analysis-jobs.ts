@@ -13,7 +13,7 @@ import {
 } from '$lib/shared/schemas/protocol.js';
 import { eq, sql } from 'drizzle-orm';
 
-export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization';
+export type JobType = 'upload_pipeline' | 'entity_extraction' | 'forensics' | 'summarization' | 'code_feature_registry';
 export type JobStatus = 'queued' | 'running' | 'completed' | 'failed';
 
 export const ANALYSIS_JOBS_NOTIFY_CHANNEL = 'atlas_analysis_jobs';

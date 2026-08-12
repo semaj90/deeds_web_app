@@ -28,6 +28,7 @@
 
 import { execSync } from 'child_process';
 import fetch from 'node-fetch';
+import { fileURLToPath } from 'node:url';
 
 interface DomainClassification {
   domain: string;
@@ -309,7 +310,7 @@ async function main() {
 }
 
 // Run CLI if invoked directly
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
 if (isMainModule || process.argv[1]?.endsWith('domain-classifier-with-semantic-validation.mts')) {
   main().catch(console.error);
 }

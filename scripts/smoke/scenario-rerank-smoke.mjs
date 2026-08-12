@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import crypto from 'crypto';
 import fs from 'fs/promises';
 import fsSync from 'fs';
+import { fileURLToPath } from 'node:url';
 
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = process.env.QDRANT_COLLECTION || 'scenarios';
@@ -86,4 +87,4 @@ async function main() {
   console.log('Wrote rerank diff to', outFile);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) main().catch(e=>{ console.error(e); process.exit(1); });
+if (process.argv[1] === fileURLToPath(import.meta.url)) main().catch(e=>{ console.error(e); process.exit(1); });

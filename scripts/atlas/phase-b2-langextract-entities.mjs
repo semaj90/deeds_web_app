@@ -23,6 +23,7 @@ const DRY_RUN = process.argv.includes('--dry-run');
 const APPLY = process.argv.includes('--apply');
 const VERBOSE = process.argv.includes('--verbose');
 const BATCH_SIZE = parseInt(process.argv.find(arg => arg.startsWith('--batch='))?.split('=')[1] || '100');
+const LIMIT = parseInt(process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] || '10000');
 
 // Connection from .env
 const pool = new Pool({
@@ -206,11 +207,11 @@ async function main() {
       WHERE summary IS NOT NULL
         AND (extracted_entities = '[]'::jsonb OR extracted_entities IS NULL)
       ORDER BY created_at DESC
-      LIMIT 10000
-    `);
+      LIMIT $1
+    `, [LIMIT]);
 
     const packets = result.rows;
-    console.log(`📦 Found ${packets.length} packets needing entity extraction\n`);
+    console.log(`📦 Found ${packets.length} packets needing entity extraction (limit=${LIMIT})\n`);
 
     let processed = 0;
     let failed = 0;

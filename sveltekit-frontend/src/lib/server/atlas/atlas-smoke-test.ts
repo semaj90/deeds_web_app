@@ -14,6 +14,7 @@ import {
   type RuntimeObservation,
 } from './atlas-runtime-context.js';
 import { estimateExecutionState, isTransitionAllowed } from './atlas-fsm-policy.js';
+import { fileURLToPath } from 'node:url';
 
 export async function runAtlasSmokeTest(): Promise<{
   passed: number;
@@ -255,7 +256,7 @@ export async function runAtlasSmokeTest(): Promise<{
 }
 
 // CLI invocation
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url);
 if (isMainModule) {
   runAtlasSmokeTest().then((result) => {
     console.log('\n=== Atlas FSM Smoke Test ===\n');

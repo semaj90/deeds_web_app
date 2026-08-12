@@ -1004,7 +1004,7 @@ This is the short execution list extracted from the current compiler / topology 
 - PF4C semantics are now confirmed from the live writer path: `pass_key` is execution metadata / idempotency key, while `pass_identity_hash` is the logical pass identity used for deterministic reuse.
 - PF4G duplicate-delivery idempotency on deterministic writes is proven by focused unit test; repeat delivery reuses the existing deterministic receipt and does not insert a duplicate row.
 - PF4H live boundary receipt is now captured from the real ledger: `analysis_pass_current` is view-only, `analysis_pass_results` remains the append-only history table, and there is no unique constraint on the current-materialization boundary.
-- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The Louvain unresolved-seed lane is now seeded from the live run, the resolution receipt is live, and the remaining out-of-domain paths are classified as explicit exclusions; `replaySafe=true` on the latest report.
+- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The Louvain unresolved-seed lane is now seeded from the live run, the resolution receipt is live, and the remaining out-of-domain paths are classified as explicit exclusions; `replaySafe=true` on the latest report. The parity receipt now also records the frozen undirected projection diagnostics (`orderedDuplicateEdges`, `reciprocalEdgePairs`, `duplicateUnorderedPairs`) so the Louvain comparison can prove it is using the same weighted projection on both backends.
 - Retrieval fusion now has the one-vote-per-lane proof route and regression test wired. The live fusion-owner matrix is still open before frozen replay can close.
 - Rust structural worker promotion stays descriptive only until parity, idempotency, and replay receipts exist.
 
@@ -1069,15 +1069,17 @@ This is the short execution list extracted from the current compiler / topology 
 - Valkey is hot coordination cache only.
 - Read-side query fanout is a fork-join executor capped at three independent read tools.
 - Shared lane manifest: `sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.ts` for GNN, exact kNN, KMeans routing hints, Ewin Tang low-rank, HyperLogLog telemetry, Kanban, and recommendation policy receipts.
-- Feature matrix setup stays three-tier: static packet `feature_matrix_5`, query-time `candidate_feature_matrix`, and canonical `semantic_768`; JSONL evidence, POS tagger output, and domain classification are derived contracts; the live POS/concept lane now materializes `feature_matrix_5` as the first wired writer, while KMeans 64/128/256 plus SOM 20x20 remain routing hints only and the setup lives in `sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.ts`.
+- Feature matrix setup stays three-tier: static packet `feature_matrix_5`, query-time `candidate_feature_matrix`, and canonical `semantic_768`; JSONL evidence, POS tagger output, and domain classification are derived contracts; the live POS/concept lane now materializes `feature_matrix_5` as the first wired writer, and the local Tree-sitter / domain classifier is now proven live, but the durable write / feedback plane is still degraded so the end-to-end receipt remains open. KMeans 64/128/256 plus SOM 20x20 remain routing hints only and the setup lives in `sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.ts`.
 - Daily Graphify is the evidence producer for TaskCandidate rows; Kanban remains the canonical task-state owner.
 - `scripts/atlas/graphify-langgraph-pipeline.mjs` now emits `graphify-task-candidates.jsonl` for the Kanban importer bridge; this is evidence, not task-state truth.
 - `T6c` KMeans remains `CACHE_HINT_ONLY` and does not block daily Graphify resumption.
 - Tang-style low-rank sampling is experimental routing only; exact cuVS / ANN ranking remains the final candidate oracle.
+- OpenCode / ACP / A2A dispatch is transport only: the agent may request work through the typed tool registry, but the actual execution backend is a shell/Python worker (`bash`, `conda run`, or the repo’s equivalent wrapper). The agent must not write canonical state directly.
 
 ### Pass Fabric steps
 
 - [ ] Prove the current worker behavior with one real poll cycle and one real claimed batch.
+- [x] Add the first first-class code evidence synthesizer writer so the live classifier can persist a durable receipt once Postgres / outbox health recovers; the builder now lives in `sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts` and is threaded through the `code_feature_registry` worker stage.
 - [ ] Replace single-job claims with `claimBatch(jobType, freeSlots)` so gates fill immediately.
 - [ ] Add `pg_notify` wakeups on enqueue and keep a slow fallback poll.
 - [ ] Add durable `AnalysisPassResult` persistence as append-only execution history.
@@ -1913,8 +1915,12 @@ work need redoing.
 
 - Layer 2 compiler output
   - ast-grep canonical join
+  - stable AST / chunk identity writer proof (`source_ref`, `source_revision`, `tree_node_id`, `title_id`)
+  - JSONL parsed-evidence batch lane and provenance receipt
   - lexical writer
   - entity writer
+  - POS tagger writer + ontology-linked domain classification writer
+  - source-to-packet adapter now wired through `analysis/source-pos-concept-packet.ts` and `code_feature_registry`; live receipt proof remains open
   - remaining extractor coverage
 
 - Layer 3 metrics / topology
@@ -1923,6 +1929,9 @@ work need redoing.
   - PageRank / Louvain / KMeans receipts
 
 - Layer 4 runtime / training
+  - `FeatureMatrixSetupV1` / `feature_matrix_5` / `candidate_feature_matrix` convergence
+  - ANN candidate generation vs rerank separation
+  - GPU sidecar adapter proof for cuVS / cuGraph parity and batch synthesis
   - feature-row convergence
   - ranker shadow gates
   - replay corpus proof

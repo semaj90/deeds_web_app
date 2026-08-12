@@ -1292,8 +1292,8 @@ def _build_event_hypergraph(
         "telemetry_revision": "event-breadth-v1",
     }
 
-    semantic_score = float((experiment_feature_matrix.dense_cosine if experiment_feature_matrix else None) or control5.semantic_confidence or 0.5)
-    structural_score = float((experiment_feature_matrix.ast_match if experiment_feature_matrix else None) or control5.structural_confidence or 0.5)
+    semantic_score = float((experiment_feature_matrix.dense_cosine if experiment_feature_matrix else None) or (control5.semantic_confidence if control5 else None) or 0.5)
+    structural_score = float((experiment_feature_matrix.ast_match if experiment_feature_matrix else None) or (control5.structural_confidence if control5 else None) or 0.5)
     graph_score = float(
         (experiment_feature_matrix.pagerank if experiment_feature_matrix else None)
         or (experiment_feature_matrix.cheirank if experiment_feature_matrix else None)

@@ -11,8 +11,8 @@ This is a support note, not a new owner.
 ## Pass fabric
 
 - PF0-PF3 are verified done from direct source read.
-- PF4 is the active ledger semantics gate.
-- Deterministic replay and stochastic execution history must stay separate.
+- PF4 is proven via live current-materialization receipt.
+- Deterministic replay and stochastic execution history stay separate.
 - `analysis_pass_current` is the eligible-materialization projection, not final truth.
 
 ## Retrieval / topology / approximation
@@ -35,10 +35,8 @@ This is a support note, not a new owner.
 
 ## Open gates
 
-- PF4C semantics and current-materialization proof
 - live Valkey HLL materializer
 - recommendation promotion guard
 - graph dispatcher registry completeness
 - Louvain durable persistence receipt
 - one-vote-per-lane / live fusion-owner matrix
-

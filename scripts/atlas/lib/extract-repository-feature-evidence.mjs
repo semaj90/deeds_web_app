@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { scanPlaceholderPatterns } from './feature-placeholder-regex-model.mjs';
+import { fileURLToPath } from 'node:url';
 
 const CODE_EXTENSIONS = new Set(['.ts','.tsx','.mts','.cts','.js','.jsx','.mjs','.cjs','.svelte','.vue','.astro','.py','.go','.rs','.java','.kt','.kts','.scala','.rb','.php','.cs','.fs','.swift','.dart','.c','.cc','.cpp','.cxx','.h','.hpp','.cu','.cuh','.sh','.bash','.zsh','.ps1','.sql','.r','.lua']);
 
@@ -84,7 +85,7 @@ function isGenericSymbol(value) { return /^(?:page|server|layout|index|handler|c
 function walkJson(value,out) { if (typeof value==='string') out.push(value); else if (Array.isArray(value)) for (const item of value) walkJson(item,out); else if (value && typeof value==='object') for (const item of Object.values(value)) walkJson(item,out); }
 function findNamedString(value,names) { if (!value || typeof value!=='object') return null; for (const name of names) if (typeof value[name]==='string') return value[name]; return null; }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const filePath = process.argv[2];
   if (!filePath) { console.error('Usage: node extract-repository-feature-evidence.mjs <file>'); process.exit(2); }
   extractRepositoryFeatureEvidence(filePath).then((result)=>console.log(JSON.stringify(result,null,2))).catch((error)=>{ console.error(error); process.exit(1); });

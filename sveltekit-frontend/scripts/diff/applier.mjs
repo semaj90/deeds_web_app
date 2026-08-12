@@ -241,7 +241,7 @@ export function applyPatches(patches, config = DEFAULT_CONFIG) {
 /**
  * CLI entry point
  */
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [,, patchFile, ...flags] = process.argv;
 
   if (!patchFile) {

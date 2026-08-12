@@ -1,0 +1,117 @@
+{
+  "receiptKind": "PASS_FABRIC_CURRENT_MATERIALIZATION_PROVEN",
+  "status": "PROVEN",
+  "generatedAt": "2026-08-11T22:33:39.032Z",
+  "boundary": {
+    "status": "available",
+    "currentBoundaryKind": "view_only",
+    "appendOnlyHistoryTable": "analysis_pass_results",
+    "currentMaterializationView": "analysis_pass_current",
+    "rawRows": 11079,
+    "currentRows": 6903,
+    "canonicalRepresentationId": "semantic_768",
+    "canonicalDimension": 768,
+    "reuseBoundary": "application_level_reuse",
+    "uniqueConstraintPresent": false
+  },
+  "current": {
+    "status": "available",
+    "rawRows": 11079,
+    "currentRows": 6903,
+    "duplicateCollapse": 4176,
+    "canonicalRepresentationId": "semantic_768",
+    "canonicalDimension": 768,
+    "sampleCurrentRows": [
+      {
+        "id": 11104,
+        "packetKey": "packet:0598a4f4ccdf",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "cb0ecf854987cdde80eaba6739c3a89c8966686171869290505265a3810aac69",
+        "createdAt": "2026-06-30 21:23:33.636094+00"
+      },
+      {
+        "id": 11103,
+        "packetKey": "packet:3eeae797683c",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "abd6d072b8054cf6833fd09b34068bf164fef9e04f86980d12564d2733e19323",
+        "createdAt": "2026-06-30 21:23:30.342836+00"
+      },
+      {
+        "id": 11102,
+        "packetKey": "packet:b1159ff26c5b",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "53ef2e3b97704d58910f5afa416698aebcb1be3547d1f7af2104e814ded848e8",
+        "createdAt": "2026-06-30 21:23:27.061851+00"
+      },
+      {
+        "id": 11101,
+        "packetKey": "packet:ec466864d510",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "5ad9079c3a00f7e0fb6c3f3a2f7c54209cb4e1a5303ac7cb6ccc7cdaeb2ee496",
+        "createdAt": "2026-06-30 21:23:23.920474+00"
+      },
+      {
+        "id": 11100,
+        "packetKey": "packet:a9feff46ef34",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "4d1bde51ce81f89885c75029f4a9f43327e60ce75fe5a69e6d0033755c64e1b4",
+        "createdAt": "2026-06-30 21:23:21.383273+00"
+      },
+      {
+        "id": 11099,
+        "packetKey": "packet:781088790aaf",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "6c07c1d0e02fb4cb86209a9d411de3b2ad268af6918a9fdae9b0b8f585bc833e",
+        "createdAt": "2026-06-30 21:23:18.239915+00"
+      },
+      {
+        "id": 11098,
+        "packetKey": "packet:5c65a3726d6e",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "7b12ee5e6e1d9f7040430f868423ac1af5e3c65d9f42681c22a0380fec9b0d2f",
+        "createdAt": "2026-06-30 21:23:15.11906+00"
+      },
+      {
+        "id": 11097,
+        "packetKey": "packet:5bff3e6a6a63",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "a74cf764769e94cd518ecac7f9a981a07bbd92d1fb7979559e91cf9e969d307d",
+        "createdAt": "2026-06-30 21:23:11.675988+00"
+      },
+      {
+        "id": 11096,
+        "packetKey": "packet:fbc485984c15",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "ecb64752a56e3627a6a476db9e9ec4b2d5c12244ee39cb5c94b1662d701e9bf3",
+        "createdAt": "2026-06-30 21:23:08.515455+00"
+      },
+      {
+        "id": 11095,
+        "packetKey": "packet:1c75e3070c64",
+        "sourceRevision": null,
+        "passType": "summarization",
+        "passRevision": null,
+        "inputHash": "f7e15915b0afb5b9ba8263786979670b2588f4d6374d8b4cc2d002acf6399eda",
+        "createdAt": "2026-06-30 21:23:05.390211+00"
+      }
+    ]
+  }
+}

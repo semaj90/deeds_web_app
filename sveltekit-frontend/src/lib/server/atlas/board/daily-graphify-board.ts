@@ -223,6 +223,22 @@ async function readFirstJson(relativePaths: string[]): Promise<{ source: string 
   return { source: null, value: null };
 }
 
+function hasBoardTasks(value: unknown): boolean {
+  const parsed = parseBoardPayload(value);
+  if (!parsed) return false;
+  const tasks = flattenBoardTasks(parsed, parsed.generated ?? parsed.generatedAt ?? 'graphify-board');
+  return tasks.length > 0;
+}
+
+async function readFirstPopulatedBoard(relativePaths: string[]): Promise<{ source: string | null; value: unknown | null }> {
+  for (const candidate of resolveCandidates(relativePaths)) {
+    if (!existsSync(candidate)) continue;
+    const value = await readJsonIfExists(candidate);
+    if (value && hasBoardTasks(value)) return { source: candidate, value };
+  }
+  return { source: null, value: null };
+}
+
 function normalizePriority(priority: unknown): 'P0' | 'P1' | 'P2' | 'P3' {
   const raw = String(priority ?? '').trim().toUpperCase();
   if (raw === 'P0' || raw === 'P1' || raw === 'P2' || raw === 'P3') return raw;
@@ -415,7 +431,7 @@ export function summarizeDailyGraphifyBoard(
 }
 
 export async function loadDailyGraphifyBoard(): Promise<DailyGraphifyBoardData> {
-  const boardResult = await readFirstJson([
+  const boardResult = await readFirstPopulatedBoard([
     path.join('docs', 'reports', 'atlas', 'atlas-kanban-tasks.json'),
     path.join('docs', 'reports', 'atlas-kanban-tasks.json'),
     path.join('docs', 'graph', 'kanban-board.json'),

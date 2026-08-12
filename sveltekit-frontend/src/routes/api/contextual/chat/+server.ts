@@ -6,6 +6,141 @@ import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-lla
 import { getRedis } from '$lib/server/redis.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { z } from 'zod';
+import {
+  CONTEXTUAL_TOOLS,
+  executeContextualTool,
+  type ContextualToolResult,
+} from '$lib/server/ai/contextual-tools.js';
+
+const SIMPLE_HISTORY_LIMIT = 4;
+const TOOL_HISTORY_LIMIT = 6;
+const SIMPLE_NUM_CTX = 4096;
+const TOOL_NUM_CTX = 6144;
+const SIMPLE_NUM_PREDICT = 128;
+const TOOL_NUM_PREDICT = 320;
+const SIMPLE_TIMEOUT_MS = 60_000;
+const TOOL_TIMEOUT_MS = 75_000;
+const MAX_STORED_HISTORY = 12;
+
+const SIMPLE_SYSTEM_PROMPT =
+  'You are a helpful legal AI assistant. Provide clear, accurate responses about legal topics. Track conversation context to give relevant follow-up responses. Unless the user asks for depth, answer in a single concise paragraph of no more than 5 sentences.';
+
+const TOOL_SYSTEM_PROMPT = `You are a contextual legal AI assistant with agentic tool-calling capabilities.
+
+Tool priority order (MUST follow):
+1. **glossary_search** - ALWAYS try this first for legal term definitions, meanings, or concepts
+2. **rag_search** - Use for relevant documents, evidence, or precedents; also fall back here if glossary returns no results
+3. **web_search** - Use only for up-to-date external information that glossary and RAG cannot provide
+
+Track conversation context and provide structured, well-cited responses. Prefer concise answers unless the user explicitly asks for detail.`;
+
+type OllamaCallStage = 'simple' | 'tool-round' | 'tool-final';
+
+interface OllamaCallDiagnostic {
+  stage: OllamaCallStage;
+  totalDurationMs: number | null;
+  loadDurationMs: number | null;
+  promptEvalDurationMs: number | null;
+  evalDurationMs: number | null;
+  promptEvalCount: number | null;
+  evalCount: number | null;
+}
+
+function toDurationMs(value?: number): number | null {
+  return typeof value === 'number' ? Math.round(value / 1e6) : null;
+}
+
+/** llama-server's /chat/completions response is OpenAI-shaped ({ choices: [...] })
+ * and never carries these Ollama-native timing fields — this type reflects what's
+ * actually passed at the two call sites below (post Ollama->llama-server migration,
+ * see CLAUDE.md's Ollama/llama-server boundary rule). Every field access here was
+ * already optional-chained/typeof-guarded, so this stays a no-op diagnostics
+ * collector (all nulls) rather than a functional change. */
+type OllamaDiagnosticSource = {
+  total_duration?: number;
+  load_duration?: number;
+  prompt_eval_duration?: number;
+  eval_duration?: number;
+  prompt_eval_count?: number;
+  eval_count?: number;
+};
+
+function collectOllamaDiagnostic(stage: OllamaCallStage, raw: unknown): OllamaCallDiagnostic {
+  const data = (raw ?? {}) as OllamaDiagnosticSource;
+  return {
+    stage,
+    totalDurationMs: toDurationMs(data.total_duration),
+    loadDurationMs: toDurationMs(data.load_duration),
+    promptEvalDurationMs: toDurationMs(data.prompt_eval_duration),
+    evalDurationMs: toDurationMs(data.eval_duration),
+    promptEvalCount: typeof data.prompt_eval_count === 'number' ? data.prompt_eval_count : null,
+    evalCount: typeof data.eval_count === 'number' ? data.eval_count : null,
+  };
+}
+
+function summarizeOllamaDiagnostics(calls: OllamaCallDiagnostic[]) {
+  const totalDurationMs = calls.reduce((sum, call) => sum + (call.totalDurationMs ?? 0), 0);
+  const loadDurationMs = calls.reduce((sum, call) => sum + (call.loadDurationMs ?? 0), 0);
+  const promptEvalDurationMs = calls.reduce(
+    (sum, call) => sum + (call.promptEvalDurationMs ?? 0),
+    0
+  );
+  const evalDurationMs = calls.reduce((sum, call) => sum + (call.evalDurationMs ?? 0), 0);
+  const promptEvalCount = calls.reduce((sum, call) => sum + (call.promptEvalCount ?? 0), 0);
+  const evalCount = calls.reduce((sum, call) => sum + (call.evalCount ?? 0), 0);
+
+  return {
+    callCount: calls.length,
+    totalDurationMs,
+    loadDurationMs,
+    promptEvalDurationMs,
+    evalDurationMs,
+    promptEvalCount,
+    evalCount,
+    approxNonOllamaMs: Math.max(
+      0,
+      totalDurationMs - loadDurationMs - promptEvalDurationMs - evalDurationMs
+    ),
+    calls,
+  };
+}
+
+const contextualChatSchema = z.object({
+  message: z.string().min(1).max(10000),
+  sessionId: z.string().max(200).optional(),
+  userId: z.string().max(200).optional(),
+  caseId: z.string().max(200).optional(),
+  enableFunctions: z.boolean().optional(),
+  /** Pre-assembled ACE context text from selected evidence/notes (checkbox panel) */
+  aceContext: z.string().max(15000).optional(),
+});
+
+/**
+ * Parse request body from either JSON or FormData.
+ * The ContextualEvidenceChatModal sends FormData while direct API callers send JSON.
+ */
+async function parseRequest(request: Request): Promise<z.infer<typeof contextualChatSchema>> {
+  const contentType = request.headers.get('content-type') ?? '';
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await request.formData();
+    return {
+      message: String(formData.get('message') ?? ''),
+      sessionId: formData.get('sessionId') ? String(formData.get('sessionId')) : undefined,
+      userId: formData.get('userId') ? String(formData.get('userId')) : undefined,
+      caseId: formData.get('caseId') ? String(formData.get('caseId')) : undefined,
+      enableFunctions: formData.get('enableFunctions') === 'true' ? true : undefined,
+      aceContext: formData.get('aceContext') ? String(formData.get('aceContext')) : undefined,
+    };
+  }
+
+  return await request.json();
+}
+
+/**
+ * POST /api/contextual/chat
+ * Contextual chat with HMM state tracking + optional agentic tool calling.
+ * Accepts both JSON and FormData (for file upload modal compatibility).
  */
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.user?.id) return json({ error: 'Unauthorized' }, { status: 401 });

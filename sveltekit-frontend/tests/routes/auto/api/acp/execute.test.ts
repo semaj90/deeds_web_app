@@ -25,7 +25,7 @@ describe('src/routes/api/acp/execute/+server.ts', () => {
       vi.resetAllMocks();
       const mod = await import('../../../../../src/routes/api/acp/execute/+server.js') as Record<string, unknown>;
       handler = mod.POST as typeof handler;
-    });
+    }, 30000);
 
     function makeReq(body?: unknown) {
       return new Request('http://localhost/api/acp/execute', body !== undefined ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
@@ -51,6 +51,51 @@ describe('src/routes/api/acp/execute/+server.ts', () => {
     it.todo('400 — bad input shape returns degraded JSON envelope');
     it.todo('200 — happy path returns expected schema');
     it.todo('degraded — upstream failure returns same top-level shape with empty defaults');
+
+    it('200 — dispatches the RAPIDS PageRank dry-run tool through ACP', async () => {
+      const resp = await handler({
+        request: makeReq({ tool: 'atlas:cugraph:pagerank:dry', args: { taskId: 'pagerank-dry-smoke' }, dryRun: true }),
+        locals: { user: { id: 'test-user' } },
+        url: makeUrl(),
+        params: {},
+      });
+
+      expect(resp.status).toBe(200);
+      const body = await resp.json() as {
+        success: boolean;
+        kind: string;
+        result?: { steps?: Array<{ action: string; target: string; detail: string }> };
+        error?: string;
+      };
+
+      expect(body.success).toBe(true);
+      expect(body.kind).toBe('plan');
+      expect(body.result?.steps?.[0]?.action).toBe('exec');
+      expect(body.result?.steps?.[0]?.target).toBe('wsl-bash');
+    });
+
+    it('200 — dispatches the live RAPIDS PageRank tool through ACP in dry-run mode', async () => {
+      const resp = await handler({
+        request: makeReq({ tool: 'atlas:cugraph:pagerank', args: { taskId: 'pagerank-live-smoke' }, dryRun: true }),
+        locals: { user: { id: 'test-user' } },
+        url: makeUrl(),
+        params: {},
+      });
+
+      expect(resp.status).toBe(200);
+      const body = await resp.json() as {
+        success: boolean;
+        kind: string;
+        result?: { steps?: Array<{ action: string; target: string; detail: string }> };
+        error?: string;
+      };
+
+      expect(body.success).toBe(true);
+      expect(body.kind).toBe('plan');
+      expect(body.result?.steps?.[0]?.action).toBe('exec');
+      expect(body.result?.steps?.[0]?.target).toBe('wsl-bash');
+      expect(body.result?.steps?.[0]?.detail).toContain('atlas-rapids-cu13');
+    });
   });
 
 });

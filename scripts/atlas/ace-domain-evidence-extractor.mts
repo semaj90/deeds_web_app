@@ -17,10 +17,17 @@
  *        ↓
  *   agent_playbook_entries (canonical playbook)
  *
- * Three-tier domain evidence signals:
- * 1. Lexical: keyword matching (deterministic, fast)
- * 2. Semantic: centroid cosine similarity + Qdrant retrieval
- * 3. Validated: LDR research + external evidence
+ * Domain evidence signals (updated 2026-08-12 — tier 2 was promised here since this file's
+ * creation but not actually implemented until now; see collectSemanticEvidence()):
+ * 1. Lexical: keyword matching (deterministic, fast) — collectLexicalEvidence/collectLinguisticEvidence
+ * 2. Structural: AST symbol facts from feature_structural_facts — collectStructuralEvidence
+ * 3. Semantic: k-NN neighbor domain voting via TurboVec-prefiltered (falls back to direct) Qdrant
+ *    ANN search over codebase_chunks_768, joined back to atlas_packets.domain_class —
+ *    collectSemanticEvidence. NOT literal centroid-cosine-similarity (no centroid exists for
+ *    this file's 8-domain taxonomy) — see that function's own docstring for why.
+ * 4. Legacy: pre-existing atlas_packets.domain_class label, used as a fallback — collectLegacyEvidence
+ * 5. Validated: LDR research + external evidence — NOT YET IMPLEMENTED (still just the docstring
+ *    promise; no collectValidatedEvidence() exists as of this note. Flagged, not built this pass.)
  *
  * NOT used in hot path. Used post-hoc to extract reusable lessons.
  *
@@ -166,6 +173,79 @@ async function collectStructuralEvidence(client: any, packetKey: string): Promis
   return [];
 }
 
+/**
+ * Tier 2 (Semantic), added 2026-08-12 — was promised in the module docstring since this file's
+ * creation ("Semantic: centroid cosine similarity + Qdrant retrieval") but never actually
+ * implemented; only lexical/structural/legacy existed. Implemented as k-NN neighbor domain
+ * voting rather than literal centroid-cosine-similarity: no pre-computed centroid exists for
+ * this file's 8-domain taxonomy (legal/auth/retrieval/database/frontend/backend/gpu/nlp) — that
+ * taxonomy is disjoint from the only centroids that do exist (`corpus:centroids` in
+ * code-intel-service.ts, AUTH/DATA/API/UI — a different, generic web-app taxonomy, not a subset
+ * or superset of this one), and computing new centroids for 8 fresh domains would need a labeled
+ * training corpus that doesn't exist yet. k-NN neighbor voting needs no pre-computed centroid —
+ * it embeds this packet, finds its real nearest neighbors in the already-populated
+ * `codebase_chunks_768` Qdrant collection (confirmed live: 105,761 points), and votes using
+ * those neighbors' already-known `atlas_packets.domain_class` labels.
+ *
+ * Tries TurboVec's fast prefilter first (`:8791`, architecturally the correct fast path per
+ * `docs/architecture/retrieval-layer-separation.md`), falls back to direct Qdrant search when
+ * TurboVec returns zero candidates — confirmed live before writing this that TurboVec's index is
+ * currently empty (`{"indexed": 0}` at `:8791/health`) while Qdrant itself has real data, so the
+ * fallback path is not hypothetical, it is the path that actually returns evidence right now.
+ */
+async function collectSemanticEvidence(client: any, packetKey: string, sourceRef: string, content?: string): Promise<DomainEvidence[]> {
+  try {
+    const { generateSingleEmbedding } = await import('$lib/server/grpc/embedding-client.js');
+    const { turbovecSearch } = await import('$lib/server/retrieval/turbovec-prefilter.js');
+    const { getQdrantClient } = await import('$lib/server/vector/qdrant-singleton.js');
+
+    const embedding = await generateSingleEmbedding(`${sourceRef} ${content ?? ''}`.slice(0, 4000));
+
+    let neighborPacketKeys: string[] = [];
+    const prefiltered = await turbovecSearch(embedding, { topK: 20, timeoutMs: 500 });
+    if (prefiltered.candidates.length > 0) {
+      neighborPacketKeys = prefiltered.candidates.map((c) => c.id).filter(Boolean);
+    } else {
+      // TurboVec empty/unavailable — fall back to direct Qdrant ANN (source of truth, not a mirror).
+      const qdrant = getQdrantClient();
+      const hits = await qdrant.search('codebase_chunks_768', {
+        vector: embedding,
+        limit: 20,
+        with_payload: true,
+      }).catch(() => [] as any[]);
+      neighborPacketKeys = (hits as any[])
+        .map((h) => h.payload?.packet_key)
+        .filter((k): k is string => typeof k === 'string' && k.length > 0 && k !== packetKey);
+    }
+
+    if (neighborPacketKeys.length === 0) return [];
+
+    const result = await client
+      .query(
+        `SELECT domain_class, count(*) as cnt FROM atlas_packets WHERE packet_key = ANY($1) AND domain_class IS NOT NULL GROUP BY domain_class ORDER BY cnt DESC LIMIT 5`,
+        [neighborPacketKeys]
+      )
+      .catch(() => ({ rows: [] }));
+
+    if (result.rows.length === 0) return [];
+
+    const totalVotes = result.rows.reduce((sum: number, r: any) => sum + Number(r.cnt), 0);
+    return result.rows.map((r: any) => ({
+      kind: 'semantic' as const,
+      source: 'turbovec_qdrant_knn',
+      value: {
+        domain: r.domain_class,
+        neighborVotes: Number(r.cnt),
+        totalNeighborsConsidered: neighborPacketKeys.length,
+      },
+      confidence: Math.min(1, Number(r.cnt) / totalVotes),
+      weight: 0.25, // real semantic signal — between lexical (0.15, cheap/noisy) and legacy (0.40, a direct pre-existing label)
+    }));
+  } catch {
+    return [];
+  }
+}
+
 async function collectLegacyEvidence(client: any, packetKey: string): Promise<DomainEvidence[]> {
   try {
     const result = await client.query(
@@ -279,6 +359,7 @@ export async function extractDomainEvidenceReport(
     allEvidence.push(...collectLexicalEvidence(sourceRef));
     allEvidence.push(...collectLinguisticEvidence(sourceRef));
     allEvidence.push(...await collectStructuralEvidence(client, packetKey));
+    allEvidence.push(...await collectSemanticEvidence(client, packetKey, sourceRef));
     allEvidence.push(...await collectLegacyEvidence(client, packetKey));
 
     // Aggregate
@@ -357,7 +438,13 @@ async function main() {
   }
 }
 
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+// `import.meta.url === \`file://${process.argv[1]}\`` never matches on Windows: process.argv[1]
+// is a raw backslash path (C:\...) while import.meta.url is a proper file:// URL (file:///C:/...),
+// so this CLI guard silently never fired on Windows — main() never ran despite `npx tsx
+// ace-domain-evidence-extractor.mts --packet-key=...` exiting 0 with no error. Found live while
+// testing collectSemanticEvidence() (2026-08-12). Fixed with pathToFileURL for a real comparison.
+const { pathToFileURL } = await import('node:url');
+const isMainModule = import.meta.url === pathToFileURL(process.argv[1] ?? '').href;
 if (isMainModule) {
   main().catch(console.error);
 }

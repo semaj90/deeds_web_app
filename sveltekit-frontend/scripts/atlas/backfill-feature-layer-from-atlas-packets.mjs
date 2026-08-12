@@ -222,16 +222,14 @@ async function upsertFeatureEdge(client, row) {
       role,
       line_start,
       line_end,
-      stable_key,
       packet_key,
       source_ref,
       content_hash,
       created_at
     )
-    VALUES ($1, $2, $3, $4, NULL, NULL, $5, $6, $7, $8, NOW())
+    VALUES ($1, $2, $3, $4, NULL, NULL, $5, $6, $7, NOW())
     ON CONFLICT (feature_key, file_path, entry_export) DO UPDATE SET
       role = EXCLUDED.role,
-      stable_key = EXCLUDED.stable_key,
       packet_key = EXCLUDED.packet_key,
       source_ref = EXCLUDED.source_ref,
       content_hash = EXCLUDED.content_hash
@@ -241,7 +239,6 @@ async function upsertFeatureEdge(client, row) {
       row.filePath,
       row.symbolName,
       row.role,
-      `${row.featureKey}:${row.filePath}:${row.symbolName ?? ''}`,
       row.packetKey,
       row.sourceRef,
       row.contentHash,

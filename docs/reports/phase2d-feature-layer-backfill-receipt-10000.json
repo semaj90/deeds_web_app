@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-08-12T01:01:24.278Z",
+  "receiptKind": "PHASE2D_FEATURE_LAYER_BACKFILL_PROOF",
+  "status": "PROVEN",
+  "command": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --apply --limit=10000",
+  "dryRunCommand": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --dry-run --limit=10000",
+  "summary": {
+    "rowsSelected": 10000,
+    "joinMethods": {
+      "exact": 9999,
+      "inferred": 0,
+      "unresolved": 1
+    },
+    "featureKeyRows": 10000,
+    "sourceRefRows": 9999,
+    "lexicalCandidates": 9999,
+    "domainCandidates": 9999,
+    "structuralCandidates": 9999,
+    "ontologyCandidates": 9999
+  },
+  "explicitExclusion": {
+    "packetKey": "ace:packet:e3b0c44298fc",
+    "packetId": "packet_0_1784513267148",
+    "sourceRef": "",
+    "classification": "MALFORMED_LEGACY_PATH",
+    "reason": "Empty source_ref on a legacy ace packet row"
+  },
+  "schemaAuditAfterApply": {
+    "feature_implementations": 6558,
+    "feature_file_edges": 7690,
+    "feature_lexical_facts": 14999,
+    "feature_domain_facts": 71658,
+    "feature_structural_facts": 14999,
+    "feature_ontology_tuples": 30537,
+    "featureJoinReady": true
+  },
+  "proofNotes": [
+    "The bounded slice stayed exact for 9,999 rows and preserved one explicit malformed legacy exclusion.",
+    "The stable_key generated-column error remained fixed in the backfill path.",
+    "This is broader bounded proof, not a full-corpus claim."
+  ]
+}

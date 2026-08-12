@@ -1,0 +1,838 @@
+{
+  "receiptKind": "GRAPH_DISPATCHER_AND_LOUVAIN_PROVEN",
+  "status": "PROVEN",
+  "reportPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\graph-dispatcher-proof.json",
+  "generatedAt": "1970-01-01T00:00:00.000Z",
+  "registry": {
+    "generatedAt": "1970-01-01T00:00:00.000Z",
+    "algorithms": [
+      "pagerank",
+      "cheirank",
+      "personalized_pagerank",
+      "louvain",
+      "leiden",
+      "kcore",
+      "betweenness"
+    ],
+    "entries": [
+      {
+        "algorithm": "pagerank",
+        "dispatchKind": "pagerank-adapter",
+        "algorithmRevision": "neo4j-gds-pagerank-mutate-v1",
+        "proofState": "wired",
+        "skipReason": null
+      },
+      {
+        "algorithm": "cheirank",
+        "dispatchKind": "cheirank-adapter",
+        "algorithmRevision": "todo-cheirank-v1",
+        "proofState": "wired",
+        "skipReason": null
+      },
+      {
+        "algorithm": "personalized_pagerank",
+        "dispatchKind": "fail-closed",
+        "algorithmRevision": "unsupported-personalized-pagerank-v1",
+        "proofState": "skipped",
+        "skipReason": "No live dispatcher is wired for personalized_pagerank; fail closed until a concrete adapter exists."
+      },
+      {
+        "algorithm": "louvain",
+        "dispatchKind": "shared-community-runner",
+        "algorithmRevision": "neo4j-gds-louvain-mutate-v1",
+        "proofState": "wired",
+        "skipReason": null
+      },
+      {
+        "algorithm": "leiden",
+        "dispatchKind": "shared-community-runner",
+        "algorithmRevision": "neo4j-gds-leiden-mutate-v1",
+        "proofState": "wired",
+        "skipReason": null
+      },
+      {
+        "algorithm": "kcore",
+        "dispatchKind": "kcore-adapter",
+        "algorithmRevision": "todo-kcore-v1",
+        "proofState": "wired",
+        "skipReason": null
+      },
+      {
+        "algorithm": "betweenness",
+        "dispatchKind": "betweenness-adapter",
+        "algorithmRevision": "todo-betweenness-v1",
+        "proofState": "wired",
+        "skipReason": null
+      }
+    ],
+    "completeness": {
+      "exactMatch": true,
+      "missing": [],
+      "extra": [],
+      "duplicateAlgorithms": []
+    },
+    "receiptId": "graph-dispatcher-981f1a64a194b4bb"
+  },
+  "louvainReceipt": {
+    "receiptId": "louvain-persistence-50824032507b175a",
+    "algorithm": "louvain",
+    "runId": "6adc7f51-68bc-4060-95a9-8bef024aa6f6",
+    "projectionName": "codeTopology",
+    "graphRevision": "fd522e94dbb6b1e13ca3f52f2886afcb4d811be6d82ee7375eaa441452f8d019",
+    "communityCount": 36401,
+    "assignmentCount": 55448,
+    "memberCount": 55448,
+    "duplicateAssignments": 0,
+    "membershipReconciled": true,
+    "latestRunAssignments": 55448,
+    "latestRunUnresolvedPacketKeys": 71,
+    "latestRunExcludedPacketKeys": 9759,
+    "atlasPacketsMutated": false,
+    "replaySafe": false,
+    "createdAt": "1970-01-01T00:00:00.000Z"
+  },
+  "louvainResolutionReceipt": {
+    "receiptId": "louvain-resolution-174cce2170acccdc",
+    "runId": "6adc7f51-68bc-4060-95a9-8bef024aa6f6",
+    "sourceRunId": "6adc7f51-68bc-4060-95a9-8bef024aa6f6",
+    "sourceReceiptId": "louvain-persistence-50824032507b175a",
+    "projectionName": "codeTopology",
+    "graphRevision": "fd522e94dbb6b1e13ca3f52f2886afcb4d811be6d82ee7375eaa441452f8d019",
+    "inputUnresolvedCount": 71,
+    "inputUnresolvedSetHash": "a647f4a10157c2bddfae6f7661a9efa16c0646f8a6178987903848afbd8b6d8e",
+    "totalRows": 71,
+    "resolvedRows": 0,
+    "approvedExcludedRows": 71,
+    "blockingRows": 0,
+    "ambiguousRows": 0,
+    "unresolvedRows": 0,
+    "excludedRows": 71,
+    "provenanceInsufficientRows": 0,
+    "unclassifiedRows": 0,
+    "bucketCounts": {
+      "RESOLVED_EXISTING_RULE": 0,
+      "AMBIGUOUS_MATCH": 0,
+      "NO_PACKET_ROW": 54,
+      "DIFFERENT_GRAIN": 12,
+      "STALE_PROJECTION": 0,
+      "PROVENANCE_INSUFFICIENT": 0,
+      "MALFORMED_LEGACY_PATH": 0,
+      "EXCLUDED_PATH": 5
+    },
+    "rows": [
+      {
+        "graphNodeKey": ".claude/hooks/posttooluse-audit.mjs",
+        "rawPath": ".claude/hooks/posttooluse-audit.mjs",
+        "normalizedPath": ".claude/hooks/posttooluse-audit.mjs",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "EXCLUDED_PATH",
+        "reason": "tooling-hook"
+      },
+      {
+        "graphNodeKey": ".claude/hooks/pretooluse-deny.mjs",
+        "rawPath": ".claude/hooks/pretooluse-deny.mjs",
+        "normalizedPath": ".claude/hooks/pretooluse-deny.mjs",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "EXCLUDED_PATH",
+        "reason": "tooling-hook"
+      },
+      {
+        "graphNodeKey": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js",
+        "rawPath": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js",
+        "normalizedPath": "docker/langgraph-synthesis/.venv/Lib/site-packages/torch/utils/model_dump/code.js",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "EXCLUDED_PATH",
+        "reason": "vendored-env"
+      },
+      {
+        "graphNodeKey": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "rawPath": "src/lib/components/admin/AdminMonitoringDashboard.svelte",
+        "normalizedPath": "lib/components/admin/AdminMonitoringDashboard.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/admin/CommandSuggestPanel.svelte",
+        "rawPath": "src/lib/components/admin/CommandSuggestPanel.svelte",
+        "normalizedPath": "lib/components/admin/CommandSuggestPanel.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/admin/RoutingExplanationPanel.svelte",
+        "rawPath": "src/lib/components/admin/RoutingExplanationPanel.svelte",
+        "normalizedPath": "lib/components/admin/RoutingExplanationPanel.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/admin/SourceProvenancePanel.svelte",
+        "rawPath": "src/lib/components/admin/SourceProvenancePanel.svelte",
+        "normalizedPath": "lib/components/admin/SourceProvenancePanel.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/ai/BifrostProgressCanvas.svelte",
+        "rawPath": "src/lib/components/ai/BifrostProgressCanvas.svelte",
+        "normalizedPath": "lib/components/ai/BifrostProgressCanvas.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasGraphCanvas.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasGraphCanvas.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasGraphCanvas.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasHealthBar.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasHealthBar.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasHealthBar.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasNodeInspector.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasNodeInspector.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasNodeInspector.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasQueryPanel.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasQueryPanel.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasQueryPanel.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasShaderBackdrop.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasShaderBackdrop.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasShaderBackdrop.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasSourceRefs.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasSourceRefs.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasSourceRefs.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/AtlasTraceTimeline.svelte",
+        "rawPath": "src/lib/components/atlas/AtlasTraceTimeline.svelte",
+        "normalizedPath": "lib/components/atlas/AtlasTraceTimeline.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/NesAtlasCard.svelte",
+        "rawPath": "src/lib/components/atlas/NesAtlasCard.svelte",
+        "normalizedPath": "lib/components/atlas/NesAtlasCard.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/atlas/NesAtlasModal.svelte",
+        "rawPath": "src/lib/components/atlas/NesAtlasModal.svelte",
+        "normalizedPath": "lib/components/atlas/NesAtlasModal.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/canvas/FabricEvidenceCanvas.svelte.corrupted-archived",
+        "rawPath": "src/lib/components/canvas/FabricEvidenceCanvas.svelte.corrupted-archived",
+        "normalizedPath": "lib/components/canvas/FabricEvidenceCanvas.svelte.corrupted-archived",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "src/lib/components/detective/ContextualDetectiveBoard.svelte-patch",
+        "rawPath": "src/lib/components/detective/ContextualDetectiveBoard.svelte-patch",
+        "normalizedPath": "lib/components/detective/ContextualDetectiveBoard.svelte-patch",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "src/lib/components/evidence/EvidenceMediaViewer.svelte",
+        "rawPath": "src/lib/components/evidence/EvidenceMediaViewer.svelte",
+        "normalizedPath": "lib/components/evidence/EvidenceMediaViewer.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/glyphs/GlyphIcon.svelte",
+        "rawPath": "src/lib/components/glyphs/GlyphIcon.svelte",
+        "normalizedPath": "lib/components/glyphs/GlyphIcon.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/intent/IntentBadge.svelte",
+        "rawPath": "src/lib/components/intent/IntentBadge.svelte",
+        "normalizedPath": "lib/components/intent/IntentBadge.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/webgpu/SwarmManifoldVisualizer.svelte",
+        "rawPath": "src/lib/components/webgpu/SwarmManifoldVisualizer.svelte",
+        "normalizedPath": "lib/components/webgpu/SwarmManifoldVisualizer.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
+        "rawPath": "src/lib/components/yorha/dashboard/RecentActivity.svelte",
+        "normalizedPath": "lib/components/yorha/dashboard/RecentActivity.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/icons/yorha/Gemini_Generated_Image_jvo9jpjvo9jpjvo9.png",
+        "rawPath": "src/lib/icons/yorha/Gemini_Generated_Image_jvo9jpjvo9jpjvo9.png",
+        "normalizedPath": "lib/icons/yorha/Gemini_Generated_Image_jvo9jpjvo9jpjvo9.png",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/CacheService.ts",
+        "rawPath": "src/lib/server/services/error-analysis/CacheService.ts",
+        "normalizedPath": "lib/server/services/error-analysis/CacheService.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/DecisionEngine.ts",
+        "rawPath": "src/lib/server/services/error-analysis/DecisionEngine.ts",
+        "normalizedPath": "lib/server/services/error-analysis/DecisionEngine.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/ErrorClustering.ts",
+        "rawPath": "src/lib/server/services/error-analysis/ErrorClustering.ts",
+        "normalizedPath": "lib/server/services/error-analysis/ErrorClustering.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/EscalationService.ts",
+        "rawPath": "src/lib/server/services/error-analysis/EscalationService.ts",
+        "normalizedPath": "lib/server/services/error-analysis/EscalationService.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/ExperienceRecorder.ts",
+        "rawPath": "src/lib/server/services/error-analysis/ExperienceRecorder.ts",
+        "normalizedPath": "lib/server/services/error-analysis/ExperienceRecorder.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/FixSynthesizer.ts",
+        "rawPath": "src/lib/server/services/error-analysis/FixSynthesizer.ts",
+        "normalizedPath": "lib/server/services/error-analysis/FixSynthesizer.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/GRPOPolicy.ts",
+        "rawPath": "src/lib/server/services/error-analysis/GRPOPolicy.ts",
+        "normalizedPath": "lib/server/services/error-analysis/GRPOPolicy.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/JSONLStorage.ts",
+        "rawPath": "src/lib/server/services/error-analysis/JSONLStorage.ts",
+        "normalizedPath": "lib/server/services/error-analysis/JSONLStorage.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/KAGTraverser.ts",
+        "rawPath": "src/lib/server/services/error-analysis/KAGTraverser.ts",
+        "normalizedPath": "lib/server/services/error-analysis/KAGTraverser.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/LearningPipeline.ts",
+        "rawPath": "src/lib/server/services/error-analysis/LearningPipeline.ts",
+        "normalizedPath": "lib/server/services/error-analysis/LearningPipeline.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/MetricsCollector.ts",
+        "rawPath": "src/lib/server/services/error-analysis/MetricsCollector.ts",
+        "normalizedPath": "lib/server/services/error-analysis/MetricsCollector.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/OllamaService.ts",
+        "rawPath": "src/lib/server/services/error-analysis/OllamaService.ts",
+        "normalizedPath": "lib/server/services/error-analysis/OllamaService.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/PatternStorage.ts",
+        "rawPath": "src/lib/server/services/error-analysis/PatternStorage.ts",
+        "normalizedPath": "lib/server/services/error-analysis/PatternStorage.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/RAGRetriever.ts",
+        "rawPath": "src/lib/server/services/error-analysis/RAGRetriever.ts",
+        "normalizedPath": "lib/server/services/error-analysis/RAGRetriever.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/error-analysis/ToolInvoker.ts",
+        "rawPath": "src/lib/server/services/error-analysis/ToolInvoker.ts",
+        "normalizedPath": "lib/server/services/error-analysis/ToolInvoker.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/ACPToolRegistry.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/ACPToolRegistry.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/KnowledgeIndexer.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/KnowledgeIndexer.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/KnowledgeIndexer.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/KnowledgeSearcher.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/KnowledgeSearcher.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/KnowledgeSearcher.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/MinioKnowledgeStore.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/MinioKnowledgeStore.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/MinioKnowledgeStore.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/PostgresKnowledgeStore.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/QdrantKnowledgeStore.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/RedisCacheService.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/RedisCacheService.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/RedisCacheService.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/SeaweedKnowledgeStore.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/SeaweedKnowledgeStore.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/SeaweedKnowledgeStore.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/TagExtractor.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/TagExtractor.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/TagExtractor.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/services/knowledge-search/TfIdfRanker.ts",
+        "rawPath": "src/lib/server/services/knowledge-search/TfIdfRanker.ts",
+        "normalizedPath": "lib/server/services/knowledge-search/TfIdfRanker.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/tools/handlers/ldrResearch.ts",
+        "rawPath": "src/lib/server/tools/handlers/ldrResearch.ts",
+        "normalizedPath": "lib/server/tools/handlers/ldrResearch.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/lib/server/utils/validateRequest.ts",
+        "rawPath": "src/lib/server/utils/validateRequest.ts",
+        "normalizedPath": "lib/server/utils/validateRequest.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+        "rawPath": "src/routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+        "normalizedPath": "routes/(analysis)@/audio-analysis/[evidenceId]/+page.server.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
+        "rawPath": "src/routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
+        "normalizedPath": "routes/(analysis)@/video-analysis/[evidenceId]/+page.server.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/api/routes/[routeId]/errors/+server.ts.new",
+        "rawPath": "src/routes/api/routes/[routeId]/errors/+server.ts.new",
+        "normalizedPath": "routes/api/routes/[routeId]/errors/+server.ts.new",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/api/routes/[routeId]/health-event/+server.ts.new",
+        "rawPath": "src/routes/api/routes/[routeId]/health-event/+server.ts.new",
+        "normalizedPath": "routes/api/routes/[routeId]/health-event/+server.ts.new",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/(app)/demos/yorha/components/dashboard/RecentActivity.svelte",
+        "rawPath": "src/routes/(app)/demos/yorha/components/dashboard/RecentActivity.svelte",
+        "normalizedPath": "routes/(app)/demos/yorha/components/dashboard/RecentActivity.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/dev/file-card/[...sourceRef]/+page.server.ts",
+        "rawPath": "src/routes/dev/file-card/[...sourceRef]/+page.server.ts",
+        "normalizedPath": "routes/dev/file-card/[...sourceRef]/+page.server.ts",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "src/routes/dev/file-card/[...sourceRef]/+page.svelte",
+        "rawPath": "src/routes/dev/file-card/[...sourceRef]/+page.svelte",
+        "normalizedPath": "routes/dev/file-card/[...sourceRef]/+page.svelte",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "NO_PACKET_ROW",
+        "reason": "no atlas_packets row"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/environment",
+        "rawPath": "SVELTEKIT:$app/environment",
+        "normalizedPath": "SVELTEKIT:$app/environment",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/forms",
+        "rawPath": "SVELTEKIT:$app/forms",
+        "normalizedPath": "SVELTEKIT:$app/forms",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/navigation",
+        "rawPath": "SVELTEKIT:$app/navigation",
+        "normalizedPath": "SVELTEKIT:$app/navigation",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/paths",
+        "rawPath": "SVELTEKIT:$app/paths",
+        "normalizedPath": "SVELTEKIT:$app/paths",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/server",
+        "rawPath": "SVELTEKIT:$app/server",
+        "normalizedPath": "SVELTEKIT:$app/server",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/state",
+        "rawPath": "SVELTEKIT:$app/state",
+        "normalizedPath": "SVELTEKIT:$app/state",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$app/stores",
+        "rawPath": "SVELTEKIT:$app/stores",
+        "normalizedPath": "SVELTEKIT:$app/stores",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$env/dynamic/private",
+        "rawPath": "SVELTEKIT:$env/dynamic/private",
+        "normalizedPath": "SVELTEKIT:$env/dynamic/private",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$env/dynamic/public",
+        "rawPath": "SVELTEKIT:$env/dynamic/public",
+        "normalizedPath": "SVELTEKIT:$env/dynamic/public",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "SVELTEKIT:$env/static/public",
+        "rawPath": "SVELTEKIT:$env/static/public",
+        "normalizedPath": "SVELTEKIT:$env/static/public",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "DIFFERENT_GRAIN",
+        "reason": "graph node is not packet-grain"
+      },
+      {
+        "graphNodeKey": "sveltekit-frontend/docs/P0-SCHEMA-VALIDATION-CHECKPOINT.md",
+        "rawPath": "sveltekit-frontend/docs/P0-SCHEMA-VALIDATION-CHECKPOINT.md",
+        "normalizedPath": "docs/P0-SCHEMA-VALIDATION-CHECKPOINT.md",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "EXCLUDED_PATH",
+        "reason": "session-artifact"
+      },
+      {
+        "graphNodeKey": "sveltekit-frontend/docs/SESSION-64-ARTIFACTS.md",
+        "rawPath": "sveltekit-frontend/docs/SESSION-64-ARTIFACTS.md",
+        "normalizedPath": "docs/SESSION-64-ARTIFACTS.md",
+        "matchCount": 0,
+        "packetKeys": [],
+        "sourceRefs": [],
+        "classification": "EXCLUDED_PATH",
+        "reason": "session-artifact"
+      }
+    ],
+    "createdAt": "1970-01-01T00:00:00.000Z",
+    "replaySafe": true
+  },
+  "openGaps": []
+}

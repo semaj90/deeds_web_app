@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-11T23:52:01.812Z",
+  "receiptKind": "PHASE2D_FEATURE_LAYER_BACKFILL_PROOF",
+  "status": "PROVEN",
+  "command": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --apply --limit=50",
+  "dryRunCommand": "node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --dry-run --limit=50",
+  "summary": {
+    "rowsSelected": 50,
+    "joinMethods": {
+      "exact": 50,
+      "inferred": 0,
+      "unresolved": 0
+    },
+    "featureKeyRows": 50,
+    "sourceRefRows": 50,
+    "lexicalCandidates": 50,
+    "domainCandidates": 50,
+    "structuralCandidates": 50,
+    "ontologyCandidates": 50
+  },
+  "schemaAuditAfterApply": {
+    "feature_implementations": 19,
+    "feature_file_edges": 84,
+    "feature_lexical_facts": 5050,
+    "feature_domain_facts": 61709,
+    "feature_structural_facts": 5050,
+    "feature_ontology_tuples": 150,
+    "featureJoinReady": true
+  },
+  "proofNotes": [
+    "The stable_key generated-column error was fixed by treating it as derived, not user-supplied.",
+    "The bounded apply hit exact joins only and wrote the feature-layer projections successfully.",
+    "Corpus expansion remains open; this is a bounded proof, not a full-corpus claim."
+  ]
+}

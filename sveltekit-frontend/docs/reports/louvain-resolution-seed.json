@@ -1,0 +1,15 @@
+{
+  "receiptKind": "LOUVAIN_UNRESOLVED_KEY_SEEDING",
+  "status": "COMPLETE",
+  "runId": "6adc7f51-68bc-4060-95a9-8bef024aa6f6",
+  "projectionName": "codeTopology",
+  "graphRevision": "fd522e94dbb6b1e13ca3f52f2886afcb4d811be6d82ee7375eaa441452f8d019",
+  "inputUnresolvedCount": 71,
+  "inputUnresolvedSetHash": "a647f4a10157c2bddfae6f7661a9efa16c0646f8a6178987903848afbd8b6d8e",
+  "resolvedRows": 55511,
+  "approvedExcludedRows": 9759,
+  "blockingRows": 71,
+  "insertedRows": 71,
+  "reportPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\louvain-resolution-seed.json",
+  "generatedAt": "2026-08-11T21:44:47.708Z"
+}

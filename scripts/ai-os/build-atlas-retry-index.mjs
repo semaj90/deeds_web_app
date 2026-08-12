@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 export function buildAtlasRetryIndex() {
     const logPath = path.resolve('docs/ai-os/agentic-progress-log.ndjson');
@@ -21,6 +22,6 @@ export function buildAtlasRetryIndex() {
     console.log(`Rebuilt retry index with ${retryPlans.length} items`);
 }
 
-if (process.argv[1] === import.meta.url.replace('file://', '')) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
     buildAtlasRetryIndex();
 }

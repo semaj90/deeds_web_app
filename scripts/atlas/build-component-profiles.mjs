@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(process.cwd());
 const SCAN_PATHS = ['src', 'scripts', 'services', 'simd-bridge', 'go-microservice'];
@@ -174,6 +175,6 @@ async function main(){
   console.log('Wrote:', OUT_JSONL, OUT_MD);
 }
 
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1].endsWith('build-component-profiles.mjs')){
+if (process.argv[1] === fileURLToPath(import.meta.url) || process.argv[1].endsWith('build-component-profiles.mjs')){
   main().catch(err=>{ console.error(err); process.exit(2); });
 }

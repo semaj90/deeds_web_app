@@ -1,10 +1,10 @@
 {
-  "receipt_id": "receipt:identity_alias_replay:1786471894409",
+  "receipt_id": "receipt:identity_alias_replay:1786487313946",
   "receipt_kind": "PACKET_IDENTITY_ALIAS_REPLAY_PROVEN",
   "producer_id": "smoke-identity-alias-replay.mjs",
   "producer_revision": "2026-08-11.v1",
-  "started_at": "2026-08-11T18:11:34.189Z",
-  "completed_at": "2026-08-11T18:11:34.409Z",
+  "started_at": "2026-08-11T22:28:33.761Z",
+  "completed_at": "2026-08-11T22:28:33.946Z",
   "input_hash": "bae730af8ec7bbf61882694cd2ea06252ee248990593bd0ea518f33aab5edca2",
   "output_hash": "ba6e9e20128d0efae1e2f055216b8086ce5f8f6dad4f8531c7c9bc6d30521939",
   "workspace_revision": null,

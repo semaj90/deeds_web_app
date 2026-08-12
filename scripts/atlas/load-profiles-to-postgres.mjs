@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import readline from 'node:readline';
 import { Pool } from 'pg';
+import { fileURLToPath } from 'node:url';
 
 function resolveSourceRef(obj) {
   return obj.sourceRef || obj.source_ref || obj.id || obj.source || (obj.payload && (obj.payload.sourceRef || obj.payload.source_ref));
@@ -98,6 +99,6 @@ async function upsertBatch(client, rows) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1].endsWith('load-profiles-to-postgres.mjs')) {
+if (process.argv[1] === fileURLToPath(import.meta.url) || process.argv[1].endsWith('load-profiles-to-postgres.mjs')) {
   main();
 }

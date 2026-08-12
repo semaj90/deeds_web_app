@@ -1,0 +1,19 @@
+{
+  "receiptKind": "PHASE2A_AST_GREP_CANONICAL_JOIN_PROVEN",
+  "status": "PROVEN",
+  "command": "node sveltekit-frontend/scripts/atlas/phase2a-ast-grep-synthetic-key-fix.mjs --apply --limit=100",
+  "sampleSize": 100,
+  "eligiblePackets": 12639,
+  "withNonEmptyAstSymbols": 6428,
+  "coveragePct": 50.86,
+  "thresholdPackets": 10112,
+  "extractedPackets": 3,
+  "skippedPackets": 97,
+  "failedPackets": 0,
+  "rowsWritten": 3,
+  "notes": [
+    "Canonical packet_key join is wired on the write path.",
+    "Synthetic packet keys are not persisted by this lane.",
+    "Remaining work is coverage expansion, not identity repair."
+  ]
+}

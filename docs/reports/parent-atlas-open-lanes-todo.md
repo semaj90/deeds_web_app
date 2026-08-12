@@ -36,6 +36,7 @@ This ladder aligns the remaining feature work without turning it on in productio
 10. Run oracle parity in order: NetworkX → Neo4j GDS → cuGraph → cuVS.
 11. Defer cuGraph / cuVS promotion until parity and value are proven.
 12. Close the repair loop only after repeated real failures validate the spine.
+13. Keep OpenCode / ACP / A2A dispatch typed and bounded; bash or Python workers own execution, not the agent.
 
 **Relevant files**
 
@@ -80,6 +81,16 @@ Remaining open taxonomy work:
 - canonical community taxonomy records
 - taxonomy-aware traversal with bounded fanout
 - replay corpus before any learned promotion
+
+## Lower-lane proof gaps
+
+- [ ] AST / chunk identity proof: stable `source_ref` / `source_revision` / `tree_node_id` / `title_id` joins still need a live writer receipt.
+- [ ] JSONL parsed-evidence lane: batch parse receipts and parser provenance still need a live proof.
+- [x] POS tagger / domain classification logic: local Tree-sitter extraction + classifier logic is live/proven, but the durable write / feedback plane is still degraded and the evidence-backed receipt lane is not yet end-to-end proven.
+- [x] Code evidence synthesizer: LangExtract / semantic record assembly now has a first-class receipt builder in `analysis/code-evidence-synthesizer.ts`, but the durable write / feedback plane still needs a healthy Postgres / outbox path before the receipt can be called complete.
+- [ ] Feature matrix convergence: `feature_matrix_5` / `candidate_feature_matrix` / `semantic_768` are contract-wired, but still need a live end-to-end proof.
+- [ ] ANN candidate generation vs rerank separation: keep search and rerank as separate owners until the receipts close.
+- [ ] GPU sidecar adapter proof: cuVS / cuGraph parity and batch synthesis remain sidecar lanes, not canonical owners.
 
 ---
 

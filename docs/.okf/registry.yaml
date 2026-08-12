@@ -54,6 +54,29 @@ contracts:
   - name: mastra-workflows-okf
     owner: sveltekit-frontend/src/lib/server/okf/mastra-workflows.okf.yaml
     role: workflow contract and orchestration metadata
+  - name: rtx-louvain-parity-note
+    owner: docs/.okf/dev/rtx-louvain-parity.md
+    role: docs note for frozen cuGraph/NetworkX Louvain parity proof
+    notes:
+      - graph_snapshot_parity
+      - edgeProjectionDiagnostics
+      - louvainCommunityAgreement
+  - name: openwiki-crawl-index-workflow
+    owner: docs/okf/parent-atlas/workflows/openwiki-crawl-index.md
+    role: parent-atlas workflow note for crawl, classify, and index
+    notes:
+      - BeautifulSoup
+      - Firecrawl
+      - domain_class
+      - focus_tags
+  - name: openwiki-dev-corpus-spec
+    owner: docs/.okf/dev/openwiki-dev-corpus-spec.md
+    role: executable OKF dev corpus build contract
+    notes:
+      - corpus.jsonl
+      - index.md
+      - summary.json
+      - canonical_api_recommendations
 notes:
   - The repository currently stores live contracts in multiple places.
   - This registry is the directory entry point, not a migration target.

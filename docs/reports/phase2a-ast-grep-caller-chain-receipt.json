@@ -1,0 +1,25 @@
+{
+  "receiptKind": "PHASE2A_AST_GREP_CALLER_CHAIN_PROVEN",
+  "status": "PROVEN",
+  "workerChain": [
+    "sveltekit-frontend/src/lib/server/analysis/worker.ts",
+    "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
+    "sveltekit-frontend/src/lib/server/analysis/worker.ts -> code_features writer"
+  ],
+  "structuralFactsPath": {
+    "writer": "sveltekit-frontend/scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs",
+    "table": "feature_structural_facts",
+    "joinKey": "packet_key",
+    "source": "atlas_packets"
+  },
+  "evidence": {
+    "workerWrites": "INSERT INTO code_features (feature_id, source_ref, symbol, kind, language, line_start, line_end, packet_key, domain_class, static_tags, summary, created_at, updated_at)",
+    "workerPacketKey": "packet_key is written from the live packet join and is intentionally not synthesized in the worker",
+    "structuralFactsWriter": "INSERT INTO feature_structural_facts (packet_key, source_ref, feature_key, tree_node_id, symbol_name, symbol_kind, structural_path, line_start, line_end, imports, calls, exports, content_hash, parser_version, processing_pass_id, metadata, created_at)"
+  },
+  "notes": [
+    "The original TODO wording mixed the worker path with the structural-facts backfill path.",
+    "The live worker path is packet-key joined and writes code_features.",
+    "feature_structural_facts is persisted by the atlas_packets backfill path with packet_key preserved as the join key."
+  ]
+}

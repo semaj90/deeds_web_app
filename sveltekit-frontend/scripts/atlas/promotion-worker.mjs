@@ -206,7 +206,7 @@ function sleep(ms) {
 }
 
 // Run if invoked directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   promotionWorker().catch(err => {
     console.error('Promotion worker crashed:', err);
     process.exit(1);

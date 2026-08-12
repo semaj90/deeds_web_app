@@ -42,6 +42,8 @@ import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
+import { classifySourceKind } from '$lib/server/classifier/source-kind-classifier.js';
+import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 
 import { insertEvidenceSchema } from '$lib/server/db/zod-schemas.js';
 
@@ -1039,6 +1041,43 @@ async function processAndEmbed(
   console.log(
     `[Upload] Extracted ${fullText.length} chars via ${extractionMethod} from ${fileName}`
   );
+
+  const sourceKind = classifySourceKind(fileName, fullText);
+  if (sourceKind === 'code') {
+    try {
+      const codeFeatureJobId = await createAnalysisJob({
+        evidenceId,
+        caseId,
+        jobType: 'code_feature_registry',
+        result: {
+          sourceRef: fileName,
+          sourceRevision: `sha256:${fileHash}`,
+          packetKey: computePacketKey(fileName, null, null),
+          text: fullText,
+          featureId: evidenceId,
+          featureLabel: fileName,
+          workspaceRevision: caseId ?? null,
+          jsonlSourceDigest: `sha256:${fileHash}`,
+          jsonlRecordIndex: 0,
+          jsonlLineNumber: 0,
+          jsonlParserRevision: 'upload-route-v1',
+          representationRevision: 'semantic_768@1',
+          producerId: 'evidence-upload-route',
+          producerRevision: 'upload-route-v1',
+          featureRevision: 'upload-route-v1',
+          sourceTables: ['analysis_jobs', 'evidence', 'code_features', 'analysis_pass_results'],
+        },
+      });
+      await updateAnalysisJob(codeFeatureJobId, { progress: '25' });
+      markStage(diagnostics, 'code_feature_registry', 'pending', 'Queued code feature registry job', {
+        sourceKind,
+        jobId: codeFeatureJobId,
+      });
+    } catch (err) {
+      console.warn('[Upload] Code feature registry enqueue failed (non-fatal):', err);
+      markStage(diagnostics, 'code_feature_registry', 'warning', 'Code feature registry enqueue failed');
+    }
+  }
 
   // Persist extracted text + method to evidence row (was missing — caused textLength: 0)
   try {

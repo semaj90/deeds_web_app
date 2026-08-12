@@ -7,6 +7,7 @@
 import amqp from 'amqplib';
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 class RabbitMQIngestHelper {
     constructor() {
@@ -235,6 +236,6 @@ async function main() {
 export { RabbitMQIngestHelper };
 
 // Run CLI if called directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch(console.error);
 }

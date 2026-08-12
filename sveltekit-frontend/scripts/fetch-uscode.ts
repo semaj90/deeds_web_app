@@ -6,6 +6,7 @@
 import axios from 'axios';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const USC_URL = 'https://uscode.house.gov/download/uscxml.zip';
 const TEMP_DIR = '/tmp';
@@ -89,7 +90,7 @@ async function main(): Promise<void> {
 }
 
 // Run if executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }
 

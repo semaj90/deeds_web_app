@@ -20,6 +20,7 @@
 import crypto from 'crypto';
 import type { QueryResultRow } from 'pg';
 import {
+import { fileURLToPath } from 'node:url';
   extractPacketIdentityFromRow,
   validatePacketIdentityFromRow,
   verifyPacketIdentityConsistency,
@@ -650,7 +651,7 @@ export class PacketValidator {
 
 // ===== NPM Script Entry Point =====
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const main = async () => {
     console.log('PacketValidator class exported. Use via TypeScript import.');
   };

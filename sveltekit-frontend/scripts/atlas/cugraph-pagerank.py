@@ -6,8 +6,9 @@ Reads the import/edge graph from Postgres, computes PageRank on GPU via
 cuGraph (RAPIDS miniforge WSL2), then bulk-writes scores back to
 atlas_packets.page_rank_score.
 
-CUDA / RAPIDS required in the calling environment:
-  conda activate rapids && python cugraph-pagerank.py [--dry-run] [--verbose]
+CUDA / RAPIDS required in the calling environment. This project's RAPIDS env is
+`atlas-rapids-cu13` (WSL2 miniforge, ~/miniforge3/envs/atlas-rapids-cu13):
+  conda activate atlas-rapids-cu13 && python cugraph-pagerank.py [--dry-run] [--verbose]
 
 DB connection: reads DATABASE_URL from environment (or constructs from
 POSTGRES_HOST / POSTGRES_PORT / POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB).
@@ -70,7 +71,7 @@ try:
 except ImportError:
     import networkx as nx
     print(f'[pagerank] cuGraph not found — falling back to networkx CPU PageRank')
-    print(f'           To enable GPU: conda activate rapids')
+    print(f'           To enable GPU: conda activate atlas-rapids-cu13')
 
 # ---------------------------------------------------------------------------
 # Load graph edges from Postgres

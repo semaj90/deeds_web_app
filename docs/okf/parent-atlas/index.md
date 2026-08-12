@@ -55,6 +55,7 @@ or any agent runtime to become a competing source of truth.
 - [gaps/missing-cluster-run-lineage.md](gaps/missing-cluster-run-lineage.md)
 - [gaps/missing-som-run-lineage.md](gaps/missing-som-run-lineage.md)
 - [workflows/repository-audit.md](workflows/repository-audit.md)
+- [workflows/openwiki-crawl-index.md](workflows/openwiki-crawl-index.md)
 - [gaps/missing-library-review.md](gaps/missing-library-review.md)
 - [gaps/mock-stub-resolution.md](gaps/mock-stub-resolution.md)
 - [gaps/agentic-error-fixing.md](gaps/agentic-error-fixing.md)

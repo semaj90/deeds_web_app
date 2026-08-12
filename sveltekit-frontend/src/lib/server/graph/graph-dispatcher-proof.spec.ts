@@ -14,6 +14,9 @@ function createDbMock(resultMap: Record<string, unknown[]>): any {
 			if (text.includes('FROM graph_community_assignments')) {
 				return { rows: resultMap.assignments ?? [] };
 			}
+			if (text.includes('FROM graph_community_resolution_seeds')) {
+				return { rows: resultMap.resolutionSeeds ?? [] };
+			}
 			return { rows: [] };
 		}),
 	};
@@ -25,6 +28,9 @@ describe('graph dispatcher proof', () => {
 			run: [{ run_id: 'run-1', projection_name: 'codeTopology', graph_revision: 'graph-rev-1', metrics: { assignments: 3, unresolvedPacketKeys: 0 } }],
 			communities: [{ community_count: 2, member_count: 3 }],
 			assignments: [{ assignment_count: 3, distinct_packets: 3 }],
+			resolutionSeeds: [
+				{ graph_node_key: 'node-1', raw_path: 'src/lib/server/auth.ts', community_id: '42' }
+			],
 		});
 
 		const receipt = await buildLouvainPersistenceReceipt(db);
@@ -34,6 +40,7 @@ describe('graph dispatcher proof', () => {
 		expect(receipt?.atlasPacketsMutated).toBe(false);
 		expect(receipt?.assignmentCount).toBe(3);
 		expect(receipt?.communityCount).toBe(2);
+		expect(receipt?.latestRunExcludedPacketKeys).toBe(0);
 	});
 
 	it('returns an open gap when no Louvain receipt exists', async () => {
@@ -43,6 +50,7 @@ describe('graph dispatcher proof', () => {
 
 		expect(snapshot.registry.completeness.exactMatch).toBe(true);
 		expect(snapshot.louvainReceipt).toBeNull();
+		expect(snapshot.louvainResolutionReceipt).toBeNull();
 		expect(snapshot.openGaps).toContain('no succeeded Louvain run found');
 	});
 });

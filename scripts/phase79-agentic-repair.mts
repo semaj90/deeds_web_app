@@ -9,6 +9,7 @@ import { HumanMessage, SystemMessage, AIMessage, BaseMessage } from "@langchain/
 import { db } from '../src/lib/server/db/client'; // Adjust path if needed
 import { errorEvents, errorSuggestions, errorSuggestionStates } from '../src/lib/server/db/schema-postgres';
 import { eq, desc, and } from 'drizzle-orm';
+import { fileURLToPath } from 'node:url';
 
 const execAsync = promisify(exec);
 
@@ -228,6 +229,6 @@ async function main() {
     await agent.repairCluster(mockCluster.id, mockError);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
     main().catch(console.error);
 }

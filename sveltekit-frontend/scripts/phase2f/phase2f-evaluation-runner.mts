@@ -36,6 +36,7 @@
 import postgres from 'postgres';
 import { z } from 'zod';
 import {
+import { fileURLToPath } from 'node:url';
   FeatureEnvelopeSchema,
   DenseSignalSchema,
   LexicalSignalSchema,
@@ -604,7 +605,7 @@ async function runEvaluationPipeline() {
 // ENTRY POINT
 // ============================================================================
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   runEvaluationPipeline().catch((err) => {
     error('[FATAL]', err);
     process.exit(1);

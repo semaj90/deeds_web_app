@@ -97,6 +97,8 @@
 - focus_tags: canonical_api_recommendations, llm_output
 - page_count: 3
 - acquisition_lane: plain-fetch
+- related_notes:
+  - `docs/.okf/dev/rtx-louvain-parity.md`
 
 - https://docs.rapids.ai/api/cuvs/stable/
 - https://docs.rapids.ai/api/cuvs/stable/c_api/neighbors_cagra_c/
@@ -123,6 +125,8 @@ This inventory captures repository-local material that can seed future dev codin
 - `docs/ai-os/opencode-context-window.md`
 - `docs/ai-os/opencode-mcp-atlas.md`
 - `docs/ai-os/opencode-skill-routing.md`
+- `docs/.okf/dev/rtx-louvain-parity.md`
+- `docs/.okf/dev/openwiki-dev-corpus-spec.md`
 - `sveltekit-frontend/docs/agents_master_stack_checklist.md`
 - `sveltekit-frontend/docs/agents-md-howto.md`
 - `sveltekit-frontend/docs/bifrost-firecrawl-programming-reference.md`
@@ -212,4 +216,3 @@ This inventory captures repository-local material that can seed future dev codin
 - `agentic_error_fixing`
 - `canonical_api_recommendations`
 ```
-

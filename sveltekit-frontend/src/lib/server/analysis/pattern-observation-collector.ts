@@ -22,6 +22,7 @@ import {
 } from '$lib/server/db/schema-postgres.js';
 import { eq, isNotNull } from 'drizzle-orm';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -286,6 +287,6 @@ async function main() {
 }
 
 // Execute if run as main module
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main();
 }

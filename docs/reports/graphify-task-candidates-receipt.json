@@ -1,0 +1,23 @@
+{
+  "receiptKind": "DAILY_GRAPHIFY_TASK_CANDIDATES_PROVEN",
+  "status": "PROVEN",
+  "startedAt": "2026-08-11T23:03:47.625Z",
+  "completedAt": "2026-08-11T23:03:47.657Z",
+  "boardSource": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\atlas-kanban-tasks.json",
+  "recommendationSource": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\semantic-search-workflow.json",
+  "workflowState": "COMPLETE",
+  "totalTasks": 4,
+  "candidateCount": 4,
+  "uniqueTaskCount": 4,
+  "uniqueDedupKeyCount": 4,
+  "sourceRefCoverage": 0,
+  "candidateKinds": {
+    "graphify_evidence": 4,
+    "recommendation_review": 0
+  },
+  "importerStateSeparate": true,
+  "jsonlPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\atlas-graphify-task-candidates.jsonl",
+  "reportPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\graphify-task-candidates-receipt.json",
+  "inputHash": "be9559b32704597d8700f38260ff9b58a041b4bf8a2b40e0fa6b350439409a11",
+  "outputHash": "6d66f57c9d48ec14f152b2eadf92051c526b042431f5df6012eaac4047bd3816"
+}

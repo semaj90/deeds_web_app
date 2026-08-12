@@ -867,7 +867,7 @@ async function main() {
 }
 
 // Run CLI
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main().catch(error => {
     console.error('❌ Fatal error:', error);
     process.exit(1);

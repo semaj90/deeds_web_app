@@ -616,7 +616,8 @@
       "mcp__atlas-tools__codebase_export_bundle",
       "mcp__atlas-tools__memory_prior_answer_lookup",
       "mcp__trace__ace_compact_search",
-      "mcp__trace__karpathy_attention_rank_files"
+      "mcp__trace__karpathy_attention_rank_files",
+      "Bash(git status *)"
     ],
     "deny": [],
     "ask": []

@@ -19,6 +19,7 @@ import {
 } from './analysis-jobs.js';
 import { recordAnalysisPassResult } from './analysis-pass-results.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, getGateStats } from './concurrency-gate.js';
+import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import { Client, Pool } from 'pg';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
@@ -44,9 +45,33 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 	const { extractAstFeatures } = await import('./ast-grep-extractor.js').catch(() => ({
 		extractAstFeatures: async () => []
 	}));
+	const { buildCodeEvidenceSynthesizerReceiptFromSource } = await import('./code-evidence-synthesizer.js').catch(() => ({
+		buildCodeEvidenceSynthesizerReceiptFromSource: async () => null
+	}));
 
 	const text = (meta.text as string) ?? '';
 	const sourceRef = (meta.sourceRef as string) ?? `evidence:${evidenceId}`;
+	const sourceRevision = (meta.sourceRevision as string) ?? null;
+	const treeNodeId = (meta.treeNodeId as string | null | undefined) ?? null;
+	const titleId = (meta.titleId as string | null | undefined) ?? null;
+	const packetKey =
+		(meta.packetKey as string | null | undefined) ??
+		computePacketKey(sourceRef, null, null);
+	const featureId = (meta.featureId as string | null | undefined) ?? packetKey ?? sourceRef;
+	const featureLabel = (meta.featureLabel as string | null | undefined) ?? sourceRef;
+	const workspaceRevision = (meta.workspaceRevision as string | null | undefined) ?? null;
+	const jsonlSourceDigest = (meta.jsonlSourceDigest as string | null | undefined) ?? null;
+	const jsonlRecordIndex = typeof meta.jsonlRecordIndex === 'number' ? meta.jsonlRecordIndex : null;
+	const jsonlLineNumber = typeof meta.jsonlLineNumber === 'number' ? meta.jsonlLineNumber : null;
+	const jsonlParserRevision = (meta.jsonlParserRevision as string | null | undefined) ?? null;
+	const representationRevision = (meta.representationRevision as string | null | undefined) ?? 'semantic_768@1';
+	const producerId = (meta.producerId as string | null | undefined) ?? 'parent-atlas-analysis-worker';
+	const producerRevision = (meta.producerRevision as string | null | undefined) ?? ANALYSIS_WORKER_REVISION;
+	const featureRevision = (meta.featureRevision as string | null | undefined) ?? 'ast-grep-feature-registry-v1';
+	const graphRevision = (meta.graphRevision as string | null | undefined) ?? null;
+	const ontologyRevision = (meta.ontologyRevision as string | null | undefined) ?? null;
+	const modelRevision = (meta.modelRevision as string | null | undefined) ?? null;
+	const partOfSpeech = (meta.partOfSpeech as string | null | undefined) ?? null;
 	const langextractEntities = (meta.entities as any[]) ?? [];
 
 	if (!text) return { featuresUpserted: 0, edgesUpserted: 0, qdrantTagsSynced: 0 };
@@ -101,10 +126,57 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 			pool.end().catch(() => {});
 		}
 
+		const synthesized = sourceRevision
+			? await buildCodeEvidenceSynthesizerReceiptFromSource({
+				packetKey,
+				sourceRef,
+				sourceRevision,
+				featureId,
+				featureLabel,
+				text,
+				isCode: true,
+				treeNodeId,
+				titleId,
+				workspaceRevision,
+				jsonlSourceDigest,
+				jsonlRecordIndex,
+				jsonlLineNumber,
+				jsonlParserRevision,
+				representationRevision,
+				producerId,
+				producerRevision,
+				featureRevision,
+				graphRevision,
+				ontologyRevision,
+				modelRevision,
+				partOfSpeech,
+				extractedFeatures: [
+					...astFeatures,
+					...langextractEntities.map((entity, index) => ({
+						type: mapLangextractEntityToFeatureType(entity),
+						name: String(entity?.text ?? entity?.label ?? `entity-${index}`),
+						description: `${String(entity?.label ?? 'ENTITY')} entity: "${String(entity?.text ?? entity?.label ?? `entity-${index}`)}"`,
+						source: 'langextract' as const,
+						rawText: typeof entity?.text === 'string' ? entity.text : undefined,
+						confidence: typeof entity?.score === 'number'
+							? entity.score
+							: typeof entity?.confidence === 'number'
+								? entity.confidence
+								: undefined,
+					})),
+					],
+				})
+			: null;
+
 		return {
 			featuresUpserted,
 			edgesUpserted,
 			qdrantTagsSynced: featuresUpserted,
+			posConceptPacket: synthesized?.packet ?? null,
+			posConceptPacketKey: synthesized?.packetKey ?? null,
+			posConceptPacketStatus: synthesized ? 'built' : 'missing_source_revision_or_packet_key',
+			codeEvidenceReceipt: synthesized?.receipt ?? null,
+			codeEvidenceReceiptStatus: synthesized ? 'built' : 'missing_source_revision_or_packet_key',
 			fallback_used: false
 		};
 	} catch (err) {
@@ -113,9 +185,33 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 			featuresUpserted: 0,
 			edgesUpserted: 0,
 			qdrantTagsSynced: 0,
+			posConceptPacket: null,
+			posConceptPacketKey: null,
+			posConceptPacketStatus: 'failed',
+			codeEvidenceReceipt: null,
+			codeEvidenceReceiptStatus: 'failed',
 			fallback_used: true,
 			error: String(err)
 		};
+	}
+}
+
+function mapLangextractEntityToFeatureType(entity: any): 'entity_person' | 'entity_org' | 'entity_location' | 'entity_statute' | 'entity_case' {
+	const label = String(entity?.label ?? '').trim().toUpperCase();
+	switch (label) {
+		case 'PERSON':
+			return 'entity_person';
+		case 'ORG':
+			return 'entity_org';
+		case 'LOCATION':
+			return 'entity_location';
+		case 'STATUTE':
+			return 'entity_statute';
+		case 'CASE':
+		case 'COURT':
+			return 'entity_case';
+		default:
+			return 'entity_case';
 	}
 }
 

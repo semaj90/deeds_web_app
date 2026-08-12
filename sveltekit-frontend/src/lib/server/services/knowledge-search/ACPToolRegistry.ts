@@ -756,6 +756,86 @@ const handlers: Record<string, HandlerFn> = {
 };
 
 // ---------------------------------------------------------------------------
+// OpenCode ACP -> bash worker split (2026-08-12)
+//
+// OpenCode agent decides WHAT to run and emits { action, taskId }. This
+// handler resolves `action` against a fixed allowlist (never a free-text
+// command string from the agent) and hands off to
+// scripts/atlas/opencode-bash-worker.mjs, which is the only thing that
+// actually shells to WSL2/bash. conda/RAPIDS activation is environment
+// setup owned by the worker script, not by this handler or the agent.
+// ---------------------------------------------------------------------------
+
+const BASH_WORKER_ACTIONS: Record<string, { command: string; useRapidsEnv: boolean }> = {
+  'louvain-resolution-report': { command: 'npm run atlas:louvain:resolution:report', useRapidsEnv: false },
+  'louvain-resolution-verify': { command: 'npm run atlas:louvain:resolution:verify', useRapidsEnv: false },
+  'graph-snapshot-parity-export': { command: 'npm run atlas:graph-snapshot-parity:export', useRapidsEnv: false },
+  'graph-snapshot-parity-validate': { command: 'npm run atlas:graph-snapshot-parity:validate -- --run-networkx --run-cugraph', useRapidsEnv: false },
+  'cugraph-pagerank': { command: 'python scripts/atlas/cugraph-pagerank.py', useRapidsEnv: true },
+  'cugraph-pagerank-dry-run': { command: 'python scripts/atlas/cugraph-pagerank.py --dry-run', useRapidsEnv: true }
+};
+
+async function bashWorkerExecute(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+  const startTime = Date.now();
+  const action = args?.action;
+
+  if (!action || typeof action !== 'string' || !(action in BASH_WORKER_ACTIONS)) {
+    return fail(`action must be one of: ${Object.keys(BASH_WORKER_ACTIONS).join(', ')}`, startTime);
+  }
+  const spec = BASH_WORKER_ACTIONS[action];
+  const request = {
+    task_id: typeof args?.taskId === 'string' ? args.taskId : `acp:${action}:${Date.now()}`,
+    command: spec.command,
+    useRapidsEnv: spec.useRapidsEnv
+  };
+
+  if (options?.dryRun) {
+    return planResult([
+      { action: 'exec', target: 'wsl-bash', detail: `${spec.useRapidsEnv ? '[atlas-rapids-cu13] ' : ''}${spec.command}` }
+    ], startTime);
+  }
+
+  try {
+    const { execFileSync } = await import('node:child_process');
+    const { resolve } = await import('node:path');
+    const workerPath = resolve(process.cwd(), 'scripts/atlas/opencode-bash-worker.mjs');
+    const output = execFileSync('node', [workerPath, JSON.stringify(request)], {
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024
+    });
+    const receipt = JSON.parse(output.trim());
+    return {
+      success: receipt.status === 'SUCCEEDED',
+      kind: 'result',
+      data: receipt,
+      duration: Date.now() - startTime
+    };
+  } catch (error: any) {
+    return fail(error.message ?? String(error), startTime);
+  }
+}
+
+async function graphSnapshotParityValidate(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+  return await bashWorkerExecute(
+    {
+      action: 'graph-snapshot-parity-validate',
+      taskId: typeof args?.taskId === 'string' ? args.taskId : undefined,
+    },
+    options,
+  );
+}
+
+async function cugraphPagerankDry(args: any, options?: ACPToolOptions): Promise<ToolResult> {
+  return await bashWorkerExecute(
+    {
+      action: 'cugraph-pagerank-dry-run',
+      taskId: typeof args?.taskId === 'string' ? args.taskId : undefined,
+    },
+    options,
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Tool definitions
 // ---------------------------------------------------------------------------
 
@@ -763,8 +843,8 @@ const handlers: Record<string, HandlerFn> = {
 const DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
-  'langextract:extract', 'langextract:batch', 'search:hyperrag'
-  , 'phase89:board-workflow'
+  'langextract:extract', 'langextract:batch', 'search:hyperrag',
+  'phase89:board-workflow', 'graph:snapshot-parity:validate', 'atlas:cugraph:pagerank', 'atlas:cugraph:pagerank:dry', 'atlas:bash-worker'
 ]);
 
 export const TOOLS: Record<string, ACPTool> = {
@@ -1107,6 +1187,96 @@ export const TOOLS: Record<string, ACPTool> = {
       }
     ],
     handler: handlers.phase89BoardWorkflow
+  },
+  'graph:snapshot-parity:validate': {
+    name: 'graph:snapshot-parity:validate',
+    description: 'Run the frozen graph snapshot parity validator through the OpenCode ACP -> bash worker split (NetworkX + cuGraph receipt)',
+    category: 'graph-analysis',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string', description: 'Optional task id for the receipt (defaults to acp:graph-snapshot-parity-validate:<timestamp>)' }
+      }
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'graph-snapshot-parity-validate' },
+        output: { taskId: 'graph-snapshot-parity-validate', status: 'SUCCEEDED', exitCode: 0 },
+        description: 'Validate the frozen graph snapshot parity receipt'
+      }
+    ],
+    handler: graphSnapshotParityValidate
+  },
+  'atlas:cugraph:pagerank:dry': {
+    name: 'atlas:cugraph:pagerank:dry',
+    description: 'Run the RAPIDS-backed cuGraph PageRank dry-run through the OpenCode ACP -> bash worker split',
+    category: 'graph-analysis',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string', description: 'Optional task id for the receipt (defaults to acp:cugraph-pagerank-dry-run:<timestamp>)' }
+      }
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'cugraph-pagerank-dry-run' },
+        output: { taskId: 'cugraph-pagerank-dry-run', status: 'SUCCEEDED', exitCode: 0 },
+        description: 'Run the RAPIDS PageRank dry run receipt'
+      }
+    ],
+    handler: cugraphPagerankDry
+  },
+  'atlas:cugraph:pagerank': {
+    name: 'atlas:cugraph:pagerank',
+    description: 'Run the RAPIDS-backed cuGraph PageRank command through the OpenCode ACP -> bash worker split',
+    category: 'graph-analysis',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string', description: 'Optional task id for the receipt (defaults to acp:cugraph-pagerank:<timestamp>)' }
+      }
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'cugraph-pagerank' },
+        output: { taskId: 'cugraph-pagerank', status: 'SUCCEEDED', exitCode: 0 },
+        description: 'Run the RAPIDS PageRank command'
+      }
+    ],
+    handler: async (args: any, options?: ACPToolOptions) => {
+      return await bashWorkerExecute(
+        {
+          action: 'cugraph-pagerank',
+          taskId: typeof args?.taskId === 'string' ? args.taskId : undefined,
+        },
+        options,
+      );
+    }
+  },
+  'atlas:bash-worker': {
+    name: 'atlas:bash-worker',
+    description: 'Run an allowlisted repo command (npm script or RAPIDS python oracle) via the OpenCode ACP -> bash worker split. `action` is a fixed enum, never a free-text command string.',
+    category: 'error-analysis',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: Object.keys(BASH_WORKER_ACTIONS), description: 'One of the allowlisted actions' },
+        taskId: { type: 'string', description: 'Optional task id for the receipt (defaults to acp:<action>:<timestamp>)' }
+      },
+      required: ['action']
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { action: 'graph-snapshot-parity-validate' },
+        output: { taskId: 'acp:graph-snapshot-parity-validate:...', status: 'SUCCEEDED', exitCode: 0 },
+        description: 'Re-run the GRAPH_SNAPSHOT_PARITY validator with both backends'
+      }
+    ],
+    handler: bashWorkerExecute
   }
 };
 
