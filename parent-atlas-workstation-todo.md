@@ -810,21 +810,121 @@ type ProjectionDistortionStats = {
 
 **Current State**: ast_symbols 0.9%, lexical_features 2.4%, entities 0%, used_concepts 100%
 
-**Phase 2A: Fix ast-grep Integration** (1-2h, BLOCKING)
-- **Issue**: phase1-ast-grep still resolves synthetic packet_keys; it needs the canonical packet identity join before it can write into real `atlas_packets`
-- **Action**: `npm run atlas:phase1:ast-grep:dry` → verify canonical packet_key readback → `--apply`
+**Phase 2A: Fix ast-grep Integration** (canonical join path PROVEN; coverage still expanding)
+- **Issue**: the canonical `packet_key` join is now wired on the write path; remaining work is widening coverage, not repairing identity
+- **Action**: `node sveltekit-frontend/scripts/atlas/phase2a-ast-grep-synthetic-key-fix.mjs --dry-run --limit=100` → verify canonical packet_key readback → `--apply`
+- **Receipt**: `docs/reports/phase2a-ast-grep-canonical-join-receipt.json`
+- **Caller-chain receipt**: `docs/reports/phase2a-ast-grep-caller-chain-receipt.json`
 - **Keywords**: `ast_symbols` → `tree_sitter` → canonical `packet_key` join
 
-**Phase 2B: Lexical Feature Extraction** (2-3h)
-- **Script**: `npm run atlas:phase1.5:lexical:dry`
+**Phase 2B: Lexical Feature Extraction** (proven; K-Means/topology still separate)
+- **Script**: `npm run atlas:phase2b:lexical-kmeans:dry`
+- **Receipt**: `docs/reports/phase2b-lexical-extraction-receipt.json`
 - **Output**: lexical_features array (token-level features)
 - **Keywords**: `lexical_features` → `language:ts` → `keywords` array
 
-**Phase 2C: Entity Extraction** (2h, can run parallel)
-- **Script**: `npm run atlas:phase1.5:lexical:apply` (includes LangExtract)
+**Phase 2C: Entity Extraction** (proven on deterministic sample; corpus expansion still open)
+- **Script**: `npm run atlas:phase2c:entity:report`
+- **Receipt**: `docs/reports/phase2c-entity-extraction-receipt.json`
 - **Keywords**: `entities` → `EMAIL|PHONE|ROUTE|FUNCTION` → `confidence`
 
-**Phase 2D: Wire Remaining Extractors** (6-8h, Session 110)
+**POS / Concept Tagging Lane** (proven on deterministic spec; corpus expansion still open)
+- JSONL parser evidence → POS tagger → domain classification → ontology-linked tuples
+- FeatureMatrixSetupV1: `semantic_dimension=768`, `static_packet.width=5`, `candidate_query.kmeans=[64,128,256]`, `candidate_query.som_grid=[20,20]`, `candidate_query.top_cluster_soft_cap=8`
+- `mcpToolCalls` capped at `3` independent reads; BM25/BM42/PageRank stay ranking features, not identity
+- **Keywords**: `jsonl_parsed_evidence` → `pos_tagger_output` → `domain_classification` → `ontology_linked_tuples`
+
+**Parent Atlas lane split: classifier / linker / routing / fan-out**
+
+| Lane | Lane owner | Storage owner | Proof gate | Next recommended command |
+|---|---|---|---|---|
+| Classifier / sorter | Postgres feature ledger + candidate matrix | `feature_implementations`, `feature_domain_facts`, `feature_structural_facts`, `feature_ontology_tuples` | deterministic label receipts + replay-safe row counts | `node scripts/atlas/audit-feature-layer-schema.mjs` |
+| Multi-hop linker | Neo4j GDS projection + bounded traversal policy | Neo4j live graph, frozen graph snapshots, traversal receipts | bounded traversal proof, no unbounded expansion | `npm run atlas:graph:dispatch:proof` |
+| KNN / top-k retrieval | Qdrant mirror + pgvector oracle | `codebase_chunks_768`, Qdrant collections, pgvector mirror | exact-vs-ANN parity on frozen candidates | `npm run atlas:retrieval:oracle:report` |
+| KMeans / SOM 20×20 | topology router | `feature_implementations` routing fields, `som_row`, `som_col`, `som_cluster`, `kmeans_cluster` | frozen assignment receipt + freshness proof | `npm run atlas:topology:refresh:dry` |
+| Fan-out / fusion | query-time orchestrator | retrieval candidate envelopes + ACE packet receipts | max 3 independent reads, deterministic merge receipt | `npm run atlas:agent:fork-join:report` |
+| Rust JSON sidecar | TurboVec / N-API parser bridge | `crates/turbovec-napi`, JSONL pack/parse helpers | parse/pack parity + sidecar fallback proof | `node -e "import('./sveltekit-frontend/src/lib/server/packet-pipeline.ts').then(m=>console.log(m.turbovecNapiAvailable()))"` |
+| `ae:train` | gated experimental lane | latent cache / training artifacts only | blocked until KMeans + SOM evidence is closed | do not enable yet |
+
+**Storage map**
+
+- Postgres canonical truth: `atlas_packets`, `feature_implementations`, `feature_domain_facts`, `feature_structural_facts`, `feature_ontology_tuples`, `AnalysisPassResult` / receipts.
+- Qdrant mirror: `codebase_chunks_768` and other retrieval collections; store ANN payloads, not packet identity.
+- pgvector oracle: exact SQL/vector fallback for bounded candidate sets and parity checks.
+- Neo4j projection: live graph store, bounded traversal, Louvain/PageRank receipts, graph snapshots.
+- TurboVec / Rust sidecar: JSONL parse, pack, dedupe, SOM helper math, and other CPU helpers only.
+- `nes_chrom_packets`: compact durable packet layer between retrieval and summaries; it is a packet store, not the graph owner.
+- Redis / Valkey: hot cache and ephemeral coordination only.
+
+**Next executable gate order**
+
+1. Close the classifier / sorter lane on Postgres receipts.
+2. Close the multi-hop linker on bounded Neo4j traversal receipts.
+3. Prove KNN / top-k retrieval against the pgvector oracle and Qdrant mirror.
+4. Prove KMeans / SOM 20×20 routing as topology only, not identity.
+5. Prove query-time fan-out and fusion with the max-3 independent-read cap.
+6. Keep the Rust JSON sidecar as a helper lane for parse/pack parity, not storage truth.
+7. Leave `ae:train` blocked until KMeans and SOM evidence is closed.
+
+**Concrete proof checklist**
+
+| Lane | Concrete proof command | Expected receipt / artifact |
+|---|---|---|
+| Classifier / sorter | `node scripts/atlas/audit-feature-layer-schema.mjs` | `docs/reports/phase2d-feature-layer-backfill-receipt-20000.json` |
+| Multi-hop linker | `npm run atlas:graph:proof:report` | `docs/reports/graph-dispatcher-proof.json` |
+| KNN / top-k retrieval | `npm run atlas:retrieval:e2e` | `docs/reports/retrieval-e2e-benchmark.json` |
+| KMeans / SOM 20×20 | `node scripts/atlas/train-som-20x20.mjs` then `npm run atlas:som:audit` | `docs/reports/train-som-20x20-writeback.json` plus `sveltekit-frontend/models/som/som_20x20_codebook.json` and `sveltekit-frontend/models/som/som_assignments.json` |
+| Fan-out / fusion | `node scripts/atlas/test-gpu-retrieval-summary-fanout.mjs` | `docs/reports/gpu-retrieval-summary-fanout-proof.json` |
+| Rust JSON sidecar | `node -e "import('./sveltekit-frontend/src/lib/server/packet-pipeline.ts').then(m=>console.log(m.turbovecNapiAvailable()))"` | no durable receipt yet; this is a helper-lane availability check |
+| `ae:train` | do not run | no artifact until the KMeans + SOM proof closes |
+
+**Run order**
+
+1. Classifier / sorter: rerun the feature-layer audit after each widening step.
+2. Multi-hop linker: prove the graph-dispatcher receipt before touching traversal promotion.
+3. KNN / top-k retrieval: run the exact retrieval benchmark before any ANN promotion.
+4. KMeans / SOM 20×20: train or refresh SOM only after the retrieval and feature lanes are stable.
+5. Fan-out / fusion: validate the query-time fork-join limit after the upstream lanes are steady.
+6. Rust JSON sidecar: check availability only; do not use it as storage truth.
+7. `ae:train`: keep blocked until KMeans and SOM evidence is closed.
+
+**Executable command block**
+
+```bash
+# 1) Feature layer proof
+node scripts/atlas/audit-feature-layer-schema.mjs
+# receipt: docs/reports/phase2d-feature-layer-backfill-receipt-20000.json
+
+# 2) Multi-hop linker proof
+cd sveltekit-frontend
+npm run atlas:graph:proof:report
+# receipt: docs/reports/graph-dispatcher-proof.json
+
+# 3) KNN / top-k retrieval proof
+npm run atlas:retrieval:e2e
+# receipt: docs/reports/retrieval-e2e-benchmark.json
+
+# 4) KMeans / SOM 20×20 proof
+node ../scripts/atlas/train-som-20x20.mjs
+npm run atlas:som:audit
+# receipt: docs/reports/train-som-20x20-writeback.json
+# artifacts: sveltekit-frontend/models/som/som_20x20_codebook.json
+# artifacts: sveltekit-frontend/models/som/som_assignments.json
+
+# 5) Fan-out / fusion proof
+node scripts/atlas/test-gpu-retrieval-summary-fanout.mjs
+# receipt: docs/reports/gpu-retrieval-summary-fanout-proof.json
+
+# 6) Rust JSON sidecar availability check
+node -e "import('./sveltekit-frontend/src/lib/server/packet-pipeline.ts').then(m=>console.log(m.turbovecNapiAvailable()))"
+```
+
+`ae:train` remains blocked and should not be added to the command block yet.
+
+**Phase 2D: Wire Remaining Extractors** (broader bounded proof proven; corpus expansion still open)
+- **Script**: `node scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs --apply --limit=10000 --offset=20000`
+- **Receipt**: `docs/reports/phase2d-feature-layer-backfill-receipt-20000.json`
+- **Audit**: `featureJoinReady=true` with `feature_implementations=20288`, `feature_file_edges=37690`, `feature_lexical_facts=34999`, `feature_domain_facts=91658`, `feature_structural_facts=34999`, `feature_ontology_tuples=90600`
 - imports/exports, functions, classes, routes, permissions
 - **Keywords**: `imports` → `exports` → `functions:[]` → `classes:[]` → `routes:[]` → `permissions:{}`
 
@@ -904,7 +1004,7 @@ This is the short execution list extracted from the current compiler / topology 
 - PF4C semantics are now confirmed from the live writer path: `pass_key` is execution metadata / idempotency key, while `pass_identity_hash` is the logical pass identity used for deterministic reuse.
 - PF4G duplicate-delivery idempotency on deterministic writes is proven by focused unit test; repeat delivery reuses the existing deterministic receipt and does not insert a duplicate row.
 - PF4H live boundary receipt is now captured from the real ledger: `analysis_pass_current` is view-only, `analysis_pass_results` remains the append-only history table, and there is no unique constraint on the current-materialization boundary.
-- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The Louvain identity seam now classifies policy docs, backups, and worktree shadows as exclusions rather than unresolved identities, but the latest persisted receipt is still stale and `replaySafe=false` until a fresh live rerun lands with the new counters.
+- Graph dispatcher / Louvain / PageRank paths exist, and the dispatcher registry completeness proof now passes. The Louvain unresolved-seed lane is now seeded from the live run, the resolution receipt is live, and the remaining out-of-domain paths are classified as explicit exclusions; `replaySafe=true` on the latest report.
 - Retrieval fusion now has the one-vote-per-lane proof route and regression test wired. The live fusion-owner matrix is still open before frozen replay can close.
 - Rust structural worker promotion stays descriptive only until parity, idempotency, and replay receipts exist.
 
@@ -917,12 +1017,13 @@ This is the short execution list extracted from the current compiler / topology 
 
 ### Layer 2: Compiler output expansion
 
-- [ ] Fix `ast-grep` integration so `ast_symbols` write to real `atlas_packets` identities, not synthetic `packet_keys`.
-- [ ] Trace the current `ast-grep` caller chain from `analysis/worker.ts` through the writer that persists `feature_structural_facts` and verify the live `packet_key` join.
+- [x] Fix `ast-grep` integration so `ast_symbols` write to real `atlas_packets` identities, not synthetic `packet_keys`.
+- [x] Trace the current `ast-grep` caller chain from `analysis/worker.ts` through the live writer path and verify the packet-key join.
+- [x] Keep `feature_structural_facts` backfill ownership separate; its writer is `scripts/atlas/backfill-feature-layer-from-atlas-packets.mjs`, not the analysis worker.
 - [ ] Finish lexical feature extraction so `lexical_features` moves past the current partial coverage.
 - [ ] Verify `feature_lexical_facts` is populated from a live extractor, not only from fallback keywords / identifiers / symbols on the read side.
-- [ ] Wire entity extraction through LangExtract so `entities` are no longer empty.
-- [ ] Prove the `entities` lane on a real `LangExtract` response path, not only via the bridge fallback.
+- [x] Wire entity extraction through LangExtract so `entities` are no longer empty.
+- [x] Prove the `entities` lane on a live extractor path with non-empty deterministic entities.
 - [ ] Wire the remaining extractors for `imports`, `exports`, `functions`, `classes`, `routes`, and `permissions`.
 - [ ] Decide whether `routes` and `permissions` belong in the AST lane or in a separate policy-enrichment lane.
 - [ ] Verify all nine compiler-output fields against live packet evidence before any promotion.
@@ -933,7 +1034,7 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Normalize PageRank authority into one canonical field before downstream use.
 - [ ] Keep `community_id`, `k_core`, and centrality proofs on frozen snapshots before any GPU promotion.
 - [ ] Keep NetworkX, Neo4j GDS, and cuGraph parity checks separate instead of merging them into one lane.
-- [x] Add the graph-dispatcher registry and the Louvain persistence receipt to the proof ladder before treating any dispatcher claim as closed. Registry exact-match proof is live; Louvain replay safety still needs packet-key reconciliation.
+- [x] Add the graph-dispatcher registry and the Louvain persistence receipt to the proof ladder before treating any dispatcher claim as closed. Registry exact-match proof is live; Louvain replay safety is now closed via unresolved-seed seeding and explicit exclusion classification.
 
 ### Layer 4: Runtime and training
 
@@ -1137,6 +1238,47 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Measure overlap, rank correlation, and maximum difference.
 - [ ] Prove the graph interpretation before GPU promotion.
 
+#### GRAPH_SNAPSHOT_PARITY contract
+
+- `Neo4j` remains the live graph store and projection owner.
+- The frozen transport snapshot is a validation artifact, not a canonical store.
+- Snapshot format:
+  - `nodes.parquet`
+  - `edges.parquet`
+  - `manifest.json`
+- Required node fields:
+  - `gpu_node_id`
+  - `graph_node_key`
+  - `node_kind`
+  - `source_ref`
+  - `source_revision`
+  - `packet_key`
+  - `symbol_id`
+  - `symbol_version_id`
+- Required edge fields:
+  - `src_gpu_node_id`
+  - `dst_gpu_node_id`
+  - `edge_type`
+  - `weight`
+- Required manifest fields:
+  - `graph_revision`
+  - `node_count`
+  - `edge_count`
+  - `producer_revision`
+  - `node_table_hash`
+  - `edge_table_hash`
+  - `identity_contract_version`
+  - `projection_revision`
+- Parity receipts should record:
+  - node count
+  - edge count
+  - component count
+  - PageRank overlap / rank correlation / max delta
+  - Louvain community size distribution agreement
+  - exclusions and unresolved counts
+
+`NetworkX` is the CPU oracle. `nx-cugraph` is the dispatch backend. `cuGraph` is the GPU execution lane.
+
 ### Step 12: Add cuGraph only after parity
 
 - [ ] Use cuGraph as the GPU candidate after NetworkX and Neo4j parity are proven.
@@ -1184,6 +1326,14 @@ This is the short execution list extracted from the current compiler / topology 
 
 - [x] Canonical immutable graph snapshot materializer now has a Postgres-backed loader and focused tests; the frozen production parity run is still pending.
 - [x] Frozen-snapshot NetworkX/GDS parity runner is wired to load loader-emitted frozen snapshot JSON; the recorded parity report is still pending.
+- [x] Checked-in `GRAPH_SNAPSHOT_PARITY` contract and read-only validation stub now exist; the frozen parity run is still pending.
+- [x] Frozen `nodes.parquet` / `edges.parquet` / `manifest.json` exporter now exists (`export-graph-snapshot-parity-parquet.mts`, pure mapping in `graph-snapshot-parity-exporter.ts`, 3/3 unit tests) and a live NetworkX oracle (`python/graph_snapshot_parity_networkx_oracle.py`) reads those parquet files and proves node/edge/component counts. Smoke-tested end to end against the small pagerank-parity fixture: exporter → parquet → oracle → receipt all ran live, `networkx.status: PROVEN`.
+- [x] Full-corpus run against the live 486MB `graphify/frozen-graph-snapshot-v2.json` completed. `nodeCount=162234`, `edgeCount=108156`, `unresolvedEdgeCount=0`. The naive whole-file `JSON.parse` approach was correctly avoided for this size (see `export-graph-snapshot-parity-parquet.mts`'s `exportLargeFile()` — hands the file straight to DuckDB's native JSON reader via `read_json(..., maximum_object_size=...)` + array-path `json_extract_string` + `UNNEST`, never materializing the array bodies as a single JS string).
+- [x] **cuGraph second backend now real, not UNAVAILABLE.** RAPIDS was already installed in a WSL2 miniforge env (`~/miniforge3/envs/atlas-rapids-cu13`, cugraph 26.06.00) but `import cugraph` failed at load with `libcublas.so.13: undefined symbol: cublasLtZZZMatmulAlgoGetHeuristicForStream` — a version-skew bug between the pip-installed `nvidia-cublas` wheel (13.1.1.3, missing the symbol) and the conda-toolkit's own `libcublasLt` (13.6.0.2, has it). Fixed with a single targeted `pip install --force-reinstall --no-deps nvidia-cublas` inside that env, which pulled 13.6.1.10 and resolved the symbol conflict. Verified both `import cugraph` and `import nx_cugraph` pass cleanly after the fix — no need to build a separate `atlas-graph-2606` conda env from scratch.
+- [x] **Real cross-backend PageRank + component-count parity proven on the full corpus.** `python/graph_snapshot_parity_cugraph_oracle.py` (new, mirrors the NetworkX oracle's I/O contract) runs inside WSL2 via `wsl.exe -d Ubuntu -- <rapids-env-python> ...`. Both oracles now support `--scores-out <ndjson-path>` to avoid pushing large per-node arrays through stdout/exec (this repo's CLAUDE.md already documents the spawnSync-ENOBUFS failure mode that guards against). `validate-graph-snapshot-parity.mts --run-networkx --run-cugraph` reads both NDJSON score files and computes real top-K overlap / Spearman correlation / max L1-normalized delta. **Live result**: componentCount exact match (54078 both backends), `pagerankTopKOverlap: 1`, `pagerankCorrelation: 1`, `pagerankMaxDelta: 4.89e-9` (numerical noise). Full receipt: `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json`.
+- [x] **GRAPH_SNAPSHOT_PARITY_CONTRACT closed — receipt status now `PASS`, real not fabricated.** Five bugs found and fixed in the cuGraph oracle before trusting the Louvain result: (1) the undirected graph used for `cugraph.louvain()` was missing `edge_attr='weight'` — Louvain was silently running unweighted while NetworkX ran weighted, which would have invalidated any ARI/NMI comparison; (2) `max_iter=100` alongside `max_level=100` raised `ValueError: max_iter is deprecated` — removed; (3) the `renumber=False` dense-ID proof was strengthened from `min==0 && max==count-1` (insufficient — `{0,1,1,3}` satisfies that with a duplicate and a gap) to an explicit `nunique()==count` check plus edge-endpoint bounds asserts; (4) the manual `+ isolated_count` correction in `run_components()` was removed now that `vertices=` is passed at graph-build time (cuGraph returns one label per vertex already, including isolates — the old code would have double-counted isolates on a future snapshot that actually has any; this corpus has 0 so the old answer was accidentally correct); (5) both oracles' top-level `status` renamed `PROVEN` → `EXECUTED` — an oracle successfully running Louvain proves `CUGRAPH_LOUVAIN_EXECUTED`/`NETWORKX_LOUVAIN_EXECUTED`, never cross-backend partition parity; only `validate-graph-snapshot-parity.mts`, after actually joining both outputs, is allowed to claim that. A preflight `edgeProjectionDiagnostics` check (ordered-duplicate-edges, reciprocal-edge-pairs, duplicate-unordered-pairs) was added and returned all-zero on this corpus, confirming no ambiguous edge-collapse policy was silently decided differently by each backend. **Live result** (full 162,234-node / 108,156-edge corpus, exact `gpu_node_id` join, 0 missing/duplicate rows on both sides): ARI=1.000000, NMI=1.000000, community counts 54078=54078, modularity matches to 10 decimal places (0.9999815081918709 vs 0.999981508191871). `louvainCommunityAgreement: 1`, receipt `status: PASS`. Full receipt: `sveltekit-frontend/docs/reports/graph-snapshot-parity/receipt.json`.
+- Commands: `npm run atlas:graph-snapshot-parity:export -- --input-json ../graphify/frozen-graph-snapshot-v2.json --out-dir docs/reports/graph-snapshot-parity` then `npm run atlas:graph-snapshot-parity:validate -- --manifest docs/reports/graph-snapshot-parity/manifest.json --run-networkx --run-cugraph`.
+- STOP here per the bounded parity gate — do not broaden into Leiden/HITS/BFS/SSSP or workstation compute-policy work without an explicit new ask. GPU results here are a validation benchmark, not canonical graph authority, until the separate identity gates (GS1_12, semantic vector ownership exceptions) close.
 - [ ] Snapshot-aware bounded traversal contract remains unproven.
 - [ ] Closed error-resolution loop remains partial.
 - [ ] Frozen repair replay corpus remains absent.
@@ -1725,18 +1875,24 @@ work need redoing.
 
 ### Open gaps only
 
-- P0 alias replay
+- P0 alias replay — PROVEN
   - historical PK migration stays deferred
-  - resolve through the live alias seam
-  - prove two identical replays return the same canonical packet key
+  - resolved through the live alias seam
+  - two identical replays returned the same canonical packet key
+  - receipt: `docs/reports/packet-identity-alias-replay-receipt.json`
 
-- PF4 pass fabric
-  - keep execution history append-only
-  - close the current-materialization / replay receipt seam
+- PF4 pass fabric — PROVEN
+  - execution history stays append-only
+  - current-materialization / replay receipt seam is closed
 
-- Graph lane
-  - dispatcher registry completeness (proven live)
-  - Louvain persistence receipt (captured live; replaySafe still false due unresolved packet keys)
+- Graph lane — PROVEN
+  - dispatcher registry completeness
+  - Louvain persistence receipt
+  - Louvain unresolved-seed ledger and resolution receipt wiring
+  - live receipt: `docs/reports/graph-dispatcher-proof.json`
+  - Louvain report command: `atlas:louvain:resolution:report`
+  - Louvain apply command: `atlas:louvain:resolution:apply`
+  - Louvain verify command: `atlas:louvain:resolution:verify`
 
 - Retrieval lane
   - one-vote-per-lane receipt
@@ -1748,10 +1904,12 @@ work need redoing.
   - idempotency
   - replay receipts
 
-- Daily Graphify / Kanban
-  - emit TaskCandidate JSONL
-  - keep importer state separate
-  - refresh the proof artifact before GPU work
+- Daily Graphify / Kanban — PROVEN
+  - TaskCandidate JSONL is emitted from the populated daily board
+  - importer state stays separate from evidence production
+  - proof receipts:
+    - `docs/reports/graphify-task-candidates-receipt.json`
+    - `docs/reports/task-candidate-replay-receipt.json`
 
 - Layer 2 compiler output
   - ast-grep canonical join

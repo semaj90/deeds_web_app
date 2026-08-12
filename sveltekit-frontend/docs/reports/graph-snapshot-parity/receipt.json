@@ -32,12 +32,12 @@
   "componentCount": 54078,
   "pagerankTopKOverlap": 1,
   "pagerankCorrelation": 1,
-  "pagerankMaxDelta": 4.888482368391661e-9,
-  "louvainCommunityAgreement": 0,
+  "pagerankMaxDelta": 4.888482368395049e-9,
+  "louvainCommunityAgreement": 1,
   "excludedNodeCount": 0,
   "excludedEdgeCount": 0,
   "unresolvedCount": 0,
-  "status": "PARTIAL",
-  "generatedAt": "2026-08-12T00:46:00.678Z",
-  "notes": "Both backends proven live from the frozen parquet artifact. componentCount agreement: exact match (networkx=54078, cugraph=54078). pagerank top-50 overlap/correlation/maxDelta computed from real per-node scores from both backends. louvainCommunityAgreement is NOT computed by this run (component count is connectivity, not community partitioning) — left at 0, not fabricated."
+  "status": "PASS",
+  "generatedAt": "2026-08-12T02:34:12.698Z",
+  "notes": "Both backends executed live from the frozen parquet artifact. componentCount agreement: exact match (networkx=54078, cugraph=54078). pagerank top-50 overlap/correlation/maxDelta computed from real per-node scores from both backends. Louvain partition agreement computed via exact gpu_node_id join (162234 nodes, 0 missing, 0 duplicates on both sides): ARI=1.000000, NMI=1.000000. Community counts: networkx=54078, cugraph=54078. Modularity: networkx=0.9999815081918709, cugraph=0.999981508191871. Both backends ran LOUVAIN_PARITY_PROJECTION_V1 (undirected, weight='weight', resolution=1.0, threshold=1e-7, max_level=100, self-loops dropped)."
 }

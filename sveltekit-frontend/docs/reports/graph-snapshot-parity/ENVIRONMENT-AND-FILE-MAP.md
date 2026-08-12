@@ -1,6 +1,6 @@
 # GRAPH_SNAPSHOT_PARITY — CUDA/WSL2/RAPIDS Environment + File Map
 
-**Status**: cuGraph backend LIVE ✅ | Cross-backend PageRank/component parity PROVEN ✅ | Louvain agreement NOT_PROVEN ⏳
+**Status**: cuGraph backend LIVE ✅ | Cross-backend PageRank/component parity PROVEN ✅ | Louvain agreement PROVEN ✅ (ARI=1.0, NMI=1.0) | Receipt `status: PASS`
 
 ---
 
@@ -133,8 +133,14 @@ Both oracle backends share the exact same I/O contract (`--nodes`, `--edges`, `-
 | pagerankTopKOverlap (top-50) | 1.0 |
 | pagerankCorrelation (Spearman) | 1.0 |
 | pagerankMaxDelta (L1-normalized) | 4.89e-9 (numerical noise) |
-| louvainCommunityAgreement | 0 — **not computed**, deliberately not fabricated |
-| receipt status | `PARTIAL` (correctly not `PASS`, gated by the un-computed Louvain field) |
+| louvainCommunityAgreement (ARI) | **1.0** — exact gpu_node_id join, 0 missing/duplicate rows both sides |
+| Louvain NMI | 1.0 |
+| Louvain community counts | 54,078 = 54,078 (exact match) |
+| Louvain modularity | 0.9999815081918709 (networkx) vs 0.999981508191871 (cugraph) |
+| edgeProjectionDiagnostics | all zero (0 ordered-duplicate, 0 reciprocal, 0 duplicate-unordered edges) — no ambiguous collapse policy to resolve |
+| receipt status | **`PASS`** |
+
+Five bugs were found and fixed in the cuGraph oracle before this result could be trusted (not before the first "looks plausible" run): the undirected Louvain graph was missing `edge_attr='weight'` (silently unweighted); a deprecated `max_iter` param was still being passed alongside `max_level`; the `renumber=False` dense-ID proof only checked min/max (insufficient — `{0,1,1,3}` passes that check while containing a duplicate and a gap), now checks `nunique()` explicitly plus edge-endpoint bounds; the manual isolated-node correction in component counting was removed now that `vertices=` is passed at graph-build time (would have double-counted isolates on a future snapshot that has any); and both oracles' status was renamed `PROVEN`→`EXECUTED` — an oracle proves it ran, never that it agrees with another backend. Only the orchestrator, after joining both outputs, may claim parity.
 
 ### Hyperedge 4 — `RUNS_IN_ENV`
 
@@ -178,8 +184,11 @@ npm run atlas:graph-snapshot-parity:validate -- \
   > docs/reports/graph-snapshot-parity/receipt.json
 ```
 
-## Next Steps
+## Status: GRAPH_SNAPSHOT_PARITY_CONTRACT closed (receipt `status: PASS`)
 
-- [ ] Compute real Louvain community partitions on both backends and an agreement score (e.g. adjusted Rand index) to close `louvainCommunityAgreement` — the one field standing between `PARTIAL` and `PASS`.
+Per the bounded parity gate this work followed: **STOP here.** Do not broaden into Leiden/HITS/BFS/SSSP or workstation compute-policy work without an explicit new ask. These GPU results are a validation benchmark, not canonical graph authority, until the separate identity gates (GS1_12, semantic vector ownership exceptions) close — see `parent-atlas-workstation-todo.md`.
+
+## Next Steps (deliberately out of scope for this contract)
+
 - [ ] Fix the stale `conda activate rapids` reference in `cugraph-pagerank.py`'s docstring to `atlas-rapids-cu13`.
-- [ ] Resolve or explicitly document the `packages/atlas-duckdb` vs `sveltekit-frontend/packages/atlas-duckdb` split per the runtime-ownership-registry governance process (CLAUDE.md, Aug 9 2026 section) — out of scope for this contract, flagged for a separate pass.
+- [ ] Resolve or explicitly document the `packages/atlas-duckdb` vs `sveltekit-frontend/packages/atlas-duckdb` split per the runtime-ownership-registry governance process (CLAUDE.md, Aug 9 2026 section).
