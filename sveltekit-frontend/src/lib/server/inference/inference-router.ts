@@ -9,15 +9,15 @@
  *   3. Bifrost cache-check (:3040, 500ms deadline) — ε-greedy; cache hits ~5ms (28× speedup)
  *      Bypassed adaptively for high-temp / long-prompt / vision (MeanCache algorithm)
  *   4. TurboQuant llama-server (:8090) — turbo3 KV cache compression (5× VRAM savings)
- *   4b. Bifrost full fallback — Ollama round-trip, only when TurboQuant is also down
+ *   4b. Bifrost full fallback — llama-server round-trip, only when TurboQuant is also down
  *   5. VLM server (:8085) — Gemma 4 E4B HF Transformers + NF4, text fallback
  *   6. LiteRT-LM (:8070) — CPU sidecar, Gemma 4 E2B with MTP 4-head speculative decode
- *   7. Ollama (gemma4-rotorquant:latest, Q4_K_M + Q8_0 KV) — default local/dev fallback
+ *   7. llama-server compatibility wrapper (Gemma 4 text; embeddings stay on Ollama)
  *
  * VISION (IMAGE + TEXT) CASCADE:
  *   1. TurboQuant with --mmproj (:8090) — unified VLM at ~80 tok/s, NO VRAM swap needed
  *   2. HF VLM server (:8085) — Gemma 4 E4B Legal fine-tune, NF4 quantization
- *   3. Ollama VLM (gemma4:e4b-it-q4_K_M) — native multimodal API, stock SigLIP tower
+ *   3. llama-server VLM (gemma4:* or loaded local VLM) — native multimodal API
  *
  * TurboQuant (ICLR 2026): Training-free KV cache quantization + native multimodal.
  * With --mmproj, handles vision+text at same speed as text-only (~80 tok/s).
@@ -27,7 +27,7 @@
  *   llama-server -m gemma4-rotorquant:latest.gguf --mmproj siglip.gguf \
  *     -ctk turbo3 -ctv turbo3 --port 8090 -ngl 99 --flash-attn on
  *
- * GPU arbiter ensures TRT-LLM and Ollama don't fight for VRAM.
+ * GPU arbiter ensures TRT-LLM and local VLM inference don't fight for VRAM.
  * All backends return the same response shape.
  */
 
@@ -39,6 +39,7 @@ import { acquireGpuLease, releaseGpuLease, getGpuLeaseStatus } from './gpu-arbit
 import { inferLLM, healthCheck as trtHealthCheck, streamLLM as streamTrtLLM } from '$lib/server/trt-llm.js';
 import { inferLLM as inferTritonLLM, healthCheck as tritonHealthCheck, streamLLM as streamTritonLLM } from '$lib/server/triton-llm.js';
 import { bifrostChat, ollamaFetch, type OllamaMessage } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, getActiveLocalVlmModel } from '$lib/server/ai/local-llama-provider.js';
 import { getGpuStats, type GpuMemory } from '$lib/server/gpu/gpu-monitor.js';
 import { TURBOQUANT_BASE_URL, LITERT_BASE_URL, VLM_BASE_URL } from '$lib/ai/model-ids.js';
 import { isPrefixWarm } from '$lib/server/inference/turbo-prefix-cache.js';
@@ -64,14 +65,14 @@ export interface InferenceRequest {
   systemPrompt?: string;
   preferTensorrt?: boolean;
   stream?: boolean;
-  /** Base64-encoded image for VLM analysis (TurboQuant with --mmproj, HF VLM, or Ollama) */
+  /** Base64-encoded image for VLM analysis (TurboQuant with --mmproj, HF VLM, or llama-server) */
   imageBase64?: string;
 }
 
 export interface InferenceResponse {
 	text: string;
 	model: string;
-	backend: 'tensorrt' | 'triton' | 'turboquant' | 'vlm-hf' | 'litert' | 'bifrost' | 'ollama';
+  backend: 'tensorrt' | 'triton' | 'turboquant' | 'vlm-hf' | 'litert' | 'bifrost' | 'llama-server';
 	usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
 	latencyMs: number;
 	error?: string;
@@ -81,8 +82,8 @@ export interface InferenceResponse {
 
 /**
  * Route inference to the best available backend.
- * When images are present: TurboQuant (--mmproj) → HF VLM → Ollama VLM.
- * For text-only: TRT-LLM → Triton → TurboQuant → VLM → Bifrost → LiteRT → Ollama.
+ * When images are present: TurboQuant (--mmproj) → HF VLM → llama-server VLM.
+ * For text-only: TRT-LLM → Triton → TurboQuant → VLM → Bifrost → LiteRT → llama-server.
  */
 export async function routeInference(request: InferenceRequest): Promise<InferenceResponse> {
   const start = performance.now();
@@ -111,7 +112,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       });
       return tqVlmResult;
     }
-    // Fallback: HF VLM server or Ollama native multimodal
+    // Fallback: HF VLM server or llama-server native multimodal
     const vlmResult = await tryVlmServer(request, start);
     if (vlmResult) {
       console.info(
@@ -119,7 +120,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       );
       logLLMInference({
         model: vlmResult.model,
-        backend: vlmResult.backend as 'vlm-hf' | 'ollama',
+        backend: vlmResult.backend as 'vlm-hf' | 'llama-server',
         latencyMs: vlmResult.latencyMs,
         tokenCount: vlmResult.usage?.total_tokens,
       });
@@ -131,7 +132,7 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
       backend: 'vlm-hf',
       latencyMs: Math.round(performance.now() - start),
       error:
-        'No VLM backend available — TurboQuant (mmproj), HF server (:8085), and Ollama VLM all failed',
+        'No VLM backend available — TurboQuant (mmproj), HF server (:8085), and llama-server VLM all failed',
     };
   }
 
@@ -277,14 +278,14 @@ export async function routeInference(request: InferenceRequest): Promise<Inferen
     return litertResult;
   }
 
-  // Fall back to direct Ollama
+  // Fall back to direct llama-server
   const result = await ollamaInference(request, start);
   console.info(
-    `[inference-router] backend=ollama latency=${result.latencyMs}ms${result.error ? ` error=${result.error}` : ''}`
+    `[inference-router] backend=llama-server latency=${result.latencyMs}ms${result.error ? ` error=${result.error}` : ''}`
   );
   logLLMInference({
     model: result.model,
-    backend: 'ollama',
+    backend: 'llama-server',
     latencyMs: result.latencyMs,
     tokenCount: result.usage?.total_tokens,
     error: result.error,
@@ -323,7 +324,7 @@ async function tryTensorRT(request: InferenceRequest): Promise<InferenceResponse
 		});
 
 		if (result.error) {
-			return null; // fall through to Ollama
+				return null; // fall through to llama-server VLM
 		}
 
 		return {
@@ -493,7 +494,7 @@ function computeCacheBypassProb(request: InferenceRequest): number {
  * Fast cache-only Bifrost probe with 500ms hard deadline.
  *
  * Bifrost semantic cache hits return in <100ms (Qdrant vector lookup → stored response).
- * Cache misses trigger a full Ollama round-trip (30-120s for Gemma 4 thinking mode).
+ * Cache misses trigger a full llama-server round-trip (30-120s for Gemma 4 thinking mode).
  * Aborting at 500ms means: hit → instant win; miss → hand off to TurboQuant.
  *
  * Cache key namespacing: uses a 6-char hash of the system prompt to partition the cache
@@ -557,7 +558,7 @@ async function tryBifrostCacheCheck(request: InferenceRequest, startTime: number
         'Content-Type': 'application/json',
         // Required: caching only activates when x-bf-cache-key is present.
         // 500ms timeout means: if Bifrost doesn't return within that window, it is
-        // waiting on Ollama inference (cache miss) — abort and let TurboQuant handle it.
+        // waiting on local inference (cache miss) — abort and let TurboQuant handle it.
         'x-bf-cache-key': cacheKey,
       },
       body: JSON.stringify({
@@ -637,7 +638,7 @@ async function tryBifrost(request: InferenceRequest, startTime: number): Promise
  *
  * Cascade:
  *   1. HF Transformers server (:8085) — legal fine-tuned NF4, if running
- *   2. Ollama native multimodal — gemma4:e4b-it-q4_K_M with /api/chat images field
+ *   2. llama-server native multimodal — gemma4:e4b-it-q4_K_M with /v1/chat/completions image_url parts
  *      (Stock E4B has identical SigLIP vision tower — frozen during GRPO training)
  *
  * For text-only requests that reach this function, only try HF server (Ollama
@@ -648,7 +649,7 @@ async function tryVlmServer(request: InferenceRequest, startTime: number): Promi
 	const hfResult = await tryHfVlmServer(request, startTime);
 	if (hfResult) return hfResult;
 
-	// ── Attempt 2: Ollama native multimodal (only for image requests) ──
+	// ── Attempt 2: llama-server native multimodal (only for image requests) ──
 	if (request.imageBase64) {
 		return tryOllamaVlm(request, startTime);
 	}
@@ -733,7 +734,7 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 	if (result) return result;
 
 	// VRAM swap: Use vlm-lifecycle to safely switch to VISION mode
-	console.info(`[vram-swap] Ollama VLM failed — triggering vlm-lifecycle switch to VISION`);
+	console.info(`[vram-swap] llama-server VLM failed — triggering vlm-lifecycle switch to VISION`);
 	const switchRes = await switchVlmMode(VlmMode.VISION);
 	if (!switchRes.success) {
     console.warn(`[vram-swap] VLM lifecycle switch failed: ${switchRes.error}`);
@@ -749,33 +750,31 @@ async function tryOllamaVlm(request: InferenceRequest, startTime: number): Promi
 	}
 }
 
-/** Raw Ollama VLM call — no VRAM swap logic */
+/** Raw llama-server VLM call — no VRAM swap logic */
 async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Promise<InferenceResponse | null> {
-	const model = 'gemma4:e4b-it-q4_K_M';
-	const messages: Array<{ role: string; content: string; images?: string[] }> = [];
-
-	if (request.systemPrompt) {
-		messages.push({ role: 'system', content: request.systemPrompt });
-	}
-	messages.push({
-		role: 'user',
-		content: request.prompt,
-		images: request.imageBase64 ? [request.imageBase64] : undefined,
-	});
+	const model = await getActiveLocalVlmModel().catch(() => 'gemma4:e4b-it-q4_K_M');
 
 	try {
-		const res = await ollamaFetch(`${getOllamaEndpoint()}/api/chat`, {
+		const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				model,
-				messages,
+				messages: [
+					...(request.systemPrompt ? [{ role: 'system', content: request.systemPrompt }] : []),
+					{
+						role: 'user',
+						content: request.imageBase64
+							? [
+								{ type: 'image_url', image_url: { url: `data:image/png;base64,${request.imageBase64}` } },
+								{ type: 'text', text: request.prompt },
+							]
+							: request.prompt,
+					},
+				],
 				stream: false,
-				keep_alive: '24h',
-				options: {
-					num_predict: request.maxTokens ?? 512,
-					temperature: request.temperature ?? 0.3,
-				},
+				max_tokens: request.maxTokens ?? 512,
+				temperature: request.temperature ?? 0.3,
 			}),
 			signal: AbortSignal.timeout(120_000),
 		});
@@ -783,17 +782,17 @@ async function _ollamaVlmCall(request: InferenceRequest, startTime: number): Pro
 		if (!res.ok) return null;
 
 		const data = await res.json();
-		const text = data.message?.content ?? '';
+		const text = data.choices?.[0]?.message?.content ?? '';
 		if (!text) return null;
 
 		return {
 			text,
 			model,
-			backend: 'ollama',
+			backend: 'llama-server',
 			usage: {
-				prompt_tokens: data.prompt_eval_count ?? 0,
-				completion_tokens: data.eval_count ?? 0,
-				total_tokens: (data.prompt_eval_count ?? 0) + (data.eval_count ?? 0),
+				prompt_tokens: data.usage?.prompt_tokens ?? 0,
+				completion_tokens: data.usage?.completion_tokens ?? 0,
+				total_tokens: data.usage?.total_tokens ?? ((data.usage?.prompt_tokens ?? 0) + (data.usage?.completion_tokens ?? 0)),
 			},
 			latencyMs: Math.round(performance.now() - startTime),
 		};
@@ -857,7 +856,7 @@ async function tryLiteRT(request: InferenceRequest, startTime: number): Promise<
 }
 
 async function ollamaInference(request: InferenceRequest, startTime: number): Promise<InferenceResponse> {
-	const model = 'gemma4-rotorquant:latest';
+		const model = 'gemma4-rotorquant:latest';
 	const prompt = request.systemPrompt
 		? `${request.systemPrompt}\n\n${request.prompt}`
 		: request.prompt;
@@ -884,7 +883,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 				return {
 					text: '',
 					model,
-					backend: 'ollama' as const,
+					backend: 'llama-server' as const,
 					latencyMs: Math.round(performance.now() - startTime),
 					error: `Ollama error: ${res.status}`
 				};
@@ -895,7 +894,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 			return {
 				text: data.response ?? '',
 				model,
-				backend: 'ollama' as const,
+				backend: 'llama-server' as const,
 				usage: {
 					prompt_tokens: data.prompt_eval_count ?? 0,
 					completion_tokens: data.eval_count ?? 0,
@@ -908,7 +907,7 @@ async function ollamaInference(request: InferenceRequest, startTime: number): Pr
 		return {
 			text: '',
 			model,
-			backend: 'ollama',
+			backend: 'llama-server',
 			latencyMs: Math.round(performance.now() - startTime),
 			error: err instanceof Error ? err.message : 'Ollama inference failed'
 		};
@@ -927,11 +926,11 @@ export interface StreamingInferenceRequest {
 export interface StreamChunk {
 	content: string;
 	done: boolean;
-	backend?: 'tensorrt' | 'triton' | 'turboquant' | 'vlm-hf' | 'litert' | 'ollama';
+	backend?: 'tensorrt' | 'triton' | 'turboquant' | 'vlm-hf' | 'litert' | 'llama-server';
 }
 
 /**
- * Streaming inference cascade: TRT-LLM → Triton → TurboQuant → Ollama.
+ * Streaming inference cascade: TRT-LLM → Triton → TurboQuant → llama-server.
  * Returns an async generator of text chunks.
  * Use for SSE endpoints, streaming chat, etc.
  */
@@ -1076,7 +1075,7 @@ export async function* routeStreamingInference(
 		// LiteRT unavailable
 	}
 
-	// Tier 5: Ollama (uses /api/chat if messages provided, /api/generate otherwise)
+	// Tier 5: llama-server compatibility wrapper (uses /api/chat if messages provided, /api/generate otherwise)
 	const ollamaUrl = getOllamaEndpoint();
 	const model = request.model ?? 'gemma4-rotorquant:latest';
 
@@ -1092,7 +1091,7 @@ export async function* routeStreamingInference(
 	});
 
 	if (!res.ok || !res.body) {
-		yield { content: '', done: true, backend: 'ollama' };
+		yield { content: '', done: true, backend: 'llama-server' };
 		return;
 	}
 
@@ -1107,14 +1106,14 @@ export async function* routeStreamingInference(
 			try {
 				const parsed = JSON.parse(line);
 				const chunk = parsed.message?.content ?? parsed.response ?? '';
-				if (chunk) yield { content: chunk, done: false, backend: 'ollama' };
+				if (chunk) yield { content: chunk, done: false, backend: 'llama-server' };
 			} catch {
 				// skip malformed
 			}
 		}
 	}
 
-	yield { content: '', done: true, backend: 'ollama' };
+	yield { content: '', done: true, backend: 'llama-server' };
 }
 
 /**

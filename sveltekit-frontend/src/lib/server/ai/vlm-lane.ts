@@ -1,5 +1,5 @@
 import { streamText } from 'ai';
-import { llamaServer, LOCAL_VLM_MODEL } from './local-llama-provider.js';
+import { getActiveLocalVlmModel, llamaServer } from './local-llama-provider.js';
 import { parseVlmPlan, type VlmPlan } from './vlm-plan-parser.js';
 import { dispatchTools, type ToolResult } from './tool-dispatcher.js';
 import type { LaneRequest } from './lane-router.js';
@@ -61,6 +61,7 @@ export async function runVlmLane(req: LaneRequest): Promise<VlmLaneResult> {
 	const allToolResults: ToolResult[] = [];
 	let finalPlan: VlmPlan = {};
 	let answer = '';
+	const activeModel = await getActiveLocalVlmModel();
 
 	const imageContent = buildImageContent(req);
 
@@ -75,7 +76,7 @@ export async function runVlmLane(req: LaneRequest): Promise<VlmLaneResult> {
 		let rawText = '';
 		try {
 			const result = streamText({
-				model: llamaServer(LOCAL_VLM_MODEL),
+				model: llamaServer(activeModel),
 				messages: [{ role: 'user', content: userContent }],
 				maxOutputTokens: 1024,
 				temperature: 0.2,
@@ -114,7 +115,7 @@ export async function runVlmLane(req: LaneRequest): Promise<VlmLaneResult> {
 		answer,
 		plan: finalPlan,
 		toolResults: allToolResults,
-		model: LOCAL_VLM_MODEL,
+		model: activeModel,
 		durationMs: Math.round(performance.now() - start),
 	};
 }

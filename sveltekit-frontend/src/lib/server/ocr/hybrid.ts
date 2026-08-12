@@ -8,9 +8,8 @@ import { createWorker } from 'tesseract.js';
 import os from 'os';
 import { ENV } from '$lib/server/env.server.js';
 
-/** VLM OCR endpoints — tries llama-server VLM first, then Ollama as fallback */
+/** VLM OCR endpoints — uses llama-server VLM, with Tesseract as the non-VLM fallback */
 const VLM_BASE_URL = ENV.VLM_BASE_URL;
-const OLLAMA_BASE_URL = ENV.OLLAMA_BASE_URL;
 const VLM_MODEL_NAME = process.env.VLM_MODEL ?? 'gemma4-rotorquant:latest';
 /** Confidence threshold below which Tesseract result triggers VLM supplement */
 const VLM_OCR_THRESHOLD = 0.6;
@@ -102,15 +101,13 @@ async function classifyDocType(imageBase64: string): Promise<DocType> {
         }
     };
 
-    return (await attempt(VLM_BASE_URL, VLM_MODEL_NAME))
-        ?? (await attempt(OLLAMA_BASE_URL, `${VLM_MODEL_NAME}:latest`))
-        ?? 'general';
+    return (await attempt(VLM_BASE_URL, VLM_MODEL_NAME)) ?? 'general';
 }
 
 /**
  * Extract text from an image buffer using the Gemma 4 VLM (gemma4-rotorquant:latest).
  * Two-step: classify document type, then apply a type-specific extraction prompt.
- * Tries llama-server :8085 first, falls back to Ollama :11434.
+ * Uses llama-server :8085 for VLM; Tesseract remains the non-VLM fallback.
  */
 async function extractTextVlm(imageBuffer: Buffer, isPdf: boolean): Promise<OcrResult> {
     const imageBase64 = imageBuffer.toString('base64');
@@ -141,15 +138,14 @@ async function extractTextVlm(imageBuffer: Buffer, isPdf: boolean): Promise<OcrR
         }
     };
 
-    const text = (await attempt(VLM_BASE_URL, VLM_MODEL_NAME))
-        ?? (await attempt(OLLAMA_BASE_URL, `${VLM_MODEL_NAME}:latest`));
+    const text = await attempt(VLM_BASE_URL, VLM_MODEL_NAME);
 
     if (!text) {
         return {
             text: '',
             method: isPdf ? 'vlm-ocr-from-pdf' : 'vlm-ocr',
             confidence: 0,
-            error: 'VLM OCR: both endpoints unavailable',
+            error: 'VLM OCR: llama-server unavailable',
         };
     }
 

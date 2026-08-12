@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
+import { computePacketKey } from '../atlas/identity/packet-key-builder.js';
 import { buildPosConceptTaggingPacketFromSource } from './source-pos-concept-packet.js';
 
 describe('source-pos-concept-packet', () => {
@@ -24,6 +24,7 @@ describe('source-pos-concept-packet', () => {
       producerId: 'source-pos-concept-adapter',
       producerRevision: 'source-pos-concept-adapter-v1',
       featureRevision: 'feature:v1',
+      vectorRefs: ['qdrant:point:session-store', 'mmap:semantic-card:session-store'],
       semanticConceptIds: ['concept:session', 'concept:store'],
       ontologyIds: ['ontology:session-store'],
       extractedFeatures: [
@@ -66,5 +67,12 @@ describe('source-pos-concept-packet', () => {
     expect(result?.packet.featureMatrixSetup.feature_tiers.candidate_query.exact_knn_top_k).toBe(100);
     expect(result?.packet.jsonlParsedEvidence.content_hash).toMatch(/^sha256:/);
     expect(result?.packet.domainClassification?.primary_label).toBe('pos-tagging');
+    expect(result?.semanticFeatureEnvelope.schemaVersion).toBe('semantic-feature-envelope.v1');
+    expect(result?.semanticFeatureEnvelope.packetKey).toBe(packetKey);
+    expect(result?.semanticFeatureEnvelope.vectorRefs).toEqual([
+      'mmap:semantic-card:session-store',
+      'qdrant:point:session-store',
+    ]);
+    expect(result?.semanticFeatureEnvelope.provenance.jsonlParserRevision).toBe('jsonl-parser-v1');
   });
 });

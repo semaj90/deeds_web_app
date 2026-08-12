@@ -61,7 +61,7 @@ import { streamText } from 'ai';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
 import { getRedis } from '$lib/server/redis.js';
 import { generateSingleEmbedding } from '../grpc/embedding-client.js';
-import { llamaServer, LOCAL_VLM_MODEL } from './local-llama-provider.js';
+import { getActiveLocalVlmModel, llamaServer } from './local-llama-provider.js';
 import { createLangExtractClient } from '$lib/server/atlas/ai/langextract-client.js';
 
 // ─── Domain taxonomy (Parent Atlas Workstation lanes) ───────────────────────
@@ -369,8 +369,9 @@ const SUMMARY_MAX_CHARS = 2000;
 export async function summarizeChunkViaLlamaServer(chunk: WorkstationChunk): Promise<string> {
 	const truncated = chunk.content.length > SUMMARY_MAX_CHARS ? chunk.content.slice(0, SUMMARY_MAX_CHARS) : chunk.content;
 	try {
+		const activeModel = await getActiveLocalVlmModel();
 		const result = streamText({
-			model: llamaServer(LOCAL_VLM_MODEL),
+			model: llamaServer(activeModel),
 			messages: [
 				{
 					role: 'user',

@@ -802,8 +802,7 @@ export async function executeContextualTool(
         const { db } = await import('$lib/server/db/client');
         const { personsOfInterest, poiPhotos } = await import('$lib/server/db/schema-postgres.js');
         const { and, eq, ne, isNull, or, desc, sql } = await import('drizzle-orm');
-        const { ollamaFetch } = await import('$lib/server/ollama.js');
-        const { ENV: env } = await import('$lib/server/env.server.js');
+        const { LLAMA_SERVER_BASE_URL, getActiveLocalVlmModel } = await import('./local-llama-provider.js');
 
         const limit = Math.min(30, Math.max(1, Number(args.limit ?? 10)));
         const passes = Math.min(3, Math.max(1, Number(args.passes ?? 3))) as 1 | 2 | 3;
@@ -909,8 +908,8 @@ export async function executeContextualTool(
 
         // Pass 2: VLM reasoning on top-5
         if (passes >= 2 && refPhoto?.thumbnailUrl) {
-          const OLLAMA = env.OLLAMA_BASE_URL.replace(/\/$/, '');
-          const model = env.OLLAMA_VLM_MODEL ?? env.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
+          const model = await getActiveLocalVlmModel();
+          const llamaUrl = LLAMA_SERVER_BASE_URL.replace(/\/$/, '');
 
           async function fetchB64(url: string): Promise<string | null> {
             try {
@@ -931,7 +930,7 @@ export async function executeContextualTool(
                 const candB64 = await fetchB64(photo.thumb);
                 if (!candB64) return;
                 try {
-                  const res = await ollamaFetch(`${OLLAMA}/api/chat`, {
+                  const res = await fetch(`${llamaUrl}/chat/completions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -939,18 +938,25 @@ export async function executeContextualTool(
                       messages: [
                         {
                           role: 'user',
-                          content: `Forensic face match. Reference: ${refPoi.name}, Candidate: ${m.name}. Same person? Reply only JSON: {"match":bool,"confidence":0-100,"reasoning":"1 sentence"}`,
-                          images: [refB64, candB64],
+                          content: [
+                            {
+                              type: 'text',
+                              text: `Forensic face match. Reference: ${refPoi.name}, Candidate: ${m.name}. Same person? Reply only JSON: {"match":bool,"confidence":0-100,"reasoning":"1 sentence"}`,
+                            },
+                            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${refB64}` } },
+                            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${candB64}` } },
+                          ],
                         },
                       ],
                       stream: false,
-                      options: { temperature: 0.1, num_predict: 150 },
+                      temperature: 0.1,
+                      max_tokens: 150,
                     }),
                     signal: AbortSignal.timeout(55_000),
                   });
                   if (res.ok) {
                     const d = await res.json();
-                    const txt: string = d?.message?.content ?? '';
+                    const txt: string = d?.choices?.[0]?.message?.content ?? d?.message?.content ?? '';
                     const match = txt.match(/\{[\s\S]*?\}/);
                     if (match) {
                       const p = JSON.parse(match[0]);

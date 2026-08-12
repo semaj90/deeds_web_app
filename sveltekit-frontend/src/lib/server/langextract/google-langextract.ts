@@ -1,5 +1,6 @@
 // This module uses Google's official LangExtract library via the Python service.
-// The service runs on port 8095 and uses gemma4-rotorquant:latest via Ollama.
+// The service runs on port 8095 and uses the active llama-server text model for
+// legacy keyword fallback when the structured extractor is unavailable.
 import { langextractFetch } from '$lib/server/langextract-client.js';
 import { ENV } from '$lib/server/env.server.js';
 import { bifrostChat } from '$lib/server/ollama.js';
@@ -40,12 +41,12 @@ export async function extractKeywords(text: string): Promise<string[]> {
         // Fall through to legacy method
     }
 
-    // Legacy fallback: direct Ollama call
+    // Legacy fallback: direct llama-server call
     return extractKeywordsLegacy(text);
 }
 
 /**
- * Legacy keyword extraction via direct Ollama call.
+ * Legacy keyword extraction via direct llama-server call.
  * Used when LangExtract service is unavailable.
  */
 async function extractKeywordsLegacy(text: string): Promise<string[]> {

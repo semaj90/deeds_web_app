@@ -76,9 +76,8 @@ import * as Hypergraph from '$lib/server/ai/hypergraph-store.js';
 import safeJsonPost from '$lib/server/utils/safe-json-post.js';
 
 // ── Config ──────────────────────────────────────────────────────────────────
-// CRITICAL (July 2026): Synthesis routes to llama-server :8090 (TurboQuant canonical).
-// Embedding routes to Ollama :11434 (embeddinggemma:latest).
-// CHAT_BASE_URL MUST prefer llama-server. Do NOT fall back to Ollama for synthesis.
+// CRITICAL (July 2026): synthesis routes to llama-server :8090 (TurboQuant canonical).
+// Ollama is embeddings-only. Do NOT fall back to Ollama for chat/generate paths.
 
 const CHAT_BASE_URL =
   ENV.LLAMA_SERVER_URL ??
@@ -251,7 +250,7 @@ function logOllamaDiagnostics(
   durationMs: number,
   status?: number,
   error?: unknown,
-  backend: 'ollama' | 'turboquant' = 'ollama'
+  backend: 'llama-server' | 'turboquant' = 'llama-server'
 ): void {
   if (!OLLAMA_DIAGNOSTICS_ENABLED) return;
 
@@ -290,9 +289,9 @@ function buildBifrostCacheTrace(
 ): LlmCacheTrace {
   return {
     modelRole: 'bifrost-chat-synthesis',
-    cacheTier: hitLevel === 'L1' ? 'L1_exact' : hitLevel === 'L2' ? 'L2_semantic' : 'L3_ollama',
+    cacheTier: hitLevel === 'L1' ? 'L1_exact' : hitLevel === 'L2' ? 'L2_semantic' : 'L3_llama_server',
     tokenizerFamily: 'gemma',
-    provider: hitLevel === 'L3' ? 'ollama' : 'bifrost',
+    provider: hitLevel === 'L3' ? 'llama-server' : 'bifrost',
     latencyMs,
     similarity,
   };
@@ -306,9 +305,9 @@ function logBifrostCacheTrace(
   logInference({
     type: 'llm',
     model,
-    backend: trace.provider === 'ollama' ? 'ollama' : 'bifrost',
+    backend: trace.provider === 'llama-server' ? 'llama-server' : 'bifrost',
     latencyMs: trace.latencyMs ?? 0,
-    cacheHit: trace.cacheTier !== 'L3_ollama',
+    cacheHit: trace.cacheTier !== 'L3_llama_server',
     metadata: {
       model_role: trace.modelRole,
       cache_tier: trace.cacheTier,
@@ -321,7 +320,7 @@ function logBifrostCacheTrace(
 // ── TurboQuant Intercept ──────────────────────────────────────────────────
 // When enabled, ollamaFetch() transparently routes /api/chat and /api/generate
 // through TurboQuant llama-server (:8080) for ~78 tok/s GPU inference.
-// Ollama remains as automatic fallback when TurboQuant is unavailable.
+// llama-server is the fallback when TurboQuant is unavailable.
 // Toggle: TURBOQUANT_INTERCEPT=false to disable.
 const runtimeConfig = resolveRuntimeConfig();
 const TURBOQUANT_INTERCEPT_ENABLED =
@@ -561,6 +560,134 @@ export async function ollamaFetch(url: string, init?: RequestInit): Promise<Resp
   if (turboResponse && turboResponse.ok) {
     logOllamaDiagnostics('success', meta, Date.now() - startedAt, 200, undefined, 'turboquant');
     return turboResponse;
+  }
+
+  let urlPath: string | null = null;
+  try {
+    urlPath = new URL(url, OLLAMA_BASE_URL).pathname;
+  } catch {
+    urlPath = null;
+  }
+
+  const isChatEndpoint = urlPath === '/api/chat';
+  const isGenerateEndpoint = urlPath === '/api/generate';
+
+  if ((isChatEndpoint || isGenerateEndpoint) && typeof init?.body === 'string') {
+    try {
+      const ollamaBody = JSON.parse(init.body) as Record<string, any>;
+      const openaiMessages: Array<{ role: string; content: string }> = [];
+
+      if (isChatEndpoint) {
+        if (Array.isArray(ollamaBody.messages)) {
+          for (const msg of ollamaBody.messages) {
+            openaiMessages.push({ role: msg.role, content: msg.content });
+          }
+        }
+      } else {
+        if (ollamaBody.system) {
+          openaiMessages.push({ role: 'system', content: ollamaBody.system });
+        }
+        openaiMessages.push({ role: 'user', content: ollamaBody.prompt ?? '' });
+      }
+
+      if (openaiMessages.length > 0 && ollamaBody.stream !== true) {
+        const temperature = ollamaBody.options?.temperature ?? 0.7;
+        const maxTokens = ollamaBody.options?.num_predict ?? 2048;
+        const llamaResponse = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: ollamaBody.model ?? (isChatEndpoint ? VLM_MODELS.gemma4 : VLM_MODELS.tool),
+            messages: openaiMessages,
+            temperature,
+            max_tokens: maxTokens,
+            stream: false,
+            ...(ollamaBody.tools ? { tools: ollamaBody.tools } : {}),
+          }),
+          signal: init?.signal,
+        });
+
+        if (llamaResponse.ok) {
+          const llamaData = fastJsonParse<{
+            choices?: Array<{
+              message?: {
+                content?: string;
+                reasoning_content?: string;
+                tool_calls?: Array<{
+                  function: { name: string; arguments: string | Record<string, unknown> };
+                }>;
+              };
+            }>;
+            usage?: {
+              prompt_tokens?: number;
+              completion_tokens?: number;
+              total_tokens?: number;
+            };
+          }>(await llamaResponse.text());
+
+          const choice = llamaData.choices?.[0]?.message;
+          const content = choice?.content ?? choice?.reasoning_content ?? '';
+          const usage = llamaData.usage ?? {};
+
+          let ollamaToolCalls:
+            | Array<{ function: { name: string; arguments: Record<string, unknown> } }>
+            | undefined;
+          if (choice?.tool_calls?.length) {
+            ollamaToolCalls = choice.tool_calls.map((tc) => {
+              let args: Record<string, unknown> = {};
+              if (typeof tc.function.arguments === 'string') {
+                try {
+                  args = JSON.parse(tc.function.arguments);
+                } catch {
+                  /* keep empty */
+                }
+              } else if (typeof tc.function.arguments === 'object' && tc.function.arguments !== null) {
+                args = tc.function.arguments as Record<string, unknown>;
+              }
+              return { function: { name: tc.function.name, arguments: args } };
+            });
+          }
+
+          const response = isChatEndpoint
+            ? {
+                model: ollamaBody.model ?? VLM_MODELS.gemma4,
+                created_at: new Date().toISOString(),
+                message: {
+                  role: 'assistant',
+                  content,
+                  ...(ollamaToolCalls?.length ? { tool_calls: ollamaToolCalls } : {}),
+                },
+                done: true,
+                total_duration: 0,
+                load_duration: 0,
+                prompt_eval_count: usage.prompt_tokens ?? 0,
+                prompt_eval_duration: 0,
+                eval_count: usage.completion_tokens ?? 0,
+                eval_duration: 0,
+              }
+            : {
+                model: ollamaBody.model ?? VLM_MODELS.tool,
+                created_at: new Date().toISOString(),
+                response: content,
+                done: true,
+                total_duration: 0,
+                load_duration: 0,
+                prompt_eval_count: usage.prompt_tokens ?? 0,
+                prompt_eval_duration: 0,
+                eval_count: usage.completion_tokens ?? 0,
+                eval_duration: 0,
+              };
+
+          logOllamaDiagnostics('success', meta, Date.now() - startedAt, llamaResponse.status, undefined, 'llama-server');
+          return new Response(JSON.stringify(response), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          });
+        }
+      }
+    } catch {
+      // Fall through to the non-chat/generate handling below.
+    }
   }
 
   // VRAM Contention Guard: If this is a large model call (VLM/Gemma4) to Ollama,
@@ -988,7 +1115,7 @@ export async function bifrostChat(
       // L2 probe failed — fall through to Bifrost gateway (L3)
     }
   }
-  // ── L3: Bifrost Gateway → Ollama ──────────────────────────────────────────
+// ── L3: Bifrost Gateway → llama-server/TurboQuant ──────────────────────────
   // Bifrost acts as a pure forwarding gateway (vector_store removed from config to
   // avoid Docker gRPC hang). L1/L2 handled above; L3 does the actual inference.
   const bifrostStart = performance.now();
@@ -1015,12 +1142,12 @@ export async function bifrostChat(
     }
   }
 
-  const callDirectOllamaFallback = async () => {
+  const callDirectLlamaFallback = async () => {
     // ── TurboQuant (llama-server :8090) Priority Gate ──────────────────────
     // Prefer TurboQuant for Gemma4 models if available (KV cache compression benefit)
     const isTurboQuantModel = model?.includes('gemma4') || model?.includes('gemma3');
     const turboQuantUrl = ENV.TURBOQUANT_BASE_URL?.replace(/\/$/, '') ?? 'http://127.0.0.1:8090';
-    let usedBackend = 'ollama';
+    let usedBackend = 'llama-server';
 
     if (isTurboQuantModel) {
       try {
@@ -1051,43 +1178,44 @@ export async function bifrostChat(
             t_l3 = performance.now() - bifrostStart;
             usedBackend = 'turboquant';
             console.log(`[bifrost] L3 TURBOQUANT OK (l3_ms=${Math.round(t_l3)})`);
-            return; // Success — don't fallback to Ollama
+            return; // Success — don't fallback further
           }
         }
       } catch (err) {
-        // TurboQuant probe/call failed — fall through to Ollama
+        // TurboQuant probe/call failed — fall through to llama-server direct
         console.warn(`[bifrost] TurboQuant probe failed (${isTurboQuantModel ? 'gate enabled' : 'not gemma4'}):`, (err as Error).message);
       }
     }
 
-    // ── Ollama Fallback ────────────────────────────────────────────────────
-    // Default fallback if TurboQuant unavailable, not gated, or fails
-    const ollamaRes = await ollamaFetch(`${CHAT_BASE_URL}/api/chat`, {
+    // ── llama-server Fallback ───────────────────────────────────────────────
+    // Default fallback if TurboQuant unavailable, not gated, or fails.
+    const llamaRes = await fetch(`${CHAT_BASE_URL}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model, // use original model name (not bifrost prefixed)
+        model: model, // use original model name
         messages: messagesForInference,
         stream: false,
         ...(options?.tools ? { tools: options.tools } : {}),
-        options: {
-          temperature: options?.temperature ?? 0.7,
-          num_predict: options?.maxTokens ?? 2048,
-        },
+        temperature: options?.temperature ?? 0.7,
+        max_tokens: options?.maxTokens ?? 2048,
       }),
       signal: AbortSignal.timeout(options?.timeoutMs ?? REQUEST_TIMEOUT_MS),
     });
 
-    if (!ollamaRes.ok) {
-      throw new Error(`Ollama L3 error: ${ollamaRes.status}`);
+    if (!llamaRes.ok) {
+      throw new Error(`llama-server L3 error: ${llamaRes.status}`);
     }
 
-    const ollamaData = fastJsonParse<OllamaResponse>(await ollamaRes.text());
-    content = sanitizeModelOutput(ollamaData.message?.content ?? '');
-    tool_calls = ollamaData.message?.tool_calls;
+    const llamaData = fastJsonParse<{
+      choices?: Array<{ message?: { content?: string; tool_calls?: any[] } }>;
+    }>(await llamaRes.text());
+    const choice = llamaData.choices?.[0]?.message;
+    content = sanitizeModelOutput(choice?.content ?? '');
+    tool_calls = choice?.tool_calls;
     t_l3 = performance.now() - bifrostStart;
-    usedBackend = 'ollama';
-    console.log(`[bifrost] L3 OLLAMA FALLBACK OK (l3_ms=${Math.round(t_l3)})`);
+    usedBackend = 'llama-server';
+    console.log(`[bifrost] L3 LLAMA-SERVER FALLBACK OK (l3_ms=${Math.round(t_l3)})`);
   };
 
   try {
@@ -1111,11 +1239,11 @@ export async function bifrostChat(
             metadata: {
               source: 'bifrostChat',
               stage: 'gateway-skip',
-              fallback: model.includes('gemma4') ? 'turboquant-or-ollama' : 'ollama-direct',
+              fallback: model.includes('gemma4') ? 'turboquant-or-llama-server' : 'llama-server-direct',
               retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
             },
           });
-          await callDirectOllamaFallback();
+          await callDirectLlamaFallback();
         } else {
           const res = await fetch(`${ENV.BIFROST_URL}/v1/chat/completions`, {
             method: 'POST',
@@ -1191,7 +1319,7 @@ export async function bifrostChat(
       return { content, tool_calls, sessionId };
     }
   } catch (bifrostErr) {
-    // ── L3 Fallback: Direct Ollama (bypasses broken Bifrost) ──
+    // ── L3 Fallback: Direct llama-server (bypasses broken Bifrost) ──
     const gatewayTimedOut = isAbortTimeoutError(bifrostErr);
     const errorMessage = (bifrostErr as Error)?.message?.slice(0, 120) ?? 'unknown error';
     bifrostGatewayUnavailableUntil = Date.now() + BIFROST_GATEWAY_FAILURE_COOLDOWN_MS;
@@ -1206,7 +1334,7 @@ export async function bifrostChat(
       metadata: {
         source: 'bifrostChat',
         stage: 'gateway-error',
-        fallback: 'ollama-direct',
+        fallback: 'llama-server-direct',
         timedOut: gatewayTimedOut,
         cooldownMs: BIFROST_GATEWAY_FAILURE_COOLDOWN_MS,
         retryAt: new Date(bifrostGatewayUnavailableUntil).toISOString(),
@@ -1215,20 +1343,20 @@ export async function bifrostChat(
 
     if (gatewayTimedOut) {
       console.info(
-        `[bifrost] Gateway timeout after ${bifrostGatewayTimeoutMs}ms, falling back to direct Ollama`
+        `[bifrost] Gateway timeout after ${bifrostGatewayTimeoutMs}ms, falling back to direct llama-server`
       );
     } else {
-      console.warn(`[bifrost] Gateway error (${errorMessage}), falling back to direct Ollama`);
+      console.warn(`[bifrost] Gateway error (${errorMessage}), falling back to direct llama-server`);
     }
 
-    await callDirectOllamaFallback();
+    await callDirectLlamaFallback();
     if (tool_calls?.length) {
       logBifrostCacheTrace(
         bifrostModel,
         buildBifrostCacheTrace('L3', Math.round(performance.now() - t_start)),
         {
           source: 'bifrostChat',
-          fallback: 'ollama-direct',
+        fallback: 'llama-server-direct',
           toolCalls: tool_calls.length,
         }
       );
@@ -1277,7 +1405,7 @@ export async function bifrostChat(
                         params_hash: cacheKey,
                         cache_key: 'global',
                         model: bifrostModel,
-                        provider: 'ollama',
+                        provider: 'llama-server',
                         response: cachedResponse,
                         stream_chunks: '',
                         from_bifrost_semantic_cache_plugin: true,
@@ -1298,8 +1426,8 @@ export async function bifrostChat(
     await setExactMatchCache(exactCacheKey, {
       content,
       model: bifrostModel,
-      backend: cacheHit ? `bifrost-semantic${hitType ? '-' + hitType : ''}` : 'ollama-direct',
-    });
+        backend: cacheHit ? `bifrost-semantic${hitType ? '-' + hitType : ''}` : 'llama-server-direct',
+      });
   }
 
   const total_ms = performance.now() - t_start;

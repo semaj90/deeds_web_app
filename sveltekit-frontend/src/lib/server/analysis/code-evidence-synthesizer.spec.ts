@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
+import { computePacketKey } from '../atlas/identity/packet-key-builder.js';
 import { buildCodeEvidenceSynthesizerReceiptFromSource } from './code-evidence-synthesizer.js';
 
 describe('code-evidence-synthesizer', () => {
@@ -25,6 +25,7 @@ describe('code-evidence-synthesizer', () => {
 			producerId: 'source-pos-concept-adapter',
 			producerRevision: 'source-pos-concept-adapter-v1',
 			featureRevision: 'feature:v1',
+			vectorRefs: ['qdrant:point:session-store'],
 			semanticConceptIds: ['concept:session', 'concept:store'],
 			ontologyIds: ['ontology:session-store'],
 			extractedFeatures: [
@@ -66,5 +67,7 @@ describe('code-evidence-synthesizer', () => {
 		expect(result?.receipt.receiptId).toMatch(/^code-evidence:/);
 		expect(result?.receipt.inputDigest).toMatch(/^sha256:/);
 		expect(result?.receipt.outputDigest).toMatch(/^sha256:/);
+		expect(result?.semanticFeatureEnvelope.schemaVersion).toBe('semantic-feature-envelope.v1');
+		expect(result?.semanticFeatureEnvelope.vectorRefs).toEqual(['qdrant:point:session-store']);
 	});
 });

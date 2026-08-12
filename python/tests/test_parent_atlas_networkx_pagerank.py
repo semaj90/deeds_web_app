@@ -103,6 +103,36 @@ def test_miniforge_sidecar_bs4_html_parser_extracts_title_and_text():
     assert "window.y" not in parsed["text"]
 
 
+def test_miniforge_sidecar_prefers_treesitter_chunker_module(monkeypatch):
+    import python.miniforge_nlp_sidecar as sidecar
+
+    class FakeChunk:
+        node_type = "function_declaration"
+        start_line = 1
+        end_line = 1
+        symbol = "demo"
+
+    class FakeChunkerModule:
+        @staticmethod
+        def chunk_file(text, language):
+            assert language == "typescript"
+            assert "function demo" in text
+            return [FakeChunk()]
+
+    monkeypatch.setattr(sidecar, "TREESITTER_CHUNKER_AVAILABLE", True)
+    monkeypatch.setattr(sidecar, "TREESITTER_CHUNKER_MODULE", FakeChunkerModule)
+    monkeypatch.setattr(sidecar, "TREE_SITTER_AVAILABLE", False)
+
+    chunks = sidecar._code_chunks_tree_sitter("function demo() {\n  return 1;\n}\n", "typescript")
+
+    assert len(chunks) == 1
+    assert chunks[0].kind == "function_declaration"
+    assert chunks[0].symbol == "demo"
+    assert chunks[0].start == 0
+    assert chunks[0].end > 0
+    assert chunks[0].text.startswith("function demo")
+
+
 def test_miniforge_sidecar_grounded_extraction_is_opt_in():
     from python.miniforge_nlp_sidecar import AnalyzeRequest, _analyze
 

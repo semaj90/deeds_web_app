@@ -81,12 +81,18 @@ export class VisionService {
     const base64 = frameBuffer.toString('base64');
 
     try {
-      const res = await ollamaFetch(`${getOllamaEndpoint()}/api/generate`, {
+      const res = await fetch(`${getOllamaEndpoint()}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: VLM_MODELS.vision,
-          prompt: `Analyze this video frame for a legal case. 
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64}` } },
+              {
+                type: 'text',
+                text: `Analyze this video frame for a legal case. 
           Return a JSON object with: 
           - "caption": A detailed description of the scene.
           - "objects": A list of key objects visible.
@@ -94,16 +100,18 @@ export class VisionService {
           - "tags": 3-5 descriptive tags.
           
           Respond ONLY with the JSON object.`,
-          images: [base64],
+              },
+            ],
+          }],
           stream: false,
-          format: 'json',
-          options: { temperature: 0.1 }
+          temperature: 0.1,
+          max_tokens: 512,
         })
       });
 
       if (!res.ok) throw new Error(`VLM failed: ${await res.text()}`);
-      const data = await res.json() as { response: string };
-      const parsed = JSON.parse(data.response);
+      const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> };
+      const parsed = JSON.parse(data.choices?.[0]?.message?.content ?? '{}');
 
       return {
         caption: parsed.caption || '',

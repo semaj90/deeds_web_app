@@ -12,11 +12,12 @@
 
 The repository already has:
 - ACE packet handling (observation → complete)
-- Multi-lane retrieval (Qdrant, Neo4j, Redis, BM25)
+- Multi-lane retrieval (Qdrant, Neo4j, Redis, BM25, TurboVec acceleration)
 - Parent Atlas assembly (Graphify → Postgres → Neo4j/Qdrant)
 - Workflow state machine (HMM OBSERVE→DIAGNOSE→RETRIEVE→PROPOSE→VALIDATE→EXECUTE)
 - Semantic RPC (inbox/outbox durability)
-- Gemma4 and llama-server adapters
+- llama-server text/VLM adapters, with Ollama retained only where an embedding compatibility shim still exists
+- A Python structural-extraction sidecar for Tree-sitter / ast-grep / LangExtract on `:8095`
 
 **Decision**: Do NOT build parallel classifiers or monolithic Graphify extensions. Instead, consolidate existing lanes into explicit contracts with versioned dimensions, separated lexical evidence classes, deterministic graph authority, and a bounded Go Retrieval service as the semantic normalization boundary.
 
@@ -170,6 +171,7 @@ Each extraction tool has one specific job. Do not use them interchangeably.
 1. **LangExtract does NOT parse TypeScript call graphs.**
 2. **Tree-sitter and ast-grep do NOT attempt to infer architectural intent from design documents.**
 3. **Gemma4 is a consumer of extracted facts, not an extractor.**
+4. **The Python sidecar is the structural extraction runtime; the TS app is the caller.**
 
 ---
 

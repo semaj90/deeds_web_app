@@ -644,7 +644,91 @@ def _grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dic
     return extracted
 
 
+def _chunk_field(item: Any, *names: str) -> Any:
+    if isinstance(item, dict):
+        for name in names:
+            if name in item and item[name] is not None:
+                return item[name]
+    for name in names:
+        value = getattr(item, name, None)
+        if value is not None:
+            return value
+    return None
+
+
+def _line_span_to_offsets(text: str, start_line: int, end_line: int) -> tuple[int, int]:
+    if not text:
+        return 0, 0
+
+    lines = text.splitlines(keepends=True)
+    if not lines:
+        return 0, 0
+
+    start_line = max(1, int(start_line))
+    end_line = max(start_line, int(end_line))
+
+    start_index = sum(len(line) for line in lines[: start_line - 1])
+    if start_line > len(lines):
+        start_index = len(text)
+
+    end_index = sum(len(line) for line in lines[: min(end_line, len(lines))])
+    if end_line >= len(lines):
+        end_index = len(text)
+
+    return start_index, max(start_index, end_index)
+
+
 def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
+    # Canonical structural chunking prefers the installed treesitter-chunker package in the
+    # Python sidecar. The local tree-sitter parser remains a compatibility fallback only.
+    if TREESITTER_CHUNKER_AVAILABLE and TREESITTER_CHUNKER_MODULE is not None:
+        chunk_file = getattr(TREESITTER_CHUNKER_MODULE, "chunk_file", None)
+        if callable(chunk_file):
+            try:
+                raw_chunks = chunk_file(text, language)
+            except TypeError:
+                try:
+                    raw_chunks = chunk_file(text, language=language)
+                except Exception:
+                    raw_chunks = []
+            except Exception:
+                raw_chunks = []
+
+            chunks: list[Chunk] = []
+            for item in raw_chunks or []:
+                kind = str(_chunk_field(item, "node_type", "kind", "type", "nodeType") or "fragment")
+                start_line = int(_chunk_field(item, "start_line", "line_start", "startLine") or 1)
+                end_line = int(_chunk_field(item, "end_line", "line_end", "endLine") or start_line)
+                start_byte = _chunk_field(item, "start_byte", "byte_start", "startByte")
+                end_byte = _chunk_field(item, "end_byte", "byte_end", "endByte")
+                if start_byte is None or end_byte is None:
+                    start_byte, end_byte = _line_span_to_offsets(text, start_line, end_line)
+                else:
+                    start_byte = max(0, int(start_byte))
+                    end_byte = max(start_byte, int(end_byte))
+
+                snippet = _chunk_field(item, "text", "content", "snippet")
+                if snippet is None:
+                    snippet = text[start_byte:end_byte]
+                snippet = str(snippet).strip()
+                if not snippet:
+                    continue
+
+                symbol = _chunk_field(item, "symbol", "name")
+                chunks.append(
+                    Chunk(
+                        kind=kind,
+                        text=snippet[:10_000],
+                        start=start_byte,
+                        end=end_byte,
+                        symbol=str(symbol) if symbol else None,
+                        language=language,
+                    )
+                )
+
+            if chunks:
+                return chunks
+
     if not TREE_SITTER_AVAILABLE:
         return []
     try:

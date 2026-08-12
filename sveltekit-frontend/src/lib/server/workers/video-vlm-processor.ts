@@ -1,6 +1,6 @@
 /**
  * Video VLM Processor — Gemma4 Visual Analysis
- * Extracts frames from video and runs VLM analysis via Ollama
+ * Extracts frames from video and runs VLM analysis via llama-server
  */
 
 import { spawn } from 'child_process';
@@ -194,7 +194,7 @@ export class VideoVLMProcessor {
 	}
 
 	/**
-	 * Analyze frames using Gemma4 VLM via Ollama
+	 * Analyze frames using Gemma4 VLM via llama-server
 	 */
 	private async analyzeFramesWithVLM(frames: { timestamp: number; path: string }[]): Promise<FrameAnalysisResult[]> {
 		const results: FrameAnalysisResult[] = [];
@@ -234,28 +234,33 @@ export class VideoVLMProcessor {
 			const imageBuffer = await fs.readFile(imagePath);
 			const base64Image = imageBuffer.toString('base64');
 
-			// Call Ollama VLM endpoint. NOTE: deliberately NOT routed through llama-server —
-			// the `images` field is Ollama-native multimodal format, and the live :8090
-			// launch config has no --mmproj flag (VLM mode is a separate launch profile
-			// per CLAUDE.md). Converting this to bifrostChat would silently drop vision
-			// input. Leave as Ollama until VLM-on-llama-server is confirmed operational.
-			const response = await fetch(`${getOllamaEndpoint()}/api/generate`, {
+			// Call llama-server VLM endpoint using OpenAI-style image_url content parts.
+			// Ollama is embeddings-only in this workspace.
+			const response = await fetch(`${getOllamaEndpoint()}/v1/chat/completions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4:e4b-it-q4_K_M',
-					prompt: `Analyze this video frame in detail. Describe what you see, list key objects/people, and provide relevant tags. Focus on legal evidence context (locations, actions, objects, people). Format: Description | Objects: obj1, obj2 | Tags: tag1, tag2`,
-					images: [base64Image],
+					model: VLM_MODELS.vision,
+					messages: [{
+						role: 'user',
+						content: [
+							{ type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
+							{
+								type: 'text',
+								text: `Analyze this video frame in detail. Describe what you see, list key objects/people, and provide relevant tags. Focus on legal evidence context (locations, actions, objects, people). Format: Description | Objects: obj1, obj2 | Tags: tag1, tag2`
+							},
+						],
+					}],
 					stream: false
 				})
 			});
 
 			if (!response.ok) {
-				throw new Error(`Ollama VLM request failed: ${response.status}`);
+				throw new Error(`llama-server VLM request failed: ${response.status}`);
 			}
 
-			const data = await response.json();
-			const text = data.response || '';
+			const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+			const text = data.choices?.[0]?.message?.content || '';
 
 			// Parse VLM response
 			const parts = text.split('|').map((p: string) => p.trim());
@@ -278,7 +283,7 @@ export class VideoVLMProcessor {
 				confidence: 0.85 // Gemma4 VLM is generally high-confidence
 			};
 		} catch (error) {
-			console.error('[VideoVLM] Error calling Gemma4 VLM:', error);
+			console.error('[VideoVLM] Error calling llama-server VLM:', error);
 			return {
 				description: 'VLM analysis failed',
 				objects: [],

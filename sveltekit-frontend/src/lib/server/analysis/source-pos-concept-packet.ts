@@ -1,15 +1,17 @@
+import { z } from 'zod';
 import { createHash } from 'node:crypto';
 import {
   extractAstAndEntities,
   type ExtractedFeature,
 } from './ast-langextract-bridge.js';
-import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
+import { computePacketKey } from '../atlas/identity/packet-key-builder.js';
 import {
   buildPosConceptTaggingPacket,
   type PosConceptTaggingPacket,
-} from '$lib/server/atlas/pos-concept-tagging-lane.js';
+} from '../atlas/pos-concept-tagging-lane.js';
 
 const DEFAULT_REPRESENTATION_REVISION = 'semantic_768@1';
+const DEFAULT_SEMANTIC_FEATURE_ENVELOPE_REVISION = 'semantic-feature-envelope.v1';
 const DEFAULT_PRODUCER_ID = 'pos-concept-source-adapter';
 const DEFAULT_PRODUCER_REVISION = 'pos-concept-source-adapter-v1';
 const DEFAULT_FEATURE_REVISION = 'ast-grep-feature-registry-v1';
@@ -69,6 +71,7 @@ export interface BuildPosConceptTaggingPacketFromSourceInput {
   screenshots?: SourcePosConceptPacketScreenshot[];
   mcpToolCalls?: SourcePosConceptPacketToolCall[];
   sourceTables?: string[];
+  vectorRefs?: string[];
   rankingSignals?: {
     bm25?: number | null;
     bm42?: number | null;
@@ -113,7 +116,46 @@ export interface BuildPosConceptTaggingPacketFromSourceResult {
   packet: PosConceptTaggingPacket;
   packetKey: string;
   extractedFeatures: ExtractedFeature[];
+  semanticFeatureEnvelope: SemanticFeatureEnvelope;
 }
+
+export const SemanticFeatureEnvelopeSchema = z
+  .object({
+    schemaVersion: z.literal(DEFAULT_SEMANTIC_FEATURE_ENVELOPE_REVISION),
+    packetKey: z.string().min(1),
+    sourceRef: z.string().min(1),
+    sourceRevision: z.string().min(1),
+    treeNodeId: z.string().nullable(),
+    titleId: z.string().nullable(),
+    featureId: z.string().min(1),
+    featureLabel: z.string().min(1),
+    representationId: z.literal('semantic_768'),
+    representationRevision: z.string().min(1),
+    producerId: z.string().min(1),
+    producerRevision: z.string().min(1),
+    featureRevision: z.string().min(1),
+    graphRevision: z.string().nullable(),
+    ontologyRevision: z.string().nullable(),
+    modelRevision: z.string().nullable(),
+    partOfSpeech: z.string().min(1),
+    semanticConceptIds: z.array(z.string().min(1)),
+    ontologyIds: z.array(z.string().min(1)),
+    astSymbolCount: z.number().int().nonnegative(),
+    extractedFeatureCount: z.number().int().nonnegative(),
+    sourceTables: z.array(z.string().min(1)),
+    vectorRefs: z.array(z.string().min(1)),
+    provenance: z
+      .object({
+        jsonlSourceDigest: z.string().min(1),
+        jsonlRecordIndex: z.number().int().nonnegative(),
+        jsonlLineNumber: z.number().int().nonnegative(),
+        jsonlParserRevision: z.string().min(1),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type SemanticFeatureEnvelope = z.infer<typeof SemanticFeatureEnvelopeSchema>;
 
 function sha256Hex(value: string): string {
   return createHash('sha256').update(value).digest('hex');
@@ -377,9 +419,42 @@ export async function buildPosConceptTaggingPacketFromSource(
     lastVerifiedAt: null,
   });
 
+  const semanticFeatureEnvelope = SemanticFeatureEnvelopeSchema.parse({
+    schemaVersion: DEFAULT_SEMANTIC_FEATURE_ENVELOPE_REVISION,
+    packetKey,
+    sourceRef,
+    sourceRevision,
+    treeNodeId: input.treeNodeId ?? null,
+    titleId: input.titleId ?? null,
+    featureId,
+    featureLabel,
+    representationId: 'semantic_768' as const,
+    representationRevision,
+    producerId,
+    producerRevision,
+    featureRevision,
+    graphRevision: input.graphRevision ?? null,
+    ontologyRevision: input.ontologyRevision ?? null,
+    modelRevision: input.modelRevision ?? null,
+    partOfSpeech: pos,
+    semanticConceptIds,
+    ontologyIds,
+    astSymbolCount: astSymbols.length,
+    extractedFeatureCount: extractedFeatures.length,
+    sourceTables: buildSourceTables(input),
+    vectorRefs: uniqueStrings(input.vectorRefs ?? []),
+    provenance: {
+      jsonlSourceDigest,
+      jsonlRecordIndex: input.jsonlRecordIndex ?? 0,
+      jsonlLineNumber: input.jsonlLineNumber ?? 0,
+      jsonlParserRevision: input.jsonlParserRevision ?? 'jsonl-parser-v1',
+    },
+  });
+
   return {
     packet,
     packetKey,
     extractedFeatures,
+    semanticFeatureEnvelope,
   };
 }

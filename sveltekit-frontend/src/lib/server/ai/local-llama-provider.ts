@@ -58,22 +58,20 @@ export async function verifyLocalVlmModel(): Promise<ResolvedInferenceModel> {
 	return resolveLoadedLlamaModel(resolveLlamaServerBaseUrl(), LOCAL_VLM_MODEL);
 }
 
-// Fire-and-forget drift check at module load: if someone restarts
-// llama-server with a different GGUF without updating ROTORQUANT_MODEL_PATH/
-// TURBO_MODEL_PATH/TURBOQUANT_MODEL_PATH, every request under LOCAL_VLM_MODEL
-// would silently target the wrong model name. This doesn't block module load
-// or change LOCAL_VLM_MODEL — it only surfaces the mismatch loudly.
-verifyLocalVlmModel()
-	.then((resolved) => {
-		if (resolved.source === 'llama-server-loaded') {
-			console.warn(
-					`[local-llama-provider] LOCAL_VLM_MODEL="${LOCAL_VLM_MODEL}" does not match what ` +
-					`llama-server has loaded ("${resolved.resolvedModel}") at ${resolveLlamaServerBaseUrl()}. ` +
-					`Requests are still sent under LOCAL_VLM_MODEL — update ROTORQUANT_MODEL_PATH/` +
-					`TURBO_MODEL_PATH/TURBOQUANT_MODEL_PATH, or restart the app, to match the loaded GGUF.`
-			);
-		}
-	})
-	.catch(() => {
-		/* llama-server may not be up yet at module load — best-effort only, non-fatal */
-	});
+/**
+ * Resolve the best model identifier for live inference.
+ *
+ * Preference order:
+ * 1) the actually loaded llama-server model when discovery succeeds
+ * 2) the configured model identifier when discovery fails or the server is unavailable
+ *
+ * This keeps callers on the loaded model identity without forcing a startup warning.
+ */
+export async function getActiveLocalVlmModel(): Promise<string> {
+	try {
+		const resolved = await verifyLocalVlmModel();
+		return resolved.resolvedModel;
+	} catch {
+		return LOCAL_VLM_MODEL;
+	}
+}

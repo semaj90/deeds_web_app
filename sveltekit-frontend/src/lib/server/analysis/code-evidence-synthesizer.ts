@@ -111,9 +111,9 @@ export function buildCodeEvidenceLedgerInputFromSource(
 	const packet = input.synthesized.packet;
 	const receipt = input.synthesized.receipt;
 
-	return {
-		analysisJobId: input.analysisJobId,
-		evidenceId: input.evidenceId,
+		return {
+			analysisJobId: input.analysisJobId,
+			evidenceId: input.evidenceId,
 		caseId: input.caseId ?? null,
 		jobType: input.jobType,
 		packetKey: receipt.packetKey,
@@ -138,6 +138,7 @@ export function buildCodeEvidenceLedgerInputFromSource(
 		payload: {
 			codeEvidenceReceipt: receipt,
 			posConceptPacket: packet,
+			semanticFeatureEnvelope: input.synthesized.semanticFeatureEnvelope,
 			posConceptPacketKey: input.synthesized.packetKey,
 			posConceptPacketStatus: 'built',
 			codeEvidenceReceiptStatus: 'built',

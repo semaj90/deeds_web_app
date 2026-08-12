@@ -1,5 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('$lib/server/env.server.js', () => ({
+  ENV: {
+    EMBEDDING_PROVIDER: 'llama-server',
+    EMBEDDING_BASE_URL: 'http://127.0.0.1:8090',
+    LLAMA_SERVER_URL: 'http://127.0.0.1:8090',
+    OLLAMA_EMBED_BASE_URL: 'http://127.0.0.1:11434',
+    OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
+  },
+}));
+
 vi.mock('$lib/server/embedding-cache-service.js', () => ({
   embeddingCacheService: {
     getEmbedding: vi.fn(async () => null),
