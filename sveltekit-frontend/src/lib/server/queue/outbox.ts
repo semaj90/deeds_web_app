@@ -22,8 +22,20 @@
 
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
-import { taskTypeSchema, type TaskType, type WorkCommandBase } from './commands.js';
-import { EXCHANGES, ROUTING_KEYS } from './topology.js';
+import {
+	taskTypeSchema,
+	type TaskType,
+	type WorkCommandBase,
+} from './commands.js';
+import type { AnalyticsEventType } from '$lib/server/analytics/analytics-event-envelope.js';
+import {
+	type IntegrationEvent,
+} from './integration-events.js';
+import type { EventFabricType } from './event-fabric.js';
+import { EXCHANGES, ROUTING_KEYS, type EventRoutingKey } from './topology.js';
+
+/** Minimal shape both `db` and a `db.transaction()` callback's `tx` satisfy. */
+type SqlExecutor = { execute: typeof db.execute };
 
 // ---------------------------------------------------------------------------
 // Error details extractor — exposes PostgreSQL cause chain
@@ -186,6 +198,102 @@ export async function enqueueTask(opts: {
 }
 
 // ---------------------------------------------------------------------------
+// AnalyticsEvent outbox write — pure notification, no workflow_tasks row.
+//
+// Call this with an open `tx` (from db.transaction()) alongside your own
+// insert, so the event row commits atomically with whatever it's reporting
+// on. Publishes on EXCHANGES.events, never EXCHANGES.tasks — this is
+// notification traffic, not claimable work.
+// ---------------------------------------------------------------------------
+
+export async function writeAnalyticsEventOutboxRow(
+  tx: SqlExecutor,
+  opts: {
+    /** Ties the event to the run/job that produced it. workflow_outbox.run_id is NOT NULL. */
+    runId: string;
+    eventType: AnalyticsEventType;
+    routingKey: EventRoutingKey;
+    payload: unknown;
+    traceId?: string;
+    sourceRef?: string;
+  }
+): Promise<{ eventId: string }> {
+  return await writeStructuredOutboxRow(tx, {
+    runId: opts.runId,
+    eventType: opts.eventType,
+    routingKey: opts.routingKey,
+    payload: opts.payload,
+    traceId: opts.traceId,
+    sourceRef: opts.sourceRef,
+    exchange: EXCHANGES.events,
+  });
+}
+
+export async function writeIntegrationEventOutboxRow(
+  tx: SqlExecutor,
+  opts: {
+    runId: string;
+    eventType: EventFabricType;
+    routingKey: EventRoutingKey;
+    payload: unknown;
+    traceId?: string;
+    sourceRef?: string;
+  }
+): Promise<{ eventId: string }> {
+  return await writeStructuredOutboxRow(tx, {
+    runId: opts.runId,
+    eventType: opts.eventType,
+    routingKey: opts.routingKey,
+    payload: opts.payload,
+    traceId: opts.traceId,
+    sourceRef: opts.sourceRef,
+    exchange: EXCHANGES.events,
+  });
+}
+
+async function writeStructuredOutboxRow(
+  tx: SqlExecutor,
+  opts: {
+    runId: string;
+    eventType: AnalyticsEventType | EventFabricType;
+    routingKey: EventRoutingKey;
+    payload: unknown;
+    traceId?: string;
+    sourceRef?: string;
+    exchange: string;
+  }
+): Promise<{ eventId: string }> {
+  const eventId = crypto.randomUUID();
+  const event = {
+    eventId,
+    eventType: opts.eventType,
+    occurredAt: new Date().toISOString(),
+    traceId: opts.traceId,
+    sourceRef: opts.sourceRef,
+    payload: opts.payload,
+  };
+
+  await tx.execute(sql`
+    INSERT INTO workflow_outbox (
+      id, run_id, task_id, event_type, payload, routing_key, exchange,
+      attempt, created_at
+    ) VALUES (
+      gen_random_uuid(),
+      ${opts.runId}::uuid,
+      NULL,
+      ${opts.eventType},
+      ${JSON.stringify(event)}::jsonb,
+      ${opts.routingKey},
+      ${opts.exchange},
+      0,
+      NOW()
+    )
+  `);
+
+  return { eventId };
+}
+
+// ---------------------------------------------------------------------------
 // Idempotency key derivation (SHA-256 via Web Crypto)
 // ---------------------------------------------------------------------------
 
@@ -222,7 +330,7 @@ export function startOutboxPublisher(opts: {
   const loop = async () => {
     while (running) {
       try {
-        await _publishBatch(publishFn, batchSize);
+        await publishOutboxBatch(publishFn, batchSize);
       } catch (err) {
         console.error('[outbox] publish batch error:', JSON.stringify(errorDetails(err), null, 2));
       }
@@ -237,10 +345,15 @@ export function startOutboxPublisher(opts: {
   };
 }
 
-async function _publishBatch(
+/**
+ * Publish one batch of undelivered outbox rows. Exported (not just called
+ * from the interval loop above) so tests can trigger exactly one
+ * deterministic publish pass instead of racing startOutboxPublisher's timer.
+ */
+export async function publishOutboxBatch(
   publishFn: (exchange: string, routingKey: string, payload: Buffer) => Promise<void>,
   batchSize: number
-): Promise<void> {
+): Promise<{ attempted: number; delivered: number }> {
   const rows = await db.execute(sql`
     SELECT id, routing_key, exchange, payload
     FROM workflow_outbox
@@ -249,6 +362,9 @@ async function _publishBatch(
     LIMIT ${batchSize}
     FOR UPDATE SKIP LOCKED
   `);
+
+  const attempted = rows.rows?.length ?? 0;
+  let delivered = 0;
 
   for (const row of rows.rows ?? []) {
     const r = row as Record<string, unknown>;
@@ -261,6 +377,7 @@ async function _publishBatch(
       await db.execute(sql`
         UPDATE workflow_outbox SET delivered_at = NOW() WHERE id = ${r.id}::uuid
       `);
+      delivered += 1;
     } catch (err) {
       await db.execute(sql`
         UPDATE workflow_outbox
@@ -271,4 +388,6 @@ async function _publishBatch(
       `);
     }
   }
+
+  return { attempted, delivered };
 }

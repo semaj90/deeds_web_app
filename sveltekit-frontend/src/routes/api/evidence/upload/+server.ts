@@ -15,8 +15,9 @@ import { getEmbeddingCache, setEmbeddingCache } from '$lib/server/vector-cache.j
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { detectForensicPatterns } from '$lib/server/analysis/forensics.js';
 import { summarizeDocument } from '$lib/server/analysis/summarizer.js';
-import { createAnalysisJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
+import { createAnalysisJob, enqueueJob, updateAnalysisJob, completeAnalysisJob, failAnalysisJob } from '$lib/server/analysis/analysis-jobs.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, EMBED_BATCH_SIZE } from '$lib/server/analysis/concurrency-gate.js';
+import { buildCodeFeatureRegistryEnqueueResult } from '$lib/server/analysis/code-feature-registry-enqueue.js';
 import { heavyRateLimiter } from '$lib/server/middleware/rate-limiter.js';
 import { detectEvidenceType, inferLegalClassification } from '$lib/server/evidence/type-detector.js';
 import { invalidateEvidenceCache, invalidateCaseCache, invalidateACEChunksCache } from '$lib/server/cache/invalidation.js';
@@ -42,8 +43,6 @@ import { createYOLOService } from '$lib/server/yolo.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { createUploadedFile } from '$lib/server/files/upload-file-service.js';
-import { classifySourceKind } from '$lib/server/classifier/source-kind-classifier.js';
-import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 
 import { insertEvidenceSchema } from '$lib/server/db/zod-schemas.js';
 
@@ -1042,35 +1041,24 @@ async function processAndEmbed(
     `[Upload] Extracted ${fullText.length} chars via ${extractionMethod} from ${fileName}`
   );
 
-  const sourceKind = classifySourceKind(fileName, fullText);
-  if (sourceKind === 'code') {
+  const codeFeatureEnqueue = buildCodeFeatureRegistryEnqueueResult({
+    evidenceId,
+    caseId,
+    fileName,
+    fileHash,
+    fullText,
+  });
+  if (codeFeatureEnqueue) {
     try {
-      const codeFeatureJobId = await createAnalysisJob({
+      const codeFeatureJobId = await enqueueJob({
         evidenceId,
         caseId,
-        jobType: 'code_feature_registry',
-        result: {
-          sourceRef: fileName,
-          sourceRevision: `sha256:${fileHash}`,
-          packetKey: computePacketKey(fileName, null, null),
-          text: fullText,
-          featureId: evidenceId,
-          featureLabel: fileName,
-          workspaceRevision: caseId ?? null,
-          jsonlSourceDigest: `sha256:${fileHash}`,
-          jsonlRecordIndex: 0,
-          jsonlLineNumber: 0,
-          jsonlParserRevision: 'upload-route-v1',
-          representationRevision: 'semantic_768@1',
-          producerId: 'evidence-upload-route',
-          producerRevision: 'upload-route-v1',
-          featureRevision: 'upload-route-v1',
-          sourceTables: ['analysis_jobs', 'evidence', 'code_features', 'analysis_pass_results'],
-        },
+        jobType: codeFeatureEnqueue.jobType,
+        result: codeFeatureEnqueue.result,
       });
       await updateAnalysisJob(codeFeatureJobId, { progress: '25' });
       markStage(diagnostics, 'code_feature_registry', 'pending', 'Queued code feature registry job', {
-        sourceKind,
+        sourceKind: 'code',
         jobId: codeFeatureJobId,
       });
     } catch (err) {

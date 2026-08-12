@@ -17,10 +17,19 @@ import {
 	ANALYSIS_JOBS_NOTIFY_CHANNEL,
 	type JobType,
 } from './analysis-jobs.js';
-import { recordAnalysisPassResult } from './analysis-pass-results.js';
+import {
+	recordAnalysisPassResult,
+	type RecordAnalysisPassResultOptions,
+} from './analysis-pass-results.js';
+import { EVENT_ROUTING_KEYS } from '$lib/server/queue/topology.js';
 import { embedGate, entityGate, forensicsGate, summarizeGate, gated, getGateStats } from './concurrency-gate.js';
+import {
+	buildCodeEvidenceLedgerInputFromSource,
+	buildCodeEvidenceSynthesizerReceiptFromSource,
+} from './code-evidence-synthesizer.js';
 import { computePacketKey } from '$lib/server/atlas/identity/packet-key-builder.js';
 import { Client, Pool } from 'pg';
+import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pass-results.js';
 
 // --- Stage executors (lazy-imported to avoid circular deps) ---
 
@@ -42,12 +51,18 @@ async function runEntityExtraction(evidenceId: string, meta: Record<string, unkn
  * Output: code_features rows, code_feature_edges, Qdrant payload tags
  */
 async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, unknown>) {
-	const { extractAstFeatures } = await import('./ast-grep-extractor.js').catch(() => ({
-		extractAstFeatures: async () => []
-	}));
-	const { buildCodeEvidenceSynthesizerReceiptFromSource } = await import('./code-evidence-synthesizer.js').catch(() => ({
-		buildCodeEvidenceSynthesizerReceiptFromSource: async () => null
-	}));
+	const [
+		{ extractAstAndEntities },
+		{ extractDependencyFeatures, extractComplexityFeatures },
+	] = await Promise.all([
+		import('./ast-langextract-bridge.js').catch(() => ({
+			extractAstAndEntities: async () => [],
+		})),
+		import('./ast-grep-extractor.js').catch(() => ({
+			extractDependencyFeatures: async () => [],
+			extractComplexityFeatures: async () => [],
+		})),
+	]);
 
 	const text = (meta.text as string) ?? '';
 	const sourceRef = (meta.sourceRef as string) ?? `evidence:${evidenceId}`;
@@ -73,12 +88,33 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 	const modelRevision = (meta.modelRevision as string | null | undefined) ?? null;
 	const partOfSpeech = (meta.partOfSpeech as string | null | undefined) ?? null;
 	const langextractEntities = (meta.entities as any[]) ?? [];
+	const metaEntityFeatures = langextractEntities.map((entity, index) => ({
+		type: mapLangextractEntityToFeatureType(entity),
+		name: String(entity?.text ?? entity?.label ?? `entity-${index}`),
+		description: `${String(entity?.label ?? 'ENTITY')} entity: "${String(entity?.text ?? entity?.label ?? `entity-${index}`)}"`,
+		source: 'langextract' as const,
+		rawText: typeof entity?.text === 'string' ? entity.text : undefined,
+		confidence: typeof entity?.score === 'number'
+			? entity.score
+			: typeof entity?.confidence === 'number'
+				? entity.confidence
+				: undefined,
+	}));
 
 	if (!text) return { featuresUpserted: 0, edgesUpserted: 0, qdrantTagsSynced: 0 };
 
 	try {
-		// Extract AST features
-		const astFeatures = await extractAstFeatures(text.slice(0, 100_000));
+		// Extract AST + LangExtract features using the bridge first, then enrich with
+		// dependency/complexity features from the AST-grep extractor.
+		const bridgedFeatures = await extractAstAndEntities(text.slice(0, 100_000), true);
+		const dependencyFeatures = await extractDependencyFeatures(text.slice(0, 100_000));
+		const complexityFeatures = await extractComplexityFeatures(text.slice(0, 100_000));
+		const extractedFeatures = dedupeExtractedFeatures([
+			...bridgedFeatures,
+			...dependencyFeatures,
+			...complexityFeatures,
+			...metaEntityFeatures,
+		]);
 
 		// Upsert to code_features table (idempotent by UNIQUE constraint)
 		const pool = new Pool({
@@ -90,7 +126,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 		let edgesUpserted = 0;
 
 		try {
-			for (const feature of astFeatures) {
+			for (const feature of extractedFeatures) {
 				const featureId = `${sourceRef}:${feature.name}:${feature.type}`;
 				const domainClass = langextractEntities.some(e => e.label === 'STATUTE') ? 'legal_code' : 'application_code';
 
@@ -126,8 +162,8 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 			pool.end().catch(() => {});
 		}
 
-		const synthesized = sourceRevision
-			? await buildCodeEvidenceSynthesizerReceiptFromSource({
+			const synthesized = sourceRevision
+				? await buildCodeEvidenceSynthesizerReceiptFromSource({
 				packetKey,
 				sourceRef,
 				sourceRevision,
@@ -150,21 +186,7 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 				ontologyRevision,
 				modelRevision,
 				partOfSpeech,
-				extractedFeatures: [
-					...astFeatures,
-					...langextractEntities.map((entity, index) => ({
-						type: mapLangextractEntityToFeatureType(entity),
-						name: String(entity?.text ?? entity?.label ?? `entity-${index}`),
-						description: `${String(entity?.label ?? 'ENTITY')} entity: "${String(entity?.text ?? entity?.label ?? `entity-${index}`)}"`,
-						source: 'langextract' as const,
-						rawText: typeof entity?.text === 'string' ? entity.text : undefined,
-						confidence: typeof entity?.score === 'number'
-							? entity.score
-							: typeof entity?.confidence === 'number'
-								? entity.confidence
-								: undefined,
-					})),
-					],
+				extractedFeatures,
 				})
 			: null;
 
@@ -194,6 +216,31 @@ async function runCodeFeatureRegistry(evidenceId: string, meta: Record<string, u
 			error: String(err)
 		};
 	}
+}
+
+function dedupeExtractedFeatures(features: Array<{
+	type: string;
+	name: string;
+	description: string;
+	source: 'ast-grep' | 'langextract' | 'pattern';
+	rawText?: string;
+	lineNumber?: number;
+	confidence?: number;
+}>): Array<{
+	type: string;
+	name: string;
+	description: string;
+	source: 'ast-grep' | 'langextract' | 'pattern';
+	rawText?: string;
+	lineNumber?: number;
+	confidence?: number;
+}> {
+	const deduped = new Map<string, typeof features[number]>();
+	for (const feature of features) {
+		const key = `${feature.source}:${feature.type}:${feature.name}:${feature.lineNumber ?? 0}`;
+		if (!deduped.has(key)) deduped.set(key, feature);
+	}
+	return [...deduped.values()];
 }
 
 function mapLangextractEntityToFeatureType(entity: any): 'entity_person' | 'entity_org' | 'entity_location' | 'entity_statute' | 'entity_case' {
@@ -361,7 +408,7 @@ async function pollOnce(): Promise<void> {
 						const result = await cfg.run(job.evidenceId, job.result);
 						const passResult = result as Record<string, unknown>;
 						const finishedAt = new Date();
-						const ledgerInput = {
+						let ledgerInput: AnalysisPassLedgerInput = {
 							analysisJobId: job.id,
 							evidenceId: job.evidenceId,
 							caseId: job.caseId,
@@ -392,7 +439,55 @@ async function pollOnce(): Promise<void> {
 							modelRevision: typeof passResult.modelRevision === 'string' ? passResult.modelRevision : null,
 						};
 
-						const persisted = await recordAnalysisPassResult(ledgerInput);
+						let recordOpts: RecordAnalysisPassResultOptions | undefined;
+
+						if (jobType === 'code_feature_registry' && typeof result === 'object' && result !== null) {
+							const codeEvidenceReceipt = (result as Record<string, unknown>).codeEvidenceReceipt;
+							const posConceptPacket = (result as Record<string, unknown>).posConceptPacket;
+							const posConceptPacketKey = (result as Record<string, unknown>).posConceptPacketKey;
+							if (codeEvidenceReceipt && posConceptPacket && posConceptPacketKey) {
+								const codeLedgerInput = buildCodeEvidenceLedgerInputFromSource({
+									analysisJobId: job.id,
+									evidenceId: job.evidenceId,
+									caseId: job.caseId,
+									jobType,
+									packetKey: String((codeEvidenceReceipt as Record<string, unknown>).packetKey ?? posConceptPacketKey),
+									sourceRef: String((codeEvidenceReceipt as Record<string, unknown>).sourceRef ?? job.evidenceId),
+									sourceRevision: String((codeEvidenceReceipt as Record<string, unknown>).sourceRevision ?? jobResult.sourceRevision ?? ''),
+									workspaceRevision: (codeEvidenceReceipt as Record<string, unknown>).workspaceRevision as string | null | undefined,
+									representationRevision: String((codeEvidenceReceipt as Record<string, unknown>).representationRevision ?? 'semantic_768@1'),
+									family: cfg.family,
+									passName: cfg.passName,
+									passRevision: cfg.passRevision,
+									backend: cfg.backend,
+									backendVersion: cfg.backendVersion,
+									device: cfg.device,
+									startedAt,
+									completedAt: finishedAt.toISOString(),
+									durationMs: Date.now() - t0,
+									analysisWorkerProducerId: ANALYSIS_WORKER_PRODUCER_ID,
+									analysisWorkerProducerRevision: ANALYSIS_WORKER_REVISION,
+									synthesized: {
+										packet: posConceptPacket as any,
+										packetKey: String(posConceptPacketKey),
+										extractedFeatures: [],
+										receipt: codeEvidenceReceipt as any,
+									},
+								});
+									if (codeLedgerInput) {
+										ledgerInput = codeLedgerInput;
+										recordOpts = {
+											emitIntegrationEvent: {
+												eventType: 'code.evidence.persisted',
+												routingKey: EVENT_ROUTING_KEYS.codeEvidencePersisted,
+												sourceRef: codeLedgerInput.sourceRef ?? undefined,
+											},
+										};
+									}
+							}
+						}
+
+						const persisted = await recordAnalysisPassResult(ledgerInput, recordOpts);
 						if (persisted === null) {
 							console.warn(`[Worker] ${jobType}/${job.id} pass ledger unavailable; continuing without persistence`);
 						}

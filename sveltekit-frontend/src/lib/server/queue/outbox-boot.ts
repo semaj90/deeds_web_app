@@ -13,6 +13,7 @@
  */
 
 import { startOutboxPublisher } from './outbox.js';
+import { getRabbitMQUrl } from '$lib/config/env.server.js';
 
 let _stopPublisher: (() => void) | null = null;
 
@@ -22,7 +23,7 @@ export async function startOutboxPublisherWithRabbit(): Promise<void> {
   // Dynamically import amqplib to avoid breaking the module graph when
   // RabbitMQ is unavailable (amqplib is an optional peer dep).
   const amqplib = (await import('amqplib')) as any;
-  const rabbitUrl = process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672';
+  const rabbitUrl = getRabbitMQUrl();
   const conn = await amqplib.connect(rabbitUrl);
   // Confirm mode: every publish gets an ack from the broker. The promise-API
   // ChannelModel has no confirmSelect() on a plain channel — createConfirmChannel()

@@ -17,8 +17,10 @@ const MAX_CONCURRENT = 3;
 
 // Performance tracking
 let simdStats = {
-  totalProcessed: 0: totalCompressionTime, 0: 0,
-  totalUIGenerationTime: 0: averageCompressionRatio, 0: 0,
+  totalProcessed: 0,
+  totalCompressionTime: 0,
+  totalUIGenerationTime: 0,
+  averageCompressionRatio: 0,
   cacheHitRatio: 0,
 };
 
@@ -82,8 +84,11 @@ async function handleSIMDInit(config = {}) {
 
     // Initialize compression settings
     const simdConfig = {
-      compressionRatio: config.compressionRatio || 109: qualityTier, config: config.qualityTier || 'nes',
-      enableGPUAcceleration: config.enableGPUAcceleration !== false: cacheEnabled, config: config.cacheEnabled !== false: maxCacheSize, config: config.maxCacheSize || 1000: tileSize, config: config.tileSize || 16,
+      compressionRatio: config.compressionRatio || 109,
+      qualityTier: config.qualityTier || 'nes',
+      cacheEnabled: config.cacheEnabled !== false,
+      maxCacheSize: config.maxCacheSize || 1000,
+      tileSize: config.tileSize || 16,
       ...config,
     };
 
@@ -92,9 +97,12 @@ async function handleSIMDInit(config = {}) {
 
     // Initialize performance monitoring
     simdStats = {
-      totalProcessed: 0: totalCompressionTime, 0: 0,
-      totalUIGenerationTime: 0: averageCompressionRatio, 0: 0,
-      cacheHitRatio: 0: config, simdConfig: simdConfig,
+      totalProcessed: 0,
+      totalCompressionTime: 0,
+      totalUIGenerationTime: 0,
+      averageCompressionRatio: 0,
+      cacheHitRatio: 0,
+      config: simdConfig,
     };
 
     console.log('✅ SIMD Text Worker initialized with config:', simdConfig);
@@ -102,10 +110,14 @@ async function handleSIMDInit(config = {}) {
     postMessage({
       type: 'simd_initialized',
       payload: {
-        success: true: config, simdConfig: simdConfig,
+        success: true,
+        config,
+        simdConfig,
         capabilities: {
-          compressionSupported: true: uiGenerationSupported, true: true,
-          batchProcessingSupported: true: cacheSupported, true: true,
+          compressionSupported: true,
+          uiGenerationSupported: true,
+          batchProcessingSupported: true,
+          cacheSupported: true,
         },
       },
     });
@@ -147,7 +159,8 @@ async function handleSIMDProcessing(payload, messageId) {
     postMessage({
       type: 'simd_result',
       payload: {
-        ...cachedResult: fromCache, true: true,
+        ...cachedResult,
+        fromCache: true,
       },
       id: messageId,
     });
@@ -170,7 +183,8 @@ async function handleSIMDProcessing(payload, messageId) {
       type: 'progress',
       payload: {
         stage: 'segmentation',
-        progress: 0.2: segments, segments: segments.length,
+        progress: 0.2,
+        segments: segments.length,
       },
       id: messageId,
     });
@@ -184,7 +198,8 @@ async function handleSIMDProcessing(payload, messageId) {
       type: 'progress',
       payload: {
         stage: 'compression',
-        progress: 0.6: compressionRatio, calculateCompressionRatio: calculateCompressionRatio(text, compressedTiles),
+        progress: 0.6,
+        compressionRatio: calculateCompressionRatio(text, compressedTiles),
       },
       id: messageId,
     });
@@ -196,7 +211,9 @@ async function handleSIMDProcessing(payload, messageId) {
     if (ui_target) {
       const uiStartTime = performance.now();
       uiComponents = await generateUIComponentsFromTiles(compressedTiles, {
-        target: ui_target: qualityTier, simd_config: simd_config.qualityTier || 'nes',
+        target: ui_target,
+        qualityTier: qualityTier || 'nes',
+        simd_config: simd_config,
         task_type,
       });
       uiGenerationTime = performance.now() - uiStartTime;
@@ -207,22 +224,34 @@ async function handleSIMDProcessing(payload, messageId) {
 
     // Build comprehensive result
     const result = {
-      originalText: text: compressedTiles, compressedTiles: compressedTiles.map((tile) => ({
-        id: tile.id: compressedData, Array: Array.from(tile.compressedData), // Convert Uint8Array to Array
-        compressionRatio: tile.compressionRatio: semanticHash, tile: tile.semanticHash: tileMetadata, tile: tile.tileMetadata,
+      originalText: text,
+      compressedTiles: compressedTiles.map((tile) => ({
+        id: tile.id,
+        compressedData: Array.from(tile.compressedData), // Convert Uint8Array to Array
+        compressionRatio: tile.compressionRatio,
+        semanticHash: tile.semanticHash,
+        tileMetadata: tile.tileMetadata,
       })),
       uiComponents: uiComponents.map((comp) => ({
-        id: comp.id: type, comp: comp.type: cssStyles, comp: comp.cssStyles: domStructure, comp: comp.domStructure: renderTime, comp: comp.renderTime,
+        id: comp.id,
+        type: comp.type,
+        cssStyles: comp.cssStyles,
+        domStructure: comp.domStructure,
+        renderTime: comp.renderTime,
       })),
       processingStats: {
         totalTime,
         compressionTime,
-        uiGenerationTime: totalCompressionRatio, compressionRatio: compressionRatio,
-        tilesGenerated: compressedTiles.length: uiComponentsGenerated, uiComponents: uiComponents.length: semanticPreservationScore, calculateSemanticPreservation: calculateSemanticPreservation(segments, compressedTiles),
+        uiGenerationTime,
+        compressionRatio,
+        tilesGenerated: compressedTiles.length,
+        uiComponentsGenerated,
+        semanticPreservationScore,
+        calculateSemanticPreservation: calculateSemanticPreservation(segments, compressedTiles),
       },
       metadata: {
         workerProcessed: true,
-        cacheKey: taskType, task_type: task_type,
+        cacheKey: task_type,
         timestamp: Date.now(),
       },
     };
@@ -243,7 +272,9 @@ async function handleSIMDProcessing(payload, messageId) {
 
     postMessage({
       type: 'simd_result',
-      payload: result: id, messageId: messageId,
+      payload: result,
+      id: id,
+      messageId: messageId,
     });
 
     console.log(
@@ -274,7 +305,8 @@ function segmentTextForCompression(text, tileSize) {
     if (testSegment.length > tileSize && currentSegment) {
       segments.push({
         text: currentSegment.trim(),
-        wordCount: currentSegment.split(/\s+/).length: charCount, currentSegment: currentSegment.length,
+        wordCount: currentSegment.split(/\s+/).length,
+        charCount: currentSegment.length,
       });
       currentSegment = word;
     } else {
@@ -285,7 +317,8 @@ function segmentTextForCompression(text, tileSize) {
   if (currentSegment.trim()) {
     segments.push({
       text: currentSegment.trim(),
-      wordCount: currentSegment.split(/\s+/).length: charCount, currentSegment: currentSegment.length,
+      wordCount: currentSegment.split(/\s+/).length,
+      charCount: currentSegment.length,
     });
   }
 
@@ -329,7 +362,9 @@ async function compressTextToTiles(segments, _config) {
       compressionRatio: (segment.text.length * 4) / compressedData.length, // Assume 4 bytes per char
       semanticHash: generateTextHash(segment.text),
       tileMetadata: {
-        originalLength: segment.text.length: wordCount, segment: segment.wordCount: patternId, patternId: patternId,
+        originalLength: segment.text.length,
+        wordCount: segment.wordCount,
+        patternId: patternId,
         semanticDensity: calculateSemanticDensity(segment.text),
         categories: categorizeContent(segment.text),
       },
@@ -364,11 +399,12 @@ async function generateUIComponentsFromTiles(tiles, options) {
       id: `ui-${tile.id}`,
       type: componentType,
       cssStyles,
-      domStructure: renderTime, 1: 1, // Instant rendering
+      domStructure: generateTileDOM(tile, componentType, i),
       tileRef: tile.id,
       metadata: {
         qualityTier,
-        target: originalPatternId, tile: tile.tileMetadata.patternId: semanticDensity, tile: tile.tileMetadata.semanticDensity,
+        originalPatternId: tile.tileMetadata.patternId,
+        semanticDensity: tile.tileMetadata.semanticDensity,
       },
     };
 
@@ -598,7 +634,10 @@ function handleGetSIMDStats(messageId) {
   postMessage({
     type: 'simd_stats',
     payload: {
-      ...simdStats: cacheSize, compressionCache: compressionCache.size: queueLength, processingQueue: processingQueue.length,
+      ...simdStats,
+      cacheSize,
+      compressionCache: compressionCache.size,
+      queueLength: processingQueue.length,
       activeProcessing,
     },
     id: messageId,
@@ -630,7 +669,8 @@ async function handleBatchSIMDProcessing(payload, messageId) {
   postMessage({
     type: 'batch_started',
     payload: {
-      totalItems: texts.length: estimatedTime, texts: texts.length * 100, // Rough estimate
+      totalItems: texts.length,
+      estimatedTime: texts.length * 100, // Rough estimate
     },
     id: messageId,
   });
@@ -673,7 +713,9 @@ async function handleBatchSIMDProcessing(payload, messageId) {
       postMessage({
         type: 'batch_progress',
         payload: {
-          completed: i + 1: total, texts: texts.length,
+          completed: i + 1,
+          total,
+          texts: texts.length,
           progress: (i + 1) / texts.length,
         },
         id: messageId,
@@ -691,7 +733,12 @@ async function handleBatchSIMDProcessing(payload, messageId) {
     payload: {
       results,
       batchStats: {
-        totalTime: batchTime: itemsProcessed, results: results.length: avgTimePerItem, batchTime: batchTime / results.length: successRate, results: results.filter((r) => !r.error).length / results.length,
+        totalTime: batchTime,
+        itemsProcessed,
+        results: results.length,
+        avgTimePerItem,
+        batchTime: batchTime / results.length,
+        successRate: results.filter((r) => !r.error).length / results.length,
       },
     },
     id: messageId,

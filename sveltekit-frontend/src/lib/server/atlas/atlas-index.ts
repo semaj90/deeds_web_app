@@ -41,6 +41,7 @@ export {
 
 export { buildBoardFabricLaneManifest } from './board/fabric-lane-manifest';
 export { buildBoardGpuBenchmarkReceipt } from './board/fabric-gpu-benchmark';
+export { buildDailyGraphifyBoardRecommendations } from './board/daily-graphify-board-recommendations';
 export { buildDailyGraphifyTaskCandidates } from './board/graphify-task-candidates';
 export {
   buildParentAtlasPhaseLaneProofReport,

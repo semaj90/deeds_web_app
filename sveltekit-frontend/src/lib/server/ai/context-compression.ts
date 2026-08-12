@@ -11,6 +11,8 @@
  */
 
 import { createHash } from 'node:crypto';
+import { stat } from 'node:fs/promises';
+import { resolve, isAbsolute } from 'node:path';
 import { getRedis } from '$lib/server/redis.js';
 
 // ── Card types ────────────────────────────────────────────────────────────────
@@ -23,7 +25,14 @@ export type FileCard = {
   knownRisks:       string[];
   recentTraceHits:  string[];
   retrievalReasons: string[];
-  score:            number;
+  /** Real ranker score, when one exists. This function never ranks — see scoreStatus. */
+  score:            number | null;
+  scoreStatus:      'RANKED' | 'NOT_EVALUATED';
+  /** Whether the summary came from an actual wiki note or was guessed from the filename. */
+  materializationStatus: 'MATERIALIZED_FROM_WIKI' | 'DEGRADED_PLACEHOLDER';
+  evidenceStatus:   'AVAILABLE' | 'UNAVAILABLE';
+  /** mtimeMs:size fingerprint of the file on disk at synthesis time, or null if unresolvable. */
+  sourceRevision:   string | null;
 };
 
 export type TraceCard = {
@@ -66,6 +75,29 @@ function sha256(s: string): string {
   return createHash('sha256').update(s).digest('hex').slice(0, 32);
 }
 
+/**
+ * mtimeMs:size fingerprint for a repo-relative file path, tried against a few
+ * root candidates (mirrors the multi-root resolution used elsewhere in the
+ * MCP server, e.g. loadTraceDynamicContextSourceText in trace-mcp-server.ts).
+ * Returns null if the file can't be found under any candidate root.
+ */
+async function resolveSourceRevision(filePath: string): Promise<string | null> {
+  const candidates = isAbsolute(filePath)
+    ? [filePath]
+    : [
+        resolve(process.cwd(), filePath),
+        resolve(process.cwd(), '..', filePath),
+        resolve(process.cwd(), '..', '..', filePath),
+      ];
+  for (const candidate of candidates) {
+    try {
+      const s = await stat(candidate);
+      if (s.isFile()) return `${s.mtimeMs}:${s.size}`;
+    } catch { /* try next root */ }
+  }
+  return null;
+}
+
 // ── compressChunkToSentence ───────────────────────────────────────────────────
 
 /** Extract the first 1–2 sentences from a chunk, capped at 200 chars. */
@@ -87,8 +119,12 @@ export async function compressChunkToSentence(chunk: string): Promise<string> {
  *  3. Heuristic from the file path itself
  */
 export async function compressFileToCard(filePath: string): Promise<FileCard> {
-  const redis     = getRedis();
-  const cacheKey  = `kv:card:file:${sha256(filePath)}`;
+  const redis          = getRedis();
+  const sourceRevision = await resolveSourceRevision(filePath);
+  // Bind the cache key to the file's on-disk revision so a changed file can't
+  // be served from yesterday's card. Unresolvable files (deleted, virtual
+  // identifiers) fall back to a path-only key but are marked UNAVAILABLE below.
+  const cacheKey = `kv:card:file:${sha256(`${filePath}:${sourceRevision ?? 'unknown'}`)}`;
 
   try {
     const cached = await redis.get(cacheKey);
@@ -110,6 +146,8 @@ export async function compressFileToCard(filePath: string): Promise<FileCard> {
     }
   } catch { /* no wiki */ }
 
+  const hasWikiEvidence = oneLineSummary.length > 0;
+
   if (!oneLineSummary) {
     const parts = filePath.split('/');
     const name  = parts[parts.length - 1].replace(/\.\w+$/, '');
@@ -125,7 +163,13 @@ export async function compressFileToCard(filePath: string): Promise<FileCard> {
     knownRisks:       [],
     recentTraceHits:  [],
     retrievalReasons: [],
-    score:            0.5,
+    // Neither the wiki-note nor the filename-heuristic path is a real ranker —
+    // never fabricate a numeric score here (that's the caller/ranker's job).
+    score:            null,
+    scoreStatus:      'NOT_EVALUATED',
+    materializationStatus: hasWikiEvidence ? 'MATERIALIZED_FROM_WIKI' : 'DEGRADED_PLACEHOLDER',
+    evidenceStatus:   hasWikiEvidence ? 'AVAILABLE' : 'UNAVAILABLE',
+    sourceRevision,
   };
 
   try {

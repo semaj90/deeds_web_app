@@ -14,50 +14,39 @@
       scoring are executing, including the `tree-sitter-typescript` ESM import fix
       (`tsLangModule.typescript ?? tsLangModule.default?.typescript`).
 
+## Exact runtime map now in use
+
+This is the file map the current implementation is aligned to:
+
+| Lane | Files |
+|---|---|
+| Extraction | `docker/miniforge-nlp-sidecar/Dockerfile`, `docker/miniforge-nlp-sidecar/docker-compose.yml`, `sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts`, `sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts` |
+| Packet synthesis | `sveltekit-frontend/src/lib/server/analysis/source-pos-concept-packet.ts`, `sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts`, `sveltekit-frontend/src/lib/server/analysis/analysis-pass-results.ts`, `sveltekit-frontend/src/lib/server/analysis/code-evidence-readback.ts` |
+| Live worker wiring | `sveltekit-frontend/src/lib/server/analysis/worker.ts` |
+| Graphify board consumer | `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts`, `sveltekit-frontend/src/lib/server/analytics/recommendation-policy.ts` |
+| TurboVec retrieval | `sveltekit-frontend/src/lib/server/retrieval/turbovec-prefilter.ts`, `sveltekit-frontend/src/lib/server/retrieval/turbovec-rerank.ts`, `sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts`, `packages/parent-atlas-retrieval/src/index.ts` |
+
+TurboVec remains retrieval acceleration only; it does not participate in extraction or evidence synthesis.
+
 ## Updated priority after the latest logs
 
-- [x] Local classifier logic is proven live.
-- [x] First-class code evidence receipt builder is now wired through `analysis/code-evidence-synthesizer.ts`.
-- [ ] Durable Postgres / outbox write plane is healthy enough for end-to-end receipts.
-- [ ] Qdrant / Redis sidecar write path re-proof is still required before promoting the pipeline.
-- [ ] Live durable receipt persistence still depends on the degraded write plane.
+| Item | State | Notes |
+|---|---|---|
+| Local classifier logic is proven live | PROVEN | live Tree-sitter / domain logic already exercised |
+| First-class code evidence receipt builder is now wired through `analysis/code-evidence-synthesizer.ts` | WIRED | worker path threads the receipt |
+| Durable Postgres / outbox write plane is healthy enough for end-to-end receipts | OPEN | durability still blocked by the write plane |
+| Qdrant / Redis sidecar write path re-proof is still required before promoting the pipeline | OPEN | sidecar write path still needs re-proof |
+| Live durable receipt persistence still depends on the degraded write plane | OPEN | still blocked until durable persistence recovers |
 
 ## Sidecar wiring — IN PROGRESS 2026-08-12 (same session, "wire it up ... conda nlp docker sidecar")
 
-- [x] Discovered `docker/miniforge-nlp-sidecar/` — a live, running Docker container
-      (`miniforge-nlp-sidecar`, image `deeds-miniforge-nlp-sidecar:latest`, port 8095) with
-      genuinely more capable tooling than the hand-rolled TS tree-sitter chunker: verified live
-      capabilities `treesitter_chunker` v4.0.0, `ast_grep_py` 0.45.1, `langextract` 0.1.0, spacy.
-      This is the exact Docker NLP sidecar CLAUDE.md's "Duplication Prevention" section already
-      flagged as having zero ACP registrations — reusing it here instead of hand-rolling a second
-      chunker is the correct call per that section's own guidance.
-- [x] **Found and fixed a real bug**: `POST /analyze` was 100% broken (500 on every request,
-      including trivial plain_text input) — root-caused via `docker logs miniforge-nlp-sidecar` to
-      `python/miniforge_nlp_sidecar.py:1295-1296`: `control5.semantic_confidence` /
-      `control5.structural_confidence` accessed unguarded on a parameter typed
-      `Optional[Control5]` (confirmed via the function signature at line 1148). Every sibling
-      access on the same two lines already guards with `(x if experiment_feature_matrix else
-      None)` — this was a one-line omission, not a design gap. Fixed with the identical guard
-      pattern: `(control5.semantic_confidence if control5 else None)`.
-- [x] Confirmed via `grep -n "control5\." python/miniforge_nlp_sidecar.py` that no other
-      unguarded access exists (the one other hit at line 1076 is a different, already-safe local
-      variable inside the function that constructs `Control5`, not the one passed into
-      `_build_event_hypergraph`).
-- [x] Rewired `parent-atlas-workstation-domain-classifier.ts`: added `chunkViaNlpSidecar()` which
-      calls `createLangExtractClient().analyze({ source_type: 'codebase', extraction_mode: 'full'
-      })`, maps the sidecar's real `chunks[]`/`features[]`/`concepts[]` into `WorkstationChunk[]`
-      + domain-scoring bonus evidence. `classifyWorkstationFile()` now tries the sidecar first
-      (`useSidecar` option, default `true`) and falls back to the local `chunkViaTreeSitter()`
-      path on any sidecar failure — per this repo's Docker-disposability hard rule, the sidecar is
-      never a hard dependency. Added `--no-sidecar` CLI flag to force the local-only path for
-      testing/comparison.
-- [ ] **Rebuild in progress** (`docker compose build` in `docker/miniforge-nlp-sidecar/`,
-      launched this session, background task `b6gxlim0f`) — not yet confirmed complete as of this
-      write. Next session (or later this session): confirm build succeeded, `docker compose up -d`
-      (or `docker restart miniforge-nlp-sidecar` if the compose recreate isn't needed), then
-      re-run the same `curl -X POST :8095/analyze` smoke test that reproduced the 500 to confirm
-      the fix landed, THEN run the classifier CLI end-to-end (see below) to confirm the full
-      sidecar-chunking path works, not just the isolated endpoint.
+| Item | State | Notes |
+|---|---|---|
+| Discovered `docker/miniforge-nlp-sidecar/` and its live capabilities | PROVEN | live container and tooling verified |
+| Found and fixed the `POST /analyze` bug | PROVEN | one-line guard fix landed |
+| Confirmed no other unguarded `control5.` access exists | PROVEN | scan completed |
+| Rewired `parent-atlas-workstation-domain-classifier.ts` to try the sidecar first | WIRED | sidecar is now the first path, fallback remains local |
+| Rebuild in progress | OPEN | build / smoke / CLI proof still pending |
 
 ## isMainModule Windows sweep — CLOSED 2026-08-12 (repo-wide, prompted by this task's own test failure)
 
@@ -92,30 +81,13 @@
 
 ## Next session — pick up here
 
-- [ ] **First real end-to-end run.** Run the CLI against one real file, e.g.:
-      `npx tsx src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts --file=src/lib/server/atlas/graph/graph-snapshot-parity-contract.ts`
-      (no `--with-llm-summary` first, to isolate tree-sitter+embedding+Qdrant+Redis from the LLM
-      call). Confirm: chunks extracted with sane line ranges, domain classified as GRAPH or
-      IDENTITY (not UNKNOWN), Qdrant collection `parent_atlas_workstation_corpus` receives points,
-      Redis `workstation:centroids` hash gets at least one domain key.
-- [ ] **Second run with `--with-llm-summary`** on the same file. Confirm summaries are real
-      sentences (not `chunk.name` fallback, which indicates the LLM call silently failed) and
-      check wall-clock cost per chunk before considering any batch/directory-wide run.
-- [ ] **Decide whether to batch over `sveltekit-frontend/src/lib/server/atlas/**` and
-      `sveltekit-frontend/scripts/atlas/**`** (the two directories most likely to actually contain
-      Parent Atlas Workstation domain code) — this needs explicit approval before running, since
-      it means N real llama-server calls if `--with-llm-summary` is used. Get a rough file count
-      first (`find ... -name '*.ts' | wc -l`) and confirm with the user before running with the
-      LLM flag on more than a handful of files.
-- [ ] **Only after a proven end-to-end run**: register this capability in
-      `docs/architecture/runtime-ownership-registry.json` as `CANONICAL_OWNER` for "Parent Atlas
-      Workstation domain classification", explicitly distinct from the existing
-      `code-intel-service.ts` AUTH/DATA/API/UI classifier's registry entry (if one exists yet —
-      check first; per the session's earlier finding, that classifier itself isn't registered
-      either, so this may be the first registry entry for either classifier).
-- [ ] **Not yet decided: live wiring.** Whether this becomes a startup-hook step, an npm script
-      (`atlas:workstation-classify`), or stays CLI-only is an open product decision — do not wire
-      it into anything live without asking first, per this session's established scope discipline.
+| Item | State | Notes |
+|---|---|---|
+| First real end-to-end run on one real file | OPEN | isolate tree-sitter, embedding, Qdrant, Redis from the LLM call first |
+| Second run with `--with-llm-summary` on the same file | OPEN | confirm real summaries and record cost per chunk |
+| Decide whether to batch over the atlas source directories | OPEN | needs explicit approval before any broad LLM run |
+| Register this capability in the runtime ownership registry only after a proven end-to-end run | OPEN | can only promote after receipt exists |
+| Decide whether live wiring belongs in a startup hook, npm script, or CLI-only path | OPEN | product decision still open |
 
 ## Reference
 

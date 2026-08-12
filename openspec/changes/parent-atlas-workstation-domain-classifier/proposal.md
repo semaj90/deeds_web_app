@@ -23,6 +23,34 @@ identity, Export Stack Arrow/GIN/MsgPack, Graph Retrieval/Hierarchy/Hypergraph, 
 provenance ladder, RTX Embeddings/Vector LOD, OKF Fit/HMM Router, QUIC/gRPC/Go sidecar transport,
 Layer 2 Compiler Output, Layer 4 Runtime/Training) — not invented ad hoc.
 
+## Concrete runtime file map
+
+This change is now aligned to the actual runtime boundaries the repo is using:
+
+- Extraction lane:
+  - `docker/miniforge-nlp-sidecar/Dockerfile`
+  - `docker/miniforge-nlp-sidecar/docker-compose.yml`
+  - `sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts`
+  - `sveltekit-frontend/src/lib/server/ai/parent-atlas-workstation-domain-classifier.ts`
+- Packet synthesis lane:
+  - `sveltekit-frontend/src/lib/server/analysis/source-pos-concept-packet.ts`
+  - `sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts`
+  - `sveltekit-frontend/src/lib/server/analysis/analysis-pass-results.ts`
+  - `sveltekit-frontend/src/lib/server/analysis/code-evidence-readback.ts`
+- Live worker wiring:
+  - `sveltekit-frontend/src/lib/server/analysis/worker.ts`
+- Graphify board consumer:
+  - `sveltekit-frontend/src/lib/server/atlas/board/daily-graphify-board-recommendations.ts`
+  - `sveltekit-frontend/src/lib/server/analytics/recommendation-policy.ts`
+- TurboVec retrieval lane:
+  - `sveltekit-frontend/src/lib/server/retrieval/turbovec-prefilter.ts`
+  - `sveltekit-frontend/src/lib/server/retrieval/turbovec-rerank.ts`
+  - `sveltekit-frontend/src/lib/server/grpc/turbovec-cuda-client.ts`
+  - `packages/parent-atlas-retrieval/src/index.ts`
+
+TurboVec stays in the retrieval lane only. It does not own structural extraction,
+LangExtract grounding, or evidence synthesis.
+
 ## Three real upgrades over the copied source
 
 1. **Real tree-sitter chunking.** The copied source's `chunkCodeSemanticallViaTreeChunker` is

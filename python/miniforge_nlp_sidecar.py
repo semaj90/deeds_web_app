@@ -1240,7 +1240,7 @@ def _build_event_hypergraph(
                 {"entity_id": rel.object, "entity_kind": "symbol", "role": "target"},
                 {"entity_id": packet_key, "entity_kind": "packet", "role": "packet"},
             ],
-            [rel.source_ref, rel.subject, rel.object],
+            [source_ref, rel.subject, rel.object],
             {"index": idx, "predicate": rel.predicate, "confidence": rel.confidence},
         )
 

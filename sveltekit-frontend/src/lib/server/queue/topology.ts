@@ -21,6 +21,10 @@
 export const EXCHANGES = {
   tasks: 'atlas.tasks.v1',
   dlx: 'atlas.tasks.dlx.v1',
+  // AnalyticsEvent exchange — deliberately separate from `tasks`. Nothing
+  // published here is claimable work; it's notification-only traffic and
+  // must never share a queue with real WorkCommand dispatch.
+  events: 'atlas.events.v1',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -42,6 +46,19 @@ export const ROUTING_KEYS = {
 
 export type RoutingKey = (typeof ROUTING_KEYS)[keyof typeof ROUTING_KEYS];
 
+// Event fabric routing keys — separate finite taxonomy, published on
+// EXCHANGES.events, never on EXCHANGES.tasks.
+export const EVENT_ROUTING_KEYS = {
+  codeEvidencePersisted: 'atlas.event.code.evidence-persisted',
+  failureObserved: 'atlas.event.failure.observed',
+  analyticsObserved: 'atlas.event.analytics.observed',
+  recommendationSignal: 'atlas.event.recommendation.signal',
+  policyDecisionReceipt: 'atlas.event.policy.decision.receipt',
+  checkpointCommit: 'atlas.event.checkpoint.commit',
+} as const;
+
+export type EventRoutingKey = (typeof EVENT_ROUTING_KEYS)[keyof typeof EVENT_ROUTING_KEYS];
+
 // ---------------------------------------------------------------------------
 // Queue names
 // ---------------------------------------------------------------------------
@@ -57,6 +74,7 @@ export const QUEUES = {
   retryCode: 'atlas.q.retry.code',
   retryRetrieval: 'atlas.q.retry.retrieval',
   retryAgent: 'atlas.q.retry.agent',
+  codeEvents: 'atlas.q.code.events',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -136,4 +154,12 @@ export async function declareTopology(ch: AmqpChannel): Promise<void> {
     });
     await ch.bindQueue(queue, EXCHANGES.tasks, bindPattern);
   }
+
+  // Events exchange + queue — event-fabric traffic only, never WorkCommand.
+  // Classic (non-quorum) durable queue: notification volume is low and
+  // consumers don't need quorum's replicated-write guarantees the way a
+  // claimable work queue does.
+  await ch.assertExchange(EXCHANGES.events, 'topic', { durable: true });
+  await ch.assertQueue(QUEUES.codeEvents, { durable: true });
+  await ch.bindQueue(QUEUES.codeEvents, EXCHANGES.events, 'atlas.event.#');
 }

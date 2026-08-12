@@ -2,10 +2,11 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 import {
-  buildPosConceptTaggingPacketFromSource,
-  type BuildPosConceptTaggingPacketFromSourceInput,
-  type BuildPosConceptTaggingPacketFromSourceResult,
+	buildPosConceptTaggingPacketFromSource,
+	type BuildPosConceptTaggingPacketFromSourceInput,
+	type BuildPosConceptTaggingPacketFromSourceResult,
 } from './source-pos-concept-packet.js';
+import type { AnalysisPassLedgerInput } from '$lib/server/db/schema/analysis-pass-results.js';
 
 const RECEIPT_SCHEMA_VERSION = 'code-evidence-synthesizer-receipt.v1' as const;
 
@@ -75,6 +76,101 @@ export type CodeEvidenceSynthesizerReceipt = z.infer<typeof CodeEvidenceSynthesi
 export interface BuildCodeEvidenceSynthesizerReceiptFromSourceResult
 	extends BuildPosConceptTaggingPacketFromSourceResult {
 	receipt: CodeEvidenceSynthesizerReceipt;
+}
+
+export interface BuildCodeEvidenceLedgerInputFromSourceInput
+{
+	analysisJobId: string;
+	evidenceId: string;
+	caseId?: string | null;
+	jobType: string;
+	packetKey: string;
+	sourceRef: string;
+	sourceRevision: string;
+	workspaceRevision?: string | null;
+	representationRevision: string;
+	family: string;
+	passName: string;
+	passRevision: string;
+	backend: string;
+	backendVersion: string;
+	device: 'cpu' | 'cuda' | 'external';
+	startedAt: string;
+	completedAt: string;
+	durationMs?: number | null;
+	analysisWorkerProducerId: string;
+	analysisWorkerProducerRevision: string;
+	synthesized?: BuildCodeEvidenceSynthesizerReceiptFromSourceResult | null;
+}
+
+export function buildCodeEvidenceLedgerInputFromSource(
+	input: BuildCodeEvidenceLedgerInputFromSourceInput
+): AnalysisPassLedgerInput | null {
+	if (!input.synthesized) return null;
+
+	const packet = input.synthesized.packet;
+	const receipt = input.synthesized.receipt;
+
+	return {
+		analysisJobId: input.analysisJobId,
+		evidenceId: input.evidenceId,
+		caseId: input.caseId ?? null,
+		jobType: input.jobType,
+		packetKey: receipt.packetKey,
+		sourceRef: receipt.sourceRef,
+		sourceRevision: receipt.sourceRevision,
+		workspaceRevision: receipt.workspaceRevision,
+		representationRevision: receipt.representationRevision,
+		family: input.family,
+		passName: input.passName,
+		passRevision: input.passRevision,
+		passType: input.passName,
+		featureId: receipt.featureId,
+		producerId: input.analysisWorkerProducerId,
+		producerRevision: input.analysisWorkerProducerRevision,
+		backend: input.backend,
+		backendVersion: input.backendVersion,
+		device: input.device,
+		status: 'succeeded',
+		startedAt: input.startedAt,
+		completedAt: input.completedAt,
+		durationMs: input.durationMs ?? null,
+		payload: {
+			codeEvidenceReceipt: receipt,
+			posConceptPacket: packet,
+			posConceptPacketKey: input.synthesized.packetKey,
+			posConceptPacketStatus: 'built',
+			codeEvidenceReceiptStatus: 'built',
+		},
+		features: {
+			extractedFeatureCount: receipt.extractedFeatureCount,
+			astSymbolCount: receipt.astSymbolCount,
+			semanticConceptCount: receipt.semanticConceptCount,
+			ontologyIdCount: receipt.ontologyIdCount,
+			semanticDimension: receipt.semanticDimension,
+			primaryDomain: receipt.primaryDomain,
+		},
+		artifacts: {
+			sourceTables: receipt.sourceTables,
+			jsonlSourceDigest: receipt.jsonlSourceDigest,
+			jsonlRecordIndex: receipt.jsonlRecordIndex,
+			jsonlLineNumber: receipt.jsonlLineNumber,
+			jsonlParserRevision: receipt.jsonlParserRevision,
+			outputDigest: receipt.outputDigest,
+		},
+		evidence: [
+			{
+				sourceRef: receipt.sourceRef,
+				sourceRevision: receipt.sourceRevision,
+				packetKey: receipt.packetKey,
+				receiptId: receipt.receiptId,
+				status: receipt.status,
+			},
+		],
+		warnings: [],
+		modelId: receipt.modelRevision ?? null,
+		modelRevision: receipt.modelRevision ?? null,
+	};
 }
 
 function buildReceiptId(seed: Omit<CodeEvidenceSynthesizerReceipt, 'receiptId' | 'createdAt'>): string {

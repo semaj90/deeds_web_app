@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS analytics_merkle_checkpoints (
+    checkpoint_id TEXT PRIMARY KEY,
+    stream_name TEXT NOT NULL,
+    start_offset TEXT NOT NULL,
+    end_offset TEXT NOT NULL,
+    event_count BIGINT NOT NULL CHECK (event_count > 0),
+    first_occurred_at TIMESTAMPTZ NOT NULL,
+    last_occurred_at TIMESTAMPTZ NOT NULL,
+    merkle_root_hex CHAR(64) NOT NULL,
+    event_schema_revision TEXT NOT NULL,
+    checkpoint_algorithm_revision TEXT NOT NULL,
+    model_revision_set_hash TEXT,
+    source_revision_set_hash TEXT,
+    graph_revision TEXT,
+    leaf_manifest_ref TEXT NOT NULL,
+    leaf_manifest_hash_hex CHAR(64) NOT NULL,
+    producer_id TEXT NOT NULL,
+    producer_revision TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (stream_name, start_offset, end_offset)
+);

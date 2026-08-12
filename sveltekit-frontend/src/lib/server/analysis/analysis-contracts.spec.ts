@@ -481,6 +481,10 @@ describe('analysis contracts', () => {
     expect(eventBundle.events.length).toBeGreaterThan(0);
     expect(eventBundle.ontologyEventTuples.length).toBeGreaterThan(0);
     expect(eventBundle.recommendationJudgment?.candidateKey).toBeTruthy();
+    expect(eventBundle.recommendationPolicyResults.length).toBeGreaterThan(0);
+    expect(eventBundle.recommendationPolicyResults[0]?.receipt.payload.decisionId).toBe(
+      eventBundle.recommendationPolicyResults[0]?.decisionId,
+    );
   });
 
   it('falls back to the local model path when the sidecar is unavailable', async () => {

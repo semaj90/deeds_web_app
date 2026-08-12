@@ -8,6 +8,26 @@ PostgreSQL is the canonical task, gate, checkpoint, and outbox store for Atlas w
 
 The gate model is executable state: task created -> PostgreSQL row written -> outbox event emitted -> RabbitMQ worker claimed -> gates evaluated -> task transitions READY / CLAIMED / RUNNING / AWAITING_GATE / COMPLETED / FAILED. LLMs may recommend the next transition, but smoke and authorization outcomes must be recorded by the worker and gate evaluator.
 
+## Event Fabric Priority
+
+1. `WorkCommand` asks a worker to do something.
+2. `IntegrationEvent` reports canonical derived state changed.
+3. `FailureObservation` records the failure and its class without retrying by itself.
+4. `AnalyticsEvent` captures observed behavior for later aggregation.
+5. `RecommendationSignal` carries derived policy suggestions only.
+6. `PolicyDecisionReceipt` records accept / reject / apply outcomes.
+7. `CheckpointCommit` freezes a Merkle-rooted population or artifact batch.
+
+Operating split:
+
+- RabbitMQ carries commands and integration delivery.
+- Kafka carries analytics history, failure observations, and tensor-policy telemetry.
+- NATS is for low-latency runtime dispatch only.
+- Postgres stores canonical receipts and checkpoints.
+- Valkey holds hot routing and policy state only.
+- Merkle roots freeze the exact analytics population used for policy or model training.
+- Failure observations never retry themselves; only explicit recovery commands may do that.
+
 ## Canonical Closure Update - 2026-06-19
 
 Status: **ARCHITECTURE FROZEN / PROOF GATES PASS**

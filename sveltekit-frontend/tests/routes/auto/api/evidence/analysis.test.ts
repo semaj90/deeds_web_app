@@ -13,10 +13,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Add hoisted mocks here when handler logic is filled in:
-// const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
-// vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));
-
 describe('src/routes/api/evidence/analysis/+server.ts', () => {
   describe('GET /api/evidence/analysis', () => {
     let handler: (evt: { request: Request; locals: Record<string, unknown>; url: URL; params: Record<string, string> }) => Promise<Response>;

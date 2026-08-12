@@ -64,6 +64,7 @@ import { createHash } from 'node:crypto';
 import { trace } from '@opentelemetry/api';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { Pool } from 'pg';
 import { ENV } from '../lib/server/env.server.js';
@@ -3648,7 +3649,17 @@ server.registerTool(
 // ── search.go_hybrid ─────────────────────────────────────────────────────────
 // Go search service RRF fusion: parallel fan-out of citation + FTS + pgvector +
 // Qdrant → reciprocal rank fusion. Faster than the Node.js hybrid for bulk recall.
-// Falls back gracefully when go-search-service is not running.
+//
+// GO_SEARCH_RRF classification: OPTIMIZED_BACKEND, canonical_fusion_owner: false.
+// This service runs its own RRF fusion independently of search.hybrid's blend
+// above — it is not (yet) coordinated with the canonical fusion semantics
+// (per-lane dedup by canonical packet identity, one vote per logical lane).
+// Treat it as a fast backend for bulk recall, not the fusion source of truth,
+// until it demonstrates parity.
+//
+// On failure, falls back to Postgres FTS (search_code_lexical) — the same
+// fallback trace.kag_search uses — rather than just returning an empty,
+// typed-degraded result.
 
 server.registerTool(
   'search.go_hybrid',
@@ -3692,21 +3703,66 @@ server.registerTool(
       const normalized = normalizeGoSearchHits(raw, query, t0);
       return { content: [{ type: 'text' as const, text: JSON.stringify(normalized, null, 2) }] };
     } catch (err) {
-      const result: NormalizedRetrievalResult = {
-        ok: false,
-        source: 'go-search',
-        degraded: true,
-        reason: String(err),
-        query,
-        hits: [],
-        elapsedMs: Date.now() - t0,
-      };
-      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+      // Real fallback lane (same pattern as trace.kag_search's step 3): the Go
+      // service's own RRF fusion is unavailable, but callers still get ranked
+      // hits instead of an empty degraded stub.
+      try {
+        const safeLimit = clampFinite(limit, 1, 50, 10);
+        const { rows } = await pool.query('SELECT * FROM search_code_lexical($1, $2, $3)', [
+          query,
+          safeLimit,
+          null,
+        ]);
+        const result: NormalizedRetrievalResult = {
+          ok: true,
+          source: 'postgres-fts',
+          degraded: true,
+          reason: `go-search unavailable (${String(err)}); served from Postgres FTS fallback`,
+          query,
+          hits: (rows as Record<string, unknown>[]).map((r) => ({
+            id: r.stable_key != null ? String(r.stable_key) : undefined,
+            path: r.file_path != null ? String(r.file_path) : undefined,
+            snippet: r.content != null ? String(r.content).slice(0, 600) : undefined,
+            score: typeof r.lexical_score === 'number' ? r.lexical_score : undefined,
+            source: 'postgres-fts',
+            topoClass: r.topo_class != null ? String(r.topo_class) : undefined,
+          })),
+          elapsedMs: Date.now() - t0,
+        };
+        return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+      } catch (fallbackErr) {
+        const result: NormalizedRetrievalResult = {
+          ok: false,
+          source: 'go-search',
+          degraded: true,
+          reason: `go-search unavailable (${String(err)}); Postgres FTS fallback also failed (${String(fallbackErr)})`,
+          query,
+          hits: [],
+          elapsedMs: Date.now() - t0,
+        };
+        return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+      }
     }
   }
 );
 
-// ── context.build_kv_packet ───────────────────────────────────────────────────
+// ── context.build_kv_packet / context.get_compressed_card /
+//    context.explain_compression / context.refresh_task_toc ───────────────────
+//
+// These four tools are thin wrappers around kv-context-controller.ts — the
+// SAME functions dev-context-planner.ts calls in-process for the live chat
+// path (gemma4-tool-controller.ts / openai-facade.ts), not a second
+// implementation.
+//
+// They used to be independently reimplemented here with a divergent, buggy
+// shape (fileCards computed but never returned, maxInputTokens accepted but
+// never enforced, a truncated-base64 non-hash masquerading as
+// stablePrefixHash, fabricated score:0.5 on placeholder cards) — AND they
+// wrote to the exact same Redis key (`kv:toc:task:{taskId}`) that
+// kv-context-controller.ts's buildKvContextPacket() owns for the real chat
+// path, with an incompatible shape. An agent calling context.build_kv_packet
+// mid-session could silently stomp the live chat context for that taskId.
+// Delegating removes the duplicate owner and the collision in one move.
 
 server.registerTool(
   'context.build_kv_packet',
@@ -3739,83 +3795,18 @@ server.registerTool(
   },
   async ({ taskId, query, hotFiles, hotSymbols, blockedAreas, maxInputTokens = 12000 }) => {
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = makeRedis();
-
-      // Build file cards in parallel (bounded to 8)
-      const { compressFileToCard, buildAttentionToc } = await import(
-        '../lib/server/ai/context-compression.js'
-      ).catch(() => ({
-        compressFileToCard: async (f: string) => ({
-          stableKey: `file:${f}`,
-          filePath: f,
-          oneLineSummary: f,
-          importantSymbols: [],
-          knownRisks: [],
-          recentTraceHits: [],
-          retrievalReasons: [],
-          score: 0,
-        }),
-        buildAttentionToc: async (
-          id: string,
-          files: string[],
-          syms: string[],
-          blocked: string[]
-        ) => ({
-          hotFiles: files,
-          hotSymbols: syms,
-          hotTools: ['search.hybrid'],
-          blockedAreas: blocked,
-          nextToolSuggestions: [],
-        }),
-      }));
-
-      const fileCards = await Promise.all(
-        hotFiles
-          .slice(0, 8)
-          .map((f: string) =>
-            compressFileToCard(f).catch(() => ({
-              stableKey: `file:${f}`,
-              filePath: f,
-              oneLineSummary: f,
-              importantSymbols: [],
-              knownRisks: [],
-              recentTraceHits: [],
-              retrievalReasons: [],
-              score: 0,
-            }))
-          )
+      const { buildKvContextPacket } = await import(
+        '../lib/server/features/ai/ai/kv-context-controller.js'
       );
-      const toc = await buildAttentionToc(taskId, hotFiles, hotSymbols, blockedAreas);
-
-      const result = {
+      const packet = await buildKvContextPacket({
         taskId,
-        stablePrefixHash:
-          'kvp_' +
-          Buffer.from(taskId + query)
-            .toString('base64')
-            .slice(0, 12),
-        level2Cards: fileCards.length,
-        toc,
-        estimatedTokens: fileCards.reduce(
-          (n, c) => n + Math.ceil(JSON.stringify(c).length / 4),
-          400
-        ),
+        query,
+        hotFiles,
+        hotSymbols,
+        blockedAreas,
         maxInputTokens,
-      };
-
-      // Cache TOC in Redis (1h) — explicit connect() required because makeRedis
-      // uses lazyConnect:true + enableOfflineQueue:false (canonical ioredis cold-start
-      // pattern from CLAUDE.md → Key Lessons → "ioredis cold-start in startup scripts")
-      try {
-        await redis.connect().catch(() => {}); // no-op if already connected
-        await redis.setex(`kv:toc:task:${taskId}`, 3600, JSON.stringify(result));
-      } catch {
-        /* non-fatal */
-      }
-      await redis.quit().catch(() => {});
-
-      return { content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }] };
+      });
+      return { content: [{ type: 'text' as const, text: JSON.stringify(packet, null, 2) }] };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
     }
@@ -3838,71 +3829,24 @@ server.registerTool(
   },
   async ({ stableKey }) => {
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = makeRedis();
-      await redis.connect().catch(() => {});
-      const crypto = await import('node:crypto');
-      const sha = (s: string) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 32);
-
-      const [type, ...rest] = stableKey.split(':');
-      const payload = rest.join(':');
-
-      let card: unknown = null;
-
-      if (type === 'file') {
-        const cacheKey = `kv:card:file:${sha(payload)}`;
-        const cached = await redis.get(cacheKey);
-        if (cached) {
-          card = JSON.parse(cached);
-        } else {
-          // Build a minimal card from wiki note or heuristic
-          const dirPath = payload.split('/').slice(0, -1).join('/');
-          let summary = '';
-          try {
-            const wikiRaw = await redis.get(`wiki:note:dir:${dirPath}`);
-            if (wikiRaw) {
-              const w = JSON.parse(wikiRaw) as { summary?: string };
-              summary = w.summary ?? wikiRaw.slice(0, 200);
-            }
-          } catch {
-            /* no wiki */
-          }
-          if (!summary) {
-            const name =
-              payload
-                .split('/')
-                .pop()
-                ?.replace(/\.\w+$/, '') ?? payload;
-            summary = `${name} — ${dirPath}`;
-          }
-          card = {
-            stableKey,
-            filePath: payload,
-            oneLineSummary: summary,
-            importantSymbols: [],
-            knownRisks: [],
-            score: 0.5,
-          };
-          await redis.setex(cacheKey, 86400, JSON.stringify(card)).catch(() => {});
-        }
-      } else if (type === 'trace') {
-        const cacheKey = `kv:card:trace:${sha(payload)}`;
-        const cached = await redis.get(cacheKey);
-        card = cached
-          ? JSON.parse(cached)
-          : {
-              stableKey,
-              traceId: payload,
-              oneLineSummary: `Trace: ${payload}`,
-              topSources: [],
-              cacheHit: false,
-              durationMs: 0,
-            };
-      } else {
-        card = { stableKey, error: `Unknown card type: ${type}. Supported: file, trace` };
+      const { getCompressedCard } = await import(
+        '../lib/server/features/ai/ai/kv-context-controller.js'
+      );
+      const card = await getCompressedCard(stableKey);
+      if (!card) {
+        const type = stableKey.split(':')[0];
+        return {
+          content: [
+            {
+              type: 'text' as const,
+              text: JSON.stringify({
+                stableKey,
+                error: `Unknown or unsupported card type: ${type}. Supported: file, trace`,
+              }),
+            },
+          ],
+        };
       }
-
-      await redis.quit().catch(() => {});
       return { content: [{ type: 'text' as const, text: JSON.stringify(card, null, 2) }] };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
@@ -3922,38 +3866,11 @@ server.registerTool(
   },
   async ({ taskId }) => {
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = makeRedis();
-      await redis.connect().catch(() => {});
-
-      const raw = await redis.get(`kv:toc:task:${taskId}`);
-      await redis.quit().catch(() => {});
-
-      if (!raw) {
-        return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({
-                taskId,
-                status: 'no-packet-found',
-                hint: 'Call context.build_kv_packet first.',
-              }),
-            },
-          ],
-        };
-      }
-
-      const packet = JSON.parse(raw) as Record<string, unknown>;
-      const explain = {
-        taskId: packet.taskId ?? taskId,
-        stablePrefixHash: packet.stablePrefixHash,
-        level2Cards: packet.level2Cards ?? 0,
-        toc: packet.toc,
-        estimatedTokens: packet.estimatedTokens,
-        maxInputTokens: packet.maxInputTokens,
-      };
-      return { content: [{ type: 'text' as const, text: JSON.stringify(explain, null, 2) }] };
+      const { explainCompression } = await import(
+        '../lib/server/features/ai/ai/kv-context-controller.js'
+      );
+      const explain = await explainCompression(taskId);
+      return { content: [{ type: 'text' as const, text: explain }] };
     } catch (err) {
       return { content: [{ type: 'text' as const, text: JSON.stringify({ error: String(err) }) }] };
     }
@@ -3975,39 +3892,15 @@ server.registerTool(
   },
   async ({ taskId, hotFiles, hotSymbols, blockedAreas }) => {
     try {
-      const { default: Redis } = await import('ioredis');
-      const redis = makeRedis();
-      await redis.connect().catch(() => {});
-
-      // Invalidate existing TOC
-      await redis.del(`kv:toc:task:${taskId}`).catch(() => {});
-
-      const newToc = {
-        hotFiles: hotFiles.slice(0, 8),
-        hotSymbols: hotSymbols.slice(0, 12),
-        hotTools: [
-          'search.hybrid',
-          'trace.kag_search',
-          'graph.expand_neighborhood',
-          'context.get_compressed_card',
-        ],
-        blockedAreas,
-        nextToolSuggestions: [
-          'context.get_compressed_card — expand a hot file',
-          'search.hybrid — find related files',
-        ],
-      };
-
-      await redis
-        .setex(`kv:toc:task:${taskId}`, 3600, JSON.stringify({ taskId, toc: newToc }))
-        .catch(() => {});
-      await redis.quit().catch(() => {});
-
+      const { refreshTaskToc } = await import(
+        '../lib/server/features/ai/ai/kv-context-controller.js'
+      );
+      const toc = await refreshTaskToc(taskId, hotFiles, hotSymbols, blockedAreas);
       return {
         content: [
           {
             type: 'text' as const,
-            text: JSON.stringify({ taskId, refreshed: true, toc: newToc }, null, 2),
+            text: JSON.stringify({ taskId, refreshed: true, toc }, null, 2),
           },
         ],
       };
@@ -10673,7 +10566,32 @@ const isDirectRun =
   typeof process.argv[1] === 'string' &&
   (process.argv[1].endsWith('trace-mcp-server.ts') || process.argv[1].endsWith('trace-mcp-server.js'));
 
-if (isDirectRun) {
+// Transport mode: 'http' (default, port 8788, StreamableHTTPServerTransport
+// per-request) or 'stdio' (OpenCode-style "local" MCP server — the parent
+// process launches this file and speaks MCP over stdin/stdout). Both modes
+// bind the SAME `server` object and its tool registry — one canonical
+// implementation, two thin transports. Set via OpenCode's local server config:
+//   { "type": "local", "command": ["npx", "tsx", "src/mcp/trace-mcp-server.ts"],
+//     "environment": { "MCP_TRANSPORT": "stdio" } }
+const MCP_TRANSPORT = (process.env.MCP_TRANSPORT ?? 'http').toLowerCase();
+
+if (isDirectRun && MCP_TRANSPORT === 'stdio') {
+  // stdout is reserved for the JSON-RPC wire in stdio mode — never
+  // console.log() here, only console.error() (stderr) for diagnostics.
+  void ensureOpenTelemetry().catch(() => { /* non-fatal startup warmup */ });
+  pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });
+
+  const stdioTransport = new StdioServerTransport();
+  server
+    .connect(stdioTransport)
+    .then(() => {
+      console.error('[trace-mcp-server] stdio transport connected — same tool registry as :8788 HTTP mode');
+    })
+    .catch((err) => {
+      console.error('[trace-mcp-server] stdio transport failed to connect:', err);
+      process.exit(1);
+    });
+} else if (isDirectRun) {
   void ensureOpenTelemetry().catch(() => { /* non-fatal startup warmup */ });
   // Pre-warm the Postgres pool so first FTS query doesn't eat into tool timeout
   pool.query('SELECT 1').catch(() => { /* non-fatal — pool will retry on first real query */ });

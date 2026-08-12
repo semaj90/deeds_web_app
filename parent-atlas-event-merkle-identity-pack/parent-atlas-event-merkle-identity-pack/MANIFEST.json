@@ -1,0 +1,29 @@
+{
+  "name": "parent-atlas-event-merkle-identity-pack",
+  "generated_at": "2026-08-12",
+  "files": [
+    "NEXT_AGENT_PROMPT.md",
+    "README.md",
+    "docs/EXECUTION_ORDER.md",
+    "docs/REFERENCE_URLS.md",
+    "sql/001_integration_event_outbox.sql",
+    "sql/002_analytics_merkle_checkpoints.sql",
+    "sql/003_graph_identity_constraints.sql",
+    "src/contracts/events.ts",
+    "src/contracts/graph-identity.ts",
+    "src/contracts/merkle.ts",
+    "src/daily/kanban-contracts.ts",
+    "src/daily/parent-atlas-daily-compiler.ts",
+    "src/graph/identity-audit.ts",
+    "src/merkle/checkpoint-builder.ts",
+    "src/merkle/node-sha256.ts",
+    "src/merkle/rfc9162-merkle.ts",
+    "tests/rfc9162-merkle.spec.ts"
+  ],
+  "notes": [
+    "Scaffold/contract pack; not a claim these exact repo files are missing.",
+    "Reuse the existing Parent Atlas stable-hash.ts.",
+    "SQL files are templates and must be reconciled with the live schema.",
+    "Reference URLs need live re-verification because web.run returned HTTP 503."
+  ]
+}

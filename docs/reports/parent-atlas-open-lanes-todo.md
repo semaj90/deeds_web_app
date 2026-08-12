@@ -84,13 +84,34 @@ Remaining open taxonomy work:
 
 ## Lower-lane proof gaps
 
-- [ ] AST / chunk identity proof: stable `source_ref` / `source_revision` / `tree_node_id` / `title_id` joins still need a live writer receipt.
-- [ ] JSONL parsed-evidence lane: batch parse receipts and parser provenance still need a live proof.
-- [x] POS tagger / domain classification logic: local Tree-sitter extraction + classifier logic is live/proven, but the durable write / feedback plane is still degraded and the evidence-backed receipt lane is not yet end-to-end proven.
-- [x] Code evidence synthesizer: LangExtract / semantic record assembly now has a first-class receipt builder in `analysis/code-evidence-synthesizer.ts`, but the durable write / feedback plane still needs a healthy Postgres / outbox path before the receipt can be called complete.
-- [ ] Feature matrix convergence: `feature_matrix_5` / `candidate_feature_matrix` / `semantic_768` are contract-wired, but still need a live end-to-end proof.
-- [ ] ANN candidate generation vs rerank separation: keep search and rerank as separate owners until the receipts close.
-- [ ] GPU sidecar adapter proof: cuVS / cuGraph parity and batch synthesis remain sidecar lanes, not canonical owners.
+| Item | State | Notes |
+|---|---|---|
+| AST / chunk identity proof | OPEN | stable `source_ref` / `source_revision` / `tree_node_id` / `title_id` joins still need a live writer receipt |
+| JSONL parsed-evidence lane | OPEN | batch parse receipts and parser provenance still need a live proof |
+| POS tagger / domain classification logic | PROVEN | local Tree-sitter extraction + classifier logic is live/proven; durable write / feedback plane still degraded |
+| Code evidence synthesizer | WIRED | LangExtract / semantic record assembly now has a first-class receipt builder; Postgres write + readback is now PROVEN (2026-08-12, `CODE_EVIDENCE_LEDGER_READBACK_PROVEN`, `code-evidence-readback.spec.ts`, 8/8 acceptance criteria live against real Postgres); outbox delivery and Qdrant/Valkey projection still needed for the full end-to-end receipt |
+| Feature matrix convergence | OPEN | `feature_matrix_5` / `candidate_feature_matrix` / `semantic_768` are contract-wired, still need live end-to-end proof |
+| ANN candidate generation vs rerank separation | OPEN | keep search and rerank as separate owners until the receipts close |
+| GPU sidecar adapter proof | OPEN | cuVS / cuGraph parity and batch synthesis remain sidecar lanes, not canonical owners |
+| Web fetch / Firecrawl evidence lane | OPEN | crawl → normalize → AST / semantic chunking → evidence packet receipt still needs a first live end-to-end proof |
+| Semantic docs ranker | OPEN | top-k docs → BitFrost / ACE routing → centroid creation → TurboVec / DiskANN acceleration still needs a bounded receipt |
+| MCP synthesis DAG | OPEN | tool-calling → curated context → `llm_synthesis` packet assembly still needs a live proof gate |
+
+### CODE EVIDENCE LOWER LANE — precise seam (2026-08-12)
+
+| Seam | State |
+|---|---|
+| Synthesizer (`sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts`) | TESTED |
+| Ledger input adapter (`buildCodeEvidenceLedgerInputFromSource`) | TESTED |
+| Worker enqueue wiring (`worker.ts` → `code_feature_registry`) | TESTED |
+| POS concept durable payload (`source-pos-concept-packet.ts`) | TESTED |
+| Postgres write + readback (`analysis-pass-results.ts` + `code-evidence-readback.ts`) | **PROVEN** — live, 8/8 acceptance criteria, real DB (`code-evidence-readback.spec.ts`) |
+| Outbox delivery | OPEN |
+| Qdrant / Valkey projection | OPEN |
+| Semantic API / LangExtract E2E | OPEN |
+| Full source→knowledge E2E | OPEN |
+
+Finding from the readback proof: `code_feature_registry` resolves to `observed_event` execution semantics (not in `KNOWN_PASS_EXECUTION_SEMANTICS`), so a replay of identical ledger input inserts a second, distinct row instead of deduplicating. That's existing, correct behavior for this pass name — this proof did not change it. Whether `code_feature_registry` should instead be `deterministic_idempotent` is an open product decision (the synthesizer itself is a pure function of its input, so the underlying computation IS deterministic; the ledger just doesn't currently take advantage of that for dedup).
 
 ---
 

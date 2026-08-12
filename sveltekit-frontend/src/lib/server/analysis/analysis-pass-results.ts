@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 
 import { db, pgRows } from '$lib/server/db/client.js';
 import {
@@ -10,6 +10,13 @@ import {
 	normalizeAnalysisPassLedgerInput,
 } from '$lib/server/db/schema/analysis-pass-results.js';
 import { eq, sql } from 'drizzle-orm';
+import { writeIntegrationEventOutboxRow } from '$lib/server/queue/outbox.js';
+import {
+	codeEvidencePersistedEventSchema,
+	type CodeEvidencePersistedEventV1,
+} from '$lib/server/queue/integration-events.js';
+import type { EventFabricType } from '$lib/server/queue/event-fabric.js';
+import type { EventRoutingKey } from '$lib/server/queue/topology.js';
 
 let analysisPassResultsTableMissing = false;
 let loggedMissingAnalysisPassResultsTable = false;
@@ -160,8 +167,73 @@ export function buildAnalysisPassLedgerEntry(input: AnalysisPassLedgerInput) {
 	return normalizeAnalysisPassLedgerInput(input);
 }
 
+export interface RecordAnalysisPassResultOptions {
+	/**
+	 * When supplied, an integration event outbox row is written in the SAME
+	 * transaction as the ledger insert — atomic with the write it reports on.
+	 * Never emitted on the deterministic_idempotent short-circuit path (no new
+	 * row was persisted there, so there's nothing to notify about).
+	 */
+	emitIntegrationEvent?: {
+		eventType: EventFabricType;
+		routingKey: EventRoutingKey;
+		traceId?: string;
+		sourceRef?: string;
+	};
+}
+
+function buildCodeEvidencePersistedEvent(
+	row: AnalysisPassResultRow
+): CodeEvidencePersistedEventV1 {
+	const output = (row.output ?? {}) as Record<string, unknown>;
+	const receipt = (output.codeEvidenceReceipt ?? {}) as Record<string, unknown>;
+	const packet = (output.posConceptPacket ?? {}) as Record<string, unknown>;
+	const provenance = (row.provenance ?? {}) as Record<string, unknown>;
+	const sourceRef = row.sourceRef ?? (typeof provenance.sourceRef === 'string' ? provenance.sourceRef : null);
+	const sourceRevision =
+		row.sourceRevision ?? (typeof provenance.sourceRevision === 'string' ? provenance.sourceRevision : null);
+	const treeNodeId = typeof receipt.treeNodeId === 'string' ? receipt.treeNodeId : null;
+	const schemaRevision = typeof receipt.schemaVersion === 'string' ? receipt.schemaVersion : null;
+	const producerId = typeof provenance.producerId === 'string' ? provenance.producerId : null;
+	const producerRevision =
+		typeof provenance.producerRevision === 'string' ? provenance.producerRevision : null;
+	const occurredAt =
+		row.createdAt instanceof Date
+			? row.createdAt.toISOString()
+			: typeof row.createdAt === 'string'
+				? new Date(row.createdAt).toISOString()
+				: new Date().toISOString();
+
+	if (!sourceRef || !sourceRevision || !schemaRevision || !producerId || !producerRevision) {
+		throw new Error('Code evidence integration event is missing required identity fields');
+	}
+
+	return codeEvidencePersistedEventSchema.parse({
+		eventId: randomUUID(),
+		eventType: 'code.evidence.persisted',
+		occurredAt,
+		traceId: typeof provenance.traceId === 'string' ? provenance.traceId : undefined,
+		sourceRef,
+		payload: {
+			evidenceId: String(row.id),
+			passKey: row.passKey,
+			sourceRef,
+			sourceRevision,
+			parseNodeId: treeNodeId,
+			packetKey: row.packetKey,
+			logicalEvidenceHash: row.passIdentityHash ?? row.passKey,
+			synthesisReceiptHash: sha256Hex(stableStringify(receipt)),
+			posConceptPacketHash: sha256Hex(stableStringify(packet)),
+			producerId,
+			producerRevision,
+			schemaRevision,
+		},
+	});
+}
+
 export async function recordAnalysisPassResult(
-	input: AnalysisPassLedgerInput
+	input: AnalysisPassLedgerInput,
+	opts?: RecordAnalysisPassResultOptions
 ): Promise<AnalysisPassPersistResult | null> {
 	if (analysisPassResultsTableMissing) return null;
 
@@ -194,6 +266,34 @@ export async function recordAnalysisPassResult(
 					row: existing,
 				};
 			}
+		}
+
+		if (opts?.emitIntegrationEvent) {
+			const emit = opts.emitIntegrationEvent;
+			return await db.transaction(async (tx) => {
+				const [fresh] = await tx
+					.insert(analysisPassResults)
+					.values(row)
+					.returning();
+
+				const rowResult = fresh ?? (row as unknown as AnalysisPassResultRow);
+				const codeEvidenceEvent = buildCodeEvidencePersistedEvent(rowResult);
+
+				await writeIntegrationEventOutboxRow(tx, {
+					runId: input.analysisJobId,
+					eventType: emit.eventType,
+					routingKey: emit.routingKey,
+					payload: codeEvidenceEvent.payload,
+					traceId: emit.traceId,
+					sourceRef: emit.sourceRef,
+				});
+
+				return {
+					inserted: true,
+					idempotencyKey: row.passKey,
+					row: rowResult,
+				};
+			});
 		}
 
 		const [fresh] = await db

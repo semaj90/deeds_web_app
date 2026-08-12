@@ -4,6 +4,42 @@
 
 ---
 
+## Current near-term TODO snapshot — 2026-08-12
+
+This snapshot keeps the user-facing board short and separates created/wired from proven.
+
+### High Priority
+
+- [ ] Fix template generation endpoint
+- [ ] Add audit logging
+- [ ] Redis connection pooling
+- [ ] Wire Qdrant reranking
+- [ ] Wire Neo4j expansion
+
+### Medium Priority
+
+- [ ] MCP report tools
+- [ ] Evidence version history
+- [ ] Report streaming AI
+- [ ] Template marketplace
+- [ ] Evidence bulk upload
+
+### Low Priority
+
+- [x] Implement concept extraction — local Tree-sitter / POS / domain classifier logic is live; durable write / feedback proof is still open.
+- [x] Wire LangExtract integration — code evidence synthesis is wired through the worker lane; end-to-end durable write is still open.
+- [ ] Add TurboVec sync
+- [ ] Integrate openai-compatible `8090` llama-server summary pipeline
+
+**Proven / wired but not done**:
+
+- `feature_matrix_5` writer is now wired as the first code lane receipt surface.
+- `code_evidence_synthesizer` now builds a durable receipt from the POS / concept packet.
+- `code_feature_registry` now threads that receipt through the worker path.
+- The durable Postgres / outbox plane is still the gating failure for `DONE`.
+
+---
+
 ## Event Plane
 
 PostgreSQL is the canonical task, gate, checkpoint, and outbox store for Atlas work. RabbitMQ handles durable async dispatch, Redis / Valkey holds hot context and leases, Arrow + `mmap` hold immutable batch snapshots, and gRPC / Protobuf carries typed sidecar commands. Browser-local work stays in Web Workers, IndexedDB, Service Workers, and SharedArrayBuffer; those are compute or cache lanes only, not canonical state.
@@ -1069,17 +1105,39 @@ This is the short execution list extracted from the current compiler / topology 
 - Valkey is hot coordination cache only.
 - Read-side query fanout is a fork-join executor capped at three independent read tools.
 - Shared lane manifest: `sveltekit-frontend/src/lib/server/atlas/contracts/fabric-lanes.ts` for GNN, exact kNN, KMeans routing hints, Ewin Tang low-rank, HyperLogLog telemetry, Kanban, and recommendation policy receipts.
-- Feature matrix setup stays three-tier: static packet `feature_matrix_5`, query-time `candidate_feature_matrix`, and canonical `semantic_768`; JSONL evidence, POS tagger output, and domain classification are derived contracts; the live POS/concept lane now materializes `feature_matrix_5` as the first wired writer, and the local Tree-sitter / domain classifier is now proven live, but the durable write / feedback plane is still degraded so the end-to-end receipt remains open. KMeans 64/128/256 plus SOM 20x20 remain routing hints only and the setup lives in `sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.ts`.
+- Feature matrix setup stays three-tier: static packet `feature_matrix_5`, query-time `candidate_feature_matrix`, and canonical `semantic_768`; JSONL evidence, POS tagger output, and domain classification are derived contracts; the local Tree-sitter / domain classifier is proven live, and the code evidence synthesizer now builds a durable receipt and is threaded through the `code_feature_registry` worker path, but the durable Postgres / outbox plane is still degraded so the end-to-end receipt remains open. KMeans 64/128/256 plus SOM 20x20 remain routing hints only and the setup lives in `sveltekit-frontend/src/lib/server/atlas/contracts/feature-extraction-v1.ts`.
 - Daily Graphify is the evidence producer for TaskCandidate rows; Kanban remains the canonical task-state owner.
 - `scripts/atlas/graphify-langgraph-pipeline.mjs` now emits `graphify-task-candidates.jsonl` for the Kanban importer bridge; this is evidence, not task-state truth.
 - `T6c` KMeans remains `CACHE_HINT_ONLY` and does not block daily Graphify resumption.
 - Tang-style low-rank sampling is experimental routing only; exact cuVS / ANN ranking remains the final candidate oracle.
 - OpenCode / ACP / A2A dispatch is transport only: the agent may request work through the typed tool registry, but the actual execution backend is a shell/Python worker (`bash`, `conda run`, or the repo’s equivalent wrapper). The agent must not write canonical state directly.
 
+### Event fabric and control loop
+
+Priority order:
+
+1. `WorkCommand` asks a worker to do something.
+2. `IntegrationEvent` reports canonical derived state changed.
+3. `FailureObservation` records what failed without retrying by itself.
+4. `AnalyticsEvent` records observed behavior for later aggregation.
+5. `RecommendationSignal` carries derived policy suggestions only.
+6. `PolicyDecisionReceipt` records accept / reject / apply outcomes.
+7. `CheckpointCommit` freezes a Merkle-rooted population or artifact batch.
+
+Operating split:
+
+- RabbitMQ carries commands and integration delivery.
+- Kafka carries analytics history, failure observations, and tensor-policy telemetry.
+- NATS is for low-latency runtime dispatch only.
+- Postgres stores canonical receipts and checkpoints.
+- Valkey holds hot routing and policy state only.
+- Merkle roots freeze the exact analytics population used for model or policy training.
+- A failure observation never retries itself; only an explicit recovery command may do that.
+
 ### Pass Fabric steps
 
 - [ ] Prove the current worker behavior with one real poll cycle and one real claimed batch.
-- [x] Add the first first-class code evidence synthesizer writer so the live classifier can persist a durable receipt once Postgres / outbox health recovers; the builder now lives in `sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts` and is threaded through the `code_feature_registry` worker stage.
+- [x] Add the first first-class code evidence synthesizer writer so the live classifier can persist a durable receipt once Postgres / outbox health recovers; the builder now lives in `sveltekit-frontend/src/lib/server/analysis/code-evidence-synthesizer.ts`, is threaded through the `code_feature_registry` worker stage, and is now queued from the upload route for code-like uploads.
 - [ ] Replace single-job claims with `claimBatch(jobType, freeSlots)` so gates fill immediately.
 - [ ] Add `pg_notify` wakeups on enqueue and keep a slow fallback poll.
 - [ ] Add durable `AnalysisPassResult` persistence as append-only execution history.
@@ -1091,6 +1149,7 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Decide whether PF4B should materialize a `analysis_pass_current` view or stay append-only history plus explicit replay selection, using the live PF4A counts as the baseline.
 - [ ] Use the live PF4B materialization receipt to decide whether PF4C should formalize pass-key semantics or simply keep current-eligible replay selection on the view boundary.
 - [ ] PF4H is now closed: no further uniqueness enforcement is needed on the current-materialization boundary beyond the view and application-level reuse path.
+- [ ] Keep the new code-evidence receipt lane under the same proof rules: created + wired is not `DONE` until durable Postgres / outbox readback is healthy.
 - [ ] Add a CPU worker pool for structural, lexical, entropy, and normalization passes.
 - [ ] Keep NLP sidecar / GPU passes bounded and batched instead of launching one request per packet.
 - [ ] Add Valkey batch helpers for hot metadata, result hints, and cache receipts only.
@@ -1111,104 +1170,7 @@ This is the short execution list extracted from the current compiler / topology 
 - [ ] Separate identical retries from distinct execution history before any deduplication or uniqueness rule.
 - [ ] Keep nullable `source_revision` / `pass_revision` explicit until provenance can be reconstructed.
 
-### PF0 packet identity alias reconciliation
-
-- [ ] Freeze the live identity family as the de facto `packet:<12hex>` / `ace:packet:<12hex>` compatibility boundary until the grain test proves otherwise.
-- [ ] Keep `packet-key-builder.ts` quarantined as a provisional V2 builder; do not use it to mutate historical PKs in place.
-- [ ] Create `atlas_packet_identity_aliases` as the canonical repair seam for legacy packet keys.
-- [ ] Wire packet-key consumers to resolve aliases before validation or persistence.
-- [ ] Stop any writer from minting a new legacy packet prefix when a canonical key or alias resolution already exists.
-- [ ] Prove replay-safe resolution without mutating `atlas_packets.packet_key` PK values.
-
-**Execution order**
-
-1. Fix worker claim underfill
-2. Add queue wakeup notifications
-3. Add durable pass ledger / append-only history
-4. Classify duplicate history groups
-5. Prove pass identity semantics
-6. Add CPU worker pool
-7. Bound NLP sidecar / GPU lane concurrency
-8. Add Valkey batching helpers
-9. Add max-3 read-tool fork-join executor
-10. Add incremental eligibility
-11. Add crash / replay validation
-
----
-
-## MASTER FEATURE TODO: Controlled Integration Ladder
-
-**Purpose**: Integrate the repair and ranking bundle as a staged proof ladder. Do not turn on all lanes at once. Prove each lane separately before it can influence production ranking or canonical truth.
-
-**Hard constraints**
-
-- Keep canonical Parent Atlas ownership of identity, evidence, and retrieval policy.
-- Copy any external bundle into a temporary integration area first; do not overwrite canonical files directly.
-- Use `trace_dynamic_context` as the evidence layer, not a second context engine.
-- Keep semantic `768` canonical and treat `384` as legacy / migration evidence only.
-- Treat RRF candidate fusion and RFF-derived geometric features as separate lanes with separate evaluation gates.
-- Do not enable cuVS, cuGraph, new graph traversal, or production fusion until the prior proof gate passes.
-
-**Relevant files**
-
-- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.ts`
-- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.schema.ts`
-- `sveltekit-frontend/src/lib/server/atlas/master-feature-map.test.ts`
-- `sveltekit-frontend/src/lib/server/atlas/context-for-file.ts`
-- `sveltekit-frontend/src/lib/server/ace/context-assembler.ts`
-- `sveltekit-frontend/src/mcp/trace-mcp-server.ts`
-- `sveltekit-frontend/src/lib/server/retrieval/search-runtime.ts`
-- `sveltekit-frontend/src/lib/server/retrieval/rrf-integration.ts`
-- `sveltekit-frontend/src/lib/server/graph/neo4j-gds.ts`
-- `sveltekit-frontend/src/lib/server/hypergraph/hypergraph-search.ts`
-- `docs/atlas/phase-20-training-readiness.md`
-- `packages/parent-atlas/docs/atlas/phase-20-training-readiness.md`
-- `docs/atlas/xgboost-reranker-contract.md`
-- `packages/parent-atlas/docs/atlas/xgboost-reranker-contract.md`
-- `docs/reports/parent-atlas-training-readiness.md`
-- `docs/reports/parent-atlas-training-readiness.json`
-- `docs/reports/parent-atlas-open-lanes-todo.md`
-
-### Step 1: Bundle staging and repair spine proof
-
-- [ ] Copy the bundle into a temporary integration area.
-- [ ] Select one known failing test and capture the failure fingerprint.
-- [ ] Wire the minimal repair loop: `observe error` → `repair state` → `localize symbols` → `bounded context` → `surgical patch` → `verify repair` → `record repair episode`.
-- [ ] Audit the packetizer / assembler / validator caller chain and classify each file as live, bridge, or orphan before promoting packet materialization.
-- [ ] Verify the loop on one real failure before expanding scope.
-
-### Step 2: Replace JSON-only context with Parent Atlas evidence
-
-- [ ] Replace simple JSON localization inputs with `trace_dynamic_context`.
-- [ ] Keep the localizer bounded to real Parent Atlas evidence: symbol IDs, packet keys, file paths, callers, tests, and retrieval scores.
-- [ ] Ensure `localize symbols` only ranks candidates supplied by the evidence layer.
-
-### Step 3: Close the semantic 768 invariant
-
-- [ ] Confirm raw embedding length is 768 for the active semantic lane.
-- [ ] Confirm `codebase_chunks_768` remains the canonical Qdrant collection.
-- [ ] Remove any runtime dependency on `384` for active retrieval.
-- [ ] Protect precomputed vectors and caches from silent dimension drift.
-
-### Step 4: Make RRF ownership explicit
-
-- [ ] Decide one canonical owner for fusion: Qdrant-side fusion or Parent Atlas-side fusion.
-- [ ] Use the bundle's RRF implementation as an oracle reference first, not a production owner.
-- [ ] Compare frozen lane rankings between the canonical implementation and the oracle reference.
-- [ ] Require mathematical agreement before changing runtime ownership.
-
-### Step 5: Restore PageRank authority as one field
-
-- [ ] Keep PageRank authority as a single field, not overlapping aliases.
-- [ ] Resolve `pickPageRankAuthorityScore()` into the canonical authority row.
-- [ ] Preserve provenance: raw, normalized, and revision metadata must stay explicit.
-
-### Step 6: Establish FeatureRowV1
-
-- [ ] Define `FeatureRowV1` as the first convergence point.
-- [ ] Start with `packetKey`, `dense`, `sparse`, `rrf`, `ast`, `pagerankAuthority`, `freshness`, `crossEncoder`, `featureRevision`, and `graphRevision`.
-- [ ] Defer `rffSimilarity` and `latent128Similarity` to later versions.
-
+                                                    
 ### Step 7: Introduce RFF as an experimental projection
 
 - [ ] Define a deterministic representation contract for RFF.

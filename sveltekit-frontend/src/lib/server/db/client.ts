@@ -68,13 +68,17 @@ const POOL_CONFIG = {
 	connectionTimeoutMillis: 5000,
 };
 
-// Log canonical DB on boot (Sprint 3.6 G17)
+// Log canonical DB on boot (Sprint 3.6 G17). console.error (stderr), not
+// console.log — stdout must stay reserved for callers that speak a wire
+// protocol over it (e.g. trace-mcp-server.ts in MCP_TRANSPORT=stdio mode,
+// which imports this module transitively via `pool`; any stdout write here
+// would corrupt the JSON-RPC stream before the handshake even completes).
 if (typeof process !== 'undefined') {
 	try {
 		const url = new URL(getDatabaseUrl());
-		console.log(`📡 [DB] Canonical target: ${url.hostname}:${url.port}${url.pathname}`);
+		console.error(`📡 [DB] Canonical target: ${url.hostname}:${url.port}${url.pathname}`);
 	} catch {
-		console.log('📡 [DB] Canonical target: [invalid URL]');
+		console.error('📡 [DB] Canonical target: [invalid URL]');
 	}
 }
 

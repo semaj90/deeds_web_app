@@ -761,27 +761,39 @@ export async function tool_kb_explain_retrieval(args: {
   }
 }
 
-/** context.build_kv_packet — return compressed ACE context bundle */
+/**
+ * context.build_kv_packet — build the compressed KV context packet.
+ *
+ * Delegates to kv-context-controller.ts, same as its context.get_compressed_card
+ * and context.explain_compression siblings below — matching the tool's own
+ * declared schema (tool-selection.ts: taskId/query/hotFiles/hotSymbols,
+ * required: ['taskId', 'query']). Previously this ignored taskId/hotFiles/
+ * hotSymbols entirely and returned an unrelated {query, chunkCount, chunks,
+ * buildMs} shape built from fetchCodebaseContext() — a third, uncoordinated
+ * implementation of the same tool name, reachable whenever Gemma4 calls
+ * context.build_kv_packet through this in-process dispatch table (see
+ * gemma4-tool-controller.ts) instead of through the HTTP MCP server.
+ */
 export async function tool_context_build_kv_packet(args: {
+  taskId: string;
   query: string;
-  limit?: number;
+  hotFiles?: string[];
+  hotSymbols?: string[];
+  blockedAreas?: string[];
+  maxInputTokens?: number;
 }): Promise<MCPToolResult> {
   const t0 = Date.now();
   try {
-    const allChunks = await fetchCodebaseContext(args.query);
-    const chunks = (allChunks ?? []).slice(0, args.limit ?? 6);
-    const packet = {
+    const { buildKvContextPacket } = await import('$lib/server/ai/kv-context-controller.js');
+    const packet = await buildKvContextPacket({
+      taskId: args.taskId,
       query: args.query,
-      chunkCount: chunks.length,
-      chunks: chunks.slice(0, 6).map((c: Record<string, unknown>) => ({
-        file_path: c.filePath,
-        symbol: c.symbolName,
-        summary: String(c.content ?? '').slice(0, 300),
-        score: c.score,
-      })),
-      buildMs: Date.now() - t0,
-    };
-    return ok('context.build_kv_packet', packet, Date.now() - t0);
+      hotFiles: args.hotFiles ?? [],
+      hotSymbols: args.hotSymbols ?? [],
+      blockedAreas: args.blockedAreas ?? [],
+      maxInputTokens: args.maxInputTokens,
+    });
+    return ok('context.build_kv_packet', packet, Date.now() - t0, false);
   } catch (e) {
     return err('context.build_kv_packet', String(e), Date.now() - t0);
   }

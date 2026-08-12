@@ -23,6 +23,7 @@ import {
 	type OntologyEventTuple,
 	type RecommendationJudgment,
 } from './event-hypergraph-contract.js';
+import { buildRecommendationPolicyResults, type RecommendationPolicyResult } from '$lib/server/analytics/recommendation-policy.js';
 
 const EvidenceSpanSchema = z
 	.object({
@@ -277,6 +278,7 @@ export interface EventHypergraphBundle {
 	eventBreadthFeatures: EventBreadthFeatures | null;
 	recommendationFeatureRows: EventRecommendationFeatureRow[];
 	recommendationJudgment: RecommendationJudgment | null;
+	recommendationPolicyResults: RecommendationPolicyResult[];
 }
 
 export interface CompileEventHypergraphBundleInput {
@@ -578,11 +580,25 @@ export function compileEventHypergraphBundle(input: CompileEventHypergraphBundle
 			})
 		: null;
 
+	const recommendationPolicyResults = recommendationFeatureRows.length
+		? buildRecommendationPolicyResults({
+				policyRevision: 'recommendation-policy-v1',
+				eventRevision,
+				featureRevision: recommendationFeatureRows[0]?.featureRevision ?? 'event-recommendation-v1',
+				generatedAt: recommendationJudgment?.generatedAt,
+				traceId: input.requestId,
+				sourceRef: input.sourceRef,
+				maxResults: Math.min(8, recommendationFeatureRows.length),
+				candidates: recommendationFeatureRows,
+			})
+		: [];
+
 	return {
 		events,
 		ontologyEventTuples,
 		eventBreadthFeatures,
 		recommendationFeatureRows,
 		recommendationJudgment,
+		recommendationPolicyResults,
 	};
 }

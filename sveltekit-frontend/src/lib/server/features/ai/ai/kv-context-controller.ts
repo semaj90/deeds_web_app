@@ -81,7 +81,11 @@ export type KvContextPacket = {
     stablePrefixTokens:   number;
     dynamicContextTokens: number;
     reservedOutputTokens: number;
+    /** Tokens actually consumed by the fileCards that made it into level2Compressed. */
+    cardTokensUsed:       number;
   };
+  /** File cards that were computed but dropped for exceeding dynamicContextTokens. */
+  rejectedFileCards: Array<{ stableKey: string; reason: string }>;
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -137,11 +141,13 @@ export async function buildKvContextPacket(opts: {
   } catch { /* miss */ }
 
   // L2: build compressed file cards in parallel (bounded to 8 files)
-  const fileCards = await Promise.all(
+  const allFileCards = await Promise.all(
     uniqueHotFiles.map(f => compressFileToCard(f).catch((): FileCard => ({
       stableKey: `file:${f}`, filePath: f, oneLineSummary: f,
       importantSymbols: [], knownRisks: [], recentTraceHits: [],
-      retrievalReasons: [], score: 0,
+      retrievalReasons: [], score: null, scoreStatus: 'NOT_EVALUATED',
+      materializationStatus: 'DEGRADED_PLACEHOLDER', evidenceStatus: 'UNAVAILABLE',
+      sourceRevision: null,
     }))),
   );
 
@@ -152,6 +158,23 @@ export async function buildKvContextPacket(opts: {
   const stablePrefixHash   = sha256(stablePrefix);
   const stablePrefixTokens = estimateTokens(stablePrefix);
   const reservedOutput     = 2_048;
+  const dynamicContextTokens = Math.max(0, maxInputTokens - stablePrefixTokens - reservedOutput);
+
+  // Enforce the token budget for real: take cards in caller-priority order
+  // (uniqueHotFiles order) until the dynamic-context budget is exhausted.
+  // Previously maxInputTokens was computed but never used to bound fileCards.
+  const fileCards: FileCard[] = [];
+  const rejectedFileCards: Array<{ stableKey: string; reason: string }> = [];
+  let cardTokensUsed = 0;
+  for (const card of allFileCards) {
+    const tokens = estimateTokens(JSON.stringify(card));
+    if (cardTokensUsed + tokens > dynamicContextTokens) {
+      rejectedFileCards.push({ stableKey: card.stableKey, reason: 'exceeds dynamicContextTokens budget' });
+      continue;
+    }
+    cardTokensUsed += tokens;
+    fileCards.push(card);
+  }
 
   const packet: KvContextPacket = {
     taskId,
@@ -172,18 +195,26 @@ export async function buildKvContextPacket(opts: {
     tokenBudget: {
       maxInputTokens,
       stablePrefixTokens,
-      dynamicContextTokens: Math.max(0, maxInputTokens - stablePrefixTokens - reservedOutput),
+      dynamicContextTokens,
       reservedOutputTokens: reservedOutput,
+      cardTokensUsed,
     },
+    rejectedFileCards,
   };
 
-  // Cache by query (30min) and task (1h)
-  const serialized  = JSON.stringify(packet);
-  const tocCacheKey = `kv:toc:task:${taskId}`;
+  // Cache by query (30min) and by task (1h). The full packet lives under
+  // kv:packet:task:{taskId} — a DISTINCT key from kv:toc:task:{taskId}, which
+  // buildAttentionToc()/refreshTaskToc() own exclusively. These used to share
+  // one key with two incompatible shapes: refreshTaskToc() would delete the
+  // full packet and replace it with a bare AttentionToc, silently blanking
+  // stablePrefixHash/fileCards/tokenBudget for any explainCompression() call
+  // made after a refresh. Splitting the keys removes that collision.
+  const serialized     = JSON.stringify(packet);
+  const packetCacheKey = `kv:packet:task:${taskId}`;
   try {
     await Promise.all([
       redis.setex(queryCacheKey, 1_800, serialized),
-      redis.setex(tocCacheKey,  3_600, serialized),
+      redis.setex(packetCacheKey, 3_600, serialized),
     ]);
   } catch { /* non-fatal */ }
 
@@ -238,7 +269,7 @@ export async function getCompressedCard(
 export async function explainCompression(taskId: string): Promise<string> {
   const redis = getRedis();
   try {
-    const raw = await redis.get(`kv:toc:task:${taskId}`);
+    const raw = await redis.get(`kv:packet:task:${taskId}`);
     if (!raw) {
       return JSON.stringify({
         taskId,
@@ -247,14 +278,22 @@ export async function explainCompression(taskId: string): Promise<string> {
       });
     }
     const p = JSON.parse(raw) as KvContextPacket;
+    // toc is read separately — refreshTaskToc() only invalidates kv:toc:task:*,
+    // so this reflects the latest refresh even if the packet itself is stale.
+    let toc = p.level3AttentionToc;
+    try {
+      const tocRaw = await redis.get(`kv:toc:task:${taskId}`);
+      if (tocRaw) toc = JSON.parse(tocRaw) as AttentionToc;
+    } catch { /* fall back to packet's toc */ }
     return JSON.stringify({
-      taskId:           p.taskId,
-      stablePrefixHash: p.stablePrefixHash,
-      fileCards:        p.level2Compressed.fileCards.length,
-      traceCards:       p.level2Compressed.traceCards.length,
-      researchCards:    p.level2Compressed.researchCards.length,
-      toc:              p.level3AttentionToc,
-      tokenBudget:      p.tokenBudget,
+      taskId:            p.taskId,
+      stablePrefixHash:  p.stablePrefixHash,
+      fileCards:         p.level2Compressed.fileCards.length,
+      rejectedFileCards: p.rejectedFileCards,
+      traceCards:        p.level2Compressed.traceCards.length,
+      researchCards:     p.level2Compressed.researchCards.length,
+      toc,
+      tokenBudget:       p.tokenBudget,
     }, null, 2);
   } catch (e) {
     return JSON.stringify({ error: String(e) });

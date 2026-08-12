@@ -53,3 +53,27 @@ export const workCommandBaseSchema = z.object({
 export type WorkCommandBase = z.infer<typeof workCommandBaseSchema>;
 
 export type WorkCommand<T = unknown> = WorkCommandBase & { payload: T };
+
+// ---------------------------------------------------------------------------
+// AnalyticsEvent envelope — observability/notification events.
+//
+// Distinct from WorkCommand: nothing claims or executes an AnalyticsEvent.
+// It notifies that something already happened; downstream consumers may
+// react (e.g. trigger a projection), but must never treat delivery as
+// authoritative state — Postgres already is by the time this publishes.
+// ---------------------------------------------------------------------------
+
+export const analyticsEventTypeSchema = z.enum(['code.evidence.persisted']);
+
+export type AnalyticsEventType = z.infer<typeof analyticsEventTypeSchema>;
+
+export const analyticsEventBaseSchema = z.object({
+  eventId: z.string().uuid(),
+  eventType: analyticsEventTypeSchema,
+  occurredAt: z.string().datetime(),
+  traceId: z.string().optional(),
+  sourceRef: z.string().optional(),
+});
+
+export type AnalyticsEventBase = z.infer<typeof analyticsEventBaseSchema>;
+export type AnalyticsEvent<T = unknown> = AnalyticsEventBase & { payload: T };

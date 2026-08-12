@@ -22,6 +22,13 @@ MiniLM/Mixedbread/HMM/CodeBERT passes as uncoordinated one-off endpoints
 instead of a typed, envelope-based pass registry with one canonical contract
 per concern.
 
+Live implementation note (2026-08-12): the SvelteKit `code_feature_registry`
+worker already routes through `src/lib/server/analysis/ast-langextract-bridge.ts`
+before packet synthesis. This proposal therefore treats the Python sidecar as
+the structural/NLP runtime owner that the worker can call, not as a separate
+parallel owner that bypasses the existing `SourcePosConceptPacket` →
+`CodeEvidenceSynthesizer` → `analysis_pass_results` chain.
+
 A large external architecture correction (this session, verbatim from the
 user) proposes: layered ownership (parser engine vs. chunking application vs.
 structural query/rewrite vs. canonical data contract, not "Tree-sitter or

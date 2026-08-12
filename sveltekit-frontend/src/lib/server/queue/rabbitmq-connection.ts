@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { getRabbitMQUrl } from '$lib/config/env.server.js';
 // amqplib types don't resolve with bundler moduleResolution — use local interfaces
 interface AmqpConnection {
     on(event: string, cb: (...args: any[]) => void): void;
@@ -18,7 +19,7 @@ interface AmqpChannel {
     once(event: string, cb: (...args: any[]) => void): void;
 }
 
-const RABBITMQ_URL = ENV.RABBITMQ_URL;
+const RABBITMQ_URL = getRabbitMQUrl();
 
 let connection: AmqpConnection | null = null;
 let channel: AmqpChannel | null = null;

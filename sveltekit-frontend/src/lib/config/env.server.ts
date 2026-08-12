@@ -121,9 +121,37 @@ export function getRedisPassword(): string {
 }
 
 export function getRabbitMQUrl(): string {
- return (
-   env?.RABBITMQ_URL || `amqp://legal_admin:secret123@${isDocker ? 'rabbitmq' : LOCALHOST}:5672`
-  );
+  const raw = env?.RABBITMQ_URL?.trim();
+  const fallbackUser = env?.RABBITMQ_USER ?? 'legal_admin';
+  const fallbackPassword = env?.RABBITMQ_PASSWORD ?? 'secret123';
+  const fallbackHost = isDocker ? 'rabbitmq' : LOCALHOST;
+
+  if (!raw) {
+    return `amqp://${encodeURIComponent(fallbackUser)}:${encodeURIComponent(fallbackPassword)}@${fallbackHost}:5672`;
+  }
+
+  try {
+    const url = new URL(raw);
+    if (!url.protocol.startsWith('amqp')) {
+      return raw;
+    }
+
+    const hasPlaceholderAuth =
+      !url.username ||
+      !url.password ||
+      (url.username === 'guest' && url.password === 'guest');
+
+    if (hasPlaceholderAuth && fallbackUser && fallbackPassword && (fallbackUser !== 'guest' || fallbackPassword !== 'guest')) {
+      url.username = fallbackUser;
+      url.password = fallbackPassword;
+    }
+
+    if (!url.hostname) url.hostname = fallbackHost;
+    if (!url.port) url.port = '5672';
+    return url.toString();
+  } catch {
+    return `amqp://${encodeURIComponent(fallbackUser)}:${encodeURIComponent(fallbackPassword)}@${fallbackHost}:5672`;
+  }
 }
 
 export function getQdrantUrl(): string {
