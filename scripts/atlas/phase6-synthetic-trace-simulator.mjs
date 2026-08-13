@@ -40,6 +40,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
+import { normalizeSourceRef } from './lib/canonical-source-ref.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
@@ -58,6 +59,11 @@ const OUT_DIR   = path.join(ROOT, 'scripts/atlas/out');
 const OUT_NDJSON = path.join(OUT_DIR, 'synthetic-traces.ndjson');
 const OUT_SUMMARY = path.join(OUT_DIR, 'synthetic-trace-summary.json');
 
+function canonicalSourceRefFrom(filePath) {
+  const relativeToRoot = path.relative(ROOT, filePath).replace(/\\/g, '/');
+  return normalizeSourceRef(relativeToRoot);
+}
+
 // Latency buckets (ms) — used to make traces feel realistic
 const LATENCY = {
   db_read:    () => 2  + Math.random() * 8,    // 2–10ms
@@ -72,10 +78,11 @@ async function fetchEdgesFromNeo4j(session) {
   const toolEdges = [];
 
   const dbResult = await session.run(`
-    MATCH (f:File)-[r:USES_DB]->(t:Table)
-    RETURN f.path AS source, t.name AS table,
+    MATCH (f:CodebaseFile)-[r:USES_DB]->(t:DBTable)
+    RETURN coalesce(f.canonicalSourceRef, f.filePath, f.relativePath, f.path, f.id) AS source,
+           t.name AS table,
            r.operation AS operation, r.line_num AS line_num, r.caller AS caller
-    ORDER BY f.path
+    ORDER BY source
   `);
   for (const rec of dbResult.records) {
     dbEdges.push({
@@ -89,10 +96,11 @@ async function fetchEdgesFromNeo4j(session) {
   }
 
   const toolResult = await session.run(`
-    MATCH (f:File)-[r:USES_TOOL]->(t:Tool)
-    RETURN f.path AS source, t.name AS tool,
+    MATCH (f:CodebaseFile)-[r:USES_TOOL]->(t:Tool)
+    RETURN coalesce(f.canonicalSourceRef, f.filePath, f.relativePath, f.path, f.id) AS source,
+           t.name AS tool,
            r.endpoint AS endpoint, r.line_num AS line_num, r.caller AS caller
-    ORDER BY f.path
+    ORDER BY source
   `);
   for (const rec of toolResult.records) {
     toolEdges.push({
@@ -142,7 +150,7 @@ function buildCapabilityMap(dbEdges, toolEdges) {
 // ── Trace generator ────────────────────────────────────────────────────────────
 function shortPath(p) {
   // Normalise backslashes and strip leading repo root prefix
-  return p.replace(/\\/g, '/').replace(/^.*sveltekit-frontend\//, '');
+  return String(p ?? '').replace(/\\/g, '/').replace(/^.*sveltekit-frontend\//, '');
 }
 
 function pickSubset(arr, minFrac = 0.4) {
@@ -230,7 +238,11 @@ async function writeTracesToNeo4j(session, traces) {
     const batch = traces.slice(i, i + BATCH);
     await session.run(`
       UNWIND $rows AS row
-      MATCH (f:File {path: row.source_file})
+      MERGE (f:CodebaseFile { canonicalSourceRef: row.source_ref })
+      ON CREATE SET f.filePath = row.source_file,
+                    f.updated_at = datetime()
+      ON MATCH SET f.filePath = coalesce(f.filePath, row.source_file),
+                   f.updated_at = datetime()
       MERGE (tr:SyntheticTrace {trace_id: row.trace_id})
       ON CREATE SET
         tr.step_count  = row.step_count,
@@ -243,6 +255,7 @@ async function writeTracesToNeo4j(session, traces) {
     `, {
       rows: batch.map(tr => ({
         source_file: tr.source_file,
+        source_ref: canonicalSourceRefFrom(tr.source_file),
         trace_id:    tr.trace_id,
         step_count:  tr.step_count,
         db_ops:      tr.db_ops,

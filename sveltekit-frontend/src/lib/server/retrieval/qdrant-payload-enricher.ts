@@ -58,6 +58,17 @@ function pickNumber(...values: unknown[]): number | null {
   return null;
 }
 
+function pickStringArray(...values: unknown[]): string[] {
+  for (const value of values) {
+    if (!Array.isArray(value)) continue;
+    const normalized = value
+      .map((entry) => String(entry).trim())
+      .filter((entry) => entry.length > 0);
+    if (normalized.length > 0) return normalized;
+  }
+  return [];
+}
+
 export interface EnrichedPayload {
   // Feature identity
   packet_key: string;
@@ -78,6 +89,8 @@ export interface EnrichedPayload {
   representation_revision: number | null;
   schema_version: string;
   feature_label: string | null;
+  graph_revision: string | null;
+  projection_revision: string | null;
 
   // Statistics (from feature_statistics)
   pagerank: number;
@@ -92,6 +105,14 @@ export interface EnrichedPayload {
   out_degree: number;
   betweenness: number;
   freshness_days: number;
+  graph_degree: number;
+  dependency_breadth: number;
+  db_affinity: number;
+  tool_affinity: number;
+  endpoint_affinity: number;
+  cache_affinity: number;
+  process_ids: string[];
+  neighborhood_hash: string | null;
 
   // Text analysis
   noun_terms: string[];
@@ -449,6 +470,28 @@ export function buildEnrichedPayload(
       chunk.representation_revision,
       chunk.representationRevision
     );
+  const graphRevision =
+    pickString(
+      packet?.graph_revision,
+      packet?.graphRevision,
+      packetMetadata.graph_revision,
+      packetMetadata.graphRevision,
+      chunkMetadata.graph_revision,
+      chunkMetadata.graphRevision,
+      chunk.graph_revision,
+      chunk.graphRevision
+    );
+  const projectionRevision =
+    pickString(
+      packet?.projection_revision,
+      packet?.projectionRevision,
+      packetMetadata.projection_revision,
+      packetMetadata.projectionRevision,
+      chunkMetadata.projection_revision,
+      chunkMetadata.projectionRevision,
+      chunk.projection_revision,
+      chunk.projectionRevision
+    );
   const qdrantPointId =
     typeof packet?.qdrant_point_id === 'string'
       ? packet.qdrant_point_id
@@ -464,6 +507,93 @@ export function buildEnrichedPayload(
   const semanticTags = Array.isArray(chunk.semanticTags)
     ? chunk.semanticTags.map((tag: unknown) => String(tag))
     : [];
+  const graphDegree =
+    pickNumber(
+      packet?.graph_degree,
+      packet?.graphDegree,
+      packetMetadata.graph_degree,
+      packetMetadata.graphDegree,
+      chunkMetadata.graph_degree,
+      chunkMetadata.graphDegree,
+      chunk.graph_degree,
+      chunk.graphDegree
+    ) ?? 0;
+  const dependencyBreadth =
+    pickNumber(
+      packet?.dependency_breadth,
+      packet?.dependencyBreadth,
+      packetMetadata.dependency_breadth,
+      packetMetadata.dependencyBreadth,
+      chunkMetadata.dependency_breadth,
+      chunkMetadata.dependencyBreadth,
+      chunk.dependency_breadth,
+      chunk.dependencyBreadth
+    ) ?? 0;
+  const dbAffinity =
+    pickNumber(
+      packet?.db_affinity,
+      packet?.dbAffinity,
+      packetMetadata.db_affinity,
+      packetMetadata.dbAffinity,
+      chunkMetadata.db_affinity,
+      chunkMetadata.dbAffinity,
+      chunk.db_affinity,
+      chunk.dbAffinity
+    ) ?? 0;
+  const toolAffinity =
+    pickNumber(
+      packet?.tool_affinity,
+      packet?.toolAffinity,
+      packetMetadata.tool_affinity,
+      packetMetadata.toolAffinity,
+      chunkMetadata.tool_affinity,
+      chunkMetadata.toolAffinity,
+      chunk.tool_affinity,
+      chunk.toolAffinity
+    ) ?? 0;
+  const endpointAffinity =
+    pickNumber(
+      packet?.endpoint_affinity,
+      packet?.endpointAffinity,
+      packetMetadata.endpoint_affinity,
+      packetMetadata.endpointAffinity,
+      chunkMetadata.endpoint_affinity,
+      chunkMetadata.endpointAffinity,
+      chunk.endpoint_affinity,
+      chunk.endpointAffinity
+    ) ?? 0;
+  const cacheAffinity =
+    pickNumber(
+      packet?.cache_affinity,
+      packet?.cacheAffinity,
+      packetMetadata.cache_affinity,
+      packetMetadata.cacheAffinity,
+      chunkMetadata.cache_affinity,
+      chunkMetadata.cacheAffinity,
+      chunk.cache_affinity,
+      chunk.cacheAffinity
+    ) ?? 0;
+  const processIds = pickStringArray(
+    packet?.process_ids,
+    packet?.processIds,
+    packetMetadata.process_ids,
+    packetMetadata.processIds,
+    chunkMetadata.process_ids,
+    chunkMetadata.processIds,
+    chunk.process_ids,
+    chunk.processIds
+  );
+  const neighborhoodHash =
+    pickString(
+      packet?.neighborhood_hash,
+      packet?.neighborhoodHash,
+      packetMetadata.neighborhood_hash,
+      packetMetadata.neighborhoodHash,
+      chunkMetadata.neighborhood_hash,
+      chunkMetadata.neighborhoodHash,
+      chunk.neighborhood_hash,
+      chunk.neighborhoodHash
+    );
 
   return {
     packet_key: packet?.packet_key ? String(packet.packet_key) : String(chunk.packet_key ?? chunk.id ?? chunk.source_ref ?? ''),
@@ -484,6 +614,8 @@ export function buildEnrichedPayload(
     representation_revision: representationRevision,
     schema_version: schemaVersion,
     feature_label: packet?.feature_label ?? chunk.feature_label ?? null,
+    graph_revision: graphRevision,
+    projection_revision: projectionRevision,
 
     pagerank: chunk.pageRankScore || chunk.page_rank_score || 0,
     hits_authority: chunk.hitsAuthority || chunk.hits_authority || 0,
@@ -497,6 +629,14 @@ export function buildEnrichedPayload(
     out_degree: chunk.outDegree || chunk.out_degree || 0,
     betweenness: chunk.betweenness || 0,
     freshness_days: chunk.freshnessDays || chunk.freshness_days || 0,
+    graph_degree: graphDegree,
+    dependency_breadth: dependencyBreadth,
+    db_affinity: dbAffinity,
+    tool_affinity: toolAffinity,
+    endpoint_affinity: endpointAffinity,
+    cache_affinity: cacheAffinity,
+    process_ids: processIds,
+    neighborhood_hash: neighborhoodHash,
 
     noun_terms: nounTerms,
     keywords: [],

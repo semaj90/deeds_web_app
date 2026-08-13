@@ -614,18 +614,20 @@ Compatibility shims remain in:
 - `src/lib/server/ace/ranking/packet-feature-matrix.ts`
 
 The copied slice introduces the latent64/centroid64 interpolation layer and the row-major
-9-feature packet matrix underneath the already-proven packet consumer pipeline. I left the
+9-feature packet matrix underneath the already-proven packet consumer pipeline. The new matrix
+bridge is now wired into the live packet consumer result as an additive field. I left the
 existing packet consumer pipeline, packet assembler, RTX ranker, and tool receipt boundary intact.
 
 Focused proof gate results:
 
 - `npm exec vitest run src/lib/server/atlas/vector/ace-packet-vector.test.ts src/lib/server/atlas/vector/turbovec-interpolation.test.ts src/lib/server/atlas/ranking/packet-feature-matrix.test.ts`
-- Result: 3 files passed, 3 tests passed
+- `npm exec vitest run src/lib/server/ace/consumer/packet-consumer-pipeline.test.ts`
+- Result: 2 files passed, 4 tests passed
 
-Open next step:
+Status:
 
-- bridge `packet-feature-matrix.ts` into the live ranking path only after the current Atlas/ACE
-  execution boundary remains stable.
+- WIRED: the Atlas feature matrix is now carried through the live packet consumer result as an
+  additive field, without changing packet identity, assembly, or tool execution behavior.
 
 ### Conservative phase-status snapshot
 

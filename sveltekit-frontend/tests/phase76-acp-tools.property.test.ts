@@ -12,6 +12,7 @@ vi.mock('$env/dynamic/public', () => ({ env: {} }));
 vi.mock('$lib/server/env.server.js', () => ({
   ENV: {
     OLLAMA_BASE_URL: 'http://127.0.0.1:11434',
+    ROTORQUANT_MODEL_PATH: 'C:/models/hforf.gguf',
     OLLAMA_CHAT_MODEL: 'gemma4-rotorquant:latest',
     OLLAMA_EMBED_MODEL: 'embeddinggemma:latest',
     OLLAMA_VLM_MODEL: 'gemma4-rotorquant:latest',
@@ -19,6 +20,12 @@ vi.mock('$lib/server/env.server.js', () => ({
     FUNCTION_GEMMA_MODEL: 'gemma4-rotorquant:latest',
     NODE_ENV: 'test',
   },
+}));
+
+vi.mock('$lib/server/llm/runtime-contract.js', () => ({
+  ROTORQUANT_MODEL_PATH: 'C:/models/hforf.gguf',
+  LLM_MODEL_ID: 'hforf.gguf',
+  verifyLlmRuntimeModel: vi.fn(async () => null),
 }));
 
 vi.mock('$lib/server/db/client', () => ({
@@ -78,6 +85,40 @@ describe('Phase 76 ACP tool registry', () => {
     expect(getACPToolSchema('db:query')?.description).toMatch(/SELECT/i);
     expect(toolSupportsDryRun('langextract:batch')).toBe(true);
     expect(toolSupportsDryRun('not:a-tool')).toBe(false);
+  });
+
+  it('registers the Parent Atlas kanban board tools', () => {
+    const registry = getACPToolRegistry();
+    const kanbanTools = [
+      'atlas.kanban.list',
+      'atlas.kanban.show',
+      'atlas.kanban.heartbeat',
+      'atlas.kanban.claim',
+      'atlas.kanban.block',
+      'atlas.kanban.complete',
+      'atlas.kanban.retry',
+      'atlas.kanban.create_child',
+    ];
+
+    for (const name of kanbanTools) {
+      const tool = registry.get(name);
+
+      expect(tool?.name).toBe(name);
+      expect(tool?.category).toBe('database');
+    }
+
+    expect(toolSupportsDryRun('atlas.kanban.list')).toBe(true);
+    expect(toolSupportsDryRun('atlas.kanban.show')).toBe(true);
+    expect(toolSupportsDryRun('atlas.kanban.heartbeat')).toBe(false);
+    expect(toolSupportsDryRun('atlas.kanban.claim')).toBe(false);
+    expect(toolSupportsDryRun('atlas.kanban.block')).toBe(false);
+    expect(toolSupportsDryRun('atlas.kanban.complete')).toBe(false);
+    expect(toolSupportsDryRun('atlas.kanban.retry')).toBe(false);
+    expect(toolSupportsDryRun('atlas.kanban.create_child')).toBe(false);
+
+    expect(getAllTools().map((tool) => tool.name)).toEqual(
+      expect.arrayContaining(kanbanTools)
+    );
   });
 
   it('rejects unknown tools', async () => {

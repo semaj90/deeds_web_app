@@ -281,6 +281,13 @@
       "when": 1785453586389,
       "tag": "0039_far_ironclad",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1786633850384,
+      "tag": "0040_kanban_task_lifecycle",
+      "breakpoints": true
     }
   ]
 }

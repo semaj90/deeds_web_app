@@ -10,6 +10,7 @@
 - written: 0
 - skipped: 33
 - failed: 0
+- featureMatrix: wired as additive live consumer output
 
 ## Results
 
@@ -46,3 +47,8 @@
 - cluster 39776: DRY_RUN (sha256:8c9fa93f03e6d5c119175008)
 - cluster 39851: DRY_RUN (sha256:421aa78117109664f028a9c1)
 - cluster 39972: DRY_RUN (sha256:dd2d15e03e8696e04b1e1ec4)
+
+## Status update
+
+- WIRED: the Atlas feature matrix is carried through the live packet consumer result as an
+  additive field; packet identity, assembly, and tool execution behavior remain unchanged.

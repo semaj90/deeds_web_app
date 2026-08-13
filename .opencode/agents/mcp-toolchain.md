@@ -33,4 +33,7 @@ Output contract:
 Vercel AI style:
 - Use tool-loop behavior equivalent to streamText + tools.
 - Keep tool calls deterministic and bounded.
+- Emit at most one tool call per assistant turn.
+- Never batch or parallelize tool calls in the same assistant turn.
+- Wait for each tool result before issuing the next tool call.
 - Do not invent results not returned by tools.

@@ -12,15 +12,57 @@ function estimateTokens(text: string): number {
 	return Math.max(1, Math.ceil(normalized.length / 4));
 }
 
+function roundScore(value: number): number {
+	return Number(value.toFixed(6));
+}
+
+function normalizeCount(value: number | null | undefined, scale: number): number {
+	return clamp01(Math.max(0, Number(value) || 0) / Math.max(1, scale));
+}
+
+function normalizeStringCount(values: readonly string[] | null | undefined, scale: number): number {
+	return clamp01((values?.length ?? 0) / Math.max(1, scale));
+}
+
+function deriveGraphAuthoritySignal(item: NonNullable<ACEContext['codebaseContext']>[number]): number {
+	const baseAuthority = clamp01(
+		item.graphAuthorityScore ?? item.pageRankScore ?? item.clusterPagerank ?? item.score
+	);
+	const graphStructure = (
+		normalizeCount(item.graphDegree, 10) * 0.55
+		) + (
+		normalizeCount(item.dependencyBreadth, 10) * 0.45
+	);
+	return roundScore(clamp01(Math.max(baseAuthority, graphStructure)));
+}
+
+function deriveExecutionUtilitySignal(item: NonNullable<ACEContext['codebaseContext']>[number]): number {
+	const processAffinity = normalizeStringCount(item.processIds, 6);
+	const endpointAffinity = clamp01(
+		item.endpointAffinity ?? (item.routeType ? 0.6 : 0)
+	);
+	const graphExecution = (endpointAffinity * 0.55) + (processAffinity * 0.45);
+	const baseline = clamp01(item.cachedLlmOutput ? 0.76 : item.hasAuthGuard ? 0.6 : 0.3);
+	return roundScore(clamp01(Math.max(baseline, graphExecution)));
+}
+
+function deriveCacheHotnessSignal(item: NonNullable<ACEContext['codebaseContext']>[number]): number {
+	const graphCache = clamp01(item.cacheAffinity ?? 0);
+	const baseline = clamp01(
+		item.hotnessBucket ? 0.88 : item.cachedLlmOutput ? 0.7 : 0.18
+	);
+	return roundScore(clamp01(Math.max(baseline, graphCache)));
+}
+
 function buildScoreVector(item: NonNullable<ACEContext['codebaseContext']>[number]): PacketScoreVector {
 	const lexical = clamp01(item.score);
 	const dense = clamp01(item.encoded64Score ?? item.pageRankScore ?? item.clusterPagerank ?? item.score);
 	const ast = clamp01(item.topoClass ? 0.72 : item.featureFamily ? 0.58 : 0.34);
-	const graphAuthority = clamp01(item.graphAuthorityScore ?? item.pageRankScore ?? item.clusterPagerank ?? item.score);
+	const graphAuthority = deriveGraphAuthoritySignal(item);
 	const centroidAffinity = clamp01(item.encoded64Score ?? item.karpathyBlend ?? item.score);
 	const recency = clamp01(item.cachedLlmOutput ? 0.82 : item.cachedLlmSource ? 0.7 : 0.35);
-	const executionUtility = clamp01(item.cachedLlmOutput ? 0.76 : item.hasAuthGuard ? 0.6 : 0.3);
-	const cacheHotness = clamp01(item.hotnessBucket ? 0.88 : item.cachedLlmOutput ? 0.7 : 0.18);
+	const executionUtility = deriveExecutionUtilitySignal(item);
+	const cacheHotness = deriveCacheHotnessSignal(item);
 	const normalizedCost = clamp01(1 - Math.min(1, estimateTokens(item.content) / 4000));
 
 	return [

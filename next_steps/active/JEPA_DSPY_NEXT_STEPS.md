@@ -1,7 +1,7 @@
 # JEPA + DSPy Next Steps
 
-**Status**: ACTIVE  
-**Updated**: July 10, 2026  
+**Status**: ACTIVE
+**Updated**: July 10, 2026
 **Scope**: Packet-JEPA evaluation, DSPy placement, and reranker promotion gate
 
 ---
@@ -96,10 +96,10 @@ Do **not** use DSPy as a substitute for:
 ### P0 — Coverage before promotion
 
 - [ ] Raise canonical packet embedding coverage in `atlas_packets` / `atlas_packet_metrics`
-- [ ] Verify the cohort is truly 384d packet embeddings, not a mixed fallback lane
+- [ ] Verify the cohort is truly 768d packet embeddings, not a mixed fallback lane
 - [ ] Re-export deterministic JEPA training pairs from the corrected cohort
 - [ ] Re-run all three baselines on the same held-out split:
-  - [ ] 384d cosine baseline
+  - [ ] 768d cosine baseline
   - [ ] PCA/AE latent baseline
   - [ ] Packet-JEPA 128
 

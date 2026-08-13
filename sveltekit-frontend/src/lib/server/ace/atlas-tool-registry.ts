@@ -223,7 +223,9 @@ export type AtlasToolPermission =
   | 'search:read'
   | 'graph:read'
   | 'code:propose'
-  | 'code:write';
+  | 'code:write'
+  | 'workflow:read'
+  | 'workflow:write';
 
 /** Caller permission grant (resolved from auth/session) */
 export interface PermissionGrant {

@@ -61,6 +61,10 @@ export {
   derivePacketInputsFromAceContext,
 } from './packet-consumer-inputs';
 export {
+  AtlasProcessPacketInputSchema,
+  buildAtlasProcessPacket,
+} from './process-packets';
+export {
   runPacketConsumerPipeline,
   hashPacketConsumerPipelineInput,
 } from './packet-consumer-pipeline';
@@ -73,6 +77,42 @@ export {
   getPacketFeatureRow,
   normalizeDemandUtility,
 } from './ranking/packet-feature-matrix';
+export {
+  KanbanTaskLaneSchema,
+  KanbanTaskStatusSchema,
+  KanbanTaskSchema,
+  KanbanTaskListInputSchema,
+  KanbanTaskListOutputSchema,
+  KanbanTaskShowInputSchema,
+  KanbanTaskClaimInputSchema,
+  KanbanTaskBlockInputSchema,
+  KanbanTaskCompleteInputSchema,
+  KanbanTaskHeartbeatInputSchema,
+  KanbanTaskHeartbeatResultSchema,
+  KanbanTaskClaimResultSchema,
+  KanbanTaskReclaimInputSchema,
+  KanbanTaskRetryInputSchema,
+  KanbanTaskCreateChildInputSchema,
+  KanbanTaskCommentSchema,
+  KanbanTaskCommentsInputSchema,
+  KanbanTaskAttemptSchema,
+  KanbanTaskAttemptsInputSchema,
+  listKanbanTasks,
+  showKanbanTask,
+  claimKanbanTask,
+  blockKanbanTask,
+  completeKanbanTask,
+  heartbeatKanbanTask,
+  reclaimStaleKanbanTask,
+  retryKanbanTask,
+  createChildKanbanTask,
+  listKanbanTaskDependencies,
+  listKanbanTaskComments,
+  listKanbanTaskAttempts,
+  listKanbanTaskEvents,
+  recordKanbanTaskAttempt,
+  formatKanbanTaskSummary,
+} from './kanban-task-board';
 export {
   buildAnalysisPassCurrentProofSnapshot,
 } from '../analysis/analysis-pass-current';

@@ -11,6 +11,7 @@
 import { createHash } from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { llamaChat } from './lib/llama-inference.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -39,6 +40,7 @@ const LIMIT      = parseInt(flag('--limit', '0'), 10);   // 0 = unlimited
 const DIR_FILTER = flag('--dir', '');                      // single directory filter
 const SKIP_LLM   = has('--skip-llm');                     // embed only, no Gemma4 call
 const FORCE      = has('--force');                         // ignore cached summaries
+const DRY_RUN    = has('--dry-run');
 const QUIET      = has('--quiet');
 
 const MAX_FILES_PER_DIR = parseInt(flag('--max-files-per-dir', '40'), 10);
@@ -49,6 +51,21 @@ function normalizeBaseUrl(value, fallback) {
   return String(value ?? fallback).replace(/^0\.0\.0\.0/, '127.0.0.1').replace(/\/+$/, '');
 }
 
+function stableStringify(value) {
+  if (Array.isArray(value)) return `[${value.map((entry) => stableStringify(entry)).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function hashProjection(value) {
+  return createHash('sha256').update(stableStringify(value)).digest('hex');
+}
+
 const QDRANT_URL = process.env.QDRANT_URL        ?? 'http://127.0.0.1:6333';
 const REDIS_URL  = process.env.REDIS_URL         ?? 'redis://127.0.0.1:6379';
 const REDIS_HOST = process.env.REDIS_HOST        ?? '127.0.0.1';
@@ -56,6 +73,11 @@ const REDIS_PORT = parseInt(process.env.REDIS_PORT ?? '6379', 10);
 const REDIS_PASS = process.env.REDIS_PASSWORD    ?? process.env.REDIS_PASS ?? 'redis';
 const COLLECTION = 'codebase_chunks_768';
 const EMBED_MODEL= 'embeddinggemma:latest';
+const GRAPH_REVISION = String(process.env.GRAPH_REVISION ?? process.env.WORKSPACE_REVISION ?? process.env.REPOSITORY_REVISION ?? 'graph:parent-atlas').trim();
+const PROJECTION_REVISION = String(process.env.PROJECTION_REVISION ?? process.env.GRAPH_PROJECTION_REVISION ?? 'graph-qdrant-projection-v1').trim();
+const REPORT_DIR = path.resolve(REPO_ROOT, 'docs', 'reports');
+const REPORT_JSON = path.join(REPORT_DIR, 'graph-qdrant-projection-receipt.json');
+const REPORT_MD = path.join(REPORT_DIR, 'graph-qdrant-projection-receipt.md');
 const OPENAI_BASE_URL = normalizeBaseUrl(
   process.env.LOCAL_OPENAI_BASE_URL ?? process.env.GEMMA4_BASE_URL ?? 'http://127.0.0.1:8090/v1',
   'http://127.0.0.1:8090/v1'
@@ -183,6 +205,7 @@ async function embed(text) {
 //   error     = summary prose only (MapReduce inverse: chunk → cluster)
 //   signature = representative file list (export/chunk inverse join: file → cluster)
 async function upsertGlyph(id, contentVector, errorVector, signatureVector, payload) {
+  if (DRY_RUN) return;
   const vector = { content: contentVector };
   if (errorVector?.length)     vector.error     = errorVector;
   if (signatureVector?.length) vector.signature = signatureVector;
@@ -201,6 +224,40 @@ async function upsertGlyph(id, contentVector, errorVector, signatureVector, payl
 function dirToPointId(dir) {
   const h = createHash('sha1').update(`dir-glyph:${dir}`).digest('hex');
   return parseInt(h.slice(0, 7), 16);
+}
+
+function deriveGraphFeatures(note, dir) {
+  const filePaths = Array.isArray(note.representativeFiles) ? note.representativeFiles : [];
+  const sortedFiles = [...filePaths].map((value) => String(value)).sort();
+  return {
+    graph_revision: GRAPH_REVISION,
+    projection_revision: PROJECTION_REVISION,
+    graph_authority_score: Number(note.memberCount ?? note.auditMetrics?.fileCount ?? filePaths.length ?? 0),
+    community_id: Number(note.clusterId ?? 0),
+    graph_degree: Number(filePaths.length ?? 0),
+    dependency_breadth: Number(note.auditMetrics?.fileCount ?? filePaths.length ?? 0),
+    graph_freshness: String(note.updatedAt ?? note.createdAt ?? new Date().toISOString()),
+    neighborhood_hash: hashProjection([dir, ...sortedFiles]),
+  };
+}
+
+async function writeReceipt(report) {
+  await mkdir(REPORT_DIR, { recursive: true });
+  await writeFile(REPORT_JSON, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+  const lines = [
+    '# Graph Qdrant Projection Receipt',
+    '',
+    `- status: ${report.status}`,
+    `- graphRevision: ${report.graphRevision}`,
+    `- projectionRevision: ${report.projectionRevision}`,
+    `- inputClusters: ${report.inputClusters}`,
+    `- qdrantUpserts: ${report.qdrantUpserts}`,
+    `- redisWrites: ${report.redisWrites}`,
+    `- failed: ${report.failed}`,
+    `- skipped: ${report.skipped}`,
+    `- generatedAt: ${report.generatedAt}`,
+  ];
+  await writeFile(REPORT_MD, `${lines.join('\n')}\n`, 'utf8');
 }
 
 function buildPrompt(note) {
@@ -230,6 +287,7 @@ const outcomes = {
 
 const startTime = Date.now();
 const targets = LIMIT > 0 ? rawCandidates.slice(0, LIMIT) : rawCandidates;
+let redisWrites = 0;
 
 for (let i = 0; i < targets.length; i++) {
   const { key, note } = targets[i];
@@ -299,6 +357,7 @@ for (let i = 0; i < targets.length; i++) {
 
     const pointId = dirToPointId(dir);
     const source_ref = dir.replace(/\\/g, '/');
+    const graphFeatures = deriveGraphFeatures(note, dir);
     await upsertGlyph(pointId, contentVector, errorVector, signatureVector, {
       kind: 'directory-cluster',
       dir,
@@ -309,10 +368,14 @@ for (let i = 0; i < targets.length; i++) {
       file_count: note.auditMetrics?.fileCount ?? 0,
       representative_files: (note.representativeFiles ?? []).slice(0, 10),
       summary,
+      ...graphFeatures,
       generatedAt: new Date().toISOString(),
     });
 
-    await rset(key, { ...note, gemma4Summary: summary, embeddingId: pointId });
+    if (!DRY_RUN) {
+      await rset(key, { ...note, gemma4Summary: summary, embeddingId: pointId, graphFeatures });
+      redisWrites++;
+    }
     outcomes.summarized++;
     
     // Progress diagnostics
@@ -339,5 +402,24 @@ for (let i = 0; i < targets.length; i++) {
 log('\n── Outcome Report ──');
 console.table(outcomes);
 log(`\nTotal time: ${Math.round((Date.now() - startTime) / 1000)}s`);
+
+await writeReceipt({
+  receiptKind: 'GRAPH_QDRANT_PROJECTION_PROVEN',
+  status: DRY_RUN ? 'DRY_RUN' : (outcomes.summary_failed === 0 && outcomes.timeout === 0 ? 'PROVEN' : 'PARTIAL'),
+  graphRevision: GRAPH_REVISION,
+  projectionRevision: PROJECTION_REVISION,
+  collection: COLLECTION,
+  inputClusters: rawCandidates.length,
+  qdrantUpserts: DRY_RUN ? 0 : outcomes.summarized,
+  redisWrites: DRY_RUN ? 0 : redisWrites,
+  failed: outcomes.summary_failed + outcomes.timeout,
+  skipped: outcomes.skipped_generated_dir + outcomes.skipped_archive_or_log + outcomes.skipped_too_many_files + outcomes.skipped_too_many_bytes + outcomes.no_source_files + outcomes.no_qdrant_points,
+  derivedFeatures: ['graph_authority_score', 'community_id', 'graph_degree', 'dependency_breadth', 'graph_freshness', 'neighborhood_hash'],
+  generatedAt: new Date().toISOString(),
+  dryRun: DRY_RUN,
+});
+
+log(`\nReceipt written: ${REPORT_JSON}`);
+log(`Report written:  ${REPORT_MD}`);
 
 await redis.quit();

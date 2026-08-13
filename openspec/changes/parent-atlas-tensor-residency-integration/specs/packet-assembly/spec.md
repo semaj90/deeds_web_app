@@ -39,7 +39,8 @@ Cluster packet requirements:
 - Qdrant and Neo4j may consume the packet later, but they do not define its identity
 
 The newer Atlas vector-selection slice sits underneath this assembler as a
-supporting layer only. It adds:
+supporting layer only. It is now wired into the packet consumer result as an
+additive feature matrix and does not alter assembly ownership. It adds:
 
 - `src/lib/server/atlas/vector/ace-packet-vector.ts`
 - `src/lib/server/atlas/vector/turbovec-interpolation.ts`

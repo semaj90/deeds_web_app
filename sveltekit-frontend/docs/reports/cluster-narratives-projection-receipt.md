@@ -1,0 +1,19 @@
+# Cluster Narratives Projection Receipt
+
+- status: PROVEN
+- graphRevision: graph:parent-atlas
+- projectionRevision: cluster-narratives-projection-v2
+- repoId: default
+- inputRows: 18
+- affectedPacketKeys: 18
+- qdrantProjected: 18
+- qdrantUpserts: 18
+- qdrantDeletes: 0
+- unchanged: 0
+- redisProjected: 18
+- failed: 0
+- graphFeatureRows: 18
+- neo4jRows: 15
+- fallbackRows: 3
+- payloadHash: bc56fcca2af028b50c4f1a923621c652563be27e48e50f89a6ad51a777f0716f
+- generatedAt: 2026-08-13T19:16:33.213Z

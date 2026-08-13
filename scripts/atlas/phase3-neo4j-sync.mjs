@@ -19,12 +19,19 @@ import neo4j from 'neo4j-driver';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeSourceRef } from './lib/canonical-source-ref.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const RESET = args.includes('--reset');
+
+function canonicalSourceRefFrom(filePath) {
+  const relativeToRoot = path.relative(projectRoot, filePath).replace(/\\/g, '/');
+  return normalizeSourceRef(relativeToRoot);
+}
 
 async function main() {
   console.log('🚀 Phase 3 Atlas: USES_DB Neo4j Sync');
@@ -76,11 +83,21 @@ async function main() {
     console.log(`  Top 10: ${Array.from(tables).sort().slice(0, 10).join(', ')}`);
     console.log();
 
+    const enrichedEdges = edges.map((e) => {
+      const filePath = e.source_file.replace(/\\/g, '/');
+      const canonicalSourceRef = canonicalSourceRefFrom(filePath);
+      return {
+        ...e,
+        filePath,
+        canonicalSourceRef,
+      };
+    });
+
     if (DRY_RUN) {
       console.log('[DRY-RUN] Would sync to Neo4j. Run without --dry-run to proceed.');
       console.log(`[PREVIEW] First 5 edges:`);
-      edges.slice(0, 5).forEach((e) => {
-        console.log(`  ${e.source_file}:${e.line_num} -[USES_DB]-> ${e.table}`);
+      enrichedEdges.slice(0, 5).forEach((e) => {
+        console.log(`  ${e.filePath} (${e.canonicalSourceRef}) :${e.line_num} -[USES_DB]-> ${e.table}`);
       });
       return;
     }
@@ -88,13 +105,19 @@ async function main() {
     // Sync to Neo4j
     console.log('[SYNC] Creating USES_DB edges in Neo4j...');
 
+    if (RESET) {
+      console.log('  ├─ Resetting existing USES_DB relationships...');
+      await session.run(`MATCH ()-[r:USES_DB]->() DELETE r`);
+      console.log('  │  Cleared prior USES_DB relationships');
+    }
+
     // 1. Create Table nodes (if not exist)
     const tableList = Array.from(tables).filter((t) => t !== 'unknown');
-    console.log(`  ├─ Creating ${tableList.length} Table nodes...`);
+    console.log(`  ├─ Creating ${tableList.length} DBTable nodes...`);
     await session.run(
       `
         UNWIND $tables AS tableName
-        MERGE (t:Table { name: tableName })
+        MERGE (t:DBTable { name: tableName })
         SET t.updated_at = datetime()
       `,
       { tables: tableList }
@@ -107,25 +130,24 @@ async function main() {
       edgeChunks.push(edges.slice(i, i + 100));
     }
 
-    // Normalize paths to match CodebaseFile nodes (use absolute paths from Phase 2)
-    const normalizedEdges = edges.map((e) => {
-      let filePath = e.source_file.replace(/\\/g, '/'); // Windows backslash → forward slash
-      return { ...e, filePath };
-    });
-
     let edgesCreated = 0;
     for (const chunk of edgeChunks) {
-      const normalizedChunk = chunk.map((e, idx) => ({
+      const normalizedChunk = chunk.map((e) => ({
         ...e,
-        filePath: e.source_file.replace(/\\/g, '/')
+        filePath: e.source_file.replace(/\\/g, '/'),
+        canonicalSourceRef: canonicalSourceRefFrom(e.source_file),
       }));
 
       await session.run(
         `
           UNWIND $edges AS edge
-          MATCH (f:CodebaseFile { filePath: edge.filePath })
-          MATCH (t:Table { name: edge.table })
-          MERGE (f)-[r:USES_DB]->(t)
+          MERGE (f:CodebaseFile { canonicalSourceRef: edge.canonicalSourceRef })
+          ON CREATE SET f.filePath = edge.filePath,
+                        f.updated_at = datetime()
+          ON MATCH SET f.filePath = coalesce(f.filePath, edge.filePath),
+                       f.updated_at = datetime()
+          MERGE (t:DBTable { name: edge.table })
+          MERGE (f)-[r:USES_DB { line_num: edge.line_num, operation: edge.operation, type: edge.type }]->(t)
           SET r.operation = edge.operation,
               r.line_num = edge.line_num,
               r.type = edge.type,
@@ -155,7 +177,7 @@ async function main() {
     // 4. Coverage check
     console.log('[COVERAGE]');
     const orphanTables = await session.run(`
-      MATCH (t:Table)
+      MATCH (t:DBTable)
       WHERE NOT (()-[:USES_DB]->(t))
       RETURN count(t) AS orphans
     `);

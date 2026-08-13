@@ -117,6 +117,37 @@ export function computeRelationshipProjectionHash(
 	return createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
 }
 
+export interface GraphProjectionFreshnessCheck {
+	graphRevision: string;
+	projectionRevision: string;
+	expectedGraphRevision: string;
+	expectedProjectionRevision: string;
+}
+
+export function assertGraphProjectionFreshness(input: GraphProjectionFreshnessCheck): GraphProjectionFreshnessCheck {
+	const parsed = GraphProjectionManifestSchema.pick({
+		graphRevision: true,
+		projectionRevision: true,
+	}).parse({
+		graphRevision: input.graphRevision,
+		projectionRevision: input.projectionRevision,
+	});
+
+	if (parsed.graphRevision !== input.expectedGraphRevision) {
+		throw new Error(
+			`stale graph projection rejected: expected graphRevision=${input.expectedGraphRevision}, got ${parsed.graphRevision}`,
+		);
+	}
+
+	if (parsed.projectionRevision !== input.expectedProjectionRevision) {
+		throw new Error(
+			`stale graph projection rejected: expected projectionRevision=${input.expectedProjectionRevision}, got ${parsed.projectionRevision}`,
+		);
+	}
+
+	return input;
+}
+
 /**
  * @deprecated Legacy pre-V2 manifest shape (single global `orientation`).
  * Kept only as the input type for expandLegacyOrientation() below. Confirmed

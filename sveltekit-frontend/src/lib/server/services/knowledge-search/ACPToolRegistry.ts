@@ -17,6 +17,24 @@ import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
 import { loadDailyGraphifyBoard } from '$lib/server/atlas/board/daily-graphify-board.js';
+import {
+  claimKanbanTask,
+  blockKanbanTask,
+  completeKanbanTask,
+  createChildKanbanTask,
+  heartbeatKanbanTask,
+  KanbanTaskClaimInputSchema,
+  KanbanTaskBlockInputSchema,
+  KanbanTaskCompleteInputSchema,
+  KanbanTaskCreateChildInputSchema,
+  KanbanTaskHeartbeatInputSchema,
+  KanbanTaskListInputSchema,
+  KanbanTaskRetryInputSchema,
+  KanbanTaskShowInputSchema,
+  listKanbanTasks,
+  retryKanbanTask,
+  showKanbanTask,
+} from '$lib/server/atlas/kanban-task-board.js';
 import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
 	buildPhase89WorkflowPlan,
@@ -104,6 +122,10 @@ function planResult(steps: ToolPlanStep[], startTime: number): ToolResult {
 
 function fail(error: string, startTime: number): ToolResult {
   return { success: false, kind: 'result', error, duration: Date.now() - startTime };
+}
+
+function kanbanPlan(action: string, detail: string, startTime: number): ToolResult {
+  return planResult([{ action, target: 'atlas.kanban', detail }], startTime);
 }
 
 // ---------------------------------------------------------------------------
@@ -845,7 +867,10 @@ const DRY_RUN_TOOLS = new Set([
   'knowledge:search', 'db:query', 'cache:get', 'cache:set', 'llm:generate',
   'error:analyze', 'fix:synthesize', 'fix:apply', 'metrics:snapshot', 'metrics:health',
   'langextract:extract', 'langextract:batch', 'search:hyperrag',
-  'phase89:board-workflow', 'graph:snapshot-parity:validate', 'atlas:cugraph:pagerank', 'atlas:cugraph:pagerank:dry', 'atlas:bash-worker'
+  'phase89:board-workflow', 'graph:snapshot-parity:validate',
+  'atlas:cugraph:pagerank', 'atlas:cugraph:pagerank:dry',
+  'atlas.kanban.list', 'atlas.kanban.show',
+  'atlas:bash-worker'
 ]);
 
 export const TOOLS: Record<string, ACPTool> = {
@@ -1256,6 +1281,319 @@ export const TOOLS: Record<string, ACPTool> = {
         options,
       );
     }
+  },
+  'atlas.kanban.list': {
+    name: 'atlas.kanban.list',
+    description: 'List kanban tasks from the canonical Atlas Postgres board.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        lane: { type: 'string', enum: ['todo', 'in_progress', 'done'] },
+        status: { type: 'string', enum: ['pending', 'active', 'completed', 'failed'] },
+        limit: { type: 'number', minimum: 1, maximum: 500, default: 100 },
+      },
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { lane: 'todo', limit: 20 },
+        output: { tasks: [], total: 0 },
+        description: 'List tasks in the todo lane',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskListInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban list request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('list', `lane=${parsed.data.lane ?? 'any'} status=${parsed.data.status ?? 'any'} limit=${parsed.data.limit}`, startTime);
+      }
+      try {
+        const data = await listKanbanTasks(parsed.data);
+        return { success: true, kind: 'result', data, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.show': {
+    name: 'atlas.kanban.show',
+    description: 'Show one kanban task from the canonical Atlas Postgres board.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string' },
+      },
+      required: ['taskId'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'atlas-task-123' },
+        output: { task: null },
+        description: 'Show a single task',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskShowInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban show request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('show', `taskId=${parsed.data.taskId}`, startTime);
+      }
+      try {
+        const task = await showKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: { task }, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.heartbeat': {
+    name: 'atlas.kanban.heartbeat',
+    description: 'Refresh a running kanban task lease without changing task identity.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string' },
+        claimToken: { type: 'string' },
+        runId: { type: 'string' },
+        note: { type: 'string' },
+      },
+      required: ['taskId', 'claimToken', 'runId'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'atlas-task-123', claimToken: 'claim-123', runId: 'run-123' },
+        output: { heartbeatAt: '2026-08-13T00:00:00.000Z' },
+        description: 'Refresh a task heartbeat',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskHeartbeatInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban heartbeat request', startTime);
+      }
+      try {
+        const result = await heartbeatKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: result, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.claim': {
+    name: 'atlas.kanban.claim',
+    description: 'Claim a kanban task and move it into active work.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string' },
+        workerId: { type: 'string' },
+      },
+      required: ['taskId'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'atlas-task-123', workerId: 'worker-1' },
+        output: { task: { taskId: 'atlas-task-123' } },
+        description: 'Claim a task for a worker',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskClaimInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban claim request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('claim', `taskId=${parsed.data.taskId} workerId=${parsed.data.workerId ?? 'anonymous'}`, startTime);
+      }
+      try {
+        const result = await claimKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: result, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.block': {
+    name: 'atlas.kanban.block',
+    description: 'Mark a kanban task blocked and return it to todo.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string' },
+        reason: { type: 'string' },
+      },
+      required: ['taskId'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'atlas-task-123', reason: 'missing evidence' },
+        output: { task: { taskId: 'atlas-task-123' } },
+        description: 'Block a task with a reason',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskBlockInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban block request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('block', `taskId=${parsed.data.taskId} reason=${parsed.data.reason ?? 'unspecified'}`, startTime);
+      }
+      try {
+        const task = await blockKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: { task }, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.complete': {
+    name: 'atlas.kanban.complete',
+    description: 'Mark a kanban task completed and move it to done.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string' },
+        workerId: { type: 'string' },
+      },
+      required: ['taskId'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'atlas-task-123', workerId: 'worker-1' },
+        output: { task: { taskId: 'atlas-task-123' } },
+        description: 'Complete a task',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskCompleteInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban complete request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('complete', `taskId=${parsed.data.taskId} workerId=${parsed.data.workerId ?? 'anonymous'}`, startTime);
+      }
+      try {
+        const task = await completeKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: { task }, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.retry': {
+    name: 'atlas.kanban.retry',
+    description: 'Retry a failed kanban task and return it to todo/pending.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        taskId: { type: 'string' },
+        reason: { type: 'string' },
+      },
+      required: ['taskId'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: { taskId: 'atlas-task-123', reason: 'transient dependency' },
+        output: { task: { taskId: 'atlas-task-123' } },
+        description: 'Retry a blocked task',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskRetryInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban retry request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('retry', `taskId=${parsed.data.taskId} reason=${parsed.data.reason ?? 'unspecified'}`, startTime);
+      }
+      try {
+        const task = await retryKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: { task }, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
+  },
+  'atlas.kanban.create_child': {
+    name: 'atlas.kanban.create_child',
+    description: 'Create a child kanban task under a parent task.',
+    category: 'database',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        parentTaskId: { type: 'string' },
+        taskId: { type: 'string' },
+        featureId: { type: 'string' },
+        featureLabel: { type: 'string' },
+        sourceRefs: { type: 'array', items: { type: 'string' } },
+        lane: { type: 'string', enum: ['todo', 'in_progress', 'done'] },
+        validationCommand: { type: 'string' },
+      },
+      required: ['parentTaskId', 'taskId', 'featureId', 'featureLabel'],
+      additionalProperties: false,
+    },
+    outputSchema: { type: 'object' },
+    examples: [
+      {
+        input: {
+          parentTaskId: 'atlas-task-123',
+          taskId: 'atlas-task-123-child-1',
+          featureId: 'atlas.feature.example',
+          featureLabel: 'Example feature',
+          sourceRefs: ['src/lib/server/atlas/board/daily-graphify-board.ts'],
+        },
+        output: { task: { taskId: 'atlas-task-123-child-1' } },
+        description: 'Create a child task',
+      },
+    ],
+    handler: async (args: any, options?: ACPToolOptions): Promise<ToolResult> => {
+      const startTime = Date.now();
+      const parsed = KanbanTaskCreateChildInputSchema.safeParse(args);
+      if (!parsed.success) {
+        return fail(parsed.error.issues[0]?.message ?? 'Invalid kanban create_child request', startTime);
+      }
+      if (options?.dryRun) {
+        return kanbanPlan('create_child', `parentTaskId=${parsed.data.parentTaskId} taskId=${parsed.data.taskId}`, startTime);
+      }
+      try {
+        const task = await createChildKanbanTask(parsed.data);
+        return { success: true, kind: 'result', data: { task }, duration: Date.now() - startTime };
+      } catch (error: any) {
+        return fail(error.message ?? String(error), startTime);
+      }
+    },
   },
   'atlas:bash-worker': {
     name: 'atlas:bash-worker',

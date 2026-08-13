@@ -19,12 +19,19 @@ import neo4j from 'neo4j-driver';
 import { readFileSync, existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeSourceRef } from './lib/canonical-source-ref.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const RESET = args.includes('--reset');
+
+function canonicalSourceRefFrom(filePath) {
+  const relativeToRoot = path.relative(projectRoot, filePath).replace(/\\/g, '/');
+  return normalizeSourceRef(relativeToRoot);
+}
 
 async function main() {
   console.log('🚀 Phase 5 Atlas: USES_CACHE Neo4j Sync');
@@ -81,6 +88,12 @@ async function main() {
     // Sync to Neo4j
     console.log('[SYNC] Creating USES_CACHE edges in Neo4j...');
 
+    if (RESET) {
+      console.log('  ├─ Resetting existing USES_CACHE relationships...');
+      await session.run(`MATCH ()-[r:USES_CACHE]->() DELETE r`);
+      console.log('  │  Cleared prior cache relationships');
+    }
+
     // 1. Create CacheSystem nodes (if not exist)
     const systemsList = Array.from(cacheSystems);
     console.log(`  ├─ Creating ${systemsList.length} CacheSystem nodes...`);
@@ -104,17 +117,20 @@ async function main() {
     for (const chunk of edgeChunks) {
       const normalizedChunk = chunk.map((e) => ({
         ...e,
-        filePath: e.source_file
-          .replace(/\\/g, '/')
-          .replace(/^sveltekit-frontend\//, '')
+        filePath: e.source_file.replace(/\\/g, '/'),
+        canonicalSourceRef: canonicalSourceRefFrom(e.source_file),
       }));
 
       await session.run(
         `
           UNWIND $edges AS edge
-          MATCH (f:CodebaseFile { filePath: edge.filePath })
-          MATCH (c:CacheSystem { name: edge.cache_type })
-          MERGE (f)-[r:USES_CACHE]->(c)
+          MERGE (f:CodebaseFile { canonicalSourceRef: edge.canonicalSourceRef })
+          ON CREATE SET f.filePath = edge.filePath,
+                        f.updated_at = datetime()
+          ON MATCH SET f.filePath = coalesce(f.filePath, edge.filePath),
+                       f.updated_at = datetime()
+          MERGE (c:CacheSystem { name: edge.cache_type })
+          MERGE (f)-[r:USES_CACHE { line_num: edge.line_num, operation: edge.operation, endpoint: edge.endpoint }]->(c)
           SET r.operation = edge.operation,
               r.endpoint = edge.endpoint,
               r.line_num = edge.line_num,

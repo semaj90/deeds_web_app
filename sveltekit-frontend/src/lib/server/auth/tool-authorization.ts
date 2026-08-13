@@ -33,14 +33,19 @@ export function derivePermissionGrant(event: RequestEvent): PermissionGrant {
     permissions.add('graph:read');
     permissions.add('code:propose');
     permissions.add('code:write');
+    permissions.add('workflow:read');
+    permissions.add('workflow:write');
   } else if (user.role === 'analyst') {
     // Analysts can search and propose changes
     permissions.add('search:read');
     permissions.add('graph:read');
     permissions.add('code:propose');
+    permissions.add('workflow:read');
+    permissions.add('workflow:write');
   } else if (user.role === 'viewer' || user.role === 'user') {
     // Viewers/users can only search
     permissions.add('search:read');
+    permissions.add('workflow:read');
   }
 
   return {

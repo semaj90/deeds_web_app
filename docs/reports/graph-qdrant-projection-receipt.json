@@ -1,0 +1,22 @@
+{
+  "receiptKind": "GRAPH_QDRANT_PROJECTION_PROVEN",
+  "status": "DRY_RUN",
+  "graphRevision": "graph:parent-atlas",
+  "projectionRevision": "graph-qdrant-projection-v1",
+  "collection": "codebase_chunks_768",
+  "inputClusters": 0,
+  "qdrantUpserts": 0,
+  "redisWrites": 0,
+  "failed": 0,
+  "skipped": 0,
+  "derivedFeatures": [
+    "graph_authority_score",
+    "community_id",
+    "graph_degree",
+    "dependency_breadth",
+    "graph_freshness",
+    "neighborhood_hash"
+  ],
+  "generatedAt": "2026-08-13T18:59:13.086Z",
+  "dryRun": true
+}

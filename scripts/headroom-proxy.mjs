@@ -37,7 +37,7 @@
  */
 
 import http from 'node:http';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, appendFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -48,6 +48,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT         = parseInt(process.env.HEADROOM_PORT   ?? '8795', 10);
 const UPSTREAM     = process.env.UPSTREAM_URL              ?? 'http://127.0.0.1:8090';
 const MEMORY_FILE  = process.env.HEADROOM_MEMORY_FILE      ?? join(__dirname, '../.headroom-memory.json');
+const CAPTURE_DIR  = process.env.HEADROOM_CAPTURE_DIR      ?? join(__dirname, '../.tmp/opencode-capture');
 const MAX_MEMORY   = parseInt(process.env.HEADROOM_MAX_MEMORY ?? '20', 10);  // max facts to inject
 const TOKEN_BUDGET = parseInt(process.env.HEADROOM_TOKEN_BUDGET ?? '12000', 10); // soft budget for compression
 const COMPRESS_AT  = Math.floor(TOKEN_BUDGET * 0.8); // start compressing at 80% budget
@@ -65,6 +66,21 @@ function loadMemory() {
 
 function saveMemory(facts) {
   writeFileSync(MEMORY_FILE, JSON.stringify(facts, null, 2), 'utf-8');
+}
+
+function ensureCaptureDir() {
+  mkdirSync(CAPTURE_DIR, { recursive: true });
+}
+
+function captureEvent(kind, payload) {
+  try {
+    ensureCaptureDir();
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const file = join(CAPTURE_DIR, `${stamp}-${kind}.jsonl`);
+    appendFileSync(file, JSON.stringify(payload) + '\n', 'utf-8');
+  } catch (err) {
+    console.error('[headroom] capture write failed:', err?.message ?? err);
+  }
 }
 
 function addFact(fact, scope = 'deeds-web-app', source = 'headroom', confidence = 0.8) {
@@ -170,15 +186,28 @@ function injectMemoryTail(messages) {
     return messages;
   }
 
-  // Insert memory tail as system message just before last user message
-  const lastUserIdx = messages.length - 1 - [...messages].reverse().findIndex(m => m.role === 'user');
-  const injected = [
-    ...messages.slice(0, lastUserIdx),
-    { role: 'system', content: tail },
-    ...messages.slice(lastUserIdx),
-  ];
+  const systemIdx = messages.findIndex(m => m.role === 'system');
+  const tailLines = tail.split('\n').length - 1;
 
-  console.error(`[headroom] injected ${tail.split('\n').length - 1} memory facts`);
+  // Some chat templates require the first system message to remain first.
+  // Merge the memory tail into the initial system message rather than
+  // inserting a second system block later in the conversation.
+  if (systemIdx >= 0) {
+    const injected = [...messages];
+    const existing = String(injected[systemIdx].content ?? '').trim();
+    injected[systemIdx] = {
+      ...injected[systemIdx],
+      content: existing ? `${existing}\n\n${tail}` : tail,
+    };
+    console.error(`[headroom] merged ${tailLines} memory facts into initial system message`);
+    return injected;
+  }
+
+  const injected = [
+    { role: 'system', content: tail },
+    ...messages,
+  ];
+  console.error(`[headroom] prepended ${tailLines} memory facts as initial system message`);
   return injected;
 }
 
@@ -192,6 +221,15 @@ async function forwardToUpstream(path, method, body, headers) {
   if (headers.authorization) upstreamHeaders.Authorization = headers.authorization;
 
   const bodyStr = body ? JSON.stringify(body) : undefined;
+
+  if (path === '/v1/chat/completions' && method === 'POST') {
+    captureEvent('request', {
+      at: new Date().toISOString(),
+      upstream: url,
+      method,
+      body,
+    });
+  }
 
   const res = await fetch(url, {
     method,
@@ -338,6 +376,13 @@ const server = http.createServer(async (req, res) => {
       }
       res.end();
 
+      captureEvent('response', {
+        at: new Date().toISOString(),
+        upstream: `${UPSTREAM}/v1/chat/completions`,
+        status: upstreamRes.status,
+        body: accumulated,
+      });
+
       // Extract corrections from streamed content
       const contentMatch = accumulated.match(/"content":"((?:[^"\\]|\\.)*)"/g);
       if (contentMatch) {
@@ -347,7 +392,14 @@ const server = http.createServer(async (req, res) => {
 
     } else {
       // Non-streaming: capture and optionally extract corrections
+      const responseClone = upstreamRes.clone();
       const responseText = await upstreamRes.text();
+      captureEvent('response', {
+        at: new Date().toISOString(),
+        upstream: `${UPSTREAM}/v1/chat/completions`,
+        status: responseClone.status,
+        body: responseText,
+      });
       res.writeHead(upstreamRes.status, { 'Content-Type': 'application/json' });
       res.end(responseText);
 

@@ -14,6 +14,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { getACPToolRegistry, toolSupportsDryRun } from '../../../../../src/lib/server/services/knowledge-search/ACPToolRegistry.js';
 
+vi.mock('../../../../../src/lib/server/llm/runtime-contract.js', () => ({
+  ROTORQUANT_MODEL_PATH: 'C:/models/hforf.gguf',
+  LLM_MODEL_ID: 'hforf.gguf',
+  verifyLlmRuntimeModel: vi.fn(async () => null),
+}));
+
 // Add hoisted mocks here when handler logic is filled in:
 // const { mockFoo } = vi.hoisted(() => ({ mockFoo: vi.fn() }));
 // vi.mock('$lib/server/foo', () => ({ foo: mockFoo }));

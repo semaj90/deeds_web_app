@@ -487,6 +487,65 @@ corrupted canonical file — that requires an actual H13 canonical run, not yet 
 `CodebaseGraphStageReceipt` structured JSON format (only inline console timing was added), no
 correction of any stale `npm run graphify:daily` documentation claims.
 
+## Neo4j → Qdrant fan-out lane (queued behind control-plane proofs)
+
+This is the next completion lane after the two control-plane proofs settle:
+
+1. fix / verify the Valkey OpenCode rules seed path
+2. prove OpenCode 1.18.18 turn-N / turn-N+1 replay on `:8090`
+3. then prove the graph → Qdrant fan-out path below
+
+The repo already has partial owners for this lane. Do not add a second fan-out subsystem or a
+second canonical Qdrant writer. The task here is to prove the existing path, record a durable
+receipt, and tighten the acceptance gates.
+
+### Existing owners already present in repo
+
+- `sveltekit-frontend/src/lib/server/atlas/projections/qdrant-packet-projection.ts`
+- `sveltekit-frontend/src/lib/server/graph/graph-projection-manifest.ts`
+- `sveltekit-frontend/src/lib/server/graph/pg-neo4j-sync.ts`
+- `scripts/atlas/project-neo4j-graphrag.mjs`
+- `scripts/atlas/project-feature-matrix-neo4j.mjs`
+- `scripts/atlas/sync-atlas-feature-map-from-qdrant.mjs`
+- `scripts/atlas/neo4j-cluster-fanout.mjs`
+- `scripts/atlas/validate-qdrant-bridge.mjs`
+- `scripts/atlas/validate-qdrant-bridge-v2.mjs`
+
+### To-do list
+
+- [ ] Verify the existing Qdrant projection contract still owns `packetKey`, `sourceRef`,
+      `featureId`, `communityId`, `pageRank`, and `graphRevision`, and does not derive
+      identity from Neo4j or Qdrant node IDs.
+- [ ] Confirm `graph-projection-manifest.ts` remains the canonical place for
+      `projectionRevision` / `graphRevision` metadata, and reuse it rather than introducing a
+      new projection-manifest type.
+- [ ] Inventory the live fan-out scripts above and classify each as `created`, `wired`, or
+      `proof-only`; do not add a new fan-out service if the existing scripts already cover the
+      path.
+- [ ] Add or reuse a `GraphProjectionReceipt`-shaped report for the fan-out run, including
+      `graphRevision`, `projectionRevision`, `sourceRef`, `packetKey`, `featureId`,
+      `communityId`, `pageRank`, and row counts.
+- [ ] Prove the run in dry-run mode first, with a bounded sample, and capture a report artifact
+      instead of mutating canonical truth.
+- [ ] Prove a bounded apply run against the same sample and verify readback / edge counts /
+      sample rows.
+- [ ] Prove idempotence: same graph revision + same input set must yield the same projected
+      rows and no duplicate canonical records.
+- [ ] Expand the fan-out only after the bounded proof passes; keep the path event/revision-driven
+      rather than reindexing on every query.
+- [ ] Keep Postgres canonical; treat Neo4j and Qdrant as rebuildable projections/mirrors for
+      this lane.
+
+### Acceptance gates
+
+- `NEO4J_QDRANT_FANOUT_DRY_RUN_PROVEN`
+- `NEO4J_QDRANT_FANOUT_APPLY_PROVEN`
+- `NEO4J_QDRANT_FANOUT_READBACK_PROVEN`
+- `GRAPH_PROJECTION_RECEIPT_PROVEN`
+- `NEO4J_QDRANT_FANOUT_IDEMPOTENT`
+- `OPENCODE_REPLAY_TURN2_PROVEN`
+- `VALKEY_OPENCODE_RULES_SEED_PROVEN`
+
 ## Stop boundary (unchanged)
 
 Stop after: proof-ladder runner, global Graphify lock, feature-envelope lock/concurrency proof,

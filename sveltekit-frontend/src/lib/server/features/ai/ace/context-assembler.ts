@@ -23,7 +23,14 @@ import { ENV } from '$lib/server/env.server.js';
 import { aceRetrievalRuns } from '$lib/server/db/schema/metadata-spine.js';
 import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown, ClusterContextPacket, TileEngineTrace } from '../../../ace/types.js';
 import { TOKEN_BUDGET } from '../../../ace/types.js';
-import { attachContextManifestToACE } from '../../../ace/ace-context-manifest.js';
+import {
+  attachContextManifestToACE,
+  deriveProcessPacketsFromACEContext,
+} from '../../../ace/ace-context-manifest.js';
+import {
+  persistAtlasProcessPacketsToQdrant,
+  readAtlasProcessPacketsFromQdrant,
+} from '../../../atlas/process-packets.js';
 import { selectPracticeTemplate } from '../../../ace/practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/event-logger.js';
@@ -1539,7 +1546,7 @@ export async function assembleACEContext(opts: {
         ontologyTuples = null;
       }
 
-      const parentAtlasContext: ACEContext = {
+      const processPacketSourceContext: ACEContext = {
         selectedRelationCards: '',
         selectedClusterSummaries: '',
         cacheTrace: '',
@@ -1612,6 +1619,34 @@ export async function assembleACEContext(opts: {
         },
         ontology: ontologyTuples,
       };
+
+      const parentAtlasContext: ACEContext = {
+        ...processPacketSourceContext,
+        processPackets: deriveProcessPacketsFromACEContext(processPacketSourceContext),
+      };
+
+      if (parentAtlasContext.processPackets?.length) {
+        try {
+          const persisted = await persistAtlasProcessPacketsToQdrant(parentAtlasContext.processPackets, {
+            collection: 'codebase_chunks',
+            wait: true,
+          });
+          const readback = await readAtlasProcessPacketsFromQdrant(
+            parentAtlasContext.processPackets.map((packet) => packet.processId),
+            { collection: persisted.collection, limit: parentAtlasContext.processPackets.length + 8 }
+          );
+
+          if (readback.packets.length < parentAtlasContext.processPackets.length) {
+            console.warn('[ACE process packets] Qdrant readback returned fewer packets than persisted', {
+              persisted: persisted.pointIds.length,
+              readback: readback.packets.length,
+              processIds: readback.processIds,
+            });
+          }
+        } catch (error) {
+          console.warn('[ACE process packets] Qdrant runtime materialization failed', error);
+        }
+      }
 
       // Fire-and-forget ACE telemetry → route_runtime_packets (non-blocking)
       Promise.all([
@@ -1757,6 +1792,7 @@ export async function assembleACEContext(opts: {
         request_id: opts.traceId ?? packet.query_hash ?? crypto.randomUUID(),
         feature_id: packet.feature_ids[0] ?? undefined,
         source_refs: telemetrySourceRefs.length > 0 ? telemetrySourceRefs : packet.source_refs,
+        processPackets: deriveProcessPacketsFromACEContext(parentAtlasContext),
         now: new Date(),
       });
     } catch (err) {
@@ -6611,6 +6647,14 @@ export async function fetchCodebaseContext(
                 somBmuRow: null,
                 somBmuCol: null,
                 graphAuthorityScore: row.graph_authority_score ?? null,
+                graphRevision: row.graph_revision ?? null,
+                projectionRevision: row.projection_revision ?? null,
+                graphDegree: row.graph_degree ?? null,
+                dependencyBreadth: row.dependency_breadth ?? null,
+                endpointAffinity: row.endpoint_affinity ?? null,
+                cacheAffinity: row.cache_affinity ?? null,
+                processIds: Array.isArray(row.process_ids) ? row.process_ids.map((value) => String(value)) : null,
+                neighborhoodHash: row.neighborhood_hash ?? null,
               }) as NonNullable<ACEContext['codebaseContext']>[number]
           );
           writeAceCodeCache(query, classifyQuery(query), agentsMdResolvedDir, ftsChunks);
@@ -6656,7 +6700,15 @@ export async function fetchCodebaseContext(
       gpuCluster: r.chunk.neo4j_gpuCluster != null ? Number(r.chunk.neo4j_gpuCluster) : null,
       clusterKey: r.chunk.cluster_key != null ? String(r.chunk.cluster_key) : null,
       pageRankScore:
-        r.chunk.neo4j_pageRankScore != null ? Number(r.chunk.neo4j_pageRankScore) : null,
+        r.chunk.neo4j_pageRankScore != null
+          ? Number(r.chunk.neo4j_pageRankScore)
+          : r.chunk.pageRankScore != null
+            ? Number(r.chunk.pageRankScore)
+            : r.chunk.pagerank != null
+              ? Number(r.chunk.pagerank)
+              : r.chunk.graph_authority_score != null
+                ? Number(r.chunk.graph_authority_score)
+                : null,
       routeType: r.chunk.neo4j_routeType != null ? String(r.chunk.neo4j_routeType) : null,
       hasAuthGuard: r.chunk.neo4j_hasAuthGuard != null ? Boolean(r.chunk.neo4j_hasAuthGuard) : null,
       somCluster: r.chunk.som_cluster != null ? Number(r.chunk.som_cluster) : null,
@@ -6668,8 +6720,62 @@ export async function fetchCodebaseContext(
       featureFamily: r.chunk.feature_family != null ? String(r.chunk.feature_family) : null,
       // Pre-computed by nightly GDS job; avoids Neo4j RTT per ACE call
       graphAuthorityScore:
-        r.chunk.graph_authority_score != null ? Number(r.chunk.graph_authority_score) : null,
-      communityId: r.chunk.communityId != null ? String(r.chunk.communityId) : null,
+        r.chunk.graph_authority_score != null
+          ? Number(r.chunk.graph_authority_score)
+          : r.chunk.graphAuthorityScore != null
+            ? Number(r.chunk.graphAuthorityScore)
+            : r.chunk.pagerank != null
+              ? Number(r.chunk.pagerank)
+              : null,
+      graphRevision:
+        r.chunk.graph_revision != null ? String(r.chunk.graph_revision) : null,
+      projectionRevision:
+        r.chunk.projection_revision != null ? String(r.chunk.projection_revision) : null,
+      graphDegree:
+        r.chunk.graph_degree != null
+          ? Number(r.chunk.graph_degree)
+          : r.chunk.graphDegree != null
+            ? Number(r.chunk.graphDegree)
+            : r.chunk.cluster_degree != null
+              ? Number(r.chunk.cluster_degree)
+              : r.chunk.clusterDegree != null
+                ? Number(r.chunk.clusterDegree)
+                : null,
+      dependencyBreadth:
+        r.chunk.dependency_breadth != null
+          ? Number(r.chunk.dependency_breadth)
+          : r.chunk.dependencyBreadth != null
+            ? Number(r.chunk.dependencyBreadth)
+            : null,
+      endpointAffinity:
+        r.chunk.endpoint_affinity != null
+          ? Number(r.chunk.endpoint_affinity)
+          : r.chunk.endpointAffinity != null
+            ? Number(r.chunk.endpointAffinity)
+            : null,
+      cacheAffinity:
+        r.chunk.cache_affinity != null
+          ? Number(r.chunk.cache_affinity)
+          : r.chunk.cacheAffinity != null
+            ? Number(r.chunk.cacheAffinity)
+            : null,
+      processIds: Array.isArray(r.chunk.process_ids)
+        ? r.chunk.process_ids.map((value) => String(value))
+        : Array.isArray(r.chunk.processIds)
+          ? r.chunk.processIds.map((value) => String(value))
+        : null,
+      neighborhoodHash:
+        r.chunk.neighborhood_hash != null
+          ? String(r.chunk.neighborhood_hash)
+          : r.chunk.neighborhoodHash != null
+            ? String(r.chunk.neighborhoodHash)
+            : null,
+      communityId:
+        r.chunk.communityId != null
+          ? String(r.chunk.communityId)
+          : r.chunk.community != null
+            ? String(r.chunk.community)
+            : null,
       dirSummary: r.chunk.dir_summary != null ? String(r.chunk.dir_summary) : null,
       agentsCardId: r.chunk.agents_card_id != null ? String(r.chunk.agents_card_id) : null,
     });

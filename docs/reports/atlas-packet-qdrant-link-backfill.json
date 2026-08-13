@@ -2,9 +2,9 @@
   "status": "WARN",
   "mode": "apply",
   "collection": "codebase_chunks_768",
-  "started_at": "2026-08-06T16:54:44.821Z",
-  "packets_loaded": 55294,
-  "all_packets_loaded": 61659,
+  "started_at": "2026-08-13T18:03:54.746Z",
+  "packets_loaded": 55295,
+  "all_packets_loaded": 61660,
   "already_linked_seen": 5000,
   "no_postgres_join_seen": 0,
   "qdrant_points_scanned": 5000,
@@ -39,28 +39,28 @@
     },
     {
       "pointId": 6,
-      "packetKey": "ace:packet:b5aa13ce0a61",
-      "sourceRef": "src/hooks.server.ts"
+      "packetKey": "packet:649b6f79c506",
+      "sourceRef": "sveltekit-frontend/src/hooks.server.ts"
     },
     {
       "pointId": 7,
-      "packetKey": "ace:packet:b5aa13ce0a61",
-      "sourceRef": "src/hooks.server.ts"
+      "packetKey": "packet:649b6f79c506",
+      "sourceRef": "sveltekit-frontend/src/hooks.server.ts"
     },
     {
       "pointId": 8,
-      "packetKey": "ace:packet:b5aa13ce0a61",
-      "sourceRef": "src/hooks.server.ts"
+      "packetKey": "packet:649b6f79c506",
+      "sourceRef": "sveltekit-frontend/src/hooks.server.ts"
     },
     {
       "pointId": 9,
-      "packetKey": "ace:packet:b5aa13ce0a61",
-      "sourceRef": "src/hooks.server.ts"
+      "packetKey": "packet:649b6f79c506",
+      "sourceRef": "sveltekit-frontend/src/hooks.server.ts"
     },
     {
       "pointId": 10,
-      "packetKey": "ace:packet:b5aa13ce0a61",
-      "sourceRef": "src/hooks.server.ts"
+      "packetKey": "packet:649b6f79c506",
+      "sourceRef": "sveltekit-frontend/src/hooks.server.ts"
     }
   ],
   "no_postgres_join_samples": [],
@@ -69,5 +69,5 @@
   "errors": [
     "Bounded scan found no missing-link updates. Scanned points were already linked or had path-drifted Qdrant payloads."
   ],
-  "finished_at": "2026-08-06T16:54:52.833Z"
+  "finished_at": "2026-08-13T18:04:11.044Z"
 }

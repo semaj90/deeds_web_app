@@ -7,6 +7,7 @@
 import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import type { AcePayload } from '$lib/server/ace/ace-payload-selector.js';
 import type { ContextManifest } from './context-compiler.parent-atlas.js';
+import type { AtlasProcessPacket } from '../atlas/process-packets.js';
 
 export interface ACEUserProfile {
 	userId: string;
@@ -243,6 +244,22 @@ export interface ACEContext {
     cachedLlmOutput?: string | null;
     /** Source pipeline of the cached LLM output */
     cachedLlmSource?: 'ace' | 'gemma4-summary' | 'kag' | 'rag' | 'agent' | 'other' | null;
+    /** Graph projection revision mirrored from the Neo4j→Qdrant fan-out lane */
+    graphRevision?: string | null;
+    /** Projection revision for the retrieval payload that carried the graph fields */
+    projectionRevision?: string | null;
+    /** Neo4j structural degree / fan-out signal */
+    graphDegree?: number | null;
+    /** Reachable dependency breadth derived from the graph projection */
+    dependencyBreadth?: number | null;
+    /** Retrieval-side endpoint affinity derived from graph neighborhood membership */
+    endpointAffinity?: number | null;
+    /** Retrieval-side cache affinity derived from projection hotness */
+    cacheAffinity?: number | null;
+    /** Process-level ancestry or execution groups associated with the packet */
+    processIds?: string[] | null;
+    /** Deterministic hash of the graph neighborhood used to build the projection */
+    neighborhoodHash?: string | null;
   }> | null;
   /** GPU cluster narratives (compiled knowledge from k-means clustering) */
   clusterNarratives?: Array<{
@@ -267,6 +284,8 @@ export interface ACEContext {
   policyDecision: ACEPolicyDecision | null;
   /** Optional compiled manifest for exact packet injection receipts. */
   contextManifest?: ContextManifest | null;
+  /** Live process packets derived from the current retrieval graph topology. */
+  processPackets?: AtlasProcessPacket[] | null;
   /**
    * nes-arch path-first directory context (LLMS.md spec).
    */

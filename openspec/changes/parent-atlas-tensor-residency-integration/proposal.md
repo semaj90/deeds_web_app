@@ -20,7 +20,8 @@ Add a revisioned bulk-numeric artifact and tile-residency layer without changing
 
 The canonical Atlas vector-selection slice now also sits underneath this integration as a
 supporting layer, without changing the existing packet consumer pipeline, packet assembler,
-RTX ranker, or tool receipt boundary. The slice adds:
+RTX ranker, or tool receipt boundary. It is now wired into the live packet consumer result as an
+additive `featureMatrix` field, not as a new owner. The slice adds:
 
 - `src/lib/server/atlas/vector/ace-packet-vector.ts`
 - `src/lib/server/atlas/vector/turbovec-interpolation.ts`

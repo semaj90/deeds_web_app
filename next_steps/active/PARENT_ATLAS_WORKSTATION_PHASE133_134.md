@@ -1,7 +1,7 @@
 # Parent Atlas Workstation Phase 133-134
 
-**Status**: ACTIVE  
-**Updated**: July 10, 2026  
+**Status**: ACTIVE
+**Updated**: July 10, 2026
 **Scope**: install, wire, and spec-evaluate the parent atlas workstation stack
 
 ---
@@ -13,7 +13,7 @@
 - `@opentelemetry/*` is not installed yet.
 - NetworkX GPU acceleration is a backend install problem, not a code rewrite problem.
 - The server GPU lane is currently LibTorch/CUDA, not Triton.
-- `gemma4-rotorquant:latest` remains the server synthesis model.
+- `llama-server` with `hforf.gguf` remains the server synthesis model.
 - `embeddinggemma` remains the canonical embedding lane.
 - Apache Arrow 21.1.0 is installed in both the root Atlas owner and the SvelteKit app.
 - The bounded Arrow IPC semantic batch is proven with stable train/eval/test splits and a packet-key row index.
@@ -102,9 +102,9 @@ Use GPU for topology compression and clustering, not for canonical identity or c
 
 Files to keep aligned:
 
-- `scripts/atlas/train-packet-jepa.py`
-- `scripts/atlas/export-packet-jepa-training-pairs.mjs`
-- `scripts/atlas/score-packet-jepa-similarity.mjs`
+- `scripts/atlas/train-packet-gepa.py`
+- `scripts/atlas/export-packet-gepa-training-pairs.mjs`
+- `scripts/atlas/score-packet-gepa-similarity.mjs`
 - `scripts/atlas/run-som-on-chunks.mjs`
 - `scripts/atlas/gpu-kmeans-clustering.mts`
 
@@ -160,7 +160,7 @@ Current result: `READY_WITH_BLOCKERS`. Arrow and bounded HyperRAG materializatio
 3. Add the NetworkX backend smoke.
 4. Wire the GPU topology lane to derived metrics.
 5. Keep browser ONNX and server GPU lanes separated.
-6. Re-run the JEPA gate only after the embedding coverage is real.
+6. Re-run the GEPA gate only after the embedding coverage is real.
 7. Run the gradient-checkpoint benchmark matrix before turning checkpointing on by default.
 
 ---

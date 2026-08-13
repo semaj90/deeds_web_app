@@ -20,12 +20,19 @@ import neo4j from 'neo4j-driver';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { normalizeSourceRef } from './lib/canonical-source-ref.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '../..');
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes('--dry-run');
+const RESET = args.includes('--reset');
+
+function canonicalSourceRefFrom(filePath) {
+  const relativeToRoot = path.relative(projectRoot, filePath).replace(/\\/g, '/');
+  return normalizeSourceRef(relativeToRoot);
+}
 
 async function main() {
   console.log('🚀 Phase 4 Atlas: USES_TOOL Neo4j Sync');
@@ -90,6 +97,13 @@ async function main() {
     // Sync to Neo4j
     console.log('[SYNC] Creating USES_TOOL edges in Neo4j...');
 
+    if (RESET) {
+      console.log('  ├─ Resetting existing USES_TOOL / USES_ENDPOINT relationships...');
+      await session.run(`MATCH ()-[r:USES_TOOL]->() DELETE r`);
+      await session.run(`MATCH ()-[r:USES_ENDPOINT]->() DELETE r`);
+      console.log('  │  Cleared prior tool relationships');
+    }
+
     // 1. Create Tool/Endpoint nodes
     const toolList = Array.from(tools);
     const endpointList = Array.from(endpoints);
@@ -135,20 +149,15 @@ async function main() {
       edgeChunks.push(edges.slice(i, i + 100));
     }
 
-    // Normalize paths
-    const normalizedEdges = edges.map((e) => ({
-      ...e,
-      filePath: e.source_file.replace(/\\/g, '/').replace(/^sveltekit-frontend\//, '')
-    }));
-
     let edgesCreated = 0;
     for (let idx = 0; idx < edgeChunks.length; idx++) {
       const chunk = edgeChunks[idx];
       const normalizedChunk = chunk.map((e) => {
-        const fullPath = path.resolve(projectRoot, e.source_file);
+        const fullPath = e.source_file.replace(/\\/g, '/');
         return {
           ...e,
-          filePath: fullPath.replace(/\\/g, '/')
+          filePath: fullPath,
+          canonicalSourceRef: canonicalSourceRefFrom(fullPath),
         };
       });
 
@@ -158,14 +167,18 @@ async function main() {
 
       if (apiEdges.length > 0) {
         await session.run(
-          `
-            UNWIND $edges AS edge
-            MATCH (f:CodebaseFile { filePath: edge.filePath })
-            MATCH (a:ApiRoute { path: edge.endpoint })
-            MERGE (f)-[r:USES_ENDPOINT]->(a)
-            SET r.line_num = edge.line_num,
-                r.type = edge.type,
-                r.updated_at = datetime()
+        `
+          UNWIND $edges AS edge
+          MERGE (f:CodebaseFile { canonicalSourceRef: edge.canonicalSourceRef })
+          ON CREATE SET f.filePath = edge.filePath,
+                        f.updated_at = datetime()
+          ON MATCH SET f.filePath = coalesce(f.filePath, edge.filePath),
+                       f.updated_at = datetime()
+          MERGE (a:ApiRoute { path: edge.endpoint })
+          MERGE (f)-[r:USES_ENDPOINT { line_num: edge.line_num, type: edge.type, endpoint: edge.endpoint }]->(a)
+          SET r.line_num = edge.line_num,
+              r.type = edge.type,
+              r.updated_at = datetime()
           `,
           { edges: apiEdges }
         );
@@ -173,14 +186,18 @@ async function main() {
 
       if (toolEdges.length > 0) {
         await session.run(
-          `
-            UNWIND $edges AS edge
-            MATCH (f:CodebaseFile { filePath: edge.filePath })
-            MATCH (t:Tool { name: edge.tool })
-            MERGE (f)-[r:USES_TOOL]->(t)
-            SET r.line_num = edge.line_num,
-                r.type = edge.type,
-                r.updated_at = datetime()
+        `
+          UNWIND $edges AS edge
+          MERGE (f:CodebaseFile { canonicalSourceRef: edge.canonicalSourceRef })
+          ON CREATE SET f.filePath = edge.filePath,
+                        f.updated_at = datetime()
+          ON MATCH SET f.filePath = coalesce(f.filePath, edge.filePath),
+                       f.updated_at = datetime()
+          MERGE (t:Tool { name: edge.tool })
+          MERGE (f)-[r:USES_TOOL { line_num: edge.line_num, type: edge.type }]->(t)
+          SET r.line_num = edge.line_num,
+              r.type = edge.type,
+              r.updated_at = datetime()
           `,
           { edges: toolEdges }
         );

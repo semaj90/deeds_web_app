@@ -26,4 +26,7 @@ Run order:
 
 Output style:
 - Vercel AI tool-loop style: deterministic tool calls and bounded iterations.
+- Emit at most one tool call per assistant turn.
+- Do not batch, parallelize, or concatenate multiple tool calls in one turn.
+- Wait for each tool result before issuing the next tool call.
 - Compact sourceRef-backed response only.

@@ -25,6 +25,7 @@ export const CONTEXT_COMPILER_SPEC_REFS = [
 export interface ContextCandidate {
   packet_key: string;
   feature_id?: string;
+  process_id?: string;
   source_ref?: string;
   content: string;
 
@@ -76,6 +77,7 @@ export interface ContextManifest {
   request_id: string;
   feature_id?: string;
   source_refs: string[];
+  selected_process_ids?: string[];
 
   retrieved_candidates: number;
   warmed_candidates: number;
@@ -280,6 +282,7 @@ export function mergeDuplicateCandidates(
       ...existing,
       content: existing.content.length >= candidate.content.length ? existing.content : candidate.content,
       feature_id: existing.feature_id ?? candidate.feature_id,
+      process_id: existing.process_id ?? candidate.process_id,
       source_ref: existing.source_ref ?? candidate.source_ref,
       lanes: [...new Set([...existing.lanes, ...candidate.lanes])],
       relevance: Math.max(existing.relevance, candidate.relevance),
@@ -315,6 +318,7 @@ function createManifestId(input: {
   feature_id?: string;
   policy_version: string;
   selected_packet_keys: string[];
+  selected_process_ids: string[];
   source_refs: string[];
 }): string {
   const canonical = JSON.stringify({
@@ -322,6 +326,7 @@ function createManifestId(input: {
     feature_id: input.feature_id ?? null,
     policy_version: input.policy_version,
     selected_packet_keys: input.selected_packet_keys,
+    selected_process_ids: input.selected_process_ids,
     source_refs: [...input.source_refs].sort(),
   });
   return `context:${createHash('sha256').update(canonical).digest('hex').slice(0, 24)}`;
@@ -407,6 +412,11 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
     ...selected.map((c) => c.source_ref).filter((v): v is string => Boolean(v)),
   ])].sort();
   const selectedPacketKeys = selected.map((c) => c.packet_key);
+  const selectedProcessIds = [...new Set(
+    selected
+      .map((c) => c.process_id)
+      .filter((v): v is string => Boolean(v))
+  )].sort();
 
   const manifest: ContextManifest = {
     manifest_id: createManifestId({
@@ -414,11 +424,13 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
       feature_id: input.feature_id,
       policy_version: policy.version,
       selected_packet_keys: selectedPacketKeys,
+      selected_process_ids: selectedProcessIds,
       source_refs: sourceRefs,
     }),
     request_id: input.request_id,
     feature_id: input.feature_id,
     source_refs: sourceRefs,
+    selected_process_ids: selectedProcessIds,
     retrieved_candidates: unique.length,
     warmed_candidates: warmedUnique.length,
     cache_hits: cacheHits.length,
