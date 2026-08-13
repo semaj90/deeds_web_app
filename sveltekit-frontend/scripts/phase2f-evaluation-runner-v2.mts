@@ -58,8 +58,8 @@ async function semanticSearch(
       limit,
     });
 
-    return result.results.map((r, idx) => ({
-      packet_key: r.id || 'unknown',
+    return result.results.map((r: any, idx: number) => ({
+      packet_key: String(r.id || 'unknown'),
       rank: idx,
     }));
   } catch (error) {

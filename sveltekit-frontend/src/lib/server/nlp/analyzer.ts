@@ -1,8 +1,7 @@
 /**
  * NLP Analyzer — Sentiment + Document Classification via Ollama
  *
- * Uses Ollama's GBNF-constrained structured output (Zod → JSON Schema)
- * from gemma4-rotorquant:latest for:
+ * Uses the canonical local synthesis model via llama-server (Zod → JSON Schema) for:
  *   1. Sentiment analysis (positive/negative/neutral + confidence)
  *   2. Document classification (contract, deed, brief, motion, etc.)
  *   3. Key phrase extraction
@@ -11,12 +10,13 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { z } from 'zod';
 
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
-const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const MODEL = LLM_MODEL_ID;
 
 export interface SentimentResult {
 	sentiment: 'positive' | 'negative' | 'neutral' | 'mixed';

@@ -1,0 +1,279 @@
+{
+  "mode": "dry-run",
+  "workspaceRevision": "workspace:parent-atlas",
+  "sourceRevision": "source:parent-atlas",
+  "graphRevision": "graph:parent-atlas",
+  "centroidsKey": "gpu:autoencoder:centroids_64",
+  "sourcePattern": "cluster:summary:*",
+  "totalKeys": 33,
+  "requested": 33,
+  "written": 0,
+  "skipped": 33,
+  "failed": 0,
+  "results": [
+    {
+      "clusterId": 0,
+      "clusterSummaryKey": "cluster:summary:0",
+      "packetKey": "sha256:4ff58c17ae76b8b115e4cd94",
+      "canonicalHash": "4b9fb69952603d4beb97637016f643eed2bc4df92e63d53237b41009086da0cb",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 1477,
+      "clusterSummaryKey": "cluster:summary:1477",
+      "packetKey": "sha256:e491e4a0fa03fd283c146e9f",
+      "canonicalHash": "1d521cce13982ab67f581b3d3b43aa612a5df8eeb4c6f2fa1e8c3207bfba9f96",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 1553,
+      "clusterSummaryKey": "cluster:summary:1553",
+      "packetKey": "sha256:2265ebdd5ff098040f2e48ac",
+      "canonicalHash": "05921b6fc7313ab9f0e09240c7a97e05f73797af337ca14cd4eb1fa0171c3d8a",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 2019,
+      "clusterSummaryKey": "cluster:summary:2019",
+      "packetKey": "sha256:8929926d81938781863e9a2d",
+      "canonicalHash": "122f6879536949e8e3d2bcc52a257099cc1ebbce44b5b72d94f9610e95a040d8",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 2123,
+      "clusterSummaryKey": "cluster:summary:2123",
+      "packetKey": "sha256:1c37d6966f67098f6efe2119",
+      "canonicalHash": "1b9880c841255a589cb16f1e27044ad077257acde8c4c2df5805a8c2af5de0cf",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 2329,
+      "clusterSummaryKey": "cluster:summary:2329",
+      "packetKey": "sha256:e06ebc6e0bbb81b9b7af2b44",
+      "canonicalHash": "b21fef61150968a65c2317c10fb8c751bc181137e264482dbea627c9d4760624",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 2346,
+      "clusterSummaryKey": "cluster:summary:2346",
+      "packetKey": "sha256:71e9b2367c6056987e84eb03",
+      "canonicalHash": "3d310c6d1dc1fc391df1548e38ac5207505e4664f8e09c1e3362c03f6a3c0afd",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 2401,
+      "clusterSummaryKey": "cluster:summary:2401",
+      "packetKey": "sha256:a645ceecb426837b301002e2",
+      "canonicalHash": "f776c606d81a698ee08b82d95b22977c91f4df9b82240d4122dc04d544dd3fc1",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 18725,
+      "clusterSummaryKey": "cluster:summary:18725",
+      "packetKey": "sha256:13f97704ef846dc2d97768ae",
+      "canonicalHash": "012f7b810992c21f244d8617517f185f4fdba79324e11032d2db64b6ed9273a3",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 18914,
+      "clusterSummaryKey": "cluster:summary:18914",
+      "packetKey": "sha256:a5561369f8fcac80a09e6e2c",
+      "canonicalHash": "e9933ed8c272f6f42e0a3ef452655805d636b32c9d5893a1ff2041ea8507f52c",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 19212,
+      "clusterSummaryKey": "cluster:summary:19212",
+      "packetKey": "sha256:8789aee64ac713bb742cfeae",
+      "canonicalHash": "a4ac75b79664e959240bec9497dfeeb2ab2644346cfcf9c5b5ddd5b0998370ae",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 19461,
+      "clusterSummaryKey": "cluster:summary:19461",
+      "packetKey": "sha256:54dcd634fd3cb920e788a0e4",
+      "canonicalHash": "3e3cf8a55aeba488b4af3fc7501c758d90221aef9c34bbb07a0d78f81a2be809",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 19591,
+      "clusterSummaryKey": "cluster:summary:19591",
+      "packetKey": "sha256:f6bf6cb6777b5f1df491bcb7",
+      "canonicalHash": "c9160d413fac6eaf9ac69e517bb8449674f8d84d5ac149251dfe3fa2ac768577",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 19612,
+      "clusterSummaryKey": "cluster:summary:19612",
+      "packetKey": "sha256:4f2fd3506cd8734385491ebe",
+      "canonicalHash": "bcab734c75aadb57093419c2ccc92ebdddc53a5268b102a017ca1bf154deede7",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 20396,
+      "clusterSummaryKey": "cluster:summary:20396",
+      "packetKey": "sha256:fecf25b2f32d0ed735435831",
+      "canonicalHash": "d21d2284f242c7cb8e9352e00253c7cbd54575d65465ff4c55cb14ec69c6118d",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 20778,
+      "clusterSummaryKey": "cluster:summary:20778",
+      "packetKey": "sha256:2d3efd7f5341538ec52b0077",
+      "canonicalHash": "52bb4b25a8a204d9f27b85e138dd6fe122ca7a91ba10712e4d020c27a41a5290",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 21174,
+      "clusterSummaryKey": "cluster:summary:21174",
+      "packetKey": "sha256:23352420a4b46b069821596f",
+      "canonicalHash": "1c4655df9a4735926749f925f328df512ae2c9e436596ab73f21e561b0d611d6",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 21389,
+      "clusterSummaryKey": "cluster:summary:21389",
+      "packetKey": "sha256:7832ff617e5cdff2a47d0440",
+      "canonicalHash": "ad94a7d328439c97d26f85c01b9cfcd0c9f75615cf2b5803acdddb551e7e6af7",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 21636,
+      "clusterSummaryKey": "cluster:summary:21636",
+      "packetKey": "sha256:e3f2bf350b6472fd65b2e43c",
+      "canonicalHash": "d01b679b30d1dc8bacb8cc7da9685d36fc8647d87e910c1aae04eaf8300e1d52",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 22886,
+      "clusterSummaryKey": "cluster:summary:22886",
+      "packetKey": "sha256:3779d83939655f5e73710dc6",
+      "canonicalHash": "4f82409f3d7f04291d9cdd3ad76d3f087377c745b2565401ab57ef42cd447a65",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 23396,
+      "clusterSummaryKey": "cluster:summary:23396",
+      "packetKey": "sha256:33f759ce39c70d0927d98c8e",
+      "canonicalHash": "c30cd317b2ec2616f5ba8c36997986e70557b19589b33f5464b8c87449a488f3",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39375,
+      "clusterSummaryKey": "cluster:summary:39375",
+      "packetKey": "sha256:0f78491a36bb65293628d890",
+      "canonicalHash": "6cd49d28a2f129147b7082b6f20003938ac6ad2f2bcd4a8be9d8119955e838b3",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39376,
+      "clusterSummaryKey": "cluster:summary:39376",
+      "packetKey": "sha256:9c52d3b0520b5a4fdd91cc83",
+      "canonicalHash": "8f7d8db55e09d9d6971ca2955f272dc09a8ed45fd8545c98c6f371c74ea99c10",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39518,
+      "clusterSummaryKey": "cluster:summary:39518",
+      "packetKey": "sha256:068668048354ecf5d371a63f",
+      "canonicalHash": "82fa694ec8fe1c084d8ce316ceee2ca424a4e2eaa0f7b2e38f6846ab0eddae43",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39581,
+      "clusterSummaryKey": "cluster:summary:39581",
+      "packetKey": "sha256:be38dff821dbbd482fade774",
+      "canonicalHash": "e15e8f213c6700cc7ab0907180b775dc3e0051696b44f9e8d1f556d1894537c2",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39584,
+      "clusterSummaryKey": "cluster:summary:39584",
+      "packetKey": "sha256:12638757cf11259a63f2b18e",
+      "canonicalHash": "5038a4b8324a63d3fabd9c43749a36be8ba2e65ccc68a15e4661a77d33e85cf8",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39601,
+      "clusterSummaryKey": "cluster:summary:39601",
+      "packetKey": "sha256:8eb052d44577ada2ca47213a",
+      "canonicalHash": "bf1b150c943de5c19f4760fd8e6aff25900724485251babc18a3a96181c72338",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39606,
+      "clusterSummaryKey": "cluster:summary:39606",
+      "packetKey": "sha256:0237b53ac138fc9b68cc9085",
+      "canonicalHash": "83b45cfbd126011e3cce17e59982b431b3ba6260987305b2ee351f0cf10c5a03",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39627,
+      "clusterSummaryKey": "cluster:summary:39627",
+      "packetKey": "sha256:00bebf8b742d889a3948508c",
+      "canonicalHash": "3050495dd6a863879349c8bd248912d6b78ec575dacbcf97fd02f7a40ffc1205",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39770,
+      "clusterSummaryKey": "cluster:summary:39770",
+      "packetKey": "sha256:a6436aedbb0a9a754d4362f0",
+      "canonicalHash": "c9852535e7f7264d06233578f5a1a7e07bb8d827b05f0eb0768c554c9c33193c",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39776,
+      "clusterSummaryKey": "cluster:summary:39776",
+      "packetKey": "sha256:8c9fa93f03e6d5c119175008",
+      "canonicalHash": "20cb3b9958c274b718859eb35ef37da6dd7563709643883b3b19ee16fa7a1cf8",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39851,
+      "clusterSummaryKey": "cluster:summary:39851",
+      "packetKey": "sha256:421aa78117109664f028a9c1",
+      "canonicalHash": "9cf92a6845495ce5a9e12a21554c3395863855907fadd650ab16df92bc73e93d",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    },
+    {
+      "clusterId": 39972,
+      "clusterSummaryKey": "cluster:summary:39972",
+      "packetKey": "sha256:dd2d15e03e8696e04b1e1ec4",
+      "canonicalHash": "6758b455239259d661b3168b5183bc615711fed1875617dec966a965c74470e0",
+      "status": "DRY_RUN",
+      "schema": "PASS"
+    }
+  ]
+}

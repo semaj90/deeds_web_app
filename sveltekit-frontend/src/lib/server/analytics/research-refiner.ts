@@ -2,6 +2,7 @@ import { searchCodebase } from '../indexer/dual-embedder.js';
 import { scoreBatchCrossEncoder } from '../retrieval/triton-reranker.js';
 import { bifrostChat } from '../ollama.js';
 import { ENV } from '../env.server.js';
+import { LLM_MODEL_ID } from '../llm/runtime-contract.js';
 import type { ResearchTopic } from './deep-research.js';
 
 /**
@@ -11,7 +12,7 @@ import type { ResearchTopic } from './deep-research.js';
  * Uses cross-encoder batch-reranking to score topics against actual codebase facts.
  */
 
-const REFINEMENT_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const REFINEMENT_MODEL = LLM_MODEL_ID;
 const EVIDENCE_THRESHOLD = 0.3;
 
 export interface ValidationResult {

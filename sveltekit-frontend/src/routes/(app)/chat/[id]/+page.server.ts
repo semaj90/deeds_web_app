@@ -9,9 +9,10 @@ import { getRedis } from '$lib/server/redis';
 import { getOllamaUrl } from '$lib/config/env.server.js';
 import type { Actions, PageServerLoad } from './$types';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const OLLAMA_URL = getOllamaUrl();
-const OLLAMA_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest';
+const OLLAMA_MODEL = LLM_MODEL_ID;
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	let history: any[] = [];

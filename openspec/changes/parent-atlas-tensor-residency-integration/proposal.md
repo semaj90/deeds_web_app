@@ -18,6 +18,16 @@ Add a revisioned bulk-numeric artifact and tile-residency layer without changing
 - optional protobuf adapter contract.
 - visualization-only NES/PS2 LOD glyph contract.
 
+The canonical Atlas vector-selection slice now also sits underneath this integration as a
+supporting layer, without changing the existing packet consumer pipeline, packet assembler,
+RTX ranker, or tool receipt boundary. The slice adds:
+
+- `src/lib/server/atlas/vector/ace-packet-vector.ts`
+- `src/lib/server/atlas/vector/turbovec-interpolation.ts`
+- `src/lib/server/atlas/ranking/packet-feature-matrix.ts`
+
+ACE compatibility re-exports remain in place for the same files under `src/lib/server/ace/`.
+
 ## Non-goals
 
 - No second RRF owner.

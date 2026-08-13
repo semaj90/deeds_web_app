@@ -14,7 +14,7 @@ const analyzeSchema = z.object({
 		confidence: z.number().optional(),
 		metadata: z.record(z.string(), z.unknown()).optional()
 	}),
-	// Optional: use gemma4-rotorquant:latest for complex tasks like codebase summarization
+	// Optional: use the canonical local synthesis model for complex tasks like codebase summarization
 	useComplexModel: z.boolean().optional()
 });
 
@@ -40,8 +40,8 @@ export const POST: RequestHandler = async (event) => {
 		const { node, useComplexModel = false } = parsed.data;
 		const text = node.description || node.title || '';
 
-		// Choose model: gemma3:270m (fast, 4.5s avg) or gemma4-rotorquant:latest (complex, 25s avg)
-		const model = useComplexModel ? 'gemma4-rotorquant:latest' : 'gemma3:270m';
+		// Choose model: gemma3:270m (fast, 4.5s avg) or the canonical local synthesis model (complex)
+		const model = useComplexModel ? LOCAL_VLM_MODEL : 'gemma3:270m';
 
 		// ── L1 Redis Cache Lookup (5ms) ──
 		const cacheKey = generateCacheKey({

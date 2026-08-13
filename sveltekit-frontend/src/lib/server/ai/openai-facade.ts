@@ -51,6 +51,7 @@ import { callTraceMcp } from '$lib/server/mcp/trace-http.js';
 import { runGemma4Agent } from '$lib/server/ai/gemma4-agent.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
 import { canUseTurboQuant } from '$lib/server/ai/backend-runtime-guards.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { isVlmOrMmprojRequestModel } from '$lib/server/ai/request-classifiers.js';
 import { shouldUseDraftModel } from '$lib/server/ai/draft-model-policy.js';
 import { compressToHCACard } from '$lib/server/ai/hca-compressor.js';
@@ -115,12 +116,12 @@ function resolveInternalModel(requested: string): string {
   // Drop any trailing `:latest` to normalise comparisons
   const m = requested.toLowerCase().replace(/:latest$/, '');
   if (m === 'yorha-ldr') return 'yorha-ldr';
-  if (m === 'gemma4-rotorquant:latest') return 'gemma4-rotorquant:latest';
+  if (m === 'gemma4-rotorquant:latest') return LLM_MODEL_ID;
   if (m.startsWith('yorha') || m.startsWith('legal') || m.includes('vlm')) {
-    return 'gemma4-rotorquant:latest';
+    return LLM_MODEL_ID;
   }
   if (m === 'gemma4-agent' || m === 'gemma4-raw' || m.startsWith('gemma4')) {
-    return 'gemma4-rotorquant:latest';
+    return LLM_MODEL_ID;
   }
   if (m.startsWith('gemma3')) return 'gemma3-legal:latest';
   if (m.startsWith('gemma270') || m.startsWith('gemma3:270')) return 'gemma3:270m';
@@ -802,7 +803,7 @@ export async function runChatCompletion(
     }));
 
     const rawContextSize =
-      internalModel === 'gemma4-rotorquant:latest' ? 65536 : RUNTIME_CONTEXT_SIZE;
+      internalModel === LLM_MODEL_ID ? 65536 : RUNTIME_CONTEXT_SIZE;
     const requestedMaxTokens = clampRequestedMaxTokens(req.max_tokens);
     const rawInputTokens = countTokens(mappedMsgs.map((m) => m.content).join('\n'));
     // For raw passthrough requests we intentionally bypass the ACE stack
@@ -994,7 +995,7 @@ export async function runChatCompletion(
   }
 
   // ── ACE path: full retrieval + prompt assembly ──
-  // 20s guard: embeddinggemma won't load when VRAM is occupied by gemma4-rotorquant:latest.
+  // 20s guard: embeddinggemma won't load when VRAM is occupied by the canonical local model.
   // On timeout we fall through with an empty context — bifrostChat still fires.
   const ACE_TIMEOUT_MS = 20_000;
   const aceStats: Record<string, any> = {};
@@ -2223,12 +2224,12 @@ function wrapResponse(args: {
 // ── Models list ────────────────────────────────────────────────────────────
 
 export const ADVERTISED_MODELS = [
-  { id: 'gemma4-agent',   owned_by: 'local' },  // → gemma4-rotorquant:latest (ACE/KAG/RAG brain)
-  { id: 'gemma4-raw',     owned_by: 'local' },  // → gemma4-rotorquant:latest (direct, no ACE)
-  { id: 'yorha-legal',    owned_by: 'yorha' },   // → gemma4-rotorquant:latest (alias)
+  { id: 'gemma4-agent',   owned_by: 'local' },  // → canonical local model (ACE/KAG/RAG brain)
+  { id: 'gemma4-raw',     owned_by: 'local' },  // → canonical local model (direct, no ACE)
+  { id: 'yorha-legal',    owned_by: 'yorha' },   // → canonical local model (alias)
   { id: 'yorha-fast',     owned_by: 'yorha' },   // → gemma3:270m
   { id: 'yorha-ldr',      owned_by: 'yorha' },   // → local-deep-research (LDR_BASE_URL)
-  { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // → gemma4-rotorquant:latest explicit
+  { id: 'gemma4-rotorquant:latest',   owned_by: 'yorha' },   // legacy alias, resolved to canonical local model
   { id: 'gemma3-legal',   owned_by: 'yorha' },   // → gemma3-legal
   { id: 'gemma3:270m',    owned_by: 'ollama' },
 ] as const;

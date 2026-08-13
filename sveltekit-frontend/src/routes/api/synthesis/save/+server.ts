@@ -3,11 +3,12 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { db } from '$lib/server/db/client';
 import { synthesisRuns } from '$lib/server/db/schema-postgres.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const saveSchema = z.object({
 	query: z.string().min(1).max(8000),
 	answer: z.string().min(1),
-	model: z.string().default('gemma4-rotorquant:latest'),
+	model: z.string().default(LLM_MODEL_ID),
 	cacheHit: z.string().optional(),
 	latencyMs: z.number().int().optional(),
 	confidence: z.number().min(0).max(1).optional(),

@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { createHash } from 'crypto';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { getRedis } from '$lib/server/redis.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
@@ -382,7 +383,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       success: true,
       data: {
         response: responseText,
-        model: 'gemma4-rotorquant:latest',
+        model: LLM_MODEL_ID,
         sessionId,
         queryHash,
         ...(caseId ? { caseId } : {}),

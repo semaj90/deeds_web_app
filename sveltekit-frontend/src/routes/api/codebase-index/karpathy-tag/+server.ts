@@ -28,6 +28,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { AI_CONFIG } from '$lib/server/config.js';
 import { chatCompletionViaOpenAICompat, extractMLMetadata } from '$lib/server/ai/lang-extract.js';
 import { bifrostChat } from '$lib/server/ollama.js';
@@ -35,7 +36,7 @@ import { bifrostChat } from '$lib/server/ollama.js';
 const QDRANT_URL   = ENV.QDRANT_URL;
 const COLLECTION   = 'codebase_chunks_768';
 const OPENAI_TAG_MODEL = AI_CONFIG.openai.model;
-const OLLAMA_TAG_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const OLLAMA_TAG_MODEL = LLM_MODEL_ID;
 
 // ── Semantic tag vocabulary ────────────────────────────────────────────────────
 
@@ -415,7 +416,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 		total,
 		pct:             total > 0 ? Math.round((tagged / total) * 100) : 0,
 		semanticTagDist: dist,
-		model:           AI_CONFIG.openai.enabled ? OPENAI_TAG_MODEL : ENV.ROTORQUANT_CHAT_MODEL,
+		model:           AI_CONFIG.openai.enabled ? OPENAI_TAG_MODEL : LLM_MODEL_ID,
 		note:            AI_CONFIG.openai.enabled
 			? 'Uses the OpenAI-compatible gateway when enabled; otherwise local Ollama + Bifrost cache.'
 			: 'Uses Ollama local + Bifrost L1/L2 cache — zero API cost',

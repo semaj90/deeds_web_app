@@ -18,6 +18,9 @@ export interface WorkflowLoopInput {
   caseId?: string;
   userId?: string;
   targetPath?: string;
+  workspaceRevision?: string;
+  modelRevision?: string;
+  sourceRefs?: string[];
   metadata?: Record<string, unknown>;
 }
 
@@ -27,6 +30,21 @@ export interface WorkflowClassification {
   severity: 'low' | 'medium' | 'high';
   lane: 'contracts' | 'schema' | 'runtime' | 'safety' | 'general';
   rationale: string;
+}
+
+export interface ScaffoldDraft {
+  scaffoldId: string;
+  taskId: string;
+  policyVersion: string;
+  selectedPackets: string[];
+  toolPlan: Array<{
+    tool: string;
+    purpose: string;
+    inputRef?: string;
+  }>;
+  contextBudget: number;
+  cacheHints: string[];
+  createdAt: string;
 }
 
 export interface WorkflowRepairResult {
@@ -40,6 +58,42 @@ export interface WorkflowSmokeResult {
   passed: boolean;
   command: string;
   outputSummary: string;
+}
+
+export interface ExecutionReceipt {
+  receiptId: string;
+  scaffoldId: string;
+  taskId: string;
+  startedAt: string;
+  finishedAt: string;
+  status: 'SUCCESS' | 'FAILED' | 'BLOCKED' | 'PARTIAL';
+  outputs: {
+    packetKeys: string[];
+    evidenceRefs: string[];
+    logs: string[];
+  };
+  verifier: {
+    schemaValid: boolean;
+    provenanceValid: boolean;
+    identityStable: boolean;
+    replayStable: boolean;
+  };
+}
+
+export interface DeterministicVerdict {
+  receiptId: string;
+  reward: number;
+  reasons: string[];
+  blockedBy: string[];
+}
+
+export interface PolicyUpdate {
+  policyVersion: string;
+  scaffoldId: string;
+  receiptId: string;
+  advantage: number;
+  stalenessWeight: number;
+  accepted: boolean;
 }
 
 export interface WorkflowLogEntry {
@@ -56,6 +110,21 @@ export interface WorkflowLogEntry {
 export interface WorkflowLoopResult {
   runId: string;
   status: 'repaired' | 'needs_review';
+  taskInput: {
+    taskId: string;
+    query: string;
+    hmmErrorClass: HmmErrorClass;
+    caseId?: string;
+    userId?: string;
+    targetPath?: string;
+    workspaceRevision?: string;
+    modelRevision?: string;
+    sourceRefs: string[];
+  };
+  scaffold: ScaffoldDraft;
+  executionReceipt: ExecutionReceipt;
+  deterministicVerdict: DeterministicVerdict;
+  policyUpdate: PolicyUpdate;
   classification: WorkflowClassification;
   repair: WorkflowRepairResult;
   smoke: WorkflowSmokeResult;
@@ -63,13 +132,23 @@ export interface WorkflowLoopResult {
 }
 
 export interface WorkflowLoopDeps {
-  repair?: (input: WorkflowLoopInput, classification: WorkflowClassification) => Promise<WorkflowRepairResult>;
+  repair?: (
+    input: WorkflowLoopInput,
+    classification: WorkflowClassification,
+    scaffold?: ScaffoldDraft,
+  ) => Promise<WorkflowRepairResult>;
   smoke?: (
     input: WorkflowLoopInput,
     classification: WorkflowClassification,
     repair: WorkflowRepairResult,
+    scaffold?: ScaffoldDraft,
   ) => Promise<WorkflowSmokeResult>;
-  log?: (entry: WorkflowLogEntry) => Promise<void>;
+  log?: (
+    entry: WorkflowLogEntry,
+    receipt?: ExecutionReceipt,
+    verdict?: DeterministicVerdict,
+    policyUpdate?: PolicyUpdate,
+  ) => Promise<void>;
   now?: () => Date;
   createRunId?: () => string;
 }
@@ -98,6 +177,132 @@ function severityForRisk(riskScore: number): WorkflowClassification['severity'] 
   if (riskScore >= 0.8) return 'high';
   if (riskScore >= 0.5) return 'medium';
   return 'low';
+}
+
+function sanitizePacketRefs(input: WorkflowLoopInput): string[] {
+  return [...new Set(
+    [
+      input.targetPath ? `file:${input.targetPath}` : null,
+      ...(input.sourceRefs ?? []).map((ref) => ref.trim()).filter(Boolean),
+      input.caseId ? `case:${input.caseId}` : null,
+      input.userId ? `user:${input.userId}` : null,
+    ].filter((value): value is string => Boolean(value))
+  )];
+}
+
+function buildScaffoldDraft(
+  input: WorkflowLoopInput,
+  classification: WorkflowClassification,
+  runId: string,
+  now: Date,
+): ScaffoldDraft {
+  const selectedPackets = sanitizePacketRefs(input);
+  const contextBudget = classification.severity === 'high' ? 2400 : classification.severity === 'medium' ? 1600 : 1000;
+
+  return {
+    scaffoldId: `scaffold:${runId}`,
+    taskId: input.caseId ?? runId,
+    policyVersion: 'atlas.error-agent.scaffold.v1',
+    selectedPackets,
+    toolPlan: [
+      { tool: 'hmm-classifier', purpose: 'classify the failure and choose a repair lane' },
+      {
+        tool: 'repair',
+        purpose: 'generate a minimal safe repair plan from the deterministic classification',
+        inputRef: input.targetPath ?? input.caseId ?? undefined,
+      },
+      { tool: 'smoke', purpose: 'validate the repair against the deterministic gate' },
+    ],
+    contextBudget,
+    cacheHints: [
+      `lane:${classification.lane}`,
+      `severity:${classification.severity}`,
+      `risk:${classification.riskScore.toFixed(2)}`,
+    ],
+    createdAt: now.toISOString(),
+  };
+}
+
+function buildExecutionReceipt(
+  input: WorkflowLoopInput,
+  scaffold: ScaffoldDraft,
+  repair: WorkflowRepairResult,
+  smoke: WorkflowSmokeResult,
+  now: Date,
+): ExecutionReceipt {
+  const status: ExecutionReceipt['status'] = !repair.ok
+    ? 'FAILED'
+    : smoke.passed
+      ? 'SUCCESS'
+      : 'PARTIAL';
+  const evidenceRefs = [...new Set([...scaffold.selectedPackets, ...repair.touchedFiles])];
+  const packetKeys = repair.touchedFiles.length > 0 ? repair.touchedFiles : scaffold.selectedPackets;
+  const verifier = {
+    schemaValid: Boolean(input.query.trim()) && Boolean(scaffold.scaffoldId) && Boolean(repair.summary),
+    provenanceValid: evidenceRefs.length > 0,
+    identityStable: new Set(evidenceRefs).size === evidenceRefs.length,
+    replayStable: true,
+  };
+
+  return {
+    receiptId: `receipt:${scaffold.scaffoldId}`,
+    scaffoldId: scaffold.scaffoldId,
+    taskId: scaffold.taskId,
+    startedAt: scaffold.createdAt,
+    finishedAt: now.toISOString(),
+    status,
+    outputs: {
+      packetKeys,
+      evidenceRefs,
+      logs: [repair.summary, smoke.outputSummary].filter(Boolean),
+    },
+    verifier,
+  };
+}
+
+function computeVerdict(
+  classification: WorkflowClassification,
+  receipt: ExecutionReceipt,
+  smoke: WorkflowSmokeResult,
+): DeterministicVerdict {
+  const reward = receipt.verifier.schemaValid && receipt.verifier.provenanceValid && receipt.verifier.identityStable
+    ? (smoke.passed ? Math.max(0.5, 1 - classification.riskScore * 0.5) : 0.15)
+    : 0;
+
+  const blockedBy: string[] = [];
+  if (!receipt.verifier.schemaValid) blockedBy.push('SCHEMA_INVALID');
+  if (!receipt.verifier.provenanceValid) blockedBy.push('PROVENANCE_MISSING');
+  if (!receipt.verifier.identityStable) blockedBy.push('IDENTITY_UNSTABLE');
+  if (!smoke.passed) blockedBy.push('SMOKE_FAILED');
+
+  return {
+    receiptId: receipt.receiptId,
+    reward,
+    reasons: [
+      `lane:${classification.lane}`,
+      `severity:${classification.severity}`,
+      `status:${receipt.status}`,
+      smoke.passed ? 'smoke:passed' : 'smoke:failed',
+    ],
+    blockedBy,
+  };
+}
+
+function computePolicyUpdate(
+  scaffold: ScaffoldDraft,
+  verdict: DeterministicVerdict,
+  input: WorkflowLoopInput,
+): PolicyUpdate {
+  const policyAgeMs = typeof input.metadata?.policyAgeMs === 'number' ? Math.max(0, input.metadata.policyAgeMs) : 0;
+  const stalenessWeight = policyAgeMs > 0 ? Math.exp(-policyAgeMs / (24 * 60 * 60 * 1000)) : 1;
+  return {
+    policyVersion: scaffold.policyVersion,
+    scaffoldId: scaffold.scaffoldId,
+    receiptId: verdict.receiptId,
+    advantage: verdict.reward - 0.5,
+    stalenessWeight,
+    accepted: verdict.reward * stalenessWeight >= 0.5 && verdict.blockedBy.length === 0,
+  };
 }
 
 export function classifyWorkflowInput(input: WorkflowLoopInput): WorkflowClassification {
@@ -147,8 +352,13 @@ function defaultSmoke(
   });
 }
 
-async function defaultLog(entry: WorkflowLogEntry): Promise<void> {
-  const { queryLogger } = await import('$lib/server/training/query-logger.js');
+async function defaultLog(
+  entry: WorkflowLogEntry,
+  _receipt?: ExecutionReceipt,
+  _verdict?: DeterministicVerdict,
+  _policyUpdate?: PolicyUpdate,
+): Promise<void> {
+  const { queryLogger } = await import('../../training/query-logger.js');
   await queryLogger.logQuery({
     timestamp: entry.timestamp,
     userQuery: entry.query,
@@ -189,14 +399,18 @@ export async function runWorkflowLoop(
   const runId = input.runId ?? createRunId();
 
   const classification = classifyWorkflowInput(input);
+  const scaffold = buildScaffoldDraft(input, classification, runId, now());
 
   const repair = deps.repair
-    ? await deps.repair(input, classification)
-    : await defaultRepair(input, classification);
+    ? await deps.repair(input, classification, scaffold)
+    : await defaultRepair(input, classification, scaffold);
 
   const smoke = deps.smoke
-    ? await deps.smoke(input, classification, repair)
-    : await defaultSmoke(input, classification);
+    ? await deps.smoke(input, classification, repair, scaffold)
+    : await defaultSmoke(input, classification, scaffold);
+  const receipt = buildExecutionReceipt(input, scaffold, repair, smoke, now());
+  const verdict = computeVerdict(classification, receipt, smoke);
+  const policyUpdate = computePolicyUpdate(scaffold, verdict, input);
 
   const log = deps.log ?? defaultLog;
   await log({
@@ -211,16 +425,38 @@ export async function runWorkflowLoop(
       riskScore: classification.riskScore,
       repairSummary: repair.summary,
       smokeCommand: smoke.command,
+      scaffoldId: scaffold.scaffoldId,
+      receiptId: receipt.receiptId,
+      reward: verdict.reward,
+      accepted: policyUpdate.accepted,
+      workspaceRevision: input.workspaceRevision ?? null,
+      modelRevision: input.modelRevision ?? null,
+      selectedPackets: scaffold.selectedPackets,
       caseId: input.caseId ?? null,
       userId: input.userId ?? null,
       ...(input.metadata ?? {}),
     },
     timestamp: now().toISOString(),
-  });
+  }, receipt, verdict, policyUpdate);
 
   const result: WorkflowLoopResult = {
     runId,
     status: smoke.passed ? 'repaired' : 'needs_review',
+    taskInput: {
+      taskId: scaffold.taskId,
+      query: input.query,
+      hmmErrorClass: input.hmmErrorClass,
+      caseId: input.caseId,
+      userId: input.userId,
+      targetPath: input.targetPath,
+      workspaceRevision: input.workspaceRevision,
+      modelRevision: input.modelRevision,
+      sourceRefs: sanitizePacketRefs(input),
+    },
+    scaffold,
+    executionReceipt: receipt,
+    deterministicVerdict: verdict,
+    policyUpdate,
     classification,
     repair,
     smoke,
@@ -230,7 +466,7 @@ export async function runWorkflowLoop(
   // Record agent trace for Phase 3F learning pipeline (fire-and-forget)
   void (async () => {
     try {
-      const { recordAgentTrace } = await import('$lib/server/observability/agent-trace-recorder.js');
+      const { recordAgentTrace } = await import('../../observability/agent-trace-recorder.js');
 
       // Extract selected_concepts from repair suggestions (minimal semantics)
       // and touched files as pseudo-concepts
@@ -247,7 +483,7 @@ export async function runWorkflowLoop(
         retrievalStrategy: 'structural',
         selectedConcepts,
         selectedPackets: repair.touchedFiles,
-        toolsCalled: ['workflow-loop', 'hmm-classifier', classification.lane],
+        toolsCalled: ['workflow-loop', 'hmm-classifier', classification.lane, scaffold.toolPlan.map((step) => step.tool).join(':')],
         outcome: smoke.passed ? 'success' : 'partial',
         reward: smoke.passed ? Math.max(0.5, 1 - classification.riskScore * 0.5) : 0.3,
         taskId: input.caseId ?? runId,

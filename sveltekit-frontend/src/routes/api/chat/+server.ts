@@ -8,6 +8,7 @@ import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { trackTokenUsage, extractOllamaTokens } from '$lib/server/ai/token-tracker.js';
 import { rgTool } from '$lib/server/ai/tools/rg-tool.js';
 import { langExtractTool } from '$lib/server/ai/tools/langextract-tool.js';
+import { LLM_MODEL_ID, ROTORQUANT_MODEL_PATH } from '$lib/server/llm/runtime-contract.js';
 
 import { insertChatMessageSchema } from '$lib/server/db/zod-schemas.js';
 
@@ -109,7 +110,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
+        model: LLM_MODEL_ID,
         messages: [
           {
             role: 'system',
@@ -138,7 +139,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     trackTokenUsage({
       userId: locals.user?.id,
       endpoint: '/api/chat',
-      model: data.model || 'gemma4-rotorquant:latest',
+      model: data.model || LLM_MODEL_ID,
+      metadata: {
+        modelPath: ROTORQUANT_MODEL_PATH,
+      },
       promptTokens: tokens.promptTokens,
       completionTokens: tokens.completionTokens,
       durationMs,
@@ -156,7 +160,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           sessionId: 'api-chat',
           message: responseText.slice(0, 5000),
           role: 'assistant',
-          metadata: { model: data.model || 'gemma4-rotorquant:latest' },
+          metadata: { model: data.model || LLM_MODEL_ID, modelPath: ROTORQUANT_MODEL_PATH },
         });
       })
       .catch(() => {});
@@ -164,7 +168,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     return json({
       message: responseText,
       response: responseText,
-      model: data.model || 'gemma4-rotorquant:latest',
+      model: data.model || LLM_MODEL_ID,
+      modelPath: ROTORQUANT_MODEL_PATH,
       tokensUsed: tokens.promptTokens + tokens.completionTokens,
       gpuLease: lease ? { backend: lease.backend, expiresAt: lease.expiresAt } : null,
       toolContext,

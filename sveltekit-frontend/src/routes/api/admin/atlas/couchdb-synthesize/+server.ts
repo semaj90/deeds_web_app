@@ -11,6 +11,7 @@
 import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const COUCHDB_URL      = (process.env.COUCHDB_URL  ?? 'http://localhost:5984').replace(/\/+$/, '');
 const COUCHDB_USER     = process.env.COUCHDB_USER  ?? 'admin';
@@ -87,7 +88,7 @@ async function synthesize(clusterId: string, docs: Array<{ title: string; body: 
 		const res = await fetch(`${ROTORQUANT_URL}/v1/chat/completions`, {
 			method: 'POST', headers: { 'Content-Type': 'application/json' },
 			body:   JSON.stringify({
-				model:      'gemma4-rotorquant:latest',
+				model:      LLM_MODEL_ID,
 				max_tokens: 800,
 				messages: [{ role: 'user', content: prompt }],
 			}),

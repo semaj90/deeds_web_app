@@ -7,8 +7,8 @@
  * current baseline, self-evals each response, then returns a pass/fail verdict.
  *
  * Body:
- *   model         string   — candidate Ollama model name (e.g. "gemma4-rotorquant:latest-v2:latest")
- *   baseline?     string   — baseline model (default: gemma4-rotorquant:latest)
+ *   model         string   — candidate model name
+ *   baseline?     string   — baseline model (default: canonical runtime model)
  *   testQueries?  string[] — override the default probe set (max 10)
  *   minDelta?     number   — minimum avg score improvement required to pass (default 0.02)
  *   timeoutMs?    number   — per-query timeout in ms (default 30000)
@@ -26,6 +26,7 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { bifrostChat, listAvailableModels } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ── Default probe queries ──────────────────────────────────────────────────
 
@@ -41,7 +42,7 @@ const DEFAULT_PROBES = [
 
 const bodySchema = z.object({
 	model:       z.string().min(1).max(200),
-	baseline:    z.string().max(200).default('gemma4-rotorquant:latest'),
+	baseline:    z.string().max(200).default(LLM_MODEL_ID),
 	testQueries: z.array(z.string().max(500)).max(10).optional(),
 	minDelta:    z.number().min(-1).max(1).default(0.02),
 	timeoutMs:   z.number().int().min(5000).max(120000).default(30000),

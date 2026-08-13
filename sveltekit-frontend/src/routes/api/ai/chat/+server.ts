@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { z } from 'zod';
 import { routeInference } from '$lib/server/inference/inference-router.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const chatMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
@@ -55,7 +56,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     return json({
       response: result.text || '',
-      model: result.model || 'gemma4-rotorquant:latest',
+      model: result.model || LLM_MODEL_ID,
       backend: result.backend,
       performance: { latencyMs: result.latencyMs },
     });

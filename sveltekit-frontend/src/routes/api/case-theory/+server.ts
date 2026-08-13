@@ -12,6 +12,7 @@ import type { CaseTheoryRequestPayload, CaseTheoryPlan } from '$lib/types/case-t
 import { generateCompletion } from '$lib/server/ai/ollama-client.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const SYSTEM_PROMPT = `You are a senior legal strategist. Given case facts, charges, and evidence, produce a structured case theory plan as JSON.
 
@@ -117,7 +118,7 @@ export const POST: RequestHandler = async (event) => {
 
 		const result = await generateCompletion({
 			prompt: userPrompt,
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			systemPrompt: SYSTEM_PROMPT,
 			temperature: 0.4,
 			maxTokens: 4096,
@@ -156,7 +157,7 @@ export const POST: RequestHandler = async (event) => {
 			metadata: {
 				timestamp: new Date().toISOString(),
 				processingTime,
-				model: 'gemma4-rotorquant:latest'
+				model: LLM_MODEL_ID
 			}
 		});
 	} catch (err) {

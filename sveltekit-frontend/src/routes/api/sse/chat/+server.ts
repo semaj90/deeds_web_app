@@ -1947,7 +1947,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const sKey = synthesisKey.forQuery(
           synthCaseId,
           message,
-          model ?? 'gemma4-rotorquant:latest',
+          model ?? 'LLM_MODEL_ID',
           'v1',
           synthCaseVersion
         );
@@ -1981,7 +1981,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             '$lib/server/cache/redis-exact-match.js'
           );
           const exactCacheKey = generateCacheKey({
-            model: model ?? 'gemma4-rotorquant:latest',
+            model: model ?? 'LLM_MODEL_ID',
             messages: [
               { role: 'system', content: systemPrompt },
               ...conversationHistory,
@@ -2020,7 +2020,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             : await lookupCachedResponseWithBudget({
                 query: message,
                 context: systemPrompt,
-                model: model ?? 'gemma4-rotorquant:latest',
+                model: model ?? 'LLM_MODEL_ID',
               });
       }
 
@@ -2083,7 +2083,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             citations: extractedCitations,
           },
           conversationTurns: conversationHistory.length,
-          model: model ?? 'gemma4-rotorquant:latest',
+          model: model ?? 'LLM_MODEL_ID',
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           cachedResponse: true,
           cachedAt: cacheResult.cachedAt,
@@ -2159,7 +2159,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         await traceLLM(
           'sse-chat-generation',
           {
-            model: model ?? 'gemma4-rotorquant:latest',
+            model: model ?? 'LLM_MODEL_ID',
             backend: 'auto',
             prompt: flatPrompt,
             policyAction: policyDecision.action,
@@ -2192,7 +2192,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
             try {
               const cachedResponse = await getCachedStreamResponse(ollamaMessages, {
-                model: model ?? 'gemma4-rotorquant:latest',
+                model: model ?? 'LLM_MODEL_ID',
                 temperature: 0.7,
                 maxTokens: 2048,
               });
@@ -2336,7 +2336,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // Note: cacheHit tracking removed - always attempt to cache successful responses
         if (fullResponse) {
           storeCachedStreamResponse(ollamaMessages, fullResponse, {
-            model: model ?? 'gemma4-rotorquant:latest',
+            model: model ?? 'LLM_MODEL_ID',
             temperature: 0.7,
             maxTokens: 2048,
           }).catch((cacheErr) => {
@@ -2613,7 +2613,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             citations: extractedCitations,
           },
           conversationTurns: conversationHistory.length,
-          model: model ?? 'gemma4-rotorquant:latest',
+          model: model ?? 'LLM_MODEL_ID',
           glossaryMatches: serializeGlossaryMatches(glossaryMatches),
           ...(aceEvaluation
             ? {
@@ -2650,7 +2650,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           logInference({
             type: 'llm',
             model:
-              inferenceBackend === 'ollama' ? (model ?? 'gemma4-rotorquant:latest') : inferenceBackend,
+              inferenceBackend === 'ollama' ? (model ?? 'LLM_MODEL_ID') : inferenceBackend,
             backend: inferenceBackend,
             latencyMs: Math.round(performance.now() - llmStreamStart),
             tokenCount: tokenSeq,
@@ -2677,7 +2677,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               sessionId: conversationId,
               message: fullResponse.slice(0, 5000),
               role: 'assistant',
-              metadata: { model: model ?? 'gemma4-rotorquant:latest', confidence },
+              metadata: { model: model ?? 'LLM_MODEL_ID', confidence },
             });
           })
           .catch((err) => {
@@ -2711,7 +2711,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                 queryEmbedding: embedData.embedding,
                 context: systemPrompt,
                 response: fullResponse,
-                model: model ?? 'gemma4-rotorquant:latest',
+                model: model ?? 'LLM_MODEL_ID',
                 confidence,
               }).catch((err) => console.warn('[SSE Chat] L2 Qdrant cache storage failed:', err));
 
@@ -2719,7 +2719,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
               import('$lib/server/cache/redis-exact-match.js')
                 .then(({ generateCacheKey, setExactMatchCache }) => {
                   const exactCacheKey = generateCacheKey({
-                    model: model ?? 'gemma4-rotorquant:latest',
+                    model: model ?? 'LLM_MODEL_ID',
                     messages: [
                       { role: 'system', content: systemPrompt },
                       ...conversationHistory,
@@ -2730,7 +2730,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
                   });
                   setExactMatchCache(exactCacheKey, {
                     content: fullResponse,
-                    model: model ?? 'gemma4-rotorquant:latest',
+                    model: model ?? 'LLM_MODEL_ID',
                     backend: inferenceBackend,
                   }).catch((err) => console.warn('[SSE Chat] L1 Redis cache storage failed:', err));
                 })
@@ -2751,13 +2751,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
           const sKey = synthesisKey.forQuery(
             synthCaseId,
             message,
-            model ?? 'gemma4-rotorquant:latest',
+            model ?? 'LLM_MODEL_ID',
             'v1',
             synthCaseVersion
           );
           setCache(
             sKey,
-            { response: fullResponse, confidence, model: model ?? 'gemma4-rotorquant:latest' },
+            { response: fullResponse, confidence, model: model ?? 'LLM_MODEL_ID' },
             TTL.SYNTHESIS * 1000
           ).catch((err) => {
             console.warn(

@@ -34,6 +34,22 @@ function makeCard(dirPath = 'src/lib/x'): AgentsDirectoryCard {
 		lastIndexedAt:   '2026-05-11T22:00:00.000Z',
 		contentHash:     'a'.repeat(64),
 		gates:           {},
+		clusterPacket:   {
+			packetKey: 'sha256:cluster-packet',
+			clusterSummaryKey: `${dirPath}:cluster:summary:0`,
+			summary: 'cluster summary',
+			topFiles: ['src/lib/x/a.ts'],
+			authorityScore: 0.9,
+			pageRankTop5: [{
+				filePath: 'src/lib/x/a.ts',
+				pageRank: 0.42,
+				karpathyBlend: 0.7,
+			}],
+			representationId: 'semantic_768',
+			representationRevision: 1,
+			centroidKey: 'gpu:autoencoder:centroids_64',
+			graphRevision: 'graph-rev-1',
+		},
 	};
 }
 
@@ -42,7 +58,7 @@ function makeCard(dirPath = 'src/lib/x'): AgentsDirectoryCard {
 describe('writeCardToCouchDB', () => {
 	it('returns skipped=disabled when enabled is false (default)', async () => {
 		const fetcher = vi.fn();
-		const r = await writeCardToCouchDB(makeCard(), { enabled: false, fetchImpl: fetcher });
+		const r = await writeCardToCouchDB(makeCard(), { enabled: false, fetchImpl: fetcher, url: 'http://localhost:5984' });
 		expect(r.wrote).toBe(false);
 		expect(r.skipped).toBe('disabled');
 		expect(fetcher).not.toHaveBeenCalled();
@@ -52,7 +68,7 @@ describe('writeCardToCouchDB', () => {
 		// VITEST is set automatically by the test runner; explicitly enabled=true
 		// must NOT bypass the env gate without allowLiveWritesInTests:true.
 		const fetcher = vi.fn();
-		const r = await writeCardToCouchDB(makeCard(), { enabled: true, fetchImpl: fetcher });
+		const r = await writeCardToCouchDB(makeCard(), { enabled: true, fetchImpl: fetcher, url: 'http://localhost:5984' });
 		expect(r.wrote).toBe(false);
 		expect(r.skipped).toBe('test-env-blocked');
 		expect(fetcher).not.toHaveBeenCalled(); // ← the critical invariant
@@ -65,6 +81,7 @@ describe('writeCardToCouchDB', () => {
 			.mockResolvedValueOnce({ ok: true, json: async () => ({}) } as unknown as Response);
 		const r = await writeCardToCouchDB(makeCard(), {
 			enabled: true,
+			url: 'http://localhost:5984',
 			fetchImpl: fetcher,
 			allowLiveWritesInTests: true,
 		});
@@ -80,6 +97,7 @@ describe('writeCardToCouchDB', () => {
 		} as unknown as Response);
 		const r = await writeCardToCouchDB(card, {
 			enabled: true,
+			url: 'http://localhost:5984',
 			fetchImpl: fetcher,
 			allowLiveWritesInTests: true,
 		});
@@ -94,6 +112,7 @@ describe('writeCardToCouchDB', () => {
 			.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ reason: 'boom' }) } as unknown as Response);
 		const r = await writeCardToCouchDB(makeCard(), {
 			enabled: true,
+			url: 'http://localhost:5984',
 			fetchImpl: fetcher,
 			allowLiveWritesInTests: true,
 		});
@@ -139,6 +158,8 @@ describe('backfillQdrantPayload', () => {
 		const body = JSON.parse(init.body as string);
 		expect(body.payload.agents_card_id).toBe('agents:dir:src-lib-x');
 		expect(body.payload.feature_keys).toEqual(['k1', 'k2']);
+		expect(body.payload.cluster_packet.packet_key).toBe('sha256:cluster-packet');
+		expect(body.payload.cluster_packet_key).toBe('sha256:cluster-packet');
 		expect(body.filter.should).toHaveLength(2); // file_path + path
 	});
 

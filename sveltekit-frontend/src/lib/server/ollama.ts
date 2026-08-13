@@ -68,6 +68,7 @@ import { Agent } from 'undici';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { TURBOQUANT_BASE_URL } from '$lib/ai/model-ids.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import crypto from 'node:crypto';
 import type { LlmCacheTrace } from '$lib/server/ai/llm-cache-trace.js';
 import { resolveRuntimeConfig } from '$lib/server/ai/inference-configs.js';
@@ -107,7 +108,9 @@ export function getOllamaGenerationEndpoint(): string {
 }
 
 const OLLAMA_BASE_URL = CHAT_BASE_URL;
-const CHAT_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+// Model selection source of truth is ROTORQUANT_MODEL_PATH (via runtime-contract.ts),
+// never a separately-set chat-model env var. See llm/runtime-contract.ts.
+const CHAT_MODEL = LLM_MODEL_ID;
 const REQUEST_TIMEOUT_MS = Number(process.env?.OLLAMA_TIMEOUT_MS ?? '600000');
 
 export function getOllamaRequestTimeoutMs(): number {
@@ -167,11 +170,14 @@ export function assertDirectOllamaAllowed(
 // Populate VLM_MODELS from ENV now that ENV is initialized.
 // CRITICAL: Embedding uses Ollama. Synthesis uses llama-server :8090.
 VLM_MODELS.embedding = ENV.OLLAMA_EMBED_MODEL ?? 'embeddinggemma:latest';
-// Synthesis models: prefer env overrides, else use llama-server canonical
-VLM_MODELS.legal = ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
-VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
-VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
-VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+// Synthesis models: derived from ROTORQUANT_MODEL_PATH (runtime-contract.ts), not a
+// second chat-model env var. GEMMA4_MODEL/OLLAMA_VLM_MODEL/FUNCTION_GEMMA_MODEL remain
+// as explicit per-role overrides ONLY for operators running a second llama-server
+// instance on a different port for that role.
+VLM_MODELS.legal = LLM_MODEL_ID;
+VLM_MODELS.gemma4 = ENV.GEMMA4_MODEL ?? LLM_MODEL_ID;
+VLM_MODELS.vision = ENV.OLLAMA_VLM_MODEL ?? LLM_MODEL_ID;
+VLM_MODELS.tool = ENV.FUNCTION_GEMMA_MODEL ?? LLM_MODEL_ID;
 
 // ── HTTP Keep-Alive Agent ───────────────────────────────────────────────────
 // Reuses TCP connections to Ollama instead of creating new ones per request.
@@ -1161,7 +1167,11 @@ export async function bifrostChat(
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: model, // llama-server accepts both ollama model names and .gguf paths
+              // Direct-to-llama-server path: announce what this server actually has
+              // loaded (LLM_MODEL_ID), not the caller's gateway-routing tag (which may
+              // name a different backend, e.g. a Docker Ollama model like
+              // gemma4-legal-vlm:latest that only the Bifrost gateway can resolve).
+              model: LLM_MODEL_ID,
               messages: messagesForInference,
               temperature: options?.temperature ?? 0.7,
               max_tokens: options?.maxTokens ?? 2048,
@@ -1193,7 +1203,7 @@ export async function bifrostChat(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model, // use original model name
+        model: LLM_MODEL_ID, // this server only ever has ROTORQUANT_MODEL_PATH loaded
         messages: messagesForInference,
         stream: false,
         ...(options?.tools ? { tools: options.tools } : {}),

@@ -15,6 +15,7 @@
 import type { BackendName } from './model-loader.js';
 import { resolveRuntimeConfig } from './inference-configs.js';
 import { canUseTurboQuant } from './backend-runtime-guards.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,8 +52,8 @@ export interface RoutingDecision {
 // ─── Model constants ─────────────────────────────────────────────────────────
 
 export const MODELS = {
-  LEGAL_VLM:   'gemma4-rotorquant:latest',   // unified text+vision, production
-  LEGAL_TEXT:  'gemma4-rotorquant:latest',        // text-only fallback
+  LEGAL_VLM:   LLM_MODEL_ID,   // unified text+vision, production
+  LEGAL_TEXT:  LLM_MODEL_ID,        // text-only fallback
   FAST:        'gemma3:270m',                // sub-2s for simple queries
   EMBED:       'embeddinggemma:latest',
 } as const;

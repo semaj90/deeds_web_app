@@ -6,6 +6,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { LLAMA_SERVER_BASE_URL } from '$lib/server/ai/local-llama-provider.js';
 import { z } from 'zod';
@@ -20,7 +21,7 @@ const RUNTIME_CONTEXT_SIZE = Number(
 );
 
 
-const MODEL = ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4:e4b-it-q4_K_M';
+const MODEL = LLM_MODEL_ID;
 const TURBOQUANT_BASE_URL = ENV.TURBOQUANT_BASE_URL;
 
 const synthesisSchema = z.object({

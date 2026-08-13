@@ -6,6 +6,7 @@ import {
 	type Phase101SummaryGeneration,
 	type Phase101SummarySynthesis
 } from '$lib/server/cache/phase101-summary-cache.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const synthesizeSchema = z.object({
 	documentId: z.string().min(1),
@@ -20,7 +21,7 @@ const synthesizeSchema = z.object({
 	featureIds: z.array(z.string().min(1)).default([]),
 	intent: z.string().max(120).default('summary'),
 	promptVersion: z.string().max(80).default('phase101-summary-v1'),
-	model: z.string().max(120).default('gemma4-rotorquant:latest')
+	model: z.string().max(120).default(LLM_MODEL_ID)
 });
 
 /** POST /api/summarize/synthesize — Synthesize insights from document sections */

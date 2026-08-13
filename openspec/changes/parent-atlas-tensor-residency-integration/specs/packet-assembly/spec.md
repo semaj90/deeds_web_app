@@ -21,6 +21,45 @@ Required fields:
 - schema_version
 - idempotency_key
 
+## Cluster packet materialization
+
+Cluster summaries produced by `graphify-som-cluster-summaries.mjs` SHALL be
+materialized into canonical ACE packets through a pure builder, then committed
+to Postgres first.
+
+Cluster packet requirements:
+
+- input source is `cluster:summary:{clusterId}` from Valkey
+- builder validates the summary record before any write
+- deterministic identity depends on the cluster summary key, workspace revision,
+  source revision, graph revision, cluster id, centroid lineage, and
+  representation revision
+- Postgres remains the canonical commit target
+- Valkey is only a warm/readback mirror
+- Qdrant and Neo4j may consume the packet later, but they do not define its identity
+
+The newer Atlas vector-selection slice sits underneath this assembler as a
+supporting layer only. It adds:
+
+- `src/lib/server/atlas/vector/ace-packet-vector.ts`
+- `src/lib/server/atlas/vector/turbovec-interpolation.ts`
+- `src/lib/server/atlas/ranking/packet-feature-matrix.ts`
+
+ACE compatibility re-exports remain in place, but the canonical owner for the
+vector slice is now `src/lib/server/atlas/`.
+
+Proof gate for this lane:
+
+- build
+- validate
+- Postgres commit
+- Postgres readback
+- Valkey warm
+- Valkey readback
+- canonical hash comparison
+- replay the same input and verify the packet key stays stable
+- fail closed if any readback diverges
+
 ## Serialization policy
 
 - JSON + simdjson/JSON parser: small control messages.

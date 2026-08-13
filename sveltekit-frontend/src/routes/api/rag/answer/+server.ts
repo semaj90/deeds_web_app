@@ -15,6 +15,7 @@ import { getOllamaEndpoint } from '$lib/server/utils/ollama-endpoint.js';
 import { z } from 'zod';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const OLLAMA_URL = getOllamaEndpoint();
 
@@ -111,12 +112,12 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		const prompt = `${systemPrompt}${contextBlock}Question: ${query}\n\nProvide a comprehensive legal analysis. Include [Source N] citations where applicable.${include_todos ? ' Also list any recommended action items.' : ''}`;
 
 		// Call Ollama (or Bifrost) for generation
-		const { answerText, genTime, evalCount } = await traceLLM('rag-answer', { model: 'gemma4-rotorquant:latest', prompt: query.slice(0, 500), case_id }, async (gen) => {
+		const { answerText, genTime, evalCount } = await traceLLM('rag-answer', { model: LLM_MODEL_ID, prompt: query.slice(0, 500), case_id }, async (gen) => {
 			// Route through Bifrost gateway when enabled (gets semantic caching)
 			if (ENV.BIFROST_ENABLED) {
 				const text = await bifrostChat(
 					[{ role: 'user', content: prompt }],
-					'gemma4-rotorquant:latest',
+					LLM_MODEL_ID,
 					{ maxTokens: max_tokens, temperature, timeoutMs: 30_000 }
 				);
 				gen.end({ output: text.slice(0, 1000) });
@@ -127,7 +128,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
+					model: LLM_MODEL_ID,
 					prompt,
 					stream: false,
 					options: {
@@ -208,7 +209,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			summary: answerText.slice(0, 200) + (answerText.length > 200 ? '...' : ''),
 			citations,
 			action_items: actionItems,
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			tokens_used: evalCount ?? Math.ceil(answerText.length / 4),
 			generation_time_ms: Math.round(genTime),
 			answer_confidence: answerConfidence,
@@ -219,7 +220,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// Track token usage (fire-and-forget)
 		trackTokenUsage({
 			endpoint: '/api/rag/answer',
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			completionTokens: evalCount ?? Math.ceil(answerText.length / 4),
 			durationMs: Math.round(genTime),
 		});
@@ -240,7 +241,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					confidence:     answerConfidence,
 					groundingScore: groundingScore,
 					tokensUsed:     evalCount ?? Math.ceil(answerText.length / 4),
-					model:          'gemma4-rotorquant:latest',
+					model:          LLM_MODEL_ID,
 				});
 			} catch (err) {
 				console.warn('[rag/answer] code-llm record skipped:', (err as Error)?.message ?? err);

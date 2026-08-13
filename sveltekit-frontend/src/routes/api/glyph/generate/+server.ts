@@ -2,6 +2,7 @@ import type { RequestHandler } from './$types';
 import type { GlyphRequest } from '$lib/server/glyph-diffusion-service.js';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const glyphSchema = z.object({
 	evidence_id: z.string().min(1),
@@ -34,7 +35,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				prompt: `Generate a JSON descriptor for a legal evidence visualization glyph.
 Style: ${style}
 Dimensions: ${dimensions[0]}x${dimensions[1]}

@@ -1,6 +1,7 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const analyzeSchema = z.object({
 	documentId: z.string().min(1),
@@ -38,7 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				prompt: `Analyze the following legal document sections. For each section, provide a relevance score (0-1) and brief explanation.
 
 Sections:

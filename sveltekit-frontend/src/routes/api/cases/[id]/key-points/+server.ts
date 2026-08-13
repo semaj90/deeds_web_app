@@ -7,6 +7,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { z } from 'zod';
 import { isUuid } from '$lib/server/validation.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /** GBNF-constrained response schema for key points */
 const keyPointsResponseSchema = z.object({
@@ -91,7 +92,7 @@ Respond with ONLY a JSON object:
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
+					model: LLM_MODEL_ID,
 					prompt,
 					format: keyPointsResponseJsonSchema,
 					stream: false,

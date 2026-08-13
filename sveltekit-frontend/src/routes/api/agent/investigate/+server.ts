@@ -4,6 +4,7 @@ import { createAutonomousAgent } from '$lib/server/agent/autonomous-agent.js';
 import { SupervisorAgent } from '$lib/server/agent/supervisor.js';
 import { SUBAGENT_TOOL_MAP } from '$lib/server/agent/subagents.js';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * POST /api/agent/investigate
@@ -191,10 +192,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
  */
 export const GET: RequestHandler = async ({ locals }) => {
 	if (!locals.user) return json({ error: 'Unauthorized' }, { status: 401 });
-	return json({
+    return json({
     name: 'Autonomous Investigation Agent',
     architecture: 'LangGraph StateGraph + Supervisor Routing',
-    model: 'gemma4-rotorquant:latest',
+    model: LLM_MODEL_ID,
     toolCount: 32,
     modes: {
       supervisor: {

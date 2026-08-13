@@ -10,7 +10,7 @@
  *   generateFixRecommendationsFromAce(...)— targeted repair plan for Claude Code
  */
 
-import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import crypto from 'node:crypto';
 import type { AceCodeIntelContext } from './codeintel-datastore.js';
 import {
@@ -196,7 +196,7 @@ export function buildGemma4AcePrompt(context: AceCodeIntelContext, task?: string
 // LLM caller
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DEFAULT_MODEL = ENV.ROTORQUANT_CHAT_MODEL ?? ENV.GEMMA4_MODEL;
+const DEFAULT_MODEL = LLM_MODEL_ID;
 
 export async function callGemma4WithAceContext(
   context: AceCodeIntelContext,

@@ -12,11 +12,12 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const requestSchema = z.object({
 	prompt: z.string().min(1).max(10_000),
 	threshold: z.number().min(0).max(1).default(0.8),
-	model: z.string().optional().default('gemma4-rotorquant:latest'),
+	model: z.string().optional().default(LLM_MODEL_ID),
 });
 
 export const POST: RequestHandler = async ({ request, locals }) => {

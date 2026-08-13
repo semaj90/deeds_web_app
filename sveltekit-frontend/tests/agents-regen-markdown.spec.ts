@@ -38,6 +38,22 @@ function makeCard(overrides: Partial<AgentsDirectoryCard> = {}): AgentsDirectory
 		qdrantTags:      ['ace', 'retrieval', 'kag'],
 		neo4jNodeId:     'agents:dir:src-lib-server-ace',
 		couchDocId:      'agents:dir:src-lib-server-ace',
+		clusterPacket:   {
+			packetKey: 'sha256:cluster-packet',
+			clusterSummaryKey: `${'src/lib/server/ace'}:cluster:summary:0`,
+			summary: 'cluster summary',
+			topFiles: ['src/lib/server/ace/a.ts'],
+			authorityScore: 0.9,
+			pageRankTop5: [{
+				filePath: 'src/lib/server/ace/a.ts',
+				pageRank: 0.42,
+				karpathyBlend: 0.7,
+			}],
+			representationId: 'semantic_768',
+			representationRevision: 1,
+			centroidKey: 'gpu:autoencoder:centroids_64',
+			graphRevision: 'graph-rev-1',
+		},
 		auditStatus:     'SHIPPED',
 		recommendations: ['src/lib/server/rag', 'src/lib/server/vector'],
 		activityScore:   3.14,
@@ -85,6 +101,7 @@ describe('renderBlockBody', () => {
 		const body = renderBlockBody('topology', card);
 		expect(body).toContain('retrieval');
 		expect(body).toContain('agents:dir:src-lib-server-ace');
+		expect(body).toContain('clusterSummaryKey');
 	});
 
 	it('status block renders auditStatus + recommendations', () => {
@@ -254,7 +271,7 @@ describe('writeCardMarkdown', () => {
 		const [absPath, body] = writeFn.mock.calls[0] as [string, string];
 		// platform-agnostic: normalise back-slashes so the assertion works on Windows + posix
 		expect(absPath.replace(/\\/g, '/')).toContain('src/lib/server/ace');
-		expect(absPath.endsWith('AGENTS.md')).toBe(true);
+		expect(absPath.endsWith('LLMS.md')).toBe(true);
 		expect(body).toContain('<!-- @auto:summary start -->');
 	});
 

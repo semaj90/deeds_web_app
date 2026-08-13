@@ -6,16 +6,13 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { and, eq, or, isNull, arrayContains } from 'drizzle-orm';
 import { z } from 'zod';
-import { ENV } from '$lib/server/env.server.js';
-import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 
 const generateReportSchema = z.object({
 	caseId: z.string().min(1, 'Case ID is required').max(500),
 	type: z.string().max(100).optional().default('charging_memo'),
 });
-
-const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 type CaseRow = typeof cases.$inferSelect;
 type EvidenceRow = typeof evidence.$inferSelect;
@@ -160,21 +157,22 @@ ${citationsData.length > 0 ? '7. ' : '6. '}Conclusion and Recommendation
 Output ONLY the HTML content (no markdown, no code fences). Use h1, h2, h3, p, ul, li, strong, em tags.`;
 
   try {
-    const res = await ollamaFetch(`${OLLAMA_URL}/api/generate`, {
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemma4-rotorquant:latest',
-        prompt,
+        model: LOCAL_VLM_MODEL,
+        messages: [{ role: 'user', content: prompt }],
         stream: false,
-        options: { temperature: 0.3, num_predict: 2048 },
+        temperature: 0.3,
+        max_tokens: 2048,
       }),
       signal: AbortSignal.timeout(30000),
     });
 
     if (res.ok) {
       const data = await res.json();
-      const aiHtml = data.response?.trim() ?? '';
+      const aiHtml = String(data?.choices?.[0]?.message?.content ?? '').trim();
       if (aiHtml.length > 100) {
         return {
           html: aiHtml,
@@ -182,7 +180,7 @@ Output ONLY the HTML content (no markdown, no code fences). Use h1, h2, h3, p, u
             type: 'doc',
             content: [{ type: 'paragraph', content: [{ type: 'text', text: aiHtml }] }],
           },
-          raw: data.response,
+          raw: aiHtml,
         };
       }
     }

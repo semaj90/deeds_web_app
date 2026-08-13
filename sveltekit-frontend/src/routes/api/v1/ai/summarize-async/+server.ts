@@ -2,11 +2,12 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { z } from 'zod';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const summarizeSchema = z.object({
   content: z.string().min(1).max(200000),
   textHash: z.string().min(1).max(128),
-  model: z.string().max(100).default('gemma4-rotorquant:latest'),
+  model: z.string().max(100).default(LLM_MODEL_ID),
   embedModel: z.string().max(100).optional(),
 });
 

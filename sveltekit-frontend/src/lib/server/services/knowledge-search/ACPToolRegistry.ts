@@ -17,6 +17,7 @@ import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { createSearchRuntime } from '$lib/server/retrieval/search-runtime.js';
 import { searchResultToHyperRagResult } from '$lib/server/retrieval/canonical-hyperrag-adapter.js';
 import { loadDailyGraphifyBoard } from '$lib/server/atlas/board/daily-graphify-board.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
 	buildPhase89WorkflowPlan,
 	buildPhase89FabricLaneManifest,
@@ -60,7 +61,7 @@ const CONFIG = {
   },
   models: {
     embedding: process.env.EMBEDDING_MODEL || 'embeddinggemma:latest',
-    chat: process.env.OLLAMA_MODEL || 'gemma4-rotorquant:latest',
+    chat: process.env.OLLAMA_MODEL || LLM_MODEL_ID,
   },
   timeouts: {
     default: 30000,
@@ -451,7 +452,7 @@ const handlers: Record<string, HandlerFn> = {
     if (options?.dryRun) {
       return planResult([
         { action: 'lookup', target: 'RAGRetriever', detail: 'Find similar past errors + fixes' },
-        { action: 'generate', target: 'Ollama', detail: 'Generate fix code via gemma4-rotorquant:latest' },
+        { action: 'generate', target: 'llama-server', detail: 'Generate fix code via the canonical runtime model' },
         { action: 'validate', target: 'FixSynthesizer', detail: 'Check syntax and AST validity' }
       ], startTime);
     }
@@ -923,7 +924,7 @@ export const TOOLS: Record<string, ACPTool> = {
       type: 'object',
       properties: {
         prompt: { type: 'string' },
-        model: { type: 'string', description: 'Ollama model name (default: gemma4-rotorquant:latest)' }
+        model: { type: 'string', description: 'llama-server model name (default: LLM_MODEL_ID)' }
       },
       required: ['prompt']
     },

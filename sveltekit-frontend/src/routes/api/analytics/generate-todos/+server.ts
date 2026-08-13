@@ -21,6 +21,7 @@ import { randomUUID } from 'crypto';
 import { pool } from '$lib/server/db/client';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { fastJsonParse } from '$lib/server/gpu/simdjson-bridge.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ── Schema ────────────────────────────────────────────────────────────────
 
@@ -278,7 +279,7 @@ Generate 5-10 todos ordered by estimated impact descending.`;
   }> = [];
 
   try {
-    const raw = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-rotorquant:latest', {
+    const raw = await bifrostChat([{ role: 'user', content: prompt }], LLM_MODEL_ID, {
       temperature: 0.1,
       maxTokens: 1500,
       cacheKey: `generate-todos-${days}d`,
@@ -342,7 +343,7 @@ Generate 5-10 todos ordered by estimated impact descending.`;
             t.reason.slice(0, 1000),
             t.suggested_action.slice(0, 500),
             t.estimated_impact,
-            JSON.stringify({ userId, days, generatedBy: 'gemma4-rotorquant:latest' }),
+            JSON.stringify({ userId, days, generatedBy: LLM_MODEL_ID }),
           ]
         );
         inserted++;

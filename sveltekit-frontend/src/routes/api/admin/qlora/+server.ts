@@ -9,6 +9,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { sql } from 'drizzle-orm';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import type { Redis } from 'ioredis';
 import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client';
@@ -25,7 +26,7 @@ const qloraConfigSchema = z.object({
 });
 
 const qloraSubmitSchema = z.object({
-	model: z.string().max(200).optional().default('gemma4-rotorquant:latest'),
+	model: z.string().max(200).optional().default(LLM_MODEL_ID),
 	dataset: z.string().max(200).optional().default('legal-qa-pairs'),
 	config: qloraConfigSchema.optional().default({})
 });

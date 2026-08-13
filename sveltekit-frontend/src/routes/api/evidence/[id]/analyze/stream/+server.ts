@@ -30,8 +30,9 @@ import { evidence, evidenceAuditLog } from '$lib/server/db/schema-postgres.js';
 import { eq } from 'drizzle-orm';
 import { isUuid } from '$lib/server/validation.js';
 import { acquireGpuLease } from '$lib/server/inference/gpu-arbiter.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
-const MODEL = 'gemma4-rotorquant:latest';
+const MODEL = LLM_MODEL_ID;
 const MAX_CONTEXT_CHARS = 8_000; // cap extractedText to keep the prompt bounded
 
 function buildAnalysisPrompt(item: {

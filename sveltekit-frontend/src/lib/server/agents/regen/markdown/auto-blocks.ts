@@ -119,6 +119,18 @@ function renderTopology(card: AgentsDirectoryCard): string {
 	} else {
 		lines.push('', '**Qdrant tags:** ' + card.qdrantTags.slice(0, 16).map((t) => `\`${t}\``).join(' · '));
 	}
+	if (card.clusterPacket) {
+		lines.push('');
+		lines.push('**Cluster packet:**');
+		lines.push(`- \`packetKey\`: \`${card.clusterPacket.packetKey}\``);
+		lines.push(`- \`clusterSummaryKey\`: \`${card.clusterPacket.clusterSummaryKey}\``);
+		lines.push(`- \`representationId\`: \`${card.clusterPacket.representationId}\``);
+		lines.push(`- \`representationRevision\`: \`${card.clusterPacket.representationRevision}\``);
+		lines.push(`- \`centroidKey\`: \`${card.clusterPacket.centroidKey}\``);
+		if (card.clusterPacket.graphRevision) {
+			lines.push(`- \`graphRevision\`: \`${card.clusterPacket.graphRevision}\``);
+		}
+	}
 	if (card.neo4jNodeId) lines.push('', `**Neo4j node id:** \`${card.neo4jNodeId}\``);
 	if (card.couchDocId)  lines.push(`**CouchDB doc id:** \`${card.couchDocId}\``);
 	return lines.join('\n');

@@ -6,6 +6,7 @@
  */
 import type { UnifiedRetrievalResult } from '$lib/server/types/retrieval.js';
 import type { AcePayload } from '$lib/server/ace/ace-payload-selector.js';
+import type { ContextManifest } from './context-compiler.parent-atlas.js';
 
 export interface ACEUserProfile {
 	userId: string;
@@ -264,6 +265,8 @@ export interface ACEContext {
   } | null;
   /** Deterministic policy decision used to size context and route tools */
   policyDecision: ACEPolicyDecision | null;
+  /** Optional compiled manifest for exact packet injection receipts. */
+  contextManifest?: ContextManifest | null;
   /**
    * nes-arch path-first directory context (LLMS.md spec).
    */

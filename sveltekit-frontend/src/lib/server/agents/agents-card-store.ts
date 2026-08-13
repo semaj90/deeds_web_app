@@ -36,6 +36,22 @@ export const agentsDirectoryCardSchema = z.object({
 	qdrantTags:     z.array(z.string()).default([]),
 	neo4jNodeId:    z.string().optional(),
 	couchDocId:     z.string().optional(),
+	clusterPacket:  z.object({
+		packetKey: z.string().min(1),
+		clusterSummaryKey: z.string().min(1),
+		summary: z.string().max(2000),
+		topFiles: z.array(z.string()).default([]),
+		authorityScore: z.number().nullable().default(null),
+		pageRankTop5: z.array(z.object({
+			filePath: z.string().min(1),
+			pageRank: z.number(),
+			karpathyBlend: z.number(),
+		})).default([]),
+		representationId: z.string().min(1),
+		representationRevision: z.number().int().nonnegative(),
+		centroidKey: z.string().min(1),
+		graphRevision: z.string().nullable().default(null),
+	}).optional(),
 
 	/** SHIPPED | PARTIAL | SPEC_ONLY | SCHEMA_DEFERRED | EXPERIMENTAL */
 	auditStatus:    z
@@ -91,6 +107,24 @@ export function computeCardContentHash(
 		routeSurfaces:  [...(card.routeSurfaces ?? [])].sort(),
 		schemaTables:   [...(card.schemaTables ?? [])].sort(),
 		qdrantTags:     [...(card.qdrantTags ?? [])].sort(),
+		clusterPacket:  card.clusterPacket ? {
+			packetKey: card.clusterPacket.packetKey,
+			clusterSummaryKey: card.clusterPacket.clusterSummaryKey,
+			summary: card.clusterPacket.summary,
+			topFiles: [...(card.clusterPacket.topFiles ?? [])].sort(),
+			authorityScore: card.clusterPacket.authorityScore ?? null,
+			pageRankTop5: [...(card.clusterPacket.pageRankTop5 ?? [])]
+				.map((entry) => ({
+					filePath: entry.filePath,
+					pageRank: entry.pageRank,
+					karpathyBlend: entry.karpathyBlend,
+				}))
+				.sort((a, b) => a.filePath.localeCompare(b.filePath)),
+			representationId: card.clusterPacket.representationId,
+			representationRevision: card.clusterPacket.representationRevision,
+			centroidKey: card.clusterPacket.centroidKey,
+			graphRevision: card.clusterPacket.graphRevision ?? null,
+		} : undefined,
 		auditStatus:    card.auditStatus ?? 'SPEC_ONLY',
 		gates:          Object.keys(card.gates ?? {}).sort().reduce((acc, k) => {
 			acc[k] = !!card.gates?.[k];

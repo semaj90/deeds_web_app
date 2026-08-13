@@ -7,9 +7,9 @@
  *   { "instruction": "...", "input": "<image: base64>", "output": "..." }
  *
  * Three synthesis modes:
- *   "description" — gemma4 describes each POI photo → (image, description) pairs
- *   "compare"     — gemma4 compares same-person photo pairs → positive/negative contrast pairs
- *   "adversarial" — gemma4 generates "looks similar but different" pairs from different POIs
+ *   "description" — llama-server describes each POI photo → (image, description) pairs
+ *   "compare"     — llama-server compares same-person photo pairs → positive/negative contrast pairs
+ *   "adversarial" — llama-server generates "looks similar but different" pairs from different POIs
  *
  * Output is written to qlora_examples table (existing) and returned as JSONL download.
  * Accessible from /admin/face-gallery admin dashboard.
@@ -22,8 +22,7 @@ import type { RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db/client';
 import { personsOfInterest, poiPhotos } from '$lib/server/db/schema-postgres.js';
 import { eq, sql, desc } from 'drizzle-orm';
-import { ollamaFetch } from '$lib/server/ollama.js';
-import { ENV } from '$lib/server/env.server.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
 import { z } from 'zod';
 
@@ -34,8 +33,7 @@ const bodySchema = z.object({
   download: z.boolean().optional().default(false),
 });
 
-const MODEL = () => ENV.OLLAMA_VLM_MODEL ?? ENV.GEMMA4_MODEL ?? 'gemma4-rotorquant:latest';
-const OLLAMA = () => ENV.OLLAMA_BASE_URL.replace(/\/$/, '');
+const MODEL = () => LOCAL_VLM_MODEL;
 
 function minioInternalBase(): string {
   const proto = ENV.MINIO_USE_SSL === 'true' ? 'https' : 'http';
@@ -57,18 +55,27 @@ async function fetchBase64(url: string): Promise<string | null> {
 
 async function vlmDescribe(imgB64: string, poiName: string): Promise<string> {
   try {
-    const res = await ollamaFetch(`${OLLAMA()}/api/chat`, {
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: MODEL(),
         messages: [{
           role: 'user',
-          content: `Describe the physical appearance of the person in this photo (${poiName}). Focus on distinguishing features useful for forensic identification: face shape, hair, eyes, nose, skin tone, approximate age. Be objective and precise. 2-4 sentences.`,
-          images: [imgB64],
+          content: [
+            {
+              type: 'text',
+              text: `Describe the physical appearance of the person in this photo (${poiName}). Focus on distinguishing features useful for forensic identification: face shape, hair, eyes, nose, skin tone, approximate age. Be objective and precise. 2-4 sentences.`
+            },
+            {
+              type: 'image_url',
+              image_url: { url: `data:image/jpeg;base64,${imgB64}` }
+            }
+          ]
         }],
         stream: false,
-        options: { temperature: 0.3, num_predict: 300 },
+        temperature: 0.3,
+        max_tokens: 300
       }),
       signal: AbortSignal.timeout(60_000),
     });
@@ -84,18 +91,31 @@ async function vlmCompare(imgA: string, imgB: string, samePersonName: string | n
   const isSame = samePersonName !== null;
   const label = isSame ? `Both photos show ${samePersonName}.` : 'These photos show different people.';
   try {
-    const res = await ollamaFetch(`${OLLAMA()}/api/chat`, {
+    const res = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: MODEL(),
         messages: [{
           role: 'user',
-          content: `Compare these two photos for forensic face matching. ${label} Explain which facial features confirm or deny identity. 2-3 sentences.`,
-          images: [imgA, imgB],
+          content: [
+            {
+              type: 'text',
+              text: `Compare these two photos for forensic face matching. ${label} Explain which facial features confirm or deny identity. 2-3 sentences.`
+            },
+            {
+              type: 'image_url',
+              image_url: { url: `data:image/jpeg;base64,${imgA}` }
+            },
+            {
+              type: 'image_url',
+              image_url: { url: `data:image/jpeg;base64,${imgB}` }
+            }
+          ]
         }],
         stream: false,
-        options: { temperature: 0.3, num_predict: 400 },
+        temperature: 0.3,
+        max_tokens: 400
       }),
       signal: AbortSignal.timeout(60_000),
     });
@@ -220,7 +240,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     }
   }
 
-  // ── Mode: adversarial (hard negatives via gemma4 confusability prompt) ────
+  // ── Mode: adversarial (hard negatives via llama-server confusability prompt) ────
   if (mode === 'adversarial') {
     const shuffled = [...poiList].sort(() => Math.random() - 0.5);
     for (let i = 0; i + 1 < shuffled.length && examples.length < limit; i++) {
@@ -229,7 +249,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       if (!photoA?.thumbnailUrl || !photoB?.thumbnailUrl) continue;
       const [b64A, b64B] = await Promise.all([fetchBase64(photoA.thumbnailUrl), fetchBase64(photoB.thumbnailUrl)]);
       if (!b64A || !b64B) continue;
-      // Ask gemma4 to identify the most confusable features, then generate a hard-negative label
+      // Ask llama-server to identify the most confusable features, then generate a hard-negative label
       const reasoning = await vlmCompare(b64A, b64B, null);
       if (!reasoning) continue;
       examples.push({

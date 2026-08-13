@@ -4,6 +4,7 @@ import type { RequestHandler } from './$types';
 import { couchdb } from '$lib/server/services/couchdb-client.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 
 const QDRANT_URL = ENV.QDRANT_URL;
@@ -321,7 +322,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 				{ role: 'system', content: systemPrompt },
 				{ role: 'user',   content: userPrompt },
 			],
-			ENV.ROTORQUANT_CHAT_MODEL,
+			LLM_MODEL_ID,
 			{
 				temperature: 0.2,
 				maxTokens:   800,
@@ -336,7 +337,7 @@ export const POST: RequestHandler = async ({ request, locals, fetch }) => {
 			fixText,
 			errorCount:  errorCards.length,
 			filesContext: affectedFiles,
-			model:       ENV.ROTORQUANT_CHAT_MODEL,
+			model:       LLM_MODEL_ID,
 			cached:      false,  // bifrostChat sets L1 on write; next identical call returns instantly
 			degraded:    errorCards.length === 0,
 		});

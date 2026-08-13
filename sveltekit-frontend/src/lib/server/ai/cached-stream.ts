@@ -20,6 +20,7 @@ import {
   setExactMatchCache,
 } from '$lib/server/cache/redis-exact-match.js';
 import { TTL } from '$lib/server/cache-keys.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface CachedStreamOptions {
   model?: string;
@@ -48,7 +49,7 @@ export async function getCachedStreamResponse(
   messages: Array<{ role: string; content: string }>,
   options: CachedStreamOptions = {}
 ): Promise<string | null> {
-  const { model = 'gemma4-rotorquant:latest', temperature = 0.7, maxTokens = 2048 } = options;
+  const { model = LLM_MODEL_ID, temperature = 0.7, maxTokens = 2048 } = options;
 
   const cacheKey = generateCacheKey({
     model,
@@ -76,7 +77,7 @@ export async function storeCachedStreamResponse(
   options: CachedStreamOptions = {}
 ): Promise<void> {
   const {
-    model = 'gemma4-rotorquant:latest',
+    model = LLM_MODEL_ID,
     temperature = 0.7,
     maxTokens = 2048,
     ttlSeconds = TTL.ACE_PROMPT,

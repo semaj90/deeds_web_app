@@ -10,6 +10,7 @@
  * and in Claude / Copilot context enrichment.
  */
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { getOllamaEndpoint, ollamaFetch } from '$lib/server/ollama.js';
 import { pool } from '$lib/server/db/client';
 import { TTL, clusterSummaryKey } from '$lib/server/cache-keys.js';
@@ -17,7 +18,7 @@ import { traceLLM } from '$lib/server/observability/langfuse.js';
 
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 const TOP_CHUNKS         = 10;
-const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const MODEL = LLM_MODEL_ID;
 
 export interface ClusterSummary {
 	clusterId: number;

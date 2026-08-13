@@ -1,4 +1,5 @@
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { assertEmbeddingModel } from '$lib/ai/model-ids.js';
 import { traceLLM, traceEmbedding } from '$lib/server/observability/langfuse.js';
 import {
@@ -10,7 +11,7 @@ import { getOllamaEndpoint, getOllamaEmbeddingEndpoint } from '$lib/server/utils
 
 const DEFAULT_OLLAMA_URL = getOllamaEndpoint();
 const DEFAULT_EMBED_OLLAMA_URL = getOllamaEmbeddingEndpoint();
-const DEFAULT_GENERATE_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const DEFAULT_GENERATE_MODEL = LLM_MODEL_ID;
 const DEFAULT_EMBED_MODEL = ENV.OLLAMA_EMBED_MODEL;
 const DEFAULT_TIMEOUT_MS = Number(process.env.OLLAMA_TIMEOUT_MS ?? 45_000);
 

@@ -13,6 +13,7 @@ import type { RequestHandler } from './$types';
 import { evaluateResponse, generateCorrectionPrompt } from '$lib/server/ace/self-prompt.js';
 import { UserHistoryTracker } from '$lib/server/ml/user-history.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
@@ -84,7 +85,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
+					model: LLM_MODEL_ID,
 					prompt: `Given this investigation query and result, suggest 4 follow-up investigation queries that would deepen the analysis. For each, rate your confidence (0.0-1.0) that this follow-up will yield useful results, and explain briefly why.
 
 Investigation Query: ${query.slice(0, 300)}

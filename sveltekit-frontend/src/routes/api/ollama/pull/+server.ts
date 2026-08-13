@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // Zod schema validates model name (trimmed, 1-200)
 const ollamaPullSchema = z.object({
@@ -18,7 +19,7 @@ export const GET: RequestHandler = async ({ locals }) => {
  service: 'ollama',
  version: '0.11.10',
  url: OLLAMA_BASE,
- model: 'gemma4-rotorquant:latest',
+ model: LLM_MODEL_ID,
  timestamp: new Date().toISOString(),
  });
 };

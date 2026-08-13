@@ -25,6 +25,7 @@ import { z } from 'zod';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { AI_CONFIG } from '$lib/server/config.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -146,7 +147,7 @@ export async function extractStructured<T>(
 	}
 ): Promise<ExtractResult<T>> {
 	const t0    = performance.now();
-	const model = options?.model ?? ENV.GEMMA4_MODEL ?? ENV.FUNCTION_GEMMA_MODEL ?? ENV.ROTORQUANT_CHAT_MODEL;
+	const model = options?.model ?? LLM_MODEL_ID;
 
 	// Build JSON shape description for system prompt
 	const shapeDesc = describeShape(schema as z.ZodTypeAny);

@@ -598,6 +598,35 @@ Phase 18 and Phase 22 overlap conceptually for boosting-based work; treat Phase 
 evaluation surface and Phase 22 as any later learned-policy experimentation, or you create two
 owners for the same capability.
 
+## ACE vector selection slice imported (2026-08-13)
+
+The new vector-selection slice has been copied into the canonical Atlas namespace and kept
+compatibility-safe through thin ACE re-exports. The imported files are:
+
+- `src/lib/server/atlas/vector/ace-packet-vector.ts`
+- `src/lib/server/atlas/vector/turbovec-interpolation.ts`
+- `src/lib/server/atlas/ranking/packet-feature-matrix.ts`
+
+Compatibility shims remain in:
+
+- `src/lib/server/ace/vector/ace-packet-vector.ts`
+- `src/lib/server/ace/vector/turbovec-interpolation.ts`
+- `src/lib/server/ace/ranking/packet-feature-matrix.ts`
+
+The copied slice introduces the latent64/centroid64 interpolation layer and the row-major
+9-feature packet matrix underneath the already-proven packet consumer pipeline. I left the
+existing packet consumer pipeline, packet assembler, RTX ranker, and tool receipt boundary intact.
+
+Focused proof gate results:
+
+- `npm exec vitest run src/lib/server/atlas/vector/ace-packet-vector.test.ts src/lib/server/atlas/vector/turbovec-interpolation.test.ts src/lib/server/atlas/ranking/packet-feature-matrix.test.ts`
+- Result: 3 files passed, 3 tests passed
+
+Open next step:
+
+- bridge `packet-feature-matrix.ts` into the live ranking path only after the current Atlas/ACE
+  execution boundary remains stable.
+
 ### Conservative phase-status snapshot
 
 | Phase | Status |

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildContextManifestFromACE } from './ace-context-manifest';
+import { attachContextManifestToACE, buildContextManifestFromACE } from './ace-context-manifest';
 import type { ACEContext } from './types';
 
 function minimalACEContext(overrides: Partial<ACEContext> = {}): ACEContext {
@@ -82,5 +82,22 @@ describe('buildContextManifestFromACE', () => {
     const snapshotBefore = JSON.stringify(context);
     buildContextManifestFromACE(context, { request_id: 'req-immutable' });
     expect(JSON.stringify(context)).toBe(snapshotBefore);
+  });
+
+  it('attaches the compiled manifest onto the live ACE context without mutating the source object', () => {
+    const context = minimalACEContext({
+      codebaseContext: [{ filePath: 'src/lib/server/ace/types.ts', content: 'hello', score: 0.7, stableKey: 'code-2' }],
+    });
+    const snapshotBefore = JSON.stringify(context);
+    const attached = attachContextManifestToACE(context, {
+      request_id: 'req-attached',
+      feature_id: 'ace.context.manifest',
+    });
+
+    expect(JSON.stringify(context)).toBe(snapshotBefore);
+    expect(attached.contextManifest).toBeTruthy();
+    expect(attached.contextManifest?.request_id).toBe('req-attached');
+    expect(attached.contextManifest?.feature_id).toBe('ace.context.manifest');
+    expect(attached.contextManifest?.selected_packet_keys.length).toBeGreaterThanOrEqual(0);
   });
 });

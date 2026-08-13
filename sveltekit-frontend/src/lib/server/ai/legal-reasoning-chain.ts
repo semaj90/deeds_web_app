@@ -24,6 +24,7 @@
 
 import { generateCompletion } from '$lib/server/ai/ollama-client.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
 	SYSTEM_LEGAL_FRAMEWORK,
 	SYSTEM_LEGAL_FACT_MAPPING,
@@ -53,7 +54,7 @@ export interface ReasoningChainResult {
 	totalDurationMs: number;
 }
 
-const MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const MODEL = LLM_MODEL_ID;
 const TIMEOUT_MS = 60_000;
 
 function buildStepPrompt(stepName: string, context: string): string {

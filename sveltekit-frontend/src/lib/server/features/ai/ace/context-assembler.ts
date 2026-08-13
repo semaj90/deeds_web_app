@@ -23,6 +23,7 @@ import { ENV } from '$lib/server/env.server.js';
 import { aceRetrievalRuns } from '$lib/server/db/schema/metadata-spine.js';
 import type { ACEContext, ACEPrompt, ACEUserProfile, RerankBreakdown, ClusterContextPacket, TileEngineTrace } from '../../../ace/types.js';
 import { TOKEN_BUDGET } from '../../../ace/types.js';
+import { attachContextManifestToACE } from '../../../ace/ace-context-manifest.js';
 import { selectPracticeTemplate } from '../../../ace/practice-templates.js';
 import { extractLegalTags } from '$lib/server/rag/tag-extractor.js';
 import { getTopQueryPatterns, getWeeklySummary } from '$lib/server/analytics/event-logger.js';
@@ -1752,7 +1753,12 @@ export async function assembleACEContext(opts: {
         }).catch(() => { /* telemetry — never throw */ });
       }).catch(() => { /* non-blocking */ });
 
-      return parentAtlasContext;
+      return attachContextManifestToACE(parentAtlasContext, {
+        request_id: opts.traceId ?? packet.query_hash ?? crypto.randomUUID(),
+        feature_id: packet.feature_ids[0] ?? undefined,
+        source_refs: telemetrySourceRefs.length > 0 ? telemetrySourceRefs : packet.source_refs,
+        now: new Date(),
+      });
     } catch (err) {
       console.warn('[Parent Atlas Preflight] failed, falling back:', err);
     }

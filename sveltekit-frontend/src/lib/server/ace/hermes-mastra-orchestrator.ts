@@ -13,6 +13,9 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { DebouncedDagLogger, type DagLogSink } from '$lib/server/observability/dag-debounced-logger.js';
+import { assembleACEContext } from '$lib/server/features/ai/ace/context-assembler.js';
+import { runPacketConsumerPipeline } from '$lib/server/atlas/packet-consumer-pipeline.js';
+import { derivePacketInputsFromAceContext } from '$lib/server/atlas/packet-consumer-inputs.js';
 
 export interface HermesQuery {
   query: string;
@@ -80,19 +83,76 @@ export class HermesMastraOrchestrator {
       // Step 1: Try Mastra agent planner
       if (this.MASTRA_ENABLED) {
         const decision = await this.planWithMastra(query);
+        const aceContext = await assembleACEContext({
+          query: query.query,
+          userId: query.userId,
+          caseId: query.caseId,
+          conversationId: query.sessionId,
+          filePath: query.fileContext,
+          enableCodebaseContext: true,
+          mode: 'parent_atlas',
+        });
+        const packetInputs = derivePacketInputsFromAceContext(aceContext);
         const execStartMs = performance.now();
 
-        // Step 2: Execute via MCP tool bridge (paperclip)
-        const toolResults = await this.executeToolsViaMcp(decision);
+        // Step 2: Execute via the packet consumer pipeline + MCP tool bridge
+        const pipeline = await runPacketConsumerPipeline({
+          requestId: `hermes_${Date.now()}`,
+          packets: packetInputs,
+          tokenBudget: Number(process.env.HERMES_PACKET_TOKEN_BUDGET || 4800),
+          maxPackets: Number(process.env.HERMES_PACKET_MAX_PACKETS || 6),
+          rankingPolicyVersion: 'hermes.packet.rank.v1',
+          assemblyPolicyVersion: 'hermes.packet.assembly.v1',
+          availableTools: decision.selectedTools.length > 0 ? decision.selectedTools : ['karpathy.attention_rank_files'],
+          toolPolicyVersion: 'hermes.packet.tool.v1',
+          toolSelector: (manifest, availableTools, policyVersion) => {
+            const toolName = decision.selectedTools[0] ?? availableTools[0];
+            return {
+              toolName,
+              toolArguments: {
+                ...(decision.toolArguments[0] ?? { query: query.query }),
+                requestId: manifest.requestId,
+                selectedPacketKeys: manifest.selectedPacketKeys,
+                manifestHash: manifest.manifestHash,
+              },
+              supportingPacketKeys: [...manifest.selectedPacketKeys],
+              policyVersion,
+              reasons: [decision.reasoning, 'hermes-packet-consumer'],
+            };
+          },
+          executeMcp: async (toolDecision) =>
+            this.executeSingleToolViaMcp(toolDecision.toolName, toolDecision.toolArguments, query),
+          synthesize: async (manifest, receipt, toolResult) =>
+            this.synthesizeResult(query, decision, [
+              {
+                tool: receipt.toolName,
+                args: receipt.supportingPacketKeys,
+                status: toolResult.status === 'SUCCESS' ? 'executed' : 'error',
+                result: toolResult.output ?? toolResult.error ?? null,
+                cached: false,
+                receipt,
+              },
+            ]),
+          now: new Date(),
+        });
         const execMs = performance.now() - execStartMs;
 
         // Step 3: Synthesis
-        const synthesis = await this.synthesizeResult(query, decision, toolResults);
+        const synthesis = pipeline.synthesis;
 
         return {
           decision,
           executionPath: 'mastra',
-          toolResults,
+          toolResults: [
+            {
+              tool: pipeline.toolDecision.toolName,
+              args: pipeline.toolDecision.toolArguments,
+              status: pipeline.toolExecution.status === 'SUCCESS' ? 'executed' : 'error',
+              result: pipeline.toolExecution.output ?? pipeline.toolExecution.error ?? null,
+              cached: false,
+              receipt: pipeline.toolReceipt,
+            },
+          ],
           synthesis,
           timing: {
             planningMs: performance.now() - planStartMs,
@@ -166,7 +226,6 @@ export class HermesMastraOrchestrator {
    */
   private static async executeToolsViaMcp(decision: HermesDecision): Promise<any[]> {
     const results: any[] = [];
-    const mcpServerUrl = process.env.TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
     const workflowId = `hermes_${Date.now()}`;
     const runId = `run_${Math.random().toString(36).slice(2, 9)}`;
 
@@ -188,51 +247,12 @@ export class HermesMastraOrchestrator {
       const args = decision.toolArguments[i] || {};
 
       try {
-        // Call MCP server tool endpoint
-        const mcpRes = await fetch(`${mcpServerUrl}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-          },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            id: `hermes_${Date.now()}_${i}`,
-            method: 'tools/call',
-            params: {
-              name: toolName,
-              arguments: args,
-            },
-          }),
-          signal: AbortSignal.timeout(10000),
-        });
-
-        if (!mcpRes.ok) {
-          await this.dagLogger.log({
-            workflowId,
-            runId,
-            nodeId: toolName,
-            kind: 'error',
-            level: 'error',
-            message: `MCP server returned ${mcpRes.status} for tool ${toolName}`,
-            attributes: { httpStatus: mcpRes.status, tool: toolName },
-          });
-
-          results.push({
-            tool: toolName,
-            args,
-            status: 'error',
-            error: `MCP server returned ${mcpRes.status}`,
-          });
-          continue;
-        }
-
-        const mcpData = (await mcpRes.json()) as any;
+        const mcpData = await this.executeSingleToolViaMcp(toolName, args);
         results.push({
           tool: toolName,
           args,
-          status: mcpData.error ? 'error' : 'executed',
-          result: mcpData.result || mcpData.error,
+          status: mcpData.status === 'SUCCESS' ? 'executed' : 'error',
+          result: mcpData.output || mcpData.error,
           cached: false,
         });
       } catch (err) {
@@ -275,6 +295,44 @@ export class HermesMastraOrchestrator {
     });
 
     return results;
+  }
+
+  private static async executeSingleToolViaMcp(
+    toolName: string,
+    args: Record<string, any>,
+    query?: HermesQuery
+  ): Promise<{ executionId: string; status: 'SUCCESS' | 'FAILED' | 'UNAVAILABLE' | 'TIMEOUT'; output?: unknown; error?: string; toolRevision?: string }> {
+    const mcpServerUrl = process.env.TRACE_MCP_URL || 'http://127.0.0.1:8788/mcp';
+    const mcpRes = await fetch(`${mcpServerUrl}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: `hermes_${Date.now()}_${toolName}`,
+        method: 'tools/call',
+        params: {
+          name: toolName,
+          arguments: args,
+        },
+      }),
+      signal: AbortSignal.timeout(10000),
+    });
+
+    if (!mcpRes.ok) {
+      throw new Error(`MCP server returned ${mcpRes.status} for tool ${toolName}`);
+    }
+
+    const mcpData = (await mcpRes.json()) as any;
+    return {
+      executionId: String(mcpData.id ?? `mcp_${Date.now()}`),
+      status: mcpData.error ? 'FAILED' : 'SUCCESS',
+      output: mcpData.result ?? undefined,
+      error: mcpData.error ? JSON.stringify(mcpData.error) : undefined,
+      toolRevision: query?.fileContext ?? undefined,
+    };
   }
 
   /**

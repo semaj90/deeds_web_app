@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 function broadcastAgentProgress(_data: unknown) { /* no-op: progress tracked via returned fixes array */ }
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
@@ -132,7 +133,7 @@ Return fixes in JSON format:
 
 	try {
     // L1/L2/L3 cache path: Redis exact → Qdrant semantic → Bifrost gateway
-    const text = await bifrostChat([{ role: 'user', content: prompt }], 'gemma4-rotorquant:latest', {
+    const text = await bifrostChat([{ role: 'user', content: prompt }], LLM_MODEL_ID, {
       temperature: 0.3,
       maxTokens: 2048,
     });

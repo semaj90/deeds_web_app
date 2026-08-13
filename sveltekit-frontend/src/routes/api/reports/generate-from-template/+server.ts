@@ -6,6 +6,7 @@ import { cases, evidence, reports } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { auditReportAction } from '$lib/server/reports/audit';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import {
 	getCachedTemplate,
 	getCachedAIContent,
@@ -108,7 +109,7 @@ Generate the complete report content in HTML format, maintaining the structure b
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gemma4-rotorquant:latest',
+              model: LLM_MODEL_ID,
               prompt: aiPrompt,
               stream: false,
               options: {
@@ -138,7 +139,7 @@ Generate the complete report content in HTML format, maintaining the structure b
                 templateType,
                 caseId,
                 content,
-                'gemma4-rotorquant:latest',
+                LLM_MODEL_ID,
                 aiResult.eval_count || undefined
               ).catch(err => console.warn('[ReportGen] Failed to cache AI content:', err));
             }

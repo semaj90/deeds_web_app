@@ -20,10 +20,10 @@
  *   node scripts/graphify-som-topology.mjs --rebuild-atlas --app-url http://localhost:5173
  */
 
-import { createClient }      from 'redis';
+import { createClient } from 'redis';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { resolve, dirname }  from 'path';
-import { fileURLToPath }     from 'url';
+import { resolve } from 'path';
+import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -36,7 +36,7 @@ const ITERS        = parseInt(argv.find(a => a.startsWith('--iters='))?.split('=
 const BOW_DIM      = 64;
 const CLUSTER_TTL  = 60 * 60 * 6; // 6h cluster tiles TTL
 const REDIS_URL    = process.env.REDIS_URL ?? 'redis://localhost:6379';
-const QDRANT_URL   = process.env.QDRANT_URL ?? 'http://localhost:6333';
+const _QDRANT_URL = process.env.QDRANT_URL ?? 'http://localhost:6333';
 const APP_URL      = process.env.PUBLIC_APP_URL ?? process.env.APP_URL ?? 'http://localhost:5173';
 const REBUILD_ATLAS = argv.includes('--rebuild-atlas');
 

@@ -4,6 +4,7 @@
  */
 
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import type { ErrorReport } from './types.js';
 
@@ -48,7 +49,7 @@ export class OllamaService {
 		this.config = {
 			url: config?.url ?? ENV.OLLAMA_BASE_URL,
 			embeddingModel: config?.embeddingModel ?? ENV.OLLAMA_EMBED_MODEL,
-			generationModel: config?.generationModel ?? ENV.ROTORQUANT_CHAT_MODEL,
+			generationModel: config?.generationModel ?? LLM_MODEL_ID,
 			timeout: config?.timeout ?? 30000,
 			maxRetries: config?.maxRetries ?? 3,
 			retryDelay: config?.retryDelay ?? 1000
@@ -60,7 +61,7 @@ export class OllamaService {
 		return {
 			url: ENV.OLLAMA_BASE_URL,
 			embeddingModel: ENV.OLLAMA_EMBED_MODEL,
-			generationModel: ENV.ROTORQUANT_CHAT_MODEL,
+			generationModel: LLM_MODEL_ID,
 			timeout: 30000,
 			maxRetries: 3,
 			retryDelay: 1000

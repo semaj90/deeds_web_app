@@ -11,6 +11,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const querySchema = z.object({
   nodeId: z.string().min(1, 'nodeId is required').max(500),
@@ -254,7 +255,7 @@ export const GET: RequestHandler = async ({ url, locals }) => {
             recordKagAnswer(`cluster:${clId}`, gemma4Summary!, {
               glyphClusterId: clId,
               tokensUsed:     Math.ceil(gemma4Summary!.length / 4),
-              model:          'gemma4-rotorquant:latest',
+              model:          LLM_MODEL_ID,
             })
           )
           .catch(() => null);

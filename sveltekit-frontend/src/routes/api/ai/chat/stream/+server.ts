@@ -10,8 +10,9 @@ import {
 	buildSystemPrompt,
 } from '$lib/server/ai/packet-stream-cache.js';
 import { runLocalAi } from '$lib/server/ai/run-local-ai.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
-const STREAM_MODEL = 'gemma4-rotorquant:latest';
+const STREAM_MODEL = LLM_MODEL_ID;
 const CACHE_REPLAY_CHUNK = 32;
 
 const streamSchema = z.object({

@@ -6,6 +6,7 @@ import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { extractDocument } from '$lib/server/langextract-client.js';
 import { extractEntities } from '$lib/server/analysis/entity-extraction.js';
 import { generateEmbedding } from '$lib/server/grpc/embedding-client.js';
@@ -106,7 +107,7 @@ async function enrichTranscription(
 				const summaryResp = await ollamaFetch('/api/generate', {
 					method: 'POST',
 					body: JSON.stringify({
-						model: 'gemma4-rotorquant:latest',
+						model: LLM_MODEL_ID,
 						prompt: `Summarize this audio transcription in the context of the legal case. Identify key facts, dates, names, and legal relevance.\n\nTranscription:\n${text.slice(0, 6000)}\n\nRelated evidence:\n${contextSnippets.slice(0, 3000)}\n\nProvide a concise 2-3 paragraph summary:`,
 						stream: false,
 						options: { temperature: 0.2, num_predict: 512 },

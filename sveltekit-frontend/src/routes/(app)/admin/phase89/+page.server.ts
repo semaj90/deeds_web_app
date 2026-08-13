@@ -1,5 +1,6 @@
 import { db } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { sql } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
@@ -86,7 +87,7 @@ export const actions: Actions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: ENV.ROTORQUANT_CHAT_MODEL,
+          model: LLM_MODEL_ID,
           prompt,
           stream: false,
           format: 'json',

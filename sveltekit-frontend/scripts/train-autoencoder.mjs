@@ -37,7 +37,7 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '.env'), override: true });
 
 const __dirname    = dirname(fileURLToPath(import.meta.url));
 const ROOT         = resolve(__dirname, '..');
@@ -54,12 +54,36 @@ const LR        = parseFloat(args.find(a => a.startsWith('--lr'))?.split('=')[1]
 const BATCH     = parseInt(args.find(a => a.startsWith('--batch'))?.split('=')[1] ?? '64', 10) || 64;
 
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://localhost:6333';
-const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://127.0.0.1:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';
+const REDIS_URL_RAW  = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
+const REDIS_URL      = (() => {
+  try {
+    const u = new URL(REDIS_URL_RAW);
+    if (!u.password && REDIS_PASSWORD) {
+      u.password = REDIS_PASSWORD;
+      return u.toString();
+    }
+    return REDIS_URL_RAW;
+  } catch {
+    return REDIS_URL_RAW;
+  }
+})();
 const COLLECTION   = 'codebase_chunks_768';
 const DIM_IN       = 768;
 const DIM_HIDDEN   = 256;
 const DIM_LATENT   = 64;
 const AUTOENCODER_HISTORY_STREAM = 'ace:autoencoder:history';
+
+function createRedisClient() {
+  return new Redis(REDIS_URL, {
+    password: REDIS_PASSWORD || undefined,
+    lazyConnect: true,
+    connectTimeout: 5000,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    retryStrategy: () => null,
+  });
+}
 
 // ── Load N-API addon ──────────────────────────────────────────────────────────
 const require = createRequire(import.meta.url);
@@ -203,11 +227,9 @@ function pairCosine(a, b, dim) {
 const stamp  = new Date().toISOString().replace(/[:.]/g, '-');
 const report = { runAt: new Date().toISOString(), epochs: EPOCHS, lr: LR, batch: BATCH, status: 'running' };
 
-const redis = new Redis(REDIS_URL, {
-  lazyConnect: true, maxRetriesPerRequest: 1, enableOfflineQueue: false,
-  retryStrategy: () => null,
-});
+const redis = createRedisClient();
 redis.on('error', () => {});
+let writerRedis = null;
 
 try {
   await redis.connect();
@@ -415,11 +437,16 @@ try {
   console.log('\n');
 
   // ── Persist weights to Redis (PyTorch out×in convention) ─────────────────
+  writerRedis = createRedisClient();
+  writerRedis.on('error', () => {});
+  await writerRedis.connect();
+  await writerRedis.ping();
+
   // Internal training uses (in×out); transpose at the save boundary so
   // ae-encode-to-redis.mjs and the Python script share the same format.
   // W1_js (768×256) → W1_pt (256×768), W2_js (256×64) → W2_pt (64×256), etc.
   const csv = (W) => Array.from(W).join(',');
-  await redis.hset('ace:autoencoder:weights', {
+  await writerRedis.hset('ace:autoencoder:weights', {
     W1: csv(toTorchLayout(W1, DIM_IN,     DIM_HIDDEN)),   // (256×768)
     b1: csv(b1),
     W2: csv(toTorchLayout(W2, DIM_HIDDEN, DIM_LATENT)),   // (64×256)
@@ -429,7 +456,7 @@ try {
     W4: csv(toTorchLayout(W4, DIM_HIDDEN, DIM_IN)),       // (768×256)
     b4: csv(b4),
   });
-  await redis.expire('ace:autoencoder:weights', 7 * 24 * 3600); // 7-day TTL
+  await writerRedis.expire('ace:autoencoder:weights', 7 * 24 * 3600); // 7-day TTL
 
   // ── Compatibility key for karpathy-gpu-enrich.mjs resolveWeights() ──────────
   // resolveWeights() reads ace:autoencoder:decoder:weights as a plain JSON string
@@ -448,7 +475,7 @@ try {
       W_combined[r * DIM_IN + c] = v;
     }
   }
-  await redis.set(
+  await writerRedis.set(
     'ace:autoencoder:decoder:weights',
     JSON.stringify({ W: Array.from(W_combined), b: Array.from(b2), hidden: DIM_LATENT, outputDim: DIM_IN }),
     'EX', 7 * 24 * 3600
@@ -456,8 +483,8 @@ try {
 
   // Store meta as HASH (same convention as train-autoencoder.py) so that
   // autoencoder-centroids.mjs and ae-encode-to-redis.mjs can read it with hgetall.
-  await redis.del('ace:autoencoder:meta'); // remove any stale plain-string key
-  await redis.hset('ace:autoencoder:meta', {
+  await writerRedis.del('ace:autoencoder:meta'); // remove any stale plain-string key
+  await writerRedis.hset('ace:autoencoder:meta', {
     trainedAt: new Date().toISOString(),
     epochs: String(EPOCHS),
     lr: String(LR),
@@ -476,8 +503,8 @@ try {
     historyKey: AUTOENCODER_HISTORY_STREAM,
     saveMode: 'train-autoencoder.mjs',
   });
-  await redis.expire('ace:autoencoder:meta', 7 * 24 * 3600);
-  await redis.xadd(
+  await writerRedis.expire('ace:autoencoder:meta', 7 * 24 * 3600);
+  await writerRedis.xadd(
     AUTOENCODER_HISTORY_STREAM,
     '*',
     'event', 'autoencoder_train',
@@ -511,6 +538,7 @@ try {
   console.error('[ae-train] ERROR:', err.message);
   process.exitCode = 1;
 } finally {
+  await writerRedis?.quit().catch(() => {});
   await redis.quit().catch(() => {});
   const out = JSON.stringify(report, null, 2);
   writeFileSync(resolve(LOG_DIR, `autoencoder-train-${stamp}.json`), out);

@@ -87,6 +87,39 @@ export interface LoadClusterSummariesResult {
 	source:     string;
 }
 
+// ── Canonical cluster ACE packets ───────────────────────────────────────────
+
+export interface ClusterAcePacketSummary {
+	clusterSummaryKey: string;
+	packetKey: string;
+	packetId: string;
+	clusterId: number;
+	summary: string;
+	topFiles: readonly string[];
+	pageRankTop5: readonly Array<{
+		filePath: string;
+		pageRank: number;
+		karpathyBlend: number;
+	}>;
+	authorityScore: number | null;
+	workspaceRevision: number;
+	sourceRevision: string;
+	graphRevision: string | null;
+	representationId: string;
+	representationRevision: number;
+	centroidKey: string;
+	canonicalHash: string;
+	createdAt: string | null;
+	source: 'postgres';
+}
+
+export interface LoadClusterPacketsResult {
+	packets:  Map<string, ClusterAcePacketSummary>;
+	loadedAt: string;
+	entryCount: number;
+	source:     string;
+}
+
 // ── Feature implementations + file edges ─────────────────────────────────────
 
 export interface FeatureRow {
@@ -180,6 +213,7 @@ export interface RegenContextDiagnostics {
 		graph:            LoaderResultDiagnostic;
 		karpathyScores:   LoaderResultDiagnostic;
 		clusterSummaries: LoaderResultDiagnostic;
+		clusterPackets:   LoaderResultDiagnostic;
 		features:         LoaderResultDiagnostic & { featureCount?: number };
 		activity:         LoaderResultDiagnostic & { rowsScanned?:  number };
 		pathAliases:      LoaderResultDiagnostic & { aliasCount?:   number };
@@ -195,6 +229,7 @@ export interface RegenContext {
 	graph:        CodebaseGraph;
 	karpathy:     LoadKarpathyResult;
 	clusters:     LoadClusterSummariesResult;
+	clusterPackets: LoadClusterPacketsResult;
 	features:     LoadFeaturesResult;
 	activity:     LoadActivityResult;
 	pathAliases:  LoadPathAliasesResult;
@@ -204,6 +239,7 @@ export interface RegenContext {
 export interface BuildRegenContextOptions {
 	skipActivity?:         boolean;
 	skipClusterSummaries?: boolean;
+	skipClusterPackets?:   boolean;
 	fixtures?: {
 		features?: LoadFeaturesResult;
 		activity?: LoadActivityResult;

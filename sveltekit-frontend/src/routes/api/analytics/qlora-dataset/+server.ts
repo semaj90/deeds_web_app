@@ -29,6 +29,7 @@ import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
 import { generateClusterSummary } from '$lib/server/indexer/cluster-summary.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 // ── Schema ─────────────────────────────────────────────────────────────────
 
@@ -313,7 +314,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             ...((row.entity_cases as string[]) ?? []),
           ]),
           tier, // quality_tier
-          process.env.OLLAMA_MODEL ?? 'gemma4-rotorquant:latest',
+          process.env.OLLAMA_MODEL ?? LLM_MODEL_ID,
           datasetSplit, // dataset_split — frozen on first insert
         ]
       );

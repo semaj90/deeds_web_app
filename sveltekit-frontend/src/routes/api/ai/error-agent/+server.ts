@@ -20,6 +20,9 @@ const errorAgentInputSchema = z.object({
   caseId: z.string().optional(),
   userId: z.string().optional(),
   targetPath: z.string().optional(),
+  workspaceRevision: z.string().optional(),
+  modelRevision: z.string().optional(),
+  sourceRefs: z.array(z.string()).optional(),
   metadata: z.record(z.string(), z.any()).optional()
 });
 

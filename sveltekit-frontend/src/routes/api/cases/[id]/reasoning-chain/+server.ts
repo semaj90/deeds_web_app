@@ -8,6 +8,7 @@
 
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { generateReasoningChain } from '$lib/server/ai/legal-reasoning-chain.js';
 import { requireAuth } from '$lib/server/auth-helpers.js';
 import { db } from '$lib/server/db/client';
@@ -78,7 +79,7 @@ export const POST: RequestHandler = async (event) => {
 			},
 			metadata: {
 				timestamp: new Date().toISOString(),
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				stepsCompleted: chain.steps.length
 			}
 		});

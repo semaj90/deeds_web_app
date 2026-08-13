@@ -1,9 +1,9 @@
 /**
- * Ollama Client for AI operations
- * Uses gemma4-rotorquant:latest for legal document analysis
+ * Chat client for AI operations.
+ * The runtime model id is derived from ROTORQUANT_MODEL_PATH via LLM_MODEL_ID.
  */
-
 import { bifrostChat } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface OllamaChatOptions {
 	model: string;
@@ -57,7 +57,7 @@ OUTPUT:
 5) Recommended Next Actions`;
 
 	return ollamaChat({
-		model: 'gemma4-rotorquant:latest',
+		model: LLM_MODEL_ID,
 		system,
 		prompt,
 		temperature: 0.3 // Lower temperature for more factual output
@@ -87,7 +87,7 @@ Write:
 - Recommended Next Actions (bullet points)`;
 
 	return ollamaChat({
-		model: 'gemma4-rotorquant:latest',
+		model: LLM_MODEL_ID,
 		system,
 		prompt,
 		temperature: 0.3
@@ -146,7 +146,7 @@ LEGAL MEMORANDUM
 Focus on creating a prosecution-ready document that analyzes the evidence, legal issues, and provides strategic guidance for the case.`;
 
 	return ollamaChat({
-		model: 'gemma4-rotorquant:latest',
+		model: LLM_MODEL_ID,
 		system,
 		prompt,
 		temperature: 0.2
@@ -186,7 +186,7 @@ Format as:
 - Action Items (if any)`;
 
 	return ollamaChat({
-		model: 'gemma4-rotorquant:latest',
+		model: LLM_MODEL_ID,
 		system,
 		prompt,
 		temperature: 0.3

@@ -33,11 +33,12 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { warmUpCache, warmUpDomain } from '$lib/server/cache/warm-up.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const WarmUpSchema = z.object({
 	batchSize: z.number().int().positive().optional().default(5),
 	delayMs: z.number().int().nonnegative().optional().default(1000),
-	model: z.string().optional().default('gemma4-rotorquant:latest'),
+	model: z.string().optional().default(LLM_MODEL_ID),
 	domain: z
 		.enum(['evidence', 'civil-procedure', 'torts', 'contracts', 'criminal', 'evidence-analysis'])
 		.optional(),

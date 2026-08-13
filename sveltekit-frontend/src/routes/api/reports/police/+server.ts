@@ -10,6 +10,7 @@ import { reports } from '$lib/server/db/schema';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const policeReportSchema = z.object({
 	narrative: z.string().min(1, 'Narrative is required').max(50000),
@@ -60,7 +61,7 @@ Output ONLY HTML content. Use h1, h2, h3, p, ul, li, strong, em tags.`;
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					model: 'gemma4-rotorquant:latest',
+					model: LLM_MODEL_ID,
 					prompt,
 					stream: false,
 					options: { temperature: 0.3, num_predict: 2048 }

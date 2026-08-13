@@ -31,6 +31,7 @@
 import { getRedis } from '$lib/server/redis.js';
 import { pool } from '$lib/server/db/client';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { generateSingleEmbedding } from '$lib/server/grpc/embedding-client.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -39,7 +40,7 @@ import path from 'node:path';
 
 const TURBOQUANT_URL   = ENV.TURBOQUANT_BASE_URL;
 const OLLAMA_URL       = ENV.OLLAMA_BASE_URL;
-const CHAT_MODEL       = ENV.ROTORQUANT_CHAT_MODEL ?? 'gemma4-rotorquant:latest';
+const CHAT_MODEL       = LLM_MODEL_ID;
 const NEO4J_URL        = ENV.NEO4J_URI;
 const NEO4J_USER       = ENV.NEO4J_USER ?? 'neo4j';
 const NEO4J_PASS       = ENV.NEO4J_PASSWORD;

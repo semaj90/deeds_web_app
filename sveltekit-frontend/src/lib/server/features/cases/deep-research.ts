@@ -33,13 +33,14 @@ import { db, pool } from '$lib/server/db/client';
 import { contextTimeline } from '$lib/server/db/schema-postgres.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { fetchTopQueryTags } from '$lib/server/ace/user-analytics-context.js';
 import type { HitPipeline } from '$lib/server/features/observability/search-analytics.js';
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const RESEARCH_CACHE_TTL = 1800; // 30 min
-const RESEARCH_MODEL = ENV.ROTORQUANT_CHAT_MODEL;
+const RESEARCH_MODEL = LLM_MODEL_ID;
 const MAX_TOPICS = 8;
 const HOT_QUERY_KEY = 'analytics:hot_queries';
 const QUERY_VEC_KEY = 'analytics:query_vecs';

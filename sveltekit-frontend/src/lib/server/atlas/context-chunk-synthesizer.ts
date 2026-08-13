@@ -15,6 +15,7 @@
 
 import { getRedis } from '$lib/server/redis.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { getOllamaEndpoint } from '$lib/server/ollama.js';
 import type { AtlasChunk, CtxPacket } from './feature-context-matrix.js';
 
@@ -133,7 +134,7 @@ export async function synthesizeFeatureChunks(
     ? `${ENV.TURBOQUANT_URL}/v1/chat/completions`
     : `${getOllamaEndpoint()}/v1/chat/completions`;
 
-  const modelName = ENV.ROTORQUANT_CHAT_MODEL;
+  const modelName = LLM_MODEL_ID;
 
   const systemPrompt = SYSTEM_PROMPT;
   const userPrompt = buildUserPrompt(featureKey, chunks);

@@ -10,6 +10,7 @@ import { generateSparseVector } from '$lib/server/vector/bm42-sparse.js';
 import { cacheControl, checkETag, notModified } from '$lib/server/middleware/cache-headers.js';
 import { recordSearchQuery } from '$lib/server/analytics/search-analytics.js';
 import { getQdrantClient } from '$lib/server/vector/qdrant-singleton.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 
 const qdrant = getQdrantClient();
 let knowledgeBaseTableAvailable: boolean | null = null;
@@ -35,7 +36,7 @@ const qd = qdrant as ReturnType<typeof getQdrantClient> & {
 const OLLAMA_URL_VAR = ENV.OLLAMA_BASE_URL;
 
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
-const LOCAL_LLM = 'gemma4-rotorquant:latest';
+const LOCAL_LLM = LOCAL_VLM_MODEL;
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const MAX_CHUNKS = 500;
@@ -486,23 +487,23 @@ Provide a clear, detailed answer based on the knowledge base. If the knowledge b
 
     // 3. Route to LLM (Gemini for complex, Gemma for simple)
     let response = '';
-    const llmUsed = 'gemma4-rotorquant:latest';
-    const ollamaRes = await ollamaFetch(`${OLLAMA_URL_VAR}/api/generate`, {
+    const llmUsed = LOCAL_LLM;
+    const ollamaRes = await fetch(`${LLAMA_SERVER_BASE_URL}/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: LOCAL_LLM,
-        prompt: augmentedPrompt,
         stream: false,
+        messages: [{ role: 'user', content: augmentedPrompt }],
       }),
       signal: AbortSignal.timeout(60_000),
     });
 
     if (!ollamaRes.ok) {
-      console.error(`[Knowledge] Ollama generate returned ${ollamaRes.status}`);
+      console.error(`[Knowledge] llama-server generate returned ${ollamaRes.status}`);
     }
     const ollamaData = await ollamaRes.json();
-    response = ollamaData?.response ?? '';
+    response = String(ollamaData?.choices?.[0]?.message?.content ?? ollamaData?.response ?? '');
 
     return json({
       success: true,

@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   recordAgentTrace: vi.fn(async () => undefined),
 }));
 
-vi.mock('$lib/server/observability/agent-trace-recorder.js', () => ({
+vi.mock('../../observability/agent-trace-recorder.js', () => ({
   recordAgentTrace: mocks.recordAgentTrace,
 }));
 

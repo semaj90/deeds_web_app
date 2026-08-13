@@ -167,7 +167,7 @@ async function main() {
 
     // Check if latent_64 slot exists — if so, read it directly (faster)
     const hasEncoded64 = await hasVectorSlot('latent_64');
-    const withVectors = hasEncoded64 ? ['latent_64', 'content'] : ['content'];
+    const withVectors = hasEncoded64 ? ['latent_64'] : ['content'];
     log(`[qdrant] latent_64 slot: ${hasEncoded64 ? 'present (primary path)' : 'absent (fallback: encode from content)'}`);
 
     // Scroll Qdrant — request vectors + som_cluster payload
@@ -186,7 +186,7 @@ async function main() {
         const scrollData = await qdrantPost(`/collections/${COLLECTION}/points/scroll`, {
             limit:        batchLimit,
             offset,
-            with_payload: ['som_cluster'],
+            with_payload: ['som_cluster', 'community_id', 'cluster_id'],
             with_vector:  withVectors,
         });
         const points = scrollData.result?.points ?? [];
@@ -195,7 +195,7 @@ async function main() {
 
         for (const pt of points) {
             totalScanned++;
-            const clusterId = pt.payload?.som_cluster;
+            const clusterId = pt.payload?.som_cluster ?? pt.payload?.community_id ?? pt.payload?.cluster_id;
             if (clusterId === undefined || clusterId === null) {
                 noCluster++;
                 continue;

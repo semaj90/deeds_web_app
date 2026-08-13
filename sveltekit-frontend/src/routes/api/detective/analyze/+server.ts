@@ -2,12 +2,13 @@ import { json } from '@sveltejs/kit';
 /**
  * Detective Analysis SSE Endpoint
  * Streams LLM-powered evidence analysis results in real-time.
- * Uses Ollama gemma4-rotorquant:latest for entity extraction, connection mapping,
+ * Uses the canonical local synthesis model for entity extraction, connection mapping,
  * anomaly detection, and timeline gap analysis.
  */
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 
 const analyzeSchema = z.object({
@@ -122,7 +123,7 @@ async function streamOllamaAnalysis(
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			prompt,
 			stream: true,
 			options: { temperature: 0.3, num_predict: 2048 }

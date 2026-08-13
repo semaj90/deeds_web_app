@@ -28,6 +28,7 @@ import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js'
 import { createHash } from 'crypto';
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const researchSchema = z.object({
 	query: z.string().trim().min(1, 'Query required').max(2000),
@@ -39,7 +40,7 @@ const researchSchema = z.object({
 
 const COLLECTION = 'codebase_chunks_768';
 const EMBEDDING_MODEL = 'embeddinggemma:latest';
-const LLM_MODEL = 'gemma4-rotorquant:latest';
+const LLM_MODEL = LLM_MODEL_ID;
 const ROOT = resolve(process.cwd());
 
 // Cooldown: don't re-research the same query within 15 minutes

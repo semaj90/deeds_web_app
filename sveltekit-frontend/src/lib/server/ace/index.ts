@@ -32,6 +32,13 @@ export type { AcePacketWriterOptions, PacketPersistResult } from './ace-packet-w
 export { AcePacketValidator, createAcePacketValidator } from './ace-packet-validator.js';
 export type { ValidationResult, SafetyCheckResult } from './ace-packet-validator.js';
 
+export * from './cluster-ace-packet.js';
+export * from './cluster-packet-consumer.js';
+export * from './ranking/packet-rtx-ranker.js';
+export * from './context/packet-assembler.js';
+export * from './tools/tool-call-receipt.js';
+export * from './consumer/packet-consumer-pipeline.js';
+
 // ── Serialization (Token Remapping) ────────────────────────────────────────
 
 // Msgpack binary codec for canonical packet → mmap-backed RL datasets

@@ -98,3 +98,13 @@ export function buildContextManifestFromACE(
     policy: { ...DEFAULT_POLICY, ...opts.policy },
   });
 }
+
+export function attachContextManifestToACE(
+  context: ACEContext,
+  opts: ACEContextManifestOptions
+): ACEContext {
+  return {
+    ...context,
+    contextManifest: buildContextManifestFromACE(context, opts).manifest,
+  };
+}

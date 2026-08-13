@@ -32,6 +32,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { bifrostChat } from '$lib/server/ollama.js';
 import { getRedis } from '$lib/server/redis.js';
 import { pool as pgPool } from '$lib/server/db/client';
@@ -549,7 +550,7 @@ async function stageLLMSynthesis(
 
   // ── Two-part composite cache key ──────────────────────────────────────────
   // stableDigest: hash of the parts that rarely change (prompt template + model)
-  const stableDigest = _ck(`v${ARCH_VERSION}:${ENV.ROTORQUANT_CHAT_MODEL}:0.2:${systemPrompt}`);
+  const stableDigest = _ck(`v${ARCH_VERSION}:${LLM_MODEL_ID}:0.2:${systemPrompt}`);
 
   // contextDigest: hash of retrieved-item IDs — captures current codebase state
   // Using IDs (not content) keeps the hash short and content-change-sensitive
@@ -570,7 +571,7 @@ async function stageLLMSynthesis(
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      ENV.ROTORQUANT_CHAT_MODEL,
+      LLM_MODEL_ID,
       {
         temperature: 0.2,
         maxTokens: 1000,
@@ -582,7 +583,7 @@ async function stageLLMSynthesis(
       stage: 'llm-synthesis',
       data: {
         response,
-        model: ENV.ROTORQUANT_CHAT_MODEL,
+        model: LLM_MODEL_ID,
         tokenCached: true,
         cacheKey: cacheKey.slice(-16),
       },
@@ -1282,7 +1283,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		pipeline:       'gpu-codebase-index',
 		version:        '2.0.0',
 		collections:    checks,
-		model:          ENV.ROTORQUANT_CHAT_MODEL,
+		model:          LLM_MODEL_ID,
 		embeddingModel: 'embeddinggemma:latest',
 		cacheStrategy:  'L1-Redis → L2-Bifrost → L3-Ollama',
 		namedVectors:   { codebase_chunks_768: ['content', 'signature', 'error'] },

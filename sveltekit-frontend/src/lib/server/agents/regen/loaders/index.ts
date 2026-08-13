@@ -14,6 +14,9 @@ export type { LoadKarpathyOptions } from './karpathy.js';
 export { loadClusterSummaries } from './cluster-summaries.js';
 export type { LoadClusterSummariesOptions } from './cluster-summaries.js';
 
+export { loadClusterPackets } from './cluster-packets.js';
+export type { LoadClusterPacketsOptions } from './cluster-packets.js';
+
 export { loadFeatures } from './features.js';
 export { loadActivity } from './activity.js';
 export { loadPathAliases } from './path-aliases.js';
@@ -34,6 +37,7 @@ export type {
 	KarpathyBlend,
 	LoadKarpathyResult,
 	LoadClusterSummariesResult,
+	LoadClusterPacketsResult,
 	FeatureRow,
 	LoadFeaturesResult,
 	ActivityEntry,
@@ -45,6 +49,7 @@ export type {
 	RegenContextDiagnostics,
 	BuildRegenContextOptions,
 	LoaderResultDiagnostic,
+	ClusterAcePacketSummary,
 } from './types.js';
 
 export { DEFAULT_ACTIVITY_WEIGHTS } from './types.js';

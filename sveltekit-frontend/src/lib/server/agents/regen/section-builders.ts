@@ -48,11 +48,33 @@ export interface SummarySlice {
 	summary: string;
 }
 
+export interface ClusterPacketSlice {
+	clusterPacket?: {
+		packetKey: string;
+		clusterSummaryKey: string;
+		summary: string;
+		topFiles: string[];
+		authorityScore: number | null;
+		pageRankTop5: Array<{
+			filePath: string;
+			pageRank: number;
+			karpathyBlend: number;
+		}>;
+		representationId: string;
+		representationRevision: number;
+		centroidKey: string;
+		graphRevision: string | null;
+	};
+}
+
 export function buildSummarySection(dirPath: string, ctx: RegenContext): SummarySlice {
 	// Priority 1: cluster summary if the dir resolves to a known cluster cell.
 	const dirEntry = ctx.graph.directories.get(dirPath);
 	const clusterKey = readClusterKey(dirEntry);
 	if (clusterKey) {
+		const clusterPacket = ctx.clusterPackets.packets.get(clusterKey);
+		if (clusterPacket?.summary) return { summary: clusterPacket.summary.slice(0, 2000) };
+
 		const clusterSummary = ctx.clusters.summaries.get(clusterKey);
 		if (clusterSummary) return { summary: clusterSummary.slice(0, 2000) };
 	}
@@ -75,6 +97,30 @@ export function buildSummarySection(dirPath: string, ctx: RegenContext): Summary
 	}
 
 	return { summary: '' };
+}
+
+export function buildClusterPacketSection(dirPath: string, ctx: RegenContext): ClusterPacketSlice {
+	const dirEntry = ctx.graph.directories.get(dirPath);
+	const clusterKey = readClusterKey(dirEntry);
+	if (!clusterKey) return {};
+
+	const packet = ctx.clusterPackets.packets.get(clusterKey);
+	if (!packet) return {};
+
+	return {
+		clusterPacket: {
+			packetKey: packet.packetKey,
+			clusterSummaryKey: packet.clusterSummaryKey,
+			summary: packet.summary.slice(0, 2000),
+			topFiles: [...packet.topFiles],
+			authorityScore: packet.authorityScore,
+			pageRankTop5: [...packet.pageRankTop5],
+			representationId: packet.representationId,
+			representationRevision: packet.representationRevision,
+			centroidKey: packet.centroidKey,
+			graphRevision: packet.graphRevision,
+		},
+	};
 }
 
 function readClusterKey(entry: unknown): string | null {
@@ -326,6 +372,7 @@ export function composeCard(
 ): ComposeResult {
 	const identity = buildIdentitySection(dirPath);
 	const summary  = buildSummarySection(identity.dirPath, ctx);
+	const clusterPacket = buildClusterPacketSection(identity.dirPath, ctx);
 	const imports  = buildImportsSection(identity.dirPath, ctx);
 	const features = buildFeatureSection(identity.dirPath, ctx);
 	const topology = buildTopologySection(identity.dirPath, ctx);
@@ -340,6 +387,7 @@ export function composeCard(
 	const draft: Omit<AgentsDirectoryCard, 'contentHash'> = {
 		...identity,
 		...summary,
+		...clusterPacket,
 		...imports,
 		...features,
 		...topology,

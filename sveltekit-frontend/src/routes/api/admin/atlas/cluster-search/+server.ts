@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const schema = z.object({
 	query:      z.string().min(1).max(2000),
@@ -72,7 +73,7 @@ async function rewriteQueries(query: string): Promise<string[]> {
 			method:  'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body:    JSON.stringify({
-				model:      'gemma4-rotorquant:latest',
+				model:      LLM_MODEL_ID,
 				max_tokens: 800,
 				messages: [{
 					role:    'user',

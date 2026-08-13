@@ -1,7 +1,7 @@
 /**
  * Phase 89: File Analysis API
  * - ripgrep search for comments/patterns
- * - gemma4-rotorquant:latest analysis
+ * - canonical local synthesis model analysis
  * - PostgreSQL raw_error_embeddings lookup
  * - Enhanced Qdrant tag generation
  */
@@ -18,6 +18,7 @@ import { promisify } from 'util';
 import { z } from 'zod';
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 const execFileAsync = promisify(execFile);
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
@@ -72,7 +73,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			LIMIT 20
 		`);
 
-    // 5. gemma4-rotorquant:latest: Analyze file
+    // 5. Analyze file with the canonical local synthesis model
     const analysis = await analyzeFileWithLLM(filePath, content, comments, (errors.rows as Record<string, unknown>[]) || []);
 
     // 6. Generate enhanced Qdrant tag
@@ -205,7 +206,7 @@ Be concise and actionable.`;
 		const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ model: 'gemma4-rotorquant:latest',
+			body: JSON.stringify({ model: LLM_MODEL_ID,
 				messages: [
 					{
 						role: 'system',

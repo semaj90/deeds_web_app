@@ -5,6 +5,7 @@
  * with the card's dirPath, set/merge:
  *   - agents_card_id = card.id  (the agents:dir:<slug> handle)
  *   - feature_keys   = card.featureKeys
+ *   - cluster_packet = canonical cluster packet projection, when present
  *
  * Uses Qdrant HTTP `set_payload` with a filter — single round-trip per card,
  * no scrolling needed. Skips entirely when `enabled: false` (dry-run path).
@@ -42,6 +43,26 @@ function isTestEnv(): boolean {
 	return Boolean(process.env.VITEST) || process.env.NODE_ENV === 'test';
 }
 
+function toClusterPacketPayload(card: AgentsDirectoryCard) {
+	if (!card.clusterPacket) return undefined;
+	return {
+		packet_key: card.clusterPacket.packetKey,
+		cluster_summary_key: card.clusterPacket.clusterSummaryKey,
+		summary: card.clusterPacket.summary,
+		top_files: [...(card.clusterPacket.topFiles ?? [])],
+		authority_score: card.clusterPacket.authorityScore ?? null,
+		page_rank_top5: [...(card.clusterPacket.pageRankTop5 ?? [])].map((entry) => ({
+			file_path: entry.filePath,
+			page_rank: entry.pageRank,
+			karpathy_blend: entry.karpathyBlend,
+		})),
+		representation_id: card.clusterPacket.representationId,
+		representation_revision: card.clusterPacket.representationRevision,
+		centroid_key: card.clusterPacket.centroidKey,
+		graph_revision: card.clusterPacket.graphRevision ?? null,
+	};
+}
+
 export async function backfillQdrantPayload(
 	card: AgentsDirectoryCard,
 	opts: QdrantBackfillOptions = {},
@@ -69,10 +90,12 @@ export async function backfillQdrantPayload(
 	// `match_prefix` would be cleaner but isn't on every Qdrant version — use
 	// a regex match instead, anchored at the start of the path field.
 	const prefix = card.dirPath.endsWith('/') ? card.dirPath : `${card.dirPath}/`;
+	const clusterPacket = toClusterPacketPayload(card);
 	const body = {
 		payload: {
 			agents_card_id: card.id,
 			feature_keys:   card.featureKeys,
+			...(clusterPacket ? { cluster_packet: clusterPacket, cluster_packet_key: clusterPacket.packet_key } : {}),
 		},
 		filter: {
 			should: [

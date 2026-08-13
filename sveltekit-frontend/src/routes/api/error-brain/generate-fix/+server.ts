@@ -3,6 +3,7 @@ import { json, error } from '@sveltejs/kit';
 import { z } from 'zod';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch, getOllamaGenerationEndpoint } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { trackTokenUsage } from '$lib/server/ai/token-tracker.js';
 
 /** GBNF-constrained response schema for error fix generation */
@@ -87,7 +88,7 @@ Respond in JSON format:
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				prompt,
 				format: fixResponseJsonSchema,
 				stream: false,
@@ -121,7 +122,7 @@ Respond in JSON format:
 		trackTokenUsage({
 			userId: locals.user?.id,
 			endpoint: '/api/error-brain/generate-fix',
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			promptTokens:     data.prompt_eval_count ?? 0,
 			completionTokens: data.eval_count ?? 0,
 			durationMs:       durationMs ?? undefined,
@@ -142,7 +143,7 @@ Respond in JSON format:
 				filePath,
 				errorMessage,
 				sourcesUsed: sources.length,
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				generatedAt: new Date().toISOString(),
 				tokenCount: data.eval_count ?? null,
 				durationMs,
@@ -154,7 +155,7 @@ Respond in JSON format:
 			success: false,
 			error: 'Fix generation failed — Ollama unavailable',
 			fix: null,
-			metadata: { filePath, errorMessage, model: 'gemma4-rotorquant:latest' },
+			metadata: { filePath, errorMessage, model: LLM_MODEL_ID },
 		}, { status: 503 });
 	}
 };

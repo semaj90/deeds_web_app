@@ -7,6 +7,7 @@ import { contextTimeline } from '$lib/server/db/schema/context-timeline';
 import { executeChain, routeIntent } from '$lib/server/ai/intent-router.js';
 import { inferIntent } from '$lib/intent/regex-intent.js';
 import { z } from 'zod';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const contextualChatSchema = z.object({
 	message: z.string().max(50000).optional(),
@@ -96,7 +97,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			suggestions: result.suggestions,
 			citations: result.citations,
 			latencyMs: result.latencyMs,
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			intent: {
 				label: intent.label,
 				confidence: intent.confidence,

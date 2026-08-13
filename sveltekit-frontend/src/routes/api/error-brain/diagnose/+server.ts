@@ -26,6 +26,7 @@ import { db } from '$lib/server/db/client';
 import { diagnosisEvents } from '$lib/server/db/schema-postgres.js';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const consoleErrorSchema = z.object({
 	message: z.string().max(2000),
@@ -474,7 +475,7 @@ ${errorContext || 'No past error matches'}`;
 	const { raw } = await traceLLM(
 		'error-diagnosis',
 		{
-			model: 'gemma4-rotorquant:latest',
+			model: LLM_MODEL_ID,
 			mode,
 			backend: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama',
 			queryLength: query.length,
@@ -487,11 +488,11 @@ ${errorContext || 'No past error matches'}`;
 			if (ENV.BIFROST_ENABLED) {
 				// Route through Bifrost gateway for semantic caching (high cache hit rate on error patterns)
 				content = await bifrostChat(
-					[
+				[
 						{ role: 'system', content: systemPrompt },
 						{ role: 'user', content: userPrompt },
 					],
-					'gemma4-rotorquant:latest',
+					LLM_MODEL_ID,
 					{
 						temperature: 0.3,
 						maxTokens: 2048,
@@ -513,7 +514,7 @@ ${errorContext || 'No past error matches'}`;
 			gen.end({ output: content.slice(0, 1000), usage: { completionTokens: estimatedTokens } });
 			trackTokenUsage({
 				endpoint: '/api/error-brain/diagnose',
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				promptTokens: 0,
 				completionTokens: estimatedTokens,
 				durationMs,

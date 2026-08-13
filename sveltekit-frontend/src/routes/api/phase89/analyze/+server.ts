@@ -3,10 +3,11 @@ import type { RequestHandler } from './$types';
 import { z } from 'zod';
 import { pool } from '$lib/server/db/client';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const analyzeSchema = z.object({
 	cluster_id: z.number().int().min(1, 'Missing cluster_id'),
-	model: z.string().max(200).optional().default('gemma4-rotorquant:latest'),
+	model: z.string().max(200).optional().default(LLM_MODEL_ID),
 	ace_context: z.boolean().optional().default(true),
 });
 

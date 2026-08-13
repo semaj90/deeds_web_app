@@ -5,6 +5,7 @@ import { evidence } from '$lib/server/db/schema-postgres.js';
 import { and, eq } from 'drizzle-orm';
 import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { isUuid } from '$lib/server/validation.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 /**
  * POST /api/evidence/[id]/suggest-summary
@@ -66,7 +67,7 @@ export const POST: RequestHandler = async ({ params, locals }) => {
       evidenceId,
       suggestedText,
       confidence: 0.85,
-      model: 'gemma4-rotorquant:latest',
+      model: LLM_MODEL_ID,
       createdAt: new Date().toISOString(),
     });
   } catch (err) {

@@ -15,6 +15,7 @@
 import { loadGraph } from './graph.js';
 import { loadKarpathyScores } from './karpathy.js';
 import { loadClusterSummaries } from './cluster-summaries.js';
+import { loadClusterPackets } from './cluster-packets.js';
 import { loadFeatures } from './features.js';
 import { loadActivity } from './activity.js';
 import { loadPathAliases } from './path-aliases.js';
@@ -61,6 +62,9 @@ export async function buildRegenContext(
 		timed('clusterSummaries', () => opts.skipClusterSummaries
 			? Promise.resolve<LoadClusterSummariesResult>({ summaries: new Map(), loadedAt: new Date().toISOString(), entryCount: 0, source: 'skipped' })
 			: loadClusterSummaries()),
+		timed('clusterPackets',   () => opts.skipClusterPackets
+			? Promise.resolve<LoadClusterPacketsResult>({ packets: new Map(), loadedAt: new Date().toISOString(), entryCount: 0, source: 'skipped' })
+			: loadClusterPackets()),
 		timed('features',         () => opts.fixtures?.features ? Promise.resolve(opts.fixtures.features) : loadFeatures()),
 		timed('activity',         () => {
 			if (opts.fixtures?.activity) return Promise.resolve(opts.fixtures.activity);
@@ -76,6 +80,7 @@ export async function buildRegenContext(
 		graphRes,
 		karpathyRes,
 		clustersRes,
+		clusterPacketsRes,
 		featuresRes,
 		activityRes,
 		aliasesRes,
@@ -84,6 +89,7 @@ export async function buildRegenContext(
 	const graph    = unwrap(graphRes,    EMPTY_GRAPH,    warnings, 'graph');
 	const karpathy = unwrap(karpathyRes, emptyKarpathy(),warnings, 'karpathyScores');
 	const clusters = unwrap(clustersRes, emptyClusters(),warnings, 'clusterSummaries');
+	const clusterPackets = unwrap(clusterPacketsRes, emptyClusterPackets(), warnings, 'clusterPackets');
 	const features = unwrap(featuresRes, emptyFeatures(),warnings, 'features');
 	const activity = unwrap(activityRes, emptyActivity(),warnings, 'activity');
 	const aliases  = unwrap(aliasesRes,  emptyAliases(), warnings, 'pathAliases');
@@ -97,6 +103,7 @@ export async function buildRegenContext(
 			graph:            { ok: graph.ok,    durationMs: graph.durationMs,    reason: graph.reason },
 			karpathyScores:   { ok: karpathy.ok, durationMs: karpathy.durationMs, entryCount: karpathy.value.entryCount, reason: karpathy.reason },
 			clusterSummaries: { ok: clusters.ok, durationMs: clusters.durationMs, entryCount: clusters.value.entryCount, reason: clusters.reason },
+			clusterPackets:   { ok: clusterPackets.ok, durationMs: clusterPackets.durationMs, entryCount: clusterPackets.value.entryCount, reason: clusterPackets.reason },
 			features:         { ok: features.ok, durationMs: features.durationMs, featureCount: features.value.features.length, reason: features.reason },
 			activity:         { ok: activity.ok, durationMs: activity.durationMs, rowsScanned: activity.value.rowsScanned, reason: activity.reason },
 			pathAliases:      { ok: aliases.ok,  durationMs: aliases.durationMs,  aliasCount: aliases.value.aliases.size, reason: aliases.reason },
@@ -110,6 +117,7 @@ export async function buildRegenContext(
 		graph:       graph.value.graph,
 		karpathy:    karpathy.value,
 		clusters:    clusters.value,
+		clusterPackets: clusterPackets.value,
 		features:    features.value,
 		activity:    activity.value,
 		pathAliases: aliases.value,
@@ -151,6 +159,9 @@ function emptyKarpathy(): LoadKarpathyResult {
 }
 function emptyClusters(): LoadClusterSummariesResult {
 	return { summaries: new Map(), loadedAt: new Date().toISOString(), entryCount: 0, source: 'empty' };
+}
+function emptyClusterPackets(): LoadClusterPacketsResult {
+	return { packets: new Map(), loadedAt: new Date().toISOString(), entryCount: 0, source: 'empty' };
 }
 function emptyFeatures(): LoadFeaturesResult {
 	return { features: [], byDir: new Map(), loadedAt: new Date().toISOString(), source: 'empty' };

@@ -2,12 +2,13 @@ import { json } from '@sveltejs/kit';
 /**
  * Detective Connections SSE Endpoint
  * Streams entity relationship graph generation for case evidence.
- * Uses Ollama gemma4-rotorquant:latest to identify people, orgs, locations,
+ * Uses the canonical local synthesis model to identify people, orgs, locations,
  * and their connections for the detective connection map.
  */
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { z } from 'zod';
 
 const connectionsSchema = z.object({
@@ -64,7 +65,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						model: 'gemma4-rotorquant:latest',
+						model: LLM_MODEL_ID,
 						prompt,
 						stream: true,
 						options: { temperature: 0.2, num_predict: 4096 }

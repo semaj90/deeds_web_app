@@ -19,10 +19,24 @@
 import { Redis } from 'ioredis';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const QDRANT_URL   = process.env.QDRANT_URL   ?? 'http://localhost:6333';
-const REDIS_URL    = process.env.REDIS_URL    ?? 'redis://localhost:6379';
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD ?? '';
+const REDIS_URL_RAW  = process.env.REDIS_URL ?? 'redis://localhost:6379';
+const REDIS_URL      = (() => {
+    try {
+        const u = new URL(REDIS_URL_RAW);
+        if (!u.password && REDIS_PASSWORD) {
+            u.password = REDIS_PASSWORD;
+            return u.toString();
+        }
+        return REDIS_URL_RAW;
+    } catch {
+        return REDIS_URL_RAW;
+    }
+})();
+const SOURCE_COLLECTION = 'codebase_chunks_768';
 const COLLECTION   = 'codebase_topology_64';
 const ENCODED_NAME = 'latent_64';
 const CONTENT_DIM  = 768;
@@ -246,19 +260,19 @@ async function main() {
     let totalFailed  = 0;
     const t0 = Date.now();
 
-    log(`[qdrant] Scrolling ${COLLECTION}...`);
+    log(`[qdrant] Scrolling ${SOURCE_COLLECTION} → ${COLLECTION}...`);
 
     while (totalScanned < FLAGS.limit) {
         const batchLimit = Math.min(FLAGS.batchSize, FLAGS.limit - totalScanned);
         const scrollBody = {
             limit: batchLimit,
             offset,
-            with_payload: ['encoded_at'],
+            with_payload: true,
             with_vector: ['content'],
         };
 
         const scrollData = await qdrantPost(
-            `/collections/${COLLECTION}/points/scroll`,
+            `/collections/${SOURCE_COLLECTION}/points/scroll`,
             scrollBody
         );
         const points = scrollData.result?.points ?? [];
@@ -283,7 +297,7 @@ async function main() {
                 continue;
             }
 
-            toEncode.push({ id: pt.id, vec: contentVec });
+            toEncode.push({ id: pt.id, vec: contentVec, payload: pt.payload ?? {} });
         }
 
         // Encode and upsert
@@ -303,41 +317,24 @@ async function main() {
             const pointIds = toEncode.map(({ id }) => id);
 
             if (!FLAGS.dryRun) {
-              if (hasEncodedVectorSlot) {
-                const vectorPoints = encoded64Vectors.map((encoded64, i) => ({
-                  id: pointIds[i],
-                  vector: {
-                    [ENCODED_NAME]: encoded64,
-                  },
-                }));
+              const upsertPoints = toEncode.map(({ id, payload }, index) => ({
+                id,
+                vector: {
+                  [ENCODED_NAME]: encoded64Vectors[index],
+                },
+                payload: {
+                  ...payload,
+                  encoded_at: weights.trainedAt,
+                },
+              }));
 
-                const upsertRes = await qdrantPut(
-                  `/collections/${COLLECTION}/points/vectors?wait=true`,
-                  { points: vectorPoints }
-                );
-                if (upsertRes.status !== 'ok' && upsertRes.result?.status !== 'completed') {
-                  console.error(
-                    `[warn] Vector upsert failed; falling back to payload-only writes: ${JSON.stringify(upsertRes)}`
-                  );
-                }
-              }
-
-              if (hasEncodedVectorSlot) {
-                await qdrantPost(`/collections/${COLLECTION}/points/payload?wait=true`, {
-                  payload: { encoded_at: weights.trainedAt },
-                  points: pointIds,
-                });
-              } else {
-                await Promise.all(
-                  toEncode.map(({ id }, index) =>
-                    qdrantPost(`/collections/${COLLECTION}/points/payload?wait=true`, {
-                      payload: {
-                        encoded_at: weights.trainedAt,
-                        [ENCODED_NAME]: encoded64Vectors[index],
-                      },
-                      points: [id],
-                    })
-                  )
+              const upsertRes = await qdrantPut(
+                `/collections/${COLLECTION}/points?wait=true`,
+                { points: upsertPoints }
+              );
+              if (upsertRes.status !== 'ok' && upsertRes.result?.status !== 'completed') {
+                console.error(
+                  `[warn] Point upsert returned unexpected status: ${JSON.stringify(upsertRes)}`
                 );
               }
               totalEncoded += toEncode.length;

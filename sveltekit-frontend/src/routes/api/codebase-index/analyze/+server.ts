@@ -22,6 +22,7 @@ import { fastJsonParse, isSimdJsonAvailable } from '$lib/server/gpu/simdjson-bri
 import { z } from 'zod';
 import { traceLLM } from '$lib/server/observability/langfuse.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { compileEventHypergraphBundle } from '$lib/server/analysis/nlp-feature-compiler.js';
 import { createMiniforgeNlpSidecarClient } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
 
@@ -115,7 +116,7 @@ ${contentForLLM}
 		const raw = await traceLLM(
 			'codebase-analysis',
 			{
-				model: 'gemma4-rotorquant:latest',
+				model: LLM_MODEL_ID,
 				backend: ENV.BIFROST_ENABLED ? 'bifrost' : 'ollama',
 				filePath: relPath,
 				lines: fileStats.lines,
@@ -130,7 +131,7 @@ ${contentForLLM}
 							{ role: 'system', content: systemPrompt },
 							{ role: 'user', content: userPrompt },
 						],
-						'gemma4-rotorquant:latest',
+						LLM_MODEL_ID,
 						{
 							temperature: 0.3,
 							maxTokens: 2048,

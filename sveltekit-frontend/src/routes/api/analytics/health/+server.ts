@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import { getRedis } from '$lib/server/redis.js';
 import { rabbitmq } from '$lib/server/queue/rabbitmq-manager-fixed.js';
 import { ollamaFetch } from '$lib/server/ollama.js';
@@ -74,7 +75,7 @@ export const GET: RequestHandler = async ({ locals }) => {
             const models = data.models.map((m: any) => m.name);
             stats.services.ollama = 'OK';
             stats.models = {
-                chat: models.includes(ENV.ROTORQUANT_CHAT_MODEL) ? 'Available' : 'Missing',
+                chat: models.includes(LLM_MODEL_ID) ? 'Available' : 'Missing',
                 embed: models.includes(ENV.OLLAMA_EMBED_MODEL) ? 'Available' : 'Missing',
                 rerank: models.includes('gemma4-rotorquant:latest') ? 'Available' : 'Missing',
             };

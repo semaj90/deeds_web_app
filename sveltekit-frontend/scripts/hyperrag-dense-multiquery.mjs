@@ -5,7 +5,7 @@
  * HyperRAG Dense Multi-Query Search Pipeline
  * ============================================
  * Integrates:
- *   - TurboVec (4-bit ANN prefilter via Python sidecar) 
+ *   - TurboVec (4-bit ANN prefilter via Python sidecar)
  *   - Qdrant 4D-manifold-filtered dense search
  *   - CouchDB wiki enrichment (GraphRAG rotorquant notes)
  *   - Redis cluster centroid cache (manifold4 topology)
@@ -335,29 +335,48 @@ log(`  ${c.g('✓')} Merged ${allResults.length} → ${ranked.length} unique ran
 log(`\n${c.b('Step 6')} — CouchDB wiki enrichment (rotorquant GraphRAG notes)`);
 
 let wikiHits = 0;
-for (const result of ranked) {
-  const dir = result.payload?.dir ?? result.payload?.directoryPath ?? '';
-  if (!dir) continue;
-  try {
+
+try {
+  for (const result of ranked) {
+    const rawDir =
+      result.payload?.dir ??
+      result.payload?.directoryPath ??
+      result.payload?.filePath?.replace(/[\\/][^\\/]+$/u, '') ??
+      result.payload?.relativePath?.replace(/[\\/][^\\/]+$/u, '');
+
+    const dir = rawDir?.replace(/\\/g, '/');
+
+    if (!dir) continue;
+
     const wikiKey = `wiki:note:dir:${dir.replace(/\//g, ':')}`;
-    const note = redisOk ? await redis.get(wikiKey).catch(() => null) : null;
+    const note = redisOk
+      ? await redis.get(wikiKey).catch(() => null)
+      : null;
+
     if (note) {
       result.payload._wikiNote = JSON.parse(note);
       wikiHits++;
-    } else {
-      // Try CouchDB directly
-      const slug = dir.replace(/\//g, '_');
-      const couchRes = await fetch(`${COUCH_URL}/karpathy_wiki/${slug}`, {
-        signal: AbortSignal.timeout(3_000),
-      }).catch(() => null);
-      if (couchRes?.ok) {
-        const doc = await couchRes.json();
-        result.payload._wikiNote = { summary: doc.content?.slice(0, 300) };
-        wikiHits++;
-      }
+      continue;
     }
-  } catch {}
+
+    // Try CouchDB directly.
+    const slug = dir.replace(/\//g, '_');
+    const couchRes = await fetch(`${COUCH_URL}/karpathy_wiki/${slug}`, {
+      signal: AbortSignal.timeout(3_000),
+    }).catch(() => null);
+
+    if (couchRes?.ok) {
+      const doc = await couchRes.json();
+      result.payload._wikiNote = {
+        summary: doc.content?.slice(0, 300),
+      };
+      wikiHits++;
+    }
+  }
+} catch (err) {
+  warn(`  Wiki enrichment error: ${err.message}`);
 }
+
 log(`  ${c.g('✓')} Wiki notes enriched: ${wikiHits}/${ranked.length} results`);
 
 // ── Step 7: Minified sidecar JSON (graph sort + log) ─────────────────────────

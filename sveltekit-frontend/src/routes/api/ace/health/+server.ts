@@ -16,6 +16,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 const T = (ms: number) => AbortSignal.timeout(ms);
 
@@ -30,7 +31,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     const r = await fetch(`${ENV.OLLAMA_BASE_URL}/api/tags`, { signal: T(5000) });
     const data = await r.json() as { models?: { name: string }[] };
     const models = data.models?.map(m => m.name) ?? [];
-    const chatModel  = ENV.ROTORQUANT_CHAT_MODEL    ?? 'gemma4-rotorquant:latest-fast:latest';
+    const chatModel  = LLM_MODEL_ID;
     const embedModel = ENV.OLLAMA_EMBED_MODEL   ?? 'embeddinggemma:latest';
     checks.ollama = {
       ok: r.ok,

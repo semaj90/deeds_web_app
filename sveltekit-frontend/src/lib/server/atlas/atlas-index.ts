@@ -58,6 +58,22 @@ export {
   getParentAtlasPassFabricProofSnapshot,
 } from './pass-fabric-proof';
 export {
+  derivePacketInputsFromAceContext,
+} from './packet-consumer-inputs';
+export {
+  runPacketConsumerPipeline,
+  hashPacketConsumerPipelineInput,
+} from './packet-consumer-pipeline';
+export {
+  PACKET_FEATURE_NAMES,
+  PACKET_FEATURE_COUNT,
+  buildPacketFeatureMatrix,
+  buildPacketFeatureMatrixFromPackets,
+  buildPacketFeatureRowsFromPackets,
+  getPacketFeatureRow,
+  normalizeDemandUtility,
+} from './ranking/packet-feature-matrix';
+export {
   buildAnalysisPassCurrentProofSnapshot,
 } from '../analysis/analysis-pass-current';
 export {

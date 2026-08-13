@@ -13,6 +13,7 @@ import { routeStreamingInference } from '$lib/server/inference/inference-router.
 import { logInference } from '$lib/server/observability/inference-log.js';
 import { qdrant } from '$lib/server/vector/qdrant-manager.js';
 import { embedText } from '$lib/server/embedding/embed.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 import type { RequestHandler } from './$types.js';
 import { z } from 'zod';
 
@@ -222,7 +223,7 @@ async function streamOllamaResponse(
 
   logInference({
     type: 'llm',
-    model: backend === 'ollama' ? 'gemma4-rotorquant:latest' : backend,
+    model: backend === 'ollama' ? LLM_MODEL_ID : backend,
     backend: backend as 'ollama' | 'tensorrt' | 'triton',
     latencyMs: Math.round(performance.now() - start),
     tokenCount,

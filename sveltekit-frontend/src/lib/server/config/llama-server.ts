@@ -2,10 +2,12 @@
  * Local llama-server configuration.
  *
  * Chat, generation, and streaming completions are owned here.
- * Ollama remains the embeddings/compatibility lane.
+ * The runtime model id is derived from ROTORQUANT_MODEL_PATH and should
+ * stay canonical across chat, synthesis, and VLM callers.
  */
 
 import { getOllamaEndpoint as getChatEndpoint } from '$lib/server/utils/ollama-endpoint.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 
 export interface LlamaServerConfig {
 	baseUrl: string;
@@ -14,7 +16,7 @@ export interface LlamaServerConfig {
 }
 
 const DEFAULT_BASE_URL = getChatEndpoint();
-const DEFAULT_MODEL = process.env?.OLLAMA_MODEL ?? 'gemma:7b';
+const DEFAULT_MODEL = LLM_MODEL_ID;
 const DEFAULT_TIMEOUT = 30000;
 
 export function getLlamaServerEndpoint(): LlamaServerConfig {

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { redisGetAcePacket, redisSetAcePacket, hashQuery, type AcePacket } from '$lib/server/cache/ace-packet-cache.js';
 import { buildVarianceRecoveryContext } from '$lib/server/ace/variance-recovery.js';
+import { LLAMA_SERVER_BASE_URL, LOCAL_VLM_MODEL } from '$lib/server/ai/local-llama-provider.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import path from 'path';
@@ -139,14 +140,13 @@ export async function POST({ request, locals }) {
       }
       
       try {
-        const baseUrl = process.env.GEMMA4_BASE_URL ?? 'http://127.0.0.1:8090';
-        const url = `${baseUrl}/v1/chat/completions`;
+        const url = `${LLAMA_SERVER_BASE_URL}/chat/completions`;
 
         const upstream = await fetch(url, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
-            model: process.env.GEMMA4_MODEL ?? 'gemma4',
+            model: LOCAL_VLM_MODEL,
             stream: true,
             messages: [
               { role: 'system', content: 'You are using an ACE packet. Prefer sourceRefs and commands. If the packet is degraded, say what is missing instead of guessing.' },

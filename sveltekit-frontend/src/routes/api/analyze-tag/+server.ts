@@ -1,6 +1,6 @@
 /**
  * Phase 89: Enhanced Tag Analysis API
- * - Analyze Qdrant tags with gemma4-rotorquant:latest
+ * - Analyze Qdrant tags with the canonical local synthesis model
  * - ripgrep search for tag occurrences
  * - Generate embeddings for tag summaries
  * - Update Qdrant metadata with enhanced tags
@@ -15,6 +15,7 @@ import { z } from 'zod';
 
 import { ollamaFetch } from '$lib/server/ollama.js';
 import { ENV } from '$lib/server/env.server.js';
+import { LLM_MODEL_ID } from '$lib/server/llm/runtime-contract.js';
 const OLLAMA_URL = ENV.OLLAMA_BASE_URL;
 
 const analyzeTagSchema = z.object({
@@ -37,7 +38,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		// 1. Search tag occurrences in Qdrant
 		const occurrences = await searchTagOccurrences(tag, collection);
 
-		// 2. Analyze with gemma4-rotorquant:latest
+		// 2. Analyze with the canonical local synthesis model
 		const analysis = await analyzeTagWithLLM(tag, occurrences);
 
 		// 3. Generate embedding for summary
@@ -150,7 +151,7 @@ Related: [tag1, tag2, tag3]`;
 	const response = await ollamaFetch(`${OLLAMA_URL}/api/chat`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ model: 'gemma4-rotorquant:latest',
+		body: JSON.stringify({ model: LLM_MODEL_ID,
 			messages: [
 				{
 					role: 'system',

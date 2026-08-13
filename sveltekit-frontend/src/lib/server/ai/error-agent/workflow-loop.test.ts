@@ -20,6 +20,12 @@ vi.mock('$lib/server/training/query-logger.js', () => {
   };
 });
 
+vi.mock('../../observability/agent-trace-recorder.js', () => {
+  return {
+    recordAgentTrace: vi.fn(),
+  };
+});
+
 describe('workflow-loop core', () => {
   beforeEach(() => {
     vi.clearAllMocks();
