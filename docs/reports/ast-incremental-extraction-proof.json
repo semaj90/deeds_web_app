@@ -1,0 +1,37 @@
+{
+  "schema": "atlas.ast.incremental-proof.v1",
+  "generatedAt": "2026-08-14T15:16:48.771Z",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "sourceRevision": "ast-incremental-proof-v1",
+  "status": "BOUNDED_PROVEN",
+  "unchangedSkipPass": true,
+  "changedReextractPass": true,
+  "deletionTombstonePass": true,
+  "productionGraphifyWiring": "PENDING",
+  "results": [
+    {
+      "sourceRef": "src/incremental-unchanged.ts",
+      "action": "SKIP_UNCHANGED",
+      "status": "PASS",
+      "contentHash": "ed3f1cb7b057d75d4ee33afec33c22c97c206634d6f726556d1944a2e56684c1"
+    },
+    {
+      "sourceRef": "src/incremental-changed.ts",
+      "action": "REEXTRACT_CHANGED",
+      "status": "PASS",
+      "contentHash": "66c0066b3899d1671c04f9c39b2d9ec1aeefa08887c93a124d275ab439b20f3a",
+      "chunkCount": 2,
+      "diagnosticCount": 0
+    },
+    {
+      "sourceRef": "src/incremental-deleted.ts",
+      "action": "DELETE_TOMBSTONE",
+      "status": "PASS",
+      "tombstone": {
+        "sourceRef": "src/incremental-deleted.ts",
+        "sourceRevision": "ast-incremental-proof-v1",
+        "reason": "SOURCE_DELETED"
+      }
+    }
+  ]
+}

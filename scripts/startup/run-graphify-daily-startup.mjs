@@ -80,6 +80,30 @@ try {
     console.log('[graphify:daily] feature recommendations complete');
   }
 
+  // DAG-4/QAS is a non-mutating recommendation sketch. It may emit a
+  // deferred receipt when no candidate feature matrix exists, but it must
+  // never block canonical Graphify completion or invent candidate evidence.
+  try {
+    execSync('npx tsx ../scripts/atlas/prove-query-adaptive-sampling.mts --daily', {
+      cwd: FRONTEND,
+      stdio: quiet ? 'ignore' : 'inherit',
+      shell: true,
+      timeout: 60 * 1000
+    });
+  } catch (qasError) {
+    console.warn(`[graphify:daily] QAS receipt deferred: ${qasError.message}`);
+  }
+  try {
+    execSync('npx tsx ../scripts/atlas/evaluate-query-adaptive-sampling.mts', {
+      cwd: FRONTEND,
+      stdio: quiet ? 'ignore' : 'inherit',
+      shell: true,
+      timeout: 60 * 1000
+    });
+  } catch (qasEvalError) {
+    console.warn(`[graphify:daily] QAS evaluation deferred: ${qasEvalError.message}`);
+  }
+
   // Terminal lifecycle marker for .vscode/tasks.json's background problemMatcher
   // (endsPattern: "graphify:daily complete") — must be printed on every exit
   // path (success, fallback-success, and failure), not just success. Before

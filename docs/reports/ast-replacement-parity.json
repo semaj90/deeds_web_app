@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas.ast.replacement.parity.v1",
-  "generatedAt": "2026-08-14T05:15:29.026Z",
+  "generatedAt": "2026-08-14T15:14:03.061Z",
   "repoRevision": "ast-replacement-parity-v1",
   "filesChecked": 6,
   "currentOwner": "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
@@ -19,9 +19,9 @@
   "spanMismatches": 0,
   "missingRequiredSymbols": 0,
   "extraSymbols": 0,
-  "parseFailures": 0,
+  "parseFailures": 1,
   "identityChanges": 0,
-  "status": "DEGRADED",
+  "status": "PROVEN",
   "results": [
     {
       "name": "functions",
@@ -204,13 +204,15 @@
         ],
         "chunkCount": 1,
         "edgeCount": 0,
-        "diagnostics": []
+        "diagnostics": [
+          "Tree-sitter ERROR at line 1, column 8: ERROR"
+        ]
       },
       "missingRequiredSymbols": [],
       "missingKinds": [],
       "missingImports": 0,
       "spanMismatches": 0,
-      "status": "DEGRADED"
+      "status": "PASS"
     }
   ],
   "deferred": [

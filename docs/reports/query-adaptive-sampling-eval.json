@@ -1,0 +1,14 @@
+{
+  "schema": "atlas.qas.evaluation-receipt.v1",
+  "status": "DEFERRED_MISSING_INPUT_OR_BASELINE",
+  "inputPath": null,
+  "baselinePath": null,
+  "budgets": [
+    128,
+    512,
+    2048
+  ],
+  "evaluations": [],
+  "exactBaselineOwner": "SearchRuntime",
+  "canonicalWrites": false
+}

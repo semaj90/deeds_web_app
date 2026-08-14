@@ -1,6 +1,6 @@
 # Parent Atlas workstation GPU/runtime integration backlog
 
-Updated: 2026-08-13
+Updated: 2026-08-14
 
 This backlog is intentionally separate from AST supersession. It does not change GPH-13 through GPH-22 acceptance, and it does not authorize deleting or promoting `ast-extractor.ts`.
 
@@ -64,12 +64,73 @@ control-plane owners and records `RAPIDS_RUNTIME_8098_REACHABLE: false` separate
 
 ### P2 — GPU retrieval and graph compute
 
-- [ ] GPU-09 Prove cuVS exact `semantic_768` KNN against the CPU/PyTorch oracle.
+- [x] GPU-09 Prove cuVS exact `semantic_768` KNN against the CPU/PyTorch oracle. Live fixture proof passed on 2026-08-14 through `127.0.0.1:8098` with cuVS `26.06.00`, RTX 3060 Ti, stable identity-qualified ordering across three runs. See `docs/reports/gpu-knn-exact-runtime-proof.{json,md}`.
+- [ ] GPU-09A Freeze the exact metric contract before scale comparisons: `semantic_768`, float32, cosine, explicit L2-normalization policy, higher-is-better score direction, and workspace/source/ordinal-map revisions. Tied distances must use a deterministic secondary identity order.
 - [ ] GPU-10 Prove Arrow/mmap immutable snapshot transport only if profiling shows a copy/serialization bottleneck.
-- [ ] GPU-11 Evaluate CAGRA recall/latency against the exact oracle; keep production disabled until separately approved.
+- [ ] GPU-11 Evaluate CAGRA recall/latency against the exact oracle; tiny live fixture passed Recall@3 = 1.0 with identity parity, but larger-corpus recall and production performance remain open. Keep production disabled until separately approved. See `docs/reports/gpu-knn-cagra-runtime-proof.{json,md}`.
+- [ ] GPU-11A Run CAGRA evaluation progressively on frozen 10K, 50K, and current-corpus snapshots. Record Recall@5/@10/@50, top-1 agreement, distance error, p50/p95 latency, build time, VRAM, filter parity, revision parity, and fallback behavior. Defer nDCG until relevance labels exist; the three-row proof is transport evidence only, not ANN-quality proof.
 - [ ] GPU-12 Prove cuGraph CPU/GPU parity on the same graph revision.
 - [ ] GPU-13 Reconcile RF6/EV1 promotion gates before any GPU result influences ranking.
 - [ ] GPU-14 Promote CAGRA only after explicit architecture revision, identity parity, recall, latency, and rollback proofs.
+
+### CAGRA semantic_768 parity gate
+
+The canonical Qdrant `codebase_chunks_768` contract uses cosine distance. The
+cuVS exact oracle and CAGRA comparison must therefore use the same
+`semantic_768`/`content` representation, float32 data, cosine metric, explicit
+normalization policy, and deterministic tie-breaking. The earlier toy
+sqeuclidean fixture is runtime evidence only and is not semantic retrieval
+parity evidence.
+
+- [ ] **CAGRA-00** Runtime/import/device proof: installed, reachable, RTX and cuVS detected.
+- [ ] **CAGRA-01** Snapshot contract: workspace/source/representation/ordinal-map revisions, checksum, 768 dimensions, float32, cosine, and `content` vector slot.
+- [ ] **CAGRA-02** 10K real Parent Atlas rows: exact cuVS versus CAGRA Recall@5/@10/@50, identity parity, and latency.
+- [ ] **CAGRA-03** 50K real Parent Atlas rows: repeat the same proof.
+- [ ] **CAGRA-04** Full frozen semantic snapshot: recall, latency, build cost, resident index size, and peak VRAM.
+- [ ] **CAGRA-05** SearchFilter to ordinal bitset parity: zero false positives, empty-set behavior, and revision match.
+- [ ] **CAGRA-06** VRAM arbitration and failover: use the existing memory-pressure owner; fall back to Qdrant when headroom is insufficient.
+- [ ] **CAGRA-07** Qdrant-versus-CAGRA executor comparison on the same queries; neither executor adds a second semantic-lane vote.
+- [ ] **CAGRA-08** Production eligibility decision; remains `false` until all preceding gates and rollback evidence pass.
+
+Required identity checks for every scale:
+
+```text
+ordinal_map_revision_match = PASS
+packet_key_parity = PASS
+symbol_version_id_parity = PASS where present
+source_revision_parity = PASS
+unknown_ordinals = 0
+duplicate_canonical_ids = 0
+```
+
+### Current GPU-KNN gate state — 2026-08-14
+
+- `GPU-KNN-01` 8098 health/capabilities: **PASS**.
+- `GPU-KNN-02` exact `semantic_768`: **PASS_ON_LIVE_FIXTURE**.
+- `GPU-KNN-03` CAGRA request: **PROHIBITED_BY_OPENSPEC**; capability metadata is contradictory and is not accepted as proof.
+- `GPU-KNN-03` CAGRA build/search: **PASS_ON_TINY_FIXTURE**; production remains quarantined.
+- `GPU-KNN-04` packet/revision identity: **PASS_ON_LIVE_FIXTURE**.
+- `GPU-KNN-05` exact-vs-CAGRA Recall@3: **1.0_ON_TINY_FIXTURE**; larger-corpus evaluation remains open.
+- `GPU-KNN-07` latency measurement: **PASS_ON_TINY_FIXTURE**; graph-build-per-request latency is not a production benchmark.
+
+The sidecar now reports CAGRA on separate axes: `available=true`,
+`authorized_for_experiment=true`, `proof_status=RUNTIME_PROVEN_ON_TINY_FIXTURE`,
+and `production_status=QUARANTINED`. Importability/capability is therefore not
+treated as production authorization.
+
+Graph expansion remains a separate bounded evidence gate: seed cap, explicit
+depth, per-seed neighbor limit, canonical visited dedupe, final candidate cap,
+and fail-open behavior. It is not a second fusion owner or a custom replacement
+for CAGRA/HNSW graph ANN.
+- `GPU-KNN-06` extra RRF vote: **DESIGN_GUARD_PASS**; executor choice remains inside one semantic lane.
+
+The exact proof did not modify Qdrant, Valkey, Neo4j, RRF, or canonical data.
+
+Current bounded implementation note: `atlas-rapids-knn-client.ts` targets the
+existing RAPIDS sidecar endpoints `/v1/knn/exact` and `/v1/knn/cagra`. It accepts
+only `semantic_768`/768-dimensional vectors and requires `(packetKey,
+sourceRevision)` identity for every corpus row. This is a dense executor seam,
+not a new Qdrant writer, RRF lane, PageRank ranker, or Valkey vector owner.
 
 ### P3 — optimization experiments
 

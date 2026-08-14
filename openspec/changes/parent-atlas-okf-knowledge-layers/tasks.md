@@ -4,6 +4,41 @@ Scope is the first bounded slice only (see proposal.md "What Changes"). Do not
 start concept/hyperedge modeling, the synthesis-mapping ledger, the full
 recommendation engine, or Deep Agents integration under this task list.
 
+## Implementation evidence — 2026-08-14
+
+- [x] Added the read-only ownership scanner
+  `scripts/atlas/audit-okf-library-ownership.mjs` and command
+  `npm run atlas:okf:library:audit`.
+- [x] Added the separate read-only runtime ownership scanner
+  `scripts/atlas/audit-okf-runtime-ownership.mjs` and command
+  `npm run atlas:okf:runtime:ownership`. It classifies canonical owners,
+  derived views, runtime executors, projections, cache, recommendations, and
+  optional orchestration/documentation surfaces without promoting any owner.
+- [x] Produced `docs/reports/okf-library-ownership.json` and `.md` after
+  scanning 26,408 executable/source files and 2 package manifests.
+- [x] The scan identified `Deep Agents` as `MISSING`; `tree-sitter`,
+  `ast-grep`, `OpenWiki`, and `cuGraph` as `IMPORTED_UNPROVEN`. Other rows are
+  heuristic `WIRED_CANDIDATE` evidence only, not promotion to canonical
+  ownership. A source-line scanner cannot prove runtime invocation, output
+  consumption, persistence, or production reachability.
+- [x] Scanner bug fixed before final run: documentation/configuration files and
+  audit scripts were excluded, and imports now require same-line import/use
+  evidence. No packages were installed and no runtime endpoints were called.
+- [x] Added the cross-domain OKF contract owner
+  `sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.ts`.
+  It defines revisioned domain classification, a derived 4×6 feature envelope,
+  and evidence-linked recommendations without replacing the existing
+  classification envelope, FeatureMatrix5/FeatureMatrixRowV1, or Kanban owner.
+- [x] Extended the existing ontology-linked tuple contract with relation
+  revision, optional source span, and explicit `OBSERVED | DERIVED |
+  SUPERSEDED` lifecycle. This remains evidence/provenance, not canonical
+  identity or retrieval truth.
+- [x] Added focused contract coverage in
+  `sveltekit-frontend/src/lib/server/atlas/contracts/okf-cross-domain-v1.spec.ts`.
+  The focused lane-contracts run passed 4 tests. This proves schema behavior
+  only; it does not prove production callers, persistence, or runtime library
+  ownership.
+
 ## Slice 1 — OKF validation + gap export
 
 - [ ] Validate existing `.okf/` files against OKF v0.2 (provenance, trust, lifecycle fields present and well-formed).
@@ -53,10 +88,10 @@ type TelemetryBreadth = {
 
 ## Slice 2 — Library integration scanner (read-only)
 
-- [ ] Build a script that walks package manifests + lockfiles + source imports for a fixed candidate list (tree-sitter, ast-grep, ts-morph, LangExtract, Deep Agents, LangChain, LangGraph, OpenWiki, KafkaJS, Debezium, Neo4j GDS, cuGraph, cuVS, TurboVec, Langfuse, OpenTelemetry, Mastra).
-- [ ] For each: record declared/resolved version, imported (bool), invoked (bool), output consumed (bool), output persisted (bool), runtime endpoint if any.
-- [ ] Classify: `WIRED | INSTALLED_UNUSED | IMPORTED_UNPROVEN | MISSING | MOCKED | STUBBED | BROKEN`.
-- [ ] Output: one JSON + Markdown report, no code changes.
+- [x] Build a read-only script that walks package manifests + executable/source imports for a fixed candidate list (tree-sitter, ast-grep, ts-morph, LangExtract, Deep Agents, LangChain, LangGraph, OpenWiki, Neo4j GDS, cuGraph, cuVS, TurboVec, Langfuse, OpenTelemetry, Mastra, PostgreSQL AIO, pgvector, bitmap indexes, Valkey, and Kanban recommendations).
+- [x] For each: record declared/imported/invoked/output-consumed/output-persisted evidence and endpoint hints. Resolved package versions and live reachability remain separate follow-up gates.
+- [x] Classify conservatively with `WIRED_CANDIDATE | INSTALLED_UNUSED | IMPORTED_UNPROVEN | MISSING | CAPABILITY_EVIDENCE_ONLY | NOT_PROVEN`.
+- [x] Output one JSON + Markdown report without package installation or runtime mutation. Heuristic `WIRED_CANDIDATE` rows are not canonical-owner promotion.
 
 ## Slice 3 — Mock/stub candidate detection
 
@@ -78,6 +113,90 @@ type TelemetryBreadth = {
 - [ ] Install OpenWiki; configure its generated-wiki output directory separate from `docs/okf/parent-atlas/` (hand-authored/canonical).
 - [ ] OpenWiki synthesizes exactly one review page summarizing this audit — verify it does not scan `.env`, secrets, model binaries, raw Qdrant vectors, or unbounded logs.
 
+## Slice 6 — Cross-domain OKF schema boundary (planning/audit only)
+
+This slice defines the OKF envelope and ownership matrix; it does not promote
+any library, database feature, model, or accelerator into a canonical owner.
+
+- [x] **OKF-06.1 Domain classification envelope** Define a revisioned
+  `DomainClassificationV1` for `document`, `file`, `feature`, `symbol`, and
+  `task` subjects. It must carry `subjectRef`, `domainId`, `taxonomyRevision`,
+  `confidence`, `evidenceRefs`, `sourceRevision`, `producerId`, and
+  `producerRevision`. Domain labels navigate and group evidence; they do not
+  become `symbol_id`, `packet_key`, or retrieval truth.
+- [x] **OKF-06.2 Ontology-linked tuple envelope** Extend the existing tuple
+  boundary with typed subject/object kinds, relation revision, evidence span or
+  source reference, and lifecycle (`OBSERVED | DERIVED | SUPERSEDED`). Keep
+  n-ary process/document/feature relationships as explicit hyperedge evidence;
+  do not flatten them into fake binary symbols.
+- [x] **OKF-06.3 Feature mapping envelope** Define one derived
+  `FeatureMatrixRowV1` mapping for the current 4×6 experimental feature grid:
+  four feature families by six derived values, each with `featureId`,
+  `featureRevision`, `subjectRef`, `ontologyRefs`, `value`, `coverage`, and
+  provenance. Reuse the existing feature-matrix owner; do not create a second
+  semantic envelope or identity schema.
+- [ ] **OKF-06.4 Document/file derivation graph** Specify how a document,
+  packet, source file, symbol, related file, feature row, and ontology tuple
+  connect through evidence references. Derived relationships must be
+  replayable from canonical Postgres/Graphify records and must not be inferred
+  solely from a cluster label or embedding similarity.
+- [x] **OKF-06.5 Runtime ownership matrix** Classify LangChain, Deep Agents,
+  LangGraph, OpenWiki, PyTorch, PostgreSQL AIO, bitmap/table indexes, pgvector,
+  Qdrant, Neo4j, Valkey, and the agentic Kanban board as
+  `ORCHESTRATOR | DOCUMENTATION | COMPUTE_EXECUTOR | CANONICAL_TRUTH |
+  PROJECTION | CACHE | RECOMMENDATION_SURFACE`. The static scanner is complete;
+  live invocation, output consumption, persistence, and endpoint reachability
+  remain separate proof gates.
+- [x] **OKF-06.6 Recommendation linkage** Define a recommendation record that
+  references one or more OKF evidence IDs, Graphify receipts, feature rows,
+  and acceptance gates. Recommended work may create or update a Kanban task,
+  but it may not mutate canonical graph, packet, ontology, vector, or cache
+  truth without an independently approved apply path.
+- [ ] **OKF-06.7 Storage/index boundary** Record PostgreSQL/pgvector as
+  canonical or durable derived storage only where an existing owner proves it;
+  record bitmap/table indexes as query accelerators with explainable filter
+  parity; record PyTorch/AIO as compute/I/O capabilities, not schema owners.
+- [ ] **OKF-06.8 Agent/document boundary** Treat LangChain/Deep Agents as
+  optional orchestration, OpenWiki as a generated review surface, and the
+  Kanban agent as a recommendation/execution coordinator. None may write
+  canonical truth directly; all durable changes require promotion receipts.
+- [ ] **OKF-06.9 Schema proof** Validate representative document, file, feature,
+  tuple, cluster, and recommendation fixtures with stable IDs, revision
+  changes, missing-evidence statuses, and supersession behavior. Produce one
+  JSON/Markdown receipt with `CREATED`, `WIRED`, `PROVEN`, and `DONE` states.
+
+### Current classification for this slice
+
+| Capability | Current boundary | Status |
+| --- | --- | --- |
+| PostgreSQL / canonical identities and revisions | truth owner | PROVEN by existing architecture; version/AIO runtime probe pending |
+| pgvector / table and bitmap indexes | derived/query acceleration | capability exists; parity proof pending |
+| PyTorch | compute executor | separate GPU/runtime proof required |
+| LangChain / Deep Agents / LangGraph | optional orchestration | not a canonical owner; integration audit pending |
+| OpenWiki | generated documentation/review surface | not a truth owner; safe output boundary pending |
+| Feature matrix 4×6 | derived feature projection | schema/coverage proof pending |
+| Domain classification / ontology tuples | OKF evidence/navigation | tuple lifecycle and revision proof pending |
+| Kanban recommendations | advisory coordination | evidence-linked fixture/promotion proof pending |
+
+### Current gaps after contract implementation
+
+- The new contracts are `CREATED` and focused-test `PROVEN`; they are not yet
+  `WIRED` to a durable Postgres work-item/evidence schema or a live agent loop.
+- The existing production feature owner remains the five-column
+  `FeatureMatrix5`/`FeatureMatrixRowV1` path. The 4×6 envelope is a derived OKF
+  mapping and must not be used to create a second feature-matrix identity or
+  vector schema.
+- LangChain and LangGraph are only heuristic `WIRED_CANDIDATE` evidence from
+  the read-only scanner. Deep Agents is `MISSING`; no promotion or package
+  install is authorized by this OpenSpec.
+- OpenWiki is `IMPORTED_UNPROVEN` and remains a generated review surface. It
+  has no approved canonical-data ingestion path.
+- PostgreSQL AIO, pgvector, bitmap/table indexes, PyTorch, Qdrant, Neo4j, and
+  Valkey still require owner-specific runtime/persistence/parity receipts.
+- Domain classification, tuple lifecycle, feature mapping, and
+  recommendation schemas do not prove semantic embedding, sparse BM42,
+  TurboVec/CAGRA, PageRank, or agent execution behavior.
+
 ## Explicitly deferred (do not start)
 
 - Concept/hyperedge modeling (`KnowledgeHyperedge`, `OkfSynthesisMapping`).
@@ -85,3 +204,6 @@ type TelemetryBreadth = {
 - Recommendation engine automation beyond the fixture in Slice 4.
 - Applying `atlas_work_items` migration to live Postgres.
 - Deep Agents / LangGraph agent-runtime wiring.
+- Direct OpenWiki ingestion of secrets, raw vectors, or unbounded repository logs.
+- Treating PostgreSQL AIO, bitmap indexes, pgvector, or PyTorch as new canonical
+  schema owners.

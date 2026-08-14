@@ -26,6 +26,11 @@
 
 ## Lane B — OKF ontology and linked tuples
 
+Cross-domain envelope ownership and the 4×6 feature mapping are now tracked
+by `parent-atlas-okf-knowledge-layers` OKF-06.1–OKF-06.9. This lane remains
+the evidence/projection consumer; it must not define a competing tuple,
+feature, or recommendation truth owner.
+
 - [ ] Extend the OKF schema/registry to carry ontology-linked tuples as first-class evidence.
 - [ ] Record domain classification as a lineage-linked navigation surface, not canonical identity.
 - [ ] Add explicit provenance fields for tuple observation and revision history.

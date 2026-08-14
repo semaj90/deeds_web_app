@@ -18,6 +18,7 @@ const REPORT_DIR = join(ROOT, 'docs/reports');
 const REPORT_JSON = join(REPORT_DIR, 'ast-ownership-receipt.json');
 const REPORT_MD = join(REPORT_DIR, 'ast-ownership-receipt.md');
 const WRITE = process.argv.includes('--write');
+const LIFECYCLE_STATES = new Set(['ACTIVE', 'MIGRATION_CANDIDATE', 'SUPERSEDED', 'QUARANTINED', 'DELETED']);
 
 const CODE_EXTENSIONS = new Set(['.ts', '.mts', '.cts', '.js', '.mjs', '.cjs']);
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.svelte-kit', 'dist', 'build', '.cache', '.tmp', '.venv', '.venv-cu130', '.venv-gemma4', '.python311', '.opencode', '.claude', '.vscode']);
@@ -39,8 +40,13 @@ function normalize(value) {
 
 function readRegistry() {
   const registry = JSON.parse(readFileSync(REGISTRY_PATH, 'utf8'));
-  if (registry.schemaVersion !== 'atlas-supersession-v1' || !Array.isArray(registry.entries)) {
+  if (registry.schemaVersion !== 'atlas-supersession-v1' || !Array.isArray(registry.entries) || !registry.lifecycleStates || !registry.promotionPolicy) {
     throw new Error(`Invalid supersession registry: ${REGISTRY_PATH}`);
+  }
+  for (const entry of registry.entries) {
+    if (!LIFECYCLE_STATES.has(entry.state)) {
+      throw new Error(`Invalid lifecycle state '${entry.state}' for ${entry.artifact}`);
+    }
   }
   return registry;
 }
@@ -78,6 +84,7 @@ function auditEntry(entry, files) {
     artifact: entry.artifact,
     artifactExists,
     declaredState: entry.state,
+    lifecycleStateValid: LIFECYCLE_STATES.has(entry.state),
     observedState: state,
     liveCallers: [...new Set(liveCallers)].sort(),
     importers: [...new Set(importers)].sort(),
@@ -127,6 +134,7 @@ const report = {
   generatedAt: new Date().toISOString(),
   status: entries.every((entry) => entry.artifactExists && entry.evidence.liveCallersEnumerated && entry.evidence.graphifyStageEnumerated) ? 'PROVEN_AUDIT' : 'INCOMPLETE',
   gates: {
+    LIFECYCLE_STATE_VALID: entries.every((entry) => entry.lifecycleStateValid),
     AST_OWNER_IDENTIFIED: entries.every((entry) => entry.replacementCandidates.length > 0),
     LIVE_CALLERS_ENUMERATED: entries.every((entry) => entry.evidence.liveCallersEnumerated),
     GRAPHIFY_STAGE_IDENTIFIED: entries.every((entry) => entry.evidence.graphifyStageEnumerated),
@@ -134,7 +142,9 @@ const report = {
     NO_ASSUMED_TYPES_TS: entries.every((entry) => entry.evidence.noAssumedTypes),
     SUPERSEDED_IMPORT_DETECTED: entries.some((entry) => entry.observedState === 'SUPERSEDED' && entry.liveCallers.length > 0)
   },
-  entries
+  entries,
+  lifecycleStates: registry.lifecycleStates,
+  promotionPolicy: registry.promotionPolicy
 };
 
 if (WRITE) {

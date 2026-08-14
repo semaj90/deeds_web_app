@@ -83,17 +83,13 @@ observed >600s). This turn independently re-verified it from a fresh context rat
 trusting the report at face value, per this repo's evidence rules — see "Independent
 re-verification" below. `/v1/knn/exact` is now genuinely `RUNTIME_SMOKE_PROVEN`.
 
-**Open contradiction found in this file, not yet resolved — read before touching CAGRA
-anywhere else**: the "index-type decision" paragraph immediately below states CAGRA is
-*explicitly excluded* ("never CAGRA... do not promote CAGRA"). Part B further down now
-claims `RAPIDS_CAGRA_ENDPOINT: RUNTIME_SMOKE_PROVEN` with a live `POST /v1/knn/cagra`
-implementation. Both statements are in this same document. This turn did **not**
-independently verify the CAGRA endpoint (no probe run against `/v1/knn/cagra`, no
-recall-vs-brute_force comparison) — its `RUNTIME_SMOKE_PROVEN` claim rests only on the
-unverified report text, which is exactly the failure pattern the Agent Execution
-Integrity rules exist to catch. Until an operator decides to lift the exclusion, treat
-`knn.cagra`'s status as `UNVERIFIED_CLAIM_CONTRADICTS_RECORDED_DECISION`, not as proven,
-and do not build anything downstream (client, MCP op, recall fixture) on top of it.
+**Contradiction resolved 2026-08-14**: the operator-authorized bounded probe
+independently verified `POST /v1/knn/cagra` against the exact cuVS oracle on a
+three-row `semantic_768` fixture with Recall@3 = `1.0` and identity parity.
+The recorded exclusion remains a production decision, so the resulting state is
+`RUNTIME_PROVEN_ON_TINY_FIXTURE` plus `PRODUCTION_QUARANTINED`, not promotion.
+Larger-corpus recall, filters, revision swaps, fallback, and production
+approval remain open.
 
 **Independent re-verification performed this turn** (fresh context, did not reuse the
 prior turn's claims): hit the already-running sidecar directly —
@@ -101,8 +97,9 @@ prior turn's claims): hit the already-running sidecar directly —
 - `POST /v1/knn/exact` with a freshly-generated synthetic 3-row/768-dim fixture
   (query = one-hot dim 0; corpus = identical / opposite / orthogonal one-hot vectors) →
   `[packet:fixture-a (0.0), packet:fixture-c (2.0)]` for `topK=2` — matches the expected
-  rank order exactly (squared-euclidean metric, consistent with orthogonal-vector
-  distance 2.0).
+  rank order exactly for the explicitly used squared-euclidean mechanics fixture.
+  This is not canonical cosine semantic-retrieval parity; the CAGRA semantic gate
+  must use the frozen `semantic_768`/`content` cosine contract.
 - 3 of the 5 fail-closed probes run directly: dimension mismatch (767-length vector) →
   `422 DIMENSION_MISMATCH`; duplicate `(packetKey, sourceRevision)` → `422
   DUPLICATE_CORPUS_IDENTITY`; `topK=0` on a 1-row corpus → `422 INVALID_TOPK`. All three
@@ -155,11 +152,51 @@ request receipt, not an absolute epoch timestamp — documented in-code, kept as
 
 ## Part B — GPU sidecar (health + capabilities + exact KNN only)
 
+### Current-session update — 2026-08-14
+
+The dedicated `atlas-rapids-cu13` WSL environment and existing
+`python/atlas_rapids_sidecar.py` were started without rebuilding containers or
+changing canonical services. `GET /health` reached `127.0.0.1:8098` and
+reported an NVIDIA GeForce RTX 3060 Ti; cuVS was `26.06.00`.
+
+The exact endpoint was exercised against a fresh three-row, 768-dimensional
+`semantic_768` fixture. Three consecutive requests returned the same
+revision-qualified packet order and preserved the `packetKey` +
+`sourceRevision` identity contract. The live artifact is
+`docs/reports/gpu-knn-exact-runtime-proof.{json,md}`.
+
+Current gate result: `GPU-KNN-01 PASS`, `GPU-KNN-02 PASS_ON_LIVE_FIXTURE`,
+`GPU-KNN-03 PASS_ON_TINY_FIXTURE`, `GPU-KNN-04 PASS_ON_LIVE_FIXTURE`,
+`GPU-KNN-05 RECALL_AT_3=1.0_ON_TINY_FIXTURE`, and `GPU-KNN-06
+DESIGN_GUARD_PASS`.
+
+The capability endpoint advertises `knn.cagra` as runtime-smoke-proven, but
+that conflicts with the recorded operator decision below. CAGRA is now
+separately proven only on the bounded tiny fixture described below; it remains
+`PROHIBITED` for production promotion until the operator explicitly revises
+the decision. Qdrant, Valkey, Neo4j, RRF, and canonical data were not modified.
+
+Bounded operator-authorized CAGRA probe (2026-08-14): the existing endpoint
+then successfully built/searched CAGRA on the same three-row `semantic_768`
+fixture used by exact KNN. Three queries matched the exact oracle at Recall@3
+`1.0` and preserved `packetKey+sourceRevision`. This is recorded in
+`docs/reports/gpu-knn-cagra-runtime-proof.{json,md}` as
+`RUNTIME_PROVEN_ON_TINY_FIXTURE`; it is not a larger-corpus or production
+promotion proof. Production CAGRA remains quarantined pending scale, filter,
+revision-swap, fallback, and explicit promotion gates.
+
+### Architecture review — 2026-08-14
+
+cuVS brute force is the exact `semantic_768` oracle. CAGRA is one optional
+dense executor, not a separate retrieval lane. Qdrant remains the persistent
+projection; Valkey is cache/hot routing only; KMeans/SOM are routing metadata;
+Neo4j PageRank is candidate evidence. No executor may add a second RRF vote.
+
 - [x] `GPU_SIDECAR_HTTP_SERVICE`: minimal local RAPIDS sidecar live — `python/atlas_rapids_sidecar.py`, port 8098, `GET /health` + `GET /v1/capabilities`. Verified: process startup, real RTX 3060 Ti detection, live GPU memory reporting, package import reporting, graceful shutdown.
 - [x] `GPU_CAPABILITY_REGISTRY`: capability discovery response live — now reports both bounded ops separately (`knn.exact`, `knn.cagra`).
 - [x] `GPU_REQUEST_RESPONSE_SCHEMAS`: exact-KNN / CAGRA request/response contract — implemented as Pydantic models in `python/atlas_rapids_sidecar.py` (`KnnQuery`, `KnnCorpusRow`, `ExactKnnRequest`, `ExactKnnHit`, `ExactKnnResponse`, `CagraKnnResponse`).
 - [x] Exact-KNN endpoint (`POST /v1/knn/exact`) with identity manifest — implemented, syntax-verified, and **independently runtime-verified** against the live sidecar (fresh revision-qualified synthetic `semantic_768` fixture, rank order, distances, fail-closed guards, repeatability, and GPU-memory stability all matched expectations). `RAPIDS_EXACT_KNN_ENDPOINT: RUNTIME_SMOKE_PROVEN` — this status is justified by re-verification performed from a fresh context, not by trusting the originating report alone.
-- [ ] CAGRA endpoint (`POST /v1/knn/cagra`) with the same bounded identity manifest — implemented, but **quarantined** because it conflicts with the recorded architecture decision ("never CAGRA... do not promote CAGRA"). `RAPIDS_CAGRA_ENDPOINT: PROHIBITED` until an operator explicitly revises the decision and a separate runtime proof is recorded; do not build downstream consumers on it.
+- [ ] CAGRA endpoint (`POST /v1/knn/cagra`) with the same bounded identity manifest — tiny-fixture runtime and exact-oracle Recall@3 are proven, but production remains **quarantined** because larger-corpus recall, filter parity, revision swaps, fallback, and promotion approval are open. `RAPIDS_CAGRA_ENDPOINT: RUNTIME_PROVEN_ON_TINY_FIXTURE; PRODUCTION_QUARANTINED`.
 - [x] Row-count (`ATLAS_RAPIDS_KNN_MAX_ROWS`, default 25000), top-k, VRAM (`ATLAS_RAPIDS_KNN_MIN_FREE_GPU_MB`, default 512), timeout, and duplicate-identity guards — all fail-closed with typed error codes (`DIMENSION_MISMATCH`, `MISSING_PACKET_IDENTITY`, `MISSING_REVISION_IDENTITY`, `DUPLICATE_CORPUS_IDENTITY`, `INVALID_TOPK`, `CORPUS_TOO_LARGE`, `EMPTY_CORPUS`, `INSUFFICIENT_GPU_MEMORY`, `DEADLINE_EXPIRED`, `CUVS_UNAVAILABLE`). Uses the `distances, neighbors = brute_force.search(...)` return order confirmed correct earlier this session (the swapped-order bug that was found and fixed in GS1.31-33).
 - [ ] Remaining exact-KNN local proof record items (non-blocking for the current contract phase): missing `sourceRevision` fail-closed probe, deadline-expired probe, full 10x determinism run, 10x GPU-memory plateau receipt, formal fixture report artifact.
 - [ ] Fixture: 20,000-row `semantic_768` sample, revision-qualified. `QDRANT_CUVS_RECALL_FIXTURE: NOT_STARTED`.
@@ -167,6 +204,36 @@ request receipt, not an absolute epoch timestamp — documented in-code, kept as
 - [x] One internal TypeScript client (`gpu-sidecar-client.ts`) — request deadline, GPU memory-limit awareness, row→`symbol_version_id` mapping, stale-row/orphan counting. `RAPIDS_TYPESCRIPT_CLIENT: IMPLEMENTED_NOT_RUNTIME_PROVEN`.
 - [ ] Exactly one bounded read-only MCP operation exposing the exact-KNN result — **only after** the client above is proven. `RAPIDS_BOUNDED_MCP_OPERATION: NOT_STARTED`.
 - [ ] Explicitly NOT in this slice: clustering, tRPC admin API, Kanban GPU receipts, Arrow mmap, Redis centroid warming, CUDA IPC, Kafka CDC work.
+
+## Part B2 — routing and hot/warm/cold evaluation backlog
+
+- [x] **ROUTE-01** Freeze `SemanticSnapshotV1`: `atlas.semantic-snapshot.v1` manifest now validates workspace/source/representation/ordinal-map revisions, canonical identity and vector digests, float32 `semantic_768` dimensions, and Arrow IPC/mmap artifact provenance. Vector materialization and Go/CUDA consumers remain open.
+- [x] **ROUTE-02** Freeze the revisioned KMeans routing metadata contract derived from `semantic_768` at K=64/128/256. Validation now requires snapshot, workspace, representation, ordinal-map, routing, assignment, and centroid lineage; centroid metadata remains routing-only and never becomes canonical identity or an additional RRF vote. Runtime clustering, Valkey warming, and candidate-reduction benchmarks remain open.
+- [ ] **ROUTE-03** Evaluate the existing 20×20 SOM only as optional topology-aware routing/visualization; compare against KMeans using candidate reduction, recall, latency, and expansion rate.
+- [ ] **ROUTE-04** Prove hot/warm/cold expansion: Valkey hot routing and ACE cards → Qdrant/CAGRA warm retrieval → Postgres/immutable snapshot cold reconstruction; every transition is revision-qualified and fail-open.
+- [ ] **ROUTE-05** Prove the same `SearchFilter` and revision mask across Qdrant, exact cuVS, and future CAGRA; zero false positives and no executor-specific fusion lane.
+- [ ] **ROUTE-06** Benchmark the routing tournament at 10K, 50K, and current semantic-card corpus sizes before considering production CAGRA or centroid warming.
+
+### CAGRA correction and canonical corpus gates — 2026-08-14
+
+- CAGRA is `INSTALLED/RUNTIME_PROVEN` on the WSL2 RTX 3060 Ti sidecar and
+  `PRODUCTION_QUARANTINED`; the tiny three-row Recall@3 result is not quality
+  proof.
+- The first real comparison must use the canonical Qdrant `content` vector
+  space with `semantic_768`, dimension 768, float32, cosine, explicit
+  normalization, and a revisioned ordinal map. Do not use the earlier
+  sqeuclidean toy fixture as semantic parity evidence.
+- The exact cuVS brute-force index is the nearest-neighbor oracle. Qdrant is a
+  serving executor comparison, not ground truth. CAGRA and Qdrant remain
+  alternative executors behind one logical dense lane.
+- Required scale sequence: 10K real Parent Atlas rows, 50K rows, then the
+  full frozen semantic snapshot. Each run must report Recall@5/@10/@50,
+  top-1 agreement, distance error, p50/p95 search latency, build time, VRAM,
+  identity parity, and failure/fallback behavior.
+- `nDCG` is deferred until a relevance-labeled retrieval set exists; do not
+  manufacture relevance labels from exact-neighbor rank.
+- SearchFilter-to-bitset parity, atomic index revision swaps, and VRAM
+  arbitration are separate gates. CAGRA cannot become a retrieval requirement.
 
 ## Part C — Patch Tournament (Phase 1: deterministic tournament only) — GS1.41 SEAM ACCEPTED
 

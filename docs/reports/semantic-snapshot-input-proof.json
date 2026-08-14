@@ -1,0 +1,33 @@
+{
+  "schema": "atlas.semantic-snapshot-input-proof.v1",
+  "status": "CANDIDATE_VALIDATED_MANIFEST_INCOMPLETE",
+  "generatedAt": "2026-08-14T17:29:48.857Z",
+  "inputPath": ".tmp\\atlas-vector-snapshots\\vector-snapshot-5k-turbovec-input.ndjson",
+  "representation": {
+    "id": "semantic_768",
+    "dimension": 768,
+    "dtype": "float32"
+  },
+  "rows": 100,
+  "validRows": 100,
+  "invalidRows": 0,
+  "duplicatePacketKeys": 0,
+  "duplicateSourceRefs": 0,
+  "identityDigest": "e7bb6a23376924aca84434b2a35887d79d86397e9a3662ab88dac95b7dbd097a",
+  "vectorDigest": "979ef085f5d5718d5f0f3bde0bbb81242ba3920f8d58475f06fc5425195f7561",
+  "missingManifestFields": [
+    "workspaceRevision",
+    "sourceRevision",
+    "representationRevision",
+    "ordinalMapRevision",
+    "artifactPath",
+    "artifactChecksum"
+  ],
+  "errors": [],
+  "gates": {
+    "INPUT_ROWS_VALID": "PASS",
+    "SEMANTIC_768_DIMENSION": "PASS",
+    "IDENTITY_UNIQUENESS": "PASS",
+    "SNAPSHOT_MANIFEST_COMPLETE": "BLOCKED_MISSING_LINEAGE"
+  }
+}

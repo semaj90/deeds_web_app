@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "atlas.qas.search-runtime-feature-build.v1",
+  "inputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\search-runtime-qas-candidates.raw.jsonl",
+  "outputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\atlas-qas-candidate-features.jsonl",
+  "status": "MISSING_INPUT",
+  "rowsRead": 0,
+  "rowsWritten": 0,
+  "candidatesSeen": 0,
+  "acceptedRows": 0,
+  "rejectedRows": 0,
+  "exactBaselineRows": 0,
+  "rejectedDetails": [],
+  "canonicalWrites": false,
+  "sourceOwner": "SearchRuntime candidate envelope + existing feature resolver"
+}

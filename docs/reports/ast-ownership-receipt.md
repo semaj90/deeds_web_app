@@ -1,6 +1,6 @@
 # AST ownership receipt
 
-- generatedAt: 2026-08-14T03:41:49.091Z
+- generatedAt: 2026-08-14T14:46:31.916Z
 - status: PROVEN_AUDIT
 
 | artifact | observed state | live callers | importers | replacement candidates |

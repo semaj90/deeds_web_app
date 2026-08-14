@@ -890,6 +890,32 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     return chunks
 
 
+def _syntax_diagnostics(text: str, language: str) -> list[str]:
+    """Report parser recovery evidence without becoming an extraction owner."""
+    if not TREE_SITTER_AVAILABLE:
+        return []
+    try:
+        parser = get_parser(language)
+        tree = parser.parse(text.encode("utf-8"))
+        root = tree.root_node
+    except Exception:
+        return []
+
+    diagnostics: list[str] = []
+    stack = [root]
+    while stack:
+        node = stack.pop()
+        node_type = str(getattr(node, "type", ""))
+        is_error = bool(getattr(node, "is_error", False)) or node_type == "ERROR"
+        is_missing = bool(getattr(node, "is_missing", False))
+        if is_error or is_missing:
+            row, column = getattr(node, "start_point", (0, 0))
+            marker = "MISSING" if is_missing else "ERROR"
+            diagnostics.append(f"Tree-sitter {marker} at line {int(row) + 1}, column {int(column) + 1}: {node_type}")
+        stack.extend(reversed(list(getattr(node, "children", []))))
+    return diagnostics
+
+
 def _code_chunks_regex(text: str, language: str) -> list[Chunk]:
     lines = text.splitlines()
     chunks: list[Chunk] = []
@@ -2007,8 +2033,44 @@ def _symbol_graph_evidence(source: str, language: str, file_path: str) -> tuple[
     return edges, []
 
 
+_AST_LANGUAGE_EXTENSIONS: dict[str, str] = {
+    ".ts": "typescript", ".tsx": "tsx", ".mts": "typescript", ".cts": "typescript",
+    ".js": "javascript", ".jsx": "javascript", ".mjs": "javascript", ".cjs": "javascript",
+    ".py": "python", ".pyi": "python", ".rs": "rust", ".go": "go", ".java": "java",
+}
+
+
+def _resolve_ast_language(language: str, file_path: str) -> tuple[str, Optional[str]]:
+    requested = language.strip().lower()
+    suffix = Path(file_path).suffix.lower()
+    supported = set(_AST_LANGUAGE_EXTENSIONS.values())
+    if requested not in supported and requested not in {"typescriptreact", "javascriptreact"}:
+        return requested, f"UnsupportedLanguageError: unsupported language '{language}' for '{file_path}'"
+    extension_language = _AST_LANGUAGE_EXTENSIONS.get(suffix)
+    if extension_language and requested not in {extension_language, "typescriptreact", "javascriptreact"}:
+        return requested, f"UnsupportedLanguageError: extension '{suffix}' does not match language '{language}'"
+    if suffix and suffix not in _AST_LANGUAGE_EXTENSIONS:
+        return requested, f"UnsupportedLanguageError: unsupported file extension '{suffix}'"
+    return requested, None
+
+
 def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
     diagnostics: list[str] = []
+    language, language_error = _resolve_ast_language(req.language, req.file_path)
+    if language_error:
+        return AstEvidenceResponse(
+            schema="atlas.ast.evidence.v1",
+            engine="treesitter-chunker",
+            engine_version=_package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker") or "unknown",
+            language=language,
+            file_path=req.file_path,
+            source_revision=req.source_revision,
+            chunks=[],
+            edges=[],
+            diagnostics=[language_error],
+            error_tag="UnsupportedLanguageError",
+            syntax_status="RECOVERED_WITH_ERRORS",
+        )
     if not TREESITTER_CHUNKER_AVAILABLE:
         diagnostics.append("treesitter-chunker is unavailable; no replacement evidence was produced")
         return AstEvidenceResponse(
@@ -2021,13 +2083,17 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
             chunks=[],
             edges=[],
             diagnostics=diagnostics,
+            error_tag="ChunkingError",
+            syntax_status="RECOVERED_WITH_ERRORS",
         )
 
     try:
-        chunks = _code_chunks_tree_sitter(req.source, req.language)
+        chunks = _code_chunks_tree_sitter(req.source, language)
     except Exception as exc:
-        diagnostics.append(f"treesitter-chunker extraction failed: {exc}")
+        diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
         chunks = []
+
+    diagnostics.extend(_syntax_diagnostics(req.source, language))
 
     engine_version = _package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker") or "unknown"
     evidence_chunks: list[AstEvidenceChunk] = []
@@ -2147,7 +2213,7 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
                 ))
 
     if not edges:
-        fallback_edges, edge_diagnostics = _symbol_graph_evidence(req.source, req.language, req.file_path)
+        fallback_edges, edge_diagnostics = _symbol_graph_evidence(req.source, language, req.file_path)
         edges.extend(fallback_edges)
         diagnostics.extend(edge_diagnostics)
 
@@ -2155,12 +2221,14 @@ def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
         schema="atlas.ast.evidence.v1",
         engine="treesitter-chunker",
         engine_version=engine_version,
-        language=req.language,
+        language=language,
         file_path=req.file_path,
         source_revision=req.source_revision,
         chunks=evidence_chunks,
         edges=edges,
         diagnostics=diagnostics,
+        error_tag="ChunkingError" if diagnostics else None,
+        syntax_status="RECOVERED_WITH_ERRORS" if diagnostics else "CLEAN",
     )
 
 

@@ -1,0 +1,58 @@
+{
+  "schema": "atlas.ast.failure-isolation.v1",
+  "generatedAt": "2026-08-14T15:14:03.158Z",
+  "sidecarUrl": "http://127.0.0.1:8095",
+  "sourceRevision": "ast-failure-isolation-v1",
+  "status": "PROVEN",
+  "totalFiles": 4,
+  "passedFiles": 4,
+  "failedFiles": 0,
+  "malformedDiagnosticPass": true,
+  "missingDiagnosticPass": true,
+  "results": [
+    {
+      "name": "valid-a",
+      "filePath": "src/valid-a.ts",
+      "status": "PASS",
+      "errorTag": null,
+      "syntaxStatus": "CLEAN",
+      "chunkCount": 2,
+      "diagnosticCount": 0,
+      "expectedDiagnostic": null,
+      "diagnosticMatch": true
+    },
+    {
+      "name": "malformed",
+      "filePath": "src/malformed.ts",
+      "status": "PASS",
+      "errorTag": "ChunkingError",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "chunkCount": 1,
+      "diagnosticCount": 1,
+      "expectedDiagnostic": "ERROR",
+      "diagnosticMatch": true
+    },
+    {
+      "name": "missing-delimiter",
+      "filePath": "src/missing-delimiter.ts",
+      "status": "PASS",
+      "errorTag": "ChunkingError",
+      "syntaxStatus": "RECOVERED_WITH_ERRORS",
+      "chunkCount": 2,
+      "diagnosticCount": 1,
+      "expectedDiagnostic": "MISSING",
+      "diagnosticMatch": true
+    },
+    {
+      "name": "valid-b",
+      "filePath": "src/valid-b.ts",
+      "status": "PASS",
+      "errorTag": null,
+      "syntaxStatus": "CLEAN",
+      "chunkCount": 2,
+      "diagnosticCount": 0,
+      "expectedDiagnostic": null,
+      "diagnosticMatch": true
+    }
+  ]
+}

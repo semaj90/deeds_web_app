@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "atlas.qas.input-adapter-report.v1",
+  "inputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\atlas-qas-candidate-features.raw.jsonl",
+  "outputPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\reports\\atlas-qas-candidate-features.jsonl",
+  "status": "MISSING_INPUT",
+  "rowsRead": 0,
+  "rowsWritten": 0,
+  "rejectedRows": [],
+  "writesCanonicalTruth": false
+}

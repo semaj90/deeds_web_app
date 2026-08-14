@@ -178,9 +178,13 @@ def capabilities() -> dict[str, Any]:
         ops.append(
             {
                 "op": "knn.cagra",
-                "status": "RUNTIME_SMOKE_PROVEN",
-                "note": "POST /v1/knn/cagra is wired with the same bounded identity contract as exact-KNN "
-                "and has now been exercised against the live WSL2 GPU environment with a successful request/response round trip.",
+                "status": "RUNTIME_PROVEN_ON_TINY_FIXTURE",
+                "available": True,
+                "authorized_for_experiment": True,
+                "proof_status": "RUNTIME_PROVEN_ON_TINY_FIXTURE",
+                "production_status": "QUARANTINED",
+                "approval_scope": "NON_MUTATING_BOUNDED_BENCHMARK",
+                "note": "POST /v1/knn/cagra has passed a bounded exact-oracle comparison on a tiny semantic_768 fixture; larger-corpus recall, filters, revision swaps, fallback, and production promotion remain unproven.",
                 "backend": "cuvs.neighbors.cagra",
                 "backend_version": _CAGRA_STATUS.get("version"),
                 "max_corpus_rows": _MAX_CORPUS_ROWS,
@@ -188,7 +192,17 @@ def capabilities() -> dict[str, Any]:
             }
         )
     else:
-        ops.append({"op": "knn.cagra", "status": "UNAVAILABLE", "reason": _CAGRA_STATUS.get("error")})
+        ops.append(
+            {
+                "op": "knn.cagra",
+                "status": "UNAVAILABLE",
+                "available": False,
+                "authorized_for_experiment": False,
+                "proof_status": "NOT_RUN",
+                "production_status": "QUARANTINED",
+                "reason": _CAGRA_STATUS.get("error"),
+            }
+        )
 
     return {
         "sidecar_version": "0.2.0",

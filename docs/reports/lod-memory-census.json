@@ -1,0 +1,55 @@
+{
+  "schema": "atlas.lod-memory-census.v1",
+  "status": "PARTIAL_NOT_MEASURED",
+  "generatedAt": "2026-08-14T17:26:33.826Z",
+  "workspaceRevision": null,
+  "representationRevision": null,
+  "measurementMode": "READ_ONLY_LOCAL_PROCESS_AND_ARTIFACT_METADATA",
+  "process": {
+    "owner": "lod-census-node-process",
+    "rssBytes": 41586688,
+    "heapUsedBytes": 4342664,
+    "externalBytes": 1529370,
+    "arrayBuffersBytes": 15458
+  },
+  "artifacts": {
+    "semanticSnapshot": {
+      "status": "NOT_CONFIGURED",
+      "bytes": null
+    },
+    "compressedIndex": {
+      "status": "NOT_CONFIGURED",
+      "bytes": null
+    },
+    "turbovecSourceRoot": {
+      "status": "MEASURED",
+      "path": "turbovec",
+      "bytes": 560505533,
+      "files": 1433,
+      "kind": "directory"
+    }
+  },
+  "measurements": {
+    "canonicalFp32CorpusBytes": null,
+    "compressedTurboVecBytes": null,
+    "compressionRatio": null,
+    "pythonTurboVecRssBytes": null,
+    "rustTurboVecRssBytes": null,
+    "arrowVirtualBytes": null,
+    "arrowResidentBytes": null,
+    "qdrantMemoryBytes": null,
+    "valkeyMemoryBytes": null,
+    "gpuVramBytes": null,
+    "ordinalMapBytes": null
+  },
+  "gates": {
+    "LOD-MEMORY-COMPRESSION-PROVEN": "NOT_PROVEN",
+    "LOD-PROCESS-WORKING-SET-PROVEN": "NOT_PROVEN"
+  },
+  "gaps": [
+    "Run against a frozen SemanticSnapshotV1 and a measured TurboVec artifact.",
+    "Collect owner-process RSS separately; this process RSS is not TurboVec RSS.",
+    "Collect Arrow/mmap resident pages, Qdrant, Valkey, GPU VRAM, and ordinal-map bytes.",
+    "Repeat after reload to detect hidden FP32 duplicates."
+  ]
+}

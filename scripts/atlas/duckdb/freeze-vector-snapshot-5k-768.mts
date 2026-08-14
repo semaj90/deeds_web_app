@@ -35,7 +35,8 @@ import { EMBEDDINGGEMMA_FULL768_V1 } from '../../../sveltekit-frontend/src/lib/s
 import { VECTOR_INDEX_REGISTRY } from '../../../sveltekit-frontend/src/lib/server/vector/vector-index-registry.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '../..');
+// __dirname is scripts/atlas/duckdb; the repository root is three levels up.
+const REPO_ROOT = path.resolve(__dirname, '../../..');
 const SNAPSHOT_DIR = path.join(REPO_ROOT, '.tmp', 'atlas-vector-snapshots');
 const MANIFEST_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k-768-manifest.json');
 const PARQUET_PATH = path.join(SNAPSHOT_DIR, 'vector-snapshot-5k-768.parquet');
@@ -140,7 +141,7 @@ async function main() {
       expected_dimension: EXPECTED_DIMENSION,
       generated_at: new Date().toISOString(),
       snapshot_kind: 'deterministic-5k-vector-freeze-768',
-      registry: VECTOR_INDEX_REGISTRY.vectorSnapshot5k,
+      registry: VECTOR_INDEX_REGISTRY.vectorSnapshot5k768,
       snapshot: {
         duckdb_path: path.relative(REPO_ROOT, path.join(SNAPSHOT_DIR, 'atlas-vector-snapshot-5k-768.duckdb')),
         parquet_path: path.relative(REPO_ROOT, PARQUET_PATH),

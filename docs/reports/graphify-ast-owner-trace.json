@@ -1,0 +1,26 @@
+{
+  "schema": "atlas.graphify.ast-owner-trace.v1",
+  "generatedAt": "2026-08-14T16:26:33.794Z",
+  "graphifyDaily": {
+    "command": "node ../scripts/startup/run-graphify-daily-startup.mjs",
+    "chain": "npm run graphify:dedup-validation:apply && npm run graphify:materialize:apply && node ../scripts/atlas/daily-graphify-cold-processing.mjs && npm run atlas:phase8:fanout:apply && npm run atlas:qdrant:tag-mirror:apply && npm run atlas:qdrant:feature-map-sync:apply",
+    "invokesExistingAstFactsMaterializer": false
+  },
+  "existingAstMaterializer": {
+    "packageScript": "node ../scripts/atlas/ast-treesitter-facts.mjs --apply --batch 200",
+    "path": "sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs",
+    "present": true
+  },
+  "replacementCandidates": {
+    "webTreeSitterFacts": true,
+    "analysisBridge": true,
+    "sidecarClient": true,
+    "legacyExtractor": true
+  },
+  "canonicalOwnerStatus": "UNRESOLVED",
+  "replacementWiringStatus": "NOT_WIRED",
+  "fallbackPolicyStatus": "NOT_DEFINED",
+  "productionReceiptStatus": "NOT_WIRED",
+  "status": "OWNER_SELECTION_BLOCKED",
+  "conclusion": "graphify:daily does not invoke the existing AST facts materializer or the 8095 replacement; select one canonical owner before wiring a replacement."
+}

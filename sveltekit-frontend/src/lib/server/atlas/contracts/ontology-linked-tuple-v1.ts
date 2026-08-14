@@ -99,6 +99,26 @@ export const OntologyLinkedTupleProvenanceSchema = z.object({
   lastVerifiedAt: z.string().datetime().nullable().optional(),
 });
 
+export const OntologyLinkedTupleEvidenceSpanSchema = z.object({
+  sourceRef: z.string().min(1),
+  start: z.number().int().nonnegative(),
+  end: z.number().int().nonnegative(),
+}).superRefine((span, ctx) => {
+  if (span.end < span.start) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['end'],
+      message: 'evidence span end must be greater than or equal to start',
+    });
+  }
+});
+
+export const OntologyLinkedTupleLifecycleSchema = z.enum([
+  'OBSERVED',
+  'DERIVED',
+  'SUPERSEDED',
+]);
+
 export const OntologyLinkedTupleV1Schema = z.object({
   tupleId: z.string().min(1),
   schemaVersion: z.literal('ontology-linked-tuple.v1'),
@@ -117,8 +137,11 @@ export const OntologyLinkedTupleV1Schema = z.object({
   conceptIds: z.array(z.string().min(1)).max(32),
   participants: z.array(OntologyLinkedTupleParticipantSchema).max(16).default([]),
   evidenceRefs: z.array(z.string().min(1)).max(32).default([]),
+  relationRevision: z.string().min(1).optional(),
+  evidenceSpan: OntologyLinkedTupleEvidenceSpanSchema.optional(),
   confidence: z.number().min(0).max(1),
   evidenceState: OntologyLinkedTupleEvidenceStateSchema,
+  lifecycle: OntologyLinkedTupleLifecycleSchema.default('OBSERVED'),
   provenance: OntologyLinkedTupleProvenanceSchema,
 });
 

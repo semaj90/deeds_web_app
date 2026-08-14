@@ -1,5 +1,35 @@
 {
   "schemaVersion": "atlas-supersession-v1",
+  "lifecycleStates": {
+    "ACTIVE": "canonical production implementation",
+    "MIGRATION_CANDIDATE": "implementation suspected of having a replacement; retained and not safe to delete",
+    "SUPERSEDED": "replacement proven and no production callers remain; retained until cleanup review",
+    "QUARANTINED": "superseded artifact retained for historical or rollback reference",
+    "DELETED": "removal explicitly approved after the quarantine/recovery window"
+  },
+  "promotionPolicy": {
+    "migrationCandidateToSuperseded": [
+      "canonical_replacement_exists",
+      "all_live_callers_use_replacement",
+      "behavioral_contract_tests_pass",
+      "graphify_daily_no_longer_depends_on_artifact"
+    ],
+    "requiredEvidence": [
+      "replacement_owner_live",
+      "ast_replacement_parity",
+      "source_span_parity",
+      "required_edge_parity",
+      "canonical_identity_unchanged",
+      "rollback_path_documented",
+      "superseded_import_count_zero"
+    ],
+    "deletionRequires": [
+      "superseded_state",
+      "quarantine_or_recovery_window_complete",
+      "digest_and_reason_recorded",
+      "rollback_instructions_recorded"
+    ]
+  },
   "entries": [
     {
       "artifact": "scripts/atlas/knowledge-layer/ast-extractor.ts",
@@ -14,9 +44,16 @@
       ],
       "reason": "No production caller was found outside the knowledge-layer barrel; live structural extraction is owned by the Graphify web-tree-sitter lane and the analysis worker bridge.",
       "promotionRequirements": [
-        "replacement_owner_confirmed",
-        "replacement_behavior_tests_pass",
+        "canonical_replacement_exists",
+        "all_live_callers_use_replacement",
+        "behavioral_contract_tests_pass",
         "graphify_daily_no_longer_depends_on_artifact",
+        "replacement_owner_live",
+        "ast_replacement_parity",
+        "source_span_parity",
+        "required_edge_parity",
+        "canonical_identity_unchanged",
+        "rollback_path_documented",
         "superseded_import_count_zero"
       ]
     }

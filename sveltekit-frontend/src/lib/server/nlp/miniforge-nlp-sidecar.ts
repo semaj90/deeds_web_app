@@ -91,6 +91,8 @@ export interface AtlasStructuralEvidence {
   chunks: AtlasStructuralEvidenceChunk[];
   edges: AtlasStructuralEvidenceEdge[];
   diagnostics: string[];
+  error_tag?: 'ChunkingError' | 'UnsupportedLanguageError' | null;
+  syntax_status?: 'CLEAN' | 'RECOVERED_WITH_ERRORS';
 }
 
 export interface NlpFeature {
@@ -371,6 +373,8 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           resolution: edge.resolution ?? null,
         })) : [],
         diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [],
+        error_tag: raw.error_tag === 'ChunkingError' || raw.error_tag === 'UnsupportedLanguageError' ? raw.error_tag : null,
+        syntax_status: raw.syntax_status === 'RECOVERED_WITH_ERRORS' ? 'RECOVERED_WITH_ERRORS' : 'CLEAN',
       };
     },
   };

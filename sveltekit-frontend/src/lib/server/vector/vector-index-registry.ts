@@ -43,6 +43,18 @@ export const VECTOR_INDEX_REGISTRY = {
     buildScript: 'scripts/atlas/duckdb/freeze-vector-snapshot.mts',
     notes: 'Deterministic 5,000-packet freeze for legacy 384 replay only; canonical reduction uses codebase_chunks_768_v2.',
   },
+  vectorSnapshot5k768: {
+    id: 'vector-snapshot-5k-768',
+    name: 'Frozen 5k semantic_768 packet vector snapshot',
+    backend: 'duckdb-snapshot',
+    contractVersion: EMBEDDINGGEMMA_FULL768_V1,
+    vectorContract: EMBEDDINGGEMMA_FULL768_CONTRACT,
+    snapshotLimit: 5000,
+    collection: 'vector_snapshot_packets_5k_768',
+    indexKind: 'reference',
+    buildScript: 'scripts/atlas/duckdb/freeze-vector-snapshot-5k-768.mts',
+    notes: 'Deterministic 5,000-packet semantic_768 reference snapshot; derived indexes remain rebuildable and non-canonical.',
+  },
   qdrantHybrid: {
     id: 'qdrant-codebase-chunks-384-hybrid',
     name: 'Legacy Qdrant HNSW + BM42 hybrid retrieval index',

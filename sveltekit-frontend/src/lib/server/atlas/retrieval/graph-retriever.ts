@@ -31,7 +31,8 @@ export interface RetrievalIdentity {
 }
 
 // Seeds are the fused top-K results; graph is a bounded expansion, not a standalone sweep.
-// maxCandidates hard-stops the traversal so a dense graph can't blow out the context budget.
+// The seed cap, maxDepth, per-seed LIMIT, visited-by-packet dedupe, and final
+// maxCandidates cap are intentional safeguards against an unrestricted BFS.
 export async function graphRetrieve(req: GraphRetrievalRequest): Promise<GraphCandidate[]> {
   const seeds = req.seedPacketKeys.slice(0, 5);
   if (seeds.length === 0) return [];

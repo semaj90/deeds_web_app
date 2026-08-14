@@ -1,7 +1,31 @@
 // Tree-sitter AST Extraction Pipeline
 // Extracts symbol boundaries, signatures, control flow, imports, exports, calls
 
-import { Language, Symbol } from './types';
+export interface Language {
+  id: string;
+  treeSitterLanguageId: number;
+}
+
+export interface Symbol {
+  id: string;
+  language: Language;
+  sourceRef: string;
+  nodeType: string;
+  signature: string;
+  returnType: string | null;
+  throws: string[];
+  controlFlow: string[];
+  imports: string[];
+  exports: string[];
+  callExpressions: string[];
+  sideEffects: string[];
+  description: string;
+  groundSpans: string[];
+  dbCalls: unknown;
+  tests: unknown;
+  created_at: string;
+  updated_at: string;
+}
 
 export interface ASTResult {
   root: unknown;
@@ -10,25 +34,28 @@ export interface ASTResult {
   errors: string[];
 }
 
-export async function parseAndExtract(source: string, filePath: string, language: Language): Promise<ASTResult> {
+export async function parseAndExtract(
+  _source: string,
+  _filePath: string,
+  _language: Language
+): Promise<ASTResult> {
   const errors: string[] = [];
   const symbols: Symbol[] = [];
   const edges: ASTResult['edges'] = [];
 
   try {
     // Parse with tree-sitter
-    const tree = await parseSource(source, language.treeSitterLanguageId);
+    const tree = await parseSource(_language);
     const rootNode = (tree as { rootNode: unknown }).rootNode;
 
     // Extract symbols
-    extractSymbols(rootNode, source, language, symbols);
+    extractSymbols(rootNode, _source, _language, symbols);
 
     // Extract edges
-    extractEdges(rootNode, source, language, edges);
+    extractEdges(rootNode, _source, _language, edges);
 
     // Extract ground spans
-    extractGroundSpans(rootNode, source, symbols);
-
+    extractGroundSpans(rootNode, _source, symbols);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
     errors.push(`Parse error: ${errorMessage}`);
@@ -37,12 +64,7 @@ export async function parseAndExtract(source: string, filePath: string, language
   return { root: tree, symbols, edges, errors };
 }
 
-function extractSymbols(
-  node: unknown,
-  source: string,
-  language: Language,
-  symbols: Symbol[]
-): void {
+function extractSymbols(node: unknown, language: Language, symbols: Symbol[]): void {
   if (!node) return;
 
   const nodeType = (node as { type?: string }).type;
@@ -50,27 +72,27 @@ function extractSymbols(
   switch (nodeType) {
     case 'function_declaration':
     case 'function_expression':
-      extractFunction(node, source, language, symbols);
+      extractFunction(node, language, symbols);
       break;
 
     case 'class_declaration':
-      extractClass(node, source, language, symbols);
+      extractClass(node, language, symbols);
       break;
 
     case 'method_definition':
-      extractMethod(node, source, language, symbols);
+      extractMethod(node, language, symbols);
       break;
 
     case 'import_declaration':
-      extractImport(node, source, language, symbols);
+      extractImport(node, language, symbols);
       break;
 
     case 'export_declaration':
-      extractExport(node, source, language, symbols);
+      extractExport(node, language, symbols);
       break;
 
     case 'call_expression':
-      extractCallExpression(node, source, language, symbols);
+      extractCallExpression(node, language, symbols);
       break;
   }
 
@@ -78,17 +100,12 @@ function extractSymbols(
   const children = (node as { children?: unknown[] }).children;
   if (children) {
     for (const child of children) {
-      extractSymbols(child, source, language, symbols);
+      extractSymbols(child, language, symbols);
     }
   }
 }
 
-function extractFunction(
-  node: unknown,
-  source: string,
-  language: Language,
-  symbols: Symbol[]
-): void {
+function extractFunction(node: unknown, language: Language, symbols: Symbol[]): void {
   const nameNode = (node as { namedChildren?: unknown[] })?.namedChildren?.[0] as
     | { text?: string }
     | undefined;
@@ -118,7 +135,7 @@ function extractFunction(
   symbols.push(symbol);
 }
 
-function extractClass(node: unknown, source: string, language: Language, symbols: Symbol[]): void {
+function extractClass(node: unknown, language: Language, symbols: Symbol[]): void {
   const nameNode = (node as { namedChildren?: unknown[] })?.namedChildren?.[0] as
     | { text?: string }
     | undefined;
@@ -148,7 +165,7 @@ function extractClass(node: unknown, source: string, language: Language, symbols
   symbols.push(symbol);
 }
 
-function extractMethod(node: unknown, source: string, language: Language, symbols: Symbol[]): void {
+function extractMethod(node: unknown, language: Language, symbols: Symbol[]): void {
   const nameNode = (node as { namedChildren?: unknown[] })?.namedChildren?.[0] as
     | { text?: string }
     | undefined;
@@ -274,30 +291,27 @@ function extractCallExpression(
   symbols.push(symbol);
 }
 
-function extractSignature(_node: unknown): string {
+function extractSignature(node: unknown, language: Language): string {
   // Simplified signature extraction
-  const paramsNode = (_node as { namedChildren?: unknown[] })?.namedChildren?.[1] as
-    | { text?: string }
-    | undefined;
-  return `${paramsNode?.text || ''}: void`;
+  return '(): void';
 }
 
-function extractReturnType(): string | null {
+function extractReturnType(node: unknown, language: Language): string | null {
   // Simplified return type extraction
   return null;
 }
 
-function extractEdges(): void {
+function extractEdges(node: unknown, _source: string, _language: Language, edges: ASTResult['edges']): void {
   // Simplified edge extraction
   // Full implementation would track: CALLS, IMPORTS, WRITES_TABLE, READS_TABLE, etc.
 }
 
-function extractGroundSpans(): void {
+function extractGroundSpans(node: unknown, _source: string, symbols: Symbol[]): void {
   // Simplified ground span extraction
   // Would extract exact source text references for each symbol
 }
 
-export async function parseSource(): Promise<unknown> {
+export async function parseSource(_language: Language): Promise<unknown> {
   // This would use the actual tree-sitter parser for the given language
   // Implementation depends on tree-sitter bindings
   throw new Error('Tree-sitter parser not yet implemented');

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "atlas.qas.sampling-receipt.v1",
+  "status": "DEFERRED_NO_FEATURE_MATRIX",
+  "workspaceRevision": "graphify-daily:unresolved",
+  "representationRevision": "semantic_768:unresolved",
+  "queryRevision": "graphify-daily:qas:r1",
+  "candidateCount": 0,
+  "sampleCount": 0,
+  "featureRevision": null,
+  "selectedPacketKeys": [],
+  "selectedSourceRefs": [],
+  "exactPromotionRequired": true,
+  "canonicalWrites": false,
+  "generatedAt": "2026-08-14T18:19:36.182Z",
+  "mode": "daily",
+  "inputPath": null,
+  "algorithm": "query-conditioned weighted deterministic sketch; Tang-inspired routing only",
+  "exactPromotion": "selected identifiers must be fetched and validated by existing canonical retrieval owners",
+  "deferred": [
+    "GEPA",
+    "GRPO",
+    "LoRA stitching",
+    "WebGPU/Dawn",
+    "GPU residency mutation",
+    "canonical writes"
+  ]
+}
