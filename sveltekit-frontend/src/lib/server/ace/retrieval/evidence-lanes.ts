@@ -2,6 +2,10 @@ import { getRedis } from '$lib/server/redis.js';
 import { db } from '$lib/server/db/client.js';
 import { sql } from 'drizzle-orm';
 import type { AceEvidence } from '../contracts/ace-context-packet.js';
+import {
+  resolveCanonicalIdentity,
+  type CanonicalIdentityResolution,
+} from '../identity-contract.js';
 
 export interface EvidenceLaneConfig {
   maxCandidates: number;
@@ -20,6 +24,9 @@ export function extractWorkspaceRevisionFromMetadata(metadata: unknown): string 
 }
 
 export function normalizeQdrantPayloadIdentity(payload: Record<string, unknown> | null | undefined): {
+  backendLocalId: string | null;
+  canonicalIdentity: CanonicalIdentityResolution;
+  identityStatus: CanonicalIdentityResolution['status'];
   packetKey: string | null;
   sourceRef: string | null;
   contentHash: string | null;
@@ -28,9 +35,29 @@ export function normalizeQdrantPayloadIdentity(payload: Record<string, unknown> 
   featureLabel: string | null;
   workspaceRevision: string | null;
 } {
+  const packetKey = payload?.packet_key as string | null ?? payload?.packetKey as string | null ?? null;
+  const sourceRef = payload?.source_ref as string | null ?? payload?.sourceRef as string | null ?? null;
+  const symbolVersionId = payload?.symbol_version_id as string | null
+    ?? payload?.symbolVersionId as string | null
+    ?? null;
+  const backendLocalId = payload?.qdrant_point_id as string | null
+    ?? payload?.qdrantPointId as string | null
+    ?? (typeof payload?.id === 'string' || typeof payload?.id === 'number' ? String(payload.id) : null)
+    ?? null;
+  const canonicalIdentity = resolveCanonicalIdentity({
+    symbolVersionId,
+    packetKey,
+    sourceRef,
+    laneIdFallback: sourceRef,
+    backendLocalId,
+  });
+
   return {
-    packetKey: payload?.packet_key as string | null ?? payload?.packetKey as string | null ?? null,
-    sourceRef: payload?.source_ref as string | null ?? payload?.sourceRef as string | null ?? null,
+    backendLocalId,
+    canonicalIdentity,
+    identityStatus: canonicalIdentity.status,
+    packetKey,
+    sourceRef,
     contentHash: payload?.content_hash as string | null ?? payload?.contentHash as string | null ?? null,
     treeNodeId: payload?.tree_node_id as string | null ?? payload?.treeNodeId as string | null ?? null,
     featureId: payload?.feature_id as string | null ?? payload?.featureId as string | null ?? null,

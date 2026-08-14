@@ -1,0 +1,143 @@
+{
+  "receiptKind": "PROCESS_PACKET_RUNTIME_PRODUCER_PROVEN",
+  "status": "PROVEN",
+  "reportJson": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\process-packet-runtime-proof.json",
+  "reportMd": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\docs\\reports\\process-packet-runtime-proof.md",
+  "generatedAt": "2026-08-14T01:07:30.232Z",
+  "collection": "codebase_chunks",
+  "stageTimeouts": {
+    "build": 5000,
+    "persist": 15000,
+    "readback": 15000,
+    "manifest": 15000,
+    "write": 5000
+  },
+  "stageTimings": [
+    {
+      "stage": "build",
+      "durationMs": 12
+    },
+    {
+      "stage": "persist",
+      "durationMs": 11536
+    },
+    {
+      "stage": "readback",
+      "durationMs": 101
+    },
+    {
+      "stage": "manifest",
+      "durationMs": 1
+    }
+  ],
+  "built": {
+    "packetKey": "sha256:45ac2b9aa25c47c1236c3dbc",
+    "processId": "process:search-route:proof",
+    "name": "searchRoute",
+    "sourceRefs": [
+      "src/routes/search/+server.ts",
+      "src/lib/server/search/rerank.ts",
+      "src/lib/server/retrieval/unified-orchestrator.ts"
+    ],
+    "stepSymbolIds": [
+      "searchRoute",
+      "retrieveCandidates",
+      "denseRetrieve",
+      "sparseRetrieve",
+      "mergeCandidates",
+      "rerankCandidates",
+      "validate"
+    ],
+    "dbTables": [
+      "atlas_packets",
+      "codebase_chunk_index"
+    ],
+    "tools": [
+      "glob",
+      "read",
+      "grep"
+    ],
+    "endpoints": [
+      "/api/search"
+    ],
+    "caches": [
+      "qdrant:codebase_chunks_768",
+      "ace:manifest"
+    ],
+    "graphRevision": "graph:parent-atlas",
+    "processHash": "sha256:24a368439519117a3d623240"
+  },
+  "persisted": {
+    "upserted": 1,
+    "pointIds": [
+      "d76ece77-32fc-eb27-3972-431e2b4e5b69"
+    ]
+  },
+  "readback": {
+    "processIds": [
+      "process:search-route:proof"
+    ],
+    "pointIds": [
+      "d76ece77-32fc-eb27-3972-431e2b4e5b69"
+    ],
+    "packetCount": 1,
+    "packets": [
+      {
+        "packetKey": "sha256:45ac2b9aa25c47c1236c3dbc",
+        "processId": "process:search-route:proof",
+        "processHash": "sha256:24a368439519117a3d623240",
+        "name": "searchRoute",
+        "sourceRefs": [
+          "src/routes/search/+server.ts",
+          "src/lib/server/search/rerank.ts",
+          "src/lib/server/retrieval/unified-orchestrator.ts"
+        ],
+        "stepSymbolIds": [
+          "searchRoute",
+          "retrieveCandidates",
+          "denseRetrieve",
+          "sparseRetrieve",
+          "mergeCandidates",
+          "rerankCandidates",
+          "validate"
+        ],
+        "dbTables": [
+          "atlas_packets",
+          "codebase_chunk_index"
+        ],
+        "tools": [
+          "glob",
+          "read",
+          "grep"
+        ],
+        "endpoints": [
+          "/api/search"
+        ],
+        "caches": [
+          "qdrant:codebase_chunks_768",
+          "ace:manifest"
+        ],
+        "graphRevision": "graph:parent-atlas"
+      }
+    ]
+  },
+  "manifest": {
+    "manifestId": "context:62413a7b1bd05af6d5dbdd3e",
+    "manifestIdAgain": "context:62413a7b1bd05af6d5dbdd3e",
+    "selectedProcessIds": [
+      "process:search-route:proof"
+    ],
+    "selectedPacketKeys": [
+      "sha256:45ac2b9aa25c47c1236c3dbc"
+    ],
+    "retrievedCandidates": 1,
+    "tokenBudget": 1200,
+    "usableTokenBudget": 1200
+  },
+  "checks": {
+    "qdrantReadbackMatch": true,
+    "qdrantRoundTripCount": true,
+    "selectedProcessIdsMatch": true,
+    "manifestDeterministic": true
+  }
+}

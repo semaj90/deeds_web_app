@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-13T17:52:03.347Z",
+  "generatedAt": "2026-08-13T23:37:26.754Z",
   "inputs": {
     "boardPath": "C:\\Users\\james\\Videos\\deeds-web-app\\docs\\graph\\kanban-board.json",
     "featureLabelsPath": "C:\\Users\\james\\Videos\\deeds-web-app\\sveltekit-frontend\\.tmp\\feature_labels.jsonl",
@@ -20,22 +20,22 @@
     "uniqueRecordCount": 6747,
     "scopedRecordCount": 6725,
     "embeddedCount": 6725,
-    "groupCount": 6515,
-    "consolidationCandidateGroups": 131,
+    "groupCount": 6516,
+    "consolidationCandidateGroups": 130,
     "highOverlapGroups": 9,
     "turbovecBackendCounts": {
       "search-derived": 6,
       "offline": 6719
     },
     "libtorchAvailable": true,
-    "libtorchGroupsScored": 131,
+    "libtorchGroupsScored": 130,
     "simdjson": {
       "hits": 141,
       "misses": 6626,
       "nativeParses": 1,
       "fallbackParses": 6625,
       "totalBytesParsed": 3957402,
-      "nativeTimeMs": 2.4096999999997024,
+      "nativeTimeMs": 2.068499999999972,
       "cacheBytes": 7815662,
       "cacheSize": 6626
     },
@@ -172,7 +172,7 @@
         "lib › shims",
         "lib › agent",
         "lib › shared",
-        "lib › data"
+        "lib › schemas"
       ],
       "topFeatureIds": [],
       "topSourceRefs": [
@@ -191,7 +191,7 @@
       "priorityMax": 2,
       "libtorch": {
         "source": "cpu",
-        "cohesion": 0.0089,
+        "cohesion": 0.0006,
         "pairCount": 10
       },
       "recommendation": "Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links."

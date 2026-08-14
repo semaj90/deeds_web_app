@@ -1,0 +1,71 @@
+{
+  "run_id": "atlas_context_build_20260813_074635",
+  "timestamp": "2026-08-13T07:46:35Z",
+  "target": "scripts/atlas/audit-concept-evidence-spine.mjs",
+  "lanes": {
+    "lane1_atlas_tools": {
+      "result": "NONE",
+      "duration_ms": 0
+    },
+    "lane2_trace_packet": {
+      "result": "NONE",
+      "duration_ms": 0
+    },
+    "lane3_kag_search": {
+      "result": "NONE",
+      "duration_ms": 0
+    },
+    "lane4_topology": {
+      "result": "NONE",
+      "duration_ms": 0
+    },
+    "lane5_suggest": {
+      "result": "NONE",
+      "duration_ms": 0
+    },
+    "lane6_rg": {
+      "result": "NONE",
+      "duration_ms": 0
+    }
+  },
+  "all_lanes_none": true,
+  "user_approved": true,
+  "created_at": "2026-08-13T07:46:35Z",
+  "file_path": "scripts/atlas/audit-concept-evidence-spine.mjs",
+  "sha256": "a631f8165459dd3b0f5f1d05f2652a6873689fc26b92d234b4f9fca33db017c1",
+  "size_bytes": 14271,
+  "decisions": [
+    {
+      "lane": 1,
+      "query": "source_ref LIKE scripts/atlas/audit-concept-evidence-spine%",
+      "result": "NONE"
+    },
+    {
+      "lane": 2,
+      "query": "file_path == scripts/atlas/audit-concept-evidence-spine.mjs",
+      "result": "NONE"
+    },
+    {
+      "lane": 3,
+      "query": "semantic audit-concept-evidence-spine",
+      "result": "NONE"
+    },
+    {
+      "lane": 4,
+      "query": "SOM cell + Neo4j SUPPORTS concept_evidence",
+      "result": "NONE"
+    },
+    {
+      "lane": 5,
+      "query": "suggest files concept_evidence_spine",
+      "result": "NONE"
+    },
+    {
+      "lane": 6,
+      "query": "rg audit.*concept.*evidence scripts/ src/",
+      "result": "NONE"
+    }
+  ],
+  "final_action": "file_creation_approved",
+  "smoke_status": "passed"
+}

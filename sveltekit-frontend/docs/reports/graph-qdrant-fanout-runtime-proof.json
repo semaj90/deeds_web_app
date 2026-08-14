@@ -1,0 +1,245 @@
+{
+  "receipt_kind": "GRAPH_QDRANT_FANOUT_RUNTIME_PROOF",
+  "status": "PROVEN",
+  "generated_at": "2026-08-14T02:38:46.099Z",
+  "workspace_revision": "1e07a730addf5f853ca740bb3cbf2decddd5ad87",
+  "graph_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1",
+  "seed": {
+    "run_id": "0f4b783d-606d-4712-88f8-da0b900f779e",
+    "algorithm": "betweenness",
+    "metric_name": "betweenness",
+    "metric_value": 167,
+    "graph_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1",
+    "projection_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1",
+    "projection_name": "atlas_feature_v1",
+    "packet_key": "ace:packet:4978fbe089ec",
+    "source_ref": "src/routes/api/chat/+server.ts",
+    "canonical_source_ref": null,
+    "file_path": null,
+    "source_path": null,
+    "tree_node_id": "e3013221-cf13-4199-b026-ef95c656c709",
+    "qdrant_point_id": null,
+    "symbol_version_id": null,
+    "graph_key": "src/routes/api/chat/+server.ts",
+    "neo4j_internal_id": 364949,
+    "neo4j_element_id": "4:4f7af8c7-380a-4f16-a9a7-74054ce03751:364949",
+    "graph_identity_status": "degraded",
+    "canonical_identity": {
+      "value": "src/routes/api/chat/+server.ts",
+      "source": "source_ref",
+      "status": "degraded",
+      "backendLocalId": "card:src/routes/api/chat/+server.ts:7096aad60167fa90"
+    },
+    "qdrant_identity": {
+      "backendLocalId": "card:src/routes/api/chat/+server.ts:7096aad60167fa90",
+      "canonicalIdentity": {
+        "value": "src/routes/api/chat/+server.ts",
+        "source": "source_ref",
+        "status": "degraded",
+        "backendLocalId": "card:src/routes/api/chat/+server.ts:7096aad60167fa90"
+      },
+      "identityStatus": "degraded",
+      "packetKey": null,
+      "sourceRef": "src/routes/api/chat/+server.ts",
+      "contentHash": "7096aad60167fa90",
+      "treeNodeId": null,
+      "featureId": null,
+      "featureLabel": null,
+      "workspaceRevision": null
+    }
+  },
+  "stage_timings": [
+    {
+      "stage": "qdrant_contract",
+      "elapsed_ms": 64,
+      "status": "PASS"
+    },
+    {
+      "stage": "seed_candidates",
+      "elapsed_ms": 1402,
+      "status": "PASS"
+    },
+    {
+      "stage": "seed_resolution",
+      "elapsed_ms": 846,
+      "status": "PASS"
+    },
+    {
+      "stage": "neo4j_fanout",
+      "elapsed_ms": 1579,
+      "status": "PASS"
+    },
+    {
+      "stage": "canonical_identity_resolution",
+      "elapsed_ms": 659,
+      "status": "PASS"
+    },
+    {
+      "stage": "qdrant_projection_lookup",
+      "elapsed_ms": 177,
+      "status": "PASS"
+    },
+    {
+      "stage": "graph_evidence_assembly",
+      "elapsed_ms": 0,
+      "status": "PASS"
+    },
+    {
+      "stage": "process_membership",
+      "elapsed_ms": 0,
+      "status": "PASS"
+    },
+    {
+      "stage": "receipt",
+      "elapsed_ms": 0,
+      "status": "PASS"
+    }
+  ],
+  "neighbor_count": 1,
+  "canonical_neighbor_count": 1,
+  "degraded_neighbor_count": 0,
+  "qdrant_projection_count": 1,
+  "process_membership_count": 0,
+  "checks": {
+    "TREE_NODE_ID_NOT_CANONICAL": true,
+    "NEO4J_INTERNAL_ID_NOT_CANONICAL": true,
+    "QDRANT_POINT_ID_NOT_CANONICAL": true,
+    "GRAPH_NEIGHBOR_CANONICAL_IDENTITY_PRESERVED": true,
+    "GRAPH_FANOUT_BOUNDED": true,
+    "GRAPH_EVIDENCE_PRESERVED": true,
+    "QDRANT_CONTENT_VECTOR_CONTRACT_768": true,
+    "BM42_NOT_REQUIRED": true,
+    "PROCESS_PACKET_LANE_UNCHANGED": true,
+    "SEED_CANONICAL_MATCH": true,
+    "NO_DUPLICATE_IDENTITY_RESOLVER": true
+  },
+  "neighbors": [
+    {
+      "graph_key": "src/lib/server/queue/dispatch-inline.ts",
+      "neo4j": {
+        "graph_key": "src/lib/server/queue/dispatch-inline.ts",
+        "file_path": null,
+        "path": "src/lib/server/queue/dispatch-inline.ts",
+        "source_ref": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+        "stable_key": null,
+        "element_id": "4:4f7af8c7-380a-4f16-a9a7-74054ce03751:396016",
+        "internal_id": 396016,
+        "labels": [
+          "CodebaseFile",
+          "ParentAtlasSource"
+        ],
+        "edge_type": "IMPORTS",
+        "hop_distance": 1
+      },
+      "atlas_packet": {
+        "packet_key": "ace:packet:40a61c73f51f",
+        "source_ref": "src/lib/server/queue/dispatch-inline.ts",
+        "canonical_source_ref": null,
+        "file_path": null,
+        "source_path": null,
+        "tree_node_id": "67282b31-9d5a-46e5-8a27-0d446435c11e",
+        "qdrant_point_id": "4598",
+        "workspace_revision": "0",
+        "representation_revision": "0",
+        "source_representation_id": null,
+        "projection_representation_id": null
+      },
+      "canonical_identity": {
+        "value": "ace:packet:40a61c73f51f",
+        "source": "packet_key",
+        "status": "canonical",
+        "backendLocalId": "4:4f7af8c7-380a-4f16-a9a7-74054ce03751:396016"
+      },
+      "qdrant": {
+        "matched_on": "packet_key",
+        "point_id": "4598",
+        "payload": {
+          "chunk_id": null,
+          "source_ref": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+          "content_hash": null,
+          "representation_id": "semantic_768",
+          "dimension": 768,
+          "model_revision": "2026-07-29",
+          "embedding_model": "embeddinggemma",
+          "domain": null,
+          "symbol": "getDispatchStats",
+          "kind": "function",
+          "qdrant_point_id": "card:src/lib/server/queue/dispatch-inline.ts:null",
+          "postgres_id": "106fbc14-31e9-41bb-8300-201df16567e7",
+          "postgres_updated_at": "2026-07-04T09:39:17.786Z",
+          "packet_key": "ace:packet:40a61c73f51f",
+          "canonical_source_ref": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+          "source_ref_key": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+          "feature_id": "dispatch-inline",
+          "feature_label": "dispatch-inline",
+          "lane_ids": [
+            "0",
+            "atlas_feature_packets",
+            "codebase_chunks_768",
+            "dispatch-inline",
+            "qdrant_chunk"
+          ],
+          "tags": [
+            "codebase_chunks_768",
+            "dispatch",
+            "dispatch-inline",
+            "inline",
+            "qdrant_chunk",
+            "queue"
+          ],
+          "bm25_text": "dispatch-inline sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+          "packet_kind": "qdrant_chunk",
+          "ledger_type": "atlas_feature_packets",
+          "community_id": 0,
+          "qdrant_vector_dim": 768,
+          "tree_node_id": "67282b31-9d5a-46e5-8a27-0d446435c11e",
+          "embedding_ref": "codebase_chunks_768:4598",
+          "payload_backfilled_at": "2026-08-13T18:02:41.798Z",
+          "graphAuthorityScore": 0.45,
+          "communityId": "community:28085",
+          "communitySize": 0,
+          "pagerank": 0.15000000000000002,
+          "cluster_key": "unclassified:community-28085"
+        },
+        "normalized_identity": {
+          "backendLocalId": "card:src/lib/server/queue/dispatch-inline.ts:null",
+          "canonicalIdentity": {
+            "value": "ace:packet:40a61c73f51f",
+            "source": "packet_key",
+            "status": "canonical",
+            "backendLocalId": "card:src/lib/server/queue/dispatch-inline.ts:null"
+          },
+          "identityStatus": "canonical",
+          "packetKey": "ace:packet:40a61c73f51f",
+          "sourceRef": "sveltekit-frontend/src/lib/server/queue/dispatch-inline.ts",
+          "contentHash": null,
+          "treeNodeId": "67282b31-9d5a-46e5-8a27-0d446435c11e",
+          "featureId": "dispatch-inline",
+          "featureLabel": "dispatch-inline",
+          "workspaceRevision": null
+        },
+        "process_ids": []
+      },
+      "graph_evidence": {
+        "seed_canonical_id": "ace:packet:4978fbe089ec",
+        "edge_type": "IMPORTS",
+        "hop_distance": 1,
+        "tree_node_id": "67282b31-9d5a-46e5-8a27-0d446435c11e",
+        "neo4j_internal_id": 396016,
+        "neo4j_element_id": "4:4f7af8c7-380a-4f16-a9a7-74054ce03751:396016",
+        "graph_revision": "7dd56c374f3c54dbdd7e5b13c75428d15b387be2cbbe3b29f830414c7456e5d1"
+      }
+    }
+  ],
+  "notes": [
+    "TREE_NODE_ID_NOT_CANONICAL",
+    "NEO4J_INTERNAL_ID_NOT_CANONICAL",
+    "QDRANT_POINT_ID_NOT_CANONICAL",
+    "GRAPH_NEIGHBOR_CANONICAL_IDENTITY_PRESERVED",
+    "GRAPH_FANOUT_BOUNDED",
+    "GRAPH_EVIDENCE_PRESERVED",
+    "QDRANT_CONTENT_VECTOR_CONTRACT_768",
+    "BM42_NOT_REQUIRED",
+    "PROCESS_PACKET_LANE_UNCHANGED"
+  ]
+}

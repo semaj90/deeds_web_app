@@ -99,3 +99,15 @@
 - Stage 4 is currently running and has produced partial progress, but the required output file is not yet present.
 - Stage 4b and Stage 5 remain blocked by Stage 4 output.
 - The task board is tracking state, not authorizing promotion.
+
+## Coordination update — 2026-08-13
+
+GPU/runtime integration is tracked separately in
+`docs/parent-atlas-workstation-gpu-runtime-backlog.md`.
+
+- GPU/runtime estimate: **58% planned/integrated**.
+- P0 correctness remains structural Graphify and identity work.
+- P1 is reproducible GPU ownership/environment and Valkey proof.
+- P2 is cuVS exact-oracle, CAGRA evaluation, and cuGraph parity.
+- P3 is TensorRT/LibTorch consolidation, multithreading, simdjson, Python 3.14/free-threading, and RMM.
+- No GPU/runtime item authorizes AST supersession or changes canonical identity/RRF ownership.

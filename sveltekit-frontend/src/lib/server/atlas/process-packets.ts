@@ -246,12 +246,10 @@ export async function persistAtlasProcessPacketsToQdrant(
   const collection = opts.collection ?? 'codebase_chunks';
   if (!packets.length) return { collection, upserted: 0, pointIds: [] };
 
-  const [{ generateEmbeddings }, { buildVectorPayload }, { qdrant: qdrantManager, sha256ToUuid }] =
-    await Promise.all([
-      import('$lib/server/grpc/embedding-client.js'),
-      import('$lib/server/config/vector-config.js'),
-      import('$lib/server/vector/qdrant-manager.js'),
-    ]);
+  const [{ generateEmbeddings }, { qdrant: qdrantManager, sha256ToUuid }] = await Promise.all([
+    import('$lib/server/grpc/embedding-client.js'),
+    import('$lib/server/vector/qdrant-manager.js'),
+  ]);
 
   const texts = packets.map((packet) => processPacketEmbeddingText(packet));
   const embeddings = await generateEmbeddings(texts);
@@ -264,7 +262,9 @@ export async function persistAtlasProcessPacketsToQdrant(
   const pointIds = packets.map((packet) => sha256ToUuid(packet.packetKey));
   const points = packets.map((packet, index) => ({
     id: pointIds[index],
-    vector: buildVectorPayload('codebase_chunks_768', vectors[index] ?? []),
+    vector: {
+      content: vectors[index] ?? [],
+    },
     payload: processPacketQdrantPayload(packet),
   }));
 

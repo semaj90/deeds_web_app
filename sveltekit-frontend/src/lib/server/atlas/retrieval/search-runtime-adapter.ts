@@ -9,6 +9,8 @@ export interface AtlasSearchRequest {
   caseId?: string;
   filters?: Record<string, unknown>;
   traceId?: string;
+  workspaceRevision?: string;
+  sourceRevision?: string;
   /** Enable bounded graph expansion after fusion. Default false. */
   withGraphExpansion?: boolean;
 }
@@ -31,6 +33,8 @@ export function createAtlasSearchAdapter(config?: { userId?: string; caseId?: st
         topK: req.topK ?? RETRIEVAL_LIMITS.defaultTopKPerLane,
         userId: req.userId ?? config?.userId,
         caseId: req.caseId ?? config?.caseId,
+        workspaceRevision: req.workspaceRevision,
+        sourceRevision: req.sourceRevision,
         filters: SearchMetadataFilterSchema.parse(req.filters ?? {}),
         spanContext: req.traceId ? { traceId: req.traceId } : undefined,
       };

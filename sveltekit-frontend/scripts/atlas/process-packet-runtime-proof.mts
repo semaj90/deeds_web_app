@@ -14,6 +14,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { performance } from 'node:perf_hooks';
 import dotenv from 'dotenv';
 
 import { buildContextManifestFromACE } from '../../src/lib/server/ace/ace-context-manifest.js';
@@ -41,6 +42,27 @@ function readFlagValue(name: string, fallback?: string): string | undefined {
   const current = process.argv[index];
   if (current.includes('=')) return current.split('=', 2)[1];
   return process.argv[index + 1] ?? fallback;
+}
+
+async function runTimedStage<T>(name: string, timeoutMs: number, fn: () => Promise<T>): Promise<{
+  value: T;
+  durationMs: number;
+}> {
+  const startedAt = performance.now();
+  let timeoutHandle: NodeJS.Timeout | undefined;
+
+  try {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        reject(new Error(`stage ${name} timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+    });
+
+    const value = await Promise.race([fn(), timeoutPromise]);
+    return { value, durationMs: Math.round(performance.now() - startedAt) };
+  } finally {
+    if (timeoutHandle) clearTimeout(timeoutHandle);
+  }
 }
 
 async function writeJson(reportPath: string, value: unknown): Promise<void> {
@@ -85,6 +107,13 @@ async function main(): Promise<void> {
   const dryRun = hasFlag('--dry-run');
   const reportJson = readFlagValue('--report-json', DEFAULT_REPORT_JSON) ?? DEFAULT_REPORT_JSON;
   const reportMd = readFlagValue('--report-md', DEFAULT_REPORT_MD) ?? DEFAULT_REPORT_MD;
+  const stageTimeouts = {
+    build: Number(readFlagValue('--build-timeout-ms', '5000') ?? '5000'),
+    persist: Number(readFlagValue('--persist-timeout-ms', '15000') ?? '15000'),
+    readback: Number(readFlagValue('--readback-timeout-ms', '15000') ?? '15000'),
+    manifest: Number(readFlagValue('--manifest-timeout-ms', '15000') ?? '15000'),
+    write: Number(readFlagValue('--write-timeout-ms', '5000') ?? '5000'),
+  };
 
   const processId = readFlagValue('--process-id', 'process:search-route:proof') ?? 'process:search-route:proof';
   const collection = readFlagValue('--collection', 'codebase_chunks') ?? 'codebase_chunks';
@@ -113,42 +142,60 @@ async function main(): Promise<void> {
     graphRevision: 'graph:parent-atlas',
   };
 
-  const built = buildAtlasProcessPacket(input);
+  const stageTimings: Array<{ stage: string; durationMs: number }> = [];
+  const buildStage = await runTimedStage('build', stageTimeouts.build, async () => buildAtlasProcessPacket(input));
+  const built = buildStage.value;
+  stageTimings.push({ stage: 'build', durationMs: buildStage.durationMs });
 
   if (dryRun) {
-    const report = {
-      receiptKind: 'PROCESS_PACKET_RUNTIME_PRODUCER_PROVEN',
-      status: 'DRY_RUN',
-      reportJson,
-      reportMd,
-      collection,
-      generatedAt: new Date().toISOString(),
-      built: stablePacketProjection(built.packet),
-      manifest: null,
-      readback: null,
-      notes: ['Dry run only — no Qdrant mutation attempted.'],
-    };
-    await writeJson(reportJson, report);
-    await writeMarkdown(reportMd, [
-      '# Process Packet Runtime Proof',
-      '',
-      `- Status: ${report.status}`,
-      `- Process ID: ${built.packet.processId}`,
-      `- Packet key: ${built.packet.packetKey}`,
-      `- Process hash: ${built.packet.processHash}`,
-      `- Collection: ${collection}`,
-      '',
-      'Dry run only — no Qdrant mutation attempted.',
-    ]);
-    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+    const writeStage = await runTimedStage('write', stageTimeouts.write, async () => {
+      const report = {
+        receiptKind: 'PROCESS_PACKET_RUNTIME_PRODUCER_PROVEN',
+        status: 'DRY_RUN',
+        reportJson,
+        reportMd,
+        collection,
+        generatedAt: new Date().toISOString(),
+        stageTimeouts,
+        stageTimings,
+        built: stablePacketProjection(built.packet),
+        manifest: null,
+        readback: null,
+        notes: ['Dry run only — no Qdrant mutation attempted.'],
+      };
+      await writeJson(reportJson, report);
+      await writeMarkdown(reportMd, [
+        '# Process Packet Runtime Proof',
+        '',
+        `- Status: ${report.status}`,
+        `- Process ID: ${built.packet.processId}`,
+        `- Packet key: ${built.packet.packetKey}`,
+        `- Process hash: ${built.packet.processHash}`,
+        `- Collection: ${collection}`,
+        '',
+        'Dry run only — no Qdrant mutation attempted.',
+      ]);
+      process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+      return report;
+    });
+    void writeStage;
     return;
   }
 
-  const persisted = await persistAtlasProcessPacketsToQdrant([built.packet], { collection, wait: true });
-  const readback = await readAtlasProcessPacketsFromQdrant([built.packet.processId], {
-    collection: persisted.collection,
-    limit: 10,
-  });
+  const persistStage = await runTimedStage('persist', stageTimeouts.persist, async () =>
+    persistAtlasProcessPacketsToQdrant([built.packet], { collection, wait: true })
+  );
+  const persisted = persistStage.value;
+  stageTimings.push({ stage: 'persist', durationMs: persistStage.durationMs });
+
+  const readbackStage = await runTimedStage('readback', stageTimeouts.readback, async () =>
+    readAtlasProcessPacketsFromQdrant([built.packet.processId], {
+      collection: persisted.collection,
+      limit: 10,
+    })
+  );
+  const readback = readbackStage.value;
+  stageTimings.push({ stage: 'readback', durationMs: readbackStage.durationMs });
 
   const readbackPacket = readback.packets[0];
   if (!readbackPacket) {
@@ -207,23 +254,29 @@ async function main(): Promise<void> {
     processPackets: reconstructedProcessPackets,
   };
 
-  const compiled = buildContextManifestFromACE(aceContext, {
-    request_id: `process-packet-runtime-proof:${built.packet.processId}`,
-    feature_id: 'ace.process.runtime-proof',
-    source_refs: built.packet.sourceRefs,
-    processPackets: reconstructedProcessPackets,
-    policy: { token_budget: 1200, reserved_tokens: 0, max_packets: 12 },
-    now: new Date(),
-  });
+  const manifestStage = await runTimedStage('manifest', stageTimeouts.manifest, async () => {
+    const compiled = buildContextManifestFromACE(aceContext, {
+      request_id: `process-packet-runtime-proof:${built.packet.processId}`,
+      feature_id: 'ace.process.runtime-proof',
+      source_refs: built.packet.sourceRefs,
+      processPackets: reconstructedProcessPackets,
+      policy: { token_budget: 1200, reserved_tokens: 0, max_packets: 12 },
+      now: new Date(),
+    });
 
-  const manifestAgain = buildContextManifestFromACE(aceContext, {
-    request_id: `process-packet-runtime-proof:${built.packet.processId}`,
-    feature_id: 'ace.process.runtime-proof',
-    source_refs: built.packet.sourceRefs,
-    processPackets: reconstructedProcessPackets,
-    policy: { token_budget: 1200, reserved_tokens: 0, max_packets: 12 },
-    now: new Date(),
+    const manifestAgain = buildContextManifestFromACE(aceContext, {
+      request_id: `process-packet-runtime-proof:${built.packet.processId}`,
+      feature_id: 'ace.process.runtime-proof',
+      source_refs: built.packet.sourceRefs,
+      processPackets: reconstructedProcessPackets,
+      policy: { token_budget: 1200, reserved_tokens: 0, max_packets: 12 },
+      now: new Date(),
+    });
+
+    return { compiled, manifestAgain };
   });
+  const { compiled, manifestAgain } = manifestStage.value;
+  stageTimings.push({ stage: 'manifest', durationMs: manifestStage.durationMs });
 
   const report = {
     receiptKind: 'PROCESS_PACKET_RUNTIME_PRODUCER_PROVEN',
@@ -232,6 +285,8 @@ async function main(): Promise<void> {
     reportMd,
     generatedAt: new Date().toISOString(),
     collection: persisted.collection,
+    stageTimeouts,
+    stageTimings,
     built: stablePacketProjection(built.packet),
     persisted: {
       upserted: persisted.upserted,

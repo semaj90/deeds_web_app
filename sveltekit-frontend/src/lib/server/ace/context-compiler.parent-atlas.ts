@@ -113,6 +113,14 @@ export interface ContextManifest {
   };
 
   created_at: string;
+
+  /** Observable RLM linkage only; never raw model reasoning. */
+  rlm_trace_id?: string;
+  rlm_depth?: number;
+  rlm_subcalls?: number;
+  rlm_cache_hits?: number;
+  rlm_cache_misses?: number;
+  ace_playbook_revision?: string;
 }
 
 export interface CompiledContext {
@@ -149,6 +157,12 @@ export interface ContextCompileInput {
   candidates: ContextCandidate[];
   policy: ContextSelectionPolicy;
   now?: Date;
+  rlm_trace_id?: string;
+  rlm_depth?: number;
+  rlm_subcalls?: number;
+  rlm_cache_hits?: number;
+  rlm_cache_misses?: number;
+  ace_playbook_revision?: string;
 }
 
 export interface ContextManifestPersistence {
@@ -320,6 +334,8 @@ function createManifestId(input: {
   selected_packet_keys: string[];
   selected_process_ids: string[];
   source_refs: string[];
+  rlm_trace_id?: string;
+  ace_playbook_revision?: string;
 }): string {
   const canonical = JSON.stringify({
     request_id: input.request_id,
@@ -328,6 +344,8 @@ function createManifestId(input: {
     selected_packet_keys: input.selected_packet_keys,
     selected_process_ids: input.selected_process_ids,
     source_refs: [...input.source_refs].sort(),
+    rlm_trace_id: input.rlm_trace_id ?? null,
+    ace_playbook_revision: input.ace_playbook_revision ?? null,
   });
   return `context:${createHash('sha256').update(canonical).digest('hex').slice(0, 24)}`;
 }
@@ -426,6 +444,8 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
       selected_packet_keys: selectedPacketKeys,
       selected_process_ids: selectedProcessIds,
       source_refs: sourceRefs,
+      rlm_trace_id: input.rlm_trace_id,
+      ace_playbook_revision: input.ace_playbook_revision,
     }),
     request_id: input.request_id,
     feature_id: input.feature_id,
@@ -456,6 +476,12 @@ export function compileContext(input: ContextCompileInput): CompiledContext {
       avoided_prompt_tokens: avoidedPromptTokens,
     },
     created_at: (input.now ?? new Date()).toISOString(),
+    ...(input.rlm_trace_id ? { rlm_trace_id: input.rlm_trace_id } : {}),
+    ...(input.rlm_depth !== undefined ? { rlm_depth: input.rlm_depth } : {}),
+    ...(input.rlm_subcalls !== undefined ? { rlm_subcalls: input.rlm_subcalls } : {}),
+    ...(input.rlm_cache_hits !== undefined ? { rlm_cache_hits: input.rlm_cache_hits } : {}),
+    ...(input.rlm_cache_misses !== undefined ? { rlm_cache_misses: input.rlm_cache_misses } : {}),
+    ...(input.ace_playbook_revision ? { ace_playbook_revision: input.ace_playbook_revision } : {}),
   };
 
   return {

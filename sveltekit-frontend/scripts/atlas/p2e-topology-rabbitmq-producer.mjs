@@ -11,7 +11,10 @@
 
 import pg from 'pg';
 import amqp from 'amqplib';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 const { Pool } = pg;
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('--dry');
 const limit = parseInt(
@@ -26,7 +29,7 @@ const DB_CONFIG = {
   password: 'legal_admin_password', // Will be overridden by env if needed
 };
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 
 // RabbitMQ queues for topology workers
 const QUEUES = {

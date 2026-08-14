@@ -29,6 +29,7 @@ from datetime import datetime
 import os
 import re
 import sys
+import tempfile
 import time
 import urllib.error
 import urllib.request
@@ -36,7 +37,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal, Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -103,6 +104,41 @@ except Exception:
     SgRoot = None  # type: ignore
     AST_GREP_AVAILABLE = False
 
+try:
+    import networkx  # type: ignore
+    NETWORKX_AVAILABLE = True
+except Exception:
+    networkx = None  # type: ignore
+    NETWORKX_AVAILABLE = False
+
+try:
+    import nx_cugraph  # type: ignore
+    NX_CUGRAPH_AVAILABLE = True
+except Exception:
+    nx_cugraph = None  # type: ignore
+    NX_CUGRAPH_AVAILABLE = False
+
+try:
+    import cugraph  # type: ignore
+    CUGRAPH_AVAILABLE = True
+except Exception:
+    cugraph = None  # type: ignore
+    CUGRAPH_AVAILABLE = False
+
+try:
+    import cuvs  # type: ignore
+    CUVS_AVAILABLE = True
+except Exception:
+    cuvs = None  # type: ignore
+    CUVS_AVAILABLE = False
+
+try:
+    import cupy  # type: ignore
+    CUPY_AVAILABLE = True
+except Exception:
+    cupy = None  # type: ignore
+    CUPY_AVAILABLE = False
+
 
 SOURCE_TYPES = Literal[
     "plain_text",
@@ -153,6 +189,57 @@ class AnalyzeRequest(BaseModel):
     grounded_extraction_required: bool = False
 
 
+class AstChunkRequest(BaseModel):
+    source: str = Field(..., min_length=1, max_length=200_000)
+    language: str = Field(..., min_length=1, max_length=64)
+    file_path: str = Field(..., alias="filePath", min_length=1, max_length=2_000)
+    source_revision: str = Field(..., alias="sourceRevision", min_length=1, max_length=256)
+
+    model_config = {"populate_by_name": True}
+
+
+class AstEvidenceChunk(BaseModel):
+    upstream_chunk_id: Optional[str] = None
+    node_type: str
+    kind: str
+    name: Optional[str] = None
+    start_byte: int
+    end_byte: int
+    start_line: int
+    start_column: int
+    end_line: int
+    end_column: int
+    calls: list[str] = Field(default_factory=list)
+    imports: list[str] = Field(default_factory=list)
+    exports: list[str] = Field(default_factory=list)
+
+
+class AstEvidenceEdge(BaseModel):
+    from_evidence_key: str
+    to_evidence_key: str
+    type: Literal["DEFINES", "IMPORTS", "EXPORTS", "CALLS", "REFERENCES"]
+    evidence_start_line: int
+    evidence_start_column: int
+    evidence_end_line: int
+    evidence_end_column: int
+    resolved: bool = False
+    resolution: Optional[str] = None
+
+
+class AstEvidenceResponse(BaseModel):
+    schema: Literal["atlas.ast.evidence.v1"]
+    engine: str
+    engine_version: str
+    language: str
+    file_path: str
+    source_revision: str
+    chunks: list[AstEvidenceChunk]
+    edges: list[AstEvidenceEdge] = Field(default_factory=list)
+    diagnostics: list[str] = Field(default_factory=list)
+    error_tag: Optional[Literal["ChunkingError", "UnsupportedLanguageError"]] = None
+    syntax_status: Literal["CLEAN", "RECOVERED_WITH_ERRORS"] = "CLEAN"
+
+
 class Chunk(BaseModel):
     kind: str
     text: str
@@ -160,6 +247,7 @@ class Chunk(BaseModel):
     end: int
     symbol: Optional[str] = None
     language: Optional[str] = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class Entity(BaseModel):
@@ -378,6 +466,29 @@ def _capabilities() -> dict[str, bool]:
         "treesitter_chunker": TREESITTER_CHUNKER_AVAILABLE,
         "ast_grep": AST_GREP_AVAILABLE,
         "torch": TORCH_AVAILABLE,
+        "networkx": NETWORKX_AVAILABLE,
+        "nx_cugraph": NX_CUGRAPH_AVAILABLE,
+        "cugraph": CUGRAPH_AVAILABLE,
+        "cuvs": CUVS_AVAILABLE,
+        "cupy": CUPY_AVAILABLE,
+    }
+
+
+def _capability_report() -> dict[str, Any]:
+    capabilities = _capabilities()
+    return {
+        "service": "parent-atlas-compute-sidecar",
+        "ast": {
+            "engine": "treesitter-chunker" if TREESITTER_CHUNKER_AVAILABLE else "unavailable",
+            "available": TREESITTER_CHUNKER_AVAILABLE,
+            "xref": TREESITTER_CHUNKER_AVAILABLE,
+            "repositoryProcessing": TREESITTER_CHUNKER_AVAILABLE,
+        },
+        "gpu": {"available": TORCH_AVAILABLE},
+        "graph": {"networkx": NETWORKX_AVAILABLE, "cugraph": CUGRAPH_AVAILABLE, "nx_cugraph": NX_CUGRAPH_AVAILABLE},
+        "vector": {"cuvs": CUVS_AVAILABLE, "cagra": CUVS_AVAILABLE},
+        "legacy": capabilities,
+        "imports": _module_proof(),
     }
 
 
@@ -684,11 +795,26 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
     if TREESITTER_CHUNKER_AVAILABLE and TREESITTER_CHUNKER_MODULE is not None:
         chunk_file = getattr(TREESITTER_CHUNKER_MODULE, "chunk_file", None)
         if callable(chunk_file):
+            temp_path: Optional[str] = None
             try:
-                raw_chunks = chunk_file(text, language)
+                suffix = ".tsx" if language.lower() in {"tsx", "typescriptreact"} else ".ts"
+                with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:
+                    handle.write(text)
+                    temp_path = handle.name
+                try:
+                    raw_chunks = chunk_file(
+                        temp_path,
+                        language,
+                        extract_metadata=True,
+                        include_retrieval_metadata=True,
+                        identity_path=f"atlas-input{suffix}",
+                    )
+                finally:
+                    if temp_path:
+                        Path(temp_path).unlink(missing_ok=True)
             except TypeError:
                 try:
-                    raw_chunks = chunk_file(text, language=language)
+                    raw_chunks = chunk_file(temp_path or text, language=language)
                 except Exception:
                     raw_chunks = []
             except Exception:
@@ -714,7 +840,8 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                 if not snippet:
                     continue
 
-                symbol = _chunk_field(item, "symbol", "name")
+                item_metadata = dict(_chunk_field(item, "metadata") or {})
+                symbol = _chunk_field(item, "symbol", "name") or item_metadata.get("symbol") or item_metadata.get("qualified_name")
                 chunks.append(
                     Chunk(
                         kind=kind,
@@ -723,6 +850,7 @@ def _code_chunks_tree_sitter(text: str, language: str) -> list[Chunk]:
                         end=end_byte,
                         symbol=str(symbol) if symbol else None,
                         language=language,
+                        metadata=item_metadata,
                     )
                 )
 
@@ -1800,6 +1928,242 @@ def _extract(req: AnalyzeRequest) -> ExtractResponse:
     )
 
 
+def _offset_line_column(source: str, offset: int) -> tuple[int, int]:
+    raw = source.encode("utf-8")
+    bounded = max(0, min(int(offset), len(raw)))
+    prefix = raw[:bounded].decode("utf-8", errors="ignore")
+    line = prefix.count("\n") + 1
+    column = len(prefix.rsplit("\n", 1)[-1])
+    return line, column
+
+
+def _structural_kind(node_type: str) -> str:
+    lowered = node_type.lower()
+    for marker, kind in (
+        ("function", "function"),
+        ("method", "method"),
+        ("class", "class"),
+        ("interface", "interface"),
+        ("import", "import"),
+        ("export", "export"),
+        ("type", "type"),
+    ):
+        if marker in lowered:
+            return kind
+    return "fragment"
+
+
+def _symbol_graph_evidence(source: str, language: str, file_path: str) -> tuple[list[AstEvidenceEdge], list[str]]:
+    """Return only relationships actually emitted by chunker.symbol_graph.
+
+    The graph is evidence-only: unresolved targets remain unresolved and never
+    become synthetic Atlas symbols.
+    """
+    module = TREESITTER_CHUNKER_MODULE
+    extractor = getattr(getattr(module, "symbol_graph", None), "extract_symbol_graph", None)
+    if not callable(extractor):
+        return [], ["treesitter-chunker symbol_graph API unavailable; edge evidence omitted"]
+
+    suffix = ".tsx" if language.lower() in {"tsx", "typescriptreact"} else ".ts"
+    temp_path: Optional[str] = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=suffix, encoding="utf-8", delete=False) as handle:
+            handle.write(source)
+            temp_path = handle.name
+        graph = extractor(temp_path, language="typescript" if language.lower() in {"typescript", "tsx", "typescriptreact"} else language)
+    except Exception as exc:
+        return [], [f"treesitter-chunker symbol graph extraction failed: {exc}"]
+    finally:
+        if temp_path:
+            try:
+                Path(temp_path).unlink(missing_ok=True)
+            except OSError:
+                pass
+
+    edges: list[AstEvidenceEdge] = []
+    module_name = re.sub(r"[^A-Za-z0-9_$]+", "_", Path(file_path).stem).strip("_") or "module"
+    for relationship in graph.get("relationships", []) if isinstance(graph, dict) else []:
+        relation_type = str(relationship.get("type", "")).lower()
+        edge_type = {"calls": "CALLS", "dependencies": "REFERENCES", "imports": "IMPORTS", "exports": "EXPORTS"}.get(relation_type)
+        if edge_type is None:
+            continue
+        line = max(1, int(relationship.get("line", 1)))
+        raw_from = str(relationship.get("from", ""))
+        raw_from_name = raw_from.rsplit(":", 1)[-1] if ":" in raw_from else raw_from
+        from_key = f"{module_name}:{raw_from_name}" if raw_from_name else module_name
+        reference = str(relationship.get("reference", relationship.get("to", "")))
+        resolved = bool(relationship.get("is_internal")) and str(relationship.get("resolution", "")).lower() == "resolved"
+        edges.append(AstEvidenceEdge(
+            from_evidence_key=from_key,
+            to_evidence_key=reference or str(relationship.get("to", "")),
+            type=edge_type,
+            evidence_start_line=line,
+            evidence_start_column=0,
+            evidence_end_line=line,
+            evidence_end_column=0,
+            resolved=resolved,
+            resolution=str(relationship.get("resolution")) if relationship.get("resolution") else None,
+        ))
+    return edges, []
+
+
+def _ast_evidence(req: AstChunkRequest) -> AstEvidenceResponse:
+    diagnostics: list[str] = []
+    if not TREESITTER_CHUNKER_AVAILABLE:
+        diagnostics.append("treesitter-chunker is unavailable; no replacement evidence was produced")
+        return AstEvidenceResponse(
+            schema="atlas.ast.evidence.v1",
+            engine="unavailable",
+            engine_version="unknown",
+            language=req.language,
+            file_path=req.file_path,
+            source_revision=req.source_revision,
+            chunks=[],
+            edges=[],
+            diagnostics=diagnostics,
+        )
+
+    try:
+        chunks = _code_chunks_tree_sitter(req.source, req.language)
+    except Exception as exc:
+        diagnostics.append(f"treesitter-chunker extraction failed: {exc}")
+        chunks = []
+
+    engine_version = _package_version("treesitter-chunker", "treesitter_chunker", "tree_sitter_chunker", "chunker") or "unknown"
+    evidence_chunks: list[AstEvidenceChunk] = []
+    for chunk in chunks:
+        start = max(0, int(chunk.start))
+        end = max(start, int(chunk.end))
+        start_line, start_column = _offset_line_column(req.source, start)
+        end_line, end_column = _offset_line_column(req.source, end)
+        node_type = str(chunk.kind or "fragment")
+        name = str(chunk.symbol) if chunk.symbol else None
+        upstream_id = _digest_parts(req.file_path, req.source_revision, node_type, name or "", start, end)
+        evidence_chunks.append(
+            AstEvidenceChunk(
+                upstream_chunk_id=upstream_id,
+                node_type=node_type,
+                kind=_structural_kind(node_type),
+                name=name,
+                start_byte=start,
+                end_byte=end,
+                start_line=start_line,
+                start_column=start_column,
+                end_line=end_line,
+                end_column=end_column,
+            )
+        )
+
+    if not evidence_chunks:
+        diagnostics.append("treesitter-chunker returned no structural chunks")
+
+    edges: list[AstEvidenceEdge] = []
+    file_key = f"file:{req.file_path.replace('\\\\', '/')}"
+    seen_edges: set[tuple[str, str, str, int]] = set()
+    for evidence_chunk, chunk in zip(evidence_chunks, chunks):
+        metadata = chunk.metadata or {}
+        symbol_key = evidence_chunk.upstream_chunk_id or file_key
+
+        if evidence_chunk.kind not in {"import", "export"} and evidence_chunk.name:
+            candidate = (file_key, symbol_key, "DEFINES", evidence_chunk.start_line)
+            if candidate not in seen_edges:
+                seen_edges.add(candidate)
+                edges.append(AstEvidenceEdge(
+                    from_evidence_key=file_key,
+                    to_evidence_key=symbol_key,
+                    type="DEFINES",
+                    evidence_start_line=evidence_chunk.start_line,
+                    evidence_start_column=evidence_chunk.start_column,
+                    evidence_end_line=evidence_chunk.end_line,
+                    evidence_end_column=evidence_chunk.end_column,
+                    resolved=True,
+                    resolution="local_chunk",
+                ))
+
+        for import_value in metadata.get("imports", []):
+            candidate = (file_key, str(import_value), "IMPORTS", evidence_chunk.start_line)
+            if candidate not in seen_edges:
+                seen_edges.add(candidate)
+                edges.append(AstEvidenceEdge(
+                    from_evidence_key=file_key,
+                    to_evidence_key=str(import_value),
+                    type="IMPORTS",
+                    evidence_start_line=evidence_chunk.start_line,
+                    evidence_start_column=evidence_chunk.start_column,
+                    evidence_end_line=evidence_chunk.end_line,
+                    evidence_end_column=evidence_chunk.end_column,
+                    resolved=False,
+                    resolution="syntax_only",
+                ))
+
+        for export_value in metadata.get("exports", []):
+            candidate = (file_key, str(export_value), "EXPORTS", evidence_chunk.start_line)
+            if candidate not in seen_edges:
+                seen_edges.add(candidate)
+                edges.append(AstEvidenceEdge(
+                    from_evidence_key=file_key,
+                    to_evidence_key=str(export_value),
+                    type="EXPORTS",
+                    evidence_start_line=evidence_chunk.start_line,
+                    evidence_start_column=evidence_chunk.start_column,
+                    evidence_end_line=evidence_chunk.end_line,
+                    evidence_end_column=evidence_chunk.end_column,
+                    resolved=False,
+                    resolution="syntax_only",
+                ))
+
+        for call in metadata.get("calls", []):
+            call_name = str(call)
+            candidate = (symbol_key, call_name, "CALLS", evidence_chunk.start_line)
+            if candidate not in seen_edges:
+                seen_edges.add(candidate)
+                edges.append(AstEvidenceEdge(
+                    from_evidence_key=symbol_key,
+                    to_evidence_key=call_name,
+                    type="CALLS",
+                    evidence_start_line=evidence_chunk.start_line,
+                    evidence_start_column=evidence_chunk.start_column,
+                    evidence_end_line=evidence_chunk.end_line,
+                    evidence_end_column=evidence_chunk.end_column,
+                    resolved=False,
+                    resolution="unresolved_target",
+                ))
+
+        for dependency in metadata.get("dependencies", []):
+            dependency_name = str(dependency)
+            candidate = (symbol_key, dependency_name, "REFERENCES", evidence_chunk.start_line)
+            if candidate not in seen_edges:
+                seen_edges.add(candidate)
+                edges.append(AstEvidenceEdge(
+                    from_evidence_key=symbol_key,
+                    to_evidence_key=dependency_name,
+                    type="REFERENCES",
+                    evidence_start_line=evidence_chunk.start_line,
+                    evidence_start_column=evidence_chunk.start_column,
+                    evidence_end_line=evidence_chunk.end_line,
+                    evidence_end_column=evidence_chunk.end_column,
+                    resolved=False,
+                    resolution="unresolved_target",
+                ))
+
+    if not edges:
+        fallback_edges, edge_diagnostics = _symbol_graph_evidence(req.source, req.language, req.file_path)
+        edges.extend(fallback_edges)
+        diagnostics.extend(edge_diagnostics)
+
+    return AstEvidenceResponse(
+        schema="atlas.ast.evidence.v1",
+        engine="treesitter-chunker",
+        engine_version=engine_version,
+        language=req.language,
+        file_path=req.file_path,
+        source_revision=req.source_revision,
+        chunks=evidence_chunks,
+        edges=edges,
+        diagnostics=diagnostics,
+    )
+
+
 @app.get("/health")
 def health() -> dict[str, Any]:
     return {
@@ -1810,6 +2174,16 @@ def health() -> dict[str, Any]:
         "imports": _module_proof(),
         "timestamp": int(time.time() * 1000),
     }
+
+
+@app.get("/capabilities")
+def capabilities() -> dict[str, Any]:
+    return _capability_report()
+
+
+@app.post("/ast/chunk", response_model=AstEvidenceResponse)
+def ast_chunk(req: AstChunkRequest) -> AstEvidenceResponse:
+    return _ast_evidence(req)
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)

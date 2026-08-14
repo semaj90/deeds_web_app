@@ -181,7 +181,7 @@ export async function extractDependencyFeatures(code: string): Promise<Extracted
 	const seen = new Set<string>();
 
 	// ES module imports
-	for (const node of root.root().findAll({ rule: { kind: 'import_declaration' } })) {
+	for (const node of root.root().findAll({ rule: { kind: 'import_statement' } })) {
 		// Find the string literal (module specifier)
 		const spec = node.find({ rule: { kind: 'string_fragment' } });
 		const moduleName = spec?.text() ?? node.text().match(/['"]([^'"]+)['"]/)?.[1] ?? '';

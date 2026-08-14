@@ -376,7 +376,11 @@ export function resolvePreferredCodebaseCollectionForTier(
 }
 
 export function assertCollectionSlot(collection: string, slot: string): void {
-  if (collection === VECTOR_CONFIG.COLLECTIONS.codebase_chunks && slot !== 'embeddinggemma_768') {
+  const isCodebase768Collection =
+    collection === VECTOR_CONFIG.COLLECTIONS.codebase_chunks ||
+    collection === VECTOR_CONFIG.COLLECTIONS.codebase_chunks_768_v2;
+
+  if (isCodebase768Collection && slot !== 'dense_768' && slot !== 'embeddinggemma_768') {
     throw new Error(`Invalid vector slot ${slot} for ${collection}`);
   }
   if (collection === VECTOR_CONFIG.COLLECTIONS.codebase_topology_128 && slot !== 'latent_128') {

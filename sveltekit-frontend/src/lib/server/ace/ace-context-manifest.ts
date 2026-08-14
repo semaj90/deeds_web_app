@@ -171,6 +171,14 @@ export interface ACEContextManifestOptions {
   processPackets?: AtlasProcessPacket[];
   policy?: Partial<ContextSelectionPolicy>;
   now?: Date;
+  rlmTrace?: {
+    requestId: string;
+    depthReached: number;
+    subcalls: number;
+    cacheHits?: number;
+    cacheMisses?: number;
+  };
+  acePlaybookRevision?: string;
 }
 
 /**
@@ -199,6 +207,12 @@ export function buildContextManifestFromACE(
     now: opts.now,
     candidates,
     policy: { ...DEFAULT_POLICY, ...opts.policy },
+    rlm_trace_id: opts.rlmTrace?.requestId,
+    rlm_depth: opts.rlmTrace?.depthReached,
+    rlm_subcalls: opts.rlmTrace?.subcalls,
+    rlm_cache_hits: opts.rlmTrace?.cacheHits,
+    rlm_cache_misses: opts.rlmTrace?.cacheMisses,
+    ace_playbook_revision: opts.acePlaybookRevision,
   });
 }
 

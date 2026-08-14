@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "atlas.bitfrost.valkey-tracking-proof.v1",
+  "generatedAt": "2026-08-14T05:08:02.610Z",
+  "prefixes": [
+    "bifrost:packet:",
+    "bifrost:card:",
+    "bifrost:graph:",
+    "bifrost:retrieval:",
+    "bifrost:ace:"
+  ],
+  "mutationScope": "connection tracking mode only; no keys or values written",
+  "status": "PROVEN_CONNECTION_CAPABILITY",
+  "gates": {
+    "VALKEY_REACHABLE": true,
+    "CLIENT_TRACKING_ACCEPTED": true,
+    "PREFIX_TRACKING_CONFIGURED": true,
+    "DATA_MUTATION_PERFORMED": false
+  },
+  "trackingInfoShape": "array"
+}

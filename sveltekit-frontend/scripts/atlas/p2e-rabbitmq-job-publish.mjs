@@ -15,14 +15,17 @@
  *   node scripts/atlas/p2e-rabbitmq-job-publish.mjs --limit=100
  */
 
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import amqp from 'amqplib';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const isDryRun = process.argv.includes('--dry-run') || process.argv.includes('--dry');
 const limit = parseInt(
   process.argv.find(arg => arg.startsWith('--limit='))?.split('=')[1] ?? '100'
 );
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 
 const QUEUES = {
   kmeans: 'topology.kmeans',

@@ -78,3 +78,9 @@ npm run atlas:feature-metadata:verify
 npm run atlas:qdrant-payload:verify:verbose
 npm run atlas:bitfrost-semantic-cache:audit
 ```
+
+## Coordination update — 2026-08-13
+
+See `docs/parent-atlas-workstation-gpu-runtime-backlog.md` for the separate GPU/runtime
+integration lane. Its roadmap estimate is **58% planned/integrated**. Do not use that
+estimate as a production proof or as an AST supersession condition.

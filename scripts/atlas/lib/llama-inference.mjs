@@ -19,8 +19,7 @@ export const LLAMA_URL =
   (process.env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090/v1')
     .replace(/\/+$/, '') + '/chat/completions';
 
-export const LLAMA_MODEL =
-  process.env.LOCAL_GEMMA_MODEL ?? 'gemma4-legal-iq4xs-direct.gguf';
+export const LLAMA_MODEL = process.env.LOCAL_GEMMA_MODEL ?? 'llama-server/hforf.gguf';
 
 const STOP_TOKENS = [
   '<end_of_turn>', '<start_of_turn>', '<|channel>thought',
@@ -82,10 +81,10 @@ export async function llamaChat(prompt, opts = {}) {
  * @returns {Promise<boolean>}
  */
 export async function isLlamaAvailable() {
-  const healthUrl = LLAMA_URL.replace('/chat/completions', '/health').replace('/v1/health', '/health');
   try {
     const r = await fetch(
-      (process.env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/v1.*/, '') + '/health',
+      (process.env.LOCAL_OPENAI_BASE_URL ?? 'http://127.0.0.1:8090').replace(/\/v1.*/, '') +
+        '/health',
       { signal: AbortSignal.timeout(2000) }
     );
     return r.ok;

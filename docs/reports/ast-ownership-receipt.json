@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "atlas-ast-ownership-receipt-v1",
+  "generatedAt": "2026-08-14T03:41:49.091Z",
+  "status": "PROVEN_AUDIT",
+  "gates": {
+    "AST_OWNER_IDENTIFIED": true,
+    "LIVE_CALLERS_ENUMERATED": true,
+    "GRAPHIFY_STAGE_IDENTIFIED": true,
+    "REPLACEMENT_IDENTIFIED_OR_EXPLICITLY_NONE": true,
+    "NO_ASSUMED_TYPES_TS": true,
+    "SUPERSEDED_IMPORT_DETECTED": false
+  },
+  "entries": [
+    {
+      "artifact": "scripts/atlas/knowledge-layer/ast-extractor.ts",
+      "artifactExists": true,
+      "declaredState": "MIGRATION_CANDIDATE",
+      "observedState": "MIGRATION_CANDIDATE",
+      "liveCallers": [],
+      "importers": [
+        "scripts/atlas/knowledge-layer/index.ts"
+      ],
+      "barrelReferences": [
+        "scripts/atlas/knowledge-layer/index.ts"
+      ],
+      "graphifyStages": [
+        "sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts"
+      ],
+      "replacementCandidates": [
+        "sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts"
+      ],
+      "promotionRequirements": [
+        "replacement_owner_confirmed",
+        "replacement_behavior_tests_pass",
+        "graphify_daily_no_longer_depends_on_artifact",
+        "superseded_import_count_zero"
+      ],
+      "evidence": {
+        "replacementIdentifiedOrExplicitlyNone": true,
+        "liveCallersEnumerated": true,
+        "graphifyStageEnumerated": true,
+        "noAssumedTypes": true
+      }
+    }
+  ]
+}

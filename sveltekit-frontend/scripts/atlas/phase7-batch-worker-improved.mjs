@@ -22,11 +22,14 @@ import pg from 'pg';
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
 import process from 'process';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 
 const { Pool } = pg;
 
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
+
 // Config
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const LLAMA_SERVER_URL = 'http://127.0.0.1:8090';
 const LLAMA_MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';

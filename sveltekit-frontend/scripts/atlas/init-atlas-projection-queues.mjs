@@ -15,9 +15,12 @@
  */
 
 import amqp from 'amqplib';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL
-  ?? `amqp://${process.env.RABBITMQ_USER ?? 'guest'}:${process.env.RABBITMQ_PASSWORD ?? 'guest'}@${process.env.RABBITMQ_HOST ?? 'localhost'}:${process.env.RABBITMQ_PORT ?? '5672'}`;
+  ?? `amqp://${process.env.RABBITMQ_USER ?? 'legal_admin'}:${process.env.RABBITMQ_PASSWORD ?? 'secret123'}@${process.env.RABBITMQ_HOST ?? '127.0.0.1'}:${process.env.RABBITMQ_PORT ?? '5673'}`;
 
 const EXCHANGE    = 'atlas.projection';
 const QUEUE       = 'atlas.qdrant.project';

@@ -23,6 +23,7 @@ import amqp from 'amqplib';
 import pg from 'pg';
 import fetch from 'node-fetch';
 import process from 'process';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import { buildCanonicalPacketKey } from '../../../scripts/atlas/lib/packet-identity.mjs';
 import {
   isUsableGemma4Summary,
@@ -31,8 +32,10 @@ import {
 
 const { Pool } = pg;
 
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
+
 // Config
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const GEMMA4_URL = process.env.GEMMA4_URL || 'http://127.0.0.1:8090';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';

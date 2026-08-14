@@ -48,11 +48,14 @@ import crypto from 'crypto';
 import fetch from 'node-fetch';
 import process from 'process';
 import { v4 as uuidv4 } from 'uuid';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 
 const { Pool } = pg;
 
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
+
 // Config
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const QDRANT_URL = process.env.QDRANT_URL || 'http://127.0.0.1:6333';
 const QDRANT_COLLECTION = 'codebase_chunks_768';
 

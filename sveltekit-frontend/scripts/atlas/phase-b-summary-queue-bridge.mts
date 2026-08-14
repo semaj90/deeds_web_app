@@ -10,8 +10,11 @@
  *   npx tsx scripts/atlas/phase-b-summary-queue-bridge.mts [--interval=30] [--batch=100]
  */
 
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import amqp from 'amqplib';
 import { Pool } from 'pg';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const INTERVAL = parseInt(
   process.argv.find(arg => arg.startsWith('--interval='))?.split('=')[1] || '30'
@@ -27,7 +30,7 @@ const PG_DB = process.env.POSTGRES_DB || 'legal_ai_db';
 const PG_USER = process.env.POSTGRES_USER || 'legal_admin';
 const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 
 const pgPool = new Pool({
   host: PG_HOST,

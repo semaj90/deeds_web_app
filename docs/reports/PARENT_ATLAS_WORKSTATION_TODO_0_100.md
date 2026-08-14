@@ -107,3 +107,15 @@ current audit reports for decisions.
 - Retrieval registry enforcement across all lanes
 - Closed-loop agentic repair with rollback proof
 - Authority promotion remains blocked
+
+## Coordination update — 2026-08-13
+
+GPU/runtime work is tracked separately in
+`docs/parent-atlas-workstation-gpu-runtime-backlog.md` at **58% planned/integrated**.
+It covers GPU owner/runtime receipts, reproducible CUDA/PyTorch/cuVS environments,
+CAGRA evaluation, cuGraph parity, TensorRT/LibTorch, Valkey invalidation,
+Arrow/mmap, multithreading, simdjson, and Python 3.14/free-threading.
+
+These are not AST supersession gates. The current order remains structural Graphify
+and identity proof first, then grounded execution, then benchmark-gated runtime
+promotion.

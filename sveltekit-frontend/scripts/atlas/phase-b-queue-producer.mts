@@ -9,7 +9,10 @@
  *   npx tsx scripts/atlas/phase-b-queue-producer.mts [--dry-run] [--limit=1000]
  */
 
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import amqp from 'amqplib';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 import { Pool } from 'pg';
 
 const DRY_RUN = process.argv.includes('--dry-run');
@@ -23,7 +26,7 @@ const PG_DB = process.env.POSTGRES_DB || 'legal_ai_db';
 const PG_USER = process.env.POSTGRES_USER || 'legal_admin';
 const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 
 const pgPool = new Pool({
   host: PG_HOST,

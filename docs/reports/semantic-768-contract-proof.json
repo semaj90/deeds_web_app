@@ -1,0 +1,342 @@
+{
+  "schemaVersion": "atlas.semantic-768.contract-proof.v1",
+  "generatedAt": "2026-08-14T04:49:34.332Z",
+  "status": "PROVEN",
+  "contract": {
+    "collection": "codebase_chunks_768",
+    "vectorSlots": {
+      "content": {
+        "present": true,
+        "size": 768,
+        "distance": "Cosine",
+        "dimensions768": true,
+        "cosine": true,
+        "valid": true
+      },
+      "error": {
+        "present": true,
+        "size": 768,
+        "distance": "Cosine",
+        "dimensions768": true,
+        "cosine": true,
+        "valid": true
+      },
+      "signature": {
+        "present": true,
+        "size": 768,
+        "distance": "Cosine",
+        "dimensions768": true,
+        "cosine": true,
+        "valid": true
+      }
+    },
+    "sparseVectors": null,
+    "embeddingDimensions": 768,
+    "distance": "Cosine"
+  },
+  "ownership": {
+    "chat": {
+      "owner": "llama-server",
+      "endpoint": "http://127.0.0.1:8090/v1",
+      "health": {
+        "url": "http://127.0.0.1:8090/health",
+        "reachable": true,
+        "status": 200,
+        "elapsedMs": 15,
+        "payload": {
+          "status": "ok"
+        }
+      },
+      "models": [
+        "hforf.gguf"
+      ]
+    },
+    "embeddings": {
+      "owner": "Ollama",
+      "endpoint": "http://127.0.0.1:11434",
+      "health": {
+        "url": "http://127.0.0.1:11434/api/tags",
+        "reachable": true,
+        "status": 200,
+        "elapsedMs": 12,
+        "payload": {
+          "models": [
+            {
+              "name": "embeddinggemma:latest",
+              "model": "embeddinggemma:latest",
+              "modified_at": "2026-05-08T23:36:10.0190077-07:00",
+              "size": 621875917,
+              "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+              "details": {
+                "parent_model": "embeddinggemma:300m-bf16",
+                "format": "gguf",
+                "family": "gemma3",
+                "families": [
+                  "gemma3"
+                ],
+                "parameter_size": "307.58M",
+                "quantization_level": "BF16",
+                "context_length": 2048,
+                "embedding_length": 768
+              },
+              "capabilities": [
+                "embedding"
+              ]
+            },
+            {
+              "name": "ibm/granite-docling:258m",
+              "model": "ibm/granite-docling:258m",
+              "modified_at": "2026-04-05T12:48:43.3511642-07:00",
+              "size": 521684919,
+              "digest": "c4bb6f55fc69f97a51fab35408776a098c6836231b022149e66ed05084d33125",
+              "details": {
+                "parent_model": "/Users/runner/.ollama/models/blobs/sha256-13fbc786212d647c540d31c90dc421775de6edde2b8b8cd061951ed86f16935c",
+                "format": "gguf",
+                "family": "llama",
+                "families": [
+                  "llama",
+                  "clip"
+                ],
+                "parameter_size": "164.01M",
+                "quantization_level": "BF16",
+                "context_length": 8192,
+                "embedding_length": 576
+              },
+              "capabilities": [
+                "completion",
+                "vision"
+              ]
+            },
+            {
+              "name": "nomic-embed-text:latest",
+              "model": "nomic-embed-text:latest",
+              "modified_at": "2025-10-18T17:52:16.4940102-07:00",
+              "size": 274302450,
+              "digest": "0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f",
+              "details": {
+                "parent_model": "",
+                "format": "gguf",
+                "family": "nomic-bert",
+                "families": [
+                  "nomic-bert"
+                ],
+                "parameter_size": "137M",
+                "quantization_level": "F16",
+                "context_length": 2048,
+                "embedding_length": 768
+              },
+              "capabilities": [
+                "embedding"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "qdrant": {
+      "owner": "Qdrant retrieval projection",
+      "endpoint": "http://127.0.0.1:6333",
+      "inspection": {
+        "url": "http://127.0.0.1:6333/collections/codebase_chunks_768",
+        "reachable": true,
+        "status": 200,
+        "elapsedMs": 106,
+        "payload": {
+          "result": {
+            "status": "green",
+            "optimizer_status": "ok",
+            "indexed_vectors_count": 117445,
+            "points_count": 105762,
+            "segments_count": 4,
+            "config": {
+              "params": {
+                "vectors": {
+                  "content": {
+                    "size": 768,
+                    "distance": "Cosine"
+                  },
+                  "error": {
+                    "size": 768,
+                    "distance": "Cosine"
+                  },
+                  "signature": {
+                    "size": 768,
+                    "distance": "Cosine"
+                  }
+                },
+                "shard_number": 1,
+                "replication_factor": 1,
+                "write_consistency_factor": 1,
+                "on_disk_payload": true
+              },
+              "hnsw_config": {
+                "m": 16,
+                "ef_construct": 200,
+                "full_scan_threshold": 10000,
+                "max_indexing_threads": 0,
+                "on_disk": false
+              },
+              "optimizer_config": {
+                "deleted_threshold": 0.2,
+                "vacuum_min_vector_number": 1000,
+                "default_segment_number": 0,
+                "max_segment_size": null,
+                "memmap_threshold": null,
+                "indexing_threshold": 10000,
+                "flush_interval_sec": 5,
+                "max_optimization_threads": null,
+                "prevent_unoptimized": null
+              },
+              "wal_config": {
+                "wal_capacity_mb": 32,
+                "wal_segments_ahead": 0,
+                "wal_retain_closed": 1
+              },
+              "quantization_config": {
+                "scalar": {
+                  "type": "int8",
+                  "quantile": 0.99,
+                  "always_ram": false
+                }
+              }
+            },
+            "payload_schema": {
+              "observed_at": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "symbol_name": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "centroid_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "parent_centroid_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "repo": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "workspace_id": {
+                "data_type": "keyword",
+                "points": 52381
+              },
+              "som_cluster": {
+                "data_type": "integer",
+                "points": 0
+              },
+              "workspace_task_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "path": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "status": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "topo_class": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "file_path": {
+                "data_type": "keyword",
+                "points": 1
+              },
+              "feature_id": {
+                "data_type": "keyword",
+                "points": 4526
+              },
+              "updated_at": {
+                "data_type": "integer",
+                "points": 0
+              },
+              "cluster_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "semantic_path": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "error_id": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "language": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "agent_pickup_ready": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "source_ref": {
+                "data_type": "keyword",
+                "points": 105762
+              },
+              "sourceRefs": {
+                "data_type": "keyword",
+                "points": 1
+              },
+              "next_action": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "summary_hash": {
+                "data_type": "keyword",
+                "points": 0
+              },
+              "tags": {
+                "data_type": "keyword",
+                "points": 4526
+              },
+              "point_kind": {
+                "data_type": "keyword",
+                "points": 1
+              },
+              "kind": {
+                "data_type": "keyword",
+                "points": 6907
+              },
+              "cluster_key": {
+                "data_type": "keyword",
+                "points": 20926
+              }
+            },
+            "update_queue": {
+              "length": 0
+            }
+          },
+          "status": "ok",
+          "time": 0.023724706
+        }
+      }
+    }
+  },
+  "gates": {
+    "QDRANT_COLLECTION_REACHABLE": true,
+    "QDRANT_CONTENT_VECTOR_768": true,
+    "QDRANT_ERROR_VECTOR_768": true,
+    "QDRANT_SIGNATURE_VECTOR_768": true,
+    "QDRANT_NO_SPARSE_ASSUMPTION": true,
+    "LLAMA_CHAT_8090_REACHABLE": true,
+    "OLLAMA_EMBEDDING_OWNER_REACHABLE": true,
+    "CHAT_EMBEDDING_SEPARATION": true,
+    "SEMANTIC_768_CANONICAL_CONTRACT": true,
+    "BM42_NOT_REQUIRED": true
+  },
+  "policy": {
+    "canonicalIdentityOwner": "Postgres/Parent Atlas",
+    "qdrantIsProjection": true,
+    "chatUsesLlama8090Only": true,
+    "embeddingsUseOllamaOnly": true,
+    "bm42": "DEGRADED/NOT_RUN; sparse schema is not required for this proof"
+  }
+}

@@ -1,7 +1,7 @@
 const LEAK_PATTERNS = [
   /<\|channel\|>\s*(analysis|thought|reasoning)\b/i,
   /<\|channel\>\s*(analysis|thought|reasoning)\b/i,
-  /<channel\|>/i,
+  /<channel>/i,
   /<\|start\|>\s*(analysis|thought|reasoning)\b/i,
   /<start_of_turn>/i,
   /<end_of_turn>/i,
@@ -9,7 +9,7 @@ const LEAK_PATTERNS = [
   /<\s*end\s+of\s+turn\s*>/i,
   /<\|message\|>/i,
   /<\|end\|>/i,
-  /<\|endthinking\|?>/i,
+  /<\|endthinking\/?>/i,
   /<think\b[^>]*>/i,
   /<thinking\b[^>]*>/i,
   /<\/think>/i,

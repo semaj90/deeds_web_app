@@ -22,6 +22,8 @@
  * stage fields (rerankScore, graphDistance, authorityScore, etc.).
  */
 
+import { resolveCanonicalIdentity } from '$lib/server/ace/identity-contract.js';
+
 // ── Discriminators ─────────────────────────────────────────────────────────
 
 /** What kind of document this chunk came from */
@@ -82,6 +84,17 @@ export interface UnifiedRetrievalResult {
   // ── Identity ──────────────────────────────────────────────────────────────
   /** Qdrant point ID, pgvector row ID, graph node ID, or generated UUID */
   id: string;
+  /** Backend-local storage ID when the source has one distinct from canonical identity */
+  backendLocalId?: string;
+  /** Canonical versus degraded identity resolution for this candidate */
+  identityStatus?: 'canonical' | 'degraded';
+  /** Explicit canonical identity resolution and its provenance */
+  canonicalIdentity?: {
+    value: string;
+    source: 'symbol_version_id' | 'packet_key' | 'source_ref' | 'lane_id_fallback';
+    status: 'canonical' | 'degraded';
+    backendLocalId: string | null;
+  };
   /** Canonical packet identity when the source already resolved one */
   packetKey?: string;
   /** Canonical source reference when available */
@@ -174,8 +187,28 @@ export function fromQdrantPoint(
   }
 ): UnifiedRetrievalResult {
   const p = pt.payload ?? {};
+  const backendLocalId = String(pt.id);
+  const canonicalIdentity = resolveCanonicalIdentity({
+    symbolVersionId:
+      typeof (p['symbol_version_id'] ?? p['symbolVersionId']) === 'string'
+        ? String(p['symbol_version_id'] ?? p['symbolVersionId'])
+        : null,
+    packetKey:
+      typeof (p['packet_key'] ?? p['packetKey']) === 'string'
+        ? String(p['packet_key'] ?? p['packetKey'])
+        : undefined,
+    sourceRef:
+      typeof (p['source_ref'] ?? p['sourceRef'] ?? p['file_path']) === 'string'
+        ? String(p['source_ref'] ?? p['sourceRef'] ?? p['file_path'])
+        : undefined,
+    laneIdFallback: backendLocalId,
+    backendLocalId,
+  });
   return {
-    id: String(pt.id),
+    id: backendLocalId,
+    backendLocalId,
+    identityStatus: canonicalIdentity.status,
+    canonicalIdentity,
     packetKey:
       typeof (p['packet_key'] ?? p['packetKey']) === 'string'
         ? String(p['packet_key'] ?? p['packetKey'])

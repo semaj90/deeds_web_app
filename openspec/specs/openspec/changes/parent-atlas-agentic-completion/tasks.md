@@ -293,3 +293,35 @@ For every fixture prove:
 Final gate:
 
 Parent Atlas SHALL demonstrate higher first-pass or bounded-retry repair success than the current unguided coding-agent baseline without materially increasing invalid mutations.
+
+---
+
+## PAAC-19 — Current workstation gate summary
+
+This section records the current open lanes and gate order so the task list stays aligned with the live Parent Atlas workstation boundary.
+
+### Open control-plane proofs
+
+* [ ] Prove OpenCode / Ornith replay on a bounded 10-turn path with a preserved `tool_calls[]` history and no raw XML leakage.
+* [ ] Keep `llama-server` chat on `:8090` only; keep embeddings on the embedding provider path, not chat.
+* [ ] Keep TRACE MCP healthy while proving the replay path.
+* [ ] Keep the Valkey OpenCode seed path fixed and idempotent.
+
+### Open graph / retrieval lane
+
+* [ ] Freeze Phase 3–6 proof artifacts as the current dynamic baseline.
+* [ ] Prove `Neo4j -> Qdrant` graph projection parity with revision, identity, and stale-projection rejection.
+* [ ] Materialize process packets from the graph revision and round-trip them through retrieval.
+* [ ] Wire graph-derived features into the existing packet feature matrix and ranking path.
+
+### Open execution lane
+
+* [ ] Bind `ContextManifest` to task grounding with `runId`, selected packet keys, selected process IDs, and source refs.
+* [ ] Route grounded tasks through the worker router to Codex / Claude Code / OpenCode.
+* [ ] Persist `ExecutionReceipt` and feed validation outcome back into recommendation telemetry.
+
+### Explicit boundary rules
+
+* [ ] Do not reopen Kanban internals; Kanban remains the task-intent surface, not truth ownership.
+* [ ] Do not let recommendation policy become a truth owner; it consumes canonical evidence and produces decisions only.
+* [ ] Do not promote GPU ranking before graph features are actually flowing through the live retrieval path.

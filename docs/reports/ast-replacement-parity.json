@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "atlas.ast.replacement.parity.v1",
+  "generatedAt": "2026-08-14T05:15:29.026Z",
+  "repoRevision": "ast-replacement-parity-v1",
+  "filesChecked": 6,
+  "currentOwner": "sveltekit-frontend/src/lib/server/analysis/ast-grep-extractor.ts",
+  "replacementOwner": "miniforge-nlp-sidecar /ast/chunk",
+  "endpoint": "http://127.0.0.1:8095",
+  "symbolsCurrent": 8,
+  "symbolsReplacement": 21,
+  "requiredEdgeCounts": {
+    "EXPORTS": 6,
+    "CALLS": 9,
+    "REFERENCES": 29,
+    "DEFINES": 12,
+    "IMPORTS": 4
+  },
+  "spanMatches": 0,
+  "spanMismatches": 0,
+  "missingRequiredSymbols": 0,
+  "extraSymbols": 0,
+  "parseFailures": 0,
+  "identityChanges": 0,
+  "status": "DEGRADED",
+  "results": [
+    {
+      "name": "functions",
+      "current": {
+        "names": [
+          "add",
+          "helper"
+        ],
+        "kinds": [
+          "function"
+        ],
+        "featureCount": 2
+      },
+      "replacement": {
+        "names": [
+          "add",
+          "helper"
+        ],
+        "kinds": [
+          "export",
+          "function",
+          "function"
+        ],
+        "chunkCount": 3,
+        "edgeCount": 13,
+        "diagnostics": []
+      },
+      "missingRequiredSymbols": [],
+      "missingKinds": [],
+      "missingImports": 0,
+      "spanMismatches": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "class-interface",
+      "current": {
+        "names": [
+          "Square",
+          "Square.area"
+        ],
+        "kinds": [
+          "class",
+          "method"
+        ],
+        "featureCount": 2
+      },
+      "replacement": {
+        "names": [
+          "Shape",
+          "area",
+          "Square",
+          "area"
+        ],
+        "kinds": [
+          "export",
+          "interface",
+          "method",
+          "export",
+          "class",
+          "method"
+        ],
+        "chunkCount": 6,
+        "edgeCount": 12,
+        "diagnostics": []
+      },
+      "missingRequiredSymbols": [],
+      "missingKinds": [],
+      "missingImports": 0,
+      "spanMismatches": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "imports-exports",
+      "current": {
+        "names": [
+          "run",
+          "node:fs"
+        ],
+        "kinds": [
+          "function",
+          "import"
+        ],
+        "featureCount": 2
+      },
+      "replacement": {
+        "names": [
+          "run",
+          "<anonymous>"
+        ],
+        "kinds": [
+          "import",
+          "export",
+          "export",
+          "fragment",
+          "function"
+        ],
+        "chunkCount": 5,
+        "edgeCount": 10,
+        "diagnostics": []
+      },
+      "missingRequiredSymbols": [],
+      "missingKinds": [],
+      "missingImports": 0,
+      "spanMismatches": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "nested-callbacks",
+      "current": {
+        "names": [
+          "outer"
+        ],
+        "kinds": [
+          "function"
+        ],
+        "featureCount": 1
+      },
+      "replacement": {
+        "names": [
+          "outer",
+          "<anonymous>"
+        ],
+        "kinds": [
+          "export",
+          "function",
+          "function"
+        ],
+        "chunkCount": 3,
+        "edgeCount": 10,
+        "diagnostics": []
+      },
+      "missingRequiredSymbols": [],
+      "missingKinds": [],
+      "missingImports": 0,
+      "spanMismatches": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "test-file",
+      "current": {
+        "names": [
+          "vitest"
+        ],
+        "kinds": [
+          "import"
+        ],
+        "featureCount": 1
+      },
+      "replacement": {
+        "names": [
+          "<anonymous>",
+          "<anonymous>"
+        ],
+        "kinds": [
+          "import",
+          "function",
+          "function"
+        ],
+        "chunkCount": 3,
+        "edgeCount": 15,
+        "diagnostics": []
+      },
+      "missingRequiredSymbols": [],
+      "missingKinds": [],
+      "missingImports": 0,
+      "spanMismatches": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "malformed",
+      "current": {
+        "names": [],
+        "kinds": [],
+        "featureCount": 0
+      },
+      "replacement": {
+        "names": [],
+        "kinds": [
+          "fragment"
+        ],
+        "chunkCount": 1,
+        "edgeCount": 0,
+        "diagnostics": []
+      },
+      "missingRequiredSymbols": [],
+      "missingKinds": [],
+      "missingImports": 0,
+      "spanMismatches": 0,
+      "status": "DEGRADED"
+    }
+  ],
+  "deferred": [
+    "full production Graphify persistence parity",
+    "canonical identity promotion",
+    "legacy supersession"
+  ]
+}

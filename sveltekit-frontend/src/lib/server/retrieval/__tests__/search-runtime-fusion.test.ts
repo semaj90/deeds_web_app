@@ -54,6 +54,228 @@ describe('fuseSearchRuntimeCandidates — within-lane best-rank fix', () => {
     const expected = 1 / (60 + 1) + 1 / (60 + 1);
     expect(fused[0]!.fusionScore).toBeCloseTo(expected, 10);
     expect(fused[0]!.contributingLanes).toEqual(expect.arrayContaining(['qdrant', 'postgres_trigram']));
+    expect(fused[0]!.laneEvidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          lane: 'dense',
+          bestRank: 1,
+          bestScore: 0.95,
+          contributionCount: 1,
+          supportingHitCount: 2,
+        }),
+        expect.objectContaining({
+          lane: 'lexical',
+          bestRank: 1,
+          bestScore: 0.8,
+          contributionCount: 1,
+          supportingHitCount: 1,
+        }),
+      ]),
+    );
+  });
+});
+
+describe('fuseSearchRuntimeCandidates — RF5 within-lane canonical dedup', () => {
+  it('keeps one canonical vote per logical lane and preserves supporting hits', () => {
+    const candidates = [
+      candidate({
+        id: 'dense-a',
+        packetKey: 'pkt:shared',
+        sourceRef: 'a.ts',
+        score: 0.96,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        qdrantPointId: 'qp-a',
+        fallback_id: 'qp-a',
+      }),
+      candidate({
+        id: 'dense-b',
+        packetKey: 'pkt:shared',
+        sourceRef: 'a.ts',
+        score: 0.81,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        qdrantPointId: 'qp-b',
+        fallback_id: 'qp-b',
+      }),
+      candidate({
+        id: 'lexical-a',
+        packetKey: 'pkt:shared',
+        sourceRef: 'a.ts',
+        score: 0.7,
+        scoreSource: 'postgres_trigram',
+        fallback_id: 'lex-a',
+      }),
+    ];
+
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(1);
+    expect(fused[0]!.fusionScore).toBeCloseTo((1 / (60 + 1)) + (1 / (60 + 1)), 10);
+    expect(fused[0]!.laneEvidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          lane: 'dense',
+          bestRank: 1,
+          bestScore: 0.96,
+          contributionCount: 1,
+          supportingHitCount: 2,
+          supportingBackendIds: expect.arrayContaining(['qp-a', 'qp-b']),
+        }),
+        expect.objectContaining({
+          lane: 'lexical',
+          bestRank: 1,
+          bestScore: 0.7,
+          contributionCount: 1,
+          supportingHitCount: 1,
+        }),
+      ]),
+    );
+  });
+
+  it('keeps different entities from the same logical lane separate', () => {
+    const candidates = [
+      candidate({
+        id: 'dense-x',
+        packetKey: 'pkt:x',
+        sourceRef: 'x.ts',
+        score: 0.98,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        qdrantPointId: 'qp-x',
+        fallback_id: 'qp-x',
+      }),
+      candidate({
+        id: 'dense-y',
+        packetKey: 'pkt:y',
+        sourceRef: 'y.ts',
+        score: 0.91,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        qdrantPointId: 'qp-y',
+        fallback_id: 'qp-y',
+      }),
+    ];
+
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(2);
+    expect(fused.map((c) => c.packetKey)).toEqual(['pkt:x', 'pkt:y']);
+    for (const item of fused) {
+      expect(item.laneEvidence).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            lane: 'dense',
+            contributionCount: 1,
+            supportingHitCount: 1,
+          }),
+        ]),
+      );
+    }
+  });
+
+  it('preserves degraded identities without silently cross-deduping them', () => {
+    const candidates = [
+      candidate({
+        id: 'deg-a',
+        packetKey: 'raw-a',
+        sourceRef: 'a.ts',
+        score: 0.75,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        identityStatus: 'degraded',
+        identitySource: 'lane_id_fallback',
+        fallback_id: 'backend-a',
+        qdrantPointId: 'backend-a',
+      }),
+      candidate({
+        id: 'deg-b',
+        packetKey: 'raw-b',
+        sourceRef: 'b.ts',
+        score: 0.73,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        identityStatus: 'degraded',
+        identitySource: 'lane_id_fallback',
+        fallback_id: 'backend-b',
+        qdrantPointId: 'backend-b',
+      }),
+    ];
+
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(2);
+    expect(fused.every((item) => item.identityStatus === 'degraded')).toBe(true);
+    expect(fused.map((item) => item.laneEvidence?.[0]?.supportingBackendIds[0])).toEqual(
+      expect.arrayContaining(['backend-a', 'backend-b']),
+    );
+  });
+
+  it('collapses exact duplicate degraded backend identities only', () => {
+    const candidates = [
+      candidate({
+        id: 'deg-a-1',
+        packetKey: 'raw-a',
+        sourceRef: 'a.ts',
+        score: 0.75,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        identityStatus: 'degraded',
+        identitySource: 'lane_id_fallback',
+        fallback_id: 'backend-a',
+        qdrantPointId: 'backend-a',
+      }),
+      candidate({
+        id: 'deg-a-2',
+        packetKey: 'raw-a',
+        sourceRef: 'a.ts',
+        score: 0.72,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        identityStatus: 'degraded',
+        identitySource: 'lane_id_fallback',
+        fallback_id: 'backend-a',
+        qdrantPointId: 'backend-a',
+      }),
+    ];
+
+    const fused = fuseSearchRuntimeCandidates(candidates);
+    expect(fused).toHaveLength(1);
+    expect(fused[0]!.identityStatus).toBe('degraded');
+    expect(fused[0]!.laneEvidence).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          lane: 'dense',
+          supportingHitCount: 2,
+          supportingBackendIds: expect.arrayContaining(['backend-a']),
+        }),
+      ]),
+    );
+  });
+
+  it('is deterministic for the same input', () => {
+    const candidates = [
+      candidate({
+        id: 'det-a',
+        packetKey: 'pkt:det',
+        sourceRef: 'det.ts',
+        score: 0.84,
+        scoreSource: 'qdrant_768',
+        embeddingLane: 'dense_768',
+        qdrantPointId: 'qp-det-a',
+        fallback_id: 'qp-det-a',
+      }),
+      candidate({
+        id: 'det-b',
+        packetKey: 'pkt:det',
+        sourceRef: 'det.ts',
+        score: 0.66,
+        scoreSource: 'postgres_trigram',
+        fallback_id: 'lex-det',
+      }),
+    ];
+
+    const first = fuseSearchRuntimeCandidates(candidates);
+    const second = fuseSearchRuntimeCandidates(candidates);
+    expect(first).toEqual(second);
+    expect(first[0]!.laneEvidence?.map((entry) => entry.lane)).toEqual(['dense', 'lexical']);
   });
 });
 

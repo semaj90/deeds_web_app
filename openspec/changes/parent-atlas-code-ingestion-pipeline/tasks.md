@@ -1,6 +1,6 @@
 # Parent Atlas — Code Ingestion Pipeline (Chunking → Embedding → Rerank → Synthesis)
 
-**Status**: Architecture frozen 2026-08-12, not yet implemented/audited. No code written for this change.
+**Status**: Architecture frozen 2026-08-12. GPH-01 and GPH-07 through GPH-12 are proven; GPH-13 through GPH-22 remain queued behind CHUNK0 ownership closure. The legacy extractor remains `MIGRATION_CANDIDATE`.
 
 ## Frozen architecture
 
@@ -38,6 +38,59 @@ DOCS / LOGS / RESEARCH (separate lane, same downstream machinery)
 
 ## Audit tasks (do first — do not add a new chunker/encoder/transport before these run)
 
+### Graphify hardening lifecycle — AST ownership and supersession
+
+These tasks make `SUPERSEDED` an evidence-backed lifecycle state. The legacy
+`scripts/atlas/knowledge-layer/ast-extractor.ts` remains `MIGRATION_CANDIDATE`
+until replacement parity and zero-import evidence are both proven; it is not
+safe to delete based on naming or lack of obvious callers alone.
+
+- [x] **GPH-01** AST ownership audit — read-only receipt identifies the legacy extractor, enumerates callers/importers, records the Graphify/analysis replacement candidates, and writes `docs/reports/ast-ownership-receipt.{json,md}`.
+- [ ] **GPH-02** Canonical Graphify contracts — nominate one `SourceSpan`, `SymbolFact`, and `EdgeFact` contract without duplicating downstream embedding, ranking, or Qdrant fields.
+- [ ] **GPH-03** Replacement parity — prove the selected Tree-sitter/analysis owner with behavioral tests before changing the lifecycle state.
+- [ ] **GPH-04** Stable symbol identity — separate logical `symbol_id`, revisioned `symbol_version_id`, and source span.
+- [ ] **GPH-05** Superseded import guard — fail the audit/CI when a `SUPERSEDED` artifact gains a new import.
+- [ ] **GPH-06** Retire only after proof — transition `MIGRATION_CANDIDATE → SUPERSEDED → QUARANTINED/DELETED` only after all four promotion requirements are recorded in a receipt.
+- [x] **GPH-07** Canonical structural evidence contract — sidecar response is `atlas.ast.evidence.v1`; it carries structural chunks/spans only and no embeddings, ranking, Qdrant IDs, or recommendation state.
+- [x] **GPH-08** Sidecar capability reporting — existing 8095 service now exposes `/capabilities` with runtime detection for treesitter-chunker, graph, GPU, and vector packages.
+- [x] **GPH-09** Treesitter-chunker AST endpoint — existing 8095 service now exposes `POST /ast/chunk`; missing treesitter-chunker returns diagnostics rather than fabricated evidence.
+- [x] **GPH-10** Parent Atlas sidecar adapter — existing Miniforge client now validates and returns `atlas.ast.evidence.v1` through `astChunk()` with a bounded timeout.
+- [x] **GPH-11** Canonical identity normalization — pure normalizer matches the existing `atlas_ast_nodes` tree-node derivation; upstream chunk IDs remain provenance, while symbol/version/packet identities remain explicitly pending canonical persistence.
+- [x] **GPH-12** Typed edge normalization — live `chunker` metadata now emits `DEFINES`, `IMPORTS`, `EXPORTS`, `CALLS`, and `REFERENCES` evidence; the downstream normalizer preserves typed edges without creating fake call symbols.
+- [ ] **GPH-13** AST parity corpus — compare the current production owner against the sidecar on real deterministic fixtures.
+- [ ] **GPH-14** Determinism/line-shift proof — prove stable logical identity separately from source spans.
+- [ ] **GPH-15** Parse-failure isolation — prove one malformed file produces a diagnostic without aborting the batch.
+- [ ] **GPH-16** Incremental extraction proof — prove changed-file extraction and explicit deletion/tombstone inputs.
+- [ ] **GPH-17** Graphify daily replacement integration — wire the selected canonical owner after GPH-11 through GPH-16 pass.
+- [ ] **GPH-18** Production Graphify receipt — record AST engine, revision, failures, identity, persistence, and projection evidence in the existing receipt.
+- [ ] **GPH-19** Replacement ownership acceptance — require live owner, parity, span/edge parity, and unchanged canonical identity.
+- [ ] **GPH-20** Mark legacy `SUPERSEDED` — blocked until every GPH-19 gate passes; legacy file remains retained.
+- [ ] **GPH-21** Superseded import guard — reject new imports only after the registry state becomes `SUPERSEDED`.
+- [ ] **GPH-22** Hardening recommendation receipt — emit recommendation state without mutating canonical Graphify truth.
+- [x] **GPH-23** Explicit lifecycle states — govern legacy implementations with `ACTIVE`, `MIGRATION_CANDIDATE`, `SUPERSEDED`, `QUARANTINED`, and `DELETED`; the current AST extractor remains `MIGRATION_CANDIDATE`.
+- [x] **GPH-24** Governance baseline — treat the ownership receipt and supersession registry as the lifecycle authority; do not promote from dead-code inference, package installation, or naming alone.
+- [x] **GPH-25** `DUPLICATE_OF GPH-02/GPH-07/GPH-11/GPH-12` — canonical structural contract is tracked by the original task family; no second acceptance gate.
+- [x] **GPH-26** `DUPLICATE_OF GPH-17` — replacement owner reachability remains part of Graphify daily integration.
+- [x] **GPH-27** `DUPLICATE_OF GPH-13` — parity corpus and `ast-replacement-parity.{json,md}` remain one task.
+- [x] **GPH-28** `DUPLICATE_OF GPH-14` — determinism and line-shift identity remain one task.
+- [x] **GPH-29** `DUPLICATE_OF GPH-15/GPH-16` — failure and incremental isolation remain the original tasks.
+- [x] **GPH-30** `DUPLICATE_OF GPH-18` — production receipt remains one task.
+- [x] **GPH-31** `DUPLICATE_OF GPH-19` — replacement acceptance gates remain one task.
+- [x] **GPH-32** `DUPLICATE_OF GPH-20` — controlled supersession remains one task.
+- [x] **GPH-33** `DUPLICATE_OF GPH-21` — regression import guard remains one task.
+- [x] **GPH-34** `DUPLICATE_OF GPH-22` — hardening recommendation lifecycle remains one task.
+- [ ] **GPH-35** Deferred cleanup window — keep `SUPERSEDED` distinct from `QUARANTINED` and `DELETED`; removal requires a later recovery-window decision, digest/reason evidence, and rollback instructions.
+
+### Current workstation integration note — 2026-08-13
+
+- The AST migration has proven GPH-01, GPH-07 through GPH-12, and the governance baseline GPH-23/GPH-24. GPH-13 through GPH-22 remain open; GPH-25 through GPH-34 are closed duplicate aliases. GPH-35 remains the later cleanup-window gate. The legacy extractor stays `MIGRATION_CANDIDATE`; no deletion or unsafe `SUPERSEDED` promotion is authorized.
+- Latest bounded parity run: `npm run atlas:ast:replacement:parity` checked six fixtures against the live worker owner and 8095 sidecar. The report is `docs/reports/ast-replacement-parity.{json,md}` with status `DEGRADED`: structural names/typed imports are preserved, but malformed-source diagnostics are not yet emitted consistently. This is exploratory evidence only; GPH-13 acceptance remains queued behind CHUNK0 ownership closure and GPH-15 parse-failure isolation.
+- PyTorch, RAPIDS/cuVS/cuGraph/CAGRA, TensorRT, LibTorch, simdjson, and multi-threaded execution remain separate deferred integration lanes. Their source files and dedicated sidecar definitions remain present; the lightweight 8095 AST sidecar intentionally reports those optional packages unavailable.
+- Ollama remains the embedding owner; llama-server on `:8090` remains the chat/generation owner. These are separate contracts.
+- Current workstation status and heuristic ranking are maintained in `docs/parent-atlas-workstation-todo.md`.
+- GPU/runtime integration is intentionally tracked separately in `docs/parent-atlas-workstation-gpu-runtime-backlog.md`; its current estimate is 58% and it must not be used to promote or block AST supersession.
+- BM42, CAGRA production use, PageRank retrieval weighting, RF5 fusion changes, and GPU promotion are not AST acceptance gates.
+
 | Task | State | What it answers |
 |---|---|---|
 | **CHUNK0** `/audit-duplication chunking` | PARTIAL_PROVEN | Which structural extraction path is `CANONICAL_OWNER`: in-process TS bridge (`ast-langextract-bridge.ts`, confirmed live — `code_feature_registry` worker routes through it), Python `treesitter-chunker` sidecar (:8095, also real — installs `tree-sitter`, `tree-sitter-language-pack`, `ast-grep-py`, `langextract`), or legacy `ast-chunker.ts` (ts-morph-based)? Live worker wiring now uses the bridge; the Python NLP sidecar now prefers `treesitter-chunker` for structural spans when installed and keeps local tree-sitter only as compatibility fallback. Canonical ownership still needs the duplication audit. |
@@ -52,10 +105,11 @@ Live implementation note (2026-08-12): `sveltekit-frontend/src/lib/server/analys
 
 The next single-action order is now:
 
-1. **CHUNK0** — prove the Python sidecar is the canonical `treesitter-chunker` span producer, with local tree-sitter only as fallback.
-2. **LX0** — prove LangExtract grounding and `char_interval`-required promotion.
-3. **CTX0** — wire the existing `ContextManifest` contract into the live `context-assembler.ts` path.
-4. Then continue with **FE5/FE6** query-time `FeatureRow`, followed by the hypergraph owner audit and the reranker/RRF audit as separate bounded slices.
+1. **CHUNK0** — close structural ownership: bridge/orchestrator, 8095 `treesitter-chunker`, local parser fallback, and canonical identity owner.
+2. **GPH-13 → GPH-22** — run the single AST supersession sequence after CHUNK0 closes.
+3. **LX0** — prove LangExtract grounding and `char_interval`-required promotion.
+4. **CTX0** — wire the existing `ContextManifest` contract into the live `context-assembler.ts` path.
+5. Then continue with **FE5/FE6** query-time `FeatureRow`, followed by the hypergraph owner audit and the reranker/RRF audit as separate bounded slices.
 
 Do not start ContextManifest wiring before CHUNK0 and LX0 are settled; the manifest is downstream of validated chunking and grounded extraction.
 

@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 import amqp from 'amqplib';
 import { execSync } from 'child_process';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 // Live container resolver: use docker inspect if .env is stale
 async function resolveRabbitMQCredentials() {
   const fromEnv = {
-    host: process.env.RABBITMQ_HOST || 'localhost',
-    port: parseInt(process.env.RABBITMQ_PORT || '5672'),
-    user: process.env.RABBITMQ_USER || 'guest',
-    password: process.env.RABBITMQ_PASSWORD || 'guest',
+    host: process.env.RABBITMQ_HOST || '127.0.0.1',
+    port: parseInt(process.env.RABBITMQ_PORT || '5673'),
+    user: process.env.RABBITMQ_USER || 'legal_admin',
+    password: process.env.RABBITMQ_PASSWORD || 'secret123',
   };
 
   try {

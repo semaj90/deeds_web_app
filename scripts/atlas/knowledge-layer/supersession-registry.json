@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "atlas-supersession-v1",
+  "entries": [
+    {
+      "artifact": "scripts/atlas/knowledge-layer/ast-extractor.ts",
+      "state": "MIGRATION_CANDIDATE",
+      "replacementCandidates": [
+        "sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/ast-langextract-bridge.ts"
+      ],
+      "observedOwners": [
+        "sveltekit-frontend/scripts/atlas/ast-treesitter-facts.mjs",
+        "sveltekit-frontend/src/lib/server/analysis/worker.ts"
+      ],
+      "reason": "No production caller was found outside the knowledge-layer barrel; live structural extraction is owned by the Graphify web-tree-sitter lane and the analysis worker bridge.",
+      "promotionRequirements": [
+        "replacement_owner_confirmed",
+        "replacement_behavior_tests_pass",
+        "graphify_daily_no_longer_depends_on_artifact",
+        "superseded_import_count_zero"
+      ]
+    }
+  ]
+}

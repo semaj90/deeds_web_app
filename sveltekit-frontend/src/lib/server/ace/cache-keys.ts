@@ -38,3 +38,24 @@ export const bifrostQueryKey = (queryHash: string): string =>
 
 export const bifrostWorkflowKey = (workflowHash: string): string =>
 	`bifrost:workflow:${workflowHash}`;
+
+/**
+ * Revision-qualified retrieval cache key. Cache identity is never canonical
+ * packet identity: a revision or policy change produces a different key.
+ */
+export const bifrostRevisionedRetrievalKey = (
+	workspaceRevision: string,
+	policyRevision: string,
+	requestHash: string
+): string => `bifrost:retrieval:${workspaceRevision}:${policyRevision}:${requestHash}`;
+
+export const bifrostEligibilityKey = (
+	workspaceRevision: string,
+	policyRevision: string,
+	eligibilityHash: string
+): string => `bifrost:eligibility:${workspaceRevision}:${policyRevision}:${eligibilityHash}`;
+
+export const bifrostCagraFilterKey = (
+	indexRevision: string,
+	filterHash: string
+): string => `bifrost:cagra-filter:${indexRevision}:${filterHash}`;

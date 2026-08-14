@@ -47,6 +47,28 @@
   - `rg -n "parse_node_id|symbol_version_id|tree_node_id" parent-atlas-workstation-todo.md openspec/changes/parent-atlas-graph-retrieval-proof`
   - `rg -n "tree_node_id" packages/parent-atlas drizzle/manual scripts/atlas`
 
+## RF4 - Canonical candidate identity contract
+
+- [x] `PROCESS_PACKET_QDRANT_INDEX_PASS` — proven separately; live Qdrant named-vector write/readback uses backend-local point IDs and preserves the process-packet spine.
+- [x] `PROCESS_PACKET_READBACK_PASS` — proven separately; readback keeps the packet envelope intact.
+- [x] `PROCESS_PACKET_RETRIEVAL_PASS` — proven separately; retrieval can consume the live packet envelope without claiming backend-local IDs as canonical.
+- [x] `CONTEXT_MANIFEST_RUNTIME_PASS` — proven separately; runtime manifest round-trip already exists.
+- [x] `RF4_SHARED_IDENTITY_OWNER` — canonical identity is resolved in the Atlas resolver layer, not inferred from Qdrant point IDs.
+- [x] `RF4_SYMBOL_VERSION_ID_PRECEDENCE` — `symbol_version_id` wins when present.
+- [x] `RF4_PACKET_KEY_FALLBACK` — fall back to `packet_key` when canonical symbol identity is absent.
+- [x] `RF4_SOURCE_REF_FALLBACK` — fall back to `source_ref` only when needed.
+- [x] `RF4_QDRANT_POINT_ID_NOT_SILENTLY_CANONICAL` — Qdrant point IDs stay backend-local unless a canonical resolver says otherwise.
+- [x] `RF4_DEGRADED_IDENTITY_OBSERVABLE` — missing canonical identity is explicit, not hidden.
+- [x] `RF4_NO_DUPLICATE_IDENTITY_RESOLVER` — no second resolver path may override the canonical one.
+- [x] `RF4_FAIL_OPEN_RETRIEVAL_PRESERVED` — degraded identity still allows retrieval to proceed.
+- [x] `GRAPH_QDRANT_FANOUT_RUNTIME_PROOF` — bounded live Neo4j → Qdrant fan-out is proven; canonical identity stays separate from Neo4j internal IDs and Qdrant point IDs, and the live `codebase_chunks_768` content vector contract is intact.
+- [x] `RF5_ONE_CANONICAL_ENTITY_ONE_LOGICAL_LANE_ONE_VOTE` — implemented in `SearchRuntime.fuseCandidates`; logical-lane dedup now preserves supporting hits and lane evidence while keeping degraded identities fail-open.
+- [ ] `PAGE_RANK_AUTHORITY_MIGRATION` — deferred; do not reopen during RF4.
+- [ ] `BM42_SPARSE_COLLECTION` — deferred / not run; keep separate from process-packet dense proof.
+- [ ] Validation commands:
+  - `npm exec vitest run src/lib/server/ace/identity-join.spec.ts`
+  - `rg -n "resolveCanonicalIdentity|identityStatus|backendLocalId|canonicalIdentity" sveltekit-frontend/src/lib/server/ace`
+
 ## GS1.11 - Parser manifest vs runtime proof
 
 - [ ] Inventory the parser manifest claims against the runtime extraction implementation.

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "atlas.ast.sidecar.proof.v1",
+  "generatedAt": "2026-08-14T05:11:47.583Z",
+  "endpoint": "http://127.0.0.1:8095",
+  "status": "PROVEN",
+  "gates": {
+    "SIDECAR_HEALTH_PASS": true,
+    "SIDECAR_CAPABILITY_DISCOVERY": true,
+    "TREESITTER_CHUNKER_IMPORTABLE": true,
+    "AST_EVIDENCE_ENDPOINT": true,
+    "AST_EVIDENCE_DIAGNOSTICS_EMPTY": true,
+    "UPSTREAM_CHUNK_ID_ONLY": true,
+    "TYPED_EDGE_EVIDENCE": true,
+    "NO_FAKE_CALL_SYMBOLS": true
+  },
+  "runtime": {
+    "health": {
+      "status": "ok",
+      "model": "miniforge-nlp-sidecar"
+    },
+    "ast": {
+      "engine": "treesitter-chunker",
+      "available": true,
+      "xref": true,
+      "repositoryProcessing": true
+    },
+    "engine": "treesitter-chunker",
+    "engineVersion": "4.0.0",
+    "chunks": 3,
+    "edges": 9,
+    "edgeTypes": [
+      "IMPORTS",
+      "REFERENCES",
+      "EXPORTS",
+      "CALLS",
+      "DEFINES"
+    ],
+    "diagnostics": []
+  }
+}

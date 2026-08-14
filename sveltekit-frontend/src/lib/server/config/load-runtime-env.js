@@ -2,11 +2,11 @@ import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
 
-function loadEnvFile(filePath) {
+function loadEnvFile(filePath, override = false) {
   if (!fs.existsSync(filePath)) return;
   const parsed = dotenv.parse(fs.readFileSync(filePath));
   for (const [key, value] of Object.entries(parsed)) {
-    if (process.env[key] === undefined) {
+    if (override || process.env[key] === undefined) {
       process.env[key] = value;
     }
   }
@@ -40,6 +40,7 @@ export function resolveRuntimeEnvRoots(cwd = process.cwd()) {
 export function loadRuntimeEnv(options = {}) {
   const cwd = options.cwd ?? process.cwd();
   const mode = options.mode ?? (process.env.NODE_ENV === 'production' ? 'process' : 'development');
+  const override = options.override ?? false;
 
   if (mode !== 'development') {
     return resolveRuntimeEnvRoots(cwd);
@@ -54,7 +55,7 @@ export function loadRuntimeEnv(options = {}) {
   ];
 
   for (const filePath of envFiles) {
-    loadEnvFile(filePath);
+    loadEnvFile(filePath, override);
   }
 
   return roots;

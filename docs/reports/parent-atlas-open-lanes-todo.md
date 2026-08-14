@@ -446,3 +446,11 @@ npm run atlas:neo4j:topology:verify
 - Consolidation: `docs/PARENT-ATLAS-CONSOLIDATION-INVENTORY.md`
 - Neo4j Queries: Manual execution in http://localhost:7474/browser
 - Memory: `memory/p3g-qdrant-upsert-fix.md`, `memory/parent-atlas-frozen-identity-contract.md`
+
+## Coordination update — 2026-08-13
+
+The GPU/runtime lane is separated from the AST and retrieval truth lanes. See
+`docs/parent-atlas-workstation-gpu-runtime-backlog.md` for GPU-01 through GPU-20.
+The active 8095 sidecar is not the authoritative GPU environment; it is the
+lightweight AST/NLP service. Dedicated RAPIDS/cuVS/CAGRA work remains separately
+gated and CAGRA remains quarantined.

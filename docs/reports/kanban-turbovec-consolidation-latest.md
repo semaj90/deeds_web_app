@@ -1,6 +1,6 @@
 # TurboVec Kanban Consolidation Report
 
-Generated: 2026-08-13T17:52:03.347Z
+Generated: 2026-08-13T23:37:26.754Z
 Board tasks: 123
 Mass inputs: 6889
 Unique records: 6747
@@ -17,7 +17,7 @@ simdjson parses: 3957402 bytes
   - top: todo-c-users-james-videos-deeds-web-app-master-feature-todo-2026-05-20-md | Add adaptive Hebbian adjustments to `ace:router:matrix` based on observed chunk hits and retrieval outcomes. | Create `schema-encoder.wgsl` for client-side reranking of documents. | Option 2: ClusterCard schema + Redis/Qdrant wiring + API route | Keep offline training and zero-copy handoff separate from the live retrieval path until benchmarks pass
 - **lib:cluster:none**: 5 records, 5 open, clusters=none, families=lib
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
-  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › data
+  - top: lib › icons | lib › shims | lib › agent | lib › shared | lib › schemas
 - **lib:cluster:18**: 5 records, 5 open, clusters=18, 35, 49, families=lib
   - Consolidate duplicate open work into one parent kanban item and keep the file-level labels as links.
   - top: lib › ambient-events › d › ts | lib › models | lib › uno-shortcuts › ts | lib › phase89-graph-visualizer › mjs | lib › composables

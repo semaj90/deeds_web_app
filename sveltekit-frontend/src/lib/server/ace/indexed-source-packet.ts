@@ -1,6 +1,10 @@
 import { and, desc, eq, inArray, or } from 'drizzle-orm';
 import { assemblePacketForSourceRef } from './parent-atlas-packet-assembler.js';
 import { buildAcePacketFromSource } from './source-to-packet.js';
+import {
+  resolveCanonicalIdentity,
+  type CanonicalIdentityResolution,
+} from './identity-contract.js';
 import type { AceFullPacket } from './ace-packet-store.js';
 import { db } from '$lib/server/db/client.js';
 import { atlasPackets } from '$lib/server/db/schema/atlas-packets.js';
@@ -25,6 +29,9 @@ export interface BuildIndexedSourcePacketResult {
   canonicalTreeNodeId: string | null;
   canonicalContentHash: string | null;
   canonicalWorkspaceRevision: string | null;
+  canonicalIdentity: CanonicalIdentityResolution | null;
+  backendLocalId: string | null;
+  identityStatus: CanonicalIdentityResolution['status'] | null;
 }
 
 export function buildSourceRefCandidates(sourceRef: string): string[] {
@@ -61,6 +68,9 @@ async function resolveCanonicalAtlasIdentity(
   canonicalTreeNodeId: string | null;
   canonicalContentHash: string | null;
   canonicalWorkspaceRevision: string | null;
+  canonicalIdentity: CanonicalIdentityResolution | null;
+  backendLocalId: string | null;
+  identityStatus: CanonicalIdentityResolution['status'] | null;
 }> {
   const refs = [...new Set(sourceRefs.flatMap(buildSourceRefCandidates).filter(Boolean))];
   if (refs.length === 0) {
@@ -71,6 +81,9 @@ async function resolveCanonicalAtlasIdentity(
       canonicalTreeNodeId: null,
       canonicalContentHash: null,
       canonicalWorkspaceRevision: null,
+      canonicalIdentity: null,
+      backendLocalId: null,
+      identityStatus: null,
     };
   }
 
@@ -89,6 +102,7 @@ async function resolveCanonicalAtlasIdentity(
       treeNodeId: atlasPackets.treeNodeId,
       contentHash: atlasPackets.sha256,
       metadata: atlasPackets.metadata,
+      qdrantPointId: atlasPackets.qdrantPointId,
     })
     .from(atlasPackets)
     .where(
@@ -100,6 +114,22 @@ async function resolveCanonicalAtlasIdentity(
     .limit(1);
 
   const row = rows[0];
+  const metadata = (row?.metadata ?? {}) as Record<string, unknown>;
+  const canonicalIdentity = row
+    ? resolveCanonicalIdentity({
+        symbolVersionId: metadata.symbol_version_id as string | null
+          ?? metadata.symbolVersionId as string | null
+          ?? null,
+        packetKey: row.packetKey,
+        sourceRef: row.sourceRef,
+        backendLocalId: row.qdrantPointId,
+      })
+    : resolveCanonicalIdentity({
+        sourceRef: refs[0] ?? null,
+        laneIdFallback: refs[0] ?? null,
+        backendLocalId: null,
+      });
+
   return {
     canonicalPacketKey: row?.packetKey ?? null,
     canonicalSourceRef: row?.sourceRef ?? null,
@@ -107,6 +137,9 @@ async function resolveCanonicalAtlasIdentity(
     canonicalTreeNodeId: row?.treeNodeId ? String(row.treeNodeId) : null,
     canonicalContentHash: row?.contentHash ?? null,
     canonicalWorkspaceRevision: extractWorkspaceRevisionFromMetadata(row?.metadata),
+    canonicalIdentity,
+    backendLocalId: canonicalIdentity.backendLocalId,
+    identityStatus: canonicalIdentity.status,
   };
 }
 
@@ -144,6 +177,9 @@ export async function buildIndexedSourcePacket(
       canonicalTreeNodeId: canonicalIdentity.canonicalTreeNodeId,
       canonicalContentHash: canonicalIdentity.canonicalContentHash,
       canonicalWorkspaceRevision: canonicalIdentity.canonicalWorkspaceRevision,
+      canonicalIdentity: canonicalIdentity.canonicalIdentity,
+      backendLocalId: canonicalIdentity.backendLocalId,
+      identityStatus: canonicalIdentity.identityStatus,
     };
   }
 
@@ -173,5 +209,8 @@ export async function buildIndexedSourcePacket(
     canonicalTreeNodeId: canonicalIdentity.canonicalTreeNodeId,
     canonicalContentHash: canonicalIdentity.canonicalContentHash,
     canonicalWorkspaceRevision: canonicalIdentity.canonicalWorkspaceRevision,
+    canonicalIdentity: canonicalIdentity.canonicalIdentity,
+    backendLocalId: canonicalIdentity.backendLocalId,
+    identityStatus: canonicalIdentity.identityStatus,
   };
 }

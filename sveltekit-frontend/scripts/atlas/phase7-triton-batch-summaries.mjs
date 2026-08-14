@@ -53,7 +53,7 @@ const { Pool } = pg;
 
 // Config
 const env = loadRepoEnv();
-const RABBITMQ_URL = env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const TRITON_URL = env.TRITON_URL || 'http://127.0.0.1:8000';
 const GEMMA4_ONNX_ADAPTER_URL = env.GEMMA4_ONNX_ADAPTER_URL || 'http://127.0.0.1:8098';
 const LLAMA_SERVER_URL = env.LLAMA_SERVER_URL || env.GEMMA4_URL || 'http://127.0.0.1:8090';

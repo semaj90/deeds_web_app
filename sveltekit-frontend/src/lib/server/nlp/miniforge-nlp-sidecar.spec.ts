@@ -76,4 +76,60 @@ describe('miniforge-nlp-sidecar', () => {
     expect(analysis.event_hypergraph?.recommendation_feature_rows).toEqual([]);
     expect(fetchSpy).toHaveBeenCalled();
   });
+
+  it('validates the atlas structural evidence endpoint without promoting upstream ids', async () => {
+    vi.spyOn(globalThis, 'fetch').mockImplementation(async (input: any) => {
+      expect(String(input)).toBe('http://127.0.0.1:9997/ast/chunk');
+      return new Response(JSON.stringify({
+        schema: 'atlas.ast.evidence.v1',
+        engine: 'treesitter-chunker',
+        engine_version: '0.1.0',
+        language: 'typescript',
+        file_path: 'src/example.ts',
+        source_revision: 'rev-1',
+        chunks: [{
+          upstream_chunk_id: 'upstream-only',
+          node_type: 'function_declaration',
+          kind: 'function',
+          name: 'hello',
+          start_byte: 0,
+          end_byte: 32,
+          start_line: 1,
+          start_column: 0,
+          end_line: 1,
+          end_column: 32,
+          calls: [],
+          imports: [],
+          exports: [],
+        }],
+        edges: [{
+          from_evidence_key: 'example:hello',
+          to_evidence_key: 'world',
+          type: 'CALLS',
+          evidence_start_line: 1,
+          evidence_start_column: 0,
+          evidence_end_line: 1,
+          evidence_end_column: 32,
+          resolved: false,
+          resolution: 'unresolved',
+        }],
+        diagnostics: [],
+      }), { status: 200 });
+    });
+
+    const { createMiniforgeNlpSidecarClient } = await import('./miniforge-nlp-sidecar.js');
+    const client = createMiniforgeNlpSidecarClient();
+    const evidence = await client.astChunk({
+      source: 'export function hello() { return 1; }',
+      language: 'typescript',
+      filePath: 'src/example.ts',
+      sourceRevision: 'rev-1',
+    });
+
+    expect(evidence.schema).toBe('atlas.ast.evidence.v1');
+    expect(evidence.chunks[0]?.upstream_chunk_id).toBe('upstream-only');
+    expect(evidence.chunks[0]?.kind).toBe('function');
+    expect(evidence.edges[0]?.type).toBe('CALLS');
+    expect(evidence.edges[0]?.resolved).toBe(false);
+  });
 });

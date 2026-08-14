@@ -17,8 +17,11 @@
 import { Command } from 'commander';
 import pg from 'pg';
 import amqplib from 'amqplib';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 
 const program = new Command();
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 program
   .option('--dry-run', 'Show what would be scheduled without applying')
@@ -37,7 +40,7 @@ const INSTALL_PG_CRON = options.installPgCron;
 const TEST_REFRESH = options.testRefresh;
 
 const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db';
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 
 async function installPgCron(pool) {
   console.log('📦 Attempting to install pg_cron extension...');

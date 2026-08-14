@@ -56,6 +56,12 @@ P0 does NOT block: backend benchmarking with frozen fixture, Windows addon class
 
 - [ ] P3.1 Implement `atlas_knn_exact` via cuVS brute_force (replace `cuvs_bridge.cc` stub) — exact oracle; validated vs NumPy oracle first
 - [ ] P3.2 Benchmark lanes vs the exact oracle: Qdrant HNSW recall, CAGRA (`atlas_cagra_build/search`), TurboVec (optional backend) — recall@k, rank overlap, distortion, memory, build/search latency, filter correctness
+
+## Workstation status note — 2026-08-13
+
+This acceleration lane was not deleted. CUDA, LibTorch, TensorRT, RAPIDS/cuVS/cuGraph, and CAGRA sources remain available, with the dedicated RAPIDS sidecar and `docker/cuvs-grpc/` retained. The active 8095 AST container is intentionally lightweight and currently reports PyTorch/cuVS/cuGraph/CuPy/CAGRA unavailable. Treat this as `DEFERRED_CAPABILITY`, not `DELETED` or production failure.
+
+Promotion remains benchmark- and runtime-proof-gated: Python 3.14, multi-threading, simdjson, TensorRT, and GPU ANN integration must not be promoted from source presence or import shape alone.
 - [ ] P3.3 Author `proto/parentatlas/acceleration/v1/atlas.proto` (Metric, TensorRef, SearchRequest with workspace/representation revisions, NeighborBatch packed, ExecutionReceipt, AtlasVectorService: ExactSearch/CagraSearch); gRPC C++ callback API, deadlines mandatory
 - [ ] P3.4 Offline projection jobs via Python worker (cuML KMeans/PCA/IncrementalPCA, cuGraph pagerank/louvain/leiden/wcc/k_core/jaccard) — consuming the `tools/agentic-research` WSL env; identity always joined back to Postgres
 - [ ] P3.5 GPU row manifest before any vector export: Qdrant point ID ↔ Postgres canonical identity ↔ content_hash ↔ representation_revision (immutable)

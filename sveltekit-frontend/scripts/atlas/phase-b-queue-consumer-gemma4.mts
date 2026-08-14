@@ -9,11 +9,14 @@
  *   npx tsx scripts/atlas/phase-b-queue-consumer-gemma4.mts [--dry-run]
  */
 
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import amqp, { Channel, Connection, Message } from 'amqplib';
 import { Pool } from 'pg';
 import { createHash } from 'crypto';
 // @ts-ignore shared ESM runtime helper has no local .d.ts
 import { sanitizeGemma4Summary } from '../../../scripts/atlas/lib/gemma4-summary-sanitizer.mjs';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -23,7 +26,7 @@ const PG_DB = process.env.POSTGRES_DB || 'legal_ai_db';
 const PG_USER = process.env.POSTGRES_USER || 'legal_admin';
 const PG_PASSWORD = process.env.POSTGRES_PASSWORD || '123456';
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 const LLAMA_URL = process.env.LLAMA_SERVER_URL || 'http://127.0.0.1:8090';
 const MODEL = 'gemma4-legal-iq4xs-direct.gguf';
 const TEMPERATURE = 0.3;

@@ -1,5 +1,80 @@
 # OpenSpec: Parent Atlas GPU Sidecar + Patch Tournament — bounded first slice
 
+## Separate workstation integration backlog
+
+The broader GPU/runtime sequence is tracked separately in
+`docs/parent-atlas-workstation-gpu-runtime-backlog.md` and is not part of AST
+supersession. Current roadmap estimate: **58% GPU/runtime integration**.
+
+GPU-02 ownership proof is now wired as
+`npm run atlas:gpu:ownership:proof`, producing
+`docs/reports/gpu-runtime-ownership-proof.{json,md}`. Current result: control-plane
+owners proven; RAPIDS `:8098` reachability remains deferred.
+
+GPU-03 semantic contract proof is now wired as
+`npm run atlas:gpu:semantic:proof`, producing
+`docs/reports/semantic-768-contract-proof.{json,md}`. It is read-only and records
+the live Qdrant named-vector contract, llama-server chat ownership, and Ollama
+embedding ownership. BM42 remains `DEGRADED/NOT_RUN` and is not a gate here.
+
+Order remains: P0 structural correctness → P1 reproducible GPU environment and
+Valkey proof → P2 cuVS/CAGRA/cuGraph retrieval evaluation → P3 TensorRT,
+multithreading, simdjson, Python 3.14/free-threading, and RMM experiments.
+
+## Deferred production-hardening gates
+
+The following gates were added after reviewing current NVIDIA, RAPIDS, PyTorch,
+Valkey, and simdjson documentation. They are acceptance work only; they do not
+promote CAGRA, change RRF, or create another source-of-truth owner.
+
+- [ ] GPU-21 filter semantics parity: canonical `SearchFilter`/revision masks
+  match Qdrant exact and future cuVS/CAGRA bitset results with zero false positives.
+- [ ] GPU-22 atomic index revision build/validate/swap; indexes remain rebuildable caches.
+- [ ] GPU-23 CUDA stream/resource ownership and synchronization receipt.
+- [ ] GPU-24 VRAM arbitration and CPU/Qdrant/Neo4j fallback receipt.
+- [ ] GPU-25 JSON/HTTP, Arrow/mmap, ordinary H2D, and pinned non-blocking H2D benchmark.
+- [ ] GPU-26 metric equivalence for float32 `semantic_768` cosine ranking.
+- [ ] GPU-27 typed GPU degradation reasons and safe fallback behavior.
+- [ ] GPU-28 NVIDIA Container Toolkit/device/image boundary proof.
+- [ ] GPU-29 TensorRT engine lifecycle, dynamic profiles, warmup, cache, and memory proof.
+- [ ] GPU-30 Python 3.14 extension compatibility receipt before free-threaded migration.
+- [ ] GPU-31 accelerator latency, memory, fallback, revision, and recall observability receipt.
+- [ ] GPU-32 Valkey expiry/eviction/cache-miss/revision-rebuild fail-open proof.
+
+Separate deferred lanes:
+
+- [ ] ACE-RLM-01: freeze the bounded revision-qualified `RLMEnvironment` contract.
+- [ ] ACE-RLM-02: expose SearchRuntime as the only retrieval/fusion tool; no second RRF.
+- [ ] ACE-RLM-03: add bounded packet/source/graph/process inspection receipts.
+- [ ] ACE-RLM-04: enforce recursion, token, latency, and subcall budgets.
+- [ ] ACE-RLM-05: compile final RLM state into `ContextManifest`.
+- [ ] ACE-RLM-06: persist `RLMTrace → ContextManifest → ExecutionReceipt` linkage.
+- [ ] ACE-RLM-07: feed execution receipts to ACE Generator/Reflector review.
+- [ ] ACE-RLM-08: persist Curator-approved playbook deltas to Postgres; Valkey is hot-only.
+- [ ] BF-01: use revision-qualified BitFrost packet/card/manifest/symbol/graph/retrieval/ACE keys.
+- [ ] BF-02: prove Valkey `CLIENT TRACKING` invalidation; notifications are telemetry only.
+- [ ] BF-03: prove optional process-local L0 invalidation from Valkey.
+- [ ] BF-04: add short-lived negative eligibility caches that fail open.
+- [ ] BF-05: qualify GPU filter-cache material by `indexRevision` and `filterHash`.
+- [ ] BF-06: prove expiry, eviction, cache miss, revision mismatch, and Valkey outage recovery.
+- [ ] SIMD-01: measure PERF0 for current JSON/JSONL parsing before adding C++.
+- [ ] SIMD-02: prototype C simdjson On-Demand only at the receipt/JSONL boundary.
+- [ ] SIMD-03: benchmark `iterate_many` with one parser per worker/thread.
+- [ ] SIMD-04: promote only on measured improvement with a JSON-compatible fallback.
+
+## Workstation status note — 2026-08-13
+
+The GPU/RAPIDS implementation was not deleted. Repository sources and the dedicated
+RAPIDS/cuVS sidecar remain present. The currently active 8095 NLP/AST container is a
+separate lightweight runtime and reports PyTorch, cuVS, cuGraph, CuPy, and CAGRA as
+unavailable. Do not interpret that capability response as deletion of this sidecar or
+as proof that the dedicated 8098/WSL2 lane is live in the current session.
+
+Current status remains: exact-KNN bounded work may be separately proven; CAGRA remains
+quarantined until the recorded architecture decision is explicitly revised and a fresh
+runtime/recall proof is completed. Python 3.14, multi-threading, simdjson, TensorRT,
+Redis/Valkey warming, and GPU promotion remain deferred integration work.
+
 ## RESUME POINT (2026-08-03, updated — WSL2 smoke test independently re-verified this turn)
 
 The WSL2 runtime smoke test described below as "not started" in the prior checkpoint was

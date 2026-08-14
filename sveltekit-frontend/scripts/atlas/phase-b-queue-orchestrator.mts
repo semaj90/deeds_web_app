@@ -13,13 +13,16 @@
  *   npx tsx scripts/atlas/phase-b-queue-orchestrator.mts [--interval=30]
  */
 
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
 import amqp from 'amqplib';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const INTERVAL = parseInt(
   process.argv.find(arg => arg.startsWith('--interval='))?.split('=')[1] || '30'
 ) * 1000; // Convert to milliseconds
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://guest:guest@127.0.0.1:5672';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://legal_admin:secret123@127.0.0.1:5673';
 
 const QUEUES = [
   'atlas.enrichment.gemma4',

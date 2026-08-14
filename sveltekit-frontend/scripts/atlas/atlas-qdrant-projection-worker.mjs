@@ -25,6 +25,9 @@
 import pg       from 'pg';
 import amqp     from 'amqplib';
 import { createHash } from 'crypto';
+import { loadRuntimeEnv } from '../../src/lib/server/config/load-runtime-env.js';
+
+loadRuntimeEnv({ cwd: process.cwd(), mode: 'development', override: true });
 
 const QDRANT_URL  = process.env.QDRANT_URL   ?? 'http://localhost:6333';
 const COLLECTION  = process.env.ATLAS_COLLECTION ?? 'codebase_chunks_384_hybrid';
@@ -35,7 +38,7 @@ const CONTRACT_VERSION  = 'atlas-qdrant-384-hybrid-v1';
 const METADATA_SCHEMA   = 'atlas-semantic-metadata-v1';
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL
-  ?? `amqp://${process.env.RABBITMQ_USER ?? 'guest'}:${process.env.RABBITMQ_PASSWORD ?? 'guest'}@${process.env.RABBITMQ_HOST ?? 'localhost'}:${process.env.RABBITMQ_PORT ?? '5672'}`;
+  ?? `amqp://${process.env.RABBITMQ_USER ?? 'legal_admin'}:${process.env.RABBITMQ_PASSWORD ?? 'secret123'}@${process.env.RABBITMQ_HOST ?? '127.0.0.1'}:${process.env.RABBITMQ_PORT ?? '5673'}`;
 
 const pool = new pg.Pool({
   host:     process.env.PG_HOST     ?? 'localhost',

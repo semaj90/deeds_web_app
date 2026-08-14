@@ -23,6 +23,16 @@ export const LLAMA_SERVER_HEALTH_URL: string =
 /** Model to use for VLM / text requests via llama-server */
 export const LOCAL_VLM_MODEL: string = resolveLlamaServerModelId();
 
+export interface LlamaSessionDescriptor {
+	baseUrl: string;
+	modelId: string;
+	healthy: boolean;
+	discoveredAt: string;
+	source: ResolvedInferenceModel['source'] | 'fallback';
+}
+
+let cachedSessionDescriptor: LlamaSessionDescriptor | null = null;
+
 function resolveLlamaServerModelId(): string {
 	const modelPath = String(
 		ENV.ROTORQUANT_MODEL_PATH ??
@@ -49,13 +59,61 @@ export const llamaServer = createOpenAICompatible({
 
 /**
  * Verify LOCAL_VLM_MODEL against what llama-server actually has loaded, via a
- * real GET /v1/models call. LOCAL_VLM_MODEL itself stays a static, env-derived
- * string computed once at module load (47+ call sites depend on it being a
- * plain string, not a promise) — this is an opt-in check for callers that
- * want to confirm live state, e.g. a startup health probe.
+ * real GET /v1/models call. The live session model is the authority for a
+ * given 8090 runtime; LOCAL_VLM_MODEL remains the configured fallback alias
+ * so legacy sync call sites can still compile.
  */
 export async function verifyLocalVlmModel(): Promise<ResolvedInferenceModel> {
 	return resolveLoadedLlamaModel(resolveLlamaServerBaseUrl(), LOCAL_VLM_MODEL);
+}
+
+/**
+ * Resolve and cache the live llama-server session descriptor.
+ *
+ * The loaded model reported by GET /v1/models is the session authority; the
+ * env-derived model name remains a fallback expectation only.
+ */
+export async function getLlamaSessionDescriptor(
+	refresh = false,
+	timeoutMs = 3_000
+): Promise<LlamaSessionDescriptor> {
+	if (cachedSessionDescriptor && !refresh) return cachedSessionDescriptor;
+
+	try {
+		const resolved = await resolveLoadedLlamaModel(resolveLlamaServerBaseUrl(), LOCAL_VLM_MODEL, timeoutMs);
+		cachedSessionDescriptor = {
+			baseUrl: resolveLlamaServerBaseUrl(),
+			modelId: resolved.resolvedModel,
+			healthy: true,
+			discoveredAt: new Date().toISOString(),
+			source: resolved.source,
+		};
+		return cachedSessionDescriptor;
+	} catch {
+		cachedSessionDescriptor = {
+			baseUrl: resolveLlamaServerBaseUrl(),
+			modelId: LOCAL_VLM_MODEL,
+			healthy: false,
+			discoveredAt: new Date().toISOString(),
+			source: 'fallback',
+		};
+		return cachedSessionDescriptor;
+	}
+}
+
+export async function getLlamaSessionModel(refresh = false, timeoutMs = 3_000): Promise<string> {
+	return (await getLlamaSessionDescriptor(refresh, timeoutMs)).modelId;
+}
+
+export async function assertExpectedLlamaModel(
+	expected = LOCAL_VLM_MODEL,
+	timeoutMs = 3_000
+): Promise<string> {
+	const actual = await getLlamaSessionModel(true, timeoutMs);
+	if (actual !== expected) {
+		throw new Error(`llama-server model drift: expected ${expected}, loaded ${actual}`);
+	}
+	return actual;
 }
 
 /**
@@ -68,10 +126,5 @@ export async function verifyLocalVlmModel(): Promise<ResolvedInferenceModel> {
  * This keeps callers on the loaded model identity without forcing a startup warning.
  */
 export async function getActiveLocalVlmModel(): Promise<string> {
-	try {
-		const resolved = await verifyLocalVlmModel();
-		return resolved.resolvedModel;
-	} catch {
-		return LOCAL_VLM_MODEL;
-	}
+	return getLlamaSessionModel();
 }

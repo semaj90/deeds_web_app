@@ -53,6 +53,46 @@ export interface NlpChunk {
   language?: string;
 }
 
+export interface AtlasStructuralEvidenceChunk {
+  upstream_chunk_id?: string;
+  node_type: string;
+  kind: string;
+  name?: string | null;
+  start_byte: number;
+  end_byte: number;
+  start_line: number;
+  start_column: number;
+  end_line: number;
+  end_column: number;
+  calls: string[];
+  imports: string[];
+  exports: string[];
+}
+
+export interface AtlasStructuralEvidenceEdge {
+  from_evidence_key: string;
+  to_evidence_key: string;
+  type: 'DEFINES' | 'IMPORTS' | 'EXPORTS' | 'CALLS' | 'REFERENCES';
+  evidence_start_line: number;
+  evidence_start_column: number;
+  evidence_end_line: number;
+  evidence_end_column: number;
+  resolved: boolean;
+  resolution?: string | null;
+}
+
+export interface AtlasStructuralEvidence {
+  schema: 'atlas.ast.evidence.v1';
+  engine: string;
+  engine_version: string;
+  language: string;
+  file_path: string;
+  source_revision: string;
+  chunks: AtlasStructuralEvidenceChunk[];
+  edges: AtlasStructuralEvidenceEdge[];
+  diagnostics: string[];
+}
+
 export interface NlpFeature {
   kind: string;
   name: string;
@@ -91,12 +131,14 @@ export interface NlpAnalyzeResponse {
     spacy: boolean;
     langextract: boolean;
     tree_sitter: boolean;
+    treesitter_chunker?: boolean;
     ast_grep: boolean;
     torch: boolean;
   };
   pass_results?: AnalysisPassResult[];
   control5?: Control5 | null;
   experiment_feature_matrix?: ExperimentFeatureMatrix | null;
+  event_hypergraph?: Record<string, unknown> | null;
   processing_time_ms: number;
 }
 
@@ -126,6 +168,7 @@ export interface MiniforgeNlpSidecarClient {
   health(): Promise<{ ready: boolean; status?: string; model?: string; capabilities?: NlpHealthResponse['capabilities'] }>;
   analyze(req: NlpAnalyzeRequest): Promise<NlpAnalyzeResponse>;
   extract(req: NlpAnalyzeRequest): Promise<NlpExtractResponse>;
+  astChunk(req: { source: string; language: string; filePath: string; sourceRevision: string }): Promise<AtlasStructuralEvidence>;
 }
 
 const HEALTH_CACHE_TTL = 30_000;
@@ -232,12 +275,14 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
           spacy: Boolean(raw.capabilities?.spacy),
           langextract: Boolean(raw.capabilities?.langextract),
           tree_sitter: Boolean(raw.capabilities?.tree_sitter),
+          treesitter_chunker: Boolean(raw.capabilities?.treesitter_chunker),
           ast_grep: Boolean(raw.capabilities?.ast_grep),
           torch: Boolean(raw.capabilities?.torch),
         },
         pass_results: Array.isArray(raw.pass_results) ? raw.pass_results : [],
         control5: (raw.control5 ?? null) as Control5 | null,
         experiment_feature_matrix: (raw.experiment_feature_matrix ?? null) as ExperimentFeatureMatrix | null,
+        event_hypergraph: (raw.event_hypergraph ?? null) as Record<string, unknown> | null,
         processing_time_ms: Number(raw.processing_time_ms ?? Date.now() - start),
       };
     },
@@ -275,6 +320,57 @@ export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpS
         entities: Array.isArray(raw.entities) ? raw.entities : [],
         metadata: (raw.metadata ?? {}) as Record<string, unknown>,
         processing_time: Number(raw.processing_time ?? 0),
+      };
+    },
+
+    async astChunk(req) {
+      const response = await fetch(`${url}/ast/chunk`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(req),
+        signal: AbortSignal.timeout(15_000),
+      });
+      const raw = (await readJson(response)) as Partial<AtlasStructuralEvidence>;
+      if (!response.ok) {
+        throw new Error(`[miniforge-nlp] ast/chunk failed: ${response.status} ${response.statusText}`);
+      }
+      if (raw.schema !== 'atlas.ast.evidence.v1' || !Array.isArray(raw.chunks)) {
+        throw new Error('[miniforge-nlp] ast/chunk returned an invalid atlas.ast.evidence.v1 payload');
+      }
+      return {
+        schema: raw.schema,
+        engine: String(raw.engine ?? 'unknown'),
+        engine_version: String(raw.engine_version ?? 'unknown'),
+        language: String(raw.language ?? req.language),
+        file_path: String(raw.file_path ?? req.filePath),
+        source_revision: String(raw.source_revision ?? req.sourceRevision),
+        chunks: raw.chunks.map((chunk) => ({
+          upstream_chunk_id: chunk.upstream_chunk_id,
+          node_type: String(chunk.node_type),
+          kind: String(chunk.kind),
+          name: chunk.name ?? null,
+          start_byte: Number(chunk.start_byte),
+          end_byte: Number(chunk.end_byte),
+          start_line: Number(chunk.start_line),
+          start_column: Number(chunk.start_column),
+          end_line: Number(chunk.end_line),
+          end_column: Number(chunk.end_column),
+          calls: Array.isArray(chunk.calls) ? chunk.calls.map(String) : [],
+          imports: Array.isArray(chunk.imports) ? chunk.imports.map(String) : [],
+          exports: Array.isArray(chunk.exports) ? chunk.exports.map(String) : [],
+        })),
+        edges: Array.isArray(raw.edges) ? raw.edges.map((edge) => ({
+          from_evidence_key: String(edge.from_evidence_key ?? ''),
+          to_evidence_key: String(edge.to_evidence_key ?? ''),
+          type: edge.type as AtlasStructuralEvidenceEdge['type'],
+          evidence_start_line: Number(edge.evidence_start_line ?? 1),
+          evidence_start_column: Number(edge.evidence_start_column ?? 0),
+          evidence_end_line: Number(edge.evidence_end_line ?? edge.evidence_start_line ?? 1),
+          evidence_end_column: Number(edge.evidence_end_column ?? 0),
+          resolved: Boolean(edge.resolved),
+          resolution: edge.resolution ?? null,
+        })) : [],
+        diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [],
       };
     },
   };

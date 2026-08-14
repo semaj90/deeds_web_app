@@ -252,6 +252,19 @@ export interface FusedCandidate extends Candidate {
   fusionScore: number;
   rankBefore: number;
   contributingLanes?: Candidate['scoreSource'][];
+  laneEvidence?: LaneEvidence[];
+}
+
+export type LogicalRetrievalLane = 'dense' | 'lexical' | 'exact' | 'ast' | 'schema' | 'rg' | 'bm42';
+
+export interface LaneEvidence {
+  lane: LogicalRetrievalLane;
+  bestRank: number;
+  bestScore: number;
+  contributionCount: number;
+  supportingHitCount: number;
+  supportingBackendIds: string[];
+  contributingSources: Candidate['scoreSource'][];
 }
 
 export interface RetrievalProofSummary {
@@ -1072,6 +1085,78 @@ export function getFusionIdentityKey(candidate: Candidate): string {
   );
 }
 
+function getFusionBackendIdentityKey(candidate: Candidate): string {
+  return (
+    candidate.fallback_id?.trim() ||
+    candidate.qdrantPointId?.trim() ||
+    candidate.treeNodeId?.trim() ||
+    candidate.id.trim() ||
+    getFusionIdentityKey(candidate)
+  );
+}
+
+function getFusionLogicalLane(candidate: Candidate): LogicalRetrievalLane {
+  if (candidate.embeddingLane === 'bm42') return 'bm42';
+  if (candidate.embeddingLane === 'dense_768') return 'dense';
+
+  switch (candidate.scoreSource) {
+    case 'postgres_trigram':
+      return 'lexical';
+    case 'qdrant':
+    case 'qdrant_768':
+      return 'dense';
+    case 'exact_symbol':
+      return 'exact';
+    case 'ast_tree':
+      return 'ast';
+    case 'schema':
+      return 'schema';
+    case 'rg_keyword':
+      return 'rg';
+    default:
+      return 'lexical';
+  }
+}
+
+function compareIdentityKeys(a: Candidate, b: Candidate): number {
+  const keyA = getFusionIdentityKey(a);
+  const keyB = getFusionIdentityKey(b);
+  if (keyA !== keyB) return keyA.localeCompare(keyB);
+
+  const backendA = getFusionBackendIdentityKey(a);
+  const backendB = getFusionBackendIdentityKey(b);
+  if (backendA !== backendB) return backendA.localeCompare(backendB);
+
+  return a.scoreSource.localeCompare(b.scoreSource) || a.sourceRef.localeCompare(b.sourceRef) || a.id.localeCompare(b.id);
+}
+
+function compareRepresentativeCandidates(a: Candidate, b: Candidate): number {
+  const scoreDelta = b.score - a.score;
+  if (Math.abs(scoreDelta) > 1e-12) return scoreDelta;
+  return compareIdentityKeys(a, b);
+}
+
+function compareLaneOrder(a: LogicalRetrievalLane, b: LogicalRetrievalLane): number {
+  const order: LogicalRetrievalLane[] = ['dense', 'lexical', 'exact', 'ast', 'schema', 'rg', 'bm42'];
+  return order.indexOf(a) - order.indexOf(b);
+}
+
+function compareFusedCandidates(a: FusedCandidate, b: FusedCandidate): number {
+  const scoreDelta = b.fusionScore - a.fusionScore;
+  if (Math.abs(scoreDelta) > 1e-12) return scoreDelta;
+  if (a.identityStatus !== b.identityStatus) {
+    return a.identityStatus === 'canonical' ? -1 : 1;
+  }
+  const laneA = a.laneEvidence?.[0]?.lane ?? getFusionLogicalLane(a);
+  const laneB = b.laneEvidence?.[0]?.lane ?? getFusionLogicalLane(b);
+  const laneDelta = compareLaneOrder(laneA, laneB);
+  if (laneDelta !== 0) return laneDelta;
+  const keyA = a.identityStatus === 'canonical' ? getFusionIdentityKey(a) : getFusionBackendIdentityKey(a);
+  const keyB = b.identityStatus === 'canonical' ? getFusionIdentityKey(b) : getFusionBackendIdentityKey(b);
+  if (keyA !== keyB) return keyA.localeCompare(keyB);
+  return a.scoreSource.localeCompare(b.scoreSource) || a.sourceRef.localeCompare(b.sourceRef) || a.id.localeCompare(b.id);
+}
+
 /**
  * Stage 2 fusion core, extracted to a standalone module-level function so it's directly
  * unit-testable without instantiating `SearchRuntime` (which requires live Postgres/Qdrant
@@ -1087,88 +1172,136 @@ export function fuseSearchRuntimeCandidates(candidates: Candidate[]): FusedCandi
     c => c.packetKey && c.packetKey.trim() !== '' && c.sourceRef && c.sourceRef.trim() !== ''
   );
 
-  // Group by source and get ranking within each
-  const sourceRanks = new Map<string, Map<string, number>>();
+  interface LaneGroup {
+    lane: LogicalRetrievalLane;
+    outputKey: string;
+    identityStatus: 'canonical' | 'degraded';
+    canonicalKey: string | null;
+    backendKey: string;
+    representative: Candidate;
+    bestRank: number;
+    bestScore: number;
+    supportingHitCount: number;
+    supportingBackendIds: Set<string>;
+    contributingSources: Set<Candidate['scoreSource']>;
+  }
 
-  const sources = ['postgres_trigram', 'qdrant', 'exact_symbol', 'ast_tree', 'schema', 'rg_keyword'] as const;
-  for (const source of sources) {
-    const sourceCards = valid.filter(c => c.scoreSource === source);
-    sourceCards.sort((a, b) => b.score - a.score || getFusionIdentityKey(a).localeCompare(getFusionIdentityKey(b)));
-    const ranked = new Map<string, number>();
-    sourceCards.forEach((c, idx) => {
-      const key = getFusionIdentityKey(c);
-      // One canonical entity / one logical lane / one vote: `sourceCards` is sorted best-first,
-      // so the FIRST occurrence of a given identity within this lane is its best rank. A
-      // duplicate identity later in this same lane (e.g. two chunk projections of one symbol)
-      // must not overwrite that best rank with a worse one — `ranked.set` unconditionally here
-      // previously let the LAST-seen (worst-ranked) duplicate silently win instead.
-      if (!ranked.has(key)) {
-        ranked.set(key, idx + 1);
-      }
+  interface AggregatedCandidate {
+    outputKey: string;
+    identityStatus: 'canonical' | 'degraded';
+    representative: Candidate;
+    fusionScore: number;
+    laneEvidence: LaneEvidence[];
+    contributingSources: Set<Candidate['scoreSource']>;
+  }
+
+  const laneBuckets = new Map<LogicalRetrievalLane, Candidate[]>();
+  for (const candidate of valid) {
+    const lane = getFusionLogicalLane(candidate);
+    const bucket = laneBuckets.get(lane) ?? [];
+    bucket.push(candidate);
+    laneBuckets.set(lane, bucket);
+  }
+
+  const laneGroups: LaneGroup[] = [];
+  for (const lane of ['dense', 'lexical', 'exact', 'ast', 'schema', 'rg', 'bm42'] as const) {
+    const laneCards = [...(laneBuckets.get(lane) ?? [])].sort((a, b) => {
+      const scoreDelta = b.score - a.score;
+      if (Math.abs(scoreDelta) > 1e-12) return scoreDelta;
+      return compareIdentityKeys(a, b);
     });
-    sourceRanks.set(source, ranked);
-  }
 
-  // Apply RRF formula: score = Σ(1 / (k + rank)) for each source
-  // k = 60 (standard RRF constant)
-  const rrfScores = new Map<string, number>();
-  for (const [packetKey] of new Map(valid.map(c => [getFusionIdentityKey(c), c]))) {
-    let rrfScore = 0;
-    for (const [, ranks] of sourceRanks) {
-      const rank = ranks.get(packetKey);
-      if (rank) {
-        rrfScore += 1 / (60 + rank);
+    const groups = new Map<string, LaneGroup>();
+    laneCards.forEach((candidate, index) => {
+      const identityStatus = candidate.identityStatus ?? 'canonical';
+      const canonicalKey = identityStatus === 'canonical' ? getFusionIdentityKey(candidate) : null;
+      const backendKey = getFusionBackendIdentityKey(candidate);
+      const outputKey = identityStatus === 'canonical'
+        ? `canonical:${canonicalKey}`
+        : `degraded:${backendKey}::${lane}`;
+
+      const existing = groups.get(outputKey);
+      if (!existing) {
+        groups.set(outputKey, {
+          lane,
+          outputKey,
+          identityStatus,
+          canonicalKey,
+          backendKey,
+          representative: candidate,
+          bestRank: index + 1,
+          bestScore: candidate.score,
+          supportingHitCount: 1,
+          supportingBackendIds: new Set([backendKey]),
+          contributingSources: new Set([candidate.scoreSource]),
+        });
+        return;
       }
-    }
-    rrfScores.set(packetKey, rrfScore);
+
+      existing.supportingHitCount += 1;
+      existing.supportingBackendIds.add(backendKey);
+      existing.contributingSources.add(candidate.scoreSource);
+    });
+
+    laneGroups.push(...groups.values());
   }
 
-  // Sort by RRF score and assign new ranks
-  const sorted = Array.from(valid).sort((a, b) => {
-    const scoreA = rrfScores.get(getFusionIdentityKey(a)) ?? 0;
-    const scoreB = rrfScores.get(getFusionIdentityKey(b)) ?? 0;
-    return scoreB - scoreA;
-  });
+  const aggregates = new Map<string, AggregatedCandidate>();
+  for (const group of laneGroups) {
+    const contribution = 1 / (60 + group.bestRank);
+    const laneEvidence: LaneEvidence = {
+      lane: group.lane,
+      bestRank: group.bestRank,
+      bestScore: group.bestScore,
+      contributionCount: 1,
+      supportingHitCount: group.supportingHitCount,
+      supportingBackendIds: Array.from(group.supportingBackendIds).sort(),
+      contributingSources: Array.from(group.contributingSources).sort(),
+    };
 
-  const unique = new Map<string, FusedCandidate>();
-  for (const candidate of sorted) {
-    const key = getFusionIdentityKey(candidate);
-    if (!unique.has(key)) {
-      unique.set(key, {
-        ...candidate,
-        packetKey: candidate.packetKey,
-        symbolVersionId: candidate.symbolVersionId ?? candidate.packetKey,
-        fusionScore: rrfScores.get(key) ?? 0,
-        rankBefore: unique.size + 1,
-        contributingLanes: [candidate.scoreSource],
-        // Absent identityStatus predates this field — treat as canonical for backward compat,
-        // never as degraded (see the Candidate interface doc comment).
-        identityStatus: candidate.identityStatus ?? 'canonical',
-        identitySource: candidate.identitySource,
+    const outputKey = group.identityStatus === 'canonical'
+      ? `canonical:${group.canonicalKey ?? getFusionIdentityKey(group.representative)}`
+      : group.outputKey;
+
+    const existing = aggregates.get(outputKey);
+    if (!existing) {
+      aggregates.set(outputKey, {
+        outputKey,
+        identityStatus: group.identityStatus,
+        representative: group.representative,
+        fusionScore: contribution,
+        laneEvidence: [laneEvidence],
+        contributingSources: new Set(group.contributingSources),
       });
-    } else {
-      const existing = unique.get(key)!;
-      const contributingLanes = new Set([...(existing.contributingLanes ?? []), candidate.scoreSource]);
-      // If any contributing lane resolved a real canonical identity for this fused entity,
-      // the fused candidate is canonical overall — a degraded base occurrence (e.g. the
-      // highest-scoring lane's payload lacked packet_key) must not mask a later lane's proof
-      // that this entity does have a real canonical identity.
-      const candidateStatus = candidate.identityStatus ?? 'canonical';
-      const promoteToCanonical = existing.identityStatus === 'degraded' && candidateStatus === 'canonical';
-      unique.set(key, {
-        ...existing,
-        contributingLanes: Array.from(contributingLanes),
-        ...(promoteToCanonical
-          ? { identityStatus: 'canonical' as const, identitySource: candidate.identitySource }
-          : {}),
-      });
+      continue;
+    }
+
+    existing.fusionScore += contribution;
+    existing.contributingSources = new Set([...existing.contributingSources, ...group.contributingSources]);
+    existing.laneEvidence.push(laneEvidence);
+    if (compareRepresentativeCandidates(group.representative, existing.representative) < 0) {
+      existing.representative = group.representative;
     }
   }
 
-  return Array.from(unique.values()).map((c, idx) => ({
-    ...c,
-    rankBefore: idx + 1,
-  }));
+  return Array.from(aggregates.values())
+    .map((aggregate) => {
+      const orderedLaneEvidence = [...aggregate.laneEvidence].sort((a, b) => compareLaneOrder(a.lane, b.lane));
+      const contributionSources = Array.from(aggregate.contributingSources).sort();
+      return {
+        ...aggregate.representative,
+        fusionScore: aggregate.fusionScore,
+        rankBefore: 0,
+        contributingLanes: contributionSources,
+        laneEvidence: orderedLaneEvidence,
+        identityStatus: aggregate.identityStatus,
+      };
+    })
+    .sort(compareFusedCandidates)
+    .map((candidate, idx) => ({
+      ...candidate,
+      rankBefore: idx + 1,
+    }));
 }
 
 /**

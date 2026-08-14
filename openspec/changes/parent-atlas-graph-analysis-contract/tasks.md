@@ -818,6 +818,18 @@ before any future session (or this one, if directed) commits to one approach. Un
 truth methodology is chosen, GA8/GA9 remain **NOT_STARTED**, not merely "not started because no
 one got to it" — they're blocked on a real, named methodological gap.
 
+### GA8 current open work (live repo state)
+
+The current blocker is still graph-input repair before any ablation/promotion work:
+
+- [ ] Re-derive `IMPORTS` from current live-tree paths only.
+- [ ] Reject `.claude/worktrees/...` sourceRefs during projection.
+- [ ] Normalize `CALLS` targets so generic symbols like `$state` do not dominate.
+- [ ] Emit a fresh graph revision and provenance receipt.
+- [ ] Build the structural-proxy golden set from that repaired revision.
+- [ ] Run the GA8 ablation harness against the golden set.
+- [ ] Promote to GA9 only after GA8 passes with the repaired inputs.
+
 **Operator selected option 1 (structural proxy labels from real graph edges), 2026-08-10.**
 Attempted to build it immediately; found a second, deeper real blocker before writing any
 golden-set data — recorded here rather than pushed past:

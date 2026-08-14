@@ -171,6 +171,35 @@ DPO
 ↓
 PPO only if still justified
 
+## ACE / RLM / BitFrost / simdjson ownership boundary
+
+This is a deferred workstation integration lane, not a new retrieval or truth
+owner. The ownership contract is:
+
+```text
+Postgres       canonical packet, playbook, revision, and receipt truth
+SearchRuntime  retrieval lanes, canonical identity resolution, and RRF fusion
+RLM            bounded recursive evidence decomposition above SearchRuntime
+ContextManifest exact selected-context boundary for model execution
+ACE            Generator/Reflector/Curator policy feedback from receipts
+Valkey         BitFrost hot cache and invalidation acceleration only
+C simdjson     optional JSON/JSONL parsing accelerator behind PERF0
+```
+
+Required stop conditions:
+
+- RLM cannot introduce a second fusion algorithm or canonical identity.
+- BitFrost cache misses, expiry, eviction, and Valkey outages must fail open to
+  canonical sources.
+- ACE playbook changes require receipt-backed review and Postgres persistence.
+- simdjson cannot replace Zod/Pydantic semantic validation.
+- Qdrant, cuVS, CAGRA, and any future Valkey vector experiment remain one
+  logical dense lane under SearchRuntime/RF5 semantics.
+
+Detailed deferred tasks are tracked as `ACE-RLM-01..08`, `BF-01..06`, and
+`SIMD-01..04` in `docs/parent-atlas-workstation-gpu-runtime-backlog.md` and
+the GPU sidecar OpenSpec.
+
 ## T6c current proven stop state
 
 1. Canonical source representation is frozen `semantic_768`.
@@ -1899,3 +1928,29 @@ work need redoing.
   - replay corpus proof
 
 **Immediate next session action**: prove alias replay on one live writer and record the receipt.
+
+## Coordination update — 2026-08-13
+
+The GPU/runtime work is now tracked in a separate backlog:
+`docs/parent-atlas-workstation-gpu-runtime-backlog.md`.
+
+Current GPU/runtime estimate: **58% planned/integrated**. This does not alter AST
+supersession gates. The active order is:
+
+1. P0: CHUNK0 → GPH-13 → GPH-14 → GPH-15 → GPH-16 → LX0.
+2. P1: GPU owner receipt → reproducible Docker/Conda environment → CUDA/PyTorch/CuPy proof → Valkey proof.
+3. P2: semantic_768 → cuVS exact oracle → Arrow/mmap if benchmarked → CAGRA evaluation → cuGraph parity.
+4. P3: TensorRT/LibTorch audit → multithreading → simdjson PERF0 → Python 3.14/free-threading → RMM if justified.
+5. New GPU hardening gates: filter parity, atomic index revision swap, CUDA
+   resource ownership, VRAM arbitration, metric equivalence, degradation
+   fallbacks, NVIDIA container proof, TensorRT lifecycle, observability, and
+   Valkey eviction/rebuild behavior are tracked in
+   `docs/parent-atlas-workstation-gpu-runtime-backlog.md` as GPU-21..GPU-32.
+
+The 8095 AST sidecar is intentionally lightweight. PyTorch, cuVS, RAPIDS,
+CAGRA, TensorRT, simdjson, and Python 3.14 are deferred integration lanes, not
+deleted capabilities or AST correctness gates.
+
+GPU-02 ownership receipt: `docs/reports/gpu-runtime-ownership-proof.json`.
+Current control-plane result is `PROVEN`; the dedicated RAPIDS `:8098` runtime is
+recorded separately as unreachable/deferred.

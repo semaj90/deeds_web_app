@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "atlas.rlm.environment-proof.v1",
+  "status": "PROVEN_BOUNDED_FIXTURE",
+  "generatedAt": "2026-08-14T04:56:39.269Z",
+  "receipt": {
+    "requestId": "rlm-proof-1",
+    "workspaceRevision": "fixture-workspace-r1",
+    "policyRevision": "fixture-policy-r1",
+    "depthReached": 0,
+    "subcalls": 1,
+    "steps": [
+      {
+        "sequence": 0,
+        "kind": "GRAPH",
+        "durationMs": 0
+      },
+      {
+        "sequence": 1,
+        "kind": "PROCESS",
+        "durationMs": 0
+      },
+      {
+        "sequence": 2,
+        "kind": "LOOP",
+        "reason": "DUPLICATE_SUBPROBLEM_SUPPRESSED",
+        "durationMs": 0
+      }
+    ],
+    "status": "COMPLETED",
+    "limits": {
+      "maxDepth": 2,
+      "maxSubcalls": 2,
+      "maxSearchCalls": 1,
+      "maxGraphExpansions": 1,
+      "maxProcessLookups": 1,
+      "maxPacketHydrations": 1,
+      "maxSourceReads": 1,
+      "maxPacketsHydrated": 1,
+      "maxTokens": 1000,
+      "deadlineMs": 1000
+    },
+    "observed": {
+      "depthReached": 0,
+      "subcalls": 1,
+      "searchCalls": 1,
+      "graphCalls": 1,
+      "processCalls": 1,
+      "packetHydrations": 0,
+      "sourceReads": 0,
+      "cacheHits": 0,
+      "cacheMisses": 0,
+      "duplicateSubproblemsSuppressed": 1
+    },
+    "selectedCanonicalIds": [
+      "packet-proof-1"
+    ],
+    "termination": "COMPLETED",
+    "durationMs": 2
+  },
+  "gates": {
+    "RLM_SEARCH_OWNER": "SearchRuntime adapter seam",
+    "RLM_BUDGETS": "PASS",
+    "RLM_LOOP_GUARD": "PASS",
+    "RLM_GRAPH_INSPECTION": "PASS",
+    "RLM_PROCESS_INSPECTION": "PASS",
+    "RLM_CANONICAL_IDENTITY_PRESERVED": "PASS",
+    "RLM_RECEIPT": "PROVEN_BOUNDED_FIXTURE"
+  },
+  "limitations": [
+    "Fixture owner adapters; live Neo4j/Postgres/ACE persistence not exercised.",
+    "No hidden reasoning or raw model content persisted."
+  ]
+}
