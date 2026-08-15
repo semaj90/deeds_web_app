@@ -104,6 +104,21 @@ try {
     console.warn(`[graphify:daily] QAS evaluation deferred: ${qasEvalError.message}`);
   }
 
+  // RLM/ACE routing consumes only the already-derived QAS candidate feature
+  // artifact. RLM selects evidence branches; ACE emits prefetch/residency hints.
+  // This step is deliberately read-only: no Valkey warming, GPU promotion,
+  // Postgres receipt persistence, graph fanout, or Kanban mutation occurs here.
+  try {
+    execSync('npx tsx ../scripts/atlas/report-rlm-ace-routing.mts', {
+      cwd: FRONTEND,
+      stdio: quiet ? 'ignore' : 'inherit',
+      shell: true,
+      timeout: 60 * 1000
+    });
+  } catch (rlmAceError) {
+    console.warn(`[graphify:daily] RLM/ACE routing receipt deferred: ${rlmAceError.message}`);
+  }
+
   // Terminal lifecycle marker for .vscode/tasks.json's background problemMatcher
   // (endsPattern: "graphify:daily complete") — must be printed on every exit
   // path (success, fallback-success, and failure), not just success. Before
