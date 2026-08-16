@@ -8,6 +8,20 @@
 - [ ] REV-01 Materialize `RevisionDependencyGraphV1` for source → AST → graph/semantic → candidate → feature → rerank artifacts.
 - [ ] CACHE-01 Define `ComputationArtifactV1` and content-addressed cache key contract.
 
+## P0 — queue / artifact transport
+
+- [x] QUEUE-00 Audit existing transport ownership: Postgres transactional outbox → RabbitMQ task/event exchanges; Redis list is UI/SSE progress only.
+- [x] QUEUE-01 Add `ArtifactAddressV1` for MMAP/Arrow IPC/Postgres/Qdrant/Valkey/GPU-resident immutable artifacts.
+- [x] QUEUE-02 Add `ActionWorkItemV1` so queue payloads carry artifact refs, revision-set hash, ordinal selection, budget and executor class instead of dense tensors.
+- [x] QUEUE-03 Route artifact work through `enqueueTask()` transactional outbox via `enqueueArtifactWorkItem()`.
+- [x] QUEUE-04 Fix event-fabric projection worker type ownership imports (`integration-events.ts` owns code-evidence; `event-fabric.ts` owns the control-loop event types).
+- [ ] QUEUE-05 Replace remaining large vector/tensor RabbitMQ payloads (for example `document.embed → vector.index`) with artifact references where profiling shows payload amplification.
+- [ ] QUEUE-06 Add explicit `artifact.materialized` / `artifact.failed` integration events and non-noop event-fabric handlers.
+- [ ] QUEUE-07 Add single-flight lease/fencing token keyed by ActionKey so duplicate at-least-once deliveries cannot compute the same expensive artifact concurrently.
+- [ ] QUEUE-08 Add consumer idempotency proof: duplicate command delivery returns the same immutable output artifact or an existing receipt.
+- [ ] QUEUE-09 Prove publisher-confirm outbox path is the only authoritative durable task publisher; generic publish helper remains convenience/non-authoritative.
+- [ ] QUEUE-10 Add message-size telemetry and fail/redirect when a task envelope exceeds the artifact-reference policy limit.
+
 ## P1 — candidate feature fabric
 
 - [x] FEAT-00 Add `CandidateFeatureRowV1` schema with nullable learned features and availability flags.
@@ -71,7 +85,10 @@
 
 ```bash
 cd sveltekit-frontend
-npx vitest run src/lib/server/atlas/features/manifold4-orientation-v1.spec.ts
+npx vitest run \
+  src/lib/server/atlas/features/manifold4-orientation-v1.spec.ts \
+  src/lib/server/queue/artifact-work-item-v1.spec.ts \
+  src/lib/server/queue/event-fabric-dispatch.spec.ts
 ```
 
-Then add a targeted typecheck for the new feature contracts before wiring producers.
+Then run the targeted TypeScript check for queue + candidate-fabric contracts before wiring artifact materializers.
