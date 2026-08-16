@@ -40,7 +40,7 @@ describe('tool candidate materializer', () => {
         ],
       },
       bootstrapSignals: {
-        'atlas.search': { semantic: undefined, signals: { semantic: 1 }, intentProbability: 1 },
+        'atlas.search': { signals: { semantic: 1 }, intentProbability: 1 },
         'atlas.patch.propose': { signals: { semantic: 1 }, intentProbability: 1 },
         'atlas.patch.apply': { signals: { semantic: 1 }, intentProbability: 1 },
       },
