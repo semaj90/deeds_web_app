@@ -200,7 +200,7 @@ export const HardwareSpecializationV1Schema = z.object({
 	workspace_revision: z.string().min(1).nullable().optional(),
 	feature_revision: z.string().min(1).nullable().optional(),
 	selections: z.array(HardwareSpecializationSelectionV1Schema).min(1),
-	validated_real_target_receipt_ids: z.array(z.string().min(1)).min(1),
+	validated_real_target_receipt_ids: z.array(z.string().min(1)).default([]),
 	candidate_receipt_ids: z.array(z.string().min(1)).default([]),
 	status: z.enum(['CANDIDATE', 'TARGET_VALIDATED', 'SUPERSEDED']),
 	created_at: z.string().datetime(),
