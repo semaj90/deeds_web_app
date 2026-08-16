@@ -78,10 +78,11 @@ function neo4jBfsPattern(direction: 'out' | 'in' | 'both', maxHops: number): str
 /**
  * Bounded live-graph executor used by atlas.graph.expand.
  *
- * It intentionally implements only the algorithms for which Parent Atlas has a
- * real executor today: bounded BFS/reverse-BFS over Neo4j. Other algorithms are
- * selected by policy but fail closed as ALGORITHM_UNAVAILABLE until their
- * cuGraph/GDS adapter is wired and parity-tested.
+ * Only plain BFS / reverse-BFS are executable here today. The policy can name
+ * richer algorithms so the contract is forward-compatible, but those choices
+ * fail closed until a real cuGraph/GDS/temporal executor is wired and parity
+ * proven. This prevents an empty or approximate mock from masquerading as a
+ * successful graph result.
  */
 export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<AtlasGraphExpandResult> {
 	const envelope = envelopeFor(input);
@@ -114,7 +115,7 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 		};
 	}
 
-	if (!['bfs', 'reverse_bfs', 'leiden_filtered_bfs'].includes(decision.algorithm)) {
+	if (!['bfs', 'reverse_bfs'].includes(decision.algorithm)) {
 		return {
 			nodes: [],
 			edges: [],
@@ -162,6 +163,8 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 			}
 			observedHops = Math.max(observedHops, Number(record.get('hops') ?? 0));
 			const pathNodes = (record.get('pathNodes') ?? []) as Array<{ properties?: Record<string, unknown>; labels?: string[] }>;
+			const pathEdges = (record.get('pathEdges') ?? []) as Array<{ type?: string }>;
+
 			for (const node of pathNodes) {
 				const id = nodeIdentity(node.properties ?? {});
 				if (!id) continue;
@@ -172,19 +175,14 @@ export async function expandAtlasGraph(input: AtlasGraphExpandRequest): Promise<
 				nodeMap.set(id, { id, labels: [...(node.labels ?? [])].sort() });
 			}
 
-			const pathEdges = (record.get('pathEdges') ?? []) as Array<{
-				type?: string;
-				start?: { properties?: Record<string, unknown> };
-				end?: { properties?: Record<string, unknown> };
-			}>;
-			for (const edge of pathEdges) {
+			for (let i = 0; i < pathEdges.length && i + 1 < pathNodes.length; i += 1) {
 				if (edgeMap.size >= maxEdges) {
 					truncated = true;
-					continue;
+					break;
 				}
-				const from = nodeIdentity(edge.start?.properties ?? {});
-				const to = nodeIdentity(edge.end?.properties ?? {});
-				const type = edge.type ?? 'RELATED';
+				const from = nodeIdentity(pathNodes[i]?.properties ?? {});
+				const to = nodeIdentity(pathNodes[i + 1]?.properties ?? {});
+				const type = pathEdges[i]?.type ?? 'RELATED';
 				if (!from || !to) continue;
 				edgeMap.set(`${from}\u0000${type}\u0000${to}`, { from, to, type });
 			}
