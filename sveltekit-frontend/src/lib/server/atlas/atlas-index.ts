@@ -39,6 +39,57 @@ export {
   buildFabricLaneManifest,
 } from './contracts/fabric-lanes';
 
+export {
+  ATLAS_RESOLUTION_STATUSES,
+} from './contracts/bounded-resolution';
+export type {
+  AtlasResolutionStatus,
+  AtlasLaneName,
+  AtlasLod,
+  AtlasRevisionSet,
+  ResourceEnvelopeV1,
+  ResourceUsageV1,
+  CandidateEvidenceV1,
+  CandidateV1,
+  CandidateExpansionV1,
+  CandidateFiberV1,
+  HyperedgeParticipantV1,
+  HyperedgeV1,
+} from './contracts/bounded-resolution';
+export {
+  emptyResourceUsage,
+  addResourceUsage,
+  withWallTime,
+  resourceBoundaryReasons,
+  hasResourceBoundary,
+  remainingCandidateCapacity,
+} from './bounded-resolution/budget';
+export {
+  canonicalSetDelta,
+  candidateDelta,
+  isStableDelta,
+} from './bounded-resolution/stability';
+export { decodeKBestLineages } from './bounded-resolution/lineage';
+export type {
+  LineageFrameV1,
+  LineageTransitionV1,
+  LineageTransitionScorer,
+  LineagePathV1,
+} from './bounded-resolution/lineage';
+export { projectHyperedgesToWeightedEdges } from './bounded-resolution/hypergraph';
+export type { HypergraphProjectionEdgeV1 } from './bounded-resolution/hypergraph';
+export {
+  ATLAS_ROUTE_BITS,
+  buildRouteMask,
+  hasRouteFlag,
+  routeHammingDistance,
+} from './bounded-resolution/route-mask';
+export type {
+  AtlasRouteFlag,
+  AtlasRouteMask,
+  RouteMaskInputV1,
+} from './bounded-resolution/route-mask';
+
 export { buildBoardFabricLaneManifest } from './board/fabric-lane-manifest';
 export { buildBoardGpuBenchmarkReceipt } from './board/fabric-gpu-benchmark';
 export { buildDailyGraphifyBoardRecommendations } from './board/daily-graphify-board-recommendations';
