@@ -14,16 +14,16 @@ import {
 } from '$lib/server/queue/code-evidence-event-processing.js';
 import type {
 	CodeEvidencePersistedEventV1,
-	AnalyticsObservationEventV1,
-	CheckpointCommitEventV1,
-	FailureObservationEventV1,
-	PolicyDecisionReceiptEventV1,
-	RecommendationSignalEventV1,
 } from '$lib/server/queue/integration-events.js';
 import {
 	createDefaultEventFabricHandlers,
 	parseEventFabricMessage,
+	type AnalyticsObservationEventV1,
+	type CheckpointCommitEventV1,
 	type EventFabricHandlerRegistry,
+	type FailureObservationEventV1,
+	type PolicyDecisionReceiptEventV1,
+	type RecommendationSignalEventV1,
 } from '$lib/server/queue/event-fabric.js';
 import { emitEventFabricAnalyticsProjection } from '$lib/server/queue/event-fabric-analytics-projection.js';
 
@@ -116,7 +116,7 @@ export async function startEventFabricWorker(
 					connection = null;
 				}
 			},
-		};
+			};
 	} catch (err) {
 		console.error('Failed to start event fabric projection worker:', err);
 		throw err;
