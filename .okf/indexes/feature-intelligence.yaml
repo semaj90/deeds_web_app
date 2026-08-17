@@ -1,0 +1,212 @@
+# Parent Atlas physical index / projection ownership policy
+version: 1
+registry_id: atlas.feature-indexes
+status: active
+owner: parent-atlas
+
+principles:
+  - postgres_is_canonical
+  - okf_defines_vocabulary_not_runtime_rows
+  - openspec_defines_required_behavior
+  - lane_not_executor
+  - projections_are_revisioned_and_rebuildable
+  - exact_identity_before_cross_lane_fusion
+  - relationship_degree_is_not_graph_degree
+
+canonical_store:
+  engine: postgresql18
+  schema: configurable
+  role: canonical_identity_evidence_relationship_state_and_snapshot_store
+  planned_tables:
+    - atlas_features
+    - atlas_feature_aliases
+    - atlas_evidence
+    - atlas_feature_evidence
+    - atlas_relationships
+    - atlas_relationship_members
+    - atlas_relationship_cardinality
+    - atlas_feature_state_receipts
+  identity_keys:
+    - feature_id
+    - feature_key
+    - evidence_id
+    - relationship_id
+    - state_revision
+  revision_keys:
+    - feature_revision
+    - evidence_revision
+    - relationship_revision
+    - source_revision
+    - evidence_snapshot_revision
+    - producer_revision
+
+postgres_indexes:
+  btree:
+    role: canonical_exact_lookup_ordering_and_fk_support
+    recommended:
+      - columns: [feature_key]
+        unique: true
+      - columns: [feature_revision]
+      - columns: [domain, status]
+      - columns: [relationship_type, relationship_degree]
+      - columns: [relationship_id, entity_type, entity_id]
+      - columns: [feature_id, evidence_snapshot_revision]
+      - columns: [source_ref, source_revision]
+  gin:
+    role: set_jsonb_and_full_text_acceleration
+    recommended:
+      - aliases
+      - tags
+      - structured_payload
+      - evidence_tsvector
+  bitmap_planner:
+    role: query_execution_strategy
+    canonical_index_type: false
+    note: >-
+      PostgreSQL may combine eligible indexes into bitmap index/heap scans for selective
+      multi-predicate queries. Atlas must not model a bitmap scan as a separate logical
+      retrieval lane or semantic authority.
+  postgres18_aio:
+    role: storage_io_execution_optimization
+    canonical_index_type: false
+    note: >-
+      Asynchronous I/O may improve physical read execution. It changes neither canonical
+      identity nor the logical retrieval lane and must remain an operational tuning concern.
+
+lexical_projection:
+  logical_lane: lexical
+  canonical_source: postgresql18
+  executors:
+    postgres_full_text:
+      index_family: gin_tsvector
+      exact_identity_required: true
+    exact_btree:
+      index_family: btree
+      exact_identity_required: true
+  note: >-
+    A future BM25 extension may be registered as another lexical executor, but it must not
+    receive an additional fusion vote merely because it uses a different engine.
+
+semantic_projection:
+  logical_lane: semantic
+  canonical_dimension: 768
+  canonical_identity: feature_id_or_evidence_id
+  executors:
+    pgvector_exact:
+      role: relational_correctness_or_small_candidate_executor
+      canonical: false
+    pgvector_hnsw:
+      role: local_postgres_ann_executor
+      canonical: false
+      distance: cosine
+      preferred_for: online_ann_when_memory_and_build_cost_are_acceptable
+    pgvector_ivfflat:
+      role: local_postgres_ann_executor
+      canonical: false
+      distance: cosine
+      preferred_for: trained_snapshot_or_lower_build_cost_ann
+    qdrant:
+      role: persistent_semantic_projection_and_filtering_executor
+      canonical: false
+      required_payload:
+        - canonical_id
+        - feature_id
+        - evidence_id
+        - source_revision
+        - projection_revision
+        - embedding_model_revision
+        - domain
+    cuvs_cagra:
+      role: gpu_ann_executor
+      canonical: false
+      source_snapshot: revisioned_postgres_semantic_snapshot
+      required_receipt:
+        - projection_revision
+        - embedding_model_revision
+        - vector_count
+        - dimensions
+        - source_checksum
+        - index_checksum
+        - build_parameters
+  fusion_rule: one_semantic_lane_one_vote
+  correctness_oracle: pgvector_exact_or_cuvs_bruteforce_exact
+
+relationship_graph_projection:
+  canonical_source: postgresql18
+  canonical_fact: atlas_relationships_plus_atlas_relationship_members
+  pairwise_projection:
+    allowed: true
+    must_retain:
+      - relationship_id
+      - relationship_revision
+      - source_revision
+      - participant_role
+      - counterpart_role
+  executors:
+    networkx:
+      role: cpu_reference_and_parity_oracle
+      canonical: false
+    neo4j:
+      role: persistent_traversal_projection
+      canonical: false
+    cugraph:
+      role: gpu_graph_analysis_executor
+      canonical: false
+      bounded_snapshot: true
+      algorithms:
+        - pagerank
+        - personalized_pagerank
+        - bfs
+        - sssp
+        - community_detection
+  traversal_limits:
+    max_hops: 2
+    max_fanout: 20
+  derived_metrics:
+    - graph_degree
+    - in_degree
+    - out_degree
+    - fanout
+    - pagerank
+    - personalized_pagerank
+    - community_id
+    - shortest_path_distance
+  completion_authority: false
+
+feature_matrix_projection:
+  row_identity: feature_id
+  canonical: false
+  source: canonical_feature_evidence_snapshot
+  columns_may_include:
+    - lexical_evidence_count
+    - semantic_centroid
+    - ast_symbol_count
+    - route_count
+    - table_count
+    - test_coverage
+    - runtime_evidence_count
+    - pagerank
+    - fanout
+    - uncertainty
+    - staleness
+  consumers:
+    - svd_association
+    - reranker
+    - kanban_priority
+  rule: derived_signals_do_not_create_canonical_relationships_without_evidence_promotion
+
+projection_receipt:
+  required_fields:
+    - projection_type
+    - projection_revision
+    - canonical_snapshot_revision
+    - source_checksum
+    - record_count
+    - producer_revision
+    - created_at
+  optional_fields:
+    - executor_version
+    - parameters
+    - output_checksum
+    - peak_vram_bytes
+    - duration_ms
