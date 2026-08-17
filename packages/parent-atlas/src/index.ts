@@ -131,6 +131,26 @@ export {
   resolveAtlasQdrantSparseVectorName,
   resolveAtlasQdrantSummaryRouteVectorName,
 } from './core/qdrant-collection-registry.js';
+export {
+  EVIDENCE_POLARITY_VALUES,
+  FEATURE_STATE_VALUES,
+  RELATIONSHIP_DEGREE_KIND_VALUES,
+  buildFeatureRelationship,
+  classifyRelationshipDegree,
+  deriveRelationshipDegree,
+  describeFeatureIntelligenceContract,
+  evidencePolaritySchema,
+  featureCandidateSchema,
+  featureEvidenceSchema,
+  featureRelationshipSchema,
+  featureSchema,
+  featureStateReceiptSchema,
+  featureStateSchema,
+  featureStateValueSchema,
+  relationshipCardinalityConstraintSchema,
+  relationshipDegreeKindSchema,
+  relationshipParticipantSchema,
+} from './core/feature-intelligence.js';
 
 // Pipelines
 export { runIngest } from './pipelines/ingest.js';
@@ -160,6 +180,18 @@ export type { PacketIdentity } from './core/canonical-packet-bridge.js';
 export type { AtlasMemoryEnvelope, GlyphRecord } from './core/canonical-packet-bridge.js';
 export type { ValidationResult, ValidationViolation, TelemetryRecord, BreadthMetrics, ProvenanceLink, RetrievalMetrics, MaterializationReport } from './core/packet-validator-materializer.js';
 export type { CanonicalServiceName, ServiceProbe, ServiceProbeStatus, ServiceProbeTransport } from './core/service-contract.js';
+export type {
+  FeatureCandidateV1,
+  FeatureEvidenceV1,
+  FeatureRelationshipBuildInput,
+  FeatureRelationshipV1,
+  FeatureStateReceiptV1,
+  FeatureStateV1,
+  FeatureV1,
+  RelationshipCardinalityConstraintV1,
+  RelationshipDegreeKind,
+  RelationshipParticipantV1,
+} from './core/feature-intelligence.js';
 export type { IngestOptions, IngestResult } from './pipelines/ingest.js';
 export type { KarpathyEnrichOptions, KarpathyEnrichResult } from './pipelines/enrich-karpathy.js';
 export type { HydrateCacheOptions, HydrateCacheResult } from './pipelines/hydrate-cache.js';
