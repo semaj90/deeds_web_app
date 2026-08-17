@@ -11,12 +11,6 @@ export interface PromoteCandidateFeatureRowV1Input {
   freshness: number;
 }
 
-function requireRevisionMatch(label: string, left: string | null, right: string): void {
-  if (left !== null && left !== right) {
-    throw new Error(`CANDIDATE_FEATURE_REVISION_MISMATCH:${label}:${left}:${right}`);
-  }
-}
-
 /**
  * Promotion boundary between the nullable/raw candidate feature envelope and the
  * normalized FeatureRowV1 used by ranking/eval. The adapter never invents
@@ -38,9 +32,6 @@ export function promoteCandidateFeatureRowV1(input: PromoteCandidateFeatureRowV1
   }
   if (candidate.graphRevision === null) throw new Error('CANDIDATE_FEATURE_GRAPH_REVISION_REQUIRED');
   if (candidate.semanticRevision === null) throw new Error('CANDIDATE_FEATURE_SEMANTIC_REVISION_REQUIRED');
-  requireRevisionMatch('graph', candidate.graphRevision, candidate.graphRevision);
-  requireRevisionMatch('semantic', candidate.semanticRevision, candidate.semanticRevision);
-
   if (candidate.crossEncoderAvailable && candidate.crossEncoderCalibratedScore === null) {
     throw new Error('CANDIDATE_FEATURE_CALIBRATED_CROSS_ENCODER_REQUIRED');
   }
