@@ -5,6 +5,7 @@ export const HyperedgeParticipantV1Schema = z
   .object({
     canonicalId: z.string().min(1),
     role: z.string().min(1),
+    ordinal: z.number().int().nonnegative().optional(),
   })
   .strict();
 export type HyperedgeParticipantV1 = z.infer<typeof HyperedgeParticipantV1Schema>;
@@ -39,6 +40,7 @@ export interface HyperedgeIncidenceRowV1 {
   hyperedgeId: string;
   canonicalId: string;
   role: string;
+  ordinal: number | null;
   incidenceWeight: 1;
   graphRevision: string;
 }
@@ -48,15 +50,20 @@ function stableUnique(values: readonly string[]): string[] {
 }
 
 function normalizeParticipants(participants: readonly HyperedgeParticipantV1[]): HyperedgeParticipantV1[] {
-  const byRoleAndId = new Map<string, HyperedgeParticipantV1>();
+  const byIdentity = new Map<string, HyperedgeParticipantV1>();
   for (const participant of participants) {
     const parsed = HyperedgeParticipantV1Schema.parse({
       canonicalId: participant.canonicalId.trim(),
       role: participant.role.trim(),
+      ordinal: participant.ordinal,
     });
-    byRoleAndId.set(`${parsed.role}\u001f${parsed.canonicalId}`, parsed);
+    const identity = `${parsed.role}\u001f${parsed.ordinal ?? ''}\u001f${parsed.canonicalId}`;
+    byIdentity.set(identity, parsed);
   }
-  return [...byRoleAndId.values()].sort((a, b) => {
+  return [...byIdentity.values()].sort((a, b) => {
+    const ordinalA = a.ordinal ?? Number.MAX_SAFE_INTEGER;
+    const ordinalB = b.ordinal ?? Number.MAX_SAFE_INTEGER;
+    if (ordinalA !== ordinalB) return ordinalA - ordinalB;
     const role = a.role.localeCompare(b.role);
     return role !== 0 ? role : a.canonicalId.localeCompare(b.canonicalId);
   });
@@ -69,16 +76,25 @@ function sha256(value: unknown): string {
 /**
  * Build a deterministic role-aware n-ary fact/event.
  *
- * Identity deliberately includes source/workspace revision: a mutation or tool
- * execution at revision R is not the same event as an otherwise identical one
- * at revision R+1. graphRevision is lineage/projection metadata and is covered
- * by the checksum, but not the stable event key, so a disposable graph
- * projection can be rebuilt without changing the canonical event identity.
+ * Optional participant ordinals preserve ordered argument/event semantics without
+ * creating a second canonical relation contract. Identity deliberately includes
+ * source/workspace revision. graphRevision remains disposable projection lineage.
  */
 export function createHyperedgeV1(input: HyperedgeV1Input): HyperedgeV1 {
   const predicate = input.predicate.trim();
   const participants = normalizeParticipants(input.participants);
   if (participants.length < 2) throw new Error('HyperedgeV1 requires at least two unique role-qualified participants');
+
+  const explicitOrdinals = participants.filter((participant) => participant.ordinal !== undefined);
+  if (explicitOrdinals.length > 0) {
+    const seenOrdinals = new Set<number>();
+    for (const participant of explicitOrdinals) {
+      if (seenOrdinals.has(participant.ordinal!)) {
+        throw new Error(`HyperedgeV1 duplicate participant ordinal ${participant.ordinal}`);
+      }
+      seenOrdinals.add(participant.ordinal!);
+    }
+  }
 
   const evidenceRefs = stableUnique(input.evidenceRefs ?? []);
   const identityPayload = {
@@ -103,15 +119,13 @@ export function createHyperedgeV1(input: HyperedgeV1Input): HyperedgeV1 {
   return HyperedgeV1Schema.parse({ ...payloadWithoutChecksum, checksum });
 }
 
-/**
- * Disposable incidence projection for Neo4j/cuGraph/PageRank materialization.
- * Canonical HyperedgeV1 remains the authority; these rows may be regenerated.
- */
+/** Disposable incidence rows. Canonical HyperedgeV1 remains the authority. */
 export function projectHyperedgeIncidence(edge: HyperedgeV1): HyperedgeIncidenceRowV1[] {
   return edge.participants.map((participant) => ({
     hyperedgeId: edge.hyperedgeId,
     canonicalId: participant.canonicalId,
     role: participant.role,
+    ordinal: participant.ordinal ?? null,
     incidenceWeight: 1,
     graphRevision: edge.graphRevision,
   }));
