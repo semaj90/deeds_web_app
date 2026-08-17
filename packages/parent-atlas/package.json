@@ -16,6 +16,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
     "test:canonical-surface": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/canonical-surface.test.mjs",
+    "test:feature-intelligence": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/feature-intelligence.test.mjs",
     "gate:identity": "node --experimental-vm-modules dist/cli.js gate identity",
     "gate:replay": "node --experimental-vm-modules dist/cli.js gate replay --all",
     "gate:lineage": "node --experimental-vm-modules dist/cli.js gate lineage",
