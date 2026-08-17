@@ -2,10 +2,10 @@
 
 ## P0 — Canonical boundary
 
-- [ ] FI-01 Define `FeatureV1`, `FeatureCandidateV1`, `FeatureEvidenceV1`, `FeatureStateV1`, `FeatureStateReceiptV1` and projection identity contracts.
+- [x] FI-01 Define `FeatureV1`, `FeatureCandidateV1`, `FeatureEvidenceV1`, `FeatureStateV1`, `FeatureStateReceiptV1` and canonical `FeatureRelationshipV1` relationship/arity contracts.
 - [ ] FI-02 Add stable `feature_id` / `feature_key` registry with revision semantics.
 - [ ] FI-03 Add evidence identity normalization and canonical promotion.
-- [ ] FI-04 Add Postgres migrations/materializers for canonical features, evidence edges and state receipts.
+- [ ] FI-04 Add Postgres migrations/materializers for canonical features, evidence edges, relationships/hyperedges and state receipts.
 
 ## P0 — Evidence ingestion
 
@@ -20,9 +20,11 @@
 ## P1 — Feature evidence graph
 
 - [ ] FI-12 Materialize typed Feature↔Evidence relations.
-- [ ] FI-13 Add explicit n-ary evidence-group/hyperedge representation.
+- [x] FI-13A Define explicit unary/binary/ternary/N-ary relationship semantics, participant roles, degree and cardinality contracts.
+- [ ] FI-13B Persist canonical n-ary relationship/hyperedge records and member rows in Postgres.
+- [ ] FI-13C Derive reversible pairwise graph projections from canonical n-ary relationships.
 - [ ] FI-14 Project canonical graph snapshot to Neo4j and NetworkX/cuGraph with parity receipts.
-- [ ] FI-15 Compute PageRank/fanout/blocking metrics by canonical `feature_id`.
+- [ ] FI-15 Compute PageRank/fanout/blocking metrics by canonical `feature_id`; keep graph node degree separate from relationship degree.
 
 ## P1 — Retrieval reconciliation
 
@@ -51,7 +53,10 @@
 ## Acceptance gates
 
 - [ ] Canonical identity survives path/cluster/projection changes.
-- [ ] Neo4j/NetworkX/cuGraph/Qdrant records round-trip to canonical feature/evidence IDs.
+- [ ] Neo4j/NetworkX/cuGraph/Qdrant records round-trip to canonical feature/evidence/relationship IDs.
+- [x] Recursive same-entity-type relationships can have multiple participants but degree 1.
+- [x] Relationship degree is distinct from cardinality and graph node degree.
+- [ ] Pairwise graph projection of an N-ary fact reconstructs the original canonical relationship ID.
 - [ ] A checked markdown task alone cannot produce `VERIFIED`.
 - [ ] PageRank changes priority but cannot directly change completion.
 - [ ] Qdrant similarity changes retrieval candidates but cannot directly change completion.
