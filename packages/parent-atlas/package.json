@@ -11,7 +11,8 @@
     "./core/hypergraph-retrieval": "./dist/core/hypergraph-retrieval.js",
     "./core/feature-intelligence-repository": "./dist/core/feature-intelligence-repository.js",
     "./core/feature-matrix": "./dist/core/feature-matrix.js",
-    "./core/ace-hypergraph-payload": "./dist/core/ace-hypergraph-payload.js"
+    "./core/ace-hypergraph-payload": "./dist/core/ace-hypergraph-payload.js",
+    "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js"
   },
   "bin": {
     "atlas": "./dist/cli.js"
