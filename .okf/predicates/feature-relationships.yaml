@@ -1,0 +1,104 @@
+# Parent Atlas canonical relationship predicate registry
+version: 1
+registry_id: atlas.feature-relationships
+status: active
+owner: parent-atlas
+
+degree_semantics:
+  definition: number_of_distinct_participating_entity_types
+  participant_count_is_degree: false
+  graph_node_degree_is_relationship_degree: false
+  cardinality_is_relationship_degree: false
+  kinds:
+    unary: 1
+    binary: 2
+    ternary: 3
+    nary: ">=4"
+
+canonical_relationship:
+  required_fields:
+    - relationship_id
+    - relationship_type
+    - participants
+    - participant_count
+    - relationship_degree
+    - relationship_degree_kind
+    - source_ref
+    - source_revision
+    - relationship_revision
+    - producer_revision
+  participant_fields:
+    - role
+    - entity_type
+    - entity_id
+  optional_participant_fields:
+    - entity_revision
+    - source_ref
+  projection_rule: >-
+    Pairwise graph edges MAY be generated for traversal and GPU analysis, but every
+    projected edge MUST retain canonical relationship_id so the original unary,
+    binary, ternary, or N-ary fact can be reconstructed.
+
+predicates:
+  depends_on:
+    allowed_degree: [unary, binary, ternary, nary]
+    pagerank_eligible: true
+    traversal_eligible: true
+  implements:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: true
+    traversal_eligible: true
+  specifies:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: false
+    traversal_eligible: true
+  uses_table:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: true
+    traversal_eligible: true
+  uses_column:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: true
+    traversal_eligible: true
+  auth_guards:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: true
+    traversal_eligible: true
+  validates:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: false
+    traversal_eligible: true
+  blocks:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: true
+    traversal_eligible: true
+  observed_at_runtime:
+    allowed_degree: [binary, ternary, nary]
+    pagerank_eligible: false
+    traversal_eligible: true
+  authorized_resource_mutation:
+    allowed_degree: [ternary, nary]
+    required_entity_types:
+      - feature
+      - route
+      - database_policy
+    recommended_entity_types:
+      - service
+      - table
+      - column
+      - test
+    pagerank_eligible: true
+    traversal_eligible: true
+
+cardinality:
+  representation: per_role_min_max
+  max_values:
+    - positive_integer
+    - many
+
+quality_gates:
+  - reject_declared_degree_mismatch
+  - reject_duplicate_cardinality_role
+  - reject_unknown_cardinality_role
+  - require_revision_qualified_source
+  - require_relationship_id_on_pairwise_projection
