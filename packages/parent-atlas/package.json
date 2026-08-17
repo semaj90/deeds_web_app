@@ -7,7 +7,9 @@
   "exports": {
     ".": "./dist/index.js",
     "./core/contextual-tree-snapshot": "./dist/core/contextual-tree-snapshot.js",
-    "./core/graph-snapshot-v2": "./dist/core/graph-snapshot-v2.js"
+    "./core/graph-snapshot-v2": "./dist/core/graph-snapshot-v2.js",
+    "./core/hypergraph-retrieval": "./dist/core/hypergraph-retrieval.js",
+    "./core/feature-intelligence-repository": "./dist/core/feature-intelligence-repository.js"
   },
   "bin": {
     "atlas": "./dist/cli.js"
@@ -17,6 +19,7 @@
     "dev": "tsc -p tsconfig.json --watch",
     "test:canonical-surface": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/canonical-surface.test.mjs",
     "test:feature-intelligence": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/feature-intelligence.test.mjs",
+    "test:hypergraph-retrieval": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/hypergraph-retrieval.test.mjs",
     "gate:identity": "node --experimental-vm-modules dist/cli.js gate identity",
     "gate:replay": "node --experimental-vm-modules dist/cli.js gate replay --all",
     "gate:lineage": "node --experimental-vm-modules dist/cli.js gate lineage",
