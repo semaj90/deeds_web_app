@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildFeatureRowV1, featureRowV1ToFloat32 } from './feature-row-v1.js';
+import {
+	assembleRankingFeatureVectorV1,
+	buildCandidateStaticFeaturesV1,
+	buildQueryCandidateFeaturesV1,
+	rankingFeatureVectorV1ToFloat32,
+	RANKING_FEATURE_VECTOR_V1_FIELDS,
+} from './feature-row-v1.js';
 
 const locator = {
 	schema: 'atlas.evidence-locator.v1' as const,
@@ -21,47 +27,79 @@ const locator = {
 	},
 };
 
-describe('FeatureRowV1', () => {
-	it('keeps locator identity separate and wires one PageRank authority signal', () => {
-		const row = buildFeatureRowV1({
+const promotedPageRank = {
+	schema: 'atlas.promoted-pagerank-evidence.v1' as const,
+	runId: 'pagerank-run:1',
+	runStatus: 'promoted' as const,
+	graphRevision: 'graph:1',
+	projectionRevision: 'projection:1',
+	normalizationRevision: 'l1-percentile:1',
+	algorithmRevision: 'pagerank:0.85:v1',
+	pagerankRaw: 0.00042,
+	pagerankL1: 0.00042,
+	authorityPercentile: 0.91,
+	authorityBand: 'high',
+	receiptRef: 'receipt:pagerank:1',
+};
+
+describe('ranking feature ownership', () => {
+	it('uses promoted PageRank percentile in static state and query features only in the overlay', () => {
+		const staticFeatures = buildCandidateStaticFeaturesV1({
 			locator,
 			featureRevision: 'feature:1',
 			graphRevision: 'graph:1',
-			semanticRevision: 'semantic:1',
+			semanticRevision: 'semantic:768:1',
+			pagerank: promotedPageRank,
+			communitySnapshotId: 'community-snapshot:1',
+			communityFingerprint: 'sha256:community-a',
+			historicalSuccess: 0.7,
+			failureFrequency: 0.2,
+			freshness: 0.8,
+			structuralDegree: 12,
+			estimatedTokenCost: 480,
+			evidenceRefs: ['evidence:static'],
+		});
+
+		expect(staticFeatures.pagerankAuthority).toBe(0.91);
+		expect(staticFeatures).not.toHaveProperty('dense');
+		expect(staticFeatures).not.toHaveProperty('crossEncoder');
+
+		const queryFeatures = buildQueryCandidateFeaturesV1({
+			queryId: 'query:1',
+			queryRevision: 'query-revision:1',
+			candidateId: locator.canonicalId,
+			packetKey: locator.packetKey,
 			dense: 0.9,
 			sparse: 0.7,
 			rrf: 0.8,
-			ast: 0.6,
-			pagerank: { pagerank_l1: 0.4, pagerank_raw: 0.3, authority_score: 0.5 },
-			pprAffinity: 0.2,
-			domainAffinity: 1,
-			freshness: 0.75,
+			astAffinity: 0.6,
+			pprAffinity: 0.5,
+			domainMatch: 1,
 			crossEncoder: 0.95,
-			executionUtility: 0.5,
-			evidenceRefs: ['evidence:b', 'evidence:a', 'evidence:a'],
+			crossEncoderRawScore: 7.2,
+			crossEncoderCalibrationRevision: 'ce-calibration:1',
+			evidenceRefs: ['evidence:query'],
 		});
 
-		expect(row.pagerankAuthority).toBe(0.4);
-		expect(row.sourceRef).toBe(locator.sourceRef);
-		expect(row.evidenceRefs).toEqual(['evidence:a', 'evidence:b']);
-		expect(featureRowV1ToFloat32(row)).toHaveLength(10);
+		const row = assembleRankingFeatureVectorV1({ staticFeatures, queryFeatures });
+		expect(row.values).toHaveLength(RANKING_FEATURE_VECTOR_V1_FIELDS.length);
+		expect(rankingFeatureVectorV1ToFloat32(row)).toHaveLength(RANKING_FEATURE_VECTOR_V1_FIELDS.length);
+		expect(row.evidenceRefs).toContain('receipt:pagerank:1');
 	});
 
-	it('rejects a row with no PageRank authority source', () => {
-		expect(() => buildFeatureRowV1({
+	it('rejects mismatched graph lineage before constructing static features', () => {
+		expect(() => buildCandidateStaticFeaturesV1({
 			locator,
 			featureRevision: 'feature:1',
-			graphRevision: 'graph:1',
-			semanticRevision: 'semantic:1',
-			dense: 0,
-			sparse: 0,
-			rrf: 0,
-			ast: 0,
-			pagerank: null,
-			domainAffinity: 0,
+			graphRevision: 'graph:DIFFERENT',
+			semanticRevision: 'semantic:768:1',
+			pagerank: promotedPageRank,
+			historicalSuccess: 0,
+			failureFrequency: 0,
 			freshness: 0,
-			executionUtility: 0,
+			structuralDegree: 0,
+			estimatedTokenCost: 0,
 			evidenceRefs: ['evidence:1'],
-		})).toThrow(/PageRank authority/);
+		})).toThrow(/graphRevision/);
 	});
 });
