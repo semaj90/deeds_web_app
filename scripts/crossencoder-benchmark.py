@@ -1,302 +1,331 @@
 #!/usr/bin/env python3
-"""
-CrossEncoder benchmark: measure quality lift, latency, and VRAM impact.
-Tests mxbai-rerank-base-v2 over frozen XGBoost v2 top-20 candidates.
+"""CrossEncoder benchmark for a frozen Parent Atlas candidate fabric.
+
+Preferred input is a revisioned JSON file so evaluation is reproducible and does
+not silently depend on a live database ranking owner.
+
+Input schema (list of query objects):
+[
+  {
+    "query_id": "q1",
+    "query_text": "...",
+    "candidates": [
+      {
+        "packet_key": "packet:...",
+        "text": "...",
+        "baseline_score": 0.7,
+        "relevance_grade": 3
+      }
+    ]
+  }
+]
+
+A legacy database fallback remains available only when DATABASE_URL is set.
 
 Usage:
-  python scripts/crossencoder-benchmark.py [--dry-run] [--top-k 5]
+  python scripts/crossencoder-benchmark.py --input eval-candidates.json --top-k 5
+  DATABASE_URL=... python scripts/crossencoder-benchmark.py --legacy-db --top-k 5
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
+import os
 import time
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Optional
 
-import psycopg
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-# Database connection
-DB_URL = "postgresql://legal_admin:123456@127.0.0.1:5434/legal_ai_db"
+MODEL_ID = os.environ.get("CROSS_ENCODER_MODEL_ID", "mixedbread-ai/mxbai-rerank-base-v2")
+MODEL_PATH = os.environ.get("CROSS_ENCODER_MODEL_PATH", "models/mxbai-rerank-base-v2")
+MODEL_REVISION = os.environ.get("CROSS_ENCODER_MODEL_REVISION", MODEL_ID)
+TOKENIZER_REVISION = os.environ.get("CROSS_ENCODER_TOKENIZER_REVISION", MODEL_REVISION)
+INFERENCE_REVISION = os.environ.get("CROSS_ENCODER_INFERENCE_REVISION", "cross-encoder-logit-v1")
+MAX_LENGTH = int(os.environ.get("CROSS_ENCODER_MAX_LENGTH", "512"))
+BATCH_SIZE = int(os.environ.get("CROSS_ENCODER_BATCH_SIZE", "8"))
 
-MODEL_ID = "mixedbread-ai/mxbai-rerank-base-v2"
-MODEL_PATH = "models/mxbai-rerank-base-v2"
-MAX_LENGTH = 512
-BATCH_SIZE = 8
+
+@dataclass(frozen=True)
+class Candidate:
+    packet_key: str
+    text: str
+    baseline_score: float
+    relevance_grade: int
 
 
-@dataclass
-class BenchmarkResult:
-    """Results for a single query."""
+@dataclass(frozen=True)
+class QueryCase:
     query_id: str
     query_text: str
+    candidates: list[Candidate]
+
+
+@dataclass(frozen=True)
+class RerankExecution:
+    ranking: list[tuple[str, float]]
+    latency_ms: float
+    vram_peak_mb: float
+    device: str
+
+
+@dataclass(frozen=True)
+class BenchmarkResult:
+    query_id: str
     candidate_count: int
     latency_ms: float
     vram_peak_mb: float
-    # XGBoost ranking (top-20)
-    xgboost_top_5: list[tuple[str, float]]
-    # Reranker ranking (top-5)
-    reranker_top_5: list[tuple[str, float]]
-    # Overlap between top-5 lists
-    overlap_at_5: int
-    # NDCG@5 delta (if gold judgments available)
-    ndcg_xgboost: Optional[float]
-    ndcg_reranker: Optional[float]
-    ndcg_delta: Optional[float]
+    device: str
+    overlap_at_k: int
+    ndcg_baseline: float
+    ndcg_reranker: float
+    ndcg_delta: float
 
 
-def load_model() -> tuple[AutoTokenizer, AutoModelForSequenceClassification]:
-    """Load mxbai-rerank-base-v2 model."""
-    print(f"[Benchmark] Loading model from {MODEL_PATH}...")
+def resolve_device(requested: str) -> torch.device:
+    if requested == "cuda":
+        if not torch.cuda.is_available():
+            raise RuntimeError("--device=cuda requested but torch.cuda.is_available() is false")
+        return torch.device("cuda")
+    if requested == "cpu":
+        return torch.device("cpu")
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def load_model(device: torch.device):
+    print(f"[Benchmark] Loading model from {MODEL_PATH} on {device}...")
     tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+    dtype = torch.float16 if device.type == "cuda" else torch.float32
     model = AutoModelForSequenceClassification.from_pretrained(
         MODEL_PATH,
-        torch_dtype=torch.float16,
-        device_map="auto",
-    ).eval()
-    print("[Benchmark] Model loaded")
+        torch_dtype=dtype,
+    ).to(device).eval()
     return tokenizer, model
 
 
-def fetch_xgboost_v2_top_20(conn: psycopg.Connection, query_id: str) -> list[dict]:
-    """Fetch XGBoost v2 top-20 candidates for a query."""
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT
-            packet_key,
-            text,
-            xgboost_v2_score,
-            relevance_grade
-        FROM retrieval_results
-        WHERE query_id = %s
-            AND model = 'xgboost_v2'
-        ORDER BY xgboost_v2_score DESC
-        LIMIT 20
-    """, (query_id,))
+def load_frozen_cases(path: Path) -> list[QueryCase]:
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(raw, list):
+        raise ValueError("frozen candidate file must contain a list")
 
-    return [
-        {
-            "packet_key": row[0],
-            "text": row[1],
-            "xgboost_score": row[2],
-            "relevance_grade": row[3],
-        }
-        for row in cur.fetchall()
-    ]
+    cases: list[QueryCase] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            raise ValueError("each query case must be an object")
+        candidates = [
+            Candidate(
+                packet_key=str(candidate["packet_key"]),
+                text=str(candidate["text"]),
+                baseline_score=float(candidate.get("baseline_score", 0.0)),
+                relevance_grade=int(candidate.get("relevance_grade", 0)),
+            )
+            for candidate in item.get("candidates", [])
+        ]
+        cases.append(QueryCase(
+            query_id=str(item["query_id"]),
+            query_text=str(item["query_text"]),
+            candidates=candidates,
+        ))
+    return cases
 
 
-def rerank_batch(
-    tokenizer: AutoTokenizer,
-    model: AutoModelForSequenceClassification,
-    query: str,
-    candidates: list[dict],
-) -> list[tuple[str, float]]:
-    """Rerank candidates using CrossEncoder."""
-    torch.cuda.reset_peak_memory_stats()
-    torch.cuda.synchronize()
+def load_legacy_db_cases(limit_queries: int, candidate_limit: int) -> list[QueryCase]:
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        raise RuntimeError("legacy DB mode requires DATABASE_URL")
+
+    import psycopg  # lazy: frozen JSON evaluation does not require psycopg
+
+    candidate_model = os.environ.get("CROSS_ENCODER_BASELINE_MODEL", "xgboost_v2")
+    cases: list[QueryCase] = []
+    with psycopg.connect(database_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT q.query_id, q.query_text
+                FROM evaluation_queries q
+                JOIN evaluation_splits s ON q.query_id = s.query_id
+                WHERE s.split_name = 'test'
+                ORDER BY q.query_id
+                LIMIT %s
+                """,
+                (limit_queries,),
+            )
+            queries = list(cur.fetchall())
+
+        for query_id, query_text in queries:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT packet_key, text, xgboost_v2_score, relevance_grade
+                    FROM retrieval_results
+                    WHERE query_id = %s AND model = %s
+                    ORDER BY xgboost_v2_score DESC
+                    LIMIT %s
+                    """,
+                    (query_id, candidate_model, candidate_limit),
+                )
+                candidates = [
+                    Candidate(
+                        packet_key=str(row[0]),
+                        text=str(row[1]),
+                        baseline_score=float(row[2] or 0.0),
+                        relevance_grade=int(row[3] or 0),
+                    )
+                    for row in cur.fetchall()
+                ]
+            cases.append(QueryCase(str(query_id), str(query_text), candidates))
+    return cases
+
+
+def rerank_batch(tokenizer, model, device: torch.device, query: str, candidates: list[Candidate]) -> RerankExecution:
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
+        torch.cuda.synchronize(device)
 
     started = time.perf_counter()
     scored: list[tuple[str, float]] = []
 
     for start in range(0, len(candidates), BATCH_SIZE):
         batch = candidates[start : start + BATCH_SIZE]
-        pairs = [[query, c["text"]] for c in batch]
-
+        pairs = [[query, candidate.text] for candidate in batch]
         encoded = tokenizer(
             pairs,
             padding=True,
             truncation=True,
             max_length=MAX_LENGTH,
             return_tensors="pt",
-        ).to("cuda")
+        ).to(device)
 
         with torch.inference_mode():
-            logits = model(**encoded).logits.reshape(-1).float().cpu().numpy()
+            logits = model(**encoded).logits.reshape(-1).float().cpu().tolist()
 
         scored.extend(
-            (c["packet_key"], float(score))
-            for c, score in zip(batch, logits, strict=True)
+            (candidate.packet_key, float(score))
+            for candidate, score in zip(batch, logits, strict=True)
         )
 
-    torch.cuda.synchronize()
-    elapsed_ms = (time.perf_counter() - started) * 1_000
-    peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+        peak_mb = torch.cuda.max_memory_allocated(device) / (1024 * 1024)
+    else:
+        peak_mb = 0.0
 
-    # Sort by score (descending)
-    ranked = sorted(scored, key=lambda x: x[1], reverse=True)
-
-    print(
-        f"  Reranked {len(candidates)} candidates in {elapsed_ms:.2f}ms, "
-        f"peak VRAM {peak_mb:.2f}MB"
+    return RerankExecution(
+        ranking=sorted(scored, key=lambda item: item[1], reverse=True),
+        latency_ms=(time.perf_counter() - started) * 1000,
+        vram_peak_mb=peak_mb,
+        device=device.type,
     )
 
-    return ranked, elapsed_ms, peak_mb
+
+def dcg_at_k(ranking: list[tuple[str, float]], gold_grades: dict[str, int], k: int) -> float:
+    total = 0.0
+    for position, (packet_key, _) in enumerate(ranking[:k], start=1):
+        grade = max(0, int(gold_grades.get(packet_key, 0)))
+        total += (2**grade - 1) / math.log2(position + 1)
+    return total
 
 
-def compute_ndcg_at_5(ranking: list[tuple[str, float]], gold_grades: dict) -> float:
-    """Compute NDCG@5 for a ranking against gold labels."""
-    dcg = 0.0
-    idcg = 0.0
-
-    for i, (packet_key, _) in enumerate(ranking[:5]):
-        grade = gold_grades.get(packet_key, 0)
-        relevance = (2 ** grade - 1) / (2 ** (i + 1))
-        dcg += relevance
-
-    # Ideal DCG (assuming grades 3, 3, 3, 2, 2)
-    ideal_grades = [3, 3, 3, 2, 2]
-    for i, grade in enumerate(ideal_grades):
-        relevance = (2 ** grade - 1) / (2 ** (i + 1))
-        idcg += relevance
-
-    if idcg == 0:
-        return 0.0
-
-    return dcg / idcg
+def ndcg_at_k(ranking: list[tuple[str, float]], gold_grades: dict[str, int], k: int) -> float:
+    dcg = dcg_at_k(ranking, gold_grades, k)
+    ideal = sorted(gold_grades.items(), key=lambda item: item[1], reverse=True)
+    ideal_ranking = [(packet_key, float(grade)) for packet_key, grade in ideal]
+    idcg = dcg_at_k(ideal_ranking, gold_grades, k)
+    return 0.0 if idcg == 0 else dcg / idcg
 
 
-def benchmark_query(
-    conn: psycopg.Connection,
-    tokenizer: AutoTokenizer,
-    model: AutoModelForSequenceClassification,
-    query_id: str,
-    query_text: str,
-) -> BenchmarkResult:
-    """Benchmark a single query."""
-    # Fetch XGBoost v2 top-20
-    candidates = fetch_xgboost_v2_top_20(conn, query_id)
-
-    if not candidates:
-        print(f"[Benchmark] Query {query_id}: no candidates found, skipping")
+def benchmark_case(tokenizer, model, device: torch.device, case: QueryCase, top_k: int) -> Optional[BenchmarkResult]:
+    if not case.candidates:
+        print(f"[Benchmark] {case.query_id}: no candidates, skip")
         return None
 
-    print(f"[Benchmark] Query {query_id}: {len(candidates)} candidates")
-
-    # Rerank
-    ranked, latency_ms, vram_peak_mb = rerank_batch(
-        tokenizer, model, query_text, candidates
+    baseline = sorted(
+        [(candidate.packet_key, candidate.baseline_score) for candidate in case.candidates],
+        key=lambda item: item[1],
+        reverse=True,
     )
-
-    # Extract top-5
-    xgboost_top_5 = [
-        (c["packet_key"], c["xgboost_score"]) for c in candidates[:5]
-    ]
-    reranker_top_5 = ranked[:5]
-
-    # Overlap
-    xgboost_keys = set(k for k, _ in xgboost_top_5)
-    reranker_keys = set(k for k, _ in reranker_top_5)
-    overlap = len(xgboost_keys & reranker_keys)
-
-    # NDCG@5 (if gold judgments available)
-    gold_grades = {c["packet_key"]: c["relevance_grade"] for c in candidates}
-    ndcg_xgboost = compute_ndcg_at_5(xgboost_top_5, gold_grades)
-    ndcg_reranker = compute_ndcg_at_5(reranker_top_5, gold_grades)
-    ndcg_delta = ndcg_reranker - ndcg_xgboost if ndcg_xgboost > 0 else None
+    execution = rerank_batch(tokenizer, model, device, case.query_text, case.candidates)
+    gold = {candidate.packet_key: candidate.relevance_grade for candidate in case.candidates}
+    baseline_keys = {packet_key for packet_key, _ in baseline[:top_k]}
+    reranked_keys = {packet_key for packet_key, _ in execution.ranking[:top_k]}
+    ndcg_baseline = ndcg_at_k(baseline, gold, top_k)
+    ndcg_reranker = ndcg_at_k(execution.ranking, gold, top_k)
 
     return BenchmarkResult(
-        query_id=query_id,
-        query_text=query_text,
-        candidate_count=len(candidates),
-        latency_ms=latency_ms,
-        vram_peak_mb=vram_peak_mb,
-        xgboost_top_5=xgboost_top_5,
-        reranker_top_5=reranker_top_5,
-        overlap_at_5=overlap,
-        ndcg_xgboost=ndcg_xgboost,
+        query_id=case.query_id,
+        candidate_count=len(case.candidates),
+        latency_ms=execution.latency_ms,
+        vram_peak_mb=execution.vram_peak_mb,
+        device=execution.device,
+        overlap_at_k=len(baseline_keys & reranked_keys),
+        ndcg_baseline=ndcg_baseline,
         ndcg_reranker=ndcg_reranker,
-        ndcg_delta=ndcg_delta,
+        ndcg_delta=ndcg_reranker - ndcg_baseline,
     )
 
 
-def main():
-    parser = argparse.ArgumentParser(description="CrossEncoder benchmark")
-    parser.add_argument("--dry-run", action="store_true", help="Do not write results")
-    parser.add_argument(
-        "--top-k", type=int, default=5, help="Top-K candidates to evaluate"
-    )
+def write_result(path: Path, results: list[BenchmarkResult], top_k: int) -> None:
+    payload: dict[str, Any] = {
+        "schema": "atlas.cross-encoder-eval.v1",
+        "model_revision": MODEL_REVISION,
+        "tokenizer_revision": TOKENIZER_REVISION,
+        "inference_revision": INFERENCE_REVISION,
+        "max_length": MAX_LENGTH,
+        "top_k": top_k,
+        "results": [asdict(result) for result in results],
+    }
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="CrossEncoder reranker benchmark")
+    parser.add_argument("--input", type=Path, help="Frozen candidate JSON; preferred evaluation source")
+    parser.add_argument("--legacy-db", action="store_true", help="Use legacy live DB evaluation source")
+    parser.add_argument("--device", choices=["auto", "cuda", "cpu"], default="auto")
+    parser.add_argument("--top-k", type=int, default=5)
+    parser.add_argument("--candidate-limit", type=int, default=20)
+    parser.add_argument("--query-limit", type=int, default=15)
+    parser.add_argument("--output", type=Path, default=Path("crossencoder-benchmark-results.json"))
+    parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
-    print("[Benchmark] CrossEncoder Reranker Benchmark")
-    print(f"[Benchmark] Model: {MODEL_ID}")
-    print(f"[Benchmark] Device: cuda" if torch.cuda.is_available() else "cpu")
+    if args.top_k <= 0:
+        raise SystemExit("--top-k must be > 0")
+    if bool(args.input) == bool(args.legacy_db):
+        raise SystemExit("choose exactly one of --input or --legacy-db")
 
-    # Load model
-    tokenizer, model = load_model()
+    cases = (
+        load_frozen_cases(args.input)
+        if args.input
+        else load_legacy_db_cases(args.query_limit, args.candidate_limit)
+    )
+    device = resolve_device(args.device)
+    tokenizer, model = load_model(device)
 
-    # Connect to DB
-    print("[Benchmark] Connecting to database...")
-    conn = psycopg.connect(DB_URL)
+    results = [
+        result
+        for case in cases
+        if (result := benchmark_case(tokenizer, model, device, case, args.top_k)) is not None
+    ]
 
-    # Fetch test queries (from evaluation_splits)
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT q.query_id, q.query_text
-        FROM evaluation_queries q
-        JOIN evaluation_splits s ON q.query_id = s.query_id
-        WHERE s.split_name = 'test'
-        ORDER BY q.query_id
-        LIMIT 15
-    """)
-
-    test_queries = [(row[0], row[1]) for row in cur.fetchall()]
-    print(f"[Benchmark] Found {len(test_queries)} test queries")
-
-    # Benchmark each query
-    results = []
-    for query_id, query_text in test_queries:
-        result = benchmark_query(conn, tokenizer, model, query_id, query_text)
-        if result:
-            results.append(result)
-
-    conn.close()
-
-    # Aggregate results
-    if results:
-        print("\n[Benchmark] RESULTS\n")
-        print(f"  Total queries: {len(results)}")
-        print(
-            f"  Avg latency: {sum(r.latency_ms for r in results) / len(results):.2f}ms"
-        )
-        print(
-            f"  Avg VRAM peak: {sum(r.vram_peak_mb for r in results) / len(results):.2f}MB"
-        )
-        print(
-            f"  Avg overlap@5: {sum(r.overlap_at_5 for r in results) / len(results):.2f}"
-        )
-
-        ndcg_deltas = [r.ndcg_delta for r in results if r.ndcg_delta is not None]
-        if ndcg_deltas:
-            mean_delta = sum(ndcg_deltas) / len(ndcg_deltas)
-            print(f"  Mean NDCG@5 delta: {mean_delta:+.4f}")
-
-        # Write results
-        if not args.dry_run:
-            print("\n[Benchmark] Writing results to crossencoder-benchmark-results.json")
-            with open("crossencoder-benchmark-results.json", "w") as f:
-                json.dump(
-                    [
-                        {
-                            "query_id": r.query_id,
-                            "candidate_count": r.candidate_count,
-                            "latency_ms": r.latency_ms,
-                            "vram_peak_mb": r.vram_peak_mb,
-                            "overlap_at_5": r.overlap_at_5,
-                            "ndcg_xgboost": r.ndcg_xgboost,
-                            "ndcg_reranker": r.ndcg_reranker,
-                            "ndcg_delta": r.ndcg_delta,
-                        }
-                        for r in results
-                    ],
-                    f,
-                    indent=2,
-                )
-    else:
+    if not results:
         print("[Benchmark] No results")
+        return 1
+
+    print(f"[Benchmark] queries={len(results)} device={device.type}")
+    print(f"[Benchmark] avg latency={sum(r.latency_ms for r in results) / len(results):.2f}ms")
+    print(f"[Benchmark] avg NDCG@{args.top_k} delta={sum(r.ndcg_delta for r in results) / len(results):+.4f}")
+
+    if not args.dry_run:
+        write_result(args.output, results, args.top_k)
+        print(f"[Benchmark] wrote {args.output}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
