@@ -5,9 +5,9 @@ This facade intentionally reuses the existing ``miniforge_nlp_sidecar``
 analysis implementation while replacing the two boundaries that were still
 lossy:
 
-* ``/ast/chunk`` now passes through native Consiliency treesitter-chunker
+* ``/ast/chunk`` passes through native Consiliency treesitter-chunker
   ``node_id``, ``file_id``, ``symbol_id``, ``chunk_id``, hierarchy and spans.
-* grounded LangExtract metadata now exposes native ``char_interval`` and
+* grounded LangExtract metadata exposes native ``char_interval`` and
   ``alignment_status``.
 
 Neither boundary creates Atlas canonical identity. GIS remains the only symbol
@@ -23,7 +23,7 @@ import time
 from pathlib import Path
 from typing import Any, Literal, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -94,13 +94,7 @@ async def request_timer(request: Request, call_next):
 
 
 def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> list[dict[str, Any]]:
-    """Run LangExtract and retain its actual grounding/alignment metadata.
-
-    Ungrounded results remain observable to the caller only if another future
-    diagnostic path chooses to retain them; this canonical-evidence metadata
-    path filters them out because ``char_interval=None`` is explicitly
-    ungrounded according to LangExtract.
-    """
+    """Run LangExtract and retain its actual grounding/alignment metadata."""
 
     if not legacy.LANGEXTRACT_AVAILABLE or legacy.langextract is None:
         return []
@@ -128,13 +122,12 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
             continue
         extracted.append(
             {
-                # Current compatibility names retained for callers already using
-                # metadata.grounded_extractions.
+                # Compatibility aliases retained while current callers migrate.
                 "class": normalized["extraction_class"],
                 "text": normalized["extraction_text"],
                 "start_char": start_pos,
                 "end_char": end_pos,
-                # Native LangExtract contract.
+                # Native LangExtract grounding contract.
                 "extraction_class": normalized["extraction_class"],
                 "extraction_text": normalized["extraction_text"],
                 "char_interval": interval,
@@ -151,11 +144,19 @@ def _native_grounded_extractions(text: str, model_id: Optional[str] = None) -> l
 legacy._grounded_extractions = _native_grounded_extractions
 
 
-def _raw_chunk_file(source: str, language: str, file_path: str) -> list[Any]:
+def _raw_chunk_file(source: str, language: str, file_path: str) -> tuple[list[Any], bool]:
+    """Return raw chunks plus whether logical identity_path was honored.
+
+    If an older treesitter-chunker API rejects ``identity_path`` we may still
+    return structural evidence for search/diagnostics, but the response is
+    explicitly degraded so Graphify cannot allow GIS promotion from potentially
+    tempfile-affine upstream IDs.
+    """
+
     module = legacy.TREESITTER_CHUNKER_MODULE
     chunk_file = getattr(module, "chunk_file", None) if module is not None else None
     if not callable(chunk_file):
-        return []
+        return [], False
 
     suffix_map = {
         "tsx": ".tsx",
@@ -175,20 +176,23 @@ def _raw_chunk_file(source: str, language: str, file_path: str) -> list[Any]:
             handle.write(source)
             temp_path = handle.name
         try:
-            return list(
-                chunk_file(
-                    temp_path,
-                    language,
-                    extract_metadata=True,
-                    include_retrieval_metadata=True,
-                    # Consiliency uses identity_path specifically so IDs can be
-                    # based on the logical repository path instead of tempfile.
-                    identity_path=file_path,
-                )
-                or []
+            return (
+                list(
+                    chunk_file(
+                        temp_path,
+                        language,
+                        extract_metadata=True,
+                        include_retrieval_metadata=True,
+                        # Logical repository path is required for stable upstream
+                        # identities; tempfile path must never be treated as proof.
+                        identity_path=file_path,
+                    )
+                    or []
+                ),
+                True,
             )
         except TypeError:
-            return list(chunk_file(temp_path, language=language) or [])
+            return list(chunk_file(temp_path, language=language) or []), False
     finally:
         if temp_path:
             Path(temp_path).unlink(missing_ok=True)
@@ -232,11 +236,17 @@ def _native_ast_evidence(req: legacy.AstChunkRequest) -> AstEvidenceResponseV2:
             syntax_status="RECOVERED_WITH_ERRORS",
         )
 
+    identity_path_preserved = False
     try:
-        raw_chunks = _raw_chunk_file(req.source, language, req.file_path)
+        raw_chunks, identity_path_preserved = _raw_chunk_file(req.source, language, req.file_path)
     except Exception as exc:
         raw_chunks = []
         diagnostics.append(f"ChunkingError: treesitter-chunker extraction failed: {exc}")
+
+    if raw_chunks and not identity_path_preserved:
+        diagnostics.append(
+            "CONSILIENCY_IDENTITY_PATH_UNPROVEN: chunker API rejected identity_path; upstream IDs may be tempfile-affine and are not promotable"
+        )
 
     diagnostics.extend(legacy._syntax_diagnostics(req.source, language))
     evidence_chunks: list[AstEvidenceChunkV2] = []
@@ -365,6 +375,7 @@ def capabilities() -> dict[str, Any]:
     result = dict(legacy.capabilities())
     result["structuralProvenance"] = {
         "nativeConsiliencyIds": True,
+        "identityPathRequiredForPromotion": True,
         "langextractCharInterval": True,
         "langextractAlignmentStatus": True,
         "canonicalIdentityAuthority": False,
