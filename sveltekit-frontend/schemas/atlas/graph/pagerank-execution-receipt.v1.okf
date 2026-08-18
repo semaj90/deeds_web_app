@@ -1,0 +1,33 @@
+schema_id: atlas.pagerank-execution-receipt
+schema_version: 1
+schema_kind: graph_execution_receipt
+status: ACTIVE
+
+description: >
+  Cross-backend receipt for comparing NetworkX, cuGraph, or Neo4j GDS PageRank
+  on the same revisioned graph projection and configuration.
+
+fields:
+  schema: { type: literal, value: atlas.pagerank-execution-receipt.v1 }
+  backend: { type: enum, values: [networkx, cugraph, neo4j-gds] }
+  graphRevision: { type: string, required: true }
+  projectionRevision: { type: string, required: true }
+  projectionHash: { type: string, required: true }
+  config: { type: object, required: true }
+  configHash: { type: string, required: true }
+  resultHash: { type: string, required: true }
+  nodeCount: { type: integer, minimum: 0 }
+  edgeCount: { type: integer, minimum: 0 }
+  computedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+parity_preconditions:
+  - graphRevision must match
+  - projectionRevision must match
+  - projectionHash must match
+  - configHash must match
+
+invariants:
+  - alpha including 0.85 is captured inside config
+  - backend identity is execution metadata, never a recommendation feature
