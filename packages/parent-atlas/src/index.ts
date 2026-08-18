@@ -167,6 +167,7 @@ export * from './core/retrieval-action-receipt.js';
 export * from './core/relationship-vector-projection.js';
 export * from './core/graph-projection-parity.js';
 export * from './core/semantic-executor-manifest.js';
+export * from './core/executor-plans.js';
 export * from './core/multiview-rerank.js';
 export * from './core/qlora-dataset-export.js';
 export * from './core/ace-hypergraph-payload.js';
