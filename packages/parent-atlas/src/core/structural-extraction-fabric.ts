@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   astGrepObservationSchema,
+  deriveUpstreamSymbolNominationKey,
   groundedLangExtractObservationSchema,
   structuralReferenceFactSchema,
   structuralSymbolNominationSchema,
@@ -52,6 +53,8 @@ export const structuralExtractionReceiptSchema = z.object({
   chunk_count: z.number().int().nonnegative(),
   xref_edge_count: z.number().int().nonnegative(),
   symbol_nomination_count: z.number().int().nonnegative(),
+  native_symbol_nomination_count: z.number().int().nonnegative(),
+  path_affine_symbol_nomination_count: z.number().int().nonnegative(),
   reference_fact_count: z.number().int().nonnegative(),
   ast_grep_observation_count: z.number().int().nonnegative(),
   grounded_langextract_count: z.number().int().nonnegative(),
@@ -116,19 +119,32 @@ export function compileStructuralExtractionFabric(
   const chunkByNodeId = new Map(chunks.map((chunk) => [chunk.upstream_node_id, chunk]));
 
   const symbolNominations: StructuralSymbolNominationV1[] = [];
+  let nativeSymbolNominations = 0;
+  let pathAffineSymbolNominations = 0;
   for (const chunk of chunks) {
     const kind = mapChunkKindToSymbolKind(chunk.kind || chunk.node_type);
-    if (!kind || !chunk.symbol_name || !chunk.upstream_symbol_id) continue;
+    if (!kind || !chunk.symbol_name) continue;
+
+    const qualifiedName = [...chunk.parent_route, chunk.symbol_name].filter(Boolean).join('::');
+    const symbolKey = deriveUpstreamSymbolNominationKey({
+      language: input.language,
+      source_ref: input.source_ref,
+      kind,
+      qualified_name: qualifiedName,
+      upstream_symbol_id: chunk.upstream_symbol_id,
+    });
+    if (chunk.upstream_symbol_id) nativeSymbolNominations += 1;
+    else pathAffineSymbolNominations += 1;
 
     symbolNominations.push(structuralSymbolNominationSchema.parse({
       nomination_id: `treesitter-chunker:${chunk.upstream_node_id}:${input.source_revision}`,
-      symbol_key: `upstream-symbol:${chunk.upstream_symbol_id}`,
+      symbol_key: symbolKey,
       identity_status: 'nominated',
       role: 'definition',
       kind,
       language: input.language,
       name: chunk.symbol_name,
-      qualified_name: [...chunk.parent_route, chunk.symbol_name].filter(Boolean).join('::'),
+      qualified_name: qualifiedName,
       container_qualified_name: chunk.parent_context ?? null,
       source_ref: input.source_ref,
       source_revision: input.source_revision,
@@ -174,8 +190,6 @@ export function compileStructuralExtractionFabric(
     }));
   }
 
-  // LangExtract observations are required to be grounded. The schema itself
-  // rejects char-interval-less extractions, mirroring LangExtract guidance.
   const groundedLangExtract = input.langextract_observations.map((item) =>
     groundedLangExtractObservationSchema.parse(item));
 
@@ -193,6 +207,8 @@ export function compileStructuralExtractionFabric(
       chunk_count: chunks.length,
       xref_edge_count: input.xref_edges.length,
       symbol_nomination_count: symbolNominations.length,
+      native_symbol_nomination_count: nativeSymbolNominations,
+      path_affine_symbol_nomination_count: pathAffineSymbolNominations,
       reference_fact_count: referenceFacts.length,
       ast_grep_observation_count: input.ast_grep_observations.length,
       grounded_langextract_count: groundedLangExtract.length,
@@ -208,6 +224,7 @@ export function describeStructuralExtractionFabric(): string {
   return [
     'Consiliency treesitter-chunker is the primary code structural/chunk/XRef evidence producer.',
     'Its node_id, file_id, symbol_id and chunk_id are preserved as upstream provenance and join keys.',
+    'Named chunks may nominate a path-affine symbol key when a native upstream symbol_id is unavailable; that nomination is never canonical identity.',
     'ast-grep contributes deterministic structural-pattern observations and never creates canonical Atlas identity.',
     'LangExtract contributes grounded semantic/entity/relation observations; char-interval-less results are rejected before canonical evidence.',
     'Parent Atlas canonical promotion alone assigns stable_symbol_id, symbol_version_id, feature_id and relationship_id.',
