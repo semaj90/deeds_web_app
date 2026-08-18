@@ -6,7 +6,8 @@ import process from 'node:process';
 
 const root = process.cwd();
 const paths = {
-  sidecar: path.join(root, 'python', 'miniforge_nlp_sidecar.py'),
+  legacySidecar: path.join(root, 'python', 'miniforge_nlp_sidecar.py'),
+  sidecarV2: path.join(root, 'python', 'miniforge_nlp_sidecar_v2.py'),
   helper: path.join(root, 'python', 'atlas_structural_provenance.py'),
   helperTest: path.join(root, 'python', 'test_atlas_structural_provenance.py'),
   client: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'nlp', 'miniforge-nlp-sidecar.ts'),
@@ -14,6 +15,8 @@ const paths = {
   materializer: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'atlas', 'indexing', 'graphify-structural-materializer.ts'),
   astGrep: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'analysis', 'ast-grep-extractor.ts'),
   proof: path.join(root, 'scripts', 'atlas', 'prove-ast-sidecar.mjs'),
+  dockerfile: path.join(root, 'docker', 'miniforge-nlp-sidecar', 'Dockerfile'),
+  launcher: path.join(root, 'scripts', 'launch-miniforge-nlp-sidecar.ps1'),
 };
 
 async function exists(file) {
@@ -38,14 +41,16 @@ for (const [name, file] of Object.entries(paths)) {
   check(`${name.toUpperCase()}_EXISTS`, await exists(file), path.relative(root, file), 'presence');
 }
 
-const [sidecar, helper, client, normalizer, materializer, astGrep, proof] = await Promise.all([
-  read(paths.sidecar),
+const [sidecarV2, helper, client, normalizer, materializer, astGrep, proof, dockerfile, launcher] = await Promise.all([
+  read(paths.sidecarV2),
   read(paths.helper),
   read(paths.client),
   read(paths.normalizer),
   read(paths.materializer),
   read(paths.astGrep),
   read(paths.proof),
+  read(paths.dockerfile),
+  read(paths.launcher),
 ]);
 
 check(
@@ -90,24 +95,39 @@ check(
   'live proof separately checks LangExtract native grounding/alignment',
 );
 
-// Production integration gates. These deliberately remain red until the Python
-// sidecar imports/calls the helper rather than reconstructing native IDs itself.
+// Production deployment gates. The provenance-v2 facade is the selected owner
+// for 8095 while the legacy monolith remains an explicit rollback target.
 check(
-  'SIDECAR_IMPORTS_PROVENANCE_HELPER',
-  /from\s+atlas_structural_provenance\s+import|import\s+atlas_structural_provenance/.test(sidecar),
-  'TODO: import python/atlas_structural_provenance.py in miniforge_nlp_sidecar.py',
+  'SIDECAR_V2_IMPORTS_PROVENANCE_HELPER',
+  sidecarV2.includes('normalize_treesitter_chunker_chunk') && sidecarV2.includes('normalize_langextract_extraction'),
+  'provenance-v2 facade imports both normalization helpers',
   'live',
 );
 check(
-  'SIDECAR_USES_NATIVE_CHUNK_NORMALIZER',
-  sidecar.includes('normalize_treesitter_chunker_chunk('),
-  'TODO: normalize every raw Consiliency CodeChunk before building AstEvidenceChunk',
+  'SIDECAR_V2_PRESERVES_NATIVE_IDS',
+  sidecarV2.includes('upstream_node_id=normalized.get("upstream_node_id")')
+    && sidecarV2.includes('upstream_file_id=normalized.get("upstream_file_id")')
+    && sidecarV2.includes('upstream_symbol_id=normalized.get("upstream_symbol_id")')
+    && sidecarV2.includes('identity_path=file_path'),
+  'provenance-v2 /ast/chunk maps native Consiliency IDs and logical identity path',
   'live',
 );
 check(
-  'SIDECAR_USES_LANGEXTRACT_NORMALIZER',
-  sidecar.includes('normalize_langextract_extraction('),
-  'TODO: preserve LangExtract char_interval + alignment_status instead of legacy start_char/end_char',
+  'SIDECAR_V2_PRESERVES_LANGEXTRACT_GROUNDING',
+  sidecarV2.includes('"char_interval": interval') && sidecarV2.includes('"alignment_status": normalized.get("alignment_status")'),
+  'provenance-v2 /analyze exposes native LangExtract grounding metadata',
+  'live',
+);
+check(
+  'DOCKER_LAUNCHES_PROVENANCE_V2',
+  dockerfile.includes('miniforge_nlp_sidecar_v2.py'),
+  'Docker 8095 entrypoint selects provenance-v2 facade',
+  'live',
+);
+check(
+  'LOCAL_LAUNCHER_DEFAULTS_TO_PROVENANCE_V2',
+  launcher.includes("'miniforge_nlp_sidecar_v2.py'") && launcher.includes('UseLegacySidecar'),
+  'PowerShell launcher defaults to provenance-v2 with explicit legacy rollback',
   'live',
 );
 
@@ -116,20 +136,22 @@ const scaffoldPass = checks.filter((item) => item.category === 'scaffold').every
 const liveWired = checks.filter((item) => item.category === 'live').every((item) => item.ok);
 
 const receipt = {
-  schema: 'atlas.structural-provenance-wiring-audit.v2',
+  schema: 'atlas.structural-provenance-wiring-audit.v3',
   status: presencePass && scaffoldPass && liveWired
-    ? 'PROVEN'
+    ? 'WIRED_UNPROVEN_RUNTIME'
     : presencePass && scaffoldPass
       ? 'SCAFFOLDED_LIVE_WIRING_PENDING'
       : 'INCOMPLETE',
   presence_ready: presencePass,
   scaffold_ready: scaffoldPass,
   live_sidecar_wired: liveWired,
+  runtime_proven: false,
   red_gates: checks.filter((item) => !item.ok).map((item) => item.id),
+  next_runtime_gate: 'Run scripts/atlas/prove-ast-sidecar.mjs against the launched provenance-v2 service.',
   checks,
 };
 
 console.log(JSON.stringify(receipt, null, 2));
-// Scaffolding may be intentionally complete while the live sidecar remains red.
-// Exit non-zero only when the checked-in scaffold itself is incomplete.
-process.exitCode = presencePass && scaffoldPass ? 0 : 1;
+// Static wiring can be complete without runtime proof. Runtime proof is emitted
+// separately by prove-ast-sidecar.mjs against the actual 8095 process.
+process.exitCode = presencePass && scaffoldPass && liveWired ? 0 : 1;
