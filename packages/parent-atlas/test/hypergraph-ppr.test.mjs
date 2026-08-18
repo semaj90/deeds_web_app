@@ -40,7 +40,7 @@ test('incidence PPR is deterministic and favors relationships reachable from the
     source_snapshot_revision: 'snapshot-r1',
     seed_entity_ids: ['route:patch-case'],
     relationships: [auth, validation, unrelated],
-    config: { alpha: 0.15, maximum_iterations: 200, tolerance: 1e-12 },
+    config: { alpha: 0.85, maximum_iterations: 200, tolerance: 1e-12 },
   };
 
   const first = runHypergraphPersonalizedPageRank(input);
@@ -48,6 +48,8 @@ test('incidence PPR is deterministic and favors relationships reachable from the
 
   assert.deepEqual(first, second);
   assert.equal(first.schema, 'atlas.hypergraph-ppr-receipt.v1');
+  assert.equal(first.alpha, 0.85);
+  assert.ok(Math.abs(first.teleport_probability - 0.15) < 1e-12);
   assert.ok(first.iterations > 0);
   assert.ok(first.relationship_scores['rel:auth'] > first.relationship_scores['rel:unrelated']);
   assert.ok(first.relationship_scores['rel:test'] > first.relationship_scores['rel:unrelated']);
