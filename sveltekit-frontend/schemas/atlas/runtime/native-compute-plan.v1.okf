@@ -13,7 +13,7 @@ fields:
   planId: { type: string, required: true }
   operation:
     type: enum
-    values: [GEMM, GEMV, COSINE_TOPK, SVD, PCA, PAGERANK, PPR, KNN_EXACT, KNN_ANN, GNN_INFER, MODEL_INFER, CLASSIFY, RERANK]
+    values: [GEMM, GEMV, COSINE_TOPK, SIGNED_S3_DOT, LOW_RANK_PROJECT, SVD, PCA, PAGERANK, PPR, KNN_EXACT, KNN_ANN, GNN_INFER, MODEL_INFER, CLASSIFY, RERANK]
   capability: { type: string, required: true }
   referenceBackend:
     type: enum
@@ -51,3 +51,5 @@ invariants:
   - int8 requires accuracyReceiptId proving the task-specific quality threshold
   - PageRank/PPR parameters and graph projection identity live in graph receipts, not implicit executor defaults
   - SVD proof compares invariant quantities such as singular values/reconstruction/subspace, not raw U/Vh bytes
+  - SIGNED_S3_DOT is retrieval feature-direction geometry where x and -x are different; true quaternion q~-q behavior stays in the experimental quaternion module
+  - LOW_RANK_PROJECT is a derived representation executor and never creates canonical identity
