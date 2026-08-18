@@ -128,7 +128,7 @@ try {
     ORDER BY ordinal_position
   `);
   const schemaColumnNames = new Set(schemaRegistryColumns.rows.map((row) => row.column_name));
-  gates.SCHEMA_REGISTRY_VERSION_PROVENANCE = ['catalog_oid', 'schema_revision', 'definition_hash', 'object_version_id', 'stable_schema_object_id']
+  gates.SCHEMA_REGISTRY_VERSION_PROVENANCE = ['catalog_oid', 'schema_revision', 'definition_hash', 'schema_object_version_id', 'stable_schema_object_id']
     .every((name) => schemaColumnNames.has(name));
   details.schema_registry_version_columns = [...schemaColumnNames];
 
