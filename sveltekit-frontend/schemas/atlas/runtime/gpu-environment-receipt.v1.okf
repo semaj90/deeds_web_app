@@ -1,0 +1,58 @@
+schema_id: atlas.gpu-environment-receipt
+schema_version: 1
+schema_kind: gpu_environment_receipt
+status: ACTIVE
+
+description: >
+  Proven runtime environment for one physical NVIDIA GPU as seen from either
+  Windows-native or WSL2. Receipts are evidence for admission and reproducible
+  benchmarking; they do not make CUDA toolkit versions part of semantic identity.
+
+fields:
+  schema: { type: literal, value: atlas.gpu-environment-receipt.v1 }
+  receiptId: { type: string, required: true }
+  runtime:
+    type: enum
+    values: [windows-native, wsl2]
+  status:
+    type: enum
+    values: [PROVEN, DEGRADED, UNAVAILABLE]
+  os: { type: string, required: true }
+  distro: { type: string, nullable: true }
+  kernelRevision: { type: string, nullable: true }
+  windowsBuild: { type: string, nullable: true }
+  gpuName: { type: string, required: true }
+  pciDeviceId: { type: string, required: true }
+  deviceUuid: { type: string, nullable: true }
+  computeCapability: { type: string, required: true }
+  driverRevision: { type: string, required: true }
+  cudaToolkitRevision: { type: string, nullable: true }
+  cudaDriverApiAvailable: { type: boolean }
+  windowsDriverBridge: { type: boolean }
+  libraries:
+    type: object
+    fields:
+      cublas: { type: string, nullable: true }
+      cublasLt: { type: string, nullable: true }
+      cusolver: { type: string, nullable: true }
+      cutlass: { type: string, nullable: true }
+      cutile: { type: string, nullable: true }
+      libtorch: { type: string, nullable: true }
+      pytorch: { type: string, nullable: true }
+      tensorrtRtx: { type: string, nullable: true }
+      tensorrtLlm: { type: string, nullable: true }
+      rapids: { type: string, nullable: true }
+      cugraph: { type: string, nullable: true }
+      cuvs: { type: string, nullable: true }
+      cupy: { type: string, nullable: true }
+  buildRevision: { type: string, nullable: true }
+  evidenceRefs: { type: string_array, default: [] }
+  observedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+validation_rules:
+  - windows-native TensorRT-RTX 1.6 is admissible only when the installed CUDA toolkit matches an NVIDIA-supported package family
+  - wsl2 must use the Windows NVIDIA driver bridge; installing a Linux NVIDIA display driver is a proof failure
+  - TensorRT-LLM is a WSL2/Linux executor and does not imply TensorRT-RTX availability on Windows
+  - PROVEN requires the selected executor's library/version plus CUDA/device evidence
