@@ -20,6 +20,7 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 - [ ] FI-09 Parse schema/migrations into table, column, FK, index and policy evidence.
 - [ ] FI-10 Join AST/symbol/route/test evidence to feature candidates.
 - [ ] FI-11 Add version-qualified external documentation evidence and version-mismatch flags.
+- [ ] FI-11B Materialize `atlas_evidence_entities` from AST/schema/runtime/test/OpenSpec evidence. **Table/view/query-time neighborhood migration written; extractor/backfill + live proof pending.**
 
 ## P1 — Feature evidence graph
 
@@ -29,7 +30,7 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 - [x] FI-13C1 Define a lossless relationship-node incidence projection and a reversible pairwise projection retaining `relationship_id`, roles and revision.
 - [ ] FI-13C2 Materialize pairwise/incidence graph projections and prove reconstruction/parity against canonical Postgres facts.
 - [ ] FI-14 Project canonical graph snapshot to Neo4j and NetworkX/cuGraph with parity receipts.
-- [ ] FI-15 Compute PageRank/PPR/fanout/blocking metrics by canonical `feature_id`; keep graph node degree separate from relationship degree.
+- [ ] FI-15 Compute PageRank/PPR/fanout/blocking metrics by canonical `feature_id`; keep graph node degree separate from relationship degree. **Deterministic CPU incidence-PPR reference + receipt written; live/cross-backend proof pending.**
 
 ## P1 — N-ary retrieval / HyperGraphRAG
 
@@ -40,9 +41,14 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 - [x] FI-16E Define deterministic sufficient-context states/actions so the DAG retrieves a missing evidence class or synthesizes.
 - [x] FI-16F Define ACE hypergraph payload with typed participants, relationship evidence, reasoning chain, sufficiency decision and projection lineage.
 - [x] FI-16G Define a dependency-injected second-stage hypergraph fusion facade over existing first-stage candidates.
-- [ ] FI-16H Wire `HyperRagFusionService` to the Parent Atlas package through an explicit workspace dependency and expose the N-ary facade on the live search/API path. **Blocked from being claimed wired: frontend currently does not declare `@deeds/parent-atlas`; unsafe cross-root imports were removed.**
-- [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts.
-- [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review.
+- [x] FI-16G2 Add query-conditioned relationship selection using semantic relevance, PPR, relation/extraction confidence, evidence coverage and expected relation type. **Test written; execution proof pending.**
+- [x] FI-16G3 Accept first-stage `family=relationship` candidates through an exact canonical relationship resolver hook; add PostgreSQL `findCanonicalRelationshipsByIds()` helper.
+- [ ] FI-16H Wire `HyperRagFusionService` to the Parent Atlas package and expose the N-ary facade on the live search/API path. **Root package links `@deeds/parent-atlas`; frontend live import/adoption remains unproven.**
+- [ ] FI-16I Add query-conditioned PPR executor over relationship/incidence candidates and write revisioned receipts. **CPU reference executor/receipt written; cuGraph/Neo4j parity + live receipt pending.**
+- [ ] FI-16J Add dynamic SQL hyperedge construction from canonical shared-entity/evidence joins and promotion review. **`atlas_evidence_entities`, event-hyperedge view, bounded SQL neighborhood function and TS reader written; extractor/backfill/apply/promotion workflow pending.**
+- [x] FI-16K Add executable ACE hypergraph packet fixture covering canonical entity seed + direct relationship candidate + typed evidence chain + sufficient-context synthesis gate. **Test source written; not executed in this connector session.**
+- [ ] FI-16L Attach `AceHypergraphPayloadV1` to the existing `CanonicalAcePacketEnvelope` / `HyperRAGPacketPipeline` materialization path under a versioned optional field; keep packet identity unchanged.
+- [ ] FI-16M Add retrieval-action receipt for every `NEED_* -> DAG action -> new evidence -> sufficiency re-evaluation` loop.
 
 ## P1 — Retrieval reconciliation
 
@@ -51,6 +57,7 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 - [ ] FI-19 Enforce one vote per logical lane regardless of executor count. **`CandidateFabricV1` and ACE payload encode `semantic_lane_votes = 1`; existing runtime fusion still needs adoption proof.**
 - [ ] FI-20 Add degraded-identity observability and exact promotion before fusion.
 - [ ] FI-21 Add SVD/randomized-low-rank/leverage-sampling candidate generation over a revisioned feature/evidence matrix; never promote relations without evidence inspection.
+- [ ] FI-21B Add exact multi-view rerank after future MUVERA/FDE candidate nomination; FDE/ANN is nomination only, original views remain rerank/evidence inputs.
 
 ## P1 — Derived feature matrix / model-routing projections
 
@@ -85,8 +92,11 @@ A checked item means the named contract/code slice exists on this branch. Runtim
 - [x] Recursive same-entity-type relationships can have multiple participants but degree 1.
 - [x] Relationship degree is distinct from cardinality and graph node degree.
 - [ ] Pairwise graph projection of an N-ary fact reconstructs the original canonical relationship ID in executed tests/parity receipts. **Test written; not executed in this connector session.**
-- [ ] Incidence projection retains one relationship node plus every typed participant role.
+- [ ] Incidence projection retains one relationship node plus every typed participant role in executed parity proof.
+- [ ] Query-conditioned fanout selects the highest supported relation rather than relationship-ID order. **Test written; not executed.**
+- [ ] CPU incidence-PPR is deterministic and cuGraph/Neo4j PPR matches within a declared tolerance. **CPU test written; cross-backend execution pending.**
 - [ ] Dynamic SQL hyperedges cannot enter canonical relationship tables without promotion review.
+- [ ] ACE packet construction produces canonical relationship IDs, typed participant roles, evidence refs, chain lineage and a sufficient-context decision. **End-to-end fixture written; execution pending.**
 - [ ] A checked markdown task alone cannot produce `VERIFIED`.
 - [ ] PageRank/PPR changes priority/routing but cannot directly change completion.
 - [ ] Qdrant/pgvector/CAGRA/TurboVec similarity changes retrieval candidates but cannot directly change completion.
