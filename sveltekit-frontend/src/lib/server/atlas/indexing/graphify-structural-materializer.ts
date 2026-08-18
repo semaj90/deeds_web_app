@@ -52,7 +52,7 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
 }
 
 export type StructuralProvenanceReadiness = {
-  status: 'NATIVE_READY' | 'COMPATIBILITY_ONLY' | 'NO_EVIDENCE';
+  status: 'NATIVE_READY' | 'NATIVE_RECOVERED' | 'COMPATIBILITY_ONLY' | 'NO_EVIDENCE';
   nativeNodeIds: number;
   nativeFileIds: number;
   nativeSymbolIds: number;
@@ -62,7 +62,10 @@ export type StructuralProvenanceReadiness = {
   reason: string;
 };
 
-function evaluateProvenanceReadiness(normalized: NormalizedAtlasStructuralEvidence | null): StructuralProvenanceReadiness {
+function evaluateProvenanceReadiness(
+  normalized: NormalizedAtlasStructuralEvidence | null,
+  providerStatus: AstProviderResult['status'],
+): StructuralProvenanceReadiness {
   if (!normalized || normalized.symbols.length === 0) {
     return {
       status: 'NO_EVIDENCE',
@@ -81,29 +84,43 @@ function evaluateProvenanceReadiness(normalized: NormalizedAtlasStructuralEviden
   const allNodesNative = provenance.nativeNodeIdCount === symbolCount;
   const allFilesNative = provenance.nativeFileIdCount === symbolCount;
   const chunksAvailable = provenance.upstreamChunkIdCount === symbolCount;
+  const nativeComplete = allNodesNative && allFilesNative && chunksAvailable;
 
-  if (allNodesNative && allFilesNative && chunksAvailable) {
+  if (!nativeComplete) {
     return {
-      status: 'NATIVE_READY',
+      status: 'COMPATIBILITY_ONLY',
       nativeNodeIds: provenance.nativeNodeIdCount,
       nativeFileIds: provenance.nativeFileIdCount,
       nativeSymbolIds: provenance.nativeSymbolIdCount,
       upstreamChunkIds: provenance.upstreamChunkIdCount,
       symbolCount,
-      canonicalPromotionAllowed: true,
-      reason: 'All structural symbols retain native Consiliency node/file/chunk provenance; GIS may evaluate canonical promotion.',
+      canonicalPromotionAllowed: false,
+      reason: 'One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical.',
+    };
+  }
+
+  if (providerStatus !== 'PROVEN') {
+    return {
+      status: 'NATIVE_RECOVERED',
+      nativeNodeIds: provenance.nativeNodeIdCount,
+      nativeFileIds: provenance.nativeFileIdCount,
+      nativeSymbolIds: provenance.nativeSymbolIdCount,
+      upstreamChunkIds: provenance.upstreamChunkIdCount,
+      symbolCount,
+      canonicalPromotionAllowed: false,
+      reason: 'Native structural provenance is complete, but the parse was recovered/degraded; evidence may be searched but GIS promotion is blocked.',
     };
   }
 
   return {
-    status: 'COMPATIBILITY_ONLY',
+    status: 'NATIVE_READY',
     nativeNodeIds: provenance.nativeNodeIdCount,
     nativeFileIds: provenance.nativeFileIdCount,
     nativeSymbolIds: provenance.nativeSymbolIdCount,
     upstreamChunkIds: provenance.upstreamChunkIdCount,
     symbolCount,
-    canonicalPromotionAllowed: false,
-    reason: 'One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical.',
+    canonicalPromotionAllowed: true,
+    reason: 'All structural symbols retain native Consiliency node/file/chunk provenance and the provider is PROVEN; GIS may evaluate canonical promotion.',
   };
 }
 
@@ -125,8 +142,8 @@ export type StructuralMaterializationResult = {
  * remain downstream and are intentionally not performed here.
  *
  * `canonicalPromotionAllowed=true` means only that native structural provenance
- * is complete enough for GIS to evaluate promotion. It does NOT mean identity
- * has been promoted or persisted.
+ * is complete and the provider parse is PROVEN. GIS must still resolve/promote
+ * the nomination and persistence must still prove the canonical identity.
  */
 export class GraphifyStructuralMaterializer {
   constructor(private readonly astProvider: AstProvider = create8095AstProvider()) {}
@@ -136,10 +153,12 @@ export class GraphifyStructuralMaterializer {
     const normalized = result.evidence && result.status !== 'FAILED'
       ? normalizeAtlasAstEvidence(result.evidence)
       : null;
-    const provenanceReadiness = evaluateProvenanceReadiness(normalized);
+    const provenanceReadiness = evaluateProvenanceReadiness(normalized, result.status);
     const diagnostics = [...result.diagnostics];
     if (provenanceReadiness.status === 'COMPATIBILITY_ONLY') {
       diagnostics.push('STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY');
+    } else if (provenanceReadiness.status === 'NATIVE_RECOVERED') {
+      diagnostics.push('STRUCTURAL_PROVENANCE_RECOVERED_NOT_PROMOTABLE');
     }
     return {
       sourceRef: input.sourceRef,
