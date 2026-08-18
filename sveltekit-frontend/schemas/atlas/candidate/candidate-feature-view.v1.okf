@@ -1,0 +1,37 @@
+schema_id: atlas.candidate-feature-view
+schema_version: 1
+schema_kind: derived_view
+status: ACTIVE
+
+description: >
+  Request-scoped candidate feature projection. This is NOT a third feature
+  truth store. It derives from the existing FeatureMatrixRowV1 /
+  CandidateFeatureMatrix owners plus revision-qualified retrieval/graph evidence.
+
+ownership:
+  canonical_feature_owner: sveltekit-frontend/src/lib/server/atlas/feature-matrix-schema.ts#FeatureMatrixRowV1
+  candidate_matrix_owner: sveltekit-frontend/src/lib/server/retrieval/retrieval-candidate-feature-matrix-v1.ts
+  persistence: NONE_REQUEST_SCOPED
+
+fields:
+  schema: { type: literal, value: atlas.candidate-feature-view.v1 }
+  requestId: { type: string, required: true }
+  candidateOrdinal: { type: integer, minimum: 0 }
+  canonicalId: { type: string, required: true }
+  packetKey: { type: string, nullable: true }
+  sourceRef: { type: string, required: true }
+  sourceFeatureRowRef: { type: string, nullable: true }
+  sourceCandidateMatrixRef: { type: string, nullable: true }
+  featureRevision: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  representationRevision: { type: string, required: true }
+  signals: { type: feature_signal_array, required: true }
+  observedLabels: { type: string_array, default: [] }
+  missingLabels: { type: string_array, default: [] }
+  checksum: { type: string, required: true }
+
+invariants:
+  - no direct persistence as canonical feature truth
+  - missing signal is UNKNOWN, never implicit zero
+  - executor identity cannot create a second logical signal vote
