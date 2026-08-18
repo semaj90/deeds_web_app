@@ -45,26 +45,30 @@ export function createEvidenceEntityRepository(pool: Pool) {
           try {
             await client.query(`
               INSERT INTO atlas_evidence_entities (
-                evidence_id, evidence_revision, source_ref, source_revision,
-                entity_type, entity_id, role, confidence, producer_revision
-              ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+                evidence_id, entity_type, entity_id, role, source_ref,
+                source_revision, extraction_revision, confidence, metadata
+              ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb)
               ON CONFLICT (evidence_id, entity_type, entity_id, role)
               DO UPDATE SET
-                evidence_revision = EXCLUDED.evidence_revision,
                 source_ref = EXCLUDED.source_ref,
                 source_revision = EXCLUDED.source_revision,
+                extraction_revision = EXCLUDED.extraction_revision,
                 confidence = EXCLUDED.confidence,
-                producer_revision = EXCLUDED.producer_revision
+                metadata = EXCLUDED.metadata
             `, [
               fact.evidence_id,
-              fact.evidence_revision,
-              fact.source_ref,
-              fact.source_revision,
               fact.entity_type,
               fact.entity_id,
               fact.role,
-              fact.confidence,
+              fact.source_ref,
+              fact.source_revision,
               fact.producer_revision,
+              fact.confidence,
+              JSON.stringify({
+                evidence_revision: fact.evidence_revision,
+                producer_revision: fact.producer_revision,
+                source_snapshot_revision: input.source_snapshot_revision,
+              }),
             ]);
             inserted += 1;
           } catch {
@@ -108,7 +112,7 @@ export function createEvidenceEntityRepository(pool: Pool) {
       let where = '';
       if (input.source_revisions && input.source_revisions.length > 0) {
         params.push(input.source_revisions);
-        where = 'WHERE source_revision = ANY($1::text[])';
+        where = 'WHERE ee.source_revision = ANY($1::text[])';
       }
       const result = await pool.query<{
         evidence_id: string;
@@ -119,13 +123,23 @@ export function createEvidenceEntityRepository(pool: Pool) {
         entity_id: string;
         role: string;
         confidence: number;
-        producer_revision: string;
+        extraction_revision: string;
+        metadata: unknown;
       }>(`
-        SELECT evidence_id, evidence_revision, source_ref, source_revision,
-               entity_type, entity_id, role, confidence, producer_revision
-        FROM atlas_evidence_entities
+        SELECT ee.evidence_id,
+               e.evidence_revision,
+               ee.source_ref,
+               ee.source_revision,
+               ee.entity_type,
+               ee.entity_id,
+               ee.role,
+               ee.confidence,
+               ee.extraction_revision,
+               ee.metadata
+        FROM atlas_evidence_entities ee
+        JOIN atlas_evidence e USING (evidence_id)
         ${where}
-        ORDER BY evidence_id, entity_type, entity_id, role
+        ORDER BY ee.evidence_id, ee.entity_type, ee.entity_id, ee.role
       `, params);
 
       const checksum = sha256(JSON.stringify(result.rows));
