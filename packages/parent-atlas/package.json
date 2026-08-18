@@ -16,6 +16,7 @@
     "./core/feature-intelligence-repository": "./dist/core/feature-intelligence-repository.js",
     "./core/feature-matrix": "./dist/core/feature-matrix.js",
     "./core/ace-hypergraph-payload": "./dist/core/ace-hypergraph-payload.js",
+    "./core/ace-packet-v2": "./dist/core/ace-packet-v2.js",
     "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js"
   },
   "bin": {
