@@ -1,13 +1,17 @@
 import type { FeatureRelationshipV1 } from './feature-intelligence.js';
 import type { FeatureIntelligenceRepository } from './feature-intelligence-repository.js';
 import {
-  buildBoundedReasoningChain,
   evaluateSufficientContext,
   type ContextEvidenceInventoryV1,
   type QueryEvidenceExpectationV1,
   type ReasoningChainV1,
   type SufficientContextDecisionV1,
 } from './hypergraph-retrieval.js';
+import {
+  buildQueryConditionedReasoningChain,
+  rankRelationshipsForQuery,
+  type HypergraphRelationshipSelectionV1,
+} from './hypergraph-query-policy.js';
 import {
   buildAceHypergraphPayload,
   type AceHypergraphPayloadV1,
@@ -34,12 +38,19 @@ export type HypergraphFusionFacadeInput = {
   fanout_limit?: number;
   semantic_scores?: Record<string, number>;
   ppr_scores?: Record<string, number>;
+  extraction_confidence?: Record<string, number>;
   evidence_inventory?: Partial<ContextEvidenceInventoryV1>;
   semantic_executors?: string[];
+  /**
+   * Optional exact canonical relationship resolver for first-stage relationship
+   * candidates. Runtime callers should bind this to PostgreSQL canonical rows.
+   */
+  relationship_resolver?: (relationshipIds: readonly string[]) => Promise<FeatureRelationshipV1[]>;
 };
 
 export type HypergraphFusionFacadeResult = {
   relationships: FeatureRelationshipV1[];
+  relationship_selection: HypergraphRelationshipSelectionV1[];
   reasoning_chain: ReasoningChainV1;
   sufficient_context: SufficientContextDecisionV1;
   ace_payloads: AceHypergraphPayloadV1[];
@@ -49,12 +60,23 @@ function unique(values: Iterable<string | null | undefined>): string[] {
   return [...new Set([...values].map((value) => String(value ?? '').trim()).filter(Boolean))];
 }
 
+function mergeRelationships(
+  fromEntities: readonly FeatureRelationshipV1[],
+  directRelationships: readonly FeatureRelationshipV1[],
+): FeatureRelationshipV1[] {
+  const byId = new Map<string, FeatureRelationshipV1>();
+  for (const relationship of [...fromEntities, ...directRelationships]) {
+    byId.set(relationship.relationship_id, relationship);
+  }
+  return [...byId.values()];
+}
+
 /**
  * Additive second-stage facade. The caller supplies first-stage candidates from
  * the existing retrieval stack; this function never replaces or double-votes
- * dense/lexical/AST discovery. It promotes those hits to canonical seed IDs,
- * retrieves canonical N-ary relations, builds the bounded chain, then decides
- * whether context is sufficient for synthesis.
+ * dense/lexical/AST discovery. It promotes hits to canonical IDs, retrieves
+ * canonical N-ary relations, applies query-conditioned relation selection,
+ * builds the bounded chain, and decides whether context is sufficient.
  */
 export async function runHypergraphFusionFacade(
   input: HypergraphFusionFacadeInput,
@@ -62,23 +84,40 @@ export async function runHypergraphFusionFacade(
   const seedEntityIds = unique(input.candidates
     .filter((candidate) => candidate.family === 'entity')
     .map((candidate) => candidate.canonical_id));
+  const directRelationshipIds = unique(input.candidates
+    .filter((candidate) => candidate.family === 'relationship')
+    .map((candidate) => candidate.canonical_id));
 
-  const relationships = await input.repository.findRelationshipsForEntities(
+  const relationshipsFromEntities = await input.repository.findRelationshipsForEntities(
     seedEntityIds,
     input.relationship_types ?? [],
     Math.max(20, Math.min((input.fanout_limit ?? 20) * Math.max(seedEntityIds.length, 1), 500)),
   );
+  const directRelationships = directRelationshipIds.length > 0 && input.relationship_resolver
+    ? await input.relationship_resolver(directRelationshipIds)
+    : [];
+  const relationships = mergeRelationships(relationshipsFromEntities, directRelationships);
 
-  const reasoningChain = buildBoundedReasoningChain({
+  const relationshipSelection = rankRelationshipsForQuery(relationships, {
+    semantic_scores: input.semantic_scores,
+    ppr_scores: input.ppr_scores,
+    extraction_confidence: input.extraction_confidence,
+    expected_relationship_types: input.expectation.expected_relationship_types,
+  });
+
+  const reasoningChain = buildQueryConditionedReasoningChain({
     query_id: input.query_id,
     source_snapshot_revision: input.source_snapshot_revision,
     seed_entity_ids: seedEntityIds,
     relationships,
     maximum_hop_count: input.maximum_hop_count ?? 2,
     fanout_limit: input.fanout_limit ?? 20,
-    allowed_relationship_types: input.relationship_types,
-    semantic_scores: input.semantic_scores,
-    ppr_scores: input.ppr_scores,
+    signals: {
+      semantic_scores: input.semantic_scores,
+      ppr_scores: input.ppr_scores,
+      extraction_confidence: input.extraction_confidence,
+      expected_relationship_types: input.expectation.expected_relationship_types,
+    },
   });
 
   const relationshipEvidenceRefs = unique(relationships.flatMap((relationship) => relationship.evidence_refs));
@@ -101,6 +140,7 @@ export async function runHypergraphFusionFacade(
   const sufficientContext = evaluateSufficientContext(input.expectation, inventory);
 
   const relationshipById = new Map(relationships.map((relationship) => [relationship.relationship_id, relationship]));
+  const selectionById = new Map(relationshipSelection.map((selection) => [selection.relationship_id, selection]));
   const relationshipEvidence = reasoningChain.relationship_ids
     .map((id) => relationshipById.get(id))
     .filter((value): value is FeatureRelationshipV1 => Boolean(value))
@@ -112,9 +152,9 @@ export async function runHypergraphFusionFacade(
       participants: relationship.participants,
       hop: Math.min(2, reasoningChain.steps.find((step) => step.relationship_id === relationship.relationship_id)?.hop ?? 0),
       evidence_refs: relationship.evidence_refs,
-      semantic_score: input.semantic_scores?.[relationship.relationship_id],
-      ppr_score: input.ppr_scores?.[relationship.relationship_id],
-      confidence: relationship.confidence,
+      semantic_score: selectionById.get(relationship.relationship_id)?.semantic_score,
+      ppr_score: selectionById.get(relationship.relationship_id)?.ppr_score,
+      confidence: selectionById.get(relationship.relationship_id)?.score ?? relationship.confidence,
       persistence: 'canonical' as const,
     }));
 
@@ -154,6 +194,7 @@ export async function runHypergraphFusionFacade(
 
   return {
     relationships,
+    relationship_selection: relationshipSelection,
     reasoning_chain: reasoningChain,
     sufficient_context: sufficientContext,
     ace_payloads: acePayloads,
