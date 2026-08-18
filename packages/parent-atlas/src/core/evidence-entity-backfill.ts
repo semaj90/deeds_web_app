@@ -1,9 +1,13 @@
 import { z } from 'zod';
 import type {
+  AstGrepObservationV1,
   FrameworkEntityNominationV1,
+  GroundedLangExtractObservationV1,
   StructuralReferenceFactV1,
   StructuralSymbolNominationV1,
   SymbolResolutionV1,
+  TreesitterChunkerChunkV1,
+  TreesitterChunkerXrefEdgeV1,
 } from './structural-symbol.js';
 
 const id = z.string().min(1);
@@ -48,12 +52,20 @@ export type EvidenceExtractionInputV1 = {
 };
 
 /**
- * Structural extractors produce nominations and reference facts first. They do
- * not directly write symbol entity IDs into atlas_evidence_entities.
+ * Code evidence is a three-producer fabric:
+ * - Consiliency treesitter-chunker: primary CodeChunk/span/hierarchy/XRef facts.
+ * - ast-grep: deterministic structural-pattern observations.
+ * - LangExtract: grounded semantic/entity/relation observations with char spans.
+ *
+ * These remain evidence until canonical promotion resolves Atlas identities.
  */
 export type StructuralEvidenceExtractionResultV1 = {
+  chunks: TreesitterChunkerChunkV1[];
+  xref_edges: TreesitterChunkerXrefEdgeV1[];
   symbol_nominations: StructuralSymbolNominationV1[];
   reference_facts: StructuralReferenceFactV1[];
+  ast_grep_observations: AstGrepObservationV1[];
+  langextract_observations: GroundedLangExtractObservationV1[];
   framework_nominations: FrameworkEntityNominationV1[];
 };
 
@@ -63,8 +75,9 @@ export interface StructuralEvidenceExtractorV1 {
 
 /**
  * Promotion adapter converts only canonical symbol resolutions into shared
- * evidence-entity facts. Degraded/ambiguous/unresolved nominations remain
- * evidence candidates and cannot become shared SQL join keys.
+ * evidence-entity facts. treesitter-chunker symbol_id/node_id/chunk_id stay
+ * provenance keys unless the canonical registry resolves them to a stable
+ * Atlas symbol identity.
  */
 export function promoteResolvedSymbolsToEvidenceEntities(input: {
   evidence_id: string;
@@ -99,38 +112,63 @@ export function promoteResolvedSymbolsToEvidenceEntities(input: {
 }
 
 /**
- * Non-structural extractors may produce already-canonical entity facts only
- * when their own resolver guarantees the entity_id is canonical. Examples:
- * schema registry table IDs, OpenSpec requirement IDs, or runtime receipt IDs.
+ * LangExtract observations may enter canonical evidence only after grounding is
+ * proven by a non-empty char_interval and their entity/relation nominations are
+ * resolved by the relevant canonical registry. The LLM extraction never owns
+ * code symbol identity.
+ */
+export function isGroundedLangExtractObservation(
+  observation: GroundedLangExtractObservationV1,
+): boolean {
+  return observation.char_interval.end_pos > observation.char_interval.start_pos;
+}
+
+/**
+ * Non-code registries may produce already-canonical entity facts only when the
+ * registry is itself authoritative: schema table/column IDs, OpenSpec IDs, or
+ * runtime receipt/resource IDs. LangExtract output alone is never sufficient.
  */
 export interface EvidenceEntityExtractorV1 {
   extract(input: EvidenceExtractionInputV1): Promise<EvidenceEntityFactV1[]>;
 }
 
 /**
- * TODO(FI-16J): source-specific deterministic producers:
+ * TODO(FI-16J): complete source-specific producers without creating a fourth
+ * competing AST owner.
  *
- * AST / code
- * - Tree-sitter tags/queries: definitions + references + exact byte/AST paths.
- * - ast-grep: higher-level structural observations (route handler patterns,
- *   framework conventions, DB-call shapes, test API patterns).
- * - chunker: creates replaceable StructuralChunkProjectionV1 spans only.
- * - canonical symbol registry: promotes symbol nominations to stable_symbol_id.
+ * CODE / AST
+ * - 8095 `POST /ast/chunk` + Consiliency/treesitter-chunker is the primary
+ *   structural evidence producer (`atlas.ast.evidence.v1`). Preserve upstream
+ *   node_id/file_id/symbol_id/chunk_id, byte spans, hierarchy and XRef edges.
+ * - Existing `atlas-ast-evidence-normalizer.ts` remains the compatibility
+ *   normalization seam and must continue leaving canonical symbol/version IDs
+ *   pending until GIS/canonical persistence resolves them.
+ * - ast-grep attaches deterministic rule observations to chunk/node spans:
+ *   routes, ORM calls, auth guards, tests, framework conventions, rewrites.
+ *   ast-grep observations may nominate entities/relations but never mint Atlas
+ *   canonical IDs.
+ * - LangExtract attaches grounded semantic/entity/relation observations. Reject
+ *   char_interval-less output from canonical evidence; keep it diagnostic only.
+ * - GIS / canonical registry resolves upstream structural provenance into
+ *   stable_symbol_id, symbol_version_id, feature_id and relationship_id.
  *
- * Schema
+ * SCHEMA
  * - tables/columns/FKs/indexes/policies from pinned migration/schema revision.
  *
- * Tests
- * - test case/assertion/target nominations + runtime result receipts.
+ * TESTS
+ * - deterministic test target/assertion structure from chunker + ast-grep;
+ *   runtime pass/fail comes from revisioned execution receipts, not LangExtract.
  *
- * OpenSpec
- * - requirement/scenario/task identities from pinned document revision.
+ * OPENSPEC
+ * - requirement/scenario/task identities from pinned document revision;
+ *   LangExtract may help nominate grounded relations but OpenSpec IDs own truth.
  *
- * Runtime
+ * RUNTIME
  * - tool/action/receipt/resource identities from revisioned execution receipts.
  *
  * Only canonical resolutions may enter atlas_evidence_entities as shared SQL
- * join keys. Degraded/ambiguous/unresolved nominations stay candidate evidence.
+ * join keys. Upstream chunker IDs and grounded NLP observations remain evidence
+ * provenance until promotion.
  */
 
 /** TODO: PostgreSQL writer should upsert by evidence_id/entity_type/entity_id/role and emit receipt after readback. */
