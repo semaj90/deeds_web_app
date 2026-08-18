@@ -152,6 +152,17 @@ export {
   relationshipParticipantSchema,
 } from './core/feature-intelligence.js';
 
+// Feature intelligence / HyperGraphRAG surfaces
+export * from './core/hypergraph-retrieval.js';
+export * from './core/hypergraph-query-policy.js';
+export * from './core/hypergraph-ppr.js';
+export * from './core/dynamic-hyperedge-sql.js';
+export * from './core/feature-matrix.js';
+export * from './core/ace-hypergraph-payload.js';
+export * from './core/hypergraph-fusion-facade.js';
+export { createFeatureIntelligenceRepository } from './core/feature-intelligence-repository.js';
+export type { FeatureIntelligenceRepository } from './core/feature-intelligence-repository.js';
+
 // Pipelines
 export { runIngest } from './pipelines/ingest.js';
 export { runKarpathyEnrich } from './pipelines/enrich-karpathy.js';
