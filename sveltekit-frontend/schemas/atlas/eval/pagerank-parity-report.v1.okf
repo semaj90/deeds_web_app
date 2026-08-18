@@ -1,0 +1,30 @@
+schema_id: atlas.pagerank-parity-report
+schema_version: 1
+schema_kind: evaluation_report
+status: EXPERIMENTAL
+
+description: >
+  Numeric/ranking parity report comparing a readable PageRank reference receipt
+  with an accelerated executor receipt over the same projection/config identity.
+
+fields:
+  schema: { type: literal, value: atlas.pagerank-parity-report.v1 }
+  status: { type: enum, values: [PASS, FAIL, NOT_COMPARABLE] }
+  sharedNodes: { type: integer, minimum: 0 }
+  maxAbsError: { type: number, minimum: 0, nullable: true }
+  meanAbsError: { type: number, minimum: 0, nullable: true }
+  rmse: { type: number, minimum: 0, nullable: true }
+  meanRankDelta: { type: number, minimum: 0, nullable: true }
+  topK: { type: integer, minimum: 1 }
+  topKJaccard: { type: number, minimum: 0, maximum: 1, nullable: true }
+  referenceReceiptRef: { type: string, required: true }
+  executorReceiptRef: { type: string, required: true }
+  projectionHash: { type: string, required: true }
+  configHash: { type: string, required: true }
+  thresholds: { type: object, required: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - PASS requires identical projectionHash and configHash
+  - thresholds are evaluation policy inputs and must be receipted
+  - backend defaults are never used as an implicit parity contract
