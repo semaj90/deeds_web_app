@@ -73,6 +73,11 @@ function canonicalIdFor(candidate: SearchRuntimeQasCandidate): string | null {
   return candidate.stableSymbolId?.trim() || null;
 }
 
+function addLogicalLane(row: QueryAdaptiveFeatureRowV1, lane: string): QueryAdaptiveFeatureRowV1 {
+  const logicalLanes = [...new Set([...row.logicalLanes, lane])].filter((value) => value !== 'qas').sort();
+  return { ...row, logicalLanes };
+}
+
 /**
  * Compose the existing owners without inventing a second retrieval or ranking
  * pipeline:
@@ -128,25 +133,29 @@ export function buildQasNeuralExecutionBridge(
     resolveFeatures: input.resolveFeatures,
   });
 
+  const rows = qas.rows.map((row) => graphProjection.graphMatchedCanonicalIds.has(row.canonicalId)
+    ? addLogicalLane(row, 'graph')
+    : row);
+
   const neuralExecutionPlan = planNeuralExecution({
     workload: input.workload ?? 'POINTWISE_RERANK',
     resource,
   });
 
   const logicalLaneSet = new Set<string>();
-  for (const row of qas.rows) {
+  for (const row of rows) {
     for (const lane of row.logicalLanes) logicalLaneSet.add(lane);
   }
-  if (graphProjection.graphMatchedCanonicalIds.size > 0) logicalLaneSet.add('graph');
   // QAS itself is a routing/sampling policy, not a retrieval lane.
   logicalLaneSet.delete('qas');
 
   const logicalLanes = [...logicalLaneSet].sort();
-  if (logicalLanes.length === 0) logicalLanes.push('graph');
+  if (logicalLanes.length === 0 && graphProjection.graphMatchedCanonicalIds.size > 0) logicalLanes.push('graph');
+  if (logicalLanes.length === 0) logicalLanes.push('unattributed');
 
   return {
-    rows: qas.rows,
-    samplerCandidates: toQasSamplerCandidates(qas.rows),
+    rows,
+    samplerCandidates: toQasSamplerCandidates(rows),
     rejected: qas.rejected,
     projections,
     graphProjectionReceipt: graphProjection.receipt,
@@ -159,7 +168,7 @@ export function buildQasNeuralExecutionBridge(
       graphRevision: graphProjection.receipt.graphRevision,
       logicalLanes,
       candidateCount: input.candidates.length,
-      acceptedCount: qas.rows.length,
+      acceptedCount: rows.length,
       rejectedCount: qas.rejected.length,
       matrixFeatureCount: 25,
       graphProjectionSchema: 'atlas.s-graph-candidate-projection.v1',
