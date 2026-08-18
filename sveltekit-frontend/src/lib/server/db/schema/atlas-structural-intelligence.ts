@@ -87,6 +87,69 @@ export const atlasStructuralReferenceResolutions = pgTable('atlas_structural_ref
 }));
 
 /**
+ * Canonical schema-object registry. PostgreSQL catalog OIDs are stored only on
+ * revision-qualified versions and never serve as Atlas identity.
+ * Manual migration: drizzle/manual/20260818_atlas_schema_object_registry_v1.sql
+ */
+export const atlasSchemaObjectRegistry = pgTable('atlas_schema_object_registry', {
+  stableSchemaObjectId: text('stable_schema_object_id').primaryKey(),
+  canonicalKey: text('canonical_key').notNull(),
+  objectKind: text('object_kind').notNull(),
+  databaseKey: text('database_key').notNull(),
+  schemaName: text('schema_name').notNull(),
+  canonicalName: text('canonical_name').notNull(),
+  canonicalQualifiedName: text('canonical_qualified_name').notNull(),
+  createdFromNominationId: text('created_from_nomination_id').notNull(),
+  createdFromSourceRef: text('created_from_source_ref').notNull(),
+  createdFromSourceRevision: text('created_from_source_revision').notNull(),
+  registryRevision: text('registry_revision').notNull(),
+  status: text('status').notNull().default('active'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+  canonicalKeyUnique: unique('atlas_schema_object_registry_canonical_key_key').on(t.canonicalKey),
+  kindIdx: index('idx_atlas_schema_object_registry_kind').on(t.databaseKey, t.schemaName, t.objectKind),
+  nameIdx: index('idx_atlas_schema_object_registry_name').on(t.canonicalQualifiedName),
+}));
+
+export const atlasSchemaObjectAliases = pgTable('atlas_schema_object_aliases', {
+  aliasKey: text('alias_key').notNull(),
+  stableSchemaObjectId: text('stable_schema_object_id').notNull(),
+  aliasKind: text('alias_kind').notNull(),
+  sourceRef: text('source_ref'),
+  sourceRevision: text('source_revision'),
+  evidenceRefs: jsonb('evidence_refs').notNull().default(sql`'[]'::jsonb`),
+  registryRevision: text('registry_revision').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+  pk: primaryKey({ columns: [t.aliasKey, t.stableSchemaObjectId] }),
+  objectIdx: index('idx_atlas_schema_object_aliases_object').on(t.stableSchemaObjectId),
+  aliasIdx: index('idx_atlas_schema_object_aliases_alias').on(t.aliasKey),
+}));
+
+export const atlasSchemaObjectVersions = pgTable('atlas_schema_object_versions', {
+  schemaObjectVersionId: text('schema_object_version_id').primaryKey(),
+  stableSchemaObjectId: text('stable_schema_object_id').notNull(),
+  objectKey: text('object_key').notNull(),
+  objectKind: text('object_kind').notNull(),
+  qualifiedName: text('qualified_name').notNull(),
+  sourceRef: text('source_ref').notNull(),
+  sourceRevision: text('source_revision').notNull(),
+  schemaRevision: text('schema_revision').notNull(),
+  parentStableSchemaObjectId: text('parent_stable_schema_object_id'),
+  catalogOid: bigint('catalog_oid', { mode: 'number' }),
+  definitionHash: text('definition_hash').notNull(),
+  producerRevision: text('producer_revision').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({
+  versionUnique: unique('atlas_schema_object_versions_stable_schema_object_id_schema_revision_definition_hash_key')
+    .on(t.stableSchemaObjectId, t.schemaRevision, t.definitionHash),
+  objectRevisionIdx: index('idx_atlas_schema_object_versions_object_revision').on(t.stableSchemaObjectId, t.schemaRevision),
+  catalogOidIdx: index('idx_atlas_schema_object_versions_catalog_oid').on(t.catalogOid),
+  sourceIdx: index('idx_atlas_schema_object_versions_source').on(t.sourceRef, t.sourceRevision),
+}));
+
+/**
  * Query-time shared-entity index used by dynamic hyperedge discovery.
  * Manual migration: drizzle/manual/20260818_atlas_dynamic_hyperedge_entities_v1.sql
  */
@@ -111,4 +174,7 @@ export type AtlasSymbolRegistryRow = typeof atlasSymbolRegistry.$inferSelect;
 export type AtlasSymbolAliasRow = typeof atlasSymbolAliases.$inferSelect;
 export type AtlasSymbolVersionRow = typeof atlasSymbolVersions.$inferSelect;
 export type AtlasStructuralReferenceResolutionRow = typeof atlasStructuralReferenceResolutions.$inferSelect;
+export type AtlasSchemaObjectRegistryRow = typeof atlasSchemaObjectRegistry.$inferSelect;
+export type AtlasSchemaObjectAliasRow = typeof atlasSchemaObjectAliases.$inferSelect;
+export type AtlasSchemaObjectVersionRow = typeof atlasSchemaObjectVersions.$inferSelect;
 export type AtlasEvidenceEntityRow = typeof atlasEvidenceEntities.$inferSelect;
