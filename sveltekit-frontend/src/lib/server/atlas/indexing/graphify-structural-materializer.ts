@@ -129,6 +129,9 @@ export type StructuralMaterializationResult = {
   sourceRevision: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
+  /** Raw 8095 evidence retained for the downstream Parent Atlas fabric. */
+  evidence: AtlasStructuralEvidence | null;
+  /** Legacy normalized structural view retained for current Graphify consumers. */
   normalized: NormalizedAtlasStructuralEvidence | null;
   provenanceReadiness: StructuralProvenanceReadiness;
   diagnostics: string[];
@@ -150,9 +153,8 @@ export class GraphifyStructuralMaterializer {
 
   async materialize(input: CanonicalSourceRef): Promise<StructuralMaterializationResult> {
     const result = await this.astProvider.materialize(input);
-    const normalized = result.evidence && result.status !== 'FAILED'
-      ? normalizeAtlasAstEvidence(result.evidence)
-      : null;
+    const evidence = result.evidence && result.status !== 'FAILED' ? result.evidence : null;
+    const normalized = evidence ? normalizeAtlasAstEvidence(evidence) : null;
     const provenanceReadiness = evaluateProvenanceReadiness(normalized, result.status);
     const diagnostics = [...result.diagnostics];
     if (provenanceReadiness.status === 'COMPATIBILITY_ONLY') {
@@ -165,6 +167,7 @@ export class GraphifyStructuralMaterializer {
       sourceRevision: input.sourceRevision,
       provider: result.provider,
       status: result.status,
+      evidence,
       normalized,
       provenanceReadiness,
       diagnostics,
