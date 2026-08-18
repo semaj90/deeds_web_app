@@ -13,8 +13,10 @@ const paths = {
   client: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'nlp', 'miniforge-nlp-sidecar.ts'),
   normalizer: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'analysis', 'atlas-ast-evidence-normalizer.ts'),
   materializer: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'atlas', 'indexing', 'graphify-structural-materializer.ts'),
+  graphifyFabric: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'atlas', 'indexing', 'graphify-structural-intelligence-adapter.ts'),
   astGrep: path.join(root, 'sveltekit-frontend', 'src', 'lib', 'server', 'analysis', 'ast-grep-extractor.ts'),
   proof: path.join(root, 'scripts', 'atlas', 'prove-ast-sidecar.mjs'),
+  integrationProof: path.join(root, 'scripts', 'atlas', 'prove-structural-intelligence-integration.mjs'),
   dockerfile: path.join(root, 'docker', 'miniforge-nlp-sidecar', 'Dockerfile'),
   launcher: path.join(root, 'scripts', 'launch-miniforge-nlp-sidecar.ps1'),
 };
@@ -41,28 +43,22 @@ for (const [name, file] of Object.entries(paths)) {
   check(`${name.toUpperCase()}_EXISTS`, await exists(file), path.relative(root, file), 'presence');
 }
 
-const [sidecarV2, helper, client, normalizer, materializer, astGrep, proof, dockerfile, launcher] = await Promise.all([
+const [sidecarV2, helper, client, normalizer, materializer, graphifyFabric, astGrep, proof, integrationProof, dockerfile, launcher] = await Promise.all([
   read(paths.sidecarV2),
   read(paths.helper),
   read(paths.client),
   read(paths.normalizer),
   read(paths.materializer),
+  read(paths.graphifyFabric),
   read(paths.astGrep),
   read(paths.proof),
+  read(paths.integrationProof),
   read(paths.dockerfile),
   read(paths.launcher),
 ]);
 
-check(
-  'HELPER_NORMALIZES_CHUNKER_IDS',
-  helper.includes('normalize_treesitter_chunker_chunk'),
-  'native node_id/file_id/symbol_id/chunk_id helper exists',
-);
-check(
-  'HELPER_NORMALIZES_LANGEXTRACT_GROUNDING',
-  helper.includes('normalize_langextract_extraction'),
-  'char_interval/alignment_status helper exists',
-);
+check('HELPER_NORMALIZES_CHUNKER_IDS', helper.includes('normalize_treesitter_chunker_chunk'), 'native node_id/file_id/symbol_id/chunk_id helper exists');
+check('HELPER_NORMALIZES_LANGEXTRACT_GROUNDING', helper.includes('normalize_langextract_extraction'), 'char_interval/alignment_status helper exists');
 check(
   'CLIENT_ACCEPTS_NATIVE_CHUNKER_IDS',
   client.includes('upstream_node_id') && client.includes('upstream_file_id') && client.includes('upstream_symbol_id') && client.includes('parent_route'),
@@ -75,9 +71,23 @@ check(
 );
 check(
   'GRAPHIFY_GATES_CANONICAL_PROMOTION',
-  materializer.includes("status: 'NATIVE_READY' | 'COMPATIBILITY_ONLY' | 'NO_EVIDENCE'")
+  materializer.includes("'NATIVE_READY' | 'NATIVE_RECOVERED' | 'COMPATIBILITY_ONLY' | 'NO_EVIDENCE'")
+    && materializer.includes('STRUCTURAL_PROVENANCE_RECOVERED_NOT_PROMOTABLE')
     && materializer.includes('canonicalPromotionAllowed'),
-  'Graphify materializer blocks GIS promotion on compatibility-only provenance',
+  'Graphify blocks GIS promotion for recovered or compatibility-only structural evidence',
+);
+check(
+  'GRAPHIFY_RETAINS_RAW_EVIDENCE_FOR_FABRIC',
+  materializer.includes('evidence: AtlasStructuralEvidence | null') && materializer.includes('evidence,'),
+  'Graphify retains raw 8095 evidence while keeping legacy normalized consumers intact',
+);
+check(
+  'GRAPHIFY_COMPILES_PARENT_ATLAS_FABRIC',
+  graphifyFabric.includes('compileStructuralExtractionFabric')
+    && graphifyFabric.includes('adaptAstGrepExtractedFeature')
+    && graphifyFabric.includes('adaptSidecarGroundedExtractions')
+    && graphifyFabric.includes('canonicalPromotionMayBeAttempted'),
+  'Graphify has an additive pre-GIS bridge into the three-producer Parent Atlas fabric',
 );
 check(
   'AST_GREP_EMITS_BYTE_RANGES',
@@ -93,6 +103,13 @@ check(
   'LIVE_PROOF_PROBES_LANGEXTRACT_ALIGNMENT',
   proof.includes('LANGEXTRACT_NATIVE_CHAR_INTERVAL') && proof.includes('LANGEXTRACT_ALIGNMENT_STATUS_VISIBLE'),
   'live proof separately checks LangExtract native grounding/alignment',
+);
+check(
+  'ORDERED_INTEGRATION_PROOF_EXISTS',
+  integrationProof.includes('PARENT_ATLAS_BUILD')
+    && integrationProof.includes('FRONTEND_STRUCTURAL_INTEGRATION_TESTS')
+    && integrationProof.includes('WRITTEN != WIRED != PROVEN'),
+  'integration proof builds Parent Atlas before frontend cross-package tests',
 );
 
 // Production deployment gates. The provenance-v2 facade is the selected owner
@@ -113,17 +130,19 @@ check(
   'live',
 );
 check(
+  'SIDECAR_V2_DEGRADES_IDENTITY_PATH_FALLBACK',
+  sidecarV2.includes('CONSILIENCY_IDENTITY_PATH_UNPROVEN')
+    && sidecarV2.includes('identity_path_preserved'),
+  'older chunker fallback remains searchable but forces recovered/nonpromotable structural status',
+  'live',
+);
+check(
   'SIDECAR_V2_PRESERVES_LANGEXTRACT_GROUNDING',
   sidecarV2.includes('"char_interval": interval') && sidecarV2.includes('"alignment_status": normalized.get("alignment_status")'),
   'provenance-v2 /analyze exposes native LangExtract grounding metadata',
   'live',
 );
-check(
-  'DOCKER_LAUNCHES_PROVENANCE_V2',
-  dockerfile.includes('miniforge_nlp_sidecar_v2.py'),
-  'Docker 8095 entrypoint selects provenance-v2 facade',
-  'live',
-);
+check('DOCKER_LAUNCHES_PROVENANCE_V2', dockerfile.includes('miniforge_nlp_sidecar_v2.py'), 'Docker 8095 entrypoint selects provenance-v2 facade', 'live');
 check(
   'LOCAL_LAUNCHER_DEFAULTS_TO_PROVENANCE_V2',
   launcher.includes("'miniforge_nlp_sidecar_v2.py'") && launcher.includes('UseLegacySidecar'),
@@ -136,7 +155,7 @@ const scaffoldPass = checks.filter((item) => item.category === 'scaffold').every
 const liveWired = checks.filter((item) => item.category === 'live').every((item) => item.ok);
 
 const receipt = {
-  schema: 'atlas.structural-provenance-wiring-audit.v3',
+  schema: 'atlas.structural-provenance-wiring-audit.v4',
   status: presencePass && scaffoldPass && liveWired
     ? 'WIRED_UNPROVEN_RUNTIME'
     : presencePass && scaffoldPass
@@ -147,11 +166,9 @@ const receipt = {
   live_sidecar_wired: liveWired,
   runtime_proven: false,
   red_gates: checks.filter((item) => !item.ok).map((item) => item.id),
-  next_runtime_gate: 'Run scripts/atlas/prove-ast-sidecar.mjs against the launched provenance-v2 service.',
+  next_runtime_gate: 'Run scripts/atlas/prove-structural-intelligence-integration.mjs; set ATLAS_PROVE_LIVE_SIDECAR=1 to include the live 8095 proof.',
   checks,
 };
 
 console.log(JSON.stringify(receipt, null, 2));
-// Static wiring can be complete without runtime proof. Runtime proof is emitted
-// separately by prove-ast-sidecar.mjs against the actual 8095 process.
 process.exitCode = presencePass && scaffoldPass && liveWired ? 0 : 1;
