@@ -42,6 +42,10 @@ export type GraphifyStructuralIntelligenceResult = {
   receipt: GraphifyStructuralIntelligenceReceipt;
 };
 
+function unique(values: readonly string[]): string[] {
+  return [...new Set(values.filter(Boolean))];
+}
+
 /**
  * Compile the existing Graphify/8095 structural evidence into the Parent Atlas
  * three-producer fabric. This is intentionally pre-GIS: it creates nominations
@@ -87,7 +91,7 @@ export function compileGraphifyStructuralIntelligence(input: {
         compatibilityNodeIdCount: 0,
         compatibilityFileIdCount: 0,
         compatibilityChunkIdCount: 0,
-        diagnostics: [...materialization.diagnostics, 'STRUCTURAL_FABRIC_SKIPPED_NO_EVIDENCE'],
+        diagnostics: unique([...materialization.diagnostics, 'STRUCTURAL_FABRIC_SKIPPED_NO_EVIDENCE']),
         canonicalIdentityCreated: false,
       },
     };
@@ -154,6 +158,10 @@ export function compileGraphifyStructuralIntelligence(input: {
     && strictNativeMode
     && compatibilityCount === 0;
 
+  const langExtractDiagnostics = groundedLangExtract.receipt.rejected_ungrounded_count > 0
+    ? [`LANGEXTRACT_UNGROUNDED_REJECTED:${groundedLangExtract.receipt.rejected_ungrounded_count}`]
+    : [];
+
   return {
     fabric,
     receipt: {
@@ -174,14 +182,12 @@ export function compileGraphifyStructuralIntelligence(input: {
       compatibilityNodeIdCount: enriched.receipt.compatibility_node_id_count,
       compatibilityFileIdCount: enriched.receipt.compatibility_file_id_count,
       compatibilityChunkIdCount: enriched.receipt.compatibility_chunk_id_count,
-      diagnostics: [
+      diagnostics: unique([
         ...materialization.diagnostics,
         ...enriched.receipt.diagnostics,
-        ...groundedLangExtract.receipt.rejected_ungrounded_count > 0
-          ? [`LANGEXTRACT_UNGROUNDED_REJECTED:${groundedLangExtract.receipt.rejected_ungrounded_count}`]
-          : [],
+        ...langExtractDiagnostics,
         ...fabric.receipt.diagnostics,
-      ],
+      ]),
       canonicalIdentityCreated: false,
     },
   };
