@@ -15,7 +15,22 @@ export type NativeExecutor =
   | 'cugraph-pyg'
   | 'tensorrt-llm';
 export type ComputeDtype = 'fp64' | 'fp32' | 'tf32' | 'bf16' | 'fp16' | 'int8';
-export type NativeOperation = 'GEMM' | 'GEMV' | 'COSINE_TOPK' | 'SVD' | 'PCA' | 'PAGERANK' | 'PPR' | 'KNN_EXACT' | 'KNN_ANN' | 'GNN_INFER' | 'MODEL_INFER' | 'CLASSIFY' | 'RERANK';
+export type NativeOperation =
+  | 'GEMM'
+  | 'GEMV'
+  | 'COSINE_TOPK'
+  | 'SIGNED_S3_DOT'
+  | 'LOW_RANK_PROJECT'
+  | 'SVD'
+  | 'PCA'
+  | 'PAGERANK'
+  | 'PPR'
+  | 'KNN_EXACT'
+  | 'KNN_ANN'
+  | 'GNN_INFER'
+  | 'MODEL_INFER'
+  | 'CLASSIFY'
+  | 'RERANK';
 
 export interface GpuEnvironmentCapabilities {
   receiptId: string;
@@ -136,7 +151,7 @@ export function chooseNativeComputeExecutor(
     }
   }
 
-  if (['GEMM', 'GEMV', 'COSINE_TOPK'].includes(req.operation)) {
+  if (['GEMM', 'GEMV', 'COSINE_TOPK', 'SIGNED_S3_DOT', 'LOW_RANK_PROJECT'].includes(req.operation)) {
     if (fits(windows, req.requiredGpuBytes) && windows.cublasLt) {
       return { runtime: 'windows-native', executor: 'cublaslt', ...dense, environmentReceiptId: windows.receiptId, reason: 'cuBLASLt Tensor Core path preferred for dense mixed-precision math' };
     }
