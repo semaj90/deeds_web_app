@@ -161,6 +161,7 @@ export * from './core/langextract-grounding-adapter.js';
 export * from './core/langextract-sidecar-metadata-adapter.js';
 export * from './core/symbol-registry-repository.js';
 export * from './core/schema-object-registry.js';
+export * from './core/postgres-schema-introspector.js';
 export * from './core/openspec-evidence-compiler.js';
 export * from './core/workflow-action-event.js';
 export * from './core/structural-reference-resolver.js';
