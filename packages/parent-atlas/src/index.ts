@@ -173,6 +173,8 @@ export * from './core/qlora-dataset-export.js';
 export * from './core/ace-hypergraph-payload.js';
 export * from './core/ace-packet-v2.js';
 export * from './core/ace-runtime-adapter.js';
+export * from './core/hyperrag-live-integration.js';
+export * from './core/proof-gates.js';
 export * from './core/hypergraph-fusion-facade.js';
 export { createFeatureIntelligenceRepository } from './core/feature-intelligence-repository.js';
 export type { FeatureIntelligenceRepository } from './core/feature-intelligence-repository.js';
