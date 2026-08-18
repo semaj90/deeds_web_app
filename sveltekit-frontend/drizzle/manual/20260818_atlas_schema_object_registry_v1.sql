@@ -1,6 +1,7 @@
 -- Parent Atlas canonical schema object registry v1
--- Stable identity for tables/columns/FKs/indexes/policies/etc. Catalog OIDs are
--- revision-local provenance only and MUST NOT become canonical Atlas identity.
+-- Stable identity for tables/columns/FKs/indexes/policies/etc. Catalog OIDs and
+-- subobject locators are revision-local provenance only and MUST NOT become
+-- canonical Atlas identity.
 -- Apply manually and read back before enabling automatic schema evidence writes.
 
 CREATE TABLE IF NOT EXISTS atlas_schema_object_registry (
@@ -56,6 +57,7 @@ CREATE TABLE IF NOT EXISTS atlas_schema_object_versions (
   schema_revision TEXT NOT NULL,
   parent_stable_schema_object_id TEXT REFERENCES atlas_schema_object_registry(stable_schema_object_id) ON DELETE SET NULL,
   catalog_oid BIGINT CHECK (catalog_oid IS NULL OR catalog_oid >= 0),
+  catalog_locator JSONB,
   definition_hash TEXT NOT NULL,
   producer_revision TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -70,4 +72,6 @@ CREATE INDEX IF NOT EXISTS idx_atlas_schema_object_versions_source
   ON atlas_schema_object_versions(source_ref, source_revision);
 
 COMMENT ON COLUMN atlas_schema_object_versions.catalog_oid IS
-  'PostgreSQL catalog OID at this schema revision only; never canonical Atlas identity.';
+  'PostgreSQL object OID at this schema revision only; never canonical Atlas identity. Columns use NULL here.';
+COMMENT ON COLUMN atlas_schema_object_versions.catalog_locator IS
+  'Revision-local PostgreSQL catalog locator such as {object_oid: relation OID, object_sub_id: attnum}; never canonical Atlas identity.';
