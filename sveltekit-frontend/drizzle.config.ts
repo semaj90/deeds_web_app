@@ -85,5 +85,6 @@ export default {
     '!atlas_feature_state_receipts', '!atlas_dynamic_hyperedge_candidates',
     '!atlas_evidence_entities', '!atlas_symbol_registry', '!atlas_symbol_aliases',
     '!atlas_symbol_versions', '!atlas_structural_reference_resolutions',
+    '!atlas_schema_object_registry', '!atlas_schema_object_aliases', '!atlas_schema_object_versions',
   ],
 } satisfies Config;
