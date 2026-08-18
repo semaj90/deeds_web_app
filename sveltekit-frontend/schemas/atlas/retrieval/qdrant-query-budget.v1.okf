@@ -1,0 +1,22 @@
+schema_id: atlas.qdrant-query-budget
+schema_version: 1
+schema_kind: retrieval_runtime_budget
+status: ACTIVE
+
+description: >
+  Query-time quality/cost controls for Qdrant as an executor behind the single
+  canonical semantic_768 lane.
+
+fields:
+  schema: { type: literal, value: atlas.qdrant-query-budget.v1 }
+  limit: { type: integer, minimum: 1 }
+  oversampling: { type: number, minimum: 1 }
+  rescoreOriginal: { type: boolean }
+  exact: { type: boolean }
+  hnswEf: { type: integer, minimum: 1, nullable: true }
+  policyRevision: { type: string, required: true }
+
+invariants:
+  - Qdrant execution produces one logical semantic vote per canonical candidate
+  - oversampling and rescoring are measured runtime dials, not global constants
+  - exact=true is an executor mode, not a new retrieval lane
