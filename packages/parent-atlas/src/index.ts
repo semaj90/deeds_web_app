@@ -153,6 +153,7 @@ export {
 } from './core/feature-intelligence.js';
 
 // Feature intelligence / HyperGraphRAG surfaces
+export * from './core/structural-symbol.js';
 export * from './core/hypergraph-retrieval.js';
 export * from './core/hypergraph-query-policy.js';
 export * from './core/hypergraph-ppr.js';
