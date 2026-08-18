@@ -1,0 +1,42 @@
+schema_id: atlas.graph-authority-receipt
+schema_version: 2
+schema_kind: graph_authority_receipt
+status: ACTIVE
+
+description: >
+  Contract emitted by the readable NetworkX PageRank/PPR oracle and matched by
+  accelerated graph executors during parity checks.
+
+fields:
+  schema: { type: literal, value: atlas.graph-authority-receipt.v2 }
+  status: { type: string, required: true }
+  snapshot_id: { type: string, required: true }
+  authority_contract: { type: string, required: true }
+  run_id: { type: string, required: true }
+  source_topology_hash: { type: string, required: true }
+  projection_hash: { type: string, required: true }
+  config_hash: { type: string, required: true }
+  personalization_hash: { type: string, nullable: true }
+  reference_engine: { type: literal, value: networkx }
+  executor_role: { type: literal, value: REFERENCE_ORACLE }
+  normalization_applied_by: { type: string, required: true }
+  config:
+    type: object
+    fields:
+      alpha: { type: number, minimum: 0, maximum: 1 }
+      max_iter: { type: integer, minimum: 1 }
+      tol: { type: number, minimum: 0 }
+      weight: { type: string, required: true }
+      mode: { type: enum, values: [global, personalized] }
+      personalization: { type: object, nullable: true }
+  node_count: { type: integer, minimum: 0 }
+  edge_count: { type: integer, minimum: 0 }
+  included_edge_types: { type: string_array, required: true }
+  excluded_edge_types: { type: string_array, required: true }
+  scores: { type: array, required: true }
+  result_hash: { type: string, required: true }
+
+invariants:
+  - alpha is recorded configuration; 0.85 is a baseline prior, not canonical truth
+  - projection_hash and config_hash must both match before backend parity is asserted
+  - semantic similarity edges remain excluded from graph-authority projection unless a newer projection contract explicitly changes that rule
