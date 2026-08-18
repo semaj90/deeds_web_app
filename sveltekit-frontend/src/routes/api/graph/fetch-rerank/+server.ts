@@ -2,9 +2,9 @@
  * POST /api/graph/fetch-rerank
  *
  * Resource-aware graph/semantic reranking. Qdrant remains the candidate source;
- * optional PageRank, n-ary hypergraph, AST, SOM/S3 and exact-evidence work are
- * admitted by a finite recommendation budget. Cache/enrichment availability is
- * never itself a relevance signal.
+ * optional PageRank, n-ary hypergraph, AST, SOM/S3 evidence is admitted by a
+ * finite recommendation budget. Exact promotion is a downstream proof gate: this
+ * endpoint may plan it, but never claims to execute it.
  */
 
 import { json } from '@sveltejs/kit';
@@ -15,6 +15,7 @@ import {
   defaultLaneEstimates,
   selectRecommendationLanes,
   type RecommendationBudget,
+  type RecommendationLane,
 } from '$lib/server/ai/resource-aware-recommendation-policy.js';
 import { mlaFusionRerank } from '$lib/server/search/mla-kv-compress.js';
 import {
@@ -87,6 +88,15 @@ const DEFAULT_BUDGET: RecommendationBudget = {
   maxLatencyMs: 250,
 };
 
+const RERANK_CONSUMABLE_LANES = new Set<RecommendationLane>([
+  'semantic',
+  'ast',
+  'pagerank',
+  'hypergraph',
+  'som',
+  'hypersphere',
+]);
+
 export const POST: RequestHandler = async ({ locals, request }) => {
   if (!locals.user?.id) {
     return json({ error: { code: 'unauthorized', message: 'Login required' } }, { status: 401 });
@@ -109,7 +119,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     queryKind, requiresExactEvidence, structuredTarget, requestedGraphHops, toolArgs,
   } = parsed.data;
   const budget: RecommendationBudget = { ...DEFAULT_BUDGET, ...(parsed.data.budget ?? {}) };
-  budget.maxCandidates = Math.min(budget.maxCandidates, qdrantHits.length);
+  const admittedCandidateCount = Math.min(qdrantHits.length, budget.maxCandidates);
 
   const recommendationPlan = selectRecommendationLanes(
     budget,
@@ -117,30 +127,37 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       queryKind: queryKind ?? 'unknown',
       requiresExactEvidence,
       structuredTarget,
-      candidateCount: qdrantHits.length,
+      candidateCount: admittedCandidateCount,
       availableGpuBytes: budget.maxGpuBytes,
       requestedGraphHops,
       toolArgs,
     }),
   );
-  const activeLanes = new Set(recommendationPlan.selected);
-  const blockedRequired = recommendationPlan.rejected.filter((r) => r.reason === 'required_lane_exceeds_budget');
-  if (blockedRequired.length) {
+
+  if (!recommendationPlan.admissible) {
     return json({
       error: {
         code: 'recommendation_budget_insufficient',
         message: 'Required recommendation evidence exceeds the supplied resource envelope',
-        blocked: blockedRequired,
+        blocked: recommendationPlan.blockingReasons,
       },
       recommendationPlan,
     }, { status: 422 });
   }
 
+  const plannedLanes = new Set(recommendationPlan.selected);
+  const consumedEvidenceLanes = new Set(
+    recommendationPlan.selected.filter((lane) => RERANK_CONSUMABLE_LANES.has(lane)),
+  );
+  const downstreamRequiredLanes = recommendationPlan.selected.filter(
+    (lane) => !RERANK_CONSUMABLE_LANES.has(lane),
+  );
+
   const t0 = Date.now();
-  let enrichedHits: QdrantHit[] = qdrantHits.slice(0, budget.maxCandidates) as QdrantHit[];
+  let enrichedHits: QdrantHit[] = qdrantHits.slice(0, admittedCandidateCount) as QdrantHit[];
 
   // Hyperedge cache enrichment is paid only when the hypergraph lane was admitted.
-  if (activeLanes.has('hypergraph')) {
+  if (consumedEvidenceLanes.has('hypergraph')) {
     try {
       const { getRedis } = await import('$lib/server/redis.js');
       const redis = getRedis();
@@ -160,9 +177,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     } catch { /* fail open: unobserved hypergraph signal stays absent */ }
   }
 
-  // S3/SOM-derived coordinates are optional challengers and are only materialized
-  // when either derived lane is admitted.
-  if (activeLanes.has('hypersphere') || activeLanes.has('som')) {
+  if (consumedEvidenceLanes.has('hypersphere') || consumedEvidenceLanes.has('som')) {
     enrichedHits = enrichedHits.map((hit) => {
       const p = hit.payload;
       if (!p || p.manifold4_q?.length === 4 || !p.manifold4?.length) return hit;
@@ -177,7 +192,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   let hmmBiasMultiplier: [number, number, number, number] | null = null;
 
   if (
-    activeLanes.has('hypersphere') &&
+    consumedEvidenceLanes.has('hypersphere') &&
     hmm?.state && (hmm.confidence ?? 0) > 0 && querySom?.manifold4_q?.length === 4
   ) {
     const section = hmmStateToGlyphSection(hmm.state);
@@ -192,9 +207,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     hmmBiasMultiplier = multiplier;
   }
 
-  // MLA is a refinement executor INSIDE the semantic lane, not another fusion vote.
+  // MLA is an executor inside the single semantic lane, not a second fusion vote.
   let mlaScoreByChunk: Map<string, number> | null = null;
-  if (activeLanes.has('semantic') && queryEmbedding) {
+  if (consumedEvidenceLanes.has('semantic') && queryEmbedding) {
     try {
       const mlaCandidates = enrichedHits.map((h) => ({
         stable_key: h.chunkId,
@@ -212,7 +227,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   }
 
   const results = rerankHits(enrichedHits, effectiveQuerySom, limit, {
-    activeLanes,
+    activeLanes: consumedEvidenceLanes,
     semanticScoreByChunk: mlaScoreByChunk ?? undefined,
   });
 
@@ -220,14 +235,19 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   return json({
     results,
     recommendationPlan,
+    downstreamRequiredLanes,
     retrievalTrace: {
       graphSort: {
         used: true,
         inputCount: qdrantHits.length,
         admittedInputCount: enrichedHits.length,
+        truncatedByCandidateBudget: qdrantHits.length - enrichedHits.length,
         outputCount: results.length,
         durationMs,
-        activeLanes: [...activeLanes],
+        plannedLanes: [...plannedLanes],
+        consumedEvidenceLanes: [...consumedEvidenceLanes],
+        downstreamRequiredLanes,
+        exactPromotionExecuted: false,
         querySomRow: querySom?.row ?? null,
         querySomCol: querySom?.col ?? null,
         mlaUsed: mlaScoreByChunk !== null,
