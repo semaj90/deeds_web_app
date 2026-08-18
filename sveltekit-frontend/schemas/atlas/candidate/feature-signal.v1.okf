@@ -1,0 +1,77 @@
+schema_id: atlas.feature-signal
+schema_version: 1
+schema_kind: derived_feature_signal
+status: ACTIVE
+
+description: >
+  Normalized nullable evidence signal used by request-scoped candidate views.
+  The logical signal is independent from the executor that produced it.
+
+fields:
+  label:
+    type: enum
+    values:
+      - semantic_similarity
+      - lexical_relevance
+      - ast_structural_match
+      - pagerank_global
+      - pagerank_personalized
+      - graph_proximity
+      - hyperedge_activation
+      - domain_match
+      - ontology_match
+      - concept_match
+      - entity_match
+      - test_neighbor
+      - schema_match
+      - freshness
+      - revision_match
+      - evidence_coverage
+      - kmeans_affinity
+      - som_adjacency
+      - low_rank_similarity
+      - learned_rerank_score
+      - prior_execution_success
+      - reuse_probability
+      - token_cost
+      - latency_cost
+      - gpu_byte_cost
+      - tool_call_cost
+  state:
+    type: enum
+    values: [OBSERVED, UNKNOWN, UNAVAILABLE, REJECTED_STALE, REJECTED_IDENTITY, NOT_APPLICABLE]
+  value: { type: number, nullable: true }
+  logicalOwner: { type: string, required: true }
+  executor:
+    type: enum
+    values:
+      - deterministic_ts
+      - postgres
+      - qdrant
+      - cuvs_exact
+      - cagra
+      - diskann
+      - turbovec
+      - networkx
+      - cugraph
+      - neo4j_gds
+      - treesitter
+      - ast_grep
+      - langextract
+      - xgboost_cpu
+      - xgboost_cuda
+      - pytorch_cpu
+      - pytorch_cuda
+      - libtorch_cpu
+      - libtorch_cuda
+      - heuristic
+      - unknown
+  evidenceRefs: { type: string_array, default: [] }
+  modelRevision: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  observedAt: { type: datetime, nullable: true }
+
+invariants:
+  - value must be null unless state=OBSERVED
+  - UNKNOWN and UNAVAILABLE never coerce to zero
+  - executor does not change logicalOwner or create an additional fusion vote
