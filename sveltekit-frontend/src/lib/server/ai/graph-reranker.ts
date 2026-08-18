@@ -198,7 +198,9 @@ export function buildWhyLabels(scores: RerankScores): string[] {
   if (scores.hyperedge > 0.3) why.push('hyperedge_weight');
   if (scores.somAdjacency > 0.4) why.push('som_neighbor');
   if (scores.fastAst > 0.3) why.push('fast_ast_boost');
-  if (scores.quaternion > 0.5) why.push('hypersphere_align');
+  // Preserve the historical reason token for API/test compatibility even though
+  // the underlying score is now interpreted as signed S^3 feature alignment.
+  if (scores.quaternion > 0.5) why.push('quaternion_align');
   return why;
 }
 
