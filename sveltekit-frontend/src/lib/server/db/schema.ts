@@ -214,3 +214,9 @@ export * from './schema/repo-function-registry.js';
 export * from './schema/atlas-contract-fields.js';
 export * from './schema/retrieval-provenance.js';
 export * from './schema/atlas-acquisition.js';
+
+// Parent Atlas manual-DDL planes. These declarations are exported for runtime
+// Drizzle typing/querying; drizzle-kit migration ownership remains excluded in
+// drizzle.config.ts.
+export * from './schema/atlas-structural-intelligence.js';
+export * from './schema/atlas-test-intelligence.js';
