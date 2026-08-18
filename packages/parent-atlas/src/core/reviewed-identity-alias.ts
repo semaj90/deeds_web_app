@@ -63,6 +63,20 @@ export function deriveReviewedAliasDecisionId(input: Omit<z.input<typeof reviewe
 }
 
 export function createReviewedIdentityAliasRepository(pool: Pool) {
+  const readback = async (input: { decision_id: string; producer_revision: string }): Promise<ReviewedIdentityAliasReadbackV1> => {
+    const result = await pool.query(`SELECT * FROM atlas_identity_alias_decisions WHERE decision_id=$1`, [input.decision_id]);
+    if (result.rowCount !== 1) throw new Error(`REVIEWED_ALIAS_READBACK_MISSING:${input.decision_id}`);
+    const row = result.rows[0] as { stable_id: string; new_key: string; registry_revision: string };
+    return reviewedIdentityAliasReadbackSchema.parse({
+      decision_id: input.decision_id,
+      stable_id: row.stable_id,
+      new_key: row.new_key,
+      registry_revision: row.registry_revision,
+      checksum: checksum(result.rows[0]),
+      producer_revision: input.producer_revision,
+    });
+  };
+
   return {
     async persist(decisionInput: ReviewedIdentityAliasV1): Promise<ReviewedIdentityAliasReadbackV1> {
       const decision = reviewedIdentityAliasSchema.parse(decisionInput);
@@ -79,20 +93,8 @@ export function createReviewedIdentityAliasRepository(pool: Pool) {
         decision.old_revision, decision.new_revision, JSON.stringify(decision.evidence_refs), decision.reviewer_id,
         decision.workflow_action_id, decision.reviewed_at, decision.registry_revision, decision.producer_revision,
       ]);
-      return this.readback({ decision_id: decision.decision_id, producer_revision: decision.producer_revision });
+      return readback({ decision_id: decision.decision_id, producer_revision: decision.producer_revision });
     },
-    async readback(input: { decision_id: string; producer_revision: string }): Promise<ReviewedIdentityAliasReadbackV1> {
-      const result = await pool.query(`SELECT * FROM atlas_identity_alias_decisions WHERE decision_id=$1`, [input.decision_id]);
-      if (result.rowCount !== 1) throw new Error(`REVIEWED_ALIAS_READBACK_MISSING:${input.decision_id}`);
-      const row = result.rows[0] as { stable_id: string; new_key: string; registry_revision: string };
-      return reviewedIdentityAliasReadbackSchema.parse({
-        decision_id: input.decision_id,
-        stable_id: row.stable_id,
-        new_key: row.new_key,
-        registry_revision: row.registry_revision,
-        checksum: checksum(result.rows[0]),
-        producer_revision: input.producer_revision,
-      });
-    },
+    readback,
   };
 }
