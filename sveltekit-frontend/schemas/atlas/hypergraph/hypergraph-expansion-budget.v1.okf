@@ -1,0 +1,23 @@
+schema_id: atlas.hypergraph-expansion-budget
+schema_version: 1
+schema_kind: resource_budget
+status: ACTIVE
+
+description: >
+  Finite query-time limits around the existing n-ary HyperGraphRAG traversal.
+  The budget limits expansion work; it never rewrites canonical hyperedges into
+  binary truth.
+
+fields:
+  schema: { type: literal, value: atlas.hypergraph-expansion-budget.v1 }
+  maxEdges: { type: integer, minimum: 0 }
+  maxMembers: { type: integer, minimum: 0 }
+  maxHops: { type: integer, minimum: 0 }
+  maxTokens: { type: integer, minimum: 0 }
+  maxMillis: { type: integer, minimum: 0 }
+  policyRevision: { type: string, required: true }
+
+invariants:
+  - expansion stops when any finite bound is exhausted
+  - n-ary member roles and edge identity are preserved
+  - projection/executor choice does not change canonical relation meaning
