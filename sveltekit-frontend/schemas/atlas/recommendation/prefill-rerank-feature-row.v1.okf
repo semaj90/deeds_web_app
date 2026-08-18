@@ -1,0 +1,43 @@
+schema_id: atlas.prefill-rerank-feature-row
+schema_version: 1
+schema_kind: recommendation_feature_row
+status: ACTIVE
+
+description: >
+  Immutable feature row for recommendation/prefill compilation after candidate
+  identity resolution. Optional enrichments remain nullable so NOT_OBSERVED is
+  distinct from OBSERVED_BAD.
+
+fields:
+  schema: { type: literal, value: atlas.prefill-rerank-feature-row.v1 }
+  requestId: { type: string, required: true }
+  candidateOrdinal: { type: integer, minimum: 0 }
+  canonicalId: { type: string, required: true }
+  packetKey: { type: string, nullable: true }
+  sourceRef: { type: string, required: true }
+  semanticScore: { type: number, minimum: 0, maximum: 1 }
+  semanticExecutor: { type: string, required: true }
+  pagerankScore: { type: number, minimum: 0, maximum: 1, nullable: true }
+  graphAuthorityReceiptRef: { type: string, nullable: true }
+  hypergraphScore: { type: number, minimum: 0, maximum: 1, nullable: true }
+  hyperedgeRefs: { type: string_array, default: [] }
+  astScore: { type: number, minimum: 0, maximum: 1, nullable: true }
+  somScore: { type: number, minimum: 0, maximum: 1, nullable: true }
+  hypersphereScore: { type: number, minimum: 0, maximum: 1, nullable: true }
+  domainScore: { type: number, minimum: 0, maximum: 1, nullable: true }
+  predictedDomain: { type: string, nullable: true }
+  domainPredictionRef: { type: string, nullable: true }
+  observedSignals: { type: string_array, required: true }
+  missingSignals: { type: string_array, required: true }
+  tokenCost: { type: integer, minimum: 0 }
+  latencyCostMs: { type: number, minimum: 0 }
+  workspaceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  featureRevision: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - semanticExecutor never creates a second semantic vote
+  - missing optional signals remain null and are excluded from presence-aware normalization
+  - domain evidence adapts an existing classifier prediction; this contract does not define a new classifier owner
