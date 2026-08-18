@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import type { AssertionResolutionV1 } from './assertion-registry.js';
 import {
   deriveTestCaseKey,
   deriveTestCaseNominationId,
@@ -19,10 +20,7 @@ const vitestAssertionResultSchema = z.object({
   title: z.string().min(1),
   duration: z.number().nonnegative().nullable().optional(),
   failureMessages: z.array(z.string()).default([]),
-  location: z.object({
-    line: z.number().int().positive(),
-    column: z.number().int().positive(),
-  }).nullable().optional(),
+  location: z.object({ line: z.number().int().positive(), column: z.number().int().positive() }).nullable().optional(),
   meta: z.record(z.string(), z.unknown()).optional(),
 }).passthrough();
 
@@ -88,12 +86,7 @@ export type VitestCompilationReceiptV1 = z.infer<typeof vitestCompilationReceipt
 
 function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
-  if (value && typeof value === 'object') {
-    return `{${Object.entries(value as Record<string, unknown>)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
-      .join(',')}}`;
-  }
+  if (value && typeof value === 'object') return `{${Object.entries(value as Record<string, unknown>).sort(([a],[b]) => a.localeCompare(b)).map(([key,item]) => `${JSON.stringify(key)}:${stable(item)}`).join(',')}}`;
   return JSON.stringify(value) ?? 'null';
 }
 
@@ -122,18 +115,7 @@ function normalizeStatus(value: string): TestExecutionObservationV1['status'] {
   }
 }
 
-/**
- * Parse the official Vitest JSON reporter shape into test nominations and
- * immutable execution observations. The reporter decides pass/fail; Parent
- * Atlas does not infer execution state from source or LangExtract text.
- */
-export function compileVitestJsonReport(input: {
-  report: unknown;
-  source_revision: string;
-  run_revision: string;
-  producer_revision: string;
-  repo_root?: string;
-}): {
+export function compileVitestJsonReport(input: { report: unknown; source_revision: string; run_revision: string; producer_revision: string; repo_root?: string }): {
   nominations: TestCaseNominationV1[];
   executions: TestExecutionObservationV1[];
   receipt: VitestCompilationReceiptV1;
@@ -148,30 +130,13 @@ export function compileVitestJsonReport(input: {
     const sourceRef = normalizePath(fileResult.name, input.repo_root);
     for (const assertion of fileResult.assertionResults) {
       const suitePath = assertion.ancestorTitles.map((value) => value.trim()).filter(Boolean);
-      const testKey = deriveTestCaseKey({
-        framework: 'vitest',
-        source_ref: sourceRef,
-        suite_path: suitePath,
-        title: assertion.title,
-      });
-      if (seen.has(testKey)) {
-        throw new Error(`VITEST_TEST_KEY_COLLISION:${sourceRef}:${assertion.fullName}`);
-      }
+      const testKey = deriveTestCaseKey({ framework: 'vitest', source_ref: sourceRef, suite_path: suitePath, title: assertion.title });
+      if (seen.has(testKey)) throw new Error(`VITEST_TEST_KEY_COLLISION:${sourceRef}:${assertion.fullName}`);
       seen.add(testKey);
 
-      const definitionHash = hash({
-        source_ref: sourceRef,
-        suite_path: suitePath,
-        title: assertion.title,
-        full_name: assertion.fullName,
-        location: assertion.location ?? null,
-      });
+      const definitionHash = hash({ source_ref: sourceRef, suite_path: suitePath, title: assertion.title, full_name: assertion.fullName, location: assertion.location ?? null });
       nominations.push(testCaseNominationSchema.parse({
-        nomination_id: deriveTestCaseNominationId({
-          test_key: testKey,
-          source_revision: input.source_revision,
-          definition_hash: definitionHash,
-        }),
+        nomination_id: deriveTestCaseNominationId({ test_key: testKey, source_revision: input.source_revision, definition_hash: definitionHash }),
         test_key: testKey,
         identity_status: 'nominated',
         framework: 'vitest',
@@ -189,14 +154,7 @@ export function compileVitestJsonReport(input: {
 
       const status = normalizeStatus(String(assertion.status));
       executions.push(testExecutionObservationSchema.parse({
-        execution_receipt_id: `test-receipt:${hash([
-          input.run_revision,
-          testKey,
-          status,
-          assertion.duration ?? null,
-          assertion.failureMessages,
-          reportChecksum,
-        ]).slice(0, 40)}`,
+        execution_receipt_id: `test-receipt:${hash([input.run_revision, testKey, status, assertion.duration ?? null, assertion.failureMessages, reportChecksum]).slice(0, 40)}`,
         test_key: testKey,
         source_ref: sourceRef,
         source_revision: input.source_revision,
@@ -216,7 +174,6 @@ export function compileVitestJsonReport(input: {
 
   const counts = { passed: 0, failed: 0, skipped: 0, error: 0 };
   for (const execution of executions) counts[execution.status] += 1;
-
   return {
     nominations,
     executions,
@@ -237,43 +194,40 @@ export function compileVitestJsonReport(input: {
 }
 
 /**
- * Join one runner observation to an already-canonical test registry resolution.
- * No resolution means no canonical atlas.test-evidence.v1 payload.
+ * Join one runner observation to an already-canonical test registry resolution
+ * and, when available, independently canonicalized static assertion identities.
  */
 export function promoteVitestExecutionToTestEvidence(input: {
   nomination: TestCaseNominationV1;
   resolution: TestCaseResolutionV1;
   execution: TestExecutionObservationV1;
+  assertion_resolutions?: AssertionResolutionV1[];
 }): TestEvidencePayloadV1 {
-  if (input.resolution.status !== 'canonical' || !input.resolution.stable_test_id) {
-    throw new Error(`TEST_EVIDENCE_REQUIRES_CANONICAL_TEST:${input.nomination.nomination_id}`);
-  }
-  if (input.nomination.nomination_id !== input.resolution.nomination_id) {
-    throw new Error('TEST_EVIDENCE_RESOLUTION_NOMINATION_MISMATCH');
-  }
-  if (input.nomination.test_key !== input.execution.test_key || input.nomination.test_key !== input.resolution.test_key) {
-    throw new Error('TEST_EVIDENCE_TEST_KEY_MISMATCH');
-  }
+  if (input.resolution.status !== 'canonical' || !input.resolution.stable_test_id) throw new Error(`TEST_EVIDENCE_REQUIRES_CANONICAL_TEST:${input.nomination.nomination_id}`);
+  if (input.nomination.nomination_id !== input.resolution.nomination_id) throw new Error('TEST_EVIDENCE_RESOLUTION_NOMINATION_MISMATCH');
+  if (input.nomination.test_key !== input.execution.test_key || input.nomination.test_key !== input.resolution.test_key) throw new Error('TEST_EVIDENCE_TEST_KEY_MISMATCH');
+
+  const assertions = (input.assertion_resolutions ?? []).map((assertion) => {
+    if (assertion.status !== 'canonical' || !assertion.stable_assertion_id) throw new Error(`TEST_EVIDENCE_ASSERTION_NOT_CANONICAL:${assertion.nomination_id}`);
+    return { assertion_id: assertion.stable_assertion_id, identity_status: 'canonical' as const };
+  });
 
   return testEvidencePayloadSchema.parse({
     schema: 'atlas.test-evidence.v1',
     test_revision: input.nomination.source_revision,
     test_id: input.resolution.stable_test_id,
     identity_status: 'canonical',
-    assertions: [],
-    runtime_receipt: {
-      receipt_id: input.execution.execution_receipt_id,
-      identity_status: 'canonical',
-      status: input.execution.status,
-    },
+    assertions,
+    runtime_receipt: { receipt_id: input.execution.execution_receipt_id, identity_status: 'canonical', status: input.execution.status },
   });
 }
 
 export function describeVitestTestEvidenceCompiler(): string {
   return [
     'Vitest JSON reporter output is the execution-status authority for Vitest tests.',
-    'Reporter rows nominate tests but do not mint stable_test_id; explicit test registry resolution is required.',
+    'Reporter assertionResults rows are test-case results, not individual expect/assert calls.',
+    'Static assertions are independently owned by the assertion registry and may be attached only after canonical assertion resolution.',
     'Line and column are version provenance and do not participate in the cross-revision test_key.',
-    'Execution receipt IDs are deterministic identities for one run/result observation and remain separate from static test identity.',
+    'Execution receipt IDs remain separate from static test and assertion identity.',
   ].join(' ');
 }
