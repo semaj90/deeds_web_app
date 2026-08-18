@@ -55,84 +55,84 @@ async function withClient<T>(pool: Pool, fn: (client: PoolClient) => Promise<T>)
   }
 }
 
+async function resolveNominationAgainstRegistry(
+  pool: Pool,
+  input: { nomination: StructuralSymbolNominationV1; registry_revision: string },
+): Promise<SymbolResolutionV1> {
+  const { nomination } = input;
+  return withClient(pool, async (client) => {
+    const result = await client.query<{ stable_symbol_id: string; basis: string }>(`
+      SELECT stable_symbol_id, basis
+      FROM (
+        SELECT stable_symbol_id, 'exact_symbol_key'::text AS basis, 1 AS priority
+        FROM atlas_symbol_registry
+        WHERE canonical_key = $1 AND status = 'active'
+        UNION ALL
+        SELECT a.stable_symbol_id, 'existing_alias'::text AS basis, 2 AS priority
+        FROM atlas_symbol_aliases a
+        JOIN atlas_symbol_registry r USING (stable_symbol_id)
+        WHERE a.alias_key = $1 AND r.status = 'active'
+        UNION ALL
+        SELECT a.stable_symbol_id, 'existing_alias'::text AS basis, 3 AS priority
+        FROM atlas_symbol_aliases a
+        JOIN atlas_symbol_registry r USING (stable_symbol_id)
+        WHERE $2::text IS NOT NULL
+          AND a.alias_key = ('upstream-symbol:' || $2::text)
+          AND r.status = 'active'
+      ) q
+      ORDER BY priority, stable_symbol_id
+    `, [nomination.symbol_key, nomination.upstream_symbol_id ?? null]);
+
+    const ids = [...new Set(result.rows.map((row) => row.stable_symbol_id))];
+    if (ids.length === 1) {
+      const row = result.rows.find((item) => item.stable_symbol_id === ids[0])!;
+      return symbolResolutionSchema.parse({
+        nomination_id: nomination.nomination_id,
+        symbol_key: nomination.symbol_key,
+        status: 'canonical',
+        stable_symbol_id: ids[0],
+        registry_revision: input.registry_revision,
+        resolution_basis: row.basis === 'exact_symbol_key' ? 'exact_symbol_key' : 'existing_alias',
+        candidate_symbol_ids: ids,
+        evidence_refs: [],
+      });
+    }
+
+    if (ids.length > 1) {
+      return symbolResolutionSchema.parse({
+        nomination_id: nomination.nomination_id,
+        symbol_key: nomination.symbol_key,
+        status: 'ambiguous',
+        registry_revision: input.registry_revision,
+        resolution_basis: 'unresolved',
+        candidate_symbol_ids: ids,
+        evidence_refs: [],
+      });
+    }
+
+    return symbolResolutionSchema.parse({
+      nomination_id: nomination.nomination_id,
+      symbol_key: nomination.symbol_key,
+      status: 'unresolved',
+      registry_revision: input.registry_revision,
+      resolution_basis: 'unresolved',
+      candidate_symbol_ids: [],
+      evidence_refs: [],
+    });
+  });
+}
+
 export type SymbolRegistryRepository = ReturnType<typeof createSymbolRegistryRepository>;
 
 export function createSymbolRegistryRepository(pool: Pool) {
   return {
-    async resolveNomination(input: {
+    resolveNomination(input: {
       nomination: StructuralSymbolNominationV1;
       registry_revision: string;
     }): Promise<SymbolResolutionV1> {
-      const { nomination } = input;
-      return withClient(pool, async (client) => {
-        const result = await client.query<{
-          stable_symbol_id: string;
-          basis: string;
-        }>(`
-          SELECT stable_symbol_id, basis
-          FROM (
-            SELECT stable_symbol_id, 'exact_symbol_key'::text AS basis, 1 AS priority
-            FROM atlas_symbol_registry
-            WHERE canonical_key = $1 AND status = 'active'
-            UNION ALL
-            SELECT a.stable_symbol_id, 'existing_alias'::text AS basis, 2 AS priority
-            FROM atlas_symbol_aliases a
-            JOIN atlas_symbol_registry r USING (stable_symbol_id)
-            WHERE a.alias_key = $1 AND r.status = 'active'
-            UNION ALL
-            SELECT a.stable_symbol_id, 'existing_alias'::text AS basis, 3 AS priority
-            FROM atlas_symbol_aliases a
-            JOIN atlas_symbol_registry r USING (stable_symbol_id)
-            WHERE $2::text IS NOT NULL
-              AND a.alias_key = ('upstream-symbol:' || $2::text)
-              AND r.status = 'active'
-          ) q
-          ORDER BY priority, stable_symbol_id
-        `, [nomination.symbol_key, nomination.upstream_symbol_id ?? null]);
-
-        const ids = [...new Set(result.rows.map((row) => row.stable_symbol_id))];
-        if (ids.length === 1) {
-          const row = result.rows.find((item) => item.stable_symbol_id === ids[0])!;
-          return symbolResolutionSchema.parse({
-            nomination_id: nomination.nomination_id,
-            symbol_key: nomination.symbol_key,
-            status: 'canonical',
-            stable_symbol_id: ids[0],
-            registry_revision: input.registry_revision,
-            resolution_basis: row.basis === 'exact_symbol_key' ? 'exact_symbol_key' : 'existing_alias',
-            candidate_symbol_ids: ids,
-            evidence_refs: [],
-          });
-        }
-
-        if (ids.length > 1) {
-          return symbolResolutionSchema.parse({
-            nomination_id: nomination.nomination_id,
-            symbol_key: nomination.symbol_key,
-            status: 'ambiguous',
-            registry_revision: input.registry_revision,
-            resolution_basis: 'unresolved',
-            candidate_symbol_ids: ids,
-            evidence_refs: [],
-          });
-        }
-
-        return symbolResolutionSchema.parse({
-          nomination_id: nomination.nomination_id,
-          symbol_key: nomination.symbol_key,
-          status: 'unresolved',
-          registry_revision: input.registry_revision,
-          resolution_basis: 'unresolved',
-          candidate_symbol_ids: [],
-          evidence_refs: [],
-        });
-      });
+      return resolveNominationAgainstRegistry(pool, input);
     },
 
-    /**
-     * Explicit promotion only. Callers must decide that the nomination is a new
-     * canonical symbol rather than a rename/move/alias of an existing symbol.
-     */
     async promoteNomination(input: {
       nomination: StructuralSymbolNominationV1;
       registry_revision: string;
@@ -140,12 +140,13 @@ export function createSymbolRegistryRepository(pool: Pool) {
       allow_create: boolean;
       evidence_refs?: string[];
     }): Promise<{ resolution: SymbolResolutionV1; version: SymbolVersionV1 }> {
-      if (!input.allow_create) {
-        throw new Error('SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE');
-      }
+      if (!input.allow_create) throw new Error('SYMBOL_PROMOTION_REQUIRES_EXPLICIT_ALLOW_CREATE');
 
       const nomination = input.nomination;
-      const existing = await this.resolveNomination({ nomination, registry_revision: input.registry_revision });
+      const existing = await resolveNominationAgainstRegistry(pool, {
+        nomination,
+        registry_revision: input.registry_revision,
+      });
       const stableSymbolId = existing.status === 'canonical' && existing.stable_symbol_id
         ? existing.stable_symbol_id
         : canonicalStableSymbolId(nomination);
@@ -163,18 +164,9 @@ export function createSymbolRegistryRepository(pool: Pool) {
             ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
             ON CONFLICT (stable_symbol_id) DO UPDATE SET
               updated_at = now(), registry_revision = EXCLUDED.registry_revision
-          `, [
-            stableSymbolId,
-            nomination.symbol_key,
-            nomination.language,
-            nomination.kind,
-            nomination.name,
-            nomination.qualified_name,
-            nomination.nomination_id,
-            nomination.source_ref,
-            nomination.source_revision,
-            input.registry_revision,
-          ]);
+          `, [stableSymbolId, nomination.symbol_key, nomination.language, nomination.kind,
+            nomination.name, nomination.qualified_name, nomination.nomination_id,
+            nomination.source_ref, nomination.source_revision, input.registry_revision]);
 
           const aliases: Array<[string, string]> = [
             [nomination.symbol_key, 'symbol_key'],
@@ -189,15 +181,8 @@ export function createSymbolRegistryRepository(pool: Pool) {
                 source_revision, evidence_refs, registry_revision
               ) VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7)
               ON CONFLICT (alias_key, stable_symbol_id) DO NOTHING
-            `, [
-              aliasKey,
-              stableSymbolId,
-              aliasKind,
-              nomination.source_ref,
-              nomination.source_revision,
-              JSON.stringify(input.evidence_refs ?? []),
-              input.registry_revision,
-            ]);
+            `, [aliasKey, stableSymbolId, aliasKind, nomination.source_ref,
+              nomination.source_revision, JSON.stringify(input.evidence_refs ?? []), input.registry_revision]);
           }
 
           await client.query(`
@@ -209,23 +194,12 @@ export function createSymbolRegistryRepository(pool: Pool) {
               producer_revision
             ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15)
             ON CONFLICT (symbol_version_id) DO NOTHING
-          `, [
-            symbolVersionId,
-            stableSymbolId,
-            nomination.source_ref,
-            nomination.source_revision,
-            nomination.workspace_revision,
-            nomination.upstream_node_id,
-            nomination.upstream_symbol_id ?? null,
-            nomination.upstream_chunk_id,
-            nomination.qualified_name,
-            nomination.declaration_hash,
-            nomination.signature_normalized ?? null,
-            nomination.byte_start,
-            nomination.byte_end,
-            JSON.stringify(nomination.parent_route),
-            input.producer_revision,
-          ]);
+          `, [symbolVersionId, stableSymbolId, nomination.source_ref, nomination.source_revision,
+            nomination.workspace_revision, nomination.upstream_node_id,
+            nomination.upstream_symbol_id ?? null, nomination.upstream_chunk_id,
+            nomination.qualified_name, nomination.declaration_hash,
+            nomination.signature_normalized ?? null, nomination.byte_start, nomination.byte_end,
+            JSON.stringify(nomination.parent_route), input.producer_revision]);
           await client.query('COMMIT');
         } catch (error) {
           await client.query('ROLLBACK');
