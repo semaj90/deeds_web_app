@@ -18,9 +18,14 @@ Status rule: `WRITTEN` means a contract/reference/scaffold exists on this branch
 | Graph parity receipt | WRITTEN | `graph-projection-parity.ts` |
 | Dynamic SQL hyperedge reader | WRITTEN / BACKFILL PENDING | `dynamic-hyperedge-sql.ts` |
 | Evidence→entity extraction contract | WRITTEN | `evidence-entity-backfill.ts` |
-| Consiliency/8095 evidence compatibility adapter | WRITTEN / NATIVE-ID SIDECAR UPGRADE PENDING | `treesitter-chunker-evidence-adapter.ts` |
-| ast-grep byte-grounded observation adapter | WRITTEN | `ast-grep-observation-adapter.ts` |
-| LangExtract char-grounding gate/adapter | WRITTEN | `langextract-grounding-adapter.ts` |
+| Consiliency/8095 evidence compatibility adapter | WRITTEN / PYTHON CALL-SITE PENDING | `treesitter-chunker-evidence-adapter.ts` |
+| Python Consiliency/LangExtract provenance normalizer | WRITTEN / 8095 IMPORT PENDING | `python/atlas_structural_provenance.py` |
+| Python provenance normalization tests | WRITTEN / NOT EXECUTED | `python/test_atlas_structural_provenance.py` |
+| Frontend 8095 client native provenance fields | WRITTEN / LIVE RESPONSE PENDING | `miniforge-nlp-sidecar.ts` |
+| ast-grep native byte-range extraction | WRITTEN / LIVE FABRIC CALL PENDING | `ast-grep-extractor.ts`, `ast-grep-observation-adapter.ts` |
+| LangExtract char-grounding + alignment gate | WRITTEN / PYTHON CALL-SITE PENDING | `langextract-grounding-adapter.ts` |
+| Current 8095 LangExtract metadata compatibility parser | WRITTEN | `langextract-sidecar-metadata-adapter.ts` |
+| Sidecar provenance wiring audit | WRITTEN | `scripts/atlas/audit-structural-provenance-wiring.mjs` |
 | Structural three-producer fabric | WRITTEN | `structural-extraction-fabric.ts` |
 | GIS canonicalization orchestration | WRITTEN | `gis-canonicalization.ts` |
 | Canonical symbol registry + explicit promotion/readback | WRITTEN / DB PROOF PENDING | `symbol-registry-repository.ts`, `20260818_atlas_symbol_registry_v1.sql` |
@@ -29,6 +34,7 @@ Status rule: `WRITTEN` means a contract/reference/scaffold exists on this branch
 | Runtime Drizzle declarations for manual structural tables | WRITTEN | `atlas-structural-intelligence.ts`, `drizzle.config.ts` exclusions |
 | Structural production receipt | WRITTEN | `structural-production-receipt.ts` |
 | Structural vertical fixture | WRITTEN / NOT EXECUTED | `structural-vertical.integration.test.mjs` |
+| Sidecar provenance compatibility fixture | WRITTEN / NOT EXECUTED | `sidecar-provenance-compat.test.mjs` |
 | Sufficient-context gate | WRITTEN | `hypergraph-retrieval.ts` |
 | Retrieval action receipt | WRITTEN | `retrieval-action-receipt.ts` |
 | ACE N-ary payload | WRITTEN | `ace-hypergraph-payload.ts` |
@@ -42,7 +48,9 @@ Status rule: `WRITTEN` means a contract/reference/scaffold exists on this branch
 ## P0 proof gates — run before claiming runtime integration
 
 - [ ] Build `packages/parent-atlas` with the repo's pinned TypeScript/Node dependency graph.
-- [ ] Execute `test:feature-intelligence:all` (now includes structural vertical fixture).
+- [ ] Execute `test:feature-intelligence:all` (includes structural vertical + sidecar provenance fixtures).
+- [ ] Execute `python/test_atlas_structural_provenance.py` in the 8095 Python environment.
+- [ ] Run `node scripts/atlas/audit-structural-provenance-wiring.mjs`; current expected state is `SCAFFOLDED_LIVE_WIRING_PENDING` until the Python sidecar imports the helper.
 - [ ] Apply `20260817_atlas_feature_intelligence_v1.sql` to a disposable/approved Postgres target.
 - [ ] Apply `20260818_atlas_dynamic_hyperedge_entities_v1.sql`.
 - [ ] Apply `20260818_atlas_symbol_registry_v1.sql`.
@@ -59,20 +67,27 @@ Status rule: `WRITTEN` means a contract/reference/scaffold exists on this branch
 
 - [x] Consume `atlas.ast.evidence.v1` and preserve native Consiliency node/file/symbol/chunk IDs when present.
 - [x] Label synthesized fallback IDs as `compat:*` provenance and prohibit them from becoming canonical identity.
-- [x] Convert byte-grounded ast-grep matches into non-authoritative observations joined to overlapping chunker nodes/chunks.
+- [x] Add side-effect-free Python normalizers for native Consiliency provenance and LangExtract grounding/alignment.
+- [x] Extend the frontend 8095 client to carry native Consiliency node/file/symbol/chunk/hierarchy fields when the service emits them.
+- [x] Make the real frontend ast-grep extractor retain `byteStart`, `byteEnd`, `ruleId` and captures from the AST match.
+- [x] Convert byte-grounded ast-grep matches/features into non-authoritative observations joined to overlapping chunker nodes/chunks.
 - [x] Reject LangExtract observations without valid `char_interval` before canonical evidence.
+- [x] Retain LangExtract alignment quality (`match_exact`, `match_greater`, `match_lesser`, `match_fuzzy`) in observations and receipts.
+- [x] Add compatibility parsing for today's 8095 `grounded_extractions` metadata while preferring native `char_interval` when present.
 - [x] Normalize chunker + ast-grep + LangExtract into one structural evidence fabric.
 - [x] Add GIS resolve/promote seam; new canonical symbol creation requires explicit promotion.
 - [x] Add canonical symbol registry/version/alias persistence contract and Drizzle declarations.
 - [x] Add structural reference resolution from upstream node/symbol/target evidence to canonical symbols.
 - [x] Add `atlas_evidence_entities` writer/readback contract aligned with the manual migration.
 - [x] Add structural production receipt with native-vs-compatibility ID counts and Graphify reachability/fallback gates.
+- [x] Add a static red/green wiring audit for the remaining Python-sidecar call-site integration.
 
 ### Still live/proof pending
 
-- [ ] Upgrade 8095 `/ast/chunk` payload to expose native Consiliency `node_id`, `file_id`, `symbol_id`, hierarchy for every supported chunk; then run with `allow_compatibility_ids=false`.
-- [ ] Wire actual ast-grep rule execution into `AstGrepObservationV1` byte-range output rather than only the adapter/reference boundary.
-- [ ] Expose raw LangExtract `char_interval`/alignment output through the live 8095 client path and feed `GroundedLangExtractObservationV1`.
+- [ ] Import `python/atlas_structural_provenance.py` from `python/miniforge_nlp_sidecar.py` and call `normalize_treesitter_chunker_chunk()` for every raw Consiliency CodeChunk.
+- [ ] Change live `/ast/chunk` output to pass through native Consiliency `node_id`, `file_id`, `symbol_id`, `chunk_id`, `parent_route`, and `parent_context`; then run with `allow_compatibility_ids=false`.
+- [ ] Call `normalize_langextract_extraction()` from `_grounded_extractions()` so live 8095 returns native `char_interval` + `alignment_status` instead of only legacy `start_char/end_char`.
+- [ ] Feed the already byte-grounded frontend ast-grep `ExtractedFeature` objects through `adaptAstGrepExtractedFeature()` + `adaptAstGrepMatches()` in the live structural ingestion path.
 - [ ] Define reviewed rename/move/alias evidence flow before auto-promoting path-changed nominations.
 - [ ] Run symbol registry migration and readback proof.
 - [ ] Run reference resolver against a bounded call/import fixture in Postgres.
@@ -141,6 +156,7 @@ Status rule: `WRITTEN` means a contract/reference/scaffold exists on this branch
 
 - Consiliency/treesitter-chunker IDs are upstream provenance/candidate join keys; GIS owns canonical Atlas symbol identity.
 - ast-grep observations and LangExtract observations cannot create canonical identity or relationships.
+- LangExtract alignment quality affects evidence confidence/eligibility, not canonical identity.
 - HNSW/CAGRA proximity edges are not application relationships.
 - Qdrant point IDs, CAGRA ordinals, Neo4j node IDs and feature-matrix row numbers are not canonical IDs.
 - Dynamic SQL hyperedges are candidates, not canonical facts.
