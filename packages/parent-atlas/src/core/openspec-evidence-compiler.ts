@@ -71,8 +71,8 @@ function scenarioId(requirementIdValue: string, title: string): string {
   return `openspec:scn:${requirementIdValue}:${titleSlug}`;
 }
 
-function taskId(changeName: string, ordinal: string): string {
-  return `openspec:task:${slug(changeName)}:${ordinal}`;
+function taskId(changeName: string, taskKey: string): string {
+  return `openspec:task:${slug(changeName)}:${slug(taskKey)}`;
 }
 
 function inferPathContext(sourceRef: string): { kind: 'main_spec' | 'delta_spec' | 'tasks'; capability?: string; changeName?: string } {
@@ -109,6 +109,12 @@ function operationForHeading(line: string): z.infer<typeof openSpecDeltaOperatio
   return match ? match[1]!.toUpperCase() as z.infer<typeof openSpecDeltaOperationSchema> : null;
 }
 
+function parseStableTaskLine(line: string): { key: string; title: string } | null {
+  const match = line.match(/^\s*-\s*\[[ xX]\]\s+((?:\d+(?:\.\d+)*)|(?:[A-Za-z][A-Za-z0-9_-]*-\d+[A-Za-z0-9_-]*))\s+(.+?)\s*$/);
+  if (!match) return null;
+  return { key: match[1]!, title: match[2]!.trim() };
+}
+
 export function compileOpenSpecEvidence(input: {
   source_ref: string;
   source_revision: string;
@@ -133,21 +139,16 @@ export function compileOpenSpecEvidence(input: {
   if (inferred.kind === 'tasks') {
     if (!changeName) throw new Error(`OPENSPEC_CHANGE_NAME_REQUIRED:${input.source_ref}`);
     for (let index = 0; index < lines.length; index += 1) {
-      const line = lines[index]!;
-      // Require explicit numeric ordinals for stable task identity. Checkbox
-      // prose without an ordinal remains noncanonical until the tasks owner adds one.
-      const match = line.match(/^\s*-\s*\[[ xX]\]\s+(\d+(?:\.\d+)*)\s+(.+?)\s*$/);
-      if (!match) continue;
-      const ordinal = match[1]!;
-      const title = match[2]!.trim();
-      const idValue = taskId(changeName, ordinal);
-      assertUniqueId(taskIds, idValue, title, 'TASK');
+      const parsedTask = parseStableTaskLine(lines[index]!);
+      if (!parsedTask) continue;
+      const idValue = taskId(changeName, parsedTask.key);
+      assertUniqueId(taskIds, idValue, parsedTask.title, 'TASK');
       tasks.push({ task_id: idValue, identity_status: 'canonical' });
-      locations.push({ entity_type: 'task', entity_id: idValue, title, start_line: index + 1, operation: 'BASE' });
+      locations.push({ entity_type: 'task', entity_id: idValue, title: parsedTask.title, start_line: index + 1, operation: 'BASE' });
     }
   } else {
     if (!capability) throw new Error(`OPENSPEC_CAPABILITY_REQUIRED:${input.source_ref}`);
-    let operation: z.infer<typeof openSpecDeltaOperationSchema> = inferred.kind === 'delta_spec' ? 'BASE' : 'BASE';
+    let operation: z.infer<typeof openSpecDeltaOperationSchema> = 'BASE';
     let currentRequirementId: string | null = null;
 
     for (let index = 0; index < lines.length; index += 1) {
@@ -183,7 +184,9 @@ export function compileOpenSpecEvidence(input: {
       if (requirementTitle) {
         const idValue = requirementId(capability, requirementTitle);
         assertUniqueId(requirementIds, idValue, requirementTitle, 'REQUIREMENT');
-        requirements.push({ requirement_id: idValue, identity_status: 'canonical' });
+        if (!requirements.some((item) => item.requirement_id === idValue)) {
+          requirements.push({ requirement_id: idValue, identity_status: 'canonical' });
+        }
         locations.push({ entity_type: 'requirement', entity_id: idValue, title: requirementTitle, start_line: index + 1, operation });
         currentRequirementId = idValue;
         continue;
@@ -196,7 +199,9 @@ export function compileOpenSpecEvidence(input: {
         }
         const idValue = scenarioId(currentRequirementId, scenarioTitle);
         assertUniqueId(scenarioIds, idValue, scenarioTitle, 'SCENARIO');
-        scenarios.push({ scenario_id: idValue, identity_status: 'canonical', requirement_id: currentRequirementId });
+        if (!scenarios.some((item) => item.scenario_id === idValue)) {
+          scenarios.push({ scenario_id: idValue, identity_status: 'canonical', requirement_id: currentRequirementId });
+        }
         locations.push({ entity_type: 'scenario', entity_id: idValue, title: scenarioTitle, start_line: index + 1, operation });
       }
     }
@@ -237,7 +242,7 @@ export function describeOpenSpecEvidenceCompiler(): string {
     'OpenSpec requirement identity is parser-owned and derived from capability plus normalized Requirement heading.',
     'Scenario identity is scoped beneath the canonical requirement ID.',
     'Delta ADDED/MODIFIED/REMOVED sections preserve the same requirement identity; RENAMED emits an explicit alias transition.',
-    'Task identity requires an explicit numeric task ordinal under a change; unnumbered checkbox prose is not promoted.',
+    'Task identity requires an explicit stable task key such as 1.2 or FI-16A under a change; unkeyed checkbox prose is not promoted.',
     'LangExtract may summarize or relate OpenSpec content but never owns OpenSpec canonical identity.',
   ].join(' ');
 }
