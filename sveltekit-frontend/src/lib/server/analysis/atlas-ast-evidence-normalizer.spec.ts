@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeAtlasAstEvidence } from './atlas-ast-evidence-normalizer.js';
 
-const evidence = (lineStart: number, overrides: { name?: string; sourceRevision?: string; nodeType?: string; kind?: string; sourceRef?: string } = {}) => ({
+const evidence = (
+  lineStart: number,
+  overrides: {
+    name?: string;
+    sourceRevision?: string;
+    nodeType?: string;
+    kind?: string;
+    sourceRef?: string;
+    nativeIds?: boolean;
+  } = {},
+) => ({
   schema: 'atlas.ast.evidence.v1' as const,
   engine: 'treesitter-chunker',
   engine_version: '4.0.0',
@@ -9,10 +19,15 @@ const evidence = (lineStart: number, overrides: { name?: string; sourceRevision?
   file_path: overrides.sourceRef ?? 'src/example.ts',
   source_revision: overrides.sourceRevision ?? 'revision-a',
   chunks: [{
-    upstream_chunk_id: 'upstream-line-dependent-id',
+    upstream_chunk_id: overrides.nativeIds === false ? undefined : 'chunk-native-1',
+    upstream_node_id: overrides.nativeIds === false ? undefined : 'node-native-1',
+    upstream_file_id: overrides.nativeIds === false ? undefined : 'file-native-1',
+    upstream_symbol_id: overrides.nativeIds === false ? undefined : 'symbol-native-1',
     node_type: overrides.nodeType ?? 'function_declaration',
     kind: overrides.kind ?? 'function',
     name: overrides.name ?? 'hello',
+    parent_route: ['module', 'hello'],
+    parent_context: 'module',
     start_byte: lineStart === 1 ? 0 : 12,
     end_byte: lineStart === 1 ? 32 : 44,
     start_line: lineStart,
@@ -48,22 +63,51 @@ describe('atlas AST evidence normalizer', () => {
     expect(second.sourceRevision).toBe(first.sourceRevision);
   });
 
-  it('keeps upstream IDs as provenance and leaves canonical identities for persistence', () => {
+  it('preserves native Consiliency IDs and leaves canonical identities for GIS persistence', () => {
     const normalized = normalizeAtlasAstEvidence(evidence(1));
     const symbol = normalized.symbols[0];
 
-    expect(symbol?.upstreamChunkId).toBe('upstream-line-dependent-id');
+    expect(symbol?.upstreamChunkId).toBe('chunk-native-1');
+    expect(symbol?.upstreamNodeId).toBe('node-native-1');
+    expect(symbol?.upstreamFileId).toBe('file-native-1');
+    expect(symbol?.upstreamSymbolId).toBe('symbol-native-1');
+    expect(symbol?.parentRoute).toEqual(['module', 'hello']);
+    expect(symbol?.parentContext).toBe('module');
+
     expect(symbol?.treeNodeId).toMatch(/^[a-f0-9]{64}$/);
+    expect(symbol?.treeNodeIdSource).toBe('atlas_compatibility_hash');
     expect(symbol?.symbolId).toBeNull();
     expect(symbol?.symbolVersionId).toBeNull();
     expect(symbol?.packetKey).toBeNull();
     expect(symbol?.identityStatus).toBe('structural_pending_canonical_persistence');
+
+    expect(normalized.provenance).toEqual({
+      nativeNodeIdCount: 1,
+      nativeFileIdCount: 1,
+      nativeSymbolIdCount: 1,
+      upstreamChunkIdCount: 1,
+      compatibilityTreeNodeIdCount: 1,
+    });
     expect(normalized.edges[0]?.type).toBe('CALLS');
     expect(normalized.edges[0]?.resolved).toBe(false);
     expect(normalized.symbols.every((item) => !item.qualifiedSymbol.startsWith('call_'))).toBe(true);
   });
 
-  it('keeps logical tree identity stable when only the source span moves', () => {
+  it('reports missing native provenance without manufacturing canonical identity', () => {
+    const normalized = normalizeAtlasAstEvidence(evidence(1, { nativeIds: false }));
+    const symbol = normalized.symbols[0];
+
+    expect(symbol?.upstreamNodeId).toBeNull();
+    expect(symbol?.upstreamFileId).toBeNull();
+    expect(symbol?.upstreamSymbolId).toBeNull();
+    expect(symbol?.upstreamChunkId).toBeNull();
+    expect(symbol?.symbolId).toBeNull();
+    expect(symbol?.symbolVersionId).toBeNull();
+    expect(normalized.provenance.nativeNodeIdCount).toBe(0);
+    expect(normalized.provenance.nativeSymbolIdCount).toBe(0);
+  });
+
+  it('keeps the compatibility coordinate stable when only the source span moves', () => {
     const first = normalizeAtlasAstEvidence(evidence(1)).symbols[0];
     const shifted = normalizeAtlasAstEvidence(evidence(2)).symbols[0];
 
@@ -72,15 +116,22 @@ describe('atlas AST evidence normalizer', () => {
     expect(shifted?.span.startByte).not.toBe(first?.span.startByte);
   });
 
-  it('keeps an unrelated sibling insertion from changing the target identity', () => {
-    const first = normalizeAtlasAstEvidence(evidence(4)).symbols[0];
-    const withSibling = normalizeAtlasAstEvidence(evidence(5)).symbols[0];
+  it('uses parent hierarchy in the compatibility coordinate', () => {
+    const base = evidence(1);
+    const changedParent = evidence(1);
+    changedParent.chunks[0] = {
+      ...changedParent.chunks[0],
+      parent_route: ['module', 'OtherContainer', 'hello'],
+      parent_context: 'OtherContainer',
+    };
 
-    expect(withSibling?.treeNodeId).toBe(first?.treeNodeId);
-    expect(withSibling?.qualifiedSymbol).toBe('hello');
+    const first = normalizeAtlasAstEvidence(base).symbols[0];
+    const second = normalizeAtlasAstEvidence(changedParent).symbols[0];
+
+    expect(second?.treeNodeId).not.toBe(first?.treeNodeId);
   });
 
-  it('keeps logical identity across a body-only revision while source revision changes', () => {
+  it('keeps the compatibility coordinate across a body-only revision while source revision changes', () => {
     const first = normalizeAtlasAstEvidence(evidence(1, { sourceRevision: 'revision-a' })).symbols[0];
     const mutated = normalizeAtlasAstEvidence(evidence(1, { sourceRevision: 'revision-b' })).symbols[0];
 
@@ -89,7 +140,7 @@ describe('atlas AST evidence normalizer', () => {
     expect(mutated?.symbolVersionId).toBeNull();
   });
 
-  it('changes logical identity when a symbol is renamed', () => {
+  it('changes the compatibility coordinate when a symbol is renamed', () => {
     const first = normalizeAtlasAstEvidence(evidence(1, { name: 'foo' })).symbols[0];
     const renamed = normalizeAtlasAstEvidence(evidence(1, { name: 'bar' })).symbols[0];
 
