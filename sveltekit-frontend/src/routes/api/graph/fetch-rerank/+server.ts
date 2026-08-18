@@ -17,6 +17,7 @@ import {
   type RecommendationBudget,
   type RecommendationLane,
 } from '$lib/server/ai/resource-aware-recommendation-policy.js';
+import { summarizeToolArgs } from '$lib/server/ai/recommendation-receipt.js';
 import { mlaFusionRerank } from '$lib/server/search/mla-kv-compress.js';
 import {
   toStandardizedBiasedQuaternion,
@@ -156,7 +157,6 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   const t0 = Date.now();
   let enrichedHits: QdrantHit[] = qdrantHits.slice(0, admittedCandidateCount) as QdrantHit[];
 
-  // Hyperedge cache enrichment is paid only when the hypergraph lane was admitted.
   if (consumedEvidenceLanes.has('hypergraph')) {
     try {
       const { getRedis } = await import('$lib/server/redis.js');
@@ -207,7 +207,6 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     hmmBiasMultiplier = multiplier;
   }
 
-  // MLA is an executor inside the single semantic lane, not a second fusion vote.
   let mlaScoreByChunk: Map<string, number> | null = null;
   if (consumedEvidenceLanes.has('semantic') && queryEmbedding) {
     try {
@@ -252,7 +251,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
         querySomCol: querySom?.col ?? null,
         mlaUsed: mlaScoreByChunk !== null,
         semanticVoteCount: 1,
-        toolArgs: toolArgs ?? {},
+        toolInput: summarizeToolArgs(toolArgs),
         budget,
         hmmBias: {
           applied: hmmBiasApplied,
