@@ -1,0 +1,182 @@
+version: 1
+domain_id: atlas.execution
+name: Parent Atlas Bounded Execution
+status: active
+owner: parent-atlas
+
+purpose: >-
+  Define deterministic policy for bounded candidate selection, GPU admission,
+  graph fanout, workflow execution, and protocol adapters without promoting
+  derived ranking or transport state into canonical identity.
+
+canonical_authority:
+  workflow_truth: postgresql18
+  schema_contracts: zod_typescript
+  behavioral_requirements: openspec
+  policy_registry: .okf
+  rule: >-
+    PostgreSQL stores canonical workflow, task, event, evidence and relationship
+    truth. OKF selects policies and executors. Qdrant, pgvector, cuVS, cuGraph,
+    Neo4j, caches and WebGPU are projections or execution backends.
+
+resource_envelope:
+  dimensions:
+    - vram_bytes
+    - context_tokens
+    - candidate_count
+    - graph_hops
+    - hyperedge_count
+    - tool_calls
+    - wall_time_ms
+  boundary_semantics: >-
+    Exhausting a bounded resource is observable boundary evidence, not proof
+    that no relevant candidate, relationship or solution exists outside the
+    explored region.
+
+selection:
+  strategy: constrained_beam
+  deterministic_default: true
+  seeded_exploration:
+    allowed: true
+    max_weight: 0.25
+    receipt_bound_seed: true
+    use: >-
+      Diversify candidates inside explicit family quotas and resource limits.
+      Randomness must never manufacture canonical evidence or identity.
+  score_signals:
+    - exact
+    - reranker
+    - personalized_pagerank
+    - pagerank
+    - semantic
+    - structural
+    - incidence_confidence
+  cost_signals:
+    - candidate_units
+    - hyperedge_units
+    - fanout_units
+    - gpu_bytes
+    - host_bytes
+  invariants:
+    - pagerank_is_ranking_evidence_only
+    - ppr_is_query_conditioned_ranking_only
+    - semantic_executor_count_does_not_add_lane_votes
+    - high_degree_hubs_do_not_bypass_fanout_budget
+    - gpu_only_work_requires_established_gpu_budget
+    - selection_receipts_are_revision_qualified
+
+family_quotas:
+  supported:
+    - entity
+    - relationship
+    - evidence
+  reason: >-
+    A bounded beam may reserve capacity for relationships and exact evidence so
+    semantically dense or high-PageRank entity hubs cannot consume the entire
+    candidate envelope.
+
+graph:
+  canonical_relationship_shape: nary_hyperedge
+  preferred_projection: incidence
+  pairwise_projection:
+    allowed: true
+    authority: derived_only
+    normalize_relation_mass: true
+  pagerank:
+    authority: derived_only
+    default_alpha: 0.85
+    convergence_required_for_proven_receipt: true
+  personalized_pagerank:
+    authority: derived_only
+    query_conditioned: true
+  expansion:
+    hard_max_hops: 4
+    enforce_fanout_budget: true
+    boundary_status: BOUNDARY_EXHAUSTED
+
+concepts:
+  entity_identity_is_concept_identity: false
+  assignment_path:
+    - deterministic_taxonomy_rules
+    - lexical_evidence
+    - ast_evidence
+    - graph_evidence
+    - semantic_candidate
+    - review_or_promotion_gate
+  canonical_predicates:
+    - ENTITY_CLASSIFIED_AS
+    - CONCEPT_BROADER_THAN
+  prohibition: >-
+    KNN proximity, community membership, low-rank association and PageRank do
+    not directly create canonical concept assignments.
+
+gpu:
+  admission:
+    telemetry_preference:
+      - nvml
+      - mixed
+    fail_closed_when_identity_missing: true
+    telemetry_missing_status: DEGRADED_TELEMETRY
+  working_set_model:
+    components:
+      - semantic_matrix
+      - feature_matrix
+      - graph_vertices
+      - graph_edges
+      - hyperedge_incidences
+      - fixed_runtime_overhead
+      - scratch_workspace
+    estimate_is_proof: false
+    final_admission_requires_live_telemetry: true
+    target_tuning_rule: >-
+      Algorithmic policy may be learned or evaluated on larger accelerators,
+      but block sizes, workspace assumptions and kernel tuning must be proven on
+      the target GPU architecture.
+
+storage:
+  postgres18:
+    canonical: true
+    aio_role: >-
+      PostgreSQL 18 asynchronous I/O may improve scans, bitmap heap scans,
+      vacuum and related storage work, but it does not change transaction or
+      workflow semantics.
+  pgvector:
+    canonical: false
+    roles:
+      - exact_vector_scan
+      - hnsw_projection
+      - ivfflat_projection
+    binary_vector_use:
+      - hamming_routing
+      - compact_control_signatures
+    semantic_truth: false
+  bitmap:
+    roles:
+      - filter_masks
+      - route_masks
+      - set_membership
+      - compact_feature_flags
+    semantic_similarity: false
+
+protocols:
+  ag_ui:
+    role: ui_interoperability_adapter
+    canonical_event_ledger: false
+  acp:
+    role: agent_client_adapter
+  a2a:
+    role: agent_to_agent_adapter
+  grpc:
+    role: targeted_live_executor_call
+  rabbitmq:
+    role: durable_async_command_event_fabric
+
+ui:
+  sveltekit2:
+    ssr: current_snapshot
+    sse: revisioned_delta_stream
+  bits_ui:
+    role: authoritative_accessible_controls
+  three_webgpu:
+    role: optional_activity_projection
+    owns_workflow_truth: false
