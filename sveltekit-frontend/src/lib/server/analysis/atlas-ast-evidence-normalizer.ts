@@ -2,9 +2,14 @@ import { createHash } from 'node:crypto';
 
 export type AtlasAstEvidenceChunk = {
   upstream_chunk_id?: string;
+  upstream_node_id?: string;
+  upstream_file_id?: string;
+  upstream_symbol_id?: string;
   node_type: string;
   kind: string;
   name?: string | null;
+  parent_route?: string[];
+  parent_context?: string | null;
   start_byte: number;
   end_byte: number;
   start_line: number;
@@ -47,7 +52,18 @@ export type NormalizedAtlasStructuralEvidence = {
   parserVersion: string;
   symbols: Array<{
     upstreamChunkId: string | null;
+    upstreamNodeId: string | null;
+    upstreamFileId: string | null;
+    upstreamSymbolId: string | null;
+    parentRoute: string[];
+    parentContext: string | null;
+    /**
+     * Legacy Atlas compatibility coordinate. This remains useful for older
+     * consumers, but it is not the native Consiliency node ID and is not a
+     * canonical symbol identity.
+     */
     treeNodeId: string;
+    treeNodeIdSource: 'atlas_compatibility_hash';
     structuralKey: string;
     symbolId: null;
     symbolVersionId: null;
@@ -80,6 +96,13 @@ export type NormalizedAtlasStructuralEvidence = {
       endColumn: number;
     };
   }>;
+  provenance: {
+    nativeNodeIdCount: number;
+    nativeFileIdCount: number;
+    nativeSymbolIdCount: number;
+    upstreamChunkIdCount: number;
+    compatibilityTreeNodeIdCount: number;
+  };
   diagnostics: string[];
 };
 
@@ -104,9 +127,12 @@ function mapNodeKind(kind: string): string {
 }
 
 /**
- * Converts sidecar evidence into the existing Atlas structural identity shape.
- * The sidecar upstream chunk ID is retained as provenance only. Canonical
- * symbol/version/packet identities remain null until canonical persistence.
+ * Converts sidecar evidence into the existing Atlas structural shape while
+ * preserving all upstream Consiliency provenance when it is available.
+ *
+ * `treeNodeId` remains a legacy Atlas compatibility hash for existing callers.
+ * New canonicalization code must prefer upstreamNodeId/upstreamSymbolId as
+ * provenance and GIS registry resolution for stable_symbol_id.
  */
 export function normalizeAtlasAstEvidence(
   input: AtlasAstEvidenceInput,
@@ -121,7 +147,9 @@ export function normalizeAtlasAstEvidence(
   const symbols = input.chunks.map((chunk) => {
     const nodeKind = mapNodeKind(chunk.kind || chunk.node_type);
     const qualifiedSymbol = chunk.name?.trim() || '';
-    const parentKey = 'ROOT';
+    const parentRoute = Array.isArray(chunk.parent_route) ? chunk.parent_route.map(String) : [];
+    const parentContext = chunk.parent_context?.trim() || null;
+    const parentKey = parentRoute.length > 0 ? parentRoute.join('/') : parentContext ?? 'ROOT';
     const normalizedSignature = '';
     const treeNodeId = sha256([
       repoId,
@@ -136,7 +164,13 @@ export function normalizeAtlasAstEvidence(
 
     return {
       upstreamChunkId: chunk.upstream_chunk_id ?? null,
+      upstreamNodeId: chunk.upstream_node_id ?? null,
+      upstreamFileId: chunk.upstream_file_id ?? null,
+      upstreamSymbolId: chunk.upstream_symbol_id ?? null,
+      parentRoute,
+      parentContext,
       treeNodeId,
+      treeNodeIdSource: 'atlas_compatibility_hash' as const,
       structuralKey,
       symbolId: null,
       symbolVersionId: null,
@@ -177,6 +211,13 @@ export function normalizeAtlasAstEvidence(
         endColumn: edge.evidence_end_column,
       },
     })),
+    provenance: {
+      nativeNodeIdCount: symbols.filter((item) => item.upstreamNodeId !== null).length,
+      nativeFileIdCount: symbols.filter((item) => item.upstreamFileId !== null).length,
+      nativeSymbolIdCount: symbols.filter((item) => item.upstreamSymbolId !== null).length,
+      upstreamChunkIdCount: symbols.filter((item) => item.upstreamChunkId !== null).length,
+      compatibilityTreeNodeIdCount: symbols.length,
+    },
     diagnostics: [...input.diagnostics],
   };
 }
