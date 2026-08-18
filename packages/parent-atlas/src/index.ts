@@ -154,6 +154,15 @@ export {
 
 // Feature intelligence / HyperGraphRAG surfaces
 export * from './core/structural-symbol.js';
+export * from './core/structural-extraction-fabric.js';
+export * from './core/treesitter-chunker-evidence-adapter.js';
+export * from './core/ast-grep-observation-adapter.js';
+export * from './core/langextract-grounding-adapter.js';
+export * from './core/symbol-registry-repository.js';
+export * from './core/structural-reference-resolver.js';
+export * from './core/evidence-entity-repository.js';
+export * from './core/gis-canonicalization.js';
+export * from './core/structural-production-receipt.js';
 export * from './core/hypergraph-retrieval.js';
 export * from './core/hypergraph-query-policy.js';
 export * from './core/hypergraph-ppr.js';
