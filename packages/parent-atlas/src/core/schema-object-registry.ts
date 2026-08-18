@@ -11,6 +11,12 @@ export const SCHEMA_OBJECT_KINDS = [
 ] as const;
 export const schemaObjectKindSchema = z.enum(SCHEMA_OBJECT_KINDS);
 
+export const schemaCatalogLocatorSchema = z.object({
+  class_oid: z.number().int().nonnegative().nullable().optional(),
+  object_oid: z.number().int().nonnegative(),
+  object_sub_id: z.number().int().nonnegative().default(0),
+}).strict();
+
 export const schemaObjectNominationSchema = z.object({
   schema: z.literal('atlas.schema-object-nomination.v1').default('atlas.schema-object-nomination.v1'),
   nomination_id: id,
@@ -26,6 +32,7 @@ export const schemaObjectNominationSchema = z.object({
   source_revision: revision,
   schema_revision: revision,
   catalog_oid: z.number().int().nonnegative().nullable().optional(),
+  catalog_locator: schemaCatalogLocatorSchema.nullable().optional(),
   definition_hash: z.string().regex(/^[a-f0-9]{64}$/),
   extractor_revision: revision,
   canonical_authority: z.literal(false).default(false),
@@ -59,6 +66,7 @@ export const schemaObjectVersionSchema = z.object({
   schema_revision: revision,
   parent_stable_schema_object_id: id.nullable().optional(),
   catalog_oid: z.number().int().nonnegative().nullable().optional(),
+  catalog_locator: schemaCatalogLocatorSchema.nullable().optional(),
   definition_hash: z.string().regex(/^[a-f0-9]{64}$/),
   producer_revision: revision,
 }).strict();
@@ -73,13 +81,25 @@ export const schemaObjectReadbackReceiptSchema = z.object({
   producer_revision: revision,
 }).strict();
 
+export type SchemaCatalogLocatorV1 = z.infer<typeof schemaCatalogLocatorSchema>;
 export type SchemaObjectNominationV1 = z.infer<typeof schemaObjectNominationSchema>;
 export type SchemaObjectResolutionV1 = z.infer<typeof schemaObjectResolutionSchema>;
 export type SchemaObjectVersionV1 = z.infer<typeof schemaObjectVersionSchema>;
 export type SchemaObjectReadbackReceiptV1 = z.infer<typeof schemaObjectReadbackReceiptSchema>;
 
+function stable(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
+}
+
 function hash(value: unknown): string {
-  return createHash('sha256').update(JSON.stringify(value), 'utf8').digest('hex');
+  return createHash('sha256').update(stable(value), 'utf8').digest('hex');
 }
 
 export function deriveSchemaObjectKey(input: {
@@ -159,6 +179,39 @@ export function createSchemaObjectRegistryRepository(pool: Pool) {
   return {
     resolveNomination,
 
+    async insertReviewedAlias(input: {
+      stable_schema_object_id: string;
+      new_nomination: SchemaObjectNominationV1;
+      alias_kind: 'rename' | 'move' | 'human';
+      registry_revision: string;
+      evidence_refs: string[];
+    }): Promise<SchemaObjectResolutionV1> {
+      await withClient(pool, async (client) => {
+        await client.query('BEGIN');
+        try {
+          const exists = await client.query(`SELECT 1 FROM atlas_schema_object_registry WHERE stable_schema_object_id=$1 AND status='active'`, [input.stable_schema_object_id]);
+          if (exists.rowCount !== 1) throw new Error(`SCHEMA_ALIAS_TARGET_MISSING:${input.stable_schema_object_id}`);
+          await client.query(`
+            INSERT INTO atlas_schema_object_aliases (
+              alias_key, stable_schema_object_id, alias_kind, source_ref, source_revision, evidence_refs, registry_revision
+            ) VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7)
+            ON CONFLICT (alias_key, stable_schema_object_id) DO NOTHING
+          `, [input.new_nomination.object_key, input.stable_schema_object_id, input.alias_kind,
+            input.new_nomination.source_ref, input.new_nomination.source_revision,
+            JSON.stringify(input.evidence_refs), input.registry_revision]);
+          await client.query('COMMIT');
+        } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+        }
+      });
+      const resolved = await resolveNomination({ nomination: input.new_nomination, registry_revision: input.registry_revision });
+      if (resolved.status !== 'canonical' || resolved.stable_schema_object_id !== input.stable_schema_object_id) {
+        throw new Error(`SCHEMA_REVIEWED_ALIAS_RESOLUTION_FAILED:${input.new_nomination.nomination_id}`);
+      }
+      return schemaObjectResolutionSchema.parse({ ...resolved, resolution_basis: input.alias_kind === 'move' ? 'explicit_move' : input.alias_kind === 'rename' ? 'explicit_rename' : 'human_review', evidence_refs: input.evidence_refs });
+    },
+
     async promoteNomination(input: {
       nomination: SchemaObjectNominationV1;
       registry_revision: string;
@@ -197,21 +250,22 @@ export function createSchemaObjectRegistryRepository(pool: Pool) {
                 alias_key, stable_schema_object_id, alias_kind, source_ref, source_revision, evidence_refs, registry_revision
               ) VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7)
               ON CONFLICT (alias_key, stable_schema_object_id) DO NOTHING
-            `, [aliasKey, stableSchemaObjectId, aliasKind, input.nomination.source_ref, input.nomination.source_revision,
-              JSON.stringify(input.evidence_refs ?? []), input.registry_revision]);
+            `, [aliasKey, stableSchemaObjectId, aliasKind, input.nomination.source_ref,
+              input.nomination.source_revision, JSON.stringify(input.evidence_refs ?? []), input.registry_revision]);
           }
 
           await client.query(`
             INSERT INTO atlas_schema_object_versions (
               schema_object_version_id, stable_schema_object_id, object_key, object_kind,
               qualified_name, source_ref, source_revision, schema_revision,
-              parent_stable_schema_object_id, catalog_oid, definition_hash, producer_revision
-            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+              parent_stable_schema_object_id, catalog_oid, catalog_locator, definition_hash, producer_revision
+            ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11::jsonb,$12,$13)
             ON CONFLICT (schema_object_version_id) DO NOTHING
           `, [schemaObjectVersionId, stableSchemaObjectId, input.nomination.object_key, input.nomination.kind,
             input.nomination.qualified_name, input.nomination.source_ref, input.nomination.source_revision,
             input.nomination.schema_revision, input.parent_stable_schema_object_id ?? null,
-            input.nomination.catalog_oid ?? null, input.nomination.definition_hash, input.producer_revision]);
+            input.nomination.catalog_oid ?? null, JSON.stringify(input.nomination.catalog_locator ?? null),
+            input.nomination.definition_hash, input.producer_revision]);
           await client.query('COMMIT');
         } catch (error) {
           await client.query('ROLLBACK');
@@ -239,6 +293,7 @@ export function createSchemaObjectRegistryRepository(pool: Pool) {
           schema_revision: input.nomination.schema_revision,
           parent_stable_schema_object_id: input.parent_stable_schema_object_id ?? null,
           catalog_oid: input.nomination.catalog_oid ?? null,
+          catalog_locator: input.nomination.catalog_locator ?? null,
           definition_hash: input.nomination.definition_hash,
           producer_revision: input.producer_revision,
         }),
@@ -250,7 +305,7 @@ export function createSchemaObjectRegistryRepository(pool: Pool) {
         const registry = await client.query(`SELECT * FROM atlas_schema_object_registry WHERE stable_schema_object_id=$1`, [input.stable_schema_object_id]);
         if (registry.rowCount !== 1) throw new Error(`SCHEMA_OBJECT_READBACK_MISSING:${input.stable_schema_object_id}`);
         const aliases = await client.query(`SELECT alias_key, alias_kind FROM atlas_schema_object_aliases WHERE stable_schema_object_id=$1 ORDER BY alias_key`, [input.stable_schema_object_id]);
-        const versions = await client.query(`SELECT schema_object_version_id, schema_revision, qualified_name, catalog_oid, definition_hash FROM atlas_schema_object_versions WHERE stable_schema_object_id=$1 ORDER BY schema_revision, schema_object_version_id`, [input.stable_schema_object_id]);
+        const versions = await client.query(`SELECT schema_object_version_id, schema_revision, qualified_name, catalog_oid, catalog_locator, definition_hash FROM atlas_schema_object_versions WHERE stable_schema_object_id=$1 ORDER BY schema_revision, schema_object_version_id`, [input.stable_schema_object_id]);
         const row = registry.rows[0] as { registry_revision: string };
         return schemaObjectReadbackReceiptSchema.parse({
           stable_schema_object_id: input.stable_schema_object_id,
@@ -267,9 +322,9 @@ export function createSchemaObjectRegistryRepository(pool: Pool) {
 
 export function describeSchemaObjectRegistry(): string {
   return [
-    'PostgreSQL catalog OIDs are revision-local provenance and never Atlas stable schema identity.',
+    'PostgreSQL catalog OIDs and column sub-object locators are revision-local provenance and never Atlas stable schema identity.',
     'Schema discovery nominates qualified objects; explicit registry promotion alone creates stable_schema_object_id.',
-    'Aliases preserve identity across reviewed renames/moves; versions retain catalog_oid and definition_hash for one schema revision.',
+    'Reviewed aliases preserve identity across renames or moves before allow_create is used for genuinely new objects.',
     'Schema evidence may enter atlas_evidence_entities only after registry resolution returns canonical identity.',
   ].join(' ');
 }
