@@ -1,0 +1,42 @@
+schema_id: atlas.gpu-lease
+schema_version: 1
+schema_kind: runtime_gpu_lease
+status: ACTIVE
+
+description: >
+  Cross-runtime reservation for one physical NVIDIA GPU shared by Windows-native
+  and WSL2 executors. The lease is an admission-control artifact only: it does not
+  transfer CUDA pointers, contexts, streams, or cache objects across runtimes.
+
+fields:
+  schema: { type: literal, value: atlas.gpu-lease.v1 }
+  leaseId: { type: string, required: true }
+  deviceIdentity:
+    type: object
+    fields:
+      pciDeviceId: { type: string, required: true }
+      deviceUuid: { type: string, nullable: true }
+      computeCapability: { type: string, required: true }
+  runtime:
+    type: enum
+    values: [windows-native, wsl2]
+  executor:
+    type: enum
+    values: [cublas, cublaslt, libtorch, tensorrt-rtx, cusolver, cutlass, cutile, cuvs-exact, cagra, cugraph, pytorch, tensorrt-llm]
+  requestedBytes: { type: integer, minimum: 0 }
+  reservedBytes: { type: integer, minimum: 0 }
+  priority:
+    type: enum
+    values: [BACKGROUND, INTERACTIVE, MUTATION_CRITICAL]
+  environmentReceiptId: { type: string, required: true }
+  acquiredAt: { type: datetime, required: true }
+  expiresAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - windows-native and wsl2 leases for the same device consume one shared physical VRAM envelope
+  - a lease never carries a CUDA pointer, CUDA context, CUDA stream, TensorRT runtime handle, or KV-cache handle
+  - reservedBytes must not exceed requestedBytes unless an explicit allocator policy receipt says otherwise
+  - expired leases are not admissible
+  - environmentReceiptId must identify a PROVEN environment receipt for the selected runtime/executor
