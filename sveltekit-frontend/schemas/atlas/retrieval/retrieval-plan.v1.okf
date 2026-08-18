@@ -1,0 +1,30 @@
+schema_id: atlas.retrieval-plan
+schema_version: 1
+schema_kind: retrieval_plan
+status: ACTIVE
+
+description: >
+  Logical retrieval plan compiled from QueryClassificationV1. It selects lanes
+  and budgets, never concrete semantic executors.
+
+fields:
+  schema: { type: literal, value: atlas.retrieval-plan.v1 }
+  retrievalPlanId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  lanes:
+    type: array
+    items:
+      type: enum
+      values: [lexical, ast, semantic, graph]
+  candidateBudget: { type: integer, minimum: 1 }
+  exactPromotionRequired: { type: boolean }
+  semanticRepresentation: { type: literal, value: semantic_768 }
+  graphHopBudget: { type: integer, minimum: 0 }
+  hyperedgeExpansionBudget: { type: integer, minimum: 0 }
+  workspaceRevision: { type: string, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - semantic appears at most once
+  - executor names QDRANT/CUVS_EXACT/CAGRA/DISKANN/TURBOVEC are forbidden from lanes
