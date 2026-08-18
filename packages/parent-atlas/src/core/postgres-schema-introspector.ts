@@ -34,15 +34,33 @@ export type PostgresCatalogNominationRowV1 = {
   qualified_name: string;
   parent_qualified_name: string | null;
   parent_kind: SchemaObjectNominationV1['kind'] | null;
-  catalog_oid: number | null;
+  catalog_oid: number | string | null;
   /** Semantic/deparsed definition only. Do not put catalog OIDs here. */
   definition: unknown;
 };
 
+function stable(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
+}
+
 function sha256(value: unknown): string {
-  const serialized = typeof value === 'string' ? value : JSON.stringify(value);
-  if (serialized === undefined) throw new Error('POSTGRES_SCHEMA_HASH_INPUT_UNDEFINED');
-  return createHash('sha256').update(serialized, 'utf8').digest('hex');
+  return createHash('sha256').update(stable(value), 'utf8').digest('hex');
+}
+
+function normalizeCatalogOid(value: number | string | null): number | null {
+  if (value == null) return null;
+  const parsed = typeof value === 'number' ? value : Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new Error(`POSTGRES_CATALOG_OID_INVALID:${String(value)}`);
+  }
+  return parsed;
 }
 
 function definitionHash(value: unknown): string {
@@ -80,7 +98,6 @@ async function withClient<T>(pool: Pool, fn: (client: PoolClient) => Promise<T>)
 
 /**
  * Pure compiler used by tests and by the live catalog query.
- *
  * Changing catalog_oid alone MUST NOT change object_key or definition_hash.
  */
 export function compilePostgresCatalogRows(input: {
@@ -108,28 +125,15 @@ export function compilePostgresCatalogRows(input: {
     source_ref: input.source_ref,
     source_revision: input.source_revision,
     schema_revision: input.schema_revision,
-    catalog_oid: row.catalog_oid,
+    catalog_oid: normalizeCatalogOid(row.catalog_oid),
     extractor_revision: input.producer_revision,
     definition: row.definition,
   }));
 }
 
 /**
- * PostgreSQL 18 catalog introspector.
- *
- * The query uses supported catalog/deparser surfaces:
- * - pg_namespace for schemas
- * - pg_class for tables/views
- * - pg_attribute + pg_get_expr for columns/defaults
- * - pg_constraint + pg_get_constraintdef for constraints/FKs
- * - pg_index + pg_get_indexdef for indexes
- * - pg_policy + pg_get_expr for RLS policies
- * - pg_proc + pg_get_functiondef/identity arguments for functions/procedures
- * - pg_trigger + pg_get_triggerdef for non-internal triggers
- *
- * Catalog OIDs are copied to nomination/version provenance only. They are never
- * included in object_key or the semantic definition hash, so dump/restore or
- * catalog rebuilds cannot redefine stable Atlas schema identity by themselves.
+ * PostgreSQL 18 catalog introspector. Supported pg_get_* deparsers produce
+ * semantic/revision evidence while catalog OIDs remain version provenance only.
  */
 export async function introspectPostgresSchema(pool: Pool, input: {
   database_key: string;
@@ -145,160 +149,91 @@ export async function introspectPostgresSchema(pool: Pool, input: {
   return withClient(pool, async (client) => {
     const result = await client.query<PostgresCatalogNominationRowV1>(`
       WITH target_namespaces AS (
-        SELECT oid, nspname
-        FROM pg_namespace
-        WHERE nspname = ANY($1::text[])
+        SELECT oid, nspname FROM pg_namespace WHERE nspname = ANY($1::text[])
       ), schema_rows AS (
-        SELECT
-          'schema'::text AS kind,
-          n.nspname::text AS schema_name,
-          n.nspname::text AS object_name,
-          n.nspname::text AS qualified_name,
-          NULL::text AS parent_qualified_name,
-          NULL::text AS parent_kind,
+        SELECT 'schema'::text AS kind, n.nspname::text AS schema_name,
+          n.nspname::text AS object_name, n.nspname::text AS qualified_name,
+          NULL::text AS parent_qualified_name, NULL::text AS parent_kind,
           n.oid::bigint AS catalog_oid,
           jsonb_build_object('name', n.nspname) AS definition
         FROM target_namespaces n
       ), relation_rows AS (
-        SELECT
-          CASE c.relkind WHEN 'v' THEN 'view' ELSE 'table' END::text AS kind,
-          n.nspname::text AS schema_name,
-          c.relname::text AS object_name,
+        SELECT CASE c.relkind WHEN 'v' THEN 'view' ELSE 'table' END::text AS kind,
+          n.nspname::text AS schema_name, c.relname::text AS object_name,
           (n.nspname || '.' || c.relname)::text AS qualified_name,
-          n.nspname::text AS parent_qualified_name,
-          'schema'::text AS parent_kind,
+          n.nspname::text AS parent_qualified_name, 'schema'::text AS parent_kind,
           c.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'relkind', c.relkind,
-            'rowsecurity', c.relrowsecurity,
-            'forcerowsecurity', c.relforcerowsecurity,
-            'partitioned', c.relkind = 'p'
-          ) AS definition
-        FROM pg_class c
-        JOIN target_namespaces n ON n.oid = c.relnamespace
+          jsonb_build_object('relkind', c.relkind, 'rowsecurity', c.relrowsecurity,
+            'forcerowsecurity', c.relforcerowsecurity, 'partitioned', c.relkind = 'p') AS definition
+        FROM pg_class c JOIN target_namespaces n ON n.oid = c.relnamespace
         WHERE c.relkind IN ('r','p','v')
       ), column_rows AS (
-        SELECT
-          'column'::text AS kind,
-          n.nspname::text AS schema_name,
+        SELECT 'column'::text AS kind, n.nspname::text AS schema_name,
           a.attname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || a.attname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
           CASE c.relkind WHEN 'v' THEN 'view' ELSE 'table' END::text AS parent_kind,
           c.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'attnum', a.attnum,
-            'type', format_type(a.atttypid, a.atttypmod),
-            'not_null', a.attnotnull,
-            'identity', a.attidentity,
-            'generated', a.attgenerated,
-            'default', pg_get_expr(d.adbin, d.adrelid, false)
-          ) AS definition
-        FROM pg_attribute a
-        JOIN pg_class c ON c.oid = a.attrelid
+          jsonb_build_object('attnum', a.attnum, 'type', format_type(a.atttypid, a.atttypmod),
+            'not_null', a.attnotnull, 'identity', a.attidentity, 'generated', a.attgenerated,
+            'default', pg_get_expr(d.adbin, d.adrelid, false)) AS definition
+        FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid
         JOIN target_namespaces n ON n.oid = c.relnamespace
         LEFT JOIN pg_attrdef d ON d.adrelid = a.attrelid AND d.adnum = a.attnum
         WHERE c.relkind IN ('r','p','v') AND a.attnum > 0 AND NOT a.attisdropped
       ), constraint_rows AS (
-        SELECT
-          CASE WHEN con.contype = 'f' THEN 'foreign_key' ELSE 'constraint' END::text AS kind,
-          n.nspname::text AS schema_name,
-          con.conname::text AS object_name,
+        SELECT CASE WHEN con.contype = 'f' THEN 'foreign_key' ELSE 'constraint' END::text AS kind,
+          n.nspname::text AS schema_name, con.conname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || con.conname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
-          'table'::text AS parent_kind,
-          con.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'contype', con.contype,
-            'definition', pg_get_constraintdef(con.oid, false),
-            'validated', con.convalidated,
-            'enforced', con.conenforced,
-            'deferrable', con.condeferrable,
-            'deferred', con.condeferred
-          ) AS definition
-        FROM pg_constraint con
-        JOIN pg_class c ON c.oid = con.conrelid
-        JOIN target_namespaces n ON n.oid = c.relnamespace
-        WHERE con.conrelid <> 0
+          'table'::text AS parent_kind, con.oid::bigint AS catalog_oid,
+          jsonb_build_object('contype', con.contype, 'definition', pg_get_constraintdef(con.oid, false),
+            'validated', con.convalidated, 'enforced', con.conenforced,
+            'deferrable', con.condeferrable, 'deferred', con.condeferred) AS definition
+        FROM pg_constraint con JOIN pg_class c ON c.oid = con.conrelid
+        JOIN target_namespaces n ON n.oid = c.relnamespace WHERE con.conrelid <> 0
       ), index_rows AS (
-        SELECT
-          'index'::text AS kind,
-          n.nspname::text AS schema_name,
-          idx.relname::text AS object_name,
-          (n.nspname || '.' || idx.relname)::text AS qualified_name,
+        SELECT 'index'::text AS kind, n.nspname::text AS schema_name,
+          idx.relname::text AS object_name, (n.nspname || '.' || idx.relname)::text AS qualified_name,
           (n.nspname || '.' || tbl.relname)::text AS parent_qualified_name,
-          'table'::text AS parent_kind,
-          idx.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'definition', pg_get_indexdef(idx.oid, 0, false),
-            'unique', i.indisunique,
-            'primary', i.indisprimary,
-            'valid', i.indisvalid,
-            'ready', i.indisready,
-            'predicate', pg_get_expr(i.indpred, i.indrelid, false)
-          ) AS definition
-        FROM pg_index i
-        JOIN pg_class idx ON idx.oid = i.indexrelid
-        JOIN pg_class tbl ON tbl.oid = i.indrelid
-        JOIN target_namespaces n ON n.oid = tbl.relnamespace
+          'table'::text AS parent_kind, idx.oid::bigint AS catalog_oid,
+          jsonb_build_object('definition', pg_get_indexdef(idx.oid, 0, false),
+            'unique', i.indisunique, 'primary', i.indisprimary, 'valid', i.indisvalid,
+            'ready', i.indisready, 'predicate', pg_get_expr(i.indpred, i.indrelid, false)) AS definition
+        FROM pg_index i JOIN pg_class idx ON idx.oid = i.indexrelid
+        JOIN pg_class tbl ON tbl.oid = i.indrelid JOIN target_namespaces n ON n.oid = tbl.relnamespace
       ), policy_rows AS (
-        SELECT
-          'database_policy'::text AS kind,
-          n.nspname::text AS schema_name,
+        SELECT 'database_policy'::text AS kind, n.nspname::text AS schema_name,
           p.polname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || p.polname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
-          'table'::text AS parent_kind,
-          p.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'command', p.polcmd,
-            'permissive', p.polpermissive,
-            'roles', ARRAY(
-              SELECT CASE WHEN role_oid = 0 THEN 'PUBLIC' ELSE pg_get_userbyid(role_oid) END
-              FROM unnest(p.polroles) AS role_oid
-              ORDER BY 1
-            ),
+          'table'::text AS parent_kind, p.oid::bigint AS catalog_oid,
+          jsonb_build_object('command', p.polcmd, 'permissive', p.polpermissive,
+            'roles', ARRAY(SELECT CASE WHEN role_oid = 0 THEN 'PUBLIC' ELSE pg_get_userbyid(role_oid) END
+              FROM unnest(p.polroles) AS role_oid ORDER BY 1),
             'using', pg_get_expr(p.polqual, p.polrelid, false),
             'with_check', pg_get_expr(p.polwithcheck, p.polrelid, false),
-            'table_row_security_enabled', c.relrowsecurity
-          ) AS definition
-        FROM pg_policy p
-        JOIN pg_class c ON c.oid = p.polrelid
+            'table_row_security_enabled', c.relrowsecurity) AS definition
+        FROM pg_policy p JOIN pg_class c ON c.oid = p.polrelid
         JOIN target_namespaces n ON n.oid = c.relnamespace
       ), function_rows AS (
-        SELECT
-          'database_function'::text AS kind,
-          n.nspname::text AS schema_name,
+        SELECT 'database_function'::text AS kind, n.nspname::text AS schema_name,
           p.proname::text AS object_name,
           (n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')')::text AS qualified_name,
-          n.nspname::text AS parent_qualified_name,
-          'schema'::text AS parent_kind,
+          n.nspname::text AS parent_qualified_name, 'schema'::text AS parent_kind,
           p.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'kind', p.prokind,
-            'identity_arguments', pg_get_function_identity_arguments(p.oid),
-            'result', pg_get_function_result(p.oid),
-            'definition', pg_get_functiondef(p.oid)
-          ) AS definition
-        FROM pg_proc p
-        JOIN target_namespaces n ON n.oid = p.pronamespace
+          jsonb_build_object('kind', p.prokind, 'identity_arguments', pg_get_function_identity_arguments(p.oid),
+            'result', pg_get_function_result(p.oid), 'definition', pg_get_functiondef(p.oid)) AS definition
+        FROM pg_proc p JOIN target_namespaces n ON n.oid = p.pronamespace
       ), trigger_rows AS (
-        SELECT
-          'trigger'::text AS kind,
-          n.nspname::text AS schema_name,
+        SELECT 'trigger'::text AS kind, n.nspname::text AS schema_name,
           t.tgname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || t.tgname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
-          'table'::text AS parent_kind,
-          t.oid::bigint AS catalog_oid,
-          jsonb_build_object(
-            'definition', pg_get_triggerdef(t.oid, false),
-            'enabled', t.tgenabled
-          ) AS definition
-        FROM pg_trigger t
-        JOIN pg_class c ON c.oid = t.tgrelid
-        JOIN target_namespaces n ON n.oid = c.relnamespace
-        WHERE NOT t.tgisinternal
+          'table'::text AS parent_kind, t.oid::bigint AS catalog_oid,
+          jsonb_build_object('definition', pg_get_triggerdef(t.oid, false), 'enabled', t.tgenabled) AS definition
+        FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+        JOIN target_namespaces n ON n.oid = c.relnamespace WHERE NOT t.tgisinternal
       )
       SELECT * FROM schema_rows
       UNION ALL SELECT * FROM relation_rows
