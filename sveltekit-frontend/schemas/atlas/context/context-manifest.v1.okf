@@ -1,0 +1,34 @@
+schema_id: atlas.context-manifest
+schema_version: 1
+schema_kind: context_manifest_contract
+status: ACTIVE
+
+description: >
+  Contract view over the existing Parent Atlas context compiler and
+  atlas_context_manifests table. This file does not authorize a second context
+  table or a second context-selection implementation.
+
+runtime_owner:
+  compiler: sveltekit-frontend/src/lib/server/ace/context-compiler.parent-atlas.ts
+  persistence: sveltekit-frontend/drizzle/0153_atlas_context_manifests.sql
+
+fields:
+  schema: { type: literal, value: atlas.context-manifest.v1 }
+  manifestId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  selectedPacketKeys: { type: string_array, default: [] }
+  rejectedPacketKeys: { type: string_array, default: [] }
+  tokenBudget: { type: integer, minimum: 1 }
+  selectedTokens: { type: integer, minimum: 0 }
+  selectionPolicyVersion: { type: string, required: true }
+  workspaceRevision: { type: string, nullable: true }
+  graphRevision: { type: string, nullable: true }
+  featureRevision: { type: string, nullable: true }
+  representationRevision: { type: string, nullable: true }
+  promotedEvidenceIds: { type: string_array, default: [] }
+  candidateSnapshotId: { type: string, nullable: true }
+  retrievalPlanId: { type: string, nullable: true }
+
+invariants:
+  - Redis/BitFrost warming never increases semantic admission score
+  - manifest persistence remains Postgres canonical run/evidence state

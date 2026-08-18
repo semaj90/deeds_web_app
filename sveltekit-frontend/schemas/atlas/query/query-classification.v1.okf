@@ -1,0 +1,46 @@
+schema_id: atlas.query-classification
+schema_version: 1
+schema_kind: query_classification
+status: ACTIVE
+
+description: >
+  Deterministic front-door classification for Parent Atlas. Converts a raw user
+  request into bounded retrieval, workflow, mutation, and validation needs. It
+  never selects a semantic executor and never creates canonical AST identity.
+
+authority:
+  domain_taxonomy: schemas/atlas/repo-artifact/repo-artifact.v1.okf
+  structural_truth: tree-sitter
+  semantic_truth: semantic_768
+
+fields:
+  schema: { type: literal, value: atlas.query-classification.v1 }
+  requestId: { type: string, required: true }
+  rawQuery: { type: string, required: true }
+  operation:
+    type: enum
+    values: [ANSWER, INSPECT, FILE_MUTATION, VALIDATE, INDEX, WORKFLOW]
+  mutationKind:
+    type: enum
+    values: [CREATE, PATCH, RENAME, DELETE]
+    nullable: true
+  domains: { type: string_array, default: [] }
+  artifactKinds: { type: string_array, default: [] }
+  targetHints: { type: string_array, default: [] }
+  symbols: { type: string_array, default: [] }
+  retrievalNeeds:
+    type: object
+    fields:
+      lexical: { type: boolean }
+      ast: { type: boolean }
+      semantic: { type: boolean }
+      graph: { type: boolean }
+  exactPromotionRequired: { type: boolean }
+  requiresMutation: { type: boolean }
+  requiresValidation: { type: boolean }
+  producerRevision: { type: string, required: true }
+
+validation_rules:
+  - semantic=true means one semantic lane; Qdrant/cuVS/CAGRA/DiskANN/TurboVec are executor choices only
+  - ast=true never grants ast-grep authority to mint symbol_id, symbol_version_id, or tree_node_id
+  - artifactKinds must come from repo-artifact.v1.okf or be explicitly marked UNKNOWN

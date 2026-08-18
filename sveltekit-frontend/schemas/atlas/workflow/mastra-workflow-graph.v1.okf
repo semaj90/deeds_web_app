@@ -1,0 +1,39 @@
+schema_id: atlas.mastra-workflow-graph
+schema_version: 1
+schema_kind: runtime_workflow_dialect
+status: ACTIVE
+
+description: >
+  JSON-safe Mastra runtime dialect compiled from AtlasWorkflowSpecV1. Mirrors
+  Mastra serialized agent/tool/step/workflow entries sufficiently for parity
+  and storage adapters; AtlasWorkflowSpecV1 remains canonical meaning.
+
+external_reference:
+  upstream: mastra-ai/mastra packages/core/src/workflows/workflow.ts
+  concepts: [serializedStepFlow, serializedStepGraph, toStorableGraph]
+
+fields:
+  schema: { type: literal, value: atlas.mastra-workflow-graph.v1 }
+  workflowId: { type: string, required: true }
+  workflowRevision: { type: integer, minimum: 1 }
+  atlasChecksum: { type: string, required: true }
+  formatRevision: { type: string, required: true }
+  entries:
+    type: array
+    items:
+      type:
+        type: enum
+        values: [step, tool, agent, workflow]
+      id: { type: string, required: true }
+      toolId: { type: string, nullable: true }
+      agentId: { type: string, nullable: true }
+      workflowRef: { type: string, nullable: true }
+      description: { type: string, nullable: true }
+      canSuspend: { type: boolean, default: false }
+      metadata: { type: object, default: {} }
+  edges: { type: dag_edge_array, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - this dialect cannot grant filesystem/database authority
+  - runtime snapshots are operational checkpoints, not Atlas domain truth
