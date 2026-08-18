@@ -1,5 +1,8 @@
 import { createMiniforgeNlpSidecarClient, type AtlasStructuralEvidence } from '$lib/server/nlp/miniforge-nlp-sidecar.js';
-import { normalizeAtlasAstEvidence, type NormalizedAtlasStructuralEvidence } from '$lib/server/analysis/atlas-ast-evidence-normalizer.js';
+import {
+  normalizeAtlasAstEvidence,
+  type NormalizedAtlasStructuralEvidence,
+} from '$lib/server/analysis/atlas-ast-evidence-normalizer.js';
 
 export type CanonicalSourceRef = {
   sourceRef: string;
@@ -51,6 +54,11 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
   };
 }
 
+export type StructuralPromotionGate =
+  | 'ELIGIBLE_FOR_GIS_EVALUATION'
+  | 'BLOCKED_NATIVE_PROVENANCE_INCOMPLETE'
+  | 'BLOCKED_PROVIDER_FAILURE';
+
 export type StructuralMaterializationResult = {
   sourceRef: string;
   sourceRevision: string;
@@ -58,14 +66,24 @@ export type StructuralMaterializationResult = {
   status: AstProviderResult['status'];
   normalized: NormalizedAtlasStructuralEvidence | null;
   diagnostics: string[];
+  nativeProvenanceComplete: boolean;
+  promotionGate: StructuralPromotionGate;
+  /** Canonical IDs remain owned by GIS/persistence and are never minted here. */
+  canonicalIdentity: {
+    symbolId: null;
+    symbolVersionId: null;
+    packetKey: null;
+  };
   persistence: 'NOT_ATTEMPTED';
   fallback: 'NONE';
 };
 
 /**
- * Canonical Graphify owner boundary. It owns orchestration and receipt shape;
- * 8095 owns structural parsing evidence. Identity persistence and projections
- * remain downstream and are intentionally not performed here.
+ * Canonical Graphify structural owner boundary.
+ *
+ * 8095/Consiliency owns parse/chunk evidence. This materializer preserves native
+ * provenance and exposes whether GIS MAY evaluate canonical promotion. It never
+ * promotes or persists identity itself.
  */
 export class GraphifyStructuralMaterializer {
   constructor(private readonly astProvider: AstProvider = create8095AstProvider()) {}
@@ -75,6 +93,13 @@ export class GraphifyStructuralMaterializer {
     const normalized = result.evidence && result.status !== 'FAILED'
       ? normalizeAtlasAstEvidence(result.evidence)
       : null;
+    const nativeProvenanceComplete = Boolean(normalized?.nativeProvenance.complete);
+    const promotionGate: StructuralPromotionGate = result.status === 'FAILED'
+      ? 'BLOCKED_PROVIDER_FAILURE'
+      : nativeProvenanceComplete
+        ? 'ELIGIBLE_FOR_GIS_EVALUATION'
+        : 'BLOCKED_NATIVE_PROVENANCE_INCOMPLETE';
+
     return {
       sourceRef: input.sourceRef,
       sourceRevision: input.sourceRevision,
@@ -82,6 +107,9 @@ export class GraphifyStructuralMaterializer {
       status: result.status,
       normalized,
       diagnostics: [...result.diagnostics],
+      nativeProvenanceComplete,
+      promotionGate,
+      canonicalIdentity: { symbolId: null, symbolVersionId: null, packetKey: null },
       persistence: 'NOT_ATTEMPTED',
       fallback: 'NONE',
     };
