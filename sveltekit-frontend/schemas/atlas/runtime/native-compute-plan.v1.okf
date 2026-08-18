@@ -1,0 +1,53 @@
+schema_id: atlas.native-compute-plan
+schema_version: 1
+schema_kind: native_compute_plan
+status: ACTIVE
+
+description: >
+  Executor-neutral compute plan for Parent Atlas. Chooses Windows-native or WSL2
+  implementations without changing operation semantics. Every accelerated result
+  must remain comparable to the declared reference backend and tolerance.
+
+fields:
+  schema: { type: literal, value: atlas.native-compute-plan.v1 }
+  planId: { type: string, required: true }
+  operation:
+    type: enum
+    values: [GEMM, GEMV, COSINE_TOPK, SVD, PCA, PAGERANK, PPR, KNN_EXACT, KNN_ANN, GNN_INFER, MODEL_INFER, CLASSIFY, RERANK]
+  capability: { type: string, required: true }
+  referenceBackend:
+    type: enum
+    values: [numpy-cpu, pytorch-cpu, networkx, boost-graph, scalar-cpp]
+  selectedRuntime:
+    type: enum
+    values: [windows-native, wsl2, cpu-only]
+  selectedExecutor:
+    type: enum
+    values: [cpu, cublas, cublaslt, libtorch-cuda, cusolver, cutlass, cutile, tensorrt-rtx, pytorch-cuda, cuvs-exact, cagra, cugraph, cugraph-pyg, tensorrt-llm]
+  dtype:
+    type: enum
+    values: [fp64, fp32, tf32, bf16, fp16, int8]
+  accumulationDtype:
+    type: enum
+    values: [fp64, fp32, tf32, bf16, fp16, int32]
+  shape: { type: integer_array, required: true }
+  smArchitecture: { type: string, nullable: true }
+  requiredGpuBytes: { type: integer, minimum: 0 }
+  numericalTolerance:
+    type: object
+    fields:
+      maxAbsError: { type: number, minimum: 0 }
+      maxRelError: { type: number, minimum: 0 }
+      minTopKOverlap: { type: number, minimum: 0, maximum: 1, nullable: true }
+  environmentReceiptId: { type: string, nullable: true }
+  gpuLeaseId: { type: string, nullable: true }
+  accuracyReceiptId: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - runtime and executor selection never change canonical operation meaning
+  - accelerated GPU executors require a proven environment receipt and active GPU lease
+  - int8 requires accuracyReceiptId proving the task-specific quality threshold
+  - PageRank/PPR parameters and graph projection identity live in graph receipts, not implicit executor defaults
+  - SVD proof compares invariant quantities such as singular values/reconstruction/subspace, not raw U/Vh bytes
