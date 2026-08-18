@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""NetworkX PageRank reference oracle for the Parent Atlas fixture-only authority gate.
+"""NetworkX PageRank reference oracle for Parent Atlas graph authority.
 
-This is a graph analytics fixture only. It is unrelated to web fetching,
-crawling, or HTML extraction.
+NetworkX is the readable/reference implementation for graph math. Accelerated
+executors (cuGraph, LibTorch, native CUDA, Neo4j projections) must prove parity
+against the same revisioned projection; they do not redefine the equation.
+
+Important: this authority graph is a directed graph and MAY contain cycles.
+Workflow/agent execution DAG validation is a separate contract.
 """
 
 from __future__ import annotations
@@ -12,14 +16,14 @@ import hashlib
 import json
 import os
 import subprocess
-import sys
 import uuid
 from pathlib import Path
+from typing import Iterable
 
 try:
     import networkx as nx
     import yaml
-except ImportError as error:  # Keep infrastructure status explicit for the caller.
+except ImportError as error:
     print(json.dumps({"status": "NETWORKX_UNAVAILABLE", "reason": str(error)}))
     raise SystemExit(2)
 
@@ -43,6 +47,10 @@ def stable_json(value: object) -> str:
     return json.dumps(normalize_numbers(value), sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
 
+def sha256_json(value: object) -> str:
+    return hashlib.sha256(stable_json(value).encode("utf-8")).hexdigest()
+
+
 def topology_hash(nodes: list[dict], edges: list[dict]) -> str:
     normalized = {
         "nodes": sorted(
@@ -54,10 +62,47 @@ def topology_hash(nodes: list[dict], edges: list[dict]) -> str:
             key=lambda edge: edge["edgeKey"],
         ),
     }
-    return hashlib.sha256(stable_json(normalized).encode("utf-8")).hexdigest()
+    return sha256_json(normalized)
 
 
-def run(fixture_path: Path, manifest_path: Path) -> dict:
+def parse_personalization(entries: Iterable[str], valid_nodes: set[str]) -> dict[str, float] | None:
+    weights: dict[str, float] = {}
+    for entry in entries:
+        if "=" not in entry:
+            raise ValueError(f"invalid personalization entry {entry!r}; expected NODE=WEIGHT")
+        node, raw_weight = entry.rsplit("=", 1)
+        node = node.strip()
+        if node not in valid_nodes:
+            raise ValueError(f"personalization node is not in graph: {node}")
+        weight = float(raw_weight)
+        if weight < 0:
+            raise ValueError("personalization weights must be >= 0")
+        weights[node] = weights.get(node, 0.0) + weight
+
+    if not weights:
+        return None
+    total = sum(weights.values())
+    if total <= 0:
+        raise ValueError("at least one personalization weight must be > 0")
+    return {node: weights[node] / total for node in sorted(weights)}
+
+
+def run(
+    fixture_path: Path,
+    manifest_path: Path,
+    *,
+    alpha: float = 0.85,
+    max_iter: int = 100,
+    tol: float = 1e-8,
+    personalization_entries: Iterable[str] = (),
+) -> dict:
+    if not 0.0 < alpha < 1.0:
+        raise ValueError("alpha must satisfy 0 < alpha < 1")
+    if max_iter <= 0:
+        raise ValueError("max_iter must be > 0")
+    if tol <= 0:
+        raise ValueError("tol must be > 0")
+
     fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
     manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8"))
     projection = manifest["graph_projection"]
@@ -71,27 +116,79 @@ def run(fixture_path: Path, manifest_path: Path) -> dict:
     snapshot_id = fixture["snapshotId"]
     nodes = [{**node, "snapshotId": snapshot_id} for node in fixture["nodes"]]
     edges = [{**edge, "snapshotId": snapshot_id} for edge in fixture["edges"]]
+
     graph = nx.DiGraph()
     graph.add_nodes_from(node["nodeKey"] for node in nodes)
+    projected_edges: list[dict] = []
     for edge in edges:
-        if edge["edgeType"] in included and edge["confidence"] >= projection["minimum_confidence"]:
+        edge_type = edge["edgeType"].upper()
+        if edge_type in included and edge["confidence"] >= projection["minimum_confidence"]:
             graph.add_edge(edge["sourceNodeKey"], edge["targetNodeKey"], weight=edge["weight"])
+            projected_edges.append(
+                {
+                    "edgeKey": edge["edgeKey"],
+                    "sourceNodeKey": edge["sourceNodeKey"],
+                    "targetNodeKey": edge["targetNodeKey"],
+                    "edgeType": edge_type,
+                    "weight": edge["weight"],
+                    "confidence": edge["confidence"],
+                }
+            )
 
-    scores = nx.pagerank(graph, alpha=0.85, max_iter=100, tol=1e-8, weight="weight")
-    top_hash = topology_hash(nodes, edges)
+    personalization = parse_personalization(personalization_entries, set(graph.nodes))
+    scores = nx.pagerank(
+        graph,
+        alpha=alpha,
+        personalization=personalization,
+        max_iter=max_iter,
+        tol=tol,
+        weight="weight",
+    )
+
+    source_topology_hash = topology_hash(nodes, edges)
+    projection_payload = {
+        "snapshotId": snapshot_id,
+        "minimumConfidence": projection["minimum_confidence"],
+        "includedEdgeTypes": sorted(included),
+        "excludedEdgeTypes": sorted(excluded),
+        "nodes": sorted(graph.nodes),
+        "edges": sorted(projected_edges, key=lambda edge: edge["edgeKey"]),
+    }
+    projection_hash = sha256_json(projection_payload)
+    personalization_hash = sha256_json(personalization) if personalization else None
+
     score_rows = [{"nodeKey": node_key, "pagerankRaw": scores[node_key]} for node_key in sorted(scores)]
-    result_hash = hashlib.sha256(stable_json(score_rows).encode("utf-8")).hexdigest()
-    run_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"atlas-networkx:{snapshot_id}:{top_hash}"))
+    result_hash = sha256_json(score_rows)
+    config = {
+        "alpha": alpha,
+        "max_iter": max_iter,
+        "tol": tol,
+        "weight": "weight",
+        "mode": "personalized" if personalization else "global",
+        "personalization": personalization,
+    }
+    config_hash = sha256_json(config)
+    run_id = str(
+        uuid.uuid5(
+            uuid.NAMESPACE_URL,
+            f"atlas-networkx:v2:{snapshot_id}:{projection_hash}:{config_hash}",
+        )
+    )
 
     return {
+        "schema": "atlas.graph-authority-receipt.v2",
         "status": "NETWORKX_REFERENCE_PROVEN",
         "snapshot_id": snapshot_id,
-        "authority_contract": "fixture-authority-v1",
+        "authority_contract": "networkx-authority-v2",
         "run_id": run_id,
-        "topology_hash": top_hash,
-        "engine": "networkx",
+        "source_topology_hash": source_topology_hash,
+        "projection_hash": projection_hash,
+        "config_hash": config_hash,
+        "personalization_hash": personalization_hash,
+        "reference_engine": "networkx",
+        "executor_role": "REFERENCE_ORACLE",
         "normalization_applied_by": "none",
-        "config": {"alpha": 0.85, "max_iter": 100, "tol": 1e-8, "weight": "weight"},
+        "config": config,
         "node_count": graph.number_of_nodes(),
         "edge_count": graph.number_of_edges(),
         "included_edge_types": sorted(included),
@@ -109,6 +206,16 @@ def main() -> int:
     parser.add_argument("--workspace-id", default=os.environ.get("PAGERANK_WORKSPACE_ID", "workspace:parent-atlas"))
     parser.add_argument("--snapshot-id", default=os.environ.get("PAGERANK_SNAPSHOT_ID", ""))
     parser.add_argument("--source-inventory-snapshot-id", default=os.environ.get("PAGERANK_SOURCE_INVENTORY_SNAPSHOT_ID", ""))
+    parser.add_argument("--alpha", type=float, default=0.85)
+    parser.add_argument("--max-iter", type=int, default=100)
+    parser.add_argument("--tol", type=float, default=1e-8)
+    parser.add_argument(
+        "--personalize",
+        action="append",
+        default=[],
+        metavar="NODE=WEIGHT",
+        help="Repeat to build a query-conditioned personalization vector",
+    )
     args = parser.parse_args()
 
     fixture_path = args.fixture
@@ -134,7 +241,19 @@ def main() -> int:
             check=True,
         )
 
-    print(json.dumps(run(fixture_path, args.manifest), sort_keys=True))
+    print(
+        json.dumps(
+            run(
+                fixture_path,
+                args.manifest,
+                alpha=args.alpha,
+                max_iter=args.max_iter,
+                tol=args.tol,
+                personalization_entries=args.personalize,
+            ),
+            sort_keys=True,
+        )
+    )
     return 0
 
 
