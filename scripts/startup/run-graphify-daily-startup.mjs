@@ -16,6 +16,7 @@ import { acquireStartupLock, releaseStartupLock } from './lib/graphify-startup-l
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const FRONTEND = path.resolve(ROOT, 'sveltekit-frontend');
+const PARENT_ATLAS = path.resolve(ROOT, 'packages/parent-atlas');
 const DAILY_CHAIN_SCRIPT = 'npm run graphify:daily:chain';
 const FALLBACK_SCRIPT = 'npm run startup:graphify-complete:no-consumer -- --skip-audit';
 const STARTUP_LOCK_FILE = path.resolve(ROOT, '.graphify-daily-start.lock');
@@ -23,6 +24,11 @@ const STARTUP_LOCK_FILE = path.resolve(ROOT, '.graphify-daily-start.lock');
 const quiet = process.env.GRAPHIFY_QUIET === '1';
 const refreshFeatures = process.env.GRAPHIFY_FEATURE_RECOMMENDATIONS === '1';
 const allowFallback = process.env.GRAPHIFY_ALLOW_FALLBACK === '1';
+const nativeStructural = process.env.GRAPHIFY_NATIVE_STRUCTURAL === '1';
+const nativeStructuralApply = process.env.GRAPHIFY_NATIVE_STRUCTURAL_APPLY === '1';
+const nativeStructuralAllowCreateSymbols = process.env.GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS === '1';
+const nativeStructuralLimit = process.env.GRAPHIFY_NATIVE_STRUCTURAL_LIMIT || '50';
+const nativeStructuralInclude = process.env.GRAPHIFY_NATIVE_STRUCTURAL_INCLUDE || '';
 const provenanceScript = 'npm run atlas:phase109b:workflow:dry';
 
 if (!acquireStartupLock(STARTUP_LOCK_FILE, { script: 'run-graphify-daily-startup.mjs' })) {
@@ -69,6 +75,44 @@ try {
   });
 
   console.log('graphify:daily partial');
+
+  // Native structural owner migration. Batch A remains a synthetic/heuristic
+  // compatibility producer and is not promoted. This step is opt-in until the
+  // 8095 runtime and PostgreSQL readback gates are proven on the workstation.
+  //
+  // GRAPHIFY_NATIVE_STRUCTURAL=1                    -> dry-run (default)
+  // GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1              -> write atlas_evidence and canonical entity facts
+  // GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS=1 -> additionally permit GIS creation of new stable symbols
+  if (nativeStructural) {
+    if (!quiet) console.log('[graphify:daily] Building Parent Atlas contracts for native structural owner...');
+    execSync('npm run build', {
+      cwd: PARENT_ATLAS,
+      stdio: quiet ? 'ignore' : 'inherit',
+      timeout: 5 * 60 * 1000,
+      shell: true,
+    });
+
+    const nativeArgs = [
+      'npx tsx scripts/atlas/native-structural-materializer.mts',
+      `--limit=${nativeStructuralLimit}`,
+    ];
+    if (nativeStructuralInclude) nativeArgs.push(`--include=${nativeStructuralInclude}`);
+    if (nativeStructuralApply) nativeArgs.push('--apply');
+    if (nativeStructuralAllowCreateSymbols) nativeArgs.push('--allow-create-symbols');
+    if (!quiet) nativeArgs.push('--verbose');
+
+    if (!quiet) {
+      console.log(`[graphify:daily] Native structural owner ${nativeStructuralApply ? 'APPLY' : 'DRY-RUN'} mode; symbol creation ${nativeStructuralAllowCreateSymbols ? 'ENABLED' : 'DISABLED'}.`);
+    }
+    execSync(nativeArgs.join(' '), {
+      cwd: FRONTEND,
+      stdio: quiet ? 'ignore' : 'inherit',
+      timeout: 2 * 60 * 60 * 1000,
+      shell: true,
+      env: { ...process.env, ATLAS_NATIVE_STRUCTURAL_LIMIT: nativeStructuralLimit },
+    });
+    if (!quiet) console.log('[graphify:daily] Native structural owner step complete');
+  }
 
   if (refreshFeatures) {
     if (!quiet) console.log('[graphify:daily] Refreshing feature recommendation index...');
