@@ -162,6 +162,8 @@ export * from './core/langextract-sidecar-metadata-adapter.js';
 export * from './core/symbol-registry-repository.js';
 export * from './core/schema-object-registry.js';
 export * from './core/postgres-schema-introspector.js';
+export * from './core/test-case-registry.js';
+export * from './core/vitest-test-evidence-compiler.js';
 export * from './core/openspec-evidence-compiler.js';
 export * from './core/workflow-action-event.js';
 export * from './core/structural-reference-resolver.js';
@@ -237,7 +239,7 @@ export type {
 } from './core/feature-intelligence.js';
 export type { IngestOptions, IngestResult } from './pipelines/ingest.js';
 export type { KarpathyEnrichOptions, KarpathyEnrichResult } from './pipelines/enrich-karpathy.js';
-export type { HydrateCacheOptions, HydrateCacheResult } from './pipelines/hydrate-cache.js';
+export type { HydrateCacheOptions, HydrateResult } from './pipelines/hydrate-cache.js';
 export type { MapReduceOptions, MapReduceResult } from './pipelines/mapreduce.js';
 export type { ReplayRunOptions } from './gates/replay.js';
 export type { FinalGateResult } from './gates/final.js';
