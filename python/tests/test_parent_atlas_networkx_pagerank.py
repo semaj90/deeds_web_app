@@ -9,22 +9,58 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "python/parent_atlas_networkx_pagerank.py"
 
 
-def test_parent_atlas_networkx_pagerank_fixture():
-    result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, check=False)
+def run_pagerank(*args: str):
+    result = subprocess.run(
+        [sys.executable, str(SCRIPT), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     payload = json.loads(result.stdout)
     assert result.returncode == 0, payload
+    return payload
+
+
+def test_parent_atlas_networkx_pagerank_fixture():
+    payload = run_pagerank()
+    assert payload["schema"] == "atlas.graph-authority-receipt.v2"
     assert payload["status"] == "NETWORKX_REFERENCE_PROVEN"
+    assert payload["executor_role"] == "REFERENCE_ORACLE"
     assert payload["node_count"] > 0
     assert "MATERIALIZES" not in payload["included_edge_types"]
     assert "SEMANTIC_SIMILAR" in payload["excluded_edge_types"]
     assert abs(sum(score["pagerankRaw"] for score in payload["scores"]) - 1.0) <= 1e-8
     assert all(score["pagerankRaw"] >= 0 for score in payload["scores"])
     assert max(payload["scores"], key=lambda score: score["pagerankRaw"])["nodeKey"]
+    assert payload["config"] == {
+        "alpha": 0.85,
+        "max_iter": 100,
+        "tol": 1e-8,
+        "weight": "weight",
+        "mode": "global",
+        "personalization": None,
+    }
 
-    repeated = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, check=False)
-    assert repeated.returncode == 0
-    assert json.loads(repeated.stdout)["topology_hash"] == payload["topology_hash"]
-    assert json.loads(repeated.stdout)["result_hash"] == payload["result_hash"]
+    repeated = run_pagerank()
+    assert repeated["source_topology_hash"] == payload["source_topology_hash"]
+    assert repeated["projection_hash"] == payload["projection_hash"]
+    assert repeated["config_hash"] == payload["config_hash"]
+    assert repeated["result_hash"] == payload["result_hash"]
+    assert repeated["run_id"] == payload["run_id"]
+
+
+def test_parent_atlas_networkx_pagerank_supports_revisioned_personalization():
+    baseline = run_pagerank()
+    anchor = baseline["scores"][0]["nodeKey"]
+    personalized = run_pagerank("--alpha", "0.80", "--personalize", f"{anchor}=1")
+
+    assert personalized["config"]["alpha"] == 0.80
+    assert personalized["config"]["mode"] == "personalized"
+    assert personalized["config"]["personalization"] == {anchor: 1}
+    assert personalized["personalization_hash"]
+    assert personalized["config_hash"] != baseline["config_hash"]
+    assert personalized["run_id"] != baseline["run_id"]
+    assert personalized["result_hash"] != baseline["result_hash"]
 
 
 def test_miniforge_nlp_sidecar_health_exposes_import_proof():
