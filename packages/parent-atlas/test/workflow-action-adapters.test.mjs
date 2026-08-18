@@ -14,9 +14,14 @@ const identity = {
   attempt: 1,
 };
 
-test('retrieval receipt preserves receipt/evidence/resource identities without inventing action identity', () => {
+test('retrieval workflow event keeps orchestrator sequence/lane and derived candidates out of canonical resources', () => {
   const event = retrievalReceiptToWorkflowAction({
     identity,
+    workflow: {
+      workflowSequence: 9,
+      lane: 'graph',
+      transport: 'local',
+    },
     producer_revision: 'workflow-adapter-r1',
     receipt: {
       schema: 'atlas.retrieval-action-receipt.v1',
@@ -43,9 +48,14 @@ test('retrieval receipt preserves receipt/evidence/resource identities without i
   });
 
   assert.equal(event.actionId, identity.actionId);
+  assert.equal(event.sequence, 9);
+  assert.equal(event.lane, 'graph');
+  assert.equal(event.metadata.retrieval_sequence, 3);
   assert.equal(event.receiptId, 'receipt:r1');
   assert.deepEqual(event.evidenceRefs, ['evidence:e1']);
   assert.ok(event.resourceRefs.some((row) => row.resource_id === 'relationship:r1'));
+  assert.ok(!event.resourceRefs.some((row) => row.resource_id === 'candidate:c1'));
+  assert.deepEqual(event.metadata.candidate_ids, ['candidate:c1']);
   assert.equal(event.kind, 'completed');
 });
 
