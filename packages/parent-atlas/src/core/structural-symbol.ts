@@ -39,13 +39,18 @@ export const STRUCTURAL_REFERENCE_KIND_VALUES = [
   'test_target',
 ] as const;
 
+export const LANGEXTRACT_ALIGNMENT_STATUS_VALUES = [
+  'match_exact',
+  'match_greater',
+  'match_lesser',
+  'match_fuzzy',
+] as const;
+
 export const structuralSymbolKindSchema = z.enum(STRUCTURAL_SYMBOL_KIND_VALUES);
 export const structuralReferenceKindSchema = z.enum(STRUCTURAL_REFERENCE_KIND_VALUES);
+export const langExtractAlignmentStatusSchema = z.enum(LANGEXTRACT_ALIGNMENT_STATUS_VALUES);
 
-/**
- * Canonicalized view of the Consiliency/treesitter-chunker CodeChunk fields
- * Parent Atlas needs. IDs stay upstream provenance until GIS promotion.
- */
+/** Canonicalized view of Consiliency CodeChunk fields needed by Atlas. */
 export const treesitterChunkerChunkSchema = z.object({
   upstream_node_id: id,
   upstream_file_id: id,
@@ -79,10 +84,7 @@ export const treesitterChunkerXrefEdgeSchema = z.object({
   weight: z.number().finite().nonnegative().default(1),
 }).strict();
 
-/**
- * ast-grep contributes deterministic structural observations. Exact byte spans
- * let observations join back to chunker provenance without becoming identity.
- */
+/** ast-grep deterministic structural observation. */
 export const astGrepObservationSchema = z.object({
   schema: z.literal('atlas.ast-grep-observation.v1').default('atlas.ast-grep-observation.v1'),
   observation_id: id,
@@ -106,8 +108,9 @@ export const astGrepObservationSchema = z.object({
 });
 
 /**
- * LangExtract is accepted as canonical-evidence input only when it retains an
- * exact source character interval. It still has no canonical identity authority.
+ * LangExtract observation with source grounding. `alignment_status` remains
+ * observable because fuzzy/greater/lesser alignments are weaker evidence than
+ * an exact source match even though all carry a character interval.
  */
 export const groundedLangExtractObservationSchema = z.object({
   schema: z.literal('atlas.grounded-langextract-observation.v1').default('atlas.grounded-langextract-observation.v1'),
@@ -120,6 +123,8 @@ export const groundedLangExtractObservationSchema = z.object({
     start_pos: z.number().int().nonnegative(),
     end_pos: z.number().int().nonnegative(),
   }).strict(),
+  alignment_status: langExtractAlignmentStatusSchema.nullable().optional(),
+  alignment_exact: z.boolean().default(false),
   attributes: z.record(z.string(), z.string()).default({}),
   confidence: z.number().finite().min(0).max(1),
   extractor_revision: revision,
@@ -128,12 +133,12 @@ export const groundedLangExtractObservationSchema = z.object({
   if (value.char_interval.end_pos <= value.char_interval.start_pos) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['char_interval', 'end_pos'], message: 'end_pos must be > start_pos' });
   }
+  if (value.alignment_exact && value.alignment_status !== 'match_exact') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['alignment_exact'], message: 'alignment_exact requires match_exact' });
+  }
 });
 
-/**
- * Extractors nominate path-affine symbols. They never manufacture the stable
- * cross-revision Atlas symbol ID; GIS/registry promotion owns that decision.
- */
+/** Extractors nominate path-affine symbols; GIS owns stable identity. */
 export const structuralSymbolNominationSchema = z.object({
   schema: z.literal('atlas.structural-symbol-nomination.v1').default('atlas.structural-symbol-nomination.v1'),
   nomination_id: id,
@@ -210,10 +215,7 @@ export const symbolVersionSchema = z.object({
   producer_revision: revision,
 }).strict();
 
-/**
- * Calls/imports/exports/type refs are structural facts. Syntax can identify an
- * upstream target; target_stable_symbol_id appears only after GIS resolution.
- */
+/** Calls/imports/exports/type refs are structural facts. */
 export const structuralReferenceFactSchema = z.object({
   schema: z.literal('atlas.structural-reference-fact.v1').default('atlas.structural-reference-fact.v1'),
   reference_id: id,
@@ -235,7 +237,6 @@ export const structuralReferenceFactSchema = z.object({
   extractor_revision: revision,
 }).strict();
 
-/** Framework entities such as SvelteKit routes remain nominations until GIS promotion. */
 export const frameworkEntityNominationSchema = z.object({
   schema: z.literal('atlas.framework-entity-nomination.v1').default('atlas.framework-entity-nomination.v1'),
   nomination_id: id,
@@ -252,10 +253,6 @@ export const frameworkEntityNominationSchema = z.object({
   canonical_authority: z.literal(false).default(false),
 }).strict();
 
-/**
- * Retrieval projection around one or more chunker spans after GIS resolution.
- * Rebuilding chunks cannot alter stable_symbol_id.
- */
 export const structuralChunkProjectionSchema = z.object({
   schema: z.literal('atlas.structural-chunk-projection.v1').default('atlas.structural-chunk-projection.v1'),
   projection_chunk_id: id,
@@ -309,7 +306,7 @@ export function describeStructuralSymbolContract(): string {
     'Consiliency treesitter-chunker owns primary code structural/chunk/XRef evidence production.',
     'Its node_id, file_id, symbol_id and chunk_id remain upstream provenance/candidate join keys.',
     'ast-grep contributes deterministic byte-grounded structural observations and has no canonical authority.',
-    'LangExtract contributes source-grounded semantic/entity/relation observations and has no code-identity authority.',
+    'LangExtract contributes source-grounded semantic/entity/relation observations; alignment quality remains observable and has no code-identity authority.',
     'GIS/registry promotion alone assigns stable_symbol_id and symbol_version_id.',
     'Calls/imports/exports/type references are structural reference facts, not independent symbols by default.',
     'Chunks and graph cuts are replaceable retrieval projections and never canonical identity.',
