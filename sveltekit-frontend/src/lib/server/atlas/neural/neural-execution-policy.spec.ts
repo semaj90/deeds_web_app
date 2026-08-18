@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   deferredAeTrainingGate,
   planNeuralExecution,
-  representationFit as _unused,
 } from './neural-execution-policy.js';
 
 const idleGpu = {
