@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import {
   groundedLangExtractObservationSchema,
+  langExtractAlignmentStatusSchema,
   type GroundedLangExtractObservationV1,
 } from './structural-symbol.js';
 
@@ -14,6 +15,7 @@ export const langExtractRawExtractionSchema = z.object({
     start_pos: z.number().int().nonnegative(),
     end_pos: z.number().int().nonnegative(),
   }).nullable().optional(),
+  alignment_status: langExtractAlignmentStatusSchema.nullable().optional(),
   attributes: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).default({}),
   confidence: z.number().finite().min(0).max(1).default(1),
 }).strict();
@@ -24,6 +26,9 @@ export const langExtractGroundingReceiptSchema = z.object({
   source_revision: revision,
   input_count: z.number().int().nonnegative(),
   grounded_count: z.number().int().nonnegative(),
+  exact_alignment_count: z.number().int().nonnegative(),
+  fuzzy_or_expanded_alignment_count: z.number().int().nonnegative(),
+  unknown_alignment_count: z.number().int().nonnegative(),
   rejected_ungrounded_count: z.number().int().nonnegative(),
   rejected_invalid_interval_count: z.number().int().nonnegative(),
   producer_revision: revision,
@@ -41,9 +46,9 @@ function stringAttributes(value: LangExtractRawExtractionV1['attributes']): Reco
 }
 
 /**
- * LangExtract results without exact source grounding are retained by callers as
- * semantic candidates if desired, but they are rejected from canonical evidence
- * at this adapter boundary.
+ * LangExtract results without a source interval are rejected from canonical
+ * evidence. Grounded fuzzy/expanded alignments are retained, but remain weaker
+ * evidence than match_exact and are counted separately in the receipt.
  */
 export function adaptGroundedLangExtract(input: {
   source_ref: string;
@@ -56,6 +61,9 @@ export function adaptGroundedLangExtract(input: {
   const observations: GroundedLangExtractObservationV1[] = [];
   let rejectedUngrounded = 0;
   let rejectedInvalid = 0;
+  let exactAlignment = 0;
+  let fuzzyOrExpanded = 0;
+  let unknownAlignment = 0;
 
   for (const rawValue of input.extractions) {
     const raw = langExtractRawExtractionSchema.parse(rawValue);
@@ -75,6 +83,11 @@ export function adaptGroundedLangExtract(input: {
       continue;
     }
 
+    const alignmentExact = raw.alignment_status === 'match_exact';
+    if (alignmentExact) exactAlignment += 1;
+    else if (raw.alignment_status) fuzzyOrExpanded += 1;
+    else unknownAlignment += 1;
+
     observations.push(groundedLangExtractObservationSchema.parse({
       extraction_id: `langextract:${sha256(JSON.stringify([
         input.source_ref,
@@ -83,15 +96,19 @@ export function adaptGroundedLangExtract(input: {
         interval.start_pos,
         interval.end_pos,
         raw.extraction_text,
+        raw.alignment_status ?? null,
       ])).slice(0, 40)}`,
       source_ref: input.source_ref,
       source_revision: input.source_revision,
       extraction_class: raw.extraction_class,
       extraction_text: raw.extraction_text,
       char_interval: interval,
+      alignment_status: raw.alignment_status ?? null,
+      alignment_exact: alignmentExact,
       attributes: {
         ...stringAttributes(raw.attributes),
         grounded_text_hash: sha256(groundedText),
+        alignment_status: raw.alignment_status ?? 'unknown',
       },
       confidence: raw.confidence,
       extractor_revision: input.extractor_revision,
@@ -106,6 +123,9 @@ export function adaptGroundedLangExtract(input: {
       source_revision: input.source_revision,
       input_count: input.extractions.length,
       grounded_count: observations.length,
+      exact_alignment_count: exactAlignment,
+      fuzzy_or_expanded_alignment_count: fuzzyOrExpanded,
+      unknown_alignment_count: unknownAlignment,
       rejected_ungrounded_count: rejectedUngrounded,
       rejected_invalid_interval_count: rejectedInvalid,
       producer_revision: input.producer_revision,
