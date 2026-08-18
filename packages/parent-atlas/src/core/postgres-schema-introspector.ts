@@ -27,13 +27,22 @@ export const postgresSchemaIntrospectionReceiptSchema = z.object({
 
 export type PostgresSchemaIntrospectionReceiptV1 = z.infer<typeof postgresSchemaIntrospectionReceiptSchema>;
 
+export type PostgresCatalogNominationRowV1 = {
+  kind: SchemaObjectNominationV1['kind'];
+  schema_name: string;
+  object_name: string;
+  qualified_name: string;
+  parent_qualified_name: string | null;
+  parent_kind: SchemaObjectNominationV1['kind'] | null;
+  catalog_oid: number | null;
+  /** Semantic/deparsed definition only. Do not put catalog OIDs here. */
+  definition: unknown;
+};
+
 function sha256(value: unknown): string {
   const serialized = typeof value === 'string' ? value : JSON.stringify(value);
+  if (serialized === undefined) throw new Error('POSTGRES_SCHEMA_HASH_INPUT_UNDEFINED');
   return createHash('sha256').update(serialized, 'utf8').digest('hex');
-}
-
-function quoteQualified(schemaName: string, objectName: string): string {
-  return `${schemaName}.${objectName}`;
 }
 
 function definitionHash(value: unknown): string {
@@ -43,20 +52,20 @@ function definitionHash(value: unknown): string {
 function nomination(input: Omit<z.input<typeof schemaObjectNominationSchema>, 'nomination_id' | 'object_key' | 'definition_hash'> & {
   definition: unknown;
 }): SchemaObjectNominationV1 {
+  const { definition, ...nominationFields } = input;
   const objectKey = deriveSchemaObjectKey({
-    database_key: input.database_key,
-    schema_name: input.schema_name,
-    kind: input.kind,
-    qualified_name: input.qualified_name,
+    database_key: nominationFields.database_key,
+    schema_name: nominationFields.schema_name,
+    kind: nominationFields.kind,
+    qualified_name: nominationFields.qualified_name,
   });
-  const hash = definitionHash(input.definition);
+  const hash = definitionHash(definition);
   return schemaObjectNominationSchema.parse({
-    ...input,
-    definition: undefined,
+    ...nominationFields,
     object_key: objectKey,
     nomination_id: deriveSchemaObjectNominationId({
       object_key: objectKey,
-      schema_revision: input.schema_revision,
+      schema_revision: nominationFields.schema_revision,
       definition_hash: hash,
     }),
     definition_hash: hash,
@@ -70,10 +79,47 @@ async function withClient<T>(pool: Pool, fn: (client: PoolClient) => Promise<T>)
 }
 
 /**
+ * Pure compiler used by tests and by the live catalog query.
+ *
+ * Changing catalog_oid alone MUST NOT change object_key or definition_hash.
+ */
+export function compilePostgresCatalogRows(input: {
+  database_key: string;
+  source_ref: string;
+  source_revision: string;
+  schema_revision: string;
+  producer_revision: string;
+  rows: PostgresCatalogNominationRowV1[];
+}): SchemaObjectNominationV1[] {
+  return input.rows.map((row) => nomination({
+    database_key: input.database_key,
+    schema_name: row.schema_name,
+    kind: row.kind,
+    object_name: row.object_name,
+    parent_object_key: row.parent_qualified_name && row.parent_kind
+      ? deriveSchemaObjectKey({
+        database_key: input.database_key,
+        schema_name: row.schema_name,
+        kind: row.parent_kind,
+        qualified_name: row.parent_qualified_name,
+      })
+      : null,
+    qualified_name: row.qualified_name,
+    source_ref: input.source_ref,
+    source_revision: input.source_revision,
+    schema_revision: input.schema_revision,
+    catalog_oid: row.catalog_oid,
+    extractor_revision: input.producer_revision,
+    definition: row.definition,
+  }));
+}
+
+/**
  * PostgreSQL 18 catalog introspector.
  *
  * The query uses supported catalog/deparser surfaces:
- * - pg_class/pg_namespace for relations
+ * - pg_namespace for schemas
+ * - pg_class for tables/views
  * - pg_attribute + pg_get_expr for columns/defaults
  * - pg_constraint + pg_get_constraintdef for constraints/FKs
  * - pg_index + pg_get_indexdef for indexes
@@ -82,8 +128,8 @@ async function withClient<T>(pool: Pool, fn: (client: PoolClient) => Promise<T>)
  * - pg_trigger + pg_get_triggerdef for non-internal triggers
  *
  * Catalog OIDs are copied to nomination/version provenance only. They are never
- * included in object_key, so dump/restore or catalog rebuilds cannot redefine
- * stable Atlas schema identity.
+ * included in object_key or the semantic definition hash, so dump/restore or
+ * catalog rebuilds cannot redefine stable Atlas schema identity by themselves.
  */
 export async function introspectPostgresSchema(pool: Pool, input: {
   database_key: string;
@@ -97,26 +143,30 @@ export async function introspectPostgresSchema(pool: Pool, input: {
   if (schemaNames.length === 0) throw new Error('POSTGRES_SCHEMA_NAMES_REQUIRED');
 
   return withClient(pool, async (client) => {
-    const rows = await client.query<{
-      kind: SchemaObjectNominationV1['kind'];
-      schema_name: string;
-      object_name: string;
-      qualified_name: string;
-      parent_qualified_name: string | null;
-      catalog_oid: number | null;
-      definition: unknown;
-    }>(`
+    const result = await client.query<PostgresCatalogNominationRowV1>(`
       WITH target_namespaces AS (
         SELECT oid, nspname
         FROM pg_namespace
         WHERE nspname = ANY($1::text[])
+      ), schema_rows AS (
+        SELECT
+          'schema'::text AS kind,
+          n.nspname::text AS schema_name,
+          n.nspname::text AS object_name,
+          n.nspname::text AS qualified_name,
+          NULL::text AS parent_qualified_name,
+          NULL::text AS parent_kind,
+          n.oid::bigint AS catalog_oid,
+          jsonb_build_object('name', n.nspname) AS definition
+        FROM target_namespaces n
       ), relation_rows AS (
         SELECT
           CASE c.relkind WHEN 'v' THEN 'view' ELSE 'table' END::text AS kind,
           n.nspname::text AS schema_name,
           c.relname::text AS object_name,
           (n.nspname || '.' || c.relname)::text AS qualified_name,
-          NULL::text AS parent_qualified_name,
+          n.nspname::text AS parent_qualified_name,
+          'schema'::text AS parent_kind,
           c.oid::bigint AS catalog_oid,
           jsonb_build_object(
             'relkind', c.relkind,
@@ -134,9 +184,9 @@ export async function introspectPostgresSchema(pool: Pool, input: {
           a.attname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || a.attname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
+          CASE c.relkind WHEN 'v' THEN 'view' ELSE 'table' END::text AS parent_kind,
           c.oid::bigint AS catalog_oid,
           jsonb_build_object(
-            'table_oid', c.oid,
             'attnum', a.attnum,
             'type', format_type(a.atttypid, a.atttypmod),
             'not_null', a.attnotnull,
@@ -156,6 +206,7 @@ export async function introspectPostgresSchema(pool: Pool, input: {
           con.conname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || con.conname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
+          'table'::text AS parent_kind,
           con.oid::bigint AS catalog_oid,
           jsonb_build_object(
             'contype', con.contype,
@@ -163,8 +214,7 @@ export async function introspectPostgresSchema(pool: Pool, input: {
             'validated', con.convalidated,
             'enforced', con.conenforced,
             'deferrable', con.condeferrable,
-            'deferred', con.condeferred,
-            'referenced_table_oid', NULLIF(con.confrelid, 0)
+            'deferred', con.condeferred
           ) AS definition
         FROM pg_constraint con
         JOIN pg_class c ON c.oid = con.conrelid
@@ -177,6 +227,7 @@ export async function introspectPostgresSchema(pool: Pool, input: {
           idx.relname::text AS object_name,
           (n.nspname || '.' || idx.relname)::text AS qualified_name,
           (n.nspname || '.' || tbl.relname)::text AS parent_qualified_name,
+          'table'::text AS parent_kind,
           idx.oid::bigint AS catalog_oid,
           jsonb_build_object(
             'definition', pg_get_indexdef(idx.oid, 0, false),
@@ -197,11 +248,16 @@ export async function introspectPostgresSchema(pool: Pool, input: {
           p.polname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || p.polname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
+          'table'::text AS parent_kind,
           p.oid::bigint AS catalog_oid,
           jsonb_build_object(
             'command', p.polcmd,
             'permissive', p.polpermissive,
-            'roles', p.polroles,
+            'roles', ARRAY(
+              SELECT CASE WHEN role_oid = 0 THEN 'PUBLIC' ELSE pg_get_userbyid(role_oid) END
+              FROM unnest(p.polroles) AS role_oid
+              ORDER BY 1
+            ),
             'using', pg_get_expr(p.polqual, p.polrelid, false),
             'with_check', pg_get_expr(p.polwithcheck, p.polrelid, false),
             'table_row_security_enabled', c.relrowsecurity
@@ -216,6 +272,7 @@ export async function introspectPostgresSchema(pool: Pool, input: {
           p.proname::text AS object_name,
           (n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')')::text AS qualified_name,
           n.nspname::text AS parent_qualified_name,
+          'schema'::text AS parent_kind,
           p.oid::bigint AS catalog_oid,
           jsonb_build_object(
             'kind', p.prokind,
@@ -232,18 +289,19 @@ export async function introspectPostgresSchema(pool: Pool, input: {
           t.tgname::text AS object_name,
           (n.nspname || '.' || c.relname || '.' || t.tgname)::text AS qualified_name,
           (n.nspname || '.' || c.relname)::text AS parent_qualified_name,
+          'table'::text AS parent_kind,
           t.oid::bigint AS catalog_oid,
           jsonb_build_object(
             'definition', pg_get_triggerdef(t.oid, false),
-            'enabled', t.tgenabled,
-            'function_oid', t.tgfoid
+            'enabled', t.tgenabled
           ) AS definition
         FROM pg_trigger t
         JOIN pg_class c ON c.oid = t.tgrelid
         JOIN target_namespaces n ON n.oid = c.relnamespace
         WHERE NOT t.tgisinternal
       )
-      SELECT * FROM relation_rows
+      SELECT * FROM schema_rows
+      UNION ALL SELECT * FROM relation_rows
       UNION ALL SELECT * FROM column_rows
       UNION ALL SELECT * FROM constraint_rows
       UNION ALL SELECT * FROM index_rows
@@ -253,29 +311,14 @@ export async function introspectPostgresSchema(pool: Pool, input: {
       ORDER BY schema_name, kind, qualified_name
     `, [schemaNames]);
 
-    const nominations = rows.rows.map((row) => nomination({
+    const nominations = compilePostgresCatalogRows({
       database_key: input.database_key,
-      schema_name: row.schema_name,
-      kind: row.kind,
-      object_name: row.object_name,
-      parent_object_key: row.parent_qualified_name
-        ? deriveSchemaObjectKey({
-          database_key: input.database_key,
-          schema_name: row.schema_name,
-          kind: row.kind === 'column' || row.kind === 'foreign_key' || row.kind === 'constraint' || row.kind === 'database_policy' || row.kind === 'trigger'
-            ? 'table'
-            : 'schema',
-          qualified_name: row.parent_qualified_name,
-        })
-        : null,
-      qualified_name: row.qualified_name,
       source_ref: input.source_ref,
       source_revision: input.source_revision,
       schema_revision: input.schema_revision,
-      catalog_oid: row.catalog_oid,
-      extractor_revision: input.producer_revision,
-      definition: row.definition,
-    }));
+      producer_revision: input.producer_revision,
+      rows: result.rows,
+    });
 
     const countsByKind: Record<string, number> = {};
     for (const item of nominations) countsByKind[item.kind] = (countsByKind[item.kind] ?? 0) + 1;
@@ -301,7 +344,7 @@ export function describePostgresSchemaIntrospector(): string {
   return [
     'PostgreSQL system catalogs are read-only discovery inputs for Atlas schema nominations.',
     'Supported pg_get_* deparsers generate revision evidence for constraints, indexes, expressions, functions and triggers.',
-    'Catalog OIDs are recorded as revision-local provenance only and never contribute to object_key.',
+    'Catalog OIDs are recorded as revision-local provenance only and never contribute to object_key or semantic definition_hash.',
     'Schema nominations must resolve through atlas_schema_object_registry before becoming atlas_evidence_entities canonical join keys.',
   ].join(' ');
 }
