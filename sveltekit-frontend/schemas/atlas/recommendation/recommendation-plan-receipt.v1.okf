@@ -1,0 +1,34 @@
+schema_id: atlas.recommendation-plan-receipt
+schema_version: 1
+schema_kind: recommendation_receipt
+status: ACTIVE
+
+description: >
+  Revisioned record of which recommendation evidence lanes were selected under
+  a finite resource envelope. Tool K/V inputs are represented by keys plus a
+  canonical checksum rather than raw values in telemetry.
+
+fields:
+  schema: { type: literal, value: atlas.recommendation-plan-receipt.v1 }
+  receiptId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  policyRevision: { type: string, required: true }
+  admissible: { type: boolean, required: true }
+  selectedLanes: { type: string_array, required: true }
+  rejectedLanes: { type: string_array, default: [] }
+  blockingReasons: { type: string_array, default: [] }
+  budget: { type: object, required: true }
+  observedCosts: { type: object, default: {} }
+  toolArgKeys: { type: string_array, default: [] }
+  toolArgsChecksum: { type: string, nullable: true }
+  pagerankReceiptRef: { type: string, nullable: true }
+  hypergraphReceiptRef: { type: string, nullable: true }
+  candidateSnapshotRef: { type: string, nullable: true }
+  exactPromotionRefs: { type: string_array, default: [] }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - cache residence is never a relevance signal
+  - missing optional evidence is unobserved, not zero-valued evidence
+  - raw secret-bearing tool values are not required in recommendation telemetry
