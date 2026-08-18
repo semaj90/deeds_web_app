@@ -1,7 +1,12 @@
 import { z } from 'zod';
 import { acePacketV2Schema, type AcePacketV2 } from './ace-packet-v2.js';
 import { retrievalActionReceiptSchema, type RetrievalActionReceiptV1 } from './retrieval-action-receipt.js';
-import { workflowActionEventSchema, type WorkflowActionEventV1 } from './workflow-action-event.js';
+import {
+  WORKFLOW_ACTION_LANES,
+  WORKFLOW_ACTION_TRANSPORTS,
+  workflowActionEventSchema,
+  type WorkflowActionEventV1,
+} from './workflow-action-event.js';
 
 const workflowIdentitySchema = z.object({
   workflowId: z.string().min(1),
@@ -12,37 +17,60 @@ const workflowIdentitySchema = z.object({
   attempt: z.number().int().positive().default(1),
 }).strict();
 
+const retrievalWorkflowContextSchema = z.object({
+  workflowSequence: z.number().int().nonnegative(),
+  lane: z.enum(WORKFLOW_ACTION_LANES),
+  transport: z.enum(WORKFLOW_ACTION_TRANSPORTS).optional(),
+  toolId: z.string().min(1).optional(),
+}).strict();
+
 export type WorkflowIdentityInputV1 = z.infer<typeof workflowIdentitySchema>;
+export type RetrievalWorkflowContextV1 = z.infer<typeof retrievalWorkflowContextSchema>;
 
 /**
  * Convert an already-materialized retrieval action receipt into the common
- * workflow event. The orchestrator must supply workflow/action/DAG identities;
- * the adapter does not hash a receipt into a fake action identity.
+ * workflow event. The orchestrator owns global event ordering and the actual
+ * execution lane/transport/tool identity. RetrievalActionReceipt.sequence is a
+ * retrieval-loop sequence only and is retained in metadata instead of being
+ * conflated with WorkflowActionEvent.sequence.
  */
 export function retrievalReceiptToWorkflowAction(input: {
   identity: WorkflowIdentityInputV1;
+  workflow: RetrievalWorkflowContextV1;
   receipt: RetrievalActionReceiptV1;
   producer_revision: string;
 }): WorkflowActionEventV1 {
   const identity = workflowIdentitySchema.parse(input.identity);
+  const workflow = retrievalWorkflowContextSchema.parse(input.workflow);
   const receipt = retrievalActionReceiptSchema.parse(input.receipt);
+
+  // candidate_ids are revision-scoped derived retrieval objects. Do not expose
+  // them as canonical runtime resources or atlas_evidence_entities join keys.
+  const resourceRefs: WorkflowActionEventV1['resourceRefs'] = [
+    ...receipt.relationship_ids.map((resource_id) => ({
+      resource_type: 'relationship',
+      resource_id,
+      role: 'relationship',
+      identity_status: 'canonical' as const,
+    })),
+  ];
+
   return workflowActionEventSchema.parse({
     ...identity,
     schema: 'atlas.workflow-action.v1',
-    sequence: receipt.sequence,
-    lane: 'graph',
-    transport: 'local',
+    sequence: workflow.workflowSequence,
+    lane: workflow.lane,
+    transport: workflow.transport,
     kind: 'completed',
+    toolId: workflow.toolId,
     receiptId: receipt.receipt_id,
-    resourceRefs: [
-      ...receipt.candidate_ids.map((resource_id) => ({ resource_type: 'candidate', resource_id, role: 'candidate', identity_status: 'canonical' as const })),
-      ...receipt.relationship_ids.map((resource_id) => ({ resource_type: 'relationship', resource_id, role: 'relationship', identity_status: 'canonical' as const })),
-    ],
+    resourceRefs,
     evidenceRefs: receipt.retrieved_evidence_refs,
     artifactRefs: [],
     startedAt: receipt.started_at,
     completedAt: receipt.finished_at,
     metadata: {
+      retrieval_sequence: receipt.sequence,
       retrieval_action: receipt.action,
       before_state: receipt.before_state,
       after_state: receipt.after_state,
@@ -53,6 +81,7 @@ export function retrievalReceiptToWorkflowAction(input: {
       requested_entity_types: receipt.requested_entity_types,
       requested_relationship_types: receipt.requested_relationship_types,
       requested_evidence_kinds: receipt.requested_evidence_kinds,
+      candidate_ids: receipt.candidate_ids,
     },
     producerRevision: input.producer_revision,
   });
@@ -60,8 +89,8 @@ export function retrievalReceiptToWorkflowAction(input: {
 
 /**
  * Emit an artifact event when a validated AcePacketV2 is assembled. The ACE
- * packet remains the artifact owner; workflow identity still comes from the
- * caller/orchestrator.
+ * packet remains the artifact owner; workflow identity and sequence still come
+ * from the caller/orchestrator.
  */
 export function acePacketToWorkflowArtifact(input: {
   identity: WorkflowIdentityInputV1;
@@ -115,7 +144,8 @@ export function acePacketToWorkflowArtifact(input: {
 export function describeWorkflowActionAdapters(): string {
   return [
     'RetrievalActionReceiptV1 supplies completed retrieval evidence and its canonical receipt ID.',
-    'AcePacketV2 supplies validated artifact/resource/relationship/evidence identities.',
-    'Neither adapter invents workflow/action/DAG IDs; active orchestrator call sites must provide those runtime-owned identities.',
+    'The active orchestrator supplies WorkflowActionEvent sequence, lane, transport, tool and DAG/action identities.',
+    'Retrieval-loop sequence remains metadata and revision-scoped candidate IDs never enter canonical runtime resourceRefs.',
+    'AcePacketV2 supplies validated artifact/resource/relationship/evidence identities without transferring packet identity ownership to the workflow adapter.',
   ].join(' ');
 }
