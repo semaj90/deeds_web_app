@@ -12,6 +12,7 @@
     "./core/hypergraph-query-policy": "./dist/core/hypergraph-query-policy.js",
     "./core/hypergraph-ppr": "./dist/core/hypergraph-ppr.js",
     "./core/dynamic-hyperedge-sql": "./dist/core/dynamic-hyperedge-sql.js",
+    "./core/relationship-query-repository": "./dist/core/relationship-query-repository.js",
     "./core/feature-intelligence-repository": "./dist/core/feature-intelligence-repository.js",
     "./core/feature-matrix": "./dist/core/feature-matrix.js",
     "./core/ace-hypergraph-payload": "./dist/core/ace-hypergraph-payload.js",
