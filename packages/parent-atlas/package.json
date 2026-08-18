@@ -29,6 +29,8 @@
     "./core/ace-hypergraph-payload": "./dist/core/ace-hypergraph-payload.js",
     "./core/ace-packet-v2": "./dist/core/ace-packet-v2.js",
     "./core/ace-runtime-adapter": "./dist/core/ace-runtime-adapter.js",
+    "./core/hyperrag-live-integration": "./dist/core/hyperrag-live-integration.js",
+    "./core/proof-gates": "./dist/core/proof-gates.js",
     "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js"
   },
   "bin": {
