@@ -1,14 +1,16 @@
 /**
  * Graph Fetch-Rerank — multi-signal scoring for Qdrant candidates.
  *
- * Combines: Qdrant semantic score (768-dim canonical or 512-dim MRL candidate),
- * Neo4j PageRank, Redis hyperedge weight, SOM adjacency bonus, fast-AST score,
- * and an optional signed S^3 feature-direction similarity.
+ * Combines: one semantic score slot (Qdrant candidate score, optionally refined
+ * by MLA inside the same logical semantic lane), PageRank, n-ary hyperedge
+ * evidence, SOM adjacency, fast-AST score, and an optional signed S^3
+ * feature-direction similarity.
  *
- * This is the bridge layer between RAG (Qdrant hits) and KAG (graph signals).
- * Canonical retrieval uses 768-dim vectors; 512-dim MRL candidate is under Phase 5 evaluation.
- * SOM/manifold4/S^3 are DERIVED_PROJECTION layers, not canonical storage.
+ * Canonical retrieval uses semantic_768. Derived projections and executors do
+ * not create independent semantic votes.
  */
+
+import type { RecommendationLane } from './resource-aware-recommendation-policy.js';
 
 export interface QdrantHit {
   chunkId: string;
@@ -41,6 +43,7 @@ export interface QuerySom {
 }
 
 export interface RerankScores {
+  /** Historical field name. This is the one logical semantic score slot. */
   qdrant: number;
   pagerank: number;
   hyperedge: number;
@@ -55,6 +58,20 @@ export interface RerankResult {
   score: number;
   scores: RerankScores;
   why: string[];
+}
+
+export interface RerankOptions {
+  /**
+   * Optional resource-policy gate. If omitted, all historical signals that are
+   * present on a candidate remain eligible so old callers keep their behavior.
+   */
+  activeLanes?: Iterable<RecommendationLane>;
+  /**
+   * Optional semantic refinement keyed by chunk id (for example MLA). This
+   * replaces the candidate's semantic score inside the SAME semantic lane; it
+   * is never added as another weighted vote.
+   */
+  semanticScoreByChunk?: ReadonlyMap<string, number>;
 }
 
 export const DEFAULT_RERANK_WEIGHTS = Object.freeze({
@@ -146,9 +163,6 @@ export function scoreCandidate(args: {
  * Optional enrichment that was not executed because of latency/VRAM/tool budget
  * must not count as negative evidence. We therefore renormalize the fixed prior
  * weights over the signals that are actually present for this candidate.
- *
- * This preserves the priors as interpretable defaults while making the result
- * resource-aware and safe for fail-open lanes.
  */
 export function scoreCandidateResourceAware(args: {
   qdrantScore: number;
@@ -204,31 +218,44 @@ export function buildWhyLabels(scores: RerankScores): string[] {
   return why;
 }
 
-export function rerankHits(hits: QdrantHit[], querySom?: QuerySom, limit = 20): RerankResult[] {
-  const queryQuat = querySom?.manifold4_q ? toUnitQuaternion(querySom.manifold4_q) : null;
+export function rerankHits(
+  hits: QdrantHit[],
+  querySom?: QuerySom,
+  limit = 20,
+  options: RerankOptions = {},
+): RerankResult[] {
+  const activeLanes = options.activeLanes ? new Set(options.activeLanes) : null;
+  const enabled = (lane: RecommendationLane) => activeLanes === null || activeLanes.has(lane);
+  const queryQuat = enabled('hypersphere') && querySom?.manifold4_q
+    ? toUnitQuaternion(querySom.manifold4_q)
+    : null;
 
   const scored: RerankResult[] = hits.map((hit) => {
     const p = hit.payload ?? {};
 
-    const hasSom = [querySom?.row, querySom?.col, p.som_bmu_row, p.som_bmu_col].every(Number.isFinite);
+    const hasSom = enabled('som') &&
+      [querySom?.row, querySom?.col, p.som_bmu_row, p.som_bmu_col].every(Number.isFinite);
     const somBonus = hasSom
       ? somAdjacencyBonus(querySom?.row, querySom?.col, p.som_bmu_row, p.som_bmu_col)
       : undefined;
 
-    const docQuat = p.manifold4_q
-      ? toUnitQuaternion(p.manifold4_q)
-      : p.manifold4
-        ? toUnitQuaternion(p.manifold4)
-        : null;
+    const docQuat = enabled('hypersphere')
+      ? p.manifold4_q
+        ? toUnitQuaternion(p.manifold4_q)
+        : p.manifold4
+          ? toUnitQuaternion(p.manifold4)
+          : null
+      : null;
 
     const directionalScore = queryQuat && docQuat ? quaternionSimilarity(queryQuat, docQuat) : undefined;
+    const semanticScore = options.semanticScoreByChunk?.get(hit.chunkId) ?? hit.score;
 
     const scores = scoreCandidateResourceAware({
-      qdrantScore: hit.score,
-      pagerankScore: p.pagerank,
-      hyperedgeWeight: p.hyperedgeWeight,
+      qdrantScore: semanticScore,
+      pagerankScore: enabled('pagerank') ? p.pagerank : undefined,
+      hyperedgeWeight: enabled('hypergraph') ? p.hyperedgeWeight : undefined,
       somBonus,
-      fastAstScore: p.fast_ast_score,
+      fastAstScore: enabled('ast') ? p.fast_ast_score : undefined,
       quaternionScore: directionalScore,
     });
 
