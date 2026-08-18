@@ -239,7 +239,7 @@ export type {
 } from './core/feature-intelligence.js';
 export type { IngestOptions, IngestResult } from './pipelines/ingest.js';
 export type { KarpathyEnrichOptions, KarpathyEnrichResult } from './pipelines/enrich-karpathy.js';
-export type { HydrateCacheOptions, HydrateResult } from './pipelines/hydrate-cache.js';
+export type { HydrateCacheOptions, HydrateCacheResult } from './pipelines/hydrate-cache.js';
 export type { MapReduceOptions, MapReduceResult } from './pipelines/mapreduce.js';
 export type { ReplayRunOptions } from './gates/replay.js';
 export type { FinalGateResult } from './gates/final.js';
