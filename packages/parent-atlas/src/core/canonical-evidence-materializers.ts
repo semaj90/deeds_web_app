@@ -88,14 +88,6 @@ export function compileResolvedSchemaEvidence(input: {
   resolutions: SchemaObjectResolutionV1[];
 }) {
   const byNomination = resolutionMap(input.resolutions);
-  const canonicalByObjectKey = new Map<string, string>();
-  for (const nomination of input.nominations) {
-    const resolution = byNomination.get(nomination.nomination_id);
-    if (resolution?.status === 'canonical' && resolution.stable_schema_object_id) {
-      canonicalByObjectKey.set(nomination.object_key, resolution.stable_schema_object_id);
-    }
-  }
-
   const tables = input.nominations
     .filter((nomination) => nomination.kind === 'table')
     .flatMap((table) => {
