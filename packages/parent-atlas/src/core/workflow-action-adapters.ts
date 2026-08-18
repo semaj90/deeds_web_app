@@ -74,10 +74,17 @@ export function acePacketToWorkflowArtifact(input: {
   const resourceRefs: WorkflowActionEventV1['resourceRefs'] = [
     { resource_type: 'packet', resource_id: packet.envelope.packet_key, role: 'packet', identity_status: 'canonical' },
     { resource_type: 'source_ref', resource_id: packet.envelope.canonical_source_ref, role: 'source', identity_status: 'canonical' },
+    ...packet.hypergraph.relationship_evidence.map((relationship) => ({
+      resource_type: 'relationship',
+      resource_id: relationship.relationship_id,
+      role: 'relationship',
+      identity_status: 'canonical' as const,
+    })),
   ];
   if (packet.envelope.feature_id) {
     resourceRefs.push({ resource_type: 'feature', resource_id: packet.envelope.feature_id, role: 'feature', identity_status: 'canonical' });
   }
+  const evidenceRefs = [...new Set(packet.hypergraph.relationship_evidence.flatMap((relationship) => relationship.evidence_refs))];
 
   return workflowActionEventSchema.parse({
     ...identity,
@@ -87,15 +94,19 @@ export function acePacketToWorkflowArtifact(input: {
     transport: 'local',
     kind: 'artifact',
     resourceRefs,
-    evidenceRefs: packet.hypergraph.evidence_refs,
+    evidenceRefs,
     artifactRefs: [packet.envelope.packet_key],
     metadata: {
+      query_id: packet.hypergraph.query_id,
       packet_revision: packet.packet_revision,
       source_ref: packet.envelope.source_ref,
       source_revision: packet.envelope.source_revision ?? null,
       source_snapshot_revision: packet.hypergraph.lineage.source_snapshot_revision,
-      graph_snapshot_revision: packet.hypergraph.lineage.graph_snapshot_revision,
-      semantic_snapshot_revision: packet.hypergraph.lineage.semantic_snapshot_revision,
+      relationship_projection_revision: packet.hypergraph.lineage.relationship_projection_revision ?? null,
+      graph_snapshot_revision: packet.hypergraph.lineage.graph_snapshot_revision ?? null,
+      semantic_projection_revision: packet.hypergraph.lineage.semantic_projection_revision ?? null,
+      semantic_model_revision: packet.hypergraph.lineage.semantic_model_revision ?? null,
+      feature_matrix_revision: packet.hypergraph.lineage.feature_matrix_revision ?? null,
     },
     producerRevision: input.producer_revision,
   });
@@ -104,7 +115,7 @@ export function acePacketToWorkflowArtifact(input: {
 export function describeWorkflowActionAdapters(): string {
   return [
     'RetrievalActionReceiptV1 supplies completed retrieval evidence and its canonical receipt ID.',
-    'AcePacketV2 supplies an artifact/resource identity surface after packet validation.',
+    'AcePacketV2 supplies validated artifact/resource/relationship/evidence identities.',
     'Neither adapter invents workflow/action/DAG IDs; active orchestrator call sites must provide those runtime-owned identities.',
   ].join(' ');
 }
