@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "atlas.ast.upstream-contract-manifest.v1",
+  "generatedFor": "parent-atlas-native-provenance-proof",
+  "contracts": [
+    {
+      "id": "consiliency.treesitter-chunker.codechunk.v1",
+      "repository": "Consiliency/treesitter-chunker",
+      "revision": "2a728c52227b517476900f708f54e1cd06fc2ff3",
+      "path": "chunker/types.py",
+      "rawUrl": "https://raw.githubusercontent.com/Consiliency/treesitter-chunker/2a728c52227b517476900f708f54e1cd06fc2ff3/chunker/types.py",
+      "requiredFragments": [
+        "node_id: str",
+        "file_id: str",
+        "symbol_id: str | None",
+        "chunk_id: str",
+        "parent_route: list[str]",
+        "qualified_route: list[str]",
+        "byte_start: int",
+        "byte_end: int",
+        "def compute_node_id(",
+        "def compute_file_id(",
+        "def compute_symbol_id("
+      ],
+      "meaning": "Native chunk IDs, hierarchy, and byte spans are upstream provenance and must be preserved by Atlas."
+    },
+    {
+      "id": "tree-sitter.range.v1",
+      "repository": "tree-sitter/tree-sitter",
+      "revision": "f235c2f1c39901dc23eb08f35040386250411078",
+      "path": "lib/include/tree_sitter/api.h",
+      "rawUrl": "https://raw.githubusercontent.com/tree-sitter/tree-sitter/f235c2f1c39901dc23eb08f35040386250411078/lib/include/tree_sitter/api.h",
+      "requiredFragments": [
+        "typedef struct TSRange",
+        "uint32_t start_byte;",
+        "uint32_t end_byte;",
+        "uint32_t ts_node_start_byte(TSNode self);",
+        "uint32_t ts_node_end_byte(TSNode self);"
+      ],
+      "meaning": "Tree-sitter source ranges are byte-addressable; Atlas must preserve byte offsets without replacing them with line-only evidence."
+    },
+    {
+      "id": "google.langextract.extraction-grounding.v1",
+      "repository": "google/langextract",
+      "revision": "3130e41b2f7ff05fbf68b48965999c7d41093036",
+      "path": "langextract/core/data.py",
+      "rawUrl": "https://raw.githubusercontent.com/google/langextract/3130e41b2f7ff05fbf68b48965999c7d41093036/langextract/core/data.py",
+      "requiredFragments": [
+        "MATCH_EXACT = \"match_exact\"",
+        "MATCH_GREATER = \"match_greater\"",
+        "MATCH_LESSER = \"match_lesser\"",
+        "MATCH_FUZZY = \"match_fuzzy\"",
+        "class CharInterval:",
+        "start_pos: int | None = None",
+        "end_pos: int | None = None",
+        "char_interval: CharInterval | None = None",
+        "alignment_status: AlignmentStatus | None = None",
+        "None when the extraction text could not be located in the source"
+      ],
+      "meaning": "char_interval is the grounding coordinate; null means ungrounded, and alignment_status records exact/fuzzy alignment semantics."
+    }
+  ]
+}
