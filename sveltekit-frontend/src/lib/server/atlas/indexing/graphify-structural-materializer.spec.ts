@@ -69,9 +69,14 @@ describe('GraphifyStructuralMaterializer', () => {
     expect(result.normalized?.symbols[0]?.symbolId).toBeNull();
   });
 
-  it('preserves recovered diagnostics as observable status', async () => {
-    const result = await new GraphifyStructuralMaterializer(provider('RECOVERED_WITH_ERRORS')).materialize(input);
+  it('blocks GIS promotion for recovered parses even when native provenance is complete', async () => {
+    const result = await new GraphifyStructuralMaterializer(provider('RECOVERED_WITH_ERRORS', { native: true })).materialize(input);
+
     expect(result.status).toBe('RECOVERED_WITH_ERRORS');
+    expect(result.provenanceReadiness.status).toBe('NATIVE_RECOVERED');
+    expect(result.provenanceReadiness.canonicalPromotionAllowed).toBe(false);
+    expect(result.provenanceReadiness.nativeNodeIds).toBe(1);
+    expect(result.diagnostics).toContain('STRUCTURAL_PROVENANCE_RECOVERED_NOT_PROMOTABLE');
     expect(result.diagnostics.some((value) => value.includes('Tree-sitter ERROR'))).toBe(true);
   });
 
