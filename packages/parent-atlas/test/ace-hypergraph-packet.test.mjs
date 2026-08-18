@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import { buildFeatureRelationship } from '../dist/core/feature-intelligence.js';
 import { aceHypergraphPayloadSchema } from '../dist/core/ace-hypergraph-payload.js';
+import { buildAcePacketV2 } from '../dist/core/ace-packet-v2.js';
 import { runHypergraphFusionFacade } from '../dist/core/hypergraph-fusion-facade.js';
 import { buildQueryConditionedReasoningChain } from '../dist/core/hypergraph-query-policy.js';
 
@@ -80,7 +81,7 @@ test('query-conditioned fanout selects higher-scoring relationship instead of al
   assert.ok(chain.steps.every((step) => step.relationship_id === 'zzz:high'));
 });
 
-test('facade constructs an ACE hypergraph payload with canonical N-ary evidence and synthesis gate', async () => {
+test('facade constructs an ACE packet with canonical envelope identity and N-ary evidence', async () => {
   const auth = authRelationship();
   const validation = testRelationship();
 
@@ -157,18 +158,88 @@ test('facade constructs an ACE hypergraph payload with canonical N-ary evidence 
   assert.ok(result.reasoning_chain.relationship_ids.includes('rel:case-owner-test'));
   assert.equal(result.ace_payloads.length, 2);
 
-  const packet = aceHypergraphPayloadSchema.parse(result.ace_payloads[0]);
-  assert.equal(packet.schema, 'atlas.ace-hypergraph-payload.v1');
-  assert.equal(packet.query_id, 'query:case-edit-auth');
-  assert.equal(packet.feature_id, 'feature:case-edit');
-  assert.equal(packet.retrieval.semantic_lane_votes, 1);
-  assert.equal(packet.retrieval.relationship_candidate_count, 2);
-  assert.equal(packet.retrieval.evidence_candidate_count, 3);
-  assert.equal(packet.sufficient_context.sufficient, true);
+  const hypergraph = aceHypergraphPayloadSchema.parse(result.ace_payloads[0]);
+  assert.equal(hypergraph.schema, 'atlas.ace-hypergraph-payload.v1');
+  assert.equal(hypergraph.query_id, 'query:case-edit-auth');
+  assert.equal(hypergraph.feature_id, 'feature:case-edit');
+  assert.equal(hypergraph.retrieval.semantic_lane_votes, 1);
+  assert.equal(hypergraph.retrieval.relationship_candidate_count, 2);
+  assert.equal(hypergraph.retrieval.evidence_candidate_count, 3);
+  assert.equal(hypergraph.sufficient_context.sufficient, true);
   assert.deepEqual(
-    new Set(packet.relationship_evidence.map((item) => item.relationship_id)),
+    new Set(hypergraph.relationship_evidence.map((item) => item.relationship_id)),
     new Set(['rel:authorized-case-mutation', 'rel:case-owner-test']),
   );
-  assert.ok(packet.relationship_evidence.some((item) => item.participants.some((p) => p.role === 'ownership_key')));
-  assert.ok(packet.reasoning_chain.steps.some((step) => step.to_entity.entity_id === 'test:case-owner'));
+  assert.ok(hypergraph.relationship_evidence.some((item) => item.participants.some((p) => p.role === 'ownership_key')));
+  assert.ok(hypergraph.reasoning_chain.steps.some((step) => step.to_entity.entity_id === 'test:case-owner'));
+
+  const packet = buildAcePacketV2({
+    packet_revision: 'packet-r1',
+    envelope: {
+      packet_key: 'packet:route-patch-case',
+      source_ref: 'src/routes/api/case/[id]/+server.ts',
+      canonical_source_ref: 'src/routes/api/case/[id]/+server.ts',
+      feature_id: 'feature:case-edit',
+      source_revision: 'src-r1',
+    },
+    hypergraph,
+    producer_revision: 'parent-atlas-test-r1',
+  });
+
+  assert.equal(packet.schema, 'atlas.ace-packet.v2');
+  assert.equal(packet.envelope.packet_key, packet.hypergraph.packet_key);
+  assert.equal(packet.envelope.feature_id, packet.hypergraph.feature_id);
+  assert.equal(packet.hypergraph.sufficient_context.next_action, 'synthesize');
+});
+
+test('ACE packet composition rejects hypergraph evidence attached to the wrong packet identity', () => {
+  const auth = authRelationship();
+  const chain = buildQueryConditionedReasoningChain({
+    query_id: 'query:mismatch',
+    source_snapshot_revision: 'snapshot-r1',
+    seed_entity_ids: ['route:patch-case'],
+    relationships: [auth],
+  });
+
+  assert.throws(() => buildAcePacketV2({
+    packet_revision: 'packet-r1',
+    envelope: {
+      packet_key: 'packet:correct',
+      source_ref: 'src/routes/api/case/[id]/+server.ts',
+      canonical_source_ref: 'src/routes/api/case/[id]/+server.ts',
+      feature_id: 'feature:case-edit',
+    },
+    hypergraph: {
+      query_id: 'query:mismatch',
+      packet_key: 'packet:wrong',
+      source_ref: 'src/routes/api/case/[id]/+server.ts',
+      feature_id: 'feature:case-edit',
+      relationship_evidence: [],
+      reasoning_chain: chain,
+      sufficient_context: {
+        query_id: 'query:mismatch',
+        sufficient: false,
+        state: 'NEED_EVIDENCE',
+        next_action: 'retrieve_evidence',
+        missing_entity_types: [],
+        missing_relationship_types: [],
+        missing_evidence_kinds: ['source_ast'],
+        blockers: [],
+      },
+      lineage: {
+        source_snapshot_revision: 'snapshot-r1',
+        producer_revision: 'parent-atlas-test-r1',
+      },
+      retrieval: {
+        semantic_lane_votes: 1,
+        semantic_executors: [],
+        relationship_candidate_count: 1,
+        evidence_candidate_count: 0,
+        graph_hops_executed: 1,
+        fanout_limit: 20,
+      },
+      derived_ranking_signals: {},
+    },
+    producer_revision: 'parent-atlas-test-r1',
+  }), /packet_key/);
 });
