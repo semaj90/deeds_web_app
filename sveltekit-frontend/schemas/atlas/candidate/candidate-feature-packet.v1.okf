@@ -1,0 +1,41 @@
+schema_id: atlas.candidate-feature-packet
+schema_version: 1
+schema_kind: transport_envelope
+status: ACTIVE
+
+description: >
+  Codec-neutral envelope for moving revision-qualified candidate features between
+  TypeScript, Python, Go/gRPC, CUDA workers, mmap/Arrow readers, and durable
+  receipt/index layers. Encoding never changes identity or feature semantics.
+
+fields:
+  schema: { type: literal, value: atlas.candidate-feature-packet.v1 }
+  requestId: { type: string, required: true }
+  candidateOrdinal: { type: integer, minimum: 0 }
+  canonicalId: { type: string, required: true }
+  packetKey: { type: string, nullable: true }
+  sourceRef: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  sourceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  featureRevision: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  featureViewChecksum: { type: string, required: true }
+  featureLabels: { type: string_array, required: true }
+  evidenceRefs: { type: string_array, default: [] }
+  codec:
+    type: enum
+    values: [JSON, MSGPACK, PROTOBUF, ARROW_IPC]
+  payloadChecksum: { type: string, required: true }
+  compression:
+    type: enum
+    values: [NONE, ZSTD, LZ4]
+  debugEncoding:
+    type: enum
+    values: [NONE, HEX]
+
+invariants:
+  - codec/compression/debugEncoding never participate in canonicalId
+  - HEX is inspection-only and must not be used as runtime binary storage format
+  - Arrow/mmap and MsgPack are transport/storage representations of the same revisioned feature packet
+  - backend IDs such as qdrant point id or DiskANN ordinal cannot replace canonicalId
