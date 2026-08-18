@@ -1,12 +1,10 @@
 /**
  * Miniforge NLP sidecar client.
  *
- * This wraps the Python FastAPI sidecar that combines:
- * - LangExtract-compatible text extraction
- * - spaCy/regex entity extraction
- * - tree-sitter chunking
- * - ast-grep structural features
- * - optional PyTorch feature summaries
+ * Provenance rule:
+ * - Consiliency/tree-sitter-chunker native IDs/spans/hierarchy are preserved verbatim.
+ * - LangExtract grounding metadata is preserved when available.
+ * - No client-side compatibility hash may replace native structural provenance.
  */
 
 import { ENV } from '$lib/server/env.server.js';
@@ -26,6 +24,12 @@ export type NlpSourceType =
   | 'general';
 
 export type NlpExtractionMode = 'entities' | 'relationships' | 'concepts' | 'full';
+export type LangExtractAlignmentStatus = 'match_exact' | 'match_greater' | 'match_lesser' | 'match_fuzzy';
+
+export interface CharIntervalV1 {
+  start_pos: number | null;
+  end_pos: number | null;
+}
 
 export interface NlpEntity {
   text: string;
@@ -34,6 +38,11 @@ export interface NlpEntity {
   end?: number;
   confidence?: number;
   source?: string;
+  /** Native LangExtract grounding metadata. null means ungrounded. */
+  char_interval?: CharIntervalV1 | null;
+  alignment_status?: LangExtractAlignmentStatus | null;
+  extraction_index?: number | null;
+  group_index?: number | null;
 }
 
 export interface NlpRelationship {
@@ -42,6 +51,8 @@ export interface NlpRelationship {
   object: string;
   confidence?: number;
   source?: string;
+  char_interval?: CharIntervalV1 | null;
+  alignment_status?: LangExtractAlignmentStatus | null;
 }
 
 export interface NlpChunk {
@@ -55,6 +66,14 @@ export interface NlpChunk {
 
 export interface AtlasStructuralEvidenceChunk {
   upstream_chunk_id?: string;
+  /** Native Consiliency provenance. */
+  node_id?: string | null;
+  file_id?: string | null;
+  symbol_id?: string | null;
+  chunk_id?: string | null;
+  parent_route?: string[];
+  parent_context?: string | null;
+  route?: string[];
   node_type: string;
   kind: string;
   name?: string | null;
@@ -190,191 +209,99 @@ function resolveBaseUrl(baseUrl?: string): string {
 async function readJson(response: Response): Promise<unknown> {
   const text = await response.text();
   if (!text) return {};
-  try {
-    return JSON.parse(text);
-  } catch {
-    return { raw: text };
-  }
+  try { return JSON.parse(text); } catch { return { raw: text }; }
+}
+
+function normalizeInterval(raw: unknown): CharIntervalV1 | null | undefined {
+  if (raw === null) return null;
+  if (!raw || typeof raw !== 'object') return undefined;
+  const value = raw as Record<string, unknown>;
+  return {
+    start_pos: Number.isFinite(Number(value.start_pos)) ? Number(value.start_pos) : null,
+    end_pos: Number.isFinite(Number(value.end_pos)) ? Number(value.end_pos) : null,
+  };
+}
+
+function normalizeEntity(raw: NlpEntity): NlpEntity {
+  return {
+    ...raw,
+    char_interval: normalizeInterval(raw.char_interval),
+    alignment_status: raw.alignment_status ?? null,
+    extraction_index: raw.extraction_index ?? null,
+    group_index: raw.group_index ?? null,
+  };
 }
 
 export function createMiniforgeNlpSidecarClient(baseUrl?: string): MiniforgeNlpSidecarClient {
   const url = resolveBaseUrl(baseUrl);
-
   return {
     async health() {
       const now = Date.now();
-      if (cachedHealthy !== null && now - healthCacheTs < HEALTH_CACHE_TTL) {
-        return { ready: cachedHealthy };
-      }
-
+      if (cachedHealthy !== null && now - healthCacheTs < HEALTH_CACHE_TTL) return { ready: cachedHealthy };
       try {
-        const response = await fetch(`${url}/health`, {
-          signal: AbortSignal.timeout(3000),
-        });
-        if (!response.ok) {
-          cachedHealthy = false;
-          healthCacheTs = now;
-          return { ready: false };
-        }
+        const response = await fetch(`${url}/health`, { signal: AbortSignal.timeout(3000) });
+        if (!response.ok) { cachedHealthy = false; healthCacheTs = now; return { ready: false }; }
         const data = (await readJson(response)) as NlpHealthResponse;
-        cachedHealthy = true;
-        healthCacheTs = now;
-        return {
-          ready: true,
-          status: data.status,
-          model: data.model,
-          capabilities: data.capabilities,
-        };
-      } catch {
-        cachedHealthy = false;
-        healthCacheTs = now;
-        return { ready: false };
-      }
+        cachedHealthy = true; healthCacheTs = now;
+        return { ready: true, status: data.status, model: data.model, capabilities: data.capabilities };
+      } catch { cachedHealthy = false; healthCacheTs = now; return { ready: false }; }
     },
 
     async analyze(req) {
       const start = Date.now();
       const response = await fetch(`${url}/analyze`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          text: req.text,
-          source_type: req.sourceType ?? 'plain_text',
-          extraction_mode: req.extractionMode ?? 'full',
-          document_id: req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
-          source_ref: req.sourceRef,
-          packet_key: req.packetKey,
-          language: req.language,
-          model_id: req.modelId,
-          max_chars: req.maxChars ?? 50_000,
-          passes: req.passes ?? [],
-          grounded_extraction_required: req.groundedExtractionRequired ?? false,
-        }),
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text: req.text, source_type: req.sourceType ?? 'plain_text', extraction_mode: req.extractionMode ?? 'full', document_id: req.documentId ?? req.packetKey ?? `doc-${Date.now()}`, source_ref: req.sourceRef, packet_key: req.packetKey, language: req.language, model_id: req.modelId, max_chars: req.maxChars ?? 50_000, passes: req.passes ?? [], grounded_extraction_required: req.groundedExtractionRequired ?? false }),
         signal: AbortSignal.timeout(30_000),
       });
-
-      if (!response.ok) {
-        cachedHealthy = false;
-        healthCacheTs = Date.now();
-        throw new Error(`[miniforge-nlp] analyze failed: ${response.status} ${response.statusText}`);
+      if (!response.ok) { cachedHealthy = false; healthCacheTs = Date.now(); throw new Error(`[miniforge-nlp] analyze failed: ${response.status} ${response.statusText}`); }
+      const raw = (await readJson(response)) as Partial<NlpAnalyzeResponse> & { capabilities?: Partial<NlpAnalyzeResponse['capabilities']> };
+      const entities = Array.isArray(raw.entities) ? raw.entities.map(normalizeEntity) : [];
+      if (req.groundedExtractionRequired && entities.some((entity) => entity.char_interval == null)) {
+        throw new Error('[miniforge-nlp] grounded extraction required but response contained ungrounded LangExtract entities');
       }
-
-      const raw = (await readJson(response)) as Partial<NlpAnalyzeResponse> & {
-        capabilities?: Partial<NlpAnalyzeResponse['capabilities']>;
-      };
-
       return {
         document_id: raw.document_id ?? req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
         source_type: (raw.source_type ?? req.sourceType ?? 'plain_text') as NlpSourceType,
         extraction_mode: (raw.extraction_mode ?? req.extractionMode ?? 'full') as NlpExtractionMode,
-        entities: Array.isArray(raw.entities) ? raw.entities : [],
-        relationships: Array.isArray(raw.relationships) ? raw.relationships : [],
-        concepts: Array.isArray(raw.concepts) ? raw.concepts : [],
-        chunks: Array.isArray(raw.chunks) ? raw.chunks : [],
-        features: Array.isArray(raw.features) ? raw.features : [],
-        metadata: (raw.metadata ?? {}) as Record<string, unknown>,
-        capabilities: {
-          spacy: Boolean(raw.capabilities?.spacy),
-          langextract: Boolean(raw.capabilities?.langextract),
-          tree_sitter: Boolean(raw.capabilities?.tree_sitter),
-          treesitter_chunker: Boolean(raw.capabilities?.treesitter_chunker),
-          ast_grep: Boolean(raw.capabilities?.ast_grep),
-          torch: Boolean(raw.capabilities?.torch),
-        },
-        pass_results: Array.isArray(raw.pass_results) ? raw.pass_results : [],
-        control5: (raw.control5 ?? null) as Control5 | null,
-        experiment_feature_matrix: (raw.experiment_feature_matrix ?? null) as ExperimentFeatureMatrix | null,
-        event_hypergraph: (raw.event_hypergraph ?? null) as Record<string, unknown> | null,
-        processing_time_ms: Number(raw.processing_time_ms ?? Date.now() - start),
+        entities,
+        relationships: Array.isArray(raw.relationships) ? raw.relationships : [], concepts: Array.isArray(raw.concepts) ? raw.concepts : [], chunks: Array.isArray(raw.chunks) ? raw.chunks : [], features: Array.isArray(raw.features) ? raw.features : [], metadata: (raw.metadata ?? {}) as Record<string, unknown>,
+        capabilities: { spacy: Boolean(raw.capabilities?.spacy), langextract: Boolean(raw.capabilities?.langextract), tree_sitter: Boolean(raw.capabilities?.tree_sitter), treesitter_chunker: Boolean(raw.capabilities?.treesitter_chunker), ast_grep: Boolean(raw.capabilities?.ast_grep), torch: Boolean(raw.capabilities?.torch) },
+        pass_results: Array.isArray(raw.pass_results) ? raw.pass_results : [], control5: (raw.control5 ?? null) as Control5 | null, experiment_feature_matrix: (raw.experiment_feature_matrix ?? null) as ExperimentFeatureMatrix | null, event_hypergraph: (raw.event_hypergraph ?? null) as Record<string, unknown> | null, processing_time_ms: Number(raw.processing_time_ms ?? Date.now() - start),
       };
     },
 
     async extract(req) {
-      const response = await fetch(`${url}/extract`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          text: req.text,
-          source_type: req.sourceType ?? 'plain_text',
-          extraction_mode: req.extractionMode ?? 'full',
-          document_id: req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
-          source_ref: req.sourceRef,
-          packet_key: req.packetKey,
-          language: req.language,
-          model_id: req.modelId,
-          max_chars: req.maxChars ?? 50_000,
-          passes: req.passes ?? [],
-          grounded_extraction_required: req.groundedExtractionRequired ?? false,
-        }),
-        signal: AbortSignal.timeout(30_000),
-      });
-
-      if (!response.ok) {
-        cachedHealthy = false;
-        healthCacheTs = Date.now();
-        throw new Error(`[miniforge-nlp] extract failed: ${response.status} ${response.statusText}`);
-      }
-
+      const response = await fetch(`${url}/extract`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: req.text, source_type: req.sourceType ?? 'plain_text', extraction_mode: req.extractionMode ?? 'full', document_id: req.documentId ?? req.packetKey ?? `doc-${Date.now()}`, source_ref: req.sourceRef, packet_key: req.packetKey, language: req.language, model_id: req.modelId, max_chars: req.maxChars ?? 50_000, passes: req.passes ?? [], grounded_extraction_required: req.groundedExtractionRequired ?? false }), signal: AbortSignal.timeout(30_000) });
+      if (!response.ok) throw new Error(`[miniforge-nlp] extract failed: ${response.status} ${response.statusText}`);
       const raw = (await readJson(response)) as Partial<NlpExtractResponse>;
-      return {
-        document_id: raw.document_id ?? req.documentId ?? req.packetKey ?? `doc-${Date.now()}`,
-        structure: (raw.structure ?? {}) as Record<string, unknown>,
-        entities: Array.isArray(raw.entities) ? raw.entities : [],
-        metadata: (raw.metadata ?? {}) as Record<string, unknown>,
-        processing_time: Number(raw.processing_time ?? 0),
-      };
+      const entities = Array.isArray(raw.entities) ? raw.entities.map(normalizeEntity) : [];
+      if (req.groundedExtractionRequired && entities.some((entity) => entity.char_interval == null)) throw new Error('[miniforge-nlp] grounded extraction required but extract response contained ungrounded entities');
+      return { document_id: raw.document_id ?? req.documentId ?? req.packetKey ?? `doc-${Date.now()}`, structure: (raw.structure ?? {}) as Record<string, unknown>, entities, metadata: (raw.metadata ?? {}) as Record<string, unknown>, processing_time: Number(raw.processing_time ?? 0) };
     },
 
     async astChunk(req) {
-      const response = await fetch(`${url}/ast/chunk`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(req),
-        signal: AbortSignal.timeout(15_000),
-      });
+      const response = await fetch(`${url}/ast/chunk`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(req), signal: AbortSignal.timeout(15_000) });
       const raw = (await readJson(response)) as Partial<AtlasStructuralEvidence>;
-      if (!response.ok) {
-        throw new Error(`[miniforge-nlp] ast/chunk failed: ${response.status} ${response.statusText}`);
-      }
-      if (raw.schema !== 'atlas.ast.evidence.v1' || !Array.isArray(raw.chunks)) {
-        throw new Error('[miniforge-nlp] ast/chunk returned an invalid atlas.ast.evidence.v1 payload');
-      }
+      if (!response.ok) throw new Error(`[miniforge-nlp] ast/chunk failed: ${response.status} ${response.statusText}`);
+      if (raw.schema !== 'atlas.ast.evidence.v1' || !Array.isArray(raw.chunks)) throw new Error('[miniforge-nlp] ast/chunk returned an invalid atlas.ast.evidence.v1 payload');
       return {
-        schema: raw.schema,
-        engine: String(raw.engine ?? 'unknown'),
-        engine_version: String(raw.engine_version ?? 'unknown'),
-        language: String(raw.language ?? req.language),
-        file_path: String(raw.file_path ?? req.filePath),
-        source_revision: String(raw.source_revision ?? req.sourceRevision),
+        schema: raw.schema, engine: String(raw.engine ?? 'unknown'), engine_version: String(raw.engine_version ?? 'unknown'), language: String(raw.language ?? req.language), file_path: String(raw.file_path ?? req.filePath), source_revision: String(raw.source_revision ?? req.sourceRevision),
         chunks: raw.chunks.map((chunk) => ({
           upstream_chunk_id: chunk.upstream_chunk_id,
-          node_type: String(chunk.node_type),
-          kind: String(chunk.kind),
-          name: chunk.name ?? null,
-          start_byte: Number(chunk.start_byte),
-          end_byte: Number(chunk.end_byte),
-          start_line: Number(chunk.start_line),
-          start_column: Number(chunk.start_column),
-          end_line: Number(chunk.end_line),
-          end_column: Number(chunk.end_column),
-          calls: Array.isArray(chunk.calls) ? chunk.calls.map(String) : [],
-          imports: Array.isArray(chunk.imports) ? chunk.imports.map(String) : [],
-          exports: Array.isArray(chunk.exports) ? chunk.exports.map(String) : [],
+          node_id: chunk.node_id ?? null,
+          file_id: chunk.file_id ?? null,
+          symbol_id: chunk.symbol_id ?? null,
+          chunk_id: chunk.chunk_id ?? chunk.upstream_chunk_id ?? null,
+          parent_route: Array.isArray(chunk.parent_route) ? chunk.parent_route.map(String) : [],
+          parent_context: chunk.parent_context ?? null,
+          route: Array.isArray(chunk.route) ? chunk.route.map(String) : [],
+          node_type: String(chunk.node_type), kind: String(chunk.kind), name: chunk.name ?? null,
+          start_byte: Number(chunk.start_byte), end_byte: Number(chunk.end_byte), start_line: Number(chunk.start_line), start_column: Number(chunk.start_column), end_line: Number(chunk.end_line), end_column: Number(chunk.end_column),
+          calls: Array.isArray(chunk.calls) ? chunk.calls.map(String) : [], imports: Array.isArray(chunk.imports) ? chunk.imports.map(String) : [], exports: Array.isArray(chunk.exports) ? chunk.exports.map(String) : [],
         })),
-        edges: Array.isArray(raw.edges) ? raw.edges.map((edge) => ({
-          from_evidence_key: String(edge.from_evidence_key ?? ''),
-          to_evidence_key: String(edge.to_evidence_key ?? ''),
-          type: edge.type as AtlasStructuralEvidenceEdge['type'],
-          evidence_start_line: Number(edge.evidence_start_line ?? 1),
-          evidence_start_column: Number(edge.evidence_start_column ?? 0),
-          evidence_end_line: Number(edge.evidence_end_line ?? edge.evidence_start_line ?? 1),
-          evidence_end_column: Number(edge.evidence_end_column ?? 0),
-          resolved: Boolean(edge.resolved),
-          resolution: edge.resolution ?? null,
-        })) : [],
-        diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [],
-        error_tag: raw.error_tag === 'ChunkingError' || raw.error_tag === 'UnsupportedLanguageError' ? raw.error_tag : null,
-        syntax_status: raw.syntax_status === 'RECOVERED_WITH_ERRORS' ? 'RECOVERED_WITH_ERRORS' : 'CLEAN',
+        edges: Array.isArray(raw.edges) ? raw.edges.map((edge) => ({ from_evidence_key: String(edge.from_evidence_key ?? ''), to_evidence_key: String(edge.to_evidence_key ?? ''), type: edge.type as AtlasStructuralEvidenceEdge['type'], evidence_start_line: Number(edge.evidence_start_line ?? 1), evidence_start_column: Number(edge.evidence_start_column ?? 0), evidence_end_line: Number(edge.evidence_end_line ?? edge.evidence_start_line ?? 1), evidence_end_column: Number(edge.evidence_end_column ?? 0), resolved: Boolean(edge.resolved), resolution: edge.resolution ?? null })) : [],
+        diagnostics: Array.isArray(raw.diagnostics) ? raw.diagnostics.map(String) : [], error_tag: raw.error_tag === 'ChunkingError' || raw.error_tag === 'UnsupportedLanguageError' ? raw.error_tag : null, syntax_status: raw.syntax_status === 'RECOVERED_WITH_ERRORS' ? 'RECOVERED_WITH_ERRORS' : 'CLEAN',
       };
     },
   };
