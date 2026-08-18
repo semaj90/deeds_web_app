@@ -1,0 +1,40 @@
+schema_id: atlas.svd-decomposition-receipt
+schema_version: 1
+schema_kind: numerical_proof_receipt
+status: ACTIVE
+
+description: >
+  Numerical proof for an SVD/PCA decomposition across CPU/GPU executors. Raw U/Vh
+  byte equality is explicitly forbidden because singular vectors are not unique
+  up to sign/phase and degenerate subspaces may rotate while representing the same
+  decomposition.
+
+fields:
+  schema: { type: literal, value: atlas.svd-decomposition-receipt.v1 }
+  receiptId: { type: string, required: true }
+  computePlanId: { type: string, required: true }
+  referenceBackend: { type: string, required: true }
+  executorBackend: { type: string, required: true }
+  inputShape: { type: integer_array, required: true }
+  rank: { type: integer, minimum: 1 }
+  singularValuesRef: { type: string, required: true }
+  singularValueMaxAbsError: { type: number, minimum: 0 }
+  reconstructionErrorReference: { type: number, minimum: 0 }
+  reconstructionErrorExecutor: { type: number, minimum: 0 }
+  explainedVarianceReference: { type: number, minimum: 0 }
+  explainedVarianceExecutor: { type: number, minimum: 0 }
+  projectorDistance: { type: number, minimum: 0 }
+  recallAtKAfterProjection: { type: number, minimum: 0, maximum: 1, nullable: true }
+  status:
+    type: enum
+    values: [PASS, FAIL, NOT_COMPARABLE]
+  environmentReceiptId: { type: string, nullable: true }
+  evidenceRefs: { type: string_array, default: [] }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - U and Vh serialized bytes are not proof identity
+  - sign/phase flips that preserve singular values and subspace do not constitute failure
+  - degenerate singular subspaces are compared through projector/subspace distance
+  - low-rank projection remains derived evidence and never participates in canonical symbol identity
