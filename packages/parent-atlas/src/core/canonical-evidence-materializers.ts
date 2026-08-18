@@ -52,8 +52,11 @@ export async function materializeOpenSpecDocument(pool: Pool, input: {
     evidence_revision: evidenceRevision,
     producer_revision: input.producer_revision,
     confidence: 1,
-    payload: document.payload,
-    tags: ['openspec', document.receipt.document_kind],
+    payload: {
+      openspec: document.payload,
+      compilation_receipt: document.receipt,
+    },
+    tags: ['openspec', document.receipt.document_kind, ...(document.receipt.rename_count > 0 ? ['contains-renames'] : [])],
     search_text: document.receipt.locations.map((item) => item.title).join(' '),
   });
   await ledger.readback({ evidence_id: id, producer_revision: input.producer_revision });
@@ -234,7 +237,8 @@ export async function materializeCanonicalTestExecution(pool: Pool, input: {
 export function describeCanonicalEvidenceMaterializers(): string {
   return [
     'All evidence families write atlas_evidence before atlas_evidence_entities so FK/readback order is deterministic.',
-    'OpenSpec IDs are already parser-canonical; schema/test IDs require canonical registry resolution before shared entity facts.',
+    'OpenSpec IDs are parser-canonical and rename transitions remain persisted in the evidence compilation receipt.',
+    'Schema/test IDs require canonical registry resolution before shared entity facts.',
     'Unresolved nominations may remain in evidence payloads but never become dynamic-hyperedge join keys.',
     'Materialization creates evidence/entity facts only; dynamic hyperedge promotion to canonical relationships remains a separate review step.',
   ].join(' ');
