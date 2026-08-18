@@ -2,6 +2,7 @@ import type { FeatureRelationshipV1 } from './feature-intelligence.js';
 import { projectRelationshipToIncidence } from './hypergraph-retrieval.js';
 
 export type HypergraphPprConfigV1 = {
+  /** Edge-follow damping factor; aligned with cuGraph/PageRank semantics. */
   alpha?: number;
   maximum_iterations?: number;
   tolerance?: number;
@@ -12,7 +13,9 @@ export type HypergraphPprReceiptV1 = {
   query_id: string;
   source_snapshot_revision: string;
   seed_entity_ids: string[];
+  /** Edge-follow damping factor. Teleport probability is 1-alpha. */
   alpha: number;
+  teleport_probability: number;
   iterations: number;
   converged: boolean;
   tolerance: number;
@@ -30,8 +33,8 @@ function normalizeDistribution(scores: Map<string, number>): void {
 
 /**
  * CPU reference PPR over the lossless bipartite incidence graph.
- * Relationship nodes and entity nodes are distinct. This is intended as a
- * deterministic correctness oracle for Neo4j/cuGraph implementations.
+ * `alpha` matches cuGraph: probability of following an outgoing edge.
+ * Teleport probability is therefore `1 - alpha`.
  */
 export function runHypergraphPersonalizedPageRank(input: {
   query_id: string;
@@ -40,7 +43,8 @@ export function runHypergraphPersonalizedPageRank(input: {
   relationships: FeatureRelationshipV1[];
   config?: HypergraphPprConfigV1;
 }): HypergraphPprReceiptV1 {
-  const alpha = input.config?.alpha ?? 0.15;
+  const alpha = input.config?.alpha ?? 0.85;
+  const teleportProbability = 1 - alpha;
   const maximumIterations = input.config?.maximum_iterations ?? 100;
   const tolerance = input.config?.tolerance ?? 1e-10;
   if (!(alpha > 0 && alpha < 1)) throw new RangeError('alpha must be between 0 and 1');
@@ -79,18 +83,12 @@ export function runHypergraphPersonalizedPageRank(input: {
   });
   if (seedNodeIds.length === 0) {
     return {
-      schema: 'atlas.hypergraph-ppr-receipt.v1',
-      query_id: input.query_id,
+      schema: 'atlas.hypergraph-ppr-receipt.v1', query_id: input.query_id,
       source_snapshot_revision: input.source_snapshot_revision,
       seed_entity_ids: [...new Set(input.seed_entity_ids)].sort(),
-      alpha,
-      iterations: 0,
-      converged: true,
-      tolerance,
-      node_count: nodes.length,
-      incidence_edge_count: incidenceEdgeCount,
-      relationship_scores: {},
-      entity_scores: {},
+      alpha, teleport_probability: teleportProbability, iterations: 0, converged: true,
+      tolerance, node_count: nodes.length, incidence_edge_count: incidenceEdgeCount,
+      relationship_scores: {}, entity_scores: {},
     };
   }
 
@@ -103,37 +101,32 @@ export function runHypergraphPersonalizedPageRank(input: {
   let iterations = 0;
 
   for (let iteration = 1; iteration <= maximumIterations; iteration += 1) {
-    const next = new Map<string, number>(nodes.map((nodeId) => [nodeId, alpha * (personalization.get(nodeId) ?? 0)]));
+    const next = new Map<string, number>(
+      nodes.map((nodeId) => [nodeId, teleportProbability * (personalization.get(nodeId) ?? 0)]),
+    );
     let danglingMass = 0;
 
     for (const nodeId of nodes) {
       const neighbors = adjacency.get(nodeId) ?? new Set<string>();
       const score = scores.get(nodeId) ?? 0;
-      if (neighbors.size === 0) {
-        danglingMass += score;
-        continue;
-      }
-      const share = (1 - alpha) * score / neighbors.size;
+      if (neighbors.size === 0) { danglingMass += score; continue; }
+      const share = alpha * score / neighbors.size;
       for (const neighbor of neighbors) next.set(neighbor, (next.get(neighbor) ?? 0) + share);
     }
 
     if (danglingMass > 0) {
       for (const nodeId of nodes) {
-        next.set(
-          nodeId,
-          (next.get(nodeId) ?? 0) + (1 - alpha) * danglingMass * (personalization.get(nodeId) ?? 0),
-        );
+        next.set(nodeId, (next.get(nodeId) ?? 0) + alpha * danglingMass * (personalization.get(nodeId) ?? 0));
       }
     }
 
     normalizeDistribution(next);
-    const delta = nodes.reduce((sum, nodeId) => sum + Math.abs((next.get(nodeId) ?? 0) - (scores.get(nodeId) ?? 0)), 0);
+    const delta = nodes.reduce(
+      (sum, nodeId) => sum + Math.abs((next.get(nodeId) ?? 0) - (scores.get(nodeId) ?? 0)), 0,
+    );
     scores = next;
     iterations = iteration;
-    if (delta <= tolerance) {
-      converged = true;
-      break;
-    }
+    if (delta <= tolerance) { converged = true; break; }
   }
 
   const relationshipScores: Record<string, number> = {};
@@ -147,17 +140,11 @@ export function runHypergraphPersonalizedPageRank(input: {
   }
 
   return {
-    schema: 'atlas.hypergraph-ppr-receipt.v1',
-    query_id: input.query_id,
+    schema: 'atlas.hypergraph-ppr-receipt.v1', query_id: input.query_id,
     source_snapshot_revision: input.source_snapshot_revision,
-    seed_entity_ids: [...new Set(input.seed_entity_ids)].sort(),
-    alpha,
-    iterations,
-    converged,
-    tolerance,
-    node_count: nodes.length,
-    incidence_edge_count: incidenceEdgeCount,
-    relationship_scores: relationshipScores,
-    entity_scores: entityScores,
+    seed_entity_ids: [...new Set(input.seed_entity_ids)].sort(), alpha,
+    teleport_probability: teleportProbability, iterations, converged, tolerance,
+    node_count: nodes.length, incidence_edge_count: incidenceEdgeCount,
+    relationship_scores: relationshipScores, entity_scores: entityScores,
   };
 }
