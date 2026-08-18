@@ -73,5 +73,17 @@ export default {
     // same reason as library_identities above: keep isolated from unrelated schema drift.
     '!atlas_research_runs', '!atlas_fetches', '!atlas_fetch_attempts',
     '!atlas_source_revisions', '!atlas_extractions',
+
+    // Parent Atlas feature intelligence / structural identity plane.
+    // Runtime Drizzle declarations exist for typing/querying, but DDL ownership is
+    // isolated under drizzle/manual/20260817_* and 20260818_* so drizzle-kit must
+    // not generate duplicate CREATE/ALTER migrations for these tables.
+    '!atlas_features', '!atlas_feature_aliases', '!atlas_evidence',
+    '!atlas_feature_evidence', '!atlas_relationships', '!atlas_relationship_members',
+    '!atlas_relationship_cardinality', '!atlas_relationship_evidence',
+    '!atlas_relationship_embeddings', '!atlas_feature_embeddings',
+    '!atlas_feature_state_receipts', '!atlas_dynamic_hyperedge_candidates',
+    '!atlas_evidence_entities', '!atlas_symbol_registry', '!atlas_symbol_aliases',
+    '!atlas_symbol_versions', '!atlas_structural_reference_resolutions',
   ],
 } satisfies Config;
