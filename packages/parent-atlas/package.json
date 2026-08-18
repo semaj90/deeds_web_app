@@ -19,14 +19,20 @@
     "./core/evidence-ledger-repository": "./dist/core/evidence-ledger-repository.js",
     "./core/evidence-entity-repository": "./dist/core/evidence-entity-repository.js",
     "./core/evidence-entity-extractors": "./dist/core/evidence-entity-extractors.js",
+    "./core/canonical-evidence-materializers": "./dist/core/canonical-evidence-materializers.js",
     "./core/openspec-evidence-compiler": "./dist/core/openspec-evidence-compiler.js",
     "./core/openspec-repository-ingestion": "./dist/core/openspec-repository-ingestion.js",
+    "./core/openspec-materialization-pipeline": "./dist/core/openspec-materialization-pipeline.js",
     "./core/workflow-action-event": "./dist/core/workflow-action-event.js",
     "./core/workflow-action-adapters": "./dist/core/workflow-action-adapters.js",
     "./core/schema-object-registry": "./dist/core/schema-object-registry.js",
     "./core/postgres-schema-introspector": "./dist/core/postgres-schema-introspector.js",
     "./core/test-case-registry": "./dist/core/test-case-registry.js",
+    "./core/assertion-registry": "./dist/core/assertion-registry.js",
+    "./core/test-execution-repository": "./dist/core/test-execution-repository.js",
     "./core/vitest-test-evidence-compiler": "./dist/core/vitest-test-evidence-compiler.js",
+    "./core/reviewed-identity-alias": "./dist/core/reviewed-identity-alias.js",
+    "./core/reviewed-alias-application": "./dist/core/reviewed-alias-application.js",
     "./core/gis-canonicalization": "./dist/core/gis-canonicalization.js",
     "./core/structural-production-receipt": "./dist/core/structural-production-receipt.js",
     "./core/hypergraph-retrieval": "./dist/core/hypergraph-retrieval.js",
@@ -54,9 +60,7 @@
     "./core/proof-gates": "./dist/core/proof-gates.js",
     "./core/hypergraph-fusion-facade": "./dist/core/hypergraph-fusion-facade.js"
   },
-  "bin": {
-    "atlas": "./dist/cli.js"
-  },
+  "bin": { "atlas": "./dist/cli.js" },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
@@ -79,12 +83,13 @@
     "test:postgres-schema-introspector": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/postgres-schema-introspector.test.mjs",
     "test:test-case-registry": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/test-case-registry.test.mjs",
     "test:vitest-test-evidence": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/vitest-test-evidence-compiler.test.mjs",
+    "test:identity-continuity": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/identity-continuity.test.mjs ./test/assertion-registry.test.mjs",
     "test:python-structural-provenance": "python ../../python/test_atlas_structural_provenance.py",
     "audit:structural-provenance": "node ../../scripts/atlas/audit-structural-provenance-wiring.mjs",
     "prove:ast-sidecar": "node ../../scripts/atlas/prove-ast-sidecar.mjs",
     "prove:database": "node ../../scripts/atlas/prove-feature-intelligence-database.mjs",
     "prove:database:fixture": "node ../../scripts/atlas/prove-feature-intelligence-database.mjs --fixture",
-    "test:feature-intelligence:all": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/feature-intelligence.test.mjs ./test/hypergraph-retrieval.test.mjs ./test/feature-matrix.test.mjs ./test/ace-hypergraph-packet.test.mjs ./test/hypergraph-ppr.test.mjs ./test/scaffold-contracts.test.mjs ./test/structural-extraction.test.mjs ./test/structural-vertical.integration.test.mjs ./test/sidecar-provenance-compat.test.mjs ./test/evidence-entity-extractors.test.mjs ./test/openspec-evidence-compiler.test.mjs ./test/openspec-repository-ingestion.test.mjs ./test/workflow-action-event.test.mjs ./test/workflow-action-adapters.test.mjs ./test/schema-object-registry.test.mjs ./test/postgres-schema-introspector.test.mjs ./test/test-case-registry.test.mjs ./test/vitest-test-evidence-compiler.test.mjs",
+    "test:feature-intelligence:all": "node ../../node_modules/typescript/bin/tsc -p tsconfig.json && node --test ./test/feature-intelligence.test.mjs ./test/hypergraph-retrieval.test.mjs ./test/feature-matrix.test.mjs ./test/ace-hypergraph-packet.test.mjs ./test/hypergraph-ppr.test.mjs ./test/scaffold-contracts.test.mjs ./test/structural-extraction.test.mjs ./test/structural-vertical.integration.test.mjs ./test/sidecar-provenance-compat.test.mjs ./test/evidence-entity-extractors.test.mjs ./test/openspec-evidence-compiler.test.mjs ./test/openspec-repository-ingestion.test.mjs ./test/workflow-action-event.test.mjs ./test/workflow-action-adapters.test.mjs ./test/schema-object-registry.test.mjs ./test/postgres-schema-introspector.test.mjs ./test/test-case-registry.test.mjs ./test/vitest-test-evidence-compiler.test.mjs ./test/identity-continuity.test.mjs ./test/assertion-registry.test.mjs",
     "gate:identity": "node --experimental-vm-modules dist/cli.js gate identity",
     "gate:replay": "node --experimental-vm-modules dist/cli.js gate replay --all",
     "gate:lineage": "node --experimental-vm-modules dist/cli.js gate lineage",
@@ -107,7 +112,5 @@
     "@types/pg": "^8.11.6",
     "typescript": "^5.5.0"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": { "node": ">=20" }
 }
