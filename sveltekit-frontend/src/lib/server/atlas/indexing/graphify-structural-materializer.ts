@@ -51,12 +51,69 @@ export function create8095AstProvider(baseUrl?: string): AstProvider {
   };
 }
 
+export type StructuralProvenanceReadiness = {
+  status: 'NATIVE_READY' | 'COMPATIBILITY_ONLY' | 'NO_EVIDENCE';
+  nativeNodeIds: number;
+  nativeFileIds: number;
+  nativeSymbolIds: number;
+  upstreamChunkIds: number;
+  symbolCount: number;
+  canonicalPromotionAllowed: boolean;
+  reason: string;
+};
+
+function evaluateProvenanceReadiness(normalized: NormalizedAtlasStructuralEvidence | null): StructuralProvenanceReadiness {
+  if (!normalized || normalized.symbols.length === 0) {
+    return {
+      status: 'NO_EVIDENCE',
+      nativeNodeIds: 0,
+      nativeFileIds: 0,
+      nativeSymbolIds: 0,
+      upstreamChunkIds: 0,
+      symbolCount: 0,
+      canonicalPromotionAllowed: false,
+      reason: 'No normalized structural symbols were produced.',
+    };
+  }
+
+  const { provenance } = normalized;
+  const symbolCount = normalized.symbols.length;
+  const allNodesNative = provenance.nativeNodeIdCount === symbolCount;
+  const allFilesNative = provenance.nativeFileIdCount === symbolCount;
+  const chunksAvailable = provenance.upstreamChunkIdCount === symbolCount;
+
+  if (allNodesNative && allFilesNative && chunksAvailable) {
+    return {
+      status: 'NATIVE_READY',
+      nativeNodeIds: provenance.nativeNodeIdCount,
+      nativeFileIds: provenance.nativeFileIdCount,
+      nativeSymbolIds: provenance.nativeSymbolIdCount,
+      upstreamChunkIds: provenance.upstreamChunkIdCount,
+      symbolCount,
+      canonicalPromotionAllowed: true,
+      reason: 'All structural symbols retain native Consiliency node/file/chunk provenance; GIS may evaluate canonical promotion.',
+    };
+  }
+
+  return {
+    status: 'COMPATIBILITY_ONLY',
+    nativeNodeIds: provenance.nativeNodeIdCount,
+    nativeFileIds: provenance.nativeFileIdCount,
+    nativeSymbolIds: provenance.nativeSymbolIdCount,
+    upstreamChunkIds: provenance.upstreamChunkIdCount,
+    symbolCount,
+    canonicalPromotionAllowed: false,
+    reason: 'One or more structural symbols lack native Consiliency node/file/chunk provenance; compatibility coordinates remain noncanonical.',
+  };
+}
+
 export type StructuralMaterializationResult = {
   sourceRef: string;
   sourceRevision: string;
   provider: AstProviderResult['provider'];
   status: AstProviderResult['status'];
   normalized: NormalizedAtlasStructuralEvidence | null;
+  provenanceReadiness: StructuralProvenanceReadiness;
   diagnostics: string[];
   persistence: 'NOT_ATTEMPTED';
   fallback: 'NONE';
@@ -66,6 +123,10 @@ export type StructuralMaterializationResult = {
  * Canonical Graphify owner boundary. It owns orchestration and receipt shape;
  * 8095 owns structural parsing evidence. Identity persistence and projections
  * remain downstream and are intentionally not performed here.
+ *
+ * `canonicalPromotionAllowed=true` means only that native structural provenance
+ * is complete enough for GIS to evaluate promotion. It does NOT mean identity
+ * has been promoted or persisted.
  */
 export class GraphifyStructuralMaterializer {
   constructor(private readonly astProvider: AstProvider = create8095AstProvider()) {}
@@ -75,13 +136,19 @@ export class GraphifyStructuralMaterializer {
     const normalized = result.evidence && result.status !== 'FAILED'
       ? normalizeAtlasAstEvidence(result.evidence)
       : null;
+    const provenanceReadiness = evaluateProvenanceReadiness(normalized);
+    const diagnostics = [...result.diagnostics];
+    if (provenanceReadiness.status === 'COMPATIBILITY_ONLY') {
+      diagnostics.push('STRUCTURAL_PROVENANCE_COMPATIBILITY_ONLY');
+    }
     return {
       sourceRef: input.sourceRef,
       sourceRevision: input.sourceRevision,
       provider: result.provider,
       status: result.status,
       normalized,
-      diagnostics: [...result.diagnostics],
+      provenanceReadiness,
+      diagnostics,
       persistence: 'NOT_ATTEMPTED',
       fallback: 'NONE',
     };
