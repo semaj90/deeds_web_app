@@ -3,211 +3,207 @@
 Date: 2026-08-18
 
 Status semantics:
+- `WRITTEN` — source/migration/test/proof code exists.
+- `WIRED` — intended production owner can reach the surface, but runtime proof has not passed.
+- `PROVEN` — requires executed build/runtime/database/GPU evidence.
+- `RED` — required proof or active integration is still missing/unexecuted.
 
-- `WRITTEN` — contract/reference/migration/test/proof code exists on this branch.
-- `WIRED` — the intended production owner can reach the new surface, but runtime proof has not passed.
-- `PROVEN` — requires executed build/runtime/database/GPU evidence. **Nothing newly added in this tranche is marked PROVEN.**
-- `RED` — a required implementation or proof step is still missing/failing/unexecuted.
+**Nothing added in this tranche is marked PROVEN.**
 
-## Reconciled implementation inventory
+## P0 identity/evidence continuity — reconciled state
 
-| Area | Current state | Surface / remaining proof |
+| Area | State | Current surface / remaining proof |
 | --- | --- | --- |
-| Canonical Feature/N-ary relationship contracts | WRITTEN | `feature-intelligence.ts` |
-| Canonical relationship PostgreSQL repository | WRITTEN / RED DB PROOF | `feature-intelligence-repository.ts` |
-| Canonical evidence ledger independent of Feature attachment | WRITTEN | `evidence-ledger-repository.ts` |
-| Dynamic evidence-entity hyperedge index | WRITTEN / RED DB PROOF | `atlas_evidence_entities`, `dynamic-hyperedge-sql.ts` |
-| Relationship `semantic_768` contract | WRITTEN / RED LIVE BACKFILL | `relationship-vector-projection.ts` |
-| CPU incidence PPR oracle | WRITTEN / RED GPU PARITY | `hypergraph-ppr.ts` |
-| Qdrant/cuVS/CAGRA/cuGraph execution plans | WRITTEN / RED LIVE BENCHMARK | `executor-plans.ts`, `semantic-executor-manifest.ts` |
-| ACE N-ary payload + packet composition | WRITTEN | `ace-hypergraph-payload.ts`, `ace-packet-v2.ts` |
-| Retrieval action receipts | WRITTEN | `retrieval-action-receipt.ts` |
-| WorkflowActionEventV1 runtime contract | WRITTEN | `workflow-action-event.ts` |
-| Retrieval receipt → WorkflowActionEvent adapter | WRITTEN / RED ACTIVE CALL-SITE | `workflow-action-adapters.ts` |
-| AcePacketV2 → WorkflowActionEvent artifact adapter | WRITTEN / RED ACTIVE CALL-SITE | `workflow-action-adapters.ts` |
+| Native Consiliency structural provenance | WIRED / RED runtime | provenance-v2 8095 + Graphify native adapter |
+| GIS symbol registry / versions / aliases | WRITTEN / RED DB proof | symbol registry repository + manual DDL |
+| PostgreSQL schema introspection | WRITTEN / RED live DB | repeatable-read/read-only catalog snapshot; search_path=pg_catalog |
+| Column catalog provenance | WRITTEN | `catalog_oid=NULL`; locator=`pg_class OID + attrelid + attnum` provenance |
+| Schema object registry | WRITTEN / RED DB proof | stable IDs separate from catalog OIDs/locators |
+| Reviewed schema/test rename/move continuity | WRITTEN / RED DB proof | `ReviewedIdentityAliasV1` + decision ledger + atomic alias projection |
+| Test registry + immutable execution receipts | WRITTEN / RED live report | Vitest JSON → nomination/execution → registry/evidence |
+| Static assertion identity | WRITTEN / RED frontend build | test declaration locator → assertion extractor → assertion registry |
+| OpenSpec repository ingestion | WRITTEN | explicit roots + content-addressed document revisions |
+| OpenSpec persistence + rename lineage | WRITTEN / RED DB proof | rename receipt persisted with evidence payload |
+| OpenSpec default batch atomicity | WRITTEN / RED DB proof | caller-owned PostgreSQL transaction when `allow_partial=false` |
+| WorkflowActionEvent adapters | WRITTEN / RED active orchestrator | workflow sequence/lane/tool owned by orchestrator; retrieval sequence stays metadata |
+| Derived retrieval candidate runtime identity | FAIL-CLOSED | candidate IDs remain metadata, never canonical resource refs |
+| ACE artifact workflow adapter | WRITTEN / RED active orchestrator | packet/relationship/evidence identity preserved |
 
-## Native structural / GIS status
+## PostgreSQL schema evidence
 
-| Gate | State | Evidence / next proof |
-| --- | --- | --- |
-| 8095 provenance-preserving facade | WIRED / RED RUNTIME PROOF | `python/miniforge_nlp_sidecar_v2.py` |
-| Docker 8095 entrypoint selects provenance-v2 | WIRED / RED RUNTIME PROOF | `docker/miniforge-nlp-sidecar/Dockerfile` |
-| PowerShell launcher defaults provenance-v2 | WIRED / RED RUNTIME PROOF | `scripts/launch-miniforge-nlp-sidecar.ps1` |
-| Native Consiliency node/file/chunk/symbol provenance | WRITTEN / RED LIVE RESPONSE | v2 sidecar + TypeScript client |
-| `identity_path` fallback degrades instead of silently promoting | WRITTEN / RED LIVE PROOF | v2 sidecar diagnostic `CONSILIENCY_IDENTITY_PATH_UNPROVEN` |
-| LangExtract native `char_interval` / alignment | WRITTEN / RED LIVE PROBE | v2 facade + grounding adapters |
-| ast-grep byte-grounded observations | WRITTEN | `ast-grep-extractor.ts`, `ast-grep-observation-adapter.ts` |
-| Graphify normalizer preserves native provenance | WRITTEN | `atlas-ast-evidence-normalizer.ts` |
-| Recovered parse blocks GIS promotion | WRITTEN | `GraphifyStructuralMaterializer` readiness gate |
-| Graphify → Parent Atlas structural fabric adapter | WIRED / RED BUILD | `graphify-structural-intelligence-adapter.ts` |
-| Native structural evidence ledger → GIS → evidence entities | WIRED / RED LIVE DB | `native-structural-materializer.mts` |
-| Selected `graphify:daily` owner can invoke native structural path | WIRED OPT-IN / RED LIVE RUN | `GRAPHIFY_NATIVE_STRUCTURAL=1` in startup owner |
-| Automatic database writes | FAIL-CLOSED | require `GRAPHIFY_NATIVE_STRUCTURAL_APPLY=1` |
-| Automatic new stable-symbol creation | FAIL-CLOSED | additionally require `GRAPHIFY_NATIVE_STRUCTURAL_ALLOW_CREATE_SYMBOLS=1` |
-| Legacy Batch A heuristic structural rows | COMPATIBILITY ONLY | synthetic/regex path; do not promote as native structural truth |
+`postgres-schema-introspector.ts` now:
 
-### Native structural apply chain
+- runs one `REPEATABLE READ, READ ONLY` transaction;
+- pins `search_path` to `pg_catalog`;
+- records `server_version_num` in the receipt;
+- uses PostgreSQL deparsers for constraints/indexes/expressions/functions/triggers;
+- keeps `catalog_oid` and `catalog_locator` out of `object_key` and `definition_hash`;
+- models a column with `catalog_oid=NULL` and revision-local locator `{class_oid: pg_class, object_oid: attrelid, object_sub_id: attnum}`.
+
+Proof runner:
 
 ```text
-Consiliency / 8095 PROVEN native evidence
-        ↓
-atlas_evidence
-        ↓
-existing symbol registry resolution
-        │
-        ├─ canonical match → stable_symbol_id
-        │
-        └─ unresolved → remains nomination
-                │
-                └─ only with explicit allow-create + NATIVE_READY → GIS promotion
-        ↓
-atlas_evidence_entities
-        ↓
-dynamic query-scoped hyperedges
+node scripts/atlas/prove-live-schema-introspection.mjs
 ```
 
-## Schema evidence owner
+Default is resolve/readback only. Registry creation requires both `--apply` and `--allow-create` so reviewed rename/move aliases may be applied first.
 
-| Gate | State | Surface |
-| --- | --- | --- |
-| Schema object nomination/registry contract | WRITTEN | `schema-object-registry.ts` |
-| Stable schema IDs separated from PostgreSQL catalog OIDs | WRITTEN | registry + version schema |
-| PostgreSQL 18 catalog introspector | WRITTEN / RED LIVE DB | `postgres-schema-introspector.ts` |
-| OID-invariant semantic definition hashing | WRITTEN | pure catalog-row compiler |
-| `pg_class` / `pg_attribute` / `pg_constraint` / `pg_index` / `pg_policy` / `pg_proc` / `pg_trigger` discovery | WRITTEN / RED LIVE DB | introspector query |
-| Stable name/deparser surfaces instead of OID-derived semantics | WRITTEN | `pg_get_constraintdef`, `pg_get_indexdef`, `pg_get_expr`, function/trigger deparsers |
-| Schema registry migration | WRITTEN / RED APPLY/READBACK | `20260818_atlas_schema_object_registry_v1.sql` |
-| Drizzle runtime declaration | WRITTEN | `atlas-structural-intelligence.ts` |
-| Drizzle migration ownership isolation | WIRED | `drizzle.config.ts` excludes manual schema registry tables |
+## Test / assertion evidence
 
-## Test evidence owner
+Current path:
 
-| Gate | State | Surface |
-| --- | --- | --- |
-| Test nomination / canonical registry contract | WRITTEN | `test-case-registry.ts` |
-| Cross-revision test key excludes line/column | WRITTEN | line movement creates version change, not identity change |
-| Rename creates a new nomination requiring alias/review | WRITTEN | explicit registry boundary |
-| Vitest JSON reporter compiler | WRITTEN / RED EXECUTION | `vitest-test-evidence-compiler.ts` |
-| Runner-owned pass/fail execution receipts | WRITTEN | `TestExecutionObservationV1` |
-| Unresolved tests rejected from canonical `atlas.test-evidence.v1` | WRITTEN | promotion gate |
-| Test registry migration | WRITTEN / RED APPLY/READBACK | `20260818_atlas_test_registry_v1.sql` |
-| Drizzle test declarations | WRITTEN | `atlas-test-intelligence.ts` |
-| Manual-DDL exclusion | WIRED | `drizzle.config.ts` |
-| Active Vitest invocation writes JSON report for ingestion | RED | configure/report file call-site |
-| Test execution receipt repository write/readback | RED | table exists; repository method still needed |
-| Assertion-level canonical identity | RED | static assertion owner not yet implemented |
+```text
+Vitest JSON reporter file
+        ↓
+compileVitestJsonReport()
+        ↓
+TestCaseNominationV1 + TestExecutionObservationV1
+        ↓
+test registry resolution
+        ↓
+stable_test_id
+        ↓
+ast-grep static test()/it() declaration locator
+        ↓
+explicit expect/assert calls within test span
+        ↓
+AssertionNominationV1
+        ↓
+assertion registry
+        ↓
+stable_assertion_id
+        ↓
+atlas.test-evidence.v1
+        ↓
+atlas_evidence → atlas_evidence_entities
+```
 
-## OpenSpec evidence owner
+Vitest `assertionResults[]` rows remain test-case execution results; they do not own individual static `expect()`/`assert()` identity. Duplicate identical static assertion fingerprints are occurrence-scoped and require explicit review before canonical creation.
 
-| Gate | State | Surface |
-| --- | --- | --- |
-| Requirement/scenario/task parser-owned identities | WRITTEN | `openspec-evidence-compiler.ts` |
-| Delta ADDED/MODIFIED/REMOVED/RENAMED semantics | WRITTEN | explicit rename aliases |
-| FI-style and numeric task IDs | WRITTEN | `FI-16A`, `1.2`, etc. |
-| Repository traversal over explicit OpenSpec roots | WRITTEN / RED TEST EXECUTION | `openspec-repository-ingestion.ts` |
-| Content-addressed document revision + separate workspace revision | WRITTEN | ingestion receipt |
-| OpenSpec DB/evidence-entity materialization | RED | parser output not yet persisted into evidence ledger/entities |
+Proof runner:
 
-## Workflow owner
+```text
+node scripts/atlas/prove-vitest-evidence.mjs --generate
+```
 
-| Gate | State | Surface |
-| --- | --- | --- |
-| Common workflow event vocabulary | WRITTEN | `WorkflowActionEventV1` |
-| Existing retrieval receipt adapter | WRITTEN | action/DAG IDs must come from orchestrator |
-| Existing ACE artifact adapter | WRITTEN | packet/relationship/evidence IDs preserved |
-| Fake receipt→action ID derivation prohibited | WRITTEN | adapters require explicit runtime identity |
-| Active retrieval executor emits event | RED | call-site wiring pending |
-| Active ACE materializer emits event | RED | call-site wiring pending |
-| Persistent workflow event ledger / transport | RED | select canonical runtime sink before enabling writes |
+Database materialization requires `--apply`; creation of unresolved tests additionally requires `--allow-create-tests`. The runner warns that rename/move review should happen before new test creation.
 
-## Database proof
+## Reviewed identity continuity
 
-`node scripts/atlas/prove-feature-intelligence-database.mjs`
+`ReviewedIdentityAliasV1` records:
 
-- default: inspection/readback only
-- `--apply`: apply isolated manual Parent Atlas migrations
-- `--fixture`: exercise proof rows/functions inside a transaction and roll them back
+- stable ID;
+- old/new key;
+- rename/move transition;
+- old/new source refs and revisions;
+- evidence refs;
+- reviewer identity;
+- workflow action ID;
+- registry and producer revisions.
 
-Proof surfaces now written:
+The database ledger `atlas_identity_alias_decisions` stores the review decision. Test/schema alias rows are projections of that decision. Application uses one PostgreSQL transaction, locks the stable registry row, verifies that `old_key` is either the canonical key or an existing alias for the same stable ID, writes the decision + alias, then re-resolves the new nomination and verifies continuity.
 
-- pgvector extension exists
-- required Feature/Evidence/N-ary/dynamic/symbol/schema/test tables exist
-- `atlas_validate_relationship()` exists
-- `atlas_dynamic_hyperedge_neighborhood()` exists
-- `atlas_evidence_entities.evidence_id` FK targets `atlas_evidence`
-- symbol registry version preserves upstream provenance
-- schema object version preserves `catalog_oid` only as revision provenance
-- test execution receipt schema exists
-- rollback fixture validates a binary relationship, dynamic evidence hyperedge, and symbol/schema/test registry readback
+This supports chained reviewed renames/moves without changing the stable identity.
 
-**Current state: RED — proof runner has not been executed against the workstation database.**
+## OpenSpec
 
-## P0 validation gates
+Current default materialization path is all-or-nothing:
 
-- [ ] Build `packages/parent-atlas`.
+```text
+repository ingestion
+  ↓ all documents parse
+BEGIN
+  ↓
+materialize document evidence + entity facts
+  ↓
+materialize next document ...
+COMMIT
+```
+
+`allow_partial=true` deliberately switches to per-document materialization. OpenSpec rename transitions are retained inside the canonical evidence payload via the compilation receipt rather than disappearing after parsing.
+
+## Workflow ownership
+
+`retrievalReceiptToWorkflowAction()` now requires the orchestrator to supply:
+
+- workflow/action/DAG identity;
+- global workflow sequence;
+- actual lane;
+- optional transport/tool identity.
+
+`RetrievalActionReceiptV1.sequence` is retained as `metadata.retrieval_sequence`; it is not global workflow ordering. Revision-scoped `candidate_ids` remain metadata. Only canonical relationship/evidence/tool/resource identities may enter workflow canonical references.
+
+**Active HyperRAG/ACE call-site remains RED:** the checked-in packet pipeline owns packet materialization and trace information but does not currently own `workflowId + actionId + dagNodeId + global sequence`. Do not fabricate those values to claim wiring.
+
+## Database proof v2
+
+```text
+node scripts/atlas/prove-feature-intelligence-database.mjs
+```
+
+Migration/proof surface now includes:
+
+- feature/evidence/N-ary relationship tables;
+- dynamic evidence-entity hyperedge index;
+- symbol registry;
+- schema registry + `catalog_locator`;
+- test registry/execution receipts;
+- reviewed identity alias decision ledger;
+- static assertion registry.
+
+`--fixture` writes proof rows inside a transaction and rolls them back. **Current state remains RED because the runner has not been executed against the workstation database.**
+
+## P0 execution gates still RED
+
+- [ ] Build `packages/parent-atlas` with strict TypeScript.
 - [ ] Run `npm --prefix packages/parent-atlas run test:feature-intelligence:all`.
-- [ ] Run `python python/test_atlas_structural_provenance.py` in the 8095 environment.
-- [ ] Run `node scripts/atlas/audit-structural-provenance-wiring.mjs`; expected static state is now `WIRED_UNPROVEN_RUNTIME`, not the old scaffold-only state.
-- [ ] Launch provenance-v2 8095 and run `node scripts/atlas/prove-ast-sidecar.mjs`.
-- [ ] Run native structural materializer dry-run on a bounded directory.
-- [ ] Run database proof inspection.
-- [ ] On approved DB target, run database proof `--apply --fixture` and capture receipt.
-- [ ] Run schema introspector against a bounded schema and prove OID-invariant replay.
-- [ ] Generate a real Vitest JSON report and feed it through the test compiler.
-- [ ] Run OpenSpec repository ingestion fixture/real root and capture receipt.
+- [ ] Run Python structural provenance tests.
+- [ ] Run static structural wiring audit.
+- [ ] Launch provenance-v2 8095 and run live AST/LangExtract proof.
+- [ ] Run native structural materializer dry-run, then approved apply/readback.
+- [ ] Run database proof inspection; on approved target run `--apply --fixture`.
+- [ ] Run `prove-live-schema-introspection.mjs` on bounded schemas and review unresolved/ambiguous nominations before any `--allow-create`.
+- [ ] Generate a real Vitest JSON report and run `prove-vitest-evidence.mjs`.
+- [ ] Ground resolved Vitest tests back to static declaration spans and run assertion extraction/registry proof.
+- [ ] Run OpenSpec repository batch materialization and capture its atomic receipt.
+- [ ] Identify or implement the active workflow orchestrator that owns workflow/action/DAG/global-sequence identity, then wire retrieval/ACE event emission there.
 
-## Remaining P1 live integration reds
+## Remaining downstream RED work after P0 proof
 
-### Evidence / promotion
+```text
+atlas_evidence_entities
+      ↓
+dynamic SQL hyperedges
+      ↓
+review / canonical relationship promotion
+      ↓
+relationship semantic_768
+      ↓
+exact pgvector/cuVS oracle
+      ↓
+Qdrant HNSW + CAGRA challengers
+      ↓
+Recall@K / latency / VRAM receipts
+      ↓
+incidence graph → NetworkX / Neo4j / cuGraph
+      ↓
+CPU PPR ↔ cuGraph PPR parity
+      ↓
+AcePacketV2 + workflow artifact
+```
 
-- [ ] Persist OpenSpec parser outputs through `atlas_evidence` and canonical evidence-entity adapters.
-- [ ] Persist schema introspection nominations/evidence and resolve through schema registry.
-- [ ] Persist Vitest execution observations and canonical test mappings.
-- [ ] Add reviewed schema/test rename/move alias APIs.
-- [ ] Add explicit dynamic-hyperedge → canonical `FeatureRelationshipV1` promotion review/materializer.
+Then materialize the pinned feature matrix and attach revisioned TurboVec/SVD/KMeans/SOM/XGBoost/CrossEncoder/QLoRA receipts as derived signals only.
 
-### Workflow / HyperRAG
+## Invariants
 
-- [ ] Wire existing retrieval loop call-site to `retrievalReceiptToWorkflowAction()`.
-- [ ] Wire ACE packet materializer call-site to `acePacketToWorkflowArtifact()`.
-- [ ] Add frontend first-stage HyperRAG hit → canonical candidate adapter where still missing.
-- [ ] Run `runHypergraphFusionFacade()` in live request flow and attach validated ACE hypergraph metadata.
-- [ ] Prove sufficient-context stop/budget/contradiction semantics in live request traces.
-
-### Graph
-
-- [ ] Materialize relationship-node incidence projection to Neo4j.
-- [ ] Materialize dense ordinal incidence projection to NetworkX/cuGraph.
-- [ ] Run CPU PPR vs cuGraph personalized PageRank with matching alpha/tolerance semantics.
-- [ ] Store `GraphProjectionParityReceiptV1` from a frozen graph snapshot.
-- [ ] Add query-seeded PPR receipt to ACE lineage.
-
-### Semantic/vector
-
-- [ ] Backfill canonical relationship `semantic_768` vectors.
-- [ ] Upsert relationship vectors to Qdrant with canonical/revision/type payload filters.
-- [ ] Freeze one exact cuVS brute-force relationship snapshot.
-- [ ] Build CAGRA from the same snapshot.
-- [ ] Record graph degree/intermediate degree/build algorithm/memory placement/peak VRAM.
-- [ ] Evaluate Qdrant HNSW and CAGRA Recall@K against exact KNN.
-- [ ] Prove executor-level dedup still yields one logical semantic vote.
-
-### Feature matrix / learning
-
-- [ ] Materialize pinned feature/evidence/AST/graph/state matrix keyed by `feature_id`.
-- [ ] Emit live model-signal receipts for low-rank/SVD/KMeans/SOM/XGBoost/CrossEncoder challengers.
-- [ ] Run exact multi-view rerank evaluation before any FDE/MUVERA-like promotion.
-- [ ] Freeze verified-evidence QLoRA dataset split/checksum and join final adapter receipt.
-
-## Explicit invariants
-
-- Consiliency IDs are upstream provenance/candidate join keys; GIS owns canonical Atlas symbol identity.
-- PostgreSQL catalog OIDs are revision-local provenance, never stable schema identity.
-- Vitest/JUnit status owns execution truth but does not own stable Atlas test identity.
-- OpenSpec parser structure owns OpenSpec requirement/scenario/task identity; LangExtract does not.
-- ast-grep and LangExtract observations cannot mint canonical identity or relationships.
+- Consiliency IDs are upstream provenance; GIS owns stable Atlas symbol identity.
+- PostgreSQL OIDs/subobject locators are revision provenance, not stable schema identity.
+- Vitest owns execution truth, not stable test or assertion identity.
+- OpenSpec parser structure owns requirement/scenario/task identity; LangExtract does not.
+- ast-grep observes static structure but cannot mint canonical application truth.
+- Reviewed alias continuity happens before `allow_create` for a potentially renamed/moved object.
+- Qdrant IDs, CAGRA ordinals, Neo4j IDs, feature-matrix rows and retrieval candidates are not canonical IDs.
 - HNSW/CAGRA proximity edges are not application relationships.
-- Qdrant point IDs, CAGRA ordinals, Neo4j node IDs and feature-matrix row numbers are not canonical IDs.
-- Dynamic SQL hyperedges are candidates, never canonical facts until explicit promotion.
-- PageRank/PPR, TurboVec, SVD, clustering, SOM/manifold and learned rankers change ranking/routing, not truth/completion.
-- `CanonicalAcePacketEnvelope` remains packet identity owner; `AcePacketV2` attaches validated N-ary evidence without replacing that owner.
+- Dynamic SQL hyperedges remain candidates until explicit relationship promotion.
+- PageRank/PPR, TurboVec, low-rank/SVD, clustering, SOM/manifold and learned rankers affect ranking/routing, not truth.
+- `CanonicalAcePacketEnvelope` remains packet identity owner; `AcePacketV2` attaches validated N-ary evidence without replacing it.
