@@ -1,0 +1,28 @@
+schema_id: atlas.recommendation-math-parity-report
+schema_version: 1
+schema_kind: evaluation_report
+status: EXPERIMENTAL
+
+description: >
+  CPU/GPU and Python/LibTorch parity evidence for semantic cosine and
+  presence-aware recommendation math. It validates acceleration only; it does
+  not select ranking weights.
+
+fields:
+  schema: { type: literal, value: atlas.recommendation-math-parity-report.v1 }
+  status: { type: enum, values: [PASS, FAIL, CUDA_UNAVAILABLE, BACKEND_UNAVAILABLE] }
+  referenceBackend: { type: string, required: true }
+  challengerBackend: { type: string, required: true }
+  fixtureChecksum: { type: string, required: true }
+  dimensions: { type: integer, minimum: 1 }
+  rows: { type: integer, minimum: 1 }
+  maxAbsError: { type: number, minimum: 0, nullable: true }
+  rmse: { type: number, minimum: 0, nullable: true }
+  tolerance: { type: number, minimum: 0 }
+  deviceMetadata: { type: object, required: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - accelerator output cannot define the reference equation
+  - PASS requires identical fixtureChecksum
+  - tolerance is explicit and revisioned
