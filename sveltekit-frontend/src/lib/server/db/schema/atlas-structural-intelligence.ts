@@ -87,8 +87,9 @@ export const atlasStructuralReferenceResolutions = pgTable('atlas_structural_ref
 }));
 
 /**
- * Canonical schema-object registry. PostgreSQL catalog OIDs are stored only on
- * revision-qualified versions and never serve as Atlas identity.
+ * Canonical schema-object registry. PostgreSQL catalog OIDs and column
+ * subobject locators are stored only on revision-qualified versions and never
+ * serve as Atlas identity.
  * Manual migration: drizzle/manual/20260818_atlas_schema_object_registry_v1.sql
  */
 export const atlasSchemaObjectRegistry = pgTable('atlas_schema_object_registry', {
@@ -138,6 +139,7 @@ export const atlasSchemaObjectVersions = pgTable('atlas_schema_object_versions',
   schemaRevision: text('schema_revision').notNull(),
   parentStableSchemaObjectId: text('parent_stable_schema_object_id'),
   catalogOid: bigint('catalog_oid', { mode: 'number' }),
+  catalogLocator: jsonb('catalog_locator'),
   definitionHash: text('definition_hash').notNull(),
   producerRevision: text('producer_revision').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
