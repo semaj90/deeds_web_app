@@ -7,7 +7,6 @@ import {
 } from './structural-symbol.js';
 
 const id = z.string().min(1);
-const revision = z.string().min(1);
 
 export const astGrepRawMatchSchema = z.object({
   rule_id: id,
@@ -22,6 +21,19 @@ export const astGrepRawMatchSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['byte_end'], message: 'byte_end must be > byte_start' });
   }
 });
+
+/** Structural subset emitted by the existing frontend ast-grep extractor. */
+export const astGrepExtractedFeatureCompatSchema = z.object({
+  type: z.string().min(1),
+  name: z.string().min(1),
+  source: z.literal('ast-grep'),
+  rawText: z.string().optional(),
+  byteStart: z.number().int().nonnegative().optional(),
+  byteEnd: z.number().int().nonnegative().optional(),
+  ruleId: z.string().min(1).optional(),
+  captures: z.record(z.string(), z.string()).optional(),
+  confidence: z.number().finite().min(0).max(1).optional(),
+}).passthrough();
 
 export type AstGrepRawMatchV1 = z.infer<typeof astGrepRawMatchSchema>;
 
@@ -40,11 +52,6 @@ function bestChunk(match: AstGrepRawMatchV1, chunks: readonly TreesitterChunkerC
     .sort((a, b) => b.overlap - a.overlap || a.chunk.byte_start - b.chunk.byte_start)[0]?.chunk;
 }
 
-/**
- * Converts ast-grep JSON/NAPI matches with exact byte ranges into grounded
- * structural observations and joins them to the nearest overlapping
- * treesitter-chunker node/chunk when possible.
- */
 export function adaptAstGrepMatches(input: {
   source_ref: string;
   source_revision: string;
@@ -81,11 +88,25 @@ export function adaptAstGrepMatches(input: {
   });
 }
 
-/**
- * Adapter for ast-grep CLI JSON mode. Current ast-grep JSON includes
- * `range.byteOffset.start/end`; callers should prefer that byte-grounded mode
- * instead of reconstructing offsets from line numbers.
- */
+/** Existing frontend `ExtractedFeature` -> byte-grounded Parent Atlas match. */
+export function adaptAstGrepExtractedFeature(featureInput: unknown): AstGrepRawMatchV1 | null {
+  const parsed = astGrepExtractedFeatureCompatSchema.safeParse(featureInput);
+  if (!parsed.success) return null;
+  const feature = parsed.data;
+  if (feature.byteStart == null || feature.byteEnd == null || feature.byteEnd <= feature.byteStart) return null;
+
+  return astGrepRawMatchSchema.parse({
+    rule_id: feature.ruleId ?? `legacy-ast-grep:${feature.type}`,
+    text: feature.rawText ?? feature.name,
+    byte_start: feature.byteStart,
+    byte_end: feature.byteEnd,
+    observation_kind: feature.type,
+    captures: feature.captures ?? { name: feature.name },
+    confidence: feature.confidence ?? 0.9,
+  });
+}
+
+/** Adapter for ast-grep CLI JSON mode. */
 export function adaptAstGrepJsonMatch(input: {
   rule_id: string;
   text: string;
