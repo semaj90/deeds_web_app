@@ -14,7 +14,7 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-from atlas_semantic512_runtime import IdentityRow, Latent64KMeansRequest, Latent64Row, cluster_latent64
+from atlas_semantic512_runtime import Latent64KMeansRequest, Latent64Row, cluster_latent64
 
 ROUTING_COLLECTION = "codebase_topology_64_v2"
 LATENT_VECTOR_NAME = "latent_64"
