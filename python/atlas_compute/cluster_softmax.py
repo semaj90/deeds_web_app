@@ -25,6 +25,8 @@ class CuvsSoftKMeansReceipt:
     dimensions: int
     n_clusters: int
     metric: str
+    pairwise_metric: str
+    pairwise_postprocess: str
     temperature: float
     initialization_ordinals: list[int]
     fit_iterations: int
@@ -54,7 +56,7 @@ def run_cuvs_soft_kmeans(
     device: str | None = None,
     seed: int = 0xA71A5,
 ):
-    """Fit cuVS sqeuclidean KMeans and return softmax(-distance/temperature)."""
+    """Fit sqeuclidean cuVS KMeans and return softmax(-squared_distance/T)."""
 
     import cupy as cp
     import torch
@@ -83,7 +85,11 @@ def run_cuvs_soft_kmeans(
     )
     centroids, inertia, n_iter = kmeans.fit(params, x, centroids=initial)
     labels, _ = kmeans.predict(params, x, centroids)
-    distances = pairwise_distance(x, centroids, metric="sqeuclidean")
+    # Python pairwise_distance documents `euclidean`, not `sqeuclidean`; square
+    # it explicitly to match the KMeans objective rather than relying on an
+    # undocumented metric spelling.
+    euclidean = pairwise_distance(x, centroids, metric="euclidean")
+    distances = euclidean * euclidean
     cp.cuda.Stream.null.synchronize()
 
     distances_host = cp.asnumpy(distances).astype(np.float32, copy=False)
@@ -104,6 +110,8 @@ def run_cuvs_soft_kmeans(
         dimensions=int(source.shape[1]),
         n_clusters=n_clusters,
         metric="sqeuclidean",
+        pairwise_metric="euclidean",
+        pairwise_postprocess="square_distance",
         temperature=float(temperature),
         initialization_ordinals=init_ordinals,
         fit_iterations=int(n_iter),
