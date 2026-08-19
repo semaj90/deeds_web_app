@@ -180,6 +180,72 @@ export type {
   ContextWindowPlanV1,
 } from './ranking/context-window-synthesis';
 export {
+  SemanticPromotionScorePolicySchema,
+  SemanticPromotionDeltaV1Schema,
+  SemanticPromotionExclusionV1Schema,
+  SemanticPromotionReceiptV1Schema,
+  RepairContextManifestV2Schema,
+  buildSemanticPromotionReceipt,
+  applySemanticPromotionReceipt,
+  rebuildRepairAfterSemanticPromotion,
+} from './ranking/semantic-promotion-feedback';
+export type {
+  SemanticPromotionScorePolicy,
+  SemanticPromotionDeltaV1,
+  SemanticPromotionExclusionV1,
+  SemanticPromotionReceiptV1,
+  RepairContextManifestV2,
+  SemanticPromotionFeedbackResultV1,
+} from './ranking/semantic-promotion-feedback';
+export {
+  MatrixDiagnosticsAlgorithmSchema,
+  MatrixDiagnosticsMeasurementPolicyV1Schema,
+  DEFAULT_MATRIX_DIAGNOSTICS_POLICY,
+  MeasuredMatrixDiagnosticsReceiptV1Schema,
+  MeasuredTangPolicyReceiptV1Schema,
+  stableReceiptSha256,
+  searchPolicyMatrixSha256,
+  measureSearchPolicyMatrixDiagnostics,
+  buildMeasuredTangPolicyReceipt,
+} from './ranking/measured-matrix-diagnostics';
+export type {
+  MatrixDiagnosticsAlgorithm,
+  MatrixDiagnosticsMeasurementPolicyV1,
+  MeasuredMatrixDiagnosticsReceiptV1,
+  MeasuredTangPolicyReceiptV1,
+} from './ranking/measured-matrix-diagnostics';
+export {
+  ContextToolDagNodeKindSchema,
+  ContextToolDagNodeV1Schema,
+  ContextToolDagV1Schema,
+  WorkflowActionEventV1Schema,
+  validateContextToolDag,
+  workflowActionFromDagNode,
+} from './workflow/context-tool-dag-contracts';
+export type {
+  ContextToolDagNodeKind,
+  ContextToolDagNodeV1,
+  ContextToolDagV1,
+  WorkflowActionEventV1,
+} from './workflow/context-tool-dag-contracts';
+export {
+  RepairProposalRevisionProofV1Schema,
+  RepairMutationProposalV1Schema,
+  OperatorRepairAuthorizationV1Schema,
+  RepairProposalWorkflowBundleV1Schema,
+  AuthorizedRepairWorkflowBundleV1Schema,
+  compileRepairMutationProposal,
+  compileRepairProposalWorkflow,
+  compileAuthorizedRepairWorkflow,
+} from './workflow/repair-mutation-proposal';
+export type {
+  RepairProposalRevisionProofV1,
+  RepairMutationProposalV1,
+  OperatorRepairAuthorizationV1,
+  RepairProposalWorkflowBundleV1,
+  AuthorizedRepairWorkflowBundleV1,
+} from './workflow/repair-mutation-proposal';
+export {
   KanbanTaskLaneSchema,
   KanbanTaskStatusSchema,
   KanbanTaskSchema,
