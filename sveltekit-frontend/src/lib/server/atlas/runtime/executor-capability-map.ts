@@ -23,7 +23,7 @@ export interface ExecutorCapability {
   executor: AtlasExecutorId;
   runtime: 'windows-native' | 'wsl2' | 'portable';
   capabilities: string[];
-  state: 'CANONICAL_OWNER' | 'PROVEN_EXECUTOR' | 'CHALLENGER' | 'CACHE_ONLY' | 'ANALYTICS_ONLY' | 'TRANSPORT_ONLY';
+  state: 'CANONICAL_OWNER' | 'PROVEN_EXECUTOR' | 'BLOCKED' | 'CHALLENGER' | 'CACHE_ONLY' | 'ANALYTICS_ONLY' | 'TRANSPORT_ONLY';
   notes: string[];
 }
 
@@ -44,14 +44,20 @@ export const ATLAS_EXECUTOR_CAPABILITIES: readonly ExecutorCapability[] = [
     notes: ['Qdrant is retrieval projection, not canonical identity.'],
   },
   {
-    executor: 'cuvs_exact', runtime: 'wsl2', state: 'PROVEN_EXECUTOR',
+    executor: 'cuvs_exact', runtime: 'wsl2', state: 'BLOCKED',
     capabilities: ['semantic_768_exact_knn'],
-    notes: ['Must use explicit cosine metric for canonical semantic_768.'],
+    notes: [
+      'Package/endpoint smoke proof exists, but the live sidecar currently relies on cuVS sqeuclidean/default geometry.',
+      'Promote only after audit-rapids-semantic-metric.mjs proves explicit cosine for canonical semantic_768.',
+    ],
   },
   {
-    executor: 'cagra', runtime: 'wsl2', state: 'CHALLENGER',
+    executor: 'cagra', runtime: 'wsl2', state: 'BLOCKED',
     capabilities: ['semantic_768_ann'],
-    notes: ['One semantic vote; validate Recall@K against cuVS exact.'],
+    notes: [
+      'The live sidecar currently configures sqeuclidean, so recall comparison to canonical cosine is not meaningful yet.',
+      'After cosine correction, keep one semantic vote and validate Recall@K against cuVS exact on the same snapshot.',
+    ],
   },
   {
     executor: 'cugraph', runtime: 'wsl2', state: 'PROVEN_EXECUTOR',
@@ -96,7 +102,7 @@ export const ATLAS_EXECUTOR_CAPABILITIES: readonly ExecutorCapability[] = [
   {
     executor: 'go_grpc', runtime: 'portable', state: 'TRANSPORT_ONLY',
     capabilities: ['typed_worker_rpc', 'streaming_rpc'],
-    notes: ['Default reliable cross-language worker boundary.'],
+    notes: ['Default reliable cross-language worker boundary; reuse channels/stubs for hot paths.'],
   },
   {
     executor: 'go_quic', runtime: 'portable', state: 'TRANSPORT_ONLY',
