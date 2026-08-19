@@ -75,7 +75,9 @@ test('observation compiler preserves exact structural/grounded features outside 
   });
 
   assert.equal(row.ast_features.length, 1);
-  assert.equal(row.ontology_features.length, 2);
+  assert.equal(row.ontology_features.length, 1);
+  assert.equal(row.langextract_features.length, 1);
+  assert.equal(row.langextract_features[0].family, 'LANGEXTRACT_BINARY');
   assert.ok(row.qdrant_tags.includes('ast=ast_function'));
   assert.ok(row.qdrant_tags.includes('langextract=algorithm'));
   assert.ok(row.qdrant_tags.includes('ontology=api'));
@@ -86,6 +88,21 @@ test('observation compiler preserves exact structural/grounded features outside 
   assert.ok(tensor.exact_binary_feature_ordinals.length >= 3);
   assert.equal(tensor.exact_semantic_promotion_required, true);
   assert.equal(tensor.exact_source_promotion_required, true);
+});
+
+test('ontology-only feature rows remain evidence-grounded', () => {
+  const row = compileObservationFeatures({
+    candidateId: 'candidate-ontology',
+    rowOrdinal: 1,
+    sourceRef: 'docs/api.md',
+    sourceRevision: 'src-r1',
+    workspaceRevision: 'workspace-r1',
+    rowIdentityChecksum: H('2'),
+    registry: registry(),
+    ontologyClasses: ['API'],
+  });
+  assert.deepEqual(row.observation_refs, ['ontology-class:api']);
+  assert.equal(row.ontology_features.length, 1);
 });
 
 test('observation compiler rejects cross-revision observation mixing', () => {
