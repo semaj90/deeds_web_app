@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+package atlas.value.v1;
+
+option go_package = "github.com/deeds-web-app/services/go-retrieval-service/proto/atlasvalue;atlasvaluev1";
+
+// Ordered/provenance-aware structured values. Do not replace entries with a
+// protobuf map: map order is undefined and duplicate keys may be collapsed.
+message StructuredValue {
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    NULL_VALUE = 1;
+    BOOL = 2;
+    INT = 3;
+    FLOAT = 4;
+    STRING = 5;
+    BYTES = 6;
+    LIST = 7;
+    TUPLE = 8;
+    OBJECT = 9;
+    MAP = 10;
+    SYMBOL_REF = 11;
+    PACKET_REF = 12;
+    TENSOR_REF = 13;
+    SOURCE_REF = 14;
+  }
+
+  string schema = 1; // atlas.structured-value.v1
+  string value_id = 2;
+  Kind kind = 3;
+
+  oneof scalar {
+    bool bool_value = 10;
+    string int_decimal = 11;
+    double float_value = 12;
+    string string_value = 13;
+    bytes bytes_value = 14;
+  }
+
+  repeated Member members = 20;
+  repeated KeyValueEntry entries = 21;
+  Reference reference = 22;
+  SourceEvidence source_evidence = 23;
+  Producer producer = 24;
+  string checksum = 25;
+}
+
+message Member {
+  uint32 ordinal = 1;
+  string role = 2;
+  StructuredValue value = 3;
+}
+
+message KeyValueEntry {
+  enum KeyForm {
+    KEY_FORM_UNSPECIFIED = 0;
+    IDENTIFIER = 1;
+    STRING = 2;
+    NUMBER = 3;
+    COMPUTED = 4;
+    SPREAD = 5;
+    OTHER = 6;
+  }
+
+  uint32 ordinal = 1;
+  StructuredValue key = 2;
+  StructuredValue value = 3;
+  KeyForm key_form = 4;
+  string source_key_node_id = 5;
+  string source_value_node_id = 6;
+}
+
+message Reference {
+  enum Kind {
+    REF_UNSPECIFIED = 0;
+    SYMBOL_REF = 1;
+    PACKET_REF = 2;
+    TENSOR_REF = 3;
+    SOURCE_REF = 4;
+  }
+
+  Kind ref_kind = 1;
+  string ref_id = 2;
+  string revision = 3;
+  string checksum = 4;
+}
+
+message SourceEvidence {
+  string tree_node_id = 1;
+  string symbol_version_id = 2;
+  string source_ref = 3;
+  uint64 start_byte = 4;
+  uint64 end_byte = 5;
+  repeated uint32 ast_path = 6;
+  string node_type = 7;
+}
+
+message Producer {
+  string runtime = 1;
+  string parser = 2;
+  string revision = 3;
+}
+
+message StructuredArgument {
+  uint32 ordinal = 1;
+  string name = 2;
+  string role = 3;
+  StructuredValue value = 4;
+}
+
+message ToolCallInput {
+  string capability = 1;
+  repeated StructuredArgument arguments = 2;
+}
