@@ -35,7 +35,7 @@ function baseManifest() {
       notes: [],
     },
     algorithm: {
-      algorithmId: 'CUVS_CAGRA_KNN' as const,
+      algorithmId: 'CAGRA_KNN' as const,
       family: 'VECTOR_SEARCH' as const,
       exactness: 'APPROXIMATE' as const,
       metric: 'COSINE' as const,
@@ -56,7 +56,7 @@ function baseManifest() {
     },
     transport: {
       kind: 'GRPC' as const,
-      endpointClass: 'atlas-rapids-sidecar',
+      endpointClass: 'cuvs-grpc',
       serialization: 'PROTOBUF' as const,
       parserBackend: 'PROTOBUF_RUNTIME' as const,
     },
@@ -79,7 +79,7 @@ describe('AlgorithmExecutionManifestV1', () => {
   it('records representation, algorithm, executor, transport, and geometry independently', () => {
     const parsed = AlgorithmExecutionManifestV1Schema.parse(baseManifest());
     expect(parsed.representations[0].representationId).toBe('semantic_768');
-    expect(parsed.algorithm.algorithmId).toBe('CUVS_CAGRA_KNN');
+    expect(parsed.algorithm.algorithmId).toBe('CAGRA_KNN');
     expect(parsed.backend.backend).toBe('CUVS');
     expect(parsed.transport.kind).toBe('GRPC');
     expect(parsed.geometry.kind).toBe('EUCLIDEAN_SEMANTIC');
