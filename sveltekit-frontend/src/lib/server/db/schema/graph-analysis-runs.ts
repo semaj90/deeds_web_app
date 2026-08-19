@@ -9,10 +9,9 @@
  * identity discipline) and they never grow new algorithm-specific columns on
  * atlas_packets itself — that's the whole point of this layer split.
  *
- * Distinct from the existing PageRank-specific atlas_graph_authority_runs_v2 /
- * atlas_graph_authority_scores_v2 (schema/graph-authority-v2.ts) — those stay
- * as-is. Migrating PageRank onto this generalized contract is Patch C, not
- * done here. Both can coexist during the transition.
+ * `projection_hash` is additive/nullable for legacy rows. New V2 graph runs
+ * must supply it through GraphAnalysisRunV2; old persisted runs remain readable
+ * without fabricating a hash for a projection that was never fully recorded.
  */
 
 import { sql } from 'drizzle-orm';
@@ -33,31 +32,21 @@ export type GraphAlgorithmValue = (typeof graphAlgorithmValues)[number];
 export const graphAnalysisRunStatusValues = ['running', 'succeeded', 'failed'] as const;
 export type GraphAnalysisRunStatusValue = (typeof graphAnalysisRunStatusValues)[number];
 
-/**
- * The lineage backbone. One row per algorithm execution — PageRank, CheiRank,
- * Louvain, Leiden, k-core, betweenness all write here, never inventing their
- * own run-tracking table.
- */
 export const graphAnalysisRuns = pgTable('graph_analysis_runs', {
   ...createAnalysisRunBaseColumns(),
   graphRevision: text('graph_revision').notNull(),
   projectionRevision: text('projection_revision').notNull(),
   projectionName: text('projection_name').notNull(),
+  projectionHash: text('projection_hash'),
   nodeCount: bigint('node_count', { mode: 'number' }).notNull(),
   relationshipCount: bigint('relationship_count', { mode: 'number' }).notNull(),
 }, (table) => ({
   algorithmIdx: index('graph_analysis_runs_algorithm_idx').on(table.algorithm, table.startedAt),
   graphRevisionIdx: index('graph_analysis_runs_graph_revision_idx').on(table.graphRevision),
+  projectionHashIdx: index('graph_analysis_runs_projection_hash_idx').on(table.projectionHash),
   statusIdx: index('graph_analysis_runs_status_idx').on(table.status),
 }));
 
-/**
- * Versioned metric results — bounded to offline graph-analysis results whose
- * dimensionality varies by algorithm (pagerank, cheirank, kcore, betweenness
- * as rows via metric_name, not one column per algorithm). NOT a general EAV
- * table for every Parent Atlas feature; FeatureRowV1 (promoted, retrieval-
- * facing) stays typed and small elsewhere.
- */
 export const graphNodeMetrics = pgTable('graph_node_metrics', {
   runId: uuid('run_id').notNull(),
   packetKey: text('packet_key').notNull(),
@@ -74,11 +63,6 @@ export const graphNodeMetrics = pgTable('graph_node_metrics', {
   graphRevisionIdx: index('graph_node_metrics_graph_revision_idx').on(table.graphRevision, table.metricName),
 }));
 
-/**
- * Per-packet community assignment for a single algorithm run. An assignment
- * alone (e.g. leiden_community_id: 46271) is NOT a taxonomy — see
- * graphCommunities below for the taxonomy record.
- */
 export const graphCommunityAssignments = pgTable('graph_community_assignments', {
   runId: uuid('run_id').notNull(),
   packetKey: text('packet_key').notNull(),
@@ -94,12 +78,6 @@ export const graphCommunityAssignments = pgTable('graph_community_assignments', 
   runIdx: index('graph_community_assignments_run_idx').on(table.runId),
 }));
 
-/**
- * The taxonomy record — one row per discovered community, with
- * representative members and quality metadata. This is where Parent Atlas's
- * taxonomy actually begins; per-packet assignments above are inputs to it,
- * not the taxonomy itself.
- */
 export const graphCommunities = pgTable('graph_communities', {
   runId: uuid('run_id').notNull(),
   algorithm: text('algorithm').notNull(),
