@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import {
   PacketTopologyEnvelopeSchema,
   type PacketTopologyEnvelope,
@@ -112,7 +112,7 @@ export function packetToReferenceTransport(
   const packet = PacketTopologyEnvelopeSchema.parse(packetInput);
   const base: Omit<CanonicalPacketTransportV1, 'checksum'> = {
     schema: 'atlas.canonical-packet-transport.v1',
-    transportId: crypto.randomUUID(),
+    transportId: randomUUID(),
     requestId: revisions.requestId,
     packetKey: packet.packet_key,
     sourceRef: packet.source_ref,
