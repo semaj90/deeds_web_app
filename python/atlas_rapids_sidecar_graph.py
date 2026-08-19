@@ -14,9 +14,11 @@ import uvicorn
 
 from atlas_rapids_graph_runtime import install_graph_routes
 from atlas_rapids_sidecar import _gpu_memory_mb, app
+from atlas_semantic512_exact_v2 import install_semantic512_exact_v2_routes
 from atlas_semantic512_runtime import install_semantic512_routes
 
 _GRAPH_RUNTIME = install_graph_routes(app, gpu_memory_reader=_gpu_memory_mb)
+install_semantic512_exact_v2_routes(app, gpu_memory_reader=_gpu_memory_mb)
 install_semantic512_routes(app, gpu_memory_reader=_gpu_memory_mb)
 
 
