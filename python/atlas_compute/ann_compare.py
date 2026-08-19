@@ -93,14 +93,15 @@ def compare_cuvs_exact_and_cagra(
         raise ValueError("corpus/query must be rank-2 with matching dimensions")
     if corpus_np.shape[0] == 0 or query_np.shape[0] == 0:
         raise ValueError("corpus/query must be non-empty")
+    if corpus_np.shape[0] < 3:
+        raise ValueError("CAGRA comparison requires at least 3 corpus rows; use brute-force only for smaller fixtures")
     if not (1 <= k <= corpus_np.shape[0]):
         raise ValueError("k out of range")
 
-    # CAGRA's graph degree cannot exceed the useful number of other vertices.
-    graph_degree = max(2, min(int(graph_degree), max(2, corpus_np.shape[0] - 1)))
+    graph_degree = max(2, min(int(graph_degree), corpus_np.shape[0] - 1))
     intermediate_graph_degree = max(
         graph_degree,
-        min(int(intermediate_graph_degree), max(graph_degree, corpus_np.shape[0])),
+        min(int(intermediate_graph_degree), corpus_np.shape[0]),
     )
     itopk_size = max(int(itopk_size), k)
     search_width = max(1, int(search_width))
