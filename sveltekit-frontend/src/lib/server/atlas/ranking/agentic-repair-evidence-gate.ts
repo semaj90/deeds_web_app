@@ -256,15 +256,14 @@ function canonicalMergeKey(candidate: RepairEvidenceCandidateV1): string {
   return candidate.packetKey ? `packet:${candidate.packetKey}` : `source:${candidate.sourceRef}`;
 }
 
-function mergeCandidates(batches: readonly RepairEvidenceBatchV1[], sourceRevision: string): RepairEvidenceCandidateV1[] {
+function mergeCandidates(batches: readonly RepairEvidenceBatchV1[]): RepairEvidenceCandidateV1[] {
   const merged = new Map<string, RepairEvidenceCandidateV1>();
 
   for (const batch of batches) {
     for (const raw of batch.candidates) {
-      const candidate = RepairEvidenceCandidateV1Schema.parse({
-        ...raw,
-        sourceRevision: raw.sourceRevision ?? sourceRevision,
-      });
+      // sourceRevision is evidence provenance. The request revision is only a
+      // validation constraint and must never be copied onto an observation.
+      const candidate = RepairEvidenceCandidateV1Schema.parse(raw);
       const key = canonicalMergeKey(candidate);
       const previous = merged.get(key);
       if (!previous) {
@@ -444,11 +443,6 @@ function buildContextPlan(
   input: AgenticRepairEvidenceGateInputV1,
   candidates: readonly RepairEvidenceCandidateV1[],
 ): ContextWindowPlanV1 {
-  const communityCounts = new Map<string, number>();
-  for (const candidate of candidates) {
-    if (candidate.communityId) communityCounts.set(candidate.communityId, (communityCounts.get(candidate.communityId) ?? 0) + 1);
-  }
-
   return buildTokenAwareContextPlan({
     schema: 'atlas.context-window-input.v1',
     requestId: input.requestId,
@@ -460,7 +454,7 @@ function buildContextPlan(
     candidates: candidates.map((candidate) => ({
       packetKey: packetIdentity(candidate),
       sourceRef: candidate.sourceRef,
-      sourceRevision: candidate.sourceRevision ?? input.sourceRevision,
+      sourceRevision: candidate.sourceRevision ?? 'unresolved:candidate-source-revision',
       ordinal: candidate.ordinal,
       tokenCount: candidate.tokenCount,
       score: clamp01(Math.max(candidate.semanticScore, candidate.lexicalScore)),
@@ -592,19 +586,19 @@ export async function buildAgenticRepairEvidenceGate(
     safeRead('CENTROID_CACHE', 'centroidLookup', () => executor.centroidLookup(request)),
   ]);
 
-  const initialCandidates = mergeCandidates([packetBatch, semanticBatch, centroidBatch], input.sourceRevision);
+  const initialCandidates = mergeCandidates([packetBatch, semanticBatch, centroidBatch]);
   const seedSourceRefs = uniqueSorted([
     ...input.targetFiles,
     ...initialCandidates.slice(0, Math.min(input.searchBudget.topK, 24)).map((row) => row.sourceRef),
   ]).slice(0, Math.min(input.searchBudget.maxGraphFanout, 64));
 
   const graphBatch = await safeRead('GRAPH_EXPANDER', 'graphExpand', () => executor.graphExpand({ ...request, seedSourceRefs }));
-  const graphMerged = mergeCandidates([packetBatch, semanticBatch, centroidBatch, graphBatch], input.sourceRevision);
+  const graphMerged = mergeCandidates([packetBatch, semanticBatch, centroidBatch, graphBatch]);
   const aceSourceRefs = uniqueSorted(graphMerged.slice(0, Math.min(input.searchBudget.exactPromotionTopK, 16)).map((row) => row.sourceRef));
   const aceBatch = await safeRead('ACE', 'aceValidate', () => executor.aceValidate({ ...request, candidateSourceRefs: aceSourceRefs }));
 
   const batches = [packetBatch, semanticBatch, graphBatch, aceBatch, centroidBatch];
-  const candidates = mergeCandidates(batches, input.sourceRevision)
+  const candidates = mergeCandidates(batches)
     .slice(0, Math.min(input.searchBudget.maxCandidates, Math.max(input.searchBudget.topK * 4, input.searchBudget.exactPromotionTopK)));
   const readiness = await buildReadiness(input, batches);
 
@@ -630,7 +624,7 @@ export async function buildAgenticRepairEvidenceGate(
       candidateId: `placeholder:${hash16(input.queryText)}`,
       packetKey: null,
       sourceRef: input.targetFiles[0] ?? 'unresolved:repair-target',
-      sourceRevision: input.sourceRevision,
+      sourceRevision: null,
       ordinal: 0,
       tokenCount: 1,
       semanticScore: 0,
@@ -660,12 +654,14 @@ export async function buildAgenticRepairEvidenceGate(
   const { matrix: featureMatrix, tang: tangPromotion } = featureMatrixAndTang(input, candidates, contextPlan);
   const exactEvidencePacketKeys = uniqueSorted(candidates.filter((row) => row.exactEvidence && row.packetKey).map((row) => row.packetKey as string));
   const exactEvidenceReady = exactEvidencePacketKeys.length > 0 && contextPlan.exactEvidenceFloorSatisfied;
-  const evidenceStatus: RepairContextManifestV1['evidenceStatus'] = readiness.gate === 'BLOCKED'
-    ? 'BLOCKED'
-    : exactEvidenceReady
+  const evidenceStatus: RepairContextManifestV1['evidenceStatus'] = readiness.gate === 'READY'
+    ? exactEvidenceReady
       ? 'READY_FOR_DRY_RUN'
+      : 'DEGRADED_EVIDENCE'
+    : readiness.gate === 'BLOCKED'
+      ? 'BLOCKED'
       : 'DEGRADED_EVIDENCE';
-  const recommendationAllowed = evidenceStatus === 'READY_FOR_DRY_RUN';
+  const recommendationAllowed = readiness.gate === 'READY' && evidenceStatus === 'READY_FOR_DRY_RUN';
   const selectedPacketSet = new Set(contextPlan.selectedPacketKeys);
   const selectedCandidates = candidates.filter((row) => selectedPacketSet.has(packetIdentity(row)));
 
