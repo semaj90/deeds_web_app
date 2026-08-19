@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GraphAnalysisRunSchema } from './graph-analysis-types.js';
+import { GraphAnalysisRunV2Schema } from './graph-analysis-types.js';
 import { GraphProjectionManifestV3Schema } from './graph-projection-manifest.js';
 import {
 	PageRankExecutionPlanV1Schema,
@@ -20,11 +20,6 @@ export const GraphLineageKeyV1Schema = z
 	})
 	.strict();
 export type GraphLineageKeyV1 = z.infer<typeof GraphLineageKeyV1Schema>;
-
-export const GraphAnalysisRunV2Schema = GraphAnalysisRunSchema.extend({
-	projectionHash: z.string().min(1),
-}).strict();
-export type GraphAnalysisRunV2 = z.infer<typeof GraphAnalysisRunV2Schema>;
 
 function assertEqual(label: string, expected: string, actual: string): void {
 	if (expected !== actual) throw new Error(`${label} mismatch: expected '${expected}', got '${actual}'`);
