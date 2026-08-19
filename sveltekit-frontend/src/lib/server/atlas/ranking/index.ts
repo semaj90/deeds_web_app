@@ -9,6 +9,37 @@
  */
 
 export type { RerankCandidate, RerankRequest, RerankResult, RerankResultItem, Reranker } from './reranker.js';
+export type {
+  AgenticRepairLibrary,
+  AgenticRepairLibraryFetchParametersV1,
+  AgenticRepairLibraryLookupRequestV1,
+  AgenticRepairLibraryLookupObservationV1,
+  AgenticRepairLibraryLookup,
+  AgenticRepairGatePolicyV1,
+  AgenticRepairReadinessInputV1,
+  RankedAgenticRepairLibraryV1,
+  AgenticRepairGroupMeanV1,
+  AgenticRepairProposedActionV1,
+  AgenticRepairReadinessResultV1,
+} from './agentic-repair-readiness-ranker.js';
+export {
+  AgenticRepairLibrarySchema,
+  AlignmentCountV1Schema,
+  AgenticRepairLibraryFetchParametersV1Schema,
+  AgenticRepairLibraryLookupRequestV1Schema,
+  AgenticRepairLibraryLookupObservationV1Schema,
+  AgenticRepairGatePolicyV1Schema,
+  AgenticRepairReadinessInputV1Schema,
+  ReadinessMetricNameSchema,
+  ReadinessMetricV1Schema,
+  RankedAgenticRepairLibraryV1Schema,
+  AgenticRepairGroupMeanV1Schema,
+  AgenticRepairActionKindSchema,
+  AgenticRepairProposedActionV1Schema,
+  AgenticRepairReadinessResultV1Schema,
+  rankAgenticRepairReadiness,
+  agenticRepairInference,
+} from './agentic-repair-readiness-ranker.js';
 
 import type { Reranker, RerankRequest, RerankResult, RerankResultItem } from './reranker.js';
 import { randomUUID } from 'node:crypto';
