@@ -25,6 +25,7 @@ const migrations = [
   '20260818_atlas_test_registry_v1.sql',
   '20260818_atlas_identity_alias_decisions_v1.sql',
   '20260818_atlas_assertion_registry_v1.sql',
+  '20260818_atlas_algorithm_execution_receipts_v1.sql',
 ];
 
 const requiredTables = [
@@ -35,6 +36,7 @@ const requiredTables = [
   'atlas_schema_object_registry','atlas_schema_object_aliases','atlas_schema_object_versions',
   'atlas_test_registry','atlas_test_aliases','atlas_test_versions','atlas_test_execution_receipts',
   'atlas_identity_alias_decisions','atlas_assertion_registry','atlas_assertion_aliases','atlas_assertion_versions',
+  'atlas_algorithm_execution_receipts',
 ];
 const requiredFunctions = ['atlas_validate_relationship','atlas_dynamic_hyperedge_neighborhood'];
 
@@ -102,6 +104,14 @@ try {
   const assertionCols = await columns(client, 'atlas_assertion_versions');
   gates.ASSERTION_IDENTITY_SURFACE = ['assertion_version_id','stable_assertion_id','stable_test_id','assertion_key','expression_fingerprint','duplicate_ordinal','byte_start','byte_end'].every((name) => assertionCols.has(name));
 
+  const executionCols = await columns(client, 'atlas_algorithm_execution_receipts');
+  gates.ALGORITHM_EXECUTION_RECEIPT_SURFACE = [
+    'execution_id','dag_node_id','stage','logical_lane','algorithm_class','algorithm','geometry','metric',
+    'compute_backend','compilation_mode','transport','serialization','source_snapshot_revision',
+    'representation_revision','input_checksum','output_checksum','manifest_checksum','manifest','recorded_at',
+  ].every((name) => executionCols.has(name));
+  details.algorithm_execution_columns = [...executionCols];
+
   if (FIXTURE && gates.REQUIRED_TABLES_EXIST && gates.REQUIRED_FUNCTIONS_EXIST) {
     await client.query('BEGIN');
     try {
@@ -114,6 +124,38 @@ try {
       const assertionId = `proof:assertion:${suffix}`;
       const decisionId = `proof:alias-decision:${suffix}`;
       const testKey = `proof-test-key:${suffix}`;
+      const executionId = `proof:execution:${suffix}`;
+      const inputChecksum = sha256('proof-execution-input');
+      const outputChecksum = sha256('proof-execution-output');
+      const executionManifest = {
+        schema: 'atlas.algorithm-execution-manifest.v1',
+        execution_id: executionId,
+        dag_node_id: 'proof:dag:semantic',
+        stage: 'semantic_nomination',
+        logical_lane: 'semantic',
+        algorithm_class: 'exact_reference',
+        algorithm: 'exact_gemm',
+        geometry: 'cosine_hypersphere',
+        metric: 'cosine',
+        dimensions: 768,
+        dtype: 'float32',
+        compute_backend: 'pytorch_eager',
+        compute_backend_revision: 'proof-backend-r1',
+        compilation_mode: 'eager',
+        transport: 'local',
+        serialization: 'numpy',
+        cache_backend: 'none',
+        source_snapshot_revision: 'proof-snapshot-r1',
+        representation_revision: 'proof-semantic-r1',
+        input_checksum: inputChecksum,
+        output_checksum: outputChecksum,
+        device: { kind: 'cpu' },
+        mutation: {},
+        fallback_used: false,
+        canonical_authority: false,
+        producer_revision: 'database-proof-r1',
+      };
+      const manifestChecksum = sha256(executionManifest);
 
       await client.query(`INSERT INTO atlas_evidence(evidence_id,evidence_kind,source_ref,source_revision,evidence_revision,producer_revision,confidence,payload,search_text) VALUES ($1,'proof.fixture','proof://database','proof-src-r1','proof-ev-r1','database-proof-r1',1,'{}'::jsonb,'proof fixture')`, [evidenceId]);
       await client.query(`INSERT INTO atlas_evidence_entities(evidence_id,entity_type,entity_id,role,source_ref,source_revision,extraction_revision,confidence) VALUES ($1,'symbol',$2,'defines','proof://database','proof-src-r1','database-proof-r1',1)`, [evidenceId, symbolId]);
@@ -128,10 +170,11 @@ try {
       await client.query(`INSERT INTO atlas_test_registry(stable_test_id,canonical_key,framework,canonical_source_ref,canonical_full_name,created_from_nomination_id,created_from_source_revision,registry_revision) VALUES ($1,$2,'vitest','proof.test.ts','proof fixture',$3,'proof-src-r1','proof-reg-r1')`, [testId, testKey, `proof-test-nomination:${suffix}`]);
       await client.query(`INSERT INTO atlas_assertion_registry(stable_assertion_id,stable_test_id,canonical_key,assertion_kind,expression_fingerprint,created_from_nomination_id,created_from_source_revision,registry_revision) VALUES ($1,$2,$3,'expect',$4,$5,'proof-src-r1','proof-reg-r1')`, [assertionId, testId, `proof-assertion-key:${suffix}`, sha256('expect(value).toBe(1)'), `proof-assertion-nomination:${suffix}`]);
       await client.query(`INSERT INTO atlas_identity_alias_decisions(decision_id,entity_kind,stable_id,old_key,new_key,transition_kind,old_revision,new_revision,evidence_refs,reviewer_id,workflow_action_id,reviewed_at,registry_revision,producer_revision) VALUES ($1,'test',$2,$3,$4,'rename','proof-src-r1','proof-src-r2',$5::jsonb,'proof-reviewer','proof-action',now(),'proof-reg-r2','database-proof-r1')`, [decisionId, testId, testKey, `${testKey}:renamed`, JSON.stringify([evidenceId])]);
+      await client.query(`INSERT INTO atlas_algorithm_execution_receipts(execution_id,dag_node_id,stage,logical_lane,algorithm_class,algorithm,geometry,metric,compute_backend,compilation_mode,transport,serialization,source_snapshot_revision,representation_revision,input_checksum,output_checksum,manifest_checksum,manifest) VALUES ($1,'proof:dag:semantic','semantic_nomination','semantic','exact_reference','exact_gemm','cosine_hypersphere','cosine','pytorch_eager','eager','local','numpy','proof-snapshot-r1','proof-semantic-r1',$2,$3,$4,$5::jsonb)`, [executionId,inputChecksum,outputChecksum,manifestChecksum,JSON.stringify(executionManifest)]);
 
       const neighborhood = await client.query(`SELECT * FROM atlas_dynamic_hyperedge_neighborhood($1::text[],10)`, [[symbolId]]);
       gates.FIXTURE_DYNAMIC_HYPEREDGE = neighborhood.rows.some((row) => row.evidence_id === evidenceId);
-      const readback = await client.query(`SELECT EXISTS(SELECT 1 FROM atlas_evidence WHERE evidence_id=$1) AS evidence, EXISTS(SELECT 1 FROM atlas_evidence_entities WHERE evidence_id=$1 AND entity_id=$2) AS evidence_entity, EXISTS(SELECT 1 FROM atlas_symbol_registry WHERE stable_symbol_id=$2) AS symbol, EXISTS(SELECT 1 FROM atlas_schema_object_registry WHERE stable_schema_object_id=$3) AS schema_object, EXISTS(SELECT 1 FROM atlas_test_registry WHERE stable_test_id=$4) AS test, EXISTS(SELECT 1 FROM atlas_assertion_registry WHERE stable_assertion_id=$5) AS assertion, EXISTS(SELECT 1 FROM atlas_identity_alias_decisions WHERE decision_id=$6) AS alias_decision`, [evidenceId,symbolId,schemaId,testId,assertionId,decisionId]);
+      const readback = await client.query(`SELECT EXISTS(SELECT 1 FROM atlas_evidence WHERE evidence_id=$1) AS evidence, EXISTS(SELECT 1 FROM atlas_evidence_entities WHERE evidence_id=$1 AND entity_id=$2) AS evidence_entity, EXISTS(SELECT 1 FROM atlas_symbol_registry WHERE stable_symbol_id=$2) AS symbol, EXISTS(SELECT 1 FROM atlas_schema_object_registry WHERE stable_schema_object_id=$3) AS schema_object, EXISTS(SELECT 1 FROM atlas_test_registry WHERE stable_test_id=$4) AS test, EXISTS(SELECT 1 FROM atlas_assertion_registry WHERE stable_assertion_id=$5) AS assertion, EXISTS(SELECT 1 FROM atlas_identity_alias_decisions WHERE decision_id=$6) AS alias_decision, EXISTS(SELECT 1 FROM atlas_algorithm_execution_receipts WHERE execution_id=$7 AND manifest_checksum=$8) AS algorithm_execution`, [evidenceId,symbolId,schemaId,testId,assertionId,decisionId,executionId,manifestChecksum]);
       gates.FIXTURE_READBACK = Object.values(readback.rows[0] ?? {}).every(Boolean);
     } finally { await client.query('ROLLBACK'); }
   } else if (FIXTURE) {
@@ -141,11 +184,11 @@ try {
   const requiredGateNames = [
     'PGVECTOR_EXTENSION','REQUIRED_TABLES_EXIST','REQUIRED_FUNCTIONS_EXIST','EVIDENCE_ENTITY_FK_TO_EVIDENCE',
     'SCHEMA_REGISTRY_VERSION_PROVENANCE','SYMBOL_REGISTRY_NATIVE_PROVENANCE','TEST_EXECUTION_RECEIPT_SURFACE',
-    'REVIEWED_ALIAS_DECISION_SURFACE','ASSERTION_IDENTITY_SURFACE',
+    'REVIEWED_ALIAS_DECISION_SURFACE','ASSERTION_IDENTITY_SURFACE','ALGORITHM_EXECUTION_RECEIPT_SURFACE',
     ...(FIXTURE ? ['FIXTURE_RELATIONSHIP_VALIDATION','FIXTURE_DYNAMIC_HYPEREDGE','FIXTURE_READBACK'] : []),
   ];
   const status = requiredGateNames.every((name) => gates[name]) ? 'PROVEN' : 'DEGRADED';
-  const receipt = { schema: 'atlas.feature-intelligence-database-proof.v2', generated_at: new Date().toISOString(), apply_requested: APPLY, fixture_requested: FIXTURE, fixture_rolled_back: FIXTURE, migrations: migrationFiles.map(({name,checksum}) => ({name,checksum})), gates, details, status };
+  const receipt = { schema: 'atlas.feature-intelligence-database-proof.v3', generated_at: new Date().toISOString(), apply_requested: APPLY, fixture_requested: FIXTURE, fixture_rolled_back: FIXTURE, migrations: migrationFiles.map(({name,checksum}) => ({name,checksum})), gates, details, status };
   receipt.checksum = sha256(receipt);
   console.log(JSON.stringify(receipt, null, 2));
   if (status !== 'PROVEN') process.exitCode = 2;
