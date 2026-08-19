@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package atlas.packet.v1;
+
+option go_package = "github.com/deeds-web-app/services/go-retrieval-service/proto/atlaspacket;atlaspacketv1";
+
+// CANONICAL PROTO SOURCE for Parent Atlas packet/data references.
+// Mirrors may exist under application subtrees for tooling, but generators should
+// consume this root proto/active definition.
+//
+// Transport only: canonical packet identity/revisions are owned by Postgres and
+// the packet/materialization pipeline, never by protobuf serialization bytes.
+message PacketRef {
+  string packet_key = 1;
+  string source_ref = 2;
+  string canonical_id = 3;
+  string workspace_revision = 4;
+  string source_revision = 5;
+  string representation_revision = 6;
+  string feature_revision = 7;
+  string graph_revision = 8;
+  string ontology_revision = 9;
+  repeated string evidence_refs = 10;
+  repeated string ontology_ids = 11;
+  repeated string concept_ids = 12;
+  repeated string hyperedge_refs = 13;
+  string context_manifest_id = 14;
+}
+
+// Reference to large immutable data. Large tensor/table payloads should not be
+// embedded in protobuf messages; use Arrow IPC/mmap/object storage and send this
+// descriptor instead.
+message DataRef {
+  enum Mode {
+    MODE_UNSPECIFIED = 0;
+    ARROW_IPC_REF = 1;
+    MMAP_REF = 2;
+    OBJECT_REF = 3;
+  }
+
+  Mode mode = 1;
+  string data_ref_id = 2;
+  string media_type = 3;
+  uint64 byte_length = 4;
+  string content_checksum = 5;
+  string locator = 6;
+}
+
+message PacketTransport {
+  string schema = 1; // atlas.canonical-packet-transport.v1
+  string transport_id = 2;
+  string request_id = 3;
+  PacketRef packet = 4;
+
+  oneof payload {
+    string json_utf8 = 10;
+    bytes msgpack = 11;
+    DataRef data_ref = 12;
+    bool packet_ref_only = 13;
+  }
+
+  string payload_media_type = 20;
+  string payload_content_checksum = 21;
+  string validation_receipt_id = 22;
+  string materialization_receipt_id = 23;
+  string producer_revision = 24;
+  string envelope_checksum = 25;
+}
+
+message PacketRefBatch {
+  repeated PacketRef packets = 1;
+}
+
+message PacketTransportBatch {
+  repeated PacketTransport packets = 1;
+}
+
+// Hydration is a separate capability from retrieval. Retrieval returns references;
+// the canonical packet/materialization owner hydrates content when necessary.
+service PacketTransportService {
+  rpc HydratePacket(PacketRef) returns (PacketTransport);
+  rpc HydratePacketBatch(PacketRefBatch) returns (PacketTransportBatch);
+}
