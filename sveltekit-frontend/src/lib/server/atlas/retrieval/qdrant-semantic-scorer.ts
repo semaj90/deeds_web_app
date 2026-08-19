@@ -12,7 +12,12 @@ export interface QdrantSemanticScoreV1 {
   score: number;
   pointId: string | number;
   sourceRevision: string | null;
+  symbolVersionId: string | null;
+  treeNodeId: string | null;
+  featureLabel: string | null;
   projectionRevision: string | null;
+  /** Bounded 512d vector carried only so cuVS can exact-rerank this same candidate fabric. */
+  vector: number[];
 }
 
 export interface QdrantSemanticScoreReceiptV1 {
@@ -20,12 +25,15 @@ export interface QdrantSemanticScoreReceiptV1 {
   collection: typeof QDRANT_SEMANTIC_COLLECTION;
   vectorName: null;
   representationId: typeof ATLAS_CANONICAL_SEMANTIC_REPRESENTATION;
+  representationRevision: string;
   dimension: typeof ATLAS_CANONICAL_SEMANTIC_DIMENSION;
   requestedPacketKeys: number;
   returnedPacketKeys: number;
   embeddingModel: string;
   embeddingCached: boolean;
   embeddingExecMs: number;
+  /** Kept server-side for the immediately-following exact cuVS rerank. */
+  queryVector: number[];
   scores: QdrantSemanticScoreV1[];
 }
 
@@ -48,12 +56,14 @@ export async function scoreQdrantSemanticCandidatesV1(
       collection: QDRANT_SEMANTIC_COLLECTION,
       vectorName: QDRANT_SEMANTIC_VECTOR_NAME,
       representationId: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
+      representationRevision: 'not-run',
       dimension: ATLAS_CANONICAL_SEMANTIC_DIMENSION,
       requestedPacketKeys: 0,
       returnedPacketKeys: 0,
       embeddingModel: 'not-run',
       embeddingCached: false,
       embeddingExecMs: 0,
+      queryVector: [],
       scores: [],
     };
   }
@@ -69,36 +79,61 @@ export async function scoreQdrantSemanticCandidatesV1(
     },
     limit: uniquePacketKeys.length,
     with_payload: true,
-    with_vector: false,
+    with_vector: true,
   } as any)) as any;
 
   const points = Array.isArray(response?.points) ? response.points : [];
   const scores: QdrantSemanticScoreV1[] = [];
+  const projectionRevisions = new Set<string>();
   for (const point of points) {
     const packetKey = point?.payload?.packet_key;
     if (typeof packetKey !== 'string' || !packetKey) continue;
+    const rawVector = Array.isArray(point?.vector)
+      ? point.vector
+      : point?.vector && typeof point.vector === 'object'
+        ? Object.values(point.vector)[0]
+        : null;
+    if (!Array.isArray(rawVector) || rawVector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) continue;
+    const projectionRevision = point?.payload?.projection_revision == null
+      ? null
+      : String(point.payload.projection_revision);
+    if (projectionRevision) projectionRevisions.add(projectionRevision);
     scores.push({
       packetKey,
       score: Number(point.score),
       pointId: point.id,
       sourceRevision:
         point?.payload?.source_revision == null ? null : String(point.payload.source_revision),
-      projectionRevision:
-        point?.payload?.projection_revision == null ? null : String(point.payload.projection_revision),
+      symbolVersionId:
+        point?.payload?.symbol_version_id == null ? null : String(point.payload.symbol_version_id),
+      treeNodeId:
+        point?.payload?.tree_node_id == null ? null : String(point.payload.tree_node_id),
+      featureLabel:
+        point?.payload?.feature_label == null ? null : String(point.payload.feature_label),
+      projectionRevision,
+      vector: rawVector.map(Number),
     });
   }
+
+  const representationRevision = projectionRevisions.size === 1
+    ? [...projectionRevisions][0]
+    : projectionRevisions.size === 0
+      ? 'unversioned-qdrant-projection'
+      : 'mixed-projection-revisions';
 
   return {
     schema: 'atlas.qdrant-semantic-score-receipt.v1',
     collection: QDRANT_SEMANTIC_COLLECTION,
     vectorName: QDRANT_SEMANTIC_VECTOR_NAME,
     representationId: ATLAS_CANONICAL_SEMANTIC_REPRESENTATION,
+    representationRevision,
     dimension: ATLAS_CANONICAL_SEMANTIC_DIMENSION,
     requestedPacketKeys: uniquePacketKeys.length,
     returnedPacketKeys: scores.length,
     embeddingModel: embedding.model,
     embeddingCached: embedding.cached,
     embeddingExecMs: embedding.exec_ms,
+    queryVector: Array.from(embedding.vector),
     scores,
   };
 }
