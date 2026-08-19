@@ -50,7 +50,7 @@ class AlignedSnapshotExperimentTests(unittest.TestCase):
                 producer_revision="test",
             )
 
-            # The semantic freezer will canonical-sort IDs a..f. Context order is
+            # The semantic freezer canonical-sorts IDs a..f. Context order is
             # deliberately different and represents source/workflow sequence.
             experiment = {
                 "experiment_revision": "aligned:v2:test",
@@ -109,6 +109,8 @@ class AlignedSnapshotExperimentTests(unittest.TestCase):
             self.assertEqual(receipt.nary_retrieval["status"], "PASS")
             self.assertLess(receipt.sparse_dense["max_abs_parity_error"], 1e-6)
             self.assertGreater(receipt.aligned_feature_columns, 768)
+            self.assertEqual(receipt.semantic_canonical_order_checksum, receipt.aligned_feature_row_identity_checksum)
+            self.assertNotEqual(receipt.semantic_versioned_row_identity_checksum, receipt.semantic_canonical_order_checksum)
             self.assertEqual(len(receipt.output_checksum), 64)
             self.assertTrue(output.exists())
 
