@@ -32,14 +32,27 @@ export const PageRankFabricExecutionDataV1Schema = z.discriminatedUnion('executo
 	CommonDataSchema.extend({
 		executorId: z.literal('CUGRAPH'),
 		role: z.literal('GPU_CHALLENGER'),
+		executionMode: z.literal('CUGRAPH_HIGH_LEVEL_PAGERANK'),
+		runtime: z.object({
+			cugraphVersion: z.string().min(1),
+			cudfVersion: z.string().min(1),
+		}).strict(),
 		failOnNonconvergence: z.boolean(),
 		graphBuildMillis: z.number().finite().nonnegative(),
 	}).strict(),
 	CommonDataSchema.extend({
 		executorId: z.literal('NEO4J_GDS'),
 		role: z.literal('REFERENCE_EXECUTOR'),
-		executionMode: z.literal('STREAM_ON_CONSTRUCTED_DATAFRAME_GRAPH'),
+		executionMode: z.literal('MUTATE_ON_CONSTRUCTED_DATAFRAME_GRAPH'),
+		runtime: z.object({
+			graphdatascienceClientVersion: z.string().min(1),
+			gdsServerVersion: z.string().min(1),
+			neo4jDatabase: z.string().min(1),
+		}).strict(),
 		graphConstructMillis: z.number().finite().nonnegative(),
+		preProcessingMillis: z.number().finite().nonnegative(),
+		postProcessingMillis: z.number().finite().nonnegative(),
+		mutateMillis: z.number().finite().nonnegative(),
 	}).strict(),
 ]);
 
@@ -105,5 +118,11 @@ export function assertPageRankFabricExecutionMatches(input: {
 	if (receipt.data.dampingFactor !== plan.parameters.dampingFactor) throw new Error('PageRank fabric dampingFactor mismatch');
 	if (receipt.data.maxIterations !== plan.parameters.maxIterations) throw new Error('PageRank fabric maxIterations mismatch');
 	if (receipt.data.tolerance !== plan.parameters.tolerance) throw new Error('PageRank fabric tolerance mismatch');
+	if (receipt.data.executorId === 'NEO4J_GDS' && receipt.data.convergenceStatus !== 'CONVERGED') {
+		throw new Error(`Neo4j GDS PageRank reference did not converge: ${receipt.data.convergenceStatus}`);
+	}
+	if (receipt.data.executorId === 'CUGRAPH' && receipt.data.convergenceStatus === 'NON_CONVERGED') {
+		throw new Error('cuGraph PageRank challenger did not converge');
+	}
 	return receipt;
 }
