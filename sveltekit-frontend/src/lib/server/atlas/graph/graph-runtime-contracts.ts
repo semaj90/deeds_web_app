@@ -4,11 +4,31 @@ export type GraphTraversalDirection = (typeof graphTraversalDirections)[number];
 export const atlasCandidateBuckets = [32, 64, 128, 256, 512] as const;
 export type AtlasCandidateBucket = (typeof atlasCandidateBuckets)[number];
 
+export const sourceMutationStatusValues = ['FRESH', 'STALE', 'UNKNOWN', 'MISSING'] as const;
+export type SourceMutationStatusV1 = (typeof sourceMutationStatusValues)[number];
+
+/**
+ * A source version is not an embedding dimension or representation revision.
+ * The live atlas_packets audit has no literal source_revision column, so delta
+ * producers must carry the evidence they actually possess and may leave the
+ * legacy numeric sourceRevision null until a real owner is established.
+ */
+export interface SourceVersionAnchorV1 {
+  sourceRef: string;
+  contentHash: string | null;
+  workspaceRevision: number | null;
+  representationRevision: number | null;
+  mutationDiffHash: string | null;
+  mutationCommit: string | null;
+}
+
 export interface GraphDeltaV1 {
   schema: 'atlas.graph-delta.v1';
   baseSnapshotId: string;
   workspaceRevision: number;
-  sourceRevision: number;
+  /** @deprecated Do not synthesize this from workspace/representation revisions. */
+  sourceRevision?: number | null;
+  sourceVersionAnchors: SourceVersionAnchorV1[];
   nodesAdded: Array<Record<string, unknown>>;
   nodesChanged: Array<Record<string, unknown>>;
   nodesRemoved: string[];
@@ -98,6 +118,8 @@ export interface CandidateFeatureRowV1 {
   packetKey: string | null;
   nodeKey: string;
   sourceRef: string | null;
+  sourceMutationStatus: SourceMutationStatusV1;
+  sourceFreshnessProven: boolean;
   semanticCosine: number | null;
   lexicalScore: number | null;
   exactSymbolMatch: number;
@@ -107,6 +129,7 @@ export interface CandidateFeatureRowV1 {
   globalPageRank: number | null;
   communityId: string | null;
   typeCompatibility: number | null;
+  /** Graph-analysis revision parity; source freshness is tracked separately. */
   revisionMatch: number;
   bitfrostHotness: number | null;
 }
@@ -122,6 +145,15 @@ export interface ContextManifestV1 {
   tokenBudget: number;
   selectedNodeKeys: string[];
   evidenceRefs: string[];
+  mutationAwareness?: {
+    proofPolicy: 'content-hash-plus-tracked-git-provenance';
+    freshCount: number;
+    staleCount: number;
+    unknownCount: number;
+    missingCount: number;
+    staleNodeKeys: string[];
+    unknownNodeKeys: string[];
+  };
   producerRevision: string;
 }
 
