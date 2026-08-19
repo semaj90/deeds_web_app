@@ -53,5 +53,9 @@ export default {
     '!atlas_test_registry', '!atlas_test_aliases', '!atlas_test_versions', '!atlas_test_execution_receipts',
     '!atlas_assertion_registry', '!atlas_assertion_aliases', '!atlas_assertion_versions',
     '!atlas_identity_alias_decisions',
+
+    // Parent Atlas algorithm/backend execution receipts. PostgreSQL stores the
+    // durable receipt; Kafka/Valkey are projections only. DDL is manual-owned.
+    '!atlas_algorithm_execution_receipts',
   ],
 } satisfies Config;
