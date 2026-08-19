@@ -1,0 +1,34 @@
+schema_id: atlas.lexical-score-evidence
+schema_version: 1
+schema_kind: retrieval_evidence
+status: ACTIVE
+
+description: >
+  Algorithm-qualified lexical/sparse score. Historical function, lane, collection
+  or vector names are not sufficient proof of BM25/BM42 semantics.
+
+fields:
+  schema: { type: literal, value: atlas.lexical-score-evidence.v1 }
+  packetKey: { type: string, required: true }
+  sourceRef: { type: string, required: true }
+  workspaceRevision: { type: string, nullable: true }
+  sourceRevision: { type: string, nullable: true }
+  algorithm:
+    type: enum
+    values: [POSTGRES_TS_RANK, POSTGRES_TRIGRAM, BM25, BM42, LEGACY_HASH_SPARSE]
+  score: { type: number, required: true }
+  rank: { type: integer, minimum: 1 }
+  executor: { type: string, required: true }
+  representationRevision: { type: string, nullable: true }
+  modelRevision: { type: string, nullable: true }
+  idfRevision: { type: string, nullable: true }
+  receiptRef: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - POSTGRES_TS_RANK must not be labeled BM25
+  - LEGACY_HASH_SPARSE must not be labeled BM42
+  - BM25 requires an implementation/receipt that actually computes BM25 statistics
+  - BM42 requires a proven BM42 producer including its model/token-importance and IDF lineage
+  - lexical algorithms may remain distinct evidence signals, but executor duplicates of one algorithm must not inflate votes
+  - a score is reusable only when its required identity and revision lineage match the request
