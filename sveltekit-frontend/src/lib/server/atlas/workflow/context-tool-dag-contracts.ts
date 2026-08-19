@@ -94,8 +94,10 @@ function assertDag(nodes: readonly ContextToolDagNodeV1[]): void {
 }
 
 /**
- * Tool calls that can mutate state must depend on exact promotion; every
- * mutation path must then pass through a validator before materialization.
+ * Exact-promotion and validation requirements are graph properties, not flags
+ * that a caller can satisfy by assertion alone. Any node declaring either
+ * requirement must have the corresponding ancestor. Mutating MCP calls also
+ * require canonical write authorization at the DAG envelope.
  */
 export function validateContextToolDag(raw: ContextToolDagV1): ContextToolDagV1 {
   const dag = ContextToolDagV1Schema.parse(raw);
@@ -119,11 +121,19 @@ export function validateContextToolDag(raw: ContextToolDagV1): ContextToolDagV1 
   };
 
   for (const node of dag.nodes) {
-    if (node.kind !== 'MCP_TOOL_CALL') continue;
     const upstream = ancestors(node);
-    if (node.requiresExactPromotion && !upstream.some((parent) => parent.kind === 'EXACT_PROMOTION')) {
-      throw new Error(`MCP tool node ${node.nodeId} requires an EXACT_PROMOTION ancestor`);
+    if (node.requiresExactPromotion
+      && node.kind !== 'EXACT_PROMOTION'
+      && !upstream.some((parent) => parent.kind === 'EXACT_PROMOTION')) {
+      throw new Error(`${node.kind} node ${node.nodeId} requires an EXACT_PROMOTION ancestor`);
     }
+    if (node.requiresValidation
+      && node.kind !== 'VALIDATE'
+      && !upstream.some((parent) => parent.kind === 'VALIDATE')) {
+      throw new Error(`${node.kind} node ${node.nodeId} requires a VALIDATE ancestor`);
+    }
+
+    if (node.kind !== 'MCP_TOOL_CALL') continue;
     if (!node.readOnly && !node.requiresValidation) {
       throw new Error(`mutating MCP tool node ${node.nodeId} must require validation`);
     }
