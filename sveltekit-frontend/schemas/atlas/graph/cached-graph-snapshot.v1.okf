@@ -1,0 +1,46 @@
+schema_id: atlas.cached-graph-snapshot
+schema_version: 1
+schema_kind: graph_snapshot
+status: ACTIVE
+
+description: >
+  Revisioned compiled graph artifact used after semantic Top-K seeding. JSON is
+  permitted as an interchange/debug representation, but traversal consumes a
+  deterministic ordinal edge table / CSR / COO projection suitable for mmap,
+  Arrow, cuDF, NetworkX reference, or cuGraph execution.
+
+fields:
+  schema: { type: literal, value: atlas.cached-graph-snapshot.v1 }
+  snapshotId: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  graphRevision: { type: string, required: true }
+  projectionRevision: { type: string, required: true }
+  topologyHash: { type: string, required: true }
+  nodeCount: { type: integer, minimum: 0 }
+  edgeCount: { type: integer, minimum: 0 }
+  hyperedgeCount: { type: integer, minimum: 0 }
+  nodeOrdinalRef: { type: string, required: true }
+  edgeTableRef: { type: string, required: true }
+  csrRef: { type: string, nullable: true }
+  cooRef: { type: string, nullable: true }
+  jsonDebugRef: { type: string, nullable: true }
+  storageTier:
+    type: enum
+    values: [NVME_MMAP, HOST_RAM, PINNED_HOST, GPU_VRAM]
+  deterministicSort:
+    type: object
+    fields:
+      keys:
+        type: string_array
+        required: true
+  relationTypeDictionaryRef: { type: string, required: true }
+  hyperedgeDictionaryRef: { type: string, nullable: true }
+  checksum: { type: string, required: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - canonical graph/n-ary truth remains outside this projection
+  - every projected edge retains relation identity and optional hyperedge provenance
+  - deterministic edge order is sourceOrdinal, relationTypeOrdinal, targetOrdinal, evidenceOrdinal unless a newer projection receipt states otherwise
+  - JSON debug artifacts are not traversed directly by GPU kernels
+  - snapshot revisions/hashes must match the graph evidence used by PageRank/PPR/frontier traversal
