@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  normalizeRotationQuaternion,
+  type RotationQuaternion,
+} from '../geometry/rigid-pose-interpolation.js';
 
 /**
  * Synthetic "Tetris" stress fixture for Parent Atlas topology plumbing.
@@ -10,6 +14,11 @@ import { z } from 'zod';
  *
  * Six DoF = three translations + three rotations:
  *   [x, y, z, roll, pitch, yaw]
+ *
+ * The Euler tuple is retained for fixture/backward compatibility and locality
+ * quantization. A separate physical unit quaternion is emitted for orientation
+ * comparison/interpolation so Euler wrap-around does not masquerade as a large
+ * physical rotation.
  *
  * Hilbert order is a locality/indexing device only. It is not a physical
  * distance metric and does not create canonical graph relations.
@@ -37,6 +46,11 @@ export const QuantizedPose6DSchema = z.tuple([
   z.number().int().nonnegative(),
 ]);
 export type QuantizedPose6D = z.infer<typeof QuantizedPose6DSchema>;
+
+export const PhysicalQuaternionSchema = z.tuple([
+  z.number().finite(), z.number().finite(), z.number().finite(), z.number().finite(),
+]);
+export type PhysicalQuaternion = z.infer<typeof PhysicalQuaternionSchema>;
 
 export const PoseAxisBoundsSchema = z.object({
   min: z.number().finite(),
@@ -136,6 +150,36 @@ export function quantizePose6D(
 }
 
 /**
+ * Convert roll/pitch/yaw to a physical unit quaternion using the explicit ZYX
+ * yaw-pitch-roll convention. Quaternion storage is [w,x,y,z].
+ *
+ * Canonical sign removes the q/-q duplication for Euclidean fixture vectors:
+ * prefer w>0; if w==0, choose the first non-zero vector component positive.
+ * This does NOT turn Euclidean KMeans into a true geodesic SO(3) clustering
+ * algorithm; physical evaluation must still use antipodal-invariant angular
+ * distance.
+ */
+export function eulerZYXToCanonicalQuaternion(roll: number, pitch: number, yaw: number): PhysicalQuaternion {
+  for (const value of [roll, pitch, yaw]) if (!Number.isFinite(value)) throw new Error('Euler angles must be finite');
+  const cr = Math.cos(roll / 2); const sr = Math.sin(roll / 2);
+  const cp = Math.cos(pitch / 2); const sp = Math.sin(pitch / 2);
+  const cy = Math.cos(yaw / 2); const sy = Math.sin(yaw / 2);
+
+  let q = normalizeRotationQuaternion([
+    cr * cp * cy + sr * sp * sy,
+    sr * cp * cy - cr * sp * sy,
+    cr * sp * cy + sr * cp * sy,
+    cr * cp * sy - sr * sp * cy,
+  ] as RotationQuaternion) as PhysicalQuaternion;
+
+  const signProbe = Math.abs(q[0]) > 1e-12 ? q[0]
+    : Math.abs(q[1]) > 1e-12 ? q[1]
+      : Math.abs(q[2]) > 1e-12 ? q[2] : q[3];
+  if (signProbe < 0) q = [-q[0], -q[1], -q[2], -q[3]];
+  return PhysicalQuaternionSchema.parse(q);
+}
+
+/**
  * John Skilling-style axes -> Hilbert transpose -> scalar distance.
  * Uses BigInt so the reference remains correct beyond 32-bit key widths.
  */
@@ -152,7 +196,6 @@ export function hilbertIndexND(point: readonly number[], bitsPerAxis: number): b
     return value;
   });
 
-  // Inverse undo / exchange stage from Skilling's n-D formulation.
   let q = 1 << (bitsPerAxis - 1);
   while (q > 1) {
     const p = q - 1;
@@ -168,7 +211,6 @@ export function hilbertIndexND(point: readonly number[], bitsPerAxis: number): b
     q >>= 1;
   }
 
-  // Gray encode.
   for (let i = 1; i < x.length; i += 1) x[i] ^= x[i - 1];
   let t = 0;
   q = 1 << (bitsPerAxis - 1);
@@ -178,7 +220,6 @@ export function hilbertIndexND(point: readonly number[], bitsPerAxis: number): b
   }
   for (let i = 0; i < x.length; i += 1) x[i] ^= t;
 
-  // Transpose bits [axis0 bitMSB, axis1 bitMSB, ...] into scalar Hilbert distance.
   let distance = 0n;
   for (let bit = bitsPerAxis - 1; bit >= 0; bit -= 1) {
     for (let axis = 0; axis < x.length; axis += 1) {
@@ -194,7 +235,17 @@ export const Tetris6DKeyValueV1Schema = z.object({
   piece: TetrisPieceKindSchema,
   representationRevision: z.string().min(1),
   bitsPerAxis: z.number().int().positive(),
+  /** Original fixture coordinates retained for locality/key parity. */
+  eulerPose6D: Pose6DSchema,
   quantizedPose6D: QuantizedPose6DSchema,
+  /** Physical orientation representation, ZYX convention, canonical q/-q sign. */
+  physicalRotationQuaternion: PhysicalQuaternionSchema,
+  /** [normalized x,y,z,qw,qx,qy,qz] — 7-D SE(3) fixture feature. */
+  se3PhysicalFeature7: z.tuple([
+    z.number().finite().min(0).max(1), z.number().finite().min(0).max(1), z.number().finite().min(0).max(1),
+    z.number().finite().min(-1).max(1), z.number().finite().min(-1).max(1),
+    z.number().finite().min(-1).max(1), z.number().finite().min(-1).max(1),
+  ]),
   hilbertIndexDecimal: z.string().regex(/^\d+$/),
   hilbertIndexHex: z.string().regex(/^[0-9a-f]+$/),
   localityBucketKey: z.string().min(1),
@@ -203,8 +254,10 @@ export const Tetris6DKeyValueV1Schema = z.object({
     z.number().finite().min(0).max(1), z.number().finite().min(0).max(1), z.number().finite().min(0).max(1),
     z.number().finite().min(0).max(1), z.number().finite().min(0).max(1), z.number().finite().min(0).max(1),
   ]),
-  /** Fixture bridge for the repo's existing 64-D SOM path: first six values are pose, remaining values are zero. */
+  /** Legacy Euler fixture bridge: first six values are normalized Euler pose. */
   somFixtureVector64: z.array(z.number().finite()).length(64),
+  /** Quaternion fixture bridge: normalized xyz + canonical unit quaternion + zero pad. */
+  somQuaternionFixtureVector64: z.array(z.number().finite()).length(64),
   somAssignment: z.null(),
   kmeansCluster: z.null(),
   canonicalGraphRelation: z.literal(false),
@@ -223,7 +276,13 @@ export function buildTetris6DKeyValue(input: {
   localityBucketBits?: number;
 }): Tetris6DKeyValueV1 {
   if (!input.canonicalId) throw new Error('canonicalId required');
-  const { quantized, normalized } = quantizePose6D(input.pose, input.bounds, input.bitsPerAxis);
+  const pose = Pose6DSchema.parse(input.pose);
+  const { quantized, normalized } = quantizePose6D(pose, input.bounds, input.bitsPerAxis);
+  const physicalRotationQuaternion = eulerZYXToCanonicalQuaternion(pose[3], pose[4], pose[5]);
+  const se3PhysicalFeature7 = [
+    normalized[0], normalized[1], normalized[2],
+    ...physicalRotationQuaternion,
+  ] as const;
   const h = hilbertIndexND(quantized, input.bitsPerAxis);
   const totalBits = input.bitsPerAxis * 6;
   const bucketBits = Math.max(0, Math.min(totalBits, input.localityBucketBits ?? Math.min(12, totalBits)));
@@ -232,22 +291,25 @@ export function buildTetris6DKeyValue(input: {
   const hHex = h.toString(16).padStart(Math.ceil(totalBits / 4), '0');
   const bucketHex = bucket.toString(16);
   const somFixtureVector64 = [...normalized, ...Array.from({ length: 58 }, () => 0)];
+  const somQuaternionFixtureVector64 = [...se3PhysicalFeature7, ...Array.from({ length: 57 }, () => 0)];
 
-  // Compound memberKey prevents distinct objects quantized to the same Hilbert
-  // cell from overwriting one another in a key/value store.
   return Tetris6DKeyValueV1Schema.parse({
     schema: 'atlas.tetris-6d-kv.v1',
     canonicalId: input.canonicalId,
     piece: input.piece,
     representationRevision: input.representationRevision,
     bitsPerAxis: input.bitsPerAxis,
+    eulerPose6D: pose,
     quantizedPose6D: quantized,
+    physicalRotationQuaternion,
+    se3PhysicalFeature7,
     hilbertIndexDecimal: h.toString(10),
     hilbertIndexHex: hHex,
     localityBucketKey: `${input.representationRevision}:h6:b${bucketBits}:${bucketHex}`,
     memberKey: `${input.representationRevision}:h6:${hHex}:${input.canonicalId}`,
     clusterVector6: normalized,
     somFixtureVector64,
+    somQuaternionFixtureVector64,
     somAssignment: null,
     kmeansCluster: null,
     canonicalGraphRelation: false,
@@ -264,10 +326,6 @@ export const DerivedHilbertLocalityEdgeV1Schema = z.object({
 }).strict();
 export type DerivedHilbertLocalityEdgeV1 = z.infer<typeof DerivedHilbertLocalityEdgeV1Schema>;
 
-/**
- * Step-1 derived graph: connect consecutive objects in Hilbert order only as a
- * locality hint. This MUST NOT be materialized as CALLS/IMPORTS/REFERENCES.
- */
 export function buildDerivedHilbertLocalityEdges(rows: readonly Tetris6DKeyValueV1[]): DerivedHilbertLocalityEdgeV1[] {
   const ordered = [...rows].sort((a, b) => {
     const ah = BigInt(a.hilbertIndexDecimal);
