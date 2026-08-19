@@ -20,7 +20,6 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -61,10 +60,9 @@ if TRITON_AVAILABLE:
         mask = offsets < n_elements
         x = tl.load(x_ptr + offsets, mask=mask, other=0.0).to(tl.float32)
         w = tl.load(w_ptr + offsets, mask=mask, other=0.0).to(tl.float32)
-        products = x * w
-        score = tl.sum(products, axis=0)
-        if offsets == 0:
-            tl.store(out_ptr, score)
+        score = tl.sum(x * w, axis=0)
+        # One Triton program instance computes one scalar reduction.
+        tl.store(out_ptr, score)
 
     @triton_op("parent_atlas::feature_affinity", mutates_args={})
     def feature_affinity(x: torch.Tensor, w: torch.Tensor) -> torch.Tensor:
@@ -136,7 +134,7 @@ def deterministic_fixture(rows: int, dim: int, seed: int, device: torch.device) 
 def run(cfg: ExperimentConfig, rows: int, device: str) -> dict[str, Any]:
     torch.manual_seed(cfg.seed)
     dev = torch.device(device if device == "cpu" or torch.cuda.is_available() else "cpu")
-    model = AtlasShadowMoE(cfg).to(dev)
+    model: nn.Module = AtlasShadowMoE(cfg).to(dev)
     model.train()
     if cfg.compile_model:
         model = torch.compile(model, dynamic=True)
