@@ -3,16 +3,15 @@ import { z } from 'zod';
 /**
  * ALT = A* + Landmarks + Triangle inequality.
  *
- * These contracts intentionally separate:
+ * Separation is deliberate:
  *   representation  = revisioned landmark-distance artifact
  *   algorithm       = ALT lower-bound evaluation
  *   executor        = CPU reference / CUDA reduction
  *   logical lane    = graph
  *
  * A landmark heuristic may accelerate exact A* without becoming a second
- * retrieval vote. PCA/latent/spectral/neural scores remain separate,
- * potentially aggressive heuristics unless admissibility is independently
- * proven.
+ * retrieval vote. PCA/latent/spectral/neural scores remain aggressive
+ * challengers unless their admissibility is independently proven.
  */
 
 export const AltDistanceValueTypeSchema = z.enum([
@@ -36,6 +35,7 @@ export const AltDistanceLayoutSchema = z.enum([
 export type AltDistanceLayout = z.infer<typeof AltDistanceLayoutSchema>;
 
 export const AltPrecomputeExecutorSchema = z.enum([
+  'TYPESCRIPT_REFERENCE',
   'NETWORKX_REFERENCE',
   'BOOST_GRAPH_CPU',
   'CUGRAPH_BFS',
@@ -50,6 +50,12 @@ export const AltHeuristicExecutorSchema = z.enum([
   'CUDA_BLOCK_REDUCTION',
 ]);
 export type AltHeuristicExecutor = z.infer<typeof AltHeuristicExecutorSchema>;
+
+export const AltHeuristicAdmissibilitySchema = z.enum([
+  'PROVEN_LOWER_BOUND',
+  'UNPROVEN_NUMERIC',
+]);
+export type AltHeuristicAdmissibility = z.infer<typeof AltHeuristicAdmissibilitySchema>;
 
 export const LandmarkDistanceArtifactRefV1Schema = z.object({
   artifactId: z.string().min(1),
@@ -69,6 +75,9 @@ export const LandmarkDistanceSnapshotV1Schema = z.object({
   projectionRevision: z.string().min(1),
   nodeOrdinalRevision: z.string().min(1),
   landmarkRevision: z.string().min(1),
+  /** Distances are meaningless without the exact edge-cost semantics used to compute them. */
+  costModelRevision: z.string().min(1),
+  edgeCostChecksumSha256: z.string().regex(/^[a-f0-9]{64}$/),
   directed: z.boolean(),
   weighted: z.boolean(),
   nonnegativeWeightsRequired: z.literal(true),
@@ -79,6 +88,10 @@ export const LandmarkDistanceSnapshotV1Schema = z.object({
   reverseDistances: LandmarkDistanceArtifactRefV1Schema.nullable(),
   distanceValueType: AltDistanceValueTypeSchema,
   distanceExactness: AltDistanceExactnessSchema,
+  /** Maximum absolute error for one stored distance, when independently proven. */
+  distanceAbsoluteErrorBound: z.number().finite().nonnegative().nullable(),
+  /** True only when the producer has evidence for distanceAbsoluteErrorBound. */
+  floatingErrorBoundCertified: z.boolean(),
   quantizedForExactSearch: z.literal(false),
   precomputeExecutor: AltPrecomputeExecutorSchema,
   unreachableSentinel: z.enum(['UINT_MAX', 'POSITIVE_INFINITY']),
@@ -120,6 +133,40 @@ export const LandmarkDistanceSnapshotV1Schema = z.object({
       message: 'undirected ALT should not duplicate the forward distance artifact',
     });
   }
+
+  if (value.distanceExactness === 'EXACT_INTEGER') {
+    if (value.distanceValueType !== 'UINT32_HOPS' && value.distanceValueType !== 'UINT64_SCALED_COST') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['distanceValueType'],
+        message: 'EXACT_INTEGER snapshots require an unsigned integer distance type',
+      });
+    }
+    if (value.distanceAbsoluteErrorBound !== 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['distanceAbsoluteErrorBound'],
+        message: 'EXACT_INTEGER snapshots must declare zero absolute error',
+      });
+    }
+  }
+
+  if (value.distanceExactness === 'AUTHORITATIVE_FLOAT') {
+    if (value.distanceValueType !== 'FLOAT32_COST' && value.distanceValueType !== 'FLOAT64_COST') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['distanceValueType'],
+        message: 'AUTHORITATIVE_FLOAT snapshots require FLOAT32_COST or FLOAT64_COST',
+      });
+    }
+    if (value.floatingErrorBoundCertified && value.distanceAbsoluteErrorBound === null) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['distanceAbsoluteErrorBound'],
+        message: 'certified floating snapshots require an absolute error bound',
+      });
+    }
+  }
 });
 export type LandmarkDistanceSnapshotV1 = z.infer<typeof LandmarkDistanceSnapshotV1Schema>;
 
@@ -132,7 +179,11 @@ export const AStarHeuristicReceiptV1Schema = z.object({
   logicalLane: z.literal('graph'),
   landmarkRevision: z.string().min(1),
   heuristicExecutor: AltHeuristicExecutorSchema,
-  admissibility: z.literal('PROVEN_LOWER_BOUND'),
+  admissibility: AltHeuristicAdmissibilitySchema,
+  /** For a difference of two distances, a certified per-distance error epsilon needs a 2*epsilon guard. */
+  numericGuardApplied: z.number().finite().nonnegative(),
+  mayTerminateExactSearch: z.boolean(),
+  mayClaimOptimality: z.boolean(),
   frontierCount: z.number().int().nonnegative(),
   landmarkCount: z.number().int().positive(),
   heuristicMinimum: z.number().finite().nonnegative().nullable(),
