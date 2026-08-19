@@ -4,6 +4,7 @@ import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
 import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
+import { scoreQdrantSemanticCandidatesV1 } from '$lib/server/atlas/retrieval/qdrant-semantic-scorer.js';
 import {
   chooseCandidateBucket,
   type AtlasSynthesisRequestV1,
@@ -27,6 +28,8 @@ function nullableScore(value: number | null): number {
 
 function compareCandidates(a: CandidateFeatureRowV1, b: CandidateFeatureRowV1): number {
   if (a.exactSymbolMatch !== b.exactSymbolMatch) return b.exactSymbolMatch - a.exactSymbolMatch;
+  const semantic = nullableScore(b.semanticCosine) - nullableScore(a.semanticCosine);
+  if (Number.isFinite(semantic) && semantic !== 0) return semantic;
   const ppr = nullableScore(b.personalizedPageRank) - nullableScore(a.personalizedPageRank);
   if (Number.isFinite(ppr) && ppr !== 0) return ppr;
   const pr = nullableScore(b.globalPageRank) - nullableScore(a.globalPageRank);
@@ -90,16 +93,30 @@ export const POST: RequestHandler = async ({ request }) => {
       }
     }
 
+    const semanticErrors: string[] = [];
+    let semanticReceipt: Awaited<ReturnType<typeof scoreQdrantSemanticCandidatesV1>> | null = null;
+    if (packetKeys.length > 0) {
+      try {
+        semanticReceipt = await scoreQdrantSemanticCandidatesV1(body.query.trim(), packetKeys, candidateLimit);
+      } catch (error) {
+        semanticErrors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    const semanticByPacket = new Map(
+      (semanticReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
+    );
+
     const seedSet = new Set(body.seedNodeKeys);
     const candidates: CandidateFeatureRowV1[] = graph.nodes.map((node, candidateOrdinal) => {
       const staticGraph = node.packetKey ? graphFeatures.get(node.packetKey) : undefined;
+      const semantic = node.packetKey ? semanticByPacket.get(node.packetKey) : undefined;
       return {
         candidateOrdinal,
         canonicalId: `${body.snapshotId}:${node.id}`,
         packetKey: node.packetKey,
         nodeKey: node.id,
         sourceRef: node.sourceRef,
-        semanticCosine: null,
+        semanticCosine: semantic?.score ?? null,
         lexicalScore: null,
         exactSymbolMatch: seedSet.has(node.id) ? 1 : 0,
         astMatch: null,
@@ -142,7 +159,7 @@ export const POST: RequestHandler = async ({ request }) => {
       evidenceRefs: executionCandidates
         .filter((candidate) => candidate.sourceRef)
         .map((candidate) => `${candidate.sourceRef}#${candidate.nodeKey}`),
-      producerRevision: 'atlas.graph-synthesis-prep.v2',
+      producerRevision: 'atlas.graph-synthesis-prep.v3',
     };
 
     return json({
@@ -164,6 +181,10 @@ export const POST: RequestHandler = async ({ request }) => {
         residency: gpuBudget,
         stages: ['semantic_768', 'graph_features', 'exact_promotion', 'context_manifest'],
       },
+      semantic: {
+        receipt: semanticReceipt,
+        errors: semanticErrors,
+      },
       graphFeatures: {
         graphRevision: body.graphRevision?.trim() || null,
         hydrated: graphFeatures.size,
@@ -176,7 +197,9 @@ export const POST: RequestHandler = async ({ request }) => {
         fallback: gpuBudget.executionTarget === 'qdrant' ? 'qdrant' : null,
       },
       next: {
-        semantic: 'Populate semanticCosine from codebase_chunks_768_v2 or the exact cuVS executor, then exact-promote the winning packet identities.',
+        semantic: semanticReceipt
+          ? 'semanticCosine is now hydrated from the canonical semantic_768 Qdrant projection for the bounded graph candidate identities.'
+          : 'Qdrant semantic enrichment failed open; keep graph candidates but do not fabricate semanticCosine.',
         graph: body.graphRevision
           ? 'Static graph metrics were read only from the requested graphRevision; query-time PPR may overwrite personalizedPageRank only with its own receipt.'
           : 'Provide graphRevision to hydrate persisted PageRank/community features; do not infer it from snapshotId.',
