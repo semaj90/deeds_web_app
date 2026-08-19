@@ -65,13 +65,13 @@ describe('context tool DAG contracts', () => {
     expect(event.mutationRequested).toBe(false);
   });
 
-  it('rejects MCP calls claiming exact promotion without an exact-promotion ancestor', () => {
+  it('rejects nodes claiming exact promotion without an exact-promotion ancestor', () => {
     const dag = baseDag();
     dag.nodes[2] = { ...dag.nodes[2], dependsOn: ['retrieve'] };
     expect(() => validateContextToolDag(dag)).toThrow(/EXACT_PROMOTION/);
   });
 
-  it('rejects unauthorized mutating tool nodes', () => {
+  it('rejects nodes claiming validation without a validator ancestor', () => {
     const dag = baseDag();
     dag.nodes[2] = {
       ...dag.nodes[2],
@@ -79,6 +79,66 @@ describe('context tool DAG contracts', () => {
       requiresValidation: true,
       toolName: 'apply_patch',
     };
+    dag.canonicalWritesAllowed = true;
+    expect(() => validateContextToolDag(dag)).toThrow(/VALIDATE ancestor/);
+  });
+
+  it('rejects mutating tool nodes with validator ancestry but no canonical write authorization', () => {
+    const dag = baseDag();
+    dag.nodes.splice(2, 0, {
+      nodeId: 'validate',
+      kind: 'VALIDATE' as const,
+      dependsOn: ['promote'],
+      canonicalIds: ['S1'],
+      toolName: null,
+      readOnly: true,
+      requiresExactPromotion: true,
+      requiresValidation: false,
+      maxAttempts: 1,
+    });
+    dag.nodes[3] = {
+      ...dag.nodes[3],
+      dependsOn: ['validate'],
+      readOnly: false,
+      requiresValidation: true,
+      toolName: 'apply_patch',
+    };
     expect(() => validateContextToolDag(dag)).toThrow(/canonicalWritesAllowed=false/);
+  });
+
+  it('accepts a mutating tool only with exact promotion, validator ancestry, and write authorization', () => {
+    const dag = baseDag();
+    dag.canonicalWritesAllowed = true;
+    dag.nodes.splice(2, 0, {
+      nodeId: 'validate',
+      kind: 'VALIDATE' as const,
+      dependsOn: ['promote'],
+      canonicalIds: ['S1'],
+      toolName: null,
+      readOnly: true,
+      requiresExactPromotion: true,
+      requiresValidation: false,
+      maxAttempts: 1,
+    });
+    dag.nodes[3] = {
+      ...dag.nodes[3],
+      dependsOn: ['validate'],
+      readOnly: false,
+      requiresValidation: true,
+      toolName: 'apply_patch',
+    };
+
+    expect(() => validateContextToolDag(dag)).not.toThrow();
+    const event = workflowActionFromDagNode({
+      dag,
+      nodeId: 'tool',
+      sequence: 4,
+      actionId: 'a-4',
+      kind: 'scheduled',
+      lane: 'tool',
+      producerRevision: 'test',
+    });
+    expect(event.mutationRequested).toBe(true);
+    expect(event.validationRequired).toBe(true);
   });
 });
