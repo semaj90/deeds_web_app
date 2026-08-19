@@ -90,7 +90,7 @@ export const routerFeatureTensorSchema = z.object({
   candidate_id: id,
   row_ordinal: z.number().int().nonnegative(),
   row_identity_checksum: checksum,
-  semantic_latent_dimension: z.enum([z.literal(64), z.literal(128)]),
+  semantic_latent_dimension: z.union([z.literal(64), z.literal(128)]),
   semantic_latent: z.array(z.number().finite()).min(64).max(128),
   exact_binary_feature_ordinals: z.array(z.number().int().nonnegative()).default([]),
   continuous_features: z.array(z.object({ ordinal: z.number().int().nonnegative(), value: z.number().finite() }).strict()).default([]),
