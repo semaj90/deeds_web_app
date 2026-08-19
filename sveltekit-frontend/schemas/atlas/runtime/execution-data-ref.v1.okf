@@ -1,0 +1,45 @@
+schema_id: atlas.execution-data-ref
+schema_version: 1
+schema_kind: execution_data_reference
+status: ACTIVE
+
+description: >
+  Immutable reference to an already-calculated Atlas artifact or tensor. Allows
+  executors to reuse scores/features without serializing large payloads through
+  JSON or recomputing them. The reference identifies bytes/location; canonical
+  identity remains in packet/symbol/source fields owned elsewhere.
+
+fields:
+  schema: { type: literal, value: atlas.execution-data-ref.v1 }
+  refId: { type: string, required: true }
+  artifactKind:
+    type: enum
+    values: [CANDIDATE_MATRIX, SEMANTIC_768, LEXICAL_SCORES, GRAPH_SCORES, HYPERGRAPH_FEATURES, FEATURE_MATRIX, TENSOR, ARROW_SNAPSHOT, MODEL_STATE]
+  representationId: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  workspaceRevision: { type: string, nullable: true }
+  sourceRevision: { type: string, nullable: true }
+  featureRevision: { type: string, nullable: true }
+  graphRevision: { type: string, nullable: true }
+  memoryTier:
+    type: enum
+    values: [GPU_VRAM, PINNED_HOST, HOST_RAM, REDIS_VALKEY, NVME_MMAP, DUCKDB, POSTGRES, QDRANT, NEO4J]
+  transport:
+    type: enum
+    values: [IN_PROCESS, NAPI, GRPC, QUIC_STREAM, PROTOBUF, MSGPACK, ARROW_IPC, MMAP_REF, REDIS_KEY, DATABASE_REF]
+  locator: { type: string, required: true }
+  byteOffset: { type: integer, minimum: 0, nullable: true }
+  byteLength: { type: integer, minimum: 0 }
+  dtype: { type: string, nullable: true }
+  shape: { type: integer_array, default: [] }
+  checksum: { type: string, required: true }
+  immutable: { type: literal, value: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - Windows and WSL2 may exchange this reference but never a raw CUDA pointer/context/stream
+  - MMAP_REF and ARROW_IPC are preferred over JSON for large immutable matrices
+  - Redis/Valkey is a hot cache reference only and never canonical truth
+  - DuckDB is an analytical/out-of-core consumer and never canonical identity storage
+  - precomputed scores may be reused only when all required revisions match the request
+  - transport/codec/location never participate in canonical packet or symbol identity
