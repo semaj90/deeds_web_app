@@ -36,12 +36,13 @@ test('semver comparison ignores v prefix and recognizes 1.19 memory tier boundar
   assert.equal(deriveQdrantVersionCapabilities('1.19.0').supports_memory_tiers_v119, true);
 });
 
-test('hybrid and IDF are version-qualified at the 1.10 boundary', () => {
+test('Atlas requires the Qdrant 1.10 hybrid plus IDF baseline for this production path', () => {
   const before = deriveQdrantVersionCapabilities('1.9.9');
   const after = deriveQdrantVersionCapabilities('1.10.0');
-  assert.equal(before.supports_sparse_vectors, true);
+  assert.equal(before.supports_sparse_vectors, false);
   assert.equal(before.supports_idf_modifier, false);
   assert.equal(before.supports_hybrid_query_api, false);
+  assert.equal(after.supports_sparse_vectors, true);
   assert.equal(after.supports_idf_modifier, true);
   assert.equal(after.supports_hybrid_query_api, true);
 });
@@ -70,13 +71,16 @@ test('unsupported sparse/IDF/query capabilities remain explicit blockers', () =>
     gateRevision: 'r1',
     profile: profile({
       qdrant_version: '1.9.0',
+      supports_sparse_vectors: false,
       supports_idf_modifier: false,
       supports_hybrid_query_api: false,
+      supports_named_vector_schema_update: false,
       native_bm25_inference: 'UNSUPPORTED',
     }),
   });
   assert.equal(gate.status, 'BLOCKED');
   assert.deepEqual(gate.blockers, [
+    'SPARSE_VECTORS_UNAVAILABLE',
     'IDF_MODIFIER_UNAVAILABLE',
     'HYBRID_QUERY_API_UNAVAILABLE',
     'NATIVE_BM25_UNAVAILABLE',
