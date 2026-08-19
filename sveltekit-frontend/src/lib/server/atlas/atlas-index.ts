@@ -78,6 +78,37 @@ export {
   normalizeDemandUtility,
 } from './ranking/packet-feature-matrix';
 export {
+  AgenticRepairLibrarySchema,
+  AlignmentCountV1Schema,
+  AgenticRepairLibraryFetchParametersV1Schema,
+  AgenticRepairLibraryLookupRequestV1Schema,
+  AgenticRepairLibraryLookupObservationV1Schema,
+  AgenticRepairGatePolicyV1Schema,
+  AgenticRepairReadinessInputV1Schema,
+  ReadinessMetricNameSchema,
+  ReadinessMetricV1Schema,
+  RankedAgenticRepairLibraryV1Schema,
+  AgenticRepairGroupMeanV1Schema,
+  AgenticRepairActionKindSchema,
+  AgenticRepairProposedActionV1Schema,
+  AgenticRepairReadinessResultV1Schema,
+  rankAgenticRepairReadiness,
+  agenticRepairInference,
+} from './ranking/agentic-repair-readiness-ranker';
+export type {
+  AgenticRepairLibrary,
+  AgenticRepairLibraryFetchParametersV1,
+  AgenticRepairLibraryLookupRequestV1,
+  AgenticRepairLibraryLookupObservationV1,
+  AgenticRepairLibraryLookup,
+  AgenticRepairGatePolicyV1,
+  AgenticRepairReadinessInputV1,
+  RankedAgenticRepairLibraryV1,
+  AgenticRepairGroupMeanV1,
+  AgenticRepairProposedActionV1,
+  AgenticRepairReadinessResultV1,
+} from './ranking/agentic-repair-readiness-ranker';
+export {
   KanbanTaskLaneSchema,
   KanbanTaskStatusSchema,
   KanbanTaskSchema,
