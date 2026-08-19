@@ -25,6 +25,7 @@ export * from './core/tensor-snapshot.js';
 export * from './core/artifact-transport.js';
 export * from './core/ace-synthesis-graph.js';
 export * from './core/agentic-file-mutation.js';
+export * from './core/agentic-workflow-control-plane.js';
 export * from './core/atlas-kernel-session.js';
 export * from './core/claim-verification.js';
 export * from './core/remote-adapter-lifecycle.js';
