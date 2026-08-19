@@ -64,7 +64,13 @@ export const LandmarkDistanceArtifactRefV1Schema = z.object({
   cols: z.number().int().positive(),
   valueType: AltDistanceValueTypeSchema,
   layout: AltDistanceLayoutSchema,
-  byteOrder: z.literal('LITTLE_ENDIAN'),
+  /**
+   * Persistent V1 writers MUST emit LITTLE_ENDIAN. Optional only so the draft
+   * branch can still parse the earlier in-memory fixture refs created before
+   * byte order became explicit. Promotion/persistence gates must reject an
+   * omitted value.
+   */
+  byteOrder: z.literal('LITTLE_ENDIAN').optional(),
   byteLength: z.number().int().positive(),
 }).strict();
 export type LandmarkDistanceArtifactRefV1 = z.infer<typeof LandmarkDistanceArtifactRefV1Schema>;
@@ -99,73 +105,37 @@ export const LandmarkDistanceSnapshotV1Schema = z.object({
   producerRevision: z.string().min(1),
 }).strict().superRefine((value, ctx) => {
   if (value.landmarkCanonicalIds.length !== value.landmarkCount) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['landmarkCount'],
-      message: 'landmarkCount must equal landmarkCanonicalIds.length',
-    });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['landmarkCount'], message: 'landmarkCount must equal landmarkCanonicalIds.length' });
   }
   if (value.forwardDistances.rows !== value.landmarkCount || value.forwardDistances.cols !== value.nodeCount) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['forwardDistances'],
-      message: 'forward distance artifact shape must be [landmarkCount, nodeCount]',
-    });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['forwardDistances'], message: 'forward distance artifact shape must be [landmarkCount, nodeCount]' });
   }
   if (value.directed) {
     if (!value.reverseDistances) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['reverseDistances'],
-        message: 'directed ALT requires reverse/transposed-graph landmark distances',
-      });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reverseDistances'], message: 'directed ALT requires reverse/transposed-graph landmark distances' });
     } else if (value.reverseDistances.rows !== value.landmarkCount || value.reverseDistances.cols !== value.nodeCount) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['reverseDistances'],
-        message: 'reverse distance artifact shape must be [landmarkCount, nodeCount]',
-      });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reverseDistances'], message: 'reverse distance artifact shape must be [landmarkCount, nodeCount]' });
     }
   }
   if (!value.directed && value.reverseDistances !== null) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['reverseDistances'],
-      message: 'undirected ALT should not duplicate the forward distance artifact',
-    });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['reverseDistances'], message: 'undirected ALT should not duplicate the forward distance artifact' });
   }
 
   if (value.distanceExactness === 'EXACT_INTEGER') {
     if (value.distanceValueType !== 'UINT32_HOPS' && value.distanceValueType !== 'UINT64_SCALED_COST') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['distanceValueType'],
-        message: 'EXACT_INTEGER snapshots require an unsigned integer distance type',
-      });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['distanceValueType'], message: 'EXACT_INTEGER snapshots require an unsigned integer distance type' });
     }
     if (value.distanceAbsoluteErrorBound !== 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['distanceAbsoluteErrorBound'],
-        message: 'EXACT_INTEGER snapshots must declare zero absolute error',
-      });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['distanceAbsoluteErrorBound'], message: 'EXACT_INTEGER snapshots must declare zero absolute error' });
     }
   }
 
   if (value.distanceExactness === 'AUTHORITATIVE_FLOAT') {
     if (value.distanceValueType !== 'FLOAT32_COST' && value.distanceValueType !== 'FLOAT64_COST') {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['distanceValueType'],
-        message: 'AUTHORITATIVE_FLOAT snapshots require FLOAT32_COST or FLOAT64_COST',
-      });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['distanceValueType'], message: 'AUTHORITATIVE_FLOAT snapshots require FLOAT32_COST or FLOAT64_COST' });
     }
     if (value.floatingErrorBoundCertified && value.distanceAbsoluteErrorBound === null) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['distanceAbsoluteErrorBound'],
-        message: 'certified floating snapshots require an absolute error bound',
-      });
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['distanceAbsoluteErrorBound'], message: 'certified floating snapshots require an absolute error bound' });
     }
   }
 });
