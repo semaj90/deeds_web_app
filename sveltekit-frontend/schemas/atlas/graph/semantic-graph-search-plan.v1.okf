@@ -1,0 +1,64 @@
+schema_id: atlas.semantic-graph-search-plan
+schema_version: 1
+schema_kind: graph_search_plan
+status: ACTIVE
+
+description: >
+  Parent Atlas production retrieval handoff from one canonical semantic lane to a
+  bounded relationship-graph traversal. latent_64/latent_128 are routing hints;
+  Qdrant or a hot CAGRA shard may produce semantic seeds; graph expansion then
+  operates on structural/n-ary relationships and does not cast another semantic vote.
+
+fields:
+  schema: { type: literal, value: atlas.semantic-graph-search-plan.v1 }
+  planId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  graphRevision: { type: string, required: true }
+  projectionRevision: { type: string, required: true }
+  semanticRepresentation: { type: literal, value: semantic_768 }
+  routingHints:
+    type: object
+    fields:
+      useLatent64: { type: boolean }
+      useLatent128: { type: boolean }
+      latent64Revision: { type: string, nullable: true }
+      latent128Revision: { type: string, nullable: true }
+      shardIds: { type: string_array, default: [] }
+      domainIds: { type: string_array, default: [] }
+  seedStage:
+    type: object
+    fields:
+      executor:
+        type: enum
+        values: [QDRANT, CAGRA_HOT_SHARD]
+      topK: { type: integer, minimum: 1 }
+      candidatePoolLimit: { type: integer, minimum: 1 }
+      semanticVoteCount: { type: literal, value: 1 }
+  graphStage:
+    type: object
+    fields:
+      strategy:
+        type: enum
+        values: [WEIGHTED_BEST_FIRST, BFS, SSSP, PERSONALIZED_PAGERANK]
+      maxDepth: { type: integer, minimum: 0 }
+      maxEdgesVisited: { type: integer, minimum: 0 }
+      maxFrontier: { type: integer, minimum: 1 }
+      maxHyperedges: { type: integer, minimum: 0 }
+      maxMembersPerHyperedge: { type: integer, minimum: 0 }
+      maxWallTimeMs: { type: integer, minimum: 1 }
+      maxGpuBytes: { type: integer, minimum: 0 }
+      allowedRelationTypes: { type: string_array, default: [] }
+  exactPromotionRequired: { type: literal, value: true }
+  checksum: { type: string, required: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - latent_64 and latent_128 are routing/topology hints and never evidence authority
+  - semantic_768 is the canonical semantic representation
+  - QDRANT and CAGRA_HOT_SHARD are mutually exclusive executors of one semantic seed stage
+  - graph traversal starts after semantic Top-K seeding and does not emit an additional semantic vote
+  - WEIGHTED_BEST_FIRST must not be labeled A* unless its heuristic is independently proven admissible for the optimized path cost
+  - all projected binary edges retain relation/hyperedge provenance sufficient to reconstruct canonical n-ary evidence
+  - exact promotion is mandatory before mutation-critical synthesis
