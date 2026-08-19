@@ -14,6 +14,12 @@ import {
   rebuildRepairAfterSemanticPromotion,
   type SemanticPromotionFeedbackResultV1,
 } from '../../src/lib/server/atlas/ranking/semantic-promotion-feedback.js';
+import {
+  buildMeasuredTangPolicyReceipt,
+  measureSearchPolicyMatrixDiagnostics,
+  type MeasuredMatrixDiagnosticsReceiptV1,
+  type MeasuredTangPolicyReceiptV1,
+} from '../../src/lib/server/atlas/ranking/measured-matrix-diagnostics.js';
 import { createTraceRepairEvidenceExecutor } from '../../src/lib/server/atlas/ranking/trace-repair-evidence-adapter.js';
 import { resolveSourceRevisionsFromPostgres } from '../../src/lib/server/atlas/identity/source-revision-resolver.js';
 import { runCanonicalRepairSemanticTournament } from '../../src/lib/server/atlas/retrieval/canonical-repair-semantic-tournament.js';
@@ -33,6 +39,8 @@ export type RepairEvidenceEvaluation = {
   result: AgenticRepairEvidenceGateResultV1;
   semanticTournament: RepairSemanticTournamentReceiptV1 | null;
   semanticPromotionFeedback: SemanticPromotionFeedbackResultV1 | null;
+  measuredMatrixDiagnostics: MeasuredMatrixDiagnosticsReceiptV1 | null;
+  measuredTangPolicy: MeasuredTangPolicyReceiptV1 | null;
   lineage: {
     workspaceRevision: string;
     sourceRevision: string;
@@ -182,7 +190,7 @@ function withCanonicalRevisionResolution(
 
 export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOptions) {
   const appRoot = path.resolve(options.appRoot);
-  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v4';
+  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v5';
   const traceUrl = new URL(options.traceMcpUrl ?? process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788/sse');
   let client: McpClient | null = null;
   let transport: StreamableHTTPClientTransport | null = null;
@@ -194,7 +202,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
     try {
       transport = new StreamableHTTPClientTransport(traceUrl);
       client = new McpClient(
-        { name: 'parent-atlas-repair-evidence', version: '4.0.0' },
+        { name: 'parent-atlas-repair-evidence', version: '5.0.0' },
         { capabilities: {} },
       );
       await client.connect(transport);
@@ -284,6 +292,9 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
 
     let semanticTournament: RepairSemanticTournamentReceiptV1 | null = null;
     let semanticPromotionFeedback: SemanticPromotionFeedbackResultV1 | null = null;
+    let measuredMatrixDiagnostics: MeasuredMatrixDiagnosticsReceiptV1 | null = null;
+    let measuredTangPolicy: MeasuredTangPolicyReceiptV1 | null = null;
+    let matrixDiagnosticsError: string | null = null;
     if ((options.enableSemanticTournament ?? true) && result.readiness.gate === 'READY') {
       semanticTournament = await runCanonicalRepairSemanticTournament({
         requestId: input.requestId,
@@ -304,6 +315,38 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
         semanticTournament,
         `${producerRevision}:semantic-promotion-feedback`,
       );
+
+      // Promotion changes the N×16 matrix, so diagnostics must be measured on the
+      // post-promotion bytes. The receipt checksum prevents stale SVD/rank data
+      // from being paired with a different feature snapshot.
+      try {
+        measuredMatrixDiagnostics = measureSearchPolicyMatrixDiagnostics(
+          semanticPromotionFeedback.featureMatrix,
+          {
+            requestId: input.requestId,
+            producerRevision: `${producerRevision}:matrix-diagnostics`,
+          },
+        );
+        measuredTangPolicy = buildMeasuredTangPolicyReceipt({
+          requestId: input.requestId,
+          matrix: semanticPromotionFeedback.featureMatrix,
+          diagnostics: measuredMatrixDiagnostics,
+          policy: {
+            maxEffectiveRankRatio: 0.35,
+            minRetainedEnergyPercent: 80,
+            maxConditionNumber: 1_000_000,
+            promotionCount: Math.min(
+              gateInput.searchBudget.exactPromotionTopK,
+              Math.max(1, semanticPromotionFeedback.featureMatrix.rows),
+            ),
+          },
+          producerRevision: `${producerRevision}:tang-policy`,
+        });
+      } catch (error) {
+        matrixDiagnosticsError = error instanceof Error ? error.message : String(error);
+        measuredMatrixDiagnostics = null;
+        measuredTangPolicy = null;
+      }
     }
 
     // Re-resolve source lineage for exact-evidence packets at the final execution
@@ -365,11 +408,25 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ...(semanticPromotionFeedback?.manifest.matrixDiagnosticsInvalidatedByPromotion
         ? ['SEMANTIC_PROMOTION_INVALIDATED_STALE_MATRIX_DIAGNOSTICS']
         : []),
+      ...(measuredMatrixDiagnostics
+        ? [
+            `POST_PROMOTION_NX16_DIAGNOSTICS_MEASURED:${measuredMatrixDiagnostics.numericalRank}/${measuredMatrixDiagnostics.columnCount}`,
+            `POST_PROMOTION_NX16_EFFECTIVE_RANK:${measuredMatrixDiagnostics.effectiveRank ?? 'null'}`,
+          ]
+        : [`POST_PROMOTION_NX16_DIAGNOSTICS_UNAVAILABLE:${matrixDiagnosticsError ?? 'not-run'}`]),
+      ...(measuredTangPolicy
+        ? [
+            `MEASURED_TANG_POLICY_${measuredTangPolicy.recommendation.status}`,
+            `MEASURED_TANG_QUALIFIED:${measuredTangPolicy.qualified}`,
+            ...measuredTangPolicy.qualificationReasonCodes,
+          ]
+        : ['MEASURED_TANG_POLICY_UNAVAILABLE']),
       'SOURCE_REVISION_FROM_CANONICAL_POSTGRES_METADATA',
       'REQUEST_REVISION_IS_CONSTRAINT_NOT_EVIDENCE_PROVENANCE',
       'CONTENT_HASH_NEVER_SUBSTITUTES_FOR_SOURCE_REVISION',
       'SEMANTIC_EXACT_DISTANCE_IS_OBSERVATION_NOT_SIMILARITY',
       'SEMANTIC_PROMOTION_DOES_NOT_CREATE_SOURCE_EXACT_EVIDENCE',
+      'TANG_SELECTION_REMAINS_STOCHASTIC_EXECUTION_REQUIRED',
       'EVIDENCE_NEVER_AUTHORIZES_MUTATION',
     ];
 
@@ -377,6 +434,8 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       result,
       semanticTournament,
       semanticPromotionFeedback,
+      measuredMatrixDiagnostics,
+      measuredTangPolicy,
       lineage: {
         workspaceRevision: observedWorkspaceRevision,
         sourceRevision: observedSourceRevision,
