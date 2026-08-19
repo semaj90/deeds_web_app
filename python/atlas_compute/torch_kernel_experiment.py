@@ -1,14 +1,14 @@
 """PyTorch/Triton execution experiment for Parent Atlas tensor primitives.
 
-The experiment compares one intentionally simple elementwise primitive across:
+Compares one intentionally simple elementwise primitive across:
 - PyTorch eager reference
 - torch.compile/Inductor
 - raw Triton JIT when Triton/CUDA are available
 - torch.library.triton_op when available
 
-This is an execution/backend experiment, not a new semantic algorithm. Every
-challenger is compared numerically to the eager FP32 result and emits an explicit
-receipt identifying the compilation path. No result owns canonical truth.
+Callers may supply a frozen FP32 tensor snapshot. Every challenger consumes the
+same bytes and is compared numerically to the eager result. This experiment is
+backend evidence only and never canonical application truth.
 """
 
 from __future__ import annotations
@@ -22,14 +22,12 @@ import numpy as np
 
 from .determinism import configure_torch_determinism
 
-
 BackendName = Literal[
     "pytorch_eager",
     "torch_compile_inductor",
     "triton_jit",
     "torch_library_triton_op",
 ]
-
 
 @dataclass(frozen=True)
 class KernelBackendMeasurement:
@@ -43,14 +41,14 @@ class KernelBackendMeasurement:
     output_checksum: str | None
     detail: str | None
 
-
 @dataclass(frozen=True)
 class TorchKernelExperimentReceipt:
     schema: str
     operation: str
     shape: list[int]
     dtype: str
-    dynamic_shapes_requested: bool
+    shape_policy: str
+    source_tensor_checksum: str
     input_checksum: str
     reference_checksum: str
     measurements: list[KernelBackendMeasurement]
@@ -59,11 +57,11 @@ class TorchKernelExperimentReceipt:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+def _numpy_checksum(values: np.ndarray) -> str:
+    return hashlib.sha256(np.ascontiguousarray(values, dtype=np.float32).tobytes()).hexdigest()
 
 def _checksum(tensor: Any) -> str:
-    values = np.ascontiguousarray(tensor.detach().cpu().float().numpy())
-    return hashlib.sha256(values.tobytes()).hexdigest()
-
+    return _numpy_checksum(tensor.detach().cpu().float().numpy())
 
 def _measure(callable_obj: Any, x: Any, y: Any, *, warmup: int = 5, repeat: int = 20) -> tuple[Any, float, float]:
     import torch
@@ -89,7 +87,6 @@ def _measure(callable_obj: Any, x: Any, y: Any, *, warmup: int = 5, repeat: int 
     steady_ms = ((time.perf_counter() - start) * 1000.0) / repeat
     return last, first_ms, steady_ms
 
-
 def _parity(reference: Any, challenger: Any) -> tuple[bool, float, float]:
     import torch
 
@@ -97,7 +94,6 @@ def _parity(reference: Any, challenger: Any) -> tuple[bool, float, float]:
     max_error = float(delta.max().detach().cpu())
     mean_error = float(delta.mean().detach().cpu())
     return bool(torch.allclose(reference.float(), challenger.float(), rtol=1e-5, atol=1e-6)), max_error, mean_error
-
 
 def _raw_triton_add_scale(scale: float):
     import triton
@@ -121,7 +117,6 @@ def _raw_triton_add_scale(scale: float):
         return out
 
     return call
-
 
 def _triton_op_add_scale(scale: float):
     import torch
@@ -149,24 +144,39 @@ def _triton_op_add_scale(scale: float):
 
     return operation
 
-
 def run_torch_kernel_experiment(
     *,
+    input_matrix: np.ndarray | None = None,
     rows: int = 1024,
     cols: int = 768,
     scale: float = 0.5,
     device: str | None = None,
-    dynamic_shapes: bool = True,
+    compile_dynamic: bool | None = None,
     seed: int = 0xA71A5,
 ) -> TorchKernelExperimentReceipt:
     import torch
 
     configure_torch_determinism(seed=seed, matmul_mode="ieee")
     selected_device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-    generator = torch.Generator(device=selected_device)
-    generator.manual_seed(seed)
-    x = torch.randn((rows, cols), generator=generator, device=selected_device, dtype=torch.float32)
-    y = torch.randn((rows, cols), generator=generator, device=selected_device, dtype=torch.float32)
+
+    if input_matrix is None:
+        generator = torch.Generator(device=selected_device)
+        generator.manual_seed(seed)
+        x = torch.randn((rows, cols), generator=generator, device=selected_device, dtype=torch.float32)
+        source_checksum = _checksum(x)
+    else:
+        values = np.asarray(input_matrix, dtype=np.float32)
+        if values.ndim != 2:
+            raise ValueError(f"input_matrix must be rank-2; got shape={values.shape}")
+        if not np.isfinite(values).all():
+            raise ValueError("input_matrix contains non-finite values")
+        x = torch.from_numpy(np.ascontiguousarray(values)).to(selected_device)
+        rows, cols = values.shape
+        source_checksum = _numpy_checksum(values)
+
+    # Derive the companion tensor deterministically from the same frozen input
+    # instead of introducing a second random data source.
+    y = torch.flip(x, dims=[-1]).contiguous()
 
     def eager(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
         return a + b * scale
@@ -181,11 +191,11 @@ def run_torch_kernel_experiment(
         first_call_ms=first_ms,
         steady_state_ms=steady_ms,
         output_checksum=_checksum(reference),
-        detail=None,
+        detail="frozen-input reference" if input_matrix is not None else "generated fixture reference",
     )]
 
     try:
-        compiled = torch.compile(eager, backend="inductor", dynamic=dynamic_shapes)
+        compiled = torch.compile(eager, backend="inductor", dynamic=compile_dynamic)
         output, compiled_first, compiled_steady = _measure(compiled, x, y)
         passed, max_error, mean_error = _parity(reference, output)
         measurements.append(KernelBackendMeasurement(
@@ -197,7 +207,7 @@ def run_torch_kernel_experiment(
             first_call_ms=compiled_first,
             steady_state_ms=compiled_steady,
             output_checksum=_checksum(output),
-            detail="dynamic=True" if dynamic_shapes else "dynamic=False",
+            detail=f"dynamic={compile_dynamic!r}",
         ))
     except Exception as exc:
         measurements.append(KernelBackendMeasurement(
@@ -226,7 +236,7 @@ def run_torch_kernel_experiment(
 
         try:
             triton_op = _triton_op_add_scale(scale)
-            compiled_triton_op = torch.compile(triton_op, backend="inductor", dynamic=dynamic_shapes)
+            compiled_triton_op = torch.compile(triton_op, backend="inductor", dynamic=compile_dynamic)
             output, op_first, op_steady = _measure(compiled_triton_op, x, y)
             passed, max_error, mean_error = _parity(reference, output)
             measurements.append(KernelBackendMeasurement(
@@ -246,11 +256,12 @@ def run_torch_kernel_experiment(
     input_digest.update(np.ascontiguousarray(x.detach().cpu().numpy()).tobytes())
     input_digest.update(np.ascontiguousarray(y.detach().cpu().numpy()).tobytes())
     return TorchKernelExperimentReceipt(
-        schema="atlas.torch-kernel-experiment-receipt.v1",
+        schema="atlas.torch-kernel-experiment-receipt.v2",
         operation="add_scale",
         shape=[rows, cols],
         dtype="float32",
-        dynamic_shapes_requested=dynamic_shapes,
+        shape_policy="automatic" if compile_dynamic is None else ("forced_dynamic" if compile_dynamic else "forced_static"),
+        source_tensor_checksum=source_checksum,
         input_checksum=input_digest.hexdigest(),
         reference_checksum=_checksum(reference),
         measurements=measurements,
