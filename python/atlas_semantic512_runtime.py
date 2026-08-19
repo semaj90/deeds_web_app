@@ -4,8 +4,9 @@ Roles are intentionally separate:
 - semantic_512 + cuVS brute_force(metric='cosine') = exact semantic oracle.
 - latent_64 + cuML KMeans = routing/partition metadata only.
 
-Neither executor owns packet identity, tree_node_id, feature_label, or graph truth.
-All returned rows preserve the caller's revision-qualified identity manifest.
+Neither executor owns packet identity, tree_node_id, feature_label, graph truth,
+or source freshness. Rows preserve packet_key plus source_ref, representation
+lineage, and source-version/reconciliation receipt IDs when available.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ import time
 from typing import Any, Callable
 
 from fastapi import APIRouter, FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 try:
     import cupy as cp
@@ -42,8 +43,8 @@ SEMANTIC_DIM = 512
 LATENT_DIM = 64
 SEMANTIC_REPRESENTATION = "semantic_512"
 LATENT_REPRESENTATION = "latent_64"
-SEMANTIC_ALGORITHM_REVISION = "atlas.cuvs-exact-cosine.semantic512.v1"
-KMEANS_ALGORITHM_REVISION = "atlas.cuml-kmeans.latent64.v1"
+SEMANTIC_ALGORITHM_REVISION = "atlas.cuvs-exact-cosine.semantic512.v2-lineage"
+KMEANS_ALGORITHM_REVISION = "atlas.cuml-kmeans.latent64.v2-lineage"
 MAX_CORPUS_ROWS = int(os.getenv("ATLAS_SEMANTIC512_MAX_CORPUS_ROWS", "25000"))
 MAX_TOP_K = int(os.getenv("ATLAS_SEMANTIC512_MAX_TOPK", "512"))
 MAX_KMEANS_ROWS = int(os.getenv("ATLAS_LATENT64_KMEANS_MAX_ROWS", "250000"))
@@ -53,7 +54,13 @@ MIN_FREE_GPU_MB = float(os.getenv("ATLAS_SEMANTIC512_MIN_FREE_GPU_MB", "384"))
 
 class IdentityRow(BaseModel):
     packetKey: str
-    sourceRevision: str
+    sourceRef: str | None = None
+    sourceRevision: str | None = None  # legacy/optional; never fabricated
+    sourceVersionReceiptId: str | None = None
+    reconciliationReceiptId: str | None = None
+    workspaceRevision: int | None = None
+    representationRevision: int | str | None = None
+    sourceRepresentationId: str | None = None
     symbolVersionId: str | None = None
     treeNodeId: str | None = None
     featureLabel: str | None = None
@@ -84,6 +91,7 @@ class Latent64KMeansRequest(BaseModel):
     rows: list[Latent64Row]
     sourceRepresentationId: str = SEMANTIC_REPRESENTATION
     autoencoderRevision: str
+    reconciliationReceiptId: str | None = None
     nClusters: int
     randomState: int = 42
     maxIter: int = 300
@@ -117,23 +125,31 @@ def _l2_normalized(values: list[float], dim: int, label: str) -> list[float]:
 
 
 def _validate_identity(rows: list[IdentityRow], label: str) -> None:
-    seen: set[tuple[str, str]] = set()
+    seen: set[str] = set()
     for index, row in enumerate(rows):
-        if not row.packetKey.strip():
+        packet_key = row.packetKey.strip()
+        if not packet_key:
             raise ValueError(f"{label}[{index}] missing packetKey")
-        if not row.sourceRevision.strip():
-            raise ValueError(f"{label}[{index}] missing sourceRevision")
-        identity = (row.packetKey, row.sourceRevision)
-        if identity in seen:
-            raise ValueError(f"duplicate {label} identity {identity}")
-        seen.add(identity)
+        if packet_key in seen:
+            raise ValueError(f"duplicate {label} packetKey {packet_key}")
+        seen.add(packet_key)
+        if row.sourceRepresentationId not in (None, SEMANTIC_REPRESENTATION):
+            raise ValueError(
+                f"{label}[{index}] sourceRepresentationId={row.sourceRepresentationId} != {SEMANTIC_REPRESENTATION}"
+            )
 
 
 def _manifest_checksum(rows: list[IdentityRow]) -> str:
     payload = [
         {
             "packetKey": row.packetKey,
+            "sourceRef": row.sourceRef,
             "sourceRevision": row.sourceRevision,
+            "sourceVersionReceiptId": row.sourceVersionReceiptId,
+            "reconciliationReceiptId": row.reconciliationReceiptId,
+            "workspaceRevision": row.workspaceRevision,
+            "representationRevision": row.representationRevision,
+            "sourceRepresentationId": row.sourceRepresentationId,
             "symbolVersionId": row.symbolVersionId,
             "treeNodeId": row.treeNodeId,
             "featureLabel": row.featureLabel,
@@ -141,6 +157,22 @@ def _manifest_checksum(rows: list[IdentityRow]) -> str:
         for row in rows
     ]
     return hashlib.sha256(json.dumps(payload, separators=(",", ":"), sort_keys=True).encode()).hexdigest()
+
+
+def _identity_json(row: IdentityRow) -> dict[str, Any]:
+    return {
+        "packetKey": row.packetKey,
+        "sourceRef": row.sourceRef,
+        "sourceRevision": row.sourceRevision,
+        "sourceVersionReceiptId": row.sourceVersionReceiptId,
+        "reconciliationReceiptId": row.reconciliationReceiptId,
+        "workspaceRevision": row.workspaceRevision,
+        "representationRevision": row.representationRevision,
+        "sourceRepresentationId": row.sourceRepresentationId,
+        "symbolVersionId": row.symbolVersionId,
+        "treeNodeId": row.treeNodeId,
+        "featureLabel": row.featureLabel,
+    }
 
 
 def _device_row(array: Any) -> list[Any]:
@@ -174,9 +206,6 @@ def exact_semantic512(req: ExactSemantic512Request) -> dict[str, Any]:
     started = time.perf_counter()
     query_arr = cp.asarray([query], dtype=cp.float32)
     corpus_arr = cp.asarray(corpus, dtype=cp.float32)
-    # Explicit metric is mandatory: cuVS brute_force defaults to squared
-    # Euclidean, which is useful for a mechanics smoke test but is not the
-    # Parent Atlas semantic cosine contract.
     index = brute_force.build(corpus_arr, metric="cosine")
     distances, neighbors = brute_force.search(index, query_arr, k=req.topK)
     duration_ms = (time.perf_counter() - started) * 1000
@@ -193,18 +222,14 @@ def exact_semantic512(req: ExactSemantic512Request) -> dict[str, Any]:
             {
                 "rank": rank,
                 "rowIndex": int(row_index),
-                "packetKey": row.packetKey,
-                "sourceRevision": row.sourceRevision,
-                "symbolVersionId": row.symbolVersionId,
-                "treeNodeId": row.treeNodeId,
-                "featureLabel": row.featureLabel,
+                **_identity_json(row),
                 "cosineDistance": distance_value,
                 "cosineSimilarity": 1.0 - distance_value,
             }
         )
 
     return {
-        "schema": "atlas.semantic512-exact-knn-receipt.v1",
+        "schema": "atlas.semantic512-exact-knn-receipt.v2",
         "operation": "knn.exact",
         "backend": "cuvs.neighbors.brute_force",
         "metric": "cosine",
@@ -214,6 +239,8 @@ def exact_semantic512(req: ExactSemantic512Request) -> dict[str, Any]:
         "dimension": SEMANTIC_DIM,
         "corpusRows": len(req.corpus),
         "topK": req.topK,
+        "identityRequirement": "packet_key",
+        "sourceFreshnessAuthority": "external-mutation/source-version-receipt",
         "identityManifestChecksum": _manifest_checksum(req.corpus),
         "durationMs": round(duration_ms, 3),
         "results": results,
@@ -242,6 +269,10 @@ def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
     except ValueError as exc:
         _fail("LATENT64_INVALID", str(exc))
 
+    receipt_ids = {row.reconciliationReceiptId for row in req.rows if row.reconciliationReceiptId}
+    if req.reconciliationReceiptId and receipt_ids and receipt_ids != {req.reconciliationReceiptId}:
+        _fail("RECONCILIATION_RECEIPT_MISMATCH", "latent rows mix reconciliation receipts")
+
     matrix = cp.asarray(vectors, dtype=cp.float32)
     started = time.perf_counter()
     model = KMeans(
@@ -260,18 +291,14 @@ def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
 
     assignments = [
         {
-            "packetKey": row.packetKey,
-            "sourceRevision": row.sourceRevision,
-            "symbolVersionId": row.symbolVersionId,
-            "treeNodeId": row.treeNodeId,
-            "featureLabel": row.featureLabel,
+            **_identity_json(row),
             "clusterId": int(labels_host[index]),
         }
         for index, row in enumerate(req.rows)
     ]
 
     return {
-        "schema": "atlas.latent64-kmeans-receipt.v1",
+        "schema": "atlas.latent64-kmeans-receipt.v2",
         "operation": "routing.kmeans",
         "backend": "cuml.cluster.KMeans",
         "algorithmRevision": KMEANS_ALGORITHM_REVISION,
@@ -279,6 +306,7 @@ def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
         "sourceRepresentationId": SEMANTIC_REPRESENTATION,
         "latentRepresentationId": LATENT_REPRESENTATION,
         "autoencoderRevision": req.autoencoderRevision,
+        "reconciliationReceiptId": req.reconciliationReceiptId,
         "dimension": LATENT_DIM,
         "rowCount": len(req.rows),
         "nClusters": req.nClusters,
@@ -294,13 +322,6 @@ def cluster_latent64(req: Latent64KMeansRequest) -> dict[str, Any]:
 
 
 def routed_topk(req: RoutedTopKRequest) -> dict[str, Any]:
-    """Evaluate one-cluster routing against the full semantic_512 exact oracle.
-
-    This is deliberately an evaluation/promotion gate. The routed result is
-    exact cosine inside the selected subset, but the receipt also computes
-    recall against the full-corpus exact top-K so a bad clustering policy cannot
-    silently become the online semantic authority.
-    """
     _validate_identity(req.corpus, "corpus")
     _validate_identity(req.corpusLatent64, "corpusLatent64")
     if len(req.corpus) != len(req.corpusLatent64):
@@ -310,34 +331,23 @@ def routed_topk(req: RoutedTopKRequest) -> dict[str, Any]:
     if set(semantic_by_key) != latent_keys:
         _fail("ROUTING_IDENTITY_MISMATCH", "semantic and latent packet_key sets differ")
 
-    full = exact_semantic512(
-        ExactSemantic512Request(query=req.query, corpus=req.corpus, topK=req.topK)
-    )
-    routed_rows = [
-        row
-        for row in req.corpus
-        if req.clusterAssignments.get(row.packetKey) == req.queryClusterId
-    ]
+    full = exact_semantic512(ExactSemantic512Request(query=req.query, corpus=req.corpus, topK=req.topK))
+    routed_rows = [row for row in req.corpus if req.clusterAssignments.get(row.packetKey) == req.queryClusterId]
     if len(routed_rows) < min(req.minRouteCandidates, len(req.corpus)):
-        # Fail open to full exact corpus when the route is too narrow.
         routed_rows = req.corpus
         route_fallback = True
     else:
         route_fallback = False
 
     routed = exact_semantic512(
-        ExactSemantic512Request(
-            query=req.query,
-            corpus=routed_rows,
-            topK=min(req.topK, len(routed_rows)),
-        )
+        ExactSemantic512Request(query=req.query, corpus=routed_rows, topK=min(req.topK, len(routed_rows)))
     )
     full_keys = {row["packetKey"] for row in full["results"]}
     routed_keys = {row["packetKey"] for row in routed["results"]}
     recall = len(full_keys & routed_keys) / max(1, len(full_keys))
 
     return {
-        "schema": "atlas.semantic512-routed-topk-receipt.v1",
+        "schema": "atlas.semantic512-routed-topk-receipt.v2",
         "sourceRepresentationId": SEMANTIC_REPRESENTATION,
         "routingRepresentationId": LATENT_REPRESENTATION,
         "queryClusterId": req.queryClusterId,
@@ -376,6 +386,8 @@ def install_semantic512_routes(
             "semanticDimension": SEMANTIC_DIM,
             "latentRepresentationId": LATENT_REPRESENTATION,
             "latentDimension": LATENT_DIM,
+            "identityRequirement": "packet_key",
+            "sourceFreshnessAuthority": "external-mutation/source-version-receipt",
             "knnExact": {"available": _CUVS_ERROR is None, "metric": "cosine", "error": _CUVS_ERROR},
             "kmeans": {"available": _CUML_ERROR is None, "randomStateRequiredForParity": True, "error": _CUML_ERROR},
             "maxCorpusRows": MAX_CORPUS_ROWS,
@@ -383,6 +395,7 @@ def install_semantic512_routes(
         }
 
     @router.post("/knn/exact")
+    @router.post("/knn/exact-v2")
     def semantic512_knn_exact(req: ExactSemantic512Request) -> dict[str, Any]:
         _guard_memory()
         return exact_semantic512(req)
