@@ -13,12 +13,16 @@ function payload(): AtlasQdrantSemanticPayloadV1 {
     packet_key: 'packet-1',
     symbol_version_id: 'symbol-v1',
     tree_node_id: 'tree-1',
+    feature_id: 'feature-1',
+    feature_label: 'retrieval.function',
     snapshot_id: 'snapshot-339',
     workspace_revision: '742',
     source_revision: '17',
-    representation_id: 'semantic_768',
+    representation_id: 'semantic_512',
     representation_revision: 109,
-    projection_revision: 'qdrant-semantic-339',
+    native_model_dimension: 768,
+    projection_method: 'embeddinggemma-mrl-prefix-renorm',
+    projection_revision: 'qdrant-semantic-512-r1',
     source_ref: 'src/lib/example.ts',
     language: 'typescript',
     node_type: 'function_declaration',
@@ -26,15 +30,19 @@ function payload(): AtlasQdrantSemanticPayloadV1 {
     domain: 'parent-atlas',
     graph_component: 'component-7',
     community: 'community-12',
+    kmeans_cluster_id: 4,
   };
 }
 
-describe('Qdrant semantic projection', () => {
-  it('keeps packet identity and snapshot identity explicit', () => {
+describe('Qdrant semantic_512 projection', () => {
+  it('keeps persisted 512 representation and native model dimension separate', () => {
     const projection = buildQdrantSemanticProjectionV1(payload(), 'cold');
-    expect(projection.collection).toBe('codebase_chunks_768_v2');
-    expect(projection.vectorName).toBe('content');
-    expect(projection.dimension).toBe(768);
+    expect(projection.collection).toBe('codebase_chunks_512');
+    expect(projection.vectorName).toBeNull();
+    expect(projection.representationId).toBe('semantic_512');
+    expect(projection.dimension).toBe(512);
+    expect(projection.nativeModelDimension).toBe(768);
+    expect(projection.projectionMethod).toBe('embeddinggemma-mrl-prefix-renorm');
     expect(projection.payload.packet_key).toBe('packet-1');
     expect(projection.payload.canonical_id).toBe('snapshot-339:packet-1');
     expect(projection.vectorStorage).toBe('on-disk');
@@ -43,6 +51,11 @@ describe('Qdrant semantic projection', () => {
   it('rejects a projection that fabricates a different canonical id', () => {
     const bad = { ...payload(), canonical_id: 'wrong-id' };
     expect(() => buildQdrantSemanticProjectionV1(bad)).toThrow(/CANONICAL_ID_MISMATCH/);
+  });
+
+  it('rejects a representation that is not semantic_512', () => {
+    const bad = { ...payload(), representation_id: 'semantic_768' as any };
+    expect(() => buildQdrantSemanticProjectionV1(bad)).toThrow(/REPRESENTATION_MISMATCH/);
   });
 
   it('keeps BM42 explicitly non-authoritative', () => {
