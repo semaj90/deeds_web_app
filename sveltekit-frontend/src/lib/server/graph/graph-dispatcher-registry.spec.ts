@@ -9,7 +9,6 @@ import {
 describe('graph dispatcher registry', () => {
 	it('covers every graph algorithm exactly once', () => {
 		const snapshot = buildGraphDispatcherRegistrySnapshot();
-
 		expect(snapshot.completeness.exactMatch).toBe(true);
 		expect(snapshot.completeness.missing).toEqual([]);
 		expect(snapshot.completeness.extra).toEqual([]);
@@ -17,12 +16,11 @@ describe('graph dispatcher registry', () => {
 		expect(snapshot.entries.map((entry) => entry.algorithm)).toEqual(GraphAlgorithmSchema.options);
 	});
 
-	it('returns a stable fail-closed entry for personalized_pagerank', () => {
+	it('routes personalized_pagerank through the PageRank adapter', () => {
 		const entry = getGraphDispatcherRegistryEntry('personalized_pagerank');
-
-		expect(entry.dispatchKind).toBe('fail-closed');
-		expect(entry.proofState).toBe('skipped');
-		expect(entry.skipReason).toContain('fail closed');
+		expect(entry.dispatchKind).toBe('pagerank-adapter');
+		expect(entry.proofState).toBe('wired');
+		expect(entry.algorithmRevision).toBe('neo4j-gds-personalized-pagerank-mutate-v1');
 	});
 
 	it('is replayable as a pure registry list', () => {
