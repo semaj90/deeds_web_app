@@ -1,0 +1,82 @@
+schema_id: atlas.execution-learning-record
+schema_version: 1
+schema_kind: learning_record
+status: ACTIVE
+
+description: >
+  Immutable learning/evaluation projection derived from a validated Parent Atlas
+  execution receipt. This record is evidence for offline SFT/QLoRA, preference,
+  reward-model, or RL datasets; it is never itself an execution truth owner.
+
+fields:
+  schema: { type: literal, value: atlas.execution-learning-record.v1 }
+  recordId: { type: string, required: true }
+  receiptId: { type: string, required: true }
+  runId: { type: string, required: true }
+  taskId: { type: string, required: true }
+  attempt: { type: integer, minimum: 0 }
+  workspaceRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  featureRevision: { type: string, nullable: true }
+  representationRevision: { type: string, nullable: true }
+  taskFamily: { type: string, required: true }
+  errorClass: { type: string, nullable: true }
+  sourceRefs: { type: string_array, default: [] }
+  packetKeys: { type: string_array, default: [] }
+  evidenceRefs: { type: string_array, default: [] }
+  mutationRefs: { type: string_array, default: [] }
+  validationRefs: { type: string_array, default: [] }
+  toolCallRefs: { type: string_array, default: [] }
+  modelRoute:
+    type: object
+    nullable: true
+    fields:
+      baseModelRevision: { type: string, nullable: true }
+      adapterRevision: { type: string, nullable: true }
+      tokenizerRevision: { type: string, nullable: true }
+      promptTemplateRevision: { type: string, nullable: true }
+      policyRevision: { type: string, nullable: true }
+  outcome:
+    type: enum
+    values: [SUCCESS, FAILED, BLOCKED, PARTIAL, REJECTED]
+  verifier:
+    type: object
+    fields:
+      schemaValid: { type: boolean }
+      provenanceValid: { type: boolean }
+      identityStable: { type: boolean }
+      executableValidationPassed: { type: boolean }
+      replayStable: { type: boolean }
+  costs:
+    type: object
+    fields:
+      latencyMs: { type: number, minimum: 0, nullable: true }
+      promptTokens: { type: integer, minimum: 0, nullable: true }
+      generatedTokens: { type: integer, minimum: 0, nullable: true }
+      peakGpuBytes: { type: integer, minimum: 0, nullable: true }
+      peakHostBytes: { type: integer, minimum: 0, nullable: true }
+      toolCalls: { type: integer, minimum: 0, nullable: true }
+  eligibility:
+    type: object
+    fields:
+      sftPositive: { type: boolean }
+      preference: { type: boolean }
+      rewardModel: { type: boolean }
+      reinforcementLearning: { type: boolean }
+      reasons: { type: string_array, default: [] }
+  privacy:
+    type: object
+    fields:
+      secretsRedacted: { type: boolean }
+      privateRuntimeMaterialRemoved: { type: boolean }
+      eligibleForOfflineTraining: { type: boolean }
+  emittedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - sftPositive requires outcome=SUCCESS and executableValidationPassed=true
+  - FAILED, BLOCKED, PARTIAL, and REJECTED records may be preference/reward/RL evidence but never positive SFT examples
+  - source/evidence identity is revision-qualified; stale evidence cannot be silently relabeled
+  - secretsRedacted and privateRuntimeMaterialRemoved must be true before eligibleForOfflineTraining can be true
+  - Kanban completion alone is never sufficient evidence for a positive training label
