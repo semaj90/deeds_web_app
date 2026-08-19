@@ -14,7 +14,9 @@ import { GraphProjectionManifestV3Schema } from './graph-projection-manifest.js'
  * same graph semantics without duplicating the 162k-node edge list in JSON.
  */
 function snapshotContentHash(input: {
+	projectionRevision: string;
 	projectionHash: string;
+	projectionName: string;
 	graphRevision: string;
 	nodeTableHash: string;
 	edgeTableHash: string;
@@ -23,7 +25,9 @@ function snapshotContentHash(input: {
 }): string {
 	return createHash('sha256')
 		.update(JSON.stringify({
+			projectionRevision: input.projectionRevision,
 			projectionHash: input.projectionHash,
+			projectionName: input.projectionName,
 			graphRevision: input.graphRevision,
 			nodeTableHash: input.nodeTableHash,
 			edgeTableHash: input.edgeTableHash,
@@ -80,7 +84,9 @@ export const GraphProjectionSnapshotV1Schema = z
 		}
 
 		const expectedHash = snapshotContentHash({
+			projectionRevision: snapshot.projection.projectionRevision,
 			projectionHash: snapshot.projection.projectionHash,
+			projectionName: snapshot.projection.projectionName,
 			graphRevision: snapshot.parityManifest.graphRevision,
 			nodeTableHash: snapshot.parityManifest.nodeTableHash,
 			edgeTableHash: snapshot.parityManifest.edgeTableHash,
@@ -98,7 +104,9 @@ export const GraphProjectionSnapshotV1Schema = z
 export type GraphProjectionSnapshotV1 = z.infer<typeof GraphProjectionSnapshotV1Schema>;
 
 export function computeGraphProjectionSnapshotHashV1(input: {
+	projectionRevision: string;
 	projectionHash: string;
+	projectionName: string;
 	graphRevision: string;
 	nodeTableHash: string;
 	edgeTableHash: string;
