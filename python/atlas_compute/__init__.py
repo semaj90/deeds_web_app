@@ -23,6 +23,12 @@ from .rapids_matrix import (
     run_cuvs_pca,
 )
 from .representation_compare import RepresentationComparisonReceipt, compare_representations
+from .semantic_snapshot_freeze import (
+    FrozenSemanticRow,
+    FrozenSemanticSnapshotReceipt,
+    freeze_semantic_snapshot,
+    load_and_verify_frozen_snapshot,
+)
 from .spectral import SpectralReceipt, symmetric_eigenspace
 from .torch_kernel_experiment import TorchKernelExperimentReceipt, run_torch_kernel_experiment
 
@@ -59,6 +65,10 @@ __all__ = [
     "run_cuvs_pca",
     "RepresentationComparisonReceipt",
     "compare_representations",
+    "FrozenSemanticRow",
+    "FrozenSemanticSnapshotReceipt",
+    "freeze_semantic_snapshot",
+    "load_and_verify_frozen_snapshot",
     "SpectralReceipt",
     "symmetric_eigenspace",
     "TorchKernelExperimentReceipt",
