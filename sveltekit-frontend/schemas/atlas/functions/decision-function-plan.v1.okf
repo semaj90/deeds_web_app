@@ -1,0 +1,65 @@
+schema_id: atlas.decision-function-plan
+schema_version: 1
+schema_kind: compute_function_plan
+status: ACTIVE
+
+description: >
+  Separates model family, training objective, output/attention decision function,
+  and execution backend. Softmax alternatives are never conflated with PEFT/DPO/PPO
+  or with XGBoost/logistic-regression model ownership.
+
+fields:
+  schema: { type: literal, value: atlas.decision-function-plan.v1 }
+  planId: { type: string, required: true }
+  purpose:
+    type: enum
+    values: [CLASSIFICATION, MULTILABEL_CLASSIFICATION, ATTENTION, RANKING, POLICY_SELECTION, REWARD_MODEL, VISUALIZATION]
+  modelFamily:
+    type: enum
+    values: [NONE, PYTORCH, XGBOOST, LOGISTIC_REGRESSION, SVM, ORDINAL_REGRESSION, TRANSFORMER]
+  trainingObjective:
+    type: enum
+    values: [NONE, SFT, PEFT, DPO, PPO, REWARD_MODELING]
+  decisionFunction:
+    type: enum
+    values: [IDENTITY, ARGMAX, TOPK, SOFTMAX, LOG_SOFTMAX, SIGMOID, SPARSEMAX, SQUAREMAX, POLYNOMIAL, MIXTURE_OF_SOFTMAXES, LINEAR_ATTENTION]
+  semantics:
+    type: enum
+    values: [INDEX_SELECTION, SCORE_ONLY, CATEGORICAL_SIMPLEX, INDEPENDENT_PROBABILITIES, SPARSE_SIMPLEX, ATTENTION_WEIGHTS, EXPERIMENTAL_APPROXIMATION]
+  executor:
+    type: enum
+    values: [typescript_cpu, pytorch_cpu, pytorch_cuda, libtorch_cpu, libtorch_cuda, cublaslt, tensorrt_rtx, triton, webgpu, xgboost_cpu, xgboost_cuda]
+  dtype:
+    type: enum
+    values: [FP32, TF32, BF16, FP16, INT8]
+  axis: { type: integer, nullable: true }
+  topK: { type: integer, minimum: 1, nullable: true }
+  inputRange:
+    type: object
+    nullable: true
+    fields:
+      min: { type: number, required: true }
+      max: { type: number, required: true }
+  outputRange:
+    type: object
+    nullable: true
+    fields:
+      min: { type: number, required: true }
+      max: { type: number, required: true }
+  requiresRetraining: { type: boolean }
+  qualityReceiptId: { type: string, nullable: true }
+  environmentReceiptId: { type: string, nullable: true }
+  gpuLeaseId: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - PEFT, DPO and PPO are training objectives and MUST NOT be encoded as decisionFunction values
+  - XGBoost CPU and CUDA are executors of one model family, not separate classifier votes
+  - SIGMOID is the default probability mapping for independent multi-label outputs
+  - ARGMAX/TOPK select indices and do not claim calibrated probabilities
+  - SPARSEMAX is a sparse-simplex challenger and requires parity/quality evaluation before replacing SOFTMAX
+  - SQUAREMAX and POLYNOMIAL are experimental approximations and require requiresRetraining=true plus qualityReceiptId before production use
+  - pretrained TRANSFORMER attention defaults to SOFTMAX unless a model-specific quality/training receipt proves another normalization
+  - TensorRT/TensorRT-RTX built-ins may execute SOFTMAX, SIGMOID and TOPK; unsupported custom functions require an explicit plugin/composition receipt
+  - WebGPU is a browser executor/visualization lane, not canonical model or retrieval truth
