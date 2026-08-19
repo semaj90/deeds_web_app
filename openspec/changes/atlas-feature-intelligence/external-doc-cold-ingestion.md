@@ -1,6 +1,6 @@
 # External docs cold-ingestion proof ladder
 
-Status vocabulary: `DONE`, `WRITTEN_UNPROVEN`, `PENDING`, `BLOCKED`.
+Status vocabulary: `DONE`, `WRITTEN_UNPROVEN`, `IMPLEMENTED_UNPROVEN`, `PENDING`, `BLOCKED`.
 
 ## Ownership
 
@@ -20,19 +20,19 @@ EDC-1  SeaweedFS artifact/citation/hydration contracts    WRITTEN_UNPROVEN
 EDC-2  content-addressed upload + checksum hydration       WRITTEN_UNPROVEN
 EDC-3  SvelteKit SeaweedFS runtime adapter                 WRITTEN_UNPROVEN
 EDC-4  Firecrawl v2 multi-format capture                   WRITTEN_UNPROVEN
-EDC-5  Qdrant capability + shadow collection proof         WRITTEN_UNPROVEN
+EDC-5  Qdrant capability + shadow collection proof         IMPLEMENTED_UNPROVEN
 EDC-6  current-corpus shadow population                    PENDING
-EDC-7  dense exact/top-k proof receipt                     WRITTEN_UNPROVEN
-EDC-8  BM25 retrieval proof receipt                        WRITTEN_UNPROVEN
-EDC-9  hybrid RRF retrieval proof receipt                  WRITTEN_UNPROVEN
-EDC-10 retrieval-owner cutover gate                        WRITTEN_UNPROVEN
+EDC-7  dense exact/top-k proof receipt                     IMPLEMENTED_UNPROVEN
+EDC-8  BM25 retrieval proof receipt                        IMPLEMENTED_UNPROVEN
+EDC-9  hybrid RRF retrieval proof receipt                  IMPLEMENTED_UNPROVEN
+EDC-10 retrieval-owner cutover gate                        IMPLEMENTED_UNPROVEN
 EDC-11 old Qdrant collection snapshot -> SeaweedFS         PENDING
 EDC-12 cold hydration query fallback                       PENDING
 EDC-13 deeds_lab archive upload + file-index Arrow          PENDING
 EDC-14 Graphify daily incremental docs refresh             PENDING
 ```
 
-`WRITTEN_UNPROVEN` means the typed contract/reference runtime/test exists but the workstation/live proof has not been executed.
+`WRITTEN_UNPROVEN` means the typed contract/reference/test exists but no live execution surface is complete. `IMPLEMENTED_UNPROVEN` means a bounded executable runtime exists but has not yet produced a workstation/live PASS receipt.
 
 ## Firecrawl capture invariant
 
@@ -116,11 +116,21 @@ source_snapshot_revision
 projection_revision
 ```
 
+The executable evaluator additionally requires a `READY` capability gate, a proven hybrid shadow schema, and exact semantic query embeddings of dimension 768. It upgrades only the supplied shadow projection receipt to `VERIFIED`; it does not mutate the current retrieval owner.
+
 The cutover gate blocks when any configured recall floor fails or when hybrid Recall@K is worse than the better single lane. The source collection remains non-deletable and must be snapshotted before any later retirement.
 
-## Bounded runtime probe
+## Bounded runtime probes
 
-`scripts/docs-atlas/probe-external-doc-hybrid-runtime.mts` has three modes:
+Capability probe:
+
+```bash
+npx tsx scripts/docs-atlas/probe-external-doc-hybrid-runtime.mts
+npx tsx scripts/docs-atlas/probe-external-doc-hybrid-runtime.mts --ensure-shadow
+npx tsx scripts/docs-atlas/probe-external-doc-hybrid-runtime.mts --exercise-bm25
+```
+
+Modes:
 
 ```text
 (no flags)          READ_ONLY
@@ -129,6 +139,23 @@ The cutover gate blocks when any configured recall floor fails or when hybrid Re
 ```
 
 The script never mutates `external_programming_docs_768` and writes a revisioned JSON capability report. A blocked BM25 proof exits non-zero.
+
+Retrieval proof, after EDC-6 emits a revision-qualified shadow projection receipt:
+
+```bash
+npm --prefix packages/parent-atlas run build
+
+npx tsx scripts/docs-atlas/prove-external-doc-retrieval.mts \
+  --fixture=docs/reports/parent-atlas/external-doc-retrieval-fixture.json \
+  --projection=docs/reports/parent-atlas/external-doc-hybrid-projection.json \
+  --capability=docs/reports/parent-atlas/external-doc-hybrid-capabilities-latest.json \
+  --k=10 \
+  --prefetch-k=50
+```
+
+The evaluator reuses the existing semantic-768 embedding endpoint/model configuration, sends exact named-dense and native BM25 queries, and sends hybrid Query API requests with dense + BM25 `prefetch[]` followed by RRF fusion. The resulting JSON contains the dense, BM25 and hybrid proof receipts plus `ExternalDocsCutoverGateV1`.
+
+A blocked cutover is a valid evaluation result and exits with code 2. No retrieval-owner mutation occurs.
 
 ## Required live proof artifacts
 
