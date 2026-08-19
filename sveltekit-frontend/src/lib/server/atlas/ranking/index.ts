@@ -111,6 +111,24 @@ export type {
   ContextCacheProposalV1,
   ContextWindowPlanV1,
 } from './context-window-synthesis.js';
+export {
+  SemanticPromotionScorePolicySchema,
+  SemanticPromotionDeltaV1Schema,
+  SemanticPromotionExclusionV1Schema,
+  SemanticPromotionReceiptV1Schema,
+  RepairContextManifestV2Schema,
+  buildSemanticPromotionReceipt,
+  applySemanticPromotionReceipt,
+  rebuildRepairAfterSemanticPromotion,
+} from './semantic-promotion-feedback.js';
+export type {
+  SemanticPromotionScorePolicy,
+  SemanticPromotionDeltaV1,
+  SemanticPromotionExclusionV1,
+  SemanticPromotionReceiptV1,
+  RepairContextManifestV2,
+  SemanticPromotionFeedbackResultV1,
+} from './semantic-promotion-feedback.js';
 
 import type { Reranker, RerankRequest, RerankResult, RerankResultItem } from './reranker.js';
 import { randomUUID } from 'node:crypto';
