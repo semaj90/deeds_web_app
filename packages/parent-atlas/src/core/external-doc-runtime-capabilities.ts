@@ -60,6 +60,32 @@ export type ExternalDocsHybridProofGateV1 = z.infer<typeof externalDocsHybridPro
 
 export type ParsedSemver = { major: number; minor: number; patch: number };
 
+export type ExternalDocsShadowCollectionConfigV1 = {
+  vectors: {
+    semantic_768: {
+      size: 768;
+      distance: 'Cosine';
+      memory?: 'cold';
+      on_disk?: true;
+    };
+  };
+  sparse_vectors: {
+    lexical_bm25: {
+      modifier: 'idf';
+      index: {
+        memory?: 'pinned';
+        on_disk?: false;
+      };
+    };
+  };
+  hnsw_config: {
+    memory?: 'cold';
+    on_disk?: true;
+  };
+  payload?: { memory: 'cold' };
+  on_disk_payload?: true;
+};
+
 export function parseSemver(value: string): ParsedSemver {
   const match = /^v?(\d+)\.(\d+)\.(\d+)/.exec(value);
   if (!match) throw new Error(`INVALID_SEMVER:${value}`);
@@ -77,21 +103,50 @@ export function semverAtLeast(value: string, minimum: string): boolean {
 export function deriveQdrantVersionCapabilities(version: string) {
   const hybridBaseline = semverAtLeast(version, '1.10.0');
   return {
-    // Atlas intentionally uses 1.10 as the minimum for this production path:
-    // that release introduced Universal Query API hybrid fusion plus the IDF
-    // modifier needed by our lexical_bm25 contract. Older sparse support is
-    // not treated as sufficient evidence for this exact workflow.
     supports_sparse_vectors: hybridBaseline,
     supports_idf_modifier: hybridBaseline,
     supports_hybrid_query_api: hybridBaseline,
-    // Qdrant 1.18 added create/delete named-vector schema APIs. Atlas still
-    // uses a shadow collection for migration because schema existence does not
-    // populate newly added vectors on historical points.
     supports_named_vector_schema_update: semverAtLeast(version, '1.18.0'),
-    // Qdrant 1.19 introduces memory: pinned|cached|cold; older versions use
-    // on_disk/on_disk_payload compatibility parameters.
     supports_memory_tiers_v119: semverAtLeast(version, '1.19.0'),
   } as const;
+}
+
+/**
+ * Qdrant 1.19+ uses per-structure memory tiers. Atlas keeps the original
+ * semantic vectors/HNSW/payload cold and the exact sparse inverted index
+ * pinned. Pre-1.19 deployments receive the documented legacy equivalents.
+ */
+export function buildExternalDocsShadowCollectionConfig(
+  profile: Pick<QdrantExternalDocsCapabilityProfileV1,
+    'qdrant_version' | 'supports_sparse_vectors' | 'supports_idf_modifier' | 'supports_memory_tiers_v119'>,
+): ExternalDocsShadowCollectionConfigV1 {
+  if (!profile.supports_sparse_vectors || !profile.supports_idf_modifier) {
+    throw new Error(`QDRANT_SHADOW_UNSUPPORTED:${profile.qdrant_version}`);
+  }
+
+  if (profile.supports_memory_tiers_v119) {
+    return {
+      vectors: {
+        semantic_768: { size: 768, distance: 'Cosine', memory: 'cold' },
+      },
+      sparse_vectors: {
+        lexical_bm25: { modifier: 'idf', index: { memory: 'pinned' } },
+      },
+      hnsw_config: { memory: 'cold' },
+      payload: { memory: 'cold' },
+    };
+  }
+
+  return {
+    vectors: {
+      semantic_768: { size: 768, distance: 'Cosine', on_disk: true },
+    },
+    sparse_vectors: {
+      lexical_bm25: { modifier: 'idf', index: { on_disk: false } },
+    },
+    hnsw_config: { on_disk: true },
+    on_disk_payload: true,
+  };
 }
 
 export function buildExternalDocsHybridProofGate(input: {
