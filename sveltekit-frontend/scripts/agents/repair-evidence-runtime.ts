@@ -11,6 +11,8 @@ import {
 } from '../../src/lib/server/atlas/ranking/agentic-repair-evidence-gate.js';
 import { createTraceRepairEvidenceExecutor } from '../../src/lib/server/atlas/ranking/trace-repair-evidence-adapter.js';
 import { resolveSourceRevisionsFromPostgres } from '../../src/lib/server/atlas/identity/source-revision-resolver.js';
+import { runCanonicalRepairSemanticTournament } from '../../src/lib/server/atlas/retrieval/canonical-repair-semantic-tournament.js';
+import type { RepairSemanticTournamentReceiptV1 } from '../../src/lib/server/atlas/retrieval/repair-semantic-corpus.js';
 
 export type RepairEvidenceRuntimeOptions = {
   appRoot: string;
@@ -18,10 +20,13 @@ export type RepairEvidenceRuntimeOptions = {
   graphRevision?: string | null;
   featureRevision?: string | null;
   producerRevision?: string;
+  enableSemanticTournament?: boolean;
+  semanticTournamentTopK?: number;
 };
 
 export type RepairEvidenceEvaluation = {
   result: AgenticRepairEvidenceGateResultV1;
+  semanticTournament: RepairSemanticTournamentReceiptV1 | null;
   lineage: {
     workspaceRevision: string;
     sourceRevision: string;
@@ -171,7 +176,7 @@ function withCanonicalRevisionResolution(
 
 export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOptions) {
   const appRoot = path.resolve(options.appRoot);
-  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v2';
+  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v3';
   const traceUrl = new URL(options.traceMcpUrl ?? process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788/sse');
   let client: McpClient | null = null;
   let transport: StreamableHTTPClientTransport | null = null;
@@ -183,7 +188,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
     try {
       transport = new StreamableHTTPClientTransport(traceUrl);
       client = new McpClient(
-        { name: 'parent-atlas-repair-evidence', version: '2.0.0' },
+        { name: 'parent-atlas-repair-evidence', version: '3.0.0' },
         { capabilities: {} },
       );
       await client.connect(transport);
@@ -270,6 +275,23 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       },
     }, executor);
 
+    let semanticTournament: RepairSemanticTournamentReceiptV1 | null = null;
+    if ((options.enableSemanticTournament ?? true) && result.readiness.gate === 'READY') {
+      semanticTournament = await runCanonicalRepairSemanticTournament({
+        requestId: input.requestId,
+        queryText: input.queryText,
+        candidates: result.candidates,
+      }, {
+        topK: options.semanticTournamentTopK ?? 8,
+        maxCandidates: 64,
+        oversampleFactor: 4,
+        deadlineMs: 5000,
+        runFullOracle: false,
+        maxOracleCorpusRows: 2048,
+        producerRevision: `${producerRevision}:semantic-tournament`,
+      });
+    }
+
     const fullyRevisionAlignedExactEvidence = isResolvedRevision(observedSourceRevision)
       && result.candidates.some((candidate) =>
         candidate.exactEvidence
@@ -284,9 +306,9 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ['featureRevision', observedFeatureRevision],
     ].filter(([, value]) => !isResolvedRevision(value)).map(([name]) => name);
 
-    // The repair skill may run only when required services are READY, the
-    // manifest has exact evidence, and the exact evidence is source-revision
-    // aligned. Diagnostic/degraded manifests are still persisted for audit.
+    // The semantic tournament is supporting evidence. Dry-run authorization is
+    // still owned by exact/revision-aligned canonical evidence from the main
+    // repair gate; GPU availability or absence cannot authorize mutation.
     const dryRunAllowed = result.readiness.gate === 'READY'
       && result.manifest.evidenceStatus === 'READY_FOR_DRY_RUN'
       && result.manifest.exactEvidencePacketKeys.length > 0
@@ -302,13 +324,21 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ...(unresolvedRevisionFields.length
         ? [`UNRESOLVED_REVISIONS:${unresolvedRevisionFields.join(',')}`]
         : ['ALL_REQUEST_REVISIONS_RESOLVED']),
+      ...(semanticTournament
+        ? [`SEMANTIC_TOURNAMENT_${semanticTournament.status}:${semanticTournament.reason}`]
+        : ['SEMANTIC_TOURNAMENT_NOT_RUN']),
+      ...(semanticTournament?.status === 'EXECUTED'
+        ? [`SEMANTIC_EXACT_PROMOTED_PACKETS:${semanticTournament.promotedPacketKeys.join(',')}`]
+        : []),
       'SOURCE_REVISION_FROM_CANONICAL_POSTGRES_METADATA',
       'CONTENT_HASH_NEVER_SUBSTITUTES_FOR_SOURCE_REVISION',
+      'SEMANTIC_TOURNAMENT_IS_SUPPORTING_EVIDENCE_ONLY',
       'EVIDENCE_NEVER_AUTHORIZES_MUTATION',
     ];
 
     return {
       result,
+      semanticTournament,
       lineage: {
         workspaceRevision: observedWorkspaceRevision,
         sourceRevision: observedSourceRevision,
