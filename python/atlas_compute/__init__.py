@@ -4,6 +4,7 @@ These modules never own canonical application truth. They consume frozen,
 revision-qualified tensors and emit derived rankings/proof receipts.
 """
 
+from .ann_compare import AnnComparisonReceipt, compare_cuvs_exact_and_cagra
 from .determinism import TorchDeterminismReceipt, configure_torch_determinism
 from .exact_semantic import ExactSemanticSearchReceipt, exact_semantic_search
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
@@ -11,6 +12,8 @@ from .interpolation import TensorInterpolationReceipt, interpolate_topology_fiel
 from .low_rank import LowRankComparisonReceipt, compare_low_rank_recommendations
 
 __all__ = [
+    "AnnComparisonReceipt",
+    "compare_cuvs_exact_and_cagra",
     "TorchDeterminismReceipt",
     "configure_torch_determinism",
     "ExactSemanticSearchReceipt",
