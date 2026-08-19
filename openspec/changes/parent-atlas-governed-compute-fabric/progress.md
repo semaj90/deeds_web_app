@@ -19,7 +19,7 @@ environment.
 
 ## Current weighted completion
 
-**18.0%** overall weighted completion.
+**22.0%** overall weighted completion.
 
 This number is intentionally conservative. It reflects the new governed-kernel/native-ABI
 integration change itself, not all historical Parent Atlas work that these lanes reuse.
@@ -27,8 +27,8 @@ integration change itself, not all historical Parent Atlas work that these lanes
 | Lane | Weight | Current | Current gate | Next gate | Evidence / blocker |
 |---|---:|---:|---|---|---|
 | Ownership & authority | 8 | 20% | CONTRACT_DEFINED | IMPLEMENTATION_PRESENT | Long-horizon coordination OpenSpec exists; cross-OpenSpec owner reconciliation is still open. |
-| Kernel contracts | 10 | 40% | IMPLEMENTATION_PRESENT | TESTS_PROVEN | `AtlasKernelSessionV1` and typed host request/response scaffolds exist; targeted tests still need an executed PASS receipt. |
-| Skill admission | 10 | 0% | DISCOVERED | CONTRACT_DEFINED | `AtlasSkillAdmissionReceiptV1` is planned but not yet implemented. |
+| Kernel contracts | 10 | 40% | IMPLEMENTATION_PRESENT | TESTS_PROVEN | `AtlasKernelSessionV1`, typed host request/response scaffolds, and proof-weighted progress schemas exist; targeted tests still need an executed PASS receipt. |
+| Skill admission | 10 | 40% | IMPLEMENTATION_PRESENT | TESTS_PROVEN | `AtlasSkillAdmissionReceiptV1`, deterministic source hashing, permission declarations, revocation checks, and tests now exist; tests have not yet been run on the workstation. |
 | Persistent kernel worker | 12 | 0% | DISCOVERED | CONTRACT_DEFINED | No live persistent IPython/Jupyter worker or authenticated host bridge proof yet. |
 | Python-backed skills | 8 | 40% | IMPLEMENTATION_PRESENT | TESTS_PROVEN | Four skill packages exist (`semantic-search`, `graph-evidence`, `claim-verifier`, `file-repair`); fresh-kernel install/import/call proof remains open. |
 | DAG / MCP / ACP / A2A | 10 | 40% | IMPLEMENTATION_PRESENT | TESTS_PROVEN | DAG/tool contracts and kernel-to-DAG binding scaffolds exist; no end-to-end governed skill invocation proof yet. |
@@ -36,13 +36,13 @@ integration change itself, not all historical Parent Atlas work that these lanes
 | Executor registry | 7 | 20% | CONTRACT_DEFINED | IMPLEMENTATION_PRESENT | Lane/executor separation and execution manifests are defined; no single host capability registry behind skills yet. |
 | Native C ABI / Node loader | 10 | 0% | DISCOVERED | CONTRACT_DEFINED | Existing monolithic Node-API bridge has been audited conceptually; `AtlasNativeCAbiV1` header/loader does not yet exist. |
 | Backend parity | 6 | 20% | CONTRACT_DEFINED | IMPLEMENTATION_PRESENT | Exact/parity methodology exists elsewhere in Atlas; parity for the new stable operation contract/backends is not yet wired. |
-| Security & receipts | 6 | 20% | CONTRACT_DEFINED | IMPLEMENTATION_PRESENT | Kernel access policy forbids canonical writes; admission, hostile-kernel, lifecycle, and execution receipts remain incomplete. |
+| Security & receipts | 6 | 20% | CONTRACT_DEFINED | IMPLEMENTATION_PRESENT | Kernel access policy forbids canonical writes and skill admission now records permissions/review gates; hostile-kernel, lifecycle, and execution receipts remain incomplete. |
 | Production rollout | 6 | 0% | DISCOVERED | CONTRACT_DEFINED | No shadow rollout, canary, rollback drill, or owner cutover for this new fabric yet. |
 
 ## Gate completion view
 
-- Contract-defined or better: **8 / 12 lanes**
-- Implementation-present or better: **3 / 12 lanes**
+- Contract-defined or better: **9 / 12 lanes**
+- Implementation-present or better: **4 / 12 lanes**
 - Tests-proven or better: **0 / 12 lanes**
 - Shadow-proven or better: **0 / 12 lanes**
 - Production-hardened: **0 / 12 lanes**
@@ -50,9 +50,8 @@ integration change itself, not all historical Parent Atlas work that these lanes
 ## Next production-hardening sequence
 
 1. **Kernel contracts → 60%**: execute targeted TypeScript/Vitest tests for
-   `AtlasKernelSessionV1` and governed-compute progress schemas; fix any type/schema failures.
-2. **Skill admission → 40%**: implement `AtlasSkillAdmissionReceiptV1`, deterministic file/package
-   hashing, permissions, dependency/SBOM evidence, and revocation identity.
+   `AtlasKernelSessionV1`, governed-compute progress, and skill-admission schemas; fix any type/schema failures.
+2. **Skill admission → 60%**: run its tests, then add real skill-directory hashing/metadata collection and a clean-environment admission fixture rather than relying only on in-memory test strings.
 3. **Python skills → 60%**: create a clean temporary Python environment, install each admitted
    skill, bind a fake/fixture host bridge, and prove each skill emits only the declared request.
 4. **Kernel worker → 40% then 60%**: implement persistent worker lifecycle and one authenticated
