@@ -92,9 +92,9 @@ function legacyReceipt(snapshot = fixtureSnapshot()) {
 }
 
 const identicalScores = [
-	{ canonicalId: 'node:a', score: 0.6 },
-	{ canonicalId: 'node:b', score: 0.3 },
-	{ canonicalId: 'node:c', score: 0.1 },
+	{ parityNodeKey: 'tree:a', score: 0.6 },
+	{ parityNodeKey: 'tree:b', score: 0.3 },
+	{ parityNodeKey: 'packet:c', score: 0.1 },
 ] as const;
 
 describe('cuGraph PageRank qualification', () => {
@@ -124,6 +124,7 @@ describe('cuGraph PageRank qualification', () => {
 			generatedAt: '2026-08-19T20:03:00.000Z',
 		});
 		expect(parity.status).toBe('PASS');
+		expect(parity.parityCoordinate).toBe('graph_node_key');
 		const qualification = qualifyCugraphFromFrozenParity({
 			snapshot,
 			legacyParityReceipt: legacyReceipt(snapshot),
