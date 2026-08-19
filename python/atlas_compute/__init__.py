@@ -12,6 +12,8 @@ from .graph_programs import BfsReceipt, CondensationDagReceipt, deterministic_bf
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
 from .interpolation import TensorInterpolationReceipt, interpolate_topology_field
 from .low_rank import LowRankComparisonReceipt, compare_low_rank_recommendations
+from .model_topology import ModelTopologyDetection, audit_model_manifest, detect_model_topology
+from .moe_grouped_mm import MoeGroupedMmReceipt, run_grouped_mm_experiment
 from .neural_router import NeuralRouterReceipt, train_receipt_router
 from .rapids_matrix import (
     RapidsKMeansReceipt,
@@ -22,6 +24,7 @@ from .rapids_matrix import (
 )
 from .representation_compare import RepresentationComparisonReceipt, compare_representations
 from .spectral import SpectralReceipt, symmetric_eigenspace
+from .torch_kernel_experiment import TorchKernelExperimentReceipt, run_torch_kernel_experiment
 
 __all__ = [
     "AnnComparisonReceipt",
@@ -42,6 +45,11 @@ __all__ = [
     "interpolate_topology_field",
     "LowRankComparisonReceipt",
     "compare_low_rank_recommendations",
+    "ModelTopologyDetection",
+    "audit_model_manifest",
+    "detect_model_topology",
+    "MoeGroupedMmReceipt",
+    "run_grouped_mm_experiment",
     "NeuralRouterReceipt",
     "train_receipt_router",
     "RapidsKMeansReceipt",
@@ -53,4 +61,6 @@ __all__ = [
     "compare_representations",
     "SpectralReceipt",
     "symmetric_eigenspace",
+    "TorchKernelExperimentReceipt",
+    "run_torch_kernel_experiment",
 ]
