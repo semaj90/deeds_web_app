@@ -204,6 +204,7 @@ export function buildTokenAwareContextPlan(value: ContextWindowInputV1): Context
     if (chosen.length >= input.budget.maxWindows) break;
     if (exactEvidenceTokens >= input.budget.minExactEvidenceTokens) break;
     if (selectedTokens + window.tokenCount > availableTokens) continue;
+    if (window.members.some((member) => selectedPackets.has(member.packetKey))) continue;
     chosen.push(window);
     selectedTokens += window.tokenCount;
     exactEvidenceTokens += window.exactEvidenceTokens;
@@ -216,7 +217,7 @@ export function buildTokenAwareContextPlan(value: ContextWindowInputV1): Context
     if (chosen.length >= input.budget.maxWindows) break;
     if (selectedTokens + window.tokenCount > availableTokens) continue;
     const newMembers = window.members.filter((member) => !selectedPackets.has(member.packetKey));
-    if (!newMembers.length) continue;
+    if (newMembers.length !== window.members.length) continue;
     chosen.push(window);
     selectedTokens += window.tokenCount;
     exactEvidenceTokens += window.exactEvidenceTokens;
