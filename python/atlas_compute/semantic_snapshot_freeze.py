@@ -7,8 +7,10 @@ Expected input row fields:
 - optional representation_id; if present it must be semantic_768
 
 The output tensor is sorted by canonical identity, written as float32 .npy, and
-accompanied by a JSON manifest whose checksums cover both row identity and tensor
-bytes. This module does not query a live store or mutate canonical state.
+accompanied by a JSON manifest with two distinct identity hashes:
+- row_identity_checksum covers ordinal + ID + revision + source_ref lineage
+- canonical_order_checksum covers only the ordered canonical IDs and is the
+  cross-feature-block alignment key.
 """
 
 from __future__ import annotations
@@ -45,6 +47,7 @@ class FrozenSemanticSnapshotReceipt:
     tensor_path: str
     tensor_checksum: str
     row_identity_checksum: str
+    canonical_order_checksum: str
     input_file_checksum: str
     ordinal_is_canonical: bool
     producer_revision: str
@@ -108,6 +111,7 @@ def freeze_semantic_snapshot(
         FrozenSemanticRow(ordinal=index, canonical_id=item[0], canonical_revision=item[1], source_ref=item[2])
         for index, item in enumerate(rows)
     ]
+    canonical_ids = [row.canonical_id for row in frozen_rows]
 
     tensor_target = Path(tensor_path)
     manifest_target = Path(manifest_path)
@@ -117,7 +121,7 @@ def freeze_semantic_snapshot(
     tensor_bytes = matrix.tobytes(order="C")
 
     receipt = FrozenSemanticSnapshotReceipt(
-        schema="atlas.frozen-semantic-snapshot.v1",
+        schema="atlas.frozen-semantic-snapshot.v2",
         snapshot_revision=snapshot_revision,
         representation_revision=representation_revision,
         representation=SEMANTIC_REPRESENTATION,
@@ -129,6 +133,7 @@ def freeze_semantic_snapshot(
         tensor_path=str(tensor_target),
         tensor_checksum=_sha256_bytes(tensor_bytes),
         row_identity_checksum=_sha256_bytes(_stable_json([asdict(row) for row in frozen_rows])),
+        canonical_order_checksum=_sha256_bytes(_stable_json(canonical_ids)),
         input_file_checksum=_sha256_bytes(raw),
         ordinal_is_canonical=False,
         producer_revision=producer_revision,
@@ -139,7 +144,7 @@ def freeze_semantic_snapshot(
 
 def load_and_verify_frozen_snapshot(manifest_path: str | Path) -> tuple[np.ndarray, dict[str, Any]]:
     manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
-    if manifest.get("schema") != "atlas.frozen-semantic-snapshot.v1":
+    if manifest.get("schema") not in {"atlas.frozen-semantic-snapshot.v1", "atlas.frozen-semantic-snapshot.v2"}:
         raise ValueError("unsupported frozen semantic snapshot schema")
     if manifest.get("representation") != SEMANTIC_REPRESENTATION or manifest.get("dimensions") != SEMANTIC_DIMENSION:
         raise ValueError("frozen snapshot is not semantic_768")
@@ -151,4 +156,17 @@ def load_and_verify_frozen_snapshot(manifest_path: str | Path) -> tuple[np.ndarr
     checksum = _sha256_bytes(np.ascontiguousarray(tensor).tobytes(order="C"))
     if checksum != manifest.get("tensor_checksum"):
         raise ValueError("frozen tensor checksum mismatch")
+
+    rows = manifest.get("rows") or []
+    canonical_ids = [str(row.get("canonical_id") or "") for row in rows]
+    if len(canonical_ids) != tensor.shape[0] or any(not value for value in canonical_ids):
+        raise ValueError("frozen row identities are invalid")
+    computed_order = _sha256_bytes(_stable_json(canonical_ids))
+    if manifest.get("schema") == "atlas.frozen-semantic-snapshot.v2":
+        if computed_order != manifest.get("canonical_order_checksum"):
+            raise ValueError("canonical order checksum mismatch")
+    else:
+        # Backward-compatible derived field for v1 manifests; callers can use it
+        # without rewriting the original manifest file.
+        manifest["canonical_order_checksum"] = computed_order
     return tensor, manifest
