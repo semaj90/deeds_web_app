@@ -51,7 +51,9 @@ function fixture() {
 		materialization: 'PARQUET_DIRECTED_EDGE_LIST' as const,
 		edgeWeightColumn: 'weight' as const,
 		contentHash: computeGraphProjectionSnapshotHashV1({
+			projectionRevision: projection.projectionRevision,
 			projectionHash,
+			projectionName: projection.projectionName,
 			graphRevision: parityManifest.graphRevision,
 			nodeTableHash: parityManifest.nodeTableHash,
 			edgeTableHash: parityManifest.edgeTableHash,
