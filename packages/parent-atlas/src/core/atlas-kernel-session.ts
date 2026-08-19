@@ -56,7 +56,7 @@ export const ATLAS_FREE_THREADING_STATUSES = [
   'OUT_OF_PROCESS',
   'VERIFIED_NO_GIL',
   'MAY_REENABLE_GIL',
-  'PYTHON_3_14T_TARGET',
+  'FREE_THREADED_WHEEL_REQUIRED',
   'UNKNOWN',
 ] as const;
 
@@ -263,101 +263,30 @@ function capability(input: Omit<AtlasAnalyzerCapabilityV1, 'availability' | 'ver
   return atlasAnalyzerCapabilitySchema.parse({ ...input, availability: 'UNPROBED', version: null, canonical_authority: false });
 }
 
-/**
- * Expected ownership/interfaces only. Availability/version are deliberately
- * UNPROBED until the kernel and host perform runtime probes.
- */
 export function buildDefaultAtlasAnalyzerCapabilities(revisionValue: string): AtlasAnalyzerCapabilityV1[] {
   return [
-    capability({
-      analyzer_id: 'TREE_SITTER', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['C11'], invocation_surfaces: ['PYTHON_IMPORT', 'C_ABI'],
-      observation_kinds: ['SOURCE_SPAN', 'AST_FACT'], free_threading_status: 'UNKNOWN', package_or_binary: 'tree_sitter',
-      notes: ['Tree-sitter runtime is C11; Python is a binding, not the parser implementation.', 'Language grammar ABI must be recorded separately from Atlas canonical identity.'],
-    }),
-    capability({
-      analyzer_id: 'TREESITTER_CHUNKER', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['PYTHON', 'C11'], invocation_surfaces: ['PYTHON_IMPORT'],
-      observation_kinds: ['SOURCE_SPAN', 'AST_FACT', 'SYMBOL_FACT'], free_threading_status: 'UNKNOWN', package_or_binary: 'treesitter-chunker',
-      notes: ['Python package orchestrates Tree-sitter grammars and structural chunk/XRef extraction.', 'Upstream chunk/node/file/symbol IDs remain provenance until GIS promotion.'],
-    }),
-    capability({
-      analyzer_id: 'AST_GREP', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['RUST'], invocation_surfaces: ['PYTHON_IMPORT', 'NODE_NAPI', 'CLI_PROCESS'],
-      observation_kinds: ['SOURCE_SPAN', 'AST_FACT', 'STRUCTURAL_MATCH'], free_threading_status: 'UNKNOWN', package_or_binary: 'ast-grep',
-      notes: ['Rust core; Python interface uses PyO3 and Node interface uses N-API.', 'Use for structural query/rewrite nomination; Atlas host still owns mutation.'],
-    }),
-    capability({
-      analyzer_id: 'TS_MORPH', analyzer_revision: revisionValue, owner_runtime: 'TYPESCRIPT_HOST',
-      implementation_languages: ['TYPESCRIPT'], invocation_surfaces: ['TYPESCRIPT_API'],
-      observation_kinds: ['AST_FACT', 'SYMBOL_FACT', 'TYPE_FACT'], free_threading_status: 'NOT_APPLICABLE', package_or_binary: 'ts-morph',
-      notes: ['Wraps the TypeScript compiler API and language service; keep it in the Node/TypeScript host rather than tunneling through Python.'],
-    }),
-    capability({
-      analyzer_id: 'LANGEXTRACT', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['PYTHON'], invocation_surfaces: ['PYTHON_IMPORT'],
-      observation_kinds: ['GROUNDED_EXTRACTION'], free_threading_status: 'UNKNOWN', package_or_binary: 'langextract',
-      notes: ['Model-backed extraction must remain source-grounded and non-canonical.', 'Free-threaded readiness depends on its dependency stack, not requires-python metadata alone.'],
-    }),
-    capability({
-      analyzer_id: 'STANZA_POS', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['PYTHON'], invocation_surfaces: ['PYTHON_IMPORT'],
-      observation_kinds: ['LEXICAL_POS'], free_threading_status: 'PYTHON_3_14T_TARGET', package_or_binary: 'stanza',
-      notes: ['Use noun/verb/POS/lemma observations for natural-language comments/docs, not as canonical code facts.', 'Stanza is PyTorch-backed, so no-GIL deployment follows the verified PyTorch wheel/runtime matrix.'],
-    }),
-    capability({
-      analyzer_id: 'CODEQL', analyzer_revision: revisionValue, owner_runtime: 'EXTERNAL_PROCESS',
-      implementation_languages: ['QL'], invocation_surfaces: ['CLI_PROCESS'],
-      observation_kinds: ['DATAFLOW_PATH', 'TYPE_FACT'], free_threading_status: 'OUT_OF_PROCESS', package_or_binary: 'codeql',
-      notes: ['CodeQL data-flow graph is a distinct semantic representation from the source AST.', 'Run bounded databases/queries out of process and attach source locations to evidence.'],
-    }),
-    capability({
-      analyzer_id: 'SOUFFLE', analyzer_revision: revisionValue, owner_runtime: 'EXTERNAL_PROCESS',
-      implementation_languages: ['DATALOG', 'C_CPP'], invocation_surfaces: ['CLI_PROCESS', 'CPP_API'],
-      observation_kinds: ['RULE_PROOF'], free_threading_status: 'OUT_OF_PROCESS', package_or_binary: 'souffle',
-      notes: ['Datalog relations derive deterministic rule conclusions; provenance proof trees explain tuples.', 'Generated C++ can later be embedded behind a native adapter after rule semantics are frozen.'],
-    }),
-    capability({
-      analyzer_id: 'PYTORCH', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['PYTHON', 'C_CPP', 'CUDA'], invocation_surfaces: ['PYTHON_IMPORT', 'LIBTORCH_STABLE_ABI'],
-      observation_kinds: ['MODEL_SCORE'], free_threading_status: 'PYTHON_3_14T_TARGET', package_or_binary: 'torch',
-      notes: ['Python frontend delegates expensive tensor operations to the C++/CUDA backend.', 'Prefer LibTorch Stable ABI for production custom operators where its supported surface is sufficient.'],
-    }),
-    capability({
-      analyzer_id: 'CUVS', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['C_CPP', 'CUDA'], invocation_surfaces: ['PYTHON_IMPORT', 'C_ABI', 'CPP_API'],
-      observation_kinds: ['EXACT_VECTOR_DISTANCE', 'MODEL_SCORE'], free_threading_status: 'UNKNOWN', package_or_binary: 'cuvs',
-      notes: ['Brute force is the vector-space oracle; ANN executors remain candidate nomination/challengers.'],
-    }),
-    capability({
-      analyzer_id: 'CUGRAPH', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL',
-      implementation_languages: ['C_CPP', 'CUDA'], invocation_surfaces: ['PYTHON_IMPORT', 'C_ABI'],
-      observation_kinds: ['GRAPH_MEASUREMENT'], free_threading_status: 'UNKNOWN', package_or_binary: 'cugraph',
-      notes: ['PageRank/PPR/HITS/community/path algorithms are graph measurements, not source relationship facts.'],
-    }),
-    capability({
-      analyzer_id: 'CUSPARSE', analyzer_revision: revisionValue, owner_runtime: 'NATIVE_LIBRARY',
-      implementation_languages: ['C_CPP', 'CUDA'], invocation_surfaces: ['C_ABI', 'CPP_API'],
-      observation_kinds: ['SPARSE_PROPAGATION'], free_threading_status: 'NOT_APPLICABLE', package_or_binary: 'cuSPARSE',
-      notes: ['Use CSR/COO incidence projections for N-ary propagation while PostgreSQL remains canonical relationship authority.'],
-    }),
+    capability({ analyzer_id: 'TREE_SITTER', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['C11'], invocation_surfaces: ['PYTHON_IMPORT', 'C_ABI'], observation_kinds: ['SOURCE_SPAN', 'AST_FACT'], free_threading_status: 'UNKNOWN', package_or_binary: 'tree_sitter', notes: ['Tree-sitter runtime is C11; Python is a binding, not the parser implementation.', 'Language grammar ABI must be recorded separately from Atlas canonical identity.'] }),
+    capability({ analyzer_id: 'TREESITTER_CHUNKER', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['PYTHON', 'C11'], invocation_surfaces: ['PYTHON_IMPORT'], observation_kinds: ['SOURCE_SPAN', 'AST_FACT', 'SYMBOL_FACT'], free_threading_status: 'UNKNOWN', package_or_binary: 'treesitter-chunker', notes: ['Python package orchestrates Tree-sitter grammars and structural chunk/XRef extraction.', 'Upstream chunk/node/file/symbol IDs remain provenance until GIS promotion.'] }),
+    capability({ analyzer_id: 'AST_GREP', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['RUST'], invocation_surfaces: ['PYTHON_IMPORT', 'NODE_NAPI', 'CLI_PROCESS'], observation_kinds: ['SOURCE_SPAN', 'AST_FACT', 'STRUCTURAL_MATCH'], free_threading_status: 'UNKNOWN', package_or_binary: 'ast-grep', notes: ['Rust core; Python interface uses PyO3 and Node interface uses N-API.', 'Use for structural query/rewrite nomination; Atlas host still owns mutation.'] }),
+    capability({ analyzer_id: 'TS_MORPH', analyzer_revision: revisionValue, owner_runtime: 'TYPESCRIPT_HOST', implementation_languages: ['TYPESCRIPT'], invocation_surfaces: ['TYPESCRIPT_API'], observation_kinds: ['AST_FACT', 'SYMBOL_FACT', 'TYPE_FACT'], free_threading_status: 'NOT_APPLICABLE', package_or_binary: 'ts-morph', notes: ['Wraps the TypeScript compiler API and language service; keep it in the Node/TypeScript host rather than tunneling through Python.'] }),
+    capability({ analyzer_id: 'LANGEXTRACT', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['PYTHON'], invocation_surfaces: ['PYTHON_IMPORT'], observation_kinds: ['GROUNDED_EXTRACTION'], free_threading_status: 'UNKNOWN', package_or_binary: 'langextract', notes: ['Model-backed extraction must remain source-grounded and non-canonical.', 'Free-threaded readiness depends on its complete native dependency stack, not requires-python metadata alone.'] }),
+    capability({ analyzer_id: 'STANZA_POS', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['PYTHON'], invocation_surfaces: ['PYTHON_IMPORT'], observation_kinds: ['LEXICAL_POS'], free_threading_status: 'FREE_THREADED_WHEEL_REQUIRED', package_or_binary: 'stanza', notes: ['Use noun/verb/POS/lemma observations for natural-language comments/docs, not as canonical code facts.', 'Stanza is PyTorch-backed; no-GIL admission requires a verified compatible PyTorch/native dependency set for the selected Python ABI.'] }),
+    capability({ analyzer_id: 'CODEQL', analyzer_revision: revisionValue, owner_runtime: 'EXTERNAL_PROCESS', implementation_languages: ['QL'], invocation_surfaces: ['CLI_PROCESS'], observation_kinds: ['DATAFLOW_PATH', 'TYPE_FACT'], free_threading_status: 'OUT_OF_PROCESS', package_or_binary: 'codeql', notes: ['CodeQL data-flow graph is a distinct semantic representation from the source AST.', 'Run bounded databases/queries out of process and attach source locations to evidence.'] }),
+    capability({ analyzer_id: 'SOUFFLE', analyzer_revision: revisionValue, owner_runtime: 'EXTERNAL_PROCESS', implementation_languages: ['DATALOG', 'C_CPP'], invocation_surfaces: ['CLI_PROCESS', 'CPP_API'], observation_kinds: ['RULE_PROOF'], free_threading_status: 'OUT_OF_PROCESS', package_or_binary: 'souffle', notes: ['Datalog relations derive deterministic rule conclusions; provenance proof trees explain tuples.', 'Generated C++ can later be embedded behind a native adapter after rule semantics are frozen.'] }),
+    capability({ analyzer_id: 'PYTORCH', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['PYTHON', 'C_CPP', 'CUDA'], invocation_surfaces: ['PYTHON_IMPORT', 'LIBTORCH_STABLE_ABI'], observation_kinds: ['MODEL_SCORE'], free_threading_status: 'FREE_THREADED_WHEEL_REQUIRED', package_or_binary: 'torch', notes: ['Python frontend delegates expensive tensor operations to the C++/CUDA backend.', 'Free-threaded wheel support is Python-version/platform specific and must be runtime-probed; prefer LibTorch Stable ABI for production custom operators where its supported surface is sufficient.'] }),
+    capability({ analyzer_id: 'CUVS', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['C_CPP', 'CUDA'], invocation_surfaces: ['PYTHON_IMPORT', 'C_ABI', 'CPP_API'], observation_kinds: ['EXACT_VECTOR_DISTANCE', 'MODEL_SCORE'], free_threading_status: 'UNKNOWN', package_or_binary: 'cuvs', notes: ['Brute force is the vector-space oracle; ANN executors remain candidate nomination/challengers.'] }),
+    capability({ analyzer_id: 'CUGRAPH', analyzer_revision: revisionValue, owner_runtime: 'IPYTHON_KERNEL', implementation_languages: ['C_CPP', 'CUDA'], invocation_surfaces: ['PYTHON_IMPORT', 'C_ABI'], observation_kinds: ['GRAPH_MEASUREMENT'], free_threading_status: 'UNKNOWN', package_or_binary: 'cugraph', notes: ['PageRank/PPR/HITS/community/path algorithms are graph measurements, not source relationship facts.'] }),
+    capability({ analyzer_id: 'CUSPARSE', analyzer_revision: revisionValue, owner_runtime: 'NATIVE_LIBRARY', implementation_languages: ['C_CPP', 'CUDA'], invocation_surfaces: ['C_ABI', 'CPP_API'], observation_kinds: ['SPARSE_PROPAGATION'], free_threading_status: 'NOT_APPLICABLE', package_or_binary: 'cuSPARSE', notes: ['Use CSR/COO incidence projections for N-ary propagation while PostgreSQL remains canonical relationship authority.'] }),
   ];
 }
 
-export function buildAtlasKernelSession(input: z.input<typeof atlasKernelSessionSchema>): AtlasKernelSessionV1 {
-  return atlasKernelSessionSchema.parse(input);
-}
-
-export function buildAtlasKernelHostRequest(input: z.input<typeof atlasKernelHostRequestSchema>): AtlasKernelHostRequestV1 {
-  return atlasKernelHostRequestSchema.parse(input);
-}
+export function buildAtlasKernelSession(input: z.input<typeof atlasKernelSessionSchema>): AtlasKernelSessionV1 { return atlasKernelSessionSchema.parse(input); }
+export function buildAtlasKernelHostRequest(input: z.input<typeof atlasKernelHostRequestSchema>): AtlasKernelHostRequestV1 { return atlasKernelHostRequestSchema.parse(input); }
 
 export function checksumAtlasKernelRequest(input: AtlasKernelHostRequestV1): string {
   const stable = (value: unknown): string => {
     if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
-    if (value && typeof value === 'object') {
-      return `{${Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`).join(',')}}`;
-    }
+    if (value && typeof value === 'object') return `{${Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`).join(',')}}`;
     return JSON.stringify(value) ?? 'null';
   };
   return createHash('sha256').update(stable(input), 'utf8').digest('hex');
@@ -368,6 +297,6 @@ export function describeAtlasKernelSession(): string {
     'TypeScript owns session, workflow, credentials, canonical identities, mutation authorization and materialization; the persistent IPython kernel is a composable compute/control environment.',
     'Kernel requests may retrieve, analyze, verify, compile prefills, propose patches and request subtask admission, but never apply canonical mutations directly.',
     'Tree-sitter Chunker/LangExtract/Stanza/PyTorch/RAPIDS may run in Python; ts-morph stays in the TypeScript host; CodeQL and Souffle are isolated process analyzers; native CUDA libraries remain implementation backends.',
-    'Free-threaded Python is capability-probed per dependency: a package version declaration is not proof that its native extension stack is no-GIL safe.',
+    'Free-threaded Python is capability-probed per dependency and Python ABI; a package version declaration is not proof that its native extension stack is no-GIL safe.',
   ].join(' ');
 }
