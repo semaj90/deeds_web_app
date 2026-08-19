@@ -3,12 +3,17 @@ import { execFileSync } from 'node:child_process';
 import { Client as McpClient } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import {
+  AgenticRepairEvidenceGateInputV1Schema,
   buildAgenticRepairEvidenceGate,
   RepairEvidenceBatchV1Schema,
   type AgenticRepairEvidenceGateResultV1,
   type RepairEvidenceBatchV1,
   type RepairEvidenceReadOnlyExecutor,
 } from '../../src/lib/server/atlas/ranking/agentic-repair-evidence-gate.js';
+import {
+  rebuildRepairAfterSemanticPromotion,
+  type SemanticPromotionFeedbackResultV1,
+} from '../../src/lib/server/atlas/ranking/semantic-promotion-feedback.js';
 import { createTraceRepairEvidenceExecutor } from '../../src/lib/server/atlas/ranking/trace-repair-evidence-adapter.js';
 import { resolveSourceRevisionsFromPostgres } from '../../src/lib/server/atlas/identity/source-revision-resolver.js';
 import { runCanonicalRepairSemanticTournament } from '../../src/lib/server/atlas/retrieval/canonical-repair-semantic-tournament.js';
@@ -27,6 +32,7 @@ export type RepairEvidenceRuntimeOptions = {
 export type RepairEvidenceEvaluation = {
   result: AgenticRepairEvidenceGateResultV1;
   semanticTournament: RepairSemanticTournamentReceiptV1 | null;
+  semanticPromotionFeedback: SemanticPromotionFeedbackResultV1 | null;
   lineage: {
     workspaceRevision: string;
     sourceRevision: string;
@@ -176,7 +182,7 @@ function withCanonicalRevisionResolution(
 
 export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOptions) {
   const appRoot = path.resolve(options.appRoot);
-  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v3';
+  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v4';
   const traceUrl = new URL(options.traceMcpUrl ?? process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788/sse');
   let client: McpClient | null = null;
   let transport: StreamableHTTPClientTransport | null = null;
@@ -188,7 +194,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
     try {
       transport = new StreamableHTTPClientTransport(traceUrl);
       client = new McpClient(
-        { name: 'parent-atlas-repair-evidence', version: '3.0.0' },
+        { name: 'parent-atlas-repair-evidence', version: '4.0.0' },
         { capabilities: {} },
       );
       await client.connect(transport);
@@ -236,7 +242,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ?? process.env.ATLAS_FEATURE_REVISION
       ?? unresolved('feature_revision');
 
-    const result = await buildAgenticRepairEvidenceGate({
+    const gateInput = AgenticRepairEvidenceGateInputV1Schema.parse({
       schema: 'atlas.agentic-repair-evidence-gate-input.v1',
       requestId: input.requestId,
       queryText: input.queryText,
@@ -273,9 +279,11 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
         minDegradedOverallMeanPercent: 25,
         minSourceRefsPerRequiredLibrary: 1,
       },
-    }, executor);
+    });
+    const result = await buildAgenticRepairEvidenceGate(gateInput, executor);
 
     let semanticTournament: RepairSemanticTournamentReceiptV1 | null = null;
+    let semanticPromotionFeedback: SemanticPromotionFeedbackResultV1 | null = null;
     if ((options.enableSemanticTournament ?? true) && result.readiness.gate === 'READY') {
       semanticTournament = await runCanonicalRepairSemanticTournament({
         requestId: input.requestId,
@@ -290,6 +298,12 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
         maxOracleCorpusRows: 2048,
         producerRevision: `${producerRevision}:semantic-tournament`,
       });
+      semanticPromotionFeedback = rebuildRepairAfterSemanticPromotion(
+        gateInput,
+        result,
+        semanticTournament,
+        `${producerRevision}:semantic-promotion-feedback`,
+      );
     }
 
     const fullyRevisionAlignedExactEvidence = isResolvedRevision(observedSourceRevision)
@@ -306,9 +320,8 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ['featureRevision', observedFeatureRevision],
     ].filter(([, value]) => !isResolvedRevision(value)).map(([name]) => name);
 
-    // The semantic tournament is supporting evidence. Dry-run authorization is
-    // still owned by exact/revision-aligned canonical evidence from the main
-    // repair gate; GPU availability or absence cannot authorize mutation.
+    // Semantic exact promotion can improve ranking/context selection, but it is
+    // not byte/source exact evidence and cannot relax the canonical dry-run gate.
     const dryRunAllowed = result.readiness.gate === 'READY'
       && result.manifest.evidenceStatus === 'READY_FOR_DRY_RUN'
       && result.manifest.exactEvidencePacketKeys.length > 0
@@ -330,15 +343,26 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ...(semanticTournament?.status === 'EXECUTED'
         ? [`SEMANTIC_EXACT_PROMOTED_PACKETS:${semanticTournament.promotedPacketKeys.join(',')}`]
         : []),
+      ...(semanticPromotionFeedback
+        ? [`SEMANTIC_PROMOTION_FEEDBACK_${semanticPromotionFeedback.receipt.status}:${semanticPromotionFeedback.receipt.reason}`]
+        : ['SEMANTIC_PROMOTION_FEEDBACK_NOT_RUN']),
+      ...(semanticPromotionFeedback?.manifest.featureMatrix.changed
+        ? ['SEMANTIC_PROMOTION_REBUILT_NX16_AND_CONTEXT']
+        : []),
+      ...(semanticPromotionFeedback?.manifest.matrixDiagnosticsInvalidatedByPromotion
+        ? ['SEMANTIC_PROMOTION_INVALIDATED_STALE_MATRIX_DIAGNOSTICS']
+        : []),
       'SOURCE_REVISION_FROM_CANONICAL_POSTGRES_METADATA',
       'CONTENT_HASH_NEVER_SUBSTITUTES_FOR_SOURCE_REVISION',
-      'SEMANTIC_TOURNAMENT_IS_SUPPORTING_EVIDENCE_ONLY',
+      'SEMANTIC_EXACT_DISTANCE_IS_OBSERVATION_NOT_SIMILARITY',
+      'SEMANTIC_PROMOTION_DOES_NOT_CREATE_SOURCE_EXACT_EVIDENCE',
       'EVIDENCE_NEVER_AUTHORIZES_MUTATION',
     ];
 
     return {
       result,
       semanticTournament,
+      semanticPromotionFeedback,
       lineage: {
         workspaceRevision: observedWorkspaceRevision,
         sourceRevision: observedSourceRevision,
