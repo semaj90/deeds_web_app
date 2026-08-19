@@ -27,6 +27,7 @@ from .interpolation import TensorInterpolationReceipt, interpolate_topology_fiel
 from .low_rank import LowRankComparisonReceipt, compare_low_rank_recommendations
 from .model_topology import ModelTopologyDetection, audit_model_manifest, detect_model_topology
 from .moe_grouped_mm import MoeGroupedMmReceipt, run_grouped_mm_experiment
+from .nary_feature_propagation import NaryFeaturePropagationReceipt, propagate_nary_features
 from .neural_router import NeuralRouterReceipt, train_receipt_router
 from .rapids_matrix import (
     RapidsKMeansReceipt,
