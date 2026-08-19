@@ -36,6 +36,7 @@ export * from './core/inference-prefill-runtime.js';
 export * from './core/inference-runtime-selection.js';
 export * from './core/structured-value-ast.js';
 export * from './core/structured-value-arrow.js';
+export * from './core/structured-value-parity.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
