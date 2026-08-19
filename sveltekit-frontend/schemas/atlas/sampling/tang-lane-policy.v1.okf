@@ -1,0 +1,54 @@
+schema_id: atlas.tang-lane-policy
+schema_version: 1
+schema_kind: sampling_policy
+status: ACTIVE
+
+description: >
+  Lifecycle-specific policy layered over the existing canonical Query Adaptive
+  Sampling (QAS) owner. This contract does not implement Tang's theorem and does
+  not create a retrieval lane; it supplies deterministic weights, sample budgets,
+  and proof requirements for indexing, reranking, prefill, decode, inference,
+  ACE/cache residency, Kanban/task-board, and agentic workflow prioritization.
+
+owner:
+  canonical_sampler: sveltekit-frontend/src/lib/server/atlas/retrieval/query-adaptive-sampler.ts
+  theorem_scope: tang_inspired_heuristic_only
+
+fields:
+  schema: { type: literal, value: atlas.tang-lane-policy.v1 }
+  policyRevision: { type: string, required: true }
+  lane:
+    type: enum
+    values: [INDEXING, RERANKING, PREFILL, DECODE, INFERENCE, ACE, KANBAN, WORKFLOW]
+  sampleSize: { type: integer, minimum: 1 }
+  deterministicTopK: { type: integer, minimum: 0 }
+  explorationCount: { type: integer, minimum: 0 }
+  seedNamespace: { type: string, required: true }
+  weights:
+    type: object
+    fields:
+      semantic: { type: number, minimum: 0 }
+      lexical: { type: number, minimum: 0 }
+      structural: { type: number, minimum: 0 }
+      domain: { type: number, minimum: 0 }
+      execution: { type: number, minimum: 0 }
+  budgets:
+    type: object
+    fields:
+      maxCandidates: { type: integer, minimum: 1 }
+      maxTokens: { type: integer, minimum: 0 }
+      maxGpuBytes: { type: integer, minimum: 0 }
+      maxLatencyMs: { type: integer, minimum: 0 }
+      maxToolCalls: { type: integer, minimum: 0 }
+  exactPromotionRequired: { type: boolean }
+  canonicalWrites: { type: literal, value: false }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - this policy delegates sampling to the existing QAS owner; it is not a second sampler
+  - QAS output is proposal/routing evidence only and never creates an RRF/retrieval vote
+  - indexing sampling may prioritize enrichment work but may not drop canonical source ingestion
+  - prefill sampling may prioritize candidates/warming but the existing ContextManifest compiler owns final prompt admission
+  - ACE/cache residency must never change relevance scores
+  - Kanban/workflow sampling may prioritize ready work but may not bypass dependencies, authorization, exact promotion, or validation gates
+  - Tang theorem complexity claims are forbidden unless the required low-rank and l2-sampling input assumptions are independently proven
