@@ -9,6 +9,8 @@
   "enable_kmeans": true,
   "kmeans_clusters": 20,
   "kmeans_temperature": 1.0,
+  "kmeans_streaming_batch_size": 0,
+  "kmeans_prediction_batch_size": 0,
   "enable_som": true,
   "som_grid_rows": 20,
   "som_grid_columns": 20,
@@ -26,6 +28,7 @@
     "vector_name": "semantic_768",
     "canonical_payload_key": "canonical_id",
     "hnsw_ef": [32, 64, 128, 256],
+    "minimum_recall_at_k": 0.95,
     "timeout_seconds": 15
   },
   "nary": {
