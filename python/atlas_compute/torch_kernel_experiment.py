@@ -104,7 +104,7 @@ def _raw_triton_add_scale(scale: float):
     import triton.language as tl
 
     @triton.jit
-    def kernel(x_ptr, y_ptr, out_ptr, n_elements: tl.constexpr, BLOCK_SIZE: tl.constexpr, SCALE: tl.constexpr):
+    def kernel(x_ptr, y_ptr, out_ptr, n_elements, BLOCK_SIZE: tl.constexpr, SCALE: tl.constexpr):
         offsets = tl.program_id(0) * BLOCK_SIZE + tl.arange(0, BLOCK_SIZE)
         mask = offsets < n_elements
         x = tl.load(x_ptr + offsets, mask=mask)
@@ -117,7 +117,7 @@ def _raw_triton_add_scale(scale: float):
         out = torch.empty_like(x)
         n_elements = x.numel()
         grid = lambda meta: (triton.cdiv(n_elements, meta["BLOCK_SIZE"]),)
-        kernel[grid](x, y, out, n_elements=n_elements, BLOCK_SIZE=256, SCALE=scale)
+        kernel[grid](x, y, out, n_elements, BLOCK_SIZE=256, SCALE=scale)
         return out
 
     return call
@@ -132,28 +132,19 @@ def _triton_op_add_scale(scale: float):
         raise RuntimeError("torch.library.triton_op/wrap_triton unavailable")
 
     @triton.jit
-    def kernel(x_ptr, y_ptr, out_ptr, n_elements: tl.constexpr, BLOCK_SIZE: tl.constexpr, SCALE: tl.constexpr):
+    def kernel(x_ptr, y_ptr, out_ptr, n_elements, BLOCK_SIZE: tl.constexpr, SCALE: tl.constexpr):
         offsets = tl.program_id(0) * BLOCK_SIZE + tl.arange(0, BLOCK_SIZE)
         mask = offsets < n_elements
         x = tl.load(x_ptr + offsets, mask=mask)
         y = tl.load(y_ptr + offsets, mask=mask)
         tl.store(out_ptr + offsets, x + y * SCALE, mask=mask)
 
-    # Namespace/name is intentionally dedicated to this experiment. The wrapper
-    # makes the Triton implementation visible to torch.compile rather than opaque.
     @torch.library.triton_op("parent_atlas::add_scale_experiment", mutates_args={})
     def operation(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         out = torch.empty_like(x)
         n_elements = x.numel()
         grid = lambda meta: (triton.cdiv(n_elements, meta["BLOCK_SIZE"]),)
-        torch.library.wrap_triton(kernel)[grid](
-            x,
-            y,
-            out,
-            n_elements=n_elements,
-            BLOCK_SIZE=256,
-            SCALE=scale,
-        )
+        torch.library.wrap_triton(kernel)[grid](x, y, out, n_elements, BLOCK_SIZE=256, SCALE=scale)
         return out
 
     return operation
