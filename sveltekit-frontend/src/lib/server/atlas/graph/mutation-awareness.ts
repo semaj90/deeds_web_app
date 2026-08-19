@@ -14,6 +14,7 @@ export interface SourceMutationAwarenessV1 {
     | 'SOURCE_REF_MISSING'
     | 'INSUFFICIENT_VERSION_EVIDENCE';
   snapshotContentHash: string | null;
+  snapshotContentHashKind: 'packet_sha256' | 'derived_snapshot_hash' | 'none';
   currentContentHash: string | null;
   contentHashMatch: boolean | null;
   trackedMutationAfterSnapshot: boolean;
@@ -55,6 +56,7 @@ type SnapshotNodeRow = {
   packet_key: string | null;
   source_ref: string | null;
   content_hash: string | null;
+  properties: Record<string, unknown> | null;
 };
 
 type CurrentPacketRow = {
@@ -85,6 +87,29 @@ function nullableInt(value: number | string | null): number | null {
   if (value == null) return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
+}
+
+/** Normalize only path syntax that Git/source_ref routinely disagree about.
+ * Deliberately preserve case: repository case rules differ across filesystems. */
+export function normalizeMutationSourceRef(value: string): string {
+  return value.trim().replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/{2,}/g, '/');
+}
+
+function sourceRefAliases(value: string): string[] {
+  const normalized = normalizeMutationSourceRef(value);
+  return [...new Set([value.trim(), normalized].filter(Boolean))];
+}
+
+function snapshotHashKind(row: SnapshotNodeRow | undefined): SourceMutationAwarenessV1['snapshotContentHashKind'] {
+  if (!row?.content_hash) return 'none';
+  const recordedPacketSha = row.properties?.sha256;
+  if (typeof recordedPacketSha === 'string' && recordedPacketSha.length > 0 && recordedPacketSha === row.content_hash) {
+    return 'packet_sha256';
+  }
+  // graph-snapshot-materializer intentionally falls back to a stable hash of
+  // packet metadata when sha256 is absent. That hash MUST NOT later be compared
+  // to a raw source sha256 as though they used the same hash contract.
+  return 'derived_snapshot_hash';
 }
 
 /**
@@ -119,11 +144,12 @@ export async function loadMutationAwarenessV1(
   const nodeKeys = [...new Set(graphNodes.map((node) => node.id).filter(Boolean))];
   const packetKeys = [...new Set(graphNodes.map((node) => node.packetKey).filter((value): value is string => Boolean(value)))];
   const sourceRefs = [...new Set(graphNodes.map((node) => node.sourceRef).filter((value): value is string => Boolean(value)))];
+  const sourceRefQueryAliases = [...new Set(sourceRefs.flatMap(sourceRefAliases))];
 
   const snapshotNodes = nodeKeys.length === 0
     ? []
     : (await pool.query<SnapshotNodeRow>(
-        `SELECT node_key, packet_key, source_ref, content_hash
+        `SELECT node_key, packet_key, source_ref, content_hash, properties
            FROM atlas_graph_nodes_v2
           WHERE snapshot_id = $1::uuid
             AND node_key = ANY($2::text[])`,
@@ -141,28 +167,33 @@ export async function loadMutationAwarenessV1(
       )).rows;
 
   let mutationRows: MutationRow[] = [];
-  if (sourceRefs.length > 0) {
+  if (sourceRefQueryAliases.length > 0) {
     const relation = await pool.query<{ relation_name: string | null }>(
       `SELECT to_regclass('public.git_mutation_provenance')::text AS relation_name`,
     );
     if (relation.rows[0]?.relation_name) {
+      // Array overlap is the index-friendly first cut. We repeat path
+      // normalization in TypeScript below so slash differences do not bypass
+      // invalidation if an overlapping alias brought the mutation into scope.
       mutationRows = (await pool.query<MutationRow>(
         `SELECT diff_hash, after_commit, created_at, source_refs, changed_files
            FROM git_mutation_provenance
           WHERE created_at > $1::timestamptz
             AND (source_refs && $2::text[] OR changed_files && $2::text[])
           ORDER BY created_at DESC, diff_hash`,
-        [snapshotCapturedAt, sourceRefs],
+        [snapshotCapturedAt, sourceRefQueryAliases],
       )).rows;
     }
   }
 
   const snapshotNodeByKey = new Map(snapshotNodes.map((row) => [row.node_key, row]));
   const currentPacketByKey = new Map(currentPackets.map((row) => [row.packet_key, row]));
+  const canonicalRequestedRefs = new Set(sourceRefs.map(normalizeMutationSourceRef));
   const latestMutationBySourceRef = new Map<string, MutationRow>();
   for (const mutation of mutationRows) {
-    for (const sourceRef of [...(mutation.source_refs ?? []), ...(mutation.changed_files ?? [])]) {
-      if (sourceRefs.includes(sourceRef) && !latestMutationBySourceRef.has(sourceRef)) {
+    for (const rawSourceRef of [...(mutation.source_refs ?? []), ...(mutation.changed_files ?? [])]) {
+      const sourceRef = normalizeMutationSourceRef(rawSourceRef);
+      if (canonicalRequestedRefs.has(sourceRef) && !latestMutationBySourceRef.has(sourceRef)) {
         latestMutationBySourceRef.set(sourceRef, mutation);
       }
     }
@@ -172,10 +203,11 @@ export async function loadMutationAwarenessV1(
     const snapshotNode = snapshotNodeByKey.get(graphNode.id);
     const packet = graphNode.packetKey ? currentPacketByKey.get(graphNode.packetKey) : undefined;
     const sourceRef = graphNode.sourceRef ?? snapshotNode?.source_ref ?? packet?.source_ref ?? null;
-    const mutation = sourceRef ? latestMutationBySourceRef.get(sourceRef) : undefined;
+    const mutation = sourceRef ? latestMutationBySourceRef.get(normalizeMutationSourceRef(sourceRef)) : undefined;
     const snapshotContentHash = snapshotNode?.content_hash ?? null;
     const currentContentHash = packet?.sha256 ?? null;
-    const contentHashMatch = snapshotContentHash && currentContentHash
+    const snapshotContentHashKind = snapshotHashKind(snapshotNode);
+    const contentHashMatch = snapshotContentHashKind === 'packet_sha256' && snapshotContentHash && currentContentHash
       ? snapshotContentHash === currentContentHash
       : null;
 
@@ -206,6 +238,7 @@ export async function loadMutationAwarenessV1(
       status,
       reason,
       snapshotContentHash,
+      snapshotContentHashKind,
       currentContentHash,
       contentHashMatch,
       trackedMutationAfterSnapshot: Boolean(mutation),
