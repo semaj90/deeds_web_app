@@ -1,0 +1,61 @@
+schema_id: atlas.native-tensor-exchange
+schema_version: 1
+schema_kind: native_tensor_exchange
+status: ACTIVE
+
+description: >
+  Request-scoped tensor exchange descriptor for Parent Atlas native execution.
+  It makes memory device, ownership, lifetime, synchronization and transport
+  explicit when tensors move between Node/N-API, LibTorch, PyTorch/RAPIDS, and
+  remote workers. It composes with ExecutionDataRefV1; it never creates canonical
+  packet/symbol identity or a new retrieval lane.
+
+fields:
+  schema: { type: literal, value: atlas.native-tensor-exchange.v1 }
+  exchangeId: { type: string, required: true }
+  dataRefId: { type: string, nullable: true }
+  producerRuntime:
+    type: enum
+    values: [windows-native, wsl2, cpu-only]
+  consumerRuntime:
+    type: enum
+    values: [windows-native, wsl2, cpu-only]
+  transportMode:
+    type: enum
+    values: [NAPI_SYNC_HOST_VIEW, NAPI_ASYNC_OWNED_COPY, DLPACK_DEVICE, ARROW_REF, MMAP_REF, PROTOBUF_TENSORREF]
+  memoryDevice:
+    type: enum
+    values: [CPU, CUDA]
+  dtype:
+    type: enum
+    values: [fp32, fp16, bf16, int8, int32, int64]
+  shape: { type: integer_array, required: true }
+  strides: { type: integer_array, default: [] }
+  contiguous: { type: boolean }
+  byteOffset: { type: integer, minimum: 0 }
+  byteLength: { type: integer, minimum: 0 }
+  ownership:
+    type: enum
+    values: [BORROWED_JS_ARRAYBUFFER, OWNED_NATIVE_BUFFER, DLPACK_SHARED, IMMUTABLE_EXTERNAL_REF]
+  lifetime:
+    type: enum
+    values: [CALL_SCOPED, PROMISE_SCOPED, EXTERNAL_OWNER]
+  synchronization:
+    type: enum
+    values: [NONE, PRODUCER_CONSUMER_SYNC_REQUIRED]
+  immutable: { type: boolean }
+  environmentReceiptId: { type: string, nullable: true }
+  gpuLeaseId: { type: string, nullable: true }
+  dataChecksum: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - a Node TypedArray/ArrayBuffer is host memory and must never be labeled CUDA merely because the consumer later copies it to a GPU
+  - NAPI_SYNC_HOST_VIEW with BORROWED_JS_ARRAYBUFFER is CALL_SCOPED; a LibTorch torch::from_blob view over it must not outlive the N-API callback unless the backing store is explicitly retained
+  - asynchronous N-API execution must own/copy the input or hold an explicit lifetime reference; the v1 safe default is NAPI_ASYNC_OWNED_COPY plus OWNED_NATIVE_BUFFER
+  - DLPACK_DEVICE uses shared tensor memory semantics and requires an external owner plus producer/consumer synchronization; in-place mutation can affect the producer
+  - raw CUDA pointers, contexts, streams and DLPack capsules must not cross the Windows/WSL runtime boundary; use PROTOBUF_TENSORREF, ARROW_REF or MMAP_REF instead
+  - CUDA exchanges require environmentReceiptId and gpuLeaseId
+  - shape, dtype and byteLength must agree before native execution
+  - transport, memory ownership and executor choice never participate in canonical packet/symbol identity
