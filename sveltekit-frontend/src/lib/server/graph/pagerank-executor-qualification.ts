@@ -4,8 +4,13 @@ import { GraphProjectionSnapshotV1Schema } from './graph-projection-snapshot-v1.
 import {
 	PageRankCrossExecutorParityReceiptV2Schema,
 	assertPageRankParityReceiptMatchesSnapshot,
+	computePageRankParityParameterHash,
 } from './pagerank-cross-executor-parity.js';
-import { PageRankExecutorIdSchema } from './pagerank-execution-contract.js';
+import {
+	PageRankExecutionPlanV1Schema,
+	PageRankExecutorIdSchema,
+	assertPageRankPlanProjection,
+} from './pagerank-execution-contract.js';
 
 export const PageRankExecutorQualificationStatusSchema = z.enum([
 	'BLOCKED',
@@ -19,6 +24,8 @@ export const PageRankExecutorQualificationV1Schema = z
 		schema: z.literal('atlas.pagerank-executor-qualification.v1'),
 		executorId: PageRankExecutorIdSchema,
 		referenceExecutorId: PageRankExecutorIdSchema,
+		algorithmRevision: z.string().min(1),
+		parameterHash: z.string().min(1),
 		graphRevision: z.string().min(1),
 		projectionRevision: z.string().min(1),
 		projectionHash: z.string().min(1),
@@ -47,19 +54,25 @@ export const PageRankExecutorQualificationV1Schema = z
 export type PageRankExecutorQualificationV1 = z.infer<typeof PageRankExecutorQualificationV1Schema>;
 
 /**
- * The older NetworkX↔cuGraph PASS proves GPU PageRank math on an immutable
- * artifact. Canonical eligibility is stronger: a PASS receipt from the
- * current canonical reference executor (NEO4J_GDS) must carry the exact V3
- * projection and snapshot hashes. No boolean proof shortcut is accepted.
+ * Legacy NetworkX↔cuGraph evidence remains useful backend/math evidence, but
+ * canonical eligibility is parameter-specific. A typed NEO4J_GDS↔CUGRAPH
+ * receipt must match the exact V3 snapshot AND exact PageRank plan.
  */
 export function qualifyCugraphFromFrozenParity(input: {
+	plan: unknown;
 	snapshot: unknown;
 	legacyParityReceipt: unknown;
 	canonicalReferenceParityReceipt?: unknown;
 	producerRevision: string;
 	createdAt?: string;
 }): PageRankExecutorQualificationV1 {
+	const plan = PageRankExecutionPlanV1Schema.parse(input.plan);
 	const snapshot = GraphProjectionSnapshotV1Schema.parse(input.snapshot);
+	assertPageRankPlanProjection(plan, snapshot.projection);
+	if (plan.algorithm !== 'pagerank' || plan.parameters.personalization.mode !== 'GLOBAL') {
+		throw new Error('cuGraph canonical qualification currently requires global pagerank');
+	}
+	const parameterHash = computePageRankParityParameterHash(plan.parameters);
 	const legacy = GraphSnapshotParityReceiptSchema.parse(input.legacyParityReceipt);
 	const legacyThresholds = {
 		minTopKOverlap: 1,
@@ -96,20 +109,23 @@ export function qualifyCugraphFromFrozenParity(input: {
 			canonicalReferenceParityReceipt = assertPageRankParityReceiptMatchesSnapshot({
 				receipt: input.canonicalReferenceParityReceipt,
 				snapshot,
+				plan,
 			});
 			canonicalReferenceParityProven =
 				canonicalReferenceParityReceipt.status === 'PASS' &&
 				canonicalReferenceParityReceipt.referenceExecutorId === 'NEO4J_GDS' &&
-				canonicalReferenceParityReceipt.challengerExecutorId === 'CUGRAPH';
+				canonicalReferenceParityReceipt.challengerExecutorId === 'CUGRAPH' &&
+				canonicalReferenceParityReceipt.algorithmRevision === plan.algorithmRevision &&
+				canonicalReferenceParityReceipt.parameterHash === parameterHash;
 			if (!canonicalReferenceParityProven) {
-				reasons.push('canonical parity receipt is not a PASS for NEO4J_GDS↔CUGRAPH');
+				reasons.push('canonical parity receipt is not a parameter-qualified PASS for NEO4J_GDS↔CUGRAPH');
 			}
 		} catch (error) {
-			reasons.push(error instanceof Error ? error.message : 'canonical parity receipt failed lineage validation');
+			reasons.push(error instanceof Error ? error.message : 'canonical parity receipt failed plan/snapshot lineage validation');
 		}
 	}
 	if (!canonicalReferenceParityProven) {
-		reasons.push('NEO4J_GDS↔CUGRAPH parity on the same V3-qualified snapshot is not yet proven');
+		reasons.push('NEO4J_GDS↔CUGRAPH parity on the same V3 snapshot and PageRank parameter set is not yet proven');
 	}
 
 	const status = !mathPass
@@ -124,6 +140,8 @@ export function qualifyCugraphFromFrozenParity(input: {
 		schema: 'atlas.pagerank-executor-qualification.v1',
 		executorId: 'CUGRAPH',
 		referenceExecutorId: 'NEO4J_GDS',
+		algorithmRevision: plan.algorithmRevision,
+		parameterHash,
 		graphRevision: snapshot.projection.graphRevision,
 		projectionRevision: snapshot.projection.projectionRevision,
 		projectionHash: snapshot.projection.projectionHash,
