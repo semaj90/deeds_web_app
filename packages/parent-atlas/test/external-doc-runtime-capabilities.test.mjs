@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   buildExternalDocsHybridProofGate,
+  buildExternalDocsShadowCollectionConfig,
   deriveQdrantVersionCapabilities,
   qdrantExternalDocsCapabilityProfileSchema,
   semverAtLeast,
@@ -45,6 +46,31 @@ test('Atlas requires the Qdrant 1.10 hybrid plus IDF baseline for this productio
   assert.equal(after.supports_sparse_vectors, true);
   assert.equal(after.supports_idf_modifier, true);
   assert.equal(after.supports_hybrid_query_api, true);
+});
+
+test('Qdrant 1.19 shadow config uses per-structure memory tiers and no unverified metadata field', () => {
+  const config = buildExternalDocsShadowCollectionConfig(profile({
+    qdrant_version: '1.19.0',
+    supports_memory_tiers_v119: true,
+  }));
+  assert.equal(config.vectors.semantic_768.memory, 'cold');
+  assert.equal(config.hnsw_config.memory, 'cold');
+  assert.equal(config.sparse_vectors.lexical_bm25.index.memory, 'pinned');
+  assert.deepEqual(config.payload, { memory: 'cold' });
+  assert.equal('on_disk_payload' in config, false);
+  assert.equal('metadata' in config, false);
+});
+
+test('pre-1.19 shadow config uses documented legacy on-disk equivalents', () => {
+  const config = buildExternalDocsShadowCollectionConfig(profile({
+    qdrant_version: '1.18.3',
+    supports_memory_tiers_v119: false,
+  }));
+  assert.equal(config.vectors.semantic_768.on_disk, true);
+  assert.equal(config.hnsw_config.on_disk, true);
+  assert.equal(config.sparse_vectors.lexical_bm25.index.on_disk, false);
+  assert.equal(config.on_disk_payload, true);
+  assert.equal('payload' in config, false);
 });
 
 test('native BM25 must be probed before the production proof gate can become ready', () => {
