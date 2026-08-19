@@ -23,6 +23,11 @@ function point(chunkId = 'chunk-1') {
     chunk_checksum: h('b'),
     domain_class: 'retrieval',
     ontology_classes: ['RETRIEVAL', 'ALGORITHM'],
+    ast_observation_kinds: ['database_write'],
+    langextract_classes: ['algorithm'],
+    tags: ['ast=database_write', 'langextract=algorithm', 'ontology=retrieval'],
+    kmeans_cluster: 17,
+    som_cell: '08:13',
     language: 'en',
     text: 'BM25 uses inverse document frequency.',
     semantic_768: vector(),
@@ -40,7 +45,7 @@ test('stable Qdrant UUID is deterministic but transport-only', () => {
   assert.match(a, /^[0-9a-f-]{36}$/);
 });
 
-test('hybrid point always carries dense semantic and BM25 text in one wire point', () => {
+test('hybrid point carries dense, BM25 and staged observation routing payload together', () => {
   const wire = hybridWirePoint(point());
   assert.equal(wire.vector.semantic_768.length, 768);
   assert.deepEqual(wire.vector.lexical_bm25, {
@@ -48,6 +53,11 @@ test('hybrid point always carries dense semantic and BM25 text in one wire point
     model: 'qdrant/bm25',
   });
   assert.equal(wire.payload.chunk_id, 'chunk-1');
+  assert.deepEqual(wire.payload.ast_observation_kinds, ['database_write']);
+  assert.deepEqual(wire.payload.langextract_classes, ['algorithm']);
+  assert.ok(wire.payload.tags.includes('ast=database_write'));
+  assert.equal(wire.payload.kmeans_cluster, 17);
+  assert.equal(wire.payload.som_cell, '08:13');
   assert.equal(wire.payload.canonical_authority, false);
 });
 
