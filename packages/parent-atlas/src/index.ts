@@ -108,6 +108,7 @@ export * from './core/atlas-kernel-session.js';
 export * from './core/claim-verification.js';
 export * from './core/remote-adapter-lifecycle.js';
 export * from './core/adaptive-memory-runtime.js';
+export * from './core/external-doc-knowledge-fabric.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
@@ -144,7 +145,7 @@ export type { GateReport, GateCheck, GateStatus, RunOptions } from './gates/type
 export type { PostgresAdapter } from './adapters/postgres.js';
 export type { QdrantAdapter, QdrantPoint, QdrantSearchResult } from './adapters/qdrant.js';
 export type { ValkeyAdapter } from './adapters/valkey.js';
-export type { Neo4jAdapter, Neo4jQueryResult } from './adapters/neo4j.js';
+export type { Neo4jAdapter } from './adapters/neo4j.js';
 export type { DuckDbAdapter, DuckDbRow } from './adapters/duckdb.js';
 export type { PacketIdentity } from './core/canonical-packet-bridge.js';
 export type { AtlasMemoryEnvelope, GlyphRecord } from './core/canonical-packet-bridge.js';
