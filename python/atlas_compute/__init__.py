@@ -5,9 +5,22 @@ revision-qualified tensors and emit derived rankings/proof receipts.
 """
 
 from .ann_compare import AnnComparisonReceipt, compare_cuvs_exact_and_cagra
+from .cluster_softmax import CuvsSoftKMeansReceipt, run_cuvs_soft_kmeans
+from .contextual_windows import ContextualWindowReceipt, contextualize_sliding_windows
 from .cugraph_ppr import CuGraphPprParityReceipt, run_cugraph_ppr_parity
+from .cuvs_analytics import (
+    CuvsAllNeighborsReceipt,
+    CuvsBinaryQuantizationReceipt,
+    CuvsExactKnnReceipt,
+    CuvsPairwiseReceipt,
+    run_cuvs_all_neighbors,
+    run_cuvs_binary_quantization,
+    run_cuvs_exact_knn,
+    run_cuvs_pairwise_distance,
+)
 from .determinism import TorchDeterminismReceipt, configure_torch_determinism
 from .exact_semantic import ExactSemanticSearchReceipt, exact_semantic_search
+from .feature_alignment import FeatureAlignmentReceipt, FeatureBlock, align_feature_blocks
 from .graph_programs import BfsReceipt, CondensationDagReceipt, deterministic_bfs, condense_and_lexicographically_sort
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
 from .interpolation import TensorInterpolationReceipt, interpolate_topology_field
@@ -29,48 +42,18 @@ from .semantic_snapshot_freeze import (
     freeze_semantic_snapshot,
     load_and_verify_frozen_snapshot,
 )
+from .som import SomLatticeReceipt, SomReceipt, aggregate_som_lattice, train_deterministic_som
+from .sparse_relations import (
+    SparseComputePolicyReceipt,
+    SparseRelationReceipt,
+    SparseSoftmaxReceipt,
+    SparseSpmmReceipt,
+    build_binary_incidence,
+    choose_sparse_compute_mode,
+    sparse_relation_softmax,
+    sparse_relation_spmm,
+)
 from .spectral import SpectralReceipt, symmetric_eigenspace
 from .torch_kernel_experiment import TorchKernelExperimentReceipt, run_torch_kernel_experiment
 
-__all__ = [
-    "AnnComparisonReceipt",
-    "compare_cuvs_exact_and_cagra",
-    "CuGraphPprParityReceipt",
-    "run_cugraph_ppr_parity",
-    "TorchDeterminismReceipt",
-    "configure_torch_determinism",
-    "ExactSemanticSearchReceipt",
-    "exact_semantic_search",
-    "BfsReceipt",
-    "CondensationDagReceipt",
-    "deterministic_bfs",
-    "condense_and_lexicographically_sort",
-    "HypergraphTensorPprReceipt",
-    "run_tensor_ppr",
-    "TensorInterpolationReceipt",
-    "interpolate_topology_field",
-    "LowRankComparisonReceipt",
-    "compare_low_rank_recommendations",
-    "ModelTopologyDetection",
-    "audit_model_manifest",
-    "detect_model_topology",
-    "MoeGroupedMmReceipt",
-    "run_grouped_mm_experiment",
-    "NeuralRouterReceipt",
-    "train_receipt_router",
-    "RapidsKMeansReceipt",
-    "RapidsPcaReceipt",
-    "deterministic_farthest_first_ordinals",
-    "run_cuvs_kmeans",
-    "run_cuvs_pca",
-    "RepresentationComparisonReceipt",
-    "compare_representations",
-    "FrozenSemanticRow",
-    "FrozenSemanticSnapshotReceipt",
-    "freeze_semantic_snapshot",
-    "load_and_verify_frozen_snapshot",
-    "SpectralReceipt",
-    "symmetric_eigenspace",
-    "TorchKernelExperimentReceipt",
-    "run_torch_kernel_experiment",
-]
+__all__ = [name for name in globals() if not name.startswith("_")]
