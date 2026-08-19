@@ -3,11 +3,7 @@ import { ornithRuntimeCapabilities, planOrnithRuntime } from './ornith-runtime-p
 
 describe('Ornith 9B runtime plan', () => {
   it('records dense FFN parameterization separately from hybrid recurrent sequence mixing', () => {
-    const plan = planOrnithRuntime({
-      workload: 'INTERACTIVE_INFERENCE',
-      linuxAvailable: true,
-      producerRevision: 'test',
-    });
+    const plan = planOrnithRuntime({ workload: 'INTERACTIVE_INFERENCE', linuxAvailable: true, producerRevision: 'test' });
     expect(plan.parameterization).toBe('DENSE_FFN');
     expect(plan.isMixtureOfExperts).toBe(false);
     expect(plan.sequenceArchitecture).toBe('HYBRID_GATED_DELTANET_FULL_ATTENTION');
@@ -22,14 +18,18 @@ describe('Ornith 9B runtime plan', () => {
   });
 
   it('uses llama-server as the default interactive quantized inference owner', () => {
-    const plan = planOrnithRuntime({
-      workload: 'TOOL_CALLING',
-      linuxAvailable: true,
-      producerRevision: 'test',
-    });
+    const plan = planOrnithRuntime({ workload: 'TOOL_CALLING', linuxAvailable: true, producerRevision: 'test' });
     expect(plan.primaryRuntime).toBe('LLAMA_SERVER_GGUF');
     expect(plan.challengerRuntimes).toContain('PYTORCH_TRANSFORMERS');
-    expect(ornithRuntimeCapabilities('LLAMA_SERVER_GGUF').supportsGatedDeltaNet).toBe(true);
+    expect(ornithRuntimeCapabilities('LLAMA_SERVER_GGUF').executionFramework).toBe('LLAMA_CPP');
+  });
+
+  it('treats current TensorRT-LLM as PyTorch-backed inference with no legacy engine-build requirement', () => {
+    const capability = ornithRuntimeCapabilities('TENSORRT_LLM');
+    expect(capability.executionFramework).toBe('PYTORCH');
+    expect(capability.requiresModelConversionOrEngineBuild).toBe(false);
+    expect(capability.supportsFullTrainingAutograd).toBe(false);
+    expect(capability.supportsQLoRATraining).toBe(false);
   });
 
   it('does not promote TensorRT-LLM until exact hybrid-model support and same-weight parity are proven', () => {
@@ -46,15 +46,14 @@ describe('Ornith 9B runtime plan', () => {
       producerRevision: 'test',
     });
     expect(proven.primaryRuntime).toBe('TENSORRT_LLM');
-    expect(ornithRuntimeCapabilities('TENSORRT_LLM').supportsGatedDeltaNet).toBe(true);
+    expect(proven.reasons.some((reason) => reason.includes('no legacy engine-build step'))).toBe(true);
   });
 
-  it('routes QLoRA and RL training to PyTorch rather than inference runtimes', () => {
+  it('routes QLoRA and RL training to PyTorch Transformers rather than serving runtimes', () => {
     for (const workload of ['QLORA_TRAINING', 'RL_TRAINING'] as const) {
       const plan = planOrnithRuntime({ workload, linuxAvailable: true, producerRevision: 'test' });
       expect(plan.primaryRuntime).toBe('PYTORCH_TRANSFORMERS');
     }
-    expect(ornithRuntimeCapabilities('LLAMA_SERVER_GGUF').supportsFullTrainingAutograd).toBe(false);
     expect(ornithRuntimeCapabilities('TENSORRT_LLM').supportsFullTrainingAutograd).toBe(false);
   });
 
