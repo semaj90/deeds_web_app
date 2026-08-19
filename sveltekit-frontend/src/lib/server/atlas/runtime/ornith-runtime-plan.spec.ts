@@ -2,14 +2,22 @@ import { describe, expect, it } from 'vitest';
 import { ornithRuntimeCapabilities, planOrnithRuntime } from './ornith-runtime-plan.js';
 
 describe('Ornith 9B runtime plan', () => {
-  it('keeps Ornith 9B dense and explicitly not SSM', () => {
+  it('records dense FFN parameterization separately from hybrid recurrent sequence mixing', () => {
     const plan = planOrnithRuntime({
       workload: 'INTERACTIVE_INFERENCE',
       linuxAvailable: true,
       producerRevision: 'test',
     });
-    expect(plan.modelArchitecture).toBe('DENSE_TRANSFORMER');
-    expect(plan.isSsm).toBe(false);
+    expect(plan.parameterization).toBe('DENSE_FFN');
+    expect(plan.isMixtureOfExperts).toBe(false);
+    expect(plan.sequenceArchitecture).toBe('HYBRID_GATED_DELTANET_FULL_ATTENTION');
+    expect(plan.statefulSequenceClass).toBe('RECURRENT_LINEAR_ATTENTION');
+    expect(plan.isMambaStyleSsm).toBe(false);
+    expect(plan.hasRecurrentLinearAttention).toBe(true);
+    expect(plan.hasFullSoftmaxAttention).toBe(true);
+    expect(plan.gatedDeltaNetLayerCount).toBe(24);
+    expect(plan.fullAttentionLayerCount).toBe(8);
+    expect(plan.totalTextLayers).toBe(32);
     expect(plan.trainingIdentity).toBe('SELF_SCAFFOLDING_RL');
   });
 
@@ -21,9 +29,10 @@ describe('Ornith 9B runtime plan', () => {
     });
     expect(plan.primaryRuntime).toBe('LLAMA_SERVER_GGUF');
     expect(plan.challengerRuntimes).toContain('PYTORCH_TRANSFORMERS');
+    expect(ornithRuntimeCapabilities('LLAMA_SERVER_GGUF').supportsGatedDeltaNet).toBe(true);
   });
 
-  it('does not promote TensorRT-LLM until model support and same-weight parity are proven', () => {
+  it('does not promote TensorRT-LLM until exact hybrid-model support and same-weight parity are proven', () => {
     const unproven = planOrnithRuntime({
       workload: 'BATCH_INFERENCE', linuxAvailable: true,
       tensorrtLlmModelSupportProven: false, sameWeightRevisionAvailable: true,
@@ -37,6 +46,7 @@ describe('Ornith 9B runtime plan', () => {
       producerRevision: 'test',
     });
     expect(proven.primaryRuntime).toBe('TENSORRT_LLM');
+    expect(ornithRuntimeCapabilities('TENSORRT_LLM').supportsGatedDeltaNet).toBe(true);
   });
 
   it('routes QLoRA and RL training to PyTorch rather than inference runtimes', () => {
@@ -48,10 +58,11 @@ describe('Ornith 9B runtime plan', () => {
     expect(ornithRuntimeCapabilities('TENSORRT_LLM').supportsFullTrainingAutograd).toBe(false);
   });
 
-  it('treats Triton as a kernel experiment under PyTorch, not a standalone model server', () => {
+  it('treats Triton as separate kernel work for recurrent GDN versus full attention', () => {
     const plan = planOrnithRuntime({ workload: 'KERNEL_EXPERIMENT', linuxAvailable: true, producerRevision: 'test' });
     expect(plan.primaryRuntime).toBe('PYTORCH_COMPILE_INDUCTOR');
     expect(plan.challengerRuntimes).toContain('PYTORCH_CUSTOM_TRITON');
     expect(ornithRuntimeCapabilities('PYTORCH_CUSTOM_TRITON').openAiCompatibleServing).toBe(false);
+    expect(plan.reasons.some((reason) => reason.includes('Gated-DeltaNet'))).toBe(true);
   });
 });
