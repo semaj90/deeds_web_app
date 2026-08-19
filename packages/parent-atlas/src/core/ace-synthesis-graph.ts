@@ -16,13 +16,22 @@ export const ACE_SYNTHESIS_NODE_KINDS = [
   'SAMPLE_QUERY_NOMINATION',
   'FEATURE_ALIGNMENT',
   'EXACT_PROMOTION',
+  'PREFILL_CACHE_LOOKUP',
   'PREFILL_COMPILE',
+  'PREFILL_CACHE_STORE',
+  'PREFILL_RESOLVE',
   'DECODE',
   'PLAN_PATCH',
   'APPLY_PATCH',
   'VALIDATE',
   'REPAIR',
   'MATERIALIZE',
+] as const;
+
+export const ACE_NODE_EXECUTION_CONDITIONS = [
+  'ALWAYS',
+  'PREFILL_CACHE_HIT',
+  'PREFILL_CACHE_MISS',
 ] as const;
 
 export const aceSynthesisNodeSchema = z.object({
@@ -35,6 +44,8 @@ export const aceSynthesisNodeSchema = z.object({
   evidence_refs: z.array(id).max(4096).default([]),
   maximum_candidates: z.number().int().positive().nullable().optional(),
   maximum_hops: z.number().int().nonnegative().max(8).nullable().optional(),
+  execution_condition: z.enum(ACE_NODE_EXECUTION_CONDITIONS).default('ALWAYS'),
+  condition_source_node_id: id.nullable().default(null),
   read_only: z.boolean(),
   mutation_requested: z.boolean(),
   exact_promotion_required: z.boolean(),
@@ -48,8 +59,14 @@ export const aceSynthesisNodeSchema = z.object({
   if (value.kind === 'APPLY_PATCH' && !value.mutation_requested) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['mutation_requested'], message: 'APPLY_PATCH must declare mutation_requested=true' });
   }
-  if (['AST_RETRIEVAL', 'SEMANTIC_KNN', 'GRAPH_RANK', 'NARY_DECOMPOSITION', 'CONTEXT_WINDOW', 'SAMPLE_QUERY_NOMINATION', 'FEATURE_ALIGNMENT'].includes(value.kind) && value.canonical_authority) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['canonical_authority'], message: `${value.kind} is derived evidence/routing compute and cannot own canonical truth` });
+  if (['AST_RETRIEVAL', 'SEMANTIC_KNN', 'GRAPH_RANK', 'NARY_DECOMPOSITION', 'CONTEXT_WINDOW', 'SAMPLE_QUERY_NOMINATION', 'FEATURE_ALIGNMENT', 'PREFILL_CACHE_LOOKUP', 'PREFILL_CACHE_STORE', 'PREFILL_RESOLVE'].includes(value.kind) && value.canonical_authority) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['canonical_authority'], message: `${value.kind} is derived evidence/routing/runtime compute and cannot own canonical truth` });
+  }
+  if (value.execution_condition === 'ALWAYS' && value.condition_source_node_id !== null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['condition_source_node_id'], message: 'ALWAYS nodes cannot declare a condition source' });
+  }
+  if (value.execution_condition !== 'ALWAYS' && value.condition_source_node_id === null) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['condition_source_node_id'], message: 'conditional nodes require condition_source_node_id' });
   }
 });
 
@@ -143,6 +160,14 @@ export function validateAceSynthesisGraph(input: z.input<typeof aceSynthesisGrap
     for (const artifactId of [...node.input_artifact_ids, ...node.output_artifact_ids]) {
       if (!artifactIds.has(artifactId)) throw new Error(`ACE_SYNTHESIS_UNKNOWN_ARTIFACT:${node.node_id}:${artifactId}`);
     }
+    if (node.condition_source_node_id !== null) {
+      const source = byId.get(node.condition_source_node_id);
+      if (!source) throw new Error(`ACE_SYNTHESIS_MISSING_CONDITION_SOURCE:${node.node_id}:${node.condition_source_node_id}`);
+      if (source.kind !== 'PREFILL_CACHE_LOOKUP') throw new Error(`ACE_SYNTHESIS_INVALID_CONDITION_SOURCE:${node.node_id}:${source.kind}`);
+      if (!node.depends_on.includes(source.node_id) && !ancestors(node, byId).some((parent) => parent.node_id === source.node_id)) {
+        throw new Error(`ACE_SYNTHESIS_CONDITION_SOURCE_NOT_UPSTREAM:${node.node_id}:${source.node_id}`);
+      }
+    }
   }
 
   const visiting = new Set<string>();
@@ -157,6 +182,8 @@ export function validateAceSynthesisGraph(input: z.input<typeof aceSynthesisGrap
   };
   for (const nodeId of [...byId.keys()].sort()) visit(nodeId);
 
+  const hasCacheBranch = graph.nodes.some((node) => ['PREFILL_CACHE_LOOKUP', 'PREFILL_CACHE_STORE', 'PREFILL_RESOLVE'].includes(node.kind));
+
   for (const node of graph.nodes) {
     const upstream = ancestors(node, byId);
 
@@ -164,14 +191,47 @@ export function validateAceSynthesisGraph(input: z.input<typeof aceSynthesisGrap
       throw new Error(`ACE_SYNTHESIS_EXACT_PROMOTION_REQUIRED:${node.node_id}`);
     }
 
+    if (node.kind === 'PREFILL_CACHE_LOOKUP') {
+      if (node.execution_condition !== 'ALWAYS') throw new Error(`ACE_SYNTHESIS_LOOKUP_MUST_ALWAYS_RUN:${node.node_id}`);
+      const required = new Set(['FEATURE_ALIGNMENT', 'EXACT_PROMOTION']);
+      const seen = new Set(upstream.map((parent) => parent.kind));
+      for (const kind of required) if (!seen.has(kind)) throw new Error(`ACE_SYNTHESIS_LOOKUP_MISSING_${kind}:${node.node_id}`);
+    }
+
     if (node.kind === 'PREFILL_COMPILE') {
       const required = new Set(['FEATURE_ALIGNMENT', 'EXACT_PROMOTION']);
       const seen = new Set(upstream.map((parent) => parent.kind));
       for (const kind of required) if (!seen.has(kind)) throw new Error(`ACE_SYNTHESIS_PREFILL_MISSING_${kind}:${node.node_id}`);
+      if (hasCacheBranch) {
+        if (node.execution_condition !== 'PREFILL_CACHE_MISS') throw new Error(`ACE_SYNTHESIS_PREFILL_COMPILE_MUST_RUN_ON_MISS:${node.node_id}`);
+        if (!upstream.some((parent) => parent.kind === 'PREFILL_CACHE_LOOKUP')) throw new Error(`ACE_SYNTHESIS_PREFILL_COMPILE_REQUIRES_LOOKUP:${node.node_id}`);
+      }
     }
 
-    if (node.kind === 'DECODE' && !upstream.some((parent) => parent.kind === 'PREFILL_COMPILE')) {
-      throw new Error(`ACE_SYNTHESIS_DECODE_REQUIRES_PREFILL:${node.node_id}`);
+    if (node.kind === 'PREFILL_CACHE_STORE') {
+      if (node.execution_condition !== 'PREFILL_CACHE_MISS') throw new Error(`ACE_SYNTHESIS_CACHE_STORE_MUST_RUN_ON_MISS:${node.node_id}`);
+      if (!upstream.some((parent) => parent.kind === 'PREFILL_COMPILE')) throw new Error(`ACE_SYNTHESIS_CACHE_STORE_REQUIRES_COMPILE:${node.node_id}`);
+      if (!upstream.some((parent) => parent.kind === 'PREFILL_CACHE_LOOKUP')) throw new Error(`ACE_SYNTHESIS_CACHE_STORE_REQUIRES_LOOKUP:${node.node_id}`);
+    }
+
+    if (node.kind === 'PREFILL_RESOLVE') {
+      if (node.execution_condition !== 'ALWAYS') throw new Error(`ACE_SYNTHESIS_PREFILL_RESOLVE_MUST_ALWAYS_RUN:${node.node_id}`);
+      const lookup = upstream.find((parent) => parent.kind === 'PREFILL_CACHE_LOOKUP');
+      const store = upstream.find((parent) => parent.kind === 'PREFILL_CACHE_STORE');
+      const compile = upstream.find((parent) => parent.kind === 'PREFILL_COMPILE');
+      if (!lookup || !compile || !store) throw new Error(`ACE_SYNTHESIS_PREFILL_RESOLVE_REQUIRES_HIT_MISS_BRANCH:${node.node_id}`);
+      if (compile.condition_source_node_id !== lookup.node_id || store.condition_source_node_id !== lookup.node_id) {
+        throw new Error(`ACE_SYNTHESIS_PREFILL_BRANCH_CONDITION_MISMATCH:${node.node_id}`);
+      }
+      if (node.output_artifact_ids.length !== 1) throw new Error(`ACE_SYNTHESIS_PREFILL_RESOLVE_REQUIRES_ONE_OUTPUT:${node.node_id}`);
+    }
+
+    if (node.kind === 'DECODE') {
+      if (hasCacheBranch) {
+        if (!upstream.some((parent) => parent.kind === 'PREFILL_RESOLVE')) throw new Error(`ACE_SYNTHESIS_DECODE_REQUIRES_PREFILL_RESOLVE:${node.node_id}`);
+      } else if (!upstream.some((parent) => parent.kind === 'PREFILL_COMPILE')) {
+        throw new Error(`ACE_SYNTHESIS_DECODE_REQUIRES_PREFILL:${node.node_id}`);
+      }
     }
 
     if (node.kind === 'APPLY_PATCH') {
@@ -188,6 +248,13 @@ export function validateAceSynthesisGraph(input: z.input<typeof aceSynthesisGrap
       if (!upstream.some((parent) => parent.kind === 'VALIDATE')) throw new Error(`ACE_SYNTHESIS_REPAIR_REQUIRES_VALIDATION_EVIDENCE:${node.node_id}`);
       if (node.canonical_authority) throw new Error(`ACE_SYNTHESIS_REPAIR_CANNOT_OWN_CANONICAL_TRUTH:${node.node_id}`);
     }
+  }
+
+  if (hasCacheBranch) {
+    const lookups = graph.nodes.filter((node) => node.kind === 'PREFILL_CACHE_LOOKUP');
+    const resolves = graph.nodes.filter((node) => node.kind === 'PREFILL_RESOLVE');
+    if (lookups.length !== 1) throw new Error('ACE_SYNTHESIS_REQUIRES_SINGLE_PREFILL_CACHE_LOOKUP');
+    if (resolves.length !== 1) throw new Error('ACE_SYNTHESIS_REQUIRES_SINGLE_PREFILL_RESOLVE');
   }
 
   const recomputed = sha256({ ...graph, graph_checksum: undefined });
@@ -226,8 +293,9 @@ export function describeAceSynthesisGraph(): string {
   return [
     'ACE synthesis is a revisioned DAG over immutable artifact references, not a bag of model-readable strings.',
     'AST, semantic KNN, PageRank/PPR, N-ary decomposition, contextual windows and Tang-style sample/query access produce derived nominations/signals only.',
-    'Exact evidence promotion must precede prefill authority and every mutating patch path.',
-    'Decode consumes a compiled prefill identity; it does not redefine the evidence snapshot.',
+    'Exact evidence promotion must precede logical prefill cache lookup and every mutating patch path.',
+    'When logical caching is enabled the DAG branches at PREFILL_CACHE_LOOKUP: HIT skips compile/store; MISS executes PREFILL_COMPILE then PREFILL_CACHE_STORE; PREFILL_RESOLVE converges both paths into exactly one compiled-prefill artifact.',
+    'Decode consumes PREFILL_RESOLVE and therefore remains backend-neutral: llama.cpp prefix caching, TensorRT-LLM paged KV reuse, Triton scheduling and future PyTorch/Triton kernels are runtime accelerators below the same logical prefill identity.',
     'Every APPLY_PATCH path is bounded, validator-gated, and materialized only after validation receipts exist; REPAIR consumes failure evidence and remains non-canonical.',
   ].join(' ');
 }
