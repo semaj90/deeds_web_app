@@ -1,0 +1,45 @@
+schema_id: atlas.structured-tool-input
+schema_version: 1
+schema_kind: workflow_tool_input
+status: ACTIVE
+
+description: >
+  Ordered structured arguments for deterministic Parent Atlas DAG/tool execution.
+  Inputs use AtlasStructuredValueV1 instead of an opaque JSON object so positional
+  order, named arguments, duplicate/source object entries, 64-bit integers,
+  references and structural provenance survive TypeScript/protobuf/Go/Python
+  transport. The target tool schema remains authoritative for semantic validation.
+
+fields:
+  schema: { type: literal, value: atlas.structured-tool-input.v1 }
+  requestId: { type: string, required: true }
+  workflowId: { type: string, required: true }
+  actionId: { type: string, required: true }
+  dagNodeId: { type: string, required: true }
+  capability: { type: string, required: true }
+  toolSchemaRevision: { type: string, required: true }
+  arguments:
+    type: array
+    default: []
+    items:
+      type: object
+      fields:
+        ordinal: { type: integer, minimum: 0 }
+        name: { type: string, nullable: true }
+        role:
+          type: enum
+          values: [POSITIONAL, NAMED, VAR_POSITIONAL, VAR_KEYWORD, OPTIONS, PAYLOAD, REFERENCE]
+        value: { type: atlas.structured-value.v1, required: true }
+  evidenceRefs: { type: string_array, default: [] }
+  exactPromotionRefs: { type: string_array, default: [] }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - arguments preserve ordinal order and MUST NOT be represented as a map when positional/source ordering matters
+  - a name does not replace ordinal; named arguments remain ordered observations for deterministic replay
+  - nested OBJECT/MAP values preserve repeated ordered entries through AtlasStructuredValueV1
+  - tool execution MUST validate these values against the capability's revisioned input schema before dispatch
+  - SYMBOL_REF/PACKET_REF/TENSOR_REF/SOURCE_REF values are hydrated/authorized by their canonical owners; a tool input may not reinterpret backend IDs as canonical refs
+  - exactPromotionRefs/evidenceRefs constrain execution and are not inferred from serialized argument bytes
+  - the structured tool input is replayable but does not itself authorize side effects; existing workflow/action authorization remains authoritative
