@@ -4,6 +4,7 @@ These modules never own canonical application truth. They consume frozen,
 revision-qualified tensors and emit derived rankings/proof receipts.
 """
 
+from .aligned_snapshot_experiment_v2 import AlignedSnapshotExperimentV2Receipt, run_aligned_snapshot_experiment_v2
 from .ann_compare import AnnComparisonReceipt, compare_cuvs_exact_and_cagra
 from .cluster_softmax import CuvsSoftKMeansReceipt, run_cuvs_soft_kmeans
 from .contextual_windows import ContextualWindowReceipt, contextualize_sliding_windows
@@ -20,7 +21,8 @@ from .cuvs_analytics import (
 )
 from .determinism import TorchDeterminismReceipt, configure_torch_determinism
 from .exact_semantic import ExactSemanticSearchReceipt, exact_semantic_search
-from .feature_alignment import FeatureAlignmentReceipt, FeatureBlock, align_feature_blocks
+from .feature_alignment import FeatureBlock, FeatureMatrixAlignmentReceipt, align_feature_blocks, make_feature_block
+from .gpu_memory import GpuMemoryReceipt, GpuMemorySampler
 from .graph_programs import BfsReceipt, CondensationDagReceipt, deterministic_bfs, condense_and_lexicographically_sort
 from .hypergraph_tensor import HypergraphTensorPprReceipt, run_tensor_ppr
 from .interpolation import TensorInterpolationReceipt, interpolate_topology_field
@@ -29,6 +31,7 @@ from .model_topology import ModelTopologyDetection, audit_model_manifest, detect
 from .moe_grouped_mm import MoeGroupedMmReceipt, run_grouped_mm_experiment
 from .nary_feature_propagation import NaryFeaturePropagationReceipt, propagate_nary_features
 from .neural_router import NeuralRouterReceipt, train_receipt_router
+from .ordered_context import OrderedContextReceipt, contextualize_explicit_order
 from .rapids_matrix import (
     RapidsKMeansReceipt,
     RapidsPcaReceipt,
