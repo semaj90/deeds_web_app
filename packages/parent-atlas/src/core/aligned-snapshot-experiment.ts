@@ -22,7 +22,8 @@ export const alignedSnapshotExperimentV2Schema = z.object({
   experiment_revision: z.string().min(1),
   semantic_snapshot_revision: z.string().min(1),
   representation_revision: z.string().min(1),
-  semantic_row_identity_checksum: checksum,
+  semantic_versioned_row_identity_checksum: checksum,
+  semantic_canonical_order_checksum: checksum,
   semantic_tensor_checksum: checksum,
   row_count: z.number().int().positive(),
   semantic_dimensions: z.literal(768),
@@ -61,6 +62,9 @@ export const alignedSnapshotExperimentV2Schema = z.object({
   if (value.k >= value.row_count) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['k'], message: 'self-excluding K must be smaller than row_count' });
   }
+  if (value.semantic_canonical_order_checksum !== value.aligned_feature_row_identity_checksum) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['aligned_feature_row_identity_checksum'], message: 'aligned feature blocks must preserve the frozen canonical row order' });
+  }
 });
 
 export const alignedSnapshotProofEnvelopeV2Schema = z.object({
@@ -93,6 +97,7 @@ export type AlignedSnapshotProofEnvelopeV2 = z.infer<typeof alignedSnapshotProof
 export function describeAlignedSnapshotExperiment(): string {
   return [
     'One frozen semantic_768 snapshot owns canonical row ordinals for the experiment.',
+    'Snapshot lineage identity and cross-block canonical row-order identity use separate checksums and must not be conflated.',
     'PyTorch FP32 exact and cuVS brute-force compare exact Top-K; CAGRA and Qdrant HNSW compare recall against exact oracles.',
     'N-ary incidence remains canonical support while sparse softmax/SpMM are derived propagation.',
     'Context windows require an explicit source/AST/workflow/temporal ordering and scatter results back to canonical row ordinals.',
