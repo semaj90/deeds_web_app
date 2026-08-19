@@ -64,7 +64,8 @@ The adapter MUST preserve source order and explicit syntax for:
 - `SV4-TS-TYPE`: exact-span ts-morph enrichment emits type facts without altering Tree-sitter provenance.
 - `SV4-SIGNATURE`: call-like expressions can carry resolved parameter/return signature facts.
 - `SV4-REFS`: declaration/reference coordinates are source-grounded and revision-qualified.
-- `SV4-CONSILIENCY-PARITY`: bounded fixtures compare spans, node types, ordered children and supplied upstream IDs with Python `treesitter-chunker`.
+- `SV4-CONSILIENCY-BOUNDARY`: bounded fixtures compare Consiliency chunk UTF-8 byte spans, node-kind semantics, source-span checksums and supplied upstream IDs with the Node parser.
+- `SV4-CONSILIENCY-ORDER`: full ordered-child parity is a separate future gate. The public `CodeChunk` surface is a chunk/XRef abstraction and does not by itself expose the complete named-child parser sequence, so the current fixture MUST NOT claim this gate.
 - `SV4-OKF`: Zod projection validates `.okf` authority boundaries.
 
 ## SV-6 — Nested Arrow IPC file snapshot
@@ -109,14 +110,107 @@ The child ordinal references reconstruct the recursive structure losslessly whil
 - `SV6-CUDF`: cuDF/Arrow consumer reads the compatible nested projection or an explicit normalized child table derived from the same snapshot.
 - `SV6-REVISION`: source/grammar/semantic changes create a new snapshot revision rather than mutating a frozen file.
 
+## Bounded cross-runtime proof
+
+The fixture is deliberately small but exercises the dangerous boundaries:
+
+```text
+TypeScript source containing π + 😀
+        ↓
+Node Tree-sitter exact UTF-8 byte ranges
+        ↓
+Consiliency treesitter-chunker function chunk
+        ↓
+exact span + semantic node kind + source checksum
+        ↓
+attach supplied upstream ID as NATIVE_UPSTREAM
+        ↓
+object literal with shorthand / nested array / computed key / spread
+        ↓
+ts-morph exact-span type enrichment
+        ↓
+resolved call signature
+        ↓
+Arrow JS nested IPC file
+        ↓
+PyArrow memory-map readback
+        ↓
+row_identity_checksum + structure_checksum parity
+        ↓
+StructuredValueCrossRuntimeProofV1
+```
+
+A green receipt is `FIXTURE_ROUNDTRIP_PROVEN`. Missing Node parser packages and missing Python chunker support are explicit blocked states rather than parity failures. No regex fallback is allowed inside this proof.
+
+The executable proof must preserve one subtle distinction:
+
+```text
+Consiliency upstream ID exists
+        ≠
+Node generated the same ID
+```
+
+The Node adapter may only attach the supplied Consiliency ID after exact byte-span and source-span checksum equality. It remains `NATIVE_UPSTREAM`, not Node-minted canonical identity.
+
+## Frozen proof runtime
+
+`packages/parent-atlas/fixtures/structured-value/runtime-manifest.json` pins the bounded proof runtime:
+
+```text
+Node:
+  tree-sitter             0.25.1
+  tree-sitter-typescript  0.23.2
+
+Python:
+  treesitter-chunker      4.0.0
+  Python                  >= 3.11
+  PyArrow                 required / observed in receipt
+```
+
+Run the capability probe first:
+
+```bash
+node scripts/atlas/probe-structured-value-proof-runtime.mjs
+```
+
+Then run the bounded proof:
+
+```bash
+npx tsx sveltekit-frontend/scripts/atlas/prove-structured-value-roundtrip.mts
+```
+
+Expected artifact directory:
+
+```text
+.tmp/atlas/structured-value-proof/
+  receipt.json
+  treesitter-chunker.json
+  snapshot.json
+  structured-value.arrow
+  ts-morph-object.json
+  ts-morph-call.json
+```
+
+These runtime-generated artifacts are proof outputs; do not promote them merely because the source harness exists.
+
 ## Current written artifacts
 
 - `packages/parent-atlas/src/core/structured-value-ast.ts`
 - `packages/parent-atlas/src/core/structured-value-arrow.ts`
+- `packages/parent-atlas/src/core/structured-value-parity.ts`
+- `packages/parent-atlas/fixtures/structured-value/ts-parity-fixture.ts`
+- `packages/parent-atlas/fixtures/structured-value/runtime-manifest.json`
 - `packages/parent-atlas/test/structured-value-ast.test.mjs`
 - `packages/parent-atlas/test/structured-value-arrow.test.mjs`
+- `packages/parent-atlas/test/structured-value-parity.test.mjs`
+- `sveltekit-frontend/src/lib/server/atlas/language/node-tree-sitter-structured-value.ts`
 - `sveltekit-frontend/src/lib/server/atlas/language/ts-morph-structured-value-enricher.ts`
 - `sveltekit-frontend/src/lib/server/atlas/language/ts-morph-structured-value-enricher.spec.ts`
+- `sveltekit-frontend/scripts/atlas/prove-structured-value-roundtrip.mts`
+- `python/prove_structured_value_chunker_fixture.py`
+- `python/atlas_structured_value_arrow.py`
+- `python/test_atlas_structured_value_arrow.py`
+- `scripts/atlas/probe-structured-value-proof-runtime.mjs`
 - `scripts/atlas/write-structured-value-arrow.mjs`
 - `scripts/atlas/write-structured-value-arrow.test.mjs`
 - `.okf/domains/structured-value.yaml`
@@ -124,17 +218,25 @@ The child ordinal references reconstruct the recursive structure losslessly whil
 ## Remaining promotion order
 
 ```text
-SV4 tests/build
+SV4/SV6 contracts build
     ↓
-install/lock Node Tree-sitter + TS/TSX grammar runtime owner
+install the pinned proof runtimes without changing their manifest revisions
     ↓
-Node ↔ Consiliency bounded parity fixture
+runtime probe READY
+    ↓
+Node ↔ Consiliency bounded chunk-boundary fixture
+    ↓
+exact-span ts-morph enrichment + resolved signature
     ↓
 SV6 JS nested IPC write/roundtrip
     ↓
 Python mmap readback
     ↓
+FIXTURE_ROUNDTRIP_PROVEN receipt
+    ↓
 PyTorch/cuDF ordinal consumer proof
+    ↓
+full Consiliency parser-child parity if/when a native AST child surface is exposed
     ↓
 SV-7 semantic collection observation
     ↓
