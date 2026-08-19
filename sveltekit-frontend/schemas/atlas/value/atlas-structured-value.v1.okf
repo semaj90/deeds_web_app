@@ -1,0 +1,92 @@
+schema_id: atlas.structured-value
+schema_version: 1
+schema_kind: structured_value
+status: ACTIVE
+
+description: >
+  Ordered, provenance-aware value algebra shared by Parent Atlas AST evidence,
+  tool/DAG arguments, JSON/MessagePack/protobuf transport, and Python/Go views.
+  It preserves source/JSON ordering and duplicate/special object keys by using
+  repeated ordered entries rather than map semantics. It is a representation of
+  a value, never a canonical symbol/packet identity source.
+
+kinds:
+  scalar: [NULL, BOOL, INT, FLOAT, STRING, BYTES]
+  ordered: [LIST, TUPLE]
+  keyed: [OBJECT, MAP]
+  references: [SYMBOL_REF, PACKET_REF, TENSOR_REF, SOURCE_REF]
+
+fields:
+  schema: { type: literal, value: atlas.structured-value.v1 }
+  valueId: { type: string, required: true }
+  kind:
+    type: enum
+    values: [NULL, BOOL, INT, FLOAT, STRING, BYTES, LIST, TUPLE, OBJECT, MAP, SYMBOL_REF, PACKET_REF, TENSOR_REF, SOURCE_REF]
+  scalar:
+    type: object
+    nullable: true
+    fields:
+      boolValue: { type: boolean, nullable: true }
+      intValue: { type: string, nullable: true, description: decimal integer string to avoid cross-language precision loss }
+      floatValue: { type: number, nullable: true }
+      stringValue: { type: string, nullable: true }
+      bytesBase64: { type: string, nullable: true }
+  members:
+    type: array
+    default: []
+    items:
+      type: object
+      fields:
+        ordinal: { type: integer, minimum: 0 }
+        role: { type: string, nullable: true }
+        value: { type: atlas.structured-value.v1, required: true }
+  entries:
+    type: array
+    default: []
+    items:
+      type: object
+      fields:
+        ordinal: { type: integer, minimum: 0 }
+        key: { type: atlas.structured-value.v1, required: true }
+        value: { type: atlas.structured-value.v1, required: true }
+        keyForm:
+          type: enum
+          values: [IDENTIFIER, STRING, NUMBER, COMPUTED, SPREAD, OTHER]
+        sourceKeyNodeId: { type: string, nullable: true }
+        sourceValueNodeId: { type: string, nullable: true }
+  reference:
+    type: object
+    nullable: true
+    fields:
+      refKind: { type: enum, values: [SYMBOL_REF, PACKET_REF, TENSOR_REF, SOURCE_REF] }
+      refId: { type: string, required: true }
+      revision: { type: string, nullable: true }
+      checksum: { type: string, nullable: true }
+  sourceEvidence:
+    type: object
+    nullable: true
+    fields:
+      treeNodeId: { type: string, nullable: true }
+      symbolVersionId: { type: string, nullable: true }
+      sourceRef: { type: string, nullable: true }
+      startByte: { type: integer, minimum: 0, nullable: true }
+      endByte: { type: integer, minimum: 0, nullable: true }
+      astPath: { type: integer_array, default: [] }
+      nodeType: { type: string, nullable: true }
+  producer:
+    type: object
+    fields:
+      runtime: { type: string, required: true }
+      parser: { type: string, required: true }
+      revision: { type: string, required: true }
+  checksum: { type: string, nullable: true }
+
+invariants:
+  - OBJECT/MAP entries preserve encounter/source order through ordinal and MUST NOT be normalized to a protobuf/JS map when provenance/order/duplicates matter
+  - LIST/TUPLE members preserve ordinal order
+  - duplicate OBJECT keys are allowed because source code and JSON inputs may contain them; a derived DictionaryView may collapse duplicates only under an explicit policy
+  - protobuf projections use repeated KeyValueEntry/Member messages; protobuf map fields are forbidden for this canonical structured-value transport
+  - intValue is represented as a decimal string so integers outside JavaScript's safe range survive TS/Go/Python/C++ transport without loss
+  - sourceEvidence coordinates come from the structural evidence owner and MUST NOT be fabricated by simdjson, MessagePack or protobuf adapters
+  - SYMBOL_REF/PACKET_REF/TENSOR_REF/SOURCE_REF carry references only and MUST NOT embed backend-specific pointers/handles
+  - syntax/value shape is not canonical symbol identity and does not prove semantic collection kinds such as LINKED_LIST/TREE/GRAPH/DAG
