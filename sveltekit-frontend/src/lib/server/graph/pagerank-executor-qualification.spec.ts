@@ -48,7 +48,9 @@ function fixtureSnapshot() {
 		projectionRevision: 'graph-snapshot-parity-v1',
 	};
 	const contentHash = computeGraphProjectionSnapshotHashV1({
+		projectionRevision: projection.projectionRevision,
 		projectionHash,
+		projectionName: projection.projectionName,
 		graphRevision: parityManifest.graphRevision,
 		nodeTableHash: parityManifest.nodeTableHash,
 		edgeTableHash: parityManifest.edgeTableHash,
