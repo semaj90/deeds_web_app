@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
-"""Train Parent Atlas routing autoencoder from canonical Qdrant semantic_512.
+"""Train Parent Atlas routing autoencoder from reconciled semantic_512 rows.
 
-Canonical evidence stays in Qdrant `codebase_chunks_512` (cosine, 512d).
-This script derives a revisioned routing-only latent_64 representation:
+Training admission is intentionally two-step:
+1. `atlas_semantic512_reconcile.py` proves Qdrant point -> codebase chunk -> atlas packet lineage.
+2. This trainer consumes ONLY ADMITTED rows from that manifest, verifies its checksum
+   against the reconciliation receipt, retrieves those exact point IDs from Qdrant,
+   verifies each 512-vector digest, then trains 512 -> 256 -> 64.
 
-    semantic_512 -> Linear(512,256)+ReLU -> Linear(256,64) -> L2 normalize
-
-and a symmetric decoder for reconstruction training. It never generates packet
-identity, tree_node_id, feature_label, or semantic evidence. Those fields are
-copied from the canonical payload when present.
-
-Outputs:
-- PyTorch checkpoint (`--model-out`)
-- JSON training receipt (`--receipt-out`)
-- optional NDJSON latent rows (`--latent-out`) for the cuML KMeans endpoint
-
-The script fails closed if a training row lacks packet_key/source_revision or is
-not exactly 512 dimensions. This deliberately prevents the older anonymous
-Qdrant corpus from becoming the source of a new supposedly-canonical latent.
+No `source_revision` is required or invented. Offline lineage is:
+packet_key + source_ref + representation lineage + source-version receipt +
+reconciliation receipt.
 """
 
 from __future__ import annotations
@@ -44,14 +36,21 @@ LATENT_DIM = 64
 REPRESENTATION_ID = "semantic_512"
 LATENT_REPRESENTATION_ID = "latent_64"
 COLLECTION = "codebase_chunks_512"
-ALGORITHM_REVISION = "atlas.semantic512-autoencoder.512-256-64.v1"
+ALGORITHM_REVISION = "atlas.semantic512-autoencoder.512-256-64.v2-reconciled"
 
 
 @dataclass(frozen=True)
 class Identity:
-    point_id: str
+    point_id: int | str
     packet_key: str
-    source_revision: str
+    source_ref: str
+    source_version_receipt_id: str
+    reconciliation_receipt_id: str
+    workspace_revision: int | None
+    representation_revision: int | None
+    source_representation_id: str
+    source_dimension: int
+    vector_digest: str
     symbol_version_id: str | None
     tree_node_id: str | None
     feature_label: str | None
@@ -80,16 +79,21 @@ class RoutingAutoencoder(nn.Module):
         return reconstructed, torch.nn.functional.normalize(z_raw, p=2, dim=1)
 
 
-def http_json(url: str, body: dict[str, Any] | None = None) -> dict[str, Any]:
-    data = None if body is None else json.dumps(body).encode("utf-8")
+def http_json(url: str, body: dict[str, Any]) -> dict[str, Any]:
     request = urllib.request.Request(
         url,
-        data=data,
-        method="GET" if body is None else "POST",
+        data=json.dumps(body).encode("utf-8"),
+        method="POST",
         headers={"Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(request, timeout=60) as response:  # nosec B310 - operator-configured local Qdrant
+    with urllib.request.urlopen(request, timeout=120) as response:  # nosec B310 - operator local Qdrant
         return json.load(response)
+
+
+def canonical_manifest_bytes(path: Path) -> bytes:
+    # Reconciliation already writes canonical JSON one object per line. Preserve
+    # bytes exactly so the reviewed checksum remains the training gate.
+    return path.read_bytes()
 
 
 def l2_normalize(vector: list[float]) -> np.ndarray:
@@ -104,60 +108,111 @@ def l2_normalize(vector: list[float]) -> np.ndarray:
     return array / norm
 
 
-def scroll_qdrant(qdrant_url: str, limit: int | None) -> tuple[list[Identity], np.ndarray]:
-    identities: list[Identity] = []
-    vectors: list[np.ndarray] = []
-    offset: Any = None
-    while limit is None or len(vectors) < limit:
-        page_limit = min(256, (limit - len(vectors)) if limit is not None else 256)
-        body: dict[str, Any] = {
-            "limit": page_limit,
-            "with_payload": True,
-            "with_vector": True,
-        }
-        if offset is not None:
-            body["offset"] = offset
-        result = http_json(f"{qdrant_url.rstrip('/')}/collections/{COLLECTION}/points/scroll", body).get("result", {})
-        points = result.get("points", [])
-        if not points:
+def vector_digest(vector: list[float]) -> str:
+    values = np.asarray(vector, dtype=np.float32)
+    if values.shape != (SEMANTIC_DIM,) or not np.isfinite(values).all():
+        raise ValueError("invalid semantic_512 vector for digest")
+    return hashlib.sha256(values.tobytes(order="C")).hexdigest()
+
+
+def load_reconciliation(manifest_path: Path, receipt_path: Path, limit: int | None) -> tuple[list[Identity], dict[str, Any]]:
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    if receipt.get("schema") != "atlas.semantic512-reconciliation-receipt.v1":
+        raise ValueError("unsupported reconciliation receipt schema")
+    if receipt.get("collection") != COLLECTION or receipt.get("representationId") != REPRESENTATION_ID:
+        raise ValueError("reconciliation receipt collection/representation mismatch")
+    if int(receipt.get("dimension") or 0) != SEMANTIC_DIM:
+        raise ValueError("reconciliation receipt dimension mismatch")
+
+    raw_manifest = canonical_manifest_bytes(manifest_path)
+    actual_checksum = hashlib.sha256(raw_manifest).hexdigest()
+    expected_checksum = str(receipt.get("manifestChecksum") or "")
+    if not expected_checksum or actual_checksum != expected_checksum:
+        raise ValueError(
+            f"reconciliation manifest checksum mismatch: expected {expected_checksum}, got {actual_checksum}"
+        )
+    receipt_id = str(receipt.get("receiptId") or "").strip()
+    if not receipt_id:
+        raise ValueError("reconciliation receipt missing receiptId")
+
+    rows: list[Identity] = []
+    seen_packets: set[str] = set()
+    for line_number, raw in enumerate(raw_manifest.decode("utf-8").splitlines(), start=1):
+        if not raw.strip():
+            continue
+        value = json.loads(raw)
+        if value.get("status") != "ADMITTED":
+            continue
+        canonical = value.get("canonical") or {}
+        representation = value.get("representation") or {}
+        packet_key = str(canonical.get("packetKey") or "").strip()
+        source_ref = str(canonical.get("sourceRef") or "").strip()
+        source_version_receipt_id = str(value.get("sourceVersionReceiptId") or "").strip()
+        digest = str(representation.get("vectorDigest") or "").strip()
+        if not packet_key or not source_ref or not source_version_receipt_id or not digest:
+            raise ValueError(f"line {line_number}: admitted row lacks canonical lineage")
+        if packet_key in seen_packets:
+            raise ValueError(f"line {line_number}: duplicate admitted packet_key {packet_key}")
+        if representation.get("representationId") != REPRESENTATION_ID:
+            raise ValueError(f"line {line_number}: wrong representation")
+        if int(representation.get("dimension") or 0) != SEMANTIC_DIM:
+            raise ValueError(f"line {line_number}: wrong vector dimension")
+        seen_packets.add(packet_key)
+        rows.append(
+            Identity(
+                point_id=value.get("pointId"),
+                packet_key=packet_key,
+                source_ref=source_ref,
+                source_version_receipt_id=source_version_receipt_id,
+                reconciliation_receipt_id=receipt_id,
+                workspace_revision=canonical.get("workspaceRevision"),
+                representation_revision=canonical.get("representationRevision"),
+                source_representation_id=REPRESENTATION_ID,
+                source_dimension=SEMANTIC_DIM,
+                vector_digest=digest,
+                symbol_version_id=None,
+                tree_node_id=None if canonical.get("treeNodeId") is None else str(canonical.get("treeNodeId")),
+                feature_label=None if canonical.get("featureLabel") is None else str(canonical.get("featureLabel")),
+            )
+        )
+        if limit is not None and len(rows) >= limit:
             break
-        for point in points:
-            payload = point.get("payload") or {}
-            packet_key = str(payload.get("packet_key") or "").strip()
-            source_revision = str(payload.get("source_revision") or "").strip()
-            if not packet_key or not source_revision:
-                raise ValueError(
-                    f"point {point.get('id')} lacks packet_key/source_revision; canonical AE training refuses anonymous rows"
-                )
+    if not rows:
+        raise ValueError("reconciliation manifest has no ADMITTED rows")
+    return rows, receipt
+
+
+def retrieve_vectors(qdrant_url: str, identities: list[Identity], batch_size: int = 256) -> np.ndarray:
+    by_id = {str(identity.point_id): identity for identity in identities}
+    vectors: dict[str, np.ndarray] = {}
+    base = qdrant_url.rstrip("/")
+    for start in range(0, len(identities), batch_size):
+        batch = identities[start : start + batch_size]
+        result = http_json(
+            f"{base}/collections/{COLLECTION}/points",
+            {"ids": [row.point_id for row in batch], "with_payload": False, "with_vector": True},
+        ).get("result", [])
+        for point in result:
+            point_id = str(point.get("id"))
+            identity = by_id.get(point_id)
+            if identity is None:
+                continue
             raw_vector = point.get("vector")
             if isinstance(raw_vector, dict):
-                # `codebase_chunks_512` is expected to be unnamed-vector. Accept a
-                # single named vector only for migration diagnostics, not ambiguity.
                 values = list(raw_vector.values())
                 if len(values) != 1:
-                    raise ValueError(f"point {point.get('id')} has ambiguous named vectors")
+                    raise ValueError(f"point {point_id} has ambiguous named vectors")
                 raw_vector = values[0]
             if not isinstance(raw_vector, list):
-                raise ValueError(f"point {point.get('id')} missing vector")
-            vectors.append(l2_normalize(raw_vector))
-            identities.append(
-                Identity(
-                    point_id=str(point.get("id")),
-                    packet_key=packet_key,
-                    source_revision=source_revision,
-                    symbol_version_id=None if payload.get("symbol_version_id") is None else str(payload.get("symbol_version_id")),
-                    tree_node_id=None if payload.get("tree_node_id") is None else str(payload.get("tree_node_id")),
-                    feature_label=None if payload.get("feature_label") is None else str(payload.get("feature_label")),
-                )
-            )
-            if limit is not None and len(vectors) >= limit:
-                break
-        offset = result.get("next_page_offset")
-        if offset is None:
-            break
-    if not vectors:
-        raise ValueError(f"no canonical {SEMANTIC_DIM}d vectors found in {COLLECTION}")
-    return identities, np.stack(vectors)
+                raise ValueError(f"point {point_id} missing vector")
+            if vector_digest(raw_vector) != identity.vector_digest:
+                raise ValueError(f"point {point_id} vector digest changed since reconciliation")
+            vectors[point_id] = l2_normalize(raw_vector)
+
+    missing = [str(row.point_id) for row in identities if str(row.point_id) not in vectors]
+    if missing:
+        raise ValueError(f"Qdrant points disappeared after reconciliation: {missing[:10]}")
+    return np.stack([vectors[str(row.point_id)] for row in identities])
 
 
 def identity_checksum(rows: list[Identity]) -> str:
@@ -180,6 +235,7 @@ def train(
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+        torch.cuda.reset_peak_memory_stats()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     tensor = torch.from_numpy(matrix)
@@ -201,7 +257,6 @@ def train(
     best_state: dict[str, torch.Tensor] | None = None
 
     started = time.perf_counter()
-    peak_vram = 0
     for epoch in range(epochs):
         model.train()
         total_loss = 0.0
@@ -235,12 +290,11 @@ def train(
             best_validation = validation_loss
             best_state = {key: value.detach().cpu().clone() for key, value in model.state_dict().items()}
         history.append({"epoch": epoch + 1, "trainMse": train_loss, "validationMse": validation_loss})
-        if device.type == "cuda":
-            peak_vram = max(peak_vram, int(torch.cuda.max_memory_allocated(device)))
 
     if best_state is not None:
         model.load_state_dict(best_state)
     duration_ms = (time.perf_counter() - started) * 1000
+    peak_vram = int(torch.cuda.max_memory_allocated(device)) if device.type == "cuda" else 0
     return model.cpu(), {
         "device": str(device),
         "durationMs": round(duration_ms, 3),
@@ -274,6 +328,8 @@ def state_digest(model: RoutingAutoencoder) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--qdrant-url", default="http://127.0.0.1:6333")
+    parser.add_argument("--reconciliation-manifest", type=Path, default=Path("data/atlas-ml/semantic512-reconciliation.ndjson"))
+    parser.add_argument("--reconciliation-receipt", type=Path, default=Path("data/atlas-ml/semantic512-reconciliation-receipt.json"))
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=256)
@@ -286,7 +342,12 @@ def main() -> int:
     parser.add_argument("--latent-out", type=Path, default=Path("data/atlas-ml/semantic512-latent64.ndjson"))
     args = parser.parse_args()
 
-    identities, matrix = scroll_qdrant(args.qdrant_url, args.limit)
+    identities, reconciliation_receipt = load_reconciliation(
+        args.reconciliation_manifest,
+        args.reconciliation_receipt,
+        args.limit,
+    )
+    matrix = retrieve_vectors(args.qdrant_url, identities)
     model, metrics = train(
         matrix,
         seed=args.seed,
@@ -307,6 +368,8 @@ def main() -> int:
             "sourceDimension": SEMANTIC_DIM,
             "latentRepresentationId": LATENT_REPRESENTATION_ID,
             "latentDimension": LATENT_DIM,
+            "reconciliationReceiptId": reconciliation_receipt["receiptId"],
+            "reconciliationManifestChecksum": reconciliation_receipt["manifestChecksum"],
             "seed": args.seed,
             "modelDigest": model_digest,
             "stateDict": model.state_dict(),
@@ -321,22 +384,30 @@ def main() -> int:
                 json.dumps(
                     {
                         "packetKey": identity.packet_key,
-                        "sourceRevision": identity.source_revision,
+                        "sourceRef": identity.source_ref,
+                        "sourceRevision": None,
+                        "sourceVersionReceiptId": identity.source_version_receipt_id,
+                        "reconciliationReceiptId": identity.reconciliation_receipt_id,
+                        "workspaceRevision": identity.workspace_revision,
+                        "representationRevision": identity.representation_revision,
+                        "sourceRepresentationId": identity.source_representation_id,
+                        "sourceDimension": identity.source_dimension,
+                        "semanticVectorDigest": identity.vector_digest,
                         "symbolVersionId": identity.symbol_version_id,
                         "treeNodeId": identity.tree_node_id,
                         "featureLabel": identity.feature_label,
                         "vector": latent.tolist(),
-                        "sourceRepresentationId": REPRESENTATION_ID,
                         "latentRepresentationId": LATENT_REPRESENTATION_ID,
                         "autoencoderRevision": model_digest,
                     },
                     separators=(",", ":"),
+                    sort_keys=True,
                 )
                 + "\n"
             )
 
     receipt = {
-        "schema": "atlas.autoencoder-training-receipt.v1",
+        "schema": "atlas.autoencoder-training-receipt.v2",
         "algorithmRevision": ALGORITHM_REVISION,
         "sourceCollection": COLLECTION,
         "sourceRepresentationId": REPRESENTATION_ID,
@@ -346,6 +417,9 @@ def main() -> int:
         "latentDimension": LATENT_DIM,
         "rowCount": len(identities),
         "identityManifestChecksum": identity_checksum(identities),
+        "reconciliationReceiptId": reconciliation_receipt["receiptId"],
+        "reconciliationManifestChecksum": reconciliation_receipt["manifestChecksum"],
+        "sourceRevisionPolicy": "ABSENT_DO_NOT_FABRICATE",
         "modelDigest": model_digest,
         "seed": args.seed,
         "epochs": args.epochs,
@@ -357,7 +431,7 @@ def main() -> int:
         "latentPath": str(args.latent_out),
     }
     args.receipt_out.parent.mkdir(parents=True, exist_ok=True)
-    args.receipt_out.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8")
+    args.receipt_out.write_text(json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps(receipt, sort_keys=True))
     return 0
 
