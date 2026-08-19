@@ -1,0 +1,53 @@
+schema_id: atlas.policy-selection-receipt
+schema_version: 1
+schema_kind: runtime_policy_receipt
+status: ACTIVE
+
+description: >
+  Observable proof of which Parent Atlas policy, model/head family, geometry
+  features, decision function, and executor were actually used for one request.
+  This is the answer to "which one are we using?" and must be emitted instead of
+  inferring runtime selection from implementation details.
+
+fields:
+  schema: { type: literal, value: atlas.policy-selection-receipt.v1 }
+  receiptId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  taskClass:
+    type: enum
+    values: [INDEXING, RERANKING, HYPERGRAPH_RAG, DOMAIN_CLASSIFICATION, POS_TAGGING, PREFILL, DECODE, INFERENCE, WORKFLOW]
+  policyId: { type: string, required: true }
+  policyRevision: { type: string, required: true }
+  featureSnapshotRef: { type: string, required: true }
+  featureRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  ontologyRevision: { type: string, nullable: true }
+  modelRevision: { type: string, nullable: true }
+  selectedHeadIds: { type: string_array, default: [] }
+  shadowHeadIds: { type: string_array, default: [] }
+  decisionFunction: { type: string, required: true }
+  executor: { type: string, required: true }
+  geometryFeatures:
+    type: array
+    items:
+      type: enum
+      values: [NONE, SIGNED_S3, QUATERNION_ROTATION, SPHERICAL_HARMONICS, JACOBIAN_DIAGNOSTIC, HILBERT_PROJECTION]
+  consumedFeatureLabels: { type: string_array, default: [] }
+  missingFeatureLabels: { type: string_array, default: [] }
+  fallbackChain: { type: string_array, default: [] }
+  environmentReceiptId: { type: string, nullable: true }
+  gpuLeaseId: { type: string, nullable: true }
+  seed: { type: string, required: true }
+  evidenceRefs: { type: string_array, default: [] }
+  canonicalWrites: { type: literal, value: false }
+  emittedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - selectedHeadIds identify the heads actually used; shadowHeadIds never affect canonical ranking or mutation authorization
+  - geometry features are derived/challenger evidence and never canonical identity or n-ary truth
+  - HILBERT_PROJECTION may embed n-ary evidence numerically but cannot replace the canonical hyperedge relation
+  - JACOBIAN_DIAGNOSTIC and SPHERICAL_HARMONICS are diagnostics/challengers until an explicit quality receipt promotes them
+  - no undocumented numeric folklore or numerology may select a head; unexplained constants such as a "prime law" are forbidden
+  - UNKNOWN/missing features remain listed as missing and are not converted into negative evidence
