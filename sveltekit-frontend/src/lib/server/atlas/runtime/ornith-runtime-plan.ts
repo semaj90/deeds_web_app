@@ -12,10 +12,13 @@ import { z } from 'zod';
  * - kernel/compiler layer: Triton/torch.compile is not a model server by itself.
  *
  * Do NOT collapse this to `isSsm=false`: Gated DeltaNet is a stateful/recurrent
- * linear-attention mechanism. Official Qwen/HF documentation calls it linear
- * attention rather than Mamba-style SSM, while llama.cpp stores the recurrent
- * state through its SSM/recurrent-memory plumbing. The manifest therefore
- * records the exact hybrid structure instead of a lossy boolean.
+ * linear-attention mechanism. The manifest records the exact hybrid structure
+ * instead of a lossy boolean.
+ *
+ * TensorRT-LLM 1.2 removed its legacy TensorRT engine backend. TensorRT-LLM is
+ * now a PyTorch-backed inference runtime and directly loads supported HF
+ * checkpoints. This is still distinct from Torch-TensorRT, which is a compiler
+ * backend for torch.compile that lowers supported PyTorch subgraphs to TensorRT.
  */
 export const OrnithParameterizationSchema = z.enum(['DENSE_FFN', 'MOE', 'UNKNOWN']);
 export const OrnithSequenceArchitectureSchema = z.enum([
@@ -51,6 +54,7 @@ export type OrnithWorkload = z.infer<typeof OrnithWorkloadSchema>;
 
 export const OrnithRuntimeCapabilityV1Schema = z.object({
   runtime: OrnithRuntimeSchema,
+  executionFramework: z.enum(['LLAMA_CPP', 'PYTORCH']),
   supportsQuantizedLocalInference: z.boolean(),
   supportsFullTrainingAutograd: z.boolean(),
   supportsQLoRATraining: z.boolean(),
@@ -70,9 +74,7 @@ export const OrnithRuntimePlanV1Schema = z.object({
   parameterization: OrnithParameterizationSchema,
   sequenceArchitecture: OrnithSequenceArchitectureSchema,
   statefulSequenceClass: OrnithStatefulSequenceClassSchema,
-  /** Dense checkpoint means no routed FFN experts; it does NOT mean attention-only Transformer. */
   isMixtureOfExperts: z.literal(false),
-  /** Explicitly false only for Mamba-style SSM classification; GDN recurrent state is recorded separately. */
   isMambaStyleSsm: z.literal(false),
   hasRecurrentLinearAttention: z.literal(true),
   hasFullSoftmaxAttention: z.literal(true),
@@ -89,11 +91,7 @@ export const OrnithRuntimePlanV1Schema = z.object({
   producerRevision: z.string().min(1),
 }).strict().superRefine((value, ctx) => {
   if (value.gatedDeltaNetLayerCount + value.fullAttentionLayerCount !== value.totalTextLayers) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['totalTextLayers'],
-      message: 'Gated DeltaNet and full-attention layer counts must sum to totalTextLayers',
-    });
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['totalTextLayers'], message: 'layer counts must sum to totalTextLayers' });
   }
 });
 export type OrnithRuntimePlanV1 = z.infer<typeof OrnithRuntimePlanV1Schema>;
@@ -103,6 +101,7 @@ export function ornithRuntimeCapabilities(runtime: OrnithRuntime): OrnithRuntime
     case 'LLAMA_SERVER_GGUF':
       return {
         runtime,
+        executionFramework: 'LLAMA_CPP',
         supportsQuantizedLocalInference: true,
         supportsFullTrainingAutograd: false,
         supportsQLoRATraining: false,
@@ -115,43 +114,16 @@ export function ornithRuntimeCapabilities(runtime: OrnithRuntime): OrnithRuntime
         requiresModelConversionOrEngineBuild: true,
       };
     case 'PYTORCH_TRANSFORMERS':
-      return {
-        runtime,
-        supportsQuantizedLocalInference: true,
-        supportsFullTrainingAutograd: true,
-        supportsQLoRATraining: true,
-        supportsModelInternalInstrumentation: true,
-        supportsCustomTritonKernels: true,
-        supportsGatedDeltaNet: true,
-        supportsFullAttentionLayers: true,
-        openAiCompatibleServing: false,
-        requiresLinux: false,
-        requiresModelConversionOrEngineBuild: false,
-      };
     case 'PYTORCH_COMPILE_INDUCTOR':
-      return {
-        runtime,
-        supportsQuantizedLocalInference: false,
-        supportsFullTrainingAutograd: true,
-        supportsQLoRATraining: true,
-        supportsModelInternalInstrumentation: true,
-        supportsCustomTritonKernels: true,
-        supportsGatedDeltaNet: true,
-        supportsFullAttentionLayers: true,
-        openAiCompatibleServing: false,
-        requiresLinux: false,
-        requiresModelConversionOrEngineBuild: false,
-      };
     case 'PYTORCH_CUSTOM_TRITON':
       return {
         runtime,
-        supportsQuantizedLocalInference: false,
+        executionFramework: 'PYTORCH',
+        supportsQuantizedLocalInference: runtime === 'PYTORCH_TRANSFORMERS',
         supportsFullTrainingAutograd: true,
         supportsQLoRATraining: true,
         supportsModelInternalInstrumentation: true,
         supportsCustomTritonKernels: true,
-        // This means "eligible for isolated GDN/full-attention kernel experiments",
-        // not that one custom Triton kernel implements the whole model runtime.
         supportsGatedDeltaNet: true,
         supportsFullAttentionLayers: true,
         openAiCompatibleServing: false,
@@ -161,6 +133,7 @@ export function ornithRuntimeCapabilities(runtime: OrnithRuntime): OrnithRuntime
     case 'TENSORRT_LLM':
       return {
         runtime,
+        executionFramework: 'PYTORCH',
         supportsQuantizedLocalInference: true,
         supportsFullTrainingAutograd: false,
         supportsQLoRATraining: false,
@@ -170,7 +143,7 @@ export function ornithRuntimeCapabilities(runtime: OrnithRuntime): OrnithRuntime
         supportsFullAttentionLayers: true,
         openAiCompatibleServing: true,
         requiresLinux: true,
-        requiresModelConversionOrEngineBuild: true,
+        requiresModelConversionOrEngineBuild: false,
       };
   }
 }
@@ -178,7 +151,7 @@ export function ornithRuntimeCapabilities(runtime: OrnithRuntime): OrnithRuntime
 export function planOrnithRuntime(input: {
   workload: OrnithWorkload;
   linuxAvailable: boolean;
-  /** Must prove the exact dense Qwen3.5/Ornith Gated-DeltaNet architecture, not merely generic Qwen support. */
+  /** Exact Ornith/Qwen3.5 hybrid support must be proven in the selected TRT-LLM revision. */
   tensorrtLlmModelSupportProven?: boolean;
   sameWeightRevisionAvailable?: boolean;
   producerRevision: string;
@@ -196,32 +169,32 @@ export function planOrnithRuntime(input: {
     case 'INTERACTIVE_INFERENCE':
     case 'TOOL_CALLING':
       primaryRuntime = 'LLAMA_SERVER_GGUF';
-      reasons.push('GGUF llama-server is the simplest low-VRAM OpenAI-compatible inference owner');
+      reasons.push('GGUF llama-server remains the bounded interactive/tool inference owner');
       if (input.linuxAvailable && trtProven && sameWeights) challengers.push('TENSORRT_LLM');
       challengers.push('PYTORCH_TRANSFORMERS');
       break;
     case 'BATCH_INFERENCE':
       primaryRuntime = input.linuxAvailable && trtProven && sameWeights ? 'TENSORRT_LLM' : 'LLAMA_SERVER_GGUF';
       reasons.push(primaryRuntime === 'TENSORRT_LLM'
-        ? 'TensorRT-LLM is enabled only after dense Qwen3.5 Gated-DeltaNet support and same-weight parity are proven'
-        : 'TensorRT-LLM remains a challenger until exact architecture support, conversion, and parity are proven');
+        ? 'TensorRT-LLM PyTorch runtime is promoted only after exact hybrid-model and same-revision parity proof; no legacy engine-build step is required'
+        : 'TensorRT-LLM PyTorch runtime remains a challenger until exact Ornith hybrid support and same-revision parity are proven');
       challengers.push('PYTORCH_TRANSFORMERS');
       break;
     case 'FEATURE_PROBE':
       primaryRuntime = 'PYTORCH_TRANSFORMERS';
       challengers.push('PYTORCH_COMPILE_INDUCTOR');
-      reasons.push('Feature probes require visibility into both recurrent Gated-DeltaNet state and full-attention layers');
+      reasons.push('Feature probes require model-internal visibility into recurrent Gated-DeltaNet and full-attention layers');
       break;
     case 'QLORA_TRAINING':
     case 'RL_TRAINING':
       primaryRuntime = 'PYTORCH_TRANSFORMERS';
       challengers.push('PYTORCH_COMPILE_INDUCTOR');
-      reasons.push('Training requires autograd; inference-only llama-server and TensorRT-LLM are not training owners');
+      reasons.push('Training requires autograd; TensorRT-LLM is PyTorch-backed but remains an inference runtime rather than the training owner');
       break;
     case 'KERNEL_EXPERIMENT':
       primaryRuntime = 'PYTORCH_COMPILE_INDUCTOR';
       challengers.push('PYTORCH_CUSTOM_TRITON', 'PYTORCH_TRANSFORMERS');
-      reasons.push('Kernel experiments must distinguish Gated-DeltaNet recurrent kernels from full-attention/SDPA kernels');
+      reasons.push('Kernel experiments distinguish Gated-DeltaNet recurrent kernels, full-attention SDPA kernels, and Atlas-side GEMM/reduction kernels');
       break;
   }
 
