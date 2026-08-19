@@ -34,6 +34,7 @@ export * from './core/adaptive-memory-runtime.js';
 export * from './core/adaptive-semantic-memory.js';
 export * from './core/external-doc-knowledge-fabric.js';
 export * from './core/external-doc-cold-fabric.js';
+export * from './core/external-doc-cold-runtime.js';
 export * from './core/contextual-prefill-fabric.js';
 export * from './core/prefill-cache-runtime.js';
 export * from './core/inference-prefill-runtime.js';
