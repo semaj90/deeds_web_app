@@ -82,6 +82,8 @@ export interface GraphViewPacketV1 {
 export interface AtlasSynthesisRequestV1 {
   schema?: 'atlas.synthesis-request.v1';
   snapshotId: string;
+  /** Generalized graph-analysis revision. Never silently inferred from snapshotId. */
+  graphRevision?: string;
   query: string;
   seedNodeKeys: string[];
   edgeTypes?: string[];
@@ -103,6 +105,7 @@ export interface CandidateFeatureRowV1 {
   personalizedPageRank: number | null;
   graphHopDistance: number;
   globalPageRank: number | null;
+  communityId: string | null;
   typeCompatibility: number | null;
   revisionMatch: number;
   bitfrostHotness: number | null;
@@ -112,6 +115,7 @@ export interface ContextManifestV1 {
   schema: 'atlas.context-manifest.v1';
   requestId: string;
   snapshotId: string;
+  graphRevision: string | null;
   query: string;
   candidateBucket: AtlasCandidateBucket;
   candidateCount: number;
