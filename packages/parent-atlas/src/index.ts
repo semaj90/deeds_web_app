@@ -39,6 +39,7 @@ export * from './core/external-doc-capture-runtime.js';
 export * from './core/external-doc-qdrant-hybrid.js';
 export * from './core/external-doc-runtime-capabilities.js';
 export * from './core/external-doc-retrieval-proof.js';
+export * from './core/external-doc-retrieval-runtime.js';
 export * from './core/contextual-prefill-fabric.js';
 export * from './core/prefill-cache-runtime.js';
 export * from './core/inference-prefill-runtime.js';
