@@ -17,6 +17,7 @@ This tranche hardens PageRank and graph fanout around the existing Graph Analysi
 - [x] Add `GraphProjectionManifestV3`.
 - [x] Hash relationship orientation, aggregation, projected property, source property, default value, and property aggregation.
 - [x] Add `GraphAnalysisRunV2` with `projectionHash` while preserving V1.
+- [x] Add nullable legacy-safe `graph_analysis_runs.projection_hash` Drizzle mapping and additive manual migration; V2 validation, not the database default, requires new qualified runs to carry a hash.
 - [x] Add `PageRankExecutionPlanV1` Zod validation.
 - [x] Reject relationship types not present in the qualified projection.
 - [x] Reject weighted PageRank unless the weight property is projected for every selected relationship type.
@@ -30,7 +31,7 @@ This tranche hardens PageRank and graph fanout around the existing Graph Analysi
 - [x] Capture real GDS convergence/timing telemetry.
 - [x] Hash the raw sorted PageRank output.
 - [x] Add `PageRankAuthorityV2` and batch contract.
-- [x] Move L1 normalization to deterministic Atlas post-processing.
+- [x] Move L1 normalization to deterministic Atlas post-processing so Neo4j/cuGraph parity compares the same normalization implementation.
 - [x] Define `authorityNorm = authorityPercentile` for V2.
 
 ## GRA-3 — fanout alignment
@@ -57,14 +58,17 @@ This tranche hardens PageRank and graph fanout around the existing Graph Analysi
 
 ## GRA-6 — retrieval feature promotion
 
-- [ ] Route `authorityNorm`, fanout distance, and dependency fanout into revision-qualified graph feature evidence.
-- [ ] Require graph/projection lineage match before those values enter the retrieval candidate feature matrix.
-- [ ] Keep PageRank/PPR/fanout from becoming independent RRF votes.
-- [ ] Run ablation before changing the existing candidate matrix width.
+- [x] Add `GraphRetrievalFeatureEvidenceV1` for revision-qualified graph ranking evidence.
+- [x] Route `authorityNorm`, graph distance, and dependency fanout into the existing `[C,25]` `authority_norm`, `graph_distance`, and `dependency_fanout` slots.
+- [x] Require graph/projection lineage match and exact packet-key identity before graph values enter the candidate feature matrix.
+- [x] Keep PageRank/PPR/fanout out of independent RRF voting in this tranche; the adapter only emits feature columns.
+- [x] Preserve matrix width at 25; no speculative graph column was added.
+- [ ] Run retrieval ablation before promoting new graph feature policies or changing matrix width.
 
 ## Validation state
 
-- [x] Contract tests added for Neo4j/cuGraph plans, weight-property qualification, relationship qualification, PPR/global mismatch, cuGraph damping bounds, legacy simulation rejection, projection-hash sensitivity, fanout projection qualification, and cross-contract lineage.
+- [x] Contract tests added for Neo4j/cuGraph plans, weight-property qualification, relationship qualification, PPR/global mismatch, cuGraph damping bounds, legacy simulation rejection, projection-hash sensitivity, fanout projection qualification, cross-contract lineage, Atlas L1 normalization, and `[C,25]` graph-feature projection.
 - [ ] Vitest/tsgo execution is still required in a checkout with repository dependencies available.
+- [ ] Apply/test `graph_analysis_projection_hash_v2.sql` against the live Postgres schema.
 - [ ] Live Neo4j smoke test of the new PageRank plan executor is still required.
 - [ ] Live bounded fanout receipt proof is still required.
