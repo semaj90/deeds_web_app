@@ -35,6 +35,23 @@ class SomReceipt:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class SomLatticeReceipt:
+    schema: str
+    rows: int
+    grid_rows: int
+    grid_columns: int
+    value_dimensions: int
+    occupied_cells: int
+    occupancy_fraction: float
+    field_checksum: str
+    count_checksum: str
+    canonical_authority: bool
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
 def _checksum(value: np.ndarray) -> str:
     return hashlib.sha256(np.ascontiguousarray(value).tobytes()).hexdigest()
 
@@ -43,8 +60,6 @@ def _farthest_seed_ordinals(matrix: np.ndarray, count: int) -> list[int]:
     if count <= 0:
         raise ValueError("count must be positive")
     if matrix.shape[0] < count:
-        # Reuse deterministic ordinals cyclically only for initialization; this
-        # does not create new identities and remains visible in the codebook.
         base = list(range(matrix.shape[0]))
         return [base[i % len(base)] for i in range(count)]
     chosen = [0]
@@ -111,8 +126,6 @@ def train_deterministic_som(
                 neighborhood = torch.exp(-grid_distance / denom).reshape(-1, 1)
                 codebook += lr * neighborhood * (sample - codebook)
 
-        # Final BMU assignment; torch.argmin resolves ties to first ordinal,
-        # which is deterministic because codebook ordinals are frozen.
         squared = torch.sum((x[:, None, :] - codebook[None, :, :]) ** 2, dim=2)
         bmus = torch.argmin(squared, dim=1)
         quantization_error = torch.sqrt(torch.gather(squared, 1, bmus[:, None]).squeeze(1)).mean()
@@ -135,3 +148,55 @@ def train_deterministic_som(
         canonical_authority=False,
     )
     return coordinates, codebook, receipt
+
+
+def aggregate_som_lattice(
+    coordinates: Any,
+    values: Sequence[Sequence[float]] | Sequence[float] | np.ndarray,
+    *,
+    grid_rows: int,
+    grid_columns: int,
+):
+    """Aggregate row-aligned values onto a SOM lattice for cubic interpolation.
+
+    Empty cells remain zero and are accompanied by a count lattice, so callers
+    can distinguish a true zero value from no observations.
+    """
+
+    coords = np.asarray(coordinates.detach().cpu().numpy() if hasattr(coordinates, "detach") else coordinates, dtype=np.int64)
+    source = np.asarray(values, dtype=np.float32)
+    if coords.ndim != 2 or coords.shape[1] != 2:
+        raise ValueError("coordinates must have shape [N,2]")
+    if source.ndim == 1:
+        source = source[:, None]
+    if source.ndim != 2 or source.shape[0] != coords.shape[0]:
+        raise ValueError("values must have shape [N] or [N,D] aligned with coordinates")
+    if grid_rows <= 0 or grid_columns <= 0:
+        raise ValueError("grid dimensions must be positive")
+    if np.any(coords[:, 0] < 0) or np.any(coords[:, 0] >= grid_rows) or np.any(coords[:, 1] < 0) or np.any(coords[:, 1] >= grid_columns):
+        raise ValueError("SOM coordinate outside lattice bounds")
+
+    sums = np.zeros((grid_rows, grid_columns, source.shape[1]), dtype=np.float64)
+    counts = np.zeros((grid_rows, grid_columns), dtype=np.int64)
+    for ordinal, (row, column) in enumerate(coords.tolist()):
+        sums[row, column] += source[ordinal].astype(np.float64)
+        counts[row, column] += 1
+    field = np.zeros_like(sums, dtype=np.float32)
+    occupied = counts > 0
+    field[occupied] = (sums[occupied] / counts[occupied, None]).astype(np.float32)
+    if field.shape[-1] == 1:
+        field = field[..., 0]
+
+    receipt = SomLatticeReceipt(
+        schema="atlas.som-lattice-receipt.v1",
+        rows=int(source.shape[0]),
+        grid_rows=grid_rows,
+        grid_columns=grid_columns,
+        value_dimensions=int(source.shape[1]),
+        occupied_cells=int(np.count_nonzero(occupied)),
+        occupancy_fraction=float(np.mean(occupied)),
+        field_checksum=_checksum(field.astype(np.float32, copy=False)),
+        count_checksum=_checksum(counts),
+        canonical_authority=False,
+    )
+    return field, counts, receipt
