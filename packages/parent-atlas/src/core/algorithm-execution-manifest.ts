@@ -27,11 +27,18 @@ export const ALGORITHM_KIND_VALUES = [
   'pos_tagger',
   'ontology_classifier',
   'exact_gemm',
+  'cuvs_exact_knn',
   'qdrant_exact',
   'hnsw',
   'cagra',
   'turbovec',
+  'cuvs_all_neighbors',
+  'cuvs_pairwise_distance',
+  'cuvs_binary_quantization',
   'nary_incidence',
+  'sparse_softmax',
+  'sparse_spmm',
+  'contextual_window',
   'bfs',
   'scc',
   'condensation_dag',
@@ -43,6 +50,7 @@ export const ALGORITHM_KIND_VALUES = [
   'randomized_low_rank',
   'autoencoder',
   'kmeans',
+  'soft_kmeans',
   'som',
   'cubic_interpolation',
   'quaternion_projection',
@@ -62,6 +70,7 @@ export const GEOMETRY_KIND_VALUES = [
   'cosine_hypersphere',
   'inner_product',
   'nary_incidence',
+  'sparse_incidence',
   'quaternion_s3',
   'hilbert_curve_locality',
   'jacobian_tangent',
@@ -168,7 +177,7 @@ export const algorithmExecutionManifestSchema = z.object({
   algorithm_class: algorithmClassSchema,
   algorithm: algorithmKindSchema,
   geometry: geometryKindSchema,
-  metric: z.enum(['none', 'cosine', 'inner_product', 'sqeuclidean']).default('none'),
+  metric: z.enum(['none', 'cosine', 'inner_product', 'sqeuclidean', 'bitwise_hamming']).default('none'),
   dimensions: z.number().int().positive().optional(),
   dtype: z.string().min(1).optional(),
   compute_backend: computeBackendSchema,
@@ -211,22 +220,35 @@ export const algorithmExecutionManifestSchema = z.object({
   canonical_authority: z.boolean().default(false),
   producer_revision: revision,
 }).strict().superRefine((value, ctx) => {
-  const semanticAlgorithms = new Set(['exact_gemm', 'qdrant_exact', 'hnsw', 'cagra', 'turbovec']);
+  const semanticAlgorithms = new Set(['exact_gemm', 'cuvs_exact_knn', 'qdrant_exact', 'hnsw', 'cagra', 'turbovec']);
   if (semanticAlgorithms.has(value.algorithm) && value.logical_lane !== 'semantic') {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['logical_lane'], message: `${value.algorithm} must remain in the semantic logical lane` });
   }
   if ((value.algorithm === 'hnsw' || value.algorithm === 'cagra') && value.algorithm_class !== 'approximate_executor') {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['algorithm_class'], message: `${value.algorithm} must be approximate_executor` });
   }
+  if ((value.algorithm === 'exact_gemm' || value.algorithm === 'cuvs_exact_knn' || value.algorithm === 'qdrant_exact') && value.algorithm_class !== 'exact_reference') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['algorithm_class'], message: `${value.algorithm} must be exact_reference` });
+  }
   if (value.algorithm === 'nary_incidence' && value.geometry !== 'nary_incidence') {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['geometry'], message: 'N-ary relationship traversal must use nary_incidence geometry' });
+  }
+  if ((value.algorithm === 'sparse_softmax' || value.algorithm === 'sparse_spmm') && value.geometry !== 'sparse_incidence') {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['geometry'], message: `${value.algorithm} must remain a sparse-incidence derived executor` });
   }
   if (value.stage === 'relationship_retrieval' || value.stage === 'incidence_traversal') {
     if (value.geometry === 'hilbert_curve_locality' || value.geometry === 'quaternion_s3' || value.geometry === 'jacobian_tangent') {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['geometry'], message: 'Derived topology geometry cannot replace canonical N-ary relationship incidence' });
     }
   }
-  if (['quaternion_projection', 'hilbert_curve_order', 'jacobian_diagnostic', 'pca', 'svd', 'randomized_low_rank', 'autoencoder', 'kmeans', 'som', 'cubic_interpolation', 'eigensolve', 'neural_executor_router'].includes(value.algorithm) && value.canonical_authority) {
+  const derivedAlgorithms = [
+    'cuvs_all_neighbors', 'cuvs_pairwise_distance', 'cuvs_binary_quantization',
+    'sparse_softmax', 'sparse_spmm', 'contextual_window',
+    'quaternion_projection', 'hilbert_curve_order', 'jacobian_diagnostic',
+    'pca', 'svd', 'randomized_low_rank', 'autoencoder', 'kmeans', 'soft_kmeans', 'som',
+    'cubic_interpolation', 'eigensolve', 'neural_executor_router',
+  ];
+  if (derivedAlgorithms.includes(value.algorithm) && value.canonical_authority) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['canonical_authority'], message: `${value.algorithm} is derived/policy evidence and cannot own canonical truth` });
   }
   if (value.algorithm === 'moe_router') {
@@ -244,7 +266,6 @@ export const algorithmExecutionManifestSchema = z.object({
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['transport'], message: 'Kafka CDC transports receipts/state changes; it is not canonical authority' });
   }
   if (value.serialization === 'simdjson_ondemand' && value.algorithm_class === 'canonical_fact_operator') {
-    // Parsing may feed a canonical materializer, but parser implementation itself is not the fact operator.
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['serialization'], message: 'simdjson is a parsing implementation detail, not a canonical fact algorithm' });
   }
 });
@@ -274,7 +295,9 @@ export function assertAlgorithmManifestConsistent(value: unknown): AlgorithmExec
 export function describeAlgorithmExecutionBoundary(): string {
   return [
     'Each DAG node records the actual algorithm, geometry, metric, backend, compilation mode, transport and revisions used.',
-    'HNSW/CAGRA remain semantic ANN executors; they are never application relationship graphs.',
+    'HNSW/CAGRA remain semantic ANN executors; cuVS exact KNN remains an exact semantic executor; all-neighbors is only a derived KNN-graph analytic.',
+    'Binary quantization, pairwise analytics, contextual windows, sparse softmax/SpMM, clustering, SOM and interpolation are derived signals only.',
+    'Sparse relation probabilities may only exist on explicit 0/1 N-ary support; sparse execution never creates relationship facts.',
     'Quaternion, Hilbert-curve, Jacobian, spectral, PCA/SVD/AE/KMeans/SOM and interpolation outputs are derived signals only.',
     'N-ary facts and participant roles remain canonical relationship state independently of any embedding geometry.',
     'An external neural executor router is policy, not model MoE. MoE labels require explicit expert topology on the model.',
