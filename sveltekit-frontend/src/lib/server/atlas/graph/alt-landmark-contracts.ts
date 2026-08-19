@@ -64,6 +64,7 @@ export const LandmarkDistanceArtifactRefV1Schema = z.object({
   cols: z.number().int().positive(),
   valueType: AltDistanceValueTypeSchema,
   layout: AltDistanceLayoutSchema,
+  byteOrder: z.literal('LITTLE_ENDIAN'),
   byteLength: z.number().int().positive(),
 }).strict();
 export type LandmarkDistanceArtifactRefV1 = z.infer<typeof LandmarkDistanceArtifactRefV1Schema>;
