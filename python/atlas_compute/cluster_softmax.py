@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import hashlib
-from typing import Any, Sequence
+from typing import Any, Literal, Sequence
 
 import numpy as np
 
@@ -25,6 +25,8 @@ class CuvsSoftKMeansReceipt:
     dimensions: int
     n_clusters: int
     metric: str
+    input_normalization: str
+    semantic_mode: str
     pairwise_metric: str
     pairwise_postprocess: str
     temperature: float
@@ -51,12 +53,18 @@ def run_cuvs_soft_kmeans(
     *,
     n_clusters: int,
     temperature: float = 1.0,
+    input_normalization: Literal["none", "l2_row"] = "none",
     max_iter: int = 300,
     tol: float = 1e-4,
     device: str | None = None,
     seed: int = 0xA71A5,
 ):
-    """Fit sqeuclidean cuVS KMeans and return softmax(-squared_distance/T)."""
+    """Fit deterministic cuVS KMeans and return a derived soft assignment.
+
+    ``l2_row`` is the preferred semantic-vector experiment: normalize every row
+    first, then use squared Euclidean KMeans. This is recorded as a cosine-like
+    proxy and is not claimed to be an exact spherical-k-means implementation.
+    """
 
     import cupy as cp
     import torch
@@ -67,10 +75,19 @@ def run_cuvs_soft_kmeans(
     source = np.asarray(matrix, dtype=np.float32)
     if source.ndim != 2 or source.shape[0] == 0 or source.shape[1] == 0:
         raise ValueError("matrix must be non-empty rank-2")
+    if not np.isfinite(source).all():
+        raise ValueError("matrix contains non-finite values")
     if not (1 <= n_clusters <= source.shape[0]):
         raise ValueError("n_clusters out of range")
     if temperature <= 0 or not np.isfinite(temperature):
         raise ValueError("temperature must be finite and positive")
+
+    if input_normalization == "l2_row":
+        norms = np.linalg.norm(source.astype(np.float64), axis=1, keepdims=True)
+        source = (source / np.maximum(norms, 1e-12)).astype(np.float32)
+        semantic_mode = "l2_normalized_sqeuclidean_cosine_proxy"
+    else:
+        semantic_mode = "raw_sqeuclidean"
 
     init_ordinals = deterministic_farthest_first_ordinals(source, n_clusters)
     x = cp.asarray(source, dtype=cp.float32)
@@ -85,9 +102,6 @@ def run_cuvs_soft_kmeans(
     )
     centroids, inertia, n_iter = kmeans.fit(params, x, centroids=initial)
     labels, _ = kmeans.predict(params, x, centroids)
-    # Python pairwise_distance documents `euclidean`, not `sqeuclidean`; square
-    # it explicitly to match the KMeans objective rather than relying on an
-    # undocumented metric spelling.
     euclidean = pairwise_distance(x, centroids, metric="euclidean")
     distances = euclidean * euclidean
     cp.cuda.Stream.null.synchronize()
@@ -110,6 +124,8 @@ def run_cuvs_soft_kmeans(
         dimensions=int(source.shape[1]),
         n_clusters=n_clusters,
         metric="sqeuclidean",
+        input_normalization=input_normalization,
+        semantic_mode=semantic_mode,
         pairwise_metric="euclidean",
         pairwise_postprocess="square_distance",
         temperature=float(temperature),
