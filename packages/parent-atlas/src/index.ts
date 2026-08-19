@@ -48,6 +48,8 @@ export * from './core/structured-value-ast.js';
 export * from './core/structured-value-arrow.js';
 export * from './core/structured-value-parity.js';
 export * from './core/temporal-indexing-fabric.js';
+export * from './core/observation-feature-compiler.js';
+export * from './core/okf-mcp-surface.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
