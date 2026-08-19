@@ -98,8 +98,8 @@ Tags are metadata/filter hints, not independent retrieval votes.
 - [x] ORF-0 — Existing owners audited: OKF registry, ontology-linked tuples, legacy FeatureMatrix, multicore MCP boundary, external-doc Qdrant scripts.
 - [x] ORF-1 — `ObservationFeatureProjectionV1` implemented: fixed ontology/AST masks, grounded structural booleans, LangExtract classes, flattened tags, evidence refs, source/representation lineage.
 - [ ] ORF-1P — Run deterministic unit tests for ORF-1 and prove input/output digest stability. Tests are written, not yet executed in this GitHub-only session.
-- [ ] ORF-2 — Postgres materializer. Persist projection rows with source/version receipts and selective B-tree/GIN indexes; benchmark filtered exact scans before adding pgvector ANN duplication.
-- [ ] ORF-2P — PostgreSQL 18 proof: EXPLAIN/ANALYZE representative filters; capture bitmap/index/heap plan and AIO settings in receipt.
+- [x] ORF-2 — Postgres exact-filter plane implemented: isolated manual migration, Drizzle schema, `(packet_key, feature_revision)` materializer, selective B-tree/GIN indexes, and no pgvector ANN duplication.
+- [ ] ORF-2P — PostgreSQL 18 proof script implemented; live EXPLAIN/ANALYZE must capture bitmap/index/heap plan and AIO settings before promotion.
 - [x] ORF-3C — `ExternalDocProjectionV1` target contract implemented for one programming-doc evidence family: semantic_512 lineage, selective indexed fields, flattened tags, cluster/community/PageRank payload hints.
 - [ ] ORF-3 — Qdrant collection/materializer implementation after migration dry-run proves the target is safe.
 - [ ] ORF-3A — External-doc 768→512 migration dry run. Reject zero vectors; preserve document/chunk checksums; compare Recall@K and exact identity before apply.
@@ -119,39 +119,43 @@ Tags are metadata/filter hints, not independent retrieval votes.
 
 ## Postgres target (ORF-2)
 
-Start with metadata/features, not another full ANN owner:
+Implemented table:
 
 ```text
 atlas_observation_feature_rows
 ----------------------------------------
-packet_key                 PK/join key component
+packet_key + feature_revision    PRIMARY KEY
 source_ref
 source_version_receipt_id
 workspace_revision
-feature_revision
 representation_id
 representation_revision
+tree_node_id
 ontology_classes[]
 ast_observation_kinds[]
 langextract_classes[]
 flattened_tags[]
-ontology_mask bit/byte payload
-ast_pattern_mask bit/byte payload
+ontology_mask jsonb
+ast_pattern_mask jsonb
 structural_flags jsonb
+evidence_refs[]
 kmeans_cluster_id nullable
 som_row/som_col nullable
 community_id nullable
 pagerank nullable
-ppr nullable
-created_at
+personalized_pagerank nullable
+producer_revision
+input_digest
+created_at / updated_at
 ```
 
-Selective indexes to prove first:
+Selective indexes:
 
 ```text
-BTREE (packet_key)
 BTREE (source_ref)
 BTREE (workspace_revision, feature_revision)
+BTREE (representation_id, representation_revision)
+BTREE (tree_node_id)
 BTREE (kmeans_cluster_id)
 BTREE (som_row, som_col)
 BTREE (community_id)
@@ -160,6 +164,8 @@ GIN   (ast_observation_kinds)
 GIN   (langextract_classes)
 GIN   (flattened_tags)
 ```
+
+The table is intentionally managed by `drizzle/manual/20260819_atlas_observation_feature_rows.sql` and excluded from ordinary Drizzle generation so this additive plane can be proven independently of unrelated schema drift.
 
 Do not add pgvector HNSW here by default. Existing Qdrant/cached GPU semantic executors already own the main ANN workload; Postgres vector use is a bounded exact/join mirror only if a later proof needs it.
 
