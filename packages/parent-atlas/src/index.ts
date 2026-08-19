@@ -48,109 +48,16 @@ export { createNeo4jAdapter } from './adapters/neo4j.js';
 export { createDuckDbAdapter, isDuckDbAvailable } from './adapters/duckdb.js';
 
 // Mirrored Atlas contracts
-export {
-  LOD_LEVEL_VALUES,
-  PACKET_KIND_VALUES,
-  describeTemporalPacketContract,
-  lodLevelSchema,
-  normalizeTemporalPacket,
-  packetKindSchema,
-  temporalPacketSchema,
-} from './core/temporal-packet.js';
-export {
-  PROCESSING_PASS_STATUS_VALUES,
-  describeProcessingPassContract,
-  normalizeProcessingPass,
-  processingPassSchema,
-  processingPassStatusSchema,
-} from './core/processing-pass.js';
-export {
-  buildFeatureEnvelopeObject,
-  buildSemanticPayloadEnvelope,
-  describeQdrantSemanticPayloadContract,
-  qdrantPayloadContractVersion,
-  semanticPayloadEnvelopeSchema,
-} from './core/qdrant-semantic-payload-envelope.js';
-export {
-  buildGraphSnapshotManifest,
-  describeGraphSnapshotContract,
-  graphSnapshotEdgeSchema,
-  graphSnapshotManifestSchema,
-  graphSnapshotStatusSchema,
-} from './core/graph-snapshot-manifest.js';
-export {
-  compileContextualTreeSnapshot,
-  contextualTreeEdgeSchema,
-  contextualTreeNodeSchema,
-  contextualTreePacketSchema,
-  ContextualTreeSnapshotError,
-} from './core/contextual-tree-snapshot.js';
-export {
-  GraphAuthorityRunV2Schema,
-  GraphResolutionIssueStatusSchema,
-  GraphResolutionIssueV2Schema,
-  GraphSnapshotV2Schema,
-  assertAuthorityRunCanPersist,
-  createGraphSnapshotV2Repository,
-  withGraphSnapshotV2Transaction,
-} from './core/graph-snapshot-v2.js';
-export {
-  ATLAS_EVENT_KIND_VALUES,
-  ATLAS_EVENT_SOURCE_VALUES,
-  ATLAS_EVENT_STATE_VALUES,
-  atlasEventFlowSchema,
-  atlasEventKindSchema,
-  atlasEventSchema,
-  atlasEventSourceSchema,
-  atlasEventStateSchema,
-  buildAtlasEventFlow,
-  hashAtlasEventFlow,
-  normalizeAtlasEvent,
-  summarizeAtlasEventFlow,
-} from './core/atlas-event-flow.js';
-export {
-  buildMultiHopRetrievalConfig,
-  buildMultiHopRetrievalQuery,
-  buildMultiHopRetrievalResult,
-  buildTemporalRetrievalPolicy,
-  multiHopRetrievalConfigSchema,
-  multiHopRetrievalQuerySchema,
-  multiHopRetrievalResultSchema,
-  retrievalLaneSchema,
-  temporalRetrievalModeSchema,
-  temporalRetrievalPolicySchema,
-} from './core/multi-hop-retrieval.js';
-export {
-  QDRANT_COLLECTION_REGISTRY,
-  QDRANT_SPARSE_VECTOR_NAME,
-  QDRANT_VECTOR_NAMES,
-  resolveAtlasQdrantDefaultCollection,
-  resolveAtlasQdrantDenseVectorName,
-  resolveAtlasQdrantLatentRouteVectorName,
-  resolveAtlasQdrantLegacySourceCollection,
-  resolveAtlasQdrantSparseVectorName,
-  resolveAtlasQdrantSummaryRouteVectorName,
-} from './core/qdrant-collection-registry.js';
-export {
-  EVIDENCE_POLARITY_VALUES,
-  FEATURE_STATE_VALUES,
-  RELATIONSHIP_DEGREE_KIND_VALUES,
-  buildFeatureRelationship,
-  classifyRelationshipDegree,
-  deriveRelationshipDegree,
-  describeFeatureIntelligenceContract,
-  evidencePolaritySchema,
-  featureCandidateSchema,
-  featureEvidenceSchema,
-  featureRelationshipSchema,
-  featureSchema,
-  featureStateReceiptSchema,
-  featureStateSchema,
-  featureStateValueSchema,
-  relationshipCardinalityConstraintSchema,
-  relationshipDegreeKindSchema,
-  relationshipParticipantSchema,
-} from './core/feature-intelligence.js';
+export * from './core/temporal-packet.js';
+export * from './core/processing-pass.js';
+export * from './core/qdrant-semantic-payload-envelope.js';
+export * from './core/graph-snapshot-manifest.js';
+export * from './core/contextual-tree-snapshot.js';
+export * from './core/graph-snapshot-v2.js';
+export * from './core/atlas-event-flow.js';
+export * from './core/multi-hop-retrieval.js';
+export * from './core/qdrant-collection-registry.js';
+export * from './core/feature-intelligence.js';
 
 // Feature intelligence / HyperGraphRAG surfaces
 export * from './core/structural-symbol.js';
@@ -182,6 +89,7 @@ export * from './core/dynamic-hyperedge-sql.js';
 export * from './core/relationship-query-repository.js';
 export * from './core/feature-matrix.js';
 export * from './core/feature-matrix-materializer.js';
+export * from './core/feature-signal-alignment.js';
 export * from './core/model-signal-receipt.js';
 export * from './core/adaptive-hypergraph-chain.js';
 export * from './core/retrieval-action-receipt.js';
@@ -234,18 +142,6 @@ export type { PacketIdentity } from './core/canonical-packet-bridge.js';
 export type { AtlasMemoryEnvelope, GlyphRecord } from './core/canonical-packet-bridge.js';
 export type { ValidationResult, ValidationViolation, TelemetryRecord, BreadthMetrics, ProvenanceLink, RetrievalMetrics, MaterializationReport } from './core/packet-validator-materializer.js';
 export type { CanonicalServiceName, ServiceProbe, ServiceProbeStatus, ServiceProbeTransport } from './core/service-contract.js';
-export type {
-  FeatureCandidateV1,
-  FeatureEvidenceV1,
-  FeatureRelationshipBuildInput,
-  FeatureRelationshipV1,
-  FeatureStateReceiptV1,
-  FeatureStateV1,
-  FeatureV1,
-  RelationshipCardinalityConstraintV1,
-  RelationshipDegreeKind,
-  RelationshipParticipantV1,
-} from './core/feature-intelligence.js';
 export type { IngestOptions, IngestResult } from './pipelines/ingest.js';
 export type { KarpathyEnrichOptions, KarpathyEnrichResult } from './pipelines/enrich-karpathy.js';
 export type { HydrateCacheOptions, HydrateCacheResult } from './pipelines/hydrate-cache.js';
