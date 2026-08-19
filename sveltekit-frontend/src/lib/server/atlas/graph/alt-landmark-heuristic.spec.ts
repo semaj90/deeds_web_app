@@ -13,6 +13,8 @@ function snapshot(directed: boolean) {
     projectionRevision: 'gp-1',
     nodeOrdinalRevision: 'ord-1',
     landmarkRevision: 'lm-1',
+    costModelRevision: 'cost-1',
+    edgeCostChecksumSha256: checksum('c'),
     directed,
     weighted: false,
     nonnegativeWeightsRequired: true as const,
@@ -39,6 +41,8 @@ function snapshot(directed: boolean) {
     } : null,
     distanceValueType: 'UINT32_HOPS' as const,
     distanceExactness: 'EXACT_INTEGER' as const,
+    distanceAbsoluteErrorBound: 0,
+    floatingErrorBoundCertified: false,
     quantizedForExactSearch: false as const,
     precomputeExecutor: 'NETWORKX_REFERENCE' as const,
     unreachableSentinel: 'UINT_MAX' as const,
@@ -62,6 +66,8 @@ describe('ALT landmark lower bound', () => {
     });
     expect(Array.from(result.heuristic)).toEqual([2, 1]);
     expect(result.receipt.admissibility).toBe('PROVEN_LOWER_BOUND');
+    expect(result.receipt.numericGuardApplied).toBe(0);
+    expect(result.receipt.mayTerminateExactSearch).toBe(true);
   });
 
   it('evaluates both directed ALT inequalities', () => {
@@ -101,6 +107,65 @@ describe('ALT landmark lower bound', () => {
     });
     expect(result.heuristic[0]).toBe(2);
     expect(result.receipt.unreachablePairCount).toBeGreaterThan(0);
+  });
+
+  it('subtracts a 2-epsilon guard for certified floating snapshots', () => {
+    const base = snapshot(false);
+    const floatSnapshot = {
+      ...base,
+      weighted: true,
+      distanceValueType: 'FLOAT64_COST' as const,
+      distanceExactness: 'AUTHORITATIVE_FLOAT' as const,
+      distanceAbsoluteErrorBound: 0.1,
+      floatingErrorBoundCertified: true,
+      unreachableSentinel: 'POSITIVE_INFINITY' as const,
+      forwardDistances: {
+        ...base.forwardDistances,
+        valueType: 'FLOAT64_COST' as const,
+        byteLength: 64,
+      },
+    };
+    const result = evaluateAltLowerBound({
+      requestId: 'rf',
+      snapshot: floatSnapshot,
+      accessor: { forward: (_l, n) => [0, 1, 2, 5][n] },
+      frontierOrdinals: [1],
+      targetOrdinal: 3,
+      producerRevision: 'test',
+    });
+    expect(result.heuristic[0]).toBeCloseTo(3.8);
+    expect(result.receipt.numericGuardApplied).toBeCloseTo(0.2);
+    expect(result.receipt.admissibility).toBe('PROVEN_LOWER_BOUND');
+    expect(result.receipt.mayClaimOptimality).toBe(true);
+  });
+
+  it('does not give exact termination authority to uncertified floating snapshots', () => {
+    const base = snapshot(false);
+    const floatSnapshot = {
+      ...base,
+      weighted: true,
+      distanceValueType: 'FLOAT64_COST' as const,
+      distanceExactness: 'AUTHORITATIVE_FLOAT' as const,
+      distanceAbsoluteErrorBound: null,
+      floatingErrorBoundCertified: false,
+      unreachableSentinel: 'POSITIVE_INFINITY' as const,
+      forwardDistances: {
+        ...base.forwardDistances,
+        valueType: 'FLOAT64_COST' as const,
+        byteLength: 64,
+      },
+    };
+    const result = evaluateAltLowerBound({
+      requestId: 'ru',
+      snapshot: floatSnapshot,
+      accessor: { forward: (_l, n) => [0, 1, 2, 5][n] },
+      frontierOrdinals: [1],
+      targetOrdinal: 3,
+      producerRevision: 'test',
+    });
+    expect(result.receipt.admissibility).toBe('UNPROVEN_NUMERIC');
+    expect(result.receipt.mayTerminateExactSearch).toBe(false);
+    expect(result.receipt.mayClaimOptimality).toBe(false);
   });
 
   it('keeps aggressive scores as tie-breakers after exact f=g+h', () => {
