@@ -73,5 +73,10 @@ export default {
     // same reason as library_identities above: keep isolated from unrelated schema drift.
     '!atlas_research_runs', '!atlas_fetches', '!atlas_fetch_attempts',
     '!atlas_source_revisions', '!atlas_extractions',
+
+    // Added 2026-08-19: ORF observation feature exact-filter plane.
+    // Managed by drizzle/manual/20260819_atlas_observation_feature_rows.sql so
+    // this additive table can be proven independently of unrelated schema drift.
+    '!atlas_observation_feature_rows',
   ],
 } satisfies Config;
