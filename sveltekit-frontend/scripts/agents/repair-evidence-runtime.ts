@@ -200,10 +200,17 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ['featureRevision', observedFeatureRevision],
     ].filter(([, value]) => !isResolvedRevision(value)).map(([name]) => name);
 
-    const dryRunAllowed = result.manifest.evidenceStatus !== 'BLOCKED'
+    // A DEGRADED required-library state remains useful for diagnostics/context,
+    // but must not trigger a repair skill. This is stricter than the underlying
+    // manifest's descriptive evidenceStatus and is the live execution gate.
+    const dryRunAllowed = result.readiness.gate === 'READY'
+      && result.manifest.evidenceStatus === 'READY_FOR_DRY_RUN'
       && result.manifest.exactEvidencePacketKeys.length > 0;
     const reasonCodes = [
       ...(dryRunAllowed ? ['EVIDENCE_SUPPORTS_DRY_RUN'] : ['EVIDENCE_BLOCKS_DRY_RUN']),
+      ...(result.readiness.gate === 'READY'
+        ? ['REQUIRED_LIBRARY_READINESS_READY']
+        : [`REQUIRED_LIBRARY_READINESS_${result.readiness.gate}`]),
       ...(fullyRevisionAlignedExactEvidence
         ? ['EXACT_EVIDENCE_REVISION_ALIGNED']
         : ['EXACT_EVIDENCE_REVISION_ALIGNMENT_NOT_PROVEN']),
