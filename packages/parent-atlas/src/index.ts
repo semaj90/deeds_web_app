@@ -106,6 +106,8 @@ export * from './core/ace-synthesis-graph.js';
 export * from './core/agentic-file-mutation.js';
 export * from './core/atlas-kernel-session.js';
 export * from './core/claim-verification.js';
+export * from './core/remote-adapter-lifecycle.js';
+export * from './core/adaptive-memory-runtime.js';
 export * from './core/hnsw-evaluation.js';
 export * from './core/gpu-resource-envelope.js';
 export * from './core/executor-plans.js';
