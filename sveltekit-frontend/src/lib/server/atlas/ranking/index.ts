@@ -146,6 +146,18 @@ export type {
   MeasuredMatrixDiagnosticsReceiptV1,
   MeasuredTangPolicyReceiptV1,
 } from './measured-matrix-diagnostics.js';
+export {
+  TangL2SamplingModeSchema,
+  TangSamplingPrngSchema,
+  TangL2SamplingDrawV1Schema,
+  TangL2SamplingReceiptV1Schema,
+  executeTangL2Sampling,
+  replayTangL2Sampling,
+} from './tang-l2-sampling.js';
+export type {
+  TangL2SamplingDrawV1,
+  TangL2SamplingReceiptV1,
+} from './tang-l2-sampling.js';
 
 import type { Reranker, RerankRequest, RerankResult, RerankResultItem } from './reranker.js';
 import { randomUUID } from 'node:crypto';
