@@ -1,5 +1,6 @@
 import {
   buildExternalDocsHybridProofGate,
+  buildExternalDocsShadowCollectionConfig,
   deriveQdrantVersionCapabilities,
   qdrantExternalDocsCapabilityProfileSchema,
   type ExternalDocsHybridProofGateV1,
@@ -74,8 +75,6 @@ export async function probeExternalDocsQdrantCapabilities(input: {
     qdrant_version: version,
     qdrant_commit: root?.commit ? String(root.commit) : null,
     ...versionCapabilities,
-    // Native BM25 inference must be exercised against the actual deployment.
-    // Version detection alone is not proof that the inference provider is usable.
     native_bm25_inference: 'UNPROBED',
     current_collection_exists: current !== null,
     shadow_collection_exists: shadow !== null,
@@ -86,64 +85,7 @@ export async function probeExternalDocsQdrantCapabilities(input: {
   });
 }
 
-function shadowCollectionCreateBody(profile: QdrantExternalDocsCapabilityProfileV1): Record<string, unknown> {
-  if (!profile.supports_sparse_vectors || !profile.supports_idf_modifier) {
-    throw new Error(`QDRANT_SHADOW_UNSUPPORTED:${profile.qdrant_version}`);
-  }
-
-  if (profile.supports_memory_tiers_v119) {
-    return {
-      vectors: {
-        semantic_768: {
-          size: 768,
-          distance: 'Cosine',
-          memory: 'cold',
-        },
-      },
-      sparse_vectors: {
-        lexical_bm25: {
-          modifier: 'idf',
-          index: { memory: 'pinned' },
-        },
-      },
-      hnsw_config: { memory: 'cold' },
-      payload: { memory: 'cold' },
-      metadata: {
-        atlas_owner: 'external-doc-knowledge-fabric',
-        atlas_projection: 'semantic_768+lexical_bm25',
-        canonical_authority: false,
-      },
-    };
-  }
-
-  return {
-    vectors: {
-      semantic_768: {
-        size: 768,
-        distance: 'Cosine',
-        on_disk: true,
-      },
-    },
-    sparse_vectors: {
-      lexical_bm25: {
-        modifier: 'idf',
-        index: { on_disk: false },
-      },
-    },
-    hnsw_config: { on_disk: true },
-    on_disk_payload: true,
-    metadata: {
-      atlas_owner: 'external-doc-knowledge-fabric',
-      atlas_projection: 'semantic_768+lexical_bm25',
-      canonical_authority: false,
-    },
-  };
-}
-
-/**
- * Creates only the shadow hybrid collection. It never mutates or drops the
- * existing external_programming_docs_768 collection.
- */
+/** Creates only the shadow collection; never mutates or drops the current one. */
 export async function ensureExternalDocsHybridShadowCollection(): Promise<'CREATED' | 'EXISTS'> {
   const profile = await probeExternalDocsQdrantCapabilities();
   if (profile.shadow_collection_exists) {
@@ -155,7 +97,7 @@ export async function ensureExternalDocsHybridShadowCollection(): Promise<'CREAT
 
   await qdrantJson(`/collections/${COLLECTION}`, {
     method: 'PUT',
-    body: JSON.stringify(shadowCollectionCreateBody(profile)),
+    body: JSON.stringify(buildExternalDocsShadowCollectionConfig(profile)),
   });
   return 'CREATED';
 }
@@ -187,10 +129,7 @@ export async function probeNativeBm25Inference(input: {
               model: 'Qdrant/bm25',
             },
           },
-          payload: {
-            atlas_probe: true,
-            canonical_authority: false,
-          },
+          payload: { atlas_probe: true, canonical_authority: false },
         }],
       }),
     });
