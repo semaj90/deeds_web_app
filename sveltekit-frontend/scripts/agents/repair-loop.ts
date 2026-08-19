@@ -7,21 +7,24 @@
  *   error event
  *   → classify
  *   → legacy feature/packet lookup (compatibility only)
- *   → TRACE-backed RepairContextManifestV1 evidence gate
+ *   → TRACE-backed evidence gate
  *   → bounded graph/semantic/context feature assembly
- *   → exact-evidence gate
+ *   → CAGRA → exact semantic promotion
+ *   → rebuild ContextManifestV2 + N×16 matrix
+ *   → measured N×16 diagnostics → Tang policy
+ *   → canonical exact source-revision proof
  *   → signed repair skill DRY-RUN
- *   → task/evidence receipts
- *   → explicit operator/DAG mutation boundary
+ *   → RepairMutationProposalV1
+ *   → proposal-only WorkflowActionEventV1
+ *   → validator → operator authorization → authorized DAG (separate boundary)
  *
- * Evidence never authorizes mutation. The historical direct --apply path is
- * retained only as an explicitly gated legacy override and is disabled unless
- * both --operator-approved and ATLAS_REPAIR_DIRECT_APPLY=1 are supplied.
+ * Evidence never authorizes mutation. This loop no longer applies patches
+ * directly; --apply is rejected so canonical writes can only be reached through
+ * the separately checksum-bound operator/DAG authorization contract.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import pg from 'pg';
 import {
@@ -33,6 +36,11 @@ import {
   type RepairTaskCard,
 } from './repair-registry.ts';
 import { createRepairEvidenceRuntime } from './repair-evidence-runtime.ts';
+import {
+  RepairProposalRevisionProofV1Schema,
+  compileRepairMutationProposal,
+  compileRepairProposalWorkflow,
+} from '../../src/lib/server/atlas/workflow/repair-mutation-proposal.js';
 
 const { Pool } = pg;
 
@@ -63,8 +71,6 @@ const DB_URL = ENV.DATABASE_URL
 
 const argv = process.argv.slice(2);
 const APPLY_REQUESTED = argv.includes('--apply');
-const OPERATOR_APPROVED = argv.includes('--operator-approved');
-const DIRECT_APPLY_ENABLED = ENV.ATLAS_REPAIR_DIRECT_APPLY === '1';
 const VERBOSE = argv.includes('--verbose');
 
 function getArg(flag: string): string | null {
@@ -231,18 +237,13 @@ function makeEvidenceQuery(event: ErrorEvent, skillId: SkillId): string {
   ].join('\n');
 }
 
-function directApplyAuthorized(evaluation: Awaited<ReturnType<ReturnType<typeof createRepairEvidenceRuntime>['evaluate']>>): boolean {
-  return APPLY_REQUESTED
-    && OPERATOR_APPROVED
-    && DIRECT_APPLY_ENABLED
-    && evaluation.lineage.fullyRevisionAlignedExactEvidence
-    && evaluation.lineage.unresolvedRevisionFields.length === 0;
-}
-
 // ── Repair loop ───────────────────────────────────────────────────────────────
 
 async function runRepairLoop(): Promise<void> {
-  log(`Starting repair loop (applyRequested=${APPLY_REQUESTED}, operatorApproved=${OPERATOR_APPROVED}, directApplyEnabled=${DIRECT_APPLY_ENABLED})`);
+  log(`Starting repair loop (proposalOnly=true, directApplyRetired=true)`);
+  if (APPLY_REQUESTED) {
+    log('⛔ --apply is retired. This loop emits RepairMutationProposalV1 only; use a checksum-bound OperatorRepairAuthorizationV1 with the authorized DAG compiler for canonical writes.');
+  }
 
   const pool = new Pool({ connectionString: DB_URL, max: 3 });
   const evidenceRuntime = createRepairEvidenceRuntime({
@@ -250,7 +251,7 @@ async function runRepairLoop(): Promise<void> {
     traceMcpUrl: ENV.TRACE_MCP_URL,
     graphRevision: CLI_GRAPH_REVISION,
     featureRevision: CLI_FEATURE_REVISION,
-    producerRevision: 'repair-loop.evidence.v1',
+    producerRevision: 'repair-loop.evidence.v2',
   });
   fs.mkdirSync(TASK_CARDS_DIR, { recursive: true });
 
@@ -266,7 +267,7 @@ async function runRepairLoop(): Promise<void> {
   let dryRuns = 0;
   let blocked = 0;
   let skipped = 0;
-  let applied = 0;
+  let proposals = 0;
 
   try {
     for (const event of events) {
@@ -290,7 +291,7 @@ async function runRepairLoop(): Promise<void> {
       verbose(`    legacy feature_id: ${featureId}`);
       verbose(`    legacy packet: ${legacyPacket?.packet_key ?? 'none'}`);
 
-      // Step 3: canonical evidence gate before any repair skill executes.
+      // Step 3: canonical evidence + semantic promotion + measured N×16 diagnostics.
       const requestId = randomUUID();
       const evaluation = await evidenceRuntime.evaluate({
         requestId,
@@ -309,6 +310,12 @@ async function runRepairLoop(): Promise<void> {
       log(`    matrix: ${evaluation.result.featureMatrix.rows}×${evaluation.result.featureMatrix.cols}`);
       log(`    context: ${evaluation.result.contextPlan.selectedTokens}/${evaluation.result.contextPlan.availableTokens} tokens`);
       log(`    lineage exact+revision aligned: ${evaluation.lineage.fullyRevisionAlignedExactEvidence}`);
+      if (evaluation.measuredMatrixDiagnostics) {
+        log(`    measured rank: effective=${evaluation.measuredMatrixDiagnostics.effectiveRank ?? 'null'} numerical=${evaluation.measuredMatrixDiagnostics.numericalRank}/${evaluation.measuredMatrixDiagnostics.columnCount}`);
+      }
+      if (evaluation.measuredTangPolicy) {
+        log(`    Tang policy: ${evaluation.measuredTangPolicy.recommendation.status} qualified=${evaluation.measuredTangPolicy.qualified}`);
+      }
       verbose(`    evidence receipt: ${evidencePath}`);
       for (const reason of evaluation.reasonCodes) verbose(`    evidence reason: ${reason}`);
 
@@ -345,8 +352,7 @@ async function runRepairLoop(): Promise<void> {
       const { skill } = skillResult;
       log(`    ✓ Loaded skill: ${skill.id} (risk: ${skill.risk})`);
 
-      // Step 5: ALWAYS dry-run first. Keep legacy packet input shape for skill compatibility;
-      // the separate evidence receipt is authoritative for context/lineage.
+      // Step 5: ALWAYS dry-run. Mutation is not available in this process.
       const repairInput = {
         error: event.error,
         source_ref: event.source_ref,
@@ -368,6 +374,8 @@ async function runRepairLoop(): Promise<void> {
       dryRuns += 1;
 
       // Step 6: auditable task card + packet/evidence references.
+      const finalManifest = evaluation.semanticPromotionFeedback?.manifest;
+      const selectedPacketKeys = finalManifest?.selectedPacketKeys ?? evaluation.result.manifest.selectedPacketKeys;
       const card = buildTaskCard({
         skillId,
         sourceRef: event.source_ref,
@@ -379,10 +387,12 @@ async function runRepairLoop(): Promise<void> {
       card.notes = appendUnique(output.notes, [
         `Evidence receipt: ${path.basename(evidencePath)}`,
         `Evidence status: ${evaluation.result.manifest.evidenceStatus}`,
-        `Feature matrix: ${evaluation.result.featureMatrix.rows}x${evaluation.result.featureMatrix.cols} ${evaluation.result.manifest.featureMatrix.sha256}`,
+        `Post-promotion feature matrix: ${evaluation.semanticPromotionFeedback?.featureMatrix.rows ?? evaluation.result.featureMatrix.rows}x${evaluation.semanticPromotionFeedback?.featureMatrix.cols ?? evaluation.result.featureMatrix.cols} ${evaluation.semanticPromotionFeedback?.manifest.featureMatrix.sha256 ?? evaluation.result.manifest.featureMatrix.sha256}`,
         `Exact revision alignment proven: ${evaluation.lineage.fullyRevisionAlignedExactEvidence}`,
+        `Measured Tang qualified: ${evaluation.measuredTangPolicy?.qualified ?? false}`,
+        'Canonical writes from this loop: false',
       ]);
-      card.packet_refs = appendUnique(card.packet_refs, evaluation.result.manifest.selectedPacketKeys);
+      card.packet_refs = appendUnique(card.packet_refs, selectedPacketKeys);
       card.status = 'dry_run_done';
 
       const cardPath = path.join(TASK_CARDS_DIR, `${card.id.replace(/[^a-z0-9-]/gi, '_')}.json`);
@@ -390,53 +400,86 @@ async function runRepairLoop(): Promise<void> {
       await upsertTaskCard(pool, card);
       log(`    ✓ Task card: ${cardPath}`);
 
-      // Step 7: mutation boundary. Evidence cannot satisfy this by itself.
-      const allowLegacyDirectApply = directApplyAuthorized(evaluation);
-      if (APPLY_REQUESTED && !allowLegacyDirectApply) {
-        const blockers = [
-          ...(!OPERATOR_APPROVED ? ['missing --operator-approved'] : []),
-          ...(!DIRECT_APPLY_ENABLED ? ['ATLAS_REPAIR_DIRECT_APPLY != 1'] : []),
-          ...(!evaluation.lineage.fullyRevisionAlignedExactEvidence ? ['revision-aligned exact evidence not proven'] : []),
+      // Step 7: compile a proposal-only workflow artifact. Tang qualification is
+      // recorded but does not authorize mutation. Source-exact revision proof and
+      // exact-promoted context remain hard prerequisites for proposal creation.
+      const proposalReady = Boolean(
+        output.patch
+        && finalManifest?.semanticPromotion.status === 'APPLIED'
+        && evaluation.measuredMatrixDiagnostics
+        && evaluation.measuredTangPolicy
+        && evaluation.lineage.fullyRevisionAlignedExactEvidence
+        && evaluation.lineage.revisionAlignedExactPacketKeys.length > 0
+        && evaluation.lineage.unresolvedRevisionFields.length === 0,
+      );
+
+      if (!proposalReady || !output.patch || !finalManifest || !evaluation.measuredMatrixDiagnostics || !evaluation.measuredTangPolicy) {
+        const proposalBlockers = [
+          ...(!output.patch ? ['dry-run produced no patch'] : []),
+          ...(finalManifest?.semanticPromotion.status !== 'APPLIED' ? ['exact semantic promotion not applied'] : []),
+          ...(!evaluation.measuredMatrixDiagnostics ? ['post-promotion N×16 diagnostics unavailable'] : []),
+          ...(!evaluation.measuredTangPolicy ? ['measured Tang policy unavailable'] : []),
+          ...(!evaluation.lineage.fullyRevisionAlignedExactEvidence ? ['canonical exact revision proof missing'] : []),
+          ...(evaluation.lineage.revisionAlignedExactPacketKeys.length === 0 ? ['no revision-aligned exact packet identity'] : []),
           ...(evaluation.lineage.unresolvedRevisionFields.length
             ? [`unresolved revisions: ${evaluation.lineage.unresolvedRevisionFields.join(', ')}`]
             : []),
         ];
-        log(`    ⛔ Direct apply blocked: ${blockers.join('; ')}`);
-        card.notes = appendUnique(card.notes, [`Direct apply blocked: ${blockers.join('; ')}`]);
+        card.notes = appendUnique(card.notes, [`Proposal not emitted: ${proposalBlockers.join('; ')}`]);
         writeJson(cardPath, card);
+        log(`    ⛔ Proposal not emitted: ${proposalBlockers.join('; ')}`);
+        continue;
       }
 
-      if (allowLegacyDirectApply && output.confidence >= 0.7 && output.patch) {
-        log(`    ⚠ Legacy direct apply override active (confidence=${output.confidence.toFixed(2)})`);
-        try {
-          await skill.run({ ...repairInput, dryRun: false });
-          card.status = 'applied';
-          card.updatedAt = new Date().toISOString();
-          writeJson(cardPath, card);
-          applied += 1;
-          log('    ✓ Patch applied under explicit legacy override');
+      try {
+        const revisionProof = RepairProposalRevisionProofV1Schema.parse({
+          schema: 'atlas.repair-proposal-revision-proof.v1',
+          requestId,
+          sourceRevision: evaluation.lineage.sourceRevision,
+          exactPacketKeys: evaluation.lineage.revisionAlignedExactPacketKeys,
+          fullyRevisionAlignedExactEvidence: true,
+          unresolvedRevisionFields: [],
+          receiptRef: `logs/repair-tasks/${path.basename(evidencePath)}#lineage`,
+          producerRevision: 'repair-loop.revision-proof.v1',
+        });
+        const proposal = compileRepairMutationProposal({
+          requestId,
+          workflowId: `repair:${requestId}`,
+          workflowRevision: 1,
+          sourceRef: event.source_ref,
+          sourceRevision: evaluation.lineage.sourceRevision,
+          patchArtifactRef: `logs/repair-tasks/${path.basename(cardPath)}#patch`,
+          patch: output.patch,
+          manifest: finalManifest,
+          diagnostics: evaluation.measuredMatrixDiagnostics,
+          tang: evaluation.measuredTangPolicy,
+          revisionProof,
+          evidenceRefs: [
+            `logs/repair-tasks/${path.basename(evidencePath)}`,
+            `logs/repair-tasks/${path.basename(cardPath)}`,
+          ],
+          producerRevision: 'repair-loop.proposal.v1',
+        });
+        const workflow = compileRepairProposalWorkflow(proposal, 'repair-loop.proposal-workflow.v1');
+        const proposalPath = path.join(TASK_CARDS_DIR, `proposal-${requestId}.json`);
+        writeJson(proposalPath, workflow);
+        proposals += 1;
 
-          for (const cmd of output.checkCommands ?? []) {
-            log(`    → ${cmd}`);
-            try {
-              execSync(cmd, { cwd: APP_ROOT, stdio: 'pipe', timeout: 60_000 });
-              log(`    ✓ Check passed: ${cmd}`);
-            } catch (checkError) {
-              const stderr = (checkError as { stderr?: Buffer }).stderr?.toString() ?? '';
-              log(`    ✗ Check failed: ${cmd}\n      ${stderr.split('\n')[0]}`);
-              card.status = 'failed';
-              card.notes = appendUnique(card.notes, [`Check failed: ${cmd}`]);
-              writeJson(cardPath, card);
-            }
-          }
-        } catch (applyError) {
-          log(`    ✗ Apply failed: ${(applyError as Error).message}`);
-          card.status = 'failed';
-          card.notes = appendUnique(card.notes, [`Apply failed: ${(applyError as Error).message}`]);
-          writeJson(cardPath, card);
-        }
-      } else if (allowLegacyDirectApply && output.confidence < 0.7) {
-        log(`    ⛔ Apply blocked: confidence ${output.confidence.toFixed(2)} < 0.70`);
+        card.notes = appendUnique(card.notes, [
+          `Repair proposal: ${path.basename(proposalPath)}`,
+          `Proposal action: ${workflow.action.actionId}`,
+          `Proposal canonical writes allowed: ${workflow.canonicalWritesAllowed}`,
+          'OperatorRepairAuthorizationV1 required before ops.apply_patch DAG can exist',
+        ]);
+        writeJson(cardPath, card);
+        await upsertTaskCard(pool, card);
+        log(`    ✓ Proposal-only workflow: ${proposalPath}`);
+        log(`    ✓ WorkflowActionEventV1: ${workflow.action.actionId} mutationRequested=${workflow.action.mutationRequested}`);
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        card.notes = appendUnique(card.notes, [`Proposal compiler blocked: ${reason}`]);
+        writeJson(cardPath, card);
+        log(`    ⛔ Proposal compiler blocked: ${reason}`);
       }
     }
   } finally {
@@ -449,8 +492,9 @@ async function runRepairLoop(): Promise<void> {
   log(`  Dry-runs:  ${dryRuns}`);
   log(`  Blocked:   ${blocked}`);
   log(`  Skipped:   ${skipped}`);
-  log(`  Applied:   ${applied}`);
-  log(`  Task cards/evidence: ${TASK_CARDS_DIR}`);
+  log(`  Proposals: ${proposals}`);
+  log(`  Applied:   0 (direct apply retired)`);
+  log(`  Task cards/evidence/proposals: ${TASK_CARDS_DIR}`);
 }
 
 runRepairLoop().catch((error) => {
