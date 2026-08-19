@@ -15,7 +15,6 @@ by the TypeScript projection/parity/qualification contracts.
 """
 
 import os
-import sys
 import json
 import time
 import argparse
@@ -41,12 +40,13 @@ def get_lineage_envelope(
     graph_revision=None,
     representation_revision="semantic_768",
     status="PROVEN",
+    producer_revision="2026-08-11.v1",
 ) -> dict:
     return {
         "receipt_id": f"receipt:{receipt_kind.lower()}:{int(time.time() * 1000)}",
         "receipt_kind": receipt_kind,
         "producer_id": producer_id,
-        "producer_revision": "2026-08-19.graph-pagerank-v2",
+        "producer_revision": producer_revision,
         "started_at": started_at,
         "completed_at": completed_at,
         "input_hash": input_hash,
@@ -308,6 +308,7 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
         graph_revision=args.graph_revision,
         representation_revision="graph-pagerank-raw-v1",
         status="EXECUTED",
+        producer_revision="2026-08-19.graph-pagerank-v2",
     )
     out_file = args.receipt_out or os.path.join(reports_dir, "graph-pagerank-cugraph-execution-receipt.json")
     os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
