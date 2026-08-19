@@ -19,8 +19,9 @@ export interface PageRankPlanExecutionV1 {
 	receipt: PageRankExecutionReceiptV1;
 }
 
+/** Explicit identity only. Never fall back to stableKey, generic id, or Neo4j internal id. */
 function canonicalNodeExpression(variable: string): string {
-	return `coalesce(${variable}.canonicalId, ${variable}.canonical_id, ${variable}.packetKey, ${variable}.packet_key, ${variable}.stableKey, ${variable}.id, ${variable}.sourceRef, ${variable}.source_ref, toString(id(${variable})))`;
+	return `coalesce(${variable}.canonicalId, ${variable}.canonical_id, ${variable}.packetKey, ${variable}.packet_key, ${variable}.sourceRef, ${variable}.source_ref)`;
 }
 
 async function resolvePersonalizationSourceNodes(
@@ -33,7 +34,7 @@ async function resolvePersonalizationSourceNodes(
 	const result = await session.run(
 		`MATCH (n)
 		 WITH n, ${canonicalNodeExpression('n')} AS canonicalId
-		 WHERE canonicalId IN $canonicalIds
+		 WHERE canonicalId IS NOT NULL AND canonicalId IN $canonicalIds
 		 RETURN canonicalId, id(n) AS nodeId
 		 ORDER BY canonicalId ASC`,
 		{ canonicalIds },
@@ -50,7 +51,7 @@ async function resolvePersonalizationSourceNodes(
 		const matches = idsByCanonical.get(seed.canonicalId) ?? [];
 		if (matches.length !== 1) {
 			throw new Error(
-				`personalized PageRank seed '${seed.canonicalId}' resolved to ${matches.length} Neo4j nodes; expected exactly one`,
+				`personalized PageRank seed '${seed.canonicalId}' resolved to ${matches.length} explicit-identity Neo4j nodes; expected exactly one`,
 			);
 		}
 	}
@@ -127,9 +128,9 @@ async function executeValidatedNeo4jPageRankPlan(plan: PageRankExecutionPlanV1):
 			`CALL gds.graph.nodeProperty.stream($graphName, $property)
 			 YIELD nodeId, propertyValue
 			 WITH nodeId, propertyValue, gds.util.asNode(nodeId) AS n
-			 RETURN nodeId,
-			        ${canonicalNodeExpression('n')} AS canonicalId,
-			        propertyValue AS score
+			 WITH nodeId, propertyValue, ${canonicalNodeExpression('n')} AS canonicalId
+			 WHERE canonicalId IS NOT NULL
+			 RETURN nodeId, canonicalId, propertyValue AS score
 			 ORDER BY canonicalId ASC`,
 			{ graphName: projectionName, property: mutateProperty },
 		);
@@ -138,10 +139,20 @@ async function executeValidatedNeo4jPageRankPlan(plan: PageRankExecutionPlanV1):
 			canonicalId: String(record.get('canonicalId')),
 			score: Number(record.get('score')),
 		}));
+		if (scores.length !== liveNodeCount) {
+			throw new Error(
+				`PageRank canonical identity coverage mismatch: projection has ${liveNodeCount} nodes but only ${scores.length} have explicit canonical/packet/source identity`,
+			);
+		}
+		const seenCanonicalIds = new Set<string>();
 		for (const score of scores) {
 			if (!Number.isFinite(score.score) || score.score < 0) {
 				throw new Error(`invalid raw PageRank score for '${score.canonicalId}'`);
 			}
+			if (seenCanonicalIds.has(score.canonicalId)) {
+				throw new Error(`duplicate explicit PageRank canonical identity '${score.canonicalId}'`);
+			}
+			seenCanonicalIds.add(score.canonicalId);
 		}
 
 		const rawOutputHash = createHash('sha256').update(JSON.stringify(scores)).digest('hex');
