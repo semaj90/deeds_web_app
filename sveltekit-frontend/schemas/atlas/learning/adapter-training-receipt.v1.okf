@@ -6,7 +6,7 @@ status: ACTIVE
 description: >
   Receipt for an offline PEFT/LoRA/QLoRA adapter training run. The receipt binds
   the adapter artifact to its exact base model, tokenizer, dataset snapshot,
-  trainable modules/ranks, memory envelope, and observed metrics.
+  trainable modules/ranks, memory envelope, optimizer/offload plan, and observed metrics.
 
 fields:
   schema: { type: literal, value: atlas.adapter-training-receipt.v1 }
@@ -22,7 +22,7 @@ fields:
     values: [SFT, DPO, PPO, REWARD_MODELING]
   peftMethod:
     type: enum
-    values: [LORA, QLORA, OTHER]
+    values: [LORA, QLORA, LORA_FA, OTHER]
   baseModel:
     type: object
     fields:
@@ -45,6 +45,16 @@ fields:
     type: enum
     values: [TRANSFORMERS_PEFT, DEEPSPEED]
   runtimeConfigRef: { type: string, nullable: true }
+  trainingExecutionCandidateId: { type: string, nullable: true }
+  trainingConfigurationSurfaceId: { type: string, nullable: true }
+  optimizer:
+    type: object
+    nullable: true
+    fields:
+      kind: { type: enum, values: [ADAMW, PAGED_ADAMW_8BIT, DEEPSPEED_CPU_ADAM] }
+      zeroStage: { type: enum, values: [0, 1, 2, 3] }
+      optimizerPlacement: { type: enum, values: [GPU, CPU, NVME] }
+      parameterPlacement: { type: enum, values: [GPU, CPU, NVME] }
   environmentReceiptId: { type: string, required: true }
   memory:
     type: object
@@ -52,6 +62,12 @@ fields:
       peakGpuBytes: { type: integer, minimum: 0, nullable: true }
       peakHostBytes: { type: integer, minimum: 0, nullable: true }
       nvmeOffloadBytes: { type: integer, minimum: 0, nullable: true }
+  performance:
+    type: object
+    nullable: true
+    fields:
+      samplesPerSecond: { type: number, minimum: 0, nullable: true }
+      stepTimeMs: { type: number, minimum: 0, nullable: true }
   trainingMetrics: { type: json, required: true }
   validationMetrics: { type: json, required: true }
   startedAt: { type: datetime, required: true }
@@ -61,6 +77,9 @@ fields:
 invariants:
   - the served GGUF checksum is inference provenance only and MUST NOT be used as the trainable checkpoint checksum
   - QLORA requires a compatible trainable checkpoint plus quantized frozen base weights and trainable adapter parameters
+  - LORA_FA must be recorded explicitly when matrix A is fixed and only matrix B is optimized
   - selectedModules and actualRanks must correspond to the proved base architecture
   - DEEPSPEED is an executor choice only; it does not change the training objective or adapter identity
+  - zeroStage is categorical and must never be populated from an interpolated fractional value
+  - DEEPSPEED_CPU_ADAM/offload settings must correspond to the exact executed TrainingExecutionCandidateV1
   - a SUCCEEDED receipt requires a non-empty adapterChecksum, datasetChecksum, and trainableCheckpointChecksum
