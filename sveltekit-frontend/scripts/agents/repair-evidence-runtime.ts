@@ -1,14 +1,16 @@
-import { createHash } from 'node:crypto';
-import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { Client as McpClient } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import {
   buildAgenticRepairEvidenceGate,
+  RepairEvidenceBatchV1Schema,
   type AgenticRepairEvidenceGateResultV1,
+  type RepairEvidenceBatchV1,
+  type RepairEvidenceReadOnlyExecutor,
 } from '../../src/lib/server/atlas/ranking/agentic-repair-evidence-gate.js';
 import { createTraceRepairEvidenceExecutor } from '../../src/lib/server/atlas/ranking/trace-repair-evidence-adapter.js';
+import { resolveSourceRevisionsFromPostgres } from '../../src/lib/server/atlas/identity/source-revision-resolver.js';
 
 export type RepairEvidenceRuntimeOptions = {
   appRoot: string;
@@ -33,16 +35,7 @@ export type RepairEvidenceEvaluation = {
   reasonCodes: string[];
 };
 
-function sha256File(filePath: string): string | null {
-  try {
-    const data = fs.readFileSync(filePath);
-    return `sha256:${createHash('sha256').update(data).digest('hex')}`;
-  } catch {
-    return null;
-  }
-}
-
-function workspaceRevision(appRoot: string): string | null {
+function gitHead(appRoot: string): string | null {
   try {
     return execFileSync('git', ['rev-parse', 'HEAD'], {
       cwd: appRoot,
@@ -67,6 +60,28 @@ function sourcePath(appRoot: string, sourceRef: string): string {
   return path.isAbsolute(normalized) ? normalized : path.resolve(appRoot, normalized);
 }
 
+function sourceRevisionFromGit(appRoot: string, sourceRef: string): string | null {
+  try {
+    const absolute = sourcePath(appRoot, sourceRef);
+    const relative = path.relative(appRoot, absolute).replace(/\\/g, '/');
+    if (!relative || relative.startsWith('../') || path.isAbsolute(relative)) return null;
+
+    // A dirty or untracked file is not represented by the current immutable git
+    // revision. Do not hash the bytes and call that a source_revision: content
+    // hash and source revision are separate contracts in Parent Atlas.
+    const status = execFileSync('git', ['status', '--porcelain', '--', relative], {
+      cwd: appRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (status) return null;
+
+    return gitHead(appRoot);
+  } catch {
+    return null;
+  }
+}
+
 function extractTextContent(result: unknown): unknown {
   if (!result || typeof result !== 'object') return result;
   const record = result as { content?: Array<{ type?: string; text?: string }>; structuredContent?: unknown };
@@ -82,9 +97,81 @@ function extractTextContent(result: unknown): unknown {
   return result;
 }
 
+async function enrichBatchWithCanonicalSourceRevision(
+  batch: RepairEvidenceBatchV1,
+): Promise<RepairEvidenceBatchV1> {
+  if (!batch.candidates.length) return batch;
+
+  const resolutions = await resolveSourceRevisionsFromPostgres(batch.candidates.map((candidate) => ({
+    candidateId: candidate.candidateId,
+    packetKey: candidate.packetKey,
+    sourceRef: candidate.sourceRef,
+  })));
+  const byCandidate = new Map(resolutions.map((resolution) => [resolution.candidateId, resolution]));
+
+  const candidates = batch.candidates.map((candidate) => {
+    const resolution = byCandidate.get(candidate.candidateId);
+    if (!resolution?.sourceRevision) return candidate;
+    return {
+      ...candidate,
+      sourceRevision: resolution.sourceRevision,
+      evidenceRefs: [...new Set([
+        ...candidate.evidenceRefs,
+        ...resolution.evidenceRefs,
+        `source-revision-status:${resolution.status}`,
+      ])].sort((a, b) => a.localeCompare(b)),
+    };
+  });
+  const observedRevisions = [...new Set(
+    candidates.map((candidate) => candidate.sourceRevision).filter((value): value is string => Boolean(value)),
+  )].sort((a, b) => a.localeCompare(b));
+
+  const resolutionReasonCodes = resolutions.map((resolution) =>
+    `SOURCE_REVISION_${resolution.status}:${resolution.candidateId}`,
+  );
+
+  return RepairEvidenceBatchV1Schema.parse({
+    ...batch,
+    candidates,
+    observedRevision: observedRevisions.length === 1 ? observedRevisions[0] : null,
+    evidenceRefs: [...new Set([
+      ...batch.evidenceRefs,
+      ...resolutions.flatMap((resolution) => resolution.evidenceRefs),
+    ])].sort((a, b) => a.localeCompare(b)),
+    reasonCodes: [...new Set([...batch.reasonCodes, ...resolutionReasonCodes])],
+    degraded: batch.degraded || resolutions.some((resolution) =>
+      resolution.status === 'AMBIGUOUS'
+      || resolution.status === 'UNVERSIONED'
+      || resolution.status === 'MISSING',
+    ),
+  });
+}
+
+function withCanonicalRevisionResolution(
+  base: RepairEvidenceReadOnlyExecutor,
+): RepairEvidenceReadOnlyExecutor {
+  return {
+    async packetLookup(request) {
+      return enrichBatchWithCanonicalSourceRevision(await base.packetLookup(request));
+    },
+    async semanticSearch(request) {
+      return enrichBatchWithCanonicalSourceRevision(await base.semanticSearch(request));
+    },
+    async graphExpand(request) {
+      return enrichBatchWithCanonicalSourceRevision(await base.graphExpand(request));
+    },
+    async aceValidate(request) {
+      return enrichBatchWithCanonicalSourceRevision(await base.aceValidate(request));
+    },
+    async centroidLookup(request) {
+      return enrichBatchWithCanonicalSourceRevision(await base.centroidLookup(request));
+    },
+  };
+}
+
 export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOptions) {
   const appRoot = path.resolve(options.appRoot);
-  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v1';
+  const producerRevision = options.producerRevision ?? 'repair-evidence-runtime.v2';
   const traceUrl = new URL(options.traceMcpUrl ?? process.env.TRACE_MCP_URL ?? 'http://127.0.0.1:8788/sse');
   let client: McpClient | null = null;
   let transport: StreamableHTTPClientTransport | null = null;
@@ -96,7 +183,7 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
     try {
       transport = new StreamableHTTPClientTransport(traceUrl);
       client = new McpClient(
-        { name: 'parent-atlas-repair-evidence', version: '1.0.0' },
+        { name: 'parent-atlas-repair-evidence', version: '2.0.0' },
         { capabilities: {} },
       );
       await client.connect(transport);
@@ -110,11 +197,12 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
     }
   }
 
-  const executor = createTraceRepairEvidenceExecutor(async (name, args) => {
+  const traceExecutor = createTraceRepairEvidenceExecutor(async (name, args) => {
     const active = await ensureClient();
     const result = await active.callTool({ name, arguments: args });
     return extractTextContent(result);
   });
+  const executor = withCanonicalRevisionResolution(traceExecutor);
 
   async function evaluate(input: {
     requestId: string;
@@ -128,12 +216,12 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
   }): Promise<RepairEvidenceEvaluation> {
     const observedWorkspaceRevision = input.workspaceRevision
       ?? process.env.ATLAS_WORKSPACE_REVISION
-      ?? workspaceRevision(appRoot)
+      ?? gitHead(appRoot)
       ?? unresolved('workspace_revision');
     const observedSourceRevision = input.sourceRevision
       ?? process.env.ATLAS_SOURCE_REVISION
-      ?? sha256File(sourcePath(appRoot, input.sourceRef))
-      ?? unresolved('source_revision');
+      ?? sourceRevisionFromGit(appRoot, input.sourceRef)
+      ?? unresolved('source_revision_dirty_or_untracked');
     const observedGraphRevision = input.graphRevision
       ?? options.graphRevision
       ?? process.env.ATLAS_GRAPH_REVISION
@@ -182,17 +270,13 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       },
     }, executor);
 
-    // Strict lineage gate: exact byte/SHA evidence is necessary but not enough.
-    // At least one exact candidate must carry the same observed source revision.
-    // atlas.packet_search does not currently emit source_revision, so this stays
-    // false until the canonical owner is upgraded instead of copying the request
-    // revision onto the hit and pretending it was observed.
-    const fullyRevisionAlignedExactEvidence = result.candidates.some((candidate) =>
-      candidate.exactEvidence
-      && candidate.packetKey != null
-      && candidate.sourceRevision != null
-      && candidate.sourceRevision === observedSourceRevision,
-    );
+    const fullyRevisionAlignedExactEvidence = isResolvedRevision(observedSourceRevision)
+      && result.candidates.some((candidate) =>
+        candidate.exactEvidence
+        && candidate.packetKey != null
+        && candidate.sourceRevision != null
+        && candidate.sourceRevision === observedSourceRevision,
+      );
     const unresolvedRevisionFields = [
       ['workspaceRevision', observedWorkspaceRevision],
       ['sourceRevision', observedSourceRevision],
@@ -200,12 +284,13 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ['featureRevision', observedFeatureRevision],
     ].filter(([, value]) => !isResolvedRevision(value)).map(([name]) => name);
 
-    // A DEGRADED required-library state remains useful for diagnostics/context,
-    // but must not trigger a repair skill. This is stricter than the underlying
-    // manifest's descriptive evidenceStatus and is the live execution gate.
+    // The repair skill may run only when required services are READY, the
+    // manifest has exact evidence, and the exact evidence is source-revision
+    // aligned. Diagnostic/degraded manifests are still persisted for audit.
     const dryRunAllowed = result.readiness.gate === 'READY'
       && result.manifest.evidenceStatus === 'READY_FOR_DRY_RUN'
-      && result.manifest.exactEvidencePacketKeys.length > 0;
+      && result.manifest.exactEvidencePacketKeys.length > 0
+      && fullyRevisionAlignedExactEvidence;
     const reasonCodes = [
       ...(dryRunAllowed ? ['EVIDENCE_SUPPORTS_DRY_RUN'] : ['EVIDENCE_BLOCKS_DRY_RUN']),
       ...(result.readiness.gate === 'READY'
@@ -217,6 +302,8 @@ export function createRepairEvidenceRuntime(options: RepairEvidenceRuntimeOption
       ...(unresolvedRevisionFields.length
         ? [`UNRESOLVED_REVISIONS:${unresolvedRevisionFields.join(',')}`]
         : ['ALL_REQUEST_REVISIONS_RESOLVED']),
+      'SOURCE_REVISION_FROM_CANONICAL_POSTGRES_METADATA',
+      'CONTENT_HASH_NEVER_SUBSTITUTES_FOR_SOURCE_REVISION',
       'EVIDENCE_NEVER_AUTHORIZES_MUTATION',
     ];
 
