@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
+import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
 import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
 import { scoreQdrantSemanticCandidatesV1 } from '$lib/server/atlas/retrieval/qdrant-semantic-scorer.js';
@@ -96,12 +97,30 @@ export const POST: RequestHandler = async ({ request }) => {
       }
     }
 
-    const [semanticResult, lexicalResult] = await Promise.allSettled([
+    const pagerankClient = createAtlasRapidsPageRankClient();
+    const shouldRunQueryPpr =
+      gpuBudget.executionTarget === 'gpu' &&
+      Boolean(body.graphRevision?.trim()) &&
+      graph.nodes.length > 0;
+
+    const [semanticResult, lexicalResult, pprResult] = await Promise.allSettled([
       packetKeys.length > 0
         ? scoreQdrantSemanticCandidatesV1(body.query.trim(), packetKeys, candidateLimit)
         : Promise.resolve(null),
       packetKeys.length > 0
         ? scorePostgresLexicalCandidatesV1(body.query.trim(), packetKeys, candidateLimit)
+        : Promise.resolve(null),
+      shouldRunQueryPpr
+        ? pagerankClient.pagerank({
+            graphRevision: body.graphRevision!.trim(),
+            seeds: body.seedNodeKeys.map((nodeKey) => ({ nodeKey, weight: 1 })),
+            candidateNodeKeys: graph.nodes.map((node) => node.id),
+            topK: Math.min(candidateLimit, graph.nodes.length),
+            alpha: 0.85,
+            tol: 1e-6,
+            maxIter: 100,
+            deadlineMs: 5_000,
+          })
         : Promise.resolve(null),
     ]);
 
@@ -113,6 +132,10 @@ export const POST: RequestHandler = async ({ request }) => {
     const lexicalErrors = lexicalResult.status === 'rejected'
       ? [lexicalResult.reason instanceof Error ? lexicalResult.reason.message : String(lexicalResult.reason)]
       : [];
+    const pprReceipt = pprResult.status === 'fulfilled' ? pprResult.value : null;
+    const pprErrors = pprResult.status === 'rejected'
+      ? [pprResult.reason instanceof Error ? pprResult.reason.message : String(pprResult.reason)]
+      : [];
 
     const semanticByPacket = new Map(
       (semanticReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
@@ -120,12 +143,16 @@ export const POST: RequestHandler = async ({ request }) => {
     const lexicalByPacket = new Map(
       (lexicalReceipt?.scores ?? []).map((score) => [score.packetKey, score]),
     );
+    const pprByNode = new Map(
+      (pprReceipt?.results ?? []).map((score) => [score.nodeKey, score]),
+    );
 
     const seedSet = new Set(body.seedNodeKeys);
     const candidates: CandidateFeatureRowV1[] = graph.nodes.map((node, candidateOrdinal) => {
       const staticGraph = node.packetKey ? graphFeatures.get(node.packetKey) : undefined;
       const semantic = node.packetKey ? semanticByPacket.get(node.packetKey) : undefined;
       const lexical = node.packetKey ? lexicalByPacket.get(node.packetKey) : undefined;
+      const queryPpr = pprByNode.get(node.id);
       return {
         candidateOrdinal,
         canonicalId: `${body.snapshotId}:${node.id}`,
@@ -136,12 +163,12 @@ export const POST: RequestHandler = async ({ request }) => {
         lexicalScore: lexical?.score ?? null,
         exactSymbolMatch: seedSet.has(node.id) ? 1 : 0,
         astMatch: null,
-        personalizedPageRank: staticGraph?.personalizedPageRank ?? null,
+        personalizedPageRank: queryPpr?.score ?? staticGraph?.personalizedPageRank ?? null,
         graphHopDistance: node.hop,
         globalPageRank: staticGraph?.pagerank ?? null,
         communityId: staticGraph?.communityId ?? null,
         typeCompatibility: null,
-        revisionMatch: body.graphRevision ? (staticGraph ? 1 : 0) : 1,
+        revisionMatch: body.graphRevision ? (staticGraph || queryPpr ? 1 : 0) : 1,
         bitfrostHotness: null,
       };
     });
@@ -172,7 +199,7 @@ export const POST: RequestHandler = async ({ request }) => {
       evidenceRefs: executionCandidates
         .filter((candidate) => candidate.sourceRef)
         .map((candidate) => `${candidate.sourceRef}#${candidate.nodeKey}`),
-      producerRevision: 'atlas.graph-synthesis-prep.v4',
+      producerRevision: 'atlas.graph-synthesis-prep.v5',
     };
 
     return json({
@@ -192,10 +219,15 @@ export const POST: RequestHandler = async ({ request }) => {
         degraded: gpuBudget.degraded,
         reason: gpuBudget.reason,
         residency: gpuBudget,
-        stages: ['semantic_768', 'lexical', 'graph_features', 'exact_promotion', 'context_manifest'],
+        stages: ['semantic_768', 'lexical', 'personalized_pagerank', 'graph_features', 'exact_promotion', 'context_manifest'],
       },
       semantic: { receipt: semanticReceipt, errors: semanticErrors },
       lexical: { receipt: lexicalReceipt, errors: lexicalErrors },
+      personalizedPageRank: {
+        requested: shouldRunQueryPpr,
+        receipt: pprReceipt,
+        errors: pprErrors,
+      },
       graphFeatures: {
         graphRevision: body.graphRevision?.trim() || null,
         hydrated: graphFeatures.size,
@@ -204,6 +236,7 @@ export const POST: RequestHandler = async ({ request }) => {
       retrievalPlan: {
         dense: 'codebase_chunks_768_v2/content (canonical semantic_768 cold/warm projection)',
         lexical: 'PostgreSQL atlas_packets FTS via websearch_to_tsquery + ts_rank_cd',
+        queryGraph: shouldRunQueryPpr ? 'resident cuGraph personalized PageRank over the requested graphRevision' : null,
         bm42: 'codebase_chunks_384_hybrid/bm42 experimental challenger only',
         fallback: gpuBudget.executionTarget === 'qdrant' ? 'qdrant' : null,
       },
@@ -214,9 +247,11 @@ export const POST: RequestHandler = async ({ request }) => {
         lexical: lexicalReceipt
           ? 'lexicalScore is hydrated by the existing canonical PostgreSQL FTS semantics; BM42 remains challenger-only.'
           : 'PostgreSQL lexical enrichment failed open; BM42 must not silently become the canonical lexical score.',
-        graph: body.graphRevision
-          ? 'Static graph metrics were read only from the requested graphRevision; query-time PPR may overwrite personalizedPageRank only with its own receipt.'
-          : 'Provide graphRevision to hydrate persisted PageRank/community features; do not infer it from snapshotId.',
+        graph: pprReceipt
+          ? 'personalizedPageRank is query-time cuGraph output from the exact requested graphRevision; persisted PageRank/community remain static priors.'
+          : body.graphRevision
+            ? 'Query-time PPR failed open or GPU policy skipped it; only revision-qualified persisted graph features may remain.'
+            : 'Provide graphRevision to hydrate persisted graph features and enable query-time PPR; never infer it from snapshotId.',
         cache: 'bitfrostHotness remains null until live invalidation/residency semantics are proven; key existence is not relevance.',
         promotion: 'Hydrate exact source/AST/type evidence before invoking the synthesis model.',
       },
