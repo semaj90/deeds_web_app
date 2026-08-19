@@ -5,8 +5,14 @@ import {
   verifyPacketIdentityConsistency,
   createEnvelopeFromRow,
   bitfrostKey,
-  type AtlasMemoryEnvelope,
 } from '../core/canonical-packet-bridge.js';
+import {
+  prefillValkeyStorageKey,
+  valkeyPrefillCacheRecordSchema,
+  verifyPrefillRecord,
+  type PrefillRuntimeIdentityV1,
+  type ValkeyPrefillCacheRecordV1,
+} from '../core/prefill-cache-runtime.js';
 import type { QueryResultRow } from 'pg';
 
 export interface ValkeyAdapter {
@@ -23,6 +29,18 @@ export interface ValkeyAdapter {
     traceId: string,
     ttlSeconds?: number
   ) => Promise<void>;
+  /** Read and validate a compiled-prefill cache record against an expected immutable identity. */
+  getPrefillRecord: (
+    identity: PrefillRuntimeIdentityV1,
+  ) => Promise<{
+    status: 'HIT' | 'MISS' | 'STALE' | 'CORRUPT' | 'REVOKED';
+    record: ValkeyPrefillCacheRecordV1 | null;
+    mismatches: string[];
+  }>;
+  /** Store an immutable compiled-prefill record only if the key does not already exist. */
+  setPrefillRecordNx: (
+    record: ValkeyPrefillCacheRecordV1,
+  ) => Promise<'STORED' | 'ALREADY_EXISTS'>;
 }
 
 export function createValkeyAdapter(overrideConfig?: { host?: string; port?: number; password?: string }): ValkeyAdapter {
@@ -74,20 +92,14 @@ export function createValkeyAdapter(overrideConfig?: { host?: string; port?: num
     traceId: string,
     ttlSeconds: number = 86400 // 24h default
   ): Promise<void> {
-    // Extract and verify canonical identity
     const identity = extractPacketIdentityFromRow(packetRow);
     const { consistent, mismatches } = verifyPacketIdentityConsistency(identity, packetRow);
     if (!consistent) {
       throw new Error(`Cannot cache packet: ${mismatches.join('; ')}`);
     }
 
-    // Create envelope
     const envelope = createEnvelopeFromRow(packetRow, traceId, 'packet');
-
-    // Use bitfrostKey for canonical cache key pattern
     const cacheKey = bitfrostKey('packet', envelope.packet_key);
-
-    // Store envelope shape: always include trace_id and identity fields
     const cacheValue = {
       trace_id: envelope.trace_id,
       packet_key: envelope.packet_key,
@@ -109,14 +121,61 @@ export function createValkeyAdapter(overrideConfig?: { host?: string; port?: num
       centroid_id: packetRow.centroid_id,
     };
 
-    await client.setex(
-      cacheKey,
-      ttlSeconds,
-      JSON.stringify(cacheValue)
-    );
+    await client.setex(cacheKey, ttlSeconds, JSON.stringify(cacheValue));
   }
 
-  return { client, get, set, hget, hgetall, keys, close, setPacketEnvelope };
+  async function getPrefillRecord(identity: PrefillRuntimeIdentityV1): Promise<{
+    status: 'HIT' | 'MISS' | 'STALE' | 'CORRUPT' | 'REVOKED';
+    record: ValkeyPrefillCacheRecordV1 | null;
+    mismatches: string[];
+  }> {
+    const storageKey = prefillValkeyStorageKey(identity.cache_key);
+    const raw = await client.get(storageKey);
+    if (raw === null) return { status: 'MISS', record: null, mismatches: [] };
+
+    let decoded: unknown;
+    try {
+      decoded = JSON.parse(raw);
+    } catch {
+      return { status: 'CORRUPT', record: null, mismatches: ['json'] };
+    }
+
+    const parsed = valkeyPrefillCacheRecordSchema.safeParse(decoded);
+    if (!parsed.success) {
+      return { status: 'CORRUPT', record: null, mismatches: ['schema'] };
+    }
+    const verification = verifyPrefillRecord(parsed.data, identity);
+    return {
+      status: verification.status,
+      record: verification.reusable ? parsed.data : null,
+      mismatches: verification.mismatches,
+    };
+  }
+
+  async function setPrefillRecordNx(record: ValkeyPrefillCacheRecordV1): Promise<'STORED' | 'ALREADY_EXISTS'> {
+    const parsed = valkeyPrefillCacheRecordSchema.parse(record);
+    const result = await client.set(
+      parsed.storage_key,
+      JSON.stringify(parsed),
+      'EX',
+      parsed.ttl_seconds,
+      'NX',
+    );
+    return result === 'OK' ? 'STORED' : 'ALREADY_EXISTS';
+  }
+
+  return {
+    client,
+    get,
+    set,
+    hget,
+    hgetall,
+    keys,
+    close,
+    setPacketEnvelope,
+    getPrefillRecord,
+    setPrefillRecordNx,
+  };
 }
 
 export async function withValkey<T>(
