@@ -1,7 +1,12 @@
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
 import { GraphProjectionSnapshotV1Schema } from './graph-projection-snapshot-v1.js';
-import { PageRankExecutorIdSchema } from './pagerank-execution-contract.js';
+import {
+	PageRankExecutionPlanV1Schema,
+	PageRankExecutorIdSchema,
+	PageRankParametersSchema,
+	assertPageRankPlanProjection,
+} from './pagerank-execution-contract.js';
 
 export const PageRankCrossExecutorParityStatusSchema = z.enum(['PASS', 'FAIL']);
 
@@ -21,6 +26,9 @@ export const PageRankCrossExecutorParityReceiptV2Schema = z
 	.object({
 		schema: z.literal('atlas.pagerank-cross-executor-parity.v2'),
 		algorithm: z.literal('pagerank'),
+		algorithmRevision: z.string().min(1),
+		parameterHash: z.string().min(1),
+		parameters: PageRankParametersSchema,
 		referenceExecutorId: PageRankExecutorIdSchema,
 		challengerExecutorId: PageRankExecutorIdSchema,
 		graphRevision: z.string().min(1),
@@ -58,6 +66,21 @@ export const PageRankCrossExecutorParityReceiptV2Schema = z
 				message: 'cross-executor parity requires two distinct executors',
 			});
 		}
+		if (receipt.parameters.personalization.mode !== 'GLOBAL') {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['parameters', 'personalization'],
+				message: 'canonical cuGraph qualification parity currently covers global PageRank only',
+			});
+		}
+		const expectedHash = computePageRankParityParameterHash(receipt.parameters);
+		if (receipt.parameterHash !== expectedHash) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				path: ['parameterHash'],
+				message: `parameterHash mismatch: expected ${expectedHash}`,
+			});
+		}
 		const expectedStatus =
 			receipt.topKOverlap >= receipt.thresholds.minTopKOverlap &&
 			receipt.spearmanCorrelation >= receipt.thresholds.minSpearmanCorrelation &&
@@ -87,6 +110,20 @@ export interface PageRankParityThresholdsV2 {
 	minSpearmanCorrelation: number;
 	maxL1Delta: number;
 	maxMeanAbsolutePercentileDelta: number;
+}
+
+export function computePageRankParityParameterHash(parametersInput: unknown): string {
+	const parameters = PageRankParametersSchema.parse(parametersInput);
+	const canonical = {
+		dampingFactor: parameters.dampingFactor,
+		maxIterations: parameters.maxIterations,
+		tolerance: parameters.tolerance,
+		relationshipTypes: [...parameters.relationshipTypes].sort(),
+		weighted: parameters.weighted,
+		relationshipWeightProperty: parameters.relationshipWeightProperty,
+		personalization: parameters.personalization,
+	};
+	return createHash('sha256').update(JSON.stringify(canonical)).digest('hex');
 }
 
 function parityScores(input: readonly unknown[]): PageRankParityScoreV2[] {
@@ -172,6 +209,7 @@ function topKOverlap(reference: readonly PageRankParityScoreV2[], challenger: re
 }
 
 export function buildPageRankCrossExecutorParityReceiptV2(input: {
+	plan: unknown;
 	snapshot: unknown;
 	referenceExecutorId: 'NEO4J_GDS';
 	challengerExecutorId: 'CUGRAPH';
@@ -182,7 +220,12 @@ export function buildPageRankCrossExecutorParityReceiptV2(input: {
 	generatedAt?: string;
 	thresholds?: PageRankParityThresholdsV2;
 }): PageRankCrossExecutorParityReceiptV2 {
+	const plan = PageRankExecutionPlanV1Schema.parse(input.plan);
 	const snapshot = GraphProjectionSnapshotV1Schema.parse(input.snapshot);
+	assertPageRankPlanProjection(plan, snapshot.projection);
+	if (plan.algorithm !== 'pagerank' || plan.parameters.personalization.mode !== 'GLOBAL') {
+		throw new Error('cross-executor canonical qualification currently requires global pagerank');
+	}
 	const reference = parityScores(input.referenceScores);
 	const challenger = parityScores(input.challengerScores);
 	if (reference.length !== snapshot.projection.nodeCount || challenger.length !== snapshot.projection.nodeCount) {
@@ -222,10 +265,17 @@ export function buildPageRankCrossExecutorParityReceiptV2(input: {
 		metrics.meanAbsolutePercentileDelta <= thresholds.maxMeanAbsolutePercentileDelta
 			? 'PASS'
 			: 'FAIL';
+	const parameters = PageRankParametersSchema.parse({
+		...plan.parameters,
+		relationshipTypes: [...plan.parameters.relationshipTypes].sort(),
+	});
 
 	return PageRankCrossExecutorParityReceiptV2Schema.parse({
 		schema: 'atlas.pagerank-cross-executor-parity.v2',
 		algorithm: 'pagerank',
+		algorithmRevision: plan.algorithmRevision,
+		parameterHash: computePageRankParityParameterHash(parameters),
+		parameters,
 		referenceExecutorId: input.referenceExecutorId,
 		challengerExecutorId: input.challengerExecutorId,
 		graphRevision: snapshot.projection.graphRevision,
@@ -249,6 +299,7 @@ export function buildPageRankCrossExecutorParityReceiptV2(input: {
 export function assertPageRankParityReceiptMatchesSnapshot(input: {
 	receipt: unknown;
 	snapshot: unknown;
+	plan?: unknown;
 }): PageRankCrossExecutorParityReceiptV2 {
 	const receipt = PageRankCrossExecutorParityReceiptV2Schema.parse(input.receipt);
 	const snapshot = GraphProjectionSnapshotV1Schema.parse(input.snapshot);
@@ -263,5 +314,13 @@ export function assertPageRankParityReceiptMatchesSnapshot(input: {
 		if (actual !== expected) throw new Error(`PageRank parity ${field} mismatch: expected '${expected}', got '${actual}'`);
 	}
 	if (receipt.nodeCount !== snapshot.projection.nodeCount) throw new Error('PageRank parity nodeCount mismatch');
+	if (input.plan != null) {
+		const plan = PageRankExecutionPlanV1Schema.parse(input.plan);
+		assertPageRankPlanProjection(plan, snapshot.projection);
+		if (receipt.algorithmRevision !== plan.algorithmRevision) throw new Error('PageRank parity algorithmRevision mismatch');
+		if (receipt.parameterHash !== computePageRankParityParameterHash(plan.parameters)) {
+			throw new Error('PageRank parity parameterHash mismatch');
+		}
+	}
 	return receipt;
 }
