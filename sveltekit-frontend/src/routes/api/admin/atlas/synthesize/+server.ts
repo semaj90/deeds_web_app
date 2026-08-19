@@ -2,6 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { traverseGraphV1 } from '$lib/server/atlas/graph/graph-traversal.js';
 import { loadGraphFeatureSnapshotV1 } from '$lib/server/atlas/graph/graph-feature-snapshot.js';
+import { loadMutationAwarenessV1 } from '$lib/server/atlas/graph/mutation-awareness.js';
 import { createAtlasRapidsPageRankClient } from '$lib/server/atlas/graph/atlas-rapids-pagerank-client.js';
 import { createAtlasRapidsMemoryClient } from '$lib/server/atlas/gpu/atlas-rapids-memory-client.js';
 import { planGpuResidencyV1 } from '$lib/server/atlas/gpu/gpu-residency-budget.js';
@@ -13,6 +14,7 @@ import {
   type AtlasSynthesisRequestV1,
   type CandidateFeatureRowV1,
   type ContextManifestV1,
+  type SourceMutationStatusV1,
 } from '$lib/server/atlas/graph/graph-runtime-contracts.js';
 
 const DEFAULT_CANDIDATE_LIMIT = 128;
@@ -41,6 +43,10 @@ function compareCandidates(a: CandidateFeatureRowV1, b: CandidateFeatureRowV1): 
   if (Number.isFinite(pr) && pr !== 0) return pr;
   if (a.graphHopDistance !== b.graphHopDistance) return a.graphHopDistance - b.graphHopDistance;
   return a.nodeKey.localeCompare(b.nodeKey);
+}
+
+function isExecutableMutationStatus(status: SourceMutationStatusV1): boolean {
+  return status !== 'STALE' && status !== 'MISSING';
 }
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -72,6 +78,23 @@ export const POST: RequestHandler = async ({ request }) => {
       direction: 'both',
       edgeTypes: body.edgeTypes,
     });
+
+    const mutationErrors: string[] = [];
+    let mutationAwareness: Awaited<ReturnType<typeof loadMutationAwarenessV1>> | null = null;
+    try {
+      mutationAwareness = await loadMutationAwarenessV1(body.snapshotId, graph.nodes);
+    } catch (error) {
+      mutationErrors.push(error instanceof Error ? error.message : String(error));
+    }
+
+    const mutationByNode = new Map(
+      (mutationAwareness?.entries ?? []).map((entry) => [entry.nodeKey, entry]),
+    );
+    const mutationByPacket = new Map(
+      (mutationAwareness?.entries ?? [])
+        .filter((entry) => entry.packetKey)
+        .map((entry) => [entry.packetKey!, entry]),
+    );
 
     const graphFeatureErrors: string[] = [];
     let graphFeatures = new Map<
@@ -138,14 +161,21 @@ export const POST: RequestHandler = async ({ request }) => {
       ? [pprResult.reason instanceof Error ? pprResult.reason.message : String(pprResult.reason)]
       : [];
 
-    // Qdrant is the persistent/online candidate executor. When GPU residency
-    // permits it, exact-rerank the very same bounded semantic_512 rows with
-    // cuVS cosine before semanticCosine enters the feature matrix.
+    // Exact semantic ranking and source freshness are independent proofs. A row
+    // does not need a fabricated source_revision to be scored exactly, but a
+    // known STALE/MISSING source is not allowed into the CUDA promotion set.
     const exactSemanticErrors: string[] = [];
     let exactSemanticReceipt: Awaited<ReturnType<ReturnType<typeof createAtlasRapidsSemantic512Client>['exactKnn']>> | null = null;
-    const exactEligibleRows = (semanticReceipt?.scores ?? []).filter(
-      (score) => Boolean(score.packetKey && score.sourceRevision && score.vector.length === 512),
+    const graphSourceRefByPacket = new Map(
+      graph.nodes
+        .filter((node) => node.packetKey)
+        .map((node) => [node.packetKey!, node.sourceRef]),
     );
+    const exactEligibleRows = (semanticReceipt?.scores ?? []).filter((score) => {
+      if (!score.packetKey || score.vector.length !== 512) return false;
+      const mutation = mutationByPacket.get(score.packetKey);
+      return !mutation || isExecutableMutationStatus(mutation.status);
+    });
     const shouldRunExactSemantic =
       gpuBudget.executionTarget === 'gpu' &&
       Boolean(semanticReceipt?.queryVector.length === 512) &&
@@ -162,7 +192,8 @@ export const POST: RequestHandler = async ({ request }) => {
           },
           corpus: exactEligibleRows.map((score) => ({
             packetKey: score.packetKey,
-            sourceRevision: score.sourceRevision!,
+            sourceRevision: score.sourceRevision,
+            sourceRef: graphSourceRefByPacket.get(score.packetKey) ?? null,
             symbolVersionId: score.symbolVersionId,
             treeNodeId: score.treeNodeId,
             featureLabel: score.featureLabel,
@@ -190,18 +221,22 @@ export const POST: RequestHandler = async ({ request }) => {
     );
 
     const seedSet = new Set(body.seedNodeKeys);
-    const candidates: CandidateFeatureRowV1[] = graph.nodes.map((node, candidateOrdinal) => {
+    const allCandidates: CandidateFeatureRowV1[] = graph.nodes.map((node, candidateOrdinal) => {
       const staticGraph = node.packetKey ? graphFeatures.get(node.packetKey) : undefined;
       const qdrantSemantic = node.packetKey ? qdrantSemanticByPacket.get(node.packetKey) : undefined;
       const exactSemantic = node.packetKey ? exactSemanticByPacket.get(node.packetKey) : undefined;
       const lexical = node.packetKey ? lexicalByPacket.get(node.packetKey) : undefined;
       const queryPpr = pprByNode.get(node.id);
+      const mutation = mutationByNode.get(node.id) ?? (node.packetKey ? mutationByPacket.get(node.packetKey) : undefined);
+      const sourceMutationStatus: SourceMutationStatusV1 = mutation?.status ?? 'UNKNOWN';
       return {
         candidateOrdinal,
         canonicalId: `${body.snapshotId}:${node.id}`,
         packetKey: node.packetKey,
         nodeKey: node.id,
         sourceRef: node.sourceRef,
+        sourceMutationStatus,
+        sourceFreshnessProven: sourceMutationStatus === 'FRESH',
         semanticCosine: exactSemantic?.cosineSimilarity ?? qdrantSemantic?.score ?? null,
         lexicalScore: lexical?.score ?? null,
         exactSymbolMatch: seedSet.has(node.id) ? 1 : 0,
@@ -216,6 +251,16 @@ export const POST: RequestHandler = async ({ request }) => {
       };
     });
 
+    // Stale/missing source occurrences remain visible in the mutation receipt but
+    // cannot enter the execution DAG/context manifest. UNKNOWN remains rankable
+    // so incomplete historical hash coverage does not destroy recall; exact
+    // source promotion must still resolve it before model synthesis.
+    const excludedByMutation = allCandidates.filter(
+      (candidate) => !isExecutableMutationStatus(candidate.sourceMutationStatus),
+    );
+    const candidates = allCandidates.filter(
+      (candidate) => isExecutableMutationStatus(candidate.sourceMutationStatus),
+    );
     candidates.sort(compareCandidates);
 
     const executionCandidateLimit =
@@ -229,6 +274,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const candidateBucket = chooseCandidateBucket(Math.max(1, executionCandidates.length));
     const requestId = graph.queryId;
+    const staleNodeKeys = (mutationAwareness?.entries ?? [])
+      .filter((entry) => entry.status === 'STALE' || entry.status === 'MISSING')
+      .map((entry) => entry.nodeKey);
+    const unknownNodeKeys = (mutationAwareness?.entries ?? [])
+      .filter((entry) => entry.status === 'UNKNOWN')
+      .map((entry) => entry.nodeKey);
     const manifest: ContextManifestV1 = {
       schema: 'atlas.context-manifest.v1',
       requestId,
@@ -242,11 +293,18 @@ export const POST: RequestHandler = async ({ request }) => {
       evidenceRefs: executionCandidates
         .filter((candidate) => candidate.sourceRef)
         .map((candidate) => `${candidate.sourceRef}#${candidate.nodeKey}`),
-      producerRevision: 'atlas.graph-synthesis-prep.v6-semantic512',
+      mutationAwareness: {
+        proofPolicy: 'content-hash-plus-tracked-git-provenance',
+        freshCount: mutationAwareness?.freshCount ?? 0,
+        staleCount: mutationAwareness?.staleCount ?? 0,
+        unknownCount: mutationAwareness?.unknownCount ?? graph.nodes.length,
+        missingCount: mutationAwareness?.missingCount ?? 0,
+        staleNodeKeys,
+        unknownNodeKeys,
+      },
+      producerRevision: 'atlas.graph-synthesis-prep.v7-semantic512-mutation-aware',
     };
 
-    // Do not serialize raw 512d vectors back to the Admin UI. Keep only the
-    // projection/query metadata needed to explain the retrieval decision.
     const semanticPublicReceipt = semanticReceipt
       ? {
           schema: semanticReceipt.schema,
@@ -264,25 +322,48 @@ export const POST: RequestHandler = async ({ request }) => {
         }
       : null;
 
+    const hasExecutableCandidates = executionCandidates.length > 0;
+    const hasUnknownFreshness = executionCandidates.some((candidate) => !candidate.sourceFreshnessProven);
+
     return json({
       ok: true,
-      status: 'PROMOTION_REQUIRED',
+      status: !hasExecutableCandidates
+        ? 'REHYDRATION_REQUIRED'
+        : hasUnknownFreshness
+          ? 'PROMOTION_REQUIRED_SOURCE_FRESHNESS'
+          : 'PROMOTION_REQUIRED',
       graph,
       candidates: executionCandidates,
+      excludedByMutation,
       manifest,
+      mutationAwareness: {
+        receipt: mutationAwareness,
+        errors: mutationErrors,
+        policy: {
+          fresh: 'rankable; eligible for source promotion',
+          unknown: 'rankable; source freshness must be promoted before synthesis',
+          stale: 'excluded from execution candidates; rehydrate/reindex first',
+          missing: 'excluded from execution candidates; restore canonical packet first',
+        },
+      },
       gpuPlan: {
         architecture: 'sm_86',
         semanticDimensions: 512,
         nativeEmbeddingModelDimensions: 768,
-        requestedCandidateCount: candidates.length,
+        requestedCandidateCount: allCandidates.length,
+        mutationEligibleCandidateCount: candidates.length,
         executionCandidateCount: executionCandidates.length,
         bucket: candidateBucket,
         rowPadding: candidateBucket - executionCandidates.length,
         executionTarget: gpuBudget.executionTarget,
-        degraded: gpuBudget.degraded,
-        reason: gpuBudget.reason,
+        degraded: gpuBudget.degraded || excludedByMutation.length > 0 || hasUnknownFreshness,
+        reason: excludedByMutation.length > 0
+          ? `${excludedByMutation.length} stale/missing source candidates excluded before execution; ${gpuBudget.reason}`
+          : hasUnknownFreshness
+            ? `source freshness remains unknown for at least one candidate; ${gpuBudget.reason}`
+            : gpuBudget.reason,
         residency: gpuBudget,
-        stages: ['semantic_512', 'cuvs_exact_cosine', 'lexical', 'personalized_pagerank', 'graph_features', 'exact_promotion', 'context_manifest'],
+        stages: ['source_ref_mutation_gate', 'semantic_512', 'cuvs_exact_cosine_v2', 'lexical', 'personalized_pagerank', 'graph_features', 'exact_promotion', 'context_manifest'],
       },
       semantic: {
         qdrant: { receipt: semanticPublicReceipt, errors: semanticErrors },
@@ -305,8 +386,9 @@ export const POST: RequestHandler = async ({ request }) => {
         errors: graphFeatureErrors,
       },
       retrievalPlan: {
-        dense: 'codebase_chunks_512 (canonical persisted EmbeddingGemma MRL semantic_512, cosine)',
-        exactDense: shouldRunExactSemantic ? 'cuVS brute_force cosine over the same bounded semantic_512 candidate rows' : null,
+        sourceFreshness: 'source_ref + trusted snapshot sha256 + git_mutation_provenance; no fabricated source_revision',
+        dense: 'codebase_chunks_512 (persisted EmbeddingGemma MRL semantic_512, cosine)',
+        exactDense: shouldRunExactSemantic ? 'cuVS brute_force cosine v2 over bounded non-stale semantic_512 rows' : null,
         routing: 'latent_64 autoencoder + KMeans is routing-only and requires its own revision receipt before use',
         lexical: 'PostgreSQL atlas_packets FTS via websearch_to_tsquery + ts_rank_cd',
         queryGraph: shouldRunQueryPpr ? 'resident cuGraph personalized PageRank over the requested graphRevision' : null,
@@ -314,22 +396,27 @@ export const POST: RequestHandler = async ({ request }) => {
         fallback: gpuBudget.executionTarget === 'qdrant' ? 'qdrant' : null,
       },
       next: {
+        mutation: excludedByMutation.length > 0
+          ? 'Rehydrate/reindex stale source_ref occurrences before they may enter the DAG.'
+          : hasUnknownFreshness
+            ? 'Promote UNKNOWN source occurrences against current source content/AST before invoking the model.'
+            : 'Selected source occurrences are freshness-proven against available mutation evidence.',
         semantic: exactSemanticReceipt
-          ? 'semanticCosine is exact cuVS cosine over the bounded canonical semantic_512 candidate fabric.'
+          ? 'semanticCosine is exact cuVS cosine over the bounded semantic_512 candidate fabric; source freshness remains a separate receipt.'
           : semanticReceipt
-            ? 'semanticCosine currently uses Qdrant cosine because exact cuVS was skipped/failed; backfill packet_key+source_revision to make all 512 rows exact-rerank eligible.'
+            ? 'semanticCosine currently uses Qdrant cosine because exact cuVS was skipped/failed; do not conflate this with source freshness.'
             : 'Qdrant semantic_512 enrichment failed open; do not fabricate semanticCosine.',
         lexical: lexicalReceipt
-          ? 'lexicalScore is hydrated by the existing canonical PostgreSQL FTS semantics; BM42 remains challenger-only.'
+          ? 'lexicalScore is hydrated by PostgreSQL FTS; BM42 remains challenger-only.'
           : 'PostgreSQL lexical enrichment failed open; BM42 must not silently become the canonical lexical score.',
         graph: pprReceipt
-          ? 'personalizedPageRank is query-time cuGraph output from the exact requested graphRevision; persisted PageRank/community remain static priors.'
+          ? 'personalizedPageRank is query-time cuGraph output from the requested graphRevision; persisted PageRank/community remain static priors.'
           : body.graphRevision
             ? 'Query-time PPR failed open or GPU policy skipped it; only revision-qualified persisted graph features may remain.'
             : 'Provide graphRevision to hydrate persisted graph features and enable query-time PPR; never infer it from snapshotId.',
-        routing: 'Train semantic_512→latent_64, run deterministic KMeans, then prove routed Recall@K against the full semantic_512 cuVS oracle before enabling cluster prefiltering.',
-        cache: 'bitfrostHotness remains null until live invalidation/residency semantics are proven; key existence is not relevance.',
-        promotion: 'Hydrate exact source/AST/type evidence before invoking the synthesis model.',
+        routing: 'Train semantic_512→latent_64, run deterministic KMeans, then prove routed Recall@K against full semantic_512 cuVS exact before enabling cluster prefiltering.',
+        cache: 'BitFrost/Valkey entries must be keyed by snapshot/representation/mutation evidence before they can be trusted after a source change.',
+        promotion: 'Hydrate exact current source/AST/type evidence; UNKNOWN freshness must not reach the synthesis model.',
       },
     });
   } catch (error) {
