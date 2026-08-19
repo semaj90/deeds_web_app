@@ -1,0 +1,36 @@
+schema_id: atlas.rapids-corpus-ref
+schema_version: 1
+schema_kind: gpu_corpus_reference
+status: ACTIVE
+
+description: >
+  Revisioned reference to a semantic_768 corpus snapshot for cuVS/CAGRA. This is
+  the preferred large-corpus transport shape; inline JSON corpus vectors remain a
+  tiny-fixture compatibility path only.
+
+fields:
+  schema: { type: literal, value: atlas.rapids-corpus-ref.v1 }
+  corpusRefId: { type: string, required: true }
+  representationId: { type: literal, value: semantic_768 }
+  representationRevision: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  featureRevision: { type: string, required: true }
+  rowCount: { type: integer, minimum: 1 }
+  dimension: { type: literal, value: 768 }
+  dtype:
+    type: enum
+    values: [float32, float16]
+  metric: { type: literal, value: cosine }
+  dataRefId: { type: string, required: true }
+  identityRefId: { type: string, required: true }
+  ordinalRefId: { type: string, required: true }
+  checksum: { type: string, required: true }
+  createdAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+
+invariants:
+  - row ordinal must round-trip to packetKey/sourceRevision identity without relying on vector-database point IDs
+  - metric is cosine because this snapshot belongs to canonical semantic_768
+  - cuVS brute-force is exact oracle; CAGRA consumes the same corpus identity but remains ANN
+  - large corpus execution should pass dataRefId/identityRefId rather than inline JSON float arrays
+  - Arrow IPC and mmap files may carry bytes, but serialized bytes do not become canonical identity
