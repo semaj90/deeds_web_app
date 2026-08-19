@@ -41,7 +41,9 @@ fields:
     fields:
       strategy:
         type: enum
-        values: [WEIGHTED_BEST_FIRST, BFS, SSSP, PERSONALIZED_PAGERANK]
+        values: [WEIGHTED_BEST_FIRST, GREEDY_BEST_FIRST, BFS, SSSP, ASTAR_REFERENCE, PERSONALIZED_PAGERANK]
+      heuristicId: { type: string, nullable: true }
+      heuristicAdmissible: { type: boolean, default: false }
       maxDepth: { type: integer, minimum: 0 }
       maxEdgesVisited: { type: integer, minimum: 0 }
       maxFrontier: { type: integer, minimum: 1 }
@@ -59,6 +61,9 @@ invariants:
   - semantic_768 is the canonical semantic representation
   - QDRANT and CAGRA_HOT_SHARD are mutually exclusive executors of one semantic seed stage
   - graph traversal starts after semantic Top-K seeding and does not emit an additional semantic vote
-  - WEIGHTED_BEST_FIRST must not be labeled A* unless its heuristic is independently proven admissible for the optimized path cost
+  - GREEDY_BEST_FIRST and WEIGHTED_BEST_FIRST are relevance strategies and do not claim shortest-path optimality
+  - ASTAR_REFERENCE requires heuristicId plus heuristicAdmissible=true; otherwise the plan is invalid
+  - A* remains a reference/helper strategy until a dedicated accelerated executor is independently proven
+  - BFS is the unweighted minimum-hop path strategy; SSSP is the weighted nonnegative-cost path strategy
   - all projected binary edges retain relation/hyperedge provenance sufficient to reconstruct canonical n-ary evidence
   - exact promotion is mandatory before mutation-critical synthesis
