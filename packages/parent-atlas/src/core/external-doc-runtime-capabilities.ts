@@ -75,12 +75,18 @@ export function semverAtLeast(value: string, minimum: string): boolean {
 }
 
 export function deriveQdrantVersionCapabilities(version: string) {
+  const hybridBaseline = semverAtLeast(version, '1.10.0');
   return {
-    // Sparse vectors are first-class from 1.7; the IDF modifier and Query API
-    // hybrid prefetch/fusion are documented from 1.10.
-    supports_sparse_vectors: semverAtLeast(version, '1.7.0'),
-    supports_idf_modifier: semverAtLeast(version, '1.10.0'),
-    supports_hybrid_query_api: semverAtLeast(version, '1.10.0'),
+    // Atlas intentionally uses 1.10 as the minimum for this production path:
+    // that release introduced Universal Query API hybrid fusion plus the IDF
+    // modifier needed by our lexical_bm25 contract. Older sparse support is
+    // not treated as sufficient evidence for this exact workflow.
+    supports_sparse_vectors: hybridBaseline,
+    supports_idf_modifier: hybridBaseline,
+    supports_hybrid_query_api: hybridBaseline,
+    // Qdrant 1.18 added create/delete named-vector schema APIs. Atlas still
+    // uses a shadow collection for migration because schema existence does not
+    // populate newly added vectors on historical points.
     supports_named_vector_schema_update: semverAtLeast(version, '1.18.0'),
     // Qdrant 1.19 introduces memory: pinned|cached|cold; older versions use
     // on_disk/on_disk_payload compatibility parameters.
