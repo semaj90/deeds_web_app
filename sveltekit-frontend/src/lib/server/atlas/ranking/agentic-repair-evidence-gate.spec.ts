@@ -53,7 +53,7 @@ function batch(input: {
     reachable: input.reachable ?? true,
     degraded: !(input.reachable ?? true),
     latencyMs: 5,
-    observedRevision: candidates.every((row) => row.sourceRevision === 'src-r1') ? 'src-r1' : null,
+    observedRevision: candidates.length > 0 && candidates.every((row) => row.sourceRevision === 'src-r1') ? 'src-r1' : null,
     candidates,
     sourceRefs: [...new Set(candidates.map((row) => row.sourceRef))],
     evidenceRefs: [...new Set(candidates.flatMap((row) => row.evidenceRefs))],
@@ -85,23 +85,21 @@ function executor(): RepairEvidenceReadOnlyExecutor {
     graphExpand: async () => batch({
       library: 'GRAPH_EXPANDER',
       executor: 'graph',
-      candidates: [
-        candidate({
-          candidateId: 'graph:p2',
-          packetKey: 'p2',
-          sourceRef: 'src/lib/b.ts',
-          ordinal: 0,
-          semanticScore: 0.1,
-          lexicalScore: 0,
-          graphAuthority: 0.95,
-          hopDistance: 1,
-          exactEvidence: false,
-          contentRef: 'source:src/lib/b.ts',
-          lanes: ['graph'],
-          executors: ['test:graph'],
-          evidenceRefs: ['graph:p2'],
-        }),
-      ],
+      candidates: [candidate({
+        candidateId: 'graph:p2',
+        packetKey: 'p2',
+        sourceRef: 'src/lib/b.ts',
+        ordinal: 0,
+        semanticScore: 0.1,
+        lexicalScore: 0,
+        graphAuthority: 0.95,
+        hopDistance: 1,
+        exactEvidence: false,
+        contentRef: 'source:src/lib/b.ts',
+        lanes: ['graph'],
+        executors: ['test:graph'],
+        evidenceRefs: ['graph:p2'],
+      })],
     }),
     aceValidate: async () => batch({
       library: 'ACE',
@@ -207,7 +205,7 @@ describe('buildAgenticRepairEvidenceGate', () => {
     expect(result.tangPromotion.stochasticSamplingStillRequiredForTangFaithfulExecution).toBe(true);
   });
 
-  it('blocks the readiness gate when a required graph executor is unreachable', async () => {
+  it('surfaces an unreachable required graph executor as non-READY without granting mutation authority', async () => {
     const broken = executor();
     broken.graphExpand = async () => batch({
       library: 'GRAPH_EXPANDER',
@@ -217,8 +215,8 @@ describe('buildAgenticRepairEvidenceGate', () => {
 
     const result = await buildAgenticRepairEvidenceGate(input, broken);
     expect(result.readiness.gate).not.toBe('READY');
-    expect(result.manifest.evidenceStatus).not.toBe('READY_FOR_DRY_RUN');
-    expect(result.manifest.recommendationAllowed).toBe(false);
+    expect(result.manifest.evidenceAuthorizesMutation).toBe(false);
+    expect(result.manifest.sideEffectsAuthorized).toBe(false);
   });
 
   it('keeps exact and CAGRA/Qdrant planning inside one semantic logical lane', async () => {
