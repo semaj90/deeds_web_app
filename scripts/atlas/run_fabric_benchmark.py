@@ -1,31 +1,34 @@
 #!/usr/bin/env python3
 """
-run_fabric_benchmark.py — Single GPU Worker Benchmark Harness
+run_fabric_benchmark.py — Single GPU / graph validation worker
 
-Supported Modes:
-  --mode fp32_exact               Real FP32 semantic_768 -> exact recovery -> parity receipt
-  --mode kmeans_runtime_eval      KMeans runtime routing evaluation (K=128, Top-C=8)
-  --mode ampere_int4_cache_eval   INT4 pack/dequant cache evaluation
-  --mode som_runtime_eval         SOM 20x20 recall and coverage evaluation
-  --mode graph_pagerank_cugraph   Frozen projection -> direct cuGraph PageRank challenger
+Supported modes:
+  fp32_exact
+  kmeans_runtime_eval
+  ampere_int4_cache_eval
+  som_runtime_eval
+  graph_pagerank_cugraph
+  graph_pagerank_neo4j_gds
 
-Graph modes are validation/challenger execution only. They never write
-Postgres, Neo4j, Qdrant, or canonical authority. Canonical promotion is owned
-by the TypeScript projection/parity/qualification contracts.
+The two graph PageRank modes consume the same GRAPH_SNAPSHOT_PARITY Parquet
+artifact. They emit the same parity-coordinate score shape keyed by
+`graph_node_key`. `graph_node_key` is a deterministic graph coordinate, not a
+canonical packet/symbol identity. Neither mode writes canonical authority.
 """
 
-import os
-import json
-import time
 import argparse
 import hashlib
+import json
+import os
+import time
+
 import numpy as np
 
 from ampere_quantization import pack_int4, unpack_int4, SEMANTIC_DIMENSION
 
 
 def sha256_data(data) -> str:
-    serialized = json.dumps(data, sort_keys=True).encode('utf-8')
+    serialized = json.dumps(data, sort_keys=True).encode("utf-8")
     return hashlib.sha256(serialized).hexdigest()
 
 
@@ -84,10 +87,17 @@ def run_fp32_exact(reports_dir: str):
         "brute_force_latency_ms": 1.45,
     }
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    receipt = get_lineage_envelope("GPU_FP32_EXACT_REPLAY_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"num_packets": num_packets}), domain_data)
+    receipt = get_lineage_envelope(
+        "GPU_FP32_EXACT_REPLAY_PROVEN",
+        "run_fabric_benchmark.py",
+        started_at,
+        completed_at,
+        sha256_data({"num_packets": num_packets}),
+        domain_data,
+    )
     out_file = os.path.join(reports_dir, "gpu-fp32-exact-receipt.json")
-    with open(out_file, "w") as f:
-        json.dump(receipt, f, indent=2)
+    with open(out_file, "w", encoding="utf-8") as handle:
+        json.dump(receipt, handle, indent=2)
     print(f"[run_fabric_benchmark:fp32_exact] SUCCESS! Receipt written to {out_file}")
 
 
@@ -103,10 +113,17 @@ def run_kmeans_eval(reports_dir: str):
         "status": "COMPLETED",
     }
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    receipt = get_lineage_envelope("GPU_KMEANS_RUNTIME_ROUTING_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"runtime_k": 128}), domain_data)
+    receipt = get_lineage_envelope(
+        "GPU_KMEANS_RUNTIME_ROUTING_PROVEN",
+        "run_fabric_benchmark.py",
+        started_at,
+        completed_at,
+        sha256_data({"runtime_k": 128}),
+        domain_data,
+    )
     out_file = os.path.join(reports_dir, "gpu-kmeans-runtime-receipt.json")
-    with open(out_file, "w") as f:
-        json.dump(receipt, f, indent=2)
+    with open(out_file, "w", encoding="utf-8") as handle:
+        json.dump(receipt, handle, indent=2)
     print(f"[run_fabric_benchmark:kmeans_eval] SUCCESS! Receipt written to {out_file}")
 
 
@@ -128,10 +145,17 @@ def run_int4_eval(reports_dir: str):
         "status": "COMPLETED",
     }
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    receipt = get_lineage_envelope("AMPERE_INT4_CACHE_EVAL_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"dimension": SEMANTIC_DIMENSION}), domain_data)
+    receipt = get_lineage_envelope(
+        "AMPERE_INT4_CACHE_EVAL_PROVEN",
+        "run_fabric_benchmark.py",
+        started_at,
+        completed_at,
+        sha256_data({"dimension": SEMANTIC_DIMENSION}),
+        domain_data,
+    )
     out_file = os.path.join(reports_dir, "gpu-ampere-int4-receipt.json")
-    with open(out_file, "w") as f:
-        json.dump(receipt, f, indent=2)
+    with open(out_file, "w", encoding="utf-8") as handle:
+        json.dump(receipt, handle, indent=2)
     print(f"[run_fabric_benchmark:int4_eval] SUCCESS! Receipt written to {out_file}")
 
 
@@ -150,20 +174,21 @@ def run_som_eval(reports_dir: str):
         "status": "COMPLETED",
     }
     completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    receipt = get_lineage_envelope("SOM_20X20_EVAL_PROVEN", "run_fabric_benchmark.py", started_at, completed_at, sha256_data({"grid": "20x20"}), domain_data)
+    receipt = get_lineage_envelope(
+        "SOM_20X20_EVAL_PROVEN",
+        "run_fabric_benchmark.py",
+        started_at,
+        completed_at,
+        sha256_data({"grid": "20x20"}),
+        domain_data,
+    )
     out_file = os.path.join(reports_dir, "gpu-som-runtime-receipt.json")
-    with open(out_file, "w") as f:
-        json.dump(receipt, f, indent=2)
+    with open(out_file, "w", encoding="utf-8") as handle:
+        json.dump(receipt, handle, indent=2)
     print(f"[run_fabric_benchmark:som_eval] SUCCESS! Receipt written to {out_file}")
 
 
-def run_graph_pagerank_cugraph(args, reports_dir: str):
-    try:
-        import cudf
-        import cugraph
-    except ImportError as error:
-        raise RuntimeError(f"RAPIDS/cuGraph unavailable: {error}") from error
-
+def validate_graph_args(args, mode: str):
     required = {
         "nodes": args.nodes,
         "edges": args.edges,
@@ -175,18 +200,90 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
     }
     missing = [name for name, value in required.items() if not value]
     if missing:
-        raise ValueError(f"graph_pagerank_cugraph missing required arguments: {', '.join(missing)}")
+        raise ValueError(f"{mode} missing required arguments: {', '.join(missing)}")
     if not args.relationship_type:
-        raise ValueError("graph_pagerank_cugraph requires at least one --relationship-type")
+        raise ValueError(f"{mode} requires at least one --relationship-type")
     if not (0.0 < args.damping < 1.0):
-        raise ValueError("cuGraph PageRank damping must be in (0,1)")
+        raise ValueError("PageRank damping must be in (0,1) for cross-executor parity")
     if args.max_iterations <= 0 or args.tolerance <= 0:
         raise ValueError("max-iterations and tolerance must be positive")
 
+
+def graph_input_hash(args) -> str:
+    return sha256_data({
+        "graphRevision": args.graph_revision,
+        "projectionRevision": args.projection_revision,
+        "projectionHash": args.projection_hash,
+        "projectionName": args.projection_name,
+        "projectionSnapshotHash": args.projection_snapshot_hash,
+        "relationshipTypes": sorted(set(args.relationship_type)),
+        "weighted": bool(args.weighted),
+        "dampingFactor": args.damping,
+        "maxIterations": args.max_iterations,
+        "tolerance": args.tolerance,
+    })
+
+
+def open_score_output(path):
+    if not path:
+        return None
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    return open(path, "w", encoding="utf-8")
+
+
+def write_parity_score(handle, score_hash, parity_node_key: str, node_ordinal: int, score: float):
+    if not parity_node_key:
+        raise ValueError(f"missing graph_node_key for ordinal {node_ordinal}")
+    if not np.isfinite(score) or score < 0.0:
+        raise ValueError(f"invalid PageRank score at ordinal {node_ordinal}")
+    encoded = json.dumps(
+        {"parityNodeKey": parity_node_key, "nodeOrdinal": node_ordinal, "score": score},
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    score_hash.update(encoded.encode("utf-8"))
+    score_hash.update(b"\n")
+    if handle:
+        handle.write(encoded + "\n")
+
+
+def build_graph_receipt(args, reports_dir: str, receipt_kind: str, executor_id: str, started_at: str, domain_data: dict):
+    completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    receipt = get_lineage_envelope(
+        receipt_kind,
+        "run_fabric_benchmark.py",
+        started_at,
+        completed_at,
+        graph_input_hash(args),
+        domain_data,
+        graph_revision=args.graph_revision,
+        representation_revision="graph-pagerank-raw-v2",
+        status="EXECUTED",
+        producer_revision="2026-08-19.graph-pagerank-v3",
+    )
+    default_name = f"graph-pagerank-{executor_id.lower().replace('_', '-')}-execution-receipt.json"
+    out_file = args.receipt_out or os.path.join(reports_dir, default_name)
+    os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
+    with open(out_file, "w", encoding="utf-8") as handle:
+        json.dump(receipt, handle, indent=2)
+    print(json.dumps(receipt, sort_keys=True))
+
+
+def run_graph_pagerank_cugraph(args, reports_dir: str):
+    validate_graph_args(args, "graph_pagerank_cugraph")
+    try:
+        import cudf
+        import cugraph
+    except ImportError as error:
+        raise RuntimeError(f"RAPIDS/cuGraph unavailable: {error}") from error
+
     started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     read_started = time.perf_counter()
-    nodes = cudf.read_parquet(args.nodes, columns=["gpu_node_id"])
-    edges = cudf.read_parquet(args.edges, columns=["src_gpu_node_id", "dst_gpu_node_id", "edge_type", "weight"])
+    nodes = cudf.read_parquet(args.nodes, columns=["gpu_node_id", "graph_node_key"])
+    edges = cudf.read_parquet(
+        args.edges,
+        columns=["src_gpu_node_id", "dst_gpu_node_id", "edge_type", "weight"],
+    )
     edges = edges[edges["edge_type"].isin(args.relationship_type)]
     read_ms = (time.perf_counter() - read_started) * 1000.0
 
@@ -197,8 +294,10 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
     ids = nodes["gpu_node_id"]
     if int(ids.nunique()) != node_count or int(ids.min()) != 0 or int(ids.max()) != node_count - 1:
         raise ValueError("gpu_node_id must be unique and dense [0,node_count-1]")
+    if int(nodes["graph_node_key"].nunique()) != node_count:
+        raise ValueError("graph_node_key must be present and unique for every parity node")
     if edge_count <= 0:
-        raise ValueError("selected relationshipTypes produced no edges; fail closed instead of fabricating uniform authority")
+        raise ValueError("selected relationshipTypes produced no edges; fail closed")
     if int(edges["src_gpu_node_id"].min()) < 0 or int(edges["dst_gpu_node_id"].min()) < 0:
         raise ValueError("negative edge endpoint")
     if int(edges["src_gpu_node_id"].max()) >= node_count or int(edges["dst_gpu_node_id"].max()) >= node_count:
@@ -235,36 +334,27 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
     compute_ms = (time.perf_counter() - compute_started) * 1000.0
 
     scores_pdf = scores_df.to_pandas().sort_values("vertex")
+    nodes_pdf = nodes.to_pandas().sort_values("gpu_node_id")
     if len(scores_pdf) != node_count:
         raise ValueError(f"cuGraph returned {len(scores_pdf)} scores for {node_count} nodes")
+
     score_hash = hashlib.sha256()
-    if args.scores_out:
-        os.makedirs(os.path.dirname(os.path.abspath(args.scores_out)), exist_ok=True)
-        output_handle = open(args.scores_out, "w", encoding="utf-8")
-    else:
-        output_handle = None
+    output_handle = open_score_output(args.scores_out)
     try:
-        for expected_ordinal, row in enumerate(scores_pdf.itertuples(index=False)):
-            node_ordinal = int(row.vertex)
-            score = float(row.pagerank)
-            if node_ordinal != expected_ordinal:
-                raise ValueError(f"score ordinal gap: expected {expected_ordinal}, got {node_ordinal}")
-            if not np.isfinite(score) or score < 0.0:
-                raise ValueError(f"invalid PageRank score at ordinal {node_ordinal}")
-            encoded = json.dumps({"nodeOrdinal": node_ordinal, "score": score}, sort_keys=True, separators=(",", ":"))
-            score_hash.update(encoded.encode("utf-8"))
-            score_hash.update(b"\n")
-            if output_handle:
-                output_handle.write(encoded + "\n")
+        for expected_ordinal, (score_row, node_row) in enumerate(zip(scores_pdf.itertuples(index=False), nodes_pdf.itertuples(index=False))):
+            node_ordinal = int(score_row.vertex)
+            if node_ordinal != expected_ordinal or int(node_row.gpu_node_id) != expected_ordinal:
+                raise ValueError(f"cuGraph/node table ordinal mismatch at {expected_ordinal}")
+            write_parity_score(output_handle, score_hash, str(node_row.graph_node_key), node_ordinal, float(score_row.pagerank))
     finally:
         if output_handle:
             output_handle.close()
 
-    raw_output_hash = score_hash.hexdigest()
     domain_data = {
         "executorId": "CUGRAPH",
         "role": "GPU_CHALLENGER",
         "algorithm": "pagerank",
+        "parityCoordinate": "graph_node_key",
         "graphRevision": args.graph_revision,
         "projectionRevision": args.projection_revision,
         "projectionHash": args.projection_hash,
@@ -280,52 +370,178 @@ def run_graph_pagerank_cugraph(args, reports_dir: str):
         "convergenceStatus": convergence_status,
         "ranIterations": None,
         "failOnNonconvergence": False,
-        "rawOutputHash": raw_output_hash,
+        "rawOutputHash": score_hash.hexdigest(),
         "readMillis": read_ms,
         "graphBuildMillis": graph_build_ms,
         "computeMillis": compute_ms,
         "scoresOut": os.path.abspath(args.scores_out) if args.scores_out else None,
     }
-    completed_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    input_hash = sha256_data({
-        "graphRevision": args.graph_revision,
-        "projectionRevision": args.projection_revision,
-        "projectionHash": args.projection_hash,
-        "projectionSnapshotHash": args.projection_snapshot_hash,
-        "relationshipTypes": sorted(set(args.relationship_type)),
-        "weighted": bool(args.weighted),
-        "dampingFactor": args.damping,
-        "maxIterations": args.max_iterations,
-        "tolerance": args.tolerance,
-    })
-    receipt = get_lineage_envelope(
+    build_graph_receipt(
+        args,
+        reports_dir,
         "GRAPH_PAGERANK_CUGRAPH_EXECUTED",
-        "run_fabric_benchmark.py",
+        "CUGRAPH",
         started_at,
-        completed_at,
-        input_hash,
         domain_data,
-        graph_revision=args.graph_revision,
-        representation_revision="graph-pagerank-raw-v1",
-        status="EXECUTED",
-        producer_revision="2026-08-19.graph-pagerank-v2",
     )
-    out_file = args.receipt_out or os.path.join(reports_dir, "graph-pagerank-cugraph-execution-receipt.json")
-    os.makedirs(os.path.dirname(os.path.abspath(out_file)), exist_ok=True)
-    with open(out_file, "w", encoding="utf-8") as handle:
-        json.dump(receipt, handle, indent=2)
-    print(json.dumps(receipt, sort_keys=True))
+
+
+def run_graph_pagerank_neo4j_gds(args, reports_dir: str):
+    validate_graph_args(args, "graph_pagerank_neo4j_gds")
+    try:
+        import pandas as pd
+        from graphdatascience import GraphDataScience
+    except ImportError as error:
+        raise RuntimeError(f"Neo4j GDS Python client unavailable: {error}") from error
+
+    started_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    read_started = time.perf_counter()
+    nodes = pd.read_parquet(args.nodes, columns=["gpu_node_id", "graph_node_key"])
+    edges = pd.read_parquet(
+        args.edges,
+        columns=["src_gpu_node_id", "dst_gpu_node_id", "edge_type", "weight"],
+    )
+    edges = edges[edges["edge_type"].isin(args.relationship_type)].copy()
+    read_ms = (time.perf_counter() - read_started) * 1000.0
+
+    nodes = nodes.sort_values("gpu_node_id").reset_index(drop=True)
+    node_count = len(nodes)
+    edge_count = len(edges)
+    if node_count <= 0:
+        raise ValueError("frozen projection contains no nodes")
+    expected_ids = np.arange(node_count, dtype=np.int64)
+    actual_ids = nodes["gpu_node_id"].to_numpy(dtype=np.int64)
+    if not np.array_equal(actual_ids, expected_ids):
+        raise ValueError("gpu_node_id must be unique and dense [0,node_count-1]")
+    if nodes["graph_node_key"].isna().any() or nodes["graph_node_key"].nunique() != node_count:
+        raise ValueError("graph_node_key must be present and unique for every parity node")
+    if edge_count <= 0:
+        raise ValueError("selected relationshipTypes produced no edges; fail closed")
+    if int(edges["src_gpu_node_id"].min()) < 0 or int(edges["dst_gpu_node_id"].min()) < 0:
+        raise ValueError("negative edge endpoint")
+    if int(edges["src_gpu_node_id"].max()) >= node_count or int(edges["dst_gpu_node_id"].max()) >= node_count:
+        raise ValueError("edge endpoint outside node range")
+
+    neo4j_uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
+    neo4j_user = os.environ.get("NEO4J_USER") or os.environ.get("NEO4J_USERNAME")
+    neo4j_password = os.environ.get("NEO4J_PASSWORD")
+    neo4j_database = os.environ.get("NEO4J_DB") or os.environ.get("NEO4J_DATABASE") or "neo4j"
+    auth = (neo4j_user, neo4j_password) if neo4j_user and neo4j_password else None
+    gds = GraphDataScience(neo4j_uri, auth=auth, database=neo4j_database, arrow=False)
+
+    node_df = pd.DataFrame({"nodeId": nodes["gpu_node_id"].astype("int64")})
+    relationship_df = pd.DataFrame({
+        "sourceNodeId": edges["src_gpu_node_id"].astype("int64"),
+        "targetNodeId": edges["dst_gpu_node_id"].astype("int64"),
+        "relationshipType": edges["edge_type"].astype(str),
+    })
+    if args.weighted:
+        relationship_df["weight"] = edges["weight"].astype(float)
+
+    graph_name = f"atlas_parity_{hashlib.sha256(args.projection_snapshot_hash.encode('utf-8')).hexdigest()[:20]}"
+    graph = None
+    try:
+        try:
+            existing = gds.graph.get(graph_name)
+            gds.graph.drop(existing)
+        except Exception:
+            pass
+
+        construct_started = time.perf_counter()
+        graph = gds.graph.construct(graph_name, node_df, relationship_df)
+        graph_construct_ms = (time.perf_counter() - construct_started) * 1000.0
+
+        compute_started = time.perf_counter()
+        stream_kwargs = {
+            "dampingFactor": args.damping,
+            "maxIterations": args.max_iterations,
+            "tolerance": args.tolerance,
+            "relationshipTypes": sorted(set(args.relationship_type)),
+            "scaler": "None",
+        }
+        if args.weighted:
+            stream_kwargs["relationshipWeightProperty"] = "weight"
+        scores = gds.pageRank.stream(graph, **stream_kwargs)
+        compute_ms = (time.perf_counter() - compute_started) * 1000.0
+
+        if "nodeId" not in scores.columns or "score" not in scores.columns:
+            raise ValueError(f"GDS PageRank stream returned unexpected columns: {list(scores.columns)}")
+        scores = scores[["nodeId", "score"]].sort_values("nodeId").reset_index(drop=True)
+        if len(scores) != node_count:
+            raise ValueError(f"GDS returned {len(scores)} scores for {node_count} nodes")
+
+        score_hash = hashlib.sha256()
+        output_handle = open_score_output(args.scores_out)
+        try:
+            for expected_ordinal, (score_row, node_row) in enumerate(zip(scores.itertuples(index=False), nodes.itertuples(index=False))):
+                node_ordinal = int(score_row.nodeId)
+                if node_ordinal != expected_ordinal or int(node_row.gpu_node_id) != expected_ordinal:
+                    raise ValueError(f"GDS/node table ordinal mismatch at {expected_ordinal}")
+                write_parity_score(output_handle, score_hash, str(node_row.graph_node_key), node_ordinal, float(score_row.score))
+        finally:
+            if output_handle:
+                output_handle.close()
+
+        domain_data = {
+            "executorId": "NEO4J_GDS",
+            "role": "REFERENCE_EXECUTOR",
+            "algorithm": "pagerank",
+            "executionMode": "STREAM_ON_CONSTRUCTED_DATAFRAME_GRAPH",
+            "parityCoordinate": "graph_node_key",
+            "graphRevision": args.graph_revision,
+            "projectionRevision": args.projection_revision,
+            "projectionHash": args.projection_hash,
+            "projectionName": args.projection_name,
+            "projectionSnapshotHash": args.projection_snapshot_hash,
+            "nodeCount": node_count,
+            "relationshipCount": edge_count,
+            "relationshipTypes": sorted(set(args.relationship_type)),
+            "weighted": bool(args.weighted),
+            "dampingFactor": args.damping,
+            "maxIterations": args.max_iterations,
+            "tolerance": args.tolerance,
+            "convergenceStatus": "UNKNOWN_STREAM_MODE",
+            "ranIterations": None,
+            "rawOutputHash": score_hash.hexdigest(),
+            "readMillis": read_ms,
+            "graphConstructMillis": graph_construct_ms,
+            "computeMillis": compute_ms,
+            "scoresOut": os.path.abspath(args.scores_out) if args.scores_out else None,
+        }
+        build_graph_receipt(
+            args,
+            reports_dir,
+            "GRAPH_PAGERANK_NEO4J_GDS_EXECUTED",
+            "NEO4J_GDS",
+            started_at,
+            domain_data,
+        )
+    finally:
+        if graph is not None:
+            try:
+                gds.graph.drop(graph)
+            except Exception:
+                pass
+        try:
+            gds.close()
+        except Exception:
+            pass
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Single GPU Fabric Benchmark Worker")
-    parser.add_argument("--mode", required=True, choices=[
-        "fp32_exact",
-        "kmeans_runtime_eval",
-        "ampere_int4_cache_eval",
-        "som_runtime_eval",
-        "graph_pagerank_cugraph",
-    ], help="Benchmark execution mode")
+    parser = argparse.ArgumentParser(description="Single GPU / graph validation fabric worker")
+    parser.add_argument(
+        "--mode",
+        required=True,
+        choices=[
+            "fp32_exact",
+            "kmeans_runtime_eval",
+            "ampere_int4_cache_eval",
+            "som_runtime_eval",
+            "graph_pagerank_cugraph",
+            "graph_pagerank_neo4j_gds",
+        ],
+    )
     parser.add_argument("--nodes")
     parser.add_argument("--edges")
     parser.add_argument("--graph-revision")
@@ -355,6 +571,8 @@ def main():
         run_som_eval(reports_dir)
     elif args.mode == "graph_pagerank_cugraph":
         run_graph_pagerank_cugraph(args, reports_dir)
+    elif args.mode == "graph_pagerank_neo4j_gds":
+        run_graph_pagerank_neo4j_gds(args, reports_dir)
 
 
 if __name__ == "__main__":
