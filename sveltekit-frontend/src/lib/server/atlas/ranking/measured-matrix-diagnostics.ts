@@ -21,10 +21,18 @@ import {
  * PCA, or hidden normalization is applied. Since the canonical matrix has only
  * 16 columns, a deterministic symmetric Jacobi eigensolver over A^T A is small
  * enough to serve as a transparent CPU oracle before any GPU challenger exists.
+ *
+ * The Tang preflight matrix contains tangPromotionProbability itself. Before a
+ * measured Tang policy exists that feature is normally zero, so full-column
+ * conditioning would be circular and frequently singular by construction. The
+ * policy therefore uses the condition number of the numerically active singular
+ * subspace and records rank deficiency separately.
  */
 
 export const MatrixDiagnosticsAlgorithmSchema = z.literal('ATA_SYMMETRIC_JACOBI_SVD_V1');
 export type MatrixDiagnosticsAlgorithm = z.infer<typeof MatrixDiagnosticsAlgorithmSchema>;
+export const MatrixConditionNumberDefinitionSchema = z.literal('NUMERICAL_ACTIVE_SUBSPACE');
+export type MatrixConditionNumberDefinition = z.infer<typeof MatrixConditionNumberDefinitionSchema>;
 
 export const MatrixDiagnosticsMeasurementPolicyV1Schema = z.object({
   retainedEnergyTargetPercent: z.number().finite().min(0).max(100),
@@ -61,6 +69,7 @@ export const MeasuredMatrixDiagnosticsReceiptV1Schema = z.object({
   effectiveRank: z.number().finite().positive().max(SEARCH_POLICY_FEATURE_COUNT).nullable(),
   retainedRank: z.number().int().positive().max(SEARCH_POLICY_FEATURE_COUNT).nullable(),
   retainedEnergyPercent: z.number().finite().min(0).max(100).nullable(),
+  conditionNumberDefinition: MatrixConditionNumberDefinitionSchema,
   conditionNumber: z.number().finite().positive().nullable(),
   retainedEnergyTargetPercent: z.number().finite().min(0).max(100),
   legacyDiagnostics: MatrixDiagnosticsV1Schema,
@@ -302,7 +311,7 @@ export function measureSearchPolicyMatrixDiagnostics(
     ? retainedEnergy(singularValues, policy.retainedEnergyTargetPercent)
     : { rank: null, percent: null };
   const smallestActive = numericalRank > 0 ? singularValues[numericalRank - 1] : 0;
-  const conditionNumber = eig.converged && !zeroMatrix && !rankDeficient && smallestActive > 0
+  const conditionNumber = eig.converged && !zeroMatrix && smallestActive > 0
     ? sigmaMax / smallestActive
     : null;
 
@@ -336,6 +345,7 @@ export function measureSearchPolicyMatrixDiagnostics(
     effectiveRank: effRank,
     retainedRank: retained.rank,
     retainedEnergyPercent: retained.percent,
+    conditionNumberDefinition: 'NUMERICAL_ACTIVE_SUBSPACE',
     conditionNumber,
     retainedEnergyTargetPercent: policy.retainedEnergyTargetPercent,
     legacyDiagnostics,
@@ -372,14 +382,13 @@ export function buildMeasuredTangPolicyReceipt(input: {
   if (!diagnostics.converged) qualificationReasonCodes.push('JACOBI_DIAGNOSTICS_DID_NOT_CONVERGE');
   if (!diagnostics.sampleSufficientForColumnRank) qualificationReasonCodes.push('ROW_COUNT_BELOW_FEATURE_COUNT_LOW_RANK_NOT_QUALIFIED');
   if (diagnostics.zeroMatrix) qualificationReasonCodes.push('ZERO_MATRIX_NOT_QUALIFIED');
-  if (diagnostics.rankDeficient) qualificationReasonCodes.push('NUMERICAL_RANK_DEFICIENT_CONDITION_UNBOUNDED');
+  if (diagnostics.rankDeficient) qualificationReasonCodes.push('NUMERICAL_RANK_DEFICIENT_ACTIVE_SUBSPACE_CONDITION_USED');
   if (recommendation.status !== 'ELIGIBLE') qualificationReasonCodes.push(`TANG_POLICY_${recommendation.status}`);
   if (recommendation.status === 'ELIGIBLE') qualificationReasonCodes.push('MEASURED_TANG_POLICY_ELIGIBLE');
 
   const qualified = diagnostics.converged
     && diagnostics.sampleSufficientForColumnRank
     && !diagnostics.zeroMatrix
-    && !diagnostics.rankDeficient
     && recommendation.status === 'ELIGIBLE';
 
   return MeasuredTangPolicyReceiptV1Schema.parse({
