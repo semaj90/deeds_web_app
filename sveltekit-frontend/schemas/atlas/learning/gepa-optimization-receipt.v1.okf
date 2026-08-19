@@ -1,0 +1,61 @@
+schema_id: atlas.gepa-optimization-receipt
+schema_version: 1
+schema_kind: program_optimization_receipt
+status: ACTIVE
+
+description: >
+  Offline/shadow receipt for Parent Atlas prompt/program optimization performed by
+  dspy.GEPA, which internally uses gepa-ai/gepa. This receipt never promotes a
+  program by itself; held-out evaluation and an explicit policy promotion receipt
+  remain mandatory.
+
+fields:
+  schema: { type: literal, value: atlas.gepa-optimization-receipt.v1 }
+  receiptId: { type: string, required: true }
+  status:
+    type: enum
+    values: [SHADOW_ONLY, EVALUATED, REJECTED, PROMOTION_ELIGIBLE]
+  optimizer: { type: literal, value: dspy.GEPA }
+  implementation: { type: literal, value: gepa-ai/gepa-via-dspy }
+  parentProgramRevision: { type: string, required: true }
+  optimizedProgramRevision: { type: string, required: true }
+  optimizedProgramChecksum: { type: string, required: true }
+  trainDatasetSnapshotId: { type: string, required: true }
+  trainDatasetChecksum: { type: string, required: true }
+  valDatasetSnapshotId: { type: string, required: true }
+  valDatasetChecksum: { type: string, required: true }
+  studentModelRevision: { type: string, required: true }
+  reflectionModelRevision: { type: string, required: true }
+  metricRevision: { type: string, required: true }
+  metricContract:
+    type: literal
+    value: gold,pred,trace,pred_name,pred_trace->Prediction(score,feedback)
+  budget:
+    type: object
+    fields:
+      mode:
+        type: enum
+        values: [AUTO, MAX_FULL_EVALS, MAX_METRIC_CALLS]
+      value: { type: string, required: true }
+  candidateSelectionStrategy:
+    type: enum
+    values: [pareto, current_best]
+  componentSelector: { type: string, required: true }
+  useMerge: { type: boolean }
+  seed: { type: integer, required: true }
+  numThreads: { type: integer, minimum: 1 }
+  detailedResultsRef: { type: string, nullable: true }
+  heldOutEvaluationReceiptId: { type: string, nullable: true }
+  promotionReceiptId: { type: string, nullable: true }
+  canonicalWrites: { type: literal, value: false }
+  producerRevision: { type: string, required: true }
+  createdAt: { type: datetime, required: true }
+
+invariants:
+  - dspy.GEPA is the DSPy wrapper and the implementation lineage must identify gepa-ai/gepa
+  - exactly one GEPA budget mode is active
+  - train and validation dataset identities must be revisioned and immutable
+  - validation data must be separate from training data for promotion-quality claims
+  - textual feedback is required for Parent Atlas GEPA optimization; a bare scalar metric is insufficient for promotion-quality experiments
+  - the optimized program remains shadow-only until heldOutEvaluationReceiptId and an explicit promotionReceiptId exist
+  - GEPA may optimize DSPy instructions/program text but never directly changes canonical retrieval identity, exact-promotion evidence, filesystem authorization, or model weights
