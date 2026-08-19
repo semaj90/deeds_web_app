@@ -3,9 +3,9 @@ import {
   chooseCandidateBucket,
   type AtlasCandidateBucket,
 } from '$lib/server/atlas/graph/graph-runtime-contracts.js';
+import { ATLAS_CANONICAL_SEMANTIC_DIMENSION } from '$lib/server/atlas/retrieval/qdrant-semantic-projection.js';
 
 const MIB = 1024 * 1024;
-const SEMANTIC_DIMENSION = 768;
 
 export type GpuTelemetrySource = 'rapids-sidecar-cupy' | 'cuda-runtime' | 'nvml' | 'unavailable';
 
@@ -64,7 +64,7 @@ export const DEFAULT_GPU_RESIDENCY_POLICY_V1: GpuResidencyPolicyV1 = {
   semanticReservedBytes: 0,
   workspaceReservedBytes: 0,
   semanticCacheFraction: 0.5,
-  semanticVectorBytes: SEMANTIC_DIMENSION * 2, // FP16 resident search cache
+  semanticVectorBytes: ATLAS_CANONICAL_SEMANTIC_DIMENSION * 2, // semantic_512 FP16 resident cache
   minimumLeaseBytesByBucket: {
     32: 384 * MIB,
     64: 512 * MIB,
@@ -139,8 +139,6 @@ export function planGpuResidencyV1(
     };
   }
 
-  // observed free is authoritative for current pressure; the total-based bound
-  // also preserves explicit future reservations (model/KV/graph/etc.).
   const freeAfterSafety = Math.max(0, telemetry.freeVramBytes - policy.safetyBytes);
   const uncommittedFromTotal = Math.max(
     0,
