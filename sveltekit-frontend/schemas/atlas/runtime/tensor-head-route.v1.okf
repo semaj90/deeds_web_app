@@ -1,0 +1,69 @@
+schema_id: atlas.tensor-head-route
+schema_version: 1
+schema_kind: model_route
+status: ACTIVE
+
+description: >
+  Deterministic request-scoped selection of one or more tensor heads/experts from
+  revision-qualified Parent Atlas evidence. The route is a derived execution
+  decision, never canonical retrieval truth, graph truth, ontology truth, or
+  symbol identity.
+
+fields:
+  schema: { type: literal, value: atlas.tensor-head-route.v1 }
+  routeId: { type: string, required: true }
+  requestId: { type: string, required: true }
+  taskClass:
+    type: enum
+    values: [POS_TAGGING, DOMAIN_CLASSIFICATION, RERANKING, HYPERGRAPH_RAG, PREFILL, DECODE, INFERENCE, INDEX_ENRICHMENT]
+  featureSnapshotRef: { type: string, required: true }
+  featureRevision: { type: string, required: true }
+  representationRevision: { type: string, required: true }
+  graphRevision: { type: string, nullable: true }
+  ontologyRevision: { type: string, nullable: true }
+  routerRevision: { type: string, required: true }
+  routingMode:
+    type: enum
+    values: [DETERMINISTIC_RULES, LINEAR_LOGISTIC, XGBOOST, PYTORCH_DENSE, PYTORCH_MOE_SHADOW]
+  decisionFunction:
+    type: enum
+    values: [ARGMAX, TOPK, SOFTMAX, SPARSEMAX]
+  topK: { type: integer, minimum: 1 }
+  selectedHeads:
+    type: array
+    items:
+      headId: { type: string, required: true }
+      score: { type: number, required: true }
+      normalizedWeight: { type: number, minimum: 0, maximum: 1 }
+      executor: { type: string, required: true }
+      modelRevision: { type: string, nullable: true }
+  shadowHeads:
+    type: array
+    items:
+      headId: { type: string, required: true }
+      score: { type: number, required: true }
+      reason: { type: string, required: true }
+  consumedSignals: { type: string_array, default: [] }
+  missingSignals: { type: string_array, default: [] }
+  geometrySignals:
+    type: array
+    items:
+      type: enum
+      values: [SIGNED_S3, QUATERNION_ROTATION, SPHERICAL_HARMONICS, JACOBIAN_DIAGNOSTIC, HILBERT_PROJECTION]
+  exactPromotionRequired: { type: boolean }
+  canonicalWrites: { type: literal, value: false }
+  seed: { type: string, required: true }
+  environmentReceiptId: { type: string, nullable: true }
+  gpuLeaseId: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - selected heads are execution/ranking helpers; no head may mint canonicalId, packetKey, symbolVersionId, treeNodeId, ontology truth, or hyperedge truth
+  - PYTORCH_MOE_SHADOW cannot affect canonical ranking or mutation authorization until a separate promotion receipt proves it
+  - graph/PageRank, ontology-linked tuples, POS/domain labels, semantic_768, and AST signals remain independent evidence inputs
+  - geometry signals are optional derived features; missing geometry is UNKNOWN, not zero evidence
+  - a 2x2 Jacobian may describe a derivative for R2->R2 but is not a routing law
+  - unexplained prime/numerology constants are forbidden from routing policy
+  - n-ary/hypergraph relations remain canonical relations; HILBERT_PROJECTION is only a numerical embedding of evidence
+  - exactPromotionRequired=true means all mutation-critical outputs must still cross the canonical exact-promotion boundary
