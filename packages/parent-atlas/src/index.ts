@@ -90,6 +90,7 @@ export * from './core/relationship-query-repository.js';
 export * from './core/feature-matrix.js';
 export * from './core/feature-matrix-materializer.js';
 export * from './core/feature-signal-alignment.js';
+export * from './core/aligned-snapshot-experiment.js';
 export * from './core/model-signal-receipt.js';
 export * from './core/adaptive-hypergraph-chain.js';
 export * from './core/retrieval-action-receipt.js';
