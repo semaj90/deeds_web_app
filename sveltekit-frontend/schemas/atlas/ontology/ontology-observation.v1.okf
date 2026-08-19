@@ -1,0 +1,47 @@
+schema_id: atlas.ontology-observation
+schema_version: 1
+schema_kind: derived_evidence
+status: ACTIVE
+
+description: >
+  Non-canonical ontology/taxonomy/domain observation emitted by Python or another
+  analysis executor from revisioned canonical tuples/evidence. Observations may be
+  validated and promoted by the canonical Atlas materializer, but analysis runtimes
+  must never mint canonical tuple/hyperedge identity directly.
+
+fields:
+  schema: { type: literal, value: atlas.ontology-observation.v1 }
+  observationId: { type: string, required: true }
+  observationKind:
+    type: enum
+    values: [RDF_PATTERN, NETWORKX_PATTERN, SOUFFLE_DERIVATION, XGBOOST_CLASSIFICATION, PYTORCH_CLASSIFICATION, ONTOLOGY_LINK]
+  subjectId: { type: string, required: true }
+  predicate: { type: string, required: true }
+  objectId: { type: string, required: true }
+  workspaceRevision: { type: string, required: true }
+  sourceRevision: { type: string, required: true }
+  ontologyRevision: { type: string, nullable: true }
+  sourceTupleIds: { type: string_array, required: true }
+  sourceHyperedgeRefs: { type: string_array, default: [] }
+  evidenceRefs: { type: string_array, required: true }
+  confidence: { type: number, minimum: 0, maximum: 1 }
+  producer:
+    type: object
+    fields:
+      runtime: { type: enum, values: [PYTHON, SOUFFLE, NATIVE, OTHER] }
+      executor: { type: string, required: true }
+      revision: { type: string, required: true }
+  validationState:
+    type: enum
+    values: [UNVALIDATED, VALIDATED, REJECTED, PROMOTED]
+  validationReceiptId: { type: string, nullable: true }
+  promotedTupleId: { type: string, nullable: true }
+  promotedHyperedgeId: { type: string, nullable: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - validationState defaults to UNVALIDATED for analysis-runtime output
+  - sourceTupleIds and evidenceRefs must be non-empty; a learned score without grounded lineage is not promotable
+  - PROMOTED requires validationReceiptId and at least one promoted canonical tuple/hyperedge identifier
+  - RDFLib/NetworkX/Souffle/PyTorch/XGBoost outputs remain observations until canonical validation/materialization succeeds
+  - observationId/checksum are evidence identities and never replace canonical tuple_id/hyperedge_id
