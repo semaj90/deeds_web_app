@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the single Parent Atlas aligned-snapshot experiment and emit proof envelope."""
+"""Run Parent Atlas aligned-snapshot experiment v2 and emit proof envelope."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ PYTHON_ROOT = ROOT / "python"
 if str(PYTHON_ROOT) not in sys.path:
     sys.path.insert(0, str(PYTHON_ROOT))
 
-from atlas_compute.aligned_snapshot_experiment import run_aligned_snapshot_experiment
+from atlas_compute.aligned_snapshot_experiment_v2 import run_aligned_snapshot_experiment_v2
 from atlas_compute.gpu_memory import GpuMemorySampler
 
 
@@ -31,8 +31,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--semantic-manifest", required=True)
     parser.add_argument("--spec", required=True)
-    parser.add_argument("--output", default="reports/aligned-snapshot-experiment.json")
-    parser.add_argument("--envelope", default="reports/aligned-snapshot-proof-envelope.json")
+    parser.add_argument("--output", default="reports/aligned-snapshot-experiment-v2.json")
+    parser.add_argument("--envelope", default="reports/aligned-snapshot-proof-envelope-v2.json")
     parser.add_argument("--gpu-device", type=int, default=0)
     args = parser.parse_args()
 
@@ -43,7 +43,7 @@ def main() -> int:
 
     sampler = GpuMemorySampler(device_index=args.gpu_device).start()
     try:
-        receipt = run_aligned_snapshot_experiment(
+        receipt = run_aligned_snapshot_experiment_v2(
             semantic_manifest_path=semantic_manifest,
             experiment_spec_path=spec,
             output_path=output,
@@ -51,9 +51,8 @@ def main() -> int:
     finally:
         memory_receipt = sampler.stop()
 
-    experiment = receipt.to_dict()
     envelope_without_checksum = {
-        "schema": "atlas.aligned-snapshot-proof-envelope.v1",
+        "schema": "atlas.aligned-snapshot-proof-envelope.v2",
         "semantic_manifest_path": str(semantic_manifest),
         "semantic_manifest_file_checksum": sha256_file(semantic_manifest),
         "experiment_spec_path": str(spec),
@@ -77,11 +76,15 @@ def main() -> int:
             "aligned_feature_matrix_checksum": receipt.aligned_feature_matrix_checksum,
             "row_count": receipt.row_count,
             "aligned_feature_columns": receipt.aligned_feature_columns,
-            "cuvs_cagra": receipt.stages.get("cuvs_cagra", {}).get("status"),
+            "pytorch_cuvs_exact_topk_overlap": receipt.pytorch_cuvs_exact_topk_overlap,
+            "cagra_recall_at_k": receipt.cagra_recall_at_k,
+            "qdrant_hnsw_best_recall_at_k": receipt.qdrant_hnsw_best_recall_at_k,
+            "cuvs_cagra": receipt.stages.get("cuvs_exact_cagra", {}).get("status"),
             "qdrant_hnsw": receipt.stages.get("qdrant_hnsw", {}).get("status"),
             "soft_kmeans": receipt.stages.get("soft_kmeans", {}).get("status"),
             "som": receipt.stages.get("som", {}).get("status"),
             "nary_sparse": receipt.stages.get("nary_sparse", {}).get("status"),
+            "ordered_context": receipt.stages.get("ordered_context", {}).get("status"),
             "context_retrieval": receipt.context_retrieval.get("status"),
             "nary_retrieval": receipt.nary_retrieval.get("status"),
         },
