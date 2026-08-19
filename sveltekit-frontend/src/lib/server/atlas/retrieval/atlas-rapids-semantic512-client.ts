@@ -2,9 +2,14 @@ import { ATLAS_CANONICAL_SEMANTIC_DIMENSION } from './qdrant-semantic-projection
 
 export interface AtlasSemantic512CorpusRowV1 {
   packetKey: string;
+  sourceRef?: string | null;
   /** Live atlas_packets currently has no canonical source_revision column. */
   sourceRevision?: string | null;
-  sourceRef?: string | null;
+  sourceVersionReceiptId?: string | null;
+  reconciliationReceiptId?: string | null;
+  workspaceRevision?: number | null;
+  representationRevision?: number | string | null;
+  sourceRepresentationId?: string | null;
   symbolVersionId?: string | null;
   treeNodeId?: string | null;
   featureLabel?: string | null;
@@ -26,8 +31,13 @@ export interface AtlasSemantic512ExactHitV1 {
   rank: number;
   rowIndex: number;
   packetKey: string;
-  sourceRevision: string | null;
   sourceRef: string | null;
+  sourceRevision: string | null;
+  sourceVersionReceiptId: string | null;
+  reconciliationReceiptId: string | null;
+  workspaceRevision: number | null;
+  representationRevision: number | string | null;
+  sourceRepresentationId: string | null;
   symbolVersionId: string | null;
   treeNodeId: string | null;
   featureLabel: string | null;
@@ -36,13 +46,13 @@ export interface AtlasSemantic512ExactHitV1 {
 }
 
 export interface AtlasSemantic512ExactReceiptV1 {
-  schema: 'atlas.semantic512-exact-knn-receipt.v1';
+  schema: 'atlas.semantic512-exact-knn-receipt.v2';
   operation: 'knn.exact';
   backend: 'cuvs.neighbors.brute_force';
   metric: 'cosine';
   algorithmRevision: string;
-  identityRequirement?: 'packet_key';
-  sourceFreshnessAuthority?: 'external-mutation-awareness-receipt';
+  identityRequirement: 'packet_key';
+  sourceFreshnessAuthority: 'external-mutation/source-version-receipt';
   representationId: 'semantic_512';
   representationRevision: string;
   dimension: 512;
@@ -64,6 +74,9 @@ function assertExactRequest(input: AtlasSemantic512ExactRequestV1): void {
   const seen = new Set<string>();
   for (const [index, row] of input.corpus.entries()) {
     if (!row.packetKey?.trim()) throw new Error(`ATLAS_SEMANTIC512_IDENTITY:${index}`);
+    if (row.sourceRepresentationId != null && row.sourceRepresentationId !== 'semantic_512') {
+      throw new Error(`ATLAS_SEMANTIC512_SOURCE_REPRESENTATION:${index}`);
+    }
     if (row.vector.length !== ATLAS_CANONICAL_SEMANTIC_DIMENSION) throw new Error(`ATLAS_SEMANTIC512_CORPUS_DIMENSION:${index}`);
     if (seen.has(row.packetKey)) throw new Error(`ATLAS_SEMANTIC512_DUPLICATE_IDENTITY:${row.packetKey}`);
     seen.add(row.packetKey);
@@ -87,7 +100,14 @@ export function createAtlasRapidsSemantic512Client(
         throw new Error(`ATLAS_SEMANTIC512_HTTP_${response.status}:${detail}`);
       }
       const receipt = await response.json() as AtlasSemantic512ExactReceiptV1;
-      if (receipt.representationId !== 'semantic_512' || receipt.dimension !== 512 || receipt.metric !== 'cosine') {
+      if (
+        receipt.schema !== 'atlas.semantic512-exact-knn-receipt.v2' ||
+        receipt.representationId !== 'semantic_512' ||
+        receipt.dimension !== 512 ||
+        receipt.metric !== 'cosine' ||
+        receipt.identityRequirement !== 'packet_key' ||
+        receipt.sourceFreshnessAuthority !== 'external-mutation/source-version-receipt'
+      ) {
         throw new Error('ATLAS_SEMANTIC512_RECEIPT_CONTRACT_MISMATCH');
       }
       return receipt;
