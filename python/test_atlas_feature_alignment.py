@@ -10,6 +10,7 @@ try:
     from atlas_compute.contextual_windows import contextualize_sliding_windows
     from atlas_compute.feature_alignment import FeatureBlock, align_feature_blocks
     from atlas_compute.interpolation import interpolate_topology_field
+    from atlas_compute.nary_feature_propagation import propagate_nary_features
     from atlas_compute.som import aggregate_som_lattice, train_deterministic_som
     from atlas_compute.sparse_relations import (
         build_binary_incidence,
@@ -84,6 +85,24 @@ class FeatureAlignmentTests(unittest.TestCase):
         output, receipt = sparse_relation_spmm(relation, features)
         np.testing.assert_allclose(output.numpy(), np.array([[4.0, 4.0], [0.0, 2.0]], dtype=np.float32))
         self.assertEqual(receipt.nnz, 3)
+
+    def test_nary_feature_propagation_only_weights_existing_memberships(self) -> None:
+        output, receipt = propagate_nary_features(
+            ["entity:a", "entity:b"],
+            ["relationship:r1", "relationship:r2", "relationship:r3"],
+            [
+                ("entity:a", "relationship:r1"),
+                ("entity:a", "relationship:r3"),
+                ("entity:b", "relationship:r2"),
+            ],
+            np.array([[1.0], [10.0], [3.0]], dtype=np.float32),
+            direction="relationship_to_entity",
+            device="cpu",
+        )
+        # Uniform softmax over supported memberships => entity:a gets mean(1,3), entity:b gets 10.
+        np.testing.assert_allclose(output.numpy(), np.array([[2.0], [10.0]], dtype=np.float32), atol=1e-6)
+        self.assertFalse(receipt.unsupported_membership_created)
+        self.assertEqual(receipt.incidence_nnz, 3)
 
     def test_sparse_policy_uses_density_and_size_not_mosparse_claim(self) -> None:
         small = choose_sparse_compute_mode(rows=8, columns=8, nnz=4)
