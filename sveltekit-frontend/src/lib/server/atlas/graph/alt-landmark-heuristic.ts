@@ -33,6 +33,42 @@ function finiteDistance(value: number): boolean {
   return Number.isFinite(value) && value >= 0;
 }
 
+function numericPolicy(snapshot: LandmarkDistanceSnapshotV1): {
+  guard: number;
+  admissibility: AStarHeuristicReceiptV1['admissibility'];
+  mayTerminateExactSearch: boolean;
+  mayClaimOptimality: boolean;
+} {
+  if (snapshot.distanceExactness === 'EXACT_INTEGER') {
+    return {
+      guard: 0,
+      admissibility: 'PROVEN_LOWER_BOUND',
+      mayTerminateExactSearch: true,
+      mayClaimOptimality: true,
+    };
+  }
+
+  if (snapshot.floatingErrorBoundCertified && snapshot.distanceAbsoluteErrorBound !== null) {
+    // Every triangle term subtracts two independently stored distances. If each
+    // is within epsilon of the true value, the raw difference can overestimate
+    // the true difference by at most 2*epsilon. Subtracting that amount restores
+    // a conservative lower bound before clamping at zero.
+    return {
+      guard: 2 * snapshot.distanceAbsoluteErrorBound,
+      admissibility: 'PROVEN_LOWER_BOUND',
+      mayTerminateExactSearch: true,
+      mayClaimOptimality: true,
+    };
+  }
+
+  return {
+    guard: 0,
+    admissibility: 'UNPROVEN_NUMERIC',
+    mayTerminateExactSearch: false,
+    mayClaimOptimality: false,
+  };
+}
+
 /**
  * Exact undirected ALT lower bound:
  *   h(v,t) = max_l |d(l,t) - d(l,v)|
@@ -45,6 +81,10 @@ function finiteDistance(value: number): boolean {
  * Terms involving unreachable landmark/node pairs are skipped rather than
  * converted to zero. A landmark contributes only when both distances for the
  * corresponding triangle-inequality term are finite.
+ *
+ * Floating snapshots are exact-search authoritative only when their producer
+ * supplies a certified absolute distance error epsilon. We then subtract
+ * 2*epsilon from every difference term, restoring a conservative bound.
  */
 export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHeuristicEvaluationResult {
   const snapshot = LandmarkDistanceSnapshotV1Schema.parse(input.snapshot);
@@ -60,6 +100,7 @@ export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHe
     throw new Error('Directed ALT evaluation requires reverse-distance accessor');
   }
 
+  const policy = numericPolicy(snapshot);
   const out = new Float64Array(input.frontierOrdinals.length);
   let unreachablePairCount = 0;
   let minimum = Number.POSITIVE_INFINITY;
@@ -75,7 +116,8 @@ export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHe
 
       if (!snapshot.directed) {
         if (finiteDistance(landmarkToTarget) && finiteDistance(landmarkToNode)) {
-          best = Math.max(best, Math.abs(landmarkToTarget - landmarkToNode));
+          const raw = Math.abs(landmarkToTarget - landmarkToNode);
+          best = Math.max(best, raw - policy.guard);
         } else {
           unreachablePairCount += 1;
         }
@@ -83,7 +125,8 @@ export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHe
       }
 
       if (finiteDistance(landmarkToTarget) && finiteDistance(landmarkToNode)) {
-        best = Math.max(best, landmarkToTarget - landmarkToNode);
+        const raw = landmarkToTarget - landmarkToNode;
+        best = Math.max(best, raw - policy.guard);
       } else {
         unreachablePairCount += 1;
       }
@@ -91,7 +134,8 @@ export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHe
       const nodeToLandmark = input.accessor.reverse?.(landmarkIndex, nodeOrdinal) ?? Number.POSITIVE_INFINITY;
       const targetToLandmark = input.accessor.reverse?.(landmarkIndex, input.targetOrdinal) ?? Number.POSITIVE_INFINITY;
       if (finiteDistance(nodeToLandmark) && finiteDistance(targetToLandmark)) {
-        best = Math.max(best, nodeToLandmark - targetToLandmark);
+        const raw = nodeToLandmark - targetToLandmark;
+        best = Math.max(best, raw - policy.guard);
       } else {
         unreachablePairCount += 1;
       }
@@ -114,7 +158,10 @@ export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHe
       logicalLane: 'graph',
       landmarkRevision: snapshot.landmarkRevision,
       heuristicExecutor: input.executor ?? 'TYPESCRIPT_REFERENCE',
-      admissibility: 'PROVEN_LOWER_BOUND',
+      admissibility: policy.admissibility,
+      numericGuardApplied: policy.guard,
+      mayTerminateExactSearch: policy.mayTerminateExactSearch,
+      mayClaimOptimality: policy.mayClaimOptimality,
       frontierCount: input.frontierOrdinals.length,
       landmarkCount: snapshot.landmarkCount,
       heuristicMinimum: input.frontierOrdinals.length > 0 ? minimum : null,
@@ -130,8 +177,8 @@ export function evaluateAltLowerBound(input: AltHeuristicEvaluationInput): AltHe
 }
 
 /**
- * Safe exact-search priority. Aggressive heuristics should only be used as a
- * secondary tie-breaker or shadow queue; they must not replace this value.
+ * Safe exact-search priority. Callers must only give termination authority to
+ * a heuristic receipt whose mayTerminateExactSearch flag is true.
  */
 export function altAStarPriority(pathCostG: number, admissibleLowerBoundH: number): number {
   if (!Number.isFinite(pathCostG) || pathCostG < 0) throw new Error('A* g cost must be finite and non-negative');
