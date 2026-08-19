@@ -1,0 +1,10 @@
+# Parent Atlas observation/NLP extraction runtime.
+#
+# Keep PyTorch out of this file: the workstation already owns the CUDA/PyTorch
+# environment, and pip-resolving another torch wheel here can silently replace
+# the validated CUDA build.
+#
+# LangExtract 1.6.0: source-grounded model-assisted extraction.
+# Stanza 1.14.0: tokenization / lemma / POS / morphology / dependency parsing.
+langextract==1.6.0
+stanza==1.14.0
