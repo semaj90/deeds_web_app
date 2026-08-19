@@ -1,24 +1,9 @@
 /**
- * Graph Analysis Run/Promotion Contract — GA0 (Patch A: contracts only, no behavior change).
+ * Graph Analysis Run/Promotion Contract — GA0.
  *
- * The lineage backbone every graph algorithm's results reference, so PageRank,
- * CheiRank, Louvain, Leiden, k-core, and betweenness don't each invent their
- * own persistence semantics.
- *
- *   canonical source graph -> GraphAnalysisRun -> algorithm-specific results
- *     -> evaluation -> promotion -> FeatureRow
- *
- * Analysis results are not retrieval features merely because they exist —
- * GraphAnalysisRun proves a run happened; promotion into FeatureRowV1 proves
- * the result is useful for retrieval. Keep those two proofs separate.
- *
- * Relationship to existing PageRank-specific contracts (audited, not
- * duplicated — see openspec/changes/parent-atlas-graph-analysis-contract):
- *   - graph-contract.ts's GraphSnapshotSchema/PageRankRunSchema and
- *     pagerank-authority-contract.ts's PageRankAuthorityRecordSchema are the
- *     mature, PageRank-specific version of this pattern. This file
- *     generalizes it across algorithms; migrating PageRank onto
- *     GraphAnalysisRun is a later patch (Patch C), not done here.
+ * GraphAnalysisRunSchema remains the persisted V1-compatible shape.
+ * GraphAnalysisRunV2Schema adds projectionHash so every promoted graph-analysis
+ * lineage can prove the exact projection semantics it consumed.
  */
 
 import { z } from 'zod';
@@ -41,11 +26,6 @@ export type GraphAlgorithm = z.infer<typeof GraphAlgorithmSchema>;
 export const GraphAnalysisRunStatusSchema = AnalysisRunEnvelopeSchema.shape.status;
 export type GraphAnalysisRunStatus = AnalysisRunEnvelope['status'];
 
-/**
- * One row per algorithm execution. Individual metric/community results
- * reference `runId` — never write algorithm-specific columns onto
- * atlas_packets.
- */
 export const GraphAnalysisRunSchema = AnalysisRunEnvelopeSchema.extend({
 	algorithm: GraphAlgorithmSchema,
 	graphRevision: z.string().min(1),
@@ -53,16 +33,18 @@ export const GraphAnalysisRunSchema = AnalysisRunEnvelopeSchema.extend({
 	projectionName: z.string().min(1),
 	nodeCount: z.number().int().nonnegative(),
 	relationshipCount: z.number().int().nonnegative(),
-})
-	.strict();
+}).strict();
 export type GraphAnalysisRun = z.infer<typeof GraphAnalysisRunSchema>;
 
 /**
- * graph_node_metrics row shape. Bounded to offline graph-analysis results
- * whose dimensionality varies by algorithm (pagerank, cheirank, kcore,
- * betweenness as rows). This is NOT a general EAV table for every Parent
- * Atlas feature — FeatureRowV1 below stays typed and small.
+ * Versioned lineage-hardening shape. V1 remains readable; all new PageRank,
+ * PPR, community, and centrality promotion paths should require V2.
  */
+export const GraphAnalysisRunV2Schema = GraphAnalysisRunSchema.extend({
+	projectionHash: z.string().min(1),
+}).strict();
+export type GraphAnalysisRunV2 = z.infer<typeof GraphAnalysisRunV2Schema>;
+
 export const GraphMetricResultSchema = z
 	.object({
 		runId: z.string().min(1),
@@ -77,12 +59,6 @@ export const GraphMetricResultSchema = z
 	.strict();
 export type GraphMetricResult = z.infer<typeof GraphMetricResultSchema>;
 
-/**
- * graph_community_assignments row shape — a single algorithm's assignment of
- * one packet to one community. Not the taxonomy itself (see
- * CommunityTaxonomyRecord below) — an assignment is merely an algorithm
- * output, e.g. `leiden_community_id: 46271` on its own is not a taxonomy.
- */
 export const CommunityAssignmentSchema = z
 	.object({
 		runId: z.string().min(1),
@@ -96,11 +72,6 @@ export const CommunityAssignmentSchema = z
 	.strict();
 export type CommunityAssignment = z.infer<typeof CommunityAssignmentSchema>;
 
-/**
- * graph_communities row shape — the taxonomy record. One row per discovered
- * community, carrying representative members and quality metadata, distinct
- * from the per-packet assignments above.
- */
 export const CommunityTaxonomyRecordSchema = z
 	.object({
 		runId: z.string().min(1),
@@ -118,11 +89,6 @@ export const CommunityTaxonomyRecordSchema = z
 	.strict();
 export type CommunityTaxonomyRecord = z.infer<typeof CommunityTaxonomyRecordSchema>;
 
-/**
- * community-taxonomy-policy.ts's evaluation output (GA3/GA4). Compares
- * Louvain vs. Leiden on the same frozen projection. Never decides promotion
- * by itself — that requires a separate, explicit promotion step (GA9).
- */
 export const CommunityEvaluationSchema = z
 	.object({
 		graphRevision: z.string().min(1),
@@ -140,12 +106,6 @@ export const CommunityEvaluationSchema = z
 	.strict();
 export type CommunityEvaluation = z.infer<typeof CommunityEvaluationSchema>;
 
-/**
- * Baseline retrieval feature row (GA9 — promoted only). Deliberately small.
- * Candidate additions (cheirank, kcore, betweenness, communityAffinity, ppr,
- * bfsHops, weightedPathCost) stay out until an ablation (GA8) proves value —
- * adding them speculatively makes attribution impossible.
- */
 export const FeatureRowV1Schema = z
 	.object({
 		packetKey: z.string().min(1),
