@@ -1,0 +1,63 @@
+schema_id: atlas.hybrid-sequence-state
+schema_version: 1
+schema_kind: runtime_sequence_state
+status: ACTIVE
+
+description: >
+  Runtime memory/accounting contract for dense hybrid sequence models such as
+  Ornith-1.0-9B/Qwen3.5. It separates recurrent Gated-DeltaNet state from
+  conventional full-attention KV state instead of treating every layer as an
+  ordinary Transformer KV-cache layer.
+
+fields:
+  schema: { type: literal, value: atlas.hybrid-sequence-state.v1 }
+  modelId: { type: string, required: true }
+  modelRevision: { type: string, required: true }
+  architecture:
+    type: enum
+    values: [HYBRID_GATED_DELTANET_FULL_ATTENTION]
+  parameterization:
+    type: enum
+    values: [DENSE_FFN, SPARSE_MOE]
+  totalTextLayers: { type: integer, minimum: 1 }
+  deltaNetLayerCount: { type: integer, minimum: 0 }
+  fullAttentionLayerCount: { type: integer, minimum: 0 }
+  fullAttentionInterval: { type: integer, minimum: 1 }
+  layerTypes: { type: string_array, required: true }
+  dtype: { type: string, required: true }
+  batchSize: { type: integer, minimum: 1 }
+  contextTokens: { type: integer, minimum: 0 }
+  deltaNetState:
+    type: object
+    fields:
+      bytesPerLayer: { type: integer, minimum: 0 }
+      totalBytes: { type: integer, minimum: 0 }
+      implementation: { type: string, required: true }
+      offloadable: { type: boolean }
+  fullAttentionKv:
+    type: object
+    fields:
+      bytesPerTokenPerLayer: { type: integer, minimum: 0 }
+      totalBytes: { type: integer, minimum: 0 }
+      keyCacheBytes: { type: integer, minimum: 0 }
+      valueCacheBytes: { type: integer, minimum: 0 }
+      implementation: { type: string, required: true }
+      paged: { type: boolean }
+      quantization: { type: string, nullable: true }
+  workspaceBytes: { type: integer, minimum: 0 }
+  modelWeightBytes: { type: integer, minimum: 0 }
+  totalEstimatedBytes: { type: integer, minimum: 0 }
+  environmentReceiptId: { type: string, nullable: true }
+  gpuLeaseId: { type: string, nullable: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - totalTextLayers must equal deltaNetLayerCount + fullAttentionLayerCount
+  - for Ornith-1.0-9B at the pinned model revision, totalTextLayers=32, deltaNetLayerCount=24, fullAttentionLayerCount=8, and fullAttentionInterval=4
+  - parameterization DENSE_FFN does not imply ordinary full-attention Transformer sequence architecture
+  - Gated DeltaNet recurrent state and full-attention KV cache are accounted separately
+  - full-attention KV growth is context-length dependent; recurrent DeltaNet state must not be estimated with the same per-token KV formula
+  - FlashAttention/SDPA acceleration applies to full-attention layers and is not proof of DeltaNet kernel acceleration
+  - FLA/causal_conv1d/PyTorch/Triton DeltaNet executors are runtime choices and do not alter model identity
+  - TensorRT-LLM may be selected only after exact model-revision and hybrid-architecture support are proven
