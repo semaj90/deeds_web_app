@@ -97,16 +97,20 @@ export const AlgorithmFamilySchema = z.enum([
 ]);
 export type AlgorithmFamily = z.infer<typeof AlgorithmFamilySchema>;
 
+/**
+ * Algorithm names are implementation-agnostic. Do not put Qdrant, cuVS,
+ * cuGraph, NetworkX, PyTorch, simdjson, MCP, etc. in this enum; those belong
+ * to backend/transport identity below.
+ */
 export const AlgorithmIdSchema = z.enum([
-  'QDRANT_KNN',
-  'CUVS_BRUTE_FORCE_KNN',
-  'CUVS_CAGRA_KNN',
-  'PYTORCH_TOPK',
-  'NETWORKX_ASTAR',
-  'NETWORKX_BFS',
-  'CUGRAPH_BFS',
-  'CUGRAPH_SSSP',
-  'NEO4J_NEIGHBORHOOD',
+  'VECTOR_KNN',
+  'BRUTE_FORCE_KNN',
+  'CAGRA_KNN',
+  'TOPK',
+  'A_STAR',
+  'BREADTH_FIRST',
+  'SSSP',
+  'NEIGHBORHOOD_EXPANSION',
   'PAGERANK',
   'LEIDEN',
   'SCC_CONDENSATION',
@@ -120,8 +124,8 @@ export const AlgorithmIdSchema = z.enum([
   'CROSS_ENCODER_RERANK',
   'MODEL_MOE_ROUTING',
   'EXTERNAL_SOFTMAX_ROUTING',
-  'SIMDJSON_PARSE',
-  'MCP_TOOL_CALL',
+  'JSON_PARSE',
+  'TOOL_CALL',
 ]);
 export type AlgorithmId = z.infer<typeof AlgorithmIdSchema>;
 
