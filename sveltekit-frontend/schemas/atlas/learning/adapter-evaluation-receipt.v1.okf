@@ -1,0 +1,55 @@
+schema_id: atlas.adapter-evaluation-receipt
+schema_version: 1
+schema_kind: model_evaluation_receipt
+status: ACTIVE
+
+description: >
+  Held-out evaluation receipt comparing a baseline route/model with one candidate
+  adapter or learned policy on the same immutable evaluation snapshot.
+
+fields:
+  schema: { type: literal, value: atlas.adapter-evaluation-receipt.v1 }
+  receiptId: { type: string, required: true }
+  evaluationSnapshotId: { type: string, required: true }
+  evaluationSnapshotChecksum: { type: string, required: true }
+  baseline:
+    type: object
+    fields:
+      modelRevision: { type: string, required: true }
+      adapterRevision: { type: string, nullable: true }
+      metrics: { type: json, required: true }
+  candidate:
+    type: object
+    fields:
+      modelRevision: { type: string, required: true }
+      adapterRevision: { type: string, nullable: true }
+      trainingReceiptId: { type: string, nullable: true }
+      metrics: { type: json, required: true }
+  requiredMetrics:
+    type: object
+    fields:
+      toolCallJsonValidity: { type: boolean }
+      exactPromotionGroundedAccuracy: { type: boolean }
+      boundedRepairSuccess: { type: boolean }
+      compileTestSuccess: { type: boolean }
+      unsupportedClaimRate: { type: boolean }
+      regressionRate: { type: boolean }
+      latency: { type: boolean }
+      tokenCost: { type: boolean }
+      peakGpuBytes: { type: boolean }
+  decision:
+    type: enum
+    values: [PROMOTE, REJECT, MORE_EVIDENCE_REQUIRED]
+  reasons: { type: string_array, default: [] }
+  environmentReceiptIds: { type: string_array, default: [] }
+  startedAt: { type: datetime, required: true }
+  finishedAt: { type: datetime, required: true }
+  producerRevision: { type: string, required: true }
+  checksum: { type: string, required: true }
+
+invariants:
+  - baseline and candidate must use the same evaluationSnapshotId/checksum
+  - training-set metrics are not sufficient for PROMOTE
+  - PROMOTE requires all requiredMetrics to be present and evaluated
+  - candidate performance must not materially increase invalid mutations, unsupported claims, or resource-policy violations
+  - every adapterRevision evaluated must be traceable to a training receipt unless it is the declared baseline
