@@ -2,6 +2,8 @@
 
 Operator correction (2026-08-19): the persisted EmbeddingGemma test corpus that actually exists is 512-dimensional; a production/canonical 768-dimensional Qdrant corpus was not created. Do not promote an assumed 768 store merely because EmbeddingGemma's native output is 768.
 
+Live-storage correction (2026-08-19): the read-only S180-6B audit proved that live `atlas_packets` has complete `source_ref` but **no literal `source_revision` column**. Do not synthesize source revision from `workspace_revision`, `representation_revision`, vector dimension, timestamps, or Qdrant point IDs. Source freshness is a separate mutation-awareness proof.
+
 ## Frozen representation contract
 
 ```text
@@ -26,11 +28,41 @@ semantic_512                 CANONICAL PERSISTED SEMANTIC REPRESENTATION
 
 Candidate buckets `32/64/128/256/512` are row counts and are unrelated to semantic vector dimensionality.
 
+## Source / mutation contract
+
+```text
+source_ref
+   |
+   +--> graph snapshot node content hash
+   +--> current packet/source hash when same hash contract is proven
+   +--> git_mutation_provenance.source_refs[] / changed_files[]
+   +--> snapshot created/finalized time
+   +--> topology hash
+   v
+MutationAwarenessReceiptV1
+   |
+   +--> FRESH
+   +--> UNKNOWN
+   +--> STALE
+   +--> MISSING
+```
+
+Rules:
+
+- `semantic_512`, legacy 768 metadata, `latent_64`, workspace revision and representation revision are **representation/state lineage**, not source freshness.
+- `FRESH`: rankable and eligible for later exact source/AST/type promotion.
+- `UNKNOWN`: rankable for recall, but exact source promotion remains blocked/degraded until current source evidence is hydrated.
+- `STALE`: excluded from execution candidates and ContextManifest; rehydrate/reindex first.
+- `MISSING`: excluded from execution candidates; restore canonical packet/source first.
+- A graph snapshot fallback hash derived from packet metadata MUST NOT be compared to a later raw source SHA-256 as though both hashes had the same contract.
+- Git/source paths are slash-normalized for mutation matching but case is preserved.
+
 ## Identity rules
 
-- PostgreSQL owns packet/source/revision identity.
+- PostgreSQL owns packet/source identity.
 - Qdrant point IDs, KNN row ordinals, KMeans labels, and latent vectors never mint identity.
-- `packet_key` + `source_revision` are mandatory for exact-KNN and autoencoder training admission.
+- `packet_key` is mandatory for exact-KNN row identity. `source_revision` is optional because no canonical live owner exists today.
+- Source freshness is proven by `MutationAwarenessReceiptV1`, not by the KNN identity manifest.
 - `tree_node_id` is conditional structural evidence and may be null until its Tree-sitter/GIS owner resolves it; never fabricate it.
 - `feature_label` is derived classification evidence and may be null; KNN/KMeans/PageRank never produce it.
 - Every `latent_64` row must cite `source_representation_id=semantic_512` and `autoencoder_revision`.
@@ -43,23 +75,36 @@ Candidate buckets `32/64/128/256/512` are row counts and are unrelated to semant
 - [x] S512-2 — Qdrant bounded scorer targets existing `codebase_chunks_512` unnamed cosine collection and joins only by `packet_key`.
 - [x] S512-3 — cuVS exact endpoint implemented with explicit `metric="cosine"`; legacy 768/sqeuclidean smoke endpoint remains separate.
 - [x] S512-4 — SvelteKit synthesis can exact-rerank the same bounded Qdrant rows on cuVS; fails open when identity/GPU is unavailable.
-- [x] S512-5 — Autoencoder trainer implemented as `512 -> 256 -> 64`, emitting model digest, identity checksum, validation loss, peak VRAM, and revisioned latent NDJSON.
+- [x] S512-5 — Autoencoder trainer scaffold implemented as `512 -> 256 -> 64`, emitting model digest, identity checksum, validation loss, peak VRAM, and revisioned latent NDJSON. Admission contract still needs S512-9E correction before live training.
 - [x] S512-6 — cuML KMeans executor implemented over `latent_64`, with explicit `random_state`, algorithm revision, centroids, inertia, and identity-preserving assignments.
 - [x] S512-7 — Separate rebuildable `codebase_topology_64_v2` routing projection materializer implemented; it never mutates semantic_512 evidence.
 - [x] S512-8 — Routed-topK evaluation endpoint implemented; reports Recall@K against full semantic_512 cuVS exact oracle and fails open to full exact corpus when routing is too narrow.
-- [ ] S512-9 — Reconcile/backfill canonical identity payload on the real `codebase_chunks_512` corpus from PostgreSQL. Must be dry-run first, classify ambiguous/conflicting rows, and preserve rollback receipt before apply.
-- [ ] S512-10 — Execute live semantic_512 Qdrant smoke: collection dimension=512, cosine, nonzero rows, packet_key/source_revision coverage reported.
-- [ ] S512-11 — Execute live cuVS cosine proof on real revision-qualified 512 rows and compare exact top-K with Qdrant HNSW Recall@K.
-- [ ] S512-12 — Train AE on the admitted real 512 corpus; reject if validation/neighborhood metrics fail threshold.
+- [x] S512-9A — Live-schema source-version audit reconciled: `source_ref` exists; canonical `source_revision` does not. Fabrication is forbidden.
+- [x] S512-9B — `MutationAwarenessReceiptV1` implemented over graph snapshot time/topology, trusted packet SHA parity, and tracked Git mutations.
+- [x] S512-9C — Synthesis DAG excludes `STALE/MISSING` source occurrences before GPU bucket/ContextManifest construction and exposes UNKNOWN as degraded freshness.
+- [x] S512-9D — Source-ref path normalization added for Git mutation matching; derived snapshot hash vs raw SHA mismatch is guarded.
+- [x] S512-9E — cuVS exact-v2 identity decoupled from nonexistent `source_revision`; packet_key remains deterministic row identity and freshness is externally receipted.
+- [ ] S512-9F — Update AE/KMeans offline admission/materialization to make `source_revision` optional and attach mutation/source-version evidence rather than inventing a revision.
+- [ ] S512-9G — Reconcile/backfill `codebase_chunks_512` payload from PostgreSQL using fields with proven owners; dry-run first, classify ambiguous/conflicting rows, preserve rollback receipt before apply.
+- [ ] S512-10 — Execute live semantic_512 Qdrant smoke: collection dimension=512, cosine, nonzero rows, packet_key coverage, source_ref coverage, and representation lineage reported. `source_revision` absence is not a failure.
+- [ ] S512-11 — Execute live cuVS cosine-v2 proof on real packet-qualified 512 rows and compare exact top-K with Qdrant HNSW Recall@K.
+- [ ] S512-12 — Train AE on admitted real 512 corpus only after S512-9F/9G; reject if validation/neighborhood metrics fail threshold.
 - [ ] S512-13 — Compare AE-64 against deterministic PCA-64 baseline on exact-neighbor Recall@K/MRR/NDCG and routing latency.
 - [ ] S512-14 — Fit seeded KMeans, materialize routing projection, and measure cluster-route Recall@K against full 512 exact oracle.
 - [ ] S512-15 — Promote routing only if it reduces candidate work without breaching retrieval recall budget; otherwise keep latent/KMeans reference-only.
-- [ ] S512-16 — Exact promotion proves source span + Tree-sitter structural identity + compiler-semantic evidence before LLM synthesis.
-- [ ] S512-17 — Reconcile older 384/768 documentation and enums only after runtime proof; do not break broad consumers with an unproven rename.
+- [ ] S512-16 — Exact promotion proves **current** source span + Tree-sitter structural identity + compiler-semantic evidence and resolves UNKNOWN freshness before LLM synthesis.
+- [ ] S512-17 — Reconcile older 384/768 documentation, pgvector columns and enums only after runtime proof; do not break broad consumers with an unproven rename.
 
 ## Promotion invariant
 
 ```text
+source_ref mutation gate
+      |
+      +-- STALE/MISSING --> rehydrate, no DAG execution
+      |
+      +-- FRESH/UNKNOWN
+              |
+              v
 Qdrant ANN candidate
       |
       v
@@ -72,9 +117,11 @@ cuVS semantic_512 exact cosine
       v
 CandidateFeatureMatrix
       v
-exact source/AST/type promotion
+exact current source/AST/type promotion
       v
 ContextManifestV1
+      v
+synthesis
 ```
 
-No derived executor gets an independent RRF vote merely because it uses a different backend.
+No derived executor gets an independent RRF vote merely because it uses a different backend. Vector dimensionality is never a source mutation/version signal.
