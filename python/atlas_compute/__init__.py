@@ -32,6 +32,7 @@ from .moe_grouped_mm import MoeGroupedMmReceipt, run_grouped_mm_experiment
 from .nary_feature_propagation import NaryFeaturePropagationReceipt, propagate_nary_features
 from .neural_router import NeuralRouterReceipt, train_receipt_router
 from .ordered_context import OrderedContextReceipt, contextualize_explicit_order
+from .qdrant_exact_alignment import QdrantExactAlignmentReceipt, compare_pytorch_and_qdrant_exact
 from .rapids_matrix import (
     RapidsKMeansReceipt,
     RapidsPcaReceipt,
