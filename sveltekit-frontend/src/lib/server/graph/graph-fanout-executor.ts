@@ -103,7 +103,7 @@ async function executeValidatedGraphFanoutPlanNeo4j(plan: GraphFanoutPlanV1): Pr
 						       labels(neighbor) AS labels,
 						       relationshipType
 						ORDER BY canonicalId ASC
-						LIMIT $limit
+						LIMIT toInteger($limit)
 					`;
 					const result = await session.run(query, { parentCanonicalId, limit: relationLimit });
 					visitedEdgeCount += result.records.length;
